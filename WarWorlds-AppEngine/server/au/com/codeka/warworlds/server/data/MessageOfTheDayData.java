@@ -20,7 +20,7 @@ import com.google.appengine.api.datastore.Text;
  * @author dean@codeka.com.au
  */
 @PersistenceCapable(identityType = IdentityType.APPLICATION)
-public class MessageOfTheDay {
+public class MessageOfTheDayData {
 
 	/**
 	 * There's only ever one MessageOfTheDay, but this makes it easy
@@ -36,7 +36,7 @@ public class MessageOfTheDay {
 	@Persistent
 	private Date postedDate;
 
-	public MessageOfTheDay(Key key) {
+	public MessageOfTheDayData(Key key) {
 		this.key = key;
 	}
 	
@@ -67,11 +67,11 @@ public class MessageOfTheDay {
 	/**
 	 * Fetches the current MOTD from the data store. (TODO: cache)
 	 */
-	public static MessageOfTheDay getCurrentMotd() {
+	public static MessageOfTheDayData getCurrentMotd() {
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		try {
-			Key key = KeyFactory.createKey(MessageOfTheDay.class.getSimpleName(), 1);
-			MessageOfTheDay motd = pm.getObjectById(MessageOfTheDay.class, key);
+			Key key = KeyFactory.createKey(MessageOfTheDayData.class.getSimpleName(), 1);
+			MessageOfTheDayData motd = pm.getObjectById(MessageOfTheDayData.class, key);
 			return motd;
 		} catch (JDOObjectNotFoundException e) {
 			return null;
@@ -84,10 +84,10 @@ public class MessageOfTheDay {
 	 * Saves the given message as the current MOTD.
 	 */
 	public static void updateMotd(String message) {
-		MessageOfTheDay motd = getCurrentMotd();
+		MessageOfTheDayData motd = getCurrentMotd();
 		if (motd == null) {
-			Key key = KeyFactory.createKey(MessageOfTheDay.class.getSimpleName(), 1);
-			motd = new MessageOfTheDay(key);
+			Key key = KeyFactory.createKey(MessageOfTheDayData.class.getSimpleName(), 1);
+			motd = new MessageOfTheDayData(key);
 		}
 		motd.setMessage(message);
 		motd.setPostedDate(new Date());
@@ -102,7 +102,7 @@ public class MessageOfTheDay {
 	
 	@Override
 	public String toString() {
-		return "MessageOfTheDay[key="+key+", message="+message.toString().substring(0,100)+"..."
+		return "MessageOfTheDayData[key="+key+", message="+message.toString().substring(0,100)+"..."
 		      +", postedDate="+postedDate+"]";
 	}
 }

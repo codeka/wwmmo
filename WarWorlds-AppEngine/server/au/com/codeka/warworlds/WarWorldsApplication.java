@@ -5,6 +5,8 @@ import org.restlet.Restlet;
 import org.restlet.resource.Directory;
 import org.restlet.routing.Router;
 
+import au.com.codeka.warworlds.server.MessageOfTheDayServerResource;
+
 public class WarWorldsApplication extends Application {
 
 	@Override

@@ -46,6 +46,7 @@ public class MotdPage extends BasePage {
 	        	motd.setPostDate(new Date());
 
 	        	MessageOfTheDayResourceProxy proxy = GWT.create(MessageOfTheDayResourceProxy.class);
+	        	proxy.getClientResource().setReference("/motd");
 	        	proxy.store(motd, new Result<Void>() {
 
 					@Override
@@ -70,6 +71,7 @@ public class MotdPage extends BasePage {
 		saveMotd.setEnabled(false);
 
     	MessageOfTheDayResourceProxy proxy = GWT.create(MessageOfTheDayResourceProxy.class);
+    	proxy.getClientResource().setReference("/motd");
     	proxy.retrieve(new Result<MessageOfTheDay>() {
 
 			@Override
