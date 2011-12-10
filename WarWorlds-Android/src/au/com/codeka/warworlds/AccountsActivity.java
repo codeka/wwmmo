@@ -85,6 +85,8 @@ public class AccountsActivity extends Activity {
      */
     private Context mContext = this;
 
+    private ProgressDialog mPleaseWaitDialog;
+    
     /**
      * Begins the activity.
      */
@@ -112,8 +114,8 @@ public class AccountsActivity extends Activity {
         if (mPendingAuth) {
             mPendingAuth = false;
             String regId = C2DMessaging.getRegistrationId(mContext);
-            if (regId != null && !"".equals(regId)) {
-                DeviceRegistrar.registerOrUnregister(mContext, regId, true);
+            if (regId != null && ! "".equals(regId)) {
+                DeviceRegistrar.register(mContext, regId);
             } else {
                 C2DMessaging.register(mContext, Setup.SENDER_ID);
             }
@@ -153,9 +155,6 @@ public class AccountsActivity extends Activity {
             final Button logInButton = (Button) findViewById(R.id.log_in_btn);
             logInButton.setOnClickListener(new OnClickListener() {
                 public void onClick(View v) {
-                    // Set "connecting" status
-                    SharedPreferences prefs = Util.getSharedPreferences(mContext);
-                    prefs.edit().putString(Util.CONNECTION_STATUS, Util.CONNECTING).commit();
                     // Get account name
                     mAccountSelectedPosition = listView.getCheckedItemPosition();
                     TextView account = (TextView) listView.getChildAt(mAccountSelectedPosition);
@@ -163,6 +162,10 @@ public class AccountsActivity extends Activity {
                     // Register
                     register((String) account.getText(), new Callable<Void>() {
                     	public Void call() {
+                    		if (mPleaseWaitDialog != null) {
+                    			mPleaseWaitDialog.dismiss();
+                    		}
+
                     		finish();
                     		return null;
                     	}
@@ -179,8 +182,7 @@ public class AccountsActivity extends Activity {
         final SharedPreferences prefs = Util.getSharedPreferences(mContext);
         String accountName = prefs.getString(Util.ACCOUNT_NAME, "Unknown");
 
-        // Format the disconnect message with the currently connected account
-        // name
+        // Format the disconnect message with the currently connected account name
         TextView logOutMsg = (TextView) findViewById(R.id.log_out_msg);
         String message = getResources().getString(R.string.log_out_msg);
         String formatted = String.format(message, accountName);
@@ -190,7 +192,16 @@ public class AccountsActivity extends Activity {
         logOutButton.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
                 // Unregister
-            	unregister();
+            	unregister(new Callable<Void>() {
+                	public Void call() {
+                		if (mPleaseWaitDialog != null) {
+                			mPleaseWaitDialog.dismiss();
+                		}
+
+                		finish();
+                		return null;
+                	}
+                });
                 finish();
             }
         });
@@ -228,7 +239,7 @@ public class AccountsActivity extends Activity {
         editor.commit();
 
         Log.i(TAG, "Registering \""+accountName+"\"...");
-        final ProgressDialog pleaseWaitDialog = ProgressDialog.show(mContext, null, "Logging in...", true);
+        mPleaseWaitDialog = ProgressDialog.show(mContext, null, "Logging in...", true);
 
         // Obtain an auth token and register
         final AccountManager mgr = AccountManager.get(mContext);
@@ -240,16 +251,12 @@ public class AccountsActivity extends Activity {
                     // Use a fake cookie for the dev mode app engine server
                     // The cookie has the form email:isAdmin:userId
                     // We set the userId to be the same as the email
-                    String authCookie = "dev_appserver_login=" + accountName + ":false:"
-                            + accountName;
+                    String authCookie = "dev_appserver_login=" + accountName + ":false:" + accountName;
                     prefs.edit().putString(Util.AUTH_COOKIE, authCookie).commit();
-                    //C2DMessaging.register(mContext, Setup.SENDER_ID);
 
-            		try {
-            			onComplete.call();
-            		} catch(Exception e) {
-            			// todo?
-            		}
+                    Log.i(TAG, "AUTH_COOKIE has been saved.");
+
+                    C2DMReceiver.register(this, Setup.SENDER_ID, onComplete);
                 } else {
                     // Get the auth token from the AccountManager and convert
                     // it into a cookie for the AppEngine server
@@ -276,22 +283,12 @@ public class AccountsActivity extends Activity {
 			                                    editor.commit();
 
 			                                    Log.i(TAG, "AUTH_COOKIE has been saved.");
-			                                    pleaseWaitDialog.dismiss();
 
-			                                    C2DMessaging.register(mContext, Setup.SENDER_ID);
+			                                    C2DMReceiver.register(AccountsActivity.this, Setup.SENDER_ID, onComplete);
                                     		} catch(Exception e) {
                                     			// todo?
                                     		}
                                     		return null;
-                                    	}
-                                    	
-                                    	@Override
-                                    	protected void onPostExecute(Void na) {
-                                    		try {
-                                    			onComplete.call();
-                                    		} catch(Exception e) {
-                                    			// todo?
-                                    		}
                                     	}
                                     }.execute();
                                 }
@@ -304,11 +301,10 @@ public class AccountsActivity extends Activity {
         }
     }
     
-    private void unregister() {
-        C2DMessaging.unregister(mContext);
+    private void unregister(final Callable<Void> onComplete) {
+        mPleaseWaitDialog = ProgressDialog.show(mContext, null, "Logging out...", true);
 
-        // clear out the preferences as well...
-        Util.clearDeviceRegistration(mContext);
+    	C2DMReceiver.unregister(this, onComplete);
     }
 
     private String getAuthToken(AccountManagerFuture<Bundle> future) {

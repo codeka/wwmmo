@@ -21,7 +21,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Locale;
 import java.util.Properties;
-import java.util.logging.Level;
 
 import org.restlet.Client;
 import org.restlet.data.Cookie;
@@ -61,26 +60,6 @@ public class Util {
      * Key for auth cookie name in shared preferences.
      */
     public static final String AUTH_COOKIE = "authCookie";
-
-    /**
-     * Key for connection status in shared preferences.
-     */
-    public static final String CONNECTION_STATUS = "connectionStatus";
-
-    /**
-     * Value for {@link #CONNECTION_STATUS} key.
-     */
-    public static final String CONNECTED = "connected";
-
-    /**
-     * Value for {@link #CONNECTION_STATUS} key.
-     */
-    public static final String CONNECTING = "connecting";
-
-    /**
-     * Value for {@link #CONNECTION_STATUS} key.
-     */
-    public static final String DISCONNECTED = "disconnected";
 
     /**
      * Key for device registration id in shared preferences.
@@ -188,18 +167,17 @@ public class Util {
 
     	URI uri = null;
     	try {
-    		uri = new URI(baseUrl + url);
+    		uri = new URI(baseUrl + "/api/v1" + url);
     	} catch(URISyntaxException e) {
     		Log.e(TAG, "Invalid URL: "+baseUrl+url);
     		return null;
     	}
 
-    	Log.i(TAG, "ClientResource: "+uri+" ("+uri.getHost()+")");
+    	Log.i(TAG, "ClientResource: "+uri);
     	ClientResource cr = new ClientResource(uri);
 
     	Client c = new Client(new org.restlet.Context(), Protocol.HTTP);
     	c.getContext().getParameters().add("retryHandler", "au.com.codeka.warworlds.RequestRetryHandler");
-    	c.getContext().getParameters().add("tracing", "true");
     	cr.setNext(c);
 
 		// add the authentication cookie to the request as well
@@ -225,7 +203,6 @@ public class Util {
         editor.remove(Util.ACCOUNT_NAME);
         editor.remove(Util.AUTH_COOKIE);
         editor.remove(Util.DEVICE_REGISTRATION_ID);
-        editor.remove(Util.CONNECTION_STATUS);
         editor.commit();
     }
     

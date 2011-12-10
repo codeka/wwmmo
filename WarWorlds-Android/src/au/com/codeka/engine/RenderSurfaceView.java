@@ -5,7 +5,6 @@ import javax.microedition.khronos.opengles.GL10;
 
 import android.content.Context;
 import android.opengl.GLSurfaceView;
-import android.opengl.GLU;
 
 public class RenderSurfaceView extends GLSurfaceView {
 

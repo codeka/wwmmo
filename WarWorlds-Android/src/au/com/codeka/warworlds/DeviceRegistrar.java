@@ -16,12 +16,21 @@
 package au.com.codeka.warworlds;
 
 import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.provider.Settings.Secure;
+import android.util.Log;
+import au.com.codeka.warworlds.shared.Device;
+import au.com.codeka.warworlds.shared.DeviceResource;
+import au.com.codeka.warworlds.shared.DevicesResource;
 
 /**
  * Register/unregister with the third-party App Engine server using
  * RequestFactory.
  */
 public class DeviceRegistrar {
+	public static String TAG = "DeviceRegistrar";
+
     public static final String ACCOUNT_NAME_EXTRA = "AccountName";
 
     public static final String STATUS_EXTRA = "Status";
@@ -32,72 +41,58 @@ public class DeviceRegistrar {
 
     public static final int ERROR_STATUS = 3;
 
-//    private static final String TAG = "DeviceRegistrar";
+    public static void register(final Context context, final String deviceRegistrationID) {
+    	registerOrUnregister(context, deviceRegistrationID, true);
+    }
 
-    public static void registerOrUnregister(final Context context,
-            final String deviceRegistrationId, final boolean register) {
-/*
+    public static void unregister(final Context context, final String deviceRegistrationID) {
+    	registerOrUnregister(context, deviceRegistrationID, false);
+    }
+    
+    private static void registerOrUnregister(final Context context,
+            final String deviceRegistrationID, final boolean register) {
+
     	final SharedPreferences settings = Util.getSharedPreferences(context);
         final String accountName = settings.getString(Util.ACCOUNT_NAME, "Unknown");
         final Intent updateUIIntent = new Intent(Util.UPDATE_UI_INTENT);
 
-        RegistrationInfoRequest request = getRequest(context);
-        RegistrationInfoProxy proxy = request.create(RegistrationInfoProxy.class);
-        proxy.setDeviceRegistrationId(deviceRegistrationId);
+        String url = "/devices";
 
-        String deviceId = Secure.getString(context.getContentResolver(), Secure.ANDROID_ID);
-        proxy.setDeviceId(deviceId);
+    	try {
+    		if (register) {
+	        	Device d = new Device();
+	        	d.setDeviceRegistrationID(deviceRegistrationID);
+	        	d.setDeviceID(Secure.getString(context.getContentResolver(), Secure.ANDROID_ID));
 
-        Request<Void> req;
+    			DevicesResource resource = Util.getClientResource(context, url, DevicesResource.class);
+	        	resource.register(d);
+	        } else {
+	        	url += "/" + deviceRegistrationID;
+
+    			DeviceResource resource = Util.getClientResource(context, url, DeviceResource.class);
+	    		resource.unregister();
+	        }
+    	} catch(Exception ex) {
+            Log.w(TAG, "Failure, got: " + ex.getMessage());
+            // Clean up application state
+            Util.clearDeviceRegistration(context);
+
+            updateUIIntent.putExtra(ACCOUNT_NAME_EXTRA, accountName);
+            updateUIIntent.putExtra(STATUS_EXTRA, ERROR_STATUS);
+            context.sendBroadcast(updateUIIntent);
+            return;
+    	}
+    	
         if (register) {
-            req = request.register().using(proxy);
+            SharedPreferences.Editor editor = settings.edit();
+            editor.putString(Util.DEVICE_REGISTRATION_ID, deviceRegistrationID);
+            editor.commit();
         } else {
-            req = request.unregister().using(proxy);
+        	Util.clearDeviceRegistration(context);
         }
 
-        req.fire(new Receiver<Void>() {
-            private void clearPreferences(SharedPreferences.Editor editor) {
-                editor.remove(Util.ACCOUNT_NAME);
-                editor.remove(Util.AUTH_COOKIE);
-                editor.remove(Util.DEVICE_REGISTRATION_ID);
-            }
-
-            @Override
-            public void onFailure(ServerFailure failure) {
-                Log.w(TAG, "Failure, got :" + failure.getMessage());
-                // Clean up application state
-                SharedPreferences.Editor editor = settings.edit();
-                clearPreferences(editor);
-                editor.commit();
-
-                updateUIIntent.putExtra(ACCOUNT_NAME_EXTRA, accountName);
-                updateUIIntent.putExtra(STATUS_EXTRA, ERROR_STATUS);
-                context.sendBroadcast(updateUIIntent);
-            }
-
-            @Override
-            public void onSuccess(Void response) {
-                SharedPreferences settings = Util.getSharedPreferences(context);
-                SharedPreferences.Editor editor = settings.edit();
-                if (register) {
-                    editor.putString(Util.DEVICE_REGISTRATION_ID, deviceRegistrationId);
-                } else {
-                    clearPreferences(editor);
-                }
-                editor.commit();
-                updateUIIntent.putExtra(ACCOUNT_NAME_EXTRA, accountName);
-                updateUIIntent.putExtra(STATUS_EXTRA, register ? REGISTERED_STATUS
-                        : UNREGISTERED_STATUS);
-                context.sendBroadcast(updateUIIntent);
-            }
-        });
-*/
+        updateUIIntent.putExtra(ACCOUNT_NAME_EXTRA, accountName);
+        updateUIIntent.putExtra(STATUS_EXTRA, register ? REGISTERED_STATUS : UNREGISTERED_STATUS);
+        context.sendBroadcast(updateUIIntent);
     }
-/*
-    private static RegistrationInfoRequest getRequest(Context context) {
-        MyRequestFactory requestFactory = Util.getRequestFactory(context, MyRequestFactory.class);
-        RegistrationInfoRequest request = requestFactory.registrationInfoRequest();
-        return request;
-    }
-*/
 }

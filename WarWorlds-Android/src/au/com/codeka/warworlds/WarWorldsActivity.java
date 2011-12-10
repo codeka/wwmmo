@@ -63,22 +63,15 @@ public class WarWorldsActivity extends Activity {
         @Override
         public void onReceive(Context context, Intent intent) {
             String accountName = intent.getStringExtra(DeviceRegistrar.ACCOUNT_NAME_EXTRA);
-            int status = intent.getIntExtra(DeviceRegistrar.STATUS_EXTRA,
-                    DeviceRegistrar.ERROR_STATUS);
+            int status = intent.getIntExtra(DeviceRegistrar.STATUS_EXTRA, DeviceRegistrar.ERROR_STATUS);
             String message = null;
-            String connectionStatus = Util.DISCONNECTED;
             if (status == DeviceRegistrar.REGISTERED_STATUS) {
                 message = getResources().getString(R.string.registration_succeeded);
-                connectionStatus = Util.CONNECTED;
             } else if (status == DeviceRegistrar.UNREGISTERED_STATUS) {
                 message = getResources().getString(R.string.unregistration_succeeded);
             } else {
                 message = getResources().getString(R.string.registration_error);
             }
-
-            // Set connection status
-            SharedPreferences prefs = Util.getSharedPreferences(mContext);
-            prefs.edit().putString(Util.CONNECTION_STATUS, connectionStatus).commit();
 
             // Display a notification
             Util.generateNotification(mContext, String.format(message, accountName));
@@ -90,10 +83,10 @@ public class WarWorldsActivity extends Activity {
      */
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        Log.i(TAG, "onCreate");
+        Log.i(TAG, "War Worlds is starting up...");
         super.onCreate(savedInstanceState);
 
-        // TODO: required?
+        // IPv4 for now (restlet works better like this)
         System.setProperty("java.net.preferIPv6Addresses", "false");
 
         requestWindowFeature(Window.FEATURE_NO_TITLE); // remove the title bar
@@ -107,9 +100,10 @@ public class WarWorldsActivity extends Activity {
         super.onResume();
 
         SharedPreferences prefs = Util.getSharedPreferences(mContext);
-        String connectionStatus = prefs.getString(Util.CONNECTION_STATUS, Util.DISCONNECTED);
-        if (Util.DISCONNECTED.equals(connectionStatus)) {
+        String deviceRegistrationID = prefs.getString(Util.DEVICE_REGISTRATION_ID, null);
+        if (deviceRegistrationID == null) {
             startActivity(new Intent(this, AccountsActivity.class));
+            return;
         }
 
         setScreenContent(R.layout.home);
@@ -196,7 +190,7 @@ public class WarWorldsActivity extends Activity {
         		startActivity(new Intent(mContext, AccountsActivity.class));
         	}
         });
-        
+
         startGameButton.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
             	startGameButton.setEnabled(false);

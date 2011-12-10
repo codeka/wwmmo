@@ -16,12 +16,16 @@
 package au.com.codeka.warworlds;
 
 import com.google.android.c2dm.C2DMBaseReceiver;
+import com.google.android.c2dm.C2DMessaging;
 
 import java.io.IOException;
+import java.util.concurrent.Callable;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.util.Log;
 
 /**
  * Receive a push message from the Cloud to Device Messaging (C2DM) service.
@@ -30,11 +34,51 @@ import android.content.SharedPreferences;
  * to the superclass constructor.
  */
 public class C2DMReceiver extends C2DMBaseReceiver {
-
+	private static String TAG = "C2DMReceiver";
+	
+	private static Callable<Void> sOnComplete;
+	private static Activity sActivity;
+	
     public C2DMReceiver() {
         super(Setup.SENDER_ID);
     }
 
+    /**
+     * Registers for C2DM notifications. Calls AccountsActivity.registrationComplete() when finished.
+     */
+    public static void register(Activity activity, String senderID, final Callable<Void> onComplete) {
+    	sOnComplete = onComplete;
+    	sActivity = activity;
+        C2DMessaging.register(activity, Setup.SENDER_ID);
+    }
+
+    /**
+     * Unregisters ourselves from C2DM notifications.
+     */
+    public static void unregister(Activity activity, final Callable<Void> onComplete) {
+    	sOnComplete = onComplete;
+    	sActivity = activity;
+    	C2DMessaging.unregister(activity);
+    }
+
+    /**
+     * Calls the onComplete handler (if there is one), making sure to do so on the main UI thread.
+     */
+    private static void callOnComplete() {
+    	if (sOnComplete != null && sActivity != null) {
+    		sActivity.runOnUiThread(new Runnable() {
+				@Override
+				public void run() {
+					try {
+						sOnComplete.call();
+						sOnComplete = null;
+					} catch(Exception e) {
+					}
+				}
+    		});
+    	}
+    }
+    
     /**
      * Called when a registration token has been received.
      * 
@@ -44,7 +88,9 @@ public class C2DMReceiver extends C2DMBaseReceiver {
      */
     @Override
     public void onRegistered(Context context, String registration) {
-        DeviceRegistrar.registerOrUnregister(context, registration, true);
+    	Log.i(TAG, "Registration complete.");
+        DeviceRegistrar.register(context, registration);
+        callOnComplete();
     }
 
     /**
@@ -54,9 +100,11 @@ public class C2DMReceiver extends C2DMBaseReceiver {
      */
     @Override
     public void onUnregistered(Context context) {
+    	Log.i(TAG, "De-registration complete.");
         SharedPreferences prefs = Util.getSharedPreferences(context);
         String deviceRegistrationID = prefs.getString(Util.DEVICE_REGISTRATION_ID, null);
-        DeviceRegistrar.registerOrUnregister(context, deviceRegistrationID, false);
+        DeviceRegistrar.unregister(context, deviceRegistrationID);
+        callOnComplete();
     }
 
     /**
@@ -68,7 +116,9 @@ public class C2DMReceiver extends C2DMBaseReceiver {
      */
     @Override
     public void onError(Context context, String errorId) {
+    	Log.w(TAG, "Error: "+errorId);
         context.sendBroadcast(new Intent(Util.UPDATE_UI_INTENT));
+        callOnComplete();
     }
 
     /**
@@ -79,6 +129,7 @@ public class C2DMReceiver extends C2DMBaseReceiver {
         /*
          * Replace this with your application-specific code
          */
+    	Log.i(TAG, "Message received.");
         MessageDisplay.displayMessage(context, intent);
     }
 }
