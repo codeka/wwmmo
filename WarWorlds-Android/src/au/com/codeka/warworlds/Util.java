@@ -15,20 +15,19 @@
  */
 package au.com.codeka.warworlds;
 
-import com.google.web.bindery.event.shared.SimpleEventBus;
-import com.google.web.bindery.requestfactory.shared.RequestFactory;
-import com.google.web.bindery.requestfactory.vm.RequestFactorySource;
-
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.HashMap;
 import java.util.Locale;
-import java.util.Map;
+import java.util.Properties;
+import java.util.logging.Level;
+
+import org.restlet.Client;
+import org.restlet.data.Cookie;
+import org.restlet.data.Protocol;
+import org.restlet.resource.ClientResource;
+import org.restlet.util.Series;
 
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -44,6 +43,8 @@ import android.util.Log;
  */
 public class Util {
 
+	private static Properties props = null;
+	
     /**
      * Tag for logging.
      */
@@ -86,11 +87,6 @@ public class Util {
      */
     public static final String DEVICE_REGISTRATION_ID = "deviceRegistrationID";
 
-    /*
-     * URL suffix for the RequestFactory servlet.
-     */
-    public static final String RF_METHOD = "/gwtRequest";
-
     /**
      * An intent name for receiving registration/unregistration status.
      */
@@ -104,9 +100,52 @@ public class Util {
     private static final String SHARED_PREFS = "warworlds".toUpperCase(Locale.ENGLISH) + "_PREFS";
 
     /**
-     * Cache containing the base URL for a given context.
+     * Gets a reference to the "warworlds.properties" file, that's deployed with the package.
+     * @return
      */
-    private static final Map<Context, String> URL_MAP = new HashMap<Context, String>();
+    public static Properties getProperties(Context context) {
+    	if (props == null) {
+	    	AssetManager assetManager = context.getAssets();
+	
+	    	InputStream inputStream = null;
+	    	try {
+	    	    inputStream = assetManager.open("warworlds.properties");
+	    	    props = new Properties();
+	    	    props.load(inputStream);
+	    	} catch (IOException e) {
+	    		props = null;
+	    	} finally {
+	    		try {
+	    			if (inputStream != null) {
+	    				inputStream.close();
+	    			}
+	    		} catch(IOException e) {
+	    		}
+	    	}
+    	}
+    	
+    	return props;
+    }
+
+    /**
+     * Returns the (debug or production) URL associated with the registration
+     * service.
+     */
+    public static String getBaseUrl(Context context) {
+    	Properties p = getProperties(context);
+    	String serverDefault = p.getProperty("server.default");
+    	String url = p.getProperty("server."+serverDefault);
+    	return url;
+    }
+    
+    /**
+     * Returns true if we are running against a dev mode appengine instance.
+     */
+    public static boolean isDebug(Context context) {
+    	Properties p = getProperties(context);
+    	String serverDefault = p.getProperty("server.default");
+    	return (serverDefault.equals("debug"));
+    }
 
     /**
      * Display a notification containing the given string.
@@ -133,56 +172,47 @@ public class Util {
     }
 
     /**
-     * Returns the (debug or production) URL associated with the registration
-     * service.
+     * Creates a \c ClientResource pointing at the given URL and that will return data for the given
+     * resource type.
      */
-    public static String getBaseUrl(Context context) {
-        String url = URL_MAP.get(context);
-        if (url == null) {
-            // if a debug_url raw resource exists, use its contents as the url
-            url = getDebugUrl(context);
-            // otherwise, use the production url
-            if (url == null) {
-                url = Setup.PROD_URL;
-            }
-            URL_MAP.put(context, url);
-        }
-        return url;
-    }
+    public static <T> T getClientResource(Context context,
+    		String url, Class<T> factoryClass) {
 
-    /**
-     * Creates and returns an initialized {@link RequestFactory} of the given
-     * type.
-     */
-    public static <T extends RequestFactory> T getRequestFactory(Context context,
-            Class<T> factoryClass) {
-        T requestFactory = RequestFactorySource.create(factoryClass);
+    	String baseUrl = getBaseUrl(context);
+    	if (baseUrl.endsWith("/")) {
+    		baseUrl = baseUrl.substring(0, baseUrl.length() - 1);
+    	}
+    	if (!url.startsWith("/")) {
+    		url = "/"+url;
+    	}
 
-        SharedPreferences prefs = getSharedPreferences(context);
+    	URI uri = null;
+    	try {
+    		uri = new URI(baseUrl + url);
+    	} catch(URISyntaxException e) {
+    		Log.e(TAG, "Invalid URL: "+baseUrl+url);
+    		return null;
+    	}
+
+    	Log.i(TAG, "ClientResource: "+uri+" ("+uri.getHost()+")");
+    	ClientResource cr = new ClientResource(uri);
+
+    	Client c = new Client(new org.restlet.Context(), Protocol.HTTP);
+    	c.getContext().getParameters().add("retryHandler", "au.com.codeka.warworlds.RequestRetryHandler");
+    	c.getContext().getParameters().add("tracing", "true");
+    	cr.setNext(c);
+
+		// add the authentication cookie to the request as well
+		SharedPreferences prefs = getSharedPreferences(context);
         String authCookie = prefs.getString(Util.AUTH_COOKIE, null);
-        if (authCookie == null) {
-        	Log.w(TAG, "It's probably not going to work without an auth cookie.");
-        	int n = 0;
-        	for(StackTraceElement ste : Thread.currentThread().getStackTrace()) {
-        		Log.w(TAG, ste.toString());
-        		n++;
-        		if (n > 10)
-        			break;
-        	}
+        if (authCookie != null) {
+	        String nvp[] = authCookie.split("=");
+	        Series<Cookie> cookies = new Series<Cookie>(Cookie.class);
+	        cookies.add(new Cookie(nvp[0], nvp[1]));
+	        cr.setCookies(cookies);
         }
 
-        String uriString = Util.getBaseUrl(context) + RF_METHOD;
-        URI uri;
-        try {
-            uri = new URI(uriString);
-        } catch (URISyntaxException e) {
-            Log.w(TAG, "Bad URI: " + uriString, e);
-            return null;
-        }
-        requestFactory.initialize(new SimpleEventBus(),
-                new AndroidRequestTransport(uri, authCookie));
-
-        return requestFactory;
+        return cr.wrap(factoryClass);
     }
 
     /**
@@ -222,59 +252,6 @@ public class Util {
         }
         
         return prefs;
-    }
-
-    /**
-     * Returns true if we are running against a dev mode appengine instance.
-     */
-    public static boolean isDebug(Context context) {
-        // Although this is a bit roundabout, it has the nice side effect
-        // of caching the result.
-        return !Setup.PROD_URL.equals(getBaseUrl(context));
-    }
-
-    /**
-     * Returns a debug url, or null. To set the url, create a file
-     * {@code assets/debugging_prefs.properties} with a line of the form
-     * 'url=http:/<ip address>:<port>'. A numeric IP address may be required in
-     * situations where the device or emulator will not be able to resolve the
-     * hostname for the dev mode server.
-     */
-    private static String getDebugUrl(Context context) {
-        BufferedReader reader = null;
-        String url = null;
-        try {
-            AssetManager assetManager = context.getAssets();
-            InputStream is = assetManager.open("debugging_prefs.properties");
-            reader = new BufferedReader(new InputStreamReader(is));
-            while (true) {
-                String s = reader.readLine();
-                if (s == null) {
-                    break;
-                }
-                if (s.startsWith("url=")) {
-                    url = s.substring(4).trim();
-                    break;
-                }
-            }
-        } catch (FileNotFoundException e) {
-            // O.K., we will use the production server
-            return null;
-        } catch (Exception e) {
-            Log.w(TAG, "Got exception " + e);
-            Log.w(TAG, Log.getStackTraceString(e));
-        } finally {
-            if (reader != null) {
-                try {
-                    reader.close();
-                } catch (IOException e) {
-                    Log.w(TAG, "Got exception " + e);
-                    Log.w(TAG, Log.getStackTraceString(e));
-                }
-            }
-        }
-
-        return url;
     }
 
     /**

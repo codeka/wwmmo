@@ -15,19 +15,7 @@
  */
 package au.com.codeka.warworlds;
 
-import com.google.web.bindery.requestfactory.shared.Receiver;
-import com.google.web.bindery.requestfactory.shared.Request;
-import com.google.web.bindery.requestfactory.shared.ServerFailure;
-
-import au.com.codeka.warworlds.client.MyRequestFactory;
-import au.com.codeka.warworlds.client.MyRequestFactory.RegistrationInfoRequest;
-import au.com.codeka.warworlds.shared.RegistrationInfoProxy;
-
 import android.content.Context;
-import android.content.Intent;
-import android.content.SharedPreferences;
-import android.provider.Settings.Secure;
-import android.util.Log;
 
 /**
  * Register/unregister with the third-party App Engine server using
@@ -44,11 +32,12 @@ public class DeviceRegistrar {
 
     public static final int ERROR_STATUS = 3;
 
-    private static final String TAG = "DeviceRegistrar";
+//    private static final String TAG = "DeviceRegistrar";
 
     public static void registerOrUnregister(final Context context,
             final String deviceRegistrationId, final boolean register) {
-        final SharedPreferences settings = Util.getSharedPreferences(context);
+/*
+    	final SharedPreferences settings = Util.getSharedPreferences(context);
         final String accountName = settings.getString(Util.ACCOUNT_NAME, "Unknown");
         final Intent updateUIIntent = new Intent(Util.UPDATE_UI_INTENT);
 
@@ -102,11 +91,13 @@ public class DeviceRegistrar {
                 context.sendBroadcast(updateUIIntent);
             }
         });
+*/
     }
-
+/*
     private static RegistrationInfoRequest getRequest(Context context) {
         MyRequestFactory requestFactory = Util.getRequestFactory(context, MyRequestFactory.class);
         RegistrationInfoRequest request = requestFactory.registrationInfoRequest();
         return request;
     }
+*/
 }

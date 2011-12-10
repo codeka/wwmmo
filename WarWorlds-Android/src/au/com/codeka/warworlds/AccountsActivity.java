@@ -243,7 +243,13 @@ public class AccountsActivity extends Activity {
                     String authCookie = "dev_appserver_login=" + accountName + ":false:"
                             + accountName;
                     prefs.edit().putString(Util.AUTH_COOKIE, authCookie).commit();
-                    C2DMessaging.register(mContext, Setup.SENDER_ID);
+                    //C2DMessaging.register(mContext, Setup.SENDER_ID);
+
+            		try {
+            			onComplete.call();
+            		} catch(Exception e) {
+            			// todo?
+            		}
                 } else {
                     // Get the auth token from the AccountManager and convert
                     // it into a cookie for the AppEngine server

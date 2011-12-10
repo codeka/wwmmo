@@ -19,6 +19,7 @@ import java.io.InputStream;
 import java.io.StringWriter;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
@@ -36,12 +37,8 @@ import android.view.View.OnClickListener;
 import android.view.Window;
 import android.webkit.WebView;
 import android.widget.Button;
-import au.com.codeka.warworlds.client.MyRequestFactory;
-import au.com.codeka.warworlds.client.MyRequestFactory.QueryMotdRequest;
-
-import com.google.web.bindery.requestfactory.shared.Receiver;
-import com.google.web.bindery.requestfactory.shared.Request;
-import com.google.web.bindery.requestfactory.shared.ServerFailure;
+import au.com.codeka.warworlds.shared.MessageOfTheDay;
+import au.com.codeka.warworlds.shared.MessageOfTheDayResource;
 
 /**
  * Main activity - requests "Hello, World" messages from the server and provides
@@ -95,6 +92,9 @@ public class WarWorldsActivity extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         Log.i(TAG, "onCreate");
         super.onCreate(savedInstanceState);
+
+        // TODO: required?
+        System.setProperty("java.net.preferIPv6Addresses", "false");
 
         requestWindowFeature(Window.FEATURE_NO_TITLE); // remove the title bar
 
@@ -159,22 +159,11 @@ public class WarWorldsActivity extends Activity {
         	@Override
         	protected String doInBackground(Void... arg0) {
         		try {
-	        		MyRequestFactory requestFactory = Util.getRequestFactory(mContext, MyRequestFactory.class);
-	        		QueryMotdRequest request = requestFactory.queryMotd();
-	        		Request<String> sendRequest = request.query();
-	        		sendRequest.fire(new Receiver<String>() {
-	        			@Override
-	        			public void onFailure(ServerFailure error) {
-	        				// todo: handle errors... (e.g. no network, etc)
-	        			}
-
-	        			@Override
-	        			public void onSuccess(String result) {
-	        				message = result;
-	        			}
-	        		});
-        		} catch(RuntimeException e) {
-        			Log.e(TAG, e.toString());
+        	    	MessageOfTheDayResource resource = Util.getClientResource(mContext, "/motd", MessageOfTheDayResource.class);
+        	    	MessageOfTheDay motd = resource.retrieve();
+        	    	message = motd.getMessage();
+        		} catch(Exception e) {
+        			Log.e(TAG, ExceptionUtils.getStackTrace(e));
         			message = "<pre>" + e.toString() + "</pre>";
         		}
 
