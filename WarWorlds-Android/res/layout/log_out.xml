@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical"
+    android:background="#000000">
+
+    <TextView
+        android:id="@+id/log_out_header"
+        android:layout_width="fill_parent"
+        android:layout_height="60dip"
+        android:layout_alignParentTop="true"
+        android:background="@drawable/gradient"
+        android:paddingLeft="10dip"
+        android:gravity="center_vertical"
+        android:textColor="#ffffff"
+        android:text="@string/log_out_header"
+        android:textSize="16dip"/>
+
+    <TextView
+        android:id="@+id/log_out_msg"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:layout_below="@id/log_out_header"
+        android:gravity="top"
+        android:background="#000000"
+        android:textColor="#ffffff"
+        android:textSize="16dip"
+        android:text="@string/log_out_msg"
+        android:paddingLeft="10dip"
+        android:paddingTop="10dip"
+        android:visibility="visible"/>
+
+    <Button
+        android:id="@+id/log_out_btn"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/log_out_msg"
+        android:layout_marginTop="5px"
+        android:text="@string/log_out" />
+
+</LinearLayout>

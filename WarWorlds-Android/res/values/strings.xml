@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- Menu item text [CHAR LIMIT=NONE] -->
+    <string name="log_out">Log Out</string>
+
+    <!-- Dialog button [CHAR LIMIT=NONE] -->
+    <string name="add_account">Add account...</string>
+
+    <!--  Name of the application in the launcher [CHAR LIMIT=NONE] -->
+    <string name="app_name">WarWorlds</string>
+
+    <!-- Dialog title text [CHAR LIMIT=NONE] -->
+    <string name="attention">Attention</string>
+
+    <!-- Button text [CHAR LIMIT=NONE] -->
+
+    <!-- Message text for "Connect" screen [CHAR LIMIT=NONE] -->
+    <string name="log_in_msg">Before playing War Worlds, you must log in. Choose the Account you wish to authenticate with below.</string>
+
+    <!-- Header text for "Connect" screen [CHAR LIMIT=NONE] -->
+    <string name="log_in_header">Log In</string>
+
+    <!-- Header text for "Connected" screen [CHAR LIMIT=NONE] -->
+    <string name="log_out_header">Log Out</string>
+
+    <!-- Message text [CHAR LIMIT=NONE] -->
+    <string name="contacting_server">Contacting server...</string>
+
+    <!-- Button text [CHAR LIMIT=NONE] -->
+    <string name="disconnect">Disconnect</string>
+
+    <!-- Informational text for "Connected" screen with placeholder for account name [CHAR LIMIT=NONE] -->
+    <string name="log_out_msg">You are currently logged in as %1$s, are you sure you want to log out?</string>
+
+    <!-- Footer text for "Connect" screen [CHAR LIMIT=NONE] -->
+
+    <!-- Footer text for "Disconnect" screen [CHAR LIMIT=NONE] -->
+
+    <!-- Initial "hello, world" informational message [CHAR LIMIT=NONE] -->
+    <string name="homepage_title_text">War Worlds</string>
+
+    <!-- Initial "hello, world" response message [CHAR LIMIT=NONE] -->
+    <string name="hello_world_text"></string>
+
+    <!-- Dialog message text [CHAR LIMIT=NONE] -->
+    <string name="needs_account">To receive notifications from this app, you must first create an account.</string>
+
+    <!-- Notification message [CHAR LIMIT=NONE] -->
+    <string name="registration_error">Failed to register/unregister %1$s.</string>
+
+    <!-- Notification message [CHAR LIMIT=NONE] -->
+    <string name="registration_succeeded">Registered %1$s for C2DM messaging.</string>
+
+    <!-- Button text [CHAR LIMIT=NONE] -->
+    <string name="start_game">Start Game</string>
+
+    <!-- List view header text [CHAR LIMIT=NONE] -->
+    <string name="log_in_note">Note: Your account details will remain private</string>
+
+    <!-- Dialog button text [CHAR LIMIT=NONE] -->
+    <string name="skip">Skip</string>
+
+    <!-- Notification message [CHAR LIMIT=NONE] -->
+    <string name="unregistration_succeeded">Unegistered %1$s for C2DM messaging.</string>
+    <string name="options">Options</string>
+    <string name="log_in">Log In</string>
+
+</resources>
