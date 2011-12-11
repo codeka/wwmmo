@@ -1,0 +1,114 @@
+
+html, body {
+	padding: 0; margin: 0;
+	width: 100%; height: 100%;
+	position: absolute;
+}
+
+body {
+	font-family: arial, helvetica, verdana, sans-serif;
+	background: #efefef;
+	overflow-x: hidden;
+}
+
+#header {
+	width: 100%;
+	background: #66b0ff;
+	padding: 0; margin: 0;
+
+	background-image: linear-gradient(bottom, rgb(37,37,37) 0%, rgb(25,25,25) 100%);
+	background-image: -moz-linear-gradient(bottom, rgb(37,37,37) 0%, rgb(25,25,25) 100%);
+	background-image: -webkit-linear-gradient(bottom, rgb(37,37,37) 0%, rgb(25,25,25) 100%);
+}
+
+#header div {
+	background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAYAAACp8Z5+AAAAJ0lEQVQIW2NkQAOMGAI2NjYzgYJnjxw5MgskyQgU+A+kZwEF0kECALGKCgWXotQhAAAAAElFTkSuQmCC) repeat;
+	height: 56px;
+}
+
+#header h1 {
+	color: #fff;
+	line-height: 56px;
+	margin: 0 0 0 2em;
+	padding: 0;
+}
+
+#navmenu {
+	position: absolute;
+	width: 300px;
+	top: 56px;
+	bottom: 0;
+
+	background-image: linear-gradient(right , rgb(214,214,214) 0%, rgb(239,239,239) 20%, rgb(239,239,239) 100%);
+	background-image: -moz-linear-gradient(right , rgb(214,214,214) 0%, rgb(239,239,239) 20%, rgb(239,239,239) 100%);
+	background-image: -webkit-linear-gradient(right , rgb(214,214,214) 0%, rgb(239,239,239) 20%, rgb(239,239,239) 100%);
+	border-right: solid 1px #666;
+}
+
+#maincontent {
+	margin-left: 310px;
+}
+
+#status {
+	position: absolute;
+	margin: 0 auto;
+	height: 20px;
+	top: 18px;
+	left: 310px;
+	padding: 0 12px;
+	border-radius: 3px;
+}
+
+.success {
+	background: #fff1a8;
+	display: block;
+}
+
+.error {
+	background: #990000;
+	color: #fff;
+	display: block;
+}
+
+.none {
+	display: none;
+}
+
+a {
+	color: #66f;
+	text-decoration: none;
+}
+
+a:hover {
+	text-decoration: underline;
+}
+
+fieldset {
+	border-radius: 5px;
+	padding: 8px;
+}
+
+fieldset legend {
+	font-weight: bold;
+	color: #900;
+	padding: 0 8px;
+}
+
+button, a.button {
+	-moz-box-shadow: inset 0px 1px 0px 0px #cae3fc;
+	-webkit-box-shadow: inset 0px 1px 0px 0px #cae3fc;
+	box-shadow: inset 0px 1px 0px 0px #cae3fc;
+	background: -webkit-gradient( linear, left top, left bottom, color-stop(0.05, #79bbff), color-stop(1, #4197ee) );
+	background: -moz-linear-gradient( center top, #79bbff 5%, #4197ee 100% );
+	background-color:#79bbff;
+	padding: 6px 16px;
+	border-radius:6px;
+	border:1px solid #469df5;
+	color: #fff;
+	font-weight: bold;
+	text-decoration:none;
+	text-shadow:1px 1px 0px #287ace;
+	cursor: pointer;
+}
+
+

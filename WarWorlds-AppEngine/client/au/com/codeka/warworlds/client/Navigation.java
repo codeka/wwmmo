@@ -17,6 +17,10 @@ public class Navigation {
 	 */
 	public static void go(Composite c) {
 		RootPanel panel = RootPanel.get("maincontent");
+		if (panel == null) {
+			return;
+		}
+
 		panel.clear();
 		panel.add(c);
 		History.newItem(c.getTitle());
@@ -28,6 +32,8 @@ public class Navigation {
 			go(new DashboardPage());
 		} else if (name.equalsIgnoreCase("motd")) {
 			go(new MotdPage());
+		} else if (name.equalsIgnoreCase("devices")) {
+			go(new DevicesPage());
 		} else {
 			// go(new NotFoundPage())
 		}

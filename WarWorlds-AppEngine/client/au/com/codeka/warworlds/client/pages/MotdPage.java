@@ -4,6 +4,7 @@ import java.util.Date;
 
 import org.restlet.client.resource.Result;
 
+import au.com.codeka.warworlds.client.Connector;
 import au.com.codeka.warworlds.client.proxy.MessageOfTheDayResourceProxy;
 import au.com.codeka.warworlds.shared.MessageOfTheDay;
 
@@ -70,8 +71,7 @@ public class MotdPage extends BasePage {
 		setStatus("Refreshing...");
 		saveMotd.setEnabled(false);
 
-    	MessageOfTheDayResourceProxy proxy = GWT.create(MessageOfTheDayResourceProxy.class);
-    	proxy.getClientResource().setReference("/api/v1/motd");
+    	MessageOfTheDayResourceProxy proxy = Connector.create(MessageOfTheDayResourceProxy.class, "/motd");
     	proxy.retrieve(new Result<MessageOfTheDay>() {
 
 			@Override

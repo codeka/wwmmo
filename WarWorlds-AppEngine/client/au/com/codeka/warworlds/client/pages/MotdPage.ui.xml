@@ -32,7 +32,7 @@
     		}
     	</style>
 	    <div id="motd">
-	    	<h1>Message of the Day.</h1>
+	    	<h1>Message of the Day</h1>
 	    	<fieldset class="curr-motd">
 	    		<legend>Current Message</legend>
 	    		<div ui:field="currMotd"></div>
