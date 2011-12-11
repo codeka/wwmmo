@@ -41,7 +41,7 @@ public class DevicesPage extends BasePage {
 			@Override
 			public void onClick(ClickEvent event) {
 				DevicesNotificationsResourceProxy proxy = Connector.create(
-						DevicesNotificationsResourceProxy.class, "/devices/notifications");
+						GWT.create(DevicesNotificationsResourceProxy.class), "/devices/notifications");
 				
 				Notification n = new Notification();
 				n.setMessage(mMessage.getValue());

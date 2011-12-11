@@ -46,8 +46,8 @@ public class MotdPage extends BasePage {
 	        	motd.setMessage(newMotd.getValue());
 	        	motd.setPostDate(new Date());
 
-	        	MessageOfTheDayResourceProxy proxy = GWT.create(MessageOfTheDayResourceProxy.class);
-	        	proxy.getClientResource().setReference("/api/v1/motd");
+	        	MessageOfTheDayResourceProxy proxy = Connector.create(
+	        			GWT.create(MessageOfTheDayResourceProxy.class), "/motd");
 	        	proxy.store(motd, new Result<Void>() {
 
 					@Override
@@ -71,7 +71,8 @@ public class MotdPage extends BasePage {
 		setStatus("Refreshing...");
 		saveMotd.setEnabled(false);
 
-    	MessageOfTheDayResourceProxy proxy = Connector.create(MessageOfTheDayResourceProxy.class, "/motd");
+    	MessageOfTheDayResourceProxy proxy = Connector.create(
+    			GWT.create(MessageOfTheDayResourceProxy.class), "/motd");
     	proxy.retrieve(new Result<MessageOfTheDay>() {
 
 			@Override
