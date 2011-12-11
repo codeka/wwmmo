@@ -156,7 +156,7 @@ public class DeviceData {
 	public static void remove(String deviceRegistrationID, String user) {
         PersistenceManager pm = PMF.get().getPersistenceManager();
         try {
-        	DeviceData dd = getDeviceForRegistrationID(deviceRegistrationID);
+        	DeviceData dd = getDeviceForRegistrationID(pm, deviceRegistrationID);
         	if (dd != null && dd.getUser().equals(user)) {
         		pm.deletePersistent(dd);
         	}
@@ -172,22 +172,26 @@ public class DeviceData {
 	public static DeviceData getDeviceForRegistrationID(String deviceRegistrationID) {
         PersistenceManager pm = PMF.get().getPersistenceManager();
         try {
-        	Query query = pm.newQuery(DeviceData.class);
-        	query.setFilter("deviceRegistrationID == '"+deviceRegistrationID+"'");
-
-        	@SuppressWarnings("unchecked")
-            List<DeviceData> qresult = (List<DeviceData>) query.execute();
-        	
-        	DeviceData result = null;
-        	for (DeviceData d : qresult) {
-        		result = d;
-        	}
-        	query.closeAll();
-
-        	return result;
+        	return getDeviceForRegistrationID(pm, deviceRegistrationID);
         } finally {
         	pm.close();
         }
+	}
+	
+	private static DeviceData getDeviceForRegistrationID(PersistenceManager pm, String deviceRegistrationID) {
+    	Query query = pm.newQuery(DeviceData.class);
+    	query.setFilter("deviceRegistrationID == '"+deviceRegistrationID+"'");
+
+    	@SuppressWarnings("unchecked")
+        List<DeviceData> qresult = (List<DeviceData>) query.execute();
+    	
+    	DeviceData result = null;
+    	for (DeviceData d : qresult) {
+    		result = d;
+    	}
+    	query.closeAll();
+
+    	return result;
 	}
 	
 	/**

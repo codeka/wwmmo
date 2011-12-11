@@ -21,6 +21,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Locale;
 import java.util.Properties;
+import java.util.logging.Level;
 
 import org.restlet.Client;
 import org.restlet.data.Cookie;
@@ -157,6 +158,9 @@ public class Util {
     public static <T> T getClientResource(Context context,
     		String url, Class<T> factoryClass) {
 
+    	org.restlet.Context.getCurrentLogger().setLevel(Level.FINEST);
+    	
+
     	String baseUrl = getBaseUrl(context);
     	if (baseUrl.endsWith("/")) {
     		baseUrl = baseUrl.substring(0, baseUrl.length() - 1);
@@ -175,6 +179,7 @@ public class Util {
 
     	Log.i(TAG, "ClientResource: "+uri);
     	ClientResource cr = new ClientResource(uri);
+    	cr.setRequestEntityBuffering(true);
 
     	Client c = new Client(new org.restlet.Context(), Protocol.HTTP);
     	c.getContext().getParameters().add("retryHandler", "au.com.codeka.warworlds.RequestRetryHandler");

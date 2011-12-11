@@ -20,13 +20,12 @@ import java.io.StringWriter;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.restlet.engine.Engine;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.res.AssetManager;
 import android.os.AsyncTask;
@@ -56,29 +55,6 @@ public class WarWorldsActivity extends Activity {
     private Context mContext = this;
 
     /**
-     * A {@link BroadcastReceiver} to receive the response from a register or
-     * unregister request, and to update the UI.
-     */
-    private final BroadcastReceiver mUpdateUIReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            String accountName = intent.getStringExtra(DeviceRegistrar.ACCOUNT_NAME_EXTRA);
-            int status = intent.getIntExtra(DeviceRegistrar.STATUS_EXTRA, DeviceRegistrar.ERROR_STATUS);
-            String message = null;
-            if (status == DeviceRegistrar.REGISTERED_STATUS) {
-                message = getResources().getString(R.string.registration_succeeded);
-            } else if (status == DeviceRegistrar.UNREGISTERED_STATUS) {
-                message = getResources().getString(R.string.unregistration_succeeded);
-            } else {
-                message = getResources().getString(R.string.registration_error);
-            }
-
-            // Display a notification
-            Util.generateNotification(mContext, String.format(message, accountName));
-        }
-    };
-
-    /**
      * Begins the activity.
      */
     @Override
@@ -89,10 +65,10 @@ public class WarWorldsActivity extends Activity {
         // IPv4 for now (restlet works better like this)
         System.setProperty("java.net.preferIPv6Addresses", "false");
 
+        Engine.getInstance().getRegisteredClients().clear();
+        Engine.getInstance().getRegisteredClients().add(new MyHttpClientHelper(null));
+        
         requestWindowFeature(Window.FEATURE_NO_TITLE); // remove the title bar
-
-        // Register a receiver to provide register/unregister notifications
-        registerReceiver(mUpdateUIReceiver, new IntentFilter(Util.UPDATE_UI_INTENT));
     }
 
     @Override
@@ -114,7 +90,6 @@ public class WarWorldsActivity extends Activity {
      */
     @Override
     public void onDestroy() {
-        unregisterReceiver(mUpdateUIReceiver);
         super.onDestroy();
     }
 

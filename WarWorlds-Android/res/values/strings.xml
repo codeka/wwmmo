@@ -8,7 +8,7 @@
     <string name="add_account">Add account...</string>
 
     <!--  Name of the application in the launcher [CHAR LIMIT=NONE] -->
-    <string name="app_name">WarWorlds</string>
+    <string name="app_name">War Worlds</string>
 
     <!-- Dialog title text [CHAR LIMIT=NONE] -->
     <string name="attention">Attention</string>
@@ -47,10 +47,8 @@
     <string name="needs_account">To receive notifications from this app, you must first create an account.</string>
 
     <!-- Notification message [CHAR LIMIT=NONE] -->
-    <string name="registration_error">Failed to register/unregister %1$s.</string>
 
     <!-- Notification message [CHAR LIMIT=NONE] -->
-    <string name="registration_succeeded">Registered %1$s for C2DM messaging.</string>
 
     <!-- Button text [CHAR LIMIT=NONE] -->
     <string name="start_game">Start Game</string>
@@ -62,7 +60,6 @@
     <string name="skip">Skip</string>
 
     <!-- Notification message [CHAR LIMIT=NONE] -->
-    <string name="unregistration_succeeded">Unegistered %1$s for C2DM messaging.</string>
     <string name="options">Options</string>
     <string name="log_in">Log In</string>
 

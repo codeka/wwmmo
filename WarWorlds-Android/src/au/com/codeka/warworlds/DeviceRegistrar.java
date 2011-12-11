@@ -16,7 +16,6 @@
 package au.com.codeka.warworlds;
 
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.provider.Settings.Secure;
 import android.util.Log;
@@ -31,16 +30,6 @@ import au.com.codeka.warworlds.shared.DevicesResource;
 public class DeviceRegistrar {
 	public static String TAG = "DeviceRegistrar";
 
-    public static final String ACCOUNT_NAME_EXTRA = "AccountName";
-
-    public static final String STATUS_EXTRA = "Status";
-
-    public static final int REGISTERED_STATUS = 1;
-
-    public static final int UNREGISTERED_STATUS = 2;
-
-    public static final int ERROR_STATUS = 3;
-
     public static void register(final Context context, final String deviceRegistrationID) {
     	registerOrUnregister(context, deviceRegistrationID, true);
     }
@@ -53,8 +42,6 @@ public class DeviceRegistrar {
             final String deviceRegistrationID, final boolean register) {
 
     	final SharedPreferences settings = Util.getSharedPreferences(context);
-        final String accountName = settings.getString(Util.ACCOUNT_NAME, "Unknown");
-        final Intent updateUIIntent = new Intent(Util.UPDATE_UI_INTENT);
 
         String url = "/devices";
 
@@ -77,9 +64,6 @@ public class DeviceRegistrar {
             // Clean up application state
             Util.clearDeviceRegistration(context);
 
-            updateUIIntent.putExtra(ACCOUNT_NAME_EXTRA, accountName);
-            updateUIIntent.putExtra(STATUS_EXTRA, ERROR_STATUS);
-            context.sendBroadcast(updateUIIntent);
             return;
     	}
     	
@@ -90,9 +74,5 @@ public class DeviceRegistrar {
         } else {
         	Util.clearDeviceRegistration(context);
         }
-
-        updateUIIntent.putExtra(ACCOUNT_NAME_EXTRA, accountName);
-        updateUIIntent.putExtra(STATUS_EXTRA, register ? REGISTERED_STATUS : UNREGISTERED_STATUS);
-        context.sendBroadcast(updateUIIntent);
     }
 }

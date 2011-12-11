@@ -202,7 +202,6 @@ public class AccountsActivity extends Activity {
                 		return null;
                 	}
                 });
-                finish();
             }
         });
     }
