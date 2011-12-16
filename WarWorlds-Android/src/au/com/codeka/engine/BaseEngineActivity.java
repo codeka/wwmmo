@@ -13,18 +13,18 @@ import android.view.Window;
 public class BaseEngineActivity extends Activity {
 
 	private RenderSurfaceView mView;
-	
+
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
-    	super.onCreate(savedInstanceState);
+        super.onCreate(savedInstanceState);
 
-    	// by default, we hide the window title, but leave the notification
-    	// area visible.
+        // by default, we hide the window title, but leave the notification
+        // area visible.
         requestWindowFeature(Window.FEATURE_NO_TITLE);
 
- 		mView = new RenderSurfaceView(this);
-   		mView.createRenderer();
-   		setContentView(mView);
+        mView = new RenderSurfaceView(this);
+        mView.createRenderer();
+        setContentView(mView);
     }
 }

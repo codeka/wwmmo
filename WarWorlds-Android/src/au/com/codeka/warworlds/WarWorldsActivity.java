@@ -36,6 +36,7 @@ import android.view.View.OnClickListener;
 import android.view.Window;
 import android.webkit.WebView;
 import android.widget.Button;
+import au.com.codeka.warworlds.game.StarfieldActivity;
 import au.com.codeka.warworlds.shared.MessageOfTheDay;
 import au.com.codeka.warworlds.shared.MessageOfTheDayResource;
 
@@ -54,6 +55,8 @@ public class WarWorldsActivity extends Activity {
      */
     private Context mContext = this;
 
+    private String mMotd = null;
+
     /**
      * Begins the activity.
      */
@@ -67,8 +70,19 @@ public class WarWorldsActivity extends Activity {
 
         Engine.getInstance().getRegisteredClients().clear();
         Engine.getInstance().getRegisteredClients().add(new MyHttpClientHelper(null));
-        
+
         requestWindowFeature(Window.FEATURE_NO_TITLE); // remove the title bar
+
+        if (savedInstanceState != null) {
+            mMotd = savedInstanceState.getString("motd");
+        }
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        outState.putString("motd", mMotd);
+
+        super.onSaveInstanceState(outState);
     }
 
     @Override
@@ -117,35 +131,42 @@ public class WarWorldsActivity extends Activity {
      * @param motd The \c WebView we'll install the MOTD to.
      */
     private void loadMotdAndVerifyAccount(final WebView motd) {
-		motd.setBackgroundColor(0x0); // transparent...
+        motd.setBackgroundColor(0x0); // transparent...
 
-		final ProgressDialog pleaseWaitDialog = ProgressDialog.show(mContext, null, 
-				"Connecting...", true);
-		
+        if (mMotd != null) {
+            motd.loadData(mMotd, "text/html", "utf-8");
+            return;
+        }
+
+        final ProgressDialog pleaseWaitDialog = ProgressDialog.show(mContext, null, 
+                "Connecting...", true);
+
         new AsyncTask<Void, Void, String>() {
-        	private String message;
+            private String message;
 
-        	@Override
-        	protected String doInBackground(Void... arg0) {
-        		try {
-        	    	MessageOfTheDayResource resource = Util.getClientResource(mContext, "/motd", MessageOfTheDayResource.class);
-        	    	MessageOfTheDay motd = resource.retrieve();
-        	    	message = motd.getMessage();
-        		} catch(Exception e) {
-        			Log.e(TAG, ExceptionUtils.getStackTrace(e));
-        			message = "<pre>" + e.toString() + "</pre>";
-        		}
+            @Override
+            protected String doInBackground(Void... arg0) {
+                try {
+                    MessageOfTheDayResource resource = Util.getClientResource(mContext, "/motd", MessageOfTheDayResource.class);
+                    MessageOfTheDay motd = resource.retrieve();
+                    message = motd.getMessage();
+                } catch(Exception e) {
+                    Log.e(TAG, ExceptionUtils.getStackTrace(e));
+                    message = "<pre>" + e.toString() + "</pre>";
+                }
 
-        		String tmpl = getHtmlFile("motd-template.html");
-        		return String.format(tmpl, message);
-        	}
+                String tmpl = getHtmlFile("motd-template.html");
+                return String.format(tmpl, message);
+            }
 
-        	@Override
-        	protected void onPostExecute(String result) {
-        		pleaseWaitDialog.dismiss();
-        		motd.loadData(result, "text/html", "utf-8");
-        		motd.setBackgroundColor(0x0); // transparent...
-        	}
+            @Override
+            protected void onPostExecute(String result) {
+                pleaseWaitDialog.dismiss();
+                motd.loadData(result, "text/html", "utf-8");
+                motd.setBackgroundColor(0x0); // transparent...
+
+                mMotd = result;
+            }
         }.execute();
     }
     
@@ -159,7 +180,7 @@ public class WarWorldsActivity extends Activity {
         final WebView motd = (WebView) findViewById(R.id.motd);
 
         loadMotdAndVerifyAccount(motd);
-        
+
         logOutButton.setOnClickListener(new OnClickListener() {
         	public void onClick(View v) {
         		startActivity(new Intent(mContext, AccountsActivity.class));
@@ -169,40 +190,7 @@ public class WarWorldsActivity extends Activity {
         startGameButton.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
             	startGameButton.setEnabled(false);
-
-                startActivity(new Intent(mContext, GameActivity.class));
-/*                
-                // Use an AsyncTask to avoid blocking the UI thread
-                new AsyncTask<Void, Void, String>() {
-                    private String message;
-
-                    @Override
-                    protected String doInBackground(Void... arg0) {
-                        MyRequestFactory requestFactory = Util.getRequestFactory(mContext,
-                                MyRequestFactory.class);
-                        final HelloWorldRequest request = requestFactory.helloWorldRequest();
-                        Log.i(TAG, "Sending request to server");
-                        request.getMessage().fire(new Receiver<String>() {
-                            @Override
-                            public void onFailure(ServerFailure error) {
-                                message = "Failure: " + error.getMessage();
-                            }
-
-                            @Override
-                            public void onSuccess(String result) {
-                                message = result;
-                            }
-                        });
-                        return message;
-                    }
-
-                    @Override
-                    protected void onPostExecute(String result) {
-                        helloWorld.setText(result);
-                        sayHelloButton.setEnabled(true);
-                    }
-                }.execute();
-*/
+                startActivity(new Intent(mContext, StarfieldActivity.class));
             }
         });
     }

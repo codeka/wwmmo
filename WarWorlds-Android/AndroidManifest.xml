@@ -40,9 +40,9 @@
             android:screenOrientation="portrait">
         </activity>
 
-        <!-- Actual game activity -->
-        <activity android:name=".GameActivity" android:label="@string/app_name"></activity>
-        
+        <!-- A couple of activities that are used by the game itself -->
+        <activity android:name=".game.StarfieldActivity" android:label="@string/app_name" android:screenOrientation="landscape"></activity>
+
         <!-- In order to use the C2DM library, an application must declare a class 
              with the name C2DMReceiver, extending com.google.android.c2dm.C2DMBaseReceiver.
              It must also include this section in the manifest. -->
