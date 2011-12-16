@@ -21,5 +21,6 @@
 	<classpathentry kind="lib" path="lib/org.restlet.ext.json.jar"/>
 	<classpathentry kind="lib" path="lib/org.restlet.ext.xml.jar"/>
 	<classpathentry kind="lib" path="lib/org.restlet.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/WarWorlds-Common"/>
 	<classpathentry kind="output" path="war/WEB-INF/classes"/>
 </classpath>

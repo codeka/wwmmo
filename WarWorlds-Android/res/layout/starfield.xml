@@ -9,6 +9,12 @@
         android:layout_weight="0.666"
         android:layout_height="match_parent"
         android:orientation="vertical" >
+
+        <au.com.codeka.warworlds.game.StarfieldSurfaceView
+            android:id="@+id/starfield"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
     </LinearLayout>
 
     <LinearLayout
