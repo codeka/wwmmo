@@ -54,6 +54,14 @@ public class SectorManager {
         return mSectorY;
     }
 
+    public int getOffsetX() {
+        return mOffsetX;
+    }
+
+    public int getOffsetY() {
+        return mOffsetY;
+    }
+
     public int getRadius() {
         return mRadius;
     }
@@ -78,5 +86,41 @@ public class SectorManager {
         }
 
         mSectors = newSectors;
+    }
+
+    /**
+     * Scrolls the view by a relative amount.
+     * @param distanceX Number of pixels in the X direction to scroll.
+     * @param distanceY Number of pixels in the Y direction to scroll.
+     */
+    public void scroll(int distanceX, int distanceY) {
+        mOffsetX += distanceX;
+        mOffsetY += distanceY;
+
+        boolean needUpdate = false;
+        while (mOffsetX < -256) {
+            mOffsetX += 512;
+            mSectorX --;
+            needUpdate = true;
+        }
+        while (mOffsetX > 256) {
+            mOffsetX -= 512;
+            mSectorX ++;
+            needUpdate = true;
+        }
+        while (mOffsetY < -256) {
+            mOffsetY += 512;
+            mSectorY --;
+            needUpdate = true;
+        }
+        while (mOffsetY > 256) {
+            mOffsetY -= 512;
+            mSectorY ++;
+            needUpdate = true;
+        }
+
+        if (needUpdate) {
+            scrollTo(mSectorX, mSectorY, mOffsetX, mOffsetY);
+        }
     }
 }

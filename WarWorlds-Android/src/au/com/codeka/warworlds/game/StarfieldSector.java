@@ -18,7 +18,7 @@ public class StarfieldSector {
         mSectorX = sectorX;
         mSectorY = sectorY;
         mNodes = new StarfieldNode[256];
-        mRandom = new CoolRandom(sectorX, sectorY);
+        mRandom = new CoolRandom(sectorX * 347, sectorY * -374);
 
         for(int y = 0; y < 16; y++) {
             for(int x = 0; x < 16; x++) {
@@ -35,7 +35,7 @@ public class StarfieldSector {
             throw new IllegalArgumentException("Invalid nodeY "+nodeY);
         }
 
-        return mNodes[nodeY+16+nodeX];
+        return mNodes[nodeY*16+nodeX];
     }
 
     public long getSectorX() {

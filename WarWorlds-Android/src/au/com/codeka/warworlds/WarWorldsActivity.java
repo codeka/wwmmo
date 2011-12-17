@@ -1,18 +1,4 @@
-/*
- * Copyright 2010 Google Inc.
- * 
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not
- * use this file except in compliance with the License. You may obtain a copy of
- * the License at
- * 
- * http://www.apache.org/licenses/LICENSE-2.0
- * 
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
- * License for the specific language governing permissions and limitations under
- * the License.
- */
+
 package au.com.codeka.warworlds;
 
 import java.io.InputStream;
@@ -114,7 +100,7 @@ public class WarWorldsActivity extends Activity {
         try {
             AssetManager assetManager = mContext.getAssets();
             InputStream is = assetManager.open("html/"+fileName);
-            
+
             StringWriter writer = new StringWriter();
             IOUtils.copy(is, writer);
             return writer.toString();
@@ -130,11 +116,11 @@ public class WarWorldsActivity extends Activity {
      * 
      * @param motd The \c WebView we'll install the MOTD to.
      */
-    private void loadMotdAndVerifyAccount(final WebView motd) {
-        motd.setBackgroundColor(0x0); // transparent...
+    private void loadMotdAndVerifyAccount(final WebView motdView) {
+        motdView.setBackgroundColor(0x0); // transparent...
 
         if (mMotd != null) {
-            motd.loadData(mMotd, "text/html", "utf-8");
+            motdView.loadData(mMotd, "text/html", "utf-8");
             return;
         }
 
@@ -149,10 +135,23 @@ public class WarWorldsActivity extends Activity {
                 try {
                     MessageOfTheDayResource resource = Util.getClientResource(mContext, "/motd", MessageOfTheDayResource.class);
                     MessageOfTheDay motd = resource.retrieve();
-                    message = motd.getMessage();
+                    if (motd == null) {
+                        // it's most likely that we need to re-authenticate...
+//                        Log.w(TAG, "MOTD is null, assuming re-authentication is required.");
+//                        Util.reauthenticate(mContext, WarWorldsActivity.this, new Callable<Void>() {
+//                            @Override
+//                            public Void call() throws Exception {
+//                                loadMotdAndVerifyAccount(motdView);
+//                                return null;
+//                            }
+//                        });
+                        message = "<pre>Try logging in and out again.</pre>";
+                    } else {
+                        message = motd.getMessage();
+                    }
                 } catch(Exception e) {
                     Log.e(TAG, ExceptionUtils.getStackTrace(e));
-                    message = "<pre>" + e.toString() + "</pre>";
+                    message = "<pre>"+ExceptionUtils.getStackTrace(e)+"</pre>";
                 }
 
                 String tmpl = getHtmlFile("motd-template.html");
@@ -162,14 +161,14 @@ public class WarWorldsActivity extends Activity {
             @Override
             protected void onPostExecute(String result) {
                 pleaseWaitDialog.dismiss();
-                motd.loadData(result, "text/html", "utf-8");
-                motd.setBackgroundColor(0x0); // transparent...
+                motdView.loadData(result, "text/html", "utf-8");
+                motdView.setBackgroundColor(0x0); // transparent...
 
                 mMotd = result;
             }
         }.execute();
     }
-    
+
     // Manage UI Screens
 
     private void setHomeScreenContent() {
@@ -177,9 +176,9 @@ public class WarWorldsActivity extends Activity {
 
         final Button startGameButton = (Button) findViewById(R.id.start_game);
         final Button logOutButton = (Button) findViewById(R.id.log_out);
-        final WebView motd = (WebView) findViewById(R.id.motd);
 
-        loadMotdAndVerifyAccount(motd);
+        final WebView motdView = (WebView) findViewById(R.id.motd);
+        loadMotdAndVerifyAccount(motdView);
 
         logOutButton.setOnClickListener(new OnClickListener() {
         	public void onClick(View v) {

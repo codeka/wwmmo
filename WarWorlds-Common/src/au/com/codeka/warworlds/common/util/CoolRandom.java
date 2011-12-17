@@ -44,7 +44,7 @@ public class CoolRandom {
 
         for(int i = 0; i < 4096; i++) {
             long v = r[i % r.length].nextInt();
-            v -= Integer.MIN_VALUE;
+            v -= (Integer.MAX_VALUE / 2);
             mBuffer[i] = v;
         }
 
@@ -52,18 +52,30 @@ public class CoolRandom {
     }
 
     public int nextInt() {
+        final long a = 0xffffffffL;
+        final long b = 0xfffffffeL;
+
         mIndex = (mIndex + 1) & 4095;
         long t = 18782 * mBuffer[mIndex] + mInitial;
         mInitial = t >>> 32;
-        long x = (t + mInitial) & 0xffffffffL;
-        if (x < mInitial) {
-            ++x;
-            ++mInitial;
+        t = (t & a) + mInitial;
+        if (t > a) {
+            mInitial ++;
+            t = t - a;
         }
 
-        long v = 0xfffffffeL - x;
-        mBuffer[mIndex] = v;
-        return (int) v;
+        mBuffer[mIndex] = b - t;
+        return (int) mBuffer[mIndex];
+    }
+
+    public int nextInt(int maxValue) {
+        return nextInt(0, maxValue);
+    }
+
+    public int nextInt(int minValue, int maxValue) {
+        // float is probably not the best way to do this...
+        float f = nextFloat();
+        return (int)((f * (float)maxValue) + (float)minValue);
     }
 
     public long nextLong() {
@@ -77,7 +89,9 @@ public class CoolRandom {
      */
     public float nextFloat() {
         long a = nextInt();
-        return (float)a / (float)Integer.MAX_VALUE;
+        float f = (float)a / (float)Integer.MAX_VALUE;
+        f = (f+1.0f) / 2.0f;
+        return f;
     }
 
     /**

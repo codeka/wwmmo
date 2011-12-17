@@ -3,7 +3,6 @@ package au.com.codeka.warworlds.game;
 import au.com.codeka.warworlds.common.util.CoolRandom;
 
 public class StarfieldNode {
-
     private StarfieldSector mSector;
     private StarfieldStar mStar;
     private int mNodeX;
@@ -15,8 +14,8 @@ public class StarfieldNode {
         mSector = sector;
 
         CoolRandom r = mSector.getRandom();
-        if (r.nextBoolean(0.2f)) {
-            mStar = new StarfieldStar();
+        if (r.nextBoolean(0.06f)) {
+            mStar = new StarfieldStar(this, mSector);
         }
     }
 

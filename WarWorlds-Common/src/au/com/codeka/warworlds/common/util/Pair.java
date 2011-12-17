@@ -21,9 +21,9 @@ public class Pair<
 
     @Override
     public int compareTo(Pair<E, F> other) {
-        int comp = other.one.compareTo(other.one);
+        int comp = one.compareTo(other.one);
         if (comp == 0) {
-            comp = other.two.compareTo(other.two);
+            comp = two.compareTo(other.two);
         }
 
         return comp;
