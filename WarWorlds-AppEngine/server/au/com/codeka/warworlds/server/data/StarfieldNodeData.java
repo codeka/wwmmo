@@ -31,7 +31,8 @@ public class StarfieldNodeData implements Serializable {
     public StarfieldNodeData() {
     }
 
-    public StarfieldNodeData(int nodeX, int nodeY, StarfieldStarData star) {
+    public StarfieldNodeData(Key key, int nodeX, int nodeY, StarfieldStarData star) {
+        mKey = key;
         mNodeX = nodeX;
         mNodeY = nodeY;
         mStar = star;
@@ -62,7 +63,9 @@ public class StarfieldNodeData implements Serializable {
         StarfieldNode node = new StarfieldNode();
         node.setNodeX(mNodeX);
         node.setNodeY(mNodeY);
-        node.setStar(mStar.toStarfieldStar());
+        if (mStar != null) {
+            node.setStar(mStar.toStarfieldStar());
+        }
         return node;
     }
 }

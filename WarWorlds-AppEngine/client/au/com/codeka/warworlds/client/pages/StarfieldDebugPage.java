@@ -67,6 +67,7 @@ public class StarfieldDebugPage extends BasePage {
 
         Request request = Connector.createRequest(Method.GET, url);
 
+        // make sure we get back JSON...
         List<Preference<MediaType>> mediaTypes = request.getClientInfo().getAcceptedMediaTypes();
         mediaTypes.clear();
         mediaTypes.add(new Preference<MediaType>(MediaType.APPLICATION_JSON, 1.0f));
@@ -75,14 +76,15 @@ public class StarfieldDebugPage extends BasePage {
 
             @Override
             public void handle(Request request, Response response) {
+                mRefresh.setEnabled(true);
+                setStatus("Success", 5000);
+
                 Representation r = response.getEntity();
                 try {
                     mSectorData.setValue(r.getText());
                 } catch (IOException e) {
-                    // TODO do something?
                 }
             }
-            
         });
     }
 

@@ -35,6 +35,10 @@ public class StarfieldSector implements Serializable {
         return mNodes[nodeY*16+nodeX];
     }
 
+    public StarfieldNode[] getNodes() {
+        return mNodes;
+    }
+
     public long getSectorX() {
         return mSectorX;
     }

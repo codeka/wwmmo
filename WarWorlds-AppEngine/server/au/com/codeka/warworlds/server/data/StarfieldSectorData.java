@@ -3,6 +3,7 @@ package au.com.codeka.warworlds.server.data;
 import java.io.Serializable;
 import java.util.Random;
 
+import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 import javax.jdo.annotations.IdentityType;
 import javax.jdo.annotations.NotPersistent;
@@ -54,6 +55,10 @@ public class StarfieldSectorData implements Serializable {
         return mNodes[nodeY*16+nodeX];
     }
 
+    public Key getKey() {
+        return mKey;
+    }
+
     public long getSectorX() {
         return mSectorX;
     }
@@ -86,7 +91,27 @@ public class StarfieldSectorData implements Serializable {
 
     public static StarfieldSectorData getSector(PersistenceManager pm, long sectorX, long sectorY) {
         Key key = buildKey(sectorX, sectorY);
-        return pm.getObjectById(StarfieldSectorData.class, key);
+        StarfieldSectorData sector = pm.getObjectById(StarfieldSectorData.class, key);
+
+        sector.mNodes = new StarfieldNodeData[256];
+        for(int nodeY = 0; nodeY < 16; nodeY++) {
+            for(int nodeX = 0; nodeX < 16; nodeX++) {
+                Key nodeKey = buildKey(sector.mKey, nodeX, nodeY);
+                StarfieldNodeData node = pm.getObjectById(StarfieldNodeData.class, nodeKey);
+
+                Key starKey = KeyFactory.createKey(nodeKey, 
+                        StarfieldStarData.class.getSimpleName(), 1);
+                try {
+                    node.setStar(pm.getObjectById(StarfieldStarData.class, starKey));
+                } catch (JDOObjectNotFoundException e) {
+                    // it won't exist if there is no star in this node...
+                }
+
+                sector.setNode(nodeX, nodeY, node);
+            }
+        }
+
+        return sector;
     }
 
     public static StarfieldSectorData generate(long sectorX, long sectorY) {
@@ -95,34 +120,37 @@ public class StarfieldSectorData implements Serializable {
         sector.mSectorX = sectorX;
         sector.mSectorY = sectorY;
 
-        CoolRandom r = new CoolRandom(sectorX, sectorY, new Random().nextInt());
-        for(int nodeY = 0; nodeY < 16; nodeY++) {
-            for(int nodeX = 0; nodeX < 16; nodeX++) {
-                Key nodeKey = buildKey(sector.mKey, nodeX, nodeY);
-
-                StarfieldStarData star = null;
-                if (r.nextBoolean(0.08f)) {
-                    Key starKey = KeyFactory.createKey(nodeKey, 
-                            StarfieldStarData.class.getSimpleName(), 1);
-
-                    int red = r.nextInt(100, 255);
-                    int green = r.nextInt(100, 255);
-                    int blue = r.nextInt(100, 255);
-                    int colour = 0xff000000 | (red << 16) | (green << 8) | blue;
-
-                    star = new StarfieldStarData(starKey,
-                            r.nextInt(-12, 12), r.nextInt(-12, 12),
-                            colour, r.nextInt(8, 12));
-                }
-
-                StarfieldNodeData node = new StarfieldNodeData(nodeX, nodeY, star);
-                sector.setNode(nodeX, nodeY, node);
-            }
-        }
-
         PersistenceManager pm = PMF.get().getPersistenceManager();
         try {
             pm.makePersistent(sector);
+
+            CoolRandom r = new CoolRandom(sectorX, sectorY, new Random().nextInt());
+            for(int nodeY = 0; nodeY < 16; nodeY++) {
+                for(int nodeX = 0; nodeX < 16; nodeX++) {
+                    Key nodeKey = buildKey(sector.mKey, nodeX, nodeY);
+
+                    StarfieldStarData star = null;
+                    if (r.nextBoolean(0.08f)) {
+                        Key starKey = KeyFactory.createKey(nodeKey, 
+                                StarfieldStarData.class.getSimpleName(), 1);
+
+                        int red = r.nextInt(100, 255);
+                        int green = r.nextInt(100, 255);
+                        int blue = r.nextInt(100, 255);
+                        int colour = 0xff000000 | (red << 16) | (green << 8) | blue;
+
+                        star = new StarfieldStarData(starKey,
+                                r.nextInt(-12, 12), r.nextInt(-12, 12),
+                                colour, r.nextInt(8, 12));
+                        pm.makePersistent(star);
+                    }
+
+                    StarfieldNodeData node = new StarfieldNodeData(nodeKey, nodeX, nodeY, star);
+                    sector.setNode(nodeX, nodeY, node);
+                }
+            }
+
+            pm.makePersistentAll(sector.mNodes);
         } finally {
             pm.close();
         }
