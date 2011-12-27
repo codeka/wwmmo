@@ -3,7 +3,8 @@ package au.com.codeka.warworlds.game;
 import java.util.Map;
 import java.util.TreeMap;
 
-import au.com.codeka.warworlds.common.util.Pair;
+import au.com.codeka.warworlds.shared.util.Pair;
+import au.com.codeka.warworlds.shared.StarfieldSector;
 
 /**
  * This class "manages" the list of \c StarfieldSector's that we have loaded
@@ -80,7 +81,8 @@ public class SectorManager {
                 if (mSectors.containsKey(key)) {
                     newSectors.put(key, mSectors.get(key));
                 } else {
-                    newSectors.put(key, new StarfieldSector(sectorX, sectorY));
+                    //TODO
+                    //newSectors.put(key, new StarfieldSector(sectorX, sectorY));
                 }
             }
         }

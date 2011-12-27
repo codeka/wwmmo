@@ -11,6 +11,9 @@ import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import au.com.codeka.warworlds.shared.StarfieldNode;
+import au.com.codeka.warworlds.shared.StarfieldSector;
+import au.com.codeka.warworlds.shared.StarfieldStar;
 
 public class StarfieldSurfaceView extends SurfaceView
                 implements SurfaceHolder.Callback {

@@ -19,81 +19,81 @@ import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Widget;
 
 public class MotdPage extends BasePage {
-	public static String TOKEN = "motd";
+    public static String TOKEN = "motd";
 
-	interface MotdPageUiBinder extends UiBinder<Widget, MotdPage> {
-	}
-	private static MotdPageUiBinder uiBinder = GWT.create(MotdPageUiBinder.class);
+    interface MotdPageUiBinder extends UiBinder<Widget, MotdPage> {
+    }
+    private static MotdPageUiBinder uiBinder = GWT.create(MotdPageUiBinder.class);
 
-	@UiField
-	Button saveMotd;
-	
-	@UiField
-	TextAreaElement newMotd;
-	
-	@UiField
-	DivElement currMotd;
-	
-	public MotdPage() {
-		initWidget(uiBinder.createAndBindUi(this));
+    @UiField
+    Button saveMotd;
 
-	    saveMotd.addClickHandler(new ClickHandler() {
-	        public void onClick(ClickEvent event) {
-	        	saveMotd.setEnabled(false);
-	        	setStatus("Saving...");
+    @UiField
+    TextAreaElement newMotd;
 
-	        	MessageOfTheDay motd = new MessageOfTheDay();
-	        	motd.setMessage(newMotd.getValue());
-	        	motd.setPostDate(new Date());
+    @UiField
+    DivElement currMotd;
 
-	        	MessageOfTheDayResourceProxy proxy = Connector.create(
-	        			GWT.create(MessageOfTheDayResourceProxy.class), "/motd");
-	        	proxy.store(motd, new Result<Void>() {
+    public MotdPage() {
+        initWidget(uiBinder.createAndBindUi(this));
 
-					@Override
-					public void onFailure(Throwable caught) {
-	            		saveMotd.setEnabled(true);
-	            		setStatus(caught.getMessage(), true);
-					}
+        saveMotd.addClickHandler(new ClickHandler() {
+            public void onClick(ClickEvent event) {
+                saveMotd.setEnabled(false);
+                setStatus("Saving...");
 
-					@Override
-					public void onSuccess(Void na) {
-            			refreshMotd();
-					}
-	        	});
-	        }
-	    });
+                MessageOfTheDay motd = new MessageOfTheDay();
+                motd.setMessage(newMotd.getValue());
+                motd.setPostDate(new Date());
 
-	    refreshMotd();
-	}
-	
-	private void refreshMotd() {
-		setStatus("Refreshing...");
-		saveMotd.setEnabled(false);
+                MessageOfTheDayResourceProxy proxy = Connector.create(
+                        GWT.create(MessageOfTheDayResourceProxy.class), "/motd");
+                proxy.store(motd, new Result<Void>() {
 
-    	MessageOfTheDayResourceProxy proxy = Connector.create(
-    			GWT.create(MessageOfTheDayResourceProxy.class), "/motd");
-    	proxy.retrieve(new Result<MessageOfTheDay>() {
+                    @Override
+                    public void onFailure(Throwable caught) {
+                        saveMotd.setEnabled(true);
+                        setStatus(caught.getMessage(), true);
+                    }
 
-			@Override
-			public void onFailure(Throwable caught) {
-				saveMotd.setEnabled(true);
-				setStatus(caught.getMessage(), true);
-			}
+                    @Override
+                    public void onSuccess(Void na) {
+                        refreshMotd();
+                    }
+                });
+            }
+        });
 
-			@Override
-			public void onSuccess(MessageOfTheDay motd) {
-				saveMotd.setEnabled(true);
-				setStatus("Success", 5000);
-				currMotd.setInnerHTML(motd.getMessage());
-				newMotd.setValue(motd.getMessage());
-			}
-    	});
-	}
+        refreshMotd();
+    }
 
-	@Override
-	public String getTitle() {
-		return TOKEN;
-	}
+    private void refreshMotd() {
+        setStatus("Refreshing...");
+        saveMotd.setEnabled(false);
+
+        MessageOfTheDayResourceProxy proxy = Connector.create(
+                GWT.create(MessageOfTheDayResourceProxy.class), "/motd");
+        proxy.retrieve(new Result<MessageOfTheDay>() {
+
+            @Override
+            public void onFailure(Throwable caught) {
+                saveMotd.setEnabled(true);
+                setStatus(caught.getMessage(), true);
+            }
+
+            @Override
+            public void onSuccess(MessageOfTheDay motd) {
+                saveMotd.setEnabled(true);
+                setStatus("Success", 5000);
+                currMotd.setInnerHTML(motd.getMessage());
+                newMotd.setValue(motd.getMessage());
+            }
+        });
+    }
+
+    @Override
+    public String getTitle() {
+        return TOKEN;
+    }
 
 }

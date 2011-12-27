@@ -1,0 +1,28 @@
+<ui:UiBinder
+		xmlns:ui='urn:ui:com.google.gwt.uibinder'
+		xmlns:g='urn:import:com.google.gwt.user.client.ui'>
+	<g:HTMLPanel>
+		<style>
+			fieldset {
+				width: 480px;
+			}
+			fieldset input[type=text] {
+				width: 180px;
+			}
+			textarea {
+				width: 95%;
+				height: 400px;
+			}
+		</style>
+		<div id="starfield-debug">
+			<h1>Starfield</h1>
+			<fieldset>
+				<legend>Sector Coordinates</legend>
+				<input type="text" ui:field="mSectorX" />
+				<input type="text" ui:field="mSectorY" />
+				<g:Button ui:field="mRefresh">Refresh</g:Button>
+			</fieldset>
+			<textarea ui:field="mSectorData" />
+		</div>
+	</g:HTMLPanel>
+</ui:UiBinder>

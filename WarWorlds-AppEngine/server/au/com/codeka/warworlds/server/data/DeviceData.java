@@ -143,10 +143,10 @@ public class DeviceData {
 	public static void store(DeviceData d) {
         PersistenceManager pm = PMF.get().getPersistenceManager();
         try {
-        	d.ensureID();
-        	pm.makePersistent(d);
+            d.ensureID();
+            pm.makePersistent(d);
         } finally {
-        	pm.close();
+            pm.close();
         }
 	}
 

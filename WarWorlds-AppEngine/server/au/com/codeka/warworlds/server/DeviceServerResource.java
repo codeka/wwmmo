@@ -14,32 +14,32 @@ import au.com.codeka.warworlds.shared.Device;
 import au.com.codeka.warworlds.shared.DeviceResource;
 
 public class DeviceServerResource extends ServerResource implements DeviceResource {
-	private static final Logger log = Logger.getLogger(DevicesServerResource.class.getName());
+    private static final Logger log = Logger.getLogger(DevicesServerResource.class.getName());
 
-	private String deviceRegistrationID;
-	
-	@Override
-	public void doInit() throws ResourceException {
-		this.deviceRegistrationID = (String) getRequest().getAttributes().get("deviceRegistrationID");
-	}
+    private String mDeviceRegistrationID;
 
-	@Override
-	public Device retrieve() {
-		DeviceData dd = DeviceData.getDeviceForRegistrationID(deviceRegistrationID);
-		if (dd == null) {
-			return null;
-		}
+    @Override
+    public void doInit() throws ResourceException {
+        mDeviceRegistrationID = (String) getRequest().getAttributes().get("deviceRegistrationID");
+    }
 
-		return dd.toDevice();
-	}
+    @Override
+    public Device retrieve() {
+        DeviceData dd = DeviceData.getDeviceForRegistrationID(mDeviceRegistrationID);
+        if (dd == null) {
+            return null;
+        }
 
-	@Override
-	public void unregister() {
-		log.info("Registering device, deviceRegistrationID="+deviceRegistrationID);
+        return dd.toDevice();
+    }
 
-		UserService userService = UserServiceFactory.getUserService();
-		User user = userService.getCurrentUser();
+    @Override
+    public void unregister() {
+        log.info("Registering device, deviceRegistrationID="+mDeviceRegistrationID);
 
-		DeviceData.remove(deviceRegistrationID, user.getEmail());
-	}
+        UserService userService = UserServiceFactory.getUserService();
+        User user = userService.getCurrentUser();
+
+        DeviceData.remove(mDeviceRegistrationID, user.getEmail());
+    }
 }
