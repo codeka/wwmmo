@@ -19,10 +19,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.Locale;
 import java.util.Properties;
 import java.util.concurrent.Callable;
-import java.util.logging.Level;
 
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
@@ -58,9 +56,6 @@ import android.util.Log;
  * retrieving shared preferences.
  */
 public class Util {
-
-	private static Properties props = null;
-	
     /**
      * Tag for logging.
      */
@@ -93,59 +88,70 @@ public class Util {
      */
     public static final String UPDATE_UI_INTENT = getPackageName() + ".UPDATE_UI";
 
-    // End shared constants
-
     /**
      * Key for shared preferences.
      */
-    private static final String SHARED_PREFS = "warworlds".toUpperCase(Locale.ENGLISH) + "_PREFS";
+    private static final String SHARED_PREFS = "WARWORLDS_PREFS";
 
     /**
-     * Gets a reference to the "warworlds.properties" file, that's deployed with the package.
-     * @return
+     * The authentication cookie stays in a global variable so we don't have
+     * to keep fetching it from the SharedPreferences all the time.
      */
-    public static Properties getProperties(Context context) {
-    	if (props == null) {
-	    	AssetManager assetManager = context.getAssets();
-	
-	    	InputStream inputStream = null;
-	    	try {
-	    	    inputStream = assetManager.open("warworlds.properties");
-	    	    props = new Properties();
-	    	    props.load(inputStream);
-	    	} catch (IOException e) {
-	    		props = null;
-	    	} finally {
-	    		try {
-	    			if (inputStream != null) {
-	    				inputStream.close();
-	    			}
-	    		} catch(IOException e) {
-	    		}
-	    	}
-    	}
-    	
-    	return props;
+    private static String sAuthCookie;
+    private static Properties sProperties;
+
+    /**
+     * Must be called before other methods on this class. We load up the initial
+     * properties, preferences and settings to make later calls easier (and not
+     * require a \c Context parameter)
+     */
+    public static void loadSettings(Context context) {
+        // load the warworlds.properties file and populate mProperties.
+        AssetManager assetManager = context.getAssets();
+
+        InputStream inputStream = null;
+        try {
+            inputStream = assetManager.open("warworlds.properties");
+            sProperties = new Properties();
+            sProperties.load(inputStream);
+        } catch (IOException e) {
+            sProperties = null;
+        } finally {
+            try {
+                if (inputStream != null) {
+                    inputStream.close();
+                }
+            } catch(IOException e) {
+            }
+        }
+
+        SharedPreferences prefs = getSharedPreferences(context);
+        sAuthCookie = prefs.getString(Util.AUTH_COOKIE, null);
+    }
+
+    /**
+     * Gets the contents of the warworlds.properties as a \c Properties.
+     */
+    public static Properties getProperties() {
+        return sProperties;
     }
 
     /**
      * Returns the (debug or production) URL associated with the registration
      * service.
      */
-    public static String getBaseUrl(Context context) {
-    	Properties p = getProperties(context);
-    	String serverDefault = p.getProperty("server.default");
-    	String url = p.getProperty("server."+serverDefault);
-    	return url;
+    public static String getBaseUrl() {
+        final String serverDefault = sProperties.getProperty("server.default");
+        final String url = sProperties.getProperty("server."+serverDefault);
+        return url;
     }
-    
+
     /**
      * Returns true if we are running against a dev mode appengine instance.
      */
-    public static boolean isDebug(Context context) {
-    	Properties p = getProperties(context);
-    	String serverDefault = p.getProperty("server.default");
-    	return (serverDefault.equals("debug"));
+    public static boolean isDebug() {
+        final String serverDefault = sProperties.getProperty("server.default");
+        return (serverDefault.equals("debug"));
     }
 
     /**
@@ -179,44 +185,39 @@ public class Util {
      * Creates a \c ClientResource pointing at the given URL and that will return data for the given
      * resource type.
      */
-    public static <T> T getClientResource(Context context,
-    		String url, Class<T> factoryClass) {
+    public static <T> T getClientResource(String url, Class<T> factoryClass) {
+        String baseUrl = getBaseUrl();
+        if (baseUrl.endsWith("/")) {
+            baseUrl = baseUrl.substring(0, baseUrl.length() - 1);
+        }
+        if (!url.startsWith("/")) {
+            url = "/"+url;
+        }
 
-    	org.restlet.Context.getCurrentLogger().setLevel(Level.FINEST);
-    	
+        URI uri = null;
+        try {
+            uri = new URI(baseUrl + "/api/v1" + url);
+        } catch(URISyntaxException e) {
+            Log.e(TAG, "Invalid URL: "+baseUrl+url);
+            return null;
+        }
 
-    	String baseUrl = getBaseUrl(context);
-    	if (baseUrl.endsWith("/")) {
-    		baseUrl = baseUrl.substring(0, baseUrl.length() - 1);
-    	}
-    	if (!url.startsWith("/")) {
-    		url = "/"+url;
-    	}
+        Log.i(TAG, "ClientResource: "+uri);
+        ClientResource cr = new ClientResource(uri);
+        cr.setRequestEntityBuffering(true);
 
-    	URI uri = null;
-    	try {
-    		uri = new URI(baseUrl + "/api/v1" + url);
-    	} catch(URISyntaxException e) {
-    		Log.e(TAG, "Invalid URL: "+baseUrl+url);
-    		return null;
-    	}
+        Client c = new Client(new org.restlet.Context(), Protocol.HTTP);
+        c.getContext().getParameters().add("retryHandler",
+                "au.com.codeka.warworlds.RequestRetryHandler");
+        cr.setNext(c);
 
-    	Log.i(TAG, "ClientResource: "+uri);
-    	ClientResource cr = new ClientResource(uri);
-    	cr.setRequestEntityBuffering(true);
-
-    	Client c = new Client(new org.restlet.Context(), Protocol.HTTP);
-    	c.getContext().getParameters().add("retryHandler", "au.com.codeka.warworlds.RequestRetryHandler");
-    	cr.setNext(c);
-
-		// add the authentication cookie to the request as well
-		SharedPreferences prefs = getSharedPreferences(context);
-        String authCookie = prefs.getString(Util.AUTH_COOKIE, null);
+        // add the authentication cookie to the request as well
+        String authCookie = sAuthCookie;
         if (authCookie != null) {
-	        String nvp[] = authCookie.split("=");
-	        Series<Cookie> cookies = new Series<Cookie>(Cookie.class);
-	        cookies.add(new Cookie(nvp[0], nvp[1]));
-	        cr.setCookies(cookies);
+            String nvp[] = authCookie.split("=");
+            Series<Cookie> cookies = new Series<Cookie>(Cookie.class);
+            cookies.add(new Cookie(nvp[0], nvp[1]));
+            cr.setCookies(cookies);
         }
 
         return cr.wrap(factoryClass);
@@ -226,7 +227,8 @@ public class Util {
      * (Re-)authenticate with the AppEngine service. We'll use the account name
      * we have saved in the preferences and re-generate a new AUTH_COOKIE.
      */
-    public static void reauthenticate(Context context, final Activity activity, final Callable<Void> onComplete) {
+    public static void reauthenticate(Context context, final Activity activity,
+            final Callable<Void> onComplete) {
         final SharedPreferences prefs = getSharedPreferences(context);
         final AccountManager mgr = AccountManager.get(context);
 
@@ -237,12 +239,14 @@ public class Util {
         for (Account acct : accts) {
             final Account account = acct;
             if (account.name.equals(accountName)) {
-                if (isDebug(context)) {
+                if (isDebug()) {
                     Log.i(TAG, "Account found, setting up with debug auth cookie.");
                     // Use a fake cookie for the dev mode app engine server
                     // The cookie has the form email:isAdmin:userId
                     // We set the userId to be the same as the email
-                    String authCookie = "dev_appserver_login=" + accountName + ":false:" + accountName;
+                    String authCookie = "dev_appserver_login=" + accountName +
+                            ":false:" + accountName;
+                    sAuthCookie = authCookie;
                     prefs.edit().putString(Util.AUTH_COOKIE, authCookie).commit();
 
                     Log.i(TAG, "AUTH_COOKIE has been saved.");
@@ -255,13 +259,16 @@ public class Util {
 
                     // Get the auth token from the AccountManager and convert
                     // it into a cookie for the AppEngine server
-                    mgr.getAuthToken(account, "ah", null, activity, new AccountManagerCallback<Bundle>() {
+                    mgr.getAuthToken(account, "ah", null, activity,
+                            new AccountManagerCallback<Bundle>() {
                         public void run(AccountManagerFuture<Bundle> future) {
                             String authToken = getAuthToken(future);
 
-                            // Ensure the token is not expired by invalidating it and obtaining a new one
+                            // Ensure the token is not expired by invalidating
+                            // it and obtaining a new one
                             mgr.invalidateAuthToken(account.type, authToken);
-                            mgr.getAuthToken(account, "ah", null, activity, new AccountManagerCallback<Bundle>() {
+                            mgr.getAuthToken(account, "ah", null, activity,
+                                    new AccountManagerCallback<Bundle>() {
                                 public void run(final AccountManagerFuture<Bundle> future) {
                                     final String newAuthToken = getAuthToken(future);
 
@@ -275,6 +282,7 @@ public class Util {
                                                 Editor editor = prefs.edit();
                                                 editor.putString(Util.AUTH_COOKIE, authCookie);
                                                 editor.commit();
+                                                sAuthCookie = authCookie;
 
                                                 Log.i(TAG, "AUTH_COOKIE has been saved.");
                                                 try {
@@ -349,14 +357,14 @@ public class Util {
      */
     public static void clearDeviceRegistration(Context context) {
         SharedPreferences prefs = context.getSharedPreferences(SHARED_PREFS, 0);
-    	
+
         SharedPreferences.Editor editor = prefs.edit();
         editor.remove(Util.ACCOUNT_NAME);
         editor.remove(Util.AUTH_COOKIE);
         editor.remove(Util.DEVICE_REGISTRATION_ID);
         editor.commit();
     }
-    
+
     /**
      * Helper method to get a SharedPreferences instance.
      */
@@ -364,21 +372,21 @@ public class Util {
         SharedPreferences prefs = context.getSharedPreferences(SHARED_PREFS, 0);
 
         String savedBaseUrl = prefs.getString("pref.baseUrl", "");
-        String baseUrl = getBaseUrl(context);
+        String baseUrl = getBaseUrl();
         if (!savedBaseUrl.equalsIgnoreCase(baseUrl)) {
-        	// if the base URL has changed, it means we're now talking to a
-        	// different instance of the app (debug vs. release probably). We'll need
-        	// to clear out some preferences first.
-        	Log.w(TAG, "BaseURL has changed (\""+baseUrl+"\" != \""+savedBaseUrl+"\"), clearing device registration");
+            // if the base URL has changed, it means we're now talking to a
+            // different instance of the app (debug vs. release probably). We'll need
+            // to clear out some preferences first.
+            Log.w(TAG, "BaseURL has changed (\""+baseUrl+"\" != \""+savedBaseUrl+"\"), clearing device registration");
 
-        	clearDeviceRegistration(context);
+            clearDeviceRegistration(context);
 
-        	prefs = context.getSharedPreferences(SHARED_PREFS, 0);
-        	SharedPreferences.Editor editor = prefs.edit();
-        	editor.putString("pref.baseUrl", baseUrl);
-        	editor.commit();
+            prefs = context.getSharedPreferences(SHARED_PREFS, 0);
+            SharedPreferences.Editor editor = prefs.edit();
+            editor.putString("pref.baseUrl", baseUrl);
+            editor.commit();
         }
-        
+
         return prefs;
     }
 

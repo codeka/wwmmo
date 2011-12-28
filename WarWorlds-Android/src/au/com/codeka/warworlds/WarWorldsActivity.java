@@ -51,6 +51,9 @@ public class WarWorldsActivity extends Activity {
         Log.i(TAG, "War Worlds is starting up...");
         super.onCreate(savedInstanceState);
 
+        // initialize the Util class
+        Util.loadSettings(mContext);
+
         // IPv4 for now (restlet works better like this)
         System.setProperty("java.net.preferIPv6Addresses", "false");
 
@@ -133,7 +136,8 @@ public class WarWorldsActivity extends Activity {
             @Override
             protected String doInBackground(Void... arg0) {
                 try {
-                    MessageOfTheDayResource resource = Util.getClientResource(mContext, "/motd", MessageOfTheDayResource.class);
+                    MessageOfTheDayResource resource = Util.getClientResource(
+                            "/motd", MessageOfTheDayResource.class);
                     MessageOfTheDay motd = resource.retrieve();
                     if (motd == null) {
                         // it's most likely that we need to re-authenticate...

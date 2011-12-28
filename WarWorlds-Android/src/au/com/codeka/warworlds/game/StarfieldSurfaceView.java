@@ -11,7 +11,6 @@ import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
-import au.com.codeka.warworlds.shared.StarfieldNode;
 import au.com.codeka.warworlds.shared.StarfieldSector;
 import au.com.codeka.warworlds.shared.StarfieldStar;
 
@@ -123,8 +122,7 @@ public class StarfieldSurfaceView extends SurfaceView
 
                 StarfieldSector sector = sm.getSector(sectorX, sectorY);
                 if (sector == null) {
-                    // TODO: huh??
-                    continue;
+                    continue; // it might not be loaded yet...
                 }
 
                 drawSector(canvas, (x * 512) + sm.getOffsetX(), (y * 512) + sm.getOffsetY(), sector);
@@ -134,21 +132,15 @@ public class StarfieldSurfaceView extends SurfaceView
 
     private void drawSector(Canvas canvas, int offsetX, int offsetY,
             StarfieldSector sector) {
-        for(int nodeY = 0; nodeY < 16; nodeY++) {
-            for(int nodeX = 0; nodeX < 16; nodeX++) {
-                StarfieldNode node = sector.getNode(nodeX, nodeY);
-                StarfieldStar star = node.getStar();
-                if (star != null) {
-                    drawStar(canvas, star, offsetX + (nodeX * 32), offsetY + (nodeY * 32));
-                }
-            }
+        for(StarfieldStar star : sector.getStars()) {
+            drawStar(canvas, star, offsetX, offsetY);
         }
     }
 
     private Paint p = null;
     private void drawStar(Canvas canvas, StarfieldStar star, int x, int y) {
-        x += star.getOffsetX();
-        y += star.getOffsetY();
+        x += star.getX();
+        y += star.getY();
 
         int[] colours = { star.getColour(), star.getColour(), 0x00000000 };
         float[] positions = { 0.0f, 0.2f, 1.0f };

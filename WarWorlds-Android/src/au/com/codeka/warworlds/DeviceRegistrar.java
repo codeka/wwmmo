@@ -51,12 +51,12 @@ public class DeviceRegistrar {
 	        	d.setDeviceRegistrationID(deviceRegistrationID);
 	        	d.setDeviceID(Secure.getString(context.getContentResolver(), Secure.ANDROID_ID));
 
-    			DevicesResource resource = Util.getClientResource(context, url, DevicesResource.class);
+    			DevicesResource resource = Util.getClientResource(url, DevicesResource.class);
 	        	resource.register(d);
 	        } else {
 	        	url += "/" + deviceRegistrationID;
 
-    			DeviceResource resource = Util.getClientResource(context, url, DeviceResource.class);
+    			DeviceResource resource = Util.getClientResource(url, DeviceResource.class);
 	    		resource.unregister();
 	        }
     	} catch(Exception ex) {
