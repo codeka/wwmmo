@@ -169,22 +169,22 @@ public class SectorManager {
         boolean needUpdate = false;
         while (mOffsetX < -256) {
             mOffsetX += 512;
-            mSectorX --;
+            mSectorX ++;
             needUpdate = true;
         }
         while (mOffsetX > 256) {
             mOffsetX -= 512;
-            mSectorX ++;
+            mSectorX --;
             needUpdate = true;
         }
         while (mOffsetY < -256) {
             mOffsetY += 512;
-            mSectorY --;
+            mSectorY ++;
             needUpdate = true;
         }
         while (mOffsetY > 256) {
             mOffsetY -= 512;
-            mSectorY ++;
+            mSectorY --;
             needUpdate = true;
         }
 

@@ -110,8 +110,8 @@ public class StarfieldSectorData implements Serializable {
                 do {
                     dupe = false;
                     for(StarData existingStar : sector.mStars) {
-                        if ((existingStar.getX() / 16) == starX &&
-                                (existingStar.getX() / 16) == starY) {
+                        if ((existingStar.getX() / 32) == starX &&
+                                (existingStar.getX() / 32) == starY) {
                             dupe = true;
                             starX = r.nextInt(0, 16);
                             starY = r.nextInt(0, 16);
@@ -120,8 +120,8 @@ public class StarfieldSectorData implements Serializable {
                     }
                 } while (dupe);
 
-                final int offsetX = r.nextInt(4, 12);
-                final int offsetY = r.nextInt(4, 12);
+                final int offsetX = r.nextInt(8, 24);
+                final int offsetY = r.nextInt(8, 24);
 
                 final int red = r.nextInt(100, 255);
                 final int green = r.nextInt(100, 255);
@@ -130,8 +130,8 @@ public class StarfieldSectorData implements Serializable {
 
                 final int size = r.nextInt(8, 12);
 
-                final StarData newStar = new StarData(starX*16 + offsetX,
-                        starY*16 + offsetY, colour, size);
+                final StarData newStar = new StarData(starX*32 + offsetX,
+                        starY*32 + offsetY, colour, size);
                 sector.mStars.add(newStar);
             }
 

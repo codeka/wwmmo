@@ -125,7 +125,8 @@ public class StarfieldSurfaceView extends SurfaceView
                     continue; // it might not be loaded yet...
                 }
 
-                drawSector(canvas, (x * 512) + sm.getOffsetX(), (y * 512) + sm.getOffsetY(), sector);
+                drawSector(canvas, (x * 512) + sm.getOffsetX(),
+                        (y * 512) + sm.getOffsetY(), sector);
             }
         }
     }
