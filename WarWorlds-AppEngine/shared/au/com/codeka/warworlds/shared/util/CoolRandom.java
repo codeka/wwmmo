@@ -73,9 +73,18 @@ public class CoolRandom {
     }
 
     public int nextInt(int minValue, int maxValue) {
+        if (maxValue == minValue) {
+            return maxValue;
+        }
+        if (maxValue < minValue) {
+            int t = maxValue;
+            maxValue = minValue;
+            minValue = t;
+        }
+
         // float is probably not the best way to do this...
         float f = nextFloat();
-        return (int)((f * (float)maxValue) + (float)minValue);
+        return (int)((f * (float)(maxValue - minValue)) + (float)minValue);
     }
 
     public long nextLong() {

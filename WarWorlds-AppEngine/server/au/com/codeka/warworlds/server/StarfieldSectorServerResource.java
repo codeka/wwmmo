@@ -1,9 +1,12 @@
 package au.com.codeka.warworlds.server;
 
 import javax.jdo.JDOObjectNotFoundException;
+import javax.jdo.PersistenceManager;
 
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.ServerResource;
+
+import com.google.android.c2dm.server.PMF;
 
 import au.com.codeka.warworlds.server.data.StarfieldSectorData;
 import au.com.codeka.warworlds.shared.StarfieldSector;
@@ -21,15 +24,21 @@ public class StarfieldSectorServerResource extends ServerResource
     }
 
     @Override
-    public StarfieldSector fetch() {
-        StarfieldSectorData sector = null;
+    public StarfieldSector getSector() {
+        PersistenceManager pm = PMF.get().getPersistenceManager();
         try {
-            sector = StarfieldSectorData.getSector(mSectorX, mSectorY);
-        } catch(JDOObjectNotFoundException e) {
-            sector = StarfieldSectorData.generate(mSectorX, mSectorY);
+            StarfieldSectorData sector = null;
+
+            try {
+                sector = StarfieldSectorData.getSector(pm, mSectorX, mSectorY);
+            } catch(JDOObjectNotFoundException e) {
+                sector = StarfieldSectorData.generate(mSectorX, mSectorY);
+            }
+
+            return sector.toStarfieldSector();
+        } finally {
+            pm.close();
         }
 
-        return sector.toStarfieldSector();
     }
-
 }

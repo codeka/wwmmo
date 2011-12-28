@@ -3,40 +3,28 @@ package au.com.codeka.warworlds.shared;
 import java.io.Serializable;
 
 /**
- * A \c StarfieldSector represents a "sector" of the starfield. It contains a
- * grid of 16x16 \c StarfieldNode, which each contains zero or one stars. 
- * @author dean@codeka.com.au
- *
+ * A \c StarfieldSector represents a "sector" of the starfield. It is 
+ * representend by a virtual "field", 256x256 pixels big of somewhere between
+ * ~10 & 15 \c StarfieldStar objects. 
  */
 public class StarfieldSector implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    private StarfieldNode[] mNodes;
+    private StarfieldStar[] mStars;
     private long mSectorX;
     private long mSectorY;
 
     public StarfieldSector() {
     }
 
-    public StarfieldSector(long sectorX, long sectorY, StarfieldNode[] nodes) {
+    public StarfieldSector(long sectorX, long sectorY, StarfieldStar[] stars) {
         mSectorX = sectorX;
         mSectorY = sectorY;
-        mNodes = nodes;
+        mStars = stars;
     }
 
-    public StarfieldNode getNode(int nodeX, int nodeY) {
-        if (nodeX >= 16 || nodeX < 0) {
-            throw new IllegalArgumentException("Invalid nodeX "+nodeX);
-        }
-        if (nodeY >= 16 || nodeY < 0) {
-            throw new IllegalArgumentException("Invalid nodeY "+nodeY);
-        }
-
-        return mNodes[nodeY*16+nodeX];
-    }
-
-    public StarfieldNode[] getNodes() {
-        return mNodes;
+    public StarfieldStar[] getStars() {
+        return mStars;
     }
 
     public long getSectorX() {

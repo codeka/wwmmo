@@ -4,5 +4,5 @@ import org.restlet.resource.Get;
 
 public interface StarfieldSectorResource {
     @Get
-    public StarfieldSector fetch();
+    public StarfieldSector getSector();
 }
