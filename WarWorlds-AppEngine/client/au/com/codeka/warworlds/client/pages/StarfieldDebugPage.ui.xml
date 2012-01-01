@@ -20,7 +20,12 @@
 				<legend>Sector Coordinates</legend>
 				<input type="text" ui:field="mSectorX" />
 				<input type="text" ui:field="mSectorY" />
-				<g:Button ui:field="mRefresh">Refresh</g:Button>
+				<g:Button ui:field="mSingleRefresh">Refresh</g:Button>
+			</fieldset>
+			<fieldset>
+				<legend>Multi-Sectors</legend>
+				<input type="text" ui:field="mSectorQuery" />
+				<g:Button ui:field="mQueryRefresh">Refresh</g:Button>
 			</fieldset>
 			<textarea ui:field="mSectorData" />
 		</div>

@@ -20,10 +20,11 @@ public class WarWorldsApplication extends Application {
 
         router.attachDefault(new Directory(getContext(), "war:///"));
         router.attach("/api/v1/motd", MessageOfTheDayServerResource.class);
+        router.attach("/api/v1/devices", DevicesServerResource.class);
         router.attach("/api/v1/devices/notifications", DevicesNotificationsServerResource.class);
         router.attach("/api/v1/devices/{deviceRegistrationID}", DeviceServerResource.class);
-        router.attach("/api/v1/devices", DevicesServerResource.class);
-        router.attach("/api/v1/starfield/sector/{sectorX}/{sectorY}", StarfieldSectorServerResource.class);
+        router.attach("/api/v1/sectors", StarfieldSectorServerResource.class);
+        router.attach("/api/v1/sectors/{sectorX}/{sectorY}", StarfieldSectorServerResource.class);
 
         return router;
     }

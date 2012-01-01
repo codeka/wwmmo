@@ -42,7 +42,13 @@ public class StarfieldDebugPage extends BasePage {
     TextAreaElement mSectorData;
 
     @UiField
-    Button mRefresh;
+    Button mSingleRefresh;
+
+    @UiField
+    InputElement mSectorQuery;
+
+    @UiField
+    Button mQueryRefresh;
 
     public StarfieldDebugPage() {
         initWidget(uiBinder.createAndBindUi(this));
@@ -50,20 +56,30 @@ public class StarfieldDebugPage extends BasePage {
         mSectorX.setValue("0");
         mSectorY.setValue("0");
 
-        mRefresh.addClickHandler(new ClickHandler() {
+        mSingleRefresh.addClickHandler(new ClickHandler() {
             @Override
             public void onClick(ClickEvent event) {
-                refreshSector();
+                refreshSector(true);
             }
-            
+        });
+        mQueryRefresh.addClickHandler(new ClickHandler() {
+            @Override
+            public void onClick(ClickEvent event) {
+                refreshSector(false);
+            }
         });
     }
 
-    private void refreshSector() {
+    private void refreshSector(boolean single) {
         setStatus("Refreshing...");
-        mRefresh.setEnabled(false);
+        mSingleRefresh.setEnabled(false);
 
-        String url = "/starfield/sector/"+mSectorX.getValue()+"/"+mSectorY.getValue();
+        String url = "/sectors";
+        if (single) {
+            url += "/"+mSectorX.getValue()+"/"+mSectorY.getValue();
+        } else {
+            url += "?coords="+mSectorQuery.getValue();
+        }
 
         Request request = Connector.createRequest(Method.GET, url);
 
@@ -76,7 +92,7 @@ public class StarfieldDebugPage extends BasePage {
 
             @Override
             public void handle(Request request, Response response) {
-                mRefresh.setEnabled(true);
+                mSingleRefresh.setEnabled(true);
                 setStatus("Success", 5000);
 
                 Representation r = response.getEntity();

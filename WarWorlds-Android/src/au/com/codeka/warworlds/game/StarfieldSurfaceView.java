@@ -108,6 +108,11 @@ public class StarfieldSurfaceView extends SurfaceView
 
     }
 
+    /**
+     * Draws the actual starfield to the given \c Canvas. This will be called in
+     * a background thread, so we can't do anything UI-specific, except drawing
+     * to the canvas.
+     */
     @Override
     public void onDraw(Canvas canvas) {
         SectorManager sm = SectorManager.getInstance();
