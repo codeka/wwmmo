@@ -1,0 +1,26 @@
+<ui:UiBinder
+		xmlns:ui='urn:ui:com.google.gwt.uibinder'
+		xmlns:g='urn:import:com.google.gwt.user.client.ui'>
+	<g:HTMLPanel>
+		<style>
+			fieldset {
+				width: 480px;
+			}
+			fieldset input[type=text] {
+				width: 180px;
+			}
+			textarea {
+				width: 95%;
+				height: 400px;
+			}
+		</style>
+		<div id="datastore-debug">
+			<h1>DataStore Entities</h1>
+			<fieldset>
+				<legend>Bulk Delete</legend>
+				<g:ListBox ui:field="mEntityTypes" />
+				<g:Button ui:field="mBulkDelete">Delete</g:Button>
+			</fieldset>
+		</div>
+	</g:HTMLPanel>
+</ui:UiBinder>

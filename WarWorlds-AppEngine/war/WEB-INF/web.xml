@@ -18,25 +18,32 @@
                         http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
     version="2.5">
 
-  <!-- Default page to serve -->
+  <!-- Default page to serve, basically just says "nothing to see here..." -->
   <welcome-file-list>
     <welcome-file>WarWorlds.html</welcome-file>
   </welcome-file-list>
 
+  <!-- MapReduce servlet -->
+  <servlet>
+    <servlet-name>mapreduce</servlet-name>
+    <servlet-class>com.google.appengine.tools.mapreduce.MapReduceServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>mapreduce</servlet-name>
+    <url-pattern>/mapreduce/*</url-pattern>
+  </servlet-mapping>
+
+  <!-- Servlet for C2DM stuff -->
   <servlet>
     <servlet-name>dataMessagingServlet</servlet-name>
-    <servlet-class>
-      com.google.android.c2dm.server.C2DMRetryServlet
-    </servlet-class>
+    <servlet-class>com.google.android.c2dm.server.C2DMRetryServlet</servlet-class>
   </servlet>
-
   <servlet-mapping>
     <servlet-name>dataMessagingServlet</servlet-name>
       <url-pattern>/tasks/c2dm</url-pattern>
   </servlet-mapping>
 
   <!-- Our main restlet servlet -->
-
   <servlet>
     <servlet-name>adapter</servlet-name>
     <servlet-class>org.restlet.ext.servlet.ServerServlet</servlet-class>
@@ -65,6 +72,16 @@
     <user-data-constraint>
       <transport-guarantee>CONFIDENTIAL</transport-guarantee>
     </user-data-constraint>
+  </security-constraint>
+
+  <!-- Only administrators can view/run mappers -->
+  <security-constraint>
+    <web-resource-collection>
+      <url-pattern>/mapreduce/*</url-pattern>
+    </web-resource-collection>
+    <auth-constraint>
+      <role-name>admin</role-name>
+    </auth-constraint>
   </security-constraint>
 
 </web-app>

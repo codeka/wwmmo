@@ -36,6 +36,8 @@ public class Navigation {
             go(new DevicesPage());
         } else if (name.equalsIgnoreCase("starfield-debug")) {
             go(new StarfieldDebugPage());
+        } else if (name.equalsIgnoreCase("datastore-debug")) {
+            go(new DataStoreDebugPage());
         } else {
             // go(new NotFoundPage())
         }

@@ -8,20 +8,16 @@ import java.util.logging.Logger;
 import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 
-import org.restlet.data.MediaType;
 import org.restlet.data.Form;
-import org.restlet.representation.ObjectRepresentation;
-import org.restlet.representation.Representation;
-import org.restlet.representation.Variant;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.ServerResource;
-
-import com.google.android.c2dm.server.PMF;
 
 import au.com.codeka.warworlds.server.data.StarfieldSectorData;
 import au.com.codeka.warworlds.shared.StarfieldSector;
 import au.com.codeka.warworlds.shared.StarfieldSectorResource;
 import au.com.codeka.warworlds.shared.util.Pair;
+
+import com.google.android.c2dm.server.PMF;
 
 public class StarfieldSectorServerResource extends ServerResource
                 implements StarfieldSectorResource {
