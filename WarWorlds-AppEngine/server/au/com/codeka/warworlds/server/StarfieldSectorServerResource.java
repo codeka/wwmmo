@@ -8,7 +8,11 @@ import java.util.logging.Logger;
 import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 
+import org.restlet.data.MediaType;
 import org.restlet.data.Form;
+import org.restlet.representation.ObjectRepresentation;
+import org.restlet.representation.Representation;
+import org.restlet.representation.Variant;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.ServerResource;
 
@@ -51,10 +55,10 @@ public class StarfieldSectorServerResource extends ServerResource
     }
 
     @Override
-    public List<StarfieldSector> getSectors() {
+    public ArrayList<StarfieldSector> getSectors() {
         PersistenceManager pm = PMF.get().getPersistenceManager();
         try {
-            List<StarfieldSector> sectors = new ArrayList<StarfieldSector>();
+            ArrayList<StarfieldSector> sectors = new ArrayList<StarfieldSector>();
 
             for(Pair<Long, Long> xy : mSectorsToFetch) {
                 StarfieldSectorData sector = null;
@@ -73,6 +77,21 @@ public class StarfieldSectorServerResource extends ServerResource
         } finally {
             pm.close();
         }
-
     }
+/*
+    @Override
+    public Representation toRepresentation(Object source, Variant target) {
+        if (MediaType.APPLICATION_JSON.equals(target.getMediaType())) {
+            return null;
+        } else if (MediaType.APPLICATION_JAVA_OBJECT_GWT.equals(target.getMediaType())) {
+            return null;
+        } else if (MediaType.APPLICATION_JAVA_OBJECT.equals(target.getMediaType())) {
+            ObjectRepresentation<ArrayList<StarfieldSector>> r = new ObjectRepresentation<ArrayList<StarfieldSector>>(
+                    (ArrayList<StarfieldSector>)source);
+            return r;
+        }
+
+        return null; // ??
+    }
+*/
 }

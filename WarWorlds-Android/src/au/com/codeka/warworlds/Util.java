@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.Callable;
 
@@ -29,6 +30,8 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.params.ClientPNames;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.restlet.Client;
+import org.restlet.data.MediaType;
+import org.restlet.data.Preference;
 import org.restlet.data.Cookie;
 import org.restlet.data.Protocol;
 import org.restlet.resource.ClientResource;
@@ -219,6 +222,11 @@ public class Util {
             cookies.add(new Cookie(nvp[0], nvp[1]));
             cr.setCookies(cookies);
         }
+
+        // make sure we get back a native java-serialized object
+        List<Preference<MediaType>> mediaTypes = cr.getClientInfo().getAcceptedMediaTypes();
+        mediaTypes.clear();
+        mediaTypes.add(new Preference<MediaType>(MediaType.APPLICATION_JAVA_OBJECT, 1.0f));
 
         return cr.wrap(factoryClass);
     }

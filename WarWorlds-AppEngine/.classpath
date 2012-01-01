@@ -16,7 +16,7 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="lib" path="war/WEB-INF/lib/org.restlet.ext.servlet.jar"/>
-	<classpathentry kind="lib" path="war/WEB-INF/lib/org.restlet.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/org.restlet.jar" sourcepath="/home/dean/software/restlet/restlet-gae-2.1rc1/src/org.restlet"/>
 	<classpathentry kind="lib" path="war/WEB-INF/lib/org.restlet.ext.gwt.jar"/>
 	<classpathentry kind="lib" path="lib/org.restlet.ext.json.jar"/>
 	<classpathentry kind="lib" path="lib/org.restlet.ext.xml.jar"/>
