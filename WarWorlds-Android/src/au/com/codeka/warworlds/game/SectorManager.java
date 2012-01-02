@@ -13,6 +13,7 @@ import android.util.Log;
 import au.com.codeka.warworlds.Util;
 import au.com.codeka.warworlds.shared.StarfieldSector;
 import au.com.codeka.warworlds.shared.StarfieldSectorResource;
+import au.com.codeka.warworlds.shared.constants.SectorConstants;
 import au.com.codeka.warworlds.shared.util.Pair;
 
 /**
@@ -199,23 +200,23 @@ public class SectorManager {
         mOffsetY += distanceY;
 
         boolean needUpdate = false;
-        while (mOffsetX < -256) {
-            mOffsetX += 512;
+        while (mOffsetX < -(SectorConstants.Width / 2)) {
+            mOffsetX += SectorConstants.Width;
             mSectorX ++;
             needUpdate = true;
         }
-        while (mOffsetX > 256) {
-            mOffsetX -= 512;
+        while (mOffsetX > (SectorConstants.Width / 2)) {
+            mOffsetX -= SectorConstants.Width;
             mSectorX --;
             needUpdate = true;
         }
-        while (mOffsetY < -256) {
-            mOffsetY += 512;
+        while (mOffsetY < -(SectorConstants.Height / 2)) {
+            mOffsetY += SectorConstants.Height;
             mSectorY ++;
             needUpdate = true;
         }
-        while (mOffsetY > 256) {
-            mOffsetY -= 512;
+        while (mOffsetY > (SectorConstants.Height / 2)) {
+            mOffsetY -= SectorConstants.Height;
             mSectorY --;
             needUpdate = true;
         }

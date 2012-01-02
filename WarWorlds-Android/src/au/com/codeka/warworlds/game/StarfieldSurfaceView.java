@@ -13,6 +13,7 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import au.com.codeka.warworlds.shared.StarfieldSector;
 import au.com.codeka.warworlds.shared.StarfieldStar;
+import au.com.codeka.warworlds.shared.constants.SectorConstants;
 
 public class StarfieldSurfaceView extends SurfaceView
                 implements SurfaceHolder.Callback {
@@ -130,8 +131,8 @@ public class StarfieldSurfaceView extends SurfaceView
                     continue; // it might not be loaded yet...
                 }
 
-                drawSector(canvas, (x * 512) + sm.getOffsetX(),
-                        (y * 512) + sm.getOffsetY(), sector);
+                drawSector(canvas, (x * SectorConstants.Width) + sm.getOffsetX(),
+                        (y * SectorConstants.Height) + sm.getOffsetY(), sector);
             }
         }
     }

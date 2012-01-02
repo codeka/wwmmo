@@ -15,6 +15,7 @@ import javax.jdo.Transaction;
 
 import au.com.codeka.warworlds.shared.StarfieldSector;
 import au.com.codeka.warworlds.shared.StarfieldStar;
+import au.com.codeka.warworlds.shared.constants.SectorConstants;
 import au.com.codeka.warworlds.shared.util.CoolRandom;
 
 import com.google.android.c2dm.server.PMF;
@@ -99,7 +100,12 @@ public class StarfieldSectorData implements Serializable {
             tx.begin();
 
             CoolRandom r = new CoolRandom(sectorX, sectorY, new Random().nextInt());
-            int numStars = r.nextInt(10, 15);
+            int numStars = r.nextInt(SectorConstants.MinStars, SectorConstants.MaxStars);
+
+            final int gridX = (SectorConstants.Width / 16);
+            final int gridY = (SectorConstants.Height / 16);
+            final int gridCentreX = gridX / 2;
+            final int gridCentreY = gridY / 2;
 
             for (int i = 0; i < numStars; i++) {
                 int starX = r.nextInt(0, 16);
@@ -110,8 +116,8 @@ public class StarfieldSectorData implements Serializable {
                 do {
                     dupe = false;
                     for(StarData existingStar : sector.mStars) {
-                        if ((existingStar.getX() / 32) == starX &&
-                                (existingStar.getX() / 32) == starY) {
+                        if ((existingStar.getX() / gridX) == starX &&
+                                (existingStar.getY() / gridY) == starY) {
                             dupe = true;
                             starX = r.nextInt(0, 16);
                             starY = r.nextInt(0, 16);
@@ -120,18 +126,20 @@ public class StarfieldSectorData implements Serializable {
                     }
                 } while (dupe);
 
-                final int offsetX = r.nextInt(8, 24);
-                final int offsetY = r.nextInt(8, 24);
+
+
+                final int offsetX = r.nextInt(gridCentreX - (gridCentreX / 2), gridCentreX + (gridCentreX / 2));
+                final int offsetY = r.nextInt(gridCentreY - (gridCentreY / 2), gridCentreY + (gridCentreY / 2));
 
                 final int red = r.nextInt(100, 255);
                 final int green = r.nextInt(100, 255);
                 final int blue = r.nextInt(100, 255);
                 final int colour = 0xff000000 | (red << 16) | (green << 8) | blue;
 
-                final int size = r.nextInt(8, 12);
+                final int size = r.nextInt(gridX / 4, gridX / 3);
 
-                final StarData newStar = new StarData(starX*32 + offsetX,
-                        starY*32 + offsetY, colour, size);
+                final StarData newStar = new StarData(starX*gridX + offsetX,
+                        starY*gridY + offsetY, colour, size);
                 sector.mStars.add(newStar);
             }
 
