@@ -13,6 +13,7 @@ import android.util.Log;
 import au.com.codeka.warworlds.Util;
 import au.com.codeka.warworlds.shared.StarfieldSector;
 import au.com.codeka.warworlds.shared.StarfieldSectorResource;
+import au.com.codeka.warworlds.shared.StarfieldStar;
 import au.com.codeka.warworlds.shared.constants.SectorConstants;
 import au.com.codeka.warworlds.shared.util.Pair;
 
@@ -133,6 +134,57 @@ public class SectorManager {
         }
 
         mSectors = newSectors;
+    }
+
+    /**
+     * Gets the \c StarfieldStar that's a close to the given (x,y), based on the current sector
+     * centre and offsets.
+     */
+    public StarfieldStar getStarAt(int viewX, int viewY) {
+        // first, work out which sector your actually inside of. If (mOffsetX, mOffsetY) is (0,0)
+        // then (x,y) corresponds exactly to the offset into (mSectorX, mSectorY). Otherwise, we
+        // have to adjust (x,y) by the offset so that it works out like that.
+        int x = viewX - mOffsetX;
+        int y = viewY - mOffsetY;
+
+        long sectorX = mSectorX;
+        long sectorY = mSectorY;
+        while (x < 0) {
+            x += SectorConstants.Width;
+            mSectorX --;
+        }
+        while (x >= SectorConstants.Width) {
+            x -= SectorConstants.Width;
+            mSectorX ++;
+        }
+        while (y < 0) {
+            y += SectorConstants.Height;
+            mSectorY --;
+        }
+        while (y >= SectorConstants.Height) {
+            y -= SectorConstants.Height;
+            mSectorY ++;
+        }
+
+        StarfieldSector sector = getSector(sectorX, sectorY);
+        if (sector == null) {
+            // if it's not loaded yet, you can't have tapped on anything...
+            return null;
+        }
+
+        x /= SectorConstants.Width / 16;
+        y /= SectorConstants.Height / 16;
+
+        for(StarfieldStar star : sector.getStars()) {
+            int starX = star.getX() / (SectorConstants.Width / 16);
+            int starY = star.getY() / (SectorConstants.Height / 16);
+
+            if (starX == x && starY == y) {
+                return star;
+            }
+        }
+
+        return null;
     }
 
     /**

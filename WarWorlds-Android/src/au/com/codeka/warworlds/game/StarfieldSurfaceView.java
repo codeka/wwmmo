@@ -1,8 +1,11 @@
 package au.com.codeka.warworlds.game;
 
+import java.util.ArrayList;
+
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.graphics.Paint.Style;
 import android.graphics.RadialGradient;
 import android.os.AsyncTask;
 import android.util.AttributeSet;
@@ -15,13 +18,18 @@ import au.com.codeka.warworlds.shared.StarfieldSector;
 import au.com.codeka.warworlds.shared.StarfieldStar;
 import au.com.codeka.warworlds.shared.constants.SectorConstants;
 
-public class StarfieldSurfaceView extends SurfaceView
-                implements SurfaceHolder.Callback {
+/**
+ * \c SurfaceView that displays the starfield. You can scroll around, tap on stars to bring
+ * up their details and so on.
+ */
+public class StarfieldSurfaceView extends SurfaceView implements SurfaceHolder.Callback {
     private static String TAG = "StarfieldSurfaceView";
 
     private SurfaceHolder mHolder;
     private GestureDetector mGestureDetector;
     private GestureHandler mGestureHandler;
+    private ArrayList<OnStarSelectedListener> mStarSelectedListeners;
+    private StarfieldStar mSelectedStar;
 
     // these are used to ensure we don't queue up heaps of AsyncTasks for
     // redrawing the screen.
@@ -32,14 +40,15 @@ public class StarfieldSurfaceView extends SurfaceView
         super(context, attrs);
         Log.i(TAG, "Starfield initializing...");
 
+        mSelectedStar = null;
+
         getHolder().addCallback(this);
         mGestureHandler = new GestureHandler();
         mGestureDetector = new GestureDetector(context, mGestureHandler);
     }
 
     @Override
-    public void surfaceChanged(SurfaceHolder holder, int format, int width,
-            int height) {
+    public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
     }
 
     @Override
@@ -59,6 +68,22 @@ public class StarfieldSurfaceView extends SurfaceView
     public boolean onTouchEvent(MotionEvent event) {
         mGestureDetector.onTouchEvent(event);
         return true;
+    }
+
+    public void addStarSelectedListener(OnStarSelectedListener listener) {
+        if (!mStarSelectedListeners.contains(listener)) {
+            mStarSelectedListeners.add(listener);
+        }
+    }
+
+    public void removeStarSelectedListener(OnStarSelectedListener listener) {
+        mStarSelectedListeners.remove(listener);
+    }
+
+    protected void fireStarSelected(StarfieldStar star) {
+        for(OnStarSelectedListener listener : mStarSelectedListeners) {
+            listener.onStarSelected(star);
+        }
     }
 
     /**
@@ -106,7 +131,6 @@ public class StarfieldSurfaceView extends SurfaceView
                 }
             }
         }.execute();
-
     }
 
     /**
@@ -150,7 +174,7 @@ public class StarfieldSurfaceView extends SurfaceView
         y += star.getY();
 
         int[] colours = { star.getColour(), star.getColour(), 0x00000000 };
-        float[] positions = { 0.0f, 0.2f, 1.0f };
+        float[] positions = { 0.0f, 0.4f, 1.0f };
 
         RadialGradient gradient = new RadialGradient(x, y, star.getSize(), 
                 colours, positions, android.graphics.Shader.TileMode.CLAMP);
@@ -161,6 +185,13 @@ public class StarfieldSurfaceView extends SurfaceView
         p.setShader(gradient);
 
         canvas.drawCircle(x, y, star.getSize(), p);
+
+        if (mSelectedStar == star) {
+            Paint p2 = new Paint();
+            p2.setARGB(255, 255, 255, 255);
+            p2.setStyle(Style.STROKE);
+            canvas.drawCircle(x, y, star.getSize() + 5, p2);
+        }
     }
 
     /**
@@ -175,5 +206,39 @@ public class StarfieldSurfaceView extends SurfaceView
             redraw(); // todo: something better? e.g. event listener or something
             return false;
         }
+
+        /**
+         * We need to check whether you tapped on a star, and if so, we'll display some
+         * basic info about the star on the status pane. Actually, we'll just fire the
+         * "StarSelect" event and let the \c StarfieldActivity do that.
+         */
+        @Override
+        public boolean onSingleTapConfirmed(MotionEvent e) {
+            int tapX = (int) e.getX();
+            int tapY = (int) e.getY();
+
+            StarfieldStar star = SectorManager.getInstance().getStarAt(tapX, tapY);
+            if (star != null) {
+                Log.i(TAG, "Star at ("+star.getX()+", "+star.getY()+") tapped.");
+                mSelectedStar = star;
+                redraw();
+            } else {
+                Log.i(TAG, "No star tapped.");
+            }
+
+            return false;
+        }
+    }
+
+    /**
+     * This interface should be implemented when you want to listen for "star selected"
+     * events -- that is, when the user selects a new star (by tapping on it).
+     */
+    public interface OnStarSelectedListener {
+        /**
+         * This is called when the user selects (by tapping it) a star. By definition, only
+         * one star can be selected at a time.
+         */
+        public abstract void onStarSelected(StarfieldStar star);
     }
 }
