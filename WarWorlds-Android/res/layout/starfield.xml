@@ -18,7 +18,7 @@
 				android:layout_height="match_parent" />
 		</LinearLayout>
 
-		<RelativeLayout
+		<LinearLayout
 			android:layout_width="0px"
 			android:layout_weight="0.333"
 			android:layout_height="match_parent"
@@ -45,13 +45,22 @@
 					android:paddingRight="5dip"
 					android:textAppearance="?android:attr/textAppearanceSmall" />
 			</LinearLayout>
-		</RelativeLayout>
+
+			<TextView
+				android:id="@+id/star_name"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:gravity="center"
+				android:textAppearance="?android:attr/textAppearanceMedium" />
+
+		</LinearLayout>
 	</LinearLayout>
 
 	<ImageView
 	    android:id="@+id/ad"
 	    android:layout_width="320px"
 	    android:layout_height="50px"
+	    android:contentDescription="Placeholder for ad"
 	    android:layout_gravity="bottom|right"
 	    android:src="@drawable/testad" />
 

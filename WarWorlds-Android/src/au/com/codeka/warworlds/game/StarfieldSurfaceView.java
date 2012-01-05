@@ -1,6 +1,7 @@
 package au.com.codeka.warworlds.game;
 
 import java.util.ArrayList;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import android.content.Context;
 import android.graphics.Canvas;
@@ -28,7 +29,7 @@ public class StarfieldSurfaceView extends SurfaceView implements SurfaceHolder.C
     private SurfaceHolder mHolder;
     private GestureDetector mGestureDetector;
     private GestureHandler mGestureHandler;
-    private ArrayList<OnStarSelectedListener> mStarSelectedListeners;
+    private CopyOnWriteArrayList<OnStarSelectedListener> mStarSelectedListeners;
     private StarfieldStar mSelectedStar;
 
     // these are used to ensure we don't queue up heaps of AsyncTasks for
@@ -40,6 +41,7 @@ public class StarfieldSurfaceView extends SurfaceView implements SurfaceHolder.C
         super(context, attrs);
         Log.i(TAG, "Starfield initializing...");
 
+        mStarSelectedListeners = new CopyOnWriteArrayList<OnStarSelectedListener>();
         mSelectedStar = null;
 
         getHolder().addCallback(this);
@@ -233,6 +235,7 @@ public class StarfieldSurfaceView extends SurfaceView implements SurfaceHolder.C
                 Log.i(TAG, "Star at ("+star.getX()+", "+star.getY()+") tapped ("+tapX+", "+tapY+").");
                 mSelectedStar = star;
                 redraw();
+                fireStarSelected(star);
             } else {
                 Log.i(TAG, "No star tapped, tap = ("+tapX+", "+tapY+")");
             }
