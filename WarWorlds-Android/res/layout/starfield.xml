@@ -17,7 +17,7 @@
 
     </LinearLayout>
 
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="0px"
         android:layout_weight="0.333"
         android:layout_height="match_parent"
@@ -48,6 +48,12 @@
 
         </LinearLayout>
 
-    </LinearLayout>
+        <TextView
+            android:id="@+id/ad"
+            android:layout_width="350px"
+            android:layout_height="50px"
+            android:text="@string/ad_placeholder" />
+
+    </RelativeLayout>
 
 </LinearLayout>

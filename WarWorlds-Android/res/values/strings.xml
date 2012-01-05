@@ -62,5 +62,6 @@
     <!-- Notification message [CHAR LIMIT=NONE] -->
     <string name="options">Options</string>
     <string name="log_in">Log In</string>
+    <string name="ad_placeholder">Ad Goes Here</string>
 
 </resources>

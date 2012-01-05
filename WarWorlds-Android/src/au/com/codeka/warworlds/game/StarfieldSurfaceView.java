@@ -45,6 +45,13 @@ public class StarfieldSurfaceView extends SurfaceView implements SurfaceHolder.C
         getHolder().addCallback(this);
         mGestureHandler = new GestureHandler();
         mGestureDetector = new GestureDetector(context, mGestureHandler);
+
+        SectorManager.getInstance().addSectorListChangedListener(new SectorManager.OnSectorListChangedListener() {
+            @Override
+            public void onSectorListChanged() {
+                redraw();
+            }
+        });
     }
 
     @Override
@@ -202,8 +209,12 @@ public class StarfieldSurfaceView extends SurfaceView implements SurfaceHolder.C
         @Override
         public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX,
                 float distanceY) {
+
+            Log.i(TAG, "Dragged, ("+distanceX+", "+distanceY+")");
+
             SectorManager.getInstance().scroll(-(int)distanceX, -(int)distanceY);
             redraw(); // todo: something better? e.g. event listener or something
+
             return false;
         }
 
@@ -219,11 +230,11 @@ public class StarfieldSurfaceView extends SurfaceView implements SurfaceHolder.C
 
             StarfieldStar star = SectorManager.getInstance().getStarAt(tapX, tapY);
             if (star != null) {
-                Log.i(TAG, "Star at ("+star.getX()+", "+star.getY()+") tapped.");
+                Log.i(TAG, "Star at ("+star.getX()+", "+star.getY()+") tapped ("+tapX+", "+tapY+").");
                 mSelectedStar = star;
                 redraw();
             } else {
-                Log.i(TAG, "No star tapped.");
+                Log.i(TAG, "No star tapped, tap = ("+tapX+", "+tapY+")");
             }
 
             return false;

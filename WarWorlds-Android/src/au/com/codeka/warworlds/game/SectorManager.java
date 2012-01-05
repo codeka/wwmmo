@@ -1,10 +1,12 @@
 package au.com.codeka.warworlds.game;
 
+import java.util.EventListener;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
 
@@ -43,12 +45,14 @@ public class SectorManager {
     private int mOffsetY;
     private Map<Pair<Long, Long>, StarfieldSector> mSectors;
     private Set<Pair<Long, Long>> mInTransitSectors;
+    private CopyOnWriteArrayList<OnSectorListChangedListener> mSectorListChangedListeners;
 
     private SectorManager() {
         mSectorX = mSectorY = 0;
         mOffsetX = mOffsetY = 0;
         mSectors = new TreeMap<Pair<Long, Long>, StarfieldSector>();
         mInTransitSectors = new TreeSet<Pair<Long, Long>>();
+        mSectorListChangedListeners = new CopyOnWriteArrayList<OnSectorListChangedListener>();
         this.scrollTo(0, 0, 0, 0);
     }
 
@@ -137,6 +141,42 @@ public class SectorManager {
     }
 
     /**
+     * Scrolls the view by a relative amount.
+     * @param distanceX Number of pixels in the X direction to scroll.
+     * @param distanceY Number of pixels in the Y direction to scroll.
+     */
+    public void scroll(int distanceX, int distanceY) {
+        mOffsetX += distanceX;
+        mOffsetY += distanceY;
+
+        boolean needUpdate = false;
+        while (mOffsetX < -(SectorConstants.Width / 2)) {
+            mOffsetX += SectorConstants.Width;
+            mSectorX ++;
+            needUpdate = true;
+        }
+        while (mOffsetX > (SectorConstants.Width / 2)) {
+            mOffsetX -= SectorConstants.Width;
+            mSectorX --;
+            needUpdate = true;
+        }
+        while (mOffsetY < -(SectorConstants.Height / 2)) {
+            mOffsetY += SectorConstants.Height;
+            mSectorY ++;
+            needUpdate = true;
+        }
+        while (mOffsetY > (SectorConstants.Height / 2)) {
+            mOffsetY -= SectorConstants.Height;
+            mSectorY --;
+            needUpdate = true;
+        }
+
+        if (needUpdate) {
+            scrollTo(mSectorX, mSectorY, mOffsetX, mOffsetY);
+        }
+    }
+
+    /**
      * Gets the \c StarfieldStar that's a close to the given (x,y), based on the current sector
      * centre and offsets.
      */
@@ -151,19 +191,19 @@ public class SectorManager {
         long sectorY = mSectorY;
         while (x < 0) {
             x += SectorConstants.Width;
-            mSectorX --;
+            sectorX --;
         }
         while (x >= SectorConstants.Width) {
             x -= SectorConstants.Width;
-            mSectorX ++;
+            sectorX ++;
         }
         while (y < 0) {
             y += SectorConstants.Height;
-            mSectorY --;
+            sectorY --;
         }
         while (y >= SectorConstants.Height) {
             y -= SectorConstants.Height;
-            mSectorY ++;
+            sectorY ++;
         }
 
         StarfieldSector sector = getSector(sectorX, sectorY);
@@ -185,6 +225,18 @@ public class SectorManager {
         }
 
         return null;
+    }
+
+    public void addSectorListChangedListener(OnSectorListChangedListener onSectorListChanged) {
+        if (mSectorListChangedListeners.contains(onSectorListChanged))
+            return;
+        mSectorListChangedListeners.add(onSectorListChanged);
+    }
+
+    protected void fireSectorListChanged() {
+        for(OnSectorListChangedListener listener : mSectorListChangedListeners) {
+            listener.onSectorListChanged();
+        }
     }
 
     /**
@@ -237,44 +289,20 @@ public class SectorManager {
                 }
                 mInTransitSectors.clear();
 
-                // TODO: view.redraw()
+                // let everybody know the list of sectors has been updated
+                fireSectorListChanged();
             }
         }.execute();
     }
 
     /**
-     * Scrolls the view by a relative amount.
-     * @param distanceX Number of pixels in the X direction to scroll.
-     * @param distanceY Number of pixels in the Y direction to scroll.
+     * This interface should be implemented when you want to listen for "sector list changed"
+     * event (which happens when a new sector is loaded).
      */
-    public void scroll(int distanceX, int distanceY) {
-        mOffsetX += distanceX;
-        mOffsetY += distanceY;
-
-        boolean needUpdate = false;
-        while (mOffsetX < -(SectorConstants.Width / 2)) {
-            mOffsetX += SectorConstants.Width;
-            mSectorX ++;
-            needUpdate = true;
-        }
-        while (mOffsetX > (SectorConstants.Width / 2)) {
-            mOffsetX -= SectorConstants.Width;
-            mSectorX --;
-            needUpdate = true;
-        }
-        while (mOffsetY < -(SectorConstants.Height / 2)) {
-            mOffsetY += SectorConstants.Height;
-            mSectorY ++;
-            needUpdate = true;
-        }
-        while (mOffsetY > (SectorConstants.Height / 2)) {
-            mOffsetY -= SectorConstants.Height;
-            mSectorY --;
-            needUpdate = true;
-        }
-
-        if (needUpdate) {
-            scrollTo(mSectorX, mSectorY, mOffsetX, mOffsetY);
-        }
+    public interface OnSectorListChangedListener extends EventListener {
+        /**
+         * This is called when the sector list changes (i.e. when a new sector(s) is loaded)
+         */
+        public abstract void onSectorListChanged();
     }
 }
