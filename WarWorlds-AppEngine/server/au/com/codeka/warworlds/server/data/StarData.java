@@ -25,6 +25,9 @@ public class StarData implements Serializable {
     private Key mKey;
 
     @Persistent
+    private String mName;
+
+    @Persistent
     private int mX;
 
     @Persistent
@@ -39,7 +42,8 @@ public class StarData implements Serializable {
     public StarData() {
     }
     
-    public StarData(int x, int y, int colour, int size) {
+    public StarData(String name, int x, int y, int colour, int size) {
+        mName = name;
         mX = x;
         mY = y;
         mColour = colour;
@@ -62,6 +66,10 @@ public class StarData implements Serializable {
      */
     public int getY() {
         return mY;
+    }
+
+    public String getName() {
+        return mName;
     }
 
     /**
@@ -89,6 +97,7 @@ public class StarData implements Serializable {
      */
     public StarfieldStar toStarfieldStar() {
         StarfieldStar star = new StarfieldStar();
+        star.setName(mName);
         star.setX(mX);
         star.setY(mY);
         star.setColour(mColour);
