@@ -48,10 +48,11 @@
 		</RelativeLayout>
 	</LinearLayout>
 
-	<TextView
-		android:id="@+id/ad"
-		android:layout_width="350px"
-		android:layout_height="50px"
-		android:layout_gravity="bottom|right"
-		android:text="@string/ad_placeholder" />
+	<ImageView
+	    android:id="@+id/ad"
+	    android:layout_width="320px"
+	    android:layout_height="50px"
+	    android:layout_gravity="bottom|right"
+	    android:src="@drawable/testad" />
+
 </merge>
