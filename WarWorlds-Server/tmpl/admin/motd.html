@@ -1,0 +1,48 @@
+{% extends "admin/skeleton.html" %}
+
+{% block head %}
+	<style>
+		.curr-motd {
+			width: 400px;
+			height: 544px;
+			border: solid 2px black;
+			margin-right: 2.5%;
+			float: left;
+		}
+
+		.curr-motd legend {
+			font-weight: bold;
+			color: #900;
+		}
+
+		.curr-motd div {
+			overflow-y: scroll;
+			height: 524px;
+		}
+
+		.new-motd {
+			margin-left: 425px;
+			margin-right: 25px;
+		}
+
+		.new-motd textarea {
+			width: 95%;
+			height: 500px;
+		}
+	</style>
+{% endblock %}
+
+{% block content %}
+	<h1>Message of the Day</h1>
+	<fieldset class="curr-motd">
+		<legend>Current Message</legend>
+		<div>{{ motd.message }}</div>
+	</fieldset>
+
+	<div class="new-motd">
+		<form method="post">
+			<textarea id="newMotd" name="new-motd">{{ motd.message }}</textarea>
+			<input type="submit" value="Update">
+		</form>
+	</div>
+{% endblock %}

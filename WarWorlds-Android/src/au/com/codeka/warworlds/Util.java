@@ -29,13 +29,6 @@ import org.apache.http.StatusLine;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.params.ClientPNames;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.restlet.Client;
-import org.restlet.data.MediaType;
-import org.restlet.data.Preference;
-import org.restlet.data.Cookie;
-import org.restlet.data.Protocol;
-import org.restlet.resource.ClientResource;
-import org.restlet.util.Series;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;

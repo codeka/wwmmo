@@ -1,0 +1,12 @@
+//
+// Copyright (c) 2012, Dean Harding (dean@codeka.com.au)
+//
+
+// TODO: separate these into separate packages?
+package warworlds;
+
+message MessageOfTheDay
+{
+	required string message = 1;
+	required int32 date = 2; // last update date (in unix epoch format)
+}

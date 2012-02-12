@@ -6,7 +6,6 @@ import java.io.StringWriter;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.restlet.engine.Engine;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
@@ -53,12 +52,6 @@ public class WarWorldsActivity extends Activity {
 
         // initialize the Util class
         Util.loadSettings(mContext);
-
-        // IPv4 for now (restlet works better like this)
-        System.setProperty("java.net.preferIPv6Addresses", "false");
-
-        Engine.getInstance().getRegisteredClients().clear();
-        Engine.getInstance().getRegisteredClients().add(new MyHttpClientHelper(null));
 
         requestWindowFeature(Window.FEATURE_NO_TITLE); // remove the title bar
 

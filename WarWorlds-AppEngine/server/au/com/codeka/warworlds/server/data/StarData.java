@@ -41,7 +41,7 @@ public class StarData implements Serializable {
 
     public StarData() {
     }
-    
+
     public StarData(String name, int x, int y, int colour, int size) {
         mName = name;
         mX = x;
