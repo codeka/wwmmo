@@ -11,7 +11,7 @@ class MessageOfTheDay(db.Model):
     '''Message of the day is displayed to users when they first connect.
     '''
     message = db.TextProperty()
-    date = db.DateTimeProperty(auto_now_add=True)
+    date = db.DateTimeProperty(auto_now=True)
 
     @staticmethod
     def _getKey():

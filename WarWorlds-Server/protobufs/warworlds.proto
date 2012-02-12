@@ -8,5 +8,5 @@ package warworlds;
 message MessageOfTheDay
 {
 	required string message = 1;
-	required int32 date = 2; // last update date (in unix epoch format)
+	required string last_update = 2; // last update date (in ISO string format)
 }
