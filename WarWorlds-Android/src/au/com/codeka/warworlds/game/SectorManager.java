@@ -13,11 +13,6 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import android.os.AsyncTask;
 import android.util.Log;
 import au.com.codeka.warworlds.Util;
-import au.com.codeka.warworlds.shared.StarfieldSector;
-import au.com.codeka.warworlds.shared.StarfieldSectorResource;
-import au.com.codeka.warworlds.shared.StarfieldStar;
-import au.com.codeka.warworlds.shared.constants.SectorConstants;
-import au.com.codeka.warworlds.shared.util.Pair;
 
 /**
  * This class "manages" the list of \c StarfieldSector's that we have loaded
@@ -42,20 +37,20 @@ public class SectorManager {
     private long mSectorX;
     private long mSectorY;
     private int mOffsetX;
-    private int mOffsetY;
+    private int mOffsetY;/*
     private Map<Pair<Long, Long>, StarfieldSector> mSectors;
     private Set<Pair<Long, Long>> mInTransitSectors;
     private CopyOnWriteArrayList<OnSectorListChangedListener> mSectorListChangedListeners;
-
+*/
     private SectorManager() {
         mSectorX = mSectorY = 0;
-        mOffsetX = mOffsetY = 0;
+        mOffsetX = mOffsetY = 0;/*
         mSectors = new TreeMap<Pair<Long, Long>, StarfieldSector>();
         mInTransitSectors = new TreeSet<Pair<Long, Long>>();
         mSectorListChangedListeners = new CopyOnWriteArrayList<OnSectorListChangedListener>();
-        this.scrollTo(0, 0, 0, 0);
+        this.scrollTo(0, 0, 0, 0);*/
     }
-
+/*
     public StarfieldSector getSector(long sectorX, long sectorY) {
         Pair<Long, Long> key = new Pair<Long, Long>(sectorX, sectorY);
         if (mSectors.containsKey(key)) {
@@ -65,7 +60,7 @@ public class SectorManager {
             return null;
         }
     }
-
+*/
     /**
      * Gets the x-coordinate of the sector that's in the "centre" of the screen.
      */
@@ -112,7 +107,7 @@ public class SectorManager {
         mSectorY = sectorY;
         mOffsetX = offsetX;
         mOffsetY = offsetY;
-
+/*
         Set<Pair<Long, Long>> missingSectors = new TreeSet<Pair<Long, Long>>();
 
         Map<Pair<Long, Long>, StarfieldSector> newSectors = 
@@ -137,7 +132,7 @@ public class SectorManager {
             requestSectors(missingSectors);
         }
 
-        mSectors = newSectors;
+        mSectors = newSectors;*/
     }
 
     /**
@@ -148,7 +143,7 @@ public class SectorManager {
     public void scroll(int distanceX, int distanceY) {
         mOffsetX += distanceX;
         mOffsetY += distanceY;
-
+/*
         boolean needUpdate = false;
         while (mOffsetX < -(SectorConstants.Width / 2)) {
             mOffsetX += SectorConstants.Width;
@@ -173,13 +168,13 @@ public class SectorManager {
 
         if (needUpdate) {
             scrollTo(mSectorX, mSectorY, mOffsetX, mOffsetY);
-        }
+        }*/
     }
 
     /**
      * Gets the \c StarfieldStar that's a close to the given (x,y), based on the current sector
      * centre and offsets.
-     */
+     *//*
     public StarfieldStar getStarAt(int viewX, int viewY) {
         // first, work out which sector your actually inside of. If (mOffsetX, mOffsetY) is (0,0)
         // then (x,y) corresponds exactly to the offset into (mSectorX, mSectorY). Otherwise, we
@@ -237,7 +232,7 @@ public class SectorManager {
         for(OnSectorListChangedListener listener : mSectorListChangedListeners) {
             listener.onSectorListChanged();
         }
-    }
+    }*/
 
     /**
      * Fetches a new sector's details from the server. This will be called when
@@ -247,7 +242,7 @@ public class SectorManager {
      * 
      * @param sectorX The x-coordinate of the sector to fetch.
      * @param sectorY The y-coordinate of the sector to fetch.
-     */
+     *//*
     private void requestSectors(final Iterable<Pair<Long, Long>> coords) {
         new AsyncTask<Void, Void, List<StarfieldSector>>() {
             @Override
@@ -294,7 +289,7 @@ public class SectorManager {
             }
         }.execute();
     }
-
+*/
     /**
      * This interface should be implemented when you want to listen for "sector list changed"
      * event (which happens when a new sector is loaded).

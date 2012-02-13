@@ -22,8 +22,6 @@ import android.view.Window;
 import android.webkit.WebView;
 import android.widget.Button;
 import au.com.codeka.warworlds.game.StarfieldActivity;
-import au.com.codeka.warworlds.shared.MessageOfTheDay;
-import au.com.codeka.warworlds.shared.MessageOfTheDayResource;
 
 /**
  * Main activity - requests "Hello, World" messages from the server and provides
@@ -128,7 +126,7 @@ public class WarWorldsActivity extends Activity {
 
             @Override
             protected String doInBackground(Void... arg0) {
-                try {
+                try {/*
                     MessageOfTheDayResource resource = Util.getClientResource(
                             "/motd", MessageOfTheDayResource.class);
                     MessageOfTheDay motd = resource.retrieve();
@@ -145,7 +143,7 @@ public class WarWorldsActivity extends Activity {
                         message = "<pre>Try logging in and out again.</pre>";
                     } else {
                         message = motd.getMessage();
-                    }
+                    }*/
                 } catch(Exception e) {
                     Log.e(TAG, ExceptionUtils.getStackTrace(e));
                     message = "<pre>"+ExceptionUtils.getStackTrace(e)+"</pre>";

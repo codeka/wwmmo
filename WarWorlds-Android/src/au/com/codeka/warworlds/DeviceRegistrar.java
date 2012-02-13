@@ -19,9 +19,6 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.provider.Settings.Secure;
 import android.util.Log;
-import au.com.codeka.warworlds.shared.Device;
-import au.com.codeka.warworlds.shared.DeviceResource;
-import au.com.codeka.warworlds.shared.DevicesResource;
 
 /**
  * Register/unregister with the third-party App Engine server using
@@ -45,7 +42,7 @@ public class DeviceRegistrar {
 
         String url = "/devices";
 
-    	try {
+    	try {/*
     		if (register) {
 	        	Device d = new Device();
 	        	d.setDeviceRegistrationID(deviceRegistrationID);
@@ -58,7 +55,7 @@ public class DeviceRegistrar {
 
     			DeviceResource resource = Util.getClientResource(url, DeviceResource.class);
 	    		resource.unregister();
-	        }
+	        }*/
     	} catch(Exception ex) {
             Log.w(TAG, "Failure, got: " + ex.getMessage());
             // Clean up application state

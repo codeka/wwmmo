@@ -197,7 +197,7 @@ public class Util {
             Log.e(TAG, "Invalid URL: "+baseUrl+url);
             return null;
         }
-
+/*
         Log.i(TAG, "ClientResource: "+uri);
         ClientResource cr = new ClientResource(uri);
         cr.setRequestEntityBuffering(true);
@@ -221,7 +221,7 @@ public class Util {
         mediaTypes.clear();
         mediaTypes.add(new Preference<MediaType>(MediaType.APPLICATION_JAVA_OBJECT, 1.0f));
 
-        return cr.wrap(factoryClass);
+        return cr.wrap(factoryClass);*/ return null;
     }
 
     /**
