@@ -13,6 +13,7 @@ import java.util.Stack;
 import javax.net.SocketFactory;
 import javax.net.ssl.SSLSocketFactory;
 
+import org.apache.http.Header;
 import org.apache.http.HttpClientConnection;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpRequest;
@@ -31,6 +32,7 @@ public class ApiClient {
     final static Logger log = LoggerFactory.getLogger(ApiClient.class);
     private static ConnectionPool sConnectionPool;
     private static URI sBaseUri;
+    private static ArrayList<String> sCookies;
 
     /**
      * Configures the client to talk to the given "baseUri". All URLs will then be relative
@@ -49,7 +51,57 @@ public class ApiClient {
 
         sConnectionPool = new ConnectionPool(ssl, baseUri.getHost(), baseUri.getPort());
         sBaseUri = baseUri;
+        sCookies = new ArrayList<String>();
+
         log.info("Configured to use base URI: {}", baseUri);
+    }
+
+    /**
+     * Gets the collection of cookies we'll add to all requests (useful for authentication, 
+     * or whatever)
+     */
+    public static List<String> getCookies() {
+        return sCookies;
+    }
+
+    /**
+     * Attempts to authenticate with an AppEngine server, given an authToken (usually taken
+     * from the accounts in an Android).
+     */
+    public static String authenticate(String authToken) {
+        String url = "/_ah/login?continue=http://localhost/&auth="+authToken;
+        ResultWrapper resp = request("GET", url);
+        int statusCode = resp.getResponse().getStatusLine().getStatusCode();
+        if (statusCode != 302) {
+            log.warn("Authentication failure: {}", resp.getResponse().getStatusLine());
+            return null;
+        }
+
+        String authCookieValue = null;
+        for(Header h : resp.getResponse().getHeaders("Set-Cookie")) {
+            for(String nvp: h.getValue().split(";")) {
+                String[] nameValue = nvp.split("=", 2);
+                if (nameValue.length != 2) {
+                    continue;
+                }
+                
+                if (nameValue[0].trim().equalsIgnoreCase("SACSID")) {
+                    authCookieValue = nameValue[1].trim();
+                }
+            }
+        }
+
+        if (authCookieValue == null) {
+            log.warn("Authentication failure: no SACSID cookie found");
+            return null;
+        }
+
+        String authCookie = "SACSID="+authCookieValue;
+
+        sCookies.clear();
+        sCookies.add(authCookie);
+
+        return authCookie;
     }
 
     /**
@@ -80,7 +132,7 @@ public class ApiClient {
                     Method m = protoBuffFactory.getDeclaredMethod("parseFrom", InputStream.class);
                     result = (T) m.invoke(null, entity.getContent());
 
-                    EntityUtils.consume(entity);
+                    entity.consumeContent();
                 } catch (Exception e) {
                     // any errors can just be ignored, reallu (return null instead)
                     log.error("Error getting protocol buffer!", e);
@@ -118,7 +170,9 @@ public class ApiClient {
                 HttpRequest request = new BasicHttpRequest("GET", uri.getPath());
                 request.addHeader("Accept", "application/x-protobuf");
                 request.addHeader("Host", uri.getHost());
-                request.addHeader("Connection", "Keep-Alive");
+                for(String cookie : sCookies) {
+                    request.addHeader("Cookie", cookie);
+                }
                 conn.sendRequestHeader(request);
                 conn.flush();
 

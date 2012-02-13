@@ -20,6 +20,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.app.Activity;
@@ -31,7 +34,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.provider.Settings;
-import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ArrayAdapter;
@@ -45,11 +47,7 @@ import com.google.android.c2dm.C2DMessaging;
  * Account selections activity - handles device registration and unregistration.
  */
 public class AccountsActivity extends Activity {
-
-    /**
-     * Tag for logging.
-     */
-    private static final String TAG = "AccountsActivity";
+    final Logger log = LoggerFactory.getLogger(AccountsActivity.class);
 
     /**
      * The selected position in the ListView of accounts.
@@ -218,7 +216,7 @@ public class AccountsActivity extends Activity {
         editor.remove(Util.DEVICE_REGISTRATION_ID);
         editor.commit();
 
-        Log.i(TAG, "Registering \""+accountName+"\"...");
+        log.info("Registering \"{}\"...", accountName);
         mPleaseWaitDialog = ProgressDialog.show(mContext, null, "Logging in...", true);
 
         // Obtain an auth token and register

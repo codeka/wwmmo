@@ -18,7 +18,17 @@ from google.appengine.api import users
 class ApiPage(webapp.RequestHandler):
     '''This is the base class for pages in the API section.
     '''
-    None
+    def dispatch(self):
+        '''Checks that a user is logged in and such before we process the request.
+        '''
+        self.user = users.get_current_user()
+        if not self.user:
+            # not logged in, return 403 Forbidden
+            self.response.set_status(403)
+            return
+
+        return super(ApiPage, self).dispatch()
+
 
 
 class MotdPage(ApiPage):

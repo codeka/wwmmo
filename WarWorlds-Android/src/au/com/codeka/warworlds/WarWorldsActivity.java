@@ -7,6 +7,8 @@ import java.io.StringWriter;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 
+import warworlds.Warworlds.MessageOfTheDay;
+
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -21,6 +23,7 @@ import android.view.View.OnClickListener;
 import android.view.Window;
 import android.webkit.WebView;
 import android.widget.Button;
+import au.com.codeka.warworlds.api.ApiClient;
 import au.com.codeka.warworlds.game.StarfieldActivity;
 
 /**
@@ -126,10 +129,8 @@ public class WarWorldsActivity extends Activity {
 
             @Override
             protected String doInBackground(Void... arg0) {
-                try {/*
-                    MessageOfTheDayResource resource = Util.getClientResource(
-                            "/motd", MessageOfTheDayResource.class);
-                    MessageOfTheDay motd = resource.retrieve();
+                try {
+                    MessageOfTheDay motd = ApiClient.getProtoBuf("motd", MessageOfTheDay.class);
                     if (motd == null) {
                         // it's most likely that we need to re-authenticate...
 //                        Log.w(TAG, "MOTD is null, assuming re-authentication is required.");
@@ -143,7 +144,7 @@ public class WarWorldsActivity extends Activity {
                         message = "<pre>Try logging in and out again.</pre>";
                     } else {
                         message = motd.getMessage();
-                    }*/
+                    }
                 } catch(Exception e) {
                     Log.e(TAG, ExceptionUtils.getStackTrace(e));
                     message = "<pre>"+ExceptionUtils.getStackTrace(e)+"</pre>";

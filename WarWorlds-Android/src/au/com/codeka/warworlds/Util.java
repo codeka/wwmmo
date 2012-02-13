@@ -19,16 +19,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.Callable;
 
-import org.apache.http.Header;
-import org.apache.http.HttpResponse;
-import org.apache.http.StatusLine;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.params.ClientPNames;
-import org.apache.http.impl.client.DefaultHttpClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
@@ -45,17 +40,14 @@ import android.content.SharedPreferences.Editor;
 import android.content.res.AssetManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.util.Log;
+import au.com.codeka.warworlds.api.ApiClient;
 
 /**
  * Utility methods for getting the base URL for client-server communication and
  * retrieving shared preferences.
  */
 public class Util {
-    /**
-     * Tag for logging.
-     */
-    private static final String TAG = "Util";
+    private static Logger log = LoggerFactory.getLogger(Util.class);
 
     // Shared constants
 
@@ -68,11 +60,6 @@ public class Util {
      * Key for auth cookie name in shared preferences.
      */
     public static final String AUTH_COOKIE = "authCookie";
-
-    /**
-     * Cookie name for authorisation.
-     */
-    private static final String AUTH_COOKIE_NAME = "SACSID";
 
     /**
      * Key for device registration id in shared preferences.
@@ -89,11 +76,6 @@ public class Util {
      */
     private static final String SHARED_PREFS = "WARWORLDS_PREFS";
 
-    /**
-     * The authentication cookie stays in a global variable so we don't have
-     * to keep fetching it from the SharedPreferences all the time.
-     */
-    private static String sAuthCookie;
     private static Properties sProperties;
 
     /**
@@ -122,7 +104,19 @@ public class Util {
         }
 
         SharedPreferences prefs = getSharedPreferences(context);
-        sAuthCookie = prefs.getString(Util.AUTH_COOKIE, null);
+
+        try {
+            URI uri = new URI(getBaseUrl());
+            ApiClient.configure(uri);
+        } catch(URISyntaxException e) {
+            // !!!
+        }
+
+        // if we've saved off the authentication cookie, cool!
+        String authCookie = prefs.getString(Util.AUTH_COOKIE, null);
+        if (authCookie != null) {
+            ApiClient.getCookies().add(authCookie);
+        }
     }
 
     /**
@@ -178,53 +172,6 @@ public class Util {
     }
 
     /**
-     * Creates a \c ClientResource pointing at the given URL and that will return data for the given
-     * resource type.
-     */
-    public static <T> T getClientResource(String url, Class<T> factoryClass) {
-        String baseUrl = getBaseUrl();
-        if (baseUrl.endsWith("/")) {
-            baseUrl = baseUrl.substring(0, baseUrl.length() - 1);
-        }
-        if (!url.startsWith("/")) {
-            url = "/"+url;
-        }
-
-        URI uri = null;
-        try {
-            uri = new URI(baseUrl + "/api/v1" + url);
-        } catch(URISyntaxException e) {
-            Log.e(TAG, "Invalid URL: "+baseUrl+url);
-            return null;
-        }
-/*
-        Log.i(TAG, "ClientResource: "+uri);
-        ClientResource cr = new ClientResource(uri);
-        cr.setRequestEntityBuffering(true);
-
-        Client c = new Client(new org.restlet.Context(), Protocol.HTTP);
-        c.getContext().getParameters().add("retryHandler",
-                "au.com.codeka.warworlds.RequestRetryHandler");
-        cr.setNext(c);
-
-        // add the authentication cookie to the request as well
-        String authCookie = sAuthCookie;
-        if (authCookie != null) {
-            String nvp[] = authCookie.split("=");
-            Series<Cookie> cookies = new Series<Cookie>(Cookie.class);
-            cookies.add(new Cookie(nvp[0], nvp[1]));
-            cr.setCookies(cookies);
-        }
-
-        // make sure we get back a native java-serialized object
-        List<Preference<MediaType>> mediaTypes = cr.getClientInfo().getAcceptedMediaTypes();
-        mediaTypes.clear();
-        mediaTypes.add(new Preference<MediaType>(MediaType.APPLICATION_JAVA_OBJECT, 1.0f));
-
-        return cr.wrap(factoryClass);*/ return null;
-    }
-
-    /**
      * (Re-)authenticate with the AppEngine service. We'll use the account name
      * we have saved in the preferences and re-generate a new AUTH_COOKIE.
      */
@@ -234,29 +181,31 @@ public class Util {
         final AccountManager mgr = AccountManager.get(context);
 
         String accountName = prefs.getString(ACCOUNT_NAME, null);
-        Log.i(TAG, "(re-)authenticating \""+accountName+"\"...");
+        log.info("(re-)authenticating \""+accountName+"\"...");
 
         Account[] accts = mgr.getAccountsByType("com.google");
         for (Account acct : accts) {
             final Account account = acct;
             if (account.name.equals(accountName)) {
                 if (isDebug()) {
-                    Log.i(TAG, "Account found, setting up with debug auth cookie.");
+                    log.info("Account found, setting up with debug auth cookie.");
                     // Use a fake cookie for the dev mode app engine server
                     // The cookie has the form email:isAdmin:userId
                     // We set the userId to be the same as the email
                     String authCookie = "dev_appserver_login=" + accountName +
                             ":false:" + accountName;
-                    sAuthCookie = authCookie;
                     prefs.edit().putString(Util.AUTH_COOKIE, authCookie).commit();
 
-                    Log.i(TAG, "AUTH_COOKIE has been saved.");
+                    ApiClient.getCookies().clear();
+                    ApiClient.getCookies().add(authCookie);
+
+                    log.info("AUTH_COOKIE has been saved.");
                     try {
                         onComplete.call();
                     } catch(Exception e) {
                     }
                 } else {
-                    Log.i(TAG, "Account found, fetching authentication token...");
+                    log.info("Account found, fetching authentication token...");
 
                     // Get the auth token from the AccountManager and convert
                     // it into a cookie for the AppEngine server
@@ -279,13 +228,14 @@ public class Util {
                                         protected Void doInBackground(Void... arg0) {
                                             try {
                                                 // Convert the token into a cookie for future use
-                                                String authCookie = getAuthCookie(newAuthToken);
+                                                String authCookie = ApiClient.authenticate(
+                                                        newAuthToken);
+
                                                 Editor editor = prefs.edit();
                                                 editor.putString(Util.AUTH_COOKIE, authCookie);
                                                 editor.commit();
-                                                sAuthCookie = authCookie;
 
-                                                Log.i(TAG, "AUTH_COOKIE has been saved.");
+                                                log.info("AUTH_COOKIE has been saved.");
                                                 try {
                                                     onComplete.call();
                                                 } catch(Exception e) {
@@ -312,45 +262,9 @@ public class Util {
             String authToken = authTokenBundle.get(AccountManager.KEY_AUTHTOKEN).toString();
             return authToken;
         } catch (Exception e) {
-            Log.w(TAG, "Got Exception " + e);
+            log.warn("Got Exception " + e);
             return null;
         }
-    }
-
-    /**
-     * Retrieves the authorisation cookie associated with the given token. This
-     * method should only be used when running against a production AppEngine
-     * backend (as opposed to a dev mode server).
-     */
-    private static String getAuthCookie(String authToken) {
-        DefaultHttpClient httpClient = new DefaultHttpClient();
-        try {
-            // Get SACSID cookie
-            httpClient.getParams().setBooleanParameter(ClientPNames.HANDLE_REDIRECTS, false);
-            String uri = Setup.PROD_URL + "/_ah/login?continue=http://localhost/&auth=" + authToken;
-            HttpGet method = new HttpGet(uri);
-
-            HttpResponse res = httpClient.execute(method);
-            StatusLine statusLine = res.getStatusLine();
-            int statusCode = statusLine.getStatusCode();
-            Header[] headers = res.getHeaders("Set-Cookie");
-            if (statusCode != 302 || headers.length == 0) {
-                return null;
-            }
-
-            for (org.apache.http.cookie.Cookie cookie : httpClient.getCookieStore().getCookies()) {
-                if (AUTH_COOKIE_NAME.equals(cookie.getName())) {
-                    return AUTH_COOKIE_NAME + "=" + cookie.getValue();
-                }
-            }
-        } catch (IOException e) {
-            Log.w(TAG, "Got IOException " + e);
-            Log.w(TAG, Log.getStackTraceString(e));
-        } finally {
-            httpClient.getParams().setBooleanParameter(ClientPNames.HANDLE_REDIRECTS, true);
-        }
-
-        return null;
     }
 
     /**
@@ -378,7 +292,7 @@ public class Util {
             // if the base URL has changed, it means we're now talking to a
             // different instance of the app (debug vs. release probably). We'll need
             // to clear out some preferences first.
-            Log.w(TAG, "BaseURL has changed (\""+baseUrl+"\" != \""+savedBaseUrl+"\"), clearing device registration");
+            log.warn("BaseURL has changed (\""+baseUrl+"\" != \""+savedBaseUrl+"\"), clearing device registration");
 
             clearDeviceRegistration(context);
 
