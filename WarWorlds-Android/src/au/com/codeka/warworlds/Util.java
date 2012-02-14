@@ -90,26 +90,11 @@ public class Util {
             }
         }
 
-        SharedPreferences prefs = getSharedPreferences(context);
-
         try {
             URI uri = new URI(getBaseUrl());
             ApiClient.configure(uri);
         } catch(URISyntaxException e) {
             // !!!
-        }
-
-        // if we've saved off the authentication cookie, cool!
-        String accountName = prefs.getString(Util.ACCOUNT_NAME, null);
-        if (accountName != null) {
-            Authenticator.authenticate(context, activity, accountName, 
-                    new Authenticator.AuthenticationCompleteCallback() {
-                        @Override
-                        public void onAuthenticationComplete(String authCookie) {
-                            // TODO: this isn't the best place for this...
-                            ApiClient.getCookies().add(authCookie);
-                        }
-                    });
         }
     }
 

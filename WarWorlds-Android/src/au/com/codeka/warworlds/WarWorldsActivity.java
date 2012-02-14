@@ -5,7 +5,6 @@ import java.io.InputStream;
 import java.io.StringWriter;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 
 import warworlds.Warworlds.MessageOfTheDay;
 
@@ -124,30 +123,27 @@ public class WarWorldsActivity extends Activity {
         final ProgressDialog pleaseWaitDialog = ProgressDialog.show(mContext, null, 
                 "Connecting...", true);
 
+        // if we've saved off the authentication cookie, cool!
+        SharedPreferences prefs = Util.getSharedPreferences(mContext);
+        final String accountName = prefs.getString(Util.ACCOUNT_NAME, null);
+        if (accountName == null) {
+            // TODO error!
+        }
+
         new AsyncTask<Void, Void, String>() {
             private String message;
 
             @Override
             protected String doInBackground(Void... arg0) {
-                try {
-                    MessageOfTheDay motd = ApiClient.getProtoBuf("motd", MessageOfTheDay.class);
-                    if (motd == null) {
-                        // it's most likely that we need to re-authenticate...
-//                        Log.w(TAG, "MOTD is null, assuming re-authentication is required.");
-//                        Util.reauthenticate(mContext, WarWorldsActivity.this, new Callable<Void>() {
-//                            @Override
-//                            public Void call() throws Exception {
-//                                loadMotdAndVerifyAccount(motdView);
-//                                return null;
-//                            }
-//                        });
-                        message = "<pre>Try logging in and out again.</pre>";
-                    } else {
-                        message = motd.getMessage();
-                    }
-                } catch(Exception e) {
-                    Log.e(TAG, ExceptionUtils.getStackTrace(e));
-                    message = "<pre>"+ExceptionUtils.getStackTrace(e)+"</pre>";
+                String authCookie = Authenticator.authenticate(mContext, WarWorldsActivity.this,
+                        accountName);
+                ApiClient.getCookies().add(authCookie);
+
+                MessageOfTheDay motd = ApiClient.getProtoBuf("motd", MessageOfTheDay.class);
+                if (motd == null) {
+                    message = "<pre>Try logging in and out again.</pre>";
+                } else {
+                    message = motd.getMessage();
                 }
 
                 String tmpl = getHtmlFile("motd-template.html");

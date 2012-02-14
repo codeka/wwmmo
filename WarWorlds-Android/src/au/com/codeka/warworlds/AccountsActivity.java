@@ -32,6 +32,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.view.View;
@@ -219,15 +220,18 @@ public class AccountsActivity extends Activity {
         log.info("Registering \"{}\"...", accountName);
         mPleaseWaitDialog = ProgressDialog.show(mContext, null, "Logging in...", true);
 
-        // Obtain an auth token and register
-        Authenticator.authenticate(this, this, accountName,
-                new Authenticator.AuthenticationCompleteCallback() {
+        // Obtain an auth token and register, on a background thread
+        new AsyncTask<Void, Void, Void>() {
             @Override
-            public void onAuthenticationComplete(String authCookie) {
+            protected Void doInBackground(Void... arg0) {
+                String authCookie = Authenticator.authenticate(mContext, AccountsActivity.this,
+                        accountName);
                 ApiClient.getCookies().add(authCookie);
                 C2DMReceiver.register(AccountsActivity.this, Setup.SENDER_ID, onComplete);
+
+                return null;
             }
-        });
+        }.execute();
     }
 
     private void unregister(final Callable<Void> onComplete) {

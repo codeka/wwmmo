@@ -6,11 +6,9 @@ import org.slf4j.LoggerFactory;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
-import android.accounts.AccountManagerCallback;
 import android.accounts.AccountManagerFuture;
 import android.app.Activity;
 import android.content.Context;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import au.com.codeka.warworlds.api.ApiAuthenticator;
 
@@ -31,14 +29,16 @@ public class Authenticator {
 
     /**
      * Authenticates the given user with App Engine.
+     * 
+     * Note: You CANNOT call this method on the main thread. Do it in a background thread, because
+     * it can (will) block on network calls.
+     * 
      * @param context
      * @param activity
      * @param accountName
-     * @param onComplete A callback that receives the authentication cookie that we'll want
-     *        to include in every App Engine request.
+     * @return The authCookie we can use in subsequent calls to App Engine.
      */
-    public static void authenticate(Context context, final Activity activity,
-            final String accountName, final AuthenticationCompleteCallback callback) {
+    public static String authenticate(Context context, Activity activity, String accountName) {
         final AccountManager mgr = AccountManager.get(context);
 
         log.info("(re-)authenticating \""+accountName+"\"...");
@@ -53,49 +53,31 @@ public class Authenticator {
                     // form email:isAdmin:userId (we set the userId to be the same as the email)
                     String authCookie = "dev_appserver_login="+accountName+":false:"+accountName;
 
-                    callback.onAuthenticationComplete(authCookie);
+                    return authCookie;
                 } else {
                     log.info("Account found, fetching authentication token...");
 
                     // Get the auth token from the AccountManager and convert it into a cookie 
                     // that's usable by App Engine
-                    mgr.getAuthToken(account, "ah", null, activity,
-                            new AccountManagerCallback<Bundle>() {
-                        public void run(AccountManagerFuture<Bundle> future) {
-                            String authToken = getAuthToken(future);
+                    AccountManagerFuture<Bundle>future = mgr.getAuthToken(account, "ah", null,
+                            activity, null, null);
+                    String authToken = getAuthToken(future);
 
-                            // Ensure the token is not expired by invalidating
-                            // it and obtaining a new one
-                            mgr.invalidateAuthToken(account.type, authToken);
-                            mgr.getAuthToken(account, "ah", null, activity,
-                                    new AccountManagerCallback<Bundle>() {
-                                public void run(final AccountManagerFuture<Bundle> future) {
-                                    final String newAuthToken = getAuthToken(future);
+                    // Ensure the token is not expired by invalidating
+                    // it and obtaining a new one
+                    mgr.invalidateAuthToken(account.type, authToken);
+                    future = mgr.getAuthToken(account, "ah", null, activity, null, null);
+                    authToken = getAuthToken(future);
 
-                                    // can't call getAuthCookie() on the main thread
-                                    new AsyncTask<Void, Void, Void>() {
-                                        @Override
-                                        protected Void doInBackground(Void... arg0) {
-                                            try {
-                                                // Convert the token into a cookie for future use
-                                                String authCookie = ApiAuthenticator.authenticate(
-                                                        newAuthToken);
+                    // Convert the token into a cookie for future use
+                    String authCookie = ApiAuthenticator.authenticate(authToken);
 
-                                                callback.onAuthenticationComplete(authCookie);
-                                            } catch(Exception e) {
-                                                // todo?
-                                            }
-                                            return null;
-                                        }
-                                    }.execute();
-                                }
-                            }, null);
-                        }
-                    }, null);
+                    return authCookie;
                 }
-                break;
             }
         }
+
+        return null; // no account found!
     }
 
     /**
