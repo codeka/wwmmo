@@ -40,6 +40,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
+import au.com.codeka.warworlds.api.ApiClient;
 
 import com.google.android.c2dm.C2DMessaging;
 
@@ -212,7 +213,6 @@ public class AccountsActivity extends Activity {
         final SharedPreferences prefs = Util.getSharedPreferences(mContext);
         SharedPreferences.Editor editor = prefs.edit();
         editor.putString(Util.ACCOUNT_NAME, accountName);
-        editor.remove(Util.AUTH_COOKIE);
         editor.remove(Util.DEVICE_REGISTRATION_ID);
         editor.commit();
 
@@ -220,11 +220,12 @@ public class AccountsActivity extends Activity {
         mPleaseWaitDialog = ProgressDialog.show(mContext, null, "Logging in...", true);
 
         // Obtain an auth token and register
-        Util.reauthenticate(mContext, this, new Callable<Void>() {
+        Authenticator.authenticate(this, this, accountName,
+                new Authenticator.AuthenticationCompleteCallback() {
             @Override
-            public Void call() throws Exception {
+            public void onAuthenticationComplete(String authCookie) {
+                ApiClient.getCookies().add(authCookie);
                 C2DMReceiver.register(AccountsActivity.this, Setup.SENDER_ID, onComplete);
-                return null;
             }
         });
     }

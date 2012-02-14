@@ -52,7 +52,7 @@ public class WarWorldsActivity extends Activity {
         super.onCreate(savedInstanceState);
 
         // initialize the Util class
-        Util.loadSettings(mContext);
+        Util.loadSettings(mContext, this);
 
         requestWindowFeature(Window.FEATURE_NO_TITLE); // remove the title bar
 

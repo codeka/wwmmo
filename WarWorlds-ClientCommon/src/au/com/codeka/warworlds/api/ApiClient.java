@@ -13,7 +13,6 @@ import java.util.Stack;
 import javax.net.SocketFactory;
 import javax.net.ssl.SSLSocketFactory;
 
-import org.apache.http.Header;
 import org.apache.http.HttpClientConnection;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpRequest;
@@ -21,7 +20,6 @@ import org.apache.http.HttpResponse;
 import org.apache.http.impl.DefaultHttpClientConnection;
 import org.apache.http.message.BasicHttpRequest;
 import org.apache.http.params.BasicHttpParams;
-import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -65,46 +63,6 @@ public class ApiClient {
     }
 
     /**
-     * Attempts to authenticate with an AppEngine server, given an authToken (usually taken
-     * from the accounts in an Android).
-     */
-    public static String authenticate(String authToken) {
-        String url = "/_ah/login?continue=http://localhost/&auth="+authToken;
-        ResultWrapper resp = request("GET", url);
-        int statusCode = resp.getResponse().getStatusLine().getStatusCode();
-        if (statusCode != 302) {
-            log.warn("Authentication failure: {}", resp.getResponse().getStatusLine());
-            return null;
-        }
-
-        String authCookieValue = null;
-        for(Header h : resp.getResponse().getHeaders("Set-Cookie")) {
-            for(String nvp: h.getValue().split(";")) {
-                String[] nameValue = nvp.split("=", 2);
-                if (nameValue.length != 2) {
-                    continue;
-                }
-                
-                if (nameValue[0].trim().equalsIgnoreCase("SACSID")) {
-                    authCookieValue = nameValue[1].trim();
-                }
-            }
-        }
-
-        if (authCookieValue == null) {
-            log.warn("Authentication failure: no SACSID cookie found");
-            return null;
-        }
-
-        String authCookie = "SACSID="+authCookieValue;
-
-        sCookies.clear();
-        sCookies.add(authCookie);
-
-        return authCookie;
-    }
-
-    /**
      * Fetches a raw protocol buffer from the given URL via a HTTP GET.
      * 
      * \param url The URL of the object to fetch, relative to the server root (so for
@@ -114,7 +72,7 @@ public class ApiClient {
      * \param protoBuffFactory the class that we want to fetch, this will also determine
      *        the return value of this method.
      */
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({"unchecked", "deprecation"}) /* not deprecated on Android */
     public static <T> T getProtoBuf(String url, Class<T> protoBuffFactory) {
         ResultWrapper res = request("GET", url);
         try {
@@ -151,11 +109,13 @@ public class ApiClient {
      * Performs a request with the given method to the given URL. The URL is assumed to be
      * relative to the \c baseUri that was passed in to \c configure().
      * 
+     * TODO: move this to some kind of "low-level" class...
+     * 
      * @param method The HTTP method (GET, POST, etc)
      * @param url The URL, relative to the \c baseUri we were configured with.
      * @return A \c ResultWrapper representing the server's response (if any)
      */
-    private static ResultWrapper request(String method, String url) {
+    public static ResultWrapper request(String method, String url) {
         HttpClientConnection conn = null;
 
         URI uri = sBaseUri.resolve(url);
@@ -167,7 +127,12 @@ public class ApiClient {
                 // requests fail, we force creating a new connection
                 conn = sConnectionPool.getConnection(numAttempts > 0);
 
-                HttpRequest request = new BasicHttpRequest("GET", uri.getPath());
+                String requestUrl = uri.getPath();
+                if (uri.getQuery() != null && uri.getQuery() != "") {
+                    requestUrl += "?"+uri.getQuery();
+                }
+                log.debug("requestUrl = "+requestUrl);
+                HttpRequest request = new BasicHttpRequest("GET", requestUrl);
                 request.addHeader("Accept", "application/x-protobuf");
                 request.addHeader("Host", uri.getHost());
                 for(String cookie : sCookies) {
@@ -209,7 +174,7 @@ public class ApiClient {
         return true; // TODO actually check...
     }
 
-    private static class ResultWrapper {
+    public static class ResultWrapper {
         private HttpResponse mResponse;
         private HttpClientConnection mConnection;
 
