@@ -82,6 +82,11 @@ class DevicesPage(ApiPage):
             # own device registrations.
             return self._getDevicesByEmail(self.user.email())
 
+    def delete(self, deviceRegistrationID):
+        device = model.DeviceRegistration.getByRegistrationID(deviceRegistrationID)
+        if device != None:
+            device.delete()
+
     def _getDevicesByEmail(self, email):
         data = model.DeviceRegistration.getByEmail(email)
 
@@ -168,5 +173,6 @@ class ApiApplication(webapp.WSGIApplication):
 
 app = ApiApplication([('/api/v1/motd', MotdPage),
                       ('/api/v1/devices', DevicesPage),
+                      ('/api/v1/devices/registration:(.+)', DevicesPage),
                       ('/api/v1/devices/user:([^/]+)/messages', DeviceMessagesPage)],
                      debug=True)

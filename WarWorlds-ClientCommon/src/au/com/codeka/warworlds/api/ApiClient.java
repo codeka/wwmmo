@@ -58,8 +58,9 @@ public class ApiClient {
         RequestManager.ResultWrapper res = RequestManager.request("GET", url, headers);
         try {
             HttpResponse resp = res.getResponse();
-            if (resp.getStatusLine().getStatusCode() != 200) {
-                log.warn("API \"{}\" returned {}", url, resp.getStatusLine());
+            int statusCode = resp.getStatusLine().getStatusCode();
+            if (statusCode < 200 || statusCode > 299) {
+                log.warn("API \"GET {}\" returned {}", url, resp.getStatusLine());
                 return null;
             }
 
@@ -82,8 +83,9 @@ public class ApiClient {
         RequestManager.ResultWrapper res = RequestManager.request("PUT", url, headers, body);
         try {
             HttpResponse resp = res.getResponse();
-            if (resp.getStatusLine().getStatusCode() != 201) {
-                log.warn("API \"{}\" returned {}", url, resp.getStatusLine());
+            int statusCode = resp.getStatusLine().getStatusCode();
+            if (statusCode < 200 || statusCode > 299) {
+                log.warn("API \"PUT {}\" returned {}", url, resp.getStatusLine());
                 return false;
             }
 
@@ -105,11 +107,30 @@ public class ApiClient {
         RequestManager.ResultWrapper res = RequestManager.request("PUT", url, headers, body);
         try {
             HttpResponse resp = res.getResponse();
-            if (resp.getStatusLine().getStatusCode() != 200) {
-                log.warn("API \"{}\" returned {}", url, resp.getStatusLine());
+            int statusCode = resp.getStatusLine().getStatusCode();
+            if (statusCode < 200 || statusCode > 299) {
+                log.warn("API \"PUT {}\" returned {}", url, resp.getStatusLine());
             }
 
             return parseResponseBody(resp, protoBuffFactory);
+        } finally {
+            res.close();
+        }
+    }
+
+    /**
+     * Sends a HTTP 'DELETE' to the given URL.
+     */
+    public static void delete(String url) {
+        Map<String, List<String>> headers = getHeaders();
+
+        RequestManager.ResultWrapper res = RequestManager.request("DELETE", url, headers);
+        try {
+            HttpResponse resp = res.getResponse();
+            int statusCode = resp.getStatusLine().getStatusCode();
+            if (statusCode < 200 || statusCode > 299) {
+                log.warn("API \"DELETE {}\" returned {}", url, resp.getStatusLine());
+            }
         } finally {
             res.close();
         }

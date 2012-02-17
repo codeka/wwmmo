@@ -43,10 +43,9 @@ public class DeviceRegistrar {
 
                 ApiClient.putProtoBuf(url, registration); // TODO: check for errors...
             } else {
-                url += "/" + deviceRegistrationID;
+                url += "/registration:" + deviceRegistrationID;
 
-                //DeviceResource resource = Util.getClientResource(url, DeviceResource.class);
-                //resource.unregister();
+                ApiClient.delete(url);
             }
         } catch(Exception ex) {
             Log.w(TAG, "Failure, got: " + ex.getMessage());
@@ -54,8 +53,8 @@ public class DeviceRegistrar {
             Util.clearDeviceRegistration(context);
 
             return;
-    	}
-    	
+        }
+
         if (register) {
             SharedPreferences.Editor editor = settings.edit();
             editor.putString(Util.DEVICE_REGISTRATION_ID, deviceRegistrationID);

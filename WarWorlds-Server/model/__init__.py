@@ -50,9 +50,20 @@ class DeviceRegistration(db.Model):
     def getByEmail(email):
         """ Returns all device registrations that are registered to the given user.
         """
-        logging.info('Searching for user='+email)
         query = DeviceRegistration.all().filter('user', email)
         return DeviceRegistration._getByQuery(query)
+
+    @staticmethod
+    def getByRegistrationID(deviceRegistrationID):
+        """ Returns a device registration, given the deviceRegistrationID.
+        """
+        query = DeviceRegistration.all().filter('deviceRegistrationID', deviceRegistrationID)
+        devices = DeviceRegistration._getByQuery(query)
+        # there's only one so we just return that
+        if len(devices) == 1:
+            return devices[0]
+        else:
+            return None
 
     @staticmethod
     def _getByQuery(query):
