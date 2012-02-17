@@ -1,9 +1,0 @@
-<ui:UiBinder
-    xmlns:ui='urn:ui:com.google.gwt.uibinder'
-    xmlns:g='urn:import:com.google.gwt.user.client.ui'>
-    <g:HTMLPanel>
-	    <div id="dashboard">
-	    	<p>This is the dashboard. Currently empty.</p>
-	    </div>
-   </g:HTMLPanel>
-</ui:UiBinder>
