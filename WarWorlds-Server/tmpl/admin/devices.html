@@ -1,0 +1,29 @@
+{% extends "admin/skeleton.html" %}
+
+{% block head %}
+	<style>
+		fieldset#find-devices {
+			width: 45%;
+		}
+		fieldset#find-devices form {
+			width: 75%;
+			margin: 0 auto;
+		}
+		fieldset#find-devices input[type=text] {
+			width: 75%;
+		}
+	</style>
+{% endblock %}
+
+{% block content %}
+	<h1>Devices</h1>
+	<fieldset id="find-devices">
+		<legend>Find Devices</legend>
+		<p>To find the devices for a particular user, enter their email address below, then click
+		   &ldquo;Search&rdquo;.
+		<form>
+			<input type="text" id="search-email" name="email" />
+			<input type="submit" id="search-submit" value="Search" />
+		</form>
+	</fieldset>
+{% endblock %}

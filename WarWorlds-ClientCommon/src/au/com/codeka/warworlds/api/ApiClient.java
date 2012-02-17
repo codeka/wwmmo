@@ -5,12 +5,16 @@ import java.lang.reflect.Method;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.TreeMap;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
+import org.apache.http.entity.ByteArrayEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.protobuf.Message;
 
 /**
  * This is the main "client" that accesses the War Worlds API.
@@ -48,15 +52,8 @@ public class ApiClient {
      * \param protoBuffFactory the class that we want to fetch, this will also determine
      *        the return value of this method.
      */
-    @SuppressWarnings({"unchecked", "deprecation"}) /* not deprecated on Android */
     public static <T> T getProtoBuf(String url, Class<T> protoBuffFactory) {
-        TreeMap<String, List<String>> headers = new TreeMap<String, List<String>>();
-        if (!sCookies.isEmpty()) {
-            headers.put("Cookie", sCookies);
-        }
-        ArrayList<String> accept = new ArrayList<String>();
-        accept.add("application/x-protobuf");
-        headers.put("Accept", accept);
+        Map<String, List<String>> headers = getHeaders();
 
         RequestManager.ResultWrapper res = RequestManager.request("GET", url, headers);
         try {
@@ -66,26 +63,101 @@ public class ApiClient {
                 return null;
             }
 
-            HttpEntity entity = resp.getEntity();
-            if (entity != null) {
-                T result = null;
-
-                try {
-                    Method m = protoBuffFactory.getDeclaredMethod("parseFrom", InputStream.class);
-                    result = (T) m.invoke(null, entity.getContent());
-
-                    entity.consumeContent();
-                } catch (Exception e) {
-                    // any errors can just be ignored, reallu (return null instead)
-                    log.error("Error getting protocol buffer!", e);
-                }
-
-                return result;
-            }
+            return parseResponseBody(resp, protoBuffFactory);
         } finally {
             res.close();
         }
+    }
 
-        return null; // TODO -- this is actually an error as well...
+    /**
+     * Uses the "PUT" HTTP method to put a protocol buffer at the given URL. This is useful when
+     * you don't expect a response (other than "201", success)
+     */
+    public static boolean putProtoBuf(String url, Message pb) {
+        Map<String, List<String>> headers = getHeaders();
+
+        ByteArrayEntity body = new ByteArrayEntity(pb.toByteArray());
+        body.setContentType("application/x-protobuf");
+
+        RequestManager.ResultWrapper res = RequestManager.request("PUT", url, headers, body);
+        try {
+            HttpResponse resp = res.getResponse();
+            if (resp.getStatusLine().getStatusCode() != 201) {
+                log.warn("API \"{}\" returned {}", url, resp.getStatusLine());
+                return false;
+            }
+
+            return true;
+        } finally {
+            res.close();
+        }
+    }
+
+    /**
+     * Uses the "PUT" HTTP method to put a protocol buffer at the given URL.
+     */
+    public static <T> T putProtoBuf(String url, Message pb, Class<T> protoBuffFactory) {
+        Map<String, List<String>> headers = getHeaders();
+
+        ByteArrayEntity body = new ByteArrayEntity(pb.toByteArray());
+        body.setContentType("application/x-protobuf");
+
+        RequestManager.ResultWrapper res = RequestManager.request("PUT", url, headers, body);
+        try {
+            HttpResponse resp = res.getResponse();
+            if (resp.getStatusLine().getStatusCode() != 200) {
+                log.warn("API \"{}\" returned {}", url, resp.getStatusLine());
+            }
+
+            return parseResponseBody(resp, protoBuffFactory);
+        } finally {
+            res.close();
+        }
+    }
+
+    /**
+     * Gets the headers that we'll add to all of our requests.
+     */
+    private static Map<String, List<String>> getHeaders() {
+        TreeMap<String, List<String>> headers = new TreeMap<String, List<String>>();
+        if (!sCookies.isEmpty()) {
+            headers.put("Cookie", sCookies);
+        }
+        ArrayList<String> accept = new ArrayList<String>();
+        accept.add("application/x-protobuf");
+        headers.put("Accept", accept);
+
+        return headers;
+    }
+
+    /**
+     * Parses the response from a request and returns the protocol buffer returned therein 
+     * (if any).
+     * 
+     * @param url
+     * @param resp
+     * @param protoBuffFactory
+     * @return
+     */
+    @SuppressWarnings({"unchecked", "deprecation"}) /* not deprecated on Android */
+    private static <T> T parseResponseBody(HttpResponse resp, Class<T> protoBuffFactory) {
+        HttpEntity entity = resp.getEntity();
+        if (entity != null) {
+            T result = null;
+
+            try {
+                Method m = protoBuffFactory.getDeclaredMethod("parseFrom", InputStream.class);
+                result = (T) m.invoke(null, entity.getContent());
+
+                entity.consumeContent();
+            } catch (Exception e) {
+                // any errors can just be ignored, reallu (return null instead)
+                log.error("Error getting protocol buffer!", e);
+            }
+
+            return result;
+        }
+
+        return null;
     }
 }

@@ -13,9 +13,11 @@ import javax.net.SocketFactory;
 import javax.net.ssl.SSLSocketFactory;
 
 import org.apache.http.HttpClientConnection;
+import org.apache.http.HttpEntity;
 import org.apache.http.HttpRequest;
 import org.apache.http.HttpResponse;
 import org.apache.http.impl.DefaultHttpClientConnection;
+import org.apache.http.message.BasicHttpEntityEnclosingRequest;
 import org.apache.http.message.BasicHttpRequest;
 import org.apache.http.params.BasicHttpParams;
 import org.slf4j.Logger;
@@ -53,7 +55,7 @@ public class RequestManager {
      * @return A \c ResultWrapper representing the server's response (if any)
      */
     public static ResultWrapper request(String method, String url) {
-        return request(method, url, null);
+        return request(method, url, null, null);
     }
 
     /**
@@ -68,6 +70,21 @@ public class RequestManager {
      */
     public static ResultWrapper request(String method, String url,
             Map<String, List<String>> extraHeaders) {
+        return request(method, url, extraHeaders, null);
+    }
+
+    /**
+     * Performs a request with the given method to the given URL. The URL is assumed to be
+     * relative to the \c baseUri that was passed in to \c configure().
+     * 
+     * @param method The HTTP method (GET, POST, etc)
+     * @param url The URL, relative to the \c baseUri we were configured with.
+     * @param extraHeaders a mapping of additional headers to include in the request (e.g.
+     *        cookies, etc)
+     * @return A \c ResultWrapper representing the server's response (if any)
+     */
+    public static ResultWrapper request(String method, String url,
+            Map<String, List<String>> extraHeaders, HttpEntity body) {
         HttpClientConnection conn = null;
 
         URI uri = sBaseUri.resolve(url);
@@ -84,7 +101,17 @@ public class RequestManager {
                     requestUrl += "?"+uri.getQuery();
                 }
                 log.debug("requestUrl = "+requestUrl);
-                HttpRequest request = new BasicHttpRequest("GET", requestUrl);
+
+                HttpRequest request;
+                if (body != null) {
+                    BasicHttpEntityEnclosingRequest beer =
+                            new BasicHttpEntityEnclosingRequest(method, requestUrl);
+                    beer.setEntity(body);
+                    request = beer;
+                } else {
+                    request = new BasicHttpRequest(method, requestUrl);
+                }
+
                 request.addHeader("Host", uri.getHost());
                 if (extraHeaders != null) {
                     for(String headerName : extraHeaders.keySet()) {
@@ -93,7 +120,15 @@ public class RequestManager {
                         }
                     }
                 }
+                if (body != null) {
+                    request.addHeader(body.getContentType());
+                    request.addHeader("Content-Length", Long.toString(body.getContentLength()));
+                }
+
                 conn.sendRequestHeader(request);
+                if (body != null) {
+                    conn.sendRequestEntity((BasicHttpEntityEnclosingRequest) request);
+                }
                 conn.flush();
 
                 HttpResponse response = conn.receiveResponseHeader();

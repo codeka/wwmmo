@@ -5,8 +5,41 @@
 // TODO: separate these into separate packages?
 package warworlds;
 
+//
+// This is used when you first connect, we display some news, important announcements,
+// stuff of that nature.
+//
 message MessageOfTheDay
 {
 	required string message = 1;
 	required string last_update = 2; // last update date (in ISO string format)
+}
+
+
+//
+// Contains details about a device's registration with C2DM so that we can send you
+// messages and stuff (e.g. when your planet is under attack, etc)
+//
+message DeviceRegistration
+{
+	// The identifier of the device. You can have multiple accounts on one device, this
+	// will then refer to the device itself.
+	required string device_id = 1;
+
+	// The identifier of this *registration*. You can register one account on one device,
+	// but you could have the same account on multiple devices, too.
+	required string device_registration_id = 2;
+
+	// If set, this is the user that the device belongs to. This is usually only returned
+	// when you fetch registrations, adding registrations you can obviously only register
+	// to yourself (i.e. if this is present, it's ignored anyway)
+	optional string user = 3;
+}
+
+//
+// Represents a collection of device registrations.
+//
+message DeviceRegistrations
+{
+	repeated DeviceRegistration registrations = 1;
 }

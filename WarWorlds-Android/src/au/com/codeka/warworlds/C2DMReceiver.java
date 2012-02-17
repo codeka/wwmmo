@@ -65,20 +65,20 @@ public class C2DMReceiver extends C2DMBaseReceiver {
      * Calls the onComplete handler (if there is one), making sure to do so on the main UI thread.
      */
     private static void callOnComplete() {
-    	if (sOnComplete != null && sActivity != null) {
-    		sActivity.runOnUiThread(new Runnable() {
-				@Override
-				public void run() {
-					try {
-						sOnComplete.call();
-						sOnComplete = null;
-					} catch(Exception e) {
-					}
-				}
-    		});
-    	}
+        if (sOnComplete != null && sActivity != null) {
+            sActivity.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        sOnComplete.call();
+                        sOnComplete = null;
+                    } catch(Exception e) {
+                    }
+                }
+            });
+        }
     }
-    
+
     /**
      * Called when a registration token has been received.
      * 

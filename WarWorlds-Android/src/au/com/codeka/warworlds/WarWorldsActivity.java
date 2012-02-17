@@ -135,10 +135,12 @@ public class WarWorldsActivity extends Activity {
 
             @Override
             protected String doInBackground(Void... arg0) {
+                // re-authenticate and get a new cookie
                 String authCookie = Authenticator.authenticate(mContext, WarWorldsActivity.this,
                         accountName);
                 ApiClient.getCookies().add(authCookie);
 
+                // fetch the message of the day (basically, a test of our new cookie)
                 MessageOfTheDay motd = ApiClient.getProtoBuf("motd", MessageOfTheDay.class);
                 if (motd == null) {
                     message = "<pre>Try logging in and out again.</pre>";
@@ -161,8 +163,6 @@ public class WarWorldsActivity extends Activity {
         }.execute();
     }
 
-    // Manage UI Screens
-
     private void setHomeScreenContent() {
         setContentView(R.layout.home);
 
@@ -173,14 +173,14 @@ public class WarWorldsActivity extends Activity {
         loadMotdAndVerifyAccount(motdView);
 
         logOutButton.setOnClickListener(new OnClickListener() {
-        	public void onClick(View v) {
-        		startActivity(new Intent(mContext, AccountsActivity.class));
-        	}
+            public void onClick(View v) {
+                startActivity(new Intent(mContext, AccountsActivity.class));
+            }
         });
 
         startGameButton.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
-            	startGameButton.setEnabled(false);
+                startGameButton.setEnabled(false);
                 startActivity(new Intent(mContext, StarfieldActivity.class));
             }
         });

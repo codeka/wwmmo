@@ -142,14 +142,14 @@ public class AccountsActivity extends Activity {
 
                     // Register
                     register((String) account.getText(), new Callable<Void>() {
-                    	public Void call() {
-                    		if (mPleaseWaitDialog != null) {
-                    			mPleaseWaitDialog.dismiss();
-                    		}
+                        public Void call() {
+                            if (mPleaseWaitDialog != null) {
+                                mPleaseWaitDialog.dismiss();
+                                }
 
-                    		finish();
-                    		return null;
-                    	}
+                            finish();
+                            return null;
+                        }
                     });
                 }
             });
@@ -173,15 +173,15 @@ public class AccountsActivity extends Activity {
         logOutButton.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
                 // Unregister
-            	unregister(new Callable<Void>() {
-                	public Void call() {
-                		if (mPleaseWaitDialog != null) {
-                			mPleaseWaitDialog.dismiss();
-                		}
+                unregister(new Callable<Void>() {
+                    public Void call() {
+                        if (mPleaseWaitDialog != null) {
+                            mPleaseWaitDialog.dismiss();
+                        }
 
-                		finish();
-                		return null;
-                	}
+                        finish();
+                        return null;
+                    }
                 });
             }
         });
@@ -237,7 +237,7 @@ public class AccountsActivity extends Activity {
     private void unregister(final Callable<Void> onComplete) {
         mPleaseWaitDialog = ProgressDialog.show(mContext, null, "Logging out...", true);
 
-    	C2DMReceiver.unregister(this, onComplete);
+        C2DMReceiver.unregister(this, onComplete);
     }
 
     // Utility Methods

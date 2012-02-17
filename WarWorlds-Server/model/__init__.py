@@ -5,6 +5,7 @@ Created on 11/02/2012
 '''
 
 from google.appengine.ext import db
+import logging
 
 
 class MessageOfTheDay(db.Model):
@@ -32,3 +33,26 @@ class MessageOfTheDay(db.Model):
             motd = MessageOfTheDay(key=MessageOfTheDay._getKey())
         motd.message = msg
         motd.put()
+
+
+class DeviceRegistration(db.Model):
+    """ Represents the details of a device registration.
+    """
+    deviceID = db.StringProperty()
+    deviceRegistrationID = db.StringProperty()
+    user = db.EmailProperty()
+
+    @staticmethod
+    def getByEmail(email):
+        """ Returns all device registrations that are registered to the given user.
+        """
+        logging.info('Searching for user='+email)
+        query = DeviceRegistration.all().filter('user', email)
+        return DeviceRegistration._getByQuery(query)
+
+    @staticmethod
+    def _getByQuery(query):
+        results = []
+        for result in query:
+            results.append(result)
+        return results

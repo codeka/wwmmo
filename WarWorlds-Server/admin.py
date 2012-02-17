@@ -64,6 +64,15 @@ class MotdPage(AdminPage):
         # rediret back to ourselves...
         self.redirect(self.request.url)
 
+
+class DevicesPage(AdminPage):
+    ''' The "devices" page lets you view all devices that have registered and send them messages.
+    '''
+
+    def get(self):
+        self.render('admin/devices.html', {})
+
 app = webapp.WSGIApplication([('/admin', DashboardPage),
-                              ('/admin/motd', MotdPage)],
+                              ('/admin/motd', MotdPage),
+                              ('/admin/devices', DevicesPage)],
                              debug=True)
