@@ -40,6 +40,10 @@ class DeviceRegistration(db.Model):
     """
     deviceID = db.StringProperty()
     deviceRegistrationID = db.StringProperty()
+    deviceModel = db.StringProperty()
+    deviceManufacturer = db.StringProperty()
+    deviceBuild = db.StringProperty()
+    deviceVersion = db.StringProperty()
     user = db.EmailProperty()
 
     @staticmethod

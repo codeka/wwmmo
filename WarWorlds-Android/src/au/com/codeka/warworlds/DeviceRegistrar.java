@@ -35,6 +35,10 @@ public class DeviceRegistrar {
                 DeviceRegistration registration = DeviceRegistration.newBuilder()
                     .setDeviceId(Secure.getString(context.getContentResolver(), Secure.ANDROID_ID))
                     .setDeviceRegistrationId(deviceRegistrationID)
+                    .setDeviceBuild(android.os.Build.DISPLAY)
+                    .setDeviceManufacturer(android.os.Build.MANUFACTURER)
+                    .setDeviceModel(android.os.Build.MODEL)
+                    .setDeviceVersion(android.os.Build.VERSION.RELEASE)
                     .build();
 
                 ApiClient.putProtoBuf(url, registration); // TODO: check for errors...

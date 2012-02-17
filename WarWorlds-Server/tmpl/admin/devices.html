@@ -1,6 +1,7 @@
 {% extends "admin/skeleton.html" %}
 
 {% block head %}
+	<script src="/js/tmpl.js"></script>
 	<style>
 		fieldset#find-devices {
 			width: 45%;
@@ -21,9 +22,57 @@
 		<legend>Find Devices</legend>
 		<p>To find the devices for a particular user, enter their email address below, then click
 		   &ldquo;Search&rdquo;.
-		<form>
-			<input type="text" id="search-email" name="email" />
-			<input type="submit" id="search-submit" value="Search" />
+		<form class="search">
+			<input type="text" id="search-email" />
+			<input type="submit" value="Search" />
+		</form>
+		<ul id="search-results"></ul>
+		<form id="sendmsg" style="display: none;">
+			<p>Send this user a message:
+			<input type="text" id="sendmsg-msg" />
+			<input type="submit" value="Send" />
 		</form>
 	</fieldset>
+	<script type="text/html" id="search-results-tmpl">
+		<li>
+			<strong><%= device_manufacturer %> <%= device_model %></strong> (Android
+			<%= device_version %>)
+		</li>
+	</script>
+	<script>
+		$("#find-devices input[type=submit]").click(function(evnt) {
+			evnt.preventDefault();
+			$.ajax({
+				url: "/api/v1/devices?user="+$("#search-email").val(),
+				dataType: "json",
+				success: function (data) {
+					var html = "", tmpl = $("#search-results-tmpl");
+					for(i in data.registrations) {
+						html += tmpl.applyTemplate(data.registrations[i]);
+					}
+					if (html == "") {
+						html = "<li><em>No devices found</em></li>";
+					}
+					$("#search-results").html(html);
+					$("#sendmsg").show();
+				}
+			});
+		});
+
+		$("form#sendmsg").on("click", "input[type=submit]", function(evnt) {
+			evnt.preventDefault();
+			var msg = $("#sendmsg-msg").val();
+			var user = $("#search-email").val();
+			$.ajax({
+				url: "/api/v1/devices/user:"+user+"/messages",
+				type: "PUT",
+				contentType: "application/json",
+				processData: false,
+				data: JSON.stringify({"message": msg}),
+				success: function(data) {
+					alert("Message Sent!");
+				}
+			});
+		});
+	</script>
 {% endblock %}
