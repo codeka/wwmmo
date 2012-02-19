@@ -1,6 +1,5 @@
 package au.com.codeka.warworlds.game;
 
-import java.util.ArrayList;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import android.content.Context;
@@ -15,6 +14,8 @@ import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import au.com.codeka.warworlds.model.Sector;
+import au.com.codeka.warworlds.model.Star;
 
 /**
  * \c SurfaceView that displays the starfield. You can scroll around, tap on stars to bring
@@ -27,7 +28,7 @@ public class StarfieldSurfaceView extends SurfaceView implements SurfaceHolder.C
     private GestureDetector mGestureDetector;
     private GestureHandler mGestureHandler;
     private CopyOnWriteArrayList<OnStarSelectedListener> mStarSelectedListeners;
- /*   private StarfieldStar mSelectedStar;*/
+    private Star mSelectedStar;
 
     // these are used to ensure we don't queue up heaps of AsyncTasks for
     // redrawing the screen.
@@ -39,18 +40,18 @@ public class StarfieldSurfaceView extends SurfaceView implements SurfaceHolder.C
         Log.i(TAG, "Starfield initializing...");
 
         mStarSelectedListeners = new CopyOnWriteArrayList<OnStarSelectedListener>();
-   /*     mSelectedStar = null;*/
+        mSelectedStar = null;
 
         getHolder().addCallback(this);
         mGestureHandler = new GestureHandler();
         mGestureDetector = new GestureDetector(context, mGestureHandler);
-/*
+
         SectorManager.getInstance().addSectorListChangedListener(new SectorManager.OnSectorListChangedListener() {
             @Override
             public void onSectorListChanged() {
                 redraw();
             }
-        });*/
+        });
     }
 
     @Override
@@ -85,13 +86,13 @@ public class StarfieldSurfaceView extends SurfaceView implements SurfaceHolder.C
     public void removeStarSelectedListener(OnStarSelectedListener listener) {
         mStarSelectedListeners.remove(listener);
     }
-/*
-    protected void fireStarSelected(StarfieldStar star) {
+
+    protected void fireStarSelected(Star star) {
         for(OnStarSelectedListener listener : mStarSelectedListeners) {
             listener.onStarSelected(star);
         }
     }
-*/
+
     /**
      * Causes the \c StarfieldSurfaceView to redraw itself. Used, eg, when we
      * scroll, etc.
@@ -150,34 +151,33 @@ public class StarfieldSurfaceView extends SurfaceView implements SurfaceHolder.C
 
         // clear it to black
         canvas.drawColor(0xff000000);
-/*
+
         for(int y = -sm.getRadius(); y <= sm.getRadius(); y++) {
             for(int x = -sm.getRadius(); x <= sm.getRadius(); x++) {
                 long sectorX = sm.getSectorCentreX() + x;
                 long sectorY = sm.getSectorCentreY() + y;
 
-                StarfieldSector sector = sm.getSector(sectorX, sectorY);
+                Sector sector = sm.getSector(sectorX, sectorY);
                 if (sector == null) {
                     continue; // it might not be loaded yet...
                 }
 
-                drawSector(canvas, (x * SectorConstants.Width) + sm.getOffsetX(),
-                        (y * SectorConstants.Height) + sm.getOffsetY(), sector);
+                drawSector(canvas, (x * SectorManager.SECTOR_SIZE) + sm.getOffsetX(),
+                        (y * SectorManager.SECTOR_SIZE) + sm.getOffsetY(), sector);
             }
-        }*/
+        }
     }
-/*
-    private void drawSector(Canvas canvas, int offsetX, int offsetY,
-            StarfieldSector sector) {
-        for(StarfieldStar star : sector.getStars()) {
+
+    private void drawSector(Canvas canvas, int offsetX, int offsetY, Sector sector) {
+        for(Star star : sector.getStars()) {
             drawStar(canvas, star, offsetX, offsetY);
         }
     }
 
     private Paint p = null;
-    private void drawStar(Canvas canvas, StarfieldStar star, int x, int y) {
-        x += star.getX();
-        y += star.getY();
+    private void drawStar(Canvas canvas, Star star, int x, int y) {
+        x += star.getOffsetX();
+        y += star.getOffsetY();
 
         int[] colours = { star.getColour(), star.getColour(), 0x00000000 };
         float[] positions = { 0.0f, 0.4f, 1.0f };
@@ -199,7 +199,7 @@ public class StarfieldSurfaceView extends SurfaceView implements SurfaceHolder.C
             canvas.drawCircle(x, y, star.getSize() + 5, p2);
         }
     }
-*/
+
     /**
      * Implements the \c OnGestureListener methods that we use to respond to
      * various touch events.
@@ -226,17 +226,17 @@ public class StarfieldSurfaceView extends SurfaceView implements SurfaceHolder.C
         public boolean onSingleTapConfirmed(MotionEvent e) {
             int tapX = (int) e.getX();
             int tapY = (int) e.getY();
-/*
-            StarfieldStar star = SectorManager.getInstance().getStarAt(tapX, tapY);
+
+            Star star = SectorManager.getInstance().getStarAt(tapX, tapY);
             if (star != null) {
-                Log.i(TAG, "Star at ("+star.getX()+", "+star.getY()+") tapped ("+tapX+", "+tapY+").");
+                Log.i(TAG, "Star at ("+star.getOffsetX()+", "+star.getOffsetY()+") tapped ("+tapX+", "+tapY+").");
                 mSelectedStar = star;
                 redraw();
                 fireStarSelected(star);
             } else {
                 Log.i(TAG, "No star tapped, tap = ("+tapX+", "+tapY+")");
             }
-*/
+
             return false;
         }
     }
@@ -250,6 +250,6 @@ public class StarfieldSurfaceView extends SurfaceView implements SurfaceHolder.C
          * This is called when the user selects (by tapping it) a star. By definition, only
          * one star can be selected at a time.
          */
-        //public abstract void onStarSelected(StarfieldStar star);
+        public abstract void onStarSelected(Star star);
     }
 }

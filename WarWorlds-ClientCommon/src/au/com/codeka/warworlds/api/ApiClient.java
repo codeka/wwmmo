@@ -143,6 +143,8 @@ public class ApiClient {
         TreeMap<String, List<String>> headers = new TreeMap<String, List<String>>();
         if (!sCookies.isEmpty()) {
             headers.put("Cookie", sCookies);
+        } else {
+            log.warn("Cookies collection is empty, possible error!");
         }
         ArrayList<String> accept = new ArrayList<String>();
         accept.add("application/x-protobuf");

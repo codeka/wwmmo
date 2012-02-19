@@ -52,6 +52,7 @@ public class WarWorldsActivity extends Activity {
 
         // initialize the Util class
         Util.loadSettings(mContext, this);
+        Authenticator.configure(mContext);
 
         requestWindowFeature(Window.FEATURE_NO_TITLE); // remove the title bar
 
@@ -140,7 +141,7 @@ public class WarWorldsActivity extends Activity {
             @Override
             protected String doInBackground(Void... arg0) {
                 // re-authenticate and get a new cookie
-                String authCookie = Authenticator.authenticate(mContext, WarWorldsActivity.this,
+                String authCookie = Authenticator.authenticate(WarWorldsActivity.this,
                         accountName);
                 ApiClient.getCookies().add(authCookie);
 

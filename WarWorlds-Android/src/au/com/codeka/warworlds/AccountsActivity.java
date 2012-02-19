@@ -224,7 +224,7 @@ public class AccountsActivity extends Activity {
         new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... arg0) {
-                String authCookie = Authenticator.authenticate(mContext, AccountsActivity.this,
+                String authCookie = Authenticator.authenticate(AccountsActivity.this,
                         accountName);
                 ApiClient.getCookies().add(authCookie);
                 C2DMReceiver.register(AccountsActivity.this, Setup.SENDER_ID, onComplete);

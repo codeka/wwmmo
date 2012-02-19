@@ -56,7 +56,7 @@
 				$y2.val(parseInt($y1.val()) + 1);
 			}
 
-			var coords = $x1.val()+","+$y1.val()+"-"+$x2.val()+","+$y2.val();
+			var coords = $x1.val()+","+$y1.val()+":"+$x2.val()+","+$y2.val();
 			$.ajax({
 				url: "/api/v1/sectors?coords="+coords,
 				dataType: "json",

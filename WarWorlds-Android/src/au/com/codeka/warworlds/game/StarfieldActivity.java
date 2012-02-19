@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.view.Window;
 import android.widget.TextView;
 import au.com.codeka.warworlds.R;
+import au.com.codeka.warworlds.model.Star;
 
 /**
  * The \c StarfieldActivity is the "home" screen of the game, and displays the
@@ -38,13 +39,13 @@ public class StarfieldActivity extends Activity {
         mUsername.setText("codeka");
         mMoney.setText("$ 12,345");
         mStarName.setText("");
-/*
+
         mStarfield.addStarSelectedListener(new StarfieldSurfaceView.OnStarSelectedListener() {
             @Override
-            public void onStarSelected(StarfieldStar star) {
+            public void onStarSelected(Star star) {
                 mStarName.setText(star.getName());
                 // todo: load the rest of the star's details...
             }
-        });*/
+        });
     }
 }

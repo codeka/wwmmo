@@ -14,11 +14,11 @@ import javax.net.ssl.SSLSocketFactory;
 
 import org.apache.http.HttpClientConnection;
 import org.apache.http.HttpEntity;
-import org.apache.http.HttpRequest;
 import org.apache.http.HttpResponse;
 import org.apache.http.impl.DefaultHttpClientConnection;
 import org.apache.http.message.BasicHttpEntityEnclosingRequest;
 import org.apache.http.message.BasicHttpRequest;
+import org.apache.http.message.BasicHttpResponse;
 import org.apache.http.params.BasicHttpParams;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,6 +30,8 @@ public class RequestManager {
     final static Logger log = LoggerFactory.getLogger(RequestManager.class);
     private static ConnectionPool sConnectionPool;
     private static URI sBaseUri;
+    private static List<ResponseReceivedHandler> sResponseReceivedHandlers =
+            new ArrayList<ResponseReceivedHandler>();
 
     public static void configure(URI baseUri) {
         boolean ssl = false;
@@ -102,7 +104,7 @@ public class RequestManager {
                 }
                 log.debug("requestUrl = "+requestUrl);
 
-                HttpRequest request;
+                BasicHttpRequest request;
                 if (body != null) {
                     BasicHttpEntityEnclosingRequest beer =
                             new BasicHttpEntityEnclosingRequest(method, requestUrl);
@@ -131,8 +133,10 @@ public class RequestManager {
                 }
                 conn.flush();
 
-                HttpResponse response = conn.receiveResponseHeader();
+                BasicHttpResponse response = (BasicHttpResponse) conn.receiveResponseHeader();
                 conn.receiveResponseEntity(response);
+
+                fireResponseReceivedHandlers(request, response);
 
                 return new ResultWrapper(conn, response);
             } catch (Exception e) {
@@ -157,11 +161,30 @@ public class RequestManager {
         }
     }
 
+    public static void addResponseReceivedHandler(ResponseReceivedHandler handler) {
+        sResponseReceivedHandlers.add(handler);
+    }
+
+    private static void fireResponseReceivedHandlers(BasicHttpRequest request,
+            BasicHttpResponse response) {
+        for(ResponseReceivedHandler handler : sResponseReceivedHandlers) {
+            handler.onResponseReceived(request, response);
+        }
+    }
+
     /**
      * Determines whether the given exception is re-tryable or not.
      */
     private static boolean canRetry(Exception e) {
         return true; // TODO actually check...
+    }
+
+    /**
+     * Register this interface to be notified of every HTTP response. You can do this, for example,
+     * to check for authentication errors and automatically re-authenticate.
+     */
+    public interface ResponseReceivedHandler {
+        void onResponseReceived(BasicHttpRequest request, BasicHttpResponse response);
     }
 
     /**

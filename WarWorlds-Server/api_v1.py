@@ -132,7 +132,7 @@ class DeviceMessagesPage(ApiPage):
 class SectorsPage(ApiPage):
     def get(self):
         if self.request.get('coords') != '':
-            (x1y1, x2y2) = self.request.get('coords').split('-', 2)
+            (x1y1, x2y2) = self.request.get('coords').split(':', 2)
             (x1, y1) = x1y1.split(',', 2)
             (x2, y2) = x2y2.split(',', 2)
 
@@ -156,13 +156,14 @@ class SectorsPage(ApiPage):
             sector_pb = sectors_pb.sectors.add()
             sector_pb.x = sector_model.x
             sector_pb.y = sector_model.y
-            
+
             for star_model in sector_model.stars:
                 star_pb = sector_pb.stars.add()
                 star_pb.offset_x = star_model.x
                 star_pb.offset_y = star_model.y
                 star_pb.name = star_model.name
                 star_pb.colour = star_model.colour
+                star_pb.size = star_model.size
                 star_pb.num_planets = 3 # TODO
 
 
