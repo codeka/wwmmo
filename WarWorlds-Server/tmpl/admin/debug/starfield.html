@@ -1,0 +1,69 @@
+{% extends "admin/skeleton.html" %}
+
+{% block head %}
+	<style>
+		#update-form textarea {
+			width: 800px;
+			height: 400px;
+		}
+		
+		#input-form input[type=text] {
+			width: 100px;
+		}
+	</style>
+{% endblock %}
+
+{% block content %}
+	<h1>Starfield</h1>
+	<p>Enter the coordinates of the sector you want to look at, and click &ldquo;Display&rdquo;.
+	<form id="input-form">
+		(
+			<input type="text" name="x1" value="0">,
+			<input type="text" name="y1" value="0">
+		) - (
+			<input type="text" name="x2">,
+			<input type="text" name="y2">
+		)
+		<input type="submit" value="Display">
+	</form>
+	<form id="update-form">
+		<textarea name="sectors"></textarea>
+	</form>
+	<script>
+		$("#input-form").on("click", "input[type=submit]", function(evnt) {
+			evnt.preventDefault();
+			var $x1 = $("#input-form input[name=x1]");
+			var $x2 = $("#input-form input[name=x2]");
+			var $y1 = $("#input-form input[name=y1]");
+			var $y2 = $("#input-form input[name=y2]");
+
+			if (parseInt($x1.val()) != $x1.val()) {
+				$x1.val("0");
+			}
+			if (parseInt($y1.val()) != $y1.val()) {
+				$y1.val("0");
+			}
+
+			if (parseInt($x2.val()) != $x2.val()) {
+				$x2.val("");
+			}
+			if (parseInt($y2.val()) != $y2.val()) {
+				$y2.val("");
+			}
+
+			if ($x2.val() == "" || $y2.val() == "") {
+				$x2.val(parseInt($x1.val()) + 1);
+				$y2.val(parseInt($y1.val()) + 1);
+			}
+
+			var coords = $x1.val()+","+$y1.val()+"-"+$x2.val()+","+$y2.val();
+			$.ajax({
+				url: "/api/v1/sectors?coords="+coords,
+				dataType: "json",
+				success: function (data) {
+					$("#update-form textarea").val(JSON.stringify(data, null, "  "));
+				}
+			});
+		});
+	</script>
+{% endblock %}

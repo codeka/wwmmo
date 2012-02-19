@@ -61,13 +61,6 @@ public class WarWorldsActivity extends Activity {
     }
 
     @Override
-    public void onSaveInstanceState(Bundle outState) {
-        outState.putString("motd", mMotd);
-
-        super.onSaveInstanceState(outState);
-    }
-
-    @Override
     public void onResume() {
         super.onResume();
 
@@ -90,6 +83,17 @@ public class WarWorldsActivity extends Activity {
     }
 
     /**
+     * Saves the current state of the activity so that we can restore it without having
+     * to re-fetch it from the server (well, we might do that anyway...)
+     */
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        outState.putString("motd", mMotd);
+
+        super.onSaveInstanceState(outState);
+    }
+
+    /**
      * Loads the MOTD template HTML, which is actually just a static asset.
      */
     private String getHtmlFile(String fileName) {
@@ -105,7 +109,7 @@ public class WarWorldsActivity extends Activity {
             return "";
         }
     }
-    
+
     /**
      * Loads the MOTD. This also checks that we're correctly registered on the server. If
      * we're not correctly registered, then we can direct them to the \c AccountPropertiesActivity.
@@ -163,6 +167,9 @@ public class WarWorldsActivity extends Activity {
         }.execute();
     }
 
+    /**
+     * Sets up the contents of the home screen.
+     */
     private void setHomeScreenContent() {
         setContentView(R.layout.home);
 

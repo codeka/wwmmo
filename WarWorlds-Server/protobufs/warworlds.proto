@@ -64,3 +64,63 @@ message DeviceMessage
 {
 	required string message = 1;
 }
+
+//
+// Represents a "sector" of space, containing a number of stars and whatnot.
+message Sector
+{
+	// these are the (x,y) coordinates of the sector. (0,0) is the "centre" of the universe,
+	// (1,1) is one sector up and to the right, and so on.
+	required int64 x = 1;
+	required int64 y = 2;
+
+	// the collection of stars in this sector.
+	repeated Star stars = 3;
+}
+
+//
+// Represents a single star within a sector. The star can have a few planets, though this
+// is optional (we don't always return the list of planets with a star).
+//
+message Star
+{
+	// the name of the star
+	required string name = 1;
+
+	// the colour of the star, as an RGB value
+	required uint32 colour = 2;
+
+	// the apparent "size" of the star (which is really just a display thing)
+	required int32 size = 3;
+
+	// the offset from the left edge of the sector, in pixels
+	required int32 offset_x = 4;
+
+	// the offset from the bottom edge of the sector, in pixels
+	required int32 offset_y = 5;
+
+	// the number of planets orbiting this star (useful for knowing whether there are
+	// actually planets, and the planets field is just empty, or whether there are no
+	// planets anyway).
+	required int32 num_planets = 6;
+
+	// the collection of planets orbiting this star (may be empty)
+	repeated Planet planets = 7;
+}
+
+//
+// Represents a planet in the star system. A planet orbits a \c Star which in turn belongs
+// to a \c Sector.
+//
+message Planet
+{
+
+}
+
+//
+// Represents a list of sectors.
+//
+message Sectors
+{
+	repeated Sector sectors = 1;
+}

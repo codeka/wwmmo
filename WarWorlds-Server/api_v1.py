@@ -6,7 +6,7 @@ Created on 12/02/2012
 
 import webapp2 as webapp
 import model
-from model.c2dm import Sender
+from model import c2dm, sector
 
 import import_fixer
 import_fixer.FixImports('google', 'protobuf')
@@ -121,12 +121,49 @@ class DeviceMessagesPage(ApiPage):
         msg = self._getRequestBody(pb.DeviceMessage)
         logging.info('Putting message to user: '+user)
         logging.info('Message: '+str(msg))
-        
-        s = Sender()
+
+        s = c2dm.Sender()
         devices = model.DeviceRegistration.getByEmail(user)
         for device in devices:
             s.sendMessage(device.deviceRegistrationID, {"msg": msg.message})
         return None
+
+
+class SectorsPage(ApiPage):
+    def get(self):
+        if self.request.get('coords') != '':
+            (x1y1, x2y2) = self.request.get('coords').split('-', 2)
+            (x1, y1) = x1y1.split(',', 2)
+            (x2, y2) = x2y2.split(',', 2)
+
+            x1 = int(x1)
+            y1 = int(y1)
+            x2 = int(x2)
+            y2 = int(y2)
+
+            sector_model = sector.SectorManager.getSectors(x1, y1, x2, y2)
+            sectors_pb = pb.Sectors()
+            self._modelToPb(sectors_pb, sector_model)
+            return sectors_pb
+        else:
+            # TODO: other ways of querying for sectors?
+            self.response.set_status(400)
+            return
+
+    def _modelToPb(self, sectors_pb, sectors_model):
+        for key in sectors_model:
+            sector_model = sectors_model[key]
+            sector_pb = sectors_pb.sectors.add()
+            sector_pb.x = sector_model.x
+            sector_pb.y = sector_model.y
+            
+            for star_model in sector_model.stars:
+                star_pb = sector_pb.stars.add()
+                star_pb.offset_x = star_model.x
+                star_pb.offset_y = star_model.y
+                star_pb.name = star_model.name
+                star_pb.colour = star_model.colour
+                star_pb.num_planets = 3 # TODO
 
 
 class ApiApplication(webapp.WSGIApplication):
@@ -174,5 +211,6 @@ class ApiApplication(webapp.WSGIApplication):
 app = ApiApplication([('/api/v1/motd', MotdPage),
                       ('/api/v1/devices', DevicesPage),
                       ('/api/v1/devices/registration:(.+)', DevicesPage),
-                      ('/api/v1/devices/user:([^/]+)/messages', DeviceMessagesPage)],
+                      ('/api/v1/devices/user:([^/]+)/messages', DeviceMessagesPage),
+                      ('/api/v1/sectors', SectorsPage)],
                      debug=True)

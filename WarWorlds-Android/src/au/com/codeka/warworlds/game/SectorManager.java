@@ -288,8 +288,8 @@ public class SectorManager {
                 fireSectorListChanged();
             }
         }.execute();
-    }
-*/
+    }*/
+
     /**
      * This interface should be implemented when you want to listen for "sector list changed"
      * event (which happens when a new sector is loaded).

@@ -65,6 +65,11 @@ class MotdPage(AdminPage):
         self.redirect(self.request.url)
 
 
+class DebugStarfieldPage(AdminPage):
+    def get(self):
+        self.render('admin/debug/starfield.html', {})
+
+
 class DevicesPage(AdminPage):
     ''' The "devices" page lets you view all devices that have registered and send them messages.
     '''
@@ -74,5 +79,6 @@ class DevicesPage(AdminPage):
 
 app = webapp.WSGIApplication([('/admin', DashboardPage),
                               ('/admin/motd', MotdPage),
-                              ('/admin/devices', DevicesPage)],
+                              ('/admin/devices', DevicesPage),
+                              ('/admin/debug/starfield', DebugStarfieldPage)],
                              debug=True)
