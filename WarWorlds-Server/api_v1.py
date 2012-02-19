@@ -172,6 +172,16 @@ class ApiApplication(webapp.WSGIApplication):
         webapp.WSGIApplication.__init__(self, *args, **kwargs)
         self.router.set_dispatcher(self.__class__.api_dispatcher)
 
+    def handle_exception(self, request, response, e):
+        logging.exception(e)
+        if isinstance(e, webapp.HTTPException):
+            response.set_status(e.code)
+        else:
+            response.set_status(500)
+
+        response.headers['Content-Type'] = 'text/plain'
+        response.write(e)
+
     @staticmethod
     def api_dispatcher(router, request, response):
         rv = router.default_dispatcher(request, response)
