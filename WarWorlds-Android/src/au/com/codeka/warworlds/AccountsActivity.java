@@ -224,10 +224,12 @@ public class AccountsActivity extends Activity {
         new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... arg0) {
-                String authCookie = Authenticator.authenticate(AccountsActivity.this,
-                        accountName);
+                String authCookie = Authenticator.authenticate(AccountsActivity.this, accountName);
                 ApiClient.getCookies().add(authCookie);
                 C2DMReceiver.register(AccountsActivity.this, Setup.SENDER_ID, onComplete);
+
+                // re-configure the authenticator, making sure it has details of the new user.
+                Authenticator.configure(mContext);
 
                 return null;
             }

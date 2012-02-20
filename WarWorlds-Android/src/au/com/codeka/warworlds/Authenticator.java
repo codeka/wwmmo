@@ -37,16 +37,34 @@ public class Authenticator {
     }
 
     public static void configure(Context context) {
-        sAccountManager = AccountManager.get(context);
+        if (sAccountManager == null) {
+            sAccountManager = AccountManager.get(context);
+        }
 
         SharedPreferences prefs = Util.getSharedPreferences(context);
         final String accountName = prefs.getString(Util.ACCOUNT_NAME, null);
 
         RequestManager.addResponseReceivedHandler(new RequestManager.ResponseReceivedHandler() {
+            private void dump(AbstractHttpMessage msg) {
+                log.info("      DUMP       ");
+                if (msg instanceof BasicHttpRequest) {
+                    log.info(((BasicHttpRequest) msg).getRequestLine().toString());
+                } else if (msg instanceof BasicHttpResponse) {
+                    log.info(((BasicHttpResponse) msg).getStatusLine().toString());
+                }
+                for (Header h : msg.getAllHeaders()) {
+                    log.info(h.getName()+": "+h.getValue());
+                }
+            }
+            
+            
             @Override
             public void onResponseReceived(BasicHttpRequest request, BasicHttpResponse response) {
                 // if we get a 403, it means we need to re-authenticate, so do that
                 if (response.getStatusLine().getStatusCode() == 403) {
+                    dump(request);
+                    dump(response);
+
                     if (sLastRequestStatusCode == 403) {
                         // if the last status code we received was 403, then re-authenticating
                         // again isn't going to help. This is only useful if, for example, the

@@ -30,8 +30,13 @@ public class ApiClient {
      * @param baseUri The base URI that all APIs calls are made against.
      */
     public static void configure(URI baseUri) {
+        log.info("Resetting cookies... configuring baseUri: "+baseUri);
         sCookies = new ArrayList<String>();
         RequestManager.configure(baseUri);
+    }
+
+    public static URI getBaseUri() {
+        return RequestManager.getBaseUri();
     }
 
     /**

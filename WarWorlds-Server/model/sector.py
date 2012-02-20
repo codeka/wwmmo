@@ -8,6 +8,8 @@ from google.appengine.ext import db
 import logging
 import random
 
+import namegen
+
 
 class Sector(db.Model):
     x = db.IntegerProperty()
@@ -116,15 +118,15 @@ class SectorGenerator:
             # no two stars are ever "too close" to each other.
             dupe = True
             while dupe:
-                star.x = random.randint(0, 16)
-                star.y = random.randint(0, 16)
+                star.x = random.randint(0, 15)
+                star.y = random.randint(0, 15)
                 dupe = False
 
                 for otherStar in sector.stars:
                     if otherStar.x == star.x and otherStar.y == star.y:
                         dupe = True
 
-            star.name = "TODO: name"
+            star.name = namegen.generate(1)[0]
             star.size = random.randint(GRID_SIZE/4, GRID_SIZE/3)
 
             r = random.randint(100, 255)

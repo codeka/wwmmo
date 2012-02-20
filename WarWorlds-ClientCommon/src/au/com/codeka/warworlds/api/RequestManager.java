@@ -48,6 +48,10 @@ public class RequestManager {
         log.info("Configured to use base URI: {}", baseUri);
     }
 
+    public static URI getBaseUri() {
+        return sBaseUri;
+    }
+
     /**
      * Performs a request with the given method to the given URL. The URL is assumed to be
      * relative to the \c baseUri that was passed in to \c configure().

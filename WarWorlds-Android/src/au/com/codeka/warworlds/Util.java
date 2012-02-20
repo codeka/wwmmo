@@ -92,7 +92,9 @@ public class Util {
 
         try {
             URI uri = new URI(getBaseUrl());
-            ApiClient.configure(uri);
+            if (ApiClient.getBaseUri() == null || !ApiClient.getBaseUri().equals(uri)) {
+                ApiClient.configure(uri);
+            }
         } catch(URISyntaxException e) {
             // !!!
         }

@@ -1,0 +1,35 @@
+-a
+-al
+-au +c
+-an
+-ba
+-be
+-bi
+-br +v
+-da
+-di
+-do
+-du
+-e
+-eu +c
+-fa
+bi
+be
+bo
+bu
+nul +v
+gu
+da
+au +c -c
+fri
+gus
++tus
++lus
++lius
++nus
++es
++ius -c
++cus
++tor
++cio
++tin
