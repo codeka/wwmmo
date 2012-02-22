@@ -1,17 +1,37 @@
 package au.com.codeka.warworlds.model;
 
+import au.com.codeka.warworlds.R;
+
 
 public class Planet {
     private static PlanetType[] sPlanetTypes = {
-        new PlanetType("Gas Giant"),
-        new PlanetType("Radiated"),
-        new PlanetType("Inferno"),
-        new PlanetType("Asteroids"),
-        new PlanetType("Water"),
-        new PlanetType("Toxic"),
-        new PlanetType("Desert"),
-        new PlanetType("Swamp"),
-        new PlanetType("Terran")
+        new PlanetType.Builder().setDisplayName("Gas Giant")
+                                .setIconId(R.drawable.planet_icon_gasgiant)
+                                .build(),
+        new PlanetType.Builder().setDisplayName("Radiated")
+                                .setIconId(R.drawable.planet_icon_radiated)
+                                .build(),
+        new PlanetType.Builder().setDisplayName("Inferno")
+                                .setIconId(R.drawable.planet_icon_inferno)
+                                .build(),
+        new PlanetType.Builder().setDisplayName("Asteroids")
+                                .setIconId(R.drawable.planet_icon_asteroids)
+                                .build(),
+        new PlanetType.Builder().setDisplayName("Water")
+                                .setIconId(R.drawable.planet_icon_water)
+                                .build(),
+        new PlanetType.Builder().setDisplayName("Toxic")
+                                .setIconId(R.drawable.planet_icon_toxic)
+                                .build(),
+        new PlanetType.Builder().setDisplayName("Desert")
+                                .setIconId(R.drawable.planet_icon_desert)
+                                .build(),
+        new PlanetType.Builder().setDisplayName("Swamp")
+                                .setIconId(R.drawable.planet_icon_swamp)
+                                .build(),
+        new PlanetType.Builder().setDisplayName("Terran")
+                                .setIconId(R.drawable.planet_icon_terran)
+                                .build()
     };
 
     private Star mStar;
@@ -50,13 +70,35 @@ public class Planet {
 
     public static class PlanetType {
         private String mDisplayName;
-
-        public PlanetType(String displayName) {
-            mDisplayName = displayName;
-        }
+        private int mIconID;
 
         public String getDisplayName() {
             return mDisplayName;
+        }
+        public int getIconID() {
+            return mIconID;
+        }
+
+        public static class Builder {
+            private PlanetType mPlanetType;
+
+            public Builder() {
+                mPlanetType = new PlanetType();
+            }
+
+            public Builder setDisplayName(String displayName) {
+                mPlanetType.mDisplayName = displayName;
+                return this;
+            }
+
+            public Builder setIconId(int id) {
+                mPlanetType.mIconID = id;
+                return this;
+            }
+
+            public PlanetType build() {
+                return mPlanetType;
+            }
         }
     }
 }

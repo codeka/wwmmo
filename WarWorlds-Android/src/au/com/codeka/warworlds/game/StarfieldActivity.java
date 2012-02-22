@@ -5,9 +5,11 @@ import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.widget.ImageView;
 import android.widget.TextView;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.model.ModelManager;
+import au.com.codeka.warworlds.model.Planet;
 import au.com.codeka.warworlds.model.Star;
 
 /**
@@ -21,6 +23,7 @@ public class StarfieldActivity extends Activity {
     TextView mMoney;
     TextView mStarName;
     ViewGroup mLoadingContainer;
+    ViewGroup mPlanetIconsContainer;
 
     /** Called when the activity is first created. */
     @Override
@@ -40,6 +43,9 @@ public class StarfieldActivity extends Activity {
         mMoney = (TextView) findViewById(R.id.money);
         mStarName = (TextView) findViewById(R.id.star_name);
         mLoadingContainer = (ViewGroup) findViewById(R.id.star_loading_container);
+        mPlanetIconsContainer = (ViewGroup) findViewById(R.id.star_planet_icons_container);
+
+        mPlanetIconsContainer.setVisibility(View.GONE);
 
         mUsername.setText("codeka");
         mMoney.setText("$ 12,345");
@@ -52,14 +58,32 @@ public class StarfieldActivity extends Activity {
 
                 // load the rest of the star's details as well
                 mLoadingContainer.setVisibility(View.VISIBLE);
+                mPlanetIconsContainer.setVisibility(View.GONE);
+
                 ModelManager.requestStar(star.getSector().getX(), star.getSector().getY(),
                         star.getID(), new ModelManager.StarFetchedHandler() {
                     /**
                      * This is called on the main thread when the star is actually fetched.
                      */
                     @Override
-                    public void onStarFetched(Star s) {
+                    public void onStarFetched(Star star) {
                         mLoadingContainer.setVisibility(View.GONE);
+                        mPlanetIconsContainer.setVisibility(View.VISIBLE);
+
+                        int numPlanetIcons = mPlanetIconsContainer.getChildCount();
+                        for (int i = 0; i < numPlanetIcons; i++) {
+                            ImageView icon = (ImageView) mPlanetIconsContainer.getChildAt(i);
+
+                            if (i < star.getPlanets().length) {
+                                icon.setVisibility(View.VISIBLE);
+
+                                Planet planet = star.getPlanets()[i];
+                                icon.setImageResource(planet.getPlanetType().getIconID());
+                            } else {
+                                icon.setVisibility(View.GONE);
+                            }
+                        }
+
                         // TODO: populate the rest of the view...
                     }
                 });
