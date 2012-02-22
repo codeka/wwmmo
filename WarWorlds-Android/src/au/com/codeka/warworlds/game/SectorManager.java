@@ -197,7 +197,7 @@ public class SectorManager {
     }
 
     /**
-     * Gets the \c StarfieldStar that's a close to the given (x,y), based on the current sector
+     * Gets the \c Star that's closest to the given (x,y), based on the current sector
      * centre and offsets.
      */
     public Star getStarAt(int viewX, int viewY) {

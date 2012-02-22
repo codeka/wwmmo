@@ -132,9 +132,9 @@ message Planet
 		INFERNO = 3;
 		ASTEROIDS = 4;
 		WATER = 5;
-		TOXIC = 7;
-		DESERT = 8;
-		SWAMP = 6;
+		TOXIC = 6;
+		DESERT = 7;
+		SWAMP = 8;
 		TERRAN = 9;
 	}
 

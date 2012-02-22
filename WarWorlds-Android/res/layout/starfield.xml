@@ -26,7 +26,8 @@
 
 			<LinearLayout
 				android:layout_width="match_parent"
-				android:layout_height="wrap_content" >
+				android:layout_height="wrap_content"
+				android:orientation="horizontal" >
 
 				<TextView
 					android:id="@+id/username"
@@ -52,6 +53,22 @@
 				android:layout_height="wrap_content"
 				android:gravity="center"
 				android:textAppearance="?android:attr/textAppearanceMedium" />
+
+			<FrameLayout
+			    android:id="@+id/star_loading_container"
+			    android:layout_width="match_parent"
+			    android:layout_height="0px"
+			    android:layout_weight="1"
+			    android:visibility="gone" >
+
+				<ProgressBar
+				    android:id="@+id/star_loading"
+				    android:layout_width="wrap_content"
+				    android:layout_height="wrap_content"
+				    android:layout_gravity="center_horizontal"
+				    android:layout_marginTop="40dp" />
+
+			</FrameLayout>
 
 		</LinearLayout>
 	</LinearLayout>

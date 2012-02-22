@@ -151,7 +151,7 @@ class StarfieldPage(ApiPage):
 
     def _planetModelToPb(self, planet_pb, planet_model):
         planet_pb.index = planet_model.index
-        planet_pb.planet_type = planet_model.planetTypeID
+        planet_pb.planet_type = planet_model.planetTypeID+1
         planet_pb.size = planet_model.size
 
 class SectorsPage(StarfieldPage):

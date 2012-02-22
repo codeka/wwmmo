@@ -37,6 +37,10 @@ public class StarfieldSurfaceView extends SurfaceView implements SurfaceHolder.C
 
     public StarfieldSurfaceView(Context context, AttributeSet attrs) {
         super(context, attrs);
+        if (this.isInEditMode()) {
+            return;
+        }
+
         Log.i(TAG, "Starfield initializing...");
 
         mStarSelectedListeners = new CopyOnWriteArrayList<OnStarSelectedListener>();
@@ -101,6 +105,10 @@ public class StarfieldSurfaceView extends SurfaceView implements SurfaceHolder.C
      * "queued" until the currently-executing redraw finishes.
      */
     public void redraw() {
+        if (isInEditMode()) {
+            return;
+        }
+
         final SurfaceHolder h = mHolder;
         if (h == null) {
             return;
@@ -147,6 +155,11 @@ public class StarfieldSurfaceView extends SurfaceView implements SurfaceHolder.C
      */
     @Override
     public void onDraw(Canvas canvas) {
+        if (isInEditMode()) {
+            // TODO: do something?
+            return;
+        }
+
         SectorManager sm = SectorManager.getInstance();
 
         // clear it to black

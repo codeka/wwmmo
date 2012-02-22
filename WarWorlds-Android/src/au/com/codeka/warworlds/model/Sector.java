@@ -47,7 +47,7 @@ public class Sector {
         s.mX = pb.getX();
         s.mY = pb.getY();
         for (warworlds.Warworlds.Star star_pb : pb.getStarsList()) {
-            s.mStars.add(Star.fromProtocolBuffer(star_pb));
+            s.mStars.add(Star.fromProtocolBuffer(s, star_pb));
         }
 
         return s;

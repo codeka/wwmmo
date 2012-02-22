@@ -1,21 +1,28 @@
 package au.com.codeka.warworlds.model;
 
-import java.util.List;
 
 public class Star {
-
+    private Sector mSector;
+    private int mID;
     private String mName;
     private int mColour;
     private int mSize;
     private int mOffsetX;
     private int mOffsetY;
     private int mNumPlanets;
-    private List<Planet> mPlanets;
+    private Planet[] mPlanets;
 
     public Star() {
+        mSector = null; // can be null if we're fetched separately from the sector
         mPlanets = null; // can be null if planets have not been populated...
     }
 
+    public Sector getSector() {
+        return mSector;
+    }
+    public int getID() {
+        return mID;
+    }
     public String getName() {
         return mName;
     }
@@ -35,26 +42,39 @@ public class Star {
         if (mPlanets == null) {
             return mNumPlanets;
         } else {
-            return mPlanets.size();
+            return mPlanets.length;
         }
     }
-    public List<Planet> getPlanets() {
+    public Planet[] getPlanets() {
         return mPlanets;
+    }
+
+    public static Star fromProtocolBuffer(warworlds.Warworlds.Star pb) {
+        return fromProtocolBuffer(null, pb);
     }
 
     /**
      * Converts the given Star protocol buffer into a \c Star.
      */
-    public static Star fromProtocolBuffer(warworlds.Warworlds.Star pb) {
+    public static Star fromProtocolBuffer(Sector sector, warworlds.Warworlds.Star pb) {
         Star s = new Star();
+        s.mSector = sector;
+        s.mID = pb.getId();
         s.mName = pb.getName();
         s.mColour = pb.getColour();
         s.mSize = pb.getSize();
         s.mOffsetX = pb.getOffsetX();
         s.mOffsetY = pb.getOffsetY();
         s.mNumPlanets = pb.getNumPlanets();
-        // TODO: planets..
-        
+
+        int numPlanets = pb.getPlanetsCount();
+        if (numPlanets > 0) {
+            s.mPlanets = new Planet[numPlanets];
+            for (int i = 0; i < numPlanets; i++) {
+                s.mPlanets[i] = Planet.fromProtocolBuffer(s, pb.getPlanets(i));
+            }
+        }
+
         return s;
     }
 }
