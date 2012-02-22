@@ -11,20 +11,56 @@ import random
 import namegen
 
 
+class PlanetType:
+    def __init__(self, name="", minSize=5, maxSize=50):
+        self.name = name
+        self.minSize = minSize
+        self.maxSize = maxSize
+
+# This is the description of different types of planets. The order is important and
+# must match what is defined for Planet.PLANET_TYPE in warworlds.proto
+_planetTypes = [
+    PlanetType(name="Gas Giant",
+               minSize=40, maxSize=50),
+    PlanetType(name="Radiated",
+               minSize=5, maxSize=30),
+    PlanetType(name="Inferno",
+               minSize=5, maxSize=30),
+    PlanetType(name="Asteroids",
+               minSize=50, maxSize=50),
+    PlanetType(name="Water",
+               minSize=20, maxSize=40),
+    PlanetType(name="Toxic",
+               minSize=10, maxSize=20),
+    PlanetType(name="Desert",
+               minSize=10, maxSize=30),
+    PlanetType(name="Swamp",
+               minSize=10, maxSize=30),
+    PlanetType(name="Terran",
+               minSize=10, maxSize=30)
+    ]
+
+
 class Sector(db.Model):
     x = db.IntegerProperty()
     y = db.IntegerProperty()
 
+
 class Star(db.Model):
+    starID = db.IntegerProperty()
     name = db.StringProperty()
     colour = db.IntegerProperty()
     size = db.IntegerProperty()
     x = db.IntegerProperty()
     y = db.IntegerProperty()
+    planets = None
 
 
 class Planet(db.Model):
-    pass
+    index = db.IntegerProperty()
+    planetTypeID = db.IntegerProperty(name="planetType")
+    planetType = None # Will be filled in with a PlanetType instance
+    size = db.IntegerProperty()
 
 
 class SectorManager:
@@ -78,6 +114,26 @@ class SectorManager:
         return sectors
 
     @staticmethod
+    def getStar(sectorX, sectorY, starID):
+        """Gets all of the details about a single star, including planets colonies and so on.
+
+        We don't worry about whether the sector has been generated. If not, we just return None.
+        After all, you shouldn't be asking for a star in a sector you haven't visited yet.
+        """
+        sectorQuery = Sector.all().filter("x", sectorX).filter("y", sectorY)
+        for sector in sectorQuery:
+            logging.info("Got sector: "+str(sector.key()))
+            starQuery = Star.all().ancestor(sector.key()).filter("starID", starID)
+            for star in starQuery:
+                planetQuery = Planet.all().ancestor(star.key())
+                star.planets = []
+                for planet in planetQuery:
+                    star.planets.append(planet)
+            return star
+
+        return None
+
+    @staticmethod
     def _getSectorKey(x, y):
         return str(x)+","+str(y)
 
@@ -109,8 +165,9 @@ class SectorGenerator:
         GRID_CENTRE = GRID_SIZE / 2
 
         numStars = random.randint(10, 15)
-        for _ in range(numStars):
+        for i in range(numStars):
             star = Star(parent=sector)
+            star.starID = i+1
 
             # Make sure there's no other stars with the same coordinates as us. For the initial
             # generation, we generate stars on a 16x16 grid. Then we scale that to fit the whole
@@ -139,9 +196,18 @@ class SectorGenerator:
         for star in sector.stars:
             offsetX = random.randint(GRID_CENTRE-(GRID_CENTRE/2.0), GRID_CENTRE+(GRID_CENTRE/2.0))
             offsetY = random.randint(GRID_CENTRE-(GRID_CENTRE/2.0), GRID_CENTRE+(GRID_CENTRE/2.0))
-            
+
             star.x = star.x*GRID_SIZE + offsetX
             star.y = star.y*GRID_SIZE + offsetY
             star.put()
+
+            numPlanets = random.randint(2, 5)
+            for index in range(numPlanets):
+                planet = Planet(parent=star)
+                planet.index = (index+1)
+                planet.planetTypeID = random.randint(0, len(_planetTypes) - 1)
+                planet.planetType = _planetTypes[planet.planetTypeID]
+                planet.size = random.randint(planet.planetType.minSize, planet.planetType.maxSize)
+                planet.put()
 
         return sector

@@ -84,28 +84,33 @@ message Sector
 //
 message Star
 {
+	// the identifier of the star, which is only gauranteed to be unique inside the
+	// star's sector (so the "global unique" identifier for a star is always going to be
+	// (sectorX, sectorY, starID)
+	required int32 id = 1;
+
 	// the name of the star
-	required string name = 1;
+	required string name = 2;
 
 	// the colour of the star, as an RGB value
-	required uint32 colour = 2;
+	required uint32 colour = 3;
 
 	// the apparent "size" of the star (which is really just a display thing)
-	required int32 size = 3;
+	required int32 size = 4;
 
 	// the offset from the left edge of the sector, in pixels
-	required int32 offset_x = 4;
+	required int32 offset_x = 5;
 
 	// the offset from the bottom edge of the sector, in pixels
-	required int32 offset_y = 5;
+	required int32 offset_y = 6;
 
 	// the number of planets orbiting this star (useful for knowing whether there are
 	// actually planets, and the planets field is just empty, or whether there are no
 	// planets anyway).
-	required int32 num_planets = 6;
+	required int32 num_planets = 7;
 
 	// the collection of planets orbiting this star (may be empty)
-	repeated Planet planets = 7;
+	repeated Planet planets = 8;
 }
 
 //
@@ -114,7 +119,30 @@ message Star
 //
 message Planet
 {
+	// The "index" of the planet represents how far it is from the sun. Planets are always
+	// in monotonically increasing order of distance (0, 1, 2, 3, etc)
+	required int32 index = 1;
 
+	// The various different "kinds" of planets. Planets are spawned in increasing order
+	// of probability (so "terran" is most likely, "gas giant" least likely).
+	enum PLANET_TYPE
+	{
+		GASGIANT = 1;
+		RADIATED = 2;
+		INFERNO = 3;
+		ASTEROIDS = 4;
+		WATER = 5;
+		TOXIC = 7;
+		DESERT = 8;
+		SWAMP = 6;
+		TERRAN = 9;
+	}
+
+	required PLANET_TYPE planet_type = 2;
+
+	// The size of the planet. Certain planet_type's are predisposed to be certain sizes
+	// (e.g. GASGIANT is predisposed to being big, etc) but planets will still vary in exact size.
+	required int32 size = 3;
 }
 
 //

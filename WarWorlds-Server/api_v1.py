@@ -129,7 +129,32 @@ class DeviceMessagesPage(ApiPage):
         return None
 
 
-class SectorsPage(ApiPage):
+class StarfieldPage(ApiPage):
+    """Base class for API pages that do things with the starfield.
+
+    This really just include common methods for converting between the model and protocol buffers.
+    """
+    def _starModelToPb(self, star_pb, star_model):
+        star_pb.id = star_model.starID
+        star_pb.offset_x = star_model.x
+        star_pb.offset_y = star_model.y
+        star_pb.name = star_model.name
+        star_pb.colour = star_model.colour
+        star_pb.size = star_model.size
+        if star_model.planets is not None:
+            for planet_model in star_model.planets:
+                planet_pb = star_pb.planets.add()
+                self._planetModelToPb(planet_pb, planet_model)
+            star_pb.num_planets = len(star_model.planets)
+        else:
+            star_pb.num_planets = 3 # TODO
+
+    def _planetModelToPb(self, planet_pb, planet_model):
+        planet_pb.index = planet_model.index
+        planet_pb.planet_type = planet_model.planetTypeID
+        planet_pb.size = planet_model.size
+
+class SectorsPage(StarfieldPage):
     def get(self):
         if self.request.get('coords') != '':
             (x1y1, x2y2) = self.request.get('coords').split(':', 2)
@@ -159,12 +184,19 @@ class SectorsPage(ApiPage):
 
             for star_model in sector_model.stars:
                 star_pb = sector_pb.stars.add()
-                star_pb.offset_x = star_model.x
-                star_pb.offset_y = star_model.y
-                star_pb.name = star_model.name
-                star_pb.colour = star_model.colour
-                star_pb.size = star_model.size
-                star_pb.num_planets = 3 # TODO
+                self._starModelToPb(star_pb, star_model)
+
+
+class StarPage(StarfieldPage):
+    def get(self, sectorX, sectorY, starID):
+        star_model = sector.SectorManager.getStar(int(sectorX), int(sectorY), int(starID))
+        if star_model is None:
+            self.response.set_status(404)
+            return
+
+        star_pb = pb.Star()
+        self._starModelToPb(star_pb, star_model)
+        return star_pb
 
 
 class ApiApplication(webapp.WSGIApplication):
@@ -223,5 +255,6 @@ app = ApiApplication([('/api/v1/motd', MotdPage),
                       ('/api/v1/devices', DevicesPage),
                       ('/api/v1/devices/registration:(.+)', DevicesPage),
                       ('/api/v1/devices/user:([^/]+)/messages', DeviceMessagesPage),
-                      ('/api/v1/sectors', SectorsPage)],
+                      ('/api/v1/sectors', SectorsPage),
+                      ('/api/v1/sectors/([0-9-]+),([0-9-]+)/stars/([0-9]+)', StarPage)],
                      debug=True)

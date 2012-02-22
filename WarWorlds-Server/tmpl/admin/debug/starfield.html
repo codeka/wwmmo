@@ -7,7 +7,7 @@
 			height: 400px;
 		}
 		
-		#input-form input[type=text] {
+		form input[type=text] {
 			width: 100px;
 		}
 	</style>
@@ -16,40 +16,33 @@
 {% block content %}
 	<h1>Starfield</h1>
 	<p>Enter the coordinates of the sector you want to look at, and click &ldquo;Display&rdquo;.
-	<form id="input-form">
-		(
-			<input type="text" name="x1" value="0">,
-			<input type="text" name="y1" value="0">
+	<form id="sector-input-form">
+		Sector: (
+			<input type="number" name="x1" value="0">,
+			<input type="number" name="y1" value="0">
 		) - (
-			<input type="text" name="x2">,
-			<input type="text" name="y2">
+			<input type="number" name="x2">,
+			<input type="number" name="y2">
 		)
+		<input type="submit" value="Display">
+	</form>
+	<form id="star-input-form">
+		Star: (
+			<input type="number" name="sectorX" value="0">,
+			<input type="number" name="sectorY" value="0">
+		) <input type="number" name="starID" value="1">
 		<input type="submit" value="Display">
 	</form>
 	<form id="update-form">
 		<textarea name="sectors"></textarea>
 	</form>
 	<script>
-		$("#input-form").on("click", "input[type=submit]", function(evnt) {
+		$("#sector-input-form").on("click", "input[type=submit]", function(evnt) {
 			evnt.preventDefault();
-			var $x1 = $("#input-form input[name=x1]");
-			var $x2 = $("#input-form input[name=x2]");
-			var $y1 = $("#input-form input[name=y1]");
-			var $y2 = $("#input-form input[name=y2]");
-
-			if (parseInt($x1.val()) != $x1.val()) {
-				$x1.val("0");
-			}
-			if (parseInt($y1.val()) != $y1.val()) {
-				$y1.val("0");
-			}
-
-			if (parseInt($x2.val()) != $x2.val()) {
-				$x2.val("");
-			}
-			if (parseInt($y2.val()) != $y2.val()) {
-				$y2.val("");
-			}
+			var $x1 = $("#sector-input-form input[name=x1]");
+			var $x2 = $("#sector-input-form input[name=x2]");
+			var $y1 = $("#sector-input-form input[name=y1]");
+			var $y2 = $("#sector-input-form input[name=y2]");
 
 			if ($x2.val() == "" || $y2.val() == "") {
 				$x2.val(parseInt($x1.val()) + 1);
@@ -61,6 +54,25 @@
 				url: "/api/v1/sectors?coords="+coords,
 				dataType: "json",
 				success: function (data) {
+					$("#update-form textarea").val(JSON.stringify(data, null, "  "));
+				},
+				error: function() {
+					alert("An error occured fetching starfield data. Check server logs.");
+				}
+			});
+		});
+
+		$("#star-input-form").on("click", "input[type=submit]", function(evnt) {
+			evnt.preventDefault();
+			var $sectorX = $("#star-input-form input[name=sectorX]");
+			var $sectorY = $("#star-input-form input[name=sectorY]");
+			var $starID = $("#star-input-form input[name=starID]");
+
+			var url = "/api/v1/sectors/"+$sectorX.val()+","+$sectorY.val()+"/stars/"+$starID.val();
+			$.ajax({
+				url: url,
+				dataType: "json",
+				success: function(data) {
 					$("#update-form textarea").val(JSON.stringify(data, null, "  "));
 				},
 				error: function() {
