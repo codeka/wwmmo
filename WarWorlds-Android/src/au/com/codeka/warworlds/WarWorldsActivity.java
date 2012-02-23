@@ -6,7 +6,7 @@ import java.io.StringWriter;
 
 import org.apache.commons.io.IOUtils;
 
-import warworlds.Warworlds.MessageOfTheDay;
+import warworlds.Warworlds.Hello;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
@@ -40,8 +40,6 @@ public class WarWorldsActivity extends Activity {
      */
     private Context mContext = this;
 
-    private String mMotd = null;
-
     /**
      * Begins the activity.
      */
@@ -55,10 +53,6 @@ public class WarWorldsActivity extends Activity {
         Authenticator.configure(mContext);
 
         requestWindowFeature(Window.FEATURE_NO_TITLE); // remove the title bar
-
-        if (savedInstanceState != null) {
-            mMotd = savedInstanceState.getString("motd");
-        }
     }
 
     @Override
@@ -84,17 +78,6 @@ public class WarWorldsActivity extends Activity {
     }
 
     /**
-     * Saves the current state of the activity so that we can restore it without having
-     * to re-fetch it from the server (well, we might do that anyway...)
-     */
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        outState.putString("motd", mMotd);
-
-        super.onSaveInstanceState(outState);
-    }
-
-    /**
      * Loads the MOTD template HTML, which is actually just a static asset.
      */
     private String getHtmlFile(String fileName) {
@@ -112,18 +95,13 @@ public class WarWorldsActivity extends Activity {
     }
 
     /**
-     * Loads the MOTD. This also checks that we're correctly registered on the server. If
-     * we're not correctly registered, then we can direct them to the \c AccountPropertiesActivity.
+     * Says "hello" to the server. Lets it know who we are, fetches the MOTD and if there's
+     * no empire registered yet, switches over to the \c EmpireSetupActivity.
      * 
      * @param motd The \c WebView we'll install the MOTD to.
      */
-    private void loadMotdAndVerifyAccount(final WebView motdView) {
+    private void sayHello(final WebView motdView) {
         motdView.setBackgroundColor(0x0); // transparent...
-
-        if (mMotd != null) {
-            motdView.loadData(mMotd, "text/html", "utf-8");
-            return;
-        }
 
         final ProgressDialog pleaseWaitDialog = ProgressDialog.show(mContext, null, 
                 "Connecting...", true);
@@ -136,7 +114,8 @@ public class WarWorldsActivity extends Activity {
         }
 
         new AsyncTask<Void, Void, String>() {
-            private String message;
+            private String mMessage;
+            private boolean mNeedsEmpireSetup;
 
             @Override
             protected String doInBackground(Void... arg0) {
@@ -145,25 +124,28 @@ public class WarWorldsActivity extends Activity {
                         accountName);
                 ApiClient.getCookies().add(authCookie);
 
-                // fetch the message of the day (basically, a test of our new cookie)
-                MessageOfTheDay motd = ApiClient.getProtoBuf("motd", MessageOfTheDay.class);
-                if (motd == null) {
-                    message = "<pre>Try logging in and out again.</pre>";
+                // say hello to the server
+                Hello hello = ApiClient.getProtoBuf("hello", Hello.class);
+                if (hello == null) {
+                    mMessage = "<pre>Try logging in and out again.</pre>";
                 } else {
-                    message = motd.getMessage();
+                    mNeedsEmpireSetup = !hello.hasEmpire();
+                    mMessage = hello.getMotd().getMessage();
                 }
 
                 String tmpl = getHtmlFile("motd-template.html");
-                return String.format(tmpl, message);
+                return String.format(tmpl, mMessage);
             }
 
             @Override
             protected void onPostExecute(String result) {
                 pleaseWaitDialog.dismiss();
-                motdView.loadData(result, "text/html", "utf-8");
-                motdView.setBackgroundColor(0x0); // transparent...
-
-                mMotd = result;
+                if (mNeedsEmpireSetup) {
+                    startActivity(new Intent(mContext, EmpireSetupActivity.class));
+                } else {
+                    motdView.loadData(result, "text/html", "utf-8");
+                    motdView.setBackgroundColor(0x0); // transparent...
+                }
             }
         }.execute();
     }
@@ -178,7 +160,7 @@ public class WarWorldsActivity extends Activity {
         final Button logOutButton = (Button) findViewById(R.id.log_out);
 
         final WebView motdView = (WebView) findViewById(R.id.motd);
-        loadMotdAndVerifyAccount(motdView);
+        sayHello(motdView);
 
         logOutButton.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {

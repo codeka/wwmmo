@@ -63,5 +63,10 @@
     <string name="options">Options</string>
     <string name="log_in">Log In</string>
     <string name="ad_placeholder">Ad Goes Here</string>
+    <string name="empire_setup_welcome">Before you begin, you need to tell us a little about your Empire. Fill in the details below to get started.</string>
+    <string name="empire_setup_name">Give your Empire a name:</string>
+    <string name="ok">OK</string>
+    <string name="cancel">Cancel</string>
+    <string name="empire_setup_name_hint">Empire name</string>
 
 </resources>

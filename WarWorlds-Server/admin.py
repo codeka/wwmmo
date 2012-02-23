@@ -50,6 +50,12 @@ class DashboardPage(AdminPage):
         self.render('admin/index.html', {})
 
 
+class EmpiresPage(AdminPage):
+    '''The 'empires' page lets you view, query, update, delete (etc) empires.
+    '''
+    def get(self):
+        self.render('admin/empires.html', {})
+
 class MotdPage(AdminPage):
     '''The "motd" page lets you view/edit the message-of-the-day.
     '''
@@ -61,7 +67,7 @@ class MotdPage(AdminPage):
     def post(self):
         model.MessageOfTheDay.save(self.request.get('new-motd'))
 
-        # rediret back to ourselves...
+        # redirect back to ourselves...
         self.redirect(self.request.url)
 
 
@@ -78,6 +84,7 @@ class DevicesPage(AdminPage):
         self.render('admin/devices.html', {})
 
 app = webapp.WSGIApplication([('/admin', DashboardPage),
+                              ('/admin/empires', EmpiresPage),
                               ('/admin/motd', MotdPage),
                               ('/admin/devices', DevicesPage),
                               ('/admin/debug/starfield', DebugStarfieldPage)],

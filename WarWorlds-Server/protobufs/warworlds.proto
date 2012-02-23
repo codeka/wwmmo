@@ -17,6 +17,49 @@ message MessageOfTheDay
 
 
 //
+// Contains details about an empire. Their "display" name, race (I guess?), display colour
+// and stuff like that.
+//
+message Empire
+{
+	// A unique identifier for the empire, useful for referencing him in other parts of the
+	// system. This won't be present in the initial "PUT"
+	optional string id = 1;
+
+	// The "display" name for the player, which is what other players see.
+	required string display_name = 2;
+
+	// The player's Google Account identifier (which is actually unique of their email address)
+	optional string user = 3;
+
+	// The player's email address
+	optional string email = 4;
+
+	enum EmpireState
+	{
+		INITIAL = 1;
+		REGISTERED = 2;
+		BANNED = 3;
+	}
+
+	required EmpireState state = 5;
+}
+
+
+//
+// The "hello" message is returned when you first connect to the game.
+//
+message Hello
+{
+	// The current message of the day.
+	required MessageOfTheDay motd = 1;
+
+	// If specified, the Empire you're currently logged in as (if not specified, it means
+	// you haven't set up an empire yet, and you should do that before anything else...)
+	optional Empire empire = 2;
+}
+
+//
 // Contains details about a device's registration with C2DM so that we can send you
 // messages and stuff (e.g. when your planet is under attack, etc)
 //

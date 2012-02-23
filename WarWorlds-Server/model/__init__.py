@@ -40,17 +40,17 @@ class DeviceRegistration(db.Model):
     """
     deviceID = db.StringProperty()
     deviceRegistrationID = db.StringProperty()
+    user = db.UserProperty()
     deviceModel = db.StringProperty()
     deviceManufacturer = db.StringProperty()
     deviceBuild = db.StringProperty()
     deviceVersion = db.StringProperty()
-    user = db.EmailProperty()
 
     @staticmethod
-    def getByEmail(email):
+    def getByUser(user):
         """ Returns all device registrations that are registered to the given user.
         """
-        query = DeviceRegistration.all().filter('user', email)
+        query = DeviceRegistration.all().filter('user', user)
         return DeviceRegistration._getByQuery(query)
 
     @staticmethod
@@ -71,3 +71,23 @@ class DeviceRegistration(db.Model):
         for result in query:
             results.append(result)
         return results
+
+
+class Empire(db.Model):
+    """Represents an empire, display name and whatnot.
+    """
+    displayName = db.StringProperty()
+    user = db.UserProperty()
+    state = db.IntegerProperty()
+
+    @staticmethod
+    def getForUser(user):
+        result = Empire.all().filter("user", user).fetch(1, 0)
+        if len(result) != 1:
+            return None
+        return result[0]
+
+    class State:
+        INITIAL = 1
+        REGISTERED = 2
+        BANNED = 3

@@ -48,16 +48,73 @@ class ApiPage(webapp.RequestHandler):
             pb.ParseFromString(self.request.body)
         return pb
 
+    def _empireModelToPb(self, empire_pb, empire_model):
+        empire_pb.id = str(empire_model.key().id_or_name())
+        empire_pb.display_name = empire_model.displayName
+        empire_pb.user = empire_model.user.user_id()
+        empire_pb.email = empire_model.user.email()
+        empire_pb.state = empire_model.state
 
-class MotdPage(ApiPage):
+    def _empirePbToModel(self, empire_model, empire_pb):
+        empire_model.displayName = empire_pb.display_name
+        if empire_pb.HasField('email'):
+            empire_model.user = users.User(empire_pb.email)
+        empire_model.state = empire_pb.state
+
+
+class HelloPage(ApiPage):
+    """The 'hello' page is what you request when you first connect.
+    """
     def get(self):
-        data = model.MessageOfTheDay.get()
+        motd_model = model.MessageOfTheDay.get()
+        empire_model = model.Empire.getForUser(self.user)
 
-        motd = pb.MessageOfTheDay()
-        motd.message = data.message
-        motd.last_update = data.date.isoformat()
-        return motd
+        hello_pb = pb.Hello()
+        if motd_model is not None:
+            hello_pb.motd.message = motd_model.message
+            hello_pb.motd.last_update = motd_model.date.isoformat()
+        else:
+            hello_pb.motd.message = ""
+            hello_pb.motd.last_update = ""
 
+        if empire_model is not None:
+            self._empireModelToPb(hello_pb.empire, empire_model)
+
+        return hello_pb
+
+
+class EmpiresPage(ApiPage):
+    def get(self):
+        if self.request.get("email", "") != "":
+            email = self.request.get("email")
+            user = users.User(email)
+            if user is None:
+                logging.info("No user found with email address '"+email+"'")
+                self.response.set_status(404)
+                return
+
+            empire_model = model.Empire.getForUser(user)
+            if empire_model is None:
+                logging.info("No empire registered with email address '"+email+"'")
+                self.response.set_status(404)
+                return
+
+            empire_pb = pb.Empire()
+            self._empireModelToPb(empire_pb, empire_model)
+            return empire_pb
+        else:
+            self.response.set_status(403)
+            return
+
+    def put(self):
+        empire_pb = self._getRequestBody(pb.Empire)
+        if empire_pb is None:
+            self.response.set_status(400)
+            return
+
+        empire_model = model.Empire()
+        self._empirePbToModel(empire_model, empire_pb)
+        empire_model.put()
 
 class DevicesPage(ApiPage):
     def put(self):
@@ -74,13 +131,13 @@ class DevicesPage(ApiPage):
         data.put()
 
     def get(self):
-        if self.request.get('user') != '':
+        if self.request.get('email') != '':
             # TODO: check that you're an administrator...
-            return self._getDevicesByEmail(self.request.get('user'))
+            return self._getDevicesByEmail(int(self.request.get('email')))
         else:
             # if you don't pass any parameters, it's like searching for your
             # own device registrations.
-            return self._getDevicesByEmail(self.user.email())
+            return self._getDevicesByUser(self.user)
 
     def delete(self, deviceRegistrationID):
         device = model.DeviceRegistration.getByRegistrationID(deviceRegistrationID)
@@ -88,7 +145,11 @@ class DevicesPage(ApiPage):
             device.delete()
 
     def _getDevicesByEmail(self, email):
-        data = model.DeviceRegistration.getByEmail(email)
+        user = users.User(email)
+        return self._getDevicesByUser(user)
+
+    def _getDevicesByUser(self, user):
+        data = model.DeviceRegistration.getByUser(user)
 
         registrations = pb.DeviceRegistrations()
         for d in data:
@@ -117,13 +178,18 @@ class DevicesPage(ApiPage):
 
 
 class DeviceMessagesPage(ApiPage):
-    def put(self, user):
+    def put(self, email):
         msg = self._getRequestBody(pb.DeviceMessage)
-        logging.info('Putting message to user: '+user)
+        logging.info('Putting message to user with email: '+email)
         logging.info('Message: '+str(msg))
 
+        user = users.User(email)
+        if user is None:
+            self.response.set_status(404)
+            return
+
         s = c2dm.Sender()
-        devices = model.DeviceRegistration.getByEmail(user)
+        devices = model.DeviceRegistration.getByUser(user)
         for device in devices:
             s.sendMessage(device.deviceRegistrationID, {"msg": msg.message})
         return None
@@ -251,7 +317,9 @@ class ApiApplication(webapp.WSGIApplication):
         return possible_types[0]
 
 
-app = ApiApplication([('/api/v1/motd', MotdPage),
+app = ApiApplication([('/api/v1/hello', HelloPage),
+                      ('/api/v1/empires', EmpiresPage),
+                      ('/api/v1/empires/([0-9]+)', EmpiresPage),
                       ('/api/v1/devices', DevicesPage),
                       ('/api/v1/devices/registration:(.+)', DevicesPage),
                       ('/api/v1/devices/user:([^/]+)/messages', DeviceMessagesPage),
