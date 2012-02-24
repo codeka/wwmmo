@@ -7,13 +7,10 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Paint.Style;
 import android.graphics.RadialGradient;
-import android.os.AsyncTask;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
-import android.view.SurfaceHolder;
-import android.view.SurfaceView;
 import au.com.codeka.warworlds.model.Sector;
 import au.com.codeka.warworlds.model.Star;
 
@@ -21,19 +18,13 @@ import au.com.codeka.warworlds.model.Star;
  * \c SurfaceView that displays the starfield. You can scroll around, tap on stars to bring
  * up their details and so on.
  */
-public class StarfieldSurfaceView extends SurfaceView implements SurfaceHolder.Callback {
+public class StarfieldSurfaceView extends UniverseElementSurfaceView {
     private static String TAG = "StarfieldSurfaceView";
 
-    private SurfaceHolder mHolder;
     private GestureDetector mGestureDetector;
     private GestureHandler mGestureHandler;
     private CopyOnWriteArrayList<OnStarSelectedListener> mStarSelectedListeners;
     private Star mSelectedStar;
-
-    // these are used to ensure we don't queue up heaps of AsyncTasks for
-    // redrawing the screen.
-    private boolean mIsRedrawing = false;
-    private boolean mNeedsRedraw = false;
 
     public StarfieldSurfaceView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -46,7 +37,6 @@ public class StarfieldSurfaceView extends SurfaceView implements SurfaceHolder.C
         mStarSelectedListeners = new CopyOnWriteArrayList<OnStarSelectedListener>();
         mSelectedStar = null;
 
-        getHolder().addCallback(this);
         mGestureHandler = new GestureHandler();
         mGestureDetector = new GestureDetector(context, mGestureHandler);
 
@@ -56,23 +46,6 @@ public class StarfieldSurfaceView extends SurfaceView implements SurfaceHolder.C
                 redraw();
             }
         });
-    }
-
-    @Override
-    public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
-    }
-
-    @Override
-    public void surfaceCreated(SurfaceHolder holder) {
-        Log.i(TAG, "surfaceCreated...");
-        mHolder = holder;
-
-        redraw();
-    }
-
-    @Override
-    public void surfaceDestroyed(SurfaceHolder holder) {
-        mHolder = null;
     }
 
     @Override
@@ -97,55 +70,8 @@ public class StarfieldSurfaceView extends SurfaceView implements SurfaceHolder.C
         }
     }
 
-    /**
-     * Causes the \c StarfieldSurfaceView to redraw itself. Used, eg, when we
-     * scroll, etc.
-     * 
-     * If we've already scheduled a redraw when you call this, the redraw is
-     * "queued" until the currently-executing redraw finishes.
-     */
-    public void redraw() {
-        if (isInEditMode()) {
-            return;
-        }
-
-        final SurfaceHolder h = mHolder;
-        if (h == null) {
-            return;
-        }
-
-        if (mIsRedrawing) {
-            mNeedsRedraw = true;
-            return;
-        }
-        mIsRedrawing = true;
-
-        new AsyncTask<Void, Void, Void>() {
-            @Override
-            protected Void doInBackground(Void... arg0) {
-                Canvas c = h.lockCanvas();
-                try {
-                    synchronized(h) {
-                        onDraw(c);
-                    }
-                } finally {
-                    h.unlockCanvasAndPost(c);
-                }
-
-                return null;
-            }
-
-            @Override
-            protected void onPostExecute(Void result) {
-                mIsRedrawing = false;
-
-                // if another redraw was scheduled, do it now
-                if (mNeedsRedraw) {
-                    mNeedsRedraw = false;
-                    redraw();
-                }
-            }
-        }.execute();
+    public Star getSelectedStar() {
+        return mSelectedStar;
     }
 
     /**

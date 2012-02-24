@@ -1,10 +1,14 @@
 package au.com.codeka.warworlds.game;
 
 import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import au.com.codeka.warworlds.R;
@@ -17,13 +21,15 @@ import au.com.codeka.warworlds.model.Star;
  * starfield where you scroll around and interact with stars, etc.
  */
 public class StarfieldActivity extends Activity {
-
+    Context mContext = this;
     StarfieldSurfaceView mStarfield;
     TextView mUsername;
     TextView mMoney;
     TextView mStarName;
     ViewGroup mLoadingContainer;
     ViewGroup mPlanetIconsContainer;
+    
+    Star mCurrentStar;
 
     /** Called when the activity is first created. */
     @Override
@@ -44,8 +50,10 @@ public class StarfieldActivity extends Activity {
         mStarName = (TextView) findViewById(R.id.star_name);
         mLoadingContainer = (ViewGroup) findViewById(R.id.star_loading_container);
         mPlanetIconsContainer = (ViewGroup) findViewById(R.id.star_planet_icons_container);
+        final Button zoomInButton = (Button) findViewById(R.id.starfield_zoomin);
 
         mPlanetIconsContainer.setVisibility(View.GONE);
+        zoomInButton.setVisibility(View.GONE);
 
         EmpireManager empire = EmpireManager.getInstance();
         mUsername.setText(empire.getDisplayName());
@@ -60,6 +68,7 @@ public class StarfieldActivity extends Activity {
                 // load the rest of the star's details as well
                 mLoadingContainer.setVisibility(View.VISIBLE);
                 mPlanetIconsContainer.setVisibility(View.GONE);
+                zoomInButton.setVisibility(View.GONE);
 
                 ModelManager.requestStar(star.getSector().getX(), star.getSector().getY(),
                         star.getID(), new ModelManager.StarFetchedHandler() {
@@ -70,6 +79,7 @@ public class StarfieldActivity extends Activity {
                     public void onStarFetched(Star star) {
                         mLoadingContainer.setVisibility(View.GONE);
                         mPlanetIconsContainer.setVisibility(View.VISIBLE);
+                        zoomInButton.setVisibility(View.VISIBLE);
 
                         int numPlanetIcons = mPlanetIconsContainer.getChildCount();
                         for (int i = 0; i < numPlanetIcons; i++) {
@@ -88,6 +98,22 @@ public class StarfieldActivity extends Activity {
                         // TODO: populate the rest of the view...
                     }
                 });
+            }
+        });
+
+        zoomInButton.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Star star = mStarfield.getSelectedStar();
+                if (star == null) {
+                    return; //??
+                }
+
+                Intent intent = new Intent(mContext, SolarSystemActivity.class);
+                intent.putExtra("au.com.codeka.warworlds.SectorX", star.getSector().getX());
+                intent.putExtra("au.com.codeka.warworlds.SectorY", star.getSector().getY());
+                intent.putExtra("au.com.codeka.warworlds.StarID", star.getID());
+                mContext.startActivity(intent);
             }
         });
     }
