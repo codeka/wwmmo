@@ -23,6 +23,7 @@ import android.view.Window;
 import android.webkit.WebView;
 import android.widget.Button;
 import au.com.codeka.warworlds.api.ApiClient;
+import au.com.codeka.warworlds.game.EmpireManager;
 import au.com.codeka.warworlds.game.StarfieldActivity;
 
 /**
@@ -114,27 +115,31 @@ public class WarWorldsActivity extends Activity {
         }
 
         new AsyncTask<Void, Void, String>() {
-            private String mMessage;
             private boolean mNeedsEmpireSetup;
 
             @Override
             protected String doInBackground(Void... arg0) {
                 // re-authenticate and get a new cookie
-                String authCookie = Authenticator.authenticate(WarWorldsActivity.this,
-                        accountName);
+                String authCookie = Authenticator.authenticate(WarWorldsActivity.this, accountName);
                 ApiClient.getCookies().add(authCookie);
 
                 // say hello to the server
                 Hello hello = ApiClient.getProtoBuf("hello", Hello.class);
+                String message;
                 if (hello == null) {
-                    mMessage = "<pre>Try logging in and out again.</pre>";
+                    message = "<pre>Try logging in and out again.</pre>";
                 } else {
-                    mNeedsEmpireSetup = !hello.hasEmpire();
-                    mMessage = hello.getMotd().getMessage();
+                    if (hello.hasEmpire()) {
+                        mNeedsEmpireSetup = false;
+                        EmpireManager.getInstance().setup(hello.getEmpire());
+                    } else {
+                        mNeedsEmpireSetup = true;
+                    }
+                    message = hello.getMotd().getMessage();
                 }
 
                 String tmpl = getHtmlFile("motd-template.html");
-                return String.format(tmpl, mMessage);
+                return String.format(tmpl, message);
             }
 
             @Override

@@ -47,8 +47,9 @@ public class StarfieldActivity extends Activity {
 
         mPlanetIconsContainer.setVisibility(View.GONE);
 
-        mUsername.setText("codeka");
-        mMoney.setText("$ 12,345");
+        EmpireManager empire = EmpireManager.getInstance();
+        mUsername.setText(empire.getDisplayName());
+        mMoney.setText("$ 12,345"); // TODO: empire.getCash()
         mStarName.setText("");
 
         mStarfield.addStarSelectedListener(new StarfieldSurfaceView.OnStarSelectedListener() {

@@ -68,5 +68,6 @@
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
     <string name="empire_setup_name_hint">Empire name</string>
+    <string name="done">Done</string>
 
 </resources>

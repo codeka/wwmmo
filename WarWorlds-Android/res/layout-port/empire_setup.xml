@@ -40,7 +40,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="4dp"
-        android:hint="@string/empire_setup_name_hint" >
+        android:hint="@string/empire_setup_name_hint"
+        android:imeOptions="actionDone"
+        android:inputType="textCapWords" >
 
         <requestFocus />
     </EditText>
@@ -51,12 +53,12 @@
         android:padding="4dp" >
 
         <Button
-            android:id="@+id/empire_setup_ok"
+            android:id="@+id/empire_setup_done"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom"
             android:layout_weight="0.5"
-            android:text="@string/ok" />
+            android:text="@string/done" />
 
         <Button
             android:id="@+id/empire_setup_cancel"

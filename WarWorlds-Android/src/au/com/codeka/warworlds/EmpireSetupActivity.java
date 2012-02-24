@@ -2,19 +2,19 @@ package au.com.codeka.warworlds;
 
 import warworlds.Warworlds.Empire;
 import warworlds.Warworlds.Empire.EmpireState;
-import warworlds.Warworlds.Hello;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.TextView.OnEditorActionListener;
 import au.com.codeka.warworlds.api.ApiClient;
 
 /**
@@ -45,15 +45,28 @@ public class EmpireSetupActivity extends Activity {
         setContentView(R.layout.empire_setup);
 
         final TextView empireName = (TextView) findViewById(R.id.empire_setup_name);
-        final Button okButton = (Button) findViewById(R.id.empire_setup_ok);
+        final Button doneButton = (Button) findViewById(R.id.empire_setup_done);
 
-        okButton.setOnClickListener(new OnClickListener() {
+        empireName.setOnEditorActionListener(new OnEditorActionListener() {
             @Override
-            public void onClick(View v) {
-                saveEmpire(empireName.getText().toString());
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                saveEmpire();
+                return true;
             }
         });
 
+        doneButton.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                saveEmpire();
+            }
+        });
+
+    }
+
+    private void saveEmpire() {
+        final TextView empireName = (TextView) findViewById(R.id.empire_setup_name);
+        saveEmpire(empireName.getText().toString());
     }
 
     private void saveEmpire(final String empireName) {
