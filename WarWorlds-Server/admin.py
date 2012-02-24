@@ -10,6 +10,10 @@ import webapp2 as webapp
 import model
 
 from google.appengine.api import users
+from google.appengine.ext import db
+from google.appengine.ext.db.metadata import Kind
+
+import logging
 
 jinja = jinja2.Environment(loader=jinja2.FileSystemLoader(os.path.dirname(__file__)+'/tmpl'))
 
@@ -76,6 +80,20 @@ class DebugStarfieldPage(AdminPage):
         self.render('admin/debug/starfield.html', {})
 
 
+class DebugDataStorePage(AdminPage):
+    def get(self):
+        kinds = []
+        q = db.GqlQuery('SELECT * FROM __kind__')
+        for p in q.fetch(100):
+            kinds.append(p.kind_name)
+        self.render('admin/debug/data-store.html', {'kinds': kinds})
+
+    def post(self):
+        if self.request.get('action') == 'bulk-delete':
+            logging.info('bulk-deleting kind: '+self.request.get('entity-kind'))
+        else:
+            self.response.set_status(400)
+
 class DevicesPage(AdminPage):
     ''' The "devices" page lets you view all devices that have registered and send them messages.
     '''
@@ -87,5 +105,6 @@ app = webapp.WSGIApplication([('/admin', DashboardPage),
                               ('/admin/empires', EmpiresPage),
                               ('/admin/motd', MotdPage),
                               ('/admin/devices', DevicesPage),
-                              ('/admin/debug/starfield', DebugStarfieldPage)],
+                              ('/admin/debug/starfield', DebugStarfieldPage),
+                              ('/admin/debug/data-store', DebugDataStorePage)],
                              debug=True)

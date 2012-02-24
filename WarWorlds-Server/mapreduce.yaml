@@ -1,0 +1,11 @@
+
+mapreduce:
+- name: Bulk Delete entities
+  mapper:
+    input_reader: mapreduce.input_readers.DatastoreInputReader
+    handler: tasks.datastore.bulkdelete
+    params:
+    - name: entity_kind
+      default: None
+
+

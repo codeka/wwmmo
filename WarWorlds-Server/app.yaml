@@ -22,6 +22,10 @@ handlers:
   static_files: static/favicon.ico
   upload: static/favicon.ico
 
+- url: /mapreduce(/.*)?
+  script: mapreduce.main.APP
+  login: admin
+
 - url: /api/v1.*
   script: api_v1.app
 
