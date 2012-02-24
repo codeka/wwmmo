@@ -83,8 +83,8 @@ class DebugStarfieldPage(AdminPage):
 class DebugDataStorePage(AdminPage):
     def get(self):
         kinds = []
-        q = db.GqlQuery('SELECT * FROM __kind__')
-        for p in q.fetch(100):
+        q = Kind.all()
+        for p in q:
             kinds.append(p.kind_name)
         self.render('admin/debug/data-store.html', {'kinds': kinds})
 
