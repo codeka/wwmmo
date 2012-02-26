@@ -127,7 +127,7 @@ class DevicesPage(ApiPage):
         data = model.DeviceRegistration()
         self._pbToModel(data, registration_info)
         # ignore what they said in the PB, we'll set the user to their own user anyway
-        data.user = self.user.email()
+        data.user = self.user
         data.put()
 
     def get(self):
@@ -165,7 +165,7 @@ class DevicesPage(ApiPage):
         model.deviceBuild = pb.device_build
         model.deviceVersion = pb.device_version
         if pb.user:
-            model.user = pb.user
+            model.user = users.User(pb.user)
 
     def _modelToPb(self, pb, model):
         pb.device_id = model.deviceID
