@@ -6,31 +6,40 @@ import au.com.codeka.warworlds.R;
 public class Planet {
     private static PlanetType[] sPlanetTypes = {
         new PlanetType.Builder().setDisplayName("Gas Giant")
-                                .setIconId(R.drawable.planet_icon_gasgiant)
+                                .setIconID(R.drawable.planet_icon_gasgiant)
+                                .setMedID(R.drawable.planet_med_gasgiant)
                                 .build(),
         new PlanetType.Builder().setDisplayName("Radiated")
-                                .setIconId(R.drawable.planet_icon_radiated)
+                                .setIconID(R.drawable.planet_icon_radiated)
+                                .setMedID(R.drawable.planet_med_radiated)
                                 .build(),
         new PlanetType.Builder().setDisplayName("Inferno")
-                                .setIconId(R.drawable.planet_icon_inferno)
+                                .setIconID(R.drawable.planet_icon_inferno)
+                                .setMedID(R.drawable.planet_med_inferno)
                                 .build(),
         new PlanetType.Builder().setDisplayName("Asteroids")
-                                .setIconId(R.drawable.planet_icon_asteroids)
+                                .setIconID(R.drawable.planet_icon_asteroids)
+                                .setMedID(R.drawable.planet_med_asteroids)
                                 .build(),
         new PlanetType.Builder().setDisplayName("Water")
-                                .setIconId(R.drawable.planet_icon_water)
+                                .setIconID(R.drawable.planet_icon_water)
+                                .setMedID(R.drawable.planet_med_water)
                                 .build(),
         new PlanetType.Builder().setDisplayName("Toxic")
-                                .setIconId(R.drawable.planet_icon_toxic)
+                                .setIconID(R.drawable.planet_icon_toxic)
+                                .setMedID(R.drawable.planet_med_toxic)
                                 .build(),
         new PlanetType.Builder().setDisplayName("Desert")
-                                .setIconId(R.drawable.planet_icon_desert)
+                                .setIconID(R.drawable.planet_icon_desert)
+                                .setMedID(R.drawable.planet_med_desert)
                                 .build(),
         new PlanetType.Builder().setDisplayName("Swamp")
-                                .setIconId(R.drawable.planet_icon_swamp)
+                                .setIconID(R.drawable.planet_icon_swamp)
+                                .setMedID(R.drawable.planet_med_swamp)
                                 .build(),
         new PlanetType.Builder().setDisplayName("Terran")
-                                .setIconId(R.drawable.planet_icon_terran)
+                                .setIconID(R.drawable.planet_icon_terran)
+                                .setMedID(R.drawable.planet_med_terran)
                                 .build()
     };
 
@@ -71,12 +80,16 @@ public class Planet {
     public static class PlanetType {
         private String mDisplayName;
         private int mIconID;
+        private int mMedID;
 
         public String getDisplayName() {
             return mDisplayName;
         }
         public int getIconID() {
             return mIconID;
+        }
+        public int getMedID() {
+            return mMedID;
         }
 
         public static class Builder {
@@ -91,8 +104,13 @@ public class Planet {
                 return this;
             }
 
-            public Builder setIconId(int id) {
+            public Builder setIconID(int id) {
                 mPlanetType.mIconID = id;
+                return this;
+            }
+
+            public Builder setMedID(int id) {
+                mPlanetType.mMedID = id;
                 return this;
             }
 
