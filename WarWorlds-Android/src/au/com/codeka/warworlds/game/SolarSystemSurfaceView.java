@@ -81,7 +81,9 @@ public class SolarSystemSurfaceView extends UniverseElementSurfaceView {
         Planet[] planets = mStar.getPlanets();
         for (int i = 0; i < planets.length; i++) {
             canvas.drawCircle(0, 0, (50*i) + 250, p2);
+        }
 
+        for (int i = 0; i < planets.length; i++) {
             int resID = planets[i].getPlanetType().getMedID();
             if (resID != 0) {
                 Bitmap bm = BitmapFactory.decodeResource(getResources(), resID);
@@ -94,8 +96,8 @@ public class SolarSystemSurfaceView extends UniverseElementSurfaceView {
                     normalizedPlanetNumber = (double) i/(planets.length - 1);
                 }
 
-                double angle = 0.4*Math.PI*normalizedPlanetNumber;
-                angle = (0.05*Math.PI) + angle;
+                double angle = (0.5/(planets.length + 1));
+                angle = (angle*i*Math.PI)+ angle*Math.PI;
 
                 double nx = x*Math.cos(angle) - y*Math.sin(angle);
                 double ny = y*Math.cos(angle) + x*Math.sin(angle);

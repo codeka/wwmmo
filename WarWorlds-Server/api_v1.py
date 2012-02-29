@@ -6,7 +6,7 @@ Created on 12/02/2012
 
 import webapp2 as webapp
 import model
-from model import c2dm, sector
+from model import c2dm, sector, empire
 
 import import_fixer
 import_fixer.FixImports('google', 'protobuf')
@@ -67,7 +67,7 @@ class HelloPage(ApiPage):
     """
     def get(self):
         motd_model = model.MessageOfTheDay.get()
-        empire_model = model.Empire.getForUser(self.user)
+        empire_model = empire.Empire.getForUser(self.user)
 
         hello_pb = pb.Hello()
         if motd_model is not None:
@@ -93,7 +93,7 @@ class EmpiresPage(ApiPage):
                 self.response.set_status(404)
                 return
 
-            empire_model = model.Empire.getForUser(user)
+            empire_model = empire.Empire.getForUser(user)
             if empire_model is None:
                 logging.info("No empire registered with email address '"+email+"'")
                 self.response.set_status(404)
@@ -112,9 +112,10 @@ class EmpiresPage(ApiPage):
             self.response.set_status(400)
             return
 
-        empire_model = model.Empire()
+        empire_model = empire.Empire()
         self._empirePbToModel(empire_model, empire_pb)
         empire_model.put()
+
 
 class DevicesPage(ApiPage):
     def put(self):

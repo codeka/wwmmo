@@ -72,22 +72,3 @@ class DeviceRegistration(db.Model):
             results.append(result)
         return results
 
-
-class Empire(db.Model):
-    """Represents an empire, display name and whatnot.
-    """
-    displayName = db.StringProperty()
-    user = db.UserProperty()
-    state = db.IntegerProperty()
-
-    @staticmethod
-    def getForUser(user):
-        result = Empire.all().filter("user", user).fetch(1, 0)
-        if len(result) != 1:
-            return None
-        return result[0]
-
-    class State:
-        INITIAL = 1
-        REGISTERED = 2
-        BANNED = 3
