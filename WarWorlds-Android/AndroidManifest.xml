@@ -37,7 +37,7 @@
 
         <!-- Account selection activity -->
         <activity android:name=".AccountsActivity" android:label="@string/app_name"
-            android:screenOrientation="portrait">
+            android:screenOrientation="landscape">
         </activity>
 
         <!-- A couple of activities that are used by the game itself -->

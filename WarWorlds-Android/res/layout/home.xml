@@ -5,68 +5,60 @@
     android:background="@drawable/title"
     android:orientation="horizontal" >
 
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="0dp"
-        android:layout_weight="0.666"
         android:layout_height="match_parent"
+        android:layout_weight="0.666"
         android:orientation="vertical" >
 
         <TextView
-            android:id="@+id/homepage_title"
+            android:id="@+id/home_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center"
-            android:padding="0dip"
             android:text="@string/homepage_title_text"
-            android:textColor="#ffffff"
-            android:textSize="48dip"
-            android:textStyle="bold" />
+            style="@style/TitleText" />
 
         <WebView
-            android:id="@+id/motd"
+            android:id="@+id/home_motd"
             android:layout_width="fill_parent"
-            android:layout_height="0dp"
-            android:layout_marginLeft="0dp"
-            android:layout_marginTop="0dp"
-            android:layout_weight="1" />
+            android:layout_height="fill_parent"
+            android:layout_below="@id/home_title" />
+    </RelativeLayout>
 
-    </LinearLayout>
-
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="0dp"
-        android:layout_weight="0.333"
-        android:layout_height="match_parent"
-        android:orientation="vertical" >
+        android:layout_height="fill_parent"
+        android:layout_weight="0.333" >
+
+        <Button
+            android:id="@+id/log_out_btn"
+            style="@style/Button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:text="@string/log_out" />
+
+        <Button
+            android:id="@+id/options_btn"
+            style="@style/Button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_above="@id/log_out_btn"
+            android:text="@string/options" />
+
+        <Button
+            android:id="@+id/start_game_btn"
+            style="@style/Button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_above="@id/options_btn"
+            android:text="@string/start_game" />
 
         <TextView
             android:id="@+id/debug_info"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:padding="10dp" />
-
-        <Button
-            android:id="@+id/start_game"
-            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="10dip"
-            android:text="@string/start_game"
-            style="@style/Button"  />
-
-        <Button
-            android:id="@+id/options"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/options"
-            style="@style/Button" />
-
-        <Button
-            android:id="@+id/log_out"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/log_out"
-            style="@style/Button" />
-
-    </LinearLayout>
+            android:layout_above="@id/start_game_btn" />
+    </RelativeLayout>
 
 </LinearLayout>

@@ -1,69 +1,73 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:background="#000000"
-    android:orientation="vertical">
+    android:background="@drawable/title"
+    android:orientation="horizontal" >
 
-    <TextView
-        android:id="@+id/log_in_header"
-        android:layout_width="fill_parent"
-        android:layout_height="60dip"
-        android:layout_alignParentTop="true"
-        android:background="@drawable/gradient"
-        android:paddingLeft="10dip"
-        android:gravity="center_vertical"
-        android:textColor="#ffffff"
-        android:text="@string/log_in_header"
-        android:textSize="16dip"/>
+    <RelativeLayout
+        android:layout_width="0dp"
+        android:layout_height="fill_parent"
+        android:layout_weight="0.666" >
 
-    <TextView
-        android:id="@+id/log_in_msg"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/log_in_header"
-        android:padding="10dip"
-        android:background="#000000"
-        android:textColor="#ffffff"
-        android:text="@string/log_in_msg"
-        android:textSize="16dip"/>
+        <TextView
+            android:id="@+id/log_in_header"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/log_in_header"
+            style="@style/TitleText" />
 
-    <TextView
-        android:id="@+id/log_in_note"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/log_in_msg"
-        android:text="@string/log_in_note"
-        android:gravity="center"
-        android:textColor="#ffffff"
-        android:layout_margin="5dip"/>
+        <TextView
+            android:id="@+id/log_in_note"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/log_in_header"
+            android:layout_margin="5dip"
+            android:gravity="center"
+            android:text="@string/log_in_note"
+            android:textColor="#ffffff" />
 
-    <View
-        android:id="@+id/divider"
-        android:layout_width="fill_parent"
-        android:layout_height="1dip"
-        android:layout_below="@id/log_in_note"
-        android:background="#808080" />
+        <View
+            android:id="@+id/divider"
+            android:layout_width="fill_parent"
+            android:layout_height="1dip"
+            android:layout_below="@id/log_in_note"
+            android:background="#808080" />
 
-    <ListView
-        android:id="@+id/select_account"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:layout_below="@id/divider"
-        android:layout_margin="10dip"
-        android:divider="#FFFFFF"
-        android:textSize="16dip"
-        android:background="@android:color/transparent"
-        android:cacheColorHint="@android:color/transparent">
-    </ListView>
+        <ListView
+            android:id="@+id/select_account"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_below="@id/divider"
+            android:layout_margin="10dip"
+            android:background="@android:color/transparent"
+            android:cacheColorHint="@android:color/transparent"
+            android:divider="#FFFFFF"
+            android:textSize="16dip" >
+        </ListView>
+    </RelativeLayout>
 
-    <Button
-        android:id="@+id/log_in_btn"
-        android:text="@string/log_in"
-        android:layout_marginTop="5px"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"/>
+    <RelativeLayout
+        android:layout_width="0dp"
+        android:layout_height="fill_parent"
+        android:layout_weight="0.333" >
+
+        <Button
+            android:id="@+id/cancel_btn"
+            style="@style/Button"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentRight="true"
+            android:text="@string/cancel" />
+        
+        <Button
+            android:id="@+id/log_in_btn"
+            style="@style/Button"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_above="@id/cancel_btn"
+            android:text="@string/log_in" />
+    </RelativeLayout>
 
 </LinearLayout>

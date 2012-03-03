@@ -36,6 +36,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.view.View;
+import android.view.Window;
 import android.view.View.OnClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -74,6 +75,8 @@ public class AccountsActivity extends Activity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        requestWindowFeature(Window.FEATURE_NO_TITLE); // remove the title bar
 
         SharedPreferences prefs = Util.getSharedPreferences(mContext);
         String deviceRegistrationID = prefs.getString(Util.DEVICE_REGISTRATION_ID, null);
@@ -183,6 +186,13 @@ public class AccountsActivity extends Activity {
                         return null;
                     }
                 });
+            }
+        });
+
+        final Button cancelButton = (Button) findViewById(R.id.cancel_btn);
+        cancelButton.setOnClickListener(new OnClickListener() {
+            public void onClick(View v) {
+                finish();
             }
         });
     }

@@ -161,11 +161,11 @@ public class WarWorldsActivity extends Activity {
     private void setHomeScreenContent() {
         setContentView(R.layout.home);
 
-        final Button startGameButton = (Button) findViewById(R.id.start_game);
-        final Button logOutButton = (Button) findViewById(R.id.log_out);
+        final Button startGameButton = (Button) findViewById(R.id.start_game_btn);
+        final Button logOutButton = (Button) findViewById(R.id.log_out_btn);
 
-        final WebView motdView = (WebView) findViewById(R.id.motd);
-        sayHello(motdView);
+        final WebView motd = (WebView) findViewById(R.id.home_motd);
+        sayHello(motd);
 
         logOutButton.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
