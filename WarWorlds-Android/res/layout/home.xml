@@ -25,7 +25,7 @@
         <WebView
             android:id="@+id/motd"
             android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
+            android:layout_height="0dp"
             android:layout_marginLeft="0dp"
             android:layout_marginTop="0dp"
             android:layout_weight="1" />
@@ -47,24 +47,25 @@
 
         <Button
             android:id="@+id/start_game"
-            android:layout_width="fill_parent"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="5px"
-            android:gravity="center_horizontal"
             android:padding="10dip"
-            android:text="@string/start_game" />
+            android:text="@string/start_game"
+            style="@style/Button"  />
 
         <Button
             android:id="@+id/options"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/options" />
+            android:text="@string/options"
+            style="@style/Button" />
 
         <Button
             android:id="@+id/log_out"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/log_out" />
+            android:text="@string/log_out"
+            style="@style/Button" />
 
     </LinearLayout>
 
