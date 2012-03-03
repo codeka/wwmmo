@@ -1,12 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="au.com.codeka.warworlds" android:versionCode="11" android:versionName="0.1.0">
-    <!--  C2DM requires Android SDK version 2.2 (API level 8) or above -->
-    <uses-sdk android:minSdkVersion="8" />
+    package="au.com.codeka.warworlds"
+    android:versionCode="1"
+    android:versionName="0.0.1" >
+
+    <!-- C2DM requires Android SDK version 2.2 (API level 8) or above -->
+    <uses-sdk
+        android:minSdkVersion="8"
+        android:targetSdkVersion="14" />
 
     <!-- Only this application can receive the messages and registration result -->
-    <permission android:name="au.com.codeka.warworlds.permission.C2D_MESSAGE"
+    <permission
+        android:name="au.com.codeka.warworlds.permission.C2D_MESSAGE"
         android:protectionLevel="signature" />
+
     <uses-permission android:name="au.com.codeka.warworlds.permission.C2D_MESSAGE" />
 
     <!-- Permission to register and receive data messages -->
@@ -24,47 +31,73 @@
     <!-- Permission to request authtokens from the AccountManager -->
     <uses-permission android:name="android.permission.USE_CREDENTIALS" />
 
-    <application android:icon="@drawable/app_icon"
-        android:label="@string/app_name" android:theme="@style/WarWorlds">
+    <application
+        android:icon="@drawable/app_icon"
+        android:label="@string/app_name"
+        android:theme="@style/WarWorlds" >
 
-        <!--  Main activity -->
-        <activity android:name=".WarWorldsActivity" android:launchMode="singleTop" android:screenOrientation="landscape">
+        <!-- Main activity -->
+        <activity
+            android:name=".WarWorldsActivity"
+            android:launchMode="singleTop"
+            android:screenOrientation="landscape" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
 
         <!-- Account selection activity -->
-        <activity android:name=".AccountsActivity" android:label="@string/app_name"
-            android:screenOrientation="landscape">
+        <activity
+            android:name=".AccountsActivity"
+            android:label="@string/app_name"
+            android:screenOrientation="landscape" >
         </activity>
 
         <!-- A couple of activities that are used by the game itself -->
-        <activity android:name=".EmpireSetupActivity"></activity><activity android:name=".game.StarfieldActivity" android:label="@string/app_name" android:screenOrientation="landscape"></activity>
+        <activity android:name=".EmpireSetupActivity" >
+        </activity>
+        <activity
+            android:name=".game.StarfieldActivity"
+            android:label="@string/app_name"
+            android:screenOrientation="landscape" >
+        </activity>
 
-        <!-- In order to use the C2DM library, an application must declare a class 
+        <!--
+             In order to use the C2DM library, an application must declare a class 
              with the name C2DMReceiver, extending com.google.android.c2dm.C2DMBaseReceiver.
-             It must also include this section in the manifest. -->
-        <activity android:name=".game.SolarSystemActivity" android:label="@string/app_name" android:screenOrientation="landscape"></activity><service android:name=".C2DMReceiver" />
+             It must also include this section in the manifest.
+        -->
+        <activity
+            android:name=".game.SolarSystemActivity"
+            android:label="@string/app_name"
+            android:screenOrientation="landscape" >
+        </activity>
 
-        <!-- Only Google services can send data messages for the app. If permission
-             is not set - any other app can generate it -->
-        <receiver android:name="com.google.android.c2dm.C2DMBroadcastReceiver"
-            android:permission="com.google.android.c2dm.permission.SEND">
+        <service android:name=".C2DMReceiver" />
+
+        <!--
+             Only Google services can send data messages for the app. If permission
+             is not set - any other app can generate it
+        -->
+        <receiver
+            android:name="com.google.android.c2dm.C2DMBroadcastReceiver"
+            android:permission="com.google.android.c2dm.permission.SEND" >
+
             <!-- Receive the actual message -->
             <intent-filter>
                 <action android:name="com.google.android.c2dm.intent.RECEIVE" />
+
                 <category android:name="au.com.codeka.warworlds" />
             </intent-filter>
             <!-- Receive the registration id -->
             <intent-filter>
                 <action android:name="com.google.android.c2dm.intent.REGISTRATION" />
+
                 <category android:name="au.com.codeka.warworlds" />
             </intent-filter>
         </receiver>
-        
-        
-        
     </application>
+
 </manifest>

@@ -3,8 +3,12 @@ package au.com.codeka.warworlds;
 
 import java.io.InputStream;
 import java.io.StringWriter;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 
 import org.apache.commons.io.IOUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import warworlds.Warworlds.Hello;
 
@@ -14,9 +18,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.AssetManager;
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;
@@ -31,14 +38,7 @@ import au.com.codeka.warworlds.game.StarfieldActivity;
  * a menu item to invoke the accounts activity.
  */
 public class WarWorldsActivity extends Activity {
-    /**
-     * Tag for logging.
-     */
-    private static final String TAG = "WarWorldsActivity";
-
-    /**
-     * The current context.
-     */
+    private static Logger log = LoggerFactory.getLogger(WarWorldsActivity.class);
     private Context mContext = this;
 
     /**
@@ -46,7 +46,6 @@ public class WarWorldsActivity extends Activity {
      */
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        Log.i(TAG, "War Worlds is starting up...");
         super.onCreate(savedInstanceState);
 
         // initialize the Util class
@@ -79,6 +78,14 @@ public class WarWorldsActivity extends Activity {
     }
 
     /**
+     * We don't have a menu, returning \c false makes sure the button doesn't appear.
+     */
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        return false;
+    }
+
+    /**
      * Loads the MOTD template HTML, which is actually just a static asset.
      */
     private String getHtmlFile(String fileName) {
@@ -102,7 +109,7 @@ public class WarWorldsActivity extends Activity {
      * @param motd The \c WebView we'll install the MOTD to.
      */
     private void sayHello(final WebView motdView) {
-        motdView.setBackgroundColor(0x0); // transparent...
+        motdView.setBackgroundColor(Color.TRANSPARENT); // transparent...
 
         final ProgressDialog pleaseWaitDialog = ProgressDialog.show(mContext, null, 
                 "Connecting...", true);
@@ -149,7 +156,24 @@ public class WarWorldsActivity extends Activity {
                     startActivity(new Intent(mContext, EmpireSetupActivity.class));
                 } else {
                     motdView.loadData(result, "text/html", "utf-8");
-                    motdView.setBackgroundColor(0x0); // transparent...
+                    motdView.setBackgroundColor(Color.TRANSPARENT);
+
+                    // this is required to make the background of the WebView actually transparent
+                    // on Honeycomb+ (this API is only available on Honeycomb+ as well, so we need
+                    // to call it via reflection...):
+                    // motdView.setLayerType(View.LAYER_TYPE_SOFTWARE, new Paint());
+                    try {
+                        Method setLayerType = View.class.getMethod("setLayerType", int.class, Paint.class);
+                        if (setLayerType != null) {
+                            setLayerType.invoke(motdView, 1, new Paint());
+                      }
+                    // ignore if the method isn't supported on this platform...
+                    } catch (SecurityException e) {
+                    } catch (NoSuchMethodException e) {
+                    } catch (IllegalArgumentException e) {
+                    } catch (IllegalAccessException e) {
+                    } catch (InvocationTargetException e) {
+                    }
                 }
             }
         }.execute();

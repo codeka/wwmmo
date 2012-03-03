@@ -5,6 +5,7 @@
     android:background="@drawable/title"
     android:orientation="horizontal" >
 
+
     <RelativeLayout
         android:layout_width="0dp"
         android:layout_height="match_parent"
