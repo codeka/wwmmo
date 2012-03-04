@@ -4,62 +4,61 @@
     android:layout_height="match_parent"
     android:orientation="vertical" >
 
-	<LinearLayout
-		android:layout_width="match_parent"
-		android:layout_height="match_parent"
-		android:baselineAligned="false"
-		android:orientation="horizontal" >
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:baselineAligned="false"
+        android:orientation="horizontal" >
 
-		<LinearLayout
-			android:layout_width="0px"
-			android:layout_weight="1"
-			android:layout_height="match_parent"
-			android:orientation="vertical" >
+        <LinearLayout
+            android:layout_width="0px"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical" >
 
-			<au.com.codeka.warworlds.game.SolarSystemSurfaceView
-				android:id="@+id/solarsystem_view"
-				android:layout_width="match_parent"
-				android:layout_height="match_parent" />
-		</LinearLayout>
+            <au.com.codeka.warworlds.game.SolarSystemSurfaceView
+                android:id="@+id/solarsystem_view"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+        </LinearLayout>
 
-		<LinearLayout
-			android:layout_width="180dp"
-			android:layout_height="match_parent"
-			android:orientation="vertical"
-			style="@style/RightPane" >
+        <LinearLayout
+            style="@style/RightPane"
+            android:layout_width="180dp"
+            android:layout_height="match_parent"
+            android:orientation="vertical" >
 
-			<LinearLayout
-				android:layout_width="match_parent"
-				android:layout_height="wrap_content"
-				android:orientation="horizontal" >
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal" >
 
-				<TextView
-					android:id="@+id/username"
-					android:layout_width="0px"
-					android:layout_weight="1"
-					android:paddingLeft="5dip"
-					android:paddingRight="5dip"
-					android:layout_height="wrap_content"
-					android:textAppearance="?android:attr/textAppearanceSmall" />
+                <TextView
+                    android:id="@+id/username"
+                    android:layout_width="0px"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:paddingLeft="5dip"
+                    android:paddingRight="5dip"
+                    android:textAppearance="?android:attr/textAppearanceSmall" />
 
-				<TextView
-					android:id="@+id/money"
-					android:layout_width="wrap_content"
-					android:layout_height="wrap_content"
-					android:paddingLeft="5dip"
-					android:paddingRight="5dip"
-					android:textAppearance="?android:attr/textAppearanceSmall" />
-			</LinearLayout>
+                <TextView
+                    android:id="@+id/money"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingLeft="5dip"
+                    android:paddingRight="5dip"
+                    android:textAppearance="?android:attr/textAppearanceSmall" />
+            </LinearLayout>
+        </LinearLayout>
+    </LinearLayout>
 
-		</LinearLayout>
-	</LinearLayout>
-
-	<ImageView
-	    android:id="@+id/ad"
-	    android:layout_width="320px"
-	    android:layout_height="50px"
-	    android:contentDescription="Placeholder for ad"
-	    android:layout_gravity="bottom|right"
-	    android:src="@drawable/testad" />
+    <ImageView
+        android:id="@+id/ad"
+        android:layout_width="320px"
+        android:layout_height="50px"
+        android:layout_gravity="bottom|right"
+        android:contentDescription="Placeholder for ad"
+        android:src="@drawable/testad" />
 
 </merge>
