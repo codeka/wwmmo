@@ -4,6 +4,8 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.os.AsyncTask;
 import android.util.AttributeSet;
+import android.view.GestureDetector;
+import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
@@ -13,13 +15,18 @@ import android.view.SurfaceView;
  *
  */
 public class UniverseElementSurfaceView extends SurfaceView implements SurfaceHolder.Callback {
-
+    private Context mContext;
     private SurfaceHolder mHolder;
     private boolean mIsRedrawing;
     private boolean mNeedsRedraw;
+    private GestureDetector mGestureDetector;
+    private boolean mDisableGestures = false;
+    GestureDetector.OnGestureListener mGestureListener;
 
     public UniverseElementSurfaceView(Context context, AttributeSet attrs) {
         super(context, attrs);
+        mContext = context;
+
         if (this.isInEditMode()) {
             return;
         }
@@ -40,6 +47,28 @@ public class UniverseElementSurfaceView extends SurfaceView implements SurfaceHo
     @Override
     public void surfaceDestroyed(SurfaceHolder holder) {
         mHolder = null;
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        if (mGestureDetector == null && !mDisableGestures) {
+            GestureDetector.OnGestureListener listener = createGestureListener();
+            if (listener == null) {
+                mDisableGestures = true;
+                return true;
+            }
+            mGestureDetector = new GestureDetector(mContext, listener);
+        }
+        mGestureDetector.onTouchEvent(event);
+        return true;
+    }
+
+    /**
+     * If you return non-null from this, we'll set up a gesture detector that calls the
+     * methods of the object you return whenever the user gestures on the surface.
+     */
+    protected GestureDetector.OnGestureListener createGestureListener() {
+        return null;
     }
 
     protected void redraw() {

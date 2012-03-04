@@ -11,7 +11,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import warworlds.Warworlds.Hello;
-
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -22,7 +21,6 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -46,6 +44,7 @@ public class WarWorldsActivity extends Activity {
      */
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        log.info("WarWorlds activity starting...");
         super.onCreate(savedInstanceState);
 
         // initialize the Util class
@@ -109,7 +108,7 @@ public class WarWorldsActivity extends Activity {
      * @param motd The \c WebView we'll install the MOTD to.
      */
     private void sayHello(final WebView motdView) {
-        motdView.setBackgroundColor(Color.TRANSPARENT); // transparent...
+        setWebViewTransparent(motdView);
 
         final ProgressDialog pleaseWaitDialog = ProgressDialog.show(mContext, null, 
                 "Connecting...", true);
@@ -156,27 +155,31 @@ public class WarWorldsActivity extends Activity {
                     startActivity(new Intent(mContext, EmpireSetupActivity.class));
                 } else {
                     motdView.loadData(result, "text/html", "utf-8");
-                    motdView.setBackgroundColor(Color.TRANSPARENT);
-
-                    // this is required to make the background of the WebView actually transparent
-                    // on Honeycomb+ (this API is only available on Honeycomb+ as well, so we need
-                    // to call it via reflection...):
-                    // motdView.setLayerType(View.LAYER_TYPE_SOFTWARE, new Paint());
-                    try {
-                        Method setLayerType = View.class.getMethod("setLayerType", int.class, Paint.class);
-                        if (setLayerType != null) {
-                            setLayerType.invoke(motdView, 1, new Paint());
-                      }
-                    // ignore if the method isn't supported on this platform...
-                    } catch (SecurityException e) {
-                    } catch (NoSuchMethodException e) {
-                    } catch (IllegalArgumentException e) {
-                    } catch (IllegalAccessException e) {
-                    } catch (InvocationTargetException e) {
-                    }
+                    setWebViewTransparent(motdView);
                 }
             }
         }.execute();
+    }
+    
+    private void setWebViewTransparent(WebView webView) {
+        webView.setBackgroundColor(Color.TRANSPARENT);
+
+        // this is required to make the background of the WebView actually transparent
+        // on Honeycomb+ (this API is only available on Honeycomb+ as well, so we need
+        // to call it via reflection...):
+        // motdView.setLayerType(View.LAYER_TYPE_SOFTWARE, new Paint());
+        try {
+            Method setLayerType = View.class.getMethod("setLayerType", int.class, Paint.class);
+            if (setLayerType != null) {
+                setLayerType.invoke(webView, 1, new Paint());
+          }
+        // ignore if the method isn't supported on this platform...
+        } catch (SecurityException e) {
+        } catch (NoSuchMethodException e) {
+        } catch (IllegalArgumentException e) {
+        } catch (IllegalAccessException e) {
+        } catch (InvocationTargetException e) {
+        }
     }
 
     /**

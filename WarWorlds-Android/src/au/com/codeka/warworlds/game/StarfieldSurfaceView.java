@@ -2,13 +2,16 @@ package au.com.codeka.warworlds.game;
 
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import android.content.Context;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Paint.Style;
 import android.graphics.RadialGradient;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import au.com.codeka.warworlds.model.Sector;
@@ -19,10 +22,7 @@ import au.com.codeka.warworlds.model.Star;
  * up their details and so on.
  */
 public class StarfieldSurfaceView extends UniverseElementSurfaceView {
-    private static String TAG = "StarfieldSurfaceView";
-
-    private GestureDetector mGestureDetector;
-    private GestureHandler mGestureHandler;
+    private Logger log = LoggerFactory.getLogger(StarfieldSurfaceView.class);
     private CopyOnWriteArrayList<OnStarSelectedListener> mStarSelectedListeners;
     private Star mSelectedStar;
 
@@ -32,13 +32,10 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
             return;
         }
 
-        Log.i(TAG, "Starfield initializing...");
+        log.info("Starfield initializing...");
 
         mStarSelectedListeners = new CopyOnWriteArrayList<OnStarSelectedListener>();
         mSelectedStar = null;
-
-        mGestureHandler = new GestureHandler();
-        mGestureDetector = new GestureDetector(context, mGestureHandler);
 
         SectorManager.getInstance().addSectorListChangedListener(new SectorManager.OnSectorListChangedListener() {
             @Override
@@ -48,10 +45,12 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
         });
     }
 
+    /**
+     * Creates the \c OnGestureListener that'll handle our gestures.
+     */
     @Override
-    public boolean onTouchEvent(MotionEvent event) {
-        mGestureDetector.onTouchEvent(event);
-        return true;
+    protected GestureDetector.OnGestureListener createGestureListener() {
+        return new GestureListener();
     }
 
     public void addStarSelectedListener(OnStarSelectedListener listener) {
@@ -88,8 +87,7 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
 
         SectorManager sm = SectorManager.getInstance();
 
-        // clear it to black
-        canvas.drawColor(0xff000000);
+        canvas.drawColor(Color.BLACK);
 
         for(int y = -sm.getRadius(); y <= sm.getRadius(); y++) {
             for(int x = -sm.getRadius(); x <= sm.getRadius(); x++) {
@@ -113,7 +111,7 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
         }
     }
 
-    private Paint p = null;
+    private Paint mStarPaint = null;
     private void drawStar(Canvas canvas, Star star, int x, int y) {
         x += star.getOffsetX();
         y += star.getOffsetY();
@@ -121,15 +119,15 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
         int[] colours = { star.getColour(), star.getColour(), 0x00000000 };
         float[] positions = { 0.0f, 0.4f, 1.0f };
 
+        if (mStarPaint == null) {
+            mStarPaint = new Paint();
+            mStarPaint.setDither(true);
+        }
         RadialGradient gradient = new RadialGradient(x, y, star.getSize(), 
                 colours, positions, android.graphics.Shader.TileMode.CLAMP);
-        if (p == null) {
-            p = new Paint();
-            p.setDither(true);
-        }
-        p.setShader(gradient);
+        mStarPaint.setShader(gradient);
 
-        canvas.drawCircle(x, y, star.getSize(), p);
+        canvas.drawCircle(x, y, star.getSize(), mStarPaint);
 
         if (mSelectedStar == star) {
             Paint p2 = new Paint();
@@ -143,13 +141,10 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
      * Implements the \c OnGestureListener methods that we use to respond to
      * various touch events.
      */
-    private class GestureHandler extends GestureDetector.SimpleOnGestureListener {
+    private class GestureListener extends GestureDetector.SimpleOnGestureListener {
         @Override
         public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX,
                 float distanceY) {
-
-            Log.i(TAG, "Dragged, ("+distanceX+", "+distanceY+")");
-
             SectorManager.getInstance().scroll(-(int)distanceX, -(int)distanceY);
             redraw(); // todo: something better? e.g. event listener or something
 
@@ -168,12 +163,9 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
 
             Star star = SectorManager.getInstance().getStarAt(tapX, tapY);
             if (star != null) {
-                Log.i(TAG, "Star at ("+star.getOffsetX()+", "+star.getOffsetY()+") tapped ("+tapX+", "+tapY+").");
                 mSelectedStar = star;
                 redraw();
                 fireStarSelected(star);
-            } else {
-                Log.i(TAG, "No star tapped, tap = ("+tapX+", "+tapY+")");
             }
 
             return false;
