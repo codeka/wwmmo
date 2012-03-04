@@ -53,12 +53,10 @@
         </LinearLayout>
     </LinearLayout>
 
-    <ImageView
+    <au.com.codeka.warworlds.BannerAdView
         android:id="@+id/ad"
-        android:layout_width="320px"
-        android:layout_height="50px"
-        android:layout_gravity="bottom|right"
-        android:contentDescription="Placeholder for ad"
-        android:src="@drawable/testad" />
+        android:layout_width="320dp"
+        android:layout_height="50dp"
+        android:layout_gravity="bottom|right" />
 
 </merge>

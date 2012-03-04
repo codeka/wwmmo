@@ -1,127 +1,123 @@
 <?xml version="1.0" encoding="utf-8"?>
-<merge  xmlns:android="http://schemas.android.com/apk/res/android">
-	<LinearLayout
-		android:layout_width="match_parent"
-		android:layout_height="match_parent"
-		android:baselineAligned="false"
-		android:orientation="horizontal" >
+<merge xmlns:android="http://schemas.android.com/apk/res/android" >
 
-		<LinearLayout
-			android:layout_width="0px"
-			android:layout_weight="1"
-			android:layout_height="match_parent"
-			android:orientation="vertical" >
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:baselineAligned="false"
+        android:orientation="horizontal" >
 
-			<au.com.codeka.warworlds.game.StarfieldSurfaceView
-				android:id="@+id/starfield"
-				android:layout_width="match_parent"
-				android:layout_height="match_parent" />
-		</LinearLayout>
+        <LinearLayout
+            android:layout_width="0px"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical" >
 
-		<LinearLayout
-			android:layout_width="180dp"
-			android:layout_height="match_parent"
-			android:orientation="vertical"
-			style="@style/RightPane">
+            <au.com.codeka.warworlds.game.StarfieldSurfaceView
+                android:id="@+id/starfield"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+        </LinearLayout>
 
-			<LinearLayout
-				android:layout_width="match_parent"
-				android:layout_height="wrap_content"
-				android:orientation="horizontal" >
+        <LinearLayout
+            style="@style/RightPane"
+            android:layout_width="180dp"
+            android:layout_height="match_parent"
+            android:orientation="vertical" >
 
-				<TextView
-					android:id="@+id/username"
-					android:layout_width="0px"
-					android:layout_weight="1"
-					android:paddingLeft="5dip"
-					android:paddingRight="5dip"
-					android:layout_height="wrap_content"
-					android:textAppearance="?android:attr/textAppearanceSmall" />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal" >
 
-				<TextView
-					android:id="@+id/money"
-					android:layout_width="wrap_content"
-					android:layout_height="wrap_content"
-					android:paddingLeft="5dip"
-					android:paddingRight="5dip"
-					android:textAppearance="?android:attr/textAppearanceSmall" />
-			</LinearLayout>
+                <TextView
+                    android:id="@+id/username"
+                    android:layout_width="0px"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:paddingLeft="5dip"
+                    android:paddingRight="5dip"
+                    android:textAppearance="?android:attr/textAppearanceSmall" />
 
-			<TextView
-				android:id="@+id/star_name"
-				android:layout_width="match_parent"
-				android:layout_height="wrap_content"
-				android:gravity="center"
-				android:textAppearance="?android:attr/textAppearanceMedium" />
+                <TextView
+                    android:id="@+id/money"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingLeft="5dip"
+                    android:paddingRight="5dip"
+                    android:textAppearance="?android:attr/textAppearanceSmall" />
+            </LinearLayout>
 
-			<FrameLayout
-			    android:id="@+id/star_loading_container"
-			    android:layout_width="match_parent"
-			    android:layout_height="0px"
-			    android:layout_weight="1"
-			    android:visibility="gone" >
+            <TextView
+                android:id="@+id/star_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
 
-				<ProgressBar
-				    android:id="@+id/star_loading"
-				    android:layout_width="wrap_content"
-				    android:layout_height="wrap_content"
-				    android:layout_gravity="center_horizontal"
-				    android:layout_marginTop="40dp" />
+            <FrameLayout
+                android:id="@+id/star_loading_container"
+                android:layout_width="match_parent"
+                android:layout_height="0px"
+                android:layout_weight="1"
+                android:visibility="gone" >
 
-			</FrameLayout>
+                <ProgressBar
+                    android:id="@+id/star_loading"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginTop="40dp" />
+            </FrameLayout>
 
-			<LinearLayout
-			    android:id="@+id/star_planet_icons_container"
-			    android:layout_width="match_parent"
-			    android:layout_height="wrap_content"
-			    android:layout_marginLeft="8dp"
-			    android:layout_marginRight="8dp" >
+            <LinearLayout
+                android:id="@+id/star_planet_icons_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="8dp" >
 
-				<ImageView
-				    android:layout_width="wrap_content"
-				    android:layout_height="wrap_content"
-				    android:src="@drawable/planet_icon_gasgiant" />
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/planet_icon_gasgiant" />
 
-				<ImageView
-				    android:layout_width="wrap_content"
-				    android:layout_height="wrap_content"
-				    android:src="@drawable/planet_icon_gasgiant" />
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/planet_icon_gasgiant" />
 
-				<ImageView
-				    android:layout_width="wrap_content"
-				    android:layout_height="wrap_content"
-				    android:src="@drawable/planet_icon_gasgiant" />
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/planet_icon_gasgiant" />
 
-				<ImageView
-				    android:layout_width="wrap_content"
-				    android:layout_height="wrap_content"
-				    android:src="@drawable/planet_icon_gasgiant" />
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/planet_icon_gasgiant" />
 
-				<ImageView
-				    android:layout_width="wrap_content"
-				    android:layout_height="wrap_content"
-				    android:src="@drawable/planet_icon_gasgiant" />
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/planet_icon_gasgiant" />
+            </LinearLayout>
 
-			</LinearLayout>
+            <Button
+                android:id="@+id/starfield_zoomin"
+                style="@style/Button"
+                android:layout_width="150dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="10dp"
+                android:text="@string/starfield_zoomin" />
+        </LinearLayout>
+    </LinearLayout>
 
-			<Button
-			    android:id="@+id/starfield_zoomin"
-			    android:layout_width="150dp"
-			    android:layout_height="wrap_content"
-			    android:layout_gravity="center"
-			    android:layout_marginTop="10dp"
-			    android:text="@string/starfield_zoomin"
-			    style="@style/Button" />
-
-		</LinearLayout>
-	</LinearLayout>
-
-	<ImageView
-	    android:id="@+id/ad"
-	    android:layout_width="320px"
-	    android:layout_height="50px"
-	    android:contentDescription="Placeholder for ad"
-	    android:layout_gravity="bottom|right"
-	    android:src="@drawable/testad" />
+    <au.com.codeka.warworlds.BannerAdView
+        android:id="@+id/ad"
+        android:layout_width="320dp"
+        android:layout_height="50dp"
+        android:layout_gravity="bottom|right" />
 
 </merge>
