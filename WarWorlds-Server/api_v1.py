@@ -16,6 +16,7 @@ from google.protobuf import message
 
 from google.appengine.api import users
 import logging
+from datetime import datetime
 
 
 class ApiPage(webapp.RequestHandler):
@@ -47,6 +48,10 @@ class ApiPage(webapp.RequestHandler):
         elif contentType == 'application/x-protobuf':
             pb.ParseFromString(self.request.body)
         return pb
+
+    def _getEmpire(self):
+        """Returns the empire for the current player."""
+        return empire.Empire.getForUser(self.user)
 
     def _empireModelToPb(self, empire_pb, empire_model):
         empire_pb.id = str(empire_model.key().id_or_name())
@@ -266,6 +271,27 @@ class StarPage(StarfieldPage):
         return star_pb
 
 
+class ColoniesPage(ApiPage):
+    def put(self):
+        # TODO: make sure they're actually allow to do this, have a free colonization
+        # ship (or require that the pass in the colonization ship), etc etc etc
+        req = self._getRequestBody(pb.ColonizeRequest)
+        star_model = sector.SectorManager.getStar(req.sector_x, req.sector_y, req.star_id)
+        if star_model is None:
+            self.response.set_status(400)
+            return
+        planet_model = star_model.planets[req.planet_index]
+
+        empire_model = self._getEmpire()
+
+        colony_model = empire.Colony()
+        colony_model.empire = empire_model
+        colony_model.planet = planet_model
+        colony_model.population = 1000
+        colony_model.populationRate = 0.0
+        colony_model.lastSimulation = datetime.now()
+        colony_model.put()
+
 class ApiApplication(webapp.WSGIApplication):
     def __init__(self, *args, **kwargs):
         webapp.WSGIApplication.__init__(self, *args, **kwargs)
@@ -325,5 +351,6 @@ app = ApiApplication([('/api/v1/hello', HelloPage),
                       ('/api/v1/devices/registration:(.+)', DevicesPage),
                       ('/api/v1/devices/user:([^/]+)/messages', DeviceMessagesPage),
                       ('/api/v1/sectors', SectorsPage),
-                      ('/api/v1/sectors/([0-9-]+),([0-9-]+)/stars/([0-9]+)', StarPage)],
+                      ('/api/v1/sectors/([0-9-]+),([0-9-]+)/stars/([0-9]+)', StarPage),
+                      ('/api/v1/colonies', ColoniesPage)],
                      debug=True)

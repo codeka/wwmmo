@@ -8,8 +8,8 @@ import java.util.List;
  */
 public class Sector {
 
-    private long mX;
-    private long mY;
+    protected long mX;
+    protected long mY;
     private List<Star> mStars;
 
     public Sector() {
@@ -51,5 +51,16 @@ public class Sector {
         }
 
         return s;
+    }
+
+    /**
+     * Sometimes a star will just have a reference to a "dummy" sector (this class) so that
+     * we can keep a reference to the sector's (x,y) coordinates.
+     */
+    public static class DummySector extends Sector {
+        public DummySector(long x, long y) {
+            mX = x;
+            mY = y;
+        }
     }
 }

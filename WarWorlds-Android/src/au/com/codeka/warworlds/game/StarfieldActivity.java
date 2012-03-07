@@ -55,8 +55,8 @@ public class StarfieldActivity extends Activity {
         mPlanetIconsContainer.setVisibility(View.GONE);
         zoomInButton.setVisibility(View.GONE);
 
-        EmpireManager empire = EmpireManager.getInstance();
-        mUsername.setText(empire.getDisplayName());
+        EmpireManager empireManager = EmpireManager.getInstance();
+        mUsername.setText(empireManager.getEmpire().getDisplayName());
         mMoney.setText("$ 12,345"); // TODO: empire.getCash()
         mStarName.setText("");
 

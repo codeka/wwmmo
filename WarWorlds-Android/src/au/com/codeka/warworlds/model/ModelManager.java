@@ -31,6 +31,9 @@ public class ModelManager {
                     warworlds.Warworlds.Star pb = ApiClient.getProtoBuf(url,
                             warworlds.Warworlds.Star.class);
                     star = Star.fromProtocolBuffer(pb);
+
+                    // we add a dummy "sector" as well which just has the sector's coordiates.
+                    star.setDummySector(sectorX, sectorY);
                 } catch(Exception e) {
                     // TODO: handle exceptions
                     log.error(ExceptionUtils.getStackTrace(e));
@@ -49,9 +52,8 @@ public class ModelManager {
                 }
             }
         }.execute();
-
     }
-    
+
     public interface StarFetchedHandler {
         void onStarFetched(Star s);
     }

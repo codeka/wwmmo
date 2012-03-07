@@ -1,74 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
-    <!-- Menu item text [CHAR LIMIT=NONE] -->
-    <string name="log_out">Log Out</string>
-
-    <!-- Dialog button [CHAR LIMIT=NONE] -->
-    <string name="add_account">Add account&#8230;</string>
-
-    <!--  Name of the application in the launcher [CHAR LIMIT=NONE] -->
     <string name="app_name">War Worlds</string>
 
-    <!-- Dialog title text [CHAR LIMIT=NONE] -->
-    <string name="attention">Attention</string>
-
-    <!-- Button text [CHAR LIMIT=NONE] -->
-
-    <!-- Message text for "Connect" screen [CHAR LIMIT=NONE] -->
-    <string name="log_in_msg">Before playing War Worlds, you must log in. Choose the Account you wish to authenticate with below.</string>
-
-    <!-- Header text for "Connect" screen [CHAR LIMIT=NONE] -->
-    <string name="log_in_header">Log In</string>
-
-    <!-- Header text for "Connected" screen [CHAR LIMIT=NONE] -->
-    <string name="log_out_header">Log Out</string>
-
-    <!-- Message text [CHAR LIMIT=NONE] -->
-    <string name="contacting_server">Contacting server&#8230;</string>
-
-    <!-- Button text [CHAR LIMIT=NONE] -->
-    <string name="disconnect">Disconnect</string>
-
-    <!-- Informational text for "Connected" screen with placeholder for account name [CHAR LIMIT=NONE] -->
-    <string name="log_out_msg">You are currently logged in as %1$s, are you sure you want to log out?</string>
-
-    <!-- Footer text for "Connect" screen [CHAR LIMIT=NONE] -->
-
-    <!-- Footer text for "Disconnect" screen [CHAR LIMIT=NONE] -->
-
-    <!-- Initial "hello, world" informational message [CHAR LIMIT=NONE] -->
-    <string name="homepage_title_text">War Worlds</string>
-
-    <!-- Initial "hello, world" response message [CHAR LIMIT=NONE] -->
-    <string name="hello_world_text"></string>
-
-    <!-- Dialog message text [CHAR LIMIT=NONE] -->
-    <string name="needs_account">To receive notifications from this app, you must first create an account.</string>
-
-    <!-- Notification message [CHAR LIMIT=NONE] -->
-
-    <!-- Notification message [CHAR LIMIT=NONE] -->
-
-    <!-- Button text [CHAR LIMIT=NONE] -->
-    <string name="start_game">Start Game</string>
-
-    <!-- List view header text [CHAR LIMIT=NONE] -->
-    <string name="log_in_note">Note: Your account details will remain private</string>
-
-    <!-- Dialog button text [CHAR LIMIT=NONE] -->
-    <string name="skip">Skip</string>
-
-    <!-- Notification message [CHAR LIMIT=NONE] -->
-    <string name="options">Options</string>
-    <string name="log_in">Log In</string>
-    <string name="ad_placeholder">Ad Goes Here</string>
-    <string name="empire_setup_welcome">Before you begin, you need to tell us a little about your Empire. Fill in the details below to get started.</string>
-    <string name="empire_setup_name">Give your Empire a name:</string>
+    <!--  Some common button labels -->
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
-    <string name="empire_setup_name_hint">Empire name</string>
     <string name="done">Done</string>
+
+    <!-- "log_in.xml" layout -->
+    <string name="log_in_header">Log In</string>
+    <string name="log_in_note">Note: Your account details will remain private</string>
+    <string name="log_in">Log In</string>
+
+    <string name="log_in_needsaccount_msg">You need a Google Account in order to be able to play War Worlds.</string>
+    <string name="log_in_addaccount">Add Account</string>
+    <string name="log_in_needsaccount_title">No Google Account</string>
+
+    <!-- "log_out.xml" layout -->
+    <string name="log_out_header">Log Out</string>
+    <string name="log_out_msg">You are currently logged in as %1$s, are you sure you want to log out?</string>
+    <string name="log_out">Log Out</string>
+
+    <!-- "home.xml" layout -->
+    <string name="homepage_title_text">War Worlds</string>
+    <string name="start_game">Start Game</string>
+    <string name="options">Options</string>
+
+    <!-- "empire_setup.xml" layout -->
+    <string name="empire_setup_welcome">Before you begin, you need to tell us a little about your Empire. Fill in the details below to get started.</string>
+    <string name="empire_setup_name">Give your Empire a name:</string>
+    <string name="empire_setup_name_hint">Empire name</string>
+
+    <!-- "starfield.xml" layout -->
     <string name="starfield_zoomin">Zoom In</string>
 
+    <!-- "solarsystem.xml" layout -->
+    <string name="solarsystem_colonize">Colonize</string>
 </resources>

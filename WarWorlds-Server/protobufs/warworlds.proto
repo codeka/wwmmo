@@ -195,3 +195,15 @@ message Sectors
 {
 	repeated Sector sectors = 1;
 }
+
+//
+// Represents a request to colonize a planet. PUT this to /colonies to colonize.
+//
+message ColonizeRequest
+{
+	// the parameters that describe the precise planet you want to colonize.
+	required int64 sector_x = 1;
+	required int64 sector_y = 2;
+	required int32 star_id = 3;
+	required int32 planet_index = 4;
+}

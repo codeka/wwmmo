@@ -49,6 +49,10 @@ public class Star {
         return mPlanets;
     }
 
+    public void setDummySector(long sectorX, long sectorY) {
+        mSector = new Sector.DummySector(sectorX, sectorY);
+    }
+
     public static Star fromProtocolBuffer(warworlds.Warworlds.Star pb) {
         return fromProtocolBuffer(null, pb);
     }

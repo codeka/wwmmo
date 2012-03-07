@@ -30,6 +30,7 @@ import android.widget.Button;
 import au.com.codeka.warworlds.api.ApiClient;
 import au.com.codeka.warworlds.game.EmpireManager;
 import au.com.codeka.warworlds.game.StarfieldActivity;
+import au.com.codeka.warworlds.model.Empire;
 
 /**
  * Main activity - requests "Hello, World" messages from the server and provides
@@ -137,7 +138,8 @@ public class WarWorldsActivity extends Activity {
                 } else {
                     if (hello.hasEmpire()) {
                         mNeedsEmpireSetup = false;
-                        EmpireManager.getInstance().setup(hello.getEmpire());
+                        EmpireManager.getInstance().setup(
+                                Empire.fromProtocolBuffer(hello.getEmpire()));
                     } else {
                         mNeedsEmpireSetup = true;
                     }

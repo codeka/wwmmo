@@ -195,7 +195,7 @@ public class SolarSystemSurfaceView extends UniverseElementSurfaceView {
                     }
                 }
             }
-            
+
             if (newPlanet) {
                 firePlanetSelected(mSelectedPlanet.planet);
                 redraw();

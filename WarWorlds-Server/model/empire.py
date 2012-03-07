@@ -40,6 +40,7 @@ class Colony(db.Model):
     eveything up to the point where the property changes, and save the new value.
     """
     planet = db.ReferenceProperty(sector.Planet)
+    empire = db.ReferenceProperty(Empire)
     population = db.IntegerProperty()
     populationRate = db.FloatProperty()
     lastSimulation = db.DateTimeProperty()

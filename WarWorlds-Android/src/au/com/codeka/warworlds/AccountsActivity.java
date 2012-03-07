@@ -116,19 +116,20 @@ public class AccountsActivity extends Activity {
         if (accounts.size() == 0) {
             // Show a dialog and invoke the "Add Account" activity if requested
             AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
-            builder.setMessage(R.string.needs_account);
-            builder.setPositiveButton(R.string.add_account, new DialogInterface.OnClickListener() {
+            builder.setMessage(R.string.log_in_needsaccount_msg);
+            builder.setPositiveButton(R.string.log_in_addaccount, new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int which) {
                     startActivity(new Intent(Settings.ACTION_ADD_ACCOUNT));
                 }
             });
-            builder.setNegativeButton(R.string.skip, new DialogInterface.OnClickListener() {
+            builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int which) {
+                    // TODO: the whole game should exit...
                     finish();
                 }
             });
             builder.setIcon(android.R.drawable.stat_sys_warning);
-            builder.setTitle(R.string.attention);
+            builder.setTitle(R.string.log_in_needsaccount_title);
             builder.show();
         } else {
             final ListView listView = (ListView) findViewById(R.id.select_account);

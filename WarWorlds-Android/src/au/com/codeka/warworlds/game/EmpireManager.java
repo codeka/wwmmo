@@ -1,6 +1,6 @@
 package au.com.codeka.warworlds.game;
 
-import warworlds.Warworlds.Empire;
+import au.com.codeka.warworlds.model.Empire;
 
 /**
  * Manages stuff about your empire (e.g. colonizing planets and whatnot).
@@ -22,18 +22,7 @@ public class EmpireManager {
         mEmpire = empire;
     }
 
-    /**
-     * Gets the display name of this empire.
-     */
-    public String getDisplayName() {
-        return mEmpire.getDisplayName();
-    }
-
-    /**
-     * Gets the identifier of this empire, which is a unique ID you can use to reference
-     * it other places.
-     */
-    public String getID() {
-        return mEmpire.getId();
+    public Empire getEmpire() {
+        return mEmpire;
     }
 }
