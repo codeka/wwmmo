@@ -20,14 +20,15 @@ public class ApiAuthenticator {
     public static String authenticate(String authToken) {
         // construct a login URL that'll work for us
         String url = "/_ah/login?continue=http://localhost/&auth="+authToken;
-        RequestManager.ResultWrapper resp = RequestManager.request("GET", url);
+        RequestManager.ResultWrapper resp = null;
         try {
+            resp = RequestManager.request("GET", url);
             int statusCode = resp.getResponse().getStatusLine().getStatusCode();
             if (statusCode != 302) {
                 log.warn("Authentication failure: {}", resp.getResponse().getStatusLine());
                 return null;
             }
-    
+
             String authCookieValue = null;
             for(Header h : resp.getResponse().getHeaders("Set-Cookie")) {
                 for(String nvp: h.getValue().split(";")) {
@@ -35,24 +36,29 @@ public class ApiAuthenticator {
                     if (nameValue.length != 2) {
                         continue;
                     }
-    
+
                     if (nameValue[0].trim().equalsIgnoreCase("SACSID")) {
                         authCookieValue = nameValue[1].trim();
                     }
                 }
             }
-    
+
             if (authCookieValue == null) {
                 log.warn("Authentication failure: no SACSID cookie found");
                 return null;
             }
-    
+
             String authCookie = "SACSID="+authCookieValue;
             log.info("Authenticated: {}", authCookie);
-    
+
             return authCookie;
+        } catch(ApiException e) {
+            log.warn("Authentication failure", e);
+            return null;
         } finally {
-            resp.close();
+            if (resp != null) {
+                resp.close();
+            }
         }
     }
 }

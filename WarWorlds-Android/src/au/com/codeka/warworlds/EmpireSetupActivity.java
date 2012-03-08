@@ -1,5 +1,8 @@
 package au.com.codeka.warworlds;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import warworlds.Warworlds.Empire;
 import warworlds.Warworlds.Empire.EmpireState;
 import android.app.Activity;
@@ -16,12 +19,14 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
 import au.com.codeka.warworlds.api.ApiClient;
+import au.com.codeka.warworlds.api.ApiException;
 
 /**
  * This activity lets you set up your Empire before you actually join the game. You need
  * to give your Empire a name, race and whatnot.
  */
 public class EmpireSetupActivity extends Activity {
+    private static Logger log = LoggerFactory.getLogger(EmpireSetupActivity.class);
     private Context mContext = this;
 
     @Override
@@ -88,7 +93,12 @@ public class EmpireSetupActivity extends Activity {
                         .setEmail(accountName)
                         .build();
 
-                return ApiClient.putProtoBuf("empires", empire);
+                try {
+                    return ApiClient.putProtoBuf("empires", empire);
+                } catch(ApiException e) {
+                    log.error("An unexpected error occured!", e); // TODO??
+                    return false;
+                }
             }
 
             @Override

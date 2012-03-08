@@ -5,7 +5,6 @@ import java.io.InputStream;
 import java.io.StringWriter;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.net.ConnectException;
 
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
@@ -29,6 +28,7 @@ import android.view.Window;
 import android.webkit.WebView;
 import android.widget.Button;
 import au.com.codeka.warworlds.api.ApiClient;
+import au.com.codeka.warworlds.api.ApiException;
 import au.com.codeka.warworlds.game.EmpireManager;
 import au.com.codeka.warworlds.game.StarfieldActivity;
 import au.com.codeka.warworlds.model.Empire;
@@ -40,6 +40,7 @@ import au.com.codeka.warworlds.model.Empire;
 public class WarWorldsActivity extends Activity {
     private static Logger log = LoggerFactory.getLogger(WarWorldsActivity.class);
     private Context mContext = this;
+    private Button mStartGameButton;
 
     /**
      * Begins the activity.
@@ -124,6 +125,7 @@ public class WarWorldsActivity extends Activity {
 
         new AsyncTask<Void, Void, String>() {
             private boolean mNeedsEmpireSetup;
+            private boolean mErrorOccured;
 
             @Override
             protected String doInBackground(Void... arg0) {
@@ -133,7 +135,7 @@ public class WarWorldsActivity extends Activity {
 
                 // say hello to the server
                 String message;
-            //    try {
+                try {
                     Hello hello = ApiClient.getProtoBuf("hello", Hello.class);
                     if (hello.hasEmpire()) {
                         mNeedsEmpireSetup = false;
@@ -143,9 +145,12 @@ public class WarWorldsActivity extends Activity {
                         mNeedsEmpireSetup = true;
                     }
                     message = hello.getMotd().getMessage();
-            //    } catch(ConnectException e) {
-             //       message = "<p>An error occured talking to the server, check data connection.</p>";
-            //    }
+                    mErrorOccured = false;
+                } catch(ApiException e) {
+                    message = "<p class=\"error\">An error occured talking to the server, check " +
+                              "data connection.</p>";
+                    mErrorOccured = true;
+                }
 
                 String tmpl = getHtmlFile("motd-template.html");
                 return String.format(tmpl, message);
@@ -159,6 +164,10 @@ public class WarWorldsActivity extends Activity {
                 } else {
                     motdView.loadData(result, "text/html", "utf-8");
                     setWebViewTransparent(motdView);
+                }
+
+                if (mErrorOccured) {
+                    mStartGameButton.setEnabled(false);
                 }
             }
         }.execute();
@@ -191,7 +200,7 @@ public class WarWorldsActivity extends Activity {
     private void setHomeScreenContent() {
         setContentView(R.layout.home);
 
-        final Button startGameButton = (Button) findViewById(R.id.start_game_btn);
+        mStartGameButton = (Button) findViewById(R.id.start_game_btn);
         final Button logOutButton = (Button) findViewById(R.id.log_out_btn);
 
         final WebView motd = (WebView) findViewById(R.id.home_motd);
@@ -203,9 +212,9 @@ public class WarWorldsActivity extends Activity {
             }
         });
 
-        startGameButton.setOnClickListener(new OnClickListener() {
+        mStartGameButton.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
-                startGameButton.setEnabled(false);
+                mStartGameButton.setEnabled(false);
                 startActivity(new Intent(mContext, StarfieldActivity.class));
             }
         });

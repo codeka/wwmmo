@@ -1,6 +1,7 @@
 package au.com.codeka.warworlds.api;
 
 import java.io.IOException;
+import java.net.ConnectException;
 import java.net.Socket;
 import java.net.URI;
 import java.net.UnknownHostException;
@@ -60,7 +61,7 @@ public class RequestManager {
      * @param url The URL, relative to the \c baseUri we were configured with.
      * @return A \c ResultWrapper representing the server's response (if any)
      */
-    public static ResultWrapper request(String method, String url) {
+    public static ResultWrapper request(String method, String url) throws ApiException {
         return request(method, url, null, null);
     }
 
@@ -75,7 +76,7 @@ public class RequestManager {
      * @return A \c ResultWrapper representing the server's response (if any)
      */
     public static ResultWrapper request(String method, String url,
-            Map<String, List<String>> extraHeaders) {
+            Map<String, List<String>> extraHeaders) throws ApiException {
         return request(method, url, extraHeaders, null);
     }
 
@@ -90,7 +91,7 @@ public class RequestManager {
      * @return A \c ResultWrapper representing the server's response (if any)
      */
     public static ResultWrapper request(String method, String url,
-            Map<String, List<String>> extraHeaders, HttpEntity body) {
+            Map<String, List<String>> extraHeaders, HttpEntity body) throws ApiException {
         HttpClientConnection conn = null;
 
         URI uri = sBaseUri.resolve(url);
@@ -144,10 +145,7 @@ public class RequestManager {
 
                 return new ResultWrapper(conn, response);
             } catch (Exception e) {
-                if (!canRetry(e)) {
-                    log.error("Got non-retryable exception making request to "+uri, e);
-                    return null;
-                } else if (numAttempts == 0) {
+                if (canRetry(e) && numAttempts == 0) {
                     log.warn("Got retryable exception making request to "+url, e);
 
                     // Note: the connection doesn't go back in the pool, and we'll close this
@@ -157,9 +155,14 @@ public class RequestManager {
                     } catch (IOException e1) {
                         // ignore errors
                     }
-                } else if (numAttempts >= 5) {
-                    log.error("Got "+numAttempts+" retryable exceptions (giving up) making request to"+url, e);
-                    return null;
+                } else {
+                    if (numAttempts >= 5) {
+                        log.error("Got "+numAttempts+" retryable exceptions (giving up) making request to"+url, e);
+                    } else {
+                        log.error("Got non-retryable exception making request to "+uri, e);
+                    }
+
+                    throw new ApiException("Error performing "+method+" "+url, e);
                 }
             }
         }
@@ -180,7 +183,11 @@ public class RequestManager {
      * Determines whether the given exception is re-tryable or not.
      */
     private static boolean canRetry(Exception e) {
-        return true; // TODO actually check...
+        if (e instanceof ConnectException) {
+            return false;
+        }
+
+        return true;
     }
 
     /**

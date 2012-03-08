@@ -57,7 +57,7 @@ public class ApiClient {
      * \param protoBuffFactory the class that we want to fetch, this will also determine
      *        the return value of this method.
      */
-    public static <T> T getProtoBuf(String url, Class<T> protoBuffFactory) {
+    public static <T> T getProtoBuf(String url, Class<T> protoBuffFactory) throws ApiException {
         Map<String, List<String>> headers = getHeaders();
 
         RequestManager.ResultWrapper res = RequestManager.request("GET", url, headers);
@@ -79,7 +79,7 @@ public class ApiClient {
      * Uses the "PUT" HTTP method to put a protocol buffer at the given URL. This is useful when
      * you don't expect a response (other than "201", success)
      */
-    public static boolean putProtoBuf(String url, Message pb) {
+    public static boolean putProtoBuf(String url, Message pb) throws ApiException{
         Map<String, List<String>> headers = getHeaders();
 
         ByteArrayEntity body = new ByteArrayEntity(pb.toByteArray());
@@ -103,7 +103,8 @@ public class ApiClient {
     /**
      * Uses the "PUT" HTTP method to put a protocol buffer at the given URL.
      */
-    public static <T> T putProtoBuf(String url, Message pb, Class<T> protoBuffFactory) {
+    public static <T> T putProtoBuf(String url, Message pb, Class<T> protoBuffFactory)
+            throws ApiException {
         Map<String, List<String>> headers = getHeaders();
 
         ByteArrayEntity body = new ByteArrayEntity(pb.toByteArray());
@@ -126,7 +127,7 @@ public class ApiClient {
     /**
      * Sends a HTTP 'DELETE' to the given URL.
      */
-    public static void delete(String url) {
+    public static void delete(String url) throws ApiException {
         Map<String, List<String>> headers = getHeaders();
 
         RequestManager.ResultWrapper res = RequestManager.request("DELETE", url, headers);
