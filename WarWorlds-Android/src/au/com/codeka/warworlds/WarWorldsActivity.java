@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.io.StringWriter;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.net.ConnectException;
 
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
@@ -131,11 +132,9 @@ public class WarWorldsActivity extends Activity {
                 ApiClient.getCookies().add(authCookie);
 
                 // say hello to the server
-                Hello hello = ApiClient.getProtoBuf("hello", Hello.class);
                 String message;
-                if (hello == null) {
-                    message = "<pre>Try logging in and out again.</pre>";
-                } else {
+            //    try {
+                    Hello hello = ApiClient.getProtoBuf("hello", Hello.class);
                     if (hello.hasEmpire()) {
                         mNeedsEmpireSetup = false;
                         EmpireManager.getInstance().setup(
@@ -144,7 +143,9 @@ public class WarWorldsActivity extends Activity {
                         mNeedsEmpireSetup = true;
                     }
                     message = hello.getMotd().getMessage();
-                }
+            //    } catch(ConnectException e) {
+             //       message = "<p>An error occured talking to the server, check data connection.</p>";
+            //    }
 
                 String tmpl = getHtmlFile("motd-template.html");
                 return String.format(tmpl, message);

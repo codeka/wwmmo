@@ -25,6 +25,9 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
     private Logger log = LoggerFactory.getLogger(StarfieldSurfaceView.class);
     private CopyOnWriteArrayList<OnStarSelectedListener> mStarSelectedListeners;
     private Star mSelectedStar;
+    private Paint mStarPaint = null;
+    private Paint mStarNamePaint = null;
+    private Paint mSelectionPaint = null;
 
     public StarfieldSurfaceView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -109,9 +112,15 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
         for(Star star : sector.getStars()) {
             drawStar(canvas, star, offsetX, offsetY);
         }
+        for(Star star : sector.getStars()) {
+            drawStarName(canvas, star, offsetX, offsetY);
+        }
     }
 
-    private Paint mStarPaint = null;
+    /**
+     * Draws a single star. Note that we draw all stars first, then the names of stars
+     * after.
+     */
     private void drawStar(Canvas canvas, Star star, int x, int y) {
         x += star.getOffsetX();
         y += star.getOffsetY();
@@ -130,11 +139,34 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
         canvas.drawCircle(x, y, star.getSize(), mStarPaint);
 
         if (mSelectedStar == star) {
-            Paint p2 = new Paint();
-            p2.setARGB(255, 255, 255, 255);
-            p2.setStyle(Style.STROKE);
-            canvas.drawCircle(x, y, star.getSize() + 5, p2);
+            if (mSelectionPaint == null) {
+                mSelectionPaint = new Paint();
+                mSelectionPaint.setARGB(255, 255, 255, 255);
+                mSelectionPaint.setStyle(Style.STROKE);
+            }
+            canvas.drawCircle(x, y, star.getSize() + 5, mSelectionPaint);
         }
+    }
+
+    /**
+     * Draws a single star. Note that we draw all stars first, then the names of stars
+     * after.
+     */
+    private void drawStarName(Canvas canvas, Star star, int x, int y) {
+        x += star.getOffsetX();
+        y += star.getOffsetY();
+
+        if (mStarNamePaint == null) {
+            mStarNamePaint = new Paint();
+            mStarNamePaint.setStyle(Style.STROKE);
+        }
+        mStarNamePaint.setARGB(255, 255, 255, 255);
+
+        float width = mStarNamePaint.measureText(star.getName());
+        x -= (width / 2.0);
+        y += star.getSize() + 10;
+
+        canvas.drawText(star.getName(), x, y, mStarNamePaint);
     }
 
     /**

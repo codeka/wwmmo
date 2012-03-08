@@ -226,6 +226,7 @@ class StarfieldPage(ApiPage):
         planet_pb.planet_type = planet_model.planetTypeID+1
         planet_pb.size = planet_model.size
 
+
 class SectorsPage(StarfieldPage):
     def get(self):
         if self.request.get('coords') != '':
@@ -291,6 +292,7 @@ class ColoniesPage(ApiPage):
         colony_model.populationRate = 0.0
         colony_model.lastSimulation = datetime.now()
         colony_model.put()
+
 
 class ApiApplication(webapp.WSGIApplication):
     def __init__(self, *args, **kwargs):
