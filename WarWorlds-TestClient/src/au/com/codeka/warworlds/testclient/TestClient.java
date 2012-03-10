@@ -5,6 +5,7 @@ import java.net.URISyntaxException;
 
 import warworlds.Warworlds.MessageOfTheDay;
 import au.com.codeka.warworlds.api.ApiClient;
+import au.com.codeka.warworlds.api.ApiException;
 
 public class TestClient {
     public static void main(String[] args) {
@@ -17,6 +18,8 @@ public class TestClient {
 
             motd = ApiClient.getProtoBuf("motd", MessageOfTheDay.class);
             System.out.println(motd.getMessage());
+        } catch (ApiException e) {
+            // TODO
         } catch (URISyntaxException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
