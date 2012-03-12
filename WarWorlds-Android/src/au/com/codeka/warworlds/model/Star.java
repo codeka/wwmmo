@@ -1,5 +1,8 @@
 package au.com.codeka.warworlds.model;
 
+import java.util.ArrayList;
+import java.util.List;
+
 
 public class Star {
     private Sector mSector;
@@ -11,10 +14,12 @@ public class Star {
     private int mOffsetY;
     private int mNumPlanets;
     private Planet[] mPlanets;
+    private ArrayList<Colony> mColonies;
 
     public Star() {
         mSector = null; // can be null if we're fetched separately from the sector
         mPlanets = null; // can be null if planets have not been populated...
+        mColonies = null;
     }
 
     public Sector getSector() {
@@ -48,6 +53,16 @@ public class Star {
     public Planet[] getPlanets() {
         return mPlanets;
     }
+    public List<Colony> getColonies() {
+        return mColonies;
+    }
+
+    public void addColony(Colony colony) {
+        if (mColonies == null) {
+            mColonies = new ArrayList<Colony>();
+        }
+        mColonies.add(colony);
+    }
 
     public void setDummySector(long sectorX, long sectorY) {
         mSector = new Sector.DummySector(sectorX, sectorY);
@@ -77,6 +92,11 @@ public class Star {
             for (int i = 0; i < numPlanets; i++) {
                 s.mPlanets[i] = Planet.fromProtocolBuffer(s, pb.getPlanets(i));
             }
+        }
+
+        s.mColonies = new ArrayList<Colony>();
+        for(warworlds.Warworlds.Colony colony_pb : pb.getColoniesList()) {
+            s.mColonies.add(Colony.fromProtocolBuffer(colony_pb));
         }
 
         return s;

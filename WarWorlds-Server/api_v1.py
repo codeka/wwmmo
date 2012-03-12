@@ -33,6 +33,10 @@ class ApiPage(webapp.RequestHandler):
 
         return super(ApiPage, self).dispatch()
 
+    def _isAdmin(self):
+        # TODO: better version of "isAdmin!"
+        return self.user.email() == 'dean@codeka.com.au'
+
     def _getRequestBody(self, ProtoBuffClass):
         """ Gets the body of the request as a protocol buffer.
 
@@ -66,13 +70,27 @@ class ApiPage(webapp.RequestHandler):
             empire_model.user = users.User(empire_pb.email)
         empire_model.state = empire_pb.state
 
+    def _colonyModelToPb(self, colony_pb, colony_model):
+        colony_pb.key = str(colony_model.key())
+        colony_pb.empire_key = str(empire.Colony.empire.get_value_for_datastore(colony_model))
+        colony_pb.star_key = str(empire.Colony.star.get_value_for_datastore(colony_model))
+        colony_pb.planet_key = str(empire.Colony.planet.get_value_for_datastore(colony_model))
+
+        colony_pb.population = colony_model.population
+        colony_pb.population_rate = colony_model.populationRate
+        #colony_pb.last_simulation = colony_model.lastSimulation
+
 
 class HelloPage(ApiPage):
-    """The 'hello' page is what you request when you first connect.
-    """
+    """The 'hello' page is what you request when you first connect."""
     def get(self):
+        user = self.user
+        if self._isAdmin() and self.request.get("email", "") != "":
+            # useful for testing as an administrator what this would return for another user...
+            user = users.User(self.request.get("email"))
         motd_model = model.MessageOfTheDay.get()
-        empire_model = empire.Empire.getForUser(self.user)
+        empire_model = empire.Empire.getForUser(user)
+        colony_models = empire.Colony.getForEmpire(empire_model)
 
         hello_pb = pb.Hello()
         if motd_model is not None:
@@ -84,6 +102,10 @@ class HelloPage(ApiPage):
 
         if empire_model is not None:
             self._empireModelToPb(hello_pb.empire, empire_model)
+
+        for colony_model in colony_models:
+            colony_pb = hello_pb.colonies.add()
+            self._colonyModelToPb(colony_pb, colony_model)
 
         return hello_pb
 
@@ -272,6 +294,10 @@ class SectorsPage(StarfieldPage):
                 star_pb = sector_pb.stars.add()
                 self._starModelToPb(star_pb, star_model)
 
+            for colony_model in empire.Colony.getForSector(sector_model):
+                colony_pb = sector_pb.colonies.add()
+                self._colonyModelToPb(colony_pb, colony_model)
+
 
 class StarPage(StarfieldPage):
     def get(self, key):
@@ -282,6 +308,11 @@ class StarPage(StarfieldPage):
 
         star_pb = pb.Star()
         self._starModelToPb(star_pb, star_model)
+
+        for colony_model in empire.Colony.getForStar(star_model):
+            colony_pb = star_pb.colonies.add()
+            self._colonyModelToPb(colony_pb, colony_model)
+
         return star_pb
 
 

@@ -127,6 +127,9 @@ message Sector
 
 	// the collection of stars in this sector.
 	repeated Star stars = 3;
+
+	// a collection of colonies in this sector (TODO: full colony details? probably not needed...)
+	repeated Colony colonies = 4;
 }
 
 //
@@ -160,6 +163,9 @@ message Star
 
 	// the collection of planets orbiting this star (may be empty)
 	repeated Planet planets = 8;
+
+	// collection of colonies on our planet(s)
+	repeated Colony colonies = 9;
 }
 
 //

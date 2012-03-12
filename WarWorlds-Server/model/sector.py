@@ -130,6 +130,7 @@ class SectorManager:
         star.planets = []
         for planet in planetQuery:
             star.planets.append(planet)
+
         return star
 
     @staticmethod

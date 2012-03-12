@@ -47,3 +47,24 @@ class Colony(db.Model):
     populationRate = db.FloatProperty()
     lastSimulation = db.DateTimeProperty()
 
+    @staticmethod
+    def getForEmpire(empire_model):
+        query = Colony.all().filter("empire", empire_model)
+        return Colony._getForQuery(query)
+
+    @staticmethod
+    def getForSector(sector_model):
+        query = Colony.all().filter("sector", sector_model)
+        return Colony._getForQuery(query)
+
+    @staticmethod
+    def getForStar(star_model):
+        query = Colony.all().filter("star", star_model)
+        return Colony._getForQuery(query)
+
+    @staticmethod
+    def _getForQuery(query):
+        colonies = []
+        for colony in query:
+            colonies.append(colony)
+        return colonies

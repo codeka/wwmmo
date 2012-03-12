@@ -3,10 +3,14 @@ package au.com.codeka.warworlds.model;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * A \c Sector represents a "section" of space, with corresponding stars, planets and so on.
  */
 public class Sector {
+    private static Logger log = LoggerFactory.getLogger(Sector.class);
 
     protected long mX;
     protected long mY;
@@ -48,6 +52,22 @@ public class Sector {
         s.mY = pb.getY();
         for (warworlds.Warworlds.Star star_pb : pb.getStarsList()) {
             s.mStars.add(Star.fromProtocolBuffer(s, star_pb));
+        }
+
+        // could this be more efficient? there's not a lot of stars, so maybe not a big deal
+        for (warworlds.Warworlds.Colony colony_pb : pb.getColoniesList()) {
+            boolean found = false;
+            for (Star star : s.mStars) {
+                if (colony_pb.getStarKey().equals(star.getKey())) {
+                    star.addColony(Colony.fromProtocolBuffer(colony_pb));
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) {
+                log.error("Could not find star that colony {} belongs to! (Apparently, {})",
+                        colony_pb.getKey(), colony_pb.getStarKey());
+            }
         }
 
         return s;

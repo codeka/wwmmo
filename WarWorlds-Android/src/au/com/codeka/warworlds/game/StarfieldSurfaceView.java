@@ -1,11 +1,14 @@
 package au.com.codeka.warworlds.game;
 
+import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -14,6 +17,8 @@ import android.graphics.RadialGradient;
 import android.util.AttributeSet;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
+import au.com.codeka.warworlds.R;
+import au.com.codeka.warworlds.model.Colony;
 import au.com.codeka.warworlds.model.Sector;
 import au.com.codeka.warworlds.model.Star;
 
@@ -28,6 +33,7 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
     private Paint mStarPaint = null;
     private Paint mStarNamePaint = null;
     private Paint mSelectionPaint = null;
+    private Bitmap mColonyIcon = null;
 
     public StarfieldSurfaceView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -39,6 +45,11 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
 
         mStarSelectedListeners = new CopyOnWriteArrayList<OnStarSelectedListener>();
         mSelectedStar = null;
+        mColonyIcon = BitmapFactory.decodeResource(getResources(), R.drawable.starfield_colony);
+
+        mSelectionPaint = new Paint();
+        mSelectionPaint.setARGB(255, 255, 255, 255);
+        mSelectionPaint.setStyle(Style.STROKE);
 
         SectorManager.getInstance().addSectorListChangedListener(new SectorManager.OnSectorListChangedListener() {
             @Override
@@ -139,12 +150,12 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
         canvas.drawCircle(x, y, star.getSize(), mStarPaint);
 
         if (mSelectedStar == star) {
-            if (mSelectionPaint == null) {
-                mSelectionPaint = new Paint();
-                mSelectionPaint.setARGB(255, 255, 255, 255);
-                mSelectionPaint.setStyle(Style.STROKE);
-            }
             canvas.drawCircle(x, y, star.getSize() + 5, mSelectionPaint);
+        }
+
+        List<Colony> colonies = star.getColonies();
+        if (colonies != null && !colonies.isEmpty()) {
+            canvas.drawBitmap(mColonyIcon, x + 10.0f, y - 10.0f, mSelectionPaint);
         }
     }
 
