@@ -41,23 +41,6 @@ import au.com.codeka.warworlds.api.ApiClient;
 public class Util {
     private static Logger log = LoggerFactory.getLogger(Util.class);
 
-    // Shared constants
-
-    /**
-     * Key for account name in shared preferences.
-     */
-    public static final String ACCOUNT_NAME = "accountName";
-
-    /**
-     * Key for device registration id in shared preferences.
-     */
-    public static final String DEVICE_REGISTRATION_ID = "deviceRegistrationID";
-
-    /**
-     * An intent name for receiving registration/unregistration status.
-     */
-    public static final String UPDATE_UI_INTENT = getPackageName() + ".UPDATE_UI";
-
     /**
      * Key for shared preferences.
      */
@@ -153,24 +136,12 @@ public class Util {
     }
 
     /**
-     * Removes all traces of our device's registration from the preferences.
-     */
-    public static void clearDeviceRegistration(Context context) {
-        SharedPreferences prefs = context.getSharedPreferences(SHARED_PREFS, 0);
-
-        SharedPreferences.Editor editor = prefs.edit();
-        editor.remove(Util.ACCOUNT_NAME);
-        editor.remove(Util.DEVICE_REGISTRATION_ID);
-        editor.commit();
-    }
-
-    /**
      * Helper method to get a SharedPreferences instance.
      */
     public static SharedPreferences getSharedPreferences(Context context) {
         SharedPreferences prefs = context.getSharedPreferences(SHARED_PREFS, 0);
 
-        String savedBaseUrl = prefs.getString("pref.baseUrl", "");
+        String savedBaseUrl = prefs.getString("Util.baseUrl", "");
         String baseUrl = getBaseUrl();
         if (!savedBaseUrl.equalsIgnoreCase(baseUrl)) {
             // if the base URL has changed, it means we're now talking to a
@@ -178,21 +149,14 @@ public class Util {
             // to clear out some preferences first.
             log.warn("BaseURL has changed (\""+baseUrl+"\" != \""+savedBaseUrl+"\"), clearing device registration");
 
-            clearDeviceRegistration(context);
-
             prefs = context.getSharedPreferences(SHARED_PREFS, 0);
             SharedPreferences.Editor editor = prefs.edit();
-            editor.putString("pref.baseUrl", baseUrl);
+            editor.remove("DeviceRegistrar.registrationKey");
+            editor.remove("AccountName");
+            editor.putString("Util.baseUrl", baseUrl);
             editor.commit();
         }
 
         return prefs;
-    }
-
-    /**
-     * Returns the package name of this class.
-     */
-    private static String getPackageName() {
-        return Util.class.getPackage().getName();
     }
 }

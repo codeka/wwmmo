@@ -62,8 +62,7 @@ public class WarWorldsActivity extends Activity {
         super.onResume();
 
         SharedPreferences prefs = Util.getSharedPreferences(mContext);
-        String deviceRegistrationID = prefs.getString(Util.DEVICE_REGISTRATION_ID, null);
-        if (deviceRegistrationID == null) {
+        if (prefs.getString("AccountName", null) == null) {
             startActivity(new Intent(this, AccountsActivity.class));
             return;
         }
@@ -118,7 +117,7 @@ public class WarWorldsActivity extends Activity {
 
         // if we've saved off the authentication cookie, cool!
         SharedPreferences prefs = Util.getSharedPreferences(mContext);
-        final String accountName = prefs.getString(Util.ACCOUNT_NAME, null);
+        final String accountName = prefs.getString("AccountName", null);
         if (accountName == null) {
             // TODO error!
         }

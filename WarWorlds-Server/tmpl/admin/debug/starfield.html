@@ -10,6 +10,9 @@
 		form input[type=text] {
 			width: 100px;
 		}
+		#star-input-form input[type=text] {
+			width: 400px;
+		}
 	</style>
 {% endblock %}
 
@@ -27,10 +30,7 @@
 		<input type="submit" value="Display">
 	</form>
 	<form id="star-input-form">
-		Star: (
-			<input type="number" name="sectorX" value="0">,
-			<input type="number" name="sectorY" value="0">
-		) <input type="number" name="starID" value="1">
+		Star: <input type="text" name="starKey" value="">
 		<input type="submit" value="Display">
 	</form>
 	<form id="update-form">
@@ -64,11 +64,9 @@
 
 		$("#star-input-form").on("click", "input[type=submit]", function(evnt) {
 			evnt.preventDefault();
-			var $sectorX = $("#star-input-form input[name=sectorX]");
-			var $sectorY = $("#star-input-form input[name=sectorY]");
-			var $starID = $("#star-input-form input[name=starID]");
+			var $starKey = $("#star-input-form input[name=starKey]");
 
-			var url = "/api/v1/sectors/"+$sectorX.val()+","+$sectorY.val()+"/stars/"+$starID.val();
+			var url = "/api/v1/stars/"+$starKey.val();
 			$.ajax({
 				url: url,
 				dataType: "json",

@@ -7,6 +7,7 @@ import android.view.Window;
 import android.widget.Button;
 import android.widget.TextView;
 import au.com.codeka.warworlds.R;
+import au.com.codeka.warworlds.model.Colony;
 import au.com.codeka.warworlds.model.Empire;
 import au.com.codeka.warworlds.model.ModelManager;
 import au.com.codeka.warworlds.model.Planet;
@@ -48,9 +49,9 @@ public class SolarSystemActivity extends Activity {
         if (extras != null) {
             long sectorX = extras.getLong("au.com.codeka.warworlds.SectorX");
             long sectorY = extras.getLong("au.com.codeka.warworlds.SectorY");
-            int starID = extras.getInt("au.com.codeka.warworlds.StarID");
+            String starKey = extras.getString("au.com.codeka.warworlds.StarKey");
 
-            ModelManager.requestStar(sectorX, sectorY, starID, new StarFetchedHandler() {
+            ModelManager.requestStar(sectorX, sectorY, starKey, new StarFetchedHandler() {
                 @Override
                 public void onStarFetched(Star s) {
                     mSolarSystemSurfaceView.setStar(s);
@@ -83,7 +84,7 @@ public class SolarSystemActivity extends Activity {
 
         EmpireManager.getInstance().getEmpire().colonize(planet, new Empire.ColonizeCompleteHandler() {
             @Override
-            public void onColonizeComplete(boolean success) {
+            public void onColonizeComplete(Colony colony) {
                 // TODO: ??
             }
         });

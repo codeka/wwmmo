@@ -54,18 +54,6 @@ class DeviceRegistration(db.Model):
         return DeviceRegistration._getByQuery(query)
 
     @staticmethod
-    def getByRegistrationID(deviceRegistrationID):
-        """ Returns a device registration, given the deviceRegistrationID.
-        """
-        query = DeviceRegistration.all().filter('deviceRegistrationID', deviceRegistrationID)
-        devices = DeviceRegistration._getByQuery(query)
-        # there's only one so we just return that
-        if len(devices) == 1:
-            return devices[0]
-        else:
-            return None
-
-    @staticmethod
     def _getByQuery(query):
         results = []
         for result in query:

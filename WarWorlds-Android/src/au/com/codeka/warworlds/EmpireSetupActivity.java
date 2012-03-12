@@ -77,7 +77,7 @@ public class EmpireSetupActivity extends Activity {
     private void saveEmpire(final String empireName) {
         // if we've saved off the authentication cookie, cool!
         SharedPreferences prefs = Util.getSharedPreferences(mContext);
-        final String accountName = prefs.getString(Util.ACCOUNT_NAME, null);
+        final String accountName = prefs.getString("AccountName", null);
         if (accountName == null) {
             // TODO error!
         }

@@ -5,7 +5,7 @@ Created on 27/02/2012
 '''
 
 from google.appengine.ext import db
-import logging
+#import logging
 import sector
 
 
@@ -20,7 +20,7 @@ class Empire(db.Model):
     def getForUser(user):
         result = Empire.all().filter("user", user).fetch(1, 0)
         if len(result) != 1:
-            return result[0]
+            return None
         return result[0]
 
     class State:
@@ -40,6 +40,8 @@ class Colony(db.Model):
     eveything up to the point where the property changes, and save the new value.
     """
     planet = db.ReferenceProperty(sector.Planet)
+    star = db.ReferenceProperty(sector.Star)
+    sector = db.ReferenceProperty(sector.Sector)
     empire = db.ReferenceProperty(Empire)
     population = db.IntegerProperty()
     populationRate = db.FloatProperty()

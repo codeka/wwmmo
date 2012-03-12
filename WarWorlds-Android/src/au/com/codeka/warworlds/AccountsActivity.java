@@ -79,8 +79,8 @@ public class AccountsActivity extends Activity {
         requestWindowFeature(Window.FEATURE_NO_TITLE); // remove the title bar
 
         SharedPreferences prefs = Util.getSharedPreferences(mContext);
-        String deviceRegistrationID = prefs.getString(Util.DEVICE_REGISTRATION_ID, null);
-        if (deviceRegistrationID == null) {
+        String accountName = prefs.getString("AccountName", null);
+        if (accountName == null) {
             // Show the 'connect' screen if we are not connected
             setScreenContent(R.layout.log_in);
         } else {
@@ -101,7 +101,7 @@ public class AccountsActivity extends Activity {
             if (regId != null && ! "".equals(regId)) {
                 DeviceRegistrar.register(mContext, regId);
             } else {
-                C2DMessaging.register(mContext, Setup.SENDER_ID);
+                C2DMessaging.register(mContext, Util.getProperties().getProperty("cd2m.sender-id"));
             }
         }
     }
@@ -165,7 +165,7 @@ public class AccountsActivity extends Activity {
      */
     private void setLogOutScreenContent() {
         final SharedPreferences prefs = Util.getSharedPreferences(mContext);
-        String accountName = prefs.getString(Util.ACCOUNT_NAME, "Unknown");
+        String accountName = prefs.getString("AccountName", "Unknown");
 
         // Format the disconnect message with the currently connected account name
         TextView logOutMsg = (TextView) findViewById(R.id.log_out_msg);
@@ -224,8 +224,7 @@ public class AccountsActivity extends Activity {
         // Store the account name in shared preferences
         final SharedPreferences prefs = Util.getSharedPreferences(mContext);
         SharedPreferences.Editor editor = prefs.edit();
-        editor.putString(Util.ACCOUNT_NAME, accountName);
-        editor.remove(Util.DEVICE_REGISTRATION_ID);
+        editor.putString("AccountName", accountName);
         editor.commit();
 
         log.info("Registering \"{}\"...", accountName);
@@ -237,7 +236,8 @@ public class AccountsActivity extends Activity {
             protected Void doInBackground(Void... arg0) {
                 String authCookie = Authenticator.authenticate(AccountsActivity.this, accountName);
                 ApiClient.getCookies().add(authCookie);
-                C2DMReceiver.register(AccountsActivity.this, Setup.SENDER_ID, onComplete);
+                String senderID = Util.getProperties().getProperty("c2dm.sender-id");
+                C2DMReceiver.register(AccountsActivity.this, senderID, onComplete);
 
                 // re-configure the authenticator, making sure it has details of the new user.
                 Authenticator.configure(mContext);
@@ -249,11 +249,21 @@ public class AccountsActivity extends Activity {
 
     private void unregister(final Callable<Void> onComplete) {
         mPleaseWaitDialog = ProgressDialog.show(mContext, null, "Logging out...", true);
+        C2DMReceiver.unregister(this, new Callable<Void>() {
+            public Void call() {
+                final SharedPreferences prefs = Util.getSharedPreferences(mContext);
+                SharedPreferences.Editor editor = prefs.edit();
+                editor.remove("AccountName");
+                editor.commit();
 
-        C2DMReceiver.unregister(this, onComplete);
+                try {
+                    onComplete.call();
+                } catch(Exception e) {
+                }
+                return null;
+            }
+        });
     }
-
-    // Utility Methods
 
     /**
      * Returns a list of registered Google account names. If no Google accounts

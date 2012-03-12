@@ -105,17 +105,32 @@ public class ApiClient {
      */
     public static <T> T putProtoBuf(String url, Message pb, Class<T> protoBuffFactory)
             throws ApiException {
+        return putOrPostProtoBuff("PUT", url, pb, protoBuffFactory);
+
+    }
+
+    /**
+     * Uses the "POST" HTTP method to post a protocol buffer at the given URL.
+     */
+    public static <T> T postProtoBuf(String url, Message pb, Class<T> protoBuffFactory)
+            throws ApiException {
+        return putOrPostProtoBuff("POST", url, pb, protoBuffFactory);
+    }
+
+    private static <T> T putOrPostProtoBuff(String method, String url, Message pb, 
+            Class<T> protoBuffFactory) throws ApiException {
         Map<String, List<String>> headers = getHeaders();
 
         ByteArrayEntity body = new ByteArrayEntity(pb.toByteArray());
         body.setContentType("application/x-protobuf");
 
-        RequestManager.ResultWrapper res = RequestManager.request("PUT", url, headers, body);
+        RequestManager.ResultWrapper res = RequestManager.request(method, url, headers, body);
         try {
             HttpResponse resp = res.getResponse();
             int statusCode = resp.getStatusLine().getStatusCode();
             if (statusCode < 200 || statusCode > 299) {
-                log.warn("API \"PUT {}\" returned {}", url, resp.getStatusLine());
+                log.warn("API \"{} {}\" returned {}", new Object[] {
+                        method, url, resp.getStatusLine()});
             }
 
             return parseResponseBody(resp, protoBuffFactory);

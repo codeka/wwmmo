@@ -24,7 +24,7 @@ message Empire
 {
 	// A unique identifier for the empire, useful for referencing him in other parts of the
 	// system. This won't be present in the initial "PUT"
-	optional string id = 1;
+	optional string key = 1;
 
 	// The "display" name for the player, which is what other players see.
 	required string display_name = 2;
@@ -57,6 +57,10 @@ message Hello
 	// If specified, the Empire you're currently logged in as (if not specified, it means
 	// you haven't set up an empire yet, and you should do that before anything else...)
 	optional Empire empire = 2;
+
+	// The list of colonies your empire owns. Typically, you'll want to start the
+	// starfield view centred on one of your own colonies...
+	repeated Colony colonies = 3;
 }
 
 //
@@ -65,13 +69,17 @@ message Hello
 //
 message DeviceRegistration
 {
+	// Unique identifier for this particuilar registration (similar to device_registration_id,
+	// but that's specific to C2DN and is kind a long and unweildy string).
+	optional string key = 1;
+
 	// The identifier of the device. You can have multiple accounts on one device, this
 	// will then refer to the device itself.
-	required string device_id = 1;
+	required string device_id = 2;
 
 	// The identifier of this *registration*. You can register one account on one device,
 	// but you could have the same account on multiple devices, too.
-	required string device_registration_id = 2;
+	required string device_registration_id = 3;
 
 	// The value of android.os.Build.MODEL for this device
 	required string device_model = 4;
@@ -89,7 +97,7 @@ message DeviceRegistration
 	// If set, this is the user that the device belongs to. This is usually only returned
 	// when you fetch registrations, adding registrations you can obviously only register
 	// to yourself (i.e. if this is present, it's ignored anyway)
-	optional string user = 3;
+	optional string user = 8;
 }
 
 //
@@ -127,10 +135,8 @@ message Sector
 //
 message Star
 {
-	// the identifier of the star, which is only gauranteed to be unique inside the
-	// star's sector (so the "global unique" identifier for a star is always going to be
-	// (sectorX, sectorY, starID)
-	required int32 id = 1;
+	// the identifier of the star, unique throughout the universe.
+	required string key = 1;
 
 	// the name of the star
 	required string name = 2;
@@ -162,9 +168,12 @@ message Star
 //
 message Planet
 {
+	// The key of the planet, unique throughout the universe.
+	required string key = 1;
+
 	// The "index" of the planet represents how far it is from the sun. Planets are always
 	// in monotonically increasing order of distance (0, 1, 2, 3, etc)
-	required int32 index = 1;
+	required int32 index = 2;
 
 	// The various different "kinds" of planets. Planets are spawned in increasing order
 	// of probability (so "terran" is most likely, "gas giant" least likely).
@@ -181,11 +190,11 @@ message Planet
 		TERRAN = 9;
 	}
 
-	required PLANET_TYPE planet_type = 2;
+	required PLANET_TYPE planet_type = 3;
 
 	// The size of the planet. Certain planet_type's are predisposed to be certain sizes
 	// (e.g. GASGIANT is predisposed to being big, etc) but planets will still vary in exact size.
-	required int32 size = 3;
+	required int32 size = 4;
 }
 
 //
@@ -201,9 +210,27 @@ message Sectors
 //
 message ColonizeRequest
 {
-	// the parameters that describe the precise planet you want to colonize.
-	required int64 sector_x = 1;
-	required int64 sector_y = 2;
-	required int32 star_id = 3;
-	required int32 planet_index = 4;
+	// The planet you want to colonize
+	required string planet_key = 1;
 }
+
+//
+// Represents a colony that's on a planet.
+//
+message Colony
+{
+	// The key of this colony, which you can use to refer to it directly.
+	optional string key = 1;
+
+	// The key of the empire that owns this colony.
+	required string empire_key = 2;
+
+	// The key of the planet and star this colony belongs to.
+	optional string planet_key = 3;
+	optional string star_key = 4;
+
+	optional int64 population = 5;
+	optional float population_rate = 6;
+
+}
+

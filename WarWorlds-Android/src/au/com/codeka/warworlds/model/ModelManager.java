@@ -18,7 +18,7 @@ public class ModelManager {
      * @param starID
      * @param callback
      */
-    public static void requestStar(final long sectorX, final long sectorY, final int starID,
+    public static void requestStar(final long sectorX, final long sectorY, final String starKey,
             final StarFetchedHandler callback) {
         new AsyncTask<Void, Void, Star>() {
             @Override
@@ -26,7 +26,7 @@ public class ModelManager {
                 Star star = null;
 
                 try {
-                    String url = "sectors/"+sectorX+","+sectorY+"/stars/"+starID;
+                    String url = "stars/"+starKey;
 
                     warworlds.Warworlds.Star pb = ApiClient.getProtoBuf(url,
                             warworlds.Warworlds.Star.class);

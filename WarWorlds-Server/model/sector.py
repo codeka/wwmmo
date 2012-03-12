@@ -47,6 +47,7 @@ class Sector(db.Model):
 
 
 class Star(db.Model):
+    sector = db.ReferenceProperty(Sector)
     starID = db.IntegerProperty()
     name = db.StringProperty()
     colour = db.IntegerProperty()
@@ -57,6 +58,7 @@ class Star(db.Model):
 
 
 class Planet(db.Model):
+    star = db.ReferenceProperty(Star)
     index = db.IntegerProperty()
     planetTypeID = db.IntegerProperty(name="planetType")
     planetType = None # Will be filled in with a PlanetType instance
@@ -97,7 +99,7 @@ class SectorManager:
         for key in sectors:
             sector = sectors[key]
             # fetch all of the sector's stars as well
-            query = Star.all().ancestor(sector.key())
+            query = Star.all().filter("sector", sector)
             sector.stars = []
             for star in query:
                 sector.stars.append(star)
@@ -114,24 +116,21 @@ class SectorManager:
         return sectors
 
     @staticmethod
-    def getStar(sectorX, sectorY, starID):
+    def getStar(starKey):
         """Gets all of the details about a single star, including planets colonies and so on.
 
         We don't worry about whether the sector has been generated. If not, we just return None.
         After all, you shouldn't be asking for a star in a sector you haven't visited yet.
         """
-        sectorQuery = Sector.all().filter("x", sectorX).filter("y", sectorY)
-        for sector in sectorQuery:
-            logging.info("Got sector: "+str(sector.key()))
-            starQuery = Star.all().ancestor(sector.key()).filter("starID", starID)
-            for star in starQuery:
-                planetQuery = Planet.all().ancestor(star.key())
-                star.planets = []
-                for planet in planetQuery:
-                    star.planets.append(planet)
-            return star
+        star = Star.get(starKey)
+        if star is None:
+            return None
 
-        return None
+        planetQuery = Planet.all().filter("star", star.key())
+        star.planets = []
+        for planet in planetQuery:
+            star.planets.append(planet)
+        return star
 
     @staticmethod
     def _getSectorKey(x, y):
@@ -165,9 +164,9 @@ class SectorGenerator:
         GRID_CENTRE = GRID_SIZE / 2
 
         numStars = random.randint(10, 15)
-        for i in range(numStars):
-            star = Star(parent=sector)
-            star.starID = i+1
+        for _ in range(numStars):
+            star = Star()
+            star.sector = sector.key()
 
             # Make sure there's no other stars with the same coordinates as us. For the initial
             # generation, we generate stars on a 16x16 grid. Then we scale that to fit the whole
@@ -203,7 +202,8 @@ class SectorGenerator:
 
             numPlanets = random.randint(2, 5)
             for index in range(numPlanets):
-                planet = Planet(parent=star)
+                planet = Planet()
+                planet.star = star.key()
                 planet.index = (index+1)
                 planet.planetTypeID = random.randint(0, len(_planetTypes) - 1)
                 planet.planetType = _planetTypes[planet.planetTypeID]

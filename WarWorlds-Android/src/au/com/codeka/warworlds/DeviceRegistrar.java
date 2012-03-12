@@ -1,11 +1,13 @@
 
 package au.com.codeka.warworlds;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import warworlds.Warworlds.DeviceRegistration;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.provider.Settings.Secure;
-import android.util.Log;
 import au.com.codeka.warworlds.api.ApiClient;
 
 /**
@@ -13,54 +15,59 @@ import au.com.codeka.warworlds.api.ApiClient;
  * RequestFactory.
  */
 public class DeviceRegistrar {
-	public static String TAG = "DeviceRegistrar";
+    private static Logger log = LoggerFactory.getLogger(DeviceRegistrar.class);
 
-    public static void register(final Context context, final String deviceRegistrationID) {
-        registerOrUnregister(context, deviceRegistrationID, true);
-    }
-
-    public static void unregister(final Context context, final String deviceRegistrationID) {
-        registerOrUnregister(context, deviceRegistrationID, false);
-    }
-
-    private static void registerOrUnregister(final Context context,
-            final String deviceRegistrationID, final boolean register) {
-
+    public static void register(final Context context, String deviceRegistrationID) {
         final SharedPreferences settings = Util.getSharedPreferences(context);
 
-        String url = "devices";
-
+        String registrationKey = null;
         try {
-            if (register) {
-                DeviceRegistration registration = DeviceRegistration.newBuilder()
-                    .setDeviceId(Secure.getString(context.getContentResolver(), Secure.ANDROID_ID))
-                    .setDeviceRegistrationId(deviceRegistrationID)
-                    .setDeviceBuild(android.os.Build.DISPLAY)
-                    .setDeviceManufacturer(android.os.Build.MANUFACTURER)
-                    .setDeviceModel(android.os.Build.MODEL)
-                    .setDeviceVersion(android.os.Build.VERSION.RELEASE)
-                    .build();
+            DeviceRegistration registration = DeviceRegistration.newBuilder()
+                .setDeviceId(Secure.getString(context.getContentResolver(), Secure.ANDROID_ID))
+                .setDeviceRegistrationId(deviceRegistrationID)
+                .setDeviceBuild(android.os.Build.DISPLAY)
+                .setDeviceManufacturer(android.os.Build.MANUFACTURER)
+                .setDeviceModel(android.os.Build.MODEL)
+                .setDeviceVersion(android.os.Build.VERSION.RELEASE)
+                .build();
 
-                ApiClient.putProtoBuf(url, registration); // TODO: check for errors...
-            } else {
-                url += "/registration:" + deviceRegistrationID;
-
-                ApiClient.delete(url);
-            }
+            // the post will update the key field in the protocol buffer for us
+            registration = ApiClient.postProtoBuf("devices", registration,
+                    DeviceRegistration.class);
+            registrationKey = registration.getKey();
         } catch(Exception ex) {
-            Log.w(TAG, "Failure, got: " + ex.getMessage());
-            // Clean up application state
-            Util.clearDeviceRegistration(context);
-
+            log.error("Failure registring device.", ex);
+            forgetDeviceRegistration(context);
             return;
         }
 
-        if (register) {
-            SharedPreferences.Editor editor = settings.edit();
-            editor.putString(Util.DEVICE_REGISTRATION_ID, deviceRegistrationID);
-            editor.commit();
-        } else {
-        	Util.clearDeviceRegistration(context);
+        SharedPreferences.Editor editor = settings.edit();
+        editor.putString("DeviceRegistrar.registrationKey", registrationKey);
+        editor.commit();
+    }
+
+    public static void unregister(final Context context) {
+        final SharedPreferences settings = Util.getSharedPreferences(context);
+        String registrationKey = settings.getString("DeviceRegistrar.registrationKey", "");
+        if (registrationKey == "") {
+            log.info("No unregistration required, device not registered.");
+            return;
         }
+
+        try {
+            String url = "devices/" + registrationKey;
+            ApiClient.delete(url);
+        } catch(Exception ex) {
+            log.error("Failure unregistering device.", ex);
+        }
+
+        forgetDeviceRegistration(context);
+    }
+
+    private static void forgetDeviceRegistration(Context context) {
+        final SharedPreferences settings = Util.getSharedPreferences(context);
+        SharedPreferences.Editor editor = settings.edit();
+        editor.remove("DeviceRegistrar.registrationKey");
+        editor.commit();
     }
 }

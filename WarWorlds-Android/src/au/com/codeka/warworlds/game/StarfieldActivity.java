@@ -71,7 +71,7 @@ public class StarfieldActivity extends Activity {
                 zoomInButton.setVisibility(View.GONE);
 
                 ModelManager.requestStar(star.getSector().getX(), star.getSector().getY(),
-                        star.getID(), new ModelManager.StarFetchedHandler() {
+                        star.getKey(), new ModelManager.StarFetchedHandler() {
                     /**
                      * This is called on the main thread when the star is actually fetched.
                      */
@@ -112,7 +112,7 @@ public class StarfieldActivity extends Activity {
                 Intent intent = new Intent(mContext, SolarSystemActivity.class);
                 intent.putExtra("au.com.codeka.warworlds.SectorX", star.getSector().getX());
                 intent.putExtra("au.com.codeka.warworlds.SectorY", star.getSector().getY());
-                intent.putExtra("au.com.codeka.warworlds.StarID", star.getID());
+                intent.putExtra("au.com.codeka.warworlds.StarKey", star.getKey());
                 mContext.startActivity(intent);
             }
         });

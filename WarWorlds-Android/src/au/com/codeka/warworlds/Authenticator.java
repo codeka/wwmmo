@@ -42,7 +42,7 @@ public class Authenticator {
         }
 
         SharedPreferences prefs = Util.getSharedPreferences(context);
-        final String accountName = prefs.getString(Util.ACCOUNT_NAME, null);
+        final String accountName = prefs.getString("AccountName", null);
 
         RequestManager.addResponseReceivedHandler(new RequestManager.ResponseReceivedHandler() {
             private void dump(AbstractHttpMessage msg) {
@@ -56,8 +56,7 @@ public class Authenticator {
                     log.info(h.getName()+": "+h.getValue());
                 }
             }
-            
-            
+
             @Override
             public void onResponseReceived(BasicHttpRequest request, BasicHttpResponse response) {
                 // if we get a 403, it means we need to re-authenticate, so do that

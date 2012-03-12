@@ -3,7 +3,7 @@ package au.com.codeka.warworlds.model;
 
 public class Star {
     private Sector mSector;
-    private int mID;
+    private String mKey;
     private String mName;
     private int mColour;
     private int mSize;
@@ -20,8 +20,8 @@ public class Star {
     public Sector getSector() {
         return mSector;
     }
-    public int getID() {
-        return mID;
+    public String getKey() {
+        return mKey;
     }
     public String getName() {
         return mName;
@@ -63,7 +63,7 @@ public class Star {
     public static Star fromProtocolBuffer(Sector sector, warworlds.Warworlds.Star pb) {
         Star s = new Star();
         s.mSector = sector;
-        s.mID = pb.getId();
+        s.mKey = pb.getKey();
         s.mName = pb.getName();
         s.mColour = pb.getColour();
         s.mSize = pb.getSize();

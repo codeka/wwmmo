@@ -10,9 +10,10 @@ import java.util.TreeSet;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import android.os.AsyncTask;
-import android.util.Log;
 import au.com.codeka.Pair;
 import au.com.codeka.warworlds.api.ApiClient;
 import au.com.codeka.warworlds.model.Sector;
@@ -29,7 +30,7 @@ import au.com.codeka.warworlds.model.Star;
  * sectors (so you can smoothly scroll, of course).
  */
 public class SectorManager {
-    private static String TAG = "SectorManager";
+    private static Logger log = LoggerFactory.getLogger(SectorManager.class);
     private static SectorManager sInstance = new SectorManager();
 
     public static SectorManager getInstance() {
@@ -286,8 +287,7 @@ public class SectorManager {
                     sectors = Sector.fromProtocolBuffer(pb.getSectorsList());
                 } catch(Exception e) {
                     // TODO: handle exceptions
-                    Log.e(TAG, ExceptionUtils.getStackTrace(e));
-                    // message = "<pre>"+ExceptionUtils.getStackTrace(e)+"</pre>";
+                    log.error(ExceptionUtils.getStackTrace(e));
                 }
                 return sectors;
             }

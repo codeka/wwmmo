@@ -44,6 +44,7 @@ public class Planet {
     };
 
     private Star mStar;
+    private String mKey;
     private int mIndex;
     private PlanetType mPlanetType;
     private int mSize;
@@ -51,15 +52,15 @@ public class Planet {
     public Star getStar() {
         return mStar;
     }
-
+    public String getKey() {
+        return mKey;
+    }
     public int getIndex() {
         return mIndex;
     }
-
     public PlanetType getPlanetType() {
         return mPlanetType;
     }
-
     public int getSize() {
         return mSize;
     }
@@ -70,6 +71,7 @@ public class Planet {
     public static Planet fromProtocolBuffer(Star star, warworlds.Warworlds.Planet pb) {
         Planet p = new Planet();
         p.mStar = star;
+        p.mKey = pb.getKey();
         p.mIndex = pb.getIndex();
         p.mPlanetType = sPlanetTypes[pb.getPlanetType().getNumber() - 1];
         p.mSize = pb.getSize();

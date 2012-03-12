@@ -10,11 +10,11 @@ import au.com.codeka.warworlds.api.ApiClient;
 
 public class Empire {
     private static final Logger log = LoggerFactory.getLogger(Empire.class);
-    private String mID;
+    private String mKey;
     private String mDisplayName;
 
-    public String getID() {
-        return mID;
+    public String getKey() {
+        return mKey;
     }
 
     public String getDisplayName() {
@@ -22,41 +22,42 @@ public class Empire {
     }
 
     public void colonize(final Planet planet, final ColonizeCompleteHandler callback) {
-        new AsyncTask<Void, Void, Boolean>() {
+        new AsyncTask<Void, Void, Colony>() {
             @Override
-            protected Boolean doInBackground(Void... arg0) {
+            protected Colony doInBackground(Void... arg0) {
                 try {
                     if (planet.getStar() == null) {
                         log.warn("planet.getStar() returned null!");
-                        return false;
+                        return null;
                     } else if (planet.getStar().getSector() == null) {
                         log.warn("planet.getStar().getSector() returned null!");
-                        return false;
+                        return null;
                     }
 
                     ColonizeRequest request = ColonizeRequest.newBuilder()
-                            .setSectorX(planet.getStar().getSector().getX())
-                            .setSectorY(planet.getStar().getSector().getY())
-                            .setStarId(planet.getStar().getID())
-                            .setPlanetIndex(planet.getIndex())
+                            .setPlanetKey(planet.getKey())
                             .build();
 
-                    return ApiClient.putProtoBuf("colonies", request);
+                    warworlds.Warworlds.Colony pb = ApiClient.postProtoBuf("colonies", request,
+                            warworlds.Warworlds.Colony.class);
+                    if (pb == null)
+                        return null;
+                    return Colony.fromProtocolBuffer(pb);
                 } catch(Exception e) {
                     // TODO: handle exceptions
                     log.error(ExceptionUtils.getStackTrace(e));
-                    return false;
+                    return null;
                 }
             }
 
             @Override
-            protected void onPostExecute(Boolean success) {
-                if (success == null) {
+            protected void onPostExecute(Colony colony) {
+                if (colony == null) {
                     return; // BAD!
                 }
 
                 if (callback != null) {
-                    callback.onColonizeComplete(success);
+                    callback.onColonizeComplete(colony);
                 }
             }
         }.execute();
@@ -65,12 +66,12 @@ public class Empire {
 
     public static Empire fromProtocolBuffer(warworlds.Warworlds.Empire pb) {
         Empire empire = new Empire();
-        empire.mID = pb.getId();
+        empire.mKey = pb.getKey();
         empire.mDisplayName = pb.getDisplayName();
         return empire;
     }
 
     public static interface ColonizeCompleteHandler {
-        public void onColonizeComplete(boolean success);
+        public void onColonizeComplete(Colony colony);
     }
 }

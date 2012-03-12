@@ -54,7 +54,7 @@ class ApiPage(webapp.RequestHandler):
         return empire.Empire.getForUser(self.user)
 
     def _empireModelToPb(self, empire_pb, empire_model):
-        empire_pb.id = str(empire_model.key().id_or_name())
+        empire_pb.key = str(empire_model.key())
         empire_pb.display_name = empire_model.displayName
         empire_pb.user = empire_model.user.user_id()
         empire_pb.email = empire_model.user.email()
@@ -123,18 +123,21 @@ class EmpiresPage(ApiPage):
 
 
 class DevicesPage(ApiPage):
-    def put(self):
-        registration_info = self._getRequestBody(pb.DeviceRegistration)
-        if registration_info == None:
+    def post(self):
+        registration_pb = self._getRequestBody(pb.DeviceRegistration)
+        if registration_pb == None:
             # handle errors...
             self.response.set_status(400)
             return
 
-        data = model.DeviceRegistration()
-        self._pbToModel(data, registration_info)
+        registration_model = model.DeviceRegistration()
+        self._pbToModel(registration_model, registration_pb)
         # ignore what they said in the PB, we'll set the user to their own user anyway
-        data.user = self.user
-        data.put()
+        registration_model.user = self.user
+        registration_model.put()
+
+        self._modelToPb(registration_pb, registration_model)
+        return registration_pb
 
     def get(self):
         if self.request.get('email') != '':
@@ -145,10 +148,16 @@ class DevicesPage(ApiPage):
             # own device registrations.
             return self._getDevicesByUser(self.user)
 
-    def delete(self, deviceRegistrationID):
-        device = model.DeviceRegistration.getByRegistrationID(deviceRegistrationID)
+    def delete(self, key):
+        device = model.DeviceRegistration.get(key)
         if device != None:
+            # make sure you only ever delete devices you own
+            if device.user != self.user:
+                self.response.set_status(403)
+                return
             device.delete()
+        else:
+            logging.warn("No device with key ["+key+"] to delete.")
 
     def _getDevicesByEmail(self, email):
         user = users.User(email)
@@ -164,6 +173,8 @@ class DevicesPage(ApiPage):
         return registrations
 
     def _pbToModel(self, model, pb):
+        if pb.HasField('key'):
+            model.key = pb.key
         model.deviceID = pb.device_id
         model.deviceRegistrationID = pb.device_registration_id
         model.deviceModel = pb.device_model
@@ -174,13 +185,14 @@ class DevicesPage(ApiPage):
             model.user = users.User(pb.user)
 
     def _modelToPb(self, pb, model):
+        pb.key = str(model.key())
         pb.device_id = model.deviceID
         pb.device_registration_id = model.deviceRegistrationID
         pb.device_model = model.deviceModel
         pb.device_manufacturer = model.deviceManufacturer
         pb.device_build = model.deviceBuild
         pb.device_version = model.deviceVersion
-        pb.user = model.user
+        pb.user = model.user.email()
 
 
 class DeviceMessagesPage(ApiPage):
@@ -207,7 +219,7 @@ class StarfieldPage(ApiPage):
     This really just include common methods for converting between the model and protocol buffers.
     """
     def _starModelToPb(self, star_pb, star_model):
-        star_pb.id = star_model.starID
+        star_pb.key = str(star_model.key())
         star_pb.offset_x = star_model.x
         star_pb.offset_y = star_model.y
         star_pb.name = star_model.name
@@ -222,6 +234,7 @@ class StarfieldPage(ApiPage):
             star_pb.num_planets = 3 # TODO
 
     def _planetModelToPb(self, planet_pb, planet_model):
+        planet_pb.key = str(planet_model.key())
         planet_pb.index = planet_model.index
         planet_pb.planet_type = planet_model.planetTypeID+1
         planet_pb.size = planet_model.size
@@ -261,8 +274,8 @@ class SectorsPage(StarfieldPage):
 
 
 class StarPage(StarfieldPage):
-    def get(self, sectorX, sectorY, starID):
-        star_model = sector.SectorManager.getStar(int(sectorX), int(sectorY), int(starID))
+    def get(self, key):
+        star_model = sector.SectorManager.getStar(key)
         if star_model is None:
             self.response.set_status(404)
             return
@@ -273,21 +286,23 @@ class StarPage(StarfieldPage):
 
 
 class ColoniesPage(ApiPage):
-    def put(self):
+    def post(self):
         # TODO: make sure they're actually allow to do this, have a free colonization
         # ship (or require that the pass in the colonization ship), etc etc etc
         req = self._getRequestBody(pb.ColonizeRequest)
-        star_model = sector.SectorManager.getStar(req.sector_x, req.sector_y, req.star_id)
-        if star_model is None:
+        planet_model = sector.Planet.get(req.planet_key)
+        if planet_model is None:
             self.response.set_status(400)
             return
-        planet_model = star_model.planets[req.planet_index]
 
         empire_model = self._getEmpire()
 
         colony_model = empire.Colony()
-        colony_model.empire = empire_model
-        colony_model.planet = planet_model
+        colony_model.empire = empire_model.key()
+        colony_model.planet = planet_model.key()
+        colony_model.sector = planet_model.star.sector.key()
+        colony_model.star = planet_model.star.key()
+
         colony_model.population = 1000
         colony_model.populationRate = 0.0
         colony_model.lastSimulation = datetime.now()
@@ -350,9 +365,9 @@ app = ApiApplication([('/api/v1/hello', HelloPage),
                       ('/api/v1/empires', EmpiresPage),
                       ('/api/v1/empires/([0-9]+)', EmpiresPage),
                       ('/api/v1/devices', DevicesPage),
-                      ('/api/v1/devices/registration:(.+)', DevicesPage),
+                      ('/api/v1/devices/([^/]+)', DevicesPage),
                       ('/api/v1/devices/user:([^/]+)/messages', DeviceMessagesPage),
                       ('/api/v1/sectors', SectorsPage),
-                      ('/api/v1/sectors/([0-9-]+),([0-9-]+)/stars/([0-9]+)', StarPage),
+                      ('/api/v1/stars/([^/]+)', StarPage),
                       ('/api/v1/colonies', ColoniesPage)],
                      debug=True)
