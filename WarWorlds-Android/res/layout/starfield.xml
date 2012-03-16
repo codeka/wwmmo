@@ -70,38 +70,12 @@
                     android:layout_marginTop="40dp" />
             </FrameLayout>
 
-            <LinearLayout
-                android:id="@+id/star_planet_icons_container"
+            <ListView
+                android:id="@+id/starfield_planet_list"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="8dp"
-                android:layout_marginRight="8dp" >
-
-                <ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:src="@drawable/planet_icon_gasgiant" />
-
-                <ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:src="@drawable/planet_icon_gasgiant" />
-
-                <ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:src="@drawable/planet_icon_gasgiant" />
-
-                <ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:src="@drawable/planet_icon_gasgiant" />
-
-                <ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:src="@drawable/planet_icon_gasgiant" />
-            </LinearLayout>
+                android:layout_height="wrap_content" >
+                <!-- Preview: listitem=@layout/starfield_planet -->
+            </ListView>
 
             <Button
                 android:id="@+id/starfield_zoomin"
@@ -111,6 +85,7 @@
                 android:layout_gravity="center"
                 android:layout_marginTop="10dp"
                 android:text="@string/starfield_zoomin" />
+
         </LinearLayout>
     </LinearLayout>
 

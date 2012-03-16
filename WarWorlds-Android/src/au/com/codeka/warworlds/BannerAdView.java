@@ -17,6 +17,9 @@ public class BannerAdView extends FrameLayout {
 
     public BannerAdView(Context context, AttributeSet attrs) {
         super(context, attrs);
+        if (isInEditMode()) {
+            return;
+        }
 
         if (context instanceof Activity) {
             Activity activity = (Activity)context;
@@ -28,7 +31,7 @@ public class BannerAdView extends FrameLayout {
     }
 
     public void refreshAd() {
-        if (mAdView == null) {
+        if (mAdView == null || isInEditMode()) {
             return;
         }
 

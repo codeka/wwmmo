@@ -4,12 +4,15 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.TextView;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.model.ModelManager;
@@ -27,8 +30,9 @@ public class StarfieldActivity extends Activity {
     TextView mMoney;
     TextView mStarName;
     ViewGroup mLoadingContainer;
-    ViewGroup mPlanetIconsContainer;
-    
+    ListView mPlanetList;
+    PlanetListAdapter mPlanetListAdapter;
+
     Star mCurrentStar;
 
     /** Called when the activity is first created. */
@@ -49,16 +53,19 @@ public class StarfieldActivity extends Activity {
         mMoney = (TextView) findViewById(R.id.money);
         mStarName = (TextView) findViewById(R.id.star_name);
         mLoadingContainer = (ViewGroup) findViewById(R.id.star_loading_container);
-        mPlanetIconsContainer = (ViewGroup) findViewById(R.id.star_planet_icons_container);
+        mPlanetList = (ListView) findViewById(R.id.starfield_planet_list);
         final Button zoomInButton = (Button) findViewById(R.id.starfield_zoomin);
 
-        mPlanetIconsContainer.setVisibility(View.GONE);
+        mPlanetList.setVisibility(View.GONE);
         zoomInButton.setVisibility(View.GONE);
 
         EmpireManager empireManager = EmpireManager.getInstance();
         mUsername.setText(empireManager.getEmpire().getDisplayName());
         mMoney.setText("$ 12,345"); // TODO: empire.getCash()
         mStarName.setText("");
+
+        mPlanetListAdapter = new PlanetListAdapter();
+        mPlanetList.setAdapter(mPlanetListAdapter);
 
         mStarfield.addStarSelectedListener(new StarfieldSurfaceView.OnStarSelectedListener() {
             @Override
@@ -67,7 +74,7 @@ public class StarfieldActivity extends Activity {
 
                 // load the rest of the star's details as well
                 mLoadingContainer.setVisibility(View.VISIBLE);
-                mPlanetIconsContainer.setVisibility(View.GONE);
+                mPlanetList.setVisibility(View.GONE);
                 zoomInButton.setVisibility(View.GONE);
 
                 ModelManager.requestStar(star.getSector().getX(), star.getSector().getY(),
@@ -78,24 +85,10 @@ public class StarfieldActivity extends Activity {
                     @Override
                     public void onStarFetched(Star star) {
                         mLoadingContainer.setVisibility(View.GONE);
-                        mPlanetIconsContainer.setVisibility(View.VISIBLE);
+                        mPlanetList.setVisibility(View.VISIBLE);
                         zoomInButton.setVisibility(View.VISIBLE);
 
-                        int numPlanetIcons = mPlanetIconsContainer.getChildCount();
-                        for (int i = 0; i < numPlanetIcons; i++) {
-                            ImageView icon = (ImageView) mPlanetIconsContainer.getChildAt(i);
-
-                            if (i < star.getPlanets().length) {
-                                icon.setVisibility(View.VISIBLE);
-
-                                Planet planet = star.getPlanets()[i];
-                                icon.setImageResource(planet.getPlanetType().getIconID());
-                            } else {
-                                icon.setVisibility(View.GONE);
-                            }
-                        }
-
-                        // TODO: populate the rest of the view...
+                        mPlanetListAdapter.setStar(star);
                     }
                 });
             }
@@ -116,5 +109,55 @@ public class StarfieldActivity extends Activity {
                 mContext.startActivity(intent);
             }
         });
+    }
+
+    class PlanetListAdapter extends BaseAdapter {
+        private Star mStar;
+
+        public void setStar(Star star) {
+            mStar = star;
+            notifyDataSetChanged();
+        }
+
+        @Override
+        public int getCount() {
+            if (mStar == null) {
+                return 0;
+            }
+
+            return mStar.getNumPlanets();
+        }
+
+        @Override
+        public Object getItem(int position) {
+            return mStar.getPlanets()[position];
+        }
+
+        @Override
+        public long getItemId(int position) {
+            return position; // TODO??
+        }
+
+        @Override
+        public int getViewTypeCount() {
+            return 1;
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            View view = convertView;
+            if (view == null) {
+                LayoutInflater inflater = (LayoutInflater)mContext.getSystemService
+                        (Context.LAYOUT_INFLATER_SERVICE);
+                view = (ViewGroup) inflater.inflate(R.layout.starfield_planet, null);
+            }
+
+            ImageView icon = (ImageView) view.findViewById(R.id.starfield_planet_icon);
+            Planet planet = mStar.getPlanets()[position];
+            icon.setImageResource(planet.getPlanetType().getIconID());
+
+            return view;
+        }
+        
     }
 }
