@@ -133,6 +133,7 @@ class HelloPage(ApiPage):
             chatClient.device = device
             chatClient.clientID = channelClientID
             chatClient.put()
+        hello_pb.channel_token = channel.create_channel(channelClientID)
         hello_pb.channel_client_id = channelClientID
 
         return hello_pb

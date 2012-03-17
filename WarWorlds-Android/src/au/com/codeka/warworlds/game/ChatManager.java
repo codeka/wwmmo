@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 
+import au.com.codeka.warworlds.api.ApiException;
+import au.com.codeka.warworlds.api.ChannelClient;
+import au.com.codeka.warworlds.api.ChannelClient.ChannelListener;
 import au.com.codeka.warworlds.model.ChatMessage;
 
 /**
@@ -20,6 +23,7 @@ public class ChatManager {
 
     private LinkedList<ChatMessage> mMessages;
     private ArrayList<MessageAddedListener> mMessageAddedListeners;
+    private ChannelClient mChannelClient;
 
     private ChatManager() {
         mMessages = new LinkedList<ChatMessage>();
@@ -30,12 +34,33 @@ public class ChatManager {
      * Called when the game starts up, we need to register with the channel and get
      * ready to start receiving chat messages.
      */
-    public void setup() {
+    public void setup(String token) {
+        mChannelClient = new ChannelClient(token, new ChannelListener() {
+            @Override
+            public void onOpen() {
+            }
+
+            @Override
+            public void onMessage(String message) {
+                addMessage(new ChatMessage(message));
+            }
+
+            @Override
+            public void onError(int code, String description) {
+            }
+
+            @Override
+            public void onClose() {
+            }
+        });
         addMessage(new ChatMessage("Welcome to War Worlds!"));
-        addMessage(new ChatMessage("Blah blah blah, yada yada yada"));
-        addMessage(new ChatMessage("Free masons run the country!"));
-        addMessage(new ChatMessage("Some more stuff."));
-        addMessage(new ChatMessage("The quick brown fox, and that..."));
+
+        // this only works because we're already on a background thread...
+        try {
+            mChannelClient.open();
+        } catch (ApiException e) {
+            //TODO: handle error
+        }
     }
 
     public void addMessageAddedListener(MessageAddedListener listener) {

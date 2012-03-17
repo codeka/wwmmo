@@ -62,9 +62,10 @@ message Hello
 	// starfield view centred on one of your own colonies...
 	repeated Colony colonies = 3;
 
-	// The ClientID you'll use to connect via the Channel API for chats (and possibly other
-	// things..?)
+	// The ClientID and token you'll use to connect via the Channel API for chats (and
+	// possibly other things..?)
 	optional string channel_client_id = 4;
+	optional string channel_token = 5;
 }
 
 //

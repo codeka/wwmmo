@@ -138,6 +138,7 @@ public class WarWorldsActivity extends Activity {
                 try {
                     String url = "hello/"+DeviceRegistrar.getDeviceRegistrationKey(mContext);
                     Hello hello = ApiClient.putProtoBuf(url, null, Hello.class);
+
                     if (hello.hasEmpire()) {
                         mNeedsEmpireSetup = false;
                         EmpireManager.getInstance().setup(
@@ -145,6 +146,9 @@ public class WarWorldsActivity extends Activity {
                     } else {
                         mNeedsEmpireSetup = true;
                     }
+
+                    ChatManager.getInstance().setup(hello.getChannelToken());
+
                     message = hello.getMotd().getMessage();
                     mErrorOccured = false;
                 } catch(ApiException e) {
@@ -166,8 +170,6 @@ public class WarWorldsActivity extends Activity {
                     motdView.loadData(result, "text/html", "utf-8");
                     setWebViewTransparent(motdView);
                 }
-
-                ChatManager.getInstance().setup();
 
                 if (mErrorOccured) {
                     mStartGameButton.setEnabled(false);

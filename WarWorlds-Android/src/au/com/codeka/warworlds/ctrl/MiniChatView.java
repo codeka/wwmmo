@@ -2,6 +2,7 @@ package au.com.codeka.warworlds.ctrl;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.os.Handler;
 import android.util.AttributeSet;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
@@ -16,7 +17,9 @@ import au.com.codeka.warworlds.model.ChatMessage;
 public class MiniChatView extends LinearLayout {
     private Context mContext;
 
+    private ScrollView mScrollView;
     private LinearLayout mMsgsContainer;
+    private MessageAddedListener mMessageAddedListener;
 
     public MiniChatView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -24,12 +27,18 @@ public class MiniChatView extends LinearLayout {
 
         this.setBackgroundColor(Color.argb(0xaa, 0, 0, 0));
 
-        ScrollView sv = new ScrollView(mContext);
-        this.addView(sv);
+        LayoutParams lp = new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT, 0);
+        mScrollView = new ScrollView(mContext);
+        mScrollView.setLayoutParams(lp);
+        this.addView(mScrollView);
 
         mMsgsContainer = new LinearLayout(mContext);
         mMsgsContainer.setOrientation(LinearLayout.VERTICAL);
-        sv.addView(mMsgsContainer);
+        mMsgsContainer.setLayoutParams(lp);
+        mScrollView.addView(mMsgsContainer);
+
+        mMessageAddedListener = new MessageAddedListener();
+        ChatManager.getInstance().addMessageAddedListener(mMessageAddedListener);
 
         refreshMessages();
     }
@@ -44,9 +53,34 @@ public class MiniChatView extends LinearLayout {
                 continue;
             }
 
-            TextView tv = new TextView(mContext);
-            tv.setText(msg.getMessage());
-            mMsgsContainer.addView(tv);
+            appendMessage(msg);
+        }
+    }
+
+    private void appendMessage(ChatMessage msg) {
+        TextView tv = new TextView(mContext);
+        tv.setText(msg.getMessage());
+        mMsgsContainer.addView(tv);
+
+        // need to wait for it to settle before we scroll again
+        mScrollView.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                mScrollView.fullScroll(ScrollView.FOCUS_DOWN);
+            }
+        }, 1);
+    }
+
+    class MessageAddedListener implements ChatManager.MessageAddedListener {
+        @Override
+        public void onMessageAdded(final ChatMessage msg) {
+            // needs to posted on the UI thread, which this is probably not...
+            MiniChatView.this.post(new Runnable() {
+                @Override
+                public void run() {
+                    appendMessage(msg);
+                }
+            });
         }
     }
 }
