@@ -89,6 +89,13 @@
         </LinearLayout>
     </LinearLayout>
 
+    <au.com.codeka.warworlds.ctrl.MiniChatView
+        android:id="@+id/mini_chat"
+        android:layout_height="50dp"
+        android:layout_width="fill_parent"
+        android:layout_marginRight="320dp"
+        android:layout_gravity="bottom|left" />
+
     <au.com.codeka.warworlds.BannerAdView
         android:id="@+id/ad"
         android:layout_width="320dp"

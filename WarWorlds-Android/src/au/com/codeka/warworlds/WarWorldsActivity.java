@@ -29,6 +29,7 @@ import android.webkit.WebView;
 import android.widget.Button;
 import au.com.codeka.warworlds.api.ApiClient;
 import au.com.codeka.warworlds.api.ApiException;
+import au.com.codeka.warworlds.game.ChatManager;
 import au.com.codeka.warworlds.game.EmpireManager;
 import au.com.codeka.warworlds.game.StarfieldActivity;
 import au.com.codeka.warworlds.model.Empire;
@@ -164,6 +165,8 @@ public class WarWorldsActivity extends Activity {
                     motdView.loadData(result, "text/html", "utf-8");
                     setWebViewTransparent(motdView);
                 }
+
+                ChatManager.getInstance().setup();
 
                 if (mErrorOccured) {
                     mStartGameButton.setEnabled(false);
