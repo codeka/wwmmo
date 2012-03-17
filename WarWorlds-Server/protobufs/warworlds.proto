@@ -61,6 +61,10 @@ message Hello
 	// The list of colonies your empire owns. Typically, you'll want to start the
 	// starfield view centred on one of your own colonies...
 	repeated Colony colonies = 3;
+
+	// The ClientID you'll use to connect via the Channel API for chats (and possibly other
+	// things..?)
+	optional string channel_client_id = 4;
 }
 
 //
@@ -115,6 +119,16 @@ message DeviceMessage
 {
 	required string message = 1;
 }
+
+
+//
+// A chat message, who it's from, the kind of message and whatnot.
+//
+message ChatMessage
+{
+	required string message = 1;
+}
+
 
 //
 // Represents a "sector" of space, containing a number of stars and whatnot.

@@ -58,7 +58,11 @@ body {
 }
 
 #maincontent {
-	margin-left: 310px;
+	position: absolute;
+	top: 56px;
+	left: 310px;
+	right: 0; bottom: 0;
+	overflow: auto;
 }
 
 #status {

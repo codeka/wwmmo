@@ -82,8 +82,11 @@ public class ApiClient {
     public static boolean putProtoBuf(String url, Message pb) throws ApiException{
         Map<String, List<String>> headers = getHeaders();
 
-        ByteArrayEntity body = new ByteArrayEntity(pb.toByteArray());
-        body.setContentType("application/x-protobuf");
+        ByteArrayEntity body = null;
+        if (pb != null) {
+            body = new ByteArrayEntity(pb.toByteArray());
+            body.setContentType("application/x-protobuf");
+        }
 
         RequestManager.ResultWrapper res = RequestManager.request("PUT", url, headers, body);
         try {
@@ -121,8 +124,11 @@ public class ApiClient {
             Class<T> protoBuffFactory) throws ApiException {
         Map<String, List<String>> headers = getHeaders();
 
-        ByteArrayEntity body = new ByteArrayEntity(pb.toByteArray());
-        body.setContentType("application/x-protobuf");
+        ByteArrayEntity body = null;
+        if (pb != null) {
+            body = new ByteArrayEntity(pb.toByteArray());
+            body.setContentType("application/x-protobuf");
+        }
 
         RequestManager.ResultWrapper res = RequestManager.request(method, url, headers, body);
         try {

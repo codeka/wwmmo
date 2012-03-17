@@ -64,6 +64,11 @@ public class DeviceRegistrar {
         forgetDeviceRegistration(context);
     }
 
+    public static String getDeviceRegistrationKey(Context context) {
+        final SharedPreferences settings = Util.getSharedPreferences(context);
+        return settings.getString("DeviceRegistrar.registrationKey", "");
+    }
+
     private static void forgetDeviceRegistration(Context context) {
         final SharedPreferences settings = Util.getSharedPreferences(context);
         SharedPreferences.Editor editor = settings.edit();

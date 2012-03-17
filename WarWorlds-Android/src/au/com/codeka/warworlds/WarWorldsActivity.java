@@ -136,7 +136,8 @@ public class WarWorldsActivity extends Activity {
                 // say hello to the server
                 String message;
                 try {
-                    Hello hello = ApiClient.getProtoBuf("hello", Hello.class);
+                    String url = "hello/"+DeviceRegistrar.getDeviceRegistrationKey(mContext);
+                    Hello hello = ApiClient.putProtoBuf(url, null, Hello.class);
                     if (hello.hasEmpire()) {
                         mNeedsEmpireSetup = false;
                         EmpireManager.getInstance().setup(

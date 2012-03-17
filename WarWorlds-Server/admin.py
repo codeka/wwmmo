@@ -9,8 +9,8 @@ import webapp2 as webapp
 
 import model
 
+from google.appengine.api import channel
 from google.appengine.api import users
-from google.appengine.ext import db
 from google.appengine.ext.db.metadata import Kind
 
 import logging
@@ -46,6 +46,7 @@ class AdminPage(webapp.RequestHandler):
 
         super(AdminPage, self).dispatch()
 
+
 class DashboardPage(AdminPage):
     '''The "dashboard" page, basically what you get when you visit /admin.
     '''
@@ -54,11 +55,32 @@ class DashboardPage(AdminPage):
         self.render('admin/index.html', {})
 
 
+class ChatPage(AdminPage):
+    '''The chat page lets us chat with all players, make real-time announcements and whatnot.'''
+
+    def get(self):
+        # if there's already a ChatClient for us, just reuse it
+        chatClient = None
+
+        clientID = 'server:'+self.user.user_id()
+        for cc in model.ChatClient.all().filter("clientID", clientID):
+            chatClient = cc
+        if chatClient == None:
+            chatClient = model.ChatClient()
+            chatClient.user = self.user
+            chatClient.clientID = clientID
+            chatClient.put()
+
+        token = channel.create_channel(clientID)
+        self.render('admin/chat.html', {'token': token})
+
+
 class EmpiresPage(AdminPage):
     '''The 'empires' page lets you view, query, update, delete (etc) empires.
     '''
     def get(self):
         self.render('admin/empires.html', {})
+
 
 class MotdPage(AdminPage):
     '''The "motd" page lets you view/edit the message-of-the-day.
@@ -103,6 +125,7 @@ class DevicesPage(AdminPage):
 
 app = webapp.WSGIApplication([('/admin', DashboardPage),
                               ('/admin/empires', EmpiresPage),
+                              ('/admin/chat', ChatPage),
                               ('/admin/motd', MotdPage),
                               ('/admin/devices', DevicesPage),
                               ('/admin/debug/starfield', DebugStarfieldPage),

@@ -14,6 +14,7 @@ import_fixer.FixImports('google', 'protobuf')
 from protobufs import protobuf_json, warworlds_pb2 as pb
 from google.protobuf import message
 
+from google.appengine.api import channel
 from google.appengine.api import users
 import logging
 from datetime import datetime
@@ -84,10 +85,24 @@ class ApiPage(webapp.RequestHandler):
 class HelloPage(ApiPage):
     """The 'hello' page is what you request when you first connect."""
     def get(self):
+        """This can be used by the administrator for testing only..."""
+        if not self._isAdmin():
+            self.response.set_status(400)
+            return
+        return self.put("")
+
+    def put(self, deviceRegistrationKey):
         user = self.user
         if self._isAdmin() and self.request.get("email", "") != "":
             # useful for testing as an administrator what this would return for another user...
             user = users.User(self.request.get("email"))
+            device = None
+        else:
+            device = model.DeviceRegistration.get(deviceRegistrationKey)
+            if device is None:
+                # ERROR
+                pass
+
         motd_model = model.MessageOfTheDay.get()
         empire_model = empire.Empire.getForUser(user)
         colony_models = empire.Colony.getForEmpire(empire_model)
@@ -107,7 +122,37 @@ class HelloPage(ApiPage):
             colony_pb = hello_pb.colonies.add()
             self._colonyModelToPb(colony_pb, colony_model)
 
+        # generate a chat client for them
+        channelClientID = "device:"+device.deviceID
+        chatClient = None
+        for cc in model.ChatClient.all().filter("clientID", channelClientID):
+            chatClient = cc
+        if chatClient is None:
+            chatClient = model.ChatClient()
+            chatClient.user = user
+            chatClient.device = device
+            chatClient.clientID = channelClientID
+            chatClient.put()
+        hello_pb.channel_client_id = channelClientID
+
         return hello_pb
+
+
+class ChatPage(ApiPage):
+    def post(self):
+        msg_pb = self._getRequestBody(pb.ChatMessage)
+        msg_model = model.ChatMessage()
+        msg_model.user = self.user
+        msg_model.message = msg_pb.message
+        msg_model.put()
+
+        # send the chat out to all connected clients (TODO: only some?)
+        for cc in model.ChatClient.all():
+            try:
+                channel.send_message(cc.clientID, msg_pb.message)
+            except:
+                # TODO: handle errors?
+                pass
 
 
 class EmpiresPage(ApiPage):
@@ -392,7 +437,8 @@ class ApiApplication(webapp.WSGIApplication):
         return possible_types[0]
 
 
-app = ApiApplication([('/api/v1/hello', HelloPage),
+app = ApiApplication([('/api/v1/hello/([^/]+)', HelloPage),
+                      ('/api/v1/chat', ChatPage),
                       ('/api/v1/empires', EmpiresPage),
                       ('/api/v1/empires/([0-9]+)', EmpiresPage),
                       ('/api/v1/devices', DevicesPage),
