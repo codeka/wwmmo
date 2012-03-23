@@ -7,12 +7,12 @@ import org.slf4j.LoggerFactory;
 /**
  * This class manages authentication with the App Engine app.
  */
-public class ApiAuthenticator {
-    final static Logger log = LoggerFactory.getLogger(ApiAuthenticator.class);
+public class AppEngineAuthenticator {
+    final static Logger log = LoggerFactory.getLogger(AppEngineAuthenticator.class);
 
     /**
      * Attempts to authenticate with an AppEngine server, given an authToken (usually taken
-     * from the accounts in an Android).
+     * from the accounts in an Android, or possible from ClientLoginAuthenticator).
      * 
      * @param authToken The authentication token, as returned by Android's account manager
      * @return An authentication cookie that you can pass to later App Engine requests.

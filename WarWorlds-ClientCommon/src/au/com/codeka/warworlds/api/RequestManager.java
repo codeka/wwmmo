@@ -130,6 +130,8 @@ public class RequestManager {
                 if (body != null) {
                     request.addHeader(body.getContentType());
                     request.addHeader("Content-Length", Long.toString(body.getContentLength()));
+                } else if (method.equalsIgnoreCase("PUT") || method.equalsIgnoreCase("POST")) {
+                    request.addHeader("Content-Length", "0");
                 }
 
                 conn.sendRequestHeader(request);

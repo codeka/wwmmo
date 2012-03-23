@@ -20,5 +20,9 @@
 	<classpathentry kind="lib" path="/WarWorlds-ClientCommon/lib/commons-codec-1.4.jar"/>
 	<classpathentry kind="lib" path="/WarWorlds-ClientCommon/lib/commons-io-2.1.jar"/>
 	<classpathentry kind="lib" path="/WarWorlds-ClientCommon/lib/commons-lang3-3.1.jar"/>
+	<classpathentry kind="lib" path="/WarWorlds-ClientCommon/lib/httpclient-4.1.3.jar"/>
+	<classpathentry kind="lib" path="/WarWorlds-ClientCommon/lib/httpclient-cache-4.1.3.jar"/>
+	<classpathentry kind="lib" path="/WarWorlds-ClientCommon/lib/json_simple-1.1.jar"/>
+	<classpathentry kind="lib" path="/WarWorlds-ClientCommon/lib/jcl-over-slf4j-1.6.4.jar"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>

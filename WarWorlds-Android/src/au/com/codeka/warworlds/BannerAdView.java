@@ -40,6 +40,7 @@ public class BannerAdView extends FrameLayout {
         request.addTestDevice("14DEBC42826F8B1AA4D5EC50BB5812B7");
         request.addTestDevice("B5F11B468A1F5906D68ECAE779BF0237");
         request.addTestDevice("CF95DC53F383F9A836FD749F3EF439CD");
+        request.addTestDevice(AdRequest.TEST_EMULATOR);
         mAdView.loadAd(request);
     }
 }

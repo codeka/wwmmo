@@ -11,7 +11,9 @@ import org.apache.http.message.BasicHttpResponse;
 import warworlds.Warworlds.Hello;
 
 import au.com.codeka.warworlds.api.ApiClient;
+import au.com.codeka.warworlds.api.ApiException;
 import au.com.codeka.warworlds.api.ChannelClient;
+import au.com.codeka.warworlds.api.ClientLoginAuthenticator;
 import au.com.codeka.warworlds.api.DevServerAuthenticator;
 import au.com.codeka.warworlds.api.RequestManager;
 import au.com.codeka.warworlds.api.ChannelClient.ChannelListener;
@@ -19,13 +21,14 @@ import au.com.codeka.warworlds.api.ChannelClient.ChannelListener;
 public class TestClient {
     public static void main(String[] args) {
         try {
-            configureApiClient(true);
+            configureApiClient(false);
 
-            Hello hello_pb = ApiClient.putProtoBuf("hello/ahBkZXZ-d2Fyd29ybGRzbW1vchgLEhJEZXZpY2VSZWdpc3RyYXRpb24YDAw", null, Hello.class);
+            //Hello hello_pb = ApiClient.putProtoBuf("hello/ahBkZXZ-d2Fyd29ybGRzbW1vchgLEhJEZXZpY2VSZWdpc3RyYXRpb24YDAw", null, Hello.class);
+            Hello hello_pb = ApiClient.putProtoBuf("hello/ag5zfndhcndvcmxkc21tb3IaCxISRGV2aWNlUmVnaXN0cmF0aW9uGIukAQw", null, Hello.class);
             String token = hello_pb.getChannelToken();
             System.out.println("Token: "+token);
 
-            ChannelClient cc = new ChannelClient(token, new ChannelListener() {
+            ChannelClient cc = ChannelClient.createChannel(token, new ChannelListener() {
                 @Override
                 public void onOpen() {
                     System.out.println("* onOpen()");
@@ -57,14 +60,14 @@ public class TestClient {
         }
     }
 
-    private static void configureApiClient(boolean devServer) throws URISyntaxException {
+    private static void configureApiClient(boolean devServer) throws URISyntaxException, ApiException {
         String cookie = null;
         if (devServer) {
             ApiClient.configure(new URI("http://localhost:8271/api/v1/"));
             cookie = DevServerAuthenticator.authenticate("warworldstest2@gmail.com", false);
         } else {
-            //ApiClient.configure(new URI("https://warworldsmmo.appspot.com/api/v1/"));
-            //TODO ClientLoginAuthenticator
+            ApiClient.configure(new URI("https://warworldsmmo.appspot.com/api/v1/"));
+            cookie = ClientLoginAuthenticator.authenticate("warworldstest1@gmail.com", "adv18997");
         }
 
         ApiClient.getCookies().clear();

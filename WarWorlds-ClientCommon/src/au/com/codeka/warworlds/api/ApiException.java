@@ -10,6 +10,10 @@ public class ApiException extends Exception {
         super(cause);
     }
 
+    public ApiException(String message) {
+        super(message);
+    }
+
     public ApiException(String message, Throwable cause) {
         super(message, cause);
     }

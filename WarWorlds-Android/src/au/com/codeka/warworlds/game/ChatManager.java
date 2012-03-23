@@ -35,7 +35,7 @@ public class ChatManager {
      * ready to start receiving chat messages.
      */
     public void setup(String token) {
-        mChannelClient = new ChannelClient(token, new ChannelListener() {
+        mChannelClient = ChannelClient.createChannel(token, new ChannelListener() {
             @Override
             public void onOpen() {
             }

@@ -15,7 +15,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import au.com.codeka.warworlds.api.ApiAuthenticator;
+import au.com.codeka.warworlds.api.AppEngineAuthenticator;
 import au.com.codeka.warworlds.api.ApiClient;
 import au.com.codeka.warworlds.api.RequestManager;
 
@@ -128,7 +128,7 @@ public class Authenticator {
                     authToken = getAuthToken(account, activity);
 
                     // Convert the token into a cookie for future use
-                    String authCookie = ApiAuthenticator.authenticate(authToken);
+                    String authCookie = AppEngineAuthenticator.authenticate(authToken);
 
                     return authCookie;
                 }
