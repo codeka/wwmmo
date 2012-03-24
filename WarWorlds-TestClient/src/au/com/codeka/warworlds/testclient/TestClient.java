@@ -21,14 +21,14 @@ import au.com.codeka.warworlds.api.ChannelClient.ChannelListener;
 public class TestClient {
     public static void main(String[] args) {
         try {
-            configureApiClient(false);
+            URI uri = configureApiClient(false);
 
             //Hello hello_pb = ApiClient.putProtoBuf("hello/ahBkZXZ-d2Fyd29ybGRzbW1vchgLEhJEZXZpY2VSZWdpc3RyYXRpb24YDAw", null, Hello.class);
             Hello hello_pb = ApiClient.putProtoBuf("hello/ag5zfndhcndvcmxkc21tb3IaCxISRGV2aWNlUmVnaXN0cmF0aW9uGIukAQw", null, Hello.class);
             String token = hello_pb.getChannelToken();
             System.out.println("Token: "+token);
 
-            ChannelClient cc = ChannelClient.createChannel(token, new ChannelListener() {
+            ChannelClient cc = ChannelClient.createChannel(uri.resolve("/"), token, new ChannelListener() {
                 @Override
                 public void onOpen() {
                     System.out.println("* onOpen()");
@@ -60,13 +60,16 @@ public class TestClient {
         }
     }
 
-    private static void configureApiClient(boolean devServer) throws URISyntaxException, ApiException {
+    private static URI configureApiClient(boolean devServer) throws URISyntaxException, ApiException {
         String cookie = null;
+        URI uri = null;
         if (devServer) {
-            ApiClient.configure(new URI("http://localhost:8271/api/v1/"));
+            uri = new URI("http://localhost:8271/api/v1/");
+            ApiClient.configure(uri);
             cookie = DevServerAuthenticator.authenticate("warworldstest2@gmail.com", false);
         } else {
-            ApiClient.configure(new URI("https://warworldsmmo.appspot.com/api/v1/"));
+            uri = new URI("https://warworldsmmo.appspot.com/api/v1/");
+            ApiClient.configure(uri);
             cookie = ClientLoginAuthenticator.authenticate("warworldstest1@gmail.com", "adv18997");
         }
 
@@ -95,5 +98,7 @@ public class TestClient {
                 }
             }
         });
+
+        return uri;
     }
 }

@@ -1,10 +1,11 @@
 package au.com.codeka.warworlds.game;
 
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 
-import au.com.codeka.warworlds.api.ApiException;
+import au.com.codeka.warworlds.api.ApiClient;
 import au.com.codeka.warworlds.api.ChannelClient;
 import au.com.codeka.warworlds.api.ChannelClient.ChannelListener;
 import au.com.codeka.warworlds.model.ChatMessage;
@@ -35,7 +36,8 @@ public class ChatManager {
      * ready to start receiving chat messages.
      */
     public void setup(String token) {
-        mChannelClient = ChannelClient.createChannel(token, new ChannelListener() {
+        URI appEngineURI = ApiClient.getBaseUri().resolve("/");
+        mChannelClient = ChannelClient.createChannel(appEngineURI, token, new ChannelListener() {
             @Override
             public void onOpen() {
             }
@@ -58,7 +60,7 @@ public class ChatManager {
         // this only works because we're already on a background thread...
         try {
             mChannelClient.open();
-        } catch (ApiException e) {
+        } catch (ChannelClient.ChannelException e) {
             //TODO: handle error
         }
     }

@@ -12,7 +12,6 @@ import java.net.URISyntaxException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -34,14 +33,14 @@ import org.json.simple.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import au.com.codeka.warworlds.api.RequestManager.ResultWrapper;
-
 /**
  * This is a client for talking to an App Engine Channel API server. Currently, there's no
  * Java (or anything but JavaScript) API, so we had to come up with our own.
  */
 public abstract class ChannelClient {
-
+    /**
+     * Implement this interface to get notifications about messages, errors and so on.
+     */
     public interface ChannelListener {
         void onOpen();
         void onMessage(String message);
@@ -49,27 +48,74 @@ public abstract class ChannelClient {
         void onClose();
     }
 
-    public static ChannelClient createChannel(String token, ChannelListener listener) {
-        if (RequestManager.getBaseUri().toString().indexOf("localhost") >= 0) {
-            return new DevChannelClient(token, listener);
+    /**
+     * Creates a new \c ChannelClient. We determine whether you're talking to a dev server or
+     * prod server by whether or not your \c appEngineURI includes the string "localhost"
+     * (TODO: is there a better way?)
+     * 
+     * @param appEngineURI The URI to your App Engine app (e.g. https://myapp.appspot.com/)
+     * @param token The channel token you got from calling \c create_channel on the server.
+     * @param listener Your implementation of \c ChannelListener.
+     */
+    public static ChannelClient createChannel(URI appEngineURI, String token, ChannelListener listener) {
+        if (appEngineURI.toString().indexOf("localhost") >= 0) {
+            return new DevChannelClient(appEngineURI, token, listener);
         } else {
-            return new ProdChannelClient(token, listener);
+            return new ProdChannelClient(appEngineURI, token, listener);
         }
     }
 
-    public abstract void open() throws ApiException;
+    public abstract void open() throws ChannelException;
 
-    public abstract void close() throws ApiException;
+    public abstract void close() throws ChannelException;
 
     /**
-     * This implementation of ChannelClient talks to the production server. 
-     * @author dean@codeka.com.au
-     *
+     * A helper method that cnsumes an HttpEntity so that the HttpClient can be reused. If you're
+     * not planning to run on Android, you can use the non-deprecated EntityUtils.consume() method
+     * instead.
+     */
+    @SuppressWarnings("deprecation")
+    private static void consume(HttpEntity entity) {
+        // make sure we've finished with the entity...
+        try {
+            if (entity != null) {
+                entity.consumeContent();
+            }
+        } catch (IOException e) {
+            // ignore....
+        }
+    }
+
+    /**
+     * This exception is thrown in case of errors.
+     */
+    public static class ChannelException extends Exception {
+        private static final long serialVersionUID = 1L;
+
+        public ChannelException() {
+        }
+
+        public ChannelException(Throwable cause) {
+            super(cause);
+        }
+
+        public ChannelException(String message) {
+            super(message);
+        }
+
+        public ChannelException(String message, Throwable cause) {
+            super(message, cause);
+        }
+    }
+
+    /**
+     * This implementation of ChannelClient talks to the production server.
      */
     private static class ProdChannelClient extends ChannelClient {
         private static final Logger log = LoggerFactory.getLogger(ProdChannelClient.class);
 
         private HttpClient mHttpClient;
+        private URI mAppEngineURI;
         private URI mBaseURI;
         private String mToken;
         private ChannelListener mChannelListener;
@@ -81,21 +127,21 @@ public abstract class ChannelClient {
         private boolean mIsRunning;
         private Thread mLongPollThread;
 
-        public ProdChannelClient(String token, ChannelListener listener) {
+        public ProdChannelClient(URI appEngineURI, String token, ChannelListener listener) {
             mToken = token;
             mChannelListener = listener;
+            mAppEngineURI = appEngineURI;
             try {
                 mBaseURI = new URI("https://talkgadget.google.com/talkgadget/");
             } catch (URISyntaxException e) {
-                // won't happen with our hard-coded URI
-            }
+            } // won't happen with our hard-coded URI
             mHttpClient = new DefaultHttpClient();
             mRequestID = 0;
             mMessageID = 1;
         }
 
         @Override
-        public void open() throws ApiException {
+        public void open() throws ChannelException {
             initialize();
             fetchSid();
             connect();
@@ -103,10 +149,9 @@ public abstract class ChannelClient {
         }
 
         @Override
-        public void close() throws ApiException {
+        public void close() throws ChannelException {
             mIsRunning = false;
-            // TODO: do something
-
+            // TODO: wait for it to actually close...
             mChannelListener.onClose();
         }
 
@@ -114,8 +159,8 @@ public abstract class ChannelClient {
          * Sets up the initial connection, passes in the token and whatnot.
          */
         @SuppressWarnings("unchecked") // JSONObject
-        private void initialize() throws ApiException {
-            String url = "warworldsmmo.appspot.com"; // TODO: real thing
+        private void initialize() throws ChannelException {
+            String url = mAppEngineURI.getHost();
 
             JSONObject xpc = new JSONObject();
             xpc.put("cn", RandomStringUtils.random(10, true, false));
@@ -134,12 +179,12 @@ public abstract class ChannelClient {
             try {
                 HttpResponse resp = mHttpClient.execute(httpGet);
                 if (resp.getStatusLine().getStatusCode() > 299) {
-                    throw new ApiException("Initialize failed: "+resp.getStatusLine());
+                    throw new ChannelException("Initialize failed: "+resp.getStatusLine());
                 }
 
                 // the response we get back is actually a bunch of Javascript, but lucky for us
                 // the important bit is nice and easy to parse. What we actually get is like:
-                
+
                 // *JUNK*JUNK*JUNK*
                 // var a = new chat.WcsDataClient("https://talkgadget.google.com/talkgadget/",
                 //         "",
@@ -165,7 +210,7 @@ public abstract class ChannelClient {
 
                     for(int i = 0; i < 7; i++) {
                         if (!m.find()) {
-                            throw new ApiException("Expected iteration #"+i+" to find something.");
+                            throw new ChannelException("Expected iteration #"+i+" to find something.");
                         }
                         if (i == 2) {
                             mClid = m.group(1);
@@ -173,23 +218,22 @@ public abstract class ChannelClient {
                             mSessionID = m.group(1);
                         } else if (i == 6) {
                             if (!mToken.equals(m.group(1))) {
-                                throw new ApiException("Tokens do not match!");
+                                throw new ChannelException("Tokens do not match!");
                             }
                         }
                     }
                 }
             } catch(IOException e) {
-                throw new ApiException(e);
+                throw new ChannelException(e);
             }
 
             log.debug("Initialization complete, [CLID="+mClid+"] [SessionID="+mSessionID+"]");
         }
 
         /**
-         * Fetches the SID, which is a kind of session ID. The response message looks like this:
-         * [0,["c","*SID*",,8]]
+         * Fetches and parses the SID, which is a kind of session ID.
          */
-        private void fetchSid() throws ApiException {
+        private void fetchSid() throws ChannelException {
             log.debug("Fetching SID");
             URI uri = getBindUri(new BasicNameValuePair("CVER", "1"));
 
@@ -220,11 +264,11 @@ public abstract class ChannelClient {
                 mSid = entries.get(1).getStringValue();
                 log.debug("SID = "+mSid);
             } catch (ClientProtocolException e) {
-                throw new ApiException(e);
+                throw new ChannelException(e);
             } catch (IOException e) {
-                throw new ApiException(e);
+                throw new ChannelException(e);
             } catch (InvalidMessageException e) {
-                throw new ApiException(e);
+                throw new ChannelException(e);
             } finally {
                 if (parser != null) {
                     parser.close();
@@ -232,7 +276,10 @@ public abstract class ChannelClient {
             }
         }
 
-        private void connect() throws ApiException {
+        /**
+         * We need to make this "connect" request to set up the binding.
+         */
+        private void connect() throws ChannelException {
             URI uri = getBindUri(new BasicNameValuePair("AID", Long.toString(mMessageID)),
                                  new BasicNameValuePair("CVER", "1"));
 
@@ -256,9 +303,9 @@ public abstract class ChannelClient {
                 HttpResponse resp = mHttpClient.execute(httpPost);
                 consume(resp.getEntity());
             } catch (ClientProtocolException e) {
-                throw new ApiException(e);
+                throw new ChannelException(e);
             } catch (IOException e) {
-                throw new ApiException(e);
+                throw new ChannelException(e);
             }
 
             mChannelListener.onOpen();
@@ -288,6 +335,10 @@ public abstract class ChannelClient {
             return mBaseURI.resolve("dch/bind?VER=8&"+URLEncodedUtils.format(params, "utf-8"));
         }
 
+        /**
+         * Begins the "long poll" thread, which basically just keeps a connection open to the
+         * /bind endpoint, reading messages. If the connection is lost we simply re-connect.
+         */
         private void longPoll() {
             if (mLongPollThread != null) {
                 return;
@@ -307,7 +358,7 @@ public abstract class ChannelClient {
                         return new TalkMessageParser(resp);
                     } catch (ClientProtocolException e) {
                     } catch (IOException e) {
-                    } catch (ApiException e) {
+                    } catch (ChannelException e) {
                     }
 
                     return null;
@@ -319,6 +370,15 @@ public abstract class ChannelClient {
                     while (mIsRunning) {
                         if (parser == null) {
                             parser = repoll();
+                            if (parser == null) {
+                                // if we can't connect, wait a few seconds and try again. Maybe
+                                // we lost network connectivity or something.
+                                log.warn("Could not connect to channel endpoint, trying again.");
+                                try {
+                                    Thread.sleep(2500);
+                                } catch (InterruptedException e) {
+                                }
+                            }
                         }
                         try {
                             TalkMessage msg = parser.getMessage();
@@ -328,7 +388,7 @@ public abstract class ChannelClient {
                             } else {
                                 handleMessage(msg);
                             }
-                        } catch (ApiException e) {
+                        } catch (ChannelException e) {
                             mChannelListener.onError(500, e.getMessage());
                             e.printStackTrace();
                             return; // TODO??
@@ -380,18 +440,6 @@ public abstract class ChannelClient {
             }
         }
 
-        @SuppressWarnings("deprecation")
-        private static void consume(HttpEntity entity) {
-            // make sure we've finished with the entity...
-            try {
-                if (entity != null) {
-                    entity.consumeContent();
-                }
-            } catch (IOException e) {
-                // ignore....
-            }
-        }
-
         /**
          * Helper class for parsing talk messages. Again, this protocol has been reverse-engineered
          * so it doesn't have a lot of error checking and is generally fairly lenient.
@@ -400,19 +448,19 @@ public abstract class ChannelClient {
             private HttpResponse mHttpResponse;
             private BufferedReader mReader;
 
-            public TalkMessageParser(HttpResponse resp) throws ApiException {
+            public TalkMessageParser(HttpResponse resp) throws ChannelException {
                 try {
                     mHttpResponse = resp;
                     InputStream ins = resp.getEntity().getContent();
                     mReader = new BufferedReader(new InputStreamReader(ins));
                 } catch (IllegalStateException e) {
-                    throw new ApiException(e);
+                    throw new ChannelException(e);
                 } catch (IOException e) {
-                    throw new ApiException(e);
+                    throw new ChannelException(e);
                 }
             }
 
-            public TalkMessage getMessage() throws ApiException {
+            public TalkMessage getMessage() throws ChannelException {
                 String submission = readSubmission();
                 if (submission == null) {
                     return null;
@@ -423,7 +471,7 @@ public abstract class ChannelClient {
                 try {
                     msg.parse(new BufferedReader(new StringReader(submission)));
                 } catch (InvalidMessageException e) {
-                    throw new ApiException(e);
+                    throw new ChannelException(e);
                 }
 
                 return msg;
@@ -440,7 +488,7 @@ public abstract class ChannelClient {
                 }
             }
 
-            private String readSubmission() throws ApiException {
+            private String readSubmission() throws ChannelException {
                 try {
                     String line = mReader.readLine();
                     if (line == null) {
@@ -456,9 +504,9 @@ public abstract class ChannelClient {
                     }
                     return new String(chars);
                 } catch (IOException e) {
-                    throw new ApiException(e);
+                    throw new ChannelException(e);
                 } catch(NumberFormatException e) {
-                    throw new ApiException("Submission was not in expected format.", e);
+                    throw new ChannelException("Submission was not in expected format.", e);
                 }
             }
         }
@@ -664,46 +712,49 @@ public abstract class ChannelClient {
         private static final Logger log = LoggerFactory.getLogger(DevChannelClient.class);
 
         private int POLLING_TIMEOUT_MS = 500;
-        private static final String BASE_URL = "/_ah/channel/";
 
+        private URI mAppEngineURI;
         private String mToken = null;
         private String mClientID = null;
         private ChannelListener mChannelListener = null;
         private boolean mIsRunning = true;
         private Thread mPollThread = null;
+        private HttpClient mHttpClient;
 
-        public DevChannelClient(String token, ChannelListener channelListener) {
+        public DevChannelClient(URI appEngineURI, String token, ChannelListener channelListener) {
+            mAppEngineURI = appEngineURI;
             mToken = token;
             mClientID = null;
             mChannelListener = channelListener;
+            mHttpClient = new DefaultHttpClient();
         }
 
         @Override
-        public void open() throws ApiException {
+        public void open() throws ChannelException {
             mIsRunning = true;
-            connect(request(getUrl("connect")));
+            connect(request(getURI("connect")));
         }
 
         @Override
-        public void close() throws ApiException {
+        public void close() throws ChannelException {
             mIsRunning = false;
-            disconnect(request(getUrl("disconnect")));
+            disconnect(request(getURI("disconnect")));
         }
 
-        private String getUrl(String command) {
+        private URI getURI(String command) {
             try {
-                String url = BASE_URL + "dev?command=" + command + "&channel=";
+                String url = "/_ah/channel/dev?command=" + command + "&channel=";
                 url += URLEncoder.encode(mToken, "UTF-8");
                 if (mClientID != null) {
                     url += "&client=" + URLEncoder.encode(mClientID, "UTF-8");
                 }
-                return url;
+                return mAppEngineURI.resolve(url);
             } catch (UnsupportedEncodingException e) {
                 return null; // should never happen
             }
         };
 
-        private void connect(ResultWrapper res) {
+        private void connect(HttpResponse res) {
             if (!wasError(res)) {
                 mClientID = getResponseString(res);
                 mChannelListener.onOpen();
@@ -713,12 +764,12 @@ public abstract class ChannelClient {
             }
         }
 
-        private void disconnect(ResultWrapper resp) {
+        private void disconnect(HttpResponse resp) {
             wasError(resp); // ignore errors, just report
             mChannelListener.onClose();
         }
 
-        private void forwardMessage(ResultWrapper res) {
+        private void forwardMessage(HttpResponse res) {
             if (!wasError(res)) {
                 String data = getResponseString(res);
                 data = StringUtils.chomp(data);
@@ -743,9 +794,10 @@ public abstract class ChannelClient {
                        }
 
                        try {
-                           ResultWrapper res = request(getUrl("poll"));
+                           HttpResponse res = request(getURI("poll"));
                            forwardMessage(res);
-                       } catch (ApiException e) {
+                           consume(res.getEntity());
+                       } catch (ChannelException e) {
                            log.error("Erroring polling for updates from channel, giving up...");
                            return;
                        }
@@ -755,8 +807,7 @@ public abstract class ChannelClient {
             mPollThread.start();
         }
 
-        private boolean wasError(ResultWrapper res) {
-            HttpResponse resp = res.getResponse();
+        private boolean wasError(HttpResponse resp) {
             if (resp.getStatusLine().getStatusCode() > 299) {
                 mChannelListener.onError(resp.getStatusLine().getStatusCode(),
                         resp.getStatusLine().toString());
@@ -765,9 +816,7 @@ public abstract class ChannelClient {
             return false;
         }
 
-        private String getResponseString(ResultWrapper res) {
-            HttpResponse resp = res.getResponse();
-
+        private String getResponseString(HttpResponse resp) {
             StringWriter outw = new StringWriter();
             try {
                 BufferedReader inr = new BufferedReader(new InputStreamReader(resp.getEntity().getContent()));
@@ -783,14 +832,21 @@ public abstract class ChannelClient {
             return outw.getBuffer().toString();
         }
 
-        private ResultWrapper request(String url) throws ApiException {
-            TreeMap<String, List<String>> headers = new TreeMap<String, List<String>>();
+        private HttpResponse request(URI uri) throws ChannelException {
+            HttpGet httpGet = new HttpGet(uri);
+
             List<String> cookies = ApiClient.getCookies();
-            if (!cookies.isEmpty()) {
-                headers.put("Cookie", cookies);
+            for (String cookie : cookies) {
+                httpGet.addHeader("Cookie", cookie);
             }
 
-            return RequestManager.request("GET", url, headers);
+            try {
+                return mHttpClient.execute(httpGet);
+            } catch (ClientProtocolException e) {
+                throw new ChannelException(e);
+            } catch (IOException e) {
+                throw new ChannelException(e);
+            }
         }
     }
 }
