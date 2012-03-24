@@ -1,36 +1,43 @@
 <!DOCTYPE html>
 <html>
-	<head>
-		<title>War Worlds &bull; {% block title %}Backend{% endblock %}</title>
-		<link type="text/css" rel="stylesheet" href="/css/admin.css">
-		<script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
-		{% block head %}{% endblock %}
-	</head>
-	<body>
-		<section id="header"><div>
-			<div class="user-details">
-				{{ logged_in_user }} &bull;
-				<a href="{{ logout_url }}">Logout</a>
-			</div>
-			<img src="/img/logo.png" width="38" height="38" alt="Logo" />
-			<h1>War Worlds</h1>
-		</div></section>
+  <head>
+    <title>War Worlds &bull; {% block title %}Backend{% endblock %}</title>
+    <link type="text/css" rel="stylesheet" href="/css/admin.css">
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+    {% block head %}{% endblock %}
+  </head>
+  <body>
+    <section id="header"><div class="header-bg">
+      <div class="user-details">
+        {{ logged_in_user }} &bull;
+        <a href="{{ logout_url }}">Logout</a>
+      </div>
+      <img src="/img/logo.png" width="38" height="38" alt="Logo" />
+      <h1>War Worlds</h1>
+      {% if msgs %}
+        <div class="msgs">
+          {% for msg in msgs %}
+            <div class="msg">{{ msg }}</div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    </div></section>
 
-		<section id="navmenu">
-			<ul>
-				<li><a href="/admin">Dashboard</a>
-				<li><a href="/admin/chat">Chat</a>
-				<li><a href="/admin/motd">Message of the Day</a>
-				<li><a href="/admin/empires">Empires</a>
-				<li><a href="/admin/devices">Devices</a>
-				<li>Debug
-					<ul>
-						<li><a href="/admin/debug/data-store">Data Store</a>
-						<li><a href="/admin/debug/starfield">Starfield</a>
-					</ul>
-			</ul>
-		</section>
+    <section id="navmenu">
+      <ul>
+        <li><a href="/admin">Dashboard</a>
+        <li><a href="/admin/chat">Chat</a>
+        <li><a href="/admin/motd">Message of the Day</a>
+        <li><a href="/admin/empires">Empires</a>
+        <li><a href="/admin/devices">Devices</a>
+        <li>Debug
+          <ul>
+            <li><a href="/admin/debug/data-store">Data Store</a>
+            <li><a href="/admin/debug/starfield">Starfield</a>
+          </ul>
+      </ul>
+    </section>
 
-		<div id="maincontent">{% block content %}{% endblock %}</div>
-	</body>
+    <div id="maincontent">{% block content %}{% endblock %}</div>
+  </body>
 </html>

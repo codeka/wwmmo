@@ -1,8 +1,8 @@
 
 mapreduce:
-- name: Bulk Delete entities
+- name: Bulk Delete
   mapper:
-    input_reader: mapreduce.input_readers.DatastoreInputReader
+    input_reader: mapreduce.input_readers.DatastoreEntityInputReader
     handler: tasks.datastore.bulkdelete
     params:
     - name: entity_kind

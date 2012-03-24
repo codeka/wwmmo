@@ -21,9 +21,19 @@ body {
 	background-image: -webkit-linear-gradient(bottom, rgb(37,37,37) 0%, rgb(25,25,25) 100%);
 }
 
-#header div {
+#header div.header-bg {
 	background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAYAAACp8Z5+AAAAJ0lEQVQIW2NkQAOMGAI2NjYzgYJnjxw5MgskyQgU+A+kZwEF0kECALGKCgWXotQhAAAAAElFTkSuQmCC) repeat;
 	height: 56px;
+	position: relative;
+}
+
+#header div.msgs {
+	position: absolute;
+	top: 4px;
+	left: 300px;
+	background: #ffdead;
+	padding: 2px 10px;
+	border-radius: 4px;
 }
 
 #header img {

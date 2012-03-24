@@ -58,7 +58,7 @@ public abstract class ChannelClient {
      * @param listener Your implementation of \c ChannelListener.
      */
     public static ChannelClient createChannel(URI appEngineURI, String token, ChannelListener listener) {
-        if (appEngineURI.toString().indexOf("localhost") >= 0) {
+        if (appEngineURI.toString().indexOf("appspot") < 0) {
             return new DevChannelClient(appEngineURI, token, listener);
         } else {
             return new ProdChannelClient(appEngineURI, token, listener);

@@ -90,7 +90,7 @@ public class ChatManager {
     public ChatMessage[] getLastMessages(int n) {
         ChatMessage[] msgs = new ChatMessage[n];
 
-        Iterator<ChatMessage> iter = mMessages.descendingIterator();
+        Iterator<ChatMessage> iter = mMessages.iterator();
         for(int i = 0; i < n; i++) {
             if (iter.hasNext()) {
                 msgs[i] = iter.next();
@@ -108,9 +108,9 @@ public class ChatManager {
     public void addMessage(ChatMessage msg) {
         synchronized(mMessages) {
             while (mMessages.size() > MAX_CHAT_HISTORY) {
-                mMessages.removeFirst();
+                mMessages.removeLast();
             }
-            mMessages.addLast(msg);
+            mMessages.addFirst(msg);
         }
         fireMessageAddedListeners(msg);
     }
@@ -124,7 +124,7 @@ public class ChatManager {
      */
     public ChatMessage getMessage(int n) {
         synchronized(mMessages) {
-            return mMessages.get(mMessages.size() - n - 1);
+            return mMessages.get(n);
         }
     }
 
