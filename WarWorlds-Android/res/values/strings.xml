@@ -36,4 +36,6 @@
 
     <!-- "solarsystem.xml" layout -->
     <string name="solarsystem_colonize">Colonize</string>
+    <string name="chat_global">Global</string>
+    <string name="chat_send">Send</string>
 </resources>

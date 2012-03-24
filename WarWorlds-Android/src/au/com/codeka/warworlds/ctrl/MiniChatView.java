@@ -1,17 +1,19 @@
 package au.com.codeka.warworlds.ctrl;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Color;
-import android.os.Handler;
 import android.util.AttributeSet;
 import android.util.TypedValue;
+import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import au.com.codeka.warworlds.R;
+import au.com.codeka.warworlds.game.ChatActivity;
 import au.com.codeka.warworlds.game.ChatManager;
 import au.com.codeka.warworlds.model.ChatMessage;
 
@@ -37,15 +39,15 @@ public class MiniChatView extends RelativeLayout {
         int size = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 30, r.getDisplayMetrics());
         LayoutParams lp = new LayoutParams(size, size);
 
-        Button btn = new Button(mContext);
-        btn.setLayoutParams(lp);
-        btn.setBackgroundResource(R.drawable.button_bg);
-        btn.setId(id++);
-        btn.setCompoundDrawablesWithIntrinsicBounds(R.drawable.chat_icon, 0, 0, 0);
-        addView(btn);
+        Button chatButton = new Button(mContext);
+        chatButton.setLayoutParams(lp);
+        chatButton.setBackgroundResource(R.drawable.button_bg);
+        chatButton.setId(id++);
+        chatButton.setCompoundDrawablesWithIntrinsicBounds(R.drawable.chat_icon, 0, 0, 0);
+        addView(chatButton);
 
         lp = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
-        lp.addRule(RelativeLayout.RIGHT_OF, btn.getId());
+        lp.addRule(RelativeLayout.RIGHT_OF, chatButton.getId());
         mScrollView = new ScrollView(mContext);
         mScrollView.setLayoutParams(lp);
         mScrollView.setId(id++);
@@ -62,6 +64,14 @@ public class MiniChatView extends RelativeLayout {
         ChatManager.getInstance().addMessageAddedListener(mMessageAddedListener);
 
         refreshMessages();
+
+        chatButton.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(mContext, ChatActivity.class);
+                mContext.startActivity(intent);
+            }
+        });
     }
 
     private void refreshMessages() {
