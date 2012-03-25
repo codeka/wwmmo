@@ -50,12 +50,18 @@ public class SolarSystemActivity extends Activity {
             long sectorX = extras.getLong("au.com.codeka.warworlds.SectorX");
             long sectorY = extras.getLong("au.com.codeka.warworlds.SectorY");
             String starKey = extras.getString("au.com.codeka.warworlds.StarKey");
+            final int planetIndex = extras.getInt("au.com.codeka.warworlds.PlanetIndex", -1);
 
             ModelManager.requestStar(sectorX, sectorY, starKey, new StarFetchedHandler() {
                 @Override
                 public void onStarFetched(Star s) {
                     mSolarSystemSurfaceView.setStar(s);
-                    mSolarSystemSurfaceView.redraw();
+                    Planet[] planets = s.getPlanets();
+                    if (planetIndex >= 0 && planets.length > planetIndex) {
+                        mSolarSystemSurfaceView.selectPlanet(planets[planetIndex].getKey());
+                    } else {
+                        mSolarSystemSurfaceView.redraw();
+                    }
                 }
             });
         }

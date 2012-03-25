@@ -32,6 +32,10 @@ public class MiniChatView extends RelativeLayout {
         super(context, attrs);
         mContext = context;
 
+        if (this.isInEditMode()) {
+            return;
+        }
+
         int id = 1;
         this.setBackgroundColor(Color.argb(0xaa, 0, 0, 0));
 

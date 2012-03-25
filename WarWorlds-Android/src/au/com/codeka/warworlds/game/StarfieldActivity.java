@@ -6,15 +6,16 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.BaseAdapter;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import au.com.codeka.warworlds.R;
+import au.com.codeka.warworlds.model.Colony;
 import au.com.codeka.warworlds.model.ModelManager;
 import au.com.codeka.warworlds.model.Planet;
 import au.com.codeka.warworlds.model.Star;
@@ -54,10 +55,8 @@ public class StarfieldActivity extends Activity {
         mStarName = (TextView) findViewById(R.id.star_name);
         mLoadingContainer = (ViewGroup) findViewById(R.id.star_loading_container);
         mPlanetList = (ListView) findViewById(R.id.starfield_planet_list);
-        final Button zoomInButton = (Button) findViewById(R.id.starfield_zoomin);
 
         mPlanetList.setVisibility(View.GONE);
-        zoomInButton.setVisibility(View.GONE);
 
         EmpireManager empireManager = EmpireManager.getInstance();
         mUsername.setText(empireManager.getEmpire().getDisplayName());
@@ -75,7 +74,6 @@ public class StarfieldActivity extends Activity {
                 // load the rest of the star's details as well
                 mLoadingContainer.setVisibility(View.VISIBLE);
                 mPlanetList.setVisibility(View.GONE);
-                zoomInButton.setVisibility(View.GONE);
 
                 ModelManager.requestStar(star.getSector().getX(), star.getSector().getY(),
                         star.getKey(), new ModelManager.StarFetchedHandler() {
@@ -86,7 +84,6 @@ public class StarfieldActivity extends Activity {
                     public void onStarFetched(Star star) {
                         mLoadingContainer.setVisibility(View.GONE);
                         mPlanetList.setVisibility(View.VISIBLE);
-                        zoomInButton.setVisibility(View.VISIBLE);
 
                         mPlanetListAdapter.setStar(star);
                     }
@@ -94,9 +91,9 @@ public class StarfieldActivity extends Activity {
             }
         });
 
-        zoomInButton.setOnClickListener(new OnClickListener() {
+        mPlanetList. setOnItemClickListener(new OnItemClickListener() {
             @Override
-            public void onClick(View v) {
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Star star = mStarfield.getSelectedStar();
                 if (star == null) {
                     return; //??
@@ -106,6 +103,7 @@ public class StarfieldActivity extends Activity {
                 intent.putExtra("au.com.codeka.warworlds.SectorX", star.getSector().getX());
                 intent.putExtra("au.com.codeka.warworlds.SectorY", star.getSector().getY());
                 intent.putExtra("au.com.codeka.warworlds.StarKey", star.getKey());
+                intent.putExtra("au.com.codeka.warworlds.PlanetIndex", position);
                 mContext.startActivity(intent);
             }
         });
@@ -156,8 +154,25 @@ public class StarfieldActivity extends Activity {
             Planet planet = mStar.getPlanets()[position];
             icon.setImageResource(planet.getPlanetType().getIconID());
 
+            TextView planetTypeTextView = (TextView) view.findViewById(R.id.starfield_planet_type);
+            planetTypeTextView.setText(planet.getPlanetType().getDisplayName());
+
+            Colony colony = null;
+            for(Colony c : mStar.getColonies()) {
+                if (c.getPlanetKey().equals(planet.getKey())) {
+                    colony = c;
+                    break;
+                }
+            }
+
+            TextView colonyTextView = (TextView) view.findViewById(R.id.starfield_planet_colony);
+            if (colony != null) {
+                colonyTextView.setText("TODO: empire?");
+            } else {
+                colonyTextView.setText("");
+            }
+
             return view;
         }
-        
     }
 }

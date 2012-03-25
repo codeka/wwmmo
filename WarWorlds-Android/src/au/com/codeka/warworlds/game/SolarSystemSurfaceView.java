@@ -84,6 +84,16 @@ public class SolarSystemSurfaceView extends UniverseElementSurfaceView {
     public Planet getSelectedPlanet() {
         return mSelectedPlanet.planet;
     }
+    public void selectPlanet(String planetKey) {
+        for(PlanetInfo planetInfo : mPlanetInfos) {
+            if (planetInfo.planet.getKey().equals(planetKey)) {
+                mSelectedPlanet = planetInfo;
+
+                firePlanetSelected(mSelectedPlanet.planet);
+                redraw();
+            }
+        }
+    }
 
     /**
      * Creates the \c OnGestureListener that'll handle our gestures.
@@ -184,21 +194,19 @@ public class SolarSystemSurfaceView extends UniverseElementSurfaceView {
     private class GestureListener extends GestureDetector.SimpleOnGestureListener {
         @Override
         public boolean onSingleTapConfirmed(MotionEvent e) {
-            boolean newPlanet = false;
+            PlanetInfo newSelection = null;
 
             Point2D tapLocation = new Point2D(e.getX(), e.getY());
             for (PlanetInfo planetInfo : mPlanetInfos) {
                 if (tapLocation.distanceTo(planetInfo.centre) < 80.0) {
                     if (mSelectedPlanet != planetInfo) {
-                        newPlanet = true;
-                        mSelectedPlanet = planetInfo;
+                        newSelection = planetInfo;
                     }
                 }
             }
 
-            if (newPlanet) {
-                firePlanetSelected(mSelectedPlanet.planet);
-                redraw();
+            if (newSelection != null) {
+                selectPlanet(newSelection.planet.getKey());
             }
 
             return false;
