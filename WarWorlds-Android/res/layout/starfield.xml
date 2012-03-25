@@ -96,7 +96,7 @@
         android:layout_marginRight="320dp"
         android:layout_gravity="bottom|left" />
 
-    <au.com.codeka.warworlds.BannerAdView
+    <au.com.codeka.warworlds.ctrl.BannerAdView
         android:id="@+id/ad"
         android:layout_width="320dp"
         android:layout_height="50dp"
