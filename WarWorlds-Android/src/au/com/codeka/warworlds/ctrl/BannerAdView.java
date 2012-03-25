@@ -1,4 +1,4 @@
-package au.com.codeka.warworlds;
+package au.com.codeka.warworlds.ctrl;
 
 import android.app.Activity;
 import android.content.Context;
