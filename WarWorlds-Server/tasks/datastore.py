@@ -8,6 +8,6 @@ from mapreduce import operation as op
 
 
 def bulkdelete(entity):
-    yield op.db.Delete(entity)
+  yield op.db.Delete(entity)
 
 

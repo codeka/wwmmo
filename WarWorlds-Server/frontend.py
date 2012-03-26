@@ -13,16 +13,15 @@ jinja = jinja2.Environment(loader=jinja2.FileSystemLoader(os.path.dirname(__file
 
 
 class MainPage(webapp.RequestHandler):
+  def get(self):
+    user = users.get_current_user()
+    if user:
+      logout_url = users.create_logout_url(self.request.uri)
+    else:
+      logout_url = None
 
-    def get(self):
-        user = users.get_current_user()
-        if user:
-            logout_url = users.create_logout_url(self.request.uri)
-        else:
-            logout_url = None
-
-        tmpl = jinja.get_template('frontend/index.html')
-        self.response.out.write(tmpl.render({'logout_url': logout_url}))
+    tmpl = jinja.get_template('frontend/index.html')
+    self.response.out.write(tmpl.render({'logout_url': logout_url}))
 
 
 app = webapp.WSGIApplication([('/', MainPage)],

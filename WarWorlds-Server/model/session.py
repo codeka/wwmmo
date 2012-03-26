@@ -21,8 +21,7 @@ class Session(db.Model):
     '''Attaches a session to the given webapp.Handler instance.
     
     This is usually called right at the start of the page so that we can query the cookie to
-    see if there's already a session establish, and create a new one if not.
-    '''
+    see if there's already a session establish, and create a new one if not.'''
 
     if options is None:
       options = {}
