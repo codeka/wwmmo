@@ -35,23 +35,18 @@ import au.com.codeka.warworlds.game.StarfieldActivity;
 import au.com.codeka.warworlds.model.Empire;
 
 /**
- * Main activity - requests "Hello, World" messages from the server and provides
- * a menu item to invoke the accounts activity.
+ * Main activity. Displays the message of the day and lets you select "Start Game", "Options", etc.
  */
 public class WarWorldsActivity extends Activity {
     private static Logger log = LoggerFactory.getLogger(WarWorldsActivity.class);
     private Context mContext = this;
     private Button mStartGameButton;
 
-    /**
-     * Begins the activity.
-     */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         log.info("WarWorlds activity starting...");
         super.onCreate(savedInstanceState);
 
-        // initialize the Util class
         Util.loadSettings(mContext, this);
         Authenticator.configure(mContext);
 
@@ -68,12 +63,9 @@ public class WarWorldsActivity extends Activity {
             return;
         }
 
-        setScreenContent(R.layout.home);
+        this.setHomeScreenContent();
     }
 
-    /**
-     * Shuts down the activity.
-     */
     @Override
     public void onDestroy() {
         super.onDestroy();
@@ -138,6 +130,11 @@ public class WarWorldsActivity extends Activity {
                 try {
                     String url = "hello/"+DeviceRegistrar.getDeviceRegistrationKey(mContext);
                     Hello hello = ApiClient.putProtoBuf(url, null, Hello.class);
+                    if (hello == null) {
+                        // Usually this happens on the dev server when we've just cleared the
+                        // data store. Not good :-)
+                        throw new ApiException("Server Error");
+                    }
 
                     if (hello.hasEmpire()) {
                         mNeedsEmpireSetup = false;
@@ -177,7 +174,7 @@ public class WarWorldsActivity extends Activity {
             }
         }.execute();
     }
-    
+
     private void setWebViewTransparent(WebView webView) {
         webView.setBackgroundColor(Color.TRANSPARENT);
 
@@ -199,9 +196,6 @@ public class WarWorldsActivity extends Activity {
         }
     }
 
-    /**
-     * Sets up the contents of the home screen.
-     */
     private void setHomeScreenContent() {
         setContentView(R.layout.home);
 
@@ -223,17 +217,5 @@ public class WarWorldsActivity extends Activity {
                 startActivity(new Intent(mContext, StarfieldActivity.class));
             }
         });
-    }
-
-    /**
-     * Sets the screen content based on the screen id.
-     */
-    private void setScreenContent(int screenId) {
-        setContentView(screenId);
-        switch (screenId) {
-            case R.layout.home:
-                setHomeScreenContent();
-                break;
-        }
     }
 }

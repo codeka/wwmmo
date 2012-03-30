@@ -28,15 +28,18 @@ class Session(db.Model):
     if 'cookie_name' not in options:
       options['cookie_name'] = 'SESSID'
 
+    sess = None
     if options['cookie_name'] in handler.request.cookies:
       session_id = handler.request.cookies[options['cookie_name']]
       sess = Session.get(session_id)
-      #TODO: validate session
-      if sess.data is not None:
-        sess.sessionData = pickle.loads(sess.data)
-      else:
-        sess.sessionData = {}
-    else:
+      if sess is not None:
+        #TODO: validate session
+        if sess.data is not None:
+          sess.sessionData = pickle.loads(sess.data)
+        else:
+          sess.sessionData = {}
+
+    if sess is None:
       sess = Session()
       sess.put()
       handler.response.set_cookie(options['cookie_name'], str(sess.key()))

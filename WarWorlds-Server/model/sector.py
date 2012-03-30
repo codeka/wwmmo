@@ -7,8 +7,25 @@ Created on 18/02/2012
 from google.appengine.ext import db
 import logging
 import random
-
+import math
 import namegen
+
+
+class StarType:
+  def __init__(self, colourName="", colourValue=0x0, bonus=0):
+    self.colourName = colourName
+    self.colourValue = colourValue
+    self.bonus = bonus
+
+
+_starTypes = [StarType(colourName="Blue", colourValue=0xffddffff, bonus=30),
+              StarType(colourName="White", colourValue=0xfffffbd8, bonus=40),
+              StarType(colourName="Yellow", colourValue=0xffffde69, bonus=50),
+              StarType(colourName="Orange", colourValue=0xffe9a21d, bonus=40),
+              StarType(colourName="Red", colourValue=0xffe9846f, bonus=30),
+              StarType(colourName="Neutron", colourValue=0xff32a1db, bonus=0),
+              StarType(colourName="Blackhole", colourValue=0xff10535f, bonus=0)
+             ]
 
 
 class PlanetType:
@@ -17,28 +34,19 @@ class PlanetType:
     self.minSize = minSize
     self.maxSize = maxSize
 
+
 # This is the description of different types of planets. The order is important and
 # must match what is defined for Planet.PLANET_TYPE in warworlds.proto
-_planetTypes = [
-  PlanetType(name="Gas Giant",
-             minSize=40, maxSize=50),
-  PlanetType(name="Radiated",
-             minSize=5, maxSize=30),
-  PlanetType(name="Inferno",
-             minSize=5, maxSize=30),
-  PlanetType(name="Asteroids",
-             minSize=50, maxSize=50),
-  PlanetType(name="Water",
-             minSize=20, maxSize=40),
-  PlanetType(name="Toxic",
-             minSize=10, maxSize=20),
-  PlanetType(name="Desert",
-             minSize=10, maxSize=30),
-  PlanetType(name="Swamp",
-             minSize=10, maxSize=30),
-  PlanetType(name="Terran",
-             minSize=10, maxSize=30)
-  ]
+_planetTypes = [PlanetType(name="Gas Giant", minSize=40, maxSize=50),
+                PlanetType(name="Radiated", minSize=5, maxSize=30),
+                PlanetType(name="Inferno", minSize=5, maxSize=30),
+                PlanetType(name="Asteroids", minSize=50, maxSize=50),
+                PlanetType(name="Water", minSize=20, maxSize=40),
+                PlanetType(name="Toxic", minSize=10, maxSize=20),
+                PlanetType(name="Desert", minSize=10, maxSize=30),
+                PlanetType(name="Swamp", minSize=10, maxSize=30),
+                PlanetType(name="Terran", minSize=10, maxSize=30)
+               ]
 
 
 class Sector(db.Model):
@@ -48,8 +56,8 @@ class Sector(db.Model):
 
 class Star(db.Model):
   sector = db.ReferenceProperty(Sector)
-  starID = db.IntegerProperty()
   name = db.StringProperty()
+  starTypeIndex = db.IntegerProperty()
   colour = db.IntegerProperty()
   size = db.IntegerProperty()
   x = db.IntegerProperty()
@@ -133,6 +141,69 @@ class SectorManager:
   def _getSectorKey(x, y):
     return str(x)+","+str(y)
 
+
+def poisson(width, height, min_distance, packing=30):
+  '''Generates a poisson distribution of points in a grid.
+  
+  Args:
+    width: The width of the grid
+    height: The height of the grid
+    min_distance: The minimum distance two points can be from each other
+    packing: A value that describes how tightly "packed" the points should be. 30 is
+      decent starting value.
+  '''
+
+  def generatePointAround(point, min_distance):
+    '''Generates a new point around the given centre point and at least min_distance from it.'''
+    radius = min_distance * (1+random.random())
+    angle = 2*math.pi*random.random()
+  
+    x, y = point
+    x = x + radius * math.cos(angle)
+    y = y + radius * math.sin(angle)
+  
+    return x, y
+
+  def inNeighbourhood(points, point, min_distance, cell_size):
+    '''Checks whether any previous point is too close to this new one.'''
+  
+    def distance(p1, p2):
+      x1, y1 = p1
+      x2, y2 = p2
+      return math.sqrt((x2-x1)*(x2-x1) + (y2-y1)*(y2-y1))
+
+    for _,this_point in enumerate(points):
+      dist = distance(point, this_point)
+      if dist < min_distance:
+        return True
+  
+    return False
+
+  cell_size= min_distance/math.sqrt(2)
+  points = set() # actually a bunch of (x,y) tuple since we're so sparse...
+  unprocessed = []
+
+  first_point = random.randint(0, width), random.randint(0, height)
+  unprocessed.append(first_point)
+  points.add(first_point)
+
+  while unprocessed:
+    logging.debug("Unprocess list contains "+str(len(unprocessed))+" items")
+    point = unprocessed.pop(random.randint(0, len(unprocessed)-1))
+    for _ in range(packing):
+      new_point = generatePointAround(point, min_distance)
+      x, y = new_point
+      if x < 0 or x >= width or y < 0 or y >= height:
+        continue
+
+      if inNeighbourhood(points, new_point, min_distance, cell_size):
+        continue
+
+      unprocessed.append(new_point)
+      points.add(new_point)
+
+  return list(points)
+
 class SectorGenerator:
   '''This class generates a brand new sector. We give it some stars, planets and whatnot.'''
 
@@ -143,6 +214,9 @@ class SectorGenerator:
   def generate(self):
     '''Generates a new sector at our (x,y) corrdinate
 
+    Stars are generated within the sector using a Poisson distribution algorithm. For more
+    details, see: http://devmag.org.za/2009/05/03/poisson-disk-sampling/
+
     TODO: currently this could result in two sectors being generated at the same (x,y)
     coordinate. We need to do something to avoid that (e.g. specify the key ourselves,
     transactions, something like that).'''
@@ -151,51 +225,36 @@ class SectorGenerator:
     sector = Sector()
     sector.x = self.x
     sector.y = self.y
+    sector.stars = []
     sector.put()
 
-    sector.stars = []
-
     SECTOR_SIZE = 1024
-    GRID_SIZE = SECTOR_SIZE / 16
-    GRID_CENTRE = GRID_SIZE / 2
 
-    numStars = random.randint(10, 15)
-    for _ in range(numStars):
+    star_points = poisson(SECTOR_SIZE, SECTOR_SIZE, SECTOR_SIZE / 8, 60)
+    for point in star_points:
       star = Star()
       star.sector = sector.key()
+      x, y = point
+      star.x = int(x)
+      star.y = int(y)
 
-      # Make sure there's no other stars with the same coordinates as us. For the initial
-      # generation, we generate stars on a 16x16 grid. Then we scale that to fit the whole
-      # sector later. This way, stars are created on a semi-regular grid and we can be sure
-      # no two stars are ever "too close" to each other.
-      dupe = True
-      while dupe:
-        star.x = random.randint(0, 15)
-        star.y = random.randint(0, 15)
-        dupe = False
-
-        for otherStar in sector.stars:
-          if otherStar.x == star.x and otherStar.y == star.y:
-            dupe = True
+      starTypeIndex = self._select(st.bonus for st in _starTypes)
+      starType = _starTypes[starTypeIndex]
+      star.colour = starType.colourValue
+      star.starTypeIndex = starTypeIndex
 
       star.name = namegen.generate(1)[0]
-      star.size = random.randint(GRID_SIZE/4, GRID_SIZE/3)
+      star.size = random.randint(16, 24)
 
-      r = random.randint(100, 255)
-      g = random.randint(100, 255)
-      b = random.randint(100, 255)
-      star.colour = 0xff000000 | (r << 16) | (g << 8) | b
+      #r = random.randint(100, 255)
+      #g = random.randint(100, 255)
+      #b = random.randint(100, 255)
+      #star.colour = 0xff000000 | (r << 16) | (g << 8) | b
 
       sector.stars.append(star)
-
-    for star in sector.stars:
-      offsetX = random.randint(GRID_CENTRE-(GRID_CENTRE/2.0), GRID_CENTRE+(GRID_CENTRE/2.0))
-      offsetY = random.randint(GRID_CENTRE-(GRID_CENTRE/2.0), GRID_CENTRE+(GRID_CENTRE/2.0))
-
-      star.x = star.x*GRID_SIZE + offsetX
-      star.y = star.y*GRID_SIZE + offsetY
       star.put()
 
+    for star in sector.stars:
       numPlanets = random.randint(2, 5)
       for index in range(numPlanets):
         planet = Planet()
@@ -206,4 +265,38 @@ class SectorGenerator:
         planet.size = random.randint(planet.planetType.minSize, planet.planetType.maxSize)
         planet.put()
 
+
+
+
     return sector
+
+  def _select(self, bonuses):
+    '''Selects an index from a list of bonuses.
+
+    For example, if you pass in [0,0,0,0], then all four indices are equally like and
+    we will return a value in the range [0,4) with equal probability. If you pass in something
+    like [0,0,30] then the third item has a "bonus" of 30 and is hence 2 is a far more likely
+    result than 0 or 1.'''
+    values = []
+    for i,bonus in enumerate(bonuses):
+      values.append(bonus + self._normalRandom(100))
+
+    maxIndex = 0
+    maxValue = 0
+    for i,v in enumerate(values):
+      if v > maxValue:
+        maxIndex = i
+        maxValue = v
+
+    return maxIndex
+
+  def _normalRandom(self, maxValue, rounds=10):
+    '''Generates a random number that has an approximate normal distribution around the midpoint.
+
+    For example, is maxValue=100 then you'll most get values around 50 and only occasionally 0
+    or 100.'''
+    n = 0
+    step = maxValue/rounds
+    for _ in range(rounds):
+      n += random.randint(0, step)
+    return n

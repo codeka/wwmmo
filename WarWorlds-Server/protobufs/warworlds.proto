@@ -11,8 +11,8 @@ package warworlds;
 //
 message MessageOfTheDay
 {
-	required string message = 1;
-	required string last_update = 2; // last update date (in ISO string format)
+    required string message = 1;
+    required string last_update = 2; // last update date (in ISO string format)
 }
 
 
@@ -22,27 +22,27 @@ message MessageOfTheDay
 //
 message Empire
 {
-	// A unique identifier for the empire, useful for referencing him in other parts of the
-	// system. This won't be present in the initial "PUT"
-	optional string key = 1;
+    // A unique identifier for the empire, useful for referencing him in other parts of the
+    // system. This won't be present in the initial "PUT"
+    optional string key = 1;
 
-	// The "display" name for the player, which is what other players see.
-	required string display_name = 2;
+    // The "display" name for the player, which is what other players see.
+    required string display_name = 2;
 
-	// The player's Google Account identifier (which is actually unique of their email address)
-	optional string user = 3;
+    // The player's Google Account identifier (which is actually unique of their email address)
+    optional string user = 3;
 
-	// The player's email address
-	optional string email = 4;
+    // The player's email address
+    optional string email = 4;
 
-	enum EmpireState
-	{
-		INITIAL = 1;
-		REGISTERED = 2;
-		BANNED = 3;
-	}
+    enum EmpireState
+    {
+        INITIAL = 1;
+        REGISTERED = 2;
+        BANNED = 3;
+    }
 
-	required EmpireState state = 5;
+    required EmpireState state = 5;
 }
 
 
@@ -51,21 +51,21 @@ message Empire
 //
 message Hello
 {
-	// The current message of the day.
-	required MessageOfTheDay motd = 1;
+    // The current message of the day.
+    required MessageOfTheDay motd = 1;
 
-	// If specified, the Empire you're currently logged in as (if not specified, it means
-	// you haven't set up an empire yet, and you should do that before anything else...)
-	optional Empire empire = 2;
+    // If specified, the Empire you're currently logged in as (if not specified, it means
+    // you haven't set up an empire yet, and you should do that before anything else...)
+    optional Empire empire = 2;
 
-	// The list of colonies your empire owns. Typically, you'll want to start the
-	// starfield view centred on one of your own colonies...
-	repeated Colony colonies = 3;
+    // The list of colonies your empire owns. Typically, you'll want to start the
+    // starfield view centred on one of your own colonies...
+    repeated Colony colonies = 3;
 
-	// The ClientID and token you'll use to connect via the Channel API for chats (and
-	// possibly other things..?)
-	optional string channel_client_id = 4;
-	optional string channel_token = 5;
+    // The ClientID and token you'll use to connect via the Channel API for chats (and
+    // possibly other things..?)
+    optional string channel_client_id = 4;
+    optional string channel_token = 5;
 }
 
 //
@@ -74,35 +74,35 @@ message Hello
 //
 message DeviceRegistration
 {
-	// Unique identifier for this particuilar registration (similar to device_registration_id,
-	// but that's specific to C2DN and is kind a long and unweildy string).
-	optional string key = 1;
+    // Unique identifier for this particuilar registration (similar to device_registration_id,
+    // but that's specific to C2DN and is kind a long and unweildy string).
+    optional string key = 1;
 
-	// The identifier of the device. You can have multiple accounts on one device, this
-	// will then refer to the device itself.
-	required string device_id = 2;
+    // The identifier of the device. You can have multiple accounts on one device, this
+    // will then refer to the device itself.
+    required string device_id = 2;
 
-	// The identifier of this *registration*. You can register one account on one device,
-	// but you could have the same account on multiple devices, too.
-	required string device_registration_id = 3;
+    // The identifier of this *registration*. You can register one account on one device,
+    // but you could have the same account on multiple devices, too.
+    required string device_registration_id = 3;
 
-	// The value of android.os.Build.MODEL for this device
-	required string device_model = 4;
+    // The value of android.os.Build.MODEL for this device
+    required string device_model = 4;
 
-	// The value of android.os.Build.MANUFACTURER for this device
-	required string device_manufacturer = 5;
+    // The value of android.os.Build.MANUFACTURER for this device
+    required string device_manufacturer = 5;
 
-	// The value of android.os.Build.DISPLAY for this device
-	required string device_build = 6;
+    // The value of android.os.Build.DISPLAY for this device
+    required string device_build = 6;
 
-	// The value of android.os.Build.VERSION.RELEASE for this device (note that this can
-	// change if you upgrade the OS without re-registering your device!)
-	required string device_version = 7;
+    // The value of android.os.Build.VERSION.RELEASE for this device (note that this can
+    // change if you upgrade the OS without re-registering your device!)
+    required string device_version = 7;
 
-	// If set, this is the user that the device belongs to. This is usually only returned
-	// when you fetch registrations, adding registrations you can obviously only register
-	// to yourself (i.e. if this is present, it's ignored anyway)
-	optional string user = 8;
+    // If set, this is the user that the device belongs to. This is usually only returned
+    // when you fetch registrations, adding registrations you can obviously only register
+    // to yourself (i.e. if this is present, it's ignored anyway)
+    optional string user = 8;
 }
 
 //
@@ -110,7 +110,7 @@ message DeviceRegistration
 //
 message DeviceRegistrations
 {
-	repeated DeviceRegistration registrations = 1;
+    repeated DeviceRegistration registrations = 1;
 }
 
 //
@@ -118,7 +118,7 @@ message DeviceRegistrations
 //
 message DeviceMessage
 {
-	required string message = 1;
+    required string message = 1;
 }
 
 
@@ -127,7 +127,7 @@ message DeviceMessage
 //
 message ChatMessage
 {
-	required string message = 1;
+    required string message = 1;
 }
 
 
@@ -135,16 +135,16 @@ message ChatMessage
 // Represents a "sector" of space, containing a number of stars and whatnot.
 message Sector
 {
-	// these are the (x,y) coordinates of the sector. (0,0) is the "centre" of the universe,
-	// (1,1) is one sector up and to the right, and so on.
-	required int64 x = 1;
-	required int64 y = 2;
+    // these are the (x,y) coordinates of the sector. (0,0) is the "centre" of the universe,
+    // (1,1) is one sector up and to the right, and so on.
+    required int64 x = 1;
+    required int64 y = 2;
 
-	// the collection of stars in this sector.
-	repeated Star stars = 3;
+    // the collection of stars in this sector.
+    repeated Star stars = 3;
 
-	// a collection of colonies in this sector (TODO: full colony details? probably not needed...)
-	repeated Colony colonies = 4;
+    // a collection of colonies in this sector (TODO: full colony details? probably not needed...)
+    repeated Colony colonies = 4;
 }
 
 //
@@ -153,34 +153,48 @@ message Sector
 //
 message Star
 {
-	// the identifier of the star, unique throughout the universe.
-	required string key = 1;
+    // the identifier of the star, unique throughout the universe.
+    optional string key = 1;
 
-	// the name of the star
-	required string name = 2;
+    // the name of the star
+    optional string name = 2;
 
-	// the colour of the star, as an RGB value
-	required uint32 colour = 3;
+    // the classification of this star. The order of these enum values
+    // must correspond to the order of the StarTypes defined in sector.py
+    enum CLASSIFICATION
+    {
+        BLUE = 0;
+        WHITE = 1;
+        YELLOW = 2;
+        ORANGE = 3;
+        RED = 4;
+        NEUTRON = 5;
+        BLACKHOLE = 6;
+    }
+    optional CLASSIFICATION classification = 3;
 
-	// the apparent "size" of the star (which is really just a display thing)
-	required int32 size = 4;
+    // the colour of the star, as an RGB value
+    optional uint32 colour = 4;
 
-	// the offset from the left edge of the sector, in pixels
-	required int32 offset_x = 5;
+    // the apparent "size" of the star (which is really just a display thing)
+    optional int32 size = 5;
 
-	// the offset from the bottom edge of the sector, in pixels
-	required int32 offset_y = 6;
+    // the offset from the left edge of the sector, in pixels
+    required int32 offset_x = 6;
 
-	// the number of planets orbiting this star (useful for knowing whether there are
-	// actually planets, and the planets field is just empty, or whether there are no
-	// planets anyway).
-	required int32 num_planets = 7;
+    // the offset from the bottom edge of the sector, in pixels
+    required int32 offset_y = 7;
 
-	// the collection of planets orbiting this star (may be empty)
-	repeated Planet planets = 8;
+    // the number of planets orbiting this star (useful for knowing whether there are
+    // actually planets, and the planets field is just empty, or whether there are no
+    // planets anyway).
+    required int32 num_planets = 8;
 
-	// collection of colonies on our planet(s)
-	repeated Colony colonies = 9;
+    // the collection of planets orbiting this star (may be empty)
+    repeated Planet planets = 9;
+
+    // collection of colonies on our planet(s)
+    repeated Colony colonies = 10;
 }
 
 //
@@ -189,33 +203,33 @@ message Star
 //
 message Planet
 {
-	// The key of the planet, unique throughout the universe.
-	required string key = 1;
+    // The key of the planet, unique throughout the universe.
+    required string key = 1;
 
-	// The "index" of the planet represents how far it is from the sun. Planets are always
-	// in monotonically increasing order of distance (0, 1, 2, 3, etc)
-	required int32 index = 2;
+    // The "index" of the planet represents how far it is from the sun. Planets are always
+    // in monotonically increasing order of distance (0, 1, 2, 3, etc)
+    required int32 index = 2;
 
-	// The various different "kinds" of planets. Planets are spawned in increasing order
-	// of probability (so "terran" is most likely, "gas giant" least likely).
-	enum PLANET_TYPE
-	{
-		GASGIANT = 1;
-		RADIATED = 2;
-		INFERNO = 3;
-		ASTEROIDS = 4;
-		WATER = 5;
-		TOXIC = 6;
-		DESERT = 7;
-		SWAMP = 8;
-		TERRAN = 9;
-	}
+    // The various different "kinds" of planets. Planets are spawned in increasing order
+    // of probability (so "terran" is most likely, "gas giant" least likely).
+    enum PLANET_TYPE
+    {
+        GASGIANT = 1;
+        RADIATED = 2;
+        INFERNO = 3;
+        ASTEROIDS = 4;
+        WATER = 5;
+        TOXIC = 6;
+        DESERT = 7;
+        SWAMP = 8;
+        TERRAN = 9;
+    }
 
-	required PLANET_TYPE planet_type = 3;
+    required PLANET_TYPE planet_type = 3;
 
-	// The size of the planet. Certain planet_type's are predisposed to be certain sizes
-	// (e.g. GASGIANT is predisposed to being big, etc) but planets will still vary in exact size.
-	required int32 size = 4;
+    // The size of the planet. Certain planet_type's are predisposed to be certain sizes
+    // (e.g. GASGIANT is predisposed to being big, etc) but planets will still vary in exact size.
+    required int32 size = 4;
 }
 
 //
@@ -223,7 +237,7 @@ message Planet
 //
 message Sectors
 {
-	repeated Sector sectors = 1;
+    repeated Sector sectors = 1;
 }
 
 //
@@ -231,8 +245,8 @@ message Sectors
 //
 message ColonizeRequest
 {
-	// The planet you want to colonize
-	required string planet_key = 1;
+    // The planet you want to colonize
+    required string planet_key = 1;
 }
 
 //
@@ -240,18 +254,18 @@ message ColonizeRequest
 //
 message Colony
 {
-	// The key of this colony, which you can use to refer to it directly.
-	optional string key = 1;
+    // The key of this colony, which you can use to refer to it directly.
+    optional string key = 1;
 
-	// The key of the empire that owns this colony.
-	required string empire_key = 2;
+    // The key of the empire that owns this colony.
+    required string empire_key = 2;
 
-	// The key of the planet and star this colony belongs to.
-	optional string planet_key = 3;
-	optional string star_key = 4;
+    // The key of the planet and star this colony belongs to.
+    optional string planet_key = 3;
+    optional string star_key = 4;
 
-	optional int64 population = 5;
-	optional float population_rate = 6;
+    optional int64 population = 5;
+    optional float population_rate = 6;
 
 }
 

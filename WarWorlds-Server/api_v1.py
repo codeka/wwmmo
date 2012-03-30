@@ -98,7 +98,8 @@ class HelloPage(ApiPage):
       device = model.DeviceRegistration.get(deviceRegistrationKey)
       if device is None:
         # ERROR
-        pass
+        self.response.set_status(400)
+        return
 
     motd_model = model.MessageOfTheDay.get()
     empire_model = empire.Empire.getForUser(user)
@@ -289,6 +290,7 @@ class StarfieldPage(ApiPage):
     star_pb.offset_y = star_model.y
     star_pb.name = star_model.name
     star_pb.colour = star_model.colour
+    star_pb.classification = star_model.starTypeIndex
     star_pb.size = star_model.size
     if star_model.planets is not None:
       for planet_model in star_model.planets:

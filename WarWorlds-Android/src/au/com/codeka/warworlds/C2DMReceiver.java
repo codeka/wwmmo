@@ -31,9 +31,6 @@ import android.content.Intent;
 
 /**
  * Receive a push message from the Cloud to Device Messaging (C2DM) service.
- * This class should be modified to include functionality specific to your
- * application. This class must have a no-arg constructor and pass the sender id
- * to the superclass constructor.
  */
 public class C2DMReceiver extends C2DMBaseReceiver {
     private static Logger log = LoggerFactory.getLogger(C2DMReceiver.class);
