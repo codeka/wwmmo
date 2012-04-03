@@ -4,7 +4,8 @@
     android:versionCode="1"
     android:versionName="0.0.1" >
 
-    <!-- C2DM requires Android SDK version 2.2 (API level 8) or above -->
+    <!-- C2DM requires Android SDK version 2.2 (API level 8) or above, and we want to be
+         able to run on the minimum version (test using a Galaxy S) -->
     <uses-sdk
         android:minSdkVersion="8"
         android:targetSdkVersion="14" />
@@ -107,7 +108,6 @@
                 <category android:name="au.com.codeka.warworlds" />
             </intent-filter>
         </receiver>
-        
     </application>
 
 </manifest>

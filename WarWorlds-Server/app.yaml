@@ -32,6 +32,10 @@ handlers:
 - url: /admin.*
   script: admin.app
 
+- url: /tasks/sector(/.*)?
+  script: tasks.sector.app
+  login: admin
+
 - url: /.*
   script: frontend.app
 

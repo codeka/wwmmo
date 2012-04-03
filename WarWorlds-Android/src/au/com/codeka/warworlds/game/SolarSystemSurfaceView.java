@@ -17,7 +17,6 @@ import android.util.AttributeSet;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import au.com.codeka.Point2D;
-import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.model.Planet;
 import au.com.codeka.warworlds.model.Star;
 
@@ -30,7 +29,11 @@ public class SolarSystemSurfaceView extends UniverseElementSurfaceView {
     private Star mStar;
     private PlanetInfo[] mPlanetInfos;
     private PlanetInfo mSelectedPlanet;
+    private Paint mSunPaint;
+    private Paint mPlanetPaint;
+    private Paint mSelectedPlanetPaint;
     private CopyOnWriteArrayList<OnPlanetSelectedListener> mPlanetSelectedListeners;
+    private StarfieldBackgroundRenderer mBackgroundRenderer;
 
     public SolarSystemSurfaceView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -39,6 +42,24 @@ public class SolarSystemSurfaceView extends UniverseElementSurfaceView {
         }
 
         mPlanetSelectedListeners = new CopyOnWriteArrayList<OnPlanetSelectedListener>();
+
+        mBackgroundRenderer = new StarfieldBackgroundRenderer(context);
+
+        int[] colours = { Color.YELLOW, Color.YELLOW, 0x00000000 };
+        float[] positions = { 0.0f, 0.4f, 1.0f };
+        mSunPaint = new Paint();
+        mSunPaint.setDither(true);
+        RadialGradient gradient = new RadialGradient(0, 0, 200, 
+                colours, positions, android.graphics.Shader.TileMode.CLAMP);
+        mSunPaint.setShader(gradient);
+
+        mPlanetPaint = new Paint();
+        mPlanetPaint.setARGB(255, 255, 255, 255);
+        mPlanetPaint.setStyle(Style.STROKE);
+
+        mSelectedPlanetPaint = new Paint();
+        mSelectedPlanetPaint.setARGB(255, 255, 255, 255);
+        mSelectedPlanetPaint.setStyle(Style.STROKE);
     }
 
     public void setStar(Star star) {
@@ -110,59 +131,25 @@ public class SolarSystemSurfaceView extends UniverseElementSurfaceView {
      */
     @Override
     public void onDraw(Canvas canvas) {
-        drawBackground(canvas);
-
         if (isInEditMode()) {
-            // TODO: do something?
             return;
         }
-        log.info("onDraw() called...");
 
         if (mStar != null) {
+            mBackgroundRenderer.drawBackground(canvas, 0, 0, canvas.getWidth(), canvas.getHeight(),
+                    mStar.hashCode());
+
             drawSun(canvas);
             drawPlanets(canvas);
         }
     }
 
-    Bitmap mBackground;
-    Paint mBackgroundPaint;
-    private void drawBackground(Canvas canvas) {
-        if (mBackground == null) {
-            mBackground = BitmapFactory.decodeResource(getResources(), R.drawable.starfield);
-        }
-        if (mBackgroundPaint == null) {
-            mBackgroundPaint = new Paint();
-            mBackgroundPaint.setARGB(255, 255, 255, 255);
-            mBackgroundPaint.setStyle(Style.STROKE);
-        }
-
-        canvas.drawBitmap(mBackground, 0, 0, mBackgroundPaint);
-    }
-
-    private Paint mSunPaint;
     private void drawSun(Canvas canvas) {
-        int[] colours = { Color.YELLOW, Color.YELLOW, 0x00000000 };
-        float[] positions = { 0.0f, 0.4f, 1.0f };
-
-        if (mSunPaint == null) {
-            mSunPaint = new Paint();
-            mSunPaint.setDither(true);
-            RadialGradient gradient = new RadialGradient(0, 0, 200, 
-                    colours, positions, android.graphics.Shader.TileMode.CLAMP);
-            mSunPaint.setShader(gradient);
-        }
 
         canvas.drawCircle(0, 0, 200, mSunPaint);
     }
 
-    Paint mPlanetPaint;
     private void drawPlanets(Canvas canvas) {
-        if (mPlanetPaint == null) {
-            mPlanetPaint = new Paint();
-            mPlanetPaint.setARGB(255, 255, 255, 255);
-            mPlanetPaint.setStyle(Style.STROKE);
-        }
-
         for (int i = 0; i < mPlanetInfos.length; i++) {
             canvas.drawCircle(0, 0, (50*i) + 250, mPlanetPaint);
         }
@@ -179,11 +166,8 @@ public class SolarSystemSurfaceView extends UniverseElementSurfaceView {
         }
 
         if (mSelectedPlanet != null) {
-            Paint p2 = new Paint();
-            p2.setARGB(255, 255, 255, 255);
-            p2.setStyle(Style.STROKE);
             canvas.drawCircle((float) mSelectedPlanet.centre.getX(), 
-                    (float) mSelectedPlanet.centre.getY(), 60, p2);
+                    (float) mSelectedPlanet.centre.getY(), 60, mSelectedPlanetPaint);
         }
     }
 

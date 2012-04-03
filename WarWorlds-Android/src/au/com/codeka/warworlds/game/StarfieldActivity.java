@@ -167,7 +167,7 @@ public class StarfieldActivity extends Activity {
 
             TextView colonyTextView = (TextView) view.findViewById(R.id.starfield_planet_colony);
             if (colony != null) {
-                colonyTextView.setText("TODO: empire?");
+                colonyTextView.setText("Colonized");
             } else {
                 colonyTextView.setText("");
             }

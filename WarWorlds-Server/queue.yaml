@@ -1,0 +1,10 @@
+
+
+# total storage limit for all of our queues. Some tuning may be required here.
+total_storage_limit: 200M
+
+queue:
+- name: sectors
+  max_concurrent_requests: 1
+  rate: 1/s
+

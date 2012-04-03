@@ -10,7 +10,6 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Paint.Style;
 import android.graphics.RadialGradient;
@@ -28,12 +27,14 @@ import au.com.codeka.warworlds.model.Star;
  */
 public class StarfieldSurfaceView extends UniverseElementSurfaceView {
     private Logger log = LoggerFactory.getLogger(StarfieldSurfaceView.class);
+    private Context mContext;
     private CopyOnWriteArrayList<OnStarSelectedListener> mStarSelectedListeners;
     private Star mSelectedStar;
-    private Paint mStarPaint = null;
-    private Paint mStarNamePaint = null;
-    private Paint mSelectionPaint = null;
-    private Bitmap mColonyIcon = null;
+    private Paint mStarPaint;
+    private Paint mStarNamePaint;
+    private Paint mSelectionPaint;
+    private Bitmap mColonyIcon;
+    private StarfieldBackgroundRenderer mBackgroundRenderer;
 
     public StarfieldSurfaceView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -43,6 +44,7 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
 
         log.info("Starfield initializing...");
 
+        mContext = context;
         mStarSelectedListeners = new CopyOnWriteArrayList<OnStarSelectedListener>();
         mSelectedStar = null;
         mColonyIcon = BitmapFactory.decodeResource(getResources(), R.drawable.starfield_colony);
@@ -50,6 +52,8 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
         mSelectionPaint = new Paint();
         mSelectionPaint.setARGB(255, 255, 255, 255);
         mSelectionPaint.setStyle(Style.STROKE);
+
+        mBackgroundRenderer = new StarfieldBackgroundRenderer(mContext);
 
         SectorManager.getInstance().addSectorListChangedListener(new SectorManager.OnSectorListChangedListener() {
             @Override
@@ -101,8 +105,6 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
 
         SectorManager sm = SectorManager.getInstance();
 
-        canvas.drawColor(Color.BLACK);
-
         for(int y = -sm.getRadius(); y <= sm.getRadius(); y++) {
             for(int x = -sm.getRadius(); x <= sm.getRadius(); x++) {
                 long sectorX = sm.getSectorCentreX() + x;
@@ -113,12 +115,22 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
                     continue; // it might not be loaded yet...
                 }
 
-                drawSector(canvas, (x * SectorManager.SECTOR_SIZE) + sm.getOffsetX(),
-                        (y * SectorManager.SECTOR_SIZE) + sm.getOffsetY(), sector);
+                int sx = (x * SectorManager.SECTOR_SIZE) + sm.getOffsetX();
+                int sy = (y * SectorManager.SECTOR_SIZE) + sm.getOffsetY();
+
+                // TODO: seed should be part of the sector (and used for other things too)
+                mBackgroundRenderer.drawBackground(canvas, sx, sy,
+                        sx+SectorManager.SECTOR_SIZE, sy+SectorManager.SECTOR_SIZE,
+                        sectorX ^ sectorY + sectorX);
+
+                drawSector(canvas, sx, sy, sector);
             }
         }
     }
 
+    /**
+     * Draws a sector, which is a 1024x1024 area of stars.
+     */
     private void drawSector(Canvas canvas, int offsetX, int offsetY, Sector sector) {
         for(Star star : sector.getStars()) {
             drawStar(canvas, star, offsetX, offsetY);
