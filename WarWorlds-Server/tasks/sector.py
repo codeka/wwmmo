@@ -4,8 +4,10 @@ Created on 01/04/2012
 @author: dean@codeka.com.au
 '''
 
+from google.appengine.api import taskqueue
 from model import sector as mdl
 from model import namegen
+import collections
 import tasks
 import logging
 import math
@@ -124,6 +126,7 @@ class SectorGenerator:
     sector = mdl.Sector()
     sector.x = self.x
     sector.y = self.y
+    sector.numColonies = 0
     sector.stars = []
     sector.put()
 
@@ -209,8 +212,52 @@ class GeneratePage(tasks.TaskPage):
     generator.generate()
 
 
-app = webapp.WSGIApplication([('/tasks/sector/generate/([0-9-]+),([0-9-]+)', GeneratePage)],
-                             debug=True)
+class ExpandUniversePage(tasks.TaskPage):
+  '''This is a cron job that is called once per day to "expand" the universe.
+
+  We look at all the sectors which currently have at least one colonized star, then make sure
+  the universe has all sectors around the centre generated. We expand the range of the universe
+  until we've generated 50 sectors -- that's enough for one day.'''
+  def get(self):
+    SectorCoords = collections.namedtuple("SectorCoords", ("x", "y"))
+    existing_sectors = set()
+
+    # First, we need to figure out the min/max coordinates of all the colonies, which marks
+    # the boundary of the "known" universe
+    min_x = max_x = min_y = max_y = 0
+    for sector in mdl.Sector.all():
+      existing_sectors.add(SectorCoords(sector.x, sector.y))
+      if sector.numColonies > 0:
+        if sector.x < min_x:
+          min_x = sector.x
+        if sector.x > max_x:
+          max_x = sector.x
+        if sector.y < min_y:
+          min_y = sector.y
+        if sector.y > max_y:
+          max_y = sector.y
+
+    logging.info("Bounds of known universe: (%d,%d) - (%d,%d)" % (min_x, min_y, max_x, max_y))
+
+    num_generated = 0
+    while num_generated < 50:
+      for y in range(min_y, max_y):
+        for x in range(min_x, max_x):
+          coord = SectorCoords(x, y)
+          if coord not in existing_sectors:
+            logging.info("Generating new sector at (%d,%d)" % (x, y))
+            taskqueue.add(url="/tasks/sector/generate/"+str(x)+","+str(y),
+                          queue_name="sectors", method="GET")
+            num_generated += 1
+      min_x -= 1
+      min_y -= 1
+      max_x += 1
+      max_y += 1
+
+
+app = webapp.WSGIApplication([('/tasks/sector/generate/([0-9-]+),([0-9-]+)', GeneratePage),
+                              ('/tasks/sector/expand-universe', ExpandUniversePage)],
+                             debug=False)
 
 
 

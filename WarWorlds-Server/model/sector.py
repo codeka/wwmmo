@@ -48,6 +48,7 @@ planet_types = [PlanetType(name="Gas Giant", minSize=40, maxSize=50),
 class Sector(db.Model):
   x = db.IntegerProperty()
   y = db.IntegerProperty()
+  numColonies = db.IntegerProperty()
 
 
 class Star(db.Model):

@@ -140,6 +140,9 @@ message Sector
     required int64 x = 1;
     required int64 y = 2;
 
+    // number of colonies in this sector
+    optional int32 num_colonies = 5;
+
     // the collection of stars in this sector.
     repeated Star stars = 3;
 

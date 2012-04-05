@@ -17,7 +17,6 @@ from google.protobuf import message
 from google.appengine.api import channel
 from google.appengine.api import users
 import logging
-from datetime import datetime
 
 
 class ApiPage(webapp.RequestHandler):
@@ -334,6 +333,10 @@ class SectorsPage(StarfieldPage):
       sector_pb = sectors_pb.sectors.add()
       sector_pb.x = sector_model.x
       sector_pb.y = sector_model.y
+      if sector_model.numColonies:
+        sector_pb.num_colonies = sector_model.numColonies
+      else:
+        sector_pb.num_colonies = 0
 
       for star_model in sector_model.stars:
         star_pb = sector_pb.stars.add()
@@ -372,15 +375,7 @@ class ColoniesPage(ApiPage):
       return
 
     empire_model = self._getEmpire()
-    colony_model = empire.Colony()
-    colony_model.empire = empire_model.key()
-    colony_model.planet = planet_model.key()
-    colony_model.sector = planet_model.star.sector.key()
-    colony_model.star = planet_model.star.key()
-    colony_model.population = 1000
-    colony_model.populationRate = 0.0
-    colony_model.lastSimulation = datetime.now()
-    colony_model.put()
+    empire_model.colonize(planet_model)
 
 
 class ApiApplication(webapp.WSGIApplication):
