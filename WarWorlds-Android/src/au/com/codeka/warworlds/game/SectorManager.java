@@ -248,6 +248,21 @@ public class SectorManager {
         return null;
     }
 
+    /**
+     * Finds the star with the given key.
+     */
+    public Star findStar(String starKey) {
+        for (Sector sector : mSectors.values()) {
+            for (Star star : sector.getStars()) {
+                if (star.getKey().equals(starKey)) {
+                    return star;
+                }
+            }
+        }
+
+        return null;
+    }
+
     public void addSectorListChangedListener(OnSectorListChangedListener onSectorListChanged) {
         if (mSectorListChangedListeners.contains(onSectorListChanged))
             return;
@@ -258,6 +273,14 @@ public class SectorManager {
         for(OnSectorListChangedListener listener : mSectorListChangedListeners) {
             listener.onSectorListChanged();
         }
+    }
+
+    /**
+     * Forces us to refresh the given sector, even if we already have it loaded. Useful when
+     * we know it's been modified (by our own actions, for example).
+     */
+    public void refreshSector(final long sectorX, final long sectorY) {
+        requestSectors(sectorX, sectorY, sectorX+1, sectorY+1);
     }
 
     /**

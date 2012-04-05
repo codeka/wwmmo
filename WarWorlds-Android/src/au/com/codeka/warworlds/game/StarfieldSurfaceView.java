@@ -58,6 +58,14 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
         SectorManager.getInstance().addSectorListChangedListener(new SectorManager.OnSectorListChangedListener() {
             @Override
             public void onSectorListChanged() {
+                // make sure we re-select the star we had selected before (if any)
+                if (mSelectedStar != null) {
+                    Star newSelectedStar = SectorManager.getInstance().findStar(mSelectedStar.getKey());
+                    // if it's the same instance, that's fine
+                    if (newSelectedStar != mSelectedStar) {
+                        selectStar(newSelectedStar);
+                    }
+                }
                 redraw();
             }
         });
@@ -89,6 +97,10 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
 
     public Star getSelectedStar() {
         return mSelectedStar;
+    }
+    public void selectStar(String starKey) {
+        Star star = SectorManager.getInstance().findStar(starKey);
+        selectStar(star);
     }
 
     /**
@@ -192,6 +204,15 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
         canvas.drawText(star.getName(), x, y, mStarNamePaint);
     }
 
+    private void selectStar(Star star) {
+        if (star != null) {
+            log.info("Selecting star: "+star.getKey());
+            mSelectedStar = star;
+            redraw();
+            fireStarSelected(star);
+        }
+    }
+
     /**
      * Implements the \c OnGestureListener methods that we use to respond to
      * various touch events.
@@ -217,11 +238,7 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
             int tapY = (int) e.getY();
 
             Star star = SectorManager.getInstance().getStarAt(tapX, tapY);
-            if (star != null) {
-                mSelectedStar = star;
-                redraw();
-                fireStarSelected(star);
-            }
+            selectStar(star);
 
             return false;
         }

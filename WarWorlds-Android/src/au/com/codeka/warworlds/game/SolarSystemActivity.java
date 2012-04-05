@@ -1,6 +1,7 @@
 package au.com.codeka.warworlds.game;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.view.Window;
@@ -21,6 +22,10 @@ import au.com.codeka.warworlds.model.Star;
  */
 public class SolarSystemActivity extends Activity {
     private SolarSystemSurfaceView mSolarSystemSurfaceView;
+    private long mSectorX;
+    private long mSectorY;
+    private String mStarKey;
+    private boolean mIsSectorUpdated;
 
     /** Called when the activity is first created. */
     @Override
@@ -47,23 +52,12 @@ public class SolarSystemActivity extends Activity {
 
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
-            long sectorX = extras.getLong("au.com.codeka.warworlds.SectorX");
-            long sectorY = extras.getLong("au.com.codeka.warworlds.SectorY");
-            String starKey = extras.getString("au.com.codeka.warworlds.StarKey");
-            final int planetIndex = extras.getInt("au.com.codeka.warworlds.PlanetIndex", -1);
+            mSectorX = extras.getLong("au.com.codeka.warworlds.SectorX");
+            mSectorY = extras.getLong("au.com.codeka.warworlds.SectorY");
+            mStarKey = extras.getString("au.com.codeka.warworlds.StarKey");
+            String selectedPlanetKey = extras.getString("au.com.codeka.warworlds.PlanetKey");
 
-            ModelManager.requestStar(sectorX, sectorY, starKey, new StarFetchedHandler() {
-                @Override
-                public void onStarFetched(Star s) {
-                    mSolarSystemSurfaceView.setStar(s);
-                    Planet[] planets = s.getPlanets();
-                    if (planetIndex >= 0 && planets.length > planetIndex) {
-                        mSolarSystemSurfaceView.selectPlanet(planets[planetIndex].getKey());
-                    } else {
-                        mSolarSystemSurfaceView.redraw();
-                    }
-                }
-            });
+            refreshStar(selectedPlanetKey);
         }
 
         mSolarSystemSurfaceView.addPlanetSelectedListener(
@@ -82,6 +76,42 @@ public class SolarSystemActivity extends Activity {
         });
     }
 
+    @Override
+    public void onBackPressed() {
+        Intent intent = new Intent();
+        intent.putExtra("au.com.codeka.warworlds.SectorUpdated", mIsSectorUpdated);
+        intent.putExtra("au.com.codeka.warworlds.SectorX", mSectorX);
+        intent.putExtra("au.com.codeka.warworlds.SectorY", mSectorY);
+        intent.putExtra("au.com.codeka.warworlds.StarKey", mStarKey);
+        setResult(RESULT_OK, intent);
+
+        super.onBackPressed();
+    }
+
+    private void refreshStar() {
+        String selectedPlanetKey = null;
+        Planet selectedPlanet = mSolarSystemSurfaceView.getSelectedPlanet();
+        if (selectedPlanet != null) {
+            selectedPlanetKey = selectedPlanet.getKey();
+        }
+
+        refreshStar(selectedPlanetKey);
+    }
+
+    private void refreshStar(final String selectedPlanetKey) {
+        ModelManager.requestStar(mSectorX, mSectorY, mStarKey, new StarFetchedHandler() {
+            @Override
+            public void onStarFetched(Star s) {
+                mSolarSystemSurfaceView.setStar(s);
+                if (selectedPlanetKey != null) {
+                    mSolarSystemSurfaceView.selectPlanet(selectedPlanetKey);
+                } else {
+                    mSolarSystemSurfaceView.redraw();
+                }
+            }
+        });
+    }
+
     private void onColonizeClick() {
         Planet planet = mSolarSystemSurfaceView.getSelectedPlanet();
         if (planet == null) {
@@ -91,7 +121,12 @@ public class SolarSystemActivity extends Activity {
         EmpireManager.getInstance().getEmpire().colonize(planet, new Empire.ColonizeCompleteHandler() {
             @Override
             public void onColonizeComplete(Colony colony) {
-                // TODO: ??
+                // refresh this page
+                refreshStar();
+
+                // remember that the sector we're in has now been updated so we can pass that
+                // back to the StarfieldActivity
+                mIsSectorUpdated = true;
             }
         });
     }

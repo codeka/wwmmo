@@ -25,27 +25,23 @@ import au.com.codeka.warworlds.model.Star;
  * starfield where you scroll around and interact with stars, etc.
  */
 public class StarfieldActivity extends Activity {
-    Context mContext = this;
-    StarfieldSurfaceView mStarfield;
-    TextView mUsername;
-    TextView mMoney;
-    TextView mStarName;
-    ViewGroup mLoadingContainer;
-    ListView mPlanetList;
-    PlanetListAdapter mPlanetListAdapter;
+    private Context mContext = this;
+    private StarfieldSurfaceView mStarfield;
+    private TextView mUsername;
+    private TextView mMoney;
+    private TextView mStarName;
+    private ViewGroup mLoadingContainer;
+    private ListView mPlanetList;
+    private PlanetListAdapter mPlanetListAdapter;
+    private Star mSelectedStar;
 
-    Star mCurrentStar;
+    private static final int SOLAR_SYSTEM_REQUEST = 1;
 
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE); // remove the title bar
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
 
         setContentView(R.layout.starfield);
 
@@ -82,6 +78,7 @@ public class StarfieldActivity extends Activity {
                      */
                     @Override
                     public void onStarFetched(Star star) {
+                        mSelectedStar = star;
                         mLoadingContainer.setVisibility(View.GONE);
                         mPlanetList.setVisibility(View.VISIBLE);
 
@@ -94,19 +91,47 @@ public class StarfieldActivity extends Activity {
         mPlanetList. setOnItemClickListener(new OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Star star = mStarfield.getSelectedStar();
-                if (star == null) {
+                if (mSelectedStar == null) {
                     return; //??
                 }
 
+                String planetKey = null;
+                if (position >= 0 && position < mSelectedStar.getPlanets().length) {
+                    Planet planet = mSelectedStar.getPlanets()[position];
+                    planetKey = planet.getKey();
+                }
+
                 Intent intent = new Intent(mContext, SolarSystemActivity.class);
-                intent.putExtra("au.com.codeka.warworlds.SectorX", star.getSector().getX());
-                intent.putExtra("au.com.codeka.warworlds.SectorY", star.getSector().getY());
-                intent.putExtra("au.com.codeka.warworlds.StarKey", star.getKey());
-                intent.putExtra("au.com.codeka.warworlds.PlanetIndex", position);
-                mContext.startActivity(intent);
+                intent.putExtra("au.com.codeka.warworlds.SectorX", mSelectedStar.getSector().getX());
+                intent.putExtra("au.com.codeka.warworlds.SectorY", mSelectedStar.getSector().getY());
+                intent.putExtra("au.com.codeka.warworlds.StarKey", mSelectedStar.getKey());
+                intent.putExtra("au.com.codeka.warworlds.PlanetKey", planetKey);
+                StarfieldActivity.this.startActivityForResult(intent, SOLAR_SYSTEM_REQUEST);
             }
         });
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
+        if (requestCode == SOLAR_SYSTEM_REQUEST && intent != null) {
+            boolean wasSectorUpdated = intent.getBooleanExtra(
+                    "au.com.codeka.warworlds.SectorUpdated", false);
+            long sectorX = intent.getLongExtra("au.com.codeka.warworlds.SectorX", 0);
+            long sectorY = intent.getLongExtra("au.com.codeka.warworlds.SectorY", 0);
+            String starKey = intent.getStringExtra("au.com.codeka.warworlds.StarKey");
+
+            if (wasSectorUpdated) {
+                SectorManager.getInstance().refreshSector(sectorX, sectorY);
+            } else {
+                // make sure we re-select the star you had selected before.
+                mStarfield.selectStar(starKey);
+            }
+        }
     }
 
     class PlanetListAdapter extends BaseAdapter {

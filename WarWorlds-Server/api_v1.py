@@ -375,8 +375,11 @@ class ColoniesPage(ApiPage):
       return
 
     empire_model = self._getEmpire()
-    empire_model.colonize(planet_model)
+    colony_model = empire_model.colonize(planet_model)
 
+    colony_pb = pb.Colony()
+    self._colonyModelToPb(colony_pb, colony_model)
+    return colony_pb
 
 class ApiApplication(webapp.WSGIApplication):
   def __init__(self, *args, **kwargs):

@@ -49,6 +49,7 @@ class Empire(db.Model):
       sector.put()
 
     db.run_in_transaction(inc_colony_count)
+    return colony
 
 class Colony(db.Model):
   '''Represents a colony on a planet. A colony is owned by a single Empire.

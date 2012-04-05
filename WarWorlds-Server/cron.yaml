@@ -1,9 +1,11 @@
 
 
+cron:
+
 #
 # Not needed until we're in REAL production...
 #
-#cron:
+
 #- description: sector generator
 #  url: /tasks/sector/expand-universe
 #  schedule: every day 23:00
