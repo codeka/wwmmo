@@ -48,6 +48,9 @@ public class Planet {
     private int mIndex;
     private PlanetType mPlanetType;
     private int mSize;
+    private int mPopulationCongeniality;
+    private int mFarmingCongeniality;
+    private int mMiningCongeniality;
 
     public Star getStar() {
         return mStar;
@@ -64,6 +67,15 @@ public class Planet {
     public int getSize() {
         return mSize;
     }
+    public int getPopulationCongeniality() {
+        return mPopulationCongeniality;
+    }
+    public int getFarmingCongeniality() {
+        return mFarmingCongeniality;
+    }
+    public int getMiningCongeniality() {
+        return mMiningCongeniality;
+    }
 
     /**
      * Converts the given Planet protocol buffer into a \c Planet.
@@ -75,6 +87,15 @@ public class Planet {
         p.mIndex = pb.getIndex();
         p.mPlanetType = sPlanetTypes[pb.getPlanetType().getNumber() - 1];
         p.mSize = pb.getSize();
+        if (pb.hasPopulationCongeniality()) {
+            p.mPopulationCongeniality = pb.getPopulationCongeniality();
+        }
+        if (pb.hasFarmingCongeniality()) {
+            p.mFarmingCongeniality = pb.getFarmingCongeniality();
+        }
+        if (pb.hasMiningCongeniality()) {
+            p.mMiningCongeniality = pb.getMiningCongeniality();
+        }
 
         return p;
     }

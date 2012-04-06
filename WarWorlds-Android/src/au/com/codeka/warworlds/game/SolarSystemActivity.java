@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.model.Colony;
@@ -27,16 +28,14 @@ public class SolarSystemActivity extends Activity {
     private String mStarKey;
     private boolean mIsSectorUpdated;
 
+    private Star mStar;
+    private Planet mSelectedPlanet;
+
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE); // remove the title bar
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
 
         setContentView(R.layout.solarsystem);
 
@@ -48,7 +47,27 @@ public class SolarSystemActivity extends Activity {
         EmpireManager empireManager = EmpireManager.getInstance();
         username.setText(empireManager.getEmpire().getDisplayName());
         money.setText("$ 12,345"); // TODO: empire.getCash()
-        colonizeButton.setVisibility(View.GONE);
+
+        mSolarSystemSurfaceView.addPlanetSelectedListener(
+                new SolarSystemSurfaceView.OnPlanetSelectedListener() {
+            @Override
+            public void onPlanetSelected(Planet planet) {
+                mSelectedPlanet = planet;
+                refreshSelectedPlanet();
+            }
+        });
+
+        colonizeButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onColonizeClick();
+            }
+        });
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
 
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
@@ -59,21 +78,6 @@ public class SolarSystemActivity extends Activity {
 
             refreshStar(selectedPlanetKey);
         }
-
-        mSolarSystemSurfaceView.addPlanetSelectedListener(
-                new SolarSystemSurfaceView.OnPlanetSelectedListener() {
-            @Override
-            public void onPlanetSelected(Planet planet) {
-                colonizeButton.setVisibility(View.VISIBLE);
-            }
-        });
-
-        colonizeButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onColonizeClick();
-            }
-        });
     }
 
     @Override
@@ -101,15 +105,87 @@ public class SolarSystemActivity extends Activity {
     private void refreshStar(final String selectedPlanetKey) {
         ModelManager.requestStar(mSectorX, mSectorY, mStarKey, new StarFetchedHandler() {
             @Override
-            public void onStarFetched(Star s) {
-                mSolarSystemSurfaceView.setStar(s);
+            public void onStarFetched(Star star) {
+                mSolarSystemSurfaceView.setStar(star);
                 if (selectedPlanetKey != null) {
                     mSolarSystemSurfaceView.selectPlanet(selectedPlanetKey);
                 } else {
                     mSolarSystemSurfaceView.redraw();
                 }
+
+                Planet planet = null;
+                if (selectedPlanetKey != null) {
+                    for (Planet p : star.getPlanets()) {
+                        if (p.getKey().equals(selectedPlanetKey)) {
+                            planet = p;
+                            break;
+                        }
+                    }
+                }
+
+                mStar = star;
+                mSelectedPlanet = planet;
+                refreshSelectedPlanet();
             }
         });
+    }
+
+    private void refreshSelectedPlanet() {
+        View containerView = findViewById(R.id.solarsystem_planet_properties);
+        if (mStar == null || mSelectedPlanet == null) {
+            containerView.setVisibility(View.GONE);
+            return;
+        }
+
+        containerView.setVisibility(View.VISIBLE);
+
+        TextView planetNameTextView = (TextView) findViewById(R.id.solarsystem_planetname);
+        planetNameTextView.setText(mStar.getName()+" "+numberToRomanNumeral(mSelectedPlanet.getIndex()));
+
+        ProgressBar populationCongenialityProgressBar = (ProgressBar) findViewById(
+                R.id.solarsystem_population_congeniality);
+        TextView populationCongenialityTextView = (TextView) findViewById(
+                R.id.solarsystem_population_congeniality_value);
+        populationCongenialityTextView.setText(Integer.toString(
+                mSelectedPlanet.getPopulationCongeniality()));
+        populationCongenialityProgressBar.setProgress(
+                (int) (populationCongenialityProgressBar.getMax() * (mSelectedPlanet.getPopulationCongeniality() / 1000.0)));
+
+        ProgressBar farmingCongenialityProgressBar = (ProgressBar) findViewById(
+                R.id.solarsystem_farming_congeniality);
+        TextView farmingCongenialityTextView = (TextView) findViewById(
+                R.id.solarsystem_farming_congeniality_value);
+        farmingCongenialityTextView.setText(Integer.toString(
+                mSelectedPlanet.getFarmingCongeniality()));
+        farmingCongenialityProgressBar.setProgress(
+                (int)(farmingCongenialityProgressBar.getMax() * (mSelectedPlanet.getFarmingCongeniality() / 100.0)));
+
+        ProgressBar miningCongenialityProgressBar = (ProgressBar) findViewById(
+                R.id.solarsystem_mining_congeniality);
+        TextView miningCongenialityTextView = (TextView) findViewById(
+                R.id.solarsystem_mining_congeniality_value);
+        miningCongenialityTextView.setText(Integer.toString(
+                mSelectedPlanet.getMiningCongeniality()));
+        miningCongenialityProgressBar.setProgress(
+                (int)(miningCongenialityProgressBar.getMax() * (mSelectedPlanet.getMiningCongeniality() / 100.0)));
+    }
+
+    private static String numberToRomanNumeral(int n) {
+        // TODO: this is dumb..
+        switch (n) {
+        case 0: return "";
+        case 1: return "I";
+        case 2: return "II";
+        case 3: return "III";
+        case 4: return "IV";
+        case 5: return "V";
+        case 6: return "VI";
+        case 7: return "VII";
+        case 8: return "VIII";
+        case 9: return "IX";
+        case 10: return "X";
+        default: return "+++";
+        }
     }
 
     private void onColonizeClick() {
