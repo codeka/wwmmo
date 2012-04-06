@@ -200,7 +200,11 @@ public class SolarSystemActivity extends Activity {
 
             TextView populationTextView = (TextView) findViewById(
                     R.id.solarsystem_colony_population_value);
-            populationTextView.setText(String.format("%d (%.1f)", mColony.getPopulation(), mColony.getPopulationRate()));
+            populationTextView.setText(String.format("%d", mColony.getPopulation()));
+
+            TextView populationRateTextView = (TextView) findViewById(
+                    R.id.solarsystem_colony_population_rate);
+            populationRateTextView.setText(String.format("%.2f", mColony.getPopulationRate()));
 
             TextView farmingTextView = (TextView) findViewById(
                     R.id.solarsystem_colony_farming_value);

@@ -197,13 +197,23 @@
                         <TextView
                             android:id="@+id/solarsystem_colony_population_value"
                             android:layout_width="wrap_content"
-                            android:layout_height="20dp"
+                            android:layout_height="wrap_content"
                             android:layout_below="@+id/solarsystem_colony_empirename"
-                            android:layout_toRightOf="@+id/solarsystem_colony_population_icon"
                             android:layout_marginLeft="4dp"
-                            android:gravity="center"
+                            android:layout_toRightOf="@+id/solarsystem_colony_population_icon"
                             android:text="999"
                             android:textAppearance="?android:attr/textAppearanceSmall" />
+
+                        <TextView
+                            android:id="@+id/solarsystem_colony_population_rate"
+                            android:layout_width="wrap_content"
+                            android:layout_height="10dp"
+                            android:layout_below="@+id/solarsystem_colony_population_value"
+                            android:layout_marginLeft="20dp"
+                            android:layout_toRightOf="@+id/solarsystem_colony_population_icon"
+                            android:text="-1.0"
+                            android:textAppearance="?android:attr/textAppearanceSmall"
+                            android:textSize="10dp" />
 
                         <ImageView
                             android:id="@+id/solarsystem_colony_farming_icon"
@@ -229,7 +239,7 @@
                             android:layout_width="20dp"
                             android:layout_height="20dp"
                             android:layout_alignParentLeft="true"
-                            android:layout_below="@id/solarsystem_colony_population_icon"
+                            android:layout_below="@id/solarsystem_colony_population_rate"
                             android:layout_marginLeft="10dp"
                             android:layout_marginTop="4dp"
                             android:src="@drawable/colony_mining_icon" />
@@ -238,7 +248,7 @@
                             android:id="@+id/solarsystem_colony_mining_value"
                             android:layout_width="wrap_content"
                             android:layout_height="20dp"
-                            android:layout_below="@id/solarsystem_colony_population_value"
+                            android:layout_below="@id/solarsystem_colony_population_rate"
                             android:layout_toRightOf="@id/solarsystem_colony_mining_icon"
                             android:layout_marginLeft="4dp"
                             android:layout_marginTop="4dp"
@@ -250,7 +260,7 @@
                             android:id="@+id/solarsystem_colony_construction_icon"
                             android:layout_width="20dp"
                             android:layout_height="20dp"
-                            android:layout_below="@id/solarsystem_colony_farming_icon"
+                            android:layout_below="@id/solarsystem_colony_population_rate"
                             android:layout_centerHorizontal="true"
                             android:layout_marginTop="4dp"
                             android:src="@drawable/colony_construction_icon" />
@@ -259,14 +269,13 @@
                             android:id="@+id/solarsystem_colony_construction_value"
                             android:layout_width="wrap_content"
                             android:layout_height="20dp"
-                            android:layout_below="@+id/solarsystem_colony_farming_value"
-                            android:layout_toRightOf="@+id/solarsystem_colony_construction_icon"
+                            android:layout_below="@id/solarsystem_colony_population_rate"
+                            android:layout_toRightOf="@id/solarsystem_colony_construction_icon"
                             android:layout_marginLeft="4dp"
                             android:layout_marginTop="4dp"
                             android:gravity="center"
                             android:text="999"
                             android:textAppearance="?android:attr/textAppearanceSmall" />
-                        
                     </RelativeLayout>
 
                     <Button

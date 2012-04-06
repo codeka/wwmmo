@@ -35,7 +35,7 @@ class Empire(db.Model):
     colony.planet = planet.key()
     colony.sector = planet.star.sector.key()
     colony.star = planet.star.key()
-    colony.population = 1000
+    colony.population = 100
     colony.populationRate = 0.0
     colony.lastSimulation = datetime.now()
     colony.put()
