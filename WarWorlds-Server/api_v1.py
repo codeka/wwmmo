@@ -296,14 +296,15 @@ class StarfieldPage(ApiPage):
         planet_pb = star_pb.planets.add()
         self._planetModelToPb(planet_pb, planet_model)
       star_pb.num_planets = len(star_model.planets)
-    else:
-      star_pb.num_planets = 3 # TODO
 
   def _planetModelToPb(self, planet_pb, planet_model):
     planet_pb.key = str(planet_model.key())
     planet_pb.index = planet_model.index
     planet_pb.planet_type = planet_model.planetTypeID + 1
     planet_pb.size = planet_model.size
+    planet_pb.population_congeniality = planet_model.populationCongeniality
+    planet_pb.farming_congeniality = planet_model.farmingCongeniality
+    planet_pb.mining_congeniality = planet_model.miningCongeniality
 
 
 class SectorsPage(StarfieldPage):
@@ -402,8 +403,8 @@ class ApiApplication(webapp.WSGIApplication):
 
     if isinstance(rv, message.Message):
       # if it's a protocol buffer, then we'll want to return either the
-      # binary serialization, or the text serialization (depending on
-      # the value of the "Accept" header)
+      # binary serialization, the text serialization, or a JSON
+      # serialization (depending on the value of the "Accept" header)
       preferred_types = ['text/plain', 'application/json', 'text/json',
                          'text/x-protobuf', 'application/x-protobuf']
       content_type = ApiApplication.get_preferred_content_type(request, preferred_types)

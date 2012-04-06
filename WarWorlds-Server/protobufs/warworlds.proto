@@ -191,7 +191,7 @@ message Star
     // the number of planets orbiting this star (useful for knowing whether there are
     // actually planets, and the planets field is just empty, or whether there are no
     // planets anyway).
-    required int32 num_planets = 8;
+    optional int32 num_planets = 8;
 
     // the collection of planets orbiting this star (may be empty)
     repeated Planet planets = 9;
@@ -232,7 +232,16 @@ message Planet
 
     // The size of the planet. Certain planet_type's are predisposed to be certain sizes
     // (e.g. GASGIANT is predisposed to being big, etc) but planets will still vary in exact size.
-    required int32 size = 4;
+    optional int32 size = 4;
+
+    // How "congenial" is this planet to supporting population
+    optional int32 population_congeniality = 5;
+
+    // How "congenial" is this planet to supporting farming
+    optional int32 farming_congeniality = 6;
+
+    // How "congenial" is this planet to supporting mining
+    optional int32 mining_congeniality = 7;
 }
 
 //

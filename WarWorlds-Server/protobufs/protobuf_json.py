@@ -46,6 +46,7 @@ __author__='Paul Dovbush <dpp@dpp.su>, Dean Harding <dean@codeka.com.au>'
 import json
 from google.protobuf.descriptor import FieldDescriptor as FD
 
+
 class ParseError(Exception): pass
 
 
@@ -85,6 +86,12 @@ def json2pb(pb, js):
     return obj2pb(pb, obj)
 
 
+def _getEnumValue(enum_type, value):
+    for value_defn in enum_type.values:
+      if value_defn.number == int(value):
+        return "%s.%s" % (enum_type.name, value_defn.name)
+    return "%d : <UNKNOWN>" % (int(value))
+
 def pb2obj(pb):
     ''' Convert google.protobuf.descriptor instance to python objects
     '''
@@ -109,6 +116,11 @@ def pb2obj(pb):
     for field, value in fields:
         if field.type == FD.TYPE_MESSAGE:
             ftype = pb2obj
+        elif field.type == FD.TYPE_ENUM:
+            if not field.enum_type:
+                raise ParseError("Field %s.%s is TYPE_ENUM, but enum_type is not populated." %field
+                                 (pb.__class__.__name, field.name))
+            ftype = lambda val: _getEnumValue(field.enum_type, val)
         elif field.type in _ftype2js:
             ftype = _ftype2js[field.type]
         else:
@@ -137,10 +149,10 @@ _ftype2js = {
     FD.TYPE_FIXED32: float,
     FD.TYPE_BOOL: bool,
     FD.TYPE_STRING: unicode,
-    #FD.TYPE_MESSAGE: pb2json,        #handled specially
+    #FD.TYPE_MESSAGE: handled specially
+    #FD.TYPE_ENUM: handled specially
     FD.TYPE_BYTES: lambda x: x.encode('string_escape'),
     FD.TYPE_UINT32: int,
-    FD.TYPE_ENUM: int,
     FD.TYPE_SFIXED32: float,
     FD.TYPE_SFIXED64: float,
     FD.TYPE_SINT32: int,

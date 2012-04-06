@@ -8,39 +8,37 @@ from google.appengine.ext import db
 from google.appengine.api import taskqueue
 
 class StarType:
-  def __init__(self, colourName="", colourValue=0x0):
+  def __init__(self, colourName="", colourValue=[0xff, 0xff, 0xff]):
     self.colourName = colourName
     self.colourValue = colourValue
 
 
-star_types = [StarType(colourName="Blue", colourValue=0xffddffff),
-              StarType(colourName="White", colourValue=0xfffffbd8),
-              StarType(colourName="Yellow", colourValue=0xffffde69),
-              StarType(colourName="Orange", colourValue=0xffe9a21d),
-              StarType(colourName="Red", colourValue=0xffe9846f),
-              StarType(colourName="Neutron", colourValue=0xff32a1db),
-              StarType(colourName="Blackhole", colourValue=0xff10535f)
+star_types = [StarType(colourName="Blue", colourValue=[0xdd, 0xff, 0xff]),
+              StarType(colourName="White", colourValue=[0xff, 0xfb, 0xd8]),
+              StarType(colourName="Yellow", colourValue=[0xff, 0xde, 0x69]),
+              StarType(colourName="Orange", colourValue=[0xe9, 0xa2, 0x1d]),
+              StarType(colourName="Red", colourValue=[0xe9, 0x84, 0x6f]),
+              StarType(colourName="Neutron", colourValue=[0x32, 0xa1, 0xdb]),
+              StarType(colourName="Blackhole", colourValue=[0x10, 0x53, 0x5f])
              ]
 
 
 class PlanetType:
-  def __init__(self, name="", minSize=5, maxSize=50):
+  def __init__(self, name=""):
     self.name = name
-    self.minSize = minSize
-    self.maxSize = maxSize
 
 
 # This is the description of different types of planets. The order is important and
 # must match what is defined for Planet.PLANET_TYPE in warworlds.proto
-planet_types = [PlanetType(name="Gas Giant", minSize=40, maxSize=50),
-                PlanetType(name="Radiated", minSize=5, maxSize=30),
-                PlanetType(name="Inferno", minSize=5, maxSize=30),
-                PlanetType(name="Asteroids", minSize=50, maxSize=50),
-                PlanetType(name="Water", minSize=20, maxSize=40),
-                PlanetType(name="Toxic", minSize=10, maxSize=20),
-                PlanetType(name="Desert", minSize=10, maxSize=30),
-                PlanetType(name="Swamp", minSize=10, maxSize=30),
-                PlanetType(name="Terran", minSize=10, maxSize=30)
+planet_types = [PlanetType(name="Gas Giant"),
+                PlanetType(name="Radiated"),
+                PlanetType(name="Inferno"),
+                PlanetType(name="Asteroids"),
+                PlanetType(name="Water"),
+                PlanetType(name="Toxic"),
+                PlanetType(name="Desert"),
+                PlanetType(name="Swamp"),
+                PlanetType(name="Terran")
                ]
 
 
@@ -68,6 +66,9 @@ class Planet(db.Model):
   planetTypeID = db.IntegerProperty(name="planetType")
   planetType = None # Will be filled in with a PlanetType instance
   size = db.IntegerProperty()
+  populationCongeniality = db.IntegerProperty()
+  farmingCongeniality = db.IntegerProperty()
+  miningCongeniality = db.IntegerProperty()
 
 
 class SectorManager:

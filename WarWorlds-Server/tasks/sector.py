@@ -17,6 +17,23 @@ import webapp2 as webapp
 # This is used to choose a star type at a given point in the map.
 _starTypeBonuses = [30, 40, 50, 40, 30, 0, 0]
 
+_starColours = {
+    'min': [[0xd0, 0xf0, 0xf0],  # Blue
+            [0xe0, 0xeb, 0xc8],  # White
+            [0xef, 0xce, 0x59],  # Yellow
+            [0xd9, 0xb2, 0x0d],  # Orange
+            [0xd9, 0x74, 0x5f],  # Red
+            [0x22, 0x91, 0xeb],  # Neutron
+            [0x00, 0x43, 0x4f]], # Black Hole
+    'max': [[0xdf, 0xff, 0xff],
+            [0xff, 0xfb, 0xe0],
+            [0xff, 0xe0, 0x6b],
+            [0xeb, 0xa4, 0x1f],
+            [0xeb, 0x86, 0x71],
+            [0x34, 0xa3, 0xdd],
+            [0x12, 0x55, 0x62]]
+    }
+
 # Bonuses for generating the number of planets around a star (0 & 1 are basically impossible)
 _planetCountBonuses = [-9999, -9999, 0, 10, 20, 10, 5, 0]
 
@@ -40,6 +57,31 @@ _planetTypeBonuses = {
              [-30,      30,       20,      -10,       -20,   0,     -10,    -10,   -30], # black hole
             ]
     }
+
+# Planet size is a normalized random number with the following bonus added. Each planet
+# type has a different size "distribution"
+_planetSizeBonuses = [
+        #GasGiant #Radiated #Inferno #Asteroids #Water #Toxic #Desert #Swamp #Terran
+        30,       -10,      0,       0,         10,    -10,   0,      0,     0
+    ]
+
+# Planet population is calculated based on the size of the planet (usually, the bigger
+# the planet, the higher the potential population) but also the following bonuses are
+# applied.
+_planetPopulationBonuses = [
+        #GasGiant #Radiated #Inferno #Asteroids #Water #Toxic #Desert #Swamp #Terran
+        0.4,      0.4,      0.4,     0.0,       0.9,   0.6,   0.9,    0.6,   1.0
+    ]
+
+_planetFarmingBonuses = [
+        #GasGiant #Radiated #Inferno #Asteroids #Water #Toxic #Desert #Swamp #Terran
+        0.4,      0.2,      0.2,     0.0,       1.0,   0.4,   0.6,    0.8,   1.2
+    ]
+
+_planetMiningBonuses = [
+        #GasGiant #Radiated #Inferno #Asteroids #Water #Toxic #Desert #Swamp #Terran
+        0.8,      1.2,      1.0,     1.5,       0.8,   0.4,   0.6,    0.6,   0.8
+    ]
 
 
 def poisson(width, height, min_distance, packing=30):
@@ -141,17 +183,21 @@ class SectorGenerator:
       star.y = int(y) + 32
 
       starTypeIndex = self._select(_starTypeBonuses)
-      starType = mdl.star_types[starTypeIndex]
-      star.colour = starType.colourValue
+      star.starType = mdl.star_types[starTypeIndex]
       star.starTypeIndex = starTypeIndex
 
       star.name = namegen.generate(1)[0]
       star.size = random.randint(16, 24)
 
-      #r = random.randint(100, 255)
-      #g = random.randint(100, 255)
-      #b = random.randint(100, 255)
-      #star.colour = 0xff000000 | (r << 16) | (g << 8) | b
+      def getColour(starTypeIndex, component):
+        c1 = _starColours['min'][starTypeIndex][component]
+        c2 = _starColours['max'][starTypeIndex][component]
+        return int(c1 + ((c2 - c1) * random.random()))
+
+      r = getColour(starTypeIndex, 0)
+      g = getColour(starTypeIndex, 1)
+      b = getColour(starTypeIndex, 2)
+      star.colour = 0xff000000 | (r << 16) | (g << 8) | b
 
       sector.stars.append(star)
       star.put()
@@ -166,7 +212,23 @@ class SectorGenerator:
         planet.index = (index+1)
         planet.planetTypeID = self._select(type_bonuses)
         planet.planetType = mdl.planet_types[planet.planetTypeID]
-        planet.size = random.randint(planet.planetType.minSize, planet.planetType.maxSize)
+
+        # A number from 0..100, we actually want it from 10...50 so we adjust
+        planet.size = self._normalRandom(100) + _planetSizeBonuses[planet.planetTypeID]
+        planet.size = int(10 + (planet.size / 2.5))
+
+        # Population is affected by the size and type of the planet. We need to turn
+        # the size into a multiplier
+        populationMultiplier = _planetPopulationBonuses[planet.planetTypeID]
+        populationMultiplier *= (planet.size * 2.0)/50.0
+        planet.populationCongeniality = int(self._normalRandom(1000) * populationMultiplier)
+
+        farmingMultipler = _planetFarmingBonuses[planet.planetTypeID]
+        planet.farmingCongeniality = int(self._normalRandom(100) * farmingMultipler)
+
+        miningMultipler = _planetMiningBonuses[planet.planetTypeID]
+        planet.miningCongeniality = int(self._normalRandom(100) * miningMultipler)
+
         planet.put()
 
     return sector

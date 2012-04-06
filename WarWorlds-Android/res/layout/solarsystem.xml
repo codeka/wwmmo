@@ -51,6 +51,14 @@
                     android:textAppearance="?android:attr/textAppearanceSmall" />
             </LinearLayout>
 
+            <TextView
+                android:id="@+id/solarsystem_planetname"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:text="Small Text"
+                android:textAppearance="?android:attr/textAppearanceSmall" />
+
             <Button
                 android:id="@+id/solarsystem_colonize"
                 style="@style/Button"
