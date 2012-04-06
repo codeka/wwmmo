@@ -6,6 +6,7 @@ Created on 18/02/2012
 
 from google.appengine.ext import db
 from google.appengine.api import taskqueue
+import logging
 
 class StarType:
   def __init__(self, colourName="", colourValue=[0xff, 0xff, 0xff]):
@@ -93,6 +94,7 @@ class SectorManager:
       # Because of limitation in App Engine's filters, we can't search for all sectors
       # where x between x1,x2 AND y between y1,y2 in the same query. So we need to run
       # multiple queries like this....
+      logging.debug("Fetching sectors X=%d, (%d..%d)" % (x, y1, y2))
       query = Sector.all()
       query = query.filter("y >=", y1).filter("y <", y2)
       query = query.filter("x =", x)
@@ -102,6 +104,7 @@ class SectorManager:
     for key in sectors:
       sector = sectors[key]
       # fetch all of the sector's stars as well
+      logging.debug("Fetching stars for sector [%s]" % (key))
       query = Star.all().filter("sector", sector)
       sector.stars = []
       for star in query:
@@ -128,7 +131,7 @@ class SectorManager:
     if star is None:
       return None
 
-    planetQuery = Planet.all().filter("star", star.key())
+    planetQuery = Planet.all().filter("star", star)
     star.planets = []
     for planet in planetQuery:
       star.planets.append(planet)

@@ -8,7 +8,6 @@ from google.appengine.api import taskqueue
 from google.appengine.ext import db
 from model import sector as mdl
 from model import namegen
-import model
 import collections
 import tasks
 import logging
