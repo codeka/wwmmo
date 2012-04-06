@@ -5,8 +5,10 @@ Created on 01/04/2012
 '''
 
 from google.appengine.api import taskqueue
+from google.appengine.ext import db
 from model import sector as mdl
 from model import namegen
+import model
 import collections
 import tasks
 import logging
@@ -159,18 +161,31 @@ class SectorGenerator:
 
     Stars are generated within the sector using a Poisson distribution algorithm. For more
     details, see: http://devmag.org.za/2009/05/03/poisson-disk-sampling/
+    '''
 
-    TODO: currently this could result in two sectors being generated at the same (x,y)
-    coordinate. We need to do something to avoid that (e.g. specify the key ourselves,
-    transactions, something like that).'''
+    # We do this first bit in a transaction to ensure only one sector at the given (x,y) location
+    # is ever generated.
+    key_name = str(self.x)+","+str(self.y)
+    def _tx():
+      sector = mdl.Sector.get_by_key_name(key_name)
+      if sector is not None:
+        # If a sector already exists, return None to indicate that we don't need to 
+        # generate a new one.
+        return None
 
-    logging.info("Generating new sector ("+str(self.x)+","+str(self.y)+")...")
-    sector = mdl.Sector()
-    sector.x = self.x
-    sector.y = self.y
-    sector.numColonies = 0
-    sector.stars = []
-    sector.put()
+      sector = mdl.Sector(key_name=key_name)
+      sector.x = self.x
+      sector.y = self.y
+      sector.numColonies = 0
+      sector.stars = []
+      sector.put()
+      return sector
+    sector =  db.run_in_transaction(_tx)
+    if sector is None:
+      logging.warn("Sector ("+key_name+") already exists.")
+      return
+    else:
+      logging.info("Generating new sector ("+key_name+")...")
 
     SECTOR_SIZE = 1024
 
@@ -230,8 +245,6 @@ class SectorGenerator:
         planet.miningCongeniality = int(self._normalRandom(100) * miningMultipler)
 
         planet.put()
-
-    return sector
 
   def _select(self, bonuses):
     '''Selects an index from a list of bonuses.

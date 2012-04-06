@@ -29,7 +29,8 @@ public class SolarSystemActivity extends Activity {
     private boolean mIsSectorUpdated;
 
     private Star mStar;
-    private Planet mSelectedPlanet;
+    private Planet mPlanet;
+    private Colony mColony;
 
     /** Called when the activity is first created. */
     @Override
@@ -52,7 +53,7 @@ public class SolarSystemActivity extends Activity {
                 new SolarSystemSurfaceView.OnPlanetSelectedListener() {
             @Override
             public void onPlanetSelected(Planet planet) {
-                mSelectedPlanet = planet;
+                mPlanet = planet;
                 refreshSelectedPlanet();
             }
         });
@@ -124,7 +125,7 @@ public class SolarSystemActivity extends Activity {
                 }
 
                 mStar = star;
-                mSelectedPlanet = planet;
+                mPlanet = planet;
                 refreshSelectedPlanet();
             }
         });
@@ -132,42 +133,71 @@ public class SolarSystemActivity extends Activity {
 
     private void refreshSelectedPlanet() {
         View containerView = findViewById(R.id.solarsystem_planet_properties);
-        if (mStar == null || mSelectedPlanet == null) {
+        if (mStar == null || mPlanet == null) {
             containerView.setVisibility(View.GONE);
             return;
+        }
+
+        mColony = null;
+        for (Colony colony : mStar.getColonies()) {
+            if (colony.getPlanetKey().equals(mPlanet.getKey())) {
+                mColony = colony;
+                break;
+            }
         }
 
         containerView.setVisibility(View.VISIBLE);
 
         TextView planetNameTextView = (TextView) findViewById(R.id.solarsystem_planetname);
-        planetNameTextView.setText(mStar.getName()+" "+numberToRomanNumeral(mSelectedPlanet.getIndex()));
+        planetNameTextView.setText(mStar.getName()+" "+numberToRomanNumeral(mPlanet.getIndex()));
 
         ProgressBar populationCongenialityProgressBar = (ProgressBar) findViewById(
                 R.id.solarsystem_population_congeniality);
         TextView populationCongenialityTextView = (TextView) findViewById(
                 R.id.solarsystem_population_congeniality_value);
         populationCongenialityTextView.setText(Integer.toString(
-                mSelectedPlanet.getPopulationCongeniality()));
+                mPlanet.getPopulationCongeniality()));
         populationCongenialityProgressBar.setProgress(
-                (int) (populationCongenialityProgressBar.getMax() * (mSelectedPlanet.getPopulationCongeniality() / 1000.0)));
+                (int) (populationCongenialityProgressBar.getMax() * (mPlanet.getPopulationCongeniality() / 1000.0)));
 
         ProgressBar farmingCongenialityProgressBar = (ProgressBar) findViewById(
                 R.id.solarsystem_farming_congeniality);
         TextView farmingCongenialityTextView = (TextView) findViewById(
                 R.id.solarsystem_farming_congeniality_value);
         farmingCongenialityTextView.setText(Integer.toString(
-                mSelectedPlanet.getFarmingCongeniality()));
+                mPlanet.getFarmingCongeniality()));
         farmingCongenialityProgressBar.setProgress(
-                (int)(farmingCongenialityProgressBar.getMax() * (mSelectedPlanet.getFarmingCongeniality() / 100.0)));
+                (int)(farmingCongenialityProgressBar.getMax() * (mPlanet.getFarmingCongeniality() / 100.0)));
 
         ProgressBar miningCongenialityProgressBar = (ProgressBar) findViewById(
                 R.id.solarsystem_mining_congeniality);
         TextView miningCongenialityTextView = (TextView) findViewById(
                 R.id.solarsystem_mining_congeniality_value);
         miningCongenialityTextView.setText(Integer.toString(
-                mSelectedPlanet.getMiningCongeniality()));
+                mPlanet.getMiningCongeniality()));
         miningCongenialityProgressBar.setProgress(
-                (int)(miningCongenialityProgressBar.getMax() * (mSelectedPlanet.getMiningCongeniality() / 100.0)));
+                (int)(miningCongenialityProgressBar.getMax() * (mPlanet.getMiningCongeniality() / 100.0)));
+
+        Button colonizeButton = (Button) findViewById(R.id.solarsystem_colonize);
+        View colonyDetailsContainer = findViewById(R.id.solarsystem_colony_details);
+        if (mColony == null) {
+            colonizeButton.setVisibility(View.VISIBLE);
+            colonyDetailsContainer.setVisibility(View.GONE);
+        } else {
+            colonizeButton.setVisibility(View.GONE);
+            colonyDetailsContainer.setVisibility(View.VISIBLE);
+
+            final TextView empireNameTextView = (TextView) findViewById(
+                    R.id.solarsystem_colony_empirename);
+            empireNameTextView.setText("");
+            EmpireManager.getInstance().fetchEmpire(mColony.getEmpireKey(),
+                    new EmpireManager.EmpireFetchedHandler() {
+                        @Override
+                        public void onEmpireFetched(Empire empire) {
+                            empireNameTextView.setText(empire.getDisplayName());
+                        }
+                    });
+        }
     }
 
     private static String numberToRomanNumeral(int n) {

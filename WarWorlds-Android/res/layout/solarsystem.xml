@@ -164,6 +164,28 @@
                             android:textAppearance="?android:attr/textAppearanceSmall" />
 
                     </RelativeLayout>
+
+                    <LinearLayout
+                        android:id="@+id/solarsystem_colony_details"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical" >
+
+                        <au.com.codeka.warworlds.ctrl.HorizontalSeparator
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="8dp"
+                            android:layout_marginRight="8dp"
+                            android:text="@string/solarsystem_colony" />
+
+                        <TextView
+                            android:id="@+id/solarsystem_colony_empirename"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:textAppearance="?android:attr/textAppearanceSmall" />
+
+                    </LinearLayout>
         
                     <Button
                         android:id="@+id/solarsystem_colonize"

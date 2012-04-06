@@ -6,6 +6,7 @@ public class Colony {
     private String mStarKey;
     private long mPopulation;
     private float mPopulationRate;
+    private String mEmpireKey;
 
     public String getKey() {
         return mKey;
@@ -15,6 +16,9 @@ public class Colony {
     }
     public String getStarKey() {
         return mStarKey;
+    }
+    public String getEmpireKey() {
+        return mEmpireKey;
     }
     public long getPopulation() {
         // TODO: calcuate based on population + (population_rate * time_since_last_simulate)
@@ -28,6 +32,7 @@ public class Colony {
         c.mStarKey = pb.getStarKey();
         c.mPopulation = pb.getPopulation();
         c.mPopulationRate = pb.getPopulationRate();
+        c.mEmpireKey = pb.getEmpireKey();
 
         return c;
     }

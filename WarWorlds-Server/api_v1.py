@@ -154,8 +154,12 @@ class ChatPage(ApiPage):
 
 
 class EmpiresPage(ApiPage):
-  def get(self):
-    if self.request.get("email", "") != "":
+  def get(self, empireKey=None):
+    empire_model = None
+
+    if empireKey:
+      empire_model = empire.Empire.get(empireKey)
+    elif self.request.get("email", "") != "":
       email = self.request.get("email")
       user = users.User(email)
       if user is None:
@@ -164,17 +168,14 @@ class EmpiresPage(ApiPage):
         return
 
       empire_model = empire.Empire.getForUser(user)
-      if empire_model is None:
-        logging.info("No empire registered with email address '" + email + "'")
-        self.response.set_status(404)
-        return
 
-      empire_pb = pb.Empire()
-      self._empireModelToPb(empire_pb, empire_model)
-      return empire_pb
-    else:
-      self.response.set_status(403)
+    if empire_model is None:
+      self.response.set_status(404)
       return
+
+    empire_pb = pb.Empire()
+    self._empireModelToPb(empire_pb, empire_model)
+    return empire_pb
 
   def put(self):
     empire_pb = self._getRequestBody(pb.Empire)

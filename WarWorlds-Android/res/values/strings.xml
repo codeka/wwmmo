@@ -39,4 +39,5 @@
     <string name="chat_global">Global</string>
     <string name="chat_send">Send</string>
     <string name="solarsystem_cogeniality_header">Cogeniality</string>
+    <string name="solarsystem_colony">Colony</string>
 </resources>

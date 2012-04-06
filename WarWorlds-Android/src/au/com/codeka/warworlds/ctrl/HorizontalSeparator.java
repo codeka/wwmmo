@@ -21,7 +21,7 @@ public class HorizontalSeparator extends TextView {
         super(context, attrs);
 
         mPaint = new Paint();
-        mPaint.setARGB(0xff, 0xff, 0xff, 0xff);
+        mPaint.setARGB(255, 14, 215, 254);
         mPaint.setStyle(Style.STROKE);
     }
 
@@ -32,7 +32,7 @@ public class HorizontalSeparator extends TextView {
 
         if (this.getText() != null) {
             String text = this.getText().toString();
-            x += this.getPaint().measureText(text);
+            x += this.getPaint().measureText(text) + 8;
         }
         canvas.drawLine(x, y, canvas.getWidth(), y, mPaint);
 
