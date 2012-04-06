@@ -197,6 +197,14 @@ public class SolarSystemActivity extends Activity {
                             empireNameTextView.setText(empire.getDisplayName());
                         }
                     });
+
+            TextView populationTextView = (TextView) findViewById(
+                    R.id.solarsystem_colony_population_value);
+            populationTextView.setText(String.format("%d (%.1f)", mColony.getPopulation(), mColony.getPopulationRate()));
+
+            TextView farmingTextView = (TextView) findViewById(
+                    R.id.solarsystem_colony_farming_value);
+            farmingTextView.setText(String.format("%.1f", mColony.getFarmingRate() * 10.0));
         }
     }
 

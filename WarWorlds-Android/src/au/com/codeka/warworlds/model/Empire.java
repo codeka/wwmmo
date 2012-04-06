@@ -42,7 +42,7 @@ public class Empire {
                             warworlds.Warworlds.Colony.class);
                     if (pb == null)
                         return null;
-                    return Colony.fromProtocolBuffer(pb);
+                    return Colony.fromProtocolBuffer(planet, pb);
                 } catch(Exception e) {
                     // TODO: handle exceptions
                     log.error(ExceptionUtils.getStackTrace(e));

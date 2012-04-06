@@ -96,7 +96,14 @@ public class Star {
 
         s.mColonies = new ArrayList<Colony>();
         for(warworlds.Warworlds.Colony colony_pb : pb.getColoniesList()) {
-            s.mColonies.add(Colony.fromProtocolBuffer(colony_pb));
+            Planet planet = null;
+            for(Planet p : s.mPlanets) {
+                if (colony_pb.getPlanetKey().equals(p.getKey())) {
+                    planet = p;
+                    break;
+                }
+            }
+            s.mColonies.add(Colony.fromProtocolBuffer(planet, colony_pb));
         }
 
         return s;

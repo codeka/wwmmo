@@ -16,6 +16,7 @@ from google.protobuf import message
 
 from google.appengine.api import channel
 from google.appengine.api import users
+import calendar
 import logging
 
 
@@ -74,9 +75,10 @@ class ApiPage(webapp.RequestHandler):
     colony_pb.star_key = str(empire.Colony.star.get_value_for_datastore(colony_model))
     colony_pb.planet_key = str(empire.Colony.planet.get_value_for_datastore(colony_model))
     colony_pb.population = colony_model.population
-    colony_pb.population_rate = colony_model.populationRate
-    #colony_pb.last_simulation = colony_model.lastSimulation
+    colony_pb.last_simulation = int(self._dateTimeToEpoch(colony_model.lastSimulation))
 
+  def _dateTimeToEpoch(self, dt):
+    return calendar.timegm(dt.timetuple())
 
 class HelloPage(ApiPage):
   '''The 'hello' page is what you request when you first connect.'''

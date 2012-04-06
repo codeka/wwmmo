@@ -277,7 +277,9 @@ message Colony
     optional string star_key = 4;
 
     optional int64 population = 5;
-    optional float population_rate = 6;
 
+    // Time, in seconds since Unix epoch, that this colony was last simulated (i.e.
+    // when the population and such was last calculated)
+    optional int64 last_simulation = 6;
 }
 

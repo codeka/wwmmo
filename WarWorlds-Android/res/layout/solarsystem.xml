@@ -54,8 +54,7 @@
             <ScrollView
                 android:id="@+id/solarsystem_planet_properties"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_marginBottom="50dp" >
+                android:layout_height="match_parent" >
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -165,13 +164,13 @@
 
                     </RelativeLayout>
 
-                    <LinearLayout
+                    <RelativeLayout
                         android:id="@+id/solarsystem_colony_details"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical" >
+                        android:layout_height="wrap_content" >
 
                         <au.com.codeka.warworlds.ctrl.HorizontalSeparator
+                            android:id="@+id/solarsystem_colony_detailstitle"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginLeft="8dp"
@@ -183,10 +182,93 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:gravity="center"
+                            android:layout_below="@id/solarsystem_colony_detailstitle"
                             android:textAppearance="?android:attr/textAppearanceSmall" />
 
-                    </LinearLayout>
-        
+                        <ImageView
+                            android:id="@+id/solarsystem_colony_population_icon"
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:layout_below="@id/solarsystem_colony_empirename"
+                            android:layout_alignParentLeft="true"
+                            android:layout_marginLeft="10dp"
+                            android:src="@drawable/colony_population_icon" />
+
+                        <TextView
+                            android:id="@+id/solarsystem_colony_population_value"
+                            android:layout_width="wrap_content"
+                            android:layout_height="20dp"
+                            android:layout_below="@+id/solarsystem_colony_empirename"
+                            android:layout_toRightOf="@+id/solarsystem_colony_population_icon"
+                            android:layout_marginLeft="4dp"
+                            android:gravity="center"
+                            android:text="999"
+                            android:textAppearance="?android:attr/textAppearanceSmall" />
+
+                        <ImageView
+                            android:id="@+id/solarsystem_colony_farming_icon"
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:layout_below="@id/solarsystem_colony_empirename"
+                            android:layout_centerHorizontal="true"
+                            android:src="@drawable/colony_farming_icon" />
+
+                        <TextView
+                            android:id="@+id/solarsystem_colony_farming_value"
+                            android:layout_width="wrap_content"
+                            android:layout_height="20dp"
+                            android:layout_below="@+id/solarsystem_colony_empirename"
+                            android:layout_toRightOf="@+id/solarsystem_colony_farming_icon"
+                            android:layout_marginLeft="4dp"
+                            android:gravity="center"
+                            android:text="999"
+                            android:textAppearance="?android:attr/textAppearanceSmall" />
+
+                        <ImageView
+                            android:id="@+id/solarsystem_colony_mining_icon"
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:layout_alignParentLeft="true"
+                            android:layout_below="@id/solarsystem_colony_population_icon"
+                            android:layout_marginLeft="10dp"
+                            android:layout_marginTop="4dp"
+                            android:src="@drawable/colony_mining_icon" />
+
+                        <TextView
+                            android:id="@+id/solarsystem_colony_mining_value"
+                            android:layout_width="wrap_content"
+                            android:layout_height="20dp"
+                            android:layout_below="@id/solarsystem_colony_population_value"
+                            android:layout_toRightOf="@id/solarsystem_colony_mining_icon"
+                            android:layout_marginLeft="4dp"
+                            android:layout_marginTop="4dp"
+                            android:gravity="center"
+                            android:text="999"
+                            android:textAppearance="?android:attr/textAppearanceSmall" />
+
+                        <ImageView
+                            android:id="@+id/solarsystem_colony_construction_icon"
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:layout_below="@id/solarsystem_colony_farming_icon"
+                            android:layout_centerHorizontal="true"
+                            android:layout_marginTop="4dp"
+                            android:src="@drawable/colony_construction_icon" />
+
+                        <TextView
+                            android:id="@+id/solarsystem_colony_construction_value"
+                            android:layout_width="wrap_content"
+                            android:layout_height="20dp"
+                            android:layout_below="@+id/solarsystem_colony_farming_value"
+                            android:layout_toRightOf="@+id/solarsystem_colony_construction_icon"
+                            android:layout_marginLeft="4dp"
+                            android:layout_marginTop="4dp"
+                            android:gravity="center"
+                            android:text="999"
+                            android:textAppearance="?android:attr/textAppearanceSmall" />
+                        
+                    </RelativeLayout>
+
                     <Button
                         android:id="@+id/solarsystem_colonize"
                         style="@style/Button"
