@@ -233,18 +233,24 @@ public class SectorManager {
             return null;
         }
 
-        x /= SECTOR_SIZE / 16;
-        y /= SECTOR_SIZE / 16;
+        int minDistance = 0;
+        Star closestStar = null;
 
         for(Star star : sector.getStars()) {
-            int starX = star.getOffsetX() / (SECTOR_SIZE / 16);
-            int starY = star.getOffsetY() / (SECTOR_SIZE / 16);
+            int starX = star.getOffsetX();
+            int starY = star.getOffsetY();
 
-            if (starX == x && starY == y) {
-                return star;
+            int distance = (starX - x)*(starX - x) + (starY - y)*(starY - y);
+            if (closestStar == null || distance < minDistance) {
+                closestStar = star;
+                minDistance = distance;
             }
         }
 
+        // only return it if you tapped within a 48 pixel radius
+        if (Math.sqrt(minDistance) <= 48) {
+            return closestStar;
+        }
         return null;
     }
 
