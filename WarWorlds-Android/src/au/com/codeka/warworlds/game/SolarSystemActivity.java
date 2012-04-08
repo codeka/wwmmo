@@ -44,6 +44,7 @@ public class SolarSystemActivity extends Activity {
         final TextView money = (TextView) findViewById(R.id.money);
         mSolarSystemSurfaceView = (SolarSystemSurfaceView) findViewById(R.id.solarsystem_view);
         final Button colonizeButton = (Button) findViewById(R.id.solarsystem_colonize);
+        final Button buildButton = (Button) findViewById(R.id.solarsystem_colony_build);
 
         EmpireManager empireManager = EmpireManager.getInstance();
         username.setText(empireManager.getEmpire().getDisplayName());
@@ -62,6 +63,13 @@ public class SolarSystemActivity extends Activity {
             @Override
             public void onClick(View v) {
                 onColonizeClick();
+            }
+        });
+
+        buildButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onBuildClick();
             }
         });
     }
@@ -247,5 +255,12 @@ public class SolarSystemActivity extends Activity {
                 mIsSectorUpdated = true;
             }
         });
+    }
+
+    /**
+     * When you click build, we need to pop up the build window.
+     */
+    private void onBuildClick() {
+        
     }
 }

@@ -276,6 +276,18 @@
                             android:gravity="center"
                             android:text="999"
                             android:textAppearance="?android:attr/textAppearanceSmall" />
+
+                        <Button
+                            android:id="@+id/solarsystem_colony_build"
+                            style="@style/Button"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignLeft="@id/solarsystem_colony_mining_icon"
+                            android:layout_toLeftOf="@id/solarsystem_colony_farming_icon"
+                            android:layout_below="@id/solarsystem_colony_mining_value"
+                            android:layout_marginRight="4dp"
+                            android:text="@string/solarsystem_colony_build" />
+
                     </RelativeLayout>
 
                     <Button

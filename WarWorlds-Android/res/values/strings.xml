@@ -40,4 +40,5 @@
     <string name="chat_send">Send</string>
     <string name="solarsystem_cogeniality_header">Cogeniality</string>
     <string name="solarsystem_colony">Colony</string>
+    <string name="solarsystem_colony_build">Build</string>
 </resources>
