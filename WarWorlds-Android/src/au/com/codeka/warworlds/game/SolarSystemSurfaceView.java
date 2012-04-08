@@ -164,6 +164,8 @@ public class SolarSystemSurfaceView extends UniverseElementSurfaceView {
         }
 
         if (mStar != null) {
+            canvas.drawColor(Color.BLACK);
+
             mBackgroundRenderer.drawBackground(canvas, 0, 0,
                     canvas.getWidth() / mPixelScale,
                     canvas.getHeight() / mPixelScale,

@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 
 import warworlds.Warworlds.Hello;
 import android.app.Activity;
+import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -21,7 +22,6 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.view.Menu;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;
@@ -42,15 +42,18 @@ public class WarWorldsActivity extends Activity {
     private Context mContext = this;
     private Button mStartGameButton;
 
+    private static final int OPTIONS_DIALOG = 1000;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         log.info("WarWorlds activity starting...");
         super.onCreate(savedInstanceState);
 
-        Util.loadSettings(mContext, this);
+        Util.loadProperties(mContext, this);
         Authenticator.configure(mContext);
 
         requestWindowFeature(Window.FEATURE_NO_TITLE); // remove the title bar
+        setHomeScreenContent();
     }
 
     @Override
@@ -62,21 +65,16 @@ public class WarWorldsActivity extends Activity {
             startActivity(new Intent(this, AccountsActivity.class));
             return;
         }
-
-        this.setHomeScreenContent();
     }
 
     @Override
-    public void onDestroy() {
-        super.onDestroy();
-    }
+    protected Dialog onCreateDialog(int id) {
+        if (id == OPTIONS_DIALOG) {
+            GlobalOptionsDialog dialog = new GlobalOptionsDialog(mContext);
+            return dialog;
+        }
 
-    /**
-     * We don't have a menu, returning \c false makes sure the button doesn't appear.
-     */
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        return false;
+        return super.onCreateDialog(id);
     }
 
     /**
@@ -201,6 +199,7 @@ public class WarWorldsActivity extends Activity {
 
         mStartGameButton = (Button) findViewById(R.id.start_game_btn);
         final Button logOutButton = (Button) findViewById(R.id.log_out_btn);
+        final Button optionsButton = (Button) findViewById(R.id.options_btn);
 
         final WebView motd = (WebView) findViewById(R.id.home_motd);
         sayHello(motd);
@@ -211,9 +210,15 @@ public class WarWorldsActivity extends Activity {
             }
         });
 
+        optionsButton.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showDialog(OPTIONS_DIALOG);
+            }
+        });
+
         mStartGameButton.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
-                mStartGameButton.setEnabled(false);
                 startActivity(new Intent(mContext, StarfieldActivity.class));
             }
         });

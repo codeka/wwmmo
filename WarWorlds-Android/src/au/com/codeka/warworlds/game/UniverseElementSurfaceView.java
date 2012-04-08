@@ -1,5 +1,8 @@
 package au.com.codeka.warworlds.game;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import android.content.Context;
 import android.graphics.Canvas;
 import android.os.AsyncTask;
@@ -15,6 +18,7 @@ import android.view.SurfaceView;
  *
  */
 public class UniverseElementSurfaceView extends SurfaceView implements SurfaceHolder.Callback {
+    private Logger log = LoggerFactory.getLogger(UniverseElementSurfaceView.class);
     private Context mContext;
     private SurfaceHolder mHolder;
     private boolean mIsRedrawing;
@@ -92,11 +96,15 @@ public class UniverseElementSurfaceView extends SurfaceView implements SurfaceHo
             protected Void doInBackground(Void... arg0) {
                 Canvas c = h.lockCanvas();
                 try {
-                    synchronized(h) {
-                        onDraw(c);
+                    try {
+                        synchronized(h) {
+                            onDraw(c);
+                        }
+                    } finally {
+                        h.unlockCanvasAndPost(c);
                     }
-                } finally {
-                    h.unlockCanvasAndPost(c);
+                } catch(Exception e) {
+                    log.error("An error occured re-drawing the canvas, ignoring.", e);
                 }
 
                 return null;

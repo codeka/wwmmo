@@ -60,8 +60,7 @@
             android:screenOrientation="landscape" >
         </activity>
 
-        <!-- A couple of activities that are used by the game itself -->
-        <activity android:name=".EmpireSetupActivity" >
+        <!-- A couple of activities that are used by the game itself --><activity android:name=".EmpireSetupActivity" >
         </activity>
         <activity
             android:name=".game.StarfieldActivity"
@@ -108,6 +107,7 @@
                 <category android:name="au.com.codeka.warworlds" />
             </intent-filter>
         </receiver>
+        
     </application>
 
 </manifest>

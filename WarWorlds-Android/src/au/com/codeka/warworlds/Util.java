@@ -53,7 +53,7 @@ public class Util {
      * properties, preferences and settings to make later calls easier (and not
      * require a \c Context parameter)
      */
-    public static void loadSettings(Context context, Activity activity) {
+    public static void loadProperties(Context context, Activity activity) {
         // load the warworlds.properties file and populate mProperties.
         AssetManager assetManager = context.getAssets();
 
@@ -84,7 +84,8 @@ public class Util {
     }
 
     /**
-     * Gets the contents of the warworlds.properties as a \c Properties.
+     * Gets the contents of the warworlds.properties as a \c Properties. These are the static
+     * properties that govern things like which server to connect to and so on.
      */
     public static Properties getProperties() {
         return sProperties;

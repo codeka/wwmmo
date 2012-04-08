@@ -36,9 +36,16 @@
 
     <!-- "solarsystem.xml" layout -->
     <string name="solarsystem_colonize">Colonize</string>
-    <string name="chat_global">Global</string>
-    <string name="chat_send">Send</string>
     <string name="solarsystem_cogeniality_header">Cogeniality</string>
     <string name="solarsystem_colony">Colony</string>
     <string name="solarsystem_colony_build">Build</string>
+
+    <!-- "chat.xml" layout -->
+    <string name="chat_global">Global</string>
+    <string name="chat_send">Send</string>
+
+    <!-- "global_options.xml" layout -->
+    <string name="globalopts_graphics_detail">Detail Level:</string>
+    <string name="globalopts_graphics_fast">Fast, Low Detail</string>
+    <string name="globalopts_graphics_slow">Slow, High Detail</string>
 </resources>

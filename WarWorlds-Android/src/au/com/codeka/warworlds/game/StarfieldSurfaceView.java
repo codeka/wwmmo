@@ -10,6 +10,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Paint.Style;
 import android.graphics.RadialGradient;
@@ -118,6 +119,7 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
         }
 
         SectorManager sm = SectorManager.getInstance();
+        canvas.drawColor(Color.BLACK);
 
         for(int y = -sm.getRadius(); y <= sm.getRadius(); y++) {
             for(int x = -sm.getRadius(); x <= sm.getRadius(); x++) {
