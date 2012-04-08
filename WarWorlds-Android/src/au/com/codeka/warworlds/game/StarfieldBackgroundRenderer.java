@@ -17,6 +17,7 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.Paint.Style;
+import android.graphics.RectF;
 
 /**
  * Handles drawing a starfield background. Used by the \c StarfieldSurfaceView and
@@ -28,31 +29,36 @@ public class StarfieldBackgroundRenderer {
     private Paint mBackgroundPaint;
     private List<Bitmap> mBgStars;
     private List<Bitmap> mBgGases;
+    private float mPixelScale;
 
     public StarfieldBackgroundRenderer(Context context) {
         mContext = context;
+        mPixelScale = context.getResources().getDisplayMetrics().density * 0.75f;
         initialize();
     }
 
-    public void drawBackground(Canvas canvas, int left, int top, int right, int bottom, long seed) {
+    public void drawBackground(Canvas canvas, float left, float top, float right, float bottom, long seed) {
         if (mBgStars == null || mBgStars.isEmpty()) {
             return;
         }
 
-        Rect src, dest;
+        Rect src;
+        RectF dest;
         Random r = new Random(seed);
 
         src = new Rect(0, 0, 512, 512);
-        dest = new Rect(left, top, right, bottom);
+        dest = new RectF(left * mPixelScale, top * mPixelScale, right * mPixelScale, bottom * mPixelScale);
         canvas.drawBitmap(mBgStars.get(r.nextInt(mBgStars.size())), src, dest, mBackgroundPaint);
 
         for (int i = 0; i < 10; i++) {
             Bitmap gas = mBgGases.get(r.nextInt(mBgGases.size()));
 
             src = new Rect(0, 0, gas.getWidth(), gas.getHeight());
-            int x = left + r.nextInt(right - left + 256) - 128;
-            int y = top + r.nextInt(bottom - top + 256) - 128;
-            dest = new Rect(x, y, x + (src.width() * 2), y + (src.height() * 2));
+            float x = left + r.nextInt((int)(right - left) + 256) - 128;
+            float y = top + r.nextInt((int)(bottom - top) + 256) - 128;
+            dest = new RectF(x * mPixelScale, y * mPixelScale,
+                    (x + (src.width() * 2)) * mPixelScale,
+                    (y + (src.height() * 2)) * mPixelScale);
 
             canvas.drawBitmap(gas, src, dest, mBackgroundPaint);
         }
