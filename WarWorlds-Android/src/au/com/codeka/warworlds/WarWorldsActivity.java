@@ -1,12 +1,6 @@
 
 package au.com.codeka.warworlds;
 
-import java.io.InputStream;
-import java.io.StringWriter;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-
-import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,18 +11,15 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.res.AssetManager;
-import android.graphics.Color;
-import android.graphics.Paint;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;
-import android.webkit.WebView;
 import android.widget.Button;
 import au.com.codeka.warworlds.api.ApiClient;
 import au.com.codeka.warworlds.api.ApiException;
+import au.com.codeka.warworlds.ctrl.TransparentWebView;
 import au.com.codeka.warworlds.game.ChatManager;
 import au.com.codeka.warworlds.game.EmpireManager;
 import au.com.codeka.warworlds.game.StarfieldActivity;
@@ -79,31 +70,12 @@ public class WarWorldsActivity extends Activity {
     }
 
     /**
-     * Loads the MOTD template HTML, which is actually just a static asset.
-     */
-    private String getHtmlFile(String fileName) {
-        try {
-            AssetManager assetManager = mContext.getAssets();
-            InputStream is = assetManager.open("html/"+fileName);
-
-            StringWriter writer = new StringWriter();
-            IOUtils.copy(is, writer);
-            return writer.toString();
-        } catch (Exception e) {
-        	// any errors (shouldn't be...) and we'll return a "blank" template.
-            return "";
-        }
-    }
-
-    /**
      * Says "hello" to the server. Lets it know who we are, fetches the MOTD and if there's
      * no empire registered yet, switches over to the \c EmpireSetupActivity.
      * 
      * @param motd The \c WebView we'll install the MOTD to.
      */
-    private void sayHello(final WebView motdView) {
-        setWebViewTransparent(motdView);
-
+    private void sayHello(final TransparentWebView motdView) {
         final ProgressDialog pleaseWaitDialog = ProgressDialog.show(mContext, null, 
                 "Connecting...", true);
 
@@ -153,8 +125,7 @@ public class WarWorldsActivity extends Activity {
                     mErrorOccured = true;
                 }
 
-                String tmpl = getHtmlFile("motd-template.html");
-                return String.format(tmpl, message);
+                return message;
             }
 
             @Override
@@ -165,8 +136,7 @@ public class WarWorldsActivity extends Activity {
                 if (mNeedsEmpireSetup) {
                     startActivity(new Intent(mContext, EmpireSetupActivity.class));
                 } else {
-                    motdView.loadData(result, "text/html", "utf-8");
-                    setWebViewTransparent(motdView);
+                    motdView.loadHtml("html/motd-template.html", result);
                 }
 
                 if (mErrorOccured) {
@@ -176,27 +146,6 @@ public class WarWorldsActivity extends Activity {
         }.execute();
     }
 
-    private void setWebViewTransparent(WebView webView) {
-        webView.setBackgroundColor(Color.TRANSPARENT);
-
-        // this is required to make the background of the WebView actually transparent
-        // on Honeycomb+ (this API is only available on Honeycomb+ as well, so we need
-        // to call it via reflection...):
-        // motdView.setLayerType(View.LAYER_TYPE_SOFTWARE, new Paint());
-        try {
-            Method setLayerType = View.class.getMethod("setLayerType", int.class, Paint.class);
-            if (setLayerType != null) {
-                setLayerType.invoke(webView, 1, new Paint());
-          }
-        // ignore if the method isn't supported on this platform...
-        } catch (SecurityException e) {
-        } catch (NoSuchMethodException e) {
-        } catch (IllegalArgumentException e) {
-        } catch (IllegalAccessException e) {
-        } catch (InvocationTargetException e) {
-        }
-    }
-
     private void setHomeScreenContent() {
         setContentView(R.layout.home);
 
@@ -204,7 +153,7 @@ public class WarWorldsActivity extends Activity {
         final Button logOutButton = (Button) findViewById(R.id.log_out_btn);
         final Button optionsButton = (Button) findViewById(R.id.options_btn);
 
-        final WebView motd = (WebView) findViewById(R.id.home_motd);
+        final TransparentWebView motd = (TransparentWebView) findViewById(R.id.home_motd);
         sayHello(motd);
 
         logOutButton.setOnClickListener(new OnClickListener() {

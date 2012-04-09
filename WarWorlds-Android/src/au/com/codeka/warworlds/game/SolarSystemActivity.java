@@ -2,7 +2,6 @@ package au.com.codeka.warworlds.game;
 
 import android.app.Activity;
 import android.app.Dialog;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -11,11 +10,13 @@ import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import au.com.codeka.warworlds.R;
+import au.com.codeka.warworlds.model.BuildingDesign;
+import au.com.codeka.warworlds.model.BuildingDesignManager;
 import au.com.codeka.warworlds.model.Colony;
 import au.com.codeka.warworlds.model.Empire;
 import au.com.codeka.warworlds.model.ModelManager;
-import au.com.codeka.warworlds.model.Planet;
 import au.com.codeka.warworlds.model.ModelManager.StarFetchedHandler;
+import au.com.codeka.warworlds.model.Planet;
 import au.com.codeka.warworlds.model.Star;
 
 /**
@@ -24,7 +25,6 @@ import au.com.codeka.warworlds.model.Star;
  *
  */
 public class SolarSystemActivity extends Activity {
-    private Context mContext = this;
     private SolarSystemSurfaceView mSolarSystemSurfaceView;
     private long mSectorX;
     private long mSectorY;
@@ -35,7 +35,8 @@ public class SolarSystemActivity extends Activity {
     private Planet mPlanet;
     private Colony mColony;
 
-    private static final int BUILDINGS_DIALOG = 1000;
+    public static final int BUILDINGS_DIALOG = 1000;
+    public static final int BUILDINGS_CONFIRM_DIALOG = 1001;
 
     /** Called when the activity is first created. */
     @Override
@@ -110,7 +111,9 @@ public class SolarSystemActivity extends Activity {
     protected Dialog onCreateDialog(int id) {
         switch(id) {
         case BUILDINGS_DIALOG:
-            return new SolarSystemBuildingsDialog(mContext);
+            return new SolarSystemBuildingsDialog(this);
+        case BUILDINGS_CONFIRM_DIALOG:
+            return new SolarSystemBuildingsConfirmDialog(this);
         }
 
         return super.onCreateDialog(id);
@@ -119,9 +122,22 @@ public class SolarSystemActivity extends Activity {
     @Override
     protected void onPrepareDialog(int id, Dialog d) {
         switch(id) {
-        case BUILDINGS_DIALOG:
+        case BUILDINGS_DIALOG: {
             SolarSystemBuildingsDialog dialog = (SolarSystemBuildingsDialog) d;
             dialog.setColony(mColony);
+        }
+        }
+    }
+
+    @Override
+    protected void onPrepareDialog(int id, Dialog d, Bundle args) {
+        switch(id) {
+        case BUILDINGS_CONFIRM_DIALOG: {
+            SolarSystemBuildingsConfirmDialog dialog = (SolarSystemBuildingsConfirmDialog) d;
+            String designID = args.getString("au.com.codeka.warworlds.BuildingID", "");
+            BuildingDesign design = BuildingDesignManager.getInstance().getDesign(designID);
+            dialog.setBuildingDesign(design);
+        }
         }
     }
 

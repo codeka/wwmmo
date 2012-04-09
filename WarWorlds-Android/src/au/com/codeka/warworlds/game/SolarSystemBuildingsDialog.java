@@ -4,9 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import android.app.Dialog;
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -14,9 +11,10 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewGroup.LayoutParams;
 import android.view.Window;
 import android.view.WindowManager;
-import android.view.ViewGroup.LayoutParams;
+import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -27,13 +25,11 @@ import au.com.codeka.warworlds.model.BuildingDesignManager;
 import au.com.codeka.warworlds.model.Colony;
 
 public class SolarSystemBuildingsDialog extends Dialog {
-    private Logger log = LoggerFactory.getLogger(SolarSystemBuildingsDialog.class);
-    private Context mContext;
-    private Colony mColony;
+    private SolarSystemActivity mActivity;
 
-    public SolarSystemBuildingsDialog(Context context) {
-        super(context);
-        mContext = context;
+    public SolarSystemBuildingsDialog(SolarSystemActivity activity) {
+        super(activity);
+        mActivity = activity;
     }
 
     @Override
@@ -61,10 +57,19 @@ public class SolarSystemBuildingsDialog extends Dialog {
 
         ListView availableDesignsList = (ListView) findViewById(R.id.buildings_available);
         availableDesignsList.setAdapter(adapter);
+        availableDesignsList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Bundle args = new Bundle();
+                BuildingDesign design = (BuildingDesign) adapter.getItem(position);
+                args.putString("au.com.codeka.warworlds.BuildingID", design.getID());
+                mActivity.showDialog(SolarSystemActivity.BUILDINGS_CONFIRM_DIALOG, args);
+            }
+        });
     }
 
     public void setColony(Colony colony) {
-        mColony = colony;
+        //mColony = colony;
     }
 
     /**
@@ -97,7 +102,7 @@ public class SolarSystemBuildingsDialog extends Dialog {
         public View getView(int position, View convertView, ViewGroup parent) {
             View view = convertView;
             if (view == null) {
-                LayoutInflater inflater = (LayoutInflater)mContext.getSystemService
+                LayoutInflater inflater = (LayoutInflater) mActivity.getSystemService
                         (Context.LAYOUT_INFLATER_SERVICE);
                 view = (ViewGroup) inflater.inflate(R.layout.solarsystem_buildings_design, null);
             }

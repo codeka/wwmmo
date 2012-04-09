@@ -49,12 +49,12 @@ public class BuildingDesign {
                     design.mDescription = elem.getTextContent();
                 } else if (elem.getNodeName().equals("cost")) {
                     String value = elem.getAttribute("credits");
-                    if (!value.isEmpty()) {
+                    if (!value.equals("")) {
                         design.mBuildCost = Integer.parseInt(value);
                     }
 
                     value = elem.getAttribute("time");
-                    if (!value.isEmpty()) {
+                    if (!value.equals("")) {
                         double timeInHours = Double.parseDouble(value);
                         design.mBuildTimeSeconds = (int)(timeInHours * 3600);
                     }

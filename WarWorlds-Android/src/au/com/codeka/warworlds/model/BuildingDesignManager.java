@@ -58,6 +58,9 @@ public class BuildingDesignManager {
             @Override
             protected void onPostExecute(List<BuildingDesign> result) {
                 mDesigns = new TreeMap<String, BuildingDesign>();
+                if (result == null)
+                    return;
+
                 for(BuildingDesign design : result) {
                     mDesigns.put(design.getID(), design);
                 }
@@ -82,6 +85,13 @@ public class BuildingDesignManager {
      */
     public SortedMap<String, BuildingDesign> getDesigns() {
         return mDesigns;
+    }
+
+    /**
+     * Gets the building design with the given identifier.
+     */
+    public BuildingDesign getDesign(String designID) {
+        return mDesigns.get(designID);
     }
 
     /**

@@ -2,12 +2,7 @@ package au.com.codeka.warworlds.model;
 
 import java.util.Date;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 public class Colony {
-    private static Logger log = LoggerFactory.getLogger(Colony.class);
-
     private String mKey;
     private String mPlanetKey;
     private String mStarKey;
@@ -65,13 +60,9 @@ public class Colony {
      * @param dt The amount of time to simulate, in hours.
      */
     private void simulateStep(Planet planet, double dt) {
-
-        log.debug(String.format("Updating farming rate: pop=%.2f focus=%.2f congeniality=%.2f",
-                mPopulation / 1000.0, mFarmingFocus, planet.getFarmingCongeniality() / 50.0));
         mFarmingRate = (mPopulation / 1000.0) * mFarmingFocus * (planet.getFarmingCongeniality() / 50.0);
 
         mPopulationRate = ((double) (planet.getPopulationCongeniality() - mPopulation) / planet.getPopulationCongeniality());
-        log.debug(String.format("Updating population rate: init=%.2f", mPopulationRate));
         mPopulationRate *= mFarmingRate * (planet.getPopulationCongeniality() / 500.0);
 
         mPopulation += mPopulation * mPopulationRate * dt;

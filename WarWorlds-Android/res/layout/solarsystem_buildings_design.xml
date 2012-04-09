@@ -9,8 +9,7 @@
         android:layout_height="48dp"
         android:layout_alignParentLeft="true"
         android:layout_centerVertical="true"
-        android:layout_marginRight="4dp"
-        android:src="@android:drawable/ic_dialog_info" />
+        android:layout_marginRight="4dp" />
 
     <TextView
         android:id="@+id/building_row1"

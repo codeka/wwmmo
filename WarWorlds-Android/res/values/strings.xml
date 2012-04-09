@@ -49,4 +49,6 @@
     <string name="globalopts_graphics_fast">Fast, Low Detail</string>
     <string name="globalopts_graphics_slow">Slow, High Detail</string>
     <string name="buildings_available_title">Available Buildings</string>
+    <string name="solarsystem_building_timetobuild">Time to Build:</string>
+    <string name="build">Build</string>
 </resources>

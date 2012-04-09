@@ -10,4 +10,23 @@
     ]]></description>
     <cost credits="250" time="2.4" />
   </building>
+  <building id="silo">
+    <name>Silo</name>
+    <icon>/data/buildings/lighthouse.png</icon>
+    <description><![CDATA[
+      <p>The Silo allows you to store farming produce indefinitely. The higher the silo level,
+      the more you can store. Silos store produce for all colonies in this starsystem and you
+      can build as many as you like.</p>
+    ]]></description>
+    <cost credits="100" time="0.5" />
+  </building>
+  <building id="research">
+    <name>Research Laboratory</name>
+    <icon>/data/buildings/science-institute.png</icon>
+    <description><![CDATA[
+      <p>Allows you to build more advanced ships and buildings. The higher the level of this
+      building, the more advanced research becomes available.</p>
+    ]]></description>
+    <cost credits="100" time="0.75" />
+  </building>
 </buildings>

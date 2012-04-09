@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+
+    <ImageView
+        android:id="@+id/building_icon"
+        android:layout_width="48dp"
+        android:layout_height="48dp" />
+
+    <TextView
+        android:id="@+id/building_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_toRightOf="@+id/building_icon"
+        android:text="Building Name"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+    <au.com.codeka.warworlds.ctrl.TransparentWebView
+        android:id="@+id/building_description"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignLeft="@+id/building_name"
+        android:layout_below="@+id/building_name"
+        android:layout_marginBottom="48dp" />
+
+    <TextView
+        android:id="@+id/building_timetobuild_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="32dp"
+        android:layout_toRightOf="@+id/building_icon"
+        android:text="@string/solarsystem_building_timetobuild"
+        android:textAppearance="?android:attr/textAppearanceSmall" />
+
+    <TextView
+        android:id="@+id/building_timetobuild"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@id/building_timetobuild_label"
+        android:layout_toRightOf="@id/building_timetobuild_label"
+        android:layout_marginLeft="10dp"
+        android:text="2.5 hours"
+        android:textAppearance="?android:attr/textAppearanceSmall" />
+
+    <Button
+        android:id="@+id/ok_btn"
+        style="@style/Button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:paddingLeft="25dp"
+        android:paddingRight="25dp"
+        android:text="@string/build" />
+
+</RelativeLayout>
