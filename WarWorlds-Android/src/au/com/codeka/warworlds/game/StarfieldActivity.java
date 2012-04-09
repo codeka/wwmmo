@@ -18,6 +18,7 @@ import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.model.Colony;
 import au.com.codeka.warworlds.model.ModelManager;
 import au.com.codeka.warworlds.model.Planet;
+import au.com.codeka.warworlds.model.SectorManager;
 import au.com.codeka.warworlds.model.Star;
 
 /**

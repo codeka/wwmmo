@@ -36,6 +36,7 @@ public class Empire {
 
                     ColonizeRequest request = ColonizeRequest.newBuilder()
                             .setPlanetKey(planet.getKey())
+                            .setStarKey(planet.getStar().getKey())
                             .build();
 
                     warworlds.Warworlds.Colony pb = ApiClient.postProtoBuf("colonies", request,

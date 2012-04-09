@@ -6,7 +6,9 @@ Created on 12/02/2012
 
 import webapp2 as webapp
 import model
-from model import c2dm, sector, empire
+from model import c2dm
+from ctrl import sector
+from ctrl import empire
 
 import import_fixer
 import_fixer.FixImports('google', 'protobuf')
@@ -16,7 +18,6 @@ from google.protobuf import message
 
 from google.appengine.api import channel
 from google.appengine.api import users
-import calendar
 import logging
 
 
@@ -52,33 +53,6 @@ class ApiPage(webapp.RequestHandler):
       pb.ParseFromString(self.request.body)
     return pb
 
-  def _getEmpire(self):
-    '''Returns the empire for the current player.'''
-    return empire.Empire.getForUser(self.user)
-
-  def _empireModelToPb(self, empire_pb, empire_model):
-    empire_pb.key = str(empire_model.key())
-    empire_pb.display_name = empire_model.displayName
-    empire_pb.user = empire_model.user.user_id()
-    empire_pb.email = empire_model.user.email()
-    empire_pb.state = empire_model.state
-
-  def _empirePbToModel(self, empire_model, empire_pb):
-    empire_model.displayName = empire_pb.display_name
-    if empire_pb.HasField('email'):
-      empire_model.user = users.User(empire_pb.email)
-    empire_model.state = empire_pb.state
-
-  def _colonyModelToPb(self, colony_pb, colony_model):
-    colony_pb.key = str(colony_model.key())
-    colony_pb.empire_key = str(empire.Colony.empire.get_value_for_datastore(colony_model))
-    colony_pb.star_key = str(empire.Colony.star.get_value_for_datastore(colony_model))
-    colony_pb.planet_key = str(empire.Colony.planet.get_value_for_datastore(colony_model))
-    colony_pb.population = colony_model.population
-    colony_pb.last_simulation = int(self._dateTimeToEpoch(colony_model.lastSimulation))
-
-  def _dateTimeToEpoch(self, dt):
-    return calendar.timegm(dt.timetuple())
 
 class HelloPage(ApiPage):
   '''The 'hello' page is what you request when you first connect.'''
@@ -103,8 +77,8 @@ class HelloPage(ApiPage):
         return
 
     motd_model = model.MessageOfTheDay.get()
-    empire_model = empire.Empire.getForUser(user)
-    colony_models = empire.Colony.getForEmpire(empire_model)
+    empire_pb = empire.EmpireController().getEmpireForUser(user)
+    colonies_pb = empire.EmpireController().getColoniesForEmpire(empire_pb)
 
     hello_pb = pb.Hello()
     if motd_model is not None:
@@ -114,12 +88,11 @@ class HelloPage(ApiPage):
       hello_pb.motd.message = ""
       hello_pb.motd.last_update = ""
 
-    if empire_model is not None:
-      self._empireModelToPb(hello_pb.empire, empire_model)
+    if empire_pb is not None:
+      hello_pb.empire.MergeFrom(empire_pb)
 
-    for colony_model in colony_models:
-      colony_pb = hello_pb.colonies.add()
-      self._colonyModelToPb(colony_pb, colony_model)
+    if colonies_pb is not None:
+      hello_pb.colonies.MergeFrom(colonies_pb.colonies)
 
     # generate a chat client for them
     channelClientID = "device:" + device.deviceID
@@ -157,10 +130,10 @@ class ChatPage(ApiPage):
 
 class EmpiresPage(ApiPage):
   def get(self, empireKey=None):
-    empire_model = None
+    empire_pb = None
 
     if empireKey:
-      empire_model = empire.Empire.get(empireKey)
+      empire_pb = empire.EmpireController().getEmpire(empireKey)
     elif self.request.get("email", "") != "":
       email = self.request.get("email")
       user = users.User(email)
@@ -169,14 +142,12 @@ class EmpiresPage(ApiPage):
         self.response.set_status(404)
         return
 
-      empire_model = empire.Empire.getForUser(user)
+      empire_pb = empire.EmpireController().getEmpireForUser(user)
 
-    if empire_model is None:
+    if empire_pb is None:
       self.response.set_status(404)
       return
 
-    empire_pb = pb.Empire()
-    self._empireModelToPb(empire_pb, empire_model)
     return empire_pb
 
   def put(self):
@@ -185,9 +156,9 @@ class EmpiresPage(ApiPage):
       self.response.set_status(400)
       return
 
-    empire_model = empire.Empire()
-    self._empirePbToModel(empire_model, empire_pb)
-    empire_model.put()
+    empire_pb.email = self.user.email()
+
+    empire.EmpireController().createEmpire(empire_pb)
 
 
 class DevicesPage(ApiPage):
@@ -282,108 +253,43 @@ class DeviceMessagesPage(ApiPage):
 
 
 class StarfieldPage(ApiPage):
-  '''Base class for API pages that do things with the starfield.
-
-  This really just include common methods for converting between the model and protocol buffers.
-  '''
-  def _starModelToPb(self, star_pb, star_model):
-    star_pb.key = str(star_model.key())
-    star_pb.offset_x = star_model.x
-    star_pb.offset_y = star_model.y
-    star_pb.name = star_model.name
-    star_pb.colour = star_model.colour
-    star_pb.classification = star_model.starTypeIndex
-    star_pb.size = star_model.size
-    if star_model.planets is not None:
-      for planet_model in star_model.planets:
-        planet_pb = star_pb.planets.add()
-        self._planetModelToPb(planet_pb, planet_model)
-      star_pb.num_planets = len(star_model.planets)
-
-  def _planetModelToPb(self, planet_pb, planet_model):
-    planet_pb.key = str(planet_model.key())
-    planet_pb.index = planet_model.index
-    planet_pb.planet_type = planet_model.planetTypeID + 1
-    planet_pb.size = planet_model.size
-    planet_pb.population_congeniality = planet_model.populationCongeniality
-    planet_pb.farming_congeniality = planet_model.farmingCongeniality
-    planet_pb.mining_congeniality = planet_model.miningCongeniality
-
+  pass
 
 class SectorsPage(StarfieldPage):
   def get(self):
     if self.request.get('coords') != '':
-      (x1y1, x2y2) = self.request.get('coords').split(':', 2)
-      (x1, y1) = x1y1.split(',', 2)
-      (x2, y2) = x2y2.split(',', 2)
+      coords = []
+      for coord in self.request.get('coords').split('|'):
+        (x, y) = coord.split(',', 2)
+        x = int(x)
+        y = int(y)
+        coords.append(sector.SectorCoord(x, y))
 
-      x1 = int(x1)
-      y1 = int(y1)
-      x2 = int(x2)
-      y2 = int(y2)
-
-      sector_model = sector.SectorManager.getSectors(x1, y1, x2, y2)
-      sectors_pb = pb.Sectors()
-      self._modelToPb(sectors_pb, sector_model)
-      return sectors_pb
+      ctrl = sector.SectorController()
+      return ctrl.getSectors(coords)
     else:
       # TODO: other ways of querying for sectors?
       self.response.set_status(400)
       return
 
-  def _modelToPb(self, sectors_pb, sectors_model):
-    for key in sectors_model:
-      sector_model = sectors_model[key]
-      sector_pb = sectors_pb.sectors.add()
-      sector_pb.x = sector_model.x
-      sector_pb.y = sector_model.y
-      if sector_model.numColonies:
-        sector_pb.num_colonies = sector_model.numColonies
-      else:
-        sector_pb.num_colonies = 0
-
-      for star_model in sector_model.stars:
-        star_pb = sector_pb.stars.add()
-        self._starModelToPb(star_pb, star_model)
-
-      for colony_model in empire.Colony.getForSector(sector_model):
-        colony_pb = sector_pb.colonies.add()
-        self._colonyModelToPb(colony_pb, colony_model)
-
 
 class StarPage(StarfieldPage):
   def get(self, key):
-    star_model = sector.SectorManager.getStar(key)
-    if star_model is None:
-      self.response.set_status(404)
-      return
-
-    star_pb = pb.Star()
-    self._starModelToPb(star_pb, star_model)
-
-    for colony_model in empire.Colony.getForStar(star_model):
-      colony_pb = star_pb.colonies.add()
-      self._colonyModelToPb(colony_pb, colony_model)
-
-    return star_pb
+    ctrl = sector.SectorController()
+    return ctrl.getStar(key)
 
 
 class ColoniesPage(ApiPage):
   def post(self):
     # TODO: make sure they're actually allow to do this, have a free colonization
     # ship (or require that the pass in the colonization ship), etc etc etc
-    req = self._getRequestBody(pb.ColonizeRequest)
-    planet_model = sector.Planet.get(req.planet_key)
-    if planet_model is None:
+    ctrl = empire.EmpireController()
+    empire_pb = ctrl.getEmpireForUser(self.user)
+    colony_pb = ctrl.colonize(empire_pb, self._getRequestBody(pb.ColonizeRequest))
+    if colony_pb is None:
       self.response.set_status(400)
-      return
-
-    empire_model = self._getEmpire()
-    colony_model = empire_model.colonize(planet_model)
-
-    colony_pb = pb.Colony()
-    self._colonyModelToPb(colony_pb, colony_model)
     return colony_pb
+
 
 class ApiApplication(webapp.WSGIApplication):
   def __init__(self, *args, **kwargs):

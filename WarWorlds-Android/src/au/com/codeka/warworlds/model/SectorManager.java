@@ -1,4 +1,4 @@
-package au.com.codeka.warworlds.game;
+package au.com.codeka.warworlds.model;
 
 import java.util.ArrayList;
 import java.util.EventListener;
@@ -16,8 +16,6 @@ import org.slf4j.LoggerFactory;
 import android.os.AsyncTask;
 import au.com.codeka.Pair;
 import au.com.codeka.warworlds.api.ApiClient;
-import au.com.codeka.warworlds.model.Sector;
-import au.com.codeka.warworlds.model.Star;
 
 /**
  * This class "manages" the list of \c StarfieldSector's that we have loaded
@@ -136,26 +134,7 @@ public class SectorManager {
         }
 
         if (!missingSectors.isEmpty()) {
-            long x1, y1, x2, y2;
-            x1 = x2 = missingSectors.get(0).one;
-            y1 = y2 = missingSectors.get(0).two;
-            for(int i = 1; i < missingSectors.size(); i++) {
-                Pair<Long, Long> coord = missingSectors.get(i);
-                if (coord.one < x1) {
-                    x1 = coord.one;
-                }
-                if (coord.two < y1) {
-                    y1 = coord.two;
-                }
-                if (coord.one > x2) {
-                    x2 = coord.one;
-                }
-                if (coord.two > y2) {
-                    y2 = coord.two;
-                }
-            }
-
-            requestSectors(x1, y1, x2+1, y2+1);
+            requestSectors(missingSectors);
         }
 
         mSectors = newSectors;
@@ -285,8 +264,10 @@ public class SectorManager {
      * Forces us to refresh the given sector, even if we already have it loaded. Useful when
      * we know it's been modified (by our own actions, for example).
      */
-    public void refreshSector(final long sectorX, final long sectorY) {
-        requestSectors(sectorX, sectorY, sectorX+1, sectorY+1);
+    public void refreshSector(long sectorX, long sectorY) {
+        ArrayList<Pair<Long, Long>> coords = new ArrayList<Pair<Long, Long>>();
+        coords.add(new Pair<Long, Long>(sectorX, sectorY));
+        requestSectors(coords);
     }
 
     /**
@@ -301,19 +282,32 @@ public class SectorManager {
      * @param sectorX2 The maximum X-coordinate of the sector to request.
      * @param sectorY2 The maximum Y-coordinate of the sector to request.
      */
-    private void requestSectors(final long sectorX1, final long sectorY1,
-            final long sectorX2, final long sectorY2) {
-        log.debug(String.format("Requesting sectors (%d, %d) to (%d, %d)...",
-                sectorX1, sectorY1, sectorX2, sectorY2));
+    private void requestSectors(final List<Pair<Long, Long>> coords) {
+        if (log.isDebugEnabled()) {
+            String msg = "";
+            for(Pair<Long, Long> coord : coords) {
+                if (msg.length() != 0) {
+                    msg += ", ";
+                }
+                msg += String.format("(%d, %d)", coord.one, coord.two);
+            }
+            log.debug(String.format("Requesting sectors %s...", msg));
+        }
 
         new AsyncTask<Void, Void, List<Sector>>() {
             @Override
             protected List<Sector> doInBackground(Void... arg0) {
                 List<Sector> sectors = null;
 
+                String url = "";
+                for(Pair<Long, Long> coord : coords) {
+                    if (url.length() != 0) {
+                        url += "%7C"; // Java doesn't like "|" for some reason (it's valid!!)
+                    }
+                    url += String.format("%d,%d", coord.one, coord.two);
+                }
+                url = "sectors?coords="+url;
                 try {
-                    String url = "sectors?coords="+sectorX1+","+sectorY1+":"+sectorX2+","+sectorY2;
-
                     warworlds.Warworlds.Sectors pb = ApiClient.getProtoBuf(url,
                             warworlds.Warworlds.Sectors.class);
                     sectors = Sector.fromProtocolBuffer(pb.getSectorsList());

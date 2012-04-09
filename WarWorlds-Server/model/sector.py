@@ -84,22 +84,16 @@ class SectorManager:
     return sectors[SectorManager._getSectorKey(x, y)]
 
   @staticmethod
-  def getSectors(x1, y1, x2, y2):
-    '''Gets all of the sectors in the rectangle defined by (x1, y1)(x2,y2)
+  def getSectors(coords):
+    '''Gets all of the sectors with the given range of coordinates.'''
 
-    Sectors are return inclusive of (x1,y1) and exclusive of (x2,y2).'''
+    keys = []
+    for coord in coords:
+      keys.append("%d,%d" % (coord.x, coord.y))
 
     sectors = {}
-    for x in range(x1, x2):
-      # Because of limitation in App Engine's filters, we can't search for all sectors
-      # where x between x1,x2 AND y between y1,y2 in the same query. So we need to run
-      # multiple queries like this....
-      logging.debug("Fetching sectors X=%d, (%d..%d)" % (x, y1, y2))
-      query = Sector.all()
-      query = query.filter("y >=", y1).filter("y <", y2)
-      query = query.filter("x =", x)
-      for sector in query:
-        sectors[SectorManager._getSectorKey(sector.x, sector.y)] = sector
+    for sector in Sector.get_by_key_name(keys):
+      sectors[SectorManager._getSectorKey(sector.x, sector.y)] = sector
 
     for key in sectors:
       sector = sectors[key]
@@ -112,12 +106,11 @@ class SectorManager:
 
     # now for any sectors which they asked for but which weren't in the data store
     # already, we'll need to generate them from scratch...
-    for y in range(y1, y2):
-      for x in range(x1, x2):
-        key = SectorManager._getSectorKey(x, y)
-        if key not in sectors:
-          taskqueue.add(url="/tasks/sector/generate/"+str(x)+","+str(y),
-                        queue_name="sectors", method="GET")
+    for coord in coords:
+      key = SectorManager._getSectorKey(coord.x, coord.y)
+      if key not in sectors:
+        taskqueue.add(url="/tasks/sector/generate/"+str(coord.x)+","+str(coord.y),
+                      queue_name="sectors", method="GET")
 
     return sectors
 

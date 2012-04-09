@@ -20,6 +20,7 @@ import android.view.MotionEvent;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.model.Colony;
 import au.com.codeka.warworlds.model.Sector;
+import au.com.codeka.warworlds.model.SectorManager;
 import au.com.codeka.warworlds.model.Star;
 
 /**

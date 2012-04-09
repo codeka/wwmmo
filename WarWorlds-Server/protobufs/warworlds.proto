@@ -159,6 +159,10 @@ message Star
     // the identifier of the star, unique throughout the universe.
     optional string key = 1;
 
+    // the sector this star is contained within
+    optional int64 sector_x = 11;
+    optional int64 sector_y = 12;
+
     // the name of the star
     optional string name = 2;
 
@@ -259,6 +263,9 @@ message ColonizeRequest
 {
     // The planet you want to colonize
     required string planet_key = 1;
+
+    // The star containing the planet you want to colonize.
+    required string star_key = 2;
 }
 
 //
@@ -283,3 +290,11 @@ message Colony
     optional int64 last_simulation = 6;
 }
 
+
+//
+// A collection of Colonies
+//
+message Colonies
+{
+    repeated Colony colonies = 1;
+}

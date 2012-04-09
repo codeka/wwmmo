@@ -1,36 +1,48 @@
 {% extends "admin/skeleton.html" %}
 
 {% block head %}
-	<style>
-		#update-form textarea {
-			width: 800px;
-			height: 400px;
-		}
-		
-		form input[type=text] {
-			width: 100px;
-		}
-		#star-input-form input[type=text] {
-			width: 400px;
-		}
-	</style>
+    <style>
+        #update-form textarea {
+            width: 800px;
+            height: 400px;
+        }
+
+        form {
+            position: relative;
+            height: 28pt;
+            line-height: 28pt;
+            width: 500pt;
+        }
+        form input[type=submit] {
+            position: absolute;
+            right: 0;
+        }
+        form input[type=text] {
+            position: absolute;
+            top: 0; left: 60pt;
+            bottom: 0; right: 70pt;
+            border: solid 1px black;
+        }
+        form label {
+            display: block;
+            position: absolute;
+            left: 0; width: 60pt;
+            top: 0; bottom: 0;
+        }
+    </style>
 {% endblock %}
 
 {% block content %}
 	<h1>Starfield</h1>
 	<p>Enter the coordinates of the sector you want to look at, and click &ldquo;Display&rdquo;.
 	<form id="sector-input-form">
-		Sector: (
-			<input type="number" name="x1" value="0">,
-			<input type="number" name="y1" value="0">
-		) - (
-			<input type="number" name="x2">,
-			<input type="number" name="y2">
-		)
+		<label>Sectors:</label>
+		<input type="text" name="coords" placeholder="x,y|x,y|x,y|...">
 		<input type="submit" value="Display">
 	</form>
 	<form id="star-input-form">
-		Star: <input type="text" name="starKey" value="">
+		<label>Star:</label>
+		<input type="text" name="starKey" value="">
 		<input type="submit" value="Display">
 	</form>
 	<form id="update-form">
@@ -39,17 +51,9 @@
 	<script>
 		$("#sector-input-form").on("click", "input[type=submit]", function(evnt) {
 			evnt.preventDefault();
-			var $x1 = $("#sector-input-form input[name=x1]");
-			var $x2 = $("#sector-input-form input[name=x2]");
-			var $y1 = $("#sector-input-form input[name=y1]");
-			var $y2 = $("#sector-input-form input[name=y2]");
+			var $coords = $("#sector-input-form input[name=coords]");
 
-			if ($x2.val() == "" || $y2.val() == "") {
-				$x2.val(parseInt($x1.val()) + 1);
-				$y2.val(parseInt($y1.val()) + 1);
-			}
-
-			var coords = $x1.val()+","+$y1.val()+":"+$x2.val()+","+$y2.val();
+			var coords = $coords.val();
 			$.ajax({
 				url: "/api/v1/sectors?coords="+coords,
 				dataType: "json",

@@ -69,8 +69,8 @@ class Colony(db.Model):
   lastSimulation = db.DateTimeProperty()
 
   @staticmethod
-  def getForEmpire(empire_model):
-    query = Colony.all().filter("empire", empire_model)
+  def getForEmpire(empire_key):
+    query = Colony.all().filter("empire", empire_key)
     return Colony._getForQuery(query)
 
   @staticmethod
