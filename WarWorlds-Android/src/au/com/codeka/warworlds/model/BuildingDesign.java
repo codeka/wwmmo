@@ -10,6 +10,7 @@ public class BuildingDesign {
     private String mDescription;
     private int mBuildCost;
     private int mBuildTimeSeconds;
+    private String mIconUrl;
 
     public String getID() {
         return mID;
@@ -25,6 +26,9 @@ public class BuildingDesign {
     }
     public int getBuildTimeSeconds() {
         return mBuildTimeSeconds;
+    }
+    public String getIconUrl() {
+        return mIconUrl;
     }
 
     public static class Factory {
@@ -54,6 +58,8 @@ public class BuildingDesign {
                         double timeInHours = Double.parseDouble(value);
                         design.mBuildTimeSeconds = (int)(timeInHours * 3600);
                     }
+                } else if (elem.getNodeName().equals("icon")) {
+                    design.mIconUrl = elem.getTextContent();
                 } else {
                     // ?? unknown element... ignore
                 }

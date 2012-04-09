@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.*;
 
+import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import au.com.codeka.XmlIterator;
 import au.com.codeka.warworlds.api.ApiClient;
@@ -22,7 +23,9 @@ public class BuildingDesignManager {
         return sInstance;
     }
 
+    private List<DesignsChangedListener> mDesignsChangedListeners;
     private SortedMap<String, BuildingDesign> mDesigns;
+    private SortedMap<String, Bitmap> mDesignIcons;
 
     /**
      * This should be called at the beginning of the game to initialize the building
@@ -30,6 +33,9 @@ public class BuildingDesignManager {
      * list.
      */
     public void setup() {
+        mDesignIcons = new TreeMap<String, Bitmap>();
+        mDesignsChangedListeners = new ArrayList<DesignsChangedListener>();
+
         new AsyncTask<Void, Void, List<BuildingDesign>>() {
             @Override
             protected List<BuildingDesign> doInBackground(Void... arg0) {
@@ -59,11 +65,64 @@ public class BuildingDesignManager {
         }.execute();
     }
 
+    public void addDesignsChangedListener(DesignsChangedListener listener) {
+        mDesignsChangedListeners.add(listener);
+    }
+    public void removeDesignsChangedListener(DesignsChangedListener listener) {
+        mDesignsChangedListeners.remove(listener);
+    }
+    protected void fireDesignsChanged() {
+        for (DesignsChangedListener listener : mDesignsChangedListeners) {
+            listener.onDesignsChanged();
+        }
+    }
+
     /**
      * Gets the collection of building designs.
      */
     public SortedMap<String, BuildingDesign> getDesigns() {
         return mDesigns;
+    }
+
+    /**
+     * Gets a \c Bitmap that represents the icon for the given design.
+     * 
+     * If we haven't fetched the icon from the server yet, this can return \c null in which
+     * case you you listen for the "designs updated" event (via \c addDesignsUpdatedListener).
+     */
+    public Bitmap getDesignIcon(final BuildingDesign design) {
+        synchronized(mDesignIcons) {
+            if (mDesignIcons.containsKey(design.getIconUrl())) {
+                return mDesignIcons.get(design.getIconUrl());
+            }
+
+            // add a null value to indicate that we're still in the process of fetching it...
+            mDesignIcons.put(design.getIconUrl(), null);
+
+            // and actually make a request to fetch
+            new AsyncTask<Void, Void, Bitmap>() {
+                @Override
+                protected Bitmap doInBackground(Void... arg0) {
+                    try {
+                        return ApiClient.getImage(design.getIconUrl());
+                    } catch (ApiException e) {
+                        log.error(String.format("Could not fetch design \"%s\" icon [%s]",
+                                design.getName(), design.getIconUrl()), e);
+                        return null;
+                    }
+                }
+                @Override
+                protected void onPostExecute(Bitmap result) {
+                    synchronized(mDesignIcons) {
+                        mDesignIcons.put(design.getIconUrl(), result);
+                    }
+
+                    fireDesignsChanged();
+                }
+            }.execute();
+
+            return null;
+        }
     }
 
     /**
@@ -88,5 +147,9 @@ public class BuildingDesignManager {
         public ParseException(String msg) {
             super(msg);
         }
+    }
+
+    public interface DesignsChangedListener {
+        void onDesignsChanged();
     }
 }

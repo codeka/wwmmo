@@ -2,6 +2,7 @@
 <buildings>
   <building id="shipyard">
     <name>Shipyard</name>
+    <icon>/data/buildings/shipyard.png</icon>
     <description><![CDATA[
       <p>The shipyard allows you to build ships.</p>
       <p>You can have only one shipyard on your planet, but it's efficiency and the range of

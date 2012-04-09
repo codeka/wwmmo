@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 
 import android.app.Dialog;
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,6 +18,7 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.BaseAdapter;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import au.com.codeka.warworlds.R;
@@ -46,8 +48,16 @@ public class SolarSystemBuildingsDialog extends Dialog {
         params.width = LayoutParams.MATCH_PARENT;
         getWindow().setAttributes(params);
 
-        BuildingListAdapter adapter = new BuildingListAdapter();
+        final BuildingListAdapter adapter = new BuildingListAdapter();
         adapter.setDesigns(BuildingDesignManager.getInstance().getDesigns());
+
+        // make sure we're aware of any changes to the designs
+        BuildingDesignManager.getInstance().addDesignsChangedListener(new BuildingDesignManager.DesignsChangedListener() {
+            @Override
+            public void onDesignsChanged() {
+                adapter.setDesigns(BuildingDesignManager.getInstance().getDesigns());
+            }
+        });
 
         ListView availableDesignsList = (ListView) findViewById(R.id.buildings_available);
         availableDesignsList.setAdapter(adapter);
@@ -92,11 +102,20 @@ public class SolarSystemBuildingsDialog extends Dialog {
                 view = (ViewGroup) inflater.inflate(R.layout.solarsystem_buildings_design, null);
             }
 
+            ImageView icon = (ImageView) view.findViewById(R.id.building_icon);
             TextView row1 = (TextView) view.findViewById(R.id.building_row1);
             TextView row2 = (TextView) view.findViewById(R.id.building_row2);
             TextView row3 = (TextView) view.findViewById(R.id.building_row3);
 
             BuildingDesign design = mDesigns.get(position);
+
+            Bitmap bm = BuildingDesignManager.getInstance().getDesignIcon(design);
+            if (bm != null) {
+                icon.setImageBitmap(bm);
+            } else {
+                icon.setImageBitmap(null);
+            }
+
             row1.setText(design.getName());
             row2.setText(String.format("$ %d - %.2f hours", design.getBuildCost(),
                     (float) design.getBuildTimeSeconds() / 3600.0f));
