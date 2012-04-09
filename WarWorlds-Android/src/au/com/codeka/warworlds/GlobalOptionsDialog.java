@@ -18,8 +18,6 @@ public class GlobalOptionsDialog extends Dialog {
     public GlobalOptionsDialog(Context context) {
         super(context);
         mContext = context;
-
-        this.setTitle("Options");
     }
 
     @Override

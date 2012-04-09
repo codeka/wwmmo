@@ -32,6 +32,7 @@ import au.com.codeka.warworlds.api.ApiException;
 import au.com.codeka.warworlds.game.ChatManager;
 import au.com.codeka.warworlds.game.EmpireManager;
 import au.com.codeka.warworlds.game.StarfieldActivity;
+import au.com.codeka.warworlds.model.BuildingDesignManager;
 import au.com.codeka.warworlds.model.Empire;
 
 /**
@@ -158,6 +159,8 @@ public class WarWorldsActivity extends Activity {
 
             @Override
             protected void onPostExecute(String result) {
+                BuildingDesignManager.getInstance().setup();
+
                 pleaseWaitDialog.dismiss();
                 if (mNeedsEmpireSetup) {
                     startActivity(new Intent(mContext, EmpireSetupActivity.class));

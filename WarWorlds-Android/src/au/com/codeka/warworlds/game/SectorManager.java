@@ -303,6 +303,9 @@ public class SectorManager {
      */
     private void requestSectors(final long sectorX1, final long sectorY1,
             final long sectorX2, final long sectorY2) {
+        log.debug(String.format("Requesting sectors (%d, %d) to (%d, %d)...",
+                sectorX1, sectorY1, sectorX2, sectorY2));
+
         new AsyncTask<Void, Void, List<Sector>>() {
             @Override
             protected List<Sector> doInBackground(Void... arg0) {

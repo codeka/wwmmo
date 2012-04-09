@@ -1,0 +1,12 @@
+<?xml version="1.0" ?>
+<buildings>
+  <building id="shipyard">
+    <name>Shipyard</name>
+    <description><![CDATA[
+      <p>The shipyard allows you to build ships.</p>
+      <p>You can have only one shipyard on your planet, but it's efficiency and the range of
+      ships available to you can be upgraded with the building of supporting buildings.</p>
+    ]]></description>
+    <cost credits="250" time="2.4" />
+  </building>
+</buildings>

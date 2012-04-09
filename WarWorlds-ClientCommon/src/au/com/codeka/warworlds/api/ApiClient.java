@@ -1,5 +1,6 @@
 package au.com.codeka.warworlds.api;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Method;
 import java.net.URI;
@@ -8,11 +9,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.entity.ByteArrayEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.w3c.dom.Document;
+import org.xml.sax.SAXException;
 
 import com.google.protobuf.Message;
 
@@ -45,6 +52,32 @@ public class ApiClient {
      */
     public static List<String> getCookies() {
         return sCookies;
+    }
+
+    /**
+     * Fetches an XML document from the given URL.
+     */
+    public static Document getXml(String url) throws ApiException {
+        Map<String, List<String>> headers = getHeaders();
+        headers.get("Accept").add("text/xml"); // we also accept XML, obviously...
+
+        RequestManager.ResultWrapper res = RequestManager.request("GET", url, headers);
+
+        DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
+        builderFactory.setValidating(false);
+
+        try {
+            DocumentBuilder builder = builderFactory.newDocumentBuilder();
+            return builder.parse(res.getResponse().getEntity().getContent());
+        } catch (ParserConfigurationException e) {
+            throw new ApiException(e);
+        } catch (IllegalStateException e) {
+            throw new ApiException(e);
+        } catch (SAXException e) {
+            throw new ApiException(e);
+        } catch (IOException e) {
+            throw new ApiException(e);
+        }
     }
 
     /**
