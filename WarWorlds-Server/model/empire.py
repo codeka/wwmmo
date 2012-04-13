@@ -91,4 +91,11 @@ class Colony(db.Model):
     return colonies
 
 
-
+class BuildOperation(db.Model):
+  '''Request a build operation that is currently in-progress.'''
+  colony = db.ReferenceProperty(Colony)
+  empire = db.ReferenceProperty(Empire)
+  star = db.ReferenceProperty(sector.Star)
+  templateName = db.StringProperty()
+  startTime = db.DateTimeProperty()
+  endTime = db.DateTimeProperty()

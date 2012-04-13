@@ -93,7 +93,8 @@ class SectorManager:
 
     sectors = {}
     for sector in Sector.get_by_key_name(keys):
-      sectors[SectorManager._getSectorKey(sector.x, sector.y)] = sector
+      if sector is not None:
+        sectors[SectorManager._getSectorKey(sector.x, sector.y)] = sector
 
     for key in sectors:
       sector = sectors[key]

@@ -298,3 +298,25 @@ message Colonies
 {
     repeated Colony colonies = 1;
 }
+
+
+//
+// A request to build something (a building, a ship, etc)
+//
+message BuildRequest
+{
+    // The key of the colony you're trying to build at. Must have a shipyard to build
+    // a ship.
+    required string colony_key = 1;
+
+    // What are you trying to build? A building or a ship?
+    enum BUILD_KIND
+    {
+        BUILDING = 0;
+        SHIP = 1;
+    }
+    required BUILD_KIND build_kind = 2;
+
+    // The name of the template you're trying to build
+    required string template_name = 3;
+}

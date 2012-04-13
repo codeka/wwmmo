@@ -4,14 +4,14 @@ Created on 12/02/2012
 @author: dean@codeka.com.au
 '''
 
+import import_fixer
+import_fixer.FixImports('google', 'protobuf')
+
 import webapp2 as webapp
 import model
 from model import c2dm
 from ctrl import sector
 from ctrl import empire
-
-import import_fixer
-import_fixer.FixImports('google', 'protobuf')
 
 from protobufs import protobuf_json, warworlds_pb2 as pb
 from google.protobuf import message
@@ -77,8 +77,8 @@ class HelloPage(ApiPage):
         return
 
     motd_model = model.MessageOfTheDay.get()
-    empire_pb = empire.EmpireController().getEmpireForUser(user)
-    colonies_pb = empire.EmpireController().getColoniesForEmpire(empire_pb)
+    empire_pb = empire.getEmpireForUser(user)
+    colonies_pb = empire.getColoniesForEmpire(empire_pb)
 
     hello_pb = pb.Hello()
     if motd_model is not None:
@@ -133,7 +133,7 @@ class EmpiresPage(ApiPage):
     empire_pb = None
 
     if empireKey:
-      empire_pb = empire.EmpireController().getEmpire(empireKey)
+      empire_pb = empire.getEmpire(empireKey)
     elif self.request.get("email", "") != "":
       email = self.request.get("email")
       user = users.User(email)
@@ -142,7 +142,7 @@ class EmpiresPage(ApiPage):
         self.response.set_status(404)
         return
 
-      empire_pb = empire.EmpireController().getEmpireForUser(user)
+      empire_pb = empire.getEmpireForUser(user)
 
     if empire_pb is None:
       self.response.set_status(404)
@@ -158,7 +158,7 @@ class EmpiresPage(ApiPage):
 
     empire_pb.email = self.user.email()
 
-    empire.EmpireController().createEmpire(empire_pb)
+    empire.createEmpire(empire_pb)
 
 
 class DevicesPage(ApiPage):
@@ -265,8 +265,7 @@ class SectorsPage(StarfieldPage):
         y = int(y)
         coords.append(sector.SectorCoord(x, y))
 
-      ctrl = sector.SectorController()
-      return ctrl.getSectors(coords)
+      return sector.getSectors(coords)
     else:
       # TODO: other ways of querying for sectors?
       self.response.set_status(400)
@@ -275,21 +274,36 @@ class SectorsPage(StarfieldPage):
 
 class StarPage(StarfieldPage):
   def get(self, key):
-    ctrl = sector.SectorController()
-    return ctrl.getStar(key)
+    return sector.getStar(key)
 
 
 class ColoniesPage(ApiPage):
   def post(self):
     # TODO: make sure they're actually allow to do this, have a free colonization
     # ship (or require that the pass in the colonization ship), etc etc etc
-    ctrl = empire.EmpireController()
-    empire_pb = ctrl.getEmpireForUser(self.user)
-    colony_pb = ctrl.colonize(empire_pb, self._getRequestBody(pb.ColonizeRequest))
+    empire_pb = empire.getEmpireForUser(self.user)
+    colony_pb = empire.colonize(empire_pb, self._getRequestBody(pb.ColonizeRequest))
     if colony_pb is None:
       self.response.set_status(400)
     return colony_pb
 
+
+class BuildQueuePage(ApiPage):
+  def post(self):
+    '''The buildqueue is where you post BuildRequest protobufs with requests to build stuff.'''
+    request_pb = self._getRequestBody(pb.BuildRequest)
+
+    # make sure the colony is owned by the current player
+    empire_pb = empire.getEmpireForUser(self.user)
+    colony_pb = empire.getColony(request_pb.colony_key)
+    if not colony_pb:
+      self.response.set_status(404)
+      return
+    if colony_pb.empire_key != empire_pb.key:
+      self.response.set_status(403)
+      return
+
+    empire.build(empire_pb, colony_pb, request_pb)
 
 class ApiApplication(webapp.WSGIApplication):
   def __init__(self, *args, **kwargs):
@@ -352,5 +366,6 @@ app = ApiApplication([('/api/v1/hello/([^/]+)', HelloPage),
                       ('/api/v1/devices/user:([^/]+)/messages', DeviceMessagesPage),
                       ('/api/v1/sectors', SectorsPage),
                       ('/api/v1/stars/([^/]+)', StarPage),
-                      ('/api/v1/colonies', ColoniesPage)],
+                      ('/api/v1/colonies', ColoniesPage),
+                      ('/api/v1/buildqueue', BuildQueuePage)],
                      debug=True)
