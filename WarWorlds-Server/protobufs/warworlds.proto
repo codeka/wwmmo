@@ -202,6 +202,9 @@ message Star
 
     // collection of colonies on our planet(s)
     repeated Colony colonies = 10;
+
+    // collection of buildings in our colonies.
+    repeated Building buildings = 13;
 }
 
 //
@@ -317,6 +320,22 @@ message BuildRequest
     }
     required BUILD_KIND build_kind = 2;
 
-    // The name of the template you're trying to build
-    required string template_name = 3;
+    // The name of the design you're trying to build
+    required string design_name = 3;
+}
+
+
+//
+// Represents a completed building in a colony.
+//
+message Building
+{
+    // The unique key of this building.
+    required string key = 1;
+
+    // The key of the colony to which this building belongs.
+    required string colony_key = 2;
+
+    // The name of the design of this building (defined in data/buildings.xml)
+    required string design_name = 3;
 }

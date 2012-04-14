@@ -96,6 +96,28 @@ class BuildOperation(db.Model):
   colony = db.ReferenceProperty(Colony)
   empire = db.ReferenceProperty(Empire)
   star = db.ReferenceProperty(sector.Star)
-  templateName = db.StringProperty()
+  designName = db.StringProperty()
   startTime = db.DateTimeProperty()
   endTime = db.DateTimeProperty()
+
+
+class Building(db.Model):
+  '''A building represents a structure on a colony that gives it certain bonuses and abilities.'''
+  colony = db.ReferenceProperty(Colony)
+  empire = db.ReferenceProperty(Empire)
+  star = db.ReferenceProperty(sector.Star)
+  designName = db.StringProperty()
+  buildTime = db.DateTimeProperty()
+
+  @staticmethod
+  def getForStar(star_model):
+    query = Building.all().filter("star", star_model)
+    return Building._getForQuery(query)
+
+  @staticmethod
+  def _getForQuery(query):
+    buildings = []
+    for building in query:
+      buildings.append(building)
+    return buildings
+

@@ -39,6 +39,10 @@ handlers:
   script: tasks.sector.app
   login: admin
 
+- url: /tasks/empire(/.*)?
+  script: tasks.empire.app
+  login: admin
+
 - url: /.*
   script: frontend.app
 

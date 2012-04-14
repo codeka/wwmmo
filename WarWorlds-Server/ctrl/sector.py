@@ -46,7 +46,7 @@ def getSectors(coords):
 def getStar(star_key):
   '''Gets a star, given it's key.'''
   cache_key = 'star:'+star_key
-  values = self._getCached([cache_key], pb.Star)
+  values = ctrl.getCached([cache_key], pb.Star)
   if cache_key in values:
     return values[cache_key]
 
@@ -60,6 +60,10 @@ def getStar(star_key):
   for colony_model in empire_mdl.Colony.getForStar(star_model):
     colony_pb = star_pb.colonies.add()
     ctrl.colonyModelToPb(colony_pb, colony_model)
+
+  for building_model in empire_mdl.Building.getForStar(star_model):
+    building_pb = star_pb.buildings.add()
+    ctrl.buildingModelToPb(building_pb, building_model)
 
   ctrl.setCached({cache_key: star_pb})
   return star_pb

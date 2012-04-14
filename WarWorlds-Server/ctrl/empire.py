@@ -5,7 +5,10 @@ from model import empire as mdl
 from protobufs import warworlds_pb2 as pb
 import logging
 from xml.etree import ElementTree as ET
-from datetime import datetime
+from datetime import datetime, timedelta
+import os
+from google.appengine.ext import db
+from google.appengine.api import taskqueue
 
 
 def getEmpireForUser(user):
@@ -116,28 +119,87 @@ def build(empire_pb, colony_pb, request_pb):
     colony_pb: The colony where the request has been made.
     request_pb: A BuildRequest protobuf with details of the build request.
   '''
-  build_model = mdl.BuildOperation()
-  build_model.colony = colony_pb.key
-  build_model.empire = empire_pb.key
-  build_model.star = colony_pb.star_key
-  build_model.templateName = request_pb.template_name
-  build_model.startTime = datetime.now()
-  
-  
+  design = BuildingDesign.getDesign(request_pb.design_name)
+  if not design:
+    logging.warn("Asked to build design '%s', which does not exist." % (request_pb.design_name))
+    return False
 
-class BuildingTemplate(object):
-  _parsedTemplates = None
+  build_model = mdl.BuildOperation()
+  build_model.colony = db.Key(colony_pb.key)
+  build_model.empire = db.Key(empire_pb.key)
+  build_model.star = db.Key(colony_pb.star_key)
+  build_model.designName = request_pb.design_name
+  build_model.startTime = datetime.now()
+  build_model.endTime = build_model.startTime + timedelta(seconds = design.buildTimeSeconds)
+  build_model.put()
+
+  # Make sure we're going to 
+  scheduleBuildCheck()
+
+  ctrl.buildRequestModelToPb(request_pb, build_model)
+  return request_pb
+
+
+def scheduleBuildCheck():
+  '''Checks when the next build is due to complete and schedules a task to run at that time.
+
+  Because of the way that tasks a scheduled, it's possible that multiple tasks can be scheduled
+  at the same time. That's OK because the task itself is idempotent (its just a waste of resources)
+  '''
+  query = mdl.BuildOperation.all().order("endTime").fetch(1)
+  for build in query:
+    # The first one we fetch (because of the ordering) will be the next one. So we'll schedule
+    # the build-check to run 5 seconds later (if there's a bunch scheduled at the same time,
+    # it's more efficient that way...)
+    time = build.endTime + timedelta(seconds=5)
+    logging.info("Scheduling next build-check at %s" % (time))
+    taskqueue.add(queue_name="default",
+                  url="/tasks/empire/build-check",
+                  method="GET",
+                  eta=time)
+
+
+class BuildingDesign(object):
+  _parsedDesigns = None
 
   @staticmethod
-  def getTemplates():
+  def getDesigns():
     '''Gets all of the building templates that are available to be built.
 
     We'll parse the /static/data/buildings.xml file, which contains all of the data about buildings
     that players can build.'''
-    if not BuildingTemplate._parsedTemplates:
-      BuildingTemplate._parsedTemplates = _parseBuildingTemplates()
-    return BuildingTemplate._parsedTemplates
+    if not BuildingDesign._parsedDesigns:
+      BuildingDesign._parsedDesigns = _parseBuildingDesigns()
+    return BuildingDesign._parsedDesigns
 
-def _parseBuildingTemplates():
-  '''Parses the /static/data/buildings.xml file and returns a list of BuildingTemplate objects.'''
-  
+  @staticmethod
+  def getDesign(designId):
+    '''Gets the design with the given ID, or None if none exists.'''
+    designs = BuildingDesign.getDesigns()
+    if designId not in designs:
+      return None
+    return designs[designId]
+
+def _parseBuildingDesigns():
+  '''Parses the /static/data/buildings.xml file and returns a list of BuildingDesign objects.'''
+  filename = os.path.join(os.path.dirname(__file__), "../data/buildings.xml")
+  logging.debug("Parsing %s" % (filename))
+  designs = {}
+  xml = ET.parse(filename)
+  for buildingXml in xml.iterfind("building"):
+    design = _parseBuildingDesign(buildingXml)
+    designs[design.id] = design
+  return designs
+
+def _parseBuildingDesign(buildingXml):
+  '''Parses a single <building> from the buildings.xml file.'''
+  design = BuildingDesign()
+  logging.debug("Parsing <building id=\"%s\">" % (buildingXml.get("id")))
+  design.id = buildingXml.get("id")
+  design.name = buildingXml.findtext("name")
+  design.description = buildingXml.findtext("description")
+  design.icon = buildingXml.findtext("icon")
+  costXml = buildingXml.find("cost")
+  design.buildCost = costXml.get("credits")
+  design.buildTimeSeconds = float(costXml.get("time")) * 3600
+  return design

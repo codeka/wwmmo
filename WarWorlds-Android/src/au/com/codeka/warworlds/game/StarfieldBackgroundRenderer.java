@@ -28,10 +28,11 @@ public class StarfieldBackgroundRenderer {
     private Logger log = LoggerFactory.getLogger(StarfieldBackgroundRenderer.class);
     private Context mContext;
     private Paint mBackgroundPaint;
-    private List<Bitmap> mBgStars;
-    private List<Bitmap> mBgGases;
     private float mPixelScale;
     private GlobalOptions.GraphicsDetail mGraphicsDetail;
+
+    private static List<Bitmap> sBgStars;
+    private static List<Bitmap> sBgGases;
 
     public StarfieldBackgroundRenderer(Context context) {
         mContext = context;
@@ -47,7 +48,7 @@ public class StarfieldBackgroundRenderer {
     }
 
     public void drawBackground(Canvas canvas, float left, float top, float right, float bottom, long seed) {
-        if (mBgStars == null || mBgStars.isEmpty()) {
+        if (sBgStars == null || sBgGases.isEmpty()) {
             return;
         }
 
@@ -58,12 +59,12 @@ public class StarfieldBackgroundRenderer {
         if (shouldDrawStars()) {
             src = new Rect(0, 0, 512, 512);
             dest = new RectF(left * mPixelScale, top * mPixelScale, right * mPixelScale, bottom * mPixelScale);
-            canvas.drawBitmap(mBgStars.get(r.nextInt(mBgStars.size())), src, dest, mBackgroundPaint);
+            canvas.drawBitmap(sBgStars.get(r.nextInt(sBgStars.size())), src, dest, mBackgroundPaint);
         }
 
         if (shouldDrawGas()) {
             for (int i = 0; i < 10; i++) {
-                Bitmap gas = mBgGases.get(r.nextInt(mBgGases.size()));
+                Bitmap gas = sBgGases.get(r.nextInt(sBgGases.size()));
 
                 src = new Rect(0, 0, gas.getWidth(), gas.getHeight());
                 float x = left + r.nextInt((int)(right - left) + 256) - 128;
@@ -88,11 +89,11 @@ public class StarfieldBackgroundRenderer {
         }
 
         AssetManager assetMgr = mContext.getAssets();
-        if (mBgStars == null && shouldDrawStars()) {
-            mBgStars = loadBitmaps(assetMgr, "decoration/starfield");
+        if (sBgStars == null && shouldDrawStars()) {
+            sBgStars = loadBitmaps(assetMgr, "decoration/starfield");
         }
-        if (mBgGases == null && shouldDrawGas()) {
-            mBgGases = loadBitmaps(assetMgr, "decoration/gas");
+        if (sBgGases == null && shouldDrawGas()) {
+            sBgGases = loadBitmaps(assetMgr, "decoration/gas");
         }
     }
 

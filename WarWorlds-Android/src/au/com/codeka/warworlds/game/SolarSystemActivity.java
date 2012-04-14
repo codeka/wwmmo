@@ -120,16 +120,6 @@ public class SolarSystemActivity extends Activity {
     }
 
     @Override
-    protected void onPrepareDialog(int id, Dialog d) {
-        switch(id) {
-        case BUILDINGS_DIALOG: {
-            SolarSystemBuildingsDialog dialog = (SolarSystemBuildingsDialog) d;
-            dialog.setColony(mColony);
-        }
-        }
-    }
-
-    @Override
     protected void onPrepareDialog(int id, Dialog d, Bundle args) {
         switch(id) {
         case BUILDINGS_CONFIRM_DIALOG: {
@@ -137,8 +127,17 @@ public class SolarSystemActivity extends Activity {
             String designID = args.getString("au.com.codeka.warworlds.BuildingID", "");
             BuildingDesign design = BuildingDesignManager.getInstance().getDesign(designID);
             dialog.setBuildingDesign(design);
+            dialog.setColony(mColony);
+            break;
+        }
+        case BUILDINGS_DIALOG: {
+            SolarSystemBuildingsDialog dialog = (SolarSystemBuildingsDialog) d;
+            dialog.setColony(mColony);
+            break;
         }
         }
+
+        super.onPrepareDialog(id, d, args);
     }
 
     private void refreshStar() {

@@ -303,7 +303,11 @@ class BuildQueuePage(ApiPage):
       self.response.set_status(403)
       return
 
-    empire.build(empire_pb, colony_pb, request_pb)
+    resp = empire.build(empire_pb, colony_pb, request_pb)
+    if resp == False:
+      self.response.set_status(400)
+      return
+    return resp
 
 class ApiApplication(webapp.WSGIApplication):
   def __init__(self, *args, **kwargs):

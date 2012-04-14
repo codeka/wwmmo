@@ -32,17 +32,20 @@
         android:layout_weight="0.5"
         android:layout_height="match_parent">
 
-        <Button
-            android:id="@+id/ok_btn"
-            style="@style/Button"
-            android:layout_width="wrap_content"
+        <au.com.codeka.warworlds.ctrl.HorizontalSeparator
+            android:id="@+id/buildings_existing_title"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentRight="true"
-            android:text="@string/done"
-            android:paddingLeft="25dp"
-            android:paddingRight="25dp"
-            android:paddingTop="5dp"
-            android:paddingBottom="5dp" />
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:text="@string/buildings_existing_title" />
+
+        <ListView
+            android:id="@+id/buildings_existing"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_below="@id/buildings_existing_title" >
+        </ListView>
     </RelativeLayout>
 </LinearLayout>

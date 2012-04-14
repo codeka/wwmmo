@@ -101,6 +101,18 @@ def planetModelToPb(planet_pb, planet_model):
   planet_pb.mining_congeniality = planet_model.miningCongeniality
 
 
+def buildingModelToPb(building_pb, building_model):
+  building_pb.key = str(building_model.key())
+  building_pb.colony_key = str(empire_mdl.Building.colony.get_value_for_datastore(building_model))
+  building_pb.design_name = building_model.designName
+
+
+def buildRequestModelToPb(build_pb, build_model):
+  build_pb.colony_key = str(empire_mdl.Building.colony.get_value_for_datastore(build_model))
+  build_pb.design_name = build_model.designName
+  #build_pb.build_kind = TODO
+
+
 def dateTimeToEpoch(dt):
   return calendar.timegm(dt.timetuple())
 

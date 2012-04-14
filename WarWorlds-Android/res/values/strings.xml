@@ -6,6 +6,7 @@
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
     <string name="done">Done</string>
+    <string name="build">Build</string>
 
     <!-- "log_in.xml" layout -->
     <string name="log_in_header">Log In</string>
@@ -32,7 +33,6 @@
     <string name="empire_setup_name_hint">Empire name</string>
 
     <!-- "starfield.xml" layout -->
-    <string name="starfield_zoomin">Zoom In</string>
 
     <!-- "solarsystem.xml" layout -->
     <string name="solarsystem_colonize">Colonize</string>
@@ -44,11 +44,13 @@
     <string name="chat_global">Global</string>
     <string name="chat_send">Send</string>
 
+    <!-- "solarsystem_buildings_*.xml layouts -->
+    <string name="buildings_available_title">Available Buildings</string>
+    <string name="buildings_existing_title">Colony Buildings</string>
+    <string name="solarsystem_building_timetobuild">Time to Build:</string>
+
     <!-- "global_options.xml" layout -->
     <string name="globalopts_graphics_detail">Detail Level:</string>
     <string name="globalopts_graphics_fast">Fast, Low Detail</string>
     <string name="globalopts_graphics_slow">Slow, High Detail</string>
-    <string name="buildings_available_title">Available Buildings</string>
-    <string name="solarsystem_building_timetobuild">Time to Build:</string>
-    <string name="build">Build</string>
 </resources>

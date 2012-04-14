@@ -3,8 +3,12 @@ package au.com.codeka.warworlds.model;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 public class Star {
+    private static Logger log = LoggerFactory.getLogger(Star.class);
     private Sector mSector;
     private String mKey;
     private String mName;
@@ -103,7 +107,17 @@ public class Star {
                     break;
                 }
             }
-            s.mColonies.add(Colony.fromProtocolBuffer(planet, colony_pb));
+            Colony c = Colony.fromProtocolBuffer(planet, colony_pb);
+
+            for (int i = 0; i < pb.getBuildingsCount(); i++) {
+                warworlds.Warworlds.Building bpb = pb.getBuildings(i);
+                if (bpb.getColonyKey().equals(c.getKey())) {
+                    log.info("Adding building: " + bpb.getDesignName());
+                    c.getBuildings().add(Building.fromProtocolBuffer(bpb));
+                }
+            }
+
+            s.mColonies.add(c);
         }
 
         return s;

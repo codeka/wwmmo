@@ -1,6 +1,8 @@
 package au.com.codeka.warworlds.model;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 public class Colony {
     private String mKey;
@@ -12,6 +14,7 @@ public class Colony {
     private Date mLastSimulation;
     private double mFarmingRate;
     private double mPopulationRate;
+    private List<Building> mBuildings;
 
     public String getKey() {
         return mKey;
@@ -36,6 +39,9 @@ public class Colony {
     }
     public double getPopulationRate() {
         return mPopulationRate;
+    }
+    public List<Building> getBuildings() {
+        return mBuildings;
     }
 
     /**
@@ -80,6 +86,7 @@ public class Colony {
         c.mEmpireKey = pb.getEmpireKey();
         c.mFarmingRate = 1.0f;
         c.mLastSimulation = new Date(pb.getLastSimulation() * 1000);
+        c.mBuildings = new ArrayList<Building>();
 
         // TODO
         c.mFarmingFocus = 0.75;

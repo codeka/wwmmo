@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import android.app.Dialog;
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -20,12 +23,17 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import au.com.codeka.warworlds.R;
+import au.com.codeka.warworlds.model.Building;
 import au.com.codeka.warworlds.model.BuildingDesign;
 import au.com.codeka.warworlds.model.BuildingDesignManager;
 import au.com.codeka.warworlds.model.Colony;
 
 public class SolarSystemBuildingsDialog extends Dialog {
+    private static Logger log = LoggerFactory.getLogger(SolarSystemBuildingsDialog.class);
     private SolarSystemActivity mActivity;
+    private Colony mColony;
+    private BuildingDesignListAdapter mDesignListAdapter;
+    private BuildingListAdapter mBuildingListAdapter;
 
     public SolarSystemBuildingsDialog(SolarSystemActivity activity) {
         super(activity);
@@ -44,38 +52,116 @@ public class SolarSystemBuildingsDialog extends Dialog {
         params.width = LayoutParams.MATCH_PARENT;
         getWindow().setAttributes(params);
 
-        final BuildingListAdapter adapter = new BuildingListAdapter();
-        adapter.setDesigns(BuildingDesignManager.getInstance().getDesigns());
+        mDesignListAdapter = new BuildingDesignListAdapter();
+        mDesignListAdapter.setDesigns(BuildingDesignManager.getInstance().getDesigns());
+
+        ListView availableDesignsList = (ListView) findViewById(R.id.buildings_available);
+        availableDesignsList.setAdapter(mDesignListAdapter);
+        availableDesignsList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Bundle args = new Bundle();
+                BuildingDesign design = (BuildingDesign) mDesignListAdapter.getItem(position);
+                args.putString("au.com.codeka.warworlds.BuildingID", design.getID());
+                mActivity.showDialog(SolarSystemActivity.BUILDINGS_CONFIRM_DIALOG, args);
+            }
+        });
+
+        mBuildingListAdapter = new BuildingListAdapter();
+        if (mColony != null) {
+            mBuildingListAdapter.setBuildings(mColony.getBuildings());
+        }
+
+        ListView existingBuildingsList = (ListView) findViewById(R.id.buildings_existing);
+        existingBuildingsList.setAdapter(mBuildingListAdapter);
 
         // make sure we're aware of any changes to the designs
         BuildingDesignManager.getInstance().addDesignsChangedListener(new BuildingDesignManager.DesignsChangedListener() {
             @Override
             public void onDesignsChanged() {
-                adapter.setDesigns(BuildingDesignManager.getInstance().getDesigns());
-            }
-        });
-
-        ListView availableDesignsList = (ListView) findViewById(R.id.buildings_available);
-        availableDesignsList.setAdapter(adapter);
-        availableDesignsList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Bundle args = new Bundle();
-                BuildingDesign design = (BuildingDesign) adapter.getItem(position);
-                args.putString("au.com.codeka.warworlds.BuildingID", design.getID());
-                mActivity.showDialog(SolarSystemActivity.BUILDINGS_CONFIRM_DIALOG, args);
+                mDesignListAdapter.setDesigns(BuildingDesignManager.getInstance().getDesigns());
+                if (mColony != null) {
+                    mBuildingListAdapter.setBuildings(mColony.getBuildings());
+                }
             }
         });
     }
 
     public void setColony(Colony colony) {
-        //mColony = colony;
+        mColony = colony;
+        if (mBuildingListAdapter != null && mColony != null) {
+            mBuildingListAdapter.setBuildings(mColony.getBuildings());
+        }
     }
 
     /**
-     * This adapter is used to populate the list of buildings in one of the views.
+     * This adapter is used to populate a list of buildings in a list view.
      */
     private class BuildingListAdapter extends BaseAdapter {
+        private List<Building> mBuildings;
+
+        public void setBuildings(List<Building> buildings) {
+            log.info("Setting buildings ("+buildings.size()+" buildings)");
+            mBuildings = buildings;
+            notifyDataSetChanged();
+        }
+
+        @Override
+        public int getCount() {
+            if (mBuildings == null)
+                return 0;
+            return mBuildings.size();
+        }
+
+        @Override
+        public Object getItem(int position) {
+            if (mBuildings == null)
+                return null;
+            return mBuildings.get(position);
+        }
+
+        @Override
+        public long getItemId(int position) {
+            return position;
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            View view = convertView;
+            if (view == null) {
+                LayoutInflater inflater = (LayoutInflater) mActivity.getSystemService
+                        (Context.LAYOUT_INFLATER_SERVICE);
+                view = (ViewGroup) inflater.inflate(R.layout.solarsystem_buildings_design, null);
+            }
+
+            ImageView icon = (ImageView) view.findViewById(R.id.building_icon);
+            TextView row1 = (TextView) view.findViewById(R.id.building_row1);
+            TextView row2 = (TextView) view.findViewById(R.id.building_row2);
+            TextView row3 = (TextView) view.findViewById(R.id.building_row3);
+
+            Building building = mBuildings.get(position);
+            BuildingDesign design = building.getDesign();
+
+            Bitmap bm = BuildingDesignManager.getInstance().getDesignIcon(design);
+            if (bm != null) {
+                icon.setImageBitmap(bm);
+            } else {
+                icon.setImageBitmap(null);
+            }
+
+            row1.setText(design.getName());
+            row2.setText(String.format("$ %d - %.2f hours", design.getBuildCost(),
+                    (float) design.getBuildTimeSeconds() / 3600.0f));
+            row3.setText("Required: none");
+
+            return view;
+        }
+    }
+
+    /**
+     * This adapter is used to populate the list of building designs in one of the views.
+     */
+    private class BuildingDesignListAdapter extends BaseAdapter {
         private List<BuildingDesign> mDesigns;
 
         public void setDesigns(Map<String, BuildingDesign> designs) {
