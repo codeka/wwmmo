@@ -1,4 +1,4 @@
-package au.com.codeka.warworlds.game;
+package au.com.codeka.warworlds.model;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -9,7 +9,6 @@ import org.slf4j.LoggerFactory;
 
 import android.os.AsyncTask;
 import au.com.codeka.warworlds.api.ApiClient;
-import au.com.codeka.warworlds.model.Empire;
 
 /**
  * Manages stuff about your empire (e.g. colonizing planets and whatnot).

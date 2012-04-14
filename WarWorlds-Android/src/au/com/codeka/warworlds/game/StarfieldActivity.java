@@ -16,6 +16,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.model.Colony;
+import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.ModelManager;
 import au.com.codeka.warworlds.model.Planet;
 import au.com.codeka.warworlds.model.SectorManager;

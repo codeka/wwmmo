@@ -14,7 +14,7 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.game.ChatActivity;
-import au.com.codeka.warworlds.game.ChatManager;
+import au.com.codeka.warworlds.model.ChatManager;
 import au.com.codeka.warworlds.model.ChatMessage;
 
 /**

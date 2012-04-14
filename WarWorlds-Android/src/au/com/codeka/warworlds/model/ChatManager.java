@@ -1,4 +1,4 @@
-package au.com.codeka.warworlds.game;
+package au.com.codeka.warworlds.model;
 
 import java.net.URI;
 import java.util.ArrayList;
@@ -8,7 +8,6 @@ import java.util.LinkedList;
 import au.com.codeka.warworlds.api.ApiClient;
 import au.com.codeka.warworlds.api.ChannelClient;
 import au.com.codeka.warworlds.api.ChannelClient.ChannelListener;
-import au.com.codeka.warworlds.model.ChatMessage;
 
 /**
  * This class keeps track of chats and whatnot.

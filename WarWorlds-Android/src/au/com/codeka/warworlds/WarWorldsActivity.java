@@ -20,11 +20,11 @@ import android.widget.Button;
 import au.com.codeka.warworlds.api.ApiClient;
 import au.com.codeka.warworlds.api.ApiException;
 import au.com.codeka.warworlds.ctrl.TransparentWebView;
-import au.com.codeka.warworlds.game.ChatManager;
-import au.com.codeka.warworlds.game.EmpireManager;
 import au.com.codeka.warworlds.game.StarfieldActivity;
 import au.com.codeka.warworlds.model.BuildingDesignManager;
+import au.com.codeka.warworlds.model.ChatManager;
 import au.com.codeka.warworlds.model.Empire;
+import au.com.codeka.warworlds.model.EmpireManager;
 
 /**
  * Main activity. Displays the message of the day and lets you select "Start Game", "Options", etc.

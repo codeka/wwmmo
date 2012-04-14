@@ -14,6 +14,7 @@ import au.com.codeka.warworlds.model.BuildingDesign;
 import au.com.codeka.warworlds.model.BuildingDesignManager;
 import au.com.codeka.warworlds.model.Colony;
 import au.com.codeka.warworlds.model.Empire;
+import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.ModelManager;
 import au.com.codeka.warworlds.model.ModelManager.StarFetchedHandler;
 import au.com.codeka.warworlds.model.Planet;
