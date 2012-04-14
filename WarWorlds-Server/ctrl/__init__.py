@@ -5,6 +5,7 @@ from google.appengine.api import users
 from google.appengine.api import memcache
 import calendar
 import logging
+import protobufs.warworlds_pb2 as pb
 
 
 def getCached(keys, ProtoBuffClass):
@@ -110,6 +111,7 @@ def buildingModelToPb(building_pb, building_model):
 def buildRequestModelToPb(build_pb, build_model):
   build_pb.colony_key = str(empire_mdl.Building.colony.get_value_for_datastore(build_model))
   build_pb.design_name = build_model.designName
+  build_pb.build_kind = 0
   #build_pb.build_kind = TODO
 
 

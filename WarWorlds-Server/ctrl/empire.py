@@ -133,12 +133,30 @@ def build(empire_pb, colony_pb, request_pb):
   build_model.endTime = build_model.startTime + timedelta(seconds = design.buildTimeSeconds)
   build_model.put()
 
+  keys = ['buildqueue:for-empire:%s' % empire_pb.key]
+  ctrl.clearCached(keys)
+
   # Make sure we're going to 
   scheduleBuildCheck()
 
   ctrl.buildRequestModelToPb(request_pb, build_model)
   return request_pb
 
+
+def getBuildQueueForEmpire(empire_pb):
+  '''Gets the current build queue for the given empire.'''
+  cache_key = 'buildqueue:for-empire:%s' % empire_pb.key
+  build_queue = ctrl.getCached([cache_key], pb.BuildQueue)
+  if cache_key in build_queue:
+    return build_queue[cache_key]
+
+  build_queue = pb.BuildQueue()
+  query = mdl.BuildOperation().all().filter("empire", db.Key(empire_pb.key))
+  for build_model in query:
+    build_pb = build_queue.requests.add()
+    ctrl.buildRequestModelToPb(build_pb, build_model)
+  ctrl.setCached({cache_key: build_queue})
+  return build_queue
 
 def scheduleBuildCheck():
   '''Checks when the next build is due to complete and schedules a task to run at that time.

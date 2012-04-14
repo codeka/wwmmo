@@ -255,6 +255,7 @@ class DeviceMessagesPage(ApiPage):
 class StarfieldPage(ApiPage):
   pass
 
+
 class SectorsPage(StarfieldPage):
   def get(self):
     if self.request.get('coords') != '':
@@ -308,6 +309,12 @@ class BuildQueuePage(ApiPage):
       self.response.set_status(400)
       return
     return resp
+
+  def get(self):
+    '''Gets the build queue for the currently logged-in user.'''
+    empire_pb = empire.getEmpireForUser(self.user)
+    return empire.getBuildQueueForEmpire(empire_pb)
+
 
 class ApiApplication(webapp.WSGIApplication):
   def __init__(self, *args, **kwargs):

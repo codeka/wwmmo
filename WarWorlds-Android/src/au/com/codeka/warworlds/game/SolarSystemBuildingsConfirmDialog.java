@@ -3,8 +3,6 @@ package au.com.codeka.warworlds.game;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import warworlds.Warworlds.BuildRequest;
-import warworlds.Warworlds.BuildRequest.BUILD_KIND;
 import android.app.Dialog;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
@@ -21,6 +19,8 @@ import au.com.codeka.warworlds.WarWorldsActivity;
 import au.com.codeka.warworlds.api.ApiClient;
 import au.com.codeka.warworlds.api.ApiException;
 import au.com.codeka.warworlds.ctrl.TransparentWebView;
+import au.com.codeka.warworlds.model.BuildQueueManager;
+import au.com.codeka.warworlds.model.BuildRequest;
 import au.com.codeka.warworlds.model.BuildingDesign;
 import au.com.codeka.warworlds.model.BuildingDesignManager;
 import au.com.codeka.warworlds.model.Colony;
@@ -51,17 +51,19 @@ public class SolarSystemBuildingsConfirmDialog extends Dialog {
             @Override
             public void onClick(View v) {
                 okButton.setEnabled(false);
-                new AsyncTask<Void, Void, Void>() {
+                new AsyncTask<Void, Void, BuildRequest>() {
                     @Override
-                    protected Void doInBackground(Void... arg0) {
-                        BuildRequest build = BuildRequest.newBuilder()
-                                .setBuildKind(BUILD_KIND.BUILDING)
+                    protected BuildRequest doInBackground(Void... arg0) {
+                        warworlds.Warworlds.BuildRequest build = warworlds.Warworlds.BuildRequest.newBuilder()
+                                .setBuildKind(warworlds.Warworlds.BuildRequest.BUILD_KIND.BUILDING)
                                 .setColonyKey(mColony.getKey())
                                 .setDesignName(mDesign.getID())
                                 .build();
                         try {
-                            build = ApiClient.postProtoBuf("buildqueue", build, warworlds.Warworlds.BuildRequest.class);
-                            // todo: do something??
+                            build = ApiClient.postProtoBuf("buildqueue", build,
+                                    warworlds.Warworlds.BuildRequest.class);
+
+                            return BuildRequest.fromProtocolBuffer(build);
                         } catch (ApiException e) {
                             log.error("Error issuing build request", e);
                         }
@@ -69,7 +71,10 @@ public class SolarSystemBuildingsConfirmDialog extends Dialog {
                         return null;
                     }
                     @Override
-                    protected void onPostExecute(Void result) {
+                    protected void onPostExecute(BuildRequest buildRequest) {
+                        // notify the BuildQueueManager that something's changed.
+                        BuildQueueManager.getInstance().refresh(buildRequest);
+
                         okButton.setEnabled(true);
                         dismiss();
                     }

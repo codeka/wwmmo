@@ -326,6 +326,15 @@ message BuildRequest
 
 
 //
+// A build queue is basically just a list of BuildRequests.
+//
+message BuildQueue
+{
+    repeated BuildRequest requests = 1;
+}
+
+
+//
 // Represents a completed building in a colony.
 //
 message Building

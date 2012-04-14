@@ -47,6 +47,7 @@
     <!-- "solarsystem_buildings_*.xml layouts -->
     <string name="buildings_available_title">Available Buildings</string>
     <string name="buildings_existing_title">Colony Buildings</string>
+    <string name="buildings_inprogress_title">In Progress</string>
     <string name="solarsystem_building_timetobuild">Time to Build:</string>
 
     <!-- "global_options.xml" layout -->
