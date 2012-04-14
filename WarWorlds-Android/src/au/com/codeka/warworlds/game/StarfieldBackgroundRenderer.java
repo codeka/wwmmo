@@ -48,7 +48,7 @@ public class StarfieldBackgroundRenderer {
     }
 
     public void drawBackground(Canvas canvas, float left, float top, float right, float bottom, long seed) {
-        if (sBgStars == null || sBgGases.isEmpty()) {
+        if (sBgStars == null || sBgStars.isEmpty()) {
             return;
         }
 
