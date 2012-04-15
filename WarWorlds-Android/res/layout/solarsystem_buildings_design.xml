@@ -38,4 +38,14 @@
         android:text="Small Text"
         android:textAppearance="?android:attr/textAppearanceSmall" />
 
+    <ProgressBar
+        android:id="@+id/building_progress"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:layout_height="10dp"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="4dp"
+        android:layout_marginRight="8dp"
+        android:layout_toRightOf="@+id/building_icon" />
+
 </RelativeLayout>

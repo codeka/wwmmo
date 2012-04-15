@@ -21,6 +21,7 @@ import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.model.BuildQueueManager;
@@ -163,6 +164,7 @@ public class SolarSystemBuildingsDialog extends Dialog {
             TextView row1 = (TextView) view.findViewById(R.id.building_row1);
             TextView row2 = (TextView) view.findViewById(R.id.building_row2);
             TextView row3 = (TextView) view.findViewById(R.id.building_row3);
+            ProgressBar progress = (ProgressBar) view.findViewById(R.id.building_progress);
 
             Building building = mBuildings.get(position);
             BuildingDesign design = building.getDesign();
@@ -175,9 +177,12 @@ public class SolarSystemBuildingsDialog extends Dialog {
             }
 
             row1.setText(design.getName());
-            row2.setText(String.format("$ %d - %.2f hours", design.getBuildCost(),
+            row2.setText("Level 1");
+
+            row3.setVisibility(View.VISIBLE);
+            progress.setVisibility(View.GONE);
+            row3.setText(String.format("Upgrade: $ %d, %.2f hours", design.getBuildCost(),
                     (float) design.getBuildTimeSeconds() / 3600.0f));
-            row3.setText("Required: none");
 
             return view;
         }
@@ -227,6 +232,7 @@ public class SolarSystemBuildingsDialog extends Dialog {
             TextView row1 = (TextView) view.findViewById(R.id.building_row1);
             TextView row2 = (TextView) view.findViewById(R.id.building_row2);
             TextView row3 = (TextView) view.findViewById(R.id.building_row3);
+            ProgressBar progress = (ProgressBar) view.findViewById(R.id.building_progress);
 
             BuildRequest request = mQueue.get(position);
             BuildingDesign design = request.getBuildingDesign();
@@ -239,9 +245,12 @@ public class SolarSystemBuildingsDialog extends Dialog {
             }
 
             row1.setText(design.getName());
-            row2.setText(String.format("$ %d - %.2f hours", design.getBuildCost(),
-                    (float) design.getBuildTimeSeconds() / 3600.0f));
-            row3.setText("Required: none");
+            row2.setText(String.format("56 %%, %.2f hours left",
+                    (float) design.getBuildTimeSeconds() * 0.44f / 3600.0f));
+
+            row3.setVisibility(View.GONE);
+            progress.setVisibility(View.VISIBLE);
+            progress.setProgress(56);
 
             return view;
         }
@@ -290,6 +299,8 @@ public class SolarSystemBuildingsDialog extends Dialog {
             TextView row1 = (TextView) view.findViewById(R.id.building_row1);
             TextView row2 = (TextView) view.findViewById(R.id.building_row2);
             TextView row3 = (TextView) view.findViewById(R.id.building_row3);
+            ProgressBar progress = (ProgressBar) view.findViewById(R.id.building_progress);
+            progress.setVisibility(View.GONE);
 
             BuildingDesign design = mDesigns.get(position);
 
