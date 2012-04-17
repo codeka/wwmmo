@@ -35,9 +35,12 @@ class Empire(db.Model):
     colony.planet = planet.key()
     colony.sector = planet.star.sector.key()
     colony.star = planet.star.key()
-    colony.population = 100
-    colony.populationRate = 0.0
+    colony.population = 100.0
     colony.lastSimulation = datetime.now()
+    colony.focusPopulation = 0.25
+    colony.focusFarming = 0.25
+    colony.focusMining = 0.25
+    colony.focusConstruction = 0.25
     colony.put()
 
     def inc_colony_count():
@@ -64,9 +67,12 @@ class Colony(db.Model):
   star = db.ReferenceProperty(sector.Star)
   sector = db.ReferenceProperty(sector.Sector)
   empire = db.ReferenceProperty(Empire)
-  population = db.IntegerProperty()
-  populationRate = db.FloatProperty()
+  population = db.FloatProperty()
   lastSimulation = db.DateTimeProperty()
+  focusPopulation = db.FloatProperty()
+  focusFarming = db.FloatProperty()
+  focusMining = db.FloatProperty()
+  focusConstruction = db.FloatProperty()
 
   @staticmethod
   def getForEmpire(empire_key):

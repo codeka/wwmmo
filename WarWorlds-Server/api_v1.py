@@ -275,7 +275,9 @@ class SectorsPage(StarfieldPage):
 
 class StarPage(StarfieldPage):
   def get(self, key):
-    return sector.getStar(key)
+    star_pb = sector.getStar(key)
+    empire.simulate(star_pb)
+    return star_pb
 
 
 class ColoniesPage(ApiPage):
@@ -288,6 +290,21 @@ class ColoniesPage(ApiPage):
       self.response.set_status(400)
     return colony_pb
 
+  def put(self, colony_key):
+    '''Updates the given colony.
+
+    When you update a colony, we need to simulate the current one first. Then we need to make
+    sure the new parameters are valid (e.g. focus adds up to 1.0 etc).
+    '''
+    # Make sure you have access to this colony!
+    colony_pb = empire.getColony(colony_key)
+    empire_pb = empire.getEmpireForUser(self.user)
+    if colony_pb.empire_key != empire_pb.key:
+      self.response.set_status(403)
+      return
+
+    colony_pb = empire.updateColony(colony_key, self._getRequestBody(pb.Colony))
+    return colony_pb
 
 class BuildQueuePage(ApiPage):
   def post(self):
@@ -313,7 +330,7 @@ class BuildQueuePage(ApiPage):
   def get(self):
     '''Gets the build queue for the currently logged-in user.'''
     empire_pb = empire.getEmpireForUser(self.user)
-    return empire.getBuildQueueForEmpire(empire_pb)
+    return empire.getBuildQueueForEmpire(empire_pb.key)
 
 
 class ApiApplication(webapp.WSGIApplication):
@@ -378,5 +395,6 @@ app = ApiApplication([('/api/v1/hello/([^/]+)', HelloPage),
                       ('/api/v1/sectors', SectorsPage),
                       ('/api/v1/stars/([^/]+)', StarPage),
                       ('/api/v1/colonies', ColoniesPage),
+                      ('/api/v1/colonies/([^/]+)', ColoniesPage),
                       ('/api/v1/buildqueue', BuildQueuePage)],
                      debug=True)

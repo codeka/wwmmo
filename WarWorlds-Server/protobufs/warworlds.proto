@@ -286,11 +286,20 @@ message Colony
     optional string planet_key = 3;
     optional string star_key = 4;
 
+    // In the backend, population is actually stored as a floating point value, but
+    // we don't care about that kind of accuracy.
     optional int64 population = 5;
 
     // Time, in seconds since Unix epoch, that this colony was last simulated (i.e.
     // when the population and such was last calculated)
     optional int64 last_simulation = 6;
+
+    // The "focus" of this colony. These numbers must add up to 1.0 and represent
+    // the percentage of the population that is focussed on the given task.
+    optional float focus_population = 7;
+    optional float focus_farming = 8;
+    optional float focus_mining = 9;
+    optional float focus_construction = 10;
 }
 
 
@@ -322,6 +331,10 @@ message BuildRequest
 
     // The name of the design you're trying to build
     required string design_name = 3;
+
+    // The date/time this build request started and the current predicted time of completion
+    optional int64 start_time = 4;
+    optional int64 end_time = 5;
 }
 
 

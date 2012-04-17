@@ -4,6 +4,8 @@ from model import empire as empire_mdl
 from google.appengine.api import users
 from google.appengine.api import memcache
 import calendar
+import time
+from datetime import datetime
 import logging
 import protobufs.warworlds_pb2 as pb
 
@@ -53,8 +55,21 @@ def colonyModelToPb(colony_pb, colony_model):
   colony_pb.empire_key = str(empire_mdl.Colony.empire.get_value_for_datastore(colony_model))
   colony_pb.star_key = str(empire_mdl.Colony.star.get_value_for_datastore(colony_model))
   colony_pb.planet_key = str(empire_mdl.Colony.planet.get_value_for_datastore(colony_model))
-  colony_pb.population = colony_model.population
+  colony_pb.population = int(colony_model.population)
   colony_pb.last_simulation = int(dateTimeToEpoch(colony_model.lastSimulation))
+  colony_pb.focus_population = colony_model.focusPopulation
+  colony_pb.focus_farming = colony_model.focusFarming
+  colony_pb.focus_mining = colony_model.focusMining
+  colony_pb.focus_construction = colony_model.focusConstruction
+
+
+def colonyPbToModel(colony_model, colony_pb):
+  colony_model.population = float(colony_pb.population)
+  colony_model.lastSimulation = epochToDateTime(colony_pb.last_simulation)
+  colony_model.focusPopulation = colony_pb.focus_population
+  colony_model.focusFarming = colony_pb.focus_farming
+  colony_model.focusMining = colony_pb.focus_mining
+  colony_model.focusConstruction = colony_pb.focus_construction
 
 
 def sectorModelToPb(sector_pb, sector_model):
@@ -69,7 +84,6 @@ def sectorModelToPb(sector_pb, sector_model):
     star_pb = sector_pb.stars.add()
     starModelToPb(star_pb, star_model)
 
-  # TODO: cache?
   for colony_model in empire_mdl.Colony.getForSector(sector_model):
     colony_pb = sector_pb.colonies.add()
     colonyModelToPb(colony_pb, colony_model)
@@ -118,3 +132,5 @@ def buildRequestModelToPb(build_pb, build_model):
 def dateTimeToEpoch(dt):
   return calendar.timegm(dt.timetuple())
 
+def epochToDateTime(epoch):
+  return datetime.fromtimestamp(epoch)

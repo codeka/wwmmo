@@ -9,12 +9,10 @@ import webapp2 as webapp
 
 import model
 from model import session
-from model import empire
 
 from mapreduce import control
 from google.appengine.api import channel
 from google.appengine.api import users
-from google.appengine.ext import db
 from google.appengine.ext.db.metadata import Kind
 
 import logging

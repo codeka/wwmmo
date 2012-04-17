@@ -8,7 +8,7 @@
       <p>You can have only one shipyard on your planet, but it's efficiency and the range of
       ships available to you can be upgraded with the building of supporting buildings.</p>
     ]]></description>
-    <cost credits="250" time="2.4" />
+    <cost credits="250" minerals="300" time="2.4" />
   </building>
   <building id="silo">
     <name>Silo</name>
@@ -18,7 +18,7 @@
       the more you can store. Silos store produce for all colonies in this starsystem and you
       can build as many as you like.</p>
     ]]></description>
-    <cost credits="100" time="0.5" />
+    <cost credits="100" minerals="400" time="0.5" />
   </building>
   <building id="research">
     <name>Research Laboratory</name>
@@ -27,6 +27,6 @@
       <p>Allows you to build more advanced ships and buildings. The higher the level of this
       building, the more advanced research becomes available.</p>
     ]]></description>
-    <cost credits="100" time="0.75" />
+    <cost credits="100" minerals="1000" time="0.75" />
   </building>
 </buildings>
