@@ -1,6 +1,7 @@
 
 
 from model import empire as empire_mdl
+from google.appengine.ext import db
 from google.appengine.api import users
 from google.appengine.api import memcache
 import calendar
@@ -104,6 +105,20 @@ def starModelToPb(star_pb, star_model):
       planet_pb = star_pb.planets.add()
       planetModelToPb(planet_pb, planet_model)
     star_pb.num_planets = len(star_model.planets)
+
+
+def empirePresenceModelToPb(presence_pb, presence_model):
+  presence_pb.empire_key = str(empire_mdl.EmpirePresence.empire.get_value_for_datastore(presence_model))
+  presence_pb.star_key = str(empire_mdl.EmpirePresence.star.get_value_for_datastore(presence_model))
+  presence_pb.total_goods = presence_model.totalGoods
+  presence_pb.total_minerals = presence_model.totalMinerals
+
+
+def empirePresencePbToModel(presence_model, presence_pb):
+  presence_model.empire = db.Key(presence_pb.empire_key)
+  presence_model.star = db.Key(presence_pb.star_key)
+  presence_model.totalGoods = presence_pb.total_goods
+  presence_model.totalMinerals = presence_pb.total_minerals
 
 
 def planetModelToPb(planet_pb, planet_model):

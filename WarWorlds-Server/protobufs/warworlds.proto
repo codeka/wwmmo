@@ -205,6 +205,9 @@ message Star
 
     // collection of buildings in our colonies.
     repeated Building buildings = 13;
+
+    // collection of EmpirePresences details the presences of the empire(s) in this solar system.
+    repeated EmpirePresence empires = 14;
 }
 
 //
@@ -257,6 +260,20 @@ message Planet
 message Sectors
 {
     repeated Sector sectors = 1;
+}
+
+//
+// Represents the details of an empire's "presence" in a star. For example, keeps track
+// of stored goods, etc.
+//
+message EmpirePresence
+{
+    required string key = 1;
+    optional string empire_key = 2;
+    optional string star_key = 3;
+
+    optional float total_goods = 4;
+    optional float total_minerals = 5;
 }
 
 //

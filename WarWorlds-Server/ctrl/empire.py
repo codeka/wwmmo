@@ -108,16 +108,48 @@ def updateColony(colony_key, updated_colony_pb):
   colony_pb.focus_mining = updated_colony_pb.focus_mining / focus_total
   colony_pb.focus_construction = updated_colony_pb.focus_construction / focus_total
 
-  keys_to_clear = []
-  keys_to_clear.append('buildqueue:for-empire:%s' % colony_pb.empire_key)
-
   # because of the simulation, we have to update all colonies.
+  updateAfterSimulate(star_pb, colony_pb.empire_key)
+
+def updateAfterSimulate(star_pb, empire_key):
+  '''After you've simulated a star for a particular empire, this updates the data store.
+
+  Usually, you'll simulate the star, update a colony, and then update. This handles the "update"
+  phase, making sure all data is updated, caches cleared, etc.
+  '''
+  if empire_key is None:
+    # it's easier to do this empire-by-empire, rather then have special-cases
+    # throughout the logic below....
+    done_empires = set()
+    for colony_pb in star_pb.colonies:
+      if colony_pb.empire_key not in done_empires:
+        done_empires.add(colony_pb.empire_key)
+        updateAfterSimulate(star_pb, colony_pb.empire_key)
+    return
+
+  keys_to_clear = []
+  keys_to_clear.append('buildqueue:for-empire:%s' % empire_key)
+
   for colony_pb in star_pb.colonies:
+    if colony_pb.empire_key != empire_key:
+      continue
+
     colony_pb.last_simulation = datetime.now()
     colony_model = mdl.Colony.get(colony_pb.key)
     ctrl.colonyPbToModel(colony_model, colony_pb)
     colony_model.put()
     keys_to_clear.append('colony:%s' % colony_pb.key)
+
+  for empire_pb in star_pb.empires:
+    if empire_pb.empire_key != empire_key:
+      continue
+    if empire_pb.key == '':
+      empire_model = mdl.EmpirePresence()
+    else:
+      empire_model = mdl.EmpirePresence.get(empire_pb.key)
+    ctrl.empirePresencePbToModel(empire_model, empire_pb)
+    empire_model.put()
+    # This is never cached separately...
 
   keys_to_clear.append('star:%s' % star_pb.key)
   ctrl.clearCached(keys_to_clear)
@@ -135,29 +167,35 @@ def simulate(star_pb, empire_key=None):
         star we're going to simulate.
     empire_key: The key of the empire we're going to simulate. If None, the default, we'll simulate
         all colonies in the star.
-  Returns:
-    We save the new colonies to the data store, and also return the star_pb with updated data.
   '''
+  if empire_key is None:
+    # it's easier to do this empire-by-empire, rather then have special-cases
+    # throughout the logic below....
+    done_empires = set()
+    for colony_pb in star_pb.colonies:
+      if colony_pb.empire_key not in done_empires:
+        done_empires.add(colony_pb.empire_key)
+        simulate(star_pb, colony_pb.empire_key)
+    return
+
+
   # figure out the start time, which is the oldest last_simulation time
   start_time = 0
-  empire_keys = []
   for colony_pb in star_pb.colonies:
-    if empire_key and colony_pb.empire_key != empire_key:
+    if colony_pb.empire_key != empire_key:
       continue
-    if colony_pb.empire_key not in empire_keys:
-      empire_keys.append(colony_pb.empire_key)
     if start_time == 0 or colony_pb.last_simulation < start_time:
       start_time = colony_pb.last_simulation
 
   if start_time == 0:
-    # No colonies worth simulation...
+    # No colonies worth simulating...
     return
 
   start_time = ctrl.epochToDateTime(start_time)
   end_time = datetime.now()
 
   # we may need to adjust the build queue
-  build_queue = getBuildQueuesForEmpires(empire_keys)
+  build_queue = getBuildQueueForEmpire(empire_key)
 
   while True:
     step_end_time = start_time + timedelta(minutes=15)
@@ -187,18 +225,32 @@ def _simulateStep(dt, star_pb, empire_key, build_queue):
     dt: A timedelta that represents the time of this step (usually 15 minutes for
         a complete step, but could be a partial step as well).
     star_pb: The star protocol buffer we're simulating.
-    emprire_key: The key of the empire we're simulating. If None, we'll simulate
+    empire_key: The key of the empire we're simulating. If None, we'll simulate
         all empires in the starsystem.
     build_queue: The build queue for the empire (or empires).
   '''
+  total_goods = None
+  total_minerals = None
+  total_population = 0
+  for empire in star_pb.empires:
+    if empire_key != empire.empire_key:
+      continue
+    total_goods = empire.total_goods
+    total_minerals = empire.total_minerals
 
-  total_goods = 0 # todo: store these in the star
-  total_minerals = 0
+  if total_goods is None and total_minerals is None:
+    # This means we didn't find their entry... add it now
+    empire_pb = star_pb.empires.add()
+    empire_pb.key = ''
+    empire_pb.empire_key = empire_key
+    empire_pb.star_key = star_pb.key
+    total_goods = 0
+    total_minerals = 0
 
   dt_in_hours = dt.total_seconds() / 3600.0
 
   for colony_pb in star_pb.colonies:
-    if empire_key and colony_pb.empire_key != empire_key:
+    if colony_pb.empire_key != empire_key:
       continue
 
     planet_pb = None
@@ -208,23 +260,20 @@ def _simulateStep(dt, star_pb, empire_key, build_queue):
         break
 
     # calculate the output from farming this turn and add it to the star global
-    goods = colony_pb.population * colony_pb.focus_farming * planet_pb.farming_congeniality
+    goods = colony_pb.population * colony_pb.focus_farming * (planet_pb.farming_congeniality/100.0)
     total_goods += goods * dt_in_hours
 
     # calculate the output from mining this turn and add it to the star global
-    minerals = colony_pb.population * colony_pb.focus_mining * planet_pb.mining_congeniality
+    minerals = colony_pb.population * colony_pb.focus_mining * (planet_pb.mining_congeniality/100.0)
     total_minerals += minerals * dt_in_hours
 
-  # As we go, we'll count up the total population of all colonies
-  total_population = 0
+    total_population += colony_pb.population
 
   # A second loop though the colonies, once the goods/minerals have been calculated. This way,
   # goods minerals are shared between colonies
   for colony_pb in star_pb.colonies:
-    if empire_key and colony_pb.empire_key != empire_key:
+    if colony_pb.empire_key != empire_key:
       continue
-
-    total_population += colony_pb.population
 
     build_requests = []
     for build_req in build_queue.requests:
@@ -267,34 +316,49 @@ def _simulateStep(dt, star_pb, empire_key, build_queue):
           # note if the build request has already finished, we don't actually have to do
           # anything since it'll be fixed up by the tasks/empire/build-check task.
 
-    # Finally, update the population. The first thing we need to do is evenly distribute goods
-    # between all of the colonies.
-    total_goods_per_hour = total_population / 10.0
-    total_goods_required = total_goods_per_hour * dt_in_hours
+  # Finally, update the population. The first thing we need to do is evenly distribute goods
+  # between all of the colonies.
+  total_goods_per_hour = total_population / 10.0
+  total_goods_required = total_goods_per_hour * dt_in_hours
 
-    # If we have more than total_goods_required stored, then we're cool. Otherwise, our population
-    # suffers...
-    goods_efficiency = 1.0
-    if total_goods_required > total_goods and total_goods > 0:
-      goods_efficiency = total_goods_required / total_goods
-    elif total_goods == 0:
-      goods_efficiency = 0
+  # If we have more than total_goods_required stored, then we're cool. Otherwise, our population
+  # suffers...
+  goods_efficiency = 1.0
+  if total_goods_required > total_goods and total_goods > 0:
+    goods_efficiency = total_goods_required / total_goods
+  elif total_goods == 0:
+    goods_efficiency = 0
 
-    # subtract all the goods we'll need
-    total_goods -= total_goods_required
+  # subtract all the goods we'll need
+  total_goods -= total_goods_required
 
-    # now loop through the colonies and update the population/goods counter
-    for colony_pb in star_pb.colonies:
-      population_increase = colony_pb.population * colony_pb.focus_population
-      population_increase *= (goods_efficiency - 0.75) # that is, from -0.75 -> 0.25
-      population_increase *= dt_in_hours
-      colony_pb.population += int(population_increase)
+  # now loop through the colonies and update the population/goods counter
+  for colony_pb in star_pb.colonies:
+    if colony_pb.empire_key != empire_key:
+      continue
 
-    # TODO:
-    # star_pb.empire_store_pb.total_goods = total_goods
-    # star_pb.empire_store_pb.total_minerals = total_minerals
+    population_increase = colony_pb.population * colony_pb.focus_population
+    population_increase *= (goods_efficiency - 0.75) # that is, from -0.75 -> 0.25
 
-  logging.debug("simulation step complete: dt=%.2f (hrs)" % (dt_in_hours))
+    planet_pb = None
+    for pb in star_pb.planets:
+      if pb.key == colony_pb.planet_key:
+        planet_pb = pb
+        break
+    congeniality_factor = 1.0 - (colony_pb.population / planet_pb.population_congeniality)
+    population_increase *= congeniality_factor
+
+    population_increase *= dt_in_hours
+    colony_pb.population += int(population_increase)
+
+  for empire in star_pb.empires:
+    if empire_key != empire.empire_key:
+      continue
+    empire.total_goods = total_goods
+    empire.total_minerals = total_minerals
+
+  logging.debug("simulation step: empire=%s dt=%.2f (hrs), delta goods=%.2f, delta minerals=%.2f, population=%.2f" % (
+      empire_key, dt_in_hours, total_goods, total_minerals, total_population))
 
 def colonize(empire_pb, colonize_request):
   '''Colonizes the planet given in the colonize_request.

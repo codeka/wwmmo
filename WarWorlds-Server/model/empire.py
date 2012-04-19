@@ -127,3 +127,22 @@ class Building(db.Model):
       buildings.append(building)
     return buildings
 
+
+class EmpirePresence(db.Model):
+  '''Represents the 'precense' of an empire in a star system.'''
+  empire = db.ReferenceProperty(Empire)
+  star = db.ReferenceProperty(sector.Star)
+  totalGoods = db.FloatProperty()
+  totalMinerals = db.FloatProperty()
+
+  @staticmethod
+  def getForStar(star_model):
+    query = EmpirePresence.all().filter("star", star_model)
+    return EmpirePresence._getForQuery(query)
+
+  @staticmethod
+  def _getForQuery(query):
+    presences = []
+    for presence in query:
+      presences.append(presence)
+    return presences

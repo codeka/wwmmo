@@ -65,5 +65,9 @@ def getStar(star_key):
     building_pb = star_pb.buildings.add()
     ctrl.buildingModelToPb(building_pb, building_model)
 
+  for presence_model in empire_mdl.EmpirePresence.getForStar(star_model):
+    presence_pb = star_pb.empires.add()
+    ctrl.empirePresenceModelToPb(presence_pb, presence_model)
+
   ctrl.setCached({cache_key: star_pb})
   return star_pb
