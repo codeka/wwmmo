@@ -304,10 +304,62 @@
         </LinearLayout>
     </LinearLayout>
 
-    <au.com.codeka.warworlds.ctrl.BannerAdView
-        android:id="@+id/ad"
-        android:layout_width="320dp"
-        android:layout_height="50dp"
-        android:layout_gravity="bottom|right" />
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" >
+
+        <au.com.codeka.warworlds.ctrl.BannerAdView
+            android:id="@+id/ad"
+            android:layout_width="320dp"
+            android:layout_height="50dp"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentBottom="true" >
+        </au.com.codeka.warworlds.ctrl.BannerAdView>
+
+        <TextView
+            android:id="@+id/stored_goods"
+            android:layout_width="wrap_content"
+            android:layout_height="20dp"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginRight="180dp"
+            android:background="#000"
+            android:gravity="center|right"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            android:text="999"
+            android:textAppearance="?android:attr/textAppearanceSmall" />
+
+        <ImageView
+            android:id="@+id/stored_goods_icon"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:background="#000"
+            android:layout_alignParentTop="true"
+            android:layout_toLeftOf="@+id/stored_goods"
+            android:src="@drawable/colony_farming_icon" />
+
+        <TextView
+            android:id="@+id/stored_minerals"
+            android:layout_width="wrap_content"
+            android:layout_height="20dp"
+            android:layout_alignParentTop="true"
+            android:layout_toLeftOf="@+id/stored_goods_icon"
+            android:background="#000"
+            android:gravity="center|right"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            android:text="999"
+            android:textAppearance="?android:attr/textAppearanceSmall" />
+
+        <ImageView
+            android:id="@+id/stored_minerals_icon"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_alignParentTop="true"
+            android:layout_toLeftOf="@+id/stored_minerals"
+            android:src="@drawable/colony_mining_icon" />
+
+    </RelativeLayout>
 
 </merge>

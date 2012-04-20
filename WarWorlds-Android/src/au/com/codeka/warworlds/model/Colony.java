@@ -10,10 +10,11 @@ public class Colony {
     private String mStarKey;
     private long mPopulation;
     private String mEmpireKey;
-    private double mFarmingFocus;
+    private float mFarmingFocus;
+    private float mConstructionFocus;
+    private float mPopulationFocus;
+    private float mMiningFocus;
     private Date mLastSimulation;
-    private double mFarmingRate;
-    private double mPopulationRate;
     private List<Building> mBuildings;
 
     public String getKey() {
@@ -31,70 +32,38 @@ public class Colony {
     public long getPopulation() {
         return mPopulation;
     }
-    public double getFarmingFocus() {
+    public float getFarmingFocus() {
         return mFarmingFocus;
     }
-    public double getFarmingRate() {
-        return mFarmingRate;
+    public float getConstructionFocus() {
+        return mConstructionFocus;
     }
-    public double getPopulationRate() {
-        return mPopulationRate;
+    public float getPopulationFocus() {
+        return mPopulationFocus;
+    }
+    public float getMiningFocus() {
+        return mMiningFocus;
+    }
+    public Date getLastSimulation() {
+        return mLastSimulation;
     }
     public List<Building> getBuildings() {
         return mBuildings;
     }
 
-    /**
-     * Simulates this colony up to the current time. Simulation occurs in 15 minute blocks.
-     */
-    public void simulate(Planet planet) {
-        Date now = new Date();
-        long millis = now.getTime() - mLastSimulation.getTime();
-
-        double hours = (millis / 1000) / 60.0 / 60.0;
-        while (hours > 0.25) {
-            simulateStep(planet, 0.25);
-            hours -= 0.25;
-        }
-        if (hours > 0.0) {
-            simulateStep(planet, hours);
-        }
-    }
-
-    /**
-     * Does a single "step" of the simulation.
-     * @param dt The amount of time to simulate, in hours.
-     */
-    private void simulateStep(Planet planet, double dt) {
-        mFarmingRate = (mPopulation / 1000.0) * mFarmingFocus * (planet.getFarmingCongeniality() / 50.0);
-
-        mPopulationRate = ((double) (planet.getPopulationCongeniality() - mPopulation) / planet.getPopulationCongeniality());
-        mPopulationRate *= mFarmingRate * (planet.getPopulationCongeniality() / 500.0);
-
-        mPopulation += mPopulation * mPopulationRate * dt;
-        if (mPopulation < 0) {
-            mPopulation = 0;
-        }
-    }
-
-    public static Colony fromProtocolBuffer(Planet planet, warworlds.Warworlds.Colony pb) {
+    public static Colony fromProtocolBuffer(warworlds.Warworlds.Colony pb) {
         Colony c = new Colony();
         c.mKey = pb.getKey();
         c.mPlanetKey = pb.getPlanetKey();
         c.mStarKey = pb.getStarKey();
         c.mPopulation = pb.getPopulation();
         c.mEmpireKey = pb.getEmpireKey();
-        c.mFarmingRate = 1.0f;
         c.mLastSimulation = new Date(pb.getLastSimulation() * 1000);
         c.mBuildings = new ArrayList<Building>();
-
-        // TODO
-        c.mFarmingFocus = 0.75;
-
-        // make sure the rates and stuff are current
-        if (planet != null) {
-            c.simulate(planet);
-        }
+        c.mFarmingFocus = pb.getFocusFarming();
+        c.mConstructionFocus = pb.getFocusConstruction();
+        c.mMiningFocus = pb.getFocusMining();
+        c.mPopulationFocus = pb.getFocusPopulation();
 
         return c;
     }

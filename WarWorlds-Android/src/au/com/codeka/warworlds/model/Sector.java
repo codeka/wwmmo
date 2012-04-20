@@ -59,7 +59,7 @@ public class Sector {
             boolean found = false;
             for (Star star : s.mStars) {
                 if (colony_pb.getStarKey().equals(star.getKey())) {
-                    star.addColony(Colony.fromProtocolBuffer(null, colony_pb));
+                    star.addColony(Colony.fromProtocolBuffer(colony_pb));
                     found = true;
                     break;
                 }

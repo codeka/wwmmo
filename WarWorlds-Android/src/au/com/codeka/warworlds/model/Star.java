@@ -19,11 +19,13 @@ public class Star {
     private int mNumPlanets;
     private Planet[] mPlanets;
     private ArrayList<Colony> mColonies;
+    private ArrayList<EmpirePresence> mEmpires;
 
     public Star() {
         mSector = null; // can be null if we're fetched separately from the sector
         mPlanets = null; // can be null if planets have not been populated...
         mColonies = null;
+        mEmpires = null;
     }
 
     public Sector getSector() {
@@ -59,6 +61,17 @@ public class Star {
     }
     public List<Colony> getColonies() {
         return mColonies;
+    }
+    public List<EmpirePresence> getEmpires() {
+        return mEmpires;
+    }
+    public EmpirePresence getEmpire(String empireKey) {
+        for (EmpirePresence ep : mEmpires) {
+            if (ep.getEmpireKey().equals(empireKey)) {
+                return ep;
+            }
+        }
+        return null;
     }
 
     public void addColony(Colony colony) {
@@ -100,14 +113,7 @@ public class Star {
 
         s.mColonies = new ArrayList<Colony>();
         for(warworlds.Warworlds.Colony colony_pb : pb.getColoniesList()) {
-            Planet planet = null;
-            for(Planet p : s.mPlanets) {
-                if (colony_pb.getPlanetKey().equals(p.getKey())) {
-                    planet = p;
-                    break;
-                }
-            }
-            Colony c = Colony.fromProtocolBuffer(planet, colony_pb);
+            Colony c = Colony.fromProtocolBuffer(colony_pb);
 
             for (int i = 0; i < pb.getBuildingsCount(); i++) {
                 warworlds.Warworlds.Building bpb = pb.getBuildings(i);
@@ -118,6 +124,11 @@ public class Star {
             }
 
             s.mColonies.add(c);
+        }
+
+        s.mEmpires = new ArrayList<EmpirePresence>();
+        for (warworlds.Warworlds.EmpirePresence empirePresencePb : pb.getEmpiresList()) {
+            s.mEmpires.add(EmpirePresence.fromProtocolBuffer(empirePresencePb));
         }
 
         return s;

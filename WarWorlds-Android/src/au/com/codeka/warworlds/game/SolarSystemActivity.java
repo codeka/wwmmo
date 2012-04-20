@@ -15,6 +15,7 @@ import au.com.codeka.warworlds.model.BuildingDesignManager;
 import au.com.codeka.warworlds.model.Colony;
 import au.com.codeka.warworlds.model.Empire;
 import au.com.codeka.warworlds.model.EmpireManager;
+import au.com.codeka.warworlds.model.EmpirePresence;
 import au.com.codeka.warworlds.model.ModelManager;
 import au.com.codeka.warworlds.model.ModelManager.StarFetchedHandler;
 import au.com.codeka.warworlds.model.Planet;
@@ -172,6 +173,27 @@ public class SolarSystemActivity extends Activity {
                     }
                 }
 
+                TextView storedGoodsTextView = (TextView) findViewById(R.id.stored_goods);
+                View storedGoodsIcon = findViewById(R.id.stored_goods_icon);
+                TextView storedMineralsTextView = (TextView) findViewById(R.id.stored_minerals);
+                View storedMineralsIcon = findViewById(R.id.stored_minerals_icon);
+
+                EmpirePresence ep = star.getEmpire(EmpireManager.getInstance().getEmpire().getKey());
+                if (ep == null) {
+                    storedGoodsTextView.setVisibility(View.GONE);
+                    storedGoodsIcon.setVisibility(View.GONE);
+                    storedMineralsTextView.setVisibility(View.GONE);
+                    storedMineralsIcon.setVisibility(View.GONE);
+                } else {
+                    storedGoodsTextView.setVisibility(View.VISIBLE);
+                    storedGoodsIcon.setVisibility(View.VISIBLE);
+                    storedMineralsTextView.setVisibility(View.VISIBLE);
+                    storedMineralsIcon.setVisibility(View.VISIBLE);
+
+                    storedGoodsTextView.setText(Integer.toString((int) ep.getTotalGoods()));
+                    storedMineralsTextView.setText(Integer.toString((int) ep.getTotalMinerals()));
+                }
+
                 mStar = star;
                 mPlanet = planet;
                 refreshSelectedPlanet();
@@ -252,11 +274,13 @@ public class SolarSystemActivity extends Activity {
 
             TextView populationRateTextView = (TextView) findViewById(
                     R.id.solarsystem_colony_population_rate);
-            populationRateTextView.setText(String.format("%.2f", mColony.getPopulationRate()));
+//            populationRateTextView.setText(String.format("%.2f", mColony.getPopulationRate()));
+            populationRateTextView.setText("todo");
 
             TextView farmingTextView = (TextView) findViewById(
                     R.id.solarsystem_colony_farming_value);
-            farmingTextView.setText(String.format("%.1f", mColony.getFarmingRate() * 10.0));
+//            farmingTextView.setText(String.format("%.1f", mColony.getFarmingRate() * 10.0));
+            farmingTextView.setText("todo");
         }
     }
 

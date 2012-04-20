@@ -282,7 +282,7 @@ def _simulateStep(dt, star_pb, empire_key, build_queue):
 
     # If we have pending build requests, we'll have to update them as well
     if len(build_requests) > 0:
-      total_workers = colony_pb.population * colony_pb.construction_focus
+      total_workers = colony_pb.population * colony_pb.focus_construction
       workers_per_build_request = total_workers / len(build_requests)
 
       for build_request in build_requests:
@@ -291,7 +291,7 @@ def _simulateStep(dt, star_pb, empire_key, build_queue):
         # So the build time the design specifies is the time to build the structure assigning
         # 100 workers are available. Double the workers and you halve the build time. Halve
         # the workers and you double the build time. 
-        total_build_time = design.buildTimeInSeconds / 3600.0
+        total_build_time = design.buildTimeSeconds / 3600.0
         total_build_time *= (100.0 / workers_per_build_request)
 
         # Work out how many hours we've spend so far (in hours)
@@ -312,7 +312,7 @@ def _simulateStep(dt, star_pb, empire_key, build_queue):
           total_minerals -= minerals_required
 
           # adjust the end_time for this turn
-          build_request.end_time = build_request.start_time + (time_spent + dt_required) * 3600.0
+          build_request.end_time = int(build_request.start_time + (time_spent + dt_required) * 3600.0)
           # note if the build request has already finished, we don't actually have to do
           # anything since it'll be fixed up by the tasks/empire/build-check task.
 
@@ -520,5 +520,5 @@ def _parseBuildingDesign(buildingXml):
   costXml = buildingXml.find("cost")
   design.buildCost = costXml.get("credits")
   design.buildTimeSeconds = float(costXml.get("time")) * 3600
-  design.buildCostMinerals = costXml.get("minerals")
+  design.buildCostMinerals = float(costXml.get("minerals"))
   return design
