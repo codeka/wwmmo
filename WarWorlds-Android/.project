@@ -2,9 +2,6 @@
 <projectDescription>
 	<name>WarWorlds-Android</name>
 	<comment></comment>
-	<projects>
-		<project>WarWorlds-ClientCommon</project>
-	</projects>
 	<buildSpec>
 		<buildCommand>
 			<name>com.android.ide.eclipse.adt.ResourceManagerBuilder</name>

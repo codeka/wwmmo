@@ -128,10 +128,10 @@ public class BuildQueueManager {
          */
         @Override
         public void onBuildQueueUpdated(List<BuildRequest> queue) {
-            for (BuildRequest req : queue) {
+            //for (BuildRequest req : queue) {
                 // TODO: figue out when it finishes, find the one coming up and wait for that
                 // to happen...
-            }
+            //}
         }
     }
 }

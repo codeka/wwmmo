@@ -246,7 +246,7 @@ public class ApiClient {
      * @param protoBuffFactory
      * @return
      */
-    @SuppressWarnings({"unchecked", "deprecation"}) /* not deprecated on Android */
+    @SuppressWarnings({"unchecked"})
     private static <T> T parseResponseBody(HttpResponse resp, Class<T> protoBuffFactory) {
         HttpEntity entity = resp.getEntity();
         if (entity != null) {

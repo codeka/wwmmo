@@ -216,7 +216,6 @@ public class RequestManager {
             return mResponse;
         }
 
-        @SuppressWarnings("deprecation") /* not deprecated on Android */
         public void close() {
             // make sure we've finished with the entity...
             try {

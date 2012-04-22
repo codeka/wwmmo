@@ -74,7 +74,6 @@ public abstract class ChannelClient {
      * not planning to run on Android, you can use the non-deprecated EntityUtils.consume() method
      * instead.
      */
-    @SuppressWarnings("deprecation")
     private static void consume(HttpEntity entity) {
         // make sure we've finished with the entity...
         try {
