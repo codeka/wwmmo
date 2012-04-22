@@ -108,6 +108,7 @@ def starModelToPb(star_pb, star_model):
 
 
 def empirePresenceModelToPb(presence_pb, presence_model):
+  presence_pb.key = str(presence_model.key())
   presence_pb.empire_key = str(empire_mdl.EmpirePresence.empire.get_value_for_datastore(presence_model))
   presence_pb.star_key = str(empire_mdl.EmpirePresence.star.get_value_for_datastore(presence_model))
   presence_pb.total_goods = presence_model.totalGoods

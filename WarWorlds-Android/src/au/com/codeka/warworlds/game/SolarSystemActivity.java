@@ -9,6 +9,7 @@ import android.view.Window;
 import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import au.com.codeka.RomanNumeralFormatter;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.model.BuildingDesign;
 import au.com.codeka.warworlds.model.BuildingDesignManager;
@@ -39,6 +40,7 @@ public class SolarSystemActivity extends Activity {
 
     public static final int BUILDINGS_DIALOG = 1000;
     public static final int BUILDINGS_CONFIRM_DIALOG = 1001;
+    public static final int FOCUS_DIALOG = 1002;
 
     /** Called when the activity is first created. */
     @Override
@@ -53,6 +55,7 @@ public class SolarSystemActivity extends Activity {
         mSolarSystemSurfaceView = (SolarSystemSurfaceView) findViewById(R.id.solarsystem_view);
         final Button colonizeButton = (Button) findViewById(R.id.solarsystem_colonize);
         final Button buildButton = (Button) findViewById(R.id.solarsystem_colony_build);
+        final Button focusButton = (Button) findViewById(R.id.solarsystem_colony_focus);
 
         EmpireManager empireManager = EmpireManager.getInstance();
         username.setText(empireManager.getEmpire().getDisplayName());
@@ -77,7 +80,14 @@ public class SolarSystemActivity extends Activity {
         buildButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                onBuildClick();
+                showDialog(BUILDINGS_DIALOG);
+            }
+        });
+
+        focusButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showDialog(FOCUS_DIALOG);
             }
         });
     }
@@ -116,6 +126,8 @@ public class SolarSystemActivity extends Activity {
             return new SolarSystemBuildingsDialog(this);
         case BUILDINGS_CONFIRM_DIALOG:
             return new SolarSystemBuildingsConfirmDialog(this);
+        case FOCUS_DIALOG:
+            return new SolarSystemFocusDialog(this);
         }
 
         return super.onCreateDialog(id);
@@ -137,12 +149,17 @@ public class SolarSystemActivity extends Activity {
             dialog.setColony(mColony);
             break;
         }
+        case FOCUS_DIALOG: {
+            SolarSystemFocusDialog dialog = (SolarSystemFocusDialog) d;
+            dialog.setColony(mColony);
+            break;
+        }
         }
 
         super.onPrepareDialog(id, d, args);
     }
 
-    private void refreshStar() {
+    public void refreshStar() {
         String selectedPlanetKey = null;
         Planet selectedPlanet = mSolarSystemSurfaceView.getSelectedPlanet();
         if (selectedPlanet != null) {
@@ -218,8 +235,9 @@ public class SolarSystemActivity extends Activity {
 
         containerView.setVisibility(View.VISIBLE);
 
+        String planetName = mStar.getName()+" "+RomanNumeralFormatter.format(mPlanet.getIndex());
         TextView planetNameTextView = (TextView) findViewById(R.id.solarsystem_planetname);
-        planetNameTextView.setText(mStar.getName()+" "+numberToRomanNumeral(mPlanet.getIndex()));
+        planetNameTextView.setText(planetName);
 
         ProgressBar populationCongenialityProgressBar = (ProgressBar) findViewById(
                 R.id.solarsystem_population_congeniality);
@@ -268,37 +286,33 @@ public class SolarSystemActivity extends Activity {
                         }
                     });
 
-            TextView populationTextView = (TextView) findViewById(
+            ProgressBar populationFocus = (ProgressBar) findViewById(
+                    R.id.solarsystem_colony_population_focus);
+            populationFocus.setProgress((int)(100.0f * mColony.getPopulationFocus()));
+            TextView populationValue = (TextView) findViewById(
                     R.id.solarsystem_colony_population_value);
-            populationTextView.setText(String.format("%d", mColony.getPopulation()));
+            populationValue.setText(String.format("%d", mColony.getPopulation()));
 
-            TextView populationRateTextView = (TextView) findViewById(
-                    R.id.solarsystem_colony_population_rate);
-//            populationRateTextView.setText(String.format("%.2f", mColony.getPopulationRate()));
-            populationRateTextView.setText("todo");
-
-            TextView farmingTextView = (TextView) findViewById(
+            ProgressBar farmingFocus = (ProgressBar) findViewById(
+                    R.id.solarsystem_colony_farming_focus);
+            farmingFocus.setProgress((int)(100.0f * mColony.getFarmingFocus()));
+            TextView farmingValue= (TextView) findViewById(
                     R.id.solarsystem_colony_farming_value);
-//            farmingTextView.setText(String.format("%.1f", mColony.getFarmingRate() * 10.0));
-            farmingTextView.setText("todo");
-        }
-    }
+            farmingValue.setText("todo");
 
-    private static String numberToRomanNumeral(int n) {
-        // TODO: this is dumb..
-        switch (n) {
-        case 0: return "";
-        case 1: return "I";
-        case 2: return "II";
-        case 3: return "III";
-        case 4: return "IV";
-        case 5: return "V";
-        case 6: return "VI";
-        case 7: return "VII";
-        case 8: return "VIII";
-        case 9: return "IX";
-        case 10: return "X";
-        default: return "+++";
+            ProgressBar miningFocus = (ProgressBar) findViewById(
+                    R.id.solarsystem_colony_mining_focus);
+            miningFocus.setProgress((int)(100.0f * mColony.getMiningFocus()));
+            TextView miningValue = (TextView) findViewById(
+                    R.id.solarsystem_colony_mining_value);
+            miningValue.setText("todo");
+
+            ProgressBar constructionFocus = (ProgressBar) findViewById(
+                    R.id.solarsystem_colony_construction_focus);
+            constructionFocus.setProgress((int)(100.0f * mColony.getConstructionFocus()));
+            TextView constructionValue = (TextView) findViewById(
+                    R.id.solarsystem_colony_construction_value);
+            constructionValue.setText("todo");
         }
     }
 
@@ -319,12 +333,5 @@ public class SolarSystemActivity extends Activity {
                 mIsSectorUpdated = true;
             }
         });
-    }
-
-    /**
-     * When you click build, we need to pop up the build window.
-     */
-    private void onBuildClick() {
-        showDialog(BUILDINGS_DIALOG);
     }
 }

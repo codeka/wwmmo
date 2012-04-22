@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.GridLayout
+        xmlns:grid="http://schemas.android.com/apk/res-auto"
+        xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="10dp"
+    grid:useDefaultMargins="true"
+    grid:alignmentMode="alignBounds"
+    grid:columnCount="2">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        grid:layout_columnSpan="2"
+        android:text="@string/solarsystem_focus_instructions" />
+
+    <ImageView
+        android:layout_width="40dp"
+        android:layout_height="20dp"
+        android:paddingLeft="10dp"
+        grid:layout_gravity="center"
+        android:src="@drawable/colony_population_icon" />
+
+    <SeekBar
+        android:id="@+id/solarsystem_colony_population_focus"
+        android:layout_height="wrap_content"
+        grid:layout_gravity="fill_horizontal" />
+
+    <ImageView
+        android:layout_width="40dp"
+        android:layout_height="20dp"
+        android:paddingLeft="10dp"
+        grid:layout_gravity="center"
+        android:src="@drawable/colony_farming_icon" />
+
+    <SeekBar
+        android:id="@+id/solarsystem_colony_farming_focus"
+        android:layout_height="wrap_content"
+        grid:layout_gravity="fill_horizontal" />
+
+    <ImageView
+        android:layout_width="40dp"
+        android:layout_height="20dp"
+        android:paddingLeft="10dp"
+        grid:layout_gravity="center"
+        android:src="@drawable/colony_mining_icon" />
+
+    <SeekBar
+        android:id="@+id/solarsystem_colony_mining_focus"
+        android:layout_height="wrap_content"
+        grid:layout_gravity="fill_horizontal" />
+
+    <ImageView
+        android:layout_width="40dp"
+        android:layout_height="20dp"
+        android:paddingLeft="10dp"
+        grid:layout_gravity="center"
+        android:src="@drawable/colony_construction_icon" />
+
+    <SeekBar
+        android:id="@+id/solarsystem_colony_construction_focus"
+        android:layout_height="wrap_content"
+        grid:layout_gravity="fill_horizontal" />
+
+    <Button
+        android:id="@+id/ok_btn"
+        style="@style/Button"
+        android:layout_width="75dp"
+        grid:layout_columnSpan="2"
+        grid:layout_gravity="right"
+        android:layout_marginRight="20dp"
+        android:text="@string/ok" />
+
+</android.support.v7.widget.GridLayout>

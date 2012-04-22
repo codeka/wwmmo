@@ -35,14 +35,26 @@ public class Colony {
     public float getFarmingFocus() {
         return mFarmingFocus;
     }
+    public void setFarmingFocus(float focus) {
+        mFarmingFocus = focus;
+    }
     public float getConstructionFocus() {
         return mConstructionFocus;
+    }
+    public void setConstructionFocus(float focus) {
+        mConstructionFocus = focus;
     }
     public float getPopulationFocus() {
         return mPopulationFocus;
     }
+    public void setPopulationFocus(float focus) {
+        mPopulationFocus = focus;
+    }
     public float getMiningFocus() {
         return mMiningFocus;
+    }
+    public void setMiningFocus(float focus) {
+        mMiningFocus = focus;
     }
     public Date getLastSimulation() {
         return mLastSimulation;
@@ -68,4 +80,17 @@ public class Colony {
         return c;
     }
 
+    public warworlds.Warworlds.Colony toProtocolBuffer() {
+        return warworlds.Warworlds.Colony.newBuilder()
+            .setKey(getKey())
+            .setPlanetKey(getPlanetKey())
+            .setStarKey(getStarKey())
+            .setEmpireKey(getEmpireKey())
+            .setPopulation(getPopulation())
+            .setFocusPopulation(getPopulationFocus())
+            .setFocusFarming(getFarmingFocus())
+            .setFocusMining(getMiningFocus())
+            .setFocusConstruction(getConstructionFocus())
+            .build();
+    }
 }

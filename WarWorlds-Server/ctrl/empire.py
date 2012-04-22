@@ -98,6 +98,12 @@ def updateColony(colony_key, updated_colony_pb):
   star_pb = sector.getStar(colony_pb.star_key)
   simulate(star_pb, colony_pb.empire_key)
 
+  # Make sure we're updating the colony in the star
+  for cpb in star_pb.colonies:
+    if cpb.key == colony_pb.key:
+      colony_pb = cpb
+      break
+
   # normalize the focus values so that they all add up to 1.0
   focus_total = (updated_colony_pb.focus_population +
                  updated_colony_pb.focus_farming +
@@ -134,7 +140,7 @@ def updateAfterSimulate(star_pb, empire_key):
     if colony_pb.empire_key != empire_key:
       continue
 
-    colony_pb.last_simulation = datetime.now()
+    colony_pb.last_simulation = ctrl.dateTimeToEpoch(datetime.now())
     colony_model = mdl.Colony.get(colony_pb.key)
     ctrl.colonyPbToModel(colony_model, colony_pb)
     colony_model.put()

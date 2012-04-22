@@ -7,6 +7,7 @@
     <string name="cancel">Cancel</string>
     <string name="done">Done</string>
     <string name="build">Build</string>
+    <string name="focus">Focus</string>
 
     <!-- "log_in.xml" layout -->
     <string name="log_in_header">Log In</string>
@@ -38,7 +39,6 @@
     <string name="solarsystem_colonize">Colonize</string>
     <string name="solarsystem_cogeniality_header">Cogeniality</string>
     <string name="solarsystem_colony">Colony</string>
-    <string name="solarsystem_colony_build">Build</string>
 
     <!-- "chat.xml" layout -->
     <string name="chat_global">Global</string>
@@ -49,7 +49,8 @@
     <string name="buildings_existing_title">Colony Buildings</string>
     <string name="buildings_inprogress_title">In Progress</string>
     <string name="solarsystem_building_timetobuild">Time to Build:</string>
-
+    <string name="solarsystem_focus_instructions">Drag the sliders to adjust focus.</string>
+    
     <!-- "global_options.xml" layout -->
     <string name="globalopts_graphics_detail">Detail Level:</string>
     <string name="globalopts_graphics_fast">Fast, Low Detail</string>
