@@ -208,6 +208,9 @@ message Star
 
     // collection of EmpirePresences details the presences of the empire(s) in this solar system.
     repeated EmpirePresence empires = 14;
+
+    // collection of BuildRequests for colonies in this star
+    repeated BuildRequest build_requests = 15;
 }
 
 //
@@ -334,9 +337,14 @@ message Colonies
 //
 message BuildRequest
 {
+    optional string key = 1;
+
     // The key of the colony you're trying to build at. Must have a shipyard to build
     // a ship.
-    required string colony_key = 1;
+    required string colony_key = 2;
+
+    // The empire this build operation belongs to.
+    required string empire_key = 3;
 
     // What are you trying to build? A building or a ship?
     enum BUILD_KIND
@@ -344,14 +352,14 @@ message BuildRequest
         BUILDING = 0;
         SHIP = 1;
     }
-    required BUILD_KIND build_kind = 2;
+    required BUILD_KIND build_kind = 4;
 
     // The name of the design you're trying to build
-    required string design_name = 3;
+    required string design_name = 5;
 
     // The date/time this build request started and the current predicted time of completion
-    optional int64 start_time = 4;
-    optional int64 end_time = 5;
+    optional int64 start_time = 6;
+    optional int64 end_time = 7;
 }
 
 

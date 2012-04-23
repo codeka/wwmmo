@@ -157,6 +157,14 @@ def updateAfterSimulate(star_pb, empire_key):
     empire_model.put()
     # This is never cached separately...
 
+  for build_pb in star_pb.build_requests:
+    if build_pb.empire_key != empire_key:
+      continue
+    build_model = mdl.BuildOperation.get(build_pb.key)
+    ctrl.buildRequestPbToModel(build_model, build_pb)
+    build_model.put()
+  keys_to_clear.append('buildqueue:for-empire:%s' % empire_key)
+
   keys_to_clear.append('star:%s' % star_pb.key)
   ctrl.clearCached(keys_to_clear)
 
@@ -200,23 +208,20 @@ def simulate(star_pb, empire_key=None):
   start_time = ctrl.epochToDateTime(start_time)
   end_time = datetime.now()
 
-  # we may need to adjust the build queue
-  build_queue = getBuildQueueForEmpire(empire_key)
-
   while True:
     step_end_time = start_time + timedelta(minutes=15)
     if step_end_time < end_time:
-      _simulateStep(timedelta(minutes=15), star_pb, empire_key, build_queue)
+      _simulateStep(timedelta(minutes=15), star_pb, empire_key)
       start_time = step_end_time
     else:
       break
 
   dt = end_time - start_time
   if dt.total_seconds() > 0:
-    _simulateStep(dt, star_pb, empire_key, build_queue)
+    _simulateStep(dt, star_pb, empire_key)
 
 
-def _simulateStep(dt, star_pb, empire_key, build_queue):
+def _simulateStep(dt, star_pb, empire_key):
   '''Simulates a single step of the colonies in the star.
 
   The order of simulation needs to be well-defined, so we define it here:
@@ -233,7 +238,6 @@ def _simulateStep(dt, star_pb, empire_key, build_queue):
     star_pb: The star protocol buffer we're simulating.
     empire_key: The key of the empire we're simulating. If None, we'll simulate
         all empires in the starsystem.
-    build_queue: The build queue for the empire (or empires).
   '''
   total_goods = None
   total_minerals = None
@@ -282,7 +286,7 @@ def _simulateStep(dt, star_pb, empire_key, build_queue):
       continue
 
     build_requests = []
-    for build_req in build_queue.requests:
+    for build_req in star_pb.build_requests:
       if build_req.colony_key == colony_pb.key:
         build_requests.append(build_req)
 
@@ -290,37 +294,47 @@ def _simulateStep(dt, star_pb, empire_key, build_queue):
     if len(build_requests) > 0:
       total_workers = colony_pb.population * colony_pb.focus_construction
       workers_per_build_request = total_workers / len(build_requests)
+      logging.debug("Total workers = %d, workers per build request = %d" % (total_workers, workers_per_build_request))
 
       for build_request in build_requests:
         design = BuildingDesign.getDesign(build_request.design_name)
+        logging.debug("Building: %s" % build_request.design_name)
 
         # So the build time the design specifies is the time to build the structure assigning
         # 100 workers are available. Double the workers and you halve the build time. Halve
         # the workers and you double the build time. 
         total_build_time = design.buildTimeSeconds / 3600.0
+        logging.debug("total_build_time(1) = %.4f" % total_build_time)
         total_build_time *= (100.0 / workers_per_build_request)
+        logging.debug("total_build_time(2) = %.4f" % total_build_time)
 
         # Work out how many hours we've spend so far (in hours)
         time_spent = datetime.now() - ctrl.epochToDateTime(build_request.start_time)
         time_spent = time_spent.total_seconds() / 3600.0
+        logging.debug("time_spent = %.4f" % time_spent)
 
         dt_required = dt_in_hours
         if time_spent + dt_required > total_build_time:
           # If we're going to finish on this turn, we only need a fraction of the minerals we'd
           # otherwise use, so make sure dt_required is correct
           dt_required = total_build_time - time_spent
+        logging.debug("dt_required = %.4f" % dt_required)
 
         # work out how many minerals we require for this turn
         minerals_required_per_hour = design.buildCostMinerals / total_build_time
-        minerals_required = minerals_required_per_hour / dt_required
+        minerals_required = minerals_required_per_hour * dt_required
+        logging.debug("minerals_required = %.4f" % minerals_required)
 
         if total_minerals > minerals_required:
           total_minerals -= minerals_required
 
           # adjust the end_time for this turn
-          build_request.end_time = int(build_request.start_time + (time_spent + dt_required) * 3600.0)
+          build_request.end_time = int(build_request.start_time + total_build_time * 3600.0)
           # note if the build request has already finished, we don't actually have to do
           # anything since it'll be fixed up by the tasks/empire/build-check task.
+        else:
+          # if we don't have enough minerals, the end time is essentially infinite
+          build_request.end_time = 0
 
   # Finally, update the population. The first thing we need to do is evenly distribute goods
   # between all of the colonies.
@@ -365,6 +379,7 @@ def _simulateStep(dt, star_pb, empire_key, build_queue):
 
   logging.debug("simulation step: empire=%s dt=%.2f (hrs), delta goods=%.2f, delta minerals=%.2f, population=%.2f" % (
       empire_key, dt_in_hours, total_goods, total_minerals, total_population))
+
 
 def colonize(empire_pb, colonize_request):
   '''Colonizes the planet given in the colonize_request.
@@ -423,13 +438,20 @@ def build(empire_pb, colony_pb, request_pb):
   build_model.star = db.Key(colony_pb.star_key)
   build_model.designName = request_pb.design_name
   build_model.startTime = datetime.now()
-  build_model.endTime = build_model.startTime + timedelta(seconds = design.buildTimeSeconds)
+  build_model.endTime = build_model.startTime + timedelta(seconds=10) # - until we simulate (below)
   build_model.put()
 
-  keys = ['buildqueue:for-empire:%s' % empire_pb.key]
+  keys = ['buildqueue:for-empire:%s' % empire_pb.key,
+          'star:%s' % colony_pb.star_key]
   ctrl.clearCached(keys)
 
-  # Make sure we're going to 
+  # We'll need to re-simulate the star now since this new building will affect the ability to
+  # build other things as well. It'll also let us calculate the exact end time
+  star_pb = sector.getStar(colony_pb.star_key)
+  simulate(star_pb, empire_pb.key)
+  updateAfterSimulate(star_pb, empire_pb.key)
+
+  # Schedule a build check so that we make sure we'll update everybody when this build completes
   scheduleBuildCheck()
 
   ctrl.buildRequestModelToPb(request_pb, build_model)

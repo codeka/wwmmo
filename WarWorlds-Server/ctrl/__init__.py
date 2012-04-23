@@ -139,10 +139,19 @@ def buildingModelToPb(building_pb, building_model):
 
 
 def buildRequestModelToPb(build_pb, build_model):
-  build_pb.colony_key = str(empire_mdl.Building.colony.get_value_for_datastore(build_model))
+  build_pb.key = str(build_model.key())
+  build_pb.colony_key = str(empire_mdl.BuildOperation.colony.get_value_for_datastore(build_model))
+  build_pb.empire_key = str(empire_mdl.BuildOperation.empire.get_value_for_datastore(build_model))
   build_pb.design_name = build_model.designName
+  build_pb.start_time = dateTimeToEpoch(build_model.startTime)
+  build_pb.end_time = dateTimeToEpoch(build_model.endTime)
   build_pb.build_kind = 0
   #build_pb.build_kind = TODO
+
+
+def buildRequestPbToModel(build_model, build_pb):
+  build_model.startTime = epochToDateTime(build_pb.start_time)
+  build_model.endTime = epochToDateTime(build_pb.end_time)
 
 
 def dateTimeToEpoch(dt):

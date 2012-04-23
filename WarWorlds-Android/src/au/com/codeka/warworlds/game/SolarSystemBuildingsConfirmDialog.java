@@ -57,6 +57,7 @@ public class SolarSystemBuildingsConfirmDialog extends Dialog {
                         warworlds.Warworlds.BuildRequest build = warworlds.Warworlds.BuildRequest.newBuilder()
                                 .setBuildKind(warworlds.Warworlds.BuildRequest.BUILD_KIND.BUILDING)
                                 .setColonyKey(mColony.getKey())
+                                .setEmpireKey(mColony.getEmpireKey())
                                 .setDesignName(mDesign.getID())
                                 .build();
                         try {

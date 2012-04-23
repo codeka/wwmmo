@@ -106,6 +106,23 @@ class BuildOperation(db.Model):
   startTime = db.DateTimeProperty()
   endTime = db.DateTimeProperty()
 
+  @staticmethod
+  def getForStar(star_model):
+    query = BuildOperation.all().filter("star", star_model)
+    return BuildOperation._getForQuery(query)
+
+  @staticmethod
+  def getForEmpire(empire):
+    query = BuildOperation.all().filter("empire", empire)
+    return BuildOperation._getForQuery(query)
+
+  @staticmethod
+  def _getForQuery(query):
+    buildops = []
+    for buildop in query:
+      buildops.append(buildop)
+    return buildops
+
 
 class Building(db.Model):
   '''A building represents a structure on a colony that gives it certain bonuses and abilities.'''
