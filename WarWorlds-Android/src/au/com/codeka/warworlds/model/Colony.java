@@ -1,7 +1,9 @@
 package au.com.codeka.warworlds.model;
 
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
+
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 public class Colony {
@@ -14,7 +16,7 @@ public class Colony {
     private float mConstructionFocus;
     private float mPopulationFocus;
     private float mMiningFocus;
-    private Date mLastSimulation;
+    private DateTime mLastSimulation;
     private List<Building> mBuildings;
 
     public String getKey() {
@@ -56,7 +58,7 @@ public class Colony {
     public void setMiningFocus(float focus) {
         mMiningFocus = focus;
     }
-    public Date getLastSimulation() {
+    public DateTime getLastSimulation() {
         return mLastSimulation;
     }
     public List<Building> getBuildings() {
@@ -70,7 +72,7 @@ public class Colony {
         c.mStarKey = pb.getStarKey();
         c.mPopulation = pb.getPopulation();
         c.mEmpireKey = pb.getEmpireKey();
-        c.mLastSimulation = new Date(pb.getLastSimulation() * 1000);
+        c.mLastSimulation = new DateTime(pb.getLastSimulation() * 1000, DateTimeZone.UTC);
         c.mBuildings = new ArrayList<Building>();
         c.mFarmingFocus = pb.getFocusFarming();
         c.mConstructionFocus = pb.getFocusConstruction();

@@ -211,17 +211,17 @@ def simulate(star_pb, empire_key=None):
   while True:
     step_end_time = start_time + timedelta(minutes=15)
     if step_end_time < end_time:
-      _simulateStep(timedelta(minutes=15), star_pb, empire_key)
+      _simulateStep(timedelta(minutes=15), start_time, star_pb, empire_key)
       start_time = step_end_time
     else:
       break
 
   dt = end_time - start_time
   if dt.total_seconds() > 0:
-    _simulateStep(dt, star_pb, empire_key)
+    _simulateStep(dt, start_time, star_pb, empire_key)
 
 
-def _simulateStep(dt, star_pb, empire_key):
+def _simulateStep(dt, now, star_pb, empire_key):
   '''Simulates a single step of the colonies in the star.
 
   The order of simulation needs to be well-defined, so we define it here:
@@ -235,10 +235,14 @@ def _simulateStep(dt, star_pb, empire_key):
   Args:
     dt: A timedelta that represents the time of this step (usually 15 minutes for
         a complete step, but could be a partial step as well).
+    now: A datetime representing the "current" time (that is, the start of the
+        current step) which we can use to determine things like whether a particular
+        build has actually started or not.
     star_pb: The star protocol buffer we're simulating.
     empire_key: The key of the empire we're simulating. If None, we'll simulate
         all empires in the starsystem.
   '''
+  logging.debug("Simulation @ %s" % (now))
   total_goods = None
   total_minerals = None
   total_population = 0
@@ -300,6 +304,14 @@ def _simulateStep(dt, star_pb, empire_key):
         design = BuildingDesign.getDesign(build_request.design_name)
         logging.debug("Building: %s" % build_request.design_name)
 
+        # work out if the building is supposed to be started this timestep or not. Even if it's
+        # scheduled to start this timestep, it may only be scheduled half-way through this time
+        # step (for example) so we need to remember that...
+        startTime = ctrl.epochToDateTime(build_request.start_time)
+        if startTime > (now + dt):
+          logging.debug("Building not scheduled to be started until %s, skipping" % (startTime))
+          continue
+
         # So the build time the design specifies is the time to build the structure assigning
         # 100 workers are available. Double the workers and you halve the build time. Halve
         # the workers and you double the build time. 
@@ -308,8 +320,8 @@ def _simulateStep(dt, star_pb, empire_key):
         total_build_time *= (100.0 / workers_per_build_request)
         logging.debug("total_build_time(2) = %.4f" % total_build_time)
 
-        # Work out how many hours we've spend so far (in hours)
-        time_spent = datetime.now() - ctrl.epochToDateTime(build_request.start_time)
+        # Work out how many hours we've spend so far
+        time_spent = now - ctrl.epochToDateTime(build_request.start_time)
         time_spent = time_spent.total_seconds() / 3600.0
         logging.debug("time_spent = %.4f" % time_spent)
 
@@ -432,6 +444,7 @@ def build(empire_pb, colony_pb, request_pb):
     logging.warn("Asked to build design '%s', which does not exist." % (request_pb.design_name))
     return False
 
+  # Save the initial build model. There's two writes here, once now and once after it
   build_model = mdl.BuildOperation()
   build_model.colony = db.Key(colony_pb.key)
   build_model.empire = db.Key(empire_pb.key)
@@ -441,12 +454,13 @@ def build(empire_pb, colony_pb, request_pb):
   build_model.endTime = build_model.startTime + timedelta(seconds=10) # - until we simulate (below)
   build_model.put()
 
+  # make sure we clear the cache so we get the latest version with the new build
   keys = ['buildqueue:for-empire:%s' % empire_pb.key,
           'star:%s' % colony_pb.star_key]
   ctrl.clearCached(keys)
 
   # We'll need to re-simulate the star now since this new building will affect the ability to
-  # build other things as well. It'll also let us calculate the exact end time
+  # build other things as well. It'll also let us calculate the exact end time of this build.
   star_pb = sector.getStar(colony_pb.star_key)
   simulate(star_pb, empire_pb.key)
   updateAfterSimulate(star_pb, empire_pb.key)
@@ -498,8 +512,14 @@ def scheduleBuildCheck():
     # the build-check to run 5 seconds later (if there's a bunch scheduled at the same time,
     # it's more efficient that way...)
     time = build.endTime + timedelta(seconds=5)
+
+    # TODO: for debugging only...
+    in_two_minutes = datetime.now() + timedelta(minutes=2)
+    if time > in_two_minutes:
+      time = in_two_minutes
+
     logging.info("Scheduling next build-check at %s" % (time))
-    taskqueue.add(queue_name="default",
+    taskqueue.add(queue_name="build",
                   url="/tasks/empire/build-check",
                   method="GET",
                   eta=time)

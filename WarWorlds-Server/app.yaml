@@ -29,10 +29,10 @@ handlers:
   script: mapreduce.main.APP
   login: admin
 
-- url: /api/v1.*
+- url: /api/v1(/.*)?
   script: api_v1.app
 
-- url: /admin.*
+- url: /admin(/.*)?
   script: admin.app
 
 - url: /tasks/sector(/.*)?

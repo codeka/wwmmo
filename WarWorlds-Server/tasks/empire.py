@@ -7,6 +7,7 @@ Created on 14/04/2012
 import webapp2 as webapp
 import tasks
 from model import empire as mdl
+from model import c2dm
 from datetime import datetime, timedelta
 import ctrl
 from ctrl import empire as ctl
@@ -55,9 +56,23 @@ class BuildCheckPage(tasks.TaskPage):
     for building_model in buildings:
       building_model.put()
 
+      design = ctl.BuildingDesign.getDesign(building_model.designName)
+
+      # Send a notification to the player that construction of their building is complete
+      msg = 'Your %s has been built.' % (design.name)
+      logging.debug('Sending message to user [%s] indicating build complete.' % (
+          building_model.empire.user.email()))
+      s = c2dm.Sender()
+      devices = ctrl.getDevicesForUser(building_model.empire.user.email())
+      for device in devices.registrations:
+        s.sendMessage(device.device_registration_id, {"msg": msg})
+      return None
+
       # clear the cached items that reference this building
-      keys_to_clear.append('star:%s' % (building_model.star.key()))
-      keys_to_clear.append('colonies:for-empire:%s' % (build.empire.key()))
+      star_key = mdl.BuildOperation.star.get_value_for_datastore(building_model)
+      empire_key = mdl.BuildOperation.empire.get_value_for_datastore(building_model)
+      keys_to_clear.append('star:%s' % (star_key))
+      keys_to_clear.append('colonies:for-empire:%s' % (empire_key))
 
     ctrl.clearCached(keys_to_clear)
     ctl.scheduleBuildCheck()

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.joda.time.Period;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -245,12 +246,14 @@ public class SolarSystemBuildingsDialog extends Dialog {
             }
 
             row1.setText(design.getName());
-            row2.setText(String.format("56 %%, %.2f hours left",
-                    (float) design.getBuildTimeSeconds() * 0.44f / 3600.0f));
+            Period remainingPeriod = request.getRemainingTime().toPeriod();
+            row2.setText(String.format("%d %%, %d:%d left",
+                    (int) request.getPercentComplete(),
+                    remainingPeriod.getHours(), remainingPeriod.getMinutes()));
 
             row3.setVisibility(View.GONE);
             progress.setVisibility(View.VISIBLE);
-            progress.setProgress(56);
+            progress.setProgress((int) request.getPercentComplete());
 
             return view;
         }

@@ -39,7 +39,7 @@ class ClientLoginTokenFactory:
 class Sender:
   def __init__(self):
     self.auth_email = 'warworlds.app-role@codeka.com.au'
-    self.auth_passwd = 'adv18997' # TODO: store this in a more secure place!!
+    self.auth_passwd = 'wYQ6fdcX' # TODO: store this in a more secure place!!
 
     self.url = 'https://android.apis.google.com/c2dm/send'
     self.token_factory = ClientLoginTokenFactory(self.auth_email, self.auth_passwd)

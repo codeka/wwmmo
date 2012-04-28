@@ -1,6 +1,7 @@
 
 
 from model import empire as empire_mdl
+import model as mdl
 from google.appengine.ext import db
 from google.appengine.api import users
 from google.appengine.api import memcache
@@ -34,6 +35,29 @@ def setCached(mapping):
 def clearCached(keys):
   mc = memcache.Client()
   mc.delete_multi(keys)
+
+
+def deviceRegistrationPbToModel(model, pb):
+  if pb.HasField('key'):
+    model.key = pb.key
+  model.deviceID = pb.device_id
+  model.deviceRegistrationID = pb.device_registration_id
+  model.deviceModel = pb.device_model
+  model.deviceManufacturer = pb.device_manufacturer
+  model.deviceBuild = pb.device_build
+  model.deviceVersion = pb.device_version
+  if pb.user:
+    model.user = users.User(pb.user)
+
+def deviceRegistrationModelToPb(pb, model):
+  pb.key = str(model.key())
+  pb.device_id = model.deviceID
+  pb.device_registration_id = model.deviceRegistrationID
+  pb.device_model = model.deviceModel
+  pb.device_manufacturer = model.deviceManufacturer
+  pb.device_build = model.deviceBuild
+  pb.device_version = model.deviceVersion
+  pb.user = model.user.email()
 
 
 def empireModelToPb(empire_pb, empire_model):
@@ -157,5 +181,35 @@ def buildRequestPbToModel(build_model, build_pb):
 def dateTimeToEpoch(dt):
   return calendar.timegm(dt.timetuple())
 
+
 def epochToDateTime(epoch):
   return datetime.fromtimestamp(epoch)
+
+
+def updateDeviceRegistration(registration_pb, user):
+  registration_model = mdl.DeviceRegistration()
+  deviceRegistrationPbToModel(registration_model, registration_pb)
+
+  # ignore what they said in the PB, we'll set the user to their own user anyway
+  registration_model.user = user
+  registration_model.put()
+
+  deviceRegistrationModelToPb(registration_pb, registration_model)
+  clearCached(['devices:for-user:%s' % (user.user_id())])
+
+
+def getDevicesForUser(user_email):
+  cache_key = 'devices:for-user:%s' % (user_email)
+  logging.debug("Cache key: %s" % (cache_key))
+  devices = getCached([cache_key], pb.DeviceRegistrations)
+  if cache_key in devices:
+    return devices[cache_key]
+
+  devices_mdl = mdl.DeviceRegistration.getByUser(users.User(user_email))
+  devices_pb = pb.DeviceRegistrations()
+  for device_mdl in devices_mdl:
+    device_pb = devices_pb.registrations.add()
+    deviceRegistrationModelToPb(device_pb, device_mdl)
+
+  setCached({cache_key: devices_pb})
+  return devices_pb

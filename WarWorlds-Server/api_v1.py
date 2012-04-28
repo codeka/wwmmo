@@ -12,6 +12,7 @@ import model
 from model import c2dm
 from ctrl import sector
 from ctrl import empire
+import ctrl
 
 from protobufs import protobuf_json, warworlds_pb2 as pb
 from google.protobuf import message
@@ -169,23 +170,20 @@ class DevicesPage(ApiPage):
       self.response.set_status(400)
       return
 
-    registration_model = model.DeviceRegistration()
-    self._pbToModel(registration_model, registration_pb)
-    # ignore what they said in the PB, we'll set the user to their own user anyway
-    registration_model.user = self.user
-    registration_model.put()
-
-    self._modelToPb(registration_pb, registration_model)
-    return registration_pb
+    return ctrl.updateDeviceRegistration(registration_pb, self.user)
 
   def get(self):
     if self.request.get('email') != '':
       # TODO: check that you're an administrator...
-      return self._getDevicesByEmail(int(self.request.get('email')))
+      user = users.User(self.request.get('email'))
+      if user is None:
+        self.response.set_status(404)
+        return
+      return ctrl.getDevicesForUser(user.email())
     else:
       # if you don't pass any parameters, it's like searching for your
       # own device registrations.
-      return self._getDevicesByUser(self.user)
+      return ctrl.getDevicesForUser(self.user.email())
 
   def delete(self, key):
     device = model.DeviceRegistration.get(key)
@@ -195,43 +193,11 @@ class DevicesPage(ApiPage):
         self.response.set_status(403)
         return
       device.delete()
+
+      # TODO: delete should be in the controller itself
+      ctrl.clearCached(['devices:for-user:%s' % (self.user.email())])
     else:
       logging.warn("No device with key [" + key + "] to delete.")
-
-  def _getDevicesByEmail(self, email):
-    user = users.User(email)
-    return self._getDevicesByUser(user)
-
-  def _getDevicesByUser(self, user):
-    data = model.DeviceRegistration.getByUser(user)
-
-    registrations = pb.DeviceRegistrations()
-    for d in data:
-      registration = registrations.registrations.add()
-      self._modelToPb(registration, d)
-    return registrations
-
-  def _pbToModel(self, model, pb):
-    if pb.HasField('key'):
-      model.key = pb.key
-    model.deviceID = pb.device_id
-    model.deviceRegistrationID = pb.device_registration_id
-    model.deviceModel = pb.device_model
-    model.deviceManufacturer = pb.device_manufacturer
-    model.deviceBuild = pb.device_build
-    model.deviceVersion = pb.device_version
-    if pb.user:
-      model.user = users.User(pb.user)
-
-  def _modelToPb(self, pb, model):
-    pb.key = str(model.key())
-    pb.device_id = model.deviceID
-    pb.device_registration_id = model.deviceRegistrationID
-    pb.device_model = model.deviceModel
-    pb.device_manufacturer = model.deviceManufacturer
-    pb.device_build = model.deviceBuild
-    pb.device_version = model.deviceVersion
-    pb.user = model.user.email()
 
 
 class DeviceMessagesPage(ApiPage):
@@ -246,9 +212,9 @@ class DeviceMessagesPage(ApiPage):
       return
 
     s = c2dm.Sender()
-    devices = model.DeviceRegistration.getByUser(user)
-    for device in devices:
-      s.sendMessage(device.deviceRegistrationID, {"msg": msg.message})
+    devices = ctrl.getDevicesForUser(user.email())
+    for device in devices.registrations:
+      s.sendMessage(device.device_registration_id, {"msg": msg.message})
     return None
 
 

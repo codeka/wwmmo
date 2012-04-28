@@ -4,7 +4,7 @@
 <pydev_project>
 <pydev_variables_property name="org.python.pydev.PROJECT_VARIABLE_SUBSTITUTION">
 <key>GOOGLE_APP_ENGINE</key>
-<value>/home/dean/software/appengine-1.6.3-python</value>
+<value>/home/dean/software/appengine-1.6.5-python</value>
 </pydev_variables_property>
 <pydev_pathproperty name="org.python.pydev.PROJECT_SOURCE_PATH">
 <path>/WarWorlds-Server</path>
@@ -29,8 +29,8 @@
 <path>${GOOGLE_APP_ENGINE}/lib/simplejson</path>
 <path>${GOOGLE_APP_ENGINE}/lib/sqlcmd</path>
 <path>${GOOGLE_APP_ENGINE}/lib/webapp2</path>
-<path>${GOOGLE_APP_ENGINE}/lib/webob</path>
 <path>${GOOGLE_APP_ENGINE}/lib/yaml/lib</path>
+<path>${GOOGLE_APP_ENGINE}/lib/webob_1_1_1</path>
 </pydev_pathproperty>
 <pydev_property name="org.python.pydev.PYTHON_PROJECT_VERSION">python 2.7</pydev_property>
 <pydev_property name="org.python.pydev.PYTHON_PROJECT_INTERPRETER">Default</pydev_property>

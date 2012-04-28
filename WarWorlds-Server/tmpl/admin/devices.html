@@ -43,7 +43,7 @@
 		$("#find-devices input[type=submit]").click(function(evnt) {
 			evnt.preventDefault();
 			$.ajax({
-				url: "/api/v1/devices?user="+$("#search-email").val(),
+				url: "/api/v1/devices?email="+$("#search-email").val(),
 				dataType: "json",
 				success: function (data) {
 					var html = "", tmpl = $("#search-results-tmpl");
