@@ -56,10 +56,12 @@
             android:text="@string/start_game" />
 
         <TextView
-            android:id="@+id/debug_info"
+            android:id="@+id/connection_status"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_above="@id/start_game_btn" />
+            android:layout_above="@id/start_game_btn"
+            android:gravity="center" />
+
     </RelativeLayout>
 
 </LinearLayout>

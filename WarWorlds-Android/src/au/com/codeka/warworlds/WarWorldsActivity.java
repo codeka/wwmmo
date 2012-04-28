@@ -13,10 +13,12 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;
 import android.widget.Button;
+import android.widget.TextView;
 import au.com.codeka.warworlds.api.ApiClient;
 import au.com.codeka.warworlds.api.ApiException;
 import au.com.codeka.warworlds.ctrl.TransparentWebView;
@@ -34,6 +36,8 @@ public class WarWorldsActivity extends Activity {
     private static Logger log = LoggerFactory.getLogger(WarWorldsActivity.class);
     private Context mContext = this;
     private Button mStartGameButton;
+    private TextView mConnectionStatus;
+    private Handler mHandler;
 
     private static final int OPTIONS_DIALOG = 1000;
 
@@ -44,6 +48,8 @@ public class WarWorldsActivity extends Activity {
 
         Util.loadProperties(mContext, this);
         Authenticator.configure(mContext);
+
+        mHandler = new Handler();
 
         requestWindowFeature(Window.FEATURE_NO_TITLE); // remove the title bar
         setHomeScreenContent();
@@ -76,9 +82,14 @@ public class WarWorldsActivity extends Activity {
      * 
      * @param motd The \c WebView we'll install the MOTD to.
      */
-    private void sayHello(final TransparentWebView motdView) {
-        final ProgressDialog pleaseWaitDialog = ProgressDialog.show(mContext, null, 
-                "Connecting...", true);
+    private void sayHello(final TransparentWebView motdView, final int retries) {
+
+        mStartGameButton.setEnabled(false);
+        if (retries == 0) {
+            mConnectionStatus.setText("Connecting...");
+        } else {
+            mConnectionStatus.setText(String.format("Retrying (#%d)...", retries+1));
+        }
 
         // if we've saved off the authentication cookie, cool!
         SharedPreferences prefs = Util.getSharedPreferences(mContext);
@@ -134,7 +145,8 @@ public class WarWorldsActivity extends Activity {
                 BuildingDesignManager.getInstance().setup();
                 BuildQueueManager.getInstance().setup();
 
-                pleaseWaitDialog.dismiss();
+                mConnectionStatus.setText("Connected");
+                mStartGameButton.setEnabled(true);
                 if (mNeedsEmpireSetup) {
                     startActivity(new Intent(mContext, EmpireSetupActivity.class));
                 } else {
@@ -142,7 +154,16 @@ public class WarWorldsActivity extends Activity {
                 }
 
                 if (mErrorOccured) {
+                    mConnectionStatus.setText("Connection Failed");
                     mStartGameButton.setEnabled(false);
+
+                    // if there's an error, try again in a few seconds
+                    mHandler.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            sayHello(motdView, retries+1);
+                        }
+                    }, 3000);
                 }
             }
         }.execute();
@@ -152,11 +173,11 @@ public class WarWorldsActivity extends Activity {
         setContentView(R.layout.home);
 
         mStartGameButton = (Button) findViewById(R.id.start_game_btn);
+        mConnectionStatus = (TextView) findViewById(R.id.connection_status);
         final Button logOutButton = (Button) findViewById(R.id.log_out_btn);
         final Button optionsButton = (Button) findViewById(R.id.options_btn);
 
         final TransparentWebView motd = (TransparentWebView) findViewById(R.id.home_motd);
-        sayHello(motd);
 
         logOutButton.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
@@ -176,5 +197,7 @@ public class WarWorldsActivity extends Activity {
                 startActivity(new Intent(mContext, StarfieldActivity.class));
             }
         });
+
+        sayHello(motd, 0);
     }
 }
