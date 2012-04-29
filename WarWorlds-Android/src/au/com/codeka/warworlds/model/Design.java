@@ -14,6 +14,7 @@ public class Design {
     protected int mBuildCost;
     protected int mBuildTimeSeconds;
     protected String mIconUrl;
+    protected DesignKind mDesignKind;
 
     public String getID() {
         return mID;
@@ -30,8 +31,38 @@ public class Design {
     public int getBuildTimeSeconds() {
         return mBuildTimeSeconds;
     }
+    public DesignKind getDesignKind() {
+        return mDesignKind;
+    }
     public String getIconUrl() {
         return mIconUrl;
+    }
+
+    /**
+     * The values here should be kept in sync with with the BuildRequest.BUILD_KIND protocol buffer.
+     */
+    public enum DesignKind {
+        BUILDING(1),
+        SHIP(2);
+
+        private int mValue;
+        DesignKind(int value) {
+            mValue = value;
+        }
+
+        public int getValue() {
+            return mValue;
+        }
+
+        public static DesignKind fromInt(int value) {
+            for (DesignKind dk : DesignKind.values()) {
+                if (dk.getValue() == value) {
+                    return dk;
+                }
+            }
+            
+            return DesignKind.BUILDING; //??
+        }
     }
 
     public abstract static class Factory {

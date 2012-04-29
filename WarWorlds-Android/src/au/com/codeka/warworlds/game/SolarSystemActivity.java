@@ -14,12 +14,15 @@ import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.model.BuildingDesign;
 import au.com.codeka.warworlds.model.BuildingDesignManager;
 import au.com.codeka.warworlds.model.Colony;
+import au.com.codeka.warworlds.model.Design;
 import au.com.codeka.warworlds.model.Empire;
 import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.EmpirePresence;
 import au.com.codeka.warworlds.model.ModelManager;
+import au.com.codeka.warworlds.model.Design.DesignKind;
 import au.com.codeka.warworlds.model.ModelManager.StarFetchedHandler;
 import au.com.codeka.warworlds.model.Planet;
+import au.com.codeka.warworlds.model.ShipDesignManager;
 import au.com.codeka.warworlds.model.Star;
 
 /**
@@ -39,7 +42,7 @@ public class SolarSystemActivity extends Activity {
     private Colony mColony;
 
     public static final int BUILD_DIALOG = 1000;
-    public static final int BUILDINGS_CONFIRM_DIALOG = 1001;
+    public static final int BUILD_CONFIRM_DIALOG = 1001;
     public static final int FOCUS_DIALOG = 1002;
 
     /** Called when the activity is first created. */
@@ -124,8 +127,8 @@ public class SolarSystemActivity extends Activity {
         switch(id) {
         case BUILD_DIALOG:
             return new SolarSystemBuildDialog(this);
-        case BUILDINGS_CONFIRM_DIALOG:
-            return new SolarSystemBuildingsConfirmDialog(this);
+        case BUILD_CONFIRM_DIALOG:
+            return new SolarSystemBuildConfirmDialog(this);
         case FOCUS_DIALOG:
             return new SolarSystemFocusDialog(this);
         }
@@ -136,11 +139,21 @@ public class SolarSystemActivity extends Activity {
     @Override
     protected void onPrepareDialog(int id, Dialog d, Bundle args) {
         switch(id) {
-        case BUILDINGS_CONFIRM_DIALOG: {
-            SolarSystemBuildingsConfirmDialog dialog = (SolarSystemBuildingsConfirmDialog) d;
-            String designID = args.getString("au.com.codeka.warworlds.BuildingID", "");
-            BuildingDesign design = BuildingDesignManager.getInstance().getDesign(designID);
-            dialog.setBuildingDesign(design);
+        case BUILD_CONFIRM_DIALOG: {
+            SolarSystemBuildConfirmDialog dialog = (SolarSystemBuildConfirmDialog) d;
+            String designID = args.getString("au.com.codeka.warworlds.DesignID", "");
+            DesignKind dk = DesignKind.fromInt(args.getInt("au.com.codeka.warworlds.DesignKind",
+                                               DesignKind.BUILDING.getValue()));
+
+            // TODO: this could be encapsulated in the DesignManager base class....
+            Design design;
+            if (dk == DesignKind.BUILDING) {
+                design = BuildingDesignManager.getInstance().getDesign(designID);
+            } else {
+                design = ShipDesignManager.getInstance().getDesign(designID);
+            }
+
+            dialog.setDesign(design);
             dialog.setColony(mColony);
             break;
         }

@@ -11,6 +11,7 @@ public class BuildingDesign extends Design {
 
         public BuildingDesign get() {
             BuildingDesign design = new BuildingDesign();
+            design.mDesignKind = Design.DesignKind.BUILDING;
             this.populateDesign(design);
             return design;
         }

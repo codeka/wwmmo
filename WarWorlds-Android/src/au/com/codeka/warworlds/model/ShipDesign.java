@@ -10,6 +10,7 @@ public class ShipDesign extends Design {
 
         public ShipDesign get() {
             ShipDesign design = new ShipDesign();
+            design.mDesignKind = Design.DesignKind.SHIP;
             this.populateDesign(design);
             return design;
         }

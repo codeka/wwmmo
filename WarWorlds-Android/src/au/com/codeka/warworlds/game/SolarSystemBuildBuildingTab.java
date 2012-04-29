@@ -83,8 +83,9 @@ public class SolarSystemBuildBuildingTab implements SolarSystemBuildDialog.Tab {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Bundle args = new Bundle();
                 BuildingDesign design = (BuildingDesign) mDesignListAdapter.getItem(position);
-                args.putString("au.com.codeka.warworlds.BuildingID", design.getID());
-                mActivity.showDialog(SolarSystemActivity.BUILDINGS_CONFIRM_DIALOG, args);
+                args.putString("au.com.codeka.warworlds.DesignID", design.getID());
+                args.putInt("au.com.codeka.warworlds.DesignKind", design.getDesignKind().getValue());
+                mActivity.showDialog(SolarSystemActivity.BUILD_CONFIRM_DIALOG, args);
             }
         });
 

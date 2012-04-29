@@ -347,10 +347,11 @@ message BuildRequest
     required string empire_key = 3;
 
     // What are you trying to build? A building or a ship?
+    // The values here should be in sync with com.codeka.warworlds.model.Design.DesignKind.
     enum BUILD_KIND
     {
-        BUILDING = 0;
-        SHIP = 1;
+        BUILDING = 1;
+        SHIP = 2;
     }
     required BUILD_KIND build_kind = 4;
 

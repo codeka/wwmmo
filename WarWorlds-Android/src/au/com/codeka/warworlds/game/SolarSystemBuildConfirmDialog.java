@@ -21,16 +21,17 @@ import au.com.codeka.warworlds.api.ApiException;
 import au.com.codeka.warworlds.ctrl.TransparentWebView;
 import au.com.codeka.warworlds.model.BuildQueueManager;
 import au.com.codeka.warworlds.model.BuildRequest;
-import au.com.codeka.warworlds.model.BuildingDesign;
 import au.com.codeka.warworlds.model.BuildingDesignManager;
 import au.com.codeka.warworlds.model.Colony;
+import au.com.codeka.warworlds.model.Design;
+import au.com.codeka.warworlds.model.ShipDesignManager;
 
-public class SolarSystemBuildingsConfirmDialog extends Dialog {
+public class SolarSystemBuildConfirmDialog extends Dialog {
     private static Logger log = LoggerFactory.getLogger(WarWorldsActivity.class);
     private Colony mColony;
-    private BuildingDesign mDesign;
+    private Design mDesign;
 
-    public SolarSystemBuildingsConfirmDialog(SolarSystemActivity activity) {
+    public SolarSystemBuildConfirmDialog(SolarSystemActivity activity) {
         super(activity);
     }
 
@@ -88,7 +89,7 @@ public class SolarSystemBuildingsConfirmDialog extends Dialog {
         mColony = colony;
     }
 
-    public void setBuildingDesign(BuildingDesign design) {
+    public void setDesign(Design design) {
         mDesign = design;
 
         TextView nameTextView = (TextView) findViewById(R.id.building_name);
@@ -96,7 +97,12 @@ public class SolarSystemBuildingsConfirmDialog extends Dialog {
         TransparentWebView descriptionWebView = (TransparentWebView) findViewById(R.id.building_description);
 
         nameTextView.setText(design.getName());
-        Bitmap bm = BuildingDesignManager.getInstance().getDesignIcon(design);
+        Bitmap bm;
+        if (design.getDesignKind() == Design.DesignKind.BUILDING) {
+            bm = BuildingDesignManager.getInstance().getDesignIcon(design);
+        } else {
+            bm = ShipDesignManager.getInstance().getDesignIcon(design);
+        }
         iconImageView.setImageBitmap(bm);
 
         descriptionWebView.loadHtml("html/building-description-template.html", design.getDescription());

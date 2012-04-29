@@ -64,7 +64,8 @@ public class SolarSystemBuildShipTab implements SolarSystemBuildDialog.Tab {
                 Bundle args = new Bundle();
                 ShipDesign design = (ShipDesign) mShipDesignListAdapter.getItem(position);
                 args.putString("au.com.codeka.warworlds.DesignID", design.getID());
-                //mActivity.showDialog(SolarSystemActivity.BUILDINGS_CONFIRM_DIALOG, args);
+                args.putInt("au.com.codeka.warworlds.DesignKind", design.getDesignKind().getValue());
+                mActivity.showDialog(SolarSystemActivity.BUILD_CONFIRM_DIALOG, args);
             }
         });
 
