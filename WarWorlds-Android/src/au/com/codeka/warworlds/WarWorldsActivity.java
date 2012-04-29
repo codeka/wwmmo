@@ -27,6 +27,7 @@ import au.com.codeka.warworlds.model.BuildingDesignManager;
 import au.com.codeka.warworlds.model.ChatManager;
 import au.com.codeka.warworlds.model.Empire;
 import au.com.codeka.warworlds.model.EmpireManager;
+import au.com.codeka.warworlds.model.ShipDesignManager;
 
 /**
  * Main activity. Displays the message of the day and lets you select "Start Game", "Options", etc.
@@ -150,6 +151,7 @@ public class WarWorldsActivity extends Activity {
             @Override
             protected void onPostExecute(String result) {
                 BuildingDesignManager.getInstance().setup();
+                ShipDesignManager.getInstance().setup();
                 BuildQueueManager.getInstance().setup();
 
                 mConnectionStatus.setText("Connected");

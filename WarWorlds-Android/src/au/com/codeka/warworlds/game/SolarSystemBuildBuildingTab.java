@@ -24,6 +24,8 @@ import au.com.codeka.warworlds.model.Building;
 import au.com.codeka.warworlds.model.BuildingDesign;
 import au.com.codeka.warworlds.model.BuildingDesignManager;
 import au.com.codeka.warworlds.model.Colony;
+import au.com.codeka.warworlds.model.Design;
+import au.com.codeka.warworlds.model.DesignManager;
 
 /**
  * Handles the "Building" tab of the \c SolarSystemBuildDialog.
@@ -90,7 +92,7 @@ public class SolarSystemBuildBuildingTab implements SolarSystemBuildDialog.Tab {
         existingBuildingsList.setAdapter(mBuildingListAdapter);
 
         // make sure we're aware of any changes to the designs
-        BuildingDesignManager.getInstance().addDesignsChangedListener(new BuildingDesignManager.DesignsChangedListener() {
+        BuildingDesignManager.getInstance().addDesignsChangedListener(new DesignManager.DesignsChangedListener() {
             @Override
             public void onDesignsChanged() {
                 mDesignListAdapter.setDesigns(BuildingDesignManager.getInstance().getDesigns());
@@ -175,8 +177,11 @@ public class SolarSystemBuildBuildingTab implements SolarSystemBuildDialog.Tab {
     private class BuildingDesignListAdapter extends BaseAdapter {
         private List<BuildingDesign> mDesigns;
 
-        public void setDesigns(Map<String, BuildingDesign> designs) {
-            mDesigns = new ArrayList<BuildingDesign>(designs.values());
+        public void setDesigns(Map<String, Design> designs) {
+            mDesigns = new ArrayList<BuildingDesign>();
+            for (Design d : designs.values()) {
+                mDesigns.add((BuildingDesign) d);
+            }
             notifyDataSetChanged();
         }
 

@@ -1,6 +1,6 @@
 <?xml version="1.0" ?>
-<buildings>
-  <building id="shipyard">
+<designs>
+  <design id="shipyard">
     <name>Shipyard</name>
     <icon>/data/buildings/shipyard.png</icon>
     <description><![CDATA[
@@ -9,8 +9,8 @@
       ships available to you can be upgraded with the building of supporting buildings.</p>
     ]]></description>
     <cost credits="250" minerals="300" time="2.4" />
-  </building>
-  <building id="silo">
+  </design>
+  <design id="silo">
     <name>Silo</name>
     <icon>/data/buildings/lighthouse.png</icon>
     <description><![CDATA[
@@ -19,8 +19,8 @@
       can build as many as you like.</p>
     ]]></description>
     <cost credits="100" minerals="400" time="0.5" />
-  </building>
-  <building id="research">
+  </design>
+  <design id="research">
     <name>Research Laboratory</name>
     <icon>/data/buildings/science-institute.png</icon>
     <description><![CDATA[
@@ -28,5 +28,5 @@
       building, the more advanced research becomes available.</p>
     ]]></description>
     <cost credits="100" minerals="1000" time="0.75" />
-  </building>
-</buildings>
+  </design>
+</designs>

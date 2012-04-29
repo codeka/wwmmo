@@ -48,6 +48,7 @@ public class SolarSystemBuildDialog extends Dialog {
 
         mTabManager = new TabManager(tabHost);
         mTabManager.addTab(new SolarSystemBuildBuildingTab(this, mActivity));
+        mTabManager.addTab(new SolarSystemBuildShipTab(this, mActivity));
         mTabManager.addTab(new SolarSystemBuildQueueTab(this, mActivity));
     }
 
