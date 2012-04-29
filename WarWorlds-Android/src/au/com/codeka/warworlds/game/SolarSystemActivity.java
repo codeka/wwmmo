@@ -38,7 +38,7 @@ public class SolarSystemActivity extends Activity {
     private Planet mPlanet;
     private Colony mColony;
 
-    public static final int BUILDINGS_DIALOG = 1000;
+    public static final int BUILD_DIALOG = 1000;
     public static final int BUILDINGS_CONFIRM_DIALOG = 1001;
     public static final int FOCUS_DIALOG = 1002;
 
@@ -80,7 +80,7 @@ public class SolarSystemActivity extends Activity {
         buildButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                showDialog(BUILDINGS_DIALOG);
+                showDialog(BUILD_DIALOG);
             }
         });
 
@@ -122,8 +122,8 @@ public class SolarSystemActivity extends Activity {
     @Override
     protected Dialog onCreateDialog(int id) {
         switch(id) {
-        case BUILDINGS_DIALOG:
-            return new SolarSystemBuildingsDialog(this);
+        case BUILD_DIALOG:
+            return new SolarSystemBuildDialog(this);
         case BUILDINGS_CONFIRM_DIALOG:
             return new SolarSystemBuildingsConfirmDialog(this);
         case FOCUS_DIALOG:
@@ -144,8 +144,8 @@ public class SolarSystemActivity extends Activity {
             dialog.setColony(mColony);
             break;
         }
-        case BUILDINGS_DIALOG: {
-            SolarSystemBuildingsDialog dialog = (SolarSystemBuildingsDialog) d;
+        case BUILD_DIALOG: {
+            SolarSystemBuildDialog dialog = (SolarSystemBuildDialog) d;
             dialog.setColony(mColony);
             break;
         }

@@ -11,26 +11,10 @@
         android:layout_height="match_parent">
 
         <au.com.codeka.warworlds.ctrl.HorizontalSeparator
-            android:id="@+id/buildings_inprogress_title"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentTop="true"
-            android:text="@string/buildings_inprogress_title" />
-
-        <ListView
-            android:id="@+id/buildings_inprogress"
-            android:layout_width="match_parent"
-            android:layout_height="64dp"
-            android:layout_alignParentLeft="true"
-            android:layout_below="@id/buildings_inprogress_title" />
-
-        <au.com.codeka.warworlds.ctrl.HorizontalSeparator
             android:id="@+id/buildings_available_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
-            android:layout_below="@id/buildings_inprogress"
             android:text="@string/buildings_available_title" />
 
         <ListView

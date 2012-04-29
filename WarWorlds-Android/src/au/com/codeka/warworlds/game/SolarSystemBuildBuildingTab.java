@@ -4,20 +4,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.joda.time.Period;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import android.app.Dialog;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewGroup.LayoutParams;
-import android.view.Window;
-import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
@@ -25,37 +20,51 @@ import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import au.com.codeka.warworlds.R;
-import au.com.codeka.warworlds.model.BuildQueueManager;
-import au.com.codeka.warworlds.model.BuildRequest;
 import au.com.codeka.warworlds.model.Building;
 import au.com.codeka.warworlds.model.BuildingDesign;
 import au.com.codeka.warworlds.model.BuildingDesignManager;
 import au.com.codeka.warworlds.model.Colony;
 
-public class SolarSystemBuildingsDialog extends Dialog {
-    private static Logger log = LoggerFactory.getLogger(SolarSystemBuildingsDialog.class);
-    private SolarSystemActivity mActivity;
-    private Colony mColony;
+/**
+ * Handles the "Building" tab of the \c SolarSystemBuildDialog.
+ */
+public class SolarSystemBuildBuildingTab implements SolarSystemBuildDialog.Tab {
+    private static Logger log = LoggerFactory.getLogger(SolarSystemBuildBuildingTab.class);
     private BuildingDesignListAdapter mDesignListAdapter;
     private BuildingListAdapter mBuildingListAdapter;
-    private BuildQueueListAdapter mBuildQueueListAdapter;
+    private SolarSystemActivity mActivity;
+    private Colony mColony;
+    private View mView;
 
-    public SolarSystemBuildingsDialog(SolarSystemActivity activity) {
-        super(activity);
+    SolarSystemBuildBuildingTab(SolarSystemBuildDialog dialog, SolarSystemActivity activity) {
         mActivity = activity;
     }
 
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    public View getView() {
+        if (mView == null)
+            setup();
+        return mView;
+    }
 
-        requestWindowFeature(Window.FEATURE_NO_TITLE);
-        setContentView(R.layout.solarsystem_buildings);
+    public String getTitle() {
+        return "Buildings";
+    }
 
-        WindowManager.LayoutParams params = getWindow().getAttributes();
-        params.height = LayoutParams.MATCH_PARENT;
-        params.width = LayoutParams.MATCH_PARENT;
-        getWindow().setAttributes(params);
+    public void setColony(Colony colony) {
+        mColony = colony;
+
+        if (mBuildingListAdapter != null && mColony != null) {
+            mBuildingListAdapter.setBuildings(mColony.getBuildings());
+        }
+    }
+
+    /**
+     * Sets up the view and returns the \c View object that we want to use in this tab.
+     */
+    private void setup() {
+        LayoutInflater inflater = (LayoutInflater) mActivity.getSystemService
+                (Context.LAYOUT_INFLATER_SERVICE);
+        mView = inflater.inflate(R.layout.solarsystem_build_buildings_tab, null);
 
         mDesignListAdapter = new BuildingDesignListAdapter();
         mDesignListAdapter.setDesigns(BuildingDesignManager.getInstance().getDesigns());
@@ -65,12 +74,7 @@ public class SolarSystemBuildingsDialog extends Dialog {
             mBuildingListAdapter.setBuildings(mColony.getBuildings());
         }
 
-        mBuildQueueListAdapter = new BuildQueueListAdapter();
-        if (mColony != null) {
-            mBuildQueueListAdapter.setBuildQueue(BuildQueueManager.getInstance().getBuildQueueForColony(mColony));
-        }
-
-        ListView availableDesignsList = (ListView) findViewById(R.id.buildings_available);
+        ListView availableDesignsList = (ListView) mView.findViewById(R.id.buildings_available);
         availableDesignsList.setAdapter(mDesignListAdapter);
         availableDesignsList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -82,11 +86,8 @@ public class SolarSystemBuildingsDialog extends Dialog {
             }
         });
 
-        ListView existingBuildingsList = (ListView) findViewById(R.id.buildings_existing);
+        ListView existingBuildingsList = (ListView) mView.findViewById(R.id.buildings_existing);
         existingBuildingsList.setAdapter(mBuildingListAdapter);
-
-        ListView buildQueueList = (ListView) findViewById(R.id.buildings_inprogress);
-        buildQueueList.setAdapter(mBuildQueueListAdapter);
 
         // make sure we're aware of any changes to the designs
         BuildingDesignManager.getInstance().addDesignsChangedListener(new BuildingDesignManager.DesignsChangedListener() {
@@ -95,30 +96,9 @@ public class SolarSystemBuildingsDialog extends Dialog {
                 mDesignListAdapter.setDesigns(BuildingDesignManager.getInstance().getDesigns());
                 if (mColony != null) {
                     mBuildingListAdapter.setBuildings(mColony.getBuildings());
-                    mBuildQueueListAdapter.setBuildQueue(BuildQueueManager.getInstance().getBuildQueueForColony(mColony));
                 }
             }
         });
-
-        // make sure we're aware of changes to the build queue
-        BuildQueueManager.getInstance().addBuildQueueUpdatedListener(new BuildQueueManager.BuildQueueUpdatedListener() {
-            @Override
-            public void onBuildQueueUpdated(List<BuildRequest> queue) {
-                if (mColony != null) {
-                    mBuildQueueListAdapter.setBuildQueue(BuildQueueManager.getInstance().getBuildQueueForColony(mColony));
-                }
-            }
-        });
-    }
-
-    public void setColony(Colony colony) {
-        mColony = colony;
-        if (mBuildingListAdapter != null && mColony != null) {
-            mBuildingListAdapter.setBuildings(mColony.getBuildings());
-        }
-        if (mBuildQueueListAdapter != null && mColony != null) {
-            mBuildQueueListAdapter.setBuildQueue(BuildQueueManager.getInstance().getBuildQueueForColony(mColony));
-        }
     }
 
     /**
@@ -158,7 +138,7 @@ public class SolarSystemBuildingsDialog extends Dialog {
             if (view == null) {
                 LayoutInflater inflater = (LayoutInflater) mActivity.getSystemService
                         (Context.LAYOUT_INFLATER_SERVICE);
-                view = (ViewGroup) inflater.inflate(R.layout.solarsystem_buildings_design, null);
+                view = inflater.inflate(R.layout.solarsystem_buildings_design, null);
             }
 
             ImageView icon = (ImageView) view.findViewById(R.id.building_icon);
@@ -184,76 +164,6 @@ public class SolarSystemBuildingsDialog extends Dialog {
             progress.setVisibility(View.GONE);
             row3.setText(String.format("Upgrade: $ %d, %.2f hours", design.getBuildCost(),
                     (float) design.getBuildTimeSeconds() / 3600.0f));
-
-            return view;
-        }
-    }
-
-
-    /**
-     * This adapter is used to populate the list of buildings that are currently in progress.
-     */
-    private class BuildQueueListAdapter extends BaseAdapter {
-        private List<BuildRequest> mQueue;
-
-        public void setBuildQueue(List<BuildRequest> queue) {
-            mQueue = queue;
-            notifyDataSetChanged();
-        }
-
-        @Override
-        public int getCount() {
-            if (mQueue == null)
-                return 0;
-            return mQueue.size();
-        }
-
-        @Override
-        public Object getItem(int position) {
-            if (mQueue == null)
-                return null;
-            return mQueue.get(position);
-        }
-
-        @Override
-        public long getItemId(int position) {
-            return position;
-        }
-
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            View view = convertView;
-            if (view == null) {
-                LayoutInflater inflater = (LayoutInflater) mActivity.getSystemService
-                        (Context.LAYOUT_INFLATER_SERVICE);
-                view = (ViewGroup) inflater.inflate(R.layout.solarsystem_buildings_design, null);
-            }
-
-            ImageView icon = (ImageView) view.findViewById(R.id.building_icon);
-            TextView row1 = (TextView) view.findViewById(R.id.building_row1);
-            TextView row2 = (TextView) view.findViewById(R.id.building_row2);
-            TextView row3 = (TextView) view.findViewById(R.id.building_row3);
-            ProgressBar progress = (ProgressBar) view.findViewById(R.id.building_progress);
-
-            BuildRequest request = mQueue.get(position);
-            BuildingDesign design = request.getBuildingDesign();
-
-            Bitmap bm = BuildingDesignManager.getInstance().getDesignIcon(design);
-            if (bm != null) {
-                icon.setImageBitmap(bm);
-            } else {
-                icon.setImageBitmap(null);
-            }
-
-            row1.setText(design.getName());
-            Period remainingPeriod = request.getRemainingTime().toPeriod();
-            row2.setText(String.format("%d %%, %d:%d left",
-                    (int) request.getPercentComplete(),
-                    remainingPeriod.getHours(), remainingPeriod.getMinutes()));
-
-            row3.setVisibility(View.GONE);
-            progress.setVisibility(View.VISIBLE);
-            progress.setProgress((int) request.getPercentComplete());
 
             return view;
         }
@@ -295,7 +205,7 @@ public class SolarSystemBuildingsDialog extends Dialog {
             if (view == null) {
                 LayoutInflater inflater = (LayoutInflater) mActivity.getSystemService
                         (Context.LAYOUT_INFLATER_SERVICE);
-                view = (ViewGroup) inflater.inflate(R.layout.solarsystem_buildings_design, null);
+                view = inflater.inflate(R.layout.solarsystem_buildings_design, null);
             }
 
             ImageView icon = (ImageView) view.findViewById(R.id.building_icon);
@@ -322,4 +232,5 @@ public class SolarSystemBuildingsDialog extends Dialog {
             return view;
         }
     }
+
 }

@@ -7,7 +7,6 @@ import org.slf4j.LoggerFactory;
 import warworlds.Warworlds.Hello;
 import android.app.Activity;
 import android.app.Dialog;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -95,7 +94,9 @@ public class WarWorldsActivity extends Activity {
         SharedPreferences prefs = Util.getSharedPreferences(mContext);
         final String accountName = prefs.getString("AccountName", null);
         if (accountName == null) {
-            // TODO error!
+            // You're not logged in... how did we get this far anyway?
+            startActivity(new Intent(this, AccountsActivity.class));
+            return;
         }
 
         new AsyncTask<Void, Void, String>() {
@@ -111,7 +112,13 @@ public class WarWorldsActivity extends Activity {
                 // say hello to the server
                 String message;
                 try {
-                    String url = "hello/"+DeviceRegistrar.getDeviceRegistrationKey(mContext);
+                    String deviceRegistrationKey = DeviceRegistrar.getDeviceRegistrationKey(mContext);
+                    if (deviceRegistrationKey.length() == 0) {
+                        mErrorOccured = true;
+                        message = "<p>Your device was not registered... for some reason.</p>";
+                        return message;
+                    }
+                    String url = "hello/"+deviceRegistrationKey;
                     Hello hello = ApiClient.putProtoBuf(url, null, Hello.class);
                     if (hello == null) {
                         // Usually this happens on the dev server when we've just cleared the

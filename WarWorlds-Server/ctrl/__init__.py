@@ -196,7 +196,7 @@ def updateDeviceRegistration(registration_pb, user):
 
   deviceRegistrationModelToPb(registration_pb, registration_model)
   clearCached(['devices:for-user:%s' % (user.user_id())])
-
+  return registration_pb
 
 def getDevicesForUser(user_email):
   cache_key = 'devices:for-user:%s' % (user_email)
