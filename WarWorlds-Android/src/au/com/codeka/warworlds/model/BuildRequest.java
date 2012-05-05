@@ -50,12 +50,6 @@ public class BuildRequest {
         }
         return new Interval(now, mEndTime).toDuration();
     }
-    public BuildingDesign getBuildingDesign() {
-        if (mBuildKind != BuildKind.BUILDING) {
-            throw new IllegalArgumentException("Cannot getBuildingDesign when BuildKind != BUILDING");
-        }
-        return BuildingDesignManager.getInstance().getDesign(mDesignName);
-    }
     public String getColonyKey() {
         return mColonyKey;
     }
@@ -70,9 +64,10 @@ public class BuildRequest {
         return request;
     }
 
+    // The value of BuildKind needs to be kept in sync with WarWorlds.proto's BUILD_KIND enum.
     public enum BuildKind {
-        BUILDING(0),
-        SHIP(1);
+        BUILDING(1),
+        SHIP(2);
 
         private int mValue;
 

@@ -55,8 +55,15 @@ public class SolarSystemBuildConfirmDialog extends Dialog {
                 new AsyncTask<Void, Void, BuildRequest>() {
                     @Override
                     protected BuildRequest doInBackground(Void... arg0) {
+                        warworlds.Warworlds.BuildRequest.BUILD_KIND kind;
+                        if (mDesign.getDesignKind() == Design.DesignKind.BUILDING) {
+                            kind = warworlds.Warworlds.BuildRequest.BUILD_KIND.BUILDING;
+                        } else {
+                            kind = warworlds.Warworlds.BuildRequest.BUILD_KIND.SHIP;
+                        }
+                        
                         warworlds.Warworlds.BuildRequest build = warworlds.Warworlds.BuildRequest.newBuilder()
-                                .setBuildKind(warworlds.Warworlds.BuildRequest.BUILD_KIND.BUILDING)
+                                .setBuildKind(kind)
                                 .setColonyKey(mColony.getKey())
                                 .setEmpireKey(mColony.getEmpireKey())
                                 .setDesignName(mDesign.getID())

@@ -103,6 +103,7 @@ class BuildOperation(db.Model):
   empire = db.ReferenceProperty(Empire)
   star = db.ReferenceProperty(sector.Star)
   designName = db.StringProperty()
+  designKind = db.IntegerProperty()
   startTime = db.DateTimeProperty()
   endTime = db.DateTimeProperty()
 

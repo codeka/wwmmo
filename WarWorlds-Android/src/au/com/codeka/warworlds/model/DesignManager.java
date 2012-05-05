@@ -26,6 +26,13 @@ public abstract class DesignManager {
     private SortedMap<String, Design> mDesigns;
     private SortedMap<String, Bitmap> mDesignIcons;
 
+    public static DesignManager getInstance(BuildRequest.BuildKind buildKind) {
+        if (buildKind == BuildRequest.BuildKind.BUILDING)
+            return BuildingDesignManager.getInstance();
+        else
+            return ShipDesignManager.getInstance();
+    }
+
     /**
      * This should be called at the beginning of the game to initialize the
      * design manager. We download the list of designs, parse them and set up the

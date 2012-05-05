@@ -301,7 +301,7 @@ def _simulateStep(dt, now, star_pb, empire_key):
       logging.debug("Total workers = %d, workers per build request = %d" % (total_workers, workers_per_build_request))
 
       for build_request in build_requests:
-        design = BuildingDesign.getDesign(build_request.design_name)
+        design = Design.getDesign(build_request.build_kind, build_request.design_name)
         logging.debug("Building: %s" % build_request.design_name)
 
         # work out if the building is supposed to be started this timestep or not. Even if it's
@@ -439,7 +439,7 @@ def build(empire_pb, colony_pb, request_pb):
     colony_pb: The colony where the request has been made.
     request_pb: A BuildRequest protobuf with details of the build request.
   '''
-  design = BuildingDesign.getDesign(request_pb.design_name)
+  design = Design.getDesign(request_pb.build_kind, request_pb.design_name)
   if not design:
     logging.warn("Asked to build design '%s', which does not exist." % (request_pb.design_name))
     return False
@@ -450,6 +450,7 @@ def build(empire_pb, colony_pb, request_pb):
   build_model.empire = db.Key(empire_pb.key)
   build_model.star = db.Key(colony_pb.star_key)
   build_model.designName = request_pb.design_name
+  build_model.designKind = request_pb.build_kind
   build_model.startTime = datetime.now()
   build_model.endTime = build_model.startTime + timedelta(seconds=10) # - until we simulate (below)
   build_model.put()
@@ -525,15 +526,21 @@ def scheduleBuildCheck():
                   eta=time)
 
 
-class BuildingDesign(object):
+class Design(object):
+  @staticmethod
+  def getDesign(kind, name):
+    if kind == pb.BuildRequest.BUILDING:
+      return BuildingDesign.getDesign(name)
+    else:
+      return ShipDesign.getDesign(name)
+
+
+class BuildingDesign(Design):
   _parsedDesigns = None
 
   @staticmethod
   def getDesigns():
-    '''Gets all of the building templates that are available to be built.
-
-    We'll parse the /static/data/buildings.xml file, which contains all of the data about buildings
-    that players can build.'''
+    '''Gets all of the building designs, which we populate from the data/buildings.xml file.'''
     if not BuildingDesign._parsedDesigns:
       BuildingDesign._parsedDesigns = _parseBuildingDesigns()
     return BuildingDesign._parsedDesigns
@@ -546,27 +553,72 @@ class BuildingDesign(object):
       return None
     return designs[designId]
 
+
+class ShipDesign(Design):
+  _parsedDesigns = None
+
+  @staticmethod
+  def getDesigns():
+    '''Gets all of the ship designs, which we populate from the data/ships.xml file.'''
+    if not ShipDesign._parsedDesigns:
+      ShipDesign._parsedDesigns = _parseShipDesigns()
+    return ShipDesign._parsedDesigns
+
+  @staticmethod
+  def getDesign(designId):
+    '''Gets the design with the given ID, or None if none exists.'''
+    designs = ShipDesign.getDesigns()
+    if designId not in designs:
+      return None
+    return designs[designId]
+
+
 def _parseBuildingDesigns():
-  '''Parses the /static/data/buildings.xml file and returns a list of BuildingDesign objects.'''
+  '''Parses the /data/buildings.xml file and returns a list of BuildingDesign objects.'''
   filename = os.path.join(os.path.dirname(__file__), "../data/buildings.xml")
   logging.debug("Parsing %s" % (filename))
   designs = {}
   xml = ET.parse(filename)
-  for buildingXml in xml.iterfind("building"):
-    design = _parseBuildingDesign(buildingXml)
+  for designXml in xml.iterfind("design"):
+    design = _parseBuildingDesign(designXml)
     designs[design.id] = design
   return designs
 
-def _parseBuildingDesign(buildingXml):
-  '''Parses a single <building> from the buildings.xml file.'''
+
+def _parseShipDesigns():
+  '''Parses the /data/ships.xml file and returns a list of ShipDesign objects.'''
+  filename = os.path.join(os.path.dirname(__file__), "../data/ships.xml")
+  logging.debug("Parsing %s" % (filename))
+  designs = {}
+  xml = ET.parse(filename)
+  for designXml in xml.iterfind("design"):
+    design = _parseShipDesign(designXml)
+    designs[design.id] = design
+  return designs
+
+
+def _parseBuildingDesign(designXml):
+  '''Parses a single <design> from the buildings.xml file.'''
   design = BuildingDesign()
-  logging.debug("Parsing <building id=\"%s\">" % (buildingXml.get("id")))
-  design.id = buildingXml.get("id")
-  design.name = buildingXml.findtext("name")
-  design.description = buildingXml.findtext("description")
-  design.icon = buildingXml.findtext("icon")
-  costXml = buildingXml.find("cost")
+  logging.debug("Parsing building <design id=\"%s\">" % (designXml.get("id")))
+  _parseDesign(designXml, design)
+  return design
+
+
+def _parseShipDesign(designXml):
+  '''Parses a single <design> from the ships.xml file.'''
+  design = ShipDesign()
+  logging.debug("Parsing ship <design id=\"%s\">" % (designXml.get("id")))
+  _parseDesign(designXml, design)
+  return design
+
+
+def _parseDesign(designXml, design):
+  design.id = designXml.get("id")
+  design.name = designXml.findtext("name")
+  design.description = designXml.findtext("description")
+  design.icon = designXml.findtext("icon")
+  costXml = designXml.find("cost")
   design.buildCost = costXml.get("credits")
   design.buildTimeSeconds = float(costXml.get("time")) * 3600
   design.buildCostMinerals = float(costXml.get("minerals"))
-  return design

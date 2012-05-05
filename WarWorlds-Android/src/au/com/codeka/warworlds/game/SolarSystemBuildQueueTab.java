@@ -17,9 +17,11 @@ import android.widget.TextView;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.model.BuildQueueManager;
 import au.com.codeka.warworlds.model.BuildRequest;
-import au.com.codeka.warworlds.model.BuildingDesign;
 import au.com.codeka.warworlds.model.BuildingDesignManager;
 import au.com.codeka.warworlds.model.Colony;
+import au.com.codeka.warworlds.model.Design;
+import au.com.codeka.warworlds.model.DesignManager;
+import au.com.codeka.warworlds.model.ShipDesignManager;
 
 public class SolarSystemBuildQueueTab implements SolarSystemBuildDialog.Tab {
     private SolarSystemActivity mActivity;
@@ -67,6 +69,14 @@ public class SolarSystemBuildQueueTab implements SolarSystemBuildDialog.Tab {
 
         // make sure we're aware of any changes to the designs
         BuildingDesignManager.getInstance().addDesignsChangedListener(new BuildingDesignManager.DesignsChangedListener() {
+            @Override
+            public void onDesignsChanged() {
+                if (mColony != null) {
+                    mBuildQueueListAdapter.setBuildQueue(BuildQueueManager.getInstance().getBuildQueueForColony(mColony));
+                }
+            }
+        });
+        ShipDesignManager.getInstance().addDesignsChangedListener(new ShipDesignManager.DesignsChangedListener() {
             @Override
             public void onDesignsChanged() {
                 if (mColony != null) {
@@ -132,9 +142,10 @@ public class SolarSystemBuildQueueTab implements SolarSystemBuildDialog.Tab {
             ProgressBar progress = (ProgressBar) view.findViewById(R.id.building_progress);
 
             BuildRequest request = mQueue.get(position);
-            BuildingDesign design = request.getBuildingDesign();
+            DesignManager dm = DesignManager.getInstance(request.getBuildKind());
+            Design design = dm.getDesign(request.getDesignName());
 
-            Bitmap bm = BuildingDesignManager.getInstance().getDesignIcon(design);
+            Bitmap bm = dm.getDesignIcon(design);
             if (bm != null) {
                 icon.setImageBitmap(bm);
             } else {
