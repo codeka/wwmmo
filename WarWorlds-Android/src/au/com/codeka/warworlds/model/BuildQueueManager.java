@@ -93,6 +93,11 @@ public class BuildQueueManager {
                     return null;
                 }
 
+                if (buildQueue == null) {
+                    log.error("Could not fetch the current build queue, check for server errors.");
+                    return null;
+                }
+
                 List<BuildRequest> queue = new ArrayList<BuildRequest>();
                 for(int i = 0; i < buildQueue.getRequestsCount(); i++) {
                     warworlds.Warworlds.BuildRequest pb = buildQueue.getRequests(i);

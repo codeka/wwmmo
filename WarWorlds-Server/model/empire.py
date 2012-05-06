@@ -164,3 +164,28 @@ class EmpirePresence(db.Model):
     for presence in query:
       presences.append(presence)
     return presences
+
+
+class Fleet(db.Model):
+  '''Represents a fleet of ships.'''
+  empire = db.ReferenceProperty(Empire)
+  designName = db.StringProperty()
+  numShips = db.IntegerProperty()
+  state = db.IntegerProperty()
+  stateStartTime = db.DateTimeProperty()
+  star = db.ReferenceProperty(sector.Star)
+  destinationStar = db.ReferenceProperty(sector.Star, collection_name='incoming_fleet_set')
+  targetFleet = db.SelfReferenceProperty()
+  targetColony = db.ReferenceProperty(Colony)
+
+  @staticmethod
+  def getForStar(star):
+    query = Fleet.all().filter("star", star)
+    return Fleet._getForQuery(query)
+
+  @staticmethod
+  def _getForQuery(query):
+    fleets = []
+    for fleet in query:
+      fleets.append(fleet)
+    return fleets

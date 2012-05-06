@@ -13,6 +13,7 @@ import ctrl
 from ctrl import empire as ctl
 from google.appengine.ext import db
 import logging
+import protobufs.warworlds_pb2 as pb
 
 
 class BuildCheckPage(tasks.TaskPage):
@@ -22,55 +23,80 @@ class BuildCheckPage(tasks.TaskPage):
     We need to confirm that the build is actually complete, set up the building or ship with the
     empire that built it, and then reschedule ourselves for the next build.
     '''
-    def _tx(build_key):
-      build = mdl.BuildOperation.get(build_key)
-      if not build:
+    def _fetchOperationInTX(oper_key):
+      '''This is done in a transaction to make sure only one request processes the build.'''
+      oper_model = mdl.BuildOperation.get(oper_key)
+      if not oper_model:
         return None
+
+      # and now we're done with this operation
+      oper_model.delete()
+      return oper_model
+
+    def _updateFleetInTX(starKey, empireKey, designName):
+      '''Checks if there's already a fleet for this star/design and updates it or creates a new one.'''
+      keyName = str(starKey)+":"+str(empireKey)+":"+designName
+      fleet_model = mdl.Fleet.get_by_key_name(keyName)
+      if not fleet_model:
+        fleet_model = mdl.Fleet(key_name=keyName)
+        fleet_model.empire = empireKey
+        fleet_model.star = starKey
+        fleet_model.designName = designName
+        fleet_model.numShips = 0
+        fleet_model.state = pb.Fleet.IDLE
+        fleet_model.stateStartTime = datetime.now()
+
+      fleet_model.numShips += 1
+      fleet_model.put()
+      return fleet_model
+
+    # Fetch the keys outside of the transaction, cause we can't do that in a TX
+    operations = []
+    query = mdl.BuildOperation.all().filter("endTime <", datetime.now() + timedelta(seconds=10))
+    for oper in query:
+      operation = db.run_in_transaction(_fetchOperationInTX, oper.key())
+      if operation:
+        operations.append(operation)
+
+    keys_to_clear = []
+    for oper_model in operations:
 
       # OK, this build operation is complete (or will complete in the next 10 seconds -- close
       # enough) so we need to make sure the building/ship itself is added to the empire.
-      colony_key = mdl.BuildOperation.colony.get_value_for_datastore(build)
-      empire_key = mdl.BuildOperation.empire.get_value_for_datastore(build)
-      star_key = mdl.BuildOperation.star.get_value_for_datastore(build)
+      colony_key = mdl.BuildOperation.colony.get_value_for_datastore(oper_model)
+      empire_key = mdl.BuildOperation.empire.get_value_for_datastore(oper_model)
+      star_key = mdl.BuildOperation.star.get_value_for_datastore(oper_model)
       logging.info("Build for empire \"%s\" complete." % (empire_key))
-      building_model = mdl.Building()
-      building_model.colony = colony_key
-      building_model.empire = empire_key
-      building_model.star = star_key
-      building_model.designName = build.designName
-      building_model.buildTime = datetime.now()
-
-      # and now we're done with this operation
-      build.delete()
-      return building_model
-
-    # Fetch the keys outside of the transaction, cause we can't do that in a TX
-    buildings = []
-    query = mdl.BuildOperation.all().filter("endTime <", datetime.now() + timedelta(seconds=10))
-    for build in query:
-      building_model = db.run_in_transaction(_tx, build.key())
-      if building_model:
-        buildings.append(building_model)
-
-    keys_to_clear = []
-    for building_model in buildings:
-      building_model.put()
-
-      design = ctl.BuildingDesign.getDesign(building_model.designName)
+      if oper_model.designKind == pb.BuildRequest.BUILDING:
+        model = mdl.Building()
+        model.colony = colony_key
+        model.empire = empire_key
+        model.star = star_key
+        model.designName = oper_model.designName
+        model.buildTime = datetime.now()
+        model.put()
+        design = ctl.BuildingDesign.getDesign(model.designName)
+      else:
+        # if it's not a building, it must be a ship. We need to check whether there's
+        # already a fleet with the same design and append to that instead of creating
+        # a new one
+        model = db.run_in_transaction(_updateFleetInTX,
+                                      star_key,
+                                      empire_key,
+                                      oper_model.designName)
+        design = ctl.ShipDesign.getDesign(model.designName)
 
       # Send a notification to the player that construction of their building is complete
       msg = 'Your %s has been built.' % (design.name)
       logging.debug('Sending message to user [%s] indicating build complete.' % (
-          building_model.empire.user.email()))
+          model.empire.user.email()))
       s = c2dm.Sender()
-      devices = ctrl.getDevicesForUser(building_model.empire.user.email())
+      devices = ctrl.getDevicesForUser(model.empire.user.email())
       for device in devices.registrations:
         s.sendMessage(device.device_registration_id, {"msg": msg})
       return None
 
-      # clear the cached items that reference this building
-      star_key = mdl.BuildOperation.star.get_value_for_datastore(building_model)
-      empire_key = mdl.BuildOperation.empire.get_value_for_datastore(building_model)
+      # clear the cached items that reference this building/fleet
       keys_to_clear.append('star:%s' % (star_key))
       keys_to_clear.append('colonies:for-empire:%s' % (empire_key))
 

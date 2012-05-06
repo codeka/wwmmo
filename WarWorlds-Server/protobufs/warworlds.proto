@@ -387,3 +387,45 @@ message Building
     // The name of the design of this building (defined in data/buildings.xml)
     required string design_name = 3;
 }
+
+
+//
+// A fleet represents one or more ships of the same(?) design.
+//
+message Fleet
+{
+    // The unique key for this fleet
+    required string key = 1;
+
+    // The key of the empire who owns this fleet
+    required string empire_key = 2;
+
+    // The name of the ship design of the ship(s) in this fleet
+    optional string design_name = 3;
+
+    // The number of ships in this fleet.
+    optional int32 num_ships = 4;
+
+    // The current state of the fleet: idle == orbiting a star, moving == moving
+    // between stars, attacking == attacking an enemy fleet, colony, etc
+    enum FLEET_STATE
+    {
+        IDLE = 1;
+        MOVING = 2;
+        ATTACKING = 3;
+    }
+    optional FLEET_STATE state = 5;
+
+    // The time this fleet was moved into the current state (used to determine things like
+    // distance between planets when moving, etc)
+    optional int64 state_start_time = 6;
+
+    // The star this fleet is associated with. If moving, star_key is the star we're moving
+    // FROM and destination_star_key is the star we're moving TO.
+    optional string star_key = 7;
+    optional string desination_star_key = 8;
+
+    // If in attacking state, this is the target fleet or colony we're attacking
+    optional string target_fleet_key = 9;
+    optional string target_colony_key = 10;
+}

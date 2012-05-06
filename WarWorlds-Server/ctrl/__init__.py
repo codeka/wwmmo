@@ -10,11 +10,15 @@ import time
 from datetime import datetime
 import logging
 import protobufs.warworlds_pb2 as pb
+from google.protobuf.message import Message
 
 
 def getCached(keys, ProtoBuffClass):
   mc = memcache.Client()
   values = mc.get_multi(keys, for_cas=True)
+  if ProtoBuffClass is None:
+    return values
+
   real_values = {}
   for key in values:
     real_value = ProtoBuffClass()
@@ -26,7 +30,10 @@ def getCached(keys, ProtoBuffClass):
 def setCached(mapping):
   serialized_mapping = {}
   for key in mapping:
-    serialized_mapping[key] = mapping[key].SerializeToString()
+    if isinstance(mapping[key], Message):
+      serialized_mapping[key] = mapping[key].SerializeToString()
+    else:
+      serialized_mapping[key] = mapping[key]
 
   mc = memcache.Client()
   mc.set_multi(serialized_mapping)
@@ -175,6 +182,24 @@ def buildRequestModelToPb(build_pb, build_model):
 def buildRequestPbToModel(build_model, build_pb):
   build_model.startTime = epochToDateTime(build_pb.start_time)
   build_model.endTime = epochToDateTime(build_pb.end_time)
+
+
+def fleetModelToPb(fleet_pb, fleet_model):
+  fleet_pb.key = str(fleet_model.key())
+  fleet_pb.empire_key = fleet_model.empire
+  fleet_pb.design_name = fleet_model.designName
+  fleet_pb.num_ships = fleet_model.numShips
+  fleet_pb.state = fleet_model.state
+  fleet_pb.state_start_time = dateTimeToEpoch(fleet_model.stateStartTime)
+  fleet_pb.star_key = str(empire_mdl.Fleet.star.get_value_for_datastore(fleet_model))
+  fleet_pb.destination_star_key = str(empire_mdl.Fleet.destinationStar.get_value_for_datastore(fleet_model))
+  fleet_pb.target_fleet_key = str(empire_mdl.Fleet.targetFleet.get_value_for_datastore(fleet_model))
+  fleet_pb.target_colony_key = str(empire_mdl.Fleet.targetColony.get_value_for_datastore(fleet_model))
+
+
+def fleetPbToModel(fleet_model, fleet_pb):
+  #TODO
+  pass
 
 
 def dateTimeToEpoch(dt):
