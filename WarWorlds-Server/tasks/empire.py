@@ -14,6 +14,7 @@ from ctrl import empire as ctl
 from google.appengine.ext import db
 import logging
 import protobufs.warworlds_pb2 as pb
+import os
 
 
 class BuildCheckPage(tasks.TaskPage):
@@ -23,6 +24,7 @@ class BuildCheckPage(tasks.TaskPage):
     We need to confirm that the build is actually complete, set up the building or ship with the
     empire that built it, and then reschedule ourselves for the next build.
     '''
+
     def _fetchOperationInTX(oper_key):
       '''This is done in a transaction to make sure only one request processes the build.'''
       oper_model = mdl.BuildOperation.get(oper_key)
@@ -33,22 +35,13 @@ class BuildCheckPage(tasks.TaskPage):
       oper_model.delete()
       return oper_model
 
-    def _updateFleetInTX(starKey, empireKey, designName):
-      '''Checks if there's already a fleet for this star/design and updates it or creates a new one.'''
-      keyName = str(starKey)+":"+str(empireKey)+":"+designName
-      fleet_model = mdl.Fleet.get_by_key_name(keyName)
-      if not fleet_model:
-        fleet_model = mdl.Fleet(key_name=keyName)
-        fleet_model.empire = empireKey
-        fleet_model.star = starKey
-        fleet_model.designName = designName
-        fleet_model.numShips = 0
-        fleet_model.state = pb.Fleet.IDLE
-        fleet_model.stateStartTime = datetime.now()
-
-      fleet_model.numShips += 1
-      fleet_model.put()
-      return fleet_model
+    def _incrShipCountInTX(fleet_key):
+      fleet_model = mdl.Fleet.get(fleet_key)
+      if fleet_model.state == pb.Fleet.IDLE:
+        fleet_model.numShips += 1
+        fleet_model.put()
+        return True
+      return False
 
     # Fetch the keys outside of the transaction, cause we can't do that in a TX
     operations = []
@@ -77,13 +70,27 @@ class BuildCheckPage(tasks.TaskPage):
         model.put()
         design = ctl.BuildingDesign.getDesign(model.designName)
       else:
-        # if it's not a building, it must be a ship. We need to check whether there's
-        # already a fleet with the same design and append to that instead of creating
-        # a new one
-        model = db.run_in_transaction(_updateFleetInTX,
-                                      star_key,
-                                      empire_key,
-                                      oper_model.designName)
+        # if it's not a building, it must be a ship. We'll try to find a fleet that'll
+        # work, but if we can't it's not a big deal -- just create a new one. Duplicates
+        # don't hurt all that much (TODO: confirm)
+        query = mdl.Fleet.all().filter("star", star_key).filter("empire", empire_key)
+        done = False
+        for fleet_model in query:
+          if (fleet_model.designName == oper_model.designName and
+              fleet_model.state == pb.Fleet.IDLE):
+            if db.run_in_transaction(_incrShipCountInTX, fleet_model.key()):
+              done = True
+              model = fleet_model
+              break
+        if not done:
+          model = mdl.Fleet()
+          model.empire = empire_key
+          model.star = star_key
+          model.designName = oper_model.designName
+          model.numShips = 1
+          model.state = pb.Fleet.IDLE
+          model.stateStartTime = datetime.now()
+          model.put()
         design = ctl.ShipDesign.getDesign(model.designName)
 
       # Send a notification to the player that construction of their building is complete
@@ -106,5 +113,5 @@ class BuildCheckPage(tasks.TaskPage):
     self.response.write("Success!")
 
 app = webapp.WSGIApplication([('/tasks/empire/build-check', BuildCheckPage)],
-                             debug=False)
+                             debug=os.environ['SERVER_SOFTWARE'].startswith('Development'))
 

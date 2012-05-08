@@ -119,7 +119,13 @@ public class RequestManager {
                     request = new BasicHttpRequest(method, requestUrl);
                 }
 
-                request.addHeader("Host", uri.getHost());
+                String host = uri.getHost();
+                if ((uri.getScheme().equals("http") && uri.getPort() != 80) ||
+                        (uri.getScheme().equals("https") && uri.getPort() != 443)) {
+                    host += ":"+uri.getPort();
+                }
+                request.addHeader("Host", host);
+
                 if (extraHeaders != null) {
                     for(String headerName : extraHeaders.keySet()) {
                         for(String headerValue : extraHeaders.get(headerName)) {

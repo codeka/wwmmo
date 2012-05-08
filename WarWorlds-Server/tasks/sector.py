@@ -14,6 +14,8 @@ import logging
 import math
 import random
 import webapp2 as webapp
+import os
+
 
 # This is used to choose a star type at a given point in the map.
 _starTypeBonuses = [30, 40, 50, 40, 30, 0, 0]
@@ -331,7 +333,7 @@ class ExpandUniversePage(tasks.TaskPage):
 
 app = webapp.WSGIApplication([('/tasks/sector/generate/([0-9-]+),([0-9-]+)', GeneratePage),
                               ('/tasks/sector/expand-universe', ExpandUniversePage)],
-                             debug=False)
+                             debug=os.environ['SERVER_SOFTWARE'].startswith('Development'))
 
 
 

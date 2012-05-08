@@ -151,4 +151,4 @@ app = webapp.WSGIApplication([('/admin', DashboardPage),
                               ('/admin/devices', DevicesPage),
                               ('/admin/debug/starfield', DebugStarfieldPage),
                               ('/admin/debug/data-store', DebugDataStorePage)],
-                             debug=True)
+                             debug=os.environ['SERVER_SOFTWARE'].startswith('Development'))

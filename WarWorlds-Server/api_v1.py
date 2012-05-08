@@ -13,6 +13,7 @@ from model import c2dm
 from ctrl import sector
 from ctrl import empire
 import ctrl
+import os
 
 from protobufs import protobuf_json, warworlds_pb2 as pb
 from google.protobuf import message
@@ -363,4 +364,4 @@ app = ApiApplication([('/api/v1/hello/([^/]+)', HelloPage),
                       ('/api/v1/colonies', ColoniesPage),
                       ('/api/v1/colonies/([^/]+)', ColoniesPage),
                       ('/api/v1/buildqueue', BuildQueuePage)],
-                     debug=True)
+                     debug=os.environ['SERVER_SOFTWARE'].startswith('Development'))
