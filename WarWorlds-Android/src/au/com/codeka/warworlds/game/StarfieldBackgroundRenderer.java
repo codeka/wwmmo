@@ -36,7 +36,7 @@ public class StarfieldBackgroundRenderer {
 
     public StarfieldBackgroundRenderer(Context context) {
         mContext = context;
-        mPixelScale = context.getResources().getDisplayMetrics().density * 0.75f;
+        mPixelScale = context.getResources().getDisplayMetrics().density;
         initialize();
 
         GlobalOptions.addOptionsChangedListener(new GlobalOptions.OptionsChangedListener() {

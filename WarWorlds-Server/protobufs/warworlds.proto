@@ -211,6 +211,9 @@ message Star
 
     // collection of BuildRequests for colonies in this star
     repeated BuildRequest build_requests = 15;
+
+    // List of fleets located in this star
+    repeated Fleet fleets = 16;
 }
 
 //
@@ -423,7 +426,7 @@ message Fleet
     // The star this fleet is associated with. If moving, star_key is the star we're moving
     // FROM and destination_star_key is the star we're moving TO.
     optional string star_key = 7;
-    optional string desination_star_key = 8;
+    optional string destination_star_key = 8;
 
     // If in attacking state, this is the target fleet or colony we're attacking
     optional string target_fleet_key = 9;

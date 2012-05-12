@@ -1,5 +1,6 @@
 package au.com.codeka.warworlds.game;
 
+import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.slf4j.Logger;
@@ -17,6 +18,8 @@ import android.util.AttributeSet;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import au.com.codeka.Point2D;
+import au.com.codeka.warworlds.R;
+import au.com.codeka.warworlds.model.Colony;
 import au.com.codeka.warworlds.model.Planet;
 import au.com.codeka.warworlds.model.Star;
 
@@ -33,6 +36,7 @@ public class SolarSystemSurfaceView extends UniverseElementSurfaceView {
     private Paint mSunPaint;
     private Paint mPlanetPaint;
     private Paint mSelectedPlanetPaint;
+    private Bitmap mColonyIcon;
     private CopyOnWriteArrayList<OnPlanetSelectedListener> mPlanetSelectedListeners;
     private StarfieldBackgroundRenderer mBackgroundRenderer;
     private float mPixelScale;
@@ -46,7 +50,7 @@ public class SolarSystemSurfaceView extends UniverseElementSurfaceView {
         mPlanetSelectedListeners = new CopyOnWriteArrayList<OnPlanetSelectedListener>();
 
         mBackgroundRenderer = new StarfieldBackgroundRenderer(context);
-        mPixelScale = context.getResources().getDisplayMetrics().density * 0.75f;
+        mPixelScale = context.getResources().getDisplayMetrics().density;
 
         int[] colours = { Color.YELLOW, Color.YELLOW, 0x00000000 };
         float[] positions = { 0.0f, 0.4f, 1.0f };
@@ -63,6 +67,8 @@ public class SolarSystemSurfaceView extends UniverseElementSurfaceView {
         mSelectedPlanetPaint = new Paint();
         mSelectedPlanetPaint.setARGB(255, 255, 255, 255);
         mSelectedPlanetPaint.setStyle(Style.STROKE);
+
+        mColonyIcon = BitmapFactory.decodeResource(getResources(), R.drawable.starfield_colony);
     }
 
     public void setStar(Star star) {
@@ -199,6 +205,18 @@ public class SolarSystemSurfaceView extends UniverseElementSurfaceView {
                         (float) planetInfo.centre.getX() - (bm.getWidth() / 2.0f),
                         (float) planetInfo.centre.getY() - (bm.getHeight() / 2.0f),
                         mPlanetPaint);
+            }
+
+            List<Colony> colonies = mStar.getColonies();
+            if (colonies != null && !colonies.isEmpty()) {
+                for (Colony colony : colonies) {
+                    if (colony.getPlanetKey().equals(mPlanetInfos[i].planet.getKey())) {
+                        canvas.drawBitmap(mColonyIcon,
+                                (float) (planetInfo.centre.getX() + mColonyIcon.getWidth()),
+                                (float) (planetInfo.centre.getY() - mColonyIcon.getHeight()),
+                                mPlanetPaint);
+                    }
+                }
             }
         }
 

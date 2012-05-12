@@ -51,7 +51,7 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
         mStarSelectedListeners = new CopyOnWriteArrayList<OnStarSelectedListener>();
         mSelectedStar = null;
         mColonyIcon = BitmapFactory.decodeResource(getResources(), R.drawable.starfield_colony);
-        mPixelScale = context.getResources().getDisplayMetrics().density * 0.75f;
+        mPixelScale = context.getResources().getDisplayMetrics().density;
 
         mSelectionPaint = new Paint();
         mSelectionPaint.setARGB(255, 255, 255, 255);
@@ -187,8 +187,8 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
 
         List<Colony> colonies = star.getColonies();
         if (colonies != null && !colonies.isEmpty()) {
-            canvas.drawBitmap(mColonyIcon, (x + 10.0f) * mPixelScale,
-                    (y - 10.0f) * mPixelScale, mSelectionPaint);
+            canvas.drawBitmap(mColonyIcon, (x + mColonyIcon.getWidth()) * mPixelScale,
+                    (y - mColonyIcon.getHeight()) * mPixelScale, mSelectionPaint);
         }
     }
 
@@ -203,12 +203,12 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
         if (mStarNamePaint == null) {
             mStarNamePaint = new Paint();
             mStarNamePaint.setStyle(Style.STROKE);
+            mStarNamePaint.setTextSize(15.0f * mPixelScale);
         }
         mStarNamePaint.setARGB(255, 255, 255, 255);
-
-        float width = mStarNamePaint.measureText(star.getName());
-        x -= (width / 2.0);
-        y += star.getSize() + 10;
+        float width = mStarNamePaint.measureText(star.getName()) / mPixelScale;
+        x -= (width / 2.0f);
+        y += star.getSize() + 10.0f;
 
         canvas.drawText(star.getName(),
                 x * mPixelScale, y * mPixelScale, mStarNamePaint);

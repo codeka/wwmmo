@@ -127,7 +127,7 @@ def starModelToPb(star_pb, star_model):
   star_pb.sector_y = star_model.sector.y
   star_pb.offset_x = star_model.x
   star_pb.offset_y = star_model.y
-  star_pb.name = star_model.name
+  star_pb.name = star_model.name.title()
   star_pb.colour = star_model.colour
   star_pb.classification = star_model.starTypeIndex
   star_pb.size = star_model.size
@@ -186,7 +186,7 @@ def buildRequestPbToModel(build_model, build_pb):
 
 def fleetModelToPb(fleet_pb, fleet_model):
   fleet_pb.key = str(fleet_model.key())
-  fleet_pb.empire_key = fleet_model.empire
+  fleet_pb.empire_key = str(empire_mdl.Fleet.empire.get_value_for_datastore(fleet_model))
   fleet_pb.design_name = fleet_model.designName
   fleet_pb.num_ships = fleet_model.numShips
   fleet_pb.state = fleet_model.state
