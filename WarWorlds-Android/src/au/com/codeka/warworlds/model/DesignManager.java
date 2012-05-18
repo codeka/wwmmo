@@ -49,14 +49,14 @@ public abstract class DesignManager {
                 try {
                     xmldoc = ApiClient.getXml(getDesignUrl());
                 } catch (ApiException e) {
-                    log.error("Error loading buildings.xml", e);
+                    log.error("Error loading "+getDesignUrl(), e);
                     return null;
                 }
 
                 try {
                     return parseDesigns(xmldoc);
                 } catch (ParseException e) {
-                    log.error("Error loading buildings.xml", e);
+                    log.error("Error loading "+getDesignUrl(), e);
                     return null;
                 }
             }

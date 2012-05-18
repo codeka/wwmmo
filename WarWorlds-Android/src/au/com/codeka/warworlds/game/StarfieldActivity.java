@@ -51,7 +51,7 @@ public class StarfieldActivity extends Activity {
         mUsername = (TextView) findViewById(R.id.username);
         mMoney = (TextView) findViewById(R.id.money);
         mStarName = (TextView) findViewById(R.id.star_name);
-        mLoadingContainer = (ViewGroup) findViewById(R.id.star_loading_container);
+        mLoadingContainer = (ViewGroup) findViewById(R.id.loading_container);
         mPlanetList = (ListView) findViewById(R.id.starfield_planet_list);
 
         mPlanetList.setVisibility(View.GONE);

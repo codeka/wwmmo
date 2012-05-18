@@ -249,6 +249,9 @@ public class SolarSystemSurfaceView extends UniverseElementSurfaceView {
                 selectPlanet(newSelection.planet.getKey());
             }
 
+            // play the 'click' sound effect
+            playSoundEffect(android.view.SoundEffectConstants.CLICK);
+
             return false;
         }
     }

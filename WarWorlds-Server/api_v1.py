@@ -80,7 +80,10 @@ class HelloPage(ApiPage):
 
     motd_model = model.MessageOfTheDay.get()
     empire_pb = empire.getEmpireForUser(user)
-    colonies_pb = empire.getColoniesForEmpire(empire_pb)
+    if empire_pb:
+      colonies_pb = empire.getColoniesForEmpire(empire_pb)
+    else:
+      colonies_pb = None
 
     hello_pb = pb.Hello()
     if motd_model is not None:

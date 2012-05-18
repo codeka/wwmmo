@@ -63,6 +63,7 @@ public class UniverseElementSurfaceView extends SurfaceView implements SurfaceHo
             }
             mGestureDetector = new GestureDetector(mContext, listener);
         }
+
         mGestureDetector.onTouchEvent(event);
         return true;
     }

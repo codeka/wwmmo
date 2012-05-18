@@ -150,19 +150,18 @@ public class WarWorldsActivity extends Activity {
 
             @Override
             protected void onPostExecute(String result) {
-                BuildingDesignManager.getInstance().setup();
-                ShipDesignManager.getInstance().setup();
-                BuildQueueManager.getInstance().setup();
-
                 mConnectionStatus.setText("Connected");
                 mStartGameButton.setEnabled(true);
                 if (mNeedsEmpireSetup) {
                     startActivity(new Intent(mContext, EmpireSetupActivity.class));
-                } else {
-                    motdView.loadHtml("html/motd-template.html", result);
-                }
+                    return;
+                } else if (!mErrorOccured) {
+                    BuildingDesignManager.getInstance().setup();
+                    ShipDesignManager.getInstance().setup();
+                    BuildQueueManager.getInstance().setup();
 
-                if (mErrorOccured) {
+                    motdView.loadHtml("html/motd-template.html", result);
+                } else /* mErrorOccured */ {
                     mConnectionStatus.setText("Connection Failed");
                     mStartGameButton.setEnabled(false);
 

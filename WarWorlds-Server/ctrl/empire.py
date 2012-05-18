@@ -19,6 +19,9 @@ def getEmpireForUser(user):
     return values[cache_key]
 
   empire_model = mdl.Empire.getForUser(user)
+  if not empire_model:
+    return None
+
   empire_pb = pb.Empire()
   ctrl.empireModelToPb(empire_pb, empire_model)
   ctrl.setCached({cache_key: empire_pb})

@@ -252,6 +252,9 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
             Star star = SectorManager.getInstance().getStarAt(tapX, tapY);
             selectStar(star);
 
+            // play the 'click' sound effect
+            playSoundEffect(android.view.SoundEffectConstants.CLICK);
+
             return false;
         }
     }
