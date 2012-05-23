@@ -45,7 +45,8 @@ class BuildCheckPage(tasks.TaskPage):
 
     # Fetch the keys outside of the transaction, cause we can't do that in a TX
     operations = []
-    query = mdl.BuildOperation.all().filter("endTime <", datetime.now() + timedelta(seconds=10))
+    query = (mdl.BuildOperation.all().filter("endTime <", datetime.now() + timedelta(seconds=10))
+                                     .filter("endTime >", datetime(2000, 1, 1)))
     for oper in query:
       operation = db.run_in_transaction(_fetchOperationInTX, oper.key())
       if operation:

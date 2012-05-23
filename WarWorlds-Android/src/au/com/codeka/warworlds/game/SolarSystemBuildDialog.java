@@ -6,15 +6,14 @@ import java.util.List;
 import android.app.Dialog;
 import android.os.Bundle;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.RelativeLayout;
 import android.widget.TabHost;
-import android.widget.TabWidget;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.model.Colony;
+import au.com.codeka.warworlds.model.Planet;
+import au.com.codeka.warworlds.model.Star;
 
 /**
  * When you click "Build" shows you the list of buildings/ships that are/can be built by your
@@ -22,7 +21,8 @@ import au.com.codeka.warworlds.model.Colony;
  * @author dean@codeka.com.au
  *
  */
-public class SolarSystemBuildDialog extends Dialog {
+public class SolarSystemBuildDialog extends Dialog
+        implements SolarSystemActivity.OnStarUpdatedListener {
     private SolarSystemActivity mActivity;
     private TabManager mTabManager;
 
@@ -50,6 +50,16 @@ public class SolarSystemBuildDialog extends Dialog {
         mTabManager.addTab(new SolarSystemBuildBuildingTab(this, mActivity));
         mTabManager.addTab(new SolarSystemBuildShipTab(this, mActivity));
         mTabManager.addTab(new SolarSystemBuildQueueTab(this, mActivity));
+    }
+
+    @Override
+    protected void onStart() {
+        mActivity.addStarUpdatedListener(this);
+    }
+
+    @Override
+    protected void onStop() {
+        mActivity.removeStarUpdatedListener(this);
     }
 
     public void setColony(Colony colony) {
@@ -90,13 +100,13 @@ public class SolarSystemBuildDialog extends Dialog {
             // which really are too high in landscape mode...
             // http://stackoverflow.com/questions/8271385/can-i-use-default-tab-styling-in-my-custom-tab-view
 
-            TabWidget tw = (TabWidget) findViewById(android.R.id.tabs);
+            /*TabWidget tw = (TabWidget) findViewById(android.R.id.tabs);
             RelativeLayout indicator = (RelativeLayout) tw.getChildTabViewAt(mTabs.size() - 1);
             indicator.findViewById(android.R.id.icon).setVisibility(View.GONE);
 
             ViewGroup.LayoutParams vglp = indicator.getLayoutParams();
             vglp.height = 40;
-            indicator.setLayoutParams(vglp);
+            indicator.setLayoutParams(vglp);*/
         }
 
         public List<Tab> getTabs() {
@@ -109,5 +119,13 @@ public class SolarSystemBuildDialog extends Dialog {
             Tab tab = mTabs.get(tabIndex);
             return tab.getView();
         }
+    }
+
+    /**
+     * When the star is refreshed, we'll want to update the colony details etc as well.
+     */
+    @Override
+    public void onStarUpdated(Star star, Planet selectedPlanet, Colony colony) {
+        setColony(colony);
     }
 }

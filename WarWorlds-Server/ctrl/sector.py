@@ -45,7 +45,7 @@ def getSectors(coords):
 
 def getStar(star_key):
   '''Gets a star, given it's key.'''
-  cache_key = 'star:'+star_key
+  cache_key = 'star:%s' % (star_key)
   values = ctrl.getCached([cache_key], pb.Star)
   if cache_key in values:
     return values[cache_key]

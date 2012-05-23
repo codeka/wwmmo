@@ -81,7 +81,7 @@ def updateColony(colony_key, updated_colony_pb):
   '''Updates the colony with the given colony_key with the new parameters in updated_colony_pb.
 
   When updating a colony, there's a few things we need to do. For example, we need to simulate
-  the colony with it's old parameters to bring it up to date. Then we need to make sure th 
+  the colony with it's old parameters to bring it up to date. Then we need to make sure the
   new parameters are valid (e.g. all the focus_* properties add up to 1), then we can save the
   new colony details.
 
@@ -117,8 +117,11 @@ def updateColony(colony_key, updated_colony_pb):
   colony_pb.focus_mining = updated_colony_pb.focus_mining / focus_total
   colony_pb.focus_construction = updated_colony_pb.focus_construction / focus_total
 
-  # because of the simulation, we have to update all colonies.
+  # We need to simulate once more to ensure the new end-time for builds, production rates and
+  # whatnot are up to date. Then, because of the simulate, we need to update the colonies
+  simulate(star_pb, colony_pb.empire_key)
   updateAfterSimulate(star_pb, colony_pb.empire_key)
+
 
 def updateAfterSimulate(star_pb, empire_key):
   '''After you've simulated a star for a particular empire, this updates the data store.
@@ -165,6 +168,8 @@ def updateAfterSimulate(star_pb, empire_key):
       continue
     build_model = mdl.BuildOperation.get(build_pb.key)
     ctrl.buildRequestPbToModel(build_model, build_pb)
+    logging.debug('Updating build-request "%s" start_time=%s end_time=%s' % 
+                  (build_model.designName, build_model.startTime, build_model.endTime))
     build_model.put()
   keys_to_clear.append('buildqueue:for-empire:%s' % empire_key)
 
@@ -210,6 +215,11 @@ def simulate(star_pb, empire_key=None):
 
   start_time = ctrl.epochToDateTime(start_time)
   end_time = datetime.now()
+
+  # if we have less than a few seconds of time to simulate, we'll extend the end time
+  # a little.
+  if (end_time - timedelta(seconds=3)) < start_time:
+    end_time = start_time + timedelta(seconds=3)
 
   while True:
     step_end_time = start_time + timedelta(minutes=15)
@@ -521,6 +531,11 @@ def scheduleBuildCheck():
     in_two_minutes = datetime.now() + timedelta(minutes=2)
     if time > in_two_minutes:
       time = in_two_minutes
+
+    # It'll be < now() if the next building is never going to finished (and hence it's endTime
+    # will be the epoch -- 1970. We'll schedule a build-check in ten minutes anyway
+    if time < datetime.now():
+      time = datetime.now() + timedelta(minutes=10)
 
     logging.info("Scheduling next build-check at %s" % (time))
     taskqueue.add(queue_name="build",

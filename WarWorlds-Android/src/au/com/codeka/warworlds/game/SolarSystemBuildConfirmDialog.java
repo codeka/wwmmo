@@ -30,9 +30,11 @@ public class SolarSystemBuildConfirmDialog extends Dialog {
     private static Logger log = LoggerFactory.getLogger(WarWorldsActivity.class);
     private Colony mColony;
     private Design mDesign;
+    private SolarSystemActivity mActivity;
 
     public SolarSystemBuildConfirmDialog(SolarSystemActivity activity) {
         super(activity);
+        mActivity = activity;
     }
 
     @Override
@@ -61,7 +63,7 @@ public class SolarSystemBuildConfirmDialog extends Dialog {
                         } else {
                             kind = warworlds.Warworlds.BuildRequest.BUILD_KIND.SHIP;
                         }
-                        
+
                         warworlds.Warworlds.BuildRequest build = warworlds.Warworlds.BuildRequest.newBuilder()
                                 .setBuildKind(kind)
                                 .setColonyKey(mColony.getKey())
@@ -83,6 +85,10 @@ public class SolarSystemBuildConfirmDialog extends Dialog {
                     protected void onPostExecute(BuildRequest buildRequest) {
                         // notify the BuildQueueManager that something's changed.
                         BuildQueueManager.getInstance().refresh(buildRequest);
+
+                        // refresh the solar system as well, since now we're building something
+                        // we'll need to recalculate times and whatnot
+                        mActivity.refreshStar();
 
                         okButton.setEnabled(true);
                         dismiss();

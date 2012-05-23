@@ -1,5 +1,7 @@
 package au.com.codeka.warworlds.game;
 
+import java.util.concurrent.CopyOnWriteArrayList;
+
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Intent;
@@ -35,7 +37,7 @@ public class SolarSystemActivity extends Activity {
     private long mSectorY;
     private String mStarKey;
     private boolean mIsSectorUpdated;
-
+    private CopyOnWriteArrayList<OnStarUpdatedListener> mStarUpdatedListeners;
     private Star mStar;
     private Planet mPlanet;
     private Colony mColony;
@@ -50,6 +52,7 @@ public class SolarSystemActivity extends Activity {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE); // remove the title bar
 
+        mStarUpdatedListeners = new CopyOnWriteArrayList<OnStarUpdatedListener>();
         setContentView(R.layout.solarsystem);
 
         final TextView username = (TextView) findViewById(R.id.username);
@@ -92,6 +95,23 @@ public class SolarSystemActivity extends Activity {
                 showDialog(FOCUS_DIALOG);
             }
         });
+    }
+
+
+    public void addStarUpdatedListener(OnStarUpdatedListener listener) {
+        if (!mStarUpdatedListeners.contains(listener)) {
+            mStarUpdatedListeners.add(listener);
+        }
+    }
+
+    public void removeStarUpdatedListener(OnStarUpdatedListener listener) {
+        mStarUpdatedListeners.remove(listener);
+    }
+
+    protected void fireStarUpdated(Star star, Planet selectedPlanet, Colony colony) {
+        for(OnStarUpdatedListener listener : mStarUpdatedListeners) {
+            listener.onStarUpdated(star, selectedPlanet, colony);
+        }
     }
 
     @Override
@@ -140,7 +160,9 @@ public class SolarSystemActivity extends Activity {
         switch(id) {
         case BUILD_CONFIRM_DIALOG: {
             SolarSystemBuildConfirmDialog dialog = (SolarSystemBuildConfirmDialog) d;
-            String designID = args.getString("au.com.codeka.warworlds.DesignID", "");
+            String designID = args.getString("au.com.codeka.warworlds.DesignID");
+            if (designID == null)
+                designID = "";
             DesignKind dk = DesignKind.fromInt(args.getInt("au.com.codeka.warworlds.DesignKind",
                                                DesignKind.BUILDING.getValue()));
 
@@ -226,6 +248,8 @@ public class SolarSystemActivity extends Activity {
                 mStar = star;
                 mPlanet = planet;
                 refreshSelectedPlanet();
+
+                fireStarUpdated(mStar, mPlanet, mColony);
             }
         });
     }
@@ -345,5 +369,9 @@ public class SolarSystemActivity extends Activity {
                 mIsSectorUpdated = true;
             }
         });
+    }
+
+    public interface OnStarUpdatedListener {
+        void onStarUpdated(Star star, Planet selectedPlanet, Colony colony);
     }
 }
