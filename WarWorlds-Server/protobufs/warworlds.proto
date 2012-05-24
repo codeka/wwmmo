@@ -382,6 +382,26 @@ message BuildQueue
 
 
 //
+// A "simulate" request, posted to a star will cause that star to simulate up to the present
+// time. Mostly useful for debugging.
+//
+message SimulateRequest
+{
+    // if true, we want to update the data store after simulating
+    optional bool update = 1;
+}
+
+
+//
+// The response to a simulate request is just a bunch of debug messages.
+//
+message SimulateResponse
+{
+    repeated string message = 1;
+}
+
+
+//
 // Represents a completed building in a colony.
 //
 message Building

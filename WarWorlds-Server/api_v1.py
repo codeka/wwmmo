@@ -250,6 +250,30 @@ class StarPage(StarfieldPage):
     return star_pb
 
 
+class StarSimulatePage(ApiPage):
+  '''This is a debugging page that lets us simulate a star on-demand.'''
+  def get(self, starKey):
+    request_pb = pb.SimulateRequest()
+    request_pb.update = False
+    return self._doSimulate(starKey, request_pb)
+
+  def post(self, starKey):
+    return self._doSimulate(starKey, self._getRequestBody(pb.SimulateRequest))
+
+  def _doSimulate(self, starKey, request_pb):
+    response_pb = pb.SimulateResponse()
+    def dolog(msg):
+      response_pb.message.append(msg)
+
+    star_pb = sector.getStar(starKey)
+    if not star_pb:
+      response_pb.message.append('ERROR: No star with given key found!')
+    else:
+      empire.simulate(star_pb, log=dolog)
+
+    return response_pb
+
+
 class ColoniesPage(ApiPage):
   def post(self):
     # TODO: make sure they're actually allow to do this, have a free colonization
@@ -364,6 +388,7 @@ app = ApiApplication([('/api/v1/hello/([^/]+)', HelloPage),
                       ('/api/v1/devices/user:([^/]+)/messages', DeviceMessagesPage),
                       ('/api/v1/sectors', SectorsPage),
                       ('/api/v1/stars/([^/]+)', StarPage),
+                      ('/api/v1/stars/([^/]+)/simulate', StarSimulatePage),
                       ('/api/v1/colonies', ColoniesPage),
                       ('/api/v1/colonies/([^/]+)', ColoniesPage),
                       ('/api/v1/buildqueue', BuildQueuePage)],

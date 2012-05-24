@@ -177,7 +177,7 @@ def updateAfterSimulate(star_pb, empire_key):
   ctrl.clearCached(keys_to_clear)
 
 
-def simulate(star_pb, empire_key=None):
+def simulate(star_pb, empire_key=None, log=logging.debug):
   '''Simulates the star and gets all of the colonies up to date.
 
   When simulating a star, we simulate all colonies in that star that belong to the given empire
@@ -189,6 +189,7 @@ def simulate(star_pb, empire_key=None):
         star we're going to simulate.
     empire_key: The key of the empire we're going to simulate. If None, the default, we'll
         simulate all colonies in the star.
+    log: A function we'll call to log message as we simulate (by default, this is logging.debug)
   '''
   if empire_key is None:
     # it's easier to do this empire-by-empire, rather then have special-cases
@@ -197,9 +198,8 @@ def simulate(star_pb, empire_key=None):
     for colony_pb in star_pb.colonies:
       if colony_pb.empire_key not in done_empires:
         done_empires.add(colony_pb.empire_key)
-        simulate(star_pb, colony_pb.empire_key)
+        simulate(star_pb, colony_pb.empire_key, log)
     return
-
 
   # figure out the start time, which is the oldest last_simulation time
   start_time = 0
@@ -224,17 +224,17 @@ def simulate(star_pb, empire_key=None):
   while True:
     step_end_time = start_time + timedelta(minutes=15)
     if step_end_time < end_time:
-      _simulateStep(timedelta(minutes=15), start_time, star_pb, empire_key)
+      _simulateStep(timedelta(minutes=15), start_time, star_pb, empire_key, log)
       start_time = step_end_time
     else:
       break
 
   dt = end_time - start_time
   if dt.total_seconds() > 0:
-    _simulateStep(dt, start_time, star_pb, empire_key)
+    _simulateStep(dt, start_time, star_pb, empire_key, log)
 
 
-def _simulateStep(dt, now, star_pb, empire_key):
+def _simulateStep(dt, now, star_pb, empire_key, log):
   '''Simulates a single step of the colonies in the star.
 
   The order of simulation needs to be well-defined, so we define it here:
@@ -254,8 +254,9 @@ def _simulateStep(dt, now, star_pb, empire_key):
     star_pb: The star protocol buffer we're simulating.
     empire_key: The key of the empire we're simulating. If None, we'll simulate
         all empires in the starsystem.
+    log: A function we'll call to log messages (for debugging)
   '''
-  logging.debug("Simulation @ %s" % (now))
+  log("Simulation @ %s" % (now))
   total_goods = None
   total_minerals = None
   total_population = 0
@@ -311,19 +312,19 @@ def _simulateStep(dt, now, star_pb, empire_key):
     if len(build_requests) > 0:
       total_workers = colony_pb.population * colony_pb.focus_construction
       workers_per_build_request = total_workers / len(build_requests)
-      logging.debug("Total workers = %d, workers per build request = %d" %
-                    (total_workers, workers_per_build_request))
+      log("Total workers = %d, workers per build request = %d" %
+          (total_workers, workers_per_build_request))
 
       for build_request in build_requests:
         design = Design.getDesign(build_request.build_kind, build_request.design_name)
-        logging.debug("Building: %s" % build_request.design_name)
+        log("Building: %s" % build_request.design_name)
 
         # work out if the building is supposed to be started this timestep or not. Even if it's
         # scheduled to start this timestep, it may only be scheduled half-way through this time
         # step (for example) so we need to remember that...
         startTime = ctrl.epochToDateTime(build_request.start_time)
         if startTime > (now + dt):
-          logging.debug("Building not scheduled to be started until %s, skipping" % (startTime))
+          log("Building not scheduled to be started until %s, skipping" % (startTime))
           continue
 
         # So the build time the design specifies is the time to build the structure assigning
@@ -331,27 +332,27 @@ def _simulateStep(dt, now, star_pb, empire_key):
         # the workers and you double the build time. 
         total_build_time_in_hours = design.buildTimeSeconds / 3600.0
         total_build_time_in_hours *= (100.0 / workers_per_build_request)
-        logging.debug("total_build_time = %.4f" % total_build_time_in_hours)
+        log("total_build_time = %.4f" % total_build_time_in_hours)
 
         # Work out how many hours we've spend so far
         time_spent = now - ctrl.epochToDateTime(build_request.start_time)
         time_spent = time_spent.total_seconds() / 3600.0
         if time_spent < 0:
           time_spent = 0
-        logging.debug("time_spent = %.4f" % time_spent)
+        log("time_spent = %.4f" % time_spent)
 
         dt_required = dt_in_hours
         if time_spent + dt_required > total_build_time_in_hours:
           # If we're going to finish on this turn, we only need a fraction of the minerals we'd
           # otherwise use, so make sure dt_required is correct
           dt_required = total_build_time_in_hours - time_spent
-        logging.debug("dt_required = %.4f" % dt_required)
+        log("dt_required = %.4f" % dt_required)
 
         # work out how many minerals we require for this turn
         minerals_required_per_hour = design.buildCostMinerals / total_build_time_in_hours
         minerals_required = minerals_required_per_hour * dt_required
-        logging.debug("mineral_required_per_hour = %.4f ; minerals_required (this turn) = %.4f"
-                      % (minerals_required_per_hour, minerals_required))
+        log("mineral_required_per_hour = %.4f ; minerals_required (this turn) = %.4f"
+            % (minerals_required_per_hour, minerals_required))
 
         if total_minerals > minerals_required:
           # awesome, we have enough minerals so we can make some progress. We'll start by
@@ -414,9 +415,9 @@ def _simulateStep(dt, now, star_pb, empire_key):
     empire.total_goods = total_goods
     empire.total_minerals = total_minerals
 
-  logging.debug(("simulation step: empire=%s dt=%.2f (hrs), delta goods=%.2f, "
-                 "delta minerals=%.2f, population=%.2f")
-                % (empire_key, dt_in_hours, total_goods, total_minerals, total_population))
+  log(("simulation step: empire=%s dt=%.2f (hrs), delta goods=%.2f, "
+       "delta minerals=%.2f, population=%.2f")
+       % (empire_key, dt_in_hours, total_goods, total_minerals, total_population))
 
 
 def colonize(empire_pb, colonize_request):
