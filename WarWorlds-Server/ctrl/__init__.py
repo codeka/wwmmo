@@ -177,11 +177,13 @@ def buildRequestModelToPb(build_pb, build_model):
   build_pb.start_time = dateTimeToEpoch(build_model.startTime)
   build_pb.end_time = dateTimeToEpoch(build_model.endTime)
   build_pb.build_kind = build_model.designKind
+  build_pb.progress = build_model.progress
 
 
 def buildRequestPbToModel(build_model, build_pb):
   build_model.startTime = epochToDateTime(build_pb.start_time)
   build_model.endTime = epochToDateTime(build_pb.end_time)
+  build_model.progress = build_pb.progress
 
 
 def fleetModelToPb(fleet_pb, fleet_model):

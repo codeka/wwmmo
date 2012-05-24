@@ -25,11 +25,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import android.app.Activity;
-import android.app.Notification;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.AssetManager;
 import au.com.codeka.warworlds.api.ApiClient;
@@ -53,7 +49,7 @@ public class Util {
      * properties, preferences and settings to make later calls easier (and not
      * require a \c Context parameter)
      */
-    public static void loadProperties(Context context, Activity activity) {
+    public static Properties loadProperties(Context context, Activity activity) {
         // load the warworlds.properties file and populate mProperties.
         AssetManager assetManager = context.getAssets();
 
@@ -81,6 +77,8 @@ public class Util {
         } catch(URISyntaxException e) {
             // !!!
         }
+
+        return sProperties;
     }
 
     /**
@@ -107,33 +105,6 @@ public class Util {
     public static boolean isDebug() {
         final String serverDefault = sProperties.getProperty("server.default");
         return (serverDefault.equals("debug"));
-    }
-
-    /**
-     * Display a notification containing the given string.
-     */
-    public static void generateNotification(Context context, String message) {
-        int icon = R.drawable.status_icon;
-        long when = System.currentTimeMillis();
-
-        // TODO: something better? this'll just launch us to the home page...
-        Intent intent = new Intent(context, WarWorldsActivity.class);
-
-        Notification notification = new Notification(icon, message, when);
-        notification.setLatestEventInfo(context, "War Worlds", message,
-                PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT));
-        notification.flags |= Notification.FLAG_AUTO_CANCEL;
-
-        SharedPreferences settings = Util.getSharedPreferences(context);
-        int notificatonID = settings.getInt("notificationID", 0);
-
-        NotificationManager nm = (NotificationManager) context
-                .getSystemService(Context.NOTIFICATION_SERVICE);
-        nm.notify(notificatonID, notification);
-
-        SharedPreferences.Editor editor = settings.edit();
-        editor.putInt("notificationID", ++notificatonID % 32);
-        editor.commit();
     }
 
     /**

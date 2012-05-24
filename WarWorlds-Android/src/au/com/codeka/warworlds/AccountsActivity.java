@@ -101,7 +101,7 @@ public class AccountsActivity extends Activity {
             if (regId != null && ! "".equals(regId)) {
                 DeviceRegistrar.register(mContext, regId);
             } else {
-                C2DMessaging.register(mContext, Util.getProperties().getProperty("cd2m.sender-id"));
+                C2DMessaging.register(mContext, C2DMReceiver.SENDER_ID);
             }
         }
     }

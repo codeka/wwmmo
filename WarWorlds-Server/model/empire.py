@@ -106,6 +106,7 @@ class BuildOperation(db.Model):
   designKind = db.IntegerProperty()
   startTime = db.DateTimeProperty()
   endTime = db.DateTimeProperty()
+  progress = db.FloatProperty()
 
   @staticmethod
   def getForStar(star_model):

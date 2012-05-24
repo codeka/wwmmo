@@ -364,6 +364,11 @@ message BuildRequest
     // The date/time this build request started and the current predicted time of completion
     optional int64 start_time = 6;
     optional int64 end_time = 7;
+
+    // this is the "progress" of the build, from 0 (just started) to 1.0 (complete). It's not
+    // always going to relate to start_time/end_time (due to lack of resources, changing focus
+    // etc etc)
+    optional float progress = 8;
 }
 
 

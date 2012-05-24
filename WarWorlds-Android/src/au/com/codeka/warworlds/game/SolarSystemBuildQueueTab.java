@@ -2,6 +2,7 @@ package au.com.codeka.warworlds.game;
 
 import java.util.List;
 
+import org.joda.time.Duration;
 import org.joda.time.Period;
 
 import android.content.Context;
@@ -153,10 +154,16 @@ public class SolarSystemBuildQueueTab implements SolarSystemBuildDialog.Tab {
             }
 
             row1.setText(design.getName());
-            Period remainingPeriod = request.getRemainingTime().toPeriod();
-            row2.setText(String.format("%d %%, %d:%d left",
-                    (int) request.getPercentComplete(),
-                    remainingPeriod.getHours(), remainingPeriod.getMinutes()));
+            Duration remainingDuration = request.getRemainingTime();
+            if (remainingDuration.equals(Duration.ZERO)) {
+                row2.setText(String.format("%d %%, not enough resources to complete.",
+                             (int) request.getPercentComplete()));
+            } else {
+                Period remainingPeriod = remainingDuration.toPeriod();
+                row2.setText(String.format("%d %%, %d:%d left",
+                        (int) request.getPercentComplete(),
+                        remainingPeriod.getHours(), remainingPeriod.getMinutes()));
+            }
 
             row3.setVisibility(View.GONE);
             progress.setVisibility(View.VISIBLE);

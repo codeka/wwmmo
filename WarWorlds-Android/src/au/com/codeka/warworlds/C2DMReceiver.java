@@ -37,8 +37,10 @@ public class C2DMReceiver extends C2DMBaseReceiver {
     private static Callable<Void> sOnComplete;
     private static Activity sActivity;
 
+    public static String SENDER_ID = "warworlds.app-role@codeka.com.au";
+
     public C2DMReceiver() {
-        super(Util.getProperties().getProperty("cd2m.sender-id"));
+        super(SENDER_ID);
     }
 
     /**
