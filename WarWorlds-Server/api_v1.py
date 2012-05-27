@@ -253,25 +253,30 @@ class StarPage(StarfieldPage):
 class StarSimulatePage(ApiPage):
   '''This is a debugging page that lets us simulate a star on-demand.'''
   def get(self, starKey):
-    request_pb = pb.SimulateRequest()
-    request_pb.update = False
-    return self._doSimulate(starKey, request_pb)
+    self._doSimulate(starKey, False)
 
   def post(self, starKey):
-    return self._doSimulate(starKey, self._getRequestBody(pb.SimulateRequest))
+    self._doSimulate(starKey, self.request.get("update") == "1")
 
-  def _doSimulate(self, starKey, request_pb):
-    response_pb = pb.SimulateResponse()
+  def _doSimulate(self, starKey, doUpdate):
+    msgs = []
     def dolog(msg):
-      response_pb.message.append(msg)
+      msgs.append(msg)
 
     star_pb = sector.getStar(starKey)
     if not star_pb:
-      response_pb.message.append('ERROR: No star with given key found!')
+      msgs.append('ERROR: No star with given key found!')
     else:
+      msgs.append("---------- Simulating:")
       empire.simulate(star_pb, log=dolog)
 
-    return response_pb
+    if doUpdate:
+      msgs.append("")
+      msgs.append("---------- Updating:")
+      empire.updateAfterSimulate(star_pb, None)
+
+    self.response.headers["Content-Type"] = "text/plain"
+    self.response.out.write("\r\n".join(msgs))
 
 
 class ColoniesPage(ApiPage):

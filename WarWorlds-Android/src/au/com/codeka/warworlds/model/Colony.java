@@ -16,6 +16,9 @@ public class Colony {
     private float mConstructionFocus;
     private float mPopulationFocus;
     private float mMiningFocus;
+    private float mPopulationDelta;
+    private float mGoodsDelta;
+    private float mMineralsDelta;
     private DateTime mLastSimulation;
     private List<Building> mBuildings;
 
@@ -58,6 +61,15 @@ public class Colony {
     public void setMiningFocus(float focus) {
         mMiningFocus = focus;
     }
+    public float getPopulationDelta() {
+        return mPopulationDelta;
+    }
+    public float getGoodsDelta() {
+        return mGoodsDelta;
+    }
+    public float getMineralsDelta() {
+        return mMineralsDelta;
+    }
     public DateTime getLastSimulation() {
         return mLastSimulation;
     }
@@ -78,6 +90,9 @@ public class Colony {
         c.mConstructionFocus = pb.getFocusConstruction();
         c.mMiningFocus = pb.getFocusMining();
         c.mPopulationFocus = pb.getFocusPopulation();
+        c.mPopulationDelta = pb.getDeltaPopulation();
+        c.mGoodsDelta = pb.getDeltaGoods();
+        c.mMineralsDelta = pb.getDeltaMinerals();
 
         return c;
     }

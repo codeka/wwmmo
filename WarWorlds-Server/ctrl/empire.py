@@ -123,7 +123,7 @@ def updateColony(colony_key, updated_colony_pb):
   updateAfterSimulate(star_pb, colony_pb.empire_key)
 
 
-def updateAfterSimulate(star_pb, empire_key):
+def updateAfterSimulate(star_pb, empire_key, log=logging.debug):
   '''After you've simulated a star for a particular empire, this updates the data store.
 
   Usually, you'll simulate the star, update a colony, and then update. This handles the "update"
@@ -136,7 +136,7 @@ def updateAfterSimulate(star_pb, empire_key):
     for colony_pb in star_pb.colonies:
       if colony_pb.empire_key not in done_empires:
         done_empires.add(colony_pb.empire_key)
-        updateAfterSimulate(star_pb, colony_pb.empire_key)
+        updateAfterSimulate(star_pb, colony_pb.empire_key, log)
     return
 
   keys_to_clear = []
@@ -168,8 +168,8 @@ def updateAfterSimulate(star_pb, empire_key):
       continue
     build_model = mdl.BuildOperation.get(build_pb.key)
     ctrl.buildRequestPbToModel(build_model, build_pb)
-    logging.debug('Updating build-request "%s" start_time=%s end_time=%s' % 
-                  (build_model.designName, build_model.startTime, build_model.endTime))
+    log('Updating build-request "%s" start_time=%s end_time=%s' % 
+        (build_model.designName, build_model.startTime, build_model.endTime))
     build_model.put()
   keys_to_clear.append('buildqueue:for-empire:%s' % empire_key)
 
@@ -278,6 +278,9 @@ def _simulateStep(dt, now, star_pb, empire_key, log):
   dt_in_hours = dt.total_seconds() / 3600.0
 
   for colony_pb in star_pb.colonies:
+    log('--- Colony: focus=(pop: %.2f, farm: %.2f, mine: %.2f, cons: %.2f)' % (
+         colony_pb.focus_population, colony_pb.focus_farming,
+         colony_pb.focus_mining, colony_pb.focus_construction))
     if colony_pb.empire_key != empire_key:
       continue
 
@@ -287,12 +290,19 @@ def _simulateStep(dt, now, star_pb, empire_key, log):
         planet_pb = pb
         break
 
+    log('--- planet: congeniality=(pop: %.2f, farm: %.2f, mine: %.2f)' %(
+         planet_pb.population_congeniality, planet_pb.farming_congeniality,
+         planet_pb.mining_congeniality))
+
     # calculate the output from farming this turn and add it to the star global
     goods = colony_pb.population*colony_pb.focus_farming * (planet_pb.farming_congeniality/100.0)
+    colony_pb.delta_goods = goods
+    log('goods: '+str(goods))
     total_goods += goods * dt_in_hours
 
     # calculate the output from mining this turn and add it to the star global
     minerals = colony_pb.population*colony_pb.focus_mining * (planet_pb.mining_congeniality/100.0)
+    colony_pb.delta_minerals = minerals
     total_minerals += minerals * dt_in_hours
 
     total_population += colony_pb.population
@@ -378,17 +388,21 @@ def _simulateStep(dt, now, star_pb, empire_key, log):
   # between all of the colonies.
   total_goods_per_hour = total_population / 10.0
   total_goods_required = total_goods_per_hour * dt_in_hours
+  log('total_goods_required: '+str(total_goods_per_hour))
 
   # If we have more than total_goods_required stored, then we're cool. Otherwise, our population
   # suffers...
   goods_efficiency = 1.0
-  if total_goods_required > total_goods and total_goods > 0:
-    goods_efficiency = total_goods_required / total_goods
-  elif total_goods == 0:
-    goods_efficiency = 0
+  if total_goods_required > total_goods and total_goods_required > 0:
+    goods_efficiency = total_goods / total_goods_required
+  log('goods_efficiency: '+str(goods_efficiency))
 
   # subtract all the goods we'll need
   total_goods -= total_goods_required
+  if total_goods < 0:
+    # We've run out of goods! That's bad...
+    total_goods = 0
+    goods_efficiency = 0
 
   # now loop through the colonies and update the population/goods counter
   for colony_pb in star_pb.colonies:
@@ -397,14 +411,22 @@ def _simulateStep(dt, now, star_pb, empire_key, log):
 
     population_increase = colony_pb.population * colony_pb.focus_population
     population_increase *= (goods_efficiency - 0.75) # that is, from -0.75 -> 0.25
+    colony_pb.delta_population = population_increase
 
     planet_pb = None
     for pb in star_pb.planets:
       if pb.key == colony_pb.planet_key:
         planet_pb = pb
         break
-    congeniality_factor = 1.0 - (colony_pb.population / planet_pb.population_congeniality)
+
+    # if we're increasing population, it slows down the closer you get to the population
+    # congeniality. If population is decreasing, it slows down the FURTHER you get.
+    congeniality_factor = colony_pb.population / planet_pb.population_congeniality
+    if population_increase >= 0:
+      congeniality_factor = 1.0 - congeniality_factor
     population_increase *= congeniality_factor
+
+    log('population_increase: '+str(population_increase))
 
     population_increase *= dt_in_hours
     colony_pb.population += int(population_increase)

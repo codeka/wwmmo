@@ -327,21 +327,28 @@ public class SolarSystemActivity extends Activity {
             populationFocus.setProgress((int)(100.0f * mColony.getPopulationFocus()));
             TextView populationValue = (TextView) findViewById(
                     R.id.solarsystem_colony_population_value);
-            populationValue.setText(String.format("%d", mColony.getPopulation()));
+            populationValue.setText(String.format("%d %s%d / hr",
+                    mColony.getPopulation(),
+                    (mColony.getPopulationDelta() > 0 ? "+" : "-"),
+                    Math.abs((int) mColony.getPopulationDelta())));
 
             ProgressBar farmingFocus = (ProgressBar) findViewById(
                     R.id.solarsystem_colony_farming_focus);
             farmingFocus.setProgress((int)(100.0f * mColony.getFarmingFocus()));
             TextView farmingValue= (TextView) findViewById(
                     R.id.solarsystem_colony_farming_value);
-            farmingValue.setText("todo");
+            farmingValue.setText(String.format("%s%d / hr",
+                    mColony.getGoodsDelta() < 0 ? "-" : "+",
+                    Math.abs((int) mColony.getGoodsDelta())));
 
             ProgressBar miningFocus = (ProgressBar) findViewById(
                     R.id.solarsystem_colony_mining_focus);
             miningFocus.setProgress((int)(100.0f * mColony.getMiningFocus()));
             TextView miningValue = (TextView) findViewById(
                     R.id.solarsystem_colony_mining_value);
-            miningValue.setText("todo");
+            miningValue.setText(String.format("%s%d / hr",
+                    mColony.getMineralsDelta() < 0 ? "-" : "+",
+                    Math.abs((int) mColony.getMineralsDelta())));
 
             ProgressBar constructionFocus = (ProgressBar) findViewById(
                     R.id.solarsystem_colony_construction_focus);

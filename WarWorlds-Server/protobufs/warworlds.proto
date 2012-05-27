@@ -323,6 +323,12 @@ message Colony
     optional float focus_farming = 8;
     optional float focus_mining = 9;
     optional float focus_construction = 10;
+
+    // After simulating, these will contain the delta values (i.e. how much do the goods
+    // or whatever changed in this colony) per hour.
+    optional float delta_population = 11;
+    optional float delta_goods = 12;
+    optional float delta_minerals = 13;
 }
 
 
@@ -378,26 +384,6 @@ message BuildRequest
 message BuildQueue
 {
     repeated BuildRequest requests = 1;
-}
-
-
-//
-// A "simulate" request, posted to a star will cause that star to simulate up to the present
-// time. Mostly useful for debugging.
-//
-message SimulateRequest
-{
-    // if true, we want to update the data store after simulating
-    optional bool update = 1;
-}
-
-
-//
-// The response to a simulate request is just a bunch of debug messages.
-//
-message SimulateResponse
-{
-    repeated string message = 1;
 }
 
 

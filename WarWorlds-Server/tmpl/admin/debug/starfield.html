@@ -109,11 +109,15 @@
             var $starKey = $("#star-simulate-form input[name=starKey]");
 
             var url = "/api/v1/stars/"+$starKey.val()+"/simulate";
+            if ($("#star-simulate-update").prop("checked")) {
+            	url += "?update=1";
+            }
+
             $.ajax({
                 url: url,
-                dataType: "json",
+                type: "POST",
                 success: function(data) {
-                    $("#update-form textarea").val(data.message.join("\r\n"));
+                    $("#update-form textarea").val(data);
                 },
                 error: function() {
                     alert("An error occured simulating the star. Check server logs.");
