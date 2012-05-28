@@ -311,7 +311,7 @@ message Colony
 
     // In the backend, population is actually stored as a floating point value, but
     // we don't care about that kind of accuracy.
-    optional int64 population = 5;
+    optional float population = 5;
 
     // Time, in seconds since Unix epoch, that this colony was last simulated (i.e.
     // when the population and such was last calculated)

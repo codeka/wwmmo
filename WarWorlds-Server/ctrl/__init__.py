@@ -87,7 +87,7 @@ def colonyModelToPb(colony_pb, colony_model):
   colony_pb.empire_key = str(empire_mdl.Colony.empire.get_value_for_datastore(colony_model))
   colony_pb.star_key = str(empire_mdl.Colony.star.get_value_for_datastore(colony_model))
   colony_pb.planet_key = str(empire_mdl.Colony.planet.get_value_for_datastore(colony_model))
-  colony_pb.population = int(colony_model.population)
+  colony_pb.population = colony_model.population
   colony_pb.last_simulation = int(dateTimeToEpoch(colony_model.lastSimulation))
   colony_pb.focus_population = colony_model.focusPopulation
   colony_pb.focus_farming = colony_model.focusFarming
@@ -96,7 +96,7 @@ def colonyModelToPb(colony_pb, colony_model):
 
 
 def colonyPbToModel(colony_model, colony_pb):
-  colony_model.population = float(colony_pb.population)
+  colony_model.population = colony_pb.population
   colony_model.lastSimulation = epochToDateTime(colony_pb.last_simulation)
   colony_model.focusPopulation = colony_pb.focus_population
   colony_model.focusFarming = colony_pb.focus_farming

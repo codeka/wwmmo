@@ -177,7 +177,12 @@ def updateAfterSimulate(star_pb, empire_key, log=logging.debug):
   ctrl.clearCached(keys_to_clear)
 
 
-def simulate(star_pb, empire_key=None, log=logging.debug):
+def _log_noop(msg):
+  '''This is the default logging function for simulate() -- it does nothing.'''
+  pass
+
+
+def simulate(star_pb, empire_key=None, log=_log_noop):
   '''Simulates the star and gets all of the colonies up to date.
 
   When simulating a star, we simulate all colonies in that star that belong to the given empire
@@ -277,8 +282,9 @@ def _simulateStep(dt, now, star_pb, empire_key, log):
 
   dt_in_hours = dt.total_seconds() / 3600.0
 
-  for colony_pb in star_pb.colonies:
-    log('--- Colony: focus=(pop: %.2f, farm: %.2f, mine: %.2f, cons: %.2f)' % (
+  for n,colony_pb in enumerate(star_pb.colonies):
+    log('--- Colony[%d]: pop=%.0f focus=(pop: %.2f, farm: %.2f, mine: %.2f, cons: %.2f)' % (
+         n, colony_pb.population,
          colony_pb.focus_population, colony_pb.focus_farming,
          colony_pb.focus_mining, colony_pb.focus_construction))
     if colony_pb.empire_key != empire_key:
@@ -297,12 +303,13 @@ def _simulateStep(dt, now, star_pb, empire_key, log):
     # calculate the output from farming this turn and add it to the star global
     goods = colony_pb.population*colony_pb.focus_farming * (planet_pb.farming_congeniality/100.0)
     colony_pb.delta_goods = goods
-    log('goods: '+str(goods))
+    log('goods: %.2f' % (goods * dt_in_hours))
     total_goods += goods * dt_in_hours
 
     # calculate the output from mining this turn and add it to the star global
     minerals = colony_pb.population*colony_pb.focus_mining * (planet_pb.mining_congeniality/100.0)
     colony_pb.delta_minerals = minerals
+    log('minerals: %.2f' % (minerals * dt_in_hours))
     total_minerals += minerals * dt_in_hours
 
     total_population += colony_pb.population
@@ -384,11 +391,13 @@ def _simulateStep(dt, now, star_pb, empire_key, log):
           # if we don't have enough minerals, the end time is essentially infinite
           build_request.end_time = 0
 
+  log('--- Updating population:')
+
   # Finally, update the population. The first thing we need to do is evenly distribute goods
   # between all of the colonies.
   total_goods_per_hour = total_population / 10.0
   total_goods_required = total_goods_per_hour * dt_in_hours
-  log('total_goods_required: '+str(total_goods_per_hour))
+  log('total_goods_required: %.2f, goods_available: %.2f' % (total_goods_required, total_goods))
 
   # If we have more than total_goods_required stored, then we're cool. Otherwise, our population
   # suffers...
@@ -405,12 +414,17 @@ def _simulateStep(dt, now, star_pb, empire_key, log):
     goods_efficiency = 0
 
   # now loop through the colonies and update the population/goods counter
-  for colony_pb in star_pb.colonies:
+  for n, colony_pb in enumerate(star_pb.colonies):
     if colony_pb.empire_key != empire_key:
       continue
 
+    log('--- Colony[%d]:' % (n))
+
     population_increase = colony_pb.population * colony_pb.focus_population
-    population_increase *= (goods_efficiency - 0.75) # that is, from -0.75 -> 0.25
+    if goods_efficiency >= 1:
+      population_increase *= 0.25
+    else:
+      population_increase *= goods_efficiency - 1.0
     colony_pb.delta_population = population_increase
 
     planet_pb = None
@@ -426,10 +440,10 @@ def _simulateStep(dt, now, star_pb, empire_key, log):
       congeniality_factor = 1.0 - congeniality_factor
     population_increase *= congeniality_factor
 
+    population_increase *= dt_in_hours
     log('population_increase: '+str(population_increase))
 
-    population_increase *= dt_in_hours
-    colony_pb.population += int(population_increase)
+    colony_pb.population += population_increase
 
   for empire in star_pb.empires:
     if empire_key != empire.empire_key:
@@ -440,6 +454,7 @@ def _simulateStep(dt, now, star_pb, empire_key, log):
   log(("simulation step: empire=%s dt=%.2f (hrs), delta goods=%.2f, "
        "delta minerals=%.2f, population=%.2f")
        % (empire_key, dt_in_hours, total_goods, total_minerals, total_population))
+  log('')
 
 
 def colonize(empire_pb, colonize_request):
