@@ -10,7 +10,7 @@ public class Colony {
     private String mKey;
     private String mPlanetKey;
     private String mStarKey;
-    private long mPopulation;
+    private float mPopulation;
     private String mEmpireKey;
     private float mFarmingFocus;
     private float mConstructionFocus;
@@ -34,7 +34,7 @@ public class Colony {
     public String getEmpireKey() {
         return mEmpireKey;
     }
-    public long getPopulation() {
+    public float getPopulation() {
         return mPopulation;
     }
     public float getFarmingFocus() {

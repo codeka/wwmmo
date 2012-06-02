@@ -264,7 +264,7 @@ def _simulateStep(dt, now, star_pb, empire_key, log):
   log("Simulation @ %s" % (now))
   total_goods = None
   total_minerals = None
-  total_population = 0
+  total_population = 0.0
   for empire in star_pb.empires:
     if empire_key != empire.empire_key:
       continue
@@ -277,8 +277,8 @@ def _simulateStep(dt, now, star_pb, empire_key, log):
     empire_pb.key = ''
     empire_pb.empire_key = empire_key
     empire_pb.star_key = star_pb.key
-    total_goods = 0
-    total_minerals = 0
+    total_goods = 0.0
+    total_minerals = 0.0
 
   dt_in_hours = dt.total_seconds() / 3600.0
 
@@ -327,6 +327,8 @@ def _simulateStep(dt, now, star_pb, empire_key, log):
 
     # If we have pending build requests, we'll have to update them as well
     if len(build_requests) > 0:
+      log("--- Building:")
+
       total_workers = colony_pb.population * colony_pb.focus_construction
       workers_per_build_request = total_workers / len(build_requests)
       log("Total workers = %d, workers per build request = %d" %
@@ -334,7 +336,7 @@ def _simulateStep(dt, now, star_pb, empire_key, log):
 
       for build_request in build_requests:
         design = Design.getDesign(build_request.build_kind, build_request.design_name)
-        log("Building: %s" % build_request.design_name)
+        log("--- Building: %s" % build_request.design_name)
 
         # work out if the building is supposed to be started this timestep or not. Even if it's
         # scheduled to start this timestep, it may only be scheduled half-way through this time
@@ -349,38 +351,40 @@ def _simulateStep(dt, now, star_pb, empire_key, log):
         # the workers and you double the build time. 
         total_build_time_in_hours = design.buildTimeSeconds / 3600.0
         total_build_time_in_hours *= (100.0 / workers_per_build_request)
-        log("total_build_time = %.4f" % total_build_time_in_hours)
+        log("total_build_time = %.2f" % total_build_time_in_hours)
 
         # Work out how many hours we've spend so far
         time_spent = now - ctrl.epochToDateTime(build_request.start_time)
         time_spent = time_spent.total_seconds() / 3600.0
         if time_spent < 0:
           time_spent = 0
-        log("time_spent = %.4f" % time_spent)
+        log("time_spent = %.2f" % time_spent)
 
         dt_required = dt_in_hours
         if time_spent + dt_required > total_build_time_in_hours:
           # If we're going to finish on this turn, we only need a fraction of the minerals we'd
           # otherwise use, so make sure dt_required is correct
           dt_required = total_build_time_in_hours - time_spent
-        log("dt_required = %.4f" % dt_required)
+        log("dt_required = %.2f" % dt_required)
 
         # work out how many minerals we require for this turn
         minerals_required_per_hour = design.buildCostMinerals / total_build_time_in_hours
         minerals_required = minerals_required_per_hour * dt_required
-        log("mineral_required_per_hour = %.4f ; minerals_required (this turn) = %.4f"
+        log("mineral_required_per_hour = %.2f, minerals_required (this turn) = %.2f"
             % (minerals_required_per_hour, minerals_required))
 
         if total_minerals > minerals_required:
           # awesome, we have enough minerals so we can make some progress. We'll start by
           # removing the minerals we need from the global pool...
           total_minerals -= minerals_required
+          log("remaining minerals: %.2f" % (total_minerals))
 
           # next, work out the actual amount of progress this turn...
           build_request.progress += dt_required / total_build_time_in_hours
           if build_request.progress >= 1:
             # complete!
             build_request.progress = 1
+          log("build progress: %.2f" % (build_request.progress))
 
           # adjust the end_time for this turn
           build_request.end_time = int(build_request.start_time +
@@ -389,6 +393,7 @@ def _simulateStep(dt, now, star_pb, empire_key, log):
           # anything since it'll be fixed up by the tasks/empire/build-check task.
         else:
           # if we don't have enough minerals, the end time is essentially infinite
+          log("  not enough minerals, cannot progress")
           build_request.end_time = 0
 
   log('--- Updating population:')
@@ -408,10 +413,10 @@ def _simulateStep(dt, now, star_pb, empire_key, log):
 
   # subtract all the goods we'll need
   total_goods -= total_goods_required
-  if total_goods < 0:
+  if total_goods < 0.0:
     # We've run out of goods! That's bad...
-    total_goods = 0
-    goods_efficiency = 0
+    total_goods = 0.0
+    goods_efficiency = 0.0
 
   # now loop through the colonies and update the population/goods counter
   for n, colony_pb in enumerate(star_pb.colonies):
@@ -436,7 +441,7 @@ def _simulateStep(dt, now, star_pb, empire_key, log):
     # if we're increasing population, it slows down the closer you get to the population
     # congeniality. If population is decreasing, it slows down the FURTHER you get.
     congeniality_factor = colony_pb.population / planet_pb.population_congeniality
-    if population_increase >= 0:
+    if population_increase >= 0.0:
       congeniality_factor = 1.0 - congeniality_factor
     population_increase *= congeniality_factor
 

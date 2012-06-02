@@ -328,7 +328,7 @@ public class SolarSystemActivity extends Activity {
             TextView populationValue = (TextView) findViewById(
                     R.id.solarsystem_colony_population_value);
             populationValue.setText(String.format("%d %s%d / hr",
-                    mColony.getPopulation(),
+                    (int) mColony.getPopulation(),
                     (mColony.getPopulationDelta() > 0 ? "+" : "-"),
                     Math.abs((int) mColony.getPopulationDelta())));
 
