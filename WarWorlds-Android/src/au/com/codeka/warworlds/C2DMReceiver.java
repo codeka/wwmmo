@@ -19,7 +19,6 @@ import com.google.android.c2dm.C2DMBaseReceiver;
 import com.google.android.c2dm.C2DMessaging;
 
 import java.io.IOException;
-import java.util.Properties;
 import java.util.concurrent.Callable;
 
 import org.slf4j.Logger;
@@ -52,8 +51,7 @@ public class C2DMReceiver extends C2DMBaseReceiver {
         sOnComplete = onComplete;
         sActivity = activity;
 
-        Properties props = Util.getProperties();
-        C2DMessaging.register(activity, props.getProperty("c2dm.sender-id"));
+        C2DMessaging.register(activity, SENDER_ID);
     }
 
     /**

@@ -153,7 +153,6 @@ def updateAfterSimulate(star_pb, empire_key, log=logging.debug):
     if colony_pb.empire_key != empire_key:
       continue
 
-    colony_pb.last_simulation = ctrl.dateTimeToEpoch(datetime.now())
     colony_model = mdl.Colony.get(colony_pb.key)
     ctrl.colonyPbToModel(colony_model, colony_pb)
     colony_model.put()
@@ -245,6 +244,14 @@ def simulate(star_pb, empire_key=None, log=_log_noop):
   dt = end_time - start_time
   if dt.total_seconds() > 0:
     _simulateStep(dt, start_time, star_pb, empire_key, log)
+
+  # Finally, we make sure last_simulation is correct
+  last_simulation = ctrl.dateTimeToEpoch(datetime.now())
+  for colony_pb in star_pb.colonies:
+    if colony_pb.empire_key != empire_key:
+      continue
+
+    colony_pb.last_simulation = last_simulation
 
 
 def _simulateStep(dt, now, star_pb, empire_key, log):

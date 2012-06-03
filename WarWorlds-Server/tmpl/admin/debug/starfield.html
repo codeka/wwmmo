@@ -74,6 +74,7 @@
             evnt.preventDefault();
             var $coords = $("#sector-input-form input[name=coords]");
 
+            $("#update-form textarea").val("");
             var coords = $coords.val();
             $.ajax({
                 url: "/api/v1/sectors?coords="+coords,
@@ -91,6 +92,7 @@
             evnt.preventDefault();
             var $starKey = $("#star-input-form input[name=starKey]");
 
+            $("#update-form textarea").val("");
             var url = "/api/v1/stars/"+$starKey.val();
             $.ajax({
                 url: url,
@@ -108,6 +110,7 @@
             evnt.preventDefault();
             var $starKey = $("#star-simulate-form input[name=starKey]");
 
+            $("#update-form textarea").val("");
             var url = "/api/v1/stars/"+$starKey.val()+"/simulate";
             if ($("#star-simulate-update").prop("checked")) {
             	url += "?update=1";

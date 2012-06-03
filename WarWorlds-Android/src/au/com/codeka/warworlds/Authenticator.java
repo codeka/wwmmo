@@ -112,9 +112,7 @@ public class Authenticator {
                     log.info("Account found, setting up with debug auth cookie.");
                     // Use a fake cookie for the dev mode app engine server. The cookie has the
                     // form email:isAdmin:userId (we set the userId to be the same as the email)
-                    String authCookie = "dev_appserver_login="+accountName+":false:"+accountName;
-
-                    return authCookie;
+                    return "dev_appserver_login="+accountName+":false:"+accountName;
                 } else {
                     log.info("Account found, fetching authentication token...");
 
@@ -128,9 +126,7 @@ public class Authenticator {
                     authToken = getAuthToken(account, activity);
 
                     // Convert the token into a cookie for future use
-                    String authCookie = AppEngineAuthenticator.authenticate(authToken);
-
-                    return authCookie;
+                    return AppEngineAuthenticator.authenticate(authToken);
                 }
             }
         }

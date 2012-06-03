@@ -147,9 +147,11 @@ public class AccountsActivity extends Activity {
                     // Register
                     register((String) account.getText(), new Callable<Void>() {
                         public Void call() {
+                            log.debug("Authentication complete.");
+
                             if (mPleaseWaitDialog != null) {
                                 mPleaseWaitDialog.dismiss();
-                                }
+                            }
 
                             finish();
                             return null;
@@ -236,7 +238,7 @@ public class AccountsActivity extends Activity {
             protected Void doInBackground(Void... arg0) {
                 String authCookie = Authenticator.authenticate(AccountsActivity.this, accountName);
                 ApiClient.getCookies().add(authCookie);
-                String senderID = Util.getProperties().getProperty("c2dm.sender-id");
+                String senderID = C2DMReceiver.SENDER_ID;
                 C2DMReceiver.register(AccountsActivity.this, senderID, onComplete);
 
                 // re-configure the authenticator, making sure it has details of the new user.

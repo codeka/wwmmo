@@ -223,7 +223,7 @@ public class SolarSystemSurfaceView extends UniverseElementSurfaceView {
         if (mSelectedPlanet != null) {
             canvas.drawCircle((float) mSelectedPlanet.centre.getX(), 
                     (float) mSelectedPlanet.centre.getY(),
-                    50 * mPixelScale, mSelectedPlanetPaint);
+                    40 * mPixelScale, mSelectedPlanetPaint);
         }
     }
 
@@ -234,23 +234,33 @@ public class SolarSystemSurfaceView extends UniverseElementSurfaceView {
     private class GestureListener extends GestureDetector.SimpleOnGestureListener {
         @Override
         public boolean onSingleTapConfirmed(MotionEvent e) {
-            PlanetInfo newSelection = null;
-
             Point2D tapLocation = new Point2D(e.getX(), e.getY());
+            PlanetInfo closestPlanet = null;
             for (PlanetInfo planetInfo : mPlanetInfos) {
-                if (tapLocation.distanceTo(planetInfo.centre) < 80.0*mPixelScale) {
-                    if (mSelectedPlanet != planetInfo) {
-                        newSelection = planetInfo;
+                if (closestPlanet == null) {
+                    closestPlanet = planetInfo;
+                } else {
+                    double distanceToClosest = tapLocation.distanceTo(closestPlanet.centre);
+                    double distanceToThis = tapLocation.distanceTo(planetInfo.centre);
+                    if (distanceToThis < distanceToClosest) {
+                        closestPlanet = planetInfo;
                     }
                 }
             }
 
-            if (newSelection != null) {
-                selectPlanet(newSelection.planet.getKey());
+            PlanetInfo newSelection = null;
+            if (closestPlanet != null &&
+                    closestPlanet != mSelectedPlanet &&
+                    tapLocation.distanceTo(closestPlanet.centre) < 60.0 * mPixelScale) {
+                newSelection = closestPlanet;
             }
 
-            // play the 'click' sound effect
-            playSoundEffect(android.view.SoundEffectConstants.CLICK);
+            if (newSelection != null) {
+                selectPlanet(newSelection.planet.getKey());
+
+                // play the 'click' sound effect
+                playSoundEffect(android.view.SoundEffectConstants.CLICK);
+            }
 
             return false;
         }

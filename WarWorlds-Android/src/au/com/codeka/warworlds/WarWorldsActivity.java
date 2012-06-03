@@ -38,6 +38,7 @@ public class WarWorldsActivity extends Activity {
     private Button mStartGameButton;
     private TextView mConnectionStatus;
     private Handler mHandler;
+    private boolean mNeedHello;
 
     private static final int OPTIONS_DIALOG = 1000;
 
@@ -53,16 +54,24 @@ public class WarWorldsActivity extends Activity {
 
         requestWindowFeature(Window.FEATURE_NO_TITLE); // remove the title bar
         setHomeScreenContent();
+        mNeedHello = true;
     }
 
     @Override
     public void onResume() {
         super.onResume();
+        log.debug("WarWorldsActivity.onResume...");
 
         SharedPreferences prefs = Util.getSharedPreferences(mContext);
         if (prefs.getString("AccountName", null) == null) {
+            log.info("No accountName saved, switching to AccountsActivity");
             startActivity(new Intent(this, AccountsActivity.class));
             return;
+        }
+
+        if (mNeedHello) {
+            sayHello(0);
+            mNeedHello = false;
         }
     }
 
@@ -82,7 +91,8 @@ public class WarWorldsActivity extends Activity {
      * 
      * @param motd The \c WebView we'll install the MOTD to.
      */
-    private void sayHello(final TransparentWebView motdView, final int retries) {
+    private void sayHello(final int retries) {
+        log.debug("Saying 'hello'...");
 
         mStartGameButton.setEnabled(false);
         if (retries == 0) {
@@ -109,6 +119,7 @@ public class WarWorldsActivity extends Activity {
                 // re-authenticate and get a new cookie
                 String authCookie = Authenticator.authenticate(WarWorldsActivity.this, accountName);
                 ApiClient.getCookies().add(authCookie);
+                log.debug("Got auth cookie: "+authCookie);
 
                 // say hello to the server
                 String message;
@@ -143,6 +154,8 @@ public class WarWorldsActivity extends Activity {
                     message = "<p class=\"error\">An error occured talking to the server, check " +
                               "data connection.</p>";
                     mErrorOccured = true;
+
+                    log.error("Error occurred in 'hello'", e);
                 }
 
                 return message;
@@ -150,6 +163,8 @@ public class WarWorldsActivity extends Activity {
 
             @Override
             protected void onPostExecute(String result) {
+                final TransparentWebView motdView = (TransparentWebView) findViewById(R.id.home_motd);
+
                 mConnectionStatus.setText("Connected");
                 mStartGameButton.setEnabled(true);
                 if (mNeedsEmpireSetup) {
@@ -169,7 +184,7 @@ public class WarWorldsActivity extends Activity {
                     mHandler.postDelayed(new Runnable() {
                         @Override
                         public void run() {
-                            sayHello(motdView, retries+1);
+                            sayHello(retries+1);
                         }
                     }, 3000);
                 }
@@ -184,8 +199,6 @@ public class WarWorldsActivity extends Activity {
         mConnectionStatus = (TextView) findViewById(R.id.connection_status);
         final Button logOutButton = (Button) findViewById(R.id.log_out_btn);
         final Button optionsButton = (Button) findViewById(R.id.options_btn);
-
-        final TransparentWebView motd = (TransparentWebView) findViewById(R.id.home_motd);
 
         logOutButton.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
@@ -205,7 +218,5 @@ public class WarWorldsActivity extends Activity {
                 startActivity(new Intent(mContext, StarfieldActivity.class));
             }
         });
-
-        sayHello(motd, 0);
     }
 }
