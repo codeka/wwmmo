@@ -1,7 +1,8 @@
 """model: Contains data definitions and methods to interact directly with the data store."""
 
-from google.appengine.ext import db
 import logging
+
+from google.appengine.ext import db
 
 
 class MessageOfTheDay(db.Model):

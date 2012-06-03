@@ -1,16 +1,18 @@
 """ctrl: The controller module contains the "business logic" for the game."""
 
-from model import empire as empire_mdl
-import model as mdl
+import calendar
+from datetime import datetime
+import logging
+import time
+
 from google.appengine.ext import db
 from google.appengine.api import users
 from google.appengine.api import memcache
-import calendar
-import time
-from datetime import datetime
-import logging
-import protobufs.warworlds_pb2 as pb
 from google.protobuf.message import Message
+
+import protobufs.warworlds_pb2 as pb
+from model import empire as empire_mdl
+import model as mdl
 
 
 def getCached(keys, ProtoBuffClass):

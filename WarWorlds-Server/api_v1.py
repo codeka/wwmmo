@@ -1,22 +1,25 @@
 """api_v1.py: The handlers for the actual API that the client calls."""
 
+import os
+import logging
+
+from google.appengine.api import channel
+from google.appengine.api import users
+
+import webapp2 as webapp
+
 import import_fixer
 import_fixer.FixImports("google", "protobuf")
 
-import webapp2 as webapp
 import model
 from model import c2dm
 from ctrl import sector
 from ctrl import empire
 import ctrl
-import os
 
 from protobufs import protobuf_json, warworlds_pb2 as pb
 from google.protobuf import message
 
-from google.appengine.api import channel
-from google.appengine.api import users
-import logging
 
 
 class ApiPage(webapp.RequestHandler):

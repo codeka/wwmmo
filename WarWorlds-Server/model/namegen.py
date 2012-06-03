@@ -1,6 +1,7 @@
 """namegen.py: Contains logic for generating random names."""
 
-import os, random
+import os
+import random
 import logging
 
 

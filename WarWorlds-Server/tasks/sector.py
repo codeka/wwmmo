@@ -1,16 +1,19 @@
 """sector.py: Sector/star/planet related tasks."""
 
-from google.appengine.api import taskqueue
-from google.appengine.ext import db
-from model import sector as mdl
-from model import namegen
 import collections
-import tasks
 import logging
 import math
-import random
-import webapp2 as webapp
 import os
+import random
+
+from google.appengine.api import taskqueue
+from google.appengine.ext import db
+
+import webapp2 as webapp
+
+from model import sector as mdl
+from model import namegen
+import tasks
 
 
 # This is used to choose a star type at a given point in the map.

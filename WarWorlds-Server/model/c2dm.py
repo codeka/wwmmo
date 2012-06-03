@@ -4,6 +4,7 @@ import logging
 import os
 import urllib, urllib2
 
+
 class ClientLoginTokenFactory:
   _token = None
 

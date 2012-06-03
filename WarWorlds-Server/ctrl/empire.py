@@ -1,17 +1,19 @@
 """empire.py: Controller for empire-related functions. Aso contains the 'simulate' method."""
 
 
+from datetime import datetime, timedelta
+import logging
+import os
+from xml.etree import ElementTree as ET
+
+from google.appengine.ext import db
+from google.appengine.api import taskqueue
+
 import ctrl
 from ctrl import sector
 from model import sector as sector_mdl
 from model import empire as mdl
 from protobufs import warworlds_pb2 as pb
-import logging
-from xml.etree import ElementTree as ET
-from datetime import datetime, timedelta
-import os
-from google.appengine.ext import db
-from google.appengine.api import taskqueue
 
 
 def getEmpireForUser(user):

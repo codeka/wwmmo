@@ -1,17 +1,19 @@
 """admin.py: Contains web handlers for the admin interface."""
 
-import jinja2, os
-import webapp2 as webapp
+import os
+import logging
 
-import model
-from model import session
-
-from mapreduce import control
 from google.appengine.api import channel
 from google.appengine.api import users
 from google.appengine.ext.db.metadata import Kind
 
-import logging
+import jinja2
+import webapp2 as webapp
+from mapreduce import control
+
+import model
+from model import session
+
 
 Jinja = jinja2.Environment(loader=jinja2.FileSystemLoader(os.path.dirname(__file__)+"/tmpl"))
 

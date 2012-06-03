@@ -1,8 +1,9 @@
 """sector.py: Contains models relating to sectors, stars, planets, etc."""
 
+import logging
+
 from google.appengine.ext import db
 from google.appengine.api import taskqueue
-import logging
 
 
 class StarType:

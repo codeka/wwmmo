@@ -1,9 +1,10 @@
 """sector.py: Contains business logic for the sectors, stars etc."""
 
-import ctrl
-from model import sector as mdl
-from model import empire as empire_mdl
 import collections
+
+import ctrl
+from model import empire as empire_mdl
+from model import sector as mdl
 from protobufs import warworlds_pb2 as pb
 
 

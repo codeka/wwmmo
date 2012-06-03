@@ -1,16 +1,19 @@
 """empire.py: Empire-related tasks."""
 
-import webapp2 as webapp
-import tasks
-from model import empire as mdl
-from model import c2dm
 from datetime import datetime, timedelta
+import logging
+import os
+
+from google.appengine.ext import db
+
+import webapp2 as webapp
+
 import ctrl
 from ctrl import empire as ctl
-from google.appengine.ext import db
-import logging
+from model import empire as mdl
+from model import c2dm
 import protobufs.warworlds_pb2 as pb
-import os
+import tasks
 
 
 class BuildCheckPage(tasks.TaskPage):

@@ -1,9 +1,11 @@
 """frontend.py: The 'frontend' is just a dummy page, "nothing to see"."""
 
-import jinja2, os
-import webapp2 as webapp
+import os
+
 from google.appengine.api import users
 
+import jinja2
+import webapp2 as webapp
 
 jinja = jinja2.Environment(loader=jinja2.FileSystemLoader(os.path.dirname(__file__)+"/tmpl"))
 

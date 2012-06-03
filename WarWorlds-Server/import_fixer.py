@@ -1,15 +1,18 @@
+"""Fixes imports so we can import things from google.*
+
+By default, we cannot include packages with the prefix 'google' in App Engine
+applications. However, we want to use protocol buffers, and they're pretty hard-
+wired to use the google. package prefix. So this'll let us use it regardless.
+
+See: http://groups.google.com/group/google-appengine/msg/12e6c7d9bcda7a46
+
+Usage:
+  import import_fixer
+  import_fixer.FixImports('google', 'protobuf')
+"""
+
 import os
 import sys
-
-# By default, we cannot include packages with the prefix 'google' in App Engine
-# applications. However, we want to use protocol buffers, and they're pretty hard-
-# wired to use the google. package prefix. So this'll let us use it regardless.
-#
-# See: http://groups.google.com/group/google-appengine/msg/12e6c7d9bcda7a46
-#
-# Usage:
-# import import_fixer
-# import_fixer.FixImports('google', 'protobuf')
 
 
 def FixImports(base_package, *packages):
