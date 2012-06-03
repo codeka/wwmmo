@@ -1,8 +1,4 @@
-'''
-Created on 24/03/2012
-
-@author: dean@codeka.com.au
-'''
+"""session.py: Models a 'session' which helps in the admin interface."""
 
 import pickle
 from google.appengine.ext import db
@@ -18,19 +14,19 @@ class Session(db.Model):
 
   @staticmethod
   def attach(handler, options=None):
-    '''Attaches a session to the given webapp.Handler instance.
-    
+    """Attaches a session to the given webapp.Handler instance.
+
     This is usually called right at the start of the page so that we can query the cookie to
-    see if there's already a session establish, and create a new one if not.'''
+    see if there's already a session establish, and create a new one if not."""
 
     if options is None:
       options = {}
-    if 'cookie_name' not in options:
-      options['cookie_name'] = 'SESSID'
+    if "cookie_name" not in options:
+      options["cookie_name"] = "SESSID"
 
     sess = None
-    if options['cookie_name'] in handler.request.cookies:
-      session_id = handler.request.cookies[options['cookie_name']]
+    if options["cookie_name"] in handler.request.cookies:
+      session_id = handler.request.cookies[options["cookie_name"]]
       sess = Session.get(session_id)
       if sess is not None:
         #TODO: validate session
@@ -42,13 +38,14 @@ class Session(db.Model):
     if sess is None:
       sess = Session()
       sess.put()
-      handler.response.set_cookie(options['cookie_name'], str(sess.key()))
+      handler.response.set_cookie(options["cookie_name"], str(sess.key()))
 
     sess.options = options
     return sess
 
   def detach(self):
-    '''Called at the end of the page cycle to save the session data back again.'''
+    """Called at the end of the page cycle to save the session data back again."""
+
     if self.isModified:
       self.data = pickle.dumps(self.sessionData)
       self.put()

@@ -1,12 +1,9 @@
-'''
-Created on 18/02/2012
-
-@author: dean@codeka.com.au
-'''
+"""sector.py: Contains models relating to sectors, stars, planets, etc."""
 
 from google.appengine.ext import db
 from google.appengine.api import taskqueue
 import logging
+
 
 class StarType:
   def __init__(self, colourName="", colourValue=[0xff, 0xff, 0xff]):
@@ -43,7 +40,6 @@ planet_types = [PlanetType(name="Gas Giant"),
                ]
 
 
-
 class Sector(db.Model):
   x = db.IntegerProperty()
   y = db.IntegerProperty()
@@ -73,19 +69,21 @@ class Planet(db.Model):
 
 
 class SectorManager:
-  ''''Manages' the sectors, stars, planets, etc. Lets you fetch them, update them, etc
+  """'Manages' the sectors, stars, planets, etc. Lets you fetch them, update them, etc
 
   The most important job of the SectorManager is to maintain consistency of the database. It also
-  helps with caching and building new sectors when they come into view for the first time.'''
+  helps with caching and building new sectors when they come into view for the first time."""
+
   @staticmethod
   def getSector(x, y):
-    '''Gets the sector at the given (x,y) coordinates.'''
+    """Gets the sector at the given (x,y) coordinates."""
+
     sectors = SectorManager.getSectors(x, y, x+1, y+1)
     return sectors[SectorManager._getSectorKey(x, y)]
 
   @staticmethod
   def getSectors(coords):
-    '''Gets all of the sectors with the given range of coordinates.'''
+    """Gets all of the sectors with the given range of coordinates."""
 
     keys = []
     for coord in coords:
@@ -117,10 +115,11 @@ class SectorManager:
 
   @staticmethod
   def getStar(starKey):
-    '''Gets all of the details about a single star, including planets colonies and so on.
+    """Gets all of the details about a single star, including planets colonies and so on.
 
     We don't worry about whether the sector has been generated. If not, we just return None.
-    After all, you shouldn't be asking for a star in a sector you haven't visited yet.'''
+    After all, you shouldn't be asking for a star in a sector you haven't visited yet."""
+
     star = Star.get(starKey)
     if star is None:
       return None

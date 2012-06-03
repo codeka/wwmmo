@@ -1,4 +1,4 @@
-
+"""sector.py: Contains business logic for the sectors, stars etc."""
 
 import ctrl
 from model import sector as mdl
@@ -7,21 +7,22 @@ import collections
 from protobufs import warworlds_pb2 as pb
 
 
-SectorCoord = collections.namedtuple('SectorCoord', ['x', 'y'])
+SectorCoord = collections.namedtuple("SectorCoord", ["x", "y"])
 
 
 def getSectors(coords):
-  '''Fetches all sectors from in the given array (of SectorCoods).'''
+  """Fetches all sectors from in the given array (of SectorCoods)."""
+
   keys = []
   for coord in coords:
-    keys.append('sector:%d,%d' % (coord.x, coord.y))
+    keys.append("sector:%d,%d" % (coord.x, coord.y))
 
   sectors = ctrl.getCached(keys, pb.Sector)
 
   # Figure out which sectors were not in the cache and fetch them from the model instead
   missing_coords = []
   for coord in coords:
-    key = 'sector:%d,%d' % (coord.x, coord.y)
+    key = "sector:%d,%d" % (coord.x, coord.y)
     if key not in sectors:
       missing_coords.append(coord)
   if len(missing_coords) > 0:
@@ -32,7 +33,7 @@ def getSectors(coords):
       sector_pb = pb.Sector()
       ctrl.sectorModelToPb(sector_pb, sector_model)
 
-      cache_key = 'sector:%d,%d' % (sector_model.x, sector_model.y)
+      cache_key = "sector:%d,%d" % (sector_model.x, sector_model.y)
       sectors[cache_key] = sector_pb
       sectors_to_cache[cache_key] = sector_pb
 
@@ -43,9 +44,11 @@ def getSectors(coords):
   sectors_pb.sectors.extend(sectors.values())
   return sectors_pb
 
+
 def getStar(star_key):
-  '''Gets a star, given it's key.'''
-  cache_key = 'star:%s' % (star_key)
+  """Gets a star, given it's key."""
+
+  cache_key = "star:%s" % (star_key)
   values = ctrl.getCached([cache_key], pb.Star)
   if cache_key in values:
     return values[cache_key]

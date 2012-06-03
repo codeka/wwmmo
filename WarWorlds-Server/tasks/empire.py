@@ -1,8 +1,4 @@
-'''
-Created on 14/04/2012
-
-@author: dean@codeka.com.au
-'''
+"""empire.py: Empire-related tasks."""
 
 import webapp2 as webapp
 import tasks
@@ -19,14 +15,15 @@ import os
 
 class BuildCheckPage(tasks.TaskPage):
   def get(self):
-    '''This page is called when a build operation is scheduled to finish.
+    """This page is called when a build operation is scheduled to finish.
 
     We need to confirm that the build is actually complete, set up the building or ship with the
     empire that built it, and then reschedule ourselves for the next build.
-    '''
+    """
 
     def _fetchOperationInTX(oper_key):
-      '''This is done in a transaction to make sure only one request processes the build.'''
+      """This is done in a transaction to make sure only one request processes the build."""
+
       oper_model = mdl.BuildOperation.get(oper_key)
       if not oper_model:
         return None
@@ -95,8 +92,8 @@ class BuildCheckPage(tasks.TaskPage):
         design = ctl.ShipDesign.getDesign(model.designName)
 
       # Send a notification to the player that construction of their building is complete
-      msg = 'Your %s has been built.' % (design.name)
-      logging.debug('Sending message to user [%s] indicating build complete.' % (
+      msg = "Your %s has been built." % (design.name)
+      logging.debug("Sending message to user [%s] indicating build complete." % (
           model.empire.user.email()))
       s = c2dm.Sender()
       devices = ctrl.getDevicesForUser(model.empire.user.email())
@@ -105,14 +102,14 @@ class BuildCheckPage(tasks.TaskPage):
       return None
 
       # clear the cached items that reference this building/fleet
-      keys_to_clear.append('star:%s' % (star_key))
-      keys_to_clear.append('colonies:for-empire:%s' % (empire_key))
+      keys_to_clear.append("star:%s" % (star_key))
+      keys_to_clear.append("colonies:for-empire:%s" % (empire_key))
 
     ctrl.clearCached(keys_to_clear)
     ctl.scheduleBuildCheck()
 
     self.response.write("Success!")
 
-app = webapp.WSGIApplication([('/tasks/empire/build-check', BuildCheckPage)],
-                             debug=os.environ['SERVER_SOFTWARE'].startswith('Development'))
+app = webapp.WSGIApplication([("/tasks/empire/build-check", BuildCheckPage)],
+                             debug=os.environ["SERVER_SOFTWARE"].startswith("Development"))
 

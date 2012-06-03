@@ -1,8 +1,4 @@
-'''
-Created on 01/04/2012
-
-@author: dean@codeka.com.au
-'''
+"""sector.py: Sector/star/planet related tasks."""
 
 from google.appengine.api import taskqueue
 from google.appengine.ext import db
@@ -21,14 +17,14 @@ import os
 _starTypeBonuses = [30, 40, 50, 40, 30, 0, 0]
 
 _starColours = {
-    'min': [[0xd0, 0xf0, 0xf0],  # Blue
+    "min": [[0xd0, 0xf0, 0xf0],  # Blue
             [0xe0, 0xeb, 0xc8],  # White
             [0xef, 0xce, 0x59],  # Yellow
             [0xd9, 0xb2, 0x0d],  # Orange
             [0xd9, 0x74, 0x5f],  # Red
             [0x22, 0x91, 0xeb],  # Neutron
             [0x00, 0x43, 0x4f]], # Black Hole
-    'max': [[0xdf, 0xff, 0xff],
+    "max": [[0xdf, 0xff, 0xff],
             [0xff, 0xfb, 0xe0],
             [0xff, 0xe0, 0x6b],
             [0xeb, 0xa4, 0x1f],
@@ -43,7 +39,7 @@ _planetCountBonuses = [-9999, -9999, 0, 10, 20, 10, 5, 0]
 # Planet type bonuses. The bonuses for each entry need to be added to get the "final" bonus
 _planetTypeBonuses = {
               #GasGiant #Radiated #Inferno #Asteroids #Water #Toxic #Desert #Swamp #Terran
-    'slot': [[-20,      10,       20,      -20,       -20,   0,     10,     0,     -10], # close to sun
+    "slot": [[-20,      10,       20,      -20,       -20,   0,     10,     0,     -10], # close to sun
              [-10,      0,        10,      -20,       0,     0,     0,      0,     -10],
              [0,        -10,      -10,     0,         0,     0,     0,      0,     10],
              [10,       -10,      -20,     0,         10,    0,     -10,    10,    10],
@@ -51,7 +47,7 @@ _planetTypeBonuses = {
              [20,       -20,      -40,     -10,       0,     0,     -30,    0,     5],
              [30,       -20,      -40,     -10,       0,     0,     -30,    0,     0] # far from sun
             ],
-    'star': [[-10,      0,        0,       0,         0,     -10,   0,      0,     0], # blue
+    "star": [[-10,      0,        0,       0,         0,     -10,   0,      0,     0], # blue
              [-10,      -5,       -5,      0,         0,     -10,   0,      0,     10], # white
              [-10,      -5,       -10,     0,         0,     -10,   0,      0,     20], # yellow
              [-10,      -5,       -20,     0,         0,     -5,    0,      0,     20], # orange
@@ -88,18 +84,19 @@ _planetMiningBonuses = [
 
 
 def poisson(width, height, min_distance, packing=30):
-  '''Generates a poisson distribution of points in a grid.
-  
+  """Generates a poisson distribution of points in a grid.
+
   Args:
     width: The width of the grid
     height: The height of the grid
     min_distance: The minimum distance two points can be from each other
     packing: A value that describes how tightly "packed" the points should be. 30 is
       decent starting value.
-  '''
+  """
 
   def generatePointAround(point, min_distance):
-    '''Generates a new point around the given centre point and at least min_distance from it.'''
+    """Generates a new point around the given centre point and at least min_distance from it."""
+
     radius = min_distance * (1+random.random())
     angle = 2*math.pi*random.random()
   
@@ -110,8 +107,8 @@ def poisson(width, height, min_distance, packing=30):
     return x, y
 
   def inNeighbourhood(points, point, min_distance, cell_size):
-    '''Checks whether any previous point is too close to this new one.'''
-  
+    """Checks whether any previous point is too close to this new one."""
+
     def distance(p1, p2):
       x1, y1 = p1
       x2, y2 = p2
@@ -133,7 +130,7 @@ def poisson(width, height, min_distance, packing=30):
   points.add(first_point)
 
   while unprocessed:
-    logging.debug("Unprocess list contains "+str(len(unprocessed))+" items")
+    logging.debug("Unprocess list contains %d items" % (len(unprocessed)))
     point = unprocessed.pop(random.randint(0, len(unprocessed)-1))
     for _ in range(packing):
       new_point = generatePointAround(point, min_distance)
@@ -151,18 +148,18 @@ def poisson(width, height, min_distance, packing=30):
 
 
 class SectorGenerator:
-  '''This class generates a brand new sector. We give it some stars, planets and whatnot.'''
+  """This class generates a brand new sector. We give it some stars, planets and whatnot."""
 
   def __init__(self, x, y):
     self.x = x
     self.y = y
 
   def generate(self):
-    '''Generates a new sector at our (x,y) corrdinate
+    """Generates a new sector at our (x,y) corrdinate
 
     Stars are generated within the sector using a Poisson distribution algorithm. For more
     details, see: http://devmag.org.za/2009/05/03/poisson-disk-sampling/
-    '''
+    """
 
     # We do this first bit in a transaction to ensure only one sector at the given (x,y) location
     # is ever generated.
@@ -183,10 +180,10 @@ class SectorGenerator:
       return sector
     sector =  db.run_in_transaction(_tx)
     if sector is None:
-      logging.warn("Sector ("+key_name+") already exists.")
+      logging.warn("Sector '%s' already exists." % (key_name))
       return
     else:
-      logging.info("Generating new sector ("+key_name+")...")
+      logging.info("Generating new sector '%s'..." % (key_name))
 
     SECTOR_SIZE = 1024
 
@@ -206,8 +203,8 @@ class SectorGenerator:
       star.size = random.randint(16, 24)
 
       def getColour(starTypeIndex, component):
-        c1 = _starColours['min'][starTypeIndex][component]
-        c2 = _starColours['max'][starTypeIndex][component]
+        c1 = _starColours["min"][starTypeIndex][component]
+        c2 = _starColours["max"][starTypeIndex][component]
         return int(c1 + ((c2 - c1) * random.random()))
 
       r = getColour(starTypeIndex, 0)
@@ -221,8 +218,8 @@ class SectorGenerator:
     for star in sector.stars:
       numPlanets = self._select(_planetCountBonuses)
       for index in range(numPlanets):
-        type_bonuses = [sum(elements) for elements in zip(_planetTypeBonuses['slot'][index],
-                                                          _planetTypeBonuses['star'][star.starTypeIndex])]
+        type_bonuses = [sum(elements) for elements in zip(_planetTypeBonuses["slot"][index],
+                                                          _planetTypeBonuses["star"][star.starTypeIndex])]
         planet = mdl.Planet()
         planet.star = star.key()
         planet.index = (index+1)
@@ -248,12 +245,13 @@ class SectorGenerator:
         planet.put()
 
   def _select(self, bonuses):
-    '''Selects an index from a list of bonuses.
+    """Selects an index from a list of bonuses.
 
     For example, if you pass in [0,0,0,0], then all four indices are equally like and
     we will return a value in the range [0,4) with equal probability. If you pass in something
     like [0,0,30] then the third item has a "bonus" of 30 and is hence 2 is a far more likely
-    result than 0 or 1.'''
+    result than 0 or 1."""
+
     values = []
     for i,bonus in enumerate(bonuses):
       values.append(bonus + self._normalRandom(100))
@@ -268,10 +266,11 @@ class SectorGenerator:
     return maxIndex
 
   def _normalRandom(self, maxValue, rounds=10):
-    '''Generates a random number that has an approximate normal distribution around the midpoint.
+    """Generates a random number that has an approximate normal distribution around the midpoint.
 
     For example, is maxValue=100 then you'll most get values around 50 and only occasionally 0
-    or 100.'''
+    or 100."""
+
     n = 0
     step = maxValue/rounds
     for _ in range(rounds):
@@ -280,7 +279,8 @@ class SectorGenerator:
 
 
 class GeneratePage(tasks.TaskPage):
-  '''Simple page that just delegates to SectorGenerator to do the work.'''
+  """Simple page that just delegates to SectorGenerator to do the work."""
+
   def get(self, sectorX, sectorY):
     sectorX = int(sectorX)
     sectorY = int(sectorY)
@@ -289,11 +289,12 @@ class GeneratePage(tasks.TaskPage):
 
 
 class ExpandUniversePage(tasks.TaskPage):
-  '''This is a cron job that is called once per day to "expand" the universe.
+  """This is a cron job that is called once per day to "expand" the universe.
 
   We look at all the sectors which currently have at least one colonized star, then make sure
   the universe has all sectors around the centre generated. We expand the range of the universe
-  until we've generated 50 sectors -- that's enough for one day.'''
+  until we've generated 50 sectors -- that's enough for one day."""
+
   def get(self):
     SectorCoords = collections.namedtuple("SectorCoords", ("x", "y"))
     existing_sectors = set()
@@ -331,9 +332,9 @@ class ExpandUniversePage(tasks.TaskPage):
       max_y += 1
 
 
-app = webapp.WSGIApplication([('/tasks/sector/generate/([0-9-]+),([0-9-]+)', GeneratePage),
-                              ('/tasks/sector/expand-universe', ExpandUniversePage)],
-                             debug=os.environ['SERVER_SOFTWARE'].startswith('Development'))
+app = webapp.WSGIApplication([("/tasks/sector/generate/([0-9-]+),([0-9-]+)", GeneratePage),
+                              ("/tasks/sector/expand-universe", ExpandUniversePage)],
+                             debug=os.environ["SERVER_SOFTWARE"].startswith("Development"))
 
 
 

@@ -1,3 +1,5 @@
+"""empire.py: Controller for empire-related functions. Aso contains the 'simulate' method."""
+
 
 import ctrl
 from ctrl import sector
@@ -13,7 +15,7 @@ from google.appengine.api import taskqueue
 
 
 def getEmpireForUser(user):
-  cache_key = 'empire:for-user:%s' % (user.user_id())
+  cache_key = "empire:for-user:%s" % (user.user_id())
   values = ctrl.getCached([cache_key], pb.Empire)
   if cache_key in values:
     return values[cache_key]
@@ -29,7 +31,7 @@ def getEmpireForUser(user):
 
 
 def getEmpire(empire_key):
-  cache_key = 'empire:%s' % (empire_key)
+  cache_key = "empire:%s" % (empire_key)
   values = ctrl.getCached([cache_key], pb.Empire)
   if cache_key in values:
     return values[cache_key]
@@ -48,7 +50,7 @@ def createEmpire(empire_pb):
 
 
 def getColoniesForEmpire(empire_pb):
-  cache_key = 'colony:for-empire:%s' % empire_pb.key
+  cache_key = "colony:for-empire:%s" % empire_pb.key
   values = ctrl.getCached([cache_key], pb.Colonies)
   if cache_key in values:
     return values[cache_key]
@@ -64,7 +66,7 @@ def getColoniesForEmpire(empire_pb):
 
 
 def getColony(colony_key):
-  cache_key = 'colony:%s' % colony_key
+  cache_key = "colony:%s" % colony_key
   values = ctrl.getCached([cache_key], pb.Colony)
   if cache_key in values:
     return values[cache_key]
@@ -78,7 +80,7 @@ def getColony(colony_key):
 
 
 def updateColony(colony_key, updated_colony_pb):
-  '''Updates the colony with the given colony_key with the new parameters in updated_colony_pb.
+  """Updates the colony with the given colony_key with the new parameters in updated_colony_pb.
 
   When updating a colony, there's a few things we need to do. For example, we need to simulate
   the colony with it's old parameters to bring it up to date. Then we need to make sure the
@@ -94,9 +96,11 @@ def updateColony(colony_key, updated_colony_pb):
         updated_colony_pb should have the same key)
     update_colony_pb: A protobuf with the updated parameters. We don't always update everything,
         just certain things that you can actually change.
+
   Returns:
     An updated colony protobuf.
-  '''
+  """
+
   colony_pb = getColony(colony_key)
   star_pb = sector.getStar(colony_pb.star_key)
   simulate(star_pb, colony_pb.empire_key)
@@ -124,11 +128,12 @@ def updateColony(colony_key, updated_colony_pb):
 
 
 def updateAfterSimulate(star_pb, empire_key, log=logging.debug):
-  '''After you've simulated a star for a particular empire, this updates the data store.
+  """After you've simulated a star for a particular empire, this updates the data store.
 
   Usually, you'll simulate the star, update a colony, and then update. This handles the "update"
   phase, making sure all data is updated, caches cleared, etc.
-  '''
+  """
+
   if empire_key is None:
     # it's easier to do this empire-by-empire, rather then have special-cases
     # throughout the logic below....
@@ -140,7 +145,7 @@ def updateAfterSimulate(star_pb, empire_key, log=logging.debug):
     return
 
   keys_to_clear = []
-  keys_to_clear.append('buildqueue:for-empire:%s' % empire_key)
+  keys_to_clear.append("buildqueue:for-empire:%s" % empire_key)
 
   for colony_pb in star_pb.colonies:
     if colony_pb.empire_key != empire_key:
@@ -150,12 +155,12 @@ def updateAfterSimulate(star_pb, empire_key, log=logging.debug):
     colony_model = mdl.Colony.get(colony_pb.key)
     ctrl.colonyPbToModel(colony_model, colony_pb)
     colony_model.put()
-    keys_to_clear.append('colony:%s' % colony_pb.key)
+    keys_to_clear.append("colony:%s" % colony_pb.key)
 
   for empire_pb in star_pb.empires:
     if empire_pb.empire_key != empire_key:
       continue
-    if empire_pb.key == '':
+    if empire_pb.key == "":
       empire_model = mdl.EmpirePresence()
     else:
       empire_model = mdl.EmpirePresence.get(empire_pb.key)
@@ -168,22 +173,23 @@ def updateAfterSimulate(star_pb, empire_key, log=logging.debug):
       continue
     build_model = mdl.BuildOperation.get(build_pb.key)
     ctrl.buildRequestPbToModel(build_model, build_pb)
-    log('Updating build-request "%s" start_time=%s end_time=%s' % 
+    log("Updating build-request '%s' start_time=%s end_time=%s" % 
         (build_model.designName, build_model.startTime, build_model.endTime))
     build_model.put()
-  keys_to_clear.append('buildqueue:for-empire:%s' % empire_key)
+  keys_to_clear.append("buildqueue:for-empire:%s" % empire_key)
 
-  keys_to_clear.append('star:%s' % star_pb.key)
+  keys_to_clear.append("star:%s" % star_pb.key)
   ctrl.clearCached(keys_to_clear)
 
 
 def _log_noop(msg):
-  '''This is the default logging function for simulate() -- it does nothing.'''
+  """This is the default logging function for simulate() -- it does nothing."""
+
   pass
 
 
 def simulate(star_pb, empire_key=None, log=_log_noop):
-  '''Simulates the star and gets all of the colonies up to date.
+  """Simulates the star and gets all of the colonies up to date.
 
   When simulating a star, we simulate all colonies in that star that belong to the given empire
   at once. This is because there are certain resources (particularly food & minerals) that get
@@ -195,7 +201,7 @@ def simulate(star_pb, empire_key=None, log=_log_noop):
     empire_key: The key of the empire we're going to simulate. If None, the default, we'll
         simulate all colonies in the star.
     log: A function we'll call to log message as we simulate (by default, this is logging.debug)
-  '''
+  """
   if empire_key is None:
     # it's easier to do this empire-by-empire, rather then have special-cases
     # throughout the logic below....
@@ -240,7 +246,7 @@ def simulate(star_pb, empire_key=None, log=_log_noop):
 
 
 def _simulateStep(dt, now, star_pb, empire_key, log):
-  '''Simulates a single step of the colonies in the star.
+  """Simulates a single step of the colonies in the star.
 
   The order of simulation needs to be well-defined, so we define it here:
    1. Farming
@@ -251,16 +257,16 @@ def _simulateStep(dt, now, star_pb, empire_key, log):
   See comments in the code for the actual algorithm.
 
   Args:
-    dt: A timedelta that represents the time of this step (usually 15 minutes for
-        a complete step, but could be a partial step as well).
-    now: A datetime representing the "current" time (that is, the start of the
-        current step) which we can use to determine things like whether a particular
-        build has actually started or not.
+    dt: A timedelta that represents the time of this step (usually 15 minutes for a complete step,
+        but could be a partial step as well).
+    now: A datetime representing the "current" time (that is, the start of the current step) which
+        we can use to determine things like whether a particular build has actually started or not.
     star_pb: The star protocol buffer we're simulating.
-    empire_key: The key of the empire we're simulating. If None, we'll simulate
-        all empires in the starsystem.
+    empire_key: The key of the empire we're simulating. If None, we'll simulate all empires in
+        the starsystem.
     log: A function we'll call to log messages (for debugging)
-  '''
+  """
+
   log("Simulation @ %s" % (now))
   total_goods = None
   total_minerals = None
@@ -274,7 +280,7 @@ def _simulateStep(dt, now, star_pb, empire_key, log):
   if total_goods is None and total_minerals is None:
     # This means we didn't find their entry... add it now
     empire_pb = star_pb.empires.add()
-    empire_pb.key = ''
+    empire_pb.key = ""
     empire_pb.empire_key = empire_key
     empire_pb.star_key = star_pb.key
     total_goods = 0.0
@@ -283,7 +289,7 @@ def _simulateStep(dt, now, star_pb, empire_key, log):
   dt_in_hours = dt.total_seconds() / 3600.0
 
   for n,colony_pb in enumerate(star_pb.colonies):
-    log('--- Colony[%d]: pop=%.0f focus=(pop: %.2f, farm: %.2f, mine: %.2f, cons: %.2f)' % (
+    log("--- Colony[%d]: pop=%.0f focus=(pop: %.2f, farm: %.2f, mine: %.2f, cons: %.2f)" % (
          n, colony_pb.population,
          colony_pb.focus_population, colony_pb.focus_farming,
          colony_pb.focus_mining, colony_pb.focus_construction))
@@ -296,20 +302,20 @@ def _simulateStep(dt, now, star_pb, empire_key, log):
         planet_pb = pb
         break
 
-    log('--- planet: congeniality=(pop: %.2f, farm: %.2f, mine: %.2f)' %(
+    log("--- planet: congeniality=(pop: %.2f, farm: %.2f, mine: %.2f)" %(
          planet_pb.population_congeniality, planet_pb.farming_congeniality,
          planet_pb.mining_congeniality))
 
     # calculate the output from farming this turn and add it to the star global
     goods = colony_pb.population*colony_pb.focus_farming * (planet_pb.farming_congeniality/100.0)
     colony_pb.delta_goods = goods
-    log('goods: %.2f' % (goods * dt_in_hours))
+    log("goods: %.2f" % (goods * dt_in_hours))
     total_goods += goods * dt_in_hours
 
     # calculate the output from mining this turn and add it to the star global
     minerals = colony_pb.population*colony_pb.focus_mining * (planet_pb.mining_congeniality/100.0)
     colony_pb.delta_minerals = minerals
-    log('minerals: %.2f' % (minerals * dt_in_hours))
+    log("minerals: %.2f" % (minerals * dt_in_hours))
     total_minerals += minerals * dt_in_hours
 
     total_population += colony_pb.population
@@ -396,20 +402,20 @@ def _simulateStep(dt, now, star_pb, empire_key, log):
           log("  not enough minerals, cannot progress")
           build_request.end_time = 0
 
-  log('--- Updating population:')
+  log("--- Updating population:")
 
   # Finally, update the population. The first thing we need to do is evenly distribute goods
   # between all of the colonies.
   total_goods_per_hour = total_population / 10.0
   total_goods_required = total_goods_per_hour * dt_in_hours
-  log('total_goods_required: %.2f, goods_available: %.2f' % (total_goods_required, total_goods))
+  log("total_goods_required: %.2f, goods_available: %.2f" % (total_goods_required, total_goods))
 
   # If we have more than total_goods_required stored, then we're cool. Otherwise, our population
   # suffers...
   goods_efficiency = 1.0
   if total_goods_required > total_goods and total_goods_required > 0:
     goods_efficiency = total_goods / total_goods_required
-  log('goods_efficiency: '+str(goods_efficiency))
+  log("goods_efficiency: %.2f" % (goods_efficiency))
 
   # subtract all the goods we'll need
   total_goods -= total_goods_required
@@ -423,7 +429,7 @@ def _simulateStep(dt, now, star_pb, empire_key, log):
     if colony_pb.empire_key != empire_key:
       continue
 
-    log('--- Colony[%d]:' % (n))
+    log("--- Colony[%d]:" % (n))
 
     population_increase = colony_pb.population * colony_pb.focus_population
     if goods_efficiency >= 1:
@@ -446,7 +452,7 @@ def _simulateStep(dt, now, star_pb, empire_key, log):
     population_increase *= congeniality_factor
 
     population_increase *= dt_in_hours
-    log('population_increase: '+str(population_increase))
+    log("population_increase: %.2f" % (population_increase))
 
     colony_pb.population += population_increase
 
@@ -463,13 +469,14 @@ def _simulateStep(dt, now, star_pb, empire_key, log):
 
 
 def colonize(empire_pb, colonize_request):
-  '''Colonizes the planet given in the colonize_request.
+  """Colonizes the planet given in the colonize_request.
 
   Args:
     empire_pb: The empire protobuf
     colonize_request: a ColonizeRequest protobuf, containing the planet
         and star key of the planet we want to colonize.
-  '''
+  """
+
   star_model = sector_mdl.SectorManager.getStar(colonize_request.star_key)
   if star_model is None:
     logging.warn("Could not find star with key: %s" % colonize_request.star_key)
@@ -489,9 +496,9 @@ def colonize(empire_pb, colonize_request):
   colony_model = empire_model.colonize(planet_model)
 
   # clear the cache of the various bits and pieces who are now invalid
-  keys = ['sector:%d,%d' % (star_model.sector.x, star_model.sector.y),
-          'star:%s' % (star_model.key()),
-          'colonies:for-empire:%s' % (empire_model.key())]
+  keys = ["sector:%d,%d" % (star_model.sector.x, star_model.sector.y),
+          "star:%s" % (star_model.key()),
+          "colonies:for-empire:%s" % (empire_model.key())]
   ctrl.clearCached(keys)
 
   colony_pb = pb.Colony()
@@ -500,14 +507,15 @@ def colonize(empire_pb, colonize_request):
 
 
 def build(empire_pb, colony_pb, request_pb):
-  '''Initiates a build operation at the given colony.
+  """Initiates a build operation at the given colony.
 
   Args:
     empire_pb: The empire that is requesting the build (we assume you've already validated
         the fact that this empire owns the colony)
     colony_pb: The colony where the request has been made.
     request_pb: A BuildRequest protobuf with details of the build request.
-  '''
+  """
+
   design = Design.getDesign(request_pb.build_kind, request_pb.design_name)
   if not design:
     logging.warn("Asked to build design '%s', which does not exist." % (request_pb.design_name))
@@ -526,8 +534,8 @@ def build(empire_pb, colony_pb, request_pb):
   build_model.put()
 
   # make sure we clear the cache so we get the latest version with the new build
-  keys = ['buildqueue:for-empire:%s' % empire_pb.key,
-          'star:%s' % colony_pb.star_key]
+  keys = ["buildqueue:for-empire:%s" % empire_pb.key,
+          "star:%s" % colony_pb.star_key]
   ctrl.clearCached(keys)
 
   # We'll need to re-simulate the star now since this new building will affect the ability to
@@ -544,8 +552,9 @@ def build(empire_pb, colony_pb, request_pb):
 
 
 def getBuildQueueForEmpire(empire_key):
-  '''Gets the current build queue for the given empire.'''
-  cache_key = 'buildqueue:for-empire:%s' % empire_key
+  """Gets the current build queue for the given empire."""
+
+  cache_key = "buildqueue:for-empire:%s" % empire_key
   build_queue = ctrl.getCached([cache_key], pb.BuildQueue)
   if cache_key in build_queue:
     return build_queue[cache_key]
@@ -560,7 +569,8 @@ def getBuildQueueForEmpire(empire_key):
 
 
 def getBuildQueuesForEmpires(empire_keys):
-  '''Gets the build queue for *multiple* empires, at the same time.'''
+  """Gets the build queue for *multiple* empires, at the same time."""
+
   build_queue_list = []
   for empire_key in empire_keys:
     build_queue_list.append(getBuildQueueForEmpire(empire_key))
@@ -572,11 +582,12 @@ def getBuildQueuesForEmpires(empire_keys):
 
 
 def scheduleBuildCheck():
-  '''Checks when the next build is due to complete and schedules a task to run at that time.
+  """Checks when the next build is due to complete and schedules a task to run at that time.
 
   Because of the way that tasks a scheduled, it's possible that multiple tasks can be scheduled
   at the same time. That's OK because the task itself is idempotent (its just a waste of resources)
-  '''
+  """
+
   query = mdl.BuildOperation.all().order("endTime").fetch(1)
   for build in query:
     # The first one we fetch (because of the ordering) will be the next one. So we'll schedule
@@ -615,14 +626,16 @@ class BuildingDesign(Design):
 
   @staticmethod
   def getDesigns():
-    '''Gets all of the building designs, which we populate from the data/buildings.xml file.'''
+    """Gets all of the building designs, which we populate from the data/buildings.xml file."""
+
     if not BuildingDesign._parsedDesigns:
       BuildingDesign._parsedDesigns = _parseBuildingDesigns()
     return BuildingDesign._parsedDesigns
 
   @staticmethod
   def getDesign(designId):
-    '''Gets the design with the given ID, or None if none exists.'''
+    """Gets the design with the given ID, or None if none exists."""
+
     designs = BuildingDesign.getDesigns()
     if designId not in designs:
       return None
@@ -634,14 +647,16 @@ class ShipDesign(Design):
 
   @staticmethod
   def getDesigns():
-    '''Gets all of the ship designs, which we populate from the data/ships.xml file.'''
+    """Gets all of the ship designs, which we populate from the data/ships.xml file."""
+
     if not ShipDesign._parsedDesigns:
       ShipDesign._parsedDesigns = _parseShipDesigns()
     return ShipDesign._parsedDesigns
 
   @staticmethod
   def getDesign(designId):
-    '''Gets the design with the given ID, or None if none exists.'''
+    """Gets the design with the given ID, or None if none exists."""
+
     designs = ShipDesign.getDesigns()
     if designId not in designs:
       return None
@@ -649,7 +664,8 @@ class ShipDesign(Design):
 
 
 def _parseBuildingDesigns():
-  '''Parses the /data/buildings.xml file and returns a list of BuildingDesign objects.'''
+  """Parses the /data/buildings.xml file and returns a list of BuildingDesign objects."""
+
   filename = os.path.join(os.path.dirname(__file__), "../data/buildings.xml")
   logging.debug("Parsing %s" % (filename))
   designs = {}
@@ -661,7 +677,8 @@ def _parseBuildingDesigns():
 
 
 def _parseShipDesigns():
-  '''Parses the /data/ships.xml file and returns a list of ShipDesign objects.'''
+  """Parses the /data/ships.xml file and returns a list of ShipDesign objects."""
+
   filename = os.path.join(os.path.dirname(__file__), "../data/ships.xml")
   logging.debug("Parsing %s" % (filename))
   designs = {}
@@ -673,7 +690,8 @@ def _parseShipDesigns():
 
 
 def _parseBuildingDesign(designXml):
-  '''Parses a single <design> from the buildings.xml file.'''
+  """Parses a single <design> from the buildings.xml file."""
+
   design = BuildingDesign()
   logging.debug("Parsing building <design id=\"%s\">" % (designXml.get("id")))
   _parseDesign(designXml, design)
@@ -681,7 +699,8 @@ def _parseBuildingDesign(designXml):
 
 
 def _parseShipDesign(designXml):
-  '''Parses a single <design> from the ships.xml file.'''
+  """Parses a single <design> from the ships.xml file."""
+
   design = ShipDesign()
   logging.debug("Parsing ship <design id=\"%s\">" % (designXml.get("id")))
   _parseDesign(designXml, design)

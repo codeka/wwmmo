@@ -1,4 +1,4 @@
-
+"""ctrl: The controller module contains the "business logic" for the game."""
 
 from model import empire as empire_mdl
 import model as mdl
@@ -45,7 +45,7 @@ def clearCached(keys):
 
 
 def deviceRegistrationPbToModel(model, pb):
-  if pb.HasField('key'):
+  if pb.HasField("key"):
     model.key = pb.key
   model.deviceID = pb.device_id
   model.deviceRegistrationID = pb.device_registration_id
@@ -77,7 +77,7 @@ def empireModelToPb(empire_pb, empire_model):
 
 def empirePbToModel(empire_model, empire_pb):
   empire_model.displayName = empire_pb.display_name
-  if empire_pb.HasField('email'):
+  if empire_pb.HasField("email"):
     empire_model.user = users.User(empire_pb.email)
   empire_model.state = empire_pb.state
 
@@ -221,11 +221,11 @@ def updateDeviceRegistration(registration_pb, user):
   registration_model.put()
 
   deviceRegistrationModelToPb(registration_pb, registration_model)
-  clearCached(['devices:for-user:%s' % (user.user_id())])
+  clearCached(["devices:for-user:%s" % (user.user_id())])
   return registration_pb
 
 def getDevicesForUser(user_email):
-  cache_key = 'devices:for-user:%s' % (user_email)
+  cache_key = "devices:for-user:%s" % (user_email)
   logging.debug("Cache key: %s" % (cache_key))
   devices = getCached([cache_key], pb.DeviceRegistrations)
   if cache_key in devices:

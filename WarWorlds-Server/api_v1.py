@@ -1,11 +1,7 @@
-'''
-Created on 12/02/2012
-
-@author: dean@codeka.com.au
-'''
+"""api_v1.py: The handlers for the actual API that the client calls."""
 
 import import_fixer
-import_fixer.FixImports('google', 'protobuf')
+import_fixer.FixImports("google", "protobuf")
 
 import webapp2 as webapp
 import model
@@ -24,9 +20,11 @@ import logging
 
 
 class ApiPage(webapp.RequestHandler):
-  '''This is the base class for pages in the API section.'''
+  """This is the base class for pages in the API section."""
+
   def dispatch(self):
-    '''Checks that a user is logged in and such before we process the request.'''
+    """Checks that a user is logged in and such before we process the request."""
+
     self.user = users.get_current_user()
     if not self.user:
       # not logged in, return 403 Forbidden
@@ -37,29 +35,32 @@ class ApiPage(webapp.RequestHandler):
 
   def _isAdmin(self):
     # TODO: better version of "isAdmin!"
-    return self.user.email() == 'dean@codeka.com.au'
+    return self.user.email() == "dean@codeka.com.au"
 
   def _getRequestBody(self, ProtoBuffClass):
-    ''' Gets the body of the request as a protocol buffer.
+    """Gets the body of the request as a protocol buffer.
 
     We check whether the body is application/json or application/x-protobuf before
     decoding the message. They're the two main kinds of requests we accept.
-    '''
+    """
+
     pb = ProtoBuffClass()
 
-    contentType = self.request.headers['Content-Type']
+    contentType = self.request.headers["Content-Type"]
     contentType = contentType.split(';')[0].strip()
-    if contentType == 'application/json':
+    if contentType == "application/json":
       protobuf_json.json2pb(pb, self.request.body)
-    elif contentType == 'application/x-protobuf':
+    elif contentType == "application/x-protobuf":
       pb.ParseFromString(self.request.body)
     return pb
 
 
 class HelloPage(ApiPage):
-  '''The 'hello' page is what you request when you first connect.'''
+  """The 'hello' page is what you request when you first connect."""
+
   def get(self):
-    '''This can be used by the administrator for testing only...'''
+    """This can be used by the administrator for testing only."""
+
     if not self._isAdmin():
       self.response.set_status(400)
       return
@@ -177,9 +178,9 @@ class DevicesPage(ApiPage):
     return ctrl.updateDeviceRegistration(registration_pb, self.user)
 
   def get(self):
-    if self.request.get('email') != '':
+    if self.request.get("email") != '':
       # TODO: check that you're an administrator...
-      user = users.User(self.request.get('email'))
+      user = users.User(self.request.get("email"))
       if user is None:
         self.response.set_status(404)
         return
@@ -199,16 +200,16 @@ class DevicesPage(ApiPage):
       device.delete()
 
       # TODO: delete should be in the controller itself
-      ctrl.clearCached(['devices:for-user:%s' % (self.user.email())])
+      ctrl.clearCached(["devices:for-user:%s" % (self.user.email())])
     else:
-      logging.warn("No device with key [" + key + "] to delete.")
+      logging.warn("No device with key [%s] to delete." % (key))
 
 
 class DeviceMessagesPage(ApiPage):
   def put(self, email):
     msg = self._getRequestBody(pb.DeviceMessage)
-    logging.info('Putting message to user with email: ' + email)
-    logging.info('Message: ' + str(msg))
+    logging.info("Putting message to user with email: %s" % (email))
+    logging.info("Message: %s" % (msg))
 
     user = users.User(email)
     if user is None:
@@ -228,9 +229,9 @@ class StarfieldPage(ApiPage):
 
 class SectorsPage(StarfieldPage):
   def get(self):
-    if self.request.get('coords') != '':
+    if self.request.get("coords") != "":
       coords = []
-      for coord in self.request.get('coords').split('|'):
+      for coord in self.request.get("coords").split('|'):
         (x, y) = coord.split(',', 2)
         x = int(x)
         y = int(y)
@@ -251,7 +252,8 @@ class StarPage(StarfieldPage):
 
 
 class StarSimulatePage(ApiPage):
-  '''This is a debugging page that lets us simulate a star on-demand.'''
+  """This is a debugging page that lets us simulate a star on-demand."""
+
   def get(self, starKey):
     self._doSimulate(starKey, False)
 
@@ -265,7 +267,7 @@ class StarSimulatePage(ApiPage):
 
     star_pb = sector.getStar(starKey)
     if not star_pb:
-      msgs.append('ERROR: No star with given key found!')
+      msgs.append("ERROR: No star with given key found!")
     else:
       msgs.append("---------- Simulating:")
       empire.simulate(star_pb, log=dolog)
@@ -290,11 +292,12 @@ class ColoniesPage(ApiPage):
     return colony_pb
 
   def put(self, colony_key):
-    '''Updates the given colony.
+    """Updates the given colony.
 
     When you update a colony, we need to simulate the current one first. Then we need to make
     sure the new parameters are valid (e.g. focus adds up to 1.0 etc).
-    '''
+    """
+
     # Make sure you have access to this colony!
     colony_pb = empire.getColony(colony_key)
     empire_pb = empire.getEmpireForUser(self.user)
@@ -307,7 +310,8 @@ class ColoniesPage(ApiPage):
 
 class BuildQueuePage(ApiPage):
   def post(self):
-    '''The buildqueue is where you post BuildRequest protobufs with requests to build stuff.'''
+    """The buildqueue is where you post BuildRequest protobufs with requests to build stuff."""
+
     request_pb = self._getRequestBody(pb.BuildRequest)
 
     # make sure the colony is owned by the current player
@@ -327,7 +331,8 @@ class BuildQueuePage(ApiPage):
     return resp
 
   def get(self):
-    '''Gets the build queue for the currently logged-in user.'''
+    """Gets the build queue for the currently logged-in user."""
+
     empire_pb = empire.getEmpireForUser(self.user)
     return empire.getBuildQueueForEmpire(empire_pb.key)
 
@@ -344,7 +349,7 @@ class ApiApplication(webapp.WSGIApplication):
     else:
       response.set_status(500)
 
-    response.headers['Content-Type'] = 'text/plain'
+    response.headers["Content-Type"] = "text/plain"
     response.write(e)
 
   @staticmethod
@@ -355,26 +360,26 @@ class ApiApplication(webapp.WSGIApplication):
       # if it's a protocol buffer, then we'll want to return either the
       # binary serialization, the text serialization, or a JSON
       # serialization (depending on the value of the "Accept" header)
-      preferred_types = ['text/plain', 'application/json', 'text/json',
-                         'text/x-protobuf', 'application/x-protobuf']
+      preferred_types = ["text/plain", "application/json", "text/json",
+                         "text/x-protobuf", "application/x-protobuf"]
       content_type = ApiApplication.get_preferred_content_type(request, preferred_types)
-      if content_type.endswith('/json'):
+      if content_type.endswith("/json"):
         # they want JSON
         resp = webapp.Response(protobuf_json.pb2json(rv))
-      elif content_type.startswith('text/'):
+      elif content_type.startswith("text/"):
         # they want a text-based format... we'll give it to them
         resp = webapp.Response(str(rv))
       else:
         # otherwise, binary protocol buffer serialization
         resp = webapp.Response(rv.SerializeToString())
-      resp.headers['Content-Type'] = content_type
+      resp.headers["Content-Type"] = content_type
       return resp
 
     return rv
 
   @staticmethod
   def get_preferred_content_type(request, possible_types):
-    accept = request.headers.get('Accept', '')
+    accept = request.headers.get("Accept", "")
     content_types = [content_type.split(';')[0] for content_type in accept.split(',')]
     for content_type in content_types:
       if content_type.lower() in possible_types:
@@ -384,17 +389,17 @@ class ApiApplication(webapp.WSGIApplication):
     return possible_types[0]
 
 
-app = ApiApplication([('/api/v1/hello/([^/]+)', HelloPage),
-                      ('/api/v1/chat', ChatPage),
-                      ('/api/v1/empires', EmpiresPage),
-                      ('/api/v1/empires/([^/]+)', EmpiresPage),
-                      ('/api/v1/devices', DevicesPage),
-                      ('/api/v1/devices/([^/]+)', DevicesPage),
-                      ('/api/v1/devices/user:([^/]+)/messages', DeviceMessagesPage),
-                      ('/api/v1/sectors', SectorsPage),
-                      ('/api/v1/stars/([^/]+)', StarPage),
-                      ('/api/v1/stars/([^/]+)/simulate', StarSimulatePage),
-                      ('/api/v1/colonies', ColoniesPage),
-                      ('/api/v1/colonies/([^/]+)', ColoniesPage),
-                      ('/api/v1/buildqueue', BuildQueuePage)],
-                     debug=os.environ['SERVER_SOFTWARE'].startswith('Development'))
+app = ApiApplication([("/api/v1/hello/([^/]+)", HelloPage),
+                      ("/api/v1/chat", ChatPage),
+                      ("/api/v1/empires", EmpiresPage),
+                      ("/api/v1/empires/([^/]+)", EmpiresPage),
+                      ("/api/v1/devices", DevicesPage),
+                      ("/api/v1/devices/([^/]+)", DevicesPage),
+                      ("/api/v1/devices/user:([^/]+)/messages", DeviceMessagesPage),
+                      ("/api/v1/sectors", SectorsPage),
+                      ("/api/v1/stars/([^/]+)", StarPage),
+                      ("/api/v1/stars/([^/]+)/simulate", StarSimulatePage),
+                      ("/api/v1/colonies", ColoniesPage),
+                      ("/api/v1/colonies/([^/]+)", ColoniesPage),
+                      ("/api/v1/buildqueue", BuildQueuePage)],
+                     debug=os.environ["SERVER_SOFTWARE"].startswith("Development"))

@@ -31,9 +31,7 @@
 #
 # Modified by Dean Harding, 2012, for use in War Worlds.
 #
-'''
-Provide serialization and de-serialization of Google's protobuf Messages into/from JSON format.
-'''
+"""protobuf_json.py: Serialization and de-serialization of protocol buffers to/from JSON."""
 
 # groups are deprecated and not supported;
 # Note that preservation of unknown fields is currently not available for Python (c) google docs

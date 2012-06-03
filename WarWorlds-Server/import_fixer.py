@@ -16,7 +16,7 @@ def FixImports(base_package, *packages):
   topdir = os.path.dirname(__file__)
 
   def ImportPackage(full_package):
-    '''Import a fully qualified package.'''
+    """Import a fully qualified package."""
     __import__(full_package, globals(), locals())
 
     # Check if the override path already exists for the module; if it does,

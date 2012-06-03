@@ -1,8 +1,4 @@
-'''
-Created on 19/02/2012
-
-@author: dean@codeka.com.au
-'''
+"""namegen.py: Contains logic for generating random names."""
 
 import os, random
 import logging
@@ -12,7 +8,8 @@ _generators = []
 
 
 def generate(numNames, minNameSyllables = 2, maxNameSyllables = 4):
-  '''Generates numNames names from the vocabularies defined in the vocabulary directory.'''
+  """Generates numNames names from the vocabularies defined in the vocabulary directory."""
+
   global _generators
   _ensureGeneratorsLoaded()
 
@@ -24,7 +21,8 @@ def generate(numNames, minNameSyllables = 2, maxNameSyllables = 4):
   return names
 
 def _ensureGeneratorsLoaded():
-  '''Ensures that we've loaded the NameGenerators. We only need to do it once.'''
+  """Ensures that we've loaded the NameGenerators. We only need to do it once."""
+
   global _generators
   if len(_generators) > 0:
     return
@@ -49,7 +47,8 @@ class NameGenerator:
     self.middles = []
 
   def parse(self, inf):
-    '''Parses a vocabulary file and populates our internal data so that we can generate names.'''
+    """Parses a vocabulary file and populates our internal data so that we can generate names."""
+
     self.prefixes = []
     self.suffixes = []
     self.middles = []
@@ -96,7 +95,8 @@ class NameGenerator:
         self.middles.append(syllable)
 
   def compose(self, numSyllables):
-    '''Composes a new word, returning the given number of syllables.'''
+    """Composes a new word, returning the given number of syllables."""
+
     word = []
     word.append(self.prefixes[random.randint(0, len(self.prefixes)-1)])
     for _ in range(1, numSyllables - 1):
@@ -106,24 +106,27 @@ class NameGenerator:
     return self._combine(word)
 
   def _combine(self, syllables):
-    '''Combines the given collection of syllables into a complete word.'''
+    """Combines the given collection of syllables into a complete word."""
+
     word = ""
     for s in syllables:
       word += s.syllable
     return word
 
   def _getSyllable(self, pool, prevSyllable):
-    '''Looks in the given "pool" of syllables for a valid syllable to add to the list.
+    """Looks in the given "pool" of syllables for a valid syllable to add to the list.
 
     Note that it's possible for this method to go into an infinite loop if there are no
-    valid combinations... be careful! (TODO: fix this!)'''
+    valid combinations... be careful! (TODO: fix this!)"""
+
     while True:
       nextSyllable = pool[random.randint(0, len(pool)-1)]
       if self._isValidPair(prevSyllable, nextSyllable):
         return nextSyllable
 
   def _isValidPair(self, prevSyllable, nextSyllable):
-    '''Checks whether the given two syllables are valid together or not.'''
+    """Checks whether the given two syllables are valid together or not."""
+
     if prevSyllable.requiresNextVowel and not nextSyllable.startsWithVowel:
       return False
     if prevSyllable.requiresNextConsonant and nextSyllable.startsWithVowel:
