@@ -361,9 +361,9 @@ def _simulateStep(dt, now, star_pb, empire_key, log):
           log("Building not scheduled to be started until %s, skipping" % (startTime))
           continue
 
-        # So the build time the design specifies is the time to build the structure assigning
-        # 100 workers are available. Double the workers and you halve the build time. Halve
-        # the workers and you double the build time. 
+        # So the build time the design specifies is the time to build the structure with
+        # 100 workers available. Double the workers and you halve the build time. Halve
+        # the workers and you double the build time.
         total_build_time_in_hours = design.buildTimeSeconds / 3600.0
         total_build_time_in_hours *= (100.0 / workers_per_build_request)
         log("total_build_time = %.2f" % total_build_time_in_hours)
@@ -371,15 +371,23 @@ def _simulateStep(dt, now, star_pb, empire_key, log):
         # Work out how many hours we've spend so far
         time_spent = now - ctrl.epochToDateTime(build_request.start_time)
         time_spent = time_spent.total_seconds() / 3600.0
-        if time_spent < 0:
-          time_spent = 0
+        # time_spend could be negative, which means we start the build half-way through this
+        # step. That's OK, the math still works out
         log("time_spent = %.2f" % time_spent)
 
+        # dt_required is the amount of time available this turn to spend on building.
         dt_required = dt_in_hours
         if time_spent + dt_required > total_build_time_in_hours:
           # If we're going to finish on this turn, we only need a fraction of the minerals we'd
           # otherwise use, so make sure dt_required is correct
           dt_required = total_build_time_in_hours - time_spent
+
+        # take starting half-way through this turn into account
+        if time_spent < 0:
+          dt_required += time_spent
+          if dt_required < 0:
+            dt_required = 0
+
         log("dt_required = %.2f" % dt_required)
 
         # work out how many minerals we require for this turn
