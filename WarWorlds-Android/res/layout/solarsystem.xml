@@ -54,12 +54,27 @@
             <ScrollView
                 android:id="@+id/solarsystem_planet_properties"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent" >
+                android:layout_height="match_parent"
+                android:layout_marginBottom="50dp" >
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical" >
+
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <Button
+                            android:id="@+id/fleet_btn"
+                            style="@style/Button"
+                            android:layout_width="75dp"
+                            android:layout_height="wrap_content"
+                            android:text="@string/fleet"
+                            android:layout_marginLeft="10dp" />
+
+                    </RelativeLayout>
 
                     <TextView
                         android:id="@+id/solarsystem_planetname"
@@ -67,7 +82,7 @@
                         android:layout_height="wrap_content"
                         android:gravity="center_horizontal"
                         android:textAppearance="?android:attr/textAppearanceSmall" />
-        
+
                     <au.com.codeka.warworlds.ctrl.HorizontalSeparator
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -301,7 +316,7 @@
                             grid:layout_columnSpan="2"
                             grid:layout_gravity="center"
                             android:text="@string/focus" />
-                        
+
                     </android.support.v7.widget.GridLayout>
 
                     <Button
@@ -313,6 +328,7 @@
                         android:layout_marginTop="10dp"
                         android:text="@string/solarsystem_colonize" />
                 </LinearLayout>
+
             </ScrollView>
 
         </LinearLayout>
@@ -327,9 +343,7 @@
             android:layout_width="320dp"
             android:layout_height="50dp"
             android:layout_alignParentRight="true"
-            android:layout_alignParentBottom="true" >
-
-        </au.com.codeka.warworlds.ctrl.BannerAdView>
+            android:layout_alignParentBottom="true" />
 
         <TextView
             android:id="@+id/stored_goods"

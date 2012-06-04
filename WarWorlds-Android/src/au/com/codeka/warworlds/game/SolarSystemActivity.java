@@ -45,6 +45,7 @@ public class SolarSystemActivity extends Activity {
     public static final int BUILD_DIALOG = 1000;
     public static final int BUILD_CONFIRM_DIALOG = 1001;
     public static final int FOCUS_DIALOG = 1002;
+    public static final int FLEET_DIALOG = 1003;
 
     /** Called when the activity is first created. */
     @Override
@@ -61,6 +62,7 @@ public class SolarSystemActivity extends Activity {
         final Button colonizeButton = (Button) findViewById(R.id.solarsystem_colonize);
         final Button buildButton = (Button) findViewById(R.id.solarsystem_colony_build);
         final Button focusButton = (Button) findViewById(R.id.solarsystem_colony_focus);
+        final Button fleetButton = (Button) findViewById(R.id.fleet_btn);
 
         EmpireManager empireManager = EmpireManager.getInstance();
         username.setText(empireManager.getEmpire().getDisplayName());
@@ -93,6 +95,13 @@ public class SolarSystemActivity extends Activity {
             @Override
             public void onClick(View v) {
                 showDialog(FOCUS_DIALOG);
+            }
+        });
+
+        fleetButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showDialog(FLEET_DIALOG);
             }
         });
     }
@@ -150,6 +159,8 @@ public class SolarSystemActivity extends Activity {
             return new SolarSystemBuildConfirmDialog(this);
         case FOCUS_DIALOG:
             return new SolarSystemFocusDialog(this);
+        case FLEET_DIALOG:
+            return new SolarSystemFleetDialog(this);
         }
 
         return super.onCreateDialog(id);
@@ -185,6 +196,11 @@ public class SolarSystemActivity extends Activity {
         }
         case FOCUS_DIALOG: {
             SolarSystemFocusDialog dialog = (SolarSystemFocusDialog) d;
+            dialog.setColony(mColony);
+            break;
+        }
+        case FLEET_DIALOG: {
+            SolarSystemFleetDialog dialog = (SolarSystemFleetDialog) d;
             dialog.setColony(mColony);
             break;
         }

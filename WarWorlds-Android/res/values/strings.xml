@@ -55,4 +55,5 @@
     <string name="globalopts_graphics_detail">Detail Level:</string>
     <string name="globalopts_graphics_fast">Fast, Low Detail</string>
     <string name="globalopts_graphics_slow">Slow, High Detail</string>
+    <string name="fleet">Fleet</string>
 </resources>
