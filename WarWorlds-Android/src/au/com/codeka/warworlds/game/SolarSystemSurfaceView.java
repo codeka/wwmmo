@@ -14,6 +14,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.RadialGradient;
 import android.graphics.Paint.Style;
+import android.os.Handler;
 import android.util.AttributeSet;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
@@ -40,6 +41,8 @@ public class SolarSystemSurfaceView extends UniverseElementSurfaceView {
     private CopyOnWriteArrayList<OnPlanetSelectedListener> mPlanetSelectedListeners;
     private StarfieldBackgroundRenderer mBackgroundRenderer;
     private float mPixelScale;
+    private boolean mPlanetSelectedFired;
+    private Handler mHandler;
 
     public SolarSystemSurfaceView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -48,7 +51,7 @@ public class SolarSystemSurfaceView extends UniverseElementSurfaceView {
         }
 
         mPlanetSelectedListeners = new CopyOnWriteArrayList<OnPlanetSelectedListener>();
-
+        mHandler = new Handler();
         mBackgroundRenderer = new StarfieldBackgroundRenderer(context);
         mPixelScale = context.getResources().getDisplayMetrics().density;
 
@@ -86,6 +89,25 @@ public class SolarSystemSurfaceView extends UniverseElementSurfaceView {
         }
 
         mPlanetsPlaced = false;
+    }
+
+    /**
+     * Gets a \c Point2D representing the centre of the given planet, relative to this
+     * \c SolarSystemSurfaceView in device pixels.
+     */
+    public Point2D getPlanetCentre(Planet planet) {
+        if (!mPlanetsPlaced) {
+            return null;
+        }
+
+        for(PlanetInfo planetInfo : mPlanetInfos) {
+            if (planetInfo.planet.getKey().equals(planet.getKey())) {
+                Point2D pixels = planetInfo.centre;
+                return new Point2D(pixels.getX() / mPixelScale, pixels.getY() / mPixelScale);
+            }
+        }
+
+        return null;
     }
 
     private void placePlanets(Canvas canvas) {
@@ -144,7 +166,9 @@ public class SolarSystemSurfaceView extends UniverseElementSurfaceView {
             if (planetInfo.planet.getKey().equals(planetKey)) {
                 mSelectedPlanet = planetInfo;
 
-                firePlanetSelected(mSelectedPlanet.planet);
+                if (mPlanetsPlaced) {
+                    firePlanetSelected(mSelectedPlanet.planet);
+                }
                 redraw();
             }
         }
@@ -182,6 +206,16 @@ public class SolarSystemSurfaceView extends UniverseElementSurfaceView {
 
             drawSun(canvas);
             drawPlanets(canvas);
+        }
+
+        if (!mPlanetSelectedFired && mSelectedPlanet != null) {
+            mHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    firePlanetSelected(mSelectedPlanet.planet);
+                }
+            });
+            mPlanetSelectedFired = true;
         }
     }
 

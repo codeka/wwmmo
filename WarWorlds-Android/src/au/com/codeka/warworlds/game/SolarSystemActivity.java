@@ -10,7 +10,9 @@ import android.view.View;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
+import au.com.codeka.Point2D;
 import au.com.codeka.RomanNumeralFormatter;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.model.BuildingDesignManager;
@@ -63,10 +65,12 @@ public class SolarSystemActivity extends Activity {
         final Button buildButton = (Button) findViewById(R.id.solarsystem_colony_build);
         final Button focusButton = (Button) findViewById(R.id.solarsystem_colony_focus);
         final Button fleetButton = (Button) findViewById(R.id.fleet_btn);
+        final View congenialityContainer = findViewById(R.id.congeniality_container);
 
         EmpireManager empireManager = EmpireManager.getInstance();
         username.setText(empireManager.getEmpire().getDisplayName());
         money.setText("$ 12,345"); // TODO: empire.getCash()
+        congenialityContainer.setVisibility(View.GONE);
 
         mSolarSystemSurfaceView.addPlanetSelectedListener(
                 new SolarSystemSurfaceView.OnPlanetSelectedListener() {
@@ -263,7 +267,6 @@ public class SolarSystemActivity extends Activity {
 
                 mStar = star;
                 mPlanet = planet;
-                refreshSelectedPlanet();
 
                 fireStarUpdated(mStar, mPlanet, mColony);
             }
@@ -287,9 +290,24 @@ public class SolarSystemActivity extends Activity {
 
         containerView.setVisibility(View.VISIBLE);
 
+        Point2D planetCentre = mSolarSystemSurfaceView.getPlanetCentre(mPlanet);
+
         String planetName = mStar.getName()+" "+RomanNumeralFormatter.format(mPlanet.getIndex());
         TextView planetNameTextView = (TextView) findViewById(R.id.solarsystem_planetname);
         planetNameTextView.setText(planetName);
+
+        View congenialityContainer = findViewById(R.id.congeniality_container);
+        if (planetCentre == null) {
+            // this is probably because the SolarSystemView probably hasn't rendered yet. We'll
+            // just ignore this then cause it'll fire an onPlanetSelected when it finishes
+            // drawing.
+        } else {
+            RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) congenialityContainer.getLayoutParams();
+            params.leftMargin = (int) planetCentre.getX();
+            params.topMargin = (int) planetCentre.getY();
+            congenialityContainer.setLayoutParams(params);
+            congenialityContainer.setVisibility(View.VISIBLE);
+        }
 
         ProgressBar populationCongenialityProgressBar = (ProgressBar) findViewById(
                 R.id.solarsystem_population_congeniality);
@@ -319,60 +337,69 @@ public class SolarSystemActivity extends Activity {
                 (int)(miningCongenialityProgressBar.getMax() * (mPlanet.getMiningCongeniality() / 100.0)));
 
         Button colonizeButton = (Button) findViewById(R.id.solarsystem_colonize);
-        View colonyDetailsContainer = findViewById(R.id.solarsystem_colony_details);
+        final View colonyDetailsContainer = findViewById(R.id.solarsystem_colony_details);
         if (mColony == null) {
             colonizeButton.setVisibility(View.VISIBLE);
             colonyDetailsContainer.setVisibility(View.GONE);
         } else {
             colonizeButton.setVisibility(View.GONE);
-            colonyDetailsContainer.setVisibility(View.VISIBLE);
+            colonyDetailsContainer.setVisibility(View.GONE);
 
-            final TextView empireNameTextView = (TextView) findViewById(
-                    R.id.solarsystem_colony_empirename);
-            empireNameTextView.setText("");
             EmpireManager.getInstance().fetchEmpire(mColony.getEmpireKey(),
-                    new EmpireManager.EmpireFetchedHandler() {
-                        @Override
-                        public void onEmpireFetched(Empire empire) {
-                            empireNameTextView.setText(empire.getDisplayName());
+                new EmpireManager.EmpireFetchedHandler() {
+                    @Override
+                    public void onEmpireFetched(Empire empire) {
+                        Empire thisEmpire = EmpireManager.getInstance().getEmpire();
+                        if (thisEmpire.getKey().equals(empire.getKey())) {
+                            colonyDetailsContainer.setVisibility(View.VISIBLE);
+                            refreshColonyDetails();
+                        } else {
+                            // it's not our colony...
                         }
-                    });
-
-            ProgressBar populationFocus = (ProgressBar) findViewById(
-                    R.id.solarsystem_colony_population_focus);
-            populationFocus.setProgress((int)(100.0f * mColony.getPopulationFocus()));
-            TextView populationValue = (TextView) findViewById(
-                    R.id.solarsystem_colony_population_value);
-            populationValue.setText(String.format("%d %s%d / hr",
-                    (int) mColony.getPopulation(),
-                    (mColony.getPopulationDelta() > 0 ? "+" : "-"),
-                    Math.abs((int) mColony.getPopulationDelta())));
-
-            ProgressBar farmingFocus = (ProgressBar) findViewById(
-                    R.id.solarsystem_colony_farming_focus);
-            farmingFocus.setProgress((int)(100.0f * mColony.getFarmingFocus()));
-            TextView farmingValue= (TextView) findViewById(
-                    R.id.solarsystem_colony_farming_value);
-            farmingValue.setText(String.format("%s%d / hr",
-                    mColony.getGoodsDelta() < 0 ? "-" : "+",
-                    Math.abs((int) mColony.getGoodsDelta())));
-
-            ProgressBar miningFocus = (ProgressBar) findViewById(
-                    R.id.solarsystem_colony_mining_focus);
-            miningFocus.setProgress((int)(100.0f * mColony.getMiningFocus()));
-            TextView miningValue = (TextView) findViewById(
-                    R.id.solarsystem_colony_mining_value);
-            miningValue.setText(String.format("%s%d / hr",
-                    mColony.getMineralsDelta() < 0 ? "-" : "+",
-                    Math.abs((int) mColony.getMineralsDelta())));
-
-            ProgressBar constructionFocus = (ProgressBar) findViewById(
-                    R.id.solarsystem_colony_construction_focus);
-            constructionFocus.setProgress((int)(100.0f * mColony.getConstructionFocus()));
-            TextView constructionValue = (TextView) findViewById(
-                    R.id.solarsystem_colony_construction_value);
-            constructionValue.setText("todo");
+                    }
+                });
         }
+    }
+    
+    private void refreshColonyDetails() {
+        final TextView populationCountTextView = (TextView) findViewById(
+                R.id.population_count);
+        populationCountTextView.setText(String.format("Population: %d",
+                                                      (int) mColony.getPopulation()));
+
+        ProgressBar populationFocus = (ProgressBar) findViewById(
+                R.id.solarsystem_colony_population_focus);
+        populationFocus.setProgress((int)(100.0f * mColony.getPopulationFocus()));
+        TextView populationValue = (TextView) findViewById(
+                R.id.solarsystem_colony_population_value);
+        populationValue.setText(String.format("%s%d / hr",
+                (mColony.getPopulationDelta() > 0 ? "+" : "-"),
+                Math.abs((int) mColony.getPopulationDelta())));
+
+        ProgressBar farmingFocus = (ProgressBar) findViewById(
+                R.id.solarsystem_colony_farming_focus);
+        farmingFocus.setProgress((int)(100.0f * mColony.getFarmingFocus()));
+        TextView farmingValue= (TextView) findViewById(
+                R.id.solarsystem_colony_farming_value);
+        farmingValue.setText(String.format("%s%d / hr",
+                mColony.getGoodsDelta() < 0 ? "-" : "+",
+                Math.abs((int) mColony.getGoodsDelta())));
+
+        ProgressBar miningFocus = (ProgressBar) findViewById(
+                R.id.solarsystem_colony_mining_focus);
+        miningFocus.setProgress((int)(100.0f * mColony.getMiningFocus()));
+        TextView miningValue = (TextView) findViewById(
+                R.id.solarsystem_colony_mining_value);
+        miningValue.setText(String.format("%s%d / hr",
+                mColony.getMineralsDelta() < 0 ? "-" : "+",
+                Math.abs((int) mColony.getMineralsDelta())));
+
+        ProgressBar constructionFocus = (ProgressBar) findViewById(
+                R.id.solarsystem_colony_construction_focus);
+        constructionFocus.setProgress((int)(100.0f * mColony.getConstructionFocus()));
+        TextView constructionValue = (TextView) findViewById(
+                R.id.solarsystem_colony_construction_value);
+        constructionValue.setText("todo");
     }
 
     private void onColonizeClick() {
