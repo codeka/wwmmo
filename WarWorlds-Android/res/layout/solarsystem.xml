@@ -201,8 +201,6 @@
                             android:gravity="center"
                             android:textAppearance="?android:attr/textAppearanceSmall" />
 
-
-
                         <ImageView
                             android:id="@+id/solarsystem_colony_population_icon"
                             android:layout_width="20dp"

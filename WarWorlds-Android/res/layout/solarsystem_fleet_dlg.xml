@@ -2,12 +2,63 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical" >
+    android:orientation="horizontal">
 
-    <Button
-        android:id="@+id/button1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Button" />
+    <ListView
+        android:id="@+id/ship_list"
+        android:layout_width="0dp"
+        android:layout_weight="1.0"
+        android:layout_height="wrap_content" />
+
+    <android.support.v7.widget.GridLayout xmlns:grid="http://schemas.android.com/apk/res-auto"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1.0"
+        grid:columnCount="2">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            grid:layout_column="0"
+            grid:layout_row="0"
+            grid:layout_columnSpan="2"
+            grid:layout_gravity="fill_horizontal" >
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/fleet_stance"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+
+            <Spinner
+                android:id="@+id/stance"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1" />
+        </LinearLayout>
+
+        <Button
+            style="@style/Button"
+            android:id="@+id/move_btn"
+            android:layout_height="wrap_content"
+            grid:layout_gravity="fill_horizontal"
+            grid:layout_column="0"
+            grid:layout_row="1"
+            android:layout_marginLeft="12dp"
+            android:layout_marginRight="12dp"
+            android:text="@string/fleet_move" />
+
+        <Button
+            style="@style/Button"
+            android:id="@+id/attack_btn"
+            android:layout_height="wrap_content"
+            grid:layout_gravity="fill_horizontal"
+            grid:layout_column="1"
+            grid:layout_row="1"
+            android:layout_marginLeft="12dp"
+            android:layout_marginRight="12dp"
+            android:text="@string/fleet_attack" />
+
+    </android.support.v7.widget.GridLayout>
 
 </LinearLayout>

@@ -6,10 +6,13 @@ import java.util.List;
 import android.app.Dialog;
 import android.os.Bundle;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.RelativeLayout;
 import android.widget.TabHost;
+import android.widget.TabWidget;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.model.Colony;
 import au.com.codeka.warworlds.model.Planet;
@@ -100,13 +103,13 @@ public class SolarSystemBuildDialog extends Dialog
             // which really are too high in landscape mode...
             // http://stackoverflow.com/questions/8271385/can-i-use-default-tab-styling-in-my-custom-tab-view
 
-            /*TabWidget tw = (TabWidget) findViewById(android.R.id.tabs);
+            TabWidget tw = (TabWidget) findViewById(android.R.id.tabs);
             RelativeLayout indicator = (RelativeLayout) tw.getChildTabViewAt(mTabs.size() - 1);
             indicator.findViewById(android.R.id.icon).setVisibility(View.GONE);
 
             ViewGroup.LayoutParams vglp = indicator.getLayoutParams();
             vglp.height = 40;
-            indicator.setLayoutParams(vglp);*/
+            indicator.setLayoutParams(vglp);
         }
 
         public List<Tab> getTabs() {
