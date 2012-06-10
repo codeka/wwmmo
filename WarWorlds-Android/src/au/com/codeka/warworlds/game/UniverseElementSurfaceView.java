@@ -26,10 +26,13 @@ public class UniverseElementSurfaceView extends SurfaceView implements SurfaceHo
     private GestureDetector mGestureDetector;
     private boolean mDisableGestures = false;
     GestureDetector.OnGestureListener mGestureListener;
+    private float mPixelScale;
 
     public UniverseElementSurfaceView(Context context, AttributeSet attrs) {
         super(context, attrs);
         mContext = context;
+
+        mPixelScale = context.getResources().getDisplayMetrics().density;
 
         if (this.isInEditMode()) {
             return;
@@ -51,6 +54,10 @@ public class UniverseElementSurfaceView extends SurfaceView implements SurfaceHo
     @Override
     public void surfaceDestroyed(SurfaceHolder holder) {
         mHolder = null;
+    }
+
+    public float getPixelScale() {
+        return mPixelScale;
     }
 
     @Override

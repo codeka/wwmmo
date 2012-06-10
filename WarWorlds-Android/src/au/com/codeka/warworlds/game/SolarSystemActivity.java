@@ -2,6 +2,9 @@ package au.com.codeka.warworlds.game;
 
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Intent;
@@ -30,10 +33,9 @@ import au.com.codeka.warworlds.model.Star;
 
 /**
  * This activity is displayed when you're actually looking at a solar system (star + planets)
- * @author dean@codeka.com.au
- *
  */
 public class SolarSystemActivity extends Activity {
+    private static Logger log = LoggerFactory.getLogger(SolarSystemActivity.class);
     private SolarSystemSurfaceView mSolarSystemSurfaceView;
     private long mSectorX;
     private long mSectorY;
@@ -302,9 +304,23 @@ public class SolarSystemActivity extends Activity {
             // just ignore this then cause it'll fire an onPlanetSelected when it finishes
             // drawing.
         } else {
+            double x = planetCentre.getX() * mSolarSystemSurfaceView.getPixelScale();
+            double y = planetCentre.getY() * mSolarSystemSurfaceView.getPixelScale();
+
+            float offsetX = congenialityContainer.getWidth() + (20 * mSolarSystemSurfaceView.getPixelScale());
+            float offsetY = congenialityContainer.getHeight() + (20 * mSolarSystemSurfaceView.getPixelScale());
+
+            if (x - offsetX < 0) {
+                offsetX  = -(20 * mSolarSystemSurfaceView.getPixelScale());
+            }
+            if (y - offsetY < 0) {
+                offsetY = -(20 * mSolarSystemSurfaceView.getPixelScale());
+            }
+
             RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) congenialityContainer.getLayoutParams();
-            params.leftMargin = (int) planetCentre.getX();
-            params.topMargin = (int) planetCentre.getY();
+            params.leftMargin = (int) (x - offsetX);
+            params.topMargin = (int) (y - offsetY);
+
             congenialityContainer.setLayoutParams(params);
             congenialityContainer.setVisibility(View.VISIBLE);
         }
@@ -351,6 +367,7 @@ public class SolarSystemActivity extends Activity {
                     public void onEmpireFetched(Empire empire) {
                         Empire thisEmpire = EmpireManager.getInstance().getEmpire();
                         if (thisEmpire.getKey().equals(empire.getKey())) {
+
                             colonyDetailsContainer.setVisibility(View.VISIBLE);
                             refreshColonyDetails();
                         } else {
@@ -360,7 +377,7 @@ public class SolarSystemActivity extends Activity {
                 });
         }
     }
-    
+
     private void refreshColonyDetails() {
         final TextView populationCountTextView = (TextView) findViewById(
                 R.id.population_count);

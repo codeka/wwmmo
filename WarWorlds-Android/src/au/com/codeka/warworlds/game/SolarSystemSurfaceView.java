@@ -40,7 +40,6 @@ public class SolarSystemSurfaceView extends UniverseElementSurfaceView {
     private Bitmap mColonyIcon;
     private CopyOnWriteArrayList<OnPlanetSelectedListener> mPlanetSelectedListeners;
     private StarfieldBackgroundRenderer mBackgroundRenderer;
-    private float mPixelScale;
     private boolean mPlanetSelectedFired;
     private Handler mHandler;
 
@@ -53,13 +52,12 @@ public class SolarSystemSurfaceView extends UniverseElementSurfaceView {
         mPlanetSelectedListeners = new CopyOnWriteArrayList<OnPlanetSelectedListener>();
         mHandler = new Handler();
         mBackgroundRenderer = new StarfieldBackgroundRenderer(context);
-        mPixelScale = context.getResources().getDisplayMetrics().density;
 
         int[] colours = { Color.YELLOW, Color.YELLOW, 0x00000000 };
         float[] positions = { 0.0f, 0.4f, 1.0f };
         mSunPaint = new Paint();
         mSunPaint.setDither(true);
-        RadialGradient gradient = new RadialGradient(0, 0, 150*mPixelScale, 
+        RadialGradient gradient = new RadialGradient(0, 0, 150 * getPixelScale(), 
                 colours, positions, android.graphics.Shader.TileMode.CLAMP);
         mSunPaint.setShader(gradient);
 
@@ -103,7 +101,8 @@ public class SolarSystemSurfaceView extends UniverseElementSurfaceView {
         for(PlanetInfo planetInfo : mPlanetInfos) {
             if (planetInfo.planet.getKey().equals(planet.getKey())) {
                 Point2D pixels = planetInfo.centre;
-                return new Point2D(pixels.getX() / mPixelScale, pixels.getY() / mPixelScale);
+                return new Point2D(pixels.getX() / getPixelScale(),
+                                    pixels.getY() / getPixelScale());
             }
         }
 
@@ -115,7 +114,7 @@ public class SolarSystemSurfaceView extends UniverseElementSurfaceView {
             return;
         }
 
-        float planetStart = 150*mPixelScale;
+        float planetStart = 150 * getPixelScale();
         float distanceBetweenPlanets = canvas.getWidth() - planetStart;
         distanceBetweenPlanets /= mPlanetInfos.length;
 
@@ -197,8 +196,8 @@ public class SolarSystemSurfaceView extends UniverseElementSurfaceView {
             canvas.drawColor(Color.BLACK);
 
             mBackgroundRenderer.drawBackground(canvas, 0, 0,
-                    canvas.getWidth() / mPixelScale,
-                    canvas.getHeight() / mPixelScale,
+                    canvas.getWidth() / getPixelScale(),
+                    canvas.getHeight() / getPixelScale(),
                     mStar.hashCode());
 
             // make sure the planets are in the correct position
@@ -220,7 +219,7 @@ public class SolarSystemSurfaceView extends UniverseElementSurfaceView {
     }
 
     private void drawSun(Canvas canvas) {
-        canvas.drawCircle(0, 0, 150 * mPixelScale, mSunPaint);
+        canvas.drawCircle(0, 0, 150 * getPixelScale(), mSunPaint);
     }
 
     private void drawPlanets(Canvas canvas) {
@@ -257,7 +256,7 @@ public class SolarSystemSurfaceView extends UniverseElementSurfaceView {
         if (mSelectedPlanet != null) {
             canvas.drawCircle((float) mSelectedPlanet.centre.getX(), 
                     (float) mSelectedPlanet.centre.getY(),
-                    40 * mPixelScale, mSelectedPlanetPaint);
+                    40 * getPixelScale(), mSelectedPlanetPaint);
         }
     }
 
@@ -285,7 +284,7 @@ public class SolarSystemSurfaceView extends UniverseElementSurfaceView {
             PlanetInfo newSelection = null;
             if (closestPlanet != null &&
                     closestPlanet != mSelectedPlanet &&
-                    tapLocation.distanceTo(closestPlanet.centre) < 60.0 * mPixelScale) {
+                    tapLocation.distanceTo(closestPlanet.centre) < 60.0 * getPixelScale()) {
                 newSelection = closestPlanet;
             }
 

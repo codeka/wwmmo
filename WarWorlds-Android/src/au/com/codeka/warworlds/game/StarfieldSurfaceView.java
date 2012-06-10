@@ -37,7 +37,6 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
     private Paint mSelectionPaint;
     private Bitmap mColonyIcon;
     private StarfieldBackgroundRenderer mBackgroundRenderer;
-    private float mPixelScale;
 
     public StarfieldSurfaceView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -51,7 +50,6 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
         mStarSelectedListeners = new CopyOnWriteArrayList<OnStarSelectedListener>();
         mSelectedStar = null;
         mColonyIcon = BitmapFactory.decodeResource(getResources(), R.drawable.starfield_colony);
-        mPixelScale = context.getResources().getDisplayMetrics().density;
 
         mSelectionPaint = new Paint();
         mSelectionPaint.setARGB(255, 255, 255, 255);
@@ -165,30 +163,31 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
         x += star.getOffsetX();
         y += star.getOffsetY();
 
-        int[] colours = { star.getColour(), star.getColour(), 0x00000000 };
-        float[] positions = { 0.0f, 0.4f, 1.0f };
+        final int[] colours = { star.getColour(), star.getColour(), 0x00000000 };
+        final float[] positions = { 0.0f, 0.4f, 1.0f };
+        final float pixelScale = getPixelScale();
 
         if (mStarPaint == null) {
             mStarPaint = new Paint();
             mStarPaint.setDither(true);
         }
-        RadialGradient gradient = new RadialGradient(x * mPixelScale, y * mPixelScale,
-                star.getSize() * mPixelScale, colours, positions,
+        RadialGradient gradient = new RadialGradient(x * pixelScale, y * pixelScale,
+                star.getSize() * pixelScale, colours, positions,
                 android.graphics.Shader.TileMode.CLAMP);
         mStarPaint.setShader(gradient);
 
-        canvas.drawCircle(x * mPixelScale, y * mPixelScale,
-                star.getSize() * mPixelScale, mStarPaint);
+        canvas.drawCircle(x * pixelScale, y * pixelScale,
+                star.getSize() * pixelScale, mStarPaint);
 
         if (mSelectedStar == star) {
-            canvas.drawCircle(x * mPixelScale, y * mPixelScale,
-                    (star.getSize() + 5) * mPixelScale, mSelectionPaint);
+            canvas.drawCircle(x * pixelScale, y * pixelScale,
+                    (star.getSize() + 5) * pixelScale, mSelectionPaint);
         }
 
         List<Colony> colonies = star.getColonies();
         if (colonies != null && !colonies.isEmpty()) {
-            canvas.drawBitmap(mColonyIcon, (x + mColonyIcon.getWidth()) * mPixelScale,
-                    (y - mColonyIcon.getHeight()) * mPixelScale, mSelectionPaint);
+            canvas.drawBitmap(mColonyIcon, (x + mColonyIcon.getWidth()) * pixelScale,
+                    (y - mColonyIcon.getHeight()) * pixelScale, mSelectionPaint);
         }
     }
 
@@ -200,18 +199,20 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
         x += star.getOffsetX();
         y += star.getOffsetY();
 
+        final float pixelScale = getPixelScale();
+
         if (mStarNamePaint == null) {
             mStarNamePaint = new Paint();
             mStarNamePaint.setStyle(Style.STROKE);
-            mStarNamePaint.setTextSize(15.0f * mPixelScale);
+            mStarNamePaint.setTextSize(15.0f * pixelScale);
         }
         mStarNamePaint.setARGB(255, 255, 255, 255);
-        float width = mStarNamePaint.measureText(star.getName()) / mPixelScale;
+        float width = mStarNamePaint.measureText(star.getName()) / pixelScale;
         x -= (width / 2.0f);
         y += star.getSize() + 10.0f;
 
         canvas.drawText(star.getName(),
-                x * mPixelScale, y * mPixelScale, mStarNamePaint);
+                x * pixelScale, y * pixelScale, mStarNamePaint);
     }
 
     private void selectStar(Star star) {
@@ -232,8 +233,8 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
         public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX,
                 float distanceY) {
             SectorManager.getInstance().scroll(
-                    -(int)(distanceX / mPixelScale),
-                    -(int)(distanceY / mPixelScale));
+                    -(int)(distanceX / getPixelScale()),
+                    -(int)(distanceY / getPixelScale()));
             redraw(); // todo: something better? e.g. event listener or something
 
             return false;
@@ -246,8 +247,8 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
          */
         @Override
         public boolean onSingleTapConfirmed(MotionEvent e) {
-            int tapX = (int) (e.getX() / mPixelScale);
-            int tapY = (int) (e.getY() / mPixelScale);
+            int tapX = (int) (e.getX() / getPixelScale());
+            int tapY = (int) (e.getY() / getPixelScale());
 
             Star star = SectorManager.getInstance().getStarAt(tapX, tapY);
             selectStar(star);

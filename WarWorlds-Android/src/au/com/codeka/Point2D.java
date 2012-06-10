@@ -4,11 +4,11 @@ package au.com.codeka;
  * Represents a point in 2D space, with some convenience methods for manipulating them.
  */
 public class Point2D {
-    private double mX;
-    private double mY;
+    private float mX;
+    private float mY;
 
     public Point2D() {
-        mX = mY = 0.0;
+        mX = mY = 0.0f;
     }
 
     public Point2D(int x, int y) {
@@ -16,21 +16,21 @@ public class Point2D {
         mY = y;
     }
 
-    public Point2D(double x, double y) {
+    public Point2D(float x, float y) {
         mX = x;
         mY = y;
     }
 
-    public double getX() {
+    public float getX() {
         return mX;
     }
-    public void setX(double x) {
+    public void setX(float x) {
         mX = x;
     }
-    public double getY() {
+    public float getY() {
         return mY;
     }
-    public void setY(double y) {
+    public void setY(float y) {
         mY = y;
     }
 
@@ -54,9 +54,9 @@ public class Point2D {
         return other.subtract(this).scalarLength();
     }
 
-    public Point2D rotate(double radians) {
-        double nx = mX*Math.cos(radians) - mY*Math.sin(radians);
-        double ny = mY*Math.cos(radians) + mX*Math.sin(radians);
+    public Point2D rotate(float radians) {
+        float nx = (float)(mX*Math.cos(radians) - mY*Math.sin(radians));
+        float ny = (float)(mY*Math.cos(radians) + mX*Math.sin(radians));
         return new Point2D(nx, ny);
     }
 }
