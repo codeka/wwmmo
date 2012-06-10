@@ -1,5 +1,6 @@
 package au.com.codeka.warworlds.game;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.joda.time.Duration;
@@ -23,11 +24,13 @@ import au.com.codeka.warworlds.model.Colony;
 import au.com.codeka.warworlds.model.Design;
 import au.com.codeka.warworlds.model.DesignManager;
 import au.com.codeka.warworlds.model.ShipDesignManager;
+import au.com.codeka.warworlds.model.Star;
 
 public class SolarSystemBuildQueueTab implements SolarSystemBuildDialog.Tab {
     private SolarSystemActivity mActivity;
     private BuildQueueListAdapter mBuildQueueListAdapter;
     private View mView;
+    private Star mStar;
     private Colony mColony;
 
     public SolarSystemBuildQueueTab(SolarSystemBuildDialog dialog, SolarSystemActivity activity) {
@@ -47,11 +50,12 @@ public class SolarSystemBuildQueueTab implements SolarSystemBuildDialog.Tab {
     }
 
     @Override
-    public void setColony(Colony colony) {
+    public void setColony(Star star, Colony colony) {
+        mStar = star;
         mColony = colony;
 
         if (mBuildQueueListAdapter != null && mColony != null) {
-            mBuildQueueListAdapter.setBuildQueue(BuildQueueManager.getInstance().getBuildQueueForColony(mColony));
+            mBuildQueueListAdapter.setBuildQueue(mStar, mColony);
         }
     }
 
@@ -61,8 +65,8 @@ public class SolarSystemBuildQueueTab implements SolarSystemBuildDialog.Tab {
         mView = inflater.inflate(R.layout.solarsystem_build_queue_tab, null);
 
         mBuildQueueListAdapter = new BuildQueueListAdapter();
-        if (mColony != null) {
-            mBuildQueueListAdapter.setBuildQueue(BuildQueueManager.getInstance().getBuildQueueForColony(mColony));
+        if (mStar != null && mColony != null) {
+            mBuildQueueListAdapter.setBuildQueue(mStar, mColony);
         }
 
         ListView buildQueueList = (ListView) mView.findViewById(R.id.build_queue);
@@ -72,16 +76,16 @@ public class SolarSystemBuildQueueTab implements SolarSystemBuildDialog.Tab {
         BuildingDesignManager.getInstance().addDesignsChangedListener(new BuildingDesignManager.DesignsChangedListener() {
             @Override
             public void onDesignsChanged() {
-                if (mColony != null) {
-                    mBuildQueueListAdapter.setBuildQueue(BuildQueueManager.getInstance().getBuildQueueForColony(mColony));
+                if (mStar != null && mColony != null) {
+                    mBuildQueueListAdapter.setBuildQueue(mStar, mColony);
                 }
             }
         });
         ShipDesignManager.getInstance().addDesignsChangedListener(new ShipDesignManager.DesignsChangedListener() {
             @Override
             public void onDesignsChanged() {
-                if (mColony != null) {
-                    mBuildQueueListAdapter.setBuildQueue(BuildQueueManager.getInstance().getBuildQueueForColony(mColony));
+                if (mStar != null && mColony != null) {
+                    mBuildQueueListAdapter.setBuildQueue(mStar, mColony);
                 }
             }
         });
@@ -90,8 +94,9 @@ public class SolarSystemBuildQueueTab implements SolarSystemBuildDialog.Tab {
         BuildQueueManager.getInstance().addBuildQueueUpdatedListener(new BuildQueueManager.BuildQueueUpdatedListener() {
             @Override
             public void onBuildQueueUpdated(List<BuildRequest> queue) {
-                if (mColony != null) {
-                    mBuildQueueListAdapter.setBuildQueue(BuildQueueManager.getInstance().getBuildQueueForColony(mColony));
+                // TODO: this will be out-of-date...
+                if (mStar != null && mColony != null) {
+                    mBuildQueueListAdapter.setBuildQueue(mStar, mColony);
                 }
             }
         });
@@ -103,8 +108,14 @@ public class SolarSystemBuildQueueTab implements SolarSystemBuildDialog.Tab {
     private class BuildQueueListAdapter extends BaseAdapter {
         private List<BuildRequest> mQueue;
 
-        public void setBuildQueue(List<BuildRequest> queue) {
-            mQueue = queue;
+        public void setBuildQueue(Star star, Colony colony) {
+            mQueue = new ArrayList<BuildRequest>();
+            for (BuildRequest buildRequest : star.getBuildRequests()) {
+                if (buildRequest.getColonyKey().equals(colony.getKey())) {
+                    mQueue.add(buildRequest);
+                }
+            }
+
             notifyDataSetChanged();
         }
 
@@ -160,9 +171,9 @@ public class SolarSystemBuildQueueTab implements SolarSystemBuildDialog.Tab {
                              (int) request.getPercentComplete()));
             } else {
                 Period remainingPeriod = remainingDuration.toPeriod();
-                row2.setText(String.format("%d %%, %d:%d left",
-                        (int) request.getPercentComplete(),
-                        remainingPeriod.getHours(), remainingPeriod.getMinutes()));
+                row2.setText(String.format("%d %%, %d:%02d left",
+                             (int) request.getPercentComplete(),
+                             remainingPeriod.getHours(), remainingPeriod.getMinutes()));
             }
 
             row3.setVisibility(View.GONE);

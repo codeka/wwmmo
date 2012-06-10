@@ -26,6 +26,7 @@ import au.com.codeka.warworlds.model.BuildingDesignManager;
 import au.com.codeka.warworlds.model.Colony;
 import au.com.codeka.warworlds.model.Design;
 import au.com.codeka.warworlds.model.DesignManager;
+import au.com.codeka.warworlds.model.Star;
 
 /**
  * Handles the "Building" tab of the \c SolarSystemBuildDialog.
@@ -52,7 +53,8 @@ public class SolarSystemBuildBuildingTab implements SolarSystemBuildDialog.Tab {
         return "Buildings";
     }
 
-    public void setColony(Colony colony) {
+    @Override
+    public void setColony(Star star, Colony colony) {
         mColony = colony;
 
         if (mBuildingListAdapter != null && mColony != null) {

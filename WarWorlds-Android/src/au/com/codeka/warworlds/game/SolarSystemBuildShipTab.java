@@ -22,6 +22,7 @@ import au.com.codeka.warworlds.model.Design;
 import au.com.codeka.warworlds.model.DesignManager;
 import au.com.codeka.warworlds.model.ShipDesign;
 import au.com.codeka.warworlds.model.ShipDesignManager;
+import au.com.codeka.warworlds.model.Star;
 
 public class SolarSystemBuildShipTab implements SolarSystemBuildDialog.Tab {
     private SolarSystemActivity mActivity;
@@ -45,7 +46,7 @@ public class SolarSystemBuildShipTab implements SolarSystemBuildDialog.Tab {
     }
 
     @Override
-    public void setColony(Colony colony) {
+    public void setColony(Star star, Colony colony) {
     }
 
     private void setup() {

@@ -186,7 +186,8 @@ def updateAfterSimulate(star_pb, empire_key, log=logging.debug):
 def _log_noop(msg):
   """This is the default logging function for simulate() -- it does nothing."""
 
-  pass
+  logging.debug(msg)
+  #pass
 
 
 def simulate(star_pb, empire_key=None, log=_log_noop):

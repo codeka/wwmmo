@@ -251,6 +251,28 @@ class StarPage(StarfieldPage):
   def get(self, key):
     star_pb = sector.getStar(key)
     empire.simulate(star_pb)
+
+    empire_pb = empire.getEmpireForUser(self.user)
+
+    # we only return fleets for the current empire -- we don't let you see
+    # other empire's fleets.
+    empire_fleets = []
+    for fleet in star_pb.fleets:
+      if fleet.empire_key == empire_pb.key:
+        empire_fleets.append(fleet)
+
+    del star_pb.fleets[:]
+    star_pb.fleets.extend(empire_fleets)
+
+    # similarly for build requests, only our own empire's build requests
+    empire_build_requests = []
+    for build_request in star_pb.build_requests:
+      if build_request.empire_key == empire_pb.key:
+        empire_build_requests.append(build_request)
+
+    del star_pb.build_requests[:]
+    star_pb.build_requests.extend(empire_build_requests)
+
     return star_pb
 
 

@@ -78,7 +78,6 @@ def getStar(star_key):
     ctrl.buildRequestModelToPb(build_pb, build_model)
 
   for fleet_model in empire_mdl.Fleet.getForStar(star_model):
-    # todo: it'd be nice to consolidate them here perhaps?
     fleet_pb = star_pb.fleets.add()
     ctrl.fleetModelToPb(fleet_pb, fleet_model)
 

@@ -20,12 +20,16 @@ public class Star {
     private Planet[] mPlanets;
     private ArrayList<Colony> mColonies;
     private ArrayList<EmpirePresence> mEmpires;
+    private ArrayList<Fleet> mFleets;
+    private ArrayList<BuildRequest> mBuildRequests;
 
     public Star() {
         mSector = null; // can be null if we're fetched separately from the sector
         mPlanets = null; // can be null if planets have not been populated...
         mColonies = null;
         mEmpires = null;
+        mFleets = null;
+        mBuildRequests = null;
     }
 
     public Sector getSector() {
@@ -72,6 +76,12 @@ public class Star {
             }
         }
         return null;
+    }
+    public List<Fleet> getFleets() {
+        return mFleets;
+    }
+    public List<BuildRequest> getBuildRequests() {
+        return mBuildRequests;
     }
 
     public void addColony(Colony colony) {
@@ -129,6 +139,16 @@ public class Star {
         s.mEmpires = new ArrayList<EmpirePresence>();
         for (warworlds.Warworlds.EmpirePresence empirePresencePb : pb.getEmpiresList()) {
             s.mEmpires.add(EmpirePresence.fromProtocolBuffer(empirePresencePb));
+        }
+
+        s.mBuildRequests = new ArrayList<BuildRequest>();
+        for (warworlds.Warworlds.BuildRequest buildRequestPb : pb.getBuildRequestsList()) {
+            s.mBuildRequests.add(BuildRequest.fromProtocolBuffer(buildRequestPb));
+        }
+
+        s.mFleets = new ArrayList<Fleet>();
+        for (warworlds.Warworlds.Fleet fleetPb : pb.getFleetsList()) {
+            s.mFleets.add(Fleet.fromProtocolBuffer(fleetPb));
         }
 
         return s;

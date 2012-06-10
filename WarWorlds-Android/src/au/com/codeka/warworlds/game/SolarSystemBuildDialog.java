@@ -65,9 +65,9 @@ public class SolarSystemBuildDialog extends Dialog
         mActivity.removeStarUpdatedListener(this);
     }
 
-    public void setColony(Colony colony) {
+    public void setColony(Star star, Colony colony) {
         for (Tab tab : mTabManager.getTabs()) {
-            tab.setColony(colony);
+            tab.setColony(star, colony);
         }
     }
 
@@ -80,7 +80,7 @@ public class SolarSystemBuildDialog extends Dialog
     public interface Tab {
         public View getView();
         public String getTitle();
-        public void setColony(Colony colony);
+        public void setColony(Star star, Colony colony);
     }
 
     private class TabManager implements TabHost.TabContentFactory {
@@ -129,6 +129,6 @@ public class SolarSystemBuildDialog extends Dialog
      */
     @Override
     public void onStarUpdated(Star star, Planet selectedPlanet, Colony colony) {
-        setColony(colony);
+        setColony(star, colony);
     }
 }

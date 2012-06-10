@@ -2,9 +2,6 @@ package au.com.codeka.warworlds.game;
 
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Intent;
@@ -35,7 +32,6 @@ import au.com.codeka.warworlds.model.Star;
  * This activity is displayed when you're actually looking at a solar system (star + planets)
  */
 public class SolarSystemActivity extends Activity {
-    private static Logger log = LoggerFactory.getLogger(SolarSystemActivity.class);
     private SolarSystemSurfaceView mSolarSystemSurfaceView;
     private long mSectorX;
     private long mSectorY;
@@ -133,6 +129,12 @@ public class SolarSystemActivity extends Activity {
     public void onResume() {
         super.onResume();
 
+        mStarKey = null;
+        mIsSectorUpdated = false;;
+        mStar = null;
+        mPlanet = null;
+        mColony = null;
+
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
             mSectorX = extras.getLong("au.com.codeka.warworlds.SectorX");
@@ -197,7 +199,7 @@ public class SolarSystemActivity extends Activity {
         }
         case BUILD_DIALOG: {
             SolarSystemBuildDialog dialog = (SolarSystemBuildDialog) d;
-            dialog.setColony(mColony);
+            dialog.setColony(mStar, mColony);
             break;
         }
         case FOCUS_DIALOG: {
@@ -207,7 +209,7 @@ public class SolarSystemActivity extends Activity {
         }
         case FLEET_DIALOG: {
             SolarSystemFleetDialog dialog = (SolarSystemFleetDialog) d;
-            dialog.setColony(mColony);
+            dialog.setStar(mStar);
             break;
         }
         }
