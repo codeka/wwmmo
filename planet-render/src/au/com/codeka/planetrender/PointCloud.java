@@ -119,7 +119,6 @@ public class PointCloud {
             double numPointsFactor = mRand.nextDouble();
             numPointsFactor = 0.75 + 0.5*numPointsFactor;
 
-
             int numPoints = 25 + (int) (475 * mDensity * numPointsFactor);
             if (numPoints < 25) {
                 numPoints = 25;

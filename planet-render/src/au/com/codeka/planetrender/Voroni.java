@@ -2,6 +2,7 @@ package au.com.codeka.planetrender;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -12,6 +13,10 @@ public class Voroni {
     private PointCloud mPointCloud;
     private ArrayList<Triangle> mTriangles;
 
+    // this mapping maps points in the point cloud to the triangles that share the
+    // point as a vertex
+    private HashMap<Vector2, List<Triangle>> mPointCloudToTriangles;
+
     /**
      * Constructs a \c Voroni diagram from the given \c PointCloud. You must call \c generate()
      * to actually generate the triangulation/voroni.
@@ -20,6 +25,9 @@ public class Voroni {
         mPointCloud = pc;
     }
 
+    /**
+     * Generates the delaunay trianglation/voroni diagram of the point cloud. 
+     */
     public void generate() {
         ArrayList<Triangle> triangles = new ArrayList<Triangle>();
         List<Vector2> points = mPointCloud.getPoints();
@@ -57,6 +65,79 @@ public class Voroni {
                 mTriangles.add(t);
             }
         }
+
+        // finally, go through the list of triangles and populate mPointCloudToTriangles
+        mPointCloudToTriangles = new HashMap<Vector2, List<Triangle>>();
+        for (Triangle t : mTriangles) {
+            addTriangleToPointCloudToTrianglesMap(points.get(t.a), t);
+            addTriangleToPointCloudToTrianglesMap(points.get(t.b), t);
+            addTriangleToPointCloudToTrianglesMap(points.get(t.c), t);
+        }
+        sortPointCloudToTrianglesMap();
+    }
+
+    /**
+     * When we first add triangles to the \c mPointCloudToTriangles map, they're just added in
+     * any old order. This doesn't work when trying to determine if a point is inside the cell
+     * or drawing the outline etc, so we need to make sure the triangles are added in clockwise
+     * order around each point. This method does that.
+     */
+    private void sortPointCloudToTrianglesMap() {
+        for (Vector2 pt : mPointCloud.getPoints()) {
+            List<Triangle> unsorted = mPointCloudToTriangles.get(pt);
+            if (unsorted == null) {
+                continue;
+            }
+
+            ArrayList<Triangle> sorted = new ArrayList<Triangle>();
+            sorted.add(unsorted.get(0));
+            unsorted.remove(0);
+
+            Edge nextEdge = sorted.get(0).findCcwEdge(pt);
+            while (!unsorted.isEmpty()) {
+                Triangle t = sorted.get(sorted.size() - 1);
+                Vector2 otherPt = t.findOppositePoint(nextEdge);
+
+                for (Triangle nextTriangle : unsorted) {
+                    nextEdge = nextTriangle.findEdge(pt, otherPt);
+                    if (nextEdge != null) {
+                        unsorted.remove(nextTriangle);
+                        sorted.add(nextTriangle);
+                        break;
+                    }
+                }
+
+                if (nextEdge == null) {
+                    // if there's no more edges in the clockwise direction then it means we're
+                    // at the edge of the diagram. We'll break out of this loop and start working
+                    // anti-clockwise the other way...
+                    break;
+                }
+            }
+
+            if (!unsorted.isEmpty()) {
+                // if we come in here, then means we got to the edge of the world and we now have
+                // to start working anti-clockwise...
+                nextEdge = sorted.get(0).findCwEdge(pt);
+
+                while (!unsorted.isEmpty()) {
+                    Triangle t = sorted.get(0);
+                    Vector2 otherPt = t.findOppositePoint(nextEdge);
+
+                    for (Triangle nextTriangle : unsorted) {
+                        nextEdge = nextTriangle.findEdge(pt, otherPt);
+                        if (nextEdge != null) {
+                            unsorted.remove(nextTriangle);
+                            sorted.add(0, nextTriangle);
+                            break;
+                        }
+                    }
+                }
+            }
+
+
+            mPointCloudToTriangles.put(pt, sorted);
+        }
     }
 
     /**
@@ -79,12 +160,40 @@ public class Voroni {
         }
     }
 
+    /**
+     * Helper class to render the Voroni diagram to the given \c Image. We draw lines of the
+     * given \c Colour.
+     */
+    public void renderVoroni(Image img, Colour c) {
+        for (Vector2 pt : mPointCloud.getPoints()) {
+            List<Triangle> triangles = mPointCloudToTriangles.get(pt);
+            if (triangles == null) {
+                // shouldn't happen, but just in case...
+                continue;
+            }
+
+            for (int i = 0; i < triangles.size() - 1; i++) {
+                drawLine(img, c, triangles.get(i).centre, triangles.get(i+1).centre);
+            }
+            drawLine(img, c, triangles.get(0).centre, triangles.get(triangles.size() - 1).centre);
+        }
+    }
+
     private void drawLine(Image img, Colour c, Vector2 p1, Vector2 p2) {
         int x1 = (int)(img.getWidth() * p1.x);
         int x2 = (int)(img.getWidth() * p2.x);
         int y1 = (int)(img.getHeight() * p1.y);
         int y2 = (int)(img.getHeight() * p2.y);
         img.drawLine(x1, y1, x2, y2, c);
+    }
+
+    private void addTriangleToPointCloudToTrianglesMap(Vector2 pt, Triangle t) {
+        List<Triangle> value = mPointCloudToTriangles.get(pt);
+        if (value == null) {
+            value = new ArrayList<Triangle>();
+            mPointCloudToTriangles.put(pt, value);
+        }
+        value.add(t);
     }
 
     /**
@@ -145,7 +254,7 @@ public class Voroni {
         for (Triangle t : superTriangles) {
             triangles.add(t);
         }
-        
+
         return superTriangles;
     }
 
@@ -153,6 +262,7 @@ public class Voroni {
      * A triangle is simply three vertices from the point cloud.
      */
     public class Triangle {
+        private List<Vector2> mPoints;
         public int a;
         public int b;
         public int c;
@@ -162,6 +272,7 @@ public class Voroni {
         public double radius;
 
         public Triangle(List<Vector2> points, int a, int b, int c) {
+            mPoints = points;
             this.a = a;
             this.b = b;
             this.c = c;
@@ -178,6 +289,104 @@ public class Voroni {
          */
         public boolean shareVertex(Triangle t) {
             return (t.hasVertex(a) || t.hasVertex(b) || t.hasVertex(c));
+        }
+
+        /**
+         * Finds an \c Edge of this triangle that shared the two given points, or \c null if
+         * no edge of this triangle shares those points.
+         */
+        public Edge findEdge(Vector2 p1, Vector2 p2) {
+            Vector2 av = mPoints.get(a);
+            Vector2 bv = mPoints.get(b);
+            Vector2 cv = mPoints.get(c);
+
+            int i1 = -1;
+            int i2 = -1;
+
+            final double EPSILON = 0.000000001;
+            if (av.equals(p1, EPSILON) || av.equals(p2, EPSILON)) {
+                if (i1 < 0)
+                    i1 = a;
+                else
+                    i2 = a;
+            }
+            if (bv.equals(p1, EPSILON) || bv.equals(p2, EPSILON)) {
+                if (i1 < 0)
+                    i1 = b;
+                else
+                    i2 = b;
+            }
+            if (cv.equals(p1, EPSILON) || cv.equals(p2, EPSILON)) {
+                if (i1 < 0)
+                    i1 = c;
+                else
+                    i2 = c;
+            }
+
+            if (i1 >= 0 && i2 >= 0)
+                return new Edge(i1, i2);
+            else
+                return null;
+        }
+
+        /**
+         * Given \c pt (one of our vertices) we return the \c Edge that is on the
+         * left hand side (that is, the other \c Edge contining this vertex will be
+         * clockwise away from this one)
+         */
+        public Edge findCcwEdge(Vector2 pt) {
+            int p1, p2, p3;
+            if (pt.equals(mPoints.get(a), 0.00000001)) { 
+                p1 = a; p2 = b; p3 = c;
+            } else if (pt.equals(mPoints.get(b), 0.00000001)) { 
+                p1 = b; p2 = c; p3 = a;
+            } else if (pt.equals(mPoints.get(c), 0.00000001)) { 
+                p1 = c; p2 = b; p3 = b;
+            } else {
+                return null;
+            }
+
+            // p1 is guaranteed to be pt by this point. We just need to work out
+            // if p2 or p3 is the other side of the edge. We'll assume the other one
+            // is p2 and check if that results in clockwise winding. If not then it
+            // must be p3.
+            // See: http://stackoverflow.com/a/1165943/241462
+            Vector2 o1 = mPoints.get(p2);
+            Vector2 o2 = mPoints.get(p3);
+
+            double sum = (o1.x - pt.x) * (o1.y + pt.y);
+            sum += (o2.x - o1.x) * (o2.y + o1.y);
+            sum += (pt.x - o2.x) * (pt.y + o2.y);
+
+            if (sum >= 0) {
+                return new Edge(p1, p2);
+            } else {
+                return new Edge(p1, p3);
+            }
+        }
+
+        public Edge findCwEdge(Vector2 pt) {
+            Edge ccwEdge = findCcwEdge(pt);
+            Vector2 oppositePt = this.findOppositePoint(ccwEdge);
+            return findEdge(oppositePt, pt);
+        }
+
+        /**
+         * Given an edge of this triangles, returns the \c Vector2 point that represents the
+         * opposite point (i.e. the point that does \i not belong to this edge).
+         */
+        public Vector2 findOppositePoint(Edge edge) {
+            if (edge.a != a && edge.b != a) {
+                return mPoints.get(a);
+            }
+            if (edge.a != b && edge.b != b) {
+                return mPoints.get(b);
+            }
+            if (edge.a != c && edge.b != c) {
+                return mPoints.get(c);
+            }
+
+            return null;
         }
 
         /**
@@ -264,6 +473,11 @@ public class Voroni {
                 }
             }
             return false;
+        }
+
+        @Override
+        public int hashCode() {
+            return a ^ b;
         }
     }
 }

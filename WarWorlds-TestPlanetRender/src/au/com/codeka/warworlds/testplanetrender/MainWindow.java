@@ -50,6 +50,7 @@ public class MainWindow {
     private JToolBar toolBar_1;
     private JCheckBox chckbxRenderDelaunay;
     private JToolBar toolBar_2;
+    private JCheckBox chckbxRenderVoroni;
 
     /**
      * Launch the application.
@@ -102,7 +103,7 @@ public class MainWindow {
         Image img = new Image(512, 512, Colour.TRANSPARENT);
         msg = String.format("Point cloud generated in: %.4fms", ((double) elapsed) / 1000000.0);
 
-        if (chckbxRenderDelaunay.isSelected()) {
+        if (chckbxRenderDelaunay.isSelected() || chckbxRenderVoroni.isSelected()) {
             Voroni v = new Voroni(pc);
 
             startTime = System.nanoTime();
@@ -112,7 +113,12 @@ public class MainWindow {
             totalElapsed += elapsed;
 
             msg += String.format("; triangulated in: %.4fms", ((double) elapsed) / 1000000.0);
-            v.renderDelaunay(img, Colour.BLACK);
+            if (chckbxRenderDelaunay.isSelected()) {
+                v.renderDelaunay(img, Colour.GREEN);
+            }
+            if (chckbxRenderVoroni.isSelected()) {
+                v.renderVoroni(img, Colour.BLUE);
+            }
         }
 
         // render the point cloud last, so the dots are on top
@@ -213,8 +219,11 @@ public class MainWindow {
         toolBar_2.add(txtPointCloudRandomness);
         txtPointCloudRandomness.setColumns(5);
         
-        chckbxRenderDelaunay = new JCheckBox("Delaunay ");
+        chckbxRenderDelaunay = new JCheckBox("Delaunay");
         toolBar_2.add(chckbxRenderDelaunay);
+        
+        chckbxRenderVoroni = new JCheckBox("Voroni");
+        toolBar_2.add(chckbxRenderVoroni);
         toolBar_2.add(btnPointCloudRender);
 
         toolBar_1 = new JToolBar();

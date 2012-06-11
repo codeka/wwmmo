@@ -27,4 +27,25 @@ class Vector2 {
     public double length() {
         return Math.sqrt(length2());
     }
+
+    @Override
+    public int hashCode() {
+        //?? not very efficient!!
+        return (new Double(x).hashCode() ^ new Double(y).hashCode());
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        if (!(other instanceof Vector2)) {
+            return false;
+        }
+
+        Vector2 ov = (Vector2) other;
+        return (x == ov.x && y == ov.y);
+    }
+
+    public boolean equals(Vector2 other, double epsilon) {
+        return Math.abs(other.x - x) < epsilon &&
+                Math.abs(other.y - y) < epsilon;
+    }
 }
