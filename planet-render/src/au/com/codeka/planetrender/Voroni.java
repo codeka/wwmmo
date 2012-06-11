@@ -96,7 +96,7 @@ public class Voroni {
         // extract all triangles in the circumscribed circle around this point
         ArrayList<Triangle> circumscribedTriangles = new ArrayList<Triangle>();
         for (Triangle t : triangles) {
-            if (t.isInCircumscribedCircle(pt, points)) {
+            if (t.isInCircumscribedCircle(pt)) {
                 circumscribedTriangles.add(t);
             }
         }
@@ -120,7 +120,7 @@ public class Voroni {
 
         // now add triangles using the unique edges and the new point!
         for (Edge e : uniqueEdges) {
-            triangles.add(new Triangle(vIndex, e.a, e.b));
+            triangles.add(new Triangle(points, vIndex, e.a, e.b));
         }
     }
 
@@ -139,8 +139,8 @@ public class Voroni {
         points.add(new Vector2(1.1, -0.1));
 
         ArrayList<Triangle> superTriangles = new ArrayList<Triangle>();
-        superTriangles.add(new Triangle(points.size() - 4, points.size() - 3, points.size() - 2));
-        superTriangles.add(new Triangle(points.size() - 4, points.size() - 2, points.size() - 1));
+        superTriangles.add(new Triangle(points, points.size() - 4, points.size() - 3, points.size() - 2));
+        superTriangles.add(new Triangle(points, points.size() - 4, points.size() - 2, points.size() - 1));
 
         for (Triangle t : superTriangles) {
             triangles.add(t);
@@ -157,10 +157,16 @@ public class Voroni {
         public int b;
         public int c;
 
-        public Triangle(int a, int b, int c) {
+        // properties of the circumscribed circle of this triangle
+        public Vector2 centre;
+        public double radius;
+
+        public Triangle(List<Vector2> points, int a, int b, int c) {
             this.a = a;
             this.b = b;
             this.c = c;
+
+            calculateCircumscribedCircle(points);
         }
 
         public boolean hasVertex(int index) {
@@ -175,14 +181,9 @@ public class Voroni {
         }
 
         /**
-         * Checks whether the given point is inside a circle that is defined by the three
-         * points in this triangle.
-         *
-         * That is, if we trace a circle such that the circle touches all three points of this
-         * triangle, then this method will return \c true if the given point is inside that circle,
-         * or \c false if it is not.
+         * Calculates the centre and radius of the circumscribed circle around this triangle.
          */
-        public boolean isInCircumscribedCircle(Vector2 pt, List<Vector2> points) {
+        private void calculateCircumscribedCircle(List<Vector2> points) {
             final Vector2 v1 = points.get(a);
             final Vector2 v2 = points.get(b);
             final Vector2 v3 = points.get(c);
@@ -191,7 +192,7 @@ public class Voroni {
 
             if (Math.abs(v1.y - v2.y) < EPSILON && Math.abs(v2.y - v3.y) < EPSILON) {
                 // the points are coincident, we can't do this...
-                return false;
+                return;
             }
 
             double xc, yc;
@@ -218,10 +219,23 @@ public class Voroni {
                 yc = m1 * (xc - mx1) + my1;
             }
 
-            final Vector2 centre = new Vector2(v2.x - xc, v2.y - yc);
-            final Vector2 dpt = new Vector2(pt.x - xc, pt.y - yc);
+            centre = new Vector2(xc, yc);
+            radius = centre.distanceTo(v2);
+        }
 
-            return (dpt.length2() < centre.length2());
+        /**
+         * Checks whether the given point is inside a circle that is defined by the three
+         * points in this triangle.
+         *
+         * That is, if we trace a circle such that the circle touches all three points of this
+         * triangle, then this method will return \c true if the given point is inside that circle,
+         * or \c false if it is not.
+         */
+        public boolean isInCircumscribedCircle(Vector2 pt) {
+            if (centre == null)
+                return false;
+
+            return pt.distanceTo(centre) < radius;
         }
     }
 
