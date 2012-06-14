@@ -11,16 +11,24 @@ public class PlanetTemplate {
         Poisson
     }
 
+    public enum BaseTextureKind {
+        VoronoiMap
+    }
+
+    private Random mRand;
     private PointCloudGenerator mPointCloudGenerator;
     private double mPointCloudDensity;
     private double mPointCloudRandomness;
-    private Random mRand;
+    private BaseTextureKind mBaseTextureKind;
+    private ColourGradient mBaseTextureColourGradient;
 
     public PlanetTemplate() {
         mRand = new Random();
         mPointCloudGenerator = PointCloudGenerator.Poisson;
-        mPointCloudDensity = 0.75;
-        mPointCloudRandomness = 0.5;
+        mPointCloudDensity = 0.5;
+        mPointCloudRandomness = 0.8;
+        mBaseTextureKind = BaseTextureKind.VoronoiMap;
+        mBaseTextureColourGradient = new ColourGradient();
     }
 
     public PlanetTemplate setRandomSeed(long seed) {
@@ -39,6 +47,14 @@ public class PlanetTemplate {
         mPointCloudDensity = density;
         return this;
     }
+    public PlanetTemplate setBaseTextureKind(BaseTextureKind kind) {
+        mBaseTextureKind = kind;
+        return this;
+    }
+    public PlanetTemplate setBaseTextureColourGradient(ColourGradient cg) {
+        mBaseTextureColourGradient = cg;
+        return this;
+    }
 
     public Random getRandom() {
         return mRand;
@@ -51,5 +67,11 @@ public class PlanetTemplate {
     }
     public double getPointCloudRandomness() {
         return mPointCloudRandomness;
+    }
+    public BaseTextureKind getBaseTextureKind() {
+        return mBaseTextureKind;
+    }
+    public ColourGradient getBaseTextureColourGradient() {
+        return mBaseTextureColourGradient;
     }
 }

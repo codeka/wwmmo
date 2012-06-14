@@ -15,10 +15,19 @@ class Vector2 {
         this.y = y;
     }
 
-    public double distanceTo(Vector2 other) {
+    /**
+     * Gets the distance squared to the given other point. This is faster than
+     * \c distanceTo (since no sqrt() is required) and still good enough for many
+     * purposes.
+     */
+    public double distanceTo2(Vector2 other) {
         final double dx = other.x - x;
         final double dy = other.y - y;
-        return Math.sqrt(dx*dx + dy*dy);
+        return dx*dx + dy*dy;
+    }
+
+    public double distanceTo(Vector2 other) {
+        return Math.sqrt(distanceTo2(other));
     }
 
     public double length2() {

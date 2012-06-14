@@ -3,13 +3,15 @@ package au.com.codeka.planetrender;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
- * This class represents a Voroni diagram (and corresponds Delaunay triangulation) of a
+ * This class represents a Voronoi diagram (and corresponds Delaunay triangulation) of a
  * \c PointCloud. It's used as the staring point of our texture generator.
  */
-public class Voroni {
+public class Voronoi {
     private PointCloud mPointCloud;
     private ArrayList<Triangle> mTriangles;
 
@@ -17,19 +19,24 @@ public class Voroni {
     // point as a vertex
     private HashMap<Vector2, List<Triangle>> mPointCloudToTriangles;
 
+    // maps from points to a list of the neighbouring points
+    private HashMap<Vector2, Set<Vector2>> mPointNeighbours;
+
+    final static double EPSILON = 0.000000001;
+
     /**
-     * Constructs a \c Voroni diagram from the given \c PointCloud. You must call \c generate()
-     * to actually generate the triangulation/voroni.
+     * Constructs a \c Voronoi diagram from the given \c PointCloud. You must call \c generate()
+     * to actually generate the triangulation/voronoi.
      */
-    public Voroni(PointCloud pc) {
+    public Voronoi(PointCloud pc) {
         mPointCloud = pc;
     }
 
     /**
-     * Generates the delaunay trianglation/voroni diagram of the point cloud. 
+     * Generates the delaunay trianglation/voronoi diagram of the point cloud. 
      */
     public void generate() {
-        ArrayList<Triangle> triangles = new ArrayList<Triangle>();
+        List<Triangle> triangles = new ArrayList<Triangle>();
         List<Vector2> points = mPointCloud.getPoints();
 
         // first, create a "super triangle" that encompasses the whole point cloud. This is
@@ -66,7 +73,12 @@ public class Voroni {
             }
         }
 
-        // finally, go through the list of triangles and populate mPointCloudToTriangles
+        // remove the super triangle points (they'll be the last four we added)
+        for (int i = 0; i < 4; i++) {
+            mPointCloud.getPoints().remove(mPointCloud.getPoints().size() - 1);
+        }
+
+        // next, go through the list of triangles and populate mPointCloudToTriangles
         mPointCloudToTriangles = new HashMap<Vector2, List<Triangle>>();
         for (Triangle t : mTriangles) {
             addTriangleToPointCloudToTrianglesMap(points.get(t.a), t);
@@ -74,6 +86,51 @@ public class Voroni {
             addTriangleToPointCloudToTrianglesMap(points.get(t.c), t);
         }
         sortPointCloudToTrianglesMap();
+
+        // finally, go through the points again and work out all of that point's neighbours
+        mPointNeighbours = new HashMap<Vector2, Set<Vector2>>();
+        for (Vector2 pt : points) {
+            triangles = mPointCloudToTriangles.get(pt);
+            if (triangles != null) {
+                Set<Vector2> neighbours = new HashSet<Vector2>();
+                for (Triangle t : triangles) {
+                    Edge edge = t.findOppositeEdge(pt);
+                    neighbours.add(points.get(edge.a));
+                    neighbours.add(points.get(edge.b));
+                }
+                mPointNeighbours.put(pt, neighbours);
+            }
+        }
+    }
+
+    /**
+     * Finds the point closest to the given input point.
+     */
+    public Vector2 findClosestPoint(Vector2 uv) {
+        Vector2 closestPoint = null;
+        double closestDistance2 = 0.0;
+
+        for (Vector2 pt : mPointCloud.getPoints()) {
+            if (closestPoint == null) {
+                closestPoint = pt;
+                closestDistance2 = pt.distanceTo2(uv);
+            } else {
+                double distance2 = pt.distanceTo2(uv);
+                if (distance2 < closestDistance2) {
+                    closestDistance2 = distance2;
+                    closestPoint = pt;
+                }
+            }
+        }
+
+        return closestPoint;
+    }
+
+    /**
+     * Gets the points that neighbour the given point.
+     */
+    public Set<Vector2> getNeighbours(Vector2 pt) {
+        return mPointNeighbours.get(pt);
     }
 
     /**
@@ -161,10 +218,10 @@ public class Voroni {
     }
 
     /**
-     * Helper class to render the Voroni diagram to the given \c Image. We draw lines of the
+     * Helper class to render the Voronoi diagram to the given \c Image. We draw lines of the
      * given \c Colour.
      */
-    public void renderVoroni(Image img, Colour c) {
+    public void renderVoronoi(Image img, Colour c) {
         for (Vector2 pt : mPointCloud.getPoints()) {
             List<Triangle> triangles = mPointCloudToTriangles.get(pt);
             if (triangles == null) {
@@ -303,7 +360,6 @@ public class Voroni {
             int i1 = -1;
             int i2 = -1;
 
-            final double EPSILON = 0.000000001;
             if (av.equals(p1, EPSILON) || av.equals(p2, EPSILON)) {
                 if (i1 < 0)
                     i1 = a;
@@ -327,6 +383,18 @@ public class Voroni {
                 return new Edge(i1, i2);
             else
                 return null;
+        }
+
+        public Edge findOppositeEdge(Vector2 pt) {
+            if (pt.equals(mPoints.get(a), EPSILON)) {
+                return new Edge(b, c);
+            } else if (pt.equals(mPoints.get(b), EPSILON)) {
+                return new Edge(a, c);
+            } else if (pt.equals(mPoints.get(c), EPSILON)) {
+                return new Edge(a, b);
+            } else {
+                return null;
+            }
         }
 
         /**
@@ -396,8 +464,6 @@ public class Voroni {
             final Vector2 v1 = points.get(a);
             final Vector2 v2 = points.get(b);
             final Vector2 v3 = points.get(c);
-
-            final double EPSILON = 0.000000001;
 
             if (Math.abs(v1.y - v2.y) < EPSILON && Math.abs(v2.y - v3.y) < EPSILON) {
                 // the points are coincident, we can't do this...

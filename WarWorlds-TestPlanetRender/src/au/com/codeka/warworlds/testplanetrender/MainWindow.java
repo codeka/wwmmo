@@ -5,7 +5,6 @@ import java.awt.Color;
 import java.awt.EventQueue;
 import java.awt.FlowLayout;
 import java.awt.Graphics;
-import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
@@ -21,19 +20,21 @@ import javax.swing.JPanel;
 import javax.swing.JToolBar;
 
 import au.com.codeka.planetrender.Colour;
+import au.com.codeka.planetrender.ColourGradient;
 import au.com.codeka.planetrender.PlanetRenderer;
 import au.com.codeka.planetrender.PlanetTemplate;
 import au.com.codeka.planetrender.PointCloud;
 import au.com.codeka.planetrender.Image;
-import au.com.codeka.planetrender.Voroni;
+import au.com.codeka.planetrender.TextureGenerator;
+import au.com.codeka.planetrender.Voronoi;
 
 import javax.swing.JComboBox;
 import javax.swing.JTextField;
 import javax.swing.JCheckBox;
-import java.awt.Dimension;
 import java.io.File;
 import java.io.IOException;
 import java.util.Random;
+import javax.swing.DefaultComboBoxModel;
 
 public class MainWindow {
 
@@ -42,15 +43,15 @@ public class MainWindow {
     private JLabel mStatus;
     private JComboBox mPointCloudGenerator;
     private JTextField txtPointCloudDensity;
-    private JButton btnPointCloudRender;
     private JTextField txtSeed;
     private JCheckBox chckbxNewSeedCheckBox;
     private JTextField txtPointCloudRandomness;
-    private JButton btnSaveButton;
-    private JToolBar toolBar_1;
     private JCheckBox chckbxRenderDelaunay;
-    private JToolBar toolBar_2;
-    private JCheckBox chckbxRenderVoroni;
+    private JCheckBox chckbxRenderVoronoi;
+    private JComboBox cbbxImageSize;
+    private JToolBar toolBar_4;
+    private JLabel lblNewLabel;
+    private JComboBox cbbxBaseTextureKind;
 
     /**
      * Launch the application.
@@ -73,10 +74,19 @@ public class MainWindow {
      */
     public MainWindow() {
         initialize();
+
+        // set up the default values based on an empty template
+        PlanetTemplate tmpl = new PlanetTemplate();
+        txtSeed.setText("0");
+        chckbxNewSeedCheckBox.setSelected(true);
+        txtPointCloudDensity.setText(String.format("%.3f", tmpl.getPointCloudDensity()));
+        mPointCloudGenerator.setSelectedItem(tmpl.getPointCloudGenerator());
+        txtPointCloudRandomness.setText(String.format("%.3f", tmpl.getPointCloudRandomness()));
+        cbbxBaseTextureKind.setSelectedItem(tmpl.getBaseTextureKind());
     }
 
     private void refreshImage() {
-        Image img = new Image(512, 512);
+        Image img = createBlankImage(Colour.TRANSPARENT);
 
         long startTime = System.nanoTime();
         PlanetRenderer renderer = new PlanetRenderer();
@@ -100,11 +110,11 @@ public class MainWindow {
         long elapsed = endTime - startTime;
         long totalElapsed = elapsed;
 
-        Image img = new Image(512, 512, Colour.TRANSPARENT);
+        Image img = createBlankImage(Colour.TRANSPARENT);
         msg = String.format("Point cloud generated in: %.4fms", ((double) elapsed) / 1000000.0);
 
-        if (chckbxRenderDelaunay.isSelected() || chckbxRenderVoroni.isSelected()) {
-            Voroni v = new Voroni(pc);
+        if (chckbxRenderDelaunay.isSelected() || chckbxRenderVoronoi.isSelected()) {
+            Voronoi v = new Voronoi(pc);
 
             startTime = System.nanoTime();
             v.generate();
@@ -116,8 +126,8 @@ public class MainWindow {
             if (chckbxRenderDelaunay.isSelected()) {
                 v.renderDelaunay(img, Colour.GREEN);
             }
-            if (chckbxRenderVoroni.isSelected()) {
-                v.renderVoroni(img, Colour.BLUE);
+            if (chckbxRenderVoronoi.isSelected()) {
+                v.renderVoronoi(img, Colour.BLUE);
             }
         }
 
@@ -127,6 +137,42 @@ public class MainWindow {
 
         msg += String.format("; total elapsed: %.4fms", ((double) totalElapsed) / 1000000.0);
         mStatus.setText(msg);
+    }
+
+    private void renderBaseTexture() {
+        PlanetTemplate tmpl = getTemplate();
+        String msg = "";
+
+        long startTime = System.nanoTime();
+        PointCloud pc = PointCloud.generate(tmpl);
+        Voronoi v = new Voronoi(pc);
+        v.generate();
+        long endTime = System.nanoTime();
+        long elapsed = endTime - startTime;
+        long totalElapsed = elapsed;
+
+        msg = String.format("Voronoi generated in: %.4fms", ((double) elapsed) / 1000000.0);
+
+        Image img = createBlankImage(Colour.TRANSPARENT);
+
+        startTime = System.nanoTime();
+        TextureGenerator generator = new TextureGenerator(v, tmpl);
+        generator.renderTexture(img);
+        endTime = System.nanoTime();
+        elapsed = endTime - startTime;
+        totalElapsed += elapsed;
+        msg += String.format("; texture generated in %.4fms", ((double) elapsed) / 1000000.0);
+
+        mImagePanel.setImage(img);
+
+        msg += String.format("; total elapsed: %.4fms", ((double) totalElapsed) / 1000000.0);
+        mStatus.setText(msg);
+    }
+
+    private Image createBlankImage(Colour baseColour) {
+        String sizeStr = (String) cbbxImageSize.getSelectedItem();
+        int size = Integer.parseInt(sizeStr);
+        return new Image(size, size, baseColour);
     }
 
     /**
@@ -151,11 +197,18 @@ public class MainWindow {
             txtSeed.setText(Long.toString(seed));
         }
 
+        ColourGradient cg = new ColourGradient();
+        cg.addNode(0.0, Colour.fromArgb(1.0, 0.5, 0.0, 0.0));
+        cg.addNode(0.8, Colour.fromArgb(1.0, 0.9, 0.0, 0.0));
+        cg.addNode(1.0, Colour.fromArgb(1.0, 1.0, 1.0, 0.0));
+
         PlanetTemplate tmpl = new PlanetTemplate()
             .setRandomSeed(Long.parseLong(txtSeed.getText()))
             .setPointCloudDensity(Double.parseDouble(txtPointCloudDensity.getText()))
             .setPointCloudGenerator((PlanetTemplate.PointCloudGenerator) mPointCloudGenerator.getSelectedItem())
-            .setPointCloudRandomness(Double.parseDouble(txtPointCloudRandomness.getText()));
+            .setPointCloudRandomness(Double.parseDouble(txtPointCloudRandomness.getText()))
+            .setBaseTextureKind((PlanetTemplate.BaseTextureKind) cbbxBaseTextureKind.getSelectedItem())
+            .setBaseTextureColourGradient(cg);
 
         return tmpl;
     }
@@ -166,14 +219,13 @@ public class MainWindow {
     private void initialize() {
         mFrame = new JFrame();
         mFrame.setTitle("Planet Render Test");
-        mFrame.setBounds(100, 100, 900, 700);
+        mFrame.setBounds(100, 100, 800, 700);
         mFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         mFrame.getContentPane().setLayout(new BorderLayout(0, 0));
 
         JPanel panel = new JPanel();
-        panel.setPreferredSize(new Dimension(10, 64));
         mFrame.getContentPane().add(panel, BorderLayout.NORTH);
-        panel.setLayout(new FlowLayout(FlowLayout.LEADING, 0, 0));
+        panel.setLayout(new GoodFlowLayout(FlowLayout.LEADING, 0, 0));
 
         JToolBar toolBar = new JToolBar();
         panel.add(toolBar);
@@ -187,8 +239,19 @@ public class MainWindow {
 
         chckbxNewSeedCheckBox = new JCheckBox("New Seed");
         toolBar.add(chckbxNewSeedCheckBox);
+        
+        JToolBar toolBar_3 = new JToolBar();
+        panel.add(toolBar_3);
+        
+        JLabel lblImageSize = new JLabel("Image Size ");
+        toolBar_3.add(lblImageSize);
+        
+        cbbxImageSize = new JComboBox();
+        cbbxImageSize.setModel(new DefaultComboBoxModel(new String[] {"16", "32", "64", "128", "256", "512", "1024", "2048", "4096"}));
+        cbbxImageSize.setSelectedIndex(5);
+        toolBar_3.add(cbbxImageSize);
 
-        toolBar_2 = new JToolBar();
+        JToolBar toolBar_2 = new JToolBar();
         panel.add(toolBar_2);
 
         JLabel lblPointCloud = new JLabel("Point Cloud ");
@@ -204,7 +267,7 @@ public class MainWindow {
         toolBar_2.add(txtPointCloudDensity);
         txtPointCloudDensity.setColumns(5);
 
-        btnPointCloudRender = new JButton("Render");
+        JButton btnPointCloudRender = new JButton("Render");
         btnPointCloudRender.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent ae) {
                 renderPointCloud();
@@ -222,11 +285,28 @@ public class MainWindow {
         chckbxRenderDelaunay = new JCheckBox("Delaunay");
         toolBar_2.add(chckbxRenderDelaunay);
         
-        chckbxRenderVoroni = new JCheckBox("Voroni");
-        toolBar_2.add(chckbxRenderVoroni);
+        chckbxRenderVoronoi = new JCheckBox("Voronoi");
+        toolBar_2.add(chckbxRenderVoronoi);
         toolBar_2.add(btnPointCloudRender);
 
-        toolBar_1 = new JToolBar();
+        toolBar_4 = new JToolBar();
+        panel.add(toolBar_4);
+
+        lblNewLabel = new JLabel("Base Texture ");
+        toolBar_4.add(lblNewLabel);
+        
+        cbbxBaseTextureKind = new JComboBox(PlanetTemplate.BaseTextureKind.values());
+        toolBar_4.add(cbbxBaseTextureKind);
+
+        JButton btnBaseTextureRender = new JButton("Render");
+        btnBaseTextureRender.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent ae) {
+                renderBaseTexture();
+            }
+        });
+        toolBar_4.add(btnBaseTextureRender);
+
+        JToolBar toolBar_1 = new JToolBar();
         panel.add(toolBar_1);
 
         JButton btnRefresh = new JButton("Refresh");
@@ -237,7 +317,7 @@ public class MainWindow {
         });
         toolBar_1.add(btnRefresh);
         
-        btnSaveButton = new JButton("Save Image...");
+        JButton btnSaveButton = new JButton("Save Image...");
         btnSaveButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent ae) {
                 saveCurrentImage();
@@ -254,14 +334,6 @@ public class MainWindow {
 
         mStatus = new JLabel("Please wait...");
         panel.add(mStatus);
-
-        // set up the default values based on an empty template
-        PlanetTemplate tmpl = new PlanetTemplate();
-        txtSeed.setText("0");
-        chckbxNewSeedCheckBox.setSelected(true);
-        txtPointCloudDensity.setText(String.format("%.3f", tmpl.getPointCloudDensity()));
-        mPointCloudGenerator.setSelectedItem(tmpl.getPointCloudGenerator());
-        txtPointCloudRandomness.setText(String.format("%.3f", tmpl.getPointCloudRandomness()));
     }
 
     private class ImagePanel extends JPanel {
@@ -292,30 +364,31 @@ public class MainWindow {
 
         @Override
         public void paintComponent(Graphics g) {
-            Rectangle bounds = g.getClipBounds();
+            int width = getWidth();
+            int height = getHeight();
 
             // fill the entire background graw
             g.setColor(Color.LIGHT_GRAY);
-            g.fillRect(bounds.x, bounds.y, bounds.width, bounds.height);
+            g.fillRect(0, 0, width, height);
 
             if (mImage != null) {
-                bounds.x += (bounds.width - mImageWidth) / 2;
-                bounds.y += (bounds.height - mImageHeight) / 2;
-                bounds.width = mImageWidth;
-                bounds.height = mImageHeight;
+                int sx = (width - mImageWidth) / 2;
+                int sy = (height - mImageHeight) / 2;
+                width = mImageWidth;
+                height = mImageHeight;
 
                 // we'll draw a checkboard background to represent the transparent parts of the image
                 g.setColor(Color.GRAY);
                 boolean odd = false;
-                for (int y = bounds.y; y < bounds.y + bounds.height; y += 16) {
+                for (int y = sy; y < sy + height; y += 16) {
                     int xOffset = (odd ? 16 : 0);
                     odd = !odd;
-                    for (int x = bounds.x + xOffset; x < bounds.x + bounds.width; x += 32) {
+                    for (int x = sx + xOffset; x < sx + width; x += 32) {
                         g.fillRect(x, y, 16, 16);
                     }
                 }
 
-                g.drawImage(mImage, bounds.x, bounds.y, null);
+                g.drawImage(mImage, sx, sy, null);
             }
         }
     }
