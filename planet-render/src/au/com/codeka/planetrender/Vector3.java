@@ -31,6 +31,25 @@ class Vector3 {
         return scaled(s);
     }
 
+    public void rotateX(double radians) {
+        double y1 = y * Math.cos(radians) - z * Math.sin(radians);
+        double z1 = y * Math.sin(radians) + z * Math.cos(radians);
+        y = y1;
+        z = z1;
+    }
+    public void rotateY(double radians) {
+        double x1 = x * Math.cos(radians) - z * Math.sin(radians);
+        double z1 = x * Math.sin(radians) + z * Math.cos(radians);
+        x = x1;
+        z = z1;
+    }
+    public void rotateZ(double radians) {
+        double x1 = x * Math.cos(radians) - y * Math.sin(radians);
+        double y1 = x * Math.sin(radians) + y * Math.cos(radians);
+        x = x1;
+        y = y1;
+    }
+
     public void scale(double s) {
         x *= s;
         y *= s;
@@ -49,5 +68,11 @@ class Vector3 {
 
     public static double dot(Vector3 a, Vector3 b) {
         return (a.x * b.x) + (a.y * b.y) + (a.z * b.z);
+    }
+
+    public static Vector3 cross(Vector3 a, Vector3 b) {
+        return new Vector3((a.x * b.z) - (a.z * b.y),
+                            (a.z * b.x) - (a.x * b.z),
+                            (a.x * b.y) - (a.y * b.x));
     }
 }

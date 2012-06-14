@@ -87,9 +87,16 @@ public class MainWindow {
 
     private void refreshImage() {
         Image img = createBlankImage(Colour.TRANSPARENT);
+        PlanetTemplate tmpl = getTemplate();
 
         long startTime = System.nanoTime();
+        PointCloud pc = PointCloud.generate(tmpl);
+        Voronoi v = new Voronoi(pc);
+        v.generate();
+        TextureGenerator generator = new TextureGenerator(v, tmpl);
+
         PlanetRenderer renderer = new PlanetRenderer();
+        renderer.setTexture(generator);
         renderer.render(img);
         long endTime = System.nanoTime();
 

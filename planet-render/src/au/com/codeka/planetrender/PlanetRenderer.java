@@ -10,12 +10,18 @@ public class PlanetRenderer {
     private Vector3 mPlanetOrigin;
     private double mAmbient;
     private Vector3 mSunOrigin;
+    private TextureGenerator mTexture;
 
     public PlanetRenderer() {
         mPlanetRadius = 10.0;
         mPlanetOrigin = new Vector3(0.0, 0.0, 30.0);
         mAmbient = 0.1;
         mSunOrigin = new Vector3(100.0, 100.0, -150.0);
+        mTexture = null;
+    }
+
+    public void setTexture(TextureGenerator texture) {
+        mTexture = texture;
     }
 
     /**
@@ -50,12 +56,39 @@ public class PlanetRenderer {
         if (intersection != null) {
             // we intersected with the planet. Now we need to work out the colour at this point
             // on the planet.
+            Colour t = queryTexture(intersection);
 
             double intensity = lightSphere(intersection);
             c.setAlpha(1.0);
-            c.setRed(intensity);
+            c.setRed(t.getRed() * intensity);
+            c.setGreen(t.getGreen() * intensity);
+            c.setBlue(t.getBlue() * intensity);
         }
         return c;
+    }
+
+    /**
+     * Query the texture for the colour at the given intersection (in 3D space).
+     */
+    private Colour queryTexture(Vector3 intersection) {
+        intersection = Vector3.subtract(intersection, mPlanetOrigin);
+
+        Vector3 Vn = new Vector3(0.0, 1.0, 0.0);
+        Vector3 Ve = new Vector3(-1.0, 0.0, 0.0);
+        Vector3 Vp = intersection.normalized();
+
+        double phi = Math.acos(-1.0 * Vector3.dot(Vn, Vp));
+        double v = phi / Math.PI;
+
+        double theta = (Math.acos(Vector3.dot(Vp, Ve) / Math.sin(phi))) / (Math.PI * 2.0);
+        double u;
+        if (Vector3.dot(Vector3.cross(Vn,  Ve), Vp) > 0) {
+            u = theta;
+        } else {
+            u = 1.0 - theta;
+        }
+
+        return mTexture.getTexel(u, v);
     }
 
     /**
