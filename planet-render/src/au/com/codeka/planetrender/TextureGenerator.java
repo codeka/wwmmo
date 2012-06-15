@@ -1,14 +1,15 @@
 package au.com.codeka.planetrender;
 
 import java.util.HashSet;
+import java.util.Random;
 import java.util.Set;
 
 public class TextureGenerator {
     private Generator mGenerator;
 
-    public TextureGenerator(Voronoi voronoi, PlanetTemplate tmpl) {
-        if (tmpl.getBaseTextureKind() == PlanetTemplate.BaseTextureKind.VoronoiMap) {
-            mGenerator = new VoronoiMapGenerator(voronoi, tmpl.getBaseTextureColourGradient());
+    public TextureGenerator(Template.TextureTemplate tmpl, Random rand) {
+        if (tmpl.getGenerator() == Template.TextureTemplate.Generator.VoronoiMap) {
+            mGenerator = new VoronoiMapGenerator(tmpl, rand);
         }
     }
 
@@ -43,9 +44,10 @@ public class TextureGenerator {
         Voronoi mVoronoi;
         ColourGradient mColourGradient;
 
-        public VoronoiMapGenerator(Voronoi voronoi, ColourGradient colourGradient) {
-            mVoronoi = voronoi;
-            mColourGradient = colourGradient;
+        public VoronoiMapGenerator(Template.TextureTemplate tmpl, Random rand) {
+            Template.VoronoiTemplate voronoiTmpl = tmpl.getParameter(Template.VoronoiTemplate.class);
+            mVoronoi = new Voronoi(voronoiTmpl, rand);
+            mColourGradient = tmpl.getParameter(Template.ColourGradientTemplate.class).getColourGradient();
         }
 
         public Colour getTexel(double u, double v) {

@@ -1,5 +1,7 @@
 package au.com.codeka.planetrender;
 
+import java.util.Random;
+
 /**
  * This is actually a very simple ray-tracing engine. The simplicity comes from the fact that
  * we assume there's only one object in the scene (the planet) and one light source (the sun).
@@ -12,16 +14,12 @@ public class PlanetRenderer {
     private Vector3 mSunOrigin;
     private TextureGenerator mTexture;
 
-    public PlanetRenderer() {
+    public PlanetRenderer(Template.PlanetTemplate tmpl, Random rand) {
         mPlanetRadius = 10.0;
         mPlanetOrigin = new Vector3(0.0, 0.0, 30.0);
         mAmbient = 0.1;
         mSunOrigin = new Vector3(100.0, 100.0, -150.0);
-        mTexture = null;
-    }
-
-    public void setTexture(TextureGenerator texture) {
-        mTexture = texture;
+        mTexture = new TextureGenerator(tmpl.getTextureTemplate(), rand);
     }
 
     /**

@@ -17,6 +17,19 @@ public class PointCloud {
         mPoints = new ArrayList<Vector2>();
     }
 
+    public PointCloud(Template.PointCloudTemplate tmpl, Random rand) {
+        Generator g = null;
+        if (tmpl.getGenerator() == Template.PointCloudTemplate.Generator.Random) {
+            g = new RandomGenerator();
+        } else if (tmpl.getGenerator() == Template.PointCloudTemplate.Generator.Poisson) {
+            g = new PoissonGenerator();
+        } else {
+            throw new RuntimeException("Unknown PointCloudGenerator: "+tmpl.getGenerator());
+        }
+
+        mPoints = g.generate(tmpl, rand);
+    }
+
     public List<Vector2> getPoints() {
         return mPoints;
     }
@@ -33,78 +46,11 @@ public class PointCloud {
     }
 
     /**
-     * Generates a new \c PointCloud using the parameters in the given \c PlanetTemplate to
-     * drive the algorithm.
-     */
-    public static PointCloud generate(PlanetTemplate tmpl) {
-        Generator g = null;
-        if (tmpl.getPointCloudGenerator() == PlanetTemplate.PointCloudGenerator.Random) {
-            g = new RandomGenerator();
-        } else if (tmpl.getPointCloudGenerator() == PlanetTemplate.PointCloudGenerator.Poisson) {
-            g = new PoissonGenerator();
-        } else {
-            throw new RuntimeException("Unknown PointCloudGenerator: "+tmpl.getPointCloudGenerator());
-        }
-
-        g.setDensity(tmpl.getPointCloudDensity());
-        g.setRandomness(tmpl.getPointCloudRandomness());
-        g.setSeed(tmpl.getRandom().nextLong());
-
-        return g.generate();
-    }
-
-    /**
      * This is the base class for implementations that generate point clouds. We contain the
      * various properties the control how many points to generate, "randomness" etc.
      */
     public static abstract class Generator {
-        protected double mDensity;
-        protected double mRandomness;
-        protected Random mRand;
-
-        /**
-         * Sets the "density", from 0 to 1, of the points to generate. 1 corresponds to
-         * "most dense" and 0 to "least dense.
-         */
-        public void setDensity(double density) {
-            mDensity = density;
-        }
-        public double getDensity() {
-            return mDensity;
-        }
-
-        /**
-         * Randomness defines how "uniform" or "random" the points should look.
-         */
-        public void setRandomness(double randomness) {
-            mRandomness = randomness;
-        }
-        public double getRandomness() {
-            return mRandomness;
-        }
-
-        /**
-         * Sets the random seed we'll use to generate the points. You can use this to generate
-         * the same set of points later.
-         */
-        public void setSeed(long seed) {
-            mRand = new Random(seed);
-        }
-
-        protected abstract void doGenerate(PointCloud pc);
-
-        /**
-         * Generates a new \c PointCloud with our configured properties.
-         */
-        public PointCloud generate() {
-            if (mRand == null) {
-                mRand = new Random();
-            }
-
-            PointCloud pc = new PointCloud();
-            doGenerate(pc);
-            return pc;
-        }
+        protected abstract ArrayList<Vector2> generate(Template.PointCloudTemplate tmpl, Random rand);
     }
 
     /**
@@ -113,21 +59,23 @@ public class PointCloud {
      */
     public static class RandomGenerator extends Generator {
         @Override
-        protected void doGenerate(PointCloud pc) {
+        protected ArrayList<Vector2> generate(Template.PointCloudTemplate tmpl, Random rand) {
             // numPointsFactor will be a number between 0.75 and 1.25 which we'll use
             // to adjust the number of points we generate
-            double numPointsFactor = mRand.nextDouble();
+            double numPointsFactor = rand.nextDouble();
             numPointsFactor = 0.75 + 0.5*numPointsFactor;
 
-            int numPoints = 25 + (int) (475 * mDensity * numPointsFactor);
+            int numPoints = 25 + (int) (475 * tmpl.getDensity() * numPointsFactor);
             if (numPoints < 25) {
                 numPoints = 25;
             }
 
+            ArrayList<Vector2> points = new ArrayList<Vector2>();
             for (int i = 0; i < numPoints; i++) {
-                Vector2 p = new Vector2(mRand.nextDouble(), mRand.nextDouble());
-                pc.mPoints.add(p);
+                Vector2 p = new Vector2(rand.nextDouble(), rand.nextDouble());
+                points.add(p);
             }
+            return points;
         }
     }
 
@@ -137,36 +85,37 @@ public class PointCloud {
      */
     public static class PoissonGenerator extends Generator {
         @Override
-        protected void doGenerate(PointCloud pc) {
-            List<Vector2> unprocessed = new ArrayList<Vector2>();
-            unprocessed.add(new Vector2(mRand.nextDouble(), mRand.nextDouble()));
+        protected ArrayList<Vector2> generate(Template.PointCloudTemplate tmpl, Random rand) {
+            ArrayList<Vector2> points = new ArrayList<Vector2>();
+            ArrayList<Vector2> unprocessed = new ArrayList<Vector2>();
+            unprocessed.add(new Vector2(rand.nextDouble(), rand.nextDouble()));
 
             // we want minDistance to be small when density is high and big when density
             // is small.
-            double minDistance = 0.001 + ((1.0 / mDensity) * 0.03);
+            double minDistance = 0.001 + ((1.0 / tmpl.getDensity()) * 0.03);
 
             // packing is how many points around each point we'll test for a new location.
             // a high randomness means we'll have a low number (more random) and a low randomness
             // means a high number (more uniform).
-            int packing = 10 + (int) ((1.0 - mRandomness) * 90);
+            int packing = 10 + (int) ((1.0 - tmpl.getRandomness()) * 90);
 
             while (!unprocessed.isEmpty()) {
                 // get a random point from the unprocessed list
-                int index = mRand.nextInt(unprocessed.size());
+                int index = rand.nextInt(unprocessed.size());
                 Vector2 point = unprocessed.get(index);
                 unprocessed.remove(index);
 
                 // if there's another point too close to this one, ignore it
-                if (inNeighbourhood(pc.mPoints, point, minDistance)) {
+                if (inNeighbourhood(points, point, minDistance)) {
                     continue;
                 }
 
                 // otherwise, this is a good one
-                pc.mPoints.add(point);
+                points.add(point);
 
                 // now generate a bunch of points around this one...
                 for (int i = 0; i < packing; i++) {
-                    Vector2 newPoint = generatePointAround(point, minDistance);
+                    Vector2 newPoint = generatePointAround(rand, point, minDistance);
                     if (newPoint.x < 0.0 || newPoint.x > 1.0) {
                         continue;
                     }
@@ -177,14 +126,16 @@ public class PointCloud {
                     unprocessed.add(newPoint);
                 }
             }
+
+            return points;
         }
 
         /**
          * Generates a new point around the given centre point and at least \c minDistance from it.
          */
-        private Vector2 generatePointAround(Vector2 point, double minDistance) {
-            double radius = minDistance * (1.0 + mRand.nextDouble());
-            double angle = 2.0 * Math.PI * mRand.nextDouble();
+        private Vector2 generatePointAround(Random rand, Vector2 point, double minDistance) {
+            double radius = minDistance * (1.0 + rand.nextDouble());
+            double angle = 2.0 * Math.PI * rand.nextDouble();
 
             return new Vector2(point.x + radius * Math.cos(angle),
                                 point.y + radius * Math.sin(angle));

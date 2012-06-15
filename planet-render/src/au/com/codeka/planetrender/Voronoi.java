@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Random;
 import java.util.Set;
 
 /**
@@ -30,12 +31,19 @@ public class Voronoi {
      */
     public Voronoi(PointCloud pc) {
         mPointCloud = pc;
+        generate();
+    }
+
+    public Voronoi(Template.VoronoiTemplate tmpl, Random rand) {
+        Template.PointCloudTemplate pcTmpl = tmpl.getParameter(Template.PointCloudTemplate.class);
+        mPointCloud = new PointCloud(pcTmpl, rand);
+        generate();
     }
 
     /**
      * Generates the delaunay trianglation/voronoi diagram of the point cloud. 
      */
-    public void generate() {
+    private void generate() {
         List<Triangle> triangles = new ArrayList<Triangle>();
         List<Vector2> points = mPointCloud.getPoints();
 

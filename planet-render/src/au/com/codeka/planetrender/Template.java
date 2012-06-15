@@ -1,0 +1,255 @@
+package au.com.codeka.planetrender;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.xml.sax.SAXException;
+
+/**
+ * A template is used to create an image (usually a complete planet, but it doesn't have to be).
+ */
+public class Template {
+    private BaseTemplate mData;
+
+    public BaseTemplate getTemplate() {
+        return mData;
+    }
+
+    /**
+     * Parses the given string input and returns the \c Template it represents.
+     */
+    public static Template parse(InputStream inp) throws TemplateException {
+        DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
+        builderFactory.setValidating(false);
+
+        Document xmldoc;
+        try {
+            DocumentBuilder builder = builderFactory.newDocumentBuilder();
+            xmldoc = builder.parse(inp);
+        } catch (ParserConfigurationException e) {
+            throw new TemplateException(e);
+        } catch (IllegalStateException e) {
+            throw new TemplateException(e);
+        } catch (SAXException e) {
+            throw new TemplateException(e);
+        } catch (IOException e) {
+            throw new TemplateException(e);
+        }
+
+        Template tmpl = new Template();
+        tmpl.mData = parseElement(xmldoc.getDocumentElement());
+        return tmpl;
+    }
+
+    private static BaseTemplate parseElement(Element elem) throws TemplateException {
+        TemplateFactory factory = null;
+        if (elem.getTagName().equals("planet")) {
+            factory = new PlanetTemplate.PlanetTemplateFactory();
+        } else if (elem.getTagName().equals("texture")) {
+            factory = new TextureTemplate.TextureTemplateFactory();
+        } else if (elem.getTagName().equals("point-cloud")) {
+            factory = new PointCloudTemplate.PointCloudTemplateFactory();
+        } else if (elem.getTagName().equals("voronoi")) {
+            factory = new VoronoiTemplate.VoronoiTemplateFactory();
+        } else if (elem.getTagName().equals("colour")) {
+            factory = new ColourGradientTemplate.ColourGradientTemplateFactory();
+        } else {
+            throw new TemplateException("Unknown element: "+elem.getTagName());
+        }
+
+        return (BaseTemplate) factory.parse(elem);
+    }
+
+    private static abstract class TemplateFactory {
+        public abstract BaseTemplate parse(Element elem) throws TemplateException;
+    }
+
+    public static class BaseTemplate {
+        private List<BaseTemplate> mParameters;
+
+        public BaseTemplate() {
+            mParameters = new ArrayList<BaseTemplate>();
+        }
+
+        public List<BaseTemplate> getParameters() {
+            return mParameters;
+        }
+
+        @SuppressWarnings("unchecked")
+        public <T extends BaseTemplate> List<T> getParameters(Class<T> classFactory) {
+            List<T> params = new ArrayList<T>();
+            for (BaseTemplate bt : mParameters) {
+                if (bt.getClass().isAssignableFrom(classFactory)) {
+                    params.add((T) bt);
+                }
+            }
+            return params;
+        }
+
+        public <T extends BaseTemplate> T getParameter(Class<T> classFactory) {
+            List<T> params = getParameters(classFactory);
+            if (params.size() > 0) {
+                return params.get(0);
+            }
+            return null;
+        }
+    }
+
+    public static class PlanetTemplate extends BaseTemplate {
+        private TextureTemplate mTextureTemplate;
+
+        public TextureTemplate getTextureTemplate() {
+            return mTextureTemplate;
+        }
+
+        private static class PlanetTemplateFactory extends TemplateFactory {
+            /**
+             * Parses a <planet> node and returns the corresponding \c PlanetTemplate.
+             */
+            @Override
+            public BaseTemplate parse(Element elem) throws TemplateException {
+                PlanetTemplate planetTemplate = new PlanetTemplate();
+                for (Element child : XmlIterator.childElements(elem, "texture")) {
+                    TextureTemplate.TextureTemplateFactory textureFactory =
+                            new TextureTemplate.TextureTemplateFactory();
+                    planetTemplate.mTextureTemplate = (TextureTemplate) textureFactory.parse(child);
+                }
+                return planetTemplate;
+            }
+        }
+    }
+
+    public static class TextureTemplate extends BaseTemplate {
+        public enum Generator {
+            VoronoiMap
+        }
+
+        private Generator mGenerator;
+
+        public Generator getGenerator() {
+            return mGenerator;
+        }
+
+        private static class TextureTemplateFactory extends TemplateFactory {
+            /**
+             * Parses a <texture> node and returns the corresponding \c TextureTemplate.
+             */
+            @Override
+            public BaseTemplate parse(Element elem) throws TemplateException {
+                TextureTemplate tmpl = new TextureTemplate();
+
+                String generator = elem.getAttribute("generator");
+                if (generator.equals("voronoi-map")) {
+                    tmpl.mGenerator = Generator.VoronoiMap;
+                } else {
+                    throw new TemplateException("Unknown <texture generator> attribute: "+generator);
+                }
+
+                for (Element child : XmlIterator.childElements(elem)) {
+                    tmpl.getParameters().add(parseElement(child));
+                }
+
+                return tmpl;
+            }
+        }
+    }
+
+    public static class VoronoiTemplate extends BaseTemplate {
+
+        private static class VoronoiTemplateFactory extends TemplateFactory {
+            /**
+             * Parses a <voronoi> node and returns the corresponding \c VoronoiTemplate.
+             */
+            @Override
+            public BaseTemplate parse(Element elem) throws TemplateException {
+                VoronoiTemplate tmpl = new VoronoiTemplate();
+
+                for (Element child : XmlIterator.childElements(elem)) {
+                    tmpl.getParameters().add(parseElement(child));
+                }
+
+                return tmpl;
+            }
+        }
+    }
+
+    public static class PointCloudTemplate extends BaseTemplate {
+        public enum Generator {
+            Random,
+            Poisson
+        }
+
+        private Generator mGenerator;
+        private double mDensity;
+        private double mRandomness;
+
+        public Generator getGenerator() {
+            return mGenerator;
+        }
+        public double getDensity() {
+            return mDensity;
+        }
+        public double getRandomness() {
+            return mRandomness;
+        }
+
+        private static class PointCloudTemplateFactory extends TemplateFactory {
+            /**
+             * Parses a <point-cloud> node and returns the corresponding \c PointCloudTemplate.
+             */
+            @Override
+            public BaseTemplate parse(Element elem) throws TemplateException {
+                PointCloudTemplate tmpl = new PointCloudTemplate();
+
+                String val = elem.getAttribute("generator");
+                if (val.equals("random")) {
+                    tmpl.mGenerator = PointCloudTemplate.Generator.Random;
+                } else if (val.equals("poisson")) {
+                    tmpl.mGenerator = PointCloudTemplate.Generator.Poisson;
+                } else {
+                    throw new TemplateException("Unknown <point-cloud> 'generator' attribute: "+val);
+                }
+
+                tmpl.mDensity = Double.parseDouble(elem.getAttribute("density"));
+                tmpl.mRandomness = Double.parseDouble(elem.getAttribute("randomness"));
+                return tmpl;
+            }
+        }
+    }
+
+    public static class ColourGradientTemplate extends BaseTemplate {
+        private ColourGradient mColourGradient;
+
+        public ColourGradient getColourGradient() {
+            return mColourGradient;
+        }
+
+        /**
+         * Parses a <colour> node and returns the corresponding \c ColourGradient.
+         */
+        private static class ColourGradientTemplateFactory extends TemplateFactory {
+            @Override
+            public BaseTemplate parse(Element elem) {
+                ColourGradientTemplate tmpl = new ColourGradientTemplate();
+                tmpl.mColourGradient = new ColourGradient();
+
+                for (Element child : XmlIterator.childElements(elem, "node")) {
+                    double n = Double.parseDouble(child.getAttribute("n"));
+                    int argb = (int) Long.parseLong(child.getAttribute("colour"), 16);
+                    tmpl.mColourGradient.addNode(n, new Colour(argb));
+                }
+
+                return tmpl;
+            }
+        }
+    }
+}
+

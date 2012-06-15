@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<planet>
+  <texture generator="voronoi-map">
+    <voronoi>
+      <point-cloud generator="poisson" density="0.2" randomness="0.8" />
+    </voronoi>
+    <colour>
+      <node n="0.0" colour="ff600000" />
+      <node n="0.8" colour="ffb00000" />
+      <node n="1.0" colour="ffffff00" />
+    </colour>
+  </texture>
+</planet>
