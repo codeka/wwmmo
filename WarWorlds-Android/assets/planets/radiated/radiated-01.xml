@@ -1,0 +1,15 @@
+<planet>
+  <texture generator="voronoi-map">
+      <voronoi>
+        <point-cloud generator="poisson" density="0.2" randomness="0.8" />
+      </voronoi>
+      <perlin persistence="0.5" startOctave="7" endOctave="16" interpolation="cosine" />
+      <colour>
+        <node n="0.0" colour="ffff004d" />
+        <node n="0.3" colour="ff5600ff" />
+        <node n="0.6" colour="ffff00ff" />
+        <node n="1.0" colour="ff5600ff" />
+      </colour>
+  </texture>
+</planet>
+

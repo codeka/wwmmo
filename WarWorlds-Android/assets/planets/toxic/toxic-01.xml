@@ -1,0 +1,10 @@
+<planet>
+  <texture generator="perlin-noise">
+      <perlin persistence="0.5" startOctave="7" endOctave="16" interpolation="cosine" />
+      <colour>
+        <node n="0.0" colour="ff006006" />
+        <node n="0.3" colour="ff002960" />
+        <node n="1.0" colour="ff00ff06" />
+      </colour>
+  </texture>
+</planet>

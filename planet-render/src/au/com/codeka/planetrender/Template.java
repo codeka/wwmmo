@@ -131,7 +131,8 @@ public class Template {
 
     public static class TextureTemplate extends BaseTemplate {
         public enum Generator {
-            VoronoiMap
+            VoronoiMap,
+            PerlinNoise
         }
 
         private Generator mGenerator;
@@ -155,6 +156,8 @@ public class Template {
                 String generator = elem.getAttribute("generator");
                 if (generator.equals("voronoi-map")) {
                     tmpl.mGenerator = Generator.VoronoiMap;
+                } else if (generator.equals("perlin-noise")) {
+                    tmpl.mGenerator = Generator.PerlinNoise;
                 } else {
                     throw new TemplateException("Unknown <texture generator> attribute: "+generator);
                 }

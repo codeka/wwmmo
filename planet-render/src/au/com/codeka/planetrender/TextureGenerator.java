@@ -10,6 +10,8 @@ public class TextureGenerator {
     public TextureGenerator(Template.TextureTemplate tmpl, Random rand) {
         if (tmpl.getGenerator() == Template.TextureTemplate.Generator.VoronoiMap) {
             mGenerator = new VoronoiMapGenerator(tmpl, rand);
+        } else if (tmpl.getGenerator() == Template.TextureTemplate.Generator.PerlinNoise) {
+            mGenerator = new PerlinNoiseGenerator(tmpl, rand);
         }
     }
 
@@ -94,6 +96,24 @@ public class TextureGenerator {
             }
 
             return mColourGradient.getColour(normalizedDistance);
+        }
+    }
+
+    /**
+     * A texture generator that generates textures based on perlin noise.
+     */
+    static class PerlinNoiseGenerator extends Generator {
+        private PerlinNoise mNoise;
+        private ColourGradient mColourGradient;
+
+        public PerlinNoiseGenerator(Template.TextureTemplate tmpl, Random rand) {
+            mNoise = new PerlinNoise(tmpl.getParameter(Template.PerlinNoiseTemplate.class), rand);
+            mColourGradient = tmpl.getParameter(Template.ColourGradientTemplate.class).getColourGradient();
+        }
+
+        public Colour getTexel(double u, double v) {
+            final double noise = mNoise.getNoise(u, v);
+            return mColourGradient.getColour(noise);
         }
     }
 }
