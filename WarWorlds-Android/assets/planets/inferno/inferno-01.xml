@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <planet>
-  <texture generator="voronoi-map" noisiness="0.8">
+  <texture generator="voronoi-map" noisiness="0.8" scaleX="1.2" scaleY="0.6">
     <voronoi>
       <point-cloud generator="poisson" density="0.2" randomness="0.8" />
     </voronoi>

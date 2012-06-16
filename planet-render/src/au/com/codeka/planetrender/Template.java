@@ -72,6 +72,17 @@ public class Template {
 
     private static abstract class TemplateFactory {
         public abstract BaseTemplate parse(Element elem) throws TemplateException;
+
+        protected Vector3 parseVector3(String val) throws TemplateException {
+            String[] parts = val.split(" ");
+            if (parts.length == 3) {
+                return new Vector3(Double.parseDouble(parts[0]),
+                                    Double.parseDouble(parts[1]),
+                                    Double.parseDouble(parts[2]));
+            } else {
+                throw new TemplateException("Invalid vector: "+val);
+            }
+        }
     }
 
     public static class BaseTemplate {
@@ -106,10 +117,14 @@ public class Template {
     }
 
     public static class PlanetTemplate extends BaseTemplate {
-        private TextureTemplate mTextureTemplate;
+        private Vector3 mNorthFrom;
+        private Vector3 mNorthTo;
 
-        public TextureTemplate getTextureTemplate() {
-            return mTextureTemplate;
+        public Vector3 getNorthFrom() {
+            return mNorthFrom;
+        }
+        public Vector3 getNorthTo() {
+            return mNorthTo;
         }
 
         private static class PlanetTemplateFactory extends TemplateFactory {
@@ -118,13 +133,22 @@ public class Template {
              */
             @Override
             public BaseTemplate parse(Element elem) throws TemplateException {
-                PlanetTemplate planetTemplate = new PlanetTemplate();
-                for (Element child : XmlIterator.childElements(elem, "texture")) {
-                    TextureTemplate.TextureTemplateFactory textureFactory =
-                            new TextureTemplate.TextureTemplateFactory();
-                    planetTemplate.mTextureTemplate = (TextureTemplate) textureFactory.parse(child);
+                PlanetTemplate tmpl = new PlanetTemplate();
+
+                tmpl.mNorthFrom = new Vector3(0.0, 1.0, 0.0);
+                tmpl.mNorthTo = new Vector3(0.0, 1.0, 0.0);
+                if (elem.getAttribute("northFrom") != null && !elem.getAttribute("northFrom").equals("")) {
+                    tmpl.mNorthFrom = parseVector3(elem.getAttribute("northFrom"));
                 }
-                return planetTemplate;
+                if (elem.getAttribute("northTo") != null && !elem.getAttribute("northTo").equals("")) {
+                    tmpl.mNorthTo = parseVector3(elem.getAttribute("northTo"));
+                }
+
+                for (Element child : XmlIterator.childElements(elem)) {
+                    tmpl.getParameters().add(parseElement(child));
+                }
+
+                return tmpl;
             }
         }
     }
@@ -137,12 +161,20 @@ public class Template {
 
         private Generator mGenerator;
         private double mNoisiness;
+        private double mScaleX;
+        private double mScaleY;
 
         public Generator getGenerator() {
             return mGenerator;
         }
         public double getNoisiness() {
             return mNoisiness;
+        }
+        public double getScaleX() {
+            return mScaleX;
+        }
+        public double getScaleY() {
+            return mScaleY;
         }
 
         private static class TextureTemplateFactory extends TemplateFactory {
@@ -167,6 +199,15 @@ public class Template {
                     tmpl.mNoisiness = 0.5;
                 } else {
                     tmpl.mNoisiness = Double.parseDouble(noisiness);
+                }
+
+                tmpl.mScaleX = 1.0;
+                tmpl.mScaleY = 1.0;
+                if (elem.getAttribute("scaleX") != null && !elem.getAttribute("scaleX").equals("")) {
+                    tmpl.mScaleX = Double.parseDouble(elem.getAttribute("scaleX"));
+                }
+                if (elem.getAttribute("scaleY") != null && !elem.getAttribute("scaleY").equals("")) {
+                    tmpl.mScaleY = Double.parseDouble(elem.getAttribute("scaleY"));
                 }
 
                 for (Element child : XmlIterator.childElements(elem)) {

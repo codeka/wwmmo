@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8" ?>
 <planet>
   <texture generator="voronoi-map" noisiness="0.6">
     <voronoi>

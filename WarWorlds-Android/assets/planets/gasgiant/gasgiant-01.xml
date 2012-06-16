@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<planet northFrom="-0.7 1 0" northTo="0.7 1 0">
+  <texture generator="voronoi-map" noisiness="0.8" scaleX="0.15">
+    <voronoi>
+      <point-cloud generator="poisson" density="0.2" randomness="0.8" />
+    </voronoi>
+    <colour>
+      <node n="0.0" colour="ff252baa" />
+      <node n="0.3" colour="ff494a9d" />
+      <node n="0.5" colour="ff0a739d" />
+      <node n="0.8" colour="ff0a4e9d" />
+      <node n="1.0" colour="ff0aae9d" />
+    </colour>
+    <perlin persistence="0.5" startOctave="6" endOctave="8" interpolation="linear" />
+  </texture>
+</planet>

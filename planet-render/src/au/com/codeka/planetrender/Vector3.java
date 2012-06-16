@@ -71,8 +71,16 @@ class Vector3 {
     }
 
     public static Vector3 cross(Vector3 a, Vector3 b) {
-        return new Vector3((a.x * b.z) - (a.z * b.y),
+        return new Vector3((a.y * b.z) - (a.z * b.y),
                             (a.z * b.x) - (a.x * b.z),
                             (a.x * b.y) - (a.y * b.x));
+    }
+
+    public static Vector3 interpolate(Vector3 a, Vector3 b, double n) {
+        return new Vector3(
+                a.x + (n * (b.x - a.x)),
+                a.y + (n * (b.y - a.y)),
+                a.z + (n * (b.z - a.z))
+            );
     }
 }

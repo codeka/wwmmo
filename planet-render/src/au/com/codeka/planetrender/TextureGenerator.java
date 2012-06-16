@@ -6,6 +6,8 @@ import java.util.Set;
 
 public class TextureGenerator {
     private Generator mGenerator;
+    private double mScaleX;
+    private double mScaleY;
 
     public TextureGenerator(Template.TextureTemplate tmpl, Random rand) {
         if (tmpl.getGenerator() == Template.TextureTemplate.Generator.VoronoiMap) {
@@ -13,13 +15,16 @@ public class TextureGenerator {
         } else if (tmpl.getGenerator() == Template.TextureTemplate.Generator.PerlinNoise) {
             mGenerator = new PerlinNoiseGenerator(tmpl, rand);
         }
+
+        mScaleX = tmpl.getScaleX();
+        mScaleY = tmpl.getScaleY();
     }
 
     /**
      * Gets the colour of the texel at the given (u,v) coordinates.
      */
     public Colour getTexel(double u, double v) {
-        return mGenerator.getTexel(u, v);
+        return mGenerator.getTexel(u * mScaleX, v * mScaleY);
     }
 
     /**

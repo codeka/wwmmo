@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<planet>
+  <texture generator="perlin-noise" scaleX="2">
+    <colour>
+      <node n="0.0" colour="ff066b8d" />
+      <node n="0.2" colour="ff06418d" />
+      <node n="0.5" colour="ff0855b8" />
+      <node n="0.5001" colour="ff21972c" />
+      <node n="1.0" colour="ff08550b" />
+    </colour>
+    <perlin persistence="0.5" startOctave="2" endOctave="5" interpolation="linear" />
+  </texture>
+</planet>

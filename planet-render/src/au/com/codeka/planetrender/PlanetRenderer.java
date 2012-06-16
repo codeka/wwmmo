@@ -13,13 +13,18 @@ public class PlanetRenderer {
     private double mAmbient;
     private Vector3 mSunOrigin;
     private TextureGenerator mTexture;
+    private Vector3 mNorth;
 
     public PlanetRenderer(Template.PlanetTemplate tmpl, Random rand) {
         mPlanetRadius = 10.0;
         mPlanetOrigin = new Vector3(0.0, 0.0, 30.0);
         mAmbient = 0.1;
         mSunOrigin = new Vector3(100.0, 100.0, -150.0);
-        mTexture = new TextureGenerator(tmpl.getTextureTemplate(), rand);
+        mTexture = new TextureGenerator(tmpl.getParameter(Template.TextureTemplate.class), rand);
+
+        Vector3 northFrom = tmpl.getNorthFrom();
+        Vector3 northTo = tmpl.getNorthTo();
+        mNorth = Vector3.interpolate(northFrom, northTo, rand.nextDouble()).normalized();
     }
 
     /**
@@ -71,8 +76,8 @@ public class PlanetRenderer {
     private Colour queryTexture(Vector3 intersection) {
         intersection = Vector3.subtract(intersection, mPlanetOrigin);
 
-        Vector3 Vn = new Vector3(0.0, 1.0, 0.0);
-        Vector3 Ve = new Vector3(-1.0, 0.0, 0.0);
+        Vector3 Vn = mNorth.normalized();
+        Vector3 Ve = Vector3.cross(Vn, new Vector3(0.0, 0.0, 1.0)).normalized();
         Vector3 Vp = intersection.normalized();
 
         double phi = Math.acos(-1.0 * Vector3.dot(Vn, Vp));

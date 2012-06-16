@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8" ?>
 <planet>
   <texture generator="perlin-noise">
       <perlin persistence="0.5" startOctave="7" endOctave="16" interpolation="cosine" />

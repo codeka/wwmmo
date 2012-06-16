@@ -168,7 +168,7 @@ public class MainWindow {
     private void initialize() {
         mFrame = new JFrame();
         mFrame.setTitle("Planet Render Test");
-        mFrame.setBounds(100, 100, 1000, 700);
+        mFrame.setBounds(100, 100, 1200, 700);
         mFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         mFrame.getContentPane().setLayout(new BorderLayout(0, 0));
 
