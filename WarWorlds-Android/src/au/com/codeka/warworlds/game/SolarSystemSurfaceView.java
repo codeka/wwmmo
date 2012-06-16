@@ -30,6 +30,7 @@ import au.com.codeka.warworlds.model.Star;
  */
 public class SolarSystemSurfaceView extends UniverseElementSurfaceView {
     private static Logger log = LoggerFactory.getLogger(SolarSystemSurfaceView.class);
+    private Context mContext;
     private Star mStar;
     private PlanetInfo[] mPlanetInfos;
     private PlanetInfo mSelectedPlanet;
@@ -49,6 +50,7 @@ public class SolarSystemSurfaceView extends UniverseElementSurfaceView {
             return;
         }
 
+        mContext = context;
         mPlanetSelectedListeners = new CopyOnWriteArrayList<OnPlanetSelectedListener>();
         mHandler = new Handler();
         mBackgroundRenderer = new StarfieldBackgroundRenderer(context);
@@ -230,15 +232,12 @@ public class SolarSystemSurfaceView extends UniverseElementSurfaceView {
 
         for (int i = 0; i < mPlanetInfos.length; i++) {
             final PlanetInfo planetInfo = mPlanetInfos[i];
-            int resID = planetInfo.planet.getPlanetType().getMedID();
-            if (resID != 0) {
-                Bitmap bm = BitmapFactory.decodeResource(getResources(), resID);
+            Bitmap bm = planetInfo.planet.getBitmap(mContext.getAssets());
 
-                canvas.drawBitmap(bm,
-                        (float) planetInfo.centre.getX() - (bm.getWidth() / 2.0f),
-                        (float) planetInfo.centre.getY() - (bm.getHeight() / 2.0f),
-                        mPlanetPaint);
-            }
+            canvas.drawBitmap(bm,
+                    (float) planetInfo.centre.getX() - (bm.getWidth() / 2.0f),
+                    (float) planetInfo.centre.getY() - (bm.getHeight() / 2.0f),
+                    mPlanetPaint);
 
             List<Colony> colonies = mStar.getColonies();
             if (colonies != null && !colonies.isEmpty()) {

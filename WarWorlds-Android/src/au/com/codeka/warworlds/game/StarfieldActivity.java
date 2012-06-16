@@ -179,7 +179,7 @@ public class StarfieldActivity extends Activity {
 
             ImageView icon = (ImageView) view.findViewById(R.id.starfield_planet_icon);
             Planet planet = mStar.getPlanets()[position];
-            icon.setImageResource(planet.getPlanetType().getIconID());
+            icon.setImageBitmap(planet.getBitmap(mContext.getAssets()));
 
             TextView planetTypeTextView = (TextView) view.findViewById(R.id.starfield_planet_type);
             planetTypeTextView.setText(planet.getPlanetType().getDisplayName());

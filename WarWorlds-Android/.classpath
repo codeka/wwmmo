@@ -23,5 +23,6 @@
 	<classpathentry exported="true" kind="lib" path="libs/protobuf-java-2.4.2-pre.jar"/>
 	<classpathentry exported="true" kind="lib" path="libs/android-support-v13.jar"/>
 	<classpathentry exported="true" kind="lib" path="libs/joda-time-2.1.jar"/>
+	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/planet-render"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>

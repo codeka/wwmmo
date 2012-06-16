@@ -1,45 +1,52 @@
 package au.com.codeka.warworlds.model;
 
-import au.com.codeka.warworlds.R;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Random;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import android.content.res.AssetManager;
+import android.graphics.Bitmap;
+import android.graphics.Bitmap.Config;
+import au.com.codeka.planetrender.Colour;
+import au.com.codeka.planetrender.Image;
+import au.com.codeka.planetrender.PlanetRenderer;
+import au.com.codeka.planetrender.Template;
+import au.com.codeka.planetrender.TemplateException;
 
 
 public class Planet {
+    private static Logger log = LoggerFactory.getLogger(Planet.class);
+
     private static PlanetType[] sPlanetTypes = {
         new PlanetType.Builder().setDisplayName("Gas Giant")
-                                .setIconID(R.drawable.planet_icon_gasgiant)
-                                .setMedID(R.drawable.planet_med_gasgiant)
+                                .setBitmapBasePath("planets/gasgiant")
                                 .build(),
         new PlanetType.Builder().setDisplayName("Radiated")
-                                .setIconID(R.drawable.planet_icon_radiated)
-                                .setMedID(R.drawable.planet_med_radiated)
+                                .setBitmapBasePath("planets/radiated")
                                 .build(),
         new PlanetType.Builder().setDisplayName("Inferno")
-                                .setIconID(R.drawable.planet_icon_inferno)
-                                .setMedID(R.drawable.planet_med_inferno)
+                                .setBitmapBasePath("planets/inferno")
                                 .build(),
         new PlanetType.Builder().setDisplayName("Asteroids")
-                                .setIconID(R.drawable.planet_icon_asteroids)
-                                .setMedID(R.drawable.planet_med_asteroids)
+                                .setBitmapBasePath("planets/asteroids")
                                 .build(),
         new PlanetType.Builder().setDisplayName("Water")
-                                .setIconID(R.drawable.planet_icon_water)
-                                .setMedID(R.drawable.planet_med_water)
+                                .setBitmapBasePath("planets/water")
                                 .build(),
         new PlanetType.Builder().setDisplayName("Toxic")
-                                .setIconID(R.drawable.planet_icon_toxic)
-                                .setMedID(R.drawable.planet_med_toxic)
+                                .setBitmapBasePath("planets/toxic")
                                 .build(),
         new PlanetType.Builder().setDisplayName("Desert")
-                                .setIconID(R.drawable.planet_icon_desert)
-                                .setMedID(R.drawable.planet_med_desert)
+                                .setBitmapBasePath("planets/desert")
                                 .build(),
         new PlanetType.Builder().setDisplayName("Swamp")
-                                .setIconID(R.drawable.planet_icon_swamp)
-                                .setMedID(R.drawable.planet_med_swamp)
+                                .setBitmapBasePath("planets/swamp")
                                 .build(),
         new PlanetType.Builder().setDisplayName("Terran")
-                                .setIconID(R.drawable.planet_icon_terran)
-                                .setMedID(R.drawable.planet_med_terran)
+                                .setBitmapBasePath("planets/terran")
                                 .build()
     };
 
@@ -51,6 +58,7 @@ public class Planet {
     private int mPopulationCongeniality;
     private int mFarmingCongeniality;
     private int mMiningCongeniality;
+    private Bitmap mBitmap;
 
     public Star getStar() {
         return mStar;
@@ -75,6 +83,66 @@ public class Planet {
     }
     public int getMiningCongeniality() {
         return mMiningCongeniality;
+    }
+    public Bitmap getBitmap(AssetManager assetManager) {
+        if (mBitmap == null) {
+            // TODO: do this in a thread!!
+            mBitmap = generateBitmap(assetManager);
+        }
+        return mBitmap;
+    }
+
+    private Bitmap generateBitmap(AssetManager assetManager) {
+        String basePath = mPlanetType.getBitmapBasePath();
+
+        // TODO: better seed
+        long seed = mKey.hashCode();
+        Random rand = new Random(seed);
+
+        String[] fileNames = null;
+        try {
+            fileNames = assetManager.list(basePath);
+        } catch(IOException e) {
+            return null; // should never happen!
+        }
+
+        String fullPath = basePath + "/";
+        if (fileNames.length == 0) {
+            return null;
+        } else if (fileNames.length == 1) {
+            fullPath += fileNames[0];
+        } else {
+            fullPath += fileNames[rand.nextInt(fileNames.length - 1)];
+        }
+        Template tmpl = null;
+        InputStream ins = null;
+        try {
+            log.info("generating planet "+fullPath+"...");
+            ins = assetManager.open(fullPath);
+            tmpl = Template.parse(ins);
+        } catch (IOException e) {
+            log.error("Error loading planet definition: "+fullPath, e);
+        } catch (TemplateException e) {
+            log.error("Error parsing planet definition: "+fullPath, e);
+        } finally {
+            if (ins != null) {
+                try {
+                    ins.close();
+                } catch (IOException e) {
+                }
+            }
+        }
+
+        if (tmpl != null) {
+            PlanetRenderer renderer = new PlanetRenderer((Template.PlanetTemplate) tmpl.getTemplate(), rand);
+
+            Image img = new Image(128, 128, Colour.TRANSPARENT);
+            renderer.render(img);
+
+            return Bitmap.createBitmap(img.getArgb(), 128, 128, Config.ARGB_8888);
+        }
+
+        return null;
     }
 
     /**
@@ -102,17 +170,13 @@ public class Planet {
 
     public static class PlanetType {
         private String mDisplayName;
-        private int mIconID;
-        private int mMedID;
+        private String mBitmapBasePath;
 
         public String getDisplayName() {
             return mDisplayName;
         }
-        public int getIconID() {
-            return mIconID;
-        }
-        public int getMedID() {
-            return mMedID;
+        public String getBitmapBasePath() {
+            return mBitmapBasePath;
         }
 
         public static class Builder {
@@ -127,13 +191,8 @@ public class Planet {
                 return this;
             }
 
-            public Builder setIconID(int id) {
-                mPlanetType.mIconID = id;
-                return this;
-            }
-
-            public Builder setMedID(int id) {
-                mPlanetType.mMedID = id;
+            public Builder setBitmapBasePath(String path) {
+                mPlanetType.mBitmapBasePath = path;
                 return this;
             }
 
