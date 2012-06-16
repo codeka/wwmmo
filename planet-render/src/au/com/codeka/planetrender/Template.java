@@ -61,6 +61,8 @@ public class Template {
             factory = new VoronoiTemplate.VoronoiTemplateFactory();
         } else if (elem.getTagName().equals("colour")) {
             factory = new ColourGradientTemplate.ColourGradientTemplateFactory();
+        } else if (elem.getTagName().equals("perlin")) {
+            factory = new PerlinNoiseTemplate.PerlinNoiseTemplateFactor();
         } else {
             throw new TemplateException("Unknown element: "+elem.getTagName());
         }
@@ -133,9 +135,13 @@ public class Template {
         }
 
         private Generator mGenerator;
+        private double mNoisiness;
 
         public Generator getGenerator() {
             return mGenerator;
+        }
+        public double getNoisiness() {
+            return mNoisiness;
         }
 
         private static class TextureTemplateFactory extends TemplateFactory {
@@ -151,6 +157,13 @@ public class Template {
                     tmpl.mGenerator = Generator.VoronoiMap;
                 } else {
                     throw new TemplateException("Unknown <texture generator> attribute: "+generator);
+                }
+
+                String noisiness = elem.getAttribute("noisiness");
+                if (noisiness == null || noisiness.equals("")) {
+                    tmpl.mNoisiness = 0.5;
+                } else {
+                    tmpl.mNoisiness = Double.parseDouble(noisiness);
                 }
 
                 for (Element child : XmlIterator.childElements(elem)) {
@@ -237,7 +250,7 @@ public class Template {
          */
         private static class ColourGradientTemplateFactory extends TemplateFactory {
             @Override
-            public BaseTemplate parse(Element elem) {
+            public BaseTemplate parse(Element elem) throws TemplateException {
                 ColourGradientTemplate tmpl = new ColourGradientTemplate();
                 tmpl.mColourGradient = new ColourGradient();
 
@@ -245,6 +258,73 @@ public class Template {
                     double n = Double.parseDouble(child.getAttribute("n"));
                     int argb = (int) Long.parseLong(child.getAttribute("colour"), 16);
                     tmpl.mColourGradient.addNode(n, new Colour(argb));
+                }
+
+                return tmpl;
+            }
+        }
+    }
+
+    public static class PerlinNoiseTemplate extends BaseTemplate {
+        public enum Interpolation {
+            None,
+            Linear,
+            Cosine
+        }
+
+        private double mPersistence;
+        private Interpolation mInterpolation;
+        private boolean mSmooth;
+        private int mStartOctave;
+        private int mEndOctave;
+
+        public double getPersistence() {
+            return mPersistence;
+        }
+        public Interpolation getInterpolation() {
+            return mInterpolation;
+        }
+        public boolean getSmooth() {
+            return mSmooth;
+        }
+        public int getStartOctave() {
+            return mStartOctave;
+        }
+        public int getEndOctave() {
+            return mEndOctave;
+        }
+
+        private static class PerlinNoiseTemplateFactor extends TemplateFactory {
+            @Override
+            public BaseTemplate parse(Element elem) throws TemplateException {
+                PerlinNoiseTemplate tmpl = new PerlinNoiseTemplate();
+
+                String val = elem.getAttribute("interpolation");
+                if (val == null || val.equals("linear")) {
+                    tmpl.mInterpolation = Interpolation.Linear;
+                } else if (val.equals("cosine")) {
+                    tmpl.mInterpolation = Interpolation.Cosine;
+                } else if (val.equals("none")) {
+                    tmpl.mInterpolation = Interpolation.None;
+                } else {
+                    throw new TemplateException("Unknown <perlin> 'interpolation' attribute: " + val);
+                }
+
+                tmpl.mPersistence = Double.parseDouble(elem.getAttribute("persistence"));
+                if (elem.getAttribute("startOctave") == null) {
+                    tmpl.mStartOctave = 1;
+                } else {
+                    tmpl.mStartOctave = Integer.parseInt(elem.getAttribute("startOctave"));
+                }
+                if (elem.getAttribute("endOctave") == null) {
+                    tmpl.mEndOctave = 10;
+                } else {
+                    tmpl.mEndOctave = Integer.parseInt(elem.getAttribute("endOctave"));
+                }
+
+                val = elem.getAttribute("smooth");
+                if (val != null) {
+                    tmpl.mSmooth = Boolean.parseBoolean(val);
                 }
 
                 return tmpl;

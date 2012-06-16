@@ -41,13 +41,21 @@ public class TextureGenerator {
      * This generator just returns a colour based on how from the points the texel is.
      */
     static class VoronoiMapGenerator extends Generator {
-        Voronoi mVoronoi;
-        ColourGradient mColourGradient;
+        private Voronoi mVoronoi;
+        private ColourGradient mColourGradient;
+        private PerlinNoise mNoise;
+        private double mNoisiness;
 
         public VoronoiMapGenerator(Template.TextureTemplate tmpl, Random rand) {
             Template.VoronoiTemplate voronoiTmpl = tmpl.getParameter(Template.VoronoiTemplate.class);
             mVoronoi = new Voronoi(voronoiTmpl, rand);
             mColourGradient = tmpl.getParameter(Template.ColourGradientTemplate.class).getColourGradient();
+            mNoisiness = tmpl.getNoisiness();
+
+            Template.PerlinNoiseTemplate noiseTemplate = tmpl.getParameter(Template.PerlinNoiseTemplate.class);
+            if (noiseTemplate != null) {
+                mNoise = new PerlinNoise(noiseTemplate, rand);
+            }
         }
 
         public Colour getTexel(double u, double v) {
@@ -80,6 +88,11 @@ public class TextureGenerator {
             final double totalDistance = distance + neighbourDistance;
 
             double normalizedDistance = distance / (totalDistance / 2.0);
+            if (mNoise != null) {
+                double noise = mNoise.getNoise(u, v);
+                normalizedDistance += (mNoisiness / 2.0) - (noise * mNoisiness);
+            }
+
             return mColourGradient.getColour(normalizedDistance);
         }
     }

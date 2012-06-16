@@ -33,10 +33,12 @@ import javax.swing.JToolBar;
 
 import au.com.codeka.planetrender.Colour;
 import au.com.codeka.planetrender.Image;
+import au.com.codeka.planetrender.PerlinNoise;
 import au.com.codeka.planetrender.PlanetRenderer;
 import au.com.codeka.planetrender.PointCloud;
 import au.com.codeka.planetrender.Template;
 import au.com.codeka.planetrender.TemplateException;
+import au.com.codeka.planetrender.TextureGenerator;
 import au.com.codeka.planetrender.Voronoi;
 
 public class MainWindow {
@@ -80,12 +82,15 @@ public class MainWindow {
      */
     private void render() {
         Template.BaseTemplate tmpl = getTemplate();
-        //String msg = "";
 
+        long startTime = System.nanoTime();
         Image img = createBlankImage(Colour.TRANSPARENT);
         if (tmpl instanceof Template.PlanetTemplate) {
             PlanetRenderer pr = new PlanetRenderer((Template.PlanetTemplate) tmpl, getRandom());
             pr.render(img);
+        } else if (tmpl instanceof Template.TextureTemplate) {
+            TextureGenerator texture = new TextureGenerator((Template.TextureTemplate) tmpl, getRandom());
+            texture.renderTexture(img);
         } else if (tmpl instanceof Template.VoronoiTemplate) {
             Voronoi v = new Voronoi((Template.VoronoiTemplate) tmpl, getRandom());
             v.renderDelaunay(img, Colour.GREEN);
@@ -93,7 +98,17 @@ public class MainWindow {
         } else if (tmpl instanceof Template.PointCloudTemplate) {
             PointCloud pc = new PointCloud((Template.PointCloudTemplate) tmpl, getRandom());
             pc.render(img);
+        } else if (tmpl instanceof Template.PerlinNoiseTemplate) {
+            PerlinNoise pn = new PerlinNoise((Template.PerlinNoiseTemplate) tmpl, getRandom());
+            pn.render(img);
+        } else {
+            mStatus.setText("Unknown template kind: "+tmpl.getClass().getName());
+            return;
         }
+        long endTime = System.nanoTime();
+
+        String msg = String.format("%.4fms elapsed.", ((double) (endTime - startTime)) / 1000000.0);
+        mStatus.setText(msg);
 
         mContentPanel.setImage(img);
     }
@@ -139,7 +154,7 @@ public class MainWindow {
     }
 
     private Random getRandom() {
-        if (chckbxNewSeedCheckBox.isSelected()) {
+        if (chckbxNewSeedCheckBox.isSelected() || txtSeed.getText().equals("")) {
             txtSeed.setText(Long.toString(new Random().nextLong()));
         }
 
@@ -153,7 +168,7 @@ public class MainWindow {
     private void initialize() {
         mFrame = new JFrame();
         mFrame.setTitle("Planet Render Test");
-        mFrame.setBounds(100, 100, 800, 700);
+        mFrame.setBounds(100, 100, 1000, 700);
         mFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         mFrame.getContentPane().setLayout(new BorderLayout(0, 0));
 
@@ -208,14 +223,15 @@ public class MainWindow {
         mFrame.getContentPane().add(panel, BorderLayout.SOUTH);
         panel.setLayout(new FlowLayout(FlowLayout.LEFT, 5, 5));
 
-        mStatus = new JLabel("Please wait...");
+        mStatus = new JLabel(" ");
         panel.add(mStatus);
         
         mSplitPane = new JSplitPane();
         mFrame.getContentPane().add(mSplitPane, BorderLayout.CENTER);
         
         mContentPanel = new ImagePanel();
-        mContentPanel.setMinimumSize(new Dimension(256, 150));
+        mContentPanel.setMinimumSize(new Dimension(150, 150));
+        mContentPanel.setPreferredSize(new Dimension(640, 480));
         mSplitPane.setLeftComponent(mContentPanel);
         
         mTemplateXml = new JTextArea();
