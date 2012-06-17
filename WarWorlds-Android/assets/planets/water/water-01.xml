@@ -2,13 +2,29 @@
 <planet>
   <texture generator="voronoi-map" noisiness="0.6">
     <voronoi>
-      <point-cloud generator="poisson" density="0.4" randomness="0.8" />
+      <point-cloud generator="poisson" density="0.4" randomness="0.9" />
     </voronoi>
     <colour>
       <node n="0.0" colour="ff003e93" />
-      <node n="0.6" colour="ff002960" />
-      <node n="1.0" colour="ff0077b5" />
+      <node n="0.6" colour="ff002980" />
+      <node n="1.0" colour="ff0055b5" />
     </colour>
-    <perlin persistence="0.5" startOctave="7" endOctave="16" interpolation="cosine" />
+    <perlin persistence="0.6" startOctave="3" endOctave="10" interpolation="linear" />
   </texture>
+  <atmosphere>
+    <inner sunStartShadow="1.4" sunShadowFactor="0.8">
+      <colour>
+        <node n="0.0" colour="00002980" />
+        <node n="0.4" colour="a0002980" />
+        <node n="1.0" colour="ff002980" />
+      </colour>
+    </inner>
+    <outer size="2" sunStartShadow="1" sunShadowFactor="0.5">
+      <colour>
+        <node n="0.0" colour="ff002980" />
+        <node n="0.5" colour="a0002980" />
+        <node n="1.0" colour="00002980" />
+      </colour>
+    </outer>
+  </atmosphere>
 </planet>
