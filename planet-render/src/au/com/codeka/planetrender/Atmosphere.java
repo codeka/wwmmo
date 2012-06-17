@@ -8,7 +8,6 @@ import java.util.Random;
 public class Atmosphere {
     private ColourGradient mInnerColourGradient;
     private ColourGradient mOuterColourGradient;
-    private double mPlanetRadius;
 
     public Atmosphere(Template.AtmosphereTemplate tmpl, Random rand) {
         if (tmpl.getInnerTemplate() != null) {
@@ -19,15 +18,6 @@ public class Atmosphere {
             mOuterColourGradient = tmpl.getOuterTemplate().getParameter(
                     Template.ColourGradientTemplate.class).getColourGradient();
         }
-    }
-
-    /**
-     * Sets the "apparent" radius of the planet, in the final image. A radius of 0.5 would mean
-     * the planet is touching the edges of the image. A radius of 0.25 would imply it's taking
-     * up half of the image.
-     */
-    public void setPlanetRadius(double radius) {
-        mPlanetRadius = radius;
     }
 
     public Colour getOuterPixelColour(double distanceToSurface) {

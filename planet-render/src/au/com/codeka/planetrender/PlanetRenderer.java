@@ -26,12 +26,6 @@ public class PlanetRenderer {
         Template.AtmosphereTemplate atmosphereTemplate = tmpl.getParameter(Template.AtmosphereTemplate.class);
         if (atmosphereTemplate != null) {
             mAtmosphere = new Atmosphere(atmosphereTemplate, rand);
-
-            // we need to work out the screen-space size of the planet. Just trace a ray back
-            // from the equator to the screen...
-            Vector3 equator = backtrace(Vector3.add(mPlanetOrigin, new Vector3(mPlanetRadius, 0.0, 0.0)));
-            double radius = Vector3.subtract(equator, new Vector3(0, 0, 1)).length();
-            mAtmosphere.setPlanetRadius(radius * 2.0);
         }
 
         Vector3 northFrom = tmpl.getNorthFrom();
@@ -168,15 +162,5 @@ public class PlanetRenderer {
         } else {
             return null;
         }
-    }
-
-    /**
-     * Converts a world-space ray into a screen-space ray. Basically all we need to is re-size
-     * the ray so that the z vector is unit-length.
-     */
-    private Vector3 backtrace(Vector3 ray) {
-        return new Vector3(ray.x / ray.z,
-                            ray.y / ray.z,
-                            1.0);
     }
 }
