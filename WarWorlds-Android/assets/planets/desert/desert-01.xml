@@ -1,16 +1,12 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <planet>
   <texture generator="perlin-noise">
-      <voronoi>
-        <point-cloud generator="poisson" density="0.7" randomness="0.9" />
-      </voronoi>
-      <perlin persistence="0.5" startOctave="3" endOctave="5" interpolation="cosine" />
+      <perlin persistence="0.5" startOctave="5" endOctave="7" interpolation="cosine" />
       <colour>
-        <node n="0.0" colour="ff662203" />
-        <node n="0.4" colour="ffdb4d03" />
-        <node n="0.7" colour="ff7b2b02" />
-        <node n="1.0" colour="ffad3c02" />
+        <node n="0.0" colour="ffc14006" />
+        <node n="0.4" colour="ffc17306" />
+        <node n="0.7" colour="ff9c4c0f" />
+        <node n="1.0" colour="ffcf6102" />
       </colour>
   </texture>
 </planet>
-

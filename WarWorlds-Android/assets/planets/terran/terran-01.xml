@@ -10,4 +10,20 @@
     </colour>
     <perlin persistence="0.5" startOctave="2" endOctave="5" interpolation="linear" />
   </texture>
+  <atmosphere>
+    <inner>
+      <colour>
+        <node n="0.0" colour="00000000" />
+        <node n="0.4" colour="000054c1" />
+        <node n="1.0" colour="ff0054c1" />
+      </colour>
+    </inner>
+    <outer>
+      <colour>
+        <node n="0.0" colour="7f0054c1" />
+        <node n="0.4" colour="000054c1" />
+        <node n="1.0" colour="00000000" />
+      </colour>
+    </outer>
+  </atmosphere>
 </planet>

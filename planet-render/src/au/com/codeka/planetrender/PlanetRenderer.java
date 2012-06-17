@@ -14,13 +14,25 @@ public class PlanetRenderer {
     private Vector3 mSunOrigin;
     private TextureGenerator mTexture;
     private Vector3 mNorth;
+    private Atmosphere mAtmosphere;
 
     public PlanetRenderer(Template.PlanetTemplate tmpl, Random rand) {
-        mPlanetRadius = 10.0;
         mPlanetOrigin = new Vector3(0.0, 0.0, 30.0);
-        mAmbient = 0.1;
         mSunOrigin = new Vector3(100.0, 100.0, -150.0);
         mTexture = new TextureGenerator(tmpl.getParameter(Template.TextureTemplate.class), rand);
+        mAmbient = tmpl.getAmbient();
+        mPlanetRadius = tmpl.getPlanetSize();
+
+        Template.AtmosphereTemplate atmosphereTemplate = tmpl.getParameter(Template.AtmosphereTemplate.class);
+        if (atmosphereTemplate != null) {
+            mAtmosphere = new Atmosphere(atmosphereTemplate, rand);
+
+            // we need to work out the screen-space size of the planet. Just trace a ray back
+            // from the equator to the screen...
+            Vector3 equator = backtrace(Vector3.add(mPlanetOrigin, new Vector3(mPlanetRadius, 0.0, 0.0)));
+            double radius = Vector3.subtract(equator, new Vector3(0, 0, 1)).length();
+            mAtmosphere.setPlanetRadius(radius * 2.0);
+        }
 
         Vector3 northFrom = tmpl.getNorthFrom();
         Vector3 northTo = tmpl.getNorthTo();
@@ -52,9 +64,7 @@ public class PlanetRenderer {
     private Colour getPixelColour(double x, double y) {
         Colour c = new Colour();
 
-        // should already be normalized, but just to be sure...
         Vector3 ray = new Vector3(x, -y, 1.0).normalized();
-
         Vector3 intersection = raytrace(ray);
         if (intersection != null) {
             // we intersected with the planet. Now we need to work out the colour at this point
@@ -66,7 +76,26 @@ public class PlanetRenderer {
             c.setRed(t.getRed() * intensity);
             c.setGreen(t.getGreen() * intensity);
             c.setBlue(t.getBlue() * intensity);
+
+            if (mAtmosphere != null) {
+                Vector3 surfaceNormal = Vector3.subtract(intersection, mPlanetOrigin).normalized();
+                Vector3 sunDirection = Vector3.subtract(mSunOrigin, intersection).normalized();
+                Colour atmosphereColour = mAtmosphere.getInnerPixelColour(intersection,
+                                                                          surfaceNormal,
+                                                                          sunDirection);
+                c = Colour.blend(c, atmosphereColour);
+            }
+        } else if (mAtmosphere != null) {
+            // if we're rendering an atmosphere, we need to work out the distance of this ray
+            // to the planet's surface
+            double u = Vector3.dot(mPlanetOrigin, ray);
+            Vector3 closest = Vector3.scale(ray, u);
+            double distance = (Vector3.subtract(closest, mPlanetOrigin).length() - mPlanetRadius);
+
+            Colour atmosphereColour = mAtmosphere.getOuterPixelColour(distance);
+            c = Colour.blend(c, atmosphereColour);
         }
+
         return c;
     }
 
@@ -128,7 +157,7 @@ public class PlanetRenderer {
     private Vector3 raytrace(Vector3 direction) {
         // intsection of a sphere and a line
         final double a = Vector3.dot(direction, direction);
-        final double b = -2.0 * Vector3.dot(mPlanetOrigin, direction);
+        final double b = 2.0 * Vector3.dot(direction, Vector3.scale(mPlanetOrigin, -1.0));
         final double c = Vector3.dot(mPlanetOrigin, mPlanetOrigin) - (mPlanetRadius * mPlanetRadius);
         final double d = (b * b) - (4.0 * a * c);
 
@@ -141,4 +170,13 @@ public class PlanetRenderer {
         }
     }
 
+    /**
+     * Converts a world-space ray into a screen-space ray. Basically all we need to is re-size
+     * the ray so that the z vector is unit-length.
+     */
+    private Vector3 backtrace(Vector3 ray) {
+        return new Vector3(ray.x / ray.z,
+                            ray.y / ray.z,
+                            1.0);
+    }
 }

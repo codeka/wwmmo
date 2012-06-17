@@ -55,7 +55,7 @@ public class PerlinNoise {
         double total = 0.0;
 
         for (int octave = 0; octave <= mEndOctave - mStartOctave; octave++) {
-            double freq = Math.pow(octave + mStartOctave, 2) + 1;
+            double freq = Math.pow(2, octave + mStartOctave) + 1;
             double amplitude = Math.pow(mPersistence, octave);
 
             double x = (u * freq);

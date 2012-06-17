@@ -14,8 +14,8 @@ public class Colour {
     }
 
     public void setAlpha(double a) {
-        int n = (int)(255 * a);
-        argb = (n << 24) | (argb & 0x00ffffff);
+        long n = (long)(255 * a);
+        argb = (int) ((n << 24) | (argb & 0x00ffffff));
     }
     public void setRed(double r) {
         int n = (int)(255 * r);
@@ -31,7 +31,7 @@ public class Colour {
     }
 
     public double getAlpha() {
-        return (double) ((argb & 0xff000000) >> 24) / 255.0;
+        return (double) ((((long) argb) & 0xff000000L) >> 24) / 255.0;
     }
     public double getRed() {
         return (double) ((argb & 0x00ff0000) >> 16) / 255.0;
@@ -70,6 +70,29 @@ public class Colour {
         final double r = lr + (rr - lr) * n;
         final double g = lg + (rg - lg) * n;
         final double b = lb + (rb - lb) * n;
+
+        return Colour.fromArgb(a, r, g, b);
+    }
+
+    /**
+     * Blends the given rhs onto the given lhs, using alpha blending.
+     */
+    public static Colour blend(Colour lhs, Colour rhs) {
+        final double la = lhs.getAlpha();
+        final double ra = rhs.getAlpha();
+        final double lr = lhs.getRed();
+        final double rr = rhs.getRed();
+        final double lg = lhs.getGreen();
+        final double rg = rhs.getGreen();
+        final double lb = lhs.getBlue();
+        final double rb = rhs.getBlue();
+
+        double a = la + ra;
+        if (a > 1.0)
+            a = 1.0;
+        double r = (lr * (1.0 - ra)) + (rr * ra);
+        double g = (lg * (1.0 - ra)) + (rg * ra);
+        double b = (lb * (1.0 - ra)) + (rb * ra);
 
         return Colour.fromArgb(a, r, g, b);
     }

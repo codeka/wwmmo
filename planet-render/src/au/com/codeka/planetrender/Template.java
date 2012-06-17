@@ -62,7 +62,9 @@ public class Template {
         } else if (elem.getTagName().equals("colour")) {
             factory = new ColourGradientTemplate.ColourGradientTemplateFactory();
         } else if (elem.getTagName().equals("perlin")) {
-            factory = new PerlinNoiseTemplate.PerlinNoiseTemplateFactor();
+            factory = new PerlinNoiseTemplate.PerlinNoiseTemplateFactory();
+        } else if (elem.getTagName().equals("atmosphere")) {
+            factory = new AtmosphereTemplate.AtmosphereTemplateFactory();
         } else {
             throw new TemplateException("Unknown element: "+elem.getTagName());
         }
@@ -119,12 +121,31 @@ public class Template {
     public static class PlanetTemplate extends BaseTemplate {
         private Vector3 mNorthFrom;
         private Vector3 mNorthTo;
+        private double mPlanetSize;
+        private double mAmbient;
+        private Vector3 mSunLocation;
 
         public Vector3 getNorthFrom() {
             return mNorthFrom;
         }
         public Vector3 getNorthTo() {
             return mNorthTo;
+        }
+        public double getPlanetSize() {
+            return mPlanetSize;
+        }
+        public double getAmbient() {
+            return mAmbient;
+        }
+        public Vector3 getSunLocation() {
+            return mSunLocation;
+        }
+
+        public void setPlanetSize(double size) {
+            mPlanetSize = size;
+        }
+        public void setSunLocation(Vector3 location) {
+            mSunLocation = location;
         }
 
         private static class PlanetTemplateFactory extends TemplateFactory {
@@ -142,6 +163,21 @@ public class Template {
                 }
                 if (elem.getAttribute("northTo") != null && !elem.getAttribute("northTo").equals("")) {
                     tmpl.mNorthTo = parseVector3(elem.getAttribute("northTo"));
+                }
+
+                tmpl.mPlanetSize = 10.0;
+                if (elem.getAttribute("size") != null && !elem.getAttribute("size").equals("")) {
+                    tmpl.mPlanetSize = Double.parseDouble(elem.getAttribute("size"));
+                }
+
+                tmpl.mAmbient = 0.1;
+                if (elem.getAttribute("ambient") != null && !elem.getAttribute("ambient").equals("")) {
+                    tmpl.mAmbient = Double.parseDouble(elem.getAttribute("ambient"));
+                }
+
+                tmpl.mSunLocation = new Vector3(100.0, 100.0, -150.0);
+                if (elem.getAttribute("sun") != null && !elem.getAttribute("sun").equals("")) {
+                    tmpl.mSunLocation = parseVector3(elem.getAttribute("sun"));
                 }
 
                 for (Element child : XmlIterator.childElements(elem)) {
@@ -338,7 +374,7 @@ public class Template {
             return mEndOctave;
         }
 
-        private static class PerlinNoiseTemplateFactor extends TemplateFactory {
+        private static class PerlinNoiseTemplateFactory extends TemplateFactory {
             @Override
             public BaseTemplate parse(Element elem) throws TemplateException {
                 PerlinNoiseTemplate tmpl = new PerlinNoiseTemplate();
@@ -373,6 +409,50 @@ public class Template {
 
                 return tmpl;
             }
+        }
+    }
+
+    public static class AtmosphereTemplate extends BaseTemplate {
+        private InnerOuterTemplate mInnerTemplate;
+        private InnerOuterTemplate mOuterTemplate;
+
+        public InnerOuterTemplate getInnerTemplate() {
+            return mInnerTemplate;
+        }
+        public InnerOuterTemplate getOuterTemplate() {
+            return mOuterTemplate;
+        }
+
+        private static class AtmosphereTemplateFactory extends TemplateFactory {
+            @Override
+            public BaseTemplate parse(Element elem) throws TemplateException {
+                AtmosphereTemplate tmpl = new AtmosphereTemplate();
+
+                for (Element child : XmlIterator.childElements(elem)) {
+                    if (child.getTagName().equals("inner")) {
+                        tmpl.mInnerTemplate = parseInnerOuterTemplate(child);
+                    } else if (child.getTagName().equals("outer")) {
+                        tmpl.mOuterTemplate = parseInnerOuterTemplate(child);
+                    }
+                }
+
+                return tmpl;
+            }
+
+            private InnerOuterTemplate parseInnerOuterTemplate(Element elem)
+                    throws TemplateException {
+                InnerOuterTemplate tmpl = new InnerOuterTemplate();
+
+                for (Element child : XmlIterator.childElements(elem)) {
+                    tmpl.getParameters().add(parseElement(child));
+                }
+
+                return tmpl;
+            }
+        }
+
+        public static class InnerOuterTemplate extends BaseTemplate {
+            
         }
     }
 }

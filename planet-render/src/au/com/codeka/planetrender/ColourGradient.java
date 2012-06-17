@@ -54,6 +54,7 @@ public class ColourGradient {
             Node rhs = mNodes.get(i + 1);
             if (rhs.n > n) {
                 double factor = (n - lhs.n) / (rhs.n - lhs.n);
+
                 return Colour.interpolate(lhs.colour, rhs.colour, factor);
             }
         }

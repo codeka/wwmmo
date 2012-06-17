@@ -59,11 +59,16 @@ class Vector3 {
         return new Vector3(x * s, y * s, z * s);
     }
 
-    /**
-     * Returns (a - b)
-     */
     public static Vector3 subtract(Vector3 a, Vector3 b) {
         return new Vector3(a.x - b.x, a.y - b.y, a.z - b.z);
+    }
+
+    public static Vector3 add(Vector3 a, Vector3 b) {
+        return new Vector3(a.x + b.x, a.y + b.y, a.z + b.z);
+    }
+
+    public static Vector3 scale(Vector3 v, double n) {
+        return new Vector3(v.x * n, v.y * n, v.z * n);
     }
 
     public static double dot(Vector3 a, Vector3 b) {

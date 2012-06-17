@@ -51,6 +51,7 @@ public class MainWindow {
     private JSplitPane mSplitPane;
     private ImagePanel mContentPanel;
     private JTextArea mTemplateXml;
+    private JComboBox cbbxBackgroundColour;
 
     /**
      * Launch the application.
@@ -199,6 +200,25 @@ public class MainWindow {
         cbbxImageSize.setModel(new DefaultComboBoxModel(new String[] {"16", "32", "64", "128", "256", "512", "1024", "2048", "4096"}));
         cbbxImageSize.setSelectedIndex(5);
         toolBar_3.add(cbbxImageSize);
+        
+        JLabel lblBackground = new JLabel(" Background: ");
+        toolBar_3.add(lblBackground);
+        
+        cbbxBackgroundColour = new JComboBox();
+        cbbxBackgroundColour.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent ae) {
+                String sel = (String) cbbxBackgroundColour.getSelectedItem();
+                if (sel.equals("Transparent")) {
+                    mContentPanel.setBackgroundColour(null);
+                } else if (sel.equals("Black")) {
+                    mContentPanel.setBackgroundColour(Colour.BLACK);
+                } else if (sel.equals("White")) {
+                    mContentPanel.setBackgroundColour(Colour.WHITE);
+                }
+            }
+        });
+        cbbxBackgroundColour.setModel(new DefaultComboBoxModel(new String[] {"Transparent", "Black", "White"}));
+        toolBar_3.add(cbbxBackgroundColour);
 
         JToolBar toolBar_1 = new JToolBar();
         panel.add(toolBar_1);
@@ -245,6 +265,7 @@ public class MainWindow {
         private java.awt.Image mImage;
         private int mImageWidth;
         private int mImageHeight;
+        private Colour mBackgroundColour;
 
         public void setImage(Image img) {
             MemoryImageSource mis = new MemoryImageSource(img.getWidth(), img.getHeight(),
@@ -265,13 +286,23 @@ public class MainWindow {
             ImageIO.write(img, "png", f);
         }
 
+        public void setBackgroundColour(Colour c) {
+            mBackgroundColour = c;
+            repaint();
+        }
+
         @Override
         public void paintComponent(Graphics g) {
             int width = getWidth();
             int height = getHeight();
 
-            // fill the entire background graw
-            g.setColor(Color.LIGHT_GRAY);
+            // fill the entire background gray
+            Color bg = Color.LIGHT_GRAY;
+            if (mBackgroundColour != null) {
+                bg = new Color((float) mBackgroundColour.getRed(), (float)  mBackgroundColour.getGreen(),
+                               (float) mBackgroundColour.getBlue(), (float) mBackgroundColour.getAlpha());
+            }
+            g.setColor(bg);
             g.fillRect(0, 0, width, height);
 
             if (mImage != null) {
@@ -280,14 +311,17 @@ public class MainWindow {
                 width = mImageWidth;
                 height = mImageHeight;
 
-                // we'll draw a checkboard background to represent the transparent parts of the image
-                g.setColor(Color.GRAY);
-                boolean odd = false;
-                for (int y = sy; y < sy + height; y += 16) {
-                    int xOffset = (odd ? 16 : 0);
-                    odd = !odd;
-                    for (int x = sx + xOffset; x < sx + width; x += 32) {
-                        g.fillRect(x, y, 16, 16);
+                // if the background is set to transparent, we'll draw a checkboard background
+                //to represent the transparent parts of the image
+                if (mBackgroundColour == null) {
+                    g.setColor(Color.GRAY);
+                    boolean odd = false;
+                    for (int y = sy; y < sy + height; y += 16) {
+                        int xOffset = (odd ? 16 : 0);
+                        odd = !odd;
+                        for (int x = sx + xOffset; x < sx + width; x += 32) {
+                            g.fillRect(x, y, 16, 16);
+                        }
                     }
                 }
 
