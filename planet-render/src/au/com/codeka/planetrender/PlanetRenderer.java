@@ -18,8 +18,8 @@ public class PlanetRenderer {
 
     public PlanetRenderer(Template.PlanetTemplate tmpl, Random rand) {
         mPlanetOrigin = new Vector3(0.0, 0.0, 30.0);
-        mSunOrigin = new Vector3(100.0, 100.0, -150.0);
         mTexture = new TextureGenerator(tmpl.getParameter(Template.TextureTemplate.class), rand);
+        mSunOrigin = tmpl.getSunLocation();
         mAmbient = tmpl.getAmbient();
         mPlanetRadius = tmpl.getPlanetSize();
 
@@ -74,7 +74,7 @@ public class PlanetRenderer {
             if (mAtmosphere != null) {
                 Vector3 surfaceNormal = Vector3.subtract(intersection, mPlanetOrigin).normalized();
                 Vector3 sunDirection = Vector3.subtract(mSunOrigin, intersection).normalized();
-                Colour atmosphereColour = mAtmosphere.getInnerPixelColour(intersection,
+                Colour atmosphereColour = mAtmosphere.getInnerPixelColour(x + 0.5, y + 0.5, intersection,
                                                                           surfaceNormal,
                                                                           sunDirection);
                 c = Colour.blend(c, atmosphereColour);
@@ -86,7 +86,12 @@ public class PlanetRenderer {
             Vector3 closest = Vector3.scale(ray, u);
             double distance = (Vector3.subtract(closest, mPlanetOrigin).length() - mPlanetRadius);
 
-            Colour atmosphereColour = mAtmosphere.getOuterPixelColour(distance);
+            Vector3 normal = Vector3.subtract(closest, mPlanetOrigin).normalized();
+            Vector3 sunDirection = Vector3.subtract(mSunOrigin, closest).normalized();
+
+            Colour atmosphereColour = mAtmosphere.getOuterPixelColour(x + 0.5, y + 0.5, normal,
+                                                                      distance,
+                                                                      sunDirection);
             c = Colour.blend(c, atmosphereColour);
         }
 

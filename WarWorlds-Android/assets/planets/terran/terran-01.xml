@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<planet>
+<planet sun="100 100 -100">
   <texture generator="perlin-noise" scaleX="2">
     <colour>
       <node n="0.0" colour="ff066b8d" />
@@ -11,17 +11,17 @@
     <perlin persistence="0.5" startOctave="2" endOctave="5" interpolation="linear" />
   </texture>
   <atmosphere>
-    <inner>
+    <inner sunStartShadow="1.2" sunShadowFactor="0.8">
       <colour>
         <node n="0.0" colour="00000000" />
         <node n="0.4" colour="000054c1" />
         <node n="1.0" colour="ff0054c1" />
       </colour>
     </inner>
-    <outer>
+    <outer size="2" sunStartShadow="1" sunShadowFactor="0.5">
       <colour>
-        <node n="0.0" colour="7f0054c1" />
-        <node n="0.4" colour="000054c1" />
+        <node n="0.0" colour="ff0054c1" />
+        <node n="0.8" colour="000054c1" />
         <node n="1.0" colour="00000000" />
       </colour>
     </outer>

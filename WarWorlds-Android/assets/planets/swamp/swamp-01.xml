@@ -12,4 +12,20 @@
         <node n="1.0" colour="ff001947" />
       </colour>
   </texture>
+  <atmosphere>
+    <inner sunStartShadow="1.2" sunShadowFactor="0.8">
+      <colour>
+        <node n="0.0" colour="00000000" />
+        <node n="0.4" colour="0000541b" />
+        <node n="1.0" colour="c000541b" />
+      </colour>
+    </inner>
+    <outer size="2" sunStartShadow="1" sunShadowFactor="0.5">
+      <colour>
+        <node n="0.0" colour="c000541b" />
+        <node n="0.8" colour="0000541b" />
+        <node n="1.0" colour="00000000" />
+      </colour>
+    </outer>
+  </atmosphere>
 </planet>

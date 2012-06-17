@@ -8,4 +8,13 @@
         <node n="1.0" colour="ff00ff06" />
       </colour>
   </texture>
+  <atmosphere>
+    <outer size="5" noisiness="0.7" sunStartShadow="1" sunShadowFactor="0.6">
+      <colour>
+        <node n="0.0" colour="ff24ff60" />
+        <node n="0.8" colour="0024ff60" />
+      </colour>
+      <perlin persistence="0.6" startOctave="3" endOctave="8" interpolation="linear" />
+    </outer>
+  </atmosphere>
 </planet>

@@ -423,6 +423,26 @@ public class Template {
             return mOuterTemplate;
         }
 
+        public static class InnerOuterTemplate extends BaseTemplate {
+            private double mSunStartShadow;
+            private double mSunShadowFactor;
+            private double mSize;
+            private double mNoisiness;
+
+            public double getSunStartShadow() {
+                return mSunStartShadow;
+            }
+            public double getSunShadowFactor() {
+                return mSunShadowFactor;
+            }
+            public double getSize() {
+                return mSize;
+            }
+            public double getNoisiness() {
+                return mNoisiness;
+            }
+        }
+
         private static class AtmosphereTemplateFactory extends TemplateFactory {
             @Override
             public BaseTemplate parse(Element elem) throws TemplateException {
@@ -443,16 +463,29 @@ public class Template {
                     throws TemplateException {
                 InnerOuterTemplate tmpl = new InnerOuterTemplate();
 
+                if (elem.getAttribute("sunStartShadow") != null && !elem.getAttribute("sunStartShadow").equals("")) {
+                    tmpl.mSunStartShadow = Double.parseDouble(elem.getAttribute("sunStartShadow"));
+                }
+
+                if (elem.getAttribute("sunShadowFactor") != null && !elem.getAttribute("sunShadowFactor").equals("")) {
+                    tmpl.mSunShadowFactor = Double.parseDouble(elem.getAttribute("sunShadowFactor"));
+                }
+
+                tmpl.mSize = 1.0;
+                if (elem.getAttribute("size") != null && !elem.getAttribute("size").equals("")) {
+                    tmpl.mSize = Double.parseDouble(elem.getAttribute("size"));
+                }
+
+                if (elem.getAttribute("noisiness") != null && !elem.getAttribute("noisiness").equals("")) {
+                    tmpl.mNoisiness = Double.parseDouble(elem.getAttribute("noisiness"));
+                }
+
                 for (Element child : XmlIterator.childElements(elem)) {
                     tmpl.getParameters().add(parseElement(child));
                 }
 
                 return tmpl;
             }
-        }
-
-        public static class InnerOuterTemplate extends BaseTemplate {
-            
         }
     }
 }

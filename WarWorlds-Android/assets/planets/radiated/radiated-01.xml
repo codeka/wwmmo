@@ -12,5 +12,20 @@
         <node n="1.0" colour="ff5600ff" />
       </colour>
   </texture>
+  <atmosphere>
+    <outer size="8" noisiness="0.7">
+      <colour>
+        <node n="0.0" colour="ffff00ff" />
+        <node n="0.8" colour="00ff00ff" />
+      </colour>
+      <perlin persistence="0.6" startOctave="3" endOctave="8" interpolation="linear" />
+    </outer>
+    <inner sunStartShadow="1" sunShadowFactor="0.3">
+      <colour>
+        <node n="0.0" colour="00ff00ff" />
+        <node n="0.6" colour="60ff00ff" />
+      </colour>
+    </inner>
+  </atmosphere>
 </planet>
 
