@@ -1,5 +1,7 @@
 package au.com.codeka.planetrender;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 /**
@@ -14,7 +16,7 @@ public class PlanetRenderer {
     private Vector3 mSunOrigin;
     private TextureGenerator mTexture;
     private Vector3 mNorth;
-    private Atmosphere mAtmosphere;
+    private List<Atmosphere> mAtmospheres;
 
     public PlanetRenderer(Template.PlanetTemplate tmpl, Random rand) {
         mPlanetOrigin = new Vector3(0.0, 0.0, 30.0);
@@ -23,9 +25,12 @@ public class PlanetRenderer {
         mAmbient = tmpl.getAmbient();
         mPlanetRadius = tmpl.getPlanetSize();
 
-        Template.AtmosphereTemplate atmosphereTemplate = tmpl.getParameter(Template.AtmosphereTemplate.class);
-        if (atmosphereTemplate != null) {
-            mAtmosphere = new Atmosphere(atmosphereTemplate, rand);
+        List<Template.AtmosphereTemplate> atmosphereTemplates = tmpl.getParameters(Template.AtmosphereTemplate.class);
+        if (atmosphereTemplates != null && atmosphereTemplates.size() > 0) {
+            mAtmospheres = new ArrayList<Atmosphere>();
+            for (Template.AtmosphereTemplate atmosphereTemplate : atmosphereTemplates) {
+                mAtmospheres.add(new Atmosphere(atmosphereTemplate, rand));
+            }
         }
 
         Vector3 northFrom = tmpl.getNorthFrom();
@@ -71,15 +76,18 @@ public class PlanetRenderer {
             c.setGreen(t.getGreen() * intensity);
             c.setBlue(t.getBlue() * intensity);
 
-            if (mAtmosphere != null) {
+            if (mAtmospheres != null) {
                 Vector3 surfaceNormal = Vector3.subtract(intersection, mPlanetOrigin).normalized();
                 Vector3 sunDirection = Vector3.subtract(mSunOrigin, intersection).normalized();
-                Colour atmosphereColour = mAtmosphere.getInnerPixelColour(x + 0.5, y + 0.5, intersection,
-                                                                          surfaceNormal,
-                                                                          sunDirection);
-                c = Colour.blend(c, atmosphereColour);
+                for (Atmosphere atmosphere : mAtmospheres) {
+                    Colour atmosphereColour = atmosphere.getInnerPixelColour(x + 0.5, y + 0.5,
+                                                                             intersection,
+                                                                             surfaceNormal,
+                                                                             sunDirection);
+                    c = Colour.blend(c, atmosphereColour);
+                }
             }
-        } else if (mAtmosphere != null) {
+        } else if (mAtmospheres != null) {
             // if we're rendering an atmosphere, we need to work out the distance of this ray
             // to the planet's surface
             double u = Vector3.dot(mPlanetOrigin, ray);
@@ -89,10 +97,12 @@ public class PlanetRenderer {
             Vector3 normal = Vector3.subtract(closest, mPlanetOrigin).normalized();
             Vector3 sunDirection = Vector3.subtract(mSunOrigin, closest).normalized();
 
-            Colour atmosphereColour = mAtmosphere.getOuterPixelColour(x + 0.5, y + 0.5, normal,
-                                                                      distance,
-                                                                      sunDirection);
-            c = Colour.blend(c, atmosphereColour);
+            for (Atmosphere atmosphere : mAtmospheres) {
+                Colour atmosphereColour = atmosphere.getOuterPixelColour(x + 0.5, y + 0.5, normal,
+                                                                         distance,
+                                                                         sunDirection);
+                c = Colour.blend(c, atmosphereColour);
+            }
         }
 
         return c;

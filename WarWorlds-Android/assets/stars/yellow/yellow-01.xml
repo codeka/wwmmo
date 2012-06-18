@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<planet ambient="0.6" size="6">
+  <texture generator="perlin-noise" scaleX="1.2" scaleY="0.6">
+    <colour>
+      <node n="0.0" colour="fffdfcf8" />
+      <node n="0.2" colour="fffa7300" />
+      <node n="0.4" colour="ffe75200" />
+      <node n="0.6" colour="ffffa13c" />
+      <node n="0.8" colour="fffdae51" />
+      <node n="1.0" colour="ffce2b02" />
+    </colour>
+    <perlin persistence="0.5" startOctave="7" endOctave="12" interpolation="cosine" />
+  </texture>
+  <atmosphere>
+    <outer size="6" noisiness="0.5">
+      <colour>
+        <node n="0.0" colour="fffd9c31" />
+        <node n="0.2" colour="fffd9c31" />
+        <node n="0.5" colour="66fd9c31" />
+        <node n="1.0" colour="00fd9c31" />
+      </colour>
+      <perlin persistence="0.5" startOctave="3" endOctave="8" interpolation="linear" />
+    </outer>
+    <inner>
+      <colour>
+        <node n="0.0" colour="33fd9c31" />
+        <node n="0.2" colour="66ad6a21" />
+        <node n="0.5" colour="a0fd9c31" />
+        <node n="1.0" colour="fffd9c31" />
+      </colour>
+    </inner>
+  </atmosphere>
+  <atmosphere>
+    <outer size="1">
+      <colour>
+        <node n="0.0" colour="fffd9c31" />
+        <node n="0.2" colour="fffd9c31" />
+        <node n="0.8" colour="33fd9c31" />
+        <node n="1.0" colour="00fd9c31" />
+      </colour>
+    </outer>
+  </atmosphere>
+</planet>
