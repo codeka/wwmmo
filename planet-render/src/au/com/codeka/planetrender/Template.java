@@ -376,7 +376,6 @@ public class Template {
 
         private double mPersistence;
         private Interpolation mInterpolation;
-        private boolean mSmooth;
         private int mStartOctave;
         private int mEndOctave;
 
@@ -385,9 +384,6 @@ public class Template {
         }
         public Interpolation getInterpolation() {
             return mInterpolation;
-        }
-        public boolean getSmooth() {
-            return mSmooth;
         }
         public int getStartOctave() {
             return mStartOctave;
@@ -422,11 +418,6 @@ public class Template {
                     tmpl.mEndOctave = 10;
                 } else {
                     tmpl.mEndOctave = Integer.parseInt(elem.getAttribute("endOctave"));
-                }
-
-                val = elem.getAttribute("smooth");
-                if (val != null) {
-                    tmpl.mSmooth = Boolean.parseBoolean(val);
                 }
 
                 return tmpl;

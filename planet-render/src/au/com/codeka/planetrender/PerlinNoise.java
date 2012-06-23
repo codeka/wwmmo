@@ -6,7 +6,6 @@ import java.util.Random;
  * This class generates perlin noise, which we can apply to various parts of the planet.
  */
 public class PerlinNoise {
-    private boolean mSmooth;
     private double mPersistence;
     private Interpolator mInterpolator;
     private long mRawSeed;
@@ -16,7 +15,6 @@ public class PerlinNoise {
 
     public PerlinNoise(Template.PerlinNoiseTemplate tmpl, Random rand) {
         mRawSeed = rand.nextLong();
-        mSmooth = tmpl.getSmooth();
         mPersistence = tmpl.getPersistence();
         mStartOctave = tmpl.getStartOctave();
         mEndOctave = tmpl.getEndOctave();
@@ -86,23 +84,6 @@ public class PerlinNoise {
         return (r * 2.0) - 1.0;
     }
 
-    private double smoothNoise(int x, int y, int octave) {
-        if (!mSmooth) {
-            return rawNoise(x, y, octave);
-        }
-
-        final double[] noiseMatrix = {
-                rawNoise(x - 1, y - 1, octave) / 16.0, rawNoise(x, y - 1, octave) / 8.0, rawNoise(x + 1, y - 1, octave) / 16.0,
-                rawNoise(x - 1, y, octave) / 8.0,      rawNoise(x, y, octave) / 4.0,     rawNoise(x + 1, y, octave) / 8.0,
-                rawNoise(x - 1, y + 1, octave) / 16.0, rawNoise(x, y + 1, octave) / 8.0, rawNoise(x + 1, y + 1, octave) / 16.0
-            };
-        double sum = 0.0;
-        for (double d : noiseMatrix) {
-            sum += d;
-        }
-        return sum;
-    }
-
     private double interpolatedNoise(double x, double y, int octave) {
         final int ix = (int) x;
         final double fx = x - (double) ix;
@@ -110,10 +91,10 @@ public class PerlinNoise {
         final int iy = (int) y;
         final double fy = y - (double) iy;
 
-        final double nx1y1 = smoothNoise(ix, iy, octave);
-        final double nx2y1 = smoothNoise(ix + 1, iy, octave);
-        final double nx1y2 = smoothNoise(ix, iy + 1, octave);
-        final double nx2y2 = smoothNoise(ix + 1, iy + 1, octave);
+        final double nx1y1 = rawNoise(ix, iy, octave);
+        final double nx2y1 = rawNoise(ix + 1, iy, octave);
+        final double nx1y2 = rawNoise(ix, iy + 1, octave);
+        final double nx2y2 = rawNoise(ix + 1, iy + 1, octave);
 
         final double ny1 = mInterpolator.interpolate(nx1y1, nx2y1, fx);
         final double ny2 = mInterpolator.interpolate(nx1y2, nx2y2, fx);
