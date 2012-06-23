@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<planet>
+<planet version="1">
   <texture generator="voronoi-map" scaleX="1.2">
       <voronoi>
         <point-cloud generator="poisson" density="0.2" randomness="0.8" />

@@ -14,6 +14,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.RadialGradient;
 import android.graphics.Paint.Style;
+import android.graphics.Rect;
 import android.os.Handler;
 import android.util.AttributeSet;
 import android.view.GestureDetector;
@@ -22,6 +23,7 @@ import au.com.codeka.Point2D;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.model.Colony;
 import au.com.codeka.warworlds.model.Planet;
+import au.com.codeka.warworlds.model.PlanetImageManager;
 import au.com.codeka.warworlds.model.Star;
 
 /**
@@ -43,6 +45,7 @@ public class SolarSystemSurfaceView extends UniverseElementSurfaceView {
     private StarfieldBackgroundRenderer mBackgroundRenderer;
     private boolean mPlanetSelectedFired;
     private Handler mHandler;
+    private PlanetBitmapGeneratedListener mBitmapGeneratedListener;
 
     public SolarSystemSurfaceView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -72,6 +75,9 @@ public class SolarSystemSurfaceView extends UniverseElementSurfaceView {
         mSelectedPlanetPaint.setStyle(Style.STROKE);
 
         mColonyIcon = BitmapFactory.decodeResource(getResources(), R.drawable.starfield_colony);
+
+        mBitmapGeneratedListener = new PlanetBitmapGeneratedListener();
+        PlanetImageManager.getInstance().addBitmapGenerateListener(mBitmapGeneratedListener);
     }
 
     public void setStar(Star star) {
@@ -110,6 +116,8 @@ public class SolarSystemSurfaceView extends UniverseElementSurfaceView {
 
         return null;
     }
+
+    
 
     private void placePlanets(Canvas canvas) {
         if (mPlanetsPlaced) {
@@ -183,6 +191,11 @@ public class SolarSystemSurfaceView extends UniverseElementSurfaceView {
         return new GestureListener();
     }
 
+    @Override
+    public void onDetachedFromWindow() {
+        PlanetImageManager.getInstance().removeBitmapGeneratedListener(mBitmapGeneratedListener);
+    }
+
     /**
      * Draws the actual starfield to the given \c Canvas. This will be called in
      * a background thread, so we can't do anything UI-specific, except drawing
@@ -230,14 +243,19 @@ public class SolarSystemSurfaceView extends UniverseElementSurfaceView {
                     mPlanetInfos[i].distanceFromSun, mPlanetPaint);
         }
 
+        PlanetImageManager pim = PlanetImageManager.getInstance();
+
         for (int i = 0; i < mPlanetInfos.length; i++) {
             final PlanetInfo planetInfo = mPlanetInfos[i];
-            Bitmap bm = planetInfo.planet.getBitmap(mContext.getAssets());
-
-            canvas.drawBitmap(bm,
-                    (float) planetInfo.centre.getX() - (bm.getWidth() / 2.0f),
-                    (float) planetInfo.centre.getY() - (bm.getHeight() / 2.0f),
-                    mPlanetPaint);
+            Bitmap bm = pim.getBitmap(mContext, planetInfo.planet);
+            if (bm != null) {
+                Rect src = new Rect(0, 0, bm.getWidth(), bm.getHeight());
+                Rect dest = new Rect((int)(planetInfo.centre.getX() - 40),
+                                     (int)(planetInfo.centre.getY() - 40),
+                                     (int)(planetInfo.centre.getX() + 40),
+                                     (int)(planetInfo.centre.getY() + 40));
+                canvas.drawBitmap(bm, src, dest, mPlanetPaint);
+            }
 
             List<Colony> colonies = mStar.getColonies();
             if (colonies != null && !colonies.isEmpty()) {
@@ -309,6 +327,16 @@ public class SolarSystemSurfaceView extends UniverseElementSurfaceView {
         public float distanceFromSun;
     }
 
+    /**
+     * Our implementation of \c PlanetImageManager.BitmapGeneratedListener just causes us to
+     * redraw the screen (with the new bitmap).
+     */
+    private class PlanetBitmapGeneratedListener implements PlanetImageManager.BitmapGeneratedListener {
+        @Override
+        public void onBitmapGenerated(Planet planet, Bitmap bmp) {
+            redraw();
+        }
+    }
 
     /**
      * This interface should be implemented when you want to listen for "planet selected"

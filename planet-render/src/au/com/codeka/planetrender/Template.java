@@ -18,9 +18,25 @@ import org.xml.sax.SAXException;
  */
 public class Template {
     private BaseTemplate mData;
+    private int mVersion;
+    private String mName;
 
     public BaseTemplate getTemplate() {
         return mData;
+    }
+
+    public int getTemplateVersion() {
+        return mVersion;
+    }
+
+    /*
+     * The name of the template is whatever you want it to be. We don't care...
+     */
+    public String getName() {
+        return mName;
+    }
+    public void setName(String name) {
+        mName = name;
     }
 
     /**
@@ -45,6 +61,12 @@ public class Template {
         }
 
         Template tmpl = new Template();
+        String version = xmldoc.getDocumentElement().getAttribute("version");
+        if (version != null && version.length() > 0) {
+            tmpl.mVersion = Integer.parseInt(version);
+        } else {
+            tmpl.mVersion = 1;
+        }
         tmpl.mData = parseElement(xmldoc.getDocumentElement());
         return tmpl;
     }

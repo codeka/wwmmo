@@ -3,6 +3,7 @@ package au.com.codeka.warworlds.game;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,6 +20,7 @@ import au.com.codeka.warworlds.model.Colony;
 import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.ModelManager;
 import au.com.codeka.warworlds.model.Planet;
+import au.com.codeka.warworlds.model.PlanetImageManager;
 import au.com.codeka.warworlds.model.SectorManager;
 import au.com.codeka.warworlds.model.Star;
 
@@ -177,9 +179,25 @@ public class StarfieldActivity extends Activity {
                 view = (ViewGroup) inflater.inflate(R.layout.starfield_planet, null);
             }
 
-            ImageView icon = (ImageView) view.findViewById(R.id.starfield_planet_icon);
-            Planet planet = mStar.getPlanets()[position];
-            icon.setImageBitmap(planet.getBitmap(mContext.getAssets()));
+            final ImageView icon = (ImageView) view.findViewById(R.id.starfield_planet_icon);
+            final Planet planet = mStar.getPlanets()[position];
+            final PlanetImageManager pim = PlanetImageManager.getInstance();
+
+            Bitmap bmp = pim.getBitmap(mContext, planet);
+            if (bmp != null) {
+                icon.setImageBitmap(bmp);
+            } else {
+                icon.setImageResource(R.drawable.planet_placeholder);
+
+                pim.addBitmapGenerateListener(new PlanetImageManager.BitmapGeneratedListener() {
+                    public void onBitmapGenerated(Planet bmpPlanet, Bitmap bmp) {
+                        if (bmpPlanet.getKey().equals(planet.getKey())) {
+                            icon.setImageBitmap(bmp);
+                            pim.removeBitmapGeneratedListener(this);
+                        }
+                    }
+                });
+            }
 
             TextView planetTypeTextView = (TextView) view.findViewById(R.id.starfield_planet_type);
             planetTypeTextView.setText(planet.getPlanetType().getDisplayName());

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<planet sun="100 100 -100">
+<planet version="1">
   <texture generator="perlin-noise" scaleX="2">
     <colour>
       <node n="0.0" colour="ff066b8d" />
