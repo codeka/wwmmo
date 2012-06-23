@@ -17,7 +17,7 @@
         <node n="0.0" colour="ffff0000" />
         <node n="0.8" colour="00ff0000" />
       </colour>
-      <perlin persistence="0.5" startOctave="3" endOctave="8" interpolation="linear" />
+      <perlin persistence="0.5" startOctave="3" endOctave="5" interpolation="linear" />
     </outer>
     <inner>
       <colour>

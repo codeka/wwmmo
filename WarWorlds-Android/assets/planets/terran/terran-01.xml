@@ -8,7 +8,7 @@
       <node n="0.5001" colour="ff21972c" />
       <node n="1.0" colour="ff08550b" />
     </colour>
-    <perlin persistence="0.5" startOctave="2" endOctave="5" interpolation="linear" />
+    <perlin persistence="0.5" startOctave="2" endOctave="4" interpolation="linear" />
   </texture>
   <atmosphere>
     <inner sunStartShadow="1.2" sunShadowFactor="0.8">

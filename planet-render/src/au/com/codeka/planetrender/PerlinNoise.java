@@ -12,6 +12,7 @@ public class PerlinNoise {
     private long mRawSeed;
     private int mStartOctave;
     private int mEndOctave;
+    private Random mRawRand;
 
     public PerlinNoise(Template.PerlinNoiseTemplate tmpl, Random rand) {
         mRawSeed = rand.nextLong();
@@ -19,6 +20,7 @@ public class PerlinNoise {
         mPersistence = tmpl.getPersistence();
         mStartOctave = tmpl.getStartOctave();
         mEndOctave = tmpl.getEndOctave();
+        mRawRand = new Random();
 
         if (tmpl.getInterpolation() == Template.PerlinNoiseTemplate.Interpolation.None) {
             mInterpolator = new NoneInterpolator();
@@ -77,7 +79,8 @@ public class PerlinNoise {
 
     private double rawNoise(int x, int y, int octave) {
         long seed = ((octave * 1000000L) + (x * 1000000000L) + (y * 100000000000L)) ^ mRawSeed;
-        double r = new Random(seed).nextDouble();
+        mRawRand.setSeed(seed);
+        double r = mRawRand.nextDouble();
 
         // we want the value to be between -1 and +1
         return (r * 2.0) - 1.0;
