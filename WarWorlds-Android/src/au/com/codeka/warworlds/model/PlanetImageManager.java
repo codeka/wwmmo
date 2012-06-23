@@ -25,6 +25,7 @@ import au.com.codeka.planetrender.Image;
 import au.com.codeka.planetrender.PlanetRenderer;
 import au.com.codeka.planetrender.Template;
 import au.com.codeka.planetrender.TemplateException;
+import au.com.codeka.planetrender.Vector3;
 
 /**
  * Manages images of planets, generates images on-the-fly and caches them as
@@ -44,9 +45,9 @@ public class PlanetImageManager {
     private Handler mHandler = new Handler();
     private List<BitmapGeneratedListener> mBitmapGeneratedListeners =
             new ArrayList<BitmapGeneratedListener>();
-
     private HashMap<String, SoftReference<Bitmap>> mLoadedBitmaps =
             new HashMap<String, SoftReference<Bitmap>>();
+    private double mPixelScale;
 
     /**
      * Gets the \c Bitmap for the given planet. If no planet image has been generated
@@ -73,6 +74,10 @@ public class PlanetImageManager {
         if (isInGenerateQueue(planet)) {
             // if we've already queued up this planet, just give up now
             return null;
+        }
+
+        if (mPixelScale == 0) {
+            mPixelScale = context.getResources().getDisplayMetrics().density;
         }
 
         long startTime = System.nanoTime();
@@ -210,6 +215,10 @@ public class PlanetImageManager {
                         }
                     }
                 });
+
+                // make it low priority -- UI must stay responsive!
+                mGenerateThread.setPriority(Thread.MIN_PRIORITY);
+
                 mGenerateThread.start();
             }
         }
@@ -263,16 +272,35 @@ public class PlanetImageManager {
      * @param outputPath
      */
     private void generateBitmap(Template tmpl, Planet planet, String outputPath) {
+        // we want to adjust the sun position so that shadows look correct when the planet is
+        // drawn on the SolarSystem page.
+        int numPlanets = planet.getStar().getNumPlanets();
+        float angle = (0.5f/(numPlanets + 1));
+        angle = (float) ((angle*planet.getIndex()*Math.PI) + angle*Math.PI);
+
+        Vector3 sunDirection = new Vector3(0.0, 1.0, -1.0);
+        sunDirection.rotateZ(angle);
+        sunDirection.scale(200.0);
+
+        Template.PlanetTemplate planetTemplate = (Template.PlanetTemplate) tmpl.getTemplate();
+        planetTemplate.setSunLocation(sunDirection);
+
+        // planet size ranges from 10 to 50, we convert that to 5..10 which is what we apply to
+        // the planet renderer itself
+        double size = ((planet.getSize() - 10.0) / 8.0) + 4.0;
+        planetTemplate.setPlanetSize(size);
+
         // TODO: better seed
         long seed = planet.getKey().hashCode();
         Random rand = new Random(seed);
 
         PlanetRenderer renderer = new PlanetRenderer((Template.PlanetTemplate) tmpl.getTemplate(), rand);
 
-        Image img = new Image(80, 80, Colour.TRANSPARENT);
+        int imgSize = (int)(100 * mPixelScale);
+        Image img = new Image(imgSize, imgSize, Colour.TRANSPARENT);
         renderer.render(img);
 
-        Bitmap bmp = Bitmap.createBitmap(img.getArgb(), 80, 80, Bitmap.Config.ARGB_8888);
+        Bitmap bmp = Bitmap.createBitmap(img.getArgb(), imgSize, imgSize, Bitmap.Config.ARGB_8888);
 
         File outputFile = new File(outputPath);
         File outputDirectory = new File(outputFile.getParent());

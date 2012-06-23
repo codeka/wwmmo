@@ -247,13 +247,15 @@ public class SolarSystemSurfaceView extends UniverseElementSurfaceView {
 
         for (int i = 0; i < mPlanetInfos.length; i++) {
             final PlanetInfo planetInfo = mPlanetInfos[i];
+
             Bitmap bm = pim.getBitmap(mContext, planetInfo.planet);
             if (bm != null) {
                 Rect src = new Rect(0, 0, bm.getWidth(), bm.getHeight());
-                Rect dest = new Rect((int)(planetInfo.centre.getX() - 40),
-                                     (int)(planetInfo.centre.getY() - 40),
-                                     (int)(planetInfo.centre.getX() + 40),
-                                     (int)(planetInfo.centre.getY() + 40));
+                double halfSize = 50.0 * getPixelScale();
+                Rect dest = new Rect((int)(planetInfo.centre.getX() - halfSize),
+                                     (int)(planetInfo.centre.getY() - halfSize),
+                                     (int)(planetInfo.centre.getX() + halfSize),
+                                     (int)(planetInfo.centre.getY() + halfSize));
                 canvas.drawBitmap(bm, src, dest, mPlanetPaint);
             }
 
