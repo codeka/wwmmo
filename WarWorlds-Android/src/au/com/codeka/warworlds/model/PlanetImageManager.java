@@ -297,10 +297,15 @@ public class PlanetImageManager {
         PlanetRenderer renderer = new PlanetRenderer((Template.PlanetTemplate) tmpl.getTemplate(), rand);
 
         int imgSize = (int)(100 * mPixelScale);
+
+        long startTime = System.nanoTime();
         Image img = new Image(imgSize, imgSize, Colour.TRANSPARENT);
         renderer.render(img);
-
         Bitmap bmp = Bitmap.createBitmap(img.getArgb(), imgSize, imgSize, Bitmap.Config.ARGB_8888);
+        long endTime = System.nanoTime();
+
+        log.debug(String.format("Rendered %dx%d image in %.4fms.",
+                imgSize, imgSize, (endTime - startTime) / 1000000.0));
 
         File outputFile = new File(outputPath);
         File outputDirectory = new File(outputFile.getParent());

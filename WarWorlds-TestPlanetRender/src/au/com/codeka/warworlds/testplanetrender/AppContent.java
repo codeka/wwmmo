@@ -76,7 +76,8 @@ public class AppContent extends JPanel {
         }
         long endTime = System.nanoTime();
 
-        String msg = String.format("%.4fms elapsed.", ((double) (endTime - startTime)) / 1000000.0);
+        String msg = String.format("%.4fms elapsed.",
+                ((double) (endTime - startTime)) / 1000000.0);
         mStatus.setText(msg);
 
         mContentPanel.setImage(img);
