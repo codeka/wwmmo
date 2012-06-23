@@ -4,9 +4,8 @@ package au.com.codeka.planetrender;
  * Helper class that represents a 3-dimensional vector.
  */
 public class Vector3 {
-
     public double x;
-    public double  y;
+    public double y;
     public double z;
 
     public Vector3() {

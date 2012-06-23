@@ -54,8 +54,8 @@ class ImagePanel extends JPanel {
         // fill the entire background gray
         Color bg = Color.LIGHT_GRAY;
         if (mBackgroundColour != null) {
-            bg = new Color((float) mBackgroundColour.getRed(), (float)  mBackgroundColour.getGreen(),
-                           (float) mBackgroundColour.getBlue(), (float) mBackgroundColour.getAlpha());
+            bg = new Color((float) mBackgroundColour.r, (float)  mBackgroundColour.g,
+                           (float) mBackgroundColour.b, (float) mBackgroundColour.a);
         }
         g.setColor(bg);
         g.fillRect(0, 0, width, height);

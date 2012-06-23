@@ -71,10 +71,7 @@ public class PlanetRenderer {
             Colour t = queryTexture(intersection);
 
             double intensity = lightSphere(intersection);
-            c.setAlpha(1.0);
-            c.setRed(t.getRed() * intensity);
-            c.setGreen(t.getGreen() * intensity);
-            c.setBlue(t.getBlue() * intensity);
+            c = new Colour(1.0, t.r * intensity, t.g * intensity, t.b * intensity);
 
             if (mAtmospheres != null) {
                 Vector3 surfaceNormal = Vector3.subtract(intersection, mPlanetOrigin).normalized();

@@ -13,12 +13,14 @@ public class Image {
         this(width, height, Colour.BLACK);
     }
     public Image(int width, int height, Colour fill) {
+        final int argb = fill.toArgb();
+
         mWidth = width;
         mHeight = height;
         mArgb = new int[width * height];
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
-                mArgb[y * width + x] = fill.argb;
+                mArgb[y * width + x] = argb;
             }
         }
     }
@@ -39,7 +41,7 @@ public class Image {
         if (y < 0 || y >= mHeight)
             return;
 
-        mArgb[y * mWidth + x] = c.argb;
+        mArgb[y * mWidth + x] = c.toArgb();
     }
 
     /**
