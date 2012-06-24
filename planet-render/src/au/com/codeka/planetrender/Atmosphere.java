@@ -58,13 +58,11 @@ public class Atmosphere {
 
         double dot = Vector3.dot(normal.normalized(), sunDirection.normalized());
         double sunFactor = getSunShadowFactor(dot, mOuterSunStartShadow, mOuterSunShadowFactor);
-        if (sunFactor < 1.0) {
-            baseColour.a *= sunFactor;
-        }
+        baseColour = new Colour(baseColour.a * sunFactor, baseColour.r, baseColour.g, baseColour.b);
 
         if (mOuterPerlin != null) {
             double noiseFactor = getNoiseFactor(u, v, mOuterPerlin, mOuterNoisiness);
-            baseColour.a *= noiseFactor;
+            baseColour = new Colour(baseColour.a * noiseFactor, baseColour.r, baseColour.g, baseColour.b);
         }
 
         return baseColour;
@@ -116,7 +114,7 @@ public class Atmosphere {
             } else {
                 dot = (dot - min) / (sunStartShadow - min);
             }
-            
+
             return dot;
         }
 

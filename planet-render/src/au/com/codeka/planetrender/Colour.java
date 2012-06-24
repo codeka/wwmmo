@@ -27,12 +27,12 @@ public class Colour {
     }
 
     public int toArgb() {
-        long a = (long)(255 * this.a);
-        int r = (int)(255 * this.r);
-        int g = (int)(255 * this.g);
-        int b = (int)(255 * this.b);
+        long la = (long)(255 * a);
+        long lr = (long)(255 * r);
+        long lg = (long)(255 * g);
+        long lb = (long)(255 * b);
 
-        return (int) (a << 24) | (r << 16) | (g << 8) | b;
+        return (int) ((la << 24) | (lr << 16) | (lg << 8) | lb);
     }
 
     public static double[] fromArgb(int argb) {
