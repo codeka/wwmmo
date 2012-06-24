@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <planet version="1">
   <texture generator="perlin-noise">
-      <perlin persistence="0.5" startOctave="7" endOctave="16" interpolation="cosine" />
+      <perlin persistence="0.5" startOctave="7" endOctave="9" interpolation="linear" />
       <colour>
         <node n="0.0" colour="ff006006" />
         <node n="0.3" colour="ff002960" />
@@ -14,7 +14,7 @@
         <node n="0.0" colour="ff24ff60" />
         <node n="0.8" colour="0024ff60" />
       </colour>
-      <perlin persistence="0.6" startOctave="3" endOctave="8" interpolation="linear" />
+      <perlin persistence="0.6" startOctave="3" endOctave="6" interpolation="linear" />
     </outer>
   </atmosphere>
 </planet>

@@ -55,13 +55,13 @@ public class PerlinNoise {
         double total = 0.0;
 
         for (int octave = 0; octave <= mEndOctave - mStartOctave; octave++) {
-            double freq = Math.pow(2, octave + mStartOctave) + 1;
-            double amplitude = Math.pow(mPersistence, octave);
+            final double freq = Math.pow(2, octave + mStartOctave) + 1;
+            final double amplitude = Math.pow(mPersistence, octave);
 
-            double x = (u * freq);
-            double y = (v * freq);
+            final double x = (u * freq);
+            final double y = (v * freq);
 
-            double n = interpolatedNoise(x, y, octave);
+            final double n = interpolatedNoise(x, y, octave);
             total += n * amplitude;
         }
 
@@ -76,7 +76,7 @@ public class PerlinNoise {
     }
 
     private double rawNoise(int x, int y, int octave) {
-        long seed = ((octave * 1000000L) + (x * 1000000000L) + (y * 100000000000L)) ^ mRawSeed;
+        final long seed = ((octave * 1000000L) + (x * 1000000000L) + (y * 100000000000L)) ^ mRawSeed;
         mRawRand.setSeed(seed);
         double r = mRawRand.nextDouble();
 

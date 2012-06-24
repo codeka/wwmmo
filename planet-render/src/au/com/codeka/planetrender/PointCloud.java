@@ -86,8 +86,8 @@ public class PointCloud {
     public static class PoissonGenerator extends Generator {
         @Override
         protected ArrayList<Vector2> generate(Template.PointCloudTemplate tmpl, Random rand) {
-            ArrayList<Vector2> points = new ArrayList<Vector2>();
-            ArrayList<Vector2> unprocessed = new ArrayList<Vector2>();
+            ArrayList<Vector2> points = new ArrayList<Vector2>(30); // give us some initial capacity
+            ArrayList<Vector2> unprocessed = new ArrayList<Vector2>(50); // give us some initial capacity
             unprocessed.add(new Vector2(rand.nextDouble(), rand.nextDouble()));
 
             // we want minDistance to be small when density is high and big when density
