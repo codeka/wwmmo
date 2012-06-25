@@ -1,8 +1,8 @@
 package au.com.codeka.planetrender;
 
-import java.util.HashSet;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
-import java.util.Set;
 
 public class TextureGenerator {
     private Generator mGenerator;
@@ -72,12 +72,14 @@ public class TextureGenerator {
             // find the closest neighbour
             Vector2 neighbour = null;
             double neighbourDistance2 = 1.0;
-            Set<Vector2> neighbours = mVoronoi.getNeighbours(pt);
+            List<Vector2> neighbours = mVoronoi.getNeighbours(pt);
             if (neighbours == null) {
-                neighbours = new HashSet<Vector2>();
+                neighbours = new ArrayList<Vector2>();
             }
 
-            for (Vector2 n : neighbours) {
+            int num = neighbours.size();
+            for (int i = 0; i < num; i++) {
+                Vector2 n = neighbours.get(i);
                 if (neighbour == null) {
                     neighbour = n;
                     neighbourDistance2 = uv.distanceTo2(n);

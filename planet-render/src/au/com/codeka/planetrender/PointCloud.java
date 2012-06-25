@@ -155,7 +155,9 @@ public class PointCloud {
          * @return
          */
         private boolean inNeighbourhood(List<Vector2> points, Vector2 point, double minDistance) {
-            for (Vector2 otherPoint : points) {
+            final int n = points.size();
+            for (int i = 0; i < n; i++) {
+                Vector2 otherPoint = points.get(i);
                 if (point.distanceTo(otherPoint) < minDistance) {
                     return true;
                 }

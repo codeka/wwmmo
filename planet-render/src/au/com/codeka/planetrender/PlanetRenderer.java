@@ -48,6 +48,7 @@ public class PlanetRenderer {
                 double ny = ((double) y / (double) img.getHeight()) - 0.5;
                 Colour c = getPixelColour(nx, ny);
                 img.setPixelColour(x, y, c);
+                Colour.pool.release(c);
             }
         }
     }
@@ -84,7 +85,9 @@ public class PlanetRenderer {
                 sunDirection.subtract(intersection);
                 sunDirection.normalize();
 
-                for (Atmosphere atmosphere : mAtmospheres) {
+                final int numAtmospheres = mAtmospheres.size();
+                for (int i = 0; i < numAtmospheres; i++) {
+                    final Atmosphere atmosphere = mAtmospheres.get(i);
                     Colour atmosphereColour = atmosphere.getInnerPixelColour(x + 0.5, y + 0.5,
                                                                              intersection,
                                                                              surfaceNormal,
@@ -113,7 +116,9 @@ public class PlanetRenderer {
             sunDirection.subtract(closest);
             sunDirection.normalize();
 
-            for (Atmosphere atmosphere : mAtmospheres) {
+            final int numAtmospheres = mAtmospheres.size();
+            for (int i = 0; i < numAtmospheres; i++) {
+                final Atmosphere atmosphere = mAtmospheres.get(i);
                 Colour atmosphereColour = atmosphere.getOuterPixelColour(x + 0.5, y + 0.5,
                                                                          surfaceNormal,
                                                                          distance,

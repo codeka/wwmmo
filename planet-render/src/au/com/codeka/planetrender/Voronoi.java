@@ -21,7 +21,7 @@ public class Voronoi {
     private HashMap<Vector2, List<Triangle>> mPointCloudToTriangles;
 
     // maps from points to a list of the neighbouring points
-    private HashMap<Vector2, Set<Vector2>> mPointNeighbours;
+    private HashMap<Vector2, List<Vector2>> mPointNeighbours;
 
     final static double EPSILON = 0.000000001;
 
@@ -53,7 +53,8 @@ public class Voronoi {
         List<Triangle> superTriangles = createSuperTriangles(points, triangles);
 
         // go through the vertices and add them...
-        for (int i = 0; i < points.size(); i++) {
+        final int size = points.size();
+        for (int i = 0; i < size; i++) {
             for (Triangle t : superTriangles) {
                 if (t.hasVertex(i)) {
                     continue;
@@ -67,9 +68,14 @@ public class Voronoi {
         // now go through the triangles and copy any that don't share a vertex with the super
         // triangles to the final array
         mTriangles = new ArrayList<Triangle>();
-        for (Triangle t : triangles) {
+        int numTriangles = triangles.size();
+        int numSuperTriangles = superTriangles.size();
+
+        for (int i = 0; i < numTriangles; i++) {
+            Triangle t = triangles.get(i);
             boolean sharesVertex = false;
-            for (Triangle st : superTriangles) {
+            for (int j = 0; j < numSuperTriangles; j++) {
+                Triangle st = superTriangles.get(j);
                 if (st.shareVertex(t)) {
                     sharesVertex = true;
                     break;
@@ -88,7 +94,9 @@ public class Voronoi {
 
         // next, go through the list of triangles and populate mPointCloudToTriangles
         mPointCloudToTriangles = new HashMap<Vector2, List<Triangle>>();
-        for (Triangle t : mTriangles) {
+        numTriangles = mTriangles.size();
+        for (int i = 0; i < numTriangles; i++) {
+            Triangle t = mTriangles.get(i);
             addTriangleToPointCloudToTrianglesMap(points.get(t.a), t);
             addTriangleToPointCloudToTrianglesMap(points.get(t.b), t);
             addTriangleToPointCloudToTrianglesMap(points.get(t.c), t);
@@ -96,17 +104,21 @@ public class Voronoi {
         sortPointCloudToTrianglesMap();
 
         // finally, go through the points again and work out all of that point's neighbours
-        mPointNeighbours = new HashMap<Vector2, Set<Vector2>>();
-        for (Vector2 pt : points) {
+        mPointNeighbours = new HashMap<Vector2, List<Vector2>>();
+        int numPoints = points.size();
+        for (int i = 0; i < numPoints; i++) {
+            Vector2 pt = points.get(i);
             triangles = mPointCloudToTriangles.get(pt);
             if (triangles != null) {
                 Set<Vector2> neighbours = new HashSet<Vector2>();
-                for (Triangle t : triangles) {
+                numTriangles = triangles.size();
+                for (int j = 0; j < numTriangles; j++) {
+                    Triangle t = triangles.get(j);
                     Edge edge = t.findOppositeEdge(pt);
                     neighbours.add(points.get(edge.a));
                     neighbours.add(points.get(edge.b));
                 }
-                mPointNeighbours.put(pt, neighbours);
+                mPointNeighbours.put(pt, new ArrayList<Vector2>(neighbours));
             }
         }
     }
@@ -118,7 +130,10 @@ public class Voronoi {
         Vector2 closestPoint = null;
         double closestDistance2 = 0.0;
 
-        for (Vector2 pt : mPointCloud.getPoints()) {
+        List<Vector2> points = mPointCloud.getPoints();
+        int numPoints = points.size();
+        for (int i = 0; i < numPoints; i++) {
+            Vector2 pt = points.get(i);
             if (closestPoint == null) {
                 closestPoint = pt;
                 closestDistance2 = pt.distanceTo2(uv);
@@ -137,7 +152,7 @@ public class Voronoi {
     /**
      * Gets the points that neighbour the given point.
      */
-    public Set<Vector2> getNeighbours(Vector2 pt) {
+    public List<Vector2> getNeighbours(Vector2 pt) {
         return mPointNeighbours.get(pt);
     }
 

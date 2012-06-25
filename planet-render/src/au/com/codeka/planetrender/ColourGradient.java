@@ -49,7 +49,8 @@ public class ColourGradient {
             return Colour.pool.borrow().reset(mNodes.get(0).colour);
         }
 
-        for (int i = 0; i < mNodes.size() - 1; i++) {
+        final int last = mNodes.size() - 1;
+        for (int i = 0; i < last; i++) {
             Node lhs = mNodes.get(i);
             Node rhs = mNodes.get(i + 1);
             if (rhs.n > n) {
