@@ -4,7 +4,7 @@ package au.com.codeka.planetrender;
  * Helper class that represents an ARGB colour.
  */
 public class Colour implements ObjectPool.Pooled {
-    public static ObjectPool<Colour> pool = new ObjectPool<Colour>(250, new ColourCreator());
+    public static ObjectPool<Colour> pool = new ObjectPool<Colour>(1000, new ColourCreator());
 
     public double a;
     public double r;

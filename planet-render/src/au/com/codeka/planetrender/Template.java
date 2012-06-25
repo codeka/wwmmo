@@ -100,9 +100,9 @@ public class Template {
         protected Vector3 parseVector3(String val) throws TemplateException {
             String[] parts = val.split(" ");
             if (parts.length == 3) {
-                return new Vector3(Double.parseDouble(parts[0]),
-                                    Double.parseDouble(parts[1]),
-                                    Double.parseDouble(parts[2]));
+                return Vector3.pool.borrow().reset(Double.parseDouble(parts[0]),
+                                                    Double.parseDouble(parts[1]),
+                                                    Double.parseDouble(parts[2]));
             } else {
                 throw new TemplateException("Invalid vector: "+val);
             }
@@ -178,13 +178,17 @@ public class Template {
             public BaseTemplate parse(Element elem) throws TemplateException {
                 PlanetTemplate tmpl = new PlanetTemplate();
 
-                tmpl.mNorthFrom = new Vector3(0.0, 1.0, 0.0);
-                tmpl.mNorthTo = new Vector3(0.0, 1.0, 0.0);
+                tmpl.mNorthFrom = Vector3.pool.borrow().reset(0.0, 1.0, 0.0);
+                tmpl.mNorthTo = Vector3.pool.borrow().reset(0.0, 1.0, 0.0);
                 if (elem.getAttribute("northFrom") != null && !elem.getAttribute("northFrom").equals("")) {
-                    tmpl.mNorthFrom = parseVector3(elem.getAttribute("northFrom"));
+                    Vector3 other = parseVector3(elem.getAttribute("northFrom"));
+                    tmpl.mNorthFrom.reset(other);
+                    Vector3.pool.release(other);
                 }
                 if (elem.getAttribute("northTo") != null && !elem.getAttribute("northTo").equals("")) {
-                    tmpl.mNorthTo = parseVector3(elem.getAttribute("northTo"));
+                    Vector3 other = parseVector3(elem.getAttribute("northTo"));
+                    tmpl.mNorthTo.reset(other);
+                    Vector3.pool.release(other);
                 }
 
                 tmpl.mPlanetSize = 10.0;
@@ -197,9 +201,11 @@ public class Template {
                     tmpl.mAmbient = Double.parseDouble(elem.getAttribute("ambient"));
                 }
 
-                tmpl.mSunLocation = new Vector3(100.0, 100.0, -150.0);
+                tmpl.mSunLocation = Vector3.pool.borrow().reset(100.0, 100.0, -150.0);
                 if (elem.getAttribute("sun") != null && !elem.getAttribute("sun").equals("")) {
-                    tmpl.mSunLocation = parseVector3(elem.getAttribute("sun"));
+                    Vector3 other = parseVector3(elem.getAttribute("sun"));
+                    tmpl.mSunLocation.reset(other);
+                    Vector3.pool.release(other);
                 }
 
                 for (Element child : XmlIterator.childElements(elem)) {

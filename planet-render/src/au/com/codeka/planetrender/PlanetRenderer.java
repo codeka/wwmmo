@@ -19,7 +19,7 @@ public class PlanetRenderer {
     private List<Atmosphere> mAtmospheres;
 
     public PlanetRenderer(Template.PlanetTemplate tmpl, Random rand) {
-        mPlanetOrigin = new Vector3(0.0, 0.0, 30.0);
+        mPlanetOrigin = Vector3.pool.borrow().reset(0.0, 0.0, 30.0);
         mTexture = new TextureGenerator(tmpl.getParameter(Template.TextureTemplate.class), rand);
         mSunOrigin = tmpl.getSunLocation();
         mAmbient = tmpl.getAmbient();
@@ -33,9 +33,8 @@ public class PlanetRenderer {
             }
         }
 
-        Vector3 northFrom = tmpl.getNorthFrom();
-        Vector3 northTo = tmpl.getNorthTo();
-        mNorth = Vector3.interpolate(northFrom, northTo, rand.nextDouble());
+        mNorth = Vector3.pool.borrow().reset(tmpl.getNorthFrom());
+        Vector3.interpolate(mNorth, tmpl.getNorthTo(), rand.nextDouble());
         mNorth.normalize();
     }
 
@@ -64,7 +63,7 @@ public class PlanetRenderer {
     private Colour getPixelColour(double x, double y) {
         Colour c = Colour.pool.borrow().reset(Colour.TRANSPARENT);
 
-        Vector3 ray = new Vector3(x, -y, 1.0);
+        Vector3 ray = Vector3.pool.borrow().reset(x, -y, 1.0);
         ray.normalize();
 
         Vector3 intersection = raytrace(ray);
@@ -77,9 +76,12 @@ public class PlanetRenderer {
             Colour.pool.release(t);
 
             if (mAtmospheres != null) {
-                Vector3 surfaceNormal = Vector3.subtract(intersection, mPlanetOrigin);
+                Vector3 surfaceNormal = Vector3.pool.borrow().reset(intersection);
+                surfaceNormal.subtract(mPlanetOrigin);
                 surfaceNormal.normalize();
-                Vector3 sunDirection = Vector3.subtract(mSunOrigin, intersection);
+
+                Vector3 sunDirection = Vector3.pool.borrow().reset(mSunOrigin);
+                sunDirection.subtract(intersection);
                 sunDirection.normalize();
 
                 for (Atmosphere atmosphere : mAtmospheres) {
@@ -90,29 +92,43 @@ public class PlanetRenderer {
                     Colour.blend(c, atmosphereColour);
                     Colour.pool.release(atmosphereColour);
                 }
+
+                Vector3.pool.release(surfaceNormal);
+                Vector3.pool.release(sunDirection);
             }
         } else if (mAtmospheres != null) {
             // if we're rendering an atmosphere, we need to work out the distance of this ray
             // to the planet's surface
             double u = Vector3.dot(mPlanetOrigin, ray);
-            Vector3 closest = Vector3.scale(ray, u);
-            double distance = (Vector3.subtract(closest, mPlanetOrigin).length() - mPlanetRadius);
+            Vector3 closest = Vector3.pool.borrow().reset(ray);
+            closest.scale(u);
 
-            Vector3 normal = Vector3.subtract(closest, mPlanetOrigin);
-            normal.normalize();
-            Vector3 sunDirection = Vector3.subtract(mSunOrigin, closest);
+            double distance = (Vector3.distanceBetween(closest, mPlanetOrigin) - mPlanetRadius);
+
+            Vector3 surfaceNormal = Vector3.pool.borrow().reset(closest);
+            surfaceNormal.subtract(mPlanetOrigin);
+            surfaceNormal.normalize();
+
+            Vector3 sunDirection = Vector3.pool.borrow().reset(mSunOrigin);
+            sunDirection.subtract(closest);
             sunDirection.normalize();
 
             for (Atmosphere atmosphere : mAtmospheres) {
-                Colour atmosphereColour = atmosphere.getOuterPixelColour(x + 0.5, y + 0.5, normal,
+                Colour atmosphereColour = atmosphere.getOuterPixelColour(x + 0.5, y + 0.5,
+                                                                         surfaceNormal,
                                                                          distance,
                                                                          sunDirection);
-                //c.reset(atmosphereColour);
                 Colour.blend(c, atmosphereColour);
                 Colour.pool.release(atmosphereColour);
             }
+
+            Vector3.pool.release(closest);
+            Vector3.pool.release(surfaceNormal);
+            Vector3.pool.release(sunDirection);
         }
 
+        Vector3.pool.release(ray);
+        Vector3.pool.release(intersection);
         return c;
     }
 
@@ -120,11 +136,10 @@ public class PlanetRenderer {
      * Query the texture for the colour at the given intersection (in 3D space).
      */
     private Colour queryTexture(Vector3 intersection) {
-        intersection = Vector3.subtract(intersection, mPlanetOrigin);
-
         Vector3 Vn = mNorth;
-        Vector3 Ve = Vector3.cross(Vn, new Vector3(0.0, 0.0, 1.0));
-        Vector3 Vp = intersection;
+        Vector3 Ve = Vector3.pool.borrow().reset(Vn.y, -Vn.x, 0.0); // (AKA Vn.cross(0, 0, 1))
+        Vector3 Vp = Vector3.pool.borrow().reset(intersection);
+        Vp.subtract(mPlanetOrigin);
 
         Ve.normalize();
         Vp.normalize();
@@ -134,11 +149,17 @@ public class PlanetRenderer {
 
         double theta = (Math.acos(Vector3.dot(Vp, Ve) / Math.sin(phi))) / (Math.PI * 2.0);
         double u;
+
+        Vector3 c = Vector3.cross(Vn, Ve);
         if (Vector3.dot(Vector3.cross(Vn,  Ve), Vp) > 0) {
             u = theta;
         } else {
             u = 1.0 - theta;
         }
+
+        Vector3.pool.release(c);
+        Vector3.pool.release(Ve);
+        Vector3.pool.release(Vp);
 
         return mTexture.getTexel(u, v);
     }
@@ -149,11 +170,15 @@ public class PlanetRenderer {
      * @param intersection Point where the ray we're currently tracing intersects with the planet.
      */
     private double lightSphere(Vector3 intersection) {
-        Vector3 surfaceNormal = Vector3.subtract(intersection, mPlanetOrigin);
+        Vector3 surfaceNormal = Vector3.pool.borrow().reset(intersection);
+        surfaceNormal.subtract(mPlanetOrigin);
         surfaceNormal.normalize();
 
         double intensity = diffuse(surfaceNormal, intersection);
-        return Math.max(mAmbient, Math.min(1.0, intensity));
+        intensity = Math.max(mAmbient, Math.min(1.0, intensity));
+
+        Vector3.pool.release(surfaceNormal);
+        return intensity;
     }
 
     /**
@@ -164,10 +189,13 @@ public class PlanetRenderer {
      * @return The diffuse factor of lighting.
      */
     private double diffuse(Vector3 normal, Vector3 point) {
-        Vector3 directionToLight = Vector3.subtract(mSunOrigin, point);
+        Vector3 directionToLight = Vector3.pool.borrow().reset(mSunOrigin);
+        directionToLight.subtract(point);
         directionToLight.normalize();
 
-        return Vector3.dot(normal, directionToLight);
+        double factor =Vector3.dot(normal, directionToLight);
+        Vector3.pool.release(directionToLight);
+        return factor;
     }
 
     /**
@@ -178,17 +206,21 @@ public class PlanetRenderer {
      * or \c null if there's no intersection.
      */
     private Vector3 raytrace(Vector3 direction) {
-        // intsection of a sphere and a line
+        // intersection of a sphere and a line
         final double a = Vector3.dot(direction, direction);
-        final double b = 2.0 * Vector3.dot(direction, Vector3.scale(mPlanetOrigin, -1.0));
+        Vector3 blah = Vector3.pool.borrow().reset(mPlanetOrigin);
+        blah.scale(-1);
+        final double b = 2.0 * Vector3.dot(direction, blah);
+        Vector3.pool.release(blah);
         final double c = Vector3.dot(mPlanetOrigin, mPlanetOrigin) - (mPlanetRadius * mPlanetRadius);
         final double d = (b * b) - (4.0 * a * c);
 
         if (d > 0.0) {
             double sign = (c < -0.00001) ? 1.0 : -1.0;
             double distance = (-b + (sign * Math.sqrt(d))) / (2.0 * a);
-            direction.scale(distance);
-            return direction;
+            Vector3 intersection = Vector3.pool.borrow().reset(direction);
+            intersection.scale(distance);
+            return  intersection;
         } else {
             return null;
         }

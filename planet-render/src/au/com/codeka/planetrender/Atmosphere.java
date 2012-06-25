@@ -73,10 +73,11 @@ public class Atmosphere {
             return Colour.pool.borrow().reset(Colour.TRANSPARENT);
         }
 
-        Vector3 cameraDirection = Vector3.subtract(new Vector3(0, 0, 0), pt);
+        Vector3 cameraDirection = Vector3.pool.borrow().reset(0, 0, 0);
+        cameraDirection.subtract(pt);
         cameraDirection.normalize();
-
         double dot = Vector3.dot(cameraDirection, normal);
+        Vector3.pool.release(cameraDirection);
 
         Colour baseColour = mInnerColourGradient.getColour(1.0 - dot);
 

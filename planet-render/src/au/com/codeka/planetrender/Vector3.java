@@ -1,24 +1,48 @@
 package au.com.codeka.planetrender;
 
+import au.com.codeka.planetrender.ObjectPool.Pooled;
+
 /**
  * Helper class that represents a 3-dimensional vector.
  */
-public class Vector3 {
+public class Vector3 implements ObjectPool.Pooled {
+    public static ObjectPool<Vector3> pool = new ObjectPool<Vector3>(250, new Vector3Creator());
+
     public double x;
     public double y;
     public double z;
 
-    public Vector3() {
-        x = y = z = 0.0;
+    private Vector3() {
     }
-    public Vector3(double x, double y, double z) {
+
+    @Override
+    public void reset() {
+    }
+
+    public Vector3 reset(double x, double y, double z) {
         this.x = x;
         this.y = y;
         this.z = z;
+        return this;
+    }
+
+    public Vector3 reset(Vector3 other) {
+        this.x = other.x;
+        this.y = other.y;
+        this.z = other.z;
+        return this;
     }
 
     public double length() {
         return Math.sqrt((x*x) + (y*y) + (z*z));
+    }
+
+    public static double distanceBetween(Vector3 lhs, Vector3 rhs) {
+        final double dx = rhs.x - lhs.x;
+        final double dy = rhs.y - lhs.y;
+        final double dz = rhs.z - lhs.z;
+
+        return Math.sqrt((dx*dx) + (dy*dy) + (dz*dz));
     }
 
     public void normalize() {
@@ -51,16 +75,16 @@ public class Vector3 {
         z *= s;
     }
 
-    public static Vector3 subtract(Vector3 a, Vector3 b) {
-        return new Vector3(a.x - b.x, a.y - b.y, a.z - b.z);
+    public void subtract(Vector3 rhs) {
+        x -= rhs.x;
+        y -= rhs.y;
+        z -= rhs.z;
     }
 
-    public static Vector3 add(Vector3 a, Vector3 b) {
-        return new Vector3(a.x + b.x, a.y + b.y, a.z + b.z);
-    }
-
-    public static Vector3 scale(Vector3 v, double n) {
-        return new Vector3(v.x * n, v.y * n, v.z * n);
+    public void add(Vector3 rhs) {
+        x += rhs.x;
+        y += rhs.y;
+        z += rhs.z;
     }
 
     public static double dot(Vector3 a, Vector3 b) {
@@ -68,16 +92,22 @@ public class Vector3 {
     }
 
     public static Vector3 cross(Vector3 a, Vector3 b) {
-        return new Vector3((a.y * b.z) - (a.z * b.y),
+        return Vector3.pool.borrow().reset(
+                            (a.y * b.z) - (a.z * b.y),
                             (a.z * b.x) - (a.x * b.z),
                             (a.x * b.y) - (a.y * b.x));
     }
 
-    public static Vector3 interpolate(Vector3 a, Vector3 b, double n) {
-        return new Vector3(
-                a.x + (n * (b.x - a.x)),
-                a.y + (n * (b.y - a.y)),
-                a.z + (n * (b.z - a.z))
-            );
+    public static void interpolate(Vector3 result, Vector3 rhs, double n) {
+        result.x += (n * (rhs.x - result.x));
+        result.y += (n * (rhs.y - result.y));
+        result.z += (n * (rhs.z - result.z));
+    }
+
+    static class Vector3Creator implements ObjectPool.PooledCreator {
+        @Override
+        public Pooled create() {
+            return new Vector3();
+        }
     }
 }

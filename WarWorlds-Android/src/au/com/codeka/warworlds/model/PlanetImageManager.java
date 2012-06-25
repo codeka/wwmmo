@@ -278,7 +278,7 @@ public class PlanetImageManager {
         float angle = (0.5f/(numPlanets + 1));
         angle = (float) ((angle*planet.getIndex()*Math.PI) + angle*Math.PI);
 
-        Vector3 sunDirection = new Vector3(0.0, 1.0, -1.0);
+        Vector3 sunDirection = Vector3.pool.borrow().reset(0.0, 1.0, -1.0);
         sunDirection.rotateZ(angle);
         sunDirection.scale(200.0);
 
@@ -304,6 +304,7 @@ public class PlanetImageManager {
         Bitmap bmp = Bitmap.createBitmap(img.getArgb(), imgSize, imgSize, Bitmap.Config.ARGB_8888);
         long endTime = System.nanoTime();
 
+        Vector3.pool.release(sunDirection);
         log.debug(String.format("Rendered %dx%d image in %.4fms.",
                 imgSize, imgSize, (endTime - startTime) / 1000000.0));
 
