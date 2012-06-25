@@ -66,7 +66,7 @@ public class TextureGenerator {
         }
 
         public Colour getTexel(double u, double v) {
-            final Vector2 uv = new Vector2(u, v);
+            final Vector2 uv = Vector2.pool.borrow().reset(u, v);
             final Vector2 pt = mVoronoi.findClosestPoint(uv);
 
             // find the closest neighbour
@@ -100,6 +100,7 @@ public class TextureGenerator {
                 normalizedDistance += (mNoisiness / 2.0) - (noise * mNoisiness);
             }
 
+            Vector2.pool.release(uv);
             return mColourGradient.getColour(normalizedDistance);
         }
     }

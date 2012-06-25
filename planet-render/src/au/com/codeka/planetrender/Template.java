@@ -359,7 +359,7 @@ public class Template {
                 for (Element child : XmlIterator.childElements(elem, "node")) {
                     double n = Double.parseDouble(child.getAttribute("n"));
                     int argb = (int) Long.parseLong(child.getAttribute("colour"), 16);
-                    tmpl.mColourGradient.addNode(n, new Colour(argb));
+                    tmpl.mColourGradient.addNode(n, Colour.pool.borrow().reset(argb));
                 }
 
                 return tmpl;

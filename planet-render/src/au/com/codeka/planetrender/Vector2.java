@@ -1,18 +1,28 @@
 package au.com.codeka.planetrender;
 
+import au.com.codeka.planetrender.ObjectPool.Pooled;
+
 /**
  * Represents a 2-dimensional vector.
  */
-class Vector2 {
+class Vector2 implements ObjectPool.Pooled {
+    public static ObjectPool<Vector2> pool = new ObjectPool<Vector2>(250, new Vector2Creator());
+
     public double x;
     public double y;
 
-    public Vector2() {
+    private Vector2() {
         x = y = 0.0;
     }
-    public Vector2(double x, double y) {
+
+    @Override
+    public void reset() {
+    }
+
+    public Vector2 reset(double x, double y) {
         this.x = x;
         this.y = y;
+        return this;
     }
 
     /**
@@ -27,7 +37,21 @@ class Vector2 {
     }
 
     public double distanceTo(Vector2 other) {
-        return Math.sqrt(distanceTo2(other));
+        final double dx = other.x - x;
+        final double dy = other.y - y;
+        return Math.sqrt(dx*dx + dy*dy);
+    }
+
+    public double distanceTo2(double x, double y) {
+        final double dx = x - this.x;
+        final double dy = y - this.y;
+        return dx*dx + dy*dy;
+    }
+
+    public double distanceTo(double x, double y) {
+        final double dx = x - this.x;
+        final double dy = y - this.y;
+        return Math.sqrt(dx*dx + dy*dy);
     }
 
     public double length2() {
@@ -56,5 +80,12 @@ class Vector2 {
     public boolean equals(Vector2 other, double epsilon) {
         return Math.abs(other.x - x) < epsilon &&
                 Math.abs(other.y - y) < epsilon;
+    }
+
+    static class Vector2Creator implements ObjectPool.PooledCreator {
+        @Override
+        public Pooled create() {
+            return new Vector2();
+        }
     }
 }

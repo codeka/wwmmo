@@ -50,19 +50,19 @@ public class Atmosphere {
 
     public Colour getOuterPixelColour(double u, double v, Vector3 normal, double distanceToSurface, Vector3 sunDirection) {
         if (mOuterColourGradient == null) {
-            return Colour.TRANSPARENT;
+            return Colour.pool.borrow().reset(Colour.TRANSPARENT);
         }
 
         distanceToSurface /= mOuterAtmosphereSize;
         Colour baseColour = mOuterColourGradient.getColour(distanceToSurface);
 
-        double dot = Vector3.dot(normal.normalized(), sunDirection.normalized());
+        double dot = Vector3.dot(normal, sunDirection);
         double sunFactor = getSunShadowFactor(dot, mOuterSunStartShadow, mOuterSunShadowFactor);
-        baseColour = new Colour(baseColour.a * sunFactor, baseColour.r, baseColour.g, baseColour.b);
+        baseColour.reset(baseColour.a * sunFactor, baseColour.r, baseColour.g, baseColour.b);
 
         if (mOuterPerlin != null) {
             double noiseFactor = getNoiseFactor(u, v, mOuterPerlin, mOuterNoisiness);
-            baseColour = new Colour(baseColour.a * noiseFactor, baseColour.r, baseColour.g, baseColour.b);
+            baseColour.reset(baseColour.a * noiseFactor, baseColour.r, baseColour.g, baseColour.b);
         }
 
         return baseColour;
@@ -70,24 +70,24 @@ public class Atmosphere {
 
     public Colour getInnerPixelColour(double u, double v, Vector3 pt, Vector3 normal, Vector3 sunDirection) {
         if (mInnerColourGradient == null) {
-            return Colour.TRANSPARENT;
+            return Colour.pool.borrow().reset(Colour.TRANSPARENT);
         }
 
-        Vector3 cameraDirection = Vector3.subtract(new Vector3(0, 0, 0), pt).normalized();
+        Vector3 cameraDirection = Vector3.subtract(new Vector3(0, 0, 0), pt);
+        cameraDirection.normalize();
+
         double dot = Vector3.dot(cameraDirection, normal);
 
         Colour baseColour = mInnerColourGradient.getColour(1.0 - dot);
 
         // if we've on the dark side of the planet, we'll want to factor in the shadow
-        dot = Vector3.dot(normal.normalized(), sunDirection.normalized());
+        dot = Vector3.dot(normal, sunDirection);
         double sunFactor = getSunShadowFactor(dot, mInnerSunStartShadow, mInnerSunShadowFactor);
-        if (sunFactor < 1.0) {
-            baseColour.a *= sunFactor;
-        }
+        baseColour.reset(baseColour.a * sunFactor, baseColour.r, baseColour.g, baseColour.b);
 
         if (mInnerPerlin != null) {
             double noiseFactor = getNoiseFactor(u, v, mInnerPerlin, mInnerNoisiness);
-            baseColour.a *= noiseFactor;
+            baseColour.reset(baseColour.a * noiseFactor, baseColour.r, baseColour.g, baseColour.b);
         }
 
         return baseColour;

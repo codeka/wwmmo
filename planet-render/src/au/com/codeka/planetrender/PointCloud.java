@@ -70,10 +70,9 @@ public class PointCloud {
                 numPoints = 25;
             }
 
-            ArrayList<Vector2> points = new ArrayList<Vector2>();
+            ArrayList<Vector2> points = new ArrayList<Vector2>(numPoints);
             for (int i = 0; i < numPoints; i++) {
-                Vector2 p = new Vector2(rand.nextDouble(), rand.nextDouble());
-                points.add(p);
+                points.add(Vector2.pool.borrow().reset(rand.nextDouble(), rand.nextDouble()));
             }
             return points;
         }
@@ -88,7 +87,7 @@ public class PointCloud {
         protected ArrayList<Vector2> generate(Template.PointCloudTemplate tmpl, Random rand) {
             ArrayList<Vector2> points = new ArrayList<Vector2>(30); // give us some initial capacity
             ArrayList<Vector2> unprocessed = new ArrayList<Vector2>(50); // give us some initial capacity
-            unprocessed.add(new Vector2(rand.nextDouble(), rand.nextDouble()));
+            unprocessed.add(Vector2.pool.borrow().reset(rand.nextDouble(), rand.nextDouble()));
 
             // we want minDistance to be small when density is high and big when density
             // is small.
@@ -107,6 +106,7 @@ public class PointCloud {
 
                 // if there's another point too close to this one, ignore it
                 if (inNeighbourhood(points, point, minDistance)) {
+                    Vector2.pool.release(point);
                     continue;
                 }
 
@@ -117,9 +117,11 @@ public class PointCloud {
                 for (int i = 0; i < packing; i++) {
                     Vector2 newPoint = generatePointAround(rand, point, minDistance);
                     if (newPoint.x < 0.0 || newPoint.x > 1.0) {
+                        Vector2.pool.release(newPoint);
                         continue;
                     }
                     if (newPoint.y < 0.0 || newPoint.y > 1.0) {
+                        Vector2.pool.release(newPoint);
                         continue;
                     }
 
@@ -137,8 +139,10 @@ public class PointCloud {
             double radius = minDistance * (1.0 + rand.nextDouble());
             double angle = 2.0 * Math.PI * rand.nextDouble();
 
-            return new Vector2(point.x + radius * Math.cos(angle),
-                                point.y + radius * Math.sin(angle));
+            Vector2 pt = Vector2.pool.borrow();
+            pt.x = point.x + radius * Math.cos(angle);
+            pt.y = point.y + radius * Math.sin(angle);
+            return pt;
         }
 
         /**

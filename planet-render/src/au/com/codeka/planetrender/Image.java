@@ -48,16 +48,17 @@ public class Image {
      * Draws a circle at the given (x,y) coordinates with the given radius and colour.
      */
     public void drawCircle(int cx, int cy, double radius, Colour c) {
-        Vector2 centre = new Vector2(cx, cy);
+        Vector2 centre = Vector2.pool.borrow();
+        centre.x = cx; centre.y = cx;
         for (int y = (int)(cy - radius); y <= (int)(cy + radius); y++) {
             for (int x = (int)(cx - radius); x <= (int)(cx + radius); x++) {
-                Vector2 p = new Vector2(x, y);
-                double distance = p.distanceTo(centre); 
+                double distance = centre.distanceTo(x, y); 
                 if (distance < radius) {
                     setPixelColour(x, y, c);
                 }
             }
         }
+        Vector2.pool.release(centre);
     }
 
     /**

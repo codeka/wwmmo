@@ -41,8 +41,9 @@ public class PerlinNoise {
                 double v = (double) y / (double) img.getHeight();
 
                 double noise = getNoise(u, v);
-                Colour c = new Colour(1.0, noise, noise, noise);
+                Colour c = Colour.pool.borrow().reset(1.0, noise, noise, noise);
                 img.setPixelColour(x, y, c);
+                Colour.pool.release(c);
             }
         }
     }

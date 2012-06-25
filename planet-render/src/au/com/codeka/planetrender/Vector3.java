@@ -25,10 +25,6 @@ public class Vector3 {
         double s = 1.0 / length();
         scale(s);
     }
-    public Vector3 normalized() {
-        double s = 1.0 / length();
-        return scaled(s);
-    }
 
     public void rotateX(double radians) {
         double y1 = y * Math.cos(radians) - z * Math.sin(radians);
@@ -53,9 +49,6 @@ public class Vector3 {
         x *= s;
         y *= s;
         z *= s;
-    }
-    public Vector3 scaled(double s) {
-        return new Vector3(x * s, y * s, z * s);
     }
 
     public static Vector3 subtract(Vector3 a, Vector3 b) {

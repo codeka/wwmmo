@@ -307,10 +307,10 @@ public class Voronoi {
      *   a vertex with these will need to be removed as well.
      */
     private List<Triangle> createSuperTriangles(List<Vector2> points, List<Triangle> triangles) {
-        points.add(new Vector2(-0.1, -0.1));
-        points.add(new Vector2(-0.1, 1.1));
-        points.add(new Vector2(1.1, 1.1));
-        points.add(new Vector2(1.1, -0.1));
+        points.add(Vector2.pool.borrow().reset(-0.1, -0.1));
+        points.add(Vector2.pool.borrow().reset(-0.1, 1.1));
+        points.add(Vector2.pool.borrow().reset(1.1, 1.1));
+        points.add(Vector2.pool.borrow().reset(1.1, -0.1));
 
         ArrayList<Triangle> superTriangles = new ArrayList<Triangle>();
         superTriangles.add(new Triangle(points, points.size() - 4, points.size() - 3, points.size() - 2));
@@ -502,7 +502,7 @@ public class Voronoi {
                 yc = m1 * (xc - mx1) + my1;
             }
 
-            centre = new Vector2(xc, yc);
+            centre = Vector2.pool.borrow().reset(xc, yc);
             radius = centre.distanceTo(v2);
         }
 

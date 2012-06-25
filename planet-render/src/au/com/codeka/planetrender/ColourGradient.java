@@ -41,12 +41,12 @@ public class ColourGradient {
      */
     public Colour getColour(double n) {
         if (mNodes.size() == 0) {
-            return Colour.TRANSPARENT;
+            return Colour.pool.borrow().reset(Colour.TRANSPARENT);
         }
 
         // if the value they gave us is less that our first node, return it's colour.
         if (mNodes.get(0).n > n) {
-            return mNodes.get(0).colour;
+            return Colour.pool.borrow().reset(mNodes.get(0).colour);
         }
 
         for (int i = 0; i < mNodes.size() - 1; i++) {
@@ -55,13 +55,15 @@ public class ColourGradient {
             if (rhs.n > n) {
                 double factor = (n - lhs.n) / (rhs.n - lhs.n);
 
-                return Colour.interpolate(lhs.colour, rhs.colour, factor);
+                Colour c = Colour.pool.borrow().reset(lhs.colour);
+                Colour.interpolate(c, rhs.colour, factor);
+                return c;
             }
         }
 
         // if we get here, it's because the n they gave us is bigger than all
         // nodes we've got
-        return mNodes.get(mNodes.size() - 1).colour;
+        return Colour.pool.borrow().reset(mNodes.get(mNodes.size() - 1).colour);
     }
 
     /**
