@@ -156,7 +156,7 @@ public class PlanetRenderer {
         double u;
 
         Vector3 c = Vector3.cross(Vn, Ve);
-        if (Vector3.dot(Vector3.cross(Vn,  Ve), Vp) > 0) {
+        if (Vector3.dot(c, Vp) > 0) {
             u = theta;
         } else {
             u = 1.0 - theta;

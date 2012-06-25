@@ -63,8 +63,10 @@ class Vector2 implements ObjectPool.Pooled {
 
     @Override
     public int hashCode() {
-        //?? not very efficient!!
-        return (new Double(x).hashCode() ^ new Double(y).hashCode());
+        // this avoids the boxing that "new Double(x).hashCode()" would require
+        long lx = Double.doubleToRawLongBits(x);
+        long ly = Double.doubleToRawLongBits(y);
+        return (int) (lx ^ ly);
     }
 
     @Override
