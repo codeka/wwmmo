@@ -1,4 +1,4 @@
-package au.com.codeka.warworlds.testplanetrender;
+package au.com.codeka.planetrendertest;
 
 import java.awt.Color;
 import java.awt.Graphics;
