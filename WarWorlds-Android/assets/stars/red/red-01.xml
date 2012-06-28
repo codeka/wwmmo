@@ -14,24 +14,16 @@
   <atmosphere>
     <outer size="6" noisiness="0.4">
       <colour>
-        <node n="0.0" colour="ffffff00" />
-        <node n="1.0" colour="00ffff00" />
+        <node n="0.0" colour="ffff0000" />
+        <node n="0.8" colour="00ff0000" />
       </colour>
       <perlin persistence="0.5" startOctave="3" endOctave="6" interpolation="linear" />
     </outer>
     <inner>
       <colour>
-        <node n="0.0" colour="00ffff00" />
-        <node n="0.5" colour="ccffff00" />
+        <node n="0.0" colour="00ff0000" />
+        <node n="0.5" colour="a0ff0000" />
       </colour>
     </inner>
-  </atmosphere>
-  <atmosphere>
-    <outer size="2">
-      <colour>
-        <node n="0.0" colour="66ffff00" />
-        <node n="1.0" colour="00ffff00" />
-      </colour>
-    </outer>
   </atmosphere>
 </planet>
