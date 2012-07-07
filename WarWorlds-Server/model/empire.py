@@ -184,8 +184,8 @@ class Fleet(db.Model):
   targetColony = db.ReferenceProperty(Colony)
 
   @staticmethod
-  def getForStar(star):
-    query = Fleet.all().filter("star", star)
+  def getForStar(star_model):
+    query = Fleet.all().filter("star", star_model)
     return Fleet._getForQuery(query)
 
   @staticmethod

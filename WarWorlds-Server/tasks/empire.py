@@ -10,6 +10,7 @@ import webapp2 as webapp
 
 import ctrl
 from ctrl import empire as ctl
+from ctrl import sector as sector_ctl
 from model import empire as mdl
 from model import c2dm
 import protobufs.warworlds_pb2 as pb
@@ -94,15 +95,17 @@ class BuildCheckPage(tasks.TaskPage):
           model.put()
         design = ctl.ShipDesign.getDesign(model.designName)
 
+      # Figure out the name of the star the object was built on, for the notification
+      star_pb = sector_ctl.getStar(star_key)
+
       # Send a notification to the player that construction of their building is complete
-      msg = "Your %s has been built." % (design.name)
+      msg = "Your %s on %s has been built." % (design.name, star_pb.name)
       logging.debug("Sending message to user [%s] indicating build complete." % (
           model.empire.user.email()))
       s = c2dm.Sender()
       devices = ctrl.getDevicesForUser(model.empire.user.email())
       for device in devices.registrations:
         s.sendMessage(device.device_registration_id, {"msg": msg})
-      return None
 
       # clear the cached items that reference this building/fleet
       keys_to_clear.append("star:%s" % (star_key))

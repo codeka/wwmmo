@@ -10,55 +10,83 @@
         android:layout_weight="1.0"
         android:layout_height="wrap_content" />
 
-    <android.support.v7.widget.GridLayout xmlns:grid="http://schemas.android.com/apk/res-auto"
+    <LinearLayout
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_weight="1.0"
-        grid:columnCount="2">
+        android:orientation="vertical">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            grid:layout_column="0"
-            grid:layout_row="0"
-            grid:layout_columnSpan="2"
-            grid:layout_gravity="fill_horizontal" >
+            android:orientation="horizontal">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/fleet_stance"
+                android:layout_marginLeft="12dp"
+                android:layout_marginRight="12dp"
                 android:textAppearance="?android:attr/textAppearanceMedium" />
 
             <Spinner
                 android:id="@+id/stance"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_marginRight="12dp"
                 android:layout_weight="1" />
         </LinearLayout>
 
-        <Button
-            style="@style/Button"
-            android:id="@+id/move_btn"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            grid:layout_gravity="fill_horizontal"
-            grid:layout_column="0"
-            grid:layout_row="1"
-            android:layout_marginLeft="12dp"
-            android:layout_marginRight="12dp"
-            android:text="@string/fleet_move" />
+            android:orientation="horizontal">
+            <Button
+                style="@style/Button"
+                android:id="@+id/move_btn"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="12dp"
+                android:layout_marginRight="12dp"
+                android:text="@string/fleet_move" />
+    
+            <Button
+                style="@style/Button"
+                android:id="@+id/attack_btn"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="12dp"
+                android:layout_marginRight="12dp"
+                android:text="@string/fleet_attack" />
+        </LinearLayout>
 
-        <Button
-            style="@style/Button"
-            android:id="@+id/attack_btn"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            grid:layout_gravity="fill_horizontal"
-            grid:layout_column="1"
-            grid:layout_row="1"
-            android:layout_marginLeft="12dp"
-            android:layout_marginRight="12dp"
-            android:text="@string/fleet_attack" />
+            android:orientation="horizontal">
+            <Button
+                style="@style/Button"
+                android:id="@+id/split_btn"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="12dp"
+                android:layout_marginRight="12dp"
+                android:text="@string/fleet_split" />
+    
+            <Button
+                style="@style/Button"
+                android:id="@+id/merge_btn"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="12dp"
+                android:layout_marginRight="12dp"
+                android:text="@string/fleet_merge" />
+        </LinearLayout>
 
-    </android.support.v7.widget.GridLayout>
+    </LinearLayout>
 
 </LinearLayout>

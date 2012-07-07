@@ -56,6 +56,8 @@
     <string name="fleet_stance">Stance</string>
     <string name="fleet_move">Move</string>
     <string name="fleet_attack">Attack</string>
+    <string name="fleet_split">Split</string>
+    <string name="fleet_merge">Merge</string>
 
     <!-- "global_options.xml" layout -->
     <string name="globalopts_graphics_detail">Detail Level:</string>

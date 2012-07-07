@@ -258,7 +258,7 @@ class StarPage(StarfieldPage):
     # other empire's fleets.
     empire_fleets = []
     for fleet in star_pb.fleets:
-      if fleet.empire_key == empire_pb.key:
+      if fleet.empire_key == empire_pb.key or self._isAdmin():
         empire_fleets.append(fleet)
 
     del star_pb.fleets[:]

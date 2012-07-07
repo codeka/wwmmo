@@ -2,6 +2,9 @@ package au.com.codeka.warworlds.game;
 
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import android.app.Dialog;
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -11,8 +14,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.view.WindowManager;
+import android.view.ViewGroup.LayoutParams;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.TextView;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.model.Fleet;
@@ -21,6 +27,7 @@ import au.com.codeka.warworlds.model.ShipDesignManager;
 import au.com.codeka.warworlds.model.Star;
 
 public class SolarSystemFleetDialog extends Dialog {
+    private Logger log = LoggerFactory.getLogger(SolarSystemFleetDialog.class);
     private SolarSystemActivity mActivity;
     private Star mStar;
     private FleetListAdapter mFleetListAdapter;
@@ -36,12 +43,22 @@ public class SolarSystemFleetDialog extends Dialog {
 
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.solarsystem_fleet_dlg);
+
+        WindowManager.LayoutParams params = getWindow().getAttributes();
+        params.height = LayoutParams.MATCH_PARENT;
+        params.width = LayoutParams.MATCH_PARENT;
+        getWindow().setAttributes(params);
+
+        mFleetListAdapter = new FleetListAdapter();
+        ListView fleetList = (ListView) findViewById(R.id.ship_list);
+        fleetList.setAdapter(mFleetListAdapter);
     }
 
     public void setStar(Star star) {
         mStar = star;
 
         if (mFleetListAdapter != null) {
+            log.debug(String.format("Setting fleets: %d", mStar.getFleets().size()));
             mFleetListAdapter.setFleets(mStar.getFleets());
         }
     }
