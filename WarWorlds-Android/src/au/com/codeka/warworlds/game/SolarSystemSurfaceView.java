@@ -117,8 +117,6 @@ public class SolarSystemSurfaceView extends UniverseElementSurfaceView {
         return null;
     }
 
-    
-
     private void placePlanets(Canvas canvas) {
         if (mPlanetsPlaced) {
             return;

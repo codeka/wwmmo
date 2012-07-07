@@ -36,10 +36,8 @@ public class BannerAdView extends FrameLayout {
         }
 
         AdRequest request = new AdRequest();
-        request.addTestDevice("6454C8B8645CEC770A284D3C7D2F58DE");
-        request.addTestDevice("14DEBC42826F8B1AA4D5EC50BB5812B7");
-        request.addTestDevice("B5F11B468A1F5906D68ECAE779BF0237");
-        request.addTestDevice("CF95DC53F383F9A836FD749F3EF439CD");
+        request.addTestDevice("14DEBC42826F8B1AA4D5EC50BB5812B7"); // Galaxy Nexus
+        request.addTestDevice("E0B9ECF834A336BF19E9E6232133C876"); // Galaxy S
         request.addTestDevice(AdRequest.TEST_EMULATOR);
         mAdView.loadAd(request);
     }

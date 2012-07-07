@@ -17,6 +17,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.model.Colony;
+import au.com.codeka.warworlds.model.Empire;
 import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.ModelManager;
 import au.com.codeka.warworlds.model.Planet;
@@ -210,9 +211,15 @@ public class StarfieldActivity extends Activity {
                 }
             }
 
-            TextView colonyTextView = (TextView) view.findViewById(R.id.starfield_planet_colony);
+            final TextView colonyTextView = (TextView) view.findViewById(R.id.starfield_planet_colony);
             if (colony != null) {
                 colonyTextView.setText("Colonized");
+                EmpireManager.getInstance().fetchEmpire(colony.getEmpireKey(), new EmpireManager.EmpireFetchedHandler() {
+                    @Override
+                    public void onEmpireFetched(Empire empire) {
+                        colonyTextView.setText(empire.getDisplayName());
+                    }
+                });
             } else {
                 colonyTextView.setText("");
             }

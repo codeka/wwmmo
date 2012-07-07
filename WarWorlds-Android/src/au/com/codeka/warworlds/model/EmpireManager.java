@@ -58,6 +58,7 @@ public class EmpireManager {
                     log.error(ExceptionUtils.getStackTrace(e));
                 }
 
+                mEmpireCache.put(empireKey, empire);
                 return empire;
             }
 
