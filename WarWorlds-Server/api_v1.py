@@ -363,6 +363,24 @@ class BuildQueuePage(ApiPage):
     return empire.getBuildQueueForEmpire(empire_pb.key)
 
 
+class FleetOrdersPage(ApiPage):
+  """This page is where we post orders that we issue to fleets.
+  """
+  def post(self, fleetID):
+    order_pb = self._getRequestBody(pb.FleetOrder)
+    fleet_pb = empire.getFleet(fleetID)
+
+    # Make sure the fleet is owned by the current user!
+    curr_empire_pb = empire.getEmpireForUser(self.user)
+    if curr_empire_pb.key != fleet_pb.empire_key:
+      self.response.set_status(403)
+      return
+
+    if not empire.orderFleet(fleet_pb, order_pb):
+      self.response.set_status(400)
+    else:
+      self.response.set_status(200)
+
 class ApiApplication(webapp.WSGIApplication):
   def __init__(self, *args, **kwargs):
     webapp.WSGIApplication.__init__(self, *args, **kwargs)
@@ -427,5 +445,6 @@ app = ApiApplication([("/api/v1/hello/([^/]+)", HelloPage),
                       ("/api/v1/stars/([^/]+)/simulate", StarSimulatePage),
                       ("/api/v1/colonies", ColoniesPage),
                       ("/api/v1/colonies/([^/]+)", ColoniesPage),
-                      ("/api/v1/buildqueue", BuildQueuePage)],
+                      ("/api/v1/buildqueue", BuildQueuePage),
+                      ("/api/v1/fleet/([^/]+)/orders", FleetOrdersPage)],
                      debug=os.environ["SERVER_SOFTWARE"].startswith("Development"))

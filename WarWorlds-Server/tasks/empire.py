@@ -83,6 +83,8 @@ class BuildCheckPage(tasks.TaskPage):
             if db.run_in_transaction(_incrShipCountInTX, fleet_model.key()):
               done = True
               model = fleet_model
+              # it's an existing fleet, so make sure we clear it's cached value
+              keys_to_clear.append("fleet:%s" % str(fleet_model.key()))
               break
         if not done:
           model = mdl.Fleet()

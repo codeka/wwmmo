@@ -443,3 +443,22 @@ message Fleet
     optional string target_fleet_key = 9;
     optional string target_colony_key = 10;
 }
+
+
+message FleetOrder
+{
+    enum FLEET_ORDER
+    {
+        SPLIT = 1;
+        MERGE = 2;
+        MOVE = 3;
+        ATTACK = 4;
+    }
+    required FLEET_ORDER order = 1;
+
+    // if the order is to split, this will be the number of ships
+    // in the "left" and "right" fleets. The numbers must add up to
+    // the original number of ships you had.
+    optional int32 split_left = 2;
+    optional int32 split_right = 3;
+}

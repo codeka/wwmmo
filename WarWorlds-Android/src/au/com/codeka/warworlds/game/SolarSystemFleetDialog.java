@@ -16,12 +16,17 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.view.ViewGroup.LayoutParams;
+import android.widget.AdapterView;
 import android.widget.BaseAdapter;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import au.com.codeka.warworlds.R;
+import au.com.codeka.warworlds.model.Colony;
+import au.com.codeka.warworlds.model.DesignManager;
 import au.com.codeka.warworlds.model.Fleet;
+import au.com.codeka.warworlds.model.Planet;
 import au.com.codeka.warworlds.model.ShipDesign;
 import au.com.codeka.warworlds.model.ShipDesignManager;
 import au.com.codeka.warworlds.model.Star;
@@ -31,6 +36,7 @@ public class SolarSystemFleetDialog extends Dialog {
     private SolarSystemActivity mActivity;
     private Star mStar;
     private FleetListAdapter mFleetListAdapter;
+    private Fleet mSelectedFleet;
 
     public SolarSystemFleetDialog(SolarSystemActivity activity) {
         super(activity);
@@ -50,17 +56,93 @@ public class SolarSystemFleetDialog extends Dialog {
         getWindow().setAttributes(params);
 
         mFleetListAdapter = new FleetListAdapter();
-        ListView fleetList = (ListView) findViewById(R.id.ship_list);
+        final ListView fleetList = (ListView) findViewById(R.id.ship_list);
         fleetList.setAdapter(mFleetListAdapter);
+
+        // make sure we're aware of any changes to the designs
+        ShipDesignManager.getInstance().addDesignsChangedListener(new DesignManager.DesignsChangedListener() {
+            @Override
+            public void onDesignsChanged() {
+                if (mStar != null && mFleetListAdapter != null) {
+                    mFleetListAdapter.setFleets(mStar.getFleets());
+                }
+            }
+        });
+
+        mActivity.addStarUpdatedListener(new SolarSystemActivity.OnStarUpdatedListener() {
+            @Override
+            public void onStarUpdated(Star star, Planet selectedPlanet, Colony colony) {
+                setStar(star);
+            }
+        });
+
+        fleetList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view,
+                    int position, long id) {
+                mSelectedFleet = mStar.getFleets().get(position);
+                log.debug("Setting selected fleet: "+mSelectedFleet.getKey());
+                mFleetListAdapter.notifyDataSetChanged();
+            }
+        });
+
+        final Button splitBtn = (Button) findViewById(R.id.split_btn);
+        splitBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Bundle args = new Bundle();
+                args.putString("au.com.codeka.warworlds.StarKey", mSelectedFleet.getStarKey());
+                args.putString("au.com.codeka.warworlds.FleetKey", mSelectedFleet.getKey());
+                mActivity.showDialog(SolarSystemActivity.FLEET_SPLIT_DIALOG, args);
+            }
+        });
     }
 
     public void setStar(Star star) {
         mStar = star;
 
+        // if we had a fleet selected, make sure we still have the same
+        // fleet selected after we refresh
+        if (mSelectedFleet != null) {
+            Fleet selectedFleet = mSelectedFleet;
+            mSelectedFleet = null;
+
+            for (Fleet f : mStar.getFleets()) {
+                if (f.getKey().equals(selectedFleet.getKey())) {
+                    mSelectedFleet = f;
+                    break;
+                }
+            }
+        }
+
         if (mFleetListAdapter != null) {
-            log.debug(String.format("Setting fleets: %d", mStar.getFleets().size()));
             mFleetListAdapter.setFleets(mStar.getFleets());
         }
+    }
+
+    /**
+     * Populates a solarsystem_fleet_row.xml view with details from the given fleet.
+     */
+    public static void populateFleetRow(View view, Fleet fleet) {
+        ImageView icon = (ImageView) view.findViewById(R.id.ship_icon);
+        TextView row1 = (TextView) view.findViewById(R.id.ship_row1);
+        TextView row2 = (TextView) view.findViewById(R.id.ship_row2);
+        TextView row3 = (TextView) view.findViewById(R.id.ship_row3);
+
+        ShipDesignManager dm = ShipDesignManager.getInstance();
+        ShipDesign design = dm.getDesign(fleet.getDesignName());
+
+        Bitmap bm = dm.getDesignIcon(design);
+        if (bm != null) {
+            icon.setImageBitmap(bm);
+        } else {
+            icon.setImageBitmap(null);
+        }
+
+        row1.setText(design.getName());
+        row2.setText(String.format("%d", fleet.getNumShips()));
+        row2.setGravity(Gravity.RIGHT);
+        row3.setVisibility(View.GONE);
     }
 
     /**
@@ -102,26 +184,14 @@ public class SolarSystemFleetDialog extends Dialog {
                 view = inflater.inflate(R.layout.solarsystem_fleet_row, null);
             }
 
-            ImageView icon = (ImageView) view.findViewById(R.id.ship_icon);
-            TextView row1 = (TextView) view.findViewById(R.id.ship_row1);
-            TextView row2 = (TextView) view.findViewById(R.id.ship_row2);
-            TextView row3 = (TextView) view.findViewById(R.id.ship_row3);
-
             Fleet fleet = mFleets.get(position);
-            ShipDesignManager dm = ShipDesignManager.getInstance();
-            ShipDesign design = dm.getDesign(fleet.getDesignName());
+            populateFleetRow(view, fleet);
 
-            Bitmap bm = dm.getDesignIcon(design);
-            if (bm != null) {
-                icon.setImageBitmap(bm);
+            if (mSelectedFleet != null && mSelectedFleet.getKey().equals(fleet.getKey())) {
+                view.setBackgroundColor(0xff0c6476);
             } else {
-                icon.setImageBitmap(null);
+                view.setBackgroundColor(0xff000000);
             }
-
-            row1.setText(design.getName());
-            row2.setText(String.format("%d", fleet.getNumShips()));
-            row2.setGravity(Gravity.RIGHT);
-            row3.setVisibility(View.GONE);
 
             return view;
         }

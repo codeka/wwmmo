@@ -628,6 +628,53 @@ def scheduleBuildCheck():
                   eta=time)
 
 
+def getFleet(fleet_key):
+  cache_key = "fleet:%s" % (fleet_key)
+  fleet = ctrl.getCached([cache_key], pb.Fleet)
+  if fleet:
+    return fleet[cache_key]
+
+  fleet_model = mdl.Fleet.get(fleet_key)
+  fleet_pb = pb.Fleet()
+  ctrl.fleetModelToPb(fleet_pb, fleet_model)
+  ctrl.setCached({cache_key: fleet_pb})
+  return fleet_pb
+
+
+def orderFleet(fleet_pb, order_pb):
+  if order_pb.order == pb.FleetOrder.SPLIT:
+    left_size = order_pb.split_left
+    right_size = order_pb.split_right
+    if left_size + right_size != fleet_pb.num_ships:
+      logging.debug("Number of ships in left/right split (%d/%d) don't match total "
+                    "ships in current fleet (%d)" % (left_size, right_size, fleet_pb.num_ships))
+      return False
+
+    # This can happen if the original size is 1, or you move the slider all the way
+    # over, essentially, it's no change
+    if left_size <= 0 or right_size <= 0:
+      return True
+
+    left_model = mdl.Fleet.get(fleet_pb.key)
+    left_model.numShips = left_size
+
+    right_model = mdl.Fleet()
+    right_model.empire = mdl.Fleet.empire.get_value_for_datastore(left_model)
+    right_model.star = mdl.Fleet.star.get_value_for_datastore(left_model)
+    right_model.designName = left_model.designName
+    right_model.state = pb.Fleet.IDLE
+    right_model.numShips = right_size
+    right_model.stateStartTime = datetime.now()
+
+    left_model.put()
+    right_model.put()
+
+    ctrl.clearCached(["fleet:%s" % fleet_pb.key,
+                      "star:%s" % fleet_pb.star_key])
+    return True
+
+  return False
+
 class Design(object):
   @staticmethod
   def getDesign(kind, name):

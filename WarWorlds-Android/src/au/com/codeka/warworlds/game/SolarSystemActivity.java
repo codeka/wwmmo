@@ -22,6 +22,7 @@ import au.com.codeka.warworlds.model.Design.DesignKind;
 import au.com.codeka.warworlds.model.Empire;
 import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.EmpirePresence;
+import au.com.codeka.warworlds.model.Fleet;
 import au.com.codeka.warworlds.model.ModelManager;
 import au.com.codeka.warworlds.model.ModelManager.StarFetchedHandler;
 import au.com.codeka.warworlds.model.Planet;
@@ -46,6 +47,7 @@ public class SolarSystemActivity extends Activity {
     public static final int BUILD_CONFIRM_DIALOG = 1001;
     public static final int FOCUS_DIALOG = 1002;
     public static final int FLEET_DIALOG = 1003;
+    public static final int FLEET_SPLIT_DIALOG = 1004;
 
     /** Called when the activity is first created. */
     @Override
@@ -169,6 +171,8 @@ public class SolarSystemActivity extends Activity {
             return new SolarSystemFocusDialog(this);
         case FLEET_DIALOG:
             return new SolarSystemFleetDialog(this);
+        case FLEET_SPLIT_DIALOG:
+            return new SolarSystemFleetSplitDialog(this);
         }
 
         return super.onCreateDialog(id);
@@ -211,6 +215,16 @@ public class SolarSystemActivity extends Activity {
             SolarSystemFleetDialog dialog = (SolarSystemFleetDialog) d;
             dialog.setStar(mStar);
             break;
+        }
+        case FLEET_SPLIT_DIALOG: {
+            SolarSystemFleetSplitDialog dialog = (SolarSystemFleetSplitDialog) d;
+
+            String fleetKey = args.getString("au.com.codeka.warworlds.FleetKey");
+            for (Fleet f : mStar.getFleets()) {
+                if (f.getKey().equals(fleetKey)) {
+                    dialog.setFleet(f);
+                }
+            }
         }
         }
 

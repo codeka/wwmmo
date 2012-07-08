@@ -137,7 +137,24 @@ public class ApiClient {
      * Uses the "PUT" HTTP method to put a protocol buffer at the given URL. This is useful when
      * you don't expect a response (other than "201", success)
      */
-    public static boolean putProtoBuf(String url, Message pb) throws ApiException{
+    public static boolean putProtoBuf(String url, Message pb) throws ApiException {
+        return putOrPostProtoBuf("PUT", url, pb);
+    }
+
+    /**
+     * Uses the "POST" HTTP method to post a protocol buffer at the given URL. This is useful when
+     * you don't expect a response (other than "200", success)
+     */
+    public static boolean postProtoBuf(String url, Message pb) throws ApiException {
+        return putOrPostProtoBuf("POST", url, pb);
+    }
+
+    /**
+     * Uses the "PUT" or "POST" HTTP method to put or post a protocol buffer at the given URL.
+     * This is useful when you don't expect a response (other than "2xx", success)
+     */
+    private static boolean putOrPostProtoBuf(String method, String url, Message pb)
+            throws ApiException {
         Map<String, List<String>> headers = getHeaders();
 
         ByteArrayEntity body = null;
@@ -146,7 +163,7 @@ public class ApiClient {
             body.setContentType("application/x-protobuf");
         }
 
-        RequestManager.ResultWrapper res = RequestManager.request("PUT", url, headers, body);
+        RequestManager.ResultWrapper res = RequestManager.request(method, url, headers, body);
         try {
             HttpResponse resp = res.getResponse();
             int statusCode = resp.getStatusLine().getStatusCode();

@@ -59,6 +59,10 @@
     <string name="fleet_split">Split</string>
     <string name="fleet_merge">Merge</string>
 
+    <!-- "solarsystem_fleet_split_dlg.xml" layout -->
+    <string name="fleet_split_title">Split Fleet</string>
+    <string name="fleet_split_ok">Split</string>
+
     <!-- "global_options.xml" layout -->
     <string name="globalopts_graphics_detail">Detail Level:</string>
     <string name="globalopts_graphics_fast">Fast, Low Detail</string>
