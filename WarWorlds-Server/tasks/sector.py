@@ -8,7 +8,6 @@ import random
 
 from google.appengine.api import taskqueue
 from google.appengine.ext import db
-
 import webapp2 as webapp
 
 from model import sector as mdl
@@ -44,17 +43,17 @@ _planetTypeBonuses = {
               #GasGiant #Radiated #Inferno #Asteroids #Water #Toxic #Desert #Swamp #Terran
     "slot": [[-20,      10,       20,      -20,       -20,   0,     10,     0,     -10], # close to sun
              [-10,      0,        10,      -20,       0,     0,     0,      0,     -10],
-             [0,        -10,      -10,     0,         0,     0,     0,      0,     10],
-             [10,       -10,      -20,     0,         10,    0,     -10,    10,    10],
-             [20,       -20,      -30,     -10,       10,    0,     -20,    10,    5],
+             [0,        -10,      -10,     0,         0,     0,     0,      0,     20],
+             [10,       -10,      -20,     0,         10,    0,     -10,    10,    25],
+             [20,       -20,      -30,     -10,       10,    0,     -20,    10,    30],
              [20,       -20,      -40,     -10,       0,     0,     -30,    0,     5],
              [30,       -20,      -40,     -10,       0,     0,     -30,    0,     0] # far from sun
             ],
-    "star": [[-10,      0,        0,       0,         0,     -10,   0,      0,     0], # blue
-             [-10,      -5,       -5,      0,         0,     -10,   0,      0,     10], # white
-             [-10,      -5,       -10,     0,         0,     -10,   0,      0,     20], # yellow
-             [-10,      -5,       -20,     0,         0,     -5,    0,      0,     20], # orange
-             [-10,      -5,       -30,     0,         0,     -5,    0,      0,     10], # red
+    "star": [[-10,      0,        0,       -10,       10,    -10,   0,      10,    40], # blue
+             [-10,      -5,       -10,     -10,       20,    -10,   0,      20,    50], # white
+             [-10,      -5,       -20,     -10,       30,    -10,   0,      30,    60], # yellow
+             [-20,      -15,      -30,     -10,       30,    -5,    0,      40,    70], # orange
+             [-20,      -15,      -40,     -10,       20,    -5,    0,      40,    80], # red
              [-30,      20,       10,      -10,       -10,   0,     -10,    -10,   -30], # neutron
              [-30,      30,       20,      -10,       -20,   0,     -10,    -10,   -30], # black hole
             ]
@@ -230,55 +229,49 @@ class SectorGenerator:
         planet.planetType = mdl.planet_types[planet.planetTypeID]
 
         # A number from 0..100, we actually want it from 10...50 so we adjust
-        planet.size = self._normalRandom(100) + _planetSizeBonuses[planet.planetTypeID]
+        planet.size = _normalRandom(100) + _planetSizeBonuses[planet.planetTypeID]
         planet.size = int(10 + (planet.size / 2.5))
 
         # Population is affected by the size and type of the planet. We need to turn
         # the size into a multiplier
         populationMultiplier = _planetPopulationBonuses[planet.planetTypeID]
         populationMultiplier *= (planet.size * 2.0)/50.0
-        planet.populationCongeniality = int(self._normalRandom(1000) * populationMultiplier)
+        planet.populationCongeniality = int(_normalRandom(1000) * populationMultiplier)
 
         farmingMultipler = _planetFarmingBonuses[planet.planetTypeID]
-        planet.farmingCongeniality = int(self._normalRandom(100) * farmingMultipler)
+        planet.farmingCongeniality = int(_normalRandom(100) * farmingMultipler)
 
         miningMultipler = _planetMiningBonuses[planet.planetTypeID]
-        planet.miningCongeniality = int(self._normalRandom(100) * miningMultipler)
+        planet.miningCongeniality = int(_normalRandom(100) * miningMultipler)
 
         planet.put()
 
   def _select(self, bonuses):
     """Selects an index from a list of bonuses.
 
-    For example, if you pass in [0,0,0,0], then all four indices are equally like and
+    For example, if you pass in [0,0,0,0], then all four indices are equally likely and
     we will return a value in the range [0,4) with equal probability. If you pass in something
     like [0,0,30] then the third item has a "bonus" of 30 and is hence 2 is a far more likely
     result than 0 or 1."""
 
     values = []
-    for i,bonus in enumerate(bonuses):
-      values.append(bonus + self._normalRandom(100))
+    total = 0
+    for bonus in bonuses:
+      n = bonus + _normalRandom(100)
+      if n > 0:
+        total += n
+        values.append(n)
+      else:
+        values.append(0)
 
-    maxIndex = 0
-    maxValue = 0
-    for i,v in enumerate(values):
-      if v > maxValue:
-        maxIndex = i
-        maxValue = v
+    rand_value = random.randint(0, total)
+    for i,n in enumerate(values):
+      rand_value -= n
+      if rand_value <= 0:
+        return i
 
-    return maxIndex
-
-  def _normalRandom(self, maxValue, rounds=10):
-    """Generates a random number that has an approximate normal distribution around the midpoint.
-
-    For example, is maxValue=100 then you'll most get values around 50 and only occasionally 0
-    or 100."""
-
-    n = 0
-    step = maxValue/rounds
-    for _ in range(rounds):
-      n += random.randint(0, step)
-    return n
+    # shouldn't get here
+    raise RuntimeError("Unexpected!")
 
 
 class GeneratePage(tasks.TaskPage):
@@ -335,9 +328,19 @@ class ExpandUniversePage(tasks.TaskPage):
       max_y += 1
 
 
+def _normalRandom(maxValue, rounds=3):
+  """Generates a random number that has an approximate normal distribution around the midpoint.
+
+  For example, is maxValue=100 then you'll most get values around 50 and only occasionally 0
+  or 100. Depending on the number of rounds, the tighter the distribution around the midpoint."""
+
+  n = 0
+  step = maxValue/rounds
+  for _ in range(rounds):
+    n += random.randint(0, step - 1)
+  return n
+
 app = webapp.WSGIApplication([("/tasks/sector/generate/([0-9-]+),([0-9-]+)", GeneratePage),
                               ("/tasks/sector/expand-universe", ExpandUniversePage)],
                              debug=os.environ["SERVER_SOFTWARE"].startswith("Development"))
-
-
 

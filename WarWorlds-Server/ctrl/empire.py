@@ -424,21 +424,20 @@ def _simulateStep(dt, now, star_pb, empire_key, log):
   # between all of the colonies.
   total_goods_per_hour = total_population / 10.0
   total_goods_required = total_goods_per_hour * dt_in_hours
-  log("total_goods_required: %.2f, goods_available: %.2f" % (total_goods_required, total_goods))
+  log("total_goods_required: %.4f, goods_available: %.4f" % (total_goods_required, total_goods))
 
   # If we have more than total_goods_required stored, then we're cool. Otherwise, our population
   # suffers...
   goods_efficiency = 1.0
   if total_goods_required > total_goods and total_goods_required > 0:
     goods_efficiency = total_goods / total_goods_required
-  log("goods_efficiency: %.2f" % (goods_efficiency))
+  log("goods_efficiency: %.4f" % (goods_efficiency))
 
   # subtract all the goods we'll need
   total_goods -= total_goods_required
   if total_goods < 0.0:
     # We've run out of goods! That's bad...
     total_goods = 0.0
-    goods_efficiency = 0.0
 
   # now loop through the colonies and update the population/goods counter
   for n, colony_pb in enumerate(star_pb.colonies):
