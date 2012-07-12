@@ -88,6 +88,22 @@ public class Colour implements ObjectPool.Pooled {
         result.reset(a, r, g, b);
     }
 
+    /**
+     * Adds the given rhs onto the given lhs, using additive blending.
+     */
+    public static void add(Colour result, Colour rhs) {
+        double a = result.a + rhs.a;
+        if (a > 1.0) a = 1.0;
+        double r = result.r + rhs.r;
+        if (r > 1.0) r = 1.0;
+        double g = result.g + rhs.g;
+        if (g > 1.0) g = 1.0;
+        double b = result.b + rhs.b;
+        if (b > 1.0) b = 1.0;
+
+        result.reset(a, r, g, b);
+    }
+
     static class ColourCreator implements ObjectPool.PooledCreator {
         @Override
         public ObjectPool.Pooled create() {

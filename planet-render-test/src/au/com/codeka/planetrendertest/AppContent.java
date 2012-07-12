@@ -51,7 +51,13 @@ public class AppContent extends JPanel {
      * Renders just the point cloud using the specified properties.
      */
     private void render() {
-        Template.BaseTemplate tmpl = getTemplate();
+        Template.BaseTemplate tmpl;
+        try {
+            tmpl = getTemplate();
+        } catch(TemplateException e) {
+            mStatus.setText("ERROR: "+e.getMessage());
+            return;
+        }
 
         long startTime = System.nanoTime();
         Image img = createBlankImage(Colour.TRANSPARENT);
@@ -106,7 +112,7 @@ public class AppContent extends JPanel {
         }
     }
 
-    private Template.BaseTemplate getTemplate() {
+    private Template.BaseTemplate getTemplate() throws TemplateException {
         String xml = mTemplateXml.getSelectedText();
         if (xml == null || xml.trim().equals("")) {
             xml = mTemplateXml.getText();
@@ -115,10 +121,8 @@ public class AppContent extends JPanel {
 
         try {
             tmpl = Template.parse(new ByteArrayInputStream(xml.getBytes("utf-8")));
-        } catch (TemplateException e) {
-            // TODO Auto-generated catch block
         } catch (UnsupportedEncodingException e) {
-            // TODO Auto-generated catch block
+            throw new TemplateException("Unsupported encoding!");
         }
 
         return tmpl.getTemplate();

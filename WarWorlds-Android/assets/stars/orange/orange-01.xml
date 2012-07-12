@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<planet version="1" ambient="0.4" size="8">
+  <texture generator="voronoi-map" noisiness="0.8" scaleX="1.2" scaleY="0.6">
+    <voronoi>
+      <point-cloud generator="poisson" density="0.2" randomness="0.8" />
+    </voronoi>
+    <colour>
+      <node n="0.0" colour="ffff6600" />
+      <node n="0.3" colour="ffff6600" />
+      <node n="1.0" colour="ffffff00" />
+    </colour>
+    <perlin persistence="0.5" startOctave="6" endOctave="8" interpolation="linear" />
+  </texture>
+  <atmosphere>
+    <outer size="6" noisiness="0.4">
+      <colour>
+        <node n="0.0" colour="ffff6600" />
+        <node n="0.8" colour="00ff6600" />
+      </colour>
+      <perlin persistence="0.5" startOctave="3" endOctave="6" interpolation="linear" />
+    </outer>
+    <inner>
+      <colour>
+        <node n="0.0" colour="00ff6600" />
+        <node n="0.5" colour="a0ff6600" />
+      </colour>
+    </inner>
+  </atmosphere>
+</planet>

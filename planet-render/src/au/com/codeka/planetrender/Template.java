@@ -432,6 +432,11 @@ public class Template {
     }
 
     public static class AtmosphereTemplate extends BaseTemplate {
+        public enum BlendMode {
+            Alpha,
+            Additive
+        }
+
         private InnerOuterTemplate mInnerTemplate;
         private InnerOuterTemplate mOuterTemplate;
 
@@ -447,6 +452,7 @@ public class Template {
             private double mSunShadowFactor;
             private double mSize;
             private double mNoisiness;
+            private BlendMode mBlendMode;
 
             public double getSunStartShadow() {
                 return mSunStartShadow;
@@ -459,6 +465,9 @@ public class Template {
             }
             public double getNoisiness() {
                 return mNoisiness;
+            }
+            public BlendMode getBlendMode() {
+                return mBlendMode;
             }
         }
 
@@ -493,6 +502,17 @@ public class Template {
                 tmpl.mSize = 1.0;
                 if (elem.getAttribute("size") != null && !elem.getAttribute("size").equals("")) {
                     tmpl.mSize = Double.parseDouble(elem.getAttribute("size"));
+                }
+
+                tmpl.mBlendMode = BlendMode.Alpha;
+                if (elem.getAttribute("blend") != null && !elem.getAttribute("blend").equals("")) {
+                    if (elem.getAttribute("blend").equalsIgnoreCase("alpha")) {
+                        tmpl.mBlendMode = BlendMode.Alpha;
+                    } else if (elem.getAttribute("blend").equalsIgnoreCase("additive")) {
+                        tmpl.mBlendMode = BlendMode.Additive;
+                    } else {
+                        throw new TemplateException("Unknown 'blend' value: "+elem.getAttribute("blend"));
+                    }
                 }
 
                 if (elem.getAttribute("noisiness") != null && !elem.getAttribute("noisiness").equals("")) {

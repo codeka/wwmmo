@@ -92,7 +92,11 @@ public class PlanetRenderer {
                                                                              intersection,
                                                                              surfaceNormal,
                                                                              sunDirection);
-                    Colour.blend(c, atmosphereColour);
+                    if (atmosphere.getInnerBlendMode() == Template.AtmosphereTemplate.BlendMode.Alpha) {
+                        Colour.blend(c, atmosphereColour);
+                    } else {
+                        Colour.add(c, atmosphereColour);
+                    }
                     Colour.pool.release(atmosphereColour);
                 }
 
@@ -123,7 +127,11 @@ public class PlanetRenderer {
                                                                          surfaceNormal,
                                                                          distance,
                                                                          sunDirection);
-                Colour.blend(c, atmosphereColour);
+                if (atmosphere.getOuterBlendMode() == Template.AtmosphereTemplate.BlendMode.Alpha) {
+                    Colour.blend(c, atmosphereColour);
+                } else {
+                    Colour.add(c, atmosphereColour);
+                }
                 Colour.pool.release(atmosphereColour);
             }
 

@@ -10,6 +10,7 @@ public class Atmosphere {
     private double mInnerSunShadowFactor;
     private double mInnerSunStartShadow;
     private double mInnerNoisiness;
+    private Template.AtmosphereTemplate.BlendMode mInnerBlendMode;
     private PerlinNoise mInnerPerlin;
     private ColourGradient mOuterColourGradient;
     private double mOuterSunShadowFactor;
@@ -17,6 +18,7 @@ public class Atmosphere {
     private double mOuterAtmosphereSize;
     private double mOuterNoisiness;
     private PerlinNoise mOuterPerlin;
+    private Template.AtmosphereTemplate.BlendMode mOuterBlendMode;
 
     public Atmosphere(Template.AtmosphereTemplate tmpl, Random rand) {
         if (tmpl.getInnerTemplate() != null) {
@@ -31,6 +33,7 @@ public class Atmosphere {
                 mInnerPerlin = new PerlinNoise(perlinTemplate, rand);
                 mInnerNoisiness = tmpl.getInnerTemplate().getNoisiness();
             }
+            mInnerBlendMode = tmpl.getInnerTemplate().getBlendMode();
         }
         if (tmpl.getOuterTemplate() != null) {
             mOuterColourGradient = tmpl.getOuterTemplate().getParameter(
@@ -45,7 +48,16 @@ public class Atmosphere {
                 mOuterPerlin = new PerlinNoise(perlinTemplate, rand);
                 mOuterNoisiness = tmpl.getOuterTemplate().getNoisiness();
             }
+            mOuterBlendMode = tmpl.getOuterTemplate().getBlendMode();
         }
+    }
+
+    public Template.AtmosphereTemplate.BlendMode getInnerBlendMode() {
+        return mInnerBlendMode;
+    }
+
+    public Template.AtmosphereTemplate.BlendMode getOuterBlendMode() {
+        return mOuterBlendMode;
     }
 
     public Colour getOuterPixelColour(double u, double v, Vector3 normal, double distanceToSurface, Vector3 sunDirection) {
