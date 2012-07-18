@@ -12,7 +12,6 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.RadialGradient;
 import android.graphics.Paint.Style;
 import android.graphics.Rect;
 import android.os.Handler;
@@ -22,10 +21,11 @@ import android.view.MotionEvent;
 import au.com.codeka.Point2D;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.model.Colony;
-import au.com.codeka.warworlds.model.Planet;
 import au.com.codeka.warworlds.model.ImageManager;
+import au.com.codeka.warworlds.model.Planet;
 import au.com.codeka.warworlds.model.PlanetImageManager;
 import au.com.codeka.warworlds.model.Star;
+import au.com.codeka.warworlds.model.StarImageManager;
 
 /**
  * \c SurfaceView that displays a solar system. Star in the top-left, planets arrayed around,
@@ -59,13 +59,9 @@ public class SolarSystemSurfaceView extends UniverseElementSurfaceView {
         mHandler = new Handler();
         mBackgroundRenderer = new StarfieldBackgroundRenderer(context);
 
-        int[] colours = { Color.YELLOW, Color.YELLOW, 0x00000000 };
-        float[] positions = { 0.0f, 0.4f, 1.0f };
         mSunPaint = new Paint();
-        mSunPaint.setDither(true);
-        RadialGradient gradient = new RadialGradient(0, 0, 150 * getPixelScale(), 
-                colours, positions, android.graphics.Shader.TileMode.CLAMP);
-        mSunPaint.setShader(gradient);
+        mSunPaint.setARGB(255, 255, 255, 255);
+        mSunPaint.setStyle(Style.STROKE);
 
         mPlanetPaint = new Paint();
         mPlanetPaint.setARGB(255, 255, 255, 255);
@@ -233,7 +229,12 @@ public class SolarSystemSurfaceView extends UniverseElementSurfaceView {
     }
 
     private void drawSun(Canvas canvas) {
-        canvas.drawCircle(0, 0, 150 * getPixelScale(), mSunPaint);
+        final float pixelScale = getPixelScale();
+        Bitmap bmp = StarImageManager.getInstance().getBitmap(mContext, mStar, 300);
+        if (bmp != null) {
+            
+            canvas.drawBitmap(bmp, -150 * pixelScale, -150 * pixelScale, mSunPaint);
+        }
     }
 
     private void drawPlanets(Canvas canvas) {

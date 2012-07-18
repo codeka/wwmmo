@@ -15,8 +15,8 @@ public class StarImageManager extends ImageManager {
     /**
      * Gets the \c Bitmap for the given star.
      */
-    public Bitmap getBitmap(Context context, Star star) {
-        return getBitmap(context, star.getKey(), 100, getTemplate(context, star), star);
+    public Bitmap getBitmap(Context context, Star star, int size) {
+        return getBitmap(context, star.getKey(), size, getTemplate(context, star), star);
     }
 
     /**

@@ -181,8 +181,6 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
         }
     }
 
-    Rect mStarBitmapRect;
-
     /**
      * Draws a single star. Note that we draw all stars first, then the names of stars
      * after.
@@ -193,27 +191,18 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
 
         final float pixelScale = getPixelScale();
 
-        if (mStarBitmapRect == null) {
-            mStarBitmapRect = new Rect(0, 0,
-                    (int)(100 * pixelScale),
-                    (int)(100 * pixelScale));
-        }
-
         // only draw the star if it's actually visible...
         if (isVisible(canvas, (x - 60) * pixelScale, (y - 60) * pixelScale,
                               (x + 60) * pixelScale, (y + 60) * pixelScale)) {
-            Rect destRect = new Rect((int)((x - star.getSize()) * pixelScale),
-                    (int)((y - star.getSize()) * pixelScale),
-                    (int)((x + star.getSize()) * pixelScale),
-                    (int)((y + star.getSize()) * pixelScale));
 
             Bitmap starBitmap = mStarBitmaps.get(star.getKey());
             if (starBitmap == null) {
-                starBitmap = StarImageManager.getInstance().getBitmap(mContext, star);
+                starBitmap = StarImageManager.getInstance().getBitmap(mContext, star, star.getSize() * 2);
                 mStarBitmaps.put(star.getKey(), starBitmap);
             }
             if (starBitmap != null) {
-                canvas.drawBitmap(starBitmap, mStarBitmapRect, destRect, mStarPaint);
+                canvas.drawBitmap(starBitmap, (x - star.getSize()) * pixelScale,
+                        (y - star.getSize()) * pixelScale, mStarPaint);
             }
 
             if (mSelectedStar == star) {

@@ -221,7 +221,7 @@ public abstract class ImageManager {
         PlanetRenderer renderer = new PlanetRenderer(
                 (Template.PlanetTemplate) item.tmpl.getTemplate(), rand);
 
-        int imgSize = (int)(100 * mPixelScale);
+        int imgSize = (int)(item.size * mPixelScale);
 
         long startTime = System.nanoTime();
         Image img = new Image(imgSize, imgSize, Colour.TRANSPARENT);
