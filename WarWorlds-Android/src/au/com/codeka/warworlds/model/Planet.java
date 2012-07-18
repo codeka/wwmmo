@@ -89,6 +89,10 @@ public class Planet {
         return p;
     }
 
+    /**
+     * Contains a definition of the planet "type". This should be kept largely in sync with
+     * the planet types defined in model/sector.py in the server.
+     */
     public static class PlanetType {
         private String mDisplayName;
         private String mBitmapBasePath;

@@ -12,13 +12,13 @@ class StarType:
     self.colourValue = colourValue
 
 
-star_types = [StarType(colourName="Blue", colourValue=[0xdd, 0xff, 0xff]),
-              StarType(colourName="White", colourValue=[0xff, 0xfb, 0xd8]),
-              StarType(colourName="Yellow", colourValue=[0xff, 0xde, 0x69]),
-              StarType(colourName="Orange", colourValue=[0xe9, 0xa2, 0x1d]),
-              StarType(colourName="Red", colourValue=[0xe9, 0x84, 0x6f]),
-              StarType(colourName="Neutron", colourValue=[0x32, 0xa1, 0xdb]),
-              StarType(colourName="Blackhole", colourValue=[0x10, 0x53, 0x5f])
+star_types = [StarType(colourName="Blue", colourValue="blue"),
+              StarType(colourName="White", colourValue="white"),
+              StarType(colourName="Yellow", colourValue="yellow"),
+              StarType(colourName="Orange", colourValue="orange"),
+              StarType(colourName="Red", colourValue="red"),
+              StarType(colourName="Neutron", colourValue="neutron"),
+              StarType(colourName="Blackhole", colourValue="back-hole")
              ]
 
 
@@ -50,7 +50,7 @@ class Sector(db.Model):
 class Star(db.Model):
   sector = db.ReferenceProperty(Sector)
   name = db.StringProperty()
-  starTypeIndex = db.IntegerProperty()
+  starTypeID = db.IntegerProperty(name="starType")
   colour = db.IntegerProperty()
   size = db.IntegerProperty()
   x = db.IntegerProperty()
@@ -62,7 +62,6 @@ class Planet(db.Model):
   star = db.ReferenceProperty(Star)
   index = db.IntegerProperty()
   planetTypeID = db.IntegerProperty(name="planetType")
-  planetType = None # Will be filled in with a PlanetType instance
   size = db.IntegerProperty()
   populationCongeniality = db.IntegerProperty()
   farmingCongeniality = db.IntegerProperty()

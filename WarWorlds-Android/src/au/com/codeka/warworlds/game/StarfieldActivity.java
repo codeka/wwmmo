@@ -19,6 +19,7 @@ import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.model.Colony;
 import au.com.codeka.warworlds.model.Empire;
 import au.com.codeka.warworlds.model.EmpireManager;
+import au.com.codeka.warworlds.model.ImageManager;
 import au.com.codeka.warworlds.model.ModelManager;
 import au.com.codeka.warworlds.model.Planet;
 import au.com.codeka.warworlds.model.PlanetImageManager;
@@ -190,9 +191,9 @@ public class StarfieldActivity extends Activity {
             } else {
                 icon.setImageResource(R.drawable.planet_placeholder);
 
-                pim.addBitmapGenerateListener(new PlanetImageManager.BitmapGeneratedListener() {
-                    public void onBitmapGenerated(Planet bmpPlanet, Bitmap bmp) {
-                        if (bmpPlanet.getKey().equals(planet.getKey())) {
+                pim.addBitmapGeneratedListener(new ImageManager.BitmapGeneratedListener() {
+                    public void onBitmapGenerated(String planetKey, Bitmap bmp) {
+                        if (planetKey.equals(planet.getKey())) {
                             icon.setImageBitmap(bmp);
                             pim.removeBitmapGeneratedListener(this);
                         }

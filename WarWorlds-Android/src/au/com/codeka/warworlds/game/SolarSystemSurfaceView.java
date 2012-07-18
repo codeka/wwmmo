@@ -23,6 +23,7 @@ import au.com.codeka.Point2D;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.model.Colony;
 import au.com.codeka.warworlds.model.Planet;
+import au.com.codeka.warworlds.model.ImageManager;
 import au.com.codeka.warworlds.model.PlanetImageManager;
 import au.com.codeka.warworlds.model.Star;
 
@@ -77,7 +78,7 @@ public class SolarSystemSurfaceView extends UniverseElementSurfaceView {
         mColonyIcon = BitmapFactory.decodeResource(getResources(), R.drawable.starfield_colony);
 
         mBitmapGeneratedListener = new PlanetBitmapGeneratedListener();
-        PlanetImageManager.getInstance().addBitmapGenerateListener(mBitmapGeneratedListener);
+        PlanetImageManager.getInstance().addBitmapGeneratedListener(mBitmapGeneratedListener);
     }
 
     public void setStar(Star star) {
@@ -331,9 +332,9 @@ public class SolarSystemSurfaceView extends UniverseElementSurfaceView {
      * Our implementation of \c PlanetImageManager.BitmapGeneratedListener just causes us to
      * redraw the screen (with the new bitmap).
      */
-    private class PlanetBitmapGeneratedListener implements PlanetImageManager.BitmapGeneratedListener {
+    private class PlanetBitmapGeneratedListener implements ImageManager.BitmapGeneratedListener {
         @Override
-        public void onBitmapGenerated(Planet planet, Bitmap bmp) {
+        public void onBitmapGenerated(String planetKey, Bitmap bmp) {
             redraw();
         }
     }

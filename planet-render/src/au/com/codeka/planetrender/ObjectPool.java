@@ -12,7 +12,7 @@ public class ObjectPool<T extends ObjectPool.Pooled> {
     }
 
     @SuppressWarnings("unchecked")
-    public T borrow() {
+    synchronized public T borrow() {
         if (mFreeIndex < 0) {
             return (T) mCreator.create();
         }
@@ -22,7 +22,7 @@ public class ObjectPool<T extends ObjectPool.Pooled> {
         return obj;
     }
 
-    public void release(Pooled obj) {
+    synchronized public void release(Pooled obj) {
         if (obj == null)
             return;
 

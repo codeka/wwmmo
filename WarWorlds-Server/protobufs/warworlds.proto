@@ -180,9 +180,6 @@ message Star
     }
     optional CLASSIFICATION classification = 3;
 
-    // the colour of the star, as an RGB value
-    optional uint32 colour = 4;
-
     // the apparent "size" of the star (which is really just a display thing)
     optional int32 size = 5;
 

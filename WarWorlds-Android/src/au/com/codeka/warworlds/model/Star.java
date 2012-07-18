@@ -7,12 +7,39 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 
+/**
+ * A star is \i basically a container for planets. It shows up on the starfield list.
+ */
 public class Star {
+    private static StarType[] sStarTypes = {
+        new StarType.Builder().setDisplayName("Blue")
+                                .setBitmapBasePath("stars/blue")
+                                .build(),
+        new StarType.Builder().setDisplayName("White")
+                                .setBitmapBasePath("stars/white")
+                                .build(),
+        new StarType.Builder().setDisplayName("Yellow")
+                                .setBitmapBasePath("stars/yellow")
+                                .build(),
+        new StarType.Builder().setDisplayName("Orange")
+                                .setBitmapBasePath("stars/orange")
+                                .build(),
+        new StarType.Builder().setDisplayName("Red")
+                                .setBitmapBasePath("stars/red")
+                                .build(),
+        new StarType.Builder().setDisplayName("Neutron")
+                                .setBitmapBasePath("stars/neutron")
+                                .build(),
+        new StarType.Builder().setDisplayName("Back Hole")
+                                .setBitmapBasePath("stars/black-hole")
+                                .build()
+    };
+
     private static Logger log = LoggerFactory.getLogger(Star.class);
     private Sector mSector;
     private String mKey;
     private String mName;
-    private int mColour;
+    private StarType mStarType;
     private int mSize;
     private int mOffsetX;
     private int mOffsetY;
@@ -41,8 +68,8 @@ public class Star {
     public String getName() {
         return mName;
     }
-    public int getColour() {
-        return mColour;
+    public StarType getStarType() {
+        return mStarType;
     }
     public int getSize() {
         return mSize;
@@ -107,7 +134,7 @@ public class Star {
         s.mSector = sector;
         s.mKey = pb.getKey();
         s.mName = pb.getName();
-        s.mColour = pb.getColour();
+        s.mStarType = sStarTypes[pb.getClassification().getNumber()];
         s.mSize = pb.getSize();
         s.mOffsetX = pb.getOffsetX();
         s.mOffsetY = pb.getOffsetY();
@@ -152,5 +179,39 @@ public class Star {
         }
 
         return s;
+    }
+
+    public static class StarType {
+        private String mDisplayName;
+        private String mBitmapBasePath;
+
+        public String getDisplayName() {
+            return mDisplayName;
+        }
+        public String getBitmapBasePath() {
+            return mBitmapBasePath;
+        }
+
+        public static class Builder {
+            private StarType mStarType;
+
+            public Builder() {
+                mStarType = new StarType();
+            }
+
+            public Builder setDisplayName(String displayName) {
+                mStarType.mDisplayName = displayName;
+                return this;
+            }
+
+            public Builder setBitmapBasePath(String path) {
+                mStarType.mBitmapBasePath = path;
+                return this;
+            }
+
+            public StarType build() {
+                return mStarType;
+            }
+        }
     }
 }

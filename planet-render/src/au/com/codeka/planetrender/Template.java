@@ -439,12 +439,16 @@ public class Template {
 
         private InnerOuterTemplate mInnerTemplate;
         private InnerOuterTemplate mOuterTemplate;
+        private StarTemplate mStarTemplate;
 
         public InnerOuterTemplate getInnerTemplate() {
             return mInnerTemplate;
         }
         public InnerOuterTemplate getOuterTemplate() {
             return mOuterTemplate;
+        }
+        public StarTemplate getStarTemplate() {
+            return mStarTemplate;
         }
 
         public static class InnerOuterTemplate extends BaseTemplate {
@@ -471,6 +475,22 @@ public class Template {
             }
         }
 
+        public static class StarTemplate extends InnerOuterTemplate {
+            public int mNumPoints;
+            public double mBaseWidth;
+            public double mSlope;
+
+            public int getNumPoints() {
+                return mNumPoints;
+            }
+            public double getBaseWidth() {
+                return mBaseWidth;
+            }
+            public double getSlope() {
+                return mSlope;
+            }
+        }
+
         private static class AtmosphereTemplateFactory extends TemplateFactory {
             @Override
             public BaseTemplate parse(Element elem) throws TemplateException {
@@ -478,19 +498,22 @@ public class Template {
 
                 for (Element child : XmlIterator.childElements(elem)) {
                     if (child.getTagName().equals("inner")) {
-                        tmpl.mInnerTemplate = parseInnerOuterTemplate(child);
+                        tmpl.mInnerTemplate = new InnerOuterTemplate();
+                        parseInnerOuterTemplate(tmpl.mInnerTemplate, child);
                     } else if (child.getTagName().equals("outer")) {
-                        tmpl.mOuterTemplate = parseInnerOuterTemplate(child);
+                        tmpl.mOuterTemplate = new InnerOuterTemplate();
+                        parseInnerOuterTemplate(tmpl.mOuterTemplate, child);
+                    } else if (child.getTagName().equals("star")) {
+                        tmpl.mStarTemplate = new StarTemplate();
+                        parseStarTemplate(tmpl.mStarTemplate, child);
                     }
                 }
 
                 return tmpl;
             }
 
-            private InnerOuterTemplate parseInnerOuterTemplate(Element elem)
+            private void parseInnerOuterTemplate(InnerOuterTemplate tmpl, Element elem)
                     throws TemplateException {
-                InnerOuterTemplate tmpl = new InnerOuterTemplate();
-
                 if (elem.getAttribute("sunStartShadow") != null && !elem.getAttribute("sunStartShadow").equals("")) {
                     tmpl.mSunStartShadow = Double.parseDouble(elem.getAttribute("sunStartShadow"));
                 }
@@ -522,8 +545,26 @@ public class Template {
                 for (Element child : XmlIterator.childElements(elem)) {
                     tmpl.getParameters().add(parseElement(child));
                 }
+            }
 
-                return tmpl;
+            private void parseStarTemplate(StarTemplate tmpl, Element elem)
+                    throws TemplateException {
+                parseInnerOuterTemplate(tmpl, elem);
+
+                tmpl.mNumPoints = 5;
+                if (elem.getAttribute("points") != null && !elem.getAttribute("points").equals("")) {
+                    tmpl.mNumPoints = Integer.parseInt(elem.getAttribute("points"));
+                }
+
+                tmpl.mBaseWidth = 1.0;
+                if (elem.getAttribute("baseWidth") != null && !elem.getAttribute("baseWidth").equals("")) {
+                    tmpl.mBaseWidth = Double.parseDouble(elem.getAttribute("baseWidth"));
+                }
+
+                tmpl.mSlope = 0.0;
+                if (elem.getAttribute("slope") != null && !elem.getAttribute("slope").equals("")) {
+                    tmpl.mSlope = Double.parseDouble(elem.getAttribute("slope"));
+                }
             }
         }
     }

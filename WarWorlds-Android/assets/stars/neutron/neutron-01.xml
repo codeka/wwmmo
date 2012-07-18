@@ -1,25 +1,25 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<planet version="1" ambient="0.6" size="8">
+<planet version="1" ambient="0.6" size="1" northFrom="-1 0 0" northTo="0 1 0">
   <texture generator="perlin-noise" noisiness="0.8" scaleX="1.2" scaleY="0.6">
     <colour>
-      <node n="0.0" colour="ff333333" />
-      <node n="0.3" colour="ff999999" />
+      <node n="0.0" colour="ff3333ff" />
+      <node n="0.3" colour="ff6666ff" />
       <node n="1.0" colour="ffcccccc" />
     </colour>
     <perlin persistence="0.5" startOctave="6" endOctave="8" interpolation="linear" />
   </texture>
   <atmosphere>
-    <outer size="6" noisiness="0.4" blend="additive">
+    <star size="15" points="2" baseWidth="4">
       <colour>
         <node n="0.0" colour="ffffffff" />
-        <node n="0.8" colour="006666ff" />
+        <node n="0.8" colour="000000ff" />
       </colour>
       <perlin persistence="0.5" startOctave="3" endOctave="6" interpolation="linear" />
-    </outer>
+    </star>
     <inner blend="additive">
       <colour>
-        <node n="0.0" colour="00333366" />
-        <node n="0.8" colour="ff999999" />
+        <node n="0.0" colour="003333ff" />
+        <node n="0.5" colour="ff9999ff" />
       </colour>
     </inner>
   </atmosphere>

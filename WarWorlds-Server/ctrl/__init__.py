@@ -130,8 +130,7 @@ def starModelToPb(star_pb, star_model):
   star_pb.offset_x = star_model.x
   star_pb.offset_y = star_model.y
   star_pb.name = star_model.name.title()
-  star_pb.colour = star_model.colour
-  star_pb.classification = star_model.starTypeIndex
+  star_pb.classification = star_model.starTypeID
   star_pb.size = star_model.size
   if star_model.planets is not None:
     for planet_model in star_model.planets:

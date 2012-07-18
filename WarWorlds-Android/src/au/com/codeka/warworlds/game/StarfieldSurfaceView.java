@@ -1,6 +1,8 @@
 package au.com.codeka.warworlds.game;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.slf4j.Logger;
@@ -13,15 +15,17 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Paint.Style;
-import android.graphics.RadialGradient;
+import android.graphics.Rect;
 import android.util.AttributeSet;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.model.Colony;
+import au.com.codeka.warworlds.model.ImageManager;
 import au.com.codeka.warworlds.model.Sector;
 import au.com.codeka.warworlds.model.SectorManager;
 import au.com.codeka.warworlds.model.Star;
+import au.com.codeka.warworlds.model.StarImageManager;
 
 /**
  * \c SurfaceView that displays the starfield. You can scroll around, tap on stars to bring
@@ -37,6 +41,7 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
     private Paint mSelectionPaint;
     private Bitmap mColonyIcon;
     private StarfieldBackgroundRenderer mBackgroundRenderer;
+    private Map<String, Bitmap> mStarBitmaps;
 
     public StarfieldSurfaceView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -49,14 +54,21 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
         mContext = context;
         mStarSelectedListeners = new CopyOnWriteArrayList<OnStarSelectedListener>();
         mSelectedStar = null;
+        mStarBitmaps = new HashMap<String, Bitmap>();
         mColonyIcon = BitmapFactory.decodeResource(getResources(), R.drawable.starfield_colony);
 
         mSelectionPaint = new Paint();
         mSelectionPaint.setARGB(255, 255, 255, 255);
         mSelectionPaint.setStyle(Style.STROKE);
 
+        mStarPaint = new Paint();
+        mStarPaint.setARGB(255, 255, 255, 255);
+        mStarPaint.setStyle(Style.STROKE);
+
         mBackgroundRenderer = new StarfieldBackgroundRenderer(mContext);
 
+        // whenever the sector list changes (i.e. when we've refreshed from the server),
+        // redraw the screen.
         SectorManager.getInstance().addSectorListChangedListener(new SectorManager.OnSectorListChangedListener() {
             @Override
             public void onSectorListChanged() {
@@ -68,6 +80,20 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
                         selectStar(newSelectedStar);
                     }
                 }
+
+                // we'll remove our cached star bitmaps as well, they'll be cached in the
+                // ImageManager, but this makes sure we don't just use up all the memory...
+                mStarBitmaps.clear();
+
+                redraw();
+            }
+        });
+
+        // whenever a new star bitmap is generated, redraw the screen
+        StarImageManager.getInstance().addBitmapGeneratedListener(
+                new ImageManager.BitmapGeneratedListener() {
+            @Override
+            public void onBitmapGenerated(String key, Bitmap bmp) {
                 redraw();
             }
         });
@@ -155,6 +181,8 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
         }
     }
 
+    Rect mStarBitmapRect;
+
     /**
      * Draws a single star. Note that we draw all stars first, then the names of stars
      * after.
@@ -163,32 +191,56 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
         x += star.getOffsetX();
         y += star.getOffsetY();
 
-        final int[] colours = { star.getColour(), star.getColour(), 0x00000000 };
-        final float[] positions = { 0.0f, 0.4f, 1.0f };
         final float pixelScale = getPixelScale();
 
-        if (mStarPaint == null) {
-            mStarPaint = new Paint();
-            mStarPaint.setDither(true);
-        }
-        RadialGradient gradient = new RadialGradient(x * pixelScale, y * pixelScale,
-                star.getSize() * pixelScale, colours, positions,
-                android.graphics.Shader.TileMode.CLAMP);
-        mStarPaint.setShader(gradient);
-
-        canvas.drawCircle(x * pixelScale, y * pixelScale,
-                star.getSize() * pixelScale, mStarPaint);
-
-        if (mSelectedStar == star) {
-            canvas.drawCircle(x * pixelScale, y * pixelScale,
-                    (star.getSize() + 5) * pixelScale, mSelectionPaint);
+        if (mStarBitmapRect == null) {
+            mStarBitmapRect = new Rect(0, 0,
+                    (int)(100 * pixelScale),
+                    (int)(100 * pixelScale));
         }
 
-        List<Colony> colonies = star.getColonies();
-        if (colonies != null && !colonies.isEmpty()) {
-            canvas.drawBitmap(mColonyIcon, (x + mColonyIcon.getWidth()) * pixelScale,
-                    (y - mColonyIcon.getHeight()) * pixelScale, mSelectionPaint);
+        // only draw the star if it's actually visible...
+        if (isVisible(canvas, (x - 60) * pixelScale, (y - 60) * pixelScale,
+                              (x + 60) * pixelScale, (y + 60) * pixelScale)) {
+            Rect destRect = new Rect((int)((x - star.getSize()) * pixelScale),
+                    (int)((y - star.getSize()) * pixelScale),
+                    (int)((x + star.getSize()) * pixelScale),
+                    (int)((y + star.getSize()) * pixelScale));
+
+            Bitmap starBitmap = mStarBitmaps.get(star.getKey());
+            if (starBitmap == null) {
+                starBitmap = StarImageManager.getInstance().getBitmap(mContext, star);
+                mStarBitmaps.put(star.getKey(), starBitmap);
+            }
+            if (starBitmap != null) {
+                canvas.drawBitmap(starBitmap, mStarBitmapRect, destRect, mStarPaint);
+            }
+
+            if (mSelectedStar == star) {
+                canvas.drawCircle(x * pixelScale, y * pixelScale,
+                        (star.getSize() + 5) * pixelScale, mSelectionPaint);
+            }
+
+            List<Colony> colonies = star.getColonies();
+            if (colonies != null && !colonies.isEmpty()) {
+                canvas.drawBitmap(mColonyIcon, (x + mColonyIcon.getWidth()) * pixelScale,
+                        (y - mColonyIcon.getHeight()) * pixelScale, mSelectionPaint);
+            }
         }
+    }
+
+    /**
+     * Determines whether any part of the given \c Rect will be visible on the given canvas,
+     * not looking at the clip rect, just looking at the bounds of the canvas.
+     */
+    private static boolean isVisible(Canvas canvas, float left, float top, float right, float bottom) {
+        if (right < 0 || bottom < 0) {
+            return false;
+        }
+        if (left > canvas.getWidth() || top > canvas.getHeight()) {
+            return false;
+        }
+        return true;
     }
 
     /**

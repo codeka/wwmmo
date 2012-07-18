@@ -29,7 +29,7 @@ public class PlanetRenderer {
         if (atmosphereTemplates != null && atmosphereTemplates.size() > 0) {
             mAtmospheres = new ArrayList<Atmosphere>();
             for (Template.AtmosphereTemplate atmosphereTemplate : atmosphereTemplates) {
-                mAtmospheres.add(new Atmosphere(atmosphereTemplate, rand));
+                Atmosphere.getAtmospheres(mAtmospheres, atmosphereTemplate, rand);
             }
         }
 
@@ -91,8 +91,9 @@ public class PlanetRenderer {
                     Colour atmosphereColour = atmosphere.getInnerPixelColour(x + 0.5, y + 0.5,
                                                                              intersection,
                                                                              surfaceNormal,
-                                                                             sunDirection);
-                    if (atmosphere.getInnerBlendMode() == Template.AtmosphereTemplate.BlendMode.Alpha) {
+                                                                             sunDirection,
+                                                                             mNorth);
+                    if (atmosphere.getBlendMode() == Template.AtmosphereTemplate.BlendMode.Alpha) {
                         Colour.blend(c, atmosphereColour);
                     } else {
                         Colour.add(c, atmosphereColour);
@@ -126,8 +127,9 @@ public class PlanetRenderer {
                 Colour atmosphereColour = atmosphere.getOuterPixelColour(x + 0.5, y + 0.5,
                                                                          surfaceNormal,
                                                                          distance,
-                                                                         sunDirection);
-                if (atmosphere.getOuterBlendMode() == Template.AtmosphereTemplate.BlendMode.Alpha) {
+                                                                         sunDirection,
+                                                                         mNorth);
+                if (atmosphere.getBlendMode() == Template.AtmosphereTemplate.BlendMode.Alpha) {
                     Colour.blend(c, atmosphereColour);
                 } else {
                     Colour.add(c, atmosphereColour);
