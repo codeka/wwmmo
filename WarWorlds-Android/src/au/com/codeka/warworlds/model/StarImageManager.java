@@ -34,8 +34,8 @@ public class StarImageManager extends ImageManager {
 
     @Override
     protected double getPlanetSize(Object extra) {
-        // TODO: this should be different per star template...
-        return 8.0;
+        Star star = (Star) extra;
+        return star.getStarType().getBaseSize();
     }
 
 }

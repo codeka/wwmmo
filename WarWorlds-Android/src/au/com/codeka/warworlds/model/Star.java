@@ -29,6 +29,8 @@ public class Star {
                                 .build(),
         new StarType.Builder().setDisplayName("Neutron")
                                 .setBitmapBasePath("stars/neutron")
+                                .setBaseSize(1.0)
+                                .setImageScale(4.0)
                                 .build(),
         new StarType.Builder().setDisplayName("Back Hole")
                                 .setBitmapBasePath("stars/black-hole")
@@ -184,6 +186,8 @@ public class Star {
     public static class StarType {
         private String mDisplayName;
         private String mBitmapBasePath;
+        private double mBaseSize;
+        private double mImageScale;
 
         public String getDisplayName() {
             return mDisplayName;
@@ -192,11 +196,29 @@ public class Star {
             return mBitmapBasePath;
         }
 
+        /**
+         * Gets the 'base size' of the star, which controls the "planet size" setting when
+         * we render the image.
+         */
+        public double getBaseSize() {
+            return mBaseSize;
+        }
+
+        /**
+         * When generating the image, we scale the final bitmap by this amount. Default is 1.0
+         * obviously.
+         */
+        public double getImageScale() {
+            return mImageScale;
+        }
+
         public static class Builder {
             private StarType mStarType;
 
             public Builder() {
                 mStarType = new StarType();
+                mStarType.mBaseSize = 8.0;
+                mStarType.mImageScale = 1.0;
             }
 
             public Builder setDisplayName(String displayName) {
@@ -206,6 +228,16 @@ public class Star {
 
             public Builder setBitmapBasePath(String path) {
                 mStarType.mBitmapBasePath = path;
+                return this;
+            }
+
+            public Builder setBaseSize(double baseSize) {
+                mStarType.mBaseSize = baseSize;
+                return this;
+            }
+
+            public Builder setImageScale(double scale) {
+                mStarType.mImageScale = scale;
                 return this;
             }
 

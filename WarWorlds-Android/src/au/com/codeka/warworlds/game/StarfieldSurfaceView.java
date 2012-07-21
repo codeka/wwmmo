@@ -15,7 +15,6 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Paint.Style;
-import android.graphics.Rect;
 import android.util.AttributeSet;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
@@ -192,17 +191,18 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
         final float pixelScale = getPixelScale();
 
         // only draw the star if it's actually visible...
-        if (isVisible(canvas, (x - 60) * pixelScale, (y - 60) * pixelScale,
-                              (x + 60) * pixelScale, (y + 60) * pixelScale)) {
+        if (isVisible(canvas, (x - 100) * pixelScale, (y - 100) * pixelScale,
+                              (x + 100) * pixelScale, (y + 100) * pixelScale)) {
 
+            int imageSize = (int)(star.getSize() * star.getStarType().getImageScale() * 2);
             Bitmap starBitmap = mStarBitmaps.get(star.getKey());
             if (starBitmap == null) {
-                starBitmap = StarImageManager.getInstance().getBitmap(mContext, star, star.getSize() * 2);
+                starBitmap = StarImageManager.getInstance().getBitmap(mContext, star, imageSize);
                 mStarBitmaps.put(star.getKey(), starBitmap);
             }
             if (starBitmap != null) {
-                canvas.drawBitmap(starBitmap, (x - star.getSize()) * pixelScale,
-                        (y - star.getSize()) * pixelScale, mStarPaint);
+                canvas.drawBitmap(starBitmap, (x - (imageSize / 2)) * pixelScale,
+                        (y - (imageSize / 2)) * pixelScale, mStarPaint);
             }
 
             if (mSelectedStar == star) {

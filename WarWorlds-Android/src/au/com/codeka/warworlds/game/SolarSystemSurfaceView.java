@@ -46,7 +46,7 @@ public class SolarSystemSurfaceView extends UniverseElementSurfaceView {
     private StarfieldBackgroundRenderer mBackgroundRenderer;
     private boolean mPlanetSelectedFired;
     private Handler mHandler;
-    private PlanetBitmapGeneratedListener mBitmapGeneratedListener;
+    private BitmapGeneratedListener mBitmapGeneratedListener;
 
     public SolarSystemSurfaceView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -73,8 +73,9 @@ public class SolarSystemSurfaceView extends UniverseElementSurfaceView {
 
         mColonyIcon = BitmapFactory.decodeResource(getResources(), R.drawable.starfield_colony);
 
-        mBitmapGeneratedListener = new PlanetBitmapGeneratedListener();
+        mBitmapGeneratedListener = new BitmapGeneratedListener();
         PlanetImageManager.getInstance().addBitmapGeneratedListener(mBitmapGeneratedListener);
+        StarImageManager.getInstance().addBitmapGeneratedListener(mBitmapGeneratedListener);
     }
 
     public void setStar(Star star) {
@@ -230,10 +231,12 @@ public class SolarSystemSurfaceView extends UniverseElementSurfaceView {
 
     private void drawSun(Canvas canvas) {
         final float pixelScale = getPixelScale();
-        Bitmap bmp = StarImageManager.getInstance().getBitmap(mContext, mStar, 300);
+
+        int imageSize = 300;
+        Bitmap bmp = StarImageManager.getInstance().getBitmap(mContext, mStar, imageSize);
         if (bmp != null) {
-            
-            canvas.drawBitmap(bmp, -150 * pixelScale, -150 * pixelScale, mSunPaint);
+            canvas.drawBitmap(bmp, -(imageSize / 2) * pixelScale,
+                    -(imageSize / 2) * pixelScale, mSunPaint);
         }
     }
 
@@ -333,7 +336,7 @@ public class SolarSystemSurfaceView extends UniverseElementSurfaceView {
      * Our implementation of \c PlanetImageManager.BitmapGeneratedListener just causes us to
      * redraw the screen (with the new bitmap).
      */
-    private class PlanetBitmapGeneratedListener implements ImageManager.BitmapGeneratedListener {
+    private class BitmapGeneratedListener implements ImageManager.BitmapGeneratedListener {
         @Override
         public void onBitmapGenerated(String planetKey, Bitmap bmp) {
             redraw();
