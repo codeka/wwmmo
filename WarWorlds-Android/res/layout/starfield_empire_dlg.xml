@@ -56,6 +56,18 @@
         android:layout_alignParentBottom="true"
         android:layout_below="@+id/empire_icon" >
 
+        <TextView
+            android:id="@+id/overview_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="10dp"
+            android:text="@string/empire_overview_format" />
+
     </RelativeLayout>
 
     <RelativeLayout

@@ -1,6 +1,7 @@
 package au.com.codeka.warworlds.game.starfield;
 
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -12,10 +13,16 @@ import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.BaseAdapter;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import au.com.codeka.warworlds.R;
+import au.com.codeka.warworlds.game.solarsystem.BuildConfirmDialog;
+import au.com.codeka.warworlds.game.solarsystem.BuildDialog;
+import au.com.codeka.warworlds.game.solarsystem.FleetDialog;
+import au.com.codeka.warworlds.game.solarsystem.FleetSplitDialog;
+import au.com.codeka.warworlds.game.solarsystem.FocusDialog;
 import au.com.codeka.warworlds.game.solarsystem.SolarSystemActivity;
 import au.com.codeka.warworlds.model.Colony;
 import au.com.codeka.warworlds.model.Empire;
@@ -116,6 +123,14 @@ public class StarfieldActivity extends Activity {
                 StarfieldActivity.this.startActivityForResult(intent, SOLAR_SYSTEM_REQUEST);
             }
         });
+
+        final Button empireBtn = (Button) findViewById(R.id.empire_btn);
+        empireBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showDialog(EmpireDialog.ID);
+            }
+        });
     }
 
     @Override
@@ -139,6 +154,28 @@ public class StarfieldActivity extends Activity {
                 mStarfield.selectStar(starKey);
             }
         }
+    }
+
+    @Override
+    protected Dialog onCreateDialog(int id) {
+        switch(id) {
+        case EmpireDialog.ID:
+            return new EmpireDialog(this);
+        }
+
+        return super.onCreateDialog(id);
+    }
+
+    @Override
+    protected void onPrepareDialog(int id, Dialog d, Bundle args) {
+        switch(id) {
+        case EmpireDialog.ID: {
+            EmpireDialog dialog = (EmpireDialog) d;
+            // TODO??
+        }
+        }
+
+        super.onPrepareDialog(id, d, args);
     }
 
     class PlanetListAdapter extends BaseAdapter {

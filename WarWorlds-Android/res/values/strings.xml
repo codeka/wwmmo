@@ -70,7 +70,11 @@
     <string name="globalopts_graphics_fast">Fast, Low Detail</string>
     <string name="globalopts_graphics_slow">Slow, High Detail</string>
 
-    <!-- "empire_activity" layout -->
+    <!-- "starfield_empire_dlg" layout -->
     <string name="colonies">Colonies</string>
     <string name="overview">Overview</string>
+    <string name="empire_overview_format"><![CDATA[
+        %1$d stars and %2$d planets colonized\n
+        %3$d ships in %4$d fleets
+    ]]></string>
 </resources>
