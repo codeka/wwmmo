@@ -83,7 +83,10 @@ public class UniverseElementSurfaceView extends SurfaceView implements SurfaceHo
         return null;
     }
 
-    protected void redraw() {
+    /**
+     * Causes this \c UniverseElementSurfaceView to redraw itself.
+     */
+    public void redraw() {
         if (isInEditMode()) {
             return;
         }

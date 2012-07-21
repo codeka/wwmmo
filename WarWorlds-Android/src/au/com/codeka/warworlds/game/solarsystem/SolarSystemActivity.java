@@ -1,4 +1,4 @@
-package au.com.codeka.warworlds.game;
+package au.com.codeka.warworlds.game.solarsystem;
 
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -164,15 +164,15 @@ public class SolarSystemActivity extends Activity {
     protected Dialog onCreateDialog(int id) {
         switch(id) {
         case BUILD_DIALOG:
-            return new SolarSystemBuildDialog(this);
+            return new BuildDialog(this);
         case BUILD_CONFIRM_DIALOG:
-            return new SolarSystemBuildConfirmDialog(this);
+            return new BuildConfirmDialog(this);
         case FOCUS_DIALOG:
-            return new SolarSystemFocusDialog(this);
+            return new FocusDialog(this);
         case FLEET_DIALOG:
-            return new SolarSystemFleetDialog(this);
+            return new FleetDialog(this);
         case FLEET_SPLIT_DIALOG:
-            return new SolarSystemFleetSplitDialog(this);
+            return new FleetSplitDialog(this);
         }
 
         return super.onCreateDialog(id);
@@ -182,7 +182,7 @@ public class SolarSystemActivity extends Activity {
     protected void onPrepareDialog(int id, Dialog d, Bundle args) {
         switch(id) {
         case BUILD_CONFIRM_DIALOG: {
-            SolarSystemBuildConfirmDialog dialog = (SolarSystemBuildConfirmDialog) d;
+            BuildConfirmDialog dialog = (BuildConfirmDialog) d;
             String designID = args.getString("au.com.codeka.warworlds.DesignID");
             if (designID == null)
                 designID = "";
@@ -202,22 +202,22 @@ public class SolarSystemActivity extends Activity {
             break;
         }
         case BUILD_DIALOG: {
-            SolarSystemBuildDialog dialog = (SolarSystemBuildDialog) d;
+            BuildDialog dialog = (BuildDialog) d;
             dialog.setColony(mStar, mColony);
             break;
         }
         case FOCUS_DIALOG: {
-            SolarSystemFocusDialog dialog = (SolarSystemFocusDialog) d;
+            FocusDialog dialog = (FocusDialog) d;
             dialog.setColony(mColony);
             break;
         }
         case FLEET_DIALOG: {
-            SolarSystemFleetDialog dialog = (SolarSystemFleetDialog) d;
+            FleetDialog dialog = (FleetDialog) d;
             dialog.setStar(mStar);
             break;
         }
         case FLEET_SPLIT_DIALOG: {
-            SolarSystemFleetSplitDialog dialog = (SolarSystemFleetSplitDialog) d;
+            FleetSplitDialog dialog = (FleetSplitDialog) d;
 
             String fleetKey = args.getString("au.com.codeka.warworlds.FleetKey");
             for (Fleet f : mStar.getFleets()) {

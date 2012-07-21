@@ -1,4 +1,4 @@
-package au.com.codeka.warworlds.game;
+package au.com.codeka.warworlds.game.starfield;
 
 import android.app.Activity;
 import android.content.Context;
@@ -16,6 +16,7 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import au.com.codeka.warworlds.R;
+import au.com.codeka.warworlds.game.solarsystem.SolarSystemActivity;
 import au.com.codeka.warworlds.model.Colony;
 import au.com.codeka.warworlds.model.Empire;
 import au.com.codeka.warworlds.model.EmpireManager;

@@ -1,4 +1,4 @@
-package au.com.codeka.warworlds.game;
+package au.com.codeka.warworlds.game.solarsystem;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -20,6 +20,8 @@ import android.view.GestureDetector;
 import android.view.MotionEvent;
 import au.com.codeka.Point2D;
 import au.com.codeka.warworlds.R;
+import au.com.codeka.warworlds.game.StarfieldBackgroundRenderer;
+import au.com.codeka.warworlds.game.UniverseElementSurfaceView;
 import au.com.codeka.warworlds.model.Colony;
 import au.com.codeka.warworlds.model.ImageManager;
 import au.com.codeka.warworlds.model.Planet;

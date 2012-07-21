@@ -1,6 +1,8 @@
 package au.com.codeka.warworlds.model;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -17,12 +19,12 @@ public class EmpireManager {
     private static Logger log = LoggerFactory.getLogger(EmpireManager.class);
     private static EmpireManager sInstance = new EmpireManager();
 
-    private static Map<String, Empire> mEmpireCache = new HashMap<String, Empire>();
-
     public static EmpireManager getInstance() {
         return sInstance;
     }
 
+    private Map<String, Empire> mEmpireCache = new HashMap<String, Empire>();
+    private Map<String, List<EmpireFetchedHandler>> mInProgress = new HashMap<String, List<EmpireFetchedHandler>>();
     private Empire mEmpire;
 
     /**
@@ -40,7 +42,24 @@ public class EmpireManager {
     public void fetchEmpire(final String empireKey, final EmpireFetchedHandler handler) {
         if (mEmpireCache.containsKey(empireKey)) {
             handler.onEmpireFetched(mEmpireCache.get(empireKey));
+            return;
         }
+
+        // if it's us, then that's good enough as well!
+        if (mEmpire.getKey().equals(empireKey)) {
+            handler.onEmpireFetched(mEmpire);
+            return;
+        }
+
+        List<EmpireFetchedHandler> inProgress = mInProgress.get(empireKey);
+        if (inProgress != null) {
+            // if there's already a call in progress, don't fetch again
+            inProgress.add(handler);
+            return;
+        }
+
+        inProgress = new ArrayList<EmpireFetchedHandler>();
+        mInProgress.put(empireKey, inProgress);
 
         new AsyncTask<Void, Void, Empire>() {
             @Override
@@ -58,7 +77,6 @@ public class EmpireManager {
                     log.error(ExceptionUtils.getStackTrace(e));
                 }
 
-                mEmpireCache.put(empireKey, empire);
                 return empire;
             }
 
@@ -69,7 +87,12 @@ public class EmpireManager {
                 }
 
                 mEmpireCache.put(empireKey, empire);
-                handler.onEmpireFetched(empire);
+
+                List<EmpireFetchedHandler> inProgress = mInProgress.get(empireKey);
+                for (EmpireFetchedHandler handler : inProgress) {
+                    handler.onEmpireFetched(empire);
+                }
+                mInProgress.remove(empireKey);
             }
         }.execute();
     }

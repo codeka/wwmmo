@@ -69,4 +69,8 @@
     <string name="globalopts_graphics_detail">Detail Level:</string>
     <string name="globalopts_graphics_fast">Fast, Low Detail</string>
     <string name="globalopts_graphics_slow">Slow, High Detail</string>
+
+    <!-- "empire_activity" layout -->
+    <string name="colonies">Colonies</string>
+    <string name="overview">Overview</string>
 </resources>

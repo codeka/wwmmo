@@ -1,4 +1,4 @@
-package au.com.codeka.warworlds.game;
+package au.com.codeka.warworlds.game.solarsystem;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,13 +18,13 @@ import au.com.codeka.warworlds.api.ApiClient;
 import au.com.codeka.warworlds.api.ApiException;
 import au.com.codeka.warworlds.model.Colony;
 
-public class SolarSystemFocusDialog extends Dialog {
-    private static Logger log = LoggerFactory.getLogger(SolarSystemFocusDialog.class);
+public class FocusDialog extends Dialog {
+    private static Logger log = LoggerFactory.getLogger(FocusDialog.class);
     private SolarSystemActivity mActivity;
     private Colony mColony;
     private List<SeekBar> mSeekBars;
 
-    public SolarSystemFocusDialog(SolarSystemActivity activity) {
+    public FocusDialog(SolarSystemActivity activity) {
         super(activity);
         mActivity = activity;
     }

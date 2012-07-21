@@ -1,4 +1,4 @@
-package au.com.codeka.warworlds.game;
+package au.com.codeka.warworlds.game.solarsystem;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,13 +26,13 @@ import au.com.codeka.warworlds.model.Colony;
 import au.com.codeka.warworlds.model.Design;
 import au.com.codeka.warworlds.model.ShipDesignManager;
 
-public class SolarSystemBuildConfirmDialog extends Dialog {
+public class BuildConfirmDialog extends Dialog {
     private static Logger log = LoggerFactory.getLogger(WarWorldsActivity.class);
     private Colony mColony;
     private Design mDesign;
     private SolarSystemActivity mActivity;
 
-    public SolarSystemBuildConfirmDialog(SolarSystemActivity activity) {
+    public BuildConfirmDialog(SolarSystemActivity activity) {
         super(activity);
         mActivity = activity;
     }

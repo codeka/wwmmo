@@ -21,7 +21,7 @@ import android.widget.TextView;
 import au.com.codeka.warworlds.api.ApiClient;
 import au.com.codeka.warworlds.api.ApiException;
 import au.com.codeka.warworlds.ctrl.TransparentWebView;
-import au.com.codeka.warworlds.game.StarfieldActivity;
+import au.com.codeka.warworlds.game.starfield.StarfieldActivity;
 import au.com.codeka.warworlds.model.BuildQueueManager;
 import au.com.codeka.warworlds.model.BuildingDesignManager;
 import au.com.codeka.warworlds.model.ChatManager;

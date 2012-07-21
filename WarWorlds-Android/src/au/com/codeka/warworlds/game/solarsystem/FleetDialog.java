@@ -1,4 +1,4 @@
-package au.com.codeka.warworlds.game;
+package au.com.codeka.warworlds.game.solarsystem;
 
 import java.util.List;
 
@@ -31,14 +31,14 @@ import au.com.codeka.warworlds.model.ShipDesign;
 import au.com.codeka.warworlds.model.ShipDesignManager;
 import au.com.codeka.warworlds.model.Star;
 
-public class SolarSystemFleetDialog extends Dialog {
-    private Logger log = LoggerFactory.getLogger(SolarSystemFleetDialog.class);
+public class FleetDialog extends Dialog {
+    private Logger log = LoggerFactory.getLogger(FleetDialog.class);
     private SolarSystemActivity mActivity;
     private Star mStar;
     private FleetListAdapter mFleetListAdapter;
     private Fleet mSelectedFleet;
 
-    public SolarSystemFleetDialog(SolarSystemActivity activity) {
+    public FleetDialog(SolarSystemActivity activity) {
         super(activity);
         mActivity = activity;
     }

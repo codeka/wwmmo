@@ -1,4 +1,4 @@
-package au.com.codeka.warworlds.game;
+package au.com.codeka.warworlds.game.solarsystem;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,15 +31,15 @@ import au.com.codeka.warworlds.model.Star;
 /**
  * Handles the "Building" tab of the \c SolarSystemBuildDialog.
  */
-public class SolarSystemBuildBuildingTab implements SolarSystemBuildDialog.Tab {
-    private static Logger log = LoggerFactory.getLogger(SolarSystemBuildBuildingTab.class);
+public class BuildBuildingTab implements BuildDialog.Tab {
+    private static Logger log = LoggerFactory.getLogger(BuildBuildingTab.class);
     private BuildingDesignListAdapter mDesignListAdapter;
     private BuildingListAdapter mBuildingListAdapter;
     private SolarSystemActivity mActivity;
     private Colony mColony;
     private View mView;
 
-    SolarSystemBuildBuildingTab(SolarSystemBuildDialog dialog, SolarSystemActivity activity) {
+    BuildBuildingTab(BuildDialog dialog, SolarSystemActivity activity) {
         mActivity = activity;
     }
 

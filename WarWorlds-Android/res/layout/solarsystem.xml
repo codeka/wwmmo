@@ -16,7 +16,7 @@
             android:layout_weight="1"
             android:orientation="vertical" >
 
-            <au.com.codeka.warworlds.game.SolarSystemSurfaceView
+            <au.com.codeka.warworlds.game.solarsystem.SolarSystemSurfaceView
                 android:id="@+id/solarsystem_view"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent" />

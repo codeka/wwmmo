@@ -1,4 +1,4 @@
-package au.com.codeka.warworlds.game;
+package au.com.codeka.warworlds.game.solarsystem;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,12 +24,12 @@ import au.com.codeka.warworlds.model.Star;
  * @author dean@codeka.com.au
  *
  */
-public class SolarSystemBuildDialog extends Dialog
+public class BuildDialog extends Dialog
         implements SolarSystemActivity.OnStarUpdatedListener {
     private SolarSystemActivity mActivity;
     private TabManager mTabManager;
 
-    public SolarSystemBuildDialog(SolarSystemActivity activity) {
+    public BuildDialog(SolarSystemActivity activity) {
         super(activity);
         mActivity = activity;
     }
@@ -50,9 +50,9 @@ public class SolarSystemBuildDialog extends Dialog
         tabHost.setup();
 
         mTabManager = new TabManager(tabHost);
-        mTabManager.addTab(new SolarSystemBuildBuildingTab(this, mActivity));
-        mTabManager.addTab(new SolarSystemBuildShipTab(this, mActivity));
-        mTabManager.addTab(new SolarSystemBuildQueueTab(this, mActivity));
+        mTabManager.addTab(new BuildBuildingTab(this, mActivity));
+        mTabManager.addTab(new BuildShipTab(this, mActivity));
+        mTabManager.addTab(new BuildQueueTab(this, mActivity));
     }
 
     @Override

@@ -1,4 +1,4 @@
-package au.com.codeka.warworlds.game;
+package au.com.codeka.warworlds.game.starfield;
 
 import java.util.HashMap;
 import java.util.List;
@@ -19,6 +19,8 @@ import android.util.AttributeSet;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import au.com.codeka.warworlds.R;
+import au.com.codeka.warworlds.game.StarfieldBackgroundRenderer;
+import au.com.codeka.warworlds.game.UniverseElementSurfaceView;
 import au.com.codeka.warworlds.model.Colony;
 import au.com.codeka.warworlds.model.ImageManager;
 import au.com.codeka.warworlds.model.Sector;

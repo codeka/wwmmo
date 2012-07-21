@@ -1,4 +1,4 @@
-package au.com.codeka.warworlds.game;
+package au.com.codeka.warworlds.game.solarsystem;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,14 +26,14 @@ import au.com.codeka.warworlds.model.DesignManager;
 import au.com.codeka.warworlds.model.ShipDesignManager;
 import au.com.codeka.warworlds.model.Star;
 
-public class SolarSystemBuildQueueTab implements SolarSystemBuildDialog.Tab {
+public class BuildQueueTab implements BuildDialog.Tab {
     private SolarSystemActivity mActivity;
     private BuildQueueListAdapter mBuildQueueListAdapter;
     private View mView;
     private Star mStar;
     private Colony mColony;
 
-    public SolarSystemBuildQueueTab(SolarSystemBuildDialog dialog, SolarSystemActivity activity) {
+    public BuildQueueTab(BuildDialog dialog, SolarSystemActivity activity) {
         mActivity = activity;
     }
 
