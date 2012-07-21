@@ -34,6 +34,8 @@
     <string name="empire_setup_name_hint">Empire name</string>
 
     <!-- "starfield.xml" layout -->
+    <string name="reports">Reports</string>
+    <string name="empire">Empire</string>
 
     <!-- "solarsystem.xml" layout -->
     <string name="solarsystem_colonize">Colonize</string>
