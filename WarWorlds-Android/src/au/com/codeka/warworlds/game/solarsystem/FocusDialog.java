@@ -6,7 +6,6 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import android.app.Dialog;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
@@ -16,13 +15,16 @@ import android.widget.SeekBar;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.api.ApiClient;
 import au.com.codeka.warworlds.api.ApiException;
+import au.com.codeka.warworlds.game.UniverseElementDialog;
 import au.com.codeka.warworlds.model.Colony;
 
-public class FocusDialog extends Dialog {
+public class FocusDialog extends UniverseElementDialog {
     private static Logger log = LoggerFactory.getLogger(FocusDialog.class);
     private SolarSystemActivity mActivity;
     private Colony mColony;
     private List<SeekBar> mSeekBars;
+
+    public static final int ID = 1002;
 
     public FocusDialog(SolarSystemActivity activity) {
         super(activity);
@@ -98,7 +100,7 @@ public class FocusDialog extends Dialog {
                         okButton.setEnabled(true);
                         dismiss();
 
-                        mActivity.refreshStar();
+                        mActivity.refresh();
                     }
                 }.execute();
             }

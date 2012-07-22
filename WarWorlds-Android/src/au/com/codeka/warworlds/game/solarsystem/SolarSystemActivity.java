@@ -1,8 +1,5 @@
 package au.com.codeka.warworlds.game.solarsystem;
 
-import java.util.concurrent.CopyOnWriteArrayList;
-
-import android.app.Activity;
 import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
@@ -15,6 +12,8 @@ import android.widget.TextView;
 import au.com.codeka.Point2D;
 import au.com.codeka.RomanNumeralFormatter;
 import au.com.codeka.warworlds.R;
+import au.com.codeka.warworlds.game.FleetSplitDialog;
+import au.com.codeka.warworlds.game.UniverseElementActivity;
 import au.com.codeka.warworlds.model.BuildingDesignManager;
 import au.com.codeka.warworlds.model.Colony;
 import au.com.codeka.warworlds.model.Design;
@@ -23,32 +22,25 @@ import au.com.codeka.warworlds.model.Empire;
 import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.EmpirePresence;
 import au.com.codeka.warworlds.model.Fleet;
-import au.com.codeka.warworlds.model.StarManager;
-import au.com.codeka.warworlds.model.StarManager.StarFetchedHandler;
 import au.com.codeka.warworlds.model.MyEmpire;
 import au.com.codeka.warworlds.model.Planet;
 import au.com.codeka.warworlds.model.ShipDesignManager;
 import au.com.codeka.warworlds.model.Star;
+import au.com.codeka.warworlds.model.StarManager;
+import au.com.codeka.warworlds.model.StarManager.StarFetchedHandler;
 
 /**
  * This activity is displayed when you're actually looking at a solar system (star + planets)
  */
-public class SolarSystemActivity extends Activity {
+public class SolarSystemActivity extends UniverseElementActivity {
     private SolarSystemSurfaceView mSolarSystemSurfaceView;
     private long mSectorX;
     private long mSectorY;
     private String mStarKey;
     private boolean mIsSectorUpdated;
-    private CopyOnWriteArrayList<OnStarUpdatedListener> mStarUpdatedListeners;
     private Star mStar;
     private Planet mPlanet;
     private Colony mColony;
-
-    public static final int BUILD_DIALOG = 1000;
-    public static final int BUILD_CONFIRM_DIALOG = 1001;
-    public static final int FOCUS_DIALOG = 1002;
-    public static final int FLEET_DIALOG = 1003;
-    public static final int FLEET_SPLIT_DIALOG = 1004;
 
     /** Called when the activity is first created. */
     @Override
@@ -56,7 +48,6 @@ public class SolarSystemActivity extends Activity {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE); // remove the title bar
 
-        mStarUpdatedListeners = new CopyOnWriteArrayList<OnStarUpdatedListener>();
         setContentView(R.layout.solarsystem);
 
         final TextView username = (TextView) findViewById(R.id.username);
@@ -92,40 +83,23 @@ public class SolarSystemActivity extends Activity {
         buildButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                showDialog(BUILD_DIALOG);
+                showDialog(BuildDialog.ID);
             }
         });
 
         focusButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                showDialog(FOCUS_DIALOG);
+                showDialog(FocusDialog.ID);
             }
         });
 
         fleetButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                showDialog(FLEET_DIALOG);
+                showDialog(FleetDialog.ID);
             }
         });
-    }
-
-
-    public void addStarUpdatedListener(OnStarUpdatedListener listener) {
-        if (!mStarUpdatedListeners.contains(listener)) {
-            mStarUpdatedListeners.add(listener);
-        }
-    }
-
-    public void removeStarUpdatedListener(OnStarUpdatedListener listener) {
-        mStarUpdatedListeners.remove(listener);
-    }
-
-    protected void fireStarUpdated(Star star, Planet selectedPlanet, Colony colony) {
-        for(OnStarUpdatedListener listener : mStarUpdatedListeners) {
-            listener.onStarUpdated(star, selectedPlanet, colony);
-        }
     }
 
     @Override
@@ -164,16 +138,14 @@ public class SolarSystemActivity extends Activity {
     @Override
     protected Dialog onCreateDialog(int id) {
         switch(id) {
-        case BUILD_DIALOG:
+        case BuildDialog.ID:
             return new BuildDialog(this);
-        case BUILD_CONFIRM_DIALOG:
+        case BuildConfirmDialog.ID:
             return new BuildConfirmDialog(this);
-        case FOCUS_DIALOG:
+        case FocusDialog.ID:
             return new FocusDialog(this);
-        case FLEET_DIALOG:
+        case FleetDialog.ID:
             return new FleetDialog(this);
-        case FLEET_SPLIT_DIALOG:
-            return new FleetSplitDialog(this);
         }
 
         return super.onCreateDialog(id);
@@ -182,7 +154,7 @@ public class SolarSystemActivity extends Activity {
     @Override
     protected void onPrepareDialog(int id, Dialog d, Bundle args) {
         switch(id) {
-        case BUILD_CONFIRM_DIALOG: {
+        case BuildConfirmDialog.ID: {
             BuildConfirmDialog dialog = (BuildConfirmDialog) d;
             String designID = args.getString("au.com.codeka.warworlds.DesignID");
             if (designID == null)
@@ -202,22 +174,22 @@ public class SolarSystemActivity extends Activity {
             dialog.setColony(mColony);
             break;
         }
-        case BUILD_DIALOG: {
+        case BuildDialog.ID: {
             BuildDialog dialog = (BuildDialog) d;
             dialog.setColony(mStar, mColony);
             break;
         }
-        case FOCUS_DIALOG: {
+        case FocusDialog.ID: {
             FocusDialog dialog = (FocusDialog) d;
             dialog.setColony(mColony);
             break;
         }
-        case FLEET_DIALOG: {
+        case FleetDialog.ID: {
             FleetDialog dialog = (FleetDialog) d;
             dialog.setStar(mStar);
             break;
         }
-        case FLEET_SPLIT_DIALOG: {
+        case FleetSplitDialog.ID: {
             FleetSplitDialog dialog = (FleetSplitDialog) d;
 
             String fleetKey = args.getString("au.com.codeka.warworlds.FleetKey");
@@ -226,13 +198,15 @@ public class SolarSystemActivity extends Activity {
                     dialog.setFleet(f);
                 }
             }
+            break;
         }
         }
 
         super.onPrepareDialog(id, d, args);
     }
 
-    public void refreshStar() {
+    @Override
+    public void refresh() {
         String selectedPlanetKey = null;
         Planet selectedPlanet = mSolarSystemSurfaceView.getSelectedPlanet();
         if (selectedPlanet != null) {
@@ -446,16 +420,12 @@ public class SolarSystemActivity extends Activity {
             @Override
             public void onColonizeComplete(Colony colony) {
                 // refresh this page
-                refreshStar();
+                refresh();
 
                 // remember that the sector we're in has now been updated so we can pass that
                 // back to the StarfieldActivity
                 mIsSectorUpdated = true;
             }
         });
-    }
-
-    public interface OnStarUpdatedListener {
-        void onStarUpdated(Star star, Planet selectedPlanet, Colony colony);
     }
 }

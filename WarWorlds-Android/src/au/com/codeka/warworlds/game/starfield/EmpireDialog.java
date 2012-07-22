@@ -2,7 +2,6 @@ package au.com.codeka.warworlds.game.starfield;
 
 import java.util.HashSet;
 
-import android.app.Dialog;
 import android.os.Bundle;
 import android.text.Html;
 import android.view.View;
@@ -12,6 +11,7 @@ import android.view.ViewGroup.LayoutParams;
 import android.widget.Button;
 import android.widget.TextView;
 import au.com.codeka.warworlds.R;
+import au.com.codeka.warworlds.game.UniverseElementDialog;
 import au.com.codeka.warworlds.model.Colony;
 import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.Fleet;
@@ -20,7 +20,7 @@ import au.com.codeka.warworlds.model.MyEmpire;
 /**
  * This dialog shows the status of the empire. You can see all your colonies, all your fleets, etc.
  */
-public class EmpireDialog extends Dialog {
+public class EmpireDialog extends UniverseElementDialog {
     private StarfieldActivity mActivity;
 
     public static final int ID = 2001;

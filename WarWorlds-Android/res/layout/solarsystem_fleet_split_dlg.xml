@@ -16,7 +16,7 @@
         android:layout_height="40dp"
         android:layout_below="@+id/title"
         android:layout_marginTop="10dp"
-        layout="@layout/solarsystem_fleet_row" />
+        layout="@layout/fleet_list_row" />
 
     <SeekBar
         android:id="@+id/split_ratio"

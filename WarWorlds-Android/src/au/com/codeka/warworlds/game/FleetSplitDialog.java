@@ -1,4 +1,4 @@
-package au.com.codeka.warworlds.game.solarsystem;
+package au.com.codeka.warworlds.game;
 
 import warworlds.Warworlds.FleetOrder;
 import android.app.Dialog;
@@ -12,13 +12,16 @@ import android.widget.TextView;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.api.ApiClient;
 import au.com.codeka.warworlds.api.ApiException;
+import au.com.codeka.warworlds.ctrl.FleetList;
 import au.com.codeka.warworlds.model.Fleet;
 
 public class FleetSplitDialog extends Dialog {
     private Fleet mFleet;
-    private SolarSystemActivity mActivity;
+    private UniverseElementActivity mActivity;
 
-    public FleetSplitDialog(SolarSystemActivity activity) {
+    public static final int ID = 1004;
+
+    public FleetSplitDialog(UniverseElementActivity activity) {
         super(activity);
         mActivity = activity;
     }
@@ -62,7 +65,7 @@ public class FleetSplitDialog extends Dialog {
                     protected void onPostExecute(Boolean success) {
                         splitBtn.setEnabled(true);
                         if (success) {
-                            mActivity.refreshStar();
+                            mActivity.refresh();
                             dismiss();
                         }
                     }
@@ -120,7 +123,7 @@ public class FleetSplitDialog extends Dialog {
         mFleet = fleet;
 
         View fleetView = findViewById(R.id.fleet);
-        FleetDialog.populateFleetRow(fleetView, fleet);
+        FleetList.populateFleetRow(fleetView, fleet);
 
         SeekBar splitRatio = (SeekBar) findViewById(R.id.split_ratio);
         splitRatio.setMax(fleet.getNumShips());

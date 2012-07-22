@@ -1,6 +1,7 @@
 package au.com.codeka.warworlds.game.starfield;
 
-import android.app.Activity;
+import java.util.List;
+
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
@@ -18,10 +19,13 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import au.com.codeka.warworlds.R;
+import au.com.codeka.warworlds.game.FleetSplitDialog;
+import au.com.codeka.warworlds.game.UniverseElementActivity;
 import au.com.codeka.warworlds.game.solarsystem.SolarSystemActivity;
 import au.com.codeka.warworlds.model.Colony;
 import au.com.codeka.warworlds.model.Empire;
 import au.com.codeka.warworlds.model.EmpireManager;
+import au.com.codeka.warworlds.model.Fleet;
 import au.com.codeka.warworlds.model.ImageManager;
 import au.com.codeka.warworlds.model.Planet;
 import au.com.codeka.warworlds.model.PlanetImageManager;
@@ -33,7 +37,7 @@ import au.com.codeka.warworlds.model.StarManager;
  * The \c StarfieldActivity is the "home" screen of the game, and displays the
  * starfield where you scroll around and interact with stars, etc.
  */
-public class StarfieldActivity extends Activity {
+public class StarfieldActivity extends UniverseElementActivity {
     private Context mContext = this;
     private StarfieldSurfaceView mStarfield;
     private TextView mUsername;
@@ -167,6 +171,19 @@ public class StarfieldActivity extends Activity {
         case EmpireDialog.ID: {
             EmpireDialog dialog = (EmpireDialog) d;
             dialog.refresh();
+            break;
+        }
+        case FleetSplitDialog.ID: {
+            FleetSplitDialog dialog = (FleetSplitDialog) d;
+
+            String fleetKey = args.getString("au.com.codeka.warworlds.FleetKey");
+            List<Fleet> fleets = EmpireManager.getInstance().getEmpire().getAllFleets();
+            if (fleets != null) for (Fleet f : fleets) {
+                if (f.getKey().equals(fleetKey)) {
+                    dialog.setFleet(f);
+                }
+            }
+            break;
         }
         }
 

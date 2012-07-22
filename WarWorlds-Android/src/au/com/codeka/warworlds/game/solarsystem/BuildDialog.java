@@ -3,7 +3,6 @@ package au.com.codeka.warworlds.game.solarsystem;
 import java.util.ArrayList;
 import java.util.List;
 
-import android.app.Dialog;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,6 +16,8 @@ import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.model.Colony;
 import au.com.codeka.warworlds.model.Planet;
 import au.com.codeka.warworlds.model.Star;
+import au.com.codeka.warworlds.game.UniverseElementActivity;
+import au.com.codeka.warworlds.game.UniverseElementDialog;
 
 /**
  * When you click "Build" shows you the list of buildings/ships that are/can be built by your
@@ -24,10 +25,12 @@ import au.com.codeka.warworlds.model.Star;
  * @author dean@codeka.com.au
  *
  */
-public class BuildDialog extends Dialog
-        implements SolarSystemActivity.OnStarUpdatedListener {
+public class BuildDialog extends UniverseElementDialog
+        implements UniverseElementActivity.OnUpdatedListener {
     private SolarSystemActivity mActivity;
     private TabManager mTabManager;
+
+    public static final int ID = 1000;
 
     public BuildDialog(SolarSystemActivity activity) {
         super(activity);
@@ -57,12 +60,12 @@ public class BuildDialog extends Dialog
 
     @Override
     protected void onStart() {
-        mActivity.addStarUpdatedListener(this);
+        mActivity.addUpdatedListener(this);
     }
 
     @Override
     protected void onStop() {
-        mActivity.removeStarUpdatedListener(this);
+        mActivity.removeUpdatedListener(this);
     }
 
     public void setColony(Star star, Colony colony) {
@@ -130,5 +133,9 @@ public class BuildDialog extends Dialog
     @Override
     public void onStarUpdated(Star star, Planet selectedPlanet, Colony colony) {
         setColony(star, colony);
+    }
+
+    @Override
+    public void onSectorUpdated() {
     }
 }

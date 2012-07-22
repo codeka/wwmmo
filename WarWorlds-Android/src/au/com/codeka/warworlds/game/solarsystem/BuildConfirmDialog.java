@@ -3,7 +3,6 @@ package au.com.codeka.warworlds.game.solarsystem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import android.app.Dialog;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -19,6 +18,7 @@ import au.com.codeka.warworlds.WarWorldsActivity;
 import au.com.codeka.warworlds.api.ApiClient;
 import au.com.codeka.warworlds.api.ApiException;
 import au.com.codeka.warworlds.ctrl.TransparentWebView;
+import au.com.codeka.warworlds.game.UniverseElementDialog;
 import au.com.codeka.warworlds.model.BuildQueueManager;
 import au.com.codeka.warworlds.model.BuildRequest;
 import au.com.codeka.warworlds.model.BuildingDesignManager;
@@ -26,11 +26,13 @@ import au.com.codeka.warworlds.model.Colony;
 import au.com.codeka.warworlds.model.Design;
 import au.com.codeka.warworlds.model.ShipDesignManager;
 
-public class BuildConfirmDialog extends Dialog {
+public class BuildConfirmDialog extends UniverseElementDialog {
     private static Logger log = LoggerFactory.getLogger(WarWorldsActivity.class);
     private Colony mColony;
     private Design mDesign;
     private SolarSystemActivity mActivity;
+
+    public static final int ID = 1001;
 
     public BuildConfirmDialog(SolarSystemActivity activity) {
         super(activity);
@@ -88,7 +90,7 @@ public class BuildConfirmDialog extends Dialog {
 
                         // refresh the solar system as well, since now we're building something
                         // we'll need to recalculate times and whatnot
-                        mActivity.refreshStar();
+                        mActivity.refresh();
 
                         okButton.setEnabled(true);
                         dismiss();
