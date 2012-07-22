@@ -25,6 +25,7 @@ import au.com.codeka.warworlds.model.EmpirePresence;
 import au.com.codeka.warworlds.model.Fleet;
 import au.com.codeka.warworlds.model.ModelManager;
 import au.com.codeka.warworlds.model.ModelManager.StarFetchedHandler;
+import au.com.codeka.warworlds.model.MyEmpire;
 import au.com.codeka.warworlds.model.Planet;
 import au.com.codeka.warworlds.model.ShipDesignManager;
 import au.com.codeka.warworlds.model.Star;
@@ -441,7 +442,7 @@ public class SolarSystemActivity extends Activity {
             return;
         }
 
-        EmpireManager.getInstance().getEmpire().colonize(planet, new Empire.ColonizeCompleteHandler() {
+        EmpireManager.getInstance().getEmpire().colonize(planet, new MyEmpire.ColonizeCompleteHandler() {
             @Override
             public void onColonizeComplete(Colony colony) {
                 // refresh this page

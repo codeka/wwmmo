@@ -47,6 +47,8 @@ public class EmpireDialog extends Dialog {
         final TextView empireName = (TextView) findViewById(R.id.empire_name);
         empireName.setText(EmpireManager.getInstance().getEmpire().getDisplayName());
 
+        
+
         //final TextView overviewText = (TextView) findViewById(R.id.overview_text);
         //overviewText.setText(text)
 

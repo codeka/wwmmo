@@ -25,17 +25,20 @@ public class EmpireManager {
 
     private Map<String, Empire> mEmpireCache = new HashMap<String, Empire>();
     private Map<String, List<EmpireFetchedHandler>> mInProgress = new HashMap<String, List<EmpireFetchedHandler>>();
-    private Empire mEmpire;
+    private MyEmpire mEmpire;
 
     /**
      * This is called when you first connect to the server. We need to pass in details about
      * the empire and stuff.
      */
-    public void setup(Empire empire) {
+    public void setup(MyEmpire empire) {
         mEmpire = empire;
     }
 
-    public Empire getEmpire() {
+    /**
+     * Gets a reference to the current empire.
+     */
+    public MyEmpire getEmpire() {
         return mEmpire;
     }
 

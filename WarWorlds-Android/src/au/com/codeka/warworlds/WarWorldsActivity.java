@@ -25,8 +25,8 @@ import au.com.codeka.warworlds.game.starfield.StarfieldActivity;
 import au.com.codeka.warworlds.model.BuildQueueManager;
 import au.com.codeka.warworlds.model.BuildingDesignManager;
 import au.com.codeka.warworlds.model.ChatManager;
-import au.com.codeka.warworlds.model.Empire;
 import au.com.codeka.warworlds.model.EmpireManager;
+import au.com.codeka.warworlds.model.MyEmpire;
 import au.com.codeka.warworlds.model.ShipDesignManager;
 
 /**
@@ -141,7 +141,7 @@ public class WarWorldsActivity extends Activity {
                     if (hello.hasEmpire()) {
                         mNeedsEmpireSetup = false;
                         EmpireManager.getInstance().setup(
-                                Empire.fromProtocolBuffer(hello.getEmpire()));
+                                MyEmpire.fromProtocolBuffer(hello.getEmpire()));
                     } else {
                         mNeedsEmpireSetup = true;
                     }
