@@ -1,0 +1,74 @@
+{% extends "admin/skeleton.html" %}
+
+{% block head %}
+  <style>
+    textarea#search-results {
+      width: 800px;
+      height: 400px;
+    }
+    form {
+      position: relative;
+      height: 28pt;
+      line-height: 28pt;
+      width: 500pt;
+    }
+    form input[type=submit] {
+      position: absolute;
+      right: 0;
+    }
+    form input[type=text] {
+      position: absolute;
+      top: 0; left: 60pt;
+      bottom: 0; right: 70pt;
+      border: solid 1px black;
+    }
+    form label {
+      display: block;
+      position: absolute;
+      left: 0; width: 60pt;
+      top: 0; bottom: 0;
+    }
+
+  </style>
+{% endblock %}
+
+{% block content %}
+  <h1>Empires</h1>
+  <p>To find the details of a given Empire, enter the email address below of the user
+     who owns the Empire, or the Empire's key, then click &ldquo;Search&rdquo;.
+  <form id="find-byemail">
+    <label for="search-email">Email:</label>
+    <input type="text" id="search-email" />
+    <input type="submit" value="Search" />
+  </form>
+  <form id="find-byid">
+    <label for="search-id">Key:</label>
+    <input type="text" id="search-id" />
+    <input type="submit" value="Search" />
+  </form>
+  <textarea id="search-results"></textarea>
+  <script>
+    $("#find-byemail, #find-byid").on("click", "input[type=submit]", function(evnt) {
+      evnt.preventDefault();
+
+      var url = "";
+      var inp = $(this).parents("form").find("input[type=text]")
+      if (inp.is("#search-email")) {
+        url = "/api/v1/empires?email="+inp.val();
+      } else {
+        url = "/api/v1/empires/"+inp.val()+"/details";
+      }
+
+      $.ajax({
+        url: url,
+        dataType: "json",
+        success: function (data) {
+          $("#search-results").val(JSON.stringify(data, null, "  "));
+        },
+        error: function(data) {
+          alert("An error occured, check server logs.");
+        }
+      });
+    });
+  </script>
+{% endblock %}

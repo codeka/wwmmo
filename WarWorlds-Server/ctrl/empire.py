@@ -627,6 +627,23 @@ def scheduleBuildCheck():
                   eta=time)
 
 
+def getFleetsForEmpire(empire_pb):
+  cache_key = "fleet:for-empire:%s" % empire_pb.key
+  values = ctrl.getCached([cache_key], pb.Fleets)
+  #if cache_key in values:
+  #  return values[cache_key]
+
+  fleet_models = mdl.Fleet.getForEmpire(empire_pb.key)
+  logging.debug("Adding %d fleets for %s" % (len(fleet_models), empire_pb.key))
+  fleets_pb = pb.Fleets()
+  for fleet_model in fleet_models:
+    fleet_pb = fleets_pb.fleets.add()
+    ctrl.fleetModelToPb(fleet_pb, fleet_model)
+
+  ctrl.setCached({cache_key: fleets_pb})
+  return fleets_pb
+
+
 def getFleet(fleet_key):
   cache_key = "fleet:%s" % (fleet_key)
   fleet = ctrl.getCached([cache_key], pb.Fleet)
@@ -669,6 +686,7 @@ def orderFleet(fleet_pb, order_pb):
     right_model.put()
 
     ctrl.clearCached(["fleet:%s" % fleet_pb.key,
+                      "fleet:for-empire:%s" % fleet_pb.empire_key,
                       "star:%s" % fleet_pb.star_key])
     return True
 

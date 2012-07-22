@@ -111,6 +111,7 @@ class BuildCheckPage(tasks.TaskPage):
 
       # clear the cached items that reference this building/fleet
       keys_to_clear.append("star:%s" % (star_key))
+      keys_to_clear.append("fleet:for-empire:%s" % (empire_key))
       keys_to_clear.append("colonies:for-empire:%s" % (empire_key))
 
     ctrl.clearCached(keys_to_clear)

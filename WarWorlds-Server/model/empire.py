@@ -53,6 +53,7 @@ class Empire(db.Model):
     db.run_in_transaction(inc_colony_count)
     return colony
 
+
 class Colony(db.Model):
   """Represents a colony on a planet. A colony is owned by a single Empire.
 
@@ -75,8 +76,10 @@ class Colony(db.Model):
   focusConstruction = db.FloatProperty()
 
   @staticmethod
-  def getForEmpire(empire_key):
-    query = Colony.all().filter("empire", empire_key)
+  def getForEmpire(empire):
+    if not isinstance(empire, Empire):
+      empire = db.Key(empire)
+    query = Colony.all().filter("empire", empire)
     return Colony._getForQuery(query)
 
   @staticmethod
@@ -186,6 +189,13 @@ class Fleet(db.Model):
   @staticmethod
   def getForStar(star_model):
     query = Fleet.all().filter("star", star_model)
+    return Fleet._getForQuery(query)
+
+  @staticmethod
+  def getForEmpire(empire):
+    if not isinstance(empire, Empire):
+      empire = db.Key(empire)
+    query = Fleet.all().filter("empire", empire)
     return Fleet._getForQuery(query)
 
   @staticmethod

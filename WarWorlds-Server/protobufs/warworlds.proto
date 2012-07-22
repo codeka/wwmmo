@@ -43,6 +43,12 @@ message Empire
     }
 
     required EmpireState state = 5;
+
+    // May not be set, but if it is this is all of the fleets owned by this empire
+    repeated Fleet fleets = 6;
+
+    // May not be set, but if it si this is all of the colonies owned by the empire
+    repeated Colony colonies = 7;
 }
 
 
@@ -439,6 +445,12 @@ message Fleet
     // If in attacking state, this is the target fleet or colony we're attacking
     optional string target_fleet_key = 9;
     optional string target_colony_key = 10;
+}
+
+
+message Fleets
+{
+    repeated Fleet fleets = 1;
 }
 
 

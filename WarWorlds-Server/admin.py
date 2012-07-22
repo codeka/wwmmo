@@ -102,11 +102,11 @@ class ChatPage(AdminPage):
     self.render("admin/chat.html", {"token": token})
 
 
-class EmpiresPage(AdminPage):
+class DebugEmpiresPage(AdminPage):
   """The 'empires' page lets you view, query, update, delete (etc) empires."""
 
   def get(self):
-    self.render("admin/empires.html", {})
+    self.render("admin/debug/empires.html", {})
 
 
 class MotdPage(AdminPage):
@@ -159,10 +159,10 @@ class DevicesPage(AdminPage):
     self.render("admin/devices.html", {})
 
 app = webapp.WSGIApplication([("/admin", DashboardPage),
-                              ("/admin/empires", EmpiresPage),
                               ("/admin/chat", ChatPage),
                               ("/admin/motd", MotdPage),
                               ("/admin/devices", DevicesPage),
+                              ("/admin/debug/empires", DebugEmpiresPage),
                               ("/admin/debug/starfield", DebugStarfieldPage),
                               ("/admin/debug/data-store", DebugDataStorePage)],
                              debug=os.environ["SERVER_SOFTWARE"].startswith("Development"))

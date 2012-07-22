@@ -170,6 +170,24 @@ class EmpiresPage(ApiPage):
     empire.createEmpire(empire_pb)
 
 
+class EmpireDetailsPage(ApiPage):
+  """The EmpireDetailsPage returns detailed information about the empire including all
+  of the empire's fleets, colonies and so on. It's only available to the owner of the
+  empire, and the administrators."""
+
+  def get(self, empireKey):
+    empire_pb = empire.getEmpire(empireKey)
+
+    if self._isAdmin() or empire_pb.email == self.user.email():
+      colonies_pb = empire.getColoniesForEmpire(empire_pb)
+      empire_pb.colonies.MergeFrom(colonies_pb.colonies)
+
+      fleets_pb = empire.getFleetsForEmpire(empire_pb)
+      empire_pb.fleets.MergeFrom(fleets_pb.fleets)
+
+    return empire_pb
+
+
 class DevicesPage(ApiPage):
   def post(self):
     registration_pb = self._getRequestBody(pb.DeviceRegistration)
@@ -437,6 +455,7 @@ app = ApiApplication([("/api/v1/hello/([^/]+)", HelloPage),
                       ("/api/v1/chat", ChatPage),
                       ("/api/v1/empires", EmpiresPage),
                       ("/api/v1/empires/([^/]+)", EmpiresPage),
+                      ("/api/v1/empires/([^/]+)/details", EmpireDetailsPage),
                       ("/api/v1/devices", DevicesPage),
                       ("/api/v1/devices/([^/]+)", DevicesPage),
                       ("/api/v1/devices/user:([^/]+)/messages", DeviceMessagesPage),
