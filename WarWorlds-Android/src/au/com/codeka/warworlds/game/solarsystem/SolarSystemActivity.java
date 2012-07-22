@@ -23,8 +23,8 @@ import au.com.codeka.warworlds.model.Empire;
 import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.EmpirePresence;
 import au.com.codeka.warworlds.model.Fleet;
-import au.com.codeka.warworlds.model.ModelManager;
-import au.com.codeka.warworlds.model.ModelManager.StarFetchedHandler;
+import au.com.codeka.warworlds.model.StarManager;
+import au.com.codeka.warworlds.model.StarManager.StarFetchedHandler;
 import au.com.codeka.warworlds.model.MyEmpire;
 import au.com.codeka.warworlds.model.Planet;
 import au.com.codeka.warworlds.model.ShipDesignManager;
@@ -243,7 +243,7 @@ public class SolarSystemActivity extends Activity {
     }
 
     private void refreshStar(final String selectedPlanetKey) {
-        ModelManager.requestStar(mSectorX, mSectorY, mStarKey, new StarFetchedHandler() {
+        StarManager.requestStar(mSectorX, mSectorY, mStarKey, new StarFetchedHandler() {
             @Override
             public void onStarFetched(Star star) {
                 mSolarSystemSurfaceView.setStar(star);

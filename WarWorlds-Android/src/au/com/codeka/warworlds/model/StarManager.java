@@ -7,8 +7,8 @@ import org.slf4j.LoggerFactory;
 import android.os.AsyncTask;
 import au.com.codeka.warworlds.api.ApiClient;
 
-public class ModelManager {
-    private static final Logger log = LoggerFactory.getLogger(ModelManager.class);
+public class StarManager {
+    private static final Logger log = LoggerFactory.getLogger(StarManager.class);
 
     /**
      * Requests the details of a star from the server, and calls the given callback when it's

@@ -28,7 +28,7 @@ import au.com.codeka.warworlds.model.Colony;
 import au.com.codeka.warworlds.model.Empire;
 import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.ImageManager;
-import au.com.codeka.warworlds.model.ModelManager;
+import au.com.codeka.warworlds.model.StarManager;
 import au.com.codeka.warworlds.model.Planet;
 import au.com.codeka.warworlds.model.PlanetImageManager;
 import au.com.codeka.warworlds.model.SectorManager;
@@ -85,8 +85,8 @@ public class StarfieldActivity extends Activity {
                 mLoadingContainer.setVisibility(View.VISIBLE);
                 mPlanetList.setVisibility(View.GONE);
 
-                ModelManager.requestStar(star.getSector().getX(), star.getSector().getY(),
-                        star.getKey(), new ModelManager.StarFetchedHandler() {
+                StarManager.requestStar(star.getSector().getX(), star.getSector().getY(),
+                        star.getKey(), new StarManager.StarFetchedHandler() {
                     /**
                      * This is called on the main thread when the star is actually fetched.
                      */
