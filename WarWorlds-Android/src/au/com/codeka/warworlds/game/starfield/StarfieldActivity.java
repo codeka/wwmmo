@@ -18,21 +18,16 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import au.com.codeka.warworlds.R;
-import au.com.codeka.warworlds.game.solarsystem.BuildConfirmDialog;
-import au.com.codeka.warworlds.game.solarsystem.BuildDialog;
-import au.com.codeka.warworlds.game.solarsystem.FleetDialog;
-import au.com.codeka.warworlds.game.solarsystem.FleetSplitDialog;
-import au.com.codeka.warworlds.game.solarsystem.FocusDialog;
 import au.com.codeka.warworlds.game.solarsystem.SolarSystemActivity;
 import au.com.codeka.warworlds.model.Colony;
 import au.com.codeka.warworlds.model.Empire;
 import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.ImageManager;
-import au.com.codeka.warworlds.model.StarManager;
 import au.com.codeka.warworlds.model.Planet;
 import au.com.codeka.warworlds.model.PlanetImageManager;
 import au.com.codeka.warworlds.model.SectorManager;
 import au.com.codeka.warworlds.model.Star;
+import au.com.codeka.warworlds.model.StarManager;
 
 /**
  * The \c StarfieldActivity is the "home" screen of the game, and displays the
@@ -171,7 +166,7 @@ public class StarfieldActivity extends Activity {
         switch(id) {
         case EmpireDialog.ID: {
             EmpireDialog dialog = (EmpireDialog) d;
-            // TODO??
+            dialog.refresh();
         }
         }
 

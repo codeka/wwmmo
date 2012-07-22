@@ -74,7 +74,7 @@
     <string name="colonies">Colonies</string>
     <string name="overview">Overview</string>
     <string name="empire_overview_format"><![CDATA[
-%1$d stars and %2$d planets colonized\n
-%3$d ships in %4$d fleets
+        <strong>%1$d</strong> stars and <strong>%2$d</strong> planets colonized<br/>
+        <strong>%3$d</strong> ships in <strong>%4$d</strong> fleets
     ]]></string>
 </resources>

@@ -15,12 +15,12 @@ public class Empire {
 
     public static Empire fromProtocolBuffer(warworlds.Warworlds.Empire pb) {
         Empire empire = new Empire();
-        populateFromProtocolBuffer(pb, empire);
+        empire.populateFromProtocolBuffer(pb);
         return empire;
     }
 
-    protected static void populateFromProtocolBuffer(warworlds.Warworlds.Empire pb, Empire empire) {
-        empire.mKey = pb.getKey();
-        empire.mDisplayName = pb.getDisplayName();
+    protected void populateFromProtocolBuffer(warworlds.Warworlds.Empire pb) {
+        mKey = pb.getKey();
+        mDisplayName = pb.getDisplayName();
     }
 }

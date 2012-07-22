@@ -1,7 +1,10 @@
 package au.com.codeka.warworlds.game.starfield;
 
+import java.util.HashSet;
+
 import android.app.Dialog;
 import android.os.Bundle;
+import android.text.Html;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -9,7 +12,10 @@ import android.view.ViewGroup.LayoutParams;
 import android.widget.Button;
 import android.widget.TextView;
 import au.com.codeka.warworlds.R;
+import au.com.codeka.warworlds.model.Colony;
 import au.com.codeka.warworlds.model.EmpireManager;
+import au.com.codeka.warworlds.model.Fleet;
+import au.com.codeka.warworlds.model.MyEmpire;
 
 /**
  * This dialog shows the status of the empire. You can see all your colonies, all your fleets, etc.
@@ -18,6 +24,15 @@ public class EmpireDialog extends Dialog {
     private StarfieldActivity mActivity;
 
     public static final int ID = 2001;
+
+    private View mOverviewContainer;
+    private View mFleetContainer;
+    private View mColonyContainer;
+    private View mProgressContainer;
+    private Button mOverviewButton;
+    private Button mFleetButton;
+    private Button mColonyButton;
+    
 
     public EmpireDialog(StarfieldActivity activity) {
         super(activity);
@@ -36,47 +51,93 @@ public class EmpireDialog extends Dialog {
         params.width = LayoutParams.MATCH_PARENT;
         getWindow().setAttributes(params);
 
-        final View overviewContainer = findViewById(R.id.overview_container);
-        final View fleetContainer = findViewById(R.id.fleet_container);
-        final View colonyContainer = findViewById(R.id.colony_container);
+        mOverviewContainer = findViewById(R.id.overview_container);
+        mFleetContainer = findViewById(R.id.fleet_container);
+        mColonyContainer = findViewById(R.id.colony_container);
+        mProgressContainer = findViewById(R.id.progress_container);
+        mOverviewButton = (Button) findViewById(R.id.overview_btn);
+        mFleetButton = (Button) findViewById(R.id.fleet_btn);
+        mColonyButton = (Button) findViewById(R.id.colony_btn);
 
-        final Button overviewBtn = (Button) findViewById(R.id.overview_btn);
-        final Button fleetBtn = (Button) findViewById(R.id.fleet_btn);
-        final Button colonyBtn = (Button) findViewById(R.id.colony_btn);
+        refresh();
+
+        mOverviewButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mFleetContainer.setVisibility(View.GONE);
+                mColonyContainer.setVisibility(View.GONE);
+                mOverviewContainer.setVisibility(View.VISIBLE);
+            }
+        });
+
+        mFleetButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mOverviewContainer.setVisibility(View.GONE);
+                mColonyContainer.setVisibility(View.GONE);
+                mFleetContainer.setVisibility(View.VISIBLE);
+            }
+        });
+
+        mColonyButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mFleetContainer.setVisibility(View.GONE);
+                mOverviewContainer.setVisibility(View.GONE);
+                mColonyContainer.setVisibility(View.VISIBLE);
+            }
+        });
+    }
+
+    public void refresh() {
+        mOverviewContainer.setVisibility(View.GONE);
+        mFleetContainer.setVisibility(View.GONE);
+        mColonyContainer.setVisibility(View.GONE);
+        mProgressContainer.setVisibility(View.VISIBLE);
+        mOverviewButton.setEnabled(false);
+        mFleetButton.setEnabled(false);
+        mColonyButton.setEnabled(false);
+
+        MyEmpire empire = EmpireManager.getInstance().getEmpire();
 
         final TextView empireName = (TextView) findViewById(R.id.empire_name);
-        empireName.setText(EmpireManager.getInstance().getEmpire().getDisplayName());
+        empireName.setText(empire.getDisplayName());
 
-        
-
-        //final TextView overviewText = (TextView) findViewById(R.id.overview_text);
-        //overviewText.setText(text)
-
-        overviewBtn.setOnClickListener(new View.OnClickListener() {
+        empire.refreshAllDetails(new MyEmpire.RefreshAllCompleteHandler() {
             @Override
-            public void onClick(View v) {
-                fleetContainer.setVisibility(View.GONE);
-                colonyContainer.setVisibility(View.GONE);
-                overviewContainer.setVisibility(View.VISIBLE);
+            public void onRefreshAllComplete(MyEmpire empire) {
+                updateControls(empire);
+
+                mOverviewContainer.setVisibility(View.VISIBLE);
+                mFleetContainer.setVisibility(View.GONE);
+                mColonyContainer.setVisibility(View.GONE);
+                mProgressContainer.setVisibility(View.GONE);
+                mOverviewButton.setEnabled(true);
+                mFleetButton.setEnabled(true);
+                mColonyButton.setEnabled(true);
             }
         });
+    }
 
-        fleetBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                overviewContainer.setVisibility(View.GONE);
-                colonyContainer.setVisibility(View.GONE);
-                fleetContainer.setVisibility(View.VISIBLE);
-            }
-        });
+    private void updateControls(MyEmpire empire) {
+        HashSet<String> colonizedStarKeys = new HashSet<String>();
+        for (Colony c : empire.getAllColonies()) {
+            colonizedStarKeys.add(c.getStarKey());
+        }
 
-        colonyBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                fleetContainer.setVisibility(View.GONE);
-                overviewContainer.setVisibility(View.GONE);
-                colonyContainer.setVisibility(View.VISIBLE);
-            }
-        });
+        int totalShips = 0;
+        for (Fleet f : empire.getAllFleets()) {
+            totalShips += f.getNumShips();
+        }
+
+        // Current value of R.id.empire_overview_format (in English):
+        // %1$d stars and %2$d planets colonized
+        // %3$d ships in %4$d fleets
+        String fmt = mActivity.getString(R.string.empire_overview_format);
+        final TextView overviewText = (TextView) findViewById(R.id.overview_text);
+        String overview = String.format(fmt,
+                colonizedStarKeys.size(), empire.getAllColonies().size(),
+                totalShips, empire.getAllFleets().size());
+        overviewText.setText(Html.fromHtml(overview));
     }
 }
