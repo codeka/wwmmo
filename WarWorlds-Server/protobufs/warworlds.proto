@@ -53,7 +53,7 @@ message Empire
     // If this is set, then it will be a list of the stars referenced by the fleets
     // and colonies. This is useful because you often want details of the stars the
     // colony/fleet is on (so you can draw the icon, etc). Note that it will *only*
-    // be the stars, and not any planets, build requests, etc.
+    // be the stars and the planets, not colonies, build requests, etc.
     repeated Star stars = 8;
 }
 

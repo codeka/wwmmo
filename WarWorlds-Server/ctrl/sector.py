@@ -95,20 +95,16 @@ def getStarSummaries(star_keys):
     cache_keys.append("star:summary:%s" % star_key)
   values = ctrl.getCached(cache_keys, pb.Star)
 
-  # figure out which stars are "missing"
-  missing = []
+  # figure out which stars are "missing" and fetch those
+  cache_mapping = {}
   for star_key in star_keys:
     if star_key in values:
       continue
-    missing.append(star_key)
 
-  # fetch the missing stars from the model, cache them
-  star_models = mdl.Star.get(missing)
-  cache_mapping = {}
-  for star_model in star_models:
+    star_model = mdl.SectorManager.getStar(star_key)
     star_pb = pb.Star()
     ctrl.starModelToPb(star_pb, star_model)
-    
+
     cache_key = "star:summary:%s" % star_pb.key
     values[cache_key] = star_pb
     cache_mapping[cache_key] = star_pb

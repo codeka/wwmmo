@@ -20,10 +20,12 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+import au.com.codeka.RomanNumeralFormatter;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.game.UniverseElementActivity;
 import au.com.codeka.warworlds.model.Colony;
 import au.com.codeka.warworlds.model.ImageManager;
+import au.com.codeka.warworlds.model.Planet;
 import au.com.codeka.warworlds.model.PlanetImageManager;
 import au.com.codeka.warworlds.model.Star;
 import au.com.codeka.warworlds.model.StarImageManager;
@@ -191,9 +193,16 @@ public class ColonyList extends FrameLayout {
 
             Colony colony = mColonies.get(position);
             Star star = mStars.get(colony.getStarKey());
+            Planet planet = null;
+            for (Planet p : star.getPlanets()) {
+                if (p.getKey().equals(colony.getPlanetKey())) {
+                    planet = p;
+                    break;
+                }
+            }
 
             ImageView starIcon = (ImageView) view.findViewById(R.id.star_icon);
-            //ImageView planetIcon = (ImageView) view.findViewById(R.id.planet_icon);
+            ImageView planetIcon = (ImageView) view.findViewById(R.id.planet_icon);
             TextView colonyName = (TextView) view.findViewById(R.id.colony_name);
             TextView colonySummary = (TextView) view.findViewById(R.id.colony_summary);
 
@@ -207,10 +216,16 @@ public class ColonyList extends FrameLayout {
             }
             starIcon.setImageBitmap(bmp);
 
-            // TODO: planet icons will have to wait until we pass the Planet objects through
-            //bmp = mBitmaps.get(colony.getPlanetKey());
+            bmp = mBitmaps.get(planet.getKey());
+            if (bmp == null) {
+                bmp = PlanetImageManager.getInstance().getBitmap(mActivity, planet);
+                if (bmp != null) {
+                    mBitmaps.put(planet.getKey(), bmp);
+                }
+            }
+            planetIcon.setImageBitmap(bmp);
 
-            colonyName.setText(String.format("%s (TODO)", star.getName()));
+            colonyName.setText(String.format("%s %s", star.getName(), RomanNumeralFormatter.format(planet.getIndex())));
             colonySummary.setText(String.format("Pop: %d", (int) colony.getPopulation()));
 
             if (mSelectedColony != null && mSelectedColony.getKey().equals(colony.getKey())) {
