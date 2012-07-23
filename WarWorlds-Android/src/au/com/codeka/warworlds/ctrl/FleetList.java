@@ -22,6 +22,7 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import au.com.codeka.warworlds.R;
+import au.com.codeka.warworlds.game.FleetMoveDialog;
 import au.com.codeka.warworlds.game.FleetSplitDialog;
 import au.com.codeka.warworlds.game.UniverseElementActivity;
 import au.com.codeka.warworlds.model.Colony;
@@ -126,9 +127,25 @@ public class FleetList extends FrameLayout {
             @Override
             public void onClick(View v) {
                 Bundle args = new Bundle();
+                Star star = mStars.get(mSelectedFleet.getStarKey());
+                args.putLong("au.com.codeka.warworlds.SectorX", star.getSectorX());
+                args.putLong("au.com.codeka.warworlds.SectorY", star.getSectorY());
+                args.putInt("au.com.codeka.warworlds.OffsetX", star.getOffsetX());
+                args.putInt("au.com.codeka.warworlds.OffsetY", star.getOffsetY());
                 args.putString("au.com.codeka.warworlds.StarKey", mSelectedFleet.getStarKey());
                 args.putString("au.com.codeka.warworlds.FleetKey", mSelectedFleet.getKey());
                 mActivity.showDialog(FleetSplitDialog.ID, args);
+            }
+        });
+
+        final Button moveBtn = (Button) findViewById(R.id.move_btn);
+        moveBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Bundle args = new Bundle();
+                args.putString("au.com.codeka.warworlds.StarKey", mSelectedFleet.getStarKey());
+                args.putString("au.com.codeka.warworlds.FleetKey", mSelectedFleet.getKey());
+                mActivity.showDialog(FleetMoveDialog.ID, args);
             }
         });
     }

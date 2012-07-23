@@ -85,30 +85,20 @@ def getStar(star_key):
   return star_pb
 
 
-def getStarSummaries(star_keys):
-  """Gets JUST the star_pb for the star(s) with the given keys.
+def sumarize(star_pb):
+  """Returns a new star_pb that contains only the star and planet details.
 
-  Because this is "summaries", it only returns the star_pb and not any of the colonies, buildings,
-  presences, etc. Useful when you want to include star details along-side something else."""
-  cache_keys = []
-  for star_key in star_keys:
-    cache_keys.append("star:summary:%s" % star_key)
-  values = ctrl.getCached(cache_keys, pb.Star)
+  We'll strip out colonies, fleets, builds, etc. To make sending this over the wire cheaper
+  in cases where that level of detail is not required."""
+  summary_pb = pb.Star()
+  summary_pb.key = star_pb.key
+  summary_pb.sector_x = star_pb.sector_x
+  summary_pb.sector_y = star_pb.sector_y
+  summary_pb.offset_x = star_pb.offset_x
+  summary_pb.offset_y = star_pb.offset_y
+  summary_pb.name = star_pb.name
+  summary_pb.classification = star_pb.classification
+  summary_pb.size = star_pb.size
+  summary_pb.planets.MergeFrom(star_pb.planets)
+  return summary_pb
 
-  # figure out which stars are "missing" and fetch those
-  cache_mapping = {}
-  for star_key in star_keys:
-    if star_key in values:
-      continue
-
-    star_model = mdl.SectorManager.getStar(star_key)
-    star_pb = pb.Star()
-    ctrl.starModelToPb(star_pb, star_model)
-
-    cache_key = "star:summary:%s" % star_pb.key
-    values[cache_key] = star_pb
-    cache_mapping[cache_key] = star_pb
-  if cache_mapping:
-    ctrl.setCached(cache_mapping)
-
-  return values.values()

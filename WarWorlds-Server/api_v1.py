@@ -175,12 +175,11 @@ class EmpireDetailsPage(ApiPage):
   of the empire's fleets, colonies and so on. It's only available to the owner of the
   empire, and the administrators."""
 
-  def get(self, empireKey):
-    empire_pb = empire.getEmpire(empireKey)
+  def get(self, empire_key):
+    empire_pb = empire.getEmpire(empire_key)
 
     if self._isAdmin() or empire_pb.email == self.user.email():
       colonies_pb = empire.getColoniesForEmpire(empire_pb)
-      empire_pb.colonies.MergeFrom(colonies_pb.colonies)
 
       fleets_pb = empire.getFleetsForEmpire(empire_pb)
       empire_pb.fleets.MergeFrom(fleets_pb.fleets)
@@ -193,7 +192,20 @@ class EmpireDetailsPage(ApiPage):
         if fleet_pb.star_key not in star_keys:
           star_keys.append(fleet_pb.star_key)
 
-      star_pbs = sector.getStarSummaries(star_keys)
+      colony_pbs = []
+      star_pbs = []
+      for star_key in star_keys:
+        star_pb = sector.getStar(star_key)
+        empire.simulate(star_pb, empire_key)
+
+        for star_colony_pb in star_pb.colonies:
+          for colony_pb in colonies_pb.colonies:
+            if colony_pb.key == star_colony_pb.key:
+              colony_pbs.append(star_colony_pb)
+
+        star_pbs.append(sector.sumarize(star_pb))
+
+      empire_pb.colonies.extend(colony_pbs)
       empire_pb.stars.extend(star_pbs)
 
     return empire_pb

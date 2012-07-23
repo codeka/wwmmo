@@ -135,31 +135,31 @@ public class MyEmpire extends Empire {
         super.populateFromProtocolBuffer(pb);
 
         List<warworlds.Warworlds.Colony> colony_pbs = pb.getColoniesList();
+        ArrayList<Colony> colonies = new ArrayList<Colony>();
         if (colony_pbs != null && colony_pbs.size() > 0) {
-            ArrayList<Colony> colonies = new ArrayList<Colony>();
             for (int i = 0; i < colony_pbs.size(); i++) {
                 colonies.add(Colony.fromProtocolBuffer(colony_pbs.get(i)));
             }
-            mAllColonies = colonies;
         }
+        mAllColonies = colonies;
 
         List<warworlds.Warworlds.Fleet> fleet_pbs = pb.getFleetsList();
+        ArrayList<Fleet> fleets = new ArrayList<Fleet>();
         if (fleet_pbs != null && fleet_pbs.size() > 0) {
-            ArrayList<Fleet> fleets = new ArrayList<Fleet>();
             for (int i = 0; i < fleet_pbs.size(); i++) {
                 fleets.add(Fleet.fromProtocolBuffer(fleet_pbs.get(i)));
             }
-            mAllFleets = fleets;
         }
+        mAllFleets = fleets;
 
         List<warworlds.Warworlds.Star> star_pbs = pb.getStarsList();
+        TreeMap<String, Star> stars = new TreeMap<String, Star>();
         if (star_pbs != null && star_pbs.size() > 0) {
-            TreeMap<String, Star> stars = new TreeMap<String, Star>();
             for (int i = 0; i < star_pbs.size(); i++) {
                 stars.put(star_pbs.get(i).getKey(), Star.fromProtocolBuffer(star_pbs.get(i)));
             }
-            mStars = stars;
         }
+        mStars = stars;
     }
 
     public static interface ColonizeCompleteHandler {

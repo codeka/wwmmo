@@ -19,6 +19,7 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import au.com.codeka.warworlds.R;
+import au.com.codeka.warworlds.game.FleetMoveDialog;
 import au.com.codeka.warworlds.game.FleetSplitDialog;
 import au.com.codeka.warworlds.game.UniverseElementActivity;
 import au.com.codeka.warworlds.game.solarsystem.SolarSystemActivity;
@@ -101,7 +102,7 @@ public class StarfieldActivity extends UniverseElementActivity {
             }
         });
 
-        mPlanetList. setOnItemClickListener(new OnItemClickListener() {
+        mPlanetList.setOnItemClickListener(new OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 if (mSelectedStar == null) {
@@ -203,6 +204,24 @@ public class StarfieldActivity extends UniverseElementActivity {
             if (fleets != null) for (Fleet f : fleets) {
                 if (f.getKey().equals(fleetKey)) {
                     dialog.setFleet(f);
+                }
+            }
+            break;
+        }
+        case FleetMoveDialog.ID: {
+            FleetMoveDialog dialog = (FleetMoveDialog) d;
+
+            String fleetKey = args.getString("au.com.codeka.warworlds.FleetKey");
+            long sectorX = args.getLong("au.com.codeka.warworlds.SectorX");
+            long sectorY = args.getLong("au.com.codeka.warworlds.SectorY");
+            int offsetX = args.getInt("au.com.codeka.warworlds.OffsetX");
+            int offsetY = args.getInt("au.com.codeka.warworlds.OffsetY");
+            String starKey = args.getString("au.com.codeka.warworlds.StarKey");
+
+            List<Fleet> fleets = EmpireManager.getInstance().getEmpire().getAllFleets();
+            if (fleets != null) for (Fleet f : fleets) {
+                if (f.getKey().equals(fleetKey)) {
+                    dialog.setFleet(f, sectorX, sectorY, offsetX, offsetY, starKey);
                 }
             }
             break;

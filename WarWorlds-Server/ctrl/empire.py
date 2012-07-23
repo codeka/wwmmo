@@ -513,7 +513,7 @@ def colonize(empire_pb, colonize_request):
   # clear the cache of the various bits and pieces who are now invalid
   keys = ["sector:%d,%d" % (star_model.sector.x, star_model.sector.y),
           "star:%s" % (star_model.key()),
-          "colonies:for-empire:%s" % (empire_model.key())]
+          "colony:for-empire:%s" % (empire_model.key())]
   ctrl.clearCached(keys)
 
   colony_pb = pb.Colony()
@@ -630,8 +630,8 @@ def scheduleBuildCheck():
 def getFleetsForEmpire(empire_pb):
   cache_key = "fleet:for-empire:%s" % empire_pb.key
   values = ctrl.getCached([cache_key], pb.Fleets)
-  #if cache_key in values:
-  #  return values[cache_key]
+  if cache_key in values:
+    return values[cache_key]
 
   fleet_models = mdl.Fleet.getForEmpire(empire_pb.key)
   logging.debug("Adding %d fleets for %s" % (len(fleet_models), empire_pb.key))

@@ -56,6 +56,8 @@ public class UniverseElementActivity extends Activity {
         switch(id) {
         case FleetSplitDialog.ID:
             return new FleetSplitDialog(this);
+        case FleetMoveDialog.ID:
+            return new FleetMoveDialog(this);
         }
 
         return super.onCreateDialog(id);

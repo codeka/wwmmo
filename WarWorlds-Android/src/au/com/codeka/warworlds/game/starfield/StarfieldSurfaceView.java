@@ -144,6 +144,8 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
             return;
         }
 
+        super.onDraw(canvas);
+
         SectorManager sm = SectorManager.getInstance();
         canvas.drawColor(Color.BLACK);
 

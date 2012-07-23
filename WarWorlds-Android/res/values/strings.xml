@@ -9,6 +9,7 @@
     <string name="build">Build</string>
     <string name="focus">Focus</string>
     <string name="view">View</string>
+    <string name="move">Move</string>
 
     <!-- "log_in.xml" layout -->
     <string name="log_in_header">Log In</string>
@@ -65,6 +66,9 @@
     <!-- "solarsystem_fleet_split_dlg.xml" layout -->
     <string name="fleet_split_title">Split Fleet</string>
     <string name="fleet_split_ok">Split</string>
+
+    <!-- "solarsystem_fleet_move_dlg.xml" layout -->
+    <string name="fleet_move_help">Select the star you want to move your fleet to and click "Move".</string>
 
     <!-- "global_options.xml" layout -->
     <string name="globalopts_graphics_detail">Detail Level:</string>
