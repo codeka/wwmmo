@@ -34,6 +34,10 @@ import au.com.codeka.warworlds.model.ShipDesignManager;
 import au.com.codeka.warworlds.model.Star;
 import au.com.codeka.warworlds.model.StarImageManager;
 
+/**
+ * This control displays a list of fleets along with controls you can use to manage them (split
+ * them, move them around, etc).
+ */
 public class FleetList extends FrameLayout {
     private FleetListAdapter mFleetListAdapter;
     private Fleet mSelectedFleet;

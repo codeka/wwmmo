@@ -95,6 +95,11 @@
         android:layout_alignParentBottom="true"
         android:layout_below="@+id/empire_icon" >
 
+        <au.com.codeka.warworlds.ctrl.ColonyList
+            android:id="@+id/colony_list"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+        
     </RelativeLayout>
 
     <RelativeLayout
