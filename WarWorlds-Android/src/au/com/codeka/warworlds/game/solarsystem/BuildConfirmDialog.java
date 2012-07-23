@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.text.Html;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -17,7 +18,6 @@ import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.WarWorldsActivity;
 import au.com.codeka.warworlds.api.ApiClient;
 import au.com.codeka.warworlds.api.ApiException;
-import au.com.codeka.warworlds.ctrl.TransparentWebView;
 import au.com.codeka.warworlds.game.UniverseElementDialog;
 import au.com.codeka.warworlds.model.BuildQueueManager;
 import au.com.codeka.warworlds.model.BuildRequest;
@@ -44,7 +44,7 @@ public class BuildConfirmDialog extends UniverseElementDialog {
         super.onCreate(savedInstanceState);
 
         requestWindowFeature(Window.FEATURE_NO_TITLE);
-        setContentView(R.layout.solarsystem_buildings_build);
+        setContentView(R.layout.solarsystem_build_confirm_dlg);
 
         WindowManager.LayoutParams params = getWindow().getAttributes();
         params.height = LayoutParams.MATCH_PARENT;
@@ -109,7 +109,7 @@ public class BuildConfirmDialog extends UniverseElementDialog {
 
         TextView nameTextView = (TextView) findViewById(R.id.building_name);
         ImageView iconImageView = (ImageView) findViewById(R.id.building_icon);
-        TransparentWebView descriptionWebView = (TransparentWebView) findViewById(R.id.building_description);
+        TextView descriptionTextView = (TextView) findViewById(R.id.building_description);
 
         nameTextView.setText(design.getName());
         Bitmap bm;
@@ -120,6 +120,6 @@ public class BuildConfirmDialog extends UniverseElementDialog {
         }
         iconImageView.setImageBitmap(bm);
 
-        descriptionWebView.loadHtml("html/building-description-template.html", design.getDescription());
+        descriptionTextView.setText(Html.fromHtml(design.getDescription()));
     }
 }
