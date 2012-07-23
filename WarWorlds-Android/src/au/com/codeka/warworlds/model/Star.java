@@ -43,6 +43,8 @@ public class Star {
     private String mName;
     private StarType mStarType;
     private int mSize;
+    private long mSectorX;
+    private long mSectorY;
     private int mOffsetX;
     private int mOffsetY;
     private int mNumPlanets;
@@ -75,6 +77,12 @@ public class Star {
     }
     public int getSize() {
         return mSize;
+    }
+    public long getSectorX() {
+        return mSectorX;
+    }
+    public long getSectorY() {
+        return mSectorY;
     }
     public int getOffsetX() {
         return mOffsetX;
@@ -138,6 +146,8 @@ public class Star {
         s.mName = pb.getName();
         s.mStarType = sStarTypes[pb.getClassification().getNumber()];
         s.mSize = pb.getSize();
+        s.mSectorX = pb.getSectorX();
+        s.mSectorY = pb.getSectorY();
         s.mOffsetX = pb.getOffsetX();
         s.mOffsetY = pb.getOffsetY();
         s.mNumPlanets = pb.getNumPlanets();

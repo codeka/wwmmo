@@ -108,18 +108,12 @@ public class StarfieldActivity extends UniverseElementActivity {
                     return; //??
                 }
 
-                String planetKey = null;
+                Planet planet = null;
                 if (position >= 0 && position < mSelectedStar.getPlanets().length) {
-                    Planet planet = mSelectedStar.getPlanets()[position];
-                    planetKey = planet.getKey();
+                    planet = mSelectedStar.getPlanets()[position];
                 }
 
-                Intent intent = new Intent(mContext, SolarSystemActivity.class);
-                intent.putExtra("au.com.codeka.warworlds.SectorX", mSelectedStar.getSector().getX());
-                intent.putExtra("au.com.codeka.warworlds.SectorY", mSelectedStar.getSector().getY());
-                intent.putExtra("au.com.codeka.warworlds.StarKey", mSelectedStar.getKey());
-                intent.putExtra("au.com.codeka.warworlds.PlanetKey", planetKey);
-                StarfieldActivity.this.startActivityForResult(intent, SOLAR_SYSTEM_REQUEST);
+                navigateToPlanet(mSelectedStar, planet, false);
             }
         });
 
@@ -130,6 +124,34 @@ public class StarfieldActivity extends UniverseElementActivity {
                 showDialog(EmpireDialog.ID);
             }
         });
+    }
+
+    /**
+     * Navigates to the given planet in the given star. Starts the SolarSystemActivity.
+     * 
+     * @param star
+     * @param planet
+     * @param scrollView If \c true, we'll also scroll the current view so that given star
+     *         is centered on the given star.
+     */
+    public void navigateToPlanet(Star star, Planet planet, boolean scrollView) {
+        if (scrollView) {
+            int offsetX = star.getOffsetX() - (int) ((mStarfield.getWidth() / 2) / mStarfield.getPixelScale());
+            int offsetY = star.getOffsetY() -  (int) ((mStarfield.getHeight() / 2) / mStarfield.getPixelScale());
+            SectorManager.getInstance().scrollTo(star.getSectorX(), star.getSectorY(),
+                    offsetX, offsetY);
+        }
+
+        Intent intent = new Intent(mContext, SolarSystemActivity.class);
+        intent.putExtra("au.com.codeka.warworlds.SectorX", star.getSectorX());
+        intent.putExtra("au.com.codeka.warworlds.SectorY", star.getSectorY());
+        intent.putExtra("au.com.codeka.warworlds.StarKey", star.getKey());
+        if (planet != null) {
+            intent.putExtra("au.com.codeka.warworlds.PlanetKey", planet.getKey());
+        } else {
+            intent.putExtra("au.com.codeka.warworlds.PlanetKey", (String) null);
+        }
+        startActivityForResult(intent, SOLAR_SYSTEM_REQUEST);
     }
 
     @Override

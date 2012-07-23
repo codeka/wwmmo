@@ -110,8 +110,8 @@ public class SectorManager {
     public void scrollTo(long sectorX, long sectorY, int offsetX, int offsetY) {
         mSectorX = sectorX;
         mSectorY = sectorY;
-        mOffsetX = offsetX;
-        mOffsetY = offsetY;
+        mOffsetX = -offsetX;
+        mOffsetY = -offsetY;
 
         List<Pair<Long, Long>> missingSectors = new ArrayList<Pair<Long, Long>>();
 
@@ -172,7 +172,7 @@ public class SectorManager {
         }
 
         if (needUpdate) {
-            scrollTo(mSectorX, mSectorY, mOffsetX, mOffsetY);
+            scrollTo(mSectorX, mSectorY, -mOffsetX, -mOffsetY);
         }
     }
 

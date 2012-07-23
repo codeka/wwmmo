@@ -16,6 +16,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
+import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -33,9 +34,11 @@ import au.com.codeka.warworlds.model.StarImageManager;
 public class ColonyList extends FrameLayout {
     private UniverseElementActivity mActivity;
     private List<Colony> mColonies;
+    private Map<String, Star> mStars;
     private Colony mSelectedColony;
     private boolean mIsInitialized;
     private ColonyListAdapter mColonyListAdapter;
+    private ViewColonyHandler mViewColonyListener;
 
     public ColonyList(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -48,6 +51,7 @@ public class ColonyList extends FrameLayout {
             Map<String, Star> stars) {
         mActivity = activity;
         mColonies = colonies;
+        mStars = stars;
 
         initialize();
 
@@ -68,6 +72,10 @@ public class ColonyList extends FrameLayout {
         mColonyListAdapter.setColonies(stars, colonies);
     }
 
+    public void setOnViewColonyListener(ViewColonyHandler listener) {
+        mViewColonyListener = listener;
+    }
+
     private void initialize() {
         if (mIsInitialized) {
             return;
@@ -85,6 +93,17 @@ public class ColonyList extends FrameLayout {
                 mSelectedColony = mColonyListAdapter.getColonyAtPosition(position);
                 mColonyListAdapter.notifyDataSetChanged();
                 refreshStatistics();
+            }
+        });
+
+        final Button viewBtn = (Button) findViewById(R.id.view_btn);
+        viewBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mSelectedColony != null && mViewColonyListener != null) {
+                    Star star = mStars.get(mSelectedColony.getStarKey());
+                    mViewColonyListener.onViewColony(star, mSelectedColony);
+                }
             }
         });
     }
@@ -236,5 +255,9 @@ public class ColonyList extends FrameLayout {
 
             return view;
         }
+    }
+
+    public interface ViewColonyHandler {
+        void onViewColony(Star star, Colony colony);
     }
 }

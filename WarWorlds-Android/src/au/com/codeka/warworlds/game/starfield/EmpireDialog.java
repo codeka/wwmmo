@@ -18,6 +18,8 @@ import au.com.codeka.warworlds.model.Colony;
 import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.Fleet;
 import au.com.codeka.warworlds.model.MyEmpire;
+import au.com.codeka.warworlds.model.Planet;
+import au.com.codeka.warworlds.model.Star;
 
 /**
  * This dialog shows the status of the empire. You can see all your colonies, all your fleets, etc.
@@ -34,7 +36,7 @@ public class EmpireDialog extends UniverseElementDialog {
     private Button mOverviewButton;
     private Button mFleetButton;
     private Button mColonyButton;
-    
+    private ColonyList mColonyList;
 
     public EmpireDialog(StarfieldActivity activity) {
         super(activity);
@@ -60,6 +62,7 @@ public class EmpireDialog extends UniverseElementDialog {
         mOverviewButton = (Button) findViewById(R.id.overview_btn);
         mFleetButton = (Button) findViewById(R.id.fleet_btn);
         mColonyButton = (Button) findViewById(R.id.colony_btn);
+        mColonyList = (ColonyList) findViewById(R.id.colony_list);
 
         refresh();
 
@@ -87,6 +90,21 @@ public class EmpireDialog extends UniverseElementDialog {
                 mFleetContainer.setVisibility(View.GONE);
                 mOverviewContainer.setVisibility(View.GONE);
                 mColonyContainer.setVisibility(View.VISIBLE);
+            }
+        });
+
+        mColonyList.setOnViewColonyListener(new ColonyList.ViewColonyHandler() {
+            @Override
+            public void onViewColony(Star star, Colony colony) {
+                Planet planet = null;
+                for (Planet p : star.getPlanets()) {
+                    if (p.getKey().equals(colony.getPlanetKey())) {
+                        planet = p;
+                    }
+                }
+
+                mActivity.navigateToPlanet(star, planet, true);
+                dismiss();
             }
         });
     }
@@ -145,7 +163,6 @@ public class EmpireDialog extends UniverseElementDialog {
         final FleetList fleetList = (FleetList) findViewById(R.id.fleet_list);
         fleetList.refresh(mActivity, empire.getAllFleets(), empire.getImportantStars());
 
-        final ColonyList colonyList = (ColonyList) findViewById(R.id.colony_list);
-        colonyList.refresh(mActivity, empire.getAllColonies(), empire.getImportantStars());
+        mColonyList.refresh(mActivity, empire.getAllColonies(), empire.getImportantStars());
     }
 }

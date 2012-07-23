@@ -287,7 +287,7 @@ class StarPage(StarfieldPage):
     # other empire's fleets.
     empire_fleets = []
     for fleet in star_pb.fleets:
-      if fleet.empire_key == empire_pb.key or self._isAdmin():
+      if self._isAdmin() or fleet.empire_key == empire_pb.key:
         empire_fleets.append(fleet)
 
     del star_pb.fleets[:]
@@ -296,7 +296,7 @@ class StarPage(StarfieldPage):
     # similarly for build requests, only our own empire's build requests
     empire_build_requests = []
     for build_request in star_pb.build_requests:
-      if build_request.empire_key == empire_pb.key:
+      if self._isAdmin() or build_request.empire_key == empire_pb.key:
         empire_build_requests.append(build_request)
 
     del star_pb.build_requests[:]
