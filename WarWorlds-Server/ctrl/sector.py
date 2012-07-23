@@ -83,3 +83,36 @@ def getStar(star_key):
 
   ctrl.setCached({cache_key: star_pb})
   return star_pb
+
+
+def getStarSummaries(star_keys):
+  """Gets JUST the star_pb for the star(s) with the given keys.
+
+  Because this is "summaries", it only returns the star_pb and not any of the colonies, buildings,
+  presences, etc. Useful when you want to include star details along-side something else."""
+  cache_keys = []
+  for star_key in star_keys:
+    cache_keys.append("star:summary:%s" % star_key)
+  values = ctrl.getCached(cache_keys, pb.Star)
+
+  # figure out which stars are "missing"
+  missing = []
+  for star_key in star_keys:
+    if star_key in values:
+      continue
+    missing.append(star_key)
+
+  # fetch the missing stars from the model, cache them
+  star_models = mdl.Star.get(missing)
+  cache_mapping = {}
+  for star_model in star_models:
+    star_pb = pb.Star()
+    ctrl.starModelToPb(star_pb, star_model)
+    
+    cache_key = "star:summary:%s" % star_pb.key
+    values[cache_key] = star_pb
+    cache_mapping[cache_key] = star_pb
+  if cache_mapping:
+    ctrl.setCached(cache_mapping)
+
+  return values.values()

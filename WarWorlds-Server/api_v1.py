@@ -185,6 +185,17 @@ class EmpireDetailsPage(ApiPage):
       fleets_pb = empire.getFleetsForEmpire(empire_pb)
       empire_pb.fleets.MergeFrom(fleets_pb.fleets)
 
+      star_keys = []
+      for colony_pb in colonies_pb.colonies:
+        if colony_pb.star_key not in star_keys:
+          star_keys.append(colony_pb.star_key)
+      for fleet_pb in fleets_pb.fleets:
+        if fleet_pb.star_key not in star_keys:
+          star_keys.append(fleet_pb.star_key)
+
+      star_pbs = sector.getStarSummaries(star_keys)
+      empire_pb.stars.extend(star_pbs)
+
     return empire_pb
 
 

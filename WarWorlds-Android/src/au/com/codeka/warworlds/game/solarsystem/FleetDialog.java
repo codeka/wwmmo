@@ -1,5 +1,7 @@
 package au.com.codeka.warworlds.game.solarsystem;
 
+import java.util.TreeMap;
+
 import android.os.Bundle;
 import android.view.ViewGroup.LayoutParams;
 import android.view.Window;
@@ -33,7 +35,10 @@ public class FleetDialog extends UniverseElementDialog {
     }
 
     public void setStar(Star star) {
+        TreeMap<String, Star> stars = new TreeMap<String, Star>();
+        stars.put(star.getKey(), star);
+
         FleetList fleetList = (FleetList) findViewById(R.id.fleet_list);
-        fleetList.refresh(mActivity, star, star.getFleets());
+        fleetList.refresh(mActivity, star.getFleets(), stars);
     }
 }

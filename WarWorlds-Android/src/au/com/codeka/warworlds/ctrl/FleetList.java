@@ -1,9 +1,10 @@
 package au.com.codeka.warworlds.ctrl;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.Map;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -26,16 +27,18 @@ import au.com.codeka.warworlds.game.UniverseElementActivity;
 import au.com.codeka.warworlds.model.Colony;
 import au.com.codeka.warworlds.model.DesignManager;
 import au.com.codeka.warworlds.model.Fleet;
+import au.com.codeka.warworlds.model.ImageManager;
 import au.com.codeka.warworlds.model.Planet;
 import au.com.codeka.warworlds.model.ShipDesign;
 import au.com.codeka.warworlds.model.ShipDesignManager;
 import au.com.codeka.warworlds.model.Star;
+import au.com.codeka.warworlds.model.StarImageManager;
 
 public class FleetList extends FrameLayout {
-    private Logger log = LoggerFactory.getLogger(FleetList.class);
     private FleetListAdapter mFleetListAdapter;
     private Fleet mSelectedFleet;
-    private Star mStar;
+    private List<Fleet> mFleets;
+    private Map<String, Star> mStars;
     private UniverseElementActivity mActivity;
     private boolean mIsInitialized;
 
@@ -46,9 +49,11 @@ public class FleetList extends FrameLayout {
         this.addView(child);
     }
 
-    public void refresh(UniverseElementActivity activity, Star star, List<Fleet> fleets) {
+    public void refresh(UniverseElementActivity activity, List<Fleet> fleets,
+            Map<String, Star> stars) {
         mActivity = activity;
-        mStar = star;
+        mFleets = fleets;
+        mStars = stars;
 
         initialize();
 
@@ -58,7 +63,7 @@ public class FleetList extends FrameLayout {
             Fleet selectedFleet = mSelectedFleet;
             mSelectedFleet = null;
 
-            for (Fleet f : mStar.getFleets()) {
+            for (Fleet f : mFleets) {
                 if (f.getKey().equals(selectedFleet.getKey())) {
                     mSelectedFleet = f;
                     break;
@@ -66,7 +71,7 @@ public class FleetList extends FrameLayout {
             }
         }
 
-        mFleetListAdapter.setFleets(fleets);
+        mFleetListAdapter.setFleets(stars, fleets);
     }
 
     private void initialize() {
@@ -83,8 +88,8 @@ public class FleetList extends FrameLayout {
         ShipDesignManager.getInstance().addDesignsChangedListener(new DesignManager.DesignsChangedListener() {
             @Override
             public void onDesignsChanged() {
-                if (mStar != null && mFleetListAdapter != null) {
-                    mFleetListAdapter.setFleets(mStar.getFleets());
+                if (mFleets != null && mFleetListAdapter != null) {
+                    mFleetListAdapter.setFleets(mStars, mFleets);
                 }
             }
         });
@@ -92,7 +97,7 @@ public class FleetList extends FrameLayout {
         mActivity.addUpdatedListener(new UniverseElementActivity.OnUpdatedListener() {
             @Override
             public void onStarUpdated(Star star, Planet selectedPlanet, Colony colony) {
-                refresh(mActivity, star, star.getFleets());
+                refresh(mActivity, star.getFleets(), mStars);
             }
             @Override
             public void onSectorUpdated() {
@@ -103,9 +108,12 @@ public class FleetList extends FrameLayout {
             @Override
             public void onItemClick(AdapterView<?> parent, View view,
                     int position, long id) {
-                mSelectedFleet = mStar.getFleets().get(position);
-                log.debug("Setting selected fleet: "+mSelectedFleet.getKey());
-                mFleetListAdapter.notifyDataSetChanged();
+                FleetListAdapter.ItemEntry entry =
+                        (FleetListAdapter.ItemEntry) mFleetListAdapter.getItem(position);
+                if (entry.type == FleetListAdapter.FLEET_ITEM_TYPE) {
+                    mSelectedFleet = (Fleet) entry.value;
+                    mFleetListAdapter.notifyDataSetChanged();
+                }
             }
         });
 
@@ -120,7 +128,6 @@ public class FleetList extends FrameLayout {
             }
         });
     }
-
 
     /**
      * Populates a solarsystem_fleet_row.xml view with details from the given fleet.
@@ -151,25 +158,88 @@ public class FleetList extends FrameLayout {
      * This adapter is used to populate the list of ship fleets that the current colony has.
      */
     private class FleetListAdapter extends BaseAdapter {
-        private List<Fleet> mFleets;
+        private ArrayList<Fleet> mFleets;
+        private Map<String, Star> mStars;
+        private ArrayList<ItemEntry> mEntries;
 
-        public void setFleets(List<Fleet> fleets) {
-            mFleets = fleets;
+        private static final int STAR_ITEM_TYPE = 0;
+        private static final int FLEET_ITEM_TYPE = 1;
+
+        public FleetListAdapter() {
+            // whenever a new star bitmap is generated, redraw the screen
+            StarImageManager.getInstance().addBitmapGeneratedListener(
+                    new ImageManager.BitmapGeneratedListener() {
+                @Override
+                public void onBitmapGenerated(String key, Bitmap bmp) {
+                    notifyDataSetChanged();
+                }
+            });
+        }
+
+        /**
+         * Sets the list of fleets that we'll be displaying.
+         */
+        public void setFleets(Map<String, Star> stars, List<Fleet> fleets) {
+            mFleets = new ArrayList<Fleet>(fleets);
+            mStars = stars;
+
+            Collections.sort(mFleets, new Comparator<Fleet>() {
+                @Override
+                public int compare(Fleet lhs, Fleet rhs) {
+                    // sort by star, then by design, then by count
+                    if (!lhs.getStarKey().equals(rhs.getStarKey())) {
+                        Star lhsStar = mStars.get(lhs.getStarKey());
+                        Star rhsStar = mStars.get(rhs.getStarKey());
+                        return lhsStar.getName().compareTo(rhsStar.getName());
+                    } else if (!lhs.getDesignName().equals(rhs.getDesignName())) {
+                        return lhs.getDesignName().compareTo(rhs.getDesignName());
+                    } else {
+                        return lhs.getNumShips() - rhs.getNumShips();
+                    }
+                }
+            });
+
+            mEntries = new ArrayList<ItemEntry>();
+            String lastStarKey = "";
+            for (Fleet f : mFleets) {
+                if (!f.getStarKey().equals(lastStarKey)) {
+                    mEntries.add(new ItemEntry(STAR_ITEM_TYPE, mStars.get(f.getStarKey())));
+                    lastStarKey = f.getStarKey();
+                }
+                mEntries.add(new ItemEntry(FLEET_ITEM_TYPE, f));
+            }
+
             notifyDataSetChanged();
+        }
+
+        /**
+         * We have two types of items, the star and the actual fleet.
+         */
+        @Override
+        public int getViewTypeCount() {
+            return 2;
+        }
+
+        @Override
+        public int getItemViewType(int position) {
+            if (mEntries == null)
+                return 0;
+
+            return mEntries.get(position).type;
         }
 
         @Override
         public int getCount() {
-            if (mFleets == null)
+            if (mEntries == null)
                 return 0;
-            return mFleets.size();
+            return mEntries.size();
         }
 
         @Override
         public Object getItem(int position) {
-            if (mFleets == null)
+            if (mEntries == null)
                 return null;
-            return mFleets.get(position);
+            return mEntries.get(position);
         }
 
         @Override
@@ -179,23 +249,57 @@ public class FleetList extends FrameLayout {
 
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
+            ItemEntry entry = mEntries.get(position);
             View view = convertView;
+
             if (view == null) {
                 LayoutInflater inflater = (LayoutInflater) mActivity.getSystemService
                         (Context.LAYOUT_INFLATER_SERVICE);
-                view = inflater.inflate(R.layout.fleet_list_row, null);
+                if (entry.type == STAR_ITEM_TYPE) {
+                    view = inflater.inflate(R.layout.fleet_list_star_row, null);
+                } else {
+                    view = inflater.inflate(R.layout.fleet_list_row, null);
+                }
             }
 
-            Fleet fleet = mFleets.get(position);
-            populateFleetRow(view, fleet);
+            if (entry.type == STAR_ITEM_TYPE) {
+                Star star = (Star) entry.value;
+                ImageView icon = (ImageView) view.findViewById(R.id.star_icon);
+                TextView name = (TextView) view.findViewById(R.id.star_name);
 
-            if (mSelectedFleet != null && mSelectedFleet.getKey().equals(fleet.getKey())) {
-                view.setBackgroundColor(0xff0c6476);
+                int imageSize = (int)(star.getSize() * star.getStarType().getImageScale() * 2);
+                if (entry.bitmap == null) {
+                    entry.bitmap = StarImageManager.getInstance().getBitmap(mActivity, star, imageSize);
+                }
+                if (entry.bitmap != null) {
+                    icon.setImageBitmap(entry.bitmap);
+                }
+
+                name.setText(star.getName());
             } else {
-                view.setBackgroundColor(0xff000000);
+                Fleet fleet = (Fleet) entry.value;
+                populateFleetRow(view, fleet);
+
+                if (mSelectedFleet != null && mSelectedFleet.getKey().equals(fleet.getKey())) {
+                    view.setBackgroundColor(0xff0c6476);
+                } else {
+                    view.setBackgroundColor(0xff000000);
+                }
             }
 
             return view;
+        }
+
+        public class ItemEntry {
+            public int type;
+            public Object value;
+            public Bitmap bitmap;
+
+            public ItemEntry(int type, Object value) {
+                this.type = type;
+                this.value = value;
+                this.bitmap = null;
+            }
         }
     }
 }

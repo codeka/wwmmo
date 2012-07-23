@@ -11,6 +11,7 @@ import android.view.ViewGroup.LayoutParams;
 import android.widget.Button;
 import android.widget.TextView;
 import au.com.codeka.warworlds.R;
+import au.com.codeka.warworlds.ctrl.FleetList;
 import au.com.codeka.warworlds.game.UniverseElementDialog;
 import au.com.codeka.warworlds.model.Colony;
 import au.com.codeka.warworlds.model.EmpireManager;
@@ -139,5 +140,8 @@ public class EmpireDialog extends UniverseElementDialog {
                 colonizedStarKeys.size(), empire.getAllColonies().size(),
                 totalShips, empire.getAllFleets().size());
         overviewText.setText(Html.fromHtml(overview));
+
+        final FleetList fleetList = (FleetList) findViewById(R.id.fleet_list);
+        fleetList.refresh(mActivity, empire.getAllFleets(), empire.getImportantStars());
     }
 }

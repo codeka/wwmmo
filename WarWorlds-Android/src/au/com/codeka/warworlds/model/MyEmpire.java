@@ -2,6 +2,8 @@ package au.com.codeka.warworlds.model;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
@@ -20,6 +22,7 @@ public class MyEmpire extends Empire {
 
     private List<Fleet> mAllFleets;
     private List<Colony> mAllColonies;
+    private Map<String, Star> mStars;
 
     public List<Fleet> getAllFleets() {
         return mAllFleets;
@@ -27,6 +30,18 @@ public class MyEmpire extends Empire {
 
     public List<Colony> getAllColonies() {
         return mAllColonies;
+    }
+
+    /**
+     * Gets a \c List<Star> of the "important" stars (that is, the stars when one of our colonies,
+     * fleets, etc are).
+     */
+    public Map<String, Star> getImportantStars() {
+        return mStars;
+    }
+
+    public Star getImportantStar(String key) {
+        return mStars.get(key);
     }
 
     /**
@@ -135,6 +150,15 @@ public class MyEmpire extends Empire {
                 fleets.add(Fleet.fromProtocolBuffer(fleet_pbs.get(i)));
             }
             mAllFleets = fleets;
+        }
+
+        List<warworlds.Warworlds.Star> star_pbs = pb.getStarsList();
+        if (star_pbs != null && star_pbs.size() > 0) {
+            TreeMap<String, Star> stars = new TreeMap<String, Star>();
+            for (int i = 0; i < star_pbs.size(); i++) {
+                stars.put(star_pbs.get(i).getKey(), Star.fromProtocolBuffer(star_pbs.get(i)));
+            }
+            mStars = stars;
         }
     }
 
