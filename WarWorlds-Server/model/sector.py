@@ -5,6 +5,7 @@ import logging
 from google.appengine.ext import db
 from google.appengine.api import taskqueue
 
+import protobufs.warworlds_pb2 as pb
 
 class StarType:
   def __init__(self, colourName="", colourValue=[0xff, 0xff, 0xff]):
@@ -41,6 +42,42 @@ planet_types = [PlanetType(name="Gas Giant"),
                ]
 
 
+class PlanetsProperty(db.Property):
+  """This is a custom property for representing a collection of planets.
+
+  Because the planets are only ever accessed from within the context of a star, there's no
+  point storing them as separate entities, since that's a huge use of resources (i.e. one
+  read/write per planet!).
+
+  Instead, we store them as Planet protocol buffers, and you can look through them directly
+  via this property."""
+
+  def get_value_for_datastore(self, model_instance):
+    planets = super(PlanetsProperty, self).get_value_for_datastore(model_instance)
+    protobuf = pb.Planets()
+    protobuf.planets.extend(planets)
+    return db.Blob(protobuf.SerializeToString())
+
+  def make_value_from_datastore(self, value):
+    protobuf = pb.Planets()
+    protobuf.ParseFromString(value)
+    planets = []
+    for planet in protobuf.planets:
+      planets.append(planet)
+    return planets
+
+  def validate(self, value):
+    value = super(PlanetsProperty, self).validate(value)
+    if value is None:
+      return value
+    if isinstance(value, list):
+      for elem in value:
+        if not isinstance(elem, pb.Planet):
+          raise db.BadValueError("All elements of %s must be of type pb.Planet" % self.name)
+      return value
+
+    raise db.BadValueError("Property %s must be a list of pb.Planet" % self.name)
+
 class Sector(db.Model):
   x = db.IntegerProperty()
   y = db.IntegerProperty()
@@ -55,17 +92,7 @@ class Star(db.Model):
   size = db.IntegerProperty()
   x = db.IntegerProperty()
   y = db.IntegerProperty()
-  planets = None
-
-
-class Planet(db.Model):
-  star = db.ReferenceProperty(Star)
-  index = db.IntegerProperty()
-  planetTypeID = db.IntegerProperty(name="planetType")
-  size = db.IntegerProperty()
-  populationCongeniality = db.IntegerProperty()
-  farmingCongeniality = db.IntegerProperty()
-  miningCongeniality = db.IntegerProperty()
+  planets = PlanetsProperty()
 
 
 class SectorManager:
@@ -123,11 +150,6 @@ class SectorManager:
     star = Star.get(starKey)
     if star is None:
       return None
-
-    planetQuery = Planet.all().filter("star", star)
-    star.planets = []
-    for planet in planetQuery:
-      star.planets.append(planet)
 
     return star
 

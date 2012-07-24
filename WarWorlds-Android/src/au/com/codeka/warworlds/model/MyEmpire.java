@@ -62,7 +62,7 @@ public class MyEmpire extends Empire {
                     }
 
                     ColonizeRequest request = ColonizeRequest.newBuilder()
-                            .setPlanetKey(planet.getKey())
+                            .setPlanetIndex(planet.getIndex())
                             .setStarKey(planet.getStar().getKey())
                             .build();
 

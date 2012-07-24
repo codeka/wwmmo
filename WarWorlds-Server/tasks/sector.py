@@ -12,6 +12,7 @@ import webapp2 as webapp
 
 from model import sector as mdl
 from model import namegen
+import protobufs.warworlds_pb2 as pb
 import tasks
 
 
@@ -187,36 +188,38 @@ class SectorGenerator:
       star.size = random.randint(16, 24)
 
       sector.stars.append(star)
-      star.put()
 
     for star in sector.stars:
+      planet_pbs = []
       numPlanets = self._select(_planetCountBonuses)
       for index in range(numPlanets):
         type_bonuses = [sum(elements) for elements in zip(_planetTypeBonuses["slot"][index],
                                                           _planetTypeBonuses["star"][star.starTypeID])]
-        planet = mdl.Planet()
-        planet.star = star.key()
-        planet.index = (index+1)
-        planet.planetTypeID = self._select(type_bonuses)
-        planet.planetType = mdl.planet_types[planet.planetTypeID]
+        planet_pb = pb.Planet()
+        planet_pb.index = (index+1)
+        planet_pb.planet_type = self._select(type_bonuses)
 
         # A number from 0..100, we actually want it from 10...50 so we adjust
-        planet.size = _normalRandom(100) + _planetSizeBonuses[planet.planetTypeID]
-        planet.size = int(10 + (planet.size / 2.5))
+        planet_pb.size = _normalRandom(100) + _planetSizeBonuses[planet_pb.planet_type]
+        planet_pb.size = int(10 + (planet_pb.size / 2.5))
 
         # Population is affected by the size and type of the planet. We need to turn
         # the size into a multiplier
-        populationMultiplier = _planetPopulationBonuses[planet.planetTypeID]
-        populationMultiplier *= (planet.size * 2.0)/50.0
-        planet.populationCongeniality = int(_normalRandom(1000) * populationMultiplier)
+        populationMultiplier = _planetPopulationBonuses[planet_pb.planet_type]
+        populationMultiplier *= (planet_pb.size * 2.0)/50.0
+        planet_pb.population_congeniality = int(_normalRandom(1000) * populationMultiplier)
 
-        farmingMultipler = _planetFarmingBonuses[planet.planetTypeID]
-        planet.farmingCongeniality = int(_normalRandom(100) * farmingMultipler)
+        farmingMultipler = _planetFarmingBonuses[planet_pb.planet_type]
+        planet_pb.farming_congeniality = int(_normalRandom(100) * farmingMultipler)
 
-        miningMultipler = _planetMiningBonuses[planet.planetTypeID]
-        planet.miningCongeniality = int(_normalRandom(100) * miningMultipler)
+        miningMultipler = _planetMiningBonuses[planet_pb.planet_type]
+        planet_pb.mining_congeniality = int(_normalRandom(100) * miningMultipler)
 
-        planet.put()
+        planet_pb.planet_type += 1 # The PB starts from 1, not 0
+        planet_pbs.append(planet_pb)
+
+      star.planets = planet_pbs
+      star.put()
 
   def _select(self, bonuses):
     """Selects an index from a list of bonuses.

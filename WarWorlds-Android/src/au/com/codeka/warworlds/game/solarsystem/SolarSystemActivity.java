@@ -117,9 +117,9 @@ public class SolarSystemActivity extends UniverseElementActivity {
             mSectorX = extras.getLong("au.com.codeka.warworlds.SectorX");
             mSectorY = extras.getLong("au.com.codeka.warworlds.SectorY");
             mStarKey = extras.getString("au.com.codeka.warworlds.StarKey");
-            String selectedPlanetKey = extras.getString("au.com.codeka.warworlds.PlanetKey");
+            int selectedPlanetIndex = extras.getInt("au.com.codeka.warworlds.PlanetIndex");
 
-            refreshStar(selectedPlanetKey);
+            refreshStar(selectedPlanetIndex);
         }
     }
 
@@ -207,30 +207,30 @@ public class SolarSystemActivity extends UniverseElementActivity {
 
     @Override
     public void refresh() {
-        String selectedPlanetKey = null;
+        int selectedPlanetIndex = -1;
         Planet selectedPlanet = mSolarSystemSurfaceView.getSelectedPlanet();
         if (selectedPlanet != null) {
-            selectedPlanetKey = selectedPlanet.getKey();
+            selectedPlanetIndex = selectedPlanet.getIndex();
         }
 
-        refreshStar(selectedPlanetKey);
+        refreshStar(selectedPlanetIndex);
     }
 
-    private void refreshStar(final String selectedPlanetKey) {
+    private void refreshStar(final int selectedPlanetIndex) {
         StarManager.requestStar(mSectorX, mSectorY, mStarKey, new StarFetchedHandler() {
             @Override
             public void onStarFetched(Star star) {
                 mSolarSystemSurfaceView.setStar(star);
-                if (selectedPlanetKey != null) {
-                    mSolarSystemSurfaceView.selectPlanet(selectedPlanetKey);
+                if (selectedPlanetIndex >= 0) {
+                    mSolarSystemSurfaceView.selectPlanet(selectedPlanetIndex);
                 } else {
                     mSolarSystemSurfaceView.redraw();
                 }
 
                 Planet planet = null;
-                if (selectedPlanetKey != null) {
+                if (selectedPlanetIndex >= 0) {
                     for (Planet p : star.getPlanets()) {
-                        if (p.getKey().equals(selectedPlanetKey)) {
+                        if (p.getIndex() == selectedPlanetIndex) {
                             planet = p;
                             break;
                         }
@@ -275,7 +275,7 @@ public class SolarSystemActivity extends UniverseElementActivity {
 
         mColony = null;
         for (Colony colony : mStar.getColonies()) {
-            if (colony.getPlanetKey().equals(mPlanet.getKey())) {
+            if (colony.getPlanetIndex() == mPlanet.getIndex()) {
                 mColony = colony;
                 break;
             }

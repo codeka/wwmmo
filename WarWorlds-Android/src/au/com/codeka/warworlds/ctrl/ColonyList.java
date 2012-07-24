@@ -163,14 +163,13 @@ public class ColonyList extends FrameLayout {
             Collections.sort(mColonies, new Comparator<Colony>() {
                 @Override
                 public int compare(Colony lhs, Colony rhs) {
-                    // sort by star, then by planet index (that last part is TODO)
+                    // sort by star, then by planet index
                     if (!lhs.getStarKey().equals(rhs.getStarKey())) {
                         Star lhsStar = mStars.get(lhs.getStarKey());
                         Star rhsStar = mStars.get(rhs.getStarKey());
                         return lhsStar.getName().compareTo(rhsStar.getName());
                     } else {
-                        // TODO: yuck!
-                        return lhs.getPlanetKey().compareTo(rhs.getPlanetKey());
+                        return lhs.getPlanetIndex() - rhs.getPlanetIndex();
                     }
                 }
             });
@@ -212,13 +211,7 @@ public class ColonyList extends FrameLayout {
 
             Colony colony = mColonies.get(position);
             Star star = mStars.get(colony.getStarKey());
-            Planet planet = null;
-            for (Planet p : star.getPlanets()) {
-                if (p.getKey().equals(colony.getPlanetKey())) {
-                    planet = p;
-                    break;
-                }
-            }
+            Planet planet = star.getPlanets()[colony.getPlanetIndex() - 1];
 
             ImageView starIcon = (ImageView) view.findViewById(R.id.star_icon);
             ImageView planetIcon = (ImageView) view.findViewById(R.id.planet_icon);
@@ -235,11 +228,11 @@ public class ColonyList extends FrameLayout {
             }
             starIcon.setImageBitmap(bmp);
 
-            bmp = mBitmaps.get(planet.getKey());
+            bmp = mBitmaps.get(planet.getStar().getKey() + "-" + planet.getIndex());
             if (bmp == null) {
                 bmp = PlanetImageManager.getInstance().getBitmap(mActivity, planet);
                 if (bmp != null) {
-                    mBitmaps.put(planet.getKey(), bmp);
+                    mBitmaps.put(planet.getStar().getKey() + "-" + planet.getIndex(), bmp);
                 }
             }
             planetIcon.setImageBitmap(bmp);

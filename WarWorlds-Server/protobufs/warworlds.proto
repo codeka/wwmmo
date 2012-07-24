@@ -231,9 +231,6 @@ message Star
 //
 message Planet
 {
-    // The key of the planet, unique throughout the universe.
-    required string key = 1;
-
     // The "index" of the planet represents how far it is from the sun. Planets are always
     // in monotonically increasing order of distance (0, 1, 2, 3, etc)
     required int32 index = 2;
@@ -269,6 +266,16 @@ message Planet
     optional int32 mining_congeniality = 7;
 }
 
+
+//
+// A collection of Planet messages.
+///
+message Planets
+{
+    repeated Planet planets = 1;
+}
+
+
 //
 // Represents a list of sectors.
 //
@@ -296,11 +303,11 @@ message EmpirePresence
 //
 message ColonizeRequest
 {
-    // The planet you want to colonize
-    required string planet_key = 1;
-
     // The star containing the planet you want to colonize.
-    required string star_key = 2;
+    required string star_key = 1;
+
+    // The index of the planet you want to colonize
+    required int32 planet_index = 2;
 }
 
 //
@@ -315,8 +322,8 @@ message Colony
     required string empire_key = 2;
 
     // The key of the planet and star this colony belongs to.
-    optional string planet_key = 3;
     optional string star_key = 4;
+    optional int32 planet_index = 14;
 
     // In the backend, population is actually stored as a floating point value, but
     // we don't care about that kind of accuracy.

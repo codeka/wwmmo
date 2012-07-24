@@ -107,7 +107,7 @@ public class SolarSystemSurfaceView extends UniverseElementSurfaceView {
         }
 
         for(PlanetInfo planetInfo : mPlanetInfos) {
-            if (planetInfo.planet.getKey().equals(planet.getKey())) {
+            if (planetInfo.planet.getIndex() == planet.getIndex()) {
                 Point2D pixels = planetInfo.centre;
                 return new Point2D(pixels.getX() / getPixelScale(),
                                     pixels.getY() / getPixelScale());
@@ -168,9 +168,9 @@ public class SolarSystemSurfaceView extends UniverseElementSurfaceView {
     public Planet getSelectedPlanet() {
         return mSelectedPlanet.planet;
     }
-    public void selectPlanet(String planetKey) {
+    public void selectPlanet(int planetIndex) {
         for(PlanetInfo planetInfo : mPlanetInfos) {
-            if (planetInfo.planet.getKey().equals(planetKey)) {
+            if (planetInfo.planet.getIndex() == planetIndex) {
                 mSelectedPlanet = planetInfo;
 
                 if (mPlanetsPlaced) {
@@ -267,7 +267,7 @@ public class SolarSystemSurfaceView extends UniverseElementSurfaceView {
             List<Colony> colonies = mStar.getColonies();
             if (colonies != null && !colonies.isEmpty()) {
                 for (Colony colony : colonies) {
-                    if (colony.getPlanetKey().equals(mPlanetInfos[i].planet.getKey())) {
+                    if (colony.getPlanetIndex() == mPlanetInfos[i].planet.getIndex()) {
                         canvas.drawBitmap(mColonyIcon,
                                 (float) (planetInfo.centre.getX() + mColonyIcon.getWidth()),
                                 (float) (planetInfo.centre.getY() - mColonyIcon.getHeight()),
@@ -313,7 +313,7 @@ public class SolarSystemSurfaceView extends UniverseElementSurfaceView {
             }
 
             if (newSelection != null) {
-                selectPlanet(newSelection.planet.getKey());
+                selectPlanet(newSelection.planet.getIndex());
 
                 // play the 'click' sound effect
                 playSoundEffect(android.view.SoundEffectConstants.CLICK);

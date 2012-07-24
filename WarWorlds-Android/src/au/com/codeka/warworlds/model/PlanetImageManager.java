@@ -20,14 +20,16 @@ public class PlanetImageManager extends ImageManager {
      * Gets the \c Bitmap for the given planet.
      */
     public Bitmap getBitmap(Context context, Planet planet) {
-        return getBitmap(context, planet.getKey(), 100, getTemplate(context, planet), planet);
+        String key = String.format("%s-%d", planet.getStar().getKey(), planet.getIndex());
+        return getBitmap(context, key, 100, getTemplate(context, planet), planet);
     }
 
     /**
      * Loads the \c Template for the given \c Planet.
      */
     private static Template getTemplate(Context context, Planet planet) {
-        return loadTemplate(context, planet.getPlanetType().getBitmapBasePath(), planet.getKey());
+        String key = String.format("%s-%d", planet.getStar().getKey(), planet.getIndex());
+        return loadTemplate(context, planet.getPlanetType().getBitmapBasePath(), key);
     }
 
     /**

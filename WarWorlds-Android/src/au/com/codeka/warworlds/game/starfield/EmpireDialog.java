@@ -96,13 +96,7 @@ public class EmpireDialog extends UniverseElementDialog {
         mColonyList.setOnViewColonyListener(new ColonyList.ViewColonyHandler() {
             @Override
             public void onViewColony(Star star, Colony colony) {
-                Planet planet = null;
-                for (Planet p : star.getPlanets()) {
-                    if (p.getKey().equals(colony.getPlanetKey())) {
-                        planet = p;
-                    }
-                }
-
+                Planet planet = star.getPlanets()[colony.getPlanetIndex() - 1];
                 mActivity.navigateToPlanet(star, planet, true);
                 dismiss();
             }

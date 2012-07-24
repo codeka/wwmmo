@@ -148,9 +148,9 @@ public class StarfieldActivity extends UniverseElementActivity {
         intent.putExtra("au.com.codeka.warworlds.SectorY", star.getSectorY());
         intent.putExtra("au.com.codeka.warworlds.StarKey", star.getKey());
         if (planet != null) {
-            intent.putExtra("au.com.codeka.warworlds.PlanetKey", planet.getKey());
+            intent.putExtra("au.com.codeka.warworlds.PlanetIndex", planet.getIndex());
         } else {
-            intent.putExtra("au.com.codeka.warworlds.PlanetKey", (String) null);
+            intent.putExtra("au.com.codeka.warworlds.PlanetIndex", -1);
         }
         startActivityForResult(intent, SOLAR_SYSTEM_REQUEST);
     }
@@ -284,7 +284,9 @@ public class StarfieldActivity extends UniverseElementActivity {
 
                 pim.addBitmapGeneratedListener(new ImageManager.BitmapGeneratedListener() {
                     public void onBitmapGenerated(String planetKey, Bitmap bmp) {
-                        if (planetKey.equals(planet.getKey())) {
+                        String thisPlanetKey = String.format("%s-%d", planet.getStar().getKey(),
+                                                                      planet.getIndex());
+                        if (planetKey.equals(thisPlanetKey)) {
                             icon.setImageBitmap(bmp);
                             pim.removeBitmapGeneratedListener(this);
                         }
@@ -297,7 +299,7 @@ public class StarfieldActivity extends UniverseElementActivity {
 
             Colony colony = null;
             for(Colony c : mStar.getColonies()) {
-                if (c.getPlanetKey().equals(planet.getKey())) {
+                if (c.getPlanetIndex() == planet.getIndex()) {
                     colony = c;
                     break;
                 }

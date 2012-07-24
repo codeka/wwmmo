@@ -5,6 +5,7 @@ from datetime import datetime
 from google.appengine.ext import db
 
 import sector
+import model.sector as sector_mdl
 
 
 class Empire(db.Model):
@@ -26,14 +27,14 @@ class Empire(db.Model):
       return None
     return result[0]
 
-  def colonize(self, planet):
+  def colonize(self, star_model, planet_index):
     """Colonizes the given planet with a new colony."""
 
     colony = Colony()
     colony.empire = self.key()
-    colony.planet = planet.key()
-    colony.sector = planet.star.sector.key()
-    colony.star = planet.star.key()
+    colony.planet_index = planet_index
+    colony.sector = sector_mdl.Star.sector.get_value_for_datastore(star_model)
+    colony.star = star_model.key()
     colony.population = 100.0
     colony.lastSimulation = datetime.now()
     colony.focusPopulation = 0.25
@@ -43,12 +44,12 @@ class Empire(db.Model):
     colony.put()
 
     def inc_colony_count():
-      sector = planet.star.sector
-      if sector.numColonies is None:
-        sector.numColonies = 1
+      sector_model = star_model.sector
+      if sector_model.numColonies is None:
+        sector_model.numColonies = 1
       else:
-        sector.numColonies += 1
-      sector.put()
+        sector_model.numColonies += 1
+      sector_model.put()
 
     db.run_in_transaction(inc_colony_count)
     return colony
@@ -64,8 +65,8 @@ class Colony(db.Model):
   on your colony, though, that'll change the various rates. So we need to run a simulation for
   eveything up to the point where the property changes, and save the new value."""
 
-  planet = db.ReferenceProperty(sector.Planet)
   star = db.ReferenceProperty(sector.Star)
+  planet_index = db.IntegerProperty()
   sector = db.ReferenceProperty(sector.Sector)
   empire = db.ReferenceProperty(Empire)
   population = db.FloatProperty()

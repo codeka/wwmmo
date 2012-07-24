@@ -304,11 +304,7 @@ def _simulateStep(dt, now, star_pb, empire_key, log):
     if colony_pb.empire_key != empire_key:
       continue
 
-    planet_pb = None
-    for pb in star_pb.planets:
-      if pb.key == colony_pb.planet_key:
-        planet_pb = pb
-        break
+    planet_pb = star_pb.planets[colony_pb.planet_index - 1]
 
     log("--- planet: congeniality=(pop: %.2f, farm: %.2f, mine: %.2f)" %(
          planet_pb.population_congeniality, planet_pb.farming_congeniality,
@@ -453,11 +449,7 @@ def _simulateStep(dt, now, star_pb, empire_key, log):
       population_increase *= goods_efficiency - 1.0
     colony_pb.delta_population = population_increase
 
-    planet_pb = None
-    for pb in star_pb.planets:
-      if pb.key == colony_pb.planet_key:
-        planet_pb = pb
-        break
+    planet_pb = star_pb.planets[colony_pb.planet_index - 1]
 
     # if we're increasing population, it slows down the closer you get to the population
     # congeniality. If population is decreasing, it slows down the FURTHER you get.
@@ -497,18 +489,12 @@ def colonize(empire_pb, colonize_request):
     logging.warn("Could not find star with key: %s" % colonize_request.star_key)
     return None
 
-  planet_model = None
-  for planet in star_model.planets:
-    if str(planet.key()) == colonize_request.planet_key:
-      planet_model = planet
-      break
-
-  if planet_model is None:
-    logging.warn("Found star, but not planet with key: %s" % colonize_request.planet_key)
+  if len(star_model.planets) < colonize_request.planet_index:
+    logging.warn("colonize_request's planet_index was out of bounds")
     return None
 
   empire_model = mdl.Empire.get(empire_pb.key)
-  colony_model = empire_model.colonize(planet_model)
+  colony_model = empire_model.colonize(star_model, colonize_request.planet_index)
 
   # clear the cache of the various bits and pieces who are now invalid
   keys = ["sector:%d,%d" % (star_model.sector.x, star_model.sector.y),

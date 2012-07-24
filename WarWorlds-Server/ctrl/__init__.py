@@ -88,7 +88,7 @@ def colonyModelToPb(colony_pb, colony_model):
   colony_pb.key = str(colony_model.key())
   colony_pb.empire_key = str(empire_mdl.Colony.empire.get_value_for_datastore(colony_model))
   colony_pb.star_key = str(empire_mdl.Colony.star.get_value_for_datastore(colony_model))
-  colony_pb.planet_key = str(empire_mdl.Colony.planet.get_value_for_datastore(colony_model))
+  colony_pb.planet_index = colony_model.planet_index
   colony_pb.population = colony_model.population
   colony_pb.last_simulation = int(dateTimeToEpoch(colony_model.lastSimulation))
   colony_pb.focus_population = colony_model.focusPopulation
@@ -116,14 +116,23 @@ def sectorModelToPb(sector_pb, sector_model):
 
   for star_model in sector_model.stars:
     star_pb = sector_pb.stars.add()
-    starModelToPb(star_pb, star_model)
+    starModelToPb(star_pb, star_model, False)
 
   for colony_model in empire_mdl.Colony.getForSector(sector_model):
     colony_pb = sector_pb.colonies.add()
     colonyModelToPb(colony_pb, colony_model)
 
 
-def starModelToPb(star_pb, star_model):
+def starModelToPb(star_pb, star_model, include_planets=True):
+  """Converts the given star model to a protocol buffer.
+
+  Args:
+    star_pb: The protocol buffer you want to populate
+    star_model: The model to fetch the data from
+    include_planet: If True (the default), we'll also include the planets from the
+        model in the protocol buffer. If False, we'll populate num_planets and leave
+        the actual planet instances out of it.
+  """
   star_pb.key = str(star_model.key())
   star_pb.sector_x = star_model.sector.x
   star_pb.sector_y = star_model.sector.y
@@ -132,11 +141,9 @@ def starModelToPb(star_pb, star_model):
   star_pb.name = star_model.name.title()
   star_pb.classification = star_model.starTypeID
   star_pb.size = star_model.size
-  if star_model.planets is not None:
-    for planet_model in star_model.planets:
-      planet_pb = star_pb.planets.add()
-      planetModelToPb(planet_pb, planet_model)
-    star_pb.num_planets = len(star_model.planets)
+  star_pb.num_planets = len(star_model.planets)
+  if include_planets:
+    star_pb.planets.extend(star_model.planets)
 
 
 def empirePresenceModelToPb(presence_pb, presence_model):

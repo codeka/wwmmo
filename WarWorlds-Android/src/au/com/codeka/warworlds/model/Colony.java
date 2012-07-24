@@ -8,8 +8,8 @@ import java.util.List;
 
 public class Colony {
     private String mKey;
-    private String mPlanetKey;
     private String mStarKey;
+    private int mPlanetIndex;
     private float mPopulation;
     private String mEmpireKey;
     private float mFarmingFocus;
@@ -25,11 +25,11 @@ public class Colony {
     public String getKey() {
         return mKey;
     }
-    public String getPlanetKey() {
-        return mPlanetKey;
-    }
     public String getStarKey() {
         return mStarKey;
+    }
+    public int getPlanetIndex() {
+        return mPlanetIndex;
     }
     public String getEmpireKey() {
         return mEmpireKey;
@@ -80,8 +80,8 @@ public class Colony {
     public static Colony fromProtocolBuffer(warworlds.Warworlds.Colony pb) {
         Colony c = new Colony();
         c.mKey = pb.getKey();
-        c.mPlanetKey = pb.getPlanetKey();
         c.mStarKey = pb.getStarKey();
+        c.mPlanetIndex = pb.getPlanetIndex();
         c.mPopulation = pb.getPopulation();
         c.mEmpireKey = pb.getEmpireKey();
         c.mLastSimulation = new DateTime(pb.getLastSimulation() * 1000, DateTimeZone.UTC);
@@ -100,7 +100,7 @@ public class Colony {
     public warworlds.Warworlds.Colony toProtocolBuffer() {
         return warworlds.Warworlds.Colony.newBuilder()
             .setKey(getKey())
-            .setPlanetKey(getPlanetKey())
+            .setPlanetIndex(getPlanetIndex())
             .setStarKey(getStarKey())
             .setEmpireKey(getEmpireKey())
             .setPopulation(getPopulation())
