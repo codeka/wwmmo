@@ -44,6 +44,12 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
     private StarfieldBackgroundRenderer mBackgroundRenderer;
     private Map<String, Bitmap> mStarBitmaps;
 
+    private static final int BufferBorderSize = 100;
+    private boolean mNeedRedraw = true;
+    private Bitmap mBuffer;
+    private int mBufferOffsetX;
+    private int mBufferOffsetY;
+
     public StarfieldSurfaceView(Context context, AttributeSet attrs) {
         super(context, attrs);
         if (this.isInEditMode()) {
@@ -86,6 +92,7 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
                 // ImageManager, but this makes sure we don't just use up all the memory...
                 mStarBitmaps.clear();
 
+                mNeedRedraw = true;
                 redraw();
             }
         });
@@ -95,6 +102,7 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
                 new ImageManager.BitmapGeneratedListener() {
             @Override
             public void onBitmapGenerated(String key, Bitmap bmp) {
+                mNeedRedraw = true;
                 redraw();
             }
         });
@@ -145,6 +153,29 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
         }
 
         super.onDraw(canvas);
+
+        if (mBuffer == null || mNeedRedraw) {
+            if (mBuffer == null) {
+                mBuffer = Bitmap.createBitmap(canvas.getWidth() + (BufferBorderSize * 2),
+                                              canvas.getHeight() + (BufferBorderSize * 2),
+                                              Bitmap.Config.ARGB_8888);
+            }
+
+            drawScene();
+            mNeedRedraw = false;
+        }
+
+        canvas.drawBitmap(mBuffer,
+                          mBufferOffsetX - BufferBorderSize,
+                          mBufferOffsetY - BufferBorderSize,
+                          mStarPaint);
+    }
+
+    /**
+     * Draws the current "scene" to the internal buffer.
+     */
+    private void drawScene() {
+        Canvas canvas = new Canvas(mBuffer);
 
         SectorManager sm = SectorManager.getInstance();
         canvas.drawColor(Color.BLACK);
@@ -264,6 +295,7 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
         if (star != null) {
             log.info("Selecting star: "+star.getKey());
             mSelectedStar = star;
+            mNeedRedraw = true;
             redraw();
             fireStarSelected(star);
         }
@@ -280,8 +312,27 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
             SectorManager.getInstance().scroll(
                     -(int)(distanceX / getPixelScale()),
                     -(int)(distanceY / getPixelScale()));
-            redraw(); // todo: something better? e.g. event listener or something
 
+            mBufferOffsetX -= distanceX;
+            mBufferOffsetY -= distanceY;
+
+            if (mBufferOffsetX < -BufferBorderSize) {
+                mNeedRedraw = true;
+            }
+            if (mBufferOffsetX > BufferBorderSize) {
+                mNeedRedraw = true;
+            }
+            if (mBufferOffsetY < -BufferBorderSize) {
+                mNeedRedraw = true;
+            }
+            if (mBufferOffsetY > BufferBorderSize) {
+                mNeedRedraw = true;
+            }
+            if (mNeedRedraw) {
+                mBufferOffsetX = mBufferOffsetY = 0;
+            }
+
+            redraw();
             return false;
         }
 
@@ -292,8 +343,8 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
          */
         @Override
         public boolean onSingleTapConfirmed(MotionEvent e) {
-            int tapX = (int) (e.getX() / getPixelScale());
-            int tapY = (int) (e.getY() / getPixelScale());
+            int tapX = (int) ((e.getX() - mBufferOffsetX + BufferBorderSize) / getPixelScale());
+            int tapY = (int) ((e.getY() - mBufferOffsetY + BufferBorderSize) / getPixelScale());
 
             Star star = SectorManager.getInstance().getStarAt(tapX, tapY);
             selectStar(star);

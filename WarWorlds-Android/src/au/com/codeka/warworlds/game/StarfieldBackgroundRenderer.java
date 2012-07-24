@@ -73,7 +73,9 @@ public class StarfieldBackgroundRenderer {
                         (x + (src.width() * 2)) * mPixelScale,
                         (y + (src.height() * 2)) * mPixelScale);
 
-                canvas.drawBitmap(gas, src, dest, mBackgroundPaint);
+                if (dest.left < right && dest.top < bottom && dest.right >= left && dest.bottom >= top) {
+                    canvas.drawBitmap(gas, src, dest, mBackgroundPaint);
+                }
             }
         }
     }
