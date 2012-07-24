@@ -88,7 +88,6 @@ class Star(db.Model):
   sector = db.ReferenceProperty(Sector)
   name = db.StringProperty()
   starTypeID = db.IntegerProperty(name="starType")
-  colour = db.IntegerProperty()
   size = db.IntegerProperty()
   x = db.IntegerProperty()
   y = db.IntegerProperty()
@@ -139,19 +138,6 @@ class SectorManager:
                       queue_name="sectors", method="GET")
 
     return sectors
-
-  @staticmethod
-  def getStar(starKey):
-    """Gets all of the details about a single star, including planets colonies and so on.
-
-    We don't worry about whether the sector has been generated. If not, we just return None.
-    After all, you shouldn't be asking for a star in a sector you haven't visited yet."""
-
-    star = Star.get(starKey)
-    if star is None:
-      return None
-
-    return star
 
   @staticmethod
   def _getSectorKey(x, y):

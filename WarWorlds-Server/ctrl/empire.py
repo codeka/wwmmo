@@ -484,7 +484,10 @@ def colonize(empire_pb, colonize_request):
         and star key of the planet we want to colonize.
   """
 
-  star_model = sector_mdl.SectorManager.getStar(colonize_request.star_key)
+  logging.info("Colonizing: Star=%s Planet=%d" % (colonize_request.star_key,
+                                                  colonize_request.planet_index))
+
+  star_model = sector_mdl.Star.get(colonize_request.star_key)
   if star_model is None:
     logging.warn("Could not find star with key: %s" % colonize_request.star_key)
     return None

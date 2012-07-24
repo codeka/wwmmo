@@ -49,6 +49,9 @@ public class MyEmpire extends Empire {
      * operation completes (successfully or not).
      */
     public void colonize(final Planet planet, final ColonizeCompleteHandler callback) {
+        log.debug(String.format("Colonizing: Star=%s Planet=%d",
+                                planet.getStar().getKey(),
+                                planet.getIndex()));
         new AsyncTask<Void, Void, Colony>() {
             @Override
             protected Colony doInBackground(Void... arg0) {
@@ -62,8 +65,8 @@ public class MyEmpire extends Empire {
                     }
 
                     ColonizeRequest request = ColonizeRequest.newBuilder()
-                            .setPlanetIndex(planet.getIndex())
                             .setStarKey(planet.getStar().getKey())
+                            .setPlanetIndex(planet.getIndex())
                             .build();
 
                     warworlds.Warworlds.Colony pb = ApiClient.postProtoBuf("colonies", request,

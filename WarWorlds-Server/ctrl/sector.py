@@ -54,7 +54,7 @@ def getStar(star_key):
   if cache_key in values:
     return values[cache_key]
 
-  star_model = mdl.SectorManager.getStar(star_key)
+  star_model = mdl.Star.get(star_key)
   if star_model is None:
     return None
 
