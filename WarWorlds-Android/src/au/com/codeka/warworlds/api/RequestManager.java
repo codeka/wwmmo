@@ -14,7 +14,6 @@ import javax.net.SocketFactory;
 import javax.net.ssl.SSLSocketFactory;
 
 import org.apache.http.HttpClientConnection;
-import org.apache.http.HttpConnectionMetrics;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.impl.DefaultHttpClientConnection;
@@ -96,7 +95,7 @@ public class RequestManager {
         HttpClientConnection conn = null;
 
         URI uri = sBaseUri.resolve(url);
-        log.debug("Requesting: {}", uri);
+        //log.debug("Requesting: {}", uri);
 
         for(int numAttempts = 0; ; numAttempts++) {
             try {
@@ -108,7 +107,7 @@ public class RequestManager {
                 if (uri.getQuery() != null && uri.getQuery() != "") {
                     requestUrl += "?"+uri.getQuery();
                 }
-                log.debug("requestUrl = "+requestUrl);
+                //log.debug("requestUrl = "+requestUrl);
 
                 BasicHttpRequest request;
                 if (body != null) {
@@ -126,7 +125,7 @@ public class RequestManager {
                         (uri.getScheme().equals("https") && uri.getPort() != 443))) {
                     host += ":"+uri.getPort();
                 }
-                log.debug("Adding host header: "+host);
+                //log.debug("Adding host header: "+host);
                 request.addHeader("Host", host);
 
                 if (extraHeaders != null) {
@@ -157,7 +156,7 @@ public class RequestManager {
                 return new ResultWrapper(conn, response);
             } catch (Exception e) {
                 if (canRetry(e) && numAttempts == 0) {
-                    log.warn("Got retryable exception making request to "+url, e);
+                    //log.warn("Got retryable exception making request to "+url, e);
 
                     // Note: the connection doesn't go back in the pool, and we'll close this
                     // one, it's probably no good anyway...
@@ -278,16 +277,16 @@ public class RequestManager {
                     while (!mFreeConnections.isEmpty()) {
                         conn = mFreeConnections.pop();
 
-                        HttpConnectionMetrics metrics = conn.getMetrics();
-                        log.debug(String.format("Got connection [%s] from free pool (%d requests," +
-                                                " %d responses, %d bytes sent, %d bytes received).",
-                                  conn,
-                                  metrics.getRequestCount(), metrics.getResponseCount(),
-                                  metrics.getSentBytesCount(), metrics.getReceivedBytesCount()));
+                        //HttpConnectionMetrics metrics = conn.getMetrics();
+                        //log.debug(String.format("Got connection [%s] from free pool (%d requests," +
+                        //                        " %d responses, %d bytes sent, %d bytes received).",
+                        //          conn,
+                        //          metrics.getRequestCount(), metrics.getResponseCount(),
+                        //          metrics.getSentBytesCount(), metrics.getReceivedBytesCount()));
                     }
                 }
             } else {
-                log.debug("Didn't look in connection pool: forceCreate = true");
+                //log.debug("Didn't look in connection pool: forceCreate = true");
             }
 
             if (conn == null) {
@@ -309,12 +308,12 @@ public class RequestManager {
             synchronized (mFreeConnections) {
                 mFreeConnections.push(conn);
 
-                HttpConnectionMetrics metrics = conn.getMetrics();
-                log.debug(String.format("Returned connection [%s] to free pool (%d requests," +
-                                        " %d responses, %d bytes sent, %d bytes received).",
-                          conn,
-                          metrics.getRequestCount(), metrics.getResponseCount(),
-                          metrics.getSentBytesCount(), metrics.getReceivedBytesCount()));
+                //HttpConnectionMetrics metrics = conn.getMetrics();
+                //log.debug(String.format("Returned connection [%s] to free pool (%d requests," +
+                //                        " %d responses, %d bytes sent, %d bytes received).",
+                //          conn,
+                //          metrics.getRequestCount(), metrics.getResponseCount(),
+                //          metrics.getSentBytesCount(), metrics.getReceivedBytesCount()));
             }
         }
 
@@ -330,8 +329,8 @@ public class RequestManager {
             DefaultHttpClientConnection conn = new DefaultHttpClientConnection();
             conn.bind(s, params);
 
-            log.debug(String.format("Connection [%s] to %s:%d created.",
-                                    conn, s.getInetAddress().toString(), mPort));
+            //log.debug(String.format("Connection [%s] to %s:%d created.",
+            //                        conn, s.getInetAddress().toString(), mPort));
             return conn;
         }
     }

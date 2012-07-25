@@ -316,16 +316,16 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
             mBufferOffsetX -= distanceX;
             mBufferOffsetY -= distanceY;
 
-            if (mBufferOffsetX < -BufferBorderSize) {
+            if (mBufferOffsetX <= -BufferBorderSize) {
                 mNeedRedraw = true;
             }
-            if (mBufferOffsetX > BufferBorderSize) {
+            if (mBufferOffsetX >= BufferBorderSize) {
                 mNeedRedraw = true;
             }
-            if (mBufferOffsetY < -BufferBorderSize) {
+            if (mBufferOffsetY <= -BufferBorderSize) {
                 mNeedRedraw = true;
             }
-            if (mBufferOffsetY > BufferBorderSize) {
+            if (mBufferOffsetY >= BufferBorderSize) {
                 mNeedRedraw = true;
             }
             if (mNeedRedraw) {

@@ -1,11 +1,12 @@
 package au.com.codeka.warworlds.game;
 
+import java.util.concurrent.Semaphore;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import android.content.Context;
 import android.graphics.Canvas;
-import android.os.AsyncTask;
 import android.util.AttributeSet;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
@@ -21,12 +22,13 @@ public class UniverseElementSurfaceView extends SurfaceView implements SurfaceHo
     private Logger log = LoggerFactory.getLogger(UniverseElementSurfaceView.class);
     private Context mContext;
     private SurfaceHolder mHolder;
-    private boolean mIsRedrawing;
-    private boolean mNeedsRedraw;
     private GestureDetector mGestureDetector;
     private boolean mDisableGestures = false;
     GestureDetector.OnGestureListener mGestureListener;
     private float mPixelScale;
+
+    private Thread mDrawThread;
+    private Semaphore mDrawSemaphore;
 
     public UniverseElementSurfaceView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -38,6 +40,7 @@ public class UniverseElementSurfaceView extends SurfaceView implements SurfaceHo
             return;
         }
 
+        mDrawSemaphore = new Semaphore(1);
         getHolder().addCallback(this);
     }
 
@@ -54,6 +57,12 @@ public class UniverseElementSurfaceView extends SurfaceView implements SurfaceHo
     @Override
     public void surfaceDestroyed(SurfaceHolder holder) {
         mHolder = null;
+
+        // if the draw thread is running, shut it down...
+        if (mDrawThread != null) {
+            mDrawThread.interrupt();
+            mDrawThread = null;
+        }
     }
 
     public float getPixelScale() {
@@ -91,46 +100,47 @@ public class UniverseElementSurfaceView extends SurfaceView implements SurfaceHo
             return;
         }
 
-        final SurfaceHolder h = mHolder;
-        if (h == null) {
+        if (mHolder == null) {
             return;
         }
 
-        if (mIsRedrawing) {
-            mNeedsRedraw = true;
-            return;
+        if (mDrawThread == null) {
+            mDrawThread = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    drawThreadProc();
+                }
+            });
+            mDrawThread.start();
         }
-        mIsRedrawing = true;
 
-        new AsyncTask<Void, Void, Void>() {
-            @Override
-            protected Void doInBackground(Void... arg0) {
-                Canvas c = h.lockCanvas();
+        try {
+            mDrawSemaphore.release();
+        } catch (Exception e) {
+            log.error("HUH?", e);
+        }
+    }
+
+    private void drawThreadProc() {
+        while (true) {
+            try {
+                mDrawSemaphore.acquire();
+            } catch (InterruptedException e) {
+                log.info("Surface was destroyed, render thread shutting down.");
+                return;
+            }
+
+            SurfaceHolder h = mHolder;
+            Canvas c = h.lockCanvas();
+            try {
                 try {
-                    try {
-                        synchronized(h) {
-                            onDraw(c);
-                        }
-                    } finally {
-                        h.unlockCanvasAndPost(c);
-                    }
-                } catch(Exception e) {
-                    log.error("An error occured re-drawing the canvas, ignoring.", e);
+                    onDraw(c);
+                } finally {
+                    h.unlockCanvasAndPost(c);
                 }
-
-                return null;
+            } catch(Exception e) {
+                log.error("An error occured re-drawing the canvas, ignoring.", e);
             }
-
-            @Override
-            protected void onPostExecute(Void result) {
-                mIsRedrawing = false;
-
-                // if another redraw was scheduled, do it now
-                if (mNeedsRedraw) {
-                    mNeedsRedraw = false;
-                    redraw();
-                }
-            }
-        }.execute();
+        }
     }
 }
