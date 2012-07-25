@@ -21,15 +21,21 @@ public class PlanetImageManager extends ImageManager {
      */
     public Bitmap getBitmap(Context context, Planet planet) {
         String key = String.format("%s-%d", planet.getStar().getKey(), planet.getIndex());
-        return getBitmap(context, key, 100, getTemplate(context, planet), planet);
+        return getBitmap(context, key, 100, new PlanetExtra(context, planet));
     }
 
     /**
      * Loads the \c Template for the given \c Planet.
      */
-    private static Template getTemplate(Context context, Planet planet) {
-        String key = String.format("%s-%d", planet.getStar().getKey(), planet.getIndex());
-        return loadTemplate(context, planet.getPlanetType().getBitmapBasePath(), key);
+    @Override
+    protected Template getTemplate(Object extra) {
+        PlanetExtra planetExtra = (PlanetExtra) extra;
+        String key = String.format("%s-%d",
+                                   planetExtra.planet.getStar().getKey(),
+                                   planetExtra.planet.getIndex());
+        return loadTemplate(planetExtra.context,
+                             planetExtra.planet.getPlanetType().getBitmapBasePath(),
+                             key);
     }
 
     /**
@@ -38,10 +44,10 @@ public class PlanetImageManager extends ImageManager {
      */
     @Override
     protected Vector3 getSunDirection(Object extra) {
-        Planet planet = (Planet) extra;
-        int numPlanets = planet.getStar().getNumPlanets();
+        PlanetExtra planetExtra = (PlanetExtra) extra;
+        int numPlanets = planetExtra.planet.getStar().getNumPlanets();
         float angle = (0.5f/(numPlanets + 1));
-        angle = (float) ((angle*planet.getIndex()*Math.PI) + angle*Math.PI);
+        angle = (float) ((angle*planetExtra.planet.getIndex()*Math.PI) + angle*Math.PI);
 
         Vector3 sunDirection = Vector3.pool.borrow().reset(0.0, 1.0, -1.0);
         sunDirection.rotateZ(angle);
@@ -53,7 +59,18 @@ public class PlanetImageManager extends ImageManager {
      * Gets the size we render the planet as.
      */
     protected double getPlanetSize(Object extra) {
-        Planet planet = (Planet) extra;
-        return ((planet.getSize() - 10.0) / 8.0) + 4.0;
+        PlanetExtra planetExtra = (PlanetExtra) extra;
+        return ((planetExtra.planet.getSize() - 10.0) / 8.0) + 4.0;
     }
+
+    private static class PlanetExtra {
+        public Planet planet;
+        public Context context;
+
+        public PlanetExtra(Context context, Planet planet) {
+            this.context = context;
+            this.planet = planet;
+        }
+    }
+
 }

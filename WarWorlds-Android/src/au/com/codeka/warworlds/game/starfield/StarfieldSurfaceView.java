@@ -1,8 +1,6 @@
 package au.com.codeka.warworlds.game.starfield;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.slf4j.Logger;
@@ -41,7 +39,6 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
     private Paint mStarNamePaint;
     private Bitmap mColonyIcon;
     private StarfieldBackgroundRenderer mBackgroundRenderer;
-    private Map<String, Bitmap> mStarBitmaps;
     private SelectionOverlay mSelectionOverlay;
 
     private static final int BufferBorderSize = 100;
@@ -61,7 +58,6 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
         mContext = context;
         mStarSelectedListeners = new CopyOnWriteArrayList<OnStarSelectedListener>();
         mSelectedStar = null;
-        mStarBitmaps = new HashMap<String, Bitmap>();
         mColonyIcon = BitmapFactory.decodeResource(getResources(), R.drawable.starfield_colony);
 
         mSelectionOverlay = new SelectionOverlay(0, 0, 20);
@@ -85,10 +81,6 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
                         selectStar(newSelectedStar);
                     }
                 }
-
-                // we'll remove our cached star bitmaps as well, they'll be cached in the
-                // ImageManager, but this makes sure we don't just use up all the memory...
-                mStarBitmaps.clear();
 
                 mNeedRedraw = true;
                 redraw();
@@ -172,6 +164,7 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
         mBufferOffsetX = mBufferOffsetY = 0;
         mOverlayOffsetX = mOverlayOffsetY = 0;
 
+        long startTime = System.nanoTime();
         Canvas canvas = new Canvas(mBuffer);
 
         SectorManager sm = SectorManager.getInstance();
@@ -198,6 +191,9 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
                 drawSector(canvas, sx, sy, sector);
             }
         }
+
+        long endTime = System.nanoTime();
+        log.debug(String.format("Scene re-drawn in %.4fms", (double)(endTime - startTime) / 1000000.0));
     }
 
     /**
@@ -227,11 +223,7 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
                               (x + 100) * pixelScale, (y + 100) * pixelScale)) {
 
             int imageSize = (int)(star.getSize() * star.getStarType().getImageScale() * 2);
-            Bitmap starBitmap = mStarBitmaps.get(star.getKey());
-            if (starBitmap == null) {
-                starBitmap = StarImageManager.getInstance().getBitmap(mContext, star, imageSize);
-                mStarBitmaps.put(star.getKey(), starBitmap);
-            }
+            Bitmap starBitmap = StarImageManager.getInstance().getBitmap(mContext, star, imageSize);
             if (starBitmap != null) {
                 canvas.drawBitmap(starBitmap, (x - (imageSize / 2)) * pixelScale,
                         (y - (imageSize / 2)) * pixelScale, mStarPaint);

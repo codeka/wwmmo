@@ -16,14 +16,17 @@ public class StarImageManager extends ImageManager {
      * Gets the \c Bitmap for the given star.
      */
     public Bitmap getBitmap(Context context, Star star, int size) {
-        return getBitmap(context, star.getKey(), size, getTemplate(context, star), star);
+        return getBitmap(context, star.getKey(), size, new StarExtra(context, star));
     }
 
     /**
      * Loads the \c Template for the given \c Planet.
      */
-    private static Template getTemplate(Context context, Star star) {
-        return loadTemplate(context, star.getStarType().getBitmapBasePath(), star.getKey());
+    protected Template getTemplate(Object extra) {
+        StarExtra starExtra = (StarExtra) extra;
+        return loadTemplate(starExtra.context,
+                             starExtra.star.getStarType().getBitmapBasePath(),
+                             starExtra.star.getKey());
     }
 
     @Override
@@ -34,8 +37,17 @@ public class StarImageManager extends ImageManager {
 
     @Override
     protected double getPlanetSize(Object extra) {
-        Star star = (Star) extra;
-        return star.getStarType().getBaseSize();
+        StarExtra starExtra = (StarExtra) extra;
+        return starExtra.star.getStarType().getBaseSize();
     }
 
+    private static class StarExtra {
+        public Star star;
+        public Context context;
+
+        public StarExtra(Context context, Star star) {
+            this.context = context;
+            this.star = star;
+        }
+    }
 }

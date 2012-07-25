@@ -6,7 +6,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Queue;
 import java.util.Random;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -41,6 +43,7 @@ public abstract class ImageManager {
     private List<BitmapGeneratedListener> mBitmapGeneratedListeners =
             new ArrayList<BitmapGeneratedListener>();
     private LruCache<String, Bitmap> mLoadedBitmaps = new LruCache<String, Bitmap>(100);
+    private Map<String, Template> mTemplates = new HashMap<String, Template>();
     private double mPixelScale;
 
     /**
@@ -59,8 +62,7 @@ public abstract class ImageManager {
      * @return A \c Bitmap with an image of the planet or star, or \c null if the image has
      *          not been generated yet.
      */
-    protected Bitmap getBitmap(Context context, final String key, int size, Template tmpl,
-            Object extra) {
+    protected Bitmap getBitmap(Context context, final String key, int size, Object extra) {
         final String cacheKey = String.format("%s_%d", key, size);
         Bitmap loadedBitmap = mLoadedBitmaps.get(cacheKey);
         if (loadedBitmap != null) {
@@ -77,6 +79,7 @@ public abstract class ImageManager {
         }
 
         long startTime = System.nanoTime();
+        Template tmpl = getTemplate(extra);
         if (tmpl == null) {
             return null;
         }
@@ -143,7 +146,7 @@ public abstract class ImageManager {
     /**
      * Loads the \c Template for the given \c Planet.
      */
-    protected static Template loadTemplate(Context context, String basePath, String key) {
+    protected Template loadTemplate(Context context, String basePath, String key) {
         String[] fileNames = null;
         try {
             fileNames = context.getAssets().list(basePath);
@@ -164,26 +167,29 @@ public abstract class ImageManager {
             fullPath += fileNames[rand.nextInt(fileNames.length - 1)];
         }
 
-        Template tmpl = null;
-        InputStream ins = null;
-        try {
-            ins = context.getAssets().open(fullPath);
-            tmpl = Template.parse(ins);
-        } catch (IOException e) {
-            log.error("Error loading object definition: "+fullPath, e);
-        } catch (TemplateException e) {
-            log.error("Error parsing object definition: "+fullPath, e);
-        } finally {
-            if (ins != null) {
-                try {
-                    ins.close();
-                } catch (IOException e) {
+        Template tmpl = mTemplates.get(fullPath);
+        if (tmpl == null) {
+            InputStream ins = null;
+            try {
+                ins = context.getAssets().open(fullPath);
+                tmpl = Template.parse(ins);
+            } catch (IOException e) {
+                log.error("Error loading object definition: "+fullPath, e);
+            } catch (TemplateException e) {
+                log.error("Error parsing object definition: "+fullPath, e);
+            } finally {
+                if (ins != null) {
+                    try {
+                        ins.close();
+                    } catch (IOException e) {
+                    }
                 }
             }
-        }
 
-        if (tmpl != null) {
-            tmpl.setName(fullPath.replace(File.separatorChar, '-').replace(".xml", ""));
+            if (tmpl != null) {
+                tmpl.setName(fullPath.replace(File.separatorChar, '-').replace(".xml", ""));
+                mTemplates.put(fullPath, tmpl);
+            }
         }
 
         return tmpl;
@@ -202,6 +208,8 @@ public abstract class ImageManager {
 
         return fullPath;
     }
+
+    protected abstract Template getTemplate(Object extra);
 
     protected abstract Vector3 getSunDirection(Object extra);
 
