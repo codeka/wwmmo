@@ -5,9 +5,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.ref.SoftReference;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Queue;
 import java.util.Random;
@@ -16,10 +14,13 @@ import java.util.concurrent.ArrayBlockingQueue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.os.AsyncTask;
 import android.os.Handler;
+import android.support.v4.util.LruCache;
 import au.com.codeka.planetrender.Colour;
 import au.com.codeka.planetrender.Image;
 import au.com.codeka.planetrender.PlanetRenderer;
@@ -30,6 +31,7 @@ import au.com.codeka.planetrender.Vector3;
 /**
  * This is the base class for the \c StarImageManagaer and \c PlanetImageManager.
  */
+@SuppressLint("NewApi") // for LruCache, we grab it from android.support.v4 anyway
 public abstract class ImageManager {
     private static Logger log = LoggerFactory.getLogger(ImageManager.class);
 
@@ -38,8 +40,7 @@ public abstract class ImageManager {
     private Handler mHandler = new Handler();
     private List<BitmapGeneratedListener> mBitmapGeneratedListeners =
             new ArrayList<BitmapGeneratedListener>();
-    private HashMap<String, SoftReference<Bitmap>> mLoadedBitmaps =
-            new HashMap<String, SoftReference<Bitmap>>();
+    private LruCache<String, Bitmap> mLoadedBitmaps = new LruCache<String, Bitmap>(100);
     private double mPixelScale;
 
     /**
@@ -58,15 +59,12 @@ public abstract class ImageManager {
      * @return A \c Bitmap with an image of the planet or star, or \c null if the image has
      *          not been generated yet.
      */
-    protected Bitmap getBitmap(Context context, String key, int size, Template tmpl,
+    protected Bitmap getBitmap(Context context, final String key, int size, Template tmpl,
             Object extra) {
-        String cacheKey = String.format("%s_%d", key, size);
-        SoftReference<Bitmap> loadedBitmap = mLoadedBitmaps.get(cacheKey);
+        final String cacheKey = String.format("%s_%d", key, size);
+        Bitmap loadedBitmap = mLoadedBitmaps.get(cacheKey);
         if (loadedBitmap != null) {
-            Bitmap bmp = loadedBitmap.get();
-            if (bmp != null) {
-                return bmp;
-            }
+            return loadedBitmap;
         }
 
         if (isInGenerateQueue(cacheKey)) {
@@ -83,16 +81,27 @@ public abstract class ImageManager {
             return null;
         }
 
-        File cacheFile = new File(getCachePath(context, tmpl, cacheKey));
+        final File cacheFile = new File(getCachePath(context, tmpl, cacheKey));
         if (cacheFile.exists()) {
             log.debug("Loading cached image: "+cacheFile.getAbsolutePath());
 
-            BitmapFactory.Options opts = new BitmapFactory.Options();
-            Bitmap bmp = BitmapFactory.decodeFile(cacheFile.getAbsolutePath(), opts);
+            new AsyncTask<Void, Void, Void>() {
+                @Override
+                protected Void doInBackground(Void... params) {
+                    BitmapFactory.Options opts = new BitmapFactory.Options();
+                    Bitmap bmp = BitmapFactory.decodeFile(cacheFile.getAbsolutePath(), opts);
 
-            mLoadedBitmaps.put(cacheKey, new SoftReference<Bitmap>(bmp));
+                    mLoadedBitmaps.put(cacheKey, bmp);
+                    return null;
+                }
 
-            return bmp;
+                @Override
+                protected void onPostExecute(Void v) {
+                    fireBitmapGeneratedListeners(key, mLoadedBitmaps.get(cacheKey));
+                }
+            }.execute();
+
+            return null;
         } else {
             long endTime = System.nanoTime();
             log.debug(String.format("No cached image (after %.4fms), generating: %s",

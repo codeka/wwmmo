@@ -5,6 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import warworlds.Warworlds.Hello;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
@@ -13,6 +14,7 @@ import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.StrictMode;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;
@@ -42,13 +44,24 @@ public class WarWorldsActivity extends Activity {
 
     private static final int OPTIONS_DIALOG = 1000;
 
+    @SuppressLint({ "NewApi" }) // StrictMode doesn't work on < 3.0
     @Override
     public void onCreate(Bundle savedInstanceState) {
         log.info("WarWorlds activity starting...");
+
         super.onCreate(savedInstanceState);
 
         Util.loadProperties(mContext, this);
         Authenticator.configure(mContext);
+
+        if (Util.isDebug()) {
+            StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
+                                       .detectDiskReads()
+                                       .detectDiskWrites()
+                                       .detectNetwork()
+                                       .penaltyLog()
+                                       .build());
+        }
 
         mHandler = new Handler();
 
