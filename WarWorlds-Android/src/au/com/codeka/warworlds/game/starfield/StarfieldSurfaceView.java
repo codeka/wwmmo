@@ -44,8 +44,8 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
     private static final int BufferBorderSize = 100;
     private boolean mNeedRedraw = true;
     private Bitmap mBuffer;
-    private int mBufferOffsetX;
-    private int mBufferOffsetY;
+    private float mBufferOffsetX;
+    private float mBufferOffsetY;
 
     public StarfieldSurfaceView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -82,7 +82,7 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
                     }
                 }
 
-                mNeedRedraw = true;
+                setDirty();
                 redraw();
             }
         });
@@ -92,7 +92,7 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
                 new ImageManager.BitmapGeneratedListener() {
             @Override
             public void onBitmapGenerated(String key, Bitmap bmp) {
-                mNeedRedraw = true;
+                setDirty();
                 redraw();
             }
         });
@@ -155,6 +155,10 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
                           mBufferOffsetX - BufferBorderSize,
                           mBufferOffsetY - BufferBorderSize,
                           mStarPaint);
+    }
+
+    public void setDirty() {
+        mNeedRedraw = true;
     }
 
     /**
@@ -295,7 +299,7 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
                 addOverlay(mSelectionOverlay);
             }
 
-            mNeedRedraw = true;
+            setDirty();
             redraw();
             fireStarSelected(star);
         }
@@ -310,27 +314,26 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
         public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX,
                 float distanceY) {
             SectorManager.getInstance().scroll(
-                    -(int)(distanceX / getPixelScale()),
-                    -(int)(distanceY / getPixelScale()));
+                    -(float)(distanceX / getPixelScale()),
+                    -(float)(distanceY / getPixelScale()));
 
             mBufferOffsetX -= distanceX;
             mBufferOffsetY -= distanceY;
-
-            if (mBufferOffsetX <= -BufferBorderSize) {
-                mNeedRedraw = true;
-            }
-            if (mBufferOffsetX >= BufferBorderSize) {
-                mNeedRedraw = true;
-            }
-            if (mBufferOffsetY <= -BufferBorderSize) {
-                mNeedRedraw = true;
-            }
-            if (mBufferOffsetY >= BufferBorderSize) {
-                mNeedRedraw = true;
-            }
-
             mOverlayOffsetX = mBufferOffsetX;
             mOverlayOffsetY = mBufferOffsetY;
+
+            if (mBufferOffsetX <= -BufferBorderSize) {
+                setDirty();
+            }
+            if (mBufferOffsetX >= BufferBorderSize) {
+                setDirty();
+            }
+            if (mBufferOffsetY <= -BufferBorderSize) {
+                setDirty();
+            }
+            if (mBufferOffsetY >= BufferBorderSize) {
+                setDirty();
+            }
 
             redraw();
             return false;

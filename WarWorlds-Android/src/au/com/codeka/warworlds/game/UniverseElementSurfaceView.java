@@ -31,8 +31,8 @@ public class UniverseElementSurfaceView extends SurfaceView implements SurfaceHo
     GestureDetector.OnGestureListener mGestureListener;
     private float mPixelScale;
     private ArrayList<Overlay> mOverlays;
-    protected int mOverlayOffsetX;
-    protected int mOverlayOffsetY;
+    protected float mOverlayOffsetX;
+    protected float mOverlayOffsetY;
 
     private Thread mDrawThread;
     private Semaphore mDrawSemaphore;
@@ -177,7 +177,7 @@ public class UniverseElementSurfaceView extends SurfaceView implements SurfaceHo
                     synchronized(mOverlays) {
                         int size = mOverlays.size();
                         for (int i = 0; i < size; i++) {
-                            mOverlays.get(i).draw(c, mOverlayOffsetX, mOverlayOffsetY);
+                            mOverlays.get(i).draw(c, (int) mOverlayOffsetX, (int) mOverlayOffsetY);
                         }
                     }
                 } finally {

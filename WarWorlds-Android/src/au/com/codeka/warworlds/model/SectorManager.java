@@ -39,8 +39,8 @@ public class SectorManager {
 
     private long mSectorX;
     private long mSectorY;
-    private int mOffsetX;
-    private int mOffsetY;
+    private float mOffsetX;
+    private float mOffsetY;
     private Map<Pair<Long, Long>, Sector> mSectors;
     private Set<Pair<Long, Long>> mInTransitSectors;
     private CopyOnWriteArrayList<OnSectorListChangedListener> mSectorListChangedListeners;
@@ -85,7 +85,7 @@ public class SectorManager {
      * smooth scrolling of the sectors).
      */
     public int getOffsetX() {
-        return mOffsetX;
+        return (int) mOffsetX;
     }
 
     /**
@@ -93,7 +93,7 @@ public class SectorManager {
      * smooth scrolling of the sectors).
      */
     public int getOffsetY() {
-        return mOffsetY;
+        return (int) mOffsetY;
     }
 
     /**
@@ -107,7 +107,7 @@ public class SectorManager {
     /**
      * Scroll to the given sector (x,y) and offset into the sector.
      */
-    public void scrollTo(long sectorX, long sectorY, int offsetX, int offsetY) {
+    public void scrollTo(long sectorX, long sectorY, float offsetX, float offsetY) {
         mSectorX = sectorX;
         mSectorY = sectorY;
         mOffsetX = -offsetX;
@@ -145,7 +145,7 @@ public class SectorManager {
      * @param distanceX Number of pixels in the X direction to scroll.
      * @param distanceY Number of pixels in the Y direction to scroll.
      */
-    public void scroll(int distanceX, int distanceY) {
+    public void scroll(float distanceX, float distanceY) {
         mOffsetX += distanceX;
         mOffsetY += distanceY;
 
@@ -184,8 +184,8 @@ public class SectorManager {
         // first, work out which sector your actually inside of. If (mOffsetX, mOffsetY) is (0,0)
         // then (x,y) corresponds exactly to the offset into (mSectorX, mSectorY). Otherwise, we
         // have to adjust (x,y) by the offset so that it works out like that.
-        int x = viewX - mOffsetX;
-        int y = viewY - mOffsetY;
+        int x = viewX - (int) mOffsetX;
+        int y = viewY - (int) mOffsetY;
 
         long sectorX = mSectorX;
         long sectorY = mSectorY;
