@@ -1,5 +1,6 @@
 package au.com.codeka.warworlds.game;
 
+import java.util.ArrayList;
 import java.util.concurrent.Semaphore;
 
 import org.slf4j.Logger;
@@ -7,6 +8,9 @@ import org.slf4j.LoggerFactory;
 
 import android.content.Context;
 import android.graphics.Canvas;
+import android.graphics.DashPathEffect;
+import android.graphics.Paint;
+import android.graphics.RectF;
 import android.util.AttributeSet;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
@@ -26,6 +30,9 @@ public class UniverseElementSurfaceView extends SurfaceView implements SurfaceHo
     private boolean mDisableGestures = false;
     GestureDetector.OnGestureListener mGestureListener;
     private float mPixelScale;
+    private ArrayList<Overlay> mOverlays;
+    protected int mOverlayOffsetX;
+    protected int mOverlayOffsetY;
 
     private Thread mDrawThread;
     private Semaphore mDrawSemaphore;
@@ -40,8 +47,26 @@ public class UniverseElementSurfaceView extends SurfaceView implements SurfaceHo
             return;
         }
 
+        mOverlays = new ArrayList<Overlay>();
         mDrawSemaphore = new Semaphore(1);
         getHolder().addCallback(this);
+    }
+
+    public void addOverlay(Overlay overlay) {
+        if (overlay.isVisible())
+            return;
+
+        synchronized(mOverlays) {
+            mOverlays.add(overlay);
+            overlay.setVisible(true);
+        }
+    }
+
+    public void removeOverlay(Overlay overlay) {
+        synchronized(mOverlays) {
+            mOverlays.remove(overlay);
+            overlay.setVisible(false);
+        }
     }
 
     @Override
@@ -123,24 +148,152 @@ public class UniverseElementSurfaceView extends SurfaceView implements SurfaceHo
 
     private void drawThreadProc() {
         while (true) {
-            try {
-                mDrawSemaphore.acquire();
-            } catch (InterruptedException e) {
+            // if we have overlays then we're animated so we need to redraw anyway
+            if (mOverlays.size() == 0) {
+                try {
+                    mDrawSemaphore.acquire();
+                } catch (InterruptedException e) {
+                    log.info("Surface was destroyed, render thread shutting down.");
+                    return;
+                }
+            }
+
+            SurfaceHolder h = mHolder;
+            if (h == null) {
                 log.info("Surface was destroyed, render thread shutting down.");
                 return;
             }
 
-            SurfaceHolder h = mHolder;
             Canvas c = h.lockCanvas();
+            if (c == null) {
+                log.info("Surface was destroyed, render thread shutting down.");
+                return;
+            }
+
             try {
                 try {
                     onDraw(c);
+
+                    synchronized(mOverlays) {
+                        int size = mOverlays.size();
+                        for (int i = 0; i < size; i++) {
+                            mOverlays.get(i).draw(c, mOverlayOffsetX, mOverlayOffsetY);
+                        }
+                    }
                 } finally {
                     h.unlockCanvasAndPost(c);
                 }
             } catch(Exception e) {
                 log.error("An error occured re-drawing the canvas, ignoring.", e);
             }
+        }
+    }
+
+    /**
+     * An \c Overlay is a little graphic that sits over the top of the surface view. It's drawn
+     * separately and can be animated as well. Useful for things like selection indicators and
+     * so on.
+     */
+    protected static abstract class Overlay {
+        private boolean mIsVisible;
+
+        private void setVisible(boolean isVisible) {
+            mIsVisible = isVisible;
+        }
+
+        public boolean isVisible() {
+            return mIsVisible;
+        }
+
+        public abstract void draw(Canvas canvas, int offsetX, int offsetY);
+    }
+
+    /**
+     * This overlay is used for drawing the selection indicator. It's an animated dotted circle
+     * that spins around the selected point.
+     */
+    protected static class SelectionOverlay extends Overlay {
+        private Paint mPaint;
+        private float mCentreX;
+        private float mCentreY;
+        private float mRadius;
+        private float mAngle;
+        private float mDashAngleDegrees;
+        private float mRotateSpeed;
+        private RectF mInnerCircle;
+        private RectF mOuterCircle;
+        private RectF mRect;
+
+        public SelectionOverlay(double centreX, double centreY, double radius) {
+            mCentreX = 0;
+            mCentreY = 0;
+            mRadius = 0;
+            mAngle = 0;
+
+            mPaint = new Paint();
+            mPaint.setAntiAlias(true);
+            mPaint.setARGB(255, 255, 255, 255);
+            mPaint.setStyle(Paint.Style.STROKE);
+
+            mInnerCircle = new RectF();
+            mOuterCircle = new RectF();
+            mRect = new RectF();
+            mRotateSpeed = 1.5f;
+
+            setCentre(centreX, centreY);
+            setRadius(radius);
+        }
+
+        public void setCentre(double x, double y) {
+            mCentreX = (float) x;
+            mCentreY = (float) y;
+            setRadius(mRadius);
+        }
+
+        public void setRadius(double radius) {
+            mRadius = (float) radius;
+
+            int numDashes = 40; // we want 40 dashes around the circle
+            double dashAngleRadians = (2 * Math.PI) / numDashes;
+            double dashPixels = dashAngleRadians * radius;
+            mDashAngleDegrees = 360.0f / numDashes;
+
+            DashPathEffect pathEffect = new DashPathEffect(new float[] {
+                    (float) dashPixels, (float) dashPixels}, 1);
+            mPaint.setPathEffect(pathEffect);
+
+            mInnerCircle.left = mCentreX - mRadius;
+            mInnerCircle.top = mCentreY - mRadius;
+            mInnerCircle.right = mCentreX + mRadius;
+            mInnerCircle.bottom = mCentreY + mRadius;
+
+            mOuterCircle.left = mCentreX - mRadius - 4;
+            mOuterCircle.top = mCentreY - mRadius - 4;
+            mOuterCircle.right = mCentreX + mRadius + 4;
+            mOuterCircle.bottom = mCentreY + mRadius + 4;
+        }
+
+        @Override
+        public void draw(Canvas canvas, int offsetX, int offsetY) {
+            mAngle += mRotateSpeed;
+            if (mAngle > 360.0f) {
+                mAngle = 0.0f;
+            }
+
+            // we cannot make the arc 360 degrees, otherwise it ignores the angle offset. Instead
+            // we make it 360 - "dash-angle" (i.e. the angle through which one dash passes)
+
+            mRect.left = mInnerCircle.left + offsetX;
+            mRect.right = mInnerCircle.right + offsetX;
+            mRect.top = mInnerCircle.top + offsetY;
+            mRect.bottom = mInnerCircle.bottom + offsetY;
+            canvas.drawArc(mRect, mAngle, 360.0f - mDashAngleDegrees, false, mPaint);
+
+            mRect.left = mOuterCircle.left + offsetX;
+            mRect.right = mOuterCircle.right + offsetX;
+            mRect.top = mOuterCircle.top + offsetY;
+            mRect.bottom = mOuterCircle.bottom + offsetY;
+            canvas.drawArc(mRect, 360.0f - mAngle, 360.0f - mDashAngleDegrees, false, mPaint);
         }
     }
 }

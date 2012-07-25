@@ -39,10 +39,10 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
     private Star mSelectedStar;
     private Paint mStarPaint;
     private Paint mStarNamePaint;
-    private Paint mSelectionPaint;
     private Bitmap mColonyIcon;
     private StarfieldBackgroundRenderer mBackgroundRenderer;
     private Map<String, Bitmap> mStarBitmaps;
+    private SelectionOverlay mSelectionOverlay;
 
     private static final int BufferBorderSize = 100;
     private boolean mNeedRedraw = true;
@@ -64,9 +64,7 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
         mStarBitmaps = new HashMap<String, Bitmap>();
         mColonyIcon = BitmapFactory.decodeResource(getResources(), R.drawable.starfield_colony);
 
-        mSelectionPaint = new Paint();
-        mSelectionPaint.setARGB(255, 255, 255, 255);
-        mSelectionPaint.setStyle(Style.STROKE);
+        mSelectionOverlay = new SelectionOverlay(0, 0, 20);
 
         mStarPaint = new Paint();
         mStarPaint.setARGB(255, 255, 255, 255);
@@ -135,10 +133,6 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
     public Star getSelectedStar() {
         return mSelectedStar;
     }
-    public void selectStar(String starKey) {
-        Star star = SectorManager.getInstance().findStar(starKey);
-        selectStar(star);
-    }
 
     /**
      * Draws the actual starfield to the given \c Canvas. This will be called in
@@ -175,6 +169,9 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
      * Draws the current "scene" to the internal buffer.
      */
     private void drawScene() {
+        mBufferOffsetX = mBufferOffsetY = 0;
+        mOverlayOffsetX = mOverlayOffsetY = 0;
+
         Canvas canvas = new Canvas(mBuffer);
 
         SectorManager sm = SectorManager.getInstance();
@@ -240,15 +237,15 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
                         (y - (imageSize / 2)) * pixelScale, mStarPaint);
             }
 
-            if (mSelectedStar == star) {
-                canvas.drawCircle(x * pixelScale, y * pixelScale,
-                        (star.getSize() + 5) * pixelScale, mSelectionPaint);
-            }
-
             List<Colony> colonies = star.getColonies();
             if (colonies != null && !colonies.isEmpty()) {
                 canvas.drawBitmap(mColonyIcon, (x + mColonyIcon.getWidth()) * pixelScale,
-                        (y - mColonyIcon.getHeight()) * pixelScale, mSelectionPaint);
+                        (y - mColonyIcon.getHeight()) * pixelScale, mStarPaint);
+            }
+
+            if (mSelectedStar == star) {
+                mSelectionOverlay.setCentre(x * pixelScale - BufferBorderSize,
+                                            y * pixelScale - BufferBorderSize);
             }
         }
     }
@@ -291,10 +288,21 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
                 x * pixelScale, y * pixelScale, mStarNamePaint);
     }
 
+    public void selectStar(String starKey) {
+        Star star = SectorManager.getInstance().findStar(starKey);
+        selectStar(star);
+    }
+
     private void selectStar(Star star) {
         if (star != null) {
             log.info("Selecting star: "+star.getKey());
             mSelectedStar = star;
+
+            mSelectionOverlay.setRadius((star.getSize() + 4) * getPixelScale());
+            if (!mSelectionOverlay.isVisible()) {
+                addOverlay(mSelectionOverlay);
+            }
+
             mNeedRedraw = true;
             redraw();
             fireStarSelected(star);
@@ -328,9 +336,9 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
             if (mBufferOffsetY >= BufferBorderSize) {
                 mNeedRedraw = true;
             }
-            if (mNeedRedraw) {
-                mBufferOffsetX = mBufferOffsetY = 0;
-            }
+
+            mOverlayOffsetX = mBufferOffsetX;
+            mOverlayOffsetY = mBufferOffsetY;
 
             redraw();
             return false;
