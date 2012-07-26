@@ -9,8 +9,24 @@
         android:layout_height="50dp"
         android:layout_alignParentTop="true" />
 
+    <au.com.codeka.warworlds.game.starfield.StarfieldSurfaceView
+        android:id="@+id/starfield"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/bottom_pane"
+        android:layout_below="@id/ad"
+        android:layout_marginBottom="-4px" />
+
+    <au.com.codeka.warworlds.ctrl.MiniChatView
+        android:id="@+id/mini_chat"
+        android:layout_height="50dp"
+        android:layout_width="fill_parent"
+        android:layout_above="@+id/bottom_pane"
+        android:layout_marginBottom="-4px" />
+
     <LinearLayout
         android:id="@+id/bottom_pane"
+        style="@style/BottomPane"
         android:layout_width="match_parent"
         android:layout_height="180dp"
         android:layout_alignParentBottom="true"
@@ -100,18 +116,5 @@
         </RelativeLayout>
 
     </LinearLayout>
-
-    <au.com.codeka.warworlds.game.starfield.StarfieldSurfaceView
-        android:id="@+id/starfield"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_above="@id/bottom_pane"
-        android:layout_below="@id/ad" />
-
-    <au.com.codeka.warworlds.ctrl.MiniChatView
-        android:id="@+id/mini_chat"
-        android:layout_height="50dp"
-        android:layout_width="fill_parent"
-        android:layout_above="@id/bottom_pane" />
 
 </RelativeLayout>
