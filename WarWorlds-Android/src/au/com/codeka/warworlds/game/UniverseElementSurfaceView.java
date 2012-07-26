@@ -220,7 +220,6 @@ public class UniverseElementSurfaceView extends SurfaceView implements SurfaceHo
         private float mRotateSpeed;
         private RectF mInnerCircle;
         private RectF mOuterCircle;
-        private RectF mRect;
 
         public SelectionOverlay(double centreX, double centreY, double radius) {
             mCentreX = 0;
@@ -235,7 +234,6 @@ public class UniverseElementSurfaceView extends SurfaceView implements SurfaceHo
 
             mInnerCircle = new RectF();
             mOuterCircle = new RectF();
-            mRect = new RectF();
             mRotateSpeed = 1.5f;
 
             setCentre(centreX, centreY);

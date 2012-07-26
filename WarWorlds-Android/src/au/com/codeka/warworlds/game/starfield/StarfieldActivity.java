@@ -42,9 +42,8 @@ public class StarfieldActivity extends UniverseElementActivity {
     private Context mContext = this;
     private StarfieldSurfaceView mStarfield;
     private TextView mUsername;
-    private TextView mMoney;
     private TextView mStarName;
-    private ViewGroup mLoadingContainer;
+    private View mLoadingContainer;
     private ListView mPlanetList;
     private PlanetListAdapter mPlanetListAdapter;
     private Star mSelectedStar;
@@ -61,16 +60,14 @@ public class StarfieldActivity extends UniverseElementActivity {
 
         mStarfield = (StarfieldSurfaceView) findViewById(R.id.starfield);
         mUsername = (TextView) findViewById(R.id.username);
-        mMoney = (TextView) findViewById(R.id.money);
         mStarName = (TextView) findViewById(R.id.star_name);
-        mLoadingContainer = (ViewGroup) findViewById(R.id.loading_container);
+        mLoadingContainer = findViewById(R.id.loading_container);
         mPlanetList = (ListView) findViewById(R.id.starfield_planet_list);
 
         mPlanetList.setVisibility(View.GONE);
 
         EmpireManager empireManager = EmpireManager.getInstance();
         mUsername.setText(empireManager.getEmpire().getDisplayName());
-        mMoney.setText("$ 12,345"); // TODO: empire.getCash()
         mStarName.setText("");
 
         mPlanetListAdapter = new PlanetListAdapter();

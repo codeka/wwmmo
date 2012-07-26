@@ -1,67 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
-<merge xmlns:android="http://schemas.android.com/apk/res/android" >
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <au.com.codeka.warworlds.ctrl.BannerAdView
+        android:id="@+id/ad"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_alignParentTop="true" />
 
     <LinearLayout
+        android:id="@+id/bottom_pane"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="180dp"
+        android:layout_alignParentBottom="true"
         android:baselineAligned="false"
         android:orientation="horizontal" >
 
-        <au.com.codeka.warworlds.game.starfield.StarfieldSurfaceView
-            android:id="@+id/starfield"
+        <FrameLayout
+            android:id="@+id/bottom_left_pane"
             android:layout_width="0dp"
             android:layout_weight="1"
-            android:layout_height="match_parent" />
-
-        <RelativeLayout
-            style="@style/RightPane"
-            android:layout_width="180dp"
-            android:layout_height="match_parent" >
-
-            <TextView
-                android:id="@+id/username"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentTop="true"
-                android:paddingLeft="5dip"
-                android:paddingRight="5dip"
-                android:textAppearance="?android:attr/textAppearanceSmall" />
-
-            <TextView
-                android:id="@+id/money"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:layout_alignParentTop="true"
-                android:paddingLeft="5dip"
-                android:paddingRight="5dip"
-                android:textAppearance="?android:attr/textAppearanceSmall" />
-
-            <Button
-                android:id="@+id/reports_btn"
-                style="@style/Button"
-                android:layout_width="75dp"
-                android:layout_height="wrap_content"
-                android:text="@string/reports"
-                android:layout_marginLeft="10dp"
-                android:layout_below="@id/username" />
-
-            <Button
-                android:id="@+id/empire_btn"
-                style="@style/Button"
-                android:layout_width="75dp"
-                android:layout_height="wrap_content"
-                android:text="@string/empire"
-                android:layout_marginLeft="5dp"
-                android:layout_below="@id/username"
-                android:layout_toRightOf="@id/reports_btn" />
+            android:layout_height="match_parent">
 
             <FrameLayout
                 android:id="@+id/loading_container"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_below="@id/reports_btn"
                 android:visibility="gone" >
 
                 <ProgressBar
@@ -75,9 +40,7 @@
             <RelativeLayout
                 android:id="@+id/selected_star"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_marginBottom="50dp"
-                android:layout_below="@id/reports_btn">
+                android:layout_height="match_parent">
 
                 <TextView
                     android:id="@+id/star_name"
@@ -86,7 +49,7 @@
                     android:layout_alignParentTop="true"
                     android:gravity="center"
                     android:textAppearance="?android:attr/textAppearanceMedium" />
-    
+
                 <ListView
                     android:id="@+id/starfield_planet_list"
                     android:layout_width="match_parent"
@@ -96,22 +59,59 @@
                 </ListView>
 
             </RelativeLayout>
+        </FrameLayout>
+
+        <RelativeLayout
+            android:id="@+id/bottom_right_pane"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:id="@+id/username"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentTop="true"
+                android:paddingLeft="5dip"
+                android:paddingRight="5dip"
+                android:textAppearance="?android:attr/textAppearanceSmall" />
+
+            <Button
+                android:id="@+id/reports_btn"
+                style="@style/Button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/reports"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:layout_below="@id/username" />
+
+            <Button
+                android:id="@+id/empire_btn"
+                style="@style/Button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/empire"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:layout_below="@id/reports_btn" />
 
         </RelativeLayout>
 
     </LinearLayout>
 
+    <au.com.codeka.warworlds.game.starfield.StarfieldSurfaceView
+        android:id="@+id/starfield"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@id/bottom_pane"
+        android:layout_below="@id/ad" />
+
     <au.com.codeka.warworlds.ctrl.MiniChatView
         android:id="@+id/mini_chat"
         android:layout_height="50dp"
         android:layout_width="fill_parent"
-        android:layout_marginRight="320dp"
-        android:layout_gravity="bottom|left" />
+        android:layout_above="@id/bottom_pane" />
 
-    <au.com.codeka.warworlds.ctrl.BannerAdView
-        android:id="@+id/ad"
-        android:layout_width="320dp"
-        android:layout_height="50dp"
-        android:layout_gravity="bottom|right" />
-
-</merge>
+</RelativeLayout>

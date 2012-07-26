@@ -51,7 +51,6 @@ public class SolarSystemActivity extends UniverseElementActivity {
         setContentView(R.layout.solarsystem);
 
         final TextView username = (TextView) findViewById(R.id.username);
-        final TextView money = (TextView) findViewById(R.id.money);
         mSolarSystemSurfaceView = (SolarSystemSurfaceView) findViewById(R.id.solarsystem_view);
         final Button colonizeButton = (Button) findViewById(R.id.solarsystem_colonize);
         final Button buildButton = (Button) findViewById(R.id.solarsystem_colony_build);
@@ -61,7 +60,6 @@ public class SolarSystemActivity extends UniverseElementActivity {
 
         EmpireManager empireManager = EmpireManager.getInstance();
         username.setText(empireManager.getEmpire().getDisplayName());
-        money.setText("$ 12,345"); // TODO: empire.getCash()
         congenialityContainer.setVisibility(View.GONE);
 
         mSolarSystemSurfaceView.addPlanetSelectedListener(
@@ -267,9 +265,7 @@ public class SolarSystemActivity extends UniverseElementActivity {
     }
 
     private void refreshSelectedPlanet() {
-        View containerView = findViewById(R.id.solarsystem_planet_properties);
         if (mStar == null || mPlanet == null) {
-            containerView.setVisibility(View.GONE);
             return;
         }
 
@@ -281,12 +277,10 @@ public class SolarSystemActivity extends UniverseElementActivity {
             }
         }
 
-        containerView.setVisibility(View.VISIBLE);
-
         Point2D planetCentre = mSolarSystemSurfaceView.getPlanetCentre(mPlanet);
 
         String planetName = mStar.getName()+" "+RomanNumeralFormatter.format(mPlanet.getIndex());
-        TextView planetNameTextView = (TextView) findViewById(R.id.solarsystem_planetname);
+        TextView planetNameTextView = (TextView) findViewById(R.id.planet_name);
         planetNameTextView.setText(planetName);
 
         View congenialityContainer = findViewById(R.id.congeniality_container);

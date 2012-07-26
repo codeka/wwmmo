@@ -176,7 +176,7 @@ public class WarWorldsActivity extends Activity {
 
             @Override
             protected void onPostExecute(String result) {
-                final TransparentWebView motdView = (TransparentWebView) findViewById(R.id.home_motd);
+                final TransparentWebView motdView = (TransparentWebView) findViewById(R.id.motd);
 
                 mConnectionStatus.setText("Connected");
                 mStartGameButton.setEnabled(true);
@@ -207,6 +207,9 @@ public class WarWorldsActivity extends Activity {
 
     private void setHomeScreenContent() {
         setContentView(R.layout.home);
+
+        View rootView = findViewById(android.R.id.content);
+        ActivityBackgroundGenerator.setBackground(rootView);
 
         mStartGameButton = (Button) findViewById(R.id.start_game_btn);
         mConnectionStatus = (TextView) findViewById(R.id.connection_status);

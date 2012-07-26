@@ -1,377 +1,363 @@
 <?xml version="1.0" encoding="utf-8"?>
-<merge xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical" >
+    android:layout_height="match_parent">
+
+    <au.com.codeka.warworlds.ctrl.BannerAdView
+        android:id="@+id/ad"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_alignParentTop="true" />
 
     <LinearLayout
+        android:id="@+id/bottom_pane"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="180dp"
+        android:layout_alignParentBottom="true"
         android:baselineAligned="false"
         android:orientation="horizontal" >
 
-        <LinearLayout
-            android:layout_width="0px"
-            android:layout_height="match_parent"
+        <RelativeLayout
+            android:id="@+id/bottom_left_pane"
+            android:layout_width="0dp"
             android:layout_weight="1"
-            android:orientation="vertical" >
+            android:layout_height="match_parent">
 
-            <au.com.codeka.warworlds.game.solarsystem.SolarSystemSurfaceView
-                android:id="@+id/solarsystem_view"
+            <TextView
+                android:id="@+id/planet_name"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent" />
-        </LinearLayout>
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:textAppearance="?android:attr/textAppearanceSmall" />
 
-        <LinearLayout
-            style="@style/RightPane"
-            android:layout_width="180dp"
-            android:layout_height="match_parent"
-            android:orientation="vertical" >
+            <TextView
+                android:id="@+id/population_count"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/planet_name"
+                android:textAppearance="?android:attr/textAppearanceSmall" />
+
+            <Button
+                android:id="@+id/solarsystem_colonize"
+                style="@style/Button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/population_count"
+                android:text="@string/solarsystem_colonize" />
+
+            <android.support.v7.widget.GridLayout xmlns:grid="http://schemas.android.com/apk/res-auto"
+                android:id="@+id/solarsystem_colony_details"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/population_count"
+                grid:columnCount="4">
+
+                <ImageView
+                    android:id="@+id/solarsystem_colony_population_icon"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    grid:layout_rowSpan="2"
+                    android:src="@drawable/colony_population_icon" />
+
+                <ProgressBar
+                    android:id="@+id/solarsystem_colony_population_focus"
+                    android:layout_height="10dp"
+                    grid:layout_gravity="fill"
+                    android:paddingRight="10dp"
+                    android:paddingLeft="2dp"
+                    style="?android:attr/progressBarStyleHorizontal" />
+
+                <ImageView
+                    android:id="@+id/solarsystem_colony_farming_icon"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    grid:layout_rowSpan="2"
+                    android:src="@drawable/colony_farming_icon" />
+
+                <ProgressBar
+                    android:id="@+id/solarsystem_colony_farming_focus"
+                    android:layout_height="10dp"
+                    grid:layout_gravity="fill"
+                    android:paddingRight="10dp"
+                    android:paddingLeft="2dp"
+                    style="?android:attr/progressBarStyleHorizontal" />
+
+
+                <TextView
+                    android:id="@+id/solarsystem_colony_population_value"
+                    android:layout_height="14dp"
+                    grid:layout_gravity="right"
+                    android:paddingRight="10dp"
+                    android:text="-1.0"
+                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:textSize="10dp" />
+
+                <TextView
+                    android:id="@+id/solarsystem_colony_farming_value"
+                    android:layout_height="14dp"
+                    grid:layout_gravity="right"
+                    android:paddingRight="10dp"
+                    android:text="+1.0"
+                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:textSize="10dp" />
+
+
+                <ImageView
+                    android:id="@+id/solarsystem_colony_mining_icon"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    grid:layout_rowSpan="2"
+                    android:src="@drawable/colony_mining_icon" />
+
+                <ProgressBar
+                    android:id="@+id/solarsystem_colony_mining_focus"
+                    android:layout_height="10dp"
+                    grid:layout_gravity="fill"
+                    android:paddingRight="10dp"
+                    android:paddingLeft="2dp"
+                    style="?android:attr/progressBarStyleHorizontal" />
+
+                <ImageView
+                    android:id="@+id/solarsystem_colony_construction_icon"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    grid:layout_rowSpan="2"
+                    android:src="@drawable/colony_construction_icon" />
+
+                <ProgressBar
+                    android:id="@+id/solarsystem_colony_construction_focus"
+                    android:layout_height="10dp"
+                    grid:layout_gravity="fill"
+                    android:paddingRight="10dp"
+                    android:paddingLeft="2dp"
+                    style="?android:attr/progressBarStyleHorizontal" />
+
+                <TextView
+                    android:id="@+id/solarsystem_colony_mining_value"
+                    android:layout_height="14dp"
+                    grid:layout_gravity="right"
+                    android:paddingRight="10dp"
+                    android:text="999"
+                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:textSize="10dp" />
+
+                <TextView
+                    android:id="@+id/solarsystem_colony_construction_value"
+                    android:layout_height="14dp"
+                    grid:layout_gravity="right"
+                    android:paddingRight="10dp"
+                    android:text="999"
+                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:textSize="10dp" />
+
+                <Button
+                    android:id="@+id/solarsystem_colony_build"
+                    style="@style/Button"
+                    android:layout_width="75dp"
+                    grid:layout_columnSpan="2"
+                    grid:layout_gravity="center"
+                    android:text="@string/build" />
+
+                <Button
+                    android:id="@+id/solarsystem_colony_focus"
+                    style="@style/Button"
+                    android:layout_width="75dp"
+                    grid:layout_columnSpan="2"
+                    grid:layout_gravity="center"
+                    android:text="@string/focus" />
+
+            </android.support.v7.widget.GridLayout>
+
+        </RelativeLayout>
+    
+        <RelativeLayout
+            android:id="@+id/bottom_right_pane"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="match_parent">
+    
+            <TextView
+                android:id="@+id/username"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingLeft="5dip"
+                android:paddingRight="5dip"
+                android:textAppearance="?android:attr/textAppearanceSmall" />
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal" >
+                android:layout_below="@id/username"
+                android:orientation="horizontal">
 
-                <TextView
-                    android:id="@+id/username"
-                    android:layout_width="0px"
-                    android:layout_height="wrap_content"
+                <Button
+                    android:id="@+id/fleet_btn"
+                    style="@style/Button"
+                    android:layout_width="0dp"
                     android:layout_weight="1"
-                    android:paddingLeft="5dip"
-                    android:paddingRight="5dip"
-                    android:textAppearance="?android:attr/textAppearanceSmall" />
-
-                <TextView
-                    android:id="@+id/money"
-                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:paddingLeft="5dip"
-                    android:paddingRight="5dip"
-                    android:textAppearance="?android:attr/textAppearanceSmall" />
+                    android:text="@string/fleet"
+                    android:layout_marginLeft="10dp" />
+
+                <Button
+                    android:id="@+id/other_btn"
+                    style="@style/Button"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:text="TODO"
+                    android:layout_marginLeft="10dp" />
+
             </LinearLayout>
 
-            <ScrollView
-                android:id="@+id/solarsystem_planet_properties"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_marginBottom="50dp" >
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical" >
-
-                    <RelativeLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content">
-
-                        <Button
-                            android:id="@+id/fleet_btn"
-                            style="@style/Button"
-                            android:layout_width="75dp"
-                            android:layout_height="wrap_content"
-                            android:text="@string/fleet"
-                            android:layout_marginLeft="10dp" />
-
-                    </RelativeLayout>
-
-                    <TextView
-                        android:id="@+id/solarsystem_planetname"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="center_horizontal"
-                        android:textAppearance="?android:attr/textAppearanceSmall" />
-
-                    <android.support.v7.widget.GridLayout xmlns:grid="http://schemas.android.com/apk/res-auto"
-                        android:id="@+id/solarsystem_colony_details"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="10dp"
-                        grid:columnCount="4">
-
-                        <TextView
-                            android:id="@+id/population_count"
-                            grid:layout_columnSpan="4"
-                            grid:layout_gravity="fill"
-                            android:gravity="center"
-                            android:textAppearance="?android:attr/textAppearanceSmall" />
-
-                        <ImageView
-                            android:id="@+id/solarsystem_colony_population_icon"
-                            android:layout_width="20dp"
-                            android:layout_height="20dp"
-                            grid:layout_rowSpan="2"
-                            android:src="@drawable/colony_population_icon" />
-
-                        <ProgressBar
-                            android:id="@+id/solarsystem_colony_population_focus"
-                            android:layout_height="10dp"
-                            grid:layout_gravity="fill"
-                            android:paddingRight="10dp"
-                            android:paddingLeft="2dp"
-                            style="?android:attr/progressBarStyleHorizontal" />
-
-                        <ImageView
-                            android:id="@+id/solarsystem_colony_farming_icon"
-                            android:layout_width="20dp"
-                            android:layout_height="20dp"
-                            grid:layout_rowSpan="2"
-                            android:src="@drawable/colony_farming_icon" />
-
-                        <ProgressBar
-                            android:id="@+id/solarsystem_colony_farming_focus"
-                            android:layout_height="10dp"
-                            grid:layout_gravity="fill"
-                            android:paddingRight="10dp"
-                            android:paddingLeft="2dp"
-                            style="?android:attr/progressBarStyleHorizontal" />
-
-
-                        <TextView
-                            android:id="@+id/solarsystem_colony_population_value"
-                            android:layout_height="14dp"
-                            grid:layout_gravity="right"
-                            android:paddingRight="10dp"
-                            android:text="-1.0"
-                            android:textAppearance="?android:attr/textAppearanceSmall"
-                            android:textSize="10dp" />
-
-                        <TextView
-                            android:id="@+id/solarsystem_colony_farming_value"
-                            android:layout_height="14dp"
-                            grid:layout_gravity="right"
-                            android:paddingRight="10dp"
-                            android:text="+1.0"
-                            android:textAppearance="?android:attr/textAppearanceSmall"
-                            android:textSize="10dp" />
-
-
-                        <ImageView
-                            android:id="@+id/solarsystem_colony_mining_icon"
-                            android:layout_width="20dp"
-                            android:layout_height="20dp"
-                            grid:layout_rowSpan="2"
-                            android:src="@drawable/colony_mining_icon" />
-
-                        <ProgressBar
-                            android:id="@+id/solarsystem_colony_mining_focus"
-                            android:layout_height="10dp"
-                            grid:layout_gravity="fill"
-                            android:paddingRight="10dp"
-                            android:paddingLeft="2dp"
-                            style="?android:attr/progressBarStyleHorizontal" />
-
-                        <ImageView
-                            android:id="@+id/solarsystem_colony_construction_icon"
-                            android:layout_width="20dp"
-                            android:layout_height="20dp"
-                            grid:layout_rowSpan="2"
-                            android:src="@drawable/colony_construction_icon" />
-
-                        <ProgressBar
-                            android:id="@+id/solarsystem_colony_construction_focus"
-                            android:layout_height="10dp"
-                            grid:layout_gravity="fill"
-                            android:paddingRight="10dp"
-                            android:paddingLeft="2dp"
-                            style="?android:attr/progressBarStyleHorizontal" />
-
-                        <TextView
-                            android:id="@+id/solarsystem_colony_mining_value"
-                            android:layout_height="14dp"
-                            grid:layout_gravity="right"
-                            android:paddingRight="10dp"
-                            android:text="999"
-                            android:textAppearance="?android:attr/textAppearanceSmall"
-                            android:textSize="10dp" />
-
-                        <TextView
-                            android:id="@+id/solarsystem_colony_construction_value"
-                            android:layout_height="14dp"
-                            grid:layout_gravity="right"
-                            android:paddingRight="10dp"
-                            android:text="999"
-                            android:textAppearance="?android:attr/textAppearanceSmall"
-                            android:textSize="10dp" />
-
-                        <Button
-                            android:id="@+id/solarsystem_colony_build"
-                            style="@style/Button"
-                            android:layout_width="75dp"
-                            grid:layout_columnSpan="2"
-                            grid:layout_gravity="center"
-                            android:text="@string/build" />
-
-                        <Button
-                            android:id="@+id/solarsystem_colony_focus"
-                            style="@style/Button"
-                            android:layout_width="75dp"
-                            grid:layout_columnSpan="2"
-                            grid:layout_gravity="center"
-                            android:text="@string/focus" />
-
-                    </android.support.v7.widget.GridLayout>
-
-                    <Button
-                        android:id="@+id/solarsystem_colonize"
-                        style="@style/Button"
-                        android:layout_width="150dp"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:layout_marginTop="10dp"
-                        android:text="@string/solarsystem_colonize" />
-                </LinearLayout>
-
-            </ScrollView>
-
-        </LinearLayout>
-    </LinearLayout>
-
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" >
-
-        <RelativeLayout
-            android:id="@+id/congeniality_container"
-            android:layout_width="80dp"
-            android:layout_height="34dp" >
-
-            <ImageView
-                android:id="@+id/solarsystem_population_icon"
-                android:layout_width="12dp"
-                android:layout_height="12dp"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentTop="true"
-                android:src="@drawable/solarsystem_icon_population" />
-
-            <ImageView
-                android:id="@+id/solarsystem_farming_icon"
-                android:layout_width="12dp"
-                android:layout_height="12dp"
-                android:layout_centerVertical="true"
-                android:src="@drawable/solarsystem_icon_farming" />
-
-            <ImageView
-                android:id="@+id/solarsystem_mining_icon"
-                android:layout_width="12dp"
-                android:layout_height="12dp"
-                android:layout_alignParentBottom="true"
-                android:src="@drawable/solarsystem_icon_mining" />
-
-            <ProgressBar
-                android:id="@+id/solarsystem_population_congeniality"
-                style="?android:attr/progressBarStyleHorizontal"
-                android:layout_width="match_parent"
-                android:layout_height="10dp"
-                android:layout_alignParentTop="true"
-                android:layout_marginLeft="2dp"
-                android:layout_marginRight="20dp"
-                android:layout_toRightOf="@+id/solarsystem_population_icon" />
-
-            <ProgressBar
-                android:id="@+id/solarsystem_farming_congeniality"
-                style="?android:attr/progressBarStyleHorizontal"
-                android:layout_width="match_parent"
-                android:layout_height="10dp"
-                android:layout_centerVertical="true"
-                android:layout_marginLeft="2dp"
-                android:layout_marginRight="20dp"
-                android:layout_toRightOf="@+id/solarsystem_population_icon" />
-
-            <ProgressBar
-                android:id="@+id/solarsystem_mining_congeniality"
-                style="?android:attr/progressBarStyleHorizontal"
-                android:layout_width="match_parent"
-                android:layout_height="10dp"
-                android:layout_alignParentBottom="true"
-                android:layout_marginLeft="2dp"
-                android:layout_marginRight="20dp"
-                android:layout_toRightOf="@id/solarsystem_population_icon"
-                android:paddingBottom="2dp" />
-
-            <TextView
-                android:id="@+id/solarsystem_population_congeniality_value"
-                android:layout_width="20dp"
-                android:layout_height="12dp"
-                android:layout_alignParentRight="true"
-                android:layout_alignParentTop="true"
-                android:gravity="center"
-                android:text="999"
-                android:textSize="10dp" />
-
-            <TextView
-                android:id="@+id/solarsystem_farming_congeniality_value"
-                android:layout_width="20dp"
-                android:layout_height="12dp"
-                android:layout_alignParentRight="true"
-                android:layout_centerVertical="true"
-                android:gravity="center"
-                android:text="999"
-                android:textSize="10dp" />
-
-            <TextView
-                android:id="@+id/solarsystem_mining_congeniality_value"
-                android:layout_width="20dp"
-                android:layout_height="12dp"
-                android:layout_alignParentBottom="true"
-                android:layout_alignParentRight="true"
-                android:gravity="center"
-                android:text="999"
-                android:textSize="10dp" />
         </RelativeLayout>
 
-        <au.com.codeka.warworlds.ctrl.BannerAdView
-            android:id="@+id/ad"
-            android:layout_width="320dp"
-            android:layout_height="50dp"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentBottom="true" />
+    </LinearLayout>
 
-        <TextView
-            android:id="@+id/stored_goods"
-            android:layout_width="wrap_content"
-            android:layout_height="20dp"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentTop="true"
-            android:layout_marginRight="180dp"
-            android:background="#000"
-            android:gravity="center|right"
-            android:paddingLeft="10dp"
-            android:paddingRight="10dp"
-            android:text="999"
-            android:textAppearance="?android:attr/textAppearanceSmall" />
+    <au.com.codeka.warworlds.game.solarsystem.SolarSystemSurfaceView
+        android:id="@+id/solarsystem_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/ad"
+        android:layout_above="@id/bottom_pane" />
 
-        <ImageView
-            android:id="@+id/stored_goods_icon"
-            android:layout_width="20dp"
-            android:layout_height="20dp"
-            android:background="#000"
-            android:layout_alignParentTop="true"
-            android:layout_toLeftOf="@+id/stored_goods"
-            android:src="@drawable/colony_farming_icon" />
+    <au.com.codeka.warworlds.ctrl.MiniChatView
+        android:id="@+id/mini_chat"
+        android:layout_height="50dp"
+        android:layout_width="fill_parent"
+        android:layout_above="@id/bottom_pane" />
 
-        <TextView
-            android:id="@+id/stored_minerals"
-            android:layout_width="wrap_content"
-            android:layout_height="20dp"
-            android:layout_alignParentTop="true"
-            android:layout_toLeftOf="@+id/stored_goods_icon"
-            android:background="#000"
-            android:gravity="center|right"
-            android:paddingLeft="10dp"
-            android:paddingRight="10dp"
-            android:text="999"
-            android:textAppearance="?android:attr/textAppearanceSmall" />
+    <RelativeLayout
+        android:id="@+id/congeniality_container"
+        android:layout_width="85dp"
+        android:layout_height="34dp"
+        android:layout_below="@id/ad" >
 
         <ImageView
-            android:id="@+id/stored_minerals_icon"
-            android:layout_width="20dp"
-            android:layout_height="20dp"
+            android:id="@+id/solarsystem_population_icon"
+            android:layout_width="12dp"
+            android:layout_height="12dp"
+            android:layout_alignParentLeft="true"
             android:layout_alignParentTop="true"
-            android:layout_toLeftOf="@+id/stored_minerals"
-            android:src="@drawable/colony_mining_icon" />
+            android:src="@drawable/solarsystem_icon_population" />
 
+        <ImageView
+            android:id="@+id/solarsystem_farming_icon"
+            android:layout_width="12dp"
+            android:layout_height="12dp"
+            android:layout_centerVertical="true"
+            android:src="@drawable/solarsystem_icon_farming" />
+
+        <ImageView
+            android:id="@+id/solarsystem_mining_icon"
+            android:layout_width="12dp"
+            android:layout_height="12dp"
+            android:layout_alignParentBottom="true"
+            android:src="@drawable/solarsystem_icon_mining" />
+
+        <ProgressBar
+            android:id="@+id/solarsystem_population_congeniality"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="match_parent"
+            android:layout_height="10dp"
+            android:layout_alignParentTop="true"
+            android:layout_marginLeft="2dp"
+            android:layout_marginRight="25dp"
+            android:layout_toRightOf="@+id/solarsystem_population_icon" />
+
+        <ProgressBar
+            android:id="@+id/solarsystem_farming_congeniality"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="match_parent"
+            android:layout_height="10dp"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="2dp"
+            android:layout_marginRight="25dp"
+            android:layout_toRightOf="@+id/solarsystem_population_icon" />
+
+        <ProgressBar
+            android:id="@+id/solarsystem_mining_congeniality"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="match_parent"
+            android:layout_height="10dp"
+            android:layout_alignParentBottom="true"
+            android:layout_marginLeft="2dp"
+            android:layout_marginRight="25dp"
+            android:layout_toRightOf="@id/solarsystem_population_icon"
+            android:paddingBottom="2dp" />
+
+        <TextView
+            android:id="@+id/solarsystem_population_congeniality_value"
+            android:layout_width="25dp"
+            android:layout_height="12dp"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentTop="true"
+            android:gravity="center"
+            android:text="999"
+            android:textSize="10dp" />
+
+        <TextView
+            android:id="@+id/solarsystem_farming_congeniality_value"
+            android:layout_width="25dp"
+            android:layout_height="12dp"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:gravity="center"
+            android:text="999"
+            android:textSize="10dp" />
+
+        <TextView
+            android:id="@+id/solarsystem_mining_congeniality_value"
+            android:layout_width="25dp"
+            android:layout_height="12dp"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentRight="true"
+            android:gravity="center"
+            android:text="999"
+            android:textSize="10dp" />
     </RelativeLayout>
 
-</merge>
+    <TextView
+        android:id="@+id/stored_goods"
+        android:layout_width="wrap_content"
+        android:layout_height="20dp"
+        android:layout_alignParentRight="true"
+        android:layout_below="@id/ad"
+        android:background="#000"
+        android:gravity="center|right"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        android:text="999"
+        android:textAppearance="?android:attr/textAppearanceSmall" />
+
+    <ImageView
+        android:id="@+id/stored_goods_icon"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:background="#000"
+        android:layout_toLeftOf="@+id/stored_goods"
+        android:layout_below="@id/ad"
+        android:src="@drawable/colony_farming_icon" />
+
+    <TextView
+        android:id="@+id/stored_minerals"
+        android:layout_width="wrap_content"
+        android:layout_height="20dp"
+        android:layout_toLeftOf="@+id/stored_goods_icon"
+        android:layout_below="@id/ad"
+        android:background="#000"
+        android:gravity="center|right"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        android:text="999"
+        android:textAppearance="?android:attr/textAppearanceSmall" />
+
+    <ImageView
+        android:id="@+id/stored_minerals_icon"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:layout_toLeftOf="@+id/stored_minerals"
+        android:layout_below="@id/ad"
+        android:src="@drawable/colony_mining_icon" />
+
+</RelativeLayout>

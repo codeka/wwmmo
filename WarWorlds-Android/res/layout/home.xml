@@ -1,67 +1,63 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:background="@drawable/title"
     android:orientation="horizontal"
     android:baselineAligned="false" >
 
-    <RelativeLayout
-        android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:layout_weight="0.666"
-        android:orientation="vertical" >
+    <TextView
+        android:id="@+id/title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:text="@string/homepage_title_text"
+        style="@style/TitleText" />
 
-        <TextView
-            android:id="@+id/home_title"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/homepage_title_text"
-            style="@style/TitleText" />
-
-        <au.com.codeka.warworlds.ctrl.TransparentWebView
-            android:id="@+id/home_motd"
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:layout_below="@id/home_title" />
-    </RelativeLayout>
-
-    <RelativeLayout
-        android:layout_width="0dp"
-        android:layout_height="fill_parent"
-        android:layout_weight="0.333" >
-
-        <Button
-            android:id="@+id/log_out_btn"
-            style="@style/Button"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:text="@string/log_out" />
+    <LinearLayout
+        android:id="@+id/button_wrapper"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:orientation="horizontal">
 
         <Button
             android:id="@+id/options_btn"
             style="@style/Button"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
+            android:layout_weight="1"
             android:layout_height="wrap_content"
-            android:layout_above="@id/log_out_btn"
             android:text="@string/options" />
 
         <Button
-            android:id="@+id/start_game_btn"
+            android:id="@+id/log_out_btn"
             style="@style/Button"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
+            android:layout_weight="1"
             android:layout_height="wrap_content"
-            android:layout_above="@id/options_btn"
-            android:text="@string/start_game" />
+            android:text="@string/log_out" />
 
-        <TextView
-            android:id="@+id/connection_status"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_above="@id/start_game_btn"
-            android:gravity="center" />
+    </LinearLayout>
 
-    </RelativeLayout>
+    <Button
+        android:id="@+id/start_game_btn"
+        style="@style/Button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/button_wrapper"
+        android:text="@string/start_game" />
 
-</LinearLayout>
+    <TextView
+        android:id="@+id/connection_status"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/start_game_btn"
+        android:gravity="center" />
+
+    <au.com.codeka.warworlds.ctrl.TransparentWebView
+        android:id="@+id/motd"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@id/connection_status"
+        android:layout_below="@id/title" />
+
+</RelativeLayout>
