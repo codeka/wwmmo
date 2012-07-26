@@ -205,6 +205,10 @@ public class AccountsActivity extends Activity {
      */
     private void setScreenContent(int screenId) {
         setContentView(screenId);
+
+        View rootView = findViewById(android.R.id.content);
+        ActivityBackgroundGenerator.setBackground(rootView);
+
         switch (screenId) {
             case R.layout.log_out:
                 setLogOutScreenContent();

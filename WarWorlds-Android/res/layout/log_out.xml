@@ -1,59 +1,51 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-    android:background="@drawable/title"
-    android:orientation="horizontal"
-    android:baselineAligned="false" >
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
 
-    <RelativeLayout
-        android:layout_width="0dp"
-        android:layout_height="fill_parent"
-        android:layout_weight="0.666" >
+    <TextView
+        android:id="@+id/log_out_header"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:text="@string/log_out_header"
+        style="@style/TitleText" />
 
-        <TextView
-            android:id="@+id/log_out_header"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/log_out_header"
-            style="@style/TitleText" />
+    <TextView
+        android:id="@+id/log_out_msg"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/log_out_header"
+        android:gravity="top"
+        android:padding="4dp"
+        android:shadowColor="#000"
+        android:shadowDx="2.0"
+        android:shadowDy="2.0"
+        android:shadowRadius="1.0"
+        android:text="@string/log_out_msg"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
 
-        <TextView
-            android:id="@+id/log_out_msg"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/log_out_header"
-            android:gravity="top"
-            android:padding="4dp"
-            android:shadowColor="#000"
-            android:shadowDx="2.0"
-            android:shadowDy="2.0"
-            android:shadowRadius="1.0"
-            android:text="@string/log_out_msg"
-            android:textAppearance="?android:attr/textAppearanceMedium" />
-    </RelativeLayout>
-
-    <RelativeLayout
-        android:layout_width="0dp"
-        android:layout_height="fill_parent"
-        android:layout_weight="0.333" >
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:orientation="horizontal" >
 
         <Button
             android:id="@+id/cancel_btn"
             style="@style/Button"
-            android:layout_width="fill_parent"
+            android:layout_width="0dp"
+            android:layout_weight="1"
             android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentRight="true"
             android:text="@string/cancel" />
 
         <Button
             android:id="@+id/log_out_btn"
             style="@style/Button"
-            android:layout_width="fill_parent"
+            android:layout_width="0dp"
+            android:layout_weight="1"
             android:layout_height="wrap_content"
-            android:layout_above="@id/cancel_btn"
             android:text="@string/log_out" />
-    </RelativeLayout>
+    </LinearLayout>
 
-</LinearLayout>
+</RelativeLayout>

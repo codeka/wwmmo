@@ -49,6 +49,9 @@ public class EmpireSetupActivity extends Activity {
     private void setScreenContent() {
         setContentView(R.layout.empire_setup);
 
+        View rootView = findViewById(android.R.id.content);
+        ActivityBackgroundGenerator.setBackground(rootView);
+
         final TextView empireName = (TextView) findViewById(R.id.empire_setup_name);
         final Button doneButton = (Button) findViewById(R.id.empire_setup_done);
 
