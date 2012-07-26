@@ -41,11 +41,8 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
     private StarfieldBackgroundRenderer mBackgroundRenderer;
     private SelectionOverlay mSelectionOverlay;
 
-    private static final int BufferBorderSize = 100;
     private boolean mNeedRedraw = true;
     private Bitmap mBuffer;
-    private float mBufferOffsetX;
-    private float mBufferOffsetY;
 
     public StarfieldSurfaceView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -142,8 +139,8 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
 
         if (mBuffer == null || mNeedRedraw) {
             if (mBuffer == null) {
-                mBuffer = Bitmap.createBitmap(canvas.getWidth() + (BufferBorderSize * 2),
-                                              canvas.getHeight() + (BufferBorderSize * 2),
+                mBuffer = Bitmap.createBitmap(canvas.getWidth(),
+                                              canvas.getHeight(),
                                               Bitmap.Config.ARGB_8888);
             }
 
@@ -151,10 +148,7 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
             mNeedRedraw = false;
         }
 
-        canvas.drawBitmap(mBuffer,
-                          mBufferOffsetX - BufferBorderSize,
-                          mBufferOffsetY - BufferBorderSize,
-                          mStarPaint);
+        canvas.drawBitmap(mBuffer, 0, 0, mStarPaint);
     }
 
     public void setDirty() {
@@ -165,9 +159,6 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
      * Draws the current "scene" to the internal buffer.
      */
     private void drawScene() {
-        mBufferOffsetX = mBufferOffsetY = 0;
-        mOverlayOffsetX = mOverlayOffsetY = 0;
-
         long startTime = System.nanoTime();
         Canvas canvas = new Canvas(mBuffer);
 
@@ -197,7 +188,11 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
         }
 
         long endTime = System.nanoTime();
-        log.debug(String.format("Scene re-drawn in %.4fms", (double)(endTime - startTime) / 1000000.0));
+        double ms = (double)(endTime - startTime) / 1000000.0;
+        if (ms > 150.0) {
+            // only log if it's > 150ms (which it should never be!)
+            log.debug(String.format("Scene re-drawn in %.4fms", ms));
+        }
     }
 
     /**
@@ -240,8 +235,7 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
             }
 
             if (mSelectedStar == star) {
-                mSelectionOverlay.setCentre(x * pixelScale - BufferBorderSize,
-                                            y * pixelScale - BufferBorderSize);
+                mSelectionOverlay.setCentre(x * pixelScale, y * pixelScale);
             }
         }
     }
@@ -317,24 +311,7 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
                     -(float)(distanceX / getPixelScale()),
                     -(float)(distanceY / getPixelScale()));
 
-            mBufferOffsetX -= distanceX;
-            mBufferOffsetY -= distanceY;
-            mOverlayOffsetX = mBufferOffsetX;
-            mOverlayOffsetY = mBufferOffsetY;
-
-            if (mBufferOffsetX <= -BufferBorderSize) {
-                setDirty();
-            }
-            if (mBufferOffsetX >= BufferBorderSize) {
-                setDirty();
-            }
-            if (mBufferOffsetY <= -BufferBorderSize) {
-                setDirty();
-            }
-            if (mBufferOffsetY >= BufferBorderSize) {
-                setDirty();
-            }
-
+            setDirty();
             redraw();
             return false;
         }
@@ -346,8 +323,8 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
          */
         @Override
         public boolean onSingleTapConfirmed(MotionEvent e) {
-            int tapX = (int) ((e.getX() - mBufferOffsetX + BufferBorderSize) / getPixelScale());
-            int tapY = (int) ((e.getY() - mBufferOffsetY + BufferBorderSize) / getPixelScale());
+            int tapX = (int) (e.getX() / getPixelScale());
+            int tapY = (int) (e.getY() / getPixelScale());
 
             Star star = SectorManager.getInstance().getStarAt(tapX, tapY);
             selectStar(star);

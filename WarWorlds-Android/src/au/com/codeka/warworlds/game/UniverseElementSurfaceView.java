@@ -31,8 +31,6 @@ public class UniverseElementSurfaceView extends SurfaceView implements SurfaceHo
     GestureDetector.OnGestureListener mGestureListener;
     private float mPixelScale;
     private ArrayList<Overlay> mOverlays;
-    protected float mOverlayOffsetX;
-    protected float mOverlayOffsetY;
 
     private Thread mDrawThread;
     private Semaphore mDrawSemaphore;
@@ -177,7 +175,7 @@ public class UniverseElementSurfaceView extends SurfaceView implements SurfaceHo
                     synchronized(mOverlays) {
                         int size = mOverlays.size();
                         for (int i = 0; i < size; i++) {
-                            mOverlays.get(i).draw(c, (int) mOverlayOffsetX, (int) mOverlayOffsetY);
+                            mOverlays.get(i).draw(c);
                         }
                     }
                 } finally {
@@ -205,7 +203,7 @@ public class UniverseElementSurfaceView extends SurfaceView implements SurfaceHo
             return mIsVisible;
         }
 
-        public abstract void draw(Canvas canvas, int offsetX, int offsetY);
+        public abstract void draw(Canvas canvas);
     }
 
     /**
@@ -274,7 +272,7 @@ public class UniverseElementSurfaceView extends SurfaceView implements SurfaceHo
         }
 
         @Override
-        public void draw(Canvas canvas, int offsetX, int offsetY) {
+        public void draw(Canvas canvas) {
             mAngle += mRotateSpeed;
             if (mAngle > 360.0f) {
                 mAngle = 0.0f;
@@ -282,18 +280,8 @@ public class UniverseElementSurfaceView extends SurfaceView implements SurfaceHo
 
             // we cannot make the arc 360 degrees, otherwise it ignores the angle offset. Instead
             // we make it 360 - "dash-angle" (i.e. the angle through which one dash passes)
-
-            mRect.left = mInnerCircle.left + offsetX;
-            mRect.right = mInnerCircle.right + offsetX;
-            mRect.top = mInnerCircle.top + offsetY;
-            mRect.bottom = mInnerCircle.bottom + offsetY;
-            canvas.drawArc(mRect, mAngle, 360.0f - mDashAngleDegrees, false, mPaint);
-
-            mRect.left = mOuterCircle.left + offsetX;
-            mRect.right = mOuterCircle.right + offsetX;
-            mRect.top = mOuterCircle.top + offsetY;
-            mRect.bottom = mOuterCircle.bottom + offsetY;
-            canvas.drawArc(mRect, 360.0f - mAngle, 360.0f - mDashAngleDegrees, false, mPaint);
+            canvas.drawArc(mInnerCircle, mAngle, 360.0f - mDashAngleDegrees, false, mPaint);
+            canvas.drawArc(mOuterCircle, 360.0f - mAngle, 360.0f - mDashAngleDegrees, false, mPaint);
         }
     }
 }
