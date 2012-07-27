@@ -1,6 +1,7 @@
 package au.com.codeka.warworlds.model;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -11,6 +12,8 @@ import org.slf4j.LoggerFactory;
 
 import warworlds.Warworlds.ColonizeRequest;
 import android.os.AsyncTask;
+import android.os.Parcel;
+import android.os.Parcelable;
 import au.com.codeka.warworlds.api.ApiClient;
 
 /**
@@ -126,6 +129,49 @@ public class MyEmpire extends Empire {
             }
         }.execute();
     }
+
+    @Override
+    public void writeToParcel(Parcel parcel, int flags) {
+        super.writeToParcel(parcel, flags);
+
+        Fleet[] fleets = new Fleet[mAllFleets.size()];
+        parcel.writeParcelableArray(mAllFleets.toArray(fleets), flags);
+
+        Colony[] colonies = new Colony[mAllColonies.size()];
+        parcel.writeParcelableArray(mAllColonies.toArray(colonies), flags);
+
+        Star[] stars = new Star[mStars.size()];
+        parcel.writeParcelableArray(mStars.values().toArray(stars), flags);
+    }
+
+    @Override
+    protected void readFromParcel(Parcel parcel) {
+        super.readFromParcel(parcel);
+
+        mAllFleets = Arrays.asList((Fleet[]) parcel.readParcelableArray(Fleet.class.getClassLoader()));
+        mAllColonies = Arrays.asList((Colony[]) parcel.readParcelableArray(Colony.class.getClassLoader()));
+
+        Star[] stars = (Star[]) parcel.readParcelableArray(Star.class.getClassLoader());
+        mStars = new TreeMap<String, Star>();
+        for (Star star : stars) {
+            mStars.put(star.getKey(), star);
+        }
+    }
+
+    public static final Parcelable.Creator<MyEmpire> CREATOR
+                = new Parcelable.Creator<MyEmpire>() {
+        @Override
+        public MyEmpire createFromParcel(Parcel parcel) {
+            MyEmpire e = new MyEmpire();
+            e.readFromParcel(parcel);
+            return e;
+        }
+
+        @Override
+        public MyEmpire[] newArray(int size) {
+            return new MyEmpire[size];
+        }
+    };
 
     public static MyEmpire fromProtocolBuffer(warworlds.Warworlds.Empire pb) {
         MyEmpire empire = new MyEmpire();

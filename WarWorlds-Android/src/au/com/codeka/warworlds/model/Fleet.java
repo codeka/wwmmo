@@ -3,7 +3,10 @@ package au.com.codeka.warworlds.model;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
-public class Fleet {
+import android.os.Parcel;
+import android.os.Parcelable;
+
+public class Fleet implements Parcelable {
     private String mKey;
     private String mEmpireKey;
     private String mDesignName;
@@ -42,6 +45,47 @@ public class Fleet {
     public String getTargetColonyKey() {
         return mTargetColonyKey;
     }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel parcel, int flags) {
+        parcel.writeString(mKey);
+        parcel.writeString(mEmpireKey);
+        parcel.writeString(mDesignName);
+        parcel.writeInt(mNumShips);
+        parcel.writeLong(mStateStartTime.getMillis());
+        parcel.writeString(mStarKey);
+        parcel.writeString(mDestinationStarKey);
+        parcel.writeString(mTargetFleetKey);
+        parcel.writeString(mTargetColonyKey);
+    }
+
+    public static final Parcelable.Creator<Fleet> CREATOR
+                = new Parcelable.Creator<Fleet>() {
+        @Override
+        public Fleet createFromParcel(Parcel parcel) {
+            Fleet f = new Fleet();
+            f.mKey = parcel.readString();
+            f.mEmpireKey = parcel.readString();
+            f.mDesignName = parcel.readString();
+            f.mNumShips = parcel.readInt();
+            f.mStateStartTime = new DateTime(parcel.readLong(), DateTimeZone.UTC);
+            f.mStarKey = parcel.readString();
+            f.mDestinationStarKey = parcel.readString();
+            f.mTargetFleetKey = parcel.readString();
+            f.mTargetColonyKey = parcel.readString();
+            return f;
+        }
+
+        @Override
+        public Fleet[] newArray(int size) {
+            return new Fleet[size];
+        }
+    };
 
     public static Fleet fromProtocolBuffer(warworlds.Warworlds.Fleet pb) {
         Fleet f = new Fleet();

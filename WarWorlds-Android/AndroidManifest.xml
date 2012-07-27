@@ -61,6 +61,9 @@
         <activity android:name=".EmpireSetupActivity"
                   android:screenOrientation="portrait" />
 
+        <activity android:name=".EmpireActivity"
+                  android:screenOrientation="portrait" />
+
         <activity android:name=".game.starfield.StarfieldActivity"
                   android:label="@string/app_name"
                   android:screenOrientation="portrait" />

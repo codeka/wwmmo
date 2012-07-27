@@ -23,7 +23,6 @@ import android.widget.ListView;
 import android.widget.TextView;
 import au.com.codeka.RomanNumeralFormatter;
 import au.com.codeka.warworlds.R;
-import au.com.codeka.warworlds.game.UniverseElementActivity;
 import au.com.codeka.warworlds.model.Colony;
 import au.com.codeka.warworlds.model.ImageManager;
 import au.com.codeka.warworlds.model.Planet;
@@ -32,7 +31,7 @@ import au.com.codeka.warworlds.model.Star;
 import au.com.codeka.warworlds.model.StarImageManager;
 
 public class ColonyList extends FrameLayout {
-    private UniverseElementActivity mActivity;
+    private Context mContext;
     private List<Colony> mColonies;
     private Map<String, Star> mStars;
     private Colony mSelectedColony;
@@ -42,14 +41,13 @@ public class ColonyList extends FrameLayout {
 
     public ColonyList(Context context, AttributeSet attrs) {
         super(context, attrs);
+        mContext = context;
 
         View child = inflate(context, R.layout.colony_list_ctrl, null);
         this.addView(child);
     }
 
-    public void refresh(UniverseElementActivity activity, List<Colony> colonies,
-            Map<String, Star> stars) {
-        mActivity = activity;
+    public void refresh(List<Colony> colonies, Map<String, Star> stars) {
         mColonies = colonies;
         mStars = stars;
 
@@ -114,7 +112,7 @@ public class ColonyList extends FrameLayout {
         if (mSelectedColony == null) {
             colonyInfo.setText("");
         } else {
-            String fmt = mActivity.getString(R.string.colony_overview_format);
+            String fmt = mContext.getString(R.string.colony_overview_format);
             String html = String.format(fmt,
                     (int) mSelectedColony.getPopulation(),
                     mSelectedColony.getFarmingFocus(),
@@ -204,7 +202,7 @@ public class ColonyList extends FrameLayout {
         public View getView(int position, View convertView, ViewGroup parent) {
             View view = convertView;
             if (view == null) {
-                LayoutInflater inflater = (LayoutInflater) mActivity.getSystemService
+                LayoutInflater inflater = (LayoutInflater) mContext.getSystemService
                         (Context.LAYOUT_INFLATER_SERVICE);
                 view = inflater.inflate(R.layout.colony_list_row, null);
             }
@@ -221,7 +219,7 @@ public class ColonyList extends FrameLayout {
             Bitmap bmp = mBitmaps.get(star.getKey());
             if (bmp == null) {
                 int imageSize = (int)(star.getSize() * star.getStarType().getImageScale() * 2);
-                bmp = StarImageManager.getInstance().getBitmap(mActivity, star, imageSize);
+                bmp = StarImageManager.getInstance().getBitmap(mContext, star, imageSize);
                 if (bmp != null) {
                     mBitmaps.put(star.getKey(), bmp);
                 }
@@ -230,7 +228,7 @@ public class ColonyList extends FrameLayout {
 
             bmp = mBitmaps.get(planet.getStar().getKey() + "-" + planet.getIndex());
             if (bmp == null) {
-                bmp = PlanetImageManager.getInstance().getBitmap(mActivity, planet);
+                bmp = PlanetImageManager.getInstance().getBitmap(mContext, planet);
                 if (bmp != null) {
                     mBitmaps.put(planet.getStar().getKey() + "-" + planet.getIndex(), bmp);
                 }

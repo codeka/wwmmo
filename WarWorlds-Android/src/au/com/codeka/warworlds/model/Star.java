@@ -6,35 +6,45 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 
 /**
  * A star is \i basically a container for planets. It shows up on the starfield list.
  */
-public class Star {
+public class Star implements Parcelable {
     private static StarType[] sStarTypes = {
-        new StarType.Builder().setDisplayName("Blue")
-                                .setBitmapBasePath("stars/blue")
-                                .build(),
-        new StarType.Builder().setDisplayName("White")
-                                .setBitmapBasePath("stars/white")
-                                .build(),
-        new StarType.Builder().setDisplayName("Yellow")
-                                .setBitmapBasePath("stars/yellow")
-                                .build(),
-        new StarType.Builder().setDisplayName("Orange")
-                                .setBitmapBasePath("stars/orange")
-                                .build(),
-        new StarType.Builder().setDisplayName("Red")
-                                .setBitmapBasePath("stars/red")
-                                .build(),
-        new StarType.Builder().setDisplayName("Neutron")
-                                .setBitmapBasePath("stars/neutron")
-                                .setBaseSize(1.0)
-                                .setImageScale(4.0)
-                                .build(),
-        new StarType.Builder().setDisplayName("Back Hole")
-                                .setBitmapBasePath("stars/black-hole")
-                                .build()
+        new StarType.Builder().setIndex(0)
+                              .setDisplayName("Blue")
+                              .setBitmapBasePath("stars/blue")
+                              .build(),
+        new StarType.Builder().setIndex(1)
+                              .setDisplayName("White")
+                              .setBitmapBasePath("stars/white")
+                              .build(),
+        new StarType.Builder().setIndex(2)
+                              .setDisplayName("Yellow")
+                              .setBitmapBasePath("stars/yellow")
+                              .build(),
+        new StarType.Builder().setIndex(3)
+                              .setDisplayName("Orange")
+                              .setBitmapBasePath("stars/orange")
+                              .build(),
+        new StarType.Builder().setIndex(4)
+                              .setDisplayName("Red")
+                              .setBitmapBasePath("stars/red")
+                              .build(),
+        new StarType.Builder().setIndex(5)
+                              .setDisplayName("Neutron")
+                              .setBitmapBasePath("stars/neutron")
+                              .setBaseSize(1.0)
+                              .setImageScale(4.0)
+                              .build(),
+        new StarType.Builder().setIndex(6)
+                              .setDisplayName("Back Hole")
+                              .setBitmapBasePath("stars/black-hole")
+                              .build()
     };
 
     private static Logger log = LoggerFactory.getLogger(Star.class);
@@ -132,6 +142,49 @@ public class Star {
         mSector = new Sector.DummySector(sectorX, sectorY);
     }
 
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel parcel, int flags) {
+        parcel.writeString(mKey);
+        parcel.writeString(mName);
+        parcel.writeInt(mStarType.getIndex());
+        parcel.writeInt(mSize);
+        parcel.writeLong(mSectorX);
+        parcel.writeLong(mSectorY);
+        parcel.writeInt(mOffsetX);
+        parcel.writeInt(mOffsetY);
+        parcel.writeInt(mNumPlanets);
+        parcel.writeParcelableArray(mPlanets, flags);
+    }
+
+    public static final Parcelable.Creator<Star> CREATOR
+                = new Parcelable.Creator<Star>() {
+        @Override
+        public Star createFromParcel(Parcel parcel) {
+            Star s = new Star();
+            s.mKey = parcel.readString();
+            s.mName = parcel.readString();
+            s.mStarType = sStarTypes[parcel.readInt()];
+            s.mSize = parcel.readInt();
+            s.mSectorX = parcel.readLong();
+            s.mSectorY = parcel.readLong();
+            s.mOffsetX = parcel.readInt();
+            s.mOffsetY = parcel.readInt();
+            s.mNumPlanets = parcel.readInt();
+            s.mPlanets = (Planet[]) parcel.readParcelableArray(Planet.class.getClassLoader());
+            return s;
+        }
+
+        @Override
+        public Star[] newArray(int size) {
+            return new Star[size];
+        }
+    };
+
     public static Star fromProtocolBuffer(warworlds.Warworlds.Star pb) {
         return fromProtocolBuffer(null, pb);
     }
@@ -194,11 +247,15 @@ public class Star {
     }
 
     public static class StarType {
+        private int mIndex;
         private String mDisplayName;
         private String mBitmapBasePath;
         private double mBaseSize;
         private double mImageScale;
 
+        public int getIndex() {
+            return mIndex;
+        }
         public String getDisplayName() {
             return mDisplayName;
         }
@@ -229,6 +286,11 @@ public class Star {
                 mStarType = new StarType();
                 mStarType.mBaseSize = 8.0;
                 mStarType.mImageScale = 1.0;
+            }
+
+            public Builder setIndex(int index) {
+                mStarType.mIndex = index;
+                return this;
             }
 
             public Builder setDisplayName(String displayName) {

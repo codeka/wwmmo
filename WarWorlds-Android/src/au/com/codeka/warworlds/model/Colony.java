@@ -3,10 +3,14 @@ package au.com.codeka.warworlds.model;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
-public class Colony {
+public class Colony implements Parcelable {
     private String mKey;
     private String mStarKey;
     private int mPlanetIndex;
@@ -76,6 +80,62 @@ public class Colony {
     public List<Building> getBuildings() {
         return mBuildings;
     }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel parcel, int flags) {
+        parcel.writeString(mKey);
+        parcel.writeString(mStarKey);
+        parcel.writeInt(mPlanetIndex);
+        parcel.writeFloat(mPopulation);
+        parcel.writeString(mEmpireKey);
+        parcel.writeFloat(mFarmingFocus);
+        parcel.writeFloat(mConstructionFocus);
+        parcel.writeFloat(mPopulationFocus);
+        parcel.writeFloat(mMiningFocus);
+        parcel.writeFloat(mPopulationDelta);
+        parcel.writeFloat(mGoodsDelta);
+        parcel.writeFloat(mMineralsDelta);
+        parcel.writeLong(mLastSimulation.getMillis());
+
+        Building[] buildings = new Building[mBuildings.size()];
+        parcel.writeParcelableArray(mBuildings.toArray(buildings), flags);
+    }
+
+    public static final Parcelable.Creator<Colony> CREATOR
+                = new Parcelable.Creator<Colony>() {
+        @Override
+        public Colony createFromParcel(Parcel parcel) {
+            Colony c = new Colony();
+            c.mKey = parcel.readString();
+            c.mStarKey = parcel.readString();
+            c.mPlanetIndex = parcel.readInt();
+            c.mPopulation = parcel.readFloat();
+            c.mEmpireKey = parcel.readString();
+            c.mFarmingFocus = parcel.readFloat();
+            c.mConstructionFocus = parcel.readFloat();
+            c.mPopulationFocus = parcel.readFloat();
+            c.mMiningFocus = parcel.readFloat();
+            c.mPopulationDelta = parcel.readFloat();
+            c.mGoodsDelta = parcel.readFloat();
+            c.mMineralsDelta = parcel.readFloat();
+            c.mLastSimulation = new DateTime(parcel.readLong(), DateTimeZone.UTC);
+
+            Building[] buildings = (Building[]) parcel.readParcelableArray(Building.class.getClassLoader());
+            c.mBuildings = Arrays.asList(buildings);
+
+            return c;
+        }
+
+        @Override
+        public Colony[] newArray(int size) {
+            return new Colony[size];
+        }
+    };
 
     public static Colony fromProtocolBuffer(warworlds.Warworlds.Colony pb) {
         Colony c = new Colony();

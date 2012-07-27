@@ -18,6 +18,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+import au.com.codeka.warworlds.EmpireActivity;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.game.FleetMoveDialog;
 import au.com.codeka.warworlds.game.FleetSplitDialog;
@@ -119,7 +120,8 @@ public class StarfieldActivity extends UniverseElementActivity {
         empireBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                showDialog(EmpireDialog.ID);
+                Intent intent = new Intent(mContext, EmpireActivity.class);
+                StarfieldActivity.this.startActivity(intent);
             }
         });
     }
@@ -176,23 +178,8 @@ public class StarfieldActivity extends UniverseElementActivity {
     }
 
     @Override
-    protected Dialog onCreateDialog(int id) {
-        switch(id) {
-        case EmpireDialog.ID:
-            return new EmpireDialog(this);
-        }
-
-        return super.onCreateDialog(id);
-    }
-
-    @Override
     protected void onPrepareDialog(int id, Dialog d, Bundle args) {
         switch(id) {
-        case EmpireDialog.ID: {
-            EmpireDialog dialog = (EmpireDialog) d;
-            dialog.refresh();
-            break;
-        }
         case FleetSplitDialog.ID: {
             FleetSplitDialog dialog = (FleetSplitDialog) d;
 

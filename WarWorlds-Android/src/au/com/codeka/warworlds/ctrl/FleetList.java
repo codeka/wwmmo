@@ -6,6 +6,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.os.Bundle;
@@ -44,7 +45,7 @@ public class FleetList extends FrameLayout {
     private Fleet mSelectedFleet;
     private List<Fleet> mFleets;
     private Map<String, Star> mStars;
-    private UniverseElementActivity mActivity;
+    private Activity mActivity;
     private boolean mIsInitialized;
 
     public FleetList(Context context, AttributeSet attrs) {
@@ -54,7 +55,7 @@ public class FleetList extends FrameLayout {
         this.addView(child);
     }
 
-    public void refresh(UniverseElementActivity activity, List<Fleet> fleets,
+    public void refresh(Activity activity, List<Fleet> fleets,
             Map<String, Star> stars) {
         mActivity = activity;
         mFleets = fleets;
@@ -99,15 +100,18 @@ public class FleetList extends FrameLayout {
             }
         });
 
-        mActivity.addUpdatedListener(new UniverseElementActivity.OnUpdatedListener() {
-            @Override
-            public void onStarUpdated(Star star, Planet selectedPlanet, Colony colony) {
-                refresh(mActivity, star.getFleets(), mStars);
-            }
-            @Override
-            public void onSectorUpdated() {
-            }
-        });
+        if (mActivity instanceof UniverseElementActivity) {
+            // TODO: will this ever be true??
+            ((UniverseElementActivity) mActivity).addUpdatedListener(new UniverseElementActivity.OnUpdatedListener() {
+                @Override
+                public void onStarUpdated(Star star, Planet selectedPlanet, Colony colony) {
+                    refresh(mActivity, star.getFleets(), mStars);
+                }
+                @Override
+                public void onSectorUpdated() {
+                }
+            });
+        }
 
         fleetList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
