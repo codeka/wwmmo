@@ -62,7 +62,7 @@ public class UniverseElementActivity extends Activity {
 
     @Override
     protected void onPrepareDialog(int id, Dialog d, Bundle args) {
-        DialogManager.getInstance().onPrepareDialog(id, d, args);
+        DialogManager.getInstance().onPrepareDialog(this, id, d, args);
         super.onPrepareDialog(id, d, args);
     }
 

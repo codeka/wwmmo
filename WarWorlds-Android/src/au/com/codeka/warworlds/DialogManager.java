@@ -9,6 +9,7 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import au.com.codeka.warworlds.game.FleetMoveDialog;
 import au.com.codeka.warworlds.game.FleetSplitDialog;
+import au.com.codeka.warworlds.game.solarsystem.FleetDialog;
 
 /**
  * Manages the dialogs we show, since they could come from multiple activities it's easier
@@ -62,6 +63,8 @@ public class DialogManager {
             return new FleetSplitDialog(activity);
         case FleetMoveDialog.ID:
             return new FleetMoveDialog(activity);
+        case FleetDialog.ID:
+            return new FleetDialog(activity);
         }
 
         return null;
@@ -70,9 +73,9 @@ public class DialogManager {
     /**
      * Activities should call this in their onPrepareDialog method.
      */
-    public void onPrepareDialog(int id, Dialog d, Bundle bundle) {
+    public void onPrepareDialog(Activity activity, int id, Dialog d, Bundle bundle) {
         if (d instanceof DialogConfigurable) {
-            ((DialogConfigurable) d).setBundle(bundle);
+            ((DialogConfigurable) d).setBundle(activity, bundle);
         }
 
         // if we have a dismiss listener for this dialog, then set it now
@@ -88,6 +91,6 @@ public class DialogManager {
      * implement this interface.
      */
     public interface DialogConfigurable {
-        void setBundle(Bundle bundle);
+        void setBundle(Activity activity, Bundle bundle);
     }
 }

@@ -200,7 +200,7 @@ public class FleetList extends FrameLayout {
                     } else if (!lhs.getDesignName().equals(rhs.getDesignName())) {
                         return lhs.getDesignName().compareTo(rhs.getDesignName());
                     } else {
-                        return lhs.getNumShips() - rhs.getNumShips();
+                        return rhs.getNumShips() - lhs.getNumShips();
                     }
                 }
             });

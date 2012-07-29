@@ -11,6 +11,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import au.com.codeka.Point2D;
 import au.com.codeka.RomanNumeralFormatter;
+import au.com.codeka.warworlds.DialogManager;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.game.UniverseElementActivity;
 import au.com.codeka.warworlds.model.BuildingDesignManager;
@@ -93,7 +94,9 @@ public class SolarSystemActivity extends UniverseElementActivity {
         fleetButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                showDialog(FleetDialog.ID);
+                Bundle args = new Bundle();
+                args.putParcelable("au.com.codeka.warworlds.Star", mStar);
+                DialogManager.getInstance().show(SolarSystemActivity.this, FleetDialog.class, args);
             }
         });
     }
@@ -140,8 +143,6 @@ public class SolarSystemActivity extends UniverseElementActivity {
             return new BuildConfirmDialog(this);
         case FocusDialog.ID:
             return new FocusDialog(this);
-        case FleetDialog.ID:
-            return new FleetDialog(this);
         }
 
         return super.onCreateDialog(id);
@@ -178,11 +179,6 @@ public class SolarSystemActivity extends UniverseElementActivity {
         case FocusDialog.ID: {
             FocusDialog dialog = (FocusDialog) d;
             dialog.setColony(mColony);
-            break;
-        }
-        case FleetDialog.ID: {
-            FleetDialog dialog = (FleetDialog) d;
-            dialog.setStar(mStar);
             break;
         }
         }

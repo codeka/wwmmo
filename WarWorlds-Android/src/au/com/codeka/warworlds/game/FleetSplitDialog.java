@@ -119,7 +119,7 @@ public class FleetSplitDialog extends Dialog implements DialogManager.DialogConf
     }
 
     @Override
-    public void setBundle(Bundle bundle) {
+    public void setBundle(Activity activity, Bundle bundle) {
         mFleet = (Fleet) bundle.getParcelable("au.com.codeka.warworlds.Fleet");
 
         View fleetView = findViewById(R.id.fleet);
