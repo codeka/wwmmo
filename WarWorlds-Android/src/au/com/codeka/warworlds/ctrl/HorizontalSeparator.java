@@ -14,6 +14,14 @@ import android.widget.TextView;
 public class HorizontalSeparator extends TextView {
     private Paint mPaint;
 
+    public HorizontalSeparator(Context context) {
+        super(context);
+
+        mPaint = new Paint();
+        mPaint.setARGB(255, 14, 215, 254);
+        mPaint.setStyle(Style.STROKE);
+    }
+
     /**
      * Constructs a new \c HorizontalSeparator.
      */

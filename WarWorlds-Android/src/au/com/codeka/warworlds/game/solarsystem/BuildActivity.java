@@ -24,6 +24,7 @@ import android.widget.TextView;
 import au.com.codeka.warworlds.DialogManager;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.TabFragmentActivity;
+import au.com.codeka.warworlds.ctrl.HorizontalSeparator;
 import au.com.codeka.warworlds.model.BuildQueueManager;
 import au.com.codeka.warworlds.model.BuildRequest;
 import au.com.codeka.warworlds.model.Building;
@@ -81,7 +82,6 @@ public class BuildActivity extends TabFragmentActivity {
     }
 
     public static class BuildingsFragment extends Fragment {
-        private BuildingDesignListAdapter mDesignListAdapter;
         private BuildingListAdapter mBuildingListAdapter;
 
         @Override
@@ -90,38 +90,44 @@ public class BuildActivity extends TabFragmentActivity {
 
             final Colony colony = ((BuildActivity) getActivity()).mColony;
 
-            mDesignListAdapter = new BuildingDesignListAdapter();
-            mDesignListAdapter.setDesigns(BuildingDesignManager.getInstance().getDesigns());
-
             mBuildingListAdapter = new BuildingListAdapter();
             if (colony != null) {
                 mBuildingListAdapter.setBuildings(colony.getBuildings());
+                mBuildingListAdapter.setDesigns(BuildingDesignManager.getInstance().getDesigns());
             }
 
-            ListView availableDesignsList = (ListView) v.findViewById(R.id.buildings_available);
-            availableDesignsList.setAdapter(mDesignListAdapter);
-            availableDesignsList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                @Override
-                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                    Bundle args = new Bundle();
-                    BuildingDesign design = (BuildingDesign) mDesignListAdapter.getItem(position);
-                    args.putString("au.com.codeka.warworlds.DesignID", design.getID());
-                    args.putInt("au.com.codeka.warworlds.DesignKind", design.getDesignKind().getValue());
-
-//                    mActivity.showDialog(BuildConfirmDialog.ID, args);
-                }
-            });
-
-            ListView existingBuildingsList = (ListView) v.findViewById(R.id.buildings_existing);
-            existingBuildingsList.setAdapter(mBuildingListAdapter);
+            ListView buildingsList = (ListView) v.findViewById(R.id.building_list);
+            buildingsList.setAdapter(mBuildingListAdapter);
 
             // make sure we're aware of any changes to the designs
             BuildingDesignManager.getInstance().addDesignsChangedListener(new DesignManager.DesignsChangedListener() {
                 @Override
                 public void onDesignsChanged() {
-                    mDesignListAdapter.setDesigns(BuildingDesignManager.getInstance().getDesigns());
+                    mBuildingListAdapter.setDesigns(BuildingDesignManager.getInstance().getDesigns());
                     if (colony != null) {
                         mBuildingListAdapter.setBuildings(colony.getBuildings());
+                    }
+                }
+            });
+
+
+            buildingsList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    Bundle args = new Bundle();
+
+                    Object o = mBuildingListAdapter.getItem(position);
+                    if (o instanceof BuildingDesign) {
+                        BuildingDesign design = (BuildingDesign) o;
+                        args.putString("au.com.codeka.warworlds.DesignID", design.getID());
+                        args.putInt("au.com.codeka.warworlds.DesignKind", design.getDesignKind().getValue());
+                        args.putParcelable("au.com.codeka.warworlds.Colony", colony);
+
+                        DialogManager.getInstance().show(getActivity(),
+                                                         BuildConfirmDialog.class,
+                                                         args);
+                    } else if (o instanceof Building) {
+                        // TODO: upgrade building
                     }
                 }
             });
@@ -134,73 +140,20 @@ public class BuildActivity extends TabFragmentActivity {
          */
         private class BuildingListAdapter extends BaseAdapter {
             private List<Building> mBuildings;
+            private List<BuildingDesign> mDesigns;
+
+            private static final int HEADING_TYPE = 0;
+            private static final int EXISTING_BUILDING_TYPE = 1;
+            private static final int NEW_BUILDING_TYPE = 2;
 
             public void setBuildings(List<Building> buildings) {
+                if (buildings == null) {
+                    buildings = new ArrayList<Building>();
+                }
+
                 mBuildings = buildings;
                 notifyDataSetChanged();
             }
-
-            @Override
-            public int getCount() {
-                if (mBuildings == null)
-                    return 0;
-                return mBuildings.size();
-            }
-
-            @Override
-            public Object getItem(int position) {
-                if (mBuildings == null)
-                    return null;
-                return mBuildings.get(position);
-            }
-
-            @Override
-            public long getItemId(int position) {
-                return position;
-            }
-
-            @Override
-            public View getView(int position, View convertView, ViewGroup parent) {
-                View view = convertView;
-                if (view == null) {
-                    LayoutInflater inflater = (LayoutInflater) getActivity().getSystemService
-                            (Context.LAYOUT_INFLATER_SERVICE);
-                    view = inflater.inflate(R.layout.solarsystem_buildings_design, null);
-                }
-
-                ImageView icon = (ImageView) view.findViewById(R.id.building_icon);
-                TextView row1 = (TextView) view.findViewById(R.id.building_row1);
-                TextView row2 = (TextView) view.findViewById(R.id.building_row2);
-                TextView row3 = (TextView) view.findViewById(R.id.building_row3);
-                ProgressBar progress = (ProgressBar) view.findViewById(R.id.building_progress);
-
-                Building building = mBuildings.get(position);
-                BuildingDesign design = building.getDesign();
-
-                Bitmap bm = BuildingDesignManager.getInstance().getDesignIcon(design);
-                if (bm != null) {
-                    icon.setImageBitmap(bm);
-                } else {
-                    icon.setImageBitmap(null);
-                }
-
-                row1.setText(design.getName());
-                row2.setText("Level 1");
-
-                row3.setVisibility(View.VISIBLE);
-                progress.setVisibility(View.GONE);
-                row3.setText(String.format("Upgrade: $ %d, %.2f hours", design.getBuildCost(),
-                        (float) design.getBuildTimeSeconds() / 3600.0f));
-
-                return view;
-            }
-        }
-
-        /**
-         * This adapter is used to populate the list of building designs in one of the views.
-         */
-        private class BuildingDesignListAdapter extends BaseAdapter {
-            private List<BuildingDesign> mDesigns;
 
             public void setDesigns(Map<String, Design> designs) {
                 mDesigns = new ArrayList<BuildingDesign>();
@@ -210,18 +163,58 @@ public class BuildActivity extends TabFragmentActivity {
                 notifyDataSetChanged();
             }
 
+            /**
+             * We have three types of items, the "headings", the list of existing buildings
+             * and the list of building designs.
+             */
+            @Override
+            public int getViewTypeCount() {
+                return 3;
+            }
+
+            @Override
+            public int getItemViewType(int position) {
+                if (mBuildings == null || mDesigns == null)
+                    return 0;
+
+                if (position == 0 || position == (mBuildings.size() + 1)) {
+                    return HEADING_TYPE;
+                } else if (position <= mBuildings.size()) {
+                    return EXISTING_BUILDING_TYPE;
+                } else {
+                    return NEW_BUILDING_TYPE;
+                }
+            }
+
+            @Override
+            public boolean isEnabled(int position) {
+                if (getItemViewType(position) == HEADING_TYPE) {
+                    return false;
+                }
+
+                return true;
+            }
+
             @Override
             public int getCount() {
-                if (mDesigns == null)
+                if (mBuildings == null || mDesigns == null)
                     return 0;
-                return mDesigns.size();
+
+                return mBuildings.size() + mDesigns.size() + 2;
             }
 
             @Override
             public Object getItem(int position) {
-                if (mDesigns == null)
+                if (mBuildings == null)
                     return null;
-                return mDesigns.get(position);
+
+                if (position == 0 || position == (mBuildings.size() + 1)) {
+                    return null;
+                } else if (position <= mBuildings.size()) {
+                    return mBuildings.get(position - 1);
+                } else {
+                    return mDesigns.get(position - mBuildings.size() - 2);
+                }
             }
 
             @Override
@@ -235,29 +228,67 @@ public class BuildActivity extends TabFragmentActivity {
                 if (view == null) {
                     LayoutInflater inflater = (LayoutInflater) getActivity().getSystemService
                             (Context.LAYOUT_INFLATER_SERVICE);
-                    view = inflater.inflate(R.layout.solarsystem_buildings_design, null);
+
+                    int viewType = getItemViewType(position);
+                    if (viewType == HEADING_TYPE) {
+                        view = new HorizontalSeparator(getActivity());
+                    } else {
+                        view = inflater.inflate(R.layout.solarsystem_buildings_design, null);
+                    }
                 }
 
-                ImageView icon = (ImageView) view.findViewById(R.id.building_icon);
-                TextView row1 = (TextView) view.findViewById(R.id.building_row1);
-                TextView row2 = (TextView) view.findViewById(R.id.building_row2);
-                TextView row3 = (TextView) view.findViewById(R.id.building_row3);
-                ProgressBar progress = (ProgressBar) view.findViewById(R.id.building_progress);
-                progress.setVisibility(View.GONE);
+                if (position == 0) {
+                    HorizontalSeparator hs = (HorizontalSeparator) view;
+                    hs.setText("Existing Buildings");
+                } else if (position <= mBuildings.size()) {
+                    ImageView icon = (ImageView) view.findViewById(R.id.building_icon);
+                    TextView row1 = (TextView) view.findViewById(R.id.building_row1);
+                    TextView row2 = (TextView) view.findViewById(R.id.building_row2);
+                    TextView row3 = (TextView) view.findViewById(R.id.building_row3);
+                    ProgressBar progress = (ProgressBar) view.findViewById(R.id.building_progress);
 
-                BuildingDesign design = mDesigns.get(position);
+                    Building building = mBuildings.get(position - 1);
+                    BuildingDesign design = building.getDesign();
 
-                Bitmap bm = BuildingDesignManager.getInstance().getDesignIcon(design);
-                if (bm != null) {
-                    icon.setImageBitmap(bm);
+                    Bitmap bm = BuildingDesignManager.getInstance().getDesignIcon(design);
+                    if (bm != null) {
+                        icon.setImageBitmap(bm);
+                    } else {
+                        icon.setImageBitmap(null);
+                    }
+
+                    row1.setText(design.getName());
+                    row2.setText("Level 1");
+
+                    row3.setVisibility(View.VISIBLE);
+                    progress.setVisibility(View.GONE);
+                    row3.setText(String.format("Upgrade: $ %d, %.2f hours", design.getBuildCost(),
+                            (float) design.getBuildTimeSeconds() / 3600.0f));
+                } else if (position == mBuildings.size() + 1) {
+                    HorizontalSeparator hs = (HorizontalSeparator) view;
+                    hs.setText("New Buildings");
                 } else {
-                    icon.setImageBitmap(null);
-                }
+                    ImageView icon = (ImageView) view.findViewById(R.id.building_icon);
+                    TextView row1 = (TextView) view.findViewById(R.id.building_row1);
+                    TextView row2 = (TextView) view.findViewById(R.id.building_row2);
+                    TextView row3 = (TextView) view.findViewById(R.id.building_row3);
+                    ProgressBar progress = (ProgressBar) view.findViewById(R.id.building_progress);
+                    progress.setVisibility(View.GONE);
 
-                row1.setText(design.getName());
-                row2.setText(String.format("$ %d - %.2f hours", design.getBuildCost(),
-                        (float) design.getBuildTimeSeconds() / 3600.0f));
-                row3.setText("Required: none");
+                    BuildingDesign design = mDesigns.get(position - mBuildings.size() - 2);
+
+                    Bitmap bm = BuildingDesignManager.getInstance().getDesignIcon(design);
+                    if (bm != null) {
+                        icon.setImageBitmap(bm);
+                    } else {
+                        icon.setImageBitmap(null);
+                    }
+
+                    row1.setText(design.getName());
+                    row2.setText(String.format("$ %d - %.2f hours", design.getBuildCost(),
+                            (float) design.getBuildTimeSeconds() / 3600.0f));
+                    row3.setText("Required: none");
+                }
 
                 return view;
             }

@@ -14,16 +14,12 @@ import au.com.codeka.RomanNumeralFormatter;
 import au.com.codeka.warworlds.DialogManager;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.game.UniverseElementActivity;
-import au.com.codeka.warworlds.model.BuildingDesignManager;
 import au.com.codeka.warworlds.model.Colony;
-import au.com.codeka.warworlds.model.Design;
-import au.com.codeka.warworlds.model.Design.DesignKind;
 import au.com.codeka.warworlds.model.Empire;
 import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.EmpirePresence;
 import au.com.codeka.warworlds.model.MyEmpire;
 import au.com.codeka.warworlds.model.Planet;
-import au.com.codeka.warworlds.model.ShipDesignManager;
 import au.com.codeka.warworlds.model.Star;
 import au.com.codeka.warworlds.model.StarManager;
 import au.com.codeka.warworlds.model.StarManager.StarFetchedHandler;
@@ -142,46 +138,15 @@ public class SolarSystemActivity extends UniverseElementActivity {
 
     @Override
     protected Dialog onCreateDialog(int id) {
-        switch(id) {
-        case BuildConfirmDialog.ID:
-            return new BuildConfirmDialog(this);
-        case FocusDialog.ID:
-            return new FocusDialog(this);
-        }
-
-        return super.onCreateDialog(id);
+        Dialog d = DialogManager.getInstance().onCreateDialog(this, id);
+        if (d == null)
+            d = super.onCreateDialog(id);
+        return d;
     }
 
     @Override
     protected void onPrepareDialog(int id, Dialog d, Bundle args) {
-        switch(id) {
-        case BuildConfirmDialog.ID: {
-            BuildConfirmDialog dialog = (BuildConfirmDialog) d;
-            String designID = args.getString("au.com.codeka.warworlds.DesignID");
-            if (designID == null)
-                designID = "";
-            DesignKind dk = DesignKind.fromInt(args.getInt("au.com.codeka.warworlds.DesignKind",
-                                               DesignKind.BUILDING.getValue()));
-
-            // TODO: this could be encapsulated in the DesignManager base class....
-            Design design;
-            if (dk == DesignKind.BUILDING) {
-                design = BuildingDesignManager.getInstance().getDesign(designID);
-            } else {
-                design = ShipDesignManager.getInstance().getDesign(designID);
-            }
-
-            dialog.setDesign(design);
-            dialog.setColony(mColony);
-            break;
-        }
-        case FocusDialog.ID: {
-            FocusDialog dialog = (FocusDialog) d;
-            dialog.setColony(mColony);
-            break;
-        }
-        }
-
+        DialogManager.getInstance().onPrepareDialog(this, id, d, args);
         super.onPrepareDialog(id, d, args);
     }
 

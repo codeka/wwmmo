@@ -235,6 +235,15 @@ public class FleetList extends FrameLayout {
         }
 
         @Override
+        public boolean isEnabled(int position) {
+            if (mEntries.get(position).type == STAR_ITEM_TYPE) {
+                return false;
+            }
+
+            return true;
+        }
+
+        @Override
         public int getCount() {
             if (mEntries == null)
                 return 0;

@@ -9,6 +9,7 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import au.com.codeka.warworlds.game.FleetMoveDialog;
 import au.com.codeka.warworlds.game.FleetSplitDialog;
+import au.com.codeka.warworlds.game.solarsystem.BuildConfirmDialog;
 import au.com.codeka.warworlds.game.solarsystem.FleetDialog;
 
 /**
@@ -65,6 +66,8 @@ public class DialogManager {
             return new FleetMoveDialog(activity);
         case FleetDialog.ID:
             return new FleetDialog(activity);
+        case BuildConfirmDialog.ID:
+            return new BuildConfirmDialog(activity);
         }
 
         return null;

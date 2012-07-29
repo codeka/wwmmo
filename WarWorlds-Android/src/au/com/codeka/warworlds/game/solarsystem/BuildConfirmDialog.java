@@ -3,6 +3,8 @@ package au.com.codeka.warworlds.game.solarsystem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import android.app.Activity;
+import android.app.Dialog;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -14,29 +16,29 @@ import android.view.ViewGroup.LayoutParams;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import au.com.codeka.warworlds.DialogManager;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.WarWorldsActivity;
 import au.com.codeka.warworlds.api.ApiClient;
 import au.com.codeka.warworlds.api.ApiException;
-import au.com.codeka.warworlds.game.UniverseElementDialog;
 import au.com.codeka.warworlds.model.BuildQueueManager;
 import au.com.codeka.warworlds.model.BuildRequest;
 import au.com.codeka.warworlds.model.BuildingDesignManager;
 import au.com.codeka.warworlds.model.Colony;
 import au.com.codeka.warworlds.model.Design;
 import au.com.codeka.warworlds.model.ShipDesignManager;
+import au.com.codeka.warworlds.model.Design.DesignKind;
+import au.com.codeka.warworlds.model.StarManager;
 
-public class BuildConfirmDialog extends UniverseElementDialog {
+public class BuildConfirmDialog extends Dialog implements DialogManager.DialogConfigurable {
     private static Logger log = LoggerFactory.getLogger(WarWorldsActivity.class);
     private Colony mColony;
     private Design mDesign;
-    private SolarSystemActivity mActivity;
 
     public static final int ID = 1001;
 
-    public BuildConfirmDialog(SolarSystemActivity activity) {
+    public BuildConfirmDialog(Activity activity) {
         super(activity);
-        mActivity = activity;
     }
 
     @Override
@@ -88,9 +90,8 @@ public class BuildConfirmDialog extends UniverseElementDialog {
                         // notify the BuildQueueManager that something's changed.
                         BuildQueueManager.getInstance().refresh(buildRequest);
 
-                        // refresh the solar system as well, since now we're building something
-                        // we'll need to recalculate times and whatnot
-                        mActivity.refresh();
+                        // tell the StarManager that this star has been updated
+                        StarManager.getInstance().refreshStar(mColony.getStarKey());
 
                         okButton.setEnabled(true);
                         dismiss();
@@ -100,11 +101,28 @@ public class BuildConfirmDialog extends UniverseElementDialog {
         });
     }
 
-    public void setColony(Colony colony) {
-        mColony = colony;
+    @Override
+    public void setBundle(Activity activity, Bundle bundle) {
+        String designID = bundle.getString("au.com.codeka.warworlds.DesignID");
+        if (designID == null)
+            designID = "";
+        DesignKind dk = DesignKind.fromInt(bundle.getInt("au.com.codeka.warworlds.DesignKind",
+                                           DesignKind.BUILDING.getValue()));
+
+        mColony = (Colony) bundle.getParcelable("au.com.codeka.warworlds.Colony");
+
+        // TODO: this could be encapsulated in the DesignManager base class....
+        Design design;
+        if (dk == DesignKind.BUILDING) {
+            design = BuildingDesignManager.getInstance().getDesign(designID);
+        } else {
+            design = ShipDesignManager.getInstance().getDesign(designID);
+        }
+
+        refresh(design);
     }
 
-    public void setDesign(Design design) {
+    private void refresh(Design design) {
         mDesign = design;
 
         TextView nameTextView = (TextView) findViewById(R.id.building_name);

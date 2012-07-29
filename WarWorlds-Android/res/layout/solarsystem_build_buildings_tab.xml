@@ -1,48 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:baselineAligned="false"
-    android:orientation="horizontal" >
+    android:layout_height="match_parent">
 
-    <RelativeLayout
-        android:layout_width="0dp"
-        android:layout_weight="0.5"
-        android:layout_height="match_parent">
+    <ListView
+        android:id="@+id/building_list"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentLeft="true"/>
 
-        <au.com.codeka.warworlds.ctrl.HorizontalSeparator
-            android:id="@+id/buildings_available_title"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:text="@string/buildings_available_title" />
-
-        <ListView
-            android:id="@+id/buildings_available"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_below="@id/buildings_available_title" />
-    </RelativeLayout>
-
-    <RelativeLayout
-        android:layout_width="0dp"
-        android:layout_weight="0.5"
-        android:layout_height="match_parent">
-
-        <au.com.codeka.warworlds.ctrl.HorizontalSeparator
-            android:id="@+id/buildings_existing_title"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentTop="true"
-            android:text="@string/buildings_existing_title" />
-
-        <ListView
-            android:id="@+id/buildings_existing"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_below="@id/buildings_existing_title" />
-    </RelativeLayout>
-</LinearLayout>
+</RelativeLayout>
