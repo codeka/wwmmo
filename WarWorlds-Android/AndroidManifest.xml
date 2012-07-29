@@ -61,7 +61,7 @@
         <activity android:name=".EmpireSetupActivity"
                   android:screenOrientation="portrait" />
 
-        <activity android:name=".EmpireActivity"
+        <activity android:name=".game.EmpireActivity"
                   android:screenOrientation="portrait" />
 
         <activity android:name=".game.starfield.StarfieldActivity"

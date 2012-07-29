@@ -1,4 +1,4 @@
-package au.com.codeka.warworlds;
+package au.com.codeka.warworlds.game;
 
 import java.util.HashSet;
 
@@ -12,10 +12,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import au.com.codeka.warworlds.DialogManager;
+import au.com.codeka.warworlds.R;
+import au.com.codeka.warworlds.TabFragmentActivity;
+import au.com.codeka.warworlds.R.id;
+import au.com.codeka.warworlds.R.layout;
+import au.com.codeka.warworlds.R.string;
 import au.com.codeka.warworlds.ctrl.ColonyList;
 import au.com.codeka.warworlds.ctrl.FleetList;
-import au.com.codeka.warworlds.game.FleetMoveDialog;
-import au.com.codeka.warworlds.game.FleetSplitDialog;
 import au.com.codeka.warworlds.model.Colony;
 import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.Fleet;
