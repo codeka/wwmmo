@@ -3,6 +3,7 @@ package au.com.codeka.warworlds.ctrl;
 import android.app.Activity;
 import android.content.Context;
 import android.util.AttributeSet;
+import android.view.Gravity;
 import android.widget.FrameLayout;
 
 import com.google.ads.AdRequest;
@@ -24,6 +25,12 @@ public class BannerAdView extends FrameLayout {
         if (context instanceof Activity) {
             Activity activity = (Activity)context;
             mAdView = new AdView(activity, AdSize.BANNER, "a14f533fbb3e1bd");
+
+            FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(LayoutParams.WRAP_CONTENT,
+                                                                       LayoutParams.WRAP_CONTENT);
+            lp.gravity = Gravity.CENTER;
+            mAdView.setLayoutParams(lp);
+
             this.addView(mAdView);
 
             refreshAd();

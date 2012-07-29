@@ -2,6 +2,7 @@ package au.com.codeka.warworlds;
 
 import java.util.HashSet;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.text.Html;
@@ -24,6 +25,30 @@ import au.com.codeka.warworlds.model.Star;
 public class EmpireActivity extends TabFragmentActivity {
 
     private static MyEmpire sCurrentEmpire;
+
+    public enum EmpireActivityResult {
+        NavigateToPlanet(1);
+
+        private int mValue;
+
+        public static EmpireActivityResult fromValue(int value) {
+            for (EmpireActivityResult res : values()) {
+                if (res.mValue == value) {
+                    return res;
+                }
+            }
+
+            throw new IllegalArgumentException("value is not a valid EmpireActivityResult");
+        }
+
+        public int getValue() {
+            return mValue;
+        }
+
+        EmpireActivityResult(int value) {
+            mValue = value;
+        }
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -99,10 +124,18 @@ public class EmpireActivity extends TabFragmentActivity {
                 @Override
                 public void onViewColony(Star star, Colony colony) {
                     Planet planet = star.getPlanets()[colony.getPlanetIndex() - 1];
-                    // TODO: end this activity, go back to the starfield one and
-                    // navigate to the given colony
-                    //getActivity().navigateToPlanet(star, planet, true);
-                    //dismiss();
+                    // end this activity, go back to the starfield and navigate to the given colony
+
+                    Intent intent = new Intent();
+                    intent.putExtra("au.com.codeka.warworlds.Result", EmpireActivityResult.NavigateToPlanet.getValue());
+                    intent.putExtra("au.com.codeka.warworlds.SectorX", star.getSectorX());
+                    intent.putExtra("au.com.codeka.warworlds.SectorY", star.getSectorY());
+                    intent.putExtra("au.com.codeka.warworlds.StarOffsetX", star.getOffsetX());
+                    intent.putExtra("au.com.codeka.warworlds.StarOffsetY", star.getOffsetY());
+                    intent.putExtra("au.com.codeka.warworlds.StarKey", star.getKey());
+                    intent.putExtra("au.com.codeka.warworlds.PlanetIndex", planet.getIndex());
+                    getActivity().setResult(RESULT_OK, intent);
+                    getActivity().finish();
                 }
             });
 

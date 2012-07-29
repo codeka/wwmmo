@@ -50,6 +50,7 @@ public class StarfieldActivity extends UniverseElementActivity {
     private Star mSelectedStar;
 
     private static final int SOLAR_SYSTEM_REQUEST = 1;
+    private static final int EMPIRE_REQUEST = 2;
 
     /** Called when the activity is first created. */
     @Override
@@ -121,7 +122,7 @@ public class StarfieldActivity extends UniverseElementActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(mContext, EmpireActivity.class);
-                StarfieldActivity.this.startActivity(intent);
+                StarfieldActivity.this.startActivityForResult(intent, EMPIRE_REQUEST);
             }
         });
     }
@@ -135,22 +136,25 @@ public class StarfieldActivity extends UniverseElementActivity {
      *         is centered on the given star.
      */
     public void navigateToPlanet(Star star, Planet planet, boolean scrollView) {
+        navigateToPlanet(star.getSectorX(), star.getSectorY(), star.getKey(),
+                         star.getOffsetX(), star.getOffsetY(), planet.getIndex(),
+                         scrollView);
+    }
+
+    private void navigateToPlanet(long sectorX, long sectorY, String starKey, int starOffsetX,
+                                  int starOffsetY, int planetIndex, boolean scrollView) {
         if (scrollView) {
-            int offsetX = star.getOffsetX() - (int) ((mStarfield.getWidth() / 2) / mStarfield.getPixelScale());
-            int offsetY = star.getOffsetY() -  (int) ((mStarfield.getHeight() / 2) / mStarfield.getPixelScale());
-            SectorManager.getInstance().scrollTo(star.getSectorX(), star.getSectorY(),
+            int offsetX = starOffsetX - (int) ((mStarfield.getWidth() / 2) / mStarfield.getPixelScale());
+            int offsetY = starOffsetY -  (int) ((mStarfield.getHeight() / 2) / mStarfield.getPixelScale());
+            SectorManager.getInstance().scrollTo(sectorX, sectorY,
                     offsetX, offsetY);
         }
 
         Intent intent = new Intent(mContext, SolarSystemActivity.class);
-        intent.putExtra("au.com.codeka.warworlds.SectorX", star.getSectorX());
-        intent.putExtra("au.com.codeka.warworlds.SectorY", star.getSectorY());
-        intent.putExtra("au.com.codeka.warworlds.StarKey", star.getKey());
-        if (planet != null) {
-            intent.putExtra("au.com.codeka.warworlds.PlanetIndex", planet.getIndex());
-        } else {
-            intent.putExtra("au.com.codeka.warworlds.PlanetIndex", -1);
-        }
+        intent.putExtra("au.com.codeka.warworlds.SectorX", sectorX);
+        intent.putExtra("au.com.codeka.warworlds.SectorY", sectorY);
+        intent.putExtra("au.com.codeka.warworlds.StarKey", starKey);
+        intent.putExtra("au.com.codeka.warworlds.PlanetIndex", planetIndex);
         startActivityForResult(intent, SOLAR_SYSTEM_REQUEST);
     }
 
@@ -173,6 +177,21 @@ public class StarfieldActivity extends UniverseElementActivity {
             } else {
                 // make sure we re-select the star you had selected before.
                 mStarfield.selectStar(starKey);
+            }
+        } else if (requestCode == EMPIRE_REQUEST && intent != null) {
+            EmpireActivity.EmpireActivityResult res = EmpireActivity.EmpireActivityResult.fromValue(
+                    intent.getIntExtra("au.com.codeka.warworlds.Result", 0));
+
+            if (res == EmpireActivity.EmpireActivityResult.NavigateToPlanet) {
+                long sectorX = intent.getLongExtra("au.com.codeka.warworlds.SectorX", 0);
+                long sectorY = intent.getLongExtra("au.com.codeka.warworlds.SectorY", 0);
+                int starOffsetX = intent.getIntExtra("au.com.codeka.warworlds.StarOffsetX", 0);
+                int starOffsetY = intent.getIntExtra("au.com.codeka.warworlds.StarOffsetY", 0);
+                String starKey = intent.getStringExtra("au.com.codeka.warworlds.StarKey");
+                int planetIndex = intent.getIntExtra("au.com.codeka.warworlds.PlanetIndex", 0);
+
+                navigateToPlanet(sectorX, sectorY, starKey, starOffsetX, starOffsetY,
+                                 planetIndex, true);
             }
         }
     }
