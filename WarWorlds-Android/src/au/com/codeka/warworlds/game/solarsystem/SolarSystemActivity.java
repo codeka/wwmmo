@@ -41,6 +41,8 @@ public class SolarSystemActivity extends UniverseElementActivity {
     private Planet mPlanet;
     private Colony mColony;
 
+    private static final int BUILD_REQUEST = 3000;
+
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -80,7 +82,11 @@ public class SolarSystemActivity extends UniverseElementActivity {
         buildButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                showDialog(BuildDialog.ID);
+                Intent intent = new Intent(SolarSystemActivity.this, BuildActivity.class);
+                intent.putExtra("au.com.codeka.warworlds.StarKey", mStar.getKey());
+                intent.putExtra("au.com.codeka.warworlds.Colony", mColony);
+
+                startActivityForResult(intent, BUILD_REQUEST);
             }
         });
 
@@ -95,7 +101,7 @@ public class SolarSystemActivity extends UniverseElementActivity {
             @Override
             public void onClick(View v) {
                 Bundle args = new Bundle();
-                args.putParcelable("au.com.codeka.warworlds.Star", mStar);
+                args.putString("au.com.codeka.warworlds.StarKey", mStar.getKey());
                 DialogManager.getInstance().show(SolarSystemActivity.this, FleetDialog.class, args);
             }
         });
@@ -137,8 +143,6 @@ public class SolarSystemActivity extends UniverseElementActivity {
     @Override
     protected Dialog onCreateDialog(int id) {
         switch(id) {
-        case BuildDialog.ID:
-            return new BuildDialog(this);
         case BuildConfirmDialog.ID:
             return new BuildConfirmDialog(this);
         case FocusDialog.ID:
@@ -171,11 +175,6 @@ public class SolarSystemActivity extends UniverseElementActivity {
             dialog.setColony(mColony);
             break;
         }
-        case BuildDialog.ID: {
-            BuildDialog dialog = (BuildDialog) d;
-            dialog.setColony(mStar, mColony);
-            break;
-        }
         case FocusDialog.ID: {
             FocusDialog dialog = (FocusDialog) d;
             dialog.setColony(mColony);
@@ -198,7 +197,7 @@ public class SolarSystemActivity extends UniverseElementActivity {
     }
 
     private void refreshStar(final int selectedPlanetIndex) {
-        StarManager.requestStar(mSectorX, mSectorY, mStarKey, new StarFetchedHandler() {
+        StarManager.getInstance().requestStar(mStarKey, true, new StarFetchedHandler() {
             @Override
             public void onStarFetched(Star star) {
                 mSolarSystemSurfaceView.setStar(star);

@@ -1,14 +1,13 @@
 package au.com.codeka.warworlds.model;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 public class Colony implements Parcelable {
     private String mKey;
@@ -125,8 +124,10 @@ public class Colony implements Parcelable {
             c.mMineralsDelta = parcel.readFloat();
             c.mLastSimulation = new DateTime(parcel.readLong(), DateTimeZone.UTC);
 
-            Building[] buildings = (Building[]) parcel.readParcelableArray(Building.class.getClassLoader());
-            c.mBuildings = Arrays.asList(buildings);
+            Parcelable[] buildings = parcel.readParcelableArray(Building.class.getClassLoader());
+            for (int i = 0; i < buildings.length; i++) {
+                c.mBuildings.add((Building) buildings[i]);
+            }
 
             return c;
         }

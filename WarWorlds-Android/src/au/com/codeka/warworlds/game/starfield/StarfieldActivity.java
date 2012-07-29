@@ -83,8 +83,8 @@ public class StarfieldActivity extends UniverseElementActivity {
                 mLoadingContainer.setVisibility(View.VISIBLE);
                 mPlanetList.setVisibility(View.GONE);
 
-                StarManager.requestStar(star.getSector().getX(), star.getSector().getY(),
-                        star.getKey(), new StarManager.StarFetchedHandler() {
+                StarManager.getInstance().requestStar(star.getKey(), true,
+                                                      new StarManager.StarFetchedHandler() {
                     /**
                      * This is called on the main thread when the star is actually fetched.
                      */

@@ -19,6 +19,7 @@ import au.com.codeka.warworlds.model.Colony;
 import au.com.codeka.warworlds.model.Fleet;
 import au.com.codeka.warworlds.model.Planet;
 import au.com.codeka.warworlds.model.Star;
+import au.com.codeka.warworlds.model.StarManager;
 
 public class FleetDialog extends Dialog implements DialogManager.DialogConfigurable {
     public static final int ID = 1003;
@@ -42,14 +43,14 @@ public class FleetDialog extends Dialog implements DialogManager.DialogConfigura
 
     @Override
     public void setBundle(final Activity activity, Bundle bundle) {
-        Star star = bundle.getParcelable("au.com.codeka.warworlds.Star");
-        refresh(activity, star);
+        final String starKey = bundle.getString("au.com.codeka.warworlds.StarKey");
+        refresh(activity, starKey);
 
         // when the star in the solar system activity changes, we want to refresh ourselves as well.
         ((SolarSystemActivity) activity).addUpdatedListener(new UniverseElementActivity.OnUpdatedListener() {
             @Override
             public void onStarUpdated(Star star, Planet selectedPlanet, Colony colony) {
-                refresh(activity, star);
+                refresh(activity, starKey);
             }
             @Override
             public void onSectorUpdated() {
@@ -81,11 +82,16 @@ public class FleetDialog extends Dialog implements DialogManager.DialogConfigura
         });
     }
 
-    private void refresh(Activity activity, Star star) {
-        TreeMap<String, Star> stars = new TreeMap<String, Star>();
-        stars.put(star.getKey(), star);
+    private void refresh(final Activity activity, String starKey) {
+        StarManager.getInstance().requestStar(starKey, false, new StarManager.StarFetchedHandler() {
+            @Override
+            public void onStarFetched(Star s) {
+                TreeMap<String, Star> stars = new TreeMap<String, Star>();
+                stars.put(s.getKey(), s);
 
-        final FleetList fleetList = (FleetList) findViewById(R.id.fleet_list);
-        fleetList.refresh(activity, star.getFleets(), stars);
+                final FleetList fleetList = (FleetList) findViewById(R.id.fleet_list);
+                fleetList.refresh(activity, s.getFleets(), stars);
+            }
+        });
     }
 }

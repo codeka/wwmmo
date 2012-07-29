@@ -175,7 +175,13 @@ public class Star implements Parcelable {
             s.mOffsetX = parcel.readInt();
             s.mOffsetY = parcel.readInt();
             s.mNumPlanets = parcel.readInt();
-            s.mPlanets = (Planet[]) parcel.readParcelableArray(Planet.class.getClassLoader());
+
+            Parcelable[] planets = parcel.readParcelableArray(Planet.class.getClassLoader());
+            s.mPlanets = new Planet[planets.length];
+            for (int i = 0; i < planets.length; i++) {
+                s.mPlanets[i] = (Planet) planets[i];
+            }
+
             return s;
         }
 

@@ -1,7 +1,6 @@
 package au.com.codeka.warworlds.model;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -61,9 +60,6 @@ public class MyEmpire extends Empire {
                 try {
                     if (planet.getStar() == null) {
                         log.warn("planet.getStar() returned null!");
-                        return null;
-                    } else if (planet.getStar().getSector() == null) {
-                        log.warn("planet.getStar().getSector() returned null!");
                         return null;
                     }
 
@@ -148,12 +144,22 @@ public class MyEmpire extends Empire {
     protected void readFromParcel(Parcel parcel) {
         super.readFromParcel(parcel);
 
-        mAllFleets = Arrays.asList((Fleet[]) parcel.readParcelableArray(Fleet.class.getClassLoader()));
-        mAllColonies = Arrays.asList((Colony[]) parcel.readParcelableArray(Colony.class.getClassLoader()));
+        Parcelable[] fleets = parcel.readParcelableArray(Fleet.class.getClassLoader());
+        mAllFleets = new ArrayList<Fleet>();
+        for (int i = 0; i < fleets.length; i++) {
+            mAllFleets.add((Fleet) fleets[i]);
+        }
 
-        Star[] stars = (Star[]) parcel.readParcelableArray(Star.class.getClassLoader());
+        Parcelable[] colonies = parcel.readParcelableArray(Colony.class.getClassLoader());
+        mAllColonies = new ArrayList<Colony>();
+        for (int i = 0; i < colonies.length; i++) {
+            mAllColonies.add((Colony) colonies[i]);
+        }
+
+        Parcelable[] stars = parcel.readParcelableArray(Star.class.getClassLoader());
         mStars = new TreeMap<String, Star>();
-        for (Star star : stars) {
+        for (Parcelable p : stars) {
+            Star star = (Star) p;
             mStars.put(star.getKey(), star);
         }
     }
