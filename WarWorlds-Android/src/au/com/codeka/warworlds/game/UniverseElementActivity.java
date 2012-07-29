@@ -5,6 +5,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import android.app.Activity;
 import android.app.Dialog;
 import android.os.Bundle;
+import au.com.codeka.warworlds.DialogManager;
 import au.com.codeka.warworlds.model.Colony;
 import au.com.codeka.warworlds.model.Planet;
 import au.com.codeka.warworlds.model.Star;
@@ -53,19 +54,15 @@ public class UniverseElementActivity extends Activity {
 
     @Override
     protected Dialog onCreateDialog(int id) {
-        switch(id) {
-        case FleetSplitDialog.ID:
-            return new FleetSplitDialog(this);
-        case FleetMoveDialog.ID:
-            return new FleetMoveDialog(this);
-        }
-
-        return super.onCreateDialog(id);
+        Dialog d = DialogManager.getInstance().onCreateDialog(this, id);
+        if (d == null)
+            d = super.onCreateDialog(id);
+        return d;
     }
-
 
     @Override
     protected void onPrepareDialog(int id, Dialog d, Bundle args) {
+        DialogManager.getInstance().onPrepareDialog(id, d, args);
         super.onPrepareDialog(id, d, args);
     }
 

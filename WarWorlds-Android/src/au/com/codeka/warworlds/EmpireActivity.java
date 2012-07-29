@@ -2,6 +2,8 @@ package au.com.codeka.warworlds;
 
 import java.util.HashSet;
 
+import android.app.Dialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -12,6 +14,8 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import au.com.codeka.warworlds.ctrl.ColonyList;
 import au.com.codeka.warworlds.ctrl.FleetList;
+import au.com.codeka.warworlds.game.FleetMoveDialog;
+import au.com.codeka.warworlds.game.FleetSplitDialog;
 import au.com.codeka.warworlds.model.Colony;
 import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.Fleet;
@@ -55,6 +59,14 @@ public class EmpireActivity extends TabFragmentActivity {
         super.onCreate(savedInstanceState);
 
         sCurrentEmpire = null;
+        refresh();
+
+        addTab("Overview", OverviewFragment.class, null);
+        addTab("Colonies", ColoniesFragment.class, null);
+        addTab("Fleets", FleetsFragment.class, null);
+    }
+
+    public void refresh() {
         EmpireManager.getInstance().getEmpire().refreshAllDetails(new MyEmpire.RefreshAllCompleteHandler() {
             @Override
             public void onRefreshAllComplete(MyEmpire empire) {
@@ -62,10 +74,20 @@ public class EmpireActivity extends TabFragmentActivity {
                 reloadTab();
             }
         });
+    }
 
-        addTab("Overview", OverviewFragment.class, null);
-        addTab("Colonies", ColoniesFragment.class, null);
-        addTab("Fleets", FleetsFragment.class, null);
+    @Override
+    protected Dialog onCreateDialog(int id) {
+        Dialog d = DialogManager.getInstance().onCreateDialog(this, id);
+        if (d == null)
+            d = super.onCreateDialog(id);
+        return d;
+    }
+
+    @Override
+    protected void onPrepareDialog(int id, Dialog d, Bundle args) {
+        DialogManager.getInstance().onPrepareDialog(id, d, args);
+        super.onPrepareDialog(id, d, args);
     }
 
     public static class BaseFragment extends Fragment {
@@ -153,6 +175,29 @@ public class EmpireActivity extends TabFragmentActivity {
             View v = inflator.inflate(R.layout.empire_fleets_tab, null);
             FleetList fleetList = (FleetList) v.findViewById(R.id.fleet_list);
             fleetList.refresh(getActivity(), sCurrentEmpire.getAllFleets(), sCurrentEmpire.getImportantStars());
+
+            fleetList.setOnFleetActionListener(new FleetList.OnFleetActionListener() {
+                @Override
+                public void onFleetSplit(Star star, Fleet fleet) {
+                    Bundle args = new Bundle();
+                    args.putParcelable("au.com.codeka.warworlds.Fleet", fleet);
+                    DialogManager.getInstance().show(getActivity(), FleetSplitDialog.class, args,
+                            new DialogInterface.OnDismissListener() {
+                                @Override
+                                public void onDismiss(DialogInterface dialog) {
+                                    ((EmpireActivity) getActivity()).refresh();
+                                }
+                            });
+                }
+
+                @Override
+                public void onFleetMove(Star star, Fleet fleet) {
+                    Bundle args = new Bundle();
+                    args.putString("au.com.codeka.warworlds.StarKey", fleet.getStarKey());
+                    args.putString("au.com.codeka.warworlds.FleetKey", fleet.getKey());
+                    DialogManager.getInstance().show(getActivity(), FleetMoveDialog.class, args);
+                }
+            });
 
             return v;
         }

@@ -12,7 +12,6 @@ import android.widget.TextView;
 import au.com.codeka.Point2D;
 import au.com.codeka.RomanNumeralFormatter;
 import au.com.codeka.warworlds.R;
-import au.com.codeka.warworlds.game.FleetSplitDialog;
 import au.com.codeka.warworlds.game.UniverseElementActivity;
 import au.com.codeka.warworlds.model.BuildingDesignManager;
 import au.com.codeka.warworlds.model.Colony;
@@ -21,7 +20,6 @@ import au.com.codeka.warworlds.model.Design.DesignKind;
 import au.com.codeka.warworlds.model.Empire;
 import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.EmpirePresence;
-import au.com.codeka.warworlds.model.Fleet;
 import au.com.codeka.warworlds.model.MyEmpire;
 import au.com.codeka.warworlds.model.Planet;
 import au.com.codeka.warworlds.model.ShipDesignManager;
@@ -185,17 +183,6 @@ public class SolarSystemActivity extends UniverseElementActivity {
         case FleetDialog.ID: {
             FleetDialog dialog = (FleetDialog) d;
             dialog.setStar(mStar);
-            break;
-        }
-        case FleetSplitDialog.ID: {
-            FleetSplitDialog dialog = (FleetSplitDialog) d;
-
-            String fleetKey = args.getString("au.com.codeka.warworlds.FleetKey");
-            for (Fleet f : mStar.getFleets()) {
-                if (f.getKey().equals(fleetKey)) {
-                    dialog.setFleet(f);
-                }
-            }
             break;
         }
         }

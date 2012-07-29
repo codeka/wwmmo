@@ -1,5 +1,6 @@
 package au.com.codeka.warworlds.game;
 
+import android.app.Activity;
 import android.app.Dialog;
 import android.os.Bundle;
 import android.view.Window;
@@ -14,14 +15,12 @@ import au.com.codeka.warworlds.model.Star;
 public class FleetMoveDialog extends Dialog {
     private Fleet mFleet;
     private Star mSourceStar;
-    private UniverseElementActivity mActivity;
     private StarfieldSurfaceView mStarfield;
 
     public static final int ID = 1008;
 
-    public FleetMoveDialog(UniverseElementActivity activity) {
+    public FleetMoveDialog(Activity activity) {
         super(activity);
-        mActivity = activity;
     }
 
     @Override

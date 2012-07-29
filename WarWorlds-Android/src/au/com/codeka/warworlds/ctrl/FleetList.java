@@ -9,7 +9,6 @@ import java.util.Map;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.os.Bundle;
 import android.util.AttributeSet;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -23,14 +22,9 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import au.com.codeka.warworlds.R;
-import au.com.codeka.warworlds.game.FleetMoveDialog;
-import au.com.codeka.warworlds.game.FleetSplitDialog;
-import au.com.codeka.warworlds.game.UniverseElementActivity;
-import au.com.codeka.warworlds.model.Colony;
 import au.com.codeka.warworlds.model.DesignManager;
 import au.com.codeka.warworlds.model.Fleet;
 import au.com.codeka.warworlds.model.ImageManager;
-import au.com.codeka.warworlds.model.Planet;
 import au.com.codeka.warworlds.model.ShipDesign;
 import au.com.codeka.warworlds.model.ShipDesignManager;
 import au.com.codeka.warworlds.model.Star;
@@ -47,12 +41,17 @@ public class FleetList extends FrameLayout {
     private Map<String, Star> mStars;
     private Activity mActivity;
     private boolean mIsInitialized;
+    private OnFleetActionListener mFleetActionListener;
 
     public FleetList(Context context, AttributeSet attrs) {
         super(context, attrs);
 
         View child = inflate(context, R.layout.fleet_list_ctrl, null);
         this.addView(child);
+    }
+
+    public void setOnFleetActionListener(OnFleetActionListener listener) {
+        mFleetActionListener = listener;
     }
 
     public void refresh(Activity activity, List<Fleet> fleets,
@@ -100,19 +99,6 @@ public class FleetList extends FrameLayout {
             }
         });
 
-        if (mActivity instanceof UniverseElementActivity) {
-            // TODO: will this ever be true??
-            ((UniverseElementActivity) mActivity).addUpdatedListener(new UniverseElementActivity.OnUpdatedListener() {
-                @Override
-                public void onStarUpdated(Star star, Planet selectedPlanet, Colony colony) {
-                    refresh(mActivity, star.getFleets(), mStars);
-                }
-                @Override
-                public void onSectorUpdated() {
-                }
-            });
-        }
-
         fleetList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view,
@@ -130,15 +116,10 @@ public class FleetList extends FrameLayout {
         splitBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Bundle args = new Bundle();
-                Star star = mStars.get(mSelectedFleet.getStarKey());
-                args.putLong("au.com.codeka.warworlds.SectorX", star.getSectorX());
-                args.putLong("au.com.codeka.warworlds.SectorY", star.getSectorY());
-                args.putInt("au.com.codeka.warworlds.OffsetX", star.getOffsetX());
-                args.putInt("au.com.codeka.warworlds.OffsetY", star.getOffsetY());
-                args.putString("au.com.codeka.warworlds.StarKey", mSelectedFleet.getStarKey());
-                args.putString("au.com.codeka.warworlds.FleetKey", mSelectedFleet.getKey());
-                mActivity.showDialog(FleetSplitDialog.ID, args);
+                if (mFleetActionListener != null) {
+                    mFleetActionListener.onFleetSplit(mStars.get(mSelectedFleet.getStarKey()),
+                                                      mSelectedFleet);
+                }
             }
         });
 
@@ -146,10 +127,10 @@ public class FleetList extends FrameLayout {
         moveBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Bundle args = new Bundle();
-                args.putString("au.com.codeka.warworlds.StarKey", mSelectedFleet.getStarKey());
-                args.putString("au.com.codeka.warworlds.FleetKey", mSelectedFleet.getKey());
-                mActivity.showDialog(FleetMoveDialog.ID, args);
+                if (mFleetActionListener != null) {
+                    mFleetActionListener.onFleetMove(mStars.get(mSelectedFleet.getStarKey()),
+                                                     mSelectedFleet);
+                }
             }
         });
     }
@@ -326,5 +307,10 @@ public class FleetList extends FrameLayout {
                 this.bitmap = null;
             }
         }
+    }
+
+    public interface OnFleetActionListener {
+        void onFleetSplit(Star star, Fleet fleet);
+        void onFleetMove(Star star, Fleet fleet);
     }
 }

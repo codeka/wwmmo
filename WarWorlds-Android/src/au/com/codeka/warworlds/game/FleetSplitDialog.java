@@ -1,6 +1,7 @@
 package au.com.codeka.warworlds.game;
 
 import warworlds.Warworlds.FleetOrder;
+import android.app.Activity;
 import android.app.Dialog;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -9,21 +10,20 @@ import android.view.Window;
 import android.widget.Button;
 import android.widget.SeekBar;
 import android.widget.TextView;
+import au.com.codeka.warworlds.DialogManager;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.api.ApiClient;
 import au.com.codeka.warworlds.api.ApiException;
 import au.com.codeka.warworlds.ctrl.FleetList;
 import au.com.codeka.warworlds.model.Fleet;
 
-public class FleetSplitDialog extends Dialog {
+public class FleetSplitDialog extends Dialog implements DialogManager.DialogConfigurable {
     private Fleet mFleet;
-    private UniverseElementActivity mActivity;
 
     public static final int ID = 1004;
 
-    public FleetSplitDialog(UniverseElementActivity activity) {
+    public FleetSplitDialog(Activity activity) {
         super(activity);
-        mActivity = activity;
     }
 
     @Override
@@ -65,7 +65,6 @@ public class FleetSplitDialog extends Dialog {
                     protected void onPostExecute(Boolean success) {
                         splitBtn.setEnabled(true);
                         if (success) {
-                            mActivity.refresh();
                             dismiss();
                         }
                     }
@@ -119,20 +118,21 @@ public class FleetSplitDialog extends Dialog {
         });
     }
 
-    public void setFleet(Fleet fleet) {
-        mFleet = fleet;
+    @Override
+    public void setBundle(Bundle bundle) {
+        mFleet = (Fleet) bundle.getParcelable("au.com.codeka.warworlds.Fleet");
 
         View fleetView = findViewById(R.id.fleet);
-        FleetList.populateFleetRow(fleetView, fleet);
+        FleetList.populateFleetRow(fleetView, mFleet);
 
         SeekBar splitRatio = (SeekBar) findViewById(R.id.split_ratio);
-        splitRatio.setMax(fleet.getNumShips());
-        splitRatio.setProgress(fleet.getNumShips() / 2);
+        splitRatio.setMax(mFleet.getNumShips());
+        splitRatio.setProgress(mFleet.getNumShips() / 2);
 
         TextView splitLeft = (TextView) findViewById(R.id.split_left);
-        splitLeft.setText(Integer.toString(fleet.getNumShips() / 2));
+        splitLeft.setText(Integer.toString(mFleet.getNumShips() / 2));
 
         TextView splitRight = (TextView) findViewById(R.id.split_right);
-        splitRight.setText(Integer.toString(fleet.getNumShips() - (fleet.getNumShips() / 2)));
+        splitRight.setText(Integer.toString(mFleet.getNumShips() - (mFleet.getNumShips() / 2)));
     }
 }
