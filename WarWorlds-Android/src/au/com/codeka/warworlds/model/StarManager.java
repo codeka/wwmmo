@@ -1,7 +1,10 @@
 package au.com.codeka.warworlds.model;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.TreeMap;
 
+import org.apache.commons.collections.IteratorUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,16 +20,63 @@ public class StarManager {
 
     private static final Logger log = LoggerFactory.getLogger(StarManager.class);
     private TreeMap<String, Star> mStars;
+    private TreeMap<String, List<StarFetchedHandler>> mStarUpdatedListeners;
 
     private StarManager() {
         mStars = new TreeMap<String, Star>();
+        mStarUpdatedListeners = new TreeMap<String, List<StarFetchedHandler>>();
+    }
+
+    /**
+     * Call this to register your interest in when a particular star is updated. Any time that
+     * star is re-fetched from the server, your \c StarFetchedHandler will be called.
+     */
+    public void addStarUpdatedListener(String starKey, StarFetchedHandler handler) {
+        synchronized(mStarUpdatedListeners) {
+            List<StarFetchedHandler> listeners = mStarUpdatedListeners.get(starKey);
+            if (listeners == null) {
+                listeners = new ArrayList<StarFetchedHandler>();
+                mStarUpdatedListeners.put(starKey, listeners);
+            }
+            listeners.add(handler);
+        }
+    }
+
+    /**
+     * Removes the given \c StarFetchedHandler from receiving updates about refreshed stars.
+     */
+    public void removeStarUpdatedListener(StarFetchedHandler handler) {
+        synchronized(mStarUpdatedListeners) {
+            for (Object o : IteratorUtils.toList(mStarUpdatedListeners.keySet().iterator())) {
+                String starKey = (String) o;
+
+                List<StarFetchedHandler> listeners = mStarUpdatedListeners.get(starKey);
+                listeners.remove(handler);
+
+                if (listeners.isEmpty()) {
+                    mStarUpdatedListeners.remove(starKey);
+                }
+            }
+        }
+    }
+
+    protected void fireStarUpdated(Star star) {
+        synchronized(mStarUpdatedListeners) {
+            List<StarFetchedHandler> listeners = mStarUpdatedListeners.get(star.getKey());
+            if (listeners != null) {
+                for (StarFetchedHandler handler : listeners) {
+                    handler.onStarFetched(star);
+                }
+            }
+        }
     }
 
     public void refreshStar(Star s) {
         refreshStar(s.getKey());
     }
+
     public void refreshStar(String starKey) {
-        mStars.remove(starKey);
+        requestStar(starKey, true, null);
     }
 
     /**
@@ -69,6 +119,7 @@ public class StarManager {
                 if (callback != null) {
                     callback.onStarFetched(star);
                 }
+                fireStarUpdated(star);
             }
         }.execute();
     }

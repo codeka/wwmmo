@@ -44,7 +44,6 @@ public class WarWorldsActivity extends Activity {
 
     private static final int OPTIONS_DIALOG = 1000;
 
-    @SuppressLint({ "NewApi" }) // StrictMode doesn't work on < 3.0
     @Override
     public void onCreate(Bundle savedInstanceState) {
         log.info("WarWorlds activity starting...");
@@ -55,12 +54,7 @@ public class WarWorldsActivity extends Activity {
         Authenticator.configure(mContext);
 
         if (Util.isDebug()) {
-            StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
-                                       .detectDiskReads()
-                                       .detectDiskWrites()
-                                       .detectNetwork()
-                                       .penaltyLog()
-                                       .build());
+            enableStrictMode();
         }
 
         mHandler = new Handler();
@@ -68,6 +62,20 @@ public class WarWorldsActivity extends Activity {
         requestWindowFeature(Window.FEATURE_NO_TITLE); // remove the title bar
         setHomeScreenContent();
         mNeedHello = true;
+    }
+
+    @SuppressLint({ "NewApi" }) // StrictMode doesn't work on < 3.0
+    private void enableStrictMode() {
+        try {
+            StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
+                      .detectDiskReads()
+                      .detectDiskWrites()
+                      .detectNetwork()
+                      .penaltyLog()
+                      .build());
+        } catch(Exception e) {
+            // ignore errors
+        }
     }
 
     @Override
