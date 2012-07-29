@@ -2,6 +2,7 @@ package au.com.codeka.warworlds.game.starfield;
 
 import java.util.List;
 
+import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
@@ -21,7 +22,6 @@ import android.widget.TextView;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.game.EmpireActivity;
 import au.com.codeka.warworlds.game.FleetMoveDialog;
-import au.com.codeka.warworlds.game.UniverseElementActivity;
 import au.com.codeka.warworlds.game.solarsystem.SolarSystemActivity;
 import au.com.codeka.warworlds.model.Colony;
 import au.com.codeka.warworlds.model.Empire;
@@ -38,7 +38,7 @@ import au.com.codeka.warworlds.model.StarManager;
  * The \c StarfieldActivity is the "home" screen of the game, and displays the
  * starfield where you scroll around and interact with stars, etc.
  */
-public class StarfieldActivity extends UniverseElementActivity {
+public class StarfieldActivity extends Activity {
     private Context mContext = this;
     private StarfieldSurfaceView mStarfield;
     private TextView mUsername;

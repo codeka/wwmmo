@@ -89,6 +89,9 @@ public class MyEmpire extends Empire {
                 if (callback != null) {
                     callback.onColonizeComplete(colony);
                 }
+
+                // make sure we record the fact that the star is updated as well
+                StarManager.getInstance().refreshStar(colony.getStarKey());
             }
         }.execute();
     }

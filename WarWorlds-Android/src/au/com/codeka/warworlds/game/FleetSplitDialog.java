@@ -16,6 +16,7 @@ import au.com.codeka.warworlds.api.ApiClient;
 import au.com.codeka.warworlds.api.ApiException;
 import au.com.codeka.warworlds.ctrl.FleetList;
 import au.com.codeka.warworlds.model.Fleet;
+import au.com.codeka.warworlds.model.StarManager;
 
 public class FleetSplitDialog extends Dialog implements DialogManager.DialogConfigurable {
     private Fleet mFleet;
@@ -63,6 +64,8 @@ public class FleetSplitDialog extends Dialog implements DialogManager.DialogConf
 
                     @Override
                     protected void onPostExecute(Boolean success) {
+                        // the star this fleet is attached to needs to be refreshed...
+                        StarManager.getInstance().refreshStar(mFleet.getStarKey());
                         splitBtn.setEnabled(true);
                         if (success) {
                             dismiss();

@@ -4,7 +4,6 @@ import java.util.TreeMap;
 
 import android.app.Activity;
 import android.app.Dialog;
-import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.ViewGroup.LayoutParams;
 import android.view.Window;
@@ -14,14 +13,12 @@ import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.ctrl.FleetList;
 import au.com.codeka.warworlds.game.FleetMoveDialog;
 import au.com.codeka.warworlds.game.FleetSplitDialog;
-import au.com.codeka.warworlds.game.UniverseElementActivity;
-import au.com.codeka.warworlds.model.Colony;
 import au.com.codeka.warworlds.model.Fleet;
-import au.com.codeka.warworlds.model.Planet;
 import au.com.codeka.warworlds.model.Star;
 import au.com.codeka.warworlds.model.StarManager;
 
-public class FleetDialog extends Dialog implements DialogManager.DialogConfigurable {
+public class FleetDialog extends Dialog implements DialogManager.DialogConfigurable,
+                                                   StarManager.StarFetchedHandler{
     public static final int ID = 1003;
 
     public FleetDialog(Activity activity) {
@@ -39,23 +36,20 @@ public class FleetDialog extends Dialog implements DialogManager.DialogConfigura
         params.height = LayoutParams.MATCH_PARENT;
         params.width = LayoutParams.MATCH_PARENT;
         getWindow().setAttributes(params);
+
+    }
+
+    @Override
+    public void onStop() {
+        StarManager.getInstance().removeStarUpdatedListener(this);
     }
 
     @Override
     public void setBundle(final Activity activity, Bundle bundle) {
         final String starKey = bundle.getString("au.com.codeka.warworlds.StarKey");
-        refresh(activity, starKey);
 
-        // when the star in the solar system activity changes, we want to refresh ourselves as well.
-        ((SolarSystemActivity) activity).addUpdatedListener(new UniverseElementActivity.OnUpdatedListener() {
-            @Override
-            public void onStarUpdated(Star star, Planet selectedPlanet, Colony colony) {
-                refresh(activity, starKey);
-            }
-            @Override
-            public void onSectorUpdated() {
-            }
-        });
+        StarManager.getInstance().requestStar(starKey, false, this);
+        StarManager.getInstance().addStarUpdatedListener(starKey, this);
 
         final FleetList fleetList = (FleetList) findViewById(R.id.fleet_list);
         fleetList.setOnFleetActionListener(new FleetList.OnFleetActionListener() {
@@ -63,13 +57,7 @@ public class FleetDialog extends Dialog implements DialogManager.DialogConfigura
             public void onFleetSplit(Star star, Fleet fleet) {
                 Bundle args = new Bundle();
                 args.putParcelable("au.com.codeka.warworlds.Fleet", fleet);
-                DialogManager.getInstance().show(activity, FleetSplitDialog.class, args,
-                        new DialogInterface.OnDismissListener() {
-                            @Override
-                            public void onDismiss(DialogInterface dialog) {
-                                ((SolarSystemActivity) activity).refresh();
-                            }
-                        });
+                DialogManager.getInstance().show(activity, FleetSplitDialog.class, args);
             }
 
             @Override
@@ -82,16 +70,12 @@ public class FleetDialog extends Dialog implements DialogManager.DialogConfigura
         });
     }
 
-    private void refresh(final Activity activity, String starKey) {
-        StarManager.getInstance().requestStar(starKey, false, new StarManager.StarFetchedHandler() {
-            @Override
-            public void onStarFetched(Star s) {
-                TreeMap<String, Star> stars = new TreeMap<String, Star>();
-                stars.put(s.getKey(), s);
+    @Override
+    public void onStarFetched(Star s) {
+        TreeMap<String, Star> stars = new TreeMap<String, Star>();
+        stars.put(s.getKey(), s);
 
-                final FleetList fleetList = (FleetList) findViewById(R.id.fleet_list);
-                fleetList.refresh(activity, s.getFleets(), stars);
-            }
-        });
+        final FleetList fleetList = (FleetList) findViewById(R.id.fleet_list);
+        fleetList.refresh(getOwnerActivity(), s.getFleets(), stars);
     }
 }

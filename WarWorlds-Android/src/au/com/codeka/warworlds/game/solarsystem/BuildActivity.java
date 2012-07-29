@@ -42,7 +42,7 @@ import au.com.codeka.warworlds.model.StarManager;
  * When you click "Build" shows you the list of buildings/ships that are/can be built by your
  * colony.
  */
-public class BuildActivity extends TabFragmentActivity {
+public class BuildActivity extends TabFragmentActivity implements StarManager.StarFetchedHandler {
     private Star mStar;
     private Colony mColony;
 
@@ -54,24 +54,34 @@ public class BuildActivity extends TabFragmentActivity {
         String starKey = extras.getString("au.com.codeka.warworlds.StarKey");
         mColony = (Colony) extras.getParcelable("au.com.codeka.warworlds.Colony");
 
-        StarManager.getInstance().requestStar(starKey, false, new StarManager.StarFetchedHandler() {
-            @Override
-            public void onStarFetched(Star s) {
-                mStar = s;
-                reloadTab();
-            }
-        });
+        StarManager.getInstance().requestStar(starKey, false, this);
+        StarManager.getInstance().addStarUpdatedListener(starKey, this);
 
         addTab("Buildings", BuildingsFragment.class, null);
         addTab("Ships", ShipsFragment.class, null);
         addTab("Queue", QueueFragment.class, null);
     }
 
+    public void onDestroy() {
+        StarManager.getInstance().removeStarUpdatedListener(this);
+    }
+
+    /**
+     * Called when our star is refreshed/updated. We want to reload the current tab.
+     */
+    @Override
+    public void onStarFetched(Star s) {
+        mStar = s;
+        reloadTab();
+    }
+
     @Override
     protected Dialog onCreateDialog(int id) {
         Dialog d = DialogManager.getInstance().onCreateDialog(this, id);
-        if (d == null)
+        if (d == null) {
             d = super.onCreateDialog(id);
+        }
+
         return d;
     }
 
@@ -109,7 +119,6 @@ public class BuildActivity extends TabFragmentActivity {
                     }
                 }
             });
-
 
             buildingsList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override

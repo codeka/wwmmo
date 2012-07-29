@@ -1,5 +1,6 @@
 package au.com.codeka.warworlds.game.solarsystem;
 
+import android.app.Activity;
 import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
@@ -13,7 +14,6 @@ import au.com.codeka.Point2D;
 import au.com.codeka.RomanNumeralFormatter;
 import au.com.codeka.warworlds.DialogManager;
 import au.com.codeka.warworlds.R;
-import au.com.codeka.warworlds.game.UniverseElementActivity;
 import au.com.codeka.warworlds.model.Colony;
 import au.com.codeka.warworlds.model.Empire;
 import au.com.codeka.warworlds.model.EmpireManager;
@@ -22,16 +22,12 @@ import au.com.codeka.warworlds.model.MyEmpire;
 import au.com.codeka.warworlds.model.Planet;
 import au.com.codeka.warworlds.model.Star;
 import au.com.codeka.warworlds.model.StarManager;
-import au.com.codeka.warworlds.model.StarManager.StarFetchedHandler;
 
 /**
  * This activity is displayed when you're actually looking at a solar system (star + planets)
  */
-public class SolarSystemActivity extends UniverseElementActivity {
+public class SolarSystemActivity extends Activity implements StarManager.StarFetchedHandler {
     private SolarSystemSurfaceView mSolarSystemSurfaceView;
-    private long mSectorX;
-    private long mSectorY;
-    private String mStarKey;
     private boolean mIsSectorUpdated;
     private Star mStar;
     private Planet mPlanet;
@@ -58,6 +54,12 @@ public class SolarSystemActivity extends UniverseElementActivity {
         EmpireManager empireManager = EmpireManager.getInstance();
         username.setText(empireManager.getEmpire().getDisplayName());
         congenialityContainer.setVisibility(View.GONE);
+
+        Bundle extras = getIntent().getExtras();
+        String starKey = extras.getString("au.com.codeka.warworlds.StarKey");
+
+        StarManager.getInstance().requestStar(starKey, true, this);
+        StarManager.getInstance().addStarUpdatedListener(starKey, this);
 
         mSolarSystemSurfaceView.addPlanetSelectedListener(
                 new SolarSystemSurfaceView.OnPlanetSelectedListener() {
@@ -89,7 +91,11 @@ public class SolarSystemActivity extends UniverseElementActivity {
         focusButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                showDialog(FocusDialog.ID);
+                Bundle args = new Bundle();
+                args.putString("au.com.codeka.warworlds.StarKey", mStar.getKey());
+                args.putParcelable("au.com.codeka.warworlds.Colony", mColony);
+
+                DialogManager.getInstance().show(SolarSystemActivity.this, FocusDialog.class, args);
             }
         });
 
@@ -104,33 +110,69 @@ public class SolarSystemActivity extends UniverseElementActivity {
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
-
-        mStarKey = null;
-        mIsSectorUpdated = false;;
-        mStar = null;
-        mPlanet = null;
-        mColony = null;
-
-        Bundle extras = getIntent().getExtras();
-        if (extras != null) {
-            mSectorX = extras.getLong("au.com.codeka.warworlds.SectorX");
-            mSectorY = extras.getLong("au.com.codeka.warworlds.SectorY");
-            mStarKey = extras.getString("au.com.codeka.warworlds.StarKey");
-            int selectedPlanetIndex = extras.getInt("au.com.codeka.warworlds.PlanetIndex");
-
-            refreshStar(selectedPlanetIndex);
+    public void onStarFetched(Star star) {
+        // if we don't have a star yet, we'll need to figure out which planet to select
+        // initially from the intent that started us. Otherwise, we'll want to select
+        // whatever planet we have currently
+        int selectedPlanetIndex;
+        if (mStar == null) {
+            Bundle extras = getIntent().getExtras();
+            selectedPlanetIndex = extras.getInt("au.com.codeka.warworlds.PlanetIndex");
+        } else if (mPlanet != null) {
+            selectedPlanetIndex = mPlanet.getIndex();
+        } else {
+            selectedPlanetIndex = -1;
         }
+
+        mSolarSystemSurfaceView.setStar(star);
+        if (selectedPlanetIndex >= 0) {
+            mSolarSystemSurfaceView.selectPlanet(selectedPlanetIndex);
+        } else {
+            mSolarSystemSurfaceView.redraw();
+        }
+
+        Planet planet = null;
+        if (selectedPlanetIndex >= 0) {
+            for (Planet p : star.getPlanets()) {
+                if (p.getIndex() == selectedPlanetIndex) {
+                    planet = p;
+                    break;
+                }
+            }
+        }
+
+        TextView storedGoodsTextView = (TextView) findViewById(R.id.stored_goods);
+        View storedGoodsIcon = findViewById(R.id.stored_goods_icon);
+        TextView storedMineralsTextView = (TextView) findViewById(R.id.stored_minerals);
+        View storedMineralsIcon = findViewById(R.id.stored_minerals_icon);
+
+        EmpirePresence ep = star.getEmpire(EmpireManager.getInstance().getEmpire().getKey());
+        if (ep == null) {
+            storedGoodsTextView.setVisibility(View.GONE);
+            storedGoodsIcon.setVisibility(View.GONE);
+            storedMineralsTextView.setVisibility(View.GONE);
+            storedMineralsIcon.setVisibility(View.GONE);
+        } else {
+            storedGoodsTextView.setVisibility(View.VISIBLE);
+            storedGoodsIcon.setVisibility(View.VISIBLE);
+            storedMineralsTextView.setVisibility(View.VISIBLE);
+            storedMineralsIcon.setVisibility(View.VISIBLE);
+
+            storedGoodsTextView.setText(Integer.toString((int) ep.getTotalGoods()));
+            storedMineralsTextView.setText(Integer.toString((int) ep.getTotalMinerals()));
+        }
+
+        mStar = star;
+        mPlanet = planet;
     }
 
     @Override
     public void onBackPressed() {
         Intent intent = new Intent();
         intent.putExtra("au.com.codeka.warworlds.SectorUpdated", mIsSectorUpdated);
-        intent.putExtra("au.com.codeka.warworlds.SectorX", mSectorX);
-        intent.putExtra("au.com.codeka.warworlds.SectorY", mSectorY);
-        intent.putExtra("au.com.codeka.warworlds.StarKey", mStarKey);
+        intent.putExtra("au.com.codeka.warworlds.SectorX", mStar.getSectorX());
+        intent.putExtra("au.com.codeka.warworlds.SectorY", mStar.getSectorY());
+        intent.putExtra("au.com.codeka.warworlds.StarKey", mStar.getKey());
         setResult(RESULT_OK, intent);
 
         super.onBackPressed();
@@ -148,67 +190,6 @@ public class SolarSystemActivity extends UniverseElementActivity {
     protected void onPrepareDialog(int id, Dialog d, Bundle args) {
         DialogManager.getInstance().onPrepareDialog(this, id, d, args);
         super.onPrepareDialog(id, d, args);
-    }
-
-    @Override
-    public void refresh() {
-        int selectedPlanetIndex = -1;
-        Planet selectedPlanet = mSolarSystemSurfaceView.getSelectedPlanet();
-        if (selectedPlanet != null) {
-            selectedPlanetIndex = selectedPlanet.getIndex();
-        }
-
-        refreshStar(selectedPlanetIndex);
-    }
-
-    private void refreshStar(final int selectedPlanetIndex) {
-        StarManager.getInstance().requestStar(mStarKey, true, new StarFetchedHandler() {
-            @Override
-            public void onStarFetched(Star star) {
-                mSolarSystemSurfaceView.setStar(star);
-                if (selectedPlanetIndex >= 0) {
-                    mSolarSystemSurfaceView.selectPlanet(selectedPlanetIndex);
-                } else {
-                    mSolarSystemSurfaceView.redraw();
-                }
-
-                Planet planet = null;
-                if (selectedPlanetIndex >= 0) {
-                    for (Planet p : star.getPlanets()) {
-                        if (p.getIndex() == selectedPlanetIndex) {
-                            planet = p;
-                            break;
-                        }
-                    }
-                }
-
-                TextView storedGoodsTextView = (TextView) findViewById(R.id.stored_goods);
-                View storedGoodsIcon = findViewById(R.id.stored_goods_icon);
-                TextView storedMineralsTextView = (TextView) findViewById(R.id.stored_minerals);
-                View storedMineralsIcon = findViewById(R.id.stored_minerals_icon);
-
-                EmpirePresence ep = star.getEmpire(EmpireManager.getInstance().getEmpire().getKey());
-                if (ep == null) {
-                    storedGoodsTextView.setVisibility(View.GONE);
-                    storedGoodsIcon.setVisibility(View.GONE);
-                    storedMineralsTextView.setVisibility(View.GONE);
-                    storedMineralsIcon.setVisibility(View.GONE);
-                } else {
-                    storedGoodsTextView.setVisibility(View.VISIBLE);
-                    storedGoodsIcon.setVisibility(View.VISIBLE);
-                    storedMineralsTextView.setVisibility(View.VISIBLE);
-                    storedMineralsIcon.setVisibility(View.VISIBLE);
-
-                    storedGoodsTextView.setText(Integer.toString((int) ep.getTotalGoods()));
-                    storedMineralsTextView.setText(Integer.toString((int) ep.getTotalMinerals()));
-                }
-
-                mStar = star;
-                mPlanet = planet;
-
-                fireStarUpdated(mStar, mPlanet, mColony);
-            }
-        });
     }
 
     private void refreshSelectedPlanet() {
@@ -360,9 +341,6 @@ public class SolarSystemActivity extends UniverseElementActivity {
         EmpireManager.getInstance().getEmpire().colonize(planet, new MyEmpire.ColonizeCompleteHandler() {
             @Override
             public void onColonizeComplete(Colony colony) {
-                // refresh this page
-                refresh();
-
                 // remember that the sector we're in has now been updated so we can pass that
                 // back to the StarfieldActivity
                 mIsSectorUpdated = true;

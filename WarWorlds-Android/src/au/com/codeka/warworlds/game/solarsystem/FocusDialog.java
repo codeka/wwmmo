@@ -6,29 +6,30 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import android.app.Activity;
+import android.app.Dialog;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.SeekBar;
+import au.com.codeka.warworlds.DialogManager;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.api.ApiClient;
 import au.com.codeka.warworlds.api.ApiException;
-import au.com.codeka.warworlds.game.UniverseElementDialog;
 import au.com.codeka.warworlds.model.Colony;
+import au.com.codeka.warworlds.model.StarManager;
 
-public class FocusDialog extends UniverseElementDialog {
+public class FocusDialog extends Dialog implements DialogManager.DialogConfigurable {
     private static Logger log = LoggerFactory.getLogger(FocusDialog.class);
-    private SolarSystemActivity mActivity;
     private Colony mColony;
     private List<SeekBar> mSeekBars;
 
     public static final int ID = 1002;
 
-    public FocusDialog(SolarSystemActivity activity) {
+    public FocusDialog(Activity activity) {
         super(activity);
-        mActivity = activity;
     }
 
     @Override
@@ -97,27 +98,15 @@ public class FocusDialog extends UniverseElementDialog {
                     }
                     @Override
                     protected void onPostExecute(Void unused) {
+                        // notify the StarManager that this star has been updated
+                        StarManager.getInstance().refreshStar(mColony.getStarKey());
+
                         okButton.setEnabled(true);
                         dismiss();
-
-                        mActivity.refresh();
                     }
                 }.execute();
             }
         });
-    }
-
-    public void setColony(Colony colony) {
-        mColony = colony;
-
-        SeekBar populationFocus = (SeekBar) findViewById(R.id.solarsystem_colony_population_focus);
-        populationFocus.setProgress((int)(mColony.getPopulationFocus() * 100.0));
-        SeekBar farmingFocus = (SeekBar) findViewById(R.id.solarsystem_colony_farming_focus);
-        farmingFocus.setProgress((int)(mColony.getFarmingFocus() * 100.0));
-        SeekBar miningFocus = (SeekBar) findViewById(R.id.solarsystem_colony_mining_focus);
-        miningFocus.setProgress((int)(mColony.getMiningFocus() * 100.0));
-        SeekBar constructionFocus = (SeekBar) findViewById(R.id.solarsystem_colony_construction_focus);
-        constructionFocus.setProgress((int)(mColony.getConstructionFocus() * 100.0));
     }
 
     private void redistribute(SeekBar changedSeekBar, double newValue) {
@@ -138,5 +127,20 @@ public class FocusDialog extends UniverseElementDialog {
                 continue;
             seekBar.setProgress((int)(seekBar.getProgress() / ratio));
         }
+    }
+
+    @Override
+    public void setBundle(Activity activity, Bundle bundle) {
+        mColony = (Colony) bundle.getParcelable("au.com.codeka.warworlds.Colony");
+
+        SeekBar populationFocus = (SeekBar) findViewById(R.id.solarsystem_colony_population_focus);
+        populationFocus.setProgress((int)(mColony.getPopulationFocus() * 100.0));
+        SeekBar farmingFocus = (SeekBar) findViewById(R.id.solarsystem_colony_farming_focus);
+        farmingFocus.setProgress((int)(mColony.getFarmingFocus() * 100.0));
+        SeekBar miningFocus = (SeekBar) findViewById(R.id.solarsystem_colony_mining_focus);
+        miningFocus.setProgress((int)(mColony.getMiningFocus() * 100.0));
+        SeekBar constructionFocus = (SeekBar) findViewById(R.id.solarsystem_colony_construction_focus);
+        constructionFocus.setProgress((int)(mColony.getConstructionFocus() * 100.0));
+
     }
 }
