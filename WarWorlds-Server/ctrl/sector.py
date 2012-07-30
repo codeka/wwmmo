@@ -46,13 +46,14 @@ def getSectors(coords):
   return sectors_pb
 
 
-def getStar(star_key):
+def getStar(star_key, force_nocache=False):
   """Gets a star, given it's key."""
 
   cache_key = "star:%s" % (star_key)
-  values = ctrl.getCached([cache_key], pb.Star)
-  if cache_key in values:
-    return values[cache_key]
+  if not force_nocache:
+    values = ctrl.getCached([cache_key], pb.Star)
+    if cache_key in values:
+      return values[cache_key]
 
   star_model = mdl.Star.get(star_key)
   if star_model is None:

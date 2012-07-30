@@ -125,6 +125,7 @@ public class Colony implements Parcelable {
             c.mLastSimulation = new DateTime(parcel.readLong(), DateTimeZone.UTC);
 
             Parcelable[] buildings = parcel.readParcelableArray(Building.class.getClassLoader());
+            c.mBuildings = new ArrayList<Building>();
             for (int i = 0; i < buildings.length; i++) {
                 c.mBuildings.add((Building) buildings[i]);
             }

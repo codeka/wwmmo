@@ -130,7 +130,17 @@ def updateColony(colony_key, updated_colony_pb):
 
   return colony_pb
 
-def updateAfterSimulate(star_pb, empire_key, log=logging.debug):
+
+def _log_noop(msg):
+  """This is the default logging function for simulate() -- it does nothing."""
+  #pass
+
+
+def _log_logging(msg):
+  logging.debug(msg)
+
+
+def updateAfterSimulate(star_pb, empire_key, log=_log_noop):
   """After you've simulated a star for a particular empire, this updates the data store.
 
   Usually, you'll simulate the star, update a colony, and then update. This handles the "update"
@@ -146,6 +156,8 @@ def updateAfterSimulate(star_pb, empire_key, log=logging.debug):
         done_empires.add(colony_pb.empire_key)
         updateAfterSimulate(star_pb, colony_pb.empire_key, log)
     return
+
+  log("Updating empire: %s" % (empire_key))
 
   keys_to_clear = []
   keys_to_clear.append("buildqueue:for-empire:%s" % empire_key)
@@ -182,11 +194,6 @@ def updateAfterSimulate(star_pb, empire_key, log=logging.debug):
 
   keys_to_clear.append("star:%s" % star_pb.key)
   ctrl.clearCached(keys_to_clear)
-
-
-def _log_noop(msg):
-  """This is the default logging function for simulate() -- it does nothing."""
-  #pass
 
 
 def simulate(star_pb, empire_key=None, log=_log_noop):
@@ -546,8 +553,8 @@ def build(empire_pb, colony_pb, request_pb):
   # We'll need to re-simulate the star now since this new building will affect the ability to
   # build other things as well. It'll also let us calculate the exact end time of this build.
   star_pb = sector.getStar(colony_pb.star_key)
-  simulate(star_pb, empire_pb.key)
-  updateAfterSimulate(star_pb, empire_pb.key)
+  simulate(star_pb, empire_pb.key, log=_log_logging)
+  updateAfterSimulate(star_pb, empire_pb.key, log=_log_logging)
 
   # Schedule a build check so that we make sure we'll update everybody when this build completes
   scheduleBuildCheck()
@@ -599,11 +606,6 @@ def scheduleBuildCheck():
     # the build-check to run 5 seconds later (if there's a bunch scheduled at the same time,
     # it's more efficient that way...)
     time = build.endTime + timedelta(seconds=5)
-
-    # TODO: for debugging only...
-    in_two_minutes = datetime.now() + timedelta(minutes=2)
-    if time > in_two_minutes:
-      time = in_two_minutes
 
     # It'll be < now() if the next building is never going to finished (and hence it's endTime
     # will be the epoch -- 1970. We'll schedule a build-check in ten minutes anyway

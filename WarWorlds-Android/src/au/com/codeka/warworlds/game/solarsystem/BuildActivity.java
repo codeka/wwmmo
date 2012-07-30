@@ -50,6 +50,13 @@ public class BuildActivity extends TabFragmentActivity implements StarManager.St
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        addTab("Buildings", BuildingsFragment.class, null);
+        addTab("Ships", ShipsFragment.class, null);
+        addTab("Queue", QueueFragment.class, null);
+    }
+
+    @Override
+    public void onResume() {
         Bundle extras = this.getIntent().getExtras();
         String starKey = extras.getString("au.com.codeka.warworlds.StarKey");
         mColony = (Colony) extras.getParcelable("au.com.codeka.warworlds.Colony");
@@ -57,15 +64,16 @@ public class BuildActivity extends TabFragmentActivity implements StarManager.St
         StarManager.getInstance().requestStar(starKey, false, this);
         StarManager.getInstance().addStarUpdatedListener(starKey, this);
 
-        addTab("Buildings", BuildingsFragment.class, null);
-        addTab("Ships", ShipsFragment.class, null);
-        addTab("Queue", QueueFragment.class, null);
+        
+
+        super.onResume();
     }
 
     @Override
-    public void onDestroy() {
-        super.onDestroy();
+    public void onPause() {
         StarManager.getInstance().removeStarUpdatedListener(this);
+
+        super.onPause();
     }
 
     /**
@@ -324,8 +332,7 @@ public class BuildActivity extends TabFragmentActivity implements StarManager.St
                     args.putString("au.com.codeka.warworlds.DesignID", design.getID());
                     args.putInt("au.com.codeka.warworlds.DesignKind", design.getDesignKind().getValue());
 
-                    //TODO:
-                    //mActivity.showDialog(BuildConfirmDialog.ID, args);
+                    DialogManager.getInstance().show(getActivity(), BuildConfirmDialog.class, args);
                 }
             });
 

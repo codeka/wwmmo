@@ -92,7 +92,15 @@ public abstract class ImageManager {
                 @Override
                 protected Void doInBackground(Void... params) {
                     BitmapFactory.Options opts = new BitmapFactory.Options();
-                    Bitmap bmp = BitmapFactory.decodeFile(cacheFile.getAbsolutePath(), opts);
+                    Bitmap bmp;
+                    try {
+                        bmp = BitmapFactory.decodeFile(cacheFile.getAbsolutePath(), opts);
+                    } catch(OutOfMemoryError e) {
+                        mLoadedBitmaps = new LruCache<String, Bitmap>(mLoadedBitmaps.maxSize() / 2);
+                        System.gc();
+
+                        bmp = BitmapFactory.decodeFile(cacheFile.getAbsolutePath(), opts);
+                    }
 
                     mLoadedBitmaps.put(cacheKey, bmp);
                     return null;
@@ -220,7 +228,7 @@ public abstract class ImageManager {
      * @param tmpl
      * @param outputPath
      */
-    private void generateBitmap(QueuedGenerate item) {
+    private boolean generateBitmap(QueuedGenerate item) {
         Vector3 sunDirection = getSunDirection(item.extra);
 
         Template.PlanetTemplate planetTemplate = (Template.PlanetTemplate) item.tmpl.getTemplate();
@@ -243,7 +251,12 @@ public abstract class ImageManager {
         long startTime = System.nanoTime();
         Image img = new Image(imgSize, imgSize, Colour.TRANSPARENT);
         renderer.render(img);
-        Bitmap bmp = Bitmap.createBitmap(img.getArgb(), imgSize, imgSize, Bitmap.Config.ARGB_8888);
+        Bitmap bmp;
+        try {
+            bmp = Bitmap.createBitmap(img.getArgb(), imgSize, imgSize, Bitmap.Config.ARGB_8888);
+        } catch(OutOfMemoryError e) {
+            return false;
+        }
         long endTime = System.nanoTime();
 
         Vector3.pool.release(sunDirection);
@@ -265,6 +278,7 @@ public abstract class ImageManager {
         }
 
         fireBitmapGeneratedListeners(item.key, bmp);
+        return true;
     }
 
     /**
@@ -301,7 +315,12 @@ public abstract class ImageManager {
         }
 
         while (item != null) {
-            generateBitmap(item);
+            if (!generateBitmap(item)) {
+                // if it failed, reduce the size of the cache, do a GC and try again...
+                mLoadedBitmaps = new LruCache<String, Bitmap>(mLoadedBitmaps.maxSize() / 2);
+                System.gc();
+                continue;
+            }
 
             synchronized(mGenerateQueue) {
                 item = mGenerateQueue.poll();
