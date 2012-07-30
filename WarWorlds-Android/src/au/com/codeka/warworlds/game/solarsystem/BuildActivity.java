@@ -62,7 +62,9 @@ public class BuildActivity extends TabFragmentActivity implements StarManager.St
         addTab("Queue", QueueFragment.class, null);
     }
 
+    @Override
     public void onDestroy() {
+        super.onDestroy();
         StarManager.getInstance().removeStarUpdatedListener(this);
     }
 

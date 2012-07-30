@@ -373,7 +373,7 @@ class ColoniesPage(ApiPage):
 
     colony_pb = empire.updateColony(colony_key, self._getRequestBody(pb.Colony))
     return colony_pb
-  
+
 
 class BuildQueuePage(ApiPage):
   def post(self):

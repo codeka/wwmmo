@@ -1,5 +1,8 @@
 package au.com.codeka.warworlds.game.solarsystem;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Intent;
@@ -27,6 +30,7 @@ import au.com.codeka.warworlds.model.StarManager;
  * This activity is displayed when you're actually looking at a solar system (star + planets)
  */
 public class SolarSystemActivity extends Activity implements StarManager.StarFetchedHandler {
+    private static Logger log = LoggerFactory.getLogger(SolarSystemActivity.class);
     private SolarSystemSurfaceView mSolarSystemSurfaceView;
     private boolean mIsSectorUpdated;
     private Star mStar;
@@ -110,7 +114,15 @@ public class SolarSystemActivity extends Activity implements StarManager.StarFet
     }
 
     @Override
+    public void onDestroy() {
+        super.onDestroy();
+        StarManager.getInstance().removeStarUpdatedListener(this);
+    }
+
+    @Override
     public void onStarFetched(Star star) {
+        log.debug("Star refreshed...");
+
         // if we don't have a star yet, we'll need to figure out which planet to select
         // initially from the intent that started us. Otherwise, we'll want to select
         // whatever planet we have currently
@@ -126,8 +138,10 @@ public class SolarSystemActivity extends Activity implements StarManager.StarFet
 
         mSolarSystemSurfaceView.setStar(star);
         if (selectedPlanetIndex >= 0) {
+            log.debug("Selecting planet #"+selectedPlanetIndex);
             mSolarSystemSurfaceView.selectPlanet(selectedPlanetIndex);
         } else {
+            log.debug("No planet selected");
             mSolarSystemSurfaceView.redraw();
         }
 
@@ -193,6 +207,8 @@ public class SolarSystemActivity extends Activity implements StarManager.StarFet
     }
 
     private void refreshSelectedPlanet() {
+        log.debug("refreshing selected planet...");
+
         if (mStar == null || mPlanet == null) {
             return;
         }
@@ -201,6 +217,7 @@ public class SolarSystemActivity extends Activity implements StarManager.StarFet
         for (Colony colony : mStar.getColonies()) {
             if (colony.getPlanetIndex() == mPlanet.getIndex()) {
                 mColony = colony;
+                log.debug("Planet has colony "+mColony.getKey()+" on it.");
                 break;
             }
         }
@@ -220,8 +237,9 @@ public class SolarSystemActivity extends Activity implements StarManager.StarFet
             double x = planetCentre.getX() * mSolarSystemSurfaceView.getPixelScale();
             double y = planetCentre.getY() * mSolarSystemSurfaceView.getPixelScale();
 
-            float offsetX = congenialityContainer.getWidth() + (20 * mSolarSystemSurfaceView.getPixelScale());
-            float offsetY = congenialityContainer.getHeight() + (20 * mSolarSystemSurfaceView.getPixelScale());
+            // hard-coded size of the congeniality container: 85x34 dp
+            float offsetX = (85 + 20) * mSolarSystemSurfaceView.getPixelScale();
+            float offsetY = (34 + 20) * mSolarSystemSurfaceView.getPixelScale();
 
             if (x - offsetX < 0) {
                 offsetX  = -(20 * mSolarSystemSurfaceView.getPixelScale());
@@ -280,6 +298,7 @@ public class SolarSystemActivity extends Activity implements StarManager.StarFet
                     public void onEmpireFetched(Empire empire) {
                         Empire thisEmpire = EmpireManager.getInstance().getEmpire();
                         if (thisEmpire.getKey().equals(empire.getKey())) {
+                            log.debug("refreshing colony details...");
 
                             colonyDetailsContainer.setVisibility(View.VISIBLE);
                             refreshColonyDetails();

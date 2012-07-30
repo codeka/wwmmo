@@ -175,6 +175,8 @@ public class SolarSystemSurfaceView extends UniverseElementSurfaceView {
 
                 if (mPlanetsPlaced) {
                     firePlanetSelected(mSelectedPlanet.planet);
+                } else {
+                    mPlanetSelectedFired = false;
                 }
                 redraw();
             }
@@ -307,7 +309,6 @@ public class SolarSystemSurfaceView extends UniverseElementSurfaceView {
 
             PlanetInfo newSelection = null;
             if (closestPlanet != null &&
-                    closestPlanet != mSelectedPlanet &&
                     tapLocation.distanceTo(closestPlanet.centre) < 60.0 * getPixelScale()) {
                 newSelection = closestPlanet;
             }

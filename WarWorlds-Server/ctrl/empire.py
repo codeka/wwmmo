@@ -128,6 +128,7 @@ def updateColony(colony_key, updated_colony_pb):
   simulate(star_pb, colony_pb.empire_key)
   updateAfterSimulate(star_pb, colony_pb.empire_key)
 
+  return colony_pb
 
 def updateAfterSimulate(star_pb, empire_key, log=logging.debug):
   """After you've simulated a star for a particular empire, this updates the data store.
