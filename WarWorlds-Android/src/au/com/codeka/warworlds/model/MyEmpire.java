@@ -64,11 +64,11 @@ public class MyEmpire extends Empire {
                     }
 
                     ColonizeRequest request = ColonizeRequest.newBuilder()
-                            .setStarKey(planet.getStar().getKey())
                             .setPlanetIndex(planet.getIndex())
                             .build();
 
-                    warworlds.Warworlds.Colony pb = ApiClient.postProtoBuf("colonies", request,
+                    String url = String.format("stars/%s/colonies", planet.getStar().getKey());
+                    warworlds.Warworlds.Colony pb = ApiClient.postProtoBuf(url, request,
                             warworlds.Warworlds.Colony.class);
                     if (pb == null)
                         return null;

@@ -4,11 +4,13 @@
     <title>War Worlds &bull; {% block title %}Backend{% endblock %}</title>
     <link type="text/css" rel="stylesheet" href="/css/admin.css">
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+    <script src="/js/admin.js"></script>
     {% block head %}{% endblock %}
   </head>
   <body>
     <section id="header"><div class="header-bg">
       <div class="user-details">
+        Impersonate: <input type="email" id="on_behalf_of" />
         {{ logged_in_user }} &bull;
         <a href="{{ logout_url }}">Logout</a>
       </div>
@@ -37,6 +39,7 @@
             <li><a href="/admin/debug/empires">Empires</a>
             <li><a href="/admin/debug/data-store">Data Store</a>
             <li><a href="/admin/debug/starfield">Starfield</a>
+            <li><a href="/admin/debug/colonies">Colonies</a>
           </ul>
       </ul>
     </section>

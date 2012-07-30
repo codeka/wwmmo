@@ -128,6 +128,11 @@ class DebugStarfieldPage(AdminPage):
     self.render("admin/debug/starfield.html", {})
 
 
+class DebugColoniesPage(AdminPage):
+  def get(self):
+    self.render("admin/debug/colonies.html", {})
+
+
 class DebugDataStorePage(AdminPage):
   def get(self):
     kinds = []
@@ -152,11 +157,13 @@ class DebugDataStorePage(AdminPage):
     else:
       self.response.set_status(400)
 
+
 class DevicesPage(AdminPage):
   """The "devices" page lets you view all devices that have registered and send them messages."""
 
   def get(self):
     self.render("admin/devices.html", {})
+
 
 app = webapp.WSGIApplication([("/admin", DashboardPage),
                               ("/admin/chat", ChatPage),
@@ -164,6 +171,7 @@ app = webapp.WSGIApplication([("/admin", DashboardPage),
                               ("/admin/devices", DevicesPage),
                               ("/admin/debug/empires", DebugEmpiresPage),
                               ("/admin/debug/starfield", DebugStarfieldPage),
-                              ("/admin/debug/data-store", DebugDataStorePage)],
+                              ("/admin/debug/data-store", DebugDataStorePage),
+                              ("/admin/debug/colonies", DebugColoniesPage)],
                              debug=os.environ["SERVER_SOFTWARE"].startswith("Development"))
 

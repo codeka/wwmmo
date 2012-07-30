@@ -175,7 +175,7 @@ public class EmpireActivity extends TabFragmentActivity {
 
             View v = inflator.inflate(R.layout.empire_fleets_tab, null);
             FleetList fleetList = (FleetList) v.findViewById(R.id.fleet_list);
-            fleetList.refresh(getActivity(), sCurrentEmpire.getAllFleets(), sCurrentEmpire.getImportantStars());
+            fleetList.refresh(sCurrentEmpire.getAllFleets(), sCurrentEmpire.getImportantStars());
 
             fleetList.setOnFleetActionListener(new FleetList.OnFleetActionListener() {
                 @Override

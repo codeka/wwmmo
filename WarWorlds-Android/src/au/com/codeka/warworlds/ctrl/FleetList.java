@@ -6,7 +6,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
-import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.util.AttributeSet;
@@ -39,12 +38,13 @@ public class FleetList extends FrameLayout {
     private Fleet mSelectedFleet;
     private List<Fleet> mFleets;
     private Map<String, Star> mStars;
-    private Activity mActivity;
+    private Context mContext;
     private boolean mIsInitialized;
     private OnFleetActionListener mFleetActionListener;
 
     public FleetList(Context context, AttributeSet attrs) {
         super(context, attrs);
+        mContext = context;
 
         View child = inflate(context, R.layout.fleet_list_ctrl, null);
         this.addView(child);
@@ -54,9 +54,7 @@ public class FleetList extends FrameLayout {
         mFleetActionListener = listener;
     }
 
-    public void refresh(Activity activity, List<Fleet> fleets,
-            Map<String, Star> stars) {
-        mActivity = activity;
+    public void refresh(List<Fleet> fleets, Map<String, Star> stars) {
         mFleets = fleets;
         mStars = stars;
 
@@ -268,7 +266,7 @@ public class FleetList extends FrameLayout {
             View view = convertView;
 
             if (view == null) {
-                LayoutInflater inflater = (LayoutInflater) mActivity.getSystemService
+                LayoutInflater inflater = (LayoutInflater) mContext.getSystemService
                         (Context.LAYOUT_INFLATER_SERVICE);
                 if (entry.type == STAR_ITEM_TYPE) {
                     view = inflater.inflate(R.layout.fleet_list_star_row, null);
@@ -284,7 +282,7 @@ public class FleetList extends FrameLayout {
 
                 int imageSize = (int)(star.getSize() * star.getStarType().getImageScale() * 2);
                 if (entry.bitmap == null) {
-                    entry.bitmap = StarImageManager.getInstance().getBitmap(mActivity, star, imageSize);
+                    entry.bitmap = StarImageManager.getInstance().getBitmap(mContext, star, imageSize);
                 }
                 if (entry.bitmap != null) {
                     icon.setImageBitmap(entry.bitmap);

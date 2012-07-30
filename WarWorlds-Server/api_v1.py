@@ -28,17 +28,22 @@ class ApiPage(webapp.RequestHandler):
   def dispatch(self):
     """Checks that a user is logged in and such before we process the request."""
 
-    self.user = users.get_current_user()
-    if not self.user:
+    self.real_user = users.get_current_user()
+    if not self.real_user:
       # not logged in, return 403 Forbidden
       self.response.set_status(403)
       return
+
+    # the admin user can beform requests on behalf of anyone
+    self.user = self.real_user
+    if self._isAdmin() and self.request.get("on_behalf_of") != "":
+      self.user = users.User(self.request.get("on_behalf_of"))
 
     return super(ApiPage, self).dispatch()
 
   def _isAdmin(self):
     # TODO: better version of "isAdmin!"
-    return self.user.email() == "dean@codeka.com.au"
+    return self.real_user.email() == "dean@codeka.com.au"
 
   def _getRequestBody(self, ProtoBuffClass):
     """Gets the body of the request as a protocol buffer.
@@ -348,16 +353,16 @@ class StarSimulatePage(ApiPage):
 
 
 class ColoniesPage(ApiPage):
-  def post(self):
+  def post(self, star_key):
     # TODO: make sure they're actually allow to do this, have a free colonization
     # ship (or require that the pass in the colonization ship), etc etc etc
     empire_pb = empire.getEmpireForUser(self.user)
-    colony_pb = empire.colonize(empire_pb, self._getRequestBody(pb.ColonizeRequest))
+    colony_pb = empire.colonize(empire_pb, star_key, self._getRequestBody(pb.ColonizeRequest))
     if colony_pb is None:
       self.response.set_status(400)
     return colony_pb
 
-  def put(self, colony_key):
+  def put(self, star_key, colony_key):
     """Updates the given colony.
 
     When you update a colony, we need to simulate the current one first. Then we need to make
@@ -407,9 +412,9 @@ class BuildQueuePage(ApiPage):
 class FleetOrdersPage(ApiPage):
   """This page is where we post orders that we issue to fleets.
   """
-  def post(self, fleetID):
+  def post(self, star_key, fleet_key):
     order_pb = self._getRequestBody(pb.FleetOrder)
-    fleet_pb = empire.getFleet(fleetID)
+    fleet_pb = empire.getFleet(fleet_key)
 
     # Make sure the fleet is owned by the current user!
     curr_empire_pb = empire.getEmpireForUser(self.user)
@@ -486,8 +491,8 @@ app = ApiApplication([("/api/v1/hello/([^/]+)", HelloPage),
                       ("/api/v1/sectors", SectorsPage),
                       ("/api/v1/stars/([^/]+)", StarPage),
                       ("/api/v1/stars/([^/]+)/simulate", StarSimulatePage),
-                      ("/api/v1/colonies", ColoniesPage),
-                      ("/api/v1/colonies/([^/]+)", ColoniesPage),
                       ("/api/v1/buildqueue", BuildQueuePage),
-                      ("/api/v1/fleet/([^/]+)/orders", FleetOrdersPage)],
+                      ("/api/v1/stars/([^/]+)/colonies", ColoniesPage),
+                      ("/api/v1/stars/([^/]+)/colonies/([^/]+)", ColoniesPage),
+                      ("/api/v1/stars/([^/]+)/fleets/([^/]+)/orders", FleetOrdersPage)],
                      debug=os.environ["SERVER_SOFTWARE"].startswith("Development"))

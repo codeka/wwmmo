@@ -30,7 +30,7 @@ class Empire(db.Model):
   def colonize(self, star_model, planet_index):
     """Colonizes the given planet with a new colony."""
 
-    colony = Colony()
+    colony = Colony(parent=star_model)
     colony.empire = self.key()
     colony.planet_index = planet_index
     colony.sector = sector_mdl.Star.sector.get_value_for_datastore(star_model)
@@ -65,7 +65,6 @@ class Colony(db.Model):
   on your colony, though, that'll change the various rates. So we need to run a simulation for
   eveything up to the point where the property changes, and save the new value."""
 
-  star = db.ReferenceProperty(sector.Star)
   planet_index = db.IntegerProperty()
   sector = db.ReferenceProperty(sector.Sector)
   empire = db.ReferenceProperty(Empire)
@@ -90,7 +89,7 @@ class Colony(db.Model):
 
   @staticmethod
   def getForStar(star_model):
-    query = Colony.all().filter("star", star_model)
+    query = Colony.all().ancestor(star_model.key())
     return Colony._getForQuery(query)
 
   @staticmethod
@@ -106,7 +105,6 @@ class BuildOperation(db.Model):
 
   colony = db.ReferenceProperty(Colony)
   empire = db.ReferenceProperty(Empire)
-  star = db.ReferenceProperty(sector.Star)
   designName = db.StringProperty()
   designKind = db.IntegerProperty()
   startTime = db.DateTimeProperty()
@@ -115,7 +113,7 @@ class BuildOperation(db.Model):
 
   @staticmethod
   def getForStar(star_model):
-    query = BuildOperation.all().filter("star", star_model)
+    query = BuildOperation.all().ancestor(star_model.key())
     return BuildOperation._getForQuery(query)
 
   @staticmethod
@@ -136,13 +134,12 @@ class Building(db.Model):
 
   colony = db.ReferenceProperty(Colony)
   empire = db.ReferenceProperty(Empire)
-  star = db.ReferenceProperty(sector.Star)
   designName = db.StringProperty()
   buildTime = db.DateTimeProperty()
 
   @staticmethod
   def getForStar(star_model):
-    query = Building.all().filter("star", star_model)
+    query = Building.all().ancestor(star_model.key())
     return Building._getForQuery(query)
 
   @staticmethod
@@ -157,13 +154,12 @@ class EmpirePresence(db.Model):
   """Represents the 'presence' of an empire in a star system."""
 
   empire = db.ReferenceProperty(Empire)
-  star = db.ReferenceProperty(sector.Star)
   totalGoods = db.FloatProperty()
   totalMinerals = db.FloatProperty()
 
   @staticmethod
   def getForStar(star_model):
-    query = EmpirePresence.all().filter("star", star_model)
+    query = EmpirePresence.all().ancestor(star_model.key())
     return EmpirePresence._getForQuery(query)
 
   @staticmethod
@@ -182,14 +178,13 @@ class Fleet(db.Model):
   numShips = db.IntegerProperty()
   state = db.IntegerProperty()
   stateStartTime = db.DateTimeProperty()
-  star = db.ReferenceProperty(sector.Star)
   destinationStar = db.ReferenceProperty(sector.Star, collection_name="incoming_fleet_set")
   targetFleet = db.SelfReferenceProperty()
   targetColony = db.ReferenceProperty(Colony)
 
   @staticmethod
   def getForStar(star_model):
-    query = Fleet.all().filter("star", star_model)
+    query = Fleet.all().ancestor(star_model.key())
     return Fleet._getForQuery(query)
 
   @staticmethod

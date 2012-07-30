@@ -76,6 +76,6 @@ public class FleetDialog extends Dialog implements DialogManager.DialogConfigura
         stars.put(s.getKey(), s);
 
         final FleetList fleetList = (FleetList) findViewById(R.id.fleet_list);
-        fleetList.refresh(getOwnerActivity(), s.getFleets(), stars);
+        fleetList.refresh(s.getFleets(), stars);
     }
 }

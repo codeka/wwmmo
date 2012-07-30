@@ -319,6 +319,8 @@ public class BuildActivity extends TabFragmentActivity implements StarManager.St
         public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
             View v = inflater.inflate(R.layout.solarsystem_build_ships_tab, null);
 
+            final Colony colony = ((BuildActivity) getActivity()).mColony;
+
             final ShipDesignListAdapter adapter = new ShipDesignListAdapter();
             adapter.setDesigns(ShipDesignManager.getInstance().getDesigns());
 
@@ -331,6 +333,7 @@ public class BuildActivity extends TabFragmentActivity implements StarManager.St
                     ShipDesign design = (ShipDesign) adapter.getItem(position);
                     args.putString("au.com.codeka.warworlds.DesignID", design.getID());
                     args.putInt("au.com.codeka.warworlds.DesignKind", design.getDesignKind().getValue());
+                    args.putParcelable("au.com.codeka.warworlds.Colony", colony);
 
                     DialogManager.getInstance().show(getActivity(), BuildConfirmDialog.class, args);
                 }

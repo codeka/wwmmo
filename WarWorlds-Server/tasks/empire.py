@@ -48,52 +48,27 @@ class BuildCheckPage(tasks.TaskPage):
     never_time = datetime(2000, 1, 1)
 
     # Fetch the keys outside of the transaction, cause we can't do that in a TX
-    operations = []
+    build_request_models = []
     query = (mdl.BuildOperation.all().filter("endTime <", complete_time)
                                      .filter("endTime >", never_time))
     for oper in query:
-      operation = db.run_in_transaction(_fetchOperationInTX, oper.key())
-      if operation:
-        operations.append(operation)
-
-    star_pbs = []
-    build_request_pbs = []
-    # simulate the stars these operations are inside of, to make sure the build time
-    # is still correct
-    for oper_model in operations:
-      star_key = mdl.BuildOperation.star.get_value_for_datastore(oper_model)
-      already_done = False
-      for star_pb in star_pbs:
-        if star_pb.key == star_key:
-          already_done = True
-          continue
-      if already_done:
-        continue
-
-      star_pb = sector_ctl.getStar(star_key, True) # force_nocache == True
-      ctl.simulate(star_pb)
-      ctl.updateAfterSimulate(star_pb)
-
-      # any build requests that are still scheduled to be completed by now
-      for build_request in star_pb.build_requests:
-        if (ctrl.epochToDateTime(build_request.end_time) < complete_time and
-            ctrl.epochToDateTime(build_request.end_time) > never_time):
-          build_request_pbs.append(build_request)
-
-      # remember that we've simulated this star so we don't do it again
-      star_pbs.append(star_pb)
+      build_request_model = db.run_in_transaction(_fetchOperationInTX, oper.key())
+      if build_request_model:
+        build_request_models.append(build_request_model)
 
     keys_to_clear = []
-    for build_request_pb in build_request_pbs:
+    for build_request_model in build_request_models:
       # OK, this build operation is complete (or will complete in the next 10 seconds -- close
       # enough) so we need to make sure the building/ship itself is added to the empire.
-      logging.info("Build for empire \"%s\" complete." % (build_request_pb.colony_key))
-      if build_request_pb.build_kind == pb.BuildRequest.BUILDING:
-        model = mdl.Building()
-        model.colony = build_request_pb.colony_key
-        model.empire = build_request_pb.empire_key
-        model.star = star_key
-        model.designName = build_request_pb.design_name
+      colony_key = mdl.BuildOperation.colony.get_value_for_datastore(build_request_model)
+      empire_key = mdl.BuildOperation.empire.get_value_for_datastore(build_request_model)
+
+      logging.info("Build for empire \"%s\", colony \"%s\" complete." % (empire_key, colony_key))
+      if build_request_model.designKind == pb.BuildRequest.BUILDING:
+        model = mdl.Building(parent=build_request_model.key().parent())
+        model.colony = colony_key
+        model.empire = empire_key
+        model.designName = build_request_model.designName
         model.buildTime = datetime.now()
         model.put()
         design = ctl.BuildingDesign.getDesign(model.designName)
@@ -101,11 +76,11 @@ class BuildCheckPage(tasks.TaskPage):
         # if it's not a building, it must be a ship. We'll try to find a fleet that'll
         # work, but if we can't it's not a big deal -- just create a new one. Duplicates
         # don't hurt all that much (TODO: confirm)
-        query = mdl.Fleet.all().filter("star", star_key).filter("empire",
-                                                                build_request_pb.empire_key)
+        query = (mdl.Fleet.all().ancestor(build_request_model.key().parent())
+                                .filter("empire", build_request_model.empire))
         done = False
         for fleet_model in query:
-          if (fleet_model.designName == build_request_pb.design_name and
+          if (fleet_model.designName == build_request_model.designName and
               fleet_model.state == pb.Fleet.IDLE):
             if db.run_in_transaction(_incrShipCountInTX, fleet_model.key()):
               done = True
@@ -114,10 +89,9 @@ class BuildCheckPage(tasks.TaskPage):
               keys_to_clear.append("fleet:%s" % str(fleet_model.key()))
               break
         if not done:
-          model = mdl.Fleet()
-          model.empire = build_request_pb.empire_key
-          model.star = star_key
-          model.designName = build_request_pb.design_name
+          model = mdl.Fleet(parent=build_request_model.key().parent())
+          model.empire = build_request_model.empire
+          model.designName = build_request_model.designName
           model.numShips = 1
           model.state = pb.Fleet.IDLE
           model.stateStartTime = datetime.now()
@@ -125,11 +99,7 @@ class BuildCheckPage(tasks.TaskPage):
         design = ctl.ShipDesign.getDesign(model.designName)
 
       # Figure out the name of the star the object was built on, for the notification
-      star_pb = None
-      for spb in star_pbs:
-        if spb.key == star_key:
-          star_pb = spb
-          break
+      star_pb = sector_ctl.getStar(build_request_model.key().parent())
 
       # Send a notification to the player that construction of their building is complete
       msg = "Your %s on %s has been built." % (design.name, star_pb.name)
@@ -141,9 +111,9 @@ class BuildCheckPage(tasks.TaskPage):
         s.sendMessage(device.device_registration_id, {"msg": msg})
 
       # clear the cached items that reference this building/fleet
-      keys_to_clear.append("star:%s" % (star_key))
-      keys_to_clear.append("fleet:for-empire:%s" % (build_request_pb.empire_key))
-      keys_to_clear.append("colonies:for-empire:%s" % (build_request_pb.empire_key))
+      keys_to_clear.append("star:%s" % (star_pb.key))
+      keys_to_clear.append("fleet:for-empire:%s" % (empire_key))
+      keys_to_clear.append("colonies:for-empire:%s" % (empire_key))
 
     ctrl.clearCached(keys_to_clear)
     ctl.scheduleBuildCheck()

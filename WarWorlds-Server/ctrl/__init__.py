@@ -58,6 +58,7 @@ def deviceRegistrationPbToModel(model, pb):
   if pb.user:
     model.user = users.User(pb.user)
 
+
 def deviceRegistrationModelToPb(pb, model):
   pb.key = str(model.key())
   pb.device_id = model.deviceID
@@ -87,7 +88,7 @@ def empirePbToModel(empire_model, empire_pb):
 def colonyModelToPb(colony_pb, colony_model):
   colony_pb.key = str(colony_model.key())
   colony_pb.empire_key = str(empire_mdl.Colony.empire.get_value_for_datastore(colony_model))
-  colony_pb.star_key = str(empire_mdl.Colony.star.get_value_for_datastore(colony_model))
+  colony_pb.star_key = str(colony_model.key().parent())
   colony_pb.planet_index = colony_model.planet_index
   colony_pb.population = colony_model.population
   colony_pb.last_simulation = int(dateTimeToEpoch(colony_model.lastSimulation))
@@ -149,14 +150,13 @@ def starModelToPb(star_pb, star_model, include_planets=True):
 def empirePresenceModelToPb(presence_pb, presence_model):
   presence_pb.key = str(presence_model.key())
   presence_pb.empire_key = str(empire_mdl.EmpirePresence.empire.get_value_for_datastore(presence_model))
-  presence_pb.star_key = str(empire_mdl.EmpirePresence.star.get_value_for_datastore(presence_model))
+  presence_pb.star_key = str(presence_model.key().parent())
   presence_pb.total_goods = presence_model.totalGoods
   presence_pb.total_minerals = presence_model.totalMinerals
 
 
 def empirePresencePbToModel(presence_model, presence_pb):
   presence_model.empire = db.Key(presence_pb.empire_key)
-  presence_model.star = db.Key(presence_pb.star_key)
   presence_model.totalGoods = presence_pb.total_goods
   presence_model.totalMinerals = presence_pb.total_minerals
 
@@ -201,7 +201,7 @@ def fleetModelToPb(fleet_pb, fleet_model):
   fleet_pb.num_ships = fleet_model.numShips
   fleet_pb.state = fleet_model.state
   fleet_pb.state_start_time = dateTimeToEpoch(fleet_model.stateStartTime)
-  fleet_pb.star_key = str(empire_mdl.Fleet.star.get_value_for_datastore(fleet_model))
+  fleet_pb.star_key = str(fleet_model.key().parent())
   fleet_pb.destination_star_key = str(empire_mdl.Fleet.destinationStar.get_value_for_datastore(fleet_model))
   fleet_pb.target_fleet_key = str(empire_mdl.Fleet.targetFleet.get_value_for_datastore(fleet_model))
   fleet_pb.target_colony_key = str(empire_mdl.Fleet.targetColony.get_value_for_datastore(fleet_model))

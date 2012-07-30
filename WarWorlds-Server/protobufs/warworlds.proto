@@ -303,11 +303,8 @@ message EmpirePresence
 //
 message ColonizeRequest
 {
-    // The star containing the planet you want to colonize.
-    required string star_key = 1;
-
     // The index of the planet you want to colonize
-    required int32 planet_index = 2;
+    required int32 planet_index = 1;
 }
 
 //

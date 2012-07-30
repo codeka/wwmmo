@@ -85,7 +85,9 @@ public class FocusDialog extends Dialog implements DialogManager.DialogConfigura
                 new AsyncTask<Void, Void, Void>() {
                     @Override
                     protected Void doInBackground(Void... arg0) {
-                        String url = "colonies/"+mColony.getKey();
+                        String url = String.format("stars/%s/colonies/%s",
+                                                   mColony.getStarKey(),
+                                                   mColony.getKey());
 
                         warworlds.Warworlds.Colony pb = mColony.toProtocolBuffer();
                         try {

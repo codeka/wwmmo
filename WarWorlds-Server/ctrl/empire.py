@@ -175,7 +175,7 @@ def updateAfterSimulate(star_pb, empire_key, log=_log_noop):
     if empire_pb.empire_key != empire_key:
       continue
     if empire_pb.key == "":
-      empire_model = mdl.EmpirePresence()
+      empire_model = mdl.EmpirePresence(parent=db.Key(star_pb.key))
     else:
       empire_model = mdl.EmpirePresence.get(empire_pb.key)
     ctrl.empirePresencePbToModel(empire_model, empire_pb)
@@ -483,21 +483,22 @@ def _simulateStep(dt, now, star_pb, empire_key, log):
   log('')
 
 
-def colonize(empire_pb, colonize_request):
+def colonize(empire_pb, star_key, colonize_request):
   """Colonizes the planet given in the colonize_request.
 
   Args:
     empire_pb: The empire protobuf
+    star_key: The key of the star you're going to colonize
     colonize_request: a ColonizeRequest protobuf, containing the planet
         and star key of the planet we want to colonize.
   """
 
-  logging.info("Colonizing: Star=%s Planet=%d" % (colonize_request.star_key,
+  logging.info("Colonizing: Star=%s Planet=%d" % (star_key,
                                                   colonize_request.planet_index))
 
-  star_model = sector_mdl.Star.get(colonize_request.star_key)
+  star_model = sector_mdl.Star.get(star_key)
   if star_model is None:
-    logging.warn("Could not find star with key: %s" % colonize_request.star_key)
+    logging.warn("Could not find star with key: %s" % star_key)
     return None
 
   if len(star_model.planets) < colonize_request.planet_index:
@@ -534,16 +535,15 @@ def build(empire_pb, colony_pb, request_pb):
     return False
 
   # Save the initial build model. There's two writes here, once now and once after it
-  build_model = mdl.BuildOperation()
-  build_model.colony = db.Key(colony_pb.key)
-  build_model.empire = db.Key(empire_pb.key)
-  build_model.star = db.Key(colony_pb.star_key)
-  build_model.designName = request_pb.design_name
-  build_model.designKind = request_pb.build_kind
-  build_model.startTime = datetime.now()
-  build_model.endTime = build_model.startTime + timedelta(seconds=10) # - until we simulate (below)
-  build_model.progress = 0.0
-  build_model.put()
+  build_operation_model = mdl.BuildOperation(parent=db.Key(colony_pb.star_key))
+  build_operation_model.colony = db.Key(colony_pb.key)
+  build_operation_model.empire = db.Key(empire_pb.key)
+  build_operation_model.designName = request_pb.design_name
+  build_operation_model.designKind = request_pb.build_kind
+  build_operation_model.startTime = datetime.now()
+  build_operation_model.endTime = build_operation_model.startTime + timedelta(seconds=10) # - until we simulate (below)
+  build_operation_model.progress = 0.0
+  build_operation_model.put()
 
   # make sure we clear the cache so we get the latest version with the new build
   keys = ["buildqueue:for-empire:%s" % empire_pb.key,
@@ -559,7 +559,7 @@ def build(empire_pb, colony_pb, request_pb):
   # Schedule a build check so that we make sure we'll update everybody when this build completes
   scheduleBuildCheck()
 
-  ctrl.buildRequestModelToPb(request_pb, build_model)
+  ctrl.buildRequestModelToPb(request_pb, build_operation_model)
   return request_pb
 
 

@@ -47,7 +47,9 @@ public class FleetSplitDialog extends Dialog implements DialogManager.DialogConf
                 new AsyncTask<Void, Void, Boolean>() {
                     @Override
                     protected Boolean doInBackground(Void... params) {
-                        String url = String.format("fleet/%s/orders", mFleet.getKey());
+                        String url = String.format("stars/%s/fleets/%s/orders",
+                                                   mFleet.getStarKey(),
+                                                   mFleet.getKey());
                         FleetOrder fleetOrder = warworlds.Warworlds.FleetOrder.newBuilder()
                                        .setOrder(warworlds.Warworlds.FleetOrder.FLEET_ORDER.SPLIT)
                                        .setSplitLeft(Integer.parseInt(splitLeft.getText().toString()))
