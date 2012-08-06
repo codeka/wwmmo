@@ -50,7 +50,7 @@ public class WarWorldsActivity extends Activity {
 
         super.onCreate(savedInstanceState);
 
-        Util.loadProperties(mContext, this);
+        Util.loadProperties(mContext);
         Authenticator.configure(mContext);
 
         if (Util.isDebug()) {
