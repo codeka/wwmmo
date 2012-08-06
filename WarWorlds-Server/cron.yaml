@@ -11,4 +11,12 @@ cron:
 #  schedule: every day 23:00
 #  timezone: Australia/Sydney
 
+# The star simulator runs every 6 hours and makes sure that no star is more than
+# 18 hours out of date. The stars "predict" 24 hours into the future, and in this way
+# we'll always have accurate estimates for the end time of build jobs, we'll know when
+# populations drop below certain levels, etc.
+# It also means we don't have possible un-bounded re-simulate times when viewing stars
+- description: star simulator
+  url: /tasks/empire/star-simulate
+  schedule: every 6 hours
 

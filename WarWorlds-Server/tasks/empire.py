@@ -120,6 +120,32 @@ class BuildCheckPage(tasks.TaskPage):
 
     self.response.write("Success!")
 
-app = webapp.WSGIApplication([("/tasks/empire/build-check", BuildCheckPage)],
+
+class StarSimulatePage(tasks.TaskPage):
+  """Simulates all stars that have not been simulated for more than 18 hours.
+
+  This is a scheduled task that runs every 6 hours. It looks for all stars that have not been
+  simulated in more than 18 hours and simulates them now. By running every 6 hours, we ensure
+  no star is more than 24 hours out of date."""
+  def get(self):
+    # find all colonies where last_simulation is at least 18 hours ago
+    last_simulation = datetime.now() - timedelta(hours=18)
+
+    star_keys = []
+    for colony_mdl in mdl.Colony.all().filter("lastSimulation <", last_simulation):
+      star_key = str(colony_mdl.key().parent())
+      if star_key not in star_keys:
+        star_keys.append(star_key)
+
+    logging.debug("%d stars to simulate" % (len(star_keys)))
+    for star_key in star_keys:
+      star_pb = sector_ctl.getStar(star_key)
+      ctl.simulate(star_pb)
+      ctl.updateAfterSimulate(star_pb)
+
+    self.response.write("Success!")
+
+app = webapp.WSGIApplication([("/tasks/empire/build-check", BuildCheckPage),
+                              ("/tasks/empire/star-simulate", StarSimulatePage)],
                              debug=os.environ["SERVER_SOFTWARE"].startswith("Development"))
 

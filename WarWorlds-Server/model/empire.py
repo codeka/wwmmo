@@ -34,7 +34,6 @@ class Empire(db.Model):
     colony.empire = self.key()
     colony.planet_index = planet_index
     colony.sector = sector_mdl.Star.sector.get_value_for_datastore(star_model)
-    colony.star = star_model.key()
     colony.population = 100.0
     colony.lastSimulation = datetime.now()
     colony.focusPopulation = 0.25

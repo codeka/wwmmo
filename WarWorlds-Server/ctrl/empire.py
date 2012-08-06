@@ -1,6 +1,7 @@
 """empire.py: Controller for empire-related functions. Aso contains the 'simulate' method."""
 
 
+import copy
 from datetime import datetime, timedelta
 import logging
 import os
@@ -140,7 +141,7 @@ def _log_logging(msg):
   logging.debug(msg)
 
 
-def updateAfterSimulate(star_pb, empire_key, log=_log_noop):
+def updateAfterSimulate(star_pb, empire_key=None, log=_log_noop):
   """After you've simulated a star for a particular empire, this updates the data store.
 
   Usually, you'll simulate the star, update a colony, and then update. This handles the "update"
@@ -240,17 +241,42 @@ def simulate(star_pb, empire_key=None, log=_log_noop):
   if (end_time - timedelta(seconds=3)) < start_time:
     end_time = start_time + timedelta(seconds=3)
 
+  # We'll simulate in "prediction mode" for an extra bit of time so that we can get a
+  # more accurate estimate of the end time for builds. We won't *record* the population
+  # growth and such, just the end time of builds. We'll also record the time that the
+  # population drops below a certain threshold so that we can warn the player.
+  prediction_time = end_time + timedelta(hours=24)
+  prediction_star_pb = None
+
   while True:
     step_end_time = start_time + timedelta(minutes=15)
     if step_end_time < end_time:
       _simulateStep(timedelta(minutes=15), start_time, star_pb, empire_key, log)
       start_time = step_end_time
+    elif step_end_time < prediction_time:
+      if not prediction_star_pb:
+        # if we haven't saved the "final" star_pb yet, do it now
+        dt = end_time - start_time
+        start_time += dt
+        if dt.total_seconds() > 0:
+          # last little bit of the simulation
+          _simulateStep(dt, start_time, star_pb, empire_key, log)
+
+        log("")
+        log("---- Prediction phase beginning")
+        log("")
+        prediction_star_pb = copy.deepcopy(star_pb)
+
+      _simulateStep(timedelta(minutes=15), start_time, prediction_star_pb, empire_key, log)
+      start_time = step_end_time
     else:
       break
 
-  dt = end_time - start_time
-  if dt.total_seconds() > 0:
-    _simulateStep(dt, start_time, star_pb, empire_key, log)
+  # copy the end times for builds from prediction_star_pb
+  for build_req in star_pb.build_requests:
+    for prediction_build_req in prediction_star_pb.build_requests:
+      if prediction_build_req.key == build_req.key:
+        build_req.end_time = prediction_build_req.end_time
 
   # Finally, we make sure last_simulation is correct
   last_simulation = ctrl.dateTimeToEpoch(datetime.now())
@@ -343,14 +369,30 @@ def _simulateStep(dt, now, star_pb, empire_key, log):
       if build_req.colony_key == colony_pb.key:
         build_requests.append(build_req)
 
+    # not all build requests will be processed this turn. We divide up the population
+    # based on the number of ACTUAL build requests they'll be working on this turn
+    num_valid_build_requests = 0
+    for build_request in build_requests:
+      startTime = ctrl.epochToDateTime(build_request.start_time)
+      if startTime > (now + dt):
+        continue
+
+      # the end_time will be accurate, since it'll have been updated last step
+      endTime = ctrl.epochToDateTime(build_request.end_time)
+      if endTime < now:
+        continue
+
+      # as long as it's started but hasn't finished, we'll be working on it this turn
+      num_valid_build_requests += 1
+
     # If we have pending build requests, we'll have to update them as well
-    if len(build_requests) > 0:
+    if num_valid_build_requests > 0:
       log("--- Building:")
 
       total_workers = colony_pb.population * colony_pb.focus_construction
-      workers_per_build_request = total_workers / len(build_requests)
+      workers_per_build_request = total_workers / num_valid_build_requests
       log("Total workers = %d, requests = %d, workers per build request = %d" %
-          (total_workers, len(build_requests), workers_per_build_request))
+          (total_workers, num_valid_build_requests, workers_per_build_request))
 
       for build_request in build_requests:
         design = Design.getDesign(build_request.build_kind, build_request.design_name)
@@ -544,7 +586,7 @@ def build(empire_pb, colony_pb, request_pb):
   build_operation_model.designName = request_pb.design_name
   build_operation_model.designKind = request_pb.build_kind
   build_operation_model.startTime = datetime.now()
-  build_operation_model.endTime = build_operation_model.startTime + timedelta(seconds=10) # - until we simulate (below)
+  build_operation_model.endTime = build_operation_model.startTime + timedelta(seconds=10)
   build_operation_model.progress = 0.0
   build_operation_model.put()
 
