@@ -349,8 +349,8 @@ def _simulateStep(dt, now, star_pb, empire_key, log):
 
       total_workers = colony_pb.population * colony_pb.focus_construction
       workers_per_build_request = total_workers / len(build_requests)
-      log("Total workers = %d, workers per build request = %d" %
-          (total_workers, workers_per_build_request))
+      log("Total workers = %d, requests = %d, workers per build request = %d" %
+          (total_workers, len(build_requests), workers_per_build_request))
 
       for build_request in build_requests:
         design = Design.getDesign(build_request.build_kind, build_request.design_name)
@@ -369,7 +369,7 @@ def _simulateStep(dt, now, star_pb, empire_key, log):
         # the workers and you double the build time.
         total_build_time_in_hours = design.buildTimeSeconds / 3600.0
         total_build_time_in_hours *= (100.0 / workers_per_build_request)
-        log("total_build_time = %.2f" % total_build_time_in_hours)
+        log("total_build_time = %.2f hrs" % total_build_time_in_hours)
 
         # Work out how many hours we've spend so far
         time_spent = now - ctrl.epochToDateTime(build_request.start_time)
@@ -384,6 +384,9 @@ def _simulateStep(dt, now, star_pb, empire_key, log):
           # If we're going to finish on this turn, we only need a fraction of the minerals we'd
           # otherwise use, so make sure dt_required is correct
           dt_required = total_build_time_in_hours - time_spent
+        if dt_required < 0:
+          log("Building complete!")
+          continue
 
         # take starting half-way through this turn into account
         if time_spent < 0:

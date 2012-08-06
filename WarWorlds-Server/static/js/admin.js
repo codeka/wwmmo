@@ -12,7 +12,6 @@ $(function() {
             }
             options.url += "on_behalf_of="+onBehalfOf;
         }
-        alert("URL: "+options.url);
     });
 
     // TODO: store "on_behalf_of" in localStorage or something

@@ -55,6 +55,11 @@ body {
 	margin-right: 1em;
 }
 
+#header #on_behalf_of {
+	padding: 4px;
+	border: solid 1px #333;
+}
+
 #navmenu {
 	position: absolute;
 	width: 300px;
