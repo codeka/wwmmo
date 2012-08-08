@@ -711,9 +711,8 @@ def orderFleet(fleet_pb, order_pb):
     left_model = mdl.Fleet.get(fleet_pb.key)
     left_model.numShips = left_size
 
-    right_model = mdl.Fleet()
+    right_model = mdl.Fleet(parent = left_model.key().parent())
     right_model.empire = mdl.Fleet.empire.get_value_for_datastore(left_model)
-    right_model.star = mdl.Fleet.star.get_value_for_datastore(left_model)
     right_model.designName = left_model.designName
     right_model.state = pb.Fleet.IDLE
     right_model.numShips = right_size
