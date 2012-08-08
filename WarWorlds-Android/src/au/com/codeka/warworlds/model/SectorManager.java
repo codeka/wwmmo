@@ -4,9 +4,7 @@ import java.util.ArrayList;
 import java.util.EventListener;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.TreeMap;
-import java.util.TreeSet;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -35,25 +33,16 @@ public class SectorManager {
         return sInstance;
     }
 
-    private int mRadius = 1;
-
-    private long mSectorX;
-    private long mSectorY;
-    private float mOffsetX;
-    private float mOffsetY;
     private Map<Pair<Long, Long>, Sector> mSectors;
-    private Set<Pair<Long, Long>> mInTransitSectors;
+    private Map<Pair<Long, Long>, List<OnSectorsFetchedListener>> mInTransitListeners;
     private CopyOnWriteArrayList<OnSectorListChangedListener> mSectorListChangedListeners;
 
     public static int SECTOR_SIZE = 1024;
 
     private SectorManager() {
-        mSectorX = mSectorY = 0;
-        mOffsetX = mOffsetY = 0;
         mSectors = new TreeMap<Pair<Long, Long>, Sector>();
-        mInTransitSectors = new TreeSet<Pair<Long, Long>>();
+        mInTransitListeners = new TreeMap<Pair<Long, Long>, List<OnSectorsFetchedListener>>();
         mSectorListChangedListeners = new CopyOnWriteArrayList<OnSectorListChangedListener>();
-        this.scrollTo(0, 0, 0, 0);
     }
 
     public Sector getSector(long sectorX, long sectorY) {
@@ -64,173 +53,6 @@ public class SectorManager {
             // it might not be loaded yet...
             return null;
         }
-    }
-
-    /**
-     * Gets the x-coordinate of the sector that's in the "centre" of the screen.
-     */
-    public long getSectorCentreX() {
-        return mSectorX;
-    }
-
-    /**
-     * Gets the y-coordinate of the sector that's in the "centre" of the screen.
-     */
-    public long getSectorCentreY() {
-        return mSectorY;
-    }
-
-    /**
-     * Gets an offset, in pixels, that we apply to the sectors (to facilitate
-     * smooth scrolling of the sectors).
-     */
-    public int getOffsetX() {
-        return (int) mOffsetX;
-    }
-
-    /**
-     * Gets an offset, in pixels, that we apply to the sectors (to facilitate
-     * smooth scrolling of the sectors).
-     */
-    public int getOffsetY() {
-        return (int) mOffsetY;
-    }
-
-    /**
-     * Gets the "radius" of sectors, around the centre one, that we should
-     * use to render a complete "screen".
-     */
-    public int getRadius() {
-        return mRadius;
-    }
-
-    /**
-     * Scroll to the given sector (x,y) and offset into the sector.
-     */
-    public void scrollTo(long sectorX, long sectorY, float offsetX, float offsetY) {
-        mSectorX = sectorX;
-        mSectorY = sectorY;
-        mOffsetX = -offsetX;
-        mOffsetY = -offsetY;
-
-        List<Pair<Long, Long>> missingSectors = new ArrayList<Pair<Long, Long>>();
-
-        Map<Pair<Long, Long>, Sector> newSectors = 
-                new TreeMap<Pair<Long, Long>, Sector>();
-        for(sectorY = mSectorY - mRadius; sectorY <= mSectorY + mRadius; sectorY++) {
-            for(sectorX = mSectorX - mRadius; sectorX <= mSectorX + mRadius; sectorX++) {
-                Pair<Long, Long> key = new Pair<Long, Long>(sectorX, sectorY);
-                if (mSectors.containsKey(key)) {
-                    newSectors.put(key, mSectors.get(key));
-                } else {
-                    // we need to fetch the sector from the server, check that
-                    // we're not already in the process of fetching it and if
-                    // not add it to a list to be fetched...
-                    if (!mInTransitSectors.contains(key)) {
-                        missingSectors.add(key);
-                    }
-                }
-            }
-        }
-
-        if (!missingSectors.isEmpty()) {
-            requestSectors(missingSectors);
-        }
-
-        mSectors = newSectors;
-    }
-
-    /**
-     * Scrolls the view by a relative amount.
-     * @param distanceX Number of pixels in the X direction to scroll.
-     * @param distanceY Number of pixels in the Y direction to scroll.
-     */
-    public void scroll(float distanceX, float distanceY) {
-        mOffsetX += distanceX;
-        mOffsetY += distanceY;
-
-        boolean needUpdate = false;
-        while (mOffsetX < -(SECTOR_SIZE / 2)) {
-            mOffsetX += SECTOR_SIZE;
-            mSectorX ++;
-            needUpdate = true;
-        }
-        while (mOffsetX > (SECTOR_SIZE / 2)) {
-            mOffsetX -= SECTOR_SIZE;
-            mSectorX --;
-            needUpdate = true;
-        }
-        while (mOffsetY < -(SECTOR_SIZE / 2)) {
-            mOffsetY += SECTOR_SIZE;
-            mSectorY ++;
-            needUpdate = true;
-        }
-        while (mOffsetY > (SECTOR_SIZE / 2)) {
-            mOffsetY -= SECTOR_SIZE;
-            mSectorY --;
-            needUpdate = true;
-        }
-
-        if (needUpdate) {
-            scrollTo(mSectorX, mSectorY, -mOffsetX, -mOffsetY);
-        }
-    }
-
-    /**
-     * Gets the \c Star that's closest to the given (x,y), based on the current sector
-     * centre and offsets.
-     */
-    public Star getStarAt(int viewX, int viewY) {
-        // first, work out which sector your actually inside of. If (mOffsetX, mOffsetY) is (0,0)
-        // then (x,y) corresponds exactly to the offset into (mSectorX, mSectorY). Otherwise, we
-        // have to adjust (x,y) by the offset so that it works out like that.
-        int x = viewX - (int) mOffsetX;
-        int y = viewY - (int) mOffsetY;
-
-        long sectorX = mSectorX;
-        long sectorY = mSectorY;
-        while (x < 0) {
-            x += SECTOR_SIZE;
-            sectorX --;
-        }
-        while (x >= SECTOR_SIZE) {
-            x -= SECTOR_SIZE;
-            sectorX ++;
-        }
-        while (y < 0) {
-            y += SECTOR_SIZE;
-            sectorY --;
-        }
-        while (y >= SECTOR_SIZE) {
-            y -= SECTOR_SIZE;
-            sectorY ++;
-        }
-
-        Sector sector = getSector(sectorX, sectorY);
-        if (sector == null) {
-            // if it's not loaded yet, you can't have tapped on anything...
-            return null;
-        }
-
-        int minDistance = 0;
-        Star closestStar = null;
-
-        for(Star star : sector.getStars()) {
-            int starX = star.getOffsetX();
-            int starY = star.getOffsetY();
-
-            int distance = (starX - x)*(starX - x) + (starY - y)*(starY - y);
-            if (closestStar == null || distance < minDistance) {
-                closestStar = star;
-                minDistance = distance;
-            }
-        }
-
-        // only return it if you tapped within a 48 pixel radius
-        if (Math.sqrt(minDistance) <= 48) {
-            return closestStar;
-        }
-        return null;
     }
 
     /**
@@ -267,7 +89,7 @@ public class SectorManager {
     public void refreshSector(long sectorX, long sectorY) {
         ArrayList<Pair<Long, Long>> coords = new ArrayList<Pair<Long, Long>>();
         coords.add(new Pair<Long, Long>(sectorX, sectorY));
-        requestSectors(coords);
+        requestSectors(coords, null);
     }
 
     /**
@@ -282,7 +104,8 @@ public class SectorManager {
      * @param sectorX2 The maximum X-coordinate of the sector to request.
      * @param sectorY2 The maximum Y-coordinate of the sector to request.
      */
-    private void requestSectors(final List<Pair<Long, Long>> coords) {
+    public void requestSectors(final List<Pair<Long, Long>> coords,
+                               final OnSectorsFetchedListener callback) {
         if (log.isDebugEnabled()) {
             String msg = "";
             for(Pair<Long, Long> coord : coords) {
@@ -294,57 +117,100 @@ public class SectorManager {
             log.debug(String.format("Requesting sectors %s...", msg));
         }
 
-        new AsyncTask<Void, Void, List<Sector>>() {
-            @Override
-            protected List<Sector> doInBackground(Void... arg0) {
-                List<Sector> sectors = null;
+        Map<Pair<Long, Long>, Sector> existingSectors = new TreeMap<Pair<Long, Long>, Sector>();
+        final List<Pair<Long, Long>> missingSectors = new ArrayList<Pair<Long, Long>>();
+        for (Pair<Long, Long> coord : coords) {
+            if (mSectors.containsKey(coord)) {
+                existingSectors.put(coord, mSectors.get(coord));
+            } else if (mInTransitListeners.containsKey(coord) && callback != null) {
+                List<OnSectorsFetchedListener> listeners = mInTransitListeners.get(coord);
+                listeners.add(callback);
+            } else {
+                missingSectors.add(coord);
+            }
+        }
 
-                String url = "";
-                for(Pair<Long, Long> coord : coords) {
-                    if (url.length() != 0) {
-                        url += "%7C"; // Java doesn't like "|" for some reason (it's valid!!)
+        if (!existingSectors.isEmpty() && callback != null) {
+            callback.onSectorsFetched(existingSectors);
+        }
+
+        if (!missingSectors.isEmpty()) {
+            // record the fact that we've now got these sectors in transit
+            for (Pair<Long, Long> coord : missingSectors) {
+                mInTransitListeners.put(coord, new ArrayList<OnSectorsFetchedListener>());
+            }
+
+            new AsyncTask<Void, Void, List<Sector>>() {
+                @Override
+                protected List<Sector> doInBackground(Void... arg0) {
+                    List<Sector> sectors = null;
+
+                    String url = "";
+                    for(Pair<Long, Long> coord : missingSectors) {
+                        if (url.length() != 0) {
+                            url += "%7C"; // Java doesn't like "|" for some reason (it's valid!!)
+                        }
+                        url += String.format("%d,%d", coord.one, coord.two);
                     }
-                    url += String.format("%d,%d", coord.one, coord.two);
-                }
-                url = "sectors?coords="+url;
-                try {
-                    warworlds.Warworlds.Sectors pb = ApiClient.getProtoBuf(url,
-                            warworlds.Warworlds.Sectors.class);
-                    sectors = Sector.fromProtocolBuffer(pb.getSectorsList());
-                } catch(Exception e) {
-                    // TODO: handle exceptions
-                    log.error(ExceptionUtils.getStackTrace(e));
-                }
-                return sectors;
-            }
+                    url = "sectors?coords="+url;
+                    try {
+                        warworlds.Warworlds.Sectors pb = ApiClient.getProtoBuf(url,
+                                warworlds.Warworlds.Sectors.class);
+                        sectors = Sector.fromProtocolBuffer(pb.getSectorsList());
+                    } catch(Exception e) {
+                        // TODO: handle exceptions
+                        log.error(ExceptionUtils.getStackTrace(e));
+                    }
 
-            @Override
-            protected void onPostExecute(List<Sector> sectors) {
-                if (sectors == null) {
-                    return; // BAD!
+                    return sectors;
                 }
 
-                for(Sector s : sectors) {
-                    Pair<Long, Long> key = new Pair<Long, Long>(
-                            s.getX(), s.getY());
-                    mSectors.put(key, s);
-                }
-                mInTransitSectors.clear();
+                @Override
+                protected void onPostExecute(List<Sector> sectors) {
+                    if (sectors == null) {
+                        return; // BAD!
+                    }
 
-                // let everybody know the list of sectors has been updated
-                fireSectorListChanged();
-            }
-        }.execute();
+                    Map<Pair<Long, Long>, Sector> theseSectors = null;
+                    if (callback != null)
+                        theseSectors = new TreeMap<Pair<Long, Long>, Sector>();
+                    for(Sector s : sectors) {
+                        Pair<Long, Long> key = new Pair<Long, Long>(s.getX(), s.getY());
+                        log.debug(String.format("Fetched sector (%d, %d)", s.getX(), s.getY()));
+
+                        mSectors.put(key, s);
+                        if (callback != null) {
+                            theseSectors.put(key, s);
+                        }
+
+                        Map<Pair<Long, Long>, Sector> thisSector = null;
+                        for (OnSectorsFetchedListener listener : mInTransitListeners.get(key)) {
+                            if (listener != null) {
+                                if (thisSector == null) {
+                                    thisSector = new TreeMap<Pair<Long, Long>, Sector>();
+                                    thisSector.put(key, s);
+                                }
+
+                                listener.onSectorsFetched(thisSector);
+                            }
+                        }
+                        mInTransitListeners.remove(key);
+                    }
+
+                    if (callback != null) {
+                        callback.onSectorsFetched(theseSectors);
+                    }
+                    fireSectorListChanged();
+                }
+            }.execute();
+        }
     }
 
-    /**
-     * This interface should be implemented when you want to listen for "sector list changed"
-     * event (which happens when a new sector is loaded).
-     */
-    public interface OnSectorListChangedListener extends EventListener {
-        /**
-         * This is called when the sector list changes (i.e. when a new sector(s) is loaded)
-         */
-        public abstract void onSectorListChanged();
+    public interface OnSectorListChangedListener {
+        void onSectorListChanged();
+    }
+
+    public interface OnSectorsFetchedListener {
+        void onSectorsFetched(Map<Pair<Long, Long>, Sector> sectors);
     }
 }

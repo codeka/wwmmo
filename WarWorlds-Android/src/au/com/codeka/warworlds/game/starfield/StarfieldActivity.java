@@ -145,8 +145,7 @@ public class StarfieldActivity extends Activity {
         if (scrollView) {
             int offsetX = starOffsetX - (int) ((mStarfield.getWidth() / 2) / mStarfield.getPixelScale());
             int offsetY = starOffsetY -  (int) ((mStarfield.getHeight() / 2) / mStarfield.getPixelScale());
-            SectorManager.getInstance().scrollTo(sectorX, sectorY,
-                    offsetX, offsetY);
+            mStarfield.scrollTo(sectorX, sectorY, offsetX, offsetY);
         }
 
         Intent intent = new Intent(mContext, SolarSystemActivity.class);
