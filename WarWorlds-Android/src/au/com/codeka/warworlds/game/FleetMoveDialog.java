@@ -7,16 +7,16 @@ import android.view.Display;
 import android.view.ViewGroup.LayoutParams;
 import android.view.Window;
 import android.view.WindowManager;
+import au.com.codeka.warworlds.DialogManager;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.game.starfield.StarfieldSurfaceView;
 import au.com.codeka.warworlds.model.Fleet;
-import au.com.codeka.warworlds.model.SectorManager;
 import au.com.codeka.warworlds.model.Star;
+import au.com.codeka.warworlds.model.StarManager;
 
-public class FleetMoveDialog extends Dialog {
+public class FleetMoveDialog extends Dialog implements DialogManager.DialogConfigurable {
     private Activity mActivity;
     private Fleet mFleet;
-    private Star mSourceStar;
     private StarfieldSurfaceView mStarfield;
 
     public static final int ID = 1008;
@@ -46,22 +46,23 @@ public class FleetMoveDialog extends Dialog {
         mStarfield.setZOrderOnTop(true);
     }
 
-    public void setFleet(Fleet fleet, Star sourceStar) {
-        mSourceStar = sourceStar;
+    @Override
+    public void setBundle(Activity activity, Bundle bundle) {
+        mFleet = (Fleet) bundle.getParcelable("au.com.codeka.warworlds.Fleet");
 
-        setFleet(fleet, mSourceStar.getSectorX(),
-                        mSourceStar.getSectorY(),
-                        mSourceStar.getOffsetX(),
-                        mSourceStar.getOffsetY(),
-                        mSourceStar.getKey());
-    }
+        StarManager.getInstance().requestStar(mFleet.getStarKey(), false,
+                                              new StarManager.StarFetchedHandler() {
+            @Override
+            public void onStarFetched(Star s) {
+                long sectorX = s.getSectorX();
+                long sectorY = s.getSectorY();
+                int offsetX = s.getOffsetX();
+                int offsetY = s.getOffsetY();
+                offsetX = offsetX - (int) ((mStarfield.getWidth() / 2) / mStarfield.getPixelScale());
+                offsetY = offsetY -  (int) ((mStarfield.getHeight() / 2) / mStarfield.getPixelScale());
 
-    public void setFleet(Fleet fleet, long sectorX, long sectorY, int offsetX, int offsetY,
-                          String starKey) {
-        mFleet = fleet;
-
-        offsetX = offsetX - (int) ((mStarfield.getWidth() / 2) / mStarfield.getPixelScale());
-        offsetY = offsetY -  (int) ((mStarfield.getHeight() / 2) / mStarfield.getPixelScale());
-        mStarfield.scrollTo(sectorX, sectorY, offsetX, offsetY);
+                mStarfield.scrollTo(sectorX, sectorY, offsetX, offsetY);
+            }
+        });
     }
 }

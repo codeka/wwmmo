@@ -111,7 +111,7 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
             }
         });
 
-        this.scrollTo(0, 0, 0, 0);
+        scrollTo(0, 0, 0, 0);
     }
 
     /**
@@ -170,6 +170,8 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
         }
 
         mSectors = newSectors;
+        setDirty();
+        redraw();
     }
 
     /**

@@ -1,7 +1,5 @@
 package au.com.codeka.warworlds.game.starfield;
 
-import java.util.List;
-
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
@@ -19,14 +17,13 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+import au.com.codeka.warworlds.DialogManager;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.game.EmpireActivity;
-import au.com.codeka.warworlds.game.FleetMoveDialog;
 import au.com.codeka.warworlds.game.solarsystem.SolarSystemActivity;
 import au.com.codeka.warworlds.model.Colony;
 import au.com.codeka.warworlds.model.Empire;
 import au.com.codeka.warworlds.model.EmpireManager;
-import au.com.codeka.warworlds.model.Fleet;
 import au.com.codeka.warworlds.model.ImageManager;
 import au.com.codeka.warworlds.model.Planet;
 import au.com.codeka.warworlds.model.PlanetImageManager;
@@ -195,28 +192,16 @@ public class StarfieldActivity extends Activity {
     }
 
     @Override
+    protected Dialog onCreateDialog(int id) {
+        Dialog d = DialogManager.getInstance().onCreateDialog(this, id);
+        if (d == null)
+            d = super.onCreateDialog(id);
+        return d;
+    }
+
+    @Override
     protected void onPrepareDialog(int id, Dialog d, Bundle args) {
-        switch(id) {
-        case FleetMoveDialog.ID: {
-            FleetMoveDialog dialog = (FleetMoveDialog) d;
-
-            String fleetKey = args.getString("au.com.codeka.warworlds.FleetKey");
-            long sectorX = args.getLong("au.com.codeka.warworlds.SectorX");
-            long sectorY = args.getLong("au.com.codeka.warworlds.SectorY");
-            int offsetX = args.getInt("au.com.codeka.warworlds.OffsetX");
-            int offsetY = args.getInt("au.com.codeka.warworlds.OffsetY");
-            String starKey = args.getString("au.com.codeka.warworlds.StarKey");
-
-            List<Fleet> fleets = EmpireManager.getInstance().getEmpire().getAllFleets();
-            if (fleets != null) for (Fleet f : fleets) {
-                if (f.getKey().equals(fleetKey)) {
-                    dialog.setFleet(f, sectorX, sectorY, offsetX, offsetY, starKey);
-                }
-            }
-            break;
-        }
-        }
-
+        DialogManager.getInstance().onPrepareDialog(this, id, d, args);
         super.onPrepareDialog(id, d, args);
     }
 
