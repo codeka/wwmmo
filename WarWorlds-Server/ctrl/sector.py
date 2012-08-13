@@ -1,6 +1,7 @@
 """sector.py: Contains business logic for the sectors, stars etc."""
 
 import collections
+import math
 
 import ctrl
 from model import empire as empire_mdl
@@ -9,6 +10,8 @@ from protobufs import warworlds_pb2 as pb
 
 
 SectorCoord = collections.namedtuple("SectorCoord", ["x", "y"])
+
+SECTOR_SIZE = 1024
 
 
 def getSectors(coords):
@@ -84,6 +87,28 @@ def getStar(star_key, force_nocache=False):
 
   ctrl.setCached({cache_key: star_pb})
   return star_pb
+
+
+def get_distance_between_stars(star_1_pb, star_2_pb):
+  """Returns the distance (in 'parsecs') between two stars.
+
+  We have to do a bit of trigenometry to get the distance between two stars, because they could
+  be in different sectors. We know the distance between two sectors (sector sizes are constant)
+  so finding the distance between two points within two sectors is a matter of adding a vector
+  from star_1 to the sector origin, a vector from the origin of sector_1 to sector_2 and then
+  a vector from the origin of sector_2 to star_2. 
+  """
+  x = -star_1_pb.offset_x
+  y = -star_1_pb.offset_y
+
+  x += (star_2_pb.sector_x - star_1_pb.sector_x) * SECTOR_SIZE
+  y += (star_2_pb.sector_y - star_1_pb.sector_y) * SECTOR_SIZE
+
+  x += star_2_pb.offset_x
+  y += star_2_pb.offset_y
+
+  distance_in_pixels = math.sqrt((x*x) + (y*y))
+  return distance_in_pixels / 10.0
 
 
 def sumarize(star_pb):

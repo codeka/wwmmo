@@ -738,9 +738,16 @@ def _orderFleet_move(fleet_pb, order_pb):
   fleet_mdl.destinationStar = db.Key(order_pb.star_key)
   fleet_mdl.put()
 
+  src_star = sector.getStar(fleet_pb.star_key)
+  dst_star = sector.getStar(db.Key(order_pb.star_key))
+  distance_in_pc = sector.get_distance_between_stars(src_star, dst_star)
+
+  design = ShipDesign.getDesign(fleet_pb.design_name)
+
   # Let's just hard-code this to 1 hour for now...
-  time = datetime.now() + timedelta(hours=1)
-  logging.info("Fleet will reach it's destination at %s" % (time))
+  time = datetime.now() + timedelta(hours=(distance_in_pc / design.speed))
+  logging.info("distance=%.2f pc, speed=%.2f pc/hr, fleet will reach it's destination at %s"
+               % (distance_in_pc, design.speed, time))
   taskqueue.add(queue_name="fleet",
                 url="/tasks/empire/fleet/"+fleet_pb.key+"/move-complete",
                 method="GET",
@@ -848,6 +855,8 @@ def _parseShipDesign(designXml):
   design = ShipDesign()
   logging.debug("Parsing ship <design id=\"%s\">" % (designXml.get("id")))
   _parseDesign(designXml, design)
+  statsXml = designXml.find("stats")
+  design.speed = float(statsXml.get("speed"))
   return design
 
 
