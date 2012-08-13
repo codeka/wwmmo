@@ -694,37 +694,65 @@ def getFleet(fleet_key):
   return fleet_pb
 
 
+def _orderFleet_split(fleet_pb, order_pb):
+  left_size = order_pb.split_left
+  right_size = order_pb.split_right
+  if left_size + right_size != fleet_pb.num_ships:
+    logging.debug("Number of ships in left/right split (%d/%d) don't match total "
+                  "ships in current fleet (%d)" % (left_size, right_size, fleet_pb.num_ships))
+    return False
+
+  # This can happen if the original size is 1, or you move the slider all the way
+  # over, essentially, it's no change
+  if left_size <= 0 or right_size <= 0:
+    return True
+
+  left_model = mdl.Fleet.get(fleet_pb.key)
+  left_model.numShips = left_size
+
+  right_model = mdl.Fleet(parent = left_model.key().parent())
+  right_model.empire = mdl.Fleet.empire.get_value_for_datastore(left_model)
+  right_model.designName = left_model.designName
+  right_model.state = pb.Fleet.IDLE
+  right_model.numShips = right_size
+  right_model.stateStartTime = datetime.now()
+
+  left_model.put()
+  right_model.put()
+
+  ctrl.clearCached(["fleet:%s" % fleet_pb.key,
+                    "fleet:for-empire:%s" % fleet_pb.empire_key,
+                    "star:%s" % fleet_pb.star_key])
+  return True
+
+
+def _orderFleet_move(fleet_pb, order_pb):
+  fleet_mdl = mdl.Fleet.get(fleet_pb.key)
+
+  if fleet_mdl.state != pb.Fleet.IDLE:
+    logging.debug("Cannot move fleet, it's not currently idle.")
+    return False
+
+  fleet_mdl.state = pb.Fleet.MOVING
+  fleet_mdl.stateStartTime = datetime.now()
+  fleet_mdl.destinationStar = db.Key(order_pb.star_key)
+  fleet_mdl.put()
+
+  # Let's just hard-code this to 1 hour for now...
+  time = datetime.now() + timedelta(hours=1)
+  logging.info("Fleet will reach it's destination at %s" % (time))
+  taskqueue.add(queue_name="fleet",
+                url="/tasks/empire/fleet/"+fleet_pb.key+"/move-complete",
+                method="GET",
+                eta=time)
+
+  return True
+
 def orderFleet(fleet_pb, order_pb):
   if order_pb.order == pb.FleetOrder.SPLIT:
-    left_size = order_pb.split_left
-    right_size = order_pb.split_right
-    if left_size + right_size != fleet_pb.num_ships:
-      logging.debug("Number of ships in left/right split (%d/%d) don't match total "
-                    "ships in current fleet (%d)" % (left_size, right_size, fleet_pb.num_ships))
-      return False
-
-    # This can happen if the original size is 1, or you move the slider all the way
-    # over, essentially, it's no change
-    if left_size <= 0 or right_size <= 0:
-      return True
-
-    left_model = mdl.Fleet.get(fleet_pb.key)
-    left_model.numShips = left_size
-
-    right_model = mdl.Fleet(parent = left_model.key().parent())
-    right_model.empire = mdl.Fleet.empire.get_value_for_datastore(left_model)
-    right_model.designName = left_model.designName
-    right_model.state = pb.Fleet.IDLE
-    right_model.numShips = right_size
-    right_model.stateStartTime = datetime.now()
-
-    left_model.put()
-    right_model.put()
-
-    ctrl.clearCached(["fleet:%s" % fleet_pb.key,
-                      "fleet:for-empire:%s" % fleet_pb.empire_key,
-                      "star:%s" % fleet_pb.star_key])
-    return True
+    return _orderFleet_split(fleet_pb, order_pb)
+  elif order_pb.order == pb.FleetOrder.MOVE:
+    return _orderFleet_move(fleet_pb, order_pb)
 
   return False
 

@@ -109,8 +109,8 @@ public class SolarSystemSurfaceView extends UniverseElementSurfaceView {
         for(PlanetInfo planetInfo : mPlanetInfos) {
             if (planetInfo.planet.getIndex() == planet.getIndex()) {
                 Point2D pixels = planetInfo.centre;
-                return new Point2D(pixels.getX() / getPixelScale(),
-                                    pixels.getY() / getPixelScale());
+                return new Point2D(pixels.x / getPixelScale(),
+                                   pixels.y / getPixelScale());
             }
         }
 
@@ -137,9 +137,9 @@ public class SolarSystemSurfaceView extends UniverseElementSurfaceView {
             angle = (float) ((angle*i*Math.PI) + angle*Math.PI);
 
             Point2D centre = new Point2D(x, y);
-            centre = centre.rotate(angle);
-            centre.setY(-1 * centre.getY());
-            log.debug("Planet centre: ("+centre.getX()+","+centre.getY()+")");
+            centre.rotate(angle);
+            centre.y *= -1;
+            log.debug("Planet centre: ("+centre.x+","+centre.y+")");
 
             planetInfo.centre = centre;
             planetInfo.distanceFromSun = distanceFromSun;
@@ -259,10 +259,10 @@ public class SolarSystemSurfaceView extends UniverseElementSurfaceView {
             if (bm != null) {
                 Rect src = new Rect(0, 0, bm.getWidth(), bm.getHeight());
                 double halfSize = 50.0 * getPixelScale();
-                Rect dest = new Rect((int)(planetInfo.centre.getX() - halfSize),
-                                     (int)(planetInfo.centre.getY() - halfSize),
-                                     (int)(planetInfo.centre.getX() + halfSize),
-                                     (int)(planetInfo.centre.getY() + halfSize));
+                Rect dest = new Rect((int)(planetInfo.centre.x - halfSize),
+                                     (int)(planetInfo.centre.y - halfSize),
+                                     (int)(planetInfo.centre.x + halfSize),
+                                     (int)(planetInfo.centre.y + halfSize));
                 canvas.drawBitmap(bm, src, dest, mPlanetPaint);
             }
 
@@ -271,8 +271,8 @@ public class SolarSystemSurfaceView extends UniverseElementSurfaceView {
                 for (Colony colony : colonies) {
                     if (colony.getPlanetIndex() == mPlanetInfos[i].planet.getIndex()) {
                         canvas.drawBitmap(mColonyIcon,
-                                (float) (planetInfo.centre.getX() + mColonyIcon.getWidth()),
-                                (float) (planetInfo.centre.getY() - mColonyIcon.getHeight()),
+                                (float) (planetInfo.centre.x + mColonyIcon.getWidth()),
+                                (float) (planetInfo.centre.y - mColonyIcon.getHeight()),
                                 mPlanetPaint);
                     }
                 }
@@ -280,8 +280,8 @@ public class SolarSystemSurfaceView extends UniverseElementSurfaceView {
         }
 
         if (mSelectedPlanet != null) {
-            canvas.drawCircle((float) mSelectedPlanet.centre.getX(), 
-                    (float) mSelectedPlanet.centre.getY(),
+            canvas.drawCircle((float) mSelectedPlanet.centre.x, 
+                    (float) mSelectedPlanet.centre.y,
                     40 * getPixelScale(), mSelectedPlanetPaint);
         }
     }

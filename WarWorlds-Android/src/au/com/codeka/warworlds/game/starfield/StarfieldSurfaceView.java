@@ -20,6 +20,7 @@ import android.util.AttributeSet;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import au.com.codeka.Pair;
+import au.com.codeka.Point2D;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.game.StarfieldBackgroundRenderer;
 import au.com.codeka.warworlds.game.UniverseElementSurfaceView;
@@ -44,6 +45,7 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
     private Bitmap mColonyIcon;
     private StarfieldBackgroundRenderer mBackgroundRenderer;
     private SelectionOverlay mSelectionOverlay;
+    private Map<String, List<StarAttachedOverlay>> mStarAttachedOverlays;
 
     private boolean mNeedRedraw = true;
     private Bitmap mBuffer;
@@ -71,8 +73,9 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
         mSectorX = mSectorY = 0;
         mOffsetX = mOffsetY = 0;
         mSectors = new TreeMap<Pair<Long, Long>, Sector>();
+        mStarAttachedOverlays = new TreeMap<String, List<StarAttachedOverlay>>();
 
-        mSelectionOverlay = new SelectionOverlay(0, 0, 20);
+        mSelectionOverlay = new SelectionOverlay();
 
         mStarPaint = new Paint();
         mStarPaint.setARGB(255, 255, 255, 255);
@@ -135,6 +138,35 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
     protected void fireStarSelected(Star star) {
         for(OnStarSelectedListener listener : mStarSelectedListeners) {
             listener.onStarSelected(star);
+        }
+    }
+
+    @Override
+    public void addOverlay(Overlay overlay) {
+        super.addOverlay(overlay);
+    }
+
+    /**
+     * Adds the given \c StarAttachedOverlay and attaches it to the given star.
+     */
+    public void addOverlay(StarAttachedOverlay overlay, Star star) {
+        addOverlay(overlay);
+
+        List<StarAttachedOverlay> starAttachedOverlays = mStarAttachedOverlays.get(star.getKey());
+        if (starAttachedOverlays == null) {
+            starAttachedOverlays = new ArrayList<StarAttachedOverlay>();
+            mStarAttachedOverlays.put(star.getKey(), starAttachedOverlays);
+        }
+        starAttachedOverlays.add(overlay);
+    }
+
+    @Override
+    public void removeOverlay(Overlay overlay) {
+        super.removeOverlay(overlay);
+
+        // we have to go through all out star-attached overlays and make sure this one is gone
+        for (List<StarAttachedOverlay> overlays : mStarAttachedOverlays.values()) {
+            overlays.remove(overlay);
         }
     }
 
@@ -378,8 +410,13 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
                         (y - mColonyIcon.getHeight()) * pixelScale, mStarPaint);
             }
 
-            if (mSelectedStar == star) {
-                mSelectionOverlay.setCentre(x * pixelScale, y * pixelScale);
+            List<StarAttachedOverlay> starAttachedOverlays = mStarAttachedOverlays.get(star.getKey());
+            if (starAttachedOverlays != null && !starAttachedOverlays.isEmpty()) {
+                int n = starAttachedOverlays.size();
+                for (int i = 0; i < n; i++) {
+                    StarAttachedOverlay sao = starAttachedOverlays.get(i);
+                    sao.setCentre(x * pixelScale, y * pixelScale);
+                }
             }
         }
     }
@@ -433,9 +470,10 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
             mSelectedStar = star;
 
             mSelectionOverlay.setRadius((star.getSize() + 4) * getPixelScale());
-            if (!mSelectionOverlay.isVisible()) {
-                addOverlay(mSelectionOverlay);
+            if (mSelectionOverlay.isVisible()) {
+                removeOverlay(mSelectionOverlay);
             }
+            addOverlay(mSelectionOverlay, star);
 
             setDirty();
             redraw();
@@ -476,6 +514,65 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
             playSoundEffect(android.view.SoundEffectConstants.CLICK);
 
             return false;
+        }
+    }
+
+    /**
+     * An \c Overlay that's "attached" to a star. We'll make sure it's recentred whenever the
+     * view scrolls around.
+     */
+    public static abstract class StarAttachedOverlay extends UniverseElementSurfaceView.Overlay {
+        protected Point2D mCentre;
+
+        public StarAttachedOverlay() {
+            mCentre = new Point2D();
+        }
+
+        public Point2D getCentre() {
+            return mCentre;
+        }
+
+        public void setCentre(double x, double y) {
+            mCentre.x = (float) x;
+            mCentre.y = (float) y;
+        }
+    }
+
+    /**
+     * This overlay is used for drawing the selection indicator. It's an animated dotted circle
+     * that spins around the selected point.
+     */
+    private static class SelectionOverlay extends StarAttachedOverlay {
+        private RotatingCircle mInnerCircle;
+        private RotatingCircle mOuterCircle;
+
+        public SelectionOverlay() {
+            Paint p = new Paint();
+            p.setARGB(255, 255, 255, 255);
+            mInnerCircle = new RotatingCircle(p);
+
+            p = new Paint();
+            p.setARGB(255, 255, 255, 255);
+            mOuterCircle = new RotatingCircle(p);
+        }
+
+        @Override
+        public void setCentre(double x, double y) {
+            super.setCentre(x, y);
+
+            mInnerCircle.setCentre(x, y);
+            mOuterCircle.setCentre(x, y);
+        }
+
+        public void setRadius(double radius) {
+            mInnerCircle.setRadius(radius);
+            mOuterCircle.setRadius(radius + 4.0);
+        }
+
+        @Override
+        public void draw(Canvas canvas) {
+            mInnerCircle.draw(canvas);
+            mOuterCircle.draw(canvas);
         }
     }
 

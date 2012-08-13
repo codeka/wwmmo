@@ -204,82 +204,72 @@ public class UniverseElementSurfaceView extends SurfaceView implements SurfaceHo
         }
 
         public abstract void draw(Canvas canvas);
-    }
 
-    /**
-     * This overlay is used for drawing the selection indicator. It's an animated dotted circle
-     * that spins around the selected point.
-     */
-    protected static class SelectionOverlay extends Overlay {
-        private Paint mPaint;
-        private float mCentreX;
-        private float mCentreY;
-        private float mRadius;
-        private float mAngle;
-        private float mDashAngleDegrees;
-        private float mRotateSpeed;
-        private RectF mInnerCircle;
-        private RectF mOuterCircle;
+        /**
+         * This helper class draws a rotating circle at the specific (x, y) coordinate with
+         * the specified radius & paint. It's useful for selection circles and whatnot.
+         */
+        public static class RotatingCircle {
+            private RectF mBounds;
+            private double mCentreX;
+            private double mCentreY;
+            private Paint mPaint;
+            private double mRadius;
+            private float mAngle;
+            private float mDashAngleDegrees;
+            private float mRotateSpeed;
 
-        public SelectionOverlay(double centreX, double centreY, double radius) {
-            mCentreX = 0;
-            mCentreY = 0;
-            mRadius = 0;
-            mAngle = 0;
+            public RotatingCircle(Paint paint) {
+                mCentreX = 0;
+                mCentreY = 0;
+                mRadius = 0;
+                mAngle = 0;
+                mRotateSpeed = 1.5f;
+                mBounds = new RectF();
 
-            mPaint = new Paint();
-            mPaint.setAntiAlias(true);
-            mPaint.setARGB(255, 255, 255, 255);
-            mPaint.setStyle(Paint.Style.STROKE);
-
-            mInnerCircle = new RectF();
-            mOuterCircle = new RectF();
-            mRotateSpeed = 1.5f;
-
-            setCentre(centreX, centreY);
-            setRadius(radius);
-        }
-
-        public void setCentre(double x, double y) {
-            mCentreX = (float) x;
-            mCentreY = (float) y;
-            setRadius(mRadius);
-        }
-
-        public void setRadius(double radius) {
-            mRadius = (float) radius;
-
-            int numDashes = 40; // we want 40 dashes around the circle
-            double dashAngleRadians = (2 * Math.PI) / numDashes;
-            double dashPixels = dashAngleRadians * radius;
-            mDashAngleDegrees = 360.0f / numDashes;
-
-            DashPathEffect pathEffect = new DashPathEffect(new float[] {
-                    (float) dashPixels, (float) dashPixels}, 1);
-            mPaint.setPathEffect(pathEffect);
-
-            mInnerCircle.left = mCentreX - mRadius;
-            mInnerCircle.top = mCentreY - mRadius;
-            mInnerCircle.right = mCentreX + mRadius;
-            mInnerCircle.bottom = mCentreY + mRadius;
-
-            mOuterCircle.left = mCentreX - mRadius - 4;
-            mOuterCircle.top = mCentreY - mRadius - 4;
-            mOuterCircle.right = mCentreX + mRadius + 4;
-            mOuterCircle.bottom = mCentreY + mRadius + 4;
-        }
-
-        @Override
-        public void draw(Canvas canvas) {
-            mAngle += mRotateSpeed;
-            if (mAngle > 360.0f) {
-                mAngle = 0.0f;
+                mPaint = paint;
+                mPaint.setAntiAlias(true);
+                mPaint.setStyle(Paint.Style.STROKE);
             }
 
-            // we cannot make the arc 360 degrees, otherwise it ignores the angle offset. Instead
-            // we make it 360 - "dash-angle" (i.e. the angle through which one dash passes)
-            canvas.drawArc(mInnerCircle, mAngle, 360.0f - mDashAngleDegrees, false, mPaint);
-            canvas.drawArc(mOuterCircle, 360.0f - mAngle, 360.0f - mDashAngleDegrees, false, mPaint);
+            public void setCentre(double x, double y) {
+                mCentreX = x;
+                mCentreY = y;
+                setRadius(mRadius);
+            }
+
+            public void setRadius(double radius) {
+                mRadius = radius;
+
+                int numDashes = 40; // we want 40 dashes around the circle
+                double dashAngleRadians = (2 * Math.PI) / numDashes;
+                double dashPixels = dashAngleRadians * radius;
+                mDashAngleDegrees = 360.0f / numDashes;
+
+                DashPathEffect pathEffect = new DashPathEffect(new float[] {
+                        (float) dashPixels, (float) dashPixels}, 1);
+                mPaint.setPathEffect(pathEffect);
+
+                mBounds.left = (float) (mCentreX - mRadius);
+                mBounds.top = (float) (mCentreY - mRadius);
+                mBounds.right = (float) (mCentreX + mRadius);
+                mBounds.bottom = (float) (mCentreY + mRadius);
+            }
+
+            public void draw(Canvas canvas) {
+                if (mRadius == 0) {
+                    return;
+                }
+
+                mAngle += mRotateSpeed;
+                if (mAngle > 360.0f) {
+                    mAngle = 0.0f;
+                }
+
+                // we cannot make the arc 360 degrees, otherwise it ignores the angle offset. Instead
+                // we make it 360 - "dash-angle" (i.e. the angle through which one dash passes)
+                canvas.drawArc(mBounds, mAngle, 360.0f - mDashAngleDegrees, false, mPaint);
+            }
         }
     }
 }

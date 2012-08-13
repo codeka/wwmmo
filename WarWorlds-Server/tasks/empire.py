@@ -145,7 +145,52 @@ class StarSimulatePage(tasks.TaskPage):
 
     self.response.write("Success!")
 
+
+class FleetMoveCompletePage(tasks.TaskPage):
+  """Called when a fleet completes it's move operation.
+
+  We need to transfer the fleet so that it's orbiting the new star."""
+  def get(self, fleet_key):
+    fleet_mdl = mdl.Fleet.get(fleet_key)
+    if fleet_mdl.state != pb.Fleet.MOVING:
+      logging.warn("Fleet [%s] is not moving, as expected." % (fleet_key))
+      self.set_response(400)
+    else:
+      new_fleet_mdl = mdl.Fleet(parent=fleet_mdl.destinationStar)
+      new_fleet_mdl.empire = mdl.Fleet.empire.get_value_for_datastore(fleet_mdl)
+      new_fleet_mdl.designName = fleet_mdl.designName
+      new_fleet_mdl.numShips = fleet_mdl.numShips
+
+      # new fleet is now idle
+      new_fleet_mdl.state = pb.Fleet.IDLE
+      new_fleet_mdl.stateStartTime = datetime.now()
+
+      fleet_mdl.delete()
+      new_fleet_mdl.put()
+
+      empire = fleet_mdl.empire
+      new_star_key = new_fleet_mdl.key().parent()
+      ctrl.clearCached(["fleet:for-empire:%s" % (empire.key()),
+                        "star:%s" % (fleet_mdl.key().parent()),
+                        "star:%s" % (new_star_key)])
+
+      design = ctl.ShipDesign.getDesign(fleet_mdl.designName)
+      star_pb = sector_ctl.getStar(new_star_key)
+
+      # Send a notification to the player that construction of their building is complete
+      msg = "Your %s fleet of %d ships has arrived on %s." % (design.name,
+                                                              fleet_mdl.numShips,
+                                                              star_pb.name)
+      logging.debug("Sending message to user [%s] indicating fleet move complete." % (
+          empire.user.email()))
+      s = c2dm.Sender()
+      devices = ctrl.getDevicesForUser(empire.user.email())
+      for device in devices.registrations:
+        s.sendMessage(device.device_registration_id, {"msg": msg})
+
+
 app = webapp.WSGIApplication([("/tasks/empire/build-check", BuildCheckPage),
-                              ("/tasks/empire/star-simulate", StarSimulatePage)],
+                              ("/tasks/empire/star-simulate", StarSimulatePage),
+                              ("/tasks/empire/fleet/([^/]+)/move-complete", FleetMoveCompletePage)],
                              debug=os.environ["SERVER_SOFTWARE"].startswith("Development"))
 

@@ -1,6 +1,6 @@
 
 
-# total storage limit for all of our queues. Some tuning may be required here.
+# total storage limit for all of our queues. Some tuning may be required here
 total_storage_limit: 200M
 
 queue:
@@ -9,6 +9,12 @@ queue:
   rate: 1/s
 
 - name: build
+  max_concurrent_requests: 1
+  rate: 1/s
+  retry_parameters:
+    task_retry_limit: 1
+
+- name: fleet
   max_concurrent_requests: 1
   rate: 1/s
   retry_parameters:

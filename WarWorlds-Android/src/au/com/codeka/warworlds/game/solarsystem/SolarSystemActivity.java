@@ -234,8 +234,8 @@ public class SolarSystemActivity extends Activity implements StarManager.StarFet
             // just ignore this then cause it'll fire an onPlanetSelected when it finishes
             // drawing.
         } else {
-            double x = planetCentre.getX() * mSolarSystemSurfaceView.getPixelScale();
-            double y = planetCentre.getY() * mSolarSystemSurfaceView.getPixelScale();
+            double x = planetCentre.x * mSolarSystemSurfaceView.getPixelScale();
+            double y = planetCentre.y * mSolarSystemSurfaceView.getPixelScale();
 
             // hard-coded size of the congeniality container: 85x34 dp
             float offsetX = (85 + 20) * mSolarSystemSurfaceView.getPixelScale();

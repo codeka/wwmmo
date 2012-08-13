@@ -16,15 +16,31 @@
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_alignParentRight="true"
-        android:layout_above="@+id/move_btn"
+        android:layout_above="@+id/buttons"
         android:text="@string/fleet_move_help" />
 
-    <Button
-        android:id="@+id/move_btn"
-        style="@style/Button"
+    <LinearLayout
+        android:id="@+id/buttons"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:text="@string/move" />
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/cancel_btn"
+            style="@style/Button"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:text="@string/cancel" />
+
+        <Button
+            android:id="@+id/move_btn"
+            style="@style/Button"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:text="@string/move" />
+    </LinearLayout>
 
 </RelativeLayout>

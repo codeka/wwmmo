@@ -480,4 +480,7 @@ message FleetOrder
     // the original number of ships you had.
     optional int32 split_left = 2;
     optional int32 split_right = 3;
+
+    // when moving or attacking, this represents the destination star
+    optional string star_key = 4;
 }
