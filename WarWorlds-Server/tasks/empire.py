@@ -12,6 +12,7 @@ import ctrl
 from ctrl import empire as ctl
 from ctrl import sector as sector_ctl
 from model import empire as mdl
+from model import sector as sector_mdl
 from model import c2dm
 import protobufs.warworlds_pb2 as pb
 import tasks
@@ -63,6 +64,10 @@ class BuildCheckPage(tasks.TaskPage):
       colony_key = mdl.BuildOperation.colony.get_value_for_datastore(build_request_model)
       empire_key = mdl.BuildOperation.empire.get_value_for_datastore(build_request_model)
 
+      # Figure out the name of the star the object was built on, for the notification
+      star_key = build_request_model.key().parent()
+      star_pb = sector_ctl.getStar(star_key)
+
       logging.info("Build for empire \"%s\", colony \"%s\" complete." % (empire_key, colony_key))
       if build_request_model.designKind == pb.BuildRequest.BUILDING:
         model = mdl.Building(parent=build_request_model.key().parent())
@@ -78,28 +83,26 @@ class BuildCheckPage(tasks.TaskPage):
         # don't hurt all that much (TODO: confirm)
         query = (mdl.Fleet.all().ancestor(build_request_model.key().parent())
                                 .filter("empire", build_request_model.empire))
-        done = False
+        existing = False
         for fleet_model in query:
           if (fleet_model.designName == build_request_model.designName and
               fleet_model.state == pb.Fleet.IDLE):
             if db.run_in_transaction(_incrShipCountInTX, fleet_model.key()):
-              done = True
+              existing = True
               model = fleet_model
               # it's an existing fleet, so make sure we clear it's cached value
               keys_to_clear.append("fleet:%s" % str(fleet_model.key()))
               break
-        if not done:
-          model = mdl.Fleet(parent=build_request_model.key().parent())
+        if not existing:
+          model = mdl.Fleet(parent=star_key)
           model.empire = build_request_model.empire
+          model.sector = sector_mdl.SectorManager.getSectorKey(star_pb.sector_x, star_pb.sector_y)
           model.designName = build_request_model.designName
           model.numShips = 1
           model.state = pb.Fleet.IDLE
           model.stateStartTime = datetime.now()
           model.put()
         design = ctl.ShipDesign.getDesign(model.designName)
-
-      # Figure out the name of the star the object was built on, for the notification
-      star_pb = sector_ctl.getStar(build_request_model.key().parent())
 
       # Send a notification to the player that construction of their building is complete
       msg = "Your %s on %s has been built." % (design.name, star_pb.name)
@@ -156,7 +159,12 @@ class FleetMoveCompletePage(tasks.TaskPage):
       logging.warn("Fleet [%s] is not moving, as expected." % (fleet_key))
       self.set_response(400)
     else:
+      new_star_key = mdl.Fleet.destinationStar.get_value_for_datastore(fleet_mdl)
+      new_star_pb = sector_ctl.getStar(new_star_key)
+
       new_fleet_mdl = mdl.Fleet(parent=fleet_mdl.destinationStar)
+      new_fleet_mdl.sector = sector_mdl.SectorManager.getSectorKey(new_star_pb.sector_x,
+                                                                   new_star_pb.sector_y)
       new_fleet_mdl.empire = mdl.Fleet.empire.get_value_for_datastore(fleet_mdl)
       new_fleet_mdl.designName = fleet_mdl.designName
       new_fleet_mdl.numShips = fleet_mdl.numShips
@@ -169,18 +177,16 @@ class FleetMoveCompletePage(tasks.TaskPage):
       new_fleet_mdl.put()
 
       empire = fleet_mdl.empire
-      new_star_key = new_fleet_mdl.key().parent()
       ctrl.clearCached(["fleet:for-empire:%s" % (empire.key()),
                         "star:%s" % (fleet_mdl.key().parent()),
                         "star:%s" % (new_star_key)])
 
       design = ctl.ShipDesign.getDesign(fleet_mdl.designName)
-      star_pb = sector_ctl.getStar(new_star_key)
 
       # Send a notification to the player that construction of their building is complete
       msg = "Your %s fleet of %d ships has arrived on %s." % (design.name,
                                                               fleet_mdl.numShips,
-                                                              star_pb.name)
+                                                              new_star_pb.name)
       logging.debug("Sending message to user [%s] indicating fleet move complete." % (
           empire.user.email()))
       s = c2dm.Sender()

@@ -160,6 +160,9 @@ message Sector
 
     // a collection of colonies in this sector (TODO: full colony details? probably not needed...)
     repeated Colony colonies = 4;
+
+    // a collection of fleets in this sector
+    repeated Fleet fleets = 6;
 }
 
 //

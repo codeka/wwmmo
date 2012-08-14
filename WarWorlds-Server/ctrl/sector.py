@@ -37,6 +37,14 @@ def getSectors(coords):
       sector_pb = pb.Sector()
       ctrl.sectorModelToPb(sector_pb, sector_model)
 
+      for colony_model in empire_mdl.Colony.getForSector(sector_model):
+        colony_pb = sector_pb.colonies.add()
+        ctrl.colonyModelToPb(colony_pb, colony_model)
+
+      for fleet_model in empire_mdl.Fleet.getForSector(sector_model):
+        fleet_pb = sector_pb.fleets.add()
+        ctrl.fleetModelToPb(fleet_pb, fleet_model)
+
       cache_key = "sector:%d,%d" % (sector_model.x, sector_model.y)
       sectors[cache_key] = sector_pb
       sectors_to_cache[cache_key] = sector_pb

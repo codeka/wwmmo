@@ -84,6 +84,7 @@ class HelloPage(ApiPage):
       device = model.DeviceRegistration.get(deviceRegistrationKey)
       if device is None:
         # ERROR
+        logging.error("No device with registration key [%s] found." % (deviceRegistrationKey))
         self.response.set_status(400)
         return
 

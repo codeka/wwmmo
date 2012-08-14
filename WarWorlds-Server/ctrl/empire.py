@@ -237,7 +237,7 @@ def simulate(star_pb, empire_key=None, log=_log_noop):
   end_time = datetime.now()
 
   # if we have less than a few seconds of time to simulate, we'll extend the end time
-  # a little.
+  # a little to ensure there's no rounding errors and such
   if (end_time - timedelta(seconds=3)) < start_time:
     end_time = start_time + timedelta(seconds=3)
 
@@ -249,25 +249,31 @@ def simulate(star_pb, empire_key=None, log=_log_noop):
   prediction_star_pb = None
 
   while True:
-    step_end_time = start_time + timedelta(minutes=15)
+    dt = timedelta(minutes=15)
+    step_end_time = start_time + dt
     if step_end_time < end_time:
-      _simulateStep(timedelta(minutes=15), start_time, star_pb, empire_key, log)
+      _simulateStep(dt, start_time, star_pb, empire_key, log)
       start_time = step_end_time
     elif step_end_time < prediction_time:
       if not prediction_star_pb:
-        # if we haven't saved the "final" star_pb yet, do it now
+        log("")
+        log("---- Last simulation step before prediction phase")
+        log("")
+
         dt = end_time - start_time
-        start_time += dt
         if dt.total_seconds() > 0:
           # last little bit of the simulation
           _simulateStep(dt, start_time, star_pb, empire_key, log)
+        start_time += dt
 
         log("")
         log("---- Prediction phase beginning")
         log("")
-        prediction_star_pb = copy.deepcopy(star_pb)
 
-      _simulateStep(timedelta(minutes=15), start_time, prediction_star_pb, empire_key, log)
+        prediction_star_pb = copy.deepcopy(star_pb)
+        dt = timedelta(minutes=15) - dt
+
+      _simulateStep(dt, start_time, prediction_star_pb, empire_key, log)
       start_time = step_end_time
     else:
       break
@@ -309,7 +315,7 @@ def _simulateStep(dt, now, star_pb, empire_key, log):
     log: A function we'll call to log messages (for debugging)
   """
 
-  log("Simulation @ %s" % (now))
+  log("Simulation @ %s (dt=%.4f hrs)" % (now, (dt.total_seconds() / 3600.0)))
   total_goods = None
   total_minerals = None
   total_population = 0.0
@@ -379,7 +385,7 @@ def _simulateStep(dt, now, star_pb, empire_key, log):
 
       # the end_time will be accurate, since it'll have been updated last step
       endTime = ctrl.epochToDateTime(build_request.end_time)
-      if endTime < now:
+      if endTime < now and endTime > datetime(2000, 1, 1):
         continue
 
       # as long as it's started but hasn't finished, we'll be working on it this turn
@@ -393,6 +399,10 @@ def _simulateStep(dt, now, star_pb, empire_key, log):
       workers_per_build_request = total_workers / num_valid_build_requests
       log("Total workers = %d, requests = %d, workers per build request = %d" %
           (total_workers, num_valid_build_requests, workers_per_build_request))
+
+      # OK, we can spare at least ONE population
+      if workers_per_build_request == 0:
+        workers_per_build_request = 1
 
       for build_request in build_requests:
         design = Design.getDesign(build_request.build_kind, build_request.design_name)
@@ -413,59 +423,50 @@ def _simulateStep(dt, now, star_pb, empire_key, log):
         total_build_time_in_hours *= (100.0 / workers_per_build_request)
         log("total_build_time = %.2f hrs" % total_build_time_in_hours)
 
-        # Work out how many hours we've spend so far
-        time_spent = now - ctrl.epochToDateTime(build_request.start_time)
-        time_spent = time_spent.total_seconds() / 3600.0
-        # time_spend could be negative, which means we start the build half-way through this
-        # step. That's OK, the math still works out
-        log("time_spent = %.2f" % time_spent)
+        # the number of hours of work required, assuming we have all the minerals we need
+        time_remaining_in_hours = (1.0 - build_request.progress) * total_build_time_in_hours
+        log("start_time = %s, time remaining = %.2f hrs" % (startTime, time_remaining_in_hours))
 
-        # dt_required is the amount of time available this turn to spend on building.
-        dt_required = dt_in_hours
-        if time_spent + dt_required > total_build_time_in_hours:
-          # If we're going to finish on this turn, we only need a fraction of the minerals we'd
-          # otherwise use, so make sure dt_required is correct
-          dt_required = total_build_time_in_hours - time_spent
-        if dt_required < 0:
-          log("Building complete!")
+        dt_used = dt_in_hours
+        if startTime > now:
+          start_offset = now - startTime
+          dt_used -= start_offset.total_seconds() / 3600.0
+        if dt_used > time_remaining_in_hours:
+          dt_used = time_remaining_in_hours
+
+        # what is the current amount of time we have now as a percentage of the total build
+        # time?
+        progress_this_turn = dt_used / total_build_time_in_hours
+        log("progress this turn: %.4f%% (%.4f hrs)" % (progress_this_turn * 100.0, dt_used))
+
+        if progress_this_turn <= 0:
+          log("no progress this turn (building complete?)")
           continue
 
-        # take starting half-way through this turn into account
-        if time_spent < 0:
-          dt_required += time_spent
-          if dt_required < 0:
-            dt_required = 0
-
-        log("dt_required = %.2f" % dt_required)
-
         # work out how many minerals we require for this turn
-        minerals_required_per_hour = design.buildCostMinerals / total_build_time_in_hours
-        minerals_required = minerals_required_per_hour * dt_required
-        log("mineral_required_per_hour = %.2f, minerals_required (this turn) = %.2f"
-            % (minerals_required_per_hour, minerals_required))
+        minerals_required = design.buildCostMinerals * progress_this_turn
+        log("mineral_required = %.2f, minerals_available = %.2f"
+            % (minerals_required, total_minerals))
 
-        if total_minerals > minerals_required:
+        if total_minerals < minerals_required:
+          # not enough minerals, no progress will be made this turn
+          log("no progress this turn (not enough minerals)")
+        else:
           # awesome, we have enough minerals so we can make some progress. We'll start by
           # removing the minerals we need from the global pool...
           total_minerals -= minerals_required
-          log("remaining minerals: %.2f" % (total_minerals))
+          build_request.progress += progress_this_turn
 
-          # next, work out the actual amount of progress this turn...
-          build_request.progress += dt_required / total_build_time_in_hours
-          if build_request.progress >= 1:
-            # complete!
-            build_request.progress = 1
-          log("build progress: %.2f" % (build_request.progress))
+        # adjust the end_time for this turn
+        time_remaining_in_hours = (1.0 - build_request.progress) * total_build_time_in_hours
+        end_time = now + timedelta(hours=dt_used) + timedelta(hours=time_remaining_in_hours)
+        build_request.end_time = ctrl.dateTimeToEpoch(end_time)
 
-          # adjust the end_time for this turn
-          build_request.end_time = int(build_request.start_time +
-                                       total_build_time_in_hours * 3600.0)
-          # note if the build request has already finished, we don't actually have to do
-          # anything since it'll be fixed up by the tasks/empire/build-check task.
-        else:
-          # if we don't have enough minerals, the end time is essentially infinite
-          log("  not enough minerals, cannot progress")
-          build_request.end_time = 0
+        if build_request.progress >= 1:
+          # if we've finished this turn, just set progress
+          build_request.progress = 1
+
+        log("total progress: %.2f%% completion time: %s" % (build_request.progress * 100.0, end_time))
 
   log("--- Updating population:")
 
@@ -585,8 +586,8 @@ def build(empire_pb, colony_pb, request_pb):
   build_operation_model.empire = db.Key(empire_pb.key)
   build_operation_model.designName = request_pb.design_name
   build_operation_model.designKind = request_pb.build_kind
-  build_operation_model.startTime = datetime.now()
-  build_operation_model.endTime = build_operation_model.startTime + timedelta(seconds=10)
+  build_operation_model.startTime = datetime.now() + timedelta(seconds=10)
+  build_operation_model.endTime = build_operation_model.startTime + timedelta(seconds=15)
   build_operation_model.progress = 0.0
   build_operation_model.put()
 
@@ -711,6 +712,7 @@ def _orderFleet_split(fleet_pb, order_pb):
   left_model.numShips = left_size
 
   right_model = mdl.Fleet(parent = left_model.key().parent())
+  right_model.sector = mdl.Fleet.sector.get_value_for_datastore(left_model)
   right_model.empire = mdl.Fleet.empire.get_value_for_datastore(left_model)
   right_model.designName = left_model.designName
   right_model.state = pb.Fleet.IDLE

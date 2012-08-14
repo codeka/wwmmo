@@ -101,11 +101,9 @@ class SectorManager:
   helps with caching and building new sectors when they come into view for the first time."""
 
   @staticmethod
-  def getSector(x, y):
-    """Gets the sector at the given (x,y) coordinates."""
-
-    sectors = SectorManager.getSectors(x, y, x+1, y+1)
-    return sectors[SectorManager._getSectorKey(x, y)]
+  def getSectorKey(x, y):
+    """Gets the db.Key() we can use for the sector at the given (x,y) coordinates."""
+    return db.Key.from_path('Sector', SectorManager._getSectorKey(x, y))
 
   @staticmethod
   def getSectors(coords):
@@ -113,7 +111,7 @@ class SectorManager:
 
     keys = []
     for coord in coords:
-      keys.append("%d,%d" % (coord.x, coord.y))
+      keys.append(SectorManager._getSectorKey(coord.x, coord.y))
 
     sectors = {}
     for sector in Sector.get_by_key_name(keys):
@@ -141,6 +139,6 @@ class SectorManager:
 
   @staticmethod
   def _getSectorKey(x, y):
-    return str(x)+","+str(y)
+    return ("%d,%d" % (x, y))
 
 

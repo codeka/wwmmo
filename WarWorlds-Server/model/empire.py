@@ -4,7 +4,6 @@ from datetime import datetime
 
 from google.appengine.ext import db
 
-import sector
 import model.sector as sector_mdl
 
 
@@ -65,7 +64,7 @@ class Colony(db.Model):
   eveything up to the point where the property changes, and save the new value."""
 
   planet_index = db.IntegerProperty()
-  sector = db.ReferenceProperty(sector.Sector)
+  sector = db.ReferenceProperty(sector_mdl.Sector)
   empire = db.ReferenceProperty(Empire)
   population = db.FloatProperty()
   lastSimulation = db.DateTimeProperty()
@@ -172,18 +171,24 @@ class EmpirePresence(db.Model):
 class Fleet(db.Model):
   """Represents a fleet of ships."""
 
+  sector = db.ReferenceProperty(sector_mdl.Sector)
   empire = db.ReferenceProperty(Empire)
   designName = db.StringProperty()
   numShips = db.IntegerProperty()
   state = db.IntegerProperty()
   stateStartTime = db.DateTimeProperty()
-  destinationStar = db.ReferenceProperty(sector.Star, collection_name="incoming_fleet_set")
+  destinationStar = db.ReferenceProperty(sector_mdl.Star, collection_name="incoming_fleet_set")
   targetFleet = db.SelfReferenceProperty()
   targetColony = db.ReferenceProperty(Colony)
 
   @staticmethod
   def getForStar(star_model):
     query = Fleet.all().ancestor(star_model.key())
+    return Fleet._getForQuery(query)
+
+  @staticmethod
+  def getForSector(sector_model):
+    query = Fleet.all().filter("sector", sector_model)
     return Fleet._getForQuery(query)
 
   @staticmethod

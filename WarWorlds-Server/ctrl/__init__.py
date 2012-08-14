@@ -119,10 +119,6 @@ def sectorModelToPb(sector_pb, sector_model):
     star_pb = sector_pb.stars.add()
     starModelToPb(star_pb, star_model, False)
 
-  for colony_model in empire_mdl.Colony.getForSector(sector_model):
-    colony_pb = sector_pb.colonies.add()
-    colonyModelToPb(colony_pb, colony_model)
-
 
 def starModelToPb(star_pb, star_model, include_planets=True):
   """Converts the given star model to a protocol buffer.
@@ -191,7 +187,7 @@ def buildRequestModelToPb(build_pb, build_model):
 def buildRequestPbToModel(build_model, build_pb):
   build_model.startTime = epochToDateTime(build_pb.start_time)
   build_model.endTime = epochToDateTime(build_pb.end_time)
-  build_model.progress = build_pb.progress
+  build_model.progress = float(build_pb.progress)
 
 
 def fleetModelToPb(fleet_pb, fleet_model):
