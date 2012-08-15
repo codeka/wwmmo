@@ -138,6 +138,13 @@ public class Star implements Parcelable {
         mColonies.add(colony);
     }
 
+    public void addFleet(Fleet fleet) {
+        if (mFleets == null) {
+            mFleets = new ArrayList<Fleet>();
+        }
+        mFleets.add(fleet);
+    }
+
     public void setDummySector(long sectorX, long sectorY) {
         mSector = new Sector.DummySector(sectorX, sectorY);
     }

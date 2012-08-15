@@ -3,9 +3,7 @@ package au.com.codeka.warworlds.game.starfield;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.TreeMap;
-import java.util.TreeSet;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.slf4j.Logger;
@@ -13,6 +11,7 @@ import org.slf4j.LoggerFactory;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -24,11 +23,13 @@ import android.view.GestureDetector;
 import android.view.MotionEvent;
 import au.com.codeka.Pair;
 import au.com.codeka.Point2D;
+import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.game.StarfieldBackgroundRenderer;
 import au.com.codeka.warworlds.game.UniverseElementSurfaceView;
 import au.com.codeka.warworlds.model.Colony;
 import au.com.codeka.warworlds.model.Empire;
 import au.com.codeka.warworlds.model.EmpireManager;
+import au.com.codeka.warworlds.model.Fleet;
 import au.com.codeka.warworlds.model.ImageManager;
 import au.com.codeka.warworlds.model.Sector;
 import au.com.codeka.warworlds.model.SectorManager;
@@ -475,7 +476,7 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
                 if (n.equals(1)) {
                     name = emp.getDisplayName();
                 } else {
-                    name = String.format("%s ×%d", emp.getDisplayName(), n);
+                    name = String.format("%s (%d)", emp.getDisplayName(), n);
                 }
 
                 Rect bounds = new Rect();
@@ -486,6 +487,55 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
 
                 i++;
             }
+        }
+
+        List<Fleet> fleets = star.getFleets();
+        if (fleets != null && !fleets.isEmpty()) {
+            Map<String, Integer> empireFleets = new TreeMap<String, Integer>();
+            for (int i = 0; i < fleets.size(); i++) {
+                Fleet f = fleets.get(i);
+
+                Integer n = empireFleets.get(f.getEmpireKey());
+                if (n == null) {
+                    empireFleets.put(f.getEmpireKey(), f.getNumShips());
+                } else {
+                    empireFleets.put(f.getEmpireKey(), n + f.getNumShips());
+                }
+            }
+
+            int i = 0;
+            for (String empireKey : empireFleets.keySet()) {
+                Integer numShips = empireFleets.get(empireKey);
+                Empire emp = mVisibleEmpires.get(empireKey);
+
+                Point2D pt = new Point2D(0, -25.0f);
+                pt.rotate((float)(Math.PI / 4.0) * -i);
+                pt.add(x, y);
+
+                Bitmap bmp = BitmapFactory.decodeResource(mContext.getResources(), R.drawable.fleet);
+                Rect src = new Rect(0, 0, bmp.getWidth(), bmp.getHeight());
+                RectF dst = new RectF((pt.x - 8) * pixelScale,
+                                      (pt.y - 8) * pixelScale,
+                                      (pt.x + 8) * pixelScale,
+                                      (pt.y + 8) * pixelScale);
+
+                canvas.drawBitmap(bmp, src, dst, mStarPaint);
+
+                String name = String.format("%s (%d)", emp.getDisplayName(), numShips);
+
+                Rect bounds = new Rect();
+                mStarPaint.getTextBounds(name, 0, name.length(), bounds);
+                float textHeight = bounds.height();
+                float textWidth = bounds.width();
+
+                canvas.drawText(name,
+                                (pt.x - 12) * pixelScale - textWidth,
+                                (pt.y + 8) * pixelScale - (textHeight / 2),
+                                mStarPaint);
+
+                i++;
+            }
+
         }
     }
 

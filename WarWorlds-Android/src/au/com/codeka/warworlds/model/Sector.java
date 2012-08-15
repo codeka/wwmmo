@@ -70,6 +70,21 @@ public class Sector {
             }
         }
 
+        for (warworlds.Warworlds.Fleet fleet_pb : pb.getFleetsList()) {
+            boolean found = false;
+            for (Star star : s.mStars) {
+                if (fleet_pb.getStarKey().equals(star.getKey())) {
+                    star.addFleet(Fleet.fromProtocolBuffer(fleet_pb));
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) {
+                log.error("Could not find star that fleet {} belongs to! (Apparently, {})",
+                        fleet_pb.getKey(), fleet_pb.getStarKey());
+            }
+        }
+
         return s;
     }
 
