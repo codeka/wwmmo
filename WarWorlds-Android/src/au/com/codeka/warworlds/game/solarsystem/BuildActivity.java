@@ -43,6 +43,7 @@ import au.com.codeka.warworlds.model.StarManager;
  * colony.
  */
 public class BuildActivity extends TabFragmentActivity implements StarManager.StarFetchedHandler {
+    private Context mContext = this;
     private Star mStar;
     private Colony mColony;
 
@@ -50,9 +51,9 @@ public class BuildActivity extends TabFragmentActivity implements StarManager.St
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        addTab("Buildings", BuildingsFragment.class, null);
-        addTab("Ships", ShipsFragment.class, null);
-        addTab("Queue", QueueFragment.class, null);
+        getTabManager().addTab(mContext, new TabInfo("Buildings", BuildingsFragment.class, null));
+        getTabManager().addTab(mContext, new TabInfo("Ships", ShipsFragment.class, null));
+        getTabManager().addTab(mContext, new TabInfo("Queue", QueueFragment.class, null));
     }
 
     @Override
@@ -82,7 +83,7 @@ public class BuildActivity extends TabFragmentActivity implements StarManager.St
     @Override
     public void onStarFetched(Star s) {
         mStar = s;
-        reloadTab();
+        getTabManager().reloadTab();
     }
 
     @Override

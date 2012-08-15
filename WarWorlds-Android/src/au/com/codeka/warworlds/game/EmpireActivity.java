@@ -3,6 +3,7 @@ package au.com.codeka.warworlds.game;
 import java.util.HashSet;
 
 import android.app.Dialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -28,8 +29,9 @@ import au.com.codeka.warworlds.model.Star;
  * This dialog shows the status of the empire. You can see all your colonies, all your fleets, etc.
  */
 public class EmpireActivity extends TabFragmentActivity {
-
     private static MyEmpire sCurrentEmpire;
+
+    Context mContext = this;
 
     public enum EmpireActivityResult {
         NavigateToPlanet(1);
@@ -62,9 +64,9 @@ public class EmpireActivity extends TabFragmentActivity {
         sCurrentEmpire = null;
         refresh();
 
-        addTab("Overview", OverviewFragment.class, null);
-        addTab("Colonies", ColoniesFragment.class, null);
-        addTab("Fleets", FleetsFragment.class, null);
+        getTabManager().addTab(mContext, new TabInfo("Overview", OverviewFragment.class, null));
+        getTabManager().addTab(mContext, new TabInfo("Colonies", ColoniesFragment.class, null));
+        getTabManager().addTab(mContext, new TabInfo("Fleets", FleetsFragment.class, null));
     }
 
     public void refresh() {
@@ -72,7 +74,7 @@ public class EmpireActivity extends TabFragmentActivity {
             @Override
             public void onRefreshAllComplete(MyEmpire empire) {
                 sCurrentEmpire = empire;
-                reloadTab();
+                getTabManager().reloadTab();
             }
         });
     }

@@ -1,10 +1,14 @@
 package au.com.codeka.warworlds.game.starfield;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,18 +20,24 @@ import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.TabHost;
 import android.widget.TextView;
 import au.com.codeka.warworlds.DialogManager;
 import au.com.codeka.warworlds.R;
+import au.com.codeka.warworlds.TabManager;
+import au.com.codeka.warworlds.TabManager.TabInfo;
 import au.com.codeka.warworlds.game.EmpireActivity;
 import au.com.codeka.warworlds.game.solarsystem.SolarSystemActivity;
 import au.com.codeka.warworlds.model.Colony;
 import au.com.codeka.warworlds.model.Empire;
 import au.com.codeka.warworlds.model.EmpireManager;
+import au.com.codeka.warworlds.model.Fleet;
 import au.com.codeka.warworlds.model.ImageManager;
 import au.com.codeka.warworlds.model.Planet;
 import au.com.codeka.warworlds.model.PlanetImageManager;
 import au.com.codeka.warworlds.model.SectorManager;
+import au.com.codeka.warworlds.model.ShipDesign;
+import au.com.codeka.warworlds.model.ShipDesignManager;
 import au.com.codeka.warworlds.model.Star;
 import au.com.codeka.warworlds.model.StarManager;
 
@@ -39,11 +49,13 @@ public class StarfieldActivity extends Activity {
     private Context mContext = this;
     private StarfieldSurfaceView mStarfield;
     private TextView mUsername;
-    private TextView mStarName;
     private View mLoadingContainer;
     private ListView mPlanetList;
     private PlanetListAdapter mPlanetListAdapter;
+    private ListView mFleetList;
+    private FleetListAdapter mFleetListAdapter;
     private Star mSelectedStar;
+    private TabManager mSelectedStarTabManager;
 
     private static final int SOLAR_SYSTEM_REQUEST = 1;
     private static final int EMPIRE_REQUEST = 2;
@@ -58,27 +70,37 @@ public class StarfieldActivity extends Activity {
 
         mStarfield = (StarfieldSurfaceView) findViewById(R.id.starfield);
         mUsername = (TextView) findViewById(R.id.username);
-        mStarName = (TextView) findViewById(R.id.star_name);
         mLoadingContainer = findViewById(R.id.loading_container);
-        mPlanetList = (ListView) findViewById(R.id.starfield_planet_list);
 
-        mPlanetList.setVisibility(View.GONE);
+        mPlanetList = new ListView(mContext);
+        mFleetList = new ListView(mContext);
+
+        mSelectedStarTabManager = new TabManager((TabHost) findViewById(R.id.selected_star), true);
+        mSelectedStarTabManager.addTab(mContext, new SelectedStarTabInfo("Planets"));
+        mSelectedStarTabManager.addTab(mContext, new SelectedStarTabInfo("Fleets"));
+
+        mPlanetList.setVisibility(View.VISIBLE);
+        mFleetList.setVisibility(View.GONE);
 
         EmpireManager empireManager = EmpireManager.getInstance();
         mUsername.setText(empireManager.getEmpire().getDisplayName());
-        mStarName.setText("");
 
         mPlanetListAdapter = new PlanetListAdapter();
         mPlanetList.setAdapter(mPlanetListAdapter);
 
+        mFleetListAdapter = new FleetListAdapter();
+        mFleetList.setAdapter(mFleetListAdapter);
+
         mStarfield.addStarSelectedListener(new StarfieldSurfaceView.OnStarSelectedListener() {
             @Override
             public void onStarSelected(Star star) {
-                mStarName.setText(star.getName());
-
                 // load the rest of the star's details as well
+                final int oldPlanetListVisibility = mPlanetList.getVisibility();
+                final int oldFleetListVisibility = mFleetList.getVisibility();
+
                 mLoadingContainer.setVisibility(View.VISIBLE);
                 mPlanetList.setVisibility(View.GONE);
+                mFleetList.setVisibility(View.GONE);
 
                 StarManager.getInstance().requestStar(star.getKey(), true,
                                                       new StarManager.StarFetchedHandler() {
@@ -89,9 +111,11 @@ public class StarfieldActivity extends Activity {
                     public void onStarFetched(Star star) {
                         mSelectedStar = star;
                         mLoadingContainer.setVisibility(View.GONE);
-                        mPlanetList.setVisibility(View.VISIBLE);
+                        mPlanetList.setVisibility(oldPlanetListVisibility);
+                        mFleetList.setVisibility(oldFleetListVisibility);
 
                         mPlanetListAdapter.setStar(star);
+                        mFleetListAdapter.setStar(star);
                     }
                 });
             }
@@ -294,5 +318,96 @@ public class StarfieldActivity extends Activity {
 
             return view;
         }
+    }
+
+    class FleetListAdapter extends BaseAdapter {
+        private Star mStar;
+        private List<Fleet> mFleets;
+
+        public void setStar(Star star) {
+            mStar = star;
+            mFleets = star.getFleets();
+            if (mFleets == null) {
+                mFleets = new ArrayList<Fleet>();
+            }
+
+            notifyDataSetChanged();
+        }
+
+        @Override
+        public int getCount() {
+            if (mStar == null) {
+                return 0;
+            }
+
+            return mFleets.size();
+        }
+
+        @Override
+        public Object getItem(int position) {
+            return mFleets.get(position);
+        }
+
+        @Override
+        public long getItemId(int position) {
+            return position; // TODO??
+        }
+
+        @Override
+        public int getViewTypeCount() {
+            return 1;
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            View view = convertView;
+            if (view == null) {
+                LayoutInflater inflater = (LayoutInflater)mContext.getSystemService
+                        (Context.LAYOUT_INFLATER_SERVICE);
+                view = (ViewGroup) inflater.inflate(R.layout.starfield_planet, null);
+            }
+
+            final ImageView icon = (ImageView) view.findViewById(R.id.starfield_planet_icon);
+            final Fleet fleet = mFleets.get(position);
+            ShipDesign design = ShipDesignManager.getInstance().getDesign(fleet.getDesignName());
+
+            String designUrl = design.getIconUrl();
+            icon.setImageURI(Uri.parse(designUrl));
+
+            TextView shipKindTextView = (TextView) view.findViewById(R.id.starfield_planet_type);
+            shipKindTextView.setText(design.getName());
+
+            final TextView shipCountTextView = (TextView) view.findViewById(R.id.starfield_planet_colony);
+            shipCountTextView.setText(String.format("%d", fleet.getNumShips()));
+
+            return view;
+        }
+    }
+
+    public class SelectedStarTabInfo extends TabManager.TabInfo {
+        public SelectedStarTabInfo(String title) {
+            super(title);
+        }
+
+        @Override
+        public View createTabContent(String tag) {
+            if (tag.equals("Planets")) {
+                return mPlanetList;
+            } else {
+                return mFleetList;
+            }
+        }
+
+        @Override
+        public void switchTo(TabInfo lastTab) {
+            if (title.equals("Planets")) {
+                mPlanetList.setVisibility(View.VISIBLE);
+                mFleetList.setVisibility(View.GONE);
+            } else {
+                mFleetList.setVisibility(View.VISIBLE);
+                mPlanetList.setVisibility(View.GONE);
+            }
+        }
+
     }
 }
