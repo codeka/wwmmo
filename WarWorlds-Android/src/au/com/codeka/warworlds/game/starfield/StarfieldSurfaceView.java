@@ -3,7 +3,9 @@ package au.com.codeka.warworlds.game.starfield;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
+import java.util.TreeSet;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.slf4j.Logger;
@@ -11,20 +13,22 @@ import org.slf4j.LoggerFactory;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Paint.Style;
+import android.graphics.Rect;
+import android.graphics.RectF;
 import android.util.AttributeSet;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import au.com.codeka.Pair;
 import au.com.codeka.Point2D;
-import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.game.StarfieldBackgroundRenderer;
 import au.com.codeka.warworlds.game.UniverseElementSurfaceView;
 import au.com.codeka.warworlds.model.Colony;
+import au.com.codeka.warworlds.model.Empire;
+import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.ImageManager;
 import au.com.codeka.warworlds.model.Sector;
 import au.com.codeka.warworlds.model.SectorManager;
@@ -42,10 +46,10 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
     private Star mSelectedStar;
     private Paint mStarPaint;
     private Paint mStarNamePaint;
-    private Bitmap mColonyIcon;
     private StarfieldBackgroundRenderer mBackgroundRenderer;
     private SelectionOverlay mSelectionOverlay;
     private Map<String, List<StarAttachedOverlay>> mStarAttachedOverlays;
+    private Map<String, Empire> mVisibleEmpires;
 
     private boolean mNeedRedraw = true;
     private Bitmap mBuffer;
@@ -69,11 +73,11 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
         mContext = context;
         mStarSelectedListeners = new CopyOnWriteArrayList<OnStarSelectedListener>();
         mSelectedStar = null;
-        mColonyIcon = BitmapFactory.decodeResource(getResources(), R.drawable.starfield_colony);
         mSectorX = mSectorY = 0;
         mOffsetX = mOffsetY = 0;
         mSectors = new TreeMap<Pair<Long, Long>, Sector>();
         mStarAttachedOverlays = new TreeMap<String, List<StarAttachedOverlay>>();
+        mVisibleEmpires = new TreeMap<String, Empire>();
 
         mSelectionOverlay = new SelectionOverlay();
 
@@ -404,11 +408,7 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
                         (y - (imageSize / 2)) * pixelScale, mStarPaint);
             }
 
-            List<Colony> colonies = star.getColonies();
-            if (colonies != null && !colonies.isEmpty()) {
-                canvas.drawBitmap(mColonyIcon, (x + mColonyIcon.getWidth()) * pixelScale,
-                        (y - mColonyIcon.getHeight()) * pixelScale, mStarPaint);
-            }
+            drawStarIcons(canvas, star, x, y);
 
             List<StarAttachedOverlay> starAttachedOverlays = mStarAttachedOverlays.get(star.getKey());
             if (starAttachedOverlays != null && !starAttachedOverlays.isEmpty()) {
@@ -417,6 +417,74 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
                     StarAttachedOverlay sao = starAttachedOverlays.get(i);
                     sao.setCentre(x * pixelScale, y * pixelScale);
                 }
+            }
+        }
+    }
+
+    private void drawStarIcons(Canvas canvas, Star star, int x, int y) {
+        final float pixelScale = getPixelScale();
+
+        List<Colony> colonies = star.getColonies();
+        if (colonies != null && !colonies.isEmpty()) {
+            Map<String, Integer> colonyEmpires = new TreeMap<String, Integer>();
+
+            for (int i = 0; i < colonies.size(); i++) {
+                Colony colony = colonies.get(i);
+
+                Empire emp = mVisibleEmpires.get(colony.getEmpireKey());
+                if (emp == null) {
+                    EmpireManager.getInstance().fetchEmpire(colony.getEmpireKey(), new EmpireManager.EmpireFetchedHandler() {
+                        @Override
+                        public void onEmpireFetched(Empire empire) {
+                            mVisibleEmpires.put(empire.getKey(), empire);
+                            setDirty();
+                            redraw();
+                        }
+                    });
+                } else {
+                    Integer n = colonyEmpires.get(emp.getKey());
+                    if (n == null) {
+                        n = 1;
+                        colonyEmpires.put(emp.getKey(), n);
+                    } else {
+                        colonyEmpires.put(emp.getKey(), n+1);
+                    }
+                }
+            }
+
+            int i = 1;
+            for (String empireKey : colonyEmpires.keySet()) {
+                Integer n = colonyEmpires.get(empireKey);
+                Empire emp = mVisibleEmpires.get(empireKey);
+
+                Bitmap bmp = emp.getShield(mContext);
+
+                Point2D pt = new Point2D(0, -25.0f);
+                pt.rotate((float)(Math.PI / 4.0) * i);
+                pt.add(x, y);
+
+                Rect src = new Rect(0, 0, bmp.getWidth(), bmp.getHeight());
+                RectF dst = new RectF((pt.x - 8) * pixelScale,
+                                      (pt.y - 8) * pixelScale,
+                                      (pt.x + 8) * pixelScale,
+                                      (pt.y + 8) * pixelScale);
+
+                canvas.drawBitmap(bmp, src, dst, mStarPaint);
+
+                String name;
+                if (n.equals(1)) {
+                    name = emp.getDisplayName();
+                } else {
+                    name = String.format("%s ×%d", emp.getDisplayName(), n);
+                }
+
+                Rect bounds = new Rect();
+                mStarPaint.getTextBounds(name, 0, name.length(), bounds);
+                float textHeight = bounds.height();
+
+                canvas.drawText(name, (pt.x + 12) * pixelScale, (pt.y + 8) * pixelScale - (textHeight / 2), mStarPaint);
+
+                i++;
             }
         }
     }

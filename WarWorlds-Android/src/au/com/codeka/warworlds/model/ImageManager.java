@@ -102,6 +102,11 @@ public abstract class ImageManager {
                         bmp = BitmapFactory.decodeFile(cacheFile.getAbsolutePath(), opts);
                     }
 
+                    if (bmp == null) {
+                        cacheFile.delete();
+                        return null;
+                    }
+
                     mLoadedBitmaps.put(cacheKey, bmp);
                     return null;
                 }

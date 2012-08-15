@@ -1,5 +1,14 @@
 package au.com.codeka.warworlds.model;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Random;
+
+import android.content.Context;
+import android.content.res.AssetManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.os.Parcel;
 import android.os.Parcelable;
 
@@ -7,6 +16,9 @@ import android.os.Parcelable;
 public class Empire implements Parcelable {
     private String mKey;
     private String mDisplayName;
+    private Bitmap mEmpireShield;
+
+    private static Bitmap sBaseShield;
 
     public String getKey() {
         return mKey;
@@ -14,6 +26,54 @@ public class Empire implements Parcelable {
 
     public String getDisplayName() {
         return mDisplayName;
+    }
+
+    /**
+     * Gets (or creates, if there isn't one) the \c Bitmap that represents this Empire's
+     * shield (i.e. their icon).
+     */
+    public Bitmap getShield(Context context) {
+        if (mEmpireShield == null) {
+            if (sBaseShield == null) {
+                AssetManager assetManager = context.getAssets();
+                InputStream ins;
+                try {
+                    ins = assetManager.open("img/shield.png");
+                } catch (IOException e) {
+                    // should never happen!
+                    return null;
+                }
+
+                try {
+                    sBaseShield = BitmapFactory.decodeStream(ins);
+                } finally {
+                    try {
+                        ins.close();
+                    } catch (IOException e) {
+                    }
+                }
+            }
+
+            int width = sBaseShield.getWidth();
+            int height = sBaseShield.getHeight();
+            int[] pixels = new int[width * height];
+            sBaseShield.getPixels(pixels, 0, width, 0, 0, width, height);
+
+            Random rand = new Random(mKey.hashCode());
+            int newColour = Color.rgb(rand.nextInt(100) + 100,
+                                      rand.nextInt(100) + 100,
+                                      rand.nextInt(100) + 100);
+
+            for (int i = 0; i < pixels.length; i++) {
+                if (pixels[i] == Color.MAGENTA) {
+                    pixels[i] = newColour;
+                }
+            }
+
+            mEmpireShield = Bitmap.createBitmap(pixels, width, height, Bitmap.Config.ARGB_8888);
+        }
+
+        return mEmpireShield;
     }
 
     @Override
