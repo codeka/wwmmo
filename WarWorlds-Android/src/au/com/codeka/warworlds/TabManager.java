@@ -58,7 +58,9 @@ public class TabManager {
 
     private void changeTab(TabInfo newTab, boolean force) {
         if (mLastTab != newTab || force) {
-            newTab.switchTo(mLastTab);
+            if (newTab != null) {
+                newTab.switchTo(mLastTab);
+            }
         }
     }
 

@@ -722,9 +722,6 @@ def _orderFleet_split(fleet_pb, order_pb):
   left_model.put()
   right_model.put()
 
-  ctrl.clearCached(["fleet:%s" % fleet_pb.key,
-                    "fleet:for-empire:%s" % fleet_pb.empire_key,
-                    "star:%s" % fleet_pb.star_key])
   return True
 
 
@@ -758,12 +755,20 @@ def _orderFleet_move(fleet_pb, order_pb):
   return True
 
 def orderFleet(fleet_pb, order_pb):
+  success = False
   if order_pb.order == pb.FleetOrder.SPLIT:
-    return _orderFleet_split(fleet_pb, order_pb)
+    success = _orderFleet_split(fleet_pb, order_pb)
   elif order_pb.order == pb.FleetOrder.MOVE:
-    return _orderFleet_move(fleet_pb, order_pb)
+    success = _orderFleet_move(fleet_pb, order_pb)
 
-  return False
+  if success:
+    star_pb = sector.getStar(fleet_pb.star_key)
+    ctrl.clearCached(["fleet:%s" % (fleet_pb.key),
+                      "fleet:for-empire:%s" % (fleet_pb.empire_key),
+                      "star:%s" % (fleet_pb.star_key),
+                      "sector:%d,%d" % (star_pb.sector_x, star_pb.sector_y)])
+
+  return success
 
 class Design(object):
   @staticmethod

@@ -63,8 +63,7 @@ public class FleetDialog extends Dialog implements DialogManager.DialogConfigura
             @Override
             public void onFleetMove(Star star, Fleet fleet) {
                 Bundle args = new Bundle();
-                args.putString("au.com.codeka.warworlds.StarKey", fleet.getStarKey());
-                args.putString("au.com.codeka.warworlds.FleetKey", fleet.getKey());
+                args.putParcelable("au.com.codeka.warworlds.Fleet", fleet);
                 DialogManager.getInstance().show(activity, FleetMoveDialog.class, args);
             }
         });

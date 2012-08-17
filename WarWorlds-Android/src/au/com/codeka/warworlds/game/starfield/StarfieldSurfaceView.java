@@ -6,6 +6,9 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
+import org.joda.time.Seconds;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,6 +36,8 @@ import au.com.codeka.warworlds.model.Fleet;
 import au.com.codeka.warworlds.model.ImageManager;
 import au.com.codeka.warworlds.model.Sector;
 import au.com.codeka.warworlds.model.SectorManager;
+import au.com.codeka.warworlds.model.ShipDesign;
+import au.com.codeka.warworlds.model.ShipDesignManager;
 import au.com.codeka.warworlds.model.Star;
 import au.com.codeka.warworlds.model.StarImageManager;
 
@@ -61,7 +66,6 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
     private long mSectorY;
     private float mOffsetX;
     private float mOffsetY;
-    private Map<Pair<Long, Long>, Sector> mSectors;
 
     public StarfieldSurfaceView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -76,7 +80,6 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
         mSelectedStar = null;
         mSectorX = mSectorY = 0;
         mOffsetX = mOffsetY = 0;
-        mSectors = new TreeMap<Pair<Long, Long>, Sector>();
         mStarAttachedOverlays = new TreeMap<String, List<StarAttachedOverlay>>();
         mVisibleEmpires = new TreeMap<String, Empire>();
 
@@ -190,23 +193,20 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
 
         List<Pair<Long, Long>> missingSectors = new ArrayList<Pair<Long, Long>>();
 
-        Map<Pair<Long, Long>, Sector> newSectors = new TreeMap<Pair<Long, Long>, Sector>();
         for(sectorY = mSectorY - mRadius; sectorY <= mSectorY + mRadius; sectorY++) {
             for(sectorX = mSectorX - mRadius; sectorX <= mSectorX + mRadius; sectorX++) {
                 Pair<Long, Long> key = new Pair<Long, Long>(sectorX, sectorY);
-                if (mSectors.containsKey(key)) {
-                    newSectors.put(key, mSectors.get(key));
-                } else {
+                Sector s = SectorManager.getInstance().getSector(sectorX, sectorY);
+                if (s == null) {
                     missingSectors.add(key);
                 }
             }
         }
 
         if (!missingSectors.isEmpty()) {
-            SectorManager.getInstance().requestSectors(missingSectors, null);
+            SectorManager.getInstance().requestSectors(missingSectors, false, null);
         }
 
-        mSectors = newSectors;
         setDirty();
         redraw();
     }
@@ -377,6 +377,33 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
     }
 
     /**
+     * Given a \c Sector, returns the (x, y) coordinates (in view-space) of the origin of this
+     * sector.
+     */
+    private Point2D getSectorOffset(long sx, long sy) {
+        SectorManager sm = SectorManager.getInstance();
+
+        for(int y = -mRadius; y <= mRadius; y++) {
+            for(int x = -mRadius; x <= mRadius; x++) {
+                long sectorX = mSectorX + x;
+                long sectorY = mSectorY + y;
+
+                Sector sector = sm.getSector(sectorX, sectorY);
+                if (sector == null) {
+                    continue; // it might not be loaded yet...
+                }
+
+                if (sector.getX() == sx && sector.getY() == sy) {
+                    return new Point2D((x * SectorManager.SECTOR_SIZE) + mOffsetX,
+                                       (y * SectorManager.SECTOR_SIZE) + mOffsetY);
+                }
+            }
+        }
+
+        return null;
+    }
+
+    /**
      * Draws a sector, which is a 1024x1024 area of stars.
      */
     private void drawSector(Canvas canvas, int offsetX, int offsetY, Sector sector) {
@@ -385,6 +412,13 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
         }
         for(Star star : sector.getStars()) {
             drawStarName(canvas, star, offsetX, offsetY);
+        }
+        for (Star star : sector.getStars()) {
+            for (Fleet fleet : star.getFleets()) {
+                if (fleet.getState() == Fleet.State.MOVING) {
+                    drawMovingFleet(canvas, fleet, star, offsetX, offsetY);
+                }
+            }
         }
     }
 
@@ -434,14 +468,7 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
 
                 Empire emp = mVisibleEmpires.get(colony.getEmpireKey());
                 if (emp == null) {
-                    EmpireManager.getInstance().fetchEmpire(colony.getEmpireKey(), new EmpireManager.EmpireFetchedHandler() {
-                        @Override
-                        public void onEmpireFetched(Empire empire) {
-                            mVisibleEmpires.put(empire.getKey(), empire);
-                            setDirty();
-                            redraw();
-                        }
-                    });
+                    EmpireManager.getInstance().fetchEmpire(colony.getEmpireKey(), new EmpireFetchedHandler());
                 } else {
                     Integer n = colonyEmpires.get(emp.getKey());
                     if (n == null) {
@@ -494,6 +521,10 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
             Map<String, Integer> empireFleets = new TreeMap<String, Integer>();
             for (int i = 0; i < fleets.size(); i++) {
                 Fleet f = fleets.get(i);
+                if (f.getState() == Fleet.State.MOVING) {
+                    // ignore moving fleets, we'll draw them separately
+                    continue;
+                }
 
                 Integer n = empireFleets.get(f.getEmpireKey());
                 if (n == null) {
@@ -507,36 +538,118 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
             for (String empireKey : empireFleets.keySet()) {
                 Integer numShips = empireFleets.get(empireKey);
                 Empire emp = mVisibleEmpires.get(empireKey);
+                if (emp == null) {
+                    EmpireManager.getInstance().fetchEmpire(empireKey, new EmpireFetchedHandler());
+                } else {
+                    Point2D pt = new Point2D(0, -25.0f);
+                    pt.rotate((float)(Math.PI / 4.0) * -i);
+                    pt.add(x, y);
 
-                Point2D pt = new Point2D(0, -25.0f);
-                pt.rotate((float)(Math.PI / 4.0) * -i);
-                pt.add(x, y);
+                    Bitmap bmp = BitmapFactory.decodeResource(mContext.getResources(), R.drawable.fleet);
+                    Rect src = new Rect(0, 0, bmp.getWidth(), bmp.getHeight());
+                    RectF dst = new RectF((pt.x - 8) * pixelScale,
+                                          (pt.y - 8) * pixelScale,
+                                          (pt.x + 8) * pixelScale,
+                                          (pt.y + 8) * pixelScale);
 
-                Bitmap bmp = BitmapFactory.decodeResource(mContext.getResources(), R.drawable.fleet);
-                Rect src = new Rect(0, 0, bmp.getWidth(), bmp.getHeight());
-                RectF dst = new RectF((pt.x - 8) * pixelScale,
-                                      (pt.y - 8) * pixelScale,
-                                      (pt.x + 8) * pixelScale,
-                                      (pt.y + 8) * pixelScale);
+                    canvas.drawBitmap(bmp, src, dst, mStarPaint);
 
-                canvas.drawBitmap(bmp, src, dst, mStarPaint);
+                    String name = String.format("%s (%d)", emp.getDisplayName(), numShips);
 
-                String name = String.format("%s (%d)", emp.getDisplayName(), numShips);
+                    Rect bounds = new Rect();
+                    mStarPaint.getTextBounds(name, 0, name.length(), bounds);
+                    float textHeight = bounds.height();
+                    float textWidth = bounds.width();
 
-                Rect bounds = new Rect();
-                mStarPaint.getTextBounds(name, 0, name.length(), bounds);
-                float textHeight = bounds.height();
-                float textWidth = bounds.width();
-
-                canvas.drawText(name,
-                                (pt.x - 12) * pixelScale - textWidth,
-                                (pt.y + 8) * pixelScale - (textHeight / 2),
-                                mStarPaint);
+                    canvas.drawText(name,
+                                    (pt.x - 12) * pixelScale - textWidth,
+                                    (pt.y + 8) * pixelScale - (textHeight / 2),
+                                    mStarPaint);
+                }
 
                 i++;
             }
 
         }
+    }
+
+    private class EmpireFetchedHandler implements EmpireManager.EmpireFetchedHandler {
+        @Override
+        public void onEmpireFetched(Empire empire) {
+            mVisibleEmpires.put(empire.getKey(), empire);
+            setDirty();
+            redraw();
+        }
+    };
+
+    /**
+     * Draw a moving fleet as a line between the source and destination stars, with an icon
+     * representing the current location of the fleet.
+     */
+    private void drawMovingFleet(Canvas canvas, Fleet fleet, Star srcStar, int offsetX, int offsetY) {
+        float pixelScale = getPixelScale();
+
+        // we'll need to find the destination star
+        Star destStar = SectorManager.getInstance().findStar(fleet.getDestinationStarKey());
+        if (destStar == null) {
+            // the destination star isn't in one of the sectors we have in memory, we'll
+            // just ignore this fleet (it's probably flying off the edge of the sector and our
+            // little viewport won't see it anyway -- unless you've got a REALLY long-range
+            // flight, maybe we can stop that from being possible).
+            return;
+        }
+
+        Point2D srcPoint = new Point2D(offsetX, offsetY);
+        srcPoint.x += srcStar.getOffsetX();
+        srcPoint.y += srcStar.getOffsetY();
+
+        Point2D destPoint = getSectorOffset(destStar.getSectorX(), destStar.getSectorY());
+        destPoint.x += destStar.getOffsetX();
+        destPoint.y += destStar.getOffsetY();
+
+        canvas.drawLine(srcPoint.x * pixelScale, srcPoint.y * pixelScale,
+                        destPoint.x * pixelScale, destPoint.y * pixelScale,
+                        mStarPaint);
+
+        // work out how far along the fleet has moved so we can draw the icon at the correct
+        // spot. Also, we'll draw the name of the empire, number of ships etc.
+        ShipDesign design = ShipDesignManager.getInstance().getDesign(fleet.getDesignName());
+        float distance = srcPoint.distanceTo(destPoint);
+        float totalTimeInHours = (float) design.getSpeedInParsecPerHour() / (distance / 10.0f);
+
+        DateTime startTime = fleet.getStateStartTime();
+        DateTime now = DateTime.now(DateTimeZone.UTC);
+        float timeSoFarInHours = Seconds.secondsBetween(startTime, now).getSeconds() / 3600.0f;
+
+        float fractionComplete = timeSoFarInHours / totalTimeInHours;
+        if (fractionComplete > 1.0f) {
+            fractionComplete = 1.0f;
+        }
+
+        // we don't want to start the fleet over the top of the star, so we'll offset it a bit
+        distance -= 40.0f;
+        if (distance < 0) {
+            distance = 0;
+        }
+
+        Point2D direction = new Point2D(destPoint);
+        direction.subtract(srcPoint);
+        direction.normalize();
+
+        Point2D location = new Point2D(direction);
+        location.scale(distance * fractionComplete);
+        location.add(srcPoint);
+
+        direction.scale(20.0f);
+        location.add(direction);
+
+        String msg = String.format("<- fleet (%d)", fleet.getNumShips());
+        canvas.drawText(msg, location.x * pixelScale, location.y * pixelScale, mStarPaint);
+
+        log.debug(String.format("Fleet [src=%.1f,%.1f] [dst=%.1f,%.1f] [fractionComplete=%.4f] [totalTime=%.4f] [timeSoFar=%.4f] [distance=%.4f]",
+                  srcPoint.x, srcPoint.y, destPoint.x, destPoint.y,
+                  timeSoFarInHours / totalTimeInHours, totalTimeInHours,
+                  timeSoFarInHours, distance));
     }
 
     /**

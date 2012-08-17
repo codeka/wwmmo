@@ -11,7 +11,7 @@ public class Fleet implements Parcelable {
     private String mEmpireKey;
     private String mDesignName;
     private int mNumShips;
-    // TODO: fleet state
+    private State mState;
     private DateTime mStateStartTime;
     private String mStarKey;
     private String mDestinationStarKey;
@@ -29,6 +29,9 @@ public class Fleet implements Parcelable {
     }
     public int getNumShips() {
         return mNumShips;
+    }
+    public State getState() {
+        return mState;
     }
     public DateTime getStateStartTime() {
         return mStateStartTime;
@@ -57,6 +60,7 @@ public class Fleet implements Parcelable {
         parcel.writeString(mEmpireKey);
         parcel.writeString(mDesignName);
         parcel.writeInt(mNumShips);
+        parcel.writeInt(mState.getValue());
         parcel.writeLong(mStateStartTime.getMillis());
         parcel.writeString(mStarKey);
         parcel.writeString(mDestinationStarKey);
@@ -73,6 +77,7 @@ public class Fleet implements Parcelable {
             f.mEmpireKey = parcel.readString();
             f.mDesignName = parcel.readString();
             f.mNumShips = parcel.readInt();
+            f.mState = State.fromNumber(parcel.readInt());
             f.mStateStartTime = new DateTime(parcel.readLong(), DateTimeZone.UTC);
             f.mStarKey = parcel.readString();
             f.mDestinationStarKey = parcel.readString();
@@ -93,12 +98,39 @@ public class Fleet implements Parcelable {
         f.mEmpireKey = pb.getEmpireKey();
         f.mDesignName = pb.getDesignName();
         f.mNumShips = pb.getNumShips();
-        // f.state = pb.getState()
+        f.mState = State.fromNumber(pb.getState().getNumber());
         f.mStateStartTime = new DateTime(pb.getStateStartTime() * 1000, DateTimeZone.UTC);
         f.mStarKey = pb.getStarKey();
         f.mDestinationStarKey = pb.getDestinationStarKey();
         f.mTargetFleetKey = pb.getTargetFleetKey();
         f.mTargetColonyKey = pb.getTargetColonyKey();
         return f;
+    }
+
+    public enum State {
+        IDLE(1),
+        MOVING(2),
+        ATTACKING(3);
+
+        private int mValue;
+
+        State(int value) {
+            mValue = value;
+        }
+
+        public int getValue() {
+            return mValue;
+        }
+
+        public static State fromNumber(int value) {
+            for(State s : State.values()) {
+                if (s.getValue() == value) {
+                    return s;
+                }
+            }
+
+            return State.IDLE;
+        }
+
     }
 }

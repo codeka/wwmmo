@@ -69,6 +69,10 @@ public class StarManager {
                 }
             }
         }
+
+        // when a star is updated, it also means the sector in which is existed is updated
+        // as well, so we'll want to refresh that sector.
+        SectorManager.getInstance().refreshSector(star.getSectorX(), star.getSectorY());
     }
 
     public void refreshStar(Star s) {

@@ -1,6 +1,7 @@
 package au.com.codeka.warworlds.model;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -35,6 +36,7 @@ public class SectorManager {
     private Map<Pair<Long, Long>, Sector> mSectors;
     private Map<Pair<Long, Long>, List<OnSectorsFetchedListener>> mInTransitListeners;
     private CopyOnWriteArrayList<OnSectorListChangedListener> mSectorListChangedListeners;
+    private Map<String, Star> mSectorStars;
 
     public static int SECTOR_SIZE = 1024;
 
@@ -42,6 +44,7 @@ public class SectorManager {
         mSectors = new TreeMap<Pair<Long, Long>, Sector>();
         mInTransitListeners = new TreeMap<Pair<Long, Long>, List<OnSectorsFetchedListener>>();
         mSectorListChangedListeners = new CopyOnWriteArrayList<OnSectorListChangedListener>();
+        mSectorStars = new TreeMap<String, Star>();
     }
 
     public Sector getSector(long sectorX, long sectorY) {
@@ -54,19 +57,15 @@ public class SectorManager {
         }
     }
 
+    public Collection<Sector> getSectors() {
+        return mSectors.values();
+    }
+
     /**
      * Finds the star with the given key.
      */
     public Star findStar(String starKey) {
-        for (Sector sector : mSectors.values()) {
-            for (Star star : sector.getStars()) {
-                if (star.getKey().equals(starKey)) {
-                    return star;
-                }
-            }
-        }
-
-        return null;
+        return mSectorStars.get(starKey);
     }
 
     public void addSectorListChangedListener(OnSectorListChangedListener onSectorListChanged) {
@@ -88,7 +87,7 @@ public class SectorManager {
     public void refreshSector(long sectorX, long sectorY) {
         ArrayList<Pair<Long, Long>> coords = new ArrayList<Pair<Long, Long>>();
         coords.add(new Pair<Long, Long>(sectorX, sectorY));
-        requestSectors(coords, null);
+        requestSectors(coords, true, null);
     }
 
     /**
@@ -103,7 +102,7 @@ public class SectorManager {
      * @param sectorX2 The maximum X-coordinate of the sector to request.
      * @param sectorY2 The maximum Y-coordinate of the sector to request.
      */
-    public void requestSectors(final List<Pair<Long, Long>> coords,
+    public void requestSectors(final List<Pair<Long, Long>> coords, boolean force,
                                final OnSectorsFetchedListener callback) {
         if (log.isDebugEnabled()) {
             String msg = "";
@@ -119,7 +118,7 @@ public class SectorManager {
         Map<Pair<Long, Long>, Sector> existingSectors = new TreeMap<Pair<Long, Long>, Sector>();
         final List<Pair<Long, Long>> missingSectors = new ArrayList<Pair<Long, Long>>();
         for (Pair<Long, Long> coord : coords) {
-            if (mSectors.containsKey(coord)) {
+            if (mSectors.containsKey(coord) && !force) {
                 existingSectors.put(coord, mSectors.get(coord));
             } else if (mInTransitListeners.containsKey(coord) && callback != null) {
                 List<OnSectorsFetchedListener> listeners = mInTransitListeners.get(coord);
@@ -180,6 +179,10 @@ public class SectorManager {
                         mSectors.put(key, s);
                         if (callback != null) {
                             theseSectors.put(key, s);
+                        }
+
+                        for (Star star : s.getStars()) {
+                            mSectorStars.put(star.getKey(), star);
                         }
 
                         Map<Pair<Long, Long>, Sector> thisSector = null;

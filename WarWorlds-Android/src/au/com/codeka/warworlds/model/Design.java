@@ -94,9 +94,16 @@ public class Design {
                 } else if (elem.getNodeName().equals("icon")) {
                     design.mIconUrl = elem.getTextContent();
                 } else {
-                    // ?? unknown element... ignore
+                    parseElement(elem, design);
                 }
             }
+        }
+
+        /**
+         * This is called when we get an "unknown" element. That means, it's a custom element
+         * for this particular design.
+         */
+        protected void parseElement(Element elem, Design design) {
         }
     }
 
