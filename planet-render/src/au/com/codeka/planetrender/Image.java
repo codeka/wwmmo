@@ -49,7 +49,7 @@ public class Image {
      */
     public void drawCircle(int cx, int cy, double radius, Colour c) {
         Vector2 centre = Vector2.pool.borrow();
-        centre.x = cx; centre.y = cx;
+        centre.x = cx; centre.y = cy;
         for (int y = (int)(cy - radius); y <= (int)(cy + radius); y++) {
             for (int x = (int)(cx - radius); x <= (int)(cx + radius); x++) {
                 double distance = centre.distanceTo(x, y); 

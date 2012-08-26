@@ -17,6 +17,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Paint.Style;
 import android.graphics.Rect;
@@ -57,6 +58,10 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
     private Map<String, List<StarAttachedOverlay>> mStarAttachedOverlays;
     private Map<String, Empire> mVisibleEmpires;
 
+    private Bitmap mFleetSingleBitmap;
+    private Bitmap mFleetMultiBitmap;
+    private Matrix mMatrix;
+
     private boolean mNeedRedraw = true;
     private Bitmap mBuffer;
 
@@ -82,6 +87,7 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
         mOffsetX = mOffsetY = 0;
         mStarAttachedOverlays = new TreeMap<String, List<StarAttachedOverlay>>();
         mVisibleEmpires = new TreeMap<String, Empire>();
+        mMatrix = new Matrix();
 
         mSelectionOverlay = new SelectionOverlay();
 
@@ -90,6 +96,8 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
         mStarPaint.setStyle(Style.STROKE);
 
         mBackgroundRenderer = new StarfieldBackgroundRenderer(mContext);
+        mFleetSingleBitmap = BitmapFactory.decodeResource(mContext.getResources(), R.drawable.fleet_single);
+        mFleetMultiBitmap = BitmapFactory.decodeResource(mContext.getResources(), R.drawable.fleet);
 
         // whenever the sector list changes (i.e. when we've refreshed from the server),
         // redraw the screen.
@@ -491,13 +499,12 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
                 pt.rotate((float)(Math.PI / 4.0) * i);
                 pt.add(x, y);
 
-                Rect src = new Rect(0, 0, bmp.getWidth(), bmp.getHeight());
-                RectF dst = new RectF((pt.x - 8) * pixelScale,
-                                      (pt.y - 8) * pixelScale,
-                                      (pt.x + 8) * pixelScale,
-                                      (pt.y + 8) * pixelScale);
-
-                canvas.drawBitmap(bmp, src, dst, mStarPaint);
+                mMatrix.reset();
+                mMatrix.postTranslate(-(bmp.getWidth() / 2.0f), -(bmp.getHeight() / 2.0f));
+                mMatrix.postScale(16.0f * pixelScale / bmp.getWidth(),
+                                  16.0f * pixelScale / bmp.getHeight());
+                mMatrix.postTranslate(pt.x * pixelScale, pt.y * pixelScale);
+                canvas.drawBitmap(bmp, mMatrix, mStarPaint);
 
                 String name;
                 if (n.equals(1)) {
@@ -510,8 +517,10 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
                 mStarPaint.getTextBounds(name, 0, name.length(), bounds);
                 float textHeight = bounds.height();
 
-                canvas.drawText(name, (pt.x + 12) * pixelScale, (pt.y + 8) * pixelScale - (textHeight / 2), mStarPaint);
-
+                canvas.drawText(name,
+                                (pt.x + 12) * pixelScale,
+                                (pt.y + 8) * pixelScale - (textHeight / 2),
+                                mStarPaint);
                 i++;
             }
         }
@@ -545,14 +554,13 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
                     pt.rotate((float)(Math.PI / 4.0) * -i);
                     pt.add(x, y);
 
-                    Bitmap bmp = BitmapFactory.decodeResource(mContext.getResources(), R.drawable.fleet);
-                    Rect src = new Rect(0, 0, bmp.getWidth(), bmp.getHeight());
-                    RectF dst = new RectF((pt.x - 8) * pixelScale,
-                                          (pt.y - 8) * pixelScale,
-                                          (pt.x + 8) * pixelScale,
-                                          (pt.y + 8) * pixelScale);
-
-                    canvas.drawBitmap(bmp, src, dst, mStarPaint);
+                    mMatrix.reset();
+                    mMatrix.postTranslate(-(mFleetMultiBitmap.getWidth() / 2.0f),
+                                          -(mFleetMultiBitmap.getHeight() / 2.0f));
+                    mMatrix.postScale(16.0f * pixelScale / mFleetMultiBitmap.getWidth(),
+                                      16.0f * pixelScale / mFleetMultiBitmap.getHeight());
+                    mMatrix.postTranslate(pt.x * pixelScale, pt.y * pixelScale);
+                    canvas.drawBitmap(mFleetMultiBitmap, mMatrix, mStarPaint);
 
                     String name = String.format("%s (%d)", emp.getDisplayName(), numShips);
 
@@ -640,16 +648,30 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
         location.scale(distance * fractionComplete);
         location.add(srcPoint);
 
+        // find the angle between "up" and the direction, so we can rotate the fleet bitmap
+        // see: http://www.gamedev.net/topic/487576-angle-between-two-lines-clockwise/
+        float angle = (float) Math.atan2(1.0 * direction.x, -1.0 * direction.y);
+
         direction.scale(20.0f);
         location.add(direction);
+
+        // scale zoom and rotate the bitmap all with one matrix
+        mMatrix.reset();
+        mMatrix.postTranslate(-(mFleetSingleBitmap.getWidth() / 2.0f),
+                              -(mFleetSingleBitmap.getHeight() / 2.0f));
+        mMatrix.postScale(20.0f * pixelScale / mFleetSingleBitmap.getWidth(),
+                          20.0f * pixelScale / mFleetSingleBitmap.getHeight());
+        mMatrix.postRotate((float) (angle * 180.0 / Math.PI));
+        mMatrix.postTranslate((location.x) * pixelScale, (location.y) * pixelScale);
+        canvas.drawBitmap(mFleetSingleBitmap, mMatrix, mStarPaint);
 
         String msg = String.format("<- fleet (%d)", fleet.getNumShips());
         canvas.drawText(msg, location.x * pixelScale, location.y * pixelScale, mStarPaint);
 
-        log.debug(String.format("Fleet [src=%.1f,%.1f] [dst=%.1f,%.1f] [fractionComplete=%.4f] [totalTime=%.4f] [timeSoFar=%.4f] [distance=%.4f]",
+        log.debug(String.format("Fleet [src=%.1f,%.1f] [dst=%.1f,%.1f] [fractionComplete=%.4f] [totalTime=%.4f] [timeSoFar=%.4f] [distance=%.4f] [angle=%.4f deg]",
                   srcPoint.x, srcPoint.y, destPoint.x, destPoint.y,
                   timeSoFarInHours / totalTimeInHours, totalTimeInHours,
-                  timeSoFarInHours, distance));
+                  timeSoFarInHours, distance, angle * 180.0 / Math.PI));
     }
 
     /**

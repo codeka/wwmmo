@@ -186,17 +186,20 @@ public class SectorManager {
                         }
 
                         Map<Pair<Long, Long>, Sector> thisSector = null;
-                        for (OnSectorsFetchedListener listener : mInTransitListeners.get(key)) {
-                            if (listener != null) {
-                                if (thisSector == null) {
-                                    thisSector = new TreeMap<Pair<Long, Long>, Sector>();
-                                    thisSector.put(key, s);
-                                }
+                        List<OnSectorsFetchedListener> listeners = mInTransitListeners.get(key);
+                        if (listeners != null) {
+                            for (OnSectorsFetchedListener listener : listeners) {
+                                if (listener != null) {
+                                    if (thisSector == null) {
+                                        thisSector = new TreeMap<Pair<Long, Long>, Sector>();
+                                        thisSector.put(key, s);
+                                    }
 
-                                listener.onSectorsFetched(thisSector);
+                                    listener.onSectorsFetched(thisSector);
+                                }
                             }
+                            mInTransitListeners.remove(key);
                         }
-                        mInTransitListeners.remove(key);
                     }
 
                     if (callback != null) {

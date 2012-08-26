@@ -48,7 +48,7 @@ public class AppContent extends JPanel {
     }
 
     /**
-     * Renders just the point cloud using the specified properties.
+     * Renders just the selected XML to the output image.
      */
     private void render() {
         Template.BaseTemplate tmpl;
