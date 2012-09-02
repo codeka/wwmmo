@@ -2,7 +2,7 @@
 <designs>
   <design id="shipyard">
     <name>Shipyard</name>
-    <icon>/data/buildings/shipyard.png</icon>
+    <sprite>building.shipyard</sprite>
     <description><![CDATA[
       <p>The shipyard allows you to build ships.</p>
       <p>You can have only one shipyard on your planet, but it's efficiency and the range of
@@ -12,7 +12,7 @@
   </design>
   <design id="silo">
     <name>Silo</name>
-    <icon>/data/buildings/lighthouse.png</icon>
+    <sprite>building.silo</sprite>
     <description><![CDATA[
       <p>The Silo allows you to store farming produce indefinitely. The higher the silo level,
       the more you can store. Silos store produce for all colonies in this starsystem and you
@@ -22,7 +22,7 @@
   </design>
   <design id="research">
     <name>Research Laboratory</name>
-    <icon>/data/buildings/science-institute.png</icon>
+    <sprite>building.research</sprite>
     <description><![CDATA[
       <p>Allows you to build more advanced ships and buildings. The higher the level of this
       building, the more advanced research becomes available.</p>

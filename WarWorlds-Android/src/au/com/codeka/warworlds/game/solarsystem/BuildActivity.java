@@ -120,17 +120,6 @@ public class BuildActivity extends TabFragmentActivity implements StarManager.St
             ListView buildingsList = (ListView) v.findViewById(R.id.building_list);
             buildingsList.setAdapter(mBuildingListAdapter);
 
-            // make sure we're aware of any changes to the designs
-            BuildingDesignManager.getInstance().addDesignsChangedListener(new DesignManager.DesignsChangedListener() {
-                @Override
-                public void onDesignsChanged() {
-                    mBuildingListAdapter.setDesigns(BuildingDesignManager.getInstance().getDesigns());
-                    if (colony != null) {
-                        mBuildingListAdapter.setBuildings(colony.getBuildings());
-                    }
-                }
-            });
-
             buildingsList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -277,7 +266,7 @@ public class BuildActivity extends TabFragmentActivity implements StarManager.St
                         icon.setImageBitmap(null);
                     }
 
-                    row1.setText(design.getName());
+                    row1.setText(design.getDisplayName());
                     row2.setText("Level 1");
 
                     row3.setVisibility(View.VISIBLE);
@@ -304,7 +293,7 @@ public class BuildActivity extends TabFragmentActivity implements StarManager.St
                         icon.setImageBitmap(null);
                     }
 
-                    row1.setText(design.getName());
+                    row1.setText(design.getDisplayName());
                     row2.setText(String.format("$ %d - %.2f hours", design.getBuildCost(),
                             (float) design.getBuildTimeSeconds() / 3600.0f));
                     row3.setText("Required: none");
@@ -337,14 +326,6 @@ public class BuildActivity extends TabFragmentActivity implements StarManager.St
                     args.putParcelable("au.com.codeka.warworlds.Colony", colony);
 
                     DialogManager.getInstance().show(getActivity(), BuildConfirmDialog.class, args);
-                }
-            });
-
-            // make sure we're aware of any changes to the designs
-            ShipDesignManager.getInstance().addDesignsChangedListener(new DesignManager.DesignsChangedListener() {
-                @Override
-                public void onDesignsChanged() {
-                    adapter.setDesigns(ShipDesignManager.getInstance().getDesigns());
                 }
             });
 
@@ -409,7 +390,7 @@ public class BuildActivity extends TabFragmentActivity implements StarManager.St
                     icon.setImageBitmap(null);
                 }
 
-                row1.setText(design.getName());
+                row1.setText(design.getDisplayName());
                 row2.setText(String.format("$ %d - %.2f hours", design.getBuildCost(),
                         (float) design.getBuildTimeSeconds() / 3600.0f));
                 row3.setText("Required: none");
@@ -434,20 +415,6 @@ public class BuildActivity extends TabFragmentActivity implements StarManager.St
 
             ListView buildQueueList = (ListView) v.findViewById(R.id.build_queue);
             buildQueueList.setAdapter(adapter);
-
-            // make sure we're aware of any changes to the designs
-            BuildingDesignManager.getInstance().addDesignsChangedListener(new BuildingDesignManager.DesignsChangedListener() {
-                @Override
-                public void onDesignsChanged() {
-                    adapter.setBuildQueue(star, colony);
-                }
-            });
-            ShipDesignManager.getInstance().addDesignsChangedListener(new ShipDesignManager.DesignsChangedListener() {
-                @Override
-                public void onDesignsChanged() {
-                    adapter.setBuildQueue(star, colony);
-                }
-            });
 
             // make sure we're aware of changes to the build queue
             BuildQueueManager.getInstance().addBuildQueueUpdatedListener(new BuildQueueManager.BuildQueueUpdatedListener() {
@@ -516,14 +483,9 @@ public class BuildActivity extends TabFragmentActivity implements StarManager.St
                 DesignManager dm = DesignManager.getInstance(request.getBuildKind());
                 Design design = dm.getDesign(request.getDesignName());
 
-                Bitmap bm = dm.getDesignIcon(design);
-                if (bm != null) {
-                    icon.setImageBitmap(bm);
-                } else {
-                    icon.setImageBitmap(null);
-                }
+                icon.setImageBitmap(dm.getDesignIcon(design));
 
-                row1.setText(design.getName());
+                row1.setText(design.getDisplayName());
                 Duration remainingDuration = request.getRemainingTime();
                 if (remainingDuration.equals(Duration.ZERO)) {
                     row2.setText(String.format("%d %%, not enough resources to complete.",

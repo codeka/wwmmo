@@ -15,8 +15,8 @@ public class BuildingDesignManager extends DesignManager {
         return (BuildingDesign) super.getDesign(designID);
     }
 
-    protected String getDesignUrl() {
-        return "/data/buildings.xml";
+    protected String getDesignPath() {
+        return "buildings.xml";
     }
 
     protected Design parseDesign(Element designElement) {

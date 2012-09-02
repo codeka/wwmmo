@@ -30,6 +30,7 @@ import au.com.codeka.warworlds.model.ChatManager;
 import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.MyEmpire;
 import au.com.codeka.warworlds.model.ShipDesignManager;
+import au.com.codeka.warworlds.model.SpriteManager;
 
 /**
  * Main activity. Displays the message of the day and lets you select "Start Game", "Options", etc.
@@ -192,8 +193,9 @@ public class WarWorldsActivity extends Activity {
                     startActivity(new Intent(mContext, EmpireSetupActivity.class));
                     return;
                 } else if (!mErrorOccured) {
-                    BuildingDesignManager.getInstance().setup();
-                    ShipDesignManager.getInstance().setup();
+                    SpriteManager.getInstance().setup(mContext);
+                    BuildingDesignManager.getInstance().setup(mContext);
+                    ShipDesignManager.getInstance().setup(mContext);
                     BuildQueueManager.getInstance().setup();
 
                     motdView.loadHtml("html/motd-template.html", result);

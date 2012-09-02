@@ -2,7 +2,7 @@
 <designs>
   <design id="colonyship">
     <name>Colony Ship</name>
-    <icon>/data/ships/colonyship.png</icon>
+    <sprite>ship.colony</sprite>
     <description><![CDATA[
       <p>The colony ship is what you'll need to colonize remote planets. They'll carry 100 of
       your colony's population to a brave new world.</p>
@@ -13,7 +13,7 @@
   </design>
   <design id="scout">
     <name>Scout</name>
-    <icon>/data/ships/scout.png</icon>
+    <sprite>ship.scout</sprite>
     <description><![CDATA[
       <p>Scouts are small, fast ships with no attack capability (and not much in the way of
       defensive capabilities, either). What they <em>are</em> good at, though, is getting in

@@ -21,7 +21,6 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import au.com.codeka.warworlds.R;
-import au.com.codeka.warworlds.model.DesignManager;
 import au.com.codeka.warworlds.model.Fleet;
 import au.com.codeka.warworlds.model.ImageManager;
 import au.com.codeka.warworlds.model.ShipDesign;
@@ -87,16 +86,6 @@ public class FleetList extends FrameLayout {
         final ListView fleetList = (ListView) findViewById(R.id.ship_list);
         fleetList.setAdapter(mFleetListAdapter);
 
-        // make sure we're aware of any changes to the designs
-        ShipDesignManager.getInstance().addDesignsChangedListener(new DesignManager.DesignsChangedListener() {
-            @Override
-            public void onDesignsChanged() {
-                if (mFleets != null && mFleetListAdapter != null) {
-                    mFleetListAdapter.setFleets(mStars, mFleets);
-                }
-            }
-        });
-
         fleetList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view,
@@ -152,7 +141,7 @@ public class FleetList extends FrameLayout {
             icon.setImageBitmap(null);
         }
 
-        row1.setText(design.getName());
+        row1.setText(design.getDisplayName());
         row2.setText(String.format("%d", fleet.getNumShips()));
         row2.setGravity(Gravity.RIGHT);
         row3.setVisibility(View.GONE);

@@ -60,6 +60,7 @@ public class TabManager {
         if (mLastTab != newTab || force) {
             if (newTab != null) {
                 newTab.switchTo(mLastTab);
+                mLastTab = newTab;
             }
         }
     }

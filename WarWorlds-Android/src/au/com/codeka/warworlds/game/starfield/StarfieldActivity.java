@@ -8,7 +8,6 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -369,13 +368,13 @@ public class StarfieldActivity extends Activity {
 
             final ImageView icon = (ImageView) view.findViewById(R.id.starfield_planet_icon);
             final Fleet fleet = mFleets.get(position);
-            ShipDesign design = ShipDesignManager.getInstance().getDesign(fleet.getDesignName());
+            ShipDesignManager designManager = ShipDesignManager.getInstance();
+            ShipDesign design = designManager.getDesign(fleet.getDesignName());
 
-            String designUrl = design.getIconUrl();
-            icon.setImageURI(Uri.parse(designUrl));
+            icon.setImageBitmap(designManager.getDesignIcon(design));
 
             TextView shipKindTextView = (TextView) view.findViewById(R.id.starfield_planet_type);
-            shipKindTextView.setText(design.getName());
+            shipKindTextView.setText(design.getDisplayName());
 
             final TextView shipCountTextView = (TextView) view.findViewById(R.id.starfield_planet_colony);
             shipCountTextView.setText(String.format("%d", fleet.getNumShips()));

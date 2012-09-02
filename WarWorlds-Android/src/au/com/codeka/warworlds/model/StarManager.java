@@ -69,10 +69,6 @@ public class StarManager {
                 }
             }
         }
-
-        // when a star is updated, it also means the sector in which is existed is updated
-        // as well, so we'll want to refresh that sector.
-        SectorManager.getInstance().refreshSector(star.getSectorX(), star.getSectorY());
     }
 
     public void refreshStar(Star s) {
@@ -80,7 +76,14 @@ public class StarManager {
     }
 
     public void refreshStar(String starKey) {
-        requestStar(starKey, true, null);
+        requestStar(starKey, true, new StarFetchedHandler() {
+            @Override
+            public void onStarFetched(Star s) {
+                // When a star is explicitly refreshed, it's usually because it's changed somehow.
+                // Generally that also means the sector has changed.
+                SectorManager.getInstance().refreshSector(s.getSectorX(), s.getSectorY());
+            }
+        });
     }
 
     /**

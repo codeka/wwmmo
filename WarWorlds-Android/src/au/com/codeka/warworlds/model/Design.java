@@ -13,13 +13,13 @@ public class Design {
     protected String mDescription;
     protected int mBuildCost;
     protected int mBuildTimeSeconds;
-    protected String mIconUrl;
+    protected String mSpriteName;
     protected DesignKind mDesignKind;
 
     public String getID() {
         return mID;
     }
-    public String getName() {
+    public String getDisplayName() {
         return mName;
     }
     public String getDescription() {
@@ -34,8 +34,8 @@ public class Design {
     public DesignKind getDesignKind() {
         return mDesignKind;
     }
-    public String getIconUrl() {
-        return mIconUrl;
+    public Sprite getSprite() {
+        return SpriteManager.getInstance().getSprite(mSpriteName);
     }
 
     /**
@@ -60,7 +60,7 @@ public class Design {
                     return dk;
                 }
             }
-            
+
             return DesignKind.BUILDING; //??
         }
     }
@@ -91,8 +91,8 @@ public class Design {
                         double timeInHours = Double.parseDouble(value);
                         design.mBuildTimeSeconds = (int)(timeInHours * 3600);
                     }
-                } else if (elem.getNodeName().equals("icon")) {
-                    design.mIconUrl = elem.getTextContent();
+                } else if (elem.getNodeName().equals("sprite")) {
+                    design.mSpriteName = elem.getTextContent();
                 } else {
                     parseElement(elem, design);
                 }

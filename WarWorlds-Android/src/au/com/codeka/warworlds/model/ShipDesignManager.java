@@ -15,8 +15,8 @@ public class ShipDesignManager extends DesignManager {
         return (ShipDesign) super.getDesign(designID);
     }
 
-    protected String getDesignUrl() {
-        return "/data/ships.xml";
+    protected String getDesignPath() {
+        return "ships.xml";
     }
 
     protected Design parseDesign(Element designElement) {

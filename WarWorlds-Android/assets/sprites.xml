@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<sprites>
+  <sheet filename="spritesheets/newsh$.shp.000000.png">
+    <sprite name="ship.scout">
+      <rect location="49,167" size="22x28" />
+      <direction>0,1</direction>
+    </sprite>
+  </sheet>
+  <sheet filename="spritesheets/newshb.shp.000000.png">
+    <sprite name="ship.colony">
+      <rect location="0,0" size="119x139" />
+      <direction>0,-1</direction>
+    </sprite>
+  </sheet>
+  <sheet filename="spritesheets/newshr.shp.000000.png">
+    <sprite name="building.research">
+      <rect location="48,1" size="72x83" />
+      <direction>0,1</direction>
+    </sprite>
+  </sheet>
+  <sheet filename="spritesheets/newshm.shp.000000.png">
+    <sprite name="building.shipyard">
+      <rect location="72,28" size="72x56" />
+      <direction>0,1</direction>
+    </sprite>
+  </sheet>
+  <sheet filename="spritesheets/tyrian.shp.01673F.png">
+    <sprite name="building.silo">
+      <rect location="144,118" size="25x19" />
+      <direction>0,1</direction>
+    </sprite>
+  </sheet>
+</sprites>

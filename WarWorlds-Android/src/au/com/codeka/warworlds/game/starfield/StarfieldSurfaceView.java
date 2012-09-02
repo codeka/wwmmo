@@ -21,7 +21,6 @@ import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Paint.Style;
 import android.graphics.Rect;
-import android.graphics.RectF;
 import android.util.AttributeSet;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
@@ -39,6 +38,8 @@ import au.com.codeka.warworlds.model.Sector;
 import au.com.codeka.warworlds.model.SectorManager;
 import au.com.codeka.warworlds.model.ShipDesign;
 import au.com.codeka.warworlds.model.ShipDesignManager;
+import au.com.codeka.warworlds.model.Sprite;
+import au.com.codeka.warworlds.model.SpriteManager;
 import au.com.codeka.warworlds.model.Star;
 import au.com.codeka.warworlds.model.StarImageManager;
 
@@ -58,7 +59,6 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
     private Map<String, List<StarAttachedOverlay>> mStarAttachedOverlays;
     private Map<String, Empire> mVisibleEmpires;
 
-    private Bitmap mFleetSingleBitmap;
     private Bitmap mFleetMultiBitmap;
     private Matrix mMatrix;
 
@@ -96,7 +96,6 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
         mStarPaint.setStyle(Style.STROKE);
 
         mBackgroundRenderer = new StarfieldBackgroundRenderer(mContext);
-        mFleetSingleBitmap = BitmapFactory.decodeResource(mContext.getResources(), R.drawable.fleet_single);
         mFleetMultiBitmap = BitmapFactory.decodeResource(mContext.getResources(), R.drawable.fleet);
 
         // whenever the sector list changes (i.e. when we've refreshed from the server),
@@ -648,22 +647,29 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
         location.scale(distance * fractionComplete);
         location.add(srcPoint);
 
+        Sprite fleetSprite = SpriteManager.getInstance().getSprite("ship.scout");
+        Point2D up = fleetSprite.getUp();
+
         // find the angle between "up" and the direction, so we can rotate the fleet bitmap
         // see: http://www.gamedev.net/topic/487576-angle-between-two-lines-clockwise/
-        float angle = (float) Math.atan2(1.0 * direction.x, -1.0 * direction.y);
+        float angle = (float) Math.atan2(up.x * direction.y - up.y * direction.x,
+                                         up.x * direction.x + up.y * direction.y);
 
         direction.scale(20.0f);
         location.add(direction);
 
         // scale zoom and rotate the bitmap all with one matrix
         mMatrix.reset();
-        mMatrix.postTranslate(-(mFleetSingleBitmap.getWidth() / 2.0f),
-                              -(mFleetSingleBitmap.getHeight() / 2.0f));
-        mMatrix.postScale(20.0f * pixelScale / mFleetSingleBitmap.getWidth(),
-                          20.0f * pixelScale / mFleetSingleBitmap.getHeight());
+        mMatrix.postTranslate(-(fleetSprite.getWidth() / 2.0f),
+                              -(fleetSprite.getHeight() / 2.0f));
+        mMatrix.postScale(20.0f * pixelScale / fleetSprite.getWidth(),
+                          20.0f * pixelScale / fleetSprite.getHeight());
         mMatrix.postRotate((float) (angle * 180.0 / Math.PI));
         mMatrix.postTranslate((location.x) * pixelScale, (location.y) * pixelScale);
-        canvas.drawBitmap(mFleetSingleBitmap, mMatrix, mStarPaint);
+        canvas.save();
+        canvas.setMatrix(mMatrix);
+        fleetSprite.draw(canvas);
+        canvas.restore();
 
         String msg = String.format("<- fleet (%d)", fleet.getNumShips());
         canvas.drawText(msg, location.x * pixelScale, location.y * pixelScale, mStarPaint);

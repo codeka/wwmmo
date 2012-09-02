@@ -129,7 +129,7 @@ public class BuildConfirmDialog extends Dialog implements DialogManager.DialogCo
         ImageView iconImageView = (ImageView) findViewById(R.id.building_icon);
         TextView descriptionTextView = (TextView) findViewById(R.id.building_description);
 
-        nameTextView.setText(design.getName());
+        nameTextView.setText(design.getDisplayName());
         Bitmap bm;
         if (design.getDesignKind() == Design.DesignKind.BUILDING) {
             bm = BuildingDesignManager.getInstance().getDesignIcon(design);

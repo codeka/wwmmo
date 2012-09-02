@@ -1,20 +1,23 @@
 package au.com.codeka.warworlds.model;
 
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.SortedMap;
 import java.util.TreeMap;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import au.com.codeka.XmlIterator;
-import au.com.codeka.warworlds.api.ApiClient;
-import au.com.codeka.warworlds.api.ApiException;
 
 /**
  * This is the base "manager" class that manages designs for ships and buildings.
@@ -22,7 +25,6 @@ import au.com.codeka.warworlds.api.ApiException;
 public abstract class DesignManager {
     private static Logger log = LoggerFactory.getLogger(DesignManager.class);
 
-    private List<DesignsChangedListener> mDesignsChangedListeners;
     private SortedMap<String, Design> mDesigns;
     private SortedMap<String, Bitmap> mDesignIcons;
 
@@ -38,25 +40,29 @@ public abstract class DesignManager {
      * design manager. We download the list of designs, parse them and set up the
      * list.
      */
-    public void setup() {
+    public void setup(final Context context) {
         mDesignIcons = new TreeMap<String, Bitmap>();
-        mDesignsChangedListeners = new ArrayList<DesignsChangedListener>();
 
         new AsyncTask<Void, Void, List<Design>>() {
             @Override
             protected List<Design> doInBackground(Void... arg0) {
                 Document xmldoc;
                 try {
-                    xmldoc = ApiClient.getXml(getDesignUrl());
-                } catch (ApiException e) {
-                    log.error("Error loading "+getDesignUrl(), e);
+                    InputStream ins = context.getAssets().open(getDesignPath());
+                    DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
+                    builderFactory.setValidating(false);
+
+                    DocumentBuilder builder = builderFactory.newDocumentBuilder();
+                    xmldoc = builder.parse(ins);
+                } catch (Exception e) {
+                    log.error("Error loading "+getDesignPath(), e);
                     return null;
                 }
 
                 try {
                     return parseDesigns(xmldoc);
                 } catch (ParseException e) {
-                    log.error("Error loading "+getDesignUrl(), e);
+                    log.error("Error loading "+getDesignPath(), e);
                     return null;
                 }
             }
@@ -74,20 +80,8 @@ public abstract class DesignManager {
         }.execute();
     }
 
-    protected abstract String getDesignUrl();
+    protected abstract String getDesignPath();
     protected abstract Design parseDesign(Element designElement);
-
-    public void addDesignsChangedListener(DesignsChangedListener listener) {
-        mDesignsChangedListeners.add(listener);
-    }
-    public void removeDesignsChangedListener(DesignsChangedListener listener) {
-        mDesignsChangedListeners.remove(listener);
-    }
-    protected void fireDesignsChanged() {
-        for (DesignsChangedListener listener : mDesignsChangedListeners) {
-            listener.onDesignsChanged();
-        }
-    }
 
     /**
      * Gets the collection of designs.
@@ -111,36 +105,18 @@ public abstract class DesignManager {
      */
     public Bitmap getDesignIcon(final Design design) {
         synchronized(mDesignIcons) {
-            if (mDesignIcons.containsKey(design.getIconUrl())) {
-                return mDesignIcons.get(design.getIconUrl());
+            if (mDesignIcons.containsKey(design.getID())) {
+                return mDesignIcons.get(design.getID());
             }
 
-            // add a null value to indicate that we're still in the process of fetching it...
-            mDesignIcons.put(design.getIconUrl(), null);
-
-            // and actually make a request to fetch
-            new AsyncTask<Void, Void, Bitmap>() {
-                @Override
-                protected Bitmap doInBackground(Void... arg0) {
-                    try {
-                        return ApiClient.getImage(design.getIconUrl());
-                    } catch (ApiException e) {
-                        log.error(String.format("Could not fetch design \"%s\" icon [%s]",
-                                design.getName(), design.getIconUrl()), e);
-                        return null;
-                    }
-                }
-                @Override
-                protected void onPostExecute(Bitmap result) {
-                    synchronized(mDesignIcons) {
-                        mDesignIcons.put(design.getIconUrl(), result);
-                    }
-
-                    fireDesignsChanged();
-                }
-            }.execute();
-
-            return null;
+            Sprite sprite = design.getSprite();
+            if (sprite != null) {
+                Bitmap icon = sprite.createIcon(150, 150);
+                mDesignIcons.put(design.getID(), icon);
+                return icon;
+            } else {
+                return null;
+            }
         }
     }
 
