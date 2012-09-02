@@ -39,7 +39,6 @@ import au.com.codeka.warworlds.model.SectorManager;
 import au.com.codeka.warworlds.model.ShipDesign;
 import au.com.codeka.warworlds.model.ShipDesignManager;
 import au.com.codeka.warworlds.model.Sprite;
-import au.com.codeka.warworlds.model.SpriteManager;
 import au.com.codeka.warworlds.model.Star;
 import au.com.codeka.warworlds.model.StarImageManager;
 
@@ -463,6 +462,25 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
         }
     }
 
+    /**
+     * Gets an \c Empire given it's key.
+     */
+    private Empire getEmpire(String empireKey) {
+        Empire emp = mVisibleEmpires.get(empireKey);
+        if (emp == null) {
+            EmpireManager.getInstance().fetchEmpire(empireKey, new EmpireManager.EmpireFetchedHandler() {
+                @Override
+                public void onEmpireFetched(Empire empire) {
+                    mVisibleEmpires.put(empire.getKey(), empire);
+                    setDirty();
+                    redraw();
+                }
+
+            });
+        }
+        return emp;
+    }
+
     private void drawStarIcons(Canvas canvas, Star star, int x, int y) {
         final float pixelScale = getPixelScale();
 
@@ -473,10 +491,8 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
             for (int i = 0; i < colonies.size(); i++) {
                 Colony colony = colonies.get(i);
 
-                Empire emp = mVisibleEmpires.get(colony.getEmpireKey());
-                if (emp == null) {
-                    EmpireManager.getInstance().fetchEmpire(colony.getEmpireKey(), new EmpireFetchedHandler());
-                } else {
+                Empire emp = getEmpire(colony.getEmpireKey());
+                if (emp != null) {
                     Integer n = colonyEmpires.get(emp.getKey());
                     if (n == null) {
                         n = 1;
@@ -545,10 +561,8 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
             int i = 0;
             for (String empireKey : empireFleets.keySet()) {
                 Integer numShips = empireFleets.get(empireKey);
-                Empire emp = mVisibleEmpires.get(empireKey);
-                if (emp == null) {
-                    EmpireManager.getInstance().fetchEmpire(empireKey, new EmpireFetchedHandler());
-                } else {
+                Empire emp = getEmpire(empireKey);
+                if (emp != null) {
                     Point2D pt = new Point2D(0, -25.0f);
                     pt.rotate((float)(Math.PI / 4.0) * -i);
                     pt.add(x, y);
@@ -580,15 +594,6 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
         }
     }
 
-    private class EmpireFetchedHandler implements EmpireManager.EmpireFetchedHandler {
-        @Override
-        public void onEmpireFetched(Empire empire) {
-            mVisibleEmpires.put(empire.getKey(), empire);
-            setDirty();
-            redraw();
-        }
-    };
-
     /**
      * Draw a moving fleet as a line between the source and destination stars, with an icon
      * representing the current location of the fleet.
@@ -613,10 +618,6 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
         Point2D destPoint = getSectorOffset(destStar.getSectorX(), destStar.getSectorY());
         destPoint.x += destStar.getOffsetX();
         destPoint.y += destStar.getOffsetY();
-
-        canvas.drawLine(srcPoint.x * pixelScale, srcPoint.y * pixelScale,
-                        destPoint.x * pixelScale, destPoint.y * pixelScale,
-                        mStarPaint);
 
         // work out how far along the fleet has moved so we can draw the icon at the correct
         // spot. Also, we'll draw the name of the empire, number of ships etc.
@@ -647,7 +648,7 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
         location.scale(distance * fractionComplete);
         location.add(srcPoint);
 
-        Sprite fleetSprite = SpriteManager.getInstance().getSprite("ship.scout");
+        Sprite fleetSprite = design.getSprite();
         Point2D up = fleetSprite.getUp();
 
         // find the angle between "up" and the direction, so we can rotate the fleet bitmap
@@ -671,13 +672,25 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
         fleetSprite.draw(canvas);
         canvas.restore();
 
-        String msg = String.format("<- fleet (%d)", fleet.getNumShips());
-        canvas.drawText(msg, location.x * pixelScale, location.y * pixelScale, mStarPaint);
+        Empire emp = getEmpire(fleet.getEmpireKey());
+        if (emp != null) {
+            Bitmap shield = emp.getShield(mContext);
+            if (shield != null) {
+                mMatrix.reset();
+                mMatrix.postTranslate(-(shield.getWidth() / 2.0f), -(shield.getHeight() / 2.0f));
+                mMatrix.postScale(16.0f * pixelScale / shield.getWidth(),
+                                  16.0f * pixelScale / shield.getHeight());
+                mMatrix.postTranslate((location.x + 20.0f) * pixelScale,
+                                      location.y * pixelScale);
+                canvas.drawBitmap(shield, mMatrix, mStarPaint);
+            }
 
-        log.debug(String.format("Fleet [src=%.1f,%.1f] [dst=%.1f,%.1f] [fractionComplete=%.4f] [totalTime=%.4f] [timeSoFar=%.4f] [distance=%.4f] [angle=%.4f deg]",
-                  srcPoint.x, srcPoint.y, destPoint.x, destPoint.y,
-                  timeSoFarInHours / totalTimeInHours, totalTimeInHours,
-                  timeSoFarInHours, distance, angle * 180.0 / Math.PI));
+            String msg = emp.getDisplayName();
+            canvas.drawText(msg, (location.x + 30.0f) * pixelScale, location.y * pixelScale, mStarPaint);
+
+            msg = String.format("%s (%d)", design.getDisplayName(), fleet.getNumShips());
+            canvas.drawText(msg, (location.x + 30.0f) * pixelScale, (location.y + 10.0f) * pixelScale, mStarPaint);
+        }
     }
 
     /**
