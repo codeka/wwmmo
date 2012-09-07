@@ -54,6 +54,8 @@ public class UniverseElementSurfaceView extends SurfaceView implements SurfaceHo
         if (overlay.isVisible())
             return;
 
+        overlay.setPixelScale(mPixelScale);
+
         synchronized(mOverlays) {
             mOverlays.add(overlay);
             overlay.setVisible(true);
@@ -194,6 +196,7 @@ public class UniverseElementSurfaceView extends SurfaceView implements SurfaceHo
      */
     protected static abstract class Overlay {
         private boolean mIsVisible;
+        private float mPixelScale;
 
         private void setVisible(boolean isVisible) {
             mIsVisible = isVisible;
@@ -201,6 +204,12 @@ public class UniverseElementSurfaceView extends SurfaceView implements SurfaceHo
 
         public boolean isVisible() {
             return mIsVisible;
+        }
+        public float getPixelScale() {
+            return mPixelScale;
+        }
+        public void setPixelScale(float pixelScale) {
+            mPixelScale = pixelScale;
         }
 
         public abstract void draw(Canvas canvas);

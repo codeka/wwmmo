@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 
 import android.os.AsyncTask;
 import au.com.codeka.Pair;
+import au.com.codeka.Point2D;
 import au.com.codeka.warworlds.api.ApiClient;
 
 /**
@@ -88,6 +89,31 @@ public class SectorManager {
         ArrayList<Pair<Long, Long>> coords = new ArrayList<Pair<Long, Long>>();
         coords.add(new Pair<Long, Long>(sectorX, sectorY));
         requestSectors(coords, true, null);
+    }
+
+    /**
+     * Returns a {@link Point2D} that represents a line segment from {@link Star} a to
+     * {@link Star} b. You can use the \c length() method to determine the distance between them.
+     */
+    public Point2D directionBetween(Star a, Star b) {
+        float dx = a.getOffsetX() - b.getOffsetX();
+        float dy = a.getOffsetY() - b.getOffsetY();
+
+        float dsx = a.getSectorX() - b.getSectorX();
+        dx += (dsx * SECTOR_SIZE);
+
+        float dsy = a.getSectorY() - b.getSectorY();
+        dy += (dsy * SECTOR_SIZE);
+
+        return new Point2D(dx, dy);
+    }
+
+    /**
+     * Calculates the distance (in "parsecs") between the two given stars.
+     */
+    public float distanceInParsecs(Star a, Star b) {
+        float distanceInPixels = directionBetween(a, b).scalarLength();
+        return distanceInPixels / 10.0f;
     }
 
     /**

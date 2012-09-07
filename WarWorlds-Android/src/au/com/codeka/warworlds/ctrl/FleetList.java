@@ -132,7 +132,7 @@ public class FleetList extends FrameLayout {
         TextView row3 = (TextView) view.findViewById(R.id.ship_row3);
 
         ShipDesignManager dm = ShipDesignManager.getInstance();
-        ShipDesign design = dm.getDesign(fleet.getDesignName());
+        ShipDesign design = dm.getDesign(fleet.getDesignID());
 
         Bitmap bm = dm.getDesignIcon(design);
         if (bm != null) {
@@ -184,8 +184,8 @@ public class FleetList extends FrameLayout {
                         Star lhsStar = mStars.get(lhs.getStarKey());
                         Star rhsStar = mStars.get(rhs.getStarKey());
                         return lhsStar.getName().compareTo(rhsStar.getName());
-                    } else if (!lhs.getDesignName().equals(rhs.getDesignName())) {
-                        return lhs.getDesignName().compareTo(rhs.getDesignName());
+                    } else if (!lhs.getDesignID().equals(rhs.getDesignID())) {
+                        return lhs.getDesignID().compareTo(rhs.getDesignID());
                     } else {
                         return rhs.getNumShips() - lhs.getNumShips();
                     }

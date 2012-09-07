@@ -1,10 +1,11 @@
 package au.com.codeka.warworlds.game.starfield;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -49,14 +50,17 @@ import au.com.codeka.warworlds.model.StarImageManager;
 public class StarfieldSurfaceView extends UniverseElementSurfaceView {
     private Logger log = LoggerFactory.getLogger(StarfieldSurfaceView.class);
     private Context mContext;
-    private CopyOnWriteArrayList<OnStarSelectedListener> mStarSelectedListeners;
+    private ArrayList<OnSelectionChangedListener> mSelectionChangedListeners;
     private Star mSelectedStar;
+    private Fleet mSelectedFleet;
     private Paint mStarPaint;
     private Paint mStarNamePaint;
     private StarfieldBackgroundRenderer mBackgroundRenderer;
     private SelectionOverlay mSelectionOverlay;
-    private Map<String, List<StarAttachedOverlay>> mStarAttachedOverlays;
+    private Map<String, List<VisibleEntityAttachedOverlay>> mStarAttachedOverlays;
+    private Map<String, List<VisibleEntityAttachedOverlay>> mFleetAttachedOverlays;
     private Map<String, Empire> mVisibleEmpires;
+    private ArrayList<VisibleEntity> mVisibleEntities;
 
     private Bitmap mFleetMultiBitmap;
     private Matrix mMatrix;
@@ -80,13 +84,15 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
         log.info("Starfield initializing...");
 
         mContext = context;
-        mStarSelectedListeners = new CopyOnWriteArrayList<OnStarSelectedListener>();
+        mSelectionChangedListeners = new ArrayList<OnSelectionChangedListener>();
         mSelectedStar = null;
         mSectorX = mSectorY = 0;
         mOffsetX = mOffsetY = 0;
-        mStarAttachedOverlays = new TreeMap<String, List<StarAttachedOverlay>>();
+        mStarAttachedOverlays = new TreeMap<String, List<VisibleEntityAttachedOverlay>>();
+        mFleetAttachedOverlays = new TreeMap<String, List<VisibleEntityAttachedOverlay>>();
         mVisibleEmpires = new TreeMap<String, Empire>();
         mMatrix = new Matrix();
+        mVisibleEntities = new ArrayList<VisibleEntity>();
 
         mSelectionOverlay = new SelectionOverlay();
 
@@ -139,19 +145,25 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
         return new GestureListener();
     }
 
-    public void addStarSelectedListener(OnStarSelectedListener listener) {
-        if (!mStarSelectedListeners.contains(listener)) {
-            mStarSelectedListeners.add(listener);
+    public void addSelectionChangedListener(OnSelectionChangedListener listener) {
+        if (!mSelectionChangedListeners.contains(listener)) {
+            mSelectionChangedListeners.add(listener);
         }
     }
 
-    public void removeStarSelectedListener(OnStarSelectedListener listener) {
-        mStarSelectedListeners.remove(listener);
+    public void removeSelectionChangedListener(OnSelectionChangedListener listener) {
+        mSelectionChangedListeners.remove(listener);
     }
 
-    protected void fireStarSelected(Star star) {
-        for(OnStarSelectedListener listener : mStarSelectedListeners) {
+    protected void fireSelectionChanged(Star star) {
+        for(OnSelectionChangedListener listener : mSelectionChangedListeners) {
             listener.onStarSelected(star);
+        }
+    }
+
+    protected void fireSelectionChanged(Fleet fleet) {
+        for(OnSelectionChangedListener listener : mSelectionChangedListeners) {
+            listener.onFleetSelected(fleet);
         }
     }
 
@@ -161,25 +173,42 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
     }
 
     /**
-     * Adds the given \c StarAttachedOverlay and attaches it to the given star.
+     * Adds the given \c VisibleEntityAttachedOverlay and attaches it to the given star.
      */
-    public void addOverlay(StarAttachedOverlay overlay, Star star) {
+    public void addOverlay(VisibleEntityAttachedOverlay overlay, Star star) {
         addOverlay(overlay);
 
-        List<StarAttachedOverlay> starAttachedOverlays = mStarAttachedOverlays.get(star.getKey());
+        List<VisibleEntityAttachedOverlay> starAttachedOverlays = mStarAttachedOverlays.get(star.getKey());
         if (starAttachedOverlays == null) {
-            starAttachedOverlays = new ArrayList<StarAttachedOverlay>();
+            starAttachedOverlays = new ArrayList<VisibleEntityAttachedOverlay>();
             mStarAttachedOverlays.put(star.getKey(), starAttachedOverlays);
         }
         starAttachedOverlays.add(overlay);
+    }
+
+    /**
+     * Adds the given \c StarAttachedOverlay and attaches it to the given fleet.
+     */
+    public void addOverlay(VisibleEntityAttachedOverlay overlay, Fleet fleet) {
+        addOverlay(overlay);
+
+        List<VisibleEntityAttachedOverlay> fleetAttachedOverlays = mFleetAttachedOverlays.get(fleet.getKey());
+        if (fleetAttachedOverlays == null) {
+            fleetAttachedOverlays = new ArrayList<VisibleEntityAttachedOverlay>();
+            mFleetAttachedOverlays.put(fleet.getKey(), fleetAttachedOverlays);
+        }
+        fleetAttachedOverlays.add(overlay);
     }
 
     @Override
     public void removeOverlay(Overlay overlay) {
         super.removeOverlay(overlay);
 
-        // we have to go through all out star-attached overlays and make sure this one is gone
-        for (List<StarAttachedOverlay> overlays : mStarAttachedOverlays.values()) {
+        // we have to go through all out entity-attached overlays and make sure this one is gone
+        for (List<VisibleEntityAttachedOverlay> overlays : mStarAttachedOverlays.values()) {
+            overlays.remove(overlay);
+        }
+        for (List<VisibleEntityAttachedOverlay> overlays : mFleetAttachedOverlays.values()) {
             overlays.remove(overlay);
         }
     }
@@ -310,6 +339,37 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
         return null;
     }
 
+    private List<VisibleEntity> getVisibleEntitiesAt(int viewX, int viewY) {
+        ArrayList<VisibleEntity> entities = new ArrayList<VisibleEntity>();
+
+        Point2D tap = new Point2D(viewX, viewY);
+        for (VisibleEntity entity : mVisibleEntities) {
+            float distance = tap.distanceTo(entity.position);
+            if (distance < 48.0f) {
+                entities.add(entity);
+            }
+        }
+
+        // we'll sort them by kind/ID so that they're already returned in the same order. This
+        // way, we can cycle through entities when they're close and you tap multiple times.
+        Collections.sort(entities, new Comparator<VisibleEntity>() {
+            @Override
+            public int compare(VisibleEntity lhs, VisibleEntity rhs) {
+                if (lhs.star != null && rhs.star == null) {
+                    return -1;
+                } else if (lhs.fleet != null && rhs.fleet == null) {
+                    return 1;
+                } else if (lhs.star != null) {
+                    return lhs.star.getKey().compareTo(rhs.star.getKey());
+                } else {
+                    return lhs.fleet.getKey().compareTo(rhs.fleet.getKey());
+                }
+            }
+        });
+
+        return entities;
+    }
+
     /**
      * Draws the actual starfield to the given \c Canvas. This will be called in
      * a background thread, so we can't do anything UI-specific, except drawing
@@ -351,6 +411,9 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
 
         SectorManager sm = SectorManager.getInstance();
         canvas.drawColor(Color.BLACK);
+
+        // clear the list of visible entities, we'll be re-creating this
+        mVisibleEntities.clear();
 
         for(int y = -mRadius; y <= mRadius; y++) {
             for(int x = -mRadius; x <= mRadius; x++) {
@@ -451,14 +514,16 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
 
             drawStarIcons(canvas, star, x, y);
 
-            List<StarAttachedOverlay> starAttachedOverlays = mStarAttachedOverlays.get(star.getKey());
+            List<VisibleEntityAttachedOverlay> starAttachedOverlays = mStarAttachedOverlays.get(star.getKey());
             if (starAttachedOverlays != null && !starAttachedOverlays.isEmpty()) {
                 int n = starAttachedOverlays.size();
                 for (int i = 0; i < n; i++) {
-                    StarAttachedOverlay sao = starAttachedOverlays.get(i);
+                    VisibleEntityAttachedOverlay sao = starAttachedOverlays.get(i);
                     sao.setCentre(x * pixelScale, y * pixelScale);
                 }
             }
+
+            mVisibleEntities.add(new VisibleEntity(new Point2D(x * pixelScale, y * pixelScale), star));
         }
     }
 
@@ -621,7 +686,7 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
 
         // work out how far along the fleet has moved so we can draw the icon at the correct
         // spot. Also, we'll draw the name of the empire, number of ships etc.
-        ShipDesign design = ShipDesignManager.getInstance().getDesign(fleet.getDesignName());
+        ShipDesign design = ShipDesignManager.getInstance().getDesign(fleet.getDesignID());
         float distance = srcPoint.distanceTo(destPoint);
         float totalTimeInHours = (float) design.getSpeedInParsecPerHour() / (distance / 10.0f);
 
@@ -651,13 +716,15 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
         Sprite fleetSprite = design.getSprite();
         Point2D up = fleetSprite.getUp();
 
-        // find the angle between "up" and the direction, so we can rotate the fleet bitmap
-        // see: http://www.gamedev.net/topic/487576-angle-between-two-lines-clockwise/
-        float angle = (float) Math.atan2(up.x * direction.y - up.y * direction.x,
-                                         up.x * direction.x + up.y * direction.y);
+        float angle = Point2D.angleBetween(up, direction);
 
         direction.scale(20.0f);
         location.add(direction);
+
+        // TODO: check that it's actually visible on the screen....
+
+        // record the fact that this guy is visible
+        mVisibleEntities.add(new VisibleEntity(new Point2D(location.x * pixelScale, location.y * pixelScale), fleet));
 
         // scale zoom and rotate the bitmap all with one matrix
         mMatrix.reset();
@@ -666,7 +733,7 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
         mMatrix.postScale(20.0f * pixelScale / fleetSprite.getWidth(),
                           20.0f * pixelScale / fleetSprite.getHeight());
         mMatrix.postRotate((float) (angle * 180.0 / Math.PI));
-        mMatrix.postTranslate((location.x) * pixelScale, (location.y) * pixelScale);
+        mMatrix.postTranslate(location.x * pixelScale, (location.y) * pixelScale);
         canvas.save();
         canvas.setMatrix(mMatrix);
         fleetSprite.draw(canvas);
@@ -690,6 +757,15 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
 
             msg = String.format("%s (%d)", design.getDisplayName(), fleet.getNumShips());
             canvas.drawText(msg, (location.x + 30.0f) * pixelScale, (location.y + 10.0f) * pixelScale, mStarPaint);
+        }
+
+        List<VisibleEntityAttachedOverlay> fleetAttachedOverlays = mFleetAttachedOverlays.get(fleet.getKey());
+        if (fleetAttachedOverlays != null && !fleetAttachedOverlays.isEmpty()) {
+            int n = fleetAttachedOverlays.size();
+            for (int i = 0; i < n; i++) {
+                VisibleEntityAttachedOverlay sao = fleetAttachedOverlays.get(i);
+                sao.setCentre(location.x * pixelScale, location.y * pixelScale);
+            }
         }
     }
 
@@ -740,6 +816,7 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
         if (star != null) {
             log.info("Selecting star: "+star.getKey());
             mSelectedStar = star;
+            mSelectedFleet = null;
 
             mSelectionOverlay.setRadius((star.getSize() + 4) * getPixelScale());
             if (mSelectionOverlay.isVisible()) {
@@ -749,7 +826,25 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
 
             setDirty();
             redraw();
-            fireStarSelected(star);
+            fireSelectionChanged(star);
+        }
+    }
+
+    private void selectFleet(Fleet fleet) {
+        if (fleet != null) {
+            log.info("Selecting fleet: "+fleet.getKey());
+            mSelectedStar = null;
+            mSelectedFleet = fleet;
+
+            mSelectionOverlay.setRadius(15.0f * getPixelScale());
+            if (mSelectionOverlay.isVisible()) {
+                removeOverlay(mSelectionOverlay);
+            }
+            addOverlay(mSelectionOverlay, fleet);
+
+            setDirty();
+            redraw();
+            fireSelectionChanged(fleet);
         }
     }
 
@@ -776,11 +871,38 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
          */
         @Override
         public boolean onSingleTapConfirmed(MotionEvent e) {
-            int tapX = (int) (e.getX() / getPixelScale());
-            int tapY = (int) (e.getY() / getPixelScale());
+            int tapX = (int) e.getX();
+            int tapY = (int) e.getY();
 
-            Star star = getStarAt(tapX, tapY);
-            selectStar(star);
+            List<VisibleEntity> tappedEntities = getVisibleEntitiesAt(tapX, tapY);
+            if (tappedEntities.size() == 0) {
+                return false;
+            }
+
+            int n;
+            for (n = 0; n < tappedEntities.size(); n++) {
+                if (mSelectedStar != null && tappedEntities.get(n).star != null) {
+                    if (mSelectedStar.getKey().equals(tappedEntities.get(n).star.getKey())) {
+                        break;
+                    }
+                }
+                if (mSelectedFleet != null && tappedEntities.get(n).fleet != null) {
+                    if (mSelectedFleet.getKey().equals(tappedEntities.get(n).fleet.getKey())) {
+                        break;
+                    }
+                }
+            }
+
+            VisibleEntity nextEntity = tappedEntities.get(0);
+            if (n < tappedEntities.size() - 1) {
+                nextEntity = tappedEntities.get(n + 1);
+            }
+
+            if (nextEntity.star != null) {
+                selectStar(nextEntity.star);
+            } else {
+                selectFleet(nextEntity.fleet);
+            }
 
             // play the 'click' sound effect
             playSoundEffect(android.view.SoundEffectConstants.CLICK);
@@ -790,13 +912,13 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
     }
 
     /**
-     * An \c Overlay that's "attached" to a star. We'll make sure it's recentred whenever the
-     * view scrolls around.
+     * An \c Overlay that's "attached" to a "visible entity" (star or fleet). We'll make sure
+     * it's recentred whenever the view scrolls around.
      */
-    public static abstract class StarAttachedOverlay extends UniverseElementSurfaceView.Overlay {
+    public static abstract class VisibleEntityAttachedOverlay extends UniverseElementSurfaceView.Overlay {
         protected Point2D mCentre;
 
-        public StarAttachedOverlay() {
+        public VisibleEntityAttachedOverlay() {
             mCentre = new Point2D();
         }
 
@@ -814,7 +936,7 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
      * This overlay is used for drawing the selection indicator. It's an animated dotted circle
      * that spins around the selected point.
      */
-    private static class SelectionOverlay extends StarAttachedOverlay {
+    private static class SelectionOverlay extends VisibleEntityAttachedOverlay {
         private RotatingCircle mInnerCircle;
         private RotatingCircle mOuterCircle;
 
@@ -849,14 +971,27 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
     }
 
     /**
-     * This interface should be implemented when you want to listen for "star selected"
-     * events -- that is, when the user selects a new star (by tapping on it).
+     * Every time we draw the screen, we track the visible entities to make tracking when you
+     * tap on them simpler. This class holds a reference to a single "visible" entity.
      */
-    public interface OnStarSelectedListener {
-        /**
-         * This is called when the user selects (by tapping it) a star. By definition, only
-         * one star can be selected at a time.
-         */
+    private static class VisibleEntity {
+        public Point2D position;
+        public Star star;
+        public Fleet fleet;
+
+        public VisibleEntity(Point2D position, Star star) {
+            this.position = position;
+            this.star = star;
+        }
+
+        public VisibleEntity(Point2D position, Fleet fleet) {
+            this.position = position;
+            this.fleet = fleet;
+        }
+    }
+
+    public interface OnSelectionChangedListener {
         public abstract void onStarSelected(Star star);
+        public abstract void onFleetSelected(Fleet fleet);
     }
 }

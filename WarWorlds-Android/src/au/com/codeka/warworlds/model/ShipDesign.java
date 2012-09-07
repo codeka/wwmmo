@@ -3,9 +3,9 @@ package au.com.codeka.warworlds.model;
 import org.w3c.dom.Element;
 
 public class ShipDesign extends Design {
-    private double mSpeedParsecPerHour;
+    private float mSpeedParsecPerHour;
 
-    public double getSpeedInParsecPerHour() {
+    public float getSpeedInParsecPerHour() {
         return mSpeedParsecPerHour;
     }
 
@@ -28,7 +28,7 @@ public class ShipDesign extends Design {
             if (elem.getNodeName().equals("stats")) {
                 String s = elem.getAttribute("speed");
                 if (s != null) {
-                    design.mSpeedParsecPerHour = Double.parseDouble(s);
+                    design.mSpeedParsecPerHour = Float.parseFloat(s);
                 }
             }
         }

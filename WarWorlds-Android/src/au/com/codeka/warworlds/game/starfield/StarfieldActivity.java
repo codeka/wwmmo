@@ -3,12 +3,18 @@ package au.com.codeka.warworlds.game.starfield;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
+import org.joda.time.Seconds;
+
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.text.Html;
+import android.util.FloatMath;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -47,14 +53,12 @@ import au.com.codeka.warworlds.model.StarManager;
 public class StarfieldActivity extends Activity {
     private Context mContext = this;
     private StarfieldSurfaceView mStarfield;
-    private TextView mUsername;
-    private View mLoadingContainer;
     private ListView mPlanetList;
     private PlanetListAdapter mPlanetListAdapter;
     private ListView mFleetList;
     private FleetListAdapter mFleetListAdapter;
-    private Star mSelectedStar;
     private TabManager mSelectedStarTabManager;
+    private Star mSelectedStar;
 
     private static final int SOLAR_SYSTEM_REQUEST = 1;
     private static final int EMPIRE_REQUEST = 2;
@@ -68,21 +72,30 @@ public class StarfieldActivity extends Activity {
         setContentView(R.layout.starfield);
 
         mStarfield = (StarfieldSurfaceView) findViewById(R.id.starfield);
-        mUsername = (TextView) findViewById(R.id.username);
-        mLoadingContainer = findViewById(R.id.loading_container);
+        final View selectionLoadingContainer = findViewById(R.id.loading_container);
+        final TabHost selectedStarContainer = (TabHost) findViewById(R.id.selected_star);
+        final View selectedFleetContainer = findViewById(R.id.selected_fleet);
+        final ImageView fleetIcon = (ImageView) findViewById(R.id.fleet_icon);
+        final ImageView empireIcon = (ImageView) findViewById(R.id.empire_icon);
+        final TextView fleetDesign = (TextView) findViewById(R.id.fleet_design);
+        final TextView empireName = (TextView) findViewById(R.id.empire_name);
+        final TextView fleetDetails = (TextView) findViewById(R.id.fleet_details);
 
         mPlanetList = new ListView(mContext);
         mFleetList = new ListView(mContext);
 
-        mSelectedStarTabManager = new TabManager((TabHost) findViewById(R.id.selected_star), true);
+        mSelectedStarTabManager = new TabManager(selectedStarContainer, true);
         mSelectedStarTabManager.addTab(mContext, new SelectedStarTabInfo("Planets"));
         mSelectedStarTabManager.addTab(mContext, new SelectedStarTabInfo("Fleets"));
 
         mPlanetList.setVisibility(View.VISIBLE);
         mFleetList.setVisibility(View.GONE);
+        selectedStarContainer.setVisibility(View.GONE);
+        selectedFleetContainer.setVisibility(View.GONE);
 
         EmpireManager empireManager = EmpireManager.getInstance();
-        mUsername.setText(empireManager.getEmpire().getDisplayName());
+        TextView username = (TextView) findViewById(R.id.username);
+        username.setText(empireManager.getEmpire().getDisplayName());
 
         mPlanetListAdapter = new PlanetListAdapter();
         mPlanetList.setAdapter(mPlanetListAdapter);
@@ -90,14 +103,16 @@ public class StarfieldActivity extends Activity {
         mFleetListAdapter = new FleetListAdapter();
         mFleetList.setAdapter(mFleetListAdapter);
 
-        mStarfield.addStarSelectedListener(new StarfieldSurfaceView.OnStarSelectedListener() {
+        mStarfield.addSelectionChangedListener(new StarfieldSurfaceView.OnSelectionChangedListener() {
             @Override
             public void onStarSelected(Star star) {
                 // load the rest of the star's details as well
                 final int oldPlanetListVisibility = mPlanetList.getVisibility();
                 final int oldFleetListVisibility = mFleetList.getVisibility();
 
-                mLoadingContainer.setVisibility(View.VISIBLE);
+                selectionLoadingContainer.setVisibility(View.VISIBLE);
+                selectedStarContainer.setVisibility(View.GONE);
+                selectedFleetContainer.setVisibility(View.GONE);
                 mPlanetList.setVisibility(View.GONE);
                 mFleetList.setVisibility(View.GONE);
 
@@ -109,7 +124,9 @@ public class StarfieldActivity extends Activity {
                     @Override
                     public void onStarFetched(Star star) {
                         mSelectedStar = star;
-                        mLoadingContainer.setVisibility(View.GONE);
+                        selectionLoadingContainer.setVisibility(View.GONE);
+                        selectedStarContainer.setVisibility(View.VISIBLE);
+
                         mPlanetList.setVisibility(oldPlanetListVisibility);
                         mFleetList.setVisibility(oldFleetListVisibility);
 
@@ -117,6 +134,56 @@ public class StarfieldActivity extends Activity {
                         mFleetListAdapter.setStar(star);
                     }
                 });
+            }
+
+            @Override
+            public void onFleetSelected(Fleet fleet) {
+                empireName.setText("");
+                empireIcon.setImageBitmap(null);
+
+                ShipDesign design = ShipDesignManager.getInstance().getDesign(fleet.getDesignID());
+                EmpireManager.getInstance().fetchEmpire(fleet.getEmpireKey(), new EmpireManager.EmpireFetchedHandler() {
+                    @Override
+                    public void onEmpireFetched(Empire empire) {
+                        empireName.setText(empire.getDisplayName());
+                        empireIcon.setImageBitmap(empire.getShield(mContext));
+                    }
+                });
+
+                fleetDesign.setText(design.getDisplayName());
+                fleetIcon.setImageBitmap(ShipDesignManager.getInstance().getDesignIcon(design));
+
+                String eta = "???";
+                Star srcStar = SectorManager.getInstance().findStar(fleet.getStarKey());
+                Star destStar = SectorManager.getInstance().findStar(fleet.getDestinationStarKey());
+                if (srcStar != null && destStar != null) {
+                    float distanceInParsecs = SectorManager.getInstance().distanceInParsecs(srcStar, destStar);
+                    float totalTimeInHours = distanceInParsecs / design.getSpeedInParsecPerHour();
+
+                    DateTime now = DateTime.now(DateTimeZone.UTC);
+                    float timeSoFarInHours = (Seconds.secondsBetween(fleet.getStateStartTime(), now).getSeconds() / 3600.0f);
+
+                    float timeRemainingInHours = totalTimeInHours - timeSoFarInHours;
+                    if (timeRemainingInHours > 0.0f) {
+                        int hrs = (int) FloatMath.floor(timeRemainingInHours);
+                        int mins = (int) FloatMath.floor((timeRemainingInHours - hrs) * 60.0f);
+                        eta = String.format("%d hrs, %d mins", hrs, mins);
+                    }
+                }
+
+                String details = String.format(
+                    "<b>Ships:</b> %d<br />" +
+                    "<b>Speed:</b> %.2f pc/hr<br />" +
+                    "<b>Destination:</b> %s<br />" +
+                    "<b>ETA:</b> %s",
+                    fleet.getNumShips(), design.getSpeedInParsecPerHour(),
+                    (destStar == null ? "???" : destStar.getName()),
+                    eta);
+                fleetDetails.setText(Html.fromHtml(details));
+
+                selectionLoadingContainer.setVisibility(View.GONE);
+                selectedStarContainer.setVisibility(View.GONE);
+                selectedFleetContainer.setVisibility(View.VISIBLE);
             }
         });
 
@@ -369,7 +436,7 @@ public class StarfieldActivity extends Activity {
             final ImageView icon = (ImageView) view.findViewById(R.id.starfield_planet_icon);
             final Fleet fleet = mFleets.get(position);
             ShipDesignManager designManager = ShipDesignManager.getInstance();
-            ShipDesign design = designManager.getDesign(fleet.getDesignName());
+            ShipDesign design = designManager.getDesign(fleet.getDesignID());
 
             icon.setImageBitmap(designManager.getDesignIcon(design));
 

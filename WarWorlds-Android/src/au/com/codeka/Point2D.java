@@ -71,4 +71,14 @@ public class Point2D {
         x *= s;
         y *= s;
     }
+
+    // 
+    /**
+     * Find the angle between "a" and "b"
+     * see: http://www.gamedev.net/topic/487576-angle-between-two-lines-clockwise/
+     */
+    public static float angleBetween(Point2D a, Point2D b) {
+        return (float) Math.atan2(a.x * b.y - a.y * b.x,
+                                  a.x * b.x + a.y * b.y);
+    }
 }

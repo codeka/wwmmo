@@ -9,7 +9,7 @@ import android.os.Parcelable;
 public class Fleet implements Parcelable {
     private String mKey;
     private String mEmpireKey;
-    private String mDesignName;
+    private String mDesignID;
     private int mNumShips;
     private State mState;
     private DateTime mStateStartTime;
@@ -24,8 +24,8 @@ public class Fleet implements Parcelable {
     public String getEmpireKey() {
         return mEmpireKey;
     }
-    public String getDesignName() {
-        return mDesignName;
+    public String getDesignID() {
+        return mDesignID;
     }
     public int getNumShips() {
         return mNumShips;
@@ -58,7 +58,7 @@ public class Fleet implements Parcelable {
     public void writeToParcel(Parcel parcel, int flags) {
         parcel.writeString(mKey);
         parcel.writeString(mEmpireKey);
-        parcel.writeString(mDesignName);
+        parcel.writeString(mDesignID);
         parcel.writeInt(mNumShips);
         parcel.writeInt(mState.getValue());
         parcel.writeLong(mStateStartTime.getMillis());
@@ -75,7 +75,7 @@ public class Fleet implements Parcelable {
             Fleet f = new Fleet();
             f.mKey = parcel.readString();
             f.mEmpireKey = parcel.readString();
-            f.mDesignName = parcel.readString();
+            f.mDesignID = parcel.readString();
             f.mNumShips = parcel.readInt();
             f.mState = State.fromNumber(parcel.readInt());
             f.mStateStartTime = new DateTime(parcel.readLong(), DateTimeZone.UTC);
@@ -96,7 +96,7 @@ public class Fleet implements Parcelable {
         Fleet f = new Fleet();
         f.mKey = pb.getKey();
         f.mEmpireKey = pb.getEmpireKey();
-        f.mDesignName = pb.getDesignName();
+        f.mDesignID = pb.getDesignName();
         f.mNumShips = pb.getNumShips();
         f.mState = State.fromNumber(pb.getState().getNumber());
         f.mStateStartTime = new DateTime(pb.getStateStartTime() * 1000, DateTimeZone.UTC);

@@ -1,21 +1,17 @@
 package au.com.codeka.warworlds.game;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import warworlds.Warworlds.FleetOrder;
-
 import android.app.Activity;
 import android.app.Dialog;
 import android.graphics.Canvas;
+import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Paint.Style;
-import android.graphics.Path;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.Display;
-import android.view.ViewGroup.LayoutParams;
 import android.view.View;
+import android.view.ViewGroup.LayoutParams;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
@@ -26,11 +22,12 @@ import au.com.codeka.warworlds.api.ApiClient;
 import au.com.codeka.warworlds.api.ApiException;
 import au.com.codeka.warworlds.game.starfield.StarfieldSurfaceView;
 import au.com.codeka.warworlds.model.Fleet;
+import au.com.codeka.warworlds.model.ShipDesignManager;
+import au.com.codeka.warworlds.model.Sprite;
 import au.com.codeka.warworlds.model.Star;
 import au.com.codeka.warworlds.model.StarManager;
 
 public class FleetMoveDialog extends Dialog implements DialogManager.DialogConfigurable {
-    private Logger log = LoggerFactory.getLogger(FleetMoveDialog.class);
     private Activity mActivity;
     private Fleet mFleet;
     private StarfieldSurfaceView mStarfield;
@@ -71,14 +68,18 @@ public class FleetMoveDialog extends Dialog implements DialogManager.DialogConfi
         mStarfield = (StarfieldSurfaceView) findViewById(R.id.starfield);
         mStarfield.setZOrderOnTop(true);
 
-        mStarfield.addStarSelectedListener(new StarfieldSurfaceView.OnStarSelectedListener() {
+        mStarfield.addSelectionChangedListener(new StarfieldSurfaceView.OnSelectionChangedListener() {
             @Override
             public void onStarSelected(Star star) {
                 mStarfield.removeOverlay(mDestinationStarOverlay);
                 mStarfield.addOverlay(mDestinationStarOverlay, star);
-                mSourceStarOverlay.calcTriangle();
+                mSourceStarOverlay.reset();
 
                 moveBtn.setEnabled(true);
+            }
+
+            @Override
+            public void onFleetSelected(Fleet fleet) {
             }
         });
 
@@ -159,22 +160,22 @@ public class FleetMoveDialog extends Dialog implements DialogManager.DialogConfi
      * This overlay is drawn over the "source" star so that we can see where the fleet is moving
      * from.
      */
-    private class SourceStarOverlay extends StarfieldSurfaceView.StarAttachedOverlay {
+    private class SourceStarOverlay extends StarfieldSurfaceView.VisibleEntityAttachedOverlay {
         private RotatingCircle mSourceCircle;
 
-        private Paint mTrianglePaint;
-        private Path mTrianglePath;
+        private Paint mShipPaint;
+        private Sprite mSprite;
+        private Matrix mMatrix;
 
         public SourceStarOverlay() {
             Paint p = new Paint();
             p.setARGB(255, 0, 255, 0);
             mSourceCircle = new RotatingCircle(p);
 
-            mTrianglePaint = new Paint();
-            mTrianglePaint.setARGB(255, 0, 255, 0);
-            mTrianglePaint.setAntiAlias(true);
-            mTrianglePaint.setStyle(Style.FILL);
-            mTrianglePath = new Path();
+            mShipPaint = new Paint();
+            mShipPaint.setARGB(255, 255, 255, 255);
+
+            mMatrix = new Matrix();
         }
 
         @Override
@@ -184,63 +185,56 @@ public class FleetMoveDialog extends Dialog implements DialogManager.DialogConfi
             mSourceCircle.setCentre(x, y);
             mSourceCircle.setRadius(30.0);
 
-            calcTriangle();
+            reset();
         }
 
         /**
          * Calculates the triangle that we draw over the star to show the direction our
          * fleet will move in.
          */
-        public void calcTriangle() {
-            Point2D top;
+        public void reset() {
+            ShipDesignManager designManager = ShipDesignManager.getInstance();
+            mSprite = designManager.getDesign(mFleet.getDesignID()).getSprite();
+
+            float pixelScale = getPixelScale();
+
+            Point2D direction;
             if (mDestinationStarOverlay.isVisible()) {
-                top = new Point2D(mDestinationStarOverlay.getCentre());
-                top.subtract(mCentre);
-                log.debug(String.format("Top: (%.2f, %.2f)", top.x, top.y));
-                top.normalize();
+                direction = new Point2D(mDestinationStarOverlay.getCentre());
+                direction.subtract(mCentre);
+                direction.normalize();
             } else {
-                top = new Point2D(0, -1);
-                log.debug("No destination is selected...");
+                direction = new Point2D(0, -1);
             }
 
-            Point2D back = new Point2D(top);
-            back.scale(-10.0f);
+            Point2D up = mSprite.getUp();
+            float angle = Point2D.angleBetween(up, direction);
 
-            Point2D right = new Point2D(top);
-            right.rotate((float)(Math.PI / 2.0));
-
-            Point2D left = new Point2D(top);
-            left.rotate((float)(-Math.PI / 2.0));
-
-            top.scale(20.0f);
-            top.add(mCentre);
-
-            right.scale(10.0f);
-            right.add(back);
-            right.add(mCentre);
-
-            left.scale(10.0f);
-            left.add(back);
-            left.add(mCentre);
-
-            mTrianglePath.reset();
-            mTrianglePath.moveTo(top.x, top.y);
-            mTrianglePath.lineTo(right.x, right.y);
-            mTrianglePath.lineTo(left.x, left.y);
-            mTrianglePath.lineTo(top.x, top.y);
+            // scale zoom and rotate the bitmap all with one matrix
+            mMatrix.reset();
+            mMatrix.postTranslate(-(mSprite.getWidth() / 2.0f),
+                                  -(mSprite.getHeight() / 2.0f));
+            mMatrix.postScale(20.0f * pixelScale / mSprite.getWidth(),
+                              20.0f * pixelScale / mSprite.getHeight());
+            mMatrix.postRotate((float) (angle * 180.0 / Math.PI));
+            mMatrix.postTranslate(mCentre.x, mCentre.y);
         }
 
         @Override
         public void draw(Canvas canvas) {
             mSourceCircle.draw(canvas);
-            canvas.drawPath(mTrianglePath, mTrianglePaint);
+
+            canvas.save();
+            canvas.setMatrix(mMatrix);
+            mSprite.draw(canvas);
+            canvas.restore();
         }
     }
 
     /**
      * This overlay is drawn once you've selected a star as the "destination" for your move.
      */
-    private class DestinationStarOverlay extends StarfieldSurfaceView.StarAttachedOverlay {
+    private class DestinationStarOverlay extends StarfieldSurfaceView.VisibleEntityAttachedOverlay {
         private Paint mLinePaint;
         private Paint mCirclePaint;
 
@@ -260,7 +254,7 @@ public class FleetMoveDialog extends Dialog implements DialogManager.DialogConfi
         public void setCentre(double x, double y) {
             super.setCentre(x, y);
 
-            mSourceStarOverlay.calcTriangle();
+            mSourceStarOverlay.reset();
         }
 
         @Override

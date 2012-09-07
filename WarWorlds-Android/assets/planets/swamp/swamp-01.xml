@@ -7,9 +7,9 @@
       <perlin persistence="0.5" startOctave="7" endOctave="16" interpolation="cosine" />
       <colour>
         <node n="0.0" colour="ff004d00" />
-        <node n="0.4" colour="ff004d46" />
-        <node n="0.6" colour="ff002546" />
-        <node n="1.0" colour="ff001947" />
+        <node n="0.4" colour="ff004d26" />
+        <node n="0.6" colour="ff002516" />
+        <node n="1.0" colour="ff004627" />
       </colour>
   </texture>
   <atmosphere>
