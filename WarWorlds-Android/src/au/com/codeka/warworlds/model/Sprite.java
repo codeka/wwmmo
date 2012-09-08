@@ -9,19 +9,12 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.ColorFilter;
 import android.graphics.Paint;
-import android.graphics.PixelFormat;
 import android.graphics.Rect;
 import android.graphics.RectF;
-import android.graphics.drawable.Drawable;
 import au.com.codeka.Point2D;
 
-/**
- * A sprite is a \c Drawable that represents a subsection of a larger image. It also (optionally)
- * supports animation (via the frames collection).
- */
-public class Sprite extends Drawable {
+public class Sprite {
     private SpriteImage mImage;
     private String mName;
     private ArrayList<SpriteFrame> mFrames;
@@ -64,6 +57,7 @@ public class Sprite extends Drawable {
     public float getScale() {
         return mScale;
     }
+
     public void setScale(float scale) {
         mScale = scale;
     }
@@ -100,7 +94,6 @@ public class Sprite extends Drawable {
         return sprite;
     }
 
-    @Override
     public void draw(Canvas canvas) {
         draw(canvas, 0);
     }
@@ -126,22 +119,6 @@ public class Sprite extends Drawable {
 
             canvas.drawBitmap(mImage.getBitmap(), frame.getRect(), r, sPaint);
         }
-    }
-
-    @Override
-    public int getOpacity() {
-        // TODO Auto-generated method stub
-        return PixelFormat.TRANSLUCENT;
-    }
-
-    @Override
-    public void setAlpha(int alpha) {
-        // TODO Auto-generated method stub
-    }
-
-    @Override
-    public void setColorFilter(ColorFilter cf) {
-        // TODO Auto-generated method stub
     }
 
     /**

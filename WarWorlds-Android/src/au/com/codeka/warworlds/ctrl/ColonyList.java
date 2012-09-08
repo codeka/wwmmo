@@ -28,6 +28,7 @@ import au.com.codeka.warworlds.model.ImageManager;
 import au.com.codeka.warworlds.model.Planet;
 import au.com.codeka.warworlds.model.PlanetImageManager;
 import au.com.codeka.warworlds.model.Sprite;
+import au.com.codeka.warworlds.model.SpriteDrawable;
 import au.com.codeka.warworlds.model.Star;
 import au.com.codeka.warworlds.model.StarImageManager;
 
@@ -228,7 +229,7 @@ public class ColonyList extends FrameLayout {
             starIcon.setImageBitmap(bmp);
 
             Sprite sprite = PlanetImageManager.getInstance().getSprite(mContext, planet);
-            planetIcon.setImageDrawable(sprite);
+            planetIcon.setImageDrawable(new SpriteDrawable(sprite));
 
             colonyName.setText(String.format("%s %s", star.getName(), RomanNumeralFormatter.format(planet.getIndex())));
             colonySummary.setText(String.format("Pop: %d", (int) colony.getPopulation()));

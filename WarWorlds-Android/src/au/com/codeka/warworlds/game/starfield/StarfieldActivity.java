@@ -42,6 +42,7 @@ import au.com.codeka.warworlds.model.SectorManager;
 import au.com.codeka.warworlds.model.ShipDesign;
 import au.com.codeka.warworlds.model.ShipDesignManager;
 import au.com.codeka.warworlds.model.Sprite;
+import au.com.codeka.warworlds.model.SpriteDrawable;
 import au.com.codeka.warworlds.model.Star;
 import au.com.codeka.warworlds.model.StarManager;
 
@@ -340,7 +341,7 @@ public class StarfieldActivity extends Activity {
             final PlanetImageManager pim = PlanetImageManager.getInstance();
 
             Sprite sprite= pim.getSprite(mContext, planet);
-            icon.setImageDrawable(sprite);
+            icon.setImageDrawable(new SpriteDrawable(sprite));
 
             TextView planetTypeTextView = (TextView) view.findViewById(R.id.starfield_planet_type);
             planetTypeTextView.setText(planet.getPlanetType().getDisplayName());
