@@ -8,39 +8,39 @@ public class Planet implements Parcelable {
     private static PlanetType[] sPlanetTypes = {
         new PlanetType.Builder().setIndex(0)
                                 .setDisplayName("Gas Giant")
-                                .setBitmapBasePath("planets/gasgiant")
+                                .setInternalName("gasgiant")
                                 .build(),
         new PlanetType.Builder().setIndex(1)
                                 .setDisplayName("Radiated")
-                                .setBitmapBasePath("planets/radiated")
+                                .setInternalName("radiated")
                                 .build(),
         new PlanetType.Builder().setIndex(2)
                                 .setDisplayName("Inferno")
-                                .setBitmapBasePath("planets/inferno")
+                                .setInternalName("inferno")
                                 .build(),
         new PlanetType.Builder().setIndex(3)
                                 .setDisplayName("Asteroids")
-                                .setBitmapBasePath("planets/asteroids")
+                                .setInternalName("asteroids")
                                 .build(),
         new PlanetType.Builder().setIndex(4)
                                 .setDisplayName("Water")
-                                .setBitmapBasePath("planets/water")
+                                .setInternalName("water")
                                 .build(),
         new PlanetType.Builder().setIndex(5)
                                 .setDisplayName("Toxic")
-                                .setBitmapBasePath("planets/toxic")
+                                .setInternalName("toxic")
                                 .build(),
         new PlanetType.Builder().setIndex(6)
                                 .setDisplayName("Desert")
-                                .setBitmapBasePath("planets/desert")
+                                .setInternalName("desert")
                                 .build(),
         new PlanetType.Builder().setIndex(7)
                                 .setDisplayName("Swamp")
-                                .setBitmapBasePath("planets/swamp")
+                                .setInternalName("swamp")
                                 .build(),
         new PlanetType.Builder().setIndex(8)
                                 .setDisplayName("Terran")
-                                .setBitmapBasePath("planets/terran")
+                                .setInternalName("terran")
                                 .build()
     };
 
@@ -75,6 +75,11 @@ public class Planet implements Parcelable {
     }
     public int getMiningCongeniality() {
         return mMiningCongeniality;
+    }
+
+    @Override
+    public int hashCode() {
+        return mStar.getKey().hashCode() ^ (mIndex * 632548);
     }
 
     @Override
@@ -141,16 +146,18 @@ public class Planet implements Parcelable {
     public static class PlanetType {
         private int mIndex;
         private String mDisplayName;
-        private String mBitmapBasePath;
-
+        private String mInternalName;
         public int getIndex() {
             return mIndex;
         }
         public String getDisplayName() {
             return mDisplayName;
         }
+        public String getInternalName() {
+            return mInternalName;
+        }
         public String getBitmapBasePath() {
-            return mBitmapBasePath;
+            return "planets/"+mInternalName;
         }
 
         public static class Builder {
@@ -170,8 +177,8 @@ public class Planet implements Parcelable {
                 return this;
             }
 
-            public Builder setBitmapBasePath(String path) {
-                mPlanetType.mBitmapBasePath = path;
+            public Builder setInternalName(String name) {
+                mPlanetType.mInternalName = name;
                 return this;
             }
 

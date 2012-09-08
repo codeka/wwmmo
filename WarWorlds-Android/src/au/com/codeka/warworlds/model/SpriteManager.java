@@ -17,6 +17,7 @@ import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 
 import android.content.Context;
+import android.graphics.Rect;
 import android.os.AsyncTask;
 import au.com.codeka.XmlIterator;
 
@@ -124,10 +125,14 @@ public class SpriteManager {
                 String[] locationStr = elem.getAttribute("location").split(",");
                 String[] sizeStr = elem.getAttribute("size").split("x");
 
-                sprite.getRect().left = Integer.parseInt(locationStr[0]);
-                sprite.getRect().top = Integer.parseInt(locationStr[1]);
-                sprite.getRect().right = sprite.getRect().left + Integer.parseInt(sizeStr[0]);
-                sprite.getRect().bottom = sprite.getRect().top + Integer.parseInt(sizeStr[1]);
+                Rect r = new Rect();
+                r.left = Integer.parseInt(locationStr[0]);
+                r.top = Integer.parseInt(locationStr[1]);
+                r.right = r.left + Integer.parseInt(sizeStr[0]);
+                r.bottom = r.top + Integer.parseInt(sizeStr[1]);
+
+                Sprite.SpriteFrame frame = new Sprite.SpriteFrame(r);
+                sprite.addFrame(frame);
             } else if (elem.getTagName().equals("direction")) {
                 String[] up = elem.getTextContent().split(",");
 

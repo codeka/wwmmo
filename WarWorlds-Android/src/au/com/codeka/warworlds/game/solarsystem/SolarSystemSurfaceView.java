@@ -11,9 +11,9 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Paint.Style;
-import android.graphics.Rect;
 import android.os.Handler;
 import android.util.AttributeSet;
 import android.view.GestureDetector;
@@ -26,6 +26,7 @@ import au.com.codeka.warworlds.model.Colony;
 import au.com.codeka.warworlds.model.ImageManager;
 import au.com.codeka.warworlds.model.Planet;
 import au.com.codeka.warworlds.model.PlanetImageManager;
+import au.com.codeka.warworlds.model.Sprite;
 import au.com.codeka.warworlds.model.Star;
 import au.com.codeka.warworlds.model.StarImageManager;
 
@@ -49,6 +50,7 @@ public class SolarSystemSurfaceView extends UniverseElementSurfaceView {
     private boolean mPlanetSelectedFired;
     private Handler mHandler;
     private BitmapGeneratedListener mBitmapGeneratedListener;
+    private Matrix mMatrix;
 
     public SolarSystemSurfaceView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -72,6 +74,8 @@ public class SolarSystemSurfaceView extends UniverseElementSurfaceView {
         mSelectedPlanetPaint = new Paint();
         mSelectedPlanetPaint.setARGB(255, 255, 255, 255);
         mSelectedPlanetPaint.setStyle(Style.STROKE);
+
+        mMatrix = new Matrix();
 
         mColonyIcon = BitmapFactory.decodeResource(getResources(), R.drawable.starfield_colony);
 
@@ -247,7 +251,7 @@ public class SolarSystemSurfaceView extends UniverseElementSurfaceView {
     private void drawPlanets(Canvas canvas) {
         for (int i = 0; i < mPlanetInfos.length; i++) {
             canvas.drawCircle(0, 0,
-                    mPlanetInfos[i].distanceFromSun, mPlanetPaint);
+                              mPlanetInfos[i].distanceFromSun, mPlanetPaint);
         }
 
         PlanetImageManager pim = PlanetImageManager.getInstance();
@@ -255,16 +259,16 @@ public class SolarSystemSurfaceView extends UniverseElementSurfaceView {
         for (int i = 0; i < mPlanetInfos.length; i++) {
             final PlanetInfo planetInfo = mPlanetInfos[i];
 
-            Bitmap bm = pim.getBitmap(mContext, planetInfo.planet);
-            if (bm != null) {
-                Rect src = new Rect(0, 0, bm.getWidth(), bm.getHeight());
-                double halfSize = 50.0 * getPixelScale();
-                Rect dest = new Rect((int)(planetInfo.centre.x - halfSize),
-                                     (int)(planetInfo.centre.y - halfSize),
-                                     (int)(planetInfo.centre.x + halfSize),
-                                     (int)(planetInfo.centre.y + halfSize));
-                canvas.drawBitmap(bm, src, dest, mPlanetPaint);
-            }
+            Sprite sprite = pim.getSprite(mContext, planetInfo.planet);
+            mMatrix.reset();
+            mMatrix.postTranslate(-(sprite.getWidth() / 2.0f), -(sprite.getHeight() / 2.0f));
+            mMatrix.postScale(100.0f * getPixelScale() / sprite.getWidth(),
+                              100.0f * getPixelScale() / sprite.getHeight());
+            mMatrix.postTranslate(planetInfo.centre.x, planetInfo.centre.y);
+            canvas.save();
+            canvas.setMatrix(mMatrix);
+            sprite.draw(canvas);
+            canvas.restore();
 
             List<Colony> colonies = mStar.getColonies();
             if (colonies != null && !colonies.isEmpty()) {

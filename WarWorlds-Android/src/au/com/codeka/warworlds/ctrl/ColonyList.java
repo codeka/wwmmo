@@ -27,6 +27,7 @@ import au.com.codeka.warworlds.model.Colony;
 import au.com.codeka.warworlds.model.ImageManager;
 import au.com.codeka.warworlds.model.Planet;
 import au.com.codeka.warworlds.model.PlanetImageManager;
+import au.com.codeka.warworlds.model.Sprite;
 import au.com.codeka.warworlds.model.Star;
 import au.com.codeka.warworlds.model.StarImageManager;
 
@@ -226,14 +227,8 @@ public class ColonyList extends FrameLayout {
             }
             starIcon.setImageBitmap(bmp);
 
-            bmp = mBitmaps.get(planet.getStar().getKey() + "-" + planet.getIndex());
-            if (bmp == null) {
-                bmp = PlanetImageManager.getInstance().getBitmap(mContext, planet);
-                if (bmp != null) {
-                    mBitmaps.put(planet.getStar().getKey() + "-" + planet.getIndex(), bmp);
-                }
-            }
-            planetIcon.setImageBitmap(bmp);
+            Sprite sprite = PlanetImageManager.getInstance().getSprite(mContext, planet);
+            planetIcon.setImageDrawable(sprite);
 
             colonyName.setText(String.format("%s %s", star.getName(), RomanNumeralFormatter.format(planet.getIndex())));
             colonySummary.setText(String.format("Pop: %d", (int) colony.getPopulation()));

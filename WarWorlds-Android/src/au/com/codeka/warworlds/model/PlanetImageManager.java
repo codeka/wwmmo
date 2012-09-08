@@ -1,5 +1,7 @@
 package au.com.codeka.warworlds.model;
 
+import java.util.Random;
+
 import android.content.Context;
 import android.graphics.Bitmap;
 import au.com.codeka.planetrender.Template;
@@ -17,11 +19,27 @@ public class PlanetImageManager extends ImageManager {
     }
 
     /**
-     * Gets the \c Bitmap for the given planet.
+     * Gets a \c Sprite for the given planet.
      */
-    public Bitmap getBitmap(Context context, Planet planet) {
+    public Sprite getSprite(Context context, Planet planet) {
         String key = String.format("%s-%d", planet.getStar().getKey(), planet.getIndex());
-        return getBitmap(context, key, 100, new PlanetExtra(context, planet));
+        PlanetExtra planetExtra = new PlanetExtra(context, planet);
+        Bitmap bmp = getBitmap(context, key, 100, planetExtra);
+        if (bmp == null) {
+            SpriteManager spriteManager = SpriteManager.getInstance();
+            Sprite s = spriteManager.getSprite("planet."+planet.getPlanetType().getInternalName());
+
+            if (s.getNumFrames() <= 1) {
+                return s;
+            }
+
+            int frameNo = new Random(planet.getStar().hashCode()).nextInt(s.getNumFrames());
+            s = s.extractFrame(frameNo);
+            s.setScale((float) getPlanetSize(planetExtra) / 10.0f);
+            return s;
+        } else {
+            return Sprite.createSimpleSprite(bmp);
+        }
     }
 
     /**

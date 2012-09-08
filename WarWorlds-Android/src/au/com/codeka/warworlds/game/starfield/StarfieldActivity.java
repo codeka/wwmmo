@@ -11,7 +11,6 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.text.Html;
 import android.util.FloatMath;
@@ -37,12 +36,12 @@ import au.com.codeka.warworlds.model.Colony;
 import au.com.codeka.warworlds.model.Empire;
 import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.Fleet;
-import au.com.codeka.warworlds.model.ImageManager;
 import au.com.codeka.warworlds.model.Planet;
 import au.com.codeka.warworlds.model.PlanetImageManager;
 import au.com.codeka.warworlds.model.SectorManager;
 import au.com.codeka.warworlds.model.ShipDesign;
 import au.com.codeka.warworlds.model.ShipDesignManager;
+import au.com.codeka.warworlds.model.Sprite;
 import au.com.codeka.warworlds.model.Star;
 import au.com.codeka.warworlds.model.StarManager;
 
@@ -340,23 +339,8 @@ public class StarfieldActivity extends Activity {
             final Planet planet = mStar.getPlanets()[position];
             final PlanetImageManager pim = PlanetImageManager.getInstance();
 
-            Bitmap bmp = pim.getBitmap(mContext, planet);
-            if (bmp != null) {
-                icon.setImageBitmap(bmp);
-            } else {
-                icon.setImageResource(R.drawable.planet_placeholder);
-
-                pim.addBitmapGeneratedListener(new ImageManager.BitmapGeneratedListener() {
-                    public void onBitmapGenerated(String planetKey, Bitmap bmp) {
-                        String thisPlanetKey = String.format("%s-%d", planet.getStar().getKey(),
-                                                                      planet.getIndex());
-                        if (planetKey.equals(thisPlanetKey)) {
-                            icon.setImageBitmap(bmp);
-                            pim.removeBitmapGeneratedListener(this);
-                        }
-                    }
-                });
-            }
+            Sprite sprite= pim.getSprite(mContext, planet);
+            icon.setImageDrawable(sprite);
 
             TextView planetTypeTextView = (TextView) view.findViewById(R.id.starfield_planet_type);
             planetTypeTextView.setText(planet.getPlanetType().getDisplayName());

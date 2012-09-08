@@ -30,4 +30,61 @@
       <direction>0,1</direction>
     </sprite>
   </sheet>
+
+  <sheet filename="planets/planets.png">
+    <sprite name="planet.asteroids" kind="alternate">
+      <rect location="0,0" size="64x64" />
+      <rect location="64,0" size="64x64" />
+      <rect location="128,0" size="64x64" />
+      <rect location="192,0" size="64x64" />
+    </sprite>
+    <sprite name="planet.desert" kind="alternate">
+      <rect location="0,64" size="64x64" />
+      <rect location="64,64" size="64x64" />
+      <rect location="128,64" size="64x64" />
+      <rect location="192,64" size="64x64" />
+    </sprite>
+    <sprite name="planet.gasgiant" kind="alternate">
+      <rect location="0,128" size="64x64" />
+      <rect location="64,128" size="64x64" />
+      <rect location="128,128" size="64x64" />
+      <rect location="192,128" size="64x64" />
+    </sprite>
+    <sprite name="planet.inferno" kind="alternate">
+      <rect location="0,192" size="64x64" />
+      <rect location="64,192" size="64x64" />
+      <rect location="128,192" size="64x64" />
+      <rect location="192,192" size="64x64" />
+    </sprite>
+    <sprite name="planet.radiated" kind="alternate">
+      <rect location="0,256" size="64x64" />
+      <rect location="64,256" size="64x64" />
+      <rect location="128,256" size="64x64" />
+      <rect location="192,256" size="64x64" />
+    </sprite>
+    <sprite name="planet.swamp" kind="alternate">
+      <rect location="0,320" size="64x64" />
+      <rect location="64,320" size="64x64" />
+      <rect location="128,320" size="64x64" />
+      <rect location="192,320" size="64x64" />
+    </sprite>
+    <sprite name="planet.terran" kind="alternate">
+      <rect location="0,384" size="64x64" />
+      <rect location="64,384" size="64x64" />
+      <rect location="128,384" size="64x64" />
+      <rect location="192,384" size="64x64" />
+    </sprite>
+    <sprite name="planet.toxic" kind="alternate">
+      <rect location="0,448" size="64x64" />
+      <rect location="64,448" size="64x64" />
+      <rect location="128,448" size="64x64" />
+      <rect location="192,448" size="64x64" />
+    </sprite>
+    <sprite name="planet.water" kind="alternate">
+      <rect location="0,512" size="64x64" />
+      <rect location="64,512" size="64x64" />
+      <rect location="128,512" size="64x64" />
+      <rect location="192,512" size="64x64" />
+    </sprite>
+  </sheet>
 </sprites>
