@@ -3,7 +3,6 @@ package au.com.codeka.warworlds.ctrl;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -131,7 +130,6 @@ public class ColonyList extends FrameLayout {
     private class ColonyListAdapter extends BaseAdapter {
         private ArrayList<Colony> mColonies;
         private Map<String, Star> mStars;
-        private Map<String, Bitmap> mBitmaps;
 
         public ColonyListAdapter() {
             // whenever a new star/planet bitmap is generated, redraw the list
@@ -149,8 +147,6 @@ public class ColonyList extends FrameLayout {
                     notifyDataSetChanged();
                 }
             });
-
-            mBitmaps = new HashMap<String, Bitmap>();
         }
 
         /**
@@ -218,17 +214,11 @@ public class ColonyList extends FrameLayout {
             TextView colonyName = (TextView) view.findViewById(R.id.colony_name);
             TextView colonySummary = (TextView) view.findViewById(R.id.colony_summary);
 
-            Bitmap bmp = mBitmaps.get(star.getKey());
-            if (bmp == null) {
-                int imageSize = (int)(star.getSize() * star.getStarType().getImageScale() * 2);
-                bmp = StarImageManager.getInstance().getBitmap(mContext, star, imageSize);
-                if (bmp != null) {
-                    mBitmaps.put(star.getKey(), bmp);
-                }
-            }
-            starIcon.setImageBitmap(bmp);
+            int imageSize = (int)(star.getSize() * star.getStarType().getImageScale() * 2);
+            Sprite sprite = StarImageManager.getInstance().getSprite(mContext, star, imageSize);
+            starIcon.setImageDrawable(new SpriteDrawable(sprite));
 
-            Sprite sprite = PlanetImageManager.getInstance().getSprite(mContext, planet);
+            sprite = PlanetImageManager.getInstance().getSprite(mContext, planet);
             planetIcon.setImageDrawable(new SpriteDrawable(sprite));
 
             colonyName.setText(String.format("%s %s", star.getName(), RomanNumeralFormatter.format(planet.getIndex())));

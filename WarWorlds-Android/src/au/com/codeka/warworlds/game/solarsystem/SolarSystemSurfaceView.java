@@ -41,7 +41,6 @@ public class SolarSystemSurfaceView extends UniverseElementSurfaceView {
     private PlanetInfo[] mPlanetInfos;
     private PlanetInfo mSelectedPlanet;
     private boolean mPlanetsPlaced;
-    private Paint mSunPaint;
     private Paint mPlanetPaint;
     private Paint mSelectedPlanetPaint;
     private Bitmap mColonyIcon;
@@ -62,10 +61,6 @@ public class SolarSystemSurfaceView extends UniverseElementSurfaceView {
         mPlanetSelectedListeners = new CopyOnWriteArrayList<OnPlanetSelectedListener>();
         mHandler = new Handler();
         mBackgroundRenderer = new StarfieldBackgroundRenderer(context);
-
-        mSunPaint = new Paint();
-        mSunPaint.setARGB(255, 255, 255, 255);
-        mSunPaint.setStyle(Style.STROKE);
 
         mPlanetPaint = new Paint();
         mPlanetPaint.setARGB(255, 255, 255, 255);
@@ -238,14 +233,19 @@ public class SolarSystemSurfaceView extends UniverseElementSurfaceView {
     }
 
     private void drawSun(Canvas canvas) {
-        final float pixelScale = getPixelScale();
+        float pixelScale = getPixelScale();
 
-        int imageSize = 300;
-        Bitmap bmp = StarImageManager.getInstance().getBitmap(mContext, mStar, imageSize);
-        if (bmp != null) {
-            canvas.drawBitmap(bmp, -(imageSize / 2) * pixelScale,
-                    -(imageSize / 2) * pixelScale, mSunPaint);
-        }
+        int imageSize = (int)(300.0f * pixelScale);
+        Sprite sprite = StarImageManager.getInstance().getSprite(mContext, mStar, imageSize);
+
+        mMatrix.reset();
+        mMatrix.postTranslate(-(sprite.getWidth() / 2.0f), -(sprite.getHeight() / 2.0f));
+        mMatrix.postScale(300.0f * pixelScale / sprite.getWidth(),
+                          300.0f * pixelScale / sprite.getHeight());
+        canvas.save();
+        canvas.setMatrix(mMatrix);
+        sprite.draw(canvas);
+        canvas.restore();
     }
 
     private void drawPlanets(Canvas canvas) {

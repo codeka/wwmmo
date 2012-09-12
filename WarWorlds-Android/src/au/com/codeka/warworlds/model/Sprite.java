@@ -102,6 +102,7 @@ public class Sprite {
             sPaint = new Paint();
             sPaint.setARGB(255, 255, 255, 255);
             sPaint.setDither(true);
+            sPaint.setFilterBitmap(true);
         }
 
         SpriteFrame frame = getFrame(frameNo);

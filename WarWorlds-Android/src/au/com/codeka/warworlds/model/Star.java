@@ -17,33 +17,33 @@ public class Star implements Parcelable {
     private static StarType[] sStarTypes = {
         new StarType.Builder().setIndex(0)
                               .setDisplayName("Blue")
-                              .setBitmapBasePath("stars/blue")
+                              .setInternalName("blue")
                               .build(),
         new StarType.Builder().setIndex(1)
                               .setDisplayName("White")
-                              .setBitmapBasePath("stars/white")
+                              .setInternalName("white")
                               .build(),
         new StarType.Builder().setIndex(2)
                               .setDisplayName("Yellow")
-                              .setBitmapBasePath("stars/yellow")
+                              .setInternalName("yellow")
                               .build(),
         new StarType.Builder().setIndex(3)
                               .setDisplayName("Orange")
-                              .setBitmapBasePath("stars/orange")
+                              .setInternalName("orange")
                               .build(),
         new StarType.Builder().setIndex(4)
                               .setDisplayName("Red")
-                              .setBitmapBasePath("stars/red")
+                              .setInternalName("red")
                               .build(),
         new StarType.Builder().setIndex(5)
                               .setDisplayName("Neutron")
-                              .setBitmapBasePath("stars/neutron")
+                              .setInternalName("neutron")
                               .setBaseSize(1.0)
                               .setImageScale(4.0)
                               .build(),
         new StarType.Builder().setIndex(6)
                               .setDisplayName("Back Hole")
-                              .setBitmapBasePath("stars/black-hole")
+                              .setInternalName("black-hole")
                               .build()
     };
 
@@ -262,7 +262,7 @@ public class Star implements Parcelable {
     public static class StarType {
         private int mIndex;
         private String mDisplayName;
-        private String mBitmapBasePath;
+        private String mInternalName;
         private double mBaseSize;
         private double mImageScale;
 
@@ -272,8 +272,11 @@ public class Star implements Parcelable {
         public String getDisplayName() {
             return mDisplayName;
         }
+        public String getInternalName() {
+            return mInternalName;
+        }
         public String getBitmapBasePath() {
-            return mBitmapBasePath;
+            return "stars/"+mInternalName;
         }
 
         /**
@@ -311,8 +314,8 @@ public class Star implements Parcelable {
                 return this;
             }
 
-            public Builder setBitmapBasePath(String path) {
-                mStarType.mBitmapBasePath = path;
+            public Builder setInternalName(String internalName) {
+                mStarType.mInternalName = internalName;
                 return this;
             }
 

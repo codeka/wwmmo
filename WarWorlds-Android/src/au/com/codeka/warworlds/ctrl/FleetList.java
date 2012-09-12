@@ -8,6 +8,7 @@ import java.util.Map;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -25,6 +26,8 @@ import au.com.codeka.warworlds.model.Fleet;
 import au.com.codeka.warworlds.model.ImageManager;
 import au.com.codeka.warworlds.model.ShipDesign;
 import au.com.codeka.warworlds.model.ShipDesignManager;
+import au.com.codeka.warworlds.model.Sprite;
+import au.com.codeka.warworlds.model.SpriteDrawable;
 import au.com.codeka.warworlds.model.Star;
 import au.com.codeka.warworlds.model.StarImageManager;
 
@@ -270,11 +273,12 @@ public class FleetList extends FrameLayout {
                 TextView name = (TextView) view.findViewById(R.id.star_name);
 
                 int imageSize = (int)(star.getSize() * star.getStarType().getImageScale() * 2);
-                if (entry.bitmap == null) {
-                    entry.bitmap = StarImageManager.getInstance().getBitmap(mContext, star, imageSize);
+                if (entry.drawable == null) {
+                    Sprite sprite = StarImageManager.getInstance().getSprite(mContext, star, imageSize);
+                    entry.drawable = new SpriteDrawable(sprite);
                 }
-                if (entry.bitmap != null) {
-                    icon.setImageBitmap(entry.bitmap);
+                if (entry.drawable != null) {
+                    icon.setImageDrawable(entry.drawable);
                 }
 
                 name.setText(star.getName());
@@ -295,12 +299,12 @@ public class FleetList extends FrameLayout {
         public class ItemEntry {
             public int type;
             public Object value;
-            public Bitmap bitmap;
+            public Drawable drawable;
 
             public ItemEntry(int type, Object value) {
                 this.type = type;
                 this.value = value;
-                this.bitmap = null;
+                this.drawable = null;
             }
         }
     }
