@@ -96,6 +96,38 @@ public class MyEmpire extends Empire {
         }.execute();
     }
 
+    public void collectTaxes(final Star star, final Colony colony) {
+        new AsyncTask<Void, Void, Colony>() {
+            @Override
+            protected Colony doInBackground(Void... arg0) {
+                try {
+                    String url = String.format("stars/%s/colonies/%s/taxes",
+                                               star.getKey(), colony.getKey());
+                    warworlds.Warworlds.Colony pb = ApiClient.postProtoBuf(url, null,
+                            warworlds.Warworlds.Colony.class);
+                    if (pb == null)
+                        return null;
+                    return Colony.fromProtocolBuffer(pb);
+                } catch(Exception e) {
+                    // TODO: handle exceptions
+                    log.error(ExceptionUtils.getStackTrace(e));
+                    return null;
+                }
+            }
+
+            @Override
+            protected void onPostExecute(Colony colony) {
+                if (colony == null) {
+                    return; // BAD!
+                }
+
+                // make sure we record the fact that the star is updated as well
+                EmpireManager.getInstance().refreshEmpire(getKey());
+                StarManager.getInstance().refreshStar(colony.getStarKey());
+            }
+        }.execute();
+    }
+
     /**
      * Refreshes all the details of this empire (e.g. collection of colonies, fleets etc)
      */

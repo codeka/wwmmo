@@ -55,6 +55,10 @@ message Empire
     // colony/fleet is on (so you can draw the icon, etc). Note that it will *only*
     // be the stars and the planets, not colonies, build requests, etc.
     repeated Star stars = 8;
+
+    // the amount of cash the empire currently has (todo: provide an estimate on the
+    // rate of change of cash, based on taxed income)
+    optional float cash = 9;
 }
 
 
@@ -345,6 +349,9 @@ message Colony
     optional float delta_population = 11;
     optional float delta_goods = 12;
     optional float delta_minerals = 13;
+
+    // Amount of uncollected taxes this colony has generated
+    optional float uncollected_taxes = 15;
 }
 
 

@@ -76,6 +76,10 @@ def empireModelToPb(empire_pb, empire_model):
   empire_pb.user = empire_model.user.user_id()
   empire_pb.email = empire_model.user.email()
   empire_pb.state = empire_model.state
+  if empire_model.cash:
+    empire_pb.cash = empire_model.cash
+  else:
+    empire_pb.cash = 0
 
 
 def empirePbToModel(empire_model, empire_pb):
@@ -96,6 +100,10 @@ def colonyModelToPb(colony_pb, colony_model):
   colony_pb.focus_farming = colony_model.focusFarming
   colony_pb.focus_mining = colony_model.focusMining
   colony_pb.focus_construction = colony_model.focusConstruction
+  if colony_model.uncollectedTaxes:
+    colony_pb.uncollected_taxes = colony_model.uncollectedTaxes
+  else:
+    colony_pb.uncollected_taxes = 0
 
 
 def colonyPbToModel(colony_model, colony_pb):
@@ -105,6 +113,7 @@ def colonyPbToModel(colony_model, colony_pb):
   colony_model.focusFarming = colony_pb.focus_farming
   colony_model.focusMining = colony_pb.focus_mining
   colony_model.focusConstruction = colony_pb.focus_construction
+  colony_model.uncollectedTaxes = colony_pb.uncollected_taxes
 
 
 def sectorModelToPb(sector_pb, sector_model):

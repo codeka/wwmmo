@@ -21,10 +21,12 @@ public class StarManager {
     private static final Logger log = LoggerFactory.getLogger(StarManager.class);
     private TreeMap<String, Star> mStars;
     private TreeMap<String, List<StarFetchedHandler>> mStarUpdatedListeners;
+    private List<StarFetchedHandler> mAllStarUpdatedListeners;
 
     private StarManager() {
         mStars = new TreeMap<String, Star>();
         mStarUpdatedListeners = new TreeMap<String, List<StarFetchedHandler>>();
+        mAllStarUpdatedListeners = new ArrayList<StarFetchedHandler>();
     }
 
     /**
@@ -32,6 +34,11 @@ public class StarManager {
      * star is re-fetched from the server, your \c StarFetchedHandler will be called.
      */
     public void addStarUpdatedListener(String starKey, StarFetchedHandler handler) {
+        if (starKey == null) {
+            mAllStarUpdatedListeners.add(handler);
+            return;
+        }
+
         synchronized(mStarUpdatedListeners) {
             List<StarFetchedHandler> listeners = mStarUpdatedListeners.get(starKey);
             if (listeners == null) {
@@ -58,6 +65,8 @@ public class StarManager {
                 }
             }
         }
+
+        mAllStarUpdatedListeners.remove(handler);
     }
 
     protected void fireStarUpdated(Star star) {
@@ -67,6 +76,11 @@ public class StarManager {
                 for (StarFetchedHandler handler : listeners) {
                     handler.onStarFetched(star);
                 }
+            }
+
+            // also anybody who's interested in ALL stars
+            for (StarFetchedHandler handler : mAllStarUpdatedListeners) {
+                handler.onStarFetched(star);
             }
         }
     }

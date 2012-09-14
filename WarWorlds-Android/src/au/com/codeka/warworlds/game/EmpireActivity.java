@@ -145,7 +145,7 @@ public class EmpireActivity extends TabFragmentActivity {
             ColonyList colonyList = (ColonyList) v.findViewById(R.id.colony_list);
             colonyList.refresh(sCurrentEmpire.getAllColonies(), sCurrentEmpire.getImportantStars());
 
-            colonyList.setOnViewColonyListener(new ColonyList.ViewColonyHandler() {
+            colonyList.setOnColonyActionListener(new ColonyList.ColonyActionHandler() {
                 @Override
                 public void onViewColony(Star star, Colony colony) {
                     Planet planet = star.getPlanets()[colony.getPlanetIndex() - 1];
@@ -161,6 +161,11 @@ public class EmpireActivity extends TabFragmentActivity {
                     intent.putExtra("au.com.codeka.warworlds.PlanetIndex", planet.getIndex());
                     getActivity().setResult(RESULT_OK, intent);
                     getActivity().finish();
+                }
+
+                @Override
+                public void onCollectTaxes(Star star, Colony colony) {
+                    EmpireManager.getInstance().getEmpire().collectTaxes(star, colony);
                 }
             });
 

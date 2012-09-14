@@ -4,7 +4,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
+import org.apache.commons.collections.IteratorUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,6 +27,7 @@ public class EmpireManager {
 
     private Map<String, Empire> mEmpireCache = new HashMap<String, Empire>();
     private Map<String, List<EmpireFetchedHandler>> mInProgress = new HashMap<String, List<EmpireFetchedHandler>>();
+    private Map<String, List<EmpireFetchedHandler>> mEmpireUpdatedListeners = new TreeMap<String, List<EmpireFetchedHandler>>();
     private MyEmpire mEmpire;
 
     /**
@@ -42,20 +45,57 @@ public class EmpireManager {
         return mEmpire;
     }
 
-    public void fetchEmpire(final String empireKey, final EmpireFetchedHandler handler) {
-        if (mEmpireCache.containsKey(empireKey)) {
-            handler.onEmpireFetched(mEmpireCache.get(empireKey));
-            return;
+    /**
+     * Call this to register your interest in when a particular empire is updated. Any time that
+     * empire is re-fetched from the server, your \c EmpireFetchedHandler will be called.
+     */
+    public void addEmpireUpdatedListener(String empireKey, EmpireFetchedHandler handler) {
+        synchronized(mEmpireUpdatedListeners) {
+            List<EmpireFetchedHandler> listeners = mEmpireUpdatedListeners.get(empireKey);
+            if (listeners == null) {
+                listeners = new ArrayList<EmpireFetchedHandler>();
+                mEmpireUpdatedListeners.put(empireKey, listeners);
+            }
+            listeners.add(handler);
         }
+    }
 
-        // if it's us, then that's good enough as well!
-        if (mEmpire.getKey().equals(empireKey)) {
-            handler.onEmpireFetched(mEmpire);
-            return;
+    /**
+     * Removes the given \c EmpireFetchedHandler from receiving updates about refreshed empires.
+     */
+    public void removeEmpireUpdatedListener(EmpireFetchedHandler handler) {
+        synchronized(mEmpireUpdatedListeners) {
+            for (Object o : IteratorUtils.toList(mEmpireUpdatedListeners.keySet().iterator())) {
+                String empireKey = (String) o;
+
+                List<EmpireFetchedHandler> listeners = mEmpireUpdatedListeners.get(empireKey);
+                listeners.remove(handler);
+
+                if (listeners.isEmpty()) {
+                    mEmpireUpdatedListeners.remove(empireKey);
+                }
+            }
         }
+    }
 
+    protected void fireEmpireUpdated(Empire empire) {
+        synchronized(mEmpireUpdatedListeners) {
+            List<EmpireFetchedHandler> listeners = mEmpireUpdatedListeners.get(empire.getKey());
+            if (listeners != null) {
+                for (EmpireFetchedHandler handler : listeners) {
+                    handler.onEmpireFetched(empire);
+                }
+            }
+        }
+    }
+
+    public void refreshEmpire(final String empireKey) {
+        refreshEmpire(empireKey, null);
+    }
+
+    public void refreshEmpire(final String empireKey, final EmpireFetchedHandler handler) {
         List<EmpireFetchedHandler> inProgress = mInProgress.get(empireKey);
-        if (inProgress != null) {
+        if (inProgress != null && handler != null) {
             // if there's already a call in progress, don't fetch again
             inProgress.add(handler);
             return;
@@ -74,7 +114,12 @@ public class EmpireManager {
 
                     warworlds.Warworlds.Empire pb = ApiClient.getProtoBuf(url,
                             warworlds.Warworlds.Empire.class);
-                    empire = Empire.fromProtocolBuffer(pb);
+
+                    if (empireKey.equals(mEmpire.getKey())) {
+                        empire = MyEmpire.fromProtocolBuffer(pb);
+                    } else {
+                        empire = Empire.fromProtocolBuffer(pb);
+                    }
                 } catch(Exception e) {
                     // TODO: handle exceptions
                     log.error(ExceptionUtils.getStackTrace(e));
@@ -89,15 +134,37 @@ public class EmpireManager {
                     return; // BAD!
                 }
 
-                mEmpireCache.put(empireKey, empire);
+                if (empireKey.equals(mEmpire.getKey())) {
+                    mEmpire = (MyEmpire) empire;
+                } else {
+                    mEmpireCache.put(empireKey, empire);
+                }
 
                 List<EmpireFetchedHandler> inProgress = mInProgress.get(empireKey);
                 for (EmpireFetchedHandler handler : inProgress) {
                     handler.onEmpireFetched(empire);
                 }
                 mInProgress.remove(empireKey);
+
+                fireEmpireUpdated(empire);
             }
         }.execute();
+
+    }
+
+    public void fetchEmpire(final String empireKey, final EmpireFetchedHandler handler) {
+        if (mEmpireCache.containsKey(empireKey)) {
+            handler.onEmpireFetched(mEmpireCache.get(empireKey));
+            return;
+        }
+
+        // if it's us, then that's good enough as well!
+        if (mEmpire.getKey().equals(empireKey)) {
+            handler.onEmpireFetched(mEmpire);
+            return;
+        }
+
+        refreshEmpire(empireKey, handler);
     }
 
     public interface EmpireFetchedHandler {

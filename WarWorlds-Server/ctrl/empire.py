@@ -18,7 +18,7 @@ from protobufs import warworlds_pb2 as pb
 
 
 def getEmpireForUser(user):
-  cache_key = "empire:for-user:%s" % (user.user_id())
+  cache_key = "empire:for-user:%s" % (user.email())
   values = ctrl.getCached([cache_key], pb.Empire)
   if cache_key in values:
     return values[cache_key]
@@ -130,6 +130,32 @@ def updateColony(colony_key, updated_colony_pb):
   updateAfterSimulate(star_pb, colony_pb.empire_key)
 
   return colony_pb
+
+
+def collectTaxes(colony_key):
+  """Transfer the uncollected taxes from the given colony into that colony's empire."""
+  colony_pb = getColony(colony_key)
+  star_pb = sector.getStar(colony_pb.star_key)
+  simulate(star_pb, colony_pb.empire_key)
+
+  empire_pb = getEmpire(colony_pb.empire_key)
+  empire_pb.cash += colony_pb.uncollected_taxes
+
+  logging.debug("Collect $%.2f in taxes from colony %s" % (colony_pb.uncollected_taxes, colony_pb.key))
+
+  # reset the uncollected taxes of this colony, but make sure it's the colony_pb that's
+  # actually in the star (otherwise updateAfterSimulate don't work!)
+  for star_colony_pb in star_pb.colonies:
+    if colony_pb.key == star_colony_pb.key:
+      star_colony_pb.uncollected_taxes = 0.0
+
+  updateAfterSimulate(star_pb, colony_pb.empire_key)
+
+  empire_model = mdl.Empire.get(colony_pb.empire_key)
+  empire_model.cash = empire_pb.cash
+  empire_model.put() 
+  ctrl.clearCached({"empire:%s" % (colony_pb.empire_key),
+                    "empire:for-user:%s" % (empire_model.user.email())})
 
 
 def _log_noop(msg):
@@ -467,6 +493,12 @@ def _simulateStep(dt, now, star_pb, empire_key, log):
           build_request.progress = 1
 
         log("total progress: %.2f%% completion time: %s" % (build_request.progress * 100.0, end_time))
+
+    # work out the amount of taxes this colony has generated in the last turn
+    tax_per_population_per_hour = 0.004
+    tax_this_turn = tax_per_population_per_hour * dt_in_hours * colony_pb.population
+    colony_pb.uncollected_taxes += tax_this_turn
+    log("tax generated: %.4f; total: %.4f" % (tax_this_turn, colony_pb.uncollected_taxes))
 
   log("--- Updating population:")
 

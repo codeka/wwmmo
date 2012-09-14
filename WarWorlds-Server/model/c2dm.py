@@ -55,7 +55,7 @@ class Sender:
     values = {"collapse_key": self.collapse_key,
               "registration_id": deviceRegistrationID}
     for key in msg:
-      values["data."+key] = msg[key]
+      values["data."+key] = msg[key].encode("utf-8")
 
     body = urllib.urlencode(values)
     request = urllib2.Request(self.url, body)

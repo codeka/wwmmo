@@ -13,6 +13,7 @@ class Empire(db.Model):
   displayName = db.StringProperty()
   user = db.UserProperty()
   state = db.IntegerProperty()
+  cash = db.FloatProperty()
 
   class State:
     INITIAL = 1
@@ -72,6 +73,7 @@ class Colony(db.Model):
   focusFarming = db.FloatProperty()
   focusMining = db.FloatProperty()
   focusConstruction = db.FloatProperty()
+  uncollectedTaxes = db.FloatProperty()
 
   @staticmethod
   def getForEmpire(empire):

@@ -26,6 +26,7 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TabHost;
 import android.widget.TextView;
+import au.com.codeka.Cash;
 import au.com.codeka.warworlds.DialogManager;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.TabManager;
@@ -36,6 +37,7 @@ import au.com.codeka.warworlds.model.Colony;
 import au.com.codeka.warworlds.model.Empire;
 import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.Fleet;
+import au.com.codeka.warworlds.model.MyEmpire;
 import au.com.codeka.warworlds.model.Planet;
 import au.com.codeka.warworlds.model.PlanetImageManager;
 import au.com.codeka.warworlds.model.SectorManager;
@@ -93,9 +95,18 @@ public class StarfieldActivity extends Activity {
         selectedStarContainer.setVisibility(View.GONE);
         selectedFleetContainer.setVisibility(View.GONE);
 
-        EmpireManager empireManager = EmpireManager.getInstance();
+        MyEmpire empire = EmpireManager.getInstance().getEmpire();
         TextView username = (TextView) findViewById(R.id.username);
-        username.setText(empireManager.getEmpire().getDisplayName());
+        username.setText(empire.getDisplayName());
+        final TextView cashTextView = (TextView) findViewById(R.id.cash);
+        cashTextView.setText(String.format("$%s", Cash.format(empire.getCash())));
+
+        EmpireManager.getInstance().addEmpireUpdatedListener(empire.getKey(), new EmpireManager.EmpireFetchedHandler() {
+            @Override
+            public void onEmpireFetched(Empire empire) {
+                cashTextView.setText(String.format("$%s", Cash.format(empire.getCash())));
+            }
+        });
 
         mPlanetListAdapter = new PlanetListAdapter();
         mPlanetList.setAdapter(mPlanetListAdapter);

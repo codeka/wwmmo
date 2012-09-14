@@ -22,6 +22,7 @@ public class Colony implements Parcelable {
     private float mPopulationDelta;
     private float mGoodsDelta;
     private float mMineralsDelta;
+    private float mUncollectedTaxes;
     private DateTime mLastSimulation;
     private List<Building> mBuildings;
 
@@ -73,6 +74,9 @@ public class Colony implements Parcelable {
     public float getMineralsDelta() {
         return mMineralsDelta;
     }
+    public float getUncollectedTaxes() {
+        return mUncollectedTaxes;
+    }
     public DateTime getLastSimulation() {
         return mLastSimulation;
     }
@@ -99,6 +103,7 @@ public class Colony implements Parcelable {
         parcel.writeFloat(mPopulationDelta);
         parcel.writeFloat(mGoodsDelta);
         parcel.writeFloat(mMineralsDelta);
+        parcel.writeFloat(mUncollectedTaxes);
         parcel.writeLong(mLastSimulation.getMillis());
 
         Building[] buildings = new Building[mBuildings.size()];
@@ -122,6 +127,7 @@ public class Colony implements Parcelable {
             c.mPopulationDelta = parcel.readFloat();
             c.mGoodsDelta = parcel.readFloat();
             c.mMineralsDelta = parcel.readFloat();
+            c.mUncollectedTaxes = parcel.readFloat();
             c.mLastSimulation = new DateTime(parcel.readLong(), DateTimeZone.UTC);
 
             Parcelable[] buildings = parcel.readParcelableArray(Building.class.getClassLoader());
@@ -155,6 +161,7 @@ public class Colony implements Parcelable {
         c.mPopulationDelta = pb.getDeltaPopulation();
         c.mGoodsDelta = pb.getDeltaGoods();
         c.mMineralsDelta = pb.getDeltaMinerals();
+        c.mUncollectedTaxes = pb.getUncollectedTaxes();
 
         return c;
     }

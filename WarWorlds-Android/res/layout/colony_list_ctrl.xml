@@ -12,36 +12,36 @@
         android:layout_marginBottom="-4px"
         android:listSelector="@drawable/list_selector" />
 
-    <LinearLayout
+    <RelativeLayout
         android:id="@+id/bottom_pane"
         style="@style/BottomPane"
         android:layout_width="match_parent"
         android:layout_height="200dp"
-        android:layout_alignParentBottom="true"
-        android:orientation="vertical">
+        android:layout_alignParentBottom="true" >
 
         <TextView
             android:id="@+id/colony_info"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1" />
+            android:layout_height="match_parent" />
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-            <Button
-                style="@style/Button"
-                android:id="@+id/view_btn"
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="12dp"
-                android:layout_marginRight="12dp"
-                android:text="@string/view" />
+        <Button
+            android:id="@+id/view_btn"
+            style="@style/Button"
+            android:layout_width="120dp"
+            android:layout_height="35dp"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentLeft="true"
+            android:text="@string/view" />
 
-        </LinearLayout>
+        <Button
+            android:id="@+id/collect_btn"
+            style="@style/Button"
+            android:layout_width="180dp"
+            android:layout_height="35dp"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentRight="true"
+            android:text="@string/collect_taxes_none" />
 
-    </LinearLayout>
+    </RelativeLayout>
 
 </RelativeLayout>

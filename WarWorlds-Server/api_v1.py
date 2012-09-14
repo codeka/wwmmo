@@ -163,6 +163,10 @@ class EmpiresPage(ApiPage):
       self.response.set_status(404)
       return
 
+    if empire_pb.email != self.user.email():
+      # it's not OUR empire, so block out a few details...
+      empire_pb.cash = 0;
+
     return empire_pb
 
   def put(self):
@@ -381,6 +385,20 @@ class ColoniesPage(ApiPage):
     return colony_pb
 
 
+class ColoniesTaxesPage(ApiPage):
+  def post(self, star_key, colony_key):
+    """Collect taxes from the current colony."""
+
+    # Make sure you have access to this colony!
+    colony_pb = empire.getColony(colony_key)
+    empire_pb = empire.getEmpireForUser(self.user)
+    if colony_pb.empire_key != empire_pb.key:
+      self.response.set_status(403)
+      return
+
+    empire.collectTaxes(colony_pb.key)
+    return colony_pb
+
 class BuildQueuePage(ApiPage):
   def post(self):
     """The buildqueue is where you post BuildRequest protobufs with requests to build stuff."""
@@ -495,5 +513,6 @@ app = ApiApplication([("/api/v1/hello/([^/]+)", HelloPage),
                       ("/api/v1/buildqueue", BuildQueuePage),
                       ("/api/v1/stars/([^/]+)/colonies", ColoniesPage),
                       ("/api/v1/stars/([^/]+)/colonies/([^/]+)", ColoniesPage),
+                      ("/api/v1/stars/([^/]+)/colonies/([^/]+)/taxes", ColoniesTaxesPage),
                       ("/api/v1/stars/([^/]+)/fleets/([^/]+)/orders", FleetOrdersPage)],
                      debug=os.environ["SERVER_SOFTWARE"].startswith("Development"))

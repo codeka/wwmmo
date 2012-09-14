@@ -13,6 +13,7 @@ import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import au.com.codeka.Cash;
 import au.com.codeka.Point2D;
 import au.com.codeka.RomanNumeralFormatter;
 import au.com.codeka.warworlds.DialogManager;
@@ -47,17 +48,24 @@ public class SolarSystemActivity extends Activity implements StarManager.StarFet
 
         setContentView(R.layout.solarsystem);
 
-        final TextView username = (TextView) findViewById(R.id.username);
         mSolarSystemSurfaceView = (SolarSystemSurfaceView) findViewById(R.id.solarsystem_view);
         final Button colonizeButton = (Button) findViewById(R.id.solarsystem_colonize);
         final Button buildButton = (Button) findViewById(R.id.solarsystem_colony_build);
         final Button focusButton = (Button) findViewById(R.id.solarsystem_colony_focus);
         final Button fleetButton = (Button) findViewById(R.id.fleet_btn);
-        final View congenialityContainer = findViewById(R.id.congeniality_container);
 
-        EmpireManager empireManager = EmpireManager.getInstance();
-        username.setText(empireManager.getEmpire().getDisplayName());
-        congenialityContainer.setVisibility(View.GONE);
+        MyEmpire empire = EmpireManager.getInstance().getEmpire();
+        TextView username = (TextView) findViewById(R.id.username);
+        username.setText(empire.getDisplayName());
+        final TextView cashTextView = (TextView) findViewById(R.id.cash);
+        cashTextView.setText(String.format("$%s", Cash.format(empire.getCash())));
+
+        EmpireManager.getInstance().addEmpireUpdatedListener(empire.getKey(), new EmpireManager.EmpireFetchedHandler() {
+            @Override
+            public void onEmpireFetched(Empire empire) {
+                cashTextView.setText(String.format("$%s", Cash.format(empire.getCash())));
+            }
+        });
 
         Bundle extras = getIntent().getExtras();
         String starKey = extras.getString("au.com.codeka.warworlds.StarKey");

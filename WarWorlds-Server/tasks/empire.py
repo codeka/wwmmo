@@ -162,6 +162,11 @@ class FleetMoveCompletePage(tasks.TaskPage):
       new_star_key = mdl.Fleet.destinationStar.get_value_for_datastore(fleet_mdl)
       new_star_pb = sector_ctl.getStar(new_star_key)
 
+      if str(fleet_mdl.key().parent()) == new_star_key:
+        old_star_pb = new_star_pb
+      else:
+        old_star_pb = sector_ctl.getStar(fleet_mdl.key().parent())
+
       new_fleet_mdl = mdl.Fleet(parent=fleet_mdl.destinationStar)
       new_fleet_mdl.sector = sector_mdl.SectorManager.getSectorKey(new_star_pb.sector_x,
                                                                    new_star_pb.sector_y)
@@ -179,7 +184,9 @@ class FleetMoveCompletePage(tasks.TaskPage):
       empire = fleet_mdl.empire
       ctrl.clearCached(["fleet:for-empire:%s" % (empire.key()),
                         "star:%s" % (fleet_mdl.key().parent()),
-                        "star:%s" % (new_star_key)])
+                        "star:%s" % (new_star_key),
+                        "sector:%d,%d" % (new_star_pb.sector_x, new_star_pb.sector_y),
+                        "sector:%d,%d" % (old_star_pb.sector_x, old_star_pb.sector_y)])
 
       design = ctl.ShipDesign.getDesign(fleet_mdl.designName)
 

@@ -17,15 +17,18 @@ public class Empire implements Parcelable {
     private String mKey;
     private String mDisplayName;
     private Bitmap mEmpireShield;
+    private float mCash;
 
     private static Bitmap sBaseShield;
 
     public String getKey() {
         return mKey;
     }
-
     public String getDisplayName() {
         return mDisplayName;
+    }
+    public float getCash() {
+        return mCash;
     }
 
     /**
@@ -116,5 +119,6 @@ public class Empire implements Parcelable {
     protected void populateFromProtocolBuffer(warworlds.Warworlds.Empire pb) {
         mKey = pb.getKey();
         mDisplayName = pb.getDisplayName();
+        mCash = pb.getCash();
     }
 }
