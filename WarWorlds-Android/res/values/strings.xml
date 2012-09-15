@@ -89,5 +89,5 @@
         <strong>Building: </strong>%4$.2f
     ]]></string>
     <string name="collect_taxes_none">Collect Taxes</string>
-    <string name="collect_taxes">Collect Taxes: $%d</string>
+    <string name="collect_taxes">Collect Taxes: %s</string>
 </resources>

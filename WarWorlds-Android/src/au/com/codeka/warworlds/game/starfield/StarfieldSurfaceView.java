@@ -137,6 +137,11 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
         scrollTo(0, 0, 0, 0);
     }
 
+    public void deselectStar() {
+        mSelectedStar = null;
+        removeOverlay(mSelectionOverlay);
+    }
+
     /**
      * Creates the \c OnGestureListener that'll handle our gestures.
      */

@@ -764,21 +764,33 @@ def _orderFleet_move(fleet_pb, order_pb):
     logging.debug("Cannot move fleet, it's not currently idle.")
     return False
 
+  src_star = sector.getStar(fleet_pb.star_key)
+  dst_star = sector.getStar(db.Key(order_pb.star_key))
+  distance_in_pc = sector.get_distance_between_stars(src_star, dst_star)
+
+  empire_mdl = fleet_mdl.empire
+  design = ShipDesign.getDesign(fleet_pb.design_name)
+
+  # work out how much this move operation is going to cost
+  fuel_cost = design.fuelCostPerParsec * fleet_mdl.numShips * distance_in_pc
+  if fuel_cost > empire_mdl.cash:
+    logging.info("Insufficient funds for move: distance=%.2f, num_ships=%d, cost=%.2f"
+                 % (distance_in_pc, fleet_mdl.numShips, fuel_cost))
+    return False
+  else:
+    empire_mdl.cash -= fuel_cost
+    empire_mdl.put()
+    ctrl.clearCached(["empire:%s" % (str(empire_mdl.key()))])
+
   fleet_mdl.state = pb.Fleet.MOVING
   fleet_mdl.stateStartTime = datetime.now()
   fleet_mdl.destinationStar = db.Key(order_pb.star_key)
   fleet_mdl.put()
 
-  src_star = sector.getStar(fleet_pb.star_key)
-  dst_star = sector.getStar(db.Key(order_pb.star_key))
-  distance_in_pc = sector.get_distance_between_stars(src_star, dst_star)
-
-  design = ShipDesign.getDesign(fleet_pb.design_name)
-
   # Let's just hard-code this to 1 hour for now...
   time = datetime.now() + timedelta(hours=(distance_in_pc / design.speed))
-  logging.info("distance=%.2f pc, speed=%.2f pc/hr, fleet will reach it's destination at %s"
-               % (distance_in_pc, design.speed, time))
+  logging.info("distance=%.2f pc, speed=%.2f pc/hr, cost=%.2f, fleet will reach it's destination at %s"
+               % (distance_in_pc, design.speed, fuel_cost, time))
   taskqueue.add(queue_name="fleet",
                 url="/tasks/empire/fleet/"+fleet_pb.key+"/move-complete",
                 method="GET",
@@ -896,6 +908,8 @@ def _parseShipDesign(designXml):
   _parseDesign(designXml, design)
   statsXml = designXml.find("stats")
   design.speed = float(statsXml.get("speed"))
+  fuelXml = designXml.find("fuel")
+  design.fuelCostPerParsec = float(fuelXml.get("costPerParsec"))
   return design
 
 

@@ -58,7 +58,7 @@ public class SolarSystemActivity extends Activity implements StarManager.StarFet
         TextView username = (TextView) findViewById(R.id.username);
         username.setText(empire.getDisplayName());
         final TextView cashTextView = (TextView) findViewById(R.id.cash);
-        cashTextView.setText(String.format("$%s", Cash.format(empire.getCash())));
+        cashTextView.setText(Cash.format(empire.getCash()));
 
         EmpireManager.getInstance().addEmpireUpdatedListener(empire.getKey(), new EmpireManager.EmpireFetchedHandler() {
             @Override

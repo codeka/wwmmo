@@ -99,12 +99,12 @@ public class StarfieldActivity extends Activity {
         TextView username = (TextView) findViewById(R.id.username);
         username.setText(empire.getDisplayName());
         final TextView cashTextView = (TextView) findViewById(R.id.cash);
-        cashTextView.setText(String.format("$%s", Cash.format(empire.getCash())));
+        cashTextView.setText(Cash.format(empire.getCash()));
 
         EmpireManager.getInstance().addEmpireUpdatedListener(empire.getKey(), new EmpireManager.EmpireFetchedHandler() {
             @Override
             public void onEmpireFetched(Empire empire) {
-                cashTextView.setText(String.format("$%s", Cash.format(empire.getCash())));
+                cashTextView.setText(Cash.format(empire.getCash()));
             }
         });
 

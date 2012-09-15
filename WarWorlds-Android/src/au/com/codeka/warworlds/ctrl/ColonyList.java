@@ -148,7 +148,7 @@ public class ColonyList extends FrameLayout {
             collectBtn.setEnabled(false);
         } else {
             collectBtn.setText(String.format(mContext.getString(R.string.collect_taxes),
-                                             (int) mSelectedColony.getUncollectedTaxes()));
+                                             Cash.format(mSelectedColony.getUncollectedTaxes())));
             collectBtn.setEnabled(true);
         }
     }
@@ -276,7 +276,7 @@ public class ColonyList extends FrameLayout {
             colonyName.setText(String.format("%s %s", star.getName(), RomanNumeralFormatter.format(planet.getIndex())));
             colonySummary.setText(String.format("Pop: %d", (int) colony.getPopulation()));
 
-            uncollectedTaxes.setText(String.format("Taxes: $%s", Cash.format(colony.getUncollectedTaxes())));
+            uncollectedTaxes.setText(String.format("Taxes: %s", Cash.format(colony.getUncollectedTaxes())));
 
             if (mSelectedColony != null && mSelectedColony.getKey().equals(colony.getKey())) {
                 view.setBackgroundColor(0xff0c6476);

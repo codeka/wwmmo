@@ -8,7 +8,8 @@
       your colony's population to a brave new world.</p>
       <p>Colony ships are single-use. The ship is destroyed once a planet is colonized.</p>
     ]]></description>
-    <cost credits="1000" minerals="1000" time="4.0" />
+    <cost minerals="1000" time="4.0" />
+    <fuel costPerParsec="120" />
     <stats speed="1" />
   </design>
   <design id="scout">
@@ -19,7 +20,8 @@
       defensive capabilities, either). What they <em>are</em> good at, though, is getting in
       and out of enemy starsystems and reporting back what they found.</p>
     ]]></description>
-    <cost credits="10" minerals="50" time="0.1667" />
+    <cost minerals="50" time="0.1667" />
+    <fuel costPerParsec="13" />
     <stats speed="17" />
   </design>
 </designs>

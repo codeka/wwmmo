@@ -2,6 +2,7 @@ package au.com.codeka.warworlds.game;
 
 import warworlds.Warworlds.FleetOrder;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
@@ -9,19 +10,26 @@ import android.graphics.Paint;
 import android.graphics.Paint.Style;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.text.Html;
+import android.util.FloatMath;
 import android.view.Display;
 import android.view.View;
 import android.view.ViewGroup.LayoutParams;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.TextView;
+import au.com.codeka.Cash;
 import au.com.codeka.Point2D;
 import au.com.codeka.warworlds.DialogManager;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.api.ApiClient;
 import au.com.codeka.warworlds.api.ApiException;
 import au.com.codeka.warworlds.game.starfield.StarfieldSurfaceView;
+import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.Fleet;
+import au.com.codeka.warworlds.model.SectorManager;
+import au.com.codeka.warworlds.model.ShipDesign;
 import au.com.codeka.warworlds.model.ShipDesignManager;
 import au.com.codeka.warworlds.model.Sprite;
 import au.com.codeka.warworlds.model.Star;
@@ -33,6 +41,7 @@ public class FleetMoveDialog extends Dialog implements DialogManager.DialogConfi
     private StarfieldSurfaceView mStarfield;
     private SourceStarOverlay mSourceStarOverlay;
     private DestinationStarOverlay mDestinationStarOverlay;
+    private Star mSourceStar;
 
     public static final int ID = 1008;
 
@@ -50,8 +59,13 @@ public class FleetMoveDialog extends Dialog implements DialogManager.DialogConfi
 
         final Button moveBtn = (Button) findViewById(R.id.move_btn);
         final Button cancelBtn = (Button) findViewById(R.id.cancel_btn);
+        final View starDetailsView = findViewById(R.id.star_details);
+        final View instructionsView = findViewById(R.id.instructions);
+        final TextView starDetailsLeft = (TextView) findViewById(R.id.star_details_left);
+        final TextView starDetailsRight = (TextView) findViewById(R.id.star_details_right);
 
         moveBtn.setEnabled(false); // disabled until you select a star
+        starDetailsView.setVisibility(View.GONE);
 
         // we want the window to be slightly taller than a square
         Display display = mActivity.getWindowManager().getDefaultDisplay();
@@ -75,7 +89,37 @@ public class FleetMoveDialog extends Dialog implements DialogManager.DialogConfi
                 mStarfield.addOverlay(mDestinationStarOverlay, star);
                 mSourceStarOverlay.reset();
 
+                if (mSourceStar != null) {
+                    float distanceInParsecs = SectorManager.getInstance()
+                                              .distanceInParsecs(mSourceStar, star);
+                    ShipDesign design = ShipDesignManager.getInstance().getDesign(mFleet.getDesignID());
+
+                    String leftDetails = String.format("<b>Star:</b> %s<br /><b>Distance:</b> %.2f pc",
+                            star.getName(), distanceInParsecs);
+                    starDetailsLeft.setText(Html.fromHtml(leftDetails));
+
+                    float timeInHours = distanceInParsecs / design.getSpeedInParsecPerHour();
+                    int hrs = (int) FloatMath.floor(timeInHours);
+                    int mins = (int) FloatMath.floor((timeInHours - hrs) * 60.0f);
+
+                    float cost = design.getFuelCost(distanceInParsecs, mFleet.getNumShips());
+                    String cash = Cash.format(cost);
+
+                    String fontOpen = "";
+                    String fontClose = "";
+                    if (cost > EmpireManager.getInstance().getEmpire().getCash()) {
+                        fontOpen = "<font color=\"#ff0000\">";
+                        fontClose = "</font>";
+                    }
+
+                    String rightDetails = String.format("<b>ETA:</b> %d hrs, %d mins<br />%s<b>Cost:</b> %s%s",
+                            hrs, mins, fontOpen, cash, fontClose);
+                    starDetailsRight.setText(Html.fromHtml(rightDetails));
+                }
+
                 moveBtn.setEnabled(true);
+                starDetailsView.setVisibility(View.VISIBLE);
+                instructionsView.setVisibility(View.GONE);
             }
 
             @Override
@@ -121,12 +165,23 @@ public class FleetMoveDialog extends Dialog implements DialogManager.DialogConfi
 
                     @Override
                     protected void onPostExecute(Boolean success) {
-                        // the star this fleet is attached to needs to be refreshed...
-                        StarManager.getInstance().refreshStar(mFleet.getStarKey());
-                        moveBtn.setEnabled(true);
-                        cancelBtn.setEnabled(true);
-                        if (success) {
-                            dismiss();
+                        if (!success) {
+                            AlertDialog dialog = new AlertDialog.Builder(mActivity)
+                                                    .setMessage("Could not move the fleet: do you have enough cash?")
+                                                    .create();
+                            dialog.show();
+                        } else {
+                            // the star this fleet is attached to needs to be refreshed...
+                            StarManager.getInstance().refreshStar(mFleet.getStarKey());
+                            moveBtn.setEnabled(true);
+                            cancelBtn.setEnabled(true);
+                            if (success) {
+                                dismiss();
+                            }
+
+                            // the empire needs to be updated, too, since we'll have subtracted
+                            // the cost of this move from your cash
+                            EmpireManager.getInstance().refreshEmpire(mFleet.getEmpireKey());
                         }
                     }
 
@@ -139,10 +194,22 @@ public class FleetMoveDialog extends Dialog implements DialogManager.DialogConfi
     public void setBundle(Activity activity, Bundle bundle) {
         mFleet = (Fleet) bundle.getParcelable("au.com.codeka.warworlds.Fleet");
 
+        final Button moveBtn = (Button) findViewById(R.id.move_btn);
+        final View starDetailsView = findViewById(R.id.star_details);
+        final View instructionsView = findViewById(R.id.instructions);
+        moveBtn.setEnabled(false);
+        starDetailsView.setVisibility(View.GONE);
+        instructionsView.setVisibility(View.VISIBLE);
+
+        mStarfield.removeOverlay(mDestinationStarOverlay);
+        mStarfield.deselectStar();
+
         StarManager.getInstance().requestStar(mFleet.getStarKey(), false,
                                               new StarManager.StarFetchedHandler() {
             @Override
             public void onStarFetched(Star s) {
+                mSourceStar = s;
+
                 long sectorX = s.getSectorX();
                 long sectorY = s.getSectorY();
                 int offsetX = s.getOffsetX();
