@@ -37,10 +37,10 @@ class BuildCheckPage(tasks.TaskPage):
       oper_model.delete()
       return oper_model
 
-    def _incrShipCountInTX(fleet_key):
+    def _incrShipCountInTX(fleet_key, n):
       fleet_model = mdl.Fleet.get(fleet_key)
       if fleet_model.state == pb.Fleet.IDLE:
-        fleet_model.numShips += 1
+        fleet_model.numShips += n
         fleet_model.put()
         return True
       return False
@@ -87,7 +87,9 @@ class BuildCheckPage(tasks.TaskPage):
         for fleet_model in query:
           if (fleet_model.designName == build_request_model.designName and
               fleet_model.state == pb.Fleet.IDLE):
-            if db.run_in_transaction(_incrShipCountInTX, fleet_model.key()):
+            if db.run_in_transaction(_incrShipCountInTX,
+                                     fleet_model.key(),
+                                     build_request_model.count):
               existing = True
               model = fleet_model
               # it's an existing fleet, so make sure we clear it's cached value
@@ -98,14 +100,16 @@ class BuildCheckPage(tasks.TaskPage):
           model.empire = build_request_model.empire
           model.sector = sector_mdl.SectorManager.getSectorKey(star_pb.sector_x, star_pb.sector_y)
           model.designName = build_request_model.designName
-          model.numShips = 1
+          model.numShips = build_request_model.count
           model.state = pb.Fleet.IDLE
           model.stateStartTime = datetime.now()
           model.put()
         design = ctl.ShipDesign.getDesign(model.designName)
 
       # Send a notification to the player that construction of their building is complete
-      msg = "Your %s on %s has been built." % (design.name, star_pb.name)
+      msg = "Your %d %s(s) on %s has been built." % (build_request_model.count,
+                                                     design.name,
+                                                     star_pb.name)
       logging.debug("Sending message to user [%s] indicating build complete." % (
           model.empire.user.email()))
       s = c2dm.Sender()

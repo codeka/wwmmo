@@ -160,11 +160,12 @@ def collectTaxes(colony_key):
 
 def _log_noop(msg):
   """This is the default logging function for simulate() -- it does nothing."""
-  #pass
+  pass
 
 
 def _log_logging(msg):
-  logging.debug(msg)
+  #logging.debug(msg)
+  pass
 
 
 def updateAfterSimulate(star_pb, empire_key=None, log=_log_noop):
@@ -445,7 +446,7 @@ def _simulateStep(dt, now, star_pb, empire_key, log):
         # So the build time the design specifies is the time to build the structure with
         # 100 workers available. Double the workers and you halve the build time. Halve
         # the workers and you double the build time.
-        total_build_time_in_hours = design.buildTimeSeconds / 3600.0
+        total_build_time_in_hours = build_request.count * design.buildTimeSeconds / 3600.0
         total_build_time_in_hours *= (100.0 / workers_per_build_request)
         log("total_build_time = %.2f hrs" % total_build_time_in_hours)
 
@@ -470,7 +471,7 @@ def _simulateStep(dt, now, star_pb, empire_key, log):
           continue
 
         # work out how many minerals we require for this turn
-        minerals_required = design.buildCostMinerals * progress_this_turn
+        minerals_required = build_request.count * design.buildCostMinerals * progress_this_turn
         log("mineral_required = %.2f, minerals_available = %.2f"
             % (minerals_required, total_minerals))
 
@@ -621,6 +622,7 @@ def build(empire_pb, colony_pb, request_pb):
   build_operation_model.startTime = datetime.now() + timedelta(seconds=10)
   build_operation_model.endTime = build_operation_model.startTime + timedelta(seconds=15)
   build_operation_model.progress = 0.0
+  build_operation_model.count = request_pb.count
   build_operation_model.put()
 
   # make sure we clear the cache so we get the latest version with the new build

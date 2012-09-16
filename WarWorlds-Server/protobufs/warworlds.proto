@@ -390,6 +390,9 @@ message BuildRequest
     // The name of the design you're trying to build
     required string design_name = 5;
 
+    // The number of things we're building in this single operation
+    optional int32 count = 9;
+
     // The date/time this build request started and the current predicted time of completion
     optional int64 start_time = 6;
     optional int64 end_time = 7;

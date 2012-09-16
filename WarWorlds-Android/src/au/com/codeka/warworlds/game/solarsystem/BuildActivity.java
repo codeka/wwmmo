@@ -485,7 +485,14 @@ public class BuildActivity extends TabFragmentActivity implements StarManager.St
 
                 icon.setImageBitmap(dm.getDesignIcon(design));
 
-                row1.setText(design.getDisplayName());
+                if (request.getCount() == 1) {
+                    row1.setText(design.getDisplayName());
+                } else {
+                    row1.setText(String.format("%s (× %d)",
+                                               design.getDisplayName(),
+                                               request.getCount()));
+                }
+
                 Duration remainingDuration = request.getRemainingTime();
                 if (remainingDuration.equals(Duration.ZERO)) {
                     row2.setText(String.format("%d %%, not enough resources to complete.",

@@ -18,6 +18,7 @@ public class BuildRequest {
     private DateTime mEndTime;
     private DateTime mStartTime;
     private float mProgress;
+    private int mCount;
 
     public BuildKind getBuildKind() {
         return mBuildKind;
@@ -30,6 +31,9 @@ public class BuildRequest {
     }
     public DateTime getEndTime() {
         return mEndTime;
+    }
+    public int getCount() {
+        return mCount;
     }
     public float getProgress() {
         return mProgress;
@@ -69,6 +73,7 @@ public class BuildRequest {
         request.mEndTime = new DateTime(pb.getEndTime() * 1000, DateTimeZone.UTC);
         request.mStartTime = new DateTime(pb.getStartTime() * 1000, DateTimeZone.UTC);
         request.mProgress = pb.getProgress();
+        request.mCount = pb.getCount();
         return request;
     }
 

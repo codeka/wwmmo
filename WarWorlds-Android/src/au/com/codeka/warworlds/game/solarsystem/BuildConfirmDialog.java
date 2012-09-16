@@ -8,13 +8,17 @@ import android.app.Dialog;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.text.Editable;
 import android.text.Html;
+import android.text.TextWatcher;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.SeekBar;
 import android.widget.TextView;
 import au.com.codeka.warworlds.DialogManager;
 import au.com.codeka.warworlds.R;
@@ -53,6 +57,49 @@ public class BuildConfirmDialog extends Dialog implements DialogManager.DialogCo
         params.width = LayoutParams.MATCH_PARENT;
         getWindow().setAttributes(params);
 
+        final SeekBar countSeekBar = (SeekBar) findViewById(R.id.build_count_seek);
+        final EditText countEdit = (EditText) findViewById(R.id.build_count_edit);
+
+        countSeekBar.setMax(99);
+        countSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+            }
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+            }
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                if (fromUser) {
+                    countEdit.setText(Integer.toString(progress + 1));
+                }
+            }
+        });
+
+        countEdit.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void afterTextChanged(Editable s) {
+                int count = Integer.parseInt(s.toString());
+                if (count <= 0) {
+                    count = 1;
+                    countEdit.setText("1");
+                }
+                if (count <= 100) {
+                    countSeekBar.setProgress(count - 1);
+                } else {
+                    countSeekBar.setProgress(99);
+                }
+            }
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                
+            }
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+            }
+            
+        });
+
         final Button okButton = (Button) findViewById(R.id.ok_btn);
         okButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -68,11 +115,13 @@ public class BuildConfirmDialog extends Dialog implements DialogManager.DialogCo
                             kind = warworlds.Warworlds.BuildRequest.BUILD_KIND.SHIP;
                         }
 
+                        int count = Integer.parseInt(countEdit.getText().toString());
                         warworlds.Warworlds.BuildRequest build = warworlds.Warworlds.BuildRequest.newBuilder()
                                 .setBuildKind(kind)
                                 .setColonyKey(mColony.getKey())
                                 .setEmpireKey(mColony.getEmpireKey())
                                 .setDesignName(mDesign.getID())
+                                .setCount(count)
                                 .build();
                         try {
                             build = ApiClient.postProtoBuf("buildqueue", build,
@@ -92,11 +141,11 @@ public class BuildConfirmDialog extends Dialog implements DialogManager.DialogCo
 
                         // tell the StarManager that this star has been updated
                         StarManager.getInstance().refreshStar(mColony.getStarKey());
-
-                        okButton.setEnabled(true);
-                        dismiss();
                     }
                 }.execute();
+
+                okButton.setEnabled(true);
+                dismiss();
             }
         });
     }
