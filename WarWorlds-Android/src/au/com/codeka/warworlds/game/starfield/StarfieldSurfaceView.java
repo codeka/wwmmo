@@ -698,7 +698,7 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
         // spot. Also, we'll draw the name of the empire, number of ships etc.
         ShipDesign design = ShipDesignManager.getInstance().getDesign(fleet.getDesignID());
         float distance = srcPoint.distanceTo(destPoint);
-        float totalTimeInHours = (float) design.getSpeedInParsecPerHour() / (distance / 10.0f);
+        float totalTimeInHours = (distance / 10.0f) / (float) design.getSpeedInParsecPerHour();
 
         DateTime startTime = fleet.getStateStartTime();
         DateTime now = DateTime.now(DateTimeZone.UTC);

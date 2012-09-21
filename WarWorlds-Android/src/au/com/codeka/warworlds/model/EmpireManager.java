@@ -141,7 +141,7 @@ public class EmpireManager {
                 }
 
                 List<EmpireFetchedHandler> inProgress = mInProgress.get(empireKey);
-                for (EmpireFetchedHandler handler : inProgress) {
+                if (inProgress != null) for (EmpireFetchedHandler handler : inProgress) {
                     handler.onEmpireFetched(empire);
                 }
                 mInProgress.remove(empireKey);

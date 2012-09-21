@@ -154,8 +154,8 @@ def collectTaxes(colony_key):
   empire_model = mdl.Empire.get(colony_pb.empire_key)
   empire_model.cash = empire_pb.cash
   empire_model.put() 
-  ctrl.clearCached({"empire:%s" % (colony_pb.empire_key),
-                    "empire:for-user:%s" % (empire_model.user.email())})
+  ctrl.clearCached(["empire:%s" % (colony_pb.empire_key),
+                    "empire:for-user:%s" % (empire_model.user.email())])
 
 
 def _log_noop(msg):
@@ -799,7 +799,9 @@ def _orderFleet_move(fleet_pb, order_pb):
   else:
     empire_mdl.cash -= fuel_cost
     empire_mdl.put()
-    ctrl.clearCached(["empire:%s" % (str(empire_mdl.key()))])
+    ctrl.clearCached(["empire:%s" % (str(empire_mdl.key())),
+                      "empire:for-user:%s" % (empire_mdl.user.email())])
+
 
   fleet_mdl.state = pb.Fleet.MOVING
   fleet_mdl.stateStartTime = datetime.now()
