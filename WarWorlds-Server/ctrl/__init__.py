@@ -162,8 +162,8 @@ def empirePresenceModelToPb(presence_pb, presence_model):
 
 def empirePresencePbToModel(presence_model, presence_pb):
   presence_model.empire = db.Key(presence_pb.empire_key)
-  presence_model.totalGoods = presence_pb.total_goods
-  presence_model.totalMinerals = presence_pb.total_minerals
+  presence_model.totalGoods = float(presence_pb.total_goods)
+  presence_model.totalMinerals = float(presence_pb.total_minerals)
 
 
 def planetModelToPb(planet_pb, planet_model):

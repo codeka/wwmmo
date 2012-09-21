@@ -352,6 +352,9 @@ def _simulateStep(dt, now, star_pb, empire_key, log):
     total_goods = empire.total_goods
     total_minerals = empire.total_minerals
 
+  max_goods = 500
+  max_minerals = 500
+
   if total_goods is None and total_minerals is None:
     # This means we didn't find their entry... add it now
     empire_pb = star_pb.empires.add()
@@ -390,6 +393,15 @@ def _simulateStep(dt, now, star_pb, empire_key, log):
     total_minerals += minerals * dt_in_hours
 
     total_population += colony_pb.population
+
+    for buildings_pb in star_pb.buildings:
+      if buildings_pb.colony_key == colony_pb.key:
+        design = BuildingDesign.getDesign(buildings_pb.design_name)
+        for storage_effect in design.getEffects("storage"):
+          log("storage effect, adding: %d goods %d minerals to max storage (%d goods, %d minerals)" %
+              (storage_effect.goods, storage_effect.minerals, max_goods, max_minerals))
+          max_goods += storage_effect.goods
+          max_minerals += storage_effect.minerals
 
   # A second loop though the colonies, once the goods/minerals have been calculated. This way,
   # goods minerals are shared between colonies
@@ -549,6 +561,11 @@ def _simulateStep(dt, now, star_pb, empire_key, log):
     log("population_increase: %.2f" % (population_increase))
 
     colony_pb.population += population_increase
+
+  if total_goods > max_goods:
+    total_goods = max_goods
+  if total_minerals > max_minerals:
+    total_minerals = max_minerals
 
   for empire in star_pb.empires:
     if empire_key != empire.empire_key:
@@ -825,8 +842,33 @@ class Design(object):
       return ShipDesign.getDesign(name)
 
 
+class BuildingEffect(object):
+  """A BuildingEffect add certain bonuses and whatnot to a star."""
+  def __init__(self, kind):
+    self.level = None
+    self.kind = kind
+
+
+class BuildingEffectStorage(BuildingEffect):
+  """A BuildingEffectStorage adjusts the star's total available storage for minerals and goods."""
+  def __init__(self, kind, effectXml):
+    super(BuildingEffectStorage, self).__init__(kind)
+    self.goods = int(effectXml.get("goods"))
+    self.minerals = int(effectXml.get("minerals"))
+
+
 class BuildingDesign(Design):
   _parsedDesigns = None
+
+  def __init__(self):
+    self.effects = []
+
+  def getEffects(self, kind=None, level=1):
+    """Gets the effects of the given kind, or an empty list if there's none."""
+    if not kind:
+      return self.effects
+    return (effect for effect in self.effects if (effect.kind == kind and
+                                                  (effect.level == level or effect.level is None)))
 
   @staticmethod
   def getDesigns():
@@ -899,6 +941,15 @@ def _parseBuildingDesign(designXml):
   design = BuildingDesign()
   logging.debug("Parsing building <design id=\"%s\">" % (designXml.get("id")))
   _parseDesign(designXml, design)
+  effectsXml = designXml.find("effects")
+  if effectsXml is not None:
+    for effectXml in effectsXml.iterfind("effect"):
+      level = int(effectXml.get("level"))
+      kind = effectXml.get("kind")
+      if kind == "storage":
+        effect = BuildingEffectStorage(kind, effectXml)
+      effect.level = level
+      design.effects.append(effect)
   return design
 
 

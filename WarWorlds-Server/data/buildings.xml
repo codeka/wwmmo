@@ -19,6 +19,13 @@
       can build as many as you like.</p>
     ]]></description>
     <cost credits="100" minerals="400" time="0.5" />
+    <effects>
+      <effect level="1" kind="storage" goods="100" minerals="100" />
+      <effect level="2" kind="storage" goods="200" minerals="200" />
+      <effect level="3" kind="storage" goods="300" minerals="300" />
+      <effect level="4" kind="storage" goods="400" minerals="400" />
+      <effect level="5" kind="storage" goods="500" minerals="500" />
+    </effects>
   </design>
   <design id="research">
     <name>Research Laboratory</name>
