@@ -27,32 +27,6 @@ class Empire(db.Model):
       return None
     return result[0]
 
-  def colonize(self, star_model, planet_index):
-    """Colonizes the given planet with a new colony."""
-
-    colony = Colony(parent=star_model)
-    colony.empire = self.key()
-    colony.planet_index = planet_index
-    colony.sector = sector_mdl.Star.sector.get_value_for_datastore(star_model)
-    colony.population = 100.0
-    colony.lastSimulation = datetime.now()
-    colony.focusPopulation = 0.25
-    colony.focusFarming = 0.25
-    colony.focusMining = 0.25
-    colony.focusConstruction = 0.25
-    colony.put()
-
-    def inc_colony_count():
-      sector_model = star_model.sector
-      if sector_model.numColonies is None:
-        sector_model.numColonies = 1
-      else:
-        sector_model.numColonies += 1
-      sector_model.put()
-
-    db.run_in_transaction(inc_colony_count)
-    return colony
-
 
 class Colony(db.Model):
   """Represents a colony on a planet. A colony is owned by a single Empire.

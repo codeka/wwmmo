@@ -303,6 +303,9 @@ message EmpirePresence
 
     optional float total_goods = 4;
     optional float total_minerals = 5;
+
+    optional float goods_delta_per_hour = 6;
+    optional float minerals_delta_per_hour = 7;
 }
 
 //

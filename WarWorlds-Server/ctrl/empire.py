@@ -582,6 +582,10 @@ def _simulateStep(dt, now, star_pb, empire_key, log):
 def colonize(empire_pb, star_key, colonize_request):
   """Colonizes the planet given in the colonize_request.
 
+  You can't colonize a planet until there's a colony ship that belongs to your empire around
+  this star. We'll check for that and return an error if there's no ship. If there is a ship,
+  then that ship will be "destroyed" when the colony is created.
+
   Args:
     empire_pb: The empire protobuf
     star_key: The key of the star you're going to colonize
@@ -592,22 +596,67 @@ def colonize(empire_pb, star_key, colonize_request):
   logging.info("Colonizing: Star=%s Planet=%d" % (star_key,
                                                   colonize_request.planet_index))
 
-  star_model = sector_mdl.Star.get(star_key)
-  if star_model is None:
+  star_pb = sector.getStar(star_key)
+  if star_pb is None:
     logging.warn("Could not find star with key: %s" % star_key)
     return None
 
-  if len(star_model.planets) < colonize_request.planet_index:
+  if len(star_pb.planets) < colonize_request.planet_index:
     logging.warn("colonize_request's planet_index was out of bounds")
     return None
 
+  # find a colony ship we can destroy
+  colony_ship_fleet_pb = None
+  for fleet_pb in star_pb.fleets:
+    if fleet_pb.empire_key != empire_pb.key:
+      continue
+    if fleet_pb.design_name == "colonyship": # TODO: hard-coded??
+      colony_ship_fleet_pb = fleet_pb
+      break
+
+  if not colony_ship_fleet_pb:
+    logging.warn("colonize_request impossible because there's no colony ship")
+    return None
+
+  def destroy_ship(fleet_key):
+    fleet_model = mdl.Fleet.get(fleet_key)
+    fleet_model.numShips -= 1
+    if fleet_model.numShips == 0:
+      fleet_model.delete()
+    else:
+      fleet_model.put()
+  db.run_in_transaction(destroy_ship, colony_ship_fleet_pb.key)
+
+  sector_key = sector_mdl.SectorManager.getSectorKey(star_pb.sector_x, star_pb.sector_y)
   empire_model = mdl.Empire.get(empire_pb.key)
-  colony_model = empire_model.colonize(star_model, colonize_request.planet_index)
+
+  colony_model = mdl.Colony(parent=db.Key(star_pb.key))
+  colony_model.empire = empire_model.key()
+  colony_model.planet_index = colonize_request.planet_index
+  colony_model.sector = sector_key
+  colony_model.population = 100.0
+  colony_model.lastSimulation = datetime.now()
+  colony_model.focusPopulation = 0.25
+  colony_model.focusFarming = 0.25
+  colony_model.focusMining = 0.25
+  colony_model.focusConstruction = 0.25
+  colony_model.put()
+
+  def inc_colony_count():
+    sector_model = sector_mdl.Sector.get(sector_key)
+    if sector_model.numColonies is None:
+      sector_model.numColonies = 1
+    else:
+      sector_model.numColonies += 1
+    sector_model.put()
+  db.run_in_transaction(inc_colony_count)
 
   # clear the cache of the various bits and pieces who are now invalid
-  keys = ["sector:%d,%d" % (star_model.sector.x, star_model.sector.y),
-          "star:%s" % (star_model.key()),
-          "colony:for-empire:%s" % (empire_model.key())]
+  keys = ["sector:%d,%d" % (star_pb.sector_x, star_pb.sector_y),
+          "star:%s" % (star_pb.key),
+          "colony:for-empire:%s" % (empire_model.key()),
+          "fleet:for-empire:%s" % (empire_pb.key),
+          "fleet:%s" % (colony_ship_fleet_pb.key)]
   ctrl.clearCached(keys)
 
   colony_pb = pb.Colony()

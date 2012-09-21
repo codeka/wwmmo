@@ -4,7 +4,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -22,6 +24,7 @@ import au.com.codeka.warworlds.model.Colony;
 import au.com.codeka.warworlds.model.Empire;
 import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.EmpirePresence;
+import au.com.codeka.warworlds.model.Fleet;
 import au.com.codeka.warworlds.model.MyEmpire;
 import au.com.codeka.warworlds.model.Planet;
 import au.com.codeka.warworlds.model.Star;
@@ -365,7 +368,28 @@ public class SolarSystemActivity extends Activity implements StarManager.StarFet
             return;
         }
 
-        EmpireManager.getInstance().getEmpire().colonize(planet, new MyEmpire.ColonizeCompleteHandler() {
+        MyEmpire empire = EmpireManager.getInstance().getEmpire();
+
+        // check that we have a colony ship (the server will check too, but this is easy)
+        boolean hasColonyShip = false;
+        for (Fleet fleet : mStar.getFleets()) {
+            if (fleet.getEmpireKey().equals(empire.getKey())) {
+                if (fleet.getDesignID().equals("colonyship")) { // TODO: hardcoded?
+                    hasColonyShip = true;
+                }
+            }
+        }
+
+        if (!hasColonyShip) {
+            // TODO: better errors...
+            AlertDialog dialog = new AlertDialog.Builder(this)
+                .setMessage("You don't have a colony ship around this star, so you cannot colonize this planet.")
+                .setPositiveButton("OK", null)
+                .create();
+            dialog.show();
+        }
+
+        empire.colonize(planet, new MyEmpire.ColonizeCompleteHandler() {
             @Override
             public void onColonizeComplete(Colony colony) {
                 // remember that the sector we're in has now been updated so we can pass that
