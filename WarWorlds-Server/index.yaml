@@ -12,5 +12,10 @@ indexes:
 
 - kind: Sector
   properties:
+  - name: numColonies
+  - name: distanceToCentre
+
+- kind: Sector
+  properties:
   - name: x
   - name: y

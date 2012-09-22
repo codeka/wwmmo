@@ -29,6 +29,9 @@
       top: 0; bottom: 0;
     }
 
+    form input[type=text]#create-empire-name {
+      right: 100pt;
+    }
   </style>
 {% endblock %}
 
@@ -46,13 +49,18 @@
     <input type="text" id="search-id" />
     <input type="submit" value="Search" />
   </form>
+  <form id="create-empire">
+    <label for="create-empire-name">Name:</label>
+    <input type="text" id="create-empire-name" />
+    <input type="submit" value="Create Empire" />
+  </form>
   <textarea id="search-results"></textarea>
   <script>
-    $("#find-byemail, #find-byid").on("click", "input[type=submit]", function(evnt) {
+    $("#find-byemail, #find-byid").on("submit", function(evnt) {
       evnt.preventDefault();
 
       var url = "";
-      var inp = $(this).parents("form").find("input[type=text]")
+      var inp = $(this).find("input[type=text]")
       if (inp.is("#search-email")) {
         url = "/api/v1/empires?email="+inp.val();
       } else {
@@ -65,8 +73,32 @@
         success: function (data) {
           $("#search-results").val(JSON.stringify(data, null, "  "));
         },
-        error: function(data) {
-          alert("An error occured, check server logs.");
+        error: function(xhr, status, err) {
+          if (xhr.status == 404) {
+            $("#search-results").val("No empire!");
+          } else {
+            alert("An error occured, check server logs: " + xhr.status);
+          }
+        }
+      });
+    });
+
+    $("#create-empire").on("submit", function(evnt) {
+      evnt.preventDefault();
+
+      var url = "/api/v1/empires";
+
+      $.ajax({
+        url: url,
+        type: "PUT",
+        contentType: "application/json",
+        data: JSON.stringify({display_name: $(this).find("input[type=text]").val(),
+                              state: 1}),
+        success: function (data) {
+          $("#search-results").val(JSON.stringify(data, null, "  "));
+        },
+        error: function(xhr, status, err) {
+          alert("An error occured, check server logs: " + xhr.status);
         }
       });
     });

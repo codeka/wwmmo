@@ -61,6 +61,7 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
     private Map<String, List<VisibleEntityAttachedOverlay>> mFleetAttachedOverlays;
     private Map<String, Empire> mVisibleEmpires;
     private ArrayList<VisibleEntity> mVisibleEntities;
+    private boolean mScrollToCentre = false;
 
     private Bitmap mFleetMultiBitmap;
     private Matrix mMatrix;
@@ -226,10 +227,26 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
      * Scroll to the given sector (x,y) and offset into the sector.
      */
     public void scrollTo(long sectorX, long sectorY, float offsetX, float offsetY) {
+        scrollTo(sectorX, sectorY, offsetX, offsetY, false);
+    }
+
+    /**
+     * Scroll to the given sector (x,y) and offset into the sector.
+     */
+    public void scrollTo(long sectorX, long sectorY, float offsetX, float offsetY, boolean centre) {
         mSectorX = sectorX;
         mSectorY = sectorY;
         mOffsetX = -offsetX;
         mOffsetY = -offsetY;
+
+        if (centre) {
+            if (mBuffer != null) {
+                mOffsetX += mBuffer.getWidth() / 2.0f / getPixelScale();
+                mOffsetY += mBuffer.getHeight() / 2.0f / getPixelScale();
+            } else {
+                mScrollToCentre = true;
+            }
+        }
 
         List<Pair<Long, Long>> missingSectors = new ArrayList<Pair<Long, Long>>();
 
@@ -413,6 +430,12 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
     private void drawScene() {
         long startTime = System.nanoTime();
         Canvas canvas = new Canvas(mBuffer);
+
+        if (mScrollToCentre) {
+            mOffsetX += mBuffer.getWidth() / 2.0f / getPixelScale();
+            mOffsetY += mBuffer.getHeight() / 2.0f / getPixelScale();
+            mScrollToCentre = false;
+        }
 
         SectorManager sm = SectorManager.getInstance();
         canvas.drawColor(Color.BLACK);

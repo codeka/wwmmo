@@ -1,6 +1,9 @@
 
 package au.com.codeka.warworlds;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,10 +30,13 @@ import au.com.codeka.warworlds.game.starfield.StarfieldActivity;
 import au.com.codeka.warworlds.model.BuildQueueManager;
 import au.com.codeka.warworlds.model.BuildingDesignManager;
 import au.com.codeka.warworlds.model.ChatManager;
+import au.com.codeka.warworlds.model.Colony;
 import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.MyEmpire;
 import au.com.codeka.warworlds.model.ShipDesignManager;
 import au.com.codeka.warworlds.model.SpriteManager;
+import au.com.codeka.warworlds.model.Star;
+import au.com.codeka.warworlds.model.StarManager;
 
 /**
  * Main activity. Displays the message of the day and lets you select "Start Game", "Options", etc.
@@ -42,6 +48,7 @@ public class WarWorldsActivity extends Activity {
     private TextView mConnectionStatus;
     private Handler mHandler;
     private boolean mNeedHello;
+    private List<Colony> mColonies;
 
     private static final int OPTIONS_DIALOG = 1000;
 
@@ -170,6 +177,11 @@ public class WarWorldsActivity extends Activity {
 
                     ChatManager.getInstance().setup(hello.getChannelToken());
 
+                    mColonies = new ArrayList<Colony>();
+                    for (warworlds.Warworlds.Colony c : hello.getColoniesList()) {
+                        mColonies.add(Colony.fromProtocolBuffer(c));
+                    }
+
                     message = hello.getMotd().getMessage();
                     mErrorOccured = false;
                 } catch(ApiException e) {
@@ -241,7 +253,32 @@ public class WarWorldsActivity extends Activity {
 
         mStartGameButton.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
-                startActivity(new Intent(mContext, StarfieldActivity.class));
+                // we'll want to start off near one of your stars. If you only have one, that's
+                // easy -- but if you've got lots what then? (TODO)
+                String starKey = null;
+                for (Colony c : mColonies) {
+                    starKey = c.getStarKey();
+                }
+
+                final Intent intent = new Intent(mContext, StarfieldActivity.class);
+                intent.putExtra("au.com.codeka.warworlds.StarKey", starKey);
+
+                if (starKey != null) {
+                    mStartGameButton.setEnabled(false);
+                    StarManager.getInstance().requestStar(starKey, false,
+                            new StarManager.StarFetchedHandler() {
+                        @Override
+                        public void onStarFetched(Star s) {
+                            mStartGameButton.setEnabled(true);
+
+                            // we don't do anything with the star, we just want to make sure it's
+                            // in the cache before we start the activity.
+                            startActivity(intent);
+                        }
+                    });
+                } else {
+                    startActivity(intent);
+                }
             }
         });
     }

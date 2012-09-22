@@ -176,7 +176,6 @@ class EmpiresPage(ApiPage):
       return
 
     empire_pb.email = self.user.email()
-
     empire.createEmpire(empire_pb)
 
 

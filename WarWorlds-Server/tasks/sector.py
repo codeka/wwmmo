@@ -10,6 +10,9 @@ from google.appengine.api import taskqueue
 from google.appengine.ext import db
 import webapp2 as webapp
 
+import import_fixer
+import_fixer.FixImports("google", "protobuf")
+
 from model import sector as mdl
 from model import namegen
 import protobufs.warworlds_pb2 as pb
@@ -160,6 +163,7 @@ class SectorGenerator:
       sector.x = self.x
       sector.y = self.y
       sector.numColonies = 0
+      sector.distanceToCentre = math.sqrt((self.x * self.x) + (self.y * self.y))
       sector.stars = []
       sector.put()
       return sector

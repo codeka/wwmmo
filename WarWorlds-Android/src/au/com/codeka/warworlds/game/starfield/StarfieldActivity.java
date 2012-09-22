@@ -108,6 +108,22 @@ public class StarfieldActivity extends Activity {
             }
         });
 
+        Bundle extras = this.getIntent().getExtras();
+        if (extras != null) {
+            String starKey = extras.getString("au.com.codeka.warworlds.StarKey");
+            if (starKey != null) {
+                StarManager.getInstance().requestStar(starKey, false,
+                        new StarManager.StarFetchedHandler() {
+                    @Override
+                    public void onStarFetched(Star s) {
+                        mStarfield.scrollTo(s.getSectorX(), s.getSectorY(),
+                                            s.getOffsetX(), s.getOffsetY(),
+                                            true);
+                    }
+                });
+            }
+        }
+
         mPlanetListAdapter = new PlanetListAdapter();
         mPlanetList.setAdapter(mPlanetListAdapter);
 

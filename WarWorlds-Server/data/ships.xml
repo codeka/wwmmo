@@ -21,7 +21,7 @@
       and out of enemy starsystems and reporting back what they found.</p>
     ]]></description>
     <cost minerals="50" time="0.1667" />
-    <fuel costPerParsec="13" />
+    <fuel costPerParsec="7.5" />
     <stats speed="17" />
   </design>
 </designs>

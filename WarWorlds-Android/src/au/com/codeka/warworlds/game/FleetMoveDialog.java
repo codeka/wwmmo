@@ -217,7 +217,7 @@ public class FleetMoveDialog extends Dialog implements DialogManager.DialogConfi
                 offsetX = offsetX - (int) ((mStarfield.getWidth() / 2) / mStarfield.getPixelScale());
                 offsetY = offsetY -  (int) ((mStarfield.getHeight() / 2) / mStarfield.getPixelScale());
 
-                mStarfield.scrollTo(sectorX, sectorY, offsetX, offsetY);
+                mStarfield.scrollTo(sectorX, sectorY, offsetX, offsetY, true);
                 mStarfield.addOverlay(mSourceStarOverlay, s);
             }
         });

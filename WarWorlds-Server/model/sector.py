@@ -82,6 +82,7 @@ class Sector(db.Model):
   x = db.IntegerProperty()
   y = db.IntegerProperty()
   numColonies = db.IntegerProperty()
+  distanceToCentre = db.FloatProperty()
 
 
 class Star(db.Model):

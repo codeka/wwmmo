@@ -4,7 +4,9 @@
 import copy
 from datetime import datetime, timedelta
 import logging
+import math
 import os
+import random
 from xml.etree import ElementTree as ET
 
 from google.appengine.ext import db
@@ -48,8 +50,111 @@ def getEmpire(empire_key):
 
 def createEmpire(empire_pb):
   empire_model = mdl.Empire()
+  empire_model.cash = 500.0
   ctrl.empirePbToModel(empire_model, empire_pb)
   empire_model.put()
+
+  # We need to set you up with some initial bits and pieces. First, we need to find
+  # sector for your colony. We look for one with no existing colonized stars and
+  # close to the centre of the universe. We chose a random one of the five closest
+  query = sector_mdl.Sector.all().filter("numColonies =", 0).order("distanceToCentre").fetch(5)
+  index = random.randint(0, 4)
+  sector_model = None
+  for s in query:
+    if index == 0:
+      sector_model = s
+      break
+    index -= 1
+
+  if not sector_model:
+    # this would happen if there's no sectors loaded that have no colonies... that's bad!!
+    logging.error("Could not find any sectors for new empire [%s]" % (str(empire_model.key())))
+    return
+
+  # Now find a star within that sector. We'll want one with two terran planets with highish
+  # population stats, close to the centre of the sector. We'll score each of the stars based on
+  # these factors and then choose the one with the highest score
+  starScores = []
+  for star_model in sector_mdl.Star.all().filter("sector", sector_model):
+    centre = sector.SECTOR_SIZE / 2
+    distance_to_centre = math.sqrt((star_model.x - centre) * (star_model.x - centre) +
+                                   (star_model.y - centre) * (star_model.y - centre))
+
+    # 0 -- 10 (0 is edge of sector, 10 is centre of sector)
+    distance_score = (centre - distance_to_centre) / (centre / 10)
+
+    num_terran_planets = 0
+    population_congeniality = 0
+    farming_congeniality = 0
+    mining_congeniality = 0
+    for planet in star_model.planets:
+      if planet.planet_type == pb.Planet.TERRAN:
+        num_terran_planets += 1
+        population_congeniality += planet.population_congeniality
+        farming_congeniality += planet.farming_congeniality
+        mining_congeniality += planet.mining_congeniality
+
+    planet_score = 0
+    if num_terran_planets >= 2:
+      planet_score = num_terran_planets
+
+    # if there's no terran planets at all, just ignore this star
+    if num_terran_planets == 0:
+      continue
+
+    # the average of the congenialities / 100 (should make it approximately 0..10)
+    congeniality_score = (population_congeniality / num_terran_planets +
+                          farming_congeniality / num_terran_planets +
+                          mining_congeniality / num_terran_planets)
+    congeniality_score /= 100
+
+    score = distance_score * planet_score * congeniality_score
+    starScores.append((score, star_model))
+
+  # just choose the star with the highest score
+  (score, star_model) = sorted(starScores, reverse=True)[0]
+
+  # next, choose the planet on this star with the highest population congeniality, that'll
+  # be the one we start out on
+  max_population_congeniality = 0
+  planet_index = 0
+  for index,planet in enumerate(star_model.planets):
+    if planet.planet_type == pb.Planet.TERRAN:
+      if planet.population_congeniality > max_population_congeniality:
+        planet_index = index + 1
+        max_population_congeniality = planet.population_congeniality
+
+  # colonize the planet!
+  star_pb = sector.getStar(str(star_model.key()))
+  _colonize(sector_model.key(), empire_model, star_pb, planet_index)
+
+  # add some initial goods and minerals to the colony
+  simulate(star_pb)
+  for empire_presence_pb in star_pb.empires:
+    if empire_presence_pb.empire_key == str(empire_model.key()):
+      empire_presence_pb.total_goods += 100
+      empire_presence_pb.total_minerals += 100
+  updateAfterSimulate(star_pb)
+
+  # give them a colony ship and a couple of scouts for free
+  fleet_model = mdl.Fleet(parent=star_model)
+  fleet_model.empire = empire_model
+  fleet_model.sector = sector_model
+  fleet_model.designName = "colonyship"
+  fleet_model.numShips = 1
+  fleet_model.state = pb.Fleet.IDLE
+  fleet_model.stateStartTime = datetime.now()
+  fleet_model.put()
+
+  fleet_model = mdl.Fleet(parent=star_model)
+  fleet_model.empire = empire_model
+  fleet_model.sector = sector_model
+  fleet_model.designName = "scout"
+  fleet_model.numShips = 10
+  fleet_model.state = pb.Fleet.IDLE
+  fleet_model.stateStartTime = datetime.now()
+  fleet_model.put()
+
 
 
 def getColoniesForEmpire(empire_pb):
@@ -552,7 +657,10 @@ def _simulateStep(dt, now, star_pb, empire_key, log):
 
     # if we're increasing population, it slows down the closer you get to the population
     # congeniality. If population is decreasing, it slows down the FURTHER you get.
-    congeniality_factor = colony_pb.population / planet_pb.population_congeniality
+    if planet_pb.population_congeniality < 10:
+      congeniality_factor = colony_pb.population / 10.0
+    else:
+      congeniality_factor = colony_pb.population / planet_pb.population_congeniality
     if population_increase >= 0.0:
       congeniality_factor = 1.0 - congeniality_factor
     population_increase *= congeniality_factor
@@ -577,6 +685,37 @@ def _simulateStep(dt, now, star_pb, empire_key, log):
        "delta minerals=%.2f, population=%.2f")
        % (empire_key, dt_in_hours, total_goods, total_minerals, total_population))
   log('')
+
+
+def _colonize(sector_key, empire_model, star_pb, planet_index):
+  colony_model = mdl.Colony(parent=db.Key(star_pb.key))
+  colony_model.empire = empire_model.key()
+  colony_model.planet_index = planet_index
+  colony_model.sector = sector_key
+  colony_model.population = 100.0
+  colony_model.lastSimulation = datetime.now()
+  colony_model.focusPopulation = 0.25
+  colony_model.focusFarming = 0.25
+  colony_model.focusMining = 0.25
+  colony_model.focusConstruction = 0.25
+  colony_model.put()
+
+  def inc_colony_count():
+    sector_model = sector_mdl.Sector.get(sector_key)
+    if sector_model.numColonies is None:
+      sector_model.numColonies = 1
+    else:
+      sector_model.numColonies += 1
+    sector_model.put()
+  db.run_in_transaction(inc_colony_count)
+
+  # clear the cache of the various bits and pieces who are now invalid
+  keys = ["sector:%d,%d" % (star_pb.sector_x, star_pb.sector_y),
+          "star:%s" % (star_pb.key),
+          "colony:for-empire:%s" % (empire_model.key())]
+  ctrl.clearCached(keys)
+
+  return colony_model
 
 
 def colonize(empire_pb, star_key, colonize_request):
@@ -626,38 +765,14 @@ def colonize(empire_pb, star_key, colonize_request):
     else:
       fleet_model.put()
   db.run_in_transaction(destroy_ship, colony_ship_fleet_pb.key)
+  keys = ["fleet:for-empire:%s" % (empire_pb.key),
+          "fleet:%s" % (colony_ship_fleet_pb.key)]
+  ctrl.clearCached(keys)
 
   sector_key = sector_mdl.SectorManager.getSectorKey(star_pb.sector_x, star_pb.sector_y)
   empire_model = mdl.Empire.get(empire_pb.key)
 
-  colony_model = mdl.Colony(parent=db.Key(star_pb.key))
-  colony_model.empire = empire_model.key()
-  colony_model.planet_index = colonize_request.planet_index
-  colony_model.sector = sector_key
-  colony_model.population = 100.0
-  colony_model.lastSimulation = datetime.now()
-  colony_model.focusPopulation = 0.25
-  colony_model.focusFarming = 0.25
-  colony_model.focusMining = 0.25
-  colony_model.focusConstruction = 0.25
-  colony_model.put()
-
-  def inc_colony_count():
-    sector_model = sector_mdl.Sector.get(sector_key)
-    if sector_model.numColonies is None:
-      sector_model.numColonies = 1
-    else:
-      sector_model.numColonies += 1
-    sector_model.put()
-  db.run_in_transaction(inc_colony_count)
-
-  # clear the cache of the various bits and pieces who are now invalid
-  keys = ["sector:%d,%d" % (star_pb.sector_x, star_pb.sector_y),
-          "star:%s" % (star_pb.key),
-          "colony:for-empire:%s" % (empire_model.key()),
-          "fleet:for-empire:%s" % (empire_pb.key),
-          "fleet:%s" % (colony_ship_fleet_pb.key)]
-  ctrl.clearCached(keys)
+  colony_model = _colonize(sector_key, empire_model, star_pb, colonize_request.planet_index)
 
   colony_pb = pb.Colony()
   ctrl.colonyModelToPb(colony_pb, colony_model)
