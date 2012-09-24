@@ -6,7 +6,9 @@
     <description><![CDATA[
       <p>The colony ship is what you'll need to colonize remote planets. They'll carry 100 of
       your colony's population to a brave new world.</p>
-      <p>Colony ships are single-use. The ship is destroyed once a planet is colonized.</p>
+      <p>Colony ships are single-use. The ship is destroyed once a planet is colonized. <i>Be
+      aware that once your ship is built, 100 population will be removed from your colony and
+      added to the ship!</i></p>
     ]]></description>
     <cost minerals="1000" time="4.0" />
     <fuel costPerParsec="120" />
