@@ -26,4 +26,16 @@
     <fuel costPerParsec="7.5" />
     <stats speed="17" />
   </design>
+  <design id="fighter">
+    <name>Fighter</name>
+    <sprite>ship.fighter</sprite>
+    <description><![CDATA[
+      <p>Your basic fighter has average speed, low-grade weapons and low-grade shields. They
+      make up for a general lack of firepower by being incredibly cheap to produce and
+      fuel-efficient, allowing you to overwhealm your enemy with numbers.</p>
+    ]]></description>
+    <cost minerals="45" time="0.15" />
+    <fuel costPerParsec="2.5" />
+    <stats speed="10" />
+  </design>
 </designs>

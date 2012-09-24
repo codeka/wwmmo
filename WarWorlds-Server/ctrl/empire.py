@@ -471,6 +471,9 @@ def _simulateStep(dt, now, star_pb, empire_key, log):
 
   dt_in_hours = dt.total_seconds() / 3600.0
 
+  goods_delta_per_hour = 0
+  minerals_delta_per_hour = 0
+
   for n,colony_pb in enumerate(star_pb.colonies):
     log("--- Colony[%d]: pop=%.0f focus=(pop: %.2f, farm: %.2f, mine: %.2f, cons: %.2f)" % (
          n, colony_pb.population,
@@ -490,12 +493,14 @@ def _simulateStep(dt, now, star_pb, empire_key, log):
     colony_pb.delta_goods = goods
     log("goods: %.2f" % (goods * dt_in_hours))
     total_goods += goods * dt_in_hours
+    goods_delta_per_hour += goods
 
     # calculate the output from mining this turn and add it to the star global
     minerals = colony_pb.population*colony_pb.focus_mining * (planet_pb.mining_congeniality/100.0)
     colony_pb.delta_minerals = minerals
     log("minerals: %.2f" % (minerals * dt_in_hours))
     total_minerals += minerals * dt_in_hours
+    minerals_delta_per_hour += minerals
 
     total_population += colony_pb.population
 
@@ -600,6 +605,7 @@ def _simulateStep(dt, now, star_pb, empire_key, log):
           # removing the minerals we need from the global pool...
           total_minerals -= minerals_required
           build_request.progress += progress_this_turn
+          minerals_delta_per_hour -= minerals_required / dt_in_hours
 
         # adjust the end_time for this turn
         time_remaining_in_hours = (1.0 - build_request.progress) * total_build_time_in_hours
@@ -624,6 +630,7 @@ def _simulateStep(dt, now, star_pb, empire_key, log):
   # between all of the colonies.
   total_goods_per_hour = total_population / 10.0
   total_goods_required = total_goods_per_hour * dt_in_hours
+  goods_delta_per_hour -= total_goods_per_hour
   log("total_goods_required: %.4f, goods_available: %.4f" % (total_goods_required, total_goods))
 
   # If we have more than total_goods_required stored, then we're cool. Otherwise, our population
@@ -680,10 +687,13 @@ def _simulateStep(dt, now, star_pb, empire_key, log):
       continue
     empire.total_goods = total_goods
     empire.total_minerals = total_minerals
+    empire.goods_delta_per_hour = goods_delta_per_hour
+    empire.minerals_delta_per_hour = minerals_delta_per_hour
 
-  log(("simulation step: empire=%s dt=%.2f (hrs), delta goods=%.2f, "
-       "delta minerals=%.2f, population=%.2f")
-       % (empire_key, dt_in_hours, total_goods, total_minerals, total_population))
+  log(("simulation step: empire=%s dt=%.2f (hrs), goods=%.2f (%.4f / hr), "
+       "minerals=%.2f (%.4f / hr), population=%.2f")
+       % (empire_key, dt_in_hours, total_goods, goods_delta_per_hour,
+          total_minerals, minerals_delta_per_hour, total_population))
   log('')
 
 
@@ -800,7 +810,7 @@ def build(empire_pb, colony_pb, request_pb):
   build_operation_model.empire = db.Key(empire_pb.key)
   build_operation_model.designName = request_pb.design_name
   build_operation_model.designKind = request_pb.build_kind
-  build_operation_model.startTime = datetime.now() + timedelta(seconds=10)
+  build_operation_model.startTime = datetime.now() - timedelta(seconds=5)
   build_operation_model.endTime = build_operation_model.startTime + timedelta(seconds=15)
   build_operation_model.progress = 0.0
   build_operation_model.count = request_pb.count

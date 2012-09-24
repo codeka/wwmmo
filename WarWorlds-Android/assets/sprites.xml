@@ -2,7 +2,11 @@
 <sprites>
   <sheet filename="spritesheets/newsh$.shp.000000.png">
     <sprite name="ship.scout">
-      <rect location="49,167" size="22x28" />
+      <rect location="49,168" size="22x28" />
+      <direction>0,1</direction>
+    </sprite>
+    <sprite name="ship.fighter">
+      <rect location="50,3" size="21x25" />
       <direction>0,1</direction>
     </sprite>
   </sheet>

@@ -60,6 +60,7 @@ public class BuildConfirmDialog extends Dialog implements DialogManager.DialogCo
         final SeekBar countSeekBar = (SeekBar) findViewById(R.id.build_count_seek);
         final EditText countEdit = (EditText) findViewById(R.id.build_count_edit);
 
+        countEdit.setText("1");
         countSeekBar.setMax(99);
         countSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
@@ -79,7 +80,15 @@ public class BuildConfirmDialog extends Dialog implements DialogManager.DialogCo
         countEdit.addTextChangedListener(new TextWatcher() {
             @Override
             public void afterTextChanged(Editable s) {
-                int count = Integer.parseInt(s.toString());
+                if (s.toString().length() == 0) {
+                    return;
+                }
+                int count = 1;
+                try {
+                    count = Integer.parseInt(s.toString());
+                } catch (Exception e) {
+                    // ignore errors here
+                }
                 if (count <= 0) {
                     count = 1;
                     countEdit.setText("1");

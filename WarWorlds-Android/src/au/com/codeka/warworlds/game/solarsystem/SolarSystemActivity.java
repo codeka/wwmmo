@@ -7,6 +7,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
 import android.view.Window;
@@ -166,24 +167,45 @@ public class SolarSystemActivity extends Activity implements StarManager.StarFet
         }
 
         TextView storedGoodsTextView = (TextView) findViewById(R.id.stored_goods);
+        TextView deltaGoodsTextView = (TextView) findViewById(R.id.delta_goods);
         View storedGoodsIcon = findViewById(R.id.stored_goods_icon);
         TextView storedMineralsTextView = (TextView) findViewById(R.id.stored_minerals);
+        TextView deltaMineralsTextView = (TextView) findViewById(R.id.delta_minerals);
         View storedMineralsIcon = findViewById(R.id.stored_minerals_icon);
 
         EmpirePresence ep = star.getEmpire(EmpireManager.getInstance().getEmpire().getKey());
         if (ep == null) {
             storedGoodsTextView.setVisibility(View.GONE);
+            deltaGoodsTextView.setVisibility(View.GONE);
             storedGoodsIcon.setVisibility(View.GONE);
             storedMineralsTextView.setVisibility(View.GONE);
+            deltaMineralsTextView.setVisibility(View.GONE);
             storedMineralsIcon.setVisibility(View.GONE);
         } else {
             storedGoodsTextView.setVisibility(View.VISIBLE);
+            deltaGoodsTextView.setVisibility(View.VISIBLE);
             storedGoodsIcon.setVisibility(View.VISIBLE);
             storedMineralsTextView.setVisibility(View.VISIBLE);
+            deltaMineralsTextView.setVisibility(View.VISIBLE);
             storedMineralsIcon.setVisibility(View.VISIBLE);
 
             storedGoodsTextView.setText(Integer.toString((int) ep.getTotalGoods()));
             storedMineralsTextView.setText(Integer.toString((int) ep.getTotalMinerals()));
+
+            if (ep.getDeltaGoodsPerHour() >= 0) {
+                deltaGoodsTextView.setTextColor(Color.GREEN);
+                deltaGoodsTextView.setText(String.format("+%d/hr", (int) ep.getDeltaGoodsPerHour()));
+            } else {
+                deltaGoodsTextView.setTextColor(Color.RED);
+                deltaGoodsTextView.setText(String.format("%d/hr", (int) ep.getDeltaGoodsPerHour()));
+            }
+            if (ep.getDeltaMineralsPerHour() >= 0) {
+                deltaMineralsTextView.setTextColor(Color.GREEN);
+                deltaMineralsTextView.setText(String.format("+%d/hr", (int) ep.getDeltaMineralsPerHour()));
+            } else {
+                deltaMineralsTextView.setTextColor(Color.RED);
+                deltaMineralsTextView.setText(String.format("%d/hr", (int) ep.getDeltaMineralsPerHour()));
+            }
         }
 
         mStar = star;

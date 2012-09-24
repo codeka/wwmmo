@@ -340,8 +340,18 @@
         android:gravity="center|right"
         android:paddingLeft="10dp"
         android:paddingRight="10dp"
-        android:text="999"
         android:textAppearance="?android:attr/textAppearanceSmall" />
+
+    <TextView
+        android:id="@+id/delta_goods"
+        android:layout_width="wrap_content"
+        android:layout_height="12dp"
+        android:layout_alignRight="@+id/stored_goods"
+        android:layout_below="@+id/stored_goods"
+        android:background="#000"
+        android:gravity="center|right"
+        android:textColor="#f00"
+        android:textSize="10dp" />
 
     <ImageView
         android:id="@+id/stored_goods_icon"
@@ -362,8 +372,18 @@
         android:gravity="center|right"
         android:paddingLeft="10dp"
         android:paddingRight="10dp"
-        android:text="999"
         android:textAppearance="?android:attr/textAppearanceSmall" />
+
+    <TextView
+        android:id="@+id/delta_minerals"
+        android:layout_width="wrap_content"
+        android:layout_height="12dp"
+        android:layout_alignRight="@+id/stored_minerals"
+        android:layout_below="@+id/stored_minerals"
+        android:background="#000"
+        android:gravity="center|right"
+        android:textColor="#0f0"
+        android:textSize="10dp" />
 
     <ImageView
         android:id="@+id/stored_minerals_icon"
