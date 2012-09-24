@@ -106,6 +106,17 @@ class BuildCheckPage(tasks.TaskPage):
           model.put()
         design = ctl.ShipDesign.getDesign(model.designName)
 
+        # if you've built a colony ship, we need to decrease the colony population by
+        # 100 (basically, those 100 people go into the colony ship, to be transported to
+        # the destination colony).
+        if build_request_model.designName.designName == "colonyship": # TODO: hard-coded OK?
+          star_pb = sector_ctl.getStar(star_key)
+          ctl.simulate(star_pb, empire_key)
+          for colony_pb in star_pb.colonies:
+            if colony_pb.key == colony_key:
+              colony_pb.population -= 100
+          ctl.updateAfterSimulate(star_pb, empire_key)
+
       # Send a notification to the player that construction of their building is complete
       msg = "Your %d %s(s) on %s has been built." % (build_request_model.count,
                                                      design.name,
