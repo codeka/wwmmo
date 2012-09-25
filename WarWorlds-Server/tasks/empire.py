@@ -6,6 +6,9 @@ import os
 
 from google.appengine.ext import db
 
+import import_fixer
+import_fixer.FixImports("google", "protobuf")
+
 import webapp2 as webapp
 
 import ctrl
@@ -109,7 +112,7 @@ class BuildCheckPage(tasks.TaskPage):
         # if you've built a colony ship, we need to decrease the colony population by
         # 100 (basically, those 100 people go into the colony ship, to be transported to
         # the destination colony).
-        if build_request_model.designName.designName == "colonyship": # TODO: hard-coded OK?
+        if build_request_model.designName == "colonyship": # TODO: hard-coded OK?
           star_pb = sector_ctl.getStar(star_key)
           ctl.simulate(star_pb, empire_key)
           for colony_pb in star_pb.colonies:

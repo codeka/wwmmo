@@ -7,6 +7,9 @@ from google.appengine.api import channel
 from google.appengine.api import users
 from google.appengine.ext.db.metadata import Kind
 
+import import_fixer
+import_fixer.FixImports("google", "protobuf")
+
 import jinja2
 import webapp2 as webapp
 from mapreduce import control

@@ -329,7 +329,7 @@ def updateAfterSimulate(star_pb, empire_key=None, log=_log_noop):
   ctrl.clearCached(keys_to_clear)
 
 
-def simulate(star_pb, empire_key=None, log=_log_noop):
+def simulate(star_pb, empire_key=None,  log=_log_noop):
   """Simulates the star and gets all of the colonies up to date.
 
   When simulating a star, we simulate all colonies in that star that belong to the given empire
@@ -402,7 +402,8 @@ def simulate(star_pb, empire_key=None, log=_log_noop):
         log("---- Prediction phase beginning")
         log("")
 
-        prediction_star_pb = copy.deepcopy(star_pb)
+        prediction_star_pb = pb.Star()
+        prediction_star_pb.ParseFromString(star_pb.SerializeToString())
         dt = timedelta(minutes=15) - dt
 
       _simulateStep(dt, start_time, prediction_star_pb, empire_key, log)
