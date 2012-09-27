@@ -13,6 +13,7 @@ import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.ctrl.FleetList;
 import au.com.codeka.warworlds.game.FleetMoveDialog;
 import au.com.codeka.warworlds.game.FleetSplitDialog;
+import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.Fleet;
 import au.com.codeka.warworlds.model.Star;
 import au.com.codeka.warworlds.model.StarManager;
@@ -65,6 +66,13 @@ public class FleetDialog extends Dialog implements DialogManager.DialogConfigura
                 Bundle args = new Bundle();
                 args.putParcelable("au.com.codeka.warworlds.Fleet", fleet);
                 DialogManager.getInstance().show(activity, FleetMoveDialog.class, args);
+            }
+
+            @Override
+            public void onFleetStanceModified(Star star, Fleet fleet, Fleet.Stance newStance) {
+                EmpireManager.getInstance().getEmpire().updateFleetStance(star,
+                                                                          fleet,
+                                                                          newStance);
             }
         });
     }

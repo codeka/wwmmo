@@ -3,23 +3,30 @@ package au.com.codeka.warworlds.ctrl;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
+
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.Spinner;
+import android.widget.SpinnerAdapter;
 import android.widget.TextView;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.model.Fleet;
@@ -30,12 +37,13 @@ import au.com.codeka.warworlds.model.Sprite;
 import au.com.codeka.warworlds.model.SpriteDrawable;
 import au.com.codeka.warworlds.model.Star;
 import au.com.codeka.warworlds.model.StarImageManager;
+import au.com.codeka.warworlds.model.StarManager;
 
 /**
  * This control displays a list of fleets along with controls you can use to manage them (split
  * them, move them around, etc).
  */
-public class FleetList extends FrameLayout {
+public class FleetList extends FrameLayout implements StarManager.StarFetchedHandler {
     private FleetListAdapter mFleetListAdapter;
     private Fleet mSelectedFleet;
     private List<Fleet> mFleets;
@@ -89,6 +97,28 @@ public class FleetList extends FrameLayout {
         final ListView fleetList = (ListView) findViewById(R.id.ship_list);
         fleetList.setAdapter(mFleetListAdapter);
 
+        final Spinner stanceSpinner = (Spinner) findViewById(R.id.stance);
+        stanceSpinner.setAdapter(new StanceAdapter());
+
+        stanceSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                Fleet.Stance stance = Fleet.Stance.values()[position];
+                if (mSelectedFleet == null) {
+                    return;
+                }
+
+                if (mSelectedFleet.getStance() != stance && mFleetActionListener != null) {
+                    mFleetActionListener.onFleetStanceModified(
+                            mStars.get(mSelectedFleet.getStarKey()),
+                            mSelectedFleet, stance);
+                }
+            }
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+            }
+        });
+
         fleetList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view,
@@ -123,6 +153,40 @@ public class FleetList extends FrameLayout {
                 }
             }
         });
+
+        StarManager.getInstance().addStarUpdatedListener(null, this);
+    }
+
+    @Override
+    public void onDetachedFromWindow() {
+        StarManager.getInstance().removeStarUpdatedListener(this);
+    }
+
+    /**
+     * When a star is updated, we may need to refresh the list.
+     */
+    @Override
+    public void onStarFetched(Star s) {
+        for (String starKey : mStars.keySet()) {
+            if (starKey.equals(s.getKey())) {
+                mStars.put(s.getKey(), s);
+
+                Iterator<Fleet> it = mFleets.iterator();
+                while (it.hasNext()) {
+                    Fleet f = it.next();
+                    if (f.getStarKey().equals(starKey)) {
+                        it.remove();
+                    }
+                }
+
+                for (int j = 0; j < s.getFleets().size(); j++) {
+                    mFleets.add(s.getFleets().get(j));
+                }
+
+                refresh(mFleets, mStars);
+                break;
+            }
+        }
     }
 
     /**
@@ -144,9 +208,19 @@ public class FleetList extends FrameLayout {
             icon.setImageBitmap(null);
         }
 
-        row1.setText(design.getDisplayName());
-        row2.setText(String.format("%d", fleet.getNumShips()));
-        row2.setGravity(Gravity.RIGHT);
+        String text;
+        if (fleet.getNumShips() == 1) {
+            text = design.getDisplayName();
+        } else {
+            text = String.format("%s (× %d)", design.getDisplayName(), fleet.getNumShips());
+        }
+        row1.setText(text);
+
+        text = String.format("%s (stance: %s)",
+                             StringUtils.capitalize(fleet.getState().toString().toLowerCase()),
+                             StringUtils.capitalize(fleet.getStance().toString().toLowerCase()));
+        row2.setText(text);
+
         row3.setVisibility(View.GONE);
     }
 
@@ -309,8 +383,67 @@ public class FleetList extends FrameLayout {
         }
     }
 
+    public class StanceAdapter extends BaseAdapter implements SpinnerAdapter {
+        Fleet.Stance[] mValues;
+
+        public StanceAdapter() {
+            mValues = Fleet.Stance.values();
+        }
+
+        @Override
+        public int getCount() {
+            return mValues.length;
+        }
+
+        @Override
+        public Object getItem(int position) {
+            return mValues[position];
+        }
+
+        @Override
+        public long getItemId(int position) {
+            return mValues[position].getValue();
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            TextView view = getCommonView(position, convertView, parent);
+
+            view.setTextColor(Color.WHITE);
+            return view;
+        }
+
+        @Override
+        public View getDropDownView(int position, View convertView, ViewGroup parent) {
+            TextView view = getCommonView(position, convertView, parent);
+
+            ViewGroup.LayoutParams lp = new AbsListView.LayoutParams(LayoutParams.MATCH_PARENT,
+                                                                     LayoutParams.MATCH_PARENT);
+            lp.height = 60;
+            view.setLayoutParams(lp);
+
+            view.setTextColor(Color.BLACK);
+            return view;
+        }
+
+        private TextView getCommonView(int position, View convertView, ViewGroup parent) {
+            TextView view;
+            if (convertView != null) {
+                view = (TextView) convertView;
+            } else {
+                view = new TextView(mContext);
+                view.setGravity(Gravity.CENTER_VERTICAL);
+            }
+
+            Fleet.Stance value = mValues[position];
+            view.setText(StringUtils.capitalize(value.toString().toLowerCase()));
+            return view;
+        }
+    }
+
     public interface OnFleetActionListener {
         void onFleetSplit(Star star, Fleet fleet);
         void onFleetMove(Star star, Fleet fleet);
+        void onFleetStanceModified(Star star, Fleet fleet, Fleet.Stance newStance);
     }
 }

@@ -157,6 +157,7 @@ class Fleet(db.Model):
   destinationStar = db.ReferenceProperty(sector_mdl.Star, collection_name="incoming_fleet_set")
   targetFleet = db.SelfReferenceProperty()
   targetColony = db.ReferenceProperty(Colony)
+  stance = db.IntegerProperty()
 
   @staticmethod
   def getForStar(star_model):

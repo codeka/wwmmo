@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import warworlds.Warworlds.ColonizeRequest;
+import warworlds.Warworlds.FleetOrder;
 import android.os.AsyncTask;
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -126,6 +127,42 @@ public class MyEmpire extends Empire {
                 StarManager.getInstance().refreshStar(colony.getStarKey());
             }
         }.execute();
+    }
+
+    public void updateFleetStance(final Star star, final Fleet fleet,
+                                  final Fleet.Stance newStance) {
+        new AsyncTask<Void, Void, Boolean>() {
+            @Override
+            protected Boolean doInBackground(Void... arg0) {
+                try {
+                    String url = String.format("stars/%s/fleets/%s/orders",
+                            fleet.getStarKey(),
+                            fleet.getKey());
+                     FleetOrder fleetOrder = warworlds.Warworlds.FleetOrder.newBuilder()
+                                    .setOrder(warworlds.Warworlds.FleetOrder.FLEET_ORDER.SET_STANCE)
+                                    .setStance(warworlds.Warworlds.Fleet.FLEET_STANCE.valueOf(newStance.getValue()))
+                                    .build();
+                    ApiClient.postProtoBuf(url, fleetOrder);
+                    return true;
+                } catch(Exception e) {
+                    // TODO: handle exceptions
+                    log.error(ExceptionUtils.getStackTrace(e));
+                    return false;
+                }
+            }
+
+            @Override
+            protected void onPostExecute(Boolean success) {
+                if (!success) {
+                    return; // BAD!
+                }
+
+                // make sure we record the fact that the star is updated as well
+                EmpireManager.getInstance().refreshEmpire(getKey());
+                StarManager.getInstance().refreshStar(star.getKey());
+            }
+        }.execute();
+
     }
 
     /**

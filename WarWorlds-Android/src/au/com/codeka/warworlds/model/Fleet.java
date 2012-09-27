@@ -17,6 +17,7 @@ public class Fleet implements Parcelable {
     private String mDestinationStarKey;
     private String mTargetFleetKey;
     private String mTargetColonyKey;
+    private Stance mStance;
 
     public String getKey() {
         return mKey;
@@ -48,6 +49,9 @@ public class Fleet implements Parcelable {
     public String getTargetColonyKey() {
         return mTargetColonyKey;
     }
+    public Stance getStance() {
+        return mStance;
+    }
 
     @Override
     public int describeContents() {
@@ -66,6 +70,7 @@ public class Fleet implements Parcelable {
         parcel.writeString(mDestinationStarKey);
         parcel.writeString(mTargetFleetKey);
         parcel.writeString(mTargetColonyKey);
+        parcel.writeInt(mStance.getValue());
     }
 
     public static final Parcelable.Creator<Fleet> CREATOR
@@ -83,6 +88,7 @@ public class Fleet implements Parcelable {
             f.mDestinationStarKey = parcel.readString();
             f.mTargetFleetKey = parcel.readString();
             f.mTargetColonyKey = parcel.readString();
+            f.mStance = Stance.fromNumber(parcel.readInt());
             return f;
         }
 
@@ -104,6 +110,11 @@ public class Fleet implements Parcelable {
         f.mDestinationStarKey = pb.getDestinationStarKey();
         f.mTargetFleetKey = pb.getTargetFleetKey();
         f.mTargetColonyKey = pb.getTargetColonyKey();
+        if (pb.hasStance()) {
+            f.mStance = Stance.fromNumber(pb.getStance().getNumber());
+        } else {
+            f.mStance = Stance.NEUTRAL;
+        }
         return f;
     }
 
@@ -131,6 +142,31 @@ public class Fleet implements Parcelable {
 
             return State.IDLE;
         }
+    }
 
+    public enum Stance {
+        PASSIVE(1),
+        NEUTRAL(2),
+        AGGRESSIVE(3);
+
+        private int mValue;
+
+        Stance(int value) {
+            mValue = value;
+        }
+
+        public int getValue() {
+            return mValue;
+        }
+
+        public static Stance fromNumber(int value) {
+            for(Stance s : Stance.values()) {
+                if (s.getValue() == value) {
+                    return s;
+                }
+            }
+
+            return Stance.NEUTRAL;
+        }
     }
 }

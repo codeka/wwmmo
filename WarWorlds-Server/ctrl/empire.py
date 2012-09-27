@@ -994,12 +994,22 @@ def _orderFleet_move(fleet_pb, order_pb):
 
   return True
 
+
+def _orderFleet_setStance(fleet_pb, order_pb):
+  fleet_mdl = mdl.Fleet.get(fleet_pb.key)
+  fleet_mdl.stance = order_pb.stance
+  fleet_mdl.put()
+  return True
+
+
 def orderFleet(fleet_pb, order_pb):
   success = False
   if order_pb.order == pb.FleetOrder.SPLIT:
     success = _orderFleet_split(fleet_pb, order_pb)
   elif order_pb.order == pb.FleetOrder.MOVE:
     success = _orderFleet_move(fleet_pb, order_pb)
+  elif order_pb.order == pb.FleetOrder.SET_STANCE:
+    success = _orderFleet_setStance(fleet_pb, order_pb)
 
   if success:
     star_pb = sector.getStar(fleet_pb.star_key)

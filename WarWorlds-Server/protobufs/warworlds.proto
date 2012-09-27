@@ -471,6 +471,17 @@ message Fleet
     // If in attacking state, this is the target fleet or colony we're attacking
     optional string target_fleet_key = 9;
     optional string target_colony_key = 10;
+
+    // The stance of the fleet is how we react when an enemy fleet comes into our
+    // airspace: passive == ignore them (even if they attack first), neutral == attack
+    // if they attack first, aggressive == attack no matter what
+    enum FLEET_STANCE
+    {
+        PASSIVE = 1;
+        NEUTRAL = 2;
+        AGGRESSIVE = 3;
+    }
+    optional FLEET_STANCE stance = 11;
 }
 
 
@@ -488,6 +499,7 @@ message FleetOrder
         MERGE = 2;
         MOVE = 3;
         ATTACK = 4;
+        SET_STANCE = 5;
     }
     required FLEET_ORDER order = 1;
 
@@ -499,4 +511,7 @@ message FleetOrder
 
     // when moving or attacking, this represents the destination star
     optional string star_key = 4;
+
+    // if the order is SET_STANCE, this will be the stance we want to change to
+    optional Fleet.FLEET_STANCE stance = 5;
 }

@@ -212,6 +212,10 @@ def fleetModelToPb(fleet_pb, fleet_model):
   fleet_pb.destination_star_key = str(empire_mdl.Fleet.destinationStar.get_value_for_datastore(fleet_model))
   fleet_pb.target_fleet_key = str(empire_mdl.Fleet.targetFleet.get_value_for_datastore(fleet_model))
   fleet_pb.target_colony_key = str(empire_mdl.Fleet.targetColony.get_value_for_datastore(fleet_model))
+  if fleet_model.stance:
+    fleet_pb.stance = fleet_model.stance
+  else:
+    fleet_pb.stance = pb.Fleet.NEUTRAL
 
 
 def fleetPbToModel(fleet_model, fleet_pb):

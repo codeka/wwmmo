@@ -204,6 +204,13 @@ public class EmpireActivity extends TabFragmentActivity {
                     args.putParcelable("au.com.codeka.warworlds.Fleet", fleet);
                     DialogManager.getInstance().show(getActivity(), FleetMoveDialog.class, args);
                 }
+
+                @Override
+                public void onFleetStanceModified(Star star, Fleet fleet, Fleet.Stance newStance) {
+                    EmpireManager.getInstance().getEmpire().updateFleetStance(star,
+                                                                              fleet,
+                                                                              newStance);
+                }
             });
 
             return v;
