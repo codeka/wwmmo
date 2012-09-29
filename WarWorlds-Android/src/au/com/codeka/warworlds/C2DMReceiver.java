@@ -111,7 +111,7 @@ public class C2DMReceiver extends C2DMBaseReceiver {
     @Override
     public void onError(Context context, String errorId) {
         log.error("An error has occured! Error={}", errorId);
-        //context.sendBroadcast(new Intent(Util.UPDATE_UI_INTENT));
+        DeviceRegistrar.register(context, "");
         callOnComplete();
     }
 

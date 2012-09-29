@@ -82,6 +82,9 @@ message Hello
     // possibly other things..?)
     optional string channel_client_id = 4;
     optional string channel_token = 5;
+
+    // If true, it means we need to re-register with C2DM (maybe because last time it failed)
+    optional bool require_c2dm_register = 6;
 }
 
 //

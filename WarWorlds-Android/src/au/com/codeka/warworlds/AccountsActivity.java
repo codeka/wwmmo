@@ -241,6 +241,7 @@ public class AccountsActivity extends Activity {
             @Override
             protected Void doInBackground(Void... arg0) {
                 String authCookie = Authenticator.authenticate(AccountsActivity.this, accountName);
+                ApiClient.getCookies().clear();
                 ApiClient.getCookies().add(authCookie);
                 String senderID = C2DMReceiver.SENDER_ID;
                 C2DMReceiver.register(AccountsActivity.this, senderID, onComplete);

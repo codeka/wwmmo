@@ -79,10 +79,10 @@ class HelloPage(ApiPage):
     if self._isAdmin() and self.request.get("email", "") != "":
       # useful for testing as an administrator what this would return for another user...
       user = users.User(self.request.get("email"))
-      device = None
+      device_mdl = None
     else:
-      device = model.DeviceRegistration.get(deviceRegistrationKey)
-      if device is None:
+      device_mdl = model.DeviceRegistration.get(deviceRegistrationKey)
+      if device_mdl is None:
         # ERROR
         logging.error("No device with registration key [%s] found." % (deviceRegistrationKey))
         self.response.set_status(400)
@@ -103,6 +103,9 @@ class HelloPage(ApiPage):
       hello_pb.motd.message = ""
       hello_pb.motd.last_update = ""
 
+    if device_mdl:
+      hello_pb.require_c2dm_register = (device_mdl.deviceRegistrationID == "")
+
     if empire_pb is not None:
       hello_pb.empire.MergeFrom(empire_pb)
 
@@ -110,14 +113,14 @@ class HelloPage(ApiPage):
       hello_pb.colonies.MergeFrom(colonies_pb.colonies)
 
     # generate a chat client for them
-    channelClientID = "device:" + device.deviceID
+    channelClientID = "device:" + device_mdl.deviceID
     chatClient = None
     for cc in model.ChatClient.all().filter("clientID", channelClientID):
       chatClient = cc
     if chatClient is None:
       chatClient = model.ChatClient()
       chatClient.user = user
-      chatClient.device = device
+      chatClient.device = device_mdl
       chatClient.clientID = channelClientID
       chatClient.put()
     hello_pb.channel_token = channel.create_channel(channelClientID)

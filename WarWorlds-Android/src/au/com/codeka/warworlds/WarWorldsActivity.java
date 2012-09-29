@@ -147,6 +147,7 @@ public class WarWorldsActivity extends Activity {
             protected String doInBackground(Void... arg0) {
                 // re-authenticate and get a new cookie
                 String authCookie = Authenticator.authenticate(WarWorldsActivity.this, accountName);
+                ApiClient.getCookies().clear();
                 ApiClient.getCookies().add(authCookie);
                 log.debug("Got auth cookie: "+authCookie);
 
@@ -173,6 +174,10 @@ public class WarWorldsActivity extends Activity {
                                 MyEmpire.fromProtocolBuffer(hello.getEmpire()));
                     } else {
                         mNeedsEmpireSetup = true;
+                    }
+
+                    if (hello.hasRequireC2DmRegister() && hello.getRequireC2DmRegister()) {
+                        log.info("TODO: re-register for C2DM...");
                     }
 
                     ChatManager.getInstance().setup(hello.getChannelToken());
