@@ -863,8 +863,8 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
         }
     }
 
-    private void selectFleet(Fleet fleet) {
-        if (fleet != null) {
+    public void selectFleet(Fleet fleet) {
+        if (fleet != null && fleet.getState() == Fleet.State.MOVING) {
             log.info("Selecting fleet: "+fleet.getKey());
             mSelectedStar = null;
             mSelectedFleet = fleet;

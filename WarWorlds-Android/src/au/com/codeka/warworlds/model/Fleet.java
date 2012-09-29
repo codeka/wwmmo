@@ -2,6 +2,7 @@ package au.com.codeka.warworlds.model;
 
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
+import org.joda.time.Seconds;
 
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -51,6 +52,17 @@ public class Fleet implements Parcelable {
     }
     public Stance getStance() {
         return mStance;
+    }
+
+    public float getTimeToDestination(Star srcStar, Star destStar) {
+        ShipDesign design = ShipDesignManager.getInstance().getDesign(mDesignID);
+        float distanceInParsecs = SectorManager.getInstance().distanceInParsecs(srcStar, destStar);
+        float totalTimeInHours = distanceInParsecs / design.getSpeedInParsecPerHour();
+
+        DateTime now = DateTime.now(DateTimeZone.UTC);
+        float timeSoFarInHours = (Seconds.secondsBetween(mStateStartTime, now).getSeconds() / 3600.0f);
+
+        return totalTimeInHours - timeSoFarInHours;
     }
 
     @Override

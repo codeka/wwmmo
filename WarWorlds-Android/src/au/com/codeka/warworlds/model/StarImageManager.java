@@ -19,7 +19,11 @@ public class StarImageManager extends ImageManager {
      */
     public Sprite getSprite(Context context, Star star, int size) {
         StarExtra starExtra = new StarExtra(context, star);
-        Bitmap bmp = getBitmap(context, star.getKey(), size, starExtra);
+        Bitmap bmp = null;
+        if (size > 0) {
+            bmp = getBitmap(context, star.getKey(), size, starExtra);
+        }
+
         if (bmp == null) {
             SpriteManager spriteManager = SpriteManager.getInstance();
 

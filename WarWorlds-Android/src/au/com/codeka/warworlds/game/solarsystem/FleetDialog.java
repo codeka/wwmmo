@@ -55,6 +55,11 @@ public class FleetDialog extends Dialog implements DialogManager.DialogConfigura
         final FleetList fleetList = (FleetList) findViewById(R.id.fleet_list);
         fleetList.setOnFleetActionListener(new FleetList.OnFleetActionListener() {
             @Override
+            public void onFleetView(Star star, Fleet fleet) {
+                // won't be called here...
+            }
+
+            @Override
             public void onFleetSplit(Star star, Fleet fleet) {
                 Bundle args = new Bundle();
                 args.putParcelable("au.com.codeka.warworlds.Fleet", fleet);

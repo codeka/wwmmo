@@ -3,17 +3,12 @@ package au.com.codeka.warworlds.game.starfield;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
-import org.joda.time.Seconds;
-
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.Html;
-import android.util.FloatMath;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,6 +22,7 @@ import android.widget.ListView;
 import android.widget.TabHost;
 import android.widget.TextView;
 import au.com.codeka.Cash;
+import au.com.codeka.TimeInHours;
 import au.com.codeka.warworlds.DialogManager;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.TabManager;
@@ -184,18 +180,8 @@ public class StarfieldActivity extends Activity {
                 Star srcStar = SectorManager.getInstance().findStar(fleet.getStarKey());
                 Star destStar = SectorManager.getInstance().findStar(fleet.getDestinationStarKey());
                 if (srcStar != null && destStar != null) {
-                    float distanceInParsecs = SectorManager.getInstance().distanceInParsecs(srcStar, destStar);
-                    float totalTimeInHours = distanceInParsecs / design.getSpeedInParsecPerHour();
-
-                    DateTime now = DateTime.now(DateTimeZone.UTC);
-                    float timeSoFarInHours = (Seconds.secondsBetween(fleet.getStateStartTime(), now).getSeconds() / 3600.0f);
-
-                    float timeRemainingInHours = totalTimeInHours - timeSoFarInHours;
-                    if (timeRemainingInHours > 0.0f) {
-                        int hrs = (int) FloatMath.floor(timeRemainingInHours);
-                        int mins = (int) FloatMath.floor((timeRemainingInHours - hrs) * 60.0f);
-                        eta = String.format("%d hrs, %d mins", hrs, mins);
-                    }
+                    float timeRemainingInHours = fleet.getTimeToDestination(srcStar, destStar);
+                    eta = TimeInHours.format(timeRemainingInHours);
                 }
 
                 String details = String.format(
@@ -270,6 +256,36 @@ public class StarfieldActivity extends Activity {
         startActivityForResult(intent, SOLAR_SYSTEM_REQUEST);
     }
 
+    public void navigateToFleet(final String starKey, final String fleetKey) {
+        Star star = SectorManager.getInstance().findStar(starKey);
+        if (star == null) {
+            StarManager.getInstance().requestStar(starKey, false, new StarManager.StarFetchedHandler() {
+                @Override
+                public void onStarFetched(Star s) {
+                    Fleet fleet = s.findFleet(fleetKey);
+                    navigateToFleet(s, fleet);
+                }
+            });
+        } else {
+            navigateToFleet(star, star.findFleet(fleetKey));
+        }
+    }
+
+    public void navigateToFleet(Star star, Fleet fleet) {
+        int offsetX = star.getOffsetX() - (int) ((mStarfield.getWidth() / 2) / mStarfield.getPixelScale());
+        int offsetY = star.getOffsetY() - (int) ((mStarfield.getHeight() / 2) / mStarfield.getPixelScale());
+
+        // todo: if the fleet is moving, scroll to it...
+
+        mStarfield.scrollTo(star.getSectorX(), star.getSectorY(), offsetX, offsetY);
+
+        if (fleet.getState() == Fleet.State.MOVING) {
+            mStarfield.selectFleet(fleet);
+        } else {
+            mStarfield.selectStar(star.getKey());
+        }
+    }
+
     @Override
     public void onResume() {
         super.onResume();
@@ -294,16 +310,21 @@ public class StarfieldActivity extends Activity {
             EmpireActivity.EmpireActivityResult res = EmpireActivity.EmpireActivityResult.fromValue(
                     intent.getIntExtra("au.com.codeka.warworlds.Result", 0));
 
+            long sectorX = intent.getLongExtra("au.com.codeka.warworlds.SectorX", 0);
+            long sectorY = intent.getLongExtra("au.com.codeka.warworlds.SectorY", 0);
+            int starOffsetX = intent.getIntExtra("au.com.codeka.warworlds.StarOffsetX", 0);
+            int starOffsetY = intent.getIntExtra("au.com.codeka.warworlds.StarOffsetY", 0);
+            String starKey = intent.getStringExtra("au.com.codeka.warworlds.StarKey");
+
             if (res == EmpireActivity.EmpireActivityResult.NavigateToPlanet) {
-                long sectorX = intent.getLongExtra("au.com.codeka.warworlds.SectorX", 0);
-                long sectorY = intent.getLongExtra("au.com.codeka.warworlds.SectorY", 0);
-                int starOffsetX = intent.getIntExtra("au.com.codeka.warworlds.StarOffsetX", 0);
-                int starOffsetY = intent.getIntExtra("au.com.codeka.warworlds.StarOffsetY", 0);
-                String starKey = intent.getStringExtra("au.com.codeka.warworlds.StarKey");
                 int planetIndex = intent.getIntExtra("au.com.codeka.warworlds.PlanetIndex", 0);
 
                 navigateToPlanet(sectorX, sectorY, starKey, starOffsetX, starOffsetY,
                                  planetIndex, true);
+            } else if (res == EmpireActivity.EmpireActivityResult.NavigateToFleet) {
+                String fleetKey = intent.getStringExtra("au.com.codeka.warworlds.FleetKey");
+
+                navigateToFleet(starKey, fleetKey);
             }
         }
     }

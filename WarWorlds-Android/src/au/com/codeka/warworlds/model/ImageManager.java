@@ -37,7 +37,10 @@ import au.com.codeka.planetrender.Vector3;
 public abstract class ImageManager {
     private static Logger log = LoggerFactory.getLogger(ImageManager.class);
 
-    private Queue<QueuedGenerate> mGenerateQueue = new ArrayBlockingQueue<QueuedGenerate>(50);
+    private static final int MAX_GENERATE_QUEUE_SIZE = 50;
+
+    private Queue<QueuedGenerate> mGenerateQueue =
+            new ArrayBlockingQueue<QueuedGenerate>(MAX_GENERATE_QUEUE_SIZE);
     private Thread mGenerateThread;
     private Handler mHandler = new Handler();
     private List<BitmapGeneratedListener> mBitmapGeneratedListeners =
@@ -337,7 +340,9 @@ public abstract class ImageManager {
         synchronized(mGenerateQueue) {
             // only add if we're not already generating this item
             if (!isInGenerateQueue(item.cacheKey)) {
-                mGenerateQueue.add(item);
+                if (mGenerateQueue.size() < MAX_GENERATE_QUEUE_SIZE) {
+                    mGenerateQueue.add(item);
+                }
             }
         }
     }

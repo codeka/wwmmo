@@ -34,7 +34,8 @@ public class EmpireActivity extends TabFragmentActivity {
     Context mContext = this;
 
     public enum EmpireActivityResult {
-        NavigateToPlanet(1);
+        NavigateToPlanet(1),
+        NavigateToFleet(2);
 
         private int mValue;
 
@@ -185,6 +186,20 @@ public class EmpireActivity extends TabFragmentActivity {
             fleetList.refresh(sCurrentEmpire.getAllFleets(), sCurrentEmpire.getImportantStars());
 
             fleetList.setOnFleetActionListener(new FleetList.OnFleetActionListener() {
+                @Override
+                public void onFleetView(Star star, Fleet fleet) {
+                    Intent intent = new Intent();
+                    intent.putExtra("au.com.codeka.warworlds.Result", EmpireActivityResult.NavigateToFleet.getValue());
+                    intent.putExtra("au.com.codeka.warworlds.SectorX", star.getSectorX());
+                    intent.putExtra("au.com.codeka.warworlds.SectorY", star.getSectorY());
+                    intent.putExtra("au.com.codeka.warworlds.StarOffsetX", star.getOffsetX());
+                    intent.putExtra("au.com.codeka.warworlds.StarOffsetY", star.getOffsetY());
+                    intent.putExtra("au.com.codeka.warworlds.StarKey", star.getKey());
+                    intent.putExtra("au.com.codeka.warworlds.FleetKey", fleet.getKey());
+                    getActivity().setResult(RESULT_OK, intent);
+                    getActivity().finish();
+                }
+
                 @Override
                 public void onFleetSplit(Star star, Fleet fleet) {
                     Bundle args = new Bundle();

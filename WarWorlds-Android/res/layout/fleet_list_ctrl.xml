@@ -93,6 +93,22 @@
                 android:text="@string/fleet_merge" />
         </LinearLayout>
 
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+            <Button
+                style="@style/Button"
+                android:id="@+id/view_btn"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="12dp"
+                android:layout_marginRight="12dp"
+                android:text="@string/fleet_view" />
+
+        </LinearLayout>
+
     </LinearLayout>
 
 </RelativeLayout>

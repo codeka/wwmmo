@@ -11,7 +11,7 @@
       added to the ship!</i></p>
     ]]></description>
     <cost minerals="1000" time="4.0" />
-    <fuel costPerParsec="120" />
+    <fuel costPerParsec="85" />
     <stats speed="1" />
   </design>
   <design id="scout">
@@ -35,7 +35,7 @@
       fuel-efficient, allowing you to overwhealm your enemy with numbers.</p>
     ]]></description>
     <cost minerals="45" time="0.15" />
-    <fuel costPerParsec="2.5" />
+    <fuel costPerParsec="0.2" />
     <stats speed="10" />
   </design>
 </designs>

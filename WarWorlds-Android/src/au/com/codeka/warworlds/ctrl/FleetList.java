@@ -13,6 +13,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
+import android.text.Html;
 import android.util.AttributeSet;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -28,9 +29,11 @@ import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.SpinnerAdapter;
 import android.widget.TextView;
+import au.com.codeka.TimeInHours;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.model.Fleet;
 import au.com.codeka.warworlds.model.ImageManager;
+import au.com.codeka.warworlds.model.SectorManager;
 import au.com.codeka.warworlds.model.ShipDesign;
 import au.com.codeka.warworlds.model.ShipDesignManager;
 import au.com.codeka.warworlds.model.Sprite;
@@ -154,6 +157,17 @@ public class FleetList extends FrameLayout implements StarManager.StarFetchedHan
             }
         });
 
+        final Button viewBtn = (Button) findViewById(R.id.view_btn);
+        viewBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mFleetActionListener != null) {
+                    mFleetActionListener.onFleetView(mStars.get(mSelectedFleet.getStarKey()),
+                                                     mSelectedFleet);
+                }
+            }
+        });
+
         StarManager.getInstance().addStarUpdatedListener(null, this);
     }
 
@@ -192,11 +206,12 @@ public class FleetList extends FrameLayout implements StarManager.StarFetchedHan
     /**
      * Populates a solarsystem_fleet_row.xml view with details from the given fleet.
      */
-    public static void populateFleetRow(View view, Fleet fleet) {
+    public static void populateFleetRow(final Context context, final Map<String, Star> stars, 
+                                        View view, final Fleet fleet) {
         ImageView icon = (ImageView) view.findViewById(R.id.ship_icon);
-        TextView row1 = (TextView) view.findViewById(R.id.ship_row1);
-        TextView row2 = (TextView) view.findViewById(R.id.ship_row2);
-        TextView row3 = (TextView) view.findViewById(R.id.ship_row3);
+        final TextView row1 = (TextView) view.findViewById(R.id.ship_row1);
+        final TextView row2 = (TextView) view.findViewById(R.id.ship_row2);
+        final TextView row3 = (TextView) view.findViewById(R.id.ship_row3);
 
         ShipDesignManager dm = ShipDesignManager.getInstance();
         ShipDesign design = dm.getDesign(fleet.getDesignID());
@@ -221,7 +236,62 @@ public class FleetList extends FrameLayout implements StarManager.StarFetchedHan
                              StringUtils.capitalize(fleet.getStance().toString().toLowerCase()));
         row2.setText(text);
 
-        row3.setVisibility(View.GONE);
+        if (fleet.getState() == Fleet.State.MOVING) {
+            row3.setVisibility(View.GONE);
+            StarManager.getInstance().requestStar(fleet.getDestinationStarKey(), false,
+                    new StarManager.StarFetchedHandler() {
+                        @Override
+                        public void onStarFetched(Star destStar) {
+                            Star srcStar = null;
+                            if (stars != null) {
+                                srcStar = stars.get(fleet.getStarKey());
+                            }
+                            if (srcStar == null) {
+                                srcStar = SectorManager.getInstance().findStar(fleet.getStarKey());
+                            }
+                            if (srcStar == null) {
+                                row3.setText("→ (unknown)");
+                            } else {
+                                float timeRemainingInHours = fleet.getTimeToDestination(srcStar, destStar);
+
+                                String eta = TimeInHours.format(timeRemainingInHours);
+                                String html = String.format("→ <img src=\"star\" width=\"16\" height=\"16\" /> %s <b>ETA:</b> %s",
+                                                            destStar.getName(), eta);
+                                row3.setText(Html.fromHtml(html, 
+                                                           new FleetListImageGetter(context, destStar),
+                                                           null));
+                            }
+                            row3.setVisibility(View.VISIBLE);
+                        }
+                    });
+        } else {
+            row3.setVisibility(View.GONE);
+        }
+    }
+
+    /**
+     * Fetches the inline images we use to display star icons and whatnot.
+     */
+    private static class FleetListImageGetter implements Html.ImageGetter {
+        private Context mContext;
+        private Star mStar;
+
+        public FleetListImageGetter(Context context, Star star) {
+            mContext = context;
+            mStar = star;
+        }
+
+        @Override
+        public Drawable getDrawable(String source) {
+            if (mStar != null) {
+                Sprite sprite = StarImageManager.getInstance().getSprite(mContext, mStar, -1);
+                Drawable d = new SpriteDrawable(sprite);
+                d.setBounds(0, 0, d.getIntrinsicWidth(), d.getIntrinsicHeight());
+                return d;
+            } else {
+                return null;
+            }
+        }
     }
 
     /**
@@ -358,7 +428,7 @@ public class FleetList extends FrameLayout implements StarManager.StarFetchedHan
                 name.setText(star.getName());
             } else {
                 Fleet fleet = (Fleet) entry.value;
-                populateFleetRow(view, fleet);
+                populateFleetRow(mContext, mStars, view, fleet);
 
                 if (mSelectedFleet != null && mSelectedFleet.getKey().equals(fleet.getKey())) {
                     view.setBackgroundColor(0xff0c6476);
@@ -442,6 +512,7 @@ public class FleetList extends FrameLayout implements StarManager.StarFetchedHan
     }
 
     public interface OnFleetActionListener {
+        void onFleetView(Star star, Fleet fleet);
         void onFleetSplit(Star star, Fleet fleet);
         void onFleetMove(Star star, Fleet fleet);
         void onFleetStanceModified(Star star, Fleet fleet, Fleet.Stance newStance);

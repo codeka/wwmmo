@@ -145,6 +145,15 @@ public class Star implements Parcelable {
         mFleets.add(fleet);
     }
 
+    public Fleet findFleet(String fleetKey) {
+        for (Fleet f : mFleets) {
+            if (f.getKey().equals(fleetKey)) {
+                return f;
+            }
+        }
+        return null;
+    }
+
     public void setDummySector(long sectorX, long sectorY) {
         mSector = new Sector.DummySector(sectorX, sectorY);
     }

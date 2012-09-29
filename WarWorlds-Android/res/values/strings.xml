@@ -62,6 +62,7 @@
     <string name="fleet_attack">Attack</string>
     <string name="fleet_split">Split</string>
     <string name="fleet_merge">Merge</string>
+    <string name="fleet_view">View</string>
 
     <!-- "solarsystem_fleet_split_dlg.xml" layout -->
     <string name="fleet_split_title">Split Fleet</string>

@@ -3,6 +3,7 @@ package au.com.codeka.warworlds.game;
 import warworlds.Warworlds.FleetOrder;
 import android.app.Activity;
 import android.app.Dialog;
+import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
@@ -20,11 +21,13 @@ import au.com.codeka.warworlds.model.StarManager;
 
 public class FleetSplitDialog extends Dialog implements DialogManager.DialogConfigurable {
     private Fleet mFleet;
+    private Context mContext;
 
     public static final int ID = 1004;
 
     public FleetSplitDialog(Activity activity) {
         super(activity);
+        mContext = activity;
     }
 
     @Override
@@ -128,7 +131,7 @@ public class FleetSplitDialog extends Dialog implements DialogManager.DialogConf
         mFleet = (Fleet) bundle.getParcelable("au.com.codeka.warworlds.Fleet");
 
         View fleetView = findViewById(R.id.fleet);
-        FleetList.populateFleetRow(fleetView, mFleet);
+        FleetList.populateFleetRow(mContext, null, fleetView, mFleet);
 
         SeekBar splitRatio = (SeekBar) findViewById(R.id.split_ratio);
         splitRatio.setMax(mFleet.getNumShips());
