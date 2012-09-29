@@ -233,6 +233,10 @@ message Star
 
     // List of fleets located in this star
     repeated Fleet fleets = 16;
+
+    // This is the time (in seconds since Unix epoch) since this star "became" empty -- that is,
+    // after the colony was destroyed. This only has meaning if the star has no colonies currently.
+    optional int64 time_emptied = 17;
 }
 
 //
@@ -329,7 +333,7 @@ message Colony
     optional string key = 1;
 
     // The key of the empire that owns this colony.
-    required string empire_key = 2;
+    optional string empire_key = 2;
 
     // The key of the planet and star this colony belongs to.
     optional string star_key = 4;
@@ -444,7 +448,7 @@ message Fleet
     required string key = 1;
 
     // The key of the empire who owns this fleet
-    required string empire_key = 2;
+    optional string empire_key = 2;
 
     // The name of the ship design of the ship(s) in this fleet
     optional string design_name = 3;

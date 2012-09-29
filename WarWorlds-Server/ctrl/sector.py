@@ -1,12 +1,17 @@
 """sector.py: Contains business logic for the sectors, stars etc."""
 
 import collections
+from datetime import datetime, timedelta
 import math
+import random
 
 import ctrl
+from ctrl import empire as empire_ctl
 from model import empire as empire_mdl
 from model import sector as mdl
 from protobufs import warworlds_pb2 as pb
+
+from google.appengine.ext import db
 
 
 SectorCoord = collections.namedtuple("SectorCoord", ["x", "y"])
@@ -93,8 +98,58 @@ def getStar(star_key, force_nocache=False):
     fleet_pb = star_pb.fleets.add()
     ctrl.fleetModelToPb(fleet_pb, fleet_model)
 
+  min_time_emptied = ctrl.dateTimeToEpoch(datetime.now() - timedelta(days=4))
+  if not star_pb.colonies and star_pb.time_emptied < min_time_emptied:
+    _addNativeColonies(star_pb)
+    # call getStar again to make sure we get the latest of everything
+    return getStar(star_pb.key)
+
   ctrl.setCached({cache_key: star_pb})
   return star_pb
+
+
+def _addNativeColonies(star_pb):
+  """Add some 'native' colonies, which are basically passive NPCs that you can "practise" on."""
+
+  # first, rank the planets by how good they are for a colony
+  def planetRank(a, b):
+    apop = int(a.population_congeniality / 100)
+    bpop = int(b.population_congeniality / 100)
+    if apop != bpop:
+      return apop - bpop
+
+    acong = a.population_congeniality + a.mining_congeniality + a.farming_congeniality
+    bcong = b.population_congeniality + b.mining_congeniality + b.farming_congeniality
+    return acong - bcong
+
+  planets = sorted(star_pb.planets, planetRank)
+
+  sector_key = mdl.SectorManager.getSectorKey(star_pb.sector_x, star_pb.sector_y)
+
+  num_colonies = random.randint(2, max(4, len(star_pb.planets)))
+  for n in range(num_colonies):
+    colony_model = empire_ctl._colonize(sector_key,
+                                        None, star_pb, planets[n].index)
+    colony_model.lastSimulation = datetime.now() - timedelta(hours=24)
+    colony_model.focusPopulation = 0.5
+    colony_model.focusFarming = 0.5
+    colony_model.focusMining = 0.0
+    colony_model.focusConstruction = 0.0
+    colony_model.put()
+
+  num_fleets = random.randint(2, 10)
+  for n in range(num_fleets):
+    fleet_model = empire_mdl.Fleet(parent=db.Key(star_pb.key))
+    fleet_model.empire = None
+    fleet_model.sector = sector_key
+    fleet_model.designName = "fighter" # TODO
+    fleet_model.numShips = random.randint(5, 20) * 5
+    fleet_model.state = pb.Fleet.IDLE
+    fleet_model.stance = pb.Fleet.AGGRESSIVE
+    fleet_model.stateStartTime = datetime.now()
+    fleet_model.put()
+
+  ctrl.clearCached(["star:%s" % (star_pb.key)])
 
 
 def get_distance_between_stars(star_1_pb, star_2_pb):

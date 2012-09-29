@@ -93,6 +93,7 @@ class Star(db.Model):
   x = db.IntegerProperty()
   y = db.IntegerProperty()
   planets = PlanetsProperty()
+  timeEmptied = db.DateTimeProperty()
 
 
 class SectorManager:

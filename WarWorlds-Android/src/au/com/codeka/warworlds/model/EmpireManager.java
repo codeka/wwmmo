@@ -29,6 +29,7 @@ public class EmpireManager {
     private Map<String, List<EmpireFetchedHandler>> mInProgress = new HashMap<String, List<EmpireFetchedHandler>>();
     private Map<String, List<EmpireFetchedHandler>> mEmpireUpdatedListeners = new TreeMap<String, List<EmpireFetchedHandler>>();
     private MyEmpire mEmpire;
+    private NativeEmpire mNativeEmpire;
 
     /**
      * This is called when you first connect to the server. We need to pass in details about
@@ -36,6 +37,7 @@ public class EmpireManager {
      */
     public void setup(MyEmpire empire) {
         mEmpire = empire;
+        mNativeEmpire = new NativeEmpire();
     }
 
     /**
@@ -43,6 +45,10 @@ public class EmpireManager {
      */
     public MyEmpire getEmpire() {
         return mEmpire;
+    }
+
+    public NativeEmpire getNativeEmpire() {
+        return mNativeEmpire;
     }
 
     /**
@@ -94,6 +100,13 @@ public class EmpireManager {
     }
 
     public void refreshEmpire(final String empireKey, final EmpireFetchedHandler handler) {
+        if (empireKey == null || empireKey.length() == 0) {
+            if (handler != null) {
+                handler.onEmpireFetched(mNativeEmpire);
+            }
+            return;
+        }
+
         List<EmpireFetchedHandler> inProgress = mInProgress.get(empireKey);
         if (inProgress != null && handler != null) {
             // if there's already a call in progress, don't fetch again
@@ -153,6 +166,11 @@ public class EmpireManager {
     }
 
     public void fetchEmpire(final String empireKey, final EmpireFetchedHandler handler) {
+        if (empireKey == null) {
+            handler.onEmpireFetched(mNativeEmpire);
+            return;
+        }
+
         if (mEmpireCache.containsKey(empireKey)) {
             handler.onEmpireFetched(mEmpireCache.get(empireKey));
             return;

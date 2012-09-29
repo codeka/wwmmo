@@ -91,7 +91,9 @@ def empirePbToModel(empire_model, empire_pb):
 
 def colonyModelToPb(colony_pb, colony_model):
   colony_pb.key = str(colony_model.key())
-  colony_pb.empire_key = str(empire_mdl.Colony.empire.get_value_for_datastore(colony_model))
+  empire_key = empire_mdl.Colony.empire.get_value_for_datastore(colony_model)
+  if empire_key:
+    colony_pb.empire_key = str(empire_key)
   colony_pb.star_key = str(colony_model.key().parent())
   colony_pb.planet_index = colony_model.planet_index
   colony_pb.population = colony_model.population
@@ -150,11 +152,17 @@ def starModelToPb(star_pb, star_model, include_planets=True):
   star_pb.num_planets = len(star_model.planets)
   if include_planets:
     star_pb.planets.extend(star_model.planets)
+  if not star_model.timeEmptied:
+    star_pb.time_emptied = 0
+  else:
+    star_pb.time_emptied = dateTimeToEpoch(star_model.timeEmptied)
 
 
 def empirePresenceModelToPb(presence_pb, presence_model):
   presence_pb.key = str(presence_model.key())
-  presence_pb.empire_key = str(empire_mdl.EmpirePresence.empire.get_value_for_datastore(presence_model))
+  empire_key = empire_mdl.EmpirePresence.empire.get_value_for_datastore(presence_model)
+  if empire_key:
+    presence_pb.empire_key = str(empire_key)
   presence_pb.star_key = str(presence_model.key().parent())
   presence_pb.total_goods = presence_model.totalGoods
   presence_pb.total_minerals = presence_model.totalMinerals
@@ -203,7 +211,9 @@ def buildRequestPbToModel(build_model, build_pb):
 
 def fleetModelToPb(fleet_pb, fleet_model):
   fleet_pb.key = str(fleet_model.key())
-  fleet_pb.empire_key = str(empire_mdl.Fleet.empire.get_value_for_datastore(fleet_model))
+  empire_key = empire_mdl.Fleet.empire.get_value_for_datastore(fleet_model)
+  if empire_key:
+    fleet_pb.empire_key = str(empire_key)
   fleet_pb.design_name = fleet_model.designName
   fleet_pb.num_ships = fleet_model.numShips
   fleet_pb.state = fleet_model.state

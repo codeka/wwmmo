@@ -111,6 +111,10 @@ public class Empire implements Parcelable {
     };
 
     public static Empire fromProtocolBuffer(warworlds.Warworlds.Empire pb) {
+        if (!pb.hasKey() || pb.getKey() == null) {
+            return new NativeEmpire();
+        }
+
         Empire empire = new Empire();
         empire.populateFromProtocolBuffer(pb);
         return empire;

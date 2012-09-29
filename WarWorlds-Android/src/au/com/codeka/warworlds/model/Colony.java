@@ -151,7 +151,9 @@ public class Colony implements Parcelable {
         c.mStarKey = pb.getStarKey();
         c.mPlanetIndex = pb.getPlanetIndex();
         c.mPopulation = pb.getPopulation();
-        c.mEmpireKey = pb.getEmpireKey();
+        if (pb.hasEmpireKey()) {
+            c.mEmpireKey = pb.getEmpireKey();
+        }
         c.mLastSimulation = new DateTime(pb.getLastSimulation() * 1000, DateTimeZone.UTC);
         c.mBuildings = new ArrayList<Building>();
         c.mFarmingFocus = pb.getFocusFarming();

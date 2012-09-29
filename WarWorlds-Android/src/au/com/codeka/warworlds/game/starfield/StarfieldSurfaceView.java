@@ -564,6 +564,10 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
      * Gets an \c Empire given it's key.
      */
     private Empire getEmpire(String empireKey) {
+        if (empireKey == null) {
+            return EmpireManager.getInstance().getNativeEmpire();
+        }
+
         Empire emp = mVisibleEmpires.get(empireKey);
         if (emp == null) {
             EmpireManager.getInstance().fetchEmpire(empireKey, new EmpireManager.EmpireFetchedHandler() {

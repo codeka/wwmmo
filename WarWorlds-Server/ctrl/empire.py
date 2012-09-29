@@ -13,7 +13,6 @@ from google.appengine.ext import db
 from google.appengine.api import taskqueue
 
 import ctrl
-from ctrl import sector
 from model import sector as sector_mdl
 from model import empire as mdl
 from protobufs import warworlds_pb2 as pb
@@ -700,7 +699,7 @@ def _simulateStep(dt, now, star_pb, empire_key, log):
 
 def _colonize(sector_key, empire_model, star_pb, planet_index):
   colony_model = mdl.Colony(parent=db.Key(star_pb.key))
-  colony_model.empire = empire_model.key()
+  colony_model.empire = empire_model
   colony_model.planet_index = planet_index
   colony_model.sector = sector_key
   colony_model.population = 100.0
@@ -722,8 +721,9 @@ def _colonize(sector_key, empire_model, star_pb, planet_index):
 
   # clear the cache of the various bits and pieces who are now invalid
   keys = ["sector:%d,%d" % (star_pb.sector_x, star_pb.sector_y),
-          "star:%s" % (star_pb.key),
-          "colony:for-empire:%s" % (empire_model.key())]
+          "star:%s" % (star_pb.key)]
+  if empire_model:
+    keys.append("colony:for-empire:%s" % (empire_model.key()))
   ctrl.clearCached(keys)
 
   return colony_model
