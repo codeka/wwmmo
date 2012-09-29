@@ -199,6 +199,9 @@ class FleetMoveCompletePage(tasks.TaskPage):
       fleet_mdl.delete()
       new_fleet_mdl.put()
 
+      new_fleet_pb = pb.Fleet()
+      ctrl.fleetModelToPb(new_fleet_pb, new_fleet_mdl)
+
       empire = fleet_mdl.empire
       ctrl.clearCached(["fleet:for-empire:%s" % (empire.key()),
                         "star:%s" % (fleet_mdl.key().parent()),
@@ -207,6 +210,8 @@ class FleetMoveCompletePage(tasks.TaskPage):
                         "sector:%d,%d" % (old_star_pb.sector_x, old_star_pb.sector_y)])
 
       design = ctl.ShipDesign.getDesign(fleet_mdl.designName)
+      for effect in design.getEffects():
+        effect.onStarLanded(new_fleet_pb, new_star_pb)
 
       # Send a notification to the player that construction of their building is complete
       msg = "Your %s fleet of %d ships has arrived on %s." % (design.name,

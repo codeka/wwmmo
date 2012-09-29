@@ -182,3 +182,13 @@ class Fleet(db.Model):
     for fleet in query:
       fleets.append(fleet)
     return fleets
+
+
+class ScoutReport(db.Model):
+  """A scout report is made by a fleet that has the "scout" effect whenever they land on a star.
+
+  Basically, the report is just a serialized Star protocol buffer, including all colonies,
+  fleets, and whatnot "frozen" in time -- at the point the report was made."""
+  empire = db.ReferenceProperty(Empire)
+  report = db.BlobProperty()
+

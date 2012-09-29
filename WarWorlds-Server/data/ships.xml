@@ -25,6 +25,9 @@
     <cost minerals="50" time="0.1667" />
     <fuel costPerParsec="7.5" />
     <stats speed="17" />
+    <effects>
+      <effect kind="scout" />
+    </effects>
   </design>
   <design id="fighter">
     <name>Fighter</name>

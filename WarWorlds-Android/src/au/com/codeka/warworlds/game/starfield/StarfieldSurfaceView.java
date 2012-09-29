@@ -592,6 +592,9 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
 
             for (int i = 0; i < colonies.size(); i++) {
                 Colony colony = colonies.get(i);
+                if (colony.getEmpireKey() == null) {
+                    continue;
+                }
 
                 Empire emp = getEmpire(colony.getEmpireKey());
                 if (emp != null) {

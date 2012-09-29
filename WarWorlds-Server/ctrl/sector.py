@@ -6,7 +6,6 @@ import math
 import random
 
 import ctrl
-from ctrl import empire as empire_ctl
 from model import empire as empire_mdl
 from model import sector as mdl
 from protobufs import warworlds_pb2 as pb
@@ -110,6 +109,7 @@ def getStar(star_key, force_nocache=False):
 
 def _addNativeColonies(star_pb):
   """Add some 'native' colonies, which are basically passive NPCs that you can "practise" on."""
+  from ctrl import empire as empire_ctl
 
   # first, rank the planets by how good they are for a colony
   def planetRank(a, b):

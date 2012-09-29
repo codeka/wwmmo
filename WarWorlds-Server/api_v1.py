@@ -293,7 +293,22 @@ class SectorsPage(StarfieldPage):
         y = int(y)
         coords.append(sector.SectorCoord(x, y))
 
-      return sector.getSectors(coords)
+      empire_pb = empire.getEmpireForUser(self.user)
+      sectors_pb = sector.getSectors(coords)
+      # we only return fleets for the current empire -- we don't let you see
+      # other empire's fleets. The exception is moving/attacking fleets, you
+      # can see those
+      for sector_pb in sectors_pb.sectors:
+        visible_fleets = []
+        for fleet_pb in sector_pb.fleets:
+          if (self._isAdmin() or fleet_pb.empire_key == empire_pb.key or
+              fleet_pb.state != pb.Fleet.IDLE):
+            visible_fleets.append(fleet_pb)
+
+        del sector_pb.fleets[:]
+        sector_pb.fleets.extend(visible_fleets)
+
+      return sectors_pb
     else:
       # TODO: other ways of querying for sectors?
       self.response.set_status(400)

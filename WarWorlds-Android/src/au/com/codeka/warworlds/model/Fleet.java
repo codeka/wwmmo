@@ -113,7 +113,9 @@ public class Fleet implements Parcelable {
     public static Fleet fromProtocolBuffer(warworlds.Warworlds.Fleet pb) {
         Fleet f = new Fleet();
         f.mKey = pb.getKey();
-        f.mEmpireKey = pb.getEmpireKey();
+        if (pb.hasEmpireKey()) {
+            f.mEmpireKey = pb.getEmpireKey();
+        }
         f.mDesignID = pb.getDesignName();
         f.mNumShips = pb.getNumShips();
         f.mState = State.fromNumber(pb.getState().getNumber());

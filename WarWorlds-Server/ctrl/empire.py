@@ -13,6 +13,7 @@ from google.appengine.ext import db
 from google.appengine.api import taskqueue
 
 import ctrl
+from ctrl import sector
 from model import sector as sector_mdl
 from model import empire as mdl
 from protobufs import warworlds_pb2 as pb
@@ -1020,7 +1021,18 @@ def orderFleet(fleet_pb, order_pb):
 
   return success
 
+
 class Design(object):
+  def __init__(self):
+    self.effects = []
+
+  def getEffects(self, kind=None, level=1):
+    """Gets the effects of the given kind, or an empty list if there's none."""
+    if not kind:
+      return self.effects
+    return (effect for effect in self.effects if (effect.kind == kind and
+                                                  (effect.level == level or effect.level is None)))
+
   @staticmethod
   def getDesign(kind, name):
     if kind == pb.BuildRequest.BUILDING:
@@ -1029,11 +1041,17 @@ class Design(object):
       return ShipDesign.getDesign(name)
 
 
-class BuildingEffect(object):
+class Effect(object):
+  """Base class for BuildingEffect and ShipEffect."""
+  def __init__(self, kind):
+    self.kind = kind
+
+
+class BuildingEffect(Effect):
   """A BuildingEffect add certain bonuses and whatnot to a star."""
   def __init__(self, kind):
+    super(BuildingEffect, self).__init__(kind)
     self.level = None
-    self.kind = kind
 
 
 class BuildingEffectStorage(BuildingEffect):
@@ -1046,16 +1064,6 @@ class BuildingEffectStorage(BuildingEffect):
 
 class BuildingDesign(Design):
   _parsedDesigns = None
-
-  def __init__(self):
-    self.effects = []
-
-  def getEffects(self, kind=None, level=1):
-    """Gets the effects of the given kind, or an empty list if there's none."""
-    if not kind:
-      return self.effects
-    return (effect for effect in self.effects if (effect.kind == kind and
-                                                  (effect.level == level or effect.level is None)))
 
   @staticmethod
   def getDesigns():
@@ -1073,6 +1081,31 @@ class BuildingDesign(Design):
     if designId not in designs:
       return None
     return designs[designId]
+
+
+class ShipEffect(Effect):
+  """A ShipEffect add certain bonuses and whatnot to a ship."""
+  def __init__(self, kind):
+    super(ShipEffect, self).__init__(kind)
+
+  def onStarLanded(self, fleet_pb, star_pb):
+    """This is called when a fleet with this effect "lands" on a star."""
+    pass
+
+
+class ShipEffectScout(ShipEffect):
+  """The scout effect will generate a scout report every time the ship reaches a star."""
+  def __init__(self, kind, effectXml):
+    super(ShipEffectScout, self).__init__(kind)
+
+  def onStarLanded(self, fleet_pb, star_pb):
+    """This is called when a fleet with this effect "lands" on a star."""
+    logging.info("Generating scout report.... star=%s" % (star_pb.name))
+    scout_report_mdl = mdl.ScoutReport(parent=db.Key(star_pb.key))
+    scout_report_mdl.empire = db.Key(fleet_pb.empire_key)
+    scout_report_mdl.report = star_pb.SerializeToString()
+    scout_report_mdl.put()
+    ctrl.clearCached(["scout-report:%s:%s" % (star_pb.key, fleet_pb.empire_key)])
 
 
 class ShipDesign(Design):
@@ -1150,6 +1183,13 @@ def _parseShipDesign(designXml):
   design.speed = float(statsXml.get("speed"))
   fuelXml = designXml.find("fuel")
   design.fuelCostPerParsec = float(fuelXml.get("costPerParsec"))
+  effectsXml = designXml.find("effects")
+  if effectsXml is not None:
+    for effectXml in effectsXml.iterfind("effect"):
+      kind = effectXml.get("kind")
+      if kind == "scout":
+        effect = ShipEffectScout(kind, effectXml)
+      design.effects.append(effect)
   return design
 
 
