@@ -18,6 +18,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.StrictMode;
+import android.preference.PreferenceManager;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;
@@ -60,6 +61,7 @@ public class WarWorldsActivity extends Activity {
 
         Util.loadProperties(mContext);
         Authenticator.configure(mContext);
+        PreferenceManager.setDefaultValues(this, R.xml.global_options, false);
 
         if (Util.isDebug()) {
             enableStrictMode();
@@ -107,8 +109,7 @@ public class WarWorldsActivity extends Activity {
     @Override
     protected Dialog onCreateDialog(int id) {
         if (id == OPTIONS_DIALOG) {
-            GlobalOptionsDialog dialog = new GlobalOptionsDialog(mContext);
-            return dialog;
+            startActivity(new Intent(mContext, GlobalOptionsActivity.class));
         }
 
         return super.onCreateDialog(id);

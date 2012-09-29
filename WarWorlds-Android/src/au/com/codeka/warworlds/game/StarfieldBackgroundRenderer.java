@@ -29,7 +29,7 @@ public class StarfieldBackgroundRenderer {
     private Context mContext;
     private Paint mBackgroundPaint;
     private float mPixelScale;
-    private GlobalOptions.GraphicsDetail mGraphicsDetail;
+    private GlobalOptions.StarfieldDetail mStarfieldDetail;
 
     private static List<Bitmap> sBgStars;
     private static List<Bitmap> sBgGases;
@@ -80,7 +80,7 @@ public class StarfieldBackgroundRenderer {
 
     private void initialize() {
         GlobalOptions globalOptions = new GlobalOptions(mContext);
-        mGraphicsDetail = globalOptions.getGraphicsDetail();
+        mStarfieldDetail = globalOptions.getStarfieldDetail();
 
         if (mBackgroundPaint == null) {
             mBackgroundPaint = new Paint();
@@ -98,10 +98,10 @@ public class StarfieldBackgroundRenderer {
     }
 
     private boolean shouldDrawStars() {
-        return mGraphicsDetail.getValue() >= GlobalOptions.GraphicsDetail.MEDIUM.getValue();
+        return mStarfieldDetail.getValue() >= GlobalOptions.StarfieldDetail.STARS.getValue();
     }
     private boolean shouldDrawGas() {
-        return mGraphicsDetail.getValue() >= GlobalOptions.GraphicsDetail.HIGH.getValue();
+        return mStarfieldDetail.getValue() >= GlobalOptions.StarfieldDetail.STARS_AND_GAS.getValue();
     }
 
     /**

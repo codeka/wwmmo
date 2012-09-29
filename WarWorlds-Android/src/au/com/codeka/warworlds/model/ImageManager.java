@@ -29,6 +29,7 @@ import au.com.codeka.planetrender.PlanetRenderer;
 import au.com.codeka.planetrender.Template;
 import au.com.codeka.planetrender.TemplateException;
 import au.com.codeka.planetrender.Vector3;
+import au.com.codeka.warworlds.GlobalOptions;
 
 /**
  * This is the base class for the \c StarImageManagaer and \c PlanetImageManager.
@@ -66,6 +67,11 @@ public abstract class ImageManager {
      *          not been generated yet.
      */
     protected Bitmap getBitmap(Context context, final String key, int size, Object extra) {
+        GlobalOptions opts = new GlobalOptions(context);
+        if (!opts.uniqueStarsAndPlanets()) {
+            return null;
+        }
+
         final String cacheKey = String.format("%s_%d", key, size);
         Bitmap loadedBitmap = mLoadedBitmaps.get(cacheKey);
         if (loadedBitmap != null) {

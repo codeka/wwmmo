@@ -4,6 +4,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 
 public class GlobalOptions {
     private static CopyOnWriteArrayList<OptionsChangedListener> mOptionsChangedListeners =
@@ -25,13 +26,13 @@ public class GlobalOptions {
         }
     }
 
-    public enum GraphicsDetail {
-        LOW (0),
-        MEDIUM (1),
-        HIGH (2);
+    public enum StarfieldDetail {
+        BLACK (0),
+        STARS (1),
+        STARS_AND_GAS (2);
 
         private int mValue;
-        GraphicsDetail(int value) {
+        StarfieldDetail(int value) {
             mValue = value;
         }
 
@@ -39,34 +40,45 @@ public class GlobalOptions {
             return mValue;
         }
 
-        public static GraphicsDetail fromValue(int value) {
-            for(GraphicsDetail d : GraphicsDetail.values()) {
+        public static StarfieldDetail fromValue(int value) {
+            for(StarfieldDetail d : StarfieldDetail.values()) {
                 if (d.getValue() == value) {
                     return d;
                 }
             }
 
-            return GraphicsDetail.HIGH;
+            return StarfieldDetail.STARS_AND_GAS;
         }
     };
 
     private SharedPreferences mPreferences;
 
     public GlobalOptions(Context context) {
-        mPreferences = Util.getSharedPreferences(context);
+        mPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+
+        mPreferences.registerOnSharedPreferenceChangeListener(new SharedPreferences.OnSharedPreferenceChangeListener() {
+            @Override
+            public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+                if (key.startsWith("GlobalOptions.")) {
+                    fireOptionsChanged(GlobalOptions.this);
+                }
+            }
+        });
     }
 
-    public GraphicsDetail getGraphicsDetail() {
-        int value = mPreferences.getInt("GlobalOptions.GraphicsDetail", GraphicsDetail.HIGH.getValue());
-        return GraphicsDetail.fromValue(value);
+    public StarfieldDetail getStarfieldDetail() {
+        String val = mPreferences.getString("GlobalOptions.StarfieldDetail", StarfieldDetail.STARS_AND_GAS.toString());
+        for (StarfieldDetail d : StarfieldDetail.values()) {
+            if (d.toString().equals(val)) {
+                return d;
+            }
+        }
+
+        return StarfieldDetail.STARS_AND_GAS;
     }
 
-    public void setGraphicsDetail(GraphicsDetail detail) {
-        SharedPreferences.Editor editor = mPreferences.edit();
-        editor.putInt("GlobalOptions.GraphicsDetail", detail.getValue());
-        editor.commit();
-
-        fireOptionsChanged(this);
+    public boolean uniqueStarsAndPlanets() {
+        return mPreferences.getBoolean("GlobalOptions.UniqueStarsAndPlanets", true);
     }
 
     /**

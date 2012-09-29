@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory 
+        android:title="Graphics"
+        android:key="pref_key_graphics">
+        <ListPreference
+            android:key="GlobalOptions.StarfieldDetail"
+            android:summary=""
+            android:title="Starfield Detail"
+            android:defaultValue="STARS_AND_GAS" />
+        <CheckBoxPreference
+            android:key="GlobalOptions.UniqueStarsAndPlanets"
+            android:summary=""
+            android:title="Unique Stars &amp; Planets"
+            android:defaultValue="true" />
+    </PreferenceCategory>
+</PreferenceScreen>
