@@ -15,7 +15,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import au.com.codeka.XmlIterator;
 
@@ -26,7 +25,6 @@ public abstract class DesignManager {
     private static Logger log = LoggerFactory.getLogger(DesignManager.class);
 
     private SortedMap<String, Design> mDesigns;
-    private SortedMap<String, Bitmap> mDesignIcons;
 
     public static DesignManager getInstance(BuildRequest.BuildKind buildKind) {
         if (buildKind == BuildRequest.BuildKind.BUILDING)
@@ -41,8 +39,6 @@ public abstract class DesignManager {
      * list.
      */
     public void setup(final Context context) {
-        mDesignIcons = new TreeMap<String, Bitmap>();
-
         new AsyncTask<Void, Void, List<Design>>() {
             @Override
             protected List<Design> doInBackground(Void... arg0) {
@@ -95,29 +91,6 @@ public abstract class DesignManager {
      */
     public Design getDesign(String designID) {
         return mDesigns.get(designID);
-    }
-
-    /**
-     * Gets a \c Bitmap that represents the icon for the given design.
-     * 
-     * If we haven't fetched the icon from the server yet, this can return \c null in which
-     * case you you listen for the "designs updated" event (via \c addDesignsUpdatedListener).
-     */
-    public Bitmap getDesignIcon(final Design design) {
-        synchronized(mDesignIcons) {
-            if (mDesignIcons.containsKey(design.getID())) {
-                return mDesignIcons.get(design.getID());
-            }
-
-            Sprite sprite = design.getSprite();
-            if (sprite != null) {
-                Bitmap icon = sprite.createIcon(150, 150);
-                mDesignIcons.put(design.getID(), icon);
-                return icon;
-            } else {
-                return null;
-            }
-        }
     }
 
     /**

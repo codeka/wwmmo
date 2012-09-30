@@ -5,16 +5,15 @@ import org.slf4j.LoggerFactory;
 
 import android.app.Activity;
 import android.app.Dialog;
-import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.Html;
 import android.text.TextWatcher;
 import android.view.View;
+import android.view.ViewGroup.LayoutParams;
 import android.view.Window;
 import android.view.WindowManager;
-import android.view.ViewGroup.LayoutParams;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -29,8 +28,9 @@ import au.com.codeka.warworlds.model.BuildRequest;
 import au.com.codeka.warworlds.model.BuildingDesignManager;
 import au.com.codeka.warworlds.model.Colony;
 import au.com.codeka.warworlds.model.Design;
-import au.com.codeka.warworlds.model.ShipDesignManager;
 import au.com.codeka.warworlds.model.Design.DesignKind;
+import au.com.codeka.warworlds.model.ShipDesignManager;
+import au.com.codeka.warworlds.model.SpriteDrawable;
 import au.com.codeka.warworlds.model.StarManager;
 
 public class BuildConfirmDialog extends Dialog implements DialogManager.DialogConfigurable {
@@ -187,14 +187,7 @@ public class BuildConfirmDialog extends Dialog implements DialogManager.DialogCo
         TextView descriptionTextView = (TextView) findViewById(R.id.building_description);
 
         nameTextView.setText(design.getDisplayName());
-        Bitmap bm;
-        if (design.getDesignKind() == Design.DesignKind.BUILDING) {
-            bm = BuildingDesignManager.getInstance().getDesignIcon(design);
-        } else {
-            bm = ShipDesignManager.getInstance().getDesignIcon(design);
-        }
-        iconImageView.setImageBitmap(bm);
-
+        iconImageView.setImageDrawable(new SpriteDrawable(design.getSprite()));
         descriptionTextView.setText(Html.fromHtml(design.getDescription()));
     }
 }

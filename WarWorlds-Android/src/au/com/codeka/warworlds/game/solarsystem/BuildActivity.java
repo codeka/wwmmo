@@ -9,7 +9,6 @@ import org.joda.time.Period;
 
 import android.app.Dialog;
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -35,6 +34,7 @@ import au.com.codeka.warworlds.model.Design;
 import au.com.codeka.warworlds.model.DesignManager;
 import au.com.codeka.warworlds.model.ShipDesign;
 import au.com.codeka.warworlds.model.ShipDesignManager;
+import au.com.codeka.warworlds.model.SpriteDrawable;
 import au.com.codeka.warworlds.model.Star;
 import au.com.codeka.warworlds.model.StarManager;
 
@@ -259,12 +259,7 @@ public class BuildActivity extends TabFragmentActivity implements StarManager.St
                     Building building = mBuildings.get(position - 1);
                     BuildingDesign design = building.getDesign();
 
-                    Bitmap bm = BuildingDesignManager.getInstance().getDesignIcon(design);
-                    if (bm != null) {
-                        icon.setImageBitmap(bm);
-                    } else {
-                        icon.setImageBitmap(null);
-                    }
+                    icon.setImageDrawable(new SpriteDrawable(design.getSprite()));
 
                     row1.setText(design.getDisplayName());
                     row2.setText("Level 1");
@@ -286,12 +281,7 @@ public class BuildActivity extends TabFragmentActivity implements StarManager.St
 
                     BuildingDesign design = mDesigns.get(position - mBuildings.size() - 2);
 
-                    Bitmap bm = BuildingDesignManager.getInstance().getDesignIcon(design);
-                    if (bm != null) {
-                        icon.setImageBitmap(bm);
-                    } else {
-                        icon.setImageBitmap(null);
-                    }
+                    icon.setImageDrawable(new SpriteDrawable(design.getSprite()));
 
                     row1.setText(design.getDisplayName());
                     row2.setText(String.format("$ %d - %.2f hours", design.getBuildCost(),
@@ -383,12 +373,7 @@ public class BuildActivity extends TabFragmentActivity implements StarManager.St
 
                 ShipDesign design = mDesigns.get(position);
 
-                Bitmap bm = ShipDesignManager.getInstance().getDesignIcon(design);
-                if (bm != null) {
-                    icon.setImageBitmap(bm);
-                } else {
-                    icon.setImageBitmap(null);
-                }
+                icon.setImageDrawable(new SpriteDrawable(design.getSprite()));
 
                 row1.setText(design.getDisplayName());
                 row2.setText(String.format("$ %d - %.2f hours", design.getBuildCost(),
@@ -483,7 +468,7 @@ public class BuildActivity extends TabFragmentActivity implements StarManager.St
                 DesignManager dm = DesignManager.getInstance(request.getBuildKind());
                 Design design = dm.getDesign(request.getDesignName());
 
-                icon.setImageBitmap(dm.getDesignIcon(design));
+                icon.setImageDrawable(new SpriteDrawable(design.getSprite()));
 
                 if (request.getCount() == 1) {
                     row1.setText(design.getDisplayName());

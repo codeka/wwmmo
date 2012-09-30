@@ -3,6 +3,8 @@ package au.com.codeka.warworlds.game.starfield;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
+
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
@@ -19,7 +21,6 @@ import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
-import android.widget.TabHost;
 import android.widget.TextView;
 import au.com.codeka.Cash;
 import au.com.codeka.TimeInHours;
@@ -42,6 +43,7 @@ import au.com.codeka.warworlds.model.ShipDesignManager;
 import au.com.codeka.warworlds.model.Sprite;
 import au.com.codeka.warworlds.model.SpriteDrawable;
 import au.com.codeka.warworlds.model.Star;
+import au.com.codeka.warworlds.model.StarImageManager;
 import au.com.codeka.warworlds.model.StarManager;
 
 /**
@@ -55,7 +57,6 @@ public class StarfieldActivity extends Activity {
     private PlanetListAdapter mPlanetListAdapter;
     private ListView mFleetList;
     private FleetListAdapter mFleetListAdapter;
-    private TabManager mSelectedStarTabManager;
     private Star mSelectedStar;
 
     private static final int SOLAR_SYSTEM_REQUEST = 1;
@@ -71,23 +72,19 @@ public class StarfieldActivity extends Activity {
 
         mStarfield = (StarfieldSurfaceView) findViewById(R.id.starfield);
         final View selectionLoadingContainer = findViewById(R.id.loading_container);
-        final TabHost selectedStarContainer = (TabHost) findViewById(R.id.selected_star);
+        final View selectedStarContainer = findViewById(R.id.selected_star);
         final View selectedFleetContainer = findViewById(R.id.selected_fleet);
         final ImageView fleetIcon = (ImageView) findViewById(R.id.fleet_icon);
         final ImageView empireIcon = (ImageView) findViewById(R.id.empire_icon);
         final TextView fleetDesign = (TextView) findViewById(R.id.fleet_design);
         final TextView empireName = (TextView) findViewById(R.id.empire_name);
         final TextView fleetDetails = (TextView) findViewById(R.id.fleet_details);
+        final TextView starName = (TextView) findViewById(R.id.star_name);
+        final ImageView starIcon = (ImageView) findViewById(R.id.star_icon);
 
-        mPlanetList = new ListView(mContext);
-        mFleetList = new ListView(mContext);
+        mPlanetList = (ListView) findViewById(R.id.planet_list);
+        mFleetList = (ListView) findViewById(R.id.fleet_list);
 
-        mSelectedStarTabManager = new TabManager(selectedStarContainer, true);
-        mSelectedStarTabManager.addTab(mContext, new SelectedStarTabInfo("Planets"));
-        mSelectedStarTabManager.addTab(mContext, new SelectedStarTabInfo("Fleets"));
-
-        mPlanetList.setVisibility(View.VISIBLE);
-        mFleetList.setVisibility(View.GONE);
         selectedStarContainer.setVisibility(View.GONE);
         selectedFleetContainer.setVisibility(View.GONE);
 
@@ -130,14 +127,9 @@ public class StarfieldActivity extends Activity {
             @Override
             public void onStarSelected(Star star) {
                 // load the rest of the star's details as well
-                final int oldPlanetListVisibility = mPlanetList.getVisibility();
-                final int oldFleetListVisibility = mFleetList.getVisibility();
-
                 selectionLoadingContainer.setVisibility(View.VISIBLE);
                 selectedStarContainer.setVisibility(View.GONE);
                 selectedFleetContainer.setVisibility(View.GONE);
-                mPlanetList.setVisibility(View.GONE);
-                mFleetList.setVisibility(View.GONE);
 
                 StarManager.getInstance().requestStar(star.getKey(), true,
                                                       new StarManager.StarFetchedHandler() {
@@ -150,11 +142,12 @@ public class StarfieldActivity extends Activity {
                         selectionLoadingContainer.setVisibility(View.GONE);
                         selectedStarContainer.setVisibility(View.VISIBLE);
 
-                        mPlanetList.setVisibility(oldPlanetListVisibility);
-                        mFleetList.setVisibility(oldFleetListVisibility);
-
                         mPlanetListAdapter.setStar(star);
                         mFleetListAdapter.setStar(star);
+
+                        starName.setText(star.getName());
+                        Sprite starImage = StarImageManager.getInstance().getSprite(mContext, star, 80);
+                        starIcon.setImageDrawable(new SpriteDrawable(starImage));
                     }
                 });
             }
@@ -174,7 +167,7 @@ public class StarfieldActivity extends Activity {
                 });
 
                 fleetDesign.setText(design.getDisplayName());
-                fleetIcon.setImageBitmap(ShipDesignManager.getInstance().getDesignIcon(design));
+                fleetIcon.setImageDrawable(new SpriteDrawable(design.getSprite()));
 
                 String eta = "???";
                 Star srcStar = SectorManager.getInstance().findStar(fleet.getStarKey());
@@ -471,13 +464,16 @@ public class StarfieldActivity extends Activity {
             ShipDesignManager designManager = ShipDesignManager.getInstance();
             ShipDesign design = designManager.getDesign(fleet.getDesignID());
 
-            icon.setImageBitmap(designManager.getDesignIcon(design));
+            icon.setImageDrawable(new SpriteDrawable(design.getSprite()));
 
             TextView shipKindTextView = (TextView) view.findViewById(R.id.starfield_planet_type);
-            shipKindTextView.setText(design.getDisplayName());
+            shipKindTextView.setText(String.format("%s (× %d)",
+                                                   design.getDisplayName(),
+                                                   fleet.getNumShips()));
 
             final TextView shipCountTextView = (TextView) view.findViewById(R.id.starfield_planet_colony);
-            shipCountTextView.setText(String.format("%d", fleet.getNumShips()));
+            shipCountTextView.setText(String.format("%s",
+                    StringUtils.capitalize(fleet.getStance().toString().toLowerCase())));
 
             return view;
         }

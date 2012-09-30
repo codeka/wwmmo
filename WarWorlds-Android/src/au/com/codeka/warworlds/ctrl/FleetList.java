@@ -216,12 +216,7 @@ public class FleetList extends FrameLayout implements StarManager.StarFetchedHan
         ShipDesignManager dm = ShipDesignManager.getInstance();
         ShipDesign design = dm.getDesign(fleet.getDesignID());
 
-        Bitmap bm = dm.getDesignIcon(design);
-        if (bm != null) {
-            icon.setImageBitmap(bm);
-        } else {
-            icon.setImageBitmap(null);
-        }
+        icon.setImageDrawable(new SpriteDrawable(design.getSprite()));
 
         String text;
         if (fleet.getNumShips() == 1) {

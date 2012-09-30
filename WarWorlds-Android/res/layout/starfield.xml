@@ -24,20 +24,19 @@
         android:layout_above="@+id/bottom_pane"
         android:layout_marginBottom="-4px" />
 
-    <LinearLayout
+    <RelativeLayout
         android:id="@+id/bottom_pane"
         style="@style/BottomPane"
         android:layout_width="match_parent"
         android:layout_height="180dp"
         android:layout_alignParentBottom="true"
-        android:baselineAligned="false"
-        android:orientation="horizontal" >
+        android:baselineAligned="false">
 
         <FrameLayout
-            android:id="@+id/bottom_left_pane"
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_height="match_parent">
+            android:id="@+id/selection_details"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_above="@+id/empire_btn">
 
             <FrameLayout
                 android:id="@+id/loading_container"
@@ -53,31 +52,76 @@
                     android:layout_marginTop="40dp" />
             </FrameLayout>
 
-            <TabHost android:id="@+id/selected_star"
-                     android:layout_width="match_parent"
-                     android:layout_height="wrap_content"
-                     android:layout_marginTop="8dp">
+            <RelativeLayout android:id="@+id/selected_star"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp">
 
-                <LinearLayout android:orientation="vertical"
-                              android:layout_width="match_parent"
-                              android:layout_height="match_parent">
+                <ImageView
+                    android:id="@+id/star_icon"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentTop="true"
+                    android:src="@drawable/app_icon" />
 
-                    <TabWidget android:id="@android:id/tabs"
-                               android:layout_width="match_parent"
-                               android:layout_height="match_parent" />
+                <TextView
+                    android:id="@+id/star_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentTop="true"
+                    android:layout_toRightOf="@+id/star_icon"
+                    android:text="Star Name"
+                    android:textAppearance="?android:attr/textAppearanceMedium" />
 
-                    <FrameLayout android:id="@android:id/tabcontent"
-                                 android:layout_width="match_parent"
-                                 android:layout_height="match_parent">
+                <Button
+                    android:id="@+id/star_details_btn"
+                    style="@style/Button"
+                    android:layout_width="75dp"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:layout_alignParentTop="true"
+                    android:text="View" />
 
-                    </FrameLayout>
+                <Button
+                    android:id="@+id/star_report_btn"
+                    style="@style/Button"
+                    android:layout_width="75dp"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:layout_below="@+id/star_details_btn"
+                    android:text="Intel." />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_below="@+id/star_icon"
+                    android:layout_alignParentBottom="true"
+                    android:layout_toLeftOf="@+id/star_details_btn"
+                    android:orientation="horizontal">
+
+                    <ListView
+                        android:id="@+id/planet_list"
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="wrap_content" >
+                    </ListView>
+    
+                    <ListView
+                        android:id="@+id/fleet_list"
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="wrap_content" >
+                    </ListView>
 
                 </LinearLayout>
-            </TabHost>
+
+            </RelativeLayout>
 
             <RelativeLayout android:id="@+id/selected_fleet"
                             android:layout_width="match_parent"
-                            android:layout_height="match_parent" >
+                            android:layout_height="match_parent"
+                            android:visibility="gone"  >
 
                 <ImageView android:id="@+id/fleet_icon"
                            android:layout_width="40dp"
@@ -125,56 +169,50 @@
                           android:text="Fleet Details" />
 
             </RelativeLayout>
+
         </FrameLayout>
 
-        <RelativeLayout
-            android:id="@+id/bottom_right_pane"
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_height="match_parent">
+        <TextView
+            android:id="@+id/username"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_toLeftOf="@+id/cash"
+            android:layout_alignBaseline="@+id/empire_btn"
+            android:paddingLeft="5dip"
+            android:paddingRight="5dip"
+            android:textAppearance="?android:attr/textAppearanceSmall" />
 
-            <TextView
-                android:id="@+id/username"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentTop="true"
-                android:paddingLeft="5dip"
-                android:paddingRight="5dip"
-                android:textAppearance="?android:attr/textAppearanceSmall" />
+        <TextView
+            android:id="@+id/cash"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_toLeftOf="@+id/reports_btn"
+            android:layout_alignBaseline="@+id/empire_btn"
+            android:paddingLeft="5dip"
+            android:paddingRight="10dip"
+            android:text="$12,345"
+            android:textAppearance="?android:attr/textAppearanceSmall" />
 
-            <TextView
-                android:id="@+id/cash"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:layout_alignParentTop="true"
-                android:paddingLeft="5dip"
-                android:paddingRight="10dip"
-                android:textAppearance="?android:attr/textAppearanceSmall" />
+        <Button
+            android:id="@+id/reports_btn"
+            style="@style/Button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Sit. Rep."
+            android:layout_toLeftOf="@+id/empire_btn"
+            android:layout_alignBaseline="@+id/empire_btn" />
 
-            <Button
-                android:id="@+id/reports_btn"
-                style="@style/Button"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/reports"
-                android:layout_marginLeft="10dp"
-                android:layout_marginRight="10dp"
-                android:layout_below="@id/username" />
+        <Button
+            android:id="@+id/empire_btn"
+            style="@style/Button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentBottom="true"
+            android:text="@string/empire" />
 
-            <Button
-                android:id="@+id/empire_btn"
-                style="@style/Button"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/empire"
-                android:layout_marginLeft="10dp"
-                android:layout_marginRight="10dp"
-                android:layout_below="@id/reports_btn" />
-
-        </RelativeLayout>
-
-    </LinearLayout>
+    </RelativeLayout>
 
 </RelativeLayout>
