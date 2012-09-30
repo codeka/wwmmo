@@ -10,6 +10,13 @@ indexes:
 # automatically uploaded to the admin console when you next deploy
 # your application using appcfg.py.
 
+- kind: ScoutReport
+  ancestor: yes
+  properties:
+  - name: empire
+  - name: date
+    direction: desc
+
 - kind: Sector
   properties:
   - name: numColonies

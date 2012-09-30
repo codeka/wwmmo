@@ -446,8 +446,7 @@ class BuildQueuePage(ApiPage):
 
 
 class FleetOrdersPage(ApiPage):
-  """This page is where we post orders that we issue to fleets.
-  """
+  """This page is where we post orders that we issue to fleets."""
   def post(self, star_key, fleet_key):
     order_pb = self._getRequestBody(pb.FleetOrder)
     fleet_pb = empire.getFleet(fleet_key)
@@ -462,6 +461,15 @@ class FleetOrdersPage(ApiPage):
       self.response.set_status(400)
     else:
       self.response.set_status(200)
+
+
+class ScoutReportsPage(ApiPage):
+  """This page returns a list of scout reports for the given star."""
+  def get(self, star_key):
+    curr_empire_pb = empire.getEmpireForUser(self.user)
+
+    scout_reports_pb = empire.getScoutReports(star_key, curr_empire_pb.key)
+    return scout_reports_pb
 
 
 class ApiApplication(webapp.WSGIApplication):
@@ -531,5 +539,6 @@ app = ApiApplication([("/api/v1/hello/([^/]+)", HelloPage),
                       ("/api/v1/stars/([^/]+)/colonies", ColoniesPage),
                       ("/api/v1/stars/([^/]+)/colonies/([^/]+)", ColoniesPage),
                       ("/api/v1/stars/([^/]+)/colonies/([^/]+)/taxes", ColoniesTaxesPage),
-                      ("/api/v1/stars/([^/]+)/fleets/([^/]+)/orders", FleetOrdersPage)],
+                      ("/api/v1/stars/([^/]+)/fleets/([^/]+)/orders", FleetOrdersPage),
+                      ("/api/v1/stars/([^/]+)/scout-reports", ScoutReportsPage)],
                      debug=os.environ["SERVER_SOFTWARE"].startswith("Development"))

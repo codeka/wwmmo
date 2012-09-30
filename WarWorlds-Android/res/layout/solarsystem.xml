@@ -226,12 +226,12 @@
                     android:layout_marginLeft="10dp" />
 
                 <Button
-                    android:id="@+id/other_btn"
+                    android:id="@+id/reports_btn"
                     style="@style/Button"
                     android:layout_width="0dp"
                     android:layout_weight="1"
                     android:layout_height="wrap_content"
-                    android:text="TODO"
+                    android:text="Reports"
                     android:layout_marginLeft="10dp" />
 
             </LinearLayout>

@@ -22,7 +22,6 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import au.com.codeka.warworlds.DialogManager;
 import au.com.codeka.warworlds.R;
-import au.com.codeka.warworlds.WarWorldsActivity;
 import au.com.codeka.warworlds.api.ApiClient;
 import au.com.codeka.warworlds.api.ApiException;
 import au.com.codeka.warworlds.model.BuildQueueManager;
@@ -35,7 +34,7 @@ import au.com.codeka.warworlds.model.Design.DesignKind;
 import au.com.codeka.warworlds.model.StarManager;
 
 public class BuildConfirmDialog extends Dialog implements DialogManager.DialogConfigurable {
-    private static Logger log = LoggerFactory.getLogger(WarWorldsActivity.class);
+    private static Logger log = LoggerFactory.getLogger(BuildConfirmDialog.class);
     private Colony mColony;
     private Design mDesign;
 

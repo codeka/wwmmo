@@ -37,7 +37,6 @@ public class FleetDialog extends Dialog implements DialogManager.DialogConfigura
         params.height = LayoutParams.MATCH_PARENT;
         params.width = LayoutParams.MATCH_PARENT;
         getWindow().setAttributes(params);
-
     }
 
     @Override

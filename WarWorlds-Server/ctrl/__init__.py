@@ -17,28 +17,12 @@ import model as mdl
 
 def getCached(keys, ProtoBuffClass):
   mc = memcache.Client()
-  values = mc.get_multi(keys, for_cas=True)
-  if ProtoBuffClass is None:
-    return values
-
-  real_values = {}
-  for key in values:
-    real_value = ProtoBuffClass()
-    real_value.ParseFromString(values[key])
-    real_values[key] = real_value
-  return real_values
+  return mc.get_multi(keys, for_cas=True)
 
 
 def setCached(mapping):
-  serialized_mapping = {}
-  for key in mapping:
-    if isinstance(mapping[key], Message):
-      serialized_mapping[key] = mapping[key].SerializeToString()
-    else:
-      serialized_mapping[key] = mapping[key]
-
   mc = memcache.Client()
-  mc.set_multi(serialized_mapping)
+  mc.set_multi(mapping)
 
 
 def clearCached(keys):
@@ -231,6 +215,13 @@ def fleetModelToPb(fleet_pb, fleet_model):
 def fleetPbToModel(fleet_model, fleet_pb):
   #TODO
   pass
+
+def scoutReportModelToPb(scout_report_pb, scout_report_mdl):
+  scout_report_pb.key = str(scout_report_mdl.key())
+  scout_report_pb.empire_key = str(empire_mdl.ScoutReport.empire.get_value_for_datastore(scout_report_mdl))
+  scout_report_pb.star_key = str(scout_report_mdl.key().parent())
+  scout_report_pb.date = dateTimeToEpoch(scout_report_mdl.date)
+  scout_report_pb.star_pb = scout_report_mdl.report
 
 
 def dateTimeToEpoch(dt):

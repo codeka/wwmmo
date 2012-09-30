@@ -191,4 +191,13 @@ class ScoutReport(db.Model):
   fleets, and whatnot "frozen" in time -- at the point the report was made."""
   empire = db.ReferenceProperty(Empire)
   report = db.BlobProperty()
+  date = db.DateTimeProperty()
 
+  @staticmethod
+  def getReports(star_key, empire_key):
+    reports = []
+    query = ScoutReport.all().ancestor(star_key).filter("empire", empire_key).order("-date")
+    for mdl in query:
+      reports.append(mdl)
+
+    return reports

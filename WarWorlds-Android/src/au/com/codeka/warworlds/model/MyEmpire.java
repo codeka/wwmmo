@@ -165,6 +165,36 @@ public class MyEmpire extends Empire {
 
     }
 
+    public void fetchScoutReports(final Star star, final FetchScoutReportCompleteHandler handler) {
+        new AsyncTask<Void, Void, List<ScoutReport>>() {
+            @Override
+            protected List<ScoutReport> doInBackground(Void... arg0) {
+                try {
+                    String url = String.format("stars/%s/scout-reports", star.getKey());
+                    warworlds.Warworlds.ScoutReports pb = ApiClient.getProtoBuf(url, 
+                            warworlds.Warworlds.ScoutReports.class);
+                    if (pb == null)
+                        return null;
+
+                    ArrayList<ScoutReport> reports = new ArrayList<ScoutReport>();
+                    for (warworlds.Warworlds.ScoutReport srpb : pb.getReportsList()) {
+                        reports.add(ScoutReport.fromProtocolBuffer(srpb));
+                    }
+                    return reports;
+                } catch(Exception e) {
+                    // TODO: handle exceptions
+                    log.error(ExceptionUtils.getStackTrace(e));
+                    return null;
+                }
+            }
+
+            @Override
+            protected void onPostExecute(List<ScoutReport> reports) {
+                handler.onComplete(reports);
+            }
+        }.execute();
+    }
+
     /**
      * Refreshes all the details of this empire (e.g. collection of colonies, fleets etc)
      */
@@ -295,5 +325,9 @@ public class MyEmpire extends Empire {
 
     public static interface RefreshAllCompleteHandler {
         public void onRefreshAllComplete(MyEmpire empire);
+    }
+
+    public static interface FetchScoutReportCompleteHandler {
+        public void onComplete(List<ScoutReport> reports);
     }
 }

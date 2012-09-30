@@ -187,6 +187,23 @@ def getColony(colony_key):
     return colony_pb
 
 
+def getScoutReports(star_key, empire_key):
+  cache_key = "scout-report:%s:%s" % (star_key, empire_key)
+  values = ctrl.getCached([cache_key], pb.ScoutReport)
+  if cache_key in values:
+    return values[cache_key]
+
+  scout_reports_pb = pb.ScoutReports()
+  scout_report_mdls = mdl.ScoutReport.getReports(db.Key(star_key), db.Key(empire_key))
+  for scout_report_mdl in scout_report_mdls:
+    scout_report_pb = scout_reports_pb.reports.add()
+    ctrl.scoutReportModelToPb(scout_report_pb, scout_report_mdl)
+
+  # note: we WANT to cache an empty one, if there's none in the data store...
+  ctrl.setCached({cache_key: scout_reports_pb})
+  return scout_reports_pb
+
+
 def updateColony(colony_key, updated_colony_pb):
   """Updates the colony with the given colony_key with the new parameters in updated_colony_pb.
 
@@ -1104,6 +1121,7 @@ class ShipEffectScout(ShipEffect):
     scout_report_mdl = mdl.ScoutReport(parent=db.Key(star_pb.key))
     scout_report_mdl.empire = db.Key(fleet_pb.empire_key)
     scout_report_mdl.report = star_pb.SerializeToString()
+    scout_report_mdl.date = datetime.now()
     scout_report_mdl.put()
     ctrl.clearCached(["scout-report:%s:%s" % (star_pb.key, fleet_pb.empire_key)])
 

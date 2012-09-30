@@ -56,6 +56,7 @@ public class SolarSystemActivity extends Activity implements StarManager.StarFet
         final Button buildButton = (Button) findViewById(R.id.solarsystem_colony_build);
         final Button focusButton = (Button) findViewById(R.id.solarsystem_colony_focus);
         final Button fleetButton = (Button) findViewById(R.id.fleet_btn);
+        final Button reportsButton = (Button) findViewById(R.id.reports_btn);
 
         MyEmpire empire = EmpireManager.getInstance().getEmpire();
         TextView username = (TextView) findViewById(R.id.username);
@@ -120,6 +121,15 @@ public class SolarSystemActivity extends Activity implements StarManager.StarFet
                 Bundle args = new Bundle();
                 args.putString("au.com.codeka.warworlds.StarKey", mStar.getKey());
                 DialogManager.getInstance().show(SolarSystemActivity.this, FleetDialog.class, args);
+            }
+        });
+
+        reportsButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Bundle args = new Bundle();
+                args.putString("au.com.codeka.warworlds.StarKey", mStar.getKey());
+                DialogManager.getInstance().show(SolarSystemActivity.this, ScoutReportDialog.class, args);
             }
         });
     }

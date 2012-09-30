@@ -12,6 +12,7 @@ import au.com.codeka.warworlds.game.FleetSplitDialog;
 import au.com.codeka.warworlds.game.solarsystem.BuildConfirmDialog;
 import au.com.codeka.warworlds.game.solarsystem.FleetDialog;
 import au.com.codeka.warworlds.game.solarsystem.FocusDialog;
+import au.com.codeka.warworlds.game.solarsystem.ScoutReportDialog;
 
 /**
  * Manages the dialogs we show, since they could come from multiple activities it's easier
@@ -71,6 +72,8 @@ public class DialogManager {
             return new BuildConfirmDialog(activity);
         case FocusDialog.ID:
             return new FocusDialog(activity);
+        case ScoutReportDialog.ID:
+            return new ScoutReportDialog(activity);
         }
 
         return null;
