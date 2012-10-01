@@ -322,7 +322,7 @@ def updateAfterSimulate(star_pb, empire_key=None, log=_log_noop):
     keys_to_clear.append("colony:%s" % colony_pb.key)
 
   for empire_pb in star_pb.empires:
-    if empire_pb.empire_key != empire_key:
+    if empire_pb.empire_key != empire_key or not empire_pb.empire_key:
       continue
     if empire_pb.key == "":
       empire_model = mdl.EmpirePresence(parent=db.Key(star_pb.key))
@@ -342,16 +342,27 @@ def updateAfterSimulate(star_pb, empire_key=None, log=_log_noop):
     build_model.put()
   keys_to_clear.append("buildqueue:for-empire:%s" % empire_key)
 
+  for fleet_pb in star_pb.fleets:
+    if fleet_pb.empire_key != empire_key:
+      continue
+    fleet_model = mdl.Fleet.get(fleet_pb.key)
+    ctrl.fleetPbToModel(fleet_model, fleet_pb)
+    fleet_model.put()
+
   keys_to_clear.append("star:%s" % star_pb.key)
   ctrl.clearCached(keys_to_clear)
 
 
 def simulate(star_pb, empire_key=None,  log=_log_noop):
-  """Simulates the star and gets all of the colonies up to date.
+  """Simulates the star and gets all of the colonies and fleets up to date.
 
   When simulating a star, we simulate all colonies in that star that belong to the given empire
   at once. This is because there are certain resources (particularly food & minerals) that get
   shared between all colonies in the starsystem.
+
+  We also simulate any non-IDLE fleets all at once (regardless of empire) because the rules for
+  attacking are quite strict (i.e. alternating attacks, etc). Simulating attacks is relatively rare,
+  because they typically resolve within a few minutes.
 
   Args:
     star_pb: A star protobuf containing details of all the colonies, planets and whatnot in the
@@ -434,13 +445,95 @@ def simulate(star_pb, empire_key=None,  log=_log_noop):
       if prediction_build_req.key == build_req.key:
         build_req.end_time = prediction_build_req.end_time
 
-  # Finally, we make sure last_simulation is correct
+  # Finally (for the colonies anyway), we make sure last_simulation is correct
   last_simulation = ctrl.dateTimeToEpoch(datetime.now())
   for colony_pb in star_pb.colonies:
     if colony_pb.empire_key != empire_key:
       continue
-
     colony_pb.last_simulation = last_simulation
+
+  # Now that the colonies are up-to-date, we'll want to simulate any ATTACKING fleets.
+  attacking_fleets = []
+  for fleet_pb in star_pb.fleets:
+    if fleet_pb.state == pb.Fleet.ATTACKING:
+      attacking_fleets.append(fleet_pb)
+
+  if attacking_fleets:
+    log("")
+    log("---- Resolving conflicts")
+    log("")
+    cache = {}
+
+    for fleet_pb in star_pb.fleets:
+      cache[fleet_pb.key] = {"design": ShipDesign.getDesign(fleet_pb.design_name),
+                             "fleet": fleet_pb}
+
+    attack_start_time = 0
+    for fleet_pb in attacking_fleets:
+      if attack_start_time == 0 or fleet_pb.state_start_time < attack_start_time:
+        attack_start_time = fleet_pb.state_start_time
+      for other_fleet_pb in star_pb.fleets:
+        if fleet_pb.target_fleet_key == other_fleet_pb.key:
+          cache[fleet_pb.key]["target"] = other_fleet_pb
+
+    # round to the next minute
+    dt = ctrl.epochToDateTime(attack_start_time)
+    attack_start_time = datetime(dt.year, dt.month, dt.day, dt.hour, dt.minute, 0)
+    attack_start_time += timedelta(minutes=1)
+
+    # attacks happen in turns, one per minute. We keep simulating until the conlict is
+    # fully resolved (usually not too long)
+    now = attack_start_time
+    round = 0
+    while True:
+      hits = []
+      for fleet_pb in attacking_fleets:
+        if fleet_pb.num_ships > 0:
+          design = cache[fleet_pb.key]['design']
+          target = cache[fleet_pb.key]['target']
+
+          if target.num_ships > 0:
+            damage = fleet_pb.num_ships # todo: more complicated!
+            hits.append({"fleet": target.key, "damage": damage})
+
+      # apply the damage from this round after every fleet has had a turn inflicting it
+      for hit in hits:
+        fleet_pb = cache[hit["fleet"]]["fleet"]
+        fleet_pb.num_ships -= int(damage)
+        if fleet_pb.num_ships < 0:
+          fleet_pb.num_ships = 0
+
+      # go through the attacking fleets and make sure they're still attacking...
+      remaining_attacking_fleets = []
+      for fleet_pb in attacking_fleets:
+        if fleet_pb.num_ships == 0:
+          continue
+
+        target = cache[fleet_pb.target_fleet_key]["fleet"]
+        if target.num_ships == 0:
+          fleet_pb.target_fleet_key = ""
+          if fleet_pb.stance == pb.Fleet.AGGRESSIVE:
+            for potential_target_fleet_pb in star_pb.fleets:
+              if fleet_pb.empire_key != potential_target_fleet_pb.empire_key:
+                fleet_pb.target_fleet_key = potential_target_fleet_pb.key
+              break
+        if not fleet_pb.target_fleet_key:
+          continue
+
+        remaining_attacking_fleets.append(fleet_pb)
+
+      now += timedelta(minutes=1)
+      round += 1
+      log("Round:%d results:" % (round))
+      for fleet_pb in star_pb.fleets:
+        log("  Fleet:%s [empire=%s] [design=%s] [num-ships=%d] [state=%d] [stance=%d]" %
+            (fleet_pb.key, fleet_pb.empire_key, fleet_pb.design_name, fleet_pb.num_ships,
+             fleet_pb.state, fleet_pb.stance))
+
+      if not remaining_attacking_fleets:
+        break
+
+    # go through any fleets that have been destroyed and... do something, I dunno...
 
 
 def _simulateStep(dt, now, star_pb, empire_key, log):
@@ -995,7 +1088,6 @@ def _orderFleet_move(fleet_pb, order_pb):
     ctrl.clearCached(["empire:%s" % (str(empire_mdl.key())),
                       "empire:for-user:%s" % (empire_mdl.user.email())])
 
-
   fleet_mdl.state = pb.Fleet.MOVING
   fleet_mdl.stateStartTime = datetime.now()
   fleet_mdl.destinationStar = db.Key(order_pb.star_key)
@@ -1109,6 +1201,9 @@ class ShipEffect(Effect):
     """This is called when a fleet with this effect "lands" on a star."""
     pass
 
+  def onFleetArrived(self, fleet_pb, star_pb, new_fleet_pb):
+    """This is called when we're orbiting a star, and a new fleet arrives."""
+    pass
 
 class ShipEffectScout(ShipEffect):
   """The scout effect will generate a scout report every time the ship reaches a star."""
@@ -1124,6 +1219,39 @@ class ShipEffectScout(ShipEffect):
     scout_report_mdl.date = datetime.now()
     scout_report_mdl.put()
     ctrl.clearCached(["scout-report:%s:%s" % (star_pb.key, fleet_pb.empire_key)])
+
+
+class ShipEffectFighter(ShipEffect):
+  """This fighter effect is for any ship that allows for fighting (which is most of them)"""
+  def __init__(self, kind, effectXml):
+    super(ShipEffectFighter, self).__init__(kind)
+
+  def onFleetArrived(self, fleet_pb, star_pb, new_fleet_pb):
+    """Called when a new fleet arrives at the star we're orbiting.
+
+    If the new fleet is an enemy (i.e. a different empire) and we're in aggressive mode, then
+    we'll want to attack it. Change into attack mode and simulate."""
+    if new_fleet_pb.empire_key == fleet_pb.empire_key:
+      return
+
+    if fleet_pb.stance != pb.Fleet.AGGRESSIVE:
+      return
+
+    if fleet_pb.state != pb.Fleet.IDLE:
+      return
+
+    # alright, let's do this thing!
+    star_pb = sector.getStar(star_pb.key)
+    simulate(star_pb)
+
+    for star_fleet_pb in star_pb.fleets:
+      if star_fleet_pb.key == fleet_pb.key:
+        star_fleet_pb.state = pb.Fleet.ATTACKING
+        star_fleet_pb.target_fleet_key = new_fleet_pb.key
+        star_fleet_pb.state_start_time = ctrl.dateTimeToEpoch(datetime.now())
+
+    simulate(star_pb)
+    updateAfterSimulate(star_pb)
 
 
 class ShipDesign(Design):
@@ -1207,6 +1335,8 @@ def _parseShipDesign(designXml):
       kind = effectXml.get("kind")
       if kind == "scout":
         effect = ShipEffectScout(kind, effectXml)
+      elif kind == "fighter":
+        effect = ShipEffectFighter(kind, effectXml)
       design.effects.append(effect)
   return design
 

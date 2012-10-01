@@ -210,8 +210,6 @@ class FleetMoveCompletePage(tasks.TaskPage):
                         "sector:%d,%d" % (old_star_pb.sector_x, old_star_pb.sector_y)])
 
       design = ctl.ShipDesign.getDesign(fleet_mdl.designName)
-      for effect in design.getEffects():
-        effect.onStarLanded(new_fleet_pb, new_star_pb)
 
       # Send a notification to the player that construction of their building is complete
       msg = "Your %s fleet of %d ships has arrived on %s." % (design.name,
@@ -223,6 +221,16 @@ class FleetMoveCompletePage(tasks.TaskPage):
       devices = ctrl.getDevicesForUser(empire.user.email())
       for device in devices.registrations:
         s.sendMessage(device.device_registration_id, {"msg": msg})
+
+      # apply any "star landed" effects
+      for effect in design.getEffects():
+        effect.onStarLanded(new_fleet_pb, new_star_pb)
+
+      # if there's any ships already there, apply their onFleetArrived effects
+      for fleet_pb in new_star_pb.fleets:
+        design = ctl.ShipDesign.getDesign(fleet_pb.design_name)
+        for effect in design.getEffects():
+          effect.onFleetArrived(fleet_pb, new_star_pb, new_fleet_pb)
 
 
 app = webapp.WSGIApplication([("/tasks/empire/build-check", BuildCheckPage),

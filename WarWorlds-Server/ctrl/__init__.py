@@ -201,9 +201,21 @@ def fleetModelToPb(fleet_pb, fleet_model):
   fleet_pb.state = fleet_model.state
   fleet_pb.state_start_time = dateTimeToEpoch(fleet_model.stateStartTime)
   fleet_pb.star_key = str(fleet_model.key().parent())
-  fleet_pb.destination_star_key = str(empire_mdl.Fleet.destinationStar.get_value_for_datastore(fleet_model))
-  fleet_pb.target_fleet_key = str(empire_mdl.Fleet.targetFleet.get_value_for_datastore(fleet_model))
-  fleet_pb.target_colony_key = str(empire_mdl.Fleet.targetColony.get_value_for_datastore(fleet_model))
+  destination_star_key = empire_mdl.Fleet.destinationStar.get_value_for_datastore(fleet_model)
+  if destination_star_key:
+    fleet_pb.destination_star_key = str(destination_star_key)
+  else:
+    fleet_pb.destination_star_key = ""
+  target_fleet_key = empire_mdl.Fleet.targetFleet.get_value_for_datastore(fleet_model)
+  if target_fleet_key:
+    fleet_pb.target_fleet_key = str(target_fleet_key)
+  else:
+    fleet_pb.target_fleet_key = ""
+  target_colony_key = empire_mdl.Fleet.targetColony.get_value_for_datastore(fleet_model)
+  if target_colony_key:
+    fleet_pb.target_colony_key = str(target_colony_key)
+  else:
+    fleet_pb.target_colony_key = ""
   if fleet_model.stance:
     fleet_pb.stance = fleet_model.stance
   else:
@@ -211,8 +223,22 @@ def fleetModelToPb(fleet_pb, fleet_model):
 
 
 def fleetPbToModel(fleet_model, fleet_pb):
-  #TODO
-  pass
+  fleet_model.state = fleet_pb.state
+  fleet_model.stateStartTime = epochToDateTime(fleet_pb.state_start_time)
+  if fleet_pb.destination_star_key:
+    fleet_model.destinationStar = db.Key(fleet_pb.destination_star_key)
+  else:
+    fleet_model.destinationStar = None
+  if fleet_pb.target_fleet_key:
+    fleet_model.targetFleet = db.Key(fleet_pb.target_fleet_key)
+  else:
+    fleet_model.targetFleet = None
+  if fleet_pb.target_colony_key:
+    fleet_model.targetColony = db.Key(fleet_pb.target_coplony_key)
+  else:
+    fleet_model.targetColony = None
+  fleet_model.stance = fleet_pb.stance
+
 
 def scoutReportModelToPb(scout_report_pb, scout_report_mdl):
   scout_report_pb.key = str(scout_report_mdl.key())
