@@ -29,6 +29,7 @@ import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.TabManager;
 import au.com.codeka.warworlds.TabManager.TabInfo;
 import au.com.codeka.warworlds.game.EmpireActivity;
+import au.com.codeka.warworlds.game.solarsystem.ScoutReportDialog;
 import au.com.codeka.warworlds.game.solarsystem.SolarSystemActivity;
 import au.com.codeka.warworlds.model.Colony;
 import au.com.codeka.warworlds.model.Empire;
@@ -215,6 +216,20 @@ public class StarfieldActivity extends Activity {
             public void onClick(View v) {
                 Intent intent = new Intent(mContext, EmpireActivity.class);
                 StarfieldActivity.this.startActivityForResult(intent, EMPIRE_REQUEST);
+            }
+        });
+
+        final Button scoutReportBtn = (Button) findViewById(R.id.scout_report_btn);
+        scoutReportBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mSelectedStar != null) {
+                    Bundle args = new Bundle();
+                    args.putString("au.com.codeka.warworlds.StarKey", mSelectedStar.getKey());
+                    DialogManager.getInstance().show(StarfieldActivity.this,
+                                                     ScoutReportDialog.class,
+                                                     args);
+                }
             }
         });
     }

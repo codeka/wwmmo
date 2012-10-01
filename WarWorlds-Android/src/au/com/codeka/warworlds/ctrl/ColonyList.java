@@ -153,6 +153,28 @@ public class ColonyList extends FrameLayout {
         }
     }
 
+    public static void populateColonyListRow(Context context, View view, Colony colony, Star star) {
+        Planet planet = star.getPlanets()[colony.getPlanetIndex() - 1];
+
+        ImageView starIcon = (ImageView) view.findViewById(R.id.star_icon);
+        ImageView planetIcon = (ImageView) view.findViewById(R.id.planet_icon);
+        TextView colonyName = (TextView) view.findViewById(R.id.colony_name);
+        TextView colonySummary = (TextView) view.findViewById(R.id.colony_summary);
+        TextView uncollectedTaxes = (TextView) view.findViewById(R.id.colony_taxes);
+
+        int imageSize = (int)(star.getSize() * star.getStarType().getImageScale() * 2);
+        Sprite sprite = StarImageManager.getInstance().getSprite(context, star, imageSize);
+        starIcon.setImageDrawable(new SpriteDrawable(sprite));
+
+        sprite = PlanetImageManager.getInstance().getSprite(context, planet);
+        planetIcon.setImageDrawable(new SpriteDrawable(sprite));
+
+        colonyName.setText(String.format("%s %s", star.getName(), RomanNumeralFormatter.format(planet.getIndex())));
+        colonySummary.setText(String.format("Pop: %d", (int) colony.getPopulation()));
+
+        uncollectedTaxes.setText(String.format("Taxes: %s", Cash.format(colony.getUncollectedTaxes())));
+    }
+
     /**
      * This adapter is used to populate the list of colonies that we're looking at.
      */
@@ -258,25 +280,7 @@ public class ColonyList extends FrameLayout {
 
             Colony colony = mColonies.get(position);
             Star star = mStars.get(colony.getStarKey());
-            Planet planet = star.getPlanets()[colony.getPlanetIndex() - 1];
-
-            ImageView starIcon = (ImageView) view.findViewById(R.id.star_icon);
-            ImageView planetIcon = (ImageView) view.findViewById(R.id.planet_icon);
-            TextView colonyName = (TextView) view.findViewById(R.id.colony_name);
-            TextView colonySummary = (TextView) view.findViewById(R.id.colony_summary);
-            TextView uncollectedTaxes = (TextView) view.findViewById(R.id.colony_taxes);
-
-            int imageSize = (int)(star.getSize() * star.getStarType().getImageScale() * 2);
-            Sprite sprite = StarImageManager.getInstance().getSprite(mContext, star, imageSize);
-            starIcon.setImageDrawable(new SpriteDrawable(sprite));
-
-            sprite = PlanetImageManager.getInstance().getSprite(mContext, planet);
-            planetIcon.setImageDrawable(new SpriteDrawable(sprite));
-
-            colonyName.setText(String.format("%s %s", star.getName(), RomanNumeralFormatter.format(planet.getIndex())));
-            colonySummary.setText(String.format("Pop: %d", (int) colony.getPopulation()));
-
-            uncollectedTaxes.setText(String.format("Taxes: %s", Cash.format(colony.getUncollectedTaxes())));
+            populateColonyListRow(mContext, view, colony, star);
 
             if (mSelectedColony != null && mSelectedColony.getKey().equals(colony.getKey())) {
                 view.setBackgroundColor(0xff0c6476);

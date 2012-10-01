@@ -308,6 +308,12 @@ class SectorsPage(StarfieldPage):
         del sector_pb.fleets[:]
         sector_pb.fleets.extend(visible_fleets)
 
+      # empty out the list of planets in the stars. it's not needed and saves
+      # a bit of space in the response
+      for sector_pb in sectors_pb.sectors:
+        for star_pb in sector_pb.stars:
+          del star_pb.planets[:]
+
       return sectors_pb
     else:
       # TODO: other ways of querying for sectors?

@@ -112,10 +112,10 @@ def sectorModelToPb(sector_pb, sector_model):
 
   for star_model in sector_model.stars:
     star_pb = sector_pb.stars.add()
-    starModelToPb(star_pb, star_model, False)
+    starModelToPb(star_pb, star_model)
 
 
-def starModelToPb(star_pb, star_model, include_planets=True):
+def starModelToPb(star_pb, star_model):
   """Converts the given star model to a protocol buffer.
 
   Args:
@@ -133,9 +133,7 @@ def starModelToPb(star_pb, star_model, include_planets=True):
   star_pb.name = star_model.name.title()
   star_pb.classification = star_model.starTypeID
   star_pb.size = star_model.size
-  star_pb.num_planets = len(star_model.planets)
-  if include_planets:
-    star_pb.planets.extend(star_model.planets)
+  star_pb.planets.extend(star_model.planets)
   if not star_model.timeEmptied:
     star_pb.time_emptied = 0
   else:

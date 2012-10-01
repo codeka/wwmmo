@@ -211,12 +211,8 @@ message Star
     // the offset from the bottom edge of the sector, in pixels
     required int32 offset_y = 7;
 
-    // the number of planets orbiting this star (useful for knowing whether there are
-    // actually planets, and the planets field is just empty, or whether there are no
-    // planets anyway).
-    optional int32 num_planets = 8;
-
-    // the collection of planets orbiting this star (may be empty)
+    // the collection of planets orbiting this star (may be empty, for example in the list
+    // of stars in a sector)
     repeated Planet planets = 9;
 
     // collection of colonies on our planet(s)

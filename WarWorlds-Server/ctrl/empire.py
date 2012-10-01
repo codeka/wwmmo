@@ -1117,7 +1117,7 @@ class ShipEffectScout(ShipEffect):
 
   def onStarLanded(self, fleet_pb, star_pb):
     """This is called when a fleet with this effect "lands" on a star."""
-    logging.info("Generating scout report.... star=%s" % (star_pb.name))
+    logging.info("Generating scout report.... star=%s (# planets=%d)" % (star_pb.name, len(star_pb.planets)))
     scout_report_mdl = mdl.ScoutReport(parent=db.Key(star_pb.key))
     scout_report_mdl.empire = db.Key(fleet_pb.empire_key)
     scout_report_mdl.report = star_pb.SerializeToString()

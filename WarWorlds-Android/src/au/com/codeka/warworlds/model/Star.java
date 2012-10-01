@@ -57,7 +57,6 @@ public class Star implements Parcelable {
     private long mSectorY;
     private int mOffsetX;
     private int mOffsetY;
-    private int mNumPlanets;
     private Planet[] mPlanets;
     private ArrayList<Colony> mColonies;
     private ArrayList<EmpirePresence> mEmpires;
@@ -102,7 +101,7 @@ public class Star implements Parcelable {
     }
     public int getNumPlanets() {
         if (mPlanets == null) {
-            return mNumPlanets;
+            return 0;
         } else {
             return mPlanets.length;
         }
@@ -173,7 +172,6 @@ public class Star implements Parcelable {
         parcel.writeLong(mSectorY);
         parcel.writeInt(mOffsetX);
         parcel.writeInt(mOffsetY);
-        parcel.writeInt(mNumPlanets);
         parcel.writeParcelableArray(mPlanets, flags);
     }
 
@@ -190,7 +188,6 @@ public class Star implements Parcelable {
             s.mSectorY = parcel.readLong();
             s.mOffsetX = parcel.readInt();
             s.mOffsetY = parcel.readInt();
-            s.mNumPlanets = parcel.readInt();
 
             Parcelable[] planets = parcel.readParcelableArray(Planet.class.getClassLoader());
             s.mPlanets = new Planet[planets.length];
@@ -225,14 +222,11 @@ public class Star implements Parcelable {
         s.mSectorY = pb.getSectorY();
         s.mOffsetX = pb.getOffsetX();
         s.mOffsetY = pb.getOffsetY();
-        s.mNumPlanets = pb.getNumPlanets();
 
         int numPlanets = pb.getPlanetsCount();
-        if (numPlanets > 0) {
-            s.mPlanets = new Planet[numPlanets];
-            for (int i = 0; i < numPlanets; i++) {
-                s.mPlanets[i] = Planet.fromProtocolBuffer(s, pb.getPlanets(i));
-            }
+        s.mPlanets = new Planet[numPlanets];
+        for (int i = 0; i < numPlanets; i++) {
+            s.mPlanets[i] = Planet.fromProtocolBuffer(s, pb.getPlanets(i));
         }
 
         s.mColonies = new ArrayList<Colony>();

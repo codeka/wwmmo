@@ -84,7 +84,7 @@
                     android:text="View" />
 
                 <Button
-                    android:id="@+id/star_report_btn"
+                    android:id="@+id/scout_report_btn"
                     style="@style/Button"
                     android:layout_width="75dp"
                     android:layout_height="wrap_content"
@@ -106,7 +106,7 @@
                         android:layout_weight="1"
                         android:layout_height="wrap_content" >
                     </ListView>
-    
+
                     <ListView
                         android:id="@+id/fleet_list"
                         android:layout_width="0dp"
