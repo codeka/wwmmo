@@ -15,6 +15,7 @@ import model
 from model import c2dm
 from ctrl import sector
 from ctrl import empire
+from ctrl import simulation
 import ctrl
 
 from protobufs import protobuf_json, warworlds_pb2 as pb
@@ -178,8 +179,10 @@ class EmpiresPage(ApiPage):
       self.response.set_status(400)
       return
 
+    sim = simulation.Simulation()
     empire_pb.email = self.user.email()
-    empire.createEmpire(empire_pb)
+    empire.createEmpire(empire_pb, sim)
+    sim.update()
 
 
 class EmpireDetailsPage(ApiPage):
@@ -204,11 +207,12 @@ class EmpireDetailsPage(ApiPage):
         if fleet_pb.star_key not in star_keys:
           star_keys.append(fleet_pb.star_key)
 
+      sim = simulation.Simulation()
       colony_pbs = []
       star_pbs = []
       for star_key in star_keys:
-        star_pb = sector.getStar(star_key)
-        empire.simulate(star_pb, empire_key)
+        sim.simulate(star_key)
+        star_pb = sim.getStar(star_key)
 
         for star_colony_pb in star_pb.colonies:
           for colony_pb in colonies_pb.colonies:
@@ -331,9 +335,10 @@ class SectorsPage(StarfieldPage):
 
 
 class StarPage(StarfieldPage):
-  def get(self, key):
-    star_pb = sector.getStar(key)
-    empire.simulate(star_pb)
+  def get(self, star_key):
+    sim = simulation.Simulation()
+    sim.simulate(star_key)
+    star_pb = sim.getStar(star_key)
 
     empire_pb = empire.getEmpireForUser(self.user)
 
@@ -362,28 +367,29 @@ class StarPage(StarfieldPage):
 class StarSimulatePage(ApiPage):
   """This is a debugging page that lets us simulate a star on-demand."""
 
-  def get(self, starKey):
-    self._doSimulate(starKey, False)
+  def get(self, star_key):
+    self._doSimulate(star_key, False)
 
-  def post(self, starKey):
-    self._doSimulate(starKey, self.request.get("update") == "1")
+  def post(self, star_key):
+    self._doSimulate(star_key, self.request.get("update") == "1")
 
-  def _doSimulate(self, starKey, doUpdate):
+  def _doSimulate(self, star_key, do_update):
     msgs = []
     def dolog(msg):
       msgs.append(msg)
 
-    star_pb = sector.getStar(starKey)
+    sim = simulation.Simulation(log=dolog)
+    star_pb = sim.getStar(star_key, True)
     if not star_pb:
       msgs.append("ERROR: No star with given key found!")
     else:
       msgs.append("---------- Simulating:")
-      empire.simulate(star_pb, log=dolog)
+      sim.simulate(star_key)
 
-    if doUpdate:
+    if do_update:
       msgs.append("")
       msgs.append("---------- Updating:")
-      empire.updateAfterSimulate(star_pb, None)
+      sim.update(star_key)
 
     self.response.headers["Content-Type"] = "text/plain"
     self.response.out.write("\r\n".join(msgs))
@@ -413,7 +419,9 @@ class ColoniesPage(ApiPage):
       self.response.set_status(403)
       return
 
-    colony_pb = empire.updateColony(colony_key, self._getRequestBody(pb.Colony))
+    sim = simulation.Simulation()
+    colony_pb = empire.updateColony(colony_key, self._getRequestBody(pb.Colony), sim)
+    sim.update()
     return colony_pb
 
 
@@ -428,13 +436,14 @@ class ColoniesTaxesPage(ApiPage):
       self.response.set_status(403)
       return
 
-    empire.collectTaxes(colony_pb.key)
+    sim = simulation.Simulation()
+    empire.collectTaxes(colony_pb.key, sim)
+    sim.update()
     return colony_pb
 
 class BuildQueuePage(ApiPage):
   def post(self):
     """The buildqueue is where you post BuildRequest protobufs with requests to build stuff."""
-
     request_pb = self._getRequestBody(pb.BuildRequest)
 
     # make sure the colony is owned by the current player
@@ -447,10 +456,13 @@ class BuildQueuePage(ApiPage):
       self.response.set_status(403)
       return
 
-    resp = empire.build(empire_pb, colony_pb, request_pb)
+    sim = simulation.Simulation()
+    resp = empire.build(empire_pb, colony_pb, request_pb, sim)
     if resp == False:
       self.response.set_status(400)
       return
+
+    sim.update()
     return resp
 
   def get(self):

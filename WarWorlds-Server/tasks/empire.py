@@ -14,6 +14,7 @@ import webapp2 as webapp
 import ctrl
 from ctrl import empire as ctl
 from ctrl import sector as sector_ctl
+from ctrl import simulation as simulation_ctl
 from model import empire as mdl
 from model import sector as sector_mdl
 from model import c2dm
@@ -113,12 +114,13 @@ class BuildCheckPage(tasks.TaskPage):
         # 100 (basically, those 100 people go into the colony ship, to be transported to
         # the destination colony).
         if build_request_model.designName == "colonyship": # TODO: hard-coded OK?
-          star_pb = sector_ctl.getStar(star_key)
-          ctl.simulate(star_pb, empire_key)
+          sim = simulation_ctl.Simulation()
+          star_pb = sim.getStar(star_key)
+          sim.simulate(star_key)
           for colony_pb in star_pb.colonies:
             if colony_pb.key == colony_key:
               colony_pb.population -= 100
-          ctl.updateAfterSimulate(star_pb, empire_key)
+          sim.update(star_key)
 
       # Send a notification to the player that construction of their building is complete
       msg = "Your %d %s(s) on %s has been built." % (build_request_model.count,
@@ -159,10 +161,10 @@ class StarSimulatePage(tasks.TaskPage):
         star_keys.append(star_key)
 
     logging.debug("%d stars to simulate" % (len(star_keys)))
+    sim = simulation_ctl.Simulation()
     for star_key in star_keys:
-      star_pb = sector_ctl.getStar(star_key)
-      ctl.simulate(star_pb)
-      ctl.updateAfterSimulate(star_pb)
+      sim.simulate(star_key)
+    sim.update()
 
     self.response.write("Success!")
 
@@ -197,24 +199,30 @@ class FleetMoveCompletePage(tasks.TaskPage):
       new_fleet_mdl.state = pb.Fleet.IDLE
       new_fleet_mdl.stateStartTime = datetime.now()
 
+      empire = fleet_mdl.empire
       fleet_mdl.delete()
       new_fleet_mdl.put()
 
-      new_fleet_pb = pb.Fleet()
-      ctrl.fleetModelToPb(new_fleet_pb, new_fleet_mdl)
-
-      empire = fleet_mdl.empire
       ctrl.clearCached(["fleet:for-empire:%s" % (empire.key()),
                         "star:%s" % (fleet_mdl.key().parent()),
                         "star:%s" % (new_star_key),
                         "sector:%d,%d" % (new_star_pb.sector_x, new_star_pb.sector_y),
                         "sector:%d,%d" % (old_star_pb.sector_x, old_star_pb.sector_y)])
 
-      design = ctl.ShipDesign.getDesign(fleet_mdl.designName)
+      sim = simulation_ctl.Simulation()
+      new_star_pb = sim.getStar(new_star_pb.key)
+      old_star_pb = sim.getStar(old_star_pb.key)
+
+      new_fleet_pb = None
+      for fleet_pb in new_star_pb.fleets:
+        if fleet_pb.key == fleet_key:
+          new_fleet_pb = fleet_pb
+
+      design = ctl.ShipDesign.getDesign(new_fleet_pb.design_name)
 
       # Send a notification to the player that construction of their building is complete
       msg = "Your %s fleet of %d ships has arrived on %s." % (design.name,
-                                                              fleet_mdl.numShips,
+                                                              new_fleet_pb.num_ships,
                                                               new_star_pb.name)
       logging.debug("Sending message to user [%s] indicating fleet move complete." % (
           empire.user.email()))
@@ -225,13 +233,15 @@ class FleetMoveCompletePage(tasks.TaskPage):
 
       # apply any "star landed" effects
       for effect in design.getEffects():
-        effect.onStarLanded(new_fleet_pb, new_star_pb)
+        effect.onStarLanded(new_fleet_pb, new_star_pb, sim)
 
       # if there's any ships already there, apply their onFleetArrived effects
       for fleet_pb in new_star_pb.fleets:
+        if fleet_pb.key == new_fleet_pb.key:
+          continue
         design = ctl.ShipDesign.getDesign(fleet_pb.design_name)
         for effect in design.getEffects():
-          effect.onFleetArrived(fleet_pb, new_star_pb, new_fleet_pb)
+          effect.onFleetArrived(new_star_pb, fleet_pb, new_fleet_pb, sim)
 
 
 class FleetDestroyedPage(tasks.TaskPage):
@@ -239,12 +249,10 @@ class FleetDestroyedPage(tasks.TaskPage):
     fleet_mdl = mdl.Fleet.get(fleet_key)
     if fleet_mdl and fleet_mdl.timeDestroyed < (datetime.now() + timedelta(seconds=5)):
       empire_mdl = fleet_mdl.empire
-      star_pb = sector_ctl.getStar(str(fleet_mdl.key().parent()))
-      ctl.simulate(star_pb)
-      ctl.updateAfterSimulate(star_pb)
-      keys_to_clear = ["fleet:for-empire:%s" % (empire_mdl.key()),
-                       "star:%s" % (star_pb.key),
-                       "sector:%d,%d" % (star_pb.sector_x, star_pb.sector_y)]
+      sim = simulation_ctl.Simulation()
+      sim.simulate(str(fleet_mdl.key().parent()))
+      sim.update()
+      keys_to_clear = ["fleet:for-empire:%s" % (empire_mdl.key())]
       fleet_mdl.delete()
       ctrl.clearCached(keys_to_clear)
 
