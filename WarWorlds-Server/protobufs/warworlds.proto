@@ -485,6 +485,9 @@ message Fleet
         AGGRESSIVE = 3;
     }
     optional FLEET_STANCE stance = 11;
+
+    // This is used internally by the server, it'll never appear in a response from the server.
+    optional int64 time_destroyed = 12;
 }
 
 

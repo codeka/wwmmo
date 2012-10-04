@@ -191,6 +191,7 @@ class FleetMoveCompletePage(tasks.TaskPage):
       new_fleet_mdl.empire = mdl.Fleet.empire.get_value_for_datastore(fleet_mdl)
       new_fleet_mdl.designName = fleet_mdl.designName
       new_fleet_mdl.numShips = fleet_mdl.numShips
+      new_fleet_mdl.stance = fleet_mdl.stance
 
       # new fleet is now idle
       new_fleet_mdl.state = pb.Fleet.IDLE
@@ -233,8 +234,24 @@ class FleetMoveCompletePage(tasks.TaskPage):
           effect.onFleetArrived(fleet_pb, new_star_pb, new_fleet_pb)
 
 
+class FleetDestroyedPage(tasks.TaskPage):
+  def get(self, fleet_key):
+    fleet_mdl = mdl.Fleet.get(fleet_key)
+    if fleet_mdl and fleet_mdl.timeDestroyed < (datetime.now() + timedelta(seconds=5)):
+      empire_mdl = fleet_mdl.empire
+      star_pb = sector_ctl.getStar(str(fleet_mdl.key().parent()))
+      ctl.simulate(star_pb)
+      ctl.updateAfterSimulate(star_pb)
+      keys_to_clear = ["fleet:for-empire:%s" % (empire_mdl.key()),
+                       "star:%s" % (star_pb.key),
+                       "sector:%d,%d" % (star_pb.sector_x, star_pb.sector_y)]
+      fleet_mdl.delete()
+      ctrl.clearCached(keys_to_clear)
+
+
 app = webapp.WSGIApplication([("/tasks/empire/build-check", BuildCheckPage),
                               ("/tasks/empire/star-simulate", StarSimulatePage),
-                              ("/tasks/empire/fleet/([^/]+)/move-complete", FleetMoveCompletePage)],
+                              ("/tasks/empire/fleet/([^/]+)/move-complete", FleetMoveCompletePage),
+                              ("/tasks/empire/fleet/([^/]+)/destroy", FleetDestroyedPage)],
                              debug=os.environ["SERVER_SOFTWARE"].startswith("Development"))
 

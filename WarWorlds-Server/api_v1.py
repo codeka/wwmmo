@@ -314,6 +314,15 @@ class SectorsPage(StarfieldPage):
         for star_pb in sector_pb.stars:
           del star_pb.planets[:]
 
+      # empty out the list of fleets that belong to the native empire
+      for sector_pb in sectors_pb.sectors:
+        real_fleets = []
+        for fleet_pb in sector_pb.fleets:
+          if fleet_pb.empire_key:
+            real_fleets.append(fleet_pb)
+        del sector_pb.fleets[:]
+        sector_pb.fleets.extend(real_fleets)
+
       return sectors_pb
     else:
       # TODO: other ways of querying for sectors?
