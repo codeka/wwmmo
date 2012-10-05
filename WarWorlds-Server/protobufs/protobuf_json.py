@@ -68,7 +68,7 @@ def obj2pb(pb, obj):
             pb_value = getattr(pb, field.name, None)
             for v in value:
                 if field.type == FD.TYPE_MESSAGE:
-                    json2pb(pb_value.add(), v)
+                    obj2pb(pb_value.add(), v)
                 else:
                     pb_value.append(ftype(v))
         else:

@@ -206,10 +206,10 @@ message Star
     optional int32 size = 5;
 
     // the offset from the left edge of the sector, in pixels
-    required int32 offset_x = 6;
+    optional int32 offset_x = 6;
 
     // the offset from the bottom edge of the sector, in pixels
-    required int32 offset_y = 7;
+    optional int32 offset_y = 7;
 
     // the collection of planets orbiting this star (may be empty, for example in the list
     // of stars in a sector)

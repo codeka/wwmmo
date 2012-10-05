@@ -5,6 +5,9 @@ from datetime import datetime, timedelta
 from google.appengine.ext import db
 from google.appengine.api import taskqueue
 
+import import_fixer
+import_fixer.FixImports("google", "protobuf")
+
 import ctrl
 from ctrl import empire as empire_ctl
 from ctrl import sector as sector_ctl
@@ -441,9 +444,6 @@ class Simulation(object):
       for fleet_pb in star_pb.fleets:
         cache[fleet_pb.key] = {"design": empire_ctl.ShipDesign.getDesign(fleet_pb.design_name),
                                "fleet": fleet_pb}
-      for fleet_pb in star_pb.fleets:
-        if fleet_pb.state != pb.Fleet.ATTACKING:
-          continue
       return cache
 
     def findNewTarget(star_pb, fleet_pb):
@@ -462,6 +462,7 @@ class Simulation(object):
     for fleet_pb in star_pb.fleets:
       if fleet_pb.state == pb.Fleet.ATTACKING:
         fleets_attacking = True
+        break
 
     if fleets_attacking:
       self.log("")
@@ -502,23 +503,24 @@ class Simulation(object):
         for fleet_pb in star_pb.fleets:
           if fleet_pb.state != pb.Fleet.ATTACKING:
             continue
+          if fleet_pb.num_ships == 0:
+            continue
           if fleet_pb.target_fleet_key not in cache:
             findNewTarget(star_pb, fleet_pb)
             if fleet_pb.state != pb.Fleet.ATTACKING:
               continue
 
           if fleet_pb.num_ships > 0:
-            design = cache[fleet_pb.key]["design"]
             target = cache[fleet_pb.target_fleet_key]["fleet"]
 
             if target.num_ships > 0:
               damage = fleet_pb.num_ships # todo: more complicated!
-              hits.append({"fleet": target.key, "damage": damage})
+              hits.append({"fleet_key": target.key, "damage": damage})
 
         # apply the damage from this round after every fleet has had a turn inflicting it
         for hit in hits:
-          fleet_pb = cache[hit["fleet"]]["fleet"]
-          fleet_pb.num_ships -= int(damage)
+          fleet_pb = cache[hit["fleet_key"]]["fleet"]
+          fleet_pb.num_ships -= int(hit["damage"])
           if fleet_pb.num_ships <= 0:
             fleet_pb.num_ships = 0
             if not fleet_pb.time_destroyed:
@@ -528,7 +530,9 @@ class Simulation(object):
         # go through the attacking fleets and make sure they're still attacking...
         remaining_attacking_fleets = []
         for fleet_pb in star_pb.fleets:
-          if fleet_pb.state != pb.Fleet.ATTACKING or fleet_pb.num_ships == 0:
+          if fleet_pb.state != pb.Fleet.ATTACKING:
+            continue
+          if fleet_pb.num_ships == 0:
             continue
 
           if fleet_pb.target_fleet_key not in cache:

@@ -8,6 +8,10 @@ import time
 from google.appengine.ext import db
 from google.appengine.api import users
 from google.appengine.api import memcache
+
+import import_fixer
+import_fixer.FixImports("google", "protobuf")
+
 from google.protobuf.message import Message
 
 import protobufs.warworlds_pb2 as pb
