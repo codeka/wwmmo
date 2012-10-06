@@ -209,13 +209,18 @@ class FleetMoveCompletePage(tasks.TaskPage):
                         "sector:%d,%d" % (new_star_pb.sector_x, new_star_pb.sector_y),
                         "sector:%d,%d" % (old_star_pb.sector_x, old_star_pb.sector_y)])
 
+      new_fleet_key = str(new_fleet_mdl.key())
       sim = simulation_ctl.Simulation()
+      sim.onFleetArrived(new_fleet_key, new_star_pb.key)
+      sim.simulate(new_star_pb.key)
+      if new_star_pb.key != old_star_pb.key:
+        sim.simulate(old_star_pb.key)
       new_star_pb = sim.getStar(new_star_pb.key)
       old_star_pb = sim.getStar(old_star_pb.key)
 
       new_fleet_pb = None
       for fleet_pb in new_star_pb.fleets:
-        if fleet_pb.key == fleet_key:
+        if fleet_pb.key == new_fleet_key:
           new_fleet_pb = fleet_pb
 
       design = ctl.ShipDesign.getDesign(new_fleet_pb.design_name)
@@ -231,18 +236,7 @@ class FleetMoveCompletePage(tasks.TaskPage):
       for device in devices.registrations:
         s.sendMessage(device.device_registration_id, {"msg": msg})
 
-      # apply any "star landed" effects
-      for effect in design.getEffects():
-        effect.onStarLanded(new_fleet_pb, new_star_pb, sim)
-
-      # if there's any ships already there, apply their onFleetArrived effects
-      for fleet_pb in new_star_pb.fleets:
-        if fleet_pb.key == new_fleet_pb.key:
-          continue
-        design = ctl.ShipDesign.getDesign(fleet_pb.design_name)
-        for effect in design.getEffects():
-          effect.onFleetArrived(new_star_pb, fleet_pb, new_fleet_pb, sim)
-
+      sim.update()
 
 class FleetDestroyedPage(tasks.TaskPage):
   def get(self, fleet_key):

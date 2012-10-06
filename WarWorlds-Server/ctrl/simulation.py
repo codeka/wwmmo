@@ -57,7 +57,6 @@ class Simulation(object):
     self.star_pbs.append(star_pb)
     return star_pb
 
-
   def simulate(self, star_key):
     """Simulates the star with the given key and gets all of the colonies and fleets up to date.
   
@@ -569,6 +568,35 @@ class Simulation(object):
               fleet_pb.time_destroyed = predicted_fleet_pb.time_destroyed
 
       # go through any fleets that have been destroyed and... do something, I dunno...
+
+  def onFleetArrived(self, fleet_key, star_key):
+    """This is called when a fleet moves into a new star system.
+
+    We will go through the existing fleets and old fleets and make sure they all know about the
+    new fleet. Some may start attacking and so on.
+
+    Args:
+      fleet_key: The key of the fleet that moved. We assume it's already in the star.
+      star_key: The key of the star the fleet has moved to.
+    """
+    star_pb = self.getStar(star_key, True)
+    fleet_pb = None
+    for fpb in star_pb.fleets:
+      if fpb.key == fleet_key:
+        fleet_pb = fpb
+
+    # apply any "star landed" effects
+    design = empire_ctl.ShipDesign.getDesign(fleet_pb.design_name)
+    for effect in design.getEffects():
+      effect.onStarLanded(fleet_pb, star_pb, self)
+
+    # if there's any ships already there, apply their onFleetArrived effects
+    for other_fleet_pb in star_pb.fleets:
+      if other_fleet_pb.key == fleet_pb.key:
+        continue
+      design = empire_ctl.ShipDesign.getDesign(other_fleet_pb.design_name)
+      for effect in design.getEffects():
+        effect.onFleetArrived(star_pb, fleet_pb, other_fleet_pb, self)
 
   def update(self):
     """Apply all of the updates we've made to the data store."""
