@@ -460,8 +460,8 @@ class Simulation(object):
     fleets_attacking = False
     for fleet_pb in star_pb.fleets:
       if fleet_pb.state == pb.Fleet.ATTACKING:
+        fleet_pb.time_destroyed = 0
         fleets_attacking = True
-        break
 
     if fleets_attacking:
       self.log("")
@@ -663,7 +663,8 @@ class Simulation(object):
       if fleet_pb.time_destroyed:
         time = ctrl.epochToDateTime(fleet_pb.time_destroyed)
         taskqueue.add(queue_name="fleet",
-                      url=("/tasks/empire/fleet/%s/destroy" % fleet_pb.key),
+                      url=("/tasks/empire/fleet/%s/destroy?dt=%d" % (fleet_pb.key,
+                                                                     fleet_pb.time_destroyed)),
                       method="GET",
                       eta=time)
 

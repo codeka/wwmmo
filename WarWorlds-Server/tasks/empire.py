@@ -238,16 +238,24 @@ class FleetMoveCompletePage(tasks.TaskPage):
 
       sim.update()
 
+
 class FleetDestroyedPage(tasks.TaskPage):
   def get(self, fleet_key):
-    fleet_mdl = mdl.Fleet.get(fleet_key)
-    if fleet_mdl and fleet_mdl.timeDestroyed < (datetime.now() + timedelta(seconds=5)):
-      empire_mdl = fleet_mdl.empire
+    def doDelete(fleet_key, time_destroyed):
+      fleet_mdl = mdl.Fleet.get(fleet_key)
+      empire_key = None
+      if fleet_mdl and fleet_mdl.timeDestroyed == ctrl.epochToDateTime(time_destroyed):
+        empire_key = str(mdl.Fleet.empire.get_value_for_datastore(fleet_mdl))
+        fleet_mdl.delete()
+      return empire_key
+
+    time_destroyed = int(self.request.get("dt"))
+    empire_key = db.run_in_transaction(doDelete, fleet_key, time_destroyed)
+    if empire_key:
       sim = simulation_ctl.Simulation()
-      sim.simulate(str(fleet_mdl.key().parent()))
+      sim.simulate(str(db.Key(fleet_key).parent()))
       sim.update()
-      keys_to_clear = ["fleet:for-empire:%s" % (empire_mdl.key())]
-      fleet_mdl.delete()
+      keys_to_clear = ["fleet:for-empire:%s" % (empire_key)]
       ctrl.clearCached(keys_to_clear)
 
 

@@ -244,6 +244,8 @@ def fleetPbToModel(fleet_model, fleet_pb):
   fleet_model.stance = fleet_pb.stance
   if fleet_pb.time_destroyed:
     fleet_model.timeDestroyed = epochToDateTime(fleet_pb.time_destroyed)
+  else:
+    fleet_model.timeDestroyed = None
   fleet_model.num_ships = fleet_pb.num_ships
 
 
