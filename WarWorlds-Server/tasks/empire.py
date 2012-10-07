@@ -238,7 +238,6 @@ class FleetMoveCompletePage(tasks.TaskPage):
 
       sim.update()
 
-
 class FleetDestroyedPage(tasks.TaskPage):
   def get(self, fleet_key):
     def doDelete(fleet_key, time_destroyed):

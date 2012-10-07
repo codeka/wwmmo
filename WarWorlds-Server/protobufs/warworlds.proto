@@ -449,8 +449,10 @@ message Fleet
     // The name of the ship design of the ship(s) in this fleet
     optional string design_name = 3;
 
-    // The number of ships in this fleet.
-    optional int32 num_ships = 4;
+    // The number of ships in this fleet. This is a floating point number because of the way
+    // damage is calculated in combat. We only ever display the Math.ceil() of this number to
+    // the user, however.
+    optional float num_ships = 4;
 
     // The current state of the fleet: idle == orbiting a star, moving == moving
     // between stars, attacking == attacking an enemy fleet, colony, etc
@@ -545,7 +547,65 @@ message ScoutReport
     optional bytes star_pb = 4;
 }
 
+
 message ScoutReports
 {
     repeated ScoutReport reports = 1;
+}
+
+
+//
+// Whenever there's combat, we record the rounds of who hits whom and so on in one of these. One
+// will be created for every minute of fighting per star.
+//
+message CombatRound
+{
+    // The FleetSummary contains enough details about a fleets so that we can display info
+    // about it in the UI. Because the fleet might be destroyed by the time we display the
+    // report, we need to keep this info around.
+    // We store all FleetSummary in the fleets field, and then the other record types just refer
+    // to them by index.
+    message FleetSummary
+    {
+        optional string fleet_key = 1;
+        optional string empire_key = 2;
+        optional string design_id = 3;
+        optional float num_ships = 4;
+    }
+
+    // This record is used when a fleet enters combat.
+    message FleetJoinedRecord
+    {
+        optional int32 fleet_index = 1;
+    }
+
+    // This record is used when a fleet choose a target.
+    message FleetTargetRecord
+    {
+        optional int32 fleet_index = 1;
+        optional int32 target_index = 2;
+    }
+
+    // This record is used when a fleet attacks another fleet
+    message FleetAttackRecord
+    {
+        optional int32 fleet_index = 1;
+        optional int32 target_index = 2;
+        optional float damage = 3;
+    }
+
+    // This record is used to record the damage done to a fleet
+    message FleetDamagedRecord
+    {
+        optional int32 fleet_index = 1;
+        optional float damage = 2;
+    }
+
+    optional string star_key = 1;
+    optional int64 round_time = 2;
+    repeated FleetSummary fleets = 3;
+    repeated FleetJoinedRecord fleets_joined = 4;
+    repeated FleetTargetRecord fleets_targetted = 5;
+    repeated FleetAttackRecord fleets_attacked = 6;
+    repeated FleetDamagedRecord fleets_damaged = 7;
 }

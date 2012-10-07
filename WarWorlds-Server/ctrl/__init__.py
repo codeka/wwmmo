@@ -3,6 +3,7 @@
 import calendar
 from datetime import datetime
 import logging
+import math
 import time
 
 from google.appengine.ext import db
@@ -201,7 +202,7 @@ def fleetModelToPb(fleet_pb, fleet_model):
   if empire_key:
     fleet_pb.empire_key = str(empire_key)
   fleet_pb.design_name = fleet_model.designName
-  fleet_pb.num_ships = fleet_model.numShips
+  fleet_pb.num_ships = int(math.ceil(fleet_model.numShips))
   fleet_pb.state = fleet_model.state
   fleet_pb.state_start_time = dateTimeToEpoch(fleet_model.stateStartTime)
   fleet_pb.star_key = str(fleet_model.key().parent())
@@ -258,7 +259,7 @@ def scoutReportModelToPb(scout_report_pb, scout_report_mdl):
 
 
 def dateTimeToEpoch(dt):
-  return calendar.timegm(dt.timetuple())
+  return int(time.mktime(dt.timetuple()))
 
 
 def epochToDateTime(epoch):

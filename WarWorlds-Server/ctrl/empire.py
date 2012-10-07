@@ -715,7 +715,9 @@ class ShipEffectFighter(ShipEffect):
                       other_fleet_pb.key)
 
         fleet_pb.state = pb.Fleet.ATTACKING
-        fleet_pb.target_fleet_key = other_fleet_pb.key
+        # Note: we don't set the target here, we'll let the simulation do that so that it's
+        # recorded in the combat report
+        #fleet_pb.target_fleet_key = other_fleet_pb.key
         fleet_pb.state_start_time = ctrl.dateTimeToEpoch(datetime.now())
         break
 
@@ -739,7 +741,9 @@ class ShipEffectFighter(ShipEffect):
     for star_fleet_pb in star_pb.fleets:
       if star_fleet_pb.key == fleet_pb.key:
         star_fleet_pb.state = pb.Fleet.ATTACKING
-        star_fleet_pb.target_fleet_key = new_fleet_pb.key
+        # Note: we don't set the target here, we'll let the simulation do that so that it's
+        # recorded in the combat report
+        #fleet_pb.target_fleet_key = other_fleet_pb.key
         star_fleet_pb.state_start_time = ctrl.dateTimeToEpoch(datetime.now())
         break
 

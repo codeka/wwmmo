@@ -151,7 +151,7 @@ class Fleet(db.Model):
   sector = db.ReferenceProperty(sector_mdl.Sector)
   empire = db.ReferenceProperty(Empire)
   designName = db.StringProperty()
-  numShips = db.IntegerProperty()
+  numShips = db.FloatProperty()
   state = db.IntegerProperty()
   stateStartTime = db.DateTimeProperty()
   destinationStar = db.ReferenceProperty(sector_mdl.Star, collection_name="incoming_fleet_set")
