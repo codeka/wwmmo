@@ -41,8 +41,9 @@ class Simulation(object):
     self.log = log
     self.empire_pbs = []
     self.star_pbs = []
-    self.combat_report = []
+    self.combat_report = pb.CombatReport()
     self.need_update = False
+    self.now = datetime.now()
 
   def getStars(self):
     return self.star_pbs
@@ -87,12 +88,10 @@ class Simulation(object):
         self._simulateEmpire(star_pb, colony_pb.empire_key)
 
     # make sure last_simulation is correct
-    last_simulation = ctrl.dateTimeToEpoch(datetime.now())
+    last_simulation = ctrl.dateTimeToEpoch(self.now)
     for colony_pb in star_pb.colonies:
       colony_pb.last_simulation = last_simulation
 
-    # Now that the colonies are up-to-date, we'll want to simulate any ATTACKING fleets.
-    self._simulateCombat(star_pb)
     self.need_update = True
 
   def _simulateEmpire(self, star_pb, empire_key):
@@ -104,7 +103,7 @@ class Simulation(object):
       return
 
     start_time = ctrl.epochToDateTime(start_time)
-    end_time = datetime.now()
+    end_time = self.now
 
     # if we have less than a few seconds of time to simulate, we'll extend the end time
     # a little to ensure there's no rounding errors and such
@@ -130,6 +129,7 @@ class Simulation(object):
           self.log("---- Last simulation step before prediction phase")
           self.log("")
 
+          self.now = end_time
           dt = end_time - start_time
           if dt.total_seconds() > 0:
             # last little bit of the simulation
@@ -196,10 +196,10 @@ class Simulation(object):
         continue
       total_goods = empire.total_goods
       total_minerals = empire.total_minerals
-  
+
     max_goods = 500
     max_minerals = 500
-  
+
     if total_goods is None and total_minerals is None:
       # This means we didn't find their entry... add it now
       empire_pb = star_pb.empires.add()
@@ -435,10 +435,15 @@ class Simulation(object):
              "minerals=%.2f (%.4f / hr), population=%.2f")
              % (empire_key, dt_in_hours, total_goods, goods_delta_per_hour,
                 total_minerals, minerals_delta_per_hour, total_population))
+
+    # Don't forget to simuilate combat for this step as well (TODO: what to do if combat continues
+    # after the prediction phase?)
+    self._simulateCombat(star_pb, now, dt)
+
     self.log("")
 
-  def _simulateCombat(self, star_pb):
-    """Simulates combat (i.e. fleets that are in ATTACKING state)."""
+  def _simulateCombat(self, star_pb, now, dt):
+    """Simulates combat for one step of the simulation (i.e. 15 rounds)."""
     def populateCache(star_pb):
       cache = {}
       for fleet_pb in star_pb.fleets:
@@ -449,7 +454,8 @@ class Simulation(object):
     fleets_attacking = False
     for fleet_pb in star_pb.fleets:
       if fleet_pb.state == pb.Fleet.ATTACKING:
-        fleet_pb.time_destroyed = 0
+        if self.combat_report.start_time == 0:
+          fleet_pb.time_destroyed = 0
         fleets_attacking = True
 
     if fleets_attacking:
@@ -466,46 +472,37 @@ class Simulation(object):
           attack_start_time = fleet_pb.state_start_time
 
       # round to the next minute
-      dt = ctrl.epochToDateTime(attack_start_time)
-      attack_start_time = datetime(dt.year, dt.month, dt.day, dt.hour, dt.minute, 0, tzinfo=dt.tzinfo)
+      ast = ctrl.epochToDateTime(attack_start_time)
+      attack_start_time = datetime(ast.year, ast.month, ast.day, ast.hour, ast.minute,
+                                   0, tzinfo=ast.tzinfo)
       attack_start_time += timedelta(minutes=1)
+
+      # if nobody is scheduled to start attacking yet, then don't...
+      if attack_start_time > (now + dt):
+        return
 
       # attacks happen in turns, one per minute. We keep simulating until the conlict is
       # fully resolved (usually not too long)
-      now = attack_start_time
-      is_predicting = False
-      real_star_pb = star_pb
-      while True:
-        if now > datetime.now() and not is_predicting:
-          # OK, now we're in prediction mode, work on a copy of the protocol buffer so that we
-          # don't kill off things that haven't finished yet...
-          self.log("Finished actual time, now predicting...")
-          is_predicting = True
-          serialized = star_pb.SerializeToString()
-          star_pb = pb.Star()
-          star_pb.ParseFromString(serialized)
-          cache = populateCache(star_pb)
+      end_time = now + dt
+      while now < end_time:
+        if now < attack_start_time:
+          now += timedelta(minutes=1)
+          continue
 
-        combat_round_pb = pb.CombatRound()
+        combat_round_pb = self.combat_report.rounds.add()
         combat_round_pb.star_key = star_pb.key
         combat_round_pb.round_time = ctrl.dateTimeToEpoch(now)
         still_attacking = self._simulateCombatRound(now, star_pb, cache, combat_round_pb)
-        if not is_predicting and combat_round_pb.fleets_attacked:
-          self.combat_report.append(combat_round_pb)
+        if not combat_round_pb.fleets_attacked:
+          del self.combat_report.rounds[-1:]
+          # todo: delete the round?
+        elif self.combat_report.start_time == 0:
+          self.combat_report.start_time = ctrl.dateTimeToEpoch(now)
 
         now += timedelta(minutes=1)
 
         if not still_attacking:
           break
-
-      if is_predicting:
-        # if we ended up predicting stuff, make sure we copy the "time destroyed" at least...
-        for predicted_fleet_pb in star_pb.fleets:
-          if not predicted_fleet_pb.time_destroyed:
-            continue
-          for fleet_pb in real_star_pb.fleets:
-            if fleet_pb.key == predicted_fleet_pb.key:
-              fleet_pb.time_destroyed = predicted_fleet_pb.time_destroyed
 
       # go through any fleets that have been destroyed and... do something, I dunno...
 
@@ -648,6 +645,7 @@ class Simulation(object):
       self._updateEmpirePresences(star_pb)
       self._updateBuildRequests(star_pb)
       self._updateFleets(star_pb)
+      self._updateCombatReport(star_pb)
       self._scheduleFleetDestroy(star_pb)
 
       keys_to_clear.append("star:%s" % star_pb.key)
@@ -690,6 +688,27 @@ class Simulation(object):
       fleet_model = mdl.Fleet.get(fleet_pb.key)
       ctrl.fleetPbToModel(fleet_model, fleet_pb)
       fleet_model.put()
+
+  def _updateCombatReport(self, star_pb):
+
+    # check for an existing one that we want to update instead of adding. If there's any
+    # overlap between the start/end dates that's what we wnat to update
+    combat_report_mdl = None
+    query = (mdl.CombatReport.all()
+                .filter("endTime >", ctrl.epochToDateTime(self.combat_report.start_time)))
+    for mdl in query:
+      combat_report_mdl = mdl
+      break
+
+    if not combat_report_mdl:
+      combat_report_mdl = mdl.CombatReport(parent=db.Key(star_pb.key))
+
+    combat_report_mdl.startTime = ctrl.epochToDateTime(self.combat_report.start_time)
+    combat_report_mdl.endTime = ctrl.epochToDateTime(self.combat_report.end_time)
+    combat_report_mdl.startEmpireKeys = self.combat_report.start_empire_keys
+    combat_report_mdl.endEmpireKeys = self.combat_report.end_empire_keys
+    combat_report_mdl.rounds = self.combat_report.SerializeToString()
+    combat_report_mdl.put()
 
   def _scheduleFleetDestroy(self, star_pb):
     """Schedules a task that'll ensure the given fleets is destroyed when it should be."""

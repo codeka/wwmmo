@@ -691,7 +691,7 @@ class ShipEffectScout(ShipEffect):
     scout_report_mdl = mdl.ScoutReport(parent=db.Key(star_pb.key))
     scout_report_mdl.empire = db.Key(fleet_pb.empire_key)
     scout_report_mdl.report = star_pb.SerializeToString()
-    scout_report_mdl.date = datetime.now()
+    scout_report_mdl.date = sim.now
     scout_report_mdl.put()
     ctrl.clearCached(["scout-report:%s:%s" % (star_pb.key, fleet_pb.empire_key)])
 
@@ -718,7 +718,7 @@ class ShipEffectFighter(ShipEffect):
         # Note: we don't set the target here, we'll let the simulation do that so that it's
         # recorded in the combat report
         #fleet_pb.target_fleet_key = other_fleet_pb.key
-        fleet_pb.state_start_time = ctrl.dateTimeToEpoch(datetime.now())
+        fleet_pb.state_start_time = ctrl.dateTimeToEpoch(sim.now)
         break
 
 
@@ -744,7 +744,7 @@ class ShipEffectFighter(ShipEffect):
         # Note: we don't set the target here, we'll let the simulation do that so that it's
         # recorded in the combat report
         #fleet_pb.target_fleet_key = other_fleet_pb.key
-        star_fleet_pb.state_start_time = ctrl.dateTimeToEpoch(datetime.now())
+        star_fleet_pb.state_start_time = ctrl.dateTimeToEpoch(sim.now)
         break
 
 

@@ -200,5 +200,22 @@ class ScoutReport(db.Model):
     query = ScoutReport.all().ancestor(star_key).filter("empire", empire_key).order("-date")
     for mdl in query:
       reports.append(mdl)
+    return reports
 
+
+class CombatReport(db.Model):
+  """A CombatReport represents the outcome of combat."""
+  startTime = db.DateTimeProperty()
+  endTime = db.DateTimeProperty()
+  startEmpireKeys = db.StringListProperty()
+  endEmpireKeys = db.StringListProperty()
+  numDestroyed = db.IntegerProperty()
+  rounds = db.BlobProperty()
+
+  @staticmethod
+  def getReportForStar(star_key):
+    reports = []
+    query = CombatReport().all().ancestor(star_key).order("-startTime")
+    for mdl in query:
+      reports.append(mdl)
     return reports

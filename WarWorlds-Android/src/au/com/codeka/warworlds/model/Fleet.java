@@ -117,7 +117,7 @@ public class Fleet implements Parcelable {
             f.mEmpireKey = pb.getEmpireKey();
         }
         f.mDesignID = pb.getDesignName();
-        f.mNumShips = pb.getNumShips();
+        f.mNumShips = (int) Math.ceil(pb.getNumShips());
         f.mState = State.fromNumber(pb.getState().getNumber());
         f.mStateStartTime = new DateTime(pb.getStateStartTime() * 1000, DateTimeZone.UTC);
         f.mStarKey = pb.getStarKey();

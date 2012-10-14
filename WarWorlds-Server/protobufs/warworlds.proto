@@ -609,3 +609,26 @@ message CombatRound
     repeated FleetAttackRecord fleets_attacked = 6;
     repeated FleetDamagedRecord fleets_damaged = 7;
 }
+
+
+//
+// A CombatReport represents a "complete" conflict, from beginning to resolution.
+//
+message CombatReport
+{
+    // The time the conflict started/finished
+    optional int64 start_time = 1;
+    optional int64 end_time = 2;
+
+    // A list of the empires who joined the conflict
+    repeated string start_empire_keys = 3;
+
+    // A list of the empires who were left when the conflict was resolved
+    repeated string end_empire_keys = 4;
+
+    // The number of ships/buildings destroyed in the conflict
+    optional int32 num_destroyed = 5;
+
+    // A page of CombatRound objects that represent this set of results
+    repeated CombatRound rounds = 6;
+}

@@ -247,7 +247,7 @@ def fleetPbToModel(fleet_model, fleet_pb):
     fleet_model.timeDestroyed = epochToDateTime(fleet_pb.time_destroyed)
   else:
     fleet_model.timeDestroyed = None
-  fleet_model.num_ships = fleet_pb.num_ships
+  fleet_model.numShips = float(fleet_pb.num_ships)
 
 
 def scoutReportModelToPb(scout_report_pb, scout_report_mdl):
