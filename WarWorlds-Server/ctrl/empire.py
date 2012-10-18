@@ -126,7 +126,12 @@ def createEmpire(empire_pb, sim):
 
   # colonize the planet!
   star_key = str(star_model.key())
-  star_pb = sim.getStar(star_key)
+  star_pb = sim.getStar(star_key, True)
+
+  # by default, the star will have a bunch of native colonies and fleets... drop those!
+  del star_pb.fleets[:]
+  del star_pb.colonies [:]
+
   _colonize(sector_model.key(), empire_model, star_pb, planet_index)
 
   # add some initial goods and minerals to the colony
@@ -141,7 +146,7 @@ def createEmpire(empire_pb, sim):
   fleet_model.empire = empire_model
   fleet_model.sector = sector_model
   fleet_model.designName = "colonyship"
-  fleet_model.numShips = 1
+  fleet_model.numShips = 1.0
   fleet_model.state = pb.Fleet.IDLE
   fleet_model.stateStartTime = datetime.now()
   fleet_model.put()
@@ -150,7 +155,7 @@ def createEmpire(empire_pb, sim):
   fleet_model.empire = empire_model
   fleet_model.sector = sector_model
   fleet_model.designName = "scout"
-  fleet_model.numShips = 10
+  fleet_model.numShips = 10.0
   fleet_model.state = pb.Fleet.IDLE
   fleet_model.stateStartTime = datetime.now()
   fleet_model.put()
@@ -521,14 +526,14 @@ def _orderFleet_split(fleet_pb, order_pb):
     return True
 
   left_model = mdl.Fleet.get(fleet_pb.key)
-  left_model.numShips = left_size
+  left_model.numShips = float(left_size)
 
   right_model = mdl.Fleet(parent = left_model.key().parent())
   right_model.sector = mdl.Fleet.sector.get_value_for_datastore(left_model)
   right_model.empire = mdl.Fleet.empire.get_value_for_datastore(left_model)
   right_model.designName = left_model.designName
   right_model.state = pb.Fleet.IDLE
-  right_model.numShips = right_size
+  right_model.numShips = float(right_size)
   right_model.stateStartTime = datetime.now()
 
   left_model.put()

@@ -197,7 +197,7 @@ class FleetMoveCompletePage(tasks.TaskPage):
 
       # new fleet is now idle
       new_fleet_mdl.state = pb.Fleet.IDLE
-      new_fleet_mdl.stateStartTime = datetime.now()
+      new_fleet_mdl.stateStartTime = datetime.now() - timedelta(seconds=1)
 
       empire = fleet_mdl.empire
       fleet_mdl.delete()

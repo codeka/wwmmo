@@ -143,7 +143,7 @@ def _addNativeColonies(star_pb):
     fleet_model.empire = None
     fleet_model.sector = sector_key
     fleet_model.designName = "fighter" # TODO
-    fleet_model.numShips = random.randint(5, 20) * 5
+    fleet_model.numShips = random.randint(5, 20) * 5.0
     fleet_model.state = pb.Fleet.IDLE
     fleet_model.stance = pb.Fleet.AGGRESSIVE
     fleet_model.stateStartTime = datetime.now()

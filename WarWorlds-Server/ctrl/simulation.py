@@ -155,6 +155,11 @@ class Simulation(object):
         if prediction_build_req.key == build_req.key:
           build_req.end_time = prediction_build_req.end_time
 
+    # any fleets that *will be* destroyed, remember the time of their death
+    for fleet_pb in star_pb.fleets:
+      for prediction_fleet_pb in prediction_star_pb.fleets:
+        fleet_pb.time_destroyed = prediction_fleet_pb.time_destroyed
+
   def _getSimulateStartTime(self, star_pb, empire_key):
     """Gets the time we should start simulate from for the given empire."""
     start_time = 0
@@ -696,8 +701,8 @@ class Simulation(object):
     combat_report_mdl = None
     query = (mdl.CombatReport.all()
                 .filter("endTime >", ctrl.epochToDateTime(self.combat_report.start_time)))
-    for mdl in query:
-      combat_report_mdl = mdl
+    for crmdl in query:
+      combat_report_mdl = crmdl
       break
 
     if not combat_report_mdl:
@@ -705,8 +710,8 @@ class Simulation(object):
 
     combat_report_mdl.startTime = ctrl.epochToDateTime(self.combat_report.start_time)
     combat_report_mdl.endTime = ctrl.epochToDateTime(self.combat_report.end_time)
-    combat_report_mdl.startEmpireKeys = self.combat_report.start_empire_keys
-    combat_report_mdl.endEmpireKeys = self.combat_report.end_empire_keys
+    #combat_report_mdl.startEmpireKeys = self.combat_report.start_empire_keys
+    #combat_report_mdl.endEmpireKeys = self.combat_report.end_empire_keys
     combat_report_mdl.rounds = self.combat_report.SerializeToString()
     combat_report_mdl.put()
 
