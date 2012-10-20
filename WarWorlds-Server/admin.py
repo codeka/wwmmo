@@ -2,6 +2,7 @@
 
 import os
 import logging
+import json
 
 from google.appengine.api import channel
 from google.appengine.api import users
@@ -10,12 +11,16 @@ from google.appengine.ext.db.metadata import Kind
 import import_fixer
 import_fixer.FixImports("google", "protobuf")
 
+import protobufs.protobuf_json
+import protobufs.warworlds_pb2 as pb
+
 import jinja2
 import webapp2 as webapp
 from mapreduce import control
 
 import model
 from model import session
+from ctrl import empire
 
 
 Jinja = jinja2.Environment(loader=jinja2.FileSystemLoader(os.path.dirname(__file__)+"/tmpl"))
@@ -131,6 +136,35 @@ class DebugStarfieldPage(AdminPage):
     self.render("admin/debug/starfield.html", {})
 
 
+class DebugReportsPage(AdminPage):
+  def get(self):
+    self.render("admin/debug/reports.html", {})
+
+
+class DebugReportsAjaxPage(AdminPage):
+  """Helper for the debug/report page that gets called via Ajax.
+
+  The reports will have serialized protocol buffers in them, and because JavaScript doesn't have
+  any way to deserialize protocol buffers, we act as an intermediary to do it on the server and
+  return JSON directly."""
+  def get(self):
+    action = self.request.get("action")
+    star_key = self.request.get("starKey")
+
+    user = users.User(self.request.get("on_behalf_of"))
+    curr_empire_pb = empire.getEmpireForUser(user)
+    if action == "scout-reports":
+      scout_reports_pb = empire.getScoutReports(star_key, curr_empire_pb.key)
+      scout_reports = protobufs.protobuf_json.pb2obj(scout_reports_pb)
+      for report in scout_reports["reports"]:
+        star_pb = pb.Star()
+        star_pb.ParseFromString(report["star_pb"].decode("string_escape"))
+        report["star_pb"] = protobufs.protobuf_json.pb2obj(star_pb)
+      self.response.headers["Content-Type"] = "application/json"
+      self.response.write(json.dumps(scout_reports))
+
+
+
 class DebugColoniesPage(AdminPage):
   def get(self):
     self.render("admin/debug/colonies.html", {})
@@ -175,6 +209,8 @@ app = webapp.WSGIApplication([("/admin", DashboardPage),
                               ("/admin/debug/empires", DebugEmpiresPage),
                               ("/admin/debug/starfield", DebugStarfieldPage),
                               ("/admin/debug/data-store", DebugDataStorePage),
-                              ("/admin/debug/colonies", DebugColoniesPage)],
+                              ("/admin/debug/colonies", DebugColoniesPage),
+                              ("/admin/debug/reports", DebugReportsPage),
+                              ("/admin/debug/reports-ajax", DebugReportsAjaxPage)],
                              debug=os.environ["SERVER_SOFTWARE"].startswith("Development"))
 

@@ -258,6 +258,24 @@ def scoutReportModelToPb(scout_report_pb, scout_report_mdl):
   scout_report_pb.star_pb = scout_report_mdl.report
 
 
+def combatReportModelToPb(combat_report_pb, combat_report_mdl, summary=False):
+  combat_report_pb.key = str(combat_report_mdl.key())
+  combat_report_pb.start_time = dateTimeToEpoch(combat_report_mdl.startTime)
+  combat_report_pb.end_time = dateTimeToEpoch(combat_report_mdl.endTime)
+  for empire_key in combat_report_mdl.startEmpireKeys:
+    combat_report_pb.start_empire_keys.append(empire_key)
+  for empire_key in combat_report_mdl.endEmpireKeys:
+    combat_report_pb.end_empire_keys.append(empire_key)
+  if combat_report_mdl.numDestroyed:
+    combat_report_pb.num_destroyed = combat_report_mdl.numDestroyed
+  if not summary:
+    combat_rounds_pb = pb.CombatReport()
+    combat_rounds_pb.ParseFromString(combat_report_mdl.rounds)
+    combat_rounds_pb.ParseFromString(combat_report_mdl.rounds)
+    combat_report_pb.key =str(len(combat_rounds_pb.rounds))
+    combat_report_pb.rounds.extend(combat_rounds_pb.rounds)
+
+
 def dateTimeToEpoch(dt):
   return int(time.mktime(dt.timetuple()))
 

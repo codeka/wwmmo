@@ -193,7 +193,7 @@ def getColony(colony_key):
 
 def getScoutReports(star_key, empire_key):
   cache_key = "scout-report:%s:%s" % (star_key, empire_key)
-  values = ctrl.getCached([cache_key], pb.ScoutReport)
+  values = ctrl.getCached([cache_key], pb.ScoutReports)
   if cache_key in values:
     return values[cache_key]
 
@@ -206,6 +206,44 @@ def getScoutReports(star_key, empire_key):
   # note: we WANT to cache an empty one, if there's none in the data store...
   ctrl.setCached({cache_key: scout_reports_pb})
   return scout_reports_pb
+
+
+def getCombatReports(star_key):
+  """Gets a 'summary' of combat reports for the given star.
+
+  We don't actually return the round data in this call, you can fetch the rounds report-by-report
+  by calling getCombatReport()."""
+  cache_key = "combat-reports:%s" % (star_key)
+  values = ctrl.getCached([cache_key], pb.CombatReports)
+  if cache_key in values:
+    return values[cache_key]
+
+  combat_reports_pb = pb.CombatReports()
+  combat_report_mdls = mdl.CombatReport.getReports(db.Key(star_key))
+  for combat_report_mdl in combat_report_mdls:
+    combat_report_pb = combat_reports_pb.reports.add()
+    ctrl.combatReportModelToPb(combat_report_pb, combat_report_mdl, summary=True)
+
+  ctrl.setCached({cache_key: combat_reports_pb})
+  return combat_reports_pb
+
+
+def getCombatReport(star_key, combat_report_key):
+  """Gets a 'summary' of combat reports for the given star.
+
+  We don't actually return the round data in this call, you can fetch the rounds report-by-report
+  by calling getCombatReport()."""
+  cache_key = "combat-report:%s" % (combat_report_key)
+  values = ctrl.getCached([cache_key], pb.CombatReport)
+  if cache_key in values:
+    return values[cache_key]
+
+  combat_report_pb = pb.CombatReport()
+  combat_report_mdl = mdl.CombatReport.get(db.Key(combat_report_key))
+  ctrl.combatReportModelToPb(combat_report_pb, combat_report_mdl, summary=False)
+
+  ctrl.setCached({cache_key: combat_report_pb})
+  return combat_report_pb
 
 
 def updateColony(colony_key, updated_colony_pb, sim):

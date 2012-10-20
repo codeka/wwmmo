@@ -213,9 +213,10 @@ class CombatReport(db.Model):
   rounds = db.BlobProperty()
 
   @staticmethod
-  def getReportForStar(star_key):
+  def getReports(star_key):
     reports = []
-    query = CombatReport().all().ancestor(star_key).order("-startTime")
+    query = CombatReport.all().ancestor(star_key).order("-startTime")
     for mdl in query:
       reports.append(mdl)
     return reports
+

@@ -499,6 +499,20 @@ class ScoutReportsPage(ApiPage):
     return scout_reports_pb
 
 
+class CombatReportsPage(ApiPage):
+  """This page returns a list of combat reports for the given star."""
+  def get(self, star_key):
+    combat_reports_pb = empire.getCombatReports(star_key)
+    return combat_reports_pb
+
+
+class CombatReportPage(ApiPage):
+  """This page returns a list of combat reports for the given star."""
+  def get(self, star_key, combat_report_key):
+    combat_report_pb = empire.getCombatReport(star_key, combat_report_key)
+    return combat_report_pb
+
+
 class ApiApplication(webapp.WSGIApplication):
   def __init__(self, *args, **kwargs):
     webapp.WSGIApplication.__init__(self, *args, **kwargs)
@@ -567,5 +581,7 @@ app = ApiApplication([("/api/v1/hello/([^/]+)", HelloPage),
                       ("/api/v1/stars/([^/]+)/colonies/([^/]+)", ColoniesPage),
                       ("/api/v1/stars/([^/]+)/colonies/([^/]+)/taxes", ColoniesTaxesPage),
                       ("/api/v1/stars/([^/]+)/fleets/([^/]+)/orders", FleetOrdersPage),
-                      ("/api/v1/stars/([^/]+)/scout-reports", ScoutReportsPage)],
+                      ("/api/v1/stars/([^/]+)/scout-reports", ScoutReportsPage),
+                      ("/api/v1/stars/([^/]+)/combat-reports", CombatReportsPage),
+                      ("/api/v1/stars/([^/]+)/combat-reports/([^/]+)", CombatReportPage)],
                      debug=os.environ["SERVER_SOFTWARE"].startswith("Development"))

@@ -616,19 +616,26 @@ message CombatRound
 //
 message CombatReport
 {
+    optional string key = 1;
+
     // The time the conflict started/finished
-    optional int64 start_time = 1;
-    optional int64 end_time = 2;
+    optional int64 start_time = 2;
+    optional int64 end_time = 3;
 
     // A list of the empires who joined the conflict
-    repeated string start_empire_keys = 3;
+    repeated string start_empire_keys = 4;
 
     // A list of the empires who were left when the conflict was resolved
-    repeated string end_empire_keys = 4;
+    repeated string end_empire_keys = 5;
 
     // The number of ships/buildings destroyed in the conflict
-    optional int32 num_destroyed = 5;
+    optional int32 num_destroyed = 6;
 
     // A page of CombatRound objects that represent this set of results
-    repeated CombatRound rounds = 6;
+    repeated CombatRound rounds = 7;
+}
+
+message CombatReports
+{
+    repeated CombatReport reports = 1;
 }

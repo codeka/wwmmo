@@ -158,7 +158,8 @@ class Simulation(object):
     # any fleets that *will be* destroyed, remember the time of their death
     for fleet_pb in star_pb.fleets:
       for prediction_fleet_pb in prediction_star_pb.fleets:
-        fleet_pb.time_destroyed = prediction_fleet_pb.time_destroyed
+        if fleet_pb.key == prediction_fleet_pb.key:
+          fleet_pb.time_destroyed = prediction_fleet_pb.time_destroyed
 
   def _getSimulateStartTime(self, star_pb, empire_key):
     """Gets the time we should start simulate from for the given empire."""
@@ -695,7 +696,6 @@ class Simulation(object):
       fleet_model.put()
 
   def _updateCombatReport(self, star_pb):
-
     # check for an existing one that we want to update instead of adding. If there's any
     # overlap between the start/end dates that's what we wnat to update
     combat_report_mdl = None

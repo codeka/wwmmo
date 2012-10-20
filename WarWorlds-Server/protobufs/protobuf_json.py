@@ -90,9 +90,15 @@ def _getEnumValue(enum_type, value):
         return "%s.%s" % (enum_type.name, value_defn.name)
     return "%d : <UNKNOWN>" % (int(value))
 
+
 def pb2obj(pb):
-    ''' Convert google.protobuf.descriptor instance to python objects
-    '''
+    """Convert google.protobuf.descriptor instance to python objects.
+
+    Args:
+      pb: The protocol buffer to convert.
+      decode_blobs: If True, we'll assume a BlobProperty is actually another serialized
+                    protocol buffer, and try to decode that as well.
+    """
     obj = {}
     fields = pb.ListFields()
 

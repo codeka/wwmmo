@@ -26,6 +26,10 @@ class MockStarFetcher:
     return self.stars[star_key]
 
 
+def debug_log(msg):
+  print msg
+
+
 class EmpirePresenceTestCase(unittest.TestCase):
   def testEmpirePresenceCreated(self):
     star_fetcher = MockStarFetcher(["""
@@ -124,10 +128,10 @@ class CombatTestCase(unittest.TestCase):
             "stance": 3}
          ]
         }
-      """ % (ctrl.dateTimeToEpoch(datetime.now() - timedelta(minutes=2)),
-             ctrl.dateTimeToEpoch(datetime.now() - timedelta(minutes=3)),
-             ctrl.dateTimeToEpoch(datetime.now() - timedelta(minutes=3)))])
-    sim = simulation.Simulation(star_fetcher=star_fetcher)
+      """ % (ctrl.dateTimeToEpoch(datetime.now() - timedelta(minutes=20)),
+             ctrl.dateTimeToEpoch(datetime.now() - timedelta(minutes=15)),
+             ctrl.dateTimeToEpoch(datetime.now() - timedelta(minutes=15)))])
+    sim = simulation.Simulation(star_fetcher=star_fetcher, log=debug_log)
     sim.simulate("star1")
 
     star_pb = sim.getStar("star1")

@@ -34,10 +34,6 @@
             right: 180pt;
         }
 
-        form#scout-report-form input[type=text] {
-            right: 95pt;
-        }
-
         form#star-simulate-form label[for=star-simulate-update] {
              left: auto;right: 100pt;
         }
@@ -69,11 +65,6 @@
         <input type="checkbox" name="update" id="star-simulate-update">
         <label for="star-simulate-update">Update</label>
         <input type="submit" value="Simulate">
-    </form>
-    <form id="scout-report-form">
-        <label>Star:</label>
-        <input type="text" name="starKey" value="">
-        <input type="submit" value="Scout Report">
     </form>
     <form id="update-form">
         <textarea name="sectors"></textarea>
@@ -133,24 +124,6 @@
                 },
                 error: function() {
                     alert("An error occured simulating the star. Check server logs.");
-                }
-            });
-        });
-
-        $("#scout-report-form").on("submit", function(evnt) {
-            evnt.preventDefault();
-            var $starKey = $("#scout-report-form input[name=starKey]");
-
-            $("#update-form textarea").val("");
-            var url = "/api/v1/stars/"+$starKey.val()+"/scout-reports";
-            $.ajax({
-                url: url,
-                dataType: "json",
-                success: function(data) {
-                    $("#update-form textarea").val(JSON.stringify(data, null, "  "));
-                },
-                error: function() {
-                    alert("An error occured fetching starfield data. Check server logs.");
                 }
             });
         });
