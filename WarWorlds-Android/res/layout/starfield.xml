@@ -104,14 +104,16 @@
                         android:id="@+id/planet_list"
                         android:layout_width="0dp"
                         android:layout_weight="1"
-                        android:layout_height="wrap_content" >
+                        android:layout_height="wrap_content"
+                        android:listSelector="@drawable/list_selector" >
                     </ListView>
 
                     <ListView
                         android:id="@+id/fleet_list"
                         android:layout_width="0dp"
                         android:layout_weight="1"
-                        android:layout_height="wrap_content" >
+                        android:layout_height="wrap_content"
+                        android:listSelector="@drawable/list_selector" >
                     </ListView>
 
                 </LinearLayout>

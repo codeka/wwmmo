@@ -32,6 +32,8 @@ public class EmpireActivity extends TabFragmentActivity {
     private static MyEmpire sCurrentEmpire;
 
     Context mContext = this;
+    Bundle mExtras = null;
+    boolean mFirstRefresh = true;
 
     public enum EmpireActivityResult {
         NavigateToPlanet(1),
@@ -68,6 +70,12 @@ public class EmpireActivity extends TabFragmentActivity {
         getTabManager().addTab(mContext, new TabInfo("Overview", OverviewFragment.class, null));
         getTabManager().addTab(mContext, new TabInfo("Colonies", ColoniesFragment.class, null));
         getTabManager().addTab(mContext, new TabInfo("Fleets", FleetsFragment.class, null));
+
+        mExtras = getIntent().getExtras();
+        String fleetKey = mExtras.getString("au.com.codeka.warworlds.FleetKey");
+        if (fleetKey != null) {
+            getTabHost().setCurrentTabByTag("Fleets");
+        }
     }
 
     public void refresh() {
@@ -76,6 +84,7 @@ public class EmpireActivity extends TabFragmentActivity {
             public void onRefreshAllComplete(MyEmpire empire) {
                 sCurrentEmpire = empire;
                 getTabManager().reloadTab();
+                mFirstRefresh = false;
             }
         });
     }
@@ -184,6 +193,14 @@ public class EmpireActivity extends TabFragmentActivity {
             View v = inflator.inflate(R.layout.empire_fleets_tab, null);
             FleetList fleetList = (FleetList) v.findViewById(R.id.fleet_list);
             fleetList.refresh(sCurrentEmpire.getAllFleets(), sCurrentEmpire.getImportantStars());
+
+            EmpireActivity activity = (EmpireActivity) getActivity();
+            if (activity.mFirstRefresh) {
+                String fleetKey = activity.mExtras.getString("au.com.codeka.warworlds.FleetKey");
+                if (fleetKey != null) {
+                    fleetList.selectFleet(fleetKey);
+                }
+            }
 
             fleetList.setOnFleetActionListener(new FleetList.OnFleetActionListener() {
                 @Override

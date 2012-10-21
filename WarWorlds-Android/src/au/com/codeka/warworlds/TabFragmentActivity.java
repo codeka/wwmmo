@@ -16,6 +16,7 @@ import android.widget.TabHost;
 public class TabFragmentActivity extends FragmentActivity {
     private Context mContext = this;
     TabManager mTabManager;
+    TabHost mTabHost;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -24,7 +25,12 @@ public class TabFragmentActivity extends FragmentActivity {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.tab_fragment_activity);
 
-        mTabManager = new TabManager((TabHost) findViewById(android.R.id.tabhost), false);
+        mTabHost = (TabHost) findViewById(android.R.id.tabhost);
+        mTabManager = new TabManager(mTabHost, false);
+    }
+
+    protected TabHost getTabHost() {
+        return mTabHost;
     }
 
     protected TabManager getTabManager() {

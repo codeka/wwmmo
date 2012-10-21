@@ -16,7 +16,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -194,7 +193,7 @@ public class StarfieldActivity extends Activity {
             }
         });
 
-        mPlanetList.setOnItemClickListener(new OnItemClickListener() {
+        mPlanetList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 if (mSelectedStar == null) {
@@ -210,12 +209,23 @@ public class StarfieldActivity extends Activity {
             }
         });
 
+        mFleetList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                if (mSelectedStar == null) {
+                    return; //??
+                }
+
+                Fleet fleet = (Fleet) mFleetListAdapter.getItem(position);
+                openEmpireActivityAtFleet(mSelectedStar, fleet);
+            }
+        });
+
         final Button empireBtn = (Button) findViewById(R.id.empire_btn);
         empireBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(mContext, EmpireActivity.class);
-                StarfieldActivity.this.startActivityForResult(intent, EMPIRE_REQUEST);
+                openEmpireActivity();
             }
         });
 
@@ -232,6 +242,18 @@ public class StarfieldActivity extends Activity {
                 }
             }
         });
+    }
+
+    public void openEmpireActivityAtFleet(Star star, Fleet fleet) {
+        Intent intent = new Intent(mContext, EmpireActivity.class);
+        intent.putExtra("au.com.codeka.warworlds.StarKey", star.getKey());
+        intent.putExtra("au.com.codeka.warworlds.FleetKey", fleet.getKey());
+        startActivityForResult(intent, EMPIRE_REQUEST);
+    }
+
+    public void openEmpireActivity() {
+        Intent intent = new Intent(mContext, EmpireActivity.class);
+        startActivityForResult(intent, EMPIRE_REQUEST);
     }
 
     /**

@@ -90,6 +90,16 @@ public class FleetList extends FrameLayout implements StarManager.StarFetchedHan
         mFleetListAdapter.setFleets(stars, fleets);
     }
 
+    public void selectFleet(String fleetKey) {
+        for (Fleet f : mFleets) {
+            if (f.getKey().equals(fleetKey)) {
+                mSelectedFleet = f;
+            }
+        }
+
+        mFleetListAdapter.notifyDataSetChanged();
+    }
+
     private void initialize() {
         if (mIsInitialized) {
             return;

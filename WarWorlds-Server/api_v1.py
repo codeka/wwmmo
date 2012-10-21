@@ -389,7 +389,7 @@ class StarSimulatePage(ApiPage):
     if do_update:
       msgs.append("")
       msgs.append("---------- Updating:")
-      sim.update(star_key)
+      sim.update()
 
     self.response.headers["Content-Type"] = "text/plain"
     self.response.out.write("\r\n".join(msgs))
