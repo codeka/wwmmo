@@ -864,6 +864,8 @@ def _parseShipDesign(designXml):
   _parseDesign(designXml, design)
   statsXml = designXml.find("stats")
   design.speed = float(statsXml.get("speed"))
+  design.baseAttack = float(statsXml.get("baseAttack"))
+  design.baseDefence = float(statsXml.get("baseDefence"))
   fuelXml = designXml.find("fuel")
   design.fuelCostPerParsec = float(fuelXml.get("costPerParsec"))
   effectsXml = designXml.find("effects")

@@ -5,6 +5,8 @@ import org.w3c.dom.Element;
 public class ShipDesign extends Design {
     private float mSpeedParsecPerHour;
     private float mFuelCostPerParsec;
+    private float mBaseAttack;
+    private float mBaseDefence;
 
     public float getSpeedInParsecPerHour() {
         return mSpeedParsecPerHour;
@@ -14,6 +16,12 @@ public class ShipDesign extends Design {
     }
     public float getFuelCost(float parsecs, int numShips) {
         return mFuelCostPerParsec * parsecs * numShips;
+    }
+    public float getBaseAttack() {
+        return mBaseAttack;
+    }
+    public float getBaseDefence() {
+        return mBaseDefence;
     }
 
     public static class Factory extends Design.Factory {
@@ -33,10 +41,9 @@ public class ShipDesign extends Design {
             ShipDesign design = (ShipDesign) baseDesign;
 
             if (elem.getNodeName().equals("stats")) {
-                String s = elem.getAttribute("speed");
-                if (s != null) {
-                    design.mSpeedParsecPerHour = Float.parseFloat(s);
-                }
+                design.mSpeedParsecPerHour = Float.parseFloat(elem.getAttribute("speed"));
+                design.mBaseAttack = Float.parseFloat(elem.getAttribute("baseAttack"));
+                design.mBaseDefence = Float.parseFloat(elem.getAttribute("baseDefence"));
             }
 
             if (elem.getNodeName().equals("fuel")) {

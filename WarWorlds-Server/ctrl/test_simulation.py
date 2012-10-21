@@ -94,15 +94,15 @@ class CombatTestCase(unittest.TestCase):
     self.assertEqual(0, star_pb.fleets[1].num_ships)
     self.assertNotEqual(0, star_pb.fleets[1].time_destroyed)
     # check that the combat report is correctly populated
-    self.assertEqual(1, len(sim.combat_report.rounds))
+    self.assertEqual(3, len(sim.combat_report.rounds))
     self.assertEqual(2, len(sim.combat_report.rounds[0].fleets))
     self.assertEqual(1, len(sim.combat_report.rounds[0].fleets_attacked))
     self.assertEqual("fleet1", sim.combat_report.rounds[0].fleets[sim.combat_report.rounds[0].fleets_attacked[0].fleet_index].fleet_key)
     self.assertEqual("fleet2", sim.combat_report.rounds[0].fleets[sim.combat_report.rounds[0].fleets_attacked[0].target_index].fleet_key)
-    self.assertEqual(10.0, sim.combat_report.rounds[0].fleets_attacked[0].damage)
+    self.assertEqual(50.0, sim.combat_report.rounds[0].fleets_attacked[0].damage)
     self.assertEqual(1, len(sim.combat_report.rounds[0].fleets_damaged))
     self.assertEqual("fleet2", sim.combat_report.rounds[0].fleets[sim.combat_report.rounds[0].fleets_damaged[0].fleet_index].fleet_key)
-    self.assertEqual(10.0, sim.combat_report.rounds[0].fleets_damaged[0].damage)
+    self.assertAlmostEqual(3.33, sim.combat_report.rounds[0].fleets_damaged[0].damage, 2)
 
 
   def testFleetOf10vsFleetOf20(self):
@@ -131,7 +131,7 @@ class CombatTestCase(unittest.TestCase):
       """ % (ctrl.dateTimeToEpoch(datetime.now() - timedelta(minutes=20)),
              ctrl.dateTimeToEpoch(datetime.now() - timedelta(minutes=15)),
              ctrl.dateTimeToEpoch(datetime.now() - timedelta(minutes=15)))])
-    sim = simulation.Simulation(star_fetcher=star_fetcher, log=debug_log)
+    sim = simulation.Simulation(star_fetcher=star_fetcher)
     sim.simulate("star1")
 
     star_pb = sim.getStar("star1")
@@ -140,15 +140,20 @@ class CombatTestCase(unittest.TestCase):
     self.assertEqual(0, star_pb.fleets[0].num_ships)
     self.assertNotEqual(0, star_pb.fleets[0].time_destroyed)
     self.assertEqual("fleet2", star_pb.fleets[1].key)
-    self.assertEqual(10, star_pb.fleets[1].num_ships)
+    self.assertEqual(15, int(star_pb.fleets[1].num_ships))
     self.assertEqual(0, star_pb.fleets[1].time_destroyed)
     # check that the combat report is correctly populated
-    self.assertEqual(1, len(sim.combat_report.rounds))
+    self.assertEqual(2, len(sim.combat_report.rounds))
     self.assertEqual(2, len(sim.combat_report.rounds[0].fleets))
     self.assertEqual(2, len(sim.combat_report.rounds[0].fleets_joined))
     self.assertEqual(2, len(sim.combat_report.rounds[0].fleets_targetted))
     self.assertEqual(2, len(sim.combat_report.rounds[0].fleets_attacked))
     self.assertEqual(2, len(sim.combat_report.rounds[0].fleets_damaged))
+    self.assertEqual(2, len(sim.combat_report.rounds[1].fleets))
+    self.assertEqual(0, len(sim.combat_report.rounds[1].fleets_joined))
+    self.assertEqual(0, len(sim.combat_report.rounds[1].fleets_targetted))
+    self.assertEqual(2, len(sim.combat_report.rounds[1].fleets_attacked))
+    self.assertEqual(2, len(sim.combat_report.rounds[1].fleets_damaged))
 
 
   def testFleetOf20vsFleetOf10(self):
@@ -183,7 +188,7 @@ class CombatTestCase(unittest.TestCase):
     star_pb = sim.getStar("star1")
     self.assertEqual(2, len(star_pb.fleets))
     self.assertEqual("fleet1", star_pb.fleets[0].key)
-    self.assertEqual(10, star_pb.fleets[0].num_ships)
+    self.assertEqual(15, int(star_pb.fleets[0].num_ships))
     self.assertEqual(0, star_pb.fleets[0].time_destroyed)
     self.assertEqual("fleet2", star_pb.fleets[1].key)
     self.assertEqual(0, star_pb.fleets[1].num_ships)
@@ -348,14 +353,15 @@ class CombatTestCase(unittest.TestCase):
     star_pb = sim.getStar("star1")
     self.assertEqual(3, len(star_pb.fleets))
     self.assertEqual("fleet1", star_pb.fleets[0].key)
-    self.assertEqual(0, star_pb.fleets[0].num_ships)
-    self.assertNotEqual(0, star_pb.fleets[0].time_destroyed)
+    self.assertEqual(9, int(star_pb.fleets[0].num_ships))
+    self.assertEqual(0, star_pb.fleets[0].time_destroyed)
     self.assertEqual("fleet2", star_pb.fleets[1].key)
     self.assertEqual(10, star_pb.fleets[1].num_ships)
     self.assertEqual(0, star_pb.fleets[1].time_destroyed)
     self.assertEqual("fleet3", star_pb.fleets[2].key)
     self.assertEqual(0, star_pb.fleets[2].num_ships)
     self.assertNotEqual(0, star_pb.fleets[2].time_destroyed)
+    self.assertEqual(3, len(sim.combat_report.rounds))
 
 
   def testResetTimeDestroyed(self):
@@ -392,8 +398,8 @@ class CombatTestCase(unittest.TestCase):
     star_pb = sim.getStar("star1")
     self.assertEqual(3, len(star_pb.fleets))
     self.assertEqual("fleet1", star_pb.fleets[0].key)
-    self.assertEqual(0, star_pb.fleets[0].num_ships)
-    self.assertNotEqual(0, star_pb.fleets[0].time_destroyed)
+    self.assertEqual(9, int(star_pb.fleets[0].num_ships))
+    self.assertEqual(0, star_pb.fleets[0].time_destroyed)
     self.assertEqual("fleet2", star_pb.fleets[1].key)
     self.assertEqual(10, star_pb.fleets[1].num_ships)
     self.assertEqual(0, star_pb.fleets[1].time_destroyed)

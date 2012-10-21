@@ -65,10 +65,11 @@
         android:id="@+id/building_timetobuild_label"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/ok_btn"
+        android:layout_above="@+id/building_mineralstobuild_label"
         android:layout_toRightOf="@+id/building_icon"
-        android:text="@string/solarsystem_building_timetobuild"
-        android:textAppearance="?android:attr/textAppearanceSmall" />
+        android:text="Time to build:"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:textStyle="bold" />
 
     <TextView
         android:id="@+id/building_timetobuild"
@@ -77,8 +78,27 @@
         android:layout_alignBaseline="@id/building_timetobuild_label"
         android:layout_toRightOf="@id/building_timetobuild_label"
         android:layout_marginLeft="10dp"
+        android:text="123"
         android:textAppearance="?android:attr/textAppearanceSmall" />
 
+    <ImageView
+        android:id="@+id/building_mineralstobuild_label"
+        android:layout_width="16dp"
+        android:layout_height="16dp"
+        android:layout_above="@+id/ok_btn"
+        android:layout_alignRight="@+id/building_timetobuild_label"
+        android:src="@drawable/colony_mining_icon" />
+
+    <TextView
+        android:id="@+id/building_mineralstobuild"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/ok_btn"
+        android:layout_toRightOf="@id/building_timetobuild_label"
+        android:layout_marginLeft="10dp"
+        android:text="123"
+        android:textAppearance="?android:attr/textAppearanceSmall" />
+    
     <Button
         android:id="@+id/ok_btn"
         style="@style/Button"

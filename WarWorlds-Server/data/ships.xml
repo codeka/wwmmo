@@ -12,7 +12,7 @@
     ]]></description>
     <cost minerals="1000" time="4.0" />
     <fuel costPerParsec="85" />
-    <stats speed="1" />
+    <stats speed="1" baseAttack="0" baseDefence="0" />
   </design>
   <design id="scout">
     <name>Scout</name>
@@ -24,7 +24,7 @@
     ]]></description>
     <cost minerals="50" time="0.1667" />
     <fuel costPerParsec="7.5" />
-    <stats speed="17" />
+    <stats speed="17" baseAttack="1" baseDefence="1" />
     <effects>
       <effect kind="scout" />
       <effect kind="fighter" />
@@ -40,7 +40,7 @@
     ]]></description>
     <cost minerals="45" time="0.15" />
     <fuel costPerParsec="0.2" />
-    <stats speed="10" />
+    <stats speed="10" baseAttack="5" baseDefence="15" />
     <effects>
       <effect kind="fighter" />
     </effects>

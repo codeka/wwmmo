@@ -19,6 +19,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
+import au.com.codeka.TimeInHours;
 import au.com.codeka.warworlds.DialogManager;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.api.ApiClient;
@@ -37,6 +38,7 @@ public class BuildConfirmDialog extends Dialog implements DialogManager.DialogCo
     private static Logger log = LoggerFactory.getLogger(BuildConfirmDialog.class);
     private Colony mColony;
     private Design mDesign;
+    private int mCurrentQueueSize;
 
     public static final int ID = 1001;
 
@@ -72,6 +74,7 @@ public class BuildConfirmDialog extends Dialog implements DialogManager.DialogCo
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 if (fromUser) {
                     countEdit.setText(Integer.toString(progress + 1));
+                    refreshBuildEstimates();
                 }
             }
         });
@@ -97,10 +100,11 @@ public class BuildConfirmDialog extends Dialog implements DialogManager.DialogCo
                 } else {
                     countSeekBar.setProgress(99);
                 }
+
+                refreshBuildEstimates();
             }
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-                
             }
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
@@ -123,7 +127,11 @@ public class BuildConfirmDialog extends Dialog implements DialogManager.DialogCo
                             kind = warworlds.Warworlds.BuildRequest.BUILD_KIND.SHIP;
                         }
 
-                        int count = Integer.parseInt(countEdit.getText().toString());
+                        int count = 1;
+                        if (mDesign.canBuildMultiple()) {
+                            count = Integer.parseInt(countEdit.getText().toString());
+                        }
+
                         warworlds.Warworlds.BuildRequest build = warworlds.Warworlds.BuildRequest.newBuilder()
                                 .setBuildKind(kind)
                                 .setColonyKey(mColony.getKey())
@@ -167,6 +175,7 @@ public class BuildConfirmDialog extends Dialog implements DialogManager.DialogCo
                                            DesignKind.BUILDING.getValue()));
 
         mColony = (Colony) bundle.getParcelable("au.com.codeka.warworlds.Colony");
+        mCurrentQueueSize = bundle.getInt("au.com.codeka.warworlds.BuildQueueSize");
 
         // TODO: this could be encapsulated in the DesignManager base class....
         Design design;
@@ -189,5 +198,39 @@ public class BuildConfirmDialog extends Dialog implements DialogManager.DialogCo
         nameTextView.setText(design.getDisplayName());
         iconImageView.setImageDrawable(new SpriteDrawable(design.getSprite()));
         descriptionTextView.setText(Html.fromHtml(design.getDescription()));
+
+        View buildCountContainer = findViewById(R.id.build_count_container);
+        if (design.canBuildMultiple()) {
+            buildCountContainer.setVisibility(View.VISIBLE);
+        } else {
+            buildCountContainer.setVisibility(View.GONE);
+        }
+
+        refreshBuildEstimates();
+    }
+
+    private void refreshBuildEstimates() {
+        // estimate the build time, based on current queue size, construction focus, etc
+        float totalWorkers = mColony.getPopulation() * mColony.getConstructionFocus();
+        float workersPerBuildRequest = totalWorkers / (mCurrentQueueSize + 1);
+        if (workersPerBuildRequest < 1) {
+            workersPerBuildRequest = 1;
+        }
+
+        int count = 1;
+        if (mDesign.canBuildMultiple()) {
+            final EditText countEdit = (EditText) findViewById(R.id.build_count_edit);
+            count = Integer.parseInt(countEdit.getText().toString());
+        }
+
+        TextView timeToBuildText = (TextView) findViewById(R.id.building_timetobuild);
+        float timeInHours = (count * mDesign.getBuildTimeSeconds()) / 3600.0f;
+        timeToBuildText.setText(TimeInHours.format(timeInHours));
+
+        TextView mineralsToBuildText = (TextView) findViewById(R.id.building_mineralstobuild);
+        float totalMineralsCost = count * mDesign.getBuildCostMinerals();
+        mineralsToBuildText.setText(Html.fromHtml(
+                                    String.format("%d (<font color=\"red\">%.2f</font>/hr)",
+                                    (int) totalMineralsCost, totalMineralsCost / timeInHours)));
     }
 }

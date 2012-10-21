@@ -296,7 +296,7 @@ class Simulation(object):
             (total_workers, num_valid_build_requests, workers_per_build_request))
 
         # OK, we can spare at least ONE population
-        if workers_per_build_request == 0:
+        if workers_per_build_request < 1:
           workers_per_build_request = 1
 
         for build_request in build_requests:
@@ -567,7 +567,8 @@ class Simulation(object):
         continue
 
       target = cache[fleet_pb.target_fleet_key]["fleet"]
-      damage = float(fleet_pb.num_ships) # todo: more complicated!
+      fleet_design = cache[fleet_pb.key]["design"]
+      damage = float(fleet_pb.num_ships) * fleet_design.baseAttack # todo: more complicated!
       hits.append({"fleet_key": target.key, "damage": damage})
       fleet_attack_pb = combat_round_pb.fleets_attacked.add()
       fleet_attack_pb.fleet_index = fleet_indices[fleet_pb.key]
@@ -582,7 +583,11 @@ class Simulation(object):
           total_damage += float(hit["damage"])
 
       if total_damage > 0.0:
+        fleet_design = cache[fleet_pb.key]["design"]
+        total_damage /= fleet_design.baseDefence
         fleet_pb.num_ships -= total_damage
+        if fleet_pb.num_ships < 0.75:
+          fleet_pb.num_ships = 0.0
         fleet_damage_pb = combat_round_pb.fleets_damaged.add()
         fleet_damage_pb.fleet_index = fleet_indices[fleet_pb.key]
         fleet_damage_pb.damage = total_damage

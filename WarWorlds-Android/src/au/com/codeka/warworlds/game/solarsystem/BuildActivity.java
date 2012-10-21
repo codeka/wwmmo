@@ -65,8 +65,6 @@ public class BuildActivity extends TabFragmentActivity implements StarManager.St
         StarManager.getInstance().requestStar(starKey, false, this);
         StarManager.getInstance().addStarUpdatedListener(starKey, this);
 
-        
-
         super.onResume();
     }
 
@@ -127,9 +125,18 @@ public class BuildActivity extends TabFragmentActivity implements StarManager.St
 
                     Object o = mBuildingListAdapter.getItem(position);
                     if (o instanceof BuildingDesign) {
+                        int buildQueueSize = 0;
+                        BuildActivity activity = (BuildActivity) getActivity();
+                        for (BuildRequest br : activity.mStar.getBuildRequests()) {
+                            if (br.getColonyKey().equals(colony.getKey())) {
+                                buildQueueSize ++;
+                            }
+                        }
+
                         BuildingDesign design = (BuildingDesign) o;
                         args.putString("au.com.codeka.warworlds.DesignID", design.getID());
                         args.putInt("au.com.codeka.warworlds.DesignKind", design.getDesignKind().getValue());
+                        args.putInt("au.com.codeka.warworlds.BuildQueueSize", buildQueueSize);
                         args.putParcelable("au.com.codeka.warworlds.Colony", colony);
 
                         DialogManager.getInstance().show(getActivity(),
@@ -266,7 +273,7 @@ public class BuildActivity extends TabFragmentActivity implements StarManager.St
 
                     row3.setVisibility(View.VISIBLE);
                     progress.setVisibility(View.GONE);
-                    row3.setText(String.format("Upgrade: $ %d, %.2f hours", design.getBuildCost(),
+                    row3.setText(String.format("Upgrade: %.2f hours",
                             (float) design.getBuildTimeSeconds() / 3600.0f));
                 } else if (position == mBuildings.size() + 1) {
                     HorizontalSeparator hs = (HorizontalSeparator) view;
@@ -284,7 +291,7 @@ public class BuildActivity extends TabFragmentActivity implements StarManager.St
                     icon.setImageDrawable(new SpriteDrawable(design.getSprite()));
 
                     row1.setText(design.getDisplayName());
-                    row2.setText(String.format("$ %d - %.2f hours", design.getBuildCost(),
+                    row2.setText(String.format("%.2f hours",
                             (float) design.getBuildTimeSeconds() / 3600.0f));
                     row3.setText("Required: none");
                 }
@@ -376,7 +383,7 @@ public class BuildActivity extends TabFragmentActivity implements StarManager.St
                 icon.setImageDrawable(new SpriteDrawable(design.getSprite()));
 
                 row1.setText(design.getDisplayName());
-                row2.setText(String.format("$ %d - %.2f hours", design.getBuildCost(),
+                row2.setText(String.format("%.2f hours",
                         (float) design.getBuildTimeSeconds() / 3600.0f));
                 row3.setText("Required: none");
 

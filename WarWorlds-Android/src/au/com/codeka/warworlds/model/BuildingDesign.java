@@ -4,6 +4,11 @@ import org.w3c.dom.Element;
 
 public class BuildingDesign extends Design {
 
+    @Override
+    public boolean canBuildMultiple() {
+        return false;
+    }
+
     public static class Factory extends Design.Factory {
         public Factory(Element shipElement) {
             super(shipElement);

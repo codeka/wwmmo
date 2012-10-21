@@ -11,8 +11,8 @@ public class Design {
     protected String mID;
     protected String mName;
     protected String mDescription;
-    protected int mBuildCost;
     protected int mBuildTimeSeconds;
+    protected float mBuildCostMinerals;
     protected String mSpriteName;
     protected DesignKind mDesignKind;
 
@@ -25,17 +25,20 @@ public class Design {
     public String getDescription() {
         return mDescription;
     }
-    public int getBuildCost() {
-        return mBuildCost;
-    }
     public int getBuildTimeSeconds() {
         return mBuildTimeSeconds;
+    }
+    public float getBuildCostMinerals() {
+        return mBuildCostMinerals;
     }
     public DesignKind getDesignKind() {
         return mDesignKind;
     }
     public Sprite getSprite() {
         return SpriteManager.getInstance().getSprite(mSpriteName);
+    }
+    public boolean canBuildMultiple() {
+        return true;
     }
 
     /**
@@ -81,15 +84,15 @@ public class Design {
                 } else if (elem.getNodeName().equals("description")) {
                     design.mDescription = elem.getTextContent();
                 } else if (elem.getNodeName().equals("cost")) {
-                    String value = elem.getAttribute("credits");
-                    if (!value.equals("")) {
-                        design.mBuildCost = Integer.parseInt(value);
-                    }
-
-                    value = elem.getAttribute("time");
+                    String value = elem.getAttribute("time");
                     if (!value.equals("")) {
                         double timeInHours = Double.parseDouble(value);
                         design.mBuildTimeSeconds = (int)(timeInHours * 3600);
+                    }
+
+                    value = elem.getAttribute("minerals");
+                    if (!value.equals("")) {
+                        design.mBuildCostMinerals = Float.parseFloat(value);
                     }
                 } else if (elem.getNodeName().equals("sprite")) {
                     design.mSpriteName = elem.getTextContent();
