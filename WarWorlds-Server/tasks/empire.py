@@ -104,7 +104,7 @@ class BuildCheckPage(tasks.TaskPage):
           model.empire = build_request_model.empire
           model.sector = sector_mdl.SectorManager.getSectorKey(star_pb.sector_x, star_pb.sector_y)
           model.designName = build_request_model.designName
-          model.numShips = build_request_model.count
+          model.numShips = float(build_request_model.count)
           model.state = pb.Fleet.IDLE
           model.stateStartTime = datetime.now()
           model.put()

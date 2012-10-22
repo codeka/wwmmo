@@ -11,6 +11,7 @@ import android.app.Dialog;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -98,6 +99,40 @@ public class BuildActivity extends TabFragmentActivity implements StarManager.St
     protected void onPrepareDialog(int id, Dialog d, Bundle args) {
         DialogManager.getInstance().onPrepareDialog(this, id, d, args);
         super.onPrepareDialog(id, d, args);
+    }
+
+    /**
+     * Returns the dependenices of the given design a string for display to the user. Dependencies
+     * that we don't meet will be coloured red.
+     */
+    private String getDependenciesList(Design design) {
+        String required = "Required: ";
+        ArrayList<Design.Dependency> dependencies = design.getDependencies();
+        if (dependencies.size() == 0) {
+            required += "none";
+        } else {
+            int n = 0;
+            for (Design.Dependency dep : dependencies) {
+                if (n > 0) {
+                    required += ", ";
+                }
+
+                boolean dependencyMet = false;
+                for (Building b : mColony.getBuildings()) {
+                    if (b.getDesign().getID().equals(dep.getDesignID())) {
+                        // TODO: check level
+                        dependencyMet = true;
+                    }
+                }
+
+                Design dependentDesign = BuildingDesignManager.getInstance().getDesign(dep.getDesignID());
+                required += "<font color=\""+(dependencyMet ? "green" : "red")+"\">";
+                required += dependentDesign.getDisplayName();
+                required += "</font>";
+            }
+        }
+
+        return required;
     }
 
     public static class BuildingsFragment extends Fragment {
@@ -293,7 +328,9 @@ public class BuildActivity extends TabFragmentActivity implements StarManager.St
                     row1.setText(design.getDisplayName());
                     row2.setText(String.format("%.2f hours",
                             (float) design.getBuildTimeSeconds() / 3600.0f));
-                    row3.setText("Required: none");
+
+                    String required = ((BuildActivity) getActivity()).getDependenciesList(design);
+                    row3.setText(required);
                 }
 
                 return view;
@@ -385,7 +422,9 @@ public class BuildActivity extends TabFragmentActivity implements StarManager.St
                 row1.setText(design.getDisplayName());
                 row2.setText(String.format("%.2f hours",
                         (float) design.getBuildTimeSeconds() / 3600.0f));
-                row3.setText("Required: none");
+
+                String required = ((BuildActivity) getActivity()).getDependenciesList(design);
+                row3.setText(Html.fromHtml(required));
 
                 return view;
             }

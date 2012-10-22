@@ -225,6 +225,7 @@ public class BuildConfirmDialog extends Dialog implements DialogManager.DialogCo
 
         TextView timeToBuildText = (TextView) findViewById(R.id.building_timetobuild);
         float timeInHours = (count * mDesign.getBuildTimeSeconds()) / 3600.0f;
+        timeInHours *= (workersPerBuildRequest / 100.0f);
         timeToBuildText.setText(TimeInHours.format(timeInHours));
 
         TextView mineralsToBuildText = (TextView) findViewById(R.id.building_mineralstobuild);

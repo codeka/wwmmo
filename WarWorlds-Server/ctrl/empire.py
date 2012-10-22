@@ -428,6 +428,25 @@ def build(empire_pb, colony_pb, request_pb, sim):
     logging.warn("Asked to build design '%s', which does not exist." % (request_pb.design_name))
     return False
 
+  if len(design.dependencies) > 0:
+    # if there's dependenices, make sure this colony meets them first
+    for dependency in design.dependencies:
+      matching_building = None
+      star_pb = sim.getStar(colony_pb.star_key, True)
+      for building_pb in star_pb.buildings:
+        if building_pb.colony_key != colony_pb.key:
+          continue
+        if building_pb.design_name != dependency.designID:
+          continue
+        # todo: if building_pb.level < dependency.level:
+        # todo:   continue
+        matching_building = building_pb
+      if not matching_building:
+        logging.warn("Cannot build %s, because dependency %s is not met." % (
+                     request_pb.build_kind, dependency.designID))
+        return False
+
+
   # Save the initial build model. There's two writes here, once now and once after it
   build_operation_model = mdl.BuildOperation(parent=db.Key(colony_pb.star_key))
   build_operation_model.colony = db.Key(colony_pb.key)
@@ -492,7 +511,7 @@ def scheduleBuildCheck(sim=None):
   Because of the way that tasks a scheduled, it's possible that multiple tasks can be scheduled
   at the same time. That's OK because the task itself is idempotent (its just a waste of resources)
   """
-
+  time = None
   query = mdl.BuildOperation.all().order("endTime").fetch(1)
   for build in query:
     # The first one we fetch (because of the ordering) will be the next one. So we'll schedule
@@ -507,6 +526,9 @@ def scheduleBuildCheck(sim=None):
         t = ctrl.epochToDateTime(build_request_pb.end_time)
         if t < time:
           time = t
+
+  if not time:
+    return
 
   # It'll be < now() if the next building is never going to finished (and hence it's endTime
   # will be the epoch -- 1970. We'll schedule a build-check in ten minutes anyway
@@ -652,6 +674,7 @@ def orderFleet(fleet_pb, order_pb):
 class Design(object):
   def __init__(self):
     self.effects = []
+    self.dependencies = []
 
   def getEffects(self, kind=None, level=1):
     """Gets the effects of the given kind, or an empty list if there's none."""
@@ -666,6 +689,12 @@ class Design(object):
       return BuildingDesign.getDesign(name)
     else:
       return ShipDesign.getDesign(name)
+
+
+class DesignDependency(object):
+  def __init__(self, designID, level):
+    self.designID = designID
+    self.level = level
 
 
 class Effect(object):
@@ -889,3 +918,11 @@ def _parseDesign(designXml, design):
   design.buildCost = costXml.get("credits")
   design.buildTimeSeconds = float(costXml.get("time")) * 3600
   design.buildCostMinerals = float(costXml.get("minerals"))
+  dependenciesXml = designXml.find("dependencies")
+  if dependenciesXml != None:
+    for requiresXml in dependenciesXml.iterfind("requires"):
+      designID = requiresXml.get("building")
+      level = requiresXml.get("level")
+      dep = DesignDependency(designID, level)
+      design.dependencies.append(dep)
+

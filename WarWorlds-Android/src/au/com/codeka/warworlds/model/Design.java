@@ -1,5 +1,7 @@
 package au.com.codeka.warworlds.model;
 
+import java.util.ArrayList;
+
 import org.w3c.dom.Element;
 
 import au.com.codeka.XmlIterator;
@@ -15,6 +17,7 @@ public class Design {
     protected float mBuildCostMinerals;
     protected String mSpriteName;
     protected DesignKind mDesignKind;
+    protected ArrayList<Dependency> mDependencies;
 
     public String getID() {
         return mID;
@@ -39,6 +42,9 @@ public class Design {
     }
     public boolean canBuildMultiple() {
         return true;
+    }
+    public ArrayList<Dependency> getDependencies() {
+        return mDependencies;
     }
 
     /**
@@ -77,6 +83,7 @@ public class Design {
 
         protected void populateDesign(Design design) {
             design.mID = mDesignElement.getAttribute("id");
+            design.mDependencies = new ArrayList<Dependency>();
 
             for(Element elem : XmlIterator.childElements(mDesignElement)) {
                 if (elem.getNodeName().equals("name")) {
@@ -96,6 +103,12 @@ public class Design {
                     }
                 } else if (elem.getNodeName().equals("sprite")) {
                     design.mSpriteName = elem.getTextContent();
+                } else if (elem.getNodeName().equals("dependencies")) {
+                    for (Element requiresElem : XmlIterator.childElements(elem, "requires")) {
+                        design.mDependencies.add(new Dependency(
+                                requiresElem.getAttribute("building"),
+                                Integer.parseInt(requiresElem.getAttribute("level"))));
+                    }
                 } else {
                     parseElement(elem, design);
                 }
@@ -110,4 +123,20 @@ public class Design {
         }
     }
 
+    public static class Dependency {
+        private String mDesignID;
+        private int mLevel;
+
+        public Dependency(String designID, int level) {
+            mDesignID = designID;
+            mLevel = level;
+        }
+
+        public String getDesignID() {
+            return mDesignID;
+        }
+        public int getLevel() {
+            return mLevel;
+        }
+    }
 }

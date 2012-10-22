@@ -10,6 +10,9 @@
       aware that once your ship is built, 100 population will be removed from your colony and
       added to the ship!</i></p>
     ]]></description>
+    <dependencies>
+      <requires building="shipyard" level="1" />
+    </dependencies>
     <cost minerals="1000" time="4.0" />
     <fuel costPerParsec="85" />
     <stats speed="1" baseAttack="0" baseDefence="0" />
@@ -22,6 +25,9 @@
       defensive capabilities, either). What they <em>are</em> good at, though, is getting in
       and out of enemy starsystems and reporting back what they found.</p>
     ]]></description>
+    <dependencies>
+      <requires building="shipyard" level="1" />
+    </dependencies>
     <cost minerals="50" time="0.1667" />
     <fuel costPerParsec="7.5" />
     <stats speed="17" baseAttack="1" baseDefence="1" />
@@ -38,6 +44,9 @@
       make up for a general lack of firepower by being incredibly cheap to produce and
       fuel-efficient, allowing you to overwhealm your enemy with numbers.</p>
     ]]></description>
+    <dependencies>
+      <requires building="shipyard" level="1" />
+    </dependencies>
     <cost minerals="45" time="0.15" />
     <fuel costPerParsec="0.2" />
     <stats speed="10" baseAttack="5" baseDefence="15" />
