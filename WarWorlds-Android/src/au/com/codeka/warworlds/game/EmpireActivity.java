@@ -72,9 +72,11 @@ public class EmpireActivity extends TabFragmentActivity {
         getTabManager().addTab(mContext, new TabInfo("Fleets", FleetsFragment.class, null));
 
         mExtras = getIntent().getExtras();
-        String fleetKey = mExtras.getString("au.com.codeka.warworlds.FleetKey");
-        if (fleetKey != null) {
-            getTabHost().setCurrentTabByTag("Fleets");
+        if (mExtras != null) {
+            String fleetKey = mExtras.getString("au.com.codeka.warworlds.FleetKey");
+            if (fleetKey != null) {
+                getTabHost().setCurrentTabByTag("Fleets");
+            }
         }
     }
 

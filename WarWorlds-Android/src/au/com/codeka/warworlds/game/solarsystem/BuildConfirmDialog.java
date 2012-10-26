@@ -223,13 +223,13 @@ public class BuildConfirmDialog extends Dialog implements DialogManager.DialogCo
             count = Integer.parseInt(countEdit.getText().toString());
         }
 
-        TextView timeToBuildText = (TextView) findViewById(R.id.building_timetobuild);
         float timeInHours = (count * mDesign.getBuildTimeSeconds()) / 3600.0f;
-        timeInHours *= (workersPerBuildRequest / 100.0f);
+        timeInHours *= (100.0f / workersPerBuildRequest);
+        TextView timeToBuildText = (TextView) findViewById(R.id.building_timetobuild);
         timeToBuildText.setText(TimeInHours.format(timeInHours));
 
-        TextView mineralsToBuildText = (TextView) findViewById(R.id.building_mineralstobuild);
         float totalMineralsCost = count * mDesign.getBuildCostMinerals();
+        TextView mineralsToBuildText = (TextView) findViewById(R.id.building_mineralstobuild);
         mineralsToBuildText.setText(Html.fromHtml(
                                     String.format("%d (<font color=\"red\">%.2f</font>/hr)",
                                     (int) totalMineralsCost, totalMineralsCost / timeInHours)));

@@ -121,11 +121,7 @@ public class ApiClient {
         RequestManager.ResultWrapper res = RequestManager.request("GET", url, headers);
         try {
             HttpResponse resp = res.getResponse();
-            int statusCode = resp.getStatusLine().getStatusCode();
-            if (statusCode < 200 || statusCode > 299) {
-                log.warn("API \"GET {}\" returned {}", url, resp.getStatusLine());
-                return null;
-            }
+            ApiException.checkResponse(resp);
 
             return parseResponseBody(resp, protoBuffFactory);
         } finally {
@@ -166,11 +162,7 @@ public class ApiClient {
         RequestManager.ResultWrapper res = RequestManager.request(method, url, headers, body);
         try {
             HttpResponse resp = res.getResponse();
-            int statusCode = resp.getStatusLine().getStatusCode();
-            if (statusCode < 200 || statusCode > 299) {
-                log.warn("API \"PUT {}\" returned {}", url, resp.getStatusLine());
-                return false;
-            }
+            ApiException.checkResponse(resp);
 
             return true;
         } finally {
@@ -207,11 +199,7 @@ public class ApiClient {
         RequestManager.ResultWrapper res = RequestManager.request(method, url, headers, body);
         try {
             HttpResponse resp = res.getResponse();
-            int statusCode = resp.getStatusLine().getStatusCode();
-            if (statusCode < 200 || statusCode > 299) {
-                log.warn("API \"{} {}\" returned {}", new Object[] {
-                        method, url, resp.getStatusLine()});
-            }
+            ApiException.checkResponse(resp);
 
             return parseResponseBody(resp, protoBuffFactory);
         } finally {
@@ -228,10 +216,7 @@ public class ApiClient {
         RequestManager.ResultWrapper res = RequestManager.request("DELETE", url, headers);
         try {
             HttpResponse resp = res.getResponse();
-            int statusCode = resp.getStatusLine().getStatusCode();
-            if (statusCode < 200 || statusCode > 299) {
-                log.warn("API \"DELETE {}\" returned {}", url, resp.getStatusLine());
-            }
+            ApiException.checkResponse(resp);
         } finally {
             res.close();
         }
@@ -264,7 +249,7 @@ public class ApiClient {
      * @return
      */
     @SuppressWarnings({"unchecked"})
-    private static <T> T parseResponseBody(HttpResponse resp, Class<T> protoBuffFactory) {
+    public static <T> T parseResponseBody(HttpResponse resp, Class<T> protoBuffFactory) {
         HttpEntity entity = resp.getEntity();
         if (entity != null) {
             T result = null;
@@ -275,8 +260,7 @@ public class ApiClient {
 
                 entity.consumeContent();
             } catch (Exception e) {
-                // any errors can just be ignored, reallu (return null instead)
-                log.error("Error getting protocol buffer!", e);
+                return null;
             }
 
             return result;

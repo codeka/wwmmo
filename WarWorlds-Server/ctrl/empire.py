@@ -14,6 +14,7 @@ from google.appengine.api import taskqueue
 
 import ctrl
 from ctrl import sector
+from ctrl import sectorgen
 from model import sector as sector_mdl
 from model import empire as mdl
 from protobufs import warworlds_pb2 as pb
@@ -57,19 +58,22 @@ def createEmpire(empire_pb, sim):
   # We need to set you up with some initial bits and pieces. First, we need to find
   # sector for your colony. We look for one with no existing colonized stars and
   # close to the centre of the universe. We chose a random one of the five closest
-  query = sector_mdl.Sector.all().filter("numColonies =", 0).order("distanceToCentre").fetch(5)
-  index = random.randint(0, 4)
   sector_model = None
-  for s in query:
-    if index == 0:
-      sector_model = s
-      break
-    index -= 1
-
-  if not sector_model:
-    # this would happen if there's no sectors loaded that have no colonies... that's bad!!
-    logging.error("Could not find any sectors for new empire [%s]" % (str(empire_model.key())))
-    return
+  while not sector_model:
+    query = sector_mdl.Sector.all().filter("numColonies =", 0).order("distanceToCentre").fetch(5)
+    index = random.randint(0, 4)
+    sector_model = None
+    for s in query:
+      if index == 0:
+        sector_model = s
+        break
+      index -= 1
+  
+    if not sector_model:
+      # this would happen if there's no sectors loaded that have no colonies... that's bad!!
+      logging.warn("Could not find any sectors for new empire [%s], creating some..." % (
+                     str(empire_model.key())))
+      sectorgen.expandUniverse(immediate=True)
 
   # Now find a star within that sector. We'll want one with two terran planets with highish
   # population stats, close to the centre of the sector. We'll score each of the stars based on
@@ -124,14 +128,20 @@ def createEmpire(empire_pb, sim):
         planet_index = index + 1
         max_population_congeniality = planet.population_congeniality
 
-  # colonize the planet!
   star_key = str(star_model.key())
   star_pb = sim.getStar(star_key, True)
 
   # by default, the star will have a bunch of native colonies and fleets... drop those!
+  for fleet_pb in star_pb.fleets:
+    fleet_mdl = mdl.Fleet.get(fleet_pb.key)
+    fleet_mdl.delete()
   del star_pb.fleets[:]
-  del star_pb.colonies [:]
+  for colony_pb in star_pb.colonies:
+    colony_mdl = mdl.Colony.get(colony_pb.key)
+    colony_mdl.delete()
+  del star_pb.colonies[:]
 
+  # colonize the planet!
   _colonize(sector_model.key(), empire_model, star_pb, planet_index)
 
   # add some initial goods and minerals to the colony
@@ -611,7 +621,7 @@ def _orderFleet_move(fleet_pb, order_pb):
 
   src_star = sector.getStar(fleet_pb.star_key)
   dst_star = sector.getStar(db.Key(order_pb.star_key))
-  distance_in_pc = sector.get_distance_between_stars(src_star, dst_star)
+  distance_in_pc = sector.getDistanceBetweenStars(src_star, dst_star)
 
   empire_mdl = fleet_mdl.empire
   design = ShipDesign.getDesign(fleet_pb.design_name)

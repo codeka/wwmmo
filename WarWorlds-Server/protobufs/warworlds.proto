@@ -17,6 +17,17 @@ message MessageOfTheDay
 
 
 //
+// Some methods will return this in the case of an error, so we can display a meaningful error
+// to the user.
+//
+message GenericError
+{
+    optional int32 error_code = 1;
+    optional string error_message = 2;
+}
+
+
+//
 // Contains details about an empire. Their "display" name, race (I guess?), display colour
 // and stuff like that.
 //

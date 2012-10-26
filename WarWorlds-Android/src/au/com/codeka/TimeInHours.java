@@ -44,10 +44,10 @@ public class TimeInHours {
     public static String format(Period p) {
         int days = p.toStandardDays().getDays();
         if (days > 0) {
-            return String.format("%d day%s, %d hr%s, %d min%s",
+            int hours = p.getHours() - (days * 24);
+            return String.format("%d day%s, %d hr%s",
                                  days, days == 1 ? "" : "s",
-                                 p.getHours(), p.getHours() == 1 ? "" : "s",
-                                 p.getMinutes(), p.getMinutes() == 1 ? "" : "s");
+                                 hours, hours == 1 ? "" : "s");
         } else if (p.getHours() > 0) {
             return String.format("%d hr%s, %d min%s",
                     p.getHours(), p.getHours() == 1 ? "" : "s",

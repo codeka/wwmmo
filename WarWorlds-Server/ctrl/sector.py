@@ -116,17 +116,17 @@ def _addNativeColonies(star_pb):
     apop = int(a.population_congeniality / 100)
     bpop = int(b.population_congeniality / 100)
     if apop != bpop:
-      return apop - bpop
+      return int(apop - bpop)
 
     acong = a.population_congeniality + a.mining_congeniality + a.farming_congeniality
     bcong = b.population_congeniality + b.mining_congeniality + b.farming_congeniality
-    return acong - bcong
+    return int(acong - bcong)
 
   planets = sorted(star_pb.planets, planetRank)
 
   sector_key = mdl.SectorManager.getSectorKey(star_pb.sector_x, star_pb.sector_y)
 
-  num_colonies = random.randint(2, max(4, len(star_pb.planets)))
+  num_colonies = random.randint(2, max(4, len(star_pb.planets) - 1))
   for n in range(num_colonies):
     colony_model = empire_ctl._colonize(sector_key,
                                         None, star_pb, planets[n].index)
@@ -137,13 +137,13 @@ def _addNativeColonies(star_pb):
     colony_model.focusConstruction = 0.0
     colony_model.put()
 
-  num_fleets = random.randint(2, 10)
+  num_fleets = random.randint(1, 5)
   for n in range(num_fleets):
     fleet_model = empire_mdl.Fleet(parent=db.Key(star_pb.key))
     fleet_model.empire = None
     fleet_model.sector = sector_key
     fleet_model.designName = "fighter" # TODO
-    fleet_model.numShips = random.randint(5, 20) * 5.0
+    fleet_model.numShips = random.randint(1, 5) * 5.0
     fleet_model.state = pb.Fleet.IDLE
     fleet_model.stance = pb.Fleet.AGGRESSIVE
     fleet_model.stateStartTime = datetime.now()
@@ -152,14 +152,14 @@ def _addNativeColonies(star_pb):
   ctrl.clearCached(["star:%s" % (star_pb.key)])
 
 
-def get_distance_between_stars(star_1_pb, star_2_pb):
+def getDistanceBetweenStars(star_1_pb, star_2_pb):
   """Returns the distance (in 'parsecs') between two stars.
 
   We have to do a bit of trigenometry to get the distance between two stars, because they could
   be in different sectors. We know the distance between two sectors (sector sizes are constant)
   so finding the distance between two points within two sectors is a matter of adding a vector
   from star_1 to the sector origin, a vector from the origin of sector_1 to sector_2 and then
-  a vector from the origin of sector_2 to star_2. 
+  a vector from the origin of sector_2 to star_2.
   """
   x = -star_1_pb.offset_x
   y = -star_1_pb.offset_y

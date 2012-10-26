@@ -96,6 +96,7 @@ public class WarWorldsActivity extends Activity {
         SharedPreferences prefs = Util.getSharedPreferences(mContext);
         if (prefs.getString("AccountName", null) == null) {
             log.info("No accountName saved, switching to AccountsActivity");
+            mNeedHello = true;
             startActivity(new Intent(this, AccountsActivity.class));
             return;
         }
@@ -136,6 +137,7 @@ public class WarWorldsActivity extends Activity {
         final String accountName = prefs.getString("AccountName", null);
         if (accountName == null) {
             // You're not logged in... how did we get this far anyway?
+            mNeedHello = true;
             startActivity(new Intent(this, AccountsActivity.class));
             return;
         }
@@ -143,6 +145,7 @@ public class WarWorldsActivity extends Activity {
         new AsyncTask<Void, Void, String>() {
             private boolean mNeedsEmpireSetup;
             private boolean mErrorOccured;
+            private boolean mNeedsReAuthenticate;
 
             @Override
             protected String doInBackground(Void... arg0) {
@@ -163,12 +166,6 @@ public class WarWorldsActivity extends Activity {
                     }
                     String url = "hello/"+deviceRegistrationKey;
                     Hello hello = ApiClient.putProtoBuf(url, null, Hello.class);
-                    if (hello == null) {
-                        // Usually this happens on the dev server when we've just cleared the
-                        // data store. Not good :-)
-                        throw new ApiException("Server Error");
-                    }
-
                     if (hello.hasEmpire()) {
                         mNeedsEmpireSetup = false;
                         EmpireManager.getInstance().setup(
@@ -191,11 +188,22 @@ public class WarWorldsActivity extends Activity {
                     message = hello.getMotd().getMessage();
                     mErrorOccured = false;
                 } catch(ApiException e) {
-                    message = "<p class=\"error\">An error occured talking to the server, check " +
-                              "data connection.</p>";
-                    mErrorOccured = true;
-
                     log.error("Error occurred in 'hello'", e);
+
+                    if (e.getHttpStatusLine() == null) {
+                        // if there's no status line, it likely means we were unable to connect
+                        // (i.e. a network error) just keep retrying until it works.
+                        message = "<p class=\"error\">An error occured talking to the server, check " +
+                                "data connection.</p>";
+                        mErrorOccured = true;
+                        mNeedsReAuthenticate = false;
+                    } else {
+                        // an HTTP error is likely because our credentials are out of date, we'll
+                        // want to re-authenticate ourselves.
+                        message = "<p class=\"error\">Authentication failed.</p>";
+                        mErrorOccured = true;
+                        mNeedsReAuthenticate = true;
+                    }
                 }
 
                 return message;
@@ -208,6 +216,7 @@ public class WarWorldsActivity extends Activity {
                 mConnectionStatus.setText("Connected");
                 mStartGameButton.setEnabled(true);
                 if (mNeedsEmpireSetup) {
+                    mNeedHello = true;
                     startActivity(new Intent(mContext, EmpireSetupActivity.class));
                     return;
                 } else if (!mErrorOccured) {
@@ -220,14 +229,29 @@ public class WarWorldsActivity extends Activity {
                 } else /* mErrorOccured */ {
                     mConnectionStatus.setText("Connection Failed");
                     mStartGameButton.setEnabled(false);
+                    motdView.loadHtml("html/motd-template.html", result);
 
-                    // if there's an error, try again in a few seconds
-                    mHandler.postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            sayHello(retries+1);
-                        }
-                    }, 3000);
+                    if (mNeedsReAuthenticate) {
+                        // if we need to re-authenticate, first forget the current credentials
+                        // the switch to the AccountsActivity.
+                        final SharedPreferences prefs = Util.getSharedPreferences(mContext);
+                        SharedPreferences.Editor editor = prefs.edit();
+                        editor.remove("AccountName");
+                        editor.commit();
+
+                        // we'll need to say hello the next time we come back to this activity
+                        mNeedHello = true;
+
+                        startActivity(new Intent(mContext, AccountsActivity.class));
+                    } else {
+                        // otherwise, just try again
+                        mHandler.postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                sayHello(retries+1);
+                            }
+                        }, 3000);
+                    }
                 }
             }
         }.execute();
@@ -246,6 +270,7 @@ public class WarWorldsActivity extends Activity {
 
         logOutButton.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
+                mNeedHello = true;
                 startActivity(new Intent(mContext, AccountsActivity.class));
             }
         });
