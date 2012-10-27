@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.TreeMap;
 
 import org.joda.time.DateTime;
@@ -23,6 +24,7 @@ import android.graphics.Paint;
 import android.graphics.Paint.Style;
 import android.graphics.Rect;
 import android.util.AttributeSet;
+import android.util.FloatMath;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import au.com.codeka.Pair;
@@ -761,10 +763,30 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
         direction.scale(20.0f);
         location.add(direction);
 
+        Point2D position = new Point2D(location.x * pixelScale, location.y * pixelScale);
+
+        // check if there's any other fleets nearby and offset this one by a bit so that they
+        // don't overlap
+        Random rand = new Random(fleet.getKey().hashCode());
+        for (int i = 0; i < mVisibleEntities.size(); i++) {
+            VisibleEntity existing = mVisibleEntities.get(i);
+            if (existing.fleet == null) {
+                continue;
+            }
+
+            if (existing.position.distanceTo(position) < (15.0f * pixelScale)) {
+                // pick a random direction and offset it a bit
+                Point2D offset = new Point2D(0, 20.0f * pixelScale);
+                offset.rotate(rand.nextFloat() * 2 * (float) Math.PI);
+                position.add(offset);
+                i = -1; // start looping again...
+            }
+        }
+
         // TODO: check that it's actually visible on the screen....
 
         // record the fact that this guy is visible
-        mVisibleEntities.add(new VisibleEntity(new Point2D(location.x * pixelScale, location.y * pixelScale), fleet));
+        mVisibleEntities.add(new VisibleEntity(position, fleet));
 
         // scale zoom and rotate the bitmap all with one matrix
         mMatrix.reset();
@@ -773,7 +795,7 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
         mMatrix.postScale(20.0f * pixelScale / fleetSprite.getWidth(),
                           20.0f * pixelScale / fleetSprite.getHeight());
         mMatrix.postRotate((float) (angle * 180.0 / Math.PI));
-        mMatrix.postTranslate(location.x * pixelScale, (location.y) * pixelScale);
+        mMatrix.postTranslate(position.x, position.y);
         canvas.save();
         canvas.setMatrix(mMatrix);
         fleetSprite.draw(canvas);
@@ -787,16 +809,16 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
                 mMatrix.postTranslate(-(shield.getWidth() / 2.0f), -(shield.getHeight() / 2.0f));
                 mMatrix.postScale(16.0f * pixelScale / shield.getWidth(),
                                   16.0f * pixelScale / shield.getHeight());
-                mMatrix.postTranslate((location.x + 20.0f) * pixelScale,
-                                      location.y * pixelScale);
+                mMatrix.postTranslate(position.x + (20.0f * pixelScale),
+                                      position.y);
                 canvas.drawBitmap(shield, mMatrix, mStarPaint);
             }
 
             String msg = emp.getDisplayName();
-            canvas.drawText(msg, (location.x + 30.0f) * pixelScale, location.y * pixelScale, mStarPaint);
+            canvas.drawText(msg, position.x + (30.0f * pixelScale), position.y, mStarPaint);
 
             msg = String.format("%s (%d)", design.getDisplayName(), fleet.getNumShips());
-            canvas.drawText(msg, (location.x + 30.0f) * pixelScale, (location.y + 10.0f) * pixelScale, mStarPaint);
+            canvas.drawText(msg, position.x + (30.0f * pixelScale), position.y + (10.0f * pixelScale), mStarPaint);
         }
 
         List<VisibleEntityAttachedOverlay> fleetAttachedOverlays = mFleetAttachedOverlays.get(fleet.getKey());
@@ -804,7 +826,7 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
             int n = fleetAttachedOverlays.size();
             for (int i = 0; i < n; i++) {
                 VisibleEntityAttachedOverlay sao = fleetAttachedOverlays.get(i);
-                sao.setCentre(location.x * pixelScale, location.y * pixelScale);
+                sao.setCentre(position.x, position.y);
             }
         }
     }

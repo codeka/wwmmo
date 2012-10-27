@@ -12,6 +12,7 @@ import android.content.DialogInterface;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.Html;
+import android.util.FloatMath;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
@@ -70,7 +71,8 @@ public class BuildProgressDialog extends Dialog implements DialogManager.DialogC
                                                "<font color=\"red\">$%d</font> (and speed up the "+
                                                "build by %s), but you don't have that much cash "+
                                                "available. Do you want to buy some cash now?",
-                                               (int) Math.floor(cost), TimeInHours.format(speedUpTime));
+                                               (int) FloatMath.floor(cost),
+                                               TimeInHours.format(speedUpTime));
 
                     AlertDialog dlg = new AlertDialog.Builder(mContext)
                                                      .setCancelable(true)
@@ -89,7 +91,7 @@ public class BuildProgressDialog extends Dialog implements DialogManager.DialogC
                     String msg = String.format(
                             "Do you want to accelerate this build? It will cost <font color=\"green\">"+
                             "$%d</font> and speed up the build by %s.",
-                            (int) Math.floor(cost), TimeInHours.format(speedUpTime));
+                            (int) FloatMath.floor(cost), TimeInHours.format(speedUpTime));
 
                     AlertDialog dlg = new AlertDialog.Builder(mContext)
                                                      .setCancelable(true)
