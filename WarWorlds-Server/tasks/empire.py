@@ -29,7 +29,6 @@ class BuildCheckPage(tasks.TaskPage):
     We need to confirm that the build is actually complete, set up the building or ship with the
     empire that built it, and then reschedule ourselves for the next build.
     """
-
     def _fetchOperationInTX(oper_key):
       """This is done in a transaction to make sure only one request processes the build."""
 
@@ -52,6 +51,8 @@ class BuildCheckPage(tasks.TaskPage):
     complete_time = datetime.now() + timedelta(seconds=10)
     never_time = datetime(2000, 1, 1)
 
+    sim = simulation_ctl.Simulation()
+
     # Fetch the keys outside of the transaction, cause we can't do that in a TX
     build_request_models = []
     query = (mdl.BuildOperation.all().filter("endTime <", complete_time)
@@ -59,6 +60,11 @@ class BuildCheckPage(tasks.TaskPage):
     for oper in query:
       build_request_model = db.run_in_transaction(_fetchOperationInTX, oper.key())
       if build_request_model:
+        star_key = str(build_request_model.key().parent())
+        # simulate the star up to this point, to make sure that any resources and whatnot
+        # removed before we complete the build.
+        if not sim.getStar(star_key):
+          sim.simulate(star_key)
         build_request_models.append(build_request_model)
 
     keys_to_clear = []
@@ -120,7 +126,8 @@ class BuildCheckPage(tasks.TaskPage):
           for colony_pb in star_pb.colonies:
             if colony_pb.key == colony_key:
               colony_pb.population -= 100
-          sim.update(star_key)
+
+      sim.update()
 
       # Send a notification to the player that construction of their building is complete
       msg = "Your %d %s(s) on %s has been built." % (build_request_model.count,
