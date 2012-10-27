@@ -441,6 +441,7 @@ class ColoniesTaxesPage(ApiPage):
     sim.update()
     return colony_pb
 
+
 class BuildQueuePage(ApiPage):
   def post(self):
     """The buildqueue is where you post BuildRequest protobufs with requests to build stuff."""
@@ -470,6 +471,27 @@ class BuildQueuePage(ApiPage):
 
     empire_pb = empire.getEmpireForUser(self.user)
     return empire.getBuildQueueForEmpire(empire_pb.key)
+
+
+class BuildAcceleratePage(ApiPage):
+  def post(self, star_key, build_request_key):
+    sim = simulation.Simulation()
+    sim.simulate(star_key)
+    star_pb = sim.getStar(star_key)
+    for build_request_pb in star_pb.build_requests:
+      if build_request_pb.key == build_request_key:
+        empire_pb = empire.getEmpireForUser(self.user)
+        if build_request_pb.empire_key != empire_pb.key:
+          self.response.set_status(403)
+          return
+
+        res = empire.accelerateBuild(empire_pb, star_pb, build_request_pb, sim)
+        sim.update()
+        empire.scheduleBuildCheck(sim)
+        return res
+
+    # if we couldn't find the build request, return 404
+    self.response.set_status(404)
 
 
 class FleetOrdersPage(ApiPage):
@@ -577,6 +599,7 @@ app = ApiApplication([("/api/v1/hello/([^/]+)", HelloPage),
                       ("/api/v1/stars/([^/]+)", StarPage),
                       ("/api/v1/stars/([^/]+)/simulate", StarSimulatePage),
                       ("/api/v1/buildqueue", BuildQueuePage),
+                      ("/api/v1/stars/([^/]+)/build/([^/]+)/accelerate", BuildAcceleratePage),
                       ("/api/v1/stars/([^/]+)/colonies", ColoniesPage),
                       ("/api/v1/stars/([^/]+)/colonies/([^/]+)", ColoniesPage),
                       ("/api/v1/stars/([^/]+)/colonies/([^/]+)/taxes", ColoniesTaxesPage),

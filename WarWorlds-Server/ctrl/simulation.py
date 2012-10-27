@@ -687,11 +687,13 @@ class Simulation(object):
     """Updated the build requests in the given star."""
     for build_request_pb in star_pb.build_requests:
       build_operation_model = mdl.BuildOperation.get(build_request_pb.key)
-      ctrl.buildRequestPbToModel(build_operation_model, build_request_pb)
-      self.log("Updating build-request '%s' start_time=%s end_time=%s" % 
-               (build_operation_model.designName, build_operation_model.startTime,
-                build_operation_model.endTime))
-      build_operation_model.put()
+      # it could be None if it completed in the meantime...
+      if build_operation_model:
+        ctrl.buildRequestPbToModel(build_operation_model, build_request_pb)
+        self.log("Updating build-request '%s' start_time=%s end_time=%s" % 
+                 (build_operation_model.designName, build_operation_model.startTime,
+                  build_operation_model.endTime))
+        build_operation_model.put()
 
   def _updateFleets(self, star_pb):
     """Updates the fleet objects inside the given star."""

@@ -24,6 +24,11 @@ message GenericError
 {
     optional int32 error_code = 1;
     optional string error_message = 2;
+
+    enum ErrorCode
+    {
+        InsufficientCash = 0;
+    }
 }
 
 

@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.joda.time.Duration;
-import org.joda.time.Period;
 
 import android.app.Dialog;
 import android.content.Context;
@@ -21,6 +20,7 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import au.com.codeka.TimeInHours;
 import au.com.codeka.warworlds.DialogManager;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.TabFragmentActivity;
@@ -447,6 +447,17 @@ public class BuildActivity extends TabFragmentActivity implements StarManager.St
             ListView buildQueueList = (ListView) v.findViewById(R.id.build_queue);
             buildQueueList.setAdapter(adapter);
 
+            buildQueueList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    Bundle args = new Bundle();
+                    BuildRequest buildRequest = (BuildRequest) adapter.getItem(position);
+                    args.putParcelable("au.com.codeka.warworlds.BuildRequest", buildRequest);
+                    args.putString("au.com.codeka.warworlds.StarKey", star.getKey());
+                    DialogManager.getInstance().show(getActivity(), BuildProgressDialog.class, args);
+                }
+            });
+
             // make sure we're aware of changes to the build queue
             BuildQueueManager.getInstance().addBuildQueueUpdatedListener(new BuildQueueManager.BuildQueueUpdatedListener() {
                 @Override
@@ -512,7 +523,7 @@ public class BuildActivity extends TabFragmentActivity implements StarManager.St
 
                 BuildRequest request = mQueue.get(position);
                 DesignManager dm = DesignManager.getInstance(request.getBuildKind());
-                Design design = dm.getDesign(request.getDesignName());
+                Design design = dm.getDesign(request.getDesignID());
 
                 icon.setImageDrawable(new SpriteDrawable(design.getSprite()));
 
@@ -529,10 +540,9 @@ public class BuildActivity extends TabFragmentActivity implements StarManager.St
                     row2.setText(String.format("%d %%, not enough resources to complete.",
                                  (int) request.getPercentComplete()));
                 } else {
-                    Period remainingPeriod = remainingDuration.toPeriod();
-                    row2.setText(String.format("%d %%, %d:%02d left",
+                    row2.setText(String.format("%d %%, %s left",
                                  (int) request.getPercentComplete(),
-                                 remainingPeriod.getHours(), remainingPeriod.getMinutes()));
+                                 TimeInHours.format(remainingDuration)));
                 }
 
                 row3.setVisibility(View.GONE);

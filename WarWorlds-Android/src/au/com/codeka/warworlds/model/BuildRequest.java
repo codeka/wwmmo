@@ -7,24 +7,31 @@ import org.joda.time.Interval;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 /**
  * Represents an in-progress build order.
  */
-public class BuildRequest {
+public class BuildRequest implements Parcelable {
     private Logger log = LoggerFactory.getLogger(BuildRequest.class);
+    private String mKey;
     private BuildKind mBuildKind;
-    private String mDesignName;
+    private String mDesignID;
     private String mColonyKey;
     private DateTime mEndTime;
     private DateTime mStartTime;
     private float mProgress;
     private int mCount;
 
+    public String getKey() {
+        return mKey;
+    }
     public BuildKind getBuildKind() {
         return mBuildKind;
     }
-    public String getDesignName() {
-        return mDesignName;
+    public String getDesignID() {
+        return mDesignID;
     }
     public DateTime getStartTime() {
         return mStartTime;
@@ -65,10 +72,50 @@ public class BuildRequest {
         return mColonyKey;
     }
 
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel parcel, int flags) {
+        parcel.writeString(mKey);
+        parcel.writeInt(mBuildKind.getValue());
+        parcel.writeString(mDesignID);
+        parcel.writeString(mColonyKey);
+        parcel.writeLong(mEndTime.getMillis());
+        parcel.writeLong(mStartTime.getMillis());
+        parcel.writeFloat(mProgress);
+        parcel.writeInt(mCount);
+    }
+
+    public static final Parcelable.Creator<BuildRequest> CREATOR
+                = new Parcelable.Creator<BuildRequest>() {
+        @Override
+        public BuildRequest createFromParcel(Parcel parcel) {
+            BuildRequest br = new BuildRequest();
+            br.mKey = parcel.readString();
+            br.mBuildKind = BuildKind.fromNumber(parcel.readInt());
+            br.mDesignID = parcel.readString();
+            br.mColonyKey = parcel.readString();
+            br.mEndTime = new DateTime(parcel.readLong(), DateTimeZone.UTC);
+            br.mStartTime = new DateTime(parcel.readLong(), DateTimeZone.UTC);
+            br.mProgress = parcel.readFloat();
+            br.mCount = parcel.readInt();
+            return br;
+        }
+
+        @Override
+        public BuildRequest[] newArray(int size) {
+            return new BuildRequest[size];
+        }
+    };
+
     public static BuildRequest fromProtocolBuffer(warworlds.Warworlds.BuildRequest pb) {
         BuildRequest request = new BuildRequest();
+        request.mKey = pb.getKey();
         request.mBuildKind = BuildKind.fromNumber(pb.getBuildKind().getNumber());
-        request.mDesignName = pb.getDesignName();
+        request.mDesignID = pb.getDesignName();
         request.mColonyKey = pb.getColonyKey();
         request.mEndTime = new DateTime(pb.getEndTime() * 1000, DateTimeZone.UTC);
         request.mStartTime = new DateTime(pb.getStartTime() * 1000, DateTimeZone.UTC);

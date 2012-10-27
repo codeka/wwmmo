@@ -119,10 +119,8 @@ class BuildCheckPage(tasks.TaskPage):
         # if you've built a colony ship, we need to decrease the colony population by
         # 100 (basically, those 100 people go into the colony ship, to be transported to
         # the destination colony).
-        if build_request_model.designName == "colonyship": # TODO: hard-coded OK?
-          sim = simulation_ctl.Simulation()
-          star_pb = sim.getStar(star_key)
-          sim.simulate(star_key)
+        if build_request_model.designName == "colonyship": # TODO: hard-coded OK?P
+          star_pb = sim.getStar(str(star_key))
           for colony_pb in star_pb.colonies:
             if colony_pb.key == colony_key:
               colony_pb.population -= 100

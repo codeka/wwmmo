@@ -10,6 +10,7 @@ import android.os.Bundle;
 import au.com.codeka.warworlds.game.FleetMoveDialog;
 import au.com.codeka.warworlds.game.FleetSplitDialog;
 import au.com.codeka.warworlds.game.solarsystem.BuildConfirmDialog;
+import au.com.codeka.warworlds.game.solarsystem.BuildProgressDialog;
 import au.com.codeka.warworlds.game.solarsystem.FleetDialog;
 import au.com.codeka.warworlds.game.solarsystem.FocusDialog;
 import au.com.codeka.warworlds.game.solarsystem.ScoutReportDialog;
@@ -74,6 +75,8 @@ public class DialogManager {
             return new FocusDialog(activity);
         case ScoutReportDialog.ID:
             return new ScoutReportDialog(activity);
+        case BuildProgressDialog.ID:
+            return new BuildProgressDialog(activity);
         }
 
         return null;

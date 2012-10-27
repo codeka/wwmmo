@@ -485,6 +485,34 @@ def build(empire_pb, colony_pb, request_pb, sim):
   return request_pb
 
 
+def accelerateBuild(empire_pb, star_pb, build_request_pb, sim):
+  """Accelerates the given build by subtracting some cash from the owning empire and halving the
+  remaining time."""
+  seconds_remaining = build_request_pb.end_time - ctrl.dateTimeToEpoch(sim.now)
+  speed_up_time_in_hours = (seconds_remaining / 3600.0) / 2.0
+  complete_now = False
+  if speed_up_time_in_hours < (1/6.0):
+    # less than ten minutes, then we'll complete the build *now*
+    speed_up_time_in_hours = seconds_remaining / 3600.0
+    complete_now = True
+
+  cost = speed_up_time_in_hours * 100.0
+  if not _subtractCash(empire_pb.key, cost):
+    err = pb.GenericError()
+    err.error_code = pb.GenericError.INSUFFICIENT_CASH
+    err.error_message = "You don't have enough cash to accelerate this build."
+    return err
+
+  # adjust the progress, then re-simulate to re-calculate the end_time
+  if complete_now:
+    build_request_pb.progress = 0.9999
+  else:
+    build_request_pb.progress += (1.0 - build_request_pb.progress) / 2.0
+  sim.simulate(star_pb.key)
+
+  return build_request_pb
+
+
 def getBuildQueueForEmpire(empire_key):
   """Gets the current build queue for the given empire."""
 
@@ -623,20 +651,14 @@ def _orderFleet_move(fleet_pb, order_pb):
   dst_star = sector.getStar(db.Key(order_pb.star_key))
   distance_in_pc = sector.getDistanceBetweenStars(src_star, dst_star)
 
-  empire_mdl = fleet_mdl.empire
   design = ShipDesign.getDesign(fleet_pb.design_name)
 
   # work out how much this move operation is going to cost
   fuel_cost = design.fuelCostPerParsec * fleet_mdl.numShips * distance_in_pc
-  if fuel_cost > empire_mdl.cash:
+  if not _subtractCash(str(mdl.Fleet.empire.get_value_for_datastore(fleet_mdl)), fuel_cost):
     logging.info("Insufficient funds for move: distance=%.2f, num_ships=%d, cost=%.2f"
                  % (distance_in_pc, fleet_mdl.numShips, fuel_cost))
     return False
-  else:
-    empire_mdl.cash -= fuel_cost
-    empire_mdl.put()
-    ctrl.clearCached(["empire:%s" % (str(empire_mdl.key())),
-                      "empire:for-user:%s" % (empire_mdl.user.email())])
 
   fleet_mdl.state = pb.Fleet.MOVING
   fleet_mdl.stateStartTime = datetime.now()
@@ -653,6 +675,25 @@ def _orderFleet_move(fleet_pb, order_pb):
                 eta=time)
 
   return True
+
+
+def _subtractCash(empire_key, amount):
+  """Removes the given amount of cash from the given empire.
+
+  Returns:
+    True if the cash was removed, False if you don't have enough cash."""
+  def subtractCashInTx(empire_key, amount):
+    empire_mdl = mdl.Empire.get(empire_key)
+    if empire_mdl.cash < amount:
+      return False
+    empire_mdl.cash -= amount
+    empire_mdl.put()
+
+    ctrl.clearCached(["empire:%s" % (str(empire_mdl.key())),
+                      "empire:for-user:%s" % (empire_mdl.user.email())])
+    return True
+
+  return db.run_in_transaction(subtractCashInTx, db.Key(empire_key), int(math.floor(amount)))
 
 
 def _orderFleet_setStance(fleet_pb, order_pb):
