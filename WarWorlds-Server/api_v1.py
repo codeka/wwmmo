@@ -18,7 +18,7 @@ from ctrl import empire
 from ctrl import simulation
 import ctrl
 
-from protobufs import protobuf_json, warworlds_pb2 as pb
+from protobufs import protobuf_json, messages_pb2 as pb
 from google.protobuf import message
 
 

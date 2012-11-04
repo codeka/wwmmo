@@ -1,7 +1,5 @@
 """empire.py: Model for storing data about empires."""
 
-from datetime import datetime
-
 from google.appengine.ext import db
 
 import model.sector as sector_mdl

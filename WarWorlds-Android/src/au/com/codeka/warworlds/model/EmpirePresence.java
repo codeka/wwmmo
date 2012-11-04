@@ -1,5 +1,7 @@
 package au.com.codeka.warworlds.model;
 
+import au.com.codeka.warworlds.model.protobuf.Messages;
+
 /**
  * The \c EmpirePresence stores the data that relates to an empire's "presence" in a starsystem.
  * This includes things like 
@@ -37,7 +39,7 @@ public class EmpirePresence {
         return mDeltaMineralsPerHour;
     }
 
-    public static EmpirePresence fromProtocolBuffer(warworlds.Warworlds.EmpirePresence pb) {
+    public static EmpirePresence fromProtocolBuffer(Messages.EmpirePresence pb) {
         EmpirePresence presence = new EmpirePresence();
         presence.mKey = pb.getKey();
         presence.mEmpireKey = pb.getEmpireKey();

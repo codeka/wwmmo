@@ -4,11 +4,11 @@ package au.com.codeka.warworlds;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import warworlds.Warworlds.DeviceRegistration;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.provider.Settings.Secure;
 import au.com.codeka.warworlds.api.ApiClient;
+import au.com.codeka.warworlds.model.protobuf.Messages;
 
 /**
  * Register/unregister with the third-party App Engine server using
@@ -22,7 +22,7 @@ public class DeviceRegistrar {
 
         String registrationKey = null;
         try {
-            DeviceRegistration registration = DeviceRegistration.newBuilder()
+            Messages.DeviceRegistration registration = Messages.DeviceRegistration.newBuilder()
                 .setDeviceId(Secure.getString(context.getContentResolver(), Secure.ANDROID_ID))
                 .setDeviceRegistrationId(deviceRegistrationID)
                 .setDeviceBuild(android.os.Build.DISPLAY)
@@ -33,7 +33,7 @@ public class DeviceRegistrar {
 
             // the post will update the key field in the protocol buffer for us
             registration = ApiClient.postProtoBuf("devices", registration,
-                    DeviceRegistration.class);
+                    Messages.DeviceRegistration.class);
             registrationKey = registration.getKey();
         } catch(Exception ex) {
             log.error("Failure registring device.", ex);

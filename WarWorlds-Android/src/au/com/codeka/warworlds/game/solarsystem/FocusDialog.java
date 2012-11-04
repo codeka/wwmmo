@@ -20,6 +20,7 @@ import au.com.codeka.warworlds.api.ApiClient;
 import au.com.codeka.warworlds.api.ApiException;
 import au.com.codeka.warworlds.model.Colony;
 import au.com.codeka.warworlds.model.StarManager;
+import au.com.codeka.warworlds.model.protobuf.Messages;
 
 public class FocusDialog extends Dialog implements DialogManager.DialogConfigurable {
     private static Logger log = LoggerFactory.getLogger(FocusDialog.class);
@@ -89,9 +90,9 @@ public class FocusDialog extends Dialog implements DialogManager.DialogConfigura
                                                    mColony.getStarKey(),
                                                    mColony.getKey());
 
-                        warworlds.Warworlds.Colony pb = mColony.toProtocolBuffer();
+                        Messages.Colony pb = mColony.toProtocolBuffer();
                         try {
-                            pb = ApiClient.putProtoBuf(url, pb, warworlds.Warworlds.Colony.class);
+                            pb = ApiClient.putProtoBuf(url, pb, Messages.Colony.class);
                         } catch (ApiException e) {
                             log.error("Error updating colony!", e);
                         }

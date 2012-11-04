@@ -18,7 +18,7 @@ from ctrl import simulation as simulation_ctl
 from model import empire as mdl
 from model import sector as sector_mdl
 from model import c2dm
-import protobufs.warworlds_pb2 as pb
+import protobufs.messages_pb2 as pb
 import tasks
 
 

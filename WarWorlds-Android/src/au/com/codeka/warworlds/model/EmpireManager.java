@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 
 import android.os.AsyncTask;
 import au.com.codeka.warworlds.api.ApiClient;
+import au.com.codeka.warworlds.model.protobuf.Messages;
 
 /**
  * Manages stuff about your empire (e.g. colonizing planets and whatnot).
@@ -125,9 +126,7 @@ public class EmpireManager {
                 try {
                     String url = "empires/"+empireKey;
 
-                    warworlds.Warworlds.Empire pb = ApiClient.getProtoBuf(url,
-                            warworlds.Warworlds.Empire.class);
-
+                    Messages.Empire pb = ApiClient.getProtoBuf(url, Messages.Empire.class);
                     if (empireKey.equals(mEmpire.getKey())) {
                         empire = MyEmpire.fromProtocolBuffer(pb);
                     } else {

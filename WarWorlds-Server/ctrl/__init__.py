@@ -15,7 +15,7 @@ import_fixer.FixImports("google", "protobuf")
 
 from google.protobuf.message import Message
 
-import protobufs.warworlds_pb2 as pb
+import protobufs.messages_pb2 as pb
 from model import empire as empire_mdl
 import model as mdl
 
@@ -260,6 +260,7 @@ def scoutReportModelToPb(scout_report_pb, scout_report_mdl):
 
 def combatReportModelToPb(combat_report_pb, combat_report_mdl, summary=False):
   combat_report_pb.key = str(combat_report_mdl.key())
+  combat_report_pb.star_key = str(combat_report_mdl.key().parent())
   combat_report_pb.start_time = dateTimeToEpoch(combat_report_mdl.startTime)
   combat_report_pb.end_time = dateTimeToEpoch(combat_report_mdl.endTime)
   for empire_key in combat_report_mdl.startEmpireKeys:

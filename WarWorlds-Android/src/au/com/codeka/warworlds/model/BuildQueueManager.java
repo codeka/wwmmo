@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import android.os.AsyncTask;
 import au.com.codeka.warworlds.api.ApiClient;
 import au.com.codeka.warworlds.api.ApiException;
+import au.com.codeka.warworlds.model.protobuf.Messages;
 
 public class BuildQueueManager {
     private static Logger log = LoggerFactory.getLogger(BuildQueueManager.class);
@@ -84,10 +85,9 @@ public class BuildQueueManager {
         new AsyncTask<Void, Void, List<BuildRequest>>() {
             @Override
             protected List<BuildRequest> doInBackground(Void... arg0) {
-                warworlds.Warworlds.BuildQueue buildQueue;
+                Messages.BuildQueue buildQueue;
                 try {
-                    buildQueue = ApiClient.getProtoBuf("buildqueue",
-                                                       warworlds.Warworlds.BuildQueue.class);
+                    buildQueue = ApiClient.getProtoBuf("buildqueue", Messages.BuildQueue.class);
                 } catch (ApiException e) {
                     log.error("Could not fetch current build queue!", e);
                     return null;
@@ -100,7 +100,7 @@ public class BuildQueueManager {
 
                 List<BuildRequest> queue = new ArrayList<BuildRequest>();
                 for(int i = 0; i < buildQueue.getRequestsCount(); i++) {
-                    warworlds.Warworlds.BuildRequest pb = buildQueue.getRequests(i);
+                    Messages.BuildRequest pb = buildQueue.getRequests(i);
                     queue.add(BuildRequest.fromProtocolBuffer(pb));
                 }
                 return queue;

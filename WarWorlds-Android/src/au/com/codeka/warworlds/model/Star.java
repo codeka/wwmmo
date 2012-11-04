@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import au.com.codeka.warworlds.model.protobuf.Messages;
 
 
 /**
@@ -204,14 +205,14 @@ public class Star implements Parcelable {
         }
     };
 
-    public static Star fromProtocolBuffer(warworlds.Warworlds.Star pb) {
+    public static Star fromProtocolBuffer(Messages.Star pb) {
         return fromProtocolBuffer(null, pb);
     }
 
     /**
      * Converts the given Star protocol buffer into a \c Star.
      */
-    public static Star fromProtocolBuffer(Sector sector, warworlds.Warworlds.Star pb) {
+    public static Star fromProtocolBuffer(Sector sector, Messages.Star pb) {
         Star s = new Star();
         s.mSector = sector;
         s.mKey = pb.getKey();
@@ -230,11 +231,11 @@ public class Star implements Parcelable {
         }
 
         s.mColonies = new ArrayList<Colony>();
-        for(warworlds.Warworlds.Colony colony_pb : pb.getColoniesList()) {
+        for(Messages.Colony colony_pb : pb.getColoniesList()) {
             Colony c = Colony.fromProtocolBuffer(colony_pb);
 
             for (int i = 0; i < pb.getBuildingsCount(); i++) {
-                warworlds.Warworlds.Building bpb = pb.getBuildings(i);
+                Messages.Building bpb = pb.getBuildings(i);
                 if (bpb.getColonyKey().equals(c.getKey())) {
                     log.info("Adding building: " + bpb.getDesignName());
                     c.getBuildings().add(Building.fromProtocolBuffer(bpb));
@@ -245,17 +246,17 @@ public class Star implements Parcelable {
         }
 
         s.mEmpires = new ArrayList<EmpirePresence>();
-        for (warworlds.Warworlds.EmpirePresence empirePresencePb : pb.getEmpiresList()) {
+        for (Messages.EmpirePresence empirePresencePb : pb.getEmpiresList()) {
             s.mEmpires.add(EmpirePresence.fromProtocolBuffer(empirePresencePb));
         }
 
         s.mBuildRequests = new ArrayList<BuildRequest>();
-        for (warworlds.Warworlds.BuildRequest buildRequestPb : pb.getBuildRequestsList()) {
+        for (Messages.BuildRequest buildRequestPb : pb.getBuildRequestsList()) {
             s.mBuildRequests.add(BuildRequest.fromProtocolBuffer(buildRequestPb));
         }
 
         s.mFleets = new ArrayList<Fleet>();
-        for (warworlds.Warworlds.Fleet fleetPb : pb.getFleetsList()) {
+        for (Messages.Fleet fleetPb : pb.getFleetsList()) {
             s.mFleets.add(Fleet.fromProtocolBuffer(fleetPb));
         }
 

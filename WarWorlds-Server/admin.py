@@ -12,7 +12,7 @@ import import_fixer
 import_fixer.FixImports("google", "protobuf")
 
 import protobufs.protobuf_json
-import protobufs.warworlds_pb2 as pb
+import protobufs.messages_pb2 as pb
 
 import jinja2
 import webapp2 as webapp

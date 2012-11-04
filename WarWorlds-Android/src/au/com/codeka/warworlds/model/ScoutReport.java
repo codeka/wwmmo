@@ -3,6 +3,8 @@ package au.com.codeka.warworlds.model;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
+import au.com.codeka.warworlds.model.protobuf.Messages;
+
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 
@@ -29,16 +31,16 @@ public class ScoutReport {
         return mStarSnapshot;
     }
 
-    public static ScoutReport fromProtocolBuffer(warworlds.Warworlds.ScoutReport pb) {
+    public static ScoutReport fromProtocolBuffer(Messages.ScoutReport pb) {
         ScoutReport scoutReport = new ScoutReport();
         scoutReport.mKey = pb.getKey();
         scoutReport.mReportDate = new DateTime(pb.getDate() * 1000, DateTimeZone.UTC);
         scoutReport.mEmpireKey = pb.getEmpireKey();
         scoutReport.mStarKey = pb.getStarKey();
         ByteString starSnapshotSerialized = pb.getStarPb();
-        warworlds.Warworlds.Star starPb;
+        Messages.Star starPb;
         try {
-            starPb = warworlds.Warworlds.Star.parseFrom(starSnapshotSerialized);
+            starPb = Messages.Star.parseFrom(starSnapshotSerialized);
             scoutReport.mStarSnapshot = Star.fromProtocolBuffer(starPb);
         } catch (InvalidProtocolBufferException e) {
             // TODO: handle errors?

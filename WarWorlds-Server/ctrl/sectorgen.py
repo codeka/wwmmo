@@ -12,7 +12,7 @@ from google.appengine.ext import db
 import import_fixer
 import_fixer.FixImports("google", "protobuf")
 
-import protobufs.warworlds_pb2 as pb
+import protobufs.messages_pb2 as pb
 
 from model import namegen, sector as mdl
 

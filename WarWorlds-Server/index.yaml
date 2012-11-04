@@ -13,6 +13,11 @@ indexes:
 - kind: CombatReport
   ancestor: yes
   properties:
+  - name: endTime
+
+- kind: CombatReport
+  ancestor: yes
+  properties:
   - name: startTime
     direction: desc
 

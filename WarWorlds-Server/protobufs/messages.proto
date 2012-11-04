@@ -3,7 +3,7 @@
 //
 
 // TODO: separate these into separate packages?
-package warworlds;
+package au.com.codeka.warworlds.model.protobuf;
 
 //
 // This is used when you first connect, we display some news, important announcements,
@@ -633,22 +633,23 @@ message CombatRound
 message CombatReport
 {
     optional string key = 1;
+    optional string star_key = 2;
 
     // The time the conflict started/finished
-    optional int64 start_time = 2;
-    optional int64 end_time = 3;
+    optional int64 start_time = 3;
+    optional int64 end_time = 4;
 
     // A list of the empires who joined the conflict
-    repeated string start_empire_keys = 4;
+    repeated string start_empire_keys = 5;
 
     // A list of the empires who were left when the conflict was resolved
-    repeated string end_empire_keys = 5;
+    repeated string end_empire_keys = 6;
 
     // The number of ships/buildings destroyed in the conflict
-    optional int32 num_destroyed = 6;
+    optional int32 num_destroyed = 7;
 
     // A page of CombatRound objects that represent this set of results
-    repeated CombatRound rounds = 7;
+    repeated CombatRound rounds = 8;
 }
 
 message CombatReports

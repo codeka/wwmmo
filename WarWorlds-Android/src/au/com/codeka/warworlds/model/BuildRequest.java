@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import au.com.codeka.warworlds.model.protobuf.Messages;
 
 /**
  * Represents an in-progress build order.
@@ -111,7 +112,7 @@ public class BuildRequest implements Parcelable {
         }
     };
 
-    public static BuildRequest fromProtocolBuffer(warworlds.Warworlds.BuildRequest pb) {
+    public static BuildRequest fromProtocolBuffer(Messages.BuildRequest pb) {
         BuildRequest request = new BuildRequest();
         request.mKey = pb.getKey();
         request.mBuildKind = BuildKind.fromNumber(pb.getBuildKind().getNumber());

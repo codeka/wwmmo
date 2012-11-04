@@ -8,7 +8,7 @@ import random
 import ctrl
 from model import empire as empire_mdl
 from model import sector as mdl
-from protobufs import warworlds_pb2 as pb
+from protobufs import messages_pb2 as pb
 
 from google.appengine.ext import db
 

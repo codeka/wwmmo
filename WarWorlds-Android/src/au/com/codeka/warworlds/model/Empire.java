@@ -11,6 +11,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.os.Parcel;
 import android.os.Parcelable;
+import au.com.codeka.warworlds.model.protobuf.Messages;
 
 
 public class Empire implements Parcelable {
@@ -110,7 +111,7 @@ public class Empire implements Parcelable {
         }
     };
 
-    public static Empire fromProtocolBuffer(warworlds.Warworlds.Empire pb) {
+    public static Empire fromProtocolBuffer(Messages.Empire pb) {
         if (!pb.hasKey() || pb.getKey() == null) {
             return new NativeEmpire();
         }
@@ -120,7 +121,7 @@ public class Empire implements Parcelable {
         return empire;
     }
 
-    protected void populateFromProtocolBuffer(warworlds.Warworlds.Empire pb) {
+    protected void populateFromProtocolBuffer(Messages.Empire pb) {
         mKey = pb.getKey();
         mDisplayName = pb.getDisplayName();
         mCash = pb.getCash();

@@ -31,6 +31,7 @@ import au.com.codeka.warworlds.model.DesignManager;
 import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.SpriteDrawable;
 import au.com.codeka.warworlds.model.StarManager;
+import au.com.codeka.warworlds.model.protobuf.Messages;
 
 public class BuildProgressDialog extends Dialog implements DialogManager.DialogConfigurable {
     private static Logger log = LoggerFactory.getLogger(BuildProgressDialog.class);
@@ -123,8 +124,7 @@ public class BuildProgressDialog extends Dialog implements DialogManager.DialogC
                 String url = "stars/"+mStarKey+"/build/"+mBuildRequest.getKey()+"/accelerate";
 
                 try {
-                    warworlds.Warworlds.BuildRequest build = ApiClient.postProtoBuf(url, null,
-                            warworlds.Warworlds.BuildRequest.class);
+                    Messages.BuildRequest build = ApiClient.postProtoBuf(url, null, Messages.BuildRequest.class);
 
                     return BuildRequest.fromProtocolBuffer(build);
                 } catch (ApiException e) {

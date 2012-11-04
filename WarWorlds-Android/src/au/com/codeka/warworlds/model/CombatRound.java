@@ -4,6 +4,7 @@ import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
 import android.util.FloatMath;
+import au.com.codeka.warworlds.model.protobuf.Messages;
 
 /**
  * This class represents a report from a single round of combat. Who entered the battle, who
@@ -40,7 +41,7 @@ public class CombatRound {
         return mFleetsDamaged;
     }
 
-    public static CombatRound fromProtocolBuffer(warworlds.Warworlds.CombatRound pb) {
+    public static CombatRound fromProtocolBuffer(Messages.CombatRound pb) {
         CombatRound cb = new CombatRound();
         cb.mStarKey = pb.getStarKey();
         cb.mRoundTime = new DateTime(pb.getRoundTime() * 1000, DateTimeZone.UTC);

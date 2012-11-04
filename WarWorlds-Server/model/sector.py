@@ -5,7 +5,7 @@ import logging
 from google.appengine.ext import db
 from google.appengine.api import taskqueue
 
-import protobufs.warworlds_pb2 as pb
+import protobufs.messages_pb2 as pb
 
 class StarType:
   def __init__(self, colourName="", colourValue=[0xff, 0xff, 0xff]):

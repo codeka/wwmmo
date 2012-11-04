@@ -6,6 +6,8 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import au.com.codeka.warworlds.model.protobuf.Messages;
+
 /**
  * A \c Sector represents a "section" of space, with corresponding stars, planets and so on.
  */
@@ -35,9 +37,9 @@ public class Sector {
      * @param pb
      * @return
      */
-    public static List<Sector> fromProtocolBuffer(List<warworlds.Warworlds.Sector> pb) {
+    public static List<Sector> fromProtocolBuffer(List<Messages.Sector> pb) {
         ArrayList<Sector> sectors = new ArrayList<Sector>();
-        for(warworlds.Warworlds.Sector sector_pb : pb) {
+        for(Messages.Sector sector_pb : pb) {
             sectors.add(fromProtocolBuffer(sector_pb));
         }
         return sectors;
@@ -46,16 +48,16 @@ public class Sector {
     /**
      * Converts a single protocol buffer \c Sector into a \c Sector class.
      */
-    public static Sector fromProtocolBuffer(warworlds.Warworlds.Sector pb) {
+    public static Sector fromProtocolBuffer(Messages.Sector pb) {
         Sector s = new Sector();
         s.mX = pb.getX();
         s.mY = pb.getY();
-        for (warworlds.Warworlds.Star star_pb : pb.getStarsList()) {
+        for (Messages.Star star_pb : pb.getStarsList()) {
             s.mStars.add(Star.fromProtocolBuffer(s, star_pb));
         }
 
         // could this be more efficient? there's not a lot of stars, so maybe not a big deal
-        for (warworlds.Warworlds.Colony colony_pb : pb.getColoniesList()) {
+        for (Messages.Colony colony_pb : pb.getColoniesList()) {
             boolean found = false;
             for (Star star : s.mStars) {
                 if (colony_pb.getStarKey().equals(star.getKey())) {
@@ -70,7 +72,7 @@ public class Sector {
             }
         }
 
-        for (warworlds.Warworlds.Fleet fleet_pb : pb.getFleetsList()) {
+        for (Messages.Fleet fleet_pb : pb.getFleetsList()) {
             boolean found = false;
             for (Star star : s.mStars) {
                 if (fleet_pb.getStarKey().equals(star.getKey())) {

@@ -17,7 +17,7 @@ from ctrl import sector
 from ctrl import sectorgen
 from model import sector as sector_mdl
 from model import empire as mdl
-from protobufs import warworlds_pb2 as pb
+from protobufs import messages_pb2 as pb
 
 
 def getEmpireForUser(user):

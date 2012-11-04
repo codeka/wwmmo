@@ -7,7 +7,6 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import warworlds.Warworlds.Hello;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Dialog;
@@ -38,6 +37,7 @@ import au.com.codeka.warworlds.model.ShipDesignManager;
 import au.com.codeka.warworlds.model.SpriteManager;
 import au.com.codeka.warworlds.model.Star;
 import au.com.codeka.warworlds.model.StarManager;
+import au.com.codeka.warworlds.model.protobuf.Messages;
 
 /**
  * Main activity. Displays the message of the day and lets you select "Start Game", "Options", etc.
@@ -165,7 +165,7 @@ public class WarWorldsActivity extends Activity {
                         return message;
                     }
                     String url = "hello/"+deviceRegistrationKey;
-                    Hello hello = ApiClient.putProtoBuf(url, null, Hello.class);
+                    Messages.Hello hello = ApiClient.putProtoBuf(url, null, Messages.Hello.class);
                     if (hello.hasEmpire()) {
                         mNeedsEmpireSetup = false;
                         EmpireManager.getInstance().setup(
@@ -181,7 +181,7 @@ public class WarWorldsActivity extends Activity {
                     ChatManager.getInstance().setup(hello.getChannelToken());
 
                     mColonies = new ArrayList<Colony>();
-                    for (warworlds.Warworlds.Colony c : hello.getColoniesList()) {
+                    for (Messages.Colony c : hello.getColoniesList()) {
                         mColonies.add(Colony.fromProtocolBuffer(c));
                     }
 

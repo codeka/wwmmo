@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 
 import android.os.AsyncTask;
 import au.com.codeka.warworlds.api.ApiClient;
+import au.com.codeka.warworlds.model.protobuf.Messages;
 
 public class StarManager {
     private static StarManager sInstance = new StarManager();
@@ -119,8 +120,7 @@ public class StarManager {
                 try {
                     String url = "stars/"+starKey;
 
-                    warworlds.Warworlds.Star pb = ApiClient.getProtoBuf(url,
-                            warworlds.Warworlds.Star.class);
+                    Messages.Star pb = ApiClient.getProtoBuf(url, Messages.Star.class);
                     star = Star.fromProtocolBuffer(pb);
                 } catch(Exception e) {
                     // TODO: handle exceptions

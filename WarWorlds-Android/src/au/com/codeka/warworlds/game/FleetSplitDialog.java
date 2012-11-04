@@ -1,6 +1,5 @@
 package au.com.codeka.warworlds.game;
 
-import warworlds.Warworlds.FleetOrder;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
@@ -18,6 +17,7 @@ import au.com.codeka.warworlds.api.ApiException;
 import au.com.codeka.warworlds.ctrl.FleetList;
 import au.com.codeka.warworlds.model.Fleet;
 import au.com.codeka.warworlds.model.StarManager;
+import au.com.codeka.warworlds.model.protobuf.Messages;
 
 public class FleetSplitDialog extends Dialog implements DialogManager.DialogConfigurable {
     private Fleet mFleet;
@@ -53,8 +53,8 @@ public class FleetSplitDialog extends Dialog implements DialogManager.DialogConf
                         String url = String.format("stars/%s/fleets/%s/orders",
                                                    mFleet.getStarKey(),
                                                    mFleet.getKey());
-                        FleetOrder fleetOrder = warworlds.Warworlds.FleetOrder.newBuilder()
-                                       .setOrder(warworlds.Warworlds.FleetOrder.FLEET_ORDER.SPLIT)
+                        Messages.FleetOrder fleetOrder = Messages.FleetOrder.newBuilder()
+                                       .setOrder(Messages.FleetOrder.FLEET_ORDER.SPLIT)
                                        .setSplitLeft(Integer.parseInt(splitLeft.getText().toString()))
                                        .setSplitRight(Integer.parseInt(splitRight.getText().toString()))
                                        .build();

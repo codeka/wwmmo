@@ -2,6 +2,7 @@ package au.com.codeka.warworlds.model;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import au.com.codeka.warworlds.model.protobuf.Messages;
 
 
 public class Planet implements Parcelable {
@@ -120,7 +121,7 @@ public class Planet implements Parcelable {
     /**
      * Converts the given Planet protocol buffer into a \c Planet.
      */
-    public static Planet fromProtocolBuffer(Star star, warworlds.Warworlds.Planet pb) {
+    public static Planet fromProtocolBuffer(Star star, Messages.Planet pb) {
         Planet p = new Planet();
         p.mStar = star;
         p.mIndex = pb.getIndex();

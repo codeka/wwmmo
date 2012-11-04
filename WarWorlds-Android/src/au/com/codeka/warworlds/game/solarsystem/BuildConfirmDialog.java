@@ -30,6 +30,7 @@ import au.com.codeka.warworlds.model.BuildingDesignManager;
 import au.com.codeka.warworlds.model.Colony;
 import au.com.codeka.warworlds.model.Design;
 import au.com.codeka.warworlds.model.Design.DesignKind;
+import au.com.codeka.warworlds.model.protobuf.Messages;
 import au.com.codeka.warworlds.model.ShipDesignManager;
 import au.com.codeka.warworlds.model.SpriteDrawable;
 import au.com.codeka.warworlds.model.StarManager;
@@ -120,11 +121,11 @@ public class BuildConfirmDialog extends Dialog implements DialogManager.DialogCo
                 new AsyncTask<Void, Void, BuildRequest>() {
                     @Override
                     protected BuildRequest doInBackground(Void... arg0) {
-                        warworlds.Warworlds.BuildRequest.BUILD_KIND kind;
+                        Messages.BuildRequest.BUILD_KIND kind;
                         if (mDesign.getDesignKind() == Design.DesignKind.BUILDING) {
-                            kind = warworlds.Warworlds.BuildRequest.BUILD_KIND.BUILDING;
+                            kind = Messages.BuildRequest.BUILD_KIND.BUILDING;
                         } else {
-                            kind = warworlds.Warworlds.BuildRequest.BUILD_KIND.SHIP;
+                            kind = Messages.BuildRequest.BUILD_KIND.SHIP;
                         }
 
                         int count = 1;
@@ -132,7 +133,7 @@ public class BuildConfirmDialog extends Dialog implements DialogManager.DialogCo
                             count = Integer.parseInt(countEdit.getText().toString());
                         }
 
-                        warworlds.Warworlds.BuildRequest build = warworlds.Warworlds.BuildRequest.newBuilder()
+                        Messages.BuildRequest build = Messages.BuildRequest.newBuilder()
                                 .setBuildKind(kind)
                                 .setColonyKey(mColony.getKey())
                                 .setEmpireKey(mColony.getEmpireKey())
@@ -140,8 +141,7 @@ public class BuildConfirmDialog extends Dialog implements DialogManager.DialogCo
                                 .setCount(count)
                                 .build();
                         try {
-                            build = ApiClient.postProtoBuf("buildqueue", build,
-                                    warworlds.Warworlds.BuildRequest.class);
+                            build = ApiClient.postProtoBuf("buildqueue", build, Messages.BuildRequest.class);
 
                             return BuildRequest.fromProtocolBuffer(build);
                         } catch (ApiException e) {

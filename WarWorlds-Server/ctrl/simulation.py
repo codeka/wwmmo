@@ -12,12 +12,21 @@ import ctrl
 from ctrl import empire as empire_ctl
 from ctrl import sector as sector_ctl
 from model import empire as mdl
-from protobufs import warworlds_pb2 as pb
+from protobufs import messages_pb2 as pb
 
 
 def _def_star_fetcher(star_key):
   """This is the default star_fetcher implementation."""
   return sector_ctl.getStar(star_key)
+
+
+def _def_combat_report_fetcher(star_key, now):
+  query = (mdl.CombatReport.all()
+              .ancestor(db.Key(star_key))
+              .filter("endTime <", datetime(2000, 1, 1)))
+  for combat_report_mdl in query.fetch(1):
+    combat_report_pb = pb.CombatReport()
+    ctrl.combatReportModelToPb(combat_report_pb, combat_report_mdl, summary=False)
 
 
 def _def_log(msg):
@@ -30,7 +39,9 @@ class Simulation(object):
 
   You can use this to simulate a star over and over and then do one single data store update
   at the end, rather than doing it multiple times."""
-  def __init__(self, star_fetcher=_def_star_fetcher, log=_def_log):
+  def __init__(self, star_fetcher=_def_star_fetcher,
+                      combat_report_fetcher=_def_combat_report_fetcher,
+                      log=_def_log):
     """Constructs a new Simulation with the given star_fetcher.
 
     Args:
@@ -38,10 +49,11 @@ class Simulation(object):
                     given star. The default implementation fetches stars from
                     ctrl.sector.getStar."""
     self.star_fetcher = star_fetcher
+    self.combat_report_fetcher = combat_report_fetcher
     self.log = log
     self.empire_pbs = []
     self.star_pbs = []
-    self.combat_report = pb.CombatReport()
+    self.combat_report_pbs = []
     self.need_update = False
     self.now = datetime.now()
 
@@ -58,6 +70,32 @@ class Simulation(object):
     star_pb = self.star_fetcher(star_key)
     self.star_pbs.append(star_pb)
     return star_pb
+
+  def getCombatReport(self, star_key, fetch=False):
+    for combat_report_pb in self.combat_report_pbs:
+      if combat_report_pb.star_key == star_key:
+        if combat_report_pb.start_time == 0 and combat_report_pb.end_time == 0:
+          return None
+        return combat_report_pb
+
+    if fetch:
+      combat_report_pb = self.combat_report_fetcher(star_key, self.now)
+      if not combat_report_pb:
+        combat_report_pb = pb.CombatReport()
+        combat_report_pb.star_key = star_key
+      self.combat_report_pbs.append(combat_report_pb)
+      return self.getCombatReport(star_key, fetch=False)
+
+    return None
+
+
+  def _setCombatReport(self, combat_report_pb):
+    for n,existing_combat_report_pb in enumerate(self.combat_report_pbs):
+      if existing_combat_report_pb.star_key == combat_report_pb.star_key:
+        self.combat_report_pbs[n] = combat_report_pb
+        return
+    self.combat_report_pbs.append(combat_report_pb)
+
 
   def simulate(self, star_key):
     """Simulates the star with the given key and gets all of the colonies and fleets up to date.
@@ -79,25 +117,13 @@ class Simulation(object):
     """
     star_pb = self.getStar(star_key, True)
 
-    # it's easier to do this empire-by-empire, rather then have special-cases
-    # throughout the logic below....
-    done_empires = set()
+    empire_keys = set()
     for colony_pb in star_pb.colonies:
-      if colony_pb.empire_key not in done_empires:
-        done_empires.add(colony_pb.empire_key)
-        self._simulateEmpire(star_pb, colony_pb.empire_key)
+      if colony_pb.empire_key not in empire_keys:
+        empire_keys.add(colony_pb.empire_key)
 
-    # make sure last_simulation is correct
-    last_simulation = ctrl.dateTimeToEpoch(self.now)
-    for colony_pb in star_pb.colonies:
-      colony_pb.last_simulation = last_simulation
-
-    self.need_update = True
-
-  def _simulateEmpire(self, star_pb, empire_key):
-    """It's simpler to simulate empire-by-empire, so we'll do that."""
     # figure out the start time, which is the oldest last_simulation time
-    start_time = self._getSimulateStartTime(star_pb, empire_key)
+    start_time = self._getSimulateStartTime(star_pb)
     if start_time == 0:
       # No colonies worth simulating...
       return
@@ -121,7 +147,7 @@ class Simulation(object):
       dt = timedelta(minutes=15)
       step_end_time = start_time + dt
       if step_end_time < end_time:
-        self._simulateStep(dt, start_time, star_pb, empire_key)
+        self._simulateStepForAllEmpires(dt, start_time, star_pb, empire_keys)
         start_time = step_end_time
       elif step_end_time < prediction_time:
         if not prediction_star_pb:
@@ -133,7 +159,7 @@ class Simulation(object):
           dt = end_time - start_time
           if dt.total_seconds() > 0:
             # last little bit of the simulation
-            self._simulateStep(dt, start_time, star_pb, empire_key)
+            self._simulateStepForAllEmpires(dt, start_time, star_pb, empire_keys)
           start_time += dt
 
           self.log("")
@@ -144,7 +170,7 @@ class Simulation(object):
           prediction_star_pb.ParseFromString(star_pb.SerializeToString())
           dt = timedelta(minutes=15) - dt
 
-        self._simulateStep(dt, start_time, prediction_star_pb, empire_key)
+        self._simulateStepForAllEmpires(dt, start_time, prediction_star_pb, empire_keys)
         start_time = step_end_time
       else:
         break
@@ -161,27 +187,40 @@ class Simulation(object):
         if fleet_pb.key == prediction_fleet_pb.key:
           fleet_pb.time_destroyed = prediction_fleet_pb.time_destroyed
 
-  def _getSimulateStartTime(self, star_pb, empire_key):
-    """Gets the time we should start simulate from for the given empire."""
+    # make sure last_simulation is correct
+    last_simulation = ctrl.dateTimeToEpoch(self.now)
+    for colony_pb in star_pb.colonies:
+      colony_pb.last_simulation = last_simulation
+
+    self.need_update = True
+
+  def _getSimulateStartTime(self, star_pb):
+    """Gets the time we should start simulate from."""
     start_time = 0
     for colony_pb in star_pb.colonies:
-      if colony_pb.empire_key != empire_key:
-        continue
       if start_time == 0 or colony_pb.last_simulation < start_time:
         start_time = colony_pb.last_simulation
     return start_time
 
+  def _simulateStepForAllEmpires(self, dt, now, star_pb, empire_keys):
+    for empire_key in empire_keys:
+      self._simulateStep(dt, now, star_pb, empire_key)
+
+    # Don't forget to simulate combat for this step as well (TODO: what to do if combat continues
+    # after the prediction phase?)
+    self._simulateCombat(star_pb, now, dt)
+
   def _simulateStep(self, dt, now, star_pb, empire_key):
     """Simulates a single step of the colonies in the star.
-  
+
     The order of simulation needs to be well-defined, so we define it here:
      1. Farming
      2. Mining
      3. Construction
      4. Population
-  
+
     See comments in the code for the actual algorithm.
-  
+
     Args:
       dt: A timedelta that represents the time of this step (usually 15 minutes for a complete step,
           but could be a partial step as well).
@@ -192,7 +231,7 @@ class Simulation(object):
           the starsystem.
       log: A function we'll call to log messages (for debugging)
     """
-  
+
     self.log("Simulation @ %s (dt=%.4f hrs)" % (now, (dt.total_seconds() / 3600.0)))
     total_goods = None
     total_minerals = None
@@ -442,10 +481,6 @@ class Simulation(object):
              % (empire_key, dt_in_hours, total_goods, goods_delta_per_hour,
                 total_minerals, minerals_delta_per_hour, total_population))
 
-    # Don't forget to simuilate combat for this step as well (TODO: what to do if combat continues
-    # after the prediction phase?)
-    self._simulateCombat(star_pb, now, dt)
-
     self.log("")
 
   def _simulateCombat(self, star_pb, now, dt):
@@ -457,11 +492,11 @@ class Simulation(object):
                                "fleet": fleet_pb}
       return cache
 
+    combat_report_pb = self.getCombatReport(star_pb.key, fetch=True)
+
     fleets_attacking = False
     for fleet_pb in star_pb.fleets:
       if fleet_pb.state == pb.Fleet.ATTACKING:
-        if self.combat_report.start_time == 0:
-          fleet_pb.time_destroyed = 0
         fleets_attacking = True
 
     if fleets_attacking:
@@ -469,6 +504,10 @@ class Simulation(object):
       self.log("---- Resolving conflicts")
       self.log("")
       cache = populateCache(star_pb)
+
+      if not combat_report_pb:
+        combat_report_pb = pb.CombatReport()
+        combat_report_pb.star_key = star_pb.key
 
       attack_start_time = 0
       for fleet_pb in star_pb.fleets:
@@ -495,20 +534,24 @@ class Simulation(object):
           now += timedelta(minutes=1)
           continue
 
-        combat_round_pb = self.combat_report.rounds.add()
+        combat_round_pb = combat_report_pb.rounds.add()
         combat_round_pb.star_key = star_pb.key
         combat_round_pb.round_time = ctrl.dateTimeToEpoch(now)
         still_attacking = self._simulateCombatRound(now, star_pb, cache, combat_round_pb)
         if not combat_round_pb.fleets_attacked:
-          del self.combat_report.rounds[-1:]
-          # todo: delete the round?
-        elif self.combat_report.start_time == 0:
-          self.combat_report.start_time = ctrl.dateTimeToEpoch(now)
+          del combat_report_pb.rounds[-1:]
+        elif combat_report_pb.start_time == 0:
+          combat_report_pb.start_time = ctrl.dateTimeToEpoch(now)
 
         now += timedelta(minutes=1)
 
         if not still_attacking:
           break
+        else:
+          combat_report_pb.end_time = ctrl.dateTimeToEpoch(now)
+
+      if combat_report_pb.start_time > 0 and not self.getCombatReport(star_pb.key, fetch=False):
+        self._setCombatReport(combat_report_pb)
 
       # go through any fleets that have been destroyed and... do something, I dunno...
 
@@ -699,27 +742,27 @@ class Simulation(object):
     """Updates the fleet objects inside the given star."""
     for fleet_pb in star_pb.fleets:
       fleet_model = mdl.Fleet.get(fleet_pb.key)
-      ctrl.fleetPbToModel(fleet_model, fleet_pb)
-      fleet_model.put()
+      if fleet_model:
+        ctrl.fleetPbToModel(fleet_model, fleet_pb)
+        fleet_model.put()
 
   def _updateCombatReport(self, star_pb):
     # check for an existing one that we want to update instead of adding. If there's any
     # overlap between the start/end dates that's what we wnat to update
-    combat_report_mdl = None
-    query = (mdl.CombatReport.all()
-                .filter("endTime >", ctrl.epochToDateTime(self.combat_report.start_time)))
-    for crmdl in query:
-      combat_report_mdl = crmdl
-      break
+    combat_report_pb = self.getCombatReport(star_pb.key, fetch=False)
+    if not combat_report_pb or combat_report_pb.start_time == 0:
+      return
 
-    if not combat_report_mdl:
+    if combat_report_pb.key:
+      combat_report_mdl = mdl.CombatReport.get(db.Key(combat_report_pb.key))
+    else:
       combat_report_mdl = mdl.CombatReport(parent=db.Key(star_pb.key))
 
-    combat_report_mdl.startTime = ctrl.epochToDateTime(self.combat_report.start_time)
-    combat_report_mdl.endTime = ctrl.epochToDateTime(self.combat_report.end_time)
-    #combat_report_mdl.startEmpireKeys = self.combat_report.start_empire_keys
-    #combat_report_mdl.endEmpireKeys = self.combat_report.end_empire_keys
-    combat_report_mdl.rounds = self.combat_report.SerializeToString()
+    combat_report_mdl.startTime = ctrl.epochToDateTime(combat_report_pb.start_time)
+    combat_report_mdl.endTime = ctrl.epochToDateTime(combat_report_pb.end_time)
+    #combat_report_mdl.startEmpireKeys = combat_report_pb.start_empire_keys
+    #combat_report_mdl.endEmpireKeys = combat_report_pb.end_empire_keys
+    combat_report_mdl.rounds = combat_report_pb.SerializeToString()
     combat_report_mdl.put()
 
   def _scheduleFleetDestroy(self, star_pb):

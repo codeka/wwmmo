@@ -9,12 +9,11 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import warworlds.Warworlds.ColonizeRequest;
-import warworlds.Warworlds.FleetOrder;
 import android.os.AsyncTask;
 import android.os.Parcel;
 import android.os.Parcelable;
 import au.com.codeka.warworlds.api.ApiClient;
+import au.com.codeka.warworlds.model.protobuf.Messages;
 
 /**
  * This is a sub-class of \c Empire that represents \em my Empire. We have extra methods
@@ -64,13 +63,12 @@ public class MyEmpire extends Empire {
                         return null;
                     }
 
-                    ColonizeRequest request = ColonizeRequest.newBuilder()
+                    Messages.ColonizeRequest request = Messages.ColonizeRequest.newBuilder()
                             .setPlanetIndex(planet.getIndex())
                             .build();
 
                     String url = String.format("stars/%s/colonies", planet.getStar().getKey());
-                    warworlds.Warworlds.Colony pb = ApiClient.postProtoBuf(url, request,
-                            warworlds.Warworlds.Colony.class);
+                    Messages.Colony pb = ApiClient.postProtoBuf(url, request, Messages.Colony.class);
                     if (pb == null)
                         return null;
                     return Colony.fromProtocolBuffer(pb);
@@ -104,8 +102,7 @@ public class MyEmpire extends Empire {
                 try {
                     String url = String.format("stars/%s/colonies/%s/taxes",
                                                star.getKey(), colony.getKey());
-                    warworlds.Warworlds.Colony pb = ApiClient.postProtoBuf(url, null,
-                            warworlds.Warworlds.Colony.class);
+                    Messages.Colony pb = ApiClient.postProtoBuf(url, null, Messages.Colony.class);
                     if (pb == null)
                         return null;
                     return Colony.fromProtocolBuffer(pb);
@@ -138,9 +135,9 @@ public class MyEmpire extends Empire {
                     String url = String.format("stars/%s/fleets/%s/orders",
                             fleet.getStarKey(),
                             fleet.getKey());
-                     FleetOrder fleetOrder = warworlds.Warworlds.FleetOrder.newBuilder()
-                                    .setOrder(warworlds.Warworlds.FleetOrder.FLEET_ORDER.SET_STANCE)
-                                    .setStance(warworlds.Warworlds.Fleet.FLEET_STANCE.valueOf(newStance.getValue()))
+                    Messages.FleetOrder fleetOrder = Messages.FleetOrder.newBuilder()
+                                    .setOrder(Messages.FleetOrder.FLEET_ORDER.SET_STANCE)
+                                    .setStance(Messages.Fleet.FLEET_STANCE.valueOf(newStance.getValue()))
                                     .build();
                     ApiClient.postProtoBuf(url, fleetOrder);
                     return true;
@@ -171,13 +168,12 @@ public class MyEmpire extends Empire {
             protected List<ScoutReport> doInBackground(Void... arg0) {
                 try {
                     String url = String.format("stars/%s/scout-reports", star.getKey());
-                    warworlds.Warworlds.ScoutReports pb = ApiClient.getProtoBuf(url, 
-                            warworlds.Warworlds.ScoutReports.class);
+                    Messages.ScoutReports pb = ApiClient.getProtoBuf(url, Messages.ScoutReports.class);
                     if (pb == null)
                         return null;
 
                     ArrayList<ScoutReport> reports = new ArrayList<ScoutReport>();
-                    for (warworlds.Warworlds.ScoutReport srpb : pb.getReportsList()) {
+                    for (Messages.ScoutReport srpb : pb.getReportsList()) {
                         reports.add(ScoutReport.fromProtocolBuffer(srpb));
                     }
                     return reports;
@@ -205,8 +201,7 @@ public class MyEmpire extends Empire {
                 try {
                     String url = "empires/"+getKey()+"/details";
 
-                    warworlds.Warworlds.Empire pb = ApiClient.getProtoBuf(url,
-                            warworlds.Warworlds.Empire.class);
+                    Messages.Empire pb = ApiClient.getProtoBuf(url, Messages.Empire.class);
                     if (pb == null)
                         return false;
 
@@ -281,17 +276,17 @@ public class MyEmpire extends Empire {
         }
     };
 
-    public static MyEmpire fromProtocolBuffer(warworlds.Warworlds.Empire pb) {
+    public static MyEmpire fromProtocolBuffer(Messages.Empire pb) {
         MyEmpire empire = new MyEmpire();
         empire.populateFromProtocolBuffer(pb);
         return empire;
     }
 
     @Override
-    protected void populateFromProtocolBuffer(warworlds.Warworlds.Empire pb) {
+    protected void populateFromProtocolBuffer(Messages.Empire pb) {
         super.populateFromProtocolBuffer(pb);
 
-        List<warworlds.Warworlds.Colony> colony_pbs = pb.getColoniesList();
+        List<Messages.Colony> colony_pbs = pb.getColoniesList();
         ArrayList<Colony> colonies = new ArrayList<Colony>();
         if (colony_pbs != null && colony_pbs.size() > 0) {
             for (int i = 0; i < colony_pbs.size(); i++) {
@@ -300,7 +295,7 @@ public class MyEmpire extends Empire {
         }
         mAllColonies = colonies;
 
-        List<warworlds.Warworlds.Fleet> fleet_pbs = pb.getFleetsList();
+        List<Messages.Fleet> fleet_pbs = pb.getFleetsList();
         ArrayList<Fleet> fleets = new ArrayList<Fleet>();
         if (fleet_pbs != null && fleet_pbs.size() > 0) {
             for (int i = 0; i < fleet_pbs.size(); i++) {
@@ -309,7 +304,7 @@ public class MyEmpire extends Empire {
         }
         mAllFleets = fleets;
 
-        List<warworlds.Warworlds.Star> star_pbs = pb.getStarsList();
+        List<Messages.Star> star_pbs = pb.getStarsList();
         TreeMap<String, Star> stars = new TreeMap<String, Star>();
         if (star_pbs != null && star_pbs.size() > 0) {
             for (int i = 0; i < star_pbs.size(); i++) {

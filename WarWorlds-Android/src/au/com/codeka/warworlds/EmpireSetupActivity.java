@@ -3,8 +3,6 @@ package au.com.codeka.warworlds;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import warworlds.Warworlds.Empire;
-import warworlds.Warworlds.Empire.EmpireState;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -20,6 +18,7 @@ import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
 import au.com.codeka.warworlds.api.ApiClient;
 import au.com.codeka.warworlds.api.ApiException;
+import au.com.codeka.warworlds.model.protobuf.Messages;
 
 /**
  * This activity lets you set up your Empire before you actually join the game. You need
@@ -91,8 +90,8 @@ public class EmpireSetupActivity extends Activity {
         new AsyncTask<Void, Void, Boolean>() {
             @Override
             protected Boolean doInBackground(Void... arg0) {
-                Empire empire = Empire.newBuilder().setDisplayName(empireName)
-                        .setState(EmpireState.INITIAL)
+                Messages.Empire empire = Messages.Empire.newBuilder().setDisplayName(empireName)
+                        .setState(Messages.Empire.EmpireState.INITIAL)
                         .setEmail(accountName)
                         .build();
 

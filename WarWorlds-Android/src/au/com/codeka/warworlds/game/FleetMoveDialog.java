@@ -1,6 +1,5 @@
 package au.com.codeka.warworlds.game;
 
-import warworlds.Warworlds.FleetOrder;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -34,6 +33,7 @@ import au.com.codeka.warworlds.model.ShipDesignManager;
 import au.com.codeka.warworlds.model.Sprite;
 import au.com.codeka.warworlds.model.Star;
 import au.com.codeka.warworlds.model.StarManager;
+import au.com.codeka.warworlds.model.protobuf.Messages;
 
 public class FleetMoveDialog extends Dialog implements DialogManager.DialogConfigurable {
     private Activity mActivity;
@@ -151,8 +151,8 @@ public class FleetMoveDialog extends Dialog implements DialogManager.DialogConfi
                         String url = String.format("stars/%s/fleets/%s/orders",
                                                    mFleet.getStarKey(),
                                                    mFleet.getKey());
-                        FleetOrder fleetOrder = warworlds.Warworlds.FleetOrder.newBuilder()
-                                       .setOrder(warworlds.Warworlds.FleetOrder.FLEET_ORDER.MOVE)
+                        Messages.FleetOrder fleetOrder = Messages.FleetOrder.newBuilder()
+                                       .setOrder(Messages.FleetOrder.FLEET_ORDER.MOVE)
                                        .setStarKey(selectedStar.getKey())
                                        .build();
                         try {

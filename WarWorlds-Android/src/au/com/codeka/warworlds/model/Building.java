@@ -2,6 +2,7 @@ package au.com.codeka.warworlds.model;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import au.com.codeka.warworlds.model.protobuf.Messages;
 
 /**
  * Represents a single building on a colony.
@@ -53,7 +54,7 @@ public class Building implements Parcelable {
         }
     };
 
-    public static Building fromProtocolBuffer(warworlds.Warworlds.Building pb) {
+    public static Building fromProtocolBuffer(Messages.Building pb) {
         Building building = new Building();
         building.mKey = pb.getKey();
         building.mColonyKey = pb.getColonyKey();

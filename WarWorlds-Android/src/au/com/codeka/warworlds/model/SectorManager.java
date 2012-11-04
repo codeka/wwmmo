@@ -15,6 +15,7 @@ import android.os.AsyncTask;
 import au.com.codeka.Pair;
 import au.com.codeka.Point2D;
 import au.com.codeka.warworlds.api.ApiClient;
+import au.com.codeka.warworlds.model.protobuf.Messages;
 
 /**
  * This class "manages" the list of \c StarfieldSector's that we have loaded
@@ -178,8 +179,7 @@ public class SectorManager {
                     }
                     url = "sectors?coords="+url;
                     try {
-                        warworlds.Warworlds.Sectors pb = ApiClient.getProtoBuf(url,
-                                warworlds.Warworlds.Sectors.class);
+                        Messages.Sectors pb = ApiClient.getProtoBuf(url, Messages.Sectors.class);
                         sectors = Sector.fromProtocolBuffer(pb.getSectorsList());
                     } catch(Exception e) {
                         // TODO: handle exceptions

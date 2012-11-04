@@ -8,6 +8,7 @@ import org.joda.time.DateTimeZone;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import au.com.codeka.warworlds.model.protobuf.Messages;
 
 public class Colony implements Parcelable {
     private String mKey;
@@ -145,7 +146,7 @@ public class Colony implements Parcelable {
         }
     };
 
-    public static Colony fromProtocolBuffer(warworlds.Warworlds.Colony pb) {
+    public static Colony fromProtocolBuffer(Messages.Colony pb) {
         Colony c = new Colony();
         c.mKey = pb.getKey();
         c.mStarKey = pb.getStarKey();
@@ -168,8 +169,8 @@ public class Colony implements Parcelable {
         return c;
     }
 
-    public warworlds.Warworlds.Colony toProtocolBuffer() {
-        return warworlds.Warworlds.Colony.newBuilder()
+    public Messages.Colony toProtocolBuffer() {
+        return Messages.Colony.newBuilder()
             .setKey(getKey())
             .setPlanetIndex(getPlanetIndex())
             .setStarKey(getStarKey())

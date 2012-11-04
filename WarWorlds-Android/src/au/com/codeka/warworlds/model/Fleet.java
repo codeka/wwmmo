@@ -6,6 +6,7 @@ import org.joda.time.Seconds;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import au.com.codeka.warworlds.model.protobuf.Messages;
 
 public class Fleet implements Parcelable {
     private String mKey;
@@ -110,7 +111,7 @@ public class Fleet implements Parcelable {
         }
     };
 
-    public static Fleet fromProtocolBuffer(warworlds.Warworlds.Fleet pb) {
+    public static Fleet fromProtocolBuffer(Messages.Fleet pb) {
         Fleet f = new Fleet();
         f.mKey = pb.getKey();
         if (pb.hasEmpireKey()) {
