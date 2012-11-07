@@ -463,11 +463,12 @@ def build(empire_pb, colony_pb, request_pb, sim):
   build_operation_model.empire = db.Key(empire_pb.key)
   build_operation_model.designName = request_pb.design_name
   build_operation_model.designKind = request_pb.build_kind
-  build_operation_model.startTime = datetime.now() - timedelta(seconds=5)
-  build_operation_model.endTime = build_operation_model.startTime + timedelta(seconds=15)
+  build_operation_model.startTime = sim.now - timedelta(seconds=5)
+  build_operation_model.endTime = sim.now + timedelta(seconds=15)
   build_operation_model.progress = 0.0
   build_operation_model.count = request_pb.count
   build_operation_model.put()
+  ctrl.buildRequestModelToPb(request_pb, build_operation_model)
 
   # make sure we clear the cache so we get the latest version with the new build
   keys = ["buildqueue:for-empire:%s" % empire_pb.key,
@@ -476,12 +477,12 @@ def build(empire_pb, colony_pb, request_pb, sim):
 
   # We'll need to re-simulate the star now since this new building will affect the ability to
   # build other things as well. It'll also let us calculate the exact end time of this build.
+  sim.updateBuildRequest(request_pb)
   sim.simulate(colony_pb.star_key)
 
   # Schedule a build check so that we make sure we'll update everybody when this build completes
   scheduleBuildCheck(sim)
 
-  ctrl.buildRequestModelToPb(request_pb, build_operation_model)
   return request_pb
 
 

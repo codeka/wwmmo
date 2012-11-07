@@ -57,8 +57,10 @@ class Simulation(object):
     self.need_update = False
     self.now = datetime.now()
 
+
   def getStars(self):
     return self.star_pbs
+
 
   def getStar(self, star_key, fetch=False):
     """Gets the given star_pb from our cache (or fetches it if required)."""
@@ -70,6 +72,7 @@ class Simulation(object):
     star_pb = self.star_fetcher(star_key)
     self.star_pbs.append(star_pb)
     return star_pb
+
 
   def getCombatReport(self, star_key, fetch=False):
     for combat_report_pb in self.combat_report_pbs:
@@ -95,6 +98,18 @@ class Simulation(object):
         self.combat_report_pbs[n] = combat_report_pb
         return
     self.combat_report_pbs.append(combat_report_pb)
+
+
+  def updateBuildRequest(self, build_request_pb):
+    for star_pb in self.star_pbs:
+      for colony_pb in star_pb.colonies:
+        if colony_pb.key == build_request_pb.colony_key:
+          for n,existing_build_request_pb in enumerate(star_pb.build_requests):
+            if existing_build_request_pb.key == build_request_pb:
+              star_pb.build_requests[n] = build_request_pb
+              return
+          star_pb.build_requests.extend([build_request_pb])
+          return
 
 
   def simulate(self, star_key):
@@ -405,7 +420,7 @@ class Simulation(object):
                    (build_request.progress * 100.0, end_time))
 
       # work out the amount of taxes this colony has generated in the last turn
-      tax_per_population_per_hour = 0.004
+      tax_per_population_per_hour = 0.012
       tax_this_turn = tax_per_population_per_hour * dt_in_hours * colony_pb.population
       colony_pb.uncollected_taxes += tax_this_turn
       self.log("tax generated: %.4f; total: %.4f" % (tax_this_turn, colony_pb.uncollected_taxes))
