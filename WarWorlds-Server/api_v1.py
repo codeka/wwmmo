@@ -498,19 +498,28 @@ class FleetOrdersPage(ApiPage):
   """This page is where we post orders that we issue to fleets."""
   def post(self, star_key, fleet_key):
     order_pb = self._getRequestBody(pb.FleetOrder)
-    fleet_pb = empire.getFleet(fleet_key)
+    sim = simulation.Simulation()
+    sim.simulate(star_key)
+    star_pb = sim.getStar(star_key)
 
-    # Make sure the fleet is owned by the current user!
-    curr_empire_pb = empire.getEmpireForUser(self.user)
-    if curr_empire_pb.key != fleet_pb.empire_key:
-      self.response.set_status(403)
-      return
+    for fleet_pb in star_pb.fleets:
+      if fleet_pb.key == fleet_key:
+        # Make sure the fleet is owned by the current user!
+        curr_empire_pb = empire.getEmpireForUser(self.user)
+        if curr_empire_pb.key != fleet_pb.empire_key:
+          self.response.set_status(403)
+          return
 
-    if not empire.orderFleet(fleet_pb, order_pb):
-      self.response.set_status(400)
-    else:
-      self.response.set_status(200)
+        logging.debug("1 fleet_pb[%s].empire_key = %s" % (fleet_pb.key, fleet_pb.empire_key))
+        if not empire.orderFleet(star_pb, fleet_pb, order_pb):
+          self.response.set_status(400)
+        else:
+          self.response.set_status(200)
+        logging.debug("2 fleet_pb[%s].empire_key = %s" % (fleet_pb.key, fleet_pb.empire_key))
+        sim.update()
+        return
 
+    self.response.set_status(400)
 
 class ScoutReportsPage(ApiPage):
   """This page returns a list of scout reports for the given star."""

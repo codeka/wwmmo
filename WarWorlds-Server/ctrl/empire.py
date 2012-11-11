@@ -408,8 +408,7 @@ def colonize(empire_pb, star_key, colonize_request):
     else:
       fleet_model.put()
   db.run_in_transaction(destroy_ship, colony_ship_fleet_pb.key)
-  keys = ["fleet:for-empire:%s" % (empire_pb.key),
-          "fleet:%s" % (colony_ship_fleet_pb.key)]
+  keys = ["fleet:for-empire:%s" % (empire_pb.key)]
   ctrl.clearCached(keys)
 
   sector_key = sector_mdl.SectorManager.getSectorKey(star_pb.sector_x, star_pb.sector_y)
@@ -598,20 +597,7 @@ def getFleetsForEmpire(empire_pb):
   return fleets_pb
 
 
-def getFleet(fleet_key):
-  cache_key = "fleet:%s" % (fleet_key)
-  fleet = ctrl.getCached([cache_key], pb.Fleet)
-  if fleet:
-    return fleet[cache_key]
-
-  fleet_model = mdl.Fleet.get(fleet_key)
-  fleet_pb = pb.Fleet()
-  ctrl.fleetModelToPb(fleet_pb, fleet_model)
-  ctrl.setCached({cache_key: fleet_pb})
-  return fleet_pb
-
-
-def _orderFleet_split(fleet_pb, order_pb):
+def _orderFleet_split(star_pb, fleet_pb, order_pb):
   left_size = order_pb.split_left
   right_size = order_pb.split_right
   if left_size + right_size != fleet_pb.num_ships:
@@ -624,47 +610,39 @@ def _orderFleet_split(fleet_pb, order_pb):
   if left_size <= 0 or right_size <= 0:
     return True
 
-  left_model = mdl.Fleet.get(fleet_pb.key)
-  left_model.numShips = float(left_size)
+  fleet_pb.num_ships = float(left_size)
 
-  right_model = mdl.Fleet(parent = left_model.key().parent())
-  right_model.sector = mdl.Fleet.sector.get_value_for_datastore(left_model)
-  right_model.empire = mdl.Fleet.empire.get_value_for_datastore(left_model)
-  right_model.designName = left_model.designName
-  right_model.state = pb.Fleet.IDLE
-  right_model.numShips = float(right_size)
-  right_model.stateStartTime = datetime.now()
-
-  left_model.put()
-  right_model.put()
+  new_fleet_pb = star_pb.fleets.add()
+  new_fleet_pb.empire_key = fleet_pb.empire_key
+  new_fleet_pb.design_name = fleet_pb.design_name
+  new_fleet_pb.state = pb.Fleet.IDLE
+  new_fleet_pb.num_ships = float(right_size)
+  new_fleet_pb.state_start_time = ctrl.dateTimeToEpoch(datetime.now())
 
   return True
 
 
-def _orderFleet_move(fleet_pb, order_pb):
-  fleet_mdl = mdl.Fleet.get(fleet_pb.key)
-
-  if fleet_mdl.state != pb.Fleet.IDLE:
+def _orderFleet_move(star_pb, fleet_pb, order_pb):
+  if fleet_pb.state != pb.Fleet.IDLE:
     logging.debug("Cannot move fleet, it's not currently idle.")
     return False
 
-  src_star = sector.getStar(fleet_pb.star_key)
+  src_star = star_pb
   dst_star = sector.getStar(db.Key(order_pb.star_key))
   distance_in_pc = sector.getDistanceBetweenStars(src_star, dst_star)
 
   design = ShipDesign.getDesign(fleet_pb.design_name)
 
   # work out how much this move operation is going to cost
-  fuel_cost = design.fuelCostPerParsec * fleet_mdl.numShips * distance_in_pc
-  if not _subtractCash(str(mdl.Fleet.empire.get_value_for_datastore(fleet_mdl)), fuel_cost):
+  fuel_cost = design.fuelCostPerParsec * fleet_pb.num_ships * distance_in_pc
+  if not _subtractCash(fleet_pb.empire_key, fuel_cost):
     logging.info("Insufficient funds for move: distance=%.2f, num_ships=%d, cost=%.2f"
-                 % (distance_in_pc, fleet_mdl.numShips, fuel_cost))
+                 % (distance_in_pc, fleet_pb.num_ships, fuel_cost))
     return False
 
-  fleet_mdl.state = pb.Fleet.MOVING
-  fleet_mdl.stateStartTime = datetime.now()
-  fleet_mdl.destinationStar = db.Key(order_pb.star_key)
-  fleet_mdl.put()
+  fleet_pb.state = pb.Fleet.MOVING
+  fleet_pb.state_start_time = ctrl.dateTimeToEpoch(datetime.now())
+  fleet_pb.destination_star_key = order_pb.star_key
 
   # Let's just hard-code this to 1 hour for now...
   time = datetime.now() + timedelta(hours=(distance_in_pc / design.speed))
@@ -697,26 +675,23 @@ def _subtractCash(empire_key, amount):
   return db.run_in_transaction(subtractCashInTx, db.Key(empire_key), int(math.floor(amount)))
 
 
-def _orderFleet_setStance(fleet_pb, order_pb):
-  fleet_mdl = mdl.Fleet.get(fleet_pb.key)
-  fleet_mdl.stance = order_pb.stance
-  fleet_mdl.put()
+def _orderFleet_setStance(star_pb, fleet_pb, order_pb):
+  fleet_pb.stance = order_pb.stance
   return True
 
 
-def orderFleet(fleet_pb, order_pb):
+def orderFleet(star_pb, fleet_pb, order_pb):
   success = False
   if order_pb.order == pb.FleetOrder.SPLIT:
-    success = _orderFleet_split(fleet_pb, order_pb)
+    success = _orderFleet_split(star_pb, fleet_pb, order_pb)
   elif order_pb.order == pb.FleetOrder.MOVE:
-    success = _orderFleet_move(fleet_pb, order_pb)
+    success = _orderFleet_move(star_pb, fleet_pb, order_pb)
   elif order_pb.order == pb.FleetOrder.SET_STANCE:
-    success = _orderFleet_setStance(fleet_pb, order_pb)
+    success = _orderFleet_setStance(star_pb, fleet_pb, order_pb)
 
   if success:
     star_pb = sector.getStar(fleet_pb.star_key)
-    ctrl.clearCached(["fleet:%s" % (fleet_pb.key),
-                      "fleet:for-empire:%s" % (fleet_pb.empire_key),
+    ctrl.clearCached(["fleet:for-empire:%s" % (fleet_pb.empire_key),
                       "star:%s" % (fleet_pb.star_key),
                       "sector:%d,%d" % (star_pb.sector_x, star_pb.sector_y)])
 

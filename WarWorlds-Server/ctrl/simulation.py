@@ -1,6 +1,7 @@
 """simulation.py: Contains the logic for simulating stars, colonies and combat."""
 
 from datetime import datetime, timedelta
+import logging
 
 from google.appengine.ext import db
 from google.appengine.api import taskqueue
@@ -12,6 +13,7 @@ import ctrl
 from ctrl import empire as empire_ctl
 from ctrl import sector as sector_ctl
 from model import empire as mdl
+from model import sector as sector_mdl
 from protobufs import messages_pb2 as pb
 
 
@@ -21,12 +23,20 @@ def _def_star_fetcher(star_key):
 
 
 def _def_combat_report_fetcher(star_key, now):
+  cache_key = "star:%s:latest-combat-report" % (star_key)
+  values = ctrl.getCached([cache_key], pb.CombatReport)
+  if cache_key in values:
+    return values[cache_key]
+
   query = (mdl.CombatReport.all()
               .ancestor(db.Key(star_key))
-              .filter("endTime <", datetime(2000, 1, 1)))
+              .order("-startTime"))
   for combat_report_mdl in query.fetch(1):
-    combat_report_pb = pb.CombatReport()
-    ctrl.combatReportModelToPb(combat_report_pb, combat_report_mdl, summary=False)
+    if combat_report_mdl.endTime < datetime(2000, 1, 1) or combat_report_mdl.endTime >= now:
+      combat_report_pb = pb.CombatReport()
+      ctrl.combatReportModelToPb(combat_report_pb, combat_report_mdl, summary=False)
+      ctrl.setCached({cache_key: combat_report_pb})
+      return combat_report_pb
 
 
 def _def_log(msg):
@@ -114,15 +124,15 @@ class Simulation(object):
 
   def simulate(self, star_key):
     """Simulates the star with the given key and gets all of the colonies and fleets up to date.
-  
+
     When simulating a star, we simulate all colonies in that star that belong to the given empire
     at once. This is because there are certain resources (particularly food & minerals) that get
     shared between all colonies in the starsystem.
-  
+
     We also simulate any non-IDLE fleets all at once (regardless of empire) because the rules for
     attacking are quite strict (i.e. alternating attacks, etc). Simulating attacks is relatively rare,
     because they typically resolve within a few minutes.
-  
+
     Args:
       star_pb: A star protobuf containing details of all the colonies, planets and whatnot in the
           star we're going to simulate.
@@ -591,8 +601,11 @@ class Simulation(object):
     # target something
     for fleet_pb in star_pb.fleets:
       if fleet_pb.stance == pb.Fleet.AGGRESSIVE:
+        # make it idle unless we can find a target
+        fleet_pb.state = pb.Fleet.IDLE
         state_start_time = ctrl.epochToDateTime(fleet_pb.state_start_time)
         if state_start_time > now:
+          fleet_pb.stance = pb.Fleet.AGGRESSIVE
           continue
         if fleet_pb.target_fleet_key and fleet_pb.target_fleet_key not in cache:
           fleet_pb.target_fleet_key = ""
@@ -608,12 +621,11 @@ class Simulation(object):
             if potential_target_fleet_pb.empire_key == fleet_pb.empire_key:
               continue
             fleet_pb.target_fleet_key = potential_target_fleet_pb.key
+            fleet_pb.stance = pb.Fleet.AGGRESSIVE
             fleet_target_pb = combat_round_pb.fleets_targetted.add()
             fleet_target_pb.fleet_index = fleet_indices[fleet_pb.key]
             fleet_target_pb.target_index = fleet_indices[potential_target_fleet_pb.key]
             break
-      if not fleet_pb.target_fleet_key:
-        fleet_pb.state = pb.Fleet.IDLE
 
     # all fleets that are currently attacking fire at once
     hits = []
@@ -622,6 +634,8 @@ class Simulation(object):
         continue
       state_start_time = ctrl.epochToDateTime(fleet_pb.state_start_time)
       if state_start_time > now:
+        continue
+      if fleet_pb.target_fleet_key not in cache:
         continue
 
       target = cache[fleet_pb.target_fleet_key]["fleet"]
@@ -756,19 +770,28 @@ class Simulation(object):
   def _updateFleets(self, star_pb):
     """Updates the fleet objects inside the given star."""
     for fleet_pb in star_pb.fleets:
-      fleet_model = mdl.Fleet.get(fleet_pb.key)
+      if fleet_pb.key:
+        fleet_model = mdl.Fleet.get(fleet_pb.key)
+      else:
+        fleet_model = None
       if fleet_model:
+        logging.debug("3 fleet_pb[%s].empire_key = %s" % (fleet_pb.key, fleet_pb.empire_key))
         ctrl.fleetPbToModel(fleet_model, fleet_pb)
-        fleet_model.put()
+      else:
+        fleet_model = mdl.Fleet(parent=db.Key(star_pb.key))
+        ctrl.fleetPbToModel(fleet_model, fleet_pb)
+        fleet_model.sector = sector_mdl.SectorManager.getSectorKey(star_pb.sector_x,
+                                                                   star_pb.sector_y)
+      fleet_model.put()
 
   def _updateCombatReport(self, star_pb):
     # check for an existing one that we want to update instead of adding. If there's any
     # overlap between the start/end dates that's what we wnat to update
     combat_report_pb = self.getCombatReport(star_pb.key, fetch=False)
-    if not combat_report_pb or combat_report_pb.start_time == 0:
+    if combat_report_pb is None or combat_report_pb.start_time == 0:
       return
 
-    if combat_report_pb.key:
+    if combat_report_pb.key and len(combat_report_pb.key) > 1:
       combat_report_mdl = mdl.CombatReport.get(db.Key(combat_report_pb.key))
     else:
       combat_report_mdl = mdl.CombatReport(parent=db.Key(star_pb.key))
@@ -779,6 +802,7 @@ class Simulation(object):
     #combat_report_mdl.endEmpireKeys = combat_report_pb.end_empire_keys
     combat_report_mdl.rounds = combat_report_pb.SerializeToString()
     combat_report_mdl.put()
+    ctrl.clearCached(["star:%s:latest-combat-report" % (star_pb.key)])
 
   def _scheduleFleetDestroy(self, star_pb):
     """Schedules a task that'll ensure the given fleets is destroyed when it should be."""

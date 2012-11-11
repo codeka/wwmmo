@@ -102,8 +102,6 @@ class BuildCheckPage(tasks.TaskPage):
                                      build_request_model.count):
               existing = True
               model = fleet_model
-              # it's an existing fleet, so make sure we clear it's cached value
-              keys_to_clear.append("fleet:%s" % str(fleet_model.key()))
               break
         if not existing:
           model = mdl.Fleet(parent=star_key)
@@ -253,11 +251,25 @@ class FleetDestroyedPage(tasks.TaskPage):
         fleet_mdl.delete()
       return empire_key
 
+    # quick check to make sure the fleet is really scheduled to be destoryed now
+    fleet_mdl = mdl.Fleet.get(fleet_key)
+    if not fleet_mdl:
+      return
     time_destroyed = int(self.request.get("dt"))
+    if fleet_mdl.timeDestroyed != ctrl.epochToDateTime(time_destroyed):
+      logging.debug("Not scheduled to delete fleet at this time (actually, at %s), skipping." % (
+                    fleet_mdl.timeDestroyed))
+      return
+
+    # simulate until *just before* the fleet is destroyed, so that all of that fleet's effects
+    # will be felt, because it's destroyed.
+    sim = simulation_ctl.Simulation()
+    sim.now = ctrl.epochToDateTime(time_destroyed)
+    sim.simulate(str(db.Key(fleet_key).parent()))
+
     empire_key = db.run_in_transaction(doDelete, fleet_key, time_destroyed)
     if empire_key:
-      sim = simulation_ctl.Simulation()
-      sim.simulate(str(db.Key(fleet_key).parent()))
+      # if it turns out we didn't delete the fleet after all, we don't need to update() 
       sim.update()
       keys_to_clear = ["fleet:for-empire:%s" % (empire_key)]
       ctrl.clearCached(keys_to_clear)

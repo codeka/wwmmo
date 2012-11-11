@@ -246,6 +246,43 @@ class CombatTestCase(unittest.TestCase):
     self.assertNotEqual(0, star_pb.fleets[1].time_destroyed)
 
 
+  def testFleetOf20VsFleetOf36(self):
+    sim = _create_simulation(star_json = ["""
+       {"key": "star1",
+         "planets": [
+           {"index": 0, "planet_type": 9} 
+         ],
+         "colonies": [
+           {"key": "colony1", "empire_key": "empire1", "star_key": "star1", "planet_index": 0,
+            "population": 100, "last_simulation": %d, "focus_population": 0.25,
+            "focus_farming": 0.25, "focus_mining": 0.25, "focus_construction": 0.25}
+         ],
+         "buildings": [],
+         "empires": [],
+         "build_requests": [],
+         "fleets": [
+           {"key": "fleet1", "empire_key": "empire1", "design_name": "fighter", "num_ships": 20,
+            "state": 1, "state_start_time": 0, "star_key": "star1", "stance": 3},
+           {"key": "fleet2", "empire_key": "empire2", "design_name": "fighter", "num_ships": 36,
+            "state": 1, "state_start_time": 0, "star_key": "star1", "stance": 3}
+         ]
+        }
+    """ % (ctrl.dateTimeToEpoch(datetime.now() - timedelta(minutes=20)))])
+    sim.now = datetime.now() - timedelta(minutes=15)
+    sim.onFleetArrived("fleet2", "star1")
+    sim.now = datetime.now() - timedelta(minutes=10)
+    sim.simulate("star1")
+
+    star_pb = sim.getStar("star1")
+    self.assertEqual(2, len(star_pb.fleets))
+    self.assertEqual("fleet1", star_pb.fleets[0].key)
+    self.assertEqual(0, star_pb.fleets[0].num_ships)
+    self.assertNotEqual(0, star_pb.fleets[0].time_destroyed)
+    self.assertEqual("fleet2", star_pb.fleets[1].key)
+    self.assertEqual(26, int(star_pb.fleets[1].num_ships))
+    self.assertEqual(0, star_pb.fleets[1].time_destroyed)
+
+
   def testNewFleetArrivesOnePassiveOneAgressiveExisting(self):
     sim = _create_simulation(star_json = ["""
         {"key": "star1",

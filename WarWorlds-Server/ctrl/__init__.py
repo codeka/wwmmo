@@ -229,6 +229,9 @@ def fleetModelToPb(fleet_pb, fleet_model):
 
 def fleetPbToModel(fleet_model, fleet_pb):
   fleet_model.state = fleet_pb.state
+  fleet_model.designName = fleet_pb.design_name
+  if fleet_pb.empire_key:
+    fleet_model.empire = db.Key(fleet_pb.empire_key)
   fleet_model.stateStartTime = epochToDateTime(fleet_pb.state_start_time)
   if fleet_pb.destination_star_key:
     fleet_model.destinationStar = db.Key(fleet_pb.destination_star_key)
