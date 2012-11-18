@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 
+import au.com.codeka.warworlds.Util;
 import au.com.codeka.warworlds.api.ApiClient;
 import au.com.codeka.warworlds.api.ChannelClient;
 import au.com.codeka.warworlds.api.ChannelClient.ChannelListener;
@@ -35,32 +36,37 @@ public class ChatManager {
      * ready to start receiving chat messages.
      */
     public void setup(String token) {
-        URI appEngineURI = ApiClient.getBaseUri().resolve("/");
-        mChannelClient = ChannelClient.createChannel(appEngineURI, token, new ChannelListener() {
-            @Override
-            public void onOpen() {
-            }
+        String chatEnabledProperty = Util.getProperties().getProperty("chat.enabled");
+        if (chatEnabledProperty == null || !chatEnabledProperty.equals("false")) {
+            URI appEngineURI = ApiClient.getBaseUri().resolve("/");
+            mChannelClient = ChannelClient.createChannel(appEngineURI, token, new ChannelListener() {
+                @Override
+                public void onOpen() {
+                }
 
-            @Override
-            public void onMessage(String message) {
-                addMessage(new ChatMessage(message));
-            }
+                @Override
+                public void onMessage(String message) {
+                    addMessage(new ChatMessage(message));
+                }
 
-            @Override
-            public void onError(int code, String description) {
-            }
+                @Override
+                public void onError(int code, String description) {
+                }
 
-            @Override
-            public void onClose() {
-            }
-        });
-        addMessage(new ChatMessage("Welcome to War Worlds!"));
+                @Override
+                public void onClose() {
+                }
+            });
+            addMessage(new ChatMessage("Welcome to War Worlds!"));
 
-        // this only works because we're already on a background thread...
-        try {
-            mChannelClient.open();
-        } catch (ChannelClient.ChannelException e) {
-            //TODO: handle error
+            // this only works because we're already on a background thread...
+            try {
+                mChannelClient.open();
+            } catch (ChannelClient.ChannelException e) {
+                //TODO: handle error
+            }
+        } else {
+            addMessage(new ChatMessage("Chat has been disabled."));
         }
     }
 

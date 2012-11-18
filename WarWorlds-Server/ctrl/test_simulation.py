@@ -1,7 +1,6 @@
 """simulation_tse.py: Unit tests for simulation.py."""
 
 from datetime import datetime, timedelta
-import json
 import unittest
 
 import ctrl

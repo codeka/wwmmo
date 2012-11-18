@@ -182,13 +182,15 @@ class FleetMoveCompletePage(tasks.TaskPage):
       logging.warn("Fleet [%s] is not moving, as expected." % (fleet_key))
       self.set_response(400)
     else:
-      new_star_key = mdl.Fleet.destinationStar.get_value_for_datastore(fleet_mdl)
-      new_star_pb = sector_ctl.getStar(new_star_key)
+      new_star_key = str(mdl.Fleet.destinationStar.get_value_for_datastore(fleet_mdl))
+      sim = simulation_ctl.Simulation()
+      sim.simulate(new_star_key)
+      new_star_pb = sim.getStar(new_star_key)
 
       if str(fleet_mdl.key().parent()) == new_star_key:
         old_star_pb = new_star_pb
       else:
-        old_star_pb = sector_ctl.getStar(fleet_mdl.key().parent())
+        old_star_pb = sim.getStar(fleet_mdl.key().parent(), True)
 
       new_fleet_mdl = mdl.Fleet(parent=fleet_mdl.destinationStar)
       new_fleet_mdl.sector = sector_mdl.SectorManager.getSectorKey(new_star_pb.sector_x,
@@ -207,24 +209,26 @@ class FleetMoveCompletePage(tasks.TaskPage):
       new_fleet_mdl.put()
 
       ctrl.clearCached(["fleet:for-empire:%s" % (empire.key()),
-                        "star:%s" % (fleet_mdl.key().parent()),
+                        "star:%s" % (old_star_pb.key),
                         "star:%s" % (new_star_key),
                         "sector:%d,%d" % (new_star_pb.sector_x, new_star_pb.sector_y),
                         "sector:%d,%d" % (old_star_pb.sector_x, old_star_pb.sector_y)])
 
-      new_fleet_key = str(new_fleet_mdl.key())
-      sim = simulation_ctl.Simulation()
+      # manually add the fleet to the new star's PB
+      new_fleet_pb = new_star_pb.fleets.add()
+      ctrl.fleetModelToPb(new_fleet_pb, new_fleet_mdl)
+      new_fleet_key = new_fleet_pb.key
+
+      # manually remove the fleet from the old star's PB
+      for n,fleet_pb in enumerate(old_star_pb.fleets):
+        if fleet_pb.key == fleet_key:
+          del old_star_pb.fleets[n]
+          break
+
       sim.onFleetArrived(new_fleet_key, new_star_pb.key)
       sim.simulate(new_star_pb.key)
       if new_star_pb.key != old_star_pb.key:
         sim.simulate(old_star_pb.key)
-      new_star_pb = sim.getStar(new_star_pb.key)
-      old_star_pb = sim.getStar(old_star_pb.key)
-
-      new_fleet_pb = None
-      for fleet_pb in new_star_pb.fleets:
-        if fleet_pb.key == new_fleet_key:
-          new_fleet_pb = fleet_pb
 
       design = ctl.ShipDesign.getDesign(new_fleet_pb.design_name)
 
@@ -265,11 +269,17 @@ class FleetDestroyedPage(tasks.TaskPage):
     # will be felt, because it's destroyed.
     sim = simulation_ctl.Simulation()
     sim.now = ctrl.epochToDateTime(time_destroyed)
-    sim.simulate(str(db.Key(fleet_key).parent()))
+    star_pb = sim.getStar(str(db.Key(fleet_key).parent()), True)
+    sim.simulate(star_pb.key)
 
     empire_key = db.run_in_transaction(doDelete, fleet_key, time_destroyed)
     if empire_key:
-      # if it turns out we didn't delete the fleet after all, we don't need to update() 
+      # if it turns out we didn't delete the fleet after all, we don't need to update()
+      for n,fleet_pb in enumerate(star_pb.fleets):
+        if fleet_pb.key == fleet_key:
+          del star_pb.fleets[n]
+          break
+
       sim.update()
       keys_to_clear = ["fleet:for-empire:%s" % (empire_key)]
       ctrl.clearCached(keys_to_clear)

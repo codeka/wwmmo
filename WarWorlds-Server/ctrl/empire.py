@@ -1,7 +1,6 @@
 """empire.py: Controller for empire-related functions. Aso contains the 'simulate' method."""
 
 
-import copy
 from datetime import datetime, timedelta
 import logging
 import math
@@ -843,7 +842,7 @@ class ShipEffectFighter(ShipEffect):
         # Note: we don't set the target here, we'll let the simulation do that so that it's
         # recorded in the combat report
         #fleet_pb.target_fleet_key = other_fleet_pb.key
-        star_fleet_pb.state_start_time = ctrl.dateTimeToEpoch(sim.now)
+        star_fleet_pb.state_start_time = ctrl.dateTimeToEpoch(sim.now - timedelta(seconds=1))
         break
 
 

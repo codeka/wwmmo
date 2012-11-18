@@ -563,10 +563,11 @@ class Simulation(object):
         combat_round_pb.star_key = star_pb.key
         combat_round_pb.round_time = ctrl.dateTimeToEpoch(now)
         still_attacking = self._simulateCombatRound(now, star_pb, cache, combat_round_pb)
+        self.log("fleets_attacked = %d" % (len(combat_round_pb.fleets_attacked)))
         if not combat_round_pb.fleets_attacked:
           del combat_report_pb.rounds[-1:]
         elif combat_report_pb.start_time == 0:
-          combat_report_pb.start_time = ctrl.dateTimeToEpoch(now)
+            combat_report_pb.start_time = ctrl.dateTimeToEpoch(now)
 
         now += timedelta(minutes=1)
 
@@ -600,37 +601,41 @@ class Simulation(object):
     # any fleet that's aggressive and not currently targetting anything should
     # target something
     for fleet_pb in star_pb.fleets:
-      if fleet_pb.stance == pb.Fleet.AGGRESSIVE:
+      if fleet_pb.state == pb.Fleet.ATTACKING and fleet_pb.target_fleet_key:
+        # decide if we should stop attacking this guy...
+        if fleet_pb.target_fleet_key not in cache:
+          fleet_pb.target_fleet_key = ""
+          fleet_pb.state = pb.Fleet.IDLE
+        else:
+          target = cache[fleet_pb.target_fleet_key]["fleet"]
+          if not target or target.time_destroyed:
+            fleet_pb.target_fleet_key = ""
+            fleet_pb.state = pb.Fleet.IDLE
+      if ((fleet_pb.stance == pb.Fleet.AGGRESSIVE or fleet_pb.state == pb.Fleet.ATTACKING) and
+           not fleet_pb.target_fleet_key):
+        state_start_time = ctrl.epochToDateTime(fleet_pb.state_start_time)
+        if state_start_time >= now:
+          continue
         # make it idle unless we can find a target
         fleet_pb.state = pb.Fleet.IDLE
-        state_start_time = ctrl.epochToDateTime(fleet_pb.state_start_time)
-        if state_start_time > now:
-          fleet_pb.stance = pb.Fleet.AGGRESSIVE
-          continue
-        if fleet_pb.target_fleet_key and fleet_pb.target_fleet_key not in cache:
-          fleet_pb.target_fleet_key = ""
-        if fleet_pb.target_fleet_key:
-          target = cache[fleet_pb.target_fleet_key]["fleet"]
-          if target.time_destroyed:
-            fleet_pb.target_fleet_key = ""
-
-        if not fleet_pb.target_fleet_key:
-          for potential_target_fleet_pb in star_pb.fleets:
-            if potential_target_fleet_pb.time_destroyed:
-              continue
-            if potential_target_fleet_pb.empire_key == fleet_pb.empire_key:
-              continue
-            fleet_pb.target_fleet_key = potential_target_fleet_pb.key
-            fleet_pb.stance = pb.Fleet.AGGRESSIVE
-            fleet_target_pb = combat_round_pb.fleets_targetted.add()
-            fleet_target_pb.fleet_index = fleet_indices[fleet_pb.key]
-            fleet_target_pb.target_index = fleet_indices[potential_target_fleet_pb.key]
-            break
+        for potential_target_fleet_pb in star_pb.fleets:
+          if potential_target_fleet_pb.time_destroyed:
+            continue
+          if potential_target_fleet_pb.empire_key == fleet_pb.empire_key:
+            continue
+          fleet_pb.target_fleet_key = potential_target_fleet_pb.key
+          fleet_pb.state = pb.Fleet.ATTACKING
+          fleet_target_pb = combat_round_pb.fleets_targetted.add()
+          fleet_target_pb.fleet_index = fleet_indices[fleet_pb.key]
+          fleet_target_pb.target_index = fleet_indices[potential_target_fleet_pb.key]
+          break
 
     # all fleets that are currently attacking fire at once
     hits = []
     for fleet_pb in star_pb.fleets:
       if fleet_pb.state != pb.Fleet.ATTACKING or fleet_pb.time_destroyed:
+        continue
+      if not fleet_pb.target_fleet_key:
         continue
       state_start_time = ctrl.epochToDateTime(fleet_pb.state_start_time)
       if state_start_time > now:
@@ -642,6 +647,8 @@ class Simulation(object):
       fleet_design = cache[fleet_pb.key]["design"]
       damage = float(fleet_pb.num_ships) * fleet_design.baseAttack # todo: more complicated!
       hits.append({"fleet_key": target.key, "damage": damage})
+      self.log("Fleet {%s} attacked by {%s} for %d damage" % (fleet_pb.target_fleet_key,
+                                                              fleet_pb.key, int(damage)))
       fleet_attack_pb = combat_round_pb.fleets_attacked.add()
       fleet_attack_pb.fleet_index = fleet_indices[fleet_pb.key]
       fleet_attack_pb.target_index = fleet_indices[fleet_pb.target_fleet_key]
@@ -683,41 +690,41 @@ class Simulation(object):
     return False
 
 
-  def onFleetArrived(self, fleet_key, star_key):
+  def onFleetArrived(self, new_fleet_key, star_key):
     """This is called when a fleet moves into a new star system.
 
     We will go through the existing fleets and old fleets and make sure they all know about the
     new fleet. Some may start attacking and so on.
 
     Args:
-      fleet_key: The key of the fleet that moved. We assume it's already in the star.
+      new_fleet_key: The key of the fleet that just arrived. We assume it's already in the star.
       star_key: The key of the star the fleet has moved to.
     """
     star_pb = self.getStar(star_key, True)
-    fleet_pb = None
+    new_fleet_pb = None
     for fpb in star_pb.fleets:
-      if fpb.key == fleet_key:
-        fleet_pb = fpb
+      if fpb.key == new_fleet_key:
+        new_fleet_pb = fpb
 
     # apply any "star landed" effects
-    design = empire_ctl.ShipDesign.getDesign(fleet_pb.design_name)
+    design = empire_ctl.ShipDesign.getDesign(new_fleet_pb.design_name)
     for effect in design.getEffects():
-      effect.onStarLanded(fleet_pb, star_pb, self)
+      effect.onStarLanded(new_fleet_pb, star_pb, self)
 
     # if there's any ships already there, apply their onFleetArrived effects
     for other_fleet_pb in star_pb.fleets:
-      if other_fleet_pb.key == fleet_pb.key:
+      if other_fleet_pb.key == new_fleet_pb.key:
         continue
       design = empire_ctl.ShipDesign.getDesign(other_fleet_pb.design_name)
       for effect in design.getEffects():
-        effect.onFleetArrived(star_pb, fleet_pb, other_fleet_pb, self)
+        effect.onFleetArrived(star_pb, new_fleet_pb, other_fleet_pb, self)
 
   def update(self):
     """Apply all of the updates we've made to the data store."""
     if not self.need_update:
       return
 
-    self.log("Applying updated...")
+    self.log("Applying updates...")
 
     keys_to_clear = []
     for empire_pb in self.empire_pbs:

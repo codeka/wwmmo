@@ -342,15 +342,18 @@ class StarPage(StarfieldPage):
 
     empire_pb = empire.getEmpireForUser(self.user)
 
-    # we only return fleets for the current empire -- we don't let you see
-    # other empire's fleets.
-    empire_fleets = []
-    for fleet in star_pb.fleets:
-      if self._isAdmin() or fleet.empire_key == empire_pb.key:
-        empire_fleets.append(fleet)
+    # if you don't have a fleet or a colony here, you don't get to see what other fleets might be
+    # here, so we remove them
+    has_fleet_or_colony = False
+    for fleet_pb in star_pb.fleets:
+      if fleet_pb.empire_key == empire_pb.key:
+        has_fleet_or_colony = True
+    for colony_pb in star_pb.colonies:
+      if colony_pb.empire_key == empire_pb.key:
+        has_fleet_or_colony = True
 
-    del star_pb.fleets[:]
-    star_pb.fleets.extend(empire_fleets)
+    if not self._isAdmin() and not has_fleet_or_colony:
+      del star_pb.fleets[:]
 
     # similarly for build requests, only our own empire's build requests
     empire_build_requests = []
@@ -520,6 +523,7 @@ class FleetOrdersPage(ApiPage):
         return
 
     self.response.set_status(400)
+
 
 class ScoutReportsPage(ApiPage):
   """This page returns a list of scout reports for the given star."""
