@@ -125,16 +125,16 @@ class BuildCheckPage(tasks.TaskPage):
 
       sim.update()
 
-      # Send a notification to the player that construction of their building is complete
-      msg = "Your %d %s(s) on %s has been built." % (build_request_model.count,
-                                                     design.name,
-                                                     star_pb.name)
-      logging.debug("Sending message to user [%s] indicating build complete." % (
-          model.empire.user.email()))
-      s = c2dm.Sender()
-      devices = ctrl.getDevicesForUser(model.empire.user.email())
-      for device in devices.registrations:
-        s.sendMessage(device.device_registration_id, {"msg": msg})
+      # Save a sitrep for this situation
+      sitrep_pb = pb.SituationReport()
+      sitrep_pb.empire_key = str(empire_key)
+      sitrep_pb.report_time = ctrl.dateTimeToEpoch(sim.now)
+      sitrep_pb.star_key = str(star_key)
+      sitrep_pb.planet_index = build_request_model.colony.planet_index
+      sitrep_pb.build_complete_record = pb.SituationReport.BuildCompleteRecord()
+      sitrep_pb.build_complete_record.build_kind = build_request_model.designKind
+      sitrep_pb.build_complete_record.design_id = build_request_model.designName
+      ctl.saveSituationReport(sitrep_pb)
 
       # clear the cached items that reference this building/fleet
       keys_to_clear.append("star:%s" % (star_pb.key))
@@ -192,10 +192,12 @@ class FleetMoveCompletePage(tasks.TaskPage):
       else:
         old_star_pb = sim.getStar(fleet_mdl.key().parent(), True)
 
+      empire_key = mdl.Fleet.empire.get_value_for_datastore(fleet_mdl)
+
       new_fleet_mdl = mdl.Fleet(parent=fleet_mdl.destinationStar)
       new_fleet_mdl.sector = sector_mdl.SectorManager.getSectorKey(new_star_pb.sector_x,
                                                                    new_star_pb.sector_y)
-      new_fleet_mdl.empire = mdl.Fleet.empire.get_value_for_datastore(fleet_mdl)
+      new_fleet_mdl.empire = empire_key
       new_fleet_mdl.designName = fleet_mdl.designName
       new_fleet_mdl.numShips = fleet_mdl.numShips
       new_fleet_mdl.stance = fleet_mdl.stance
@@ -229,21 +231,35 @@ class FleetMoveCompletePage(tasks.TaskPage):
       sim.simulate(new_star_pb.key)
       if new_star_pb.key != old_star_pb.key:
         sim.simulate(old_star_pb.key)
-
-      design = ctl.ShipDesign.getDesign(new_fleet_pb.design_name)
-
-      # Send a notification to the player that construction of their building is complete
-      msg = "Your %s fleet of %d ships has arrived on %s." % (design.name,
-                                                              new_fleet_pb.num_ships,
-                                                              new_star_pb.name)
-      logging.debug("Sending message to user [%s] indicating fleet move complete." % (
-          empire.user.email()))
-      s = c2dm.Sender()
-      devices = ctrl.getDevicesForUser(empire.user.email())
-      for device in devices.registrations:
-        s.sendMessage(device.device_registration_id, {"msg": msg})
-
       sim.update()
+
+      # Save a sitrep for this situation
+      sitrep_pb = pb.SituationReport()
+      sitrep_pb.empire_key = str(empire_key)
+      sitrep_pb.report_time = ctrl.dateTimeToEpoch(sim.now)
+      sitrep_pb.star_key = new_star_pb.key
+      sitrep_pb.planet_index = -1
+      sitrep_pb.move_complete_record = pb.SituationReport.MoveCompleteRecord()
+      sitrep_pb.move_complete_record.fleet_key = new_fleet_pb.key
+      sitrep_pb.move_complete_record.design_id = new_fleet_pb.design_name
+      sitrep_pb.move_complete_record.num_ships = new_fleet_pb.num_ships
+
+      combat_report_pb = sim.getCombatReport(new_star_pb.key)
+      if combat_report_pb and combat_report_pb.rounds:
+        # if there's a combat report it means we also entered a battle (possibly), so we might
+        # have to update the sit.rep. to cover that. We might also have to generate a sit.rep.
+        # for any other empires that are already here...
+        round_1 = combat_report_pb.rounds[0]
+        for combat_fleet_pb in round_1.fleets:
+          if combat_fleet_pb.key == new_fleet_pb.key:
+            sitrep_pb.fleet_under_attack_record = pb.SituationReport.FleetUnderAttackRecord()
+            sitrep_pb.fleet_under_attack_record.fleet_key = new_fleet_pb.key
+            sitrep_pb.fleet_under_attack_record.design_id = new_fleet_pb.design_name
+            sitrep_pb.fleet_under_attack_record.num_ships = new_fleet_pb.num_ships
+            sitrep_pb.fleet_under_attack_record.combat_report_key = combat_report_pb.key
+
+      ctl.saveSituationReport(sitrep_pb)
+
 
 class FleetDestroyedPage(tasks.TaskPage):
   def get(self, fleet_key):
@@ -283,6 +299,17 @@ class FleetDestroyedPage(tasks.TaskPage):
       sim.update()
       keys_to_clear = ["fleet:for-empire:%s" % (empire_key)]
       ctrl.clearCached(keys_to_clear)
+
+      # Save a sitrep for this situation
+      sitrep_pb = pb.SituationReport()
+      sitrep_pb.empire_key = empire_key
+      sitrep_pb.report_time = ctrl.dateTimeToEpoch(sim.now)
+      sitrep_pb.star_key = star_pb.key
+      sitrep_pb.planet_index = -1
+      sitrep_pb.fleet_destroyed_record = pb.SituationReport.FleetDestroyedRecord()
+      sitrep_pb.fleet_destroyed_record.design_id = fleet_pb.design_name
+      sitrep_pb.fleet_destroyed_record.combat_report_key = "TODO"
+      ctl.saveSituationReport(sitrep_pb)
 
 
 app = webapp.WSGIApplication([("/tasks/empire/build-check", BuildCheckPage),

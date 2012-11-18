@@ -809,6 +809,7 @@ class Simulation(object):
     #combat_report_mdl.endEmpireKeys = combat_report_pb.end_empire_keys
     combat_report_mdl.rounds = combat_report_pb.SerializeToString()
     combat_report_mdl.put()
+    combat_report_pb.key = str(combat_report_mdl.key())
     ctrl.clearCached(["star:%s:latest-combat-report" % (star_pb.key)])
 
   def _scheduleFleetDestroy(self, star_pb):

@@ -300,9 +300,9 @@ def updateDeviceRegistration(registration_pb, user):
   clearCached(["devices:for-user:%s" % (user.user_id())])
   return registration_pb
 
+
 def getDevicesForUser(user_email):
   cache_key = "devices:for-user:%s" % (user_email)
-  logging.debug("Cache key: %s" % (cache_key))
   devices = getCached([cache_key], pb.DeviceRegistrations)
   if cache_key in devices:
     return devices[cache_key]

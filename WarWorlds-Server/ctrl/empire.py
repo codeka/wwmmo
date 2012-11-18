@@ -16,6 +16,7 @@ from ctrl import sector
 from ctrl import sectorgen
 from model import sector as sector_mdl
 from model import empire as mdl
+from model import c2dm as c2dm_mdl
 from protobufs import messages_pb2 as pb
 
 
@@ -695,6 +696,28 @@ def orderFleet(star_pb, fleet_pb, order_pb):
                       "sector:%d,%d" % (star_pb.sector_x, star_pb.sector_y)])
 
   return success
+
+
+def saveSituationReport(sitrep_pb):
+  """Saves the given situation report (a pb.SituationReport) to the data store, and (possibly)
+     generates a notification for the user as well."""
+  sitrep_blob = sitrep_pb.SerializeToString()
+  sitrep_mdl = mdl.SituationReport(parent=db.Key(sitrep_pb.empire_key))
+  sitrep_mdl.eventTime = ctrl.epochToDateTime(sitrep_pb.report_time)
+  sitrep_mdl.star = db.Key(sitrep_pb.star_key)
+  sitrep_mdl.report = sitrep_blob
+  sitrep_mdl.put()
+
+  ctrl.clearCached(["sitrep:for-empire:%s" % (sitrep_pb.empire_key),
+                    "sitrep:for-star:%s" % (sitrep_pb.star_key)])
+
+  # todo: check settings before generating the notification?
+  s = c2dm_mdl.Sender()
+  empire_pb = getEmpire(sitrep_pb.empire_key)
+  devices = ctrl.getDevicesForUser(empire_pb.email)
+  for device in devices.registrations:
+    s.sendMessage(device.device_registration_id, {"sitrep": sitrep_blob})
+
 
 
 class Design(object):

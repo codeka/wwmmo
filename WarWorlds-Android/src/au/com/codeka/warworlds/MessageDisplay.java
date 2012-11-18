@@ -44,9 +44,10 @@ public class MessageDisplay {
         Bundle extras = intent.getExtras();
         if (extras != null) {
             String message = (String) extras.get("msg");
-
-            displayNotification(context, message);
-            playNotificationSound(context);
+            if (message != null) {
+                displayNotification(context, message);
+                playNotificationSound(context);
+            }
         }
     }
 

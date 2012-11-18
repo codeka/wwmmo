@@ -652,7 +652,70 @@ message CombatReport
     repeated CombatRound rounds = 8;
 }
 
+
 message CombatReports
 {
     repeated CombatReport reports = 1;
 }
+
+
+//
+// A SituationReport is basically anything of interest to the player. For example, when you
+// finish a build, a Sit. Rep. is generated. When your fleet moves to another star, a Sit. Rep.
+// is generated, if your fleet is involved in combat, a Sit. Rep. is generated (one when it's
+// first attacked, and once more when it's defeated/victorious)
+//
+message SituationReport
+{
+    optional string key = 1;
+    optional string empire_key = 2;
+    optional int64 report_time = 3;
+    optional string star_key = 4;
+    optional int32 planet_index = 5;
+
+    // This record is used when a building has finished being built.
+    message BuildCompleteRecord
+    {
+        optional BuildRequest.BUILD_KIND build_kind = 1;
+        optional string design_id = 2;
+    }
+    optional BuildCompleteRecord build_complete_record = 6;
+
+    // This record is used when a fleet has completed a move to a star.
+    message MoveCompleteRecord
+    {
+        optional string fleet_key = 1;
+        optional string fleet_design_id = 3;
+        optional float num_ships = 4;
+    }
+    optional MoveCompleteRecord move_complete_record = 7;
+
+    // This record is used when a fleet comes under attack (also when it starts attacking
+    // another fleet)
+    message FleetUnderAttackRecord
+    {
+        optional string fleet_key = 1;
+        optional string fleet_design_id = 2;
+        optional float num_ships = 3;
+        optional string combat_report_key = 4;
+    }
+    optional FleetUnderAttackRecord fleet_under_attack_record = 8;
+
+    message FleetDestroyedRecord
+    {
+        optional string fleet_design_id = 1;
+        optional string combat_report_key = 2;
+    }
+    optional FleetDestroyedRecord fleet_destroyed_record = 9;
+
+    message FleetVictoriousRecord
+    {
+        optional string fleet_key = 1;
+        optional string fleet_design_id = 2;
+        optional float num_ships = 3;
+        optional string combat_report_key = 4;
+    }
+    optional FleetVictoriousRecord fleet_victorious_record = 10;
+}
+
+

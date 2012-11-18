@@ -218,3 +218,12 @@ class CombatReport(db.Model):
       reports.append(mdl)
     return reports
 
+
+class SituationReport(db.Model):
+  """A SituationReport contains a summary of every event that is of interest.
+
+  For example, when there's combat, when a building completes, when a movement complets, etc. This
+  model basically just contains a serialized pb.SituationReport protobuf."""
+  reportTime = db.DateTimeProperty()
+  star = db.ReferenceProperty(sector_mdl.Star)
+  report = db.BlobProperty()
