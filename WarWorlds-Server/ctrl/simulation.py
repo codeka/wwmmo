@@ -782,7 +782,6 @@ class Simulation(object):
       else:
         fleet_model = None
       if fleet_model:
-        logging.debug("3 fleet_pb[%s].empire_key = %s" % (fleet_pb.key, fleet_pb.empire_key))
         ctrl.fleetPbToModel(fleet_model, fleet_pb)
       else:
         fleet_model = mdl.Fleet(parent=db.Key(star_pb.key))

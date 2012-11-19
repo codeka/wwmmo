@@ -1,6 +1,7 @@
 """empire.py: Controller for empire-related functions. Aso contains the 'simulate' method."""
 
 
+import base64
 from datetime import datetime, timedelta
 import logging
 import math
@@ -16,8 +17,9 @@ from ctrl import sector
 from ctrl import sectorgen
 from model import sector as sector_mdl
 from model import empire as mdl
-from model import c2dm as c2dm_mdl
+from model import gcm as gcm_mdl
 from protobufs import messages_pb2 as pb
+from protobufs import protobuf_json
 
 
 def getEmpireForUser(user):
@@ -712,12 +714,14 @@ def saveSituationReport(sitrep_pb):
                     "sitrep:for-star:%s" % (sitrep_pb.star_key)])
 
   # todo: check settings before generating the notification?
-  s = c2dm_mdl.Sender()
   empire_pb = getEmpire(sitrep_pb.empire_key)
   devices = ctrl.getDevicesForUser(empire_pb.email)
+  registration_ids = []
   for device in devices.registrations:
-    s.sendMessage(device.device_registration_id, {"sitrep": sitrep_blob})
-
+    registration_ids.append(device.device_registration_id)
+  gcm = gcm_mdl.GCM('AIzaSyADWOC-tWUbzj-SVW13Sz5UuUiGfcmHHDA')
+  gcm.json_request(registration_ids=registration_ids,
+                   data={"sitrep": base64.b64encode(sitrep_blob)})
 
 
 class Design(object):

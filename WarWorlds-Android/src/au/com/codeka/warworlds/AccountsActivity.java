@@ -23,6 +23,8 @@ import java.util.concurrent.Callable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.android.gcm.GCMRegistrar;
+
 import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.app.Activity;
@@ -43,8 +45,6 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 import au.com.codeka.warworlds.api.ApiClient;
-
-import com.google.android.c2dm.C2DMessaging;
 
 /**
  * Account selections activity - handles device registration and unregistration.
@@ -97,11 +97,11 @@ public class AccountsActivity extends Activity {
         super.onResume();
         if (mPendingAuth) {
             mPendingAuth = false;
-            String regId = C2DMessaging.getRegistrationId(mContext);
+            String regId = GCMRegistrar.getRegistrationId(mContext);
             if (regId != null && ! "".equals(regId)) {
                 DeviceRegistrar.register(mContext, regId);
             } else {
-                C2DMessaging.register(mContext, C2DMReceiver.SENDER_ID);
+                GCMIntentService.register(this, null);
             }
         }
     }
@@ -243,8 +243,7 @@ public class AccountsActivity extends Activity {
                 String authCookie = Authenticator.authenticate(AccountsActivity.this, accountName);
                 ApiClient.getCookies().clear();
                 ApiClient.getCookies().add(authCookie);
-                String senderID = C2DMReceiver.SENDER_ID;
-                C2DMReceiver.register(AccountsActivity.this, senderID, onComplete);
+                GCMIntentService.register(AccountsActivity.this, onComplete);
 
                 // re-configure the authenticator, making sure it has details of the new user.
                 Authenticator.configure(mContext);
@@ -256,7 +255,7 @@ public class AccountsActivity extends Activity {
 
     private void unregister(final Callable<Void> onComplete) {
         mPleaseWaitDialog = ProgressDialog.show(mContext, null, "Logging out...", true);
-        C2DMReceiver.unregister(this, new Callable<Void>() {
+        GCMIntentService.unregister(this, new Callable<Void>() {
             public Void call() {
                 final SharedPreferences prefs = Util.getSharedPreferences(mContext);
                 SharedPreferences.Editor editor = prefs.edit();

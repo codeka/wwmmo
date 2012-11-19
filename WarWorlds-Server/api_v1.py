@@ -12,7 +12,7 @@ import import_fixer
 import_fixer.FixImports("google", "protobuf")
 
 import model
-from model import c2dm
+from model import gcm as gcm_mdl
 from ctrl import sector
 from ctrl import empire
 from ctrl import simulation
@@ -276,10 +276,13 @@ class DeviceMessagesPage(ApiPage):
       self.response.set_status(404)
       return
 
-    s = c2dm.Sender()
-    devices = ctrl.getDevicesForUser(user.email())
+    devices = ctrl.getDevicesForUser(email)
+    registration_ids = []
     for device in devices.registrations:
-      s.sendMessage(device.device_registration_id, {"msg": msg.message})
+      registration_ids.append(device.device_registration_id)
+    gcm = gcm_mdl.GCM('AIzaSyADWOC-tWUbzj-SVW13Sz5UuUiGfcmHHDA')
+    gcm.json_request(registration_ids=registration_ids,
+                     data={"msg": "Hello World"})
     return None
 
 
@@ -513,12 +516,10 @@ class FleetOrdersPage(ApiPage):
           self.response.set_status(403)
           return
 
-        logging.debug("1 fleet_pb[%s].empire_key = %s" % (fleet_pb.key, fleet_pb.empire_key))
         if not empire.orderFleet(star_pb, fleet_pb, order_pb):
           self.response.set_status(400)
         else:
           self.response.set_status(200)
-        logging.debug("2 fleet_pb[%s].empire_key = %s" % (fleet_pb.key, fleet_pb.empire_key))
         sim.update()
         return
 

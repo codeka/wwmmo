@@ -7,6 +7,8 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.android.gcm.GCMRegistrar;
+
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Dialog;
@@ -62,6 +64,9 @@ public class WarWorldsActivity extends Activity {
         Util.loadProperties(mContext);
         Authenticator.configure(mContext);
         PreferenceManager.setDefaultValues(this, R.xml.global_options, false);
+
+        GCMRegistrar.checkDevice(mContext);
+        GCMRegistrar.checkManifest(mContext);
 
         if (Util.isDebug()) {
             enableStrictMode();

@@ -15,6 +15,12 @@
  */
 package au.com.codeka.warworlds;
 
+import org.apache.commons.codec.binary.Base64;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.google.protobuf.InvalidProtocolBufferException;
+
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -26,11 +32,13 @@ import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
+import au.com.codeka.warworlds.model.protobuf.Messages;
 
 /**
  * Display a message as a notification, with an accompanying sound.
  */
 public class MessageDisplay {
+    private static Logger log = LoggerFactory.getLogger(MessageDisplay.class);
 
     private MessageDisplay() {
     }
@@ -43,12 +51,30 @@ public class MessageDisplay {
     public static void displayMessage(Context context, Intent intent) {
         Bundle extras = intent.getExtras();
         if (extras != null) {
-            String message = (String) extras.get("msg");
-            if (message != null) {
-                displayNotification(context, message);
+            for(String key : extras.keySet()) {
+                log.debug(String.format("%s = %s", key, extras.get(key)));
+            }
+            if (extras.containsKey("msg")) {
+                displayNotification(context, extras.get("msg").toString());
                 playNotificationSound(context);
+            } else if (extras.containsKey("sitrep")) {
+                byte[] blob = Base64.decodeBase64(extras.getString("sitrep"));
+                try {
+                    Messages.SituationReport sitrep = Messages.SituationReport.parseFrom(blob);
+                } catch (InvalidProtocolBufferException e) {
+                    log.error("Could not parse situation report!", e);
+                    return;
+                }
+
+                displayNotification(context, sitrep);
+                playNotificationSound(context);
+
             }
         }
+    }
+
+    private static void displayNotification(Context context, Messages.SituationReport sitrep) {
+        displayNotification(context, "We got a situation over here!");
     }
 
     private static void displayNotification(Context context, String message) {

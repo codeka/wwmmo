@@ -1,14 +1,14 @@
 
 package au.com.codeka.warworlds;
 
-import com.google.android.c2dm.C2DMBaseReceiver;
-import com.google.android.c2dm.C2DMessaging;
-
 import java.io.IOException;
 import java.util.concurrent.Callable;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.android.gcm.GCMBaseIntentService;
+import com.google.android.gcm.GCMRegistrar;
 
 import android.app.Activity;
 import android.content.Context;
@@ -17,27 +17,22 @@ import android.content.Intent;
 /**
  * Receive a push message from the Cloud to Device Messaging (C2DM) service.
  */
-public class C2DMReceiver extends C2DMBaseReceiver {
-    private static Logger log = LoggerFactory.getLogger(C2DMReceiver.class);
+public class GCMIntentService extends GCMBaseIntentService {
+    private static Logger log = LoggerFactory.getLogger(GCMIntentService.class);
     private static Callable<Void> sOnComplete;
     private static Activity sActivity;
 
-    public static String SENDER_ID = "warworlds.app-role@codeka.com.au";
-
-    public C2DMReceiver() {
-        super(SENDER_ID);
-    }
+    public static String PROJECT_ID = "990931198580";
 
     /**
      * Registers for C2DM notifications. Calls
      * AccountsActivity.registrationComplete() when finished.
      */
-    public static void register(Activity activity, String senderID,
-            final Callable<Void> onComplete) {
+    public static void register(Activity activity, final Callable<Void> onComplete) {
         sOnComplete = onComplete;
         sActivity = activity;
 
-        C2DMessaging.register(activity, SENDER_ID);
+        GCMRegistrar.register(activity, PROJECT_ID);
     }
 
     /**
@@ -47,7 +42,7 @@ public class C2DMReceiver extends C2DMBaseReceiver {
             final Callable<Void> onComplete) {
         sOnComplete = onComplete;
         sActivity = activity;
-        C2DMessaging.unregister(activity);
+        GCMRegistrar.unregister(activity);
     }
 
     /**
@@ -80,9 +75,9 @@ public class C2DMReceiver extends C2DMBaseReceiver {
      *             if registration cannot be performed
      */
     @Override
-    public void onRegistered(Context context, String registration) {
-        log.info("C2DM device registration complete: "+registration);
-        DeviceRegistrar.register(context, registration);
+    public void onRegistered(Context context, String deviceRegistrationID) {
+        log.info("GCM device registration complete, deviceRegistrationID = "+deviceRegistrationID);
+        DeviceRegistrar.register(context, deviceRegistrationID);
         callOnComplete();
     }
 
@@ -93,26 +88,29 @@ public class C2DMReceiver extends C2DMBaseReceiver {
      *            the Context
      */
     @Override
-    public void onUnregistered(Context context) {
-        log.info("Unregistered from C2DM.");
+    public void onUnregistered(Context context, String deviceRegistrationID) {
+        log.info("Unregistered from GCM, deviceRegistrationID = "+deviceRegistrationID);
         DeviceRegistrar.unregister(context);
         callOnComplete();
     }
 
     /**
-     * Called on registration error. This is called in the context of a Service
-     * - no dialog or UI.
-     * 
-     * @param context
-     *            the Context
-     * @param errorId
-     *            an error message, defined in {@link C2DMBaseReceiver}
+     * Called where there's a non-recoverable error.
      */
     @Override
     public void onError(Context context, String errorId) {
         log.error("An error has occured! Error={}", errorId);
         DeviceRegistrar.register(context, "");
         callOnComplete();
+    }
+
+    /**
+     * Called when there's a \i recoverable error.
+     */
+    @Override
+    public boolean onRecoverableError(Context context, String errorId) {
+        log.error("A recoverable error has occured, trying again. Error={}", errorId);
+        return true;
     }
 
     /**
@@ -124,7 +122,7 @@ public class C2DMReceiver extends C2DMBaseReceiver {
         // set to go still.
         Util.loadProperties(this);
 
-        log.info("C2DM message received.");
+        log.info("GCM message received.");
         MessageDisplay.displayMessage(context, intent);
     }
 }

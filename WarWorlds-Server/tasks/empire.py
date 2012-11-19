@@ -17,7 +17,6 @@ from ctrl import sector as sector_ctl
 from ctrl import simulation as simulation_ctl
 from model import empire as mdl
 from model import sector as sector_mdl
-from model import c2dm
 import protobufs.messages_pb2 as pb
 import tasks
 
@@ -131,7 +130,6 @@ class BuildCheckPage(tasks.TaskPage):
       sitrep_pb.report_time = ctrl.dateTimeToEpoch(sim.now)
       sitrep_pb.star_key = str(star_key)
       sitrep_pb.planet_index = build_request_model.colony.planet_index
-      sitrep_pb.build_complete_record = pb.SituationReport.BuildCompleteRecord()
       sitrep_pb.build_complete_record.build_kind = build_request_model.designKind
       sitrep_pb.build_complete_record.design_id = build_request_model.designName
       ctl.saveSituationReport(sitrep_pb)
@@ -239,9 +237,8 @@ class FleetMoveCompletePage(tasks.TaskPage):
       sitrep_pb.report_time = ctrl.dateTimeToEpoch(sim.now)
       sitrep_pb.star_key = new_star_pb.key
       sitrep_pb.planet_index = -1
-      sitrep_pb.move_complete_record = pb.SituationReport.MoveCompleteRecord()
       sitrep_pb.move_complete_record.fleet_key = new_fleet_pb.key
-      sitrep_pb.move_complete_record.design_id = new_fleet_pb.design_name
+      sitrep_pb.move_complete_record.fleet_design_id = new_fleet_pb.design_name
       sitrep_pb.move_complete_record.num_ships = new_fleet_pb.num_ships
 
       combat_report_pb = sim.getCombatReport(new_star_pb.key)
@@ -251,10 +248,9 @@ class FleetMoveCompletePage(tasks.TaskPage):
         # for any other empires that are already here...
         round_1 = combat_report_pb.rounds[0]
         for combat_fleet_pb in round_1.fleets:
-          if combat_fleet_pb.key == new_fleet_pb.key:
-            sitrep_pb.fleet_under_attack_record = pb.SituationReport.FleetUnderAttackRecord()
+          if combat_fleet_pb.fleet_key == new_fleet_pb.key:
             sitrep_pb.fleet_under_attack_record.fleet_key = new_fleet_pb.key
-            sitrep_pb.fleet_under_attack_record.design_id = new_fleet_pb.design_name
+            sitrep_pb.fleet_under_attack_record.fleet_design_id = new_fleet_pb.design_name
             sitrep_pb.fleet_under_attack_record.num_ships = new_fleet_pb.num_ships
             sitrep_pb.fleet_under_attack_record.combat_report_key = combat_report_pb.key
 
@@ -306,8 +302,7 @@ class FleetDestroyedPage(tasks.TaskPage):
       sitrep_pb.report_time = ctrl.dateTimeToEpoch(sim.now)
       sitrep_pb.star_key = star_pb.key
       sitrep_pb.planet_index = -1
-      sitrep_pb.fleet_destroyed_record = pb.SituationReport.FleetDestroyedRecord()
-      sitrep_pb.fleet_destroyed_record.design_id = fleet_pb.design_name
+      sitrep_pb.fleet_destroyed_record.fleet_design_id = fleet_pb.design_name
       sitrep_pb.fleet_destroyed_record.combat_report_key = "TODO"
       ctl.saveSituationReport(sitrep_pb)
 
