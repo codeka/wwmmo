@@ -153,6 +153,8 @@ public class EmpireActivity extends TabFragmentActivity {
                 return getLoadingView(inflator);
             }
 
+            final Context context = getActivity();
+
             View v = inflator.inflate(R.layout.empire_colonies_tab, null);
             ColonyList colonyList = (ColonyList) v.findViewById(R.id.colony_list);
             colonyList.refresh(sCurrentEmpire.getAllColonies(), sCurrentEmpire.getImportantStars());
@@ -177,7 +179,7 @@ public class EmpireActivity extends TabFragmentActivity {
 
                 @Override
                 public void onCollectTaxes(Star star, Colony colony) {
-                    EmpireManager.getInstance().getEmpire().collectTaxes(star, colony);
+                    EmpireManager.getInstance().getEmpire().collectTaxes(context, star, colony);
                 }
             });
 
@@ -195,6 +197,8 @@ public class EmpireActivity extends TabFragmentActivity {
             View v = inflator.inflate(R.layout.empire_fleets_tab, null);
             FleetList fleetList = (FleetList) v.findViewById(R.id.fleet_list);
             fleetList.refresh(sCurrentEmpire.getAllFleets(), sCurrentEmpire.getImportantStars());
+
+            final Context context = getActivity();
 
             EmpireActivity activity = (EmpireActivity) getActivity();
             if (activity.mFirstRefresh) {
@@ -241,9 +245,8 @@ public class EmpireActivity extends TabFragmentActivity {
 
                 @Override
                 public void onFleetStanceModified(Star star, Fleet fleet, Fleet.Stance newStance) {
-                    EmpireManager.getInstance().getEmpire().updateFleetStance(star,
-                                                                              fleet,
-                                                                              newStance);
+                    EmpireManager.getInstance().getEmpire().updateFleetStance(context, star,
+                                                                              fleet, newStance);
                 }
             });
 

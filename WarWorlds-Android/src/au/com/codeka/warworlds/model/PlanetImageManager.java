@@ -1,5 +1,6 @@
 package au.com.codeka.warworlds.model;
 
+import java.util.Locale;
 import java.util.Random;
 
 import android.content.Context;
@@ -22,7 +23,8 @@ public class PlanetImageManager extends ImageManager {
      * Gets a \c Sprite for the given planet.
      */
     public Sprite getSprite(Context context, Planet planet) {
-        String key = String.format("%s-%d", planet.getStar().getKey(), planet.getIndex());
+        String key = String.format(Locale.ENGLISH, "%s-%d",
+                                   planet.getStarSummary().getKey(), planet.getIndex());
         PlanetExtra planetExtra = new PlanetExtra(context, planet);
         Bitmap bmp = getBitmap(context, key, 100, planetExtra);
         if (bmp == null) {
@@ -33,7 +35,7 @@ public class PlanetImageManager extends ImageManager {
                 return s;
             }
 
-            int frameNo = new Random(planet.getStar().hashCode()).nextInt(s.getNumFrames());
+            int frameNo = new Random(planet.getStarSummary().hashCode()).nextInt(s.getNumFrames());
             s = s.extractFrame(frameNo);
             s.setScale((float) getPlanetSize(planetExtra) / 10.0f);
             return s;
@@ -48,8 +50,8 @@ public class PlanetImageManager extends ImageManager {
     @Override
     protected Template getTemplate(Object extra) {
         PlanetExtra planetExtra = (PlanetExtra) extra;
-        String key = String.format("%s-%d",
-                                   planetExtra.planet.getStar().getKey(),
+        String key = String.format(Locale.ENGLISH, "%s-%d",
+                                   planetExtra.planet.getStarSummary().getKey(),
                                    planetExtra.planet.getIndex());
         return loadTemplate(planetExtra.context,
                              planetExtra.planet.getPlanetType().getBitmapBasePath(),
@@ -63,7 +65,7 @@ public class PlanetImageManager extends ImageManager {
     @Override
     protected Vector3 getSunDirection(Object extra) {
         PlanetExtra planetExtra = (PlanetExtra) extra;
-        int numPlanets = planetExtra.planet.getStar().getNumPlanets();
+        int numPlanets = planetExtra.planet.getStarSummary().getNumPlanets();
         float angle = (0.5f/(numPlanets + 1));
         angle = (float) ((angle*planetExtra.planet.getIndex()*Math.PI) + angle*Math.PI);
 

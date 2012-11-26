@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 
 import android.app.Activity;
 import android.app.Dialog;
+import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.Editable;
@@ -37,6 +38,7 @@ import au.com.codeka.warworlds.model.StarManager;
 
 public class BuildConfirmDialog extends Dialog implements DialogManager.DialogConfigurable {
     private static Logger log = LoggerFactory.getLogger(BuildConfirmDialog.class);
+    private Context mContext;
     private Colony mColony;
     private Design mDesign;
     private int mCurrentQueueSize;
@@ -45,6 +47,7 @@ public class BuildConfirmDialog extends Dialog implements DialogManager.DialogCo
 
     public BuildConfirmDialog(Activity activity) {
         super(activity);
+        mContext = activity;
     }
 
     @Override
@@ -156,7 +159,7 @@ public class BuildConfirmDialog extends Dialog implements DialogManager.DialogCo
                         BuildQueueManager.getInstance().refresh(buildRequest);
 
                         // tell the StarManager that this star has been updated
-                        StarManager.getInstance().refreshStar(mColony.getStarKey());
+                        StarManager.getInstance().refreshStar(mContext, mColony.getStarKey());
                     }
                 }.execute();
 

@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
@@ -41,6 +42,7 @@ import au.com.codeka.warworlds.model.SpriteDrawable;
 import au.com.codeka.warworlds.model.Star;
 import au.com.codeka.warworlds.model.StarImageManager;
 import au.com.codeka.warworlds.model.StarManager;
+import au.com.codeka.warworlds.model.StarSummary;
 
 /**
  * This control displays a list of fleets along with controls you can use to manage them (split
@@ -232,21 +234,21 @@ public class FleetList extends FrameLayout implements StarManager.StarFetchedHan
         if (fleet.getNumShips() == 1) {
             text = design.getDisplayName();
         } else {
-            text = String.format("%s (× %d)", design.getDisplayName(), fleet.getNumShips());
+            text = String.format(Locale.ENGLISH, "%s (× %d)", design.getDisplayName(), fleet.getNumShips());
         }
         row1.setText(text);
 
         text = String.format("%s (stance: %s)",
-                             StringUtils.capitalize(fleet.getState().toString().toLowerCase()),
-                             StringUtils.capitalize(fleet.getStance().toString().toLowerCase()));
+                             StringUtils.capitalize(fleet.getState().toString().toLowerCase(Locale.ENGLISH)),
+                             StringUtils.capitalize(fleet.getStance().toString().toLowerCase(Locale.ENGLISH)));
         row2.setText(text);
 
         if (fleet.getState() == Fleet.State.MOVING) {
             row3.setVisibility(View.GONE);
-            StarManager.getInstance().requestStar(fleet.getDestinationStarKey(), false,
-                    new StarManager.StarFetchedHandler() {
+            StarManager.getInstance().requestStarSummary(context, fleet.getDestinationStarKey(),
+                    new StarManager.StarSummaryFetchedHandler() {
                         @Override
-                        public void onStarFetched(Star destStar) {
+                        public void onStarSummaryFetched(StarSummary destStar) {
                             Star srcStar = null;
                             if (stars != null) {
                                 srcStar = stars.get(fleet.getStarKey());
@@ -279,17 +281,17 @@ public class FleetList extends FrameLayout implements StarManager.StarFetchedHan
      */
     private static class FleetListImageGetter implements Html.ImageGetter {
         private Context mContext;
-        private Star mStar;
+        private StarSummary mStarSummary;
 
-        public FleetListImageGetter(Context context, Star star) {
+        public FleetListImageGetter(Context context, StarSummary starSummary) {
             mContext = context;
-            mStar = star;
+            mStarSummary = starSummary;
         }
 
         @Override
         public Drawable getDrawable(String source) {
-            if (mStar != null) {
-                Sprite sprite = StarImageManager.getInstance().getSprite(mContext, mStar, -1);
+            if (mStarSummary != null) {
+                Sprite sprite = StarImageManager.getInstance().getSprite(mContext, mStarSummary, -1);
                 Drawable d = new SpriteDrawable(sprite);
                 d.setBounds(0, 0, d.getIntrinsicWidth(), d.getIntrinsicHeight());
                 return d;

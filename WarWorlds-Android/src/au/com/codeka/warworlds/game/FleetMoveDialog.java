@@ -1,5 +1,7 @@
 package au.com.codeka.warworlds.game;
 
+import java.util.Locale;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -33,6 +35,7 @@ import au.com.codeka.warworlds.model.ShipDesignManager;
 import au.com.codeka.warworlds.model.Sprite;
 import au.com.codeka.warworlds.model.Star;
 import au.com.codeka.warworlds.model.StarManager;
+import au.com.codeka.warworlds.model.StarSummary;
 import au.com.codeka.warworlds.model.protobuf.Messages;
 
 public class FleetMoveDialog extends Dialog implements DialogManager.DialogConfigurable {
@@ -41,7 +44,7 @@ public class FleetMoveDialog extends Dialog implements DialogManager.DialogConfi
     private StarfieldSurfaceView mStarfield;
     private SourceStarOverlay mSourceStarOverlay;
     private DestinationStarOverlay mDestinationStarOverlay;
-    private Star mSourceStar;
+    private StarSummary mSourceStarSummary;
 
     public static final int ID = 1008;
 
@@ -89,18 +92,19 @@ public class FleetMoveDialog extends Dialog implements DialogManager.DialogConfi
                 mStarfield.addOverlay(mDestinationStarOverlay, star);
                 mSourceStarOverlay.reset();
 
-                if (mSourceStar != null) {
+                if (mSourceStarSummary != null) {
                     float distanceInParsecs = SectorManager.getInstance()
-                                              .distanceInParsecs(mSourceStar, star);
+                                              .distanceInParsecs(mSourceStarSummary, star);
                     ShipDesign design = ShipDesignManager.getInstance().getDesign(mFleet.getDesignID());
 
-                    String leftDetails = String.format("<b>Star:</b> %s<br /><b>Distance:</b> %.2f pc",
+                    String leftDetails = String.format(Locale.ENGLISH,
+                            "<b>Star:</b> %s<br /><b>Distance:</b> %.2f pc",
                             star.getName(), distanceInParsecs);
                     starDetailsLeft.setText(Html.fromHtml(leftDetails));
 
                     float timeInHours = distanceInParsecs / design.getSpeedInParsecPerHour();
-                    int hrs = (int) FloatMath.floor(timeInHours);
-                    int mins = (int) FloatMath.floor((timeInHours - hrs) * 60.0f);
+                    int hrs = (int) Math.floor(timeInHours);
+                    int mins = (int) Math.floor((timeInHours - hrs) * 60.0f);
 
                     float cost = design.getFuelCost(distanceInParsecs, mFleet.getNumShips());
                     String cash = Cash.format(cost);
@@ -112,7 +116,8 @@ public class FleetMoveDialog extends Dialog implements DialogManager.DialogConfi
                         fontClose = "</font>";
                     }
 
-                    String rightDetails = String.format("<b>ETA:</b> %d hrs, %d mins<br />%s<b>Cost:</b> %s%s",
+                    String rightDetails = String.format(Locale.ENGLISH,
+                            "<b>ETA:</b> %d hrs, %d mins<br />%s<b>Cost:</b> %s%s",
                             hrs, mins, fontOpen, cash, fontClose);
                     starDetailsRight.setText(Html.fromHtml(rightDetails));
                 }
@@ -172,7 +177,7 @@ public class FleetMoveDialog extends Dialog implements DialogManager.DialogConfi
                             dialog.show();
                         } else {
                             // the star this fleet is attached to needs to be refreshed...
-                            StarManager.getInstance().refreshStar(mFleet.getStarKey());
+                            StarManager.getInstance().refreshStar(mActivity, mFleet.getStarKey());
                             moveBtn.setEnabled(true);
                             cancelBtn.setEnabled(true);
                             if (success) {
@@ -204,11 +209,11 @@ public class FleetMoveDialog extends Dialog implements DialogManager.DialogConfi
         mStarfield.removeOverlay(mDestinationStarOverlay);
         mStarfield.deselectStar();
 
-        StarManager.getInstance().requestStar(mFleet.getStarKey(), false,
-                                              new StarManager.StarFetchedHandler() {
+        StarManager.getInstance().requestStarSummary(mActivity, mFleet.getStarKey(),
+                                                     new StarManager.StarSummaryFetchedHandler() {
             @Override
-            public void onStarFetched(Star s) {
-                mSourceStar = s;
+            public void onStarSummaryFetched(StarSummary s) {
+                mSourceStarSummary = s;
 
                 long sectorX = s.getSectorX();
                 long sectorY = s.getSectorY();

@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 
 import android.app.Activity;
 import android.app.Dialog;
+import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
@@ -26,11 +27,13 @@ public class FocusDialog extends Dialog implements DialogManager.DialogConfigura
     private static Logger log = LoggerFactory.getLogger(FocusDialog.class);
     private Colony mColony;
     private List<SeekBar> mSeekBars;
+    private Context mContext;
 
     public static final int ID = 1002;
 
     public FocusDialog(Activity activity) {
         super(activity);
+        mContext = activity;
     }
 
     @Override
@@ -102,7 +105,7 @@ public class FocusDialog extends Dialog implements DialogManager.DialogConfigura
                     @Override
                     protected void onPostExecute(Void unused) {
                         // notify the StarManager that this star has been updated
-                        StarManager.getInstance().refreshStar(mColony.getStarKey());
+                        StarManager.getInstance().refreshStar(mContext, mColony.getStarKey());
 
                         okButton.setEnabled(true);
                         dismiss();

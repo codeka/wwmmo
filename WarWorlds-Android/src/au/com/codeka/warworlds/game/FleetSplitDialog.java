@@ -70,7 +70,7 @@ public class FleetSplitDialog extends Dialog implements DialogManager.DialogConf
                     @Override
                     protected void onPostExecute(Boolean success) {
                         // the star this fleet is attached to needs to be refreshed...
-                        StarManager.getInstance().refreshStar(mFleet.getStarKey());
+                        StarManager.getInstance().refreshStar(mContext, mFleet.getStarKey());
                         splitBtn.setEnabled(true);
                         if (success) {
                             dismiss();

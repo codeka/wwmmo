@@ -59,8 +59,10 @@ public class MessageDisplay {
                 playNotificationSound(context);
             } else if (extras.containsKey("sitrep")) {
                 byte[] blob = Base64.decodeBase64(extras.getString("sitrep"));
+
+                Messages.SituationReport sitrep;
                 try {
-                    Messages.SituationReport sitrep = Messages.SituationReport.parseFrom(blob);
+                    sitrep = Messages.SituationReport.parseFrom(blob);
                 } catch (InvalidProtocolBufferException e) {
                     log.error("Could not parse situation report!", e);
                     return;

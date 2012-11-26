@@ -63,7 +63,7 @@ public class BuildActivity extends TabFragmentActivity implements StarManager.St
         String starKey = extras.getString("au.com.codeka.warworlds.StarKey");
         mColony = (Colony) extras.getParcelable("au.com.codeka.warworlds.Colony");
 
-        StarManager.getInstance().requestStar(starKey, false, this);
+        StarManager.getInstance().requestStar(mContext, starKey, false, this);
         StarManager.getInstance().addStarUpdatedListener(starKey, this);
 
         super.onResume();

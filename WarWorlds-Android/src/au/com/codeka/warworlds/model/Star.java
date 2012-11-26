@@ -14,102 +14,20 @@ import au.com.codeka.warworlds.model.protobuf.Messages;
 /**
  * A star is \i basically a container for planets. It shows up on the starfield list.
  */
-public class Star implements Parcelable {
-    private static StarType[] sStarTypes = {
-        new StarType.Builder().setIndex(0)
-                              .setDisplayName("Blue")
-                              .setInternalName("blue")
-                              .build(),
-        new StarType.Builder().setIndex(1)
-                              .setDisplayName("White")
-                              .setInternalName("white")
-                              .build(),
-        new StarType.Builder().setIndex(2)
-                              .setDisplayName("Yellow")
-                              .setInternalName("yellow")
-                              .build(),
-        new StarType.Builder().setIndex(3)
-                              .setDisplayName("Orange")
-                              .setInternalName("orange")
-                              .build(),
-        new StarType.Builder().setIndex(4)
-                              .setDisplayName("Red")
-                              .setInternalName("red")
-                              .build(),
-        new StarType.Builder().setIndex(5)
-                              .setDisplayName("Neutron")
-                              .setInternalName("neutron")
-                              .setBaseSize(1.0)
-                              .setImageScale(4.0)
-                              .build(),
-        new StarType.Builder().setIndex(6)
-                              .setDisplayName("Back Hole")
-                              .setInternalName("black-hole")
-                              .build()
-    };
-
+public class Star extends StarSummary {
     private static Logger log = LoggerFactory.getLogger(Star.class);
-    private Sector mSector;
-    private String mKey;
-    private String mName;
-    private StarType mStarType;
-    private int mSize;
-    private long mSectorX;
-    private long mSectorY;
-    private int mOffsetX;
-    private int mOffsetY;
-    private Planet[] mPlanets;
     private ArrayList<Colony> mColonies;
     private ArrayList<EmpirePresence> mEmpires;
     private ArrayList<Fleet> mFleets;
     private ArrayList<BuildRequest> mBuildRequests;
 
     public Star() {
-        mSector = null; // can be null if we're fetched separately from the sector
-        mPlanets = null; // can be null if planets have not been populated...
         mColonies = null;
         mEmpires = null;
         mFleets = null;
         mBuildRequests = null;
     }
 
-    public Sector getSector() {
-        return mSector;
-    }
-    public String getKey() {
-        return mKey;
-    }
-    public String getName() {
-        return mName;
-    }
-    public StarType getStarType() {
-        return mStarType;
-    }
-    public int getSize() {
-        return mSize;
-    }
-    public long getSectorX() {
-        return mSectorX;
-    }
-    public long getSectorY() {
-        return mSectorY;
-    }
-    public int getOffsetX() {
-        return mOffsetX;
-    }
-    public int getOffsetY() {
-        return mOffsetY;
-    }
-    public int getNumPlanets() {
-        if (mPlanets == null) {
-            return 0;
-        } else {
-            return mPlanets.length;
-        }
-    }
-    public Planet[] getPlanets() {
-        return mPlanets;
-    }
     public List<Colony> getColonies() {
         return mColonies;
     }
@@ -154,48 +72,12 @@ public class Star implements Parcelable {
         return null;
     }
 
-    public void setDummySector(long sectorX, long sectorY) {
-        mSector = new Sector.DummySector(sectorX, sectorY);
-    }
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel parcel, int flags) {
-        parcel.writeString(mKey);
-        parcel.writeString(mName);
-        parcel.writeInt(mStarType.getIndex());
-        parcel.writeInt(mSize);
-        parcel.writeLong(mSectorX);
-        parcel.writeLong(mSectorY);
-        parcel.writeInt(mOffsetX);
-        parcel.writeInt(mOffsetY);
-        parcel.writeParcelableArray(mPlanets, flags);
-    }
-
     public static final Parcelable.Creator<Star> CREATOR
                 = new Parcelable.Creator<Star>() {
         @Override
         public Star createFromParcel(Parcel parcel) {
             Star s = new Star();
-            s.mKey = parcel.readString();
-            s.mName = parcel.readString();
-            s.mStarType = sStarTypes[parcel.readInt()];
-            s.mSize = parcel.readInt();
-            s.mSectorX = parcel.readLong();
-            s.mSectorY = parcel.readLong();
-            s.mOffsetX = parcel.readInt();
-            s.mOffsetY = parcel.readInt();
-
-            Parcelable[] planets = parcel.readParcelableArray(Planet.class.getClassLoader());
-            s.mPlanets = new Planet[planets.length];
-            for (int i = 0; i < planets.length; i++) {
-                s.mPlanets[i] = (Planet) planets[i];
-            }
-
+            s.populateFromParcel(parcel);
             return s;
         }
 
@@ -205,32 +87,11 @@ public class Star implements Parcelable {
         }
     };
 
-    public static Star fromProtocolBuffer(Messages.Star pb) {
-        return fromProtocolBuffer(null, pb);
-    }
+    @Override
+    public void populateFromProtocolBuffer(Messages.Star pb) {
+        super.populateFromProtocolBuffer(pb);
 
-    /**
-     * Converts the given Star protocol buffer into a \c Star.
-     */
-    public static Star fromProtocolBuffer(Sector sector, Messages.Star pb) {
-        Star s = new Star();
-        s.mSector = sector;
-        s.mKey = pb.getKey();
-        s.mName = pb.getName();
-        s.mStarType = sStarTypes[pb.getClassification().getNumber()];
-        s.mSize = pb.getSize();
-        s.mSectorX = pb.getSectorX();
-        s.mSectorY = pb.getSectorY();
-        s.mOffsetX = pb.getOffsetX();
-        s.mOffsetY = pb.getOffsetY();
-
-        int numPlanets = pb.getPlanetsCount();
-        s.mPlanets = new Planet[numPlanets];
-        for (int i = 0; i < numPlanets; i++) {
-            s.mPlanets[i] = Planet.fromProtocolBuffer(s, pb.getPlanets(i));
-        }
-
-        s.mColonies = new ArrayList<Colony>();
+        mColonies = new ArrayList<Colony>();
         for(Messages.Colony colony_pb : pb.getColoniesList()) {
             Colony c = Colony.fromProtocolBuffer(colony_pb);
 
@@ -242,100 +103,31 @@ public class Star implements Parcelable {
                 }
             }
 
-            s.mColonies.add(c);
+            mColonies.add(c);
         }
 
-        s.mEmpires = new ArrayList<EmpirePresence>();
+        mEmpires = new ArrayList<EmpirePresence>();
         for (Messages.EmpirePresence empirePresencePb : pb.getEmpiresList()) {
-            s.mEmpires.add(EmpirePresence.fromProtocolBuffer(empirePresencePb));
+            mEmpires.add(EmpirePresence.fromProtocolBuffer(empirePresencePb));
         }
 
-        s.mBuildRequests = new ArrayList<BuildRequest>();
+        mBuildRequests = new ArrayList<BuildRequest>();
         for (Messages.BuildRequest buildRequestPb : pb.getBuildRequestsList()) {
-            s.mBuildRequests.add(BuildRequest.fromProtocolBuffer(buildRequestPb));
+            mBuildRequests.add(BuildRequest.fromProtocolBuffer(buildRequestPb));
         }
 
-        s.mFleets = new ArrayList<Fleet>();
+        mFleets = new ArrayList<Fleet>();
         for (Messages.Fleet fleetPb : pb.getFleetsList()) {
-            s.mFleets.add(Fleet.fromProtocolBuffer(fleetPb));
+            mFleets.add(Fleet.fromProtocolBuffer(fleetPb));
         }
-
-        return s;
     }
 
-    public static class StarType {
-        private int mIndex;
-        private String mDisplayName;
-        private String mInternalName;
-        private double mBaseSize;
-        private double mImageScale;
-
-        public int getIndex() {
-            return mIndex;
-        }
-        public String getDisplayName() {
-            return mDisplayName;
-        }
-        public String getInternalName() {
-            return mInternalName;
-        }
-        public String getBitmapBasePath() {
-            return "stars/"+mInternalName;
-        }
-
-        /**
-         * Gets the 'base size' of the star, which controls the "planet size" setting when
-         * we render the image.
-         */
-        public double getBaseSize() {
-            return mBaseSize;
-        }
-
-        /**
-         * When generating the image, we scale the final bitmap by this amount. Default is 1.0
-         * obviously.
-         */
-        public double getImageScale() {
-            return mImageScale;
-        }
-
-        public static class Builder {
-            private StarType mStarType;
-
-            public Builder() {
-                mStarType = new StarType();
-                mStarType.mBaseSize = 8.0;
-                mStarType.mImageScale = 1.0;
-            }
-
-            public Builder setIndex(int index) {
-                mStarType.mIndex = index;
-                return this;
-            }
-
-            public Builder setDisplayName(String displayName) {
-                mStarType.mDisplayName = displayName;
-                return this;
-            }
-
-            public Builder setInternalName(String internalName) {
-                mStarType.mInternalName = internalName;
-                return this;
-            }
-
-            public Builder setBaseSize(double baseSize) {
-                mStarType.mBaseSize = baseSize;
-                return this;
-            }
-
-            public Builder setImageScale(double scale) {
-                mStarType.mImageScale = scale;
-                return this;
-            }
-
-            public StarType build() {
-                return mStarType;
-            }
-        }
+    /**
+     * Converts the given Star protocol buffer into a \c Star.
+     */
+    public static Star fromProtocolBuffer(Messages.Star pb) {
+        Star s = new Star();
+        s.populateFromProtocolBuffer(pb);
+        return s;
     }
 }

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Random;
 import java.util.TreeMap;
@@ -44,6 +45,7 @@ import au.com.codeka.warworlds.model.ShipDesignManager;
 import au.com.codeka.warworlds.model.Sprite;
 import au.com.codeka.warworlds.model.Star;
 import au.com.codeka.warworlds.model.StarImageManager;
+import au.com.codeka.warworlds.model.StarSummary;
 
 /**
  * \c SurfaceView that displays the starfield. You can scroll around, tap on stars to bring
@@ -183,13 +185,13 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
     /**
      * Adds the given \c VisibleEntityAttachedOverlay and attaches it to the given star.
      */
-    public void addOverlay(VisibleEntityAttachedOverlay overlay, Star star) {
+    public void addOverlay(VisibleEntityAttachedOverlay overlay, StarSummary starSummary) {
         addOverlay(overlay);
 
-        List<VisibleEntityAttachedOverlay> starAttachedOverlays = mStarAttachedOverlays.get(star.getKey());
+        List<VisibleEntityAttachedOverlay> starAttachedOverlays = mStarAttachedOverlays.get(starSummary.getKey());
         if (starAttachedOverlays == null) {
             starAttachedOverlays = new ArrayList<VisibleEntityAttachedOverlay>();
-            mStarAttachedOverlays.put(star.getKey(), starAttachedOverlays);
+            mStarAttachedOverlays.put(starSummary.getKey(), starAttachedOverlays);
         }
         starAttachedOverlays.add(overlay);
     }
@@ -632,7 +634,7 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
                 if (n.equals(1)) {
                     name = emp.getDisplayName();
                 } else {
-                    name = String.format("%s (%d)", emp.getDisplayName(), n);
+                    name = String.format(Locale.ENGLISH, "%s (%d)", emp.getDisplayName(), n);
                 }
 
                 Rect bounds = new Rect();
@@ -682,7 +684,7 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
                     mMatrix.postTranslate(pt.x * pixelScale, pt.y * pixelScale);
                     canvas.drawBitmap(mFleetMultiBitmap, mMatrix, mStarPaint);
 
-                    String name = String.format("%s (%d)", emp.getDisplayName(), numShips);
+                    String name = String.format(Locale.ENGLISH, "%s (%d)", emp.getDisplayName(), numShips);
 
                     Rect bounds = new Rect();
                     mStarPaint.getTextBounds(name, 0, name.length(), bounds);
@@ -817,7 +819,7 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
             String msg = emp.getDisplayName();
             canvas.drawText(msg, position.x + (30.0f * pixelScale), position.y, mStarPaint);
 
-            msg = String.format("%s (%d)", design.getDisplayName(), fleet.getNumShips());
+            msg = String.format(Locale.ENGLISH, "%s (%d)", design.getDisplayName(), fleet.getNumShips());
             canvas.drawText(msg, position.x + (30.0f * pixelScale), position.y + (10.0f * pixelScale), mStarPaint);
         }
 

@@ -9,6 +9,7 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -50,16 +51,17 @@ public class MyEmpire extends Empire {
      * Colonizes the given planet. We'll call the given \c ColonizeCompleteHandler when the
      * operation completes (successfully or not).
      */
-    public void colonize(final Planet planet, final ColonizeCompleteHandler callback) {
+    public void colonize(final Context context, final Planet planet,
+                         final ColonizeCompleteHandler callback) {
         log.debug(String.format("Colonizing: Star=%s Planet=%d",
-                                planet.getStar().getKey(),
+                                planet.getStarSummary().getKey(),
                                 planet.getIndex()));
         new AsyncTask<Void, Void, Colony>() {
             @Override
             protected Colony doInBackground(Void... arg0) {
                 try {
-                    if (planet.getStar() == null) {
-                        log.warn("planet.getStar() returned null!");
+                    if (planet.getStarSummary() == null) {
+                        log.warn("planet.getStarSummary() returned null!");
                         return null;
                     }
 
@@ -67,7 +69,7 @@ public class MyEmpire extends Empire {
                             .setPlanetIndex(planet.getIndex())
                             .build();
 
-                    String url = String.format("stars/%s/colonies", planet.getStar().getKey());
+                    String url = String.format("stars/%s/colonies", planet.getStarSummary().getKey());
                     Messages.Colony pb = ApiClient.postProtoBuf(url, request, Messages.Colony.class);
                     if (pb == null)
                         return null;
@@ -90,12 +92,12 @@ public class MyEmpire extends Empire {
                 }
 
                 // make sure we record the fact that the star is updated as well
-                StarManager.getInstance().refreshStar(colony.getStarKey());
+                StarManager.getInstance().refreshStar(context, colony.getStarKey());
             }
         }.execute();
     }
 
-    public void collectTaxes(final Star star, final Colony colony) {
+    public void collectTaxes(final Context context, final Star star, final Colony colony) {
         new AsyncTask<Void, Void, Colony>() {
             @Override
             protected Colony doInBackground(Void... arg0) {
@@ -121,12 +123,12 @@ public class MyEmpire extends Empire {
 
                 // make sure we record the fact that the star is updated as well
                 EmpireManager.getInstance().refreshEmpire(getKey());
-                StarManager.getInstance().refreshStar(colony.getStarKey());
+                StarManager.getInstance().refreshStar(context, colony.getStarKey());
             }
         }.execute();
     }
 
-    public void updateFleetStance(final Star star, final Fleet fleet,
+    public void updateFleetStance(final Context context, final Star star, final Fleet fleet,
                                   final Fleet.Stance newStance) {
         new AsyncTask<Void, Void, Boolean>() {
             @Override
@@ -156,7 +158,7 @@ public class MyEmpire extends Empire {
 
                 // make sure we record the fact that the star is updated as well
                 EmpireManager.getInstance().refreshEmpire(getKey());
-                StarManager.getInstance().refreshStar(star.getKey());
+                StarManager.getInstance().refreshStar(context, star.getKey());
             }
         }.execute();
 

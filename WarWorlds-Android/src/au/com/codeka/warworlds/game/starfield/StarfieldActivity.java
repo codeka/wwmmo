@@ -2,6 +2,7 @@ package au.com.codeka.warworlds.game.starfield;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -45,6 +46,7 @@ import au.com.codeka.warworlds.model.SpriteDrawable;
 import au.com.codeka.warworlds.model.Star;
 import au.com.codeka.warworlds.model.StarImageManager;
 import au.com.codeka.warworlds.model.StarManager;
+import au.com.codeka.warworlds.model.StarSummary;
 
 /**
  * The \c StarfieldActivity is the "home" screen of the game, and displays the
@@ -105,10 +107,10 @@ public class StarfieldActivity extends Activity {
         if (extras != null) {
             String starKey = extras.getString("au.com.codeka.warworlds.StarKey");
             if (starKey != null) {
-                StarManager.getInstance().requestStar(starKey, false,
-                        new StarManager.StarFetchedHandler() {
+                StarManager.getInstance().requestStarSummary(this, starKey,
+                        new StarManager.StarSummaryFetchedHandler() {
                     @Override
-                    public void onStarFetched(Star s) {
+                    public void onStarSummaryFetched(StarSummary s) {
                         mStarfield.scrollTo(s.getSectorX(), s.getSectorY(),
                                             s.getOffsetX(), s.getOffsetY(),
                                             true);
@@ -131,7 +133,7 @@ public class StarfieldActivity extends Activity {
                 selectedStarContainer.setVisibility(View.GONE);
                 selectedFleetContainer.setVisibility(View.GONE);
 
-                StarManager.getInstance().requestStar(star.getKey(), true,
+                StarManager.getInstance().requestStar(mContext, star.getKey(), true,
                                                       new StarManager.StarFetchedHandler() {
                     /**
                      * This is called on the main thread when the star is actually fetched.
@@ -177,7 +179,7 @@ public class StarfieldActivity extends Activity {
                     eta = TimeInHours.format(timeRemainingInHours);
                 }
 
-                String details = String.format(
+                String details = String.format(Locale.ENGLISH,
                     "<b>Ships:</b> %d<br />" +
                     "<b>Speed:</b> %.2f pc/hr<br />" +
                     "<b>Destination:</b> %s<br />" +
@@ -289,13 +291,14 @@ public class StarfieldActivity extends Activity {
     public void navigateToFleet(final String starKey, final String fleetKey) {
         Star star = SectorManager.getInstance().findStar(starKey);
         if (star == null) {
-            StarManager.getInstance().requestStar(starKey, false, new StarManager.StarFetchedHandler() {
-                @Override
-                public void onStarFetched(Star s) {
-                    Fleet fleet = s.findFleet(fleetKey);
-                    navigateToFleet(s, fleet);
-                }
-            });
+            StarManager.getInstance().requestStar(mContext, starKey, false,
+                new StarManager.StarFetchedHandler() {
+                    @Override
+                    public void onStarFetched(Star s) {
+                        Fleet fleet = s.findFleet(fleetKey);
+                        navigateToFleet(s, fleet);
+                    }
+                });
         } else {
             navigateToFleet(star, star.findFleet(fleetKey));
         }
@@ -510,7 +513,7 @@ public class StarfieldActivity extends Activity {
 
             final TextView shipCountTextView = (TextView) view.findViewById(R.id.starfield_planet_colony);
             shipCountTextView.setText(String.format("%s",
-                    StringUtils.capitalize(fleet.getStance().toString().toLowerCase())));
+                    StringUtils.capitalize(fleet.getStance().toString().toLowerCase(Locale.ENGLISH))));
 
             return view;
         }

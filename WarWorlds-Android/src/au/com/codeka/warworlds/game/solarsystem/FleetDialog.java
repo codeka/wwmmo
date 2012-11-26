@@ -4,6 +4,7 @@ import java.util.TreeMap;
 
 import android.app.Activity;
 import android.app.Dialog;
+import android.content.Context;
 import android.os.Bundle;
 import android.view.ViewGroup.LayoutParams;
 import android.view.Window;
@@ -21,9 +22,11 @@ import au.com.codeka.warworlds.model.StarManager;
 public class FleetDialog extends Dialog implements DialogManager.DialogConfigurable,
                                                    StarManager.StarFetchedHandler{
     public static final int ID = 1003;
+    Context mContext;
 
     public FleetDialog(Activity activity) {
         super(activity);
+        mContext = activity;
     }
 
     @Override
@@ -48,7 +51,7 @@ public class FleetDialog extends Dialog implements DialogManager.DialogConfigura
     public void setBundle(final Activity activity, Bundle bundle) {
         final String starKey = bundle.getString("au.com.codeka.warworlds.StarKey");
 
-        StarManager.getInstance().requestStar(starKey, false, this);
+        StarManager.getInstance().requestStar(mContext, starKey, false, this);
         StarManager.getInstance().addStarUpdatedListener(starKey, this);
 
         final FleetList fleetList = (FleetList) findViewById(R.id.fleet_list);
@@ -74,9 +77,8 @@ public class FleetDialog extends Dialog implements DialogManager.DialogConfigura
 
             @Override
             public void onFleetStanceModified(Star star, Fleet fleet, Fleet.Stance newStance) {
-                EmpireManager.getInstance().getEmpire().updateFleetStance(star,
-                                                                          fleet,
-                                                                          newStance);
+                EmpireManager.getInstance().getEmpire().updateFleetStance(mContext, star,
+                                                                          fleet, newStance);
             }
         });
     }

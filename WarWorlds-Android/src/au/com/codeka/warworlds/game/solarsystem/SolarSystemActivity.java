@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -36,6 +37,7 @@ import au.com.codeka.warworlds.model.StarManager;
 public class SolarSystemActivity extends Activity implements StarManager.StarFetchedHandler {
     private static Logger log = LoggerFactory.getLogger(SolarSystemActivity.class);
     private SolarSystemSurfaceView mSolarSystemSurfaceView;
+    private Context mContext = this;
     private boolean mIsSectorUpdated;
     private Star mStar;
     private Planet mPlanet;
@@ -74,7 +76,7 @@ public class SolarSystemActivity extends Activity implements StarManager.StarFet
         Bundle extras = getIntent().getExtras();
         String starKey = extras.getString("au.com.codeka.warworlds.StarKey");
 
-        StarManager.getInstance().requestStar(starKey, true, this);
+        StarManager.getInstance().requestStar(this, starKey, true, this);
         StarManager.getInstance().addStarUpdatedListener(starKey, this);
 
         mSolarSystemSurfaceView.addPlanetSelectedListener(
@@ -420,7 +422,7 @@ public class SolarSystemActivity extends Activity implements StarManager.StarFet
             dialog.show();
         }
 
-        empire.colonize(planet, new MyEmpire.ColonizeCompleteHandler() {
+        empire.colonize(mContext, planet, new MyEmpire.ColonizeCompleteHandler() {
             @Override
             public void onColonizeComplete(Colony colony) {
                 // remember that the sector we're in has now been updated so we can pass that

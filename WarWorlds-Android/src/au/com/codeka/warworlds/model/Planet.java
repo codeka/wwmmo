@@ -45,7 +45,7 @@ public class Planet implements Parcelable {
                                 .build()
     };
 
-    private Star mStar;
+    private StarSummary mStarSummary;
     private int mIndex;
     private PlanetType mPlanetType;
     private int mSize;
@@ -53,11 +53,11 @@ public class Planet implements Parcelable {
     private int mFarmingCongeniality;
     private int mMiningCongeniality;
 
-    public Star getStar() {
-        return mStar;
+    public StarSummary getStarSummary() {
+        return mStarSummary;
     }
-    public void setStar(Star star) {
-        mStar = star;
+    public void setStarSummary(StarSummary starSummary) {
+        mStarSummary = starSummary;
     }
     public int getIndex() {
         return mIndex;
@@ -80,7 +80,7 @@ public class Planet implements Parcelable {
 
     @Override
     public int hashCode() {
-        return mStar.getKey().hashCode() ^ (mIndex * 632548);
+        return mStarSummary.getKey().hashCode() ^ (mIndex * 632548);
     }
 
     @Override
@@ -121,9 +121,9 @@ public class Planet implements Parcelable {
     /**
      * Converts the given Planet protocol buffer into a \c Planet.
      */
-    public static Planet fromProtocolBuffer(Star star, Messages.Planet pb) {
+    public static Planet fromProtocolBuffer(StarSummary starSummary, Messages.Planet pb) {
         Planet p = new Planet();
-        p.mStar = star;
+        p.mStarSummary = starSummary;
         p.mIndex = pb.getIndex();
         p.mPlanetType = sPlanetTypes[pb.getPlanetType().getNumber() - 1];
         p.mSize = pb.getSize();
@@ -138,6 +138,15 @@ public class Planet implements Parcelable {
         }
 
         return p;
+    }
+
+    public void toProtocolBuffer(Messages.Planet.Builder pb) {
+        pb.setIndex(mIndex);
+        pb.setPlanetType(Messages.Planet.PLANET_TYPE.valueOf(mPlanetType.mIndex + 1));
+        pb.setSize(mSize);
+        pb.setPopulationCongeniality(mPopulationCongeniality);
+        pb.setFarmingCongeniality(mFarmingCongeniality);
+        pb.setMiningCongeniality(mMiningCongeniality);
     }
 
     /**

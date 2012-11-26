@@ -53,7 +53,7 @@ public class Sector {
         s.mX = pb.getX();
         s.mY = pb.getY();
         for (Messages.Star star_pb : pb.getStarsList()) {
-            s.mStars.add(Star.fromProtocolBuffer(s, star_pb));
+            s.mStars.add(Star.fromProtocolBuffer(star_pb));
         }
 
         // could this be more efficient? there's not a lot of stars, so maybe not a big deal

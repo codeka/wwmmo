@@ -17,7 +17,7 @@ public class StarImageManager extends ImageManager {
     /**
      * Gets the \c Bitmap for the given star.
      */
-    public Sprite getSprite(Context context, Star star, int size) {
+    public Sprite getSprite(Context context, StarSummary star, int size) {
         StarExtra starExtra = new StarExtra(context, star);
         Bitmap bmp = null;
         if (size > 0) {
@@ -66,10 +66,10 @@ public class StarImageManager extends ImageManager {
     }
 
     private static class StarExtra {
-        public Star star;
+        public StarSummary star;
         public Context context;
 
-        public StarExtra(Context context, Star star) {
+        public StarExtra(Context context, StarSummary star) {
             this.context = context;
             this.star = star;
         }

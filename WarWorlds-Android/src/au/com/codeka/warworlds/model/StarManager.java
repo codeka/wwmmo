@@ -1,5 +1,10 @@
 package au.com.codeka.warworlds.model;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.TreeMap;
@@ -9,6 +14,7 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import android.content.Context;
 import android.os.AsyncTask;
 import au.com.codeka.warworlds.api.ApiClient;
 import au.com.codeka.warworlds.model.protobuf.Messages;
@@ -21,11 +27,13 @@ public class StarManager {
 
     private static final Logger log = LoggerFactory.getLogger(StarManager.class);
     private TreeMap<String, Star> mStars;
+    private TreeMap<String, StarSummary> mStarSummaries;
     private TreeMap<String, List<StarFetchedHandler>> mStarUpdatedListeners;
     private List<StarFetchedHandler> mAllStarUpdatedListeners;
 
     private StarManager() {
         mStars = new TreeMap<String, Star>();
+        mStarSummaries = new TreeMap<String, StarSummary>();
         mStarUpdatedListeners = new TreeMap<String, List<StarFetchedHandler>>();
         mAllStarUpdatedListeners = new ArrayList<StarFetchedHandler>();
     }
@@ -86,12 +94,12 @@ public class StarManager {
         }
     }
 
-    public void refreshStar(Star s) {
-        refreshStar(s.getKey());
+    public void refreshStar(Context context, Star s) {
+        refreshStar(context, s.getKey());
     }
 
-    public void refreshStar(String starKey) {
-        requestStar(starKey, true, new StarFetchedHandler() {
+    public void refreshStar(Context context, String starKey) {
+        requestStar(context, starKey, true, new StarFetchedHandler() {
             @Override
             public void onStarFetched(Star s) {
                 // When a star is explicitly refreshed, it's usually because it's changed somehow.
@@ -101,11 +109,46 @@ public class StarManager {
         });
     }
 
+    public void requestStarSummary(final Context context, final String starKey,
+                                   final StarSummaryFetchedHandler callback) {
+        StarSummary ss = mStarSummaries.get(starKey);
+        if (ss != null) {
+            callback.onStarSummaryFetched(ss);
+            return;
+        }
+
+        ss = mStars.get(starKey);
+        if (ss != null) {
+            callback.onStarSummaryFetched(ss);
+            return;
+        }
+
+        new AsyncTask<Void, Void, StarSummary>() {
+            @Override
+            protected StarSummary doInBackground(Void... arg0) {
+                StarSummary ss = loadStarSummary(context, starKey);
+                if (ss != null) {
+                    return ss;
+                }
+
+                // no cache StarSummary, fetch the full star
+                ss = doFetchStar(context, starKey);
+                return ss;
+            }
+
+            @Override
+            protected void onPostExecute(StarSummary starSummary) {
+                callback.onStarSummaryFetched(starSummary);
+            }
+        }.execute();
+    }
+
     /**
      * Requests the details of a star from the server, and calls the given callback when it's
      * received. The callback is called on the main thread.
      */
-    public void requestStar(final String starKey, boolean force, final StarFetchedHandler callback) {
+    public void requestStar(final Context context, final String starKey, boolean force,
+                            final StarFetchedHandler callback) {
         Star s = mStars.get(starKey);
         if (s != null && !force) {
             callback.onStarFetched(s);
@@ -115,19 +158,7 @@ public class StarManager {
         new AsyncTask<Void, Void, Star>() {
             @Override
             protected Star doInBackground(Void... arg0) {
-                Star star = null;
-
-                try {
-                    String url = "stars/"+starKey;
-
-                    Messages.Star pb = ApiClient.getProtoBuf(url, Messages.Star.class);
-                    star = Star.fromProtocolBuffer(pb);
-                } catch(Exception e) {
-                    // TODO: handle exceptions
-                    log.error(ExceptionUtils.getStackTrace(e));
-                }
-
-                return star;
+                return doFetchStar(context, starKey);
             }
 
             @Override
@@ -136,7 +167,10 @@ public class StarManager {
                     return; // BAD!
                 }
 
+                // if we had the star summary cached, remove it (cause the star itself is newer)
+                mStarSummaries.remove(starKey);
                 mStars.put(starKey, star);
+
                 if (callback != null) {
                     callback.onStarFetched(star);
                 }
@@ -145,7 +179,96 @@ public class StarManager {
         }.execute();
     }
 
+    private Star doFetchStar(final Context context, final String starKey) {
+        Star star = null;
+
+        try {
+            String url = "stars/"+starKey;
+
+            Messages.Star pb = ApiClient.getProtoBuf(url, Messages.Star.class);
+            star = Star.fromProtocolBuffer(pb);
+        } catch(Exception e) {
+            // TODO: handle exceptions
+            log.error(ExceptionUtils.getStackTrace(e));
+        }
+
+        if (star != null) {
+            updateStarSummary(context, star);
+        }
+
+        return star;
+    }
+
+    /**
+     * This is called when we fetch a new \c StarSummary, we'll want to cache it.
+     */
+    private static void updateStarSummary(Context context, StarSummary summary) {
+        File summaryFile = getSummaryFile(context, summary.getKey());
+
+        Messages.Star.Builder starpb = Messages.Star.newBuilder();
+        summary.toProtocolBuffer(starpb);
+        Messages.Star pb = starpb.build();
+
+        FileOutputStream fos = null;
+        try {
+            fos = new FileOutputStream(summaryFile.getCanonicalPath());
+            pb.writeTo(fos);
+        } catch (FileNotFoundException e) {
+        } catch (IOException e) {
+        } finally {
+            if (fos != null) {
+                try {
+                    fos.close();
+                } catch (IOException e) {
+                }
+            }
+        }
+    }
+
+    /**
+     * Attempts to load a \c StarSummary back from the cache directory.
+     */
+    private static StarSummary loadStarSummary(Context context, String starKey) {
+        File summaryFile = getSummaryFile(context, starKey);
+        if (!summaryFile.exists()) {
+            return null;
+        }
+
+        FileInputStream fis = null;
+        try {
+            fis = new FileInputStream(summaryFile.getCanonicalPath());
+            Messages.Star pb = Messages.Star.newBuilder().mergeFrom(fis).build();
+
+            StarSummary ss = new StarSummary();
+            ss.populateFromProtocolBuffer(pb);
+            return ss;
+        } catch (FileNotFoundException e) {
+        } catch (IOException e) {
+        } finally {
+            if (fis != null) {
+                try {
+                    fis.close();
+                } catch (IOException e) {
+                }
+            }
+        }
+
+        return null;
+    }
+
+    private static File getSummaryFile(Context context, String starKey) {
+        File cacheDir = context.getCacheDir();
+
+        File starsDir = new File(cacheDir, "stars");
+        starsDir.mkdirs();
+
+        return new File(starsDir, starKey+".cache");
+    }
+
     public interface StarFetchedHandler {
         void onStarFetched(Star s);
+    }
+    public interface StarSummaryFetchedHandler {
+        void onStarSummaryFetched(StarSummary s);
     }
 }

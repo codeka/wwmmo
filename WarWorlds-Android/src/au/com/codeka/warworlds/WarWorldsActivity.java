@@ -37,8 +37,8 @@ import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.MyEmpire;
 import au.com.codeka.warworlds.model.ShipDesignManager;
 import au.com.codeka.warworlds.model.SpriteManager;
-import au.com.codeka.warworlds.model.Star;
 import au.com.codeka.warworlds.model.StarManager;
+import au.com.codeka.warworlds.model.StarSummary;
 import au.com.codeka.warworlds.model.protobuf.Messages;
 
 /**
@@ -301,10 +301,10 @@ public class WarWorldsActivity extends Activity {
 
                 if (starKey != null) {
                     mStartGameButton.setEnabled(false);
-                    StarManager.getInstance().requestStar(starKey, false,
-                            new StarManager.StarFetchedHandler() {
+                    StarManager.getInstance().requestStarSummary(mContext, starKey,
+                            new StarManager.StarSummaryFetchedHandler() {
                         @Override
-                        public void onStarFetched(Star s) {
+                        public void onStarSummaryFetched(StarSummary s) {
                             mStartGameButton.setEnabled(true);
 
                             // we don't do anything with the star, we just want to make sure it's

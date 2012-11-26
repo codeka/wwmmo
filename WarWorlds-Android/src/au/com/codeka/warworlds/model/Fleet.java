@@ -55,7 +55,7 @@ public class Fleet implements Parcelable {
         return mStance;
     }
 
-    public float getTimeToDestination(Star srcStar, Star destStar) {
+    public float getTimeToDestination(StarSummary srcStar, StarSummary destStar) {
         ShipDesign design = ShipDesignManager.getInstance().getDesign(mDesignID);
         float distanceInParsecs = SectorManager.getInstance().distanceInParsecs(srcStar, destStar);
         float totalTimeInHours = distanceInParsecs / design.getSpeedInParsecPerHour();

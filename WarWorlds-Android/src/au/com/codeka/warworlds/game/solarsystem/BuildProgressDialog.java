@@ -1,5 +1,7 @@
 package au.com.codeka.warworlds.game.solarsystem;
 
+import java.util.Locale;
+
 import org.joda.time.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,7 +14,6 @@ import android.content.DialogInterface;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.Html;
-import android.util.FloatMath;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
@@ -68,12 +69,11 @@ public class BuildProgressDialog extends Dialog implements DialogManager.DialogC
                 float cost = speedUpTimeInHours * 100.0f;
 
                 if (cost > EmpireManager.getInstance().getEmpire().getCash()) {
-                    String msg = String.format("Accelerating this build would cost "+
-                                               "<font color=\"red\">$%d</font> (and speed up the "+
-                                               "build by %s), but you don't have that much cash "+
-                                               "available. Do you want to buy some cash now?",
-                                               (int) FloatMath.floor(cost),
-                                               TimeInHours.format(speedUpTime));
+                    String msg = String.format(Locale.ENGLISH,
+                            "Accelerating this build would cost <font color=\"red\">$%d</font> "+
+                            "(and speed up the build by %s), but you don't have that much cash "+
+                            "available. Do you want to buy some cash now?",
+                            (int) Math.floor(cost), TimeInHours.format(speedUpTime));
 
                     AlertDialog dlg = new AlertDialog.Builder(mContext)
                                                      .setCancelable(true)
@@ -89,10 +89,10 @@ public class BuildProgressDialog extends Dialog implements DialogManager.DialogC
                                                      .create();
                     dlg.show();
                 } else {
-                    String msg = String.format(
+                    String msg = String.format(Locale.ENGLISH,
                             "Do you want to accelerate this build? It will cost <font color=\"green\">"+
                             "$%d</font> and speed up the build by %s.",
-                            (int) FloatMath.floor(cost), TimeInHours.format(speedUpTime));
+                            (int) Math.floor(cost), TimeInHours.format(speedUpTime));
 
                     AlertDialog dlg = new AlertDialog.Builder(mContext)
                                                      .setCancelable(true)
@@ -142,7 +142,7 @@ public class BuildProgressDialog extends Dialog implements DialogManager.DialogC
                 BuildQueueManager.getInstance().refresh(buildRequest);
 
                 // tell the StarManager that this star has been updated
-                StarManager.getInstance().refreshStar(mStarKey);
+                StarManager.getInstance().refreshStar(mContext, mStarKey);
 
                 if (buildRequest != null) {
                     mBuildRequest = buildRequest;
