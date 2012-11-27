@@ -719,3 +719,7 @@ message SituationReport
 }
 
 
+message SituationReports
+{
+    repeated SituationReport situation_reports = 1;
+}

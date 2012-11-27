@@ -15,7 +15,8 @@
  */
 package au.com.codeka.warworlds;
 
-import org.apache.commons.codec.binary.Base64;
+import java.util.Locale;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,6 +33,11 @@ import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Base64;
+import au.com.codeka.warworlds.model.ShipDesign;
+import au.com.codeka.warworlds.model.ShipDesignManager;
+import au.com.codeka.warworlds.model.StarManager;
+import au.com.codeka.warworlds.model.StarSummary;
 import au.com.codeka.warworlds.model.protobuf.Messages;
 
 /**
@@ -58,7 +64,7 @@ public class MessageDisplay {
                 displayNotification(context, extras.get("msg").toString());
                 playNotificationSound(context);
             } else if (extras.containsKey("sitrep")) {
-                byte[] blob = Base64.decodeBase64(extras.getString("sitrep"));
+                byte[] blob = Base64.decode(extras.getString("sitrep"), Base64.DEFAULT);
 
                 Messages.SituationReport sitrep;
                 try {
@@ -75,8 +81,56 @@ public class MessageDisplay {
         }
     }
 
-    private static void displayNotification(Context context, Messages.SituationReport sitrep) {
-        displayNotification(context, "We got a situation over here!");
+    private static void displayNotification(final Context context,
+                                            final Messages.SituationReport sitrep) {
+        String starKey = sitrep.getStarKey();
+        StarManager.getInstance().requestStarSummary(context, starKey,
+            new StarManager.StarSummaryFetchedHandler() {
+                @Override
+                public void onStarSummaryFetched(StarSummary starSummary) {
+                    displayNotification(context, starSummary, sitrep);
+                }
+            });
+    }
+
+    private static void displayNotification(Context context, StarSummary starSummary,
+                                            Messages.SituationReport sitrep) {
+
+        String msg = "";
+
+        Messages.SituationReport.MoveCompleteRecord mcr = sitrep.getMoveCompleteRecord();
+        if (mcr != null) {
+            msg += getFleetLine(mcr.getFleetDesignId(), mcr.getNumShips());
+            msg += String.format(Locale.ENGLISH, " arrived at %s", starSummary.getName());
+        }
+
+        Messages.SituationReport.FleetUnderAttackRecord fuar = sitrep.getFleetUnderAttackRecord();
+        if (fuar != null) {
+            if (mcr != null) {
+                msg += ", and is under attack";
+            } else {
+                msg += getFleetLine(fuar.getFleetDesignId(), fuar.getNumShips());
+                msg += String.format(Locale.ENGLISH, " is under attack at %s", starSummary.getName());
+            }
+        }
+
+        if (msg.length() == 0) {
+            msg = "We got a situation over here!";
+        }
+
+        displayNotification(context, msg);
+    }
+
+    private static String getFleetLine(String designID, float numShips) {
+        ShipDesign design = ShipDesignManager.getInstance().getDesign(designID);
+        String msg = design.getDisplayName();
+
+        int n = (int)(Math.ceil(numShips));
+        if (n > 1) {
+            msg += String.format(Locale.ENGLISH, " (× %d)", n);
+        }
+
+        return msg;
     }
 
     private static void displayNotification(Context context, String message) {

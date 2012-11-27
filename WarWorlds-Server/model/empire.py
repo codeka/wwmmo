@@ -227,3 +227,21 @@ class SituationReport(db.Model):
   reportTime = db.DateTimeProperty()
   star = db.ReferenceProperty(sector_mdl.Star)
   report = db.BlobProperty()
+
+  @staticmethod
+  def getForEmpire(empire_key):
+    query = SituationReport.all().ancestor(db.Key(empire_key)).order("-reportTime")
+    return SituationReport._getForQuery(query)
+
+  @staticmethod
+  def getForStar(empire_key, star_key):
+    query = (SituationReport.all().ancestor(db.Key(empire_key))
+                            .filter("star", db.Key(star_key)).order("-reportTime"))
+    return SituationReport._getForQuery(query)
+
+  @staticmethod
+  def _getForQuery(query):
+    sitrep_mdls = []
+    for mdl in query:
+      sitrep_mdls.append(mdl)
+    return sitrep_mdls

@@ -46,7 +46,7 @@
             position: absolute;
             width: 800px;
             bottom: 0;
-            top: 180px;
+            top: 240px;
             overflow: auto;
             white-space: pre;
         }
@@ -70,13 +70,18 @@
         <input type="text" name="combatReportKey" value="">
         <input type="submit" value="Combat Report">
     </form>
+    <form id="sitrep-form">
+        <label>Sit. Rep.:</label>
+        <input type="text" name="sitrepKey" value="" placeholder="Star Key, or blank for all">
+        <input type="submit" value="Fetch">
+    </form>
     <div id="output"></div>
     <script>
         $("#scout-report-form").on("submit", function(evnt) {
             evnt.preventDefault();
             var $starKey = $("#scout-report-form input[name=starKey]");
 
-            $("#update-form textarea").val("");
+            $("#output").text("");
             var url = "/admin/debug/reports-ajax?starKey="+$starKey.val()+"&action=scout-reports";
             $.ajax({
                 url: url,
@@ -94,7 +99,7 @@
             evnt.preventDefault();
             var $starKey = $("#combat-reports-form input[name=starKey]");
 
-            $("#update-form textarea").val("");
+            $("#output").text("");
             var url = "/api/v1/stars/"+$starKey.val()+"/combat-reports";
             $.ajax({
                 url: url,
@@ -112,8 +117,30 @@
             evnt.preventDefault();
             var $combatReportKey = $("#combat-report-form input[name=combatReportKey]");
 
-            $("#update-form textarea").val("");
+            $("#output").text("");
             var url = "/api/v1/stars/TODO/combat-reports/"+$combatReportKey.val();
+            $.ajax({
+                url: url,
+                dataType: "json",
+                success: function(data) {
+                    $("#output").text(JSON.stringify(data, null, "  "));
+                },
+                error: function() {
+                    alert("An error occured fetching starfield data. Check server logs.");
+                }
+            });
+        });
+
+        $("#sitrep-form").on("submit", function(evnt) {
+            evnt.preventDefault();
+
+            var $sitrepKey = $("#sitrep-form input[name=sitrepKey]");
+
+            $("#output").text("");
+            var url = "/api/v1/sit-reports";
+            if ($sitrepKey.val() != "") {
+                url = "/api/v1/stars/"+$sitrepKey.val()+"/sit-reports";
+            }
             $.ajax({
                 url: url,
                 dataType: "json",

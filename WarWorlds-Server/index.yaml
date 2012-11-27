@@ -37,3 +37,16 @@ indexes:
   properties:
   - name: x
   - name: y
+
+- kind: SituationReport
+  ancestor: yes
+  properties:
+  - name: reportTime
+    direction: desc
+
+- kind: SituationReport
+  ancestor: yes
+  properties:
+  - name: star
+  - name: reportTime
+    direction: desc

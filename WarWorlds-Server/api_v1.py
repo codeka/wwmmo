@@ -549,6 +549,12 @@ class CombatReportPage(ApiPage):
     return combat_report_pb
 
 
+class SitrepPage(ApiPage):
+  def get(self, star_key=None):
+    empire_pb = empire.getEmpireForUser(self.user)
+    return empire.getSituationReports(empire_pb.key, star_key)
+
+
 class ApiApplication(webapp.WSGIApplication):
   def __init__(self, *args, **kwargs):
     webapp.WSGIApplication.__init__(self, *args, **kwargs)
@@ -609,10 +615,10 @@ app = ApiApplication([("/api/v1/hello/([^/]+)", HelloPage),
                       ("/api/v1/devices", DevicesPage),
                       ("/api/v1/devices/([^/]+)", DevicesPage),
                       ("/api/v1/devices/user:([^/]+)/messages", DeviceMessagesPage),
+                      ("/api/v1/buildqueue", BuildQueuePage),
                       ("/api/v1/sectors", SectorsPage),
                       ("/api/v1/stars/([^/]+)", StarPage),
                       ("/api/v1/stars/([^/]+)/simulate", StarSimulatePage),
-                      ("/api/v1/buildqueue", BuildQueuePage),
                       ("/api/v1/stars/([^/]+)/build/([^/]+)/accelerate", BuildAcceleratePage),
                       ("/api/v1/stars/([^/]+)/colonies", ColoniesPage),
                       ("/api/v1/stars/([^/]+)/colonies/([^/]+)", ColoniesPage),
@@ -620,5 +626,7 @@ app = ApiApplication([("/api/v1/hello/([^/]+)", HelloPage),
                       ("/api/v1/stars/([^/]+)/fleets/([^/]+)/orders", FleetOrdersPage),
                       ("/api/v1/stars/([^/]+)/scout-reports", ScoutReportsPage),
                       ("/api/v1/stars/([^/]+)/combat-reports", CombatReportsPage),
-                      ("/api/v1/stars/([^/]+)/combat-reports/([^/]+)", CombatReportPage)],
+                      ("/api/v1/stars/([^/]+)/combat-reports/([^/]+)", CombatReportPage),
+                      ("/api/v1/stars/([^/]+)/sit-reports", SitrepPage),
+                      ("/api/v1/sit-reports", SitrepPage)],
                      debug=os.environ["SERVER_SOFTWARE"].startswith("Development"))
