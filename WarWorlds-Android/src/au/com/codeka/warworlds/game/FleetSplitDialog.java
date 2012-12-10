@@ -1,16 +1,15 @@
 package au.com.codeka.warworlds.game;
 
-import android.app.Activity;
-import android.app.Dialog;
-import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.app.DialogFragment;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.SeekBar;
 import android.widget.TextView;
-import au.com.codeka.warworlds.DialogManager;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.api.ApiClient;
 import au.com.codeka.warworlds.api.ApiException;
@@ -19,28 +18,35 @@ import au.com.codeka.warworlds.model.Fleet;
 import au.com.codeka.warworlds.model.StarManager;
 import au.com.codeka.warworlds.model.protobuf.Messages;
 
-public class FleetSplitDialog extends Dialog implements DialogManager.DialogConfigurable {
+public class FleetSplitDialog extends DialogFragment {
     private Fleet mFleet;
-    private Context mContext;
 
-    public static final int ID = 1004;
+    public FleetSplitDialog() {
+    }
 
-    public FleetSplitDialog(Activity activity) {
-        super(activity);
-        mContext = activity;
+    public void setFleet(Fleet fleet) {
+        mFleet = fleet;
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        getDialog().requestWindowFeature(Window.FEATURE_NO_TITLE);
 
-        requestWindowFeature(Window.FEATURE_NO_TITLE);
-        setContentView(R.layout.solarsystem_fleet_split_dlg);
+        View view = inflater.inflate(R.layout.fleet_split_dlg, container);
 
-        final SeekBar splitRatio = (SeekBar) findViewById(R.id.split_ratio);
-        final TextView splitLeft = (TextView) findViewById(R.id.split_left);
-        final TextView splitRight = (TextView) findViewById(R.id.split_right);
-        final Button splitBtn = (Button) findViewById(R.id.split_btn);
+        final SeekBar splitRatio = (SeekBar) view.findViewById(R.id.split_ratio);
+        final TextView splitLeft = (TextView) view.findViewById(R.id.split_left);
+        final TextView splitRight = (TextView) view.findViewById(R.id.split_right);
+        final Button splitBtn = (Button) view.findViewById(R.id.split_btn);
+
+        View fleetView = view.findViewById(R.id.fleet);
+        FleetList.populateFleetRow(getActivity(), null, fleetView, mFleet);
+
+        splitRatio.setMax(mFleet.getNumShips());
+        splitRatio.setProgress(mFleet.getNumShips() / 2);
+        splitLeft.setText(Integer.toString(mFleet.getNumShips() / 2));
+        splitRight.setText(Integer.toString(mFleet.getNumShips() - (mFleet.getNumShips() / 2)));
 
         splitBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -70,7 +76,8 @@ public class FleetSplitDialog extends Dialog implements DialogManager.DialogConf
                     @Override
                     protected void onPostExecute(Boolean success) {
                         // the star this fleet is attached to needs to be refreshed...
-                        StarManager.getInstance().refreshStar(mContext, mFleet.getStarKey());
+                        StarManager.getInstance().refreshStar(
+                                getActivity(), mFleet.getStarKey());
                         splitBtn.setEnabled(true);
                         if (success) {
                             dismiss();
@@ -124,23 +131,7 @@ public class FleetSplitDialog extends Dialog implements DialogManager.DialogConf
                 }
             }
         });
-    }
 
-    @Override
-    public void setBundle(Activity activity, Bundle bundle) {
-        mFleet = (Fleet) bundle.getParcelable("au.com.codeka.warworlds.Fleet");
-
-        View fleetView = findViewById(R.id.fleet);
-        FleetList.populateFleetRow(mContext, null, fleetView, mFleet);
-
-        SeekBar splitRatio = (SeekBar) findViewById(R.id.split_ratio);
-        splitRatio.setMax(mFleet.getNumShips());
-        splitRatio.setProgress(mFleet.getNumShips() / 2);
-
-        TextView splitLeft = (TextView) findViewById(R.id.split_left);
-        splitLeft.setText(Integer.toString(mFleet.getNumShips() / 2));
-
-        TextView splitRight = (TextView) findViewById(R.id.split_right);
-        splitRight.setText(Integer.toString(mFleet.getNumShips() - (mFleet.getNumShips() / 2)));
+        return view;
     }
 }

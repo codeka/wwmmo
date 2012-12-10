@@ -3,67 +3,77 @@ package au.com.codeka.warworlds.game.solarsystem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import android.app.Activity;
-import android.app.Dialog;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.app.DialogFragment;
 import android.text.Editable;
 import android.text.Html;
 import android.text.TextWatcher;
+import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup.LayoutParams;
+import android.view.ViewGroup;
 import android.view.Window;
-import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import au.com.codeka.TimeInHours;
-import au.com.codeka.warworlds.DialogManager;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.api.ApiClient;
 import au.com.codeka.warworlds.api.ApiException;
 import au.com.codeka.warworlds.model.BuildQueueManager;
 import au.com.codeka.warworlds.model.BuildRequest;
-import au.com.codeka.warworlds.model.BuildingDesignManager;
 import au.com.codeka.warworlds.model.Colony;
 import au.com.codeka.warworlds.model.Design;
-import au.com.codeka.warworlds.model.Design.DesignKind;
-import au.com.codeka.warworlds.model.protobuf.Messages;
-import au.com.codeka.warworlds.model.ShipDesignManager;
 import au.com.codeka.warworlds.model.SpriteDrawable;
 import au.com.codeka.warworlds.model.StarManager;
+import au.com.codeka.warworlds.model.protobuf.Messages;
 
-public class BuildConfirmDialog extends Dialog implements DialogManager.DialogConfigurable {
+public class BuildConfirmDialog extends DialogFragment {
     private static Logger log = LoggerFactory.getLogger(BuildConfirmDialog.class);
     private Context mContext;
     private Colony mColony;
     private Design mDesign;
     private int mCurrentQueueSize;
+    private View mView;
 
-    public static final int ID = 1001;
+    public BuildConfirmDialog() {
+    }
 
-    public BuildConfirmDialog(Activity activity) {
-        super(activity);
-        mContext = activity;
+    public void setup(Design design, Colony colony, int buildQueueSize) {
+        mDesign = design;
+        mColony = colony;
+        mCurrentQueueSize = buildQueueSize;
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        getDialog().requestWindowFeature(Window.FEATURE_NO_TITLE);
+        mView = inflater.inflate(R.layout.solarsystem_build_confirm_dlg,
+                                     container);
 
-        requestWindowFeature(Window.FEATURE_NO_TITLE);
-        setContentView(R.layout.solarsystem_build_confirm_dlg);
+        final SeekBar countSeekBar = (SeekBar) mView.findViewById(R.id.build_count_seek);
+        final EditText countEdit = (EditText) mView.findViewById(R.id.build_count_edit);
 
-        WindowManager.LayoutParams params = getWindow().getAttributes();
-        params.height = LayoutParams.MATCH_PARENT;
-        params.width = LayoutParams.MATCH_PARENT;
-        getWindow().setAttributes(params);
+        TextView nameTextView = (TextView) mView.findViewById(R.id.building_name);
+        ImageView iconImageView = (ImageView) mView.findViewById(R.id.building_icon);
+        TextView descriptionTextView = (TextView) mView.findViewById(R.id.building_description);
 
-        final SeekBar countSeekBar = (SeekBar) findViewById(R.id.build_count_seek);
-        final EditText countEdit = (EditText) findViewById(R.id.build_count_edit);
+        nameTextView.setText(mDesign.getDisplayName());
+        iconImageView.setImageDrawable(new SpriteDrawable(mDesign.getSprite()));
+        descriptionTextView.setText(Html.fromHtml(mDesign.getDescription()));
+
+        View buildCountContainer = mView.findViewById(R.id.build_count_container);
+        if (mDesign.canBuildMultiple()) {
+            buildCountContainer.setVisibility(View.VISIBLE);
+        } else {
+            buildCountContainer.setVisibility(View.GONE);
+        }
+
+        refreshBuildEstimates();
 
         countEdit.setText("1");
         countSeekBar.setMax(99);
@@ -116,7 +126,7 @@ public class BuildConfirmDialog extends Dialog implements DialogManager.DialogCo
             
         });
 
-        final Button okButton = (Button) findViewById(R.id.ok_btn);
+        final Button okButton = (Button) mView.findViewById(R.id.ok_btn);
         okButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -167,49 +177,8 @@ public class BuildConfirmDialog extends Dialog implements DialogManager.DialogCo
                 dismiss();
             }
         });
-    }
 
-    @Override
-    public void setBundle(Activity activity, Bundle bundle) {
-        String designID = bundle.getString("au.com.codeka.warworlds.DesignID");
-        if (designID == null)
-            designID = "";
-        DesignKind dk = DesignKind.fromInt(bundle.getInt("au.com.codeka.warworlds.DesignKind",
-                                           DesignKind.BUILDING.getValue()));
-
-        mColony = (Colony) bundle.getParcelable("au.com.codeka.warworlds.Colony");
-        mCurrentQueueSize = bundle.getInt("au.com.codeka.warworlds.BuildQueueSize");
-
-        // TODO: this could be encapsulated in the DesignManager base class....
-        Design design;
-        if (dk == DesignKind.BUILDING) {
-            design = BuildingDesignManager.getInstance().getDesign(designID);
-        } else {
-            design = ShipDesignManager.getInstance().getDesign(designID);
-        }
-
-        refresh(design);
-    }
-
-    private void refresh(Design design) {
-        mDesign = design;
-
-        TextView nameTextView = (TextView) findViewById(R.id.building_name);
-        ImageView iconImageView = (ImageView) findViewById(R.id.building_icon);
-        TextView descriptionTextView = (TextView) findViewById(R.id.building_description);
-
-        nameTextView.setText(design.getDisplayName());
-        iconImageView.setImageDrawable(new SpriteDrawable(design.getSprite()));
-        descriptionTextView.setText(Html.fromHtml(design.getDescription()));
-
-        View buildCountContainer = findViewById(R.id.build_count_container);
-        if (design.canBuildMultiple()) {
-            buildCountContainer.setVisibility(View.VISIBLE);
-        } else {
-            buildCountContainer.setVisibility(View.GONE);
-        }
-
-        refreshBuildEstimates();
+        return mView;
     }
 
     private void refreshBuildEstimates() {
@@ -222,17 +191,17 @@ public class BuildConfirmDialog extends Dialog implements DialogManager.DialogCo
 
         int count = 1;
         if (mDesign.canBuildMultiple()) {
-            final EditText countEdit = (EditText) findViewById(R.id.build_count_edit);
+            final EditText countEdit = (EditText) mView.findViewById(R.id.build_count_edit);
             count = Integer.parseInt(countEdit.getText().toString());
         }
 
         float timeInHours = (count * mDesign.getBuildTimeSeconds()) / 3600.0f;
         timeInHours *= (100.0f / workersPerBuildRequest);
-        TextView timeToBuildText = (TextView) findViewById(R.id.building_timetobuild);
+        TextView timeToBuildText = (TextView) mView.findViewById(R.id.building_timetobuild);
         timeToBuildText.setText(TimeInHours.format(timeInHours));
 
         float totalMineralsCost = count * mDesign.getBuildCostMinerals();
-        TextView mineralsToBuildText = (TextView) findViewById(R.id.building_mineralstobuild);
+        TextView mineralsToBuildText = (TextView) mView.findViewById(R.id.building_mineralstobuild);
         mineralsToBuildText.setText(Html.fromHtml(
                                     String.format("%d (<font color=\"red\">%.2f</font>/hr)",
                                     (int) totalMineralsCost, totalMineralsCost / timeInHours)));

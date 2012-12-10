@@ -6,22 +6,22 @@ import org.joda.time.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.app.DialogFragment;
 import android.text.Html;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import au.com.codeka.TimeInHours;
-import au.com.codeka.warworlds.DialogManager;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.api.ApiClient;
 import au.com.codeka.warworlds.api.ApiException;
@@ -34,27 +34,30 @@ import au.com.codeka.warworlds.model.SpriteDrawable;
 import au.com.codeka.warworlds.model.StarManager;
 import au.com.codeka.warworlds.model.protobuf.Messages;
 
-public class BuildProgressDialog extends Dialog implements DialogManager.DialogConfigurable {
+public class BuildProgressDialog extends DialogFragment {
     private static Logger log = LoggerFactory.getLogger(BuildProgressDialog.class);
 
     public static final int ID = 48976;
     private Context mContext;
     private BuildRequest mBuildRequest;
     private String mStarKey;
+    private View mView;
 
-    public BuildProgressDialog(Activity activity) {
-        super(activity);
-        mContext = activity;
+    public BuildProgressDialog() {
+    }
+
+    public void setBuildRequest(BuildRequest buildRequest, String starKey) {
+        mBuildRequest = buildRequest;
+        mStarKey = starKey;
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        getDialog().requestWindowFeature(Window.FEATURE_NO_TITLE);
+        mView = inflater.inflate(R.layout.build_progress_dlg, container);
 
-        requestWindowFeature(Window.FEATURE_NO_TITLE);
-        setContentView(R.layout.build_progress_dlg);
-
-        Button accelerateBtn = (Button) findViewById(R.id.accelerate_btn);
+        Button accelerateBtn = (Button) mView.findViewById(R.id.accelerate_btn);
         accelerateBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -109,11 +112,14 @@ public class BuildProgressDialog extends Dialog implements DialogManager.DialogC
                 }
             }
         });
+
+        refresh();
+        return mView;
     }
 
     private void accelerateBuild() {
-        final Button accelerateBtn = (Button) findViewById(R.id.accelerate_btn);
-        final Button cancelBtn = (Button) findViewById(R.id.cancel_btn);
+        final Button accelerateBtn = (Button) mView.findViewById(R.id.accelerate_btn);
+        final Button cancelBtn = (Button) mView.findViewById(R.id.cancel_btn);
 
         accelerateBtn.setEnabled(false);
         cancelBtn.setEnabled(false);
@@ -157,21 +163,14 @@ public class BuildProgressDialog extends Dialog implements DialogManager.DialogC
     public void onStop() {
     }
 
-    @Override
-    public void setBundle(Activity activity, Bundle bundle) {
-        mBuildRequest = (BuildRequest) bundle.getParcelable("au.com.codeka.warworlds.BuildRequest");
-        mStarKey = bundle.getString("au.com.codeka.warworlds.StarKey");
-        refresh();
-    }
-
     private void refresh() {
         Design design = DesignManager.getInstance(mBuildRequest.getBuildKind())
                                      .getDesign(mBuildRequest.getDesignID());
 
-        ImageView imgView = (ImageView) findViewById(R.id.build_icon);
+        ImageView imgView = (ImageView) mView.findViewById(R.id.build_icon);
         imgView.setImageDrawable(new SpriteDrawable(design.getSprite()));
 
-        TextView designNameView = (TextView) findViewById(R.id.build_design_name);
+        TextView designNameView = (TextView) mView.findViewById(R.id.build_design_name);
         if (mBuildRequest.getCount() == 1) {
             designNameView.setText(design.getDisplayName());
         } else {
@@ -180,7 +179,7 @@ public class BuildProgressDialog extends Dialog implements DialogManager.DialogC
                                    mBuildRequest.getCount()));
         }
 
-        TextView buildTimeRemainingView = (TextView) findViewById(R.id.build_time_remaining);
+        TextView buildTimeRemainingView = (TextView) mView.findViewById(R.id.build_time_remaining);
         Duration remainingDuration = mBuildRequest.getRemainingTime();
         if (remainingDuration.equals(Duration.ZERO)) {
             buildTimeRemainingView.setText(String.format("%d %%, not enough resources to complete.",
@@ -191,7 +190,7 @@ public class BuildProgressDialog extends Dialog implements DialogManager.DialogC
                               TimeInHours.format(remainingDuration)));
         }
 
-        ProgressBar buildProgressBar = (ProgressBar) findViewById(R.id.build_progress);
+        ProgressBar buildProgressBar = (ProgressBar) mView.findViewById(R.id.build_progress);
         buildProgressBar.setProgress((int) mBuildRequest.getPercentComplete());
     }
 }

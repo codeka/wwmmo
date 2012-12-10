@@ -3,13 +3,13 @@ package au.com.codeka.warworlds.game.solarsystem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
@@ -19,7 +19,6 @@ import android.widget.TextView;
 import au.com.codeka.Cash;
 import au.com.codeka.Point2D;
 import au.com.codeka.RomanNumeralFormatter;
-import au.com.codeka.warworlds.DialogManager;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.model.Colony;
 import au.com.codeka.warworlds.model.Empire;
@@ -34,7 +33,7 @@ import au.com.codeka.warworlds.model.StarManager;
 /**
  * This activity is displayed when you're actually looking at a solar system (star + planets)
  */
-public class SolarSystemActivity extends Activity implements StarManager.StarFetchedHandler {
+public class SolarSystemActivity extends FragmentActivity implements StarManager.StarFetchedHandler {
     private static Logger log = LoggerFactory.getLogger(SolarSystemActivity.class);
     private SolarSystemSurfaceView mSolarSystemSurfaceView;
     private Context mContext = this;
@@ -109,29 +108,28 @@ public class SolarSystemActivity extends Activity implements StarManager.StarFet
         focusButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Bundle args = new Bundle();
-                args.putString("au.com.codeka.warworlds.StarKey", mStar.getKey());
-                args.putParcelable("au.com.codeka.warworlds.Colony", mColony);
-
-                DialogManager.getInstance().show(SolarSystemActivity.this, FocusDialog.class, args);
+                FocusDialog dialog = new FocusDialog();
+                dialog.setColony(mColony);
+                dialog.show(getSupportFragmentManager(), "");
             }
         });
 
         fleetButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Bundle args = new Bundle();
-                args.putString("au.com.codeka.warworlds.StarKey", mStar.getKey());
-                DialogManager.getInstance().show(SolarSystemActivity.this, FleetDialog.class, args);
+                FragmentManager fm = getSupportFragmentManager();
+                FleetDialog dialog = new FleetDialog();
+                dialog.setStar(mStar);
+                dialog.show(fm, "");
             }
         });
 
         reportsButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Bundle args = new Bundle();
-                args.putString("au.com.codeka.warworlds.StarKey", mStar.getKey());
-                DialogManager.getInstance().show(SolarSystemActivity.this, ScoutReportDialog.class, args);
+                ScoutReportDialog dialog = new ScoutReportDialog();
+                dialog.setStar(mStar);
+                dialog.show(getSupportFragmentManager(), "");
             }
         });
     }
@@ -234,20 +232,6 @@ public class SolarSystemActivity extends Activity implements StarManager.StarFet
         setResult(RESULT_OK, intent);
 
         super.onBackPressed();
-    }
-
-    @Override
-    protected Dialog onCreateDialog(int id) {
-        Dialog d = DialogManager.getInstance().onCreateDialog(this, id);
-        if (d == null)
-            d = super.onCreateDialog(id);
-        return d;
-    }
-
-    @Override
-    protected void onPrepareDialog(int id, Dialog d, Bundle args) {
-        DialogManager.getInstance().onPrepareDialog(this, id, d, args);
-        super.onPrepareDialog(id, d, args);
     }
 
     private void refreshSelectedPlanet() {

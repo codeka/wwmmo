@@ -9,28 +9,23 @@ import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.Duration;
 import org.joda.time.Interval;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import android.app.Activity;
-import android.app.Dialog;
 import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.support.v4.app.DialogFragment;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.view.Window;
-import android.view.WindowManager;
 import android.widget.AbsListView;
 import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.SpinnerAdapter;
 import android.widget.TextView;
-import au.com.codeka.warworlds.DialogManager;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.ctrl.ColonyList;
 import au.com.codeka.warworlds.ctrl.FleetList;
@@ -39,39 +34,32 @@ import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.Fleet;
 import au.com.codeka.warworlds.model.MyEmpire;
 import au.com.codeka.warworlds.model.ScoutReport;
-import au.com.codeka.warworlds.model.SectorManager;
 import au.com.codeka.warworlds.model.Star;
 
-public class ScoutReportDialog extends Dialog implements DialogManager.DialogConfigurable {
-    private static Logger log = LoggerFactory.getLogger(ScoutReportDialog.class);
-    private Context mContext;
+public class ScoutReportDialog extends DialogFragment {
     private ReportAdapter mReportAdapter;
+    private Star mStar;
+    private View mView;
 
-    public static final int ID = 98475;
+    public ScoutReportDialog() {
+    }
 
-    public ScoutReportDialog(Activity activity) {
-        super(activity);
-        mContext = activity;
+    public void setStar(Star star) {
+        mStar = star;
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        getDialog().requestWindowFeature(Window.FEATURE_NO_TITLE);
+        mView = inflater.inflate(R.layout.scout_report_dlg, container);
 
-        requestWindowFeature(Window.FEATURE_NO_TITLE);
-        setContentView(R.layout.scout_report_dlg);
-
-        WindowManager.LayoutParams params = getWindow().getAttributes();
-        params.height = LayoutParams.MATCH_PARENT;
-        params.width = LayoutParams.MATCH_PARENT;
-        getWindow().setAttributes(params);
-
-        final View progressBar = findViewById(R.id.progress_bar);
-        final View reportList = findViewById(R.id.report_items);
-        final View reportDate = findViewById(R.id.report_date);
-        final View newerButton = findViewById(R.id.newer_btn);
-        final View olderButton = findViewById(R.id.older_btn);
-        final ListView reportItems = (ListView) findViewById(R.id.report_items);
+        final View progressBar = mView.findViewById(R.id.progress_bar);
+        final View reportList = mView.findViewById(R.id.report_items);
+        final View reportDate = mView.findViewById(R.id.report_date);
+        final View newerButton = mView.findViewById(R.id.newer_btn);
+        final View olderButton = mView.findViewById(R.id.older_btn);
+        final ListView reportItems = (ListView) mView.findViewById(R.id.report_items);
 
         progressBar.setVisibility(View.VISIBLE);
         reportList.setVisibility(View.GONE);
@@ -81,25 +69,12 @@ public class ScoutReportDialog extends Dialog implements DialogManager.DialogCon
 
         mReportAdapter = new ReportAdapter();
         reportItems.setAdapter(mReportAdapter);
-    }
-
-    @Override
-    public void setBundle(Activity activity, Bundle bundle) {
-        final View progressBar = findViewById(R.id.progress_bar);
-        final View reportList = findViewById(R.id.report_items);
 
         progressBar.setVisibility(View.VISIBLE);
         reportList.setVisibility(View.GONE);
 
-        String starKey = bundle.getString("au.com.codeka.warworlds.StarKey");
-        Star star = SectorManager.getInstance().findStar(starKey);
-        if (star == null) {
-            // TODO: should never happen...
-            log.error("SectorManager.findStar() returned null!");
-            return;
-        }
-
-        EmpireManager.getInstance().getEmpire().fetchScoutReports(star, new MyEmpire.FetchScoutReportCompleteHandler() {
+        EmpireManager.getInstance().getEmpire().fetchScoutReports(
+                mStar, new MyEmpire.FetchScoutReportCompleteHandler() {
             @Override
             public void onComplete(List<ScoutReport> reports) {
                 progressBar.setVisibility(View.GONE);
@@ -108,17 +83,19 @@ public class ScoutReportDialog extends Dialog implements DialogManager.DialogCon
                 refreshReports(reports);
             }
         });
+
+        return mView;
     }
 
     private void refreshReports(List<ScoutReport> reports) {
 
-        Spinner reportDates = (Spinner) findViewById(R.id.report_date);
+        Spinner reportDates = (Spinner) mView.findViewById(R.id.report_date);
         reportDates.setAdapter(new ReportDatesAdapter(reports));
 
         if (reports.size() > 0) {
-            final View reportDate = findViewById(R.id.report_date);
-            final View newerButton = findViewById(R.id.newer_btn);
-            final View olderButton = findViewById(R.id.older_btn);
+            final View reportDate = mView.findViewById(R.id.report_date);
+            final View newerButton = mView.findViewById(R.id.newer_btn);
+            final View olderButton = mView.findViewById(R.id.older_btn);
             reportDate.setEnabled(true);
             newerButton.setEnabled(true);
             olderButton.setEnabled(true);
@@ -175,7 +152,7 @@ public class ScoutReportDialog extends Dialog implements DialogManager.DialogCon
             if (convertView != null) {
                 view = (TextView) convertView;
             } else {
-                view = new TextView(mContext);
+                view = new TextView(getActivity());
                 view.setGravity(Gravity.CENTER_VERTICAL);
             }
 
@@ -238,7 +215,6 @@ public class ScoutReportDialog extends Dialog implements DialogManager.DialogCon
                         if (lhsFleet.getDesignID().equals(rhsFleet.getDesignID())) {
                             return lhsFleet.getNumShips() - rhsFleet.getNumShips();
                         } else {
-                            // TODO: can we trust this sort? so far we can...
                             return lhsFleet.getDesignID().compareTo(rhsFleet.getDesignID());
                         }
                     }
@@ -297,7 +273,7 @@ public class ScoutReportDialog extends Dialog implements DialogManager.DialogCon
             View view = convertView;
 
             if (view == null) {
-                LayoutInflater inflater = (LayoutInflater) mContext.getSystemService
+                LayoutInflater inflater = (LayoutInflater) getActivity().getSystemService
                         (Context.LAYOUT_INFLATER_SERVICE);
                 if (item.colony != null) {
                     view = inflater.inflate(R.layout.colony_list_row, null);
@@ -309,12 +285,12 @@ public class ScoutReportDialog extends Dialog implements DialogManager.DialogCon
             if (item.colony != null) {
                 Colony colony = item.colony;
 
-                ColonyList.populateColonyListRow(mContext, view, colony, mStar);
+                ColonyList.populateColonyListRow(getActivity(), view, colony, mStar);
                 TextView uncollectedTaxes = (TextView) view.findViewById(R.id.colony_taxes);
                 uncollectedTaxes.setText("");
             } else {
                 Fleet fleet = item.fleet;
-                FleetList.populateFleetRow(mContext, null, view, fleet);
+                FleetList.populateFleetRow(getActivity(), null, view, fleet);
             }
 
             return view;

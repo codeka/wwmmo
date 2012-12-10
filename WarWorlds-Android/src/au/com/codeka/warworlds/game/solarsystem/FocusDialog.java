@@ -6,16 +6,15 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import android.app.Activity;
-import android.app.Dialog;
-import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.app.DialogFragment;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.SeekBar;
-import au.com.codeka.warworlds.DialogManager;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.api.ApiClient;
 import au.com.codeka.warworlds.api.ApiException;
@@ -23,25 +22,33 @@ import au.com.codeka.warworlds.model.Colony;
 import au.com.codeka.warworlds.model.StarManager;
 import au.com.codeka.warworlds.model.protobuf.Messages;
 
-public class FocusDialog extends Dialog implements DialogManager.DialogConfigurable {
+public class FocusDialog extends DialogFragment {
     private static Logger log = LoggerFactory.getLogger(FocusDialog.class);
     private Colony mColony;
     private List<SeekBar> mSeekBars;
-    private Context mContext;
 
-    public static final int ID = 1002;
+    public FocusDialog() {
+    }
 
-    public FocusDialog(Activity activity) {
-        super(activity);
-        mContext = activity;
+    public void setColony(Colony colony) {
+        mColony = colony;
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        getDialog().requestWindowFeature(Window.FEATURE_NO_TITLE);
+        View view = inflater.inflate(R.layout.solarsystem_focus, container);
 
-        requestWindowFeature(Window.FEATURE_NO_TITLE);
-        setContentView(R.layout.solarsystem_focus);
+        final SeekBar populationFocus = (SeekBar) view.findViewById(R.id.solarsystem_colony_population_focus);
+        final SeekBar farmingFocus = (SeekBar) view.findViewById(R.id.solarsystem_colony_farming_focus);
+        final SeekBar miningFocus = (SeekBar) view.findViewById(R.id.solarsystem_colony_mining_focus);
+        final SeekBar constructionFocus = (SeekBar) view.findViewById(R.id.solarsystem_colony_construction_focus);
+
+        populationFocus.setProgress((int)(mColony.getPopulationFocus() * 100.0));
+        farmingFocus.setProgress((int)(mColony.getFarmingFocus() * 100.0));
+        miningFocus.setProgress((int)(mColony.getMiningFocus() * 100.0));
+        constructionFocus.setProgress((int)(mColony.getConstructionFocus() * 100.0));
 
         mSeekBars = new ArrayList<SeekBar>();
         int[] ids = {R.id.solarsystem_colony_population_focus,
@@ -49,7 +56,7 @@ public class FocusDialog extends Dialog implements DialogManager.DialogConfigura
                      R.id.solarsystem_colony_mining_focus,
                      R.id.solarsystem_colony_construction_focus};
         for(int id : ids) {
-            SeekBar seekBar = (SeekBar) findViewById(id);
+            SeekBar seekBar = (SeekBar) view.findViewById(id);
             seekBar.setMax(100);
             mSeekBars.add(seekBar);
 
@@ -69,15 +76,10 @@ public class FocusDialog extends Dialog implements DialogManager.DialogConfigura
             });
         }
 
-        final Button okButton = (Button) findViewById(R.id.ok_btn);
+        final Button okButton = (Button) view.findViewById(R.id.ok_btn);
         okButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                SeekBar populationFocus = (SeekBar) findViewById(R.id.solarsystem_colony_population_focus);
-                SeekBar farmingFocus = (SeekBar) findViewById(R.id.solarsystem_colony_farming_focus);
-                SeekBar miningFocus = (SeekBar) findViewById(R.id.solarsystem_colony_mining_focus);
-                SeekBar constructionFocus = (SeekBar) findViewById(R.id.solarsystem_colony_construction_focus);
-
                 mColony.setPopulationFocus(populationFocus.getProgress() / 100.0f);
                 mColony.setFarmingFocus(farmingFocus.getProgress() / 100.0f);
                 mColony.setMiningFocus(miningFocus.getProgress() / 100.0f);
@@ -105,7 +107,8 @@ public class FocusDialog extends Dialog implements DialogManager.DialogConfigura
                     @Override
                     protected void onPostExecute(Void unused) {
                         // notify the StarManager that this star has been updated
-                        StarManager.getInstance().refreshStar(mContext, mColony.getStarKey());
+                        StarManager.getInstance().refreshStar(
+                                getActivity(), mColony.getStarKey());
 
                         okButton.setEnabled(true);
                         dismiss();
@@ -113,6 +116,8 @@ public class FocusDialog extends Dialog implements DialogManager.DialogConfigura
                 }.execute();
             }
         });
+
+        return view;
     }
 
     private void redistribute(SeekBar changedSeekBar, double newValue) {
@@ -133,20 +138,5 @@ public class FocusDialog extends Dialog implements DialogManager.DialogConfigura
                 continue;
             seekBar.setProgress((int)(seekBar.getProgress() / ratio));
         }
-    }
-
-    @Override
-    public void setBundle(Activity activity, Bundle bundle) {
-        mColony = (Colony) bundle.getParcelable("au.com.codeka.warworlds.Colony");
-
-        SeekBar populationFocus = (SeekBar) findViewById(R.id.solarsystem_colony_population_focus);
-        populationFocus.setProgress((int)(mColony.getPopulationFocus() * 100.0));
-        SeekBar farmingFocus = (SeekBar) findViewById(R.id.solarsystem_colony_farming_focus);
-        farmingFocus.setProgress((int)(mColony.getFarmingFocus() * 100.0));
-        SeekBar miningFocus = (SeekBar) findViewById(R.id.solarsystem_colony_mining_focus);
-        miningFocus.setProgress((int)(mColony.getMiningFocus() * 100.0));
-        SeekBar constructionFocus = (SeekBar) findViewById(R.id.solarsystem_colony_construction_focus);
-        constructionFocus.setProgress((int)(mColony.getConstructionFocus() * 100.0));
-
     }
 }

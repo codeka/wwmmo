@@ -6,11 +6,10 @@ import java.util.Locale;
 
 import org.apache.commons.lang3.StringUtils;
 
-import android.app.Activity;
-import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
 import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -24,7 +23,6 @@ import android.widget.ListView;
 import android.widget.TextView;
 import au.com.codeka.Cash;
 import au.com.codeka.TimeInHours;
-import au.com.codeka.warworlds.DialogManager;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.TabManager;
 import au.com.codeka.warworlds.TabManager.TabInfo;
@@ -52,7 +50,7 @@ import au.com.codeka.warworlds.model.StarSummary;
  * The \c StarfieldActivity is the "home" screen of the game, and displays the
  * starfield where you scroll around and interact with stars, etc.
  */
-public class StarfieldActivity extends Activity {
+public class StarfieldActivity extends FragmentActivity {
     private Context mContext = this;
     private StarfieldSurfaceView mStarfield;
     private ListView mPlanetList;
@@ -236,11 +234,9 @@ public class StarfieldActivity extends Activity {
             @Override
             public void onClick(View v) {
                 if (mSelectedStar != null) {
-                    Bundle args = new Bundle();
-                    args.putString("au.com.codeka.warworlds.StarKey", mSelectedStar.getKey());
-                    DialogManager.getInstance().show(StarfieldActivity.this,
-                                                     ScoutReportDialog.class,
-                                                     args);
+                    ScoutReportDialog dialog = new ScoutReportDialog();
+                    dialog.setStar(mSelectedStar);
+                    dialog.show(getSupportFragmentManager(), "");
                 }
             }
         });
@@ -360,20 +356,6 @@ public class StarfieldActivity extends Activity {
                 navigateToFleet(starKey, fleetKey);
             }
         }
-    }
-
-    @Override
-    protected Dialog onCreateDialog(int id) {
-        Dialog d = DialogManager.getInstance().onCreateDialog(this, id);
-        if (d == null)
-            d = super.onCreateDialog(id);
-        return d;
-    }
-
-    @Override
-    protected void onPrepareDialog(int id, Dialog d, Bundle args) {
-        DialogManager.getInstance().onPrepareDialog(this, id, d, args);
-        super.onPrepareDialog(id, d, args);
     }
 
     class PlanetListAdapter extends BaseAdapter {

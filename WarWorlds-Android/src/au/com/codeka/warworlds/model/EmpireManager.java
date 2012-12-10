@@ -16,7 +16,7 @@ import au.com.codeka.warworlds.api.ApiClient;
 import au.com.codeka.warworlds.model.protobuf.Messages;
 
 /**
- * Manages stuff about your empire (e.g. colonizing planets and whatnot).
+ * Manages stuff about your empire (e.g. colonising planets and what-not).
  */
 public class EmpireManager {
     private static Logger log = LoggerFactory.getLogger(EmpireManager.class);

@@ -2,7 +2,6 @@ package au.com.codeka.warworlds.game;
 
 import java.util.HashSet;
 
-import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -14,7 +13,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import au.com.codeka.warworlds.DialogManager;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.TabFragmentActivity;
 import au.com.codeka.warworlds.ctrl.ColonyList;
@@ -92,20 +90,6 @@ public class EmpireActivity extends TabFragmentActivity {
         });
     }
 
-    @Override
-    protected Dialog onCreateDialog(int id) {
-        Dialog d = DialogManager.getInstance().onCreateDialog(this, id);
-        if (d == null)
-            d = super.onCreateDialog(id);
-        return d;
-    }
-
-    @Override
-    protected void onPrepareDialog(int id, Dialog d, Bundle args) {
-        DialogManager.getInstance().onPrepareDialog(this, id, d, args);
-        super.onPrepareDialog(id, d, args);
-    }
-
     public static class BaseFragment extends Fragment {
         /**
          * Gets a view to display if we're still loading the empire details.
@@ -134,7 +118,7 @@ public class EmpireActivity extends TabFragmentActivity {
             }
 
             // Current value of R.id.empire_overview_format (in English):
-            // %1$d stars and %2$d planets colonized
+            // %1$d stars and %2$d planets colonised
             // %3$d ships in %4$d fleets
             String fmt = getActivity().getString(R.string.empire_overview_format);
             final TextView overviewText = (TextView) v.findViewById(R.id.overview_text);
@@ -228,13 +212,11 @@ public class EmpireActivity extends TabFragmentActivity {
                 public void onFleetSplit(Star star, Fleet fleet) {
                     Bundle args = new Bundle();
                     args.putParcelable("au.com.codeka.warworlds.Fleet", fleet);
-                    DialogManager.getInstance().show(getActivity(), FleetSplitDialog.class, args,
-                            new DialogInterface.OnDismissListener() {
-                                @Override
-                                public void onDismiss(DialogInterface dialog) {
-                                    ((EmpireActivity) getActivity()).refresh();
-                                }
-                            });
+
+                    FragmentManager fm = getActivity().getSupportFragmentManager();
+                    FleetSplitDialog dialog = new FleetSplitDialog();
+                    dialog.setFleet(fleet);
+                    dialog.show(fm, "");
                 }
 
                 @Override
@@ -242,7 +224,7 @@ public class EmpireActivity extends TabFragmentActivity {
                     FragmentManager fm = getActivity().getSupportFragmentManager();
                     FleetMoveDialog dialog = new FleetMoveDialog();
                     dialog.setFleet(fleet);
-                    dialog.show(fm, "stuff");
+                    dialog.show(fm, "");
                 }
 
                 @Override

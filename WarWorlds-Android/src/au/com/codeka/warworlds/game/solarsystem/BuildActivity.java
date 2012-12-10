@@ -6,7 +6,6 @@ import java.util.Map;
 
 import org.joda.time.Duration;
 
-import android.app.Dialog;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -21,7 +20,6 @@ import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import au.com.codeka.TimeInHours;
-import au.com.codeka.warworlds.DialogManager;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.TabFragmentActivity;
 import au.com.codeka.warworlds.ctrl.HorizontalSeparator;
@@ -85,25 +83,9 @@ public class BuildActivity extends TabFragmentActivity implements StarManager.St
         getTabManager().reloadTab();
     }
 
-    @Override
-    protected Dialog onCreateDialog(int id) {
-        Dialog d = DialogManager.getInstance().onCreateDialog(this, id);
-        if (d == null) {
-            d = super.onCreateDialog(id);
-        }
-
-        return d;
-    }
-
-    @Override
-    protected void onPrepareDialog(int id, Dialog d, Bundle args) {
-        DialogManager.getInstance().onPrepareDialog(this, id, d, args);
-        super.onPrepareDialog(id, d, args);
-    }
-
     /**
-     * Returns the dependenices of the given design a string for display to the user. Dependencies
-     * that we don't meet will be coloured red.
+     * Returns the dependencies of the given design a string for display to
+     * the user. Dependencies that we don't meet will be coloured red.
      */
     private String getDependenciesList(Design design) {
         String required = "Required: ";
@@ -156,8 +138,6 @@ public class BuildActivity extends TabFragmentActivity implements StarManager.St
             buildingsList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                    Bundle args = new Bundle();
-
                     Object o = mBuildingListAdapter.getItem(position);
                     if (o instanceof BuildingDesign) {
                         int buildQueueSize = 0;
@@ -169,14 +149,10 @@ public class BuildActivity extends TabFragmentActivity implements StarManager.St
                         }
 
                         BuildingDesign design = (BuildingDesign) o;
-                        args.putString("au.com.codeka.warworlds.DesignID", design.getID());
-                        args.putInt("au.com.codeka.warworlds.DesignKind", design.getDesignKind().getValue());
-                        args.putInt("au.com.codeka.warworlds.BuildQueueSize", buildQueueSize);
-                        args.putParcelable("au.com.codeka.warworlds.Colony", colony);
 
-                        DialogManager.getInstance().show(getActivity(),
-                                                         BuildConfirmDialog.class,
-                                                         args);
+                        BuildConfirmDialog dialog = new BuildConfirmDialog();
+                        dialog.setup(design, colony, buildQueueSize);
+                        dialog.show(getActivity().getSupportFragmentManager(), "");
                     } else if (o instanceof Building) {
                         // TODO: upgrade building
                     }
@@ -353,13 +329,18 @@ public class BuildActivity extends TabFragmentActivity implements StarManager.St
             availableDesignsList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                    Bundle args = new Bundle();
+                    int buildQueueSize = 0;
+                    BuildActivity activity = (BuildActivity) getActivity();
+                    for (BuildRequest br : activity.mStar.getBuildRequests()) {
+                        if (br.getColonyKey().equals(colony.getKey())) {
+                            buildQueueSize ++;
+                        }
+                    }
                     ShipDesign design = (ShipDesign) adapter.getItem(position);
-                    args.putString("au.com.codeka.warworlds.DesignID", design.getID());
-                    args.putInt("au.com.codeka.warworlds.DesignKind", design.getDesignKind().getValue());
-                    args.putParcelable("au.com.codeka.warworlds.Colony", colony);
 
-                    DialogManager.getInstance().show(getActivity(), BuildConfirmDialog.class, args);
+                    BuildConfirmDialog dialog = new BuildConfirmDialog();
+                    dialog.setup(design, colony, buildQueueSize);
+                    dialog.show(getActivity().getSupportFragmentManager(), "");
                 }
             });
 
@@ -450,11 +431,10 @@ public class BuildActivity extends TabFragmentActivity implements StarManager.St
             buildQueueList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                    Bundle args = new Bundle();
                     BuildRequest buildRequest = (BuildRequest) adapter.getItem(position);
-                    args.putParcelable("au.com.codeka.warworlds.BuildRequest", buildRequest);
-                    args.putString("au.com.codeka.warworlds.StarKey", star.getKey());
-                    DialogManager.getInstance().show(getActivity(), BuildProgressDialog.class, args);
+                    BuildProgressDialog dialog = new BuildProgressDialog();
+                    dialog.setBuildRequest(buildRequest, star.getKey());
+                    dialog.show(getActivity().getSupportFragmentManager(), "");
                 }
             });
 
@@ -462,7 +442,6 @@ public class BuildActivity extends TabFragmentActivity implements StarManager.St
             BuildQueueManager.getInstance().addBuildQueueUpdatedListener(new BuildQueueManager.BuildQueueUpdatedListener() {
                 @Override
                 public void onBuildQueueUpdated(List<BuildRequest> queue) {
-                    // TODO: this will be out-of-date...
                     adapter.setBuildQueue(star, colony);
                 }
             });
