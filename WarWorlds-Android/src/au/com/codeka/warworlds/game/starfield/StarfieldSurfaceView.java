@@ -534,12 +534,13 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
         if (isVisible(canvas, (x - 100) * pixelScale, (y - 100) * pixelScale,
                               (x + 100) * pixelScale, (y + 100) * pixelScale)) {
 
-            int imageSize = (int)(star.getSize() * star.getStarType().getImageScale() * 2);
+            float imageScale = (float) star.getStarType().getImageScale();
+            int imageSize = (int)(star.getSize() * imageScale * 2);
             Sprite sprite = StarImageManager.getInstance().getSprite(mContext, star, imageSize);
             mMatrix.reset();
             mMatrix.postTranslate(-(sprite.getWidth() / 2.0f), -(sprite.getHeight() / 2.0f));
-            mMatrix.postScale(40.0f * pixelScale / sprite.getWidth(),
-                              40.0f * pixelScale / sprite.getHeight());
+            mMatrix.postScale(40.0f * imageScale * pixelScale / sprite.getWidth(),
+                              40.0f * imageScale * pixelScale / sprite.getHeight());
             mMatrix.postTranslate(x * pixelScale, y * pixelScale);
             canvas.save();
             canvas.setMatrix(mMatrix);

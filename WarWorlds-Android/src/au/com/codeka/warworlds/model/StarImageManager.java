@@ -27,7 +27,8 @@ public class StarImageManager extends ImageManager {
         if (bmp == null) {
             SpriteManager spriteManager = SpriteManager.getInstance();
 
-            String spriteName = "star."+(size > 250 ? "big." : "small.")+star.getStarType().getInternalName();
+            double realSize = size * star.getStarType().getImageScale();
+            String spriteName = "star."+(realSize > 250 ? "big." : "small.")+star.getStarType().getInternalName();
             Sprite s = spriteManager.getSprite(spriteName);
 
             if (s.getNumFrames() <= 1) {
@@ -36,7 +37,6 @@ public class StarImageManager extends ImageManager {
 
             int frameNo = new Random(star.hashCode()).nextInt(s.getNumFrames());
             s = s.extractFrame(frameNo);
-            s.setScale((float) getPlanetSize(starExtra) / 8.0f);
             return s;
         } else {
             return Sprite.createSimpleSprite(bmp);

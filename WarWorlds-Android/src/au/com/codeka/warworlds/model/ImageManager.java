@@ -8,6 +8,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Random;
@@ -72,7 +73,7 @@ public abstract class ImageManager {
             return null;
         }
 
-        final String cacheKey = String.format("%s_%d", key, size);
+        final String cacheKey = String.format(Locale.ENGLISH, "%s_%d", key, size);
         Bitmap loadedBitmap = mLoadedBitmaps.get(cacheKey);
         if (loadedBitmap != null) {
             return loadedBitmap;
@@ -176,7 +177,6 @@ public abstract class ImageManager {
             return null; // should never happen!
         }
 
-        // TODO: better seed
         long seed = key.hashCode();
         Random rand = new Random(seed);
 
@@ -253,7 +253,6 @@ public abstract class ImageManager {
         double size = getPlanetSize(item.extra);
         planetTemplate.setPlanetSize(size);
 
-        // TODO: better seed
         long seed = item.key.hashCode();
         Random rand = new Random(seed);
 
