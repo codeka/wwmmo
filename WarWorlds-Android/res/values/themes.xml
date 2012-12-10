@@ -1,19 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="WarWorlds" parent="android:Theme"></style>
-
-    <style name="BottomPane" parent="@style/WarWorlds">
-        <item name="android:background">@drawable/bottom_pane_bg</item>
+    <style name="WarWorlds" parent="@android:style/Theme">
+        <item name="android:buttonStyle">@style/Button</item>
+        <item name="android:spinnerStyle">@style/Spinner</item>
     </style>
 
     <style name="Button" parent="android:style/Widget.Button">
         <item name="android:background">@drawable/button_bg</item>
         <item name="android:textColor">#ffffff</item>
-        <item name="android:layout_marginTop">6dp</item>
-        <item name="android:layout_marginBottom">6dp</item>
-        <item name="android:layout_marginLeft">2dp</item>
-        <item name="android:layout_marginRight">2dp</item>
     </style>
 
     <style name="Spinner" parent="android:style/Widget.Spinner">
@@ -25,6 +20,10 @@
         <item name="android:layout_marginRight">2dp</item>
     </style>
 
+    <style name="BottomPane" parent="@style/WarWorlds">
+        <item name="android:background">@drawable/bottom_pane_bg</item>
+    </style>
+    
     <style name="TitleText" parent="android:style/TextAppearance">
         <item name="android:gravity">center</item>
         <item name="android:textSize">48dp</item>

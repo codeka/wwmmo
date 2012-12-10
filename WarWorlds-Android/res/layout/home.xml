@@ -22,28 +22,27 @@
 
         <Button
             android:id="@+id/options_btn"
-            style="@style/Button"
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="wrap_content"
+            android:layout_margin="6dp"
             android:text="@string/options" />
 
         <Button
             android:id="@+id/log_out_btn"
-            style="@style/Button"
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="wrap_content"
+            android:layout_margin="6dp"
             android:text="@string/log_out" />
-
     </LinearLayout>
 
     <Button
         android:id="@+id/start_game_btn"
-        style="@style/Button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_above="@id/button_wrapper"
+        android:layout_margin="6dp"
         android:text="@string/start_game" />
 
     <TextView

@@ -3,6 +3,8 @@ package au.com.codeka.warworlds.game;
 import java.util.Locale;
 
 import android.app.AlertDialog;
+import android.app.Dialog;
+import android.content.DialogInterface;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.graphics.Paint;
@@ -13,9 +15,6 @@ import android.support.v4.app.DialogFragment;
 import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
-import android.view.Window;
-import android.widget.Button;
 import android.widget.TextView;
 import au.com.codeka.Cash;
 import au.com.codeka.Point2D;
@@ -40,6 +39,7 @@ public class FleetMoveDialog extends DialogFragment {
     private SourceStarOverlay mSourceStarOverlay;
     private DestinationStarOverlay mDestinationStarOverlay;
     private StarSummary mSourceStarSummary;
+    private View mView;
 
     public FleetMoveDialog() {
     }
@@ -48,28 +48,24 @@ public class FleetMoveDialog extends DialogFragment {
         mFleet = fleet;
     }
 
+
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public Dialog onCreateDialog(Bundle savedInstanceState) {
+        LayoutInflater inflater = getActivity().getLayoutInflater();
+        mView = inflater.inflate(R.layout.fleet_move_dlg, null);
 
-        getDialog().requestWindowFeature(Window.FEATURE_NO_TITLE);
-        View view = inflater.inflate(R.layout.fleet_move_dlg, container);
+        final View starDetailsView = mView.findViewById(R.id.star_details);
+        final View instructionsView = mView.findViewById(R.id.instructions);
+        final TextView starDetailsLeft = (TextView) mView.findViewById(R.id.star_details_left);
+        final TextView starDetailsRight = (TextView) mView.findViewById(R.id.star_details_right);
 
-        final Button moveBtn = (Button) view.findViewById(R.id.move_btn);
-        final Button cancelBtn = (Button) view.findViewById(R.id.cancel_btn);
-        final View starDetailsView = view.findViewById(R.id.star_details);
-        final View instructionsView = view.findViewById(R.id.instructions);
-        final TextView starDetailsLeft = (TextView) view.findViewById(R.id.star_details_left);
-        final TextView starDetailsRight = (TextView) view.findViewById(R.id.star_details_right);
-
-        moveBtn.setEnabled(false); // disabled until you select a star
         starDetailsView.setVisibility(View.GONE);
         instructionsView.setVisibility(View.VISIBLE);
 
         mSourceStarOverlay = new SourceStarOverlay();
         mDestinationStarOverlay = new DestinationStarOverlay();
 
-        mStarfield = (StarfieldSurfaceView) view.findViewById(R.id.starfield);
+        mStarfield = (StarfieldSurfaceView) mView.findViewById(R.id.starfield);
         mStarfield.setZOrderOnTop(true);
 
         mStarfield.addSelectionChangedListener(new StarfieldSurfaceView.OnSelectionChangedListener() {
@@ -109,7 +105,8 @@ public class FleetMoveDialog extends DialogFragment {
                     starDetailsRight.setText(Html.fromHtml(rightDetails));
                 }
 
-                moveBtn.setEnabled(true);
+                ((AlertDialog) getDialog()).getButton(AlertDialog.BUTTON_POSITIVE)
+                            .setEnabled(true);
                 starDetailsView.setVisibility(View.VISIBLE);
                 instructionsView.setVisibility(View.GONE);
             }
@@ -119,69 +116,8 @@ public class FleetMoveDialog extends DialogFragment {
             }
         });
 
-        cancelBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                dismiss();
-            }
-        });
-
-        moveBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                final Star selectedStar = mStarfield.getSelectedStar();
-                if (selectedStar == null) {
-                    return;
-                }
-
-                moveBtn.setEnabled(false);
-                cancelBtn.setEnabled(false);
-
-                new AsyncTask<Void, Void, Boolean>() {
-                    @Override
-                    protected Boolean doInBackground(Void... params) {
-                        String url = String.format("stars/%s/fleets/%s/orders",
-                                                   mFleet.getStarKey(),
-                                                   mFleet.getKey());
-                        Messages.FleetOrder fleetOrder = Messages.FleetOrder.newBuilder()
-                                       .setOrder(Messages.FleetOrder.FLEET_ORDER.MOVE)
-                                       .setStarKey(selectedStar.getKey())
-                                       .build();
-                        try {
-                            return ApiClient.postProtoBuf(url, fleetOrder);
-                        } catch (ApiException e) {
-                            return false;
-                        }
-                    }
-
-                    @Override
-                    protected void onPostExecute(Boolean success) {
-                        if (!success) {
-                            AlertDialog dialog = new AlertDialog.Builder(getActivity())
-                                                    .setMessage("Could not move the fleet: do you have enough cash?")
-                                                    .create();
-                            dialog.show();
-                        } else {
-                            // the star this fleet is attached to needs to be refreshed...
-                            StarManager.getInstance().refreshStar(getActivity(), mFleet.getStarKey());
-                            moveBtn.setEnabled(true);
-                            cancelBtn.setEnabled(true);
-                            if (success) {
-                                dismiss();
-                            }
-
-                            // the empire needs to be updated, too, since we'll have subtracted
-                            // the cost of this move from your cash
-                            EmpireManager.getInstance().refreshEmpire(mFleet.getEmpireKey());
-                        }
-                    }
-
-                }.execute();
-            }
-        });
-
         StarManager.getInstance().requestStarSummary(getActivity(), mFleet.getStarKey(),
-                                                     new StarManager.StarSummaryFetchedHandler() {
+                new StarManager.StarSummaryFetchedHandler() {
             @Override
             public void onStarSummaryFetched(StarSummary s) {
                 mSourceStarSummary = s;
@@ -198,7 +134,85 @@ public class FleetMoveDialog extends DialogFragment {
             }
         });
 
-        return view;
+        AlertDialog.Builder b = new AlertDialog.Builder(getActivity());
+        b.setView(mView);
+
+        b.setPositiveButton("Move", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                onMoveClick();
+            }
+            
+        });
+
+        b.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dismiss();
+            }
+        });
+
+        final AlertDialog dialog = b.create();
+        dialog.setOnShowListener(new DialogInterface.OnShowListener() {
+            @Override
+            public void onShow(DialogInterface d) {
+                dialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
+            }
+        });
+
+        return dialog;
+    }
+
+    private void onMoveClick() {
+        final Star selectedStar = mStarfield.getSelectedStar();
+        if (selectedStar == null) {
+            return;
+        }
+
+        final AlertDialog dialog = (AlertDialog) getDialog();
+        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
+        dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setEnabled(false);
+
+        new AsyncTask<Void, Void, Boolean>() {
+            @Override
+            protected Boolean doInBackground(Void... params) {
+                String url = String.format("stars/%s/fleets/%s/orders",
+                                           mFleet.getStarKey(),
+                                           mFleet.getKey());
+                Messages.FleetOrder fleetOrder = Messages.FleetOrder.newBuilder()
+                               .setOrder(Messages.FleetOrder.FLEET_ORDER.MOVE)
+                               .setStarKey(selectedStar.getKey())
+                               .build();
+                try {
+                    return ApiClient.postProtoBuf(url, fleetOrder);
+                } catch (ApiException e) {
+                    return false;
+                }
+            }
+
+            @Override
+            protected void onPostExecute(Boolean success) {
+                if (!success) {
+                    AlertDialog dialog = new AlertDialog.Builder(getActivity())
+                                            .setMessage("Could not move the fleet: do you have enough cash?")
+                                            .create();
+                    dialog.show();
+                } else {
+                    // the star this fleet is attached to needs to be refreshed...
+                    StarManager.getInstance().refreshStar(getActivity(), mFleet.getStarKey());
+                    dialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(true);
+                    dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setEnabled(true);
+                    if (success) {
+                        dismiss();
+                    }
+
+                    // the empire needs to be updated, too, since we'll have subtracted
+                    // the cost of this move from your cash
+                    EmpireManager.getInstance().refreshEmpire(mFleet.getEmpireKey());
+                }
+            }
+
+        }.execute();
     }
 
     /**
