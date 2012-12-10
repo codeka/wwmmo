@@ -6,7 +6,11 @@ import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
 
-
+@SuppressWarnings("deprecation") // we use the deprecated "single list of
+                                 // preferences" here, because we want to support
+                                 // older versions of Android, and there's no
+                                 // implementing this twice when we only have
+                                 // one level of preferences anyway.
 public class GlobalOptionsActivity extends PreferenceActivity
                                    implements SharedPreferences.OnSharedPreferenceChangeListener {
 
@@ -15,7 +19,8 @@ public class GlobalOptionsActivity extends PreferenceActivity
         super.onCreate(savedInstanceState);
         addPreferencesFromResource(R.xml.global_options);
 
-        ListPreference starfieldDetail = (ListPreference) getPreferenceScreen().findPreference("GlobalOptions.StarfieldDetail");
+        ListPreference starfieldDetail = (ListPreference) getPreferenceScreen()
+                .findPreference("GlobalOptions.StarfieldDetail");
         String[] values = {
             GlobalOptions.StarfieldDetail.BLACK.toString(),
             GlobalOptions.StarfieldDetail.STARS.toString(),
@@ -47,7 +52,8 @@ public class GlobalOptionsActivity extends PreferenceActivity
     }
 
     @Override
-    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences,
+                                          String key) {
         refreshPreferenceSummaries();
     }
 
