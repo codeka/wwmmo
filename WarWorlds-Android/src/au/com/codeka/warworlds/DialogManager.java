@@ -65,8 +65,8 @@ public class DialogManager {
         switch(id) {
         case FleetSplitDialog.ID:
             return new FleetSplitDialog(activity);
-        case FleetMoveDialog.ID:
-            return new FleetMoveDialog(activity);
+       // case FleetMoveDialog.ID:
+       //     return new FleetMoveDialog(activity);
         case FleetDialog.ID:
             return new FleetDialog(activity);
         case BuildConfirmDialog.ID:

@@ -2,27 +2,23 @@ package au.com.codeka.warworlds.game;
 
 import java.util.Locale;
 
-import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.Dialog;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Paint.Style;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.app.DialogFragment;
 import android.text.Html;
-import android.util.FloatMath;
-import android.view.Display;
+import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup.LayoutParams;
+import android.view.ViewGroup;
 import android.view.Window;
-import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.TextView;
 import au.com.codeka.Cash;
 import au.com.codeka.Point2D;
-import au.com.codeka.warworlds.DialogManager;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.api.ApiClient;
 import au.com.codeka.warworlds.api.ApiException;
@@ -38,51 +34,42 @@ import au.com.codeka.warworlds.model.StarManager;
 import au.com.codeka.warworlds.model.StarSummary;
 import au.com.codeka.warworlds.model.protobuf.Messages;
 
-public class FleetMoveDialog extends Dialog implements DialogManager.DialogConfigurable {
-    private Activity mActivity;
+public class FleetMoveDialog extends DialogFragment {
     private Fleet mFleet;
     private StarfieldSurfaceView mStarfield;
     private SourceStarOverlay mSourceStarOverlay;
     private DestinationStarOverlay mDestinationStarOverlay;
     private StarSummary mSourceStarSummary;
 
-    public static final int ID = 1008;
+    public FleetMoveDialog() {
+    }
 
-    public FleetMoveDialog(Activity activity) {
-        super(activity);
-        mActivity = activity;
+    public void setFleet(Fleet fleet) {
+        mFleet = fleet;
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
 
-        requestWindowFeature(Window.FEATURE_NO_TITLE);
-        setContentView(R.layout.fleet_move_dlg);
+        getDialog().requestWindowFeature(Window.FEATURE_NO_TITLE);
+        View view = inflater.inflate(R.layout.fleet_move_dlg, container);
 
-        final Button moveBtn = (Button) findViewById(R.id.move_btn);
-        final Button cancelBtn = (Button) findViewById(R.id.cancel_btn);
-        final View starDetailsView = findViewById(R.id.star_details);
-        final View instructionsView = findViewById(R.id.instructions);
-        final TextView starDetailsLeft = (TextView) findViewById(R.id.star_details_left);
-        final TextView starDetailsRight = (TextView) findViewById(R.id.star_details_right);
+        final Button moveBtn = (Button) view.findViewById(R.id.move_btn);
+        final Button cancelBtn = (Button) view.findViewById(R.id.cancel_btn);
+        final View starDetailsView = view.findViewById(R.id.star_details);
+        final View instructionsView = view.findViewById(R.id.instructions);
+        final TextView starDetailsLeft = (TextView) view.findViewById(R.id.star_details_left);
+        final TextView starDetailsRight = (TextView) view.findViewById(R.id.star_details_right);
 
         moveBtn.setEnabled(false); // disabled until you select a star
         starDetailsView.setVisibility(View.GONE);
-
-        // we want the window to be slightly taller than a square
-        Display display = mActivity.getWindowManager().getDefaultDisplay();
-        int displayWidth = display.getWidth();
-
-        WindowManager.LayoutParams params = getWindow().getAttributes();
-        params.height = displayWidth;
-        params.width = LayoutParams.MATCH_PARENT;
-        getWindow().setAttributes(params);
+        instructionsView.setVisibility(View.VISIBLE);
 
         mSourceStarOverlay = new SourceStarOverlay();
         mDestinationStarOverlay = new DestinationStarOverlay();
 
-        mStarfield = (StarfieldSurfaceView) findViewById(R.id.starfield);
+        mStarfield = (StarfieldSurfaceView) view.findViewById(R.id.starfield);
         mStarfield.setZOrderOnTop(true);
 
         mStarfield.addSelectionChangedListener(new StarfieldSurfaceView.OnSelectionChangedListener() {
@@ -163,7 +150,6 @@ public class FleetMoveDialog extends Dialog implements DialogManager.DialogConfi
                         try {
                             return ApiClient.postProtoBuf(url, fleetOrder);
                         } catch (ApiException e) {
-                            // TODO: do something..?
                             return false;
                         }
                     }
@@ -171,13 +157,13 @@ public class FleetMoveDialog extends Dialog implements DialogManager.DialogConfi
                     @Override
                     protected void onPostExecute(Boolean success) {
                         if (!success) {
-                            AlertDialog dialog = new AlertDialog.Builder(mActivity)
+                            AlertDialog dialog = new AlertDialog.Builder(getActivity())
                                                     .setMessage("Could not move the fleet: do you have enough cash?")
                                                     .create();
                             dialog.show();
                         } else {
                             // the star this fleet is attached to needs to be refreshed...
-                            StarManager.getInstance().refreshStar(mActivity, mFleet.getStarKey());
+                            StarManager.getInstance().refreshStar(getActivity(), mFleet.getStarKey());
                             moveBtn.setEnabled(true);
                             cancelBtn.setEnabled(true);
                             if (success) {
@@ -193,23 +179,8 @@ public class FleetMoveDialog extends Dialog implements DialogManager.DialogConfi
                 }.execute();
             }
         });
-    }
 
-    @Override
-    public void setBundle(Activity activity, Bundle bundle) {
-        mFleet = (Fleet) bundle.getParcelable("au.com.codeka.warworlds.Fleet");
-
-        final Button moveBtn = (Button) findViewById(R.id.move_btn);
-        final View starDetailsView = findViewById(R.id.star_details);
-        final View instructionsView = findViewById(R.id.instructions);
-        moveBtn.setEnabled(false);
-        starDetailsView.setVisibility(View.GONE);
-        instructionsView.setVisibility(View.VISIBLE);
-
-        mStarfield.removeOverlay(mDestinationStarOverlay);
-        mStarfield.deselectStar();
-
-        StarManager.getInstance().requestStarSummary(mActivity, mFleet.getStarKey(),
+        StarManager.getInstance().requestStarSummary(getActivity(), mFleet.getStarKey(),
                                                      new StarManager.StarSummaryFetchedHandler() {
             @Override
             public void onStarSummaryFetched(StarSummary s) {
@@ -226,6 +197,8 @@ public class FleetMoveDialog extends Dialog implements DialogManager.DialogConfi
                 mStarfield.addOverlay(mSourceStarOverlay, s);
             }
         });
+
+        return view;
     }
 
     /**

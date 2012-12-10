@@ -8,6 +8,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -238,9 +239,10 @@ public class EmpireActivity extends TabFragmentActivity {
 
                 @Override
                 public void onFleetMove(Star star, Fleet fleet) {
-                    Bundle args = new Bundle();
-                    args.putParcelable("au.com.codeka.warworlds.Fleet", fleet);
-                    DialogManager.getInstance().show(getActivity(), FleetMoveDialog.class, args);
+                    FragmentManager fm = getActivity().getSupportFragmentManager();
+                    FleetMoveDialog dialog = new FleetMoveDialog();
+                    dialog.setFleet(fleet);
+                    dialog.show(fm, "stuff");
                 }
 
                 @Override
