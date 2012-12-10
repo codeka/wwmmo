@@ -7,11 +7,8 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.android.gcm.GCMRegistrar;
-
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -41,6 +38,8 @@ import au.com.codeka.warworlds.model.StarManager;
 import au.com.codeka.warworlds.model.StarSummary;
 import au.com.codeka.warworlds.model.protobuf.Messages;
 
+import com.google.android.gcm.GCMRegistrar;
+
 /**
  * Main activity. Displays the message of the day and lets you select "Start Game", "Options", etc.
  */
@@ -52,8 +51,6 @@ public class WarWorldsActivity extends Activity {
     private Handler mHandler;
     private boolean mNeedHello;
     private List<Colony> mColonies;
-
-    private static final int OPTIONS_DIALOG = 1000;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -110,15 +107,6 @@ public class WarWorldsActivity extends Activity {
             sayHello(0);
             mNeedHello = false;
         }
-    }
-
-    @Override
-    protected Dialog onCreateDialog(int id) {
-        if (id == OPTIONS_DIALOG) {
-            startActivity(new Intent(mContext, GlobalOptionsActivity.class));
-        }
-
-        return super.onCreateDialog(id);
     }
 
     /**
@@ -283,7 +271,7 @@ public class WarWorldsActivity extends Activity {
         optionsButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                showDialog(OPTIONS_DIALOG);
+                startActivity(new Intent(mContext, GlobalOptionsActivity.class));
             }
         });
 
