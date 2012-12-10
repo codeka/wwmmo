@@ -2,7 +2,9 @@ package au.com.codeka.warworlds;
 
 import java.util.Random;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.drawable.BitmapDrawable;
@@ -37,6 +39,17 @@ public class ActivityBackgroundGenerator {
         StarfieldBackgroundRenderer renderer = new StarfieldBackgroundRenderer(view.getContext());
         renderer.drawBackground(canvas, 0.0f, 0.0f, width, height, new Random().nextLong());
 
-        view.setBackgroundDrawable(new BitmapDrawable(bmp));
+        setBackground(view, bmp);
+    }
+
+    @SuppressLint("NewApi")
+    @SuppressWarnings("deprecation")
+    private static void setBackground(View view, Bitmap bmp) {
+        int sdk = android.os.Build.VERSION.SDK_INT;
+        if (sdk < android.os.Build.VERSION_CODES.JELLY_BEAN) {
+            view.setBackgroundDrawable(new BitmapDrawable(Resources.getSystem(), bmp));
+        } else {
+            view.setBackground(new BitmapDrawable(Resources.getSystem(), bmp));
+        }
     }
 }

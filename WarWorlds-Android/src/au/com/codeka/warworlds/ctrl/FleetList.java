@@ -513,7 +513,7 @@ public class FleetList extends FrameLayout implements StarManager.StarFetchedHan
             }
 
             Fleet.Stance value = mValues[position];
-            view.setText(StringUtils.capitalize(value.toString().toLowerCase()));
+            view.setText(StringUtils.capitalize(value.toString().toLowerCase(Locale.ENGLISH)));
             return view;
         }
     }

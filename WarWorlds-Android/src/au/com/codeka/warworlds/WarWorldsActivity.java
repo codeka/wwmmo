@@ -289,8 +289,9 @@ public class WarWorldsActivity extends Activity {
 
         mStartGameButton.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
-                // we'll want to start off near one of your stars. If you only have one, that's
-                // easy -- but if you've got lots what then? (TODO)
+                // we'll want to start off near one of your stars. If you
+                // only have one, that's easy -- but if you've got lots
+                // what then?
                 String starKey = null;
                 for (Colony c : mColonies) {
                     starKey = c.getStarKey();
@@ -307,8 +308,9 @@ public class WarWorldsActivity extends Activity {
                         public void onStarSummaryFetched(StarSummary s) {
                             mStartGameButton.setEnabled(true);
 
-                            // we don't do anything with the star, we just want to make sure it's
-                            // in the cache before we start the activity.
+                            // we don't do anything with the star, we just want
+                            // to make sure it's in the cache before we start
+                            // the activity.
                             startActivity(intent);
                         }
                     });

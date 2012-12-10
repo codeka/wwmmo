@@ -22,6 +22,7 @@ import org.slf4j.LoggerFactory;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 
+import android.annotation.SuppressLint;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -134,16 +135,7 @@ public class MessageDisplay {
     }
 
     private static void displayNotification(Context context, String message) {
-        int icon = R.drawable.status_icon;
-        long when = System.currentTimeMillis();
-
-        // TODO: something better? this'll just launch us to the home page...
-        Intent intent = new Intent(context, WarWorldsActivity.class);
-
-        Notification notification = new Notification(icon, message, when);
-        notification.setLatestEventInfo(context, "War Worlds", message,
-                PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT));
-        notification.flags |= Notification.FLAG_AUTO_CANCEL;
+        Notification notification = buildNotification(context, message);
 
         SharedPreferences settings = Util.getSharedPreferences(context);
         int notificatonID = settings.getInt("notificationID", 0);
@@ -155,6 +147,36 @@ public class MessageDisplay {
         SharedPreferences.Editor editor = settings.edit();
         editor.putInt("notificationID", ++notificatonID % 32);
         editor.commit();
+    }
+
+    @SuppressWarnings("deprecation")
+    @SuppressLint("NewApi")
+    private static Notification buildNotification(Context context,
+                                                  String message) {
+        int icon = R.drawable.status_icon;
+        long when = System.currentTimeMillis();
+
+        // TODO: something better? this'll just launch us to the home page...
+        Intent intent = new Intent(context, WarWorldsActivity.class);
+        PendingIntent pendingIntent = PendingIntent.getActivity(
+                context, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT);
+
+        int sdk = android.os.Build.VERSION.SDK_INT;
+        if (sdk < android.os.Build.VERSION_CODES.HONEYCOMB) {
+            Notification notification = new Notification(icon, message, when);
+            notification.setLatestEventInfo(context, "War Worlds", message,
+                    pendingIntent);
+            notification.flags |= Notification.FLAG_AUTO_CANCEL;
+            return notification;
+        } else {
+            return new Notification.Builder(context)
+                    .setSmallIcon(icon)
+                    .setContentTitle("War Worlds")
+                    .setContentText(message)
+                    .setWhen(when)
+                    .setContentIntent(pendingIntent)
+                    .build();
+        }
     }
 
     private static void playNotificationSound(Context context) {

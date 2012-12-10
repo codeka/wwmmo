@@ -42,7 +42,7 @@ public class RequestManager {
         if (baseUri.getScheme().equalsIgnoreCase("https")) {
             ssl = true;
         } else if (!baseUri.getScheme().equalsIgnoreCase("http")) {
-            // TODO: invalid scheme!!
+            // should never happen
             log.error("Invalid URI scheme \"{}\", assuming http.", baseUri.getScheme());
         }
 
@@ -194,7 +194,7 @@ public class RequestManager {
     }
 
     private static void fireResponseReceivedHandlers(BasicHttpRequest request,
-            BasicHttpResponse response) {
+            BasicHttpResponse response) throws RequestRetryException {
         for(ResponseReceivedHandler handler : sResponseReceivedHandlers) {
             handler.onResponseReceived(request, response);
         }
@@ -204,10 +204,15 @@ public class RequestManager {
      * Determines whether the given exception is re-tryable or not.
      */
     private static boolean canRetry(Exception e) {
+        if (e instanceof RequestRetryException) {
+            return true;
+        }
+
         if (e instanceof ConnectException) {
             return false;
         }
 
+        // may be others that we can't, but we'll just rety everything for now
         return true;
     }
 
@@ -216,7 +221,9 @@ public class RequestManager {
      * to check for authentication errors and automatically re-authenticate.
      */
     public interface ResponseReceivedHandler {
-        void onResponseReceived(BasicHttpRequest request, BasicHttpResponse response);
+        void onResponseReceived(BasicHttpRequest request,
+                                BasicHttpResponse response)
+                throws RequestRetryException;
     }
 
     /**

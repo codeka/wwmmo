@@ -25,7 +25,6 @@ import android.graphics.Paint;
 import android.graphics.Paint.Style;
 import android.graphics.Rect;
 import android.util.AttributeSet;
-import android.util.FloatMath;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import au.com.codeka.Pair;
@@ -404,7 +403,6 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
     @Override
     public void onDraw(Canvas canvas) {
         if (isInEditMode()) {
-            // TODO: do something?
             return;
         }
 
@@ -460,7 +458,6 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
                 int sx = (int)((x * SectorManager.SECTOR_SIZE) + mOffsetX);
                 int sy = (int)((y * SectorManager.SECTOR_SIZE) + mOffsetY);
 
-                // TODO: seed should be part of the sector (and used for other things too)
                 mBackgroundRenderer.drawBackground(canvas, sx, sy,
                         sx+SectorManager.SECTOR_SIZE, sy+SectorManager.SECTOR_SIZE,
                         sectorX ^ sectorY + sectorX);
@@ -784,8 +781,6 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
                 i = -1; // start looping again...
             }
         }
-
-        // TODO: check that it's actually visible on the screen....
 
         // record the fact that this guy is visible
         mVisibleEntities.add(new VisibleEntity(position, fleet));

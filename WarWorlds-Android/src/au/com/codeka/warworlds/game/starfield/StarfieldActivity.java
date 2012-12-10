@@ -400,7 +400,7 @@ public class StarfieldActivity extends Activity {
 
         @Override
         public long getItemId(int position) {
-            return position; // TODO??
+            return position;
         }
 
         @Override
@@ -482,7 +482,7 @@ public class StarfieldActivity extends Activity {
 
         @Override
         public long getItemId(int position) {
-            return position; // TODO??
+            return position;
         }
 
         @Override

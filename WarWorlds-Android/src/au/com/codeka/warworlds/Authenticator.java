@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.accounts.AccountManagerFuture;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -18,6 +19,7 @@ import android.os.Bundle;
 import au.com.codeka.warworlds.api.AppEngineAuthenticator;
 import au.com.codeka.warworlds.api.ApiClient;
 import au.com.codeka.warworlds.api.RequestManager;
+import au.com.codeka.warworlds.api.RequestRetryException;
 
 /**
  * This class works in concert with \c ApiAuthenticator to authenticate the current
@@ -58,7 +60,9 @@ public class Authenticator {
             }
 
             @Override
-            public void onResponseReceived(BasicHttpRequest request, BasicHttpResponse response) {
+            public void onResponseReceived(BasicHttpRequest request,
+                                           BasicHttpResponse response)
+                    throws RequestRetryException {
                 // if we get a 403, it means we need to re-authenticate, so do that
                 if (response.getStatusLine().getStatusCode() == 403) {
                     dump(request);
@@ -83,7 +87,7 @@ public class Authenticator {
 
                     // throw an exception so that the RequestManager knows to try the request
                     // for a second time.
-                    throw new RuntimeException(); // TODO: better exception
+                    throw new RequestRetryException();
                 }
 
                 sLastRequestStatusCode = response.getStatusLine().getStatusCode();
@@ -140,12 +144,26 @@ public class Authenticator {
                     account, "ah", null, activity, null, null);
             return getAuthToken(future);
         } else {
-            // this version will notify the user of failures, but won't pop up the 
-            // authentication page. Useful when running in the background.
-            AccountManagerFuture<Bundle>future = sAccountManager.getAuthToken(
-                    account, "ah", true, null, null);
-            return getAuthToken(future);
+            return getAuthTokenNoActivity(account);
         }
+    }
+
+    @SuppressLint("NewApi") // getAuthToken for >= ICE_CREAM_SANDWICH
+    @SuppressWarnings("deprecation") // getAuthToken for < ICE_CREAM_SANDWICH
+    private static String getAuthTokenNoActivity(Account account) {
+        // this version will notify the user of failures, but won't pop up the 
+        // authentication page. Useful when running in the background.
+        AccountManagerFuture<Bundle> future;
+
+        int sdk = android.os.Build.VERSION.SDK_INT;
+        if (sdk < android.os.Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
+            future = sAccountManager.getAuthToken(account, "ah", false,
+                                                  null, null);
+        } else {
+            future = sAccountManager.getAuthToken(account, "ah", null,
+                                                  false, null, null);
+        }
+        return getAuthToken(future);
     }
 
     /**
