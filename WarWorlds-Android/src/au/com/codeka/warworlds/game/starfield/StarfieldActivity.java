@@ -27,7 +27,7 @@ import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.TabManager;
 import au.com.codeka.warworlds.TabManager.TabInfo;
 import au.com.codeka.warworlds.game.EmpireActivity;
-import au.com.codeka.warworlds.game.solarsystem.ScoutReportDialog;
+import au.com.codeka.warworlds.game.ScoutReportDialog;
 import au.com.codeka.warworlds.game.solarsystem.SolarSystemActivity;
 import au.com.codeka.warworlds.model.Colony;
 import au.com.codeka.warworlds.model.Empire;

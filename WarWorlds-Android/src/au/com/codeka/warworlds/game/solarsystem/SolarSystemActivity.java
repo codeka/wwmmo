@@ -20,6 +20,7 @@ import au.com.codeka.Cash;
 import au.com.codeka.Point2D;
 import au.com.codeka.RomanNumeralFormatter;
 import au.com.codeka.warworlds.R;
+import au.com.codeka.warworlds.game.ScoutReportDialog;
 import au.com.codeka.warworlds.model.Colony;
 import au.com.codeka.warworlds.model.Empire;
 import au.com.codeka.warworlds.model.EmpireManager;

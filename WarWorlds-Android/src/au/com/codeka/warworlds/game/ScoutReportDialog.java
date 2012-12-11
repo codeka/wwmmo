@@ -1,4 +1,4 @@
-package au.com.codeka.warworlds.game.solarsystem;
+package au.com.codeka.warworlds.game;
 
 import java.util.ArrayList;
 import java.util.Collections;
