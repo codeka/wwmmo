@@ -62,7 +62,6 @@ public class StarfieldActivity extends FragmentActivity {
     private static final int SOLAR_SYSTEM_REQUEST = 1;
     private static final int EMPIRE_REQUEST = 2;
 
-    /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

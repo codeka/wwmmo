@@ -3,13 +3,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
 
-    <au.com.codeka.warworlds.game.starfield.StarfieldSurfaceView
-            android:id="@+id/starfield"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_alignParentTop="true"
-            android:layout_above="@+id/bottom_pane" />
-
     <RelativeLayout android:id="@+id/bottom_pane"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -36,4 +29,11 @@
                       android:layout_height="wrap_content" />
         </LinearLayout>
     </RelativeLayout>
+
+    <au.com.codeka.warworlds.game.starfield.StarfieldSurfaceView
+        android:id="@+id/starfield"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/bottom_pane" />
+
 </RelativeLayout>
