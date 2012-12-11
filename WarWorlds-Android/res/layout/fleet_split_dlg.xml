@@ -4,17 +4,11 @@
     android:layout_height="match_parent"
     android:padding="10dp">
 
-    <au.com.codeka.warworlds.ctrl.HorizontalSeparator
-        android:id="@+id/title"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/fleet_split_title" />
-
     <include
         android:id="@+id/fleet"
         android:layout_width="match_parent"
-        android:layout_height="40dp"
-        android:layout_below="@+id/title"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
         android:layout_marginTop="10dp"
         layout="@layout/fleet_list_row" />
 
@@ -45,15 +39,5 @@
         android:layout_marginTop="10dp"
         android:ems="6"
         android:inputType="number" />
-
-    <Button
-        style="@style/Button"
-        android:id="@+id/split_btn"
-        android:layout_width="150dp"
-        android:layout_height="wrap_content"
-        android:layout_alignRight="@+id/split_right"
-        android:layout_below="@+id/split_right"
-        android:layout_marginTop="10dp"
-        android:text="@string/fleet_split_ok" />
 
 </RelativeLayout>

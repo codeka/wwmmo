@@ -64,10 +64,6 @@
     <string name="fleet_merge">Merge</string>
     <string name="fleet_view">View</string>
 
-    <!-- "solarsystem_fleet_split_dlg.xml" layout -->
-    <string name="fleet_split_title">Split Fleet</string>
-    <string name="fleet_split_ok">Split</string>
-
     <!-- "solarsystem_fleet_move_dlg.xml" layout -->
     <string name="fleet_move_help">Select the star you want to move your fleet to and click "Move".</string>
 

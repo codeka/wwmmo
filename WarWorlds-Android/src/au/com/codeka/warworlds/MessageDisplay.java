@@ -100,12 +100,20 @@ public class MessageDisplay {
         String msg = "";
 
         Messages.SituationReport.MoveCompleteRecord mcr = sitrep.getMoveCompleteRecord();
+        if (mcr.getFleetDesignId() == null) {
+            mcr = null;
+        }
+
         if (mcr != null) {
             msg += getFleetLine(mcr.getFleetDesignId(), mcr.getNumShips());
             msg += String.format(Locale.ENGLISH, " arrived at %s", starSummary.getName());
         }
 
         Messages.SituationReport.FleetUnderAttackRecord fuar = sitrep.getFleetUnderAttackRecord();
+        if (fuar.getFleetDesignId() == null) {
+            fuar = null;
+        }
+
         if (fuar != null) {
             if (mcr != null) {
                 msg += ", and is under attack";

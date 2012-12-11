@@ -1,13 +1,14 @@
 package au.com.codeka.warworlds.game;
 
+import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.content.DialogInterface;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
-import android.view.Window;
-import android.widget.Button;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import au.com.codeka.warworlds.R;
@@ -20,6 +21,7 @@ import au.com.codeka.warworlds.model.protobuf.Messages;
 
 public class FleetSplitDialog extends DialogFragment {
     private Fleet mFleet;
+    private View mView;
 
     public FleetSplitDialog() {
     }
@@ -29,64 +31,21 @@ public class FleetSplitDialog extends DialogFragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        getDialog().requestWindowFeature(Window.FEATURE_NO_TITLE);
+    public Dialog onCreateDialog(Bundle savedInstanceState) {
+        LayoutInflater inflater = getActivity().getLayoutInflater();
+        mView = inflater.inflate(R.layout.fleet_split_dlg, null);
 
-        View view = inflater.inflate(R.layout.fleet_split_dlg, container);
+        final SeekBar splitRatio = (SeekBar) mView.findViewById(R.id.split_ratio);
+        final TextView splitLeft = (TextView) mView.findViewById(R.id.split_left);
+        final TextView splitRight = (TextView) mView.findViewById(R.id.split_right);
 
-        final SeekBar splitRatio = (SeekBar) view.findViewById(R.id.split_ratio);
-        final TextView splitLeft = (TextView) view.findViewById(R.id.split_left);
-        final TextView splitRight = (TextView) view.findViewById(R.id.split_right);
-        final Button splitBtn = (Button) view.findViewById(R.id.split_btn);
-
-        View fleetView = view.findViewById(R.id.fleet);
+        View fleetView = mView.findViewById(R.id.fleet);
         FleetList.populateFleetRow(getActivity(), null, fleetView, mFleet);
 
         splitRatio.setMax(mFleet.getNumShips());
         splitRatio.setProgress(mFleet.getNumShips() / 2);
         splitLeft.setText(Integer.toString(mFleet.getNumShips() / 2));
         splitRight.setText(Integer.toString(mFleet.getNumShips() - (mFleet.getNumShips() / 2)));
-
-        splitBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                splitBtn.setEnabled(false);
-
-                new AsyncTask<Void, Void, Boolean>() {
-                    @Override
-                    protected Boolean doInBackground(Void... params) {
-                        String url = String.format("stars/%s/fleets/%s/orders",
-                                                   mFleet.getStarKey(),
-                                                   mFleet.getKey());
-                        Messages.FleetOrder fleetOrder = Messages.FleetOrder.newBuilder()
-                                       .setOrder(Messages.FleetOrder.FLEET_ORDER.SPLIT)
-                                       .setSplitLeft(Integer.parseInt(splitLeft.getText().toString()))
-                                       .setSplitRight(Integer.parseInt(splitRight.getText().toString()))
-                                       .build();
-
-                        try {
-                            return ApiClient.postProtoBuf(url, fleetOrder);
-                        } catch (ApiException e) {
-                            // TODO: do something..?
-                            return false;
-                        }
-                    }
-
-                    @Override
-                    protected void onPostExecute(Boolean success) {
-                        // the star this fleet is attached to needs to be refreshed...
-                        StarManager.getInstance().refreshStar(
-                                getActivity(), mFleet.getStarKey());
-                        splitBtn.setEnabled(true);
-                        if (success) {
-                            dismiss();
-                        }
-                    }
-
-                }.execute();
-            }
-        });
 
         splitRatio.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
@@ -132,6 +91,63 @@ public class FleetSplitDialog extends DialogFragment {
             }
         });
 
-        return view;
+        AlertDialog.Builder b = new AlertDialog.Builder(getActivity());
+        b.setView(mView);
+        b.setTitle("Split Fleet");
+
+        b.setPositiveButton("Split", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                onSplitClick();
+            }
+            
+        });
+
+        b.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dismiss();
+            }
+        });
+
+        return b.create();
+    }
+
+    private void onSplitClick() {
+        ((AlertDialog) getDialog()).getButton(AlertDialog.BUTTON_POSITIVE)
+                                   .setEnabled(false);
+
+        final TextView splitLeft = (TextView) mView.findViewById(R.id.split_left);
+        final TextView splitRight = (TextView) mView.findViewById(R.id.split_right);
+        final Activity activity = getActivity();
+
+        new AsyncTask<Void, Void, Boolean>() {
+            @Override
+            protected Boolean doInBackground(Void... params) {
+                String url = String.format("stars/%s/fleets/%s/orders",
+                                           mFleet.getStarKey(),
+                                           mFleet.getKey());
+                Messages.FleetOrder fleetOrder = Messages.FleetOrder.newBuilder()
+                               .setOrder(Messages.FleetOrder.FLEET_ORDER.SPLIT)
+                               .setSplitLeft(Integer.parseInt(splitLeft.getText().toString()))
+                               .setSplitRight(Integer.parseInt(splitRight.getText().toString()))
+                               .build();
+
+                try {
+                    return ApiClient.postProtoBuf(url, fleetOrder);
+                } catch (ApiException e) {
+                    // TODO: do something..?
+                    return false;
+                }
+            }
+
+            @Override
+            protected void onPostExecute(Boolean success) {
+                // the star this fleet is attached to needs to be refreshed...
+                StarManager.getInstance().refreshStar(
+                        activity, mFleet.getStarKey());
+            }
+
+        }.execute();
     }
 }

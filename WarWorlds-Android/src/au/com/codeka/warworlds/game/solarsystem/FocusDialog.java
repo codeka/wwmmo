@@ -6,14 +6,15 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.content.DialogInterface;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
-import android.view.Window;
-import android.widget.Button;
 import android.widget.SeekBar;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.api.ApiClient;
@@ -35,10 +36,9 @@ public class FocusDialog extends DialogFragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        getDialog().requestWindowFeature(Window.FEATURE_NO_TITLE);
-        View view = inflater.inflate(R.layout.solarsystem_focus, container);
+    public Dialog onCreateDialog(Bundle savedInstanceState) {
+        LayoutInflater inflater = getActivity().getLayoutInflater();
+        View view = inflater.inflate(R.layout.focus_dlg, null);
 
         final SeekBar populationFocus = (SeekBar) view.findViewById(R.id.solarsystem_colony_population_focus);
         final SeekBar farmingFocus = (SeekBar) view.findViewById(R.id.solarsystem_colony_farming_focus);
@@ -76,48 +76,25 @@ public class FocusDialog extends DialogFragment {
             });
         }
 
-        final Button okButton = (Button) view.findViewById(R.id.ok_btn);
-        okButton.setOnClickListener(new View.OnClickListener() {
+        AlertDialog.Builder b = new AlertDialog.Builder(getActivity());
+        b.setView(view);
+        b.setTitle("Colony Focus");
+
+        b.setPositiveButton("Set", new DialogInterface.OnClickListener() {
             @Override
-            public void onClick(View v) {
-                mColony.setPopulationFocus(populationFocus.getProgress() / 100.0f);
-                mColony.setFarmingFocus(farmingFocus.getProgress() / 100.0f);
-                mColony.setMiningFocus(miningFocus.getProgress() / 100.0f);
-                mColony.setConstructionFocus(constructionFocus.getProgress() / 100.0f);
-
-                // todo: show spinner?
-                okButton.setEnabled(false);
-
-                new AsyncTask<Void, Void, Void>() {
-                    @Override
-                    protected Void doInBackground(Void... arg0) {
-                        String url = String.format("stars/%s/colonies/%s",
-                                                   mColony.getStarKey(),
-                                                   mColony.getKey());
-
-                        Messages.Colony pb = mColony.toProtocolBuffer();
-                        try {
-                            pb = ApiClient.putProtoBuf(url, pb, Messages.Colony.class);
-                        } catch (ApiException e) {
-                            log.error("Error updating colony!", e);
-                        }
-
-                        return null;
-                    }
-                    @Override
-                    protected void onPostExecute(Void unused) {
-                        // notify the StarManager that this star has been updated
-                        StarManager.getInstance().refreshStar(
-                                getActivity(), mColony.getStarKey());
-
-                        okButton.setEnabled(true);
-                        dismiss();
-                    }
-                }.execute();
+            public void onClick(DialogInterface dialog, int which) {
+                onSetClick();
             }
         });
 
-        return view;
+        b.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dismiss();
+            }
+        });
+
+        return b.create();
     }
 
     private void redistribute(SeekBar changedSeekBar, double newValue) {
@@ -138,5 +115,41 @@ public class FocusDialog extends DialogFragment {
                 continue;
             seekBar.setProgress((int)(seekBar.getProgress() / ratio));
         }
+    }
+
+    private void onSetClick() {
+
+        mColony.setPopulationFocus(mSeekBars.get(0).getProgress() / 100.0f);
+        mColony.setFarmingFocus(mSeekBars.get(1).getProgress() / 100.0f);
+        mColony.setMiningFocus(mSeekBars.get(2).getProgress() / 100.0f);
+        mColony.setConstructionFocus(mSeekBars.get(3).getProgress() / 100.0f);
+
+        final Activity activity = getActivity();
+        ((AlertDialog) getDialog()).getButton(AlertDialog.BUTTON_POSITIVE)
+                                   .setEnabled(false);
+
+        new AsyncTask<Void, Void, Void>() {
+            @Override
+            protected Void doInBackground(Void... arg0) {
+                String url = String.format("stars/%s/colonies/%s",
+                                           mColony.getStarKey(),
+                                           mColony.getKey());
+
+                Messages.Colony pb = mColony.toProtocolBuffer();
+                try {
+                    pb = ApiClient.putProtoBuf(url, pb, Messages.Colony.class);
+                } catch (ApiException e) {
+                    log.error("Error updating colony!", e);
+                }
+
+                return null;
+            }
+            @Override
+            protected void onPostExecute(Void unused) {
+                // notify the StarManager that this star has been updated
+                StarManager.getInstance().refreshStar(activity,
+                                                      mColony.getStarKey());
+            }
+        }.execute();
     }
 }

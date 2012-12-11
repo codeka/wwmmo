@@ -3,7 +3,10 @@ package au.com.codeka.warworlds.game.solarsystem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import android.content.Context;
+import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.content.DialogInterface;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
@@ -12,9 +15,6 @@ import android.text.Html;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
-import android.view.Window;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.SeekBar;
@@ -33,7 +33,6 @@ import au.com.codeka.warworlds.model.protobuf.Messages;
 
 public class BuildConfirmDialog extends DialogFragment {
     private static Logger log = LoggerFactory.getLogger(BuildConfirmDialog.class);
-    private Context mContext;
     private Colony mColony;
     private Design mDesign;
     private int mCurrentQueueSize;
@@ -49,11 +48,9 @@ public class BuildConfirmDialog extends DialogFragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        getDialog().requestWindowFeature(Window.FEATURE_NO_TITLE);
-        mView = inflater.inflate(R.layout.solarsystem_build_confirm_dlg,
-                                     container);
+    public Dialog onCreateDialog(Bundle savedInstanceState) {
+        LayoutInflater inflater = getActivity().getLayoutInflater();
+        mView = inflater.inflate(R.layout.solarsystem_build_confirm_dlg, null);
 
         final SeekBar countSeekBar = (SeekBar) mView.findViewById(R.id.build_count_seek);
         final EditText countEdit = (EditText) mView.findViewById(R.id.build_count_edit);
@@ -126,59 +123,25 @@ public class BuildConfirmDialog extends DialogFragment {
             
         });
 
-        final Button okButton = (Button) mView.findViewById(R.id.ok_btn);
-        okButton.setOnClickListener(new View.OnClickListener() {
+        AlertDialog.Builder b = new AlertDialog.Builder(getActivity());
+        b.setView(mView);
+        b.setTitle("Confirm Build");
+
+        b.setPositiveButton("Build", new DialogInterface.OnClickListener() {
             @Override
-            public void onClick(View v) {
-                okButton.setEnabled(false);
-                new AsyncTask<Void, Void, BuildRequest>() {
-                    @Override
-                    protected BuildRequest doInBackground(Void... arg0) {
-                        Messages.BuildRequest.BUILD_KIND kind;
-                        if (mDesign.getDesignKind() == Design.DesignKind.BUILDING) {
-                            kind = Messages.BuildRequest.BUILD_KIND.BUILDING;
-                        } else {
-                            kind = Messages.BuildRequest.BUILD_KIND.SHIP;
-                        }
+            public void onClick(DialogInterface dialog, int which) {
+                onBuildClick();
+            }
+        });
 
-                        int count = 1;
-                        if (mDesign.canBuildMultiple()) {
-                            count = Integer.parseInt(countEdit.getText().toString());
-                        }
-
-                        Messages.BuildRequest build = Messages.BuildRequest.newBuilder()
-                                .setBuildKind(kind)
-                                .setColonyKey(mColony.getKey())
-                                .setEmpireKey(mColony.getEmpireKey())
-                                .setDesignName(mDesign.getID())
-                                .setCount(count)
-                                .build();
-                        try {
-                            build = ApiClient.postProtoBuf("buildqueue", build, Messages.BuildRequest.class);
-
-                            return BuildRequest.fromProtocolBuffer(build);
-                        } catch (ApiException e) {
-                            log.error("Error issuing build request", e);
-                        }
-
-                        return null;
-                    }
-                    @Override
-                    protected void onPostExecute(BuildRequest buildRequest) {
-                        // notify the BuildQueueManager that something's changed.
-                        BuildQueueManager.getInstance().refresh(buildRequest);
-
-                        // tell the StarManager that this star has been updated
-                        StarManager.getInstance().refreshStar(mContext, mColony.getStarKey());
-                    }
-                }.execute();
-
-                okButton.setEnabled(true);
+        b.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
                 dismiss();
             }
         });
 
-        return mView;
+        return b.create();
     }
 
     private void refreshBuildEstimates() {
@@ -205,5 +168,55 @@ public class BuildConfirmDialog extends DialogFragment {
         mineralsToBuildText.setText(Html.fromHtml(
                                     String.format("%d (<font color=\"red\">%.2f</font>/hr)",
                                     (int) totalMineralsCost, totalMineralsCost / timeInHours)));
+    }
+
+    private void onBuildClick() {
+        ((AlertDialog) getDialog()).getButton(AlertDialog.BUTTON_POSITIVE)
+                                   .setEnabled(false);
+
+        final EditText countEdit = (EditText) mView.findViewById(R.id.build_count_edit);
+        final Activity activity = getActivity();
+
+        new AsyncTask<Void, Void, BuildRequest>() {
+            @Override
+            protected BuildRequest doInBackground(Void... arg0) {
+                Messages.BuildRequest.BUILD_KIND kind;
+                if (mDesign.getDesignKind() == Design.DesignKind.BUILDING) {
+                    kind = Messages.BuildRequest.BUILD_KIND.BUILDING;
+                } else {
+                    kind = Messages.BuildRequest.BUILD_KIND.SHIP;
+                }
+
+                int count = 1;
+                if (mDesign.canBuildMultiple()) {
+                    count = Integer.parseInt(countEdit.getText().toString());
+                }
+
+                Messages.BuildRequest build = Messages.BuildRequest.newBuilder()
+                        .setBuildKind(kind)
+                        .setColonyKey(mColony.getKey())
+                        .setEmpireKey(mColony.getEmpireKey())
+                        .setDesignName(mDesign.getID())
+                        .setCount(count)
+                        .build();
+                try {
+                    build = ApiClient.postProtoBuf("buildqueue", build, Messages.BuildRequest.class);
+
+                    return BuildRequest.fromProtocolBuffer(build);
+                } catch (ApiException e) {
+                    log.error("Error issuing build request", e);
+                }
+
+                return null;
+            }
+            @Override
+            protected void onPostExecute(BuildRequest buildRequest) {
+                // notify the BuildQueueManager that something's changed.
+                BuildQueueManager.getInstance().refresh(buildRequest);
+
+                // tell the StarManager that this star has been updated
+                StarManager.getInstance().refreshStar(activity, mColony.getStarKey());
+            }
+        }.execute();
     }
 }

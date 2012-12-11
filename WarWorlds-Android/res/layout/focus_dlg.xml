@@ -63,13 +63,4 @@
         android:layout_height="wrap_content"
         grid:layout_gravity="fill_horizontal" />
 
-    <Button
-        android:id="@+id/ok_btn"
-        style="@style/Button"
-        android:layout_width="75dp"
-        grid:layout_columnSpan="2"
-        grid:layout_gravity="right"
-        android:layout_marginRight="20dp"
-        android:text="@string/ok" />
-
 </android.support.v7.widget.GridLayout>

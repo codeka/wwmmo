@@ -2,6 +2,7 @@ package au.com.codeka.warworlds.game;
 
 import java.util.Locale;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
@@ -13,7 +14,6 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.text.Html;
-import android.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.TextView;
@@ -48,7 +48,6 @@ public class FleetMoveDialog extends DialogFragment {
     public void setFleet(Fleet fleet) {
         mFleet = fleet;
     }
-
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -174,6 +173,8 @@ public class FleetMoveDialog extends DialogFragment {
         dialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
         dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setEnabled(false);
 
+        final Activity activity = getActivity();
+
         new AsyncTask<Void, Void, Boolean>() {
             @Override
             protected Boolean doInBackground(Void... params) {
@@ -194,18 +195,13 @@ public class FleetMoveDialog extends DialogFragment {
             @Override
             protected void onPostExecute(Boolean success) {
                 if (!success) {
-                    AlertDialog dialog = new AlertDialog.Builder(getActivity())
+                    AlertDialog dialog = new AlertDialog.Builder(activity)
                                             .setMessage("Could not move the fleet: do you have enough cash?")
                                             .create();
                     dialog.show();
                 } else {
                     // the star this fleet is attached to needs to be refreshed...
-                    StarManager.getInstance().refreshStar(getActivity(), mFleet.getStarKey());
-                    dialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(true);
-                    dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setEnabled(true);
-                    if (success) {
-                        dismiss();
-                    }
+                    StarManager.getInstance().refreshStar(activity, mFleet.getStarKey());
 
                     // the empire needs to be updated, too, since we'll have subtracted
                     // the cost of this move from your cash
