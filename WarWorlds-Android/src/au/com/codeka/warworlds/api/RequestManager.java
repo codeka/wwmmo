@@ -16,6 +16,8 @@ import javax.net.ssl.SSLSocketFactory;
 import org.apache.http.HttpClientConnection;
 import org.apache.http.HttpConnectionMetrics;
 import org.apache.http.HttpEntity;
+import org.apache.http.HttpException;
+import org.apache.http.HttpRequest;
 import org.apache.http.HttpResponse;
 import org.apache.http.impl.DefaultHttpClientConnection;
 import org.apache.http.message.BasicHttpEntityEnclosingRequest;
@@ -26,7 +28,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Provides the low-level interface for making requests and so on.
+ * Provides the low-level interface for making requests to the API.
  */
 public class RequestManager {
     final static Logger log = LoggerFactory.getLogger(RequestManager.class);
@@ -34,6 +36,8 @@ public class RequestManager {
     private static URI sBaseUri;
     private static List<ResponseReceivedHandler> sResponseReceivedHandlers =
             new ArrayList<ResponseReceivedHandler>();
+    private static List<RequestManagerStateChangedHandler> sRequestManagerStateChangedHandlers =
+            new ArrayList<RequestManagerStateChangedHandler>();
 
     private static boolean sVerboseLog = true;
 
@@ -95,7 +99,7 @@ public class RequestManager {
      */
     public static ResultWrapper request(String method, String url,
             Map<String, List<String>> extraHeaders, HttpEntity body) throws ApiException {
-        HttpClientConnection conn = null;
+        Connection conn = null;
 
         URI uri = sBaseUri.resolve(url);
         if (sVerboseLog) {
@@ -107,6 +111,9 @@ public class RequestManager {
                 // Note: we only allow connections from the pool on the first attempt, if
                 // requests fail, we force creating a new connection
                 conn = sConnectionPool.getConnection(numAttempts > 0);
+
+                RequestManagerState state = getCurrentState();
+                fireRequestManagerStateChangedHandlers(state);
 
                 String requestUrl = uri.getPath();
                 if (uri.getQuery() != null && uri.getQuery() != "") {
@@ -151,14 +158,7 @@ public class RequestManager {
                     request.addHeader("Content-Length", "0");
                 }
 
-                conn.sendRequestHeader(request);
-                if (body != null) {
-                    conn.sendRequestEntity((BasicHttpEntityEnclosingRequest) request);
-                }
-                conn.flush();
-
-                BasicHttpResponse response = (BasicHttpResponse) conn.receiveResponseHeader();
-                conn.receiveResponseEntity(response);
+                BasicHttpResponse response = conn.sendRequest(request, body);
 
                 fireResponseReceivedHandlers(request, response);
 
@@ -171,11 +171,8 @@ public class RequestManager {
 
                     // Note: the connection doesn't go back in the pool, and we'll close this
                     // one, it's probably no good anyway...
-                    try {
-                        conn.close();
-                    } catch (IOException e1) {
-                        // ignore errors
-                    }
+                    conn.close();
+                    sConnectionPool.returnConnection(conn);
                 } else {
                     if (numAttempts >= 5) {
                         log.error("Got "+numAttempts+" retryable exceptions (giving up) making request to"+url, e);
@@ -189,6 +186,13 @@ public class RequestManager {
         }
     }
 
+    private static RequestManagerState getCurrentState() {
+        RequestManagerState state = new RequestManagerState();
+        state.numInProgressRequests = sConnectionPool.getNumBusyConnections();
+        state.lastUri = sConnectionPool.getLastUri();
+        return state;
+    }
+
     public static void addResponseReceivedHandler(ResponseReceivedHandler handler) {
         sResponseReceivedHandlers.add(handler);
     }
@@ -197,6 +201,20 @@ public class RequestManager {
             BasicHttpResponse response) throws RequestRetryException {
         for(ResponseReceivedHandler handler : sResponseReceivedHandlers) {
             handler.onResponseReceived(request, response);
+        }
+    }
+
+    public static void addRequestManagerStateChangedHandler(RequestManagerStateChangedHandler handler) {
+        sRequestManagerStateChangedHandlers.add(handler);
+    }
+
+    public static void removeRequestManagerStateChangedHandler(RequestManagerStateChangedHandler handler) {
+        sRequestManagerStateChangedHandlers.remove(handler);
+    }
+
+    private static void fireRequestManagerStateChangedHandlers(RequestManagerState state) {
+        for(RequestManagerStateChangedHandler handler : sRequestManagerStateChangedHandlers) {
+            handler.onStateChanged(state);
         }
     }
 
@@ -227,13 +245,30 @@ public class RequestManager {
     }
 
     /**
+     * Represents the current "state" of the request manager, and gets passed
+     * to any request manager state changed handlers.
+     */
+    public static class RequestManagerState {
+        public int numInProgressRequests;
+        public String lastUri;
+    }
+
+    /**
+     * Handler that's called whenever the state of the request manager changes
+     * (e.g. a new request is made, a request completes, etc).
+     */
+    public interface RequestManagerStateChangedHandler {
+        void onStateChanged(RequestManagerState state);
+    }
+
+    /**
      * Wraps the result of a request that we've made.
      */
     public static class ResultWrapper {
         private HttpResponse mResponse;
-        private HttpClientConnection mConnection;
+        private Connection mConnection;
 
-        public ResultWrapper(HttpClientConnection conn, HttpResponse resp) {
+        public ResultWrapper(Connection conn, HttpResponse resp) {
             mConnection = conn;
             mResponse = resp;
         }
@@ -251,6 +286,58 @@ public class RequestManager {
             }
 
             sConnectionPool.returnConnection(mConnection);
+
+            RequestManagerState state = getCurrentState();
+            fireRequestManagerStateChangedHandlers(state);
+        }
+    }
+
+    /**
+     * A wrapper around \c HttpClientConnection that remembers the last
+     * URL we requested.
+     */
+    private static class Connection {
+        private HttpClientConnection mHttpClientConnection;
+        private String mLastUri;
+
+        public Connection(HttpClientConnection httpClientConnection) {
+            mHttpClientConnection = httpClientConnection;
+            mLastUri = "";
+        }
+
+        public BasicHttpResponse sendRequest(HttpRequest request, HttpEntity body)
+                        throws HttpException, IOException {
+            mLastUri = request.getRequestLine().getUri();
+
+            mHttpClientConnection.sendRequestHeader(request);
+            if (body != null) {
+                mHttpClientConnection.sendRequestEntity((BasicHttpEntityEnclosingRequest) request);
+            }
+            mHttpClientConnection.flush();
+
+            BasicHttpResponse response = (BasicHttpResponse) mHttpClientConnection.receiveResponseHeader();
+            mHttpClientConnection.receiveResponseEntity(response);
+
+            return response;
+        }
+
+        public HttpConnectionMetrics getMetrics() {
+            return mHttpClientConnection.getMetrics();
+        }
+
+        public String getLastUri() {
+            return mLastUri;
+        }
+
+        public boolean isOpen() {
+            return mHttpClientConnection.isOpen();
+        }
+
+        public void close() {
+            try {
+                mHttpClientConnection.close();
+            } catch (IOException e) {
+            }
         }
     }
 
@@ -259,15 +346,15 @@ public class RequestManager {
      */
     private static class ConnectionPool {
         private final Logger log = LoggerFactory.getLogger(ConnectionPool.class);
-        private Stack<HttpClientConnection> mFreeConnections;
-        private List<HttpClientConnection> mBusyConnections;
+        private Stack<Connection> mFreeConnections;
+        private List<Connection> mBusyConnections;
         private SocketFactory mSocketFactory;
         private String mHost;
         private int mPort;
 
         public ConnectionPool(boolean ssl, String host, int port) {
-            mFreeConnections = new Stack<HttpClientConnection>();
-            mBusyConnections = new ArrayList<HttpClientConnection>();
+            mFreeConnections = new Stack<Connection>();
+            mBusyConnections = new ArrayList<Connection>();
             if (ssl) {
                 log.debug("Will create SSL connections");
                 mSocketFactory = SSLSocketFactory.getDefault();
@@ -282,14 +369,31 @@ public class RequestManager {
             }
         }
 
+        public int getNumBusyConnections() {
+            synchronized(mBusyConnections) {
+                return mBusyConnections.size();
+            }
+        }
+
+        public String getLastUri() {
+            synchronized(mBusyConnections) {
+                if (mBusyConnections.isEmpty()) {
+                    return "";
+                }
+
+                Connection conn = mBusyConnections.get(0);
+                return conn.getLastUri();
+            }
+        }
+
         /**
          * Gets an already-open socket or creates a new one.
          * @throws IOException 
          * @throws UnknownHostException 
          */
-        public HttpClientConnection getConnection(boolean forceCreate)
+        public Connection getConnection(boolean forceCreate)
                 throws UnknownHostException, IOException {
-            HttpClientConnection conn = null;
+            Connection conn = null;
             if (!forceCreate) {
                 synchronized (mFreeConnections) {
                     while (!mFreeConnections.isEmpty()) {
@@ -320,9 +424,13 @@ public class RequestManager {
             return conn;
         }
 
-        public void returnConnection(HttpClientConnection conn) {
+        public void returnConnection(Connection conn) {
             synchronized (mBusyConnections) {
                 mBusyConnections.remove(conn);
+            }
+            
+            if (!conn.isOpen()) {
+                return;
             }
 
             synchronized (mFreeConnections) {
@@ -344,7 +452,7 @@ public class RequestManager {
          * @throws IOException 
          * @throws UnknownHostException 
          */
-        private HttpClientConnection createConnection() throws UnknownHostException, IOException {
+        private Connection createConnection() throws UnknownHostException, IOException {
             Socket s = mSocketFactory.createSocket(mHost, mPort);
 
             BasicHttpParams params = new BasicHttpParams();
@@ -355,7 +463,7 @@ public class RequestManager {
                 log.debug(String.format("Connection [%s] to %s:%d created.",
                                         conn, s.getInetAddress().toString(), mPort));
             }
-            return conn;
+            return new Connection(conn);
         }
     }
 }

@@ -70,8 +70,6 @@ public class BuildConfirmDialog extends DialogFragment {
             buildCountContainer.setVisibility(View.GONE);
         }
 
-        refreshBuildEstimates();
-
         countEdit.setText("1");
         countSeekBar.setMax(99);
         countSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
@@ -122,6 +120,8 @@ public class BuildConfirmDialog extends DialogFragment {
             }
             
         });
+
+        refreshBuildEstimates();
 
         AlertDialog.Builder b = new AlertDialog.Builder(getActivity());
         b.setView(mView);

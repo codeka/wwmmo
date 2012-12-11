@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center" >
+
+    <ProgressBar android:id="@+id/working"
+                 android:layout_width="18dp"
+                 android:layout_height="18dp"
+                 android:layout_marginLeft="5dp"
+                 android:layout_alignParentLeft="true" />
+
+    <TextView android:id="@+id/empire_name"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:paddingLeft="27dp"
+              android:paddingRight="5dp"
+              android:text="Empire"
+              android:singleLine="true"
+              android:textAppearance="?android:attr/textAppearanceSmall" />
+
+    <TextView android:id="@+id/cash"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:layout_alignParentRight="true"
+              android:layout_alignParentTop="true"
+              android:paddingLeft="5dp"
+              android:paddingRight="10dp"
+              android:text="$12,345"
+              android:textAppearance="?android:attr/textAppearanceSmall" />
+
+</RelativeLayout>

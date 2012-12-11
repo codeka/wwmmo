@@ -174,39 +174,6 @@
 
         </FrameLayout>
 
-        <TextView
-            android:id="@+id/username"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_toLeftOf="@+id/cash"
-            android:layout_alignBaseline="@+id/empire_btn"
-            android:paddingLeft="5dip"
-            android:paddingRight="5dip"
-            android:textAppearance="?android:attr/textAppearanceSmall" />
-
-        <TextView
-            android:id="@+id/cash"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_toLeftOf="@+id/reports_btn"
-            android:layout_alignBaseline="@+id/empire_btn"
-            android:paddingLeft="5dip"
-            android:paddingRight="10dip"
-            android:text="$12,345"
-            android:textAppearance="?android:attr/textAppearanceSmall" />
-
-        <Button
-            android:id="@+id/reports_btn"
-            style="@style/Button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginRight="5dp"
-            android:text="Sit. Rep."
-            android:layout_toLeftOf="@+id/empire_btn"
-            android:layout_alignBaseline="@+id/empire_btn" />
-
         <Button
             android:id="@+id/empire_btn"
             style="@style/Button"
@@ -215,6 +182,24 @@
             android:layout_alignParentRight="true"
             android:layout_alignParentBottom="true"
             android:text="Empire" />
+
+        <Button
+            android:id="@+id/reports_btn"
+            style="@style/Button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_marginRight="5dp"
+            android:layout_toLeftOf="@+id/empire_btn"
+            android:text="Sit. Rep." />
+
+        <au.com.codeka.warworlds.ctrl.InfobarView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignTop="@id/reports_btn"
+            android:layout_toLeftOf="@+id/reports_btn" />
 
     </RelativeLayout>
 

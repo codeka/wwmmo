@@ -21,9 +21,6 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-
 import com.google.protobuf.Message;
 
 /**
@@ -82,26 +79,6 @@ public class ApiClient {
             throw new ApiException(e);
         } finally {
             res.close();
-        }
-    }
-
-    /**
-     * Fetches an image from the given URL.
-     */
-    public static Bitmap getImage(String url) throws ApiException {
-        Map<String, List<String>> headers = getHeaders();
-        headers.get("Accept").add("image/png"); // we also accept images, obviously...
-        headers.get("Accept").add("image/jpg");
-        headers.get("Accept").add("image/jpeg");
-
-        RequestManager.ResultWrapper res = RequestManager.request("GET", url, headers);
-
-        try {
-            return BitmapFactory.decodeStream(res.getResponse().getEntity().getContent());
-        } catch (IllegalStateException e) {
-            throw new ApiException(e);
-        } catch (IOException e) {
-            throw new ApiException(e);
         }
     }
 
