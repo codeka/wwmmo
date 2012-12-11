@@ -147,7 +147,7 @@
                           android:layout_toRightOf="@+id/fleet_icon"
                           android:gravity="center_vertical"
                           android:text="Fleet Design"
-                          android:textSize="18dp" />
+                          android:textSize="18sp" />
 
                 <TextView android:id="@+id/empire_name"
                           android:layout_width="wrap_content"
@@ -202,6 +202,7 @@
             style="@style/Button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginRight="5dp"
             android:text="Sit. Rep."
             android:layout_toLeftOf="@+id/empire_btn"
             android:layout_alignBaseline="@+id/empire_btn" />
@@ -213,7 +214,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
             android:layout_alignParentBottom="true"
-            android:text="@string/empire" />
+            android:text="Empire" />
 
     </RelativeLayout>
 

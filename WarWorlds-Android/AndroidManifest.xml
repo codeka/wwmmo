@@ -8,7 +8,7 @@
          able to run on the minimum version (test using a Galaxy S) -->
     <uses-sdk
         android:minSdkVersion="8"
-        android:targetSdkVersion="14" />
+        android:targetSdkVersion="17" />
 
     <!-- Only this application can receive the messages and registration result -->
     <permission

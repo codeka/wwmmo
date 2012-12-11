@@ -28,7 +28,7 @@
         android:layout_toRightOf="@+id/fleet_icon"
         android:gravity="center_vertical"
         android:text="Fleet Design"
-        android:textSize="18dp" />
+        android:textSize="18sp" />
 
     <TextView
         android:id="@+id/empire_name"

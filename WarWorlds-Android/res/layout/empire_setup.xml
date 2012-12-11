@@ -14,7 +14,7 @@
         android:padding="0dip"
         android:text="@string/homepage_title_text"
         android:textColor="#ffffff"
-        android:textSize="48dip"
+        android:textSize="48sp"
         android:textStyle="bold" />
 
     <TextView

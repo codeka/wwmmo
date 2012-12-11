@@ -106,7 +106,7 @@
                     android:paddingRight="10dp"
                     android:text="-1.0"
                     android:textAppearance="?android:attr/textAppearanceSmall"
-                    android:textSize="10dp" />
+                    android:textSize="10sp" />
 
                 <TextView
                     android:id="@+id/solarsystem_colony_farming_value"
@@ -115,7 +115,7 @@
                     android:paddingRight="10dp"
                     android:text="+1.0"
                     android:textAppearance="?android:attr/textAppearanceSmall"
-                    android:textSize="10dp" />
+                    android:textSize="10sp" />
 
 
                 <ImageView
@@ -155,7 +155,7 @@
                     android:paddingRight="10dp"
                     android:text="999"
                     android:textAppearance="?android:attr/textAppearanceSmall"
-                    android:textSize="10dp" />
+                    android:textSize="10sp" />
 
                 <TextView
                     android:id="@+id/solarsystem_colony_construction_value"
@@ -164,7 +164,7 @@
                     android:paddingRight="10dp"
                     android:text="999"
                     android:textAppearance="?android:attr/textAppearanceSmall"
-                    android:textSize="10dp" />
+                    android:textSize="10sp" />
 
                 <Button
                     android:id="@+id/solarsystem_colony_build"
@@ -307,7 +307,7 @@
             android:layout_alignParentTop="true"
             android:gravity="center"
             android:text="999"
-            android:textSize="10dp" />
+            android:textSize="10sp" />
 
         <TextView
             android:id="@+id/solarsystem_farming_congeniality_value"
@@ -317,7 +317,7 @@
             android:layout_centerVertical="true"
             android:gravity="center"
             android:text="999"
-            android:textSize="10dp" />
+            android:textSize="10sp" />
 
         <TextView
             android:id="@+id/solarsystem_mining_congeniality_value"
@@ -327,7 +327,7 @@
             android:layout_alignParentRight="true"
             android:gravity="center"
             android:text="999"
-            android:textSize="10dp" />
+            android:textSize="10sp" />
     </RelativeLayout>
 
     <TextView
@@ -351,7 +351,7 @@
         android:background="#000"
         android:gravity="center|right"
         android:textColor="#f00"
-        android:textSize="10dp" />
+        android:textSize="10sp" />
 
     <ImageView
         android:id="@+id/stored_goods_icon"
@@ -383,7 +383,7 @@
         android:background="#000"
         android:gravity="center|right"
         android:textColor="#0f0"
-        android:textSize="10dp" />
+        android:textSize="10sp" />
 
     <ImageView
         android:id="@+id/stored_minerals_icon"
