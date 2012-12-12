@@ -29,8 +29,10 @@
             style="@style/Button"
             android:layout_width="120dp"
             android:layout_height="35dp"
-            android:layout_alignParentBottom="true"
+            android:layout_above="@+id/infobar"
             android:layout_alignParentLeft="true"
+            android:layout_marginLeft="5dp"
+            android:layout_marginBottom="5dp"
             android:text="@string/view" />
 
         <Button
@@ -38,9 +40,17 @@
             style="@style/Button"
             android:layout_width="180dp"
             android:layout_height="35dp"
-            android:layout_alignParentBottom="true"
+            android:layout_above="@+id/infobar"
             android:layout_alignParentRight="true"
+            android:layout_marginRight="5dp"
+            android:layout_marginBottom="5dp"
             android:text="@string/collect_taxes_none" />
+
+        <au.com.codeka.warworlds.ctrl.InfobarView
+            android:id="@+id/infobar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true" />
 
     </RelativeLayout>
 

@@ -186,7 +186,7 @@ public class RequestManager {
         }
     }
 
-    private static RequestManagerState getCurrentState() {
+    public static RequestManagerState getCurrentState() {
         RequestManagerState state = new RequestManagerState();
         state.numInProgressRequests = sConnectionPool.getNumBusyConnections();
         state.lastUri = sConnectionPool.getLastUri();

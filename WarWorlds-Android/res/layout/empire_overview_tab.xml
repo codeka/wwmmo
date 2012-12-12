@@ -32,4 +32,10 @@
         android:layout_marginRight="10dp"
         android:text="@string/empire_overview_format" />
 
+    <au.com.codeka.warworlds.ctrl.InfobarView
+        android:id="@+id/infobar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true" />
+
 </RelativeLayout>

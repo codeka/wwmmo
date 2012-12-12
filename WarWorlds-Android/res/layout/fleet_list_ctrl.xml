@@ -55,6 +55,8 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="12dp"
                 android:layout_marginRight="12dp"
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="5dp"
                 android:text="@string/fleet_move" />
     
             <Button
@@ -65,6 +67,8 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="12dp"
                 android:layout_marginRight="12dp"
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="5dp"
                 android:text="@string/fleet_attack" />
         </LinearLayout>
 
@@ -80,6 +84,8 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="12dp"
                 android:layout_marginRight="12dp"
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="5dp"
                 android:text="@string/fleet_split" />
     
             <Button
@@ -90,6 +96,8 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="12dp"
                 android:layout_marginRight="12dp"
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="5dp"
                 android:text="@string/fleet_merge" />
         </LinearLayout>
 
@@ -105,9 +113,16 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="12dp"
                 android:layout_marginRight="12dp"
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="5dp"
                 android:text="@string/fleet_view" />
 
         </LinearLayout>
+
+        <au.com.codeka.warworlds.ctrl.InfobarView
+            android:id="@+id/infobar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
 
     </LinearLayout>
 

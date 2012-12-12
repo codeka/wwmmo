@@ -3,11 +3,18 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <au.com.codeka.warworlds.ctrl.InfobarView
+        android:id="@+id/infobar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true" />
+
     <ListView
         android:id="@+id/building_list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_above="@+id/infobar"
         android:listSelector="@drawable/list_selector" />
 
 </RelativeLayout>
