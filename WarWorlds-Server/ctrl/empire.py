@@ -705,7 +705,7 @@ def saveSituationReport(sitrep_pb):
      generates a notification for the user as well."""
   sitrep_blob = sitrep_pb.SerializeToString()
   sitrep_mdl = mdl.SituationReport(parent=db.Key(sitrep_pb.empire_key))
-  sitrep_mdl.eventTime = ctrl.epochToDateTime(sitrep_pb.report_time)
+  sitrep_mdl.reportTime = ctrl.epochToDateTime(sitrep_pb.report_time)
   sitrep_mdl.star = db.Key(sitrep_pb.star_key)
   sitrep_mdl.report = sitrep_blob
   sitrep_mdl.put()
@@ -725,7 +725,6 @@ def saveSituationReport(sitrep_pb):
 
 
 def getSituationReports(empire_key, star_key=None):
-  logging.info("here")
   if star_key:
     cache_key = "sitrep:for-star:%s:%s" % (empire_key, star_key)
   else:
@@ -738,7 +737,6 @@ def getSituationReports(empire_key, star_key=None):
     sitrep_models = mdl.SituationReport.getForStar(empire_key, star_key)
   else:
     sitrep_models = mdl.SituationReport.getForEmpire(empire_key)
-  logging.info("here")
   sitreps_pb = pb.SituationReports()
   for sitrep_model in sitrep_models:
     sitrep_pb = sitreps_pb.situation_reports.add()

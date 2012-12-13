@@ -551,7 +551,6 @@ class CombatReportPage(ApiPage):
 
 class SitrepPage(ApiPage):
   def get(self, star_key=None):
-    logging.info("wat")
     empire_pb = empire.getEmpireForUser(self.user)
     return empire.getSituationReports(empire_pb.key, star_key)
 

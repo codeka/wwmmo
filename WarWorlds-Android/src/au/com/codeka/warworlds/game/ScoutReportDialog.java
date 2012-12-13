@@ -5,11 +5,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
-import org.joda.time.Duration;
-import org.joda.time.Interval;
-
 import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -26,6 +21,7 @@ import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.SpinnerAdapter;
 import android.widget.TextView;
+import au.com.codeka.TimeInHours;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.ctrl.ColonyList;
 import au.com.codeka.warworlds.ctrl.FleetList;
@@ -157,14 +153,7 @@ public class ScoutReportDialog extends DialogFragment {
             }
 
             ScoutReport report = mReports.get(position);
-            DateTime now = DateTime.now(DateTimeZone.UTC);
-            if (now.compareTo(report.getReportDate()) < 0) {
-                view.setText("0 hrs ago");
-            } else {
-                Interval interval = new Interval(report.getReportDate(), now);
-                Duration duration = interval.toDuration();
-                view.setText(String.format("%d hrs ago", duration.toStandardHours().getHours()));
-            }
+            view.setText(TimeInHours.format(report.getReportDate()));
             return view;
         }
     }

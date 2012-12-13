@@ -7,8 +7,6 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,6 +28,9 @@ import au.com.codeka.warworlds.MessageDisplay;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.api.ApiClient;
 import au.com.codeka.warworlds.api.ApiException;
+import au.com.codeka.warworlds.model.BuildRequest.BuildKind;
+import au.com.codeka.warworlds.model.Design;
+import au.com.codeka.warworlds.model.DesignManager;
 import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.MyEmpire;
 import au.com.codeka.warworlds.model.SituationReport;
@@ -193,9 +194,34 @@ public class SitrepActivity extends Activity {
                     SitrepActivity.this, starSummary, imageSize);
             starIcon.setImageDrawable(new SpriteDrawable(starSprite));
 
-            reportTime.setText(TimeInHours.format(DateTime.now(DateTimeZone.UTC),
-                                                  sitrep.getReportTime()));
+            reportTime.setText(TimeInHours.format(sitrep.getReportTime()));
             reportContent.setText(msg);
+
+            String designID = null;
+            BuildKind buildKind = BuildKind.SHIP;
+            if (sitrep.getBuildCompleteRecord() != null) {
+                reportTitle.setText("Build Complete");
+                SituationReport.BuildCompleteRecord bcr = sitrep.getBuildCompleteRecord();
+                buildKind = bcr.getBuildKind();
+                designID = bcr.getDesignID();
+            } else if (sitrep.getMoveCompleteRecord() != null) {
+                reportTitle.setText("Move Complete");
+                designID = sitrep.getMoveCompleteRecord().getFleetDesignID();
+            } else if (sitrep.getFleetDestroyedRecord() != null) {
+                reportTitle.setText("Fleet Destroyed");
+                designID = sitrep.getFleetDestroyedRecord().getFleetDesignID();
+            } else if (sitrep.getFleetVictoriousRecord() != null) {
+                reportTitle.setText("Fleet Victorious");
+                designID = sitrep.getFleetVictoriousRecord().getFleetDesignID();
+            } else if (sitrep.getFleetUnderAttackRecord() != null) {
+                reportTitle.setText("Fleet Under Attack");
+                designID = sitrep.getFleetUnderAttackRecord().getFleetDesignID();
+            }
+
+            if (designID != null) {
+                Design design = DesignManager.getInstance(buildKind).getDesign(designID);
+                overlayIcon.setImageDrawable(new SpriteDrawable(design.getSprite()));
+            }
 
             return view;
         }
