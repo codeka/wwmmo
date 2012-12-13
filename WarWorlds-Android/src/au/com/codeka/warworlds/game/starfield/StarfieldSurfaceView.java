@@ -79,6 +79,9 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
     private float mOffsetX;
     private float mOffsetY;
 
+    private SectorManager.OnSectorListChangedListener mSectorListChangedListener;
+    private ImageManager.BitmapGeneratedListener mBitmapGeneratedListener;
+
     public StarfieldSurfaceView(Context context, AttributeSet attrs) {
         super(context, attrs);
         if (this.isInEditMode()) {
@@ -109,7 +112,7 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
 
         // whenever the sector list changes (i.e. when we've refreshed from the server),
         // redraw the screen.
-        SectorManager.getInstance().addSectorListChangedListener(new SectorManager.OnSectorListChangedListener() {
+        mSectorListChangedListener = new SectorManager.OnSectorListChangedListener() {
             @Override
             public void onSectorListChanged() {
                 log.debug("Sector list has changed, redrawing.");
@@ -126,19 +129,32 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
                 setDirty();
                 redraw();
             }
-        });
+        };
 
         // whenever a new star bitmap is generated, redraw the screen
-        StarImageManager.getInstance().addBitmapGeneratedListener(
-                new ImageManager.BitmapGeneratedListener() {
+        mBitmapGeneratedListener = new ImageManager.BitmapGeneratedListener() {
             @Override
             public void onBitmapGenerated(String key, Bitmap bmp) {
                 setDirty();
                 redraw();
             }
-        });
+        };
 
         scrollTo(0, 0, 0, 0);
+    }
+
+    @Override
+    protected void onAttachedToWindow() {
+        super.onAttachedToWindow();
+        SectorManager.getInstance().addSectorListChangedListener(mSectorListChangedListener);
+        StarImageManager.getInstance().addBitmapGeneratedListener(mBitmapGeneratedListener);
+    }
+
+    @Override
+    protected void onDetachedFromWindow() {
+        super.onDetachedFromWindow();
+        SectorManager.getInstance().removeSectorListChangedListener(mSectorListChangedListener);
+        StarImageManager.getInstance().removeBitmapGeneratedListener(mBitmapGeneratedListener);
     }
 
     public void deselectStar() {

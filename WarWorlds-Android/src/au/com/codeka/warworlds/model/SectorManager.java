@@ -76,6 +76,12 @@ public class SectorManager {
         mSectorListChangedListeners.add(onSectorListChanged);
     }
 
+    public void removeSectorListChangedListener(OnSectorListChangedListener onSectorListChanged) {
+        if (!mSectorListChangedListeners.contains(onSectorListChanged))
+            return;
+        mSectorListChangedListeners.remove(onSectorListChanged);
+    }
+
     protected void fireSectorListChanged() {
         for(OnSectorListChangedListener listener : mSectorListChangedListeners) {
             listener.onSectorListChanged();

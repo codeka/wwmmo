@@ -42,6 +42,11 @@ indexes:
   ancestor: yes
   properties:
   - name: reportTime
+
+- kind: SituationReport
+  ancestor: yes
+  properties:
+  - name: reportTime
     direction: desc
 
 - kind: SituationReport

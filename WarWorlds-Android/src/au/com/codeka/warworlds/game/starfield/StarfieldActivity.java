@@ -27,6 +27,7 @@ import au.com.codeka.warworlds.TabManager;
 import au.com.codeka.warworlds.TabManager.TabInfo;
 import au.com.codeka.warworlds.game.EmpireActivity;
 import au.com.codeka.warworlds.game.ScoutReportDialog;
+import au.com.codeka.warworlds.game.SitrepActivity;
 import au.com.codeka.warworlds.game.solarsystem.SolarSystemActivity;
 import au.com.codeka.warworlds.model.Colony;
 import au.com.codeka.warworlds.model.Empire;
@@ -59,6 +60,7 @@ public class StarfieldActivity extends FragmentActivity {
 
     private static final int SOLAR_SYSTEM_REQUEST = 1;
     private static final int EMPIRE_REQUEST = 2;
+    private static final int SITREP_REQUEST = 3;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -224,6 +226,14 @@ public class StarfieldActivity extends FragmentActivity {
                 }
             }
         });
+
+        final Button sitrepBtn = (Button) findViewById(R.id.sitrep_btn);
+        sitrepBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                openSitrepActivity();
+            }
+        });
     }
 
     public void openEmpireActivityAtFleet(Star star, Fleet fleet) {
@@ -236,6 +246,11 @@ public class StarfieldActivity extends FragmentActivity {
     public void openEmpireActivity() {
         Intent intent = new Intent(mContext, EmpireActivity.class);
         startActivityForResult(intent, EMPIRE_REQUEST);
+    }
+
+    public void openSitrepActivity() {
+        Intent intent = new Intent(mContext, SitrepActivity.class);
+        startActivityForResult(intent, SITREP_REQUEST);
     }
 
     /**

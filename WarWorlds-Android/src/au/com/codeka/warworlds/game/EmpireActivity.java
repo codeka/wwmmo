@@ -11,6 +11,7 @@ import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.TabFragmentActivity;
@@ -106,6 +107,15 @@ public class EmpireActivity extends TabFragmentActivity {
             }
 
             View v = inflator.inflate(R.layout.empire_overview_tab, null);
+
+            MyEmpire empire = EmpireManager.getInstance().getEmpire();
+
+            TextView empireName = (TextView) v.findViewById(R.id.empire_name);
+            ImageView empireIcon = (ImageView) v.findViewById(R.id.empire_icon);
+
+            empireName.setText(empire.getDisplayName());
+            empireIcon.setImageBitmap(empire.getShield(getActivity()));
+
             HashSet<String> colonizedStarKeys = new HashSet<String>();
             for (Colony c : sCurrentEmpire.getAllColonies()) {
                 colonizedStarKeys.add(c.getStarKey());

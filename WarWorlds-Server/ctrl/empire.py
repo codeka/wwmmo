@@ -725,6 +725,7 @@ def saveSituationReport(sitrep_pb):
 
 
 def getSituationReports(empire_key, star_key=None):
+  logging.info("here")
   if star_key:
     cache_key = "sitrep:for-star:%s:%s" % (empire_key, star_key)
   else:
@@ -737,14 +738,11 @@ def getSituationReports(empire_key, star_key=None):
     sitrep_models = mdl.SituationReport.getForStar(empire_key, star_key)
   else:
     sitrep_models = mdl.SituationReport.getForEmpire(empire_key)
-  sitrep_pbs = []
-  for sitrep_model in sitrep_models:
-    sitrep_pb = pb.SituationReport()
-    sitrep_pb.ParseFromString(sitrep_model.report)
-    sitrep_pbs.append(sitrep_pb)
-
+  logging.info("here")
   sitreps_pb = pb.SituationReports()
-  sitreps_pb.situation_reports.extend(sitrep_pbs)
+  for sitrep_model in sitrep_models:
+    sitrep_pb = sitreps_pb.situation_reports.add()
+    sitrep_pb.ParseFromString(sitrep_model.report)
 
   ctrl.setCached({cache_key: sitreps_pb})
   return sitreps_pb

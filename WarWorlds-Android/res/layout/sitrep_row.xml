@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center_vertical">
+
+    <ImageView
+        android:id="@+id/star_icon"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_alignParentLeft="true"
+        android:layout_marginRight="4dp"
+        android:src="@drawable/fleet_single" />
+
+    <ImageView
+        android:id="@+id/overlay_icon"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_alignParentLeft="true"
+        android:layout_marginRight="4dp"
+        android:src="@drawable/app_icon" />
+
+    <TextView
+        android:id="@+id/report_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/overlay_icon"
+        android:layout_toRightOf="@+id/overlay_icon"
+        android:text="Move complete"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+    <TextView
+        android:id="@+id/report_content"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/report_title"
+        android:layout_toLeftOf="@+id/report_time"
+        android:layout_below="@+id/report_title"
+        android:text="Fighter (x 12) arrived at SomeStar, and is under attack"
+        android:textAppearance="?android:attr/textAppearanceSmall" />
+
+    <TextView
+        android:id="@+id/report_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:text="12 hrs ago"
+        android:textAppearance="?android:attr/textAppearanceSmall" />
+
+</RelativeLayout>

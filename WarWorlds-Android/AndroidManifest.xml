@@ -77,6 +77,9 @@
 
         <activity android:name=".game.ChatActivity" />
 
+        <activity android:name=".game.SitrepActivity"
+                  android:screenOrientation="portrait" />
+
         <activity android:name="com.google.ads.AdActivity"
                   android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize" />
 

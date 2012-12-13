@@ -2,6 +2,54 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent" >
-    
+
+    <ImageView
+        android:id="@+id/empire_icon"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_alignParentTop="true"
+        android:src="@drawable/app_icon" />
+
+    <TextView
+        android:id="@+id/empire_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_alignTop="@+id/empire_icon"
+        android:layout_toRightOf="@+id/empire_icon"
+        android:text="Empire Name"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
+
+    <TextView
+        android:id="@+id/report_summary"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/empire_name"
+        android:layout_toRightOf="@+id/empire_icon"
+        android:layout_alignParentRight="true"
+        android:text="Situation Report"
+        android:textAppearance="?android:attr/textAppearanceSmall" />
+
+    <ProgressBar
+        android:id="@+id/progress_bar"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:layout_below="@+id/empire_icon"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="100dp" />
+
+    <ListView
+        android:id="@+id/report_items"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/empire_icon"
+        android:layout_above="@+id/infobar"
+        android:listSelector="@drawable/list_selector" />
+
+    <au.com.codeka.warworlds.ctrl.InfobarView
+        android:id="@+id/infobar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true" />
 
 </RelativeLayout>

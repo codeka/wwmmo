@@ -126,14 +126,7 @@ public class StarManager {
         new AsyncTask<Void, Void, StarSummary>() {
             @Override
             protected StarSummary doInBackground(Void... arg0) {
-                StarSummary ss = loadStarSummary(context, starKey);
-                if (ss != null) {
-                    return ss;
-                }
-
-                // no cache StarSummary, fetch the full star
-                ss = doFetchStar(context, starKey);
-                return ss;
+                return requestStarSummarySync(context, starKey);
             }
 
             @Override
@@ -141,6 +134,32 @@ public class StarManager {
                 callback.onStarSummaryFetched(starSummary);
             }
         }.execute();
+    }
+
+    /**
+     * Like \c requestStarSummary but runs synchronously. Useful if you're
+     * @param context
+     * @param starKey
+     * @return
+     */
+    public StarSummary requestStarSummarySync(Context context, String starKey) {
+        StarSummary ss = mStarSummaries.get(starKey);
+        if (ss != null) {
+            return ss;
+        }
+
+        ss = mStars.get(starKey);
+        if (ss != null) {
+            return ss;
+        }
+
+        ss = loadStarSummary(context, starKey);
+        if (ss != null) {
+            return ss;
+        }
+
+        // no cache StarSummary, fetch the full star
+        return doFetchStar(context, starKey);
     }
 
     /**

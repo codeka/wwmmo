@@ -35,8 +35,12 @@ import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Base64;
+import au.com.codeka.warworlds.model.BuildRequest.BuildKind;
+import au.com.codeka.warworlds.model.BuildingDesign;
+import au.com.codeka.warworlds.model.BuildingDesignManager;
 import au.com.codeka.warworlds.model.ShipDesign;
 import au.com.codeka.warworlds.model.ShipDesignManager;
+import au.com.codeka.warworlds.model.SituationReport;
 import au.com.codeka.warworlds.model.StarManager;
 import au.com.codeka.warworlds.model.StarSummary;
 import au.com.codeka.warworlds.model.protobuf.Messages;
@@ -67,9 +71,10 @@ public class MessageDisplay {
             } else if (extras.containsKey("sitrep")) {
                 byte[] blob = Base64.decode(extras.getString("sitrep"), Base64.DEFAULT);
 
-                Messages.SituationReport sitrep;
+                SituationReport sitrep;
                 try {
-                    sitrep = Messages.SituationReport.parseFrom(blob);
+                    Messages.SituationReport pb = Messages.SituationReport.parseFrom(blob);
+                    sitrep = SituationReport.fromProtocolBuffer(pb);
                 } catch (InvalidProtocolBufferException e) {
                     log.error("Could not parse situation report!", e);
                     return;
@@ -83,7 +88,7 @@ public class MessageDisplay {
     }
 
     private static void displayNotification(final Context context,
-                                            final Messages.SituationReport sitrep) {
+                                            final SituationReport sitrep) {
         String starKey = sitrep.getStarKey();
         StarManager.getInstance().requestStarSummary(context, starKey,
             new StarManager.StarSummaryFetchedHandler() {
@@ -95,39 +100,67 @@ public class MessageDisplay {
     }
 
     private static void displayNotification(Context context, StarSummary starSummary,
-                                            Messages.SituationReport sitrep) {
+                                            SituationReport sitrep) {
+        String msg = getNotificationMessage(starSummary, sitrep);
+        displayNotification(context, msg);
+    }
 
+    public static String getNotificationMessage(StarSummary starSummary, SituationReport sitrep) {
         String msg = "";
 
-        Messages.SituationReport.MoveCompleteRecord mcr = sitrep.getMoveCompleteRecord();
-        if (mcr.getFleetDesignId() == null) {
-            mcr = null;
-        }
-
+        SituationReport.MoveCompleteRecord mcr = sitrep.getMoveCompleteRecord();
         if (mcr != null) {
-            msg += getFleetLine(mcr.getFleetDesignId(), mcr.getNumShips());
+            msg += getFleetLine(mcr.getFleetDesignID(), mcr.getNumShips());
             msg += String.format(Locale.ENGLISH, " arrived at %s", starSummary.getName());
         }
 
-        Messages.SituationReport.FleetUnderAttackRecord fuar = sitrep.getFleetUnderAttackRecord();
-        if (fuar.getFleetDesignId() == null) {
-            fuar = null;
+        SituationReport.BuildCompleteRecord bcr = sitrep.getBuildCompleteRecord();
+        if (bcr != null) {
+            msg = "Construction of ";
+            if (bcr.getBuildKind().equals(BuildKind.SHIP)) {
+                msg += getFleetLine(bcr.getDesignID(), 1);
+            } else {
+                BuildingDesign design = BuildingDesignManager.getInstance().getDesign(bcr.getDesignID());
+                msg += design.getDisplayName();
+            }
+            msg += String.format(Locale.ENGLISH, " complete on %s", starSummary.getName());
         }
 
+        SituationReport.FleetUnderAttackRecord fuar = sitrep.getFleetUnderAttackRecord();
         if (fuar != null) {
             if (mcr != null) {
                 msg += ", and is under attack";
+            } else if (bcr != null) {
+                msg += ", which is under attack";
             } else {
-                msg += getFleetLine(fuar.getFleetDesignId(), fuar.getNumShips());
+                msg += getFleetLine(fuar.getFleetDesignID(), fuar.getNumShips());
                 msg += String.format(Locale.ENGLISH, " is under attack at %s", starSummary.getName());
             }
+        }
+
+        SituationReport.FleetDestroyedRecord fdr = sitrep.getFleetDestroyedRecord();
+        if (fdr != null) {
+            if (fuar != null) {
+                msg += " - it was DESTROYED!";
+            } else {
+                msg += String.format(Locale.ENGLISH, "%s fleet destroyed on %s",
+                        getFleetLine(fdr.getFleetDesignID(), 1),
+                        starSummary.getName());
+            }
+        }
+
+        SituationReport.FleetVictoriousRecord fvr = sitrep.getFleetVictoriousRecord();
+        if (fvr != null) {
+            msg += String.format(Locale.ENGLISH, "%s fleet prevailed in battle on %s",
+                    getFleetLine(fvr.getFleetDesignID(), fvr.getNumShips()),
+                    starSummary.getName());
         }
 
         if (msg.length() == 0) {
             msg = "We got a situation over here!";
         }
 
-        displayNotification(context, msg);
+        return msg;
     }
 
     private static String getFleetLine(String designID, float numShips) {

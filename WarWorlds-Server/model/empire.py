@@ -3,7 +3,7 @@
 from google.appengine.ext import db
 
 import model.sector as sector_mdl
-
+import logging
 
 class Empire(db.Model):
   """Represents an empire, display name and whatnot."""
@@ -230,6 +230,7 @@ class SituationReport(db.Model):
 
   @staticmethod
   def getForEmpire(empire_key):
+    logging.info("Fetching sitreps...")
     query = SituationReport.all().ancestor(db.Key(empire_key)).order("-reportTime")
     return SituationReport._getForQuery(query)
 
