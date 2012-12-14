@@ -835,12 +835,12 @@ class ShipEffectScout(ShipEffect):
   def onStarLanded(self, fleet_pb, star_pb, sim):
     """This is called when a fleet with this effect "lands" on a star."""
     logging.info("Generating scout report.... star=%s (# planets=%d)" % (star_pb.name, len(star_pb.planets)))
-    scout_report_mdl = mdl.ScoutReport(parent=db.Key(star_pb.key))
-    scout_report_mdl.empire = db.Key(fleet_pb.empire_key)
-    scout_report_mdl.report = star_pb.SerializeToString()
-    scout_report_mdl.date = sim.now
-    scout_report_mdl.put()
-    ctrl.clearCached(["scout-report:%s:%s" % (star_pb.key, fleet_pb.empire_key)])
+    scout_report_pb = pb.ScoutReport()
+    scout_report_pb.empire_key = fleet_pb.empire_key
+    scout_report_pb.star_key = star_pb.key
+    scout_report_pb.star_pb = star_pb.SerializeToString()
+    scout_report_pb.date = ctrl.dateTimeToEpoch(sim.now)
+    sim.addScoutReport(scout_report_pb)
 
 
 class ShipEffectFighter(ShipEffect):

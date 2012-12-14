@@ -41,6 +41,7 @@ public class SolarSystemActivity extends FragmentActivity implements StarManager
     private Star mStar;
     private Planet mPlanet;
     private Colony mColony;
+    private boolean mIsFirstRefresh;
 
     private static final int BUILD_REQUEST = 3000;
 
@@ -62,6 +63,7 @@ public class SolarSystemActivity extends FragmentActivity implements StarManager
         Bundle extras = getIntent().getExtras();
         String starKey = extras.getString("au.com.codeka.warworlds.StarKey");
 
+        mIsFirstRefresh = true;
         StarManager.getInstance().requestStar(this, starKey, true, this);
         StarManager.getInstance().addStarUpdatedListener(starKey, this);
 
@@ -207,6 +209,17 @@ public class SolarSystemActivity extends FragmentActivity implements StarManager
 
         mStar = star;
         mPlanet = planet;
+
+        if (mIsFirstRefresh) {
+            mIsFirstRefresh = false;
+            Bundle extras = getIntent().getExtras();
+            boolean showScoutReport = extras.getBoolean("au.com.codeka.warworlds.ShowScoutReport");
+            if (showScoutReport) {
+                ScoutReportDialog dialog = new ScoutReportDialog();
+                dialog.setStar(mStar);
+                dialog.show(getSupportFragmentManager(), "");
+            }
+        }
     }
 
     @Override

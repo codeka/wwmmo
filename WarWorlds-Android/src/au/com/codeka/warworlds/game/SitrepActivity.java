@@ -12,12 +12,14 @@ import org.slf4j.LoggerFactory;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -28,6 +30,7 @@ import au.com.codeka.warworlds.MessageDisplay;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.api.ApiClient;
 import au.com.codeka.warworlds.api.ApiException;
+import au.com.codeka.warworlds.game.solarsystem.SolarSystemActivity;
 import au.com.codeka.warworlds.model.BuildRequest.BuildKind;
 import au.com.codeka.warworlds.model.Design;
 import au.com.codeka.warworlds.model.DesignManager;
@@ -73,6 +76,44 @@ public class SitrepActivity extends Activity {
 
         final ListView reportItems = (ListView) findViewById(R.id.report_items);
         reportItems.setAdapter(mSituationReportAdapter);
+        reportItems.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view,
+                    int position, long id) {
+                SituationReport sitrep = mSituationReportAdapter.getSituationReport(position);
+
+                Intent intent = new Intent(mContext, SolarSystemActivity.class);
+                intent.putExtra("au.com.codeka.warworlds.StarKey", sitrep.getStarKey());
+
+                SituationReport.MoveCompleteRecord mcr = sitrep.getMoveCompleteRecord();
+                if (mcr != null) {
+                    if (mcr.getScoutReportKey() != null) {
+                        // if there's a scout report, we'll want to show that
+                        intent.putExtra("au.com.codeka.warworlds.ShowScoutReport", true);
+                    }
+                }
+
+                String combatReportKey = null;
+                SituationReport.FleetUnderAttackRecord fuar = sitrep.getFleetUnderAttackRecord();
+                if (fuar != null) {
+                    combatReportKey = fuar.getCombatReportKey();
+                }
+                SituationReport.FleetDestroyedRecord fdr = sitrep.getFleetDestroyedRecord();
+                if (fdr != null) {
+                    combatReportKey = fdr.getCombatReportKey();
+                }
+                SituationReport.FleetVictoriousRecord fvr = sitrep.getFleetVictoriousRecord();
+                if (fvr != null) {
+                    combatReportKey = fvr.getCombatReportKey();
+                }
+
+                if (combatReportKey != null) {
+                    intent.putExtra("au.com.codeka.warworlds.CombatReportKey", combatReportKey);
+                }
+
+                startActivity(intent);
+            }
+        });
 
         refresh();
     }
@@ -141,6 +182,10 @@ public class SitrepActivity extends Activity {
 
         public SituationReportAdapter() {
             mItems = new ArrayList<SituationReport>();
+        }
+
+        public SituationReport getSituationReport(int position) {
+            return mItems.get(position);
         }
 
         public void setItems(List<SituationReport> items,

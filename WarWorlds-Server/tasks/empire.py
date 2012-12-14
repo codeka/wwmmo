@@ -132,6 +132,7 @@ class BuildCheckPage(tasks.TaskPage):
       sitrep_pb.planet_index = build_request_model.colony.planet_index
       sitrep_pb.build_complete_record.build_kind = build_request_model.designKind
       sitrep_pb.build_complete_record.design_id = build_request_model.designName
+      sitrep_pb.build_complete_record.count = build_request_model.count
       ctl.saveSituationReport(sitrep_pb)
 
       # clear the cached items that reference this building/fleet
@@ -240,6 +241,8 @@ class FleetMoveCompletePage(tasks.TaskPage):
       sitrep_pb.move_complete_record.fleet_key = new_fleet_pb.key
       sitrep_pb.move_complete_record.fleet_design_id = new_fleet_pb.design_name
       sitrep_pb.move_complete_record.num_ships = new_fleet_pb.num_ships
+      for scout_report_pb in sim.scout_report_pbs:
+        sitrep_pb.move_complete_record.scout_report_key = scout_report_pb.key
 
       combat_report_pb = sim.getCombatReport(new_star_pb.key)
       if combat_report_pb and combat_report_pb.rounds:

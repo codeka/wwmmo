@@ -107,6 +107,7 @@ public class SituationReport {
         private String mFleetKey;
         private String mFleetDesignID;
         private float mNumShips;
+        private String mScoutReportKey;
 
         public String getFleetKey() {
             return mFleetKey;
@@ -117,12 +118,16 @@ public class SituationReport {
         public float getNumShips() {
             return mNumShips;
         }
+        public String getScoutReportKey() {
+            return mScoutReportKey;
+        }
 
         private static MoveCompleteRecord fromProtocolBuffer(Messages.SituationReport.MoveCompleteRecord pb) {
             MoveCompleteRecord mcr = new MoveCompleteRecord();
             mcr.mFleetKey = pb.getFleetKey();
             mcr.mFleetDesignID = pb.getFleetDesignId();
             mcr.mNumShips = pb.getNumShips();
+            mcr.mScoutReportKey = pb.getScoutReportKey();
             return mcr;
         }
     }

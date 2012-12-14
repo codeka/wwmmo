@@ -64,6 +64,7 @@ class Simulation(object):
     self.empire_pbs = []
     self.star_pbs = []
     self.combat_report_pbs = []
+    self.scout_report_pbs = []
     self.need_update = False
     self.now = datetime.now()
 
@@ -100,6 +101,10 @@ class Simulation(object):
       return self.getCombatReport(star_key, fetch=False)
 
     return None
+
+
+  def addScoutReport(self, scout_report_pb):
+    self.scout_report_pbs.append(scout_report_pb)
 
 
   def _setCombatReport(self, combat_report_pb):
@@ -741,7 +746,20 @@ class Simulation(object):
       keys_to_clear.append("star:%s" % star_pb.key)
       keys_to_clear.append("sector:%d,%d" % (star_pb.sector_x, star_pb.sector_y))
 
+    for scout_report_pb in self.scout_report_pbs:
+      self._updateScoutReport(scout_report_pb)
+      keys_to_clear.append("scout-report:%s:%s" % (scout_report_pb.star_key,
+                                                   scout_report_pb.empire_key))
+
     ctrl.clearCached(keys_to_clear)
+
+  def _updateScoutReport(self, scout_report_pb):
+    scout_report_mdl = mdl.ScoutReport(parent=db.Key(scout_report_pb.star_key))
+    scout_report_mdl.empire = db.Key(scout_report_pb.empire_key)
+    scout_report_mdl.report = scout_report_pb.star_pb
+    scout_report_mdl.date = ctrl.epochToDateTime(scout_report_pb.date)
+    scout_report_mdl.put()
+    scout_report_pb.key = str(scout_report_mdl.key())
 
   def _updateColonies(self, star_pb, keys_to_clear):
     for colony_pb in star_pb.colonies:

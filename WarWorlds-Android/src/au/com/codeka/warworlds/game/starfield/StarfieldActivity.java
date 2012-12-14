@@ -276,8 +276,6 @@ public class StarfieldActivity extends FragmentActivity {
         }
 
         Intent intent = new Intent(mContext, SolarSystemActivity.class);
-        intent.putExtra("au.com.codeka.warworlds.SectorX", sectorX);
-        intent.putExtra("au.com.codeka.warworlds.SectorY", sectorY);
         intent.putExtra("au.com.codeka.warworlds.StarKey", starKey);
         intent.putExtra("au.com.codeka.warworlds.PlanetIndex", planetIndex);
         startActivityForResult(intent, SOLAR_SYSTEM_REQUEST);

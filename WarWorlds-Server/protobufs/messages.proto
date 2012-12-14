@@ -678,6 +678,7 @@ message SituationReport
     {
         optional BuildRequest.BUILD_KIND build_kind = 1;
         optional string design_id = 2;
+        optional int32 count = 3;
     }
     optional BuildCompleteRecord build_complete_record = 6;
 
@@ -687,6 +688,7 @@ message SituationReport
         optional string fleet_key = 1;
         optional string fleet_design_id = 3;
         optional float num_ships = 4;
+        optional string scout_report_key = 5;
     }
     optional MoveCompleteRecord move_complete_record = 7;
 
