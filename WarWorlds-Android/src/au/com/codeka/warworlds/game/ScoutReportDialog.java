@@ -5,7 +5,10 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
@@ -45,10 +48,9 @@ public class ScoutReportDialog extends DialogFragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        getDialog().requestWindowFeature(Window.FEATURE_NO_TITLE);
-        mView = inflater.inflate(R.layout.scout_report_dlg, container);
+    public Dialog onCreateDialog(Bundle savedInstanceState) {
+        LayoutInflater inflater = getActivity().getLayoutInflater();
+        mView = inflater.inflate(R.layout.scout_report_dlg, null);
 
         final View progressBar = mView.findViewById(R.id.progress_bar);
         final View reportList = mView.findViewById(R.id.report_items);
@@ -80,7 +82,17 @@ public class ScoutReportDialog extends DialogFragment {
             }
         });
 
-        return mView;
+        AlertDialog.Builder b = new AlertDialog.Builder(getActivity());
+        b.setView(mView);
+
+        b.setNeutralButton("Close", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dismiss();
+            }
+        });
+
+        return b.create();
     }
 
     private void refreshReports(List<ScoutReport> reports) {

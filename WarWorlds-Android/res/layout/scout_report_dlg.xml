@@ -7,38 +7,31 @@
         android:id="@+id/report_date"
         style="@style/Spinner"
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="30dp"
         android:layout_alignParentTop="true"
-        android:layout_marginLeft="85dp"
-        android:layout_marginRight="85dp"
+        android:layout_marginLeft="90dp"
+        android:layout_marginRight="90dp"
         android:layout_centerHorizontal="true" />
 
     <Button
         android:id="@+id/older_btn"
         style="@style/Button"
         android:layout_width="80dp"
-        android:layout_height="wrap_content"
+        android:layout_height="30dp"
         android:layout_alignBaseline="@+id/report_date"
         android:layout_alignParentLeft="true"
+        android:layout_margin="5dp"
         android:text="← Older" />
 
     <Button
         android:id="@+id/newer_btn"
         style="@style/Button"
         android:layout_width="80dp"
-        android:layout_height="wrap_content"
+        android:layout_height="30dp"
         android:layout_alignBaseline="@+id/report_date"
         android:layout_alignParentRight="true"
+        android:layout_margin="5dp"
         android:text="Newer →" />
-
-    <Button
-        android:id="@+id/close_btn"
-        style="@style/Button"
-        android:layout_width="120dp"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentRight="true"
-        android:text="Close" />
 
     <ImageView
         android:id="@+id/star_icon"
@@ -72,9 +65,8 @@
         android:id="@+id/report_items"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_below="@+id/report_summary"
-        android:layout_above="@+id/close_btn" />
+        android:layout_alignParentBottom="true"
+        android:layout_below="@+id/report_summary" />
 
     <ProgressBar
         android:id="@+id/progress_bar"
