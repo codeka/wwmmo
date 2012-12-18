@@ -8,6 +8,9 @@ libraries:
 - name: jinja2
   version: latest
 
+builtins:
+- deferred: on
+
 handlers:
 - url: /img
   static_dir: static/img

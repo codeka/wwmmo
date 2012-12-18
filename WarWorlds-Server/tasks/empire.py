@@ -260,59 +260,8 @@ class FleetMoveCompletePage(tasks.TaskPage):
       ctl.saveSituationReport(sitrep_pb)
 
 
-class FleetDestroyedPage(tasks.TaskPage):
-  def get(self, fleet_key):
-    def doDelete(fleet_key, time_destroyed):
-      fleet_mdl = mdl.Fleet.get(fleet_key)
-      empire_key = None
-      if fleet_mdl and fleet_mdl.timeDestroyed == ctrl.epochToDateTime(time_destroyed):
-        empire_key = str(mdl.Fleet.empire.get_value_for_datastore(fleet_mdl))
-        fleet_mdl.delete()
-      return empire_key
-
-    # quick check to make sure the fleet is really scheduled to be destoryed now
-    fleet_mdl = mdl.Fleet.get(fleet_key)
-    if not fleet_mdl:
-      return
-    time_destroyed = int(self.request.get("dt"))
-    if fleet_mdl.timeDestroyed != ctrl.epochToDateTime(time_destroyed):
-      logging.debug("Not scheduled to delete fleet at this time (actually, at %s), skipping." % (
-                    fleet_mdl.timeDestroyed))
-      return
-
-    # simulate until *just before* the fleet is destroyed, so that all of that fleet's effects
-    # will be felt, because it's destroyed.
-    sim = simulation_ctl.Simulation()
-    sim.now = ctrl.epochToDateTime(time_destroyed)
-    star_pb = sim.getStar(str(db.Key(fleet_key).parent()), True)
-    sim.simulate(star_pb.key)
-
-    empire_key = db.run_in_transaction(doDelete, fleet_key, time_destroyed)
-    if empire_key:
-      # if it turns out we didn't delete the fleet after all, we don't need to update()
-      for n,fleet_pb in enumerate(star_pb.fleets):
-        if fleet_pb.key == fleet_key:
-          del star_pb.fleets[n]
-          break
-
-      sim.update()
-      keys_to_clear = ["fleet:for-empire:%s" % (empire_key)]
-      ctrl.clearCached(keys_to_clear)
-
-      # Save a sitrep for this situation
-      sitrep_pb = pb.SituationReport()
-      sitrep_pb.empire_key = empire_key
-      sitrep_pb.report_time = ctrl.dateTimeToEpoch(sim.now)
-      sitrep_pb.star_key = star_pb.key
-      sitrep_pb.planet_index = -1
-      sitrep_pb.fleet_destroyed_record.fleet_design_id = fleet_pb.design_name
-      sitrep_pb.fleet_destroyed_record.combat_report_key = "TODO"
-      ctl.saveSituationReport(sitrep_pb)
-
-
 app = webapp.WSGIApplication([("/tasks/empire/build-check", BuildCheckPage),
                               ("/tasks/empire/star-simulate", StarSimulatePage),
-                              ("/tasks/empire/fleet/([^/]+)/move-complete", FleetMoveCompletePage),
-                              ("/tasks/empire/fleet/([^/]+)/destroy", FleetDestroyedPage)],
+                              ("/tasks/empire/fleet/([^/]+)/move-complete", FleetMoveCompletePage)],
                              debug=os.environ["SERVER_SOFTWARE"].startswith("Development"))
 

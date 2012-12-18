@@ -13,23 +13,22 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
-        android:layout_toRightOf="@+id/building_icon"
+        android:layout_toRightOf="@id/building_icon"
         android:textAppearance="?android:attr/textAppearanceMedium" />
 
     <TextView
         android:id="@+id/building_description"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_alignLeft="@+id/building_name"
-        android:layout_below="@+id/building_name"
-        android:layout_above="@+id/build_count_container"/>
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@id/building_name"
+        android:layout_below="@id/building_name"/>
 
     <RelativeLayout
         android:id="@+id/build_count_container"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/building_timetobuild_label"
-        android:layout_toRightOf="@+id/building_icon">
+        android:layout_below="@id/building_description"
+        android:layout_toRightOf="@id/building_icon">
 
         <TextView
             android:id="@+id/build_count_label"
@@ -37,13 +36,14 @@
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
             android:text="Number to build:"
-            android:textAppearance="?android:attr/textAppearanceSmall" />
-    
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textStyle="bold" />
+
         <SeekBar
             android:id="@+id/build_count_seek"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/build_count_label"
+            android:layout_below="@id/build_count_label"
             android:layout_toLeftOf="@+id/build_count_edit"
             android:layout_marginRight="10dp"
             android:layout_alignParentLeft="true" />
@@ -53,7 +53,7 @@
             android:layout_width="100dp"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
-            android:layout_alignBaseline="@+id/build_count_seek"
+            android:layout_alignBottom="@id/build_count_seek"
             android:inputType="number" >
 
             <requestFocus />
@@ -65,7 +65,7 @@
         android:id="@+id/building_timetobuild_label"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/building_mineralstobuild_label"
+        android:layout_below="@+id/build_count_container"
         android:layout_toRightOf="@+id/building_icon"
         android:text="Time to build:"
         android:textAppearance="?android:attr/textAppearanceSmall"
@@ -85,7 +85,7 @@
         android:id="@+id/building_mineralstobuild_label"
         android:layout_width="16dp"
         android:layout_height="16dp"
-        android:layout_alignParentBottom="true"
+        android:layout_below="@+id/building_timetobuild_label"
         android:layout_alignRight="@+id/building_timetobuild_label"
         android:src="@drawable/colony_mining_icon" />
 
@@ -93,7 +93,7 @@
         android:id="@+id/building_mineralstobuild"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
+        android:layout_below="@+id/building_timetobuild_label"
         android:layout_toRightOf="@id/building_timetobuild_label"
         android:layout_marginLeft="10dp"
         android:text="123"

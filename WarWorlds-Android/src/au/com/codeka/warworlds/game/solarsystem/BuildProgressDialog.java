@@ -6,23 +6,19 @@ import org.joda.time.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import android.app.AlertDialog;
-import android.content.Context;
-import android.content.DialogInterface;
+import android.app.Dialog;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
-import android.view.Window;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import au.com.codeka.TimeInHours;
 import au.com.codeka.warworlds.R;
+import au.com.codeka.warworlds.StyledDialog;
 import au.com.codeka.warworlds.api.ApiClient;
 import au.com.codeka.warworlds.api.ApiException;
 import au.com.codeka.warworlds.model.BuildQueueManager;
@@ -37,8 +33,6 @@ import au.com.codeka.warworlds.model.protobuf.Messages;
 public class BuildProgressDialog extends DialogFragment {
     private static Logger log = LoggerFactory.getLogger(BuildProgressDialog.class);
 
-    public static final int ID = 48976;
-    private Context mContext;
     private BuildRequest mBuildRequest;
     private String mStarKey;
     private View mView;
@@ -52,77 +46,85 @@ public class BuildProgressDialog extends DialogFragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        getDialog().requestWindowFeature(Window.FEATURE_NO_TITLE);
-        mView = inflater.inflate(R.layout.build_progress_dlg, container);
+    public Dialog onCreateDialog(Bundle savedInstanceState) {
+        LayoutInflater inflater = getActivity().getLayoutInflater();
+        mView = inflater.inflate(R.layout.build_progress_dlg, null);
 
-        Button accelerateBtn = (Button) mView.findViewById(R.id.accelerate_btn);
-        accelerateBtn.setOnClickListener(new View.OnClickListener() {
+        StyledDialog.Builder b = new StyledDialog.Builder(getActivity());
+        b.setView(mView);
+        b.setPositiveButton("Accelerate", new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Duration speedUpTime = Duration.millis(
-                        mBuildRequest.getRemainingTime().getMillis() / 2);
-                if (speedUpTime.compareTo(Duration.standardMinutes(10)) < 0) {
-                    // if it's less than a 10 minute speed up, we make it instant
-                    speedUpTime = mBuildRequest.getRemainingTime();
-                }
-
-                float speedUpTimeInHours = speedUpTime.toStandardSeconds().getSeconds() / 3600.0f;
-                float cost = speedUpTimeInHours * 100.0f;
-
-                if (cost > EmpireManager.getInstance().getEmpire().getCash()) {
-                    String msg = String.format(Locale.ENGLISH,
-                            "Accelerating this build would cost <font color=\"red\">$%d</font> "+
-                            "(and speed up the build by %s), but you don't have that much cash "+
-                            "available. Do you want to buy some cash now?",
-                            (int) Math.floor(cost), TimeInHours.format(speedUpTime));
-
-                    AlertDialog dlg = new AlertDialog.Builder(mContext)
-                                                     .setCancelable(true)
-                                                     .setTitle("Accelerate Build")
-                                                     .setMessage(Html.fromHtml(msg))
-                                                     .setPositiveButton("Buy Cash", new DialogInterface.OnClickListener() {
-                                                         @Override
-                                                         public void onClick(DialogInterface dialog, int which) {
-                                                             // TODO
-                                                         }
-                                                     })
-                                                     .setNegativeButton("Cancel", null)
-                                                     .create();
-                    dlg.show();
-                } else {
-                    String msg = String.format(Locale.ENGLISH,
-                            "Do you want to accelerate this build? It will cost <font color=\"green\">"+
-                            "$%d</font> and speed up the build by %s.",
-                            (int) Math.floor(cost), TimeInHours.format(speedUpTime));
-
-                    AlertDialog dlg = new AlertDialog.Builder(mContext)
-                                                     .setCancelable(true)
-                                                     .setMessage(Html.fromHtml(msg))
-                                                     .setPositiveButton("Accelerate", new DialogInterface.OnClickListener() {
-                                                         @Override
-                                                         public void onClick(DialogInterface dialog, int which) {
-                                                             accelerateBuild();
-                                                         }
-                                                     })
-                                                     .setNegativeButton("Cancel", null)
-                                                     .create();
-                    dlg.show();
-                }
+                onAccelerateClick();
             }
         });
 
+        b.setNeutralButton("Stop", new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // TODO Auto-generated method stub
+                
+            }
+        });
+
+        b.setNegativeButton("Close", null);
+
         refresh();
-        return mView;
+        return b.create();
+    }
+
+    private void onAccelerateClick() {
+        Duration speedUpTime = Duration.millis(
+                mBuildRequest.getRemainingTime().getMillis() / 2);
+        if (speedUpTime.compareTo(Duration.standardMinutes(10)) < 0) {
+            // if it's less than a 10 minute speed up, we make it instant
+            speedUpTime = mBuildRequest.getRemainingTime();
+        }
+
+        float speedUpTimeInHours = speedUpTime.toStandardSeconds().getSeconds() / 3600.0f;
+        float cost = speedUpTimeInHours * 100.0f;
+
+        if (cost > EmpireManager.getInstance().getEmpire().getCash()) {
+            String msg = String.format(Locale.ENGLISH,
+                    "Accelerating this build would cost <font color=\"red\">$%d</font> "+
+                    "(and speed up the build by %s), but you don't have that much cash "+
+                    "available. Do you want to buy some cash now?",
+                    (int) Math.floor(cost), TimeInHours.format(speedUpTime));
+
+            StyledDialog dlg = new StyledDialog.Builder(getActivity())
+                               .setTitle("Accelerate Build")
+                               .setMessage(Html.fromHtml(msg))
+                               .setPositiveButton("Buy Cash", new View.OnClickListener() {
+                                   @Override
+                                   public void onClick(View view) {
+                                                     // TODO
+                                   }
+                               })
+                               .setNegativeButton("Cancel", null)
+                               .create();
+            dlg.show();
+        } else {
+            String msg = String.format(Locale.ENGLISH,
+                    "Do you want to accelerate this build? It will cost <font color=\"green\">"+
+                    "$%d</font> and speed up the build by %s.",
+                    (int) Math.floor(cost), TimeInHours.format(speedUpTime));
+
+            final StyledDialog dlg = new StyledDialog.Builder(getActivity())
+                               .setMessage(Html.fromHtml(msg))
+                               .setPositiveButton("Accelerate", true, new View.OnClickListener() {
+                                   @Override
+                                   public void onClick(View view) {
+                                       accelerateBuild();
+                                   }
+                               })
+                               .setNegativeButton("Cancel", null)
+                               .create();
+            dlg.show();
+        }
     }
 
     private void accelerateBuild() {
-        final Button accelerateBtn = (Button) mView.findViewById(R.id.accelerate_btn);
-        final Button cancelBtn = (Button) mView.findViewById(R.id.cancel_btn);
-
-        accelerateBtn.setEnabled(false);
-        cancelBtn.setEnabled(false);
+        ((StyledDialog) getDialog()).getPositiveButton().setEnabled(false);
 
         new AsyncTask<Void, Void, BuildRequest>() {
             @Override
@@ -141,14 +143,13 @@ public class BuildProgressDialog extends DialogFragment {
             }
             @Override
             protected void onPostExecute(BuildRequest buildRequest) {
-                accelerateBtn.setEnabled(true);
-                cancelBtn.setEnabled(true);
+                ((StyledDialog) getDialog()).getPositiveButton().setEnabled(true);
 
                 // notify the BuildQueueManager that something's changed.
                 BuildQueueManager.getInstance().refresh(buildRequest);
 
                 // tell the StarManager that this star has been updated
-                StarManager.getInstance().refreshStar(mContext, mStarKey);
+                StarManager.getInstance().refreshStar(getActivity(), mStarKey);
 
                 if (buildRequest != null) {
                     mBuildRequest = buildRequest;
@@ -157,10 +158,6 @@ public class BuildProgressDialog extends DialogFragment {
             }
         }.execute();
 
-    }
-
-    @Override
-    public void onStop() {
     }
 
     private void refresh() {

@@ -9,7 +9,8 @@
         android:layout_height="48dp"
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="20dp"
         android:src="@drawable/app_icon" />
 
     <TextView
@@ -18,7 +19,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_toRightOf="@+id/build_icon"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="20dp"
         android:text="Design Name"
         android:textAppearance="?android:attr/textAppearanceMedium" />
 
@@ -37,35 +38,9 @@
         android:layout_width="wrap_content"
         android:layout_height="10dp"
         android:layout_marginRight="10dp"
+        android:layout_marginBottom="20dp"
         android:layout_alignLeft="@+id/build_design_name"
         android:layout_alignParentRight="true"
         android:layout_below="@+id/build_time_remaining" />
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-            android:layout_marginTop="14dp"
-        android:layout_below="@+id/build_progress" >
-
-        <Button
-            style="@style/Button"
-            android:id="@+id/accelerate_btn"
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_height="40dp"
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="10dp"
-            android:text="Accelerate Build" />
-
-        <Button style="@style/Button"
-            android:id="@+id/cancel_btn"
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_height="40dp"
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="10dp"
-            android:text="Cancel Build" />
-
-    </LinearLayout>
 
 </RelativeLayout>

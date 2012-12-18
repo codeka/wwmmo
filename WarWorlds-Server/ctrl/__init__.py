@@ -225,6 +225,8 @@ def fleetModelToPb(fleet_pb, fleet_model):
     fleet_pb.stance = fleet_model.stance
   else:
     fleet_pb.stance = pb.Fleet.NEUTRAL
+  if fleet_model.lastVictory:
+    fleet_pb.last_victory = dateTimeToEpoch(fleet_model.lastVictory)
 
 
 def fleetPbToModel(fleet_model, fleet_pb):
@@ -250,6 +252,10 @@ def fleetPbToModel(fleet_model, fleet_pb):
     fleet_model.timeDestroyed = epochToDateTime(fleet_pb.time_destroyed)
   else:
     fleet_model.timeDestroyed = None
+  if fleet_pb.last_victory:
+    fleet_model.lastVictory = epochToDateTime(fleet_pb.last_victory)
+  else:
+    fleet_model.lastVictory = None
   fleet_model.numShips = float(fleet_pb.num_ships)
 
 

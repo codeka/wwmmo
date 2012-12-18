@@ -5,10 +5,9 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import android.app.AlertDialog;
+import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
@@ -17,7 +16,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
-import android.view.Window;
 import android.widget.AbsListView;
 import android.widget.BaseAdapter;
 import android.widget.ListView;
@@ -26,6 +24,7 @@ import android.widget.SpinnerAdapter;
 import android.widget.TextView;
 import au.com.codeka.TimeInHours;
 import au.com.codeka.warworlds.R;
+import au.com.codeka.warworlds.StyledDialog;
 import au.com.codeka.warworlds.ctrl.ColonyList;
 import au.com.codeka.warworlds.ctrl.FleetList;
 import au.com.codeka.warworlds.model.Colony;
@@ -47,6 +46,7 @@ public class ScoutReportDialog extends DialogFragment {
         mStar = star;
     }
 
+    @SuppressLint("NewApi")
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         LayoutInflater inflater = getActivity().getLayoutInflater();
@@ -82,12 +82,12 @@ public class ScoutReportDialog extends DialogFragment {
             }
         });
 
-        AlertDialog.Builder b = new AlertDialog.Builder(getActivity());
+        StyledDialog.Builder b = new StyledDialog.Builder(getActivity());
         b.setView(mView);
 
-        b.setNeutralButton("Close", new DialogInterface.OnClickListener() {
+        b.setNeutralButton("Close", new View.OnClickListener() {
             @Override
-            public void onClick(DialogInterface dialog, int which) {
+            public void onClick(View v) {
                 dismiss();
             }
         });

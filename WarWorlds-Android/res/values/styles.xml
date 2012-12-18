@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
 
     <style name="Button" parent="android:style/Widget.Button">
         <item name="android:background">@drawable/button_bg</item>
@@ -13,6 +13,10 @@
         <item name="android:layout_marginBottom">6dp</item>
         <item name="android:layout_marginLeft">2dp</item>
         <item name="android:layout_marginRight">2dp</item>
+    </style>
+
+    <style name="Dialog">
+        <item name="android:background">@drawable/dialog_bg</item>
     </style>
 
     <style name="BottomPane">

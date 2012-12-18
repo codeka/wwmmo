@@ -87,7 +87,8 @@ public class SitrepActivity extends Activity {
 
                 SituationReport.MoveCompleteRecord mcr = sitrep.getMoveCompleteRecord();
                 if (mcr != null) {
-                    if (mcr.getScoutReportKey() != null) {
+                    if (mcr.getScoutReportKey() != null &&
+                        mcr.getScoutReportKey().length() > 0) {
                         // if there's a scout report, we'll want to show that
                         intent.putExtra("au.com.codeka.warworlds.ShowScoutReport", true);
                     }

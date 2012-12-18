@@ -3,7 +3,6 @@ package au.com.codeka.warworlds.game;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.content.DialogInterface;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
@@ -12,6 +11,7 @@ import android.view.View;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import au.com.codeka.warworlds.R;
+import au.com.codeka.warworlds.StyledDialog;
 import au.com.codeka.warworlds.api.ApiClient;
 import au.com.codeka.warworlds.api.ApiException;
 import au.com.codeka.warworlds.ctrl.FleetList;
@@ -91,24 +91,19 @@ public class FleetSplitDialog extends DialogFragment {
             }
         });
 
-        AlertDialog.Builder b = new AlertDialog.Builder(getActivity());
+        StyledDialog.Builder b = new StyledDialog.Builder(getActivity());
         b.setView(mView);
         b.setTitle("Split Fleet");
 
-        b.setPositiveButton("Split", new DialogInterface.OnClickListener() {
+        b.setPositiveButton("Split", new View.OnClickListener() {
             @Override
-            public void onClick(DialogInterface dialog, int which) {
+            public void onClick(View view) {
                 onSplitClick();
             }
             
         });
 
-        b.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dismiss();
-            }
-        });
+        b.setNegativeButton("Cancel", null);
 
         return b.create();
     }
@@ -146,6 +141,10 @@ public class FleetSplitDialog extends DialogFragment {
                 // the star this fleet is attached to needs to be refreshed...
                 StarManager.getInstance().refreshStar(
                         activity, mFleet.getStarKey());
+
+                if (success) {
+                    dismiss();
+                }
             }
 
         }.execute();

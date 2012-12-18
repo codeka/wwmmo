@@ -506,6 +506,11 @@ message Fleet
 
     // This is used internally by the server, it'll never appear in a response from the server.
     optional int64 time_destroyed = 12;
+
+    // This is the date/time of the last battle this fleet was victorious in,
+    // it's mostly useless on the client (used for some housekeeping on the
+    // server)
+    optional int64 last_victory = 13;
 }
 
 

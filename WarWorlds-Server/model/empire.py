@@ -156,6 +156,7 @@ class Fleet(db.Model):
   targetColony = db.ReferenceProperty(Colony)
   stance = db.IntegerProperty()
   timeDestroyed = db.DateTimeProperty()
+  lastVictory = db.DateTimeProperty()
 
   @staticmethod
   def getForStar(star_model):

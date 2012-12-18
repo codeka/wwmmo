@@ -714,14 +714,17 @@ def saveSituationReport(sitrep_pb):
                     "sitrep:for-star:%s:%s" % (sitrep_pb.empire_key, sitrep_pb.star_key)])
 
   # todo: check settings before generating the notification?
-  empire_pb = getEmpire(sitrep_pb.empire_key)
-  devices = ctrl.getDevicesForUser(empire_pb.email)
-  registration_ids = []
-  for device in devices.registrations:
-    registration_ids.append(device.device_registration_id)
-  gcm = gcm_mdl.GCM('AIzaSyADWOC-tWUbzj-SVW13Sz5UuUiGfcmHHDA')
-  gcm.json_request(registration_ids=registration_ids,
-                   data={"sitrep": base64.b64encode(sitrep_blob)})
+  try:
+    empire_pb = getEmpire(sitrep_pb.empire_key)
+    devices = ctrl.getDevicesForUser(empire_pb.email)
+    registration_ids = []
+    for device in devices.registrations:
+      registration_ids.append(device.device_registration_id)
+    gcm = gcm_mdl.GCM('AIzaSyADWOC-tWUbzj-SVW13Sz5UuUiGfcmHHDA')
+    gcm.json_request(registration_ids=registration_ids,
+                     data={"sitrep": base64.b64encode(sitrep_blob)})
+  except:
+    logging.warn("An error occurred sending notification, notification not sent")
 
 
 def getSituationReports(empire_key, star_key=None):

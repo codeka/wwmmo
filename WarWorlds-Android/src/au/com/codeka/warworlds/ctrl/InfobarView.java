@@ -75,12 +75,13 @@ public class InfobarView extends FrameLayout
             mHandler = new Handler();
 
             MyEmpire empire = EmpireManager.getInstance().getEmpire();
+            if (empire != null) {
+                TextView empireName = (TextView) mView.findViewById(R.id.empire_name);
+                empireName.setText(empire.getDisplayName());
 
-            TextView empireName = (TextView) mView.findViewById(R.id.empire_name);
-            empireName.setText(empire.getDisplayName());
-
-            TextView cash = (TextView) mView.findViewById(R.id.cash);
-            cash.setText(Cash.format(empire.getCash()));
+                TextView cash = (TextView) mView.findViewById(R.id.cash);
+                cash.setText(Cash.format(empire.getCash()));
+            }
 
             EmpireManager.getInstance()
                          .addEmpireUpdatedListener(empire.getKey(), this);

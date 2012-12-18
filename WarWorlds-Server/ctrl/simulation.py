@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 import logging
 
 from google.appengine.ext import db
-from google.appengine.api import taskqueue
+from google.appengine.ext import deferred
 
 import import_fixer
 import_fixer.FixImports("google", "protobuf")
@@ -681,7 +681,7 @@ class Simulation(object):
       if fleet_pb.num_ships <= 0:
         fleet_pb.num_ships = 0
         if not fleet_pb.time_destroyed:
-          self.log("FLEET DESTROYED: %s" %(fleet_pb.key))
+          self.log("FLEET DESTROYED: %s" % (fleet_pb.key))
           fleet_pb.time_destroyed = ctrl.dateTimeToEpoch(now)
 
     # go through the attacking fleets and make sure they're still attacking...
@@ -691,6 +691,14 @@ class Simulation(object):
       if fleet_pb.time_destroyed:
         continue
       return True
+
+    # if there's no more fleets attacking, then any that are left over
+    # were victorious, so mark them as such
+    for fleet_pb in star_pb.fleets:
+      if fleet_pb.time_destroyed:
+        continue
+      self.log("FLEET VICTORIOUS: %s" % (fleet_pb.key))
+      fleet_pb.last_victory = ctrl.dateTimeToEpoch(now)
 
     return False
 
@@ -724,6 +732,7 @@ class Simulation(object):
       for effect in design.getEffects():
         effect.onFleetArrived(star_pb, new_fleet_pb, other_fleet_pb, self)
 
+
   def update(self):
     """Apply all of the updates we've made to the data store."""
     if not self.need_update:
@@ -742,6 +751,7 @@ class Simulation(object):
       self._updateFleets(star_pb)
       self._updateCombatReport(star_pb)
       self._scheduleFleetDestroy(star_pb)
+      self._scheduleFleetVictory(star_pb)
 
       keys_to_clear.append("star:%s" % star_pb.key)
       keys_to_clear.append("sector:%d,%d" % (star_pb.sector_x, star_pb.sector_y))
@@ -833,10 +843,99 @@ class Simulation(object):
     """Schedules a task that'll ensure the given fleets is destroyed when it should be."""
     for fleet_pb in star_pb.fleets:
       if fleet_pb.time_destroyed:
-        time = ctrl.epochToDateTime(fleet_pb.time_destroyed)
-        taskqueue.add(queue_name="fleet",
-                      url=("/tasks/empire/fleet/%s/destroy?dt=%d" % (fleet_pb.key,
-                                                                     fleet_pb.time_destroyed)),
-                      method="GET",
-                      eta=time)
+        now = ctrl.dateTimeToEpoch(datetime.now())
+        countdown = fleet_pb.time_destroyed - now
+        combat_report_pb = self.getCombatReport(star_pb.key, fetch=False)
+        if not combat_report_pb:
+          return
 
+        deferred.defer(on_fleet_destroyed,
+                       fleet_pb, combat_report_pb.key,
+                       _countdown = countdown)
+
+  def _scheduleFleetVictory(self, star_pb):
+    """Schedules a task that'll ensure the given fleets is notified of victory
+       when it should be."""
+    for fleet_pb in star_pb.fleets:
+      if fleet_pb.last_victory and fleet_pb.empire_key:
+        now = ctrl.dateTimeToEpoch(datetime.now())
+        countdown = fleet_pb.time_destroyed - now
+        combat_report_pb = self.getCombatReport(star_pb.key, fetch=False)
+        if not combat_report_pb:
+          return
+
+        deferred.defer(on_fleet_victorious,
+                       fleet_pb, combat_report_pb.key,
+                       _countdown = countdown)
+
+
+def on_fleet_destroyed(fleet_pb, combat_report_key):
+  """This is a deferred task that's called when a fleet is destroyed."""
+  def doDelete(fleet_pb):
+    fleet_mdl = mdl.Fleet.get(fleet_pb.key)
+    if fleet_mdl and fleet_mdl.timeDestroyed == ctrl.epochToDateTime(fleet_pb.time_destroyed):
+      fleet_mdl.delete()
+      return True
+    return False
+
+  # quick check to make sure the fleet is really scheduled to be destroyed now
+  fleet_mdl = mdl.Fleet.get(fleet_pb.key)
+  if not fleet_mdl:
+    return
+  if fleet_mdl.timeDestroyed != ctrl.epochToDateTime(fleet_pb.time_destroyed):
+    logging.debug("Not scheduled to delete fleet at this time (actually, at %s), skipping." % (
+                  fleet_mdl.timeDestroyed))
+    return
+
+  # simulate until *just before* the fleet is destroyed, so that all of that fleet's effects
+  # will be felt, because it's destroyed.
+  sim = Simulation()
+  sim.now = ctrl.epochToDateTime(fleet_pb.time_destroyed)
+  star_pb = sim.getStar(fleet_pb.star_key, True)
+  sim.simulate(star_pb.key)
+
+  if db.run_in_transaction(doDelete, fleet_pb):
+    # if it turns out we didn't delete the fleet after all, we don't need to update()
+    for n,star_fleet_pb in enumerate(star_pb.fleets):
+      if star_fleet_pb.key == fleet_pb.key:
+        del star_pb.fleets[n]
+        break
+
+    sim.update()
+    if fleet_pb.empire_key and fleet_pb.empire_key != "":
+      keys_to_clear = ["fleet:for-empire:%s" % (fleet_pb.empire_key)]
+      ctrl.clearCached(keys_to_clear)
+      # Save a sitrep for this situation
+      sitrep_pb = pb.SituationReport()
+      sitrep_pb.empire_key = fleet_pb.empire_key
+      sitrep_pb.report_time = ctrl.dateTimeToEpoch(sim.now)
+      sitrep_pb.star_key = star_pb.key
+      sitrep_pb.planet_index = -1
+      sitrep_pb.fleet_destroyed_record.fleet_design_id = fleet_pb.design_name
+      sitrep_pb.fleet_destroyed_record.combat_report_key = combat_report_key
+      empire_ctl.saveSituationReport(sitrep_pb)
+
+
+def on_fleet_victorious(fleet_pb, combat_report_key):
+  """This is a deferred task that's called when a fleet is victorious."""
+  def doUpdate(fleet_pb):
+    fleet_mdl = mdl.Fleet.get(fleet_pb.key)
+    if fleet_mdl and fleet_mdl.lastVictory == ctrl.epochToDateTime(fleet_pb.last_victory):
+      fleet_mdl.lastVictory = None
+      fleet_mdl.put()
+      return True
+    return False
+
+  if db.run_in_transaction(doUpdate, fleet_pb):
+    if fleet_pb.empire_key and fleet_pb.empire_key != "":
+      keys_to_clear = ["fleet:for-empire:%s" % (fleet_pb.empire_key)]
+      ctrl.clearCached(keys_to_clear)
+      # Save a sitrep for this situation
+      sitrep_pb = pb.SituationReport()
+      sitrep_pb.empire_key = fleet_pb.empire_key
+      sitrep_pb.report_time = fleet_pb.last_victory
+      sitrep_pb.star_key = fleet_pb.star_key
+      sitrep_pb.planet_index = -1
+      sitrep_pb.fleet_victorious_record.fleet_design_id = fleet_pb.design_name
+      sitrep_pb.fleet_victorious_record.combat_report_key = combat_report_key
+      empire_ctl.saveSituationReport(sitrep_pb)

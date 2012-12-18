@@ -4,9 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.app.Dialog;
-import android.content.DialogInterface;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
@@ -21,6 +19,7 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import au.com.codeka.TimeInHours;
 import au.com.codeka.warworlds.R;
+import au.com.codeka.warworlds.StyledDialog;
 import au.com.codeka.warworlds.api.ApiClient;
 import au.com.codeka.warworlds.api.ApiException;
 import au.com.codeka.warworlds.model.BuildQueueManager;
@@ -50,7 +49,7 @@ public class BuildConfirmDialog extends DialogFragment {
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         LayoutInflater inflater = getActivity().getLayoutInflater();
-        mView = inflater.inflate(R.layout.solarsystem_build_confirm_dlg, null);
+        mView = inflater.inflate(R.layout.build_confirm_dlg, null);
 
         final SeekBar countSeekBar = (SeekBar) mView.findViewById(R.id.build_count_seek);
         final EditText countEdit = (EditText) mView.findViewById(R.id.build_count_edit);
@@ -123,23 +122,17 @@ public class BuildConfirmDialog extends DialogFragment {
 
         refreshBuildEstimates();
 
-        AlertDialog.Builder b = new AlertDialog.Builder(getActivity());
+        StyledDialog.Builder b = new StyledDialog.Builder(getActivity());
         b.setView(mView);
-        b.setTitle("Confirm Build");
 
-        b.setPositiveButton("Build", new DialogInterface.OnClickListener() {
+        b.setPositiveButton("Build", new View.OnClickListener() {
             @Override
-            public void onClick(DialogInterface dialog, int which) {
+            public void onClick(View view) {
                 onBuildClick();
             }
         });
 
-        b.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dismiss();
-            }
-        });
+        b.setNegativeButton("Cancel", null);
 
         return b.create();
     }
@@ -171,8 +164,7 @@ public class BuildConfirmDialog extends DialogFragment {
     }
 
     private void onBuildClick() {
-        ((AlertDialog) getDialog()).getButton(AlertDialog.BUTTON_POSITIVE)
-                                   .setEnabled(false);
+        ((StyledDialog) getDialog()).getPositiveButton().setEnabled(false);
 
         final EditText countEdit = (EditText) mView.findViewById(R.id.build_count_edit);
         final Activity activity = getActivity();
@@ -216,6 +208,8 @@ public class BuildConfirmDialog extends DialogFragment {
 
                 // tell the StarManager that this star has been updated
                 StarManager.getInstance().refreshStar(activity, mColony.getStarKey());
+
+                dismiss();
             }
         }.execute();
     }
