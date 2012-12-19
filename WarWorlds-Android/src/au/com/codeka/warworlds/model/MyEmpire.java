@@ -193,6 +193,34 @@ public class MyEmpire extends Empire {
         }.execute();
     }
 
+    public void fetchCombatReport(final String starKey, final String combatReportKey,
+            final FetchCombatReportCompleteHandler handler ) {
+        new AsyncTask<Void, Void, CombatReport>() {
+            @Override
+            protected CombatReport doInBackground(Void... arg0) {
+                try {
+                    String url = String.format("stars/%s/combat-reports/%s",
+                                               starKey, combatReportKey);
+                    Messages.CombatReport pb = ApiClient.getProtoBuf(url,
+                                                 Messages.CombatReport.class);
+                    if (pb == null)
+                        return null;
+
+                    return CombatReport.fromProtocolBuffer(pb);
+                } catch(Exception e) {
+                    // TODO: handle exceptions
+                    log.error(ExceptionUtils.getStackTrace(e));
+                    return null;
+                }
+            }
+
+            @Override
+            protected void onPostExecute(CombatReport report) {
+                handler.onComplete(report);
+            }
+        }.execute();
+    }
+
     /**
      * Refreshes all the details of this empire (e.g. collection of colonies, fleets etc)
      */
@@ -326,5 +354,9 @@ public class MyEmpire extends Empire {
 
     public static interface FetchScoutReportCompleteHandler {
         public void onComplete(List<ScoutReport> reports);
+    }
+
+    public static interface FetchCombatReportCompleteHandler {
+        public void onComplete(CombatReport report);
     }
 }

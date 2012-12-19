@@ -19,6 +19,7 @@ import android.widget.TextView;
 import au.com.codeka.Point2D;
 import au.com.codeka.RomanNumeralFormatter;
 import au.com.codeka.warworlds.R;
+import au.com.codeka.warworlds.game.CombatReportDialog;
 import au.com.codeka.warworlds.game.ScoutReportDialog;
 import au.com.codeka.warworlds.model.Colony;
 import au.com.codeka.warworlds.model.Empire;
@@ -217,6 +218,13 @@ public class SolarSystemActivity extends FragmentActivity implements StarManager
             if (showScoutReport) {
                 ScoutReportDialog dialog = new ScoutReportDialog();
                 dialog.setStar(mStar);
+                dialog.show(getSupportFragmentManager(), "");
+            }
+
+            String combatReportKey = extras.getString("au.com.codeka.warworlds.CombatReportKey");
+            if (!showScoutReport && combatReportKey != null) {
+                CombatReportDialog dialog = new CombatReportDialog();
+                dialog.loadCombatReport(mStar, combatReportKey);
                 dialog.show(getSupportFragmentManager(), "");
             }
         }
