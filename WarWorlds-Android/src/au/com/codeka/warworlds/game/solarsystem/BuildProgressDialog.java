@@ -88,7 +88,8 @@ public class BuildProgressDialog extends DialogFragment {
             String msg = String.format(Locale.ENGLISH,
                     "Accelerating this build would cost <font color=\"red\">$%d</font> "+
                     "(and speed up the build by %s), but you don't have that much cash "+
-                    "available. Do you want to buy some cash now?",
+                    "available. Do you want to buy some cash now?<br/><br/>"+
+                    "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus non turpis nulla, a congue libero. Nullam id lacus quis lacus laoreet mattis et nec elit. Integer vitae ullamcorper nisl. Fusce nec neque odio, facilisis tristique ante. Phasellus viverra felis ante, eget pulvinar mi. Vestibulum ullamcorper quam id eros placerat non posuere velit malesuada. Integer blandit dapibus mauris. Etiam vel turpis id eros viverra mollis nec et lorem. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Nullam convallis accumsan porta. Donec semper porttitor nisl in semper. Curabitur porttitor tortor non tellus congue mattis. Aenean in leo vel erat ultrices lobortis non eu lacus. Nulla sed eros ipsum, quis semper sapien. Nullam euismod, nulla gravida congue rhoncus, dui mi facilisis nulla, vitae ultrices nunc odio sed arcu.",
                     (int) Math.floor(cost), TimeInHours.format(speedUpTime));
 
             StyledDialog dlg = new StyledDialog.Builder(getActivity())
