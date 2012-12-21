@@ -54,4 +54,21 @@
       <effect kind="fighter" />
     </effects>
   </design>
+  <design id="troopcarrier">
+    <name>Troop Carrier</name>
+    <sprite>ship.troopcarrier</sprite>
+    <description><![CDATA[
+      <p>The Troop Carrier carries ground troops which you can deploy to capture
+      an enemy colony.</p>
+    ]]></description>
+    <dependencies>
+      <requires building="shipyard" level="1" />
+    </dependencies>
+    <cost minerals="50" time="0.17" />
+    <fuel costPerParsec="0.2" />
+    <stats speed="10" baseAttack="1" baseDefence="1" />
+    <effects>
+      <!--effect kind="troopcarrier" /-->
+    </effects>
+  </design>
 </designs>

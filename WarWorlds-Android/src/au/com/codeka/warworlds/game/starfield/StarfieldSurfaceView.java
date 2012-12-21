@@ -807,7 +807,7 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
         mMatrix.postTranslate(-(fleetSprite.getWidth() / 2.0f),
                               -(fleetSprite.getHeight() / 2.0f));
         mMatrix.postScale(20.0f * pixelScale / fleetSprite.getWidth(),
-                          20.0f * pixelScale / fleetSprite.getHeight());
+                          20.0f * pixelScale / fleetSprite.getWidth());
         mMatrix.postRotate((float) (angle * 180.0 / Math.PI));
         mMatrix.postTranslate(position.x, position.y);
         canvas.save();
