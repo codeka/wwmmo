@@ -3,7 +3,6 @@ package au.com.codeka.warworlds.game;
 import java.util.Locale;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.graphics.Canvas;
@@ -20,6 +19,7 @@ import android.widget.TextView;
 import au.com.codeka.Cash;
 import au.com.codeka.Point2D;
 import au.com.codeka.warworlds.R;
+import au.com.codeka.warworlds.StyledDialog;
 import au.com.codeka.warworlds.api.ApiClient;
 import au.com.codeka.warworlds.api.ApiException;
 import au.com.codeka.warworlds.game.starfield.StarfieldSurfaceView;
@@ -105,8 +105,8 @@ public class FleetMoveDialog extends DialogFragment {
                     starDetailsRight.setText(Html.fromHtml(rightDetails));
                 }
 
-                ((AlertDialog) getDialog()).getButton(AlertDialog.BUTTON_POSITIVE)
-                            .setEnabled(true);
+                ((StyledDialog) getDialog()).getPositiveButton()
+                                            .setEnabled(true);
                 starDetailsView.setVisibility(View.VISIBLE);
                 instructionsView.setVisibility(View.GONE);
             }
@@ -134,29 +134,23 @@ public class FleetMoveDialog extends DialogFragment {
             }
         });
 
-        AlertDialog.Builder b = new AlertDialog.Builder(getActivity());
+        StyledDialog.Builder b = new StyledDialog.Builder(getActivity());
         b.setView(mView);
 
-        b.setPositiveButton("Move", new DialogInterface.OnClickListener() {
+        b.setPositiveButton("Move", new View.OnClickListener() {
             @Override
-            public void onClick(DialogInterface dialog, int which) {
+            public void onClick(View view) {
                 onMoveClick();
             }
             
         });
+        b.setNegativeButton("Cancel", null);
 
-        b.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dismiss();
-            }
-        });
-
-        final AlertDialog dialog = b.create();
+        final StyledDialog dialog = b.create();
         dialog.setOnShowListener(new DialogInterface.OnShowListener() {
             @Override
             public void onShow(DialogInterface d) {
-                dialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
+                dialog.getPositiveButton().setEnabled(false);
             }
         });
 
@@ -169,9 +163,9 @@ public class FleetMoveDialog extends DialogFragment {
             return;
         }
 
-        final AlertDialog dialog = (AlertDialog) getDialog();
-        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
-        dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setEnabled(false);
+        final StyledDialog dialog = (StyledDialog) getDialog();
+        dialog.getPositiveButton().setEnabled(false);
+        dialog.getNegativeButton().setEnabled(false);
 
         final Activity activity = getActivity();
 
@@ -195,10 +189,13 @@ public class FleetMoveDialog extends DialogFragment {
             @Override
             protected void onPostExecute(Boolean success) {
                 if (!success) {
-                    AlertDialog dialog = new AlertDialog.Builder(activity)
+                    StyledDialog dialog = new StyledDialog.Builder(activity)
                                             .setMessage("Could not move the fleet: do you have enough cash?")
                                             .create();
                     dialog.show();
+
+                    dialog.getPositiveButton().setEnabled(true);
+                    dialog.getNegativeButton().setEnabled(true);
                 } else {
                     // the star this fleet is attached to needs to be refreshed...
                     StarManager.getInstance().refreshStar(activity, mFleet.getStarKey());
@@ -206,6 +203,8 @@ public class FleetMoveDialog extends DialogFragment {
                     // the empire needs to be updated, too, since we'll have subtracted
                     // the cost of this move from your cash
                     EmpireManager.getInstance().refreshEmpire(mFleet.getEmpireKey());
+
+                    dismiss();
                 }
             }
 

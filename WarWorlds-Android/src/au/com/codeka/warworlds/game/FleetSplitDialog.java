@@ -1,7 +1,6 @@
 package au.com.codeka.warworlds.game;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.app.Dialog;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -109,8 +108,7 @@ public class FleetSplitDialog extends DialogFragment {
     }
 
     private void onSplitClick() {
-        ((AlertDialog) getDialog()).getButton(AlertDialog.BUTTON_POSITIVE)
-                                   .setEnabled(false);
+        ((StyledDialog) getDialog()).getPositiveButton().setEnabled(false);
 
         final TextView splitLeft = (TextView) mView.findViewById(R.id.split_left);
         final TextView splitRight = (TextView) mView.findViewById(R.id.split_right);

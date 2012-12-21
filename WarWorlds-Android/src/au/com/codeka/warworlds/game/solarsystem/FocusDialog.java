@@ -7,9 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.app.Dialog;
-import android.content.DialogInterface;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
@@ -17,6 +15,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.SeekBar;
 import au.com.codeka.warworlds.R;
+import au.com.codeka.warworlds.StyledDialog;
 import au.com.codeka.warworlds.api.ApiClient;
 import au.com.codeka.warworlds.api.ApiException;
 import au.com.codeka.warworlds.model.Colony;
@@ -76,23 +75,16 @@ public class FocusDialog extends DialogFragment {
             });
         }
 
-        AlertDialog.Builder b = new AlertDialog.Builder(getActivity());
+        StyledDialog.Builder b = new StyledDialog.Builder(getActivity());
         b.setView(view);
-        b.setTitle("Colony Focus");
 
-        b.setPositiveButton("Set", new DialogInterface.OnClickListener() {
+        b.setPositiveButton("Set", new View.OnClickListener() {
             @Override
-            public void onClick(DialogInterface dialog, int which) {
+            public void onClick(View v) {
                 onSetClick();
             }
         });
-
-        b.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dismiss();
-            }
-        });
+        b.setNegativeButton("Cancel", null);
 
         return b.create();
     }
@@ -118,6 +110,7 @@ public class FocusDialog extends DialogFragment {
     }
 
     private void onSetClick() {
+        ((StyledDialog) getDialog()).getPositiveButton().setEnabled(false);
 
         mColony.setPopulationFocus(mSeekBars.get(0).getProgress() / 100.0f);
         mColony.setFarmingFocus(mSeekBars.get(1).getProgress() / 100.0f);
@@ -125,8 +118,6 @@ public class FocusDialog extends DialogFragment {
         mColony.setConstructionFocus(mSeekBars.get(3).getProgress() / 100.0f);
 
         final Activity activity = getActivity();
-        ((AlertDialog) getDialog()).getButton(AlertDialog.BUTTON_POSITIVE)
-                                   .setEnabled(false);
 
         new AsyncTask<Void, Void, Void>() {
             @Override
@@ -149,6 +140,8 @@ public class FocusDialog extends DialogFragment {
                 // notify the StarManager that this star has been updated
                 StarManager.getInstance().refreshStar(activity,
                                                       mColony.getStarKey());
+
+                dismiss();
             }
         }.execute();
     }

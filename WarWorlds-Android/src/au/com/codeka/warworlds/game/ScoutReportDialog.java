@@ -17,6 +17,7 @@ import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.AbsListView;
 import android.widget.BaseAdapter;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.SpinnerAdapter;
@@ -31,7 +32,9 @@ import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.Fleet;
 import au.com.codeka.warworlds.model.MyEmpire;
 import au.com.codeka.warworlds.model.ScoutReport;
+import au.com.codeka.warworlds.model.SpriteDrawable;
 import au.com.codeka.warworlds.model.Star;
+import au.com.codeka.warworlds.model.StarImageManager;
 
 public class ScoutReportDialog extends DialogFragment {
     private ReportAdapter mReportAdapter;
@@ -50,12 +53,21 @@ public class ScoutReportDialog extends DialogFragment {
         LayoutInflater inflater = getActivity().getLayoutInflater();
         mView = inflater.inflate(R.layout.scout_report_dlg, null);
 
+        final ImageView starIcon = (ImageView) mView.findViewById(R.id.star_icon);
+        final TextView starName = (TextView) mView.findViewById(R.id.star_name);
+        final TextView reportSummary = (TextView) mView.findViewById(R.id.report_summary);
         final View progressBar = mView.findViewById(R.id.progress_bar);
         final View reportList = mView.findViewById(R.id.report_items);
         final View reportDate = mView.findViewById(R.id.report_date);
         final View newerButton = mView.findViewById(R.id.newer_btn);
         final View olderButton = mView.findViewById(R.id.older_btn);
         final ListView reportItems = (ListView) mView.findViewById(R.id.report_items);
+
+        int imageSize = (int)(mStar.getSize() * mStar.getStarType().getImageScale() * 2);
+        starIcon.setImageDrawable(new SpriteDrawable(
+                StarImageManager.getInstance().getSprite(getActivity(), mStar, imageSize)));
+        starName.setText(mStar.getName());
+        reportSummary.setText("Scout Report");
 
         progressBar.setVisibility(View.VISIBLE);
         reportList.setVisibility(View.GONE);

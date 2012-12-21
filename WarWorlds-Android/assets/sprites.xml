@@ -34,6 +34,12 @@
       <direction>0,1</direction>
     </sprite>
   </sheet>
+  <sheet filename="spritesheets/newsh5.shp.000000.png">
+    <sprite name="ship.troopcarrier">
+      <rect location="2,84" size="69x26" />
+      <direction>0,-1</direction>
+    </sprite>
+  </sheet>
 
   <sheet filename="planets/planets.png">
     <sprite name="planet.asteroids" kind="alternate">
