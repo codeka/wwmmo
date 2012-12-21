@@ -300,8 +300,12 @@ class SectorsPage(StarfieldPage):
         y = int(y)
         coords.append(sector.SectorCoord(x, y))
 
+      gen = True
+      if self.request.get("gen") == "0":
+        gen = False
+
       empire_pb = empire.getEmpireForUser(self.user)
-      sectors_pb = sector.getSectors(coords)
+      sectors_pb = sector.getSectors(coords, gen)
       # we only return fleets for the current empire -- we don't let you see
       # other empire's fleets. The exception is moving/attacking fleets, you
       # can see those

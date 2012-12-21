@@ -22,5 +22,16 @@ class MainPage(webapp.RequestHandler):
     self.response.out.write(tmpl.render({"logout_url": logout_url}))
 
 
-app = webapp.WSGIApplication([("/", MainPage)],
+class IntelPage(webapp.RequestHandler):
+  def get(self):
+    user = users.get_current_user()
+    if not user:
+      self.redirect(users.create_login_url(self.request.uri))
+    else:
+      tmpl = jinja.get_template("intel/index.html")
+      self.response.out.write(tmpl.render({}))
+
+
+app = webapp.WSGIApplication([("/", MainPage),
+                              ("/intel", IntelPage)],
                               debug=os.environ["SERVER_SOFTWARE"].startswith("Development"))

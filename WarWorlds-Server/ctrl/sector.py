@@ -18,8 +18,13 @@ SectorCoord = collections.namedtuple("SectorCoord", ["x", "y"])
 SECTOR_SIZE = 1024
 
 
-def getSectors(coords):
-  """Fetches all sectors from in the given array (of SectorCoods)."""
+def getSectors(coords, gen=True):
+  """Fetches all sectors from in the given array (of SectorCoods).
+
+  Args:
+    coords: The list of coordinates to fetch.
+    gen: If True, we'll generate missing sectors. If False we don't.
+  """
 
   keys = []
   for coord in coords:
@@ -34,7 +39,7 @@ def getSectors(coords):
     if key not in sectors:
       missing_coords.append(coord)
   if len(missing_coords) > 0:
-    sectors_model = mdl.SectorManager.getSectors(missing_coords)
+    sectors_model = mdl.SectorManager.getSectors(missing_coords, gen)
     sectors_to_cache = {}
     for key in sectors_model:
       sector_model = sectors_model[key]

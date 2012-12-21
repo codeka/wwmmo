@@ -108,7 +108,7 @@ class SectorManager:
     return db.Key.from_path('Sector', SectorManager._getSectorKey(x, y))
 
   @staticmethod
-  def getSectors(coords):
+  def getSectors(coords, gen=True):
     """Gets all of the sectors with the given range of coordinates."""
 
     keys = []
@@ -131,11 +131,12 @@ class SectorManager:
 
     # now for any sectors which they asked for but which weren't in the data store
     # already, we'll need to generate them from scratch...
-    for coord in coords:
-      key = SectorManager._getSectorKey(coord.x, coord.y)
-      if key not in sectors:
-        taskqueue.add(url="/tasks/sector/generate/"+str(coord.x)+","+str(coord.y),
-                      queue_name="sectors", method="GET")
+    if gen:
+      for coord in coords:
+        key = SectorManager._getSectorKey(coord.x, coord.y)
+        if key not in sectors:
+          taskqueue.add(url="/tasks/sector/generate/"+str(coord.x)+","+str(coord.y),
+                        queue_name="sectors", method="GET")
 
     return sectors
 
