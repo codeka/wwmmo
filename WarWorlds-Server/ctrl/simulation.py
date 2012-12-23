@@ -12,6 +12,7 @@ import_fixer.FixImports("google", "protobuf")
 import ctrl
 from ctrl import empire as empire_ctl
 from ctrl import sector as sector_ctl
+from ctrl import designs
 from model import empire as mdl
 from model import sector as sector_mdl
 from protobufs import messages_pb2 as pb
@@ -274,6 +275,11 @@ class Simulation(object):
 
     max_goods = 500
     max_minerals = 500
+    for empire in star_pb.empires:
+      if empire_key != empire.empire_key:
+        continue
+      max_goods = empire.max_goods
+      max_minerals = empire.max_minerals
 
     if total_goods is None and total_minerals is None:
       # This means we didn't find their entry... add it now
@@ -319,15 +325,6 @@ class Simulation(object):
 
       total_population += colony_pb.population
 
-      for buildings_pb in star_pb.buildings:
-        if buildings_pb.colony_key == colony_pb.key:
-          design = empire_ctl.BuildingDesign.getDesign(buildings_pb.design_name)
-          for storage_effect in design.getEffects("storage"):
-            self.log("storage effect, adding: %d goods %d minerals to max storage (%d goods, %d minerals)" %
-                     (storage_effect.goods, storage_effect.minerals, max_goods, max_minerals))
-            max_goods += storage_effect.goods
-            max_minerals += storage_effect.minerals
-
     # A second loop though the colonies, once the goods/minerals have been calculated. This way,
     # goods minerals are shared between colonies
     for colony_pb in star_pb.colonies:
@@ -369,7 +366,7 @@ class Simulation(object):
           workers_per_build_request = 1
 
         for build_request in build_requests:
-          design = empire_ctl.Design.getDesign(build_request.build_kind, build_request.design_name)
+          design = designs.Design.getDesign(build_request.build_kind, build_request.design_name)
           self.log("--- Building: %s" % build_request.design_name)
 
           # work out if the building is supposed to be started this timestep or not. Even if it's
@@ -518,7 +515,7 @@ class Simulation(object):
     def populateCache(star_pb):
       cache = {}
       for fleet_pb in star_pb.fleets:
-        cache[fleet_pb.key] = {"design": empire_ctl.ShipDesign.getDesign(fleet_pb.design_name),
+        cache[fleet_pb.key] = {"design": designs.ShipDesign.getDesign(fleet_pb.design_name),
                                "fleet": fleet_pb}
       return cache
 
@@ -556,7 +553,7 @@ class Simulation(object):
       if attack_start_time > (now + dt):
         return
 
-      # attacks happen in turns, one per minute. We keep simulating until the conlict is
+      # attacks happen in turns, one per minute. We keep simulating until the conflict is
       # fully resolved (usually not too long)
       end_time = now + dt
       while now < end_time:
@@ -720,7 +717,7 @@ class Simulation(object):
         new_fleet_pb = fpb
 
     # apply any "star landed" effects
-    design = empire_ctl.ShipDesign.getDesign(new_fleet_pb.design_name)
+    design = designs.ShipDesign.getDesign(new_fleet_pb.design_name)
     for effect in design.getEffects():
       effect.onStarLanded(new_fleet_pb, star_pb, self)
 
@@ -728,7 +725,7 @@ class Simulation(object):
     for other_fleet_pb in star_pb.fleets:
       if other_fleet_pb.key == new_fleet_pb.key:
         continue
-      design = empire_ctl.ShipDesign.getDesign(other_fleet_pb.design_name)
+      design = designs.ShipDesign.getDesign(other_fleet_pb.design_name)
       for effect in design.getEffects():
         effect.onFleetArrived(star_pb, new_fleet_pb, other_fleet_pb, self)
 

@@ -108,6 +108,7 @@ class Building(db.Model):
   empire = db.ReferenceProperty(Empire)
   designName = db.StringProperty()
   buildTime = db.DateTimeProperty()
+  level = db.IntegerProperty()
 
   @staticmethod
   def getForStar(star_model):

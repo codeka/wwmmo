@@ -325,6 +325,9 @@ message EmpirePresence
 
     optional float goods_delta_per_hour = 6;
     optional float minerals_delta_per_hour = 7;
+
+    optional float max_goods = 8;
+    optional float max_minerals = 9;
 }
 
 //
@@ -374,6 +377,10 @@ message Colony
 
     // Amount of uncollected taxes this colony has generated
     optional float uncollected_taxes = 15;
+
+    // The colony's defence bonus, which when multiplied by one quarter of
+    // the population gives the colony's total defence score.
+    optional float defence_bonus = 16;
 }
 
 
@@ -448,6 +455,9 @@ message Building
 
     // The name of the design of this building (defined in data/buildings.xml)
     required string design_name = 3;
+
+    // The level of this building
+    optional int32 level = 4;
 }
 
 

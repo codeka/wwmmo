@@ -15,6 +15,7 @@ import ctrl
 from ctrl import empire as ctl
 from ctrl import sector as sector_ctl
 from ctrl import simulation as simulation_ctl
+from ctrl import designs
 from model import empire as mdl
 from model import sector as sector_mdl
 import protobufs.messages_pb2 as pb
@@ -85,7 +86,7 @@ class BuildCheckPage(tasks.TaskPage):
         model.designName = build_request_model.designName
         model.buildTime = datetime.now()
         model.put()
-        design = ctl.BuildingDesign.getDesign(model.designName)
+        design = designs.BuildingDesign.getDesign(model.designName)
       else:
         # if it's not a building, it must be a ship. We'll try to find a fleet that'll
         # work, but if we can't it's not a big deal -- just create a new one. Duplicates
@@ -111,7 +112,7 @@ class BuildCheckPage(tasks.TaskPage):
           model.state = pb.Fleet.IDLE
           model.stateStartTime = datetime.now()
           model.put()
-        design = ctl.ShipDesign.getDesign(model.designName)
+        design = designs.ShipDesign.getDesign(model.designName)
 
         # if you've built a colony ship, we need to decrease the colony population by
         # 100 (basically, those 100 people go into the colony ship, to be transported to

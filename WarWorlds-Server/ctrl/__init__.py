@@ -95,6 +95,7 @@ def colonyModelToPb(colony_pb, colony_model):
     colony_pb.uncollected_taxes = colony_model.uncollectedTaxes
   else:
     colony_pb.uncollected_taxes = 0
+  colony_pb.defence_bonus = 1
 
 
 def colonyPbToModel(colony_model, colony_pb):
@@ -153,6 +154,8 @@ def empirePresenceModelToPb(presence_pb, presence_model):
   presence_pb.star_key = str(presence_model.key().parent())
   presence_pb.total_goods = presence_model.totalGoods
   presence_pb.total_minerals = presence_model.totalMinerals
+  presence_pb.max_goods = 500
+  presence_pb.max_minerals = 500
 
 
 def empirePresencePbToModel(presence_model, presence_pb):
@@ -175,6 +178,10 @@ def buildingModelToPb(building_pb, building_model):
   building_pb.key = str(building_model.key())
   building_pb.colony_key = str(empire_mdl.Building.colony.get_value_for_datastore(building_model))
   building_pb.design_name = building_model.designName
+  if building_model.level:
+    building_pb.level = building_model.level
+  else:
+    building_pb.level = 1
 
 
 def buildRequestModelToPb(build_pb, build_model):

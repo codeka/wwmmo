@@ -1,7 +1,10 @@
 package au.com.codeka.warworlds.game.solarsystem;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import org.joda.time.Duration;
@@ -22,7 +25,6 @@ import android.widget.TextView;
 import au.com.codeka.TimeInHours;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.TabFragmentActivity;
-import au.com.codeka.warworlds.ctrl.HorizontalSeparator;
 import au.com.codeka.warworlds.model.BuildQueueManager;
 import au.com.codeka.warworlds.model.BuildRequest;
 import au.com.codeka.warworlds.model.Building;
@@ -124,12 +126,12 @@ public class BuildActivity extends TabFragmentActivity implements StarManager.St
         public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
             View v = inflater.inflate(R.layout.solarsystem_build_buildings_tab, null);
 
+            final Star star = ((BuildActivity) getActivity()).mStar;
             final Colony colony = ((BuildActivity) getActivity()).mColony;
 
             mBuildingListAdapter = new BuildingListAdapter();
             if (colony != null) {
-                mBuildingListAdapter.setBuildings(colony.getBuildings());
-                mBuildingListAdapter.setDesigns(BuildingDesignManager.getInstance().getDesigns());
+                mBuildingListAdapter.setColony(star, colony);
             }
 
             ListView buildingsList = (ListView) v.findViewById(R.id.building_list);
@@ -138,8 +140,8 @@ public class BuildActivity extends TabFragmentActivity implements StarManager.St
             buildingsList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                    Object o = mBuildingListAdapter.getItem(position);
-                    if (o instanceof BuildingDesign) {
+                    Entry entry = (Entry) mBuildingListAdapter.getItem(position);
+                    if (entry.design != null) {
                         int buildQueueSize = 0;
                         BuildActivity activity = (BuildActivity) getActivity();
                         for (BuildRequest br : activity.mStar.getBuildRequests()) {
@@ -148,12 +150,10 @@ public class BuildActivity extends TabFragmentActivity implements StarManager.St
                             }
                         }
 
-                        BuildingDesign design = (BuildingDesign) o;
-
                         BuildConfirmDialog dialog = new BuildConfirmDialog();
-                        dialog.setup(design, colony, buildQueueSize);
+                        dialog.setup(entry.design, colony, buildQueueSize);
                         dialog.show(getActivity().getSupportFragmentManager(), "");
-                    } else if (o instanceof Building) {
+                    } else if (entry.building != null) {
                         // TODO: upgrade building
                     }
                 }
@@ -166,27 +166,75 @@ public class BuildActivity extends TabFragmentActivity implements StarManager.St
          * This adapter is used to populate a list of buildings in a list view.
          */
         private class BuildingListAdapter extends BaseAdapter {
-            private List<Building> mBuildings;
-            private List<BuildingDesign> mDesigns;
+            private ArrayList<Entry> mEntries;
 
             private static final int HEADING_TYPE = 0;
             private static final int EXISTING_BUILDING_TYPE = 1;
             private static final int NEW_BUILDING_TYPE = 2;
 
-            public void setBuildings(List<Building> buildings) {
+            public void setColony(Star star, Colony colony) {
+                List<Building> buildings = colony.getBuildings();
                 if (buildings == null) {
                     buildings = new ArrayList<Building>();
                 }
 
-                mBuildings = buildings;
-                notifyDataSetChanged();
-            }
-
-            public void setDesigns(Map<String, Design> designs) {
-                mDesigns = new ArrayList<BuildingDesign>();
-                for (Design d : designs.values()) {
-                    mDesigns.add((BuildingDesign) d);
+                mEntries = new ArrayList<Entry>();
+                for (Building b : buildings) {
+                    Entry entry = new Entry();
+                    entry.building = b;
+                    mEntries.add(entry);
                 }
+
+                for (BuildRequest br : star.getBuildRequests()) {
+                    if (br.getColonyKey().equals(colony.getKey()) &&
+                        br.getBuildKind().equals(BuildRequest.BuildKind.BUILDING)) {
+                        Entry entry = new Entry();
+                        entry.buildRequest = br;
+                        mEntries.add(entry);
+                    }
+                }
+
+                Collections.sort(mEntries, new Comparator<Entry>() {
+                    @Override
+                    public int compare(Entry lhs, Entry rhs) {
+                        String a = (lhs.building != null ? lhs.building.getDesignName() : lhs.buildRequest.getDesignID());
+                        String b = (rhs.building != null ? rhs.building.getDesignName() : rhs.buildRequest.getDesignID());
+                        return a.compareTo(b);
+                    }
+                });
+
+                Entry title = new Entry();
+                title.title = "Existing Buildings";
+                mEntries.add(0, title);
+
+                title = new Entry();
+                title.title = "Available Buildings";
+                mEntries.add(title);
+
+                for (Design d : BuildingDesignManager.getInstance().getDesigns().values()) {
+                    BuildingDesign bd = (BuildingDesign) d;
+                    if (bd.getMaxPerColony() > 0) {
+                        int numExisting = 0;
+                        for (Entry e : mEntries) {
+                            if (e.building != null) {
+                                if (e.building.getDesignName().equals(bd.getID())) {
+                                    numExisting ++;
+                                }
+                            } else if (e.buildRequest != null) {
+                                if (e.buildRequest.getDesignID().equals(bd.getID())) {
+                                    numExisting ++;
+                                }
+                            }
+                        }
+                        if (numExisting >= bd.getMaxPerColony()) {
+                            continue;
+                        }
+                    }
+                    Entry entry = new Entry();
+                    entry.design = bd;
+                    mEntries.add(entry);
+                }
+
                 notifyDataSetChanged();
             }
 
@@ -201,16 +249,14 @@ public class BuildActivity extends TabFragmentActivity implements StarManager.St
 
             @Override
             public int getItemViewType(int position) {
-                if (mBuildings == null || mDesigns == null)
+                if (mEntries == null)
                     return 0;
 
-                if (position == 0 || position == (mBuildings.size() + 1)) {
+                if (mEntries.get(position).title != null)
                     return HEADING_TYPE;
-                } else if (position <= mBuildings.size()) {
-                    return EXISTING_BUILDING_TYPE;
-                } else {
+                if (mEntries.get(position).design != null)
                     return NEW_BUILDING_TYPE;
-                }
+                return EXISTING_BUILDING_TYPE;
             }
 
             @Override
@@ -224,24 +270,18 @@ public class BuildActivity extends TabFragmentActivity implements StarManager.St
 
             @Override
             public int getCount() {
-                if (mBuildings == null || mDesigns == null)
+                if (mEntries == null)
                     return 0;
 
-                return mBuildings.size() + mDesigns.size() + 2;
+                return mEntries.size();
             }
 
             @Override
             public Object getItem(int position) {
-                if (mBuildings == null)
+                if (mEntries == null)
                     return null;
 
-                if (position == 0 || position == (mBuildings.size() + 1)) {
-                    return null;
-                } else if (position <= mBuildings.size()) {
-                    return mBuildings.get(position - 1);
-                } else {
-                    return mDesigns.get(position - mBuildings.size() - 2);
-                }
+                return mEntries.get(position);
             }
 
             @Override
@@ -258,37 +298,49 @@ public class BuildActivity extends TabFragmentActivity implements StarManager.St
 
                     int viewType = getItemViewType(position);
                     if (viewType == HEADING_TYPE) {
-                        view = new HorizontalSeparator(getActivity());
+                        view = new TextView(getActivity());
                     } else {
                         view = inflater.inflate(R.layout.solarsystem_buildings_design, null);
                     }
                 }
 
-                if (position == 0) {
-                    HorizontalSeparator hs = (HorizontalSeparator) view;
-                    hs.setText("Existing Buildings");
-                } else if (position <= mBuildings.size()) {
+                Entry entry = mEntries.get(position);
+                if (entry.title != null) {
+                    TextView tv = (TextView) view;
+                    tv.setText(entry.title);
+                } else if (entry.building != null || entry.buildRequest != null) {
                     ImageView icon = (ImageView) view.findViewById(R.id.building_icon);
                     TextView row1 = (TextView) view.findViewById(R.id.building_row1);
                     TextView row2 = (TextView) view.findViewById(R.id.building_row2);
                     TextView row3 = (TextView) view.findViewById(R.id.building_row3);
                     ProgressBar progress = (ProgressBar) view.findViewById(R.id.building_progress);
 
-                    Building building = mBuildings.get(position - 1);
-                    BuildingDesign design = building.getDesign();
+                    Building building = entry.building;
+                    BuildRequest buildRequest = entry.buildRequest;
+                    BuildingDesign design = (building != null
+                            ? building.getDesign()
+                            : BuildingDesignManager.getInstance().getDesign(buildRequest.getDesignID()));
 
                     icon.setImageDrawable(new SpriteDrawable(design.getSprite()));
 
                     row1.setText(design.getDisplayName());
-                    row2.setText("Level 1");
+                    if (building != null) {
+                        row2.setText("Level 1");
+                        row3.setVisibility(View.VISIBLE);
+                        progress.setVisibility(View.GONE);
+                        row3.setText(String.format(Locale.ENGLISH,
+                                "Upgrade: %.2f hours",
+                                (float) design.getBuildTimeSeconds() / 3600.0f));
+                    } else {
+                        row2.setText(String.format(Locale.ENGLISH,
+                                "Building: %d %%, %s left",
+                                 (int) buildRequest.getPercentComplete(),
+                                 TimeInHours.format(buildRequest.getRemainingTime())));
 
-                    row3.setVisibility(View.VISIBLE);
-                    progress.setVisibility(View.GONE);
-                    row3.setText(String.format("Upgrade: %.2f hours",
-                            (float) design.getBuildTimeSeconds() / 3600.0f));
-                } else if (position == mBuildings.size() + 1) {
-                    HorizontalSeparator hs = (HorizontalSeparator) view;
-                    hs.setText("New Buildings");
+                        row3.setVisibility(View.GONE);
+                        progress.setVisibility(View.VISIBLE);
+                        progress.setProgress((int) buildRequest.getPercentComplete());
+                    }
                 } else {
                     ImageView icon = (ImageView) view.findViewById(R.id.building_icon);
                     TextView row1 = (TextView) view.findViewById(R.id.building_row1);
@@ -297,7 +349,7 @@ public class BuildActivity extends TabFragmentActivity implements StarManager.St
                     ProgressBar progress = (ProgressBar) view.findViewById(R.id.building_progress);
                     progress.setVisibility(View.GONE);
 
-                    BuildingDesign design = mDesigns.get(position - mBuildings.size() - 2);
+                    BuildingDesign design = mEntries.get(position).design;
 
                     icon.setImageDrawable(new SpriteDrawable(design.getSprite()));
 
@@ -311,6 +363,13 @@ public class BuildActivity extends TabFragmentActivity implements StarManager.St
 
                 return view;
             }
+        }
+
+        private static class Entry {
+            public String title;
+            public BuildRequest buildRequest;
+            public Building building;
+            public BuildingDesign design;
         }
     }
 
@@ -516,10 +575,10 @@ public class BuildActivity extends TabFragmentActivity implements StarManager.St
 
                 Duration remainingDuration = request.getRemainingTime();
                 if (remainingDuration.equals(Duration.ZERO)) {
-                    row2.setText(String.format("%d %%, not enough resources to complete.",
+                    row2.setText(String.format(Locale.ENGLISH, "%d %%, not enough resources to complete.",
                                  (int) request.getPercentComplete()));
                 } else {
-                    row2.setText(String.format("%d %%, %s left",
+                    row2.setText(String.format(Locale.ENGLISH, "%d %%, %s left",
                                  (int) request.getPercentComplete(),
                                  TimeInHours.format(remainingDuration)));
                 }

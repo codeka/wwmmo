@@ -2,10 +2,12 @@
 
 import collections
 from datetime import datetime, timedelta
+
 import math
 import random
 
 import ctrl
+from ctrl import designs
 from model import empire as empire_mdl
 from model import sector as mdl
 from protobufs import messages_pb2 as pb
@@ -101,6 +103,21 @@ def getStar(star_key, force_nocache=False):
   for fleet_model in empire_mdl.Fleet.getForStar(star_model):
     fleet_pb = star_pb.fleets.add()
     ctrl.fleetModelToPb(fleet_pb, fleet_model)
+
+  for building_pb in star_pb.buildings:
+    building_empire_key = None
+    design = designs.BuildingDesign.getDesign(building_pb.design_name)
+    for effect in design.effects:
+      if effect.level and effect.level != building_pb.level:
+        continue
+      for colony_pb in star_pb.colonies:
+        if building_pb.colony_key == colony_pb.key:
+          effect.applyToColony(building_pb, colony_pb)
+          building_empire_key = colony_pb.empire_key
+      if building_empire_key:
+        for empire_presence_pb in star_pb.empires:
+          if empire_presence_pb.empire_key == building_empire_key:
+            effect.applyToEmpirePresence(building_pb, empire_presence_pb)
 
   min_time_emptied = ctrl.dateTimeToEpoch(datetime.now() - timedelta(days=4))
   if not star_pb.colonies and star_pb.time_emptied < min_time_emptied:

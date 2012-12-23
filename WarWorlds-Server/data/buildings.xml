@@ -8,7 +8,8 @@
       <p>You can have only one shipyard on your planet, but it's efficiency and the range of
       ships available to you can be upgraded with the building of supporting buildings.</p>
     ]]></description>
-    <cost credits="250" minerals="300" time="2.4" />
+    <cost minerals="300" time="2.4" />
+    <limits maxPerColony="1" />
   </design>
   <design id="silo">
     <name>Silo</name>
@@ -34,6 +35,25 @@
       <p>Allows you to build more advanced ships and buildings. The higher the level of this
       building, the more advanced research becomes available.</p>
     ]]></description>
-    <cost credits="100" minerals="1000" time="0.75" />
+    <cost minerals="1000" time="0.75" />
+    <limits maxPerColony="1" />
+  </design>
+  <design id="groundshield">
+    <name>Ground Shield</name>
+    <sprite>building.shield-1</sprite>
+    <description><![CDATA[
+      <p>The ground shield provide additional defence when an enemey lands a troop
+      carrier. Your colony's base defence will be increased by 0.25 for each level
+      of Ground Shield.
+    ]]></description>
+    <cost minerals="350" time="1.2" />
+    <effects>
+      <effect level="1" kind="defence" bonus="0.25" />
+      <effect level="2" kind="defence" bonus="0.5" />
+      <effect level="3" kind="defence" bonus="0.75" />
+      <effect level="4" kind="defence" bonus="1" />
+      <effect level="5" kind="defence" bonus="1.25" />
+    </effects>
+    <limits maxPerColony="1" />
   </design>
 </designs>
