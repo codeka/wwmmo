@@ -64,6 +64,10 @@
 
 $(function() {
 
+  function randomInt(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+  }
+
   //
   // Helper class that encapsulates functionality of a 2D vector.
   //
@@ -155,13 +159,21 @@ $(function() {
       this.offsetX = pb.offset_x;
       this.offsetY = pb.offset_y;
       this.key = pb.key;
-      this.size = pb.size;
+      this.size = pb.size * 1.5;
+
+      Math.seedrandom(this.key);
+      this.imgIndex = randomInt(0, 3);
     },
 
     render: function(context, offsetX, offsetY) {
-      context.fillRect(offsetX + this.offsetX - (this.size / 2),
-                       offsetY + this.offsetY - (this.size / 2),
-                       this.size, this.size);
+      if (Star.small.img.complete) {
+        var slice = Star.small[this.type][this.imgIndex];
+        context.drawImage(Star.small.img,
+          slice.x, slice.y, slice.width, slice.height,
+          offsetX + this.offsetX - (this.size * slice.scale / 2),
+          offsetY + this.offsetY - (this.size * slice.scale / 2),
+          this.size * slice.scale, this.size * slice.scale);
+      }
 
       context.textAlign = "center";
       context.font = "12pt sans-serif"
@@ -170,6 +182,53 @@ $(function() {
                       offsetY + this.offsetY + this.size + 6);
     }
   });
+  Star.small = {
+    img: new Image(),
+    "CLASSIFICATION.BLACKHOLE": [
+      {x: 0, y: 0, width: 32, height: 32, scale: 1},
+      {x: 32, y: 0, width: 32, height: 32, scale: 1},
+      {x: 64, y: 0, width: 32, height: 32, scale: 1},
+      {x: 96, y: 0, width: 32, height: 32, scale: 1}
+    ],
+    "CLASSIFICATION.BLUE": [
+      {x: 0, y: 32, width: 32, height: 32, scale: 1},
+      {x: 32, y: 32, width: 32, height: 32, scale: 1},
+      {x: 64, y: 32, width: 32, height: 32, scale: 1},
+      {x: 96, y: 32, width: 32, height: 32, scale: 1}
+    ],
+    "CLASSIFICATION.NEUTRON": [
+      {x: 0, y: 64, width: 64, height: 64, scale: 4},
+      {x: 64, y: 64, width: 64, height: 64, scale: 4},
+      {x: 0, y: 128, width: 64, height: 64, scale: 4},
+      {x: 64, y: 128, width: 64, height: 64, scale: 4}
+    ],
+    "CLASSIFICATION.ORANGE": [
+      {x: 0, y: 192, width: 32, height: 32, scale: 1},
+      {x: 32, y: 192, width: 32, height: 32, scale: 1},
+      {x: 64, y: 192, width: 32, height: 32, scale: 1},
+      {x: 96, y: 192, width: 32, height: 32, scale: 1}
+    ],
+    "CLASSIFICATION.RED": [
+      {x: 0, y: 224, width: 32, height: 32, scale: 1},
+      {x: 32, y: 224, width: 32, height: 32, scale: 1},
+      {x: 64, y: 224, width: 32, height: 32, scale: 1},
+      {x: 96, y: 224, width: 32, height: 32, scale: 1}
+    ],
+    "CLASSIFICATION.WHITE": [
+      {x: 0, y: 256, width: 32, height: 32, scale: 1},
+      {x: 32, y: 256, width: 32, height: 32, scale: 1},
+      {x: 64, y: 256, width: 32, height: 32, scale: 1},
+      {x: 96, y: 256, width: 32, height: 32, scale: 1}
+    ],
+    "CLASSIFICATION.YELLOW": [
+      {x: 0, y: 288, width: 32, height: 32, scale: 1},
+      {x: 32, y: 288, width: 32, height: 32, scale: 1},
+      {x: 64, y: 288, width: 32, height: 32, scale: 1},
+      {x: 96, y: 288, width: 32, height: 32, scale: 1}
+    ]
+  };
+  Star.small.img.src = "/intel/stars_small.png";
+  Star.small.img.onload = function() { world.draw(); }
 
   var Sector = WorldObject.extend({
     init: function(pb) {
@@ -180,12 +239,40 @@ $(function() {
         var star = new Star(pb.stars[i]);
         this.stars.push(star);
       }
+
+      Math.seedrandom(this.sectorX+","+this.sectorY);
+      this.backgroundIndex = randomInt(0, 1);
+
+      this.gases = [];
+      for (var i = 0; i < 10; i++) {
+        var gas = {};
+        gas.index = randomInt(0, Sector.gases.length - 1);
+        gas.x = randomInt(0, Sector.SIZE);
+        gas.y = randomInt(0, Sector.SIZE);
+        this.gases.push(gas);
+      }
     },
 
     render: function(context) {
-      var x = this.world.offsetX + Sector.SIZE * this.sectorX;
-      var y = this.world.offsetY + Sector.SIZE * this.sectorY;
-      context.strokeRect(x, y, Sector.SIZE, Sector.SIZE);
+      var x = this.world.offsetX + Sector.SIZE * (this.sectorX - this.world.sectorX);
+      var y = this.world.offsetY + Sector.SIZE * (this.sectorY - this.world.sectorY);
+
+      var background = Sector.backgrounds[this.backgroundIndex];
+      if (background.complete) {
+        context.drawImage(background, x, y, Sector.SIZE, Sector.SIZE);
+      }
+      for (var i = 0; i < this.gases.length; i++) {
+        var img = Sector.gases[this.gases[i].index];
+        if (!img.complete) {
+          continue;
+        }
+        var width = img.naturalWidth * 2;
+        var height = img.naturalHeight * 2;
+        context.drawImage(img,
+                          x + this.gases[i].x - (width / 2),
+                          y + this.gases[i].y - (height / 2),
+                          width, height);
+      }
 
       for (var i = 0; i < this.stars.length; i++) {
         this.stars[i].render(context, x, y);
@@ -193,31 +280,62 @@ $(function() {
     }
   });
   Sector.SIZE = 1024;
+  Sector.backgrounds = [new Image(), new Image()];
+  Sector.backgrounds[0].src = "/intel/decoration/starfield/01.png";
+  Sector.backgrounds[1].src = "/intel/decoration/starfield/02.png";
+  Sector.gases = [];
+  for (var i = 0; i <= 13; i++) {
+    var img = new Image();
+    var name = "00"+i;
+    name = name.substr(name.length - 2);
+    img.src = "/intel/decoration/gas/"+name+".png";
+    img.onload = function () {
+      world.draw();
+    }
+    Sector.gases.push(img);
+  }
 
   //
   // The World is the container for all the objects.
   //
   var World = Class.extend({
     init: function() {
-      this._objects = [];
+      this._sectors = [];
+      this._inTransitSectors = [];
       this.offsetX = 0;
       this.offsetY = 0;
+      this.sectorX = 0;
+      this.sectorY = 0;
     },
 
-    drag: function(dx, dy) {
+    drag: function(dx, dy, onComplete) {
       this.offsetX += dx;
       this.offsetY += dy;
-      this.draw();
-    },
 
-    addObject: function(obj) {
-      obj.world = this;
-      this._objects.push(obj);
+      while (this.offsetX < -(Sector.SIZE/2)) {
+        this.sectorX += 1;
+        this.offsetX += Sector.SIZE;
+      }
+      while (this.offsetX > (Sector.SIZE/2)) {
+        this.sectorX -= 1;
+        this.offsetX -= Sector.SIZE;
+      }
+      while (this.offsetY < -(Sector.SIZE/2)) {
+        this.sectorY += 1;
+        this.offsetY += Sector.SIZE;
+      }
+      while (this.offsetY > (Sector.SIZE/2)) {
+        this.sectorY -= 1;
+        this.offsetY -= Sector.SIZE;
+      }
+      this.refreshSectors();
+
+      this.draw(onComplete);
     },
 
     update: function(now) {
-      for (var i = 0; i < this._objects.length; i++) {
-        this._objects[i].update(now);
+      for (var i = 0; i < this._sectors.length; i++) {
+        this._sectors[i].update(now);
       }
     },
 
@@ -227,12 +345,12 @@ $(function() {
       context.fillStyle = "#fff";
       context.strokeStyle = "#fff";
 
-      for (var i = 0; i < this._objects.length; i++) {
-        this._objects[i].render(context);
+      for (var i = 0; i < this._sectors.length; i++) {
+        this._sectors[i].render(context);
       }
     },
 
-    draw: function() {
+    draw: function(onComplete) {
       function requestFrame(callback) {
         var fn = window.C ||
                  window.webkitRequestAnimationFrame ||
@@ -249,27 +367,101 @@ $(function() {
         canvas.height = canvas.offsetHeight;
         world.update(new Date());
         world.render(canvas);
+
+        if (onComplete) {
+          onComplete();
+        }
       }
 
       requestFrame(doDraw);
+    },
+
+    // checks whether we need to fetch some new sectors from the server, and
+    // then fetches them if we do.
+    refreshSectors: function() {
+      var neededSectors = [];
+      for (var y = this.sectorY - 1; y <= this.sectorY + 1; y++ ) {
+        for (var x = this.sectorX - 1; x <= this.sectorX + 1; x++) {
+          neededSectors.push({"sectorX": x, "sectorY": y});
+        }
+      }
+
+      // go through the existing objects and remove any that's not in the
+      // list of "needed" sectors
+      var existingSectors = []
+      for (var i = 0; i < this._sectors.length; i++ ) {
+        for (var j = 0; j < neededSectors.length; j++) {
+          if (this._sectors[i].sectorX == neededSectors[j].sectorX &&
+              this._sectors[i].sectorY == neededSectors[j].sectorY) {
+            existingSectors.push(this._sectors[i]);
+          }
+        }
+      }
+      this._sectors = existingSectors;
+
+      // now build up the URL of sectors that are in neededSectors, but NOT
+      // in existingSectors...
+      var missingSectors = []
+      for (var i = 0; i < neededSectors.length; i++) {
+        var found = false;
+        var key = neededSectors[i].sectorX+","+neededSectors[i].sectorY;
+        for (var j = 0; j < existingSectors.length; j++) {
+          if (neededSectors[i].sectorX == existingSectors[j].sectorX &&
+              neededSectors[i].sectorY == existingSectors[j].sectorY) {
+            found = true;
+          }
+        }
+        for (var j = 0; j < this._inTransitSectors.length; j++) {
+          if (this._inTransitSectors[j] == key) {
+            found = true;
+          }
+        }
+        if (!found) {
+          missingSectors.push(key);
+        }
+      }
+
+      if (missingSectors.length > 0) {
+        for (var i = 0; i < missingSectors.length; i++) {
+          this._inTransitSectors.push(missingSectors[i]);
+        }
+
+        console.log("fetching sectors: "+missingSectors.join("|"));
+        var world = this;
+        $.ajax({
+          url: "/api/v1/sectors?coords="+missingSectors.join("|")+"&gen=0",
+          dataType: "json",
+          success: function (data) {
+            if (!data || !data.sectors) {
+              return;
+            }
+            for (var i = 0; i < data.sectors.length; i++) {
+              var sector = new Sector(data.sectors[i]);
+              sector.world = world;
+              world._sectors.push(sector);
+
+              var key = sector.sectorX+","+sector.sectorY;
+              var remainingInTransitSectors = [];
+              for (var j = 0; j < world._inTransitSectors.length; j++) {
+                if (world._inTransitSectors[j] == key) {
+                  continue;
+                }
+                remainingInTransitSectors.push(world._inTransitSectors[j]);
+              }
+              world._inTransitSectors = remainingInTransitSectors;
+            }
+            world.draw();
+          },
+          error: function() {
+            alert("An error occurred fetching starfield data. Sorry.");
+          }
+        });
+      }
     }
   });
 
   var world = new World();
-  $.ajax({
-    url: "/api/v1/sectors?coords=0,0|-1,0|-1,-1|0,-1|1,0|1,1|0,1|-1,1|1,-1&gen=0",
-    dataType: "json",
-    success: function (data) {
-      for (var i = 0; i < data.sectors.length; i++) {
-        var sector = new Sector(data.sectors[i]);
-        world.addObject(sector);
-      }
-      world.draw();
-    },
-    error: function() {
-      alert("An error occurred fetching starfield data. Sorry.");
-    }
-  });
+  world.refreshSectors();
 
   // this is our click-and-drag code that handles scrolling around the world
   $(function() {
@@ -293,5 +485,49 @@ $(function() {
         world.drag(dx, dy);
       }
     });
+
+    var LEFT = 37;
+    var UP = 38;
+    var RIGHT = 39;
+    var DOWN = 40;
+
+    var pressed = [];
+    function keyScroll() {
+      if (pressed.length == 0) {
+        return;
+      }
+
+      var dx = 0;
+      var dy = 0;
+      for (var i = 0; i < pressed.length; i++) {
+        if (pressed[i] == LEFT) {
+          dx ++;
+        } else if (pressed[i] == UP) {
+          dy ++;
+        } else if (pressed[i] == RIGHT) {
+          dx --;
+        } else if (pressed[i] == DOWN) {
+          dy --;
+        }
+      }
+      world.drag(dx, dy, keyScroll);
+    }
+
+    $(document).on("keydown", function(evnt) {
+      if (evnt.which >= LEFT && evnt.which <= DOWN) {
+        pressed.push(evnt.which);
+        keyScroll();
+      }
+    }).on("keyup", function(evnt) {
+      if (evnt.which >= LEFT && evnt.which <= DOWN) {
+        var remaining = []
+        for (var i = 0; i < pressed.length; i++) {
+          if (pressed[i] != evnt.which) {
+            remaining.push(pressed[i]);
+          }
+        }
+        pressed = remaining;
+      }
+    });;
   });
 });
