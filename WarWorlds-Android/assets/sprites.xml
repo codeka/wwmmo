@@ -10,6 +10,12 @@
       <direction>0,1</direction>
     </sprite>
   </sheet>
+  <sheet filename="spritesheets/newsh@.shp.000000.png">
+    <sprite name="building.biosphere-1">
+      <rect location="0,59" size="23x23" />
+      <direction>0,1</direction>
+    </sprite>
+  </sheet>
   <sheet filename="spritesheets/newshb.shp.000000.png">
     <sprite name="ship.colony">
       <rect location="0,0" size="119x139" />

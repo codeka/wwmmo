@@ -16,6 +16,8 @@ public class EmpirePresence {
     private float mTotalMinerals;
     private float mDeltaGoodsPerHour;
     private float mDeltaMineralsPerHour;
+    private float mMaxGoods;
+    private float mMaxMinerals;
 
     public String getKey() {
         return mKey;
@@ -38,6 +40,12 @@ public class EmpirePresence {
     public float getDeltaMineralsPerHour() {
         return mDeltaMineralsPerHour;
     }
+    public float getMaxGoods() {
+        return mMaxGoods;
+    }
+    public float getMaxMinerals() {
+        return mMaxMinerals;
+    }
 
     public static EmpirePresence fromProtocolBuffer(Messages.EmpirePresence pb) {
         EmpirePresence presence = new EmpirePresence();
@@ -48,6 +56,8 @@ public class EmpirePresence {
         presence.mTotalMinerals = pb.getTotalMinerals();
         presence.mDeltaGoodsPerHour = pb.getGoodsDeltaPerHour();
         presence.mDeltaMineralsPerHour = pb.getMineralsDeltaPerHour();
+        presence.mMaxGoods = pb.getMaxGoods();
+        presence.mMaxMinerals = pb.getMaxMinerals();
         return presence;
     }
 }

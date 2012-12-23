@@ -363,7 +363,7 @@ message Colony
     optional int64 last_simulation = 6;
 
     // The "focus" of this colony. These numbers must add up to 1.0 and represent
-    // the percentage of the population that is focussed on the given task.
+    // the percentage of the population that is focused on the given task.
     optional float focus_population = 7;
     optional float focus_farming = 8;
     optional float focus_mining = 9;
@@ -381,6 +381,10 @@ message Colony
     // The colony's defence bonus, which when multiplied by one quarter of
     // the population gives the colony's total defence score.
     optional float defence_bonus = 16;
+
+    // When all bonuses and what-not are applies, what is this colony's maximum
+    // population?
+    optional float max_population = 17;
 }
 
 

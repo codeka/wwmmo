@@ -26,6 +26,8 @@ public class Colony implements Parcelable {
     private float mUncollectedTaxes;
     private DateTime mLastSimulation;
     private List<Building> mBuildings;
+    private float mMaxPopulation;
+    private float mDefenceBoost;
 
     public String getKey() {
         return mKey;
@@ -84,6 +86,12 @@ public class Colony implements Parcelable {
     public List<Building> getBuildings() {
         return mBuildings;
     }
+    public float getMaxPopulation() {
+        return mMaxPopulation;
+    }
+    public float getDefenceBoost() {
+        return mDefenceBoost;
+    }
 
     @Override
     public int describeContents() {
@@ -106,6 +114,8 @@ public class Colony implements Parcelable {
         parcel.writeFloat(mMineralsDelta);
         parcel.writeFloat(mUncollectedTaxes);
         parcel.writeLong(mLastSimulation.getMillis());
+        parcel.writeFloat(mMaxPopulation);
+        parcel.writeFloat(mDefenceBoost);
 
         Building[] buildings = new Building[mBuildings.size()];
         parcel.writeParcelableArray(mBuildings.toArray(buildings), flags);
@@ -130,6 +140,8 @@ public class Colony implements Parcelable {
             c.mMineralsDelta = parcel.readFloat();
             c.mUncollectedTaxes = parcel.readFloat();
             c.mLastSimulation = new DateTime(parcel.readLong(), DateTimeZone.UTC);
+            c.mMaxPopulation = parcel.readFloat();
+            c.mDefenceBoost = parcel.readFloat();
 
             Parcelable[] buildings = parcel.readParcelableArray(Building.class.getClassLoader());
             c.mBuildings = new ArrayList<Building>();
@@ -165,6 +177,8 @@ public class Colony implements Parcelable {
         c.mGoodsDelta = pb.getDeltaGoods();
         c.mMineralsDelta = pb.getDeltaMinerals();
         c.mUncollectedTaxes = pb.getUncollectedTaxes();
+        c.mMaxPopulation = pb.getMaxPopulation();
+        c.mDefenceBoost = pb.getDefenceBonus();
 
         return c;
     }

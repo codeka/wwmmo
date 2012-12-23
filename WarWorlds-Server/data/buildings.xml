@@ -56,4 +56,23 @@
     </effects>
     <limits maxPerColony="1" />
   </design>
+  <design id="biosphere">
+    <name>Biosphere</name>
+    <sprite>building.biosphere-1</sprite>
+    <description><![CDATA[
+      <p>The Biosphere increases a planet's maximum population. Without a biosphere,
+      a planet's maximum population is approximately equal to it's population
+      congeniality. But each level of biosphere adds 100 or 15% (whichever is
+      greater).</p>
+    ]]></description>
+    <cost minerals="400" time="3.4" />
+    <effects>
+      <effect level="1" kind="populationBoost" boost="1.15" min="100" />
+      <effect level="2" kind="populationBoost" boost="1.30" min="150" />
+      <effect level="3" kind="populationBoost" boost="1.45" min="200" />
+      <effect level="4" kind="populationBoost" boost="1.60" min="250" />
+      <effect level="5" kind="populationBoost" boost="1.75" min="300" />
+    </effects>
+    <limits maxPerColony="1" />
+  </design>
 </designs>

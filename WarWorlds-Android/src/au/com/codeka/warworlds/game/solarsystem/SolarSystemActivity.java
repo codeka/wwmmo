@@ -1,5 +1,7 @@
 package au.com.codeka.warworlds.game.solarsystem;
 
+import java.util.Locale;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -189,8 +191,13 @@ public class SolarSystemActivity extends FragmentActivity implements StarManager
             deltaMineralsTextView.setVisibility(View.VISIBLE);
             storedMineralsIcon.setVisibility(View.VISIBLE);
 
-            storedGoodsTextView.setText(Integer.toString((int) ep.getTotalGoods()));
-            storedMineralsTextView.setText(Integer.toString((int) ep.getTotalMinerals()));
+            String goods = String.format(Locale.ENGLISH, "%d / %d", (int) ep.getTotalGoods(),
+                    (int) ep.getMaxGoods());
+            storedGoodsTextView.setText(goods);
+
+            String minerals = String.format(Locale.ENGLISH, "%d / %d", (int)ep.getTotalMinerals(),
+                    (int) ep.getMaxMinerals());
+            storedMineralsTextView.setText(minerals);
 
             if (ep.getDeltaGoodsPerHour() >= 0) {
                 deltaGoodsTextView.setTextColor(Color.GREEN);
@@ -349,8 +356,8 @@ public class SolarSystemActivity extends FragmentActivity implements StarManager
     private void refreshColonyDetails() {
         final TextView populationCountTextView = (TextView) findViewById(
                 R.id.population_count);
-        populationCountTextView.setText(String.format("Population: %d",
-                                                      (int) mColony.getPopulation()));
+        populationCountTextView.setText(String.format("Population: %d / %d",
+                (int) mColony.getPopulation(), (int) mColony.getMaxPopulation()));
 
         ProgressBar populationFocus = (ProgressBar) findViewById(
                 R.id.solarsystem_colony_population_focus);

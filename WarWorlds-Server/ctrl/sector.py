@@ -5,6 +5,7 @@ from datetime import datetime, timedelta
 
 import math
 import random
+import logging
 
 import ctrl
 from ctrl import designs
@@ -104,6 +105,13 @@ def getStar(star_key, force_nocache=False):
     fleet_pb = star_pb.fleets.add()
     ctrl.fleetModelToPb(fleet_pb, fleet_model)
 
+  # set up the initial max_population on the colonies, based on their planet's
+  # population congeniality
+  for colony_pb in star_pb.colonies:
+    planet_pb = star_pb.planets[colony_pb.planet_index - 1]
+    colony_pb.max_population = int(planet_pb.population_congeniality)
+
+  # apply affects of any buildings
   for building_pb in star_pb.buildings:
     building_empire_key = None
     design = designs.BuildingDesign.getDesign(building_pb.design_name)
@@ -118,6 +126,7 @@ def getStar(star_key, force_nocache=False):
         for empire_presence_pb in star_pb.empires:
           if empire_presence_pb.empire_key == building_empire_key:
             effect.applyToEmpirePresence(building_pb, empire_presence_pb)
+
 
   min_time_emptied = ctrl.dateTimeToEpoch(datetime.now() - timedelta(days=4))
   if not star_pb.colonies and star_pb.time_emptied < min_time_emptied:

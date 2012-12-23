@@ -70,11 +70,24 @@ class BuildingEffectStorage(BuildingEffect):
 
 
 class BuildingEffectDefence(BuildingEffect):
+  """A building effect that boosts a colonies defence capabilities."""
   def __init__(self, kind, effectXml):
     self.defence_bonus = float(effectXml.get("bonus"))
 
   def applyToColony(self, building_pb, colony_pb):
     colony_pb.defence_bonus += self.defence_bonus
+
+
+class BuildingEffectPopulationBoost(BuildingEffect):
+  """A building effect that boosts a colony's maximum population."""
+  def __init__(self, kind, effectXml):
+    self.population_boost = float(effectXml.get("boost"))
+    self.min = int(effectXml.get("min"))
+
+  def applyToColony(self, building_pb, colony_pb):
+    colony_pb.max_population *= self.population_boost
+    if colony_pb.max_population < self.min:
+      colony_pb.max_population = self.min
 
 
 class BuildingDesign(Design):
@@ -242,6 +255,8 @@ def _parseBuildingDesign(designXml):
         effect = BuildingEffectStorage(kind, effectXml)
       elif kind == "defence":
         effect = BuildingEffectDefence(kind, effectXml)
+      elif kind == "populationBoost":
+        effect = BuildingEffectPopulationBoost(kind, effectXml)
       effect.level = level
       design.effects.append(effect)
   design.maxPerColony = 0

@@ -358,7 +358,7 @@ class Simulation(object):
 
         total_workers = colony_pb.population * colony_pb.focus_construction
         workers_per_build_request = total_workers / num_valid_build_requests
-        self.log("Total workers = %d, requests = %d, workers per build request = %d" %
+        self.log("Total workers = %.2f, requests = %d, workers per build request = %.2f" %
             (total_workers, num_valid_build_requests, workers_per_build_request))
 
         # OK, we can spare at least ONE population
@@ -475,18 +475,21 @@ class Simulation(object):
 
       planet_pb = star_pb.planets[colony_pb.planet_index - 1]
 
-      # if we're increasing population, it slows down the closer you get to the population
-      # congeniality. If population is decreasing, it slows down the FURTHER you get.
-      if planet_pb.population_congeniality < 10:
-        congeniality_factor = colony_pb.population / 10.0
+      # if we're increasing population, it slows down the closer you get to the
+      # max population. If population is decreasing, it slows down the FURTHER
+      # you get.
+      max_factor = float(colony_pb.max_population)
+      if max_factor < 10:
+        max_factor = colony_pb.population / 10.0
       else:
-        congeniality_factor = colony_pb.population / planet_pb.population_congeniality
+        max_factor = colony_pb.population / max_factor
       if population_increase >= 0.0:
-        congeniality_factor = 1.0 - congeniality_factor
-      population_increase *= congeniality_factor
+        max_factor = 1.0 - max_factor
+      population_increase *= max_factor * max_factor
 
       population_increase *= dt_in_hours
-      self.log("population_increase: %.2f" % (population_increase))
+      self.log("max_population: %.2f factor=%.2f population_increase: %.2f" % (
+              float(colony_pb.max_population), max_factor, population_increase))
 
       colony_pb.population += population_increase
 
