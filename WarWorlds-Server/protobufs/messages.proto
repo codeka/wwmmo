@@ -28,6 +28,7 @@ message GenericError
     enum ErrorCode
     {
         InsufficientCash = 0;
+        CannotAttackOwnColony = 1;
     }
 }
 

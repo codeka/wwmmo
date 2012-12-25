@@ -7,20 +7,24 @@ import org.slf4j.LoggerFactory;
 
 import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
+import android.text.Html;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import au.com.codeka.Point2D;
 import au.com.codeka.RomanNumeralFormatter;
 import au.com.codeka.warworlds.R;
+import au.com.codeka.warworlds.StyledDialog;
 import au.com.codeka.warworlds.game.CombatReportDialog;
 import au.com.codeka.warworlds.game.ScoutReportDialog;
 import au.com.codeka.warworlds.model.Colony;
@@ -30,6 +34,8 @@ import au.com.codeka.warworlds.model.EmpirePresence;
 import au.com.codeka.warworlds.model.Fleet;
 import au.com.codeka.warworlds.model.MyEmpire;
 import au.com.codeka.warworlds.model.Planet;
+import au.com.codeka.warworlds.model.ShipDesign;
+import au.com.codeka.warworlds.model.ShipDesignManager;
 import au.com.codeka.warworlds.model.Star;
 import au.com.codeka.warworlds.model.StarManager;
 
@@ -44,6 +50,7 @@ public class SolarSystemActivity extends FragmentActivity implements StarManager
     private Star mStar;
     private Planet mPlanet;
     private Colony mColony;
+    private Empire mColonyEmpire;
     private boolean mIsFirstRefresh;
 
     private static final int BUILD_REQUEST = 3000;
@@ -62,6 +69,7 @@ public class SolarSystemActivity extends FragmentActivity implements StarManager
         final Button focusButton = (Button) findViewById(R.id.solarsystem_colony_focus);
         final Button fleetButton = (Button) findViewById(R.id.fleet_btn);
         final Button reportsButton = (Button) findViewById(R.id.reports_btn);
+        final Button attackButton = (Button) findViewById(R.id.enemy_empire_attack);
 
         Bundle extras = getIntent().getExtras();
         String starKey = extras.getString("au.com.codeka.warworlds.StarKey");
@@ -122,6 +130,13 @@ public class SolarSystemActivity extends FragmentActivity implements StarManager
                 ScoutReportDialog dialog = new ScoutReportDialog();
                 dialog.setStar(mStar);
                 dialog.show(getSupportFragmentManager(), "");
+            }
+        });
+
+        attackButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onAttackColony();
             }
         });
     }
@@ -249,6 +264,42 @@ public class SolarSystemActivity extends FragmentActivity implements StarManager
         super.onBackPressed();
     }
 
+    private void onAttackColony() {
+        int defence = (int)(0.25 * mColony.getPopulation() * mColony.getDefenceBoost());
+
+        final MyEmpire myEmpire = EmpireManager.getInstance().getEmpire();
+        int attack = 0;
+        for (Fleet fleet : mStar.getFleets()) {
+            if (fleet.getEmpireKey().equals(myEmpire.getKey())) {
+                ShipDesign design = ShipDesignManager.getInstance().getDesign(fleet.getDesignID());
+                if (design.hasEffect("troopcarrier")) {
+                    attack += fleet.getNumShips();
+                }
+            }
+        }
+
+        StyledDialog.Builder b = new StyledDialog.Builder(this);
+        b.setMessage(Html.fromHtml(String.format(Locale.ENGLISH,
+                "<p>Do you want to attack this %s colony?</p>" +
+                "<p><b>Colony defence:</b> %d<br />" +
+                "   <b>Your attack capability:</b> %d</p>",
+                mColonyEmpire.getDisplayName(), defence, attack)));
+        b.setPositiveButton("Attack!", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(final DialogInterface dialog, int which) {
+                myEmpire.attackColony(mContext, mStar, mColony,
+                    new MyEmpire.AttackColonyCompleteHandler() {
+                        @Override
+                        public void onComplete() {
+                            dialog.dismiss();
+                        }
+                    });
+            }
+        });
+        b.setNegativeButton("Cancel", null);
+        b.create().show();
+    }
+
     private void refreshSelectedPlanet() {
         log.debug("refreshing selected planet...");
 
@@ -328,25 +379,28 @@ public class SolarSystemActivity extends FragmentActivity implements StarManager
 
         Button colonizeButton = (Button) findViewById(R.id.solarsystem_colonize);
         final View colonyDetailsContainer = findViewById(R.id.solarsystem_colony_details);
+        final View enemyColonyDetailsContainer = findViewById(R.id.enemy_colony_details);
         if (mColony == null) {
             colonizeButton.setVisibility(View.VISIBLE);
             colonyDetailsContainer.setVisibility(View.GONE);
+            enemyColonyDetailsContainer.setVisibility(View.GONE);
         } else {
             colonizeButton.setVisibility(View.GONE);
             colonyDetailsContainer.setVisibility(View.GONE);
+            enemyColonyDetailsContainer.setVisibility(View.GONE);
 
             EmpireManager.getInstance().fetchEmpire(mColony.getEmpireKey(),
                 new EmpireManager.EmpireFetchedHandler() {
                     @Override
                     public void onEmpireFetched(Empire empire) {
                         Empire thisEmpire = EmpireManager.getInstance().getEmpire();
+                        mColonyEmpire = empire;
                         if (thisEmpire.getKey().equals(empire.getKey())) {
-                            log.debug("refreshing colony details...");
-
                             colonyDetailsContainer.setVisibility(View.VISIBLE);
                             refreshColonyDetails();
                         } else {
-                            // it's not our colony...
+                            enemyColonyDetailsContainer.setVisibility(View.VISIBLE);
+                            refreshEnemyColonyDetails(empire);
                         }
                     }
                 });
@@ -392,6 +446,22 @@ public class SolarSystemActivity extends FragmentActivity implements StarManager
         TextView constructionValue = (TextView) findViewById(
                 R.id.solarsystem_colony_construction_value);
         constructionValue.setText("todo");
+    }
+
+    private void refreshEnemyColonyDetails(Empire empire) {
+        final TextView populationCountTextView = (TextView) findViewById(
+                R.id.population_count);
+        populationCountTextView.setText(String.format("Population: %d",
+                (int) mColony.getPopulation()));
+
+        ImageView enemyIcon = (ImageView) findViewById(R.id.enemy_empire_icon);
+        TextView enemyName = (TextView) findViewById(R.id.enemy_empire_name);
+        TextView enemyDefence = (TextView) findViewById(R.id.enemy_empire_defence);
+
+        enemyIcon.setImageBitmap(empire.getShield(this));
+        enemyName.setText(empire.getDisplayName());
+        enemyDefence.setText(String.format(Locale.ENGLISH, "Defence: %d",
+                (int)(0.25 * mColony.getPopulation() * mColony.getDefenceBoost())));
     }
 
     private void onColonizeClick() {

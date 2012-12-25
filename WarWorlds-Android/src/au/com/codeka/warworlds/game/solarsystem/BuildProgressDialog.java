@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import android.app.Dialog;
+import android.content.DialogInterface;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
@@ -52,16 +53,16 @@ public class BuildProgressDialog extends DialogFragment {
 
         StyledDialog.Builder b = new StyledDialog.Builder(getActivity());
         b.setView(mView);
-        b.setPositiveButton("Accelerate", new View.OnClickListener() {
+        b.setPositiveButton("Accelerate", new DialogInterface.OnClickListener() {
             @Override
-            public void onClick(View v) {
+            public void onClick(DialogInterface dialog, int which) {
                 onAccelerateClick();
             }
         });
 
-        b.setNeutralButton("Stop", new View.OnClickListener() {
+        b.setNeutralButton("Stop", new DialogInterface.OnClickListener() {
             @Override
-            public void onClick(View v) {
+            public void onClick(DialogInterface dialog, int which) {
                 // TODO Auto-generated method stub
                 
             }
@@ -94,9 +95,9 @@ public class BuildProgressDialog extends DialogFragment {
             StyledDialog dlg = new StyledDialog.Builder(getActivity())
                                .setTitle("Accelerate Build")
                                .setMessage(Html.fromHtml(msg))
-                               .setPositiveButton("Buy Cash", new View.OnClickListener() {
+                               .setPositiveButton("Buy Cash", new DialogInterface.OnClickListener() {
                                    @Override
-                                   public void onClick(View view) {
+                                   public void onClick(DialogInterface dialog, int which) {
                                                      // TODO
                                    }
                                })
@@ -111,9 +112,9 @@ public class BuildProgressDialog extends DialogFragment {
 
             final StyledDialog dlg = new StyledDialog.Builder(getActivity())
                                .setMessage(Html.fromHtml(msg))
-                               .setPositiveButton("Accelerate", true, new View.OnClickListener() {
+                               .setPositiveButton("Accelerate", true, new DialogInterface.OnClickListener() {
                                    @Override
-                                   public void onClick(View view) {
+                                   public void onClick(DialogInterface dialog, int which) {
                                        accelerateBuild();
                                    }
                                })

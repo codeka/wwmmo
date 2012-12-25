@@ -66,6 +66,7 @@ class Simulation(object):
     self.star_pbs = []
     self.combat_report_pbs = []
     self.scout_report_pbs = []
+    self.destroyed_colony_pbs = []
     self.need_update = False
     self.now = datetime.now()
 
@@ -127,6 +128,8 @@ class Simulation(object):
           star_pb.build_requests.extend([build_request_pb])
           return
 
+  def destroyColony(self, colony_pb):
+    self.destroyed_colony_pbs.append(colony_pb)
 
   def simulate(self, star_key):
     """Simulates the star with the given key and gets all of the colonies and fleets up to date.
@@ -773,10 +776,16 @@ class Simulation(object):
 
   def _updateColonies(self, star_pb, keys_to_clear):
     for colony_pb in star_pb.colonies:
+      keys_to_clear.append("colony:%s" % colony_pb.key)
+
       colony_model = mdl.Colony.get(colony_pb.key)
+      for destroyed_colony_pb in self.destroyed_colony_pbs:
+        if destroyed_colony_pb.key == colony_pb.key:
+          colony_model.delete()
+          #TODO: notify owner!
+          return
       ctrl.colonyPbToModel(colony_model, colony_pb)
       colony_model.put()
-      keys_to_clear.append("colony:%s" % colony_pb.key)
 
   def _updateEmpirePresences(self, star_pb):
     """Updates the empire presence models in the given star."""
@@ -846,11 +855,12 @@ class Simulation(object):
         now = ctrl.dateTimeToEpoch(datetime.now())
         countdown = fleet_pb.time_destroyed - now
         combat_report_pb = self.getCombatReport(star_pb.key, fetch=False)
-        if not combat_report_pb:
-          return
+        combat_report_key = None
+        if combat_report_pb:
+          combat_report_key = combat_report_pb.key
 
         deferred.defer(on_fleet_destroyed,
-                       fleet_pb, combat_report_pb.key,
+                       fleet_pb, combat_report_key,
                        _countdown = countdown)
 
   def _scheduleFleetVictory(self, star_pb):
@@ -912,7 +922,8 @@ def on_fleet_destroyed(fleet_pb, combat_report_key):
       sitrep_pb.star_key = star_pb.key
       sitrep_pb.planet_index = -1
       sitrep_pb.fleet_destroyed_record.fleet_design_id = fleet_pb.design_name
-      sitrep_pb.fleet_destroyed_record.combat_report_key = combat_report_key
+      if combat_report_key:
+        sitrep_pb.fleet_destroyed_record.combat_report_key = combat_report_key
       empire_ctl.saveSituationReport(sitrep_pb)
 
 

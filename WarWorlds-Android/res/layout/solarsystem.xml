@@ -56,14 +56,16 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center_horizontal"
-                    android:textAppearance="?android:attr/textAppearanceSmall" />
+                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:text="Planet Name" />
 
                 <TextView
                     android:id="@+id/population_count"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_below="@id/planet_name"
-                    android:textAppearance="?android:attr/textAppearanceSmall" />
+                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:text="Population: 123/1234" />
 
                 <Button
                     android:id="@+id/solarsystem_colonize"
@@ -71,14 +73,52 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_below="@id/population_count"
-                    android:text="@string/solarsystem_colonize" />
+                    android:text="@string/solarsystem_colonize"
+                    android:visibility="gone" />
+
+                <RelativeLayout android:id="@+id/enemy_colony_details"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:layout_below="@id/population_count"
+                                android:visibility="visible">
+                    <ImageView android:id="@+id/enemy_empire_icon"
+                               android:layout_width="40dp"
+                               android:layout_height="40dp"
+                               android:layout_marginTop="6dp"
+                               android:layout_marginLeft="6dp" />
+                    <TextView android:id="@+id/enemy_empire_name"
+                              android:layout_width="wrap_content"
+                              android:layout_height="wrap_content"
+                              android:layout_toRightOf="@id/enemy_empire_icon"
+                              android:layout_marginTop="6dp"
+                              android:layout_marginLeft="6dp"
+                              android:textAppearance="?android:attr/textAppearanceSmall"
+                              android:text="Empire Name" />
+                    <TextView android:id="@+id/enemy_empire_defence"
+                              android:layout_width="wrap_content"
+                              android:layout_height="wrap_content"
+                              android:layout_toRightOf="@id/enemy_empire_icon"
+                              android:layout_below="@id/enemy_empire_name"
+                              android:layout_marginLeft="6dp"
+                              android:textAppearance="?android:attr/textAppearanceSmall"
+                              android:text="Defence: 1234" />
+                    <Button android:id="@+id/enemy_empire_attack"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_below="@id/enemy_empire_icon"
+                            android:layout_marginTop="10dp"
+                            android:layout_marginLeft="10dp"
+                            android:layout_marginRight="10dp"
+                            android:text="Attack" />
+                </RelativeLayout>
 
                 <android.support.v7.widget.GridLayout xmlns:grid="http://schemas.android.com/apk/res-auto"
                     android:id="@+id/solarsystem_colony_details"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_below="@id/population_count"
-                    grid:columnCount="4">
+                    grid:columnCount="4"
+                    android:visibility="gone">
 
                     <ImageView
                         android:id="@+id/solarsystem_colony_population_icon"

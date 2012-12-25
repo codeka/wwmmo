@@ -63,6 +63,13 @@ class ApiPage(webapp.RequestHandler):
       pb.ParseFromString(self.request.body)
     return pb
 
+  def raiseError(self, error_code, error_message):
+    err = pb.GenericError()
+    err.error_code = error_code
+    err.error_message = error_message
+    self.response.set_status(400)
+    return err
+
 
 class HelloPage(ApiPage):
   """The 'hello' page is what you request when you first connect."""
@@ -452,6 +459,22 @@ class ColoniesTaxesPage(ApiPage):
     return colony_pb
 
 
+class ColoniesAttackPage(ApiPage):
+  def post(self, star_key, colony_key):
+    """This is called when you want to attack an enemy colony. We check that
+       you have some troopcarrier ships in the star and if so, work out whether
+       you destroy the colony or not."""
+    colony_pb = empire.getColony(colony_key)
+    empire_pb = empire.getEmpireForUser(self.user)
+    if colony_pb.empire_key == empire_pb.key:
+      return self.raiseError(pb.GenericError.CannotAttackOwnColony, "")
+    sim = simulation.Simulation()
+    empire.attackColony(empire_pb, colony_pb, sim)
+    star_pb = sim.getStar(colony_pb.star_key)
+    sim.update()
+    return star_pb
+
+
 class BuildQueuePage(ApiPage):
   def post(self):
     """The buildqueue is where you post BuildRequest protobufs with requests to build stuff."""
@@ -627,6 +650,7 @@ app = ApiApplication([("/api/v1/hello/([^/]+)", HelloPage),
                       ("/api/v1/stars/([^/]+)/colonies", ColoniesPage),
                       ("/api/v1/stars/([^/]+)/colonies/([^/]+)", ColoniesPage),
                       ("/api/v1/stars/([^/]+)/colonies/([^/]+)/taxes", ColoniesTaxesPage),
+                      ("/api/v1/stars/([^/]+)/colonies/([^/]+)/attack", ColoniesAttackPage),
                       ("/api/v1/stars/([^/]+)/fleets/([^/]+)/orders", FleetOrdersPage),
                       ("/api/v1/stars/([^/]+)/scout-reports", ScoutReportsPage),
                       ("/api/v1/stars/([^/]+)/combat-reports", CombatReportsPage),

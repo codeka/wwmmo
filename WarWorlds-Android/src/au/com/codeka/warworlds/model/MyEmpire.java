@@ -253,6 +253,40 @@ public class MyEmpire extends Empire {
         }.execute();
     }
 
+    public void attackColony(final Context context, final Star star,
+                             final Colony colony,
+                             final AttackColonyCompleteHandler callback) {
+        new AsyncTask<Void, Void, Star>() {
+            @Override
+            protected Star doInBackground(Void... arg0) {
+                try {
+                    String url = "stars/"+star.getKey()+"/colonies/"+colony.getKey()+"/attack";
+
+                    Messages.Star pb = ApiClient.postProtoBuf(url, null, Messages.Star.class);
+                    if (pb == null)
+                        return null;
+
+                    return Star.fromProtocolBuffer(pb);
+                } catch(Exception e) {
+                    // TODO: handle exceptions
+                    log.error(ExceptionUtils.getStackTrace(e));
+                    return null;
+                }
+            }
+
+            @Override
+            protected void onPostExecute(Star star) {
+                if (star != null) {
+                    StarManager.getInstance().refreshStar(context, star.getKey());
+                }
+
+                if (callback != null) {
+                    callback.onComplete();
+                }
+            }
+        }.execute();
+    }
+
     @Override
     public void writeToParcel(Parcel parcel, int flags) {
         super.writeToParcel(parcel, flags);
@@ -358,5 +392,9 @@ public class MyEmpire extends Empire {
 
     public static interface FetchCombatReportCompleteHandler {
         public void onComplete(CombatReport report);
+    }
+
+    public static interface AttackColonyCompleteHandler {
+        public void onComplete();
     }
 }

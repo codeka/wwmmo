@@ -96,13 +96,7 @@ public class CombatReportDialog extends DialogFragment {
 
         StyledDialog.Builder b = new StyledDialog.Builder(getActivity());
         b.setView(mView);
-
-        b.setNeutralButton("Close", new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                dismiss();
-            }
-        });
+        b.setNeutralButton("Close", null);
 
         return b.create();
     }

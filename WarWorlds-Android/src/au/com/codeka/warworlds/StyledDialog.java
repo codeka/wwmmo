@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 
 import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewTreeObserver;
@@ -108,11 +109,9 @@ public class StyledDialog extends Dialog implements ViewTreeObserver.OnGlobalLay
         if (mBuilder.mNegativeLabel != null) {
             Button btn = (Button) wnd.findViewById(R.id.negative_btn);
             btn.setText(mBuilder.mNegativeLabel);
-            if (mBuilder.mNegativeClickListener != null) {
-                btn.setOnClickListener(mBuilder.mNegativeClickListener);
-            } else {
-                btn.setOnClickListener(new DefButtonClickListener());
-            }
+            btn.setOnClickListener(new ButtonClickListener(mBuilder.mNegativeClickListener,
+                                                              Dialog.BUTTON_NEGATIVE,
+                                                              false));
             buttons.add(btn);
         } else {
             wnd.findViewById(R.id.negative_btn).setVisibility(View.GONE);
@@ -120,11 +119,9 @@ public class StyledDialog extends Dialog implements ViewTreeObserver.OnGlobalLay
         if (mBuilder.mNeutralLabel != null) {
             Button btn = (Button) wnd.findViewById(R.id.neutral_btn);
             btn.setText(mBuilder.mNeutralLabel);
-            if (mBuilder.mNeutralClickListener != null) {
-                btn.setOnClickListener(mBuilder.mNeutralClickListener);
-            } else {
-                btn.setOnClickListener(new DefButtonClickListener());
-            }
+            btn.setOnClickListener(new ButtonClickListener(mBuilder.mNeutralClickListener,
+                                                              Dialog.BUTTON_NEUTRAL,
+                                                              false));
             buttons.add(btn);
         } else {
             wnd.findViewById(R.id.neutral_btn).setVisibility(View.GONE);
@@ -132,15 +129,9 @@ public class StyledDialog extends Dialog implements ViewTreeObserver.OnGlobalLay
         if (mBuilder.mPositiveLabel != null) {
             Button btn = (Button) wnd.findViewById(R.id.positive_btn);
             btn.setText(mBuilder.mPositiveLabel);
-            if (mBuilder.mPositiveClickListener != null) {
-                if (mBuilder.mPositiveAutoClose) {
-                    btn.setOnClickListener(new DefButtonClickListener(mBuilder.mPositiveClickListener));
-                } else {
-                    btn.setOnClickListener(mBuilder.mPositiveClickListener);
-                }
-            } else {
-                btn.setOnClickListener(new DefButtonClickListener());
-            }
+            btn.setOnClickListener(new ButtonClickListener(mBuilder.mPositiveClickListener,
+                                                              Dialog.BUTTON_POSITIVE,
+                                                              mBuilder.mPositiveAutoClose));
             buttons.add(btn);
         } else {
             wnd.findViewById(R.id.positive_btn).setVisibility(View.GONE);
@@ -170,33 +161,38 @@ public class StyledDialog extends Dialog implements ViewTreeObserver.OnGlobalLay
         }
     }
 
-    private class DefButtonClickListener implements View.OnClickListener {
-        private View.OnClickListener mOtherListener;
+    private class ButtonClickListener implements View.OnClickListener {
+        private DialogInterface.OnClickListener mOtherListener;
+        private int mWhich;
+        private boolean mAutoClose;
 
-        public DefButtonClickListener() {
-        }
-        public DefButtonClickListener(View.OnClickListener otherListener) {
+        public ButtonClickListener(DialogInterface.OnClickListener otherListener,
+                                      int which, boolean autoClose) {
             mOtherListener = otherListener;
+            mWhich = which;
+            mAutoClose = autoClose;
         }
 
         @Override
         public void onClick(View v) {
             if (mOtherListener != null) {
-                mOtherListener.onClick(v);
+                mOtherListener.onClick(StyledDialog.this, mWhich);
             }
-            dismiss();
+            if (mOtherListener == null || mAutoClose) {
+                dismiss();
+            }
         }
     }
 
     public static class Builder {
         private Context mContext;
         private CharSequence mPositiveLabel;
-        private View.OnClickListener mPositiveClickListener;
+        private DialogInterface.OnClickListener mPositiveClickListener;
         private boolean mPositiveAutoClose;
         private CharSequence mNegativeLabel;
-        private View.OnClickListener mNegativeClickListener;
+        private DialogInterface.OnClickListener mNegativeClickListener;
         private CharSequence mNeutralLabel;
-        private View.OnClickListener mNeutralClickListener;
+        private DialogInterface.OnClickListener mNeutralClickListener;
         private View mView;
         private CharSequence mTitle;
 
@@ -204,21 +200,22 @@ public class StyledDialog extends Dialog implements ViewTreeObserver.OnGlobalLay
             mContext = context;
         }
 
-        public Builder setPositiveButton(CharSequence label, View.OnClickListener listener) {
+        public Builder setPositiveButton(CharSequence label, DialogInterface.OnClickListener listener) {
             return setPositiveButton(label, false, listener);
         }
-        public Builder setPositiveButton(CharSequence label, boolean autoClose, final View.OnClickListener listener) {
+        public Builder setPositiveButton(CharSequence label, boolean autoClose,
+                                         final DialogInterface.OnClickListener listener) {
             mPositiveLabel = label;
             mPositiveClickListener = listener;
             mPositiveAutoClose = autoClose;
             return this;
         }
-        public Builder setNegativeButton(CharSequence label, View.OnClickListener listener) {
+        public Builder setNegativeButton(CharSequence label, DialogInterface.OnClickListener listener) {
             mNegativeLabel = label;
             mNegativeClickListener = listener;
             return this;
         }
-        public Builder setNeutralButton(CharSequence label, View.OnClickListener listener) {
+        public Builder setNeutralButton(CharSequence label, DialogInterface.OnClickListener listener) {
             mNeutralLabel = label;
             mNeutralClickListener = listener;
             return this;

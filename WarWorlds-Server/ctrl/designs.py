@@ -22,6 +22,13 @@ class Design(object):
     return (effect for effect in self.effects if (effect.kind == kind and
                                                   (effect.level == level or effect.level is None)))
 
+  def hasEffect(self, kind, level=None):
+    for effect in self.effects:
+      if effect.kind == kind:
+        if level is None or effect.level is None or effect.level == level:
+          return True
+    return False
+
   @staticmethod
   def getDesign(kind, name):
     if kind == pb.BuildRequest.BUILDING:
@@ -193,6 +200,13 @@ class ShipEffectFighter(ShipEffect):
         break
 
 
+class ShipEffectTroopCarrier(ShipEffect):
+  """The troop carrier effect means this ship carriers troops that can be used
+     to attack colonies."""
+  def __init__(self, kind, effectXml):
+    super(ShipEffectTroopCarrier, self).__init__(kind)
+
+
 class ShipDesign(Design):
   _parsedDesigns = None
 
@@ -288,6 +302,8 @@ def _parseShipDesign(designXml):
         effect = ShipEffectScout(kind, effectXml)
       elif kind == "fighter":
         effect = ShipEffectFighter(kind, effectXml)
+      elif kind == "troopcarrier":
+        effect = ShipEffectTroopCarrier(kind, effectXml)
       design.effects.append(effect)
   return design
 

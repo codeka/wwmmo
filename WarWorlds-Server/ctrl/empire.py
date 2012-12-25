@@ -421,6 +421,72 @@ def colonize(empire_pb, star_key, colonize_request):
   return colony_pb
 
 
+def attackColony(empire_pb, colony_pb, sim):
+  """Attacking colonies is actually quite simple, at least compared with
+     attacking fleets. The number of ships you have with the "troop carrier"
+     effect represents your attack score. The defence score of the colony is
+     0.25 * it's population * it's defence boost.
+
+     The number of ships remaining after an attack is:
+     num_ships - (population * 0.25 * defence_bonus)
+     The number of population remaining after an attack is:
+     population - (num_ships * 4 / defence_bonus)
+
+     This is guaranteed to reduce at least one of the numbers to below zero
+     in which case, which ever has > 0 is the winner. It could also result in
+     both == 0, which is considered a win for the attacking fleet.
+
+     If the population goes below zero, the colony is destroyed. If the number
+     of ships goes below zero, the colony remains, but with reduce population
+     (hopefully you can rebuild before more ships come!).
+  """
+  sim.simulate(colony_pb.star_key)
+  star_pb = sim.getStar(colony_pb.star_key)
+
+  num_troop_carriers = 0
+  troop_carrier_fleet_pbs = []
+  for fleet_pb in star_pb.fleets:
+    if fleet_pb.empire_key != empire_pb.key:
+      continue
+    if fleet_pb.state != pb.Fleet.IDLE:
+      continue
+    design = designs.ShipDesign.getDesign(fleet_pb.design_name)
+    if design.hasEffect("troopcarrier"):
+      num_troop_carriers += fleet_pb.num_ships
+      troop_carrier_fleet_pbs.append(fleet_pb)
+
+  remaining_ships = num_troop_carriers - (colony_pb.population * 0.25 * colony_pb.defence_bonus)
+  remaining_population = colony_pb.population - (num_troop_carriers * 4 / colony_pb.defence_bonus)
+
+  if remaining_population <= 0:
+    logging.debug("colony destroyed: remaining_population=%.2f remaining_ships=%.2f" % (
+                  remaining_population, remaining_ships))
+    # the ships won: the colony is destroyed! First, update the fleets so that
+    # they have the correct remaining ships, some fleets may be destroyed
+    num_lost = num_troop_carriers - remaining_ships
+    for fleet_pb in troop_carrier_fleet_pbs:
+      if fleet_pb.num_ships < num_lost:
+        num_lost - fleet_pb.num_ships
+        fleet_pb.time_destroyed = ctrl.dateTimeToEpoch(sim.now)
+        fleet_pb.num_ships = 0
+      else:
+        fleet_pb.num_ships -= num_lost
+    # now mark the colony destroyed
+    sim.destroyColony(colony_pb)
+  else:
+    logging.debug("fleets destroyed: remaining_population=%.2f remaining_ships=%.2f" % (
+                  remaining_population, remaining_ships))
+    # all of the ships were destroyed... first, reduce the colony's population
+    # by the corresponding amount
+    for star_colony_pb in star_pb.colonies:
+      if star_colony_pb.key == colony_pb.key:
+        star_colony_pb.population = remaining_population
+    # and then destroyed all the fleets
+    for fleet_pb in troop_carrier_fleet_pbs:
+      fleet_pb.time_destroyed = ctrl.dateTimeToEpoch(sim.now)
+      fleet_pb.num_ships = 0
+
+
 def build(empire_pb, colony_pb, request_pb, sim):
   """Initiates a build operation at the given colony.
 

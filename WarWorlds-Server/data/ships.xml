@@ -68,7 +68,7 @@
     <fuel costPerParsec="0.2" />
     <stats speed="10" baseAttack="1" baseDefence="1" />
     <effects>
-      <!--effect kind="troopcarrier" /-->
+      <effect kind="troopcarrier" />
     </effects>
   </design>
 </designs>

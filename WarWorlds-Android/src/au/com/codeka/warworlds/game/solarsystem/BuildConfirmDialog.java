@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 
 import android.app.Activity;
 import android.app.Dialog;
+import android.content.DialogInterface;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
@@ -125,9 +126,9 @@ public class BuildConfirmDialog extends DialogFragment {
         StyledDialog.Builder b = new StyledDialog.Builder(getActivity());
         b.setView(mView);
 
-        b.setPositiveButton("Build", new View.OnClickListener() {
+        b.setPositiveButton("Build", new DialogInterface.OnClickListener() {
             @Override
-            public void onClick(View view) {
+            public void onClick(DialogInterface dialog, int which) {
                 onBuildClick();
             }
         });

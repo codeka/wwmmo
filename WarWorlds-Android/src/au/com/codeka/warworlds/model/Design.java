@@ -18,6 +18,7 @@ public class Design {
     protected String mSpriteName;
     protected DesignKind mDesignKind;
     protected ArrayList<Dependency> mDependencies;
+    protected ArrayList<Effect> mEffects;
 
     public String getID() {
         return mID;
@@ -45,6 +46,25 @@ public class Design {
     }
     public ArrayList<Dependency> getDependencies() {
         return mDependencies;
+    }
+    public ArrayList<Effect> getEffects() {
+        return mEffects;
+    }
+    public boolean hasEffect(String kind) {
+        for (Effect e : mEffects) {
+            if (e.getKind().equals(kind)) {
+                return true;
+            }
+        }
+        return false;
+    }
+    public boolean hasEffect(String kind, int level) {
+        for (Effect e : mEffects) {
+            if (e.getKind().equals(kind) && (e.getLevel() == 0 || e.getLevel() == level)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -84,6 +104,7 @@ public class Design {
         protected void populateDesign(Design design) {
             design.mID = mDesignElement.getAttribute("id");
             design.mDependencies = new ArrayList<Dependency>();
+            design.mEffects = new ArrayList<Effect>();
 
             for(Element elem : XmlIterator.childElements(mDesignElement)) {
                 if (elem.getNodeName().equals("name")) {
@@ -109,9 +130,29 @@ public class Design {
                                 requiresElem.getAttribute("building"),
                                 Integer.parseInt(requiresElem.getAttribute("level"))));
                     }
+                } else if (elem.getNodeName().equals("effects")) {
+                    for (Element effectElem : XmlIterator.childElements(elem, "effect")) {
+                        Effect effect = createEffect();
+                        populateEffect(effectElem, effect);
+                        design.mEffects.add(effect);
+                    }
                 } else {
                     parseElement(elem, design);
                 }
+            }
+        }
+
+        protected Effect createEffect() {
+            return new Effect();
+        }
+        protected void populateEffect(Element effectElem, Effect effect) {
+            effect.mKind = effectElem.getAttribute("kind");
+
+            String s = effectElem.getAttribute("level");
+            if (s != null && s.length() > 0) {
+                effect.mLevel = Integer.parseInt(s);
+            } else {
+                effect.mLevel = 0;
             }
         }
 
@@ -137,6 +178,18 @@ public class Design {
         }
         public int getLevel() {
             return mLevel;
+        }
+    }
+
+    public static class Effect {
+        private String mKind;
+        private int mLevel;
+
+        public int getLevel() {
+            return mLevel;
+        }
+        public String getKind() {
+            return mKind;
         }
     }
 }

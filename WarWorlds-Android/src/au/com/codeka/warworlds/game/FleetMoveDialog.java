@@ -137,12 +137,11 @@ public class FleetMoveDialog extends DialogFragment {
         StyledDialog.Builder b = new StyledDialog.Builder(getActivity());
         b.setView(mView);
 
-        b.setPositiveButton("Move", new View.OnClickListener() {
+        b.setPositiveButton("Move", new DialogInterface.OnClickListener() {
             @Override
-            public void onClick(View view) {
+            public void onClick(DialogInterface dialog, int which) {
                 onMoveClick();
             }
-            
         });
         b.setNegativeButton("Cancel", null);
 

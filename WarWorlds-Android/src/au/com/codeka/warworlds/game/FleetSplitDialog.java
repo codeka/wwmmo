@@ -2,6 +2,7 @@ package au.com.codeka.warworlds.game;
 
 import android.app.Activity;
 import android.app.Dialog;
+import android.content.DialogInterface;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
@@ -94,9 +95,9 @@ public class FleetSplitDialog extends DialogFragment {
         b.setView(mView);
         b.setTitle("Split Fleet");
 
-        b.setPositiveButton("Split", new View.OnClickListener() {
+        b.setPositiveButton("Split", new DialogInterface.OnClickListener() {
             @Override
-            public void onClick(View view) {
+            public void onClick(DialogInterface dialog, int which) {
                 onSplitClick();
             }
             

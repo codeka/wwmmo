@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 
 import android.app.Activity;
 import android.app.Dialog;
+import android.content.DialogInterface;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
@@ -78,9 +79,9 @@ public class FocusDialog extends DialogFragment {
         StyledDialog.Builder b = new StyledDialog.Builder(getActivity());
         b.setView(view);
 
-        b.setPositiveButton("Set", new View.OnClickListener() {
+        b.setPositiveButton("Set", new DialogInterface.OnClickListener() {
             @Override
-            public void onClick(View v) {
+            public void onClick(DialogInterface dialog, int which) {
                 onSetClick();
             }
         });
