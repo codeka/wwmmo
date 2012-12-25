@@ -8,7 +8,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -43,7 +42,7 @@ import com.google.android.gcm.GCMRegistrar;
 /**
  * Main activity. Displays the message of the day and lets you select "Start Game", "Options", etc.
  */
-public class WarWorldsActivity extends Activity {
+public class WarWorldsActivity extends BaseActivity {
     private static Logger log = LoggerFactory.getLogger(WarWorldsActivity.class);
     private Context mContext = this;
     private Button mStartGameButton;
@@ -171,7 +170,7 @@ public class WarWorldsActivity extends Activity {
                         log.info("TODO: re-register for C2DM...");
                     }
 
-                    ChatManager.getInstance().setup(hello.getChannelToken());
+                    ChatManager.getInstance().setup();
 
                     mColonies = new ArrayList<Colony>();
                     for (Messages.Colony c : hello.getColoniesList()) {
@@ -217,6 +216,9 @@ public class WarWorldsActivity extends Activity {
                     BuildingDesignManager.getInstance().setup(mContext);
                     ShipDesignManager.getInstance().setup(mContext);
                     BuildQueueManager.getInstance().setup();
+
+                    // make sure we're correctly registered as online.
+                    BackgroundDetector.getInstance().onBackgroundStatusChange(WarWorldsActivity.this);
 
                     motdView.loadHtml("html/motd-template.html", result);
                 } else /* mErrorOccured */ {

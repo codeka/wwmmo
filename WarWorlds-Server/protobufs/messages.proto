@@ -95,11 +95,6 @@ message Hello
     // starfield view centred on one of your own colonies...
     repeated Colony colonies = 3;
 
-    // The ClientID and token you'll use to connect via the Channel API for chats (and
-    // possibly other things..?)
-    optional string channel_client_id = 4;
-    optional string channel_token = 5;
-
     // If true, it means we need to re-register with C2DM (maybe because last time it failed)
     optional bool require_c2dm_register = 6;
 }
@@ -149,6 +144,17 @@ message DeviceRegistrations
     repeated DeviceRegistration registrations = 1;
 }
 
+
+//
+// The "online" status of a device. We'll use this to update whether or not
+// to send chat messages via GCM (or wait until you poll) etc.
+//
+message DeviceOnlineStatus
+{
+    optional bool is_online = 1;
+}
+
+
 //
 // Represents a message that we'll be sending to a device.
 //
@@ -164,6 +170,7 @@ message DeviceMessage
 message ChatMessage
 {
     required string message = 1;
+    optional string empire_key = 2;
 }
 
 

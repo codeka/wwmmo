@@ -38,6 +38,8 @@ import android.util.Base64;
 import au.com.codeka.warworlds.model.BuildRequest.BuildKind;
 import au.com.codeka.warworlds.model.BuildingDesign;
 import au.com.codeka.warworlds.model.BuildingDesignManager;
+import au.com.codeka.warworlds.model.ChatManager;
+import au.com.codeka.warworlds.model.ChatMessage;
 import au.com.codeka.warworlds.model.ShipDesign;
 import au.com.codeka.warworlds.model.ShipDesignManager;
 import au.com.codeka.warworlds.model.SituationReport;
@@ -82,7 +84,19 @@ public class MessageDisplay {
 
                 displayNotification(context, sitrep);
                 playNotificationSound(context);
+            } else if (extras.containsKey("chat")) {
+                byte[] blob = Base64.decode(extras.getString("chat"), Base64.DEFAULT);
 
+                ChatMessage msg;
+                try {
+                    Messages.ChatMessage pb = Messages.ChatMessage.parseFrom(blob);
+                    msg = ChatMessage.fromProtocolBuffer(pb);
+                } catch(InvalidProtocolBufferException e) {
+                    log.error("Could not parse chat message!", e);
+                    return;
+                }
+
+                ChatManager.getInstance().addMessage(msg);
             }
         }
     }

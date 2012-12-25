@@ -1,11 +1,11 @@
 package au.com.codeka.warworlds.game;
 
-import android.app.Activity;
 import android.os.Bundle;
 import android.view.Window;
+import au.com.codeka.warworlds.BaseActivity;
 import au.com.codeka.warworlds.R;
 
-public class ChatActivity extends Activity {
+public class ChatActivity extends BaseActivity {
 
     /** Called when the activity is first created. */
     @Override

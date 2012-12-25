@@ -1,9 +1,10 @@
 """api_v1.py: The handlers for the actual API that the client calls."""
 
+from datetime import datetime
 import os
 import logging
 
-from google.appengine.api import channel
+from google.appengine.ext import db
 from google.appengine.api import users
 
 import webapp2 as webapp
@@ -16,6 +17,7 @@ from model import gcm as gcm_mdl
 from ctrl import sector
 from ctrl import empire
 from ctrl import simulation
+from ctrl import chat
 import ctrl
 
 from protobufs import protobuf_json, messages_pb2 as pb
@@ -120,38 +122,21 @@ class HelloPage(ApiPage):
     if colonies_pb is not None:
       hello_pb.colonies.MergeFrom(colonies_pb.colonies)
 
-    # generate a chat client for them
-    channelClientID = "device:" + device_mdl.deviceID
-    chatClient = None
-    for cc in model.ChatClient.all().filter("clientID", channelClientID):
-      chatClient = cc
-    if chatClient is None:
-      chatClient = model.ChatClient()
-      chatClient.user = user
-      chatClient.device = device_mdl
-      chatClient.clientID = channelClientID
-      chatClient.put()
-    hello_pb.channel_token = channel.create_channel(channelClientID)
-    hello_pb.channel_client_id = channelClientID
-
     return hello_pb
 
 
 class ChatPage(ApiPage):
   def post(self):
     msg_pb = self._getRequestBody(pb.ChatMessage)
-    msg_model = model.ChatMessage()
-    msg_model.user = self.user
-    msg_model.message = msg_pb.message
-    msg_model.put()
+    chat.postMessage(self.user, msg_pb)
 
     # send the chat out to all connected clients (TODO: only some?)
-    for cc in model.ChatClient.all():
-      try:
-        channel.send_message(cc.clientID, msg_pb.message)
-      except:
-        # TODO: handle errors?
-        pass
+    #for cc in model.ChatClient.all():
+    #  try:
+    #    channel.send_message(cc.clientID, msg_pb.message)
+    #  except:
+    #    # TODO: handle errors?
+    #    pass
 
 
 class EmpiresPage(ApiPage):
@@ -270,6 +255,20 @@ class DevicesPage(ApiPage):
       ctrl.clearCached(["devices:for-user:%s" % (self.user.email())])
     else:
       logging.warn("No device with key [%s] to delete." % (key))
+
+  def put(self, key):
+    device_online_status_pb = self._getRequestBody(pb.DeviceOnlineStatus)
+
+    query = model.OnlineDevice.all().filter("device", db.Key(key))
+    for device in query:
+      device.delete()
+
+    if device_online_status_pb.is_online:
+      online_device_mdl = model.OnlineDevice()
+      online_device_mdl.device = db.Key(key)
+      online_device_mdl.user = self.user
+      online_device_mdl.onlineSince = datetime.now()
+      online_device_mdl.put()
 
 
 class DeviceMessagesPage(ApiPage):

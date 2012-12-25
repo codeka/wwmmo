@@ -10,7 +10,6 @@ import java.util.TreeSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
@@ -26,6 +25,7 @@ import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import au.com.codeka.TimeInHours;
+import au.com.codeka.warworlds.BaseActivity;
 import au.com.codeka.warworlds.MessageDisplay;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.api.ApiClient;
@@ -44,7 +44,7 @@ import au.com.codeka.warworlds.model.StarManager;
 import au.com.codeka.warworlds.model.StarSummary;
 import au.com.codeka.warworlds.model.protobuf.Messages;
 
-public class SitrepActivity extends Activity {
+public class SitrepActivity extends BaseActivity {
     private static Logger log = LoggerFactory.getLogger(SitrepActivity.class);
     private Context mContext = this;
     private SituationReportAdapter mSituationReportAdapter;

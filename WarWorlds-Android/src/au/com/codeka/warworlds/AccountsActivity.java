@@ -23,11 +23,8 @@ import java.util.concurrent.Callable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.android.gcm.GCMRegistrar;
-
 import android.accounts.Account;
 import android.accounts.AccountManager;
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -38,18 +35,20 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.view.View;
-import android.view.Window;
 import android.view.View.OnClickListener;
+import android.view.Window;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 import au.com.codeka.warworlds.api.ApiClient;
 
+import com.google.android.gcm.GCMRegistrar;
+
 /**
  * Account selections activity - handles device registration and unregistration.
  */
-public class AccountsActivity extends Activity {
+public class AccountsActivity extends BaseActivity {
     final Logger log = LoggerFactory.getLogger(AccountsActivity.class);
 
     /**
@@ -93,7 +92,7 @@ public class AccountsActivity extends Activity {
      * Resumes the activity.
      */
     @Override
-    protected void onResume() {
+    public void onResume() {
         super.onResume();
         if (mPendingAuth) {
             mPendingAuth = false;

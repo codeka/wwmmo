@@ -58,18 +58,12 @@ class DeviceRegistration(db.Model):
     return results
 
 
-class ChatClient(db.Model):
-  """A chat client is a user that's connected to the server *right now* and will receive chats.
-
-  I'm not sure if this is the best model for this, after all, there might be more reasons why
-  you'd wanty to store a list of "currently connected" clients than just chatting, but for now
-  that's all I've got so that's what we'll go with.
-  """
-
+class OnlineDevice(db.Model):
+  """An online device is a device that is currently online and active in the
+     game. We use this to determine who to send chats to and so on."""
   device = db.ReferenceProperty(DeviceRegistration)
   user = db.UserProperty()
-  clientID = db.StringProperty()
-  # TODO: more??
+  onlineSince = db.DateTimeProperty()
 
 
 class ChatMessage(db.Model):

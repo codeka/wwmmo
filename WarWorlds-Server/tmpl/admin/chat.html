@@ -1,85 +1,69 @@
 {% extends "admin/skeleton.html" %}
 
 {% block head %}
-	<script src="/js/tmpl.js"></script>
-	<script type="text/javascript" src="/_ah/channel/jsapi"></script>
-	<style>
-		section#messages {
-			position: absolute;
-			left: 0px;
-			right: 10px;
-			bottom: 50px;
-			top: 70px;
-			overflow-y: auto;
-			border: solid 1px #999;
-		}
-		form {
-			position: absolute;
-			bottom: 0; left: 0; right: 0;
-			height: 50px;
-		}
-		form input[type=text] {
-			position: absolute;
-			left: 0; top: 4px; right: 120px;
-		}
-		form input[type=submit] {
-			position: absolute;
-			top: 0; right: 30px;
-		}
-	</style>
+  <script src="/js/tmpl.js"></script>
+  <style>
+    section#messages {
+      position: absolute;
+      left: 0px;
+      right: 10px;
+      bottom: 50px;
+      top: 70px;
+      overflow-y: auto;
+      border: solid 1px #999;
+    }
+    form {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 50px;
+    }
+    form input[type=text] {
+      position: absolute;
+      left: 0; top: 4px; right: 120px;
+    }
+    form input[type=submit] {
+      position: absolute;
+      top: 0; right: 30px;
+    }
+  </style>
 {% endblock %}
 
 {% block content %}
-	<h1>Chat</h1>
-	<section id="messages"></section>
-	<form id="sendmsg">
-		<input type="text">
-		<input type="submit" value="Send">
-	</form>
-	<script>
-		$("form input[type=text]").focus();
-		$("form#sendmsg").on("click", "input[type=submit]", function(evnt) {
-			evnt.preventDefault();
+  <h1>Chat</h1>
+  <section id="messages"></section>
+  <form id="sendmsg">
+    <input type="text">
+    <input type="submit" value="Send">
+  </form>
+  <script>
+    $("form input[type=text]").focus();
+    $("form#sendmsg").on("click", "input[type=submit]", function(evnt) {
+      evnt.preventDefault();
 
-			$val = $("form input[type=text]")
-			sendMessage($val.val());
-			$val.val("").focus();
-		});
+      $val = $("form input[type=text]")
+      sendMessage($val.val());
+      $val.val("").focus();
+    });
 
-		function appendMessage(msg) {
-			// todo: template?
-			$("section#messages").append("<div>"+msg+"</div>");
-		}
+    function appendMessage(msg) {
+      // todo: template?
+      $("section#messages").append("<div>"+msg+"</div>");
+    }
 
-		function sendMessage(msg) {
-			var url = "/api/v1/chat";
-			$.ajax({
-				url: url, type: "POST", contentType: "application/json",
-				data: JSON.stringify({
-					"message": msg
-				}),
-				success: function(data) {
-					// ??
-				},
-				error: function(xhr, status, err) {
-					appendMessage("[ERROR] An error occured sending the last message");
-				}
-			});
-		}
-
-		channel = new goog.appengine.Channel("{{ token }}");
-		socket = channel.open();
-		socket.onopen = function() {
-			
-		};
-		socket.onmessage = function(msg) {
-			appendMessage(msg.data);
-		};
-		socket.onerror = function(err) {
-			appendMessage("[ERROR] An error occurred: "+err.description);
-		};
-		socket.onclose = function() {
-			// TODO: deregister
-		};
-	</script>
+    function sendMessage(msg) {
+      var url = "/api/v1/chat";
+      $.ajax({
+        url: url, type: "POST", contentType: "application/json",
+        data: JSON.stringify({
+          "message": msg
+        }),
+        success: function(data) {
+          // ??
+        },
+        error: function(xhr, status, err) {
+          appendMessage("[ERROR] An error occured sending the last message");
+        }
+      });
+    }
+  </script>
 {% endblock %}

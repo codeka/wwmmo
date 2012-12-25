@@ -11,7 +11,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.text.Html;
 import android.view.View;
@@ -23,6 +22,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import au.com.codeka.Point2D;
 import au.com.codeka.RomanNumeralFormatter;
+import au.com.codeka.warworlds.BaseActivity;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.StyledDialog;
 import au.com.codeka.warworlds.game.CombatReportDialog;
@@ -42,7 +42,7 @@ import au.com.codeka.warworlds.model.StarManager;
 /**
  * This activity is displayed when you're actually looking at a solar system (star + planets)
  */
-public class SolarSystemActivity extends FragmentActivity implements StarManager.StarFetchedHandler {
+public class SolarSystemActivity extends BaseActivity implements StarManager.StarFetchedHandler {
     private static Logger log = LoggerFactory.getLogger(SolarSystemActivity.class);
     private SolarSystemSurfaceView mSolarSystemSurfaceView;
     private Context mContext = this;

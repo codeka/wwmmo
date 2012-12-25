@@ -3,7 +3,6 @@ package au.com.codeka.warworlds;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTransaction;
 import android.view.View;
 import android.view.Window;
@@ -13,7 +12,7 @@ import android.widget.TabHost;
  * This is our base \c FragmentActivity class for a tabbed activity. We'll define the code
  * generating our tab buttons and so on.
  */
-public class TabFragmentActivity extends FragmentActivity {
+public class TabFragmentActivity extends BaseActivity {
     private Context mContext = this;
     TabManager mTabManager;
     TabHost mTabHost;

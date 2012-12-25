@@ -3,7 +3,6 @@ package au.com.codeka.warworlds;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -22,9 +21,9 @@ import au.com.codeka.warworlds.model.protobuf.Messages;
 
 /**
  * This activity lets you set up your Empire before you actually join the game. You need
- * to give your Empire a name, race and whatnot.
+ * to give your Empire a name, race and what-not.
  */
-public class EmpireSetupActivity extends Activity {
+public class EmpireSetupActivity extends BaseActivity {
     private static Logger log = LoggerFactory.getLogger(EmpireSetupActivity.class);
     private Context mContext = this;
 

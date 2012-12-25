@@ -1,19 +1,16 @@
 package au.com.codeka.warworlds.model;
 
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 
+import au.com.codeka.warworlds.BackgroundDetector;
 import au.com.codeka.warworlds.Util;
-import au.com.codeka.warworlds.api.ApiClient;
-import au.com.codeka.warworlds.api.ChannelClient;
-import au.com.codeka.warworlds.api.ChannelClient.ChannelListener;
 
 /**
- * This class keeps track of chats and whatnot.
+ * This class keeps track of chats and what-not.
  */
-public class ChatManager {
+public class ChatManager implements BackgroundDetector.BackgroundChangeHandler {
     private static ChatManager sInstance = new ChatManager();
 
     public static ChatManager getInstance() {
@@ -24,7 +21,6 @@ public class ChatManager {
 
     private LinkedList<ChatMessage> mMessages;
     private ArrayList<MessageAddedListener> mMessageAddedListeners;
-    private ChannelClient mChannelClient;
 
     private ChatManager() {
         mMessages = new LinkedList<ChatMessage>();
@@ -35,36 +31,12 @@ public class ChatManager {
      * Called when the game starts up, we need to register with the channel and get
      * ready to start receiving chat messages.
      */
-    public void setup(String token) {
+    public void setup() {
+        BackgroundDetector.getInstance().addBackgroundChangeHandler(this);
+
         String chatEnabledProperty = Util.getProperties().getProperty("chat.enabled");
         if (chatEnabledProperty == null || !chatEnabledProperty.equals("false")) {
-            URI appEngineURI = ApiClient.getBaseUri().resolve("/");
-            mChannelClient = ChannelClient.createChannel(appEngineURI, token, new ChannelListener() {
-                @Override
-                public void onOpen() {
-                }
-
-                @Override
-                public void onMessage(String message) {
-                    addMessage(new ChatMessage(message));
-                }
-
-                @Override
-                public void onError(int code, String description) {
-                }
-
-                @Override
-                public void onClose() {
-                }
-            });
             addMessage(new ChatMessage("Welcome to War Worlds!"));
-
-            // this only works because we're already on a background thread...
-            try {
-                mChannelClient.open();
-            } catch (ChannelClient.ChannelException e) {
-                //TODO: handle error
-            }
         } else {
             addMessage(new ChatMessage("Chat has been disabled."));
         }
@@ -135,5 +107,11 @@ public class ChatManager {
 
     public interface MessageAddedListener {
         void onMessageAdded(ChatMessage msg);
+    }
+
+    @Override
+    public void onBackgroundChange(boolean isInBackground) {
+        // TODO Auto-generated method stub
+        
     }
 }

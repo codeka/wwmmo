@@ -4,7 +4,6 @@ import os
 import logging
 import json
 
-from google.appengine.api import channel
 from google.appengine.api import users
 from google.appengine.ext.db.metadata import Kind
 
@@ -93,21 +92,7 @@ class ChatPage(AdminPage):
   """The chat page lets us chat with all players, make real-time announcements and whatnot."""
 
   def get(self):
-    # if there's already a ChatClient for us, just reuse it
-    chatClient = None
-
-    clientID = "server:%s" % (self.user.user_id())
-    for client in model.ChatClient.all().filter("clientID", clientID):
-      chatClient = client
-
-    if chatClient == None:
-      chatClient = model.ChatClient()
-      chatClient.user = self.user
-      chatClient.clientID = clientID
-      chatClient.put()
-
-    token = channel.create_channel(clientID)
-    self.render("admin/chat.html", {"token": token})
+    self.render("admin/chat.html", {})
 
 
 class DebugEmpiresPage(AdminPage):

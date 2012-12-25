@@ -9,7 +9,6 @@ import org.apache.commons.lang3.StringUtils;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.app.FragmentActivity;
 import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,6 +21,7 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import au.com.codeka.TimeInHours;
+import au.com.codeka.warworlds.BaseActivity;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.TabManager;
 import au.com.codeka.warworlds.TabManager.TabInfo;
@@ -49,7 +49,7 @@ import au.com.codeka.warworlds.model.StarSummary;
  * The \c StarfieldActivity is the "home" screen of the game, and displays the
  * starfield where you scroll around and interact with stars, etc.
  */
-public class StarfieldActivity extends FragmentActivity {
+public class StarfieldActivity extends BaseActivity {
     private Context mContext = this;
     private StarfieldSurfaceView mStarfield;
     private ListView mPlanetList;
