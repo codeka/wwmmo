@@ -2,14 +2,14 @@ package au.com.codeka.warworlds.game.solarsystem;
 
 import java.util.TreeMap;
 
+import android.app.Dialog;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentManager;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
-import android.view.Window;
 import au.com.codeka.warworlds.R;
+import au.com.codeka.warworlds.StyledDialog;
 import au.com.codeka.warworlds.ctrl.FleetList;
 import au.com.codeka.warworlds.game.FleetMoveDialog;
 import au.com.codeka.warworlds.game.FleetSplitDialog;
@@ -31,10 +31,9 @@ public class FleetDialog extends DialogFragment
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        getDialog().requestWindowFeature(Window.FEATURE_NO_TITLE);
-        mView = inflater.inflate(R.layout.fleet_dlg, container);
+    public Dialog onCreateDialog(Bundle savedInstanceState) {
+        LayoutInflater inflater = getActivity().getLayoutInflater();
+        mView = inflater.inflate(R.layout.fleet_dlg, null);
 
         StarManager.getInstance().addStarUpdatedListener(mStar.getKey(), this);
 
@@ -73,7 +72,14 @@ public class FleetDialog extends DialogFragment
             }
         });
 
-        return mView;
+        // no "View" button or infobar, because it doesn't make sense here...
+        mView.findViewById(R.id.view_btn).setVisibility(View.GONE);
+        mView.findViewById(R.id.infobar).setVisibility(View.GONE);
+
+        StyledDialog.Builder b = new StyledDialog.Builder(getActivity());
+        b.setView(mView);
+        b.setNeutralButton("Close", null);
+        return b.create();
     }
 
     @Override
