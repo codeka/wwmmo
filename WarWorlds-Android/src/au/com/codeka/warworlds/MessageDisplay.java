@@ -40,9 +40,11 @@ import au.com.codeka.warworlds.model.BuildingDesign;
 import au.com.codeka.warworlds.model.BuildingDesignManager;
 import au.com.codeka.warworlds.model.ChatManager;
 import au.com.codeka.warworlds.model.ChatMessage;
+import au.com.codeka.warworlds.model.SectorManager;
 import au.com.codeka.warworlds.model.ShipDesign;
 import au.com.codeka.warworlds.model.ShipDesignManager;
 import au.com.codeka.warworlds.model.SituationReport;
+import au.com.codeka.warworlds.model.Star;
 import au.com.codeka.warworlds.model.StarManager;
 import au.com.codeka.warworlds.model.StarSummary;
 import au.com.codeka.warworlds.model.protobuf.Messages;
@@ -80,6 +82,21 @@ public class MessageDisplay {
                 } catch (InvalidProtocolBufferException e) {
                     log.error("Could not parse situation report!", e);
                     return;
+                }
+
+                // refresh the star this situation report is for, obviously
+                // something happened that we'll want to know about
+                if (!StarManager.getInstance().refreshStar(
+                            context,
+                            sitrep.getStarKey(),
+                            true)) { // <-- only refresh the star if we have one cached
+                    // if we didn't refresh the star, then at least refresh
+                    // the sector it was in (could have been a moving
+                    // fleet, say)
+                    Star star = SectorManager.getInstance().findStar(sitrep.getStarKey());
+                    if (star != null) {
+                        SectorManager.getInstance().refreshSector(star.getSectorX(), star.getSectorY());
+                    }
                 }
 
                 displayNotification(context, sitrep);

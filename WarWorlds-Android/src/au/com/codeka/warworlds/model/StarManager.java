@@ -99,6 +99,14 @@ public class StarManager {
     }
 
     public void refreshStar(Context context, String starKey) {
+        refreshStar(context, starKey, false);
+    }
+
+    public boolean refreshStar(Context context, String starKey, boolean onlyIfCached) {
+        if (onlyIfCached && !mStars.containsKey(starKey)) {
+            return false;
+        }
+
         requestStar(context, starKey, true, new StarFetchedHandler() {
             @Override
             public void onStarFetched(Star s) {
@@ -107,6 +115,8 @@ public class StarManager {
                 SectorManager.getInstance().refreshSector(s.getSectorX(), s.getSectorY());
             }
         });
+
+        return true;
     }
 
     public void requestStarSummary(final Context context, final String starKey,
