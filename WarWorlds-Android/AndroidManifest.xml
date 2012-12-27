@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="au.com.codeka.warworlds"
-    android:versionCode="1"
+    android:versionCode="2"
     android:versionName="0.0.1" >
 
     <!-- C2DM requires Android SDK version 2.2 (API level 8) or above, and we want to be
@@ -32,8 +32,11 @@
          we need to enumerate the accounts so you can log on. -->
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
 
-    <!-- Permission to request authtokens from the AccountManager - again, so you can log on. -->
+    <!-- Permission to request auth tokens from the AccountManager - again, so you can log on. -->
     <uses-permission android:name="android.permission.USE_CREDENTIALS" />
+
+    <!-- Permission that allows us to access in-app billing -->
+    <uses-permission android:name="com.android.vending.BILLING" />
 
     <application
         android:icon="@drawable/app_icon"

@@ -2,6 +2,7 @@
 
 from datetime import datetime, timedelta
 import logging
+import math
 
 from google.appengine.ext import db
 from google.appengine.ext import deferred
@@ -471,28 +472,29 @@ class Simulation(object):
 
       population_increase = colony_pb.population * colony_pb.focus_population
       if goods_efficiency >= 1:
-        population_increase *= 0.25
+        population_increase *= 0.5
       else:
-        population_increase *= goods_efficiency - 1.0
-      colony_pb.delta_population = population_increase
-
-      planet_pb = star_pb.planets[colony_pb.planet_index - 1]
+        population_increase *= 0.5 * (goods_efficiency - 1.0)
 
       # if we're increasing population, it slows down the closer you get to the
       # max population. If population is decreasing, it slows down the FURTHER
       # you get.
       max_factor = float(colony_pb.max_population)
-      if max_factor < 10:
-        max_factor = colony_pb.population / 10.0
+      max_factor = colony_pb.population / max_factor
+      if max_factor > 1.0:
+        # population is bigger than it should be...
+        max_factor -= 1.0
+        population_increase = -max_factor * population_increase
       else:
-        max_factor = colony_pb.population / max_factor
-      if population_increase >= 0.0:
         max_factor = 1.0 - max_factor
-      population_increase *= max_factor * max_factor
+
+      population_increase *= max_factor
+      colony_pb.delta_population = population_increase
 
       population_increase *= dt_in_hours
-      self.log("max_population: %.2f factor=%.2f population_increase: %.2f" % (
-              float(colony_pb.max_population), max_factor, population_increase))
+      self.log("max_population: %.2f factor=%.2f population_increase: %.2f new_population: %.2f" % (
+              float(colony_pb.max_population), max_factor, population_increase,
+              colony_pb.population + population_increase))
 
       colony_pb.population += population_increase
 

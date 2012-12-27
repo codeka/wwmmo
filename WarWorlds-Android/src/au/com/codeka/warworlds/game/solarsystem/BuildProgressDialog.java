@@ -63,8 +63,7 @@ public class BuildProgressDialog extends DialogFragment {
         b.setNeutralButton("Stop", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                // TODO Auto-generated method stub
-                
+                onStopClick();
             }
         });
 
@@ -124,8 +123,31 @@ public class BuildProgressDialog extends DialogFragment {
         }
     }
 
+    private void onStopClick() {
+        String msg =
+             "Are you <em>sure</em> you want to stop this build? Stopping the " +
+             "build will not return any resources to you, though it will free " +
+             "up your population to work on other constructions.";
+
+        StyledDialog dlg = new StyledDialog.Builder(getActivity())
+                           .setTitle("Stop Build")
+                           .setMessage(Html.fromHtml(msg))
+                           .setPositiveButton("Stop Build", new DialogInterface.OnClickListener() {
+                               @Override
+                               public void onClick(DialogInterface dialog, int which) {
+                                   stopBuild();
+                                   dialog.dismiss();
+                               }
+                           })
+                           .setNegativeButton("Cancel", null)
+                           .create();
+        dlg.show();
+
+    }
+
     private void accelerateBuild() {
         ((StyledDialog) getDialog()).getPositiveButton().setEnabled(false);
+        ((StyledDialog) getDialog()).getNeutralButton().setEnabled(false);
 
         new AsyncTask<Void, Void, BuildRequest>() {
             @Override
@@ -145,6 +167,7 @@ public class BuildProgressDialog extends DialogFragment {
             @Override
             protected void onPostExecute(BuildRequest buildRequest) {
                 ((StyledDialog) getDialog()).getPositiveButton().setEnabled(true);
+                ((StyledDialog) getDialog()).getNeutralButton().setEnabled(true);
 
                 // notify the BuildQueueManager that something's changed.
                 BuildQueueManager.getInstance().refresh(buildRequest);
@@ -156,6 +179,36 @@ public class BuildProgressDialog extends DialogFragment {
                     mBuildRequest = buildRequest;
                     refresh();
                 }
+            }
+        }.execute();
+    }
+
+    private void stopBuild() {
+        ((StyledDialog) getDialog()).getNeutralButton().setEnabled(false);
+        ((StyledDialog) getDialog()).getPositiveButton().setEnabled(false);
+
+        new AsyncTask<Void, Void, Boolean>() {
+            @Override
+            protected Boolean doInBackground(Void... arg0) {
+                String url = "stars/"+mStarKey+"/build/"+mBuildRequest.getKey()+"/stop";
+
+                try {
+                    ApiClient.postProtoBuf(url, null);
+                    return true;
+                } catch (ApiException e) {
+                    log.error("Error issuing build request", e);
+                    return false;
+                }
+            }
+            @Override
+            protected void onPostExecute(Boolean success) {
+                // notify the BuildQueueManager that something's changed.
+                BuildQueueManager.getInstance().refresh();
+
+                // tell the StarManager that this star has been updated
+                StarManager.getInstance().refreshStar(getActivity(), mStarKey);
+
+                dismiss();
             }
         }.execute();
 

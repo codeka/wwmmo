@@ -35,6 +35,7 @@ public class DeviceRegistrar {
             registration = ApiClient.postProtoBuf("devices", registration,
                     Messages.DeviceRegistration.class);
             registrationKey = registration.getKey();
+            log.info("Got registration key: "+registrationKey);
         } catch(Exception ex) {
             log.error("Failure registring device.", ex);
             forgetDeviceRegistration(context);

@@ -591,6 +591,29 @@ def accelerateBuild(empire_pb, star_pb, build_request_pb, sim):
   return build_request_pb
 
 
+def stopBuild(empire_pb, star_pb, build_request_pb, sim):
+  """Stops (cancels) the given build."""
+
+  # delete the build request from the data store, remove it from the star_pb
+  # and re-simulate
+  build_op_mdl = mdl.BuildOperation.get(db.Key(build_request_pb.key))
+  if build_op_mdl:
+    build_op_mdl.delete()
+
+    for n,star_build_request_pb in enumerate(star_pb.build_requests):
+      if star_build_request_pb.key == build_request_pb.key:
+        del star_pb.build_requests[n]
+        break
+
+    sim.simulate(star_pb.key)
+
+    ctrl.clearCached(["buildqueue:for-empire:%s" % empire_pb.key,
+                      "star:%s" % star_pb.key])
+
+    return True
+  return False
+
+
 def getBuildQueueForEmpire(empire_key):
   """Gets the current build queue for the given empire."""
 

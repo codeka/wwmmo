@@ -75,10 +75,16 @@ public class BackgroundDetector {
                 Messages.DeviceOnlineStatus.newBuilder()
                                            .setIsOnline(!mIsInBackground)
                                            .build();
+
+        final String deviceRegistrationKey = DeviceRegistrar.getDeviceRegistrationKey(activity);
+        if (deviceRegistrationKey == null || deviceRegistrationKey.isEmpty()) {
+            return;
+        }
+
         new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... params) {
-                String url = "/api/v1/devices/"+DeviceRegistrar.getDeviceRegistrationKey(activity);
+                String url = "/api/v1/devices/"+deviceRegistrationKey;
                 try {
                     ApiClient.putProtoBuf(url, dos_pb);
                 } catch (ApiException e) {

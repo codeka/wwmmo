@@ -526,6 +526,28 @@ class BuildAcceleratePage(ApiPage):
     self.response.set_status(404)
 
 
+class BuildStopPage(ApiPage):
+  def post(self, star_key, build_request_key):
+    sim = simulation.Simulation()
+    sim.simulate(star_key)
+    star_pb = sim.getStar(star_key)
+    for build_request_pb in star_pb.build_requests:
+      if build_request_pb.key == build_request_key:
+        empire_pb = empire.getEmpireForUser(self.user)
+        if build_request_pb.empire_key != empire_pb.key:
+          self.response.set_status(403)
+          return
+
+        if empire.stopBuild(empire_pb, star_pb, build_request_pb, sim):
+          sim.update()
+          empire.scheduleBuildCheck(sim)
+        else:
+          self.response.set_status(400) # todo: better errors
+
+    # if we couldn't find the build request, return 404
+    self.response.set_status(404)
+
+
 class FleetOrdersPage(ApiPage):
   """This page is where we post orders that we issue to fleets."""
   def post(self, star_key, fleet_key):
@@ -646,6 +668,7 @@ app = ApiApplication([("/api/v1/hello/([^/]+)", HelloPage),
                       ("/api/v1/stars/([^/]+)", StarPage),
                       ("/api/v1/stars/([^/]+)/simulate", StarSimulatePage),
                       ("/api/v1/stars/([^/]+)/build/([^/]+)/accelerate", BuildAcceleratePage),
+                      ("/api/v1/stars/([^/]+)/build/([^/]+)/stop", BuildStopPage),
                       ("/api/v1/stars/([^/]+)/colonies", ColoniesPage),
                       ("/api/v1/stars/([^/]+)/colonies/([^/]+)", ColoniesPage),
                       ("/api/v1/stars/([^/]+)/colonies/([^/]+)/taxes", ColoniesTaxesPage),
