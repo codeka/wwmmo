@@ -25,7 +25,6 @@ import org.slf4j.LoggerFactory;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
-import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -50,92 +49,28 @@ import com.google.android.gcm.GCMRegistrar;
  */
 public class AccountsActivity extends BaseActivity {
     final Logger log = LoggerFactory.getLogger(AccountsActivity.class);
-
-    /**
-     * The selected position in the ListView of accounts.
-     */
     private int mAccountSelectedPosition = 0;
-
-    /**
-     * True if we are waiting for App Engine authorisation.
-     */
     private boolean mPendingAuth = false;
-
-    /**
-     * The current context.
-     */
     private Context mContext = this;
-
     private ProgressDialog mPleaseWaitDialog;
-    
-    /**
-     * Begins the activity.
-     */
+    private boolean mIsLogIn;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         requestWindowFeature(Window.FEATURE_NO_TITLE); // remove the title bar
 
+        View rootView = findViewById(android.R.id.content);
+        ActivityBackgroundGenerator.setBackground(rootView);
+
         SharedPreferences prefs = Util.getSharedPreferences(mContext);
         String accountName = prefs.getString("AccountName", null);
         if (accountName == null) {
-            // Show the 'connect' screen if we are not connected
-            setScreenContent(R.layout.log_in);
-        } else {
-            // Show the 'log out' screen if we are logged in
-            setScreenContent(R.layout.log_out);
-        }
-    }
+            mIsLogIn = true;
+            setContentView(R.layout.log_in);
 
-    /**
-     * Resumes the activity.
-     */
-    @Override
-    public void onResume() {
-        super.onResume();
-        if (mPendingAuth) {
-            mPendingAuth = false;
-            String regId = GCMRegistrar.getRegistrationId(mContext);
-            if (regId != null && ! "".equals(regId)) {
-                DeviceRegistrar.register(mContext, regId);
-            } else {
-                GCMIntentService.register(this, null);
-            }
-        }
-    }
-
-    // Manage UI Screens
-
-    /**
-     * Sets up the 'log in' screen content.
-     */
-    private void setLogInScreenContent() {
-        List<String> accounts = getGoogleAccounts();
-        if (accounts.size() == 0) {
-            // Show a dialog and invoke the "Add Account" activity if requested
-            AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
-            builder.setMessage(R.string.log_in_needsaccount_msg);
-            builder.setPositiveButton(R.string.log_in_addaccount, new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int which) {
-                    startActivity(new Intent(Settings.ACTION_ADD_ACCOUNT));
-                }
-            });
-            builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int which) {
-                    // TODO: the whole game should exit...
-                    finish();
-                }
-            });
-            builder.setIcon(android.R.drawable.stat_sys_warning);
-            builder.setTitle(R.string.log_in_needsaccount_title);
-            builder.show();
-        } else {
             final ListView listView = (ListView) findViewById(R.id.select_account);
-            listView.setAdapter(new ArrayAdapter<String>(mContext, R.layout.account, accounts));
-            listView.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
-            listView.setItemChecked(mAccountSelectedPosition, true);
-
             final Button logInButton = (Button) findViewById(R.id.log_in_btn);
             logInButton.setOnClickListener(new OnClickListener() {
                 public void onClick(View v) {
@@ -158,6 +93,80 @@ public class AccountsActivity extends BaseActivity {
                     });
                 }
             });
+        } else {
+            mIsLogIn = false;
+            setContentView(R.layout.log_out);
+
+            final Button logOutButton = (Button) findViewById(R.id.log_out_btn);
+            logOutButton.setOnClickListener(new OnClickListener() {
+                public void onClick(View v) {
+                    // Unregister
+                    unregister(new Callable<Void>() {
+                        public Void call() {
+                            if (mPleaseWaitDialog != null) {
+                                mPleaseWaitDialog.dismiss();
+                            }
+
+                            finish();
+                            return null;
+                        }
+                    });
+                }
+            });
+        }
+
+        final Button cancelButton = (Button) findViewById(R.id.cancel_btn);
+        cancelButton.setOnClickListener(new OnClickListener() {
+            public void onClick(View v) {
+                finish();
+            }
+        });
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (mPendingAuth) {
+            mPendingAuth = false;
+            String regId = GCMRegistrar.getRegistrationId(mContext);
+            if (regId != null && ! "".equals(regId)) {
+                DeviceRegistrar.register(mContext, regId);
+            } else {
+                GCMIntentService.register(this, null);
+            }
+        }
+
+        if (mIsLogIn) {
+            setLogInScreenContent();
+        } else {
+            setLogOutScreenContent();
+        }
+    }
+
+    private void setLogInScreenContent() {
+        List<String> accounts = getGoogleAccounts();
+        if (accounts.size() == 0) {
+            // Show a dialog and invoke the "Add Account" activity if requested
+            StyledDialog.Builder builder = new StyledDialog.Builder(mContext);
+            builder.setMessage("You need a Google Account in order to be able to play War Worlds.");
+            builder.setPositiveButton("Add Account", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
+                    startActivity(new Intent(Settings.ACTION_ADD_ACCOUNT));
+                }
+            });
+            builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
+                    // TODO: the whole game should exit...
+                    finish();
+                }
+            });
+            builder.setTitle("No Google Account");
+            builder.create().show();
+        } else {
+            ListView listView = (ListView) findViewById(R.id.select_account);
+            listView.setAdapter(new ArrayAdapter<String>(mContext, R.layout.account, accounts));
+            listView.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
+            listView.setItemChecked(mAccountSelectedPosition, true);
         }
     }
 
@@ -173,52 +182,7 @@ public class AccountsActivity extends BaseActivity {
         String message = getResources().getString(R.string.log_out_msg);
         String formatted = String.format(message, accountName);
         logOutMsg.setText(formatted);
-
-        final Button logOutButton = (Button) findViewById(R.id.log_out_btn);
-        logOutButton.setOnClickListener(new OnClickListener() {
-            public void onClick(View v) {
-                // Unregister
-                unregister(new Callable<Void>() {
-                    public Void call() {
-                        if (mPleaseWaitDialog != null) {
-                            mPleaseWaitDialog.dismiss();
-                        }
-
-                        finish();
-                        return null;
-                    }
-                });
-            }
-        });
-
-        final Button cancelButton = (Button) findViewById(R.id.cancel_btn);
-        cancelButton.setOnClickListener(new OnClickListener() {
-            public void onClick(View v) {
-                finish();
-            }
-        });
     }
-
-    /**
-     * Sets the screen content based on the screen id.
-     */
-    private void setScreenContent(int screenId) {
-        setContentView(screenId);
-
-        View rootView = findViewById(android.R.id.content);
-        ActivityBackgroundGenerator.setBackground(rootView);
-
-        switch (screenId) {
-            case R.layout.log_out:
-                setLogOutScreenContent();
-                break;
-            case R.layout.log_in:
-                setLogInScreenContent();
-                break;
-        }
-    }
-
-    // Register and Unregister
 
     /**
      * Registers for C2DM messaging with the given account name.

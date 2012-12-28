@@ -61,6 +61,8 @@
                   android:label="@string/app_name"
                   android:screenOrientation="portrait" />
 
+        <activity android:name=".WarmWelcomeActivity" />
+
         <activity android:name=".GlobalOptionsActivity" />
 
         <activity android:name=".EmpireSetupActivity"

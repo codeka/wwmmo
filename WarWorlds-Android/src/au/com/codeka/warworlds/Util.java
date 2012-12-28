@@ -14,6 +14,10 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.AssetManager;
 import au.com.codeka.warworlds.api.ApiClient;
+import au.com.codeka.warworlds.model.BuildQueueManager;
+import au.com.codeka.warworlds.model.BuildingDesignManager;
+import au.com.codeka.warworlds.model.ShipDesignManager;
+import au.com.codeka.warworlds.model.SpriteManager;
 
 /**
  * Utility methods for getting the base URL for client-server communication and
@@ -28,6 +32,17 @@ public class Util {
     private static final String SHARED_PREFS = "WARWORLDS_PREFS";
 
     private static Properties sProperties;
+
+    /**
+     * This should be called from every entry-point into the process to make
+     * sure the various globals are up and running.
+     */
+    public static void setup(Context context) {
+        SpriteManager.getInstance().setup(context);
+        BuildingDesignManager.getInstance().setup(context);
+        ShipDesignManager.getInstance().setup(context);
+        BuildQueueManager.getInstance().setup();
+    }
 
     /**
      * Must be called before other methods on this class. We load up the initial
@@ -94,7 +109,7 @@ public class Util {
      */
     public static boolean isDebug() {
         final String serverDefault = sProperties.getProperty("server.default");
-        return (serverDefault.equals("debug"));
+        return (serverDefault.equals("debug") || serverDefault.equals("emulator"));
     }
 
     /**

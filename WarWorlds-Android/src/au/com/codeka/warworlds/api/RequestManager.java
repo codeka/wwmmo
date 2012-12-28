@@ -171,8 +171,10 @@ public class RequestManager {
 
                     // Note: the connection doesn't go back in the pool, and we'll close this
                     // one, it's probably no good anyway...
-                    conn.close();
-                    sConnectionPool.returnConnection(conn);
+                    if (conn != null) {
+                        conn.close();
+                        sConnectionPool.returnConnection(conn);
+                    }
                 } else {
                     if (numAttempts >= 5) {
                         log.error("Got "+numAttempts+" retryable exceptions (giving up) making request to"+url, e);

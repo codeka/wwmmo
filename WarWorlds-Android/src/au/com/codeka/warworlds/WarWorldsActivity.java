@@ -95,6 +95,14 @@ public class WarWorldsActivity extends BaseActivity {
         log.debug("WarWorldsActivity.onResume...");
 
         SharedPreferences prefs = Util.getSharedPreferences(mContext);
+        if (prefs.getBoolean("WarmWelcome",  false) == false) {
+            // if we've never done the warm-welcome, do it now
+            log.info("Starting Warm Welcome");
+            mNeedHello = true;
+            startActivity(new Intent(this, WarmWelcomeActivity.class));
+            return;
+        }
+
         if (prefs.getString("AccountName", null) == null) {
             log.info("No accountName saved, switching to AccountsActivity");
             mNeedHello = true;
@@ -212,19 +220,16 @@ public class WarWorldsActivity extends BaseActivity {
                     startActivity(new Intent(mContext, EmpireSetupActivity.class));
                     return;
                 } else if (!mErrorOccured) {
-                    SpriteManager.getInstance().setup(mContext);
-                    BuildingDesignManager.getInstance().setup(mContext);
-                    ShipDesignManager.getInstance().setup(mContext);
-                    BuildQueueManager.getInstance().setup();
+                    Util.setup(mContext);
 
                     // make sure we're correctly registered as online.
                     BackgroundDetector.getInstance().onBackgroundStatusChange(WarWorldsActivity.this);
 
-                    motdView.loadHtml("html/motd-template.html", result);
+                    motdView.loadHtml("html/skeleton.html", result);
                 } else /* mErrorOccured */ {
                     mConnectionStatus.setText("Connection Failed");
                     mStartGameButton.setEnabled(false);
-                    motdView.loadHtml("html/motd-template.html", result);
+                    motdView.loadHtml("html/skeleton.html", result);
 
                     if (mNeedsReAuthenticate) {
                         // if we need to re-authenticate, first forget the current credentials

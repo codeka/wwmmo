@@ -5,12 +5,21 @@
     android:orientation="horizontal"
     android:baselineAligned="false" >
 
+    <ImageView
+        android:id="@+id/title_icon"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_margin="5dp"
+        android:src="@drawable/app_icon" />
+
     <TextView
         android:id="@+id/title"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
-        android:text="@string/homepage_title_text"
+        android:layout_alignParentRight="true"
+        android:layout_toRightOf="@+id/title_icon"
+        android:text="War Worlds"
         style="@style/TitleText" />
 
     <LinearLayout
@@ -40,7 +49,7 @@
     <Button
         android:id="@+id/start_game_btn"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="40dp"
         android:layout_above="@id/button_wrapper"
         android:layout_margin="6dp"
         android:text="@string/start_game" />

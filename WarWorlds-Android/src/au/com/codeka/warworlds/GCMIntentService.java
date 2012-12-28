@@ -120,7 +120,8 @@ public class GCMIntentService extends GCMBaseIntentService {
     public void onMessage(Context context, Intent intent) {
         // since this can be called when the application is not running, make sure we're
         // set to go still.
-        Util.loadProperties(this);
+        Util.loadProperties(context);
+        Util.setup(context);
 
         log.info("GCM message received.");
         MessageDisplay.displayMessage(context, intent);

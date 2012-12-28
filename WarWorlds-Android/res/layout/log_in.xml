@@ -3,29 +3,38 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent">
 
+    <ImageView
+        android:id="@+id/title_icon"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_margin="5dp"
+        android:src="@drawable/app_icon" />
+
     <TextView
-        android:id="@+id/log_in_header"
-        android:layout_width="fill_parent"
+        android:id="@+id/title"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
-        android:text="@string/log_in_header"
+        android:layout_alignParentRight="true"
+        android:layout_toRightOf="@+id/title_icon"
+        android:text="Log In"
         style="@style/TitleText" />
 
     <TextView
-        android:id="@+id/log_in_note"
+        android:id="@+id/note"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/log_in_header"
+        android:layout_below="@id/title"
         android:layout_margin="5dip"
         android:gravity="center"
-        android:text="@string/log_in_note"
+        android:text="Note: your account details will remain private"
         android:textColor="#ffffff" />
 
     <View
         android:id="@+id/divider"
         android:layout_width="fill_parent"
         android:layout_height="1dip"
-        android:layout_below="@id/log_in_note"
+        android:layout_below="@id/note"
         android:background="#808080" />
 
     <ListView
@@ -53,7 +62,8 @@
             style="@style/Button"
             android:layout_width="0dp"
             android:layout_weight="1"
-            android:layout_height="wrap_content"
+            android:layout_height="40dp"
+            android:layout_margin="5dp"
             android:text="@string/cancel" />
 
         <Button
@@ -61,7 +71,8 @@
             style="@style/Button"
             android:layout_width="0dp"
             android:layout_weight="1"
-            android:layout_height="wrap_content"
+            android:layout_height="40dp"
+            android:layout_margin="5dp"
             android:text="@string/log_in" />
 
     </LinearLayout>

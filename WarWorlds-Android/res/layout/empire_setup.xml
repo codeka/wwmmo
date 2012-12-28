@@ -5,17 +5,22 @@
     android:orientation="horizontal"
     android:baselineAligned="false" >
 
+    <ImageView
+        android:id="@+id/title_icon"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_margin="5dp"
+        android:src="@drawable/app_icon" />
+
     <TextView
         android:id="@+id/title"
-        android:layout_width="fill_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
-        android:gravity="center"
-        android:padding="0dip"
-        android:text="@string/homepage_title_text"
-        android:textColor="#ffffff"
-        android:textSize="48sp"
-        android:textStyle="bold" />
+        android:layout_alignParentRight="true"
+        android:layout_toRightOf="@+id/title_icon"
+        android:text="War Worlds"
+        style="@style/TitleText" />
 
     <TextView
         android:id="@+id/welcome"
@@ -63,7 +68,8 @@
             android:id="@+id/empire_setup_cancel"
             android:layout_width="0dp"
             android:layout_weight="1"
-            android:layout_height="wrap_content"
+            android:layout_height="40dp"
+            android:layout_margin="5dp"
             android:text="@string/cancel"
             style="@style/Button" />
 
@@ -71,7 +77,8 @@
             android:id="@+id/empire_setup_done"
             android:layout_width="0dp"
             android:layout_weight="1"
-            android:layout_height="wrap_content"
+            android:layout_height="40dp"
+            android:layout_margin="5dp"
             android:text="@string/done"
             style="@style/Button" />
 

@@ -13,12 +13,7 @@
 
     <!-- "log_in.xml" layout -->
     <string name="log_in_header">Log In</string>
-    <string name="log_in_note">Note: Your account details will remain private</string>
     <string name="log_in">Log In</string>
-
-    <string name="log_in_needsaccount_msg">You need a Google Account in order to be able to play War Worlds.</string>
-    <string name="log_in_addaccount">Add Account</string>
-    <string name="log_in_needsaccount_title">No Google Account</string>
 
     <!-- "log_out.xml" layout -->
     <string name="log_out_header">Log Out</string>

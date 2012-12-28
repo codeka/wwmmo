@@ -3,19 +3,29 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent" >
 
+
+    <ImageView
+        android:id="@+id/title_icon"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_margin="5dp"
+        android:src="@drawable/app_icon" />
+
     <TextView
-        android:id="@+id/log_out_header"
-        android:layout_width="match_parent"
+        android:id="@+id/title"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
-        android:text="@string/log_out_header"
+        android:layout_alignParentRight="true"
+        android:layout_toRightOf="@+id/title_icon"
+        android:text="Log Out"
         style="@style/TitleText" />
 
     <TextView
         android:id="@+id/log_out_msg"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/log_out_header"
+        android:layout_below="@id/title"
         android:gravity="top"
         android:padding="4dp"
         android:shadowColor="#000"
@@ -36,7 +46,8 @@
             style="@style/Button"
             android:layout_width="0dp"
             android:layout_weight="1"
-            android:layout_height="wrap_content"
+            android:layout_height="40dp"
+            android:layout_margin="5dp"
             android:text="@string/cancel" />
 
         <Button
@@ -44,7 +55,8 @@
             style="@style/Button"
             android:layout_width="0dp"
             android:layout_weight="1"
-            android:layout_height="wrap_content"
+            android:layout_height="40dp"
+            android:layout_margin="5dp"
             android:text="@string/log_out" />
     </LinearLayout>
 

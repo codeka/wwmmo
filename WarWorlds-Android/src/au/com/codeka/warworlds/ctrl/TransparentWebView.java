@@ -42,7 +42,7 @@ public class TransparentWebView extends WebView {
      * the string "%s" in that template with the HTML you've supplied.
      */
     public void loadHtml(String templateFileName, String html) {
-        String tmpl = getHtmlFile(templateFileName);
+        String tmpl = getHtmlFile(getContext(), templateFileName);
         html = String.format(tmpl, html);
         html = Base64.encodeToString(html.getBytes(), Base64.DEFAULT);
         log.debug(String.format("Loading HTML (template=%s)", templateFileName));
@@ -56,9 +56,9 @@ public class TransparentWebView extends WebView {
     /**
      * Loads a template HTML file from within your assets folder.
      */
-    private String getHtmlFile(String fileName) {
+    public static String getHtmlFile(Context context, String fileName) {
         try {
-            AssetManager assetManager = getContext().getAssets();
+            AssetManager assetManager = context.getAssets();
             InputStream is = assetManager.open(fileName);
 
             StringWriter writer = new StringWriter();
