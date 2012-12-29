@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="custom_rules">
+  <xmlproperty file="AndroidManifest.xml" prefix="mymanifest" collapseAttributes="true"/>
+  <property name="build.dir" value="bin/${mymanifest.manifest.android:versionName}/" />
+
+  <taskdef resource="net/sf/antcontrib/antcontrib.properties"/>
+
+  <target name="-pre-build">
+    <exec executable="svnversion" outputproperty="svnversion"/>
+    <propertyregex property="svnversion"
+                   input="${svnversion}"
+                   regexp="([0-9]+).*"
+                   replace="\1"
+                   global="true" />
+
+    <propertyfile file="version.properties" comment="Version info">
+      <entry key="build.date" type="date" value="now" pattern="yyyyMMdd" />
+      <entry key="build.number" default="0" type="int" operation="+" value="1" />
+      <entry key="build.svn" type="int" value="${svnversion}" />
+    </propertyfile>
+    <loadproperties srcFile="version.properties" />
+
+    <if>
+      <condition><equals arg1="${build.target}" arg2="release" /></condition>
+      <then>
+        <!-- make sure we set server.default to "prod" in release mode -->
+        <replaceregexp file="assets/warworlds.properties"
+                       match="^server.default=.*$"
+                       flags="gm"
+                       replace="server.default=prod" />
+
+        <replaceregexp file="AndroidManifest.xml"
+                       match="android:versionCode=&quot;(.*)&quot;"
+                       flags="g"
+                       replace="android:versionCode=&quot;${build.number}&quot;" />
+        <replaceregexp file="AndroidManifest.xml"
+                       match="android:versionName=&quot;(.*)&quot;"
+                       flags="g"
+                       replace="android:versionName=&quot;0.1.${build.date}.${build.svn}&quot;" />
+      </then>
+    </if>
+  </target>
+
+  <target name="-post-build">
+    <!-- Put the server.default back to "debug" (technically, it might've been "emulator"
+         as well, but this is easier than explicitly remembering... -->
+    <replaceregexp file="assets/warworlds.properties"
+                   match="^server.default=.*$"
+                   flags="gm"
+                   replace="server.default=debug" />
+  </target>
+
+</project>
