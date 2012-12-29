@@ -27,6 +27,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
+        android:layout_marginLeft="@dimen/tablet_margin_5dp"
+        android:layout_marginRight="@dimen/tablet_margin_5dp"
         android:orientation="horizontal">
 
         <Button
@@ -34,7 +36,9 @@
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="wrap_content"
-            android:layout_margin="6dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="5dp"
+            android:layout_marginRight="5dp"
             android:text="@string/options" />
 
         <Button
@@ -42,7 +46,9 @@
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="wrap_content"
-            android:layout_margin="6dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="5dp"
+            android:layout_marginLeft="5dp"
             android:text="@string/log_out" />
     </LinearLayout>
 
@@ -51,7 +57,10 @@
         android:layout_width="match_parent"
         android:layout_height="40dp"
         android:layout_above="@id/button_wrapper"
-        android:layout_margin="6dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="5dp"
+        android:layout_marginLeft="@dimen/tablet_margin_5dp"
+        android:layout_marginRight="@dimen/tablet_margin_5dp"
         android:text="@string/start_game" />
 
     <TextView
@@ -66,6 +75,8 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_above="@id/connection_status"
-        android:layout_below="@id/title" />
+        android:layout_below="@id/title"
+        android:layout_marginLeft="@dimen/tablet_margin"
+        android:layout_marginRight="@dimen/tablet_margin" />
 
 </RelativeLayout>

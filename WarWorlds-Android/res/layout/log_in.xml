@@ -25,7 +25,7 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/title"
-        android:layout_margin="5dip"
+        android:layout_margin="5dp"
         android:gravity="center"
         android:text="Note: your account details will remain private"
         android:textColor="#ffffff" />
@@ -35,6 +35,8 @@
         android:layout_width="fill_parent"
         android:layout_height="1dip"
         android:layout_below="@id/note"
+        android:layout_marginLeft="@dimen/tablet_margin"
+        android:layout_marginRight="@dimen/tablet_margin"
         android:background="#808080" />
 
     <ListView
@@ -43,7 +45,10 @@
         android:layout_height="fill_parent"
         android:layout_below="@id/divider"
         android:layout_above="@+id/bottom_pane"
-        android:layout_margin="10dip"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="@dimen/tablet_margin_10dp"
+        android:layout_marginRight="@dimen/tablet_margin_10dp"
+        android:layout_marginBottom="10dp"
         android:background="@android:color/transparent"
         android:cacheColorHint="@android:color/transparent"
         android:divider="#FFFFFF"
@@ -55,6 +60,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
+        android:layout_marginLeft="@dimen/tablet_margin_10dp"
+        android:layout_marginRight="@dimen/tablet_margin_10dp"
         android:orientation="horizontal">
 
         <Button

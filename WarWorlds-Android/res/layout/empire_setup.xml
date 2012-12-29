@@ -27,6 +27,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/title"
+        android:layout_marginTop="@dimen/tablet_margin"
+        android:layout_marginLeft="@dimen/tablet_margin"
+        android:layout_marginRight="@dimen/tablet_margin"
         android:padding="4dp"
         android:shadowColor="#000"
         android:shadowDx="2.0"
@@ -41,6 +44,8 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/welcome"
         android:layout_marginTop="20dp"
+        android:layout_marginLeft="@dimen/tablet_margin"
+        android:layout_marginRight="@dimen/tablet_margin"
         android:padding="4dp"
         android:text="@string/empire_setup_name"
         android:textAppearance="?android:attr/textAppearanceMedium" />
@@ -50,7 +55,10 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/setup_name"
-        android:layout_margin="4dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginLeft="@dimen/tablet_margin_5dp"
+        android:layout_marginRight="@dimen/tablet_margin_5dp"
+        android:layout_marginBottom="5dp"
         android:hint="@string/empire_setup_name_hint"
         android:imeOptions="actionDone"
         android:inputType="textCapWords" >
@@ -62,6 +70,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
+        android:layout_marginLeft="@dimen/tablet_margin"
+        android:layout_marginRight="@dimen/tablet_margin"
         android:orientation="horizontal">
 
         <Button
