@@ -15,39 +15,39 @@
  */
 package au.com.codeka.warworlds;
 
-import java.util.Locale;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.protobuf.InvalidProtocolBufferException;
-
-import android.annotation.SuppressLint;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Color;
 import android.media.AudioManager;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.app.NotificationCompat;
 import android.util.Base64;
-import au.com.codeka.warworlds.model.BuildRequest.BuildKind;
-import au.com.codeka.warworlds.model.BuildingDesign;
-import au.com.codeka.warworlds.model.BuildingDesignManager;
+import au.com.codeka.warworlds.model.BuildRequest;
 import au.com.codeka.warworlds.model.ChatManager;
 import au.com.codeka.warworlds.model.ChatMessage;
 import au.com.codeka.warworlds.model.SectorManager;
-import au.com.codeka.warworlds.model.ShipDesign;
-import au.com.codeka.warworlds.model.ShipDesignManager;
 import au.com.codeka.warworlds.model.SituationReport;
+import au.com.codeka.warworlds.model.Sprite;
 import au.com.codeka.warworlds.model.Star;
+import au.com.codeka.warworlds.model.StarImageManager;
 import au.com.codeka.warworlds.model.StarManager;
 import au.com.codeka.warworlds.model.StarSummary;
 import au.com.codeka.warworlds.model.protobuf.Messages;
+
+import com.google.protobuf.InvalidProtocolBufferException;
 
 /**
  * Display a message as a notification, with an accompanying sound.
@@ -70,7 +70,7 @@ public class MessageDisplay {
                 log.debug(String.format("%s = %s", key, extras.get(key)));
             }
             if (extras.containsKey("msg")) {
-                displayNotification(context, extras.get("msg").toString());
+                displayNotification(context, buildNotification(context, extras.get("msg").toString()));
                 playNotificationSound(context);
             } else if (extras.containsKey("sitrep")) {
                 byte[] blob = Base64.decode(extras.getString("sitrep"), Base64.DEFAULT);
@@ -125,89 +125,15 @@ public class MessageDisplay {
             new StarManager.StarSummaryFetchedHandler() {
                 @Override
                 public void onStarSummaryFetched(StarSummary starSummary) {
-                    displayNotification(context, starSummary, sitrep);
+                    displayNotification(context, buildNotification(context, starSummary, sitrep));
                 }
             });
     }
 
-    private static void displayNotification(Context context, StarSummary starSummary,
-                                            SituationReport sitrep) {
-        String msg = getNotificationMessage(starSummary, sitrep);
-        displayNotification(context, msg);
-    }
-
-    public static String getNotificationMessage(StarSummary starSummary, SituationReport sitrep) {
-        String msg = "";
-
-        SituationReport.MoveCompleteRecord mcr = sitrep.getMoveCompleteRecord();
-        if (mcr != null) {
-            msg += getFleetLine(mcr.getFleetDesignID(), mcr.getNumShips());
-            msg += String.format(Locale.ENGLISH, " arrived at %s", starSummary.getName());
+    private static void displayNotification(Context context, Notification notification) {
+        if (notification == null) {
+            return;
         }
-
-        SituationReport.BuildCompleteRecord bcr = sitrep.getBuildCompleteRecord();
-        if (bcr != null) {
-            msg = "Construction of ";
-            if (bcr.getBuildKind().equals(BuildKind.SHIP)) {
-                msg += getFleetLine(bcr.getDesignID(), 1);
-            } else {
-                BuildingDesign design = BuildingDesignManager.getInstance().getDesign(bcr.getDesignID());
-                msg += design.getDisplayName();
-            }
-            msg += String.format(Locale.ENGLISH, " complete on %s", starSummary.getName());
-        }
-
-        SituationReport.FleetUnderAttackRecord fuar = sitrep.getFleetUnderAttackRecord();
-        if (fuar != null) {
-            if (mcr != null) {
-                msg += ", and is under attack";
-            } else if (bcr != null) {
-                msg += ", which is under attack";
-            } else {
-                msg += getFleetLine(fuar.getFleetDesignID(), fuar.getNumShips());
-                msg += String.format(Locale.ENGLISH, " is under attack at %s", starSummary.getName());
-            }
-        }
-
-        SituationReport.FleetDestroyedRecord fdr = sitrep.getFleetDestroyedRecord();
-        if (fdr != null) {
-            if (fuar != null) {
-                msg += " - it was DESTROYED!";
-            } else {
-                msg += String.format(Locale.ENGLISH, "%s fleet destroyed on %s",
-                        getFleetLine(fdr.getFleetDesignID(), 1),
-                        starSummary.getName());
-            }
-        }
-
-        SituationReport.FleetVictoriousRecord fvr = sitrep.getFleetVictoriousRecord();
-        if (fvr != null) {
-            msg += String.format(Locale.ENGLISH, "%s fleet prevailed in battle on %s",
-                    getFleetLine(fvr.getFleetDesignID(), fvr.getNumShips()),
-                    starSummary.getName());
-        }
-
-        if (msg.length() == 0) {
-            msg = "We got a situation over here!";
-        }
-
-        return msg;
-    }
-
-    private static String getFleetLine(String designID, float numShips) {
-        ShipDesign design = ShipDesignManager.getInstance().getDesign(designID);
-        String msg = design.getDisplayName();
-
-        int n = (int)(Math.ceil(numShips));
-        if (n > 1) {
-            msg += String.format(Locale.ENGLISH, " (× %d)", n);
-        }
-
-        return msg;
-    }
-
-    private static void displayNotification(Context context, String message) {
-        Notification notification = buildNotification(context, message);
 
         SharedPreferences settings = Util.getSharedPreferences(context);
         int notificatonID = settings.getInt("notificationID", 0);
@@ -221,34 +147,103 @@ public class MessageDisplay {
         editor.commit();
     }
 
-    @SuppressWarnings("deprecation")
-    @SuppressLint("NewApi")
     private static Notification buildNotification(Context context,
                                                   String message) {
         int icon = R.drawable.status_icon;
         long when = System.currentTimeMillis();
 
-        // TODO: something better? this'll just launch us to the home page...
         Intent intent = new Intent(context, WarWorldsActivity.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(
                 context, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT);
 
-        int sdk = android.os.Build.VERSION.SDK_INT;
-        if (sdk < android.os.Build.VERSION_CODES.HONEYCOMB) {
-            Notification notification = new Notification(icon, message, when);
-            notification.setLatestEventInfo(context, "War Worlds", message,
-                    pendingIntent);
-            notification.flags |= Notification.FLAG_AUTO_CANCEL;
-            return notification;
-        } else {
-            return new Notification.Builder(context)
-                    .setSmallIcon(icon)
-                    .setContentTitle("War Worlds")
-                    .setContentText(message)
-                    .setWhen(when)
-                    .setContentIntent(pendingIntent)
-                    .build();
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
+        builder.setContentTitle("War Worlds");
+        builder.setContentText(message);
+        builder.setWhen(when);
+        builder.setContentIntent(pendingIntent);
+        builder.setSmallIcon(icon);
+        builder.setAutoCancel(true);
+        builder.setLights(Color.RED, 1000, 3000);
+
+        return builder.getNotification();
+    }
+
+    private static Notification buildNotification(Context context,
+                                                  StarSummary star,
+                                                  SituationReport sitrep) {
+
+        GlobalOptions.NotificationKind kind = getNotificationKind(sitrep);
+        GlobalOptions.NotificationOptions options = new GlobalOptions(context).getNotificationOptions(kind);
+        if (!options.isEnabled()) {
+            return null;
         }
+
+        // TODO: make this show the situation report
+        Intent intent = new Intent(context, WarWorldsActivity.class);
+        PendingIntent pendingIntent = PendingIntent.getActivity(
+                context, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT);
+
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
+
+        try {
+            int iconWidth = context.getResources().getDimensionPixelSize(android.R.dimen.notification_large_icon_width);
+            int iconHeight = context.getResources().getDimensionPixelSize(android.R.dimen.notification_large_icon_height);
+
+            Bitmap largeIcon;
+            Sprite designSprite = sitrep.getDesignSprite();
+            if (designSprite != null) {
+                largeIcon = designSprite.createIcon(iconWidth, iconHeight);
+            } else {
+                largeIcon = Bitmap.createBitmap(iconWidth, iconHeight, Bitmap.Config.ARGB_8888);
+            }
+
+            Canvas canvas = new Canvas(largeIcon);
+            Sprite starSprite = StarImageManager.getInstance().getSprite(context, star, iconWidth / 2);
+            starSprite.draw(canvas);
+
+            builder.setLargeIcon(largeIcon);
+        } catch (Resources.NotFoundException e) {
+            // probably an old version of Android that doesn't support
+            // large icons
+        }
+
+        builder.setContentTitle(sitrep.getTitle());
+        builder.setContentText(sitrep.getDescription(star));
+        builder.setWhen(sitrep.getReportTime().getMillis());
+        builder.setContentIntent(pendingIntent);
+        builder.setSmallIcon(R.drawable.status_icon);
+        builder.setAutoCancel(true);
+        builder.setLights(options.getLedColour(), 1000, 3000);
+
+        return builder.getNotification();
+    }
+
+    private static GlobalOptions.NotificationKind getNotificationKind(SituationReport sitrep) {
+        if (sitrep.getBuildCompleteRecord() != null) {
+            if (sitrep.getBuildCompleteRecord().getBuildKind() == BuildRequest.BuildKind.BUILDING) {
+                return GlobalOptions.NotificationKind.BUILDING_BUILD_COMPLETE;
+            } else {
+                return GlobalOptions.NotificationKind.FLEET_BUILD_COMPLETE;
+            }
+        }
+
+        if (sitrep.getFleetUnderAttackRecord() != null) {
+            return GlobalOptions.NotificationKind.FLEET_UNDER_ATTACK;
+        }
+
+        if (sitrep.getMoveCompleteRecord() != null) {
+            return GlobalOptions.NotificationKind.FLEET_MOVE_COMPLETE;
+        }
+
+        if (sitrep.getFleetDestroyedRecord() != null) {
+            return GlobalOptions.NotificationKind.FLEET_DESTROYED;
+        }
+
+        if (sitrep.getFleetVictoriousRecord() != null) {
+            return GlobalOptions.NotificationKind.FLEET_VICTORIOUS;
+        }
+
+        return GlobalOptions.NotificationKind.OTHER;
     }
 
     private static void playNotificationSound(Context context) {

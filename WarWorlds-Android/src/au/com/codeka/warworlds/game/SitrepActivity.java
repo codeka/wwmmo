@@ -10,6 +10,7 @@ import java.util.TreeSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
@@ -26,14 +27,10 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import au.com.codeka.TimeInHours;
 import au.com.codeka.warworlds.BaseActivity;
-import au.com.codeka.warworlds.MessageDisplay;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.api.ApiClient;
 import au.com.codeka.warworlds.api.ApiException;
 import au.com.codeka.warworlds.game.solarsystem.SolarSystemActivity;
-import au.com.codeka.warworlds.model.BuildRequest.BuildKind;
-import au.com.codeka.warworlds.model.Design;
-import au.com.codeka.warworlds.model.DesignManager;
 import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.MyEmpire;
 import au.com.codeka.warworlds.model.SituationReport;
@@ -63,6 +60,10 @@ public class SitrepActivity extends BaseActivity {
     @Override
     public void onResume() {
         super.onResume();
+
+        // clear all our notifications
+        NotificationManager nm = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        nm.cancelAll();
 
         setContentView(R.layout.sitrep);
 
@@ -227,7 +228,7 @@ public class SitrepActivity extends BaseActivity {
             }
 
             StarSummary starSummary = mStarSummaries.get(sitrep.getStarKey());
-            String msg = MessageDisplay.getNotificationMessage(starSummary, sitrep);
+            String msg = sitrep.getDescription(starSummary);
 
             TextView reportTitle = (TextView) view.findViewById(R.id.report_title);
             TextView reportContent = (TextView) view.findViewById(R.id.report_content);
@@ -242,31 +243,11 @@ public class SitrepActivity extends BaseActivity {
 
             reportTime.setText(TimeInHours.format(sitrep.getReportTime()));
             reportContent.setText(msg);
+            reportTitle.setText(sitrep.getTitle());
 
-            String designID = null;
-            BuildKind buildKind = BuildKind.SHIP;
-            if (sitrep.getBuildCompleteRecord() != null) {
-                reportTitle.setText("Build Complete");
-                SituationReport.BuildCompleteRecord bcr = sitrep.getBuildCompleteRecord();
-                buildKind = bcr.getBuildKind();
-                designID = bcr.getDesignID();
-            } else if (sitrep.getMoveCompleteRecord() != null) {
-                reportTitle.setText("Move Complete");
-                designID = sitrep.getMoveCompleteRecord().getFleetDesignID();
-            } else if (sitrep.getFleetDestroyedRecord() != null) {
-                reportTitle.setText("Fleet Destroyed");
-                designID = sitrep.getFleetDestroyedRecord().getFleetDesignID();
-            } else if (sitrep.getFleetVictoriousRecord() != null) {
-                reportTitle.setText("Fleet Victorious");
-                designID = sitrep.getFleetVictoriousRecord().getFleetDesignID();
-            } else if (sitrep.getFleetUnderAttackRecord() != null) {
-                reportTitle.setText("Fleet Under Attack");
-                designID = sitrep.getFleetUnderAttackRecord().getFleetDesignID();
-            }
-
-            if (designID != null) {
-                Design design = DesignManager.getInstance(buildKind).getDesign(designID);
-                overlayIcon.setImageDrawable(new SpriteDrawable(design.getSprite()));
+            Sprite designSprite = sitrep.getDesignSprite();
+            if (designSprite != null) {
+                overlayIcon.setImageDrawable(new SpriteDrawable(designSprite));
             }
 
             return view;

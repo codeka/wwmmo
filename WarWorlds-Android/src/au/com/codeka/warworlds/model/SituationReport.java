@@ -1,8 +1,11 @@
 package au.com.codeka.warworlds.model;
 
+import java.util.Locale;
+
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
+import au.com.codeka.warworlds.model.BuildRequest.BuildKind;
 import au.com.codeka.warworlds.model.protobuf.Messages;
 
 public class SituationReport {
@@ -46,6 +49,112 @@ public class SituationReport {
     }
     public FleetVictoriousRecord getFleetVictoriousRecord() {
         return mFleetVictoriousRecord;
+    }
+
+    public String getTitle() {
+        if (mBuildCompleteRecord != null) {
+            return "Build Complete";
+        } else if (mMoveCompleteRecord != null) {
+            return "Move Complete";
+        } else if (mFleetDestroyedRecord != null) {
+            return "Fleet Destroyed";
+        } else if (mFleetVictoriousRecord != null) {
+            return "Fleet Victorious";
+        } else if (mFleetUnderAttackRecord != null) {
+            return "Fleet Under Attack";
+        }
+
+        return "War Worlds";
+    }
+
+    public String getDescription(StarSummary starSummary) {
+        String msg = "";
+
+        if (mMoveCompleteRecord != null) {
+            msg += getFleetLine(mMoveCompleteRecord.getFleetDesignID(), mMoveCompleteRecord.getNumShips());
+            msg += String.format(Locale.ENGLISH, " arrived at %s", starSummary.getName());
+        }
+
+        if (mBuildCompleteRecord != null) {
+            msg = "Construction of ";
+            if (mBuildCompleteRecord.getBuildKind().equals(BuildKind.SHIP)) {
+                msg += getFleetLine(mBuildCompleteRecord.getDesignID(), 1);
+            } else {
+                BuildingDesign design = BuildingDesignManager.getInstance().getDesign(mBuildCompleteRecord.getDesignID());
+                msg += design.getDisplayName();
+            }
+            msg += String.format(Locale.ENGLISH, " complete on %s", starSummary.getName());
+        }
+
+        if (mFleetUnderAttackRecord != null) {
+            if (mMoveCompleteRecord != null) {
+                msg += ", and is under attack";
+            } else if (mBuildCompleteRecord != null) {
+                msg += ", which is under attack";
+            } else {
+                msg += getFleetLine(mFleetUnderAttackRecord.getFleetDesignID(), mFleetUnderAttackRecord.getNumShips());
+                msg += String.format(Locale.ENGLISH, " is under attack at %s", starSummary.getName());
+            }
+        }
+
+        if (mFleetDestroyedRecord != null) {
+            if (mFleetUnderAttackRecord != null) {
+                msg += " - it was DESTROYED!";
+            } else {
+                msg += String.format(Locale.ENGLISH, "%s fleet destroyed on %s",
+                        getFleetLine(mFleetDestroyedRecord.getFleetDesignID(), 1),
+                        starSummary.getName());
+            }
+        }
+
+        if (mFleetVictoriousRecord != null) {
+            msg += String.format(Locale.ENGLISH, "%s fleet prevailed in battle on %s",
+                    getFleetLine(mFleetVictoriousRecord.getFleetDesignID(), mFleetVictoriousRecord.getNumShips()),
+                    starSummary.getName());
+        }
+
+        if (msg.length() == 0) {
+            msg = "We got a situation over here!";
+        }
+
+        return msg;
+    }
+
+    public Sprite getDesignSprite() {
+        String designID = null;
+        BuildKind buildKind = BuildKind.SHIP;
+        if (mBuildCompleteRecord != null) {
+            SituationReport.BuildCompleteRecord bcr = mBuildCompleteRecord;
+            buildKind = bcr.getBuildKind();
+            designID = bcr.getDesignID();
+        } else if (mMoveCompleteRecord != null) {
+            designID = mMoveCompleteRecord.getFleetDesignID();
+        } else if (mFleetDestroyedRecord != null) {
+            designID = mFleetDestroyedRecord.getFleetDesignID();
+        } else if (mFleetVictoriousRecord != null) {
+            designID = mFleetVictoriousRecord.getFleetDesignID();
+        } else if (mFleetUnderAttackRecord != null) {
+            designID = mFleetUnderAttackRecord.getFleetDesignID();
+        }
+
+        if (designID != null) {
+            Design design = DesignManager.getInstance(buildKind).getDesign(designID);
+            return design.getSprite();
+        } else {
+            return null;
+        }
+    }
+
+    private static String getFleetLine(String designID, float numShips) {
+        ShipDesign design = ShipDesignManager.getInstance().getDesign(designID);
+        String msg = design.getDisplayName();
+
+        int n = (int)(Math.ceil(numShips));
+        if (n > 1) {
+            msg += String.format(Locale.ENGLISH, " (× %d)", n);
+        }
+
+        return msg;
     }
 
     public static SituationReport fromProtocolBuffer(Messages.SituationReport pb) {
