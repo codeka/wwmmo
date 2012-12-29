@@ -6,8 +6,10 @@ import org.slf4j.LoggerFactory;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.provider.Settings.Secure;
 import au.com.codeka.warworlds.api.ApiClient;
+import au.com.codeka.warworlds.api.ApiException;
 import au.com.codeka.warworlds.model.protobuf.Messages;
 
 /**
@@ -17,14 +19,13 @@ import au.com.codeka.warworlds.model.protobuf.Messages;
 public class DeviceRegistrar {
     private static Logger log = LoggerFactory.getLogger(DeviceRegistrar.class);
 
-    public static void register(final Context context, String deviceRegistrationID) {
+    public static void register(final Context context) {
         final SharedPreferences settings = Util.getSharedPreferences(context);
 
         String registrationKey = null;
         try {
             Messages.DeviceRegistration registration = Messages.DeviceRegistration.newBuilder()
                 .setDeviceId(Secure.getString(context.getContentResolver(), Secure.ANDROID_ID))
-                .setDeviceRegistrationId(deviceRegistrationID)
                 .setDeviceBuild(android.os.Build.DISPLAY)
                 .setDeviceManufacturer(android.os.Build.MANUFACTURER)
                 .setDeviceModel(android.os.Build.MODEL)
@@ -45,6 +46,29 @@ public class DeviceRegistrar {
         SharedPreferences.Editor editor = settings.edit();
         editor.putString("DeviceRegistrar.registrationKey", registrationKey);
         editor.commit();
+    }
+
+    public static void updateGcmRegistration(final Context context,
+                                             final String gcmRegistrationID) {
+        new AsyncTask<Void, Void, Void>() {
+            @Override
+            protected Void doInBackground(Void... arg0) {
+                String deviceRegistrationKey = getDeviceRegistrationKey(context);
+                Messages.DeviceRegistration regpb = Messages.DeviceRegistration.newBuilder()
+                        .setGcmRegistrationId(gcmRegistrationID)
+                        .setKey(deviceRegistrationKey)
+                        .build();
+
+                String url = "/api/v1/devices/"+deviceRegistrationKey;
+                try {
+                    ApiClient.putProtoBuf(url, regpb);
+                } catch (ApiException e) {
+                    log.error("Could not update online status, ignored.");
+                }
+
+                return null;
+            }
+        }.execute();
     }
 
     public static void unregister(final Context context) {

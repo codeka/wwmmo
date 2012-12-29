@@ -818,7 +818,7 @@ def saveSituationReport(sitrep_pb):
     devices = ctrl.getDevicesForUser(empire_pb.email)
     registration_ids = []
     for device in devices.registrations:
-      registration_ids.append(device.device_registration_id)
+      registration_ids.append(device.gcm_registration_id)
     gcm = gcm_mdl.GCM('AIzaSyADWOC-tWUbzj-SVW13Sz5UuUiGfcmHHDA')
     gcm.json_request(registration_ids=registration_ids,
                      data={"sitrep": base64.b64encode(sitrep_blob)})

@@ -2,66 +2,42 @@
 package au.com.codeka.warworlds;
 
 import java.io.IOException;
-import java.util.concurrent.Callable;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.android.gcm.GCMBaseIntentService;
-import com.google.android.gcm.GCMRegistrar;
-
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+
+import com.google.android.gcm.GCMBaseIntentService;
+import com.google.android.gcm.GCMRegistrar;
 
 /**
  * Receive a push message from the Cloud to Device Messaging (C2DM) service.
  */
 public class GCMIntentService extends GCMBaseIntentService {
     private static Logger log = LoggerFactory.getLogger(GCMIntentService.class);
-    private static Callable<Void> sOnComplete;
-    private static Activity sActivity;
 
     public static String PROJECT_ID = "990931198580";
+
+    public GCMIntentService() {
+        super(PROJECT_ID);
+    }
 
     /**
      * Registers for C2DM notifications. Calls
      * AccountsActivity.registrationComplete() when finished.
      */
-    public static void register(Activity activity, final Callable<Void> onComplete) {
-        sOnComplete = onComplete;
-        sActivity = activity;
-
+    public static void register(Activity activity) {
         GCMRegistrar.register(activity, PROJECT_ID);
     }
 
     /**
      * Unregisters ourselves from C2DM notifications.
      */
-    public static void unregister(Activity activity,
-            final Callable<Void> onComplete) {
-        sOnComplete = onComplete;
-        sActivity = activity;
+    public static void unregister(Activity activity) {
         GCMRegistrar.unregister(activity);
-    }
-
-    /**
-     * Calls the onComplete handler (if there is one), making sure to do so on
-     * the main UI thread.
-     */
-    private static void callOnComplete() {
-        if (sOnComplete != null && sActivity != null) {
-            sActivity.runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        sOnComplete.call();
-                        sOnComplete = null;
-                    } catch (Exception e) {
-                    }
-                }
-            });
-        }
     }
 
     /**
@@ -75,10 +51,9 @@ public class GCMIntentService extends GCMBaseIntentService {
      *             if registration cannot be performed
      */
     @Override
-    public void onRegistered(Context context, String deviceRegistrationID) {
-        log.info("GCM device registration complete, deviceRegistrationID = "+deviceRegistrationID);
-        DeviceRegistrar.register(context, deviceRegistrationID);
-        callOnComplete();
+    public void onRegistered(Context context, String gcmRegistrationID) {
+        log.info("GCM device registration complete, gcmRegistrationID = "+gcmRegistrationID);
+        DeviceRegistrar.updateGcmRegistration(context, gcmRegistrationID);
     }
 
     /**
@@ -91,7 +66,6 @@ public class GCMIntentService extends GCMBaseIntentService {
     public void onUnregistered(Context context, String deviceRegistrationID) {
         log.info("Unregistered from GCM, deviceRegistrationID = "+deviceRegistrationID);
         DeviceRegistrar.unregister(context);
-        callOnComplete();
     }
 
     /**
@@ -100,8 +74,6 @@ public class GCMIntentService extends GCMBaseIntentService {
     @Override
     public void onError(Context context, String errorId) {
         log.error("An error has occured! Error={}", errorId);
-        DeviceRegistrar.register(context, "");
-        callOnComplete();
     }
 
     /**

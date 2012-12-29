@@ -39,7 +39,8 @@ def deviceRegistrationPbToModel(model, pb):
   if pb.HasField("key"):
     model.key = pb.key
   model.deviceID = pb.device_id
-  model.deviceRegistrationID = pb.device_registration_id
+  if pb.gcm_registration_id:
+    model.gcmRegistrationID = pb.gcm_registration_id
   model.deviceModel = pb.device_model
   model.deviceManufacturer = pb.device_manufacturer
   model.deviceBuild = pb.device_build
@@ -51,7 +52,8 @@ def deviceRegistrationPbToModel(model, pb):
 def deviceRegistrationModelToPb(pb, model):
   pb.key = str(model.key())
   pb.device_id = model.deviceID
-  pb.device_registration_id = model.deviceRegistrationID
+  if model.gcmRegistrationID:
+    pb.gcm_registration_id = model.gcmRegistrationID
   pb.device_model = model.deviceModel
   pb.device_manufacturer = model.deviceManufacturer
   pb.device_build = model.deviceBuild
@@ -314,14 +316,21 @@ def epochToDateTime(epoch):
 
 
 def updateDeviceRegistration(registration_pb, user):
-  registration_model = mdl.DeviceRegistration()
-  deviceRegistrationPbToModel(registration_model, registration_pb)
 
-  # ignore what they said in the PB, we'll set the user to their own user anyway
-  registration_model.user = user
-  registration_model.put()
+  # first, check if there's one already there for this device/user
+  registration_mdl = None
+  for this_mdl in mdl.DeviceRegistration.all().filter("deviceID", registration_pb.device_id):
+    if this_mdl.user.email() == user.email():
+      registration_mdl = this_mdl
+      break
+  if not registration_mdl:
+    registration_mdl = mdl.DeviceRegistration()
+  deviceRegistrationPbToModel(registration_mdl, registration_pb)
+  registration_mdl.user = user
 
-  deviceRegistrationModelToPb(registration_pb, registration_model)
+  registration_mdl.put()
+
+  deviceRegistrationModelToPb(registration_pb, registration_mdl)
   clearCached(["devices:for-user:%s" % (user.user_id())])
   return registration_pb
 

@@ -36,7 +36,7 @@ class DeviceRegistration(db.Model):
   """Represents the details of a device registration."""
 
   deviceID = db.StringProperty()
-  deviceRegistrationID = db.StringProperty()
+  gcmRegistrationID = db.StringProperty()
   user = db.UserProperty()
   deviceModel = db.StringProperty()
   deviceManufacturer = db.StringProperty()

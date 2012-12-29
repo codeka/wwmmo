@@ -141,6 +141,7 @@ public class WarWorldsActivity extends BaseActivity {
         new AsyncTask<Void, Void, String>() {
             private boolean mNeedsEmpireSetup;
             private boolean mErrorOccured;
+            private boolean mNoAutoRetry;
             private boolean mNeedsReAuthenticate;
 
             @Override
@@ -156,8 +157,9 @@ public class WarWorldsActivity extends BaseActivity {
                 try {
                     String deviceRegistrationKey = DeviceRegistrar.getDeviceRegistrationKey(mContext);
                     if (deviceRegistrationKey.length() == 0) {
+                        mNeedsReAuthenticate = true;
                         mErrorOccured = true;
-                        message = "<p>Your device was not registered... for some reason.</p>";
+                        message = "<p>Re-authentication needed...</p>";
                         return message;
                     }
                     String url = "hello/"+deviceRegistrationKey;
@@ -170,8 +172,10 @@ public class WarWorldsActivity extends BaseActivity {
                         mNeedsEmpireSetup = true;
                     }
 
-                    if (hello.hasRequireC2DmRegister() && hello.getRequireC2DmRegister()) {
-                        log.info("TODO: re-register for C2DM...");
+                    if (hello.hasRequireGcmRegister() && hello.getRequireGcmRegister()) {
+                        log.info("Re-registering for GCM...");
+                        GCMIntentService.register(WarWorldsActivity.this);
+                        // we can keep going, though...
                     }
 
                     ChatManager.getInstance().setup();
@@ -239,7 +243,7 @@ public class WarWorldsActivity extends BaseActivity {
                         mNeedHello = true;
 
                         startActivity(new Intent(mContext, AccountsActivity.class));
-                    } else {
+                    } else if (!mNoAutoRetry) {
                         // otherwise, just try again
                         mHandler.postDelayed(new Runnable() {
                             @Override

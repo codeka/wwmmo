@@ -42,15 +42,12 @@ import android.widget.ListView;
 import android.widget.TextView;
 import au.com.codeka.warworlds.api.ApiClient;
 
-import com.google.android.gcm.GCMRegistrar;
-
 /**
  * Account selections activity - handles device registration and unregistration.
  */
 public class AccountsActivity extends BaseActivity {
     final Logger log = LoggerFactory.getLogger(AccountsActivity.class);
     private int mAccountSelectedPosition = 0;
-    private boolean mPendingAuth = false;
     private Context mContext = this;
     private ProgressDialog mPleaseWaitDialog;
     private boolean mIsLogIn;
@@ -100,17 +97,8 @@ public class AccountsActivity extends BaseActivity {
             final Button logOutButton = (Button) findViewById(R.id.log_out_btn);
             logOutButton.setOnClickListener(new OnClickListener() {
                 public void onClick(View v) {
-                    // Unregister
-                    unregister(new Callable<Void>() {
-                        public Void call() {
-                            if (mPleaseWaitDialog != null) {
-                                mPleaseWaitDialog.dismiss();
-                            }
-
-                            finish();
-                            return null;
-                        }
-                    });
+                    unregister();
+                    finish();
                 }
             });
         }
@@ -126,15 +114,6 @@ public class AccountsActivity extends BaseActivity {
     @Override
     public void onResume() {
         super.onResume();
-        if (mPendingAuth) {
-            mPendingAuth = false;
-            String regId = GCMRegistrar.getRegistrationId(mContext);
-            if (regId != null && ! "".equals(regId)) {
-                DeviceRegistrar.register(mContext, regId);
-            } else {
-                GCMIntentService.register(this, null);
-            }
-        }
 
         if (mIsLogIn) {
             setLogInScreenContent();
@@ -206,32 +185,36 @@ public class AccountsActivity extends BaseActivity {
                 String authCookie = Authenticator.authenticate(AccountsActivity.this, accountName);
                 ApiClient.getCookies().clear();
                 ApiClient.getCookies().add(authCookie);
-                GCMIntentService.register(AccountsActivity.this, onComplete);
+
+                // Schedule registration with GCM, which will update our device
+                // when we get the registration ID
+                GCMIntentService.register(AccountsActivity.this);
 
                 // re-configure the authenticator, making sure it has details of the new user.
                 Authenticator.configure(mContext);
 
+                // register the fact that this device exists on the server
+                DeviceRegistrar.register(mContext);
                 return null;
+            }
+
+            @Override
+            protected void onPostExecute(Void param) {
+                try {
+                    onComplete.call();
+                } catch (Exception e) {
+                }
             }
         }.execute();
     }
 
-    private void unregister(final Callable<Void> onComplete) {
-        mPleaseWaitDialog = ProgressDialog.show(mContext, null, "Logging out...", true);
-        GCMIntentService.unregister(this, new Callable<Void>() {
-            public Void call() {
-                final SharedPreferences prefs = Util.getSharedPreferences(mContext);
-                SharedPreferences.Editor editor = prefs.edit();
-                editor.remove("AccountName");
-                editor.commit();
+    private void unregister() {
+        GCMIntentService.unregister(this);
 
-                try {
-                    onComplete.call();
-                } catch(Exception e) {
-                }
-                return null;
-            }
-        });
+        final SharedPreferences prefs = Util.getSharedPreferences(mContext);
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.remove("AccountName");
+        editor.commit();
     }
 
     /**

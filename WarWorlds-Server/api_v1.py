@@ -114,7 +114,7 @@ class HelloPage(ApiPage):
       hello_pb.motd.last_update = ""
 
     if device_mdl:
-      hello_pb.require_c2dm_register = (device_mdl.deviceRegistrationID == "")
+      hello_pb.require_gcm_register = (device_mdl.gcmRegistrationID == "")
 
     if empire_pb is not None:
       hello_pb.empire.MergeFrom(empire_pb)
@@ -257,18 +257,25 @@ class DevicesPage(ApiPage):
       logging.warn("No device with key [%s] to delete." % (key))
 
   def put(self, key):
-    device_online_status_pb = self._getRequestBody(pb.DeviceOnlineStatus)
+    if self.request.get("online_status") == "1":
+      device_online_status_pb = self._getRequestBody(pb.DeviceOnlineStatus)
 
-    query = model.OnlineDevice.all().filter("device", db.Key(key))
-    for device in query:
-      device.delete()
+      query = model.OnlineDevice.all().filter("device", db.Key(key))
+      for device in query:
+        device.delete()
 
-    if device_online_status_pb.is_online:
-      online_device_mdl = model.OnlineDevice()
-      online_device_mdl.device = db.Key(key)
-      online_device_mdl.user = self.user
-      online_device_mdl.onlineSince = datetime.now()
-      online_device_mdl.put()
+      if device_online_status_pb.is_online:
+        online_device_mdl = model.OnlineDevice()
+        online_device_mdl.device = db.Key(key)
+        online_device_mdl.user = self.user
+        online_device_mdl.onlineSince = datetime.now()
+        online_device_mdl.put()
+    else:
+      device_registration_pb = self._getRequestBody(pb.DeviceRegistration)
+
+      device_registration_mdl = model.DeviceRegistration.get(key)
+      device_registration_mdl.gcmRegistrationID = device_registration_pb.gcm_registration_id
+      device_registration_mdl.put()
 
 
 class DeviceMessagesPage(ApiPage):
@@ -285,7 +292,7 @@ class DeviceMessagesPage(ApiPage):
     devices = ctrl.getDevicesForUser(email)
     registration_ids = []
     for device in devices.registrations:
-      registration_ids.append(device.device_registration_id)
+      registration_ids.append(device.gcm_registration_id)
     gcm = gcm_mdl.GCM('AIzaSyADWOC-tWUbzj-SVW13Sz5UuUiGfcmHHDA')
     gcm.json_request(registration_ids=registration_ids,
                      data={"msg": "Hello World"})
