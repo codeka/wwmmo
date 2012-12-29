@@ -17,6 +17,7 @@ import android.util.AttributeSet;
 import android.util.Base64;
 import android.view.View;
 import android.webkit.WebView;
+import android.webkit.WebViewClient;
 
 /**
  * A \c WebView with a transparent background. It's a little tricky and the method
@@ -29,6 +30,7 @@ public class TransparentWebView extends WebView {
     public TransparentWebView(Context context, AttributeSet attrs) {
         super(context, attrs);
         setTransparent();
+        setWebViewClient(new WebViewClient());
     }
 
     @Override
