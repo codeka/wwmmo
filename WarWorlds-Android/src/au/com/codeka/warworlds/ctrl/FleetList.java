@@ -32,8 +32,11 @@ import android.widget.SpinnerAdapter;
 import android.widget.TextView;
 import au.com.codeka.TimeInHours;
 import au.com.codeka.warworlds.R;
+import au.com.codeka.warworlds.model.Empire;
+import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.Fleet;
 import au.com.codeka.warworlds.model.ImageManager;
+import au.com.codeka.warworlds.model.MyEmpire;
 import au.com.codeka.warworlds.model.SectorManager;
 import au.com.codeka.warworlds.model.ShipDesign;
 import au.com.codeka.warworlds.model.ShipDesignManager;
@@ -272,7 +275,22 @@ public class FleetList extends FrameLayout implements StarManager.StarFetchedHan
                         }
                     });
         } else {
+            row3.setText("");
             row3.setVisibility(View.GONE);
+
+            final MyEmpire myEmpire = EmpireManager.getInstance().getEmpire();
+            EmpireManager.getInstance().fetchEmpire(fleet.getEmpireKey(), new EmpireManager.EmpireFetchedHandler() {
+                @Override
+                public void onEmpireFetched(Empire empire) {
+                    row3.setVisibility(View.VISIBLE);
+
+                    if (myEmpire.getKey().equals(empire.getKey())) {
+                        row3.setText(empire.getDisplayName());
+                    } else {
+                        row3.setText(Html.fromHtml("<font color=\"red\">"+empire.getDisplayName()+"</font>"));
+                    }
+                }
+            });
         }
     }
 

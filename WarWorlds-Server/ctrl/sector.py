@@ -127,7 +127,6 @@ def getStar(star_key, force_nocache=False):
           if empire_presence_pb.empire_key == building_empire_key:
             effect.applyToEmpirePresence(building_pb, empire_presence_pb)
 
-
   min_time_emptied = ctrl.dateTimeToEpoch(datetime.now() - timedelta(days=4))
   if not star_pb.colonies and star_pb.time_emptied < min_time_emptied:
     _addNativeColonies(star_pb)

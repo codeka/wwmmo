@@ -42,6 +42,9 @@ public class TimeInHours {
 
     public static String format(DateTime then) {
         DateTime now = DateTime.now(DateTimeZone.UTC);
+        if (now.isBefore(then)) {
+            return "just now";
+        }
         Duration d = new Interval(then, now).toDuration();
         if (d.compareTo(Duration.standardSeconds(15)) <  0)
             d = Duration.standardSeconds(5);

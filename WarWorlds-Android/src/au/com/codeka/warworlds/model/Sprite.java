@@ -8,10 +8,8 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
-import android.graphics.RectF;
 import au.com.codeka.Point2D;
 
 public class Sprite {
@@ -120,47 +118,6 @@ public class Sprite {
 
             canvas.drawBitmap(mImage.getBitmap(), frame.getRect(), r, sPaint);
         }
-    }
-
-    /**
-     * Creates an "icon" of this sprite, which is typically scaled up to the nearest
-     * integer multiple of the current size, that's smaller than the given width/height.
-     */
-    public Bitmap createIcon(int width, int height) {
-        return createIcon(width, height, 0);
-    }
-
-    public Bitmap createIcon(int width, int height, int frameNo) {
-        SpriteFrame frame = getFrame(frameNo);
-
-        int scaleWidth = getWidth();
-        int scaleHeight = getHeight();
-        int factor = 1;
-        while ((scaleWidth * factor) < width && (scaleHeight * factor) < height) {
-            factor += 1;
-        }
-        if (factor > 1) {
-            factor --;
-        }
-        if (factor > 4) {
-            factor = 4;
-        }
-        scaleWidth *= factor;
-        scaleHeight *= factor;
-
-        Paint p = new Paint();
-        p.setARGB(255, 255, 255, 255);
-        p.setDither(false);
-
-        Bitmap bmp = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-        Canvas c = new Canvas(bmp);
-        c.drawColor(Color.TRANSPARENT);
-
-        float x = (width / 2.0f) - (scaleWidth / 2.0f);
-        float y = (height / 2.0f) - (scaleHeight / 2.0f);
-        c.drawBitmap(mImage.getBitmap(), frame.getRect(),
-                     new RectF(x, y, x + scaleWidth, y + scaleHeight), p);
-        return bmp;
     }
 
     public static class SpriteFrame {

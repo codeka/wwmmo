@@ -480,6 +480,8 @@ class Simulation(object):
       # max population. If population is decreasing, it slows down the FURTHER
       # you get.
       max_factor = float(colony_pb.max_population)
+      if max_factor < 10:
+        max_factor = 10
       max_factor = colony_pb.population / max_factor
       if max_factor > 1.0:
         # population is bigger than it should be...
@@ -785,6 +787,21 @@ class Simulation(object):
         if destroyed_colony_pb.key == colony_pb.key:
           colony_model.delete()
           #TODO: notify owner!
+
+          # if there's no more colonies in this star, make sure we update
+          # the time_emptied field so that it doesn't just create a bunch
+          # more native colonies the next time around...
+          num_remaining_colonies = len(star_pb.colonies)
+          for star_colony_pb in star_pb.colonies:
+            for destroyed_colony_pb in self.destroyed_colony_pbs:
+              if star_colony_pb.key == destroyed_colony_pb.key:
+                num_remaining_colonies -= 1
+          if num_remaining_colonies <= 0:
+            star_mdl = sector_mdl.Star.get(db.Key(star_pb.key))
+            star_mdl.time_emptied = ctrl.dateTimeToEpoch(self.now)
+            star_mdl.put()
+            # note: we'll clear the cached version of this star anyway...
+
           return
       ctrl.colonyPbToModel(colony_model, colony_pb)
       colony_model.put()

@@ -46,6 +46,7 @@ public class WarWorldsActivity extends BaseActivity {
     private Handler mHandler;
     private boolean mNeedHello;
     private List<Colony> mColonies;
+    private String mStarKey;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -214,7 +215,6 @@ public class WarWorldsActivity extends BaseActivity {
                 final TransparentWebView motdView = (TransparentWebView) findViewById(R.id.motd);
 
                 mConnectionStatus.setText("Connected");
-                mStartGameButton.setEnabled(true);
                 if (mNeedsEmpireSetup) {
                     mNeedHello = true;
                     startActivity(new Intent(mContext, EmpireSetupActivity.class));
@@ -226,6 +226,7 @@ public class WarWorldsActivity extends BaseActivity {
                     BackgroundDetector.getInstance().onBackgroundStatusChange(WarWorldsActivity.this);
 
                     motdView.loadHtml("html/skeleton.html", result);
+                    findColony();
                 } else /* mErrorOccured */ {
                     mConnectionStatus.setText("Connection Failed");
                     mStartGameButton.setEnabled(false);
@@ -257,6 +258,41 @@ public class WarWorldsActivity extends BaseActivity {
         }.execute();
     }
 
+    private void findColony() {
+        // we'll want to start off near one of your stars. If you
+        // only have one, that's easy -- but if you've got lots
+        // what then?
+        mStarKey = null;
+        for (Colony c : mColonies) {
+            mStarKey = c.getStarKey();
+        }
+
+        if (mStarKey != null) {
+            mStartGameButton.setEnabled(false);
+            StarManager.getInstance().requestStarSummary(mContext, mStarKey,
+                    new StarManager.StarSummaryFetchedHandler() {
+                @Override
+                public void onStarSummaryFetched(StarSummary s) {
+                    mStartGameButton.setEnabled(true);
+
+                    // we don't do anything with the star, we just want
+                    // to make sure it's in the cache before we start
+                    // the activity. Now the start button is ready to go!
+                    mStartGameButton.setEnabled(true);
+
+                    boolean showSituationReport = getIntent().getBooleanExtra("au.com.codeka.warworlds.ShowSituationReport", false);
+                    if (showSituationReport) {
+                        Intent intent = new Intent(mContext, StarfieldActivity.class);
+                        intent.putExtra("au.com.codeka.warworlds.ShowSituationReport", true);
+                        startActivity(intent);
+                    }
+                }
+            });
+        } else {
+            mStartGameButton.setEnabled(true);
+        }
+    }
+
     private void setHomeScreenContent() {
         setContentView(R.layout.home);
 
@@ -284,34 +320,9 @@ public class WarWorldsActivity extends BaseActivity {
 
         mStartGameButton.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
-                // we'll want to start off near one of your stars. If you
-                // only have one, that's easy -- but if you've got lots
-                // what then?
-                String starKey = null;
-                for (Colony c : mColonies) {
-                    starKey = c.getStarKey();
-                }
-
                 final Intent intent = new Intent(mContext, StarfieldActivity.class);
-                intent.putExtra("au.com.codeka.warworlds.StarKey", starKey);
-
-                if (starKey != null) {
-                    mStartGameButton.setEnabled(false);
-                    StarManager.getInstance().requestStarSummary(mContext, starKey,
-                            new StarManager.StarSummaryFetchedHandler() {
-                        @Override
-                        public void onStarSummaryFetched(StarSummary s) {
-                            mStartGameButton.setEnabled(true);
-
-                            // we don't do anything with the star, we just want
-                            // to make sure it's in the cache before we start
-                            // the activity.
-                            startActivity(intent);
-                        }
-                    });
-                } else {
-                    startActivity(intent);
-                }
+                intent.putExtra("au.com.codeka.warworlds.StarKey", mStarKey);
+                startActivity(intent);
             }
         });
     }

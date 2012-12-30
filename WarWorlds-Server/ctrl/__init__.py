@@ -303,7 +303,6 @@ def combatReportModelToPb(combat_report_pb, combat_report_mdl, summary=False):
     combat_rounds_pb = pb.CombatReport()
     combat_rounds_pb.ParseFromString(combat_report_mdl.rounds)
     combat_rounds_pb.ParseFromString(combat_report_mdl.rounds)
-    combat_report_pb.key =str(len(combat_rounds_pb.rounds))
     combat_report_pb.rounds.extend(combat_rounds_pb.rounds)
 
 

@@ -28,6 +28,7 @@ import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Matrix;
 import android.media.AudioManager;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
@@ -178,8 +179,8 @@ public class MessageDisplay {
             return null;
         }
 
-        // TODO: make this show the situation report
         Intent intent = new Intent(context, WarWorldsActivity.class);
+        intent.putExtra("au.com.codeka.warworlds.ShowSituationReport", true);
         PendingIntent pendingIntent = PendingIntent.getActivity(
                 context, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT);
 
@@ -189,15 +190,21 @@ public class MessageDisplay {
             int iconWidth = context.getResources().getDimensionPixelSize(android.R.dimen.notification_large_icon_width);
             int iconHeight = context.getResources().getDimensionPixelSize(android.R.dimen.notification_large_icon_height);
 
-            Bitmap largeIcon;
+            Bitmap largeIcon = Bitmap.createBitmap(iconWidth, iconHeight, Bitmap.Config.ARGB_8888);
+            Canvas canvas = new Canvas(largeIcon);
+
             Sprite designSprite = sitrep.getDesignSprite();
             if (designSprite != null) {
-                largeIcon = designSprite.createIcon(iconWidth, iconHeight);
-            } else {
-                largeIcon = Bitmap.createBitmap(iconWidth, iconHeight, Bitmap.Config.ARGB_8888);
+                Matrix matrix = new Matrix();
+                matrix.setScale((float) iconWidth / (float) designSprite.getWidth(),
+                                (float) iconHeight / (float) designSprite.getHeight());
+
+                canvas.save();
+                canvas.setMatrix(matrix);
+                designSprite.draw(canvas);
+                canvas.restore();
             }
 
-            Canvas canvas = new Canvas(largeIcon);
             Sprite starSprite = StarImageManager.getInstance().getSprite(context, star, iconWidth / 2);
             starSprite.draw(canvas);
 

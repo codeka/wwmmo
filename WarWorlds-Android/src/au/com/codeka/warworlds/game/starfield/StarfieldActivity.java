@@ -101,6 +101,12 @@ public class StarfieldActivity extends BaseActivity {
                     }
                 });
             }
+
+            boolean showSituationReport = extras.getBoolean("au.com.codeka.warworlds.ShowSituationReport", false);
+            if (showSituationReport) {
+                Intent intent = new Intent(mContext, SitrepActivity.class);
+                startActivity(intent);
+            }
         }
 
         mPlanetListAdapter = new PlanetListAdapter();
