@@ -260,6 +260,10 @@ message Star
     optional int64 time_emptied = 17;
 }
 
+message Stars {
+    repeated Star stars = 1;
+}
+
 //
 // Represents a planet in the star system. A planet orbits a \c Star which in turn belongs
 // to a \c Sector.

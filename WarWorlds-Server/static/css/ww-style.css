@@ -1,0 +1,74 @@
+/*
+ * Provides CSS for styling elements in the distinctive "War Worlds" style.
+ */
+
+ 
+
+.cut-off {
+  position: relative;
+  background: black;
+  width: 200pt;
+  height: 75pt;
+  border-top: solid 1px #0ed7fe;
+  border-right: solid 1px #0ed7fe;
+  color: white;
+  padding: 4px 4px 0 0;
+}
+
+.cut-off:before {
+  position: absolute;
+  content: "";
+  top: 2px;
+  left: -5px;
+  bottom: -2px;
+  width: 4px;
+  background: black;
+  -webkit-transform: skewy(-45deg);
+  -moz-transform: skewy(-45deg);
+  transform: skewy(-45deg);
+  border-top: solid 1px #0ed7fe;
+  border-left: solid 1px #0ed7fe;
+}
+
+.cut-off:after {
+  position: absolute;
+  bottom: -4px;
+  left: -2px;
+  right: 2px;
+  height: 4px;
+  content: "";
+  background: black;
+  -webkit-transform: skewx(-45deg);
+  -moz-transform: skewx(-45deg);
+  transform: skewx(-45deg);
+  border-right: solid 1px #0ed7fe;
+  border-bottom: solid 1px #0ed7fe;
+}
+
+a {
+  color: #0ed7fe;
+}
+
+div.edittext {
+  position: relative;
+  background: black;
+  border: none;
+}
+
+div.edittext:after {
+  content: "";
+  position: absolute;
+  bottom: 4px;
+  left: 0;
+  right: 0;
+  height: 4px;
+  border: solid 1px #0ed7fe;
+  border-top: none;
+}
+
+div.edittext input {
+  outline: none;
+  background: transparent;
+  border: none;
+  color: #fff;
+}

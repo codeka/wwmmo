@@ -89,19 +89,19 @@ def colonyModelToPb(colony_pb, colony_model):
   colony_pb.planet_index = colony_model.planet_index
   colony_pb.population = colony_model.population
   colony_pb.last_simulation = int(dateTimeToEpoch(colony_model.lastSimulation))
-  if colony_model.focusPopulation:
+  if colony_model.focusPopulation > 0:
     colony_pb.focus_population = colony_model.focusPopulation
   else:
     colony_pb.focus_population = 0.0
-  if colony_model.focusFarming:
+  if colony_model.focusFarming > 0:
     colony_pb.focus_farming = colony_model.focusFarming
   else:
     colony_pb.focus_farming = 0.0
-  if colony_model.focusMining:
+  if colony_model.focusMining > 0:
     colony_pb.focus_mining = colony_model.focusMining
   else:
     colony_pb.focus_mining = 0.0
-  if colony_model.focusConstruction:
+  if colony_model.focusConstruction > 0:
     colony_pb.focus_construction = colony_model.focusConstruction
   else:
     colony_pb.focus_construction = 0.0

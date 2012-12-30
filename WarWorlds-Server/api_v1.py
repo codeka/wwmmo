@@ -387,6 +387,15 @@ class StarPage(StarfieldPage):
     return star_pb
 
 
+class StarsPage(ApiPage):
+  def get(self):
+    query = self.request.get("q")
+    if query:
+      return sector.getStars(query)
+    else:
+      self.response.set_status(404)
+
+
 class StarSimulatePage(ApiPage):
   """This is a debugging page that lets us simulate a star on-demand."""
 
@@ -672,6 +681,7 @@ app = ApiApplication([("/api/v1/hello/([^/]+)", HelloPage),
                       ("/api/v1/devices/user:([^/]+)/messages", DeviceMessagesPage),
                       ("/api/v1/buildqueue", BuildQueuePage),
                       ("/api/v1/sectors", SectorsPage),
+                      ("/api/v1/stars", StarsPage),
                       ("/api/v1/stars/([^/]+)", StarPage),
                       ("/api/v1/stars/([^/]+)/simulate", StarSimulatePage),
                       ("/api/v1/stars/([^/]+)/build/([^/]+)/accelerate", BuildAcceleratePage),

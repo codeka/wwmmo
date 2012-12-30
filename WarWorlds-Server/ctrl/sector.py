@@ -5,7 +5,6 @@ from datetime import datetime, timedelta
 
 import math
 import random
-import logging
 
 import ctrl
 from ctrl import designs
@@ -135,6 +134,17 @@ def getStar(star_key, force_nocache=False):
 
   ctrl.setCached({cache_key: star_pb})
   return star_pb
+
+
+def getStars(search_query):
+  """Searches for stars based on the given query (by default, name of the star)."""
+  stars_pb = pb.Stars()
+  query = (mdl.Star.all().filter("name >=", search_query)
+                         .filter("name <", search_query + u"\ufffd"))
+  for star_mdl in query:
+    star_pb = stars_pb.stars.add()
+    ctrl.starModelToPb(star_pb, star_mdl)
+  return stars_pb
 
 
 def _addNativeColonies(star_pb):

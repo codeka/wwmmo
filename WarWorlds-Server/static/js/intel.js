@@ -333,6 +333,19 @@ $(function() {
       this.draw(onComplete);
     },
 
+    scrollTo: function(sectorX, sectorY, offsetX, offsetY) {
+      this.sectorX = sectorX;
+      this.sectorY = sectorY;
+      this.offsetX = -offsetX;
+      this.offsetY = -offsetY;
+
+      // "drag" the view by half the canvas width/height so that the given
+      // position is actually in the centre of the screen (which is what you'd
+      // usually expect)
+      $doc = $(document);
+      this.drag($doc.width() / 2, $doc.height() / 2);
+    },
+
     update: function(now) {
       for (var i = 0; i < this._sectors.length; i++) {
         this._sectors[i].update(now);
@@ -515,11 +528,17 @@ $(function() {
 
     $(document).on("keydown", function(evnt) {
       if (evnt.which >= LEFT && evnt.which <= DOWN) {
+        if (evnt.target.tagName == "INPUT") {
+          return;
+        }
         pressed.push(evnt.which);
         keyScroll();
       }
     }).on("keyup", function(evnt) {
       if (evnt.which >= LEFT && evnt.which <= DOWN) {
+        if (evnt.target.tagName == "INPUT") {
+          return;
+        }
         var remaining = []
         for (var i = 0; i < pressed.length; i++) {
           if (pressed[i] != evnt.which) {
@@ -528,6 +547,52 @@ $(function() {
         }
         pressed = remaining;
       }
-    });;
+    });
+  });
+
+  // Handles searching
+  $(function() {
+    var collapsedHeight = $("#search").height();
+
+    $("#search").on("keypress", function(evnt) {
+      if (evnt.which == 13) {
+        var $results = $("#search-results");
+        var $tmpl = $("#search-result-tmpl");
+        var url = "/api/v1/stars?q="+$("#search input[type=text]").val();
+
+        $results.empty();
+
+        $.ajax({
+          "url": url,
+          "dataType": "json",
+          "success": function(data) {
+            $("#search").animate({"height": 300}, "fast");
+            for (var n = 0; n < data.stars.length; n++) {
+              var star_pb = data.stars[n];
+              Math.seedrandom(star_pb.key);
+              star_pb.icon_class = star_pb.classification.split(".")[1].toLowerCase();
+              star_pb.icon_class += "-"+(parseInt(Math.random() * 4) + 1);
+
+              $html = $($tmpl.applyTemplate(star_pb));
+              $html.data("star_pb", star_pb);
+              $results.append($html);
+            }
+            $("#search-close").css("display", "block");
+          }
+        });
+      }
+    });
+
+    $("#search-results").on("click", "div.search-result", function(evnt) {
+      var star_pb = $(this).data("star_pb");
+      world.scrollTo(star_pb.sector_x, star_pb.sector_y,
+                     star_pb.offset_x, star_pb.offset_y);
+    });
+
+    $("#search-close").on("click", function(evnt) {
+      $("#search-results").empty();
+      $("#search").animate({"height": collapsedHeight}, "fast");
+      $(this).css("display", "none");
+    });
   });
 });
