@@ -26,10 +26,19 @@
       <div id="search-results"></div>
       <a href="javascript:;" id="search-close" style="display: none;">Close</a>
     </div>
+    <div id="star-details" class="cut-off dialog" style="display: none;">
+      <div class="star-icon-container"><div class="star-icon-big"></div></div>
+      <div class="star-name"></div>
+      <div class="star-classification"></div>
+
+      <div class="star-key">
+        Key: <input type="text" readonly>
+      </div>
+    </div>
 
     <script id="search-result-tmpl" type="text/html">
       <div class="search-result">
-        <div class="star-icon <%= icon_class %>"></div>
+        <div class="star-icon-small <%= icon_class %>"></div>
         <span class="star-name"><%= name %></span>
       </div>
     </script>

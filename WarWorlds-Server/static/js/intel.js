@@ -82,6 +82,10 @@ $(function() {
       }
     },
 
+    length2: function() {
+      return (this.x * this.x) + (this.y * this.y);
+    },
+
     length: function() {
       return Math.sqrt((this.x * this.x) + (this.y * this.y));
     },
@@ -178,8 +182,8 @@ $(function() {
       context.textAlign = "center";
       context.font = "12pt sans-serif"
       context.fillText(this.name,
-                      offsetX + this.offsetX,
-                      offsetY + this.offsetY + this.size + 6);
+                       offsetX + this.offsetX,
+                       offsetY + this.offsetY + this.size + 6);
     }
   });
   Star.small = {
@@ -346,6 +350,40 @@ $(function() {
       this.drag($doc.width() / 2, $doc.height() / 2);
     },
 
+    direction: function(from, to) {
+      var dx = from.offsetX - to.offsetX;
+      var dy = from.offsetY - to.offsetY;
+
+      var dsx = from.sectorX - to.sectorX;
+      dx += (dsx * Sector.SIZE);
+
+      var dsy = from.sectorY - to.sectorY;
+      dy += (dsy * Sector.SIZE);
+
+      return new Vector2(dx, dy);
+    },
+
+    findClosestStar: function(pos) {
+      for (var i = 0; i < this._sectors.length; i++) {
+        var sector = this._sectors[i];
+        if (sector.sectorX == pos.sectorX &&
+            sector.sectorY == pos.sectorY) {
+          var closest = null;
+          var distance = null;
+          for (var j = 0; j < sector.stars.length; j++) {
+            var star = sector.stars[j];
+            var d = this.direction(pos, star).length2();
+            if (closest == null || d < distance) {
+              closest = star;
+              distance = d;
+            }
+          }
+          return closest;
+        }
+      }
+      return null;
+    },
+
     update: function(now) {
       for (var i = 0; i < this._sectors.length; i++) {
         this._sectors[i].update(now);
@@ -480,12 +518,14 @@ $(function() {
   $(function() {
     var canvas = $("#main-canvas");
     var isDragging = false;
+    var startX = 0;
+    var startY = 0;
     var lastX = 0;
     var lastY = 0;
     canvas.on("mousedown", function(evnt) {
       isDragging = true;
-      lastX = evnt.pageX;
-      lastY = evnt.pageY;
+      lastX = startX = evnt.pageX;
+      lastY = startY = evnt.pageY;
     }).on("mouseup", function(evnt) {
       isDragging = false;
     }).on("mousemove", function(evnt) {
@@ -496,7 +536,16 @@ $(function() {
         lastY = evnt.pageY;
 
         world.drag(dx, dy);
+        var pt = new Vector2(lastX, lastY);
+        pt.add(new Vector2(startX, startY));
+        if (pt.length() > 10) {
+          canvas.data("dragged", true);
+        }
       }
+    }).on("click", function(evnt) {
+      setTimeout(function() {
+        canvas.data("dragged", false);
+      }, 10);
     });
 
     var LEFT = 37;
@@ -593,6 +642,63 @@ $(function() {
       $("#search-results").empty();
       $("#search").animate({"height": collapsedHeight}, "fast");
       $(this).css("display", "none");
+    });
+  });
+
+  // Handles selection of stars (i.e. clicking on them)
+  $(function() {
+    var canvas = $("#main-canvas");
+    var mouseOverStar = null;
+    canvas.on("mousemove", function(evnt) {
+      var mpos = {"sectorX": 0, "sectorY": 0, "offsetX": evnt.pageX, "offsetY": evnt.pageY};
+
+      mpos.offsetX -= world.offsetX;
+      mpos.offsetY -= world.offsetY;
+      mpos.sectorX = world.sectorX;
+      mpos.sectorY = world.sectorY;
+      while (mpos.offsetX < 0) {
+        mpos.sectorX -= 1;
+        mpos.offsetX += Sector.SIZE;
+      }
+      while (mpos.offsetX > Sector.SIZE) {
+        mpos.sectorX += 1;
+        mpos.offsetX -= Sector.SIZE;
+      }
+      while (mpos.offsetY < 0) {
+        mpos.sectorY -= 1;
+        mpos.offsetY += Sector.SIZE;
+      }
+      while (mpos.offsetY > Sector.SIZE) {
+        mpos.sectorY += 1;
+        mpos.offsetY -= Sector.SIZE;
+      }
+
+      var star = world.findClosestStar(mpos);
+      if (star != null && world.direction(mpos, star).length() < 20) {
+        mouseOverStar = star;
+        canvas.css("cursor", "pointer");
+      } else {
+        mouseOverStar = null;
+        canvas.css("cursor", "default");
+      }
+    }).on("click", function(evnt) {
+      if (canvas.data("dragged")) {
+        return;
+      }
+      if (mouseOverStar == null) {
+        $("#star-details").fadeOut("fast");
+      } else {
+          var star = mouseOverStar;
+          Math.seedrandom(star.key);
+          var $details = $("#star-details");
+          var className = star.type.split(".")[1].toLowerCase();
+          className += "-"+randomInt(1, 4);
+          $details.find("div.star-icon-big").attr("class", "star-icon-big "+className);
+          $details.find("div.star-name").html(star.name);
+          $details.find("div.star-classification").html(star.type.split(".")[1].toLowerCase());
+          $details.find("div.star-key input").val(star.key);
+          $details.fadeIn("fast");
+      }
     });
   });
 });

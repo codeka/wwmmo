@@ -60,7 +60,7 @@ body {
   background: #0c6476;
 }
 
-#search-results div.search-result div.star-icon {
+#search-results div.search-result div.star-icon-small {
   position: absolute;
   top: -webkit-calc(16pt - 16px);
   top: calc(16pt - 16px);
@@ -80,34 +80,122 @@ body {
   line-height: 32pt;
 }
 
-div.star-icon { background: url(/intel/stars_small.png) no-repeat; }
-div.star-icon.blackhole-1 { background-position: 0 0; }
-div.star-icon.blackhole-2 { background-position: -32px 0; }
-div.star-icon.blackhole-3 { background-position: -64px 0; }
-div.star-icon.blackhole-4 { background-position: -96px 0; }
-div.star-icon.blue-1 { background-position: 0 -32px; }
-div.star-icon.blue-2 { background-position: -32px -32px; }
-div.star-icon.blue-3 { background-position: -64px -32px; }
-div.star-icon.blue-4 { background-position: -96px -32px; }
+#star-details {
+  position: absolute;
+  left: 10pt;
+  bottom: 10pt;
+  width: 200pt;
+  height: 200pt;
+}
 
-div.star-icon.neutron-1 { background-position: 0 -32px; }
-div.star-icon.neutron-2 { background-position: -32px -32px; }
-div.star-icon.neutron-3 { background-position: -64px -32px; }
-div.star-icon.neutron-4 { background-position: -96px -32px; }
+#star-details div.star-icon-container {
+  position: absolute;
+  top: 0; right: 0;
+  width: 150px;
+  height: 150px;
+  overflow: hidden;
+}
 
-div.star-icon.orange-1 { background-position: 0 -192px; }
-div.star-icon.orange-2 { background-position: -32px -192px; }
-div.star-icon.orange-3 { background-position: -64px -192px; }
-div.star-icon.orange-4 { background-position: -96px -192px; }
-div.star-icon.red-1 { background-position: 0 -224px; }
-div.star-icon.red-2 { background-position: -32px -224px; }
-div.star-icon.red-3 { background-position: -64px -224px; }
-div.star-icon.red-4 { background-position: -96px -224px; }
-div.star-icon.white-1 { background-position: 0 -256px; }
-div.star-icon.white-2 { background-position: -32px -256px; }
-div.star-icon.white-3 { background-position: -64px -256px; }
-div.star-icon.white-4 { background-position: -96px -256px; }
-div.star-icon.yellow-1 { background-position: 0 -288px; }
-div.star-icon.yellow-2 { background-position: -32px -288px; }
-div.star-icon.yellow-3 { background-position: -64px -288px; }
-div.star-icon.yellow-4 { background-position: -96px -288px; }
+#star-details div.star-icon-big {
+  position: absolute;
+  top: -106px; right: -106px;
+  width: 256px;
+  height: 256px;
+}
+
+#star-details div.star-name {
+  position: absolute;
+  top: 10pt;
+  left: 10pt;
+  font-size: 18pt;
+  font-weight: bold;
+}
+
+#star-details div.star-classification {
+  position: absolute;
+  top: 28pt;
+  left: 10pt;
+  color: #ccc;
+}
+
+#star-details div.star-key {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 20px;
+  line-height: 20px;
+  color: #ccc;
+}
+#star-details div.star-key input {
+  position: absolute;
+  top: 0;
+  left: 30px;
+  right: 0;
+  bottom: 0;
+  background: transparent;
+  border: none;
+  color: #ccc;
+}
+
+div.star-icon-small { background: url(/intel/stars_small.png) no-repeat; }
+div.star-icon-small.blackhole-1 { background-position: 0 0; }
+div.star-icon-small.blackhole-2 { background-position: -32px 0; }
+div.star-icon-small.blackhole-3 { background-position: -64px 0; }
+div.star-icon-small.blackhole-4 { background-position: -96px 0; }
+div.star-icon-small.blue-1 { background-position: 0 -32px; }
+div.star-icon-small.blue-2 { background-position: -32px -32px; }
+div.star-icon-small.blue-3 { background-position: -64px -32px; }
+div.star-icon-small.blue-4 { background-position: -96px -32px; }
+
+div.star-icon-small.neutron-1 { background-position: 0 -32px; }
+div.star-icon-small.neutron-2 { background-position: -32px -32px; }
+div.star-icon-small.neutron-3 { background-position: -64px -32px; }
+div.star-icon-small.neutron-4 { background-position: -96px -32px; }
+
+div.star-icon-small.orange-1 { background-position: 0 -192px; }
+div.star-icon-small.orange-2 { background-position: -32px -192px; }
+div.star-icon-small.orange-3 { background-position: -64px -192px; }
+div.star-icon-small.orange-4 { background-position: -96px -192px; }
+div.star-icon-small.red-1 { background-position: 0 -224px; }
+div.star-icon-small.red-2 { background-position: -32px -224px; }
+div.star-icon-small.red-3 { background-position: -64px -224px; }
+div.star-icon-small.red-4 { background-position: -96px -224px; }
+div.star-icon-small.white-1 { background-position: 0 -256px; }
+div.star-icon-small.white-2 { background-position: -32px -256px; }
+div.star-icon-small.white-3 { background-position: -64px -256px; }
+div.star-icon-small.white-4 { background-position: -96px -256px; }
+div.star-icon-small.yellow-1 { background-position: 0 -288px; }
+div.star-icon-small.yellow-2 { background-position: -32px -288px; }
+div.star-icon-small.yellow-3 { background-position: -64px -288px; }
+div.star-icon-small.yellow-4 { background-position: -96px -288px; }
+
+div.star-icon-big { background: url(/intel/stars_big.png) no-repeat; }
+div.star-icon-big.blackhole-1 { background-position: 0 0; }
+div.star-icon-big.blackhole-2 { background-position: -256px 0; }
+div.star-icon-big.blackhole-3 { background-position: 0px 0; }
+div.star-icon-big.blackhole-4 { background-position: -256px 0; }
+div.star-icon-big.blue-1 { background-position: 0 -256px; }
+div.star-icon-big.blue-2 { background-position: -256px -256px; }
+div.star-icon-big.blue-3 { background-position: 0 -256px; }
+div.star-icon-big.blue-4 { background-position: -256px -256px; }
+div.star-icon-big.neutron-1 { background-position: 0 -512px; }
+div.star-icon-big.neutron-2 { background-position: -256px -512px; }
+div.star-icon-big.neutron-3 { background-position: 0 -512px; }
+div.star-icon-big.neutron-4 { background-position: -256px -512px; }
+div.star-icon-big.orange-1 { background-position: 0 -768px; }
+div.star-icon-big.orange-2 { background-position: -256px -768px; }
+div.star-icon-big.orange-3 { background-position: 0 -768px; }
+div.star-icon-big.orange-4 { background-position: -256px -768px; }
+div.star-icon-big.red-1 { background-position: 0 -1024px; }
+div.star-icon-big.red-2 { background-position: -256px -1024px; }
+div.star-icon-big.red-3 { background-position: 0 -1024px; }
+div.star-icon-big.red-4 { background-position: -256px -1024px; }
+div.star-icon-big.white-1 { background-position: 0 -1280px; }
+div.star-icon-big.white-2 { background-position: -256px -1280px; }
+div.star-icon-big.white-3 { background-position: 0 -1280px; }
+div.star-icon-big.white-4 { background-position: -256px -1280px; }
+div.star-icon-big.yellow-1 { background-position: 0 -1536px; }
+div.star-icon-big.yellow-2 { background-position: -256px -1536px; }
+div.star-icon-big.yellow-3 { background-position: 0 -1536px; }
+div.star-icon-big.yellow-4 { background-position: -256px -1536px; }
