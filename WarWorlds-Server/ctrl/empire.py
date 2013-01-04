@@ -534,6 +534,9 @@ def build(empire_pb, colony_pb, request_pb, sim):
                    request_pb.build_kind))
       return False
 
+  # make sure the star is simulated up to this point
+  sim.simulate(colony_pb.star_key)
+
   # Save the initial build model. There's two writes here, once now and once after it
   build_operation_model = mdl.BuildOperation(parent=db.Key(colony_pb.star_key))
   build_operation_model.colony = db.Key(colony_pb.key)

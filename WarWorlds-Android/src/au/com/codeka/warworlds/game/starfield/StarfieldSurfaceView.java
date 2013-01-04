@@ -19,7 +19,6 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Paint.Style;
@@ -51,28 +50,24 @@ import au.com.codeka.warworlds.model.StarSummary;
  * up their details and so on.
  */
 public class StarfieldSurfaceView extends UniverseElementSurfaceView {
-    private Logger log = LoggerFactory.getLogger(StarfieldSurfaceView.class);
+    private static final Logger log = LoggerFactory.getLogger(StarfieldSurfaceView.class);
     private Context mContext;
     private ArrayList<OnSelectionChangedListener> mSelectionChangedListeners;
     private Star mSelectedStar;
     private Fleet mSelectedFleet;
     private Paint mStarPaint;
-    private Paint mStarNamePaint;
-    private StarfieldBackgroundRenderer mBackgroundRenderer;
     private SelectionOverlay mSelectionOverlay;
     private Map<String, List<VisibleEntityAttachedOverlay>> mStarAttachedOverlays;
     private Map<String, List<VisibleEntityAttachedOverlay>> mFleetAttachedOverlays;
     private Map<String, Empire> mVisibleEmpires;
-    private ArrayList<VisibleEntity> mVisibleEntities;
+    private List<VisibleEntity> mVisibleEntities;
     private boolean mScrollToCentre = false;
-
-    private Bitmap mFleetMultiBitmap;
-    private Matrix mMatrix;
 
     private boolean mNeedRedraw = true;
     private Bitmap mBuffer;
 
-    private int mRadius = 1;
+    private static Bitmap sFleetMultiBitmap;
+    private static final int sRadius = 1;
 
     private long mSectorX;
     private long mSectorY;
@@ -98,7 +93,6 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
         mStarAttachedOverlays = new TreeMap<String, List<VisibleEntityAttachedOverlay>>();
         mFleetAttachedOverlays = new TreeMap<String, List<VisibleEntityAttachedOverlay>>();
         mVisibleEmpires = new TreeMap<String, Empire>();
-        mMatrix = new Matrix();
         mVisibleEntities = new ArrayList<VisibleEntity>();
 
         mSelectionOverlay = new SelectionOverlay();
@@ -107,8 +101,9 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
         mStarPaint.setARGB(255, 255, 255, 255);
         mStarPaint.setStyle(Style.STROKE);
 
-        mBackgroundRenderer = new StarfieldBackgroundRenderer(mContext);
-        mFleetMultiBitmap = BitmapFactory.decodeResource(mContext.getResources(), R.drawable.fleet);
+        if (sFleetMultiBitmap == null) {
+            sFleetMultiBitmap = BitmapFactory.decodeResource(mContext.getResources(), R.drawable.fleet);
+        }
 
         // whenever the sector list changes (i.e. when we've refreshed from the server),
         // redraw the screen.
@@ -269,8 +264,8 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
 
         List<Pair<Long, Long>> missingSectors = new ArrayList<Pair<Long, Long>>();
 
-        for(sectorY = mSectorY - mRadius; sectorY <= mSectorY + mRadius; sectorY++) {
-            for(sectorX = mSectorX - mRadius; sectorX <= mSectorX + mRadius; sectorX++) {
+        for(sectorY = mSectorY - sRadius; sectorY <= mSectorY + sRadius; sectorY++) {
+            for(sectorX = mSectorX - sRadius; sectorX <= mSectorX + sRadius; sectorX++) {
                 Pair<Long, Long> key = new Pair<Long, Long>(sectorX, sectorY);
                 Sector s = SectorManager.getInstance().getSector(sectorX, sectorY);
                 if (s == null) {
@@ -431,7 +426,15 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
                                               Bitmap.Config.ARGB_8888);
             }
 
-            drawScene();
+            if (mScrollToCentre) {
+                mOffsetX += mBuffer.getWidth() / 2.0f / getPixelScale();
+                mOffsetY += mBuffer.getHeight() / 2.0f / getPixelScale();
+                mScrollToCentre = false;
+            }
+
+            DrawState state = new DrawState(this);
+            drawScene(state);
+            mVisibleEntities = state.visibleEntities;
             mNeedRedraw = false;
         }
 
@@ -445,40 +448,29 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
     /**
      * Draws the current "scene" to the internal buffer.
      */
-    private void drawScene() {
+    private static void drawScene(DrawState state) {
         long startTime = System.nanoTime();
-        Canvas canvas = new Canvas(mBuffer);
-
-        if (mScrollToCentre) {
-            mOffsetX += mBuffer.getWidth() / 2.0f / getPixelScale();
-            mOffsetY += mBuffer.getHeight() / 2.0f / getPixelScale();
-            mScrollToCentre = false;
-        }
-
         SectorManager sm = SectorManager.getInstance();
-        canvas.drawColor(Color.BLACK);
 
-        // clear the list of visible entities, we'll be re-creating this
-        mVisibleEntities.clear();
+        for(int y = -sRadius; y <= sRadius; y++) {
+            for(int x = -sRadius; x <= sRadius; x++) {
+                long sX = state.sectorX + x;
+                long sY = state.sectorY + y;
 
-        for(int y = -mRadius; y <= mRadius; y++) {
-            for(int x = -mRadius; x <= mRadius; x++) {
-                long sectorX = mSectorX + x;
-                long sectorY = mSectorY + y;
-
-                Sector sector = sm.getSector(sectorX, sectorY);
+                Sector sector = sm.getSector(sX, sY);
                 if (sector == null) {
                     continue; // it might not be loaded yet...
                 }
 
-                int sx = (int)((x * SectorManager.SECTOR_SIZE) + mOffsetX);
-                int sy = (int)((y * SectorManager.SECTOR_SIZE) + mOffsetY);
+                int sx = (int)((x * SectorManager.SECTOR_SIZE) + state.offsetX);
+                int sy = (int)((y * SectorManager.SECTOR_SIZE) + state.offsetY);
 
-                mBackgroundRenderer.drawBackground(canvas, sx, sy,
-                        sx+SectorManager.SECTOR_SIZE, sy+SectorManager.SECTOR_SIZE,
-                        sectorX ^ sectorY + sectorX);
+                StarfieldBackgroundRenderer bgRenderer = SectorManager.getInstance().getBackgroundRenderer(
+                        state.context, sector);
+                bgRenderer.drawBackground(state.canvas, sx, sy,
+                        sx+SectorManager.SECTOR_SIZE, sy+SectorManager.SECTOR_SIZE);
 
-                drawSector(canvas, sx, sy, sector);
+                drawSector(state, sx, sy, sector);
             }
         }
 
@@ -494,13 +486,13 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
      * Given a \c Sector, returns the (x, y) coordinates (in view-space) of the origin of this
      * sector.
      */
-    private Point2D getSectorOffset(long sx, long sy) {
+    private static Point2D getSectorOffset(DrawState state, long sx, long sy) {
         SectorManager sm = SectorManager.getInstance();
 
-        for(int y = -mRadius; y <= mRadius; y++) {
-            for(int x = -mRadius; x <= mRadius; x++) {
-                long sectorX = mSectorX + x;
-                long sectorY = mSectorY + y;
+        for(int y = -sRadius; y <= sRadius; y++) {
+            for(int x = -sRadius; x <= sRadius; x++) {
+                long sectorX = state.sectorX + x;
+                long sectorY = state.sectorY + y;
 
                 Sector sector = sm.getSector(sectorX, sectorY);
                 if (sector == null) {
@@ -508,8 +500,8 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
                 }
 
                 if (sector.getX() == sx && sector.getY() == sy) {
-                    return new Point2D((x * SectorManager.SECTOR_SIZE) + mOffsetX,
-                                       (y * SectorManager.SECTOR_SIZE) + mOffsetY);
+                    return new Point2D((x * SectorManager.SECTOR_SIZE) + state.offsetX,
+                                       (y * SectorManager.SECTOR_SIZE) + state.offsetY);
                 }
             }
         }
@@ -520,17 +512,17 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
     /**
      * Draws a sector, which is a 1024x1024 area of stars.
      */
-    private void drawSector(Canvas canvas, int offsetX, int offsetY, Sector sector) {
+    private static void drawSector(DrawState state, int offsetX, int offsetY, Sector sector) {
         for(Star star : sector.getStars()) {
-            drawStar(canvas, star, offsetX, offsetY);
+            drawStar(state, star, offsetX, offsetY);
         }
         for(Star star : sector.getStars()) {
-            drawStarName(canvas, star, offsetX, offsetY);
+            drawStarName(state, star, offsetX, offsetY);
         }
         for (Star star : sector.getStars()) {
             for (Fleet fleet : star.getFleets()) {
                 if (fleet.getState() == Fleet.State.MOVING) {
-                    drawMovingFleet(canvas, fleet, star, offsetX, offsetY);
+                    drawMovingFleet(state, fleet, star, offsetX, offsetY);
                 }
             }
         }
@@ -540,60 +532,58 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
      * Draws a single star. Note that we draw all stars first, then the names of stars
      * after.
      */
-    private void drawStar(Canvas canvas, Star star, int x, int y) {
+    private static void drawStar(DrawState state, Star star, int x, int y) {
         x += star.getOffsetX();
         y += star.getOffsetY();
-
-        final float pixelScale = getPixelScale();
+        final float pixelScale = state.pixelScale;
 
         // only draw the star if it's actually visible...
-        if (isVisible(canvas, (x - 100) * pixelScale, (y - 100) * pixelScale,
-                              (x + 100) * pixelScale, (y + 100) * pixelScale)) {
+        if (isVisible(state.canvas, (x - 100) * pixelScale, (y - 100) * pixelScale,
+                                    (x + 100) * pixelScale, (y + 100) * pixelScale)) {
 
             float imageScale = (float) star.getStarType().getImageScale();
             int imageSize = (int)(star.getSize() * imageScale * 2);
-            Sprite sprite = StarImageManager.getInstance().getSprite(mContext, star, imageSize);
-            mMatrix.reset();
-            mMatrix.postTranslate(-(sprite.getWidth() / 2.0f), -(sprite.getHeight() / 2.0f));
-            mMatrix.postScale(40.0f * imageScale * pixelScale / sprite.getWidth(),
-                              40.0f * imageScale * pixelScale / sprite.getHeight());
-            mMatrix.postTranslate(x * pixelScale, y * pixelScale);
-            canvas.save();
-            canvas.setMatrix(mMatrix);
-            sprite.draw(canvas);
-            canvas.restore();
+            Sprite sprite = StarImageManager.getInstance().getSprite(state.context, star, imageSize);
+            state.matrix.reset();
+            state.matrix.postTranslate(-(sprite.getWidth() / 2.0f), -(sprite.getHeight() / 2.0f));
+            state.matrix.postScale(40.0f * imageScale * pixelScale / sprite.getWidth(),
+                                   40.0f * imageScale * pixelScale / sprite.getHeight());
+            state.matrix.postTranslate(x * pixelScale, y * pixelScale);
+            state.canvas.save();
+            state.canvas.setMatrix(state.matrix);
+            sprite.draw(state.canvas);
+            state.canvas.restore();
 
-            drawStarIcons(canvas, star, x, y);
+            drawStarIcons(state, star, x, y);
 
-            List<VisibleEntityAttachedOverlay> starAttachedOverlays = mStarAttachedOverlays.get(star.getKey());
-            if (starAttachedOverlays != null && !starAttachedOverlays.isEmpty()) {
-                int n = starAttachedOverlays.size();
+            List<VisibleEntityAttachedOverlay> overlays = state.starAttachedOverlays.get(star.getKey());
+            if (overlays != null && !overlays.isEmpty()) {
+                int n = overlays.size();
                 for (int i = 0; i < n; i++) {
-                    VisibleEntityAttachedOverlay sao = starAttachedOverlays.get(i);
+                    VisibleEntityAttachedOverlay sao = overlays.get(i);
                     sao.setCentre(x * pixelScale, y * pixelScale);
                 }
             }
 
-            mVisibleEntities.add(new VisibleEntity(new Point2D(x * pixelScale, y * pixelScale), star));
+            state.visibleEntities.add(new VisibleEntity(new Point2D(x * pixelScale, y * pixelScale), star));
         }
     }
 
     /**
      * Gets an \c Empire given it's key.
      */
-    private Empire getEmpire(String empireKey) {
+    private static Empire getEmpire(final DrawState state, String empireKey) {
         if (empireKey == null) {
             return EmpireManager.getInstance().getNativeEmpire();
         }
 
-        Empire emp = mVisibleEmpires.get(empireKey);
+        Empire emp = state.visibleEmpires.get(empireKey);
         if (emp == null) {
             EmpireManager.getInstance().fetchEmpire(empireKey, new EmpireManager.EmpireFetchedHandler() {
                 @Override
                 public void onEmpireFetched(Empire empire) {
-                    mVisibleEmpires.put(empire.getKey(), empire);
-                    setDirty();
-                    redraw();
+                    state.visibleEmpires.put(empire.getKey(), empire);
+                    state.requestRedraw();
                 }
 
             });
@@ -601,9 +591,7 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
         return emp;
     }
 
-    private void drawStarIcons(Canvas canvas, Star star, int x, int y) {
-        final float pixelScale = getPixelScale();
-
+    private static void drawStarIcons(DrawState state, Star star, int x, int y) {
         List<Colony> colonies = star.getColonies();
         if (colonies != null && !colonies.isEmpty()) {
             Map<String, Integer> colonyEmpires = new TreeMap<String, Integer>();
@@ -614,7 +602,7 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
                     continue;
                 }
 
-                Empire emp = getEmpire(colony.getEmpireKey());
+                Empire emp = getEmpire(state, colony.getEmpireKey());
                 if (emp != null) {
                     Integer n = colonyEmpires.get(emp.getKey());
                     if (n == null) {
@@ -629,20 +617,20 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
             int i = 1;
             for (String empireKey : colonyEmpires.keySet()) {
                 Integer n = colonyEmpires.get(empireKey);
-                Empire emp = mVisibleEmpires.get(empireKey);
+                Empire emp = state.visibleEmpires.get(empireKey);
 
-                Bitmap bmp = emp.getShield(mContext);
+                Bitmap bmp = emp.getShield(state.context);
 
                 Point2D pt = new Point2D(0, -25.0f);
                 pt.rotate((float)(Math.PI / 4.0) * i);
                 pt.add(x, y);
 
-                mMatrix.reset();
-                mMatrix.postTranslate(-(bmp.getWidth() / 2.0f), -(bmp.getHeight() / 2.0f));
-                mMatrix.postScale(16.0f * pixelScale / bmp.getWidth(),
-                                  16.0f * pixelScale / bmp.getHeight());
-                mMatrix.postTranslate(pt.x * pixelScale, pt.y * pixelScale);
-                canvas.drawBitmap(bmp, mMatrix, mStarPaint);
+                state.matrix.reset();
+                state.matrix.postTranslate(-(bmp.getWidth() / 2.0f), -(bmp.getHeight() / 2.0f));
+                state.matrix.postScale(16.0f * state.pixelScale / bmp.getWidth(),
+                                       16.0f * state.pixelScale / bmp.getHeight());
+                state.matrix.postTranslate(pt.x * state.pixelScale, pt.y * state.pixelScale);
+                state.canvas.drawBitmap(bmp, state.matrix, state.starPaint);
 
                 String name;
                 if (n.equals(1)) {
@@ -652,13 +640,13 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
                 }
 
                 Rect bounds = new Rect();
-                mStarPaint.getTextBounds(name, 0, name.length(), bounds);
+                state.starPaint.getTextBounds(name, 0, name.length(), bounds);
                 float textHeight = bounds.height();
 
-                canvas.drawText(name,
-                                (pt.x + 12) * pixelScale,
-                                (pt.y + 8) * pixelScale - (textHeight / 2),
-                                mStarPaint);
+                state.canvas.drawText(name,
+                                      (pt.x + 12) * state.pixelScale,
+                                      (pt.y + 8) * state.pixelScale - (textHeight / 2),
+                                      state.starPaint);
                 i++;
             }
         }
@@ -684,31 +672,31 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
             int i = 0;
             for (String empireKey : empireFleets.keySet()) {
                 Integer numShips = empireFleets.get(empireKey);
-                Empire emp = getEmpire(empireKey);
+                Empire emp = getEmpire(state, empireKey);
                 if (emp != null) {
                     Point2D pt = new Point2D(0, -25.0f);
                     pt.rotate((float)(Math.PI / 4.0) * -i);
                     pt.add(x, y);
 
-                    mMatrix.reset();
-                    mMatrix.postTranslate(-(mFleetMultiBitmap.getWidth() / 2.0f),
-                                          -(mFleetMultiBitmap.getHeight() / 2.0f));
-                    mMatrix.postScale(16.0f * pixelScale / mFleetMultiBitmap.getWidth(),
-                                      16.0f * pixelScale / mFleetMultiBitmap.getHeight());
-                    mMatrix.postTranslate(pt.x * pixelScale, pt.y * pixelScale);
-                    canvas.drawBitmap(mFleetMultiBitmap, mMatrix, mStarPaint);
+                    state.matrix.reset();
+                    state.matrix.postTranslate(-(sFleetMultiBitmap.getWidth() / 2.0f),
+                                               -(sFleetMultiBitmap.getHeight() / 2.0f));
+                    state.matrix.postScale(16.0f * state.pixelScale / sFleetMultiBitmap.getWidth(),
+                                      16.0f * state.pixelScale / sFleetMultiBitmap.getHeight());
+                    state.matrix.postTranslate(pt.x * state.pixelScale, pt.y * state.pixelScale);
+                    state.canvas.drawBitmap(sFleetMultiBitmap, state.matrix, state.starPaint);
 
                     String name = String.format(Locale.ENGLISH, "%s (%d)", emp.getDisplayName(), numShips);
 
                     Rect bounds = new Rect();
-                    mStarPaint.getTextBounds(name, 0, name.length(), bounds);
+                    state.starPaint.getTextBounds(name, 0, name.length(), bounds);
                     float textHeight = bounds.height();
                     float textWidth = bounds.width();
 
-                    canvas.drawText(name,
-                                    (pt.x - 12) * pixelScale - textWidth,
-                                    (pt.y + 8) * pixelScale - (textHeight / 2),
-                                    mStarPaint);
+                    state.canvas.drawText(name,
+                                          (pt.x - 12) * state.pixelScale - textWidth,
+                                          (pt.y + 8) * state.pixelScale - (textHeight / 2),
+                                          state.starPaint);
                 }
 
                 i++;
@@ -721,8 +709,8 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
      * Draw a moving fleet as a line between the source and destination stars, with an icon
      * representing the current location of the fleet.
      */
-    private void drawMovingFleet(Canvas canvas, Fleet fleet, Star srcStar, int offsetX, int offsetY) {
-        float pixelScale = getPixelScale();
+    private static void drawMovingFleet(DrawState state, Fleet fleet, Star srcStar, int offsetX, int offsetY) {
+        float pixelScale = state.pixelScale;
 
         // we'll need to find the destination star
         Star destStar = SectorManager.getInstance().findStar(fleet.getDestinationStarKey());
@@ -738,7 +726,7 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
         srcPoint.x += srcStar.getOffsetX();
         srcPoint.y += srcStar.getOffsetY();
 
-        Point2D destPoint = getSectorOffset(destStar.getSectorX(), destStar.getSectorY());
+        Point2D destPoint = getSectorOffset(state, destStar.getSectorX(), destStar.getSectorY());
         destPoint.x += destStar.getOffsetX();
         destPoint.y += destStar.getOffsetY();
 
@@ -784,8 +772,8 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
         // check if there's any other fleets nearby and offset this one by a bit so that they
         // don't overlap
         Random rand = new Random(fleet.getKey().hashCode());
-        for (int i = 0; i < mVisibleEntities.size(); i++) {
-            VisibleEntity existing = mVisibleEntities.get(i);
+        for (int i = 0; i < state.visibleEntities.size(); i++) {
+            VisibleEntity existing = state.visibleEntities.get(i);
             if (existing.fleet == null) {
                 continue;
             }
@@ -800,42 +788,44 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
         }
 
         // record the fact that this guy is visible
-        mVisibleEntities.add(new VisibleEntity(position, fleet));
+        state.visibleEntities.add(new VisibleEntity(position, fleet));
 
         // scale zoom and rotate the bitmap all with one matrix
-        mMatrix.reset();
-        mMatrix.postTranslate(-(fleetSprite.getWidth() / 2.0f),
-                              -(fleetSprite.getHeight() / 2.0f));
-        mMatrix.postScale(20.0f * pixelScale / fleetSprite.getWidth(),
-                          20.0f * pixelScale / fleetSprite.getWidth());
-        mMatrix.postRotate((float) (angle * 180.0 / Math.PI));
-        mMatrix.postTranslate(position.x, position.y);
-        canvas.save();
-        canvas.setMatrix(mMatrix);
-        fleetSprite.draw(canvas);
-        canvas.restore();
+        state.matrix.reset();
+        state.matrix.postTranslate(-(fleetSprite.getWidth() / 2.0f),
+                                   -(fleetSprite.getHeight() / 2.0f));
+        state.matrix.postScale(20.0f * pixelScale / fleetSprite.getWidth(),
+                              20.0f * pixelScale / fleetSprite.getWidth());
+        state.matrix.postRotate((float) (angle * 180.0 / Math.PI));
+        state.matrix.postTranslate(position.x, position.y);
+        state.canvas.save();
+        state.canvas.setMatrix(state.matrix);
+        fleetSprite.draw(state.canvas);
+        state.canvas.restore();
 
-        Empire emp = getEmpire(fleet.getEmpireKey());
+        Empire emp = getEmpire(state, fleet.getEmpireKey());
         if (emp != null) {
-            Bitmap shield = emp.getShield(mContext);
+            Bitmap shield = emp.getShield(state.context);
             if (shield != null) {
-                mMatrix.reset();
-                mMatrix.postTranslate(-(shield.getWidth() / 2.0f), -(shield.getHeight() / 2.0f));
-                mMatrix.postScale(16.0f * pixelScale / shield.getWidth(),
-                                  16.0f * pixelScale / shield.getHeight());
-                mMatrix.postTranslate(position.x + (20.0f * pixelScale),
-                                      position.y);
-                canvas.drawBitmap(shield, mMatrix, mStarPaint);
+                state.matrix.reset();
+                state.matrix.postTranslate(-(shield.getWidth() / 2.0f), -(shield.getHeight() / 2.0f));
+                state.matrix.postScale(16.0f * pixelScale / shield.getWidth(),
+                                       16.0f * pixelScale / shield.getHeight());
+                state.matrix.postTranslate(position.x + (20.0f * pixelScale),
+                                           position.y);
+                state.canvas.drawBitmap(shield, state.matrix, state.starPaint);
             }
 
             String msg = emp.getDisplayName();
-            canvas.drawText(msg, position.x + (30.0f * pixelScale), position.y, mStarPaint);
+            state.canvas.drawText(msg, position.x + (30.0f * pixelScale),
+                    position.y, state.starPaint);
 
             msg = String.format(Locale.ENGLISH, "%s (%d)", design.getDisplayName(), fleet.getNumShips());
-            canvas.drawText(msg, position.x + (30.0f * pixelScale), position.y + (10.0f * pixelScale), mStarPaint);
+            state.canvas.drawText(msg, position.x + (30.0f * pixelScale),
+                    position.y + (10.0f * pixelScale), state.starPaint);
         }
 
-        List<VisibleEntityAttachedOverlay> fleetAttachedOverlays = mFleetAttachedOverlays.get(fleet.getKey());
+        List<VisibleEntityAttachedOverlay> fleetAttachedOverlays = state.fleetAttachedOverlays.get(fleet.getKey());
         if (fleetAttachedOverlays != null && !fleetAttachedOverlays.isEmpty()) {
             int n = fleetAttachedOverlays.size();
             for (int i = 0; i < n; i++) {
@@ -863,24 +853,19 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
      * Draws a single star. Note that we draw all stars first, then the names of stars
      * after.
      */
-    private void drawStarName(Canvas canvas, Star star, int x, int y) {
+    private static void drawStarName(DrawState state, Star star, int x, int y) {
         x += star.getOffsetX();
         y += star.getOffsetY();
 
-        final float pixelScale = getPixelScale();
+        final float pixelScale = state.pixelScale;
 
-        if (mStarNamePaint == null) {
-            mStarNamePaint = new Paint();
-            mStarNamePaint.setStyle(Style.STROKE);
-            mStarNamePaint.setTextSize(15.0f * pixelScale);
-        }
-        mStarNamePaint.setARGB(255, 255, 255, 255);
-        float width = mStarNamePaint.measureText(star.getName()) / pixelScale;
+        state.starNamePaint.setARGB(255, 255, 255, 255);
+        float width = state.starNamePaint.measureText(star.getName()) / pixelScale;
         x -= (width / 2.0f);
         y += star.getSize() + 10.0f;
 
-        canvas.drawText(star.getName(),
-                x * pixelScale, y * pixelScale, mStarNamePaint);
+        state.canvas.drawText(star.getName(),
+                x * pixelScale, y * pixelScale, state.starNamePaint);
     }
 
     public void selectStar(String starKey) {
@@ -1043,6 +1028,53 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
         public void draw(Canvas canvas) {
             mInnerCircle.draw(canvas);
             mOuterCircle.draw(canvas);
+        }
+    }
+
+    private static class DrawState {
+        public Context context;
+        public Bitmap bitmap;
+        public long sectorX;
+        public long sectorY;
+        public float offsetX;
+        public float offsetY;
+        public List<VisibleEntity> visibleEntities;
+        public Canvas canvas;
+        public float pixelScale;
+        public Map<String, List<VisibleEntityAttachedOverlay>> starAttachedOverlays;
+        public Map<String, List<VisibleEntityAttachedOverlay>> fleetAttachedOverlays;
+        public Matrix matrix;
+        public Map<String, Empire> visibleEmpires;
+        public Paint starPaint;
+        public Paint starNamePaint;
+
+        private StarfieldSurfaceView mStarfieldSurfaceView;
+
+        public DrawState(StarfieldSurfaceView ssv) {
+            mStarfieldSurfaceView = ssv;
+            context = ssv.mContext;
+            bitmap = ssv.mBuffer;
+            canvas = new Canvas(bitmap);
+            sectorX = ssv.mSectorX;
+            sectorY = ssv.mSectorY;
+            offsetX = ssv.mOffsetX;
+            offsetY = ssv.mOffsetY;
+            pixelScale = ssv.getPixelScale();
+            visibleEntities = new ArrayList<VisibleEntity>();
+            starAttachedOverlays = ssv.mStarAttachedOverlays;
+            fleetAttachedOverlays = ssv.mFleetAttachedOverlays;
+            matrix = new Matrix();
+            visibleEmpires = ssv.mVisibleEmpires;
+            starPaint = ssv.mStarPaint;
+
+            starNamePaint = new Paint();
+            starNamePaint.setStyle(Style.STROKE);
+            starNamePaint.setTextSize(15.0f * pixelScale);
+        }
+
+        public void requestRedraw() {
+            mStarfieldSurfaceView.setDirty();
+            mStarfieldSurfaceView.redraw();
         }
     }
 

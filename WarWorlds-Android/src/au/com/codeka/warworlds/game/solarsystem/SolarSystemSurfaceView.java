@@ -60,7 +60,6 @@ public class SolarSystemSurfaceView extends UniverseElementSurfaceView {
         mContext = context;
         mPlanetSelectedListeners = new CopyOnWriteArrayList<OnPlanetSelectedListener>();
         mHandler = new Handler();
-        mBackgroundRenderer = new StarfieldBackgroundRenderer(context);
 
         mPlanetPaint = new Paint();
         mPlanetPaint.setARGB(255, 255, 255, 255);
@@ -209,10 +208,13 @@ public class SolarSystemSurfaceView extends UniverseElementSurfaceView {
         if (mStar != null) {
             canvas.drawColor(Color.BLACK);
 
+            if (mBackgroundRenderer == null) {
+                mBackgroundRenderer = new StarfieldBackgroundRenderer(mContext,
+                        new long[] {mStar.getKey().hashCode()});
+            }
             mBackgroundRenderer.drawBackground(canvas, 0, 0,
                     canvas.getWidth() / getPixelScale(),
-                    canvas.getHeight() / getPixelScale(),
-                    mStar.hashCode());
+                    canvas.getHeight() / getPixelScale());
 
             // make sure the planets are in the correct position
             placePlanets(canvas);

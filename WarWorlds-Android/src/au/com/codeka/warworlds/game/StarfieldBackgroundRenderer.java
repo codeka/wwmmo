@@ -14,6 +14,7 @@ import android.content.res.AssetManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.Paint.Style;
@@ -26,74 +27,103 @@ import au.com.codeka.warworlds.GlobalOptions;
  */
 public class StarfieldBackgroundRenderer {
     private Logger log = LoggerFactory.getLogger(StarfieldBackgroundRenderer.class);
-    private Context mContext;
-    private Paint mBackgroundPaint;
     private float mPixelScale;
     private GlobalOptions.StarfieldDetail mStarfieldDetail;
+    private long[] mSeeds;
+    private Paint mBackgroundPaint;
+    private Bitmap mPreRendered;
 
     private static List<Bitmap> sBgStars;
     private static List<Bitmap> sBgGases;
 
-    public StarfieldBackgroundRenderer(Context context) {
-        mContext = context;
+    public StarfieldBackgroundRenderer(Context context, long[] seeds) {
         mPixelScale = context.getResources().getDisplayMetrics().density;
-        initialize();
 
-        GlobalOptions.addOptionsChangedListener(new GlobalOptions.OptionsChangedListener() {
-            @Override
-            public void onOptionsChanged(GlobalOptions newOptions) {
-                initialize();
-            }
-        });
-    }
-
-    public void drawBackground(Canvas canvas, float left, float top, float right, float bottom, long seed) {
-        if (sBgStars == null || sBgStars.isEmpty()) {
-            return;
-        }
-
-        Rect src;
-        RectF dest;
-        Random r = new Random(seed);
-
-        if (shouldDrawStars()) {
-            src = new Rect(0, 0, 512, 512);
-            dest = new RectF(left * mPixelScale, top * mPixelScale, right * mPixelScale, bottom * mPixelScale);
-            canvas.drawBitmap(sBgStars.get(r.nextInt(sBgStars.size())), src, dest, mBackgroundPaint);
-        }
-
-        if (shouldDrawGas()) {
-            for (int i = 0; i < 10; i++) {
-                Bitmap gas = sBgGases.get(r.nextInt(sBgGases.size()));
-
-                src = new Rect(0, 0, gas.getWidth(), gas.getHeight());
-                float x = left + r.nextInt((int)(right - left) + 256) - 128;
-                float y = top + r.nextInt((int)(bottom - top) + 256) - 128;
-                dest = new RectF(x * mPixelScale, y * mPixelScale,
-                        (x + (src.width() * 2)) * mPixelScale,
-                        (y + (src.height() * 2)) * mPixelScale);
-
-                canvas.drawBitmap(gas, src, dest, mBackgroundPaint);
+        mSeeds = seeds;
+        if (mSeeds.length != 9) {
+            Random r = new Random(mSeeds[0]);
+            mSeeds = new long[9];
+            for (int i = 0; i < 9; i++) {
+                mSeeds[i] = r.nextLong();
             }
         }
+
+        initialize(context);
     }
 
-    private void initialize() {
-        GlobalOptions globalOptions = new GlobalOptions(mContext);
+    public void drawBackground(Canvas canvas, float left, float top, float right, float bottom) {
+        Rect src = new Rect(0, 0, 512, 512);
+        RectF dest = new RectF(left * mPixelScale, top * mPixelScale, right * mPixelScale, bottom * mPixelScale);
+        canvas.drawBitmap(mPreRendered, src, dest, mBackgroundPaint);
+    }
+
+    public void close() {
+        mPreRendered.recycle();
+    }
+
+    private void initialize(Context context) {
+        GlobalOptions globalOptions = new GlobalOptions(context);
         mStarfieldDetail = globalOptions.getStarfieldDetail();
 
-        if (mBackgroundPaint == null) {
-            mBackgroundPaint = new Paint();
-            mBackgroundPaint.setStyle(Style.STROKE);
-            mBackgroundPaint.setARGB(255, 255, 255, 255);
-        }
-
-        AssetManager assetMgr = mContext.getAssets();
+        AssetManager assetMgr = context.getAssets();
         if (sBgStars == null && shouldDrawStars()) {
             sBgStars = loadBitmaps(assetMgr, "decoration/starfield");
         }
         if (sBgGases == null && shouldDrawGas()) {
             sBgGases = loadBitmaps(assetMgr, "decoration/gas");
+        }
+
+        mPreRendered = Bitmap.createBitmap(512, 512, Bitmap.Config.ARGB_8888);
+        render(mPreRendered);
+    }
+
+    /**
+     * Renders the background to the given bitmap, which we can then use to
+     * render the background again later.
+     */
+    private void render(Bitmap bmp) {
+        Canvas c = new Canvas(bmp);
+        if (sBgStars == null || sBgStars.isEmpty()) {
+            return;
+        }
+
+        // start off black
+        c.drawColor(Color.BLACK);
+
+        Rect src;
+        RectF dest;
+        Random r = new Random(mSeeds[4]);
+        mBackgroundPaint = new Paint();
+        mBackgroundPaint.setStyle(Style.STROKE);
+        mBackgroundPaint.setARGB(255, 255, 255, 255);
+
+        if (shouldDrawStars()) {
+            src = new Rect(0, 0, 512, 512);
+            dest = new RectF(0, 0, 512, 512);
+            c.drawBitmap(sBgStars.get(r.nextInt(sBgStars.size())), src, dest, mBackgroundPaint);
+        }
+
+        if (shouldDrawGas()) {
+            for (int iy = -1; iy <= 1; iy++) {
+                for (int ix = -1; ix <= 1; ix++) {
+                    long seed = mSeeds[((iy + 1) * 3) + (ix + 1)];
+                    Random xyr = new Random(seed);
+                    for (int i = 0; i < 10; i++) {
+                        Bitmap gas = sBgGases.get(xyr.nextInt(sBgGases.size()));
+
+                        src = new Rect(0, 0, gas.getWidth(), gas.getHeight());
+                        float x = xyr.nextInt(bmp.getWidth() + 128) - 64;
+                        float y = xyr.nextInt(bmp.getWidth() + 128) - 64;
+                        dest = new RectF(
+                                x - (src.width() / 2) + (ix * bmp.getWidth()),
+                                y - (src.height() / 2) + (iy * bmp.getHeight()),
+                                x + (src.width() / 2) + (ix * bmp.getWidth()),
+                                y + (src.height() / 2) + (iy * bmp.getHeight()));
+
+                        c.drawBitmap(gas, src, dest, mBackgroundPaint);
+                    }
+                }
+            }
         }
     }
 

@@ -36,8 +36,9 @@ public class ActivityBackgroundGenerator {
         Bitmap bmp = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(bmp);
 
-        StarfieldBackgroundRenderer renderer = new StarfieldBackgroundRenderer(view.getContext());
-        renderer.drawBackground(canvas, 0.0f, 0.0f, width, height, new Random().nextLong());
+        StarfieldBackgroundRenderer renderer = new StarfieldBackgroundRenderer(view.getContext(),
+                new long[] {new Random().nextLong()});
+        renderer.drawBackground(canvas, 0.0f, 0.0f, width, height);
 
         setBackground(view, bmp);
     }

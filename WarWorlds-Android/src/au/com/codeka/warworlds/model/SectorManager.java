@@ -11,10 +11,13 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import android.content.Context;
 import android.os.AsyncTask;
+import android.support.v4.util.LruCache;
 import au.com.codeka.Pair;
 import au.com.codeka.Point2D;
 import au.com.codeka.warworlds.api.ApiClient;
+import au.com.codeka.warworlds.game.StarfieldBackgroundRenderer;
 import au.com.codeka.warworlds.model.protobuf.Messages;
 
 /**
@@ -35,7 +38,7 @@ public class SectorManager {
         return sInstance;
     }
 
-    private Map<Pair<Long, Long>, Sector> mSectors;
+    private SectorCache mSectors;
     private Map<Pair<Long, Long>, List<OnSectorsFetchedListener>> mInTransitListeners;
     private CopyOnWriteArrayList<OnSectorListChangedListener> mSectorListChangedListeners;
     private Map<String, Star> mSectorStars;
@@ -43,7 +46,7 @@ public class SectorManager {
     public static int SECTOR_SIZE = 1024;
 
     private SectorManager() {
-        mSectors = new TreeMap<Pair<Long, Long>, Sector>();
+        mSectors = new SectorCache();
         mInTransitListeners = new TreeMap<Pair<Long, Long>, List<OnSectorsFetchedListener>>();
         mSectorListChangedListeners = new CopyOnWriteArrayList<OnSectorListChangedListener>();
         mSectorStars = new TreeMap<String, Star>();
@@ -51,16 +54,16 @@ public class SectorManager {
 
     public Sector getSector(long sectorX, long sectorY) {
         Pair<Long, Long> key = new Pair<Long, Long>(sectorX, sectorY);
-        if (mSectors.containsKey(key)) {
-            return mSectors.get(key);
-        } else {
-            // it might not be loaded yet...
-            return null;
-        }
+        return mSectors.get(key);
+    }
+
+    public StarfieldBackgroundRenderer getBackgroundRenderer(Context context, Sector s) {
+        Pair<Long, Long> coords = new Pair<Long, Long>(s.getX(), s.getY());
+        return mSectors.getBackgroundRenderer(context, coords);
     }
 
     public Collection<Sector> getSectors() {
-        return mSectors.values();
+        return mSectors.snapshot().values();
     }
 
     /**
@@ -124,16 +127,7 @@ public class SectorManager {
     }
 
     /**
-     * Fetches the details of a bunch of sectors from the server. We request all sectors
-     * in a square.
-     * 
-     * TODO: that's not very efficient... often we'll only need an L-shape of sectors, no need
-     * to request the sector in the middle as well.
-     * 
-     * @param sectorX1 The minimum X-coordinate of the sector to request.
-     * @param sectorY1 The minimum Y-coordinate of the sector to request.
-     * @param sectorX2 The maximum X-coordinate of the sector to request.
-     * @param sectorY2 The maximum Y-coordinate of the sector to request.
+     * Fetches the details of a bunch of sectors from the server.
      */
     public void requestSectors(final List<Pair<Long, Long>> coords, boolean force,
                                final OnSectorsFetchedListener callback) {
@@ -151,8 +145,9 @@ public class SectorManager {
         Map<Pair<Long, Long>, Sector> existingSectors = new TreeMap<Pair<Long, Long>, Sector>();
         final List<Pair<Long, Long>> missingSectors = new ArrayList<Pair<Long, Long>>();
         for (Pair<Long, Long> coord : coords) {
-            if (mSectors.containsKey(coord) && !force) {
-                existingSectors.put(coord, mSectors.get(coord));
+            Sector s = mSectors.get(coord);
+            if (s != null && !force) {
+                existingSectors.put(coord, s);
             } else if (mInTransitListeners.containsKey(coord) && callback != null) {
                 List<OnSectorsFetchedListener> listeners = mInTransitListeners.get(coord);
                 listeners.add(callback);
@@ -188,7 +183,6 @@ public class SectorManager {
                         Messages.Sectors pb = ApiClient.getProtoBuf(url, Messages.Sectors.class);
                         sectors = Sector.fromProtocolBuffer(pb.getSectorsList());
                     } catch(Exception e) {
-                        // TODO: handle exceptions
                         log.error(ExceptionUtils.getStackTrace(e));
                     }
 
@@ -240,6 +234,69 @@ public class SectorManager {
                     fireSectorListChanged();
                 }
             }.execute();
+        }
+    }
+
+    private static class SectorCache extends LruCache<String, Sector> {
+        private Map<String, StarfieldBackgroundRenderer> mBackgroundRenderers;
+
+        public SectorCache() {
+            super(12);
+            mBackgroundRenderers = new TreeMap<String, StarfieldBackgroundRenderer>();
+        }
+
+        public static String key(Pair<Long, Long> coord) {
+            return String.format("%d:%d", coord.one, coord.two);
+        }
+
+        public StarfieldBackgroundRenderer getBackgroundRenderer(Context context, Pair<Long, Long> coords) {
+            String key = key(coords);
+            StarfieldBackgroundRenderer renderer = mBackgroundRenderers.get(key);
+            if (renderer == null) {
+                if (this.get(key) != null) {
+                    long[] seeds = new long[9];
+                    for (int y = -1; y <= 1; y++) {
+                        for (int x = -1; x <= 1; x++) {
+                            int n = ((y + 1) * 3) + (x + 1);
+                            seeds[n] = (coords.one + x) ^ (coords.two + y) + (coords.one + x);
+                        }
+                    }
+                    renderer = new StarfieldBackgroundRenderer(context, seeds);
+                    mBackgroundRenderers.put(key, renderer);
+                }
+            }
+            return renderer;
+        }
+
+        public Sector get(Pair<Long, Long> coords) {
+            return get(key(coords));
+        }
+
+        public void put(Pair<Long, Long> coords, Sector s) {
+            put(key(coords), s);
+        }
+
+        @Override
+        protected void entryRemoved(boolean evicted,
+                                    String key,
+                                    Sector oldValue,
+                                    Sector newValue) {
+            if (newValue == null) {
+                StarfieldBackgroundRenderer renderer = mBackgroundRenderers.get(key);
+                if (renderer != null) {
+                    renderer.close();
+                    mBackgroundRenderers.remove(key);
+                }
+            }
+            /*if (newValue == null) {
+                log.debug(String.format("SectorCache.entryRemoved(%s) evictionCount=%d",
+                        key, evictionCount()));
+                StringBuilder msg = new StringBuilder();
+                for (StackTraceElement ste : Thread.currentThread().getStackTrace()) {
+                    msg.append(ste.toString()+"\r\n");
+                }
+                log.debug(msg.toString());
+            }*/
         }
     }
 
