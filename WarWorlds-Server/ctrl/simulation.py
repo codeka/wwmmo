@@ -966,6 +966,8 @@ def on_fleet_victorious(fleet_pb, combat_report_key):
       sitrep_pb.report_time = fleet_pb.last_victory
       sitrep_pb.star_key = fleet_pb.star_key
       sitrep_pb.planet_index = -1
+      sitrep_pb.fleet_victorious_record.fleet_key = fleet_pb.key
       sitrep_pb.fleet_victorious_record.fleet_design_id = fleet_pb.design_name
+      sitrep_pb.fleet_victorious_record.num_ships = fleet_pb.num_ships
       sitrep_pb.fleet_victorious_record.combat_report_key = combat_report_key
       empire_ctl.saveSituationReport(sitrep_pb)

@@ -283,6 +283,7 @@ public class WarWorldsActivity extends BaseActivity {
                     boolean showSituationReport = getIntent().getBooleanExtra("au.com.codeka.warworlds.ShowSituationReport", false);
                     if (showSituationReport) {
                         Intent intent = new Intent(mContext, StarfieldActivity.class);
+                        intent.putExtra("au.com.codeka.warworlds.StarKey", mStarKey);
                         intent.putExtra("au.com.codeka.warworlds.ShowSituationReport", true);
                         startActivity(intent);
                     }

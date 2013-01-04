@@ -186,7 +186,7 @@ public class SituationReport {
         }
 
         if (pb.getFleetVictoriousRecord() != null &&
-            pb.getFleetVictoriousRecord().hasFleetKey()) {
+            pb.getFleetVictoriousRecord().hasFleetDesignId()) {
             sitrep.mFleetVictoriousRecord = FleetVictoriousRecord.fromProtocolBuffer(pb.getFleetVictoriousRecord());
         }
 

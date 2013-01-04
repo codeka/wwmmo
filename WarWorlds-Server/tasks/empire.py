@@ -180,7 +180,7 @@ class FleetMoveCompletePage(tasks.TaskPage):
     fleet_mdl = mdl.Fleet.get(fleet_key)
     if fleet_mdl.state != pb.Fleet.MOVING:
       logging.warn("Fleet [%s] is not moving, as expected." % (fleet_key))
-      self.set_response(400)
+      self.response.set_status(400)
     else:
       new_star_key = str(mdl.Fleet.destinationStar.get_value_for_datastore(fleet_mdl))
       sim = simulation_ctl.Simulation()
