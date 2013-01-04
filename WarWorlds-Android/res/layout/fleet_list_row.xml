@@ -15,9 +15,10 @@
         android:id="@+id/ship_row1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
+        android:layout_alignTop="@+id/ship_icon"
         android:layout_toRightOf="@+id/ship_icon"
-        android:textAppearance="?android:attr/textAppearanceSmall" />
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:text="Row 1" />
 
     <TextView
         android:id="@+id/ship_row2"
@@ -25,14 +26,16 @@
         android:layout_height="wrap_content"
         android:layout_centerVertical="true"
         android:layout_toRightOf="@+id/ship_icon"
-        android:textAppearance="?android:attr/textAppearanceSmall" />
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:text="Row 2" />
 
     <TextView
         android:id="@+id/ship_row3"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_toRightOf="@+id/ship_icon"
-        android:layout_alignParentBottom="true"
-        android:textAppearance="?android:attr/textAppearanceSmall" />
+        android:layout_alignBottom="@+id/ship_icon"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:text="Row 3" />
 
 </RelativeLayout>

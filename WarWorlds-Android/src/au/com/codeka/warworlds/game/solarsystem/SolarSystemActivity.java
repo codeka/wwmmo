@@ -327,19 +327,21 @@ public class SolarSystemActivity extends BaseActivity implements StarManager.Sta
             // this is probably because the SolarSystemView probably hasn't rendered yet. We'll
             // just ignore this then cause it'll fire an onPlanetSelected when it finishes
             // drawing.
+            congenialityContainer.setVisibility(View.GONE);
         } else {
-            double x = planetCentre.x * mSolarSystemSurfaceView.getPixelScale();
-            double y = planetCentre.y * mSolarSystemSurfaceView.getPixelScale();
+            float pixelScale = mSolarSystemSurfaceView.getPixelScale();
+            double x = planetCentre.x * pixelScale;
+            double y = planetCentre.y * pixelScale;
 
             // hard-coded size of the congeniality container: 85x34 dp
-            float offsetX = (85 + 20) * mSolarSystemSurfaceView.getPixelScale();
-            float offsetY = (34 + 20) * mSolarSystemSurfaceView.getPixelScale();
+            float offsetX = (85 + 20) * pixelScale;
+            float offsetY = (34 + 20) * pixelScale;
 
             if (x - offsetX < 0) {
-                offsetX  = -(20 * mSolarSystemSurfaceView.getPixelScale());
+                offsetX  = -(20 * pixelScale);
             }
-            if (y - offsetY < 0) {
-                offsetY = -(20 * mSolarSystemSurfaceView.getPixelScale());
+            if (y - offsetY < 20) {
+                offsetY = -(20 * pixelScale);
             }
 
             RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) congenialityContainer.getLayoutParams();
@@ -384,6 +386,8 @@ public class SolarSystemActivity extends BaseActivity implements StarManager.Sta
             colonizeButton.setVisibility(View.VISIBLE);
             colonyDetailsContainer.setVisibility(View.GONE);
             enemyColonyDetailsContainer.setVisibility(View.GONE);
+
+            refreshUncolonizedDetails();
         } else {
             colonizeButton.setVisibility(View.GONE);
             colonyDetailsContainer.setVisibility(View.GONE);
@@ -405,6 +409,12 @@ public class SolarSystemActivity extends BaseActivity implements StarManager.Sta
                     }
                 });
         }
+    }
+
+    private void refreshUncolonizedDetails() {
+        final TextView populationCountTextView = (TextView) findViewById(
+                R.id.population_count);
+        populationCountTextView.setText("Uncolonized");
     }
 
     private void refreshColonyDetails() {

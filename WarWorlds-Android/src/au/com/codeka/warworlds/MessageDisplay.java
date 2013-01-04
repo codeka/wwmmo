@@ -220,7 +220,7 @@ public class MessageDisplay {
         builder.setContentIntent(pendingIntent);
         builder.setSmallIcon(R.drawable.status_icon);
         builder.setAutoCancel(true);
-        builder.setLights(options.getLedColour(), 1000, 3000);
+        builder.setLights(options.getLedColour(), 1000, 5000);
 
         return builder.getNotification();
     }

@@ -19,8 +19,6 @@ import android.view.SurfaceView;
 
 /**
  * Base class for things like \c StarfieldSurfaceView and \c SolarSystemSurfaceView, etc.
- * @author dean@codeka.com.au
- *
  */
 public class UniverseElementSurfaceView extends SurfaceView implements SurfaceHolder.Callback {
     private Logger log = LoggerFactory.getLogger(UniverseElementSurfaceView.class);
@@ -71,6 +69,9 @@ public class UniverseElementSurfaceView extends SurfaceView implements SurfaceHo
 
     @Override
     public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
+        log.info("Surface changed!");
+        mHolder = holder;
+        redraw();
     }
 
     @Override
@@ -148,45 +149,54 @@ public class UniverseElementSurfaceView extends SurfaceView implements SurfaceHo
 
     private void drawThreadProc() {
         while (true) {
-            // if we have overlays then we're animated so we need to redraw anyway
-            if (mOverlays.size() == 0) {
-                try {
-                    mDrawSemaphore.acquire();
-                } catch (InterruptedException e) {
-                    log.info("Surface was destroyed, render thread shutting down.");
-                    return;
-                }
-            }
-
-            SurfaceHolder h = mHolder;
-            if (h == null) {
-                log.info("Surface was destroyed, render thread shutting down.");
-                return;
-            }
-
-            Canvas c = h.lockCanvas();
-            if (c == null) {
-                log.info("Surface was destroyed, render thread shutting down.");
-                return;
-            }
-
             try {
-                try {
-                    onDraw(c);
-
-                    synchronized(mOverlays) {
-                        int size = mOverlays.size();
-                        for (int i = 0; i < size; i++) {
-                            mOverlays.get(i).draw(c);
-                        }
-                    }
-                } finally {
-                    h.unlockCanvasAndPost(c);
+                if (!drawOnce()) {
+                    mDrawThread = null;
+                    return;
                 }
             } catch(Exception e) {
                 log.error("An error occured re-drawing the canvas, ignoring.", e);
             }
         }
+    }
+
+    private boolean drawOnce() {
+        // if we have overlays then we're animated so we need to redraw anyway
+        if (mOverlays.size() == 0) {
+            try {
+                mDrawSemaphore.acquire();
+            } catch (InterruptedException e) {
+                log.info("Surface was destroyed, render thread shutting down.");
+                return false;
+            }
+        }
+
+        SurfaceHolder h = mHolder;
+        if (h == null) {
+            log.info("Surface was destroyed, render thread shutting down.");
+            return false;
+        }
+
+        Canvas c = h.lockCanvas();
+        if (c == null) {
+            log.info("Surface was destroyed, render thread shutting down.");
+            return false;
+        }
+
+        try {
+            onDraw(c);
+
+            synchronized(mOverlays) {
+                int size = mOverlays.size();
+                for (int i = 0; i < size; i++) {
+                    mOverlays.get(i).draw(c);
+                }
+            }
+        } finally {
+            h.unlockCanvasAndPost(c);
+        }
+
+        return true;
     }
 
     /**
