@@ -166,7 +166,7 @@ def _addNativeColonies(star_pb):
 
   sector_key = mdl.SectorManager.getSectorKey(star_pb.sector_x, star_pb.sector_y)
 
-  num_colonies = random.randint(1, max(4, len(planets) - 1))
+  num_colonies = random.randint(1, min(4, len(planets) - 1))
   for n in range(num_colonies):
     colony_model = empire_ctl._colonize(sector_key,
                                         None, star_pb, planets[n].index)

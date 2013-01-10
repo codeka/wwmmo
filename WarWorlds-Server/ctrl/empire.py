@@ -57,31 +57,85 @@ def findStarForNewEmpire():
   close as to make them an easy target."""
   sector_model = None
   while not sector_model:
-    query = sector_mdl.Sector.all().filter("numColonies =", 0).order("distanceToCentre").fetch(5)
-    index = random.randint(0, 4)
-    sector_model = None
+    query = (sector_mdl.Sector.all().filter("numColonies <", 50)
+                                    .filter("numColonies >=", 1)
+                                    .order("numColonies")
+                                    .order("distanceToCentre")
+                                    .fetch(10))
+    models = []
     for s in query:
-      if index == 0:
-        sector_model = s
-        break
-      index -= 1
+      models.append(s)
 
-    if not sector_model:
+    if len(models) == 0:
+      query = (sector_mdl.Sector.all().filter("numColonies <", 50)
+                                      .order("numColonies")
+                                      .order("distanceToCentre")
+                                      .fetch(10))
+      for s in query:
+        models.append(s)
+
+    if len(models) == 0:
       # this would happen if there's no sectors loaded that have no colonies... that's bad!!
       logging.warn("Could not find any sectors for new empire, creating some...")
       sectorgen.expandUniverse(immediate=True)
+    else:
+      index = random.randint(0, len(models) - 1)
+      sector_model = models[index]
 
-  # Now find a star within that sector. We'll want one with two terran planets with highish
-  # population stats, close to the centre of the sector. We'll score each of the stars based on
-  # these factors and then choose the one with the highest score
-  starScores = []
+  # get the existing colonies in this sector
+  colonized_stars = []
+  for colony_model in mdl.Colony.all().filter("sector", sector_model):
+    empire_key = mdl.Colony.empire.get_value_for_datastore(colony_model)
+    if empire_key:
+      star_key = colony_model.key().parent()
+      colonized_stars.append(star_key)
+
+  stars = []
   for star_model in sector_mdl.Star.all().filter("sector", sector_model):
+    star = {"star_model": star_model}
+    star["is_colonized"] = (star_model.key() in colonized_stars)
+    stars.append(star)
+
+  # Now find a star within that sector. We'll want one with two terran planets
+  # with highish population stats, close to the centre of the sector, but far
+  # from any existing (non-Native) colonies. We'll score each of the stars
+  # based on these factors and then choose the one with the highest score
+  starScores = []
+  for star in stars:
+    if star["is_colonized"]:
+      # colonized stars are right out...
+      continue
+    star_model = star["star_model"]
+
     centre = sector.SECTOR_SIZE / 2
     distance_to_centre = math.sqrt((star_model.x - centre) * (star_model.x - centre) +
                                    (star_model.y - centre) * (star_model.y - centre))
 
     # 0 -- 10 (0 is edge of sector, 10 is centre of sector)
-    distance_score = (centre - distance_to_centre) / (centre / 10)
+    distance_to_centre_score = (centre - distance_to_centre) / (centre / 10)
+    if distance_to_centre_score < 1:
+      distance_to_centre_score = 1
+
+    # figure out the distance to the closest colony
+    distance_to_colony_score = 1
+    distance_to_other_colony = 0
+    other_colony = None
+    for other_star in stars:
+      if other_star["is_colonized"] and other_star["star_model"] != star_model:
+        distance_to_this_colony = math.sqrt(
+            (star_model.x - other_star["star_model"].x) * (star_model.x - other_star["star_model"].x) +
+            (star_model.y - other_star["star_model"].y) * (star_model.y - other_star["star_model"].y))
+        if not other_colony or distance_to_this_colony < distance_to_other_colony:
+          other_colony = other_star
+          distance_to_other_colony = distance_to_this_colony
+    if other_colony:
+      if distance_to_other_colony < 500:
+        distance_to_colony_score = 0
+      else:
+        distance_to_colony_score = 500 / distance_to_other_colony
+      distance_to_colony_score *= distance_to_colony_score
+      logging.debug("Star[%s] distance_to_other_colony=%.2f score=%.2f" % (
+                star_model.name, distance_to_other_colony, distance_to_colony_score))
 
     num_terran_planets = 0
     population_congeniality = 0
@@ -108,11 +162,13 @@ def findStarForNewEmpire():
                           mining_congeniality / num_terran_planets)
     congeniality_score /= 100
 
-    score = distance_score * planet_score * congeniality_score
+    score = (distance_to_centre_score * planet_score * congeniality_score *
+             distance_to_colony_score)
     starScores.append((score, star_model))
 
   # just choose the star with the highest score
   (score, star_model) = sorted(starScores, reverse=True)[0]
+  logging.info("Chose star with score=%d" % (score))
 
   # next, choose the planet on this star with the highest population congeniality, that'll
   # be the one we start out on
@@ -150,7 +206,7 @@ def createEmpire(empire_pb, sim):
   # colonize the planet!
   sector_key = sector_mdl.SectorManager.getSectorKey(star_pb.sector_x,
                                                      star_pb.sector_y)
-  _colonize(sector_key, empire_model, star_pb, planet_index)
+  _colonize(sector_key, empire_model, star_pb, planet_index, count_in_sector=False)
 
   # add some initial goods and minerals to the colony
   sim.simulate(star_key)
@@ -337,7 +393,7 @@ def collectTaxes(colony_key, sim):
                     "empire:for-user:%s" % (empire_model.user.email())])
 
 
-def _colonize(sector_key, empire_model, star_pb, planet_index):
+def _colonize(sector_key, empire_model, star_pb, planet_index, count_in_sector=True):
   colony_model = mdl.Colony(parent=db.Key(star_pb.key))
   colony_model.empire = empire_model
   colony_model.planet_index = planet_index
@@ -357,7 +413,8 @@ def _colonize(sector_key, empire_model, star_pb, planet_index):
     else:
       sector_model.numColonies += 1
     sector_model.put()
-  db.run_in_transaction(inc_colony_count)
+  if count_in_sector:
+    db.run_in_transaction(inc_colony_count)
 
   # clear the cache of the various bits and pieces who are now invalid
   keys = ["sector:%d,%d" % (star_pb.sector_x, star_pb.sector_y),

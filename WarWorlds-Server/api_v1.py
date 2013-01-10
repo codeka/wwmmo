@@ -366,10 +366,10 @@ class StarPage(StarfieldPage):
     # here, so we remove them
     has_fleet_or_colony = False
     for fleet_pb in star_pb.fleets:
-      if fleet_pb.empire_key == empire_pb.key:
+      if empire_pb and fleet_pb.empire_key == empire_pb.key:
         has_fleet_or_colony = True
     for colony_pb in star_pb.colonies:
-      if colony_pb.empire_key == empire_pb.key:
+      if empire_pb and colony_pb.empire_key == empire_pb.key:
         has_fleet_or_colony = True
 
     if not self._isAdmin() and not has_fleet_or_colony:
