@@ -28,8 +28,13 @@ class IntelPage(webapp.RequestHandler):
     if not user:
       self.redirect(users.create_login_url(self.request.uri))
     else:
+      data = {}
+      if user.email() == "dean@codeka.com.au":
+        data["is_admin"] = True
+      else:
+        data["is_admin"] = False
       tmpl = jinja.get_template("intel/index.html")
-      self.response.out.write(tmpl.render({}))
+      self.response.out.write(tmpl.render(data))
 
 
 app = webapp.WSGIApplication([("/", MainPage),

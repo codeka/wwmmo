@@ -390,8 +390,12 @@ class StarPage(StarfieldPage):
 class StarsPage(ApiPage):
   def get(self):
     query = self.request.get("q")
+    findForEmpire = self.request.get("find_for_empire")
     if query:
       return sector.getStars(query)
+    elif findForEmpire == "1":
+      (star_key, _) = empire.findStarForNewEmpire()
+      return sector.getStar(star_key)
     else:
       self.response.set_status(404)
 

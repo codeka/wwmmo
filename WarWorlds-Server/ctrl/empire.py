@@ -49,15 +49,12 @@ def getEmpire(empire_key):
   return empire_pb
 
 
-def createEmpire(empire_pb, sim):
-  empire_model = mdl.Empire()
-  empire_model.cash = 500.0
-  ctrl.empirePbToModel(empire_model, empire_pb)
-  empire_model.put()
+def findStarForNewEmpire():
+  """Find a star which is suitable for a new empire.
 
-  # We need to set you up with some initial bits and pieces. First, we need to find
-  # sector for your colony. We look for one with no existing colonized stars and
-  # close to the centre of the universe. We chose a random one of the five closest
+  When a new player joins the game, we want to find a star for their initial
+  colony. We need to choose a star that's close to other players, but not TOO
+  close as to make them an easy target."""
   sector_model = None
   while not sector_model:
     query = sector_mdl.Sector.all().filter("numColonies =", 0).order("distanceToCentre").fetch(5)
@@ -68,11 +65,10 @@ def createEmpire(empire_pb, sim):
         sector_model = s
         break
       index -= 1
-  
+
     if not sector_model:
       # this would happen if there's no sectors loaded that have no colonies... that's bad!!
-      logging.warn("Could not find any sectors for new empire [%s], creating some..." % (
-                     str(empire_model.key())))
+      logging.warn("Could not find any sectors for new empire, creating some...")
       sectorgen.expandUniverse(immediate=True)
 
   # Now find a star within that sector. We'll want one with two terran planets with highish
@@ -129,6 +125,16 @@ def createEmpire(empire_pb, sim):
         max_population_congeniality = planet.population_congeniality
 
   star_key = str(star_model.key())
+  return (star_key, planet_index)
+
+
+def createEmpire(empire_pb, sim):
+  empire_model = mdl.Empire()
+  empire_model.cash = 500.0
+  ctrl.empirePbToModel(empire_model, empire_pb)
+  empire_model.put()
+
+  (star_key, planet_index) = findStarForNewEmpire()
   star_pb = sim.getStar(star_key, True)
 
   # by default, the star will have a bunch of native colonies and fleets... drop those!
@@ -142,7 +148,9 @@ def createEmpire(empire_pb, sim):
   del star_pb.colonies[:]
 
   # colonize the planet!
-  _colonize(sector_model.key(), empire_model, star_pb, planet_index)
+  sector_key = sector_mdl.SectorManager.getSectorKey(star_pb.sector_x,
+                                                     star_pb.sector_y)
+  _colonize(sector_key, empire_model, star_pb, planet_index)
 
   # add some initial goods and minerals to the colony
   sim.simulate(star_key)
@@ -152,18 +160,18 @@ def createEmpire(empire_pb, sim):
       empire_presence_pb.total_minerals += 100
 
   # give them a colony ship and a couple of scouts for free
-  fleet_model = mdl.Fleet(parent=star_model)
+  fleet_model = mdl.Fleet(parent=db.Key(star_pb.key))
   fleet_model.empire = empire_model
-  fleet_model.sector = sector_model
+  fleet_model.sector = sector_key
   fleet_model.designName = "colonyship"
   fleet_model.numShips = 1.0
   fleet_model.state = pb.Fleet.IDLE
   fleet_model.stateStartTime = datetime.now()
   fleet_model.put()
 
-  fleet_model = mdl.Fleet(parent=star_model)
+  fleet_model = mdl.Fleet(parent=db.Key(star_pb.key))
   fleet_model.empire = empire_model
-  fleet_model.sector = sector_model
+  fleet_model.sector = sector_key
   fleet_model.designName = "scout"
   fleet_model.numShips = 10.0
   fleet_model.state = pb.Fleet.IDLE

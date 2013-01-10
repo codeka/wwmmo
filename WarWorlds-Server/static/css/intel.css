@@ -80,6 +80,16 @@ body {
   line-height: 32pt;
 }
 
+#debug {
+  position: absolute;
+  left: 10pt;
+  top: 10pt;
+  width: 60pt;
+  height: 20pt;
+  line-height: 20pt;
+  text-align: center;
+}
+
 #star-details {
   position: absolute;
   left: 10pt;

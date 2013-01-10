@@ -154,6 +154,21 @@ $(function() {
     }
   });
 
+  var Colony = WorldObject.extend({
+    init: function(star, pb) {
+      this.star = star;
+      this.empireKey = pb.empire_key;
+    },
+
+    render: function(context, offsetX, offsetY) {
+      if (typeof this.empireKey == "undefined") {
+        return;
+      }
+      context.fillText("Colony",
+                       offsetX, offsetY);
+    }
+  });
+
   var Star = WorldObject.extend({
     init: function(pb) {
       this.name = pb.name;
@@ -164,6 +179,7 @@ $(function() {
       this.offsetY = pb.offset_y;
       this.key = pb.key;
       this.size = pb.size * 1.5;
+      this.colonies = [];
 
       Math.seedrandom(this.key);
       this.imgIndex = randomInt(0, 3);
@@ -177,6 +193,12 @@ $(function() {
           offsetX + this.offsetX - (this.size * slice.scale / 2),
           offsetY + this.offsetY - (this.size * slice.scale / 2),
           this.size * slice.scale, this.size * slice.scale);
+      }
+
+      for (var i = 0; i < this.colonies.length; i++) {
+        var colony = this.colonies[i];
+        colony.render(context,
+                      offsetX + this.offsetX, offsetY + this.offsetY);
       }
 
       context.textAlign = "center";
@@ -242,6 +264,19 @@ $(function() {
       for (var i = 0; i < pb.stars.length; i++) {
         var star = new Star(pb.stars[i]);
         this.stars.push(star);
+      }
+
+      if (pb.colonies) {
+        for (var i = 0; i < pb.colonies.length; i++) {
+          var star_key = pb.colonies[i].star_key;
+          for (var j = 0; j < this.stars.length; j++) {
+            if (this.stars[j].key == star_key) {
+              var colony = new Colony(this.stars[j], pb.colonies[i]);
+              this.stars[j].colonies.push(colony);
+              break;
+            }
+          }
+        }
       }
 
       Math.seedrandom(this.sectorX+","+this.sectorY);
@@ -647,6 +682,18 @@ $(function() {
     });
   });
 
+  function showStarDetails(star) {
+    Math.seedrandom(star.key);
+    var $details = $("#star-details");
+    var className = star.type.split(".")[1].toLowerCase();
+    className += "-"+randomInt(1, 4);
+    $details.find("div.star-icon-big").attr("class", "star-icon-big "+className);
+    $details.find("div.star-name").html(star.name);
+    $details.find("div.star-classification").html(star.type.split(".")[1].toLowerCase());
+    $details.find("div.star-key input").val(star.key);
+    $details.fadeIn("fast");
+  }
+
   // Handles selection of stars (i.e. clicking on them)
   $(function() {
     var canvas = $("#main-canvas");
@@ -690,17 +737,24 @@ $(function() {
       if (mouseOverStar == null) {
         $("#star-details").fadeOut("fast");
       } else {
-          var star = mouseOverStar;
-          Math.seedrandom(star.key);
-          var $details = $("#star-details");
-          var className = star.type.split(".")[1].toLowerCase();
-          className += "-"+randomInt(1, 4);
-          $details.find("div.star-icon-big").attr("class", "star-icon-big "+className);
-          $details.find("div.star-name").html(star.name);
-          $details.find("div.star-classification").html(star.type.split(".")[1].toLowerCase());
-          $details.find("div.star-key input").val(star.key);
-          $details.fadeIn("fast");
+        showStarDetails(mouseOverStar);
       }
     });
+  });
+
+  // handles the "New Empire" debug function
+  $(function() {
+    $("#debug-new-empire").click(function() {
+      $.ajax({
+        url: "/api/v1/stars?find_for_empire=1",
+        "dataType": "json",
+        "success": function(star_pb) {
+          var star = new Star(star_pb);
+          showStarDetails(star);
+          world.scrollTo(star_pb.sector_x, star_pb.sector_y,
+                         star_pb.offset_x, star_pb.offset_y);
+        }
+      })
+    })
   });
 });
