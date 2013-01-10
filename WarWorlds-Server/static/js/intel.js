@@ -503,8 +503,10 @@ $(function() {
             }
             world.draw();
           },
-          error: function() {
-            alert("An error occurred fetching starfield data. Sorry.");
+          error: function(xhr, textStatus, error) {
+            alert("An error occurred fetching starfield data. Sorry.\r\n\r\n"+
+                  textStatus+"\r\n"+
+                  error);
           }
         });
       }

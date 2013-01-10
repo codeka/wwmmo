@@ -41,6 +41,7 @@ __version__='0.0.6'
 __author__='Paul Dovbush <dpp@dpp.su>, Dean Harding <dean@codeka.com.au>'
 
 
+import math
 import json
 from google.protobuf.descriptor import FieldDescriptor as FD
 
@@ -133,6 +134,12 @@ def pb2obj(pb):
             val = []
             for v in value:
                 val.append(ftype(v))
+        elif ftype == float:
+          # we want to check that it's a valid number and not NaN or +/- Inf
+          # which will cause problems when encoded in JSON
+          val = ftype(value)
+          if math.isnan(val) or math.isinf(val):
+            val = None
         else:
             val = ftype(value)
         obj[field.name] = val
@@ -140,7 +147,7 @@ def pb2obj(pb):
 
 
 def pb2json(pb):
-    return json.dumps(pb2obj(pb))
+    return json.dumps(pb2obj(pb), allow_nan=False)
 
 
 _ftype2js = {
