@@ -306,6 +306,12 @@ def combatReportModelToPb(combat_report_pb, combat_report_mdl, summary=False):
     combat_report_pb.rounds.extend(combat_rounds_pb.rounds)
 
 
+def chatMessageModelToPb(chat_message_pb, chat_message_mdl):
+  chat_message_pb.message = chat_message_mdl.message
+  chat_message_pb.empire_key = "TODO"
+  chat_message_pb.date_posted = dateTimeToEpoch(chat_message_mdl.postedDate)
+
+
 def dateTimeToEpoch(dt):
   return int(time.mktime(dt.timetuple()))
 

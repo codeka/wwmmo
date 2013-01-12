@@ -4,8 +4,11 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 
+import android.os.AsyncTask;
 import au.com.codeka.warworlds.BackgroundDetector;
 import au.com.codeka.warworlds.Util;
+import au.com.codeka.warworlds.api.ApiClient;
+import au.com.codeka.warworlds.model.protobuf.Messages;
 
 /**
  * This class keeps track of chats and what-not.
@@ -54,6 +57,31 @@ public class ChatManager implements BackgroundDetector.BackgroundChangeHandler {
         for(MessageAddedListener listener : mMessageAddedListeners) {
             listener.onMessageAdded(msg);
         }
+    }
+
+    /**
+     * Posts a message from us to the server.
+     */
+    public void postMessage(final ChatMessage msg) {
+        new AsyncTask<Void, Void, Boolean>() {
+            @Override
+            protected Boolean doInBackground(Void... arg0) {
+                try {
+                    Messages.ChatMessage pb = Messages.ChatMessage.newBuilder()
+                            .setMessage(msg.getMessage())
+                            .build();
+                    ApiClient.postProtoBuf("chat", pb);
+                    return true;
+                } catch (Exception e) {
+                    return false;
+                }
+            }
+
+            @Override
+            protected void onPostExecute(Boolean success) {
+                // TODO; append this message
+            }
+        }.execute();
     }
 
     public ChatMessage getLastMessage() {

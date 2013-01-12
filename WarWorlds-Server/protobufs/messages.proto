@@ -172,6 +172,12 @@ message ChatMessage
 {
     required string message = 1;
     optional string empire_key = 2;
+    optional int32 date_posted = 3;
+}
+
+message ChatMessages
+{
+    repeated ChatMessage messages = 1;
 }
 
 

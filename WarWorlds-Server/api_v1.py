@@ -1,6 +1,6 @@
 """api_v1.py: The handlers for the actual API that the client calls."""
 
-from datetime import datetime
+from datetime import datetime, timedelta
 import os
 import logging
 
@@ -126,17 +126,29 @@ class HelloPage(ApiPage):
 
 
 class ChatPage(ApiPage):
+  def get(self):
+    """Gets the latest chat messages based on various criteria."""
+    since = self.request.get("since")
+    if since:
+      since = ctrl.epochToDateTime(int(since))
+      seven_days_ago = datetime.now() - timedelta(days=7)
+      if since < seven_days_ago:
+        since = seven_days_ago
+    else:
+      since = datetime.now() - timedelta(hours=24)
+    max_chats = self.request.get("max")
+    if max_chats:
+      max_chats = int(max_chats)
+      if max_chats > 1000:
+        max_chats = 1000
+    else:
+      max_chats = 100
+
+    return chat.getLatestChats(since=since, max_chats=max_chats)
+
   def post(self):
     msg_pb = self._getRequestBody(pb.ChatMessage)
     chat.postMessage(self.user, msg_pb)
-
-    # send the chat out to all connected clients (TODO: only some?)
-    #for cc in model.ChatClient.all():
-    #  try:
-    #    channel.send_message(cc.clientID, msg_pb.message)
-    #  except:
-    #    # TODO: handle errors?
-    #    pass
 
 
 class EmpiresPage(ApiPage):

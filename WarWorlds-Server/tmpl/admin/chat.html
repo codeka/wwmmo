@@ -46,6 +46,20 @@
     });
 
     function appendMessage(msg) {
+      if (typeof msg != "string") {
+        var dt = new Date();
+        dt.setTime(msg.date_posted * 1000);
+
+        function zeroPad(str, n) {
+          str = "0000000000"+str;
+          return str.substr(str.length - n);
+        }
+
+        var dtstr = dt.getFullYear()+"-"+zeroPad(dt.getMonth() + 1, 2)+"-"+zeroPad(dt.getDay(), 2);
+        dtstr += " "+zeroPad(dt.getHours(), 2)+":"+zeroPad(dt.getMinutes(), 2);
+        msg = dtstr+" : "+msg.message;
+      }
+
       // todo: template?
       $("section#messages").append("<div>"+msg+"</div>");
     }
@@ -65,5 +79,29 @@
         }
       });
     }
+
+    var lastFetch = new Date();
+    lastFetch.setDate(lastFetch.getDate() - 1);
+    function fetchMessages() {
+      $.ajax({
+        "url": "/api/v1/chat?since="+parseInt(lastFetch.getTime() / 1000),
+        "method": "get",
+        "dataType": "json",
+        "success": function(data) {
+          if (typeof data.messages == "undefined") {
+            return;
+          }
+
+          for (var i = 0; i < data.messages.length; i++) {
+            var msg = data.messages[i];
+            appendMessage(msg);
+          }
+          lastFetch = new Date();
+        }
+      });
+    }
+
+    fetchMessages();
+    setInterval(fetchMessages, 15000);
   </script>
 {% endblock %}
