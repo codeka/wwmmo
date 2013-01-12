@@ -17,12 +17,11 @@ import android.util.AttributeSet;
 import android.util.Base64;
 import android.view.View;
 import android.webkit.WebView;
-import android.webkit.WebViewClient;
 
 /**
  * A \c WebView with a transparent background. It's a little tricky and the method
  * for getting a transparent background seems to be totally different depending on
- * which version of the Android API your device is. Hmm.
+ * which version of the Android API your device is.
  */
 public class TransparentWebView extends WebView {
     private static Logger log = LoggerFactory.getLogger(TransparentWebView.class);
@@ -30,7 +29,6 @@ public class TransparentWebView extends WebView {
     public TransparentWebView(Context context, AttributeSet attrs) {
         super(context, attrs);
         setTransparent();
-        setWebViewClient(new WebViewClient());
     }
 
     @Override
