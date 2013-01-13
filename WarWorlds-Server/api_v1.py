@@ -148,6 +148,13 @@ class ChatPage(ApiPage):
 
   def post(self):
     msg_pb = self._getRequestBody(pb.ChatMessage)
+    empire_pb = empire.getEmpireForUser(self.user)
+    if empire_pb:
+      msg_pb.empire_key = empire_pb.key
+    else:
+      msg_pb.empire_key = ""
+    msg_pb.date_posted = ctrl.dateTimeToEpoch(datetime.now())
+
     chat.postMessage(self.user, msg_pb)
 
 

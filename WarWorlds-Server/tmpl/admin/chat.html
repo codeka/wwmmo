@@ -45,20 +45,48 @@
       $val.val("").focus();
     });
 
-    function appendMessage(msg) {
-      if (typeof msg != "string") {
-        var dt = new Date();
-        dt.setTime(msg.date_posted * 1000);
-
-        function zeroPad(str, n) {
-          str = "0000000000"+str;
-          return str.substr(str.length - n);
-        }
-
-        var dtstr = dt.getFullYear()+"-"+zeroPad(dt.getMonth() + 1, 2)+"-"+zeroPad(dt.getDay(), 2);
-        dtstr += " "+zeroPad(dt.getHours(), 2)+":"+zeroPad(dt.getMinutes(), 2);
-        msg = dtstr+" : "+msg.message;
+    var g_empires = {};
+    function getEmpire(empireKey, callback) {
+      if (typeof g_empires[empireKey] != "undefined") {
+        callback(g_empires[empireKey]);
+      } else {
+        $.ajax({
+          "url": "/api/v1/empires/"+empireKey,
+          "dataType": "json",
+          "method": "GET",
+          "success": function(data) {
+            g_empires[data.key] = data;
+            callback(data);
+          }
+        });
       }
+    }
+
+    function appendMessage(msg) {
+      if (typeof msg.empire == "undefined") {
+        if (msg.empire_key) {
+          getEmpire(msg.empire_key, function(empire) {
+            msg.empire = empire;
+            appendMessage(msg);
+          });
+        } else {
+          msg.empire = {display_name: "[SERVER]"};
+          appendMessage(msg);
+        }
+        return;
+      }
+
+      var dt = new Date();
+      dt.setTime(msg.date_posted * 1000);
+
+      function zeroPad(str, n) {
+        str = "0000000000"+str;
+        return str.substr(str.length - n);
+      }
+      var dtstr = dt.getFullYear()+"-"+zeroPad(dt.getMonth() + 1, 2)+"-"+zeroPad(dt.getDay(), 2);
+      dtstr += " "+zeroPad(dt.getHours(), 2)+":"+zeroPad(dt.getMinutes(), 2);
+
+      msg = dtstr+" : "+msg.empire.display_name+" : "+msg.message;
 
       // todo: template?
       $("section#messages").append("<div>"+msg+"</div>");
@@ -75,7 +103,8 @@
           // ??
         },
         error: function(xhr, status, err) {
-          appendMessage("[ERROR] An error occured sending the last message");
+          // todo: handle errors
+          //appendMessage("[ERROR] An error occured sending the last message");
         }
       });
     }

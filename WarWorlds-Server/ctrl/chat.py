@@ -4,16 +4,21 @@ import base64
 from datetime import datetime, timedelta
 import logging
 
+from google.appengine.ext import db
+
 import ctrl
-from model import gcm as gcm_mdl
 import model
+from model import gcm as gcm_mdl
+from model import chat as chat_mdl
 
 from protobufs import messages_pb2 as pb
 
 def postMessage(user, msg_pb):
-  msg_model = model.ChatMessage()
+  msg_model = chat_mdl.ChatMessage()
   msg_model.user = user
   msg_model.message = msg_pb.message
+  if msg_pb.empire_key:
+    msg_model.empire = db.Key(msg_pb.empire_key)
   msg_model.put()
 
   one_day_ago = datetime.now() - timedelta(hours=24)
@@ -34,7 +39,7 @@ def postMessage(user, msg_pb):
 
 
 def getLatestChats(since=None, max_chats=None):
-  query = model.ChatMessage.all()
+  query = chat_mdl.ChatMessage.all()
   if since:
     query.filter("postedDate >", since)
   query.order("-postedDate")

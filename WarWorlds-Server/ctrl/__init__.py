@@ -16,6 +16,7 @@ import_fixer.FixImports("google", "protobuf")
 from google.protobuf.message import Message
 
 import protobufs.messages_pb2 as pb
+from model import chat as chat_mdl
 from model import empire as empire_mdl
 import model as mdl
 
@@ -308,7 +309,9 @@ def combatReportModelToPb(combat_report_pb, combat_report_mdl, summary=False):
 
 def chatMessageModelToPb(chat_message_pb, chat_message_mdl):
   chat_message_pb.message = chat_message_mdl.message
-  chat_message_pb.empire_key = "TODO"
+  empire_key = chat_mdl.ChatMessage.empire.get_value_for_datastore(chat_message_mdl)
+  if empire_key:
+    chat_message_pb.empire_key = str(empire_key)
   chat_message_pb.date_posted = dateTimeToEpoch(chat_message_mdl.postedDate)
 
 

@@ -1,8 +1,10 @@
 package au.com.codeka.warworlds.model;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
+
+import org.joda.time.DateTime;
 
 import android.os.AsyncTask;
 import au.com.codeka.warworlds.BackgroundDetector;
@@ -24,6 +26,7 @@ public class ChatManager implements BackgroundDetector.BackgroundChangeHandler {
 
     private LinkedList<ChatMessage> mMessages;
     private ArrayList<MessageAddedListener> mMessageAddedListeners;
+    private DateTime mMostRecentMsg;
 
     private ChatManager() {
         mMessages = new LinkedList<ChatMessage>();
@@ -43,6 +46,10 @@ public class ChatManager implements BackgroundDetector.BackgroundChangeHandler {
         } else {
             addMessage(new ChatMessage("Chat has been disabled."));
         }
+
+        // fetch all chats from the last 24 hours
+        mMostRecentMsg = (new DateTime()).minusDays(1);
+        requestMessages(mMostRecentMsg);
     }
 
     public void addMessageAddedListener(MessageAddedListener listener) {
@@ -85,26 +92,38 @@ public class ChatManager implements BackgroundDetector.BackgroundChangeHandler {
     }
 
     public ChatMessage getLastMessage() {
-        ChatMessage[] msgs = getLastMessages(1);
-        return msgs[0];
+        return getMessage(mMessages.size() - 1);
+    }
+
+    /**
+     * Returns the nth message, where 0 is the {i most recent} message.
+     */
+    public ChatMessage getMessage(int n) {
+        synchronized(mMessages) {
+            return mMessages.get(mMessages.size() - n - 1);
+        }
     }
 
     /**
      * Returns the last {c n} messages.
      */
-    public ChatMessage[] getLastMessages(int n) {
-        ChatMessage[] msgs = new ChatMessage[n];
+    public List<ChatMessage> getLastMessages(int n) {
+        ArrayList<ChatMessage> msgs = new ArrayList<ChatMessage>();
 
-        Iterator<ChatMessage> iter = mMessages.iterator();
-        for(int i = 0; i < n; i++) {
-            if (iter.hasNext()) {
-                msgs[i] = iter.next();
-            } else {
-                break;
-            }
+        int startIndex = mMessages.size() - 1 - n;
+        if (startIndex < 0) {
+            startIndex = 0;
+        }
+
+        for(int i = startIndex; i < mMessages.size(); i++) {
+            msgs.add(mMessages.get(i));
         }
 
         return msgs;
+    }
+
+    public List<ChatMessage> getAllMessages() {
+        return mMessages;
     }
 
     /**
@@ -113,9 +132,13 @@ public class ChatManager implements BackgroundDetector.BackgroundChangeHandler {
     public void addMessage(ChatMessage msg) {
         synchronized(mMessages) {
             while (mMessages.size() > MAX_CHAT_HISTORY) {
-                mMessages.removeLast();
+                mMessages.removeFirst();
             }
-            mMessages.addFirst(msg);
+            mMessages.add(msg);
+
+            if (msg.getDatePosted() != null) {
+                mMostRecentMsg = msg.getDatePosted();
+            }
         }
         fireMessageAddedListeners(msg);
     }
@@ -124,22 +147,47 @@ public class ChatManager implements BackgroundDetector.BackgroundChangeHandler {
         return mMessages.size();
     }
 
-    /**
-     * Returns the nth message, where 0 is the {i most recent} message.
-     */
-    public ChatMessage getMessage(int n) {
-        synchronized(mMessages) {
-            return mMessages.get(n);
+    @Override
+    public void onBackgroundChange(boolean isInBackground) {
+        if (!isInBackground) {
+            // TODO: fetch most recent messages...
         }
+    }
+
+    private void requestMessages(final DateTime since) {
+        new AsyncTask<Void, Void, ArrayList<ChatMessage>>() {
+            @Override
+            protected ArrayList<ChatMessage> doInBackground(Void... arg0) {
+                ArrayList<ChatMessage> msgs = new ArrayList<ChatMessage>();
+
+                try {
+                    String url = "chat?since="+(since.getMillis()/1000);
+                    Messages.ChatMessages pb = ApiClient.getProtoBuf(url,
+                            Messages.ChatMessages.class);
+
+                    // this comes back most recent first, but we work in the
+                    // opposite order...
+                    for (int i = pb.getMessagesCount() - 1; i >= 0; i--) {
+                        ChatMessage msg = ChatMessage.fromProtocolBuffer(pb.getMessages(i));
+                        msgs.add(msg);
+                    }
+                } catch (Exception e) {
+                    // TODO: errors?
+                }
+
+                return msgs;
+            }
+
+            @Override
+            protected void onPostExecute(ArrayList<ChatMessage> msgs) {
+                for (ChatMessage msg : msgs) {
+                    addMessage(msg);
+                }
+            }
+        }.execute();
     }
 
     public interface MessageAddedListener {
         void onMessageAdded(ChatMessage msg);
-    }
-
-    @Override
-    public void onBackgroundChange(boolean isInBackground) {
-        // TODO Auto-generated method stub
-        
     }
 }

@@ -1,5 +1,7 @@
 package au.com.codeka.warworlds.ctrl;
 
+import java.util.List;
+
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
@@ -14,6 +16,8 @@ import android.widget.TextView;
 import au.com.codeka.warworlds.game.ChatActivity;
 import au.com.codeka.warworlds.model.ChatManager;
 import au.com.codeka.warworlds.model.ChatMessage;
+import au.com.codeka.warworlds.model.Empire;
+import au.com.codeka.warworlds.model.EmpireManager;
 
 /**
  * This control displays the mini chat window, which displays recent chat
@@ -25,6 +29,8 @@ public class MiniChatView extends RelativeLayout {
     private ScrollView mScrollView;
     private LinearLayout mMsgsContainer;
     private MessageAddedListener mMessageAddedListener;
+
+    private static final int MAX_ROWS = 10;
 
     public MiniChatView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -71,20 +77,29 @@ public class MiniChatView extends RelativeLayout {
     private void refreshMessages() {
         mMsgsContainer.removeAllViews();
 
-        ChatMessage[] msgs = ChatManager.getInstance().getLastMessages(10);
-        for(int i = msgs.length - 1; i >= 0; i--) {
-            ChatMessage msg = msgs[i];
-            if (msg == null) {
-                continue;
-            }
-
-            appendMessage(msg);
+        List<ChatMessage> msgs = ChatManager.getInstance().getLastMessages(10);
+        for(ChatMessage msg : msgs) {
+            appendMessage(msg, null);
         }
     }
 
-    private void appendMessage(ChatMessage msg) {
+    private void appendMessage(final ChatMessage msg, Empire emp) {
+        if (emp == null && msg.getEmpireKey() != null) {
+            EmpireManager.getInstance().fetchEmpire(msg.getEmpireKey(), new EmpireManager.EmpireFetchedHandler() {
+                @Override
+                public void onEmpireFetched(Empire empire) {
+                    appendMessage(msg, empire);
+                }
+            });
+            return;
+        }
+
         TextView tv = new TextView(mContext);
-        tv.setText(msg.getMessage());
+        tv.setText(msg.format(emp));
+
+        while (mMsgsContainer.getChildCount() >= MAX_ROWS) {
+            mMsgsContainer.removeViewAt(0);
+        }
         mMsgsContainer.addView(tv);
 
         // need to wait for it to settle before we scroll again
@@ -103,7 +118,7 @@ public class MiniChatView extends RelativeLayout {
             MiniChatView.this.post(new Runnable() {
                 @Override
                 public void run() {
-                    appendMessage(msg);
+                    appendMessage(msg, null);
                 }
             });
         }

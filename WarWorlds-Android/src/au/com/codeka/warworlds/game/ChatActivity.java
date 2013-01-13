@@ -1,6 +1,9 @@
 package au.com.codeka.warworlds.game;
 
+import java.util.List;
+
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
@@ -12,11 +15,14 @@ import au.com.codeka.warworlds.BaseActivity;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.model.ChatManager;
 import au.com.codeka.warworlds.model.ChatMessage;
+import au.com.codeka.warworlds.model.Empire;
+import au.com.codeka.warworlds.model.EmpireManager;
 
 public class ChatActivity extends BaseActivity
                           implements ChatManager.MessageAddedListener {
     private ScrollView mScrollView;
     private LinearLayout mChatOutput;
+    private Handler mHandler;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -26,6 +32,7 @@ public class ChatActivity extends BaseActivity
 
         mScrollView = (ScrollView) findViewById(R.id.scroll_view);
         mChatOutput = (LinearLayout) findViewById(R.id.chat_output);
+        mHandler = new Handler();
 
         final EditText chatMsg = (EditText) findViewById(R.id.chat_text);
 
@@ -56,13 +63,28 @@ public class ChatActivity extends BaseActivity
     }
 
     @Override
-    public void onMessageAdded(ChatMessage msg) {
-        appendMessage(msg);
+    public void onMessageAdded(final ChatMessage msg) {
+        mHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                appendMessage(msg, null);
+            }
+        });
     }
 
-    private void appendMessage(ChatMessage msg) {
+    private void appendMessage(final ChatMessage msg, Empire emp) {
+        if (emp == null && msg.getEmpireKey() != null) {
+            EmpireManager.getInstance().fetchEmpire(msg.getEmpireKey(), new EmpireManager.EmpireFetchedHandler() {
+                @Override
+                public void onEmpireFetched(Empire empire) {
+                    appendMessage(msg, empire);
+                }
+            });
+            return;
+        }
+
         TextView tv = new TextView(this);
-        tv.setText(msg.getMessage());
+        tv.setText(msg.format(emp));
         mChatOutput.addView(tv);
 
         // need to wait for it to settle before we scroll again
@@ -77,14 +99,9 @@ public class ChatActivity extends BaseActivity
     private void refreshMessages() {
         mChatOutput.removeAllViews();
 
-        ChatMessage[] msgs = ChatManager.getInstance().getLastMessages(10);
-        for(int i = msgs.length - 1; i >= 0; i--) {
-            ChatMessage msg = msgs[i];
-            if (msg == null) {
-                continue;
-            }
-
-            appendMessage(msg);
+        List<ChatMessage> msgs = ChatManager.getInstance().getAllMessages();
+        for(ChatMessage msg : msgs) {
+            appendMessage(msg, null);
         }
     }
 
