@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.os.AsyncTask;
+import android.os.Handler;
 import au.com.codeka.warworlds.api.ApiClient;
 import au.com.codeka.warworlds.api.ApiException;
 import au.com.codeka.warworlds.model.protobuf.Messages;
@@ -38,7 +39,9 @@ public class BackgroundDetector {
     }
     private BackgroundDetector() {
         mIsInBackground = true;
+        mIsTransitioningToBackground = false;
         mBackgroundChangeHandlers = new ArrayList<BackgroundChangeHandler>();
+        mHandler = new Handler();
     }
     private static Logger log = LoggerFactory.getLogger(BackgroundDetector.class);
 
@@ -46,6 +49,8 @@ public class BackgroundDetector {
     private String mStartingActivityPackage;
     private boolean mIsInBackground;
     private ArrayList<BackgroundChangeHandler> mBackgroundChangeHandlers;
+    private boolean mIsTransitioningToBackground;
+    private Handler mHandler;
 
     public boolean isInBackground() {
         return mIsInBackground;
@@ -97,6 +102,34 @@ public class BackgroundDetector {
 
         fireBackgroundChangeHandlers();
     }
+    
+    private void transitionToBackground(final BaseActivity activity) {
+        if (mIsTransitioningToBackground) {
+            return;
+        }
+
+        mIsTransitioningToBackground = true;
+        mHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if (mIsTransitioningToBackground) {
+                    mIsTransitioningToBackground = false;
+                    mIsInBackground = true;
+                    onBackgroundStatusChange(activity);
+                }
+            }
+        }, 5000);
+    }
+
+    private void transitionToForeground(BaseActivity activity) {
+        if (mIsTransitioningToBackground) {
+            mIsTransitioningToBackground = false;
+            return;
+        }
+
+        mIsInBackground = false;
+        onBackgroundStatusChange(activity);
+    }
 
     public void onActivityPause(BaseActivity activity) {
         mNumActiveActivities --;
@@ -104,8 +137,7 @@ public class BackgroundDetector {
             if (mStartingActivityPackage != null &&
                 mStartingActivityPackage.startsWith("au.com.codeka.warworlds")) {
             } else {
-                mIsInBackground = true;
-                onBackgroundStatusChange(activity);
+                transitionToBackground(activity);
             }
         }
     }
@@ -116,8 +148,7 @@ public class BackgroundDetector {
             if (mStartingActivityPackage != null &&
                 mStartingActivityPackage.startsWith("au.com.codeka.warworlds")) {
             } else {
-                mIsInBackground = false;
-                onBackgroundStatusChange(activity);
+                transitionToForeground(activity);
             }
         }
     }
