@@ -40,14 +40,6 @@ class BuildCheckPage(tasks.TaskPage):
       oper_model.delete()
       return oper_model
 
-    def _incrShipCountInTX(fleet_key, n):
-      fleet_model = mdl.Fleet.get(fleet_key)
-      if fleet_model.state == pb.Fleet.IDLE:
-        fleet_model.numShips += n
-        fleet_model.put()
-        return True
-      return False
-
     complete_time = datetime.now() + timedelta(seconds=10)
     never_time = datetime(2000, 1, 1)
 
@@ -76,7 +68,7 @@ class BuildCheckPage(tasks.TaskPage):
 
       # Figure out the name of the star the object was built on, for the notification
       star_key = build_request_model.key().parent()
-      star_pb = sector_ctl.getStar(star_key)
+      star_pb = sim.getStar(str(star_key))
 
       logging.info("Build for empire \"%s\", colony \"%s\" complete." % (empire_key, colony_key))
       if build_request_model.designKind == pb.BuildRequest.BUILDING:
@@ -86,23 +78,16 @@ class BuildCheckPage(tasks.TaskPage):
         model.designName = build_request_model.designName
         model.buildTime = datetime.now()
         model.put()
-        design = designs.BuildingDesign.getDesign(model.designName)
       else:
         # if it's not a building, it must be a ship. We'll try to find a fleet that'll
         # work, but if we can't it's not a big deal -- just create a new one. Duplicates
-        # don't hurt all that much (TODO: confirm)
-        query = (mdl.Fleet.all().ancestor(build_request_model.key().parent())
-                                .filter("empire", build_request_model.empire))
-        existing = False
-        for fleet_model in query:
-          if (fleet_model.designName == build_request_model.designName and
-              fleet_model.state == pb.Fleet.IDLE):
-            if db.run_in_transaction(_incrShipCountInTX,
-                                     fleet_model.key(),
-                                     build_request_model.count):
+        # don't hurt all that much
+        existing = False;
+        for fleet_pb in star_pb.fleets:
+          if fleet_pb.design_name == build_request_model.designName:
+            if fleet_pb.state == pb.Fleet.IDLE:
+              fleet_pb.num_ships += float(build_request_model.count)
               existing = True
-              model = fleet_model
-              break
         if not existing:
           model = mdl.Fleet(parent=star_key)
           model.empire = build_request_model.empire
@@ -112,13 +97,11 @@ class BuildCheckPage(tasks.TaskPage):
           model.state = pb.Fleet.IDLE
           model.stateStartTime = datetime.now()
           model.put()
-        design = designs.ShipDesign.getDesign(model.designName)
 
         # if you've built a colony ship, we need to decrease the colony population by
         # 100 (basically, those 100 people go into the colony ship, to be transported to
         # the destination colony).
         if build_request_model.designName == "colonyship": # TODO: hard-coded OK?P
-          star_pb = sim.getStar(str(star_key))
           for colony_pb in star_pb.colonies:
             if colony_pb.key == colony_key:
               colony_pb.population -= 100

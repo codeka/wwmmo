@@ -731,7 +731,7 @@ def scheduleBuildCheck(sim=None):
     for star_pb in sim.getStars():
       for build_request_pb in star_pb.build_requests:
         t = ctrl.epochToDateTime(build_request_pb.end_time)
-        if t < time:
+        if not time or t < time:
           time = t
 
   if not time:
