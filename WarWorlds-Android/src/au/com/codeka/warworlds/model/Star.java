@@ -93,6 +93,11 @@ public class Star extends StarSummary {
 
         mColonies = new ArrayList<Colony>();
         for(Messages.Colony colony_pb : pb.getColoniesList()) {
+            if (colony_pb.getPopulation() < 1.0) {
+                // colonies with zero population are dead -- they just don't
+                // know it yet.
+                continue;
+            }
             Colony c = Colony.fromProtocolBuffer(colony_pb);
 
             for (int i = 0; i < pb.getBuildingsCount(); i++) {

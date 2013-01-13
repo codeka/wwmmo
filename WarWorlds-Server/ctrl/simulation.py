@@ -780,9 +780,21 @@ class Simulation(object):
 
   def _updateColonies(self, star_pb, keys_to_clear):
     for colony_pb in star_pb.colonies:
+      # check if this colony has zero population, it should be destroyed
+      pop = colony_pb.population
+      if not pop or math.isinf(pop) or math.isnan(pop) or math.floor(colony_pb.population) <= 0:
+        found = False
+        for destroyed_colony_pb in self.destroyed_colony_pbs:
+          if colony_pb.key == destroyed_colony_pb.key:
+            found = True
+        if not found:
+          self.destroyed_colony_pbs.append(colony_pb)
+
+    for colony_pb in star_pb.colonies:
       keys_to_clear.append("colony:%s" % colony_pb.key)
 
-      colony_model = mdl.Colony.get(colony_pb.key)
+      is_destroyed = False
+      colony_model = mdl.Colony.get(db.Key(colony_pb.key))
       for destroyed_colony_pb in self.destroyed_colony_pbs:
         if destroyed_colony_pb.key == colony_pb.key:
           colony_model.delete()
@@ -797,14 +809,17 @@ class Simulation(object):
               if star_colony_pb.key == destroyed_colony_pb.key:
                 num_remaining_colonies -= 1
           if num_remaining_colonies <= 0:
+            self.log("No more colonies, updating time_emptied to be now.")
             star_mdl = sector_mdl.Star.get(db.Key(star_pb.key))
-            star_mdl.time_emptied = ctrl.dateTimeToEpoch(self.now)
+            star_mdl.timeEmptied = ctrl.dateTimeToEpoch(self.now)
             star_mdl.put()
             # note: we'll clear the cached version of this star anyway...
 
-          return
-      ctrl.colonyPbToModel(colony_model, colony_pb)
-      colony_model.put()
+          is_destroyed = True
+          break
+      if not is_destroyed:
+        ctrl.colonyPbToModel(colony_model, colony_pb)
+        colony_model.put()
 
   def _updateEmpirePresences(self, star_pb):
     """Updates the empire presence models in the given star."""

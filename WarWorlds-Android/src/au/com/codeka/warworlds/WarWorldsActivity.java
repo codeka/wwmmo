@@ -183,6 +183,9 @@ public class WarWorldsActivity extends BaseActivity {
 
                     mColonies = new ArrayList<Colony>();
                     for (Messages.Colony c : hello.getColoniesList()) {
+                        if (c.getPopulation() < 1.0) {
+                            continue;
+                        }
                         mColonies.add(Colony.fromProtocolBuffer(c));
                     }
 

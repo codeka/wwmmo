@@ -58,6 +58,12 @@ public class Sector {
 
         // could this be more efficient? there's not a lot of stars, so maybe not a big deal
         for (Messages.Colony colony_pb : pb.getColoniesList()) {
+            if (colony_pb.getPopulation() < 1.0) {
+                // colonies with zero population are dead -- they just don't
+                // know it yet.
+                continue;
+            }
+
             boolean found = false;
             for (Star star : s.mStars) {
                 if (colony_pb.getStarKey().equals(star.getKey())) {

@@ -354,6 +354,9 @@ public class MyEmpire extends Empire {
         ArrayList<Colony> colonies = new ArrayList<Colony>();
         if (colony_pbs != null && colony_pbs.size() > 0) {
             for (int i = 0; i < colony_pbs.size(); i++) {
+                if (colony_pbs.get(i).getPopulation() < 1.0) {
+                    continue;
+                }
                 colonies.add(Colony.fromProtocolBuffer(colony_pbs.get(i)));
             }
         }
