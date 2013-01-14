@@ -9,7 +9,7 @@
             android:title="Starfield Detail"
             android:defaultValue="STARS_AND_GAS" />
         <CheckBoxPreference
-            android:key="GlobalOptions.UniqueStarsAndPlanets"
+            android:key="GlobalOptions.GenUniqueStarsAndPlanets"
             android:summary=""
             android:title="Unique Stars &amp; Planets"
             android:defaultValue="true" />

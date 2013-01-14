@@ -56,7 +56,7 @@ public class GlobalOptions {
     }
 
     public boolean uniqueStarsAndPlanets() {
-        return mPreferences.getBoolean("GlobalOptions.UniqueStarsAndPlanets", true);
+        return mPreferences.getBoolean("GlobalOptions.GenUniqueStarsAndPlanets", false);
     }
 
     public NotificationOptions getNotificationOptions(NotificationKind kind) {

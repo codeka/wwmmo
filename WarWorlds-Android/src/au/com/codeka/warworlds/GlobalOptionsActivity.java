@@ -73,7 +73,7 @@ public class GlobalOptionsActivity extends PreferenceActivity
             break;
         }
 
-        p = getPreferenceScreen().findPreference("GlobalOptions.UniqueStarsAndPlanets");
+        p = getPreferenceScreen().findPreference("GlobalOptions.GenUniqueStarsAndPlanets");
         if (opts.uniqueStarsAndPlanets()) {
             p.setSummary("Generate unique star and planet images");
         } else {
