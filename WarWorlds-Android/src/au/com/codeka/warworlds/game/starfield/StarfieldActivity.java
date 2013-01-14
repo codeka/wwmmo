@@ -443,9 +443,14 @@ public class StarfieldActivity extends BaseActivity {
 
         public void setStar(Star star) {
             mStar = star;
-            mFleets = star.getFleets();
-            if (mFleets == null) {
-                mFleets = new ArrayList<Fleet>();
+            mFleets = new ArrayList<Fleet>();
+
+            if (star.getFleets() != null) {
+                for (Fleet f : star.getFleets()) {
+                    if (!f.getState().equals(Fleet.State.MOVING)) {
+                        mFleets.add(f);
+                    }
+                }
             }
 
             notifyDataSetChanged();

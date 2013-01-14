@@ -96,10 +96,16 @@ public class FleetList extends FrameLayout implements StarManager.StarFetchedHan
     }
 
     public void selectFleet(String fleetKey) {
+        mSelectedFleet = null;
         for (Fleet f : mFleets) {
             if (f.getKey().equals(fleetKey)) {
                 mSelectedFleet = f;
             }
+        }
+
+        if (mSelectedFleet != null) {
+            final Spinner stanceSpinner = (Spinner) findViewById(R.id.stance);
+            stanceSpinner.setSelection(mSelectedFleet.getStance().getValue() - 1);
         }
 
         mFleetListAdapter.notifyDataSetChanged();
@@ -144,8 +150,7 @@ public class FleetList extends FrameLayout implements StarManager.StarFetchedHan
                 FleetListAdapter.ItemEntry entry =
                         (FleetListAdapter.ItemEntry) mFleetListAdapter.getItem(position);
                 if (entry.type == FleetListAdapter.FLEET_ITEM_TYPE) {
-                    mSelectedFleet = (Fleet) entry.value;
-                    mFleetListAdapter.notifyDataSetChanged();
+                    selectFleet(((Fleet) entry.value).getKey());
                 }
             }
         });
