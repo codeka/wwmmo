@@ -809,6 +809,7 @@ def _orderFleet_split(star_pb, fleet_pb, order_pb):
   new_fleet_pb.empire_key = fleet_pb.empire_key
   new_fleet_pb.design_name = fleet_pb.design_name
   new_fleet_pb.state = pb.Fleet.IDLE
+  new_fleet_pb.stance = fleet_pb.stance
   new_fleet_pb.num_ships = float(right_size)
   new_fleet_pb.state_start_time = ctrl.dateTimeToEpoch(datetime.now())
 

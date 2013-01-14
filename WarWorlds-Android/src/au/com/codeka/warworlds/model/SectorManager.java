@@ -241,7 +241,7 @@ public class SectorManager {
         private Map<String, StarfieldBackgroundRenderer> mBackgroundRenderers;
 
         public SectorCache() {
-            super(12);
+            super(18);
             mBackgroundRenderers = new TreeMap<String, StarfieldBackgroundRenderer>();
         }
 

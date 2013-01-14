@@ -246,7 +246,7 @@ def fleetModelToPb(fleet_pb, fleet_model):
   if fleet_model.stance:
     fleet_pb.stance = fleet_model.stance
   else:
-    fleet_pb.stance = pb.Fleet.NEUTRAL
+    fleet_pb.stance = pb.Fleet.AGGRESSIVE
   if fleet_model.lastVictory:
     fleet_pb.last_victory = dateTimeToEpoch(fleet_model.lastVictory)
 

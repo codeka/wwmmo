@@ -95,6 +95,7 @@ class BuildCheckPage(tasks.TaskPage):
           model.designName = build_request_model.designName
           model.numShips = float(build_request_model.count)
           model.state = pb.Fleet.IDLE
+          model.stance = pb.Fleet.AGGRESSIVE
           model.stateStartTime = datetime.now()
           model.put()
 
