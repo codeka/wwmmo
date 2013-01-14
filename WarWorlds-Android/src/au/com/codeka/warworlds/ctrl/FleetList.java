@@ -514,10 +514,10 @@ public class FleetList extends FrameLayout implements StarManager.StarFetchedHan
 
             ViewGroup.LayoutParams lp = new AbsListView.LayoutParams(LayoutParams.MATCH_PARENT,
                                                                      LayoutParams.MATCH_PARENT);
-            lp.height = 60;
+            lp.height = 80;
             view.setLayoutParams(lp);
-
-            view.setTextColor(Color.BLACK);
+            view.setTextColor(Color.WHITE);
+            view.setText("  "+view.getText().toString());
             return view;
         }
 

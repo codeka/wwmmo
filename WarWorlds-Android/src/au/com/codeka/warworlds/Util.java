@@ -32,16 +32,24 @@ public class Util {
     private static final String SHARED_PREFS = "WARWORLDS_PREFS";
 
     private static Properties sProperties;
+    private static boolean sWasSetup;
 
     /**
      * This should be called from every entry-point into the process to make
      * sure the various globals are up and running.
      */
-    public static void setup(Context context) {
+    public static boolean setup(Context context) {
+        if (sWasSetup) {
+            return false;
+        }
+
         SpriteManager.getInstance().setup(context);
         BuildingDesignManager.getInstance().setup(context);
         ShipDesignManager.getInstance().setup(context);
         BuildQueueManager.getInstance().setup();
+
+        sWasSetup = true;
+        return true;
     }
 
     /**
