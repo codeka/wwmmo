@@ -81,10 +81,11 @@ public class InfobarView extends FrameLayout
 
                 TextView cash = (TextView) mView.findViewById(R.id.cash);
                 cash.setText(Cash.format(empire.getCash()));
+
+                EmpireManager.getInstance()
+                             .addEmpireUpdatedListener(empire.getKey(), this);
             }
 
-            EmpireManager.getInstance()
-                         .addEmpireUpdatedListener(empire.getKey(), this);
             RequestManager.addRequestManagerStateChangedHandler(this);
 
             // set up the initial state

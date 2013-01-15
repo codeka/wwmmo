@@ -159,6 +159,10 @@ public class FleetList extends FrameLayout implements StarManager.StarFetchedHan
         splitBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if (mSelectedFleet == null) {
+                    return;
+                }
+
                 if (mFleetActionListener != null) {
                     mFleetActionListener.onFleetSplit(mStars.get(mSelectedFleet.getStarKey()),
                                                       mSelectedFleet);
@@ -170,6 +174,10 @@ public class FleetList extends FrameLayout implements StarManager.StarFetchedHan
         moveBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if (mSelectedFleet == null) {
+                    return;
+                }
+
                 if (mFleetActionListener != null) {
                     mFleetActionListener.onFleetMove(mStars.get(mSelectedFleet.getStarKey()),
                                                      mSelectedFleet);
