@@ -241,7 +241,7 @@ public class SectorManager {
         private Map<String, StarfieldBackgroundRenderer> mBackgroundRenderers;
 
         public SectorCache() {
-            super(18);
+            super(10);
             mBackgroundRenderers = new TreeMap<String, StarfieldBackgroundRenderer>();
         }
 
@@ -288,7 +288,7 @@ public class SectorManager {
                     mBackgroundRenderers.remove(key);
                 }
             }
-            /*if (newValue == null) {
+            if (newValue == null) {
                 log.debug(String.format("SectorCache.entryRemoved(%s) evictionCount=%d",
                         key, evictionCount()));
                 StringBuilder msg = new StringBuilder();
@@ -296,7 +296,7 @@ public class SectorManager {
                     msg.append(ste.toString()+"\r\n");
                 }
                 log.debug(msg.toString());
-            }*/
+            }
         }
     }
 

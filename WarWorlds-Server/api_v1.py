@@ -525,7 +525,7 @@ class BuildQueuePage(ApiPage):
       self.response.set_status(404)
       return
     if colony_pb.empire_key != empire_pb.key:
-      self.response.set_status(403)
+      self.response.set_status(401)
       return
 
     sim = simulation.Simulation()
@@ -539,8 +539,9 @@ class BuildQueuePage(ApiPage):
 
   def get(self):
     """Gets the build queue for the currently logged-in user."""
-
     empire_pb = empire.getEmpireForUser(self.user)
+    logging.debug("Getting buildqueue for empire [%s] (%s)" % (
+                  empire_pb.key, self.user.email()))
     return empire.getBuildQueueForEmpire(empire_pb.key)
 
 

@@ -135,7 +135,9 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
             }
         };
 
-        scrollTo(0, 0, 0, 0);
+        // disable the initial scrollTo -- you MUST call scrollTo yourself
+        // at some point!
+        //scrollTo(0, 0, 0, 0);
     }
 
     @Override
