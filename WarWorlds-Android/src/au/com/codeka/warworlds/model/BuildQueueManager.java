@@ -23,6 +23,8 @@ public class BuildQueueManager {
             new ArrayList<BuildQueueUpdatedListener>();
     private BuildQueueMonitor mBuildQueueMonitor;
     private List<BuildRequest> mCurrentQueue;
+    private boolean mIsRefreshing;
+    private boolean mNeedRefresh;
 
     public void addBuildQueueUpdatedListener(BuildQueueUpdatedListener listener) {
         mBuildQueueUpdatedListeners.add(listener);
@@ -44,11 +46,19 @@ public class BuildQueueManager {
     }
 
     public List<BuildRequest> getCurrentQueue() {
+        if (mCurrentQueue == null) {
+            return new ArrayList<BuildRequest>();
+        }
         return mCurrentQueue;
     }
 
     public List<BuildRequest> getBuildQueueForColony(Colony colony) {
         List<BuildRequest> colonyQueue = new ArrayList<BuildRequest>();
+        if (mCurrentQueue == null) {
+            fetchBuildQueue(null);
+            return colonyQueue;
+        }
+
         for (BuildRequest req : mCurrentQueue) {
             if (req.getColonyKey().equals(colony.getKey())) {
                 colonyQueue.add(req);
@@ -73,6 +83,12 @@ public class BuildQueueManager {
      * just add it to the list without re-querying the server again.
      */
     public void refresh(BuildRequest request) {
+        if (mCurrentQueue == null) {
+            // if we don't have a build queue yet, just fetch it from the server
+            fetchBuildQueue(null);
+            return;
+        }
+
         mCurrentQueue.add(request);
         fireBuildQueueUpdatedListeners(mCurrentQueue);
     }
@@ -82,6 +98,12 @@ public class BuildQueueManager {
      * all of the currently in-progress build operations.
      */
     private void fetchBuildQueue(final BuildQueueUpdatedListener callback) {
+        if (mIsRefreshing) {
+            mNeedRefresh = true;
+            return;
+        }
+        mIsRefreshing = true;
+ 
         new AsyncTask<Void, Void, List<BuildRequest>>() {
             @Override
             protected List<BuildRequest> doInBackground(Void... arg0) {
@@ -113,6 +135,12 @@ public class BuildQueueManager {
                     if (callback != null) {
                         callback.onBuildQueueUpdated(queue);
                     }
+                }
+                
+                mIsRefreshing = false;
+                if (mNeedRefresh) {
+                    mNeedRefresh = false;
+                    fetchBuildQueue(null);
                 }
             }
         }.execute();
