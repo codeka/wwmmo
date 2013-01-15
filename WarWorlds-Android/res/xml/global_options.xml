@@ -12,6 +12,6 @@
             android:key="GlobalOptions.GenUniqueStarsAndPlanets"
             android:summary=""
             android:title="Unique Stars &amp; Planets"
-            android:defaultValue="true" />
+            android:defaultValue="false" />
     </PreferenceCategory>
 </PreferenceScreen>

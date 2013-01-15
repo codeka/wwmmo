@@ -9,7 +9,6 @@
 	</classpathentry>
 	<classpathentry kind="con" path="com.android.ide.eclipse.adt.ANDROID_FRAMEWORK"/>
 	<classpathentry kind="con" path="com.android.ide.eclipse.adt.LIBRARIES"/>
-	<classpathentry exported="true" kind="lib" path="libs/GoogleAdMobAdsSdk-4.3.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="libs/validation-api-1.0.0.GA.jar"/>
 	<classpathentry exported="true" kind="lib" path="libs/commons-codec-1.4.jar"/>
 	<classpathentry exported="true" kind="lib" path="libs/commons-io-2.1.jar"/>
@@ -22,5 +21,6 @@
 	<classpathentry exported="true" kind="lib" path="libs/protobuf-java-2.4.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="libs/slf4j-android-1.6.1-RC1.jar"/>
 	<classpathentry exported="true" kind="lib" path="libs/planet-render.jar"/>
+	<classpathentry exported="true" kind="lib" path="libs/GoogleAdMobAdsSdk-6.2.1.jar"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>

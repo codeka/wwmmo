@@ -44,7 +44,7 @@ public class BannerAdView extends FrameLayout {
 
         AdRequest request = new AdRequest();
         request.addTestDevice("14DEBC42826F8B1AA4D5EC50BB5812B7"); // Galaxy Nexus
-        request.addTestDevice("E0B9ECF834A336BF19E9E6232133C876"); // Nexus S
+       // request.addTestDevice("E0B9ECF834A336BF19E9E6232133C876"); // Nexus S
         request.addTestDevice("E3E9BC57830668448015E1753F83BB44"); // Nexus One
 
         request.addTestDevice(AdRequest.TEST_EMULATOR);
