@@ -72,8 +72,11 @@ public class SitrepActivity extends BaseActivity {
         TextView empireName = (TextView) findViewById(R.id.empire_name);
         ImageView empireIcon = (ImageView) findViewById(R.id.empire_icon);
 
-        empireName.setText(empire.getDisplayName());
-        empireIcon.setImageBitmap(empire.getShield(this));
+        if (empire != null) {
+            // TODO: add an "empire updated" listener here!
+            empireName.setText(empire.getDisplayName());
+            empireIcon.setImageBitmap(empire.getShield(this));
+        }
 
         final ListView reportItems = (ListView) findViewById(R.id.report_items);
         reportItems.setAdapter(mSituationReportAdapter);
