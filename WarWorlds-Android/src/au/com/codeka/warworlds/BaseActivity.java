@@ -15,7 +15,7 @@ public class BaseActivity extends FragmentActivity {
     public void onResume() {
         // if we're resuming after a long break, we could have been GCed in
         // which case need to set things up again...
-        Util.getProperties();
+        Util.loadProperties(this);
         Util.setup(this);
 
         BackgroundDetector.getInstance().onActivityResume(this);
