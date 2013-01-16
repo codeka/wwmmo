@@ -64,7 +64,6 @@ public class EmpireActivity extends TabFragmentActivity {
         super.onCreate(savedInstanceState);
 
         sCurrentEmpire = null;
-        refresh();
 
         getTabManager().addTab(mContext, new TabInfo("Overview", OverviewFragment.class, null));
         getTabManager().addTab(mContext, new TabInfo("Colonies", ColoniesFragment.class, null));
@@ -77,6 +76,12 @@ public class EmpireActivity extends TabFragmentActivity {
                 getTabHost().setCurrentTabByTag("Fleets");
             }
         }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        refresh();
     }
 
     public void refresh() {
@@ -195,7 +200,7 @@ public class EmpireActivity extends TabFragmentActivity {
             final Context context = getActivity();
 
             EmpireActivity activity = (EmpireActivity) getActivity();
-            if (activity.mFirstRefresh) {
+            if (activity.mFirstRefresh && activity.mExtras != null) {
                 String fleetKey = activity.mExtras.getString("au.com.codeka.warworlds.FleetKey");
                 if (fleetKey != null) {
                     fleetList.selectFleet(fleetKey);
