@@ -111,7 +111,7 @@ public class FocusDialog extends DialogFragment {
     }
 
     private void onSetClick() {
-        ((StyledDialog) getDialog()).getPositiveButton().setEnabled(false);
+        ((StyledDialog) getDialog()).setCloseable(false);
 
         mColony.setPopulationFocus(mSeekBars.get(0).getProgress() / 100.0f);
         mColony.setFarmingFocus(mSeekBars.get(1).getProgress() / 100.0f);

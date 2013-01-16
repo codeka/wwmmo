@@ -43,6 +43,28 @@ public class StyledDialog extends Dialog implements ViewTreeObserver.OnGlobalLay
         return (Button) getWindow().findViewById(R.id.negative_btn);
     }
 
+    /**
+     * A helper method to enable/disable the buttons (and ability to cancel)
+     * so that the user can' close the dialog while some operating is in
+     * progress.
+     */
+    public void setCloseable(boolean closeable) {
+        Button btn;
+        btn = getPositiveButton();
+        if (btn != null) {
+            btn.setEnabled(closeable);
+        }
+        btn = getNeutralButton();
+        if (btn != null) {
+            btn.setEnabled(closeable);
+        }
+        btn = getNegativeButton();
+        if (btn != null) {
+            btn.setEnabled(closeable);
+        }
+        setCancelable(closeable);
+    }
+
     @Override
     protected void onCreate(Bundle savedInstance) {
         super.onCreate(savedInstance);

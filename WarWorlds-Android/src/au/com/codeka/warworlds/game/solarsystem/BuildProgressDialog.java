@@ -146,8 +146,7 @@ public class BuildProgressDialog extends DialogFragment {
     }
 
     private void accelerateBuild() {
-        ((StyledDialog) getDialog()).getPositiveButton().setEnabled(false);
-        ((StyledDialog) getDialog()).getNeutralButton().setEnabled(false);
+        ((StyledDialog) getDialog()).setCloseable(false);
 
         new AsyncTask<Void, Void, BuildRequest>() {
             @Override
@@ -166,8 +165,7 @@ public class BuildProgressDialog extends DialogFragment {
             }
             @Override
             protected void onPostExecute(BuildRequest buildRequest) {
-                ((StyledDialog) getDialog()).getPositiveButton().setEnabled(true);
-                ((StyledDialog) getDialog()).getNeutralButton().setEnabled(true);
+                ((StyledDialog) getDialog()).setCloseable(true);
 
                 // notify the BuildQueueManager that something's changed.
                 BuildQueueManager.getInstance().refresh(buildRequest);
@@ -184,8 +182,7 @@ public class BuildProgressDialog extends DialogFragment {
     }
 
     private void stopBuild() {
-        ((StyledDialog) getDialog()).getNeutralButton().setEnabled(false);
-        ((StyledDialog) getDialog()).getPositiveButton().setEnabled(false);
+        ((StyledDialog) getDialog()).setCloseable(false);
 
         new AsyncTask<Void, Void, Boolean>() {
             @Override

@@ -165,7 +165,7 @@ public class BuildConfirmDialog extends DialogFragment {
     }
 
     private void onBuildClick() {
-        ((StyledDialog) getDialog()).getPositiveButton().setEnabled(false);
+        ((StyledDialog) getDialog()).setCloseable(false);
 
         final EditText countEdit = (EditText) mView.findViewById(R.id.build_count_edit);
         final Activity activity = getActivity();

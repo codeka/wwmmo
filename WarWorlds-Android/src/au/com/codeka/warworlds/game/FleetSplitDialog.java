@@ -109,7 +109,7 @@ public class FleetSplitDialog extends DialogFragment {
     }
 
     private void onSplitClick() {
-        ((StyledDialog) getDialog()).getPositiveButton().setEnabled(false);
+        ((StyledDialog) getDialog()).setCloseable(false);
 
         final TextView splitLeft = (TextView) mView.findViewById(R.id.split_left);
         final TextView splitRight = (TextView) mView.findViewById(R.id.split_right);
@@ -141,6 +141,7 @@ public class FleetSplitDialog extends DialogFragment {
                 StarManager.getInstance().refreshStar(
                         activity, mFleet.getStarKey());
 
+                ((StyledDialog) getDialog()).setCloseable(true);
                 if (success) {
                     dismiss();
                 }
