@@ -149,7 +149,7 @@ class ChatPage(ApiPage):
   def post(self):
     msg_pb = self._getRequestBody(pb.ChatMessage)
     empire_pb = empire.getEmpireForUser(self.user)
-    if empire_pb:
+    if empire_pb and not self._isAdmin():
       msg_pb.empire_key = empire_pb.key
     else:
       msg_pb.empire_key = ""

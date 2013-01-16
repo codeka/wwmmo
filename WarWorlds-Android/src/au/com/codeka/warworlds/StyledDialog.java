@@ -93,8 +93,12 @@ public class StyledDialog extends Dialog implements ViewTreeObserver.OnGlobalLay
         }
         int contentHeight = content.getHeight();
 
-        log.info(String.format("available height: %d; content height: %d;",
-                 availableHeight, contentHeight));
+        if (availableHeight > 1024) {
+            availableHeight = 1024;
+        }
+
+        log.info(String.format("available height: %d; content height: %d; content height in dp: %d",
+                 availableHeight, contentHeight, (int)(contentHeight / pixelScale)));
 
         if (availableHeight < contentHeight) {
             RelativeLayout.LayoutParams lp = (RelativeLayout.LayoutParams)

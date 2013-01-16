@@ -35,7 +35,7 @@ public class WarmWelcomeActivity extends BaseActivity {
             public void onClick(View v) {
                 // save the fact that we've finished the warm welcome
                 SharedPreferences prefs = Util.getSharedPreferences(mContext);
-                prefs.edit().putBoolean("WarmWelcome", true).apply();
+                prefs.edit().putBoolean("WarmWelcome", true).commit();
 
                 // this activity is finished, move to the AccountActivity
                 finish();
