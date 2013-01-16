@@ -240,6 +240,21 @@ public class StarfieldActivity extends BaseActivity {
                 openSitrepActivity();
             }
         });
+
+        final Button viewBtn = (Button) findViewById(R.id.view_btn);
+        viewBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mSelectedStar == null) {
+                    return;
+                }
+
+                Intent intent = new Intent(mContext, SolarSystemActivity.class);
+                intent.putExtra("au.com.codeka.warworlds.StarKey", mSelectedStar.getKey());
+                startActivityForResult(intent, SOLAR_SYSTEM_REQUEST);
+
+            }
+        });
     }
 
     public void openEmpireActivityAtFleet(Star star, Fleet fleet) {

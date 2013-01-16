@@ -57,7 +57,7 @@
                     android:layout_height="wrap_content"
                     android:gravity="center_horizontal"
                     android:textAppearance="?android:attr/textAppearanceSmall"
-                    android:text="Planet Name" />
+                    android:text="" />
 
                 <TextView
                     android:id="@+id/population_count"
@@ -65,7 +65,7 @@
                     android:layout_height="wrap_content"
                     android:layout_below="@id/planet_name"
                     android:textAppearance="?android:attr/textAppearanceSmall"
-                    android:text="Population: 123/1234" />
+                    android:text="" />
 
                 <Button
                     android:id="@+id/solarsystem_colonize"

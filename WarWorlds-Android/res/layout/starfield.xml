@@ -75,7 +75,7 @@
                     android:textAppearance="?android:attr/textAppearanceMedium" />
 
                 <Button
-                    android:id="@+id/star_details_btn"
+                    android:id="@+id/view_btn"
                     style="@style/Button"
                     android:layout_width="75dp"
                     android:layout_height="wrap_content"
@@ -89,7 +89,7 @@
                     android:layout_width="75dp"
                     android:layout_height="wrap_content"
                     android:layout_alignParentRight="true"
-                    android:layout_below="@+id/star_details_btn"
+                    android:layout_below="@+id/view_btn"
                     android:layout_marginTop="10dp"
                     android:text="Intel." />
 
@@ -98,7 +98,7 @@
                     android:layout_height="match_parent"
                     android:layout_below="@+id/star_icon"
                     android:layout_alignParentBottom="true"
-                    android:layout_toLeftOf="@+id/star_details_btn"
+                    android:layout_toLeftOf="@+id/view_btn"
                     android:orientation="horizontal">
 
                     <ListView
