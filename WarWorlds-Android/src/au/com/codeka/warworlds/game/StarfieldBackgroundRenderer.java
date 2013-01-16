@@ -52,13 +52,19 @@ public class StarfieldBackgroundRenderer {
     }
 
     public void drawBackground(Canvas canvas, float left, float top, float right, float bottom) {
-        Rect src = new Rect(0, 0, 512, 512);
-        RectF dest = new RectF(left * mPixelScale, top * mPixelScale, right * mPixelScale, bottom * mPixelScale);
-        canvas.drawBitmap(mPreRendered, src, dest, mBackgroundPaint);
+        if (mPreRendered != null) {
+            Rect src = new Rect(0, 0, 512, 512);
+            RectF dest = new RectF(left * mPixelScale, top * mPixelScale, right * mPixelScale, bottom * mPixelScale);
+            canvas.drawBitmap(mPreRendered, src, dest, mBackgroundPaint);
+        } else {
+            canvas.drawRect(left,  top, right, bottom, mBackgroundPaint);
+        }
     }
 
     public void close() {
-        mPreRendered.recycle();
+        if (mPreRendered != null) {
+            mPreRendered.recycle();
+        }
     }
 
     private void initialize(Context context) {
@@ -73,8 +79,14 @@ public class StarfieldBackgroundRenderer {
             sBgGases = loadBitmaps(assetMgr, "decoration/gas");
         }
 
-        mPreRendered = Bitmap.createBitmap(512, 512, Bitmap.Config.ARGB_8888);
-        render(mPreRendered);
+        if (shouldDrawStars() || shouldDrawGas()) {
+            mPreRendered = Bitmap.createBitmap(512, 512, Bitmap.Config.ARGB_8888);
+            render(mPreRendered);
+        } else {
+            mBackgroundPaint = new Paint();
+            mBackgroundPaint.setStyle(Style.FILL);
+            mBackgroundPaint.setARGB(255, 0, 0, 0);
+        }
     }
 
     /**
@@ -83,9 +95,6 @@ public class StarfieldBackgroundRenderer {
      */
     private void render(Bitmap bmp) {
         Canvas c = new Canvas(bmp);
-        if (sBgStars == null || sBgStars.isEmpty()) {
-            return;
-        }
 
         // start off black
         c.drawColor(Color.BLACK);
