@@ -189,6 +189,10 @@ public class FleetList extends FrameLayout implements StarManager.StarFetchedHan
         viewBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if (mSelectedFleet == null) {
+                    return;
+                }
+
                 if (mFleetActionListener != null) {
                     mFleetActionListener.onFleetView(mStars.get(mSelectedFleet.getStarKey()),
                                                      mSelectedFleet);
