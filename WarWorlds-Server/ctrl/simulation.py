@@ -811,7 +811,7 @@ class Simulation(object):
           if num_remaining_colonies <= 0:
             self.log("No more colonies, updating time_emptied to be now.")
             star_mdl = sector_mdl.Star.get(db.Key(star_pb.key))
-            star_mdl.timeEmptied = ctrl.dateTimeToEpoch(self.now)
+            star_mdl.timeEmptied = self.now
             star_mdl.put()
             # note: we'll clear the cached version of this star anyway...
 

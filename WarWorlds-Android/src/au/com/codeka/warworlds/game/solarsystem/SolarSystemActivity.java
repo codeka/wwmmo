@@ -255,10 +255,12 @@ public class SolarSystemActivity extends BaseActivity implements StarManager.Sta
     @Override
     public void onBackPressed() {
         Intent intent = new Intent();
-        intent.putExtra("au.com.codeka.warworlds.SectorUpdated", mIsSectorUpdated);
-        intent.putExtra("au.com.codeka.warworlds.SectorX", mStar.getSectorX());
-        intent.putExtra("au.com.codeka.warworlds.SectorY", mStar.getSectorY());
-        intent.putExtra("au.com.codeka.warworlds.StarKey", mStar.getKey());
+        if (mStar != null) {
+            intent.putExtra("au.com.codeka.warworlds.SectorUpdated", mIsSectorUpdated);
+            intent.putExtra("au.com.codeka.warworlds.SectorX", mStar.getSectorX());
+            intent.putExtra("au.com.codeka.warworlds.SectorY", mStar.getSectorY());
+            intent.putExtra("au.com.codeka.warworlds.StarKey", mStar.getKey());
+        }
         setResult(RESULT_OK, intent);
 
         super.onBackPressed();

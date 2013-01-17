@@ -5,6 +5,7 @@ import logging
 import os
 
 from google.appengine.ext import db
+from google.appengine.api import taskqueue
 
 import import_fixer
 import_fixer.FixImports("google", "protobuf")
@@ -13,9 +14,7 @@ import webapp2 as webapp
 
 import ctrl
 from ctrl import empire as ctl
-from ctrl import sector as sector_ctl
 from ctrl import simulation as simulation_ctl
-from ctrl import designs
 from model import empire as mdl
 from model import sector as sector_mdl
 import protobufs.messages_pb2 as pb
@@ -70,6 +69,8 @@ class BuildCheckPage(tasks.TaskPage):
       star_key = build_request_model.key().parent()
       star_pb = sim.getStar(str(star_key))
 
+      new_fleet_key = None
+
       logging.info("Build for empire \"%s\", colony \"%s\" complete." % (empire_key, colony_key))
       if build_request_model.designKind == pb.BuildRequest.BUILDING:
         model = mdl.Building(parent=build_request_model.key().parent())
@@ -85,7 +86,8 @@ class BuildCheckPage(tasks.TaskPage):
         existing = False;
         for fleet_pb in star_pb.fleets:
           if fleet_pb.design_name == build_request_model.designName:
-            if fleet_pb.state == pb.Fleet.IDLE:
+            if (fleet_pb.state == pb.Fleet.IDLE and fleet_pb.empire_key and
+                fleet_pb.empire_key == str(empire_key)):
               fleet_pb.num_ships += float(build_request_model.count)
               existing = True
         if not existing:
@@ -98,6 +100,7 @@ class BuildCheckPage(tasks.TaskPage):
           model.stance = pb.Fleet.AGGRESSIVE
           model.stateStartTime = datetime.now()
           model.put()
+          new_fleet_key = str(model.key())
 
         # if you've built a colony ship, we need to decrease the colony population by
         # 100 (basically, those 100 people go into the colony ship, to be transported to
@@ -108,9 +111,30 @@ class BuildCheckPage(tasks.TaskPage):
               colony_pb.population -= 100
 
       sim.update()
+      sitrep_pb = pb.SituationReport()
+
+      if new_fleet_key:
+        # if new fleets have been added, we'll need re-simulate
+        # the star, and call onFleetArrived so that it can start
+        # attacking any enemies present
+        sim = simulation_ctl.Simulation()
+        sim.onFleetArrived(new_fleet_key, str(star_key))
+        sim.simulate(str(star_key))
+        sim.update()
+        combat_report_pb = sim.getCombatReport(str(star_key))
+        if combat_report_pb and combat_report_pb.rounds:
+          # if there's a combat report it means we also entered a battle (possibly), so we might
+          # have to update the sit.rep. to cover that. We might also have to generate a sit.rep.
+          # for any other empires that are already here...
+          round_1 = combat_report_pb.rounds[0]
+          for combat_fleet_pb in round_1.fleets:
+            if combat_fleet_pb.fleet_key == new_fleet_key:
+              sitrep_pb.fleet_under_attack_record.fleet_key = new_fleet_key
+              sitrep_pb.fleet_under_attack_record.fleet_design_id = combat_fleet_pb.design_id
+              sitrep_pb.fleet_under_attack_record.num_ships = combat_fleet_pb.num_ships
+              sitrep_pb.fleet_under_attack_record.combat_report_key = combat_report_pb.key
 
       # Save a sitrep for this situation
-      sitrep_pb = pb.SituationReport()
       sitrep_pb.empire_key = str(empire_key)
       sitrep_pb.report_time = ctrl.dateTimeToEpoch(sim.now)
       sitrep_pb.star_key = str(star_key)
@@ -118,6 +142,7 @@ class BuildCheckPage(tasks.TaskPage):
       sitrep_pb.build_complete_record.build_kind = build_request_model.designKind
       sitrep_pb.build_complete_record.design_id = build_request_model.designName
       sitrep_pb.build_complete_record.count = build_request_model.count
+
       ctl.saveSituationReport(sitrep_pb)
 
       # clear the cached items that reference this building/fleet
@@ -126,7 +151,11 @@ class BuildCheckPage(tasks.TaskPage):
       keys_to_clear.append("colonies:for-empire:%s" % (empire_key))
 
     ctrl.clearCached(keys_to_clear)
-    ctl.scheduleBuildCheck()
+
+    force_reschedule = False
+    if self.request.get("auto") != "1":
+      force_reschedule = True
+    ctl.scheduleBuildCheck(force_reschedule=force_reschedule)
 
     self.response.write("Success!")
 
@@ -149,9 +178,21 @@ class StarSimulatePage(tasks.TaskPage):
 
     logging.debug("%d stars to simulate" % (len(star_keys)))
     sim = simulation_ctl.Simulation()
+    n = 0
+    finished_all = True
     for star_key in star_keys:
       sim.simulate(star_key)
+      if n > 10:
+        finished_all = False
+        break
+      n += 1
     sim.update()
+
+    if not finished_all:
+      logging.debug("Not all stars finished, queueing up another one.")
+      taskqueue.add(queue_name="sectors",
+                    url="/tasks/empire/star-simulate",
+                    method="GET")
 
     self.response.write("Success!")
 

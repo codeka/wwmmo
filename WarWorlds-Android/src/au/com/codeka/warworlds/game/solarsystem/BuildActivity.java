@@ -396,6 +396,10 @@ public class BuildActivity extends TabFragmentActivity implements StarManager.St
                         }
                     }
                     ShipDesign design = (ShipDesign) adapter.getItem(position);
+                    if (design == null) {
+                        // not sure why this would ever happen?
+                        return;
+                    }
 
                     BuildConfirmDialog dialog = new BuildConfirmDialog();
                     dialog.setup(design, colony, buildQueueSize);

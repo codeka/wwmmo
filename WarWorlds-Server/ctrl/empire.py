@@ -8,6 +8,7 @@ import math
 import random
 
 from google.appengine.ext import db
+from google.appengine.api import memcache
 from google.appengine.api import taskqueue
 
 import ctrl
@@ -736,7 +737,7 @@ def getBuildQueuesForEmpires(empire_keys):
   return build_queues
 
 
-def scheduleBuildCheck(sim=None):
+def scheduleBuildCheck(sim=None, force_reschedule=False):
   """Checks when the next build is due to complete and schedules a task to run at that time.
 
   Because of the way that tasks a scheduled, it's possible that multiple tasks can be scheduled
@@ -766,11 +767,21 @@ def scheduleBuildCheck(sim=None):
   if time < datetime.now():
     time = datetime.now() + timedelta(minutes=10)
 
-  logging.info("Scheduling next build-check at %s" % (time))
-  taskqueue.add(queue_name="build",
-                url="/tasks/empire/build-check",
-                method="GET",
-                eta=time)
+  mc = memcache.Client()
+  time_dt = ctrl.dateTimeToEpoch(time)
+  existing_dt = mc.get("build-check")
+  now_dt = ctrl.dateTimeToEpoch(datetime.now())
+  if (not existing_dt or time_dt < existing_dt
+       or force_reschedule or existing_dt <= now_dt):
+    logging.info("Scheduling next build-check at %s" % (time))
+    taskqueue.add(queue_name="build",
+                  url="/tasks/empire/build-check?auto=1",
+                  method="GET",
+                  eta=time)
+    mc.set("build-check", time_dt)
+  else:
+    logging.info("(this_dt=%d, existing_dt=%d) - not scheduling build-check, another is already queued." % (
+                 time_dt, existing_dt))
 
 
 def getFleetsForEmpire(empire_pb):
