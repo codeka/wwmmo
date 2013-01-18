@@ -543,6 +543,7 @@ message Fleet
 
     // This is used internally by the server, it'll never appear in a response from the server.
     optional int64 time_destroyed = 12;
+    optional bool block_notification_on_destroy = 14;
 
     // This is the date/time of the last battle this fleet was victorious in,
     // it's mostly useless on the client (used for some housekeeping on the
@@ -564,7 +565,6 @@ message FleetOrder
         SPLIT = 1;
         MERGE = 2;
         MOVE = 3;
-        ATTACK = 4;
         SET_STANCE = 5;
     }
     required FLEET_ORDER order = 1;
@@ -580,6 +580,9 @@ message FleetOrder
 
     // if the order is SET_STANCE, this will be the stance we want to change to
     optional Fleet.FLEET_STANCE stance = 5;
+
+    // if the order is MERGE, this will be the fleet to merge with
+    optional string merge_fleet_key = 6;
 }
 
 

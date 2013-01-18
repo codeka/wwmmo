@@ -835,6 +835,30 @@ def _orderFleet_split(star_pb, fleet_pb, order_pb):
   return True
 
 
+def _orderFleet_merge(star_pb, fleet_pb, order_pb):
+  if fleet_pb.state != pb.Fleet.IDLE:
+    logging.info("Cannot merge a (src) fleet that's not IDLE")
+    return False
+  merged = False
+  for other_fleet_pb in star_pb.fleets:
+    if other_fleet_pb.key == order_pb.merge_fleet_key:
+      if other_fleet_pb.state != pb.Fleet.IDLE:
+        logging.info("Cannot merge a (dest) fleet that's not IDLE")
+        return False
+      if other_fleet_pb.design_name != fleet_pb.design_name:
+        logging.info("Cannot merge fleets of different designs")
+        return False
+      logging.info("Merging fleet [%s] into [%s]" % (
+          other_fleet_pb.key, fleet_pb.key))
+      fleet_pb.num_ships += other_fleet_pb.num_ships
+      other_fleet_pb.time_destroyed = ctrl.dateTimeToEpoch(datetime.now())
+      other_fleet_pb.block_notification_on_destroy = True
+      merged = True
+  if not merged:
+    logging.info("No fleet to merge: %s" % (order_pb.merge_fleet_key))
+  return merged
+
+
 def _orderFleet_move(star_pb, fleet_pb, order_pb):
   if fleet_pb.state != pb.Fleet.IDLE:
     logging.debug("Cannot move fleet, it's not currently idle.")
@@ -901,6 +925,8 @@ def orderFleet(star_pb, fleet_pb, order_pb):
     success = _orderFleet_move(star_pb, fleet_pb, order_pb)
   elif order_pb.order == pb.FleetOrder.SET_STANCE:
     success = _orderFleet_setStance(star_pb, fleet_pb, order_pb)
+  elif order_pb.order == pb.FleetOrder.MERGE:
+    success = _orderFleet_merge(star_pb, fleet_pb, order_pb)
 
   if success:
     star_pb = sector.getStar(fleet_pb.star_key)

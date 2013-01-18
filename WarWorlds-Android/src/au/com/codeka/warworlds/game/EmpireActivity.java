@@ -1,6 +1,7 @@
 package au.com.codeka.warworlds.game;
 
 import java.util.HashSet;
+import java.util.List;
 
 import android.content.Context;
 import android.content.Intent;
@@ -238,6 +239,14 @@ public class EmpireActivity extends TabFragmentActivity {
                     FragmentManager fm = getActivity().getSupportFragmentManager();
                     FleetMoveDialog dialog = new FleetMoveDialog();
                     dialog.setFleet(fleet);
+                    dialog.show(fm, "");
+                }
+
+                @Override
+                public void onFleetMerge(Fleet fleet, List<Fleet> potentialFleets) {
+                    FragmentManager fm = getActivity().getSupportFragmentManager();
+                    FleetMergeDialog dialog = new FleetMergeDialog();
+                    dialog.setup(fleet, potentialFleets);
                     dialog.show(fm, "");
                 }
 

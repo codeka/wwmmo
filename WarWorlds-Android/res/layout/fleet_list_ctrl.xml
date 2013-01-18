@@ -58,10 +58,10 @@
                 android:layout_marginTop="5dp"
                 android:layout_marginBottom="5dp"
                 android:text="@string/fleet_move" />
-    
+
             <Button
                 style="@style/Button"
-                android:id="@+id/attack_btn"
+                android:id="@+id/view_btn"
                 android:layout_width="0dp"
                 android:layout_weight="1"
                 android:layout_height="wrap_content"
@@ -69,7 +69,15 @@
                 android:layout_marginRight="12dp"
                 android:layout_marginTop="5dp"
                 android:layout_marginBottom="5dp"
-                android:text="@string/fleet_attack" />
+                android:text="@string/fleet_view" />
+            <View
+                android:id="@+id/view_placeholder"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="10dp"
+                android:layout_marginLeft="12dp"
+                android:layout_marginRight="12dp"
+                android:visibility="gone" />
         </LinearLayout>
 
         <LinearLayout
@@ -87,7 +95,7 @@
                 android:layout_marginTop="5dp"
                 android:layout_marginBottom="5dp"
                 android:text="@string/fleet_split" />
-    
+
             <Button
                 style="@style/Button"
                 android:id="@+id/merge_btn"
@@ -101,23 +109,10 @@
                 android:text="@string/fleet_merge" />
         </LinearLayout>
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-            <Button
-                style="@style/Button"
-                android:id="@+id/view_btn"
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="12dp"
-                android:layout_marginRight="12dp"
-                android:layout_marginTop="5dp"
-                android:layout_marginBottom="5dp"
-                android:text="@string/fleet_view" />
-
-        </LinearLayout>
+        <View
+            android:layout_width="10dp"
+            android:layout_weight="1"
+            android:layout_height="0dp" />
 
         <au.com.codeka.warworlds.ctrl.InfobarView
             android:id="@+id/infobar"

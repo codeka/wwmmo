@@ -200,6 +200,21 @@ public class FleetList extends FrameLayout implements StarManager.StarFetchedHan
             }
         });
 
+        final Button mergeBtn = (Button) findViewById(R.id.merge_btn);
+        mergeBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mSelectedFleet == null) {
+                    return;
+                }
+
+                if (mFleetActionListener != null) {
+                    mFleetActionListener.onFleetMerge(mSelectedFleet,
+                                                      mFleets);
+                }
+            }
+        });
+
         StarManager.getInstance().addStarUpdatedListener(null, this);
     }
 
@@ -558,5 +573,6 @@ public class FleetList extends FrameLayout implements StarManager.StarFetchedHan
         void onFleetSplit(Star star, Fleet fleet);
         void onFleetMove(Star star, Fleet fleet);
         void onFleetStanceModified(Star star, Fleet fleet, Fleet.Stance newStance);
+        void onFleetMerge(Fleet fleet, List<Fleet> potentialFleets);
     }
 }

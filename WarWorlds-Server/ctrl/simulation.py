@@ -894,16 +894,17 @@ class Simulation(object):
       if fleet_pb.time_destroyed:
         now = ctrl.dateTimeToEpoch(datetime.now())
         countdown = fleet_pb.time_destroyed - now
-        if countdown < 1:
-          countdown = 1
         combat_report_pb = self.getCombatReport(star_pb.key, fetch=False)
         combat_report_key = None
         if combat_report_pb:
           combat_report_key = combat_report_pb.key
 
-        deferred.defer(on_fleet_destroyed,
-                       fleet_pb, combat_report_key,
-                       _countdown = countdown)
+        if countdown < 1:
+          on_fleet_destroyed(fleet_pb, combat_report_key, True)
+        else:
+          deferred.defer(on_fleet_destroyed,
+                         fleet_pb, combat_report_key, False,
+                         _countdown = countdown)
 
   def _scheduleFleetVictory(self, star_pb):
     """Schedules a task that'll ensure the given fleets is notified of victory
@@ -921,7 +922,7 @@ class Simulation(object):
                        _countdown = countdown)
 
 
-def on_fleet_destroyed(fleet_pb, combat_report_key):
+def on_fleet_destroyed(fleet_pb, combat_report_key, immediate):
   """This is a deferred task that's called when a fleet is destroyed."""
   def doDelete(fleet_pb):
     fleet_mdl = mdl.Fleet.get(fleet_pb.key)
@@ -944,7 +945,8 @@ def on_fleet_destroyed(fleet_pb, combat_report_key):
   sim = Simulation()
   sim.now = ctrl.epochToDateTime(fleet_pb.time_destroyed)
   star_pb = sim.getStar(fleet_pb.star_key, True)
-  sim.simulate(star_pb.key)
+  if not immediate:
+    sim.simulate(star_pb.key)
 
   if db.run_in_transaction(doDelete, fleet_pb):
     # if it turns out we didn't delete the fleet after all, we don't need to update()
@@ -957,16 +959,17 @@ def on_fleet_destroyed(fleet_pb, combat_report_key):
     if fleet_pb.empire_key and fleet_pb.empire_key != "":
       keys_to_clear = ["fleet:for-empire:%s" % (fleet_pb.empire_key)]
       ctrl.clearCached(keys_to_clear)
-      # Save a sitrep for this situation
-      sitrep_pb = pb.SituationReport()
-      sitrep_pb.empire_key = fleet_pb.empire_key
-      sitrep_pb.report_time = ctrl.dateTimeToEpoch(sim.now)
-      sitrep_pb.star_key = star_pb.key
-      sitrep_pb.planet_index = -1
-      sitrep_pb.fleet_destroyed_record.fleet_design_id = fleet_pb.design_name
-      if combat_report_key:
-        sitrep_pb.fleet_destroyed_record.combat_report_key = combat_report_key
-      empire_ctl.saveSituationReport(sitrep_pb)
+      if not not fleet_pb.block_notification_on_destroy:
+        # Save a sitrep for this situation
+        sitrep_pb = pb.SituationReport()
+        sitrep_pb.empire_key = fleet_pb.empire_key
+        sitrep_pb.report_time = ctrl.dateTimeToEpoch(sim.now)
+        sitrep_pb.star_key = star_pb.key
+        sitrep_pb.planet_index = -1
+        sitrep_pb.fleet_destroyed_record.fleet_design_id = fleet_pb.design_name
+        if combat_report_key:
+          sitrep_pb.fleet_destroyed_record.combat_report_key = combat_report_key
+        empire_ctl.saveSituationReport(sitrep_pb)
 
 
 def on_fleet_victorious(fleet_pb, combat_report_key):

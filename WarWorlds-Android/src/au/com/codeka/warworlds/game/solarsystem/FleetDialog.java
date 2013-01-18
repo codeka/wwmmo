@@ -1,5 +1,6 @@
 package au.com.codeka.warworlds.game.solarsystem;
 
+import java.util.List;
 import java.util.TreeMap;
 
 import android.app.Dialog;
@@ -11,6 +12,7 @@ import android.view.View;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.StyledDialog;
 import au.com.codeka.warworlds.ctrl.FleetList;
+import au.com.codeka.warworlds.game.FleetMergeDialog;
 import au.com.codeka.warworlds.game.FleetMoveDialog;
 import au.com.codeka.warworlds.game.FleetSplitDialog;
 import au.com.codeka.warworlds.model.EmpireManager;
@@ -62,6 +64,14 @@ public class FleetDialog extends DialogFragment
                 FragmentManager fm = getActivity().getSupportFragmentManager();
                 FleetMoveDialog dialog = new FleetMoveDialog();
                 dialog.setFleet(fleet);
+                dialog.show(fm, "");
+            }
+
+            @Override
+            public void onFleetMerge(Fleet fleet, List<Fleet> potentialFleets) {
+                FragmentManager fm = getActivity().getSupportFragmentManager();
+                FleetMergeDialog dialog = new FleetMergeDialog();
+                dialog.setup(fleet, potentialFleets);
                 dialog.show(fm, "");
             }
 

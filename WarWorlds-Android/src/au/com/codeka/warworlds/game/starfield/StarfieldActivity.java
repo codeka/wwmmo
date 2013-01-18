@@ -58,6 +58,12 @@ public class StarfieldActivity extends BaseActivity {
     private FleetListAdapter mFleetListAdapter;
     private Star mSelectedStar;
 
+    // when fetching a star/fleet we set this to the one we're fetching. This
+    // way, if there's multiple in progress at once, on the last one to be
+    // initiated will actually do anything
+    private String mFetchingStarKey;
+    private String mFetchingFleetKey;
+
     private static final int SOLAR_SYSTEM_REQUEST = 1;
     private static final int EMPIRE_REQUEST = 2;
     private static final int SITREP_REQUEST = 3;
@@ -122,6 +128,8 @@ public class StarfieldActivity extends BaseActivity {
                 selectionLoadingContainer.setVisibility(View.VISIBLE);
                 selectedStarContainer.setVisibility(View.GONE);
                 selectedFleetContainer.setVisibility(View.GONE);
+                mFetchingStarKey = star.getKey();
+                mFetchingFleetKey = null;
 
                 StarManager.getInstance().requestStar(mContext, star.getKey(), true,
                                                       new StarManager.StarFetchedHandler() {
@@ -130,9 +138,15 @@ public class StarfieldActivity extends BaseActivity {
                      */
                     @Override
                     public void onStarFetched(Star star) {
+                        if (mFetchingStarKey == null ||
+                            !mFetchingStarKey.equals(star.getKey())) {
+                            return;
+                        }
+
                         mSelectedStar = star;
                         selectionLoadingContainer.setVisibility(View.GONE);
                         selectedStarContainer.setVisibility(View.VISIBLE);
+                        selectedFleetContainer.setVisibility(View.GONE);
 
                         mPlanetListAdapter.setStar(star);
                         mFleetListAdapter.setStar(star);
@@ -145,14 +159,20 @@ public class StarfieldActivity extends BaseActivity {
             }
 
             @Override
-            public void onFleetSelected(Fleet fleet) {
+            public void onFleetSelected(final Fleet fleet) {
                 empireName.setText("");
                 empireIcon.setImageBitmap(null);
+                mFetchingFleetKey = fleet.getKey();
+                mFetchingStarKey = null;
 
                 ShipDesign design = ShipDesignManager.getInstance().getDesign(fleet.getDesignID());
                 EmpireManager.getInstance().fetchEmpire(fleet.getEmpireKey(), new EmpireManager.EmpireFetchedHandler() {
                     @Override
                     public void onEmpireFetched(Empire empire) {
+                        if (mFetchingFleetKey == null ||
+                            !mFetchingFleetKey.equals(fleet.getKey())) {
+                            return;
+                        }
                         empireName.setText(empire.getDisplayName());
                         empireIcon.setImageBitmap(empire.getShield(mContext));
                     }
