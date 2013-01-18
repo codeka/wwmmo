@@ -15,8 +15,6 @@ import au.com.codeka.warworlds.BaseActivity;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.model.ChatManager;
 import au.com.codeka.warworlds.model.ChatMessage;
-import au.com.codeka.warworlds.model.Empire;
-import au.com.codeka.warworlds.model.EmpireManager;
 
 public class ChatActivity extends BaseActivity
                           implements ChatManager.MessageAddedListener {
@@ -67,24 +65,14 @@ public class ChatActivity extends BaseActivity
         mHandler.post(new Runnable() {
             @Override
             public void run() {
-                appendMessage(msg, null);
+                appendMessage(msg);
             }
         });
     }
 
-    private void appendMessage(final ChatMessage msg, Empire emp) {
-        if (emp == null && msg.getEmpireKey() != null) {
-            EmpireManager.getInstance().fetchEmpire(msg.getEmpireKey(), new EmpireManager.EmpireFetchedHandler() {
-                @Override
-                public void onEmpireFetched(Empire empire) {
-                    appendMessage(msg, empire);
-                }
-            });
-            return;
-        }
-
+    private void appendMessage(final ChatMessage msg) {
         TextView tv = new TextView(this);
-        tv.setText(msg.format(emp));
+        tv.setText(msg.format());
         mChatOutput.addView(tv);
 
         // need to wait for it to settle before we scroll again
@@ -101,7 +89,7 @@ public class ChatActivity extends BaseActivity
 
         List<ChatMessage> msgs = ChatManager.getInstance().getAllMessages();
         for(ChatMessage msg : msgs) {
-            appendMessage(msg, null);
+            appendMessage(msg);
         }
     }
 

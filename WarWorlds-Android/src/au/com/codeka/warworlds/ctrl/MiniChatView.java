@@ -16,19 +16,18 @@ import android.widget.TextView;
 import au.com.codeka.warworlds.game.ChatActivity;
 import au.com.codeka.warworlds.model.ChatManager;
 import au.com.codeka.warworlds.model.ChatMessage;
-import au.com.codeka.warworlds.model.Empire;
-import au.com.codeka.warworlds.model.EmpireManager;
 
 /**
  * This control displays the mini chat window, which displays recent chat
  * messages on each screen.
  */
-public class MiniChatView extends RelativeLayout {
+public class MiniChatView extends RelativeLayout
+                          implements ChatManager.MessageAddedListener,
+                                     ChatManager.MessageUpdatedListener {
     private Context mContext;
 
     private ScrollView mScrollView;
     private LinearLayout mMsgsContainer;
-    private MessageAddedListener mMessageAddedListener;
 
     private static final int MAX_ROWS = 10;
 
@@ -60,9 +59,6 @@ public class MiniChatView extends RelativeLayout {
         mMsgsContainer.setId(id++);
         mScrollView.addView(mMsgsContainer);
 
-        mMessageAddedListener = new MessageAddedListener();
-        ChatManager.getInstance().addMessageAddedListener(mMessageAddedListener);
-
         refreshMessages();
 
         mMsgsContainer.setOnClickListener(new OnClickListener() {
@@ -74,28 +70,31 @@ public class MiniChatView extends RelativeLayout {
         });
     }
 
+    @Override
+    public void onAttachedToWindow() {
+        ChatManager.getInstance().addMessageAddedListener(this);
+        ChatManager.getInstance().addMessageUpdatedListener(this);
+    }
+
+    @Override
+    public void onDetachedFromWindow() {
+        ChatManager.getInstance().removeMessageAddedListener(this);
+        ChatManager.getInstance().removeMessageUpdatedListener(this);
+    }
+
     private void refreshMessages() {
         mMsgsContainer.removeAllViews();
 
         List<ChatMessage> msgs = ChatManager.getInstance().getLastMessages(10);
         for(ChatMessage msg : msgs) {
-            appendMessage(msg, null);
+            appendMessage(msg);
         }
     }
 
-    private void appendMessage(final ChatMessage msg, Empire emp) {
-        if (emp == null && msg.getEmpireKey() != null) {
-            EmpireManager.getInstance().fetchEmpire(msg.getEmpireKey(), new EmpireManager.EmpireFetchedHandler() {
-                @Override
-                public void onEmpireFetched(Empire empire) {
-                    appendMessage(msg, empire);
-                }
-            });
-            return;
-        }
-
+    private void appendMessage(final ChatMessage msg) {
         TextView tv = new TextView(mContext);
-        tv.setText(msg.format(emp));
+        tv.setText(msg.format());
+        tv.setTag(msg);
 
         while (mMsgsContainer.getChildCount() >= MAX_ROWS) {
             mMsgsContainer.removeViewAt(0);
@@ -111,16 +110,35 @@ public class MiniChatView extends RelativeLayout {
         }, 1);
     }
 
-    class MessageAddedListener implements ChatManager.MessageAddedListener {
-        @Override
-        public void onMessageAdded(final ChatMessage msg) {
-            // needs to posted on the UI thread, which this is probably not...
-            MiniChatView.this.post(new Runnable() {
-                @Override
-                public void run() {
-                    appendMessage(msg, null);
-                }
-            });
+    private void updateMessage(final ChatMessage msg) {
+        for (int i = 0; i < mMsgsContainer.getChildCount(); i++) {
+            TextView tv = (TextView) mMsgsContainer.getChildAt(i);
+            ChatMessage other = (ChatMessage) tv.getTag();
+            
+            if (other.getDatePosted().equals(msg.getDatePosted()) &&
+                other.getEmpireKey().equals(msg.getEmpireKey())) {
+                tv.setText(msg.format());
+            }
         }
+    }
+
+    @Override
+    public void onMessageAdded(final ChatMessage msg) {
+        post(new Runnable() {
+            @Override
+            public void run() {
+                appendMessage(msg);
+            }
+        });
+    }
+
+    @Override
+    public void onMessageUpdated(final ChatMessage msg) {
+        post(new Runnable() {
+            @Override
+            public void run() {
+                updateMessage(msg);
+            }
+        });
     }
 }

@@ -26,11 +26,13 @@ public class ChatManager implements BackgroundDetector.BackgroundChangeHandler {
 
     private LinkedList<ChatMessage> mMessages;
     private ArrayList<MessageAddedListener> mMessageAddedListeners;
+    private ArrayList<MessageUpdatedListener> mMessageUpdatedListeners;
     private DateTime mMostRecentMsg;
 
     private ChatManager() {
         mMessages = new LinkedList<ChatMessage>();
         mMessageAddedListeners = new ArrayList<MessageAddedListener>();
+        mMessageUpdatedListeners = new ArrayList<MessageUpdatedListener>();
     }
 
     /**
@@ -63,6 +65,20 @@ public class ChatManager implements BackgroundDetector.BackgroundChangeHandler {
     private void fireMessageAddedListeners(ChatMessage msg) {
         for(MessageAddedListener listener : mMessageAddedListeners) {
             listener.onMessageAdded(msg);
+        }
+    }
+
+    public void addMessageUpdatedListener(MessageUpdatedListener listener) {
+        if (!mMessageUpdatedListeners.contains(listener)) {
+            mMessageUpdatedListeners.add(listener);
+        }
+    }
+    public void removeMessageUpdatedListener(MessageUpdatedListener listener) {
+        mMessageUpdatedListeners.remove(listener);
+    }
+    private void fireMessageUpdatedListeners(ChatMessage msg) {
+        for(MessageUpdatedListener listener : mMessageUpdatedListeners) {
+            listener.onMessageUpdated(msg);
         }
     }
 
@@ -129,7 +145,7 @@ public class ChatManager implements BackgroundDetector.BackgroundChangeHandler {
     /**
      * Adds a new message to the chat list.
      */
-    public void addMessage(ChatMessage msg) {
+    public void addMessage(final ChatMessage msg) {
         synchronized(mMessages) {
             while (mMessages.size() > MAX_CHAT_HISTORY) {
                 mMessages.removeFirst();
@@ -138,6 +154,17 @@ public class ChatManager implements BackgroundDetector.BackgroundChangeHandler {
 
             if (msg.getDatePosted() != null) {
                 mMostRecentMsg = msg.getDatePosted();
+            }
+
+            if (msg.getEmpire() == null && msg.getEmpireKey() != null) {
+                EmpireManager.getInstance().fetchEmpire(msg.getEmpireKey(),
+                        new EmpireManager.EmpireFetchedHandler() {
+                            @Override
+                            public void onEmpireFetched(Empire empire) {
+                                msg.setEmpire(empire);
+                                fireMessageUpdatedListeners(msg);
+                            }
+                        });
             }
         }
         fireMessageAddedListeners(msg);
@@ -189,5 +216,8 @@ public class ChatManager implements BackgroundDetector.BackgroundChangeHandler {
 
     public interface MessageAddedListener {
         void onMessageAdded(ChatMessage msg);
+    }
+    public interface MessageUpdatedListener {
+        void onMessageUpdated(ChatMessage msg);
     }
 }

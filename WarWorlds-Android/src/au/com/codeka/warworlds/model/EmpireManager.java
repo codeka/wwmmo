@@ -113,10 +113,11 @@ public class EmpireManager {
             // if there's already a call in progress, don't fetch again
             inProgress.add(handler);
             return;
+        } else {
+            inProgress = new ArrayList<EmpireFetchedHandler>();
+            inProgress.add(handler);
+            mInProgress.put(empireKey, inProgress);
         }
-
-        inProgress = new ArrayList<EmpireFetchedHandler>();
-        mInProgress.put(empireKey, inProgress);
 
         new AsyncTask<Void, Void, Empire>() {
             @Override

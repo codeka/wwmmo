@@ -28,6 +28,20 @@
       left: 0; width: 60pt;
       top: 0; bottom: 0;
     }
+    form#find-byemailidname input[type=text] {
+      right: 130pt;
+    }
+    form#find-byemailidname input[type=checkbox] {
+      position: absolute;
+      right: 110pt;
+      top: 6pt;
+    }
+    form#find-byemailidname label[for=search-details] {
+      position: absolute;
+      top: 0; bottom: 0;
+      left: 392pt;
+      line-height: 28pt
+    }
 
     form input[type=text]#create-empire-name {
       right: 100pt;
@@ -39,14 +53,11 @@
   <h1>Empires</h1>
   <p>To find the details of a given Empire, enter the email address below of the user
      who owns the Empire, or the Empire's key, then click &ldquo;Search&rdquo;.
-  <form id="find-byemail">
-    <label for="search-email">Email:</label>
-    <input type="text" id="search-email" />
-    <input type="submit" value="Search" />
-  </form>
-  <form id="find-byid">
-    <label for="search-id">Key:</label>
-    <input type="text" id="search-id" />
+  <form id="find-byemailidname">
+    <label for="search-email">Search:</label>
+    <input type="text" id="search-value" placeholder="Key, email or name" />
+    <input type="checkbox" id="search-details">
+    <label for="search-details" title="(You must specify key for this)">Details</label>
     <input type="submit" value="Search" />
   </form>
   <form id="create-empire">
@@ -56,15 +67,15 @@
   </form>
   <textarea id="search-results"></textarea>
   <script>
-    $("#find-byemail, #find-byid").on("submit", function(evnt) {
+    $("#find-byemailidname").on("submit", function(evnt) {
       evnt.preventDefault();
 
       var url = "";
-      var inp = $(this).find("input[type=text]")
-      if (inp.is("#search-email")) {
-        url = "/api/v1/empires?email="+inp.val();
-      } else {
+      var inp = $(this).find("input[type=text]");
+      if ($(this).find("input[type=checkbox]").prop("checked")) {
         url = "/api/v1/empires/"+inp.val()+"/details";
+      } else {
+        url = "/api/v1/empires?search="+inp.val();
       }
 
       $.ajax({

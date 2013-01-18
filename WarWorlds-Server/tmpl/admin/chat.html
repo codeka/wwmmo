@@ -86,10 +86,16 @@
       var dtstr = dt.getFullYear()+"-"+zeroPad(dt.getMonth() + 1, 2)+"-"+zeroPad(dt.getDay(), 2);
       dtstr += " "+zeroPad(dt.getHours(), 2)+":"+zeroPad(dt.getMinutes(), 2);
 
-      msg = dtstr+" : "+msg.empire.display_name+" : "+msg.message;
+      var msgstr = dtstr+" : "+msg.empire.display_name+" : "+msg.message;
 
-      // todo: template?
-      $("section#messages").append("<div>"+msg+"</div>");
+      var div = $("<div>"+msgstr+"</div>");
+      div.data("dt", msg.date_posted);
+      $("section#messages").append(div);
+      var items = $("section#messages").children().detach().sort(function(lhs, rhs) {
+        var n = $(rhs).data("dt") - $(lhs).data("dt");
+        return -(n < 0 ? -1 : (n > 0 ? 1 : 0));
+      });
+      $("section#messages").append(items);
     }
 
     function sendMessage(msg) {

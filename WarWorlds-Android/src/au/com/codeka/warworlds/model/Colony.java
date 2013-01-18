@@ -3,9 +3,6 @@ package au.com.codeka.warworlds.model;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
-
 import android.os.Parcel;
 import android.os.Parcelable;
 import au.com.codeka.warworlds.model.protobuf.Messages;
@@ -24,7 +21,6 @@ public class Colony implements Parcelable {
     private float mGoodsDelta;
     private float mMineralsDelta;
     private float mUncollectedTaxes;
-    private DateTime mLastSimulation;
     private List<Building> mBuildings;
     private float mMaxPopulation;
     private float mDefenceBoost;
@@ -80,9 +76,6 @@ public class Colony implements Parcelable {
     public float getUncollectedTaxes() {
         return mUncollectedTaxes;
     }
-    public DateTime getLastSimulation() {
-        return mLastSimulation;
-    }
     public List<Building> getBuildings() {
         return mBuildings;
     }
@@ -113,7 +106,6 @@ public class Colony implements Parcelable {
         parcel.writeFloat(mGoodsDelta);
         parcel.writeFloat(mMineralsDelta);
         parcel.writeFloat(mUncollectedTaxes);
-        parcel.writeLong(mLastSimulation.getMillis());
         parcel.writeFloat(mMaxPopulation);
         parcel.writeFloat(mDefenceBoost);
 
@@ -139,7 +131,6 @@ public class Colony implements Parcelable {
             c.mGoodsDelta = parcel.readFloat();
             c.mMineralsDelta = parcel.readFloat();
             c.mUncollectedTaxes = parcel.readFloat();
-            c.mLastSimulation = new DateTime(parcel.readLong(), DateTimeZone.UTC);
             c.mMaxPopulation = parcel.readFloat();
             c.mDefenceBoost = parcel.readFloat();
 
@@ -167,7 +158,6 @@ public class Colony implements Parcelable {
         if (pb.hasEmpireKey()) {
             c.mEmpireKey = pb.getEmpireKey();
         }
-        c.mLastSimulation = new DateTime(pb.getLastSimulation() * 1000, DateTimeZone.UTC);
         c.mBuildings = new ArrayList<Building>();
         c.mFarmingFocus = pb.getFocusFarming();
         c.mConstructionFocus = pb.getFocusConstruction();

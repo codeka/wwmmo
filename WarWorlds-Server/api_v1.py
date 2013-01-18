@@ -164,15 +164,20 @@ class EmpiresPage(ApiPage):
 
     if empireKey:
       empire_pb = empire.getEmpire(empireKey)
-    elif self.request.get("email", "") != "":
-      email = self.request.get("email")
-      user = users.User(email)
-      if user is None:
-        logging.info("No user found with email address '" + email + "'")
-        self.response.set_status(404)
-        return
-
-      empire_pb = empire.getEmpireForUser(user)
+    elif self.request.get("search", "") != "":
+      search = self.request.get("search")
+      if "@" in search:
+        user = users.User(search)
+        if user:
+          empire_pb = empire.getEmpireForUser(user)
+      if not empire_pb:
+        empire_pb = empire.getEmpireByName(search)
+      if not empire_pb:
+        try:
+          key = db.Key(search)
+          empire_pb = empire.getEmpire(str(key))
+        except:
+          empire_pb = None
 
     if empire_pb is None:
       self.response.set_status(404)

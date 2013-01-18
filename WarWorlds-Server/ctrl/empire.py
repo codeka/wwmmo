@@ -37,6 +37,13 @@ def getEmpireForUser(user):
   return empire_pb
 
 
+def getEmpireByName(name):
+  """Searches for an empire by name."""
+  for empire_model in mdl.Empire.all().filter("displayName", name).fetch(1):
+    return getEmpire(str(empire_model.key()))
+  return None
+
+
 def getEmpire(empire_key):
   cache_key = "empire:%s" % (empire_key)
   values = ctrl.getCached([cache_key], pb.Empire)

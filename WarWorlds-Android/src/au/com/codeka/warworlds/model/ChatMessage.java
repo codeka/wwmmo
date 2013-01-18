@@ -11,6 +11,7 @@ import au.com.codeka.warworlds.model.protobuf.Messages;
 public class ChatMessage {
     private String mMessage;
     private String mEmpireKey;
+    private Empire mEmpire;
     private DateTime mDatePosted;
 
     private static DateTimeFormatter sChatDateFormat;
@@ -30,6 +31,12 @@ public class ChatMessage {
     public String getEmpireKey() {
         return mEmpireKey;
     }
+    public Empire getEmpire() {
+        return mEmpire;
+    }
+    public void setEmpire(Empire emp) {
+        mEmpire = emp;
+    }
     public DateTime getDatePosted() {
         return mDatePosted;
     }
@@ -39,20 +46,21 @@ public class ChatMessage {
      * ChatActivity. It actually returns a snippet of formatted text, hence the
      * CharSequence.
      */
-    public CharSequence format(Empire emp) {
+    public CharSequence format() {
         String msg = mMessage;
 
         boolean isEnemy = false;
         boolean isFriendly = false;
-        if (mEmpireKey != null && emp != null &&
-            mEmpireKey.equals(emp.getKey())) {
+        boolean isServer = false;
+        if (mEmpireKey != null && mEmpire != null) {
             if (!mEmpireKey.equals(EmpireManager.getInstance().getEmpire().getKey())) {
                 isEnemy = true;
             } else {
                 isFriendly = true;
             }
-            msg = emp.getDisplayName() + " : " + msg;
+            msg = mEmpire.getDisplayName() + " : " + msg;
         } else if (mEmpireKey == null && mDatePosted != null) {
+            isServer = true;
             msg = "[SERVER] : " + msg;
         }
 
@@ -63,7 +71,7 @@ public class ChatMessage {
             msg = mDatePosted.toString(sChatDateFormat) + " : " + msg;
         }
 
-        if (mEmpireKey == null && mDatePosted != null) {
+        if (isServer) {
             msg = "<font color=\"#00ffff\"><b>"+msg+"</b></font>";
         } else if (isEnemy) {
             msg = "<font color=\"#ff9999\">"+msg+"</font>";
