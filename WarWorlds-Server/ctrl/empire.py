@@ -568,6 +568,7 @@ def attackColony(empire_pb, colony_pb, sim):
         fleet_pb.num_ships = 0
       else:
         fleet_pb.num_ships -= num_lost
+        num_lost = 0
     # now mark the colony destroyed
     sim.destroyColony(colony_pb)
   else:

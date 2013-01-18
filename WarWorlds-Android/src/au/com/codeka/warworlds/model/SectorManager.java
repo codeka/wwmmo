@@ -32,9 +32,12 @@ import au.com.codeka.warworlds.model.protobuf.Messages;
  */
 public class SectorManager {
     private static Logger log = LoggerFactory.getLogger(SectorManager.class);
-    private static SectorManager sInstance = new SectorManager();
+    private static SectorManager sInstance;
 
     public static SectorManager getInstance() {
+        if (sInstance == null) {
+            sInstance = new SectorManager();
+        }
         return sInstance;
     }
 
