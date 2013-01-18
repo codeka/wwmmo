@@ -87,6 +87,8 @@ def getStar(star_key, force_nocache=False):
   for colony_model in empire_mdl.Colony.getForStar(star_model):
     colony_pb = star_pb.colonies.add()
     ctrl.colonyModelToPb(colony_pb, colony_model)
+    if star_pb.last_simulation == 0:
+      star_pb.last_simulation = ctrl.dateTimeToEpoch(colony_model.lastSimulation)
 
   for building_model in empire_mdl.Building.getForStar(star_model):
     building_pb = star_pb.buildings.add()
@@ -101,6 +103,8 @@ def getStar(star_key, force_nocache=False):
     ctrl.buildRequestModelToPb(build_pb, build_model)
 
   for fleet_model in empire_mdl.Fleet.getForStar(star_model):
+    if fleet_model.numShips <= 0.0:
+      continue
     fleet_pb = star_pb.fleets.add()
     ctrl.fleetModelToPb(fleet_pb, fleet_model)
 

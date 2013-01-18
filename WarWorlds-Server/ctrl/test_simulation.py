@@ -53,13 +53,14 @@ class EmpirePresenceTestCase(unittest.TestCase):
          ],
          "colonies": [
            {"key": "colony1", "empire_key": "empire1", "star_key": "star1", "planet_index": 0,
-            "population": 100, "last_simulation": %d, "focus_population": 0.25,
+            "population": 100, "focus_population": 0.25,
             "focus_farming": 0.25, "focus_mining": 0.25, "focus_construction": 0.25}
          ],
          "buildings": [],
          "empires": [],
          "build_requests": [],
-         "fleets": []
+         "fleets": [],
+         "last_simulation": %d
         }
       """ % (ctrl.dateTimeToEpoch(datetime.now() - timedelta(minutes=1)))])
     sim.simulate("star1")
@@ -79,7 +80,7 @@ class CombatTestCase(unittest.TestCase):
          ],
          "colonies": [
            {"key": "colony1", "empire_key": "empire1", "star_key": "star1", "planet_index": 0,
-            "population": 100, "last_simulation": %d, "focus_population": 0.25,
+            "population": 100, "focus_population": 0.25,
             "focus_farming": 0.25, "focus_mining": 0.25, "focus_construction": 0.25}
          ],
          "buildings": [],
@@ -91,7 +92,8 @@ class CombatTestCase(unittest.TestCase):
             "stance": 3},
            {"key": "fleet2", "empire_key": "empire2", "design_name": "fighter", "num_ships": 10,
             "state": 1, "state_start_time": 0, "star_key": "star1", "stance": 1}
-         ]
+         ],
+         "last_simulation": %d
         }
       """ % (ctrl.dateTimeToEpoch(datetime.now() - timedelta(minutes=2)),
              ctrl.dateTimeToEpoch(datetime.now() - timedelta(minutes=3)))])
@@ -126,7 +128,7 @@ class CombatTestCase(unittest.TestCase):
          ],
          "colonies": [
            {"key": "colony1", "empire_key": "empire1", "star_key": "star1", "planet_index": 0,
-            "population": 100, "last_simulation": %d, "focus_population": 0.25,
+            "population": 100, "focus_population": 0.25,
             "focus_farming": 0.25, "focus_mining": 0.25, "focus_construction": 0.25}
          ],
          "buildings": [],
@@ -139,7 +141,8 @@ class CombatTestCase(unittest.TestCase):
            {"key": "fleet2", "empire_key": "empire2", "design_name": "fighter", "num_ships": 20,
             "state": 3, "state_start_time": %d, "star_key": "star1", "target_fleet_key": "",
             "stance": 3}
-         ]
+         ],
+         "last_simulation": %d
         }
       """ % (ctrl.dateTimeToEpoch(datetime.now() - timedelta(minutes=20)),
              ctrl.dateTimeToEpoch(datetime.now() - timedelta(minutes=15)),
@@ -177,12 +180,13 @@ class CombatTestCase(unittest.TestCase):
          ],
          "colonies": [
            {"key": "colony1", "empire_key": "empire1", "star_key": "star1", "planet_index": 0,
-            "population": 100, "last_simulation": %d, "focus_population": 0.25,
+            "population": 100, "focus_population": 0.25,
             "focus_farming": 0.25, "focus_mining": 0.25, "focus_construction": 0.25}
          ],
          "buildings": [],
          "empires": [],
          "build_requests": [],
+         "last_simulation": %d,
          "fleets": [
            {"key": "fleet1", "empire_key": "empire1", "design_name": "fighter", "num_ships": 20,
             "state": 3, "state_start_time": %d, "star_key": "star1", "target_fleet_key": "fleet2",
@@ -215,9 +219,10 @@ class CombatTestCase(unittest.TestCase):
          ],
          "colonies": [
            {"key": "colony1", "empire_key": "empire1", "star_key": "star1", "planet_index": 0,
-            "population": 100, "last_simulation": %d, "focus_population": 0.25,
+            "population": 100, "focus_population": 0.25,
             "focus_farming": 0.25, "focus_mining": 0.25, "focus_construction": 0.25}
          ],
+         "last_simulation": %d,
          "buildings": [],
          "empires": [],
          "build_requests": [],
@@ -253,9 +258,10 @@ class CombatTestCase(unittest.TestCase):
          ],
          "colonies": [
            {"key": "colony1", "empire_key": "empire1", "star_key": "star1", "planet_index": 0,
-            "population": 100, "last_simulation": %d, "focus_population": 0.25,
+            "population": 100, "focus_population": 0.25,
             "focus_farming": 0.25, "focus_mining": 0.25, "focus_construction": 0.25}
          ],
+         "last_simulation": %d,
          "buildings": [],
          "empires": [],
          "build_requests": [],
@@ -290,9 +296,10 @@ class CombatTestCase(unittest.TestCase):
          ],
          "colonies": [
            {"key": "colony1", "empire_key": "empire1", "star_key": "star1", "planet_index": 0,
-            "population": 100, "last_simulation": %d, "focus_population": 0.25,
+            "population": 100, "focus_population": 0.25,
             "focus_farming": 0.25, "focus_mining": 0.25, "focus_construction": 0.25}
          ],
+         "last_simulation": %d,
          "buildings": [],
          "empires": [],
          "build_requests": [],
@@ -332,9 +339,10 @@ class CombatTestCase(unittest.TestCase):
          ],
          "colonies": [
            {"key": "colony1", "empire_key": "empire1", "star_key": "star1", "planet_index": 0,
-            "population": 100, "last_simulation": %d, "focus_population": 0.25,
+            "population": 100, "focus_population": 0.25,
             "focus_farming": 0.25, "focus_mining": 0.25, "focus_construction": 0.25}
          ],
+         "last_simulation": %d,
          "buildings": [],
          "empires": [],
          "build_requests": [],
@@ -374,9 +382,10 @@ class CombatTestCase(unittest.TestCase):
          ],
          "colonies": [
            {"key": "colony1", "empire_key": "empire1", "star_key": "star1", "planet_index": 0,
-            "population": 100, "last_simulation": %d, "focus_population": 0.25,
+            "population": 100, "focus_population": 0.25,
             "focus_farming": 0.25, "focus_mining": 0.25, "focus_construction": 0.25}
          ],
+         "last_simulation": %d,
          "buildings": [],
          "empires": [],
          "build_requests": [],

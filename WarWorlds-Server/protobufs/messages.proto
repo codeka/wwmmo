@@ -264,6 +264,9 @@ message Star
     // This is the time (in seconds since Unix epoch) since this star "became" empty -- that is,
     // after the colony was destroyed. This only has meaning if the star has no colonies currently.
     optional int64 time_emptied = 17;
+
+    // Time, that this star was last simulated
+    optional int64 last_simulation = 18;
 }
 
 message Stars {
@@ -379,7 +382,8 @@ message Colony
 
     // Time, in seconds since Unix epoch, that this colony was last simulated (i.e.
     // when the population and such was last calculated)
-    optional int64 last_simulation = 6;
+    // NOT_USED_ANY_MORE
+    optional int64 DEPRECATED_last_simulation = 6;
 
     // The "focus" of this colony. These numbers must add up to 1.0 and represent
     // the percentage of the population that is focused on the given task.

@@ -160,7 +160,7 @@ class Simulation(object):
     # figure out the start time, which is the oldest last_simulation time
     start_time = self._getSimulateStartTime(star_pb)
     if start_time == 0:
-      # No colonies worth simulating...
+      # Nothing worth simulating...
       return
 
     start_time = ctrl.epochToDateTime(start_time)
@@ -224,18 +224,13 @@ class Simulation(object):
 
     # make sure last_simulation is correct
     last_simulation = ctrl.dateTimeToEpoch(self.now)
-    for colony_pb in star_pb.colonies:
-      colony_pb.last_simulation = last_simulation
+    star_pb.last_simulation = last_simulation
 
     self.need_update = True
 
   def _getSimulateStartTime(self, star_pb):
     """Gets the time we should start simulate from."""
-    start_time = 0
-    for colony_pb in star_pb.colonies:
-      if start_time == 0 or colony_pb.last_simulation < start_time:
-        start_time = colony_pb.last_simulation
-    return start_time
+    return star_pb.last_simulation
 
   def _simulateStepForAllEmpires(self, dt, now, star_pb, empire_keys):
     for empire_key in empire_keys:
@@ -752,6 +747,7 @@ class Simulation(object):
       keys_to_clear.append("buildqueue:for-empire:%s" % empire_pb.key)
 
     for star_pb in self.star_pbs:
+      self._updateStar(star_pb)
       self._updateColonies(star_pb, keys_to_clear)
       self._updateEmpirePresences(star_pb)
       self._updateBuildRequests(star_pb)
@@ -777,6 +773,11 @@ class Simulation(object):
     scout_report_mdl.date = ctrl.epochToDateTime(scout_report_pb.date)
     scout_report_mdl.put()
     scout_report_pb.key = str(scout_report_mdl.key())
+
+  def _updateStar(self, star_pb):
+    star_mdl = sector_mdl.Star.get(star_pb.key)
+    star_mdl.lastSimulation = ctrl.epochToDateTime(star_pb.last_simulation)
+    star_mdl.put()
 
   def _updateColonies(self, star_pb, keys_to_clear):
     for colony_pb in star_pb.colonies:
@@ -888,6 +889,8 @@ class Simulation(object):
       if fleet_pb.time_destroyed:
         now = ctrl.dateTimeToEpoch(datetime.now())
         countdown = fleet_pb.time_destroyed - now
+        if countdown < 1:
+          countdown = 1
         combat_report_pb = self.getCombatReport(star_pb.key, fetch=False)
         combat_report_key = None
         if combat_report_pb:
@@ -926,7 +929,7 @@ def on_fleet_destroyed(fleet_pb, combat_report_key):
   fleet_mdl = mdl.Fleet.get(fleet_pb.key)
   if not fleet_mdl:
     return
-  if fleet_mdl.timeDestroyed != ctrl.epochToDateTime(fleet_pb.time_destroyed):
+  if fleet_mdl.timeDestroyed > ctrl.epochToDateTime(fleet_pb.time_destroyed):
     logging.debug("Not scheduled to delete fleet at this time (actually, at %s), skipping." % (
                   fleet_mdl.timeDestroyed))
     return

@@ -89,7 +89,6 @@ def colonyModelToPb(colony_pb, colony_model):
   colony_pb.star_key = str(colony_model.key().parent())
   colony_pb.planet_index = colony_model.planet_index
   colony_pb.population = colony_model.population
-  colony_pb.last_simulation = int(dateTimeToEpoch(colony_model.lastSimulation))
   if colony_model.focusPopulation > 0:
     colony_pb.focus_population = colony_model.focusPopulation
   else:
@@ -115,7 +114,6 @@ def colonyModelToPb(colony_pb, colony_model):
 
 def colonyPbToModel(colony_model, colony_pb):
   colony_model.population = colony_pb.population
-  colony_model.lastSimulation = epochToDateTime(colony_pb.last_simulation)
   colony_model.focusPopulation = colony_pb.focus_population
   colony_model.focusFarming = colony_pb.focus_farming
   colony_model.focusMining = colony_pb.focus_mining
@@ -148,13 +146,20 @@ def starModelToPb(star_pb, star_model):
   """
   star_pb.key = str(star_model.key())
   star_pb.sector_x = star_model.sector.x
-  star_pb.sector_y = star_model.sector.y
+  if not star_model.sector.y:
+    star_pb.sector_y = 0
+  else:
+    star_pb.sector_y = star_model.sector.y
   star_pb.offset_x = star_model.x
   star_pb.offset_y = star_model.y
   star_pb.name = star_model.name.title()
   star_pb.classification = star_model.starTypeID
   star_pb.size = star_model.size
   star_pb.planets.extend(star_model.planets)
+  if star_model.lastSimulation:
+    star_pb.last_simulation = dateTimeToEpoch(star_model.lastSimulation)
+  else:
+    star_pb.last_simulation = 0
   if not star_model.timeEmptied:
     star_pb.time_emptied = 0
   else:

@@ -94,6 +94,7 @@ class Star(db.Model):
   y = db.IntegerProperty()
   planets = PlanetsProperty()
   timeEmptied = db.DateTimeProperty()
+  lastSimulation = db.DateTimeProperty()
 
 
 class SectorManager:
