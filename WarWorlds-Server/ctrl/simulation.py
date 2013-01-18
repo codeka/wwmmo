@@ -230,7 +230,12 @@ class Simulation(object):
 
   def _getSimulateStartTime(self, star_pb):
     """Gets the time we should start simulate from."""
-    return star_pb.last_simulation
+    last_simulation = star_pb.last_simulation
+    if last_simulation == 0:
+      for fleet_pb in star_pb.fleets:
+        if last_simulation == 0 or fleet_pb.state_start_time < last_simulation:
+          last_simulation = fleet_pb.state_start_time
+    return last_simulation
 
   def _simulateStepForAllEmpires(self, dt, now, star_pb, empire_keys):
     for empire_key in empire_keys:
