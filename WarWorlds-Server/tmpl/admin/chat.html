@@ -116,7 +116,7 @@
     }
 
     var lastFetch = new Date();
-    lastFetch.setDate(lastFetch.getDate() - 1);
+    lastFetch.setDate(lastFetch.getDate() - 4);
     function fetchMessages() {
       $.ajax({
         "url": "/api/v1/chat?since="+parseInt(lastFetch.getTime() / 1000),

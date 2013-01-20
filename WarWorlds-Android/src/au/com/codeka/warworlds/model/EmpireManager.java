@@ -155,7 +155,9 @@ public class EmpireManager {
 
                 List<EmpireFetchedHandler> inProgress = mInProgress.get(empireKey);
                 if (inProgress != null) for (EmpireFetchedHandler handler : inProgress) {
-                    handler.onEmpireFetched(empire);
+                    if (handler != null) {
+                        handler.onEmpireFetched(empire);
+                    }
                 }
                 mInProgress.remove(empireKey);
 
@@ -177,7 +179,7 @@ public class EmpireManager {
         }
 
         // if it's us, then that's good enough as well!
-        if (mEmpire.getKey().equals(empireKey)) {
+        if (mEmpire != null && mEmpire.getKey().equals(empireKey)) {
             handler.onEmpireFetched(mEmpire);
             return;
         }

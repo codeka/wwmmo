@@ -102,6 +102,10 @@ public class SolarSystemActivity extends BaseActivity implements StarManager.Sta
         buildButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if (mStar == null) {
+                    return; // can happen before the star loads
+                }
+
                 Intent intent = new Intent(SolarSystemActivity.this, BuildActivity.class);
                 intent.putExtra("au.com.codeka.warworlds.StarKey", mStar.getKey());
                 intent.putExtra("au.com.codeka.warworlds.Colony", mColony);
@@ -122,6 +126,10 @@ public class SolarSystemActivity extends BaseActivity implements StarManager.Sta
         fleetButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if (mStar == null) {
+                    return; // can happen before the star loads
+                }
+
                 FragmentManager fm = getSupportFragmentManager();
                 FleetDialog dialog = new FleetDialog();
                 dialog.setStar(mStar);
@@ -132,6 +140,10 @@ public class SolarSystemActivity extends BaseActivity implements StarManager.Sta
         reportsButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if (mStar == null) {
+                    return; // can happen before the star loads
+                }
+
                 ScoutReportDialog dialog = new ScoutReportDialog();
                 dialog.setStar(mStar);
                 dialog.show(getSupportFragmentManager(), "");

@@ -114,7 +114,14 @@ public class MiniChatView extends RelativeLayout
         for (int i = 0; i < mMsgsContainer.getChildCount(); i++) {
             TextView tv = (TextView) mMsgsContainer.getChildAt(i);
             ChatMessage other = (ChatMessage) tv.getTag();
-            
+            if (other == null || other.getDatePosted() == null) {
+                continue;
+            }
+
+            if (other.getEmpireKey() == null | msg.getEmpireKey() == null) {
+                continue;
+            }
+
             if (other.getDatePosted().equals(msg.getDatePosted()) &&
                 other.getEmpireKey().equals(msg.getEmpireKey())) {
                 tv.setText(msg.format());
