@@ -513,6 +513,10 @@ public class SolarSystemActivity extends BaseActivity implements StarManager.Sta
         // check that we have a colony ship (the server will check too, but this is easy)
         boolean hasColonyShip = false;
         for (Fleet fleet : mStar.getFleets()) {
+            if (fleet.getEmpireKey() == null) {
+                continue;
+            }
+
             if (fleet.getEmpireKey().equals(empire.getKey())) {
                 if (fleet.getDesignID().equals("colonyship")) { // TODO: hardcoded?
                     hasColonyShip = true;
@@ -522,7 +526,7 @@ public class SolarSystemActivity extends BaseActivity implements StarManager.Sta
 
         if (!hasColonyShip) {
             // TODO: better errors...
-            AlertDialog dialog = new AlertDialog.Builder(this)
+            StyledDialog dialog = new StyledDialog.Builder(this)
                 .setMessage("You don't have a colony ship around this star, so you cannot colonize this planet.")
                 .setPositiveButton("OK", null)
                 .create();

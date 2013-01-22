@@ -65,8 +65,9 @@ def deviceRegistrationModelToPb(pb, model):
 def empireModelToPb(empire_pb, empire_model):
   empire_pb.key = str(empire_model.key())
   empire_pb.display_name = empire_model.displayName
-  empire_pb.user = empire_model.user.user_id()
-  empire_pb.email = empire_model.user.email()
+  if empire_model.user and empire_model.user.user_id():
+    empire_pb.user = empire_model.user.user_id()
+    empire_pb.email = empire_model.user.email()
   empire_pb.state = empire_model.state
   if empire_model.cash:
     empire_pb.cash = empire_model.cash

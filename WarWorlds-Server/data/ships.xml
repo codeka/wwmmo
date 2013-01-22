@@ -15,7 +15,7 @@
     </dependencies>
     <cost minerals="1000" time="4.0" />
     <fuel costPerParsec="35" />
-    <stats speed="1" baseAttack="0" baseDefence="0" />
+    <stats speed="1" baseAttack="1" baseDefence="1" />
   </design>
   <design id="scout">
     <name>Scout</name>

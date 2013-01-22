@@ -170,8 +170,10 @@ class StarSimulatePage(tasks.TaskPage):
     # find all stars where last_simulation is at least 18 hours ago
     last_simulation = datetime.now() - timedelta(hours=18)
 
+    MAX_STARS = 10
+
     star_keys = []
-    for star_mdl in sector_mdl.Star.all().filter("lastSimulation <", last_simulation):
+    for star_mdl in sector_mdl.Star.all().filter("lastSimulation <", last_simulation).fetch(MAX_STARS + 1):
       star_key = str(star_mdl.key())
       if star_key not in star_keys:
         star_keys.append(star_key)
@@ -189,7 +191,7 @@ class StarSimulatePage(tasks.TaskPage):
       if star_pb.last_simulation > ctrl.dateTimeToEpoch(last_simulation):
         continue
       sim.simulate(star_key)
-      if n > 10:
+      if n > MAX_STARS:
         finished_all = False
         break
       n += 1
@@ -210,7 +212,7 @@ class FleetMoveCompletePage(tasks.TaskPage):
   We need to transfer the fleet so that it's orbiting the new star."""
   def get(self, fleet_key):
     fleet_mdl = mdl.Fleet.get(fleet_key)
-    if fleet_mdl.state != pb.Fleet.MOVING:
+    if not fleet_mdl or fleet_mdl.state != pb.Fleet.MOVING:
       logging.warn("Fleet [%s] is not moving, as expected." % (fleet_key))
       self.response.set_status(400)
     else:

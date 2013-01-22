@@ -3,6 +3,7 @@
 import collections
 from datetime import datetime, timedelta
 
+import logging
 import math
 import random
 
@@ -131,7 +132,7 @@ def getStar(star_key, force_nocache=False):
             effect.applyToEmpirePresence(building_pb, empire_presence_pb)
 
   min_time_emptied = ctrl.dateTimeToEpoch(datetime.now() - timedelta(days=4))
-  if not star_pb.colonies and star_pb.time_emptied < min_time_emptied:
+  if not star_pb.colonies and star_pb.time_emptied < min_time_emptied and len(star_pb.planets) > 0:
     _addNativeColonies(star_pb)
     # call getStar again to make sure we get the latest of everything
     return getStar(star_pb.key)
@@ -170,7 +171,11 @@ def _addNativeColonies(star_pb):
 
   sector_key = mdl.SectorManager.getSectorKey(star_pb.sector_x, star_pb.sector_y)
 
-  num_colonies = random.randint(1, min(4, len(planets) - 1))
+  if len(planets) <= 0:
+    logging.warn("Star %s (%s) has no planets(!)" % (star_pb.name, star_pb.key))
+    return
+  else:
+    num_colonies = random.randint(1, min(4, len(planets) - 1))
   for n in range(num_colonies):
     colony_model = empire_ctl._colonize(sector_key,
                                         None, star_pb, planets[n].index)
