@@ -19,7 +19,8 @@
               android:layout_height="wrap_content"
               android:layout_alignParentBottom="true"
               android:layout_toLeftOf="@+id/chat_send"
-              android:inputType="textLongMessage">
+              android:inputType="textLongMessage"
+              android:imeActionLabel="Send">
         <requestFocus />
     </EditText>
 
