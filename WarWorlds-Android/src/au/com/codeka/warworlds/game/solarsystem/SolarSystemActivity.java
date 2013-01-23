@@ -375,6 +375,9 @@ public class SolarSystemActivity extends BaseActivity implements StarManager.Sta
             RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) congenialityContainer.getLayoutParams();
             params.leftMargin = (int) (x - offsetX);
             params.topMargin = (int) (y - offsetY);
+            if (params.topMargin < (40 * pixelScale)) {
+                params.topMargin = (int)(40 * pixelScale);
+            }
 
             congenialityContainer.setLayoutParams(params);
             congenialityContainer.setVisibility(View.VISIBLE);
