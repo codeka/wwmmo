@@ -914,19 +914,21 @@ def _subtractCash(empire_key, amount):
   return db.run_in_transaction(subtractCashInTx, db.Key(empire_key), int(math.floor(amount)))
 
 
-def _orderFleet_setStance(star_pb, fleet_pb, order_pb):
+def _orderFleet_setStance(star_pb, fleet_pb, order_pb, sim):
   fleet_pb.stance = order_pb.stance
+  if order_pb.stance == pb.Fleet.AGGRESSIVE:
+    sim.onFleetArrived(fleet_pb.key, star_pb.key)
   return True
 
 
-def orderFleet(star_pb, fleet_pb, order_pb):
+def orderFleet(star_pb, fleet_pb, order_pb, sim):
   success = False
   if order_pb.order == pb.FleetOrder.SPLIT:
     success = _orderFleet_split(star_pb, fleet_pb, order_pb)
   elif order_pb.order == pb.FleetOrder.MOVE:
     success = _orderFleet_move(star_pb, fleet_pb, order_pb)
   elif order_pb.order == pb.FleetOrder.SET_STANCE:
-    success = _orderFleet_setStance(star_pb, fleet_pb, order_pb)
+    success = _orderFleet_setStance(star_pb, fleet_pb, order_pb, sim)
   elif order_pb.order == pb.FleetOrder.MERGE:
     success = _orderFleet_merge(star_pb, fleet_pb, order_pb)
 

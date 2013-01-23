@@ -131,6 +131,10 @@ class ShipEffect(Effect):
     """This is called when we're orbiting a star, and a new fleet arrives."""
     pass
 
+  def onAttacked(self, star_pb, fleet_pb, attacker_fleet_pb, sim):
+    """This is called when another fleet attacks us."""
+    pass
+
 
 class ShipEffectScout(ShipEffect):
   """The scout effect will generate a scout report every time the ship reaches a star."""
@@ -196,6 +200,22 @@ class ShipEffectFighter(ShipEffect):
         # Note: we don't set the target here, we'll let the simulation do that so that it's
         # recorded in the combat report
         #fleet_pb.target_fleet_key = other_fleet_pb.key
+        star_fleet_pb.state_start_time = ctrl.dateTimeToEpoch(sim.now - timedelta(seconds=1))
+        break
+
+
+  def onAttacked(self, fleet_pb, attacker_fleet_pb, sim):
+    """If another fleet attacks us, then we'll attack back (but only if we're idle."""
+    if fleet_pb.state != pb.Fleet.IDLE:
+      return
+
+    logging.debug("A fleet (%s) is attacking us, fight back!" % (attacker_fleet_pb.key))
+
+    star_pb = sim.getStar(fleet_pb.star_key)
+    for star_fleet_pb in star_pb.fleets:
+      if star_fleet_pb.key == fleet_pb.key:
+        star_fleet_pb.state = pb.Fleet.ATTACKING
+        star_fleet_pb.target_fleet_key = attacker_fleet_pb.key
         star_fleet_pb.state_start_time = ctrl.dateTimeToEpoch(sim.now - timedelta(seconds=1))
         break
 

@@ -623,7 +623,7 @@ class FleetOrdersPage(ApiPage):
           self.response.set_status(403)
           return
 
-        if not empire.orderFleet(star_pb, fleet_pb, order_pb):
+        if not empire.orderFleet(star_pb, fleet_pb, order_pb, sim):
           self.response.set_status(400)
         else:
           self.response.set_status(200)

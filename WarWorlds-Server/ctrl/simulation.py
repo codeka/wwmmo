@@ -665,6 +665,11 @@ class Simulation(object):
       fleet_attack_pb.fleet_index = fleet_indices[fleet_pb.key]
       fleet_attack_pb.target_index = fleet_indices[fleet_pb.target_fleet_key]
       fleet_attack_pb.damage = damage
+      if target.state == pb.Fleet.IDLE:
+        # if the target isn't currently attacking, let's make it fight back
+        target_design = cache[target.key]["design"]
+        for effect in target_design.getEffects():
+          effect.onAttacked(target, fleet_pb, self)
 
     # apply the damage from this round after every fleet has had a turn inflicting it
     for fleet_pb in star_pb.fleets:
