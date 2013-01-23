@@ -26,6 +26,29 @@ public class MyEmpire extends Empire {
     private List<Fleet> mAllFleets;
     private List<Colony> mAllColonies;
     private Map<String, Star> mStars;
+    private List<RefreshAllCompleteHandler> mRefreshAllCompleteHandlers;
+
+    public MyEmpire() {
+        mRefreshAllCompleteHandlers = new ArrayList<RefreshAllCompleteHandler>();
+    }
+
+    public void addRefreshAllCompleteHandler(RefreshAllCompleteHandler handler) {
+        synchronized(mRefreshAllCompleteHandlers) {
+            mRefreshAllCompleteHandlers.add(handler);
+        }
+    }
+    public void removeRefreshAllCompleteHandler(RefreshAllCompleteHandler handler) {
+        synchronized(mRefreshAllCompleteHandlers) {
+            mRefreshAllCompleteHandlers.remove(handler);
+        }
+    }
+    private void fireRefreshAllCompleteHandler() {
+        synchronized(mRefreshAllCompleteHandlers) {
+            for (RefreshAllCompleteHandler handler : mRefreshAllCompleteHandlers) {
+                handler.onRefreshAllComplete(this);
+            }
+        }
+    }
 
     public List<Fleet> getAllFleets() {
         return mAllFleets;
@@ -97,33 +120,31 @@ public class MyEmpire extends Empire {
         }.execute();
     }
 
-    public void collectTaxes(final Context context, final Star star, final Colony colony) {
-        new AsyncTask<Void, Void, Colony>() {
+    public void collectTaxes(final Context context) {
+        new AsyncTask<Void, Void, Boolean>() {
             @Override
-            protected Colony doInBackground(Void... arg0) {
+            protected Boolean doInBackground(Void... arg0) {
                 try {
-                    String url = String.format("stars/%s/colonies/%s/taxes",
-                                               star.getKey(), colony.getKey());
-                    Messages.Colony pb = ApiClient.postProtoBuf(url, null, Messages.Colony.class);
-                    if (pb == null)
-                        return null;
-                    return Colony.fromProtocolBuffer(pb);
+                    String url = String.format("empires/%s/taxes", getKey());
+                    ApiClient.postProtoBuf(url, null);
                 } catch(Exception e) {
                     // TODO: handle exceptions
                     log.error(ExceptionUtils.getStackTrace(e));
-                    return null;
+                    return false;
                 }
+
+                return true;
             }
 
             @Override
-            protected void onPostExecute(Colony colony) {
-                if (colony == null) {
+            protected void onPostExecute(Boolean success) {
+                if (!success) {
                     return; // BAD!
                 }
 
                 // make sure we record the fact that the star is updated as well
-                EmpireManager.getInstance().refreshEmpire(getKey());
-                StarManager.getInstance().refreshStar(context, colony.getStarKey());
+                refreshAllDetails(null);
+                // TODO: StarManager.getInstance().refreshStar(context, colony.getStarKey());
             }
         }.execute();
     }
@@ -246,9 +267,14 @@ public class MyEmpire extends Empire {
 
             @Override
             protected void onPostExecute(Boolean success) {
+                if (!success) {
+                    return;
+                }
+
                 if (callback != null) {
                     callback.onRefreshAllComplete(MyEmpire.this);
                 }
+                fireRefreshAllCompleteHandler();
             }
         }.execute();
     }

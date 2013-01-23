@@ -24,6 +24,8 @@ import au.com.codeka.Cash;
 import au.com.codeka.RomanNumeralFormatter;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.model.Colony;
+import au.com.codeka.warworlds.model.EmpireManager;
+import au.com.codeka.warworlds.model.MyEmpire;
 import au.com.codeka.warworlds.model.ImageManager;
 import au.com.codeka.warworlds.model.Planet;
 import au.com.codeka.warworlds.model.PlanetImageManager;
@@ -33,7 +35,7 @@ import au.com.codeka.warworlds.model.Star;
 import au.com.codeka.warworlds.model.StarImageManager;
 import au.com.codeka.warworlds.model.StarManager;
 
-public class ColonyList extends FrameLayout {
+public class ColonyList extends FrameLayout implements MyEmpire.RefreshAllCompleteHandler {
     private Context mContext;
     private Map<String, Star> mStars;
     private Colony mSelectedColony;
@@ -70,6 +72,21 @@ public class ColonyList extends FrameLayout {
 
         refreshSelectedColony();
         mColonyListAdapter.setColonies(stars, colonies);
+    }
+
+    @Override
+    public void onAttachedToWindow() {
+        EmpireManager.getInstance().getEmpire().addRefreshAllCompleteHandler(this);
+    }
+
+    @Override
+    public void onDetachedFromWindow() {
+        EmpireManager.getInstance().getEmpire().removeRefreshAllCompleteHandler(this);
+    }
+
+    @Override
+    public void onRefreshAllComplete(MyEmpire empire) {
+        refresh(empire.getAllColonies(), empire.getImportantStars());
     }
 
     public void setOnColonyActionListener(ColonyActionHandler listener) {
@@ -111,10 +128,7 @@ public class ColonyList extends FrameLayout {
         collectBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (mSelectedColony != null && mColonyActionListener != null) {
-                    Star star = mStars.get(mSelectedColony.getStarKey());
-                    mColonyActionListener.onCollectTaxes(star, mSelectedColony);
-                }
+                mColonyActionListener.onCollectTaxes();
             }
         });
     }
@@ -140,16 +154,6 @@ public class ColonyList extends FrameLayout {
                     mSelectedColony.getConstructionFocus()
                 );
             colonyInfo.setText(Html.fromHtml(html));
-        }
-
-        Button collectBtn = (Button) findViewById(R.id.collect_btn);
-        if (mSelectedColony == null) {
-            collectBtn.setText(mContext.getString(R.string.collect_taxes_none));
-            collectBtn.setEnabled(false);
-        } else {
-            collectBtn.setText(String.format(mContext.getString(R.string.collect_taxes),
-                                             Cash.format(mSelectedColony.getUncollectedTaxes())));
-            collectBtn.setEnabled(true);
         }
     }
 
@@ -294,6 +298,6 @@ public class ColonyList extends FrameLayout {
 
     public interface ColonyActionHandler {
         void onViewColony(Star star, Colony colony);
-        void onCollectTaxes(Star star, Colony colony);
+        void onCollectTaxes();
     }
 }

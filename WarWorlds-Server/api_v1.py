@@ -502,6 +502,20 @@ class ColoniesTaxesPage(ApiPage):
     return colony_pb
 
 
+class EmpireTaxesPage(ApiPage):
+  def post(self, empire_key):
+    empire_pb = empire.getEmpireForUser(self.user)
+    if empire_pb.key != empire_key:
+      self.set_status(403)
+      return
+
+    colonies_pb = empire.getColoniesForEmpire(empire_pb)
+    sim = simulation.Simulation()
+    for colony_pb in colonies_pb.colonies:
+      empire.collectTaxes(colony_pb.key, sim)
+      sim.update()
+
+
 class ColoniesAttackPage(ApiPage):
   def post(self, star_key, colony_key):
     """This is called when you want to attack an enemy colony. We check that
@@ -705,6 +719,7 @@ app = ApiApplication([("/api/v1/hello/([^/]+)", HelloPage),
                       ("/api/v1/empires", EmpiresPage),
                       ("/api/v1/empires/([^/]+)", EmpiresPage),
                       ("/api/v1/empires/([^/]+)/details", EmpireDetailsPage),
+                      ("/api/v1/empires/([^/]+)/taxes", EmpireTaxesPage),
                       ("/api/v1/devices", DevicesPage),
                       ("/api/v1/devices/([^/]+)", DevicesPage),
                       ("/api/v1/devices/user:([^/]+)/messages", DeviceMessagesPage),

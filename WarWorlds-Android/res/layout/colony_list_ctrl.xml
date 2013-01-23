@@ -44,7 +44,7 @@
             android:layout_alignParentRight="true"
             android:layout_marginRight="5dp"
             android:layout_marginBottom="5dp"
-            android:text="@string/collect_taxes_none" />
+            android:text="Collect Taxes" />
 
         <au.com.codeka.warworlds.ctrl.InfobarView
             android:id="@+id/infobar"

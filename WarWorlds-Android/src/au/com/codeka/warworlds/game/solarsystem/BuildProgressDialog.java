@@ -173,6 +173,9 @@ public class BuildProgressDialog extends DialogFragment {
                 // tell the StarManager that this star has been updated
                 StarManager.getInstance().refreshStar(getActivity(), mStarKey);
 
+                // tell the EmpireManager to update the empire (since our cash will have gone down)
+                EmpireManager.getInstance().refreshEmpire();
+
                 if (buildRequest != null) {
                     mBuildRequest = buildRequest;
                     refresh();

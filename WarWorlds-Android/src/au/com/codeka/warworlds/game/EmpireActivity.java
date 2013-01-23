@@ -178,8 +178,8 @@ public class EmpireActivity extends TabFragmentActivity {
                 }
 
                 @Override
-                public void onCollectTaxes(Star star, Colony colony) {
-                    EmpireManager.getInstance().getEmpire().collectTaxes(context, star, colony);
+                public void onCollectTaxes() {
+                    EmpireManager.getInstance().getEmpire().collectTaxes(context);
                 }
             });
 
