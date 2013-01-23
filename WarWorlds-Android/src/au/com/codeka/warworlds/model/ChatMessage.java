@@ -17,6 +17,7 @@ public class ChatMessage {
     private static DateTimeFormatter sChatDateFormat;
 
     public ChatMessage() {
+        mDatePosted = new DateTime(DateTimeZone.UTC);
     }
     public ChatMessage(String message) {
         mMessage = message;
@@ -36,6 +37,9 @@ public class ChatMessage {
     }
     public void setEmpire(Empire emp) {
         mEmpire = emp;
+        if (emp != null) {
+            mEmpireKey = emp.getKey();
+        }
     }
     public DateTime getDatePosted() {
         return mDatePosted;
@@ -68,7 +72,7 @@ public class ChatMessage {
             if (sChatDateFormat == null) {
                 sChatDateFormat = DateTimeFormat.forPattern("hh:mm a");
             }
-            msg = mDatePosted.toString(sChatDateFormat) + " : " + msg;
+            msg = mDatePosted.withZone(DateTimeZone.getDefault()).toString(sChatDateFormat) + " : " + msg;
         }
 
         if (isServer) {

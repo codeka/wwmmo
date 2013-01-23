@@ -39,6 +39,8 @@ import android.util.Base64;
 import au.com.codeka.warworlds.model.BuildRequest;
 import au.com.codeka.warworlds.model.ChatManager;
 import au.com.codeka.warworlds.model.ChatMessage;
+import au.com.codeka.warworlds.model.EmpireManager;
+import au.com.codeka.warworlds.model.MyEmpire;
 import au.com.codeka.warworlds.model.SectorManager;
 import au.com.codeka.warworlds.model.SituationReport;
 import au.com.codeka.warworlds.model.Sprite;
@@ -111,6 +113,15 @@ public class MessageDisplay {
                     msg = ChatMessage.fromProtocolBuffer(pb);
                 } catch(InvalidProtocolBufferException e) {
                     log.error("Could not parse chat message!", e);
+                    return;
+                }
+
+                // don't add our own chats, since they'll have been added automatically
+                MyEmpire myEmpire = EmpireManager.getInstance().getEmpire();
+                if (myEmpire == null) {
+                    return;
+                }
+                if (msg.getEmpireKey() == null || msg.getEmpireKey().equals(myEmpire.getKey())) {
                     return;
                 }
 

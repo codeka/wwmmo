@@ -15,6 +15,7 @@ import au.com.codeka.warworlds.BaseActivity;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.model.ChatManager;
 import au.com.codeka.warworlds.model.ChatMessage;
+import au.com.codeka.warworlds.model.EmpireManager;
 
 public class ChatActivity extends BaseActivity
                           implements ChatManager.MessageAddedListener {
@@ -40,6 +41,7 @@ public class ChatActivity extends BaseActivity
             public void onClick(View v) {
                 ChatMessage msg = new ChatMessage();
                 msg.setMessage(chatMsg.getText().toString());
+                msg.setEmpire(EmpireManager.getInstance().getEmpire());
                 chatMsg.setText("");
 
                 ChatManager.getInstance().postMessage(msg);

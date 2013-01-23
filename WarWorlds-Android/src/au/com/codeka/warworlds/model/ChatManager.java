@@ -102,7 +102,10 @@ public class ChatManager implements BackgroundDetector.BackgroundChangeHandler {
 
             @Override
             protected void onPostExecute(Boolean success) {
-                // TODO; append this message
+                if (success) {
+                   // msg.
+                    addMessage(msg);
+                }
             }
         }.execute();
     }
