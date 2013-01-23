@@ -109,7 +109,7 @@ def colonyModelToPb(colony_pb, colony_model):
   if colony_model.uncollectedTaxes:
     colony_pb.uncollected_taxes = colony_model.uncollectedTaxes
   else:
-    colony_pb.uncollected_taxes = 0
+    colony_pb.uncollected_taxes = 0.0
   colony_pb.defence_bonus = 1
 
 
@@ -119,7 +119,7 @@ def colonyPbToModel(colony_model, colony_pb):
   colony_model.focusFarming = colony_pb.focus_farming
   colony_model.focusMining = colony_pb.focus_mining
   colony_model.focusConstruction = colony_pb.focus_construction
-  colony_model.uncollectedTaxes = colony_pb.uncollected_taxes
+  colony_model.uncollectedTaxes = float(colony_pb.uncollected_taxes)
 
 
 def sectorModelToPb(sector_pb, sector_model):

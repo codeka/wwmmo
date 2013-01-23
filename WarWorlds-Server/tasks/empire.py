@@ -167,8 +167,8 @@ class StarSimulatePage(tasks.TaskPage):
   simulated in more than 18 hours and simulates them now. By running every 6 hours, we ensure
   no star is more than 24 hours out of date."""
   def get(self):
-    # find all stars where last_simulation is at least 18 hours ago
-    last_simulation = datetime.now() - timedelta(hours=18)
+    # find all stars where last_simulation is at least 48 hours ago
+    last_simulation = datetime.now() - timedelta(hours=48)
 
     MAX_STARS = 10
 
@@ -177,7 +177,7 @@ class StarSimulatePage(tasks.TaskPage):
       star_key = str(star_mdl.key())
       if star_key not in star_keys:
         star_keys.append(star_key)
-    for colony_mdl in mdl.Colony.all().filter("lastSimulation <", last_simulation):
+    for colony_mdl in mdl.Colony.all().filter("lastSimulation <", last_simulation).fetch(MAX_STARS + 1):
       star_key = str(colony_mdl.key().parent())
       if star_key not in star_keys:
         star_keys.append(star_key)
