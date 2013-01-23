@@ -369,7 +369,7 @@ public class StarfieldActivity extends BaseActivity {
 
             if (wasSectorUpdated) {
                 SectorManager.getInstance().refreshSector(sectorX, sectorY);
-            } else {
+            } else if (starKey != null) {
                 // make sure we re-select the star you had selected before.
                 mStarfield.selectStar(starKey);
             }

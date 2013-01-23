@@ -5,7 +5,6 @@ import java.util.Locale;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -511,6 +510,9 @@ public class SolarSystemActivity extends BaseActivity implements StarManager.Sta
             return;
         }
 
+        final Button colonizeButton = (Button) findViewById(R.id.solarsystem_colonize);
+        colonizeButton.setEnabled(false);
+
         MyEmpire empire = EmpireManager.getInstance().getEmpire();
 
         // check that we have a colony ship (the server will check too, but this is easy)
@@ -539,6 +541,8 @@ public class SolarSystemActivity extends BaseActivity implements StarManager.Sta
         empire.colonize(mContext, planet, new MyEmpire.ColonizeCompleteHandler() {
             @Override
             public void onColonizeComplete(Colony colony) {
+                colonizeButton.setEnabled(true);
+
                 // remember that the sector we're in has now been updated so we can pass that
                 // back to the StarfieldActivity
                 mIsSectorUpdated = true;

@@ -487,6 +487,8 @@ def colonize(empire_pb, star_key, colonize_request):
   # find a colony ship we can destroy
   colony_ship_fleet_pb = None
   for fleet_pb in star_pb.fleets:
+    if fleet_pb.state != pb.Fleet.IDLE:
+      continue
     if fleet_pb.empire_key != empire_pb.key:
       continue
     if fleet_pb.design_name == "colonyship": # TODO: hard-coded??
