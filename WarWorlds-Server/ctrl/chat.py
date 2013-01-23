@@ -27,8 +27,11 @@ def postMessage(user, msg_pb):
   registration_ids = []
   for online_device_mdl in model.OnlineDevice.all():
     if online_device_mdl.onlineSince >= one_day_ago:
-      device_mdl = online_device_mdl.device
-      registration_ids.append(device_mdl.gcmRegistrationID)
+      try:
+        device_mdl = online_device_mdl.device
+        registration_ids.append(device_mdl.gcmRegistrationID)
+      except:
+        pass # ignore ones that give an error
 
   try:
     gcm = gcm_mdl.GCM('AIzaSyADWOC-tWUbzj-SVW13Sz5UuUiGfcmHHDA')
