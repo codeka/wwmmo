@@ -25,6 +25,7 @@ public class MyEmpire extends Empire {
 
     private List<Fleet> mAllFleets;
     private List<Colony> mAllColonies;
+    private List<BuildRequest> mAllBuildRequests;
     private Map<String, Star> mStars;
     private List<RefreshAllCompleteHandler> mRefreshAllCompleteHandlers;
 
@@ -56,6 +57,10 @@ public class MyEmpire extends Empire {
 
     public List<Colony> getAllColonies() {
         return mAllColonies;
+    }
+
+    public List<BuildRequest> getAllBuildRequests() {
+        return mAllBuildRequests;
     }
 
     /**
@@ -317,11 +322,23 @@ public class MyEmpire extends Empire {
     public void writeToParcel(Parcel parcel, int flags) {
         super.writeToParcel(parcel, flags);
 
+        if (mAllFleets == null) {
+            mAllFleets = new ArrayList<Fleet>();
+        }
         Fleet[] fleets = new Fleet[mAllFleets.size()];
         parcel.writeParcelableArray(mAllFleets.toArray(fleets), flags);
 
+        if (mAllColonies == null) {
+            mAllColonies = new ArrayList<Colony>();
+        }
         Colony[] colonies = new Colony[mAllColonies.size()];
         parcel.writeParcelableArray(mAllColonies.toArray(colonies), flags);
+
+        if (mAllBuildRequests == null) {
+            mAllBuildRequests = new ArrayList<BuildRequest>();
+        }
+        BuildRequest[] buildRequests = new BuildRequest[mAllBuildRequests.size()];
+        parcel.writeParcelableArray(mAllBuildRequests.toArray(buildRequests), flags);
 
         Star[] stars = new Star[mStars.size()];
         parcel.writeParcelableArray(mStars.values().toArray(stars), flags);
@@ -341,6 +358,12 @@ public class MyEmpire extends Empire {
         mAllColonies = new ArrayList<Colony>();
         for (int i = 0; i < colonies.length; i++) {
             mAllColonies.add((Colony) colonies[i]);
+        }
+
+        Parcelable[] buildRequests = parcel.readParcelableArray(BuildRequest.class.getClassLoader());
+        mAllBuildRequests = new ArrayList<BuildRequest>();
+        for (int i = 0; i < buildRequests.length; i++) {
+            mAllBuildRequests.add((BuildRequest) buildRequests[i]);
         }
 
         Parcelable[] stars = parcel.readParcelableArray(Star.class.getClassLoader());
@@ -396,6 +419,15 @@ public class MyEmpire extends Empire {
             }
         }
         mAllFleets = fleets;
+
+        List<Messages.BuildRequest> build_request_pbs = pb.getBuildRequestsList();
+        ArrayList<BuildRequest> buildRequests = new ArrayList<BuildRequest>();
+        if (build_request_pbs != null && build_request_pbs.size() > 0) {
+            for (int i = 0; i < build_request_pbs.size(); i++) {
+                buildRequests.add(BuildRequest.fromProtocolBuffer(build_request_pbs.get(i)));
+            }
+        }
+        mAllBuildRequests = buildRequests;
 
         List<Messages.Star> star_pbs = pb.getStarsList();
         TreeMap<String, Star> stars = new TreeMap<String, Star>();

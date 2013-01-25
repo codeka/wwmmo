@@ -7,8 +7,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import org.joda.time.Duration;
-
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -25,14 +23,13 @@ import android.widget.TextView;
 import au.com.codeka.TimeInHours;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.TabFragmentActivity;
-import au.com.codeka.warworlds.model.BuildQueueManager;
+import au.com.codeka.warworlds.ctrl.BuildQueueList;
 import au.com.codeka.warworlds.model.BuildRequest;
 import au.com.codeka.warworlds.model.Building;
 import au.com.codeka.warworlds.model.BuildingDesign;
 import au.com.codeka.warworlds.model.BuildingDesignManager;
 import au.com.codeka.warworlds.model.Colony;
 import au.com.codeka.warworlds.model.Design;
-import au.com.codeka.warworlds.model.DesignManager;
 import au.com.codeka.warworlds.model.ShipDesign;
 import au.com.codeka.warworlds.model.ShipDesignManager;
 import au.com.codeka.warworlds.model.SpriteDrawable;
@@ -485,114 +482,20 @@ public class BuildActivity extends TabFragmentActivity implements StarManager.St
             if (star == null)
                 return inflater.inflate(R.layout.solarsystem_build_loading_tab, null);
 
-            final BuildQueueListAdapter adapter = new BuildQueueListAdapter();
-            adapter.setBuildQueue(star, colony);
+            BuildQueueList buildQueueList = (BuildQueueList) v.findViewById(R.id.build_queue);
+            buildQueueList.refresh(star, colony);
 
-            ListView buildQueueList = (ListView) v.findViewById(R.id.build_queue);
-            buildQueueList.setAdapter(adapter);
-
-            buildQueueList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            buildQueueList.setBuildQueueActionListener(new BuildQueueList.BuildQueueActionListener() {
                 @Override
-                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                    BuildRequest buildRequest = (BuildRequest) adapter.getItem(position);
+                public void onBuildClick(Star star, BuildRequest buildRequest) {
                     BuildProgressDialog dialog = new BuildProgressDialog();
                     dialog.setBuildRequest(buildRequest, star.getKey());
                     dialog.show(getActivity().getSupportFragmentManager(), "");
                 }
             });
 
-            // make sure we're aware of changes to the build queue
-            BuildQueueManager.getInstance().addBuildQueueUpdatedListener(new BuildQueueManager.BuildQueueUpdatedListener() {
-                @Override
-                public void onBuildQueueUpdated(List<BuildRequest> queue) {
-                    adapter.setBuildQueue(star, colony);
-                }
-            });
-
             return v;
         }
 
-        /**
-         * This adapter is used to populate the list of buildings that are currently in progress.
-         */
-        private class BuildQueueListAdapter extends BaseAdapter {
-            private List<BuildRequest> mQueue;
-
-            public void setBuildQueue(Star star, Colony colony) {
-                mQueue = new ArrayList<BuildRequest>();
-                for (BuildRequest buildRequest : star.getBuildRequests()) {
-                    if (buildRequest.getColonyKey().equals(colony.getKey())) {
-                        mQueue.add(buildRequest);
-                    }
-                }
-
-                notifyDataSetChanged();
-            }
-
-            @Override
-            public int getCount() {
-                if (mQueue == null)
-                    return 0;
-                return mQueue.size();
-            }
-
-            @Override
-            public Object getItem(int position) {
-                if (mQueue == null)
-                    return null;
-                return mQueue.get(position);
-            }
-
-            @Override
-            public long getItemId(int position) {
-                return position;
-            }
-
-            @Override
-            public View getView(int position, View convertView, ViewGroup parent) {
-                View view = convertView;
-                if (view == null) {
-                    LayoutInflater inflater = (LayoutInflater) getActivity().getSystemService
-                            (Context.LAYOUT_INFLATER_SERVICE);
-                    view = inflater.inflate(R.layout.solarsystem_buildings_design, null);
-                }
-
-                ImageView icon = (ImageView) view.findViewById(R.id.building_icon);
-                TextView row1 = (TextView) view.findViewById(R.id.building_row1);
-                TextView row2 = (TextView) view.findViewById(R.id.building_row2);
-                TextView row3 = (TextView) view.findViewById(R.id.building_row3);
-                ProgressBar progress = (ProgressBar) view.findViewById(R.id.building_progress);
-
-                BuildRequest request = mQueue.get(position);
-                DesignManager dm = DesignManager.getInstance(request.getBuildKind());
-                Design design = dm.getDesign(request.getDesignID());
-
-                icon.setImageDrawable(new SpriteDrawable(design.getSprite()));
-
-                if (request.getCount() == 1) {
-                    row1.setText(design.getDisplayName());
-                } else {
-                    row1.setText(String.format("%s (× %d)",
-                                               design.getDisplayName(),
-                                               request.getCount()));
-                }
-
-                Duration remainingDuration = request.getRemainingTime();
-                if (remainingDuration.equals(Duration.ZERO)) {
-                    row2.setText(String.format(Locale.ENGLISH, "%d %%, not enough resources to complete.",
-                                 (int) request.getPercentComplete()));
-                } else {
-                    row2.setText(String.format(Locale.ENGLISH, "%d %%, %s left",
-                                 (int) request.getPercentComplete(),
-                                 TimeInHours.format(remainingDuration)));
-                }
-
-                row3.setVisibility(View.GONE);
-                progress.setVisibility(View.VISIBLE);
-                progress.setProgress((int) request.getPercentComplete());
-
-                return view;
-            }
-        }
     }
 }

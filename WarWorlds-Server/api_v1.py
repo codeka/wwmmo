@@ -226,6 +226,7 @@ class EmpireDetailsPage(ApiPage):
       sim = simulation.Simulation()
       colony_pbs = []
       star_pbs = []
+      build_request_pbs = []
       for star_key in star_keys:
         sim.simulate(star_key)
         star_pb = sim.getStar(star_key)
@@ -235,8 +236,12 @@ class EmpireDetailsPage(ApiPage):
             if colony_pb.key == star_colony_pb.key:
               colony_pbs.append(star_colony_pb)
 
+        for build_request_pb in star_pb.build_requests:
+          build_request_pbs.append(build_request_pb)
+
         star_pbs.append(sector.sumarize(star_pb))
 
+      empire_pb.build_requests.extend(build_request_pbs)
       empire_pb.colonies.extend(colony_pbs)
       empire_pb.stars.extend(star_pbs)
 

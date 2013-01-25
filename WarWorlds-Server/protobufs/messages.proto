@@ -67,8 +67,11 @@ message Empire
     // May not be set, but if it si this is all of the colonies owned by the empire
     repeated Colony colonies = 7;
 
-    // If this is set, then it will be a list of the stars referenced by the fleets
-    // and colonies. This is useful because you often want details of the stars the
+    // May not be set, but if it is then this will be all the build requests currently in progress
+    repeated BuildRequest build_requests = 10;
+
+    // If this is set, then it will be a list of the stars referenced by the fleets,
+    // colonies and build requests. This is useful because you often want details of the stars the
     // colony/fleet is on (so you can draw the icon, etc). Note that it will *only*
     // be the stars and the planets, not colonies, build requests, etc.
     repeated Star stars = 8;

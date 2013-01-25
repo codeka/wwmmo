@@ -2,6 +2,8 @@ package au.com.codeka.warworlds.game;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 import android.content.Context;
 import android.content.Intent;
@@ -16,8 +18,11 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.TabFragmentActivity;
+import au.com.codeka.warworlds.ctrl.BuildQueueList;
 import au.com.codeka.warworlds.ctrl.ColonyList;
 import au.com.codeka.warworlds.ctrl.FleetList;
+import au.com.codeka.warworlds.game.solarsystem.BuildProgressDialog;
+import au.com.codeka.warworlds.model.BuildRequest;
 import au.com.codeka.warworlds.model.Colony;
 import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.Fleet;
@@ -68,6 +73,7 @@ public class EmpireActivity extends TabFragmentActivity {
 
         getTabManager().addTab(mContext, new TabInfo("Overview", OverviewFragment.class, null));
         getTabManager().addTab(mContext, new TabInfo("Colonies", ColoniesFragment.class, null));
+        getTabManager().addTab(mContext, new TabInfo("Build", BuildQueueFragment.class, null));
         getTabManager().addTab(mContext, new TabInfo("Fleets", FleetsFragment.class, null));
 
         mExtras = getIntent().getExtras();
@@ -180,6 +186,36 @@ public class EmpireActivity extends TabFragmentActivity {
                 @Override
                 public void onCollectTaxes() {
                     EmpireManager.getInstance().getEmpire().collectTaxes(context);
+                }
+            });
+
+            return v;
+        }
+    }
+
+    public static class BuildQueueFragment extends BaseFragment {
+        public View onCreateView(LayoutInflater inflator, ViewGroup container, Bundle savedInstanceState) {
+            if (sCurrentEmpire == null) {
+                return getLoadingView(inflator);
+            }
+
+            View v = inflator.inflate(R.layout.empire_buildqueue_tab, null);
+
+            Map<String, Colony> colonies = new TreeMap<String, Colony>();
+            for (Colony colony : sCurrentEmpire.getAllColonies()) {
+                colonies.put(colony.getKey(), colony);
+            }
+            BuildQueueList buildQueueList = (BuildQueueList) v.findViewById(R.id.build_queue);
+            buildQueueList.refresh(sCurrentEmpire.getImportantStars(),
+                                   colonies,
+                                   sCurrentEmpire.getAllBuildRequests());
+
+            buildQueueList.setBuildQueueActionListener(new BuildQueueList.BuildQueueActionListener() {
+                @Override
+                public void onBuildClick(Star star, BuildRequest buildRequest) {
+                    BuildProgressDialog dialog = new BuildProgressDialog();
+                    dialog.setBuildRequest(buildRequest, star.getKey());
+                    dialog.show(getActivity().getSupportFragmentManager(), "");
                 }
             });
 
