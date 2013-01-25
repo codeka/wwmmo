@@ -1,4 +1,5 @@
 <resources>
     <drawable name="list_item_pressed">#06333c</drawable>
     <drawable name="list_item_selected">#0c6476</drawable>
+    <drawable name="list_item_normal">#000000</drawable>
 </resources>

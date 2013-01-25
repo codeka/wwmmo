@@ -16,12 +16,9 @@ public class TabManager {
     private TabHost mTabHost;
     private TreeMap<String, TabInfo> mTabInfos = new TreeMap<String, TabInfo>();
     private TabInfo mLastTab;
-    private boolean mSmallButtons;
 
-    public TabManager(TabHost tabHost, boolean smallButtons) {
+    public TabManager(TabHost tabHost) {
         mTabHost = tabHost;
-        mSmallButtons = smallButtons;
-
         mTabHost.setup();
     }
 
@@ -37,7 +34,6 @@ public class TabManager {
                                      .setContent(tabInfo);
 
         mTabHost.addTab(setContent);
-
         mTabHost.setOnTabChangedListener(new TabHost.OnTabChangeListener() {
             @Override
             public void onTabChanged(String tabId) {
@@ -69,13 +65,7 @@ public class TabManager {
      * Creates the \c View that represents the actual tab button.
      */
     private View createTabButton(Context context, final String text) {
-        View view;
-        if (mSmallButtons) {
-            view = LayoutInflater.from(context).inflate(R.layout.tab_button_small, null);
-        } else {
-            view = LayoutInflater.from(context).inflate(R.layout.tab_button, null);
-        }
-
+        View view = LayoutInflater.from(context).inflate(R.layout.tab_button, null);
         TextView tv = (TextView) view.findViewById(R.id.text);
         tv.setText(text);
         return view;

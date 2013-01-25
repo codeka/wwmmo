@@ -25,7 +25,7 @@ public class TabFragmentActivity extends BaseActivity {
         setContentView(R.layout.tab_fragment_activity);
 
         mTabHost = (TabHost) findViewById(android.R.id.tabhost);
-        mTabManager = new TabManager(mTabHost, false);
+        mTabManager = new TabManager(mTabHost);
     }
 
     protected TabHost getTabHost() {
@@ -75,7 +75,6 @@ public class TabFragmentActivity extends BaseActivity {
 
             ft.commit();
             getSupportFragmentManager().executePendingTransactions();
-
         }
     }
 }
