@@ -259,7 +259,7 @@ public class BuildQueueList extends FrameLayout implements MyEmpire.RefreshAllCo
             if (mEntries == null)
                 return 0;
 
-            return mEntries.get(position).buildRequest == null ? 1 : 2;
+            return mEntries.get(position).buildRequest == null ? 0 : 1;
         }
 
         @Override

@@ -4,8 +4,6 @@ import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.Duration;
 import org.joda.time.Interval;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -15,7 +13,6 @@ import au.com.codeka.warworlds.model.protobuf.Messages;
  * Represents an in-progress build order.
  */
 public class BuildRequest implements Parcelable {
-    private Logger log = LoggerFactory.getLogger(BuildRequest.class);
     private String mKey;
     private BuildKind mBuildKind;
     private String mDesignID;

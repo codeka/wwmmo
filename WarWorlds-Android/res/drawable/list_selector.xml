@@ -4,6 +4,4 @@
         android:drawable="@drawable/list_item_pressed" />
   <item android:state_selected="true"
         android:drawable="@drawable/list_item_selected" />
-  <item android:state_selected="false"
-        android:drawable="@drawable/list_item_normal" />
 </selector>
