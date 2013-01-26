@@ -11,6 +11,7 @@ import java.util.TreeMap;
 import org.joda.time.Duration;
 
 import android.content.Context;
+import android.os.Handler;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -25,21 +26,29 @@ import android.widget.TextView;
 import au.com.codeka.RomanNumeralFormatter;
 import au.com.codeka.TimeInHours;
 import au.com.codeka.warworlds.R;
-import au.com.codeka.warworlds.model.BuildQueueManager;
 import au.com.codeka.warworlds.model.BuildRequest;
 import au.com.codeka.warworlds.model.Colony;
 import au.com.codeka.warworlds.model.Design;
 import au.com.codeka.warworlds.model.DesignManager;
+import au.com.codeka.warworlds.model.EmpireManager;
+import au.com.codeka.warworlds.model.MyEmpire;
 import au.com.codeka.warworlds.model.Planet;
 import au.com.codeka.warworlds.model.PlanetImageManager;
 import au.com.codeka.warworlds.model.Sprite;
 import au.com.codeka.warworlds.model.SpriteDrawable;
 import au.com.codeka.warworlds.model.Star;
+import au.com.codeka.warworlds.model.StarManager;
 import au.com.codeka.warworlds.model.StarImageManager;
 
-public class BuildQueueList extends FrameLayout /*implements StarManager.StarFetchedHandler*/ {
+public class BuildQueueList extends FrameLayout implements MyEmpire.RefreshAllCompleteHandler,
+                                                           StarManager.StarFetchedHandler {
     private Context mContext;
     private BuildQueueActionListener mActionListener;
+    private BuildQueueListAdapter mBuildQueueListAdapter;
+    private Colony mColony;
+    private List<String> mStarKeys;
+    private Handler mHandler;
+    private ProgressUpdater mProgressUpdater;
 
     public BuildQueueList(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -47,13 +56,46 @@ public class BuildQueueList extends FrameLayout /*implements StarManager.StarFet
 
         View child = inflate(context, R.layout.buildqueue_list_ctrl, null);
         this.addView(child);
+
+        mBuildQueueListAdapter = new BuildQueueListAdapter();
+        ListView buildQueueList = (ListView) findViewById(R.id.build_queue_list);
+        buildQueueList.setAdapter(mBuildQueueListAdapter);
+
+        buildQueueList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                BuildQueueListAdapter.ItemEntry entry = (BuildQueueListAdapter.ItemEntry) mBuildQueueListAdapter.getItem(position);
+                if (mActionListener != null && entry.buildRequest != null) {
+                    mActionListener.onBuildClick(mBuildQueueListAdapter.getStarForBuildRequest(entry.buildRequest), entry.buildRequest);
+                }
+            }
+        });
+
+        mHandler = new Handler();
     }
 
     public void setBuildQueueActionListener(BuildQueueActionListener listener) {
         mActionListener = listener;
     }
 
+    /**
+     * If one of the stars we care about updates, we'll want to refresh ourselves, too.
+     */
+    @Override
+    public void onStarFetched(Star s) {
+        for (String starKey : mStarKeys) {
+            if (s.getKey().equals(starKey)) {
+                EmpireManager.getInstance().refreshEmpire();
+                return;
+            }
+        }
+    }
+
     public void refresh(final Star star, final Colony colony) {
+        refresh(star, colony, star.getBuildRequests());
+    }
+
+    public void refresh(final Star star, final Colony colony, List<BuildRequest> allBuildRequests) {
         Map<String, Star> stars = new TreeMap<String, Star>();
         stars.put(star.getKey(), star);
 
@@ -67,35 +109,67 @@ public class BuildQueueList extends FrameLayout /*implements StarManager.StarFet
             }
         }
 
+        mColony = colony;
         refresh(stars, colonies, buildRequests);
     }
 
     public void refresh(final Map<String, Star> stars,
                         final Map<String, Colony> colonies,
                         final List<BuildRequest> buildRequests) {
-        final BuildQueueListAdapter adapter = new BuildQueueListAdapter();
-        adapter.setBuildQueue(stars, colonies, buildRequests);
+        // save the list of star keys we're interested in here
+        mStarKeys = new ArrayList<String>();
+        for (Star star : stars.values()) {
+            mStarKeys.add(star.getKey());
+        }
 
-        ListView buildQueueList = (ListView) findViewById(R.id.build_queue_list);
-        buildQueueList.setAdapter(adapter);
+        mBuildQueueListAdapter.setBuildQueue(stars, colonies, buildRequests);
+    }
 
-        buildQueueList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                BuildQueueListAdapter.ItemEntry entry = (BuildQueueListAdapter.ItemEntry) adapter.getItem(position);
-                if (mActionListener != null && entry.buildRequest != null) {
-                    mActionListener.onBuildClick(adapter.getStarForBuildRequest(entry.buildRequest), entry.buildRequest);
+    /**
+     * When the empire is updated, make sure we display the latest build queue.
+     */
+    @Override
+    public void onRefreshAllComplete(MyEmpire empire) {
+        if (mColony != null) {
+            String colonyKey = mColony.getKey();
+            mColony = null;
+
+            for (int i = 0; i < empire.getAllColonies().size(); i++) {
+                Colony colony = empire.getAllColonies().get(i);
+                if (colony.getKey().equals(colonyKey)) {
+                    mColony = colony;
+                    break;
                 }
             }
-        });
 
-        // make sure we're aware of changes to the build queue
-        BuildQueueManager.getInstance().addBuildQueueUpdatedListener(new BuildQueueManager.BuildQueueUpdatedListener() {
-            @Override
-            public void onBuildQueueUpdated(List<BuildRequest> queue) {
-                adapter.setBuildQueue(stars, colonies, queue);
+            refresh(empire.getImportantStar(mColony.getStarKey()),
+                    mColony, empire.getAllBuildRequests());
+        } else {
+            Map<String, Colony> colonies = new TreeMap<String, Colony>();
+            for (Colony colony : empire.getAllColonies()) {
+                colonies.put(colony.getKey(), colony);
             }
-        });
+
+            refresh(empire.getImportantStars(), colonies, empire.getAllBuildRequests());
+        }
+    }
+
+    @Override
+    public void onAttachedToWindow() {
+        EmpireManager.getInstance().getEmpire().addRefreshAllCompleteHandler(this);
+        StarManager.getInstance().addStarUpdatedListener(null, this);
+
+        mProgressUpdater = new ProgressUpdater();
+        mHandler.postDelayed(mProgressUpdater, 5000);
+    }
+
+    @Override
+    public void onDetachedFromWindow() {
+        EmpireManager.getInstance().getEmpire().removeRefreshAllCompleteHandler(this);
+        StarManager.getInstance().removeStarUpdatedListener(this);
+
+        mHandler.removeCallbacks(mProgressUpdater);
+        mProgressUpdater = null;
     }
 
     /**
@@ -122,9 +196,22 @@ public class BuildQueueList extends FrameLayout /*implements StarManager.StarFet
                         Colony lhsColony = mColonies.get(lhs.getColonyKey());
                         Colony rhsColony = mColonies.get(rhs.getColonyKey());
 
+                        if (lhsColony == null) {
+                            return -1;
+                        } else if (rhsColony == null) {
+                            return 1;
+                        }
+
                         if (!lhsColony.getStarKey().equals(rhsColony.getStarKey())) {
                             Star lhsStar = mStars.get(lhsColony.getStarKey());
                             Star rhsStar = mStars.get(rhsColony.getStarKey());
+
+                            if (lhsStar == null) {
+                                return -1;
+                            } else if (rhsStar == null) {
+                                return 1;
+                            }
+
                             return lhsStar.getName().compareTo(rhsStar.getName());
                         } else {
                             return lhsColony.getPlanetIndex() - rhsColony.getPlanetIndex();
@@ -203,6 +290,36 @@ public class BuildQueueList extends FrameLayout /*implements StarManager.StarFet
             return position;
         }
 
+        public void refreshProgress() {
+            if (mEntries == null) {
+                return;
+            }
+
+            for (ItemEntry entry : mEntries) {
+                if (entry.buildRequest != null) {
+                    refreshEntryProgress(entry);
+                }
+            }
+        }
+
+        private void refreshEntryProgress(ItemEntry entry) {
+            Duration remainingDuration = entry.buildRequest.getRemainingTime();
+            if (remainingDuration.equals(Duration.ZERO)) {
+                entry.progressText.setText(String.format(Locale.ENGLISH, "%d %%, not enough resources to complete.",
+                                           (int) entry.buildRequest.getPercentComplete()));
+            } else if (remainingDuration.getStandardMinutes() > 0) {
+                entry.progressText.setText(String.format(Locale.ENGLISH, "%d %%, %s left",
+                        (int) entry.buildRequest.getPercentComplete(),
+                        TimeInHours.format(remainingDuration)));
+            } else {
+                entry.progressText.setText(String.format(Locale.ENGLISH, "%d %%, almost done",
+                        (int) entry.buildRequest.getPercentComplete(),
+                        TimeInHours.format(remainingDuration)));
+            }
+
+            entry.progressBar.setProgress((int) entry.buildRequest.getPercentComplete());
+        }
+
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
             ItemEntry entry = mEntries.get(position);
@@ -245,9 +362,9 @@ public class BuildQueueList extends FrameLayout /*implements StarManager.StarFet
             } else {
                 ImageView icon = (ImageView) view.findViewById(R.id.building_icon);
                 TextView row1 = (TextView) view.findViewById(R.id.building_row1);
-                TextView row2 = (TextView) view.findViewById(R.id.building_row2);
+                entry.progressText = (TextView) view.findViewById(R.id.building_row2);
                 TextView row3 = (TextView) view.findViewById(R.id.building_row3);
-                ProgressBar progress = (ProgressBar) view.findViewById(R.id.building_progress);
+                entry.progressBar = (ProgressBar) view.findViewById(R.id.building_progress);
 
                 DesignManager dm = DesignManager.getInstance(entry.buildRequest.getBuildKind());
                 Design design = dm.getDesign(entry.buildRequest.getDesignID());
@@ -262,19 +379,9 @@ public class BuildQueueList extends FrameLayout /*implements StarManager.StarFet
                                                entry.buildRequest.getCount()));
                 }
 
-                Duration remainingDuration = entry.buildRequest.getRemainingTime();
-                if (remainingDuration.equals(Duration.ZERO)) {
-                    row2.setText(String.format(Locale.ENGLISH, "%d %%, not enough resources to complete.",
-                                 (int) entry.buildRequest.getPercentComplete()));
-                } else {
-                    row2.setText(String.format(Locale.ENGLISH, "%d %%, %s left",
-                                 (int) entry.buildRequest.getPercentComplete(),
-                                 TimeInHours.format(remainingDuration)));
-                }
-
                 row3.setVisibility(View.GONE);
-                progress.setVisibility(View.VISIBLE);
-                progress.setProgress((int) entry.buildRequest.getPercentComplete());
+                entry.progressBar.setVisibility(View.VISIBLE);
+                refreshEntryProgress(entry);
             }
 
             return view;
@@ -286,9 +393,21 @@ public class BuildQueueList extends FrameLayout /*implements StarManager.StarFet
             public SpriteDrawable starDrawable;
             public SpriteDrawable planetDrawable;
             public BuildRequest buildRequest;
+            public ProgressBar progressBar;
+            public TextView progressText;
         }
     }
 
+    /**
+     * This is called every five seconds, we'll refresh the current progress values.
+     */
+    private class ProgressUpdater implements Runnable {
+        @Override
+        public void run() {
+            mBuildQueueListAdapter.refreshProgress();
+            mHandler.postDelayed(this, 5000);
+        }
+    }
 
     public interface BuildQueueActionListener {
         void onBuildClick(Star star, BuildRequest buildRequest);

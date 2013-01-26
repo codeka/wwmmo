@@ -23,10 +23,10 @@ import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.StyledDialog;
 import au.com.codeka.warworlds.api.ApiClient;
 import au.com.codeka.warworlds.api.ApiException;
-import au.com.codeka.warworlds.model.BuildQueueManager;
 import au.com.codeka.warworlds.model.BuildRequest;
 import au.com.codeka.warworlds.model.Colony;
 import au.com.codeka.warworlds.model.Design;
+import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.SpriteDrawable;
 import au.com.codeka.warworlds.model.StarManager;
 import au.com.codeka.warworlds.model.protobuf.Messages;
@@ -204,10 +204,7 @@ public class BuildConfirmDialog extends DialogFragment {
             }
             @Override
             protected void onPostExecute(BuildRequest buildRequest) {
-                // notify the BuildQueueManager that something's changed.
-                BuildQueueManager.getInstance().refresh(buildRequest);
-
-                // tell the StarManager that this star has been updated
+                EmpireManager.getInstance().refreshEmpire();
                 StarManager.getInstance().refreshStar(activity, mColony.getStarKey());
 
                 dismiss();

@@ -22,8 +22,13 @@ public class BuildRequest implements Parcelable {
     private String mColonyKey;
     private DateTime mEndTime;
     private DateTime mStartTime;
+    private DateTime mRefreshTime;
     private float mProgress;
     private int mCount;
+
+    public BuildRequest() {
+        mRefreshTime = DateTime.now(DateTimeZone.UTC);
+    }
 
     public String getKey() {
         return mKey;
@@ -44,10 +49,22 @@ public class BuildRequest implements Parcelable {
         return mCount;
     }
     public float getProgress() {
-        return mProgress;
+        // mProgress will be the accurate at the time this BuildRequest was refreshed from the
+        // server. We'll do a little bit of interpolation so that it's a good estimate *after*
+        // we've been refreshed from the server, too.
+        DateTime now = DateTime.now(DateTimeZone.UTC);
+        if (mEndTime.isBefore(now)) {
+            return 1.0f;
+        }
+
+        long numerator = new Interval(mRefreshTime, now).toDurationMillis();
+        long denominator = new Interval(mRefreshTime, mEndTime).toDurationMillis();
+        float percentRemaining = (float) numerator / (float) denominator;
+
+        return mProgress + ((1.0f - mProgress) * percentRemaining);
     }
     public float getPercentComplete() {
-        float percent = mProgress * 100.0f;
+        float percent = getProgress() * 100.0f;
         if (percent < 0)
             percent = 0;
         if (percent > 100)
@@ -56,8 +73,6 @@ public class BuildRequest implements Parcelable {
     }
     public Duration getRemainingTime() {
         DateTime now = DateTime.now(DateTimeZone.UTC);
-        log.info("getRemainingTime() now="+now+", endTime="+mEndTime);
-
         if (mEndTime.isBefore(now)) {
             return Duration.ZERO;
         }

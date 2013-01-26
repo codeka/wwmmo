@@ -22,7 +22,6 @@ import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.StyledDialog;
 import au.com.codeka.warworlds.api.ApiClient;
 import au.com.codeka.warworlds.api.ApiException;
-import au.com.codeka.warworlds.model.BuildQueueManager;
 import au.com.codeka.warworlds.model.BuildRequest;
 import au.com.codeka.warworlds.model.Design;
 import au.com.codeka.warworlds.model.DesignManager;
@@ -167,9 +166,6 @@ public class BuildProgressDialog extends DialogFragment {
             protected void onPostExecute(BuildRequest buildRequest) {
                 ((StyledDialog) getDialog()).setCloseable(true);
 
-                // notify the BuildQueueManager that something's changed.
-                BuildQueueManager.getInstance().refresh(buildRequest);
-
                 // tell the StarManager that this star has been updated
                 StarManager.getInstance().refreshStar(getActivity(), mStarKey);
 
@@ -202,10 +198,7 @@ public class BuildProgressDialog extends DialogFragment {
             }
             @Override
             protected void onPostExecute(Boolean success) {
-                // notify the BuildQueueManager that something's changed.
-                BuildQueueManager.getInstance().refresh();
-
-                // tell the StarManager that this star has been updated
+                EmpireManager.getInstance().refreshEmpire();
                 StarManager.getInstance().refreshStar(getActivity(), mStarKey);
 
                 dismiss();

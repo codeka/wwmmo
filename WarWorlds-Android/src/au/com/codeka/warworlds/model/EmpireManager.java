@@ -97,7 +97,7 @@ public class EmpireManager {
     }
 
     public void refreshEmpire() {
-        refreshEmpire(mEmpire.getKey(), null);
+        mEmpire.refreshAllDetails(null);
     }
 
     public void refreshEmpire(final String empireKey) {
