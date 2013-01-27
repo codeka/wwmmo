@@ -120,8 +120,6 @@ def getStar(star_key, force_nocache=False):
     building_empire_key = None
     design = designs.BuildingDesign.getDesign(building_pb.design_name)
     for effect in design.effects:
-      if effect.level and effect.level != building_pb.level:
-        continue
       for colony_pb in star_pb.colonies:
         if building_pb.colony_key == colony_pb.key:
           effect.applyToColony(building_pb, colony_pb)

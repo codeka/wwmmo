@@ -62,5 +62,19 @@
       <effect kind="populationBoost" boost="0.15" min="100" />
     </effects>
     <limits maxPerColony="1" />
+    <levels>
+      <level no="2">
+        <cost minerals="400" time="3.4" />
+        <effects>
+          <effect kind="populationBoost" boost="0.3" min="200" />
+        </effects>
+      </level>
+      <level no="3">
+        <cost minerals="400" time="3.4" />
+        <effects>
+          <effect kind="populationBoost" boost="0.45" min="300" />
+        </effects>
+      </level>
+    </levels>
   </design>
 </designs>

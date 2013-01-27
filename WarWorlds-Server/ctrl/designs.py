@@ -13,6 +13,7 @@ class Design(object):
   def __init__(self):
     self.effects = []
     self.dependencies = []
+    self.levels = []
 
   def getEffects(self, kind=None):
     """Gets the effects of the given kind, or an empty list if there's none."""
@@ -282,7 +283,6 @@ def _parseBuildingDesign(designXml):
   effectsXml = designXml.find("effects")
   if effectsXml is not None:
     for effectXml in effectsXml.iterfind("effect"):
-      level = int(effectXml.get("level"))
       kind = effectXml.get("kind")
       if kind == "storage":
         effect = BuildingEffectStorage(kind, effectXml)
@@ -290,7 +290,6 @@ def _parseBuildingDesign(designXml):
         effect = BuildingEffectDefence(kind, effectXml)
       elif kind == "populationBoost":
         effect = BuildingEffectPopulationBoost(kind, effectXml)
-      effect.level = level
       design.effects.append(effect)
   design.maxPerColony = 0
   limitsXml = designXml.find("limits")

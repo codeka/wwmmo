@@ -138,7 +138,7 @@ public class BuildQueueList extends FrameLayout implements MyEmpire.RefreshAllCo
         colonies.put(colony.getKey(), colony);
 
         List<BuildRequest> buildRequests = new ArrayList<BuildRequest>();
-        for (BuildRequest request : star.getBuildRequests()) {
+        for (BuildRequest request : allBuildRequests) {
             if (request.getColonyKey().equals(colony.getKey())) {
                 buildRequests.add(request);
             }
