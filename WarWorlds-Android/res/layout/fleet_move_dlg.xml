@@ -11,7 +11,7 @@
         <TextView android:id="@+id/instructions"
                   android:layout_width="match_parent"
                   android:layout_height="wrap_content"
-                  android:text="@string/fleet_move_help" />
+                  android:text="Select the star you want to move your fleet to and click &quot;Move&quot;" />
 
         <LinearLayout android:id="@+id/star_details"
                       android:layout_width="match_parent"

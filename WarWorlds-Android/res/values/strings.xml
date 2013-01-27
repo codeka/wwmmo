@@ -3,25 +3,20 @@
     <string name="app_name">War Worlds</string>
 
     <!--  Some common button labels -->
-    <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
     <string name="done">Done</string>
     <string name="build">Build</string>
     <string name="focus">Focus</string>
     <string name="view">View</string>
-    <string name="move">Move</string>
 
     <!-- "log_in.xml" layout -->
-    <string name="log_in_header">Log In</string>
     <string name="log_in">Log In</string>
 
     <!-- "log_out.xml" layout -->
-    <string name="log_out_header">Log Out</string>
     <string name="log_out_msg">You are currently logged in as %1$s, are you sure you want to log out?</string>
     <string name="log_out">Log Out</string>
 
     <!-- "home.xml" layout -->
-    <string name="homepage_title_text">War Worlds</string>
     <string name="start_game">Start Game</string>
     <string name="options">Options</string>
 
@@ -30,46 +25,20 @@
     <string name="empire_setup_name">Give your Empire a name:</string>
     <string name="empire_setup_name_hint">Empire name</string>
 
-    <!-- "starfield.xml" layout -->
-    <string name="reports">Reports</string>
-    <string name="empire">Empire</string>
 
     <!-- "solarsystem.xml" layout -->
     <string name="solarsystem_colonize">Colonize</string>
-    <string name="solarsystem_cogeniality_header">Cogeniality</string>
-    <string name="solarsystem_colony">Colony</string>
     <string name="fleet">Fleet</string>
 
-    <!-- "chat.xml" layout -->
-    <string name="chat_global">Global</string>
-    <string name="chat_send">Send</string>
-
-    <!-- "solarsystem_buildings_*.xml layouts -->
-    <string name="buildings_available_title">Available Buildings</string>
-    <string name="buildings_existing_title">Colony Buildings</string>
-    <string name="buildings_inprogress_title">In Progress</string>
-    <string name="solarsystem_building_timetobuild">Time to Build:</string>
     <string name="solarsystem_focus_instructions">Drag the sliders to adjust focus.</string>
 
     <!-- "solarsystem_fleet_dlg.xml layout -->
     <string name="fleet_stance">Stance</string>
     <string name="fleet_move">Move</string>
-    <string name="fleet_attack">Attack</string>
     <string name="fleet_split">Split</string>
     <string name="fleet_merge">Merge</string>
     <string name="fleet_view">View</string>
 
-    <!-- "solarsystem_fleet_move_dlg.xml" layout -->
-    <string name="fleet_move_help">Select the star you want to move your fleet to and click "Move".</string>
-
-    <!-- "global_options.xml" layout -->
-    <string name="globalopts_graphics_detail">Detail Level:</string>
-    <string name="globalopts_graphics_fast">Fast, Low Detail</string>
-    <string name="globalopts_graphics_slow">Slow, High Detail</string>
-
-    <!-- "starfield_empire_dlg" layout -->
-    <string name="colonies">Colonies</string>
-    <string name="overview">Overview</string>
     <string name="empire_overview_format"><![CDATA[
         <strong>%1$d</strong> stars and <strong>%2$d</strong> planets colonized<br/>
         <strong>%3$d</strong> ships in <strong>%4$d</strong> fleets
@@ -80,6 +49,4 @@
         <strong>Mining: </strong>%3$.2f<br />
         <strong>Building: </strong>%4$.2f
     ]]></string>
-    <string name="collect_taxes_none">Collect Taxes</string>
-    <string name="collect_taxes">Collect Taxes: %s</string>
 </resources>

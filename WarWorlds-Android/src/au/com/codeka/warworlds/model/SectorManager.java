@@ -3,6 +3,7 @@ package au.com.codeka.warworlds.model;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -249,7 +250,7 @@ public class SectorManager {
         }
 
         public static String key(Pair<Long, Long> coord) {
-            return String.format("%d:%d", coord.one, coord.two);
+            return String.format(Locale.ENGLISH, "%d:%d", coord.one, coord.two);
         }
 
         public StarfieldBackgroundRenderer getBackgroundRenderer(Context context, Pair<Long, Long> coords) {

@@ -60,7 +60,7 @@ public class ChatActivity extends BaseActivity
 
     private void sendCurrentChat() {
         EditText chatMsg = (EditText) findViewById(R.id.chat_text);
-        if (chatMsg.getText().toString().isEmpty()) {
+        if (chatMsg.getText().toString().equals("")) {
             return;
         }
 

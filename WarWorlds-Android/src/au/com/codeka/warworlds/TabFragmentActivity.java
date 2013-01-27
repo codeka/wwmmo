@@ -1,5 +1,6 @@
 package au.com.codeka.warworlds;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -12,6 +13,7 @@ import android.widget.TabHost;
  * This is our base \c FragmentActivity class for a tabbed activity. We'll define the code
  * generating our tab buttons and so on.
  */
+@SuppressLint("Registered") // it's a base class
 public class TabFragmentActivity extends BaseActivity {
     private Context mContext = this;
     TabManager mTabManager;

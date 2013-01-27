@@ -89,7 +89,7 @@ public class ChatMessage {
     public static ChatMessage fromProtocolBuffer(Messages.ChatMessage pb) {
         ChatMessage chatMessage = new ChatMessage();
         chatMessage.mMessage = pb.getMessage();
-        if (pb.getEmpireKey() != null && !pb.getEmpireKey().isEmpty()) {
+        if (pb.getEmpireKey() != null && !pb.getEmpireKey().equals("")) {
             chatMessage.mEmpireKey = pb.getEmpireKey();
         }
         chatMessage.mDatePosted = new DateTime(pb.getDatePosted() * 1000, DateTimeZone.UTC);
