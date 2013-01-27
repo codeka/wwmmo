@@ -21,11 +21,7 @@
     ]]></description>
     <cost credits="100" minerals="400" time="0.5" />
     <effects>
-      <effect level="1" kind="storage" goods="100" minerals="100" />
-      <effect level="2" kind="storage" goods="200" minerals="200" />
-      <effect level="3" kind="storage" goods="300" minerals="300" />
-      <effect level="4" kind="storage" goods="400" minerals="400" />
-      <effect level="5" kind="storage" goods="500" minerals="500" />
+      <effect kind="storage" goods="100" minerals="100" />
     </effects>
   </design>
   <design id="research">
@@ -48,11 +44,7 @@
     ]]></description>
     <cost minerals="350" time="1.2" />
     <effects>
-      <effect level="1" kind="defence" bonus="0.25" />
-      <effect level="2" kind="defence" bonus="0.5" />
-      <effect level="3" kind="defence" bonus="0.75" />
-      <effect level="4" kind="defence" bonus="1" />
-      <effect level="5" kind="defence" bonus="1.25" />
+      <effect kind="defence" bonus="0.25" />
     </effects>
     <limits maxPerColony="1" />
   </design>
@@ -67,11 +59,7 @@
     ]]></description>
     <cost minerals="400" time="3.4" />
     <effects>
-      <effect level="1" kind="populationBoost" boost="1.15" min="100" />
-      <effect level="2" kind="populationBoost" boost="1.30" min="150" />
-      <effect level="3" kind="populationBoost" boost="1.45" min="200" />
-      <effect level="4" kind="populationBoost" boost="1.60" min="250" />
-      <effect level="5" kind="populationBoost" boost="1.75" min="300" />
+      <effect kind="populationBoost" boost="0.15" min="100" />
     </effects>
     <limits maxPerColony="1" />
   </design>

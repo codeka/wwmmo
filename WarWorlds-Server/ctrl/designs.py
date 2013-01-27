@@ -14,13 +14,12 @@ class Design(object):
     self.effects = []
     self.dependencies = []
 
-  def getEffects(self, kind=None, level=1):
+  def getEffects(self, kind=None):
     """Gets the effects of the given kind, or an empty list if there's none."""
     if not kind:
       return self.effects
 
-    return (effect for effect in self.effects if (effect.kind == kind and
-                                                  (effect.level == level or effect.level is None)))
+    return (effect for effect in self.effects if (effect.kind == kind))
 
   def hasEffect(self, kind, level=None):
     for effect in self.effects:
@@ -92,9 +91,10 @@ class BuildingEffectPopulationBoost(BuildingEffect):
     self.min = int(effectXml.get("min"))
 
   def applyToColony(self, building_pb, colony_pb):
-    colony_pb.max_population *= self.population_boost
-    if colony_pb.max_population < self.min:
-      colony_pb.max_population = self.min
+    extra_population = colony_pb.max_population * self.population_boost
+    if extra_population < self.min:
+      extra_population = self.min
+    colony_pb.max_population += extra_population
 
 
 class BuildingDesign(Design):
