@@ -18,7 +18,6 @@ import au.com.codeka.warworlds.game.FleetSplitDialog;
 import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.Fleet;
 import au.com.codeka.warworlds.model.Star;
-import au.com.codeka.warworlds.model.StarManager;
 
 public class FleetDialog extends DialogFragment {
     private Star mStar;

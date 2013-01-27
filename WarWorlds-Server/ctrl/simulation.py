@@ -974,7 +974,7 @@ def on_fleet_destroyed(fleet_pb, combat_report_key, immediate):
     if fleet_pb.empire_key and fleet_pb.empire_key != "":
       keys_to_clear = ["fleet:for-empire:%s" % (fleet_pb.empire_key)]
       ctrl.clearCached(keys_to_clear)
-      if not not fleet_pb.block_notification_on_destroy:
+      if not fleet_pb.block_notification_on_destroy:
         # Save a sitrep for this situation
         sitrep_pb = pb.SituationReport()
         sitrep_pb.empire_key = fleet_pb.empire_key
