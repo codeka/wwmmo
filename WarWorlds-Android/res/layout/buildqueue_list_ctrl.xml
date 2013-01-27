@@ -72,5 +72,11 @@
                 android:layout_marginRight="4dp"
                 android:text="Stop" />
 
+        <au.com.codeka.warworlds.ctrl.InfobarView
+            android:id="@+id/infobar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true" />
+
     </RelativeLayout>
 </RelativeLayout>

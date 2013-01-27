@@ -18,6 +18,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
+import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -49,10 +50,13 @@ public class BuildQueueList extends FrameLayout implements MyEmpire.RefreshAllCo
     private List<String> mStarKeys;
     private Handler mHandler;
     private ProgressUpdater mProgressUpdater;
+    private BuildRequest mSelectedBuildRequest;
+    private boolean mShowStars;
 
     public BuildQueueList(Context context, AttributeSet attrs) {
         super(context, attrs);
         mContext = context;
+        mShowStars = true;
 
         View child = inflate(context, R.layout.buildqueue_list_ctrl, null);
         this.addView(child);
@@ -65,13 +69,44 @@ public class BuildQueueList extends FrameLayout implements MyEmpire.RefreshAllCo
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 BuildQueueListAdapter.ItemEntry entry = (BuildQueueListAdapter.ItemEntry) mBuildQueueListAdapter.getItem(position);
-                if (mActionListener != null && entry.buildRequest != null) {
-                    mActionListener.onBuildClick(mBuildQueueListAdapter.getStarForBuildRequest(entry.buildRequest), entry.buildRequest);
+                if (entry.buildRequest != null) {
+                    mSelectedBuildRequest = entry.buildRequest;
+                    mBuildQueueListAdapter.notifyDataSetChanged();
+                    refreshSelection();
                 }
             }
         });
 
+        Button stopBtn = (Button) findViewById(R.id.stop_btn);
+        stopBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mActionListener != null && mSelectedBuildRequest != null) {
+                    mActionListener.onStopClick(mBuildQueueListAdapter.getStarForBuildRequest(mSelectedBuildRequest), mSelectedBuildRequest);
+                }
+            }
+        });
+
+        Button accelerateBtn = (Button) findViewById(R.id.accelerate_btn);
+        accelerateBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mActionListener != null && mSelectedBuildRequest != null) {
+                    mActionListener.onAccelerateClick(mBuildQueueListAdapter.getStarForBuildRequest(mSelectedBuildRequest), mSelectedBuildRequest);
+                }
+            }
+        });
+
+        refreshSelection();
+
         mHandler = new Handler();
+    }
+
+    public void setShowStars(boolean showStars) {
+        mShowStars = showStars;
+        if (mBuildQueueListAdapter != null) {
+            mBuildQueueListAdapter.notifyDataSetChanged();
+        }
     }
 
     public void setBuildQueueActionListener(BuildQueueActionListener listener) {
@@ -125,11 +160,55 @@ public class BuildQueueList extends FrameLayout implements MyEmpire.RefreshAllCo
         mBuildQueueListAdapter.setBuildQueue(stars, colonies, buildRequests);
     }
 
+    private void refreshSelection() {
+        ProgressBar progressBar = (ProgressBar) findViewById(R.id.bottom_pane).findViewById(R.id.building_progress);
+        TextView progressText = (TextView) findViewById(R.id.bottom_pane).findViewById(R.id.progress_text);
+        ImageView icon = (ImageView) findViewById(R.id.bottom_pane).findViewById(R.id.building_icon);
+        TextView buildingName = (TextView) findViewById(R.id.bottom_pane).findViewById(R.id.building_name);
+
+        if (mSelectedBuildRequest == null) {
+            findViewById(R.id.stop_btn).setEnabled(false);
+            findViewById(R.id.accelerate_btn).setEnabled(false);
+            buildingName.setVisibility(View.GONE);
+            icon.setVisibility(View.GONE);
+            progressBar.setVisibility(View.GONE);
+            progressText.setVisibility(View.GONE);
+            return;
+        }
+
+        findViewById(R.id.stop_btn).setEnabled(true);
+        findViewById(R.id.accelerate_btn).setEnabled(true);
+        buildingName.setVisibility(View.VISIBLE);
+        icon.setVisibility(View.VISIBLE);
+        progressBar.setVisibility(View.VISIBLE);
+        progressText.setVisibility(View.VISIBLE);
+
+        DesignManager dm = DesignManager.getInstance(mSelectedBuildRequest.getBuildKind());
+        Design design = dm.getDesign(mSelectedBuildRequest.getDesignID());
+
+        icon.setImageDrawable(new SpriteDrawable(design.getSprite()));
+
+        if (mSelectedBuildRequest.getCount() == 1) {
+            buildingName.setText(design.getDisplayName());
+        } else {
+            buildingName.setText(String.format(Locale.ENGLISH, "%s (× %d)",
+                                 design.getDisplayName(),
+                                 mSelectedBuildRequest.getCount()));
+        }
+
+        mBuildQueueListAdapter.refreshEntryProgress(mSelectedBuildRequest, progressBar, progressText);
+    }
+
     /**
      * When the empire is updated, make sure we display the latest build queue.
      */
     @Override
     public void onRefreshAllComplete(MyEmpire empire) {
+        String selectedBuildRequestKey = null;
+        if (mSelectedBuildRequest != null) {
+            selectedBuildRequestKey = mSelectedBuildRequest.getKey();
+        }
+
         if (mColony != null) {
             String colonyKey = mColony.getKey();
             mColony = null;
@@ -152,6 +231,17 @@ public class BuildQueueList extends FrameLayout implements MyEmpire.RefreshAllCo
 
             refresh(empire.getImportantStars(), colonies, empire.getAllBuildRequests());
         }
+
+        mSelectedBuildRequest = null;
+        if (selectedBuildRequestKey != null) {
+            for (BuildRequest buildRequest : empire.getAllBuildRequests()) {
+                if (buildRequest.getKey().equals(selectedBuildRequestKey)) {
+                    mSelectedBuildRequest = buildRequest;
+                    break;
+                }
+            }
+        }
+        refreshSelection();
     }
 
     @Override
@@ -228,10 +318,12 @@ public class BuildQueueList extends FrameLayout implements MyEmpire.RefreshAllCo
             for (BuildRequest buildRequest : mBuildRequests) {
                 Colony colony = mColonies.get(buildRequest.getColonyKey());
                 if (!colony.getStarKey().equals(lastStarKey) || colony.getPlanetIndex() != lastPlanetIndex) {
-                    ItemEntry entry = new ItemEntry();
-                    entry.star = mStars.get(colony.getStarKey());
-                    entry.planet = entry.star.getPlanets()[colony.getPlanetIndex() - 1];
-                    mEntries.add(entry);
+                    if (mShowStars) {
+                        ItemEntry entry = new ItemEntry();
+                        entry.star = mStars.get(colony.getStarKey());
+                        entry.planet = entry.star.getPlanets()[colony.getPlanetIndex() - 1];
+                        mEntries.add(entry);
+                    }
                     lastStarKey = colony.getStarKey();
                     lastPlanetIndex = colony.getPlanetIndex();
                 }
@@ -242,11 +334,6 @@ public class BuildQueueList extends FrameLayout implements MyEmpire.RefreshAllCo
             }
 
             notifyDataSetChanged();
-        }
-
-        public Star getStarForBuildRequest(BuildRequest buildRequest) {
-            Colony colony = mColonies.get(buildRequest.getColonyKey());
-            return mStars.get(colony.getStarKey());
         }
 
         @Override
@@ -302,7 +389,12 @@ public class BuildQueueList extends FrameLayout implements MyEmpire.RefreshAllCo
             }
         }
 
-        private void refreshEntryProgress(ItemEntry entry) {
+        public Star getStarForBuildRequest(BuildRequest buildRequest) {
+            Colony colony = mColonies.get(buildRequest.getColonyKey());
+            return mStars.get(colony.getStarKey());
+        }
+
+        public void refreshEntryProgress(ItemEntry entry) {
             if (entry.progressBar == null || entry.progressText == null) {
                 return;
             }
@@ -310,21 +402,27 @@ public class BuildQueueList extends FrameLayout implements MyEmpire.RefreshAllCo
                 return;
             }
 
-            Duration remainingDuration = entry.buildRequest.getRemainingTime();
+            refreshEntryProgress(entry.buildRequest, entry.progressBar, entry.progressText);
+        }
+
+        public void refreshEntryProgress(BuildRequest buildRequest,
+                                         ProgressBar progressBar,
+                                         TextView progressText) {
+            Duration remainingDuration = buildRequest.getRemainingTime();
             if (remainingDuration.equals(Duration.ZERO)) {
-                entry.progressText.setText(String.format(Locale.ENGLISH, "%d %%, not enough resources to complete.",
-                                           (int) entry.buildRequest.getPercentComplete()));
+                progressText.setText(String.format(Locale.ENGLISH, "%d %%, not enough resources to complete.",
+                                     (int) buildRequest.getPercentComplete()));
             } else if (remainingDuration.getStandardMinutes() > 0) {
-                entry.progressText.setText(String.format(Locale.ENGLISH, "%d %%, %s left",
-                        (int) entry.buildRequest.getPercentComplete(),
+                progressText.setText(String.format(Locale.ENGLISH, "%d %%, %s left",
+                        (int) buildRequest.getPercentComplete(),
                         TimeInHours.format(remainingDuration)));
             } else {
-                entry.progressText.setText(String.format(Locale.ENGLISH, "%d %%, almost done",
-                        (int) entry.buildRequest.getPercentComplete(),
+                progressText.setText(String.format(Locale.ENGLISH, "%d %%, almost done",
+                        (int) buildRequest.getPercentComplete(),
                         TimeInHours.format(remainingDuration)));
             }
 
-            entry.progressBar.setProgress((int) entry.buildRequest.getPercentComplete());
+            progressBar.setProgress((int) buildRequest.getPercentComplete());
         }
 
         @Override
@@ -393,6 +491,12 @@ public class BuildQueueList extends FrameLayout implements MyEmpire.RefreshAllCo
                 row3.setVisibility(View.GONE);
                 entry.progressBar.setVisibility(View.VISIBLE);
 
+                if (mSelectedBuildRequest != null && mSelectedBuildRequest.getKey().equals(entry.buildRequest.getKey())) {
+                    view.setBackgroundColor(0xff0c6476);
+                } else {
+                    view.setBackgroundColor(0xff000000);
+                }
+
                 refreshEntryProgress(entry);
             }
 
@@ -417,11 +521,15 @@ public class BuildQueueList extends FrameLayout implements MyEmpire.RefreshAllCo
         @Override
         public void run() {
             mBuildQueueListAdapter.refreshProgress();
+            if (mSelectedBuildRequest != null) {
+                refreshSelection();
+            }
             mHandler.postDelayed(this, 5000);
         }
     }
 
     public interface BuildQueueActionListener {
-        void onBuildClick(Star star, BuildRequest buildRequest);
+        void onAccelerateClick(Star star, BuildRequest buildRequest);
+        void onStopClick(Star star, BuildRequest buildRequest);
     }
 }

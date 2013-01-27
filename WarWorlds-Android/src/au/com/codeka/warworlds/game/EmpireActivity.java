@@ -21,7 +21,6 @@ import au.com.codeka.warworlds.TabFragmentActivity;
 import au.com.codeka.warworlds.ctrl.BuildQueueList;
 import au.com.codeka.warworlds.ctrl.ColonyList;
 import au.com.codeka.warworlds.ctrl.FleetList;
-import au.com.codeka.warworlds.game.solarsystem.BuildProgressDialog;
 import au.com.codeka.warworlds.model.BuildRequest;
 import au.com.codeka.warworlds.model.Colony;
 import au.com.codeka.warworlds.model.EmpireManager;
@@ -212,9 +211,16 @@ public class EmpireActivity extends TabFragmentActivity {
 
             buildQueueList.setBuildQueueActionListener(new BuildQueueList.BuildQueueActionListener() {
                 @Override
-                public void onBuildClick(Star star, BuildRequest buildRequest) {
-                    BuildProgressDialog dialog = new BuildProgressDialog();
-                    dialog.setBuildRequest(buildRequest, star.getKey());
+                public void onAccelerateClick(Star star, BuildRequest buildRequest) {
+                    BuildAccelerateConfirmDialog dialog = new BuildAccelerateConfirmDialog();
+                    dialog.setBuildRequest(star, buildRequest);
+                    dialog.show(getActivity().getSupportFragmentManager(), "");
+                }
+
+                @Override
+                public void onStopClick(Star star, BuildRequest buildRequest) {
+                    BuildStopConfirmDialog dialog = new BuildStopConfirmDialog();
+                    dialog.setBuildRequest(star, buildRequest);
                     dialog.show(getActivity().getSupportFragmentManager(), "");
                 }
             });

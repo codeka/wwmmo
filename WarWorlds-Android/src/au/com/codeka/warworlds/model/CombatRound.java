@@ -3,7 +3,6 @@ package au.com.codeka.warworlds.model;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
-import android.util.FloatMath;
 import au.com.codeka.warworlds.model.protobuf.Messages;
 
 /**
@@ -51,7 +50,7 @@ public class CombatRound {
             cb.mFleetSummaries[i].mFleetKey = pb.getFleets(i).getFleetKey();
             cb.mFleetSummaries[i].mEmpireKey = pb.getFleets(i).getEmpireKey();
             cb.mFleetSummaries[i].mDesignID = pb.getFleets(i).getDesignId();
-            cb.mFleetSummaries[i].mNumShips = (int) FloatMath.ceil(pb.getFleets(i).getNumShips());
+            cb.mFleetSummaries[i].mNumShips = (int) Math.ceil(pb.getFleets(i).getNumShips());
         }
         cb.mFleetsJoined = new FleetJoinedRecord[pb.getFleetsJoinedCount()];
         for (int i = 0; i < pb.getFleetsJoinedCount(); i++) {
