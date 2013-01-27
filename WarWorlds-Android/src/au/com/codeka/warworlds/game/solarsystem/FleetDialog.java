@@ -20,8 +20,7 @@ import au.com.codeka.warworlds.model.Fleet;
 import au.com.codeka.warworlds.model.Star;
 import au.com.codeka.warworlds.model.StarManager;
 
-public class FleetDialog extends DialogFragment
-                         implements StarManager.StarFetchedHandler{
+public class FleetDialog extends DialogFragment {
     private Star mStar;
     private View mView;
 
@@ -36,8 +35,6 @@ public class FleetDialog extends DialogFragment
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         LayoutInflater inflater = getActivity().getLayoutInflater();
         mView = inflater.inflate(R.layout.fleet_dlg, null);
-
-        StarManager.getInstance().addStarUpdatedListener(mStar.getKey(), this);
 
         final FleetList fleetList = (FleetList) mView.findViewById(R.id.fleet_list);
 
@@ -90,20 +87,5 @@ public class FleetDialog extends DialogFragment
         b.setView(mView);
         b.setNeutralButton("Close", null);
         return b.create();
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-        StarManager.getInstance().removeStarUpdatedListener(this);
-    }
-
-    @Override
-    public void onStarFetched(Star s) {
-        TreeMap<String, Star> stars = new TreeMap<String, Star>();
-        stars.put(s.getKey(), s);
-
-        final FleetList fleetList = (FleetList) mView.findViewById(R.id.fleet_list);
-        fleetList.refresh(s.getFleets(), stars);
     }
 }

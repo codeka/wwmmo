@@ -187,7 +187,9 @@ public class StarManager {
         new AsyncTask<Void, Void, Star>() {
             @Override
             protected Star doInBackground(Void... arg0) {
-                return doFetchStar(context, starKey);
+                Star star = doFetchStar(context, starKey);
+                log.debug(String.format("STAR[%s] has %d fleets.", star.getKey(), star.getFleets().size()));
+                return star;
             }
 
             @Override
