@@ -11,6 +11,9 @@ libraries:
 builtins:
 - deferred: on
 
+inbound_services:
+- warmup
+
 handlers:
 - url: /img
   static_dir: static/img
@@ -48,6 +51,9 @@ handlers:
 - url: /tasks/empire(/.*)?
   script: tasks.empire.app
   login: admin
+
+- url: /_ah/.*
+  script: tasks.builtin.app
 
 - url: /.*
   script: frontend.app

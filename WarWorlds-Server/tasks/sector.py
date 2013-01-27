@@ -2,8 +2,9 @@
 
 from ctrl import sectorgen
 import os
-import tasks
 import webapp2 as webapp
+
+import tasks
 
 
 class GeneratePage(tasks.TaskPage):

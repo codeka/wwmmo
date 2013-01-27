@@ -669,7 +669,7 @@ class Simulation(object):
         # if the target isn't currently attacking, let's make it fight back
         target_design = cache[target.key]["design"]
         for effect in target_design.getEffects():
-          effect.onAttacked(target, fleet_pb, self)
+          effect.onAttacked(star_pb, target, fleet_pb, self)
 
     # apply the damage from this round after every fleet has had a turn inflicting it
     for fleet_pb in star_pb.fleets:
@@ -806,6 +806,8 @@ class Simulation(object):
 
       is_destroyed = False
       colony_model = mdl.Colony.get(db.Key(colony_pb.key))
+      if not colony_model:
+        return
       for destroyed_colony_pb in self.destroyed_colony_pbs:
         if destroyed_colony_pb.key == colony_pb.key:
           colony_model.delete()
@@ -931,18 +933,26 @@ def on_fleet_destroyed(fleet_pb, combat_report_key, immediate):
   """This is a deferred task that's called when a fleet is destroyed."""
   def doDelete(fleet_pb):
     fleet_mdl = mdl.Fleet.get(fleet_pb.key)
-    if fleet_mdl and fleet_mdl.timeDestroyed == ctrl.epochToDateTime(fleet_pb.time_destroyed):
-      fleet_mdl.delete()
-      return True
-    return False
+    if not fleet_mdl:
+      return False
+    if not fleet_mdl.timeDestroyed:
+      return False
+    if fleet_mdl.timeDestroyed != ctrl.epochToDateTime(fleet_pb.time_destroyed):
+      return False
+    fleet_mdl.delete()
+    return True
 
   # quick check to make sure the fleet is really scheduled to be destroyed now
   fleet_mdl = mdl.Fleet.get(fleet_pb.key)
   if not fleet_mdl:
     return
+  if not fleet_mdl.timeDestroyed:
+    logging.debug("Fleet [%s] is not scheduled to be destroyed any more, skipping." % (
+                  str(fleet_mdl.key())))
+    return
   if fleet_mdl.timeDestroyed > ctrl.epochToDateTime(fleet_pb.time_destroyed):
-    logging.debug("Not scheduled to delete fleet at this time (actually, at %s), skipping." % (
-                  fleet_mdl.timeDestroyed))
+    logging.debug("Fleet [%s] not scheduled to be deleted at this time (actually, at %s), skipping." % (
+                  str(fleet_mdl.key()), fleet_mdl.timeDestroyed))
     return
 
   # simulate until *just before* the fleet is destroyed, so that all of that fleet's effects

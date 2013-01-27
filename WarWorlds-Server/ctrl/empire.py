@@ -404,6 +404,8 @@ def updateColony(colony_key, updated_colony_pb, sim):
 def collectTaxes(colony_key, sim):
   """Transfer the uncollected taxes from the given colony into that colony's empire."""
   colony_pb = getColony(colony_key)
+  if not colony_pb:
+    return
   sim.simulate(colony_pb.star_key)
   star_pb = sim.getStar(colony_pb.star_key)
 

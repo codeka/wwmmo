@@ -518,7 +518,7 @@ class EmpireTaxesPage(ApiPage):
     sim = simulation.Simulation()
     for colony_pb in colonies_pb.colonies:
       empire.collectTaxes(colony_pb.key, sim)
-      sim.update()
+    sim.update()
 
 
 class ColoniesAttackPage(ApiPage):

@@ -204,14 +204,13 @@ class ShipEffectFighter(ShipEffect):
         break
 
 
-  def onAttacked(self, fleet_pb, attacker_fleet_pb, sim):
+  def onAttacked(self, star_pb, fleet_pb, attacker_fleet_pb, sim):
     """If another fleet attacks us, then we'll attack back (but only if we're idle."""
     if fleet_pb.state != pb.Fleet.IDLE:
       return
 
     logging.debug("A fleet (%s) is attacking us, fight back!" % (attacker_fleet_pb.key))
 
-    star_pb = sim.getStar(fleet_pb.star_key)
     for star_fleet_pb in star_pb.fleets:
       if star_fleet_pb.key == fleet_pb.key:
         star_fleet_pb.state = pb.Fleet.ATTACKING

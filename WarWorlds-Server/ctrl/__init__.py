@@ -173,8 +173,16 @@ def empirePresenceModelToPb(presence_pb, presence_model):
   if empire_key:
     presence_pb.empire_key = str(empire_key)
   presence_pb.star_key = str(presence_model.key().parent())
-  presence_pb.total_goods = presence_model.totalGoods
-  presence_pb.total_minerals = presence_model.totalMinerals
+  if (not math.isnan(presence_model.totalGoods) and not math.isinf(presence_model.totalGoods)
+      and presence_model.totalGoods > 0):
+    presence_pb.total_goods = presence_model.totalGoods
+  else:
+    presence_pb.total_goods = 0
+  if (not math.isnan(presence_model.totalMinerals) and not math.isinf(presence_model.totalMinerals)
+      and presence_model.totalMinerals > 0):
+    presence_pb.total_minerals = presence_model.totalMinerals
+  else:
+    presence_pb.total_minerals = 0
   presence_pb.max_goods = 500
   presence_pb.max_minerals = 500
 

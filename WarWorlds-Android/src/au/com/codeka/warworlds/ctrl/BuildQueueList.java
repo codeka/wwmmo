@@ -303,6 +303,13 @@ public class BuildQueueList extends FrameLayout implements MyEmpire.RefreshAllCo
         }
 
         private void refreshEntryProgress(ItemEntry entry) {
+            if (entry.progressBar == null || entry.progressText == null) {
+                return;
+            }
+            if (entry.progressBar.getTag() != entry || entry.progressText.getTag() != entry) {
+                return;
+            }
+
             Duration remainingDuration = entry.buildRequest.getRemainingTime();
             if (remainingDuration.equals(Duration.ZERO)) {
                 entry.progressText.setText(String.format(Locale.ENGLISH, "%d %%, not enough resources to complete.",
@@ -366,6 +373,10 @@ public class BuildQueueList extends FrameLayout implements MyEmpire.RefreshAllCo
                 TextView row3 = (TextView) view.findViewById(R.id.building_row3);
                 entry.progressBar = (ProgressBar) view.findViewById(R.id.building_progress);
 
+                // we use these to detect when the view gets recycled in our refresh handler.
+                entry.progressText.setTag(entry);
+                entry.progressBar.setTag(entry);
+
                 DesignManager dm = DesignManager.getInstance(entry.buildRequest.getBuildKind());
                 Design design = dm.getDesign(entry.buildRequest.getDesignID());
 
@@ -381,6 +392,7 @@ public class BuildQueueList extends FrameLayout implements MyEmpire.RefreshAllCo
 
                 row3.setVisibility(View.GONE);
                 entry.progressBar.setVisibility(View.VISIBLE);
+
                 refreshEntryProgress(entry);
             }
 
