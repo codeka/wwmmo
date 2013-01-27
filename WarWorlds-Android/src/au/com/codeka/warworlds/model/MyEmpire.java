@@ -149,7 +149,6 @@ public class MyEmpire extends Empire {
 
                 // make sure we record the fact that the star is updated as well
                 refreshAllDetails(null);
-                // TODO: StarManager.getInstance().refreshStar(context, colony.getStarKey());
             }
         }.execute();
     }
@@ -280,6 +279,9 @@ public class MyEmpire extends Empire {
                     callback.onRefreshAllComplete(MyEmpire.this);
                 }
                 fireRefreshAllCompleteHandler();
+
+                // also, anybody waiting for updates from empires in general
+                EmpireManager.getInstance().fireEmpireUpdated(MyEmpire.this);
             }
         }.execute();
     }

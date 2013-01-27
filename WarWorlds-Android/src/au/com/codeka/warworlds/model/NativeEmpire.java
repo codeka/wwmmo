@@ -2,6 +2,7 @@ package au.com.codeka.warworlds.model;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import au.com.codeka.warworlds.Util;
 
 /**
  * The "native" empire is a special empire that represents the NPC colonies and fleets.
@@ -9,7 +10,12 @@ import android.graphics.Bitmap;
 public class NativeEmpire extends Empire {
     @Override
     public String getDisplayName() {
-        return "Native";
+        if (Util.isDebug()) {
+            // helps with testing wrapping and stuff... people like long names!
+            return "Native with a really long name";
+        } else {
+            return "Native";
+        }
     }
 
     @Override

@@ -85,7 +85,7 @@ public class EmpireManager {
         }
     }
 
-    protected void fireEmpireUpdated(Empire empire) {
+    public void fireEmpireUpdated(Empire empire) {
         synchronized(mEmpireUpdatedListeners) {
             List<EmpireFetchedHandler> listeners = mEmpireUpdatedListeners.get(empire.getKey());
             if (listeners != null) {

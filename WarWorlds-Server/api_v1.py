@@ -502,7 +502,7 @@ class ColoniesTaxesPage(ApiPage):
       return
 
     sim = simulation.Simulation()
-    empire.collectTaxes(colony_pb.key, sim)
+    empire.collectTaxesFromColony(colony_pb.key, sim)
     sim.update()
     return colony_pb
 
@@ -514,10 +514,8 @@ class EmpireTaxesPage(ApiPage):
       self.set_status(403)
       return
 
-    colonies_pb = empire.getColoniesForEmpire(empire_pb)
     sim = simulation.Simulation()
-    for colony_pb in colonies_pb.colonies:
-      empire.collectTaxes(colony_pb.key, sim)
+    empire.collectTaxesFromEmpire(empire_pb, sim)
     sim.update()
 
 

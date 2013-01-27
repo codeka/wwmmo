@@ -401,7 +401,7 @@ def updateColony(colony_key, updated_colony_pb, sim):
   return colony_pb
 
 
-def collectTaxes(colony_key, sim):
+def collectTaxesFromColony(colony_key, sim):
   """Transfer the uncollected taxes from the given colony into that colony's empire."""
   colony_pb = getColony(colony_key)
   if not colony_pb:
@@ -425,6 +425,33 @@ def collectTaxes(colony_key, sim):
   empire_model.put() 
   ctrl.clearCached(["empire:%s" % (colony_pb.empire_key),
                     "empire:for-user:%s" % (empire_model.user.email())])
+
+
+def collectTaxesFromEmpire(empire_pb, sim):
+  colonies_pb = getColoniesForEmpire(empire_pb)
+
+  # first, simulate all of the stars up to this point
+  simulated_stars = []
+  for colony_pb in colonies_pb.colonies:
+    if colony_pb.star_key not in simulated_stars:
+      simulated_stars.append(colony_pb.star_key)
+      sim.simulate(colony_pb.star_key)
+
+  total_cash = empire_pb.cash
+  for star_key in simulated_stars:
+    star_pb = sim.getStar(star_key)
+    for colony_pb in star_pb.colonies:
+      if colony_pb.empire_key == empire_pb.key:
+        total_cash += colony_pb.uncollected_taxes
+        colony_pb.uncollected_taxes = 0.0
+
+  empire_mdl = mdl.Empire.get(empire_pb.key)
+  empire_mdl.cash = total_cash
+  empire_mdl.put()
+  sim.update()
+
+  ctrl.clearCached(["empire:%s" % (colony_pb.empire_key),
+                    "empire:for-user:%s" % (empire_mdl.user.email())])
 
 
 def _colonize(sector_key, empire_model, star_pb, planet_index, count_in_sector=True):
