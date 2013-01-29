@@ -74,6 +74,44 @@
     <effects>
       <effect kind="defence" bonus="0.25" />
     </effects>
+    <upgrades>
+      <upgrade level="2">
+        <cost minerals="350" time="1.2" />
+        <effects>
+          <effect kind="defence" bonus="0.5" />
+        </effects>
+        <dependencies>
+          <requires building="research" level="1" />
+        </dependencies>
+      </upgrade>
+      <upgrade level="3">
+        <cost minerals="350" time="1.2" />
+        <effects>
+          <effect kind="defence" bonus="0.75" />
+        </effects>
+        <dependencies>
+          <requires building="research" level="1" />
+        </dependencies>
+      </upgrade>
+      <upgrade level="4">
+        <cost minerals="350" time="1.2" />
+        <effects>
+          <effect kind="defence" bonus="1.0" />
+        </effects>
+        <dependencies>
+          <requires building="research" level="1" />
+        </dependencies>
+      </upgrade>
+      <upgrade level="2">
+        <cost minerals="350" time="1.2" />
+        <effects>
+          <effect kind="defence" bonus="1.25" />
+        </effects>
+        <dependencies>
+          <requires building="research" level="1" />
+        </dependencies>
+      </upgrade>
+    </upgrades>
     <limits maxPerColony="1" />
   </design>
   <design id="biosphere">

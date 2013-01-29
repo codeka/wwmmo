@@ -103,6 +103,7 @@ class BuildCheckPage(tasks.TaskPage):
                 fleet_pb.empire_key == str(empire_key)):
               fleet_pb.num_ships += float(build_request_model.count)
               existing = True
+              break
         if not existing:
           model = mdl.Fleet(parent=star_key)
           model.empire = build_request_model.empire
