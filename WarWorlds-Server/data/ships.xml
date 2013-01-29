@@ -29,8 +29,8 @@
       <requires building="shipyard" level="1" />
     </dependencies>
     <cost minerals="50" time="0.1667" />
-    <fuel costPerParsec="7.5" />
-    <stats speed="17" baseAttack="1" baseDefence="1" />
+    <fuel costPerParsec="0.1" />
+    <stats speed="23" baseAttack="1" baseDefence="1" />
     <effects>
       <effect kind="scout" />
       <effect kind="fighter" />

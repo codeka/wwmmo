@@ -228,7 +228,8 @@ def createEmpire(empire_pb, sim):
   # by default, the star will have a bunch of native colonies and fleets... drop those!
   for fleet_pb in star_pb.fleets:
     fleet_mdl = mdl.Fleet.get(fleet_pb.key)
-    fleet_mdl.delete()
+    if fleet_mdl:
+      fleet_mdl.delete()
   del star_pb.fleets[:]
   for colony_pb in star_pb.colonies:
     colony_mdl = mdl.Colony.get(colony_pb.key)
@@ -450,7 +451,7 @@ def collectTaxesFromEmpire(empire_pb, sim):
   empire_mdl.put()
   sim.update()
 
-  ctrl.clearCached(["empire:%s" % (colony_pb.empire_key),
+  ctrl.clearCached(["empire:%s" % (empire_pb.key),
                     "empire:for-user:%s" % (empire_mdl.user.email())])
 
 

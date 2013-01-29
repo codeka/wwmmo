@@ -65,9 +65,14 @@ class BuildCheckPage(tasks.TaskPage):
       colony_key = mdl.BuildOperation.colony.get_value_for_datastore(build_request_model)
       empire_key = mdl.BuildOperation.empire.get_value_for_datastore(build_request_model)
 
+      # if the colony has been destroyed, then ignore this...
+      if not mdl.Colony.get(colony_key):
+        logging.warn("Colony [%s] has been destroyed, build not completed." % (str(colony_key)))
+        continue
+
       # Figure out the name of the star the object was built on, for the notification
       star_key = build_request_model.key().parent()
-      star_pb = sim.getStar(str(star_key))
+      star_pb = sim.getStar(str(star_key), True)
 
       new_fleet_key = None
 
