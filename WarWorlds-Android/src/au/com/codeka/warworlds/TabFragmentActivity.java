@@ -78,5 +78,14 @@ public class TabFragmentActivity extends BaseActivity {
             ft.commit();
             getSupportFragmentManager().executePendingTransactions();
         }
+
+        @Override
+        public boolean reload() {
+            if (fragment != null && (fragment instanceof TabManager.Reloadable)) {
+                ((TabManager.Reloadable) fragment).reloadTab();
+                return true;
+            }
+            return false;
+        }
     }
 }

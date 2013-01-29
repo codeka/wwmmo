@@ -13,8 +13,7 @@ public class Design {
     protected String mID;
     protected String mName;
     protected String mDescription;
-    protected int mBuildTimeSeconds;
-    protected float mBuildCostMinerals;
+    protected BuildCost mBuildCost;
     protected String mSpriteName;
     protected DesignKind mDesignKind;
     protected ArrayList<Dependency> mDependencies;
@@ -29,11 +28,8 @@ public class Design {
     public String getDescription() {
         return mDescription;
     }
-    public int getBuildTimeSeconds() {
-        return mBuildTimeSeconds;
-    }
-    public float getBuildCostMinerals() {
-        return mBuildCostMinerals;
+    public BuildCost getBuildCost() {
+        return mBuildCost;
     }
     public DesignKind getDesignKind() {
         return mDesignKind;
@@ -112,24 +108,11 @@ public class Design {
                 } else if (elem.getNodeName().equals("description")) {
                     design.mDescription = elem.getTextContent();
                 } else if (elem.getNodeName().equals("cost")) {
-                    String value = elem.getAttribute("time");
-                    if (!value.equals("")) {
-                        double timeInHours = Double.parseDouble(value);
-                        design.mBuildTimeSeconds = (int)(timeInHours * 3600);
-                    }
-
-                    value = elem.getAttribute("minerals");
-                    if (!value.equals("")) {
-                        design.mBuildCostMinerals = Float.parseFloat(value);
-                    }
+                    design.mBuildCost = new BuildCost(elem);
                 } else if (elem.getNodeName().equals("sprite")) {
                     design.mSpriteName = elem.getTextContent();
                 } else if (elem.getNodeName().equals("dependencies")) {
-                    for (Element requiresElem : XmlIterator.childElements(elem, "requires")) {
-                        design.mDependencies.add(new Dependency(
-                                requiresElem.getAttribute("building"),
-                                Integer.parseInt(requiresElem.getAttribute("level"))));
-                    }
+                    design.mDependencies = Dependency.parse(elem);
                 } else if (elem.getNodeName().equals("effects")) {
                     for (Element effectElem : XmlIterator.childElements(elem, "effect")) {
                         Effect effect = createEffect();
@@ -168,6 +151,16 @@ public class Design {
         private String mDesignID;
         private int mLevel;
 
+        public static ArrayList<Dependency> parse(Element elem) {
+            ArrayList<Dependency> dependencies = new ArrayList<Dependency>();
+            for (Element requiresElem : XmlIterator.childElements(elem, "requires")) {
+                dependencies.add(new Dependency(
+                        requiresElem.getAttribute("building"),
+                        Integer.parseInt(requiresElem.getAttribute("level"))));
+            }
+            return dependencies;
+        }
+
         public Dependency(String designID, int level) {
             mDesignID = designID;
             mLevel = level;
@@ -190,6 +183,32 @@ public class Design {
         }
         public String getKind() {
             return mKind;
+        }
+    }
+
+    public static class BuildCost {
+        private int mTimeInSeconds;
+        private float mCostInMinerals;
+
+        public BuildCost(Element costElement) {
+            String value = costElement.getAttribute("time");
+            if (!value.equals("")) {
+                double timeInHours = Double.parseDouble(value);
+                mTimeInSeconds = (int)(timeInHours * 3600);
+            }
+
+            value = costElement.getAttribute("minerals");
+            if (!value.equals("")) {
+                mCostInMinerals = Float.parseFloat(value);
+            }
+
+        }
+
+        public int getTimeInSeconds() {
+            return mTimeInSeconds;
+        }
+        public float getCostInMinerals() {
+            return mCostInMinerals;
         }
     }
 }

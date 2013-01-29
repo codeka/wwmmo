@@ -632,9 +632,36 @@ def build(empire_pb, colony_pb, request_pb, sim):
     logging.warn("Asked to build design '%s', which does not exist." % (request_pb.design_name))
     return False
 
-  if len(design.dependencies) > 0:
+  if (request_pb.build_kind == pb.BuildRequest.BUILDING
+      and design.maxPerColony > 0
+      and not request_pb.existing_building_key):
+    num_existing = 0
+    star_pb = sim.getStar(colony_pb.star_key, True)
+    for building_pb in star_pb.buildings:
+      if building_pb.colony_key != colony_pb.key:
+        continue
+      if building_pb.design_name == request_pb.design_name:
+        num_existing += 1
+    if num_existing >= design.maxPerColony:
+      msg = "Cannot build %s, because we already have the maximum." % (
+            request_pb.design_name)
+      raise ctrl.ApiError(pb.GenericError.CannotBuildMaxPerColonyReached, msg)
+
+  dependencies = design.dependencies
+
+  if request_pb.existing_building_key:
+    star_pb = sim.getStar(colony_pb.star_key, True)
+    for building_pb in star_pb.buildings:
+      if building_pb.key == request_pb.existing_building_key:
+        if building_pb.level > len(design.upgrades):
+          msg = "Cannot build %s, existing building is at maximum level." % (
+                 request_pb.design_name)
+          raise ctrl.ApiError(pb.GenericError.CannotBuildMaxLevelReached, msg)
+        dependencies = design.getDependencies(building_pb.level + 1)
+
+  if len(dependencies) > 0:
     # if there's dependenices, make sure this colony meets them first
-    for dependency in design.dependencies:
+    for dependency in dependencies:
       matching_building = None
       star_pb = sim.getStar(colony_pb.star_key, True)
       for building_pb in star_pb.buildings:
@@ -646,22 +673,13 @@ def build(empire_pb, colony_pb, request_pb, sim):
         # todo:   continue
         matching_building = building_pb
       if not matching_building:
-        logging.warn("Cannot build %s, because dependency %s is not met." % (
-                     request_pb.build_kind, dependency.designID))
-        return False
-
-  if request_pb.build_kind == pb.BuildRequest.BUILDING and design.maxPerColony > 0:
-    num_existing = 0
-    star_pb = sim.getStar(colony_pb.star_key, True)
-    for building_pb in star_pb.buildings:
-      if building_pb.colony_key != colony_pb.key:
-        continue
-      if building_pb.design_name == request_pb.design_name:
-        num_existing += 1
-    if num_existing >= design.maxPerColony:
-      logging.warn("Cannot build %s, because we already hax the maximum." % (
-                   request_pb.build_kind))
-      return False
+        if request_pb.existing_building_key:
+          msg = "Cannot upgrade %s, because dependency %s is not met." % (
+                request_pb.design_name, dependency.designID)
+        else:
+          msg = "Cannot build %s, because dependency %s is not met." % (
+                request_pb.design_name, dependency.designID)
+        raise ctrl.ApiError(pb.GenericError.CannotBuildDependencyNotMet, msg)
 
   # make sure the star is simulated up to this point
   sim.simulate(colony_pb.star_key)
@@ -676,6 +694,8 @@ def build(empire_pb, colony_pb, request_pb, sim):
   build_operation_model.endTime = sim.now + timedelta(seconds=15)
   build_operation_model.progress = 0.0
   build_operation_model.count = request_pb.count
+  if request_pb.existing_building_key:
+    build_operation_model.existingBuilding = db.Key(request_pb.existing_building_key)
   build_operation_model.put()
   ctrl.buildRequestModelToPb(request_pb, build_operation_model)
 

@@ -66,10 +66,10 @@ class ApiPage(webapp.RequestHandler):
     return pb
 
   def raiseError(self, error_code, error_message):
+    self.response.set_status(400)
     err = pb.GenericError()
     err.error_code = error_code
     err.error_message = error_message
-    self.response.set_status(400)
     return err
 
 
@@ -551,13 +551,9 @@ class BuildQueuePage(ApiPage):
       return
 
     sim = simulation.Simulation()
-    resp = empire.build(empire_pb, colony_pb, request_pb, sim)
-    if resp == False:
-      self.response.set_status(400)
-      return
-
+    build_request_pb = empire.build(empire_pb, colony_pb, request_pb, sim)
     sim.update()
-    return resp
+    return build_request_pb
 
   def get(self):
     """Gets the build queue for the currently logged-in user."""
@@ -682,7 +678,16 @@ class ApiApplication(webapp.WSGIApplication):
 
   @staticmethod
   def api_dispatcher(router, request, response):
-    rv = router.default_dispatcher(request, response)
+    try:
+      status = 200
+      rv = router.default_dispatcher(request, response)
+    except ctrl.ApiError, e:
+      logging.warn(e.error_message) # no more than this is needed, I think, since these are usually
+                                    # for input validation error and stuff, not programming errors
+      rv = pb.GenericError()
+      rv.error_code = e.error_code
+      rv.error_message = e.error_message
+      status = 400
 
     if isinstance(rv, message.Message):
       # if it's a protocol buffer, then we'll want to return either the
@@ -700,6 +705,7 @@ class ApiApplication(webapp.WSGIApplication):
       else:
         # otherwise, binary protocol buffer serialization
         resp = webapp.Response(rv.SerializeToString())
+      resp.set_status(status)
       resp.headers["Content-Type"] = content_type
       return resp
 

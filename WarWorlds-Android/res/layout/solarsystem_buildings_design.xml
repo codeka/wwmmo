@@ -48,4 +48,20 @@
         android:layout_marginRight="8dp"
         android:layout_toRightOf="@+id/building_icon" />
 
+    <TextView android:id="@+id/building_level"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:layout_alignParentRight="true"
+              android:layout_marginRight="6dp"
+              android:layout_centerVertical="true"
+              android:textSize="30sp"
+              android:text="1" />
+    <TextView android:id="@+id/building_level_label"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:layout_toLeftOf="@+id/building_level"
+              android:layout_marginRight="6dp"
+              android:layout_centerVertical="true"
+              android:text="Level:" />
+
 </RelativeLayout>

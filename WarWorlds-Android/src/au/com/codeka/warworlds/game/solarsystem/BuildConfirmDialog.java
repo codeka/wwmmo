@@ -24,6 +24,7 @@ import au.com.codeka.warworlds.StyledDialog;
 import au.com.codeka.warworlds.api.ApiClient;
 import au.com.codeka.warworlds.api.ApiException;
 import au.com.codeka.warworlds.model.BuildRequest;
+import au.com.codeka.warworlds.model.Building;
 import au.com.codeka.warworlds.model.Colony;
 import au.com.codeka.warworlds.model.Design;
 import au.com.codeka.warworlds.model.EmpireManager;
@@ -35,6 +36,7 @@ public class BuildConfirmDialog extends DialogFragment {
     private static Logger log = LoggerFactory.getLogger(BuildConfirmDialog.class);
     private Colony mColony;
     private Design mDesign;
+    private Building mExistingBuilding;
     private int mCurrentQueueSize;
     private View mView;
 
@@ -43,6 +45,13 @@ public class BuildConfirmDialog extends DialogFragment {
 
     public void setup(Design design, Colony colony, int buildQueueSize) {
         mDesign = design;
+        mColony = colony;
+        mCurrentQueueSize = buildQueueSize;
+    }
+
+    public void setup(Building existingBuilding, Colony colony, int buildQueueSize) {
+        mExistingBuilding = existingBuilding;
+        mDesign = existingBuilding.getDesign();
         mColony = colony;
         mCurrentQueueSize = buildQueueSize;
     }
@@ -63,11 +72,22 @@ public class BuildConfirmDialog extends DialogFragment {
         iconImageView.setImageDrawable(new SpriteDrawable(mDesign.getSprite()));
         descriptionTextView.setText(Html.fromHtml(mDesign.getDescription()));
 
+        View upgradeContainer = mView.findViewById(R.id.upgrade_container);
         View buildCountContainer = mView.findViewById(R.id.build_count_container);
-        if (mDesign.canBuildMultiple()) {
+        if (mDesign.canBuildMultiple() && mExistingBuilding == null) {
             buildCountContainer.setVisibility(View.VISIBLE);
+            upgradeContainer.setVisibility(View.GONE);
         } else {
             buildCountContainer.setVisibility(View.GONE);
+            if (mExistingBuilding != null) {
+                upgradeContainer.setVisibility(View.VISIBLE);
+
+                TextView timeToBuildLabel = (TextView) mView.findViewById(R.id.building_timetobuild_label);
+                timeToBuildLabel.setText("Time to upgrade:");
+
+                TextView currentLevel = (TextView) mView.findViewById(R.id.upgrade_current_level);
+                currentLevel.setText(Integer.toString(mExistingBuilding.getLevel()));
+            }
         }
 
         countEdit.setText("1");
@@ -124,9 +144,15 @@ public class BuildConfirmDialog extends DialogFragment {
         refreshBuildEstimates();
 
         StyledDialog.Builder b = new StyledDialog.Builder(getActivity());
+        if (mExistingBuilding == null) {
+            b.setTitle("Build");
+        } else {
+            b.setTitle("Upgrade");
+        }
         b.setView(mView);
 
-        b.setPositiveButton("Build", new DialogInterface.OnClickListener() {
+        String label = (mExistingBuilding == null ? "Build" : "Upgrade");
+        b.setPositiveButton(label, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 onBuildClick();
@@ -152,12 +178,12 @@ public class BuildConfirmDialog extends DialogFragment {
             count = Integer.parseInt(countEdit.getText().toString());
         }
 
-        float timeInHours = (count * mDesign.getBuildTimeSeconds()) / 3600.0f;
+        float timeInHours = (count * mDesign.getBuildCost().getTimeInSeconds()) / 3600.0f;
         timeInHours *= (100.0f / workersPerBuildRequest);
         TextView timeToBuildText = (TextView) mView.findViewById(R.id.building_timetobuild);
         timeToBuildText.setText(TimeInHours.format(timeInHours));
 
-        float totalMineralsCost = count * mDesign.getBuildCostMinerals();
+        float totalMineralsCost = count * mDesign.getBuildCost().getCostInMinerals();
         TextView mineralsToBuildText = (TextView) mView.findViewById(R.id.building_mineralstobuild);
         mineralsToBuildText.setText(Html.fromHtml(
                                     String.format("%d (<font color=\"red\">%.2f</font>/hr)",
@@ -165,12 +191,16 @@ public class BuildConfirmDialog extends DialogFragment {
     }
 
     private void onBuildClick() {
-        ((StyledDialog) getDialog()).setCloseable(false);
+        final StyledDialog dialog = ((StyledDialog) getDialog());
+        dialog.setCloseable(false);
 
         final EditText countEdit = (EditText) mView.findViewById(R.id.build_count_edit);
         final Activity activity = getActivity();
 
         new AsyncTask<Void, Void, BuildRequest>() {
+            private int mErrorCode;
+            private String mErrorMsg;
+
             @Override
             protected BuildRequest doInBackground(Void... arg0) {
                 Messages.BuildRequest.BUILD_KIND kind;
@@ -191,6 +221,7 @@ public class BuildConfirmDialog extends DialogFragment {
                         .setEmpireKey(mColony.getEmpireKey())
                         .setDesignName(mDesign.getID())
                         .setCount(count)
+                        .setExistingBuildingKey(mExistingBuilding == null ? "" : mExistingBuilding.getKey())
                         .build();
                 try {
                     build = ApiClient.postProtoBuf("buildqueue", build, Messages.BuildRequest.class);
@@ -198,16 +229,28 @@ public class BuildConfirmDialog extends DialogFragment {
                     return BuildRequest.fromProtocolBuffer(build);
                 } catch (ApiException e) {
                     log.error("Error issuing build request", e);
+                    if (e.getServerErrorCode() > 0) {
+                        mErrorCode = e.getServerErrorCode();
+                        mErrorMsg = e.getServerErrorMessage();
+                    }
                 }
 
                 return null;
             }
             @Override
             protected void onPostExecute(BuildRequest buildRequest) {
-                EmpireManager.getInstance().refreshEmpire();
-                StarManager.getInstance().refreshStar(activity, mColony.getStarKey());
-
                 dismiss();
+
+                if (mErrorCode > 0) {
+                    new StyledDialog.Builder(getActivity())
+                                    .setTitle("Cannot Build")
+                                    .setMessage(mErrorMsg)
+                                    .setPositiveButton("Close", true, null)
+                                    .create().show();
+                } else {
+                    EmpireManager.getInstance().refreshEmpire();
+                    StarManager.getInstance().refreshStar(activity, mColony.getStarKey());
+                }
             }
         }.execute();
     }

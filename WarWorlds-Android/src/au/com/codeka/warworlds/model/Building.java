@@ -11,6 +11,7 @@ public class Building implements Parcelable {
     private String mKey;
     private String mColonyKey;
     private String mDesignName;
+    private int mLevel;
 
     public String getKey() {
         return mKey;
@@ -20,6 +21,9 @@ public class Building implements Parcelable {
     }
     public String getDesignName() {
         return mDesignName;
+    }
+    public int getLevel() {
+        return mLevel;
     }
     public BuildingDesign getDesign() {
         return BuildingDesignManager.getInstance().getDesign(mDesignName);
@@ -35,6 +39,7 @@ public class Building implements Parcelable {
         parcel.writeString(mKey);
         parcel.writeString(mColonyKey);
         parcel.writeString(mDesignName);
+        parcel.writeInt(mLevel);
     }
 
     public static final Parcelable.Creator<Building> CREATOR
@@ -45,6 +50,7 @@ public class Building implements Parcelable {
             b.mKey = parcel.readString();
             b.mColonyKey = parcel.readString();
             b.mDesignName = parcel.readString();
+            b.mLevel = parcel.readInt();
             return b;
         }
 
@@ -59,6 +65,7 @@ public class Building implements Parcelable {
         building.mKey = pb.getKey();
         building.mColonyKey = pb.getColonyKey();
         building.mDesignName = pb.getDesignName();
+        building.mLevel = pb.getLevel();
         return building;
     }
 }

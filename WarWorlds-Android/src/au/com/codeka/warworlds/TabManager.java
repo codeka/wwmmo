@@ -49,6 +49,10 @@ public class TabManager {
     }
 
     public void reloadTab() {
+        if (mLastTab != null && mLastTab.reload()) {
+            return;
+        }
+
         changeTab(mLastTab, true);
     }
 
@@ -85,5 +89,18 @@ public class TabManager {
         public abstract View createTabContent(String tag);
 
         public abstract void switchTo(TabInfo lastTab);
+
+        /**
+         * If possible, try to reload this tab, to avoid destroying it and recreating it.
+         */
+        public abstract boolean reload();
+    }
+
+    /**
+     * Your tab's \c Fragment can implement this interface if you want to support reloading without
+     * literally unloading and re-loading the whole tab.
+     */
+    public interface Reloadable {
+        void reloadTab();
     }
 }

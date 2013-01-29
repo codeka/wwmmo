@@ -12,6 +12,7 @@ import org.joda.time.Duration;
 
 import android.content.Context;
 import android.os.Handler;
+import android.text.Html;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -28,6 +29,7 @@ import au.com.codeka.RomanNumeralFormatter;
 import au.com.codeka.TimeInHours;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.model.BuildRequest;
+import au.com.codeka.warworlds.model.Building;
 import au.com.codeka.warworlds.model.Colony;
 import au.com.codeka.warworlds.model.Design;
 import au.com.codeka.warworlds.model.DesignManager;
@@ -38,11 +40,9 @@ import au.com.codeka.warworlds.model.PlanetImageManager;
 import au.com.codeka.warworlds.model.Sprite;
 import au.com.codeka.warworlds.model.SpriteDrawable;
 import au.com.codeka.warworlds.model.Star;
-import au.com.codeka.warworlds.model.StarManager;
 import au.com.codeka.warworlds.model.StarImageManager;
 
-public class BuildQueueList extends FrameLayout implements MyEmpire.RefreshAllCompleteHandler,
-                                                           StarManager.StarFetchedHandler {
+public class BuildQueueList extends FrameLayout implements MyEmpire.RefreshAllCompleteHandler {
     private Context mContext;
     private BuildQueueActionListener mActionListener;
     private BuildQueueListAdapter mBuildQueueListAdapter;
@@ -113,19 +113,6 @@ public class BuildQueueList extends FrameLayout implements MyEmpire.RefreshAllCo
         mActionListener = listener;
     }
 
-    /**
-     * If one of the stars we care about updates, we'll want to refresh ourselves, too.
-     */
-    @Override
-    public void onStarFetched(Star s) {
-        for (String starKey : mStarKeys) {
-            if (s.getKey().equals(starKey)) {
-                EmpireManager.getInstance().refreshEmpire();
-                return;
-            }
-        }
-    }
-
     public void refresh(final Star star, final Colony colony) {
         refresh(star, colony, star.getBuildRequests());
     }
@@ -160,7 +147,7 @@ public class BuildQueueList extends FrameLayout implements MyEmpire.RefreshAllCo
         mBuildQueueListAdapter.setBuildQueue(stars, colonies, buildRequests);
     }
 
-    private void refreshSelection() {
+    public void refreshSelection() {
         ProgressBar progressBar = (ProgressBar) findViewById(R.id.bottom_pane).findViewById(R.id.building_progress);
         TextView progressText = (TextView) findViewById(R.id.bottom_pane).findViewById(R.id.progress_text);
         ImageView icon = (ImageView) findViewById(R.id.bottom_pane).findViewById(R.id.building_icon);
@@ -247,7 +234,6 @@ public class BuildQueueList extends FrameLayout implements MyEmpire.RefreshAllCo
     @Override
     public void onAttachedToWindow() {
         EmpireManager.getInstance().getEmpire().addRefreshAllCompleteHandler(this);
-        StarManager.getInstance().addStarUpdatedListener(null, this);
 
         mProgressUpdater = new ProgressUpdater();
         mHandler.postDelayed(mProgressUpdater, 5000);
@@ -256,7 +242,6 @@ public class BuildQueueList extends FrameLayout implements MyEmpire.RefreshAllCo
     @Override
     public void onDetachedFromWindow() {
         EmpireManager.getInstance().getEmpire().removeRefreshAllCompleteHandler(this);
-        StarManager.getInstance().removeStarUpdatedListener(this);
 
         mHandler.removeCallbacks(mProgressUpdater);
         mProgressUpdater = null;
@@ -317,11 +302,13 @@ public class BuildQueueList extends FrameLayout implements MyEmpire.RefreshAllCo
             int lastPlanetIndex = -1;
             for (BuildRequest buildRequest : mBuildRequests) {
                 Colony colony = mColonies.get(buildRequest.getColonyKey());
+                Star star = mStars.get(colony.getStarKey());
+
                 if (!colony.getStarKey().equals(lastStarKey) || colony.getPlanetIndex() != lastPlanetIndex) {
                     if (mShowStars) {
                         ItemEntry entry = new ItemEntry();
-                        entry.star = mStars.get(colony.getStarKey());
-                        entry.planet = entry.star.getPlanets()[colony.getPlanetIndex() - 1];
+                        entry.star = star;
+                        entry.planet = star.getPlanets()[colony.getPlanetIndex() - 1];
                         mEntries.add(entry);
                     }
                     lastStarKey = colony.getStarKey();
@@ -330,6 +317,15 @@ public class BuildQueueList extends FrameLayout implements MyEmpire.RefreshAllCo
 
                 ItemEntry entry = new ItemEntry();
                 entry.buildRequest = buildRequest;
+
+                if (buildRequest.getExistingBuildingKey() != null) {
+                    for (Building building : colony.getBuildings()) {
+                        if (building.getKey().equals(buildRequest.getExistingBuildingKey())) {
+                            entry.existingBuilding = building;
+                        }
+                    }
+                }
+
                 mEntries.add(entry);
             }
 
@@ -408,19 +404,24 @@ public class BuildQueueList extends FrameLayout implements MyEmpire.RefreshAllCo
         public void refreshEntryProgress(BuildRequest buildRequest,
                                          ProgressBar progressBar,
                                          TextView progressText) {
+            String prefix = String.format(Locale.ENGLISH, "<font color=\"#0c6476\">%s:</font> ",
+                    buildRequest.getExistingBuildingKey() == null ? "Building" : "Upgrading");
+
             Duration remainingDuration = buildRequest.getRemainingTime();
+            String msg;
             if (remainingDuration.equals(Duration.ZERO)) {
-                progressText.setText(String.format(Locale.ENGLISH, "%d %%, not enough resources to complete.",
-                                     (int) buildRequest.getPercentComplete()));
+                msg = String.format(Locale.ENGLISH, "%s %d %%, not enough resources to complete.",
+                                    prefix, (int) buildRequest.getPercentComplete());
             } else if (remainingDuration.getStandardMinutes() > 0) {
-                progressText.setText(String.format(Locale.ENGLISH, "%d %%, %s left",
-                        (int) buildRequest.getPercentComplete(),
-                        TimeInHours.format(remainingDuration)));
+                msg = String.format(Locale.ENGLISH, "%s %d %%, %s left",
+                                    prefix, (int) buildRequest.getPercentComplete(),
+                                    TimeInHours.format(remainingDuration));
             } else {
-                progressText.setText(String.format(Locale.ENGLISH, "%d %%, almost done",
-                        (int) buildRequest.getPercentComplete(),
-                        TimeInHours.format(remainingDuration)));
+                msg = String.format(Locale.ENGLISH, "%s %d %%, almost done",
+                                    prefix, (int) buildRequest.getPercentComplete(),
+                                    TimeInHours.format(remainingDuration));
             }
+            progressText.setText(Html.fromHtml(msg));
 
             progressBar.setProgress((int) buildRequest.getPercentComplete());
         }
@@ -470,6 +471,8 @@ public class BuildQueueList extends FrameLayout implements MyEmpire.RefreshAllCo
                 entry.progressText = (TextView) view.findViewById(R.id.building_row2);
                 TextView row3 = (TextView) view.findViewById(R.id.building_row3);
                 entry.progressBar = (ProgressBar) view.findViewById(R.id.building_progress);
+                TextView level = (TextView) view.findViewById(R.id.building_level);
+                TextView levelLabel = (TextView) view.findViewById(R.id.building_level_label);
 
                 // we use these to detect when the view gets recycled in our refresh handler.
                 entry.progressText.setTag(entry);
@@ -479,6 +482,13 @@ public class BuildQueueList extends FrameLayout implements MyEmpire.RefreshAllCo
                 Design design = dm.getDesign(entry.buildRequest.getDesignID());
 
                 icon.setImageDrawable(new SpriteDrawable(design.getSprite()));
+
+                if (entry.existingBuilding != null) {
+                    level.setText(Integer.toString(entry.existingBuilding.getLevel()));
+                } else {
+                    level.setVisibility(View.GONE);
+                    levelLabel.setVisibility(View.GONE);
+                }
 
                 if (entry.buildRequest.getCount() == 1) {
                     row1.setText(design.getDisplayName());
@@ -509,6 +519,7 @@ public class BuildQueueList extends FrameLayout implements MyEmpire.RefreshAllCo
             public SpriteDrawable starDrawable;
             public SpriteDrawable planetDrawable;
             public BuildRequest buildRequest;
+            public Building existingBuilding;
             public ProgressBar progressBar;
             public TextView progressText;
         }

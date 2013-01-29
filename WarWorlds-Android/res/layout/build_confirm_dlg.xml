@@ -23,49 +23,73 @@
         android:layout_alignLeft="@id/building_name"
         android:layout_below="@id/building_name"/>
 
-    <RelativeLayout
-        android:id="@+id/build_count_container"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/building_description"
-        android:layout_toRightOf="@id/building_icon">
-
-        <TextView
-            android:id="@+id/build_count_label"
+    <FrameLayout android:id="@+id/upgrade_vs_new_container"
+                 android:layout_width="match_parent"
+                 android:layout_height="wrap_content"
+                 android:layout_below="@id/building_description"
+                 android:layout_toRightOf="@id/building_icon">
+        <RelativeLayout
+            android:id="@+id/build_count_container"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
-            android:text="Number to build:"
-            android:textAppearance="?android:attr/textAppearanceSmall"
-            android:textStyle="bold" />
+            android:visibility="visible">
 
-        <SeekBar
-            android:id="@+id/build_count_seek"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/build_count_label"
-            android:layout_toLeftOf="@+id/build_count_edit"
-            android:layout_marginRight="10dp"
-            android:layout_alignParentLeft="true" />
+            <TextView
+                android:id="@+id/build_count_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:text="Number to build:"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:textStyle="bold" />
 
-        <EditText
-            android:id="@+id/build_count_edit"
-            android:layout_width="100dp"
-            android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:layout_alignBottom="@id/build_count_seek"
-            android:inputType="number" >
+            <SeekBar
+                android:id="@+id/build_count_seek"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/build_count_label"
+                android:layout_toLeftOf="@+id/build_count_edit"
+                android:layout_marginRight="10dp"
+                android:layout_alignParentLeft="true" />
 
-            <requestFocus />
-        </EditText>
+            <EditText
+                android:id="@+id/build_count_edit"
+                android:layout_width="100dp"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_alignBottom="@id/build_count_seek"
+                android:inputType="number" >
+                <requestFocus />
+            </EditText>
+        </RelativeLayout>
 
-    </RelativeLayout>
+        <RelativeLayout android:id="@+id/upgrade_container"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:visibility="gone">
+            <TextView android:id="@+id/upgrade_current_level_label"
+                      android:layout_width="wrap_content"
+                      android:layout_height="wrap_content"
+                      android:layout_alignParentTop="true"
+                      android:text="Current Level:"
+                      android:textAppearance="?android:attr/textAppearanceSmall"
+                      android:textStyle="bold" />
+            <TextView android:id="@+id/upgrade_current_level"
+                      android:layout_width="wrap_content"
+                      android:layout_height="wrap_content"
+                      android:layout_alignBaseline="@+id/upgrade_current_level_label"
+                      android:layout_toRightOf="@+id/upgrade_current_level_label"
+                      android:layout_marginLeft="10dp"
+                      android:text="1" />
+
+        </RelativeLayout>
+    </FrameLayout>
 
     <TextView
         android:id="@+id/building_timetobuild_label"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/build_count_container"
+        android:layout_below="@+id/upgrade_vs_new_container"
         android:layout_toRightOf="@+id/building_icon"
         android:text="Time to build:"
         android:textAppearance="?android:attr/textAppearanceSmall"

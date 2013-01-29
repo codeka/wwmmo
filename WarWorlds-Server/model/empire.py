@@ -71,36 +71,6 @@ class Colony(db.Model):
     return colonies
 
 
-class BuildOperation(db.Model):
-  """Request a build operation that is currently in-progress."""
-
-  colony = db.ReferenceProperty(Colony)
-  empire = db.ReferenceProperty(Empire)
-  designName = db.StringProperty()
-  designKind = db.IntegerProperty()
-  startTime = db.DateTimeProperty()
-  endTime = db.DateTimeProperty()
-  progress = db.FloatProperty()
-  count = db.IntegerProperty()
-
-  @staticmethod
-  def getForStar(star_model):
-    query = BuildOperation.all().ancestor(star_model.key())
-    return BuildOperation._getForQuery(query)
-
-  @staticmethod
-  def getForEmpire(empire):
-    query = BuildOperation.all().filter("empire", empire)
-    return BuildOperation._getForQuery(query)
-
-  @staticmethod
-  def _getForQuery(query):
-    buildops = []
-    for buildop in query:
-      buildops.append(buildop)
-    return buildops
-
-
 class Building(db.Model):
   """A building represents a structure on a colony that gives it certain bonuses and abilities."""
 
@@ -121,6 +91,37 @@ class Building(db.Model):
     for building in query:
       buildings.append(building)
     return buildings
+
+
+class BuildOperation(db.Model):
+  """Request a build operation that is currently in-progress."""
+
+  colony = db.ReferenceProperty(Colony)
+  empire = db.ReferenceProperty(Empire)
+  designName = db.StringProperty()
+  designKind = db.IntegerProperty()
+  startTime = db.DateTimeProperty()
+  endTime = db.DateTimeProperty()
+  progress = db.FloatProperty()
+  count = db.IntegerProperty()
+  existingBuilding = db.ReferenceProperty(Building)
+
+  @staticmethod
+  def getForStar(star_model):
+    query = BuildOperation.all().ancestor(star_model.key())
+    return BuildOperation._getForQuery(query)
+
+  @staticmethod
+  def getForEmpire(empire):
+    query = BuildOperation.all().filter("empire", empire)
+    return BuildOperation._getForQuery(query)
+
+  @staticmethod
+  def _getForQuery(query):
+    buildops = []
+    for buildop in query:
+      buildops.append(buildop)
+    return buildops
 
 
 class EmpirePresence(db.Model):

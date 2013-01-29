@@ -223,6 +223,9 @@ def buildRequestModelToPb(build_pb, build_model):
   build_pb.build_kind = build_model.designKind
   build_pb.progress = build_model.progress
   build_pb.count = build_model.count
+  existing_building_key = empire_mdl.BuildOperation.existingBuilding.get_value_for_datastore(build_model)
+  if existing_building_key:
+    build_pb.existing_building_key = str(existing_building_key)
 
 
 def buildRequestPbToModel(build_model, build_pb):
@@ -371,3 +374,17 @@ def getDevicesForUser(user_email):
 
   setCached({cache_key: devices_pb})
   return devices_pb
+
+
+class ApiError(Exception):
+  def __init__(self, error_code, error_message):
+    Exception.__init__(self, error_message)
+    self.error_code = error_code
+    self.error_message = error_message
+
+  def getGenericError(self):
+    err = pb.GenericError()
+    err.error_code = self.error_code
+    err.error_message = self.error_message
+    return err
+

@@ -23,8 +23,6 @@ import android.widget.TextView;
 import au.com.codeka.TimeInHours;
 import au.com.codeka.warworlds.BaseActivity;
 import au.com.codeka.warworlds.R;
-import au.com.codeka.warworlds.TabManager;
-import au.com.codeka.warworlds.TabManager.TabInfo;
 import au.com.codeka.warworlds.game.EmpireActivity;
 import au.com.codeka.warworlds.game.ScoutReportDialog;
 import au.com.codeka.warworlds.game.SitrepActivity;
@@ -542,32 +540,5 @@ public class StarfieldActivity extends BaseActivity {
 
             return view;
         }
-    }
-
-    public class SelectedStarTabInfo extends TabManager.TabInfo {
-        public SelectedStarTabInfo(String title) {
-            super(title);
-        }
-
-        @Override
-        public View createTabContent(String tag) {
-            if (tag.equals("Planets")) {
-                return mPlanetList;
-            } else {
-                return mFleetList;
-            }
-        }
-
-        @Override
-        public void switchTo(TabInfo lastTab) {
-            if (title.equals("Planets")) {
-                mPlanetList.setVisibility(View.VISIBLE);
-                mFleetList.setVisibility(View.GONE);
-            } else {
-                mFleetList.setVisibility(View.VISIBLE);
-                mPlanetList.setVisibility(View.GONE);
-            }
-        }
-
     }
 }

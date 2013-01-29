@@ -27,8 +27,11 @@ message GenericError
 
     enum ErrorCode
     {
-        InsufficientCash = 0;
-        CannotAttackOwnColony = 1;
+        InsufficientCash = 1;
+        CannotAttackOwnColony = 2;
+        CannotBuildDependencyNotMet = 3;
+        CannotBuildMaxPerColonyReached = 4;
+        CannotBuildMaxLevelReached = 5;
     }
 }
 
@@ -460,6 +463,11 @@ message BuildRequest
     // always going to relate to start_time/end_time (due to lack of resources, changing focus
     // etc etc)
     optional float progress = 8;
+
+    // If this is set, then we're upgrading an existing building with the given key. This is only
+    // valid if build_kind is set to BUILDING and obviously the building has to exist in the
+    // current colony as well.
+    optional string existing_building_key = 10;
 }
 
 

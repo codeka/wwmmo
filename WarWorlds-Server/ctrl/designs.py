@@ -13,21 +13,28 @@ class Design(object):
   def __init__(self):
     self.effects = []
     self.dependencies = []
-    self.levels = []
+    self.upgrades = []
 
-  def getEffects(self, kind=None):
+  def getEffects(self, kind=None, level=1):
     """Gets the effects of the given kind, or an empty list if there's none."""
+    all_effects = self.effects
+    if level > 1:
+      all_effects = self.upgrades[level - 2].effects
+
     if not kind:
-      return self.effects
+      return all_effects
+    return (effect for effect in all_effects if (effect.kind == kind))
 
-    return (effect for effect in self.effects if (effect.kind == kind))
-
-  def hasEffect(self, kind, level=None):
-    for effect in self.effects:
-      if effect.kind == kind:
-        if level is None or effect.level is None or effect.level == level:
-          return True
+  def hasEffect(self, kind, level=1):
+    for _ in self.getEffects(kind, level):
+      return True
     return False
+
+  def getDependencies(self, level=1):
+    dependencies = self.dependencies
+    if level > 1:
+      dependencies = self.upgrades[level - 2].dependencies
+    return dependencies
 
   @staticmethod
   def getDesign(kind, name):
@@ -96,6 +103,26 @@ class BuildingEffectPopulationBoost(BuildingEffect):
     if extra_population < self.min:
       extra_population = self.min
     colony_pb.max_population += extra_population
+
+
+class Upgrade(object):
+  """Upgrades can be applied to building to change their effects and so on."""
+  def __init__(self, upgradeXml):
+    effectsXml = upgradeXml.find("effects")
+    if effectsXml is not None:
+      self.effects = _parseBuildingEffects(effectsXml)
+    else:
+      self.effects = []
+
+    costXml = upgradeXml.find("cost")
+    self.buildTimeSeconds = float(costXml.get("time")) * 3600
+    self.buildCostMinerals = float(costXml.get("minerals"))
+
+    dependenciesXml = upgradeXml.find("dependencies")
+    if dependenciesXml is not None:
+      self.dependencies = _parseDependencies(dependenciesXml)
+    else:
+      self.dependencies = []
 
 
 class BuildingDesign(Design):
@@ -274,6 +301,20 @@ def _parseShipDesigns():
   return designs
 
 
+def _parseBuildingEffects(effectsXml):
+  effects = []
+  for effectXml in effectsXml.iterfind("effect"):
+    kind = effectXml.get("kind")
+    if kind == "storage":
+      effect = BuildingEffectStorage(kind, effectXml)
+    elif kind == "defence":
+      effect = BuildingEffectDefence(kind, effectXml)
+    elif kind == "populationBoost":
+      effect = BuildingEffectPopulationBoost(kind, effectXml)
+    effects.append(effect)
+  return effects
+
+
 def _parseBuildingDesign(designXml):
   """Parses a single <design> from the buildings.xml file."""
 
@@ -282,21 +323,17 @@ def _parseBuildingDesign(designXml):
   _parseDesign(designXml, design)
   effectsXml = designXml.find("effects")
   if effectsXml is not None:
-    for effectXml in effectsXml.iterfind("effect"):
-      kind = effectXml.get("kind")
-      if kind == "storage":
-        effect = BuildingEffectStorage(kind, effectXml)
-      elif kind == "defence":
-        effect = BuildingEffectDefence(kind, effectXml)
-      elif kind == "populationBoost":
-        effect = BuildingEffectPopulationBoost(kind, effectXml)
-      design.effects.append(effect)
+    design.effects = _parseBuildingEffects(effectsXml)
   design.maxPerColony = 0
   limitsXml = designXml.find("limits")
   if limitsXml is not None:
     maxPerColony = limitsXml.get("maxPerColony")
     if maxPerColony is not None:
       design.maxPerColony = int(maxPerColony)
+  upgradesXml = designXml.find("upgrades")
+  if upgradesXml is not None:
+    for upgradeXml in upgradesXml.iterfind("upgrade"):
+      design.upgrades.append(Upgrade(upgradeXml))
   return design
 
 
@@ -326,6 +363,16 @@ def _parseShipDesign(designXml):
   return design
 
 
+def _parseDependencies(dependenciesXml):
+  dependencies = []
+  for requiresXml in dependenciesXml.iterfind("requires"):
+    designID = requiresXml.get("building")
+    level = requiresXml.get("level")
+    dep = DesignDependency(designID, level)
+    dependencies.append(dep)
+  return dependencies
+
+
 def _parseDesign(designXml, design):
   design.id = designXml.get("id")
   design.name = designXml.findtext("name")
@@ -336,8 +383,4 @@ def _parseDesign(designXml, design):
   design.buildCostMinerals = float(costXml.get("minerals"))
   dependenciesXml = designXml.find("dependencies")
   if dependenciesXml != None:
-    for requiresXml in dependenciesXml.iterfind("requires"):
-      designID = requiresXml.get("building")
-      level = requiresXml.get("level")
-      dep = DesignDependency(designID, level)
-      design.dependencies.append(dep)
+    design.dependencies = _parseDependencies(dependenciesXml)

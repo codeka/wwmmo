@@ -22,6 +22,7 @@ public class BuildRequest implements Parcelable {
     private DateTime mRefreshTime;
     private float mProgress;
     private int mCount;
+    private String mExistingBuildingKey;
 
     public BuildRequest() {
         mRefreshTime = DateTime.now(DateTimeZone.UTC);
@@ -44,6 +45,9 @@ public class BuildRequest implements Parcelable {
     }
     public int getCount() {
         return mCount;
+    }
+    public String getExistingBuildingKey() {
+        return mExistingBuildingKey;
     }
     public float getProgress() {
         // mProgress will be the accurate at the time this BuildRequest was refreshed from the
@@ -100,6 +104,7 @@ public class BuildRequest implements Parcelable {
         parcel.writeLong(mStartTime.getMillis());
         parcel.writeFloat(mProgress);
         parcel.writeInt(mCount);
+        parcel.writeString(mExistingBuildingKey);
     }
 
     public static final Parcelable.Creator<BuildRequest> CREATOR
@@ -115,6 +120,7 @@ public class BuildRequest implements Parcelable {
             br.mStartTime = new DateTime(parcel.readLong(), DateTimeZone.UTC);
             br.mProgress = parcel.readFloat();
             br.mCount = parcel.readInt();
+            br.mExistingBuildingKey = parcel.readString();
             return br;
         }
 
@@ -134,6 +140,9 @@ public class BuildRequest implements Parcelable {
         request.mStartTime = new DateTime(pb.getStartTime() * 1000, DateTimeZone.UTC);
         request.mProgress = pb.getProgress();
         request.mCount = pb.getCount();
+        if (pb.getExistingBuildingKey() != null && !pb.getExistingBuildingKey().equals("")) {
+            request.mExistingBuildingKey = pb.getExistingBuildingKey();
+        }
         return request;
     }
 

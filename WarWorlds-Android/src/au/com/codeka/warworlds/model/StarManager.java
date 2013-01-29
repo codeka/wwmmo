@@ -188,7 +188,8 @@ public class StarManager {
             @Override
             protected Star doInBackground(Void... arg0) {
                 Star star = doFetchStar(context, starKey);
-                log.debug(String.format("STAR[%s] has %d fleets.", star.getKey(), star.getFleets().size()));
+                log.debug(String.format("STAR[%s] has %d fleets.", star.getKey(),
+                          star.getFleets() == null ? 0 : star.getFleets().size()));
                 return star;
             }
 

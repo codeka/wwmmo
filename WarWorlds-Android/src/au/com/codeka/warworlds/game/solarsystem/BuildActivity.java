@@ -23,6 +23,7 @@ import android.widget.TextView;
 import au.com.codeka.TimeInHours;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.TabFragmentActivity;
+import au.com.codeka.warworlds.TabManager;
 import au.com.codeka.warworlds.ctrl.BuildQueueList;
 import au.com.codeka.warworlds.game.BuildAccelerateConfirmDialog;
 import au.com.codeka.warworlds.game.BuildStopConfirmDialog;
@@ -84,14 +85,26 @@ public class BuildActivity extends TabFragmentActivity implements StarManager.St
         getTabManager().reloadTab();
     }
 
+    private String getDependenciesList(Design design) {
+        return getDependenciesList(design, 1);
+    }
+
     /**
      * Returns the dependencies of the given design a string for display to
      * the user. Dependencies that we don't meet will be coloured red.
      */
-    private String getDependenciesList(Design design) {
+    private String getDependenciesList(Design design, int level) {
         String required = "Required: ";
-        ArrayList<Design.Dependency> dependencies = design.getDependencies();
-        if (dependencies.size() == 0) {
+        List<Design.Dependency> dependencies;
+        if (level == 1 || design.getDesignKind() != Design.DesignKind.BUILDING) {
+            dependencies = design.getDependencies();
+        } else {
+            BuildingDesign bd = (BuildingDesign) design;
+            BuildingDesign.Upgrade upgrade = bd.getUpgrades().get(level - 1);
+            dependencies = upgrade.getDependencies();
+        }
+
+        if (dependencies == null || dependencies.size() == 0) {
             required += "none";
         } else {
             int n = 0;
@@ -140,20 +153,22 @@ public class BuildActivity extends TabFragmentActivity implements StarManager.St
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                     Entry entry = (Entry) mBuildingListAdapter.getItem(position);
-                    if (entry.design != null) {
-                        int buildQueueSize = 0;
-                        BuildActivity activity = (BuildActivity) getActivity();
-                        for (BuildRequest br : activity.mStar.getBuildRequests()) {
-                            if (br.getColonyKey().equals(colony.getKey())) {
-                                buildQueueSize ++;
-                            }
+                    int buildQueueSize = 0;
+                    BuildActivity activity = (BuildActivity) getActivity();
+                    for (BuildRequest br : activity.mStar.getBuildRequests()) {
+                        if (br.getColonyKey().equals(colony.getKey())) {
+                            buildQueueSize ++;
                         }
+                    }
 
+                    if (entry.design != null) {
                         BuildConfirmDialog dialog = new BuildConfirmDialog();
                         dialog.setup(entry.design, colony, buildQueueSize);
                         dialog.show(getActivity().getSupportFragmentManager(), "");
                     } else if (entry.building != null) {
-                        // TODO: upgrade building
+                        BuildConfirmDialog dialog = new BuildConfirmDialog();
+                        dialog.setup(entry.building, colony, buildQueueSize);
+                        dialog.show(getActivity().getSupportFragmentManager(), "");
                     }
                 }
             });
@@ -181,12 +196,20 @@ public class BuildActivity extends TabFragmentActivity implements StarManager.St
                 for (Building b : buildings) {
                     Entry entry = new Entry();
                     entry.building = b;
+                    // if the building is being upgraded (i.e. if there's a build request that
+                    // references this building) then add the build request as well
+                    for (BuildRequest br : star.getBuildRequests()) {
+                        if (br.getExistingBuildingKey() != null && br.getExistingBuildingKey().equals(b.getKey())) {
+                            entry.buildRequest = br;
+                        }
+                    }
                     mEntries.add(entry);
                 }
 
                 for (BuildRequest br : star.getBuildRequests()) {
                     if (br.getColonyKey().equals(colony.getKey()) &&
-                        br.getBuildKind().equals(BuildRequest.BuildKind.BUILDING)) {
+                        br.getBuildKind().equals(BuildRequest.BuildKind.BUILDING) &&
+                        br.getExistingBuildingKey() == null) {
                         Entry entry = new Entry();
                         entry.buildRequest = br;
                         mEntries.add(entry);
@@ -264,6 +287,16 @@ public class BuildActivity extends TabFragmentActivity implements StarManager.St
                     return false;
                 }
 
+                // also, if it's an existing building that's at the max level it can't be
+                // upgraded any more, so also disabled.
+                Entry entry = mEntries.get(position);
+                if (entry.building != null) {
+                    int maxUpgrades = entry.building.getDesign().getUpgrades().size();
+                    if (entry.building.getLevel() > maxUpgrades) {
+                        return false;
+                    }
+                }
+
                 return true;
             }
 
@@ -308,10 +341,13 @@ public class BuildActivity extends TabFragmentActivity implements StarManager.St
                     TextView tv = (TextView) view;
                     tv.setText(entry.title);
                 } else if (entry.building != null || entry.buildRequest != null) {
+                    // existing building/upgrading building
                     ImageView icon = (ImageView) view.findViewById(R.id.building_icon);
                     TextView row1 = (TextView) view.findViewById(R.id.building_row1);
                     TextView row2 = (TextView) view.findViewById(R.id.building_row2);
                     TextView row3 = (TextView) view.findViewById(R.id.building_row3);
+                    TextView level = (TextView) view.findViewById(R.id.building_level);
+                    TextView levelLabel = (TextView) view.findViewById(R.id.building_level_label);
                     ProgressBar progress = (ProgressBar) view.findViewById(R.id.building_progress);
 
                     Building building = entry.building;
@@ -322,31 +358,54 @@ public class BuildActivity extends TabFragmentActivity implements StarManager.St
 
                     icon.setImageDrawable(new SpriteDrawable(design.getSprite()));
 
-                    row1.setText(design.getDisplayName());
-                    if (building != null) {
-                        row2.setText("Level 1");
-                        row3.setVisibility(View.VISIBLE);
-                        progress.setVisibility(View.GONE);
-                        row3.setText(String.format(Locale.ENGLISH,
-                                "Upgrade: %.2f hours",
-                                (float) design.getBuildTimeSeconds() / 3600.0f));
+                    int numUpgrades = design.getUpgrades().size();
+
+                    if (numUpgrades == 0 || building == null) {
+                        level.setVisibility(View.GONE);
+                        levelLabel.setVisibility(View.GONE);
                     } else {
-                        row2.setText(String.format(Locale.ENGLISH,
-                                "Building: %d %%, %s left",
-                                 (int) buildRequest.getPercentComplete(),
-                                 TimeInHours.format(buildRequest.getRemainingTime())));
+                        level.setText(Integer.toString(building.getLevel()));
+                        level.setVisibility(View.VISIBLE);
+                        levelLabel.setVisibility(View.VISIBLE);
+                    }
+
+                    row1.setText(design.getDisplayName());
+                    if (buildRequest != null) {
+                        String verb = (building == null ? "Building" : "Upgrading");
+                        row2.setText(Html.fromHtml(String.format(Locale.ENGLISH,
+                                "<font color=\"#0c6476\">%s:</font> %d %%, %s left",
+                                verb, (int) buildRequest.getPercentComplete(),
+                                 TimeInHours.format(buildRequest.getRemainingTime()))));
 
                         row3.setVisibility(View.GONE);
                         progress.setVisibility(View.VISIBLE);
                         progress.setProgress((int) buildRequest.getPercentComplete());
+                    } else {
+                        if (numUpgrades < building.getLevel()) {
+                            row2.setText("No more upgrades");
+                            row3.setVisibility(View.GONE);
+                            progress.setVisibility(View.GONE);
+                        } else {
+                            progress.setVisibility(View.GONE);
+                            row2.setText(String.format(Locale.ENGLISH,
+                                    "Upgrade: %.2f hours",
+                                    (float) design.getBuildCost().getTimeInSeconds() / 3600.0f));
+
+                            String required = ((BuildActivity) getActivity()).getDependenciesList(design, building.getLevel());
+                            row3.setVisibility(View.VISIBLE);
+                            row3.setText(Html.fromHtml(required));
+                        }
                     }
                 } else {
+                    // new building
                     ImageView icon = (ImageView) view.findViewById(R.id.building_icon);
                     TextView row1 = (TextView) view.findViewById(R.id.building_row1);
                     TextView row2 = (TextView) view.findViewById(R.id.building_row2);
                     TextView row3 = (TextView) view.findViewById(R.id.building_row3);
-                    ProgressBar progress = (ProgressBar) view.findViewById(R.id.building_progress);
-                    progress.setVisibility(View.GONE);
+
+                    view.findViewById(R.id.building_progress).setVisibility(View.GONE);
+                    view.findViewById(R.id.building_level).setVisibility(View.GONE);
+                    view.findViewById(R.id.building_level_label).setVisibility(View.GONE);
 
                     BuildingDesign design = mEntries.get(position).design;
 
@@ -354,7 +413,7 @@ public class BuildActivity extends TabFragmentActivity implements StarManager.St
 
                     row1.setText(design.getDisplayName());
                     row2.setText(String.format("%.2f hours",
-                            (float) design.getBuildTimeSeconds() / 3600.0f));
+                            (float) design.getBuildCost().getTimeInSeconds() / 3600.0f));
 
                     String required = ((BuildActivity) getActivity()).getDependenciesList(design);
                     row3.setText(required);
@@ -455,8 +514,9 @@ public class BuildActivity extends TabFragmentActivity implements StarManager.St
                 TextView row1 = (TextView) view.findViewById(R.id.building_row1);
                 TextView row2 = (TextView) view.findViewById(R.id.building_row2);
                 TextView row3 = (TextView) view.findViewById(R.id.building_row3);
-                ProgressBar progress = (ProgressBar) view.findViewById(R.id.building_progress);
-                progress.setVisibility(View.GONE);
+                view.findViewById(R.id.building_progress).setVisibility(View.GONE);
+                view.findViewById(R.id.building_level).setVisibility(View.GONE);
+                view.findViewById(R.id.building_level_label).setVisibility(View.GONE);
 
                 ShipDesign design = mDesigns.get(position);
 
@@ -464,7 +524,7 @@ public class BuildActivity extends TabFragmentActivity implements StarManager.St
 
                 row1.setText(design.getDisplayName());
                 row2.setText(String.format("%.2f hours",
-                        (float) design.getBuildTimeSeconds() / 3600.0f));
+                        (float) design.getBuildCost().getTimeInSeconds() / 3600.0f));
 
                 String required = ((BuildActivity) getActivity()).getDependenciesList(design);
                 row3.setText(Html.fromHtml(required));
@@ -474,7 +534,9 @@ public class BuildActivity extends TabFragmentActivity implements StarManager.St
         }
     }
 
-    public static class QueueFragment extends Fragment {
+    public static class QueueFragment extends Fragment implements TabManager.Reloadable {
+        private BuildQueueList mBuildQueueList;
+
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
             View v = inflater.inflate(R.layout.solarsystem_build_queue_tab, null);
@@ -484,11 +546,11 @@ public class BuildActivity extends TabFragmentActivity implements StarManager.St
             if (star == null)
                 return inflater.inflate(R.layout.solarsystem_build_loading_tab, null);
 
-            BuildQueueList buildQueueList = (BuildQueueList) v.findViewById(R.id.build_queue);
-            buildQueueList.setShowStars(false);
-            buildQueueList.refresh(star, colony);
+            mBuildQueueList = (BuildQueueList) v.findViewById(R.id.build_queue);
+            mBuildQueueList.setShowStars(false);
+            mBuildQueueList.refresh(star, colony);
 
-            buildQueueList.setBuildQueueActionListener(new BuildQueueList.BuildQueueActionListener() {
+            mBuildQueueList.setBuildQueueActionListener(new BuildQueueList.BuildQueueActionListener() {
                 @Override
                 public void onAccelerateClick(Star star, BuildRequest buildRequest) {
                     BuildAccelerateConfirmDialog dialog = new BuildAccelerateConfirmDialog();
@@ -505,6 +567,13 @@ public class BuildActivity extends TabFragmentActivity implements StarManager.St
             });
 
             return v;
+        }
+
+        @Override
+        public void reloadTab() {
+            if (mBuildQueueList != null) {
+                mBuildQueueList.refreshSelection();
+            }
         }
 
     }

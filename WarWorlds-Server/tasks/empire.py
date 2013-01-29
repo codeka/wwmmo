@@ -73,12 +73,25 @@ class BuildCheckPage(tasks.TaskPage):
 
       logging.info("Build for empire \"%s\", colony \"%s\" complete." % (empire_key, colony_key))
       if build_request_model.designKind == pb.BuildRequest.BUILDING:
-        model = mdl.Building(parent=build_request_model.key().parent())
-        model.colony = colony_key
-        model.empire = empire_key
-        model.designName = build_request_model.designName
-        model.buildTime = datetime.now()
-        model.put()
+        # if it's an upgrade of an existing building, then just upgrade that building...
+        existing_building_key = mdl.BuildOperation.existingBuilding.get_value_for_datastore(build_request_model)
+        if existing_building_key:
+          model = mdl.Building.get(existing_building_key)
+          if not model:
+            logging.error("Could not find building %s to upgrade!" % (str(existing_building_key)))
+          else:
+            # TODO: check the star, empire, colony and so on?
+            if not model.level:
+              model.level = 1
+            model.level += 1
+            model.put()
+        else:
+          model = mdl.Building(parent=build_request_model.key().parent())
+          model.colony = colony_key
+          model.empire = empire_key
+          model.designName = build_request_model.designName
+          model.buildTime = datetime.now()
+          model.put()
       else:
         # if it's not a building, it must be a ship. We'll try to find a fleet that'll
         # work, but if we can't it's not a big deal -- just create a new one. Duplicates
