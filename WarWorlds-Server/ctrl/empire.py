@@ -950,6 +950,8 @@ def _subtractCash(empire_key, amount):
   Returns:
     True if the cash was removed, False if you don't have enough cash."""
   def subtractCashInTx(empire_key, amount):
+    if amount <= 0:
+      return
     empire_mdl = mdl.Empire.get(empire_key)
     if empire_mdl.cash < amount:
       return False
