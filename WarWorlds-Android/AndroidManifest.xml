@@ -80,7 +80,11 @@
         <activity android:name=".game.solarsystem.BuildActivity"
                   android:screenOrientation="portrait" />
 
-        <activity android:name=".game.ChatActivity" />
+        <activity android:name=".game.solarsystem.FleetActivity"
+                  android:screenOrientation="portrait" />
+        
+        <activity android:name=".game.ChatActivity"
+                  android:screenOrientation="portrait" />
 
         <activity android:name=".game.SitrepActivity"
                   android:screenOrientation="portrait" />

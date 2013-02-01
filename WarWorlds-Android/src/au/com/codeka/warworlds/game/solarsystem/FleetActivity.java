@@ -3,14 +3,13 @@ package au.com.codeka.warworlds.game.solarsystem;
 import java.util.List;
 import java.util.TreeMap;
 
-import android.app.Dialog;
 import android.os.Bundle;
-import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentManager;
-import android.view.LayoutInflater;
 import android.view.View;
+import android.view.Window;
+import android.widget.FrameLayout;
+import au.com.codeka.warworlds.BaseActivity;
 import au.com.codeka.warworlds.R;
-import au.com.codeka.warworlds.StyledDialog;
 import au.com.codeka.warworlds.ctrl.FleetList;
 import au.com.codeka.warworlds.game.FleetMergeDialog;
 import au.com.codeka.warworlds.game.FleetMoveDialog;
@@ -18,30 +17,38 @@ import au.com.codeka.warworlds.game.FleetSplitDialog;
 import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.Fleet;
 import au.com.codeka.warworlds.model.Star;
+import au.com.codeka.warworlds.model.StarManager;
 
-public class FleetDialog extends DialogFragment {
+public class FleetActivity extends BaseActivity {
     private Star mStar;
-    private View mView;
+    private FleetList mFleetList;
 
-    public FleetDialog() {
-    }
-
-    public void setStar(Star star) {
-        mStar = star;
+    public FleetActivity() {
     }
 
     @Override
-    public Dialog onCreateDialog(Bundle savedInstanceState) {
-        LayoutInflater inflater = getActivity().getLayoutInflater();
-        mView = inflater.inflate(R.layout.fleet_dlg, null);
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        requestWindowFeature(Window.FEATURE_NO_TITLE); // remove the title bar
 
-        final FleetList fleetList = (FleetList) mView.findViewById(R.id.fleet_list);
+        mFleetList = new FleetList(this);
+        FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT,
+                                                                   FrameLayout.LayoutParams.MATCH_PARENT);
+        addContentView(mFleetList, lp);
 
-        TreeMap<String, Star> stars = new TreeMap<String, Star>();
-        stars.put(mStar.getKey(), mStar);
-        fleetList.refresh(mStar.getFleets(), stars);
+        String starKey = getIntent().getExtras().getString("au.com.codeka.warworlds.StarKey");
+        StarManager.getInstance().requestStar(this, starKey, false, new StarManager.StarFetchedHandler() {
+            @Override
+            public void onStarFetched(Star s) {
+                mStar = s;
 
-        fleetList.setOnFleetActionListener(new FleetList.OnFleetActionListener() {
+                TreeMap<String, Star> stars = new TreeMap<String, Star>();
+                stars.put(mStar.getKey(), mStar);
+                mFleetList.refresh(mStar.getFleets(), stars);
+            }
+        });
+
+        mFleetList.setOnFleetActionListener(new FleetList.OnFleetActionListener() {
             @Override
             public void onFleetView(Star star, Fleet fleet) {
                 // won't be called here...
@@ -49,7 +56,7 @@ public class FleetDialog extends DialogFragment {
 
             @Override
             public void onFleetSplit(Star star, Fleet fleet) {
-                FragmentManager fm = getActivity().getSupportFragmentManager();
+                FragmentManager fm = getSupportFragmentManager();
                 FleetSplitDialog dialog = new FleetSplitDialog();
                 dialog.setFleet(fleet);
                 dialog.show(fm, "");
@@ -57,7 +64,7 @@ public class FleetDialog extends DialogFragment {
 
             @Override
             public void onFleetMove(Star star, Fleet fleet) {
-                FragmentManager fm = getActivity().getSupportFragmentManager();
+                FragmentManager fm = getSupportFragmentManager();
                 FleetMoveDialog dialog = new FleetMoveDialog();
                 dialog.setFleet(fleet);
                 dialog.show(fm, "");
@@ -65,7 +72,7 @@ public class FleetDialog extends DialogFragment {
 
             @Override
             public void onFleetMerge(Fleet fleet, List<Fleet> potentialFleets) {
-                FragmentManager fm = getActivity().getSupportFragmentManager();
+                FragmentManager fm = getSupportFragmentManager();
                 FleetMergeDialog dialog = new FleetMergeDialog();
                 dialog.setup(fleet, potentialFleets);
                 dialog.show(fm, "");
@@ -74,17 +81,11 @@ public class FleetDialog extends DialogFragment {
             @Override
             public void onFleetStanceModified(Star star, Fleet fleet, Fleet.Stance newStance) {
                 EmpireManager.getInstance().getEmpire().updateFleetStance(
-                        getActivity(), star, fleet, newStance);
+                        FleetActivity.this, star, fleet, newStance);
             }
         });
 
-        // no "View" button or infobar, because it doesn't make sense here...
-        mView.findViewById(R.id.view_btn).setVisibility(View.GONE);
-        mView.findViewById(R.id.infobar).setVisibility(View.GONE);
-
-        StyledDialog.Builder b = new StyledDialog.Builder(getActivity());
-        b.setView(mView);
-        b.setNeutralButton("Close", null);
-        return b.create();
+        // no "View" button, because it doesn't make sense here...
+        mFleetList.findViewById(R.id.view_btn).setVisibility(View.GONE);
     }
 }

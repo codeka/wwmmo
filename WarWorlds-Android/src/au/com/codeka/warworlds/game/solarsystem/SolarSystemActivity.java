@@ -129,10 +129,9 @@ public class SolarSystemActivity extends BaseActivity implements StarManager.Sta
                     return; // can happen before the star loads
                 }
 
-                FragmentManager fm = getSupportFragmentManager();
-                FleetDialog dialog = new FleetDialog();
-                dialog.setStar(mStar);
-                dialog.show(fm, "");
+                Intent intent = new Intent(SolarSystemActivity.this, FleetActivity.class);
+                intent.putExtra("au.com.codeka.warworlds.StarKey", mStar.getKey());
+                startActivity(intent);
             }
         });
 

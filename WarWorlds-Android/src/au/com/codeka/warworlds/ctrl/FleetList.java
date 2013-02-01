@@ -68,6 +68,14 @@ public class FleetList extends FrameLayout implements StarManager.StarFetchedHan
         this.addView(child);
     }
 
+    public FleetList(Context context) {
+        super(context);
+        mContext = context;
+
+        View child = inflate(context, R.layout.fleet_list_ctrl, null);
+        this.addView(child);
+    }
+
     public void setOnFleetActionListener(OnFleetActionListener listener) {
         mFleetActionListener = listener;
     }
