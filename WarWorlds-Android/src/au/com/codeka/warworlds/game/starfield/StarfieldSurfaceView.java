@@ -15,6 +15,7 @@ import org.joda.time.Seconds;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -416,6 +417,7 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
      * a background thread, so we can't do anything UI-specific, except drawing
      * to the canvas.
      */
+    @SuppressLint("DrawAllocation") // these are definitely bad, but need some time to figure out
     @Override
     public void onDraw(Canvas canvas) {
         if (isInEditMode()) {

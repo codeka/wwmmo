@@ -122,6 +122,11 @@ public class StarfieldActivity extends BaseActivity {
         mStarfield.addSelectionChangedListener(new StarfieldSurfaceView.OnSelectionChangedListener() {
             @Override
             public void onStarSelected(Star star) {
+                if (mSelectedStar != null && mSelectedStar.getKey().equals(star.getKey())) {
+                    // same star, ignore...
+                    return;
+                }
+
                 // load the rest of the star's details as well
                 selectionLoadingContainer.setVisibility(View.VISIBLE);
                 selectedStarContainer.setVisibility(View.GONE);
@@ -162,6 +167,7 @@ public class StarfieldActivity extends BaseActivity {
                 empireIcon.setImageBitmap(null);
                 mFetchingFleetKey = fleet.getKey();
                 mFetchingStarKey = null;
+                mSelectedStar = null;
 
                 ShipDesign design = ShipDesignManager.getInstance().getDesign(fleet.getDesignID());
                 EmpireManager.getInstance().fetchEmpire(fleet.getEmpireKey(), new EmpireManager.EmpireFetchedHandler() {
