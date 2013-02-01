@@ -132,7 +132,7 @@ class Simulation(object):
   def destroyColony(self, colony_pb):
     self.destroyed_colony_pbs.append(colony_pb)
 
-  def simulate(self, star_key):
+  def simulate(self, star_key, do_prediction=True):
     """Simulates the star with the given key and gets all of the colonies and fleets up to date.
 
     When simulating a star, we simulate all colonies in that star that belong to the given empire
@@ -146,8 +146,8 @@ class Simulation(object):
     Args:
       star_pb: A star protobuf containing details of all the colonies, planets and whatnot in the
           star we're going to simulate.
-      empire_key: The key of the empire we're going to simulate. If None, the default, we'll
-          simulate all colonies in the star.
+      do_prediction: If False, we'll skip the prediction phase (which can cause some innaccuracies
+                     but in certain situations, that's OK)
       log: A function we'll call to log message as we simulate (by default, this is logging.debug)
     """
     star_pb = self.getStar(star_key, True)
@@ -197,13 +197,16 @@ class Simulation(object):
             self._simulateStepForAllEmpires(dt, start_time, star_pb, empire_keys)
           start_time += dt
 
-          self.log("")
-          self.log("---- Prediction phase beginning")
-          self.log("")
-
-          prediction_star_pb = pb.Star()
-          prediction_star_pb.ParseFromString(star_pb.SerializeToString())
-          dt = timedelta(minutes=15) - dt
+          if not do_prediction:
+            self.log("---- Skipping prediction phase")
+            step_end_time = prediction_time
+          else:
+            self.log("")
+            self.log("---- Prediction phase beginning")
+            self.log("")
+            prediction_star_pb = pb.Star()
+            prediction_star_pb.ParseFromString(star_pb.SerializeToString())
+            dt = timedelta(minutes=15) - dt
 
         self._simulateStepForAllEmpires(dt, start_time, prediction_star_pb, empire_keys)
         start_time = step_end_time

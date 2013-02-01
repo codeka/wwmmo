@@ -228,7 +228,7 @@ class EmpireDetailsPage(ApiPage):
       star_pbs = []
       build_request_pbs = []
       for star_key in star_keys:
-        sim.simulate(star_key)
+        sim.simulate(star_key, do_prediction=False)
         star_pb = sim.getStar(star_key)
 
         for star_colony_pb in star_pb.colonies:
