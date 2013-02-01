@@ -83,6 +83,7 @@ public class StarfieldActivity extends BaseActivity {
         final TextView empireName = (TextView) findViewById(R.id.empire_name);
         final TextView fleetDetails = (TextView) findViewById(R.id.fleet_details);
         final TextView starName = (TextView) findViewById(R.id.star_name);
+        final TextView starKind = (TextView) findViewById(R.id.star_kind);
         final ImageView starIcon = (ImageView) findViewById(R.id.star_icon);
 
         mPlanetList = (ListView) findViewById(R.id.planet_list);
@@ -155,6 +156,7 @@ public class StarfieldActivity extends BaseActivity {
                         mFleetListAdapter.setStar(star);
 
                         starName.setText(star.getName());
+                        starKind.setText(star.getStarType().getDisplayName());
                         Sprite starImage = StarImageManager.getInstance().getSprite(mContext, star, 80);
                         starIcon.setImageDrawable(new SpriteDrawable(starImage));
                     }
@@ -536,9 +538,8 @@ public class StarfieldActivity extends BaseActivity {
             icon.setImageDrawable(new SpriteDrawable(design.getSprite()));
 
             TextView shipKindTextView = (TextView) view.findViewById(R.id.starfield_planet_type);
-            shipKindTextView.setText(String.format("%s (× %d)",
-                                                   design.getDisplayName(),
-                                                   fleet.getNumShips()));
+            shipKindTextView.setText(String.format("%d × %s",
+                    fleet.getNumShips(), design.getDisplayName(fleet.getNumShips() > 1)));
 
             final TextView shipCountTextView = (TextView) view.findViewById(R.id.starfield_planet_colony);
             shipCountTextView.setText(String.format("%s",

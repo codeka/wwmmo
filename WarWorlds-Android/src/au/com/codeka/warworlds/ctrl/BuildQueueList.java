@@ -178,9 +178,8 @@ public class BuildQueueList extends FrameLayout implements MyEmpire.RefreshAllCo
         if (mSelectedBuildRequest.getCount() == 1) {
             buildingName.setText(design.getDisplayName());
         } else {
-            buildingName.setText(String.format(Locale.ENGLISH, "%s (× %d)",
-                                 design.getDisplayName(),
-                                 mSelectedBuildRequest.getCount()));
+            buildingName.setText(String.format(Locale.ENGLISH, "%d × %s",
+                    mSelectedBuildRequest.getCount(), design.getDisplayName(mSelectedBuildRequest.getCount() > 1)));
         }
 
         mBuildQueueListAdapter.refreshEntryProgress(mSelectedBuildRequest, progressBar, progressText);
@@ -493,9 +492,8 @@ public class BuildQueueList extends FrameLayout implements MyEmpire.RefreshAllCo
                 if (entry.buildRequest.getCount() == 1) {
                     row1.setText(design.getDisplayName());
                 } else {
-                    row1.setText(String.format("%s (× %d)",
-                                               design.getDisplayName(),
-                                               entry.buildRequest.getCount()));
+                    row1.setText(String.format("%d × %s)",
+                            entry.buildRequest.getCount(), design.getDisplayName(entry.buildRequest.getCount() > 1)));
                 }
 
                 row3.setVisibility(View.GONE);

@@ -25,6 +25,9 @@ public class Design {
     public String getDisplayName() {
         return mName;
     }
+    public String getDisplayName(boolean plural) {
+        return mName+(plural ? "s" : "");
+    }
     public String getDescription() {
         return mDescription;
     }

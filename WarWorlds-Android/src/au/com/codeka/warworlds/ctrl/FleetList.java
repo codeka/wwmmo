@@ -265,12 +265,8 @@ public class FleetList extends FrameLayout implements StarManager.StarFetchedHan
 
         icon.setImageDrawable(new SpriteDrawable(design.getSprite()));
 
-        String text;
-        if (fleet.getNumShips() == 1) {
-            text = design.getDisplayName();
-        } else {
-            text = String.format(Locale.ENGLISH, "%s (× %d)", design.getDisplayName(), fleet.getNumShips());
-        }
+        String text = String.format(Locale.ENGLISH, "%d × %s",
+                    fleet.getNumShips(), design.getDisplayName(fleet.getNumShips() > 1));
         row1.setText(text);
 
         text = String.format("%s (stance: %s)",

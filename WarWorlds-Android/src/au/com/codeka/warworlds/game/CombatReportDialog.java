@@ -290,8 +290,8 @@ public class CombatReportDialog extends DialogFragment {
             if (intNumShips == 1) {
                 return design.getDisplayName();
             } else {
-                return String.format(Locale.ENGLISH, "%s (× %d)",
-                        design.getDisplayName(), intNumShips);
+                return String.format(Locale.ENGLISH, "%d × %s",
+                        intNumShips, design.getDisplayName(intNumShips > 1));
             }
         }
 

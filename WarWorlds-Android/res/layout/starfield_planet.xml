@@ -21,7 +21,9 @@
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:layout_alignParentTop="true"
-            android:text="Gas Giant"
+            android:text=""
+            android:singleLine="true"
+            android:ellipsize="end"
             android:textAppearance="?android:attr/textAppearanceSmall" />
 
         <TextView
@@ -30,7 +32,9 @@
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:layout_below="@id/starfield_planet_type"
-            android:text="Blah blah blah"
+            android:text=""
+            android:singleLine="true"
+            android:ellipsize="end"
             android:textAppearance="?android:attr/textAppearanceSmall" />
 
         </RelativeLayout>

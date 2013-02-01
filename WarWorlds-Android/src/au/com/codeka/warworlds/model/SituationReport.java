@@ -147,14 +147,9 @@ public class SituationReport {
 
     private static String getFleetLine(String designID, float numShips) {
         ShipDesign design = ShipDesignManager.getInstance().getDesign(designID);
-        String msg = design.getDisplayName();
-
         int n = (int)(Math.ceil(numShips));
-        if (n > 1) {
-            msg += String.format(Locale.ENGLISH, " (× %d)", n);
-        }
-
-        return msg;
+        return String.format(Locale.ENGLISH, "%d × %s",
+                design.getDisplayName(n > 1), n);
     }
 
     public static SituationReport fromProtocolBuffer(Messages.SituationReport pb) {

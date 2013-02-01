@@ -74,6 +74,15 @@
                     android:text="Star Name"
                     android:textAppearance="?android:attr/textAppearanceMedium" />
 
+                <TextView android:id="@+id/star_kind"
+                          android:layout_width="wrap_content"
+                          android:layout_height="wrap_content"
+                          android:layout_below="@+id/star_name"
+                          android:layout_toRightOf="@+id/star_icon"
+                          android:text="Kind"
+                          android:textSize="12sp"
+                          android:textAppearance="?android:attr/textAppearanceSmall" />
+
                 <Button
                     android:id="@+id/view_btn"
                     style="@style/Button"
@@ -116,7 +125,6 @@
                         android:layout_height="wrap_content"
                         android:listSelector="@drawable/list_selector" >
                     </ListView>
-
                 </LinearLayout>
 
             </RelativeLayout>
@@ -170,9 +178,7 @@
                           android:layout_marginRight="8dp"
                           android:layout_marginTop="8dp"
                           android:text="Fleet Details" />
-
             </RelativeLayout>
-
         </FrameLayout>
 
         <Button
