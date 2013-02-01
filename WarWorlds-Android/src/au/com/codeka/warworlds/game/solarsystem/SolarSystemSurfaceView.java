@@ -42,7 +42,7 @@ public class SolarSystemSurfaceView extends UniverseElementSurfaceView {
     private PlanetInfo mSelectedPlanet;
     private boolean mPlanetsPlaced;
     private Paint mPlanetPaint;
-    private Paint mSelectedPlanetPaint;
+    private SelectionOverlay mSelectionOverlay;
     private Bitmap mColonyIcon;
     private CopyOnWriteArrayList<OnPlanetSelectedListener> mPlanetSelectedListeners;
     private StarfieldBackgroundRenderer mBackgroundRenderer;
@@ -65,9 +65,7 @@ public class SolarSystemSurfaceView extends UniverseElementSurfaceView {
         mPlanetPaint.setARGB(255, 255, 255, 255);
         mPlanetPaint.setStyle(Style.STROKE);
 
-        mSelectedPlanetPaint = new Paint();
-        mSelectedPlanetPaint.setARGB(255, 255, 255, 255);
-        mSelectedPlanetPaint.setStyle(Style.STROKE);
+        mSelectionOverlay = new SelectionOverlay();
 
         mMatrix = new Matrix();
 
@@ -176,6 +174,9 @@ public class SolarSystemSurfaceView extends UniverseElementSurfaceView {
                 } else {
                     mPlanetSelectedFired = false;
                 }
+
+                addOverlay(mSelectionOverlay);
+
                 redraw();
             }
         }
@@ -286,9 +287,8 @@ public class SolarSystemSurfaceView extends UniverseElementSurfaceView {
         }
 
         if (mSelectedPlanet != null) {
-            canvas.drawCircle((float) mSelectedPlanet.centre.x, 
-                    (float) mSelectedPlanet.centre.y,
-                    40 * getPixelScale(), mSelectedPlanetPaint);
+            mSelectionOverlay.setCentre(mSelectedPlanet.centre.x, mSelectedPlanet.centre.y);
+            mSelectionOverlay.setRadius(35.0 * getPixelScale());
         }
     }
 

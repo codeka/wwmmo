@@ -16,6 +16,7 @@ import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import au.com.codeka.Point2D;
 
 /**
  * Base class for things like \c StarfieldSurfaceView and \c SolarSystemSurfaceView, etc.
@@ -251,6 +252,10 @@ public class UniverseElementSurfaceView extends SurfaceView implements SurfaceHo
                 mPaint.setStyle(Paint.Style.STROKE);
             }
 
+            public void setRotateSpeed(float speed) {
+                mRotateSpeed = speed;
+            }
+
             public void setCentre(double x, double y) {
                 mCentreX = x;
                 mCentreY = y;
@@ -289,6 +294,66 @@ public class UniverseElementSurfaceView extends SurfaceView implements SurfaceHo
                 // we make it 360 - "dash-angle" (i.e. the angle through which one dash passes)
                 canvas.drawArc(mBounds, mAngle, 360.0f - mDashAngleDegrees, false, mPaint);
             }
+        }
+    }
+
+    /**
+     * An \c Overlay that's "attached" to a "visible entity" (star or fleet). We'll make sure
+     * it's recentred whenever the view scrolls around.
+     */
+    public static abstract class VisibleEntityAttachedOverlay extends Overlay {
+        protected Point2D mCentre;
+
+        public VisibleEntityAttachedOverlay() {
+            mCentre = new Point2D();
+        }
+
+        public Point2D getCentre() {
+            return mCentre;
+        }
+
+        public void setCentre(double x, double y) {
+            mCentre.x = (float) x;
+            mCentre.y = (float) y;
+        }
+    }
+
+    /**
+     * This overlay is used for drawing the selection indicator. It's an animated dotted circle
+     * that spins around the selected point.
+     */
+    protected static class SelectionOverlay extends VisibleEntityAttachedOverlay {
+        private RotatingCircle mInnerCircle;
+        private RotatingCircle mOuterCircle;
+
+        public SelectionOverlay() {
+            Paint p = new Paint();
+            p.setARGB(255, 255, 255, 255);
+            mInnerCircle = new RotatingCircle(p);
+            mInnerCircle.setRotateSpeed(-1.5f);
+
+            p = new Paint();
+            p.setARGB(255, 255, 255, 255);
+            mOuterCircle = new RotatingCircle(p);
+        }
+
+        @Override
+        public void setCentre(double x, double y) {
+            super.setCentre(x, y);
+
+            mInnerCircle.setCentre(x, y);
+            mOuterCircle.setCentre(x, y);
+        }
+
+        public void setRadius(double radius) {
+            mInnerCircle.setRadius(radius);
+            mOuterCircle.setRadius(radius + 4.0);
+        }
+
+        @Override
+        public void draw(Canvas canvas) {
+            mInnerCircle.draw(canvas);
+            mOuterCircle.draw(canvas);
         }
     }
 }

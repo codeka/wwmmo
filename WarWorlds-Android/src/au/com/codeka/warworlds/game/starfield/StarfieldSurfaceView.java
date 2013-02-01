@@ -974,65 +974,6 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
         }
     }
 
-    /**
-     * An \c Overlay that's "attached" to a "visible entity" (star or fleet). We'll make sure
-     * it's recentred whenever the view scrolls around.
-     */
-    public static abstract class VisibleEntityAttachedOverlay extends UniverseElementSurfaceView.Overlay {
-        protected Point2D mCentre;
-
-        public VisibleEntityAttachedOverlay() {
-            mCentre = new Point2D();
-        }
-
-        public Point2D getCentre() {
-            return mCentre;
-        }
-
-        public void setCentre(double x, double y) {
-            mCentre.x = (float) x;
-            mCentre.y = (float) y;
-        }
-    }
-
-    /**
-     * This overlay is used for drawing the selection indicator. It's an animated dotted circle
-     * that spins around the selected point.
-     */
-    private static class SelectionOverlay extends VisibleEntityAttachedOverlay {
-        private RotatingCircle mInnerCircle;
-        private RotatingCircle mOuterCircle;
-
-        public SelectionOverlay() {
-            Paint p = new Paint();
-            p.setARGB(255, 255, 255, 255);
-            mInnerCircle = new RotatingCircle(p);
-
-            p = new Paint();
-            p.setARGB(255, 255, 255, 255);
-            mOuterCircle = new RotatingCircle(p);
-        }
-
-        @Override
-        public void setCentre(double x, double y) {
-            super.setCentre(x, y);
-
-            mInnerCircle.setCentre(x, y);
-            mOuterCircle.setCentre(x, y);
-        }
-
-        public void setRadius(double radius) {
-            mInnerCircle.setRadius(radius);
-            mOuterCircle.setRadius(radius + 4.0);
-        }
-
-        @Override
-        public void draw(Canvas canvas) {
-            mInnerCircle.draw(canvas);
-            mOuterCircle.draw(canvas);
-        }
-    }
-
     private static class DrawState {
         public Context context;
         public Bitmap bitmap;
