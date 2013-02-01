@@ -87,12 +87,14 @@ public class EmpireManager {
 
     public void fireEmpireUpdated(Empire empire) {
         synchronized(mEmpireUpdatedListeners) {
+            List<EmpireFetchedHandler> oldListeners = mEmpireUpdatedListeners.get(empire.getKey());
+            if (oldListeners == null) {
+                return;
+            }
             List<EmpireFetchedHandler> listeners = new ArrayList<EmpireFetchedHandler>(
                     mEmpireUpdatedListeners.get(empire.getKey()));
-            if (listeners != null) {
-                for (EmpireFetchedHandler handler : listeners) {
-                    handler.onEmpireFetched(empire);
-                }
+            for (EmpireFetchedHandler handler : listeners) {
+                handler.onEmpireFetched(empire);
             }
         }
     }

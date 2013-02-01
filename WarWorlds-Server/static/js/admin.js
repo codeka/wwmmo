@@ -14,5 +14,14 @@ $(function() {
         }
     });
 
+    $(document).ajaxSend(function(evnt, xhr) {
+        xhr.startTime = new Date();
+    });
+
+    $(document).ajaxSuccess(function(evnt, xhr) {
+        xhr.endTime = new Date();
+        xhr.elapsedMs = (xhr.endTime.getTime() - xhr.startTime.getTime());
+    });
+
     // TODO: store "on_behalf_of" in localStorage or something
 });

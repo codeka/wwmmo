@@ -66,6 +66,7 @@
     <input type="submit" value="Create Empire" />
   </form>
   <textarea id="search-results"></textarea>
+  <div id="search-time"></div>
   <script>
     $("#find-byemailidname").on("submit", function(evnt) {
       evnt.preventDefault();
@@ -81,7 +82,10 @@
       $.ajax({
         url: url,
         dataType: "json",
-        success: function (data) {
+        success: function (data, status, xhr) {
+          setTimeout(function() {
+            $("#search-time").html("<b>Time:</b> "+xhr.elapsedMs+"ms");
+          }, 10);
           $("#search-results").val(JSON.stringify(data, null, "  "));
         },
         error: function(xhr, status, err) {

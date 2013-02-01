@@ -199,7 +199,7 @@ class Simulation(object):
 
           if not do_prediction:
             self.log("---- Skipping prediction phase")
-            step_end_time = prediction_time
+            break
           else:
             self.log("")
             self.log("---- Prediction phase beginning")
@@ -213,17 +213,17 @@ class Simulation(object):
       else:
         break
 
-    # copy the end times for builds from prediction_star_pb
-    for build_req in star_pb.build_requests:
-      for prediction_build_req in prediction_star_pb.build_requests:
-        if prediction_build_req.key == build_req.key:
-          build_req.end_time = prediction_build_req.end_time
-
-    # any fleets that *will be* destroyed, remember the time of their death
-    for fleet_pb in star_pb.fleets:
-      for prediction_fleet_pb in prediction_star_pb.fleets:
-        if fleet_pb.key == prediction_fleet_pb.key:
-          fleet_pb.time_destroyed = prediction_fleet_pb.time_destroyed
+    if prediction_star_pb:
+      # copy the end times for builds from prediction_star_pb
+      for build_req in star_pb.build_requests:
+        for prediction_build_req in prediction_star_pb.build_requests:
+          if prediction_build_req.key == build_req.key:
+            build_req.end_time = prediction_build_req.end_time
+      # any fleets that *will be* destroyed, remember the time of their death
+      for fleet_pb in star_pb.fleets:
+        for prediction_fleet_pb in prediction_star_pb.fleets:
+          if fleet_pb.key == prediction_fleet_pb.key:
+            fleet_pb.time_destroyed = prediction_fleet_pb.time_destroyed
 
     # make sure last_simulation is correct
     last_simulation = ctrl.dateTimeToEpoch(self.now)
