@@ -1,66 +1,129 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v7.widget.GridLayout
-        xmlns:grid="http://schemas.android.com/apk/res-auto"
-        xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:layout_margin="10dp"
-    grid:useDefaultMargins="true"
-    grid:alignmentMode="alignBounds"
-    grid:columnCount="2">
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="10dp">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        grid:layout_columnSpan="2"
-        android:text="@string/solarsystem_focus_instructions" />
+    <TextView android:id="@+id/note"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:layout_alignParentTop="true"
+              android:layout_alignParentLeft="true"
+              android:layout_margin="10dp"
+              android:text="Drag the sliders to adjust focus." />
 
-    <ImageView
-        android:layout_width="40dp"
-        android:layout_height="20dp"
-        android:paddingLeft="10dp"
-        grid:layout_gravity="center"
-        android:src="@drawable/colony_population_icon" />
+    <SeekBar android:id="@+id/focus_population"
+             android:layout_width="match_parent"
+             android:layout_height="wrap_content"
+             android:layout_marginTop="10dp"
+             android:layout_marginLeft="10dp"
+             android:layout_marginRight="10dp"
+             android:layout_below="@+id/note"
+             android:layout_toRightOf="@+id/focus_population_icon"
+             android:layout_toLeftOf="@+id/focus_population_value" />
 
-    <SeekBar
-        android:id="@+id/solarsystem_colony_population_focus"
-        android:layout_height="wrap_content"
-        grid:layout_gravity="fill_horizontal" />
+    <ImageView android:id="@+id/focus_population_icon"
+               android:layout_width="20dp"
+               android:layout_height="20dp"
+               android:layout_alignTop="@+id/focus_population"
+               android:layout_alignBottom="@+id/focus_population"
+               android:layout_alignParentLeft="true"
+               android:layout_marginLeft="10dp"
+               android:src="@drawable/colony_population_icon" />
 
-    <ImageView
-        android:layout_width="40dp"
-        android:layout_height="20dp"
-        android:paddingLeft="10dp"
-        grid:layout_gravity="center"
-        android:src="@drawable/colony_farming_icon" />
+    <TextView android:id="@+id/focus_population_value"
+              android:layout_width="30dp"
+              android:layout_height="wrap_content"
+              android:layout_alignParentRight="true"
+              android:layout_marginRight="2dp"
+              android:layout_alignTop="@+id/focus_population"
+              android:layout_alignBottom="@+id/focus_population"
+              android:gravity="center_vertical"
+              android:text="99" />
 
-    <SeekBar
-        android:id="@+id/solarsystem_colony_farming_focus"
-        android:layout_height="wrap_content"
-        grid:layout_gravity="fill_horizontal" />
+    <SeekBar android:id="@+id/focus_farming"
+             android:layout_width="match_parent"
+             android:layout_height="wrap_content"
+             android:layout_marginTop="10dp"
+             android:layout_marginLeft="10dp"
+             android:layout_marginRight="10dp"
+             android:layout_below="@+id/focus_population"
+             android:layout_toRightOf="@+id/focus_farming_icon"
+             android:layout_toLeftOf="@+id/focus_farming_value" />
 
-    <ImageView
-        android:layout_width="40dp"
-        android:layout_height="20dp"
-        android:paddingLeft="10dp"
-        grid:layout_gravity="center"
-        android:src="@drawable/colony_mining_icon" />
+    <ImageView android:id="@+id/focus_farming_icon"
+               android:layout_width="20dp"
+               android:layout_height="20dp"
+               android:layout_alignTop="@+id/focus_farming"
+               android:layout_alignBottom="@+id/focus_farming"
+               android:layout_alignParentLeft="true"
+               android:layout_marginLeft="10dp"
+               android:src="@drawable/colony_farming_icon" />
 
-    <SeekBar
-        android:id="@+id/solarsystem_colony_mining_focus"
-        android:layout_height="wrap_content"
-        grid:layout_gravity="fill_horizontal" />
+    <TextView android:id="@+id/focus_farming_value"
+              android:layout_width="30dp"
+              android:layout_height="wrap_content"
+              android:layout_alignParentRight="true"
+              android:layout_marginRight="2dp"
+              android:layout_alignTop="@+id/focus_farming"
+              android:layout_alignBottom="@+id/focus_farming"
+              android:gravity="center_vertical"
+              android:text="99" />
 
-    <ImageView
-        android:layout_width="40dp"
-        android:layout_height="20dp"
-        android:paddingLeft="10dp"
-        grid:layout_gravity="center"
-        android:src="@drawable/colony_construction_icon" />
+    <SeekBar android:id="@+id/focus_mining"
+             android:layout_width="match_parent"
+             android:layout_height="wrap_content"
+             android:layout_marginTop="10dp"
+             android:layout_marginLeft="10dp"
+             android:layout_marginRight="10dp"
+             android:layout_below="@+id/focus_farming"
+             android:layout_toRightOf="@+id/focus_mining_icon"
+             android:layout_toLeftOf="@+id/focus_mining_value" />
 
-    <SeekBar
-        android:id="@+id/solarsystem_colony_construction_focus"
-        android:layout_height="wrap_content"
-        grid:layout_gravity="fill_horizontal" />
+    <ImageView android:id="@+id/focus_mining_icon"
+               android:layout_width="20dp"
+               android:layout_height="20dp"
+               android:layout_alignTop="@+id/focus_mining"
+               android:layout_alignBottom="@+id/focus_mining"
+               android:layout_alignParentLeft="true"
+               android:layout_marginLeft="10dp"
+               android:src="@drawable/colony_mining_icon" />
 
-</android.support.v7.widget.GridLayout>
+    <TextView android:id="@+id/focus_mining_value"
+              android:layout_width="30dp"
+              android:layout_height="wrap_content"
+              android:layout_alignParentRight="true"
+              android:layout_marginRight="2dp"
+              android:layout_alignTop="@+id/focus_mining"
+              android:layout_alignBottom="@+id/focus_mining"
+              android:gravity="center_vertical"
+              android:text="99" />
+
+    <SeekBar android:id="@+id/focus_construction"
+             android:layout_width="match_parent"
+             android:layout_height="wrap_content"
+             android:layout_margin="10dp"
+             android:layout_below="@+id/focus_mining"
+             android:layout_toRightOf="@+id/focus_construction_icon"
+             android:layout_toLeftOf="@+id/focus_construction_value" />
+
+    <ImageView android:id="@+id/focus_construction_icon"
+               android:layout_width="20dp"
+               android:layout_height="20dp"
+               android:layout_alignTop="@+id/focus_construction"
+               android:layout_alignBottom="@+id/focus_construction"
+               android:layout_alignParentLeft="true"
+               android:layout_marginLeft="10dp"
+               android:src="@drawable/colony_construction_icon" />
+
+    <TextView android:id="@+id/focus_construction_value"
+              android:layout_width="30dp"
+              android:layout_height="wrap_content"
+              android:layout_alignParentRight="true"
+              android:layout_marginRight="2dp"
+              android:layout_alignTop="@+id/focus_construction"
+              android:layout_alignBottom="@+id/focus_construction"
+              android:gravity="center_vertical"
+              android:text="99" />
+
+</RelativeLayout>

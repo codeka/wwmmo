@@ -30,8 +30,6 @@
     <string name="solarsystem_colonize">Colonize</string>
     <string name="fleet">Fleet</string>
 
-    <string name="solarsystem_focus_instructions">Drag the sliders to adjust focus.</string>
-
     <!-- "solarsystem_fleet_dlg.xml layout -->
     <string name="fleet_stance">Stance</string>
     <string name="fleet_move">Move</string>
