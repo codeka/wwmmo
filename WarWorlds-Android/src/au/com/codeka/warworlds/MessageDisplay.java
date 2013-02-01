@@ -100,6 +100,8 @@ public class MessageDisplay {
                     if (star != null) {
                         SectorManager.getInstance().refreshSector(star.getSectorX(), star.getSectorY());
                     }
+                    // refresh the empire as well, since stuff has happened...
+                    EmpireManager.getInstance().refreshEmpire();
                 }
 
                 displayNotification(context, sitrep);

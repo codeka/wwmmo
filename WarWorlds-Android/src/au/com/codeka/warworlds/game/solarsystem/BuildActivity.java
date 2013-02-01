@@ -81,8 +81,18 @@ public class BuildActivity extends TabFragmentActivity implements StarManager.St
      */
     @Override
     public void onStarFetched(Star s) {
-        mStar = s;
-        getTabManager().reloadTab();
+        if (mStar == null || mStar.getKey().equals(s.getKey())) {
+            mStar = s;
+            if (mColony != null) {
+                for (Colony colony : mStar.getColonies()) {
+                    if (colony.getKey().equals(mColony.getKey())) {
+                        mColony = colony;
+                    }
+                }
+            }
+
+            getTabManager().reloadTab();
+        }
     }
 
     private String getDependenciesList(Design design) {

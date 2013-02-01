@@ -64,6 +64,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_below="@id/planet_name"
+                    android:layout_marginLeft="6dp"
                     android:textAppearance="?android:attr/textAppearanceSmall"
                     android:text="" />
 
@@ -121,9 +122,18 @@
                     android:layout_below="@id/population_count"
                     android:visibility="gone">
 
+                    <TextView android:id="@+id/colony_defence"
+                              android:layout_width="wrap_content"
+                              android:layout_height="wrap_content"
+                              android:layout_alignParentTop="true"
+                              android:layout_marginLeft="6dp"
+                              android:textAppearance="?android:attr/textAppearanceSmall"
+                              android:text="" />
+
                     <View android:id="@+id/colony_center_marker"
                           android:layout_width="2dp"
                           android:layout_height="match_parent"
+                          android:layout_below="@+id/colony_defence"
                           android:layout_centerHorizontal="true" />
 
                     <ImageView
@@ -131,7 +141,7 @@
                         android:layout_width="20dp"
                         android:layout_height="20dp"
                         android:layout_alignParentLeft="true"
-                        android:layout_alignParentTop="true"
+                          android:layout_below="@+id/colony_defence"
                         android:src="@drawable/colony_population_icon" />
 
                     <ProgressBar
@@ -140,6 +150,7 @@
                         android:layout_height="10dp"
                         android:layout_toRightOf="@id/solarsystem_colony_population_icon"
                         android:layout_toLeftOf="@id/colony_center_marker"
+                        android:layout_below="@+id/colony_defence"
                         android:paddingRight="10dp"
                         android:paddingLeft="2dp"
                         style="?android:attr/progressBarStyleHorizontal" />
@@ -160,7 +171,7 @@
                         android:layout_width="20dp"
                         android:layout_height="20dp"
                         android:layout_toRightOf="@id/colony_center_marker"
-                        android:layout_alignParentTop="true"
+                          android:layout_below="@+id/colony_defence"
                         android:src="@drawable/colony_farming_icon" />
 
                     <ProgressBar
@@ -169,6 +180,7 @@
                         android:layout_height="10dp"
                         android:layout_toRightOf="@id/solarsystem_colony_farming_icon"
                         android:layout_alignParentRight="true"
+                        android:layout_below="@+id/colony_defence"
                         android:paddingRight="10dp"
                         android:paddingLeft="2dp"
                         style="?android:attr/progressBarStyleHorizontal" />

@@ -462,6 +462,10 @@ public class SolarSystemActivity extends BaseActivity implements StarManager.Sta
         populationCountTextView.setText(String.format("Population: %d / %d",
                 (int) mColony.getPopulation(), (int) mColony.getMaxPopulation()));
 
+        TextView defenceTextView = (TextView) findViewById(R.id.colony_defence);
+        defenceTextView.setText(String.format("Defence: %d",
+                (int) (0.25 * mColony.getPopulation() * mColony.getDefenceBoost())));
+
         ProgressBar populationFocus = (ProgressBar) findViewById(
                 R.id.solarsystem_colony_population_focus);
         populationFocus.setProgress((int)(100.0f * mColony.getPopulationFocus()));
