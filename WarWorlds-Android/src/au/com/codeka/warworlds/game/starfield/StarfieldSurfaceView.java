@@ -23,6 +23,7 @@ import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Paint.Style;
 import android.graphics.Rect;
+import android.os.Handler;
 import android.util.AttributeSet;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
@@ -62,6 +63,7 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
     private Map<String, Empire> mVisibleEmpires;
     private List<VisibleEntity> mVisibleEntities;
     private boolean mScrollToCentre = false;
+    private Handler mHandler;
 
     private boolean mNeedRedraw = true;
     private Bitmap mBuffer;
@@ -94,6 +96,7 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
         mFleetAttachedOverlays = new TreeMap<String, List<VisibleEntityAttachedOverlay>>();
         mVisibleEmpires = new TreeMap<String, Empire>();
         mVisibleEntities = new ArrayList<VisibleEntity>();
+        mHandler = new Handler();
 
         mSelectionOverlay = new SelectionOverlay();
 
@@ -435,9 +438,18 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
             }
 
             DrawState state = new DrawState(this);
-            drawScene(state);
+            final List<Pair<Long, Long>> missingSectors = drawScene(state);
             mVisibleEntities = state.visibleEntities;
             mNeedRedraw = false;
+
+            if (missingSectors != null) {
+                mHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        SectorManager.getInstance().requestSectors(missingSectors, false, null);
+                    }
+                });
+            }
         }
 
         canvas.drawBitmap(mBuffer, 0, 0, mStarPaint);
@@ -450,9 +462,11 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
     /**
      * Draws the current "scene" to the internal buffer.
      */
-    private static void drawScene(DrawState state) {
+    private static List<Pair<Long, Long>> drawScene(DrawState state) {
         long startTime = System.nanoTime();
         SectorManager sm = SectorManager.getInstance();
+
+        List<Pair<Long, Long>> missingSectors = null;
 
         for(int y = -sRadius; y <= sRadius; y++) {
             for(int x = -sRadius; x <= sRadius; x++) {
@@ -461,7 +475,12 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
 
                 Sector sector = sm.getSector(sX, sY);
                 if (sector == null) {
-                    continue; // it might not be loaded yet...
+                    if (missingSectors == null) {
+                        missingSectors = new ArrayList<Pair<Long, Long>>();
+                    }
+                    missingSectors.add(new Pair<Long, Long>(sX, sY));
+                    log.debug(String.format("Missing sector: %d, %d", sX, sY));
+                    continue;
                 }
 
                 int sx = (int)((x * SectorManager.SECTOR_SIZE) + state.offsetX);
@@ -482,6 +501,8 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
             // only log if it's > 150ms (which it should never be!)
             log.debug(String.format("Scene re-drawn in %.4fms", ms));
         }
+
+        return missingSectors;
     }
 
     /**
