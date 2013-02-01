@@ -17,10 +17,10 @@
              android:layout_height="wrap_content"
              android:layout_marginTop="10dp"
              android:layout_marginLeft="10dp"
-             android:layout_marginRight="10dp"
+             android:layout_marginRight="30dp"
              android:layout_below="@+id/note"
              android:layout_toRightOf="@+id/focus_population_icon"
-             android:layout_toLeftOf="@+id/focus_population_value" />
+             android:layout_alignParentRight="true" />
 
     <ImageView android:id="@+id/focus_population_icon"
                android:layout_width="20dp"
@@ -32,7 +32,7 @@
                android:src="@drawable/colony_population_icon" />
 
     <TextView android:id="@+id/focus_population_value"
-              android:layout_width="30dp"
+              android:layout_width="wrap_content"
               android:layout_height="wrap_content"
               android:layout_alignParentRight="true"
               android:layout_marginRight="2dp"
@@ -46,7 +46,8 @@
              android:layout_height="wrap_content"
              android:layout_marginTop="10dp"
              android:layout_marginLeft="10dp"
-             android:layout_marginRight="10dp"
+             android:layout_marginRight="30dp"
+             android:layout_alignParentRight="true"
              android:layout_below="@+id/focus_population"
              android:layout_toRightOf="@+id/focus_farming_icon"
              android:layout_toLeftOf="@+id/focus_farming_value" />
@@ -61,21 +62,31 @@
                android:src="@drawable/colony_farming_icon" />
 
     <TextView android:id="@+id/focus_farming_value"
-              android:layout_width="30dp"
+              android:layout_width="wrap_content"
               android:layout_height="wrap_content"
               android:layout_alignParentRight="true"
               android:layout_marginRight="2dp"
               android:layout_alignTop="@+id/focus_farming"
-              android:layout_alignBottom="@+id/focus_farming"
               android:gravity="center_vertical"
               android:text="99" />
+
+    <TextView android:id="@+id/focus_farming_delta"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:layout_alignParentRight="true"
+              android:layout_alignRight="@+id/focus_farming_value"
+              android:layout_below="@+id/focus_farming_value"
+              android:layout_marginRight="2dp"
+              android:text="+66 / hr"
+              android:textSize="10sp" />
 
     <SeekBar android:id="@+id/focus_mining"
              android:layout_width="match_parent"
              android:layout_height="wrap_content"
              android:layout_marginTop="10dp"
              android:layout_marginLeft="10dp"
-             android:layout_marginRight="10dp"
+             android:layout_marginRight="30dp"
+             android:layout_alignParentRight="true"
              android:layout_below="@+id/focus_farming"
              android:layout_toRightOf="@+id/focus_mining_icon"
              android:layout_toLeftOf="@+id/focus_mining_value" />
@@ -90,19 +101,32 @@
                android:src="@drawable/colony_mining_icon" />
 
     <TextView android:id="@+id/focus_mining_value"
-              android:layout_width="30dp"
+              android:layout_width="wrap_content"
               android:layout_height="wrap_content"
               android:layout_alignParentRight="true"
               android:layout_marginRight="2dp"
               android:layout_alignTop="@+id/focus_mining"
-              android:layout_alignBottom="@+id/focus_mining"
               android:gravity="center_vertical"
               android:text="99" />
 
+    <TextView android:id="@+id/focus_mining_delta"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:layout_alignParentRight="true"
+              android:layout_alignRight="@+id/focus_mining_value"
+              android:layout_below="@+id/focus_mining_value"
+              android:layout_marginRight="2dp"
+              android:text="+66 / hr"
+              android:textSize="10sp" />
+    
     <SeekBar android:id="@+id/focus_construction"
              android:layout_width="match_parent"
              android:layout_height="wrap_content"
-             android:layout_margin="10dp"
+             android:layout_marginTop="10dp"
+             android:layout_marginBottom="10dp"
+             android:layout_marginLeft="10dp"
+             android:layout_marginRight="30dp"
+             android:layout_alignParentRight="true"
              android:layout_below="@+id/focus_mining"
              android:layout_toRightOf="@+id/focus_construction_icon"
              android:layout_toLeftOf="@+id/focus_construction_value" />
@@ -117,7 +141,7 @@
                android:src="@drawable/colony_construction_icon" />
 
     <TextView android:id="@+id/focus_construction_value"
-              android:layout_width="30dp"
+              android:layout_width="wrap_content"
               android:layout_height="wrap_content"
               android:layout_alignParentRight="true"
               android:layout_marginRight="2dp"

@@ -117,7 +117,7 @@ public class SolarSystemActivity extends BaseActivity implements StarManager.Sta
             @Override
             public void onClick(View v) {
                 FocusDialog dialog = new FocusDialog();
-                dialog.setColony(mColony);
+                dialog.setColony(mStar, mColony);
                 dialog.show(getSupportFragmentManager(), "");
             }
         });
@@ -155,12 +155,20 @@ public class SolarSystemActivity extends BaseActivity implements StarManager.Sta
                 onAttackColony();
             }
         });
+
+        mCancelFetch = false;
     }
 
     @Override
     public void onSaveInstanceState(Bundle state) {
         super.onSaveInstanceState(state);
         mCancelFetch = true;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        mCancelFetch = false;
     }
 
     @Override
@@ -173,6 +181,7 @@ public class SolarSystemActivity extends BaseActivity implements StarManager.Sta
     public void onStarFetched(Star star) {
         log.debug("Star refreshed...");
         if (mCancelFetch) {
+            log.debug("Fetch was cancelled...");
             return;
         }
 
