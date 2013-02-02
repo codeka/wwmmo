@@ -100,6 +100,10 @@ public class EmpireManager {
     }
 
     public void refreshEmpire() {
+        if (mEmpire == null) {
+            // todo?
+            return;
+        }
         mEmpire.refreshAllDetails(null);
     }
 

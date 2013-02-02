@@ -156,6 +156,12 @@ public class StarSummary implements Parcelable {
         }
     }
 
+    public static StarSummary fromProtocolBuffer(Messages.Star pb) {
+        StarSummary starSummary = new StarSummary();
+        starSummary.populateFromProtocolBuffer(pb);
+        return starSummary;
+    }
+
     public void toProtocolBuffer(Messages.Star.Builder pb) {
         pb.setKey(mKey);
         pb.setName(mName);
@@ -171,6 +177,12 @@ public class StarSummary implements Parcelable {
             mPlanets[i].toProtocolBuffer(planet);
             pb.addPlanets(planet);
         }
+    }
+
+    public Messages.Star toProtocolBuffer() {
+        Messages.Star.Builder pb = Messages.Star.newBuilder();
+        toProtocolBuffer(pb);
+        return pb.build();
     }
 
     public static class StarType {

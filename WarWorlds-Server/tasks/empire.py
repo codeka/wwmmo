@@ -15,6 +15,7 @@ import webapp2 as webapp
 import ctrl
 from ctrl import empire as ctl
 from ctrl import simulation as simulation_ctl
+from ctrl import designs as designs_ctl
 from model import empire as mdl
 from model import sector as sector_mdl
 import protobufs.messages_pb2 as pb
@@ -89,9 +90,13 @@ class BuildCheckPage(tasks.TaskPage):
             logging.error("Could not find building %s to upgrade!" % (str(existing_building_key)))
           else:
             # TODO: check the star, empire, colony and so on?
+            design = designs_ctl.BuildingDesign.getDesign(model.designName)
+            maxLevel = len(design.upgrades) + 1
             if not model.level:
               model.level = 1
             model.level += 1
+            if model.level > maxLevel:
+              model.level = maxLevel
             model.put()
             log_msg["building"] = model.designName
             log_msg["existing_building"] = str(existing_building_key)

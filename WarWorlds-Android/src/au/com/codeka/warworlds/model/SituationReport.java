@@ -67,6 +67,57 @@ public class SituationReport {
         return "War Worlds";
     }
 
+    /**
+     * Gets an HTML summary of this notification, useful for notification messages.
+     */
+    public String getSummaryLine(StarSummary starSummary) {
+        String msg = String.format(Locale.ENGLISH, "<b>%s:</b> ", starSummary.getName());
+
+        if (mMoveCompleteRecord != null) {
+            msg += getFleetLine(mMoveCompleteRecord.getFleetDesignID(), mMoveCompleteRecord.getNumShips());
+            msg += " arrived";
+        }
+
+        if (mBuildCompleteRecord != null) {
+            if (mBuildCompleteRecord.getBuildKind().equals(BuildKind.SHIP)) {
+                msg += getFleetLine(mBuildCompleteRecord.getDesignID(), 1);
+            } else {
+                BuildingDesign design = BuildingDesignManager.getInstance().getDesign(mBuildCompleteRecord.getDesignID());
+                msg += design.getDisplayName();
+            }
+            msg += " built";
+        }
+
+        if (mFleetUnderAttackRecord != null) {
+            if (mMoveCompleteRecord != null || mBuildCompleteRecord != null) {
+                msg += ", and attacked!";
+            } else {
+                msg += getFleetLine(mFleetUnderAttackRecord.getFleetDesignID(), mFleetUnderAttackRecord.getNumShips());
+                msg += " attacked!";
+            }
+        }
+
+        if (mFleetDestroyedRecord != null) {
+            if (mFleetUnderAttackRecord != null) {
+                msg += " and <i>destroyed</i>";
+            } else {
+                msg += String.format(Locale.ENGLISH, "%s <i>destroyed</i>",
+                        getFleetLine(mFleetDestroyedRecord.getFleetDesignID(), 1));
+            }
+        }
+
+        if (mFleetVictoriousRecord != null) {
+            msg += String.format(Locale.ENGLISH, "%s <i>victorious</i>",
+                    getFleetLine(mFleetVictoriousRecord.getFleetDesignID(), mFleetVictoriousRecord.getNumShips()));
+        }
+
+        if (msg.length() == 0) {
+            msg = "Unknown situation";
+        }
+
+        return msg;
+    }
+
     public String getDescription(StarSummary starSummary) {
         String msg = "";
 

@@ -730,7 +730,7 @@ def accelerateBuild(empire_pb, star_pb, build_request_pb, sim):
   cost = speed_up_time_in_hours * 100.0
   if not _subtractCash(empire_pb.key, cost):
     err = pb.GenericError()
-    err.error_code = pb.GenericError.INSUFFICIENT_CASH
+    err.error_code = pb.GenericError.InsufficientCash
     err.error_message = "You don't have enough cash to accelerate this build."
     return err
 
@@ -807,9 +807,9 @@ def scheduleBuildCheck(sim=None, force_reschedule=False):
   query = mdl.BuildOperation.all().order("endTime").fetch(1)
   for build in query:
     # The first one we fetch (because of the ordering) will be the next one. So we'll schedule
-    # the build-check to run 5 seconds later (if there's a bunch scheduled at the same time,
+    # the build-check to run 1 second later (if there's a bunch scheduled at the same time,
     # it's more efficient that way...)
-    time = build.endTime + timedelta(seconds=5)
+    time = build.endTime + timedelta(seconds=1)
 
   # Check the simulation -- any builds there might be scheduled before this one
   if sim:
@@ -821,11 +821,10 @@ def scheduleBuildCheck(sim=None, force_reschedule=False):
 
   if not time:
     return
-
-  # It'll be < now() if the next building is never going to finished (and hence it's endTime
-  # will be the epoch -- 1970. We'll schedule a build-check in ten minutes anyway
+  if time < datetime(2000, 1, 1):
+    return
   if time < datetime.now():
-    time = datetime.now() + timedelta(minutes=10)
+    time = datetime.now() + timedelta(seconds=1)
 
   mc = memcache.Client()
   time_dt = ctrl.dateTimeToEpoch(time)

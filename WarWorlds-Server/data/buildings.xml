@@ -44,7 +44,7 @@
           <effect kind="storage" goods="460" minerals="460" />
         </effects>
       </upgrade>
-      <upgrade level="2">
+      <upgrade level="5">
         <cost minerals="400" time="0.5" />
         <effects>
           <effect kind="storage" goods="600" minerals="600" />
@@ -102,7 +102,7 @@
           <requires building="research" level="1" />
         </dependencies>
       </upgrade>
-      <upgrade level="2">
+      <upgrade level="5">
         <cost minerals="350" time="1.2" />
         <effects>
           <effect kind="defence" bonus="1.25" />

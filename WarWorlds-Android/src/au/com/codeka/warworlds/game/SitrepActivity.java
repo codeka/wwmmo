@@ -10,7 +10,6 @@ import java.util.TreeSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
@@ -27,6 +26,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import au.com.codeka.TimeInHours;
 import au.com.codeka.warworlds.BaseActivity;
+import au.com.codeka.warworlds.Notifications;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.api.ApiClient;
 import au.com.codeka.warworlds.api.ApiException;
@@ -70,8 +70,7 @@ public class SitrepActivity extends BaseActivity {
 
         if (mStarKey == null) {
             // clear all our notifications
-            NotificationManager nm = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-            nm.cancelAll();
+            Notifications.clearNotifications(mContext);
 
             MyEmpire empire = EmpireManager.getInstance().getEmpire();
 

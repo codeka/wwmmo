@@ -9,9 +9,20 @@ import org.slf4j.LoggerFactory;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Bundle;
+import android.util.Base64;
+import au.com.codeka.warworlds.model.ChatManager;
+import au.com.codeka.warworlds.model.ChatMessage;
+import au.com.codeka.warworlds.model.EmpireManager;
+import au.com.codeka.warworlds.model.MyEmpire;
+import au.com.codeka.warworlds.model.SectorManager;
+import au.com.codeka.warworlds.model.Star;
+import au.com.codeka.warworlds.model.StarManager;
+import au.com.codeka.warworlds.model.protobuf.Messages;
 
 import com.google.android.gcm.GCMBaseIntentService;
 import com.google.android.gcm.GCMRegistrar;
+import com.google.protobuf.InvalidProtocolBufferException;
 
 /**
  * Receive a push message from the Cloud to Device Messaging (C2DM) service.
@@ -95,7 +106,64 @@ public class GCMIntentService extends GCMBaseIntentService {
         Util.loadProperties(context);
         Util.setup(context);
 
-        log.info("GCM message received.");
-        MessageDisplay.displayMessage(context, intent);
+        log.debug("GCM message received.");
+        Bundle extras = intent.getExtras();
+        if (extras != null) {
+            for(String key : extras.keySet()) {
+                log.debug(String.format("%s = %s", key, extras.get(key)));
+            }
+            if (extras.containsKey("sitrep")) {
+                byte[] blob = Base64.decode(extras.getString("sitrep"), Base64.DEFAULT);
+
+                Messages.SituationReport pb;
+                try {
+                    pb = Messages.SituationReport.parseFrom(blob);
+                } catch (InvalidProtocolBufferException e) {
+                    log.error("Could not parse situation report!", e);
+                    return;
+                }
+
+                // refresh the star this situation report is for, obviously
+                // something happened that we'll want to know about
+                if (!StarManager.getInstance().refreshStar(
+                            context,
+                            pb.getStarKey(),
+                            true)) { // <-- only refresh the star if we have one cached
+                    // if we didn't refresh the star, then at least refresh
+                    // the sector it was in (could have been a moving
+                    // fleet, say)
+                    Star star = SectorManager.getInstance().findStar(pb.getStarKey());
+                    if (star != null) {
+                        SectorManager.getInstance().refreshSector(star.getSectorX(), star.getSectorY());
+                    }
+                    // refresh the empire as well, since stuff has happened...
+                    EmpireManager.getInstance().refreshEmpire();
+                }
+
+                Notifications.displayNotification(context, pb);
+            } else if (extras.containsKey("chat")) {
+                byte[] blob = Base64.decode(extras.getString("chat"), Base64.DEFAULT);
+
+                ChatMessage msg;
+                try {
+                    Messages.ChatMessage pb = Messages.ChatMessage.parseFrom(blob);
+                    msg = ChatMessage.fromProtocolBuffer(pb);
+                } catch(InvalidProtocolBufferException e) {
+                    log.error("Could not parse chat message!", e);
+                    return;
+                }
+
+                // don't add our own chats, since they'll have been added automatically
+                MyEmpire myEmpire = EmpireManager.getInstance().getEmpire();
+                if (myEmpire == null) {
+                    return;
+                }
+                if (msg.getEmpireKey() == null || msg.getEmpireKey().equals(myEmpire.getKey())) {
+                    return;
+                }
+
+                ChatManager.getInstance().addMessage(msg);
+            }
+        }
     }
 }
