@@ -46,7 +46,7 @@ public class FleetActivity extends BaseActivity {
                 stars.put(mStar.getKey(), mStar);
                 mFleetList.refresh(mStar.getFleets(), stars);
 
-                String fleetKey = getIntent().getExtras().getString("au.com.codeka.warworlds.FleetKey", null);
+                String fleetKey = getIntent().getExtras().getString("au.com.codeka.warworlds.FleetKey");
                 if (fleetKey != null) {
                     mFleetList.selectFleet(fleetKey);
                 }

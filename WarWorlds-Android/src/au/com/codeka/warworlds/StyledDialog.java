@@ -115,6 +115,10 @@ public class StyledDialog extends Dialog implements ViewTreeObserver.OnGlobalLay
         }
         int contentHeight = content.getHeight();
 
+        int displayHeight = mContext.getResources().getDisplayMetrics().heightPixels;
+        if (availableHeight > (displayHeight - 200)) {
+            availableHeight = displayHeight - 200; // fudge factor
+        }
         if (availableHeight > 1024) {
             availableHeight = 1024;
         }
