@@ -7,6 +7,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.media.RingtoneManager;
 import android.preference.PreferenceManager;
 
 public class GlobalOptions {
@@ -59,12 +60,18 @@ public class GlobalOptions {
         return mPreferences.getBoolean("GlobalOptions.GenUniqueStarsAndPlanets", false);
     }
 
+    public boolean notificationsEnabled() {
+        return mPreferences.getBoolean("GlobalOptions.EnableNotifications", true);
+    }
+
     public NotificationOptions getNotificationOptions(NotificationKind kind) {
         String baseName = "GlobalOptions.Notifications["+kind+"].";
         NotificationOptions opt = new NotificationOptions();
         opt.mKind = kind;
         opt.mNotificationEnabled = mPreferences.getBoolean(baseName+"Enabled", true);
-        opt.mLedColour = mPreferences.getInt(baseName+"Colour", Color.RED);
+        opt.mLedColour = Color.parseColor(mPreferences.getString(baseName+"LedColour", "#FF0000"));
+        opt.mRingtone = mPreferences.getString(baseName+"Ringtone",
+                RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION).toString());
         return opt;
     }
 
@@ -124,6 +131,7 @@ public class GlobalOptions {
         private NotificationKind mKind;
         private boolean mNotificationEnabled;
         private int mLedColour;
+        private String mRingtone;
 
         public NotificationKind getKind() {
             return mKind;
@@ -139,6 +147,12 @@ public class GlobalOptions {
         }
         public void setLedColour(int argb) {
             mLedColour = argb;
+        }
+        public String getRingtone() {
+            return mRingtone;
+        }
+        public void setRingtone(String ringtone) {
+            mRingtone = ringtone;
         }
     }
 }

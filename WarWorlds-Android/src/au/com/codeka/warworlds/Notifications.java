@@ -19,9 +19,6 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
-import android.media.AudioManager;
-import android.media.Ringtone;
-import android.media.RingtoneManager;
 import android.net.Uri;
 import android.support.v4.app.NotificationCompat;
 import android.text.Html;
@@ -70,10 +67,13 @@ public class Notifications {
             return;
         }
 
+        if (!new GlobalOptions(context).notificationsEnabled()) {
+            return;
+        }
+
         NotificationManager nm = (NotificationManager) context
                 .getSystemService(Context.NOTIFICATION_SERVICE);
         nm.notify(1, notification);
-        playNotificationSound(context);
     }
 
     private static Notification buildNotification(Context context,
@@ -137,6 +137,11 @@ public class Notifications {
                 builder.setContentText(sitrep.getDescription(star));
                 builder.setWhen(sitrep.getReportTime().getMillis());
 
+                String ringtone = new GlobalOptions(context).getNotificationOptions(kind).getRingtone();
+                if (ringtone != null && ringtone.length() > 0) {
+                    builder.setSound(Uri.parse(ringtone));
+                }
+
                 options = thisOptions;
             }
             first = false;
@@ -185,17 +190,6 @@ public class Notifications {
         }
 
         return GlobalOptions.NotificationKind.OTHER;
-    }
-
-    private static void playNotificationSound(Context context) {
-        Uri uri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-        if (uri != null) {
-            Ringtone rt = RingtoneManager.getRingtone(context, uri);
-            if (rt != null) {
-                rt.setStreamType(AudioManager.STREAM_NOTIFICATION);
-                rt.play();
-            }
-        }
     }
 
     /**
