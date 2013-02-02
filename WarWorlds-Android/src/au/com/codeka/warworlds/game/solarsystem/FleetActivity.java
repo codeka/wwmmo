@@ -45,6 +45,11 @@ public class FleetActivity extends BaseActivity {
                 TreeMap<String, Star> stars = new TreeMap<String, Star>();
                 stars.put(mStar.getKey(), mStar);
                 mFleetList.refresh(mStar.getFleets(), stars);
+
+                String fleetKey = getIntent().getExtras().getString("au.com.codeka.warworlds.FleetKey", null);
+                if (fleetKey != null) {
+                    mFleetList.selectFleet(fleetKey);
+                }
             }
         });
 

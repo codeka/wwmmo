@@ -45,7 +45,7 @@ public class SitrepActivity extends BaseActivity {
     private static Logger log = LoggerFactory.getLogger(SitrepActivity.class);
     private Context mContext = this;
     private SituationReportAdapter mSituationReportAdapter;
-
+    private String mStarKey;
     private Map<String, StarSummary> mStarSummaries;
 
     @Override
@@ -55,27 +55,40 @@ public class SitrepActivity extends BaseActivity {
 
         mStarSummaries = new TreeMap<String, StarSummary>();
         mSituationReportAdapter = new SituationReportAdapter();
+
+        mStarKey = getIntent().getStringExtra("au.com.codeka.warworlds.StarKey");
     }
 
     @Override
     public void onResume() {
         super.onResume();
 
-        // clear all our notifications
-        NotificationManager nm = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        nm.cancelAll();
-
         setContentView(R.layout.sitrep);
 
-        MyEmpire empire = EmpireManager.getInstance().getEmpire();
+        final TextView empireName = (TextView) findViewById(R.id.empire_name);
+        final ImageView empireIcon = (ImageView) findViewById(R.id.empire_icon);
 
-        TextView empireName = (TextView) findViewById(R.id.empire_name);
-        ImageView empireIcon = (ImageView) findViewById(R.id.empire_icon);
+        if (mStarKey == null) {
+            // clear all our notifications
+            NotificationManager nm = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+            nm.cancelAll();
 
-        if (empire != null) {
-            // TODO: add an "empire updated" listener here!
-            empireName.setText(empire.getDisplayName());
-            empireIcon.setImageBitmap(empire.getShield(this));
+            MyEmpire empire = EmpireManager.getInstance().getEmpire();
+
+            if (empire != null) {
+                // TODO: add an "empire updated" listener here!
+                empireName.setText(empire.getDisplayName());
+                empireIcon.setImageBitmap(empire.getShield(this));
+            }
+        } else {
+            StarManager.getInstance().requestStarSummary(mContext, mStarKey, new StarManager.StarSummaryFetchedHandler() {
+                @Override
+                public void onStarSummaryFetched(StarSummary s) {
+                    empireName.setText(s.getName());
+                    Sprite starSprite = StarImageManager.getInstance().getSprite(mContext, s, empireIcon.getWidth());
+                    empireIcon.setImageDrawable(new SpriteDrawable(starSprite));
+                }
+            });
         }
 
         final ListView reportItems = (ListView) findViewById(R.id.report_items);
@@ -135,6 +148,9 @@ public class SitrepActivity extends BaseActivity {
             @Override
             protected List<SituationReport> doInBackground(Void... params) {
                 String url = "/api/v1/sit-reports";
+                if (mStarKey != null) {
+                    url = String.format("/api/v1/stars/%s/sit-reports", mStarKey);
+                }
 
                 try {
                     Messages.SituationReports pb = ApiClient.getProtoBuf(

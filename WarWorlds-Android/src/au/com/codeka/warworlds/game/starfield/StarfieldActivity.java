@@ -1,10 +1,6 @@
 package au.com.codeka.warworlds.game.starfield;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Locale;
-
-import org.apache.commons.lang3.StringUtils;
 
 import android.content.Context;
 import android.content.Intent;
@@ -23,6 +19,7 @@ import android.widget.TextView;
 import au.com.codeka.TimeInHours;
 import au.com.codeka.warworlds.BaseActivity;
 import au.com.codeka.warworlds.R;
+import au.com.codeka.warworlds.ctrl.FleetListSimple;
 import au.com.codeka.warworlds.game.EmpireActivity;
 import au.com.codeka.warworlds.game.ScoutReportDialog;
 import au.com.codeka.warworlds.game.SitrepActivity;
@@ -52,8 +49,7 @@ public class StarfieldActivity extends BaseActivity {
     private StarfieldSurfaceView mStarfield;
     private ListView mPlanetList;
     private PlanetListAdapter mPlanetListAdapter;
-    private ListView mFleetList;
-    private FleetListAdapter mFleetListAdapter;
+    private FleetListSimple mFleetList;
     private Star mSelectedStar;
 
     // when fetching a star/fleet we set this to the one we're fetching. This
@@ -87,7 +83,7 @@ public class StarfieldActivity extends BaseActivity {
         final ImageView starIcon = (ImageView) findViewById(R.id.star_icon);
 
         mPlanetList = (ListView) findViewById(R.id.planet_list);
-        mFleetList = (ListView) findViewById(R.id.fleet_list);
+        mFleetList = (FleetListSimple) findViewById(R.id.fleet_list);
 
         selectedStarContainer.setVisibility(View.GONE);
         selectedFleetContainer.setVisibility(View.GONE);
@@ -116,9 +112,6 @@ public class StarfieldActivity extends BaseActivity {
 
         mPlanetListAdapter = new PlanetListAdapter();
         mPlanetList.setAdapter(mPlanetListAdapter);
-
-        mFleetListAdapter = new FleetListAdapter();
-        mFleetList.setAdapter(mFleetListAdapter);
 
         mStarfield.addSelectionChangedListener(new StarfieldSurfaceView.OnSelectionChangedListener() {
             @Override
@@ -153,7 +146,7 @@ public class StarfieldActivity extends BaseActivity {
                         selectedFleetContainer.setVisibility(View.GONE);
 
                         mPlanetListAdapter.setStar(star);
-                        mFleetListAdapter.setStar(star);
+                        mFleetList.setStar(star);
 
                         starName.setText(star.getName());
                         starKind.setText(star.getStarType().getDisplayName());
@@ -227,14 +220,13 @@ public class StarfieldActivity extends BaseActivity {
             }
         });
 
-        mFleetList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        mFleetList.setFleetSelectedHandler(new FleetListSimple.FleetSelectedHandler() {
             @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+            public void onFleetSelected(Fleet fleet) {
                 if (mSelectedStar == null) {
                     return; //??
                 }
 
-                Fleet fleet = (Fleet) mFleetListAdapter.getItem(position);
                 openEmpireActivityAtFleet(mSelectedStar, fleet);
             }
         });
@@ -478,74 +470,4 @@ public class StarfieldActivity extends BaseActivity {
         }
     }
 
-    class FleetListAdapter extends BaseAdapter {
-        private Star mStar;
-        private List<Fleet> mFleets;
-
-        public void setStar(Star star) {
-            mStar = star;
-            mFleets = new ArrayList<Fleet>();
-
-            if (star.getFleets() != null) {
-                for (Fleet f : star.getFleets()) {
-                    if (!f.getState().equals(Fleet.State.MOVING)) {
-                        mFleets.add(f);
-                    }
-                }
-            }
-
-            notifyDataSetChanged();
-        }
-
-        @Override
-        public int getCount() {
-            if (mStar == null) {
-                return 0;
-            }
-
-            return mFleets.size();
-        }
-
-        @Override
-        public Object getItem(int position) {
-            return mFleets.get(position);
-        }
-
-        @Override
-        public long getItemId(int position) {
-            return position;
-        }
-
-        @Override
-        public int getViewTypeCount() {
-            return 1;
-        }
-
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            View view = convertView;
-            if (view == null) {
-                LayoutInflater inflater = (LayoutInflater)mContext.getSystemService
-                        (Context.LAYOUT_INFLATER_SERVICE);
-                view = (ViewGroup) inflater.inflate(R.layout.starfield_planet, null);
-            }
-
-            final ImageView icon = (ImageView) view.findViewById(R.id.starfield_planet_icon);
-            final Fleet fleet = mFleets.get(position);
-            ShipDesignManager designManager = ShipDesignManager.getInstance();
-            ShipDesign design = designManager.getDesign(fleet.getDesignID());
-
-            icon.setImageDrawable(new SpriteDrawable(design.getSprite()));
-
-            TextView shipKindTextView = (TextView) view.findViewById(R.id.starfield_planet_type);
-            shipKindTextView.setText(String.format("%d × %s",
-                    fleet.getNumShips(), design.getDisplayName(fleet.getNumShips() > 1)));
-
-            final TextView shipCountTextView = (TextView) view.findViewById(R.id.starfield_planet_colony);
-            shipCountTextView.setText(String.format("%s",
-                    StringUtils.capitalize(fleet.getStance().toString().toLowerCase(Locale.ENGLISH))));
-
-            return view;
-        }
-    }
 }

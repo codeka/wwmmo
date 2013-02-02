@@ -118,13 +118,11 @@
                         android:listSelector="@drawable/list_selector" >
                     </ListView>
 
-                    <ListView
+                    <au.com.codeka.warworlds.ctrl.FleetListSimple
                         android:id="@+id/fleet_list"
                         android:layout_width="0dp"
                         android:layout_weight="1"
-                        android:layout_height="wrap_content"
-                        android:listSelector="@drawable/list_selector" >
-                    </ListView>
+                        android:layout_height="wrap_content" />
                 </LinearLayout>
 
             </RelativeLayout>
@@ -205,7 +203,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
             android:layout_alignParentLeft="true"
-            android:layout_alignTop="@id/reports_btn"
+            android:layout_alignTop="@id/sitrep_btn"
             android:layout_toLeftOf="@+id/sitrep_btn" />
 
     </RelativeLayout>

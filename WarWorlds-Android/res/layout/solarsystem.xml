@@ -141,7 +141,7 @@
                         android:layout_width="20dp"
                         android:layout_height="20dp"
                         android:layout_alignParentLeft="true"
-                          android:layout_below="@+id/colony_defence"
+                        android:layout_below="@+id/colony_defence"
                         android:src="@drawable/colony_population_icon" />
 
                     <ProgressBar
@@ -277,9 +277,7 @@
                         android:layout_toRightOf="@id/colony_center_marker"
                         android:layout_margin="8dp"
                         android:text="@string/focus" />
-
                 </RelativeLayout>
-
             </RelativeLayout>
 
             <RelativeLayout
@@ -288,37 +286,43 @@
                 android:layout_weight="1"
                 android:layout_height="match_parent">
 
-                <LinearLayout
+                <View android:id="@+id/btn_spacer"
+                      android:layout_width="1dp"
+                      android:layout_height="10dp"
+                      android:layout_marginTop="10dp"
+                      android:layout_centerHorizontal="true" />
+
+                <!-- Button
+                    android:id="@+id/fleet_btn"
+                    style="@style/Button"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_alignParentTop="true"
+                    android:layout_alignParentLeft="true"
+                    android:layout_toLeftOf="@+id/btn_spacer"
+                    android:layout_marginLeft="5dp"
+                    android:layout_marginRight="2dp"
                     android:layout_marginTop="10dp"
-                    android:orientation="horizontal">
+                    android:text="Fleet" / -->
 
-                    <Button
-                        android:id="@+id/fleet_btn"
-                        style="@style/Button"
-                        android:layout_width="0dp"
-                        android:layout_weight="1"
-                        android:layout_height="wrap_content"
-                        android:text="@string/fleet"
-                        android:layout_marginLeft="10dp" />
+                <Button
+                    android:id="@+id/sitrep_btn"
+                    style="@style/Button"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:layout_toRightOf="@+id/btn_spacer"
+                    android:layout_marginLeft="2dp"
+                    android:layout_marginRight="5dp"
+                    android:layout_marginTop="10dp"
+                    android:text="Sit. Rep." />
 
-                    <Button
-                        android:id="@+id/reports_btn"
-                        style="@style/Button"
-                        android:layout_width="0dp"
-                        android:layout_weight="1"
-                        android:layout_height="wrap_content"
-                        android:text="Reports"
-                        android:layout_marginLeft="10dp" />
-
-                </LinearLayout>
-
+                <au.com.codeka.warworlds.ctrl.FleetListSimple
+                          android:id="@+id/fleet_list"
+                          android:layout_width="match_parent"
+                          android:layout_height="match_parent"
+                          android:layout_below="@+id/sitrep_btn" />
             </RelativeLayout>
-
         </LinearLayout>
-
     </RelativeLayout>
 
     <RelativeLayout

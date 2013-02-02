@@ -149,7 +149,7 @@ public class SituationReport {
         ShipDesign design = ShipDesignManager.getInstance().getDesign(designID);
         int n = (int)(Math.ceil(numShips));
         return String.format(Locale.ENGLISH, "%d × %s",
-                design.getDisplayName(n > 1), n);
+                n, design.getDisplayName(n > 1));
     }
 
     public static SituationReport fromProtocolBuffer(Messages.SituationReport pb) {

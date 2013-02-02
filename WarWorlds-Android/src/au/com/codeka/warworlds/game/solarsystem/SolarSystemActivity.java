@@ -10,7 +10,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.support.v4.app.FragmentManager;
 import android.text.Html;
 import android.view.View;
 import android.view.Window;
@@ -24,8 +23,10 @@ import au.com.codeka.RomanNumeralFormatter;
 import au.com.codeka.warworlds.BaseActivity;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.StyledDialog;
+import au.com.codeka.warworlds.ctrl.FleetListSimple;
 import au.com.codeka.warworlds.game.CombatReportDialog;
 import au.com.codeka.warworlds.game.ScoutReportDialog;
+import au.com.codeka.warworlds.game.SitrepActivity;
 import au.com.codeka.warworlds.model.Colony;
 import au.com.codeka.warworlds.model.Empire;
 import au.com.codeka.warworlds.model.EmpireManager;
@@ -71,9 +72,9 @@ public class SolarSystemActivity extends BaseActivity implements StarManager.Sta
         final Button colonizeButton = (Button) findViewById(R.id.solarsystem_colonize);
         final Button buildButton = (Button) findViewById(R.id.solarsystem_colony_build);
         final Button focusButton = (Button) findViewById(R.id.solarsystem_colony_focus);
-        final Button fleetButton = (Button) findViewById(R.id.fleet_btn);
-        final Button reportsButton = (Button) findViewById(R.id.reports_btn);
+        final Button sitrepButton = (Button) findViewById(R.id.sitrep_btn);
         final Button attackButton = (Button) findViewById(R.id.enemy_empire_attack);
+        final FleetListSimple fleetList = (FleetListSimple) findViewById(R.id.fleet_list);
 
         Bundle extras = getIntent().getExtras();
         String starKey = extras.getString("au.com.codeka.warworlds.StarKey");
@@ -122,29 +123,16 @@ public class SolarSystemActivity extends BaseActivity implements StarManager.Sta
             }
         });
 
-        fleetButton.setOnClickListener(new View.OnClickListener() {
+        sitrepButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (mStar == null) {
                     return; // can happen before the star loads
                 }
 
-                Intent intent = new Intent(SolarSystemActivity.this, FleetActivity.class);
+                Intent intent = new Intent(mContext, SitrepActivity.class);
                 intent.putExtra("au.com.codeka.warworlds.StarKey", mStar.getKey());
                 startActivity(intent);
-            }
-        });
-
-        reportsButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (mStar == null) {
-                    return; // can happen before the star loads
-                }
-
-                ScoutReportDialog dialog = new ScoutReportDialog();
-                dialog.setStar(mStar);
-                dialog.show(getSupportFragmentManager(), "");
             }
         });
 
@@ -152,6 +140,16 @@ public class SolarSystemActivity extends BaseActivity implements StarManager.Sta
             @Override
             public void onClick(View v) {
                 onAttackColony();
+            }
+        });
+
+        fleetList.setFleetSelectedHandler(new FleetListSimple.FleetSelectedHandler() {
+            @Override
+            public void onFleetSelected(Fleet fleet) {
+                Intent intent = new Intent(SolarSystemActivity.this, FleetActivity.class);
+                intent.putExtra("au.com.codeka.warworlds.StarKey", mStar.getKey());
+                intent.putExtra("au.com.codeka.warworlds.FleetKey", fleet.getKey());
+                startActivity(intent);
             }
         });
 
@@ -180,7 +178,6 @@ public class SolarSystemActivity extends BaseActivity implements StarManager.Sta
     public void onStarFetched(Star star) {
         log.debug("Star refreshed...");
         if (mCancelFetch) {
-            log.debug("Fetch was cancelled...");
             return;
         }
 
@@ -222,6 +219,9 @@ public class SolarSystemActivity extends BaseActivity implements StarManager.Sta
         TextView storedMineralsTextView = (TextView) findViewById(R.id.stored_minerals);
         TextView deltaMineralsTextView = (TextView) findViewById(R.id.delta_minerals);
         View storedMineralsIcon = findViewById(R.id.stored_minerals_icon);
+        FleetListSimple fleetList = (FleetListSimple) findViewById(R.id.fleet_list);
+
+        fleetList.setStar(star);
 
         EmpirePresence ep = star.getEmpire(EmpireManager.getInstance().getEmpire().getKey());
         if (ep == null) {
