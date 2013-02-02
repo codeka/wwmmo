@@ -53,11 +53,6 @@ public class SolarSystemActivity extends BaseActivity implements StarManager.Sta
     private Empire mColonyEmpire;
     private boolean mIsFirstRefresh;
 
-    // we save this so that if you tap somewhere else while a fetch is in
-    // progress, you won't overwrite stuff when they both show up at the same
-    // time
-    private boolean mCancelFetch = false;
-
     private static final int BUILD_REQUEST = 3000;
 
     /** Called when the activity is first created. */
@@ -152,20 +147,18 @@ public class SolarSystemActivity extends BaseActivity implements StarManager.Sta
                 startActivity(intent);
             }
         });
-
-        mCancelFetch = false;
     }
 
     @Override
     public void onSaveInstanceState(Bundle state) {
         super.onSaveInstanceState(state);
-        mCancelFetch = true;
+        //mCancelFetch = true;
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        mCancelFetch = false;
+        //mCancelFetch = false;
     }
 
     @Override
@@ -177,9 +170,6 @@ public class SolarSystemActivity extends BaseActivity implements StarManager.Sta
     @Override
     public void onStarFetched(Star star) {
         log.debug("Star refreshed...");
-        if (mCancelFetch) {
-            return;
-        }
 
         // if we don't have a star yet, we'll need to figure out which planet to select
         // initially from the intent that started us. Otherwise, we'll want to select
