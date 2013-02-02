@@ -76,7 +76,10 @@ class BuildCheckPage(tasks.TaskPage):
 
       new_fleet_key = None
 
-      logging.info("Build for empire \"%s\", colony \"%s\" complete." % (empire_key, colony_key))
+      log_msg = {}
+      log_msg["empire"] = str(empire_key)
+      log_msg["colony"] = str(colony_key)
+      log_msg["star"] = "%s [%s]" % (star_pb.name, star_pb.key)
       if build_request_model.designKind == pb.BuildRequest.BUILDING:
         # if it's an upgrade of an existing building, then just upgrade that building...
         existing_building_key = mdl.BuildOperation.existingBuilding.get_value_for_datastore(build_request_model)
@@ -90,6 +93,9 @@ class BuildCheckPage(tasks.TaskPage):
               model.level = 1
             model.level += 1
             model.put()
+            log_msg["building"] = model.designName
+            log_msg["existing_building"] = str(existing_building_key)
+            log_msg["level"] = model.level
         else:
           model = mdl.Building(parent=build_request_model.key().parent())
           model.colony = colony_key
@@ -97,6 +103,7 @@ class BuildCheckPage(tasks.TaskPage):
           model.designName = build_request_model.designName
           model.buildTime = datetime.now()
           model.put()
+          log_msg["building"] = model.designName
       else:
         # if it's not a building, it must be a ship. We'll try to find a fleet that'll
         # work, but if we can't it's not a big deal -- just create a new one. Duplicates
@@ -106,8 +113,14 @@ class BuildCheckPage(tasks.TaskPage):
           if fleet_pb.design_name == build_request_model.designName:
             if (fleet_pb.state == pb.Fleet.IDLE and fleet_pb.empire_key and
                 fleet_pb.empire_key == str(empire_key)):
+              num_existing = fleet_pb.num_ships
               fleet_pb.num_ships += float(build_request_model.count)
               existing = True
+              log_msg["fleet"] = fleet_pb.design_name
+              log_msg["existing_fleet"] = fleet_pb.key
+              log_msg["num_ships"] = "%.2f (existing) + %d (new) = %.2f" % (num_existing,
+                                                                            build_request_model.count,
+                                                                            fleet_pb.num_ships)
               break
         if not existing:
           model = mdl.Fleet(parent=star_key)
@@ -120,6 +133,8 @@ class BuildCheckPage(tasks.TaskPage):
           model.stateStartTime = datetime.now()
           model.put()
           new_fleet_key = str(model.key())
+          log_msg["fleet"] = build_request_model.designName
+          log_msg["num_ships"] = "%d" % (build_request_model.count)
 
         # if you've built a colony ship, we need to decrease the colony population by
         # 100 (basically, those 100 people go into the colony ship, to be transported to
@@ -129,6 +144,10 @@ class BuildCheckPage(tasks.TaskPage):
             if colony_pb.key == colony_key:
               colony_pb.population -= 100
 
+      msg = "Construction complete!"
+      for k,v in log_msg.items():
+        msg += "\r\n"+k+": "+v
+      logging.info(msg)
       sim.update()
       sitrep_pb = pb.SituationReport()
 
