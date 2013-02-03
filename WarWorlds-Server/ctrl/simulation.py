@@ -477,6 +477,7 @@ class Simulation(object):
       if goods_efficiency >= 1:
         population_increase *= 0.5
       else:
+        population_increase = colony_pb.population * (1.0 - colony_pb.focus_population)
         population_increase *= 0.5 * (goods_efficiency - 1.0)
 
       # if we're increasing population, it slows down the closer you get to the
@@ -488,9 +489,12 @@ class Simulation(object):
       max_factor = colony_pb.population / max_factor
       if max_factor > 1.0:
         # population is bigger than it should be...
+        population_increase = colony_pb.population * (1.0 - colony_pb.focus_population) * 0.5
+        self.log("Adjusted population increase: %.2f" % population_increase)
+
         max_factor -= 1.0
         population_increase = -max_factor * population_increase
-      else:
+      if population_increase > 0:
         max_factor = 1.0 - max_factor
 
       population_increase *= max_factor
@@ -501,7 +505,13 @@ class Simulation(object):
               float(colony_pb.max_population), max_factor, population_increase,
               colony_pb.population + population_increase))
 
+      in_cooldown = False
+      if colony_pb.cooldown_end_time:
+        in_cooldown = colony_pb.cooldown_end_time > ctrl.dateTimeToEpoch(self.now)
       colony_pb.population += population_increase
+      if in_cooldown and colony_pb.population < 100.0:
+        self.log("In cooldown period, population capped at 100.")
+        colony_pb.population = 100.0
 
     if total_goods > max_goods:
       total_goods = max_goods
@@ -814,7 +824,16 @@ class Simulation(object):
       for destroyed_colony_pb in self.destroyed_colony_pbs:
         if destroyed_colony_pb.key == colony_pb.key:
           colony_model.delete()
-          #TODO: notify owner!
+          if colony_pb.empire_key:
+            # Save a sitrep for this situation
+            sitrep_pb = pb.SituationReport()
+            sitrep_pb.empire_key = colony_pb.empire_key
+            sitrep_pb.report_time = ctrl.dateTimeToEpoch(self.now)
+            sitrep_pb.star_key = star_pb.key
+            sitrep_pb.planet_index = colony_pb.planet_index
+            sitrep_pb.colony_destroyed_record.colony_key = colony_pb.key
+            #sitrep_pb.colony_destroyed_record.enemy_empire_key = ??
+            empire_ctl.saveSituationReport(sitrep_pb)
 
           # if there's no more colonies in this star, make sure we update
           # the time_emptied field so that it doesn't just create a bunch

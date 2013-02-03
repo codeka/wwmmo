@@ -460,9 +460,13 @@ public class SolarSystemActivity extends BaseActivity implements StarManager.Sta
         populationFocus.setProgress((int)(100.0f * mColony.getPopulationFocus()));
         TextView populationValue = (TextView) findViewById(
                 R.id.solarsystem_colony_population_value);
-        populationValue.setText(String.format("%s%d / hr",
+        String deltaPopulation = String.format("%s%d / hr",
                 (mColony.getPopulationDelta() > 0 ? "+" : "-"),
-                Math.abs((int) mColony.getPopulationDelta())));
+                Math.abs((int) mColony.getPopulationDelta()));
+        if (mColony.getPopulationDelta() < 0 && mColony.getPopulation() < 110.0 && mColony.isInCooldown()) {
+            deltaPopulation = "<font color=\"#ffff00\">"+deltaPopulation+"</font>";
+        }
+        populationValue.setText(Html.fromHtml(deltaPopulation));
 
         ProgressBar farmingFocus = (ProgressBar) findViewById(
                 R.id.solarsystem_colony_farming_focus);

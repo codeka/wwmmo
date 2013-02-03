@@ -111,6 +111,8 @@ def colonyModelToPb(colony_pb, colony_model):
   else:
     colony_pb.uncollected_taxes = 0.0
   colony_pb.defence_bonus = 1
+  if colony_model.cooldownEndTime:
+    colony_pb.cooldown_end_time = dateTimeToEpoch(colony_model.cooldownEndTime)
 
 
 def colonyPbToModel(colony_model, colony_pb):

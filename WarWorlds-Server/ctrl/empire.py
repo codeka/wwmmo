@@ -466,6 +466,7 @@ def _colonize(sector_key, empire_model, star_pb, planet_index, count_in_sector=T
   colony_model.focusFarming = 0.25
   colony_model.focusMining = 0.25
   colony_model.focusConstruction = 0.25
+  colony_model.cooldownEndTime = datetime.now() + timedelta(hours=8)
   colony_model.put()
 
   def inc_colony_count():

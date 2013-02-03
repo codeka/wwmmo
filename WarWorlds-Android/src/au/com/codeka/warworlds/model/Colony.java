@@ -3,6 +3,9 @@ package au.com.codeka.warworlds.model;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
+
 import android.os.Parcel;
 import android.os.Parcelable;
 import au.com.codeka.warworlds.model.protobuf.Messages;
@@ -24,6 +27,7 @@ public class Colony implements Parcelable {
     private List<Building> mBuildings;
     private float mMaxPopulation;
     private float mDefenceBoost;
+    private DateTime mCooldownTimeEnd;
 
     public String getKey() {
         return mKey;
@@ -85,6 +89,13 @@ public class Colony implements Parcelable {
     public float getDefenceBoost() {
         return mDefenceBoost;
     }
+    public boolean isInCooldown() {
+        if (mCooldownTimeEnd == null) {
+            return false;
+        }
+        DateTime now = DateTime.now(DateTimeZone.UTC);
+        return (now.compareTo(mCooldownTimeEnd) < 0);
+    }
 
     @Override
     public int describeContents() {
@@ -108,6 +119,11 @@ public class Colony implements Parcelable {
         parcel.writeFloat(mUncollectedTaxes);
         parcel.writeFloat(mMaxPopulation);
         parcel.writeFloat(mDefenceBoost);
+        if (mCooldownTimeEnd == null) {
+            parcel.writeLong(0);
+        } else {
+            parcel.writeLong(mCooldownTimeEnd.getMillis());
+        }
 
         Building[] buildings = new Building[mBuildings.size()];
         parcel.writeParcelableArray(mBuildings.toArray(buildings), flags);
@@ -133,6 +149,10 @@ public class Colony implements Parcelable {
             c.mUncollectedTaxes = parcel.readFloat();
             c.mMaxPopulation = parcel.readFloat();
             c.mDefenceBoost = parcel.readFloat();
+            long millis = parcel.readLong();
+            if (millis > 0) {
+                c.mCooldownTimeEnd = new DateTime(millis, DateTimeZone.UTC);
+            }
 
             Parcelable[] buildings = parcel.readParcelableArray(Building.class.getClassLoader());
             c.mBuildings = new ArrayList<Building>();
@@ -169,6 +189,9 @@ public class Colony implements Parcelable {
         c.mUncollectedTaxes = pb.getUncollectedTaxes();
         c.mMaxPopulation = pb.getMaxPopulation();
         c.mDefenceBoost = pb.getDefenceBonus();
+        if (pb.hasCooldownEndTime()) {
+            c.mCooldownTimeEnd = new DateTime(pb.getCooldownEndTime() * 1000, DateTimeZone.UTC);
+        }
 
         return c;
     }

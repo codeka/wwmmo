@@ -100,7 +100,7 @@ class BuildCheckPage(tasks.TaskPage):
             model.put()
             log_msg["building"] = model.designName
             log_msg["existing_building"] = str(existing_building_key)
-            log_msg["level"] = model.level
+            log_msg["level"] = str(model.level)
         else:
           model = mdl.Building(parent=build_request_model.key().parent())
           model.colony = colony_key

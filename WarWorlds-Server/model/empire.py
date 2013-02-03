@@ -45,6 +45,7 @@ class Colony(db.Model):
   focusMining = db.FloatProperty()
   focusConstruction = db.FloatProperty()
   uncollectedTaxes = db.FloatProperty()
+  cooldownEndTime = db.DateTimeProperty()
 
   @staticmethod
   def getForEmpire(empire):

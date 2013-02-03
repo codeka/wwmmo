@@ -414,6 +414,10 @@ message Colony
     // When all bonuses and what-not are applies, what is this colony's maximum
     // population?
     optional float max_population = 17;
+
+    // If set, this is the time the "cooldown" period ends. While in cooldown, the colony will
+    // not lose population
+    optional int64 cooldown_end_time = 18;
 }
 
 
@@ -774,6 +778,13 @@ message SituationReport
         optional string combat_report_key = 4;
     }
     optional FleetVictoriousRecord fleet_victorious_record = 10;
+
+    message ColonyDestroyedRecord
+    {
+        optional string colony_key = 1;
+        optional string enemy_empire_key = 2;
+    }
+    optional ColonyDestroyedRecord colony_destroyed_record = 11;
 }
 
 

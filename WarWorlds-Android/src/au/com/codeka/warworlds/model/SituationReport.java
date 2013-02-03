@@ -5,6 +5,7 @@ import java.util.Locale;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
+import au.com.codeka.RomanNumeralFormatter;
 import au.com.codeka.warworlds.model.BuildRequest.BuildKind;
 import au.com.codeka.warworlds.model.protobuf.Messages;
 
@@ -19,6 +20,7 @@ public class SituationReport {
     private FleetUnderAttackRecord mFleetUnderAttackRecord;
     private FleetDestroyedRecord mFleetDestroyedRecord;
     private FleetVictoriousRecord mFleetVictoriousRecord;
+    private ColonyDestroyedRecord mColonyDestroyedRecord;
 
     public String getKey() {
         return mKey;
@@ -50,6 +52,9 @@ public class SituationReport {
     public FleetVictoriousRecord getFleetVictoriousRecord() {
         return mFleetVictoriousRecord;
     }
+    public ColonyDestroyedRecord getColonyDestroyedRecord() {
+        return mColonyDestroyedRecord;
+    }
 
     public String getTitle() {
         if (mBuildCompleteRecord != null) {
@@ -62,6 +67,8 @@ public class SituationReport {
             return "Fleet Victorious";
         } else if (mFleetUnderAttackRecord != null) {
             return "Fleet Under Attack";
+        } else if (mColonyDestroyedRecord != null) {
+            return "Colony Destroyed";
         }
 
         return "War Worlds";
@@ -71,7 +78,13 @@ public class SituationReport {
      * Gets an HTML summary of this notification, useful for notification messages.
      */
     public String getSummaryLine(StarSummary starSummary) {
-        String msg = String.format(Locale.ENGLISH, "<b>%s:</b> ", starSummary.getName());
+        String msg;
+        if (mPlanetIndex >= 0) {
+            msg = String.format(Locale.ENGLISH, "<b>%s %s:</b>",
+                                starSummary.getName(), RomanNumeralFormatter.format(mPlanetIndex));
+        } else {
+            msg = String.format(Locale.ENGLISH, "<b>%s:</b> ", starSummary.getName());
+        }
 
         if (mMoveCompleteRecord != null) {
             msg += getFleetLine(mMoveCompleteRecord.getFleetDesignID(), mMoveCompleteRecord.getNumShips());
@@ -109,6 +122,10 @@ public class SituationReport {
         if (mFleetVictoriousRecord != null) {
             msg += String.format(Locale.ENGLISH, "%s <i>victorious</i>",
                     getFleetLine(mFleetVictoriousRecord.getFleetDesignID(), mFleetVictoriousRecord.getNumShips()));
+        }
+
+        if (mColonyDestroyedRecord != null) {
+            msg += "Colony <em>destroyed!</em>";
         }
 
         if (msg.length() == 0) {
@@ -162,6 +179,11 @@ public class SituationReport {
             msg += String.format(Locale.ENGLISH, "%s fleet prevailed in battle on %s",
                     getFleetLine(mFleetVictoriousRecord.getFleetDesignID(), mFleetVictoriousRecord.getNumShips()),
                     starSummary.getName());
+        }
+
+        if (mColonyDestroyedRecord != null) {
+            msg += String.format(Locale.ENGLISH, "Colony on %s %s destroyed",
+                    starSummary.getName(), RomanNumeralFormatter.format(mPlanetIndex));
         }
 
         if (msg.length() == 0) {
@@ -234,6 +256,11 @@ public class SituationReport {
         if (pb.getFleetVictoriousRecord() != null &&
             pb.getFleetVictoriousRecord().hasFleetDesignId()) {
             sitrep.mFleetVictoriousRecord = FleetVictoriousRecord.fromProtocolBuffer(pb.getFleetVictoriousRecord());
+        }
+
+        if (pb.getColonyDestroyedRecord() != null &&
+            pb.getColonyDestroyedRecord().hasColonyKey()) {
+            sitrep.mColonyDestroyedRecord = ColonyDestroyedRecord.fromProtocolBuffer(pb.getColonyDestroyedRecord());
         }
 
         return sitrep;
@@ -361,6 +388,28 @@ public class SituationReport {
             fvr.mNumShips = pb.getNumShips();
             fvr.mCombatReportKey = pb.getCombatReportKey();
             return fvr;
+        }
+    }
+
+    public static class ColonyDestroyedRecord {
+        private String mColonyKey;
+        private String mEnemyEmpireKey;
+
+        public String getColonyKey() {
+            return mColonyKey;
+        }
+        public String getEnemyEmpireKey() {
+            return mEnemyEmpireKey;
+        }
+
+        private static ColonyDestroyedRecord fromProtocolBuffer(Messages.SituationReport.ColonyDestroyedRecord pb) {
+            ColonyDestroyedRecord cdr = new ColonyDestroyedRecord();
+            cdr.mColonyKey = pb.getColonyKey();
+            cdr.mEnemyEmpireKey = pb.getEnemyEmpireKey();
+            if (cdr.mEnemyEmpireKey != null && cdr.mEnemyEmpireKey.length() == 0) {
+                cdr.mEnemyEmpireKey = null;
+            }
+            return cdr;
         }
     }
 }
