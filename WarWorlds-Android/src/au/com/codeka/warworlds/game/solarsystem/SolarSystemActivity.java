@@ -22,7 +22,9 @@ import au.com.codeka.Point2D;
 import au.com.codeka.RomanNumeralFormatter;
 import au.com.codeka.warworlds.BaseActivity;
 import au.com.codeka.warworlds.R;
+import au.com.codeka.warworlds.ServerGreeter;
 import au.com.codeka.warworlds.StyledDialog;
+import au.com.codeka.warworlds.ServerGreeter.ServerGreeting;
 import au.com.codeka.warworlds.ctrl.FleetListSimple;
 import au.com.codeka.warworlds.game.CombatReportDialog;
 import au.com.codeka.warworlds.game.ScoutReportDialog;
@@ -71,12 +73,10 @@ public class SolarSystemActivity extends BaseActivity implements StarManager.Sta
         final Button attackButton = (Button) findViewById(R.id.enemy_empire_attack);
         final FleetListSimple fleetList = (FleetListSimple) findViewById(R.id.fleet_list);
 
-        Bundle extras = getIntent().getExtras();
-        String starKey = extras.getString("au.com.codeka.warworlds.StarKey");
-
         mIsFirstRefresh = true;
-        StarManager.getInstance().requestStar(this, starKey, true, this);
-        StarManager.getInstance().addStarUpdatedListener(starKey, this);
+        if (savedInstanceState != null) {
+            mIsFirstRefresh = savedInstanceState.getBoolean("au.com.codeka.warworlds.IsFirstRefresh");
+        }
 
         mSolarSystemSurfaceView.addPlanetSelectedListener(
                 new SolarSystemSurfaceView.OnPlanetSelectedListener() {
@@ -104,7 +104,6 @@ public class SolarSystemActivity extends BaseActivity implements StarManager.Sta
                 Intent intent = new Intent(SolarSystemActivity.this, BuildActivity.class);
                 intent.putExtra("au.com.codeka.warworlds.StarKey", mStar.getKey());
                 intent.putExtra("au.com.codeka.warworlds.Colony", mColony);
-
                 startActivityForResult(intent, BUILD_REQUEST);
             }
         });
@@ -152,13 +151,24 @@ public class SolarSystemActivity extends BaseActivity implements StarManager.Sta
     @Override
     public void onSaveInstanceState(Bundle state) {
         super.onSaveInstanceState(state);
-        //mCancelFetch = true;
+        state.putBoolean("au.com.codeka.warworlds.IsFirstRefresh", false);
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        //mCancelFetch = false;
+
+        ServerGreeter.waitForHello(this, new ServerGreeter.HelloCompleteHandler() {
+            @Override
+            public void onHelloComplete(boolean success, ServerGreeting greeting) {
+                Bundle extras = getIntent().getExtras();
+                String starKey = extras.getString("au.com.codeka.warworlds.StarKey");
+
+                StarManager.getInstance().requestStar(SolarSystemActivity.this, starKey, true,
+                                                      SolarSystemActivity.this);
+                StarManager.getInstance().addStarUpdatedListener(starKey, SolarSystemActivity.this);
+            }
+        });
     }
 
     @Override

@@ -28,6 +28,9 @@ import au.com.codeka.TimeInHours;
 import au.com.codeka.warworlds.BaseActivity;
 import au.com.codeka.warworlds.Notifications;
 import au.com.codeka.warworlds.R;
+import au.com.codeka.warworlds.ServerGreeter;
+import au.com.codeka.warworlds.ServerGreeter.ServerGreeting;
+import au.com.codeka.warworlds.WarWorldsActivity;
 import au.com.codeka.warworlds.api.ApiClient;
 import au.com.codeka.warworlds.api.ApiException;
 import au.com.codeka.warworlds.game.solarsystem.SolarSystemActivity;
@@ -64,31 +67,6 @@ public class SitrepActivity extends BaseActivity {
         super.onResume();
 
         setContentView(R.layout.sitrep);
-
-        final TextView empireName = (TextView) findViewById(R.id.empire_name);
-        final ImageView empireIcon = (ImageView) findViewById(R.id.empire_icon);
-
-        if (mStarKey == null) {
-            // clear all our notifications
-            Notifications.clearNotifications(mContext);
-
-            MyEmpire empire = EmpireManager.getInstance().getEmpire();
-
-            if (empire != null) {
-                // TODO: add an "empire updated" listener here!
-                empireName.setText(empire.getDisplayName());
-                empireIcon.setImageBitmap(empire.getShield(this));
-            }
-        } else {
-            StarManager.getInstance().requestStarSummary(mContext, mStarKey, new StarManager.StarSummaryFetchedHandler() {
-                @Override
-                public void onStarSummaryFetched(StarSummary s) {
-                    empireName.setText(s.getName());
-                    Sprite starSprite = StarImageManager.getInstance().getSprite(mContext, s, empireIcon.getWidth());
-                    empireIcon.setImageDrawable(new SpriteDrawable(starSprite));
-                }
-            });
-        }
 
         final ListView reportItems = (ListView) findViewById(R.id.report_items);
         reportItems.setAdapter(mSituationReportAdapter);
@@ -135,7 +113,35 @@ public class SitrepActivity extends BaseActivity {
         refresh();
     }
 
-    private void refresh() {
+    private void refreshTitle() {
+        final TextView empireName = (TextView) findViewById(R.id.empire_name);
+        final ImageView empireIcon = (ImageView) findViewById(R.id.empire_icon);
+
+        if (mStarKey == null) {
+            // clear all our notifications
+            Notifications.clearNotifications(mContext);
+
+            MyEmpire empire = EmpireManager.getInstance().getEmpire();
+
+            if (empire != null) {
+                // TODO: add an "empire updated" listener here!
+                empireName.setText(empire.getDisplayName());
+                empireIcon.setImageBitmap(empire.getShield(this));
+            }
+        } else {
+            StarManager.getInstance().requestStarSummary(mContext, mStarKey, new StarManager.StarSummaryFetchedHandler() {
+                @Override
+                public void onStarSummaryFetched(StarSummary s) {
+                    empireName.setText(s.getName());
+                    Sprite starSprite = StarImageManager.getInstance().getSprite(mContext, s, empireIcon.getWidth());
+                    empireIcon.setImageDrawable(new SpriteDrawable(starSprite));
+                }
+            });
+        }
+
+    }
+
+    private void refreshReportItems() {
         final ProgressBar progressBar = (ProgressBar) findViewById(R.id.progress_bar);
         final ListView reportItems = (ListView) findViewById(R.id.report_items);
 
@@ -194,6 +200,20 @@ public class SitrepActivity extends BaseActivity {
                 mSituationReportAdapter.setItems(items, mStarSummaries);
             }
         }.execute();
+    }
+
+    private void refresh() {
+        ServerGreeter.waitForHello(this, new ServerGreeter.HelloCompleteHandler() {
+            @Override
+            public void onHelloComplete(boolean success, ServerGreeting greeting) {
+                if (!success) {
+                    startActivity(new Intent(SitrepActivity.this, WarWorldsActivity.class));
+                } else {
+                    refreshReportItems();
+                    refreshTitle();
+                }
+            }
+        });
     }
 
     private class SituationReportAdapter extends BaseAdapter {

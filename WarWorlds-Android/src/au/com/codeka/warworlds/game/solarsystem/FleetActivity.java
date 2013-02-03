@@ -3,6 +3,7 @@ package au.com.codeka.warworlds.game.solarsystem;
 import java.util.List;
 import java.util.TreeMap;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.view.View;
@@ -10,6 +11,9 @@ import android.view.Window;
 import android.widget.FrameLayout;
 import au.com.codeka.warworlds.BaseActivity;
 import au.com.codeka.warworlds.R;
+import au.com.codeka.warworlds.ServerGreeter;
+import au.com.codeka.warworlds.ServerGreeter.ServerGreeting;
+import au.com.codeka.warworlds.WarWorldsActivity;
 import au.com.codeka.warworlds.ctrl.FleetList;
 import au.com.codeka.warworlds.game.FleetMergeDialog;
 import au.com.codeka.warworlds.game.FleetMoveDialog;
@@ -19,12 +23,9 @@ import au.com.codeka.warworlds.model.Fleet;
 import au.com.codeka.warworlds.model.Star;
 import au.com.codeka.warworlds.model.StarManager;
 
-public class FleetActivity extends BaseActivity {
+public class FleetActivity extends BaseActivity implements StarManager.StarFetchedHandler {
     private Star mStar;
     private FleetList mFleetList;
-
-    public FleetActivity() {
-    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -35,23 +36,6 @@ public class FleetActivity extends BaseActivity {
         FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT,
                                                                    FrameLayout.LayoutParams.MATCH_PARENT);
         addContentView(mFleetList, lp);
-
-        String starKey = getIntent().getExtras().getString("au.com.codeka.warworlds.StarKey");
-        StarManager.getInstance().requestStar(this, starKey, false, new StarManager.StarFetchedHandler() {
-            @Override
-            public void onStarFetched(Star s) {
-                mStar = s;
-
-                TreeMap<String, Star> stars = new TreeMap<String, Star>();
-                stars.put(mStar.getKey(), mStar);
-                mFleetList.refresh(mStar.getFleets(), stars);
-
-                String fleetKey = getIntent().getExtras().getString("au.com.codeka.warworlds.FleetKey");
-                if (fleetKey != null) {
-                    mFleetList.selectFleet(fleetKey);
-                }
-            }
-        });
 
         mFleetList.setOnFleetActionListener(new FleetList.OnFleetActionListener() {
             @Override
@@ -92,5 +76,44 @@ public class FleetActivity extends BaseActivity {
 
         // no "View" button, because it doesn't make sense here...
         mFleetList.findViewById(R.id.view_btn).setVisibility(View.GONE);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        ServerGreeter.waitForHello(this, new ServerGreeter.HelloCompleteHandler() {
+            
+            @Override
+            public void onHelloComplete(boolean success, ServerGreeting greeting) {
+                if (!success) {
+                    startActivity(new Intent(FleetActivity.this, WarWorldsActivity.class));
+                } else {
+                    String starKey = getIntent().getExtras().getString("au.com.codeka.warworlds.StarKey");
+                    StarManager.getInstance().requestStar(FleetActivity.this, starKey, false, FleetActivity.this);
+                    StarManager.getInstance().addStarUpdatedListener(starKey, FleetActivity.this);
+                }
+            }
+        });
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        StarManager.getInstance().removeStarUpdatedListener(this);
+    }
+
+    @Override
+    public void onStarFetched(Star s) {
+        mStar = s;
+
+        TreeMap<String, Star> stars = new TreeMap<String, Star>();
+        stars.put(mStar.getKey(), mStar);
+        mFleetList.refresh(mStar.getFleets(), stars);
+
+        String fleetKey = getIntent().getExtras().getString("au.com.codeka.warworlds.FleetKey");
+        if (fleetKey != null) {
+            mFleetList.selectFleet(fleetKey);
+        }
     }
 }

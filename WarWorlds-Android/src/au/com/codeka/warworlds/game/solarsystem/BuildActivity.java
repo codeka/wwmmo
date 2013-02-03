@@ -22,8 +22,10 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import au.com.codeka.TimeInHours;
 import au.com.codeka.warworlds.R;
+import au.com.codeka.warworlds.ServerGreeter;
 import au.com.codeka.warworlds.TabFragmentActivity;
 import au.com.codeka.warworlds.TabManager;
+import au.com.codeka.warworlds.ServerGreeter.ServerGreeting;
 import au.com.codeka.warworlds.ctrl.BuildQueueList;
 import au.com.codeka.warworlds.game.BuildAccelerateConfirmDialog;
 import au.com.codeka.warworlds.game.BuildStopConfirmDialog;
@@ -59,21 +61,25 @@ public class BuildActivity extends TabFragmentActivity implements StarManager.St
 
     @Override
     public void onResume() {
-        Bundle extras = this.getIntent().getExtras();
-        String starKey = extras.getString("au.com.codeka.warworlds.StarKey");
-        mColony = (Colony) extras.getParcelable("au.com.codeka.warworlds.Colony");
-
-        StarManager.getInstance().requestStar(mContext, starKey, false, this);
-        StarManager.getInstance().addStarUpdatedListener(starKey, this);
-
         super.onResume();
+
+        ServerGreeter.waitForHello(this, new ServerGreeter.HelloCompleteHandler() {
+            @Override
+            public void onHelloComplete(boolean success, ServerGreeting greeting) {
+                Bundle extras = getIntent().getExtras();
+                String starKey = extras.getString("au.com.codeka.warworlds.StarKey");
+                mColony = (Colony) extras.getParcelable("au.com.codeka.warworlds.Colony");
+
+                StarManager.getInstance().requestStar(mContext, starKey, false, BuildActivity.this);
+                StarManager.getInstance().addStarUpdatedListener(starKey, BuildActivity.this);
+            }
+        });
     }
 
     @Override
     public void onPause() {
-        StarManager.getInstance().removeStarUpdatedListener(this);
-
         super.onPause();
+        StarManager.getInstance().removeStarUpdatedListener(this);
     }
 
     /**

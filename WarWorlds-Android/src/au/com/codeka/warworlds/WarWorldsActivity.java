@@ -1,39 +1,25 @@
 
 package au.com.codeka.warworlds;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.StrictMode;
-import android.preference.PreferenceManager;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.TextView;
-import au.com.codeka.warworlds.api.ApiClient;
-import au.com.codeka.warworlds.api.ApiException;
 import au.com.codeka.warworlds.ctrl.TransparentWebView;
 import au.com.codeka.warworlds.game.starfield.StarfieldActivity;
-import au.com.codeka.warworlds.model.ChatManager;
 import au.com.codeka.warworlds.model.Colony;
-import au.com.codeka.warworlds.model.EmpireManager;
-import au.com.codeka.warworlds.model.MyEmpire;
 import au.com.codeka.warworlds.model.StarManager;
 import au.com.codeka.warworlds.model.StarSummary;
-import au.com.codeka.warworlds.model.protobuf.Messages;
-
-import com.google.android.gcm.GCMRegistrar;
 
 /**
  * Main activity. Displays the message of the day and lets you select "Start Game", "Options", etc.
@@ -43,47 +29,16 @@ public class WarWorldsActivity extends BaseActivity {
     private Context mContext = this;
     private Button mStartGameButton;
     private TextView mConnectionStatus;
-    private Handler mHandler;
-    private boolean mNeedHello;
-    private List<Colony> mColonies;
     private String mStarKey;
+    private HelloWatcher mHelloWatcher;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        log.info("WarWorlds activity starting...");
-
         super.onCreate(savedInstanceState);
-
-        Util.loadProperties(mContext);
-        Authenticator.configure(mContext);
-        PreferenceManager.setDefaultValues(this, R.xml.global_options, false);
-
-        GCMRegistrar.checkDevice(mContext);
-        GCMRegistrar.checkManifest(mContext);
-
-        if (Util.isDebug()) {
-            enableStrictMode();
-        }
-
-        mHandler = new Handler();
-
+        log.info("WarWorlds activity starting...");
         requestWindowFeature(Window.FEATURE_NO_TITLE); // remove the title bar
-        setHomeScreenContent();
-        mNeedHello = true;
-    }
 
-    @SuppressLint({ "NewApi" }) // StrictMode doesn't work on < 3.0
-    private void enableStrictMode() {
-        try {
-            StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
-                      .detectDiskReads()
-                      .detectDiskWrites()
-                      .detectNetwork()
-                      .penaltyLog()
-                      .build());
-        } catch(Exception e) {
-            // ignore errors
-        }
+        setHomeScreenContent();
     }
 
     @Override
@@ -95,21 +50,46 @@ public class WarWorldsActivity extends BaseActivity {
         if (prefs.getBoolean("WarmWelcome",  false) == false) {
             // if we've never done the warm-welcome, do it now
             log.info("Starting Warm Welcome");
-            mNeedHello = true;
             startActivity(new Intent(this, WarmWelcomeActivity.class));
             return;
         }
 
         if (prefs.getString("AccountName", null) == null) {
             log.info("No accountName saved, switching to AccountsActivity");
-            mNeedHello = true;
             startActivity(new Intent(this, AccountsActivity.class));
             return;
         }
 
-        if (mNeedHello) {
-            sayHello(0);
-            mNeedHello = false;
+        mStartGameButton.setEnabled(false);
+        mConnectionStatus.setText("Connecting...");
+
+        mHelloWatcher = new HelloWatcher();
+        ServerGreeter.addHelloWatcher(mHelloWatcher);
+
+        ServerGreeter.waitForHello(this, new ServerGreeter.HelloCompleteHandler() {
+            @Override
+            public void onHelloComplete(boolean success, ServerGreeter.ServerGreeting greeting) {
+                if (success) {
+                    TransparentWebView motdView = (TransparentWebView) findViewById(R.id.motd);
+
+                    mConnectionStatus.setText("Connected");
+                    motdView.loadHtml("html/skeleton.html", greeting.getMessageOfTheDay());
+                    findColony(greeting.getColonies());
+                }
+            }
+        });
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        ServerGreeter.removeHelloWatcher(mHelloWatcher);
+    }
+
+    private class HelloWatcher implements ServerGreeter.HelloWatcher {
+        @Override
+        public void onRetry(final int retries) {
+            mConnectionStatus.setText(String.format("Retrying (#%d)...", retries+1));
         }
     }
 
@@ -119,154 +99,13 @@ public class WarWorldsActivity extends BaseActivity {
      * 
      * @param motd The \c WebView we'll install the MOTD to.
      */
-    private void sayHello(final int retries) {
-        log.debug("Saying 'hello'...");
 
-        mStartGameButton.setEnabled(false);
-        if (retries == 0) {
-            mConnectionStatus.setText("Connecting...");
-        } else {
-            mConnectionStatus.setText(String.format("Retrying (#%d)...", retries+1));
-        }
-
-        // if we've saved off the authentication cookie, cool!
-        SharedPreferences prefs = Util.getSharedPreferences(mContext);
-        final String accountName = prefs.getString("AccountName", null);
-        if (accountName == null) {
-            // You're not logged in... how did we get this far anyway?
-            mNeedHello = true;
-            startActivity(new Intent(this, AccountsActivity.class));
-            return;
-        }
-
-        new AsyncTask<Void, Void, String>() {
-            private boolean mNeedsEmpireSetup;
-            private boolean mErrorOccured;
-            private boolean mNoAutoRetry;
-            private boolean mNeedsReAuthenticate;
-
-            @Override
-            protected String doInBackground(Void... arg0) {
-                // re-authenticate and get a new cookie
-                String authCookie = Authenticator.authenticate(WarWorldsActivity.this, accountName);
-                ApiClient.getCookies().clear();
-                ApiClient.getCookies().add(authCookie);
-                log.debug("Got auth cookie: "+authCookie);
-
-                // say hello to the server
-                String message;
-                try {
-                    String deviceRegistrationKey = DeviceRegistrar.getDeviceRegistrationKey(mContext);
-                    if (deviceRegistrationKey.length() == 0) {
-                        mNeedsReAuthenticate = true;
-                        mErrorOccured = true;
-                        message = "<p>Re-authentication needed...</p>";
-                        return message;
-                    }
-                    String url = "hello/"+deviceRegistrationKey;
-                    Messages.Hello hello = ApiClient.putProtoBuf(url, null, Messages.Hello.class);
-                    if (hello.hasEmpire()) {
-                        mNeedsEmpireSetup = false;
-                        EmpireManager.getInstance().setup(
-                                MyEmpire.fromProtocolBuffer(hello.getEmpire()));
-                    } else {
-                        mNeedsEmpireSetup = true;
-                    }
-
-                    if (hello.hasRequireGcmRegister() && hello.getRequireGcmRegister()) {
-                        log.info("Re-registering for GCM...");
-                        GCMIntentService.register(WarWorldsActivity.this);
-                        // we can keep going, though...
-                    }
-
-                    ChatManager.getInstance().setup();
-
-                    mColonies = new ArrayList<Colony>();
-                    for (Messages.Colony c : hello.getColoniesList()) {
-                        if (c.getPopulation() < 1.0) {
-                            continue;
-                        }
-                        mColonies.add(Colony.fromProtocolBuffer(c));
-                    }
-
-                    message = hello.getMotd().getMessage();
-                    mErrorOccured = false;
-                } catch(ApiException e) {
-                    log.error("Error occurred in 'hello'", e);
-
-                    if (e.getHttpStatusLine() == null) {
-                        // if there's no status line, it likely means we were unable to connect
-                        // (i.e. a network error) just keep retrying until it works.
-                        message = "<p class=\"error\">An error occured talking to the server, check " +
-                                "data connection.</p>";
-                        mErrorOccured = true;
-                        mNeedsReAuthenticate = false;
-                    } else {
-                        // an HTTP error is likely because our credentials are out of date, we'll
-                        // want to re-authenticate ourselves.
-                        message = "<p class=\"error\">Authentication failed.</p>";
-                        mErrorOccured = true;
-                        mNeedsReAuthenticate = true;
-                    }
-                }
-
-                return message;
-            }
-
-            @Override
-            protected void onPostExecute(String result) {
-                final TransparentWebView motdView = (TransparentWebView) findViewById(R.id.motd);
-
-                mConnectionStatus.setText("Connected");
-                if (mNeedsEmpireSetup) {
-                    mNeedHello = true;
-                    startActivity(new Intent(mContext, EmpireSetupActivity.class));
-                    return;
-                } else if (!mErrorOccured) {
-                    Util.setup(mContext);
-
-                    // make sure we're correctly registered as online.
-                    BackgroundDetector.getInstance().onBackgroundStatusChange(WarWorldsActivity.this);
-
-                    motdView.loadHtml("html/skeleton.html", result);
-                    findColony();
-                } else /* mErrorOccured */ {
-                    mConnectionStatus.setText("Connection Failed");
-                    mStartGameButton.setEnabled(false);
-                    motdView.loadHtml("html/skeleton.html", result);
-
-                    if (mNeedsReAuthenticate) {
-                        // if we need to re-authenticate, first forget the current credentials
-                        // the switch to the AccountsActivity.
-                        final SharedPreferences prefs = Util.getSharedPreferences(mContext);
-                        SharedPreferences.Editor editor = prefs.edit();
-                        editor.remove("AccountName");
-                        editor.commit();
-
-                        // we'll need to say hello the next time we come back to this activity
-                        mNeedHello = true;
-
-                        startActivity(new Intent(mContext, AccountsActivity.class));
-                    } else if (!mNoAutoRetry) {
-                        // otherwise, just try again
-                        mHandler.postDelayed(new Runnable() {
-                            @Override
-                            public void run() {
-                                sayHello(retries+1);
-                            }
-                        }, 3000);
-                    }
-                }
-            }
-        }.execute();
-    }
-
-    private void findColony() {
+    private void findColony(List<Colony> colonies) {
         // we'll want to start off near one of your stars. If you
         // only have one, that's easy -- but if you've got lots
         // what then?
         mStarKey = null;
-        for (Colony c : mColonies) {
+        for (Colony c : colonies) {
             mStarKey = c.getStarKey();
         }
 
@@ -310,7 +149,6 @@ public class WarWorldsActivity extends BaseActivity {
 
         logOutButton.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
-                mNeedHello = true;
                 startActivity(new Intent(mContext, AccountsActivity.class));
             }
         });

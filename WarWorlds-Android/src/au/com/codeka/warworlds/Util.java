@@ -42,6 +42,7 @@ public class Util {
             return false;
         }
 
+        Authenticator.configure(context);
         SpriteManager.getInstance().setup(context);
         BuildingDesignManager.getInstance().setup(context);
         ShipDesignManager.getInstance().setup(context);

@@ -17,7 +17,10 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 import au.com.codeka.warworlds.R;
+import au.com.codeka.warworlds.ServerGreeter;
 import au.com.codeka.warworlds.TabFragmentActivity;
+import au.com.codeka.warworlds.ServerGreeter.ServerGreeting;
+import au.com.codeka.warworlds.WarWorldsActivity;
 import au.com.codeka.warworlds.ctrl.BuildQueueList;
 import au.com.codeka.warworlds.ctrl.ColonyList;
 import au.com.codeka.warworlds.ctrl.FleetList;
@@ -91,12 +94,22 @@ public class EmpireActivity extends TabFragmentActivity {
     }
 
     public void refresh() {
-        EmpireManager.getInstance().getEmpire().refreshAllDetails(new MyEmpire.RefreshAllCompleteHandler() {
+        ServerGreeter.waitForHello(this, new ServerGreeter.HelloCompleteHandler() {
             @Override
-            public void onRefreshAllComplete(MyEmpire empire) {
-                sCurrentEmpire = empire;
-                getTabManager().reloadTab();
-                mFirstRefresh = false;
+            public void onHelloComplete(boolean success, ServerGreeting greeting) {
+                if (!success) {
+                    startActivity(new Intent(mContext, WarWorldsActivity.class));
+                    return;
+                }
+
+                EmpireManager.getInstance().getEmpire().refreshAllDetails(new MyEmpire.RefreshAllCompleteHandler() {
+                    @Override
+                    public void onRefreshAllComplete(MyEmpire empire) {
+                        sCurrentEmpire = empire;
+                        getTabManager().reloadTab();
+                        mFirstRefresh = false;
+                    }
+                });
             }
         });
     }
