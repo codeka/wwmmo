@@ -158,6 +158,27 @@ public class StarfieldActivity extends BaseActivity implements StarfieldSurfaceV
                 startActivityForResult(intent, SOLAR_SYSTEM_REQUEST);
             }
         });
+
+        ServerGreeter.waitForHello(this, new ServerGreeter.HelloCompleteHandler() {
+            @Override
+            public void onHelloComplete(boolean success, ServerGreeting greeting) {
+                Bundle extras = getIntent().getExtras();
+                if (extras != null) {
+                    String starKey = extras.getString("au.com.codeka.warworlds.StarKey");
+                    if (starKey != null) {
+                        StarManager.getInstance().requestStarSummary(StarfieldActivity.this, starKey,
+                                new StarManager.StarSummaryFetchedHandler() {
+                            @Override
+                            public void onStarSummaryFetched(StarSummary s) {
+                                mStarfield.scrollTo(s.getSectorX(), s.getSectorY(),
+                                                    s.getOffsetX(), s.getOffsetY(),
+                                                    true);
+                            }
+                        });
+                    }
+                }
+            }
+        });
     }
 
     public void openEmpireActivityAtFleet(Star star, Fleet fleet) {
@@ -245,19 +266,6 @@ public class StarfieldActivity extends BaseActivity implements StarfieldSurfaceV
             public void onHelloComplete(boolean success, ServerGreeting greeting) {
                 Bundle extras = getIntent().getExtras();
                 if (extras != null) {
-                    String starKey = extras.getString("au.com.codeka.warworlds.StarKey");
-                    if (starKey != null) {
-                        StarManager.getInstance().requestStarSummary(StarfieldActivity.this, starKey,
-                                new StarManager.StarSummaryFetchedHandler() {
-                            @Override
-                            public void onStarSummaryFetched(StarSummary s) {
-                                mStarfield.scrollTo(s.getSectorX(), s.getSectorY(),
-                                                    s.getOffsetX(), s.getOffsetY(),
-                                                    true);
-                            }
-                        });
-                    }
-
                     if (mIsFirstRefresh) {
                         boolean showSituationReport = extras.getBoolean("au.com.codeka.warworlds.ShowSituationReport", false);
                         if (showSituationReport) {
