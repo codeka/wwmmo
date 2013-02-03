@@ -4,13 +4,12 @@ import java.util.Random;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.content.res.Resources;
-import android.graphics.Bitmap;
 import android.graphics.Canvas;
-import android.graphics.drawable.BitmapDrawable;
+import android.graphics.ColorFilter;
+import android.graphics.PixelFormat;
+import android.graphics.drawable.Drawable;
 import android.util.DisplayMetrics;
 import android.view.Display;
-
 import android.view.View;
 import android.view.WindowManager;
 import au.com.codeka.warworlds.game.StarfieldBackgroundRenderer;
@@ -30,27 +29,61 @@ public class ActivityBackgroundGenerator {
         android.util.DisplayMetrics metrics = new DisplayMetrics();
         display.getMetrics(metrics);
 
-        int width = metrics.widthPixels;
-        int height = metrics.heightPixels;
-
-        Bitmap bmp = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-        Canvas canvas = new Canvas(bmp);
-
         StarfieldBackgroundRenderer renderer = new StarfieldBackgroundRenderer(view.getContext(),
                 new long[] {new Random().nextLong()});
-        renderer.drawBackground(canvas, 0.0f, 0.0f, width, height);
-
-        setBackground(view, bmp);
+        BackgroundDrawable drawable = new BackgroundDrawable(renderer, metrics.heightPixels);
+        setBackground(view, drawable);
     }
 
     @SuppressLint("NewApi")
     @SuppressWarnings("deprecation")
-    private static void setBackground(View view, Bitmap bmp) {
+    private static void setBackground(View view, BackgroundDrawable drawable) {
         int sdk = android.os.Build.VERSION.SDK_INT;
         if (sdk < android.os.Build.VERSION_CODES.JELLY_BEAN) {
-            view.setBackgroundDrawable(new BitmapDrawable(Resources.getSystem(), bmp));
+            view.setBackgroundDrawable(drawable);
         } else {
-            view.setBackground(new BitmapDrawable(Resources.getSystem(), bmp));
+            view.setBackground(drawable);
+        }
+    }
+
+    public static class BackgroundDrawable extends Drawable {
+        private StarfieldBackgroundRenderer mRenderer;
+        private int mBaseSize;
+
+        public BackgroundDrawable(StarfieldBackgroundRenderer renderer, int deviceHeight) {
+            mRenderer = renderer;
+            mBaseSize = 1024;
+            if (deviceHeight > mBaseSize) {
+                mBaseSize = deviceHeight;
+            }
+        }
+
+        @Override
+        public void draw(Canvas canvas) {
+            mRenderer.drawBackground(canvas, 0, 0, mBaseSize, mBaseSize);
+        }
+
+        @Override
+        public int getIntrinsicWidth() {
+            return mBaseSize;
+        }
+
+        @Override
+        public int getIntrinsicHeight() {
+            return mBaseSize;
+        }
+
+        @Override
+        public int getOpacity() {
+            return PixelFormat.TRANSLUCENT;
+        }
+
+        @Override
+        public void setAlpha(int alpha) {
+        }
+
+        @Override
+        public void setColorFilter(ColorFilter cf) {
         }
     }
 }

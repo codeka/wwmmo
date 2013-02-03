@@ -51,6 +51,10 @@ public class StarfieldBackgroundRenderer {
         initialize(context);
     }
 
+    public Bitmap getPreRenderer() {
+        return mPreRendered;
+    }
+
     public void drawBackground(Canvas canvas, float left, float top, float right, float bottom) {
         if (mPreRendered != null) {
             Rect src = new Rect(0, 0, 512, 512);
