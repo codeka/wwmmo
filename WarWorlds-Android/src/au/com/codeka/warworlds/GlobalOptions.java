@@ -56,6 +56,16 @@ public class GlobalOptions {
         return StarfieldDetail.STARS_AND_GAS;
     }
 
+    public void setStarfieldDetail(StarfieldDetail detail) {
+        if (getStarfieldDetail().equals(detail)) {
+            return;
+        }
+
+        mPreferences.edit()
+                    .putString("GlobalOptions.StarfieldDetail", detail.toString())
+                    .commit();
+    }
+
     public boolean uniqueStarsAndPlanets() {
         return mPreferences.getBoolean("GlobalOptions.GenUniqueStarsAndPlanets", false);
     }

@@ -1,14 +1,19 @@
 
 package au.com.codeka.warworlds;
 
+import java.text.DecimalFormat;
 import java.util.List;
+import java.util.Locale;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager.NameNotFoundException;
 import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -72,7 +77,24 @@ public class WarWorldsActivity extends BaseActivity {
                 if (success) {
                     TransparentWebView motdView = (TransparentWebView) findViewById(R.id.motd);
 
-                    mConnectionStatus.setText("Connected");
+                    // we'll display a bit of debugging info along with the 'connected' message
+                    long maxMemoryBytes = Runtime.getRuntime().maxMemory();
+                    int memoryClass = ((ActivityManager) getSystemService(ACTIVITY_SERVICE)).getMemoryClass();
+                    PackageInfo packageInfo = null;
+                    try {
+                        packageInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
+                    } catch (NameNotFoundException e) {
+                    }
+
+                    DecimalFormat formatter = new DecimalFormat("#,##0");
+                    String msg = String.format(Locale.ENGLISH,
+                                               "Connected\r\nMemory Class: %d - Max bytes: %s\r\nVersion: %s%s",
+                                               memoryClass,
+                                               formatter.format(maxMemoryBytes),
+                                               packageInfo == null ? "Unknown" : packageInfo.versionName,
+                                               Util.isDebug() ? " (debug)" : " (rel)");
+                    mConnectionStatus.setText(msg);
+
                     motdView.loadHtml("html/skeleton.html", greeting.getMessageOfTheDay());
                     findColony(greeting.getColonies());
                 }

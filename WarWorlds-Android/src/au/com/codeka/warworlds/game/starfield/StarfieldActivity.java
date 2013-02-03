@@ -264,7 +264,7 @@ public class StarfieldActivity extends BaseActivity implements StarfieldSurfaceV
                             Intent intent = new Intent(mContext, SitrepActivity.class);
                             startActivity(intent);
                         }
-    
+
                         mIsFirstRefresh = false;
                     }
                 }

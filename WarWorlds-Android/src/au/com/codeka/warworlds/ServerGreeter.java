@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import com.google.android.gcm.GCMRegistrar;
 
 import android.annotation.SuppressLint;
+import android.app.ActivityManager;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
@@ -96,6 +97,13 @@ public class ServerGreeter {
 
         Authenticator.configure(activity);
         PreferenceManager.setDefaultValues(activity, R.xml.global_options, false);
+
+        int memoryClass = ((ActivityManager) activity.getSystemService(BaseActivity.ACTIVITY_SERVICE)).getMemoryClass();
+        if (memoryClass < 40) {
+            // on low memory devices, we want to make sure the background detail is always BLACK
+            // this is a bit of a hack, but should stop the worst of the memory issues (I hope!)
+            new GlobalOptions(activity).setStarfieldDetail(GlobalOptions.StarfieldDetail.BLACK);
+        }
 
         // if we've saved off the authentication cookie, cool!
         SharedPreferences prefs = Util.getSharedPreferences(activity);
