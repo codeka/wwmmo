@@ -844,6 +844,40 @@ def scheduleBuildCheck(sim=None, force_reschedule=False):
                  time_dt, existing_dt))
 
 
+def scheduleMoveCheck():
+  time = None
+  query = mdl.Fleet.all().filter("eta >", 0).order("eta").fetch(1)
+  for fleet in query:
+    # The first one we fetch (because of the ordering) will be the next one. So we'll schedule
+    # the build-check to run 1 second later (if there's a bunch scheduled at the same time,
+    # it's more efficient that way...)
+    time = fleet.eta + timedelta(seconds=1)
+
+  if not time:
+    return
+  if time < datetime(2000, 1, 1):
+    return
+  if time < datetime.now():
+    time = datetime.now() + timedelta(seconds=1)
+
+  mc = memcache.Client()
+  time_dt = ctrl.dateTimeToEpoch(time)
+  existing_dt = mc.get("move-check")
+  now_dt = ctrl.dateTimeToEpoch(datetime.now())
+  if (not existing_dt or time_dt < existing_dt
+      or existing_dt <= now_dt):
+    logging.info("Scheduling next move-check at %s" % (time))
+    taskqueue.add(queue_name="fleet",
+                  url="/tasks/empire/move-check?auto=1",
+                  method="GET",
+                  eta=time)
+    mc.set("move-check", time_dt)
+  else:
+    logging.info("(this_dt=%d, existing_dt=%d) - not scheduling move-check, another is already queued." % (
+                 time_dt, existing_dt))
+
+
+
 def getFleetsForEmpire(empire_pb):
   cache_key = "fleet:for-empire:%s" % empire_pb.key
   values = ctrl.getCached([cache_key], pb.Fleets)
@@ -937,10 +971,7 @@ def _orderFleet_move(star_pb, fleet_pb, order_pb):
   time = datetime.now() + timedelta(hours=(distance_in_pc / design.speed))
   logging.info("distance=%.2f pc, speed=%.2f pc/hr, cost=%.2f, fleet will reach it's destination at %s"
                % (distance_in_pc, design.speed, fuel_cost, time))
-  taskqueue.add(queue_name="fleet",
-                url="/tasks/empire/fleet/"+fleet_pb.key+"/move-complete",
-                method="GET",
-                eta=time)
+  fleet_pb.eta = ctrl.dateTimeToEpoch(time)
 
   return True
 

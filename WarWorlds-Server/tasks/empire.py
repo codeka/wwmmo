@@ -249,97 +249,130 @@ class StarSimulatePage(tasks.TaskPage):
     self.response.write("Success!")
 
 
+class FleetMoveCheckPage(tasks.TaskPage):
+  def get(self):
+    def _fetchOperationInTX(fleet_key):
+      """This is done in a transaction to make sure only one request processes the build."""
+      fleet_model = mdl.Fleet.get(fleet_key)
+      if not fleet_model or not fleet_model.eta:
+        return None
+      fleet_model.eta = None
+      fleet_model.put()
+      return fleet_model
+
+    complete_time = datetime.now() + timedelta(seconds=10)
+
+    # Fetch the keys outside of the transaction, cause we can't do that in a TX
+    fleet_keys = []
+    query = mdl.Fleet.all().filter("eta <", complete_time)
+    for fleet_model in query:
+      fleet_keys.append(fleet_model.key())
+    for fleet_key in fleet_keys:
+      fleet_model = db.run_in_transaction(_fetchOperationInTX, fleet_key)
+      if not fleet_model:
+        continue
+      _on_move_complete(fleet_key)
+
+    ctl.scheduleMoveCheck()
+
+
 class FleetMoveCompletePage(tasks.TaskPage):
   """Called when a fleet completes it's move operation.
 
   We need to transfer the fleet so that it's orbiting the new star."""
   def get(self, fleet_key):
-    fleet_mdl = mdl.Fleet.get(fleet_key)
-    if not fleet_mdl or fleet_mdl.state != pb.Fleet.MOVING:
-      logging.warn("Fleet [%s] is not moving, as expected." % (fleet_key))
+    if not _on_move_complete(fleet_key):
       self.response.set_status(400)
+
+
+def _on_move_complete(fleet_key):
+  fleet_mdl = mdl.Fleet.get(fleet_key)
+  if not fleet_mdl or fleet_mdl.state != pb.Fleet.MOVING:
+    logging.warn("Fleet [%s] is not moving, as expected." % (fleet_key))
+    return False
+  else:
+    new_star_key = str(mdl.Fleet.destinationStar.get_value_for_datastore(fleet_mdl))
+    sim = simulation_ctl.Simulation()
+    sim.simulate(new_star_key)
+    new_star_pb = sim.getStar(new_star_key)
+
+    if str(fleet_mdl.key().parent()) == new_star_key:
+      old_star_pb = new_star_pb
     else:
-      new_star_key = str(mdl.Fleet.destinationStar.get_value_for_datastore(fleet_mdl))
-      sim = simulation_ctl.Simulation()
-      sim.simulate(new_star_key)
-      new_star_pb = sim.getStar(new_star_key)
+      old_star_pb = sim.getStar(fleet_mdl.key().parent(), True)
 
-      if str(fleet_mdl.key().parent()) == new_star_key:
-        old_star_pb = new_star_pb
-      else:
-        old_star_pb = sim.getStar(fleet_mdl.key().parent(), True)
+    empire_key = mdl.Fleet.empire.get_value_for_datastore(fleet_mdl)
 
-      empire_key = mdl.Fleet.empire.get_value_for_datastore(fleet_mdl)
+    new_fleet_mdl = mdl.Fleet(parent=fleet_mdl.destinationStar)
+    new_fleet_mdl.sector = sector_mdl.SectorManager.getSectorKey(new_star_pb.sector_x,
+                                                                 new_star_pb.sector_y)
+    new_fleet_mdl.empire = empire_key
+    new_fleet_mdl.designName = fleet_mdl.designName
+    new_fleet_mdl.numShips = fleet_mdl.numShips
+    new_fleet_mdl.stance = fleet_mdl.stance
 
-      new_fleet_mdl = mdl.Fleet(parent=fleet_mdl.destinationStar)
-      new_fleet_mdl.sector = sector_mdl.SectorManager.getSectorKey(new_star_pb.sector_x,
-                                                                   new_star_pb.sector_y)
-      new_fleet_mdl.empire = empire_key
-      new_fleet_mdl.designName = fleet_mdl.designName
-      new_fleet_mdl.numShips = fleet_mdl.numShips
-      new_fleet_mdl.stance = fleet_mdl.stance
+    # new fleet is now idle
+    new_fleet_mdl.state = pb.Fleet.IDLE
+    new_fleet_mdl.stateStartTime = datetime.now() - timedelta(seconds=1)
 
-      # new fleet is now idle
-      new_fleet_mdl.state = pb.Fleet.IDLE
-      new_fleet_mdl.stateStartTime = datetime.now() - timedelta(seconds=1)
+    empire = fleet_mdl.empire
+    fleet_mdl.delete()
+    new_fleet_mdl.put()
 
-      empire = fleet_mdl.empire
-      fleet_mdl.delete()
-      new_fleet_mdl.put()
+    ctrl.clearCached(["fleet:for-empire:%s" % (empire.key()),
+                      "star:%s" % (old_star_pb.key),
+                      "star:%s" % (new_star_key),
+                      "sector:%d,%d" % (new_star_pb.sector_x, new_star_pb.sector_y),
+                      "sector:%d,%d" % (old_star_pb.sector_x, old_star_pb.sector_y)])
 
-      ctrl.clearCached(["fleet:for-empire:%s" % (empire.key()),
-                        "star:%s" % (old_star_pb.key),
-                        "star:%s" % (new_star_key),
-                        "sector:%d,%d" % (new_star_pb.sector_x, new_star_pb.sector_y),
-                        "sector:%d,%d" % (old_star_pb.sector_x, old_star_pb.sector_y)])
+    # manually add the fleet to the new star's PB
+    new_fleet_pb = new_star_pb.fleets.add()
+    ctrl.fleetModelToPb(new_fleet_pb, new_fleet_mdl)
+    new_fleet_key = new_fleet_pb.key
 
-      # manually add the fleet to the new star's PB
-      new_fleet_pb = new_star_pb.fleets.add()
-      ctrl.fleetModelToPb(new_fleet_pb, new_fleet_mdl)
-      new_fleet_key = new_fleet_pb.key
+    # manually remove the fleet from the old star's PB
+    for n,fleet_pb in enumerate(old_star_pb.fleets):
+      if fleet_pb.key == fleet_key:
+        del old_star_pb.fleets[n]
+        break
 
-      # manually remove the fleet from the old star's PB
-      for n,fleet_pb in enumerate(old_star_pb.fleets):
-        if fleet_pb.key == fleet_key:
-          del old_star_pb.fleets[n]
-          break
+    sim.onFleetArrived(new_fleet_key, new_star_pb.key)
+    sim.simulate(new_star_pb.key)
+    if new_star_pb.key != old_star_pb.key:
+      sim.simulate(old_star_pb.key)
+    sim.update()
 
-      sim.onFleetArrived(new_fleet_key, new_star_pb.key)
-      sim.simulate(new_star_pb.key)
-      if new_star_pb.key != old_star_pb.key:
-        sim.simulate(old_star_pb.key)
-      sim.update()
+    # Save a sitrep for this situation
+    sitrep_pb = pb.SituationReport()
+    sitrep_pb.empire_key = str(empire_key)
+    sitrep_pb.report_time = ctrl.dateTimeToEpoch(sim.now)
+    sitrep_pb.star_key = new_star_pb.key
+    sitrep_pb.planet_index = -1
+    sitrep_pb.move_complete_record.fleet_key = new_fleet_pb.key
+    sitrep_pb.move_complete_record.fleet_design_id = new_fleet_pb.design_name
+    sitrep_pb.move_complete_record.num_ships = new_fleet_pb.num_ships
+    for scout_report_pb in sim.scout_report_pbs:
+      sitrep_pb.move_complete_record.scout_report_key = scout_report_pb.key
 
-      # Save a sitrep for this situation
-      sitrep_pb = pb.SituationReport()
-      sitrep_pb.empire_key = str(empire_key)
-      sitrep_pb.report_time = ctrl.dateTimeToEpoch(sim.now)
-      sitrep_pb.star_key = new_star_pb.key
-      sitrep_pb.planet_index = -1
-      sitrep_pb.move_complete_record.fleet_key = new_fleet_pb.key
-      sitrep_pb.move_complete_record.fleet_design_id = new_fleet_pb.design_name
-      sitrep_pb.move_complete_record.num_ships = new_fleet_pb.num_ships
-      for scout_report_pb in sim.scout_report_pbs:
-        sitrep_pb.move_complete_record.scout_report_key = scout_report_pb.key
+    combat_report_pb = sim.getCombatReport(new_star_pb.key)
+    if combat_report_pb and combat_report_pb.rounds:
+      # if there's a combat report it means we also entered a battle (possibly), so we might
+      # have to update the sit.rep. to cover that. We might also have to generate a sit.rep.
+      # for any other empires that are already here...
+      round_1 = combat_report_pb.rounds[0]
+      for combat_fleet_pb in round_1.fleets:
+        if combat_fleet_pb.fleet_key == new_fleet_pb.key:
+          sitrep_pb.fleet_under_attack_record.fleet_key = new_fleet_pb.key
+          sitrep_pb.fleet_under_attack_record.fleet_design_id = new_fleet_pb.design_name
+          sitrep_pb.fleet_under_attack_record.num_ships = new_fleet_pb.num_ships
+          sitrep_pb.fleet_under_attack_record.combat_report_key = combat_report_pb.key
 
-      combat_report_pb = sim.getCombatReport(new_star_pb.key)
-      if combat_report_pb and combat_report_pb.rounds:
-        # if there's a combat report it means we also entered a battle (possibly), so we might
-        # have to update the sit.rep. to cover that. We might also have to generate a sit.rep.
-        # for any other empires that are already here...
-        round_1 = combat_report_pb.rounds[0]
-        for combat_fleet_pb in round_1.fleets:
-          if combat_fleet_pb.fleet_key == new_fleet_pb.key:
-            sitrep_pb.fleet_under_attack_record.fleet_key = new_fleet_pb.key
-            sitrep_pb.fleet_under_attack_record.fleet_design_id = new_fleet_pb.design_name
-            sitrep_pb.fleet_under_attack_record.num_ships = new_fleet_pb.num_ships
-            sitrep_pb.fleet_under_attack_record.combat_report_key = combat_report_pb.key
-
-      ctl.saveSituationReport(sitrep_pb)
+    ctl.saveSituationReport(sitrep_pb)
 
 
 app = webapp.WSGIApplication([("/tasks/empire/build-check", BuildCheckPage),
                               ("/tasks/empire/star-simulate", StarSimulatePage),
+                              ("/tasks/empire/move-check", FleetMoveCheckPage),
                               ("/tasks/empire/fleet/([^/]+)/move-complete", FleetMoveCompletePage)],
                              debug=os.environ["SERVER_SOFTWARE"].startswith("Development"))
 

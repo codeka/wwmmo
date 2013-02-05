@@ -564,6 +564,9 @@ message Fleet
     // it's mostly useless on the client (used for some housekeeping on the
     // server)
     optional int64 last_victory = 13;
+
+    // for moving fleets, this is the time we expect it to arrive
+    optional int64 eta = 15;
 }
 
 

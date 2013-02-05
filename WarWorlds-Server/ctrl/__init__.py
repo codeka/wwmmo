@@ -268,6 +268,8 @@ def fleetModelToPb(fleet_pb, fleet_model):
     fleet_pb.stance = pb.Fleet.AGGRESSIVE
   if fleet_model.lastVictory:
     fleet_pb.last_victory = dateTimeToEpoch(fleet_model.lastVictory)
+  if fleet_model.eta:
+    fleet_pb.eta = dateTimeToEpoch(fleet_model.eta)
 
 
 def fleetPbToModel(fleet_model, fleet_pb):
@@ -298,6 +300,10 @@ def fleetPbToModel(fleet_model, fleet_pb):
   else:
     fleet_model.lastVictory = None
   fleet_model.numShips = float(fleet_pb.num_ships)
+  if fleet_pb.eta:
+    fleet_model.eta = epochToDateTime(fleet_pb.eta)
+  else:
+    fleet_model.eta = None
 
 
 def scoutReportModelToPb(scout_report_pb, scout_report_mdl):

@@ -160,6 +160,7 @@ class Fleet(db.Model):
   stance = db.IntegerProperty()
   timeDestroyed = db.DateTimeProperty()
   lastVictory = db.DateTimeProperty()
+  eta = db.DateTimeProperty()
 
   @staticmethod
   def getForStar(star_model):

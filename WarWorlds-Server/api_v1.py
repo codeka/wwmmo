@@ -121,7 +121,11 @@ class HelloPage(ApiPage):
       hello_pb.motd.last_update = ""
 
     if device_mdl:
-      hello_pb.require_gcm_register = (device_mdl.gcmRegistrationID == "")
+      if not device_mdl.gcmRegistrationID:
+        logging.info("This user will require GCM re-registration.")
+        hello_pb.require_gcm_register = True
+      else:
+        hello_pb.require_gcm_register = False
 
     if empire_pb is not None:
       hello_pb.empire.MergeFrom(empire_pb)
@@ -312,6 +316,9 @@ class DevicesPage(ApiPage):
       device_registration_mdl = model.DeviceRegistration.get(key)
       device_registration_mdl.gcmRegistrationID = device_registration_pb.gcm_registration_id
       device_registration_mdl.put()
+      logging.info("Updated device (ID=%s) with GCM registration (%s)" % (
+                   device_registration_mdl.deviceID,
+                   device_registration_mdl.gcmRegistrationID))
 
 
 class DeviceMessagesPage(ApiPage):
