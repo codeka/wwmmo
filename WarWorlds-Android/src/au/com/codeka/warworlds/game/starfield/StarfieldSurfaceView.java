@@ -512,26 +512,8 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
      * sector.
      */
     private static Point2D getSectorOffset(DrawState state, long sx, long sy) {
-        SectorManager sm = SectorManager.getInstance();
-
-        for(int y = -sRadius; y <= sRadius; y++) {
-            for(int x = -sRadius; x <= sRadius; x++) {
-                long sectorX = state.sectorX + x;
-                long sectorY = state.sectorY + y;
-
-                Sector sector = sm.getSector(sectorX, sectorY);
-                if (sector == null) {
-                    continue; // it might not be loaded yet...
-                }
-
-                if (sector.getX() == sx && sector.getY() == sy) {
-                    return new Point2D((x * SectorManager.SECTOR_SIZE) + state.offsetX,
-                                       (y * SectorManager.SECTOR_SIZE) + state.offsetY);
-                }
-            }
-        }
-
-        return null;
+        return new Point2D((sx * SectorManager.SECTOR_SIZE) + state.offsetX,
+                           (sy * SectorManager.SECTOR_SIZE) + state.offsetY);
     }
 
     /**

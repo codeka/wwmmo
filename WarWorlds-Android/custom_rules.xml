@@ -29,6 +29,13 @@
                        flags="gm"
                        replace="server.default=prod" />
 
+	<!-- make sure on_behalf_of is commented out -->
+	<replaceregexp file="assets/warworlds.properties"
+	               match="^user.on_behalf_of=.*$"
+	               flags="gm"
+	               replace="#user.on_behalf_of=nobody" />
+
+	<!-- update the version number -->
         <replaceregexp file="AndroidManifest.xml"
                        match="android:versionCode=&quot;(.*)&quot;"
                        flags="g"
