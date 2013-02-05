@@ -23,7 +23,11 @@ import ctrl
 from protobufs import protobuf_json, messages_pb2 as pb
 from google.protobuf import message
 
+ADMINISTRATORS = ["dean@codeka.com.au"]
 
+IMPERSONATORS = ["dean@codeka.com.au",
+                 "warworldstest1@gmail.com",
+                 "warworldstest2@gmail.com"]
 
 class ApiPage(webapp.RequestHandler):
   """This is the base class for pages in the API section."""
@@ -39,14 +43,17 @@ class ApiPage(webapp.RequestHandler):
 
     # the admin user can beform requests on behalf of anyone
     self.user = self.real_user
-    if self._isAdmin() and self.request.get("on_behalf_of") != "":
+    if self._canImpersonate() and self.request.get("on_behalf_of") != "":
       self.user = users.User(self.request.get("on_behalf_of"))
 
     return super(ApiPage, self).dispatch()
 
   def _isAdmin(self):
     # TODO: better version of "isAdmin!"
-    return self.real_user.email() == "dean@codeka.com.au"
+    return self.real_user.email() in ADMINISTRATORS
+
+  def _canImpersonate(self):
+    return self.real_user.email() in IMPERSONATORS
 
   def _getRequestBody(self, ProtoBuffClass):
     """Gets the body of the request as a protocol buffer.

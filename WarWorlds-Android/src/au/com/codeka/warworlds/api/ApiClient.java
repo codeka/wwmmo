@@ -42,6 +42,10 @@ public class ApiClient {
         RequestManager.configure(baseUri);
     }
 
+    public static void impersonate(String user) {
+        RequestManager.impersonate(user);
+    }
+
     public static URI getBaseUri() {
         return RequestManager.getBaseUri();
     }

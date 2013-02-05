@@ -90,6 +90,11 @@ public class Util {
             // !!!
         }
 
+        String impersonateUser = sProperties.getProperty("user.on_behalf_of", null);
+        if (impersonateUser != null) {
+            ApiClient.impersonate(impersonateUser);
+        }
+
         return sProperties;
     }
 

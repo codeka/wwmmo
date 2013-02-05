@@ -38,6 +38,7 @@ public class RequestManager {
             new ArrayList<ResponseReceivedHandler>();
     private static List<RequestManagerStateChangedHandler> sRequestManagerStateChangedHandlers =
             new ArrayList<RequestManagerStateChangedHandler>();
+    private static String sImpersonateUser;
 
     private static boolean sVerboseLog = true;
 
@@ -54,6 +55,10 @@ public class RequestManager {
         sBaseUri = baseUri;
 
         log.info("Configured to use base URI: {}", baseUri);
+    }
+
+    public static void impersonate(String user) {
+        sImpersonateUser = user;
     }
 
     public static URI getBaseUri() {
@@ -118,6 +123,14 @@ public class RequestManager {
                 String requestUrl = uri.getPath();
                 if (uri.getQuery() != null && uri.getQuery() != "") {
                     requestUrl += "?"+uri.getQuery();
+                }
+                if (sImpersonateUser != null) {
+                    if (requestUrl.indexOf("?") > 0) {
+                        requestUrl += "&";
+                    } else {
+                        requestUrl += "?";
+                    }
+                    requestUrl += "on_behalf_of="+sImpersonateUser;
                 }
                 if (sVerboseLog) {
                     log.debug("requestUrl = "+requestUrl);
