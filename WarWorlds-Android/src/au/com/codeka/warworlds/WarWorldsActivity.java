@@ -127,6 +127,9 @@ public class WarWorldsActivity extends BaseActivity {
         // only have one, that's easy -- but if you've got lots
         // what then?
         mStarKey = null;
+        if (colonies == null) {
+            return;
+        }
         for (Colony c : colonies) {
             mStarKey = c.getStarKey();
         }
