@@ -1,54 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
 <sprites>
-  <sheet filename="spritesheets/newsh$.shp.000000.png">
-    <sprite name="ship.scout">
-      <rect location="49,168" size="22x28" />
-      <direction>0,1</direction>
-    </sprite>
+  <sheet filename="spritesheets/sprites.png">
     <sprite name="ship.fighter">
-      <rect location="50,3" size="21x25" />
+      <rect location="0,0" size="21x24" />
       <direction>0,1</direction>
     </sprite>
-  </sheet>
-  <sheet filename="spritesheets/newsh@.shp.000000.png">
+    <sprite name="ship.scout">
+      <rect location="21,0" size="22x28" />
+      <direction>0,1</direction>
+    </sprite>
     <sprite name="building.biosphere-1">
-      <rect location="0,59" size="23x23" />
+      <rect location="43,0" size="25x24" />
       <direction>0,1</direction>
     </sprite>
-  </sheet>
-  <sheet filename="spritesheets/newshb.shp.000000.png">
     <sprite name="ship.colony">
-      <rect location="0,0" size="119x139" />
+      <rect location="0,28" size="50x58" />
       <direction>0,-1</direction>
     </sprite>
-  </sheet>
-  <sheet filename="spritesheets/newshr.shp.000000.png">
     <sprite name="building.research">
-      <rect location="48,1" size="72x83" />
+      <rect location="52,26" size="50x58" />
       <direction>0,1</direction>
     </sprite>
-  </sheet>
-  <sheet filename="spritesheets/newshm.shp.000000.png">
     <sprite name="building.shipyard">
-      <rect location="72,28" size="72x56" />
+      <rect location="0,87" size="64x50" />
       <direction>0,1</direction>
     </sprite>
-  </sheet>
-  <sheet filename="spritesheets/tyrian.shp.01673F.png">
     <sprite name="building.silo">
-      <rect location="144,118" size="25x19" />
+      <rect location="68,0" size="25x19" />
       <direction>0,1</direction>
     </sprite>
-  </sheet>
-  <sheet filename="spritesheets/newshc.shp.000000.png">
     <sprite name="building.shield-1">
-      <rect location="144,112" size="24x28" />
+      <rect location="93,0" size="26x30" />
       <direction>0,1</direction>
     </sprite>
-  </sheet>
-  <sheet filename="spritesheets/newsh5.shp.000000.png">
     <sprite name="ship.troopcarrier">
-      <rect location="2,84" size="69x26" />
+      <rect location="64,84" size="71x29" />
       <direction>0,-1</direction>
     </sprite>
   </sheet>

@@ -846,7 +846,7 @@ def scheduleBuildCheck(sim=None, force_reschedule=False):
 
 def scheduleMoveCheck():
   time = None
-  query = mdl.Fleet.all().filter("eta >", 0).order("eta").fetch(1)
+  query = mdl.Fleet.all().filter("eta !=", None).order("eta").fetch(1)
   for fleet in query:
     # The first one we fetch (because of the ordering) will be the next one. So we'll schedule
     # the build-check to run 1 second later (if there's a bunch scheduled at the same time,

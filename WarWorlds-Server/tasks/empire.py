@@ -264,9 +264,11 @@ class FleetMoveCheckPage(tasks.TaskPage):
 
     # Fetch the keys outside of the transaction, cause we can't do that in a TX
     fleet_keys = []
-    query = mdl.Fleet.all().filter("eta <", complete_time)
+    query = mdl.Fleet.all().filter("eta !=", None).filter("eta <", complete_time).fetch(2)
     for fleet_model in query:
       fleet_keys.append(fleet_model.key())
+      if len(fleet_keys) >= 2:
+        break
     for fleet_key in fleet_keys:
       fleet_model = db.run_in_transaction(_fetchOperationInTX, fleet_key)
       if not fleet_model:
@@ -295,6 +297,10 @@ def _on_move_complete(fleet_key):
     sim = simulation_ctl.Simulation()
     sim.simulate(new_star_key)
     new_star_pb = sim.getStar(new_star_key)
+
+    logging.info("Fleet %s (%.2f) [%s] moved to %s [%s]" % (
+                 fleet_mdl.designName, fleet_mdl.numShips, str(fleet_mdl.key()),
+                 new_star_pb.name, new_star_pb.key))
 
     if str(fleet_mdl.key().parent()) == new_star_key:
       old_star_pb = new_star_pb
