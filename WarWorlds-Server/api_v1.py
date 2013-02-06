@@ -105,35 +105,56 @@ class HelloPage(ApiPage):
         self.response.set_status(400)
         return
 
-    motd_model = model.MessageOfTheDay.get()
     empire_pb = empire.getEmpireForUser(user)
     if empire_pb:
       colonies_pb = empire.getColoniesForEmpire(empire_pb)
     else:
       colonies_pb = None
 
-    hello_pb = pb.Hello()
+    login_history_mdl = model.LoginHistory()
+    login_history_mdl.userEmail = self.user.email()
+    login_history_mdl.userID = self.user.user_id()
+    if empire_pb:
+      login_history_mdl.empire = db.Key(empire_pb.key)
+      login_history_mdl.empireName = empire_pb.display_name
+    login_history_mdl.date = datetime.now()
+    hello_request_pb = None
+    try:
+      hello_request_pb = self._getRequestBody(pb.HelloRequest)
+    except:
+      pass # older client
+    if hello_request_pb:
+      login_history_mdl.deviceModel = hello_request_pb.device_model
+      login_history_mdl.deviceManufacturer = hello_request_pb.device_manufacturer
+      login_history_mdl.deviceBuild = hello_request_pb.device_build
+      login_history_mdl.deviceVersion = hello_request_pb.device_version
+      login_history_mdl.memoryClass = hello_request_pb.memory_class
+    login_history_mdl.put()
+
+    motd_model = model.MessageOfTheDay.get()
+
+    hello_resp_pb = pb.HelloResponse()
     if motd_model is not None:
-      hello_pb.motd.message = motd_model.message
-      hello_pb.motd.last_update = motd_model.date.isoformat()
+      hello_resp_pb.motd.message = motd_model.message
+      hello_resp_pb.motd.last_update = motd_model.date.isoformat()
     else:
-      hello_pb.motd.message = ""
-      hello_pb.motd.last_update = ""
+      hello_resp_pb.motd.message = ""
+      hello_resp_pb.motd.last_update = ""
 
     if device_mdl:
       if not device_mdl.gcmRegistrationID:
         logging.info("This user will require GCM re-registration.")
-        hello_pb.require_gcm_register = True
+        hello_resp_pb.require_gcm_register = True
       else:
-        hello_pb.require_gcm_register = False
+        hello_resp_pb.require_gcm_register = False
 
     if empire_pb is not None:
-      hello_pb.empire.MergeFrom(empire_pb)
+      hello_resp_pb.empire.MergeFrom(empire_pb)
 
     if colonies_pb is not None:
-      hello_pb.colonies.MergeFrom(colonies_pb.colonies)
+      hello_resp_pb.colonies.MergeFrom(colonies_pb.colonies)
 
-    return hello_pb
+    return hello_resp_pb
 
 
 class ChatPage(ApiPage):

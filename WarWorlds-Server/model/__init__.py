@@ -4,6 +4,7 @@ import logging
 
 from google.appengine.ext import db
 
+from model import empire as empire_mdl
 
 class MessageOfTheDay(db.Model):
   """Message of the day is displayed to users when they first connect."""
@@ -56,6 +57,19 @@ class DeviceRegistration(db.Model):
     for result in query:
       results.append(result)
     return results
+
+
+class LoginHistory(db.Model):
+  userEmail = db.StringProperty()
+  userID = db.StringProperty()
+  empire = db.ReferenceProperty(empire_mdl.Empire)
+  empireName = db.StringProperty()
+  date = db.DateTimeProperty()
+  deviceModel = db.StringProperty()
+  deviceManufacturer = db.StringProperty()
+  deviceBuild = db.StringProperty()
+  deviceVersion = db.StringProperty()
+  memoryClass = db.IntegerProperty()
 
 
 class OnlineDevice(db.Model):

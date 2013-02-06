@@ -84,11 +84,35 @@ message Empire
     optional float cash = 9;
 }
 
+//
+// The "hello" request when you first join the game contains some info about yourself which we
+// record for posterity.
+//
+message HelloRequest
+{
+    // The value of android.os.Build.MODEL for this device
+    optional string device_model = 1;
+
+    // The value of android.os.Build.MANUFACTURER for this device
+    optional string device_manufacturer = 2;
+
+    // The value of android.os.Build.DISPLAY for this device
+    optional string device_build = 3;
+
+    // The value of android.os.Build.VERSION.RELEASE for this device (note that this can
+    // change if you upgrade the OS without re-registering your device!)
+    optional string device_version = 4;
+
+    // The memory class of your device -- basically, how much memory can we assume is available
+    // to the War Worlds app (in megabytes)
+    optional int32 memory_class = 5;
+}
+
 
 //
 // The "hello" message is returned when you first connect to the game.
 //
-message Hello
+message HelloResponse
 {
     // The current message of the day.
     required MessageOfTheDay motd = 1;

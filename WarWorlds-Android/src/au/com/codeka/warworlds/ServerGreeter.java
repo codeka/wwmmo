@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import com.google.android.gcm.GCMRegistrar;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.app.ActivityManager;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -143,17 +144,27 @@ public class ServerGreeter {
                         message = "<p>Re-authentication needed...</p>";
                         return message;
                     }
+
+                    int memoryClass = ((ActivityManager) activity.getSystemService(Activity.ACTIVITY_SERVICE)).getMemoryClass();
+                    Messages.HelloRequest req = Messages.HelloRequest.newBuilder()
+                            .setDeviceBuild(android.os.Build.DISPLAY)
+                            .setDeviceManufacturer(android.os.Build.MANUFACTURER)
+                            .setDeviceModel(android.os.Build.MODEL)
+                            .setDeviceVersion(android.os.Build.VERSION.RELEASE)
+                            .setMemoryClass(memoryClass)
+                            .build();
+
                     String url = "hello/"+deviceRegistrationKey;
-                    Messages.Hello hello = ApiClient.putProtoBuf(url, null, Messages.Hello.class);
-                    if (hello.hasEmpire()) {
+                    Messages.HelloResponse resp = ApiClient.putProtoBuf(url, req, Messages.HelloResponse.class);
+                    if (resp.hasEmpire()) {
                         mNeedsEmpireSetup = false;
                         EmpireManager.getInstance().setup(
-                                MyEmpire.fromProtocolBuffer(hello.getEmpire()));
+                                MyEmpire.fromProtocolBuffer(resp.getEmpire()));
                     } else {
                         mNeedsEmpireSetup = true;
                     }
 
-                    if (hello.hasRequireGcmRegister() && hello.getRequireGcmRegister()) {
+                    if (resp.hasRequireGcmRegister() && resp.getRequireGcmRegister()) {
                         log.info("Re-registering for GCM...");
                         GCMIntentService.register(activity);
                         // we can keep going, though...
@@ -162,14 +173,14 @@ public class ServerGreeter {
                     ChatManager.getInstance().setup();
 
                     mColonies = new ArrayList<Colony>();
-                    for (Messages.Colony c : hello.getColoniesList()) {
+                    for (Messages.Colony c : resp.getColoniesList()) {
                         if (c.getPopulation() < 1.0) {
                             continue;
                         }
                         mColonies.add(Colony.fromProtocolBuffer(c));
                     }
 
-                    message = hello.getMotd().getMessage();
+                    message = resp.getMotd().getMessage();
                     mErrorOccured = false;
                 } catch(ApiException e) {
                     log.error("Error occurred in 'hello'", e);
