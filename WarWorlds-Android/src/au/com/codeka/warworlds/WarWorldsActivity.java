@@ -146,14 +146,6 @@ public class WarWorldsActivity extends BaseActivity {
                     // to make sure it's in the cache before we start
                     // the activity. Now the start button is ready to go!
                     mStartGameButton.setEnabled(true);
-
-                    boolean showSituationReport = getIntent().getBooleanExtra("au.com.codeka.warworlds.ShowSituationReport", false);
-                    if (showSituationReport) {
-                        Intent intent = new Intent(mContext, StarfieldActivity.class);
-                        intent.putExtra("au.com.codeka.warworlds.StarKey", mStarKey);
-                        intent.putExtra("au.com.codeka.warworlds.ShowSituationReport", true);
-                        startActivity(intent);
-                    }
                 }
             });
         } else {

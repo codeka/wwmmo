@@ -512,6 +512,8 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
      * sector.
      */
     private static Point2D getSectorOffset(DrawState state, long sx, long sy) {
+        sx -= state.sectorX;
+        sy -= state.sectorY;
         return new Point2D((sx * SectorManager.SECTOR_SIZE) + state.offsetX,
                            (sy * SectorManager.SECTOR_SIZE) + state.offsetY);
     }

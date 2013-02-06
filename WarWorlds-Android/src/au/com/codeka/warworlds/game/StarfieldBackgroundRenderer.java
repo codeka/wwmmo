@@ -61,7 +61,10 @@ public class StarfieldBackgroundRenderer {
             RectF dest = new RectF(left * mPixelScale, top * mPixelScale, right * mPixelScale, bottom * mPixelScale);
             canvas.drawBitmap(mPreRendered, src, dest, mBackgroundPaint);
         } else {
-            canvas.drawRect(left,  top, right, bottom, mBackgroundPaint);
+            canvas.drawRect(left * mPixelScale,
+                            top * mPixelScale,
+                            right * mPixelScale,
+                            bottom * mPixelScale, mBackgroundPaint);
         }
     }
 

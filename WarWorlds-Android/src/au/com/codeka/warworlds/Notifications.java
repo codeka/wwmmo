@@ -22,6 +22,7 @@ import android.graphics.Matrix;
 import android.net.Uri;
 import android.support.v4.app.NotificationCompat;
 import android.text.Html;
+import au.com.codeka.warworlds.game.SitrepActivity;
 import au.com.codeka.warworlds.model.BuildRequest;
 import au.com.codeka.warworlds.model.SituationReport;
 import au.com.codeka.warworlds.model.Sprite;
@@ -79,8 +80,7 @@ public class Notifications {
     private static Notification buildNotification(Context context,
                                                   List<NotificationDetails> notifications) {
 
-        Intent intent = new Intent(context, WarWorldsActivity.class);
-        intent.putExtra("au.com.codeka.warworlds.ShowSituationReport", true);
+        Intent intent = new Intent(context, SitrepActivity.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(
                 context, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT);
 
