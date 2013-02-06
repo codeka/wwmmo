@@ -1,5 +1,6 @@
 package au.com.codeka.warworlds.game.starfield;
 
+import java.util.List;
 import java.util.Locale;
 
 import android.content.Context;
@@ -162,23 +163,44 @@ public class StarfieldActivity extends BaseActivity implements StarfieldSurfaceV
         ServerGreeter.waitForHello(this, new ServerGreeter.HelloCompleteHandler() {
             @Override
             public void onHelloComplete(boolean success, ServerGreeting greeting) {
+                findColony(greeting.getColonies());
+
                 Bundle extras = getIntent().getExtras();
                 if (extras != null) {
                     String starKey = extras.getString("au.com.codeka.warworlds.StarKey");
                     if (starKey != null) {
-                        StarManager.getInstance().requestStarSummary(StarfieldActivity.this, starKey,
-                                new StarManager.StarSummaryFetchedHandler() {
-                            @Override
-                            public void onStarSummaryFetched(StarSummary s) {
-                                mStarfield.scrollTo(s.getSectorX(), s.getSectorY(),
-                                                    s.getOffsetX(), s.getOffsetY(),
-                                                    true);
-                            }
-                        });
                     }
                 }
             }
         });
+    }
+
+    /**
+     * Finds one of our colony's stars and scrolls to it.
+     */
+    private void findColony(List<Colony> colonies) {
+        // we'll want to start off near one of your stars. If you
+        // only have one, that's easy -- but if you've got lots
+        // what then?
+        String starKey = null;
+        if (colonies == null) {
+            return;
+        }
+        for (Colony c : colonies) {
+            starKey = c.getStarKey();
+        }
+
+        if (starKey != null) {
+            StarManager.getInstance().requestStarSummary(StarfieldActivity.this, starKey,
+                    new StarManager.StarSummaryFetchedHandler() {
+                @Override
+                public void onStarSummaryFetched(StarSummary s) {
+                    mStarfield.scrollTo(s.getSectorX(), s.getSectorY(),
+                                        s.getOffsetX(), s.getOffsetY(),
+                                        true);
+                }
+            });
+        }
     }
 
     public void openEmpireActivityAtFleet(Star star, Fleet fleet) {
@@ -267,11 +289,7 @@ public class StarfieldActivity extends BaseActivity implements StarfieldSurfaceV
                 Bundle extras = getIntent().getExtras();
                 if (extras != null) {
                     if (mIsFirstRefresh) {
-                        boolean showSituationReport = extras.getBoolean("au.com.codeka.warworlds.ShowSituationReport", false);
-                        if (showSituationReport) {
-                            Intent intent = new Intent(mContext, SitrepActivity.class);
-                            startActivity(intent);
-                        }
+
 
                         mIsFirstRefresh = false;
                     }

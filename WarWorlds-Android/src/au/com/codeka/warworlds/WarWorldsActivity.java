@@ -2,7 +2,6 @@
 package au.com.codeka.warworlds;
 
 import java.text.DecimalFormat;
-import java.util.List;
 import java.util.Locale;
 
 import org.slf4j.Logger;
@@ -22,9 +21,6 @@ import android.widget.Button;
 import android.widget.TextView;
 import au.com.codeka.warworlds.ctrl.TransparentWebView;
 import au.com.codeka.warworlds.game.starfield.StarfieldActivity;
-import au.com.codeka.warworlds.model.Colony;
-import au.com.codeka.warworlds.model.StarManager;
-import au.com.codeka.warworlds.model.StarSummary;
 
 /**
  * Main activity. Displays the message of the day and lets you select "Start Game", "Options", etc.
@@ -43,7 +39,36 @@ public class WarWorldsActivity extends BaseActivity {
         log.info("WarWorlds activity starting...");
         requestWindowFeature(Window.FEATURE_NO_TITLE); // remove the title bar
 
-        setHomeScreenContent();
+        setContentView(R.layout.home);
+
+        View rootView = findViewById(android.R.id.content);
+        ActivityBackgroundGenerator.setBackground(rootView);
+
+        mStartGameButton = (Button) findViewById(R.id.start_game_btn);
+        mConnectionStatus = (TextView) findViewById(R.id.connection_status);
+        final Button logOutButton = (Button) findViewById(R.id.log_out_btn);
+        final Button optionsButton = (Button) findViewById(R.id.options_btn);
+
+        logOutButton.setOnClickListener(new OnClickListener() {
+            public void onClick(View v) {
+                startActivity(new Intent(mContext, AccountsActivity.class));
+            }
+        });
+
+        optionsButton.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(mContext, GlobalOptionsActivity.class));
+            }
+        });
+
+        mStartGameButton.setOnClickListener(new OnClickListener() {
+            public void onClick(View v) {
+                final Intent intent = new Intent(mContext, StarfieldActivity.class);
+                intent.putExtra("au.com.codeka.warworlds.StarKey", mStarKey);
+                startActivity(intent);
+            }
+        });
     }
 
     @Override
@@ -96,7 +121,7 @@ public class WarWorldsActivity extends BaseActivity {
                     mConnectionStatus.setText(msg);
 
                     motdView.loadHtml("html/skeleton.html", greeting.getMessageOfTheDay());
-                    findColony(greeting.getColonies());
+                    mStartGameButton.setEnabled(true);
                 }
             }
         });
@@ -113,76 +138,5 @@ public class WarWorldsActivity extends BaseActivity {
         public void onRetry(final int retries) {
             mConnectionStatus.setText(String.format("Retrying (#%d)...", retries+1));
         }
-    }
-
-    /**
-     * Says "hello" to the server. Lets it know who we are, fetches the MOTD and if there's
-     * no empire registered yet, switches over to the \c EmpireSetupActivity.
-     * 
-     * @param motd The \c WebView we'll install the MOTD to.
-     */
-
-    private void findColony(List<Colony> colonies) {
-        // we'll want to start off near one of your stars. If you
-        // only have one, that's easy -- but if you've got lots
-        // what then?
-        mStarKey = null;
-        if (colonies == null) {
-            return;
-        }
-        for (Colony c : colonies) {
-            mStarKey = c.getStarKey();
-        }
-
-        if (mStarKey != null) {
-            mStartGameButton.setEnabled(false);
-            StarManager.getInstance().requestStarSummary(mContext, mStarKey,
-                    new StarManager.StarSummaryFetchedHandler() {
-                @Override
-                public void onStarSummaryFetched(StarSummary s) {
-                    mStartGameButton.setEnabled(true);
-
-                    // we don't do anything with the star, we just want
-                    // to make sure it's in the cache before we start
-                    // the activity. Now the start button is ready to go!
-                    mStartGameButton.setEnabled(true);
-                }
-            });
-        } else {
-            mStartGameButton.setEnabled(true);
-        }
-    }
-
-    private void setHomeScreenContent() {
-        setContentView(R.layout.home);
-
-        View rootView = findViewById(android.R.id.content);
-        ActivityBackgroundGenerator.setBackground(rootView);
-
-        mStartGameButton = (Button) findViewById(R.id.start_game_btn);
-        mConnectionStatus = (TextView) findViewById(R.id.connection_status);
-        final Button logOutButton = (Button) findViewById(R.id.log_out_btn);
-        final Button optionsButton = (Button) findViewById(R.id.options_btn);
-
-        logOutButton.setOnClickListener(new OnClickListener() {
-            public void onClick(View v) {
-                startActivity(new Intent(mContext, AccountsActivity.class));
-            }
-        });
-
-        optionsButton.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(mContext, GlobalOptionsActivity.class));
-            }
-        });
-
-        mStartGameButton.setOnClickListener(new OnClickListener() {
-            public void onClick(View v) {
-                final Intent intent = new Intent(mContext, StarfieldActivity.class);
-                intent.putExtra("au.com.codeka.warworlds.StarKey", mStarKey);
-                startActivity(intent);
-            }
-        });
     }
 }

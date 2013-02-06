@@ -21,6 +21,7 @@ import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.net.Uri;
 import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.TaskStackBuilder;
 import android.text.Html;
 import au.com.codeka.warworlds.game.SitrepActivity;
 import au.com.codeka.warworlds.model.BuildRequest;
@@ -81,8 +82,13 @@ public class Notifications {
                                                   List<NotificationDetails> notifications) {
 
         Intent intent = new Intent(context, SitrepActivity.class);
-        PendingIntent pendingIntent = PendingIntent.getActivity(
-                context, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT);
+
+        // we want to add the StarfieldActivity to the "back stack" of the situation report so that
+        // when you press "back" from the sitrep you go to the starfield.
+        PendingIntent pendingIntent = TaskStackBuilder.create(context)
+                                        .addParentStack(SitrepActivity.class)
+                                        .addNextIntent(intent)
+                                        .getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
         builder.setContentIntent(pendingIntent);

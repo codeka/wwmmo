@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="au.com.codeka.warworlds"
-    android:versionCode="41"
-    android:versionName="0.1.20130206.429" >
+    android:versionCode="42"
+    android:versionName="0.1.20130206.431" >
 
     <!-- C2DM requires Android SDK version 2.2 (API level 8) or above, and we want to be
          able to run on the minimum version (test using a Galaxy S) -->
@@ -61,9 +61,11 @@
                   android:label="@string/app_name"
                   android:screenOrientation="portrait" />
 
-        <activity android:name=".WarmWelcomeActivity" />
+        <activity android:name=".WarmWelcomeActivity"
+                  android:screenOrientation="portrait" />
 
-        <activity android:name=".GlobalOptionsActivity" />
+        <activity android:name=".GlobalOptionsActivity"
+                  android:screenOrientation="portrait" />
 
         <activity android:name=".EmpireSetupActivity"
                   android:screenOrientation="portrait" />
@@ -87,7 +89,11 @@
                   android:screenOrientation="portrait" />
 
         <activity android:name=".game.SitrepActivity"
-                  android:screenOrientation="portrait" />
+                  android:screenOrientation="portrait">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".game.starfield.StarfieldActivity" />
+        </activity>
 
         <activity android:name="com.google.ads.AdActivity"
                   android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize" />
