@@ -215,7 +215,7 @@ public class FleetMoveDialog extends DialogFragment {
      * from.
      */
     private class SourceStarOverlay extends StarfieldSurfaceView.VisibleEntityAttachedOverlay {
-        private RotatingCircle mSourceCircle;
+        private DashedCircle mSourceCircle;
 
         private Paint mShipPaint;
         private Sprite mSprite;
@@ -224,7 +224,7 @@ public class FleetMoveDialog extends DialogFragment {
         public SourceStarOverlay() {
             Paint p = new Paint();
             p.setARGB(255, 0, 255, 0);
-            mSourceCircle = new RotatingCircle(p);
+            mSourceCircle = new DashedCircle(p);
 
             mShipPaint = new Paint();
             mShipPaint.setARGB(255, 255, 255, 255);

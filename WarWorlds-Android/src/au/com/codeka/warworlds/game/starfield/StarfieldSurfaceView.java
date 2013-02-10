@@ -57,7 +57,6 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
     private ArrayList<OnSelectionChangedListener> mSelectionChangedListeners;
     private Star mSelectedStar;
     private Fleet mSelectedFleet;
-    private Paint mStarPaint;
     private SelectionOverlay mSelectionOverlay;
     private Map<String, List<VisibleEntityAttachedOverlay>> mStarAttachedOverlays;
     private Map<String, List<VisibleEntityAttachedOverlay>> mFleetAttachedOverlays;
@@ -65,9 +64,6 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
     private List<VisibleEntity> mVisibleEntities;
     private boolean mScrollToCentre = false;
     private Handler mHandler;
-
-    private boolean mNeedRedraw = true;
-    private Bitmap mBuffer;
 
     private static Bitmap sFleetMultiBitmap;
     private static final int sRadius = 1;
@@ -101,10 +97,6 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
 
         mSelectionOverlay = new SelectionOverlay();
 
-        mStarPaint = new Paint();
-        mStarPaint.setARGB(255, 255, 255, 255);
-        mStarPaint.setStyle(Style.STROKE);
-
         if (sFleetMultiBitmap == null) {
             sFleetMultiBitmap = BitmapFactory.decodeResource(mContext.getResources(), R.drawable.fleet);
         }
@@ -125,7 +117,6 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
                     }
                 }
 
-                setDirty();
                 redraw();
             }
         };
@@ -134,7 +125,6 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
         mBitmapGeneratedListener = new ImageManager.BitmapGeneratedListener() {
             @Override
             public void onBitmapGenerated(String key, Bitmap bmp) {
-                setDirty();
                 redraw();
             }
         };
@@ -260,12 +250,7 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
         mOffsetY = -offsetY;
 
         if (centre) {
-            if (mBuffer != null) {
-                mOffsetX += mBuffer.getWidth() / 2.0f / getPixelScale();
-                mOffsetY += mBuffer.getHeight() / 2.0f / getPixelScale();
-            } else {
-                mScrollToCentre = true;
-            }
+            mScrollToCentre = true;
         }
 
         List<Pair<Long, Long>> missingSectors = new ArrayList<Pair<Long, Long>>();
@@ -284,7 +269,6 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
             SectorManager.getInstance().requestSectors(missingSectors, false, null);
         }
 
-        setDirty();
         redraw();
     }
 
@@ -426,39 +410,24 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
 
         super.onDraw(canvas);
 
-        if (mBuffer == null || mNeedRedraw) {
-            if (mBuffer == null) {
-                mBuffer = Bitmap.createBitmap(canvas.getWidth(),
-                                              canvas.getHeight(),
-                                              Bitmap.Config.ARGB_8888);
-            }
-
-            if (mScrollToCentre) {
-                mOffsetX += mBuffer.getWidth() / 2.0f / getPixelScale();
-                mOffsetY += mBuffer.getHeight() / 2.0f / getPixelScale();
-                mScrollToCentre = false;
-            }
-
-            DrawState state = new DrawState(this);
-            final List<Pair<Long, Long>> missingSectors = drawScene(state);
-            mVisibleEntities = state.visibleEntities;
-            mNeedRedraw = false;
-
-            if (missingSectors != null) {
-                mHandler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        SectorManager.getInstance().requestSectors(missingSectors, false, null);
-                    }
-                });
-            }
+        if (mScrollToCentre) {
+            mOffsetX += canvas.getWidth() / 2.0f / getPixelScale();
+            mOffsetY += canvas.getHeight() / 2.0f / getPixelScale();
+            mScrollToCentre = false;
         }
 
-        canvas.drawBitmap(mBuffer, 0, 0, mStarPaint);
-    }
+        DrawState state = new DrawState(this, canvas);
+        final List<Pair<Long, Long>> missingSectors = drawScene(state);
+        mVisibleEntities = state.visibleEntities;
 
-    public void setDirty() {
-        mNeedRedraw = true;
+        if (missingSectors != null) {
+            mHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    SectorManager.getInstance().requestSectors(missingSectors, false, null);
+                }
+            });
+        }
     }
 
     /**
@@ -894,7 +863,6 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
             }
             addOverlay(mSelectionOverlay, star);
 
-            setDirty();
             redraw();
             fireSelectionChanged(star);
         }
@@ -912,7 +880,6 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
             }
             addOverlay(mSelectionOverlay, fleet);
 
-            setDirty();
             redraw();
             fireSelectionChanged(fleet);
         }
@@ -929,7 +896,6 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
             scroll(-(float)(distanceX / getPixelScale()),
                    -(float)(distanceY / getPixelScale()));
 
-            setDirty();
             redraw();
             return false;
         }
@@ -983,7 +949,6 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
 
     private static class DrawState {
         public Context context;
-        public Bitmap bitmap;
         public long sectorX;
         public long sectorY;
         public float offsetX;
@@ -1000,11 +965,10 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
 
         private StarfieldSurfaceView mStarfieldSurfaceView;
 
-        public DrawState(StarfieldSurfaceView ssv) {
+        public DrawState(StarfieldSurfaceView ssv, Canvas canvas) {
             mStarfieldSurfaceView = ssv;
             context = ssv.mContext;
-            bitmap = ssv.mBuffer;
-            canvas = new Canvas(bitmap);
+            this.canvas = canvas;
             sectorX = ssv.mSectorX;
             sectorY = ssv.mSectorY;
             offsetX = ssv.mOffsetX;
@@ -1015,7 +979,10 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
             fleetAttachedOverlays = ssv.mFleetAttachedOverlays;
             matrix = new Matrix();
             visibleEmpires = ssv.mVisibleEmpires;
-            starPaint = ssv.mStarPaint;
+
+            starPaint = new Paint();
+            starPaint.setARGB(255, 255, 255, 255);
+            starPaint.setStyle(Style.STROKE);
 
             starNamePaint = new Paint();
             starNamePaint.setStyle(Style.STROKE);
@@ -1023,7 +990,6 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
         }
 
         public void requestRedraw() {
-            mStarfieldSurfaceView.setDirty();
             mStarfieldSurfaceView.redraw();
         }
     }

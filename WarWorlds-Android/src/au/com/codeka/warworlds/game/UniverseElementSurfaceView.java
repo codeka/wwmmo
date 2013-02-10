@@ -11,6 +11,7 @@ import android.graphics.Canvas;
 import android.graphics.DashPathEffect;
 import android.graphics.Paint;
 import android.graphics.RectF;
+import android.os.Process;
 import android.util.AttributeSet;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
@@ -70,7 +71,17 @@ public class UniverseElementSurfaceView extends SurfaceView implements SurfaceHo
 
     @Override
     public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
-        log.info("Surface changed!");
+        if (mDrawThread != null) {
+            log.info(String.format("Surface changed, stopping draw thread %d", mDrawThread.getId()));
+            mHolder = null;
+            redraw();
+            try {
+                mDrawThread.join();
+            } catch(InterruptedException e) {
+            }
+            mDrawThread = null;
+        }
+
         mHolder = holder;
         redraw();
     }
@@ -151,6 +162,15 @@ public class UniverseElementSurfaceView extends SurfaceView implements SurfaceHo
     private void drawThreadProc() {
         while (true) {
             try {
+                // if we have overlays then we're animated so we need to redraw anyway
+                try {
+                    mDrawSemaphore.acquire();
+                } catch (InterruptedException e) {
+                    log.info("Surface was destroyed, render thread shutting down.");
+                    mDrawThread = null;
+                    return;
+                }
+
                 if (!drawOnce()) {
                     mDrawThread = null;
                     return;
@@ -162,16 +182,6 @@ public class UniverseElementSurfaceView extends SurfaceView implements SurfaceHo
     }
 
     private boolean drawOnce() {
-        // if we have overlays then we're animated so we need to redraw anyway
-        if (mOverlays.size() == 0) {
-            try {
-                mDrawSemaphore.acquire();
-            } catch (InterruptedException e) {
-                log.info("Surface was destroyed, render thread shutting down.");
-                return false;
-            }
-        }
-
         SurfaceHolder h = mHolder;
         if (h == null) {
             log.info("Surface was destroyed, render thread shutting down.");
@@ -184,8 +194,10 @@ public class UniverseElementSurfaceView extends SurfaceView implements SurfaceHo
             return false;
         }
 
+        log.debug("Drawing from thread: "+Process.myTid());
         try {
             onDraw(c);
+            log.debug("Drawing complete, rendering overlays: "+Process.myTid());
 
             synchronized(mOverlays) {
                 int size = mOverlays.size();
@@ -194,6 +206,7 @@ public class UniverseElementSurfaceView extends SurfaceView implements SurfaceHo
                 }
             }
         } finally {
+            log.debug("Unlocking canvas: "+Process.myTid());
             h.unlockCanvasAndPost(c);
         }
 
@@ -229,31 +242,20 @@ public class UniverseElementSurfaceView extends SurfaceView implements SurfaceHo
          * This helper class draws a rotating circle at the specific (x, y) coordinate with
          * the specified radius & paint. It's useful for selection circles and whatnot.
          */
-        public static class RotatingCircle {
+        public static class DashedCircle {
             private RectF mBounds;
             private double mCentreX;
             private double mCentreY;
             private Paint mPaint;
             private double mRadius;
-            private float mAngle;
             private float mDashAngleDegrees;
-            private float mRotateSpeed;
 
-            public RotatingCircle(Paint paint) {
+            public DashedCircle(Paint paint) {
                 mCentreX = 0;
                 mCentreY = 0;
                 mRadius = 0;
-                mAngle = 0;
-                mRotateSpeed = 1.5f;
                 mBounds = new RectF();
-
                 mPaint = paint;
-                mPaint.setAntiAlias(true);
-                mPaint.setStyle(Paint.Style.STROKE);
-            }
-
-            public void setRotateSpeed(float speed) {
-                mRotateSpeed = speed;
             }
 
             public void setCentre(double x, double y) {
@@ -285,14 +287,9 @@ public class UniverseElementSurfaceView extends SurfaceView implements SurfaceHo
                     return;
                 }
 
-                mAngle += mRotateSpeed;
-                if (mAngle > 360.0f) {
-                    mAngle = 0.0f;
-                }
-
                 // we cannot make the arc 360 degrees, otherwise it ignores the angle offset. Instead
                 // we make it 360 - "dash-angle" (i.e. the angle through which one dash passes)
-                canvas.drawArc(mBounds, mAngle, 360.0f - mDashAngleDegrees, false, mPaint);
+                canvas.drawArc(mBounds, 0, 360.0f - mDashAngleDegrees, false, mPaint);
             }
         }
     }
@@ -323,18 +320,17 @@ public class UniverseElementSurfaceView extends SurfaceView implements SurfaceHo
      * that spins around the selected point.
      */
     protected static class SelectionOverlay extends VisibleEntityAttachedOverlay {
-        private RotatingCircle mInnerCircle;
-        private RotatingCircle mOuterCircle;
+        private DashedCircle mInnerCircle;
+        private DashedCircle mOuterCircle;
 
         public SelectionOverlay() {
             Paint p = new Paint();
             p.setARGB(255, 255, 255, 255);
-            mInnerCircle = new RotatingCircle(p);
-            mInnerCircle.setRotateSpeed(-1.5f);
+            p.setAntiAlias(true);
+            p.setStyle(Paint.Style.STROKE);
 
-            p = new Paint();
-            p.setARGB(255, 255, 255, 255);
-            mOuterCircle = new RotatingCircle(p);
+            mInnerCircle = new DashedCircle(p);
+            mOuterCircle = new DashedCircle(p);
         }
 
         @Override

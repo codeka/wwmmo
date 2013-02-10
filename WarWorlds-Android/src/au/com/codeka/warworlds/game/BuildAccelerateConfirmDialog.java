@@ -49,16 +49,16 @@ public class BuildAccelerateConfirmDialog extends DialogFragment {
                     (int) Math.floor(cost), TimeInHours.format(speedUpTime));
 
             return new StyledDialog.Builder(getActivity())
-            .setTitle("Accelerate Build")
-            .setMessage(Html.fromHtml(msg))
-            .setPositiveButton("Buy Cash", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                                  // TODO
-                }
-            })
-            .setNegativeButton("Cancel", null)
-            .create();
+                                .setTitle("Accelerate Build")
+                                .setMessage(Html.fromHtml(msg))
+                                .setPositiveButton("Buy Cash", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                                      // TODO
+                                    }
+                                })
+                                .setNegativeButton("Cancel", null)
+                                .create();
         } else {
             String msg = String.format(Locale.ENGLISH,
                     "Do you want to accelerate this build? It will cost <font color=\"green\">"+

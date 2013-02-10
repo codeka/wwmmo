@@ -64,10 +64,9 @@ public class SolarSystemSurfaceView extends UniverseElementSurfaceView {
         mPlanetPaint = new Paint();
         mPlanetPaint.setARGB(255, 255, 255, 255);
         mPlanetPaint.setStyle(Style.STROKE);
+        mMatrix = new Matrix();
 
         mSelectionOverlay = new SelectionOverlay();
-
-        mMatrix = new Matrix();
 
         mColonyIcon = BitmapFactory.decodeResource(getResources(), R.drawable.starfield_colony);
 
@@ -176,7 +175,6 @@ public class SolarSystemSurfaceView extends UniverseElementSurfaceView {
                 }
 
                 addOverlay(mSelectionOverlay);
-
                 redraw();
             }
         }
@@ -299,6 +297,10 @@ public class SolarSystemSurfaceView extends UniverseElementSurfaceView {
     private class GestureListener extends GestureDetector.SimpleOnGestureListener {
         @Override
         public boolean onSingleTapConfirmed(MotionEvent e) {
+            if (mPlanetInfos == null) {
+                return false;
+            }
+
             Point2D tapLocation = new Point2D(e.getX(), e.getY());
             PlanetInfo closestPlanet = null;
             for (PlanetInfo planetInfo : mPlanetInfos) {
