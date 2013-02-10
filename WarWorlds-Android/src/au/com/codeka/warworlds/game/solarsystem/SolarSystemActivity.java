@@ -26,6 +26,7 @@ import au.com.codeka.warworlds.ServerGreeter;
 import au.com.codeka.warworlds.StyledDialog;
 import au.com.codeka.warworlds.ServerGreeter.ServerGreeting;
 import au.com.codeka.warworlds.ctrl.FleetListSimple;
+import au.com.codeka.warworlds.ctrl.SelectionView;
 import au.com.codeka.warworlds.game.CombatReportDialog;
 import au.com.codeka.warworlds.game.ScoutReportDialog;
 import au.com.codeka.warworlds.game.SitrepActivity;
@@ -72,6 +73,8 @@ public class SolarSystemActivity extends BaseActivity implements StarManager.Sta
         final Button sitrepButton = (Button) findViewById(R.id.sitrep_btn);
         final Button attackButton = (Button) findViewById(R.id.enemy_empire_attack);
         final FleetListSimple fleetList = (FleetListSimple) findViewById(R.id.fleet_list);
+        final SelectionView selectionView = (SelectionView) findViewById(R.id.selection);
+        mSolarSystemSurfaceView.setSelectionView(selectionView);
 
         mIsFirstRefresh = true;
         if (savedInstanceState != null) {

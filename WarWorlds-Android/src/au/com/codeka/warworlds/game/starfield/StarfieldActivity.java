@@ -23,6 +23,7 @@ import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.ServerGreeter;
 import au.com.codeka.warworlds.ServerGreeter.ServerGreeting;
 import au.com.codeka.warworlds.ctrl.FleetListSimple;
+import au.com.codeka.warworlds.ctrl.SelectionView;
 import au.com.codeka.warworlds.game.EmpireActivity;
 import au.com.codeka.warworlds.game.ScoutReportDialog;
 import au.com.codeka.warworlds.game.SitrepActivity;
@@ -79,6 +80,7 @@ public class StarfieldActivity extends BaseActivity implements StarfieldSurfaceV
         }
 
         mStarfield = (StarfieldSurfaceView) findViewById(R.id.starfield);
+        mStarfield.setSelectionView((SelectionView) findViewById(R.id.selection));
 
         mPlanetList = (ListView) findViewById(R.id.planet_list);
         mFleetList = (FleetListSimple) findViewById(R.id.fleet_list);

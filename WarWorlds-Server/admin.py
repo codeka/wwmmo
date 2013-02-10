@@ -1,5 +1,6 @@
 """admin.py: Contains web handlers for the admin interface."""
 
+from datetime import datetime, timedelta
 import os
 import logging
 import json
@@ -19,6 +20,7 @@ from mapreduce import control
 
 import model
 from model import session
+from model import statistics as stats_mdl
 from ctrl import empire
 
 
@@ -84,8 +86,19 @@ class DashboardPage(AdminPage):
   """The "dashboard" page, basically what you get when you visit /admin."""
 
   def get(self):
-    data = {}
-    self.render("admin/index.html", data)
+    empire_nda = {}
+    query = (stats_mdl.ActiveEmpires.all().filter("date >", datetime.now() - timedelta(days=30))
+                                    .order("date"))
+    for nda in query:
+      date = nda.date.replace(hour=0, minute=0, second=0, microsecond=0)
+      if date in empire_nda:
+        values = empire_nda[date]
+      else:
+        values = {"date": date}
+        empire_nda[date] = values
+      values[str(nda.numDays)+"da"] = nda.actives
+    data = {"empire_nda": empire_nda.values()}
+    self.render("admin/dashboard.html", data)
 
 
 class ChatPage(AdminPage):

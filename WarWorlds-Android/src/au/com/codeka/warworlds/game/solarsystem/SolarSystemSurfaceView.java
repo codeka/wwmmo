@@ -18,8 +18,11 @@ import android.os.Handler;
 import android.util.AttributeSet;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
+import android.view.View;
+import android.widget.RelativeLayout;
 import au.com.codeka.Point2D;
 import au.com.codeka.warworlds.R;
+import au.com.codeka.warworlds.ctrl.SelectionView;
 import au.com.codeka.warworlds.game.StarfieldBackgroundRenderer;
 import au.com.codeka.warworlds.game.UniverseElementSurfaceView;
 import au.com.codeka.warworlds.model.Colony;
@@ -42,7 +45,7 @@ public class SolarSystemSurfaceView extends UniverseElementSurfaceView {
     private PlanetInfo mSelectedPlanet;
     private boolean mPlanetsPlaced;
     private Paint mPlanetPaint;
-    private SelectionOverlay mSelectionOverlay;
+    private SelectionView mSelectionView;
     private Bitmap mColonyIcon;
     private CopyOnWriteArrayList<OnPlanetSelectedListener> mPlanetSelectedListeners;
     private StarfieldBackgroundRenderer mBackgroundRenderer;
@@ -66,13 +69,18 @@ public class SolarSystemSurfaceView extends UniverseElementSurfaceView {
         mPlanetPaint.setStyle(Style.STROKE);
         mMatrix = new Matrix();
 
-        mSelectionOverlay = new SelectionOverlay();
-
         mColonyIcon = BitmapFactory.decodeResource(getResources(), R.drawable.starfield_colony);
 
         mBitmapGeneratedListener = new BitmapGeneratedListener();
         PlanetImageManager.getInstance().addBitmapGeneratedListener(mBitmapGeneratedListener);
         StarImageManager.getInstance().addBitmapGeneratedListener(mBitmapGeneratedListener);
+    }
+
+    public void setSelectionView(SelectionView selectionView) {
+        mSelectionView = selectionView;
+        if (mSelectionView != null) {
+            mSelectionView.setVisibility(View.GONE);
+        }
     }
 
     public void setStar(Star star) {
@@ -174,7 +182,16 @@ public class SolarSystemSurfaceView extends UniverseElementSurfaceView {
                     mPlanetSelectedFired = false;
                 }
 
-                addOverlay(mSelectionOverlay);
+                if (mPlanetsPlaced && mSelectedPlanet != null && mSelectionView != null) {
+                    RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) mSelectionView.getLayoutParams();
+                    params.leftMargin = (int) (getLeft() + mSelectedPlanet.centre.x - (mSelectionView.getWidth() / 2));
+                    params.topMargin = (int) (getTop() + mSelectedPlanet.centre.y - (mSelectionView.getHeight() / 2));
+                    mSelectionView.setLayoutParams(params);
+                    mSelectionView.setVisibility(View.VISIBLE);
+                } else if (mSelectionView != null) {
+                    mSelectionView.setVisibility(View.GONE);
+                }
+
                 redraw();
             }
         }
@@ -284,9 +301,10 @@ public class SolarSystemSurfaceView extends UniverseElementSurfaceView {
             }
         }
 
-        if (mSelectedPlanet != null) {
-            mSelectionOverlay.setCentre(mSelectedPlanet.centre.x, mSelectedPlanet.centre.y);
-            mSelectionOverlay.setRadius(35.0 * getPixelScale());
+        if (mSelectedPlanet != null && mSelectionView != null) {
+
+//            mSelectionOverlay.setCentre(mSelectedPlanet.centre.x, mSelectedPlanet.centre.y);
+//            mSelectionOverlay.setRadius(35.0 * getPixelScale());
         }
     }
 

@@ -11,7 +11,6 @@ import android.graphics.Canvas;
 import android.graphics.DashPathEffect;
 import android.graphics.Paint;
 import android.graphics.RectF;
-import android.os.Process;
 import android.util.AttributeSet;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
@@ -194,11 +193,8 @@ public class UniverseElementSurfaceView extends SurfaceView implements SurfaceHo
             return false;
         }
 
-        log.debug("Drawing from thread: "+Process.myTid());
         try {
             onDraw(c);
-            log.debug("Drawing complete, rendering overlays: "+Process.myTid());
-
             synchronized(mOverlays) {
                 int size = mOverlays.size();
                 for (int i = 0; i < size; i++) {
@@ -206,7 +202,6 @@ public class UniverseElementSurfaceView extends SurfaceView implements SurfaceHo
                 }
             }
         } finally {
-            log.debug("Unlocking canvas: "+Process.myTid());
             h.unlockCanvasAndPost(c);
         }
 
@@ -312,44 +307,6 @@ public class UniverseElementSurfaceView extends SurfaceView implements SurfaceHo
         public void setCentre(double x, double y) {
             mCentre.x = (float) x;
             mCentre.y = (float) y;
-        }
-    }
-
-    /**
-     * This overlay is used for drawing the selection indicator. It's an animated dotted circle
-     * that spins around the selected point.
-     */
-    protected static class SelectionOverlay extends VisibleEntityAttachedOverlay {
-        private DashedCircle mInnerCircle;
-        private DashedCircle mOuterCircle;
-
-        public SelectionOverlay() {
-            Paint p = new Paint();
-            p.setARGB(255, 255, 255, 255);
-            p.setAntiAlias(true);
-            p.setStyle(Paint.Style.STROKE);
-
-            mInnerCircle = new DashedCircle(p);
-            mOuterCircle = new DashedCircle(p);
-        }
-
-        @Override
-        public void setCentre(double x, double y) {
-            super.setCentre(x, y);
-
-            mInnerCircle.setCentre(x, y);
-            mOuterCircle.setCentre(x, y);
-        }
-
-        public void setRadius(double radius) {
-            mInnerCircle.setRadius(radius);
-            mOuterCircle.setRadius(radius + 4.0);
-        }
-
-        @Override
-        public void draw(Canvas canvas) {
-            mInnerCircle.draw(canvas);
-            mOuterCircle.draw(canvas);
         }
     }
 }

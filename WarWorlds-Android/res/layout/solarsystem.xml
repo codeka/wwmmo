@@ -325,6 +325,12 @@
         </LinearLayout>
     </RelativeLayout>
 
+    <au.com.codeka.warworlds.ctrl.SelectionView
+        android:id="@+id/selection"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:visibility="visible" />
+
     <RelativeLayout
         android:id="@+id/congeniality_container"
         android:layout_width="85dp"

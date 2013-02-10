@@ -1,0 +1,34 @@
+{% extends "admin/skeleton.html" %}
+
+{% block content %}
+  <script type="text/javascript" src="https://www.google.com/jsapi"></script>
+  
+  <h1>Active Empires</h1>
+
+  <div id="n-day-actives" style="width: 90%; margin: 0 auto; height: 480px;"></div>
+  <script type="text/javascript">
+    google.load("visualization", "1", {packages:["corechart"]});
+    google.setOnLoadCallback(drawChart);
+
+    function drawChart() {
+      var dataTable = new google.visualization.DataTable();
+      dataTable.addColumn("date", "Date");
+      dataTable.addColumn("number", "1-day actives");
+      dataTable.addColumn("number", "7-day actives");
+      dataTable.addRows([
+      {%- for nda in empire_nda %}
+        [new Date({{nda["date"].year}}, {{nda["date"].month - 1}}, {{nda["date"].day}}), {{nda["1da"]}}, {{nda["7da"]}}],
+      {%- endfor %}
+      ]);
+
+      var dataView = new google.visualization.DataView(dataTable);
+
+      var options = {
+      };
+
+      var chart = new google.visualization.LineChart(document.getElementById("n-day-actives"));
+      chart.draw(dataView, options);
+    }
+  </script>
+
+{% endblock %}

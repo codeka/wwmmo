@@ -28,9 +28,12 @@ import android.os.Handler;
 import android.util.AttributeSet;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
+import android.view.View;
+import android.widget.RelativeLayout;
 import au.com.codeka.Pair;
 import au.com.codeka.Point2D;
 import au.com.codeka.warworlds.R;
+import au.com.codeka.warworlds.ctrl.SelectionView;
 import au.com.codeka.warworlds.game.StarfieldBackgroundRenderer;
 import au.com.codeka.warworlds.game.UniverseElementSurfaceView;
 import au.com.codeka.warworlds.model.Colony;
@@ -55,9 +58,8 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
     private static final Logger log = LoggerFactory.getLogger(StarfieldSurfaceView.class);
     private Context mContext;
     private ArrayList<OnSelectionChangedListener> mSelectionChangedListeners;
-    private Star mSelectedStar;
-    private Fleet mSelectedFleet;
-    private SelectionOverlay mSelectionOverlay;
+    private VisibleEntity mSelectedEntity;
+    private SelectionView mSelectionView;
     private Map<String, List<VisibleEntityAttachedOverlay>> mStarAttachedOverlays;
     private Map<String, List<VisibleEntityAttachedOverlay>> mFleetAttachedOverlays;
     private Map<String, Empire> mVisibleEmpires;
@@ -86,7 +88,7 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
 
         mContext = context;
         mSelectionChangedListeners = new ArrayList<OnSelectionChangedListener>();
-        mSelectedStar = null;
+        mSelectedEntity = null;
         mSectorX = mSectorY = 0;
         mOffsetX = mOffsetY = 0;
         mStarAttachedOverlays = new TreeMap<String, List<VisibleEntityAttachedOverlay>>();
@@ -94,8 +96,6 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
         mVisibleEmpires = new TreeMap<String, Empire>();
         mVisibleEntities = new ArrayList<VisibleEntity>();
         mHandler = new Handler();
-
-        mSelectionOverlay = new SelectionOverlay();
 
         if (sFleetMultiBitmap == null) {
             sFleetMultiBitmap = BitmapFactory.decodeResource(mContext.getResources(), R.drawable.fleet);
@@ -108,12 +108,14 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
             public void onSectorListChanged() {
                 log.debug("Sector list has changed, redrawing.");
 
-                // make sure we re-select the star we had selected before (if any)
-                if (mSelectedStar != null) {
-                    Star newSelectedStar = SectorManager.getInstance().findStar(mSelectedStar.getKey());
-                    // if it's the same instance, that's fine
-                    if (newSelectedStar != mSelectedStar) {
-                        selectStar(newSelectedStar);
+                // make sure we re-select the entity we had selected before (if any)
+                if (mSelectedEntity != null) {
+                    if (mSelectedEntity.star != null) {
+                        Star newSelectedStar = SectorManager.getInstance().findStar(mSelectedEntity.star.getKey());
+                        // if it's the same instance, that's fine
+                        if (newSelectedStar != mSelectedEntity.star) {
+                           selectStar(newSelectedStar);
+                        }
                     }
                 }
 
@@ -134,6 +136,10 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
         //scrollTo(0, 0, 0, 0);
     }
 
+    public void setSelectionView(SelectionView selectionView) {
+        mSelectionView = selectionView;
+    }
+
     @Override
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
@@ -149,8 +155,10 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
     }
 
     public void deselectStar() {
-        mSelectedStar = null;
-        removeOverlay(mSelectionOverlay);
+        mSelectedEntity = null;
+        if (mSelectionView != null) {
+            mSelectionView.setVisibility(View.GONE);
+        }
     }
 
     /**
@@ -171,15 +179,13 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
         mSelectionChangedListeners.remove(listener);
     }
 
-    protected void fireSelectionChanged(Star star) {
+    protected void fireSelectionChanged(VisibleEntity entity) {
         for(OnSelectionChangedListener listener : mSelectionChangedListeners) {
-            listener.onStarSelected(star);
-        }
-    }
-
-    protected void fireSelectionChanged(Fleet fleet) {
-        for(OnSelectionChangedListener listener : mSelectionChangedListeners) {
-            listener.onFleetSelected(fleet);
+            if (entity.star != null) {
+                listener.onStarSelected(entity.star);
+            } else if (entity.fleet != null) {
+                listener.onFleetSelected(entity.fleet);
+            }
         }
     }
 
@@ -230,7 +236,10 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
     }
 
     public Star getSelectedStar() {
-        return mSelectedStar;
+        if (mSelectedEntity == null) {
+            return null;
+        }
+        return mSelectedEntity.star;
     }
 
     /**
@@ -306,6 +315,18 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
         if (needUpdate) {
             scrollTo(mSectorX, mSectorY, -mOffsetX, -mOffsetY);
         }
+        placeSelection();
+    }
+
+    private void placeSelection() {
+        if (mSelectionView == null || mSelectedEntity == null) {
+            return;
+        }
+
+        RelativeLayout.LayoutParams lp = (RelativeLayout.LayoutParams) mSelectionView.getLayoutParams();
+        lp.leftMargin = (int) mSelectedEntity.position.x;
+        lp.topMargin = (int) mSelectedEntity.position.y;
+        mSelectionView.setLayoutParams(lp);
     }
 
     /**
@@ -419,6 +440,7 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
         DrawState state = new DrawState(this, canvas);
         final List<Pair<Long, Long>> missingSectors = drawScene(state);
         mVisibleEntities = state.visibleEntities;
+        mSelectedEntity = state.selectedEntity;
 
         if (missingSectors != null) {
             mHandler.post(new Runnable() {
@@ -543,7 +565,11 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
                 }
             }
 
-            state.visibleEntities.add(new VisibleEntity(new Point2D(x * pixelScale, y * pixelScale), star));
+            VisibleEntity ve = new VisibleEntity(new Point2D(x * pixelScale, y * pixelScale), star);
+            if (state.selectedEntity != null && state.selectedEntity.star != null && state.selectedEntity.star.getKey().equals(star.getKey())) {
+                state.selectedEntity = ve;
+            }
+            state.visibleEntities.add(ve);
         }
     }
 
@@ -766,7 +792,11 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
         }
 
         // record the fact that this guy is visible
-        state.visibleEntities.add(new VisibleEntity(position, fleet));
+        VisibleEntity ve = new VisibleEntity(position, fleet);
+        if (state.selectedEntity != null && state.selectedEntity.fleet != null && state.selectedEntity.fleet.getKey().equals(fleet.getKey())) {
+            state.selectedEntity = ve;
+        }
+        state.visibleEntities.add(ve);
 
         // scale zoom and rotate the bitmap all with one matrix
         state.matrix.reset();
@@ -854,35 +884,52 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
     private void selectStar(Star star) {
         if (star != null) {
             log.info("Selecting star: "+star.getKey());
-            mSelectedStar = star;
-            mSelectedFleet = null;
-
-            mSelectionOverlay.setRadius((star.getSize() + 4) * getPixelScale());
-            if (mSelectionOverlay.isVisible()) {
-                removeOverlay(mSelectionOverlay);
+            mSelectedEntity = null;
+            for (VisibleEntity entity : mVisibleEntities) {
+                if (entity.star != null && entity.star.getKey().equals(star.getKey())) {
+                    selectEntity(entity);
+                    break;
+                }
             }
-            addOverlay(mSelectionOverlay, star);
-
-            redraw();
-            fireSelectionChanged(star);
         }
     }
 
     public void selectFleet(Fleet fleet) {
         if (fleet != null && fleet.getState() == Fleet.State.MOVING) {
             log.info("Selecting fleet: "+fleet.getKey());
-            mSelectedStar = null;
-            mSelectedFleet = fleet;
-
-            mSelectionOverlay.setRadius(15.0f * getPixelScale());
-            if (mSelectionOverlay.isVisible()) {
-                removeOverlay(mSelectionOverlay);
+            mSelectedEntity = null;
+            for (VisibleEntity entity : mVisibleEntities) {
+                if (entity.fleet != null && entity.fleet.getKey().equals(fleet.getKey())) {
+                    selectEntity(entity);
+                    break;
+                }
             }
-            addOverlay(mSelectionOverlay, fleet);
-
-            redraw();
-            fireSelectionChanged(fleet);
         }
+    }
+
+    /**
+     * Selected a fleet or star.
+     */
+    public void selectEntity(VisibleEntity entity) {
+        if (entity.fleet != null) {
+            if (entity.fleet.getState() != Fleet.State.MOVING) {
+                return;
+            }
+        }
+
+        mSelectedEntity = entity;
+        if (mSelectionView != null && mSelectedEntity != null) {
+            RelativeLayout.LayoutParams lp = (RelativeLayout.LayoutParams) mSelectionView.getLayoutParams();
+            lp.width = 30;
+            lp.height = 30;
+            mSelectionView.setLayoutParams(lp);
+            mSelectionView.setVisibility(View.VISIBLE);
+            
+        }
+
+        redraw();
+        fireSelectionChanged(entity);
+        placeSelection();
     }
 
     /**
@@ -917,15 +964,8 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
 
             int n;
             for (n = 0; n < tappedEntities.size(); n++) {
-                if (mSelectedStar != null && tappedEntities.get(n).star != null) {
-                    if (mSelectedStar.getKey().equals(tappedEntities.get(n).star.getKey())) {
-                        break;
-                    }
-                }
-                if (mSelectedFleet != null && tappedEntities.get(n).fleet != null) {
-                    if (mSelectedFleet.getKey().equals(tappedEntities.get(n).fleet.getKey())) {
-                        break;
-                    }
+                if (mSelectedEntity != null && mSelectedEntity == tappedEntities.get(n)) {
+                    break;
                 }
             }
 
@@ -962,6 +1002,7 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
         public Map<String, Empire> visibleEmpires;
         public Paint starPaint;
         public Paint starNamePaint;
+        public VisibleEntity selectedEntity;
 
         private StarfieldSurfaceView mStarfieldSurfaceView;
 
@@ -979,6 +1020,7 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
             fleetAttachedOverlays = ssv.mFleetAttachedOverlays;
             matrix = new Matrix();
             visibleEmpires = ssv.mVisibleEmpires;
+            selectedEntity = ssv.mSelectedEntity;
 
             starPaint = new Paint();
             starPaint.setARGB(255, 255, 255, 255);
