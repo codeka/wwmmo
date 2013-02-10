@@ -951,7 +951,7 @@ def _orderFleet_move(star_pb, fleet_pb, order_pb):
     return False
 
   src_star = star_pb
-  dst_star = sector.getStar(db.Key(order_pb.star_key))
+  dst_star = sector.getStar(order_pb.star_key)
   distance_in_pc = sector.getDistanceBetweenStars(src_star, dst_star)
 
   design = designs.ShipDesign.getDesign(fleet_pb.design_name)
@@ -969,8 +969,8 @@ def _orderFleet_move(star_pb, fleet_pb, order_pb):
 
   # Let's just hard-code this to 1 hour for now...
   time = datetime.now() + timedelta(hours=(distance_in_pc / design.speed))
-  logging.info("distance=%.2f pc, speed=%.2f pc/hr, cost=%.2f, fleet will reach it's destination at %s"
-               % (distance_in_pc, design.speed, fuel_cost, time))
+  logging.info("Fleet [%s]: distance=%.2f pc, speed=%.2f pc/hr, cost=%.2f, fleet will reach it's destination at %s"
+               % (fleet_pb.key, distance_in_pc, design.speed, fuel_cost, time))
   fleet_pb.eta = ctrl.dateTimeToEpoch(time)
 
   return True

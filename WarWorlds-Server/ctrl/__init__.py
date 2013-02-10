@@ -270,6 +270,8 @@ def fleetModelToPb(fleet_pb, fleet_model):
     fleet_pb.last_victory = dateTimeToEpoch(fleet_model.lastVictory)
   if fleet_model.eta:
     fleet_pb.eta = dateTimeToEpoch(fleet_model.eta)
+  else:
+    fleet_pb.eta = 0
 
 
 def fleetPbToModel(fleet_model, fleet_pb):

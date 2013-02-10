@@ -14,6 +14,7 @@ import webapp2 as webapp
 
 import ctrl
 from ctrl import empire as ctl
+from ctrl import sector as sector_ctl
 from ctrl import simulation as simulation_ctl
 from ctrl import designs as designs_ctl
 from model import empire as mdl
@@ -249,12 +250,41 @@ class StarSimulatePage(tasks.TaskPage):
     self.response.write("Success!")
 
 
+
+class FleetMoveFixPage(tasks.TaskPage):
+  def get(self):
+    n = 0
+    query = mdl.Fleet.all().filter("destinationStar !=", None)
+    for fleet_mdl in query:
+      if fleet_mdl.eta:
+        continue
+
+      src_star = sector_ctl.getStar(str(fleet_mdl.key().parent()))
+      dst_star = sector_ctl.getStar(str(mdl.Fleet.destinationStar.get_value_for_datastore(fleet_mdl)))
+      distance_in_pc = sector_ctl.getDistanceBetweenStars(src_star, dst_star)
+      design = designs_ctl.ShipDesign.getDesign(fleet_mdl.designName)
+      fleet_mdl.eta = fleet_mdl.stateStartTime + timedelta(hours=(distance_in_pc / design.speed))
+      fleet_mdl.put()
+      logging.info("Updating eta for fleet [%s] (%.2f %s) to %s" % (
+        str(fleet_mdl.key()), fleet_mdl.numShips, design.name, str(fleet_mdl.eta)))
+
+      n += 1
+      if n >= 4:
+        logging.info("Still more to go, queuing another one.")
+        taskqueue.add(queue_name="fleet",
+                      url="/tasks/empire/move-fix",
+                      method="GET")
+        break
+
+
 class FleetMoveCheckPage(tasks.TaskPage):
   def get(self):
-    def _fetchOperationInTX(fleet_key):
+    def _fetchOperationInTX(fleet_key, complete_time):
       """This is done in a transaction to make sure only one request processes the build."""
       fleet_model = mdl.Fleet.get(fleet_key)
       if not fleet_model or not fleet_model.eta:
+        return None
+      if fleet_model.eta > complete_time:
         return None
       fleet_model.eta = None
       fleet_model.put()
@@ -270,10 +300,10 @@ class FleetMoveCheckPage(tasks.TaskPage):
       if len(fleet_keys) >= 2:
         break
     for fleet_key in fleet_keys:
-      fleet_model = db.run_in_transaction(_fetchOperationInTX, fleet_key)
+      fleet_model = db.run_in_transaction(_fetchOperationInTX, fleet_key, complete_time)
       if not fleet_model:
         continue
-      _on_move_complete(fleet_key)
+      _on_move_complete(fleet_model)
 
     ctl.scheduleMoveCheck()
 
@@ -283,13 +313,16 @@ class FleetMoveCompletePage(tasks.TaskPage):
 
   We need to transfer the fleet so that it's orbiting the new star."""
   def get(self, fleet_key):
-    if not _on_move_complete(fleet_key):
+    fleet_model = mdl.Fleet.get(fleet_key)
+    if not fleet_model:
+      self.response.set_statu(400)
+    if not _on_move_complete(fleet_model):
       self.response.set_status(400)
 
 
-def _on_move_complete(fleet_key):
-  fleet_mdl = mdl.Fleet.get(fleet_key)
-  if not fleet_mdl or fleet_mdl.state != pb.Fleet.MOVING:
+def _on_move_complete(fleet_mdl):
+  fleet_key = str(fleet_mdl.key())
+  if fleet_mdl.state != pb.Fleet.MOVING:
     logging.warn("Fleet [%s] is not moving, as expected." % (fleet_key))
     return False
   else:
@@ -379,6 +412,7 @@ def _on_move_complete(fleet_key):
 app = webapp.WSGIApplication([("/tasks/empire/build-check", BuildCheckPage),
                               ("/tasks/empire/star-simulate", StarSimulatePage),
                               ("/tasks/empire/move-check", FleetMoveCheckPage),
+                              ("/tasks/empire/move-fix", FleetMoveFixPage),
                               ("/tasks/empire/fleet/([^/]+)/move-complete", FleetMoveCompletePage)],
                              debug=os.environ["SERVER_SOFTWARE"].startswith("Development"))
 

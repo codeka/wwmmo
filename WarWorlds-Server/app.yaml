@@ -14,6 +14,10 @@ builtins:
 inbound_services:
 - warmup
 
+# We can't include it because it doesn't support Python 2.7/threadsafe=true
+#includes:
+#- mapreduce/include.yaml
+
 handlers:
 - url: /img
   static_dir: static/img
@@ -34,6 +38,10 @@ handlers:
   static_files: static/favicon.ico
   upload: static/favicon.ico
 
+# These two are copied (and slightly modified from mapreduce/include.yaml so
+# it can support threading:true
+- url: /mapreduce/pipeline/images
+  static_dir: mapreduce/lib/pipeline/ui/images
 - url: /mapreduce(/.*)?
   script: mapreduce.main.APP
   login: admin
@@ -50,6 +58,10 @@ handlers:
 
 - url: /tasks/empire(/.*)?
   script: tasks.empire.app
+  login: admin
+
+- url: /tasks/stats(/.*)?
+  script: tasks.statistics.app
   login: admin
 
 - url: /_ah/.*
