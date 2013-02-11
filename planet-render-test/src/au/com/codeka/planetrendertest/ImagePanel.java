@@ -10,8 +10,8 @@ import java.io.IOException;
 import javax.imageio.ImageIO;
 import javax.swing.JPanel;
 
-import au.com.codeka.planetrender.Colour;
-import au.com.codeka.planetrender.Image;
+import au.com.codeka.common.Colour;
+import au.com.codeka.common.Image;
 
 class ImagePanel extends JPanel {
     private static final long serialVersionUID = 1L;

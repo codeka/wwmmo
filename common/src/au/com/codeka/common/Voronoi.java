@@ -1,11 +1,10 @@
-package au.com.codeka.planetrender;
+package au.com.codeka.common;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Random;
 import java.util.Set;
 
 /**
@@ -13,8 +12,8 @@ import java.util.Set;
  * \c PointCloud. It's used as the staring point of our texture generator.
  */
 public class Voronoi {
-    private PointCloud mPointCloud;
-    private ArrayList<Triangle> mTriangles;
+    protected PointCloud mPointCloud;
+    protected ArrayList<Triangle> mTriangles;
 
     // this mapping maps points in the point cloud to the triangles that share the
     // point as a vertex
@@ -34,16 +33,10 @@ public class Voronoi {
         generate();
     }
 
-    public Voronoi(Template.VoronoiTemplate tmpl, Random rand) {
-        Template.PointCloudTemplate pcTmpl = tmpl.getParameter(Template.PointCloudTemplate.class);
-        mPointCloud = new PointCloud(pcTmpl, rand);
-        generate();
-    }
-
     /**
      * Generates the delaunay trianglation/voronoi diagram of the point cloud. 
      */
-    private void generate() {
+    protected void generate() {
         List<Triangle> triangles = new ArrayList<Triangle>();
         List<Vector2> points = mPointCloud.getPoints();
 

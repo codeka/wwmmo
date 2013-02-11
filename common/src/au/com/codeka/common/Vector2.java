@@ -1,11 +1,12 @@
-package au.com.codeka.planetrender;
+package au.com.codeka.common;
 
-import au.com.codeka.planetrender.ObjectPool.Pooled;
+import au.com.codeka.common.ObjectPool;
+import au.com.codeka.common.ObjectPool.Pooled;
 
 /**
  * Represents a 2-dimensional vector.
  */
-class Vector2 implements ObjectPool.Pooled {
+public class Vector2 implements ObjectPool.Pooled {
     public static ObjectPool<Vector2> pool = new ObjectPool<Vector2>(250, new Vector2Creator());
 
     public double x;

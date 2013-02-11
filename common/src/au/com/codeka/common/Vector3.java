@@ -1,6 +1,7 @@
-package au.com.codeka.planetrender;
+package au.com.codeka.common;
 
-import au.com.codeka.planetrender.ObjectPool.Pooled;
+import au.com.codeka.common.ObjectPool;
+import au.com.codeka.common.ObjectPool.Pooled;
 
 /**
  * Helper class that represents a 3-dimensional vector.

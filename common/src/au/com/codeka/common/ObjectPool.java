@@ -1,4 +1,4 @@
-package au.com.codeka.planetrender;
+package au.com.codeka.common;
 
 public class ObjectPool<T extends ObjectPool.Pooled> {
     private PooledCreator mCreator;

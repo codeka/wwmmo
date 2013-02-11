@@ -4,6 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import au.com.codeka.common.Colour;
+import au.com.codeka.common.Image;
+import au.com.codeka.common.Vector3;
+
 /**
  * This is actually a very simple ray-tracing engine. The simplicity comes from the fact that
  * we assume there's only one object in the scene (the planet) and one light source (the sun).

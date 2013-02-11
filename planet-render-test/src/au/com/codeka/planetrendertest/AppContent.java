@@ -25,6 +25,11 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.JToolBar;
 
+import au.com.codeka.common.Colour;
+import au.com.codeka.common.Image;
+import au.com.codeka.common.PerlinNoise;
+import au.com.codeka.common.PointCloud;
+import au.com.codeka.common.Voronoi;
 import au.com.codeka.planetrender.*;
 
 /**
@@ -68,14 +73,14 @@ public class AppContent extends JPanel {
             TextureGenerator texture = new TextureGenerator((Template.TextureTemplate) tmpl, getRandom());
             texture.renderTexture(img);
         } else if (tmpl instanceof Template.VoronoiTemplate) {
-            Voronoi v = new Voronoi((Template.VoronoiTemplate) tmpl, getRandom());
+            Voronoi v = new TemplatedVoronoi((Template.VoronoiTemplate) tmpl, getRandom());
             v.renderDelaunay(img, Colour.GREEN);
             v.renderVoronoi(img, Colour.BLUE);
         } else if (tmpl instanceof Template.PointCloudTemplate) {
-            PointCloud pc = new PointCloud((Template.PointCloudTemplate) tmpl, getRandom());
+            PointCloud pc = new TemplatedPointCloud((Template.PointCloudTemplate) tmpl, getRandom());
             pc.render(img);
         } else if (tmpl instanceof Template.PerlinNoiseTemplate) {
-            PerlinNoise pn = new PerlinNoise((Template.PerlinNoiseTemplate) tmpl, getRandom());
+            PerlinNoise pn = new TemplatedPerlinNoise((Template.PerlinNoiseTemplate) tmpl, getRandom());
             pn.render(img);
         } else {
             mStatus.setText("Unknown template kind: "+tmpl.getClass().getName());

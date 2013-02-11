@@ -1,4 +1,4 @@
-package au.com.codeka.planetrender;
+package au.com.codeka.common;
 
 import java.util.Random;
 
@@ -6,29 +6,20 @@ import java.util.Random;
  * This class generates perlin noise, which we can apply to various parts of the planet.
  */
 public class PerlinNoise {
-    private double mPersistence;
-    private Interpolator mInterpolator;
-    private long mRawSeed;
-    private int mStartOctave;
-    private int mEndOctave;
-    private Random mRawRand;
+    protected double mPersistence;
+    protected Interpolator mInterpolator;
+    protected long mRawSeed;
+    protected int mStartOctave;
+    protected int mEndOctave;
+    protected Random mRawRand;
 
-    public PerlinNoise(Template.PerlinNoiseTemplate tmpl, Random rand) {
-        mRawSeed = rand.nextLong();
-        mPersistence = tmpl.getPersistence();
-        mStartOctave = tmpl.getStartOctave();
-        mEndOctave = tmpl.getEndOctave();
+    public PerlinNoise() {
+        mRawSeed = 0;
+        mPersistence = 0;
+        mStartOctave = 0;
+        mEndOctave = 0;
         mRawRand = new Random();
-
-        if (tmpl.getInterpolation() == Template.PerlinNoiseTemplate.Interpolation.None) {
-            mInterpolator = new NoneInterpolator();
-        } else if (tmpl.getInterpolation() == Template.PerlinNoiseTemplate.Interpolation.Linear) {
-            mInterpolator = new LinearInterpolator();
-        } else if (tmpl.getInterpolation() == Template.PerlinNoiseTemplate.Interpolation.Cosine) {
-            mInterpolator = new CosineInterpolator();
-        } else {
-            mInterpolator = new NoneInterpolator(); // ??
-        }
+        mInterpolator = new NoneInterpolator();
     }
 
     /**
@@ -103,23 +94,29 @@ public class PerlinNoise {
         return mInterpolator.interpolate(ny1, ny2, fy);
     }
 
-    private interface Interpolator {
+    protected interface Interpolator {
         double interpolate(double a, double b, double n);
     }
 
-    private static class NoneInterpolator implements Interpolator {
+    protected static class NoneInterpolator implements Interpolator {
+        public NoneInterpolator() {}
+
         public double interpolate(double a, double b, double n) {
             return a;
         }
     }
 
-    private static class LinearInterpolator implements Interpolator {
+    protected static class LinearInterpolator implements Interpolator {
+        public LinearInterpolator() {}
+
         public double interpolate(double a, double b, double n) {
             return a + n * (b - a);
         }
     }
 
-    private static class CosineInterpolator implements Interpolator {
+    protected static class CosineInterpolator implements Interpolator {
+        public CosineInterpolator() {}
+
         public double interpolate(double a, double b, double n) {
             double radians = n * Math.PI;
             n = (1 - Math.cos(radians)) * 0.5;

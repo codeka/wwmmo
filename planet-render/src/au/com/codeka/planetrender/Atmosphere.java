@@ -4,6 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import au.com.codeka.common.Colour;
+import au.com.codeka.common.ColourGradient;
+import au.com.codeka.common.PerlinNoise;
+import au.com.codeka.common.Vector3;
+
 /**
  * This class will generate an atmosphere around a planet.
  */
@@ -98,7 +103,7 @@ public class Atmosphere {
             Template.PerlinNoiseTemplate perlinTemplate = tmpl.getParameter(
                     Template.PerlinNoiseTemplate.class);
             if (perlinTemplate != null) {
-                mPerlin = new PerlinNoise(perlinTemplate, rand);
+                mPerlin = new TemplatedPerlinNoise(perlinTemplate, rand);
                 mNoisiness = tmpl.getNoisiness();
             }
             mBlendMode = tmpl.getBlendMode();
@@ -160,7 +165,7 @@ public class Atmosphere {
             Template.PerlinNoiseTemplate perlinTemplate = tmpl.getParameter(
                     Template.PerlinNoiseTemplate.class);
             if (perlinTemplate != null) {
-                mPerlin = new PerlinNoise(perlinTemplate, rand);
+                mPerlin = new TemplatedPerlinNoise(perlinTemplate, rand);
                 mNoisiness = tmpl.getNoisiness();
             }
             mBlendMode = tmpl.getBlendMode();

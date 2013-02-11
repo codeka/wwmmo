@@ -4,6 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import au.com.codeka.common.Colour;
+import au.com.codeka.common.ColourGradient;
+import au.com.codeka.common.Image;
+import au.com.codeka.common.PerlinNoise;
+import au.com.codeka.common.Vector2;
+import au.com.codeka.common.Voronoi;
+
 public class TextureGenerator {
     private Generator mGenerator;
     private double mScaleX;
@@ -55,13 +62,13 @@ public class TextureGenerator {
 
         public VoronoiMapGenerator(Template.TextureTemplate tmpl, Random rand) {
             Template.VoronoiTemplate voronoiTmpl = tmpl.getParameter(Template.VoronoiTemplate.class);
-            mVoronoi = new Voronoi(voronoiTmpl, rand);
+            mVoronoi = new TemplatedVoronoi(voronoiTmpl, rand);
             mColourGradient = tmpl.getParameter(Template.ColourGradientTemplate.class).getColourGradient();
             mNoisiness = tmpl.getNoisiness();
 
             Template.PerlinNoiseTemplate noiseTemplate = tmpl.getParameter(Template.PerlinNoiseTemplate.class);
             if (noiseTemplate != null) {
-                mNoise = new PerlinNoise(noiseTemplate, rand);
+                mNoise = new TemplatedPerlinNoise(noiseTemplate, rand);
             }
         }
 
@@ -115,7 +122,7 @@ public class TextureGenerator {
         private ColourGradient mColourGradient;
 
         public PerlinNoiseGenerator(Template.TextureTemplate tmpl, Random rand) {
-            mNoise = new PerlinNoise(tmpl.getParameter(Template.PerlinNoiseTemplate.class), rand);
+            mNoise = new TemplatedPerlinNoise(tmpl.getParameter(Template.PerlinNoiseTemplate.class), rand);
             mColourGradient = tmpl.getParameter(Template.ColourGradientTemplate.class).getColourGradient();
         }
 

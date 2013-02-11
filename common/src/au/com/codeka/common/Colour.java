@@ -1,4 +1,6 @@
-package au.com.codeka.planetrender;
+package au.com.codeka.common;
+
+import au.com.codeka.common.ObjectPool;
 
 /**
  * Helper class that represents an ARGB colour.

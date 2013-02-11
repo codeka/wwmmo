@@ -13,6 +13,11 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 
+import au.com.codeka.common.Colour;
+import au.com.codeka.common.ColourGradient;
+import au.com.codeka.common.Vector3;
+import au.com.codeka.common.XmlIterator;
+
 /**
  * A template is used to create an image (usually a complete planet, but it doesn't have to be).
  */

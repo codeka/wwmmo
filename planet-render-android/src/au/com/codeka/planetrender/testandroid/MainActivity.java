@@ -13,7 +13,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
-import au.com.codeka.planetrender.Image;
+import au.com.codeka.common.Image;
 import au.com.codeka.planetrender.PlanetRenderer;
 import au.com.codeka.planetrender.Template;
 import au.com.codeka.planetrender.TemplateException;
