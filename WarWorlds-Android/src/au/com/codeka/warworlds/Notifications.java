@@ -226,53 +226,64 @@ public class Notifications {
 
         public void addNotification(NotificationDetails details) {
             SQLiteDatabase db = getWritableDatabase();
-
-            ByteArrayOutputStream sitrep = new ByteArrayOutputStream();
-            ByteArrayOutputStream star = new ByteArrayOutputStream();
             try {
-                details.sitrep.writeTo(sitrep);
-                details.star.writeTo(star);
-            } catch (IOException e) {
-                // we won't get the notification, but not the end of the world...
-                return;
-            }
+                ByteArrayOutputStream sitrep = new ByteArrayOutputStream();
+                ByteArrayOutputStream star = new ByteArrayOutputStream();
+                try {
+                    details.sitrep.writeTo(sitrep);
+                    details.star.writeTo(star);
+                } catch (IOException e) {
+                    // we won't get the notification, but not the end of the world...
+                    return;
+                }
 
-            ContentValues values = new ContentValues();
-            values.put("star", star.toByteArray());
-            values.put("sitrep", sitrep.toByteArray());
-            values.put("timestamp", details.sitrep.getReportTime());
-            db.insert("notifications", null, values);
+                ContentValues values = new ContentValues();
+                values.put("star", star.toByteArray());
+                values.put("sitrep", sitrep.toByteArray());
+                values.put("timestamp", details.sitrep.getReportTime());
+                db.insert("notifications", null, values);
+            } finally {
+                db.close();
+            }
         }
 
         public List<NotificationDetails> getNotifications() {
-            SQLiteDatabase db = getReadableDatabase();
-
             ArrayList<NotificationDetails> notifications = new ArrayList<NotificationDetails>();
-            Cursor cursor = db.query("notifications", new String[] {"star", "sitrep"},
-                                     null, null, null, null, "timestamp DESC");
-            if (!cursor.moveToFirst()) {
-                cursor.close();
-                return notifications;
-            }
 
-            do {
-                try {
-                    NotificationDetails notification = new NotificationDetails();
-                    notification.star = Messages.Star.parseFrom(cursor.getBlob(0));
-                    notification.sitrep = Messages.SituationReport.parseFrom(cursor.getBlob(1));
-                    notifications.add(notification);
-                } catch (InvalidProtocolBufferException e) {
-                    // any errors here and we'll just skip this notification
+            SQLiteDatabase db = getReadableDatabase();
+            try {
+                Cursor cursor = db.query("notifications", new String[] {"star", "sitrep"},
+                                         null, null, null, null, "timestamp DESC");
+                if (!cursor.moveToFirst()) {
+                    cursor.close();
+                    return notifications;
                 }
-            } while (cursor.moveToNext());
-            cursor.close();
+
+                do {
+                    try {
+                        NotificationDetails notification = new NotificationDetails();
+                        notification.star = Messages.Star.parseFrom(cursor.getBlob(0));
+                        notification.sitrep = Messages.SituationReport.parseFrom(cursor.getBlob(1));
+                        notifications.add(notification);
+                    } catch (InvalidProtocolBufferException e) {
+                        // any errors here and we'll just skip this notification
+                    }
+                } while (cursor.moveToNext());
+                cursor.close();
+            } finally {
+                db.close();
+            }
 
             return notifications;
         }
 
         public void clearNotifications() {
             SQLiteDatabase db = getReadableDatabase();
-            db.execSQL("DELETE FROM notifications;");
+            try {
+                db.execSQL("DELETE FROM notifications;");
+            } finally {
+                db.close();
+            }
         }
     }
 

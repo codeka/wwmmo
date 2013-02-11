@@ -45,80 +45,60 @@ public class SelectionView extends FrameLayout {
         lp.topMargin = lp.leftMargin = lp.bottomMargin = lp.rightMargin = 6;
         mInnerCircle = new CircleView(context);
         mInnerCircle.setLayoutParams(lp);
+        mInnerCircle.setReverse(true);
         addView(mInnerCircle);
-    }
-    
-    @Override
-    public void onAttachedToWindow() {
-        super.onAttachedToWindow();
-        updateAnimation();
-    }
-
-    @Override
-    public void onSizeChanged(int w, int h, int oldw, int oldh) {
-        super.onSizeChanged(w, h, oldw, oldh);
-        updateAnimation();
-    }
-
-    private void updateAnimation() {
-        RotateAnimation outerAnimation = getRotation(0.0f, 360.0f, mOuterCircle);
-        mOuterCircle.setAnimation(outerAnimation);
-        mOuterCircle.startAnimation(outerAnimation);
-
-        RotateAnimation innerAnimation = getRotation(360.0f, 0.0f, mInnerCircle);
-        mInnerCircle.setAnimation(innerAnimation);
-        mInnerCircle.startAnimation(innerAnimation);
-    }
-
-    private RotateAnimation getRotation(float startAngle, float endAngle, View view) {
-        final int pivotX = view.getWidth() / 2;
-        final int pivotY = view.getHeight() / 2;
-
-        RotateAnimation anim = new RotateAnimation(startAngle, endAngle, pivotX, pivotY);
-        anim.setStartOffset(0);
-        anim.setDuration(3000);
-        anim.setRepeatCount(Animation.INFINITE);
-        anim.setRepeatMode(Animation.RESTART);
-        anim.setInterpolator(new LinearInterpolator());
-        return anim;
     }
 
     public class CircleView extends View {
         private Paint mPaint;
         private RectF mBounds;
+        private boolean mIsReverse;
+
+        private static final int NUM_DASHES = 40;
 
         public CircleView(Context context) {
             super(context);
         }
 
+        public void setReverse(boolean reverse) {
+            mIsReverse = reverse;
+        }
 
         @Override
         public void onSizeChanged(int w, int h, int oldw, int oldh) {
             super.onSizeChanged(w, h, oldw, oldh);
-            updateAnimation();
+
+            float size = Math.max(w, h);
+            final float pivot = size / 2.0f;
+            final float startAngle = (mIsReverse ? 360.0f : 0.0f);
+            final float endAngle = (mIsReverse ? 0.0f : 360.0f);
+
+            RotateAnimation anim = new RotateAnimation(startAngle, endAngle, pivot, pivot);
+            anim.setStartOffset(0);
+            anim.setDuration(4000);
+            anim.setRepeatCount(Animation.INFINITE);
+            anim.setRepeatMode(Animation.RESTART);
+            anim.setInterpolator(new LinearInterpolator());
+            setAnimation(anim);
+            startAnimation(anim);
+
+            mBounds = new RectF(0, 0, size, size);
+
+            mPaint = new Paint();
+            mPaint.setARGB(255, 255, 255, 255);
+            mPaint.setAntiAlias(true);
+            mPaint.setStyle(Paint.Style.STROKE);
+
+            float dashAngleRadians = (float)((2 * Math.PI) / NUM_DASHES);
+            float dashPixels = dashAngleRadians * ((float) getWidth() / 2.0f);
+            DashPathEffect pathEffect = new DashPathEffect(new float[] {
+                    dashPixels, dashPixels}, 1);
+            mPaint.setPathEffect(pathEffect);
         }
 
         @Override
         public void onDraw(Canvas c) {
-            int numDashes = 40; // we want 40 dashes around the circle
-            float dashAngleDegrees = 360.0f / numDashes;
-
-            if (mPaint == null) {
-                mPaint = new Paint();
-                mPaint.setARGB(255, 255, 255, 255);
-                mPaint.setAntiAlias(true);
-                mPaint.setStyle(Paint.Style.STROKE);
-
-                float dashAngleRadians = (float)((2 * Math.PI) / numDashes);
-                float dashPixels = dashAngleRadians * ((float) getWidth() / 2.0f);
-                DashPathEffect pathEffect = new DashPathEffect(new float[] {
-                        dashPixels, dashPixels}, 1);
-                mPaint.setPathEffect(pathEffect);
-            }
-
-            if (mBounds == null) {
-                mBounds = new RectF(0, 0, getWidth(), getHeight());
-            }
+            float dashAngleDegrees = 360.0f / NUM_DASHES;
 
             // we cannot make the arc 360 degrees, otherwise it ignores the angle offset. Instead
             // we make it 360 - "dash-angle" (i.e. the angle through which one dash passes)

@@ -3,9 +3,6 @@ package au.com.codeka.warworlds.game.solarsystem;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -14,7 +11,6 @@ import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Paint.Style;
-import android.os.Handler;
 import android.util.AttributeSet;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
@@ -38,19 +34,15 @@ import au.com.codeka.warworlds.model.StarImageManager;
  * and representations of the fleets, etc.
  */
 public class SolarSystemSurfaceView extends UniverseElementSurfaceView {
-    private static Logger log = LoggerFactory.getLogger(SolarSystemSurfaceView.class);
     private Context mContext;
     private Star mStar;
     private PlanetInfo[] mPlanetInfos;
     private PlanetInfo mSelectedPlanet;
-    private boolean mPlanetsPlaced;
     private Paint mPlanetPaint;
     private SelectionView mSelectionView;
     private Bitmap mColonyIcon;
     private CopyOnWriteArrayList<OnPlanetSelectedListener> mPlanetSelectedListeners;
     private StarfieldBackgroundRenderer mBackgroundRenderer;
-    private boolean mPlanetSelectedFired;
-    private Handler mHandler;
     private BitmapGeneratedListener mBitmapGeneratedListener;
     private Matrix mMatrix;
 
@@ -62,7 +54,6 @@ public class SolarSystemSurfaceView extends UniverseElementSurfaceView {
 
         mContext = context;
         mPlanetSelectedListeners = new CopyOnWriteArrayList<OnPlanetSelectedListener>();
-        mHandler = new Handler();
 
         mPlanetPaint = new Paint();
         mPlanetPaint.setARGB(255, 255, 255, 255);
@@ -97,7 +88,8 @@ public class SolarSystemSurfaceView extends UniverseElementSurfaceView {
             mPlanetInfos[i] = planetInfo;
         }
 
-        mPlanetsPlaced = false;
+        placePlanets();
+        redraw();
     }
 
     /**
@@ -105,7 +97,7 @@ public class SolarSystemSurfaceView extends UniverseElementSurfaceView {
      * \c SolarSystemSurfaceView in device pixels.
      */
     public Point2D getPlanetCentre(Planet planet) {
-        if (!mPlanetsPlaced) {
+        if (mPlanetInfos == null) {
             return null;
         }
 
@@ -120,13 +112,11 @@ public class SolarSystemSurfaceView extends UniverseElementSurfaceView {
         return null;
     }
 
-    private void placePlanets(Canvas canvas) {
-        if (mPlanetsPlaced) {
-            return;
-        }
+    private void placePlanets() {
+        int width = getWidth();
 
         float planetStart = 150 * getPixelScale();
-        float distanceBetweenPlanets = canvas.getWidth() - planetStart;
+        float distanceBetweenPlanets = width - planetStart;
         distanceBetweenPlanets /= mPlanetInfos.length;
 
         for (int i = 0; i < mPlanetInfos.length; i++) {
@@ -142,14 +132,13 @@ public class SolarSystemSurfaceView extends UniverseElementSurfaceView {
             Point2D centre = new Point2D(x, y);
             centre.rotate(angle);
             centre.y *= -1;
-            log.debug("Planet centre: ("+centre.x+","+centre.y+")");
 
             planetInfo.centre = centre;
             planetInfo.distanceFromSun = distanceFromSun;
             mPlanetInfos[i] = planetInfo;
         }
 
-        mPlanetsPlaced = true;
+        updateSelection();
     }
 
     public void addPlanetSelectedListener(OnPlanetSelectedListener listener) {
@@ -176,24 +165,27 @@ public class SolarSystemSurfaceView extends UniverseElementSurfaceView {
             if (planetInfo.planet.getIndex() == planetIndex) {
                 mSelectedPlanet = planetInfo;
 
-                if (mPlanetsPlaced) {
-                    firePlanetSelected(mSelectedPlanet.planet);
-                } else {
-                    mPlanetSelectedFired = false;
-                }
+                firePlanetSelected(mSelectedPlanet.planet);
 
-                if (mPlanetsPlaced && mSelectedPlanet != null && mSelectionView != null) {
-                    RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) mSelectionView.getLayoutParams();
-                    params.leftMargin = (int) (getLeft() + mSelectedPlanet.centre.x - (mSelectionView.getWidth() / 2));
-                    params.topMargin = (int) (getTop() + mSelectedPlanet.centre.y - (mSelectionView.getHeight() / 2));
-                    mSelectionView.setLayoutParams(params);
-                    mSelectionView.setVisibility(View.VISIBLE);
+                if (mSelectedPlanet != null && mSelectionView != null) {
+                    updateSelection();
                 } else if (mSelectionView != null) {
                     mSelectionView.setVisibility(View.GONE);
                 }
-
-                redraw();
             }
+        }
+    }
+
+    private void updateSelection() {
+        if (mSelectedPlanet != null && mSelectionView != null) {
+            mSelectionView.setVisibility(View.VISIBLE);
+
+            RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) mSelectionView.getLayoutParams();
+            params.width = (int) ((((mSelectedPlanet.planet.getSize() - 10.0) / 8.0) + 4.0) * 10.0) + (int) (40 * getPixelScale());
+            params.height = params.width;
+            params.leftMargin = (int) (getLeft() + mSelectedPlanet.centre.x - (params.width / 2));
+            params.topMargin = (int) (getTop() + mSelectedPlanet.centre.y - (params.height / 2));
+            mSelectionView.setLayoutParams(params);
         }
     }
 
@@ -208,6 +200,15 @@ public class SolarSystemSurfaceView extends UniverseElementSurfaceView {
     @Override
     public void onDetachedFromWindow() {
         PlanetImageManager.getInstance().removeBitmapGeneratedListener(mBitmapGeneratedListener);
+    }
+
+    @Override
+    public void onSizeChanged(int width, int height, int oldWidth, int oldHeight) {
+        super.onSizeChanged(width, height, oldWidth, oldHeight);
+        if (mPlanetInfos == null) {
+            return;
+        }
+        placePlanets();
     }
 
     /**
@@ -232,22 +233,11 @@ public class SolarSystemSurfaceView extends UniverseElementSurfaceView {
                     canvas.getWidth() / getPixelScale(),
                     canvas.getHeight() / getPixelScale());
 
-            // make sure the planets are in the correct position
-            placePlanets(canvas);
-
             drawSun(canvas);
             drawPlanets(canvas);
         }
 
-        if (!mPlanetSelectedFired && mSelectedPlanet != null) {
-            mHandler.post(new Runnable() {
-                @Override
-                public void run() {
-                    firePlanetSelected(mSelectedPlanet.planet);
-                }
-            });
-            mPlanetSelectedFired = true;
-        }
+        drawOverlays(canvas);
     }
 
     private void drawSun(Canvas canvas) {
@@ -261,7 +251,7 @@ public class SolarSystemSurfaceView extends UniverseElementSurfaceView {
         mMatrix.postScale(300.0f * pixelScale / sprite.getWidth(),
                           300.0f * pixelScale / sprite.getHeight());
         canvas.save();
-        canvas.setMatrix(mMatrix);
+        canvas.concat(mMatrix);
         sprite.draw(canvas);
         canvas.restore();
     }
@@ -284,7 +274,7 @@ public class SolarSystemSurfaceView extends UniverseElementSurfaceView {
                               100.0f * getPixelScale() / sprite.getHeight());
             mMatrix.postTranslate(planetInfo.centre.x, planetInfo.centre.y);
             canvas.save();
-            canvas.setMatrix(mMatrix);
+            canvas.concat(mMatrix);
             sprite.draw(canvas);
             canvas.restore();
 
@@ -299,12 +289,6 @@ public class SolarSystemSurfaceView extends UniverseElementSurfaceView {
                     }
                 }
             }
-        }
-
-        if (mSelectedPlanet != null && mSelectionView != null) {
-
-//            mSelectionOverlay.setCentre(mSelectedPlanet.centre.x, mSelectedPlanet.centre.y);
-//            mSelectionOverlay.setRadius(35.0 * getPixelScale());
         }
     }
 

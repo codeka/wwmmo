@@ -113,7 +113,7 @@ public class FleetActivity extends BaseActivity implements StarManager.StarFetch
 
         String fleetKey = getIntent().getExtras().getString("au.com.codeka.warworlds.FleetKey");
         if (fleetKey != null) {
-            mFleetList.selectFleet(fleetKey);
+            mFleetList.selectFleet(fleetKey, true);
         }
     }
 }

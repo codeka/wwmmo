@@ -1,10 +1,6 @@
 package au.com.codeka.warworlds.game;
 
 import java.util.ArrayList;
-import java.util.concurrent.Semaphore;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import android.content.Context;
 import android.graphics.Canvas;
@@ -14,25 +10,19 @@ import android.graphics.RectF;
 import android.util.AttributeSet;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
-import android.view.SurfaceHolder;
-import android.view.SurfaceView;
+import android.view.View;
 import au.com.codeka.Point2D;
 
 /**
  * Base class for things like \c StarfieldSurfaceView and \c SolarSystemSurfaceView, etc.
  */
-public class UniverseElementSurfaceView extends SurfaceView implements SurfaceHolder.Callback {
-    private Logger log = LoggerFactory.getLogger(UniverseElementSurfaceView.class);
+public class UniverseElementSurfaceView extends View {
     private Context mContext;
-    private SurfaceHolder mHolder;
     private GestureDetector mGestureDetector;
     private boolean mDisableGestures = false;
     GestureDetector.OnGestureListener mGestureListener;
     private float mPixelScale;
     private ArrayList<Overlay> mOverlays;
-
-    private Thread mDrawThread;
-    private Semaphore mDrawSemaphore;
 
     public UniverseElementSurfaceView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -45,8 +35,6 @@ public class UniverseElementSurfaceView extends SurfaceView implements SurfaceHo
         }
 
         mOverlays = new ArrayList<Overlay>();
-        mDrawSemaphore = new Semaphore(1);
-        getHolder().addCallback(this);
     }
 
     public void addOverlay(Overlay overlay) {
@@ -68,46 +56,14 @@ public class UniverseElementSurfaceView extends SurfaceView implements SurfaceHo
         }
     }
 
-    @Override
-    public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
-        if (mDrawThread != null) {
-            log.info(String.format("Surface changed, stopping draw thread %d", mDrawThread.getId()));
-            mHolder = null;
-            redraw();
-            try {
-                mDrawThread.join();
-            } catch(InterruptedException e) {
-            }
-            mDrawThread = null;
-        }
-
-        mHolder = holder;
-        redraw();
-    }
-
-    @Override
-    public void surfaceCreated(SurfaceHolder holder) {
-        mHolder = holder;
-        redraw();
-    }
-
-    @Override
-    public void surfaceDestroyed(SurfaceHolder holder) {
-        mHolder = null;
-
-        // if the draw thread is running, shut it down...
-        if (mDrawThread != null) {
-            mDrawThread.interrupt();
-            mDrawThread = null;
-        }
-    }
-
     public float getPixelScale() {
         return mPixelScale;
     }
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
+        super.onTouchEvent(event);
+
         if (mGestureDetector == null && !mDisableGestures) {
             GestureDetector.OnGestureListener listener = createGestureListener();
             if (listener == null) {
@@ -137,75 +93,16 @@ public class UniverseElementSurfaceView extends SurfaceView implements SurfaceHo
             return;
         }
 
-        if (mHolder == null) {
-            return;
-        }
-
-        if (mDrawThread == null) {
-            mDrawThread = new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    drawThreadProc();
-                }
-            });
-            mDrawThread.start();
-        }
-
-        try {
-            mDrawSemaphore.release();
-        } catch (Exception e) {
-            log.error("HUH?", e);
-        }
+        invalidate();
     }
 
-    private void drawThreadProc() {
-        while (true) {
-            try {
-                // if we have overlays then we're animated so we need to redraw anyway
-                try {
-                    mDrawSemaphore.acquire();
-                } catch (InterruptedException e) {
-                    log.info("Surface was destroyed, render thread shutting down.");
-                    mDrawThread = null;
-                    return;
-                }
-
-                if (!drawOnce()) {
-                    mDrawThread = null;
-                    return;
-                }
-            } catch(Exception e) {
-                log.error("An error occured re-drawing the canvas, ignoring.", e);
+    protected void drawOverlays(Canvas canvas) {
+        synchronized(mOverlays) {
+            int size = mOverlays.size();
+            for (int i = 0; i < size; i++) {
+                mOverlays.get(i).draw(canvas);
             }
         }
-    }
-
-    private boolean drawOnce() {
-        SurfaceHolder h = mHolder;
-        if (h == null) {
-            log.info("Surface was destroyed, render thread shutting down.");
-            return false;
-        }
-
-        Canvas c = h.lockCanvas();
-        if (c == null) {
-            log.info("Surface was destroyed, render thread shutting down.");
-            return false;
-        }
-
-        try {
-            onDraw(c);
-            synchronized(mOverlays) {
-                int size = mOverlays.size();
-                for (int i = 0; i < size; i++) {
-                    mOverlays.get(i).draw(c);
-                }
-            }
-        } finally {
-            h.unlockCanvasAndPost(c);
-        }
-
-        return true;
     }
 
     /**

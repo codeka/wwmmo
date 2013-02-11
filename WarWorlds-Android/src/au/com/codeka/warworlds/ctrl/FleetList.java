@@ -103,7 +103,7 @@ public class FleetList extends FrameLayout implements StarManager.StarFetchedHan
         mFleetListAdapter.setFleets(stars, fleets);
     }
 
-    public void selectFleet(String fleetKey) {
+    public void selectFleet(String fleetKey, boolean recentre) {
         mSelectedFleet = null;
         for (Fleet f : mFleets) {
             if (f.getKey().equals(fleetKey)) {
@@ -114,6 +114,14 @@ public class FleetList extends FrameLayout implements StarManager.StarFetchedHan
         if (mSelectedFleet != null) {
             final Spinner stanceSpinner = (Spinner) findViewById(R.id.stance);
             stanceSpinner.setSelection(mSelectedFleet.getStance().getValue() - 1);
+
+            if (recentre) {
+                int position = mFleetListAdapter.getItemPosition(mSelectedFleet);
+                if (position >= 0) {
+                    final ListView fleetList = (ListView) findViewById(R.id.ship_list);
+                    fleetList.setSelection(position);
+                }
+            }
         }
 
         mFleetListAdapter.notifyDataSetChanged();
@@ -158,7 +166,7 @@ public class FleetList extends FrameLayout implements StarManager.StarFetchedHan
                 FleetListAdapter.ItemEntry entry =
                         (FleetListAdapter.ItemEntry) mFleetListAdapter.getItem(position);
                 if (entry.type == FleetListAdapter.FLEET_ITEM_TYPE) {
-                    selectFleet(((Fleet) entry.value).getKey());
+                    selectFleet(((Fleet) entry.value).getKey(), false);
                 }
             }
         });
@@ -450,6 +458,21 @@ public class FleetList extends FrameLayout implements StarManager.StarFetchedHan
             if (mEntries == null)
                 return null;
             return mEntries.get(position);
+        }
+
+        public int getItemPosition(Fleet fleet) {
+            int index = 0;
+            for (; index < mEntries.size(); index++) {
+                ItemEntry entry = mEntries.get(index);
+                if (entry.type == FLEET_ITEM_TYPE) {
+                    Fleet entryFleet = (Fleet) entry.value;
+                    if (entryFleet.getKey().equals(fleet.getKey())) {
+                        return index;
+                    }
+                }
+            }
+
+            return -1;
         }
 
         @Override

@@ -65,6 +65,7 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
     private Map<String, Empire> mVisibleEmpires;
     private List<VisibleEntity> mVisibleEntities;
     private boolean mScrollToCentre = false;
+    private boolean mIsScrolling;
     private Handler mHandler;
 
     private static Bitmap sFleetMultiBitmap;
@@ -131,8 +132,7 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
             }
         };
 
-        // disable the initial scrollTo -- you MUST call scrollTo yourself
-        // at some point!
+        // disable the initial scrollTo -- you MUST call scrollTo yourself at some point!
         //scrollTo(0, 0, 0, 0);
     }
 
@@ -167,6 +167,17 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
     @Override
     protected GestureDetector.OnGestureListener createGestureListener() {
         return new GestureListener();
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        super.onTouchEvent(event);
+
+        if (event.getAction() == MotionEvent.ACTION_UP && mIsScrolling) {
+            mIsScrolling = false;
+            placeSelection();
+        }
+        return true;
     }
 
     public void addSelectionChangedListener(OnSelectionChangedListener listener) {
@@ -315,7 +326,6 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
         if (needUpdate) {
             scrollTo(mSectorX, mSectorY, -mOffsetX, -mOffsetY);
         }
-        placeSelection();
     }
 
     private void placeSelection() {
@@ -324,9 +334,10 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
         }
 
         RelativeLayout.LayoutParams lp = (RelativeLayout.LayoutParams) mSelectionView.getLayoutParams();
-        lp.leftMargin = (int) mSelectedEntity.position.x;
-        lp.topMargin = (int) mSelectedEntity.position.y;
+        lp.leftMargin = (int) mSelectedEntity.position.x + getLeft() - (mSelectionView.getWidth() / 2);
+        lp.topMargin = (int) mSelectedEntity.position.y + getTop() - (mSelectionView.getHeight() / 2);
         mSelectionView.setLayoutParams(lp);
+        mSelectionView.setVisibility(View.VISIBLE);
     }
 
     /**
@@ -428,12 +439,11 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
         if (isInEditMode()) {
             return;
         }
-
         super.onDraw(canvas);
 
         if (mScrollToCentre) {
-            mOffsetX += canvas.getWidth() / 2.0f / getPixelScale();
-            mOffsetY += canvas.getHeight() / 2.0f / getPixelScale();
+            mOffsetX += getWidth() / 2.0f / getPixelScale();
+            mOffsetY += getHeight() / 2.0f / getPixelScale();
             mScrollToCentre = false;
         }
 
@@ -442,14 +452,13 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
         mVisibleEntities = state.visibleEntities;
         mSelectedEntity = state.selectedEntity;
 
+        drawOverlays(canvas);
+
         if (missingSectors != null) {
-            mHandler.post(new Runnable() {
-                @Override
-                public void run() {
-                    SectorManager.getInstance().requestSectors(missingSectors, false, null);
-                }
-            });
+            SectorManager.getInstance().requestSectors(missingSectors, false, null);
         }
+
+        //placeSelection();
     }
 
     /**
@@ -550,7 +559,7 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
                                    40.0f * imageScale * pixelScale / sprite.getHeight());
             state.matrix.postTranslate(x * pixelScale, y * pixelScale);
             state.canvas.save();
-            state.canvas.setMatrix(state.matrix);
+            state.canvas.concat(state.matrix);
             sprite.draw(state.canvas);
             state.canvas.restore();
 
@@ -807,7 +816,7 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
         state.matrix.postRotate((float) (angle * 180.0 / Math.PI));
         state.matrix.postTranslate(position.x, position.y);
         state.canvas.save();
-        state.canvas.setMatrix(state.matrix);
+        state.canvas.concat(state.matrix);
         fleetSprite.draw(state.canvas);
         state.canvas.restore();
 
@@ -920,16 +929,24 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
         mSelectedEntity = entity;
         if (mSelectionView != null && mSelectedEntity != null) {
             RelativeLayout.LayoutParams lp = (RelativeLayout.LayoutParams) mSelectionView.getLayoutParams();
-            lp.width = 30;
-            lp.height = 30;
+            lp.width = 40;
+            lp.height = 40;
+            if (mSelectedEntity.star != null) {
+                lp.width = (int)(mSelectedEntity.star.getSize() * 2 * getPixelScale());
+                lp.height = (int)(mSelectedEntity.star.getSize() * 2 * getPixelScale());
+            }
             mSelectionView.setLayoutParams(lp);
             mSelectionView.setVisibility(View.VISIBLE);
-            
         }
 
         redraw();
         fireSelectionChanged(entity);
-        placeSelection();
+        mHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                placeSelection();
+            }
+        });
     }
 
     /**
@@ -943,6 +960,10 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
             scroll(-(float)(distanceX / getPixelScale()),
                    -(float)(distanceY / getPixelScale()));
 
+            if (mSelectionView != null) {
+                mSelectionView.setVisibility(View.GONE);
+            }
+            mIsScrolling = true;
             redraw();
             return false;
         }

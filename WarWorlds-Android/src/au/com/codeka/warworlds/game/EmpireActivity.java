@@ -259,7 +259,7 @@ public class EmpireActivity extends TabFragmentActivity {
             if (activity.mFirstRefresh && activity.mExtras != null) {
                 String fleetKey = activity.mExtras.getString("au.com.codeka.warworlds.FleetKey");
                 if (fleetKey != null) {
-                    fleetList.selectFleet(fleetKey);
+                    fleetList.selectFleet(fleetKey, true);
                 }
             }
 

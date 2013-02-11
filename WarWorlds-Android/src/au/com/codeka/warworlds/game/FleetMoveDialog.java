@@ -66,7 +66,6 @@ public class FleetMoveDialog extends DialogFragment {
         mDestinationStarOverlay = new DestinationStarOverlay();
 
         mStarfield = (StarfieldSurfaceView) mView.findViewById(R.id.starfield);
-        mStarfield.setZOrderOnTop(true);
 
         mStarfield.addSelectionChangedListener(new StarfieldSurfaceView.OnSelectionChangedListener() {
             @Override
@@ -215,8 +214,6 @@ public class FleetMoveDialog extends DialogFragment {
      * from.
      */
     private class SourceStarOverlay extends StarfieldSurfaceView.VisibleEntityAttachedOverlay {
-        private DashedCircle mSourceCircle;
-
         private Paint mShipPaint;
         private Sprite mSprite;
         private Matrix mMatrix;
@@ -224,7 +221,6 @@ public class FleetMoveDialog extends DialogFragment {
         public SourceStarOverlay() {
             Paint p = new Paint();
             p.setARGB(255, 0, 255, 0);
-            mSourceCircle = new DashedCircle(p);
 
             mShipPaint = new Paint();
             mShipPaint.setARGB(255, 255, 255, 255);
@@ -235,10 +231,6 @@ public class FleetMoveDialog extends DialogFragment {
         @Override
         public void setCentre(double x, double y) {
             super.setCentre(x, y);
-
-            mSourceCircle.setCentre(x, y);
-            mSourceCircle.setRadius(30.0);
-
             reset();
         }
 
@@ -276,10 +268,8 @@ public class FleetMoveDialog extends DialogFragment {
 
         @Override
         public void draw(Canvas canvas) {
-            mSourceCircle.draw(canvas);
-
             canvas.save();
-            canvas.setMatrix(mMatrix);
+            canvas.concat(mMatrix);
             mSprite.draw(canvas);
             canvas.restore();
         }
@@ -307,7 +297,6 @@ public class FleetMoveDialog extends DialogFragment {
         @Override
         public void setCentre(double x, double y) {
             super.setCentre(x, y);
-
             mSourceStarOverlay.reset();
         }
 
