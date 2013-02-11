@@ -1,4 +1,4 @@
-package au.com.codeka.planetrendertest;
+package au.com.codeka.common.ui;
 
 import java.awt.Component;
 import java.awt.Container;
