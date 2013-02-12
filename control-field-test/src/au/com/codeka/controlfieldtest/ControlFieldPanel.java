@@ -2,17 +2,24 @@ package au.com.codeka.controlfieldtest;
 
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.Point;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.awt.image.MemoryImageSource;
 import java.io.File;
 import java.io.IOException;
 
 import javax.imageio.ImageIO;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 import au.com.codeka.common.Colour;
 import au.com.codeka.common.Image;
 import au.com.codeka.common.PointCloud;
+import au.com.codeka.common.Vector2;
+import au.com.codeka.common.Voronoi;
+import au.com.codeka.controlfield.ControlField;
 
 /**
  * A special panel that renders the control field and underlying PointCloud.
@@ -25,16 +32,65 @@ public class ControlFieldPanel extends JPanel {
     private int mImageHeight;
     private Colour mBackgroundColour;
     private PointCloud mPointCloud;
+    private Voronoi mVoronoi;
+    private ControlField mControlField;
+
+    public ControlFieldPanel() {
+        this.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent evnt) {
+                if (mVoronoi == null || mImage == null) {
+                    return;
+                }
+
+                int mx = evnt.getPoint().x - ControlFieldPanel.this.getWidth() / 2;
+                int my = evnt.getPoint().y - ControlFieldPanel.this.getHeight() / 2;
+
+                double u = (double) mx / (mImageWidth / 2.0);
+                double v = (double) my / (mImageHeight / 2.0);
+
+                u = 0.5 + (u / 2.0);
+                if (u < 0.0 || u > 1.0) {
+                    return;
+                }
+
+                v = 0.5 + (v / 2.0);
+                if (v < 0.0 || v > 1.0) {
+                    return;
+                }
+
+                Vector2 pt = mVoronoi.findClosestPoint(Vector2.pool.borrow().reset(u, v));
+                mControlField.addPointToControlField(pt);
+                render();
+            }
+        });
+
+        mBackgroundColour = Colour.BLACK;
+    }
 
     public void setPointCloud(PointCloud pointCloud) {
         mPointCloud = pointCloud;
-        render();
     }
 
-    private void render() {
-        Image img = new Image(512, 512);
+    public void setVoronoi(Voronoi voronoi) {
+        mVoronoi = voronoi;
+    }
+
+    public void setControlField(ControlField controlField) {
+        mControlField = controlField;
+    }
+
+    public void render() {
+        Image img = new Image(512, 512, Colour.TRANSPARENT);
+        if (mControlField != null) {
+            mControlField.render(img, Colour.GREEN);
+        }
         if (mPointCloud != null) {
             mPointCloud.render(img);
+        }
+        if (mVoronoi != null) {
+            //mVoronoi.renderVoronoi(img, Colour.BLUE);
+            //mVoronoi.renderDelaunay(img, Colour.BLUE);
         }
 
         setImage(img);
