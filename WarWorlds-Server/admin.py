@@ -27,6 +27,11 @@ from ctrl import empire
 Jinja = jinja2.Environment(loader=jinja2.FileSystemLoader(os.path.dirname(__file__)+"/tmpl"))
 
 
+def _jinja_number(n):
+  return "{:,}".format(n)
+Jinja.filters["number"] = _jinja_number
+
+
 class AdminPage(webapp.RequestHandler):
   """This is the base class for pages in the admin section."""
 
@@ -87,8 +92,7 @@ class DashboardPage(AdminPage):
 
   def get(self):
     empire_nda = {}
-    query = (stats_mdl.ActiveEmpires.all().filter("date >", datetime.now() - timedelta(days=30))
-                                    .order("date"))
+    query = (stats_mdl.ActiveEmpires.all().filter("date >", datetime.now() - timedelta(days=30)))
     for nda in query:
       date = nda.date.replace(hour=0, minute=0, second=0, microsecond=0)
       if date in empire_nda:
@@ -97,7 +101,19 @@ class DashboardPage(AdminPage):
         values = {"date": date}
         empire_nda[date] = values
       values[str(nda.numDays)+"da"] = nda.actives
-    data = {"empire_nda": empire_nda.values()}
+    empire_nda = sorted(empire_nda.values(), lambda lhs, rhs: cmp(lhs["date"], rhs["date"]))
+
+    empire_rank = []
+    query = stats_mdl.EmpireRank.all().order("-totalStars").fetch(10)
+    for empire in query:
+      empire_rank.append({"empire_name": empire.empire.displayName,
+                          "totalStars": empire.totalStars,
+                          "totalColonies": empire.totalColonies,
+                          "totalBuildings": empire.totalBuildings,
+                          "totalShips": empire.totalShips})
+      if len(empire_rank) >= 10:
+        break
+    data = {"empire_nda": empire_nda, "empire_rank": empire_rank}
     self.render("admin/dashboard.html", data)
 
 
