@@ -3,6 +3,7 @@ package au.com.codeka.warworlds;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.support.v4.app.FragmentActivity;
+import au.com.codeka.warworlds.model.PurchaseManager;
 
 @SuppressLint("Registered") // it's a base class
 public class BaseActivity extends FragmentActivity {
@@ -40,5 +41,10 @@ public class BaseActivity extends FragmentActivity {
     public void onPostResume() {
         BackgroundDetector.getInstance().onActivityPostResume(this);
         super.onPostResume();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
+        PurchaseManager.getInstance().onActivityResult(requestCode, resultCode, intent);
     }
 }

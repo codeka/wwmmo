@@ -150,6 +150,24 @@ def getStars(search_query):
   return stars_pb
 
 
+def renameStar(star_pb, rename_request_pb):
+  """Renames a star, the rename_request_pb is a pb.StarRenameRequest."""
+  star_mdl = mdl.Star.get(db.Key(star_pb.key))
+  star_mdl.name = rename_request_pb.new_name
+  star_mdl.put()
+  star_rename_mdl = mdl.StarRename()
+  star_rename_mdl.star = db.Key(star_pb.key)
+  star_rename_mdl.oldName = rename_request_pb.old_name
+  star_rename_mdl.newName = rename_request_pb.new_name
+  star_rename_mdl.purchaseOrderId = rename_request_pb.purchase_order_id
+  star_rename_mdl.purchaseTime = ctrl.epochToDateTime(rename_request_pb.purchase_time)
+  star_rename_mdl.purchaseDeveloperPayload = rename_request_pb.purchase_developer_payload
+  star_rename_mdl.purchasePrice = rename_request_pb.purchase_price
+  star_rename_mdl.put()
+  ctrl.clearCached(["star:%s" % (star_pb.key),
+                    "sector:%d,%d" % (star_pb.sector_x, star_pb.sector_y)])
+
+
 def _addNativeColonies(star_pb):
   """Add some 'native' colonies, which are basically passive NPCs that you can "practise" on."""
   from ctrl import empire as empire_ctl

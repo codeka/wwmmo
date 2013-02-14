@@ -15,6 +15,7 @@ import android.content.SharedPreferences;
 import android.content.res.AssetManager;
 import au.com.codeka.warworlds.api.ApiClient;
 import au.com.codeka.warworlds.model.BuildingDesignManager;
+import au.com.codeka.warworlds.model.PurchaseManager;
 import au.com.codeka.warworlds.model.ShipDesignManager;
 import au.com.codeka.warworlds.model.SpriteManager;
 
@@ -46,6 +47,7 @@ public class Util {
         SpriteManager.getInstance().setup(context);
         BuildingDesignManager.getInstance().setup(context);
         ShipDesignManager.getInstance().setup(context);
+        PurchaseManager.getInstance().setup(context);
 
         sWasSetup = true;
         return true;

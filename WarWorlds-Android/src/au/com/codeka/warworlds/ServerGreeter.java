@@ -5,8 +5,6 @@ import java.util.ArrayList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.android.gcm.GCMRegistrar;
-
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ActivityManager;
@@ -23,6 +21,8 @@ import au.com.codeka.warworlds.model.Colony;
 import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.MyEmpire;
 import au.com.codeka.warworlds.model.protobuf.Messages;
+
+import com.google.android.gcm.GCMRegistrar;
 
 /**
  * This class is used to make sure we're said "Hello" to the server and that we've got our

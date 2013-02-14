@@ -97,6 +97,16 @@ class Star(db.Model):
   lastSimulation = db.DateTimeProperty()
 
 
+class StarRename(db.Model):
+  star = db.ReferenceProperty(Star)
+  oldName = db.StringProperty()
+  newName = db.StringProperty()
+  purchaseOrderId = db.StringProperty()
+  purchaseTime = db.DateTimeProperty()
+  purchaseDeveloperPayload = db.StringProperty()
+  purchasePrice = db.StringProperty()
+
+
 class SectorManager:
   """'Manages' the sectors, stars, planets, etc. Lets you fetch them, update them, etc
 

@@ -450,6 +450,20 @@ class StarPage(StarfieldPage):
 
     return star_pb
 
+  def put(self, star_key):
+    rename_request_pb = self._getRequestBody(pb.StarRenameRequest)
+    if rename_request_pb.star_key != star_key:
+      self.response.set_status(404)
+      return
+
+    star_pb = sector.getStar(star_key)
+    if star_pb.name != rename_request_pb.old_name:
+      self.raiseError(pb.GenericError.RenameStarOldNameIncorrect,
+                      "Expected old_name to be %s but instead got %s" % (star_pb.name, rename_request_pb.old_name))
+      return
+
+    sector.renameStar(star_pb, rename_request_pb)
+    return sector.getStar(star_pb.key)
 
 class StarsPage(ApiPage):
   def get(self):

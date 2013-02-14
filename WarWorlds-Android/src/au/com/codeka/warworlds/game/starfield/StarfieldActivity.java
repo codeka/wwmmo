@@ -3,7 +3,11 @@ package au.com.codeka.warworlds.game.starfield;
 import java.util.List;
 import java.util.Locale;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.Html;
@@ -21,12 +25,14 @@ import au.com.codeka.TimeInHours;
 import au.com.codeka.warworlds.BaseActivity;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.ServerGreeter;
+import au.com.codeka.warworlds.StyledDialog;
 import au.com.codeka.warworlds.ServerGreeter.ServerGreeting;
 import au.com.codeka.warworlds.ctrl.FleetListSimple;
 import au.com.codeka.warworlds.ctrl.SelectionView;
 import au.com.codeka.warworlds.game.EmpireActivity;
 import au.com.codeka.warworlds.game.ScoutReportDialog;
 import au.com.codeka.warworlds.game.SitrepActivity;
+import au.com.codeka.warworlds.game.StarRenameDialog;
 import au.com.codeka.warworlds.game.solarsystem.SolarSystemActivity;
 import au.com.codeka.warworlds.model.Colony;
 import au.com.codeka.warworlds.model.Empire;
@@ -34,6 +40,7 @@ import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.Fleet;
 import au.com.codeka.warworlds.model.Planet;
 import au.com.codeka.warworlds.model.PlanetImageManager;
+import au.com.codeka.warworlds.model.PurchaseManager;
 import au.com.codeka.warworlds.model.SectorManager;
 import au.com.codeka.warworlds.model.ShipDesign;
 import au.com.codeka.warworlds.model.ShipDesignManager;
@@ -43,19 +50,26 @@ import au.com.codeka.warworlds.model.Star;
 import au.com.codeka.warworlds.model.StarImageManager;
 import au.com.codeka.warworlds.model.StarManager;
 import au.com.codeka.warworlds.model.StarSummary;
+import au.com.codeka.warworlds.model.billing.IabException;
+import au.com.codeka.warworlds.model.billing.IabHelper;
+import au.com.codeka.warworlds.model.billing.IabResult;
+import au.com.codeka.warworlds.model.billing.Purchase;
+import au.com.codeka.warworlds.model.billing.SkuDetails;
 
 /**
  * The \c StarfieldActivity is the "home" screen of the game, and displays the
  * starfield where you scroll around and interact with stars, etc.
  */
 public class StarfieldActivity extends BaseActivity implements StarfieldSurfaceView.OnSelectionChangedListener {
+    private static final Logger log = LoggerFactory.getLogger(StarfieldActivity.class);
     private Context mContext = this;
     private StarfieldSurfaceView mStarfield;
     private ListView mPlanetList;
     private PlanetListAdapter mPlanetListAdapter;
     private FleetListSimple mFleetList;
     private Star mSelectedStar;
-    private boolean mIsFirstRefresh;
+
+    private Purchase mStarRenamePurchase;
 
     // when fetching a star/fleet we set this to the one we're fetching. This
     // way, if there's multiple in progress at once, on the last one to be
@@ -73,11 +87,6 @@ public class StarfieldActivity extends BaseActivity implements StarfieldSurfaceV
         requestWindowFeature(Window.FEATURE_NO_TITLE); // remove the title bar
 
         setContentView(R.layout.starfield);
-
-        mIsFirstRefresh = true;
-        if (savedInstanceState != null) {
-            mIsFirstRefresh = savedInstanceState.getBoolean("au.com.codeka.warworlds.IsFirstRefresh");
-        }
 
         mStarfield = (StarfieldSurfaceView) findViewById(R.id.starfield);
         mStarfield.setSelectionView((SelectionView) findViewById(R.id.selection));
@@ -162,6 +171,14 @@ public class StarfieldActivity extends BaseActivity implements StarfieldSurfaceV
             }
         });
 
+        final Button renameBtn = (Button) findViewById(R.id.rename_btn);
+        renameBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onRenameClick();
+            }
+        });
+
         ServerGreeter.waitForHello(this, new ServerGreeter.HelloCompleteHandler() {
             @Override
             public void onHelloComplete(boolean success, ServerGreeting greeting) {
@@ -175,6 +192,16 @@ public class StarfieldActivity extends BaseActivity implements StarfieldSurfaceV
                 }
             }
         });
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        if (mStarRenamePurchase != null) {
+            showStarRenamePopup(mStarRenamePurchase);
+            mStarRenamePurchase = null;
+        }
     }
 
     /**
@@ -281,23 +308,76 @@ public class StarfieldActivity extends BaseActivity implements StarfieldSurfaceV
         }
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
+    public void onRenameClick() {
+        SkuDetails starRenameSku;
+        try {
+            starRenameSku = PurchaseManager.getInstance()
+                                           .getInventory().getSkuDetails("star_rename");
+        } catch (IabException e) {
+            log.error("Couldn't get SKU details!", e);
+            return;
+        }
 
-        ServerGreeter.waitForHello(this, new ServerGreeter.HelloCompleteHandler() {
-            @Override
-            public void onHelloComplete(boolean success, ServerGreeting greeting) {
-                Bundle extras = getIntent().getExtras();
-                if (extras != null) {
-                    if (mIsFirstRefresh) {
+        new StyledDialog.Builder(this)
+                .setMessage(String.format(Locale.ENGLISH,
+                        "Renaming stars costs %s. If you wish to continue, you'll be directed "+
+                        "to the Play Store where you can purchase a one-time code to rename this "+
+                        "star. Are you sure you want to continue?",
+                        starRenameSku.getPrice()))
+                .setTitle("Rename Star")
+                .setNegativeButton("Cancel", null)
+                .setPositiveButton("Rename", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        doRenameStar();
+                        dialog.dismiss();
+                    }
+                })
+                .create().show();
+    }
 
+    public void doRenameStar() {
+        if (mSelectedStar == null) {
+            return;
+        }
 
-                        mIsFirstRefresh = false;
+        try {
+            PurchaseManager.getInstance().launchPurchaseFlow(this, "star_rename", new IabHelper.OnIabPurchaseFinishedListener() {
+                @Override
+                public void onIabPurchaseFinished(IabResult result, final Purchase info) {
+                    if (mSelectedStar == null) {
+                        return;
+                    }
+
+                    boolean isSuccess = result.isSuccess();
+                    if (result.isFailure() && result.getResponse() == IabHelper.BILLING_RESPONSE_RESULT_ITEM_ALREADY_OWNED) {
+                        // if they've already purchased a star-renamed, but not reclaimed it, then
+                        // we let them through anyway.
+                        isSuccess = true;
+                    }
+
+                    if (isSuccess) {
+                        try {
+                            showStarRenamePopup(info);
+                        } catch(IllegalStateException e) {
+                            // this can be called before the activity is resumed, so we just set a
+                            // flag that'll cause us to pop up the dialog when the activity is resumed.
+                            mStarRenamePurchase = info;
+                        }
                     }
                 }
-            }
-        });
+            });
+        } catch (IabException e) {
+            log.error("Couldn't get SKU details!", e);
+            return;
+        }
+    }
+
+    private void showStarRenamePopup(Purchase purchase) {
+        StarRenameDialog dialog = new StarRenameDialog();
+        dialog.setPurchaseInfo(purchase);
+        dialog.setStar(mSelectedStar);
+        dialog.show(getSupportFragmentManager(), "");
     }
 
     @Override
@@ -308,6 +388,8 @@ public class StarfieldActivity extends BaseActivity implements StarfieldSurfaceV
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
+        super.onActivityResult(requestCode, resultCode, intent);
+
         if (requestCode == SOLAR_SYSTEM_REQUEST && intent != null) {
             boolean wasSectorUpdated = intent.getBooleanExtra(
                     "au.com.codeka.warworlds.SectorUpdated", false);

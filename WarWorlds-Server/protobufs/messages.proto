@@ -32,6 +32,7 @@ message GenericError
         CannotBuildDependencyNotMet = 3;
         CannotBuildMaxPerColonyReached = 4;
         CannotBuildMaxLevelReached = 5;
+        RenameStarOldNameIncorrect = 6;
     }
 }
 
@@ -299,9 +300,27 @@ message Star
     optional int64 last_simulation = 18;
 }
 
-message Stars {
+
+message Stars
+{
     repeated Star stars = 1;
 }
+
+//
+// A request to rename a star, include the purchase details from the App Store.
+//
+message StarRenameRequest
+{
+    required string star_key = 1;
+    required string old_name = 2;
+    required string new_name = 3;
+
+    optional string purchase_order_id = 4;
+    optional int64 purchase_time = 5;
+    optional string purchase_developer_payload = 6;
+    optional string purchase_price = 7;
+}
+
 
 //
 // Represents a planet in the star system. A planet orbits a \c Star which in turn belongs

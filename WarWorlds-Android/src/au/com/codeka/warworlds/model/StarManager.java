@@ -17,6 +17,10 @@ import org.slf4j.LoggerFactory;
 import android.content.Context;
 import android.os.AsyncTask;
 import au.com.codeka.warworlds.api.ApiClient;
+import au.com.codeka.warworlds.api.ApiException;
+import au.com.codeka.warworlds.model.billing.IabException;
+import au.com.codeka.warworlds.model.billing.Purchase;
+import au.com.codeka.warworlds.model.billing.SkuDetails;
 import au.com.codeka.warworlds.model.protobuf.Messages;
 
 public class StarManager {
@@ -208,6 +212,61 @@ public class StarManager {
                 if (callback != null) {
                     callback.onStarFetched(star);
                 }
+                fireStarUpdated(star);
+            }
+        }.execute();
+    }
+
+    public void renameStar(final Context context, final Purchase purchase,
+                           final Star star, final String newName) {
+        new AsyncTask<Void, Void, Star>() {
+            @Override
+            protected Star doInBackground(Void... arg0) {
+                String url = "stars/"+star.getKey();
+
+                String price = "???";
+                SkuDetails sku = null;
+                try {
+                    sku = PurchaseManager.getInstance().getInventory().getSkuDetails(purchase.getSku());
+                } catch (IabException e1) {
+                }
+                if (sku != null) {
+                    price = sku.getPrice();
+                }
+
+                Messages.StarRenameRequest pb = Messages.StarRenameRequest.newBuilder()
+                        .setStarKey(star.getKey())
+                        .setOldName(star.getName())
+                        .setNewName(newName)
+                        .setPurchaseOrderId(purchase.getOrderId())
+                        .setPurchaseTime(purchase.getPurchaseTime())
+                        .setPurchasePrice(price)
+                        .setPurchaseDeveloperPayload(purchase.getDeveloperPayload())
+                        .build();
+
+                Messages.Star star_pb;
+                try {
+                    star_pb = ApiClient.putProtoBuf(url, pb, Messages.Star.class);
+                    Star star = Star.fromProtocolBuffer(star_pb);
+
+                    updateStarSummary(context, star);
+                    return star;
+                } catch (ApiException e) {
+                    log.error("Error renaming star!", e);
+                    return null;
+                }
+            }
+
+            @Override
+            protected void onPostExecute(Star star) {
+                if (star == null) {
+                    return; //TODO: bad!
+                }
+
+                // if we had the star summary cached, remove it (cause the star itself is newer)
+                mStarSummaries.remove(star.getKey());
+                mStars.put(star.getKey(), star);
+
                 fireStarUpdated(star);
             }
         }.execute();
