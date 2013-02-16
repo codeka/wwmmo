@@ -60,7 +60,9 @@ import au.com.codeka.warworlds.model.billing.SkuDetails;
  * The \c StarfieldActivity is the "home" screen of the game, and displays the
  * starfield where you scroll around and interact with stars, etc.
  */
-public class StarfieldActivity extends BaseActivity implements StarfieldSurfaceView.OnSelectionChangedListener {
+public class StarfieldActivity extends BaseActivity
+                               implements StarfieldSurfaceView.OnSelectionChangedListener,
+                                          StarManager.StarFetchedHandler {
     private static final Logger log = LoggerFactory.getLogger(StarfieldActivity.class);
     private Context mContext = this;
     private StarfieldSurfaceView mStarfield;
@@ -195,6 +197,13 @@ public class StarfieldActivity extends BaseActivity implements StarfieldSurfaceV
     }
 
     @Override
+    public void onStart() {
+        super.onStart();
+
+        StarManager.getInstance().addStarUpdatedListener(null, this);
+    }
+
+    @Override
     public void onResume() {
         super.onResume();
 
@@ -202,6 +211,13 @@ public class StarfieldActivity extends BaseActivity implements StarfieldSurfaceV
             showStarRenamePopup(mStarRenamePurchase);
             mStarRenamePurchase = null;
         }
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+
+        StarManager.getInstance().removeStarUpdatedListener(this);
     }
 
     /**
@@ -436,9 +452,6 @@ public class StarfieldActivity extends BaseActivity implements StarfieldSurfaceV
         final View selectionLoadingContainer = findViewById(R.id.loading_container);
         final View selectedStarContainer = findViewById(R.id.selected_star);
         final View selectedFleetContainer = findViewById(R.id.selected_fleet);
-        final TextView starName = (TextView) findViewById(R.id.star_name);
-        final TextView starKind = (TextView) findViewById(R.id.star_kind);
-        final ImageView starIcon = (ImageView) findViewById(R.id.star_icon);
 
         // load the rest of the star's details as well
         selectionLoadingContainer.setVisibility(View.VISIBLE);
@@ -447,32 +460,40 @@ public class StarfieldActivity extends BaseActivity implements StarfieldSurfaceV
         mFetchingStarKey = star.getKey();
         mFetchingFleetKey = null;
 
-        StarManager.getInstance().requestStar(mContext, star.getKey(), true,
-                                              new StarManager.StarFetchedHandler() {
-            /**
-             * This is called on the main thread when the star is actually fetched.
-             */
-            @Override
-            public void onStarFetched(Star star) {
-                if (mFetchingStarKey == null ||
-                    !mFetchingStarKey.equals(star.getKey())) {
-                    return;
-                }
+        StarManager.getInstance().requestStar(mContext, star.getKey(), true, this);
+    }
 
-                mSelectedStar = star;
-                selectionLoadingContainer.setVisibility(View.GONE);
-                selectedStarContainer.setVisibility(View.VISIBLE);
-                selectedFleetContainer.setVisibility(View.GONE);
+    @Override
+    public void onStarFetched(Star star) {
+        if (mSelectedStar != null && mSelectedStar.getKey().equals(star.getKey())) {
+            // if it's the star we already have selected, then we may as well refresh
+            // whatever we've got.
+            mFetchingStarKey = mSelectedStar.getKey();
+        }
+        if (mFetchingStarKey == null ||
+            !mFetchingStarKey.equals(star.getKey())) {
+            return;
+        }
 
-                mPlanetListAdapter.setStar(star);
-                mFleetList.setStar(star);
+        final View selectionLoadingContainer = findViewById(R.id.loading_container);
+        final View selectedStarContainer = findViewById(R.id.selected_star);
+        final View selectedFleetContainer = findViewById(R.id.selected_fleet);
+        final TextView starName = (TextView) findViewById(R.id.star_name);
+        final TextView starKind = (TextView) findViewById(R.id.star_kind);
+        final ImageView starIcon = (ImageView) findViewById(R.id.star_icon);
 
-                starName.setText(star.getName());
-                starKind.setText(star.getStarType().getDisplayName());
-                Sprite starImage = StarImageManager.getInstance().getSprite(mContext, star, 80);
-                starIcon.setImageDrawable(new SpriteDrawable(starImage));
-            }
-        });
+        mSelectedStar = star;
+        selectionLoadingContainer.setVisibility(View.GONE);
+        selectedStarContainer.setVisibility(View.VISIBLE);
+        selectedFleetContainer.setVisibility(View.GONE);
+
+        mPlanetListAdapter.setStar(star);
+        mFleetList.setStar(star);
+
+        starName.setText(star.getName());
+        starKind.setText(star.getStarType().getDisplayName());
+        Sprite starImage = StarImageManager.getInstance().getSprite(mContext, star, 80);
+        starIcon.setImageDrawable(new SpriteDrawable(starImage));
     }
 
     @Override
@@ -606,5 +627,4 @@ public class StarfieldActivity extends BaseActivity implements StarfieldSurfaceV
             return view;
         }
     }
-
 }

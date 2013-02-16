@@ -101,8 +101,23 @@ public class PurchaseManager {
         }
     }
 
-    public void consume(Purchase purchase, IabHelper.OnConsumeFinishedListener listener) {
-        mHelper.consumeAsync(purchase, listener);
+    public void consume(Purchase purchase, final IabHelper.OnConsumeFinishedListener listener) {
+        mHelper.consumeAsync(purchase, new IabHelper.OnConsumeFinishedListener() {
+            @Override
+            public void onConsumeFinished(Purchase purchase, IabResult result) {
+                listener.onConsumeFinished(purchase, result);
+
+                // we'll want to refresh the inventory as well, now that we've consumed something
+                mHelper.queryInventoryAsync(true, sAllSkus, new IabHelper.QueryInventoryFinishedListener() {
+                    @Override
+                    public void onQueryInventoryFinished(IabResult result, Inventory inv) {
+                        if (result.isSuccess()) {
+                            mInventory = inv;
+                        }
+                    }
+                });
+            }
+        });
     }
 
     public void close() {

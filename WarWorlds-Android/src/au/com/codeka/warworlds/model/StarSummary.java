@@ -89,6 +89,10 @@ public class StarSummary implements Parcelable {
         return mPlanets;
     }
 
+    public void setName(String name) {
+        mName = name;
+    }
+
     @Override
     public int describeContents() {
         return 0;

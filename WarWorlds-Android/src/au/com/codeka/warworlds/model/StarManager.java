@@ -96,6 +96,9 @@ public class StarManager {
                 handler.onStarFetched(star);
             }
         }
+
+        // also let the SectorManager know, it's interested in certain kinds of updates
+        SectorManager.getInstance().onStarUpdate(star);
     }
 
     public void refreshStar(Context context, Star s) {

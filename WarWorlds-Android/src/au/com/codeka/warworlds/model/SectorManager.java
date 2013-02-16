@@ -96,6 +96,20 @@ public class SectorManager {
     }
 
     /**
+     * This is called by the StarManager when a star is updated. We care about certain changes to
+     * stars (e.g. when they're renamed), but not all...
+     */
+    public void onStarUpdate(Star star) {
+        Star ourStar = findStar(star.getKey());
+        if (ourStar != null) {
+            if (!ourStar.getName().equals(star.getName())) {
+                ourStar.setName(star.getName());
+                fireSectorListChanged();
+            }
+        }
+    }
+
+    /**
      * Forces us to refresh the given sector, even if we already have it loaded. Useful when
      * we know it's been modified (by our own actions, for example).
      */

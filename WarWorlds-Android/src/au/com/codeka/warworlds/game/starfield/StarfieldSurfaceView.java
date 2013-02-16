@@ -49,12 +49,14 @@ import au.com.codeka.warworlds.model.Sprite;
 import au.com.codeka.warworlds.model.Star;
 import au.com.codeka.warworlds.model.StarImageManager;
 import au.com.codeka.warworlds.model.StarSummary;
+import au.com.codeka.warworlds.model.StarManager;
 
 /**
  * \c SurfaceView that displays the starfield. You can scroll around, tap on stars to bring
  * up their details and so on.
  */
-public class StarfieldSurfaceView extends UniverseElementSurfaceView {
+public class StarfieldSurfaceView extends UniverseElementSurfaceView
+                                  implements StarManager.StarFetchedHandler {
     private static final Logger log = LoggerFactory.getLogger(StarfieldSurfaceView.class);
     private Context mContext;
     private ArrayList<OnSelectionChangedListener> mSelectionChangedListeners;
@@ -145,6 +147,7 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
         super.onAttachedToWindow();
         SectorManager.getInstance().addSectorListChangedListener(mSectorListChangedListener);
         StarImageManager.getInstance().addBitmapGeneratedListener(mBitmapGeneratedListener);
+        StarManager.getInstance().addStarUpdatedListener(null, this);
     }
 
     @Override
@@ -152,6 +155,7 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
         super.onDetachedFromWindow();
         SectorManager.getInstance().removeSectorListChangedListener(mSectorListChangedListener);
         StarImageManager.getInstance().removeBitmapGeneratedListener(mBitmapGeneratedListener);
+        StarManager.getInstance().removeStarUpdatedListener(this);
     }
 
     public void deselectStar() {
@@ -947,6 +951,23 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView {
                 placeSelection();
             }
         });
+    }
+
+    /**
+     * When a star is updated, if it's one of ours, then we'll want to redraw to make sure we
+     * have the latest data (e.g. it might've been renamed)
+     */
+    @Override
+    public void onStarFetched(Star s) {
+        boolean needRedraw = false;
+        for (VisibleEntity entity : mVisibleEntities) {
+            if (entity.star != null && entity.star.getKey().equals(s.getKey())) {
+                needRedraw = true;
+            }
+        }
+        if (needRedraw) {
+            redraw();
+        }
     }
 
     /**
