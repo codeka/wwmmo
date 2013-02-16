@@ -16,7 +16,7 @@ import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.RelativeLayout;
-import au.com.codeka.Point2D;
+import au.com.codeka.common.Vector2;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.ctrl.SelectionView;
 import au.com.codeka.warworlds.game.StarfieldBackgroundRenderer;
@@ -83,7 +83,7 @@ public class SolarSystemSurfaceView extends UniverseElementSurfaceView {
         for (int i = 0; i < planets.length; i++) {
             PlanetInfo planetInfo = new PlanetInfo();
             planetInfo.planet = planets[i];
-            planetInfo.centre = new Point2D(0, 0);
+            planetInfo.centre = new Vector2(0, 0);
             planetInfo.distanceFromSun = 0.0f;
             mPlanetInfos[i] = planetInfo;
         }
@@ -96,15 +96,15 @@ public class SolarSystemSurfaceView extends UniverseElementSurfaceView {
      * Gets a \c Point2D representing the centre of the given planet, relative to this
      * \c SolarSystemSurfaceView in device pixels.
      */
-    public Point2D getPlanetCentre(Planet planet) {
+    public Vector2 getPlanetCentre(Planet planet) {
         if (mPlanetInfos == null) {
             return null;
         }
 
         for(PlanetInfo planetInfo : mPlanetInfos) {
             if (planetInfo.planet.getIndex() == planet.getIndex()) {
-                Point2D pixels = planetInfo.centre;
-                return new Point2D(pixels.x / getPixelScale(),
+                Vector2 pixels = planetInfo.centre;
+                return new Vector2(pixels.x / getPixelScale(),
                                    pixels.y / getPixelScale());
             }
         }
@@ -129,7 +129,7 @@ public class SolarSystemSurfaceView extends UniverseElementSurfaceView {
             float angle = (0.5f/(mPlanetInfos.length + 1));
             angle = (float) ((angle*i*Math.PI) + angle*Math.PI);
 
-            Point2D centre = new Point2D(x, y);
+            Vector2 centre = new Vector2(x, y);
             centre.rotate(angle);
             centre.y *= -1;
 
@@ -272,7 +272,7 @@ public class SolarSystemSurfaceView extends UniverseElementSurfaceView {
             mMatrix.postTranslate(-(sprite.getWidth() / 2.0f), -(sprite.getHeight() / 2.0f));
             mMatrix.postScale(100.0f * getPixelScale() / sprite.getWidth(),
                               100.0f * getPixelScale() / sprite.getHeight());
-            mMatrix.postTranslate(planetInfo.centre.x, planetInfo.centre.y);
+            mMatrix.postTranslate((float) planetInfo.centre.x, (float) planetInfo.centre.y);
             canvas.save();
             canvas.concat(mMatrix);
             sprite.draw(canvas);
@@ -303,7 +303,7 @@ public class SolarSystemSurfaceView extends UniverseElementSurfaceView {
                 return false;
             }
 
-            Point2D tapLocation = new Point2D(e.getX(), e.getY());
+            Vector2 tapLocation = Vector2.pool.borrow().reset(e.getX(), e.getY());
             PlanetInfo closestPlanet = null;
             for (PlanetInfo planetInfo : mPlanetInfos) {
                 if (closestPlanet == null) {
@@ -330,6 +330,7 @@ public class SolarSystemSurfaceView extends UniverseElementSurfaceView {
                 playSoundEffect(android.view.SoundEffectConstants.CLICK);
             }
 
+            Vector2.pool.release(tapLocation);
             return false;
         }
     }
@@ -341,7 +342,7 @@ public class SolarSystemSurfaceView extends UniverseElementSurfaceView {
      */
     private static class PlanetInfo {
         public Planet planet;
-        public Point2D centre;
+        public Vector2 centre;
         public float distanceFromSun;
     }
 

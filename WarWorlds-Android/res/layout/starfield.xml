@@ -91,11 +91,11 @@
 
                 <Button android:id="@+id/rename_btn"
                     style="@style/Button"
-                        android:layout_width="wrap_content"
+                    android:layout_width="75dp"
                         android:layout_height="wrap_content"
-                        android:layout_toRightOf="@id/star_name"
-                        android:layout_alignTop="@id/star_name"
-                        android:layout_marginLeft="6dp"
+                        android:layout_toLeftOf="@id/view_btn"
+                        android:layout_alignTop="@id/view_btn"
+                        android:layout_marginRight="10dp"
                         android:text="Rename" />
 
                 <Button
@@ -213,13 +213,22 @@
             android:layout_toLeftOf="@+id/empire_btn"
             android:text="Sit. Rep." />
 
+        <Button android:id="@+id/tactical_map_btn"
+                style="@style/Button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:layout_marginRight="5dp"
+                android:layout_toLeftOf="@id/sitrep_btn"
+                android:text="Tactical" />
+
         <au.com.codeka.warworlds.ctrl.InfobarView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
             android:layout_alignParentLeft="true"
-            android:layout_alignTop="@id/sitrep_btn"
-            android:layout_toLeftOf="@+id/sitrep_btn" />
+            android:layout_alignTop="@id/tactical_map_btn"
+            android:layout_toLeftOf="@+id/tactical_map_btn" />
 
     </RelativeLayout>
 

@@ -10,13 +10,13 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
-import au.com.codeka.Point2D;
+import au.com.codeka.common.Vector2;
 
 public class Sprite {
     private SpriteImage mImage;
     private String mName;
     private ArrayList<SpriteFrame> mFrames;
-    private Point2D mUp;
+    private Vector2 mUp;
     private int mWidth;
     private int mHeight;
     private float mScale;
@@ -27,7 +27,7 @@ public class Sprite {
         mImage = image;
         mName = name;
         mFrames = new ArrayList<SpriteFrame>();
-        mUp = new Point2D(0, 1);
+        mUp = new Vector2(0, 1);
         mScale = 1.0f;
     }
 
@@ -43,7 +43,7 @@ public class Sprite {
     public int getNumFrames() {
         return mFrames.size();
     }
-    public Point2D getUp() {
+    public Vector2 getUp() {
         return mUp;
     }
     public int getWidth() {

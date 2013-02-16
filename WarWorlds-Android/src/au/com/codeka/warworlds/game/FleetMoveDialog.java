@@ -17,7 +17,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.TextView;
 import au.com.codeka.Cash;
-import au.com.codeka.Point2D;
+import au.com.codeka.common.Vector2;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.StyledDialog;
 import au.com.codeka.warworlds.api.ApiClient;
@@ -244,17 +244,17 @@ public class FleetMoveDialog extends DialogFragment {
 
             float pixelScale = getPixelScale();
 
-            Point2D direction;
+            Vector2 direction = Vector2.pool.borrow();
             if (mDestinationStarOverlay.isVisible()) {
-                direction = new Point2D(mDestinationStarOverlay.getCentre());
+                direction.reset(mDestinationStarOverlay.getCentre());
                 direction.subtract(mCentre);
                 direction.normalize();
             } else {
-                direction = new Point2D(0, -1);
+                direction.reset(0, -1);
             }
 
-            Point2D up = mSprite.getUp();
-            float angle = Point2D.angleBetween(up, direction);
+            float angle = Vector2.angleBetween(mSprite.getUp(), direction);
+            Vector2.pool.release(direction); direction = null;
 
             // scale zoom and rotate the bitmap all with one matrix
             mMatrix.reset();
@@ -263,7 +263,7 @@ public class FleetMoveDialog extends DialogFragment {
             mMatrix.postScale(20.0f * pixelScale / mSprite.getWidth(),
                               20.0f * pixelScale / mSprite.getHeight());
             mMatrix.postRotate((float) (angle * 180.0 / Math.PI));
-            mMatrix.postTranslate(mCentre.x, mCentre.y);
+            mMatrix.postTranslate((float) mCentre.x, (float) mCentre.y);
         }
 
         @Override
@@ -302,12 +302,12 @@ public class FleetMoveDialog extends DialogFragment {
 
         @Override
         public void draw(Canvas canvas) {
-            Point2D start = mSourceStarOverlay.getCentre();
-            canvas.drawLine(start.x, start.y,
-                            mCentre.x, mCentre.y,
+            Vector2 start = mSourceStarOverlay.getCentre();
+            canvas.drawLine((float) start.x, (float) start.y,
+                            (float) mCentre.x, (float) mCentre.y,
                             mLinePaint);
 
-            canvas.drawCircle(mCentre.x, mCentre.y, 10.0f, mCirclePaint);
+            canvas.drawCircle((float) mCentre.x, (float) mCentre.y, 10.0f, mCirclePaint);
         }
 
     }

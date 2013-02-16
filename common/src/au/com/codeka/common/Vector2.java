@@ -12,8 +12,16 @@ public class Vector2 implements ObjectPool.Pooled {
     public double x;
     public double y;
 
-    private Vector2() {
+    public Vector2() {
         x = y = 0.0;
+    }
+    public Vector2(double x, double y) {
+        this.x = x;
+        this.y = y;
+    }
+    public Vector2(Vector2 other) {
+        this.x = other.x;
+        this.y = other.y;
     }
 
     @Override
@@ -23,6 +31,11 @@ public class Vector2 implements ObjectPool.Pooled {
     public Vector2 reset(double x, double y) {
         this.x = x;
         this.y = y;
+        return this;
+    }
+    public Vector2 reset(Vector2 other) {
+        this.x = other.x;
+        this.y = other.y;
         return this;
     }
 
@@ -62,6 +75,41 @@ public class Vector2 implements ObjectPool.Pooled {
         return Math.sqrt(length2());
     }
 
+
+    public void add(Vector2 other) {
+        x += other.x;
+        y += other.y;
+    }
+    public void add(float x, float y) {
+        this.x += x;
+        this.y += y;
+    }
+
+    public void subtract(Vector2 other) {
+        x -= other.x;
+        y -= other.y;
+    }
+    public void subtract(float x, float y) {
+        this.x -= x;
+        this.y -= y;
+    }
+
+    public void rotate(float radians) {
+        float nx = (float)(x*Math.cos(radians) - y*Math.sin(radians));
+        float ny = (float)(y*Math.cos(radians) + x*Math.sin(radians));
+        x = nx;
+        y = ny;
+    }
+
+    public void normalize() {
+        scale(1.0 / length());
+    }
+
+    public void scale(double s) {
+        x *= s;
+        y *= s;
+    }
+
     @Override
     public int hashCode() {
         // this avoids the boxing that "new Double(x).hashCode()" would require
@@ -83,6 +131,15 @@ public class Vector2 implements ObjectPool.Pooled {
     public boolean equals(Vector2 other, double epsilon) {
         return Math.abs(other.x - x) < epsilon &&
                 Math.abs(other.y - y) < epsilon;
+    }
+
+    /**
+     * Find the angle between "a" and "b"
+     * see: http://www.gamedev.net/topic/487576-angle-between-two-lines-clockwise/
+     */
+    public static float angleBetween(Vector2 a, Vector2 b) {
+        return (float) Math.atan2(a.x * b.y - a.y * b.x,
+                                  a.x * b.x + a.y * b.y);
     }
 
     static class Vector2Creator implements ObjectPool.PooledCreator {

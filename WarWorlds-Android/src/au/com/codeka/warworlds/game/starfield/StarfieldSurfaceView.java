@@ -31,7 +31,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.RelativeLayout;
 import au.com.codeka.Pair;
-import au.com.codeka.Point2D;
+import au.com.codeka.common.Vector2;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.ctrl.SelectionView;
 import au.com.codeka.warworlds.game.StarfieldBackgroundRenderer;
@@ -258,6 +258,18 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView
     }
 
     /**
+     * Gets the \c Star that's closest to the centre of the screen.
+     */
+    public Star findStarInCentre() {
+        //for (VisibleEntity entity : mVisibleEntities) {
+        //    if (entity.star != null) {
+        //        entity.position.x;
+        //    }
+        //}
+        return null;
+    }
+
+    /**
      * Scroll to the given sector (x,y) and offset into the sector.
      */
     public void scrollTo(long sectorX, long sectorY, float offsetX, float offsetY) {
@@ -404,13 +416,14 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView
     private List<VisibleEntity> getVisibleEntitiesAt(int viewX, int viewY) {
         ArrayList<VisibleEntity> entities = new ArrayList<VisibleEntity>();
 
-        Point2D tap = new Point2D(viewX, viewY);
+        Vector2 tap = Vector2.pool.borrow().reset(viewX, viewY);
         for (VisibleEntity entity : mVisibleEntities) {
-            float distance = tap.distanceTo(entity.position);
-            if (distance < 48.0f) {
+            double distance = tap.distanceTo(entity.position);
+            if (distance < 48.0) {
                 entities.add(entity);
             }
         }
+        Vector2.pool.release(tap);
 
         // we'll sort them by kind/ID so that they're already returned in the same order. This
         // way, we can cycle through entities when they're close and you tap multiple times.
@@ -515,10 +528,10 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView
      * Given a \c Sector, returns the (x, y) coordinates (in view-space) of the origin of this
      * sector.
      */
-    private static Point2D getSectorOffset(DrawState state, long sx, long sy) {
+    private static Vector2 getSectorOffset(DrawState state, long sx, long sy) {
         sx -= state.sectorX;
         sy -= state.sectorY;
-        return new Point2D((sx * SectorManager.SECTOR_SIZE) + state.offsetX,
+        return new Vector2((sx * SectorManager.SECTOR_SIZE) + state.offsetX,
                            (sy * SectorManager.SECTOR_SIZE) + state.offsetY);
     }
 
@@ -578,7 +591,7 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView
                 }
             }
 
-            VisibleEntity ve = new VisibleEntity(new Point2D(x * pixelScale, y * pixelScale), star);
+            VisibleEntity ve = new VisibleEntity(new Vector2(x * pixelScale, y * pixelScale), star);
             if (state.selectedEntity != null && state.selectedEntity.star != null && state.selectedEntity.star.getKey().equals(star.getKey())) {
                 state.selectedEntity = ve;
             }
@@ -638,7 +651,7 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView
 
                 Bitmap bmp = emp.getShield(state.context);
 
-                Point2D pt = new Point2D(0, -25.0f);
+                Vector2 pt = Vector2.pool.borrow().reset(0, -25.0f);
                 pt.rotate((float)(Math.PI / 4.0) * i);
                 pt.add(x, y);
 
@@ -646,7 +659,7 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView
                 state.matrix.postTranslate(-(bmp.getWidth() / 2.0f), -(bmp.getHeight() / 2.0f));
                 state.matrix.postScale(16.0f * state.pixelScale / bmp.getWidth(),
                                        16.0f * state.pixelScale / bmp.getHeight());
-                state.matrix.postTranslate(pt.x * state.pixelScale, pt.y * state.pixelScale);
+                state.matrix.postTranslate((float) pt.x * state.pixelScale, (float) pt.y * state.pixelScale);
                 state.canvas.drawBitmap(bmp, state.matrix, state.starPaint);
 
                 String name;
@@ -661,9 +674,10 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView
                 float textHeight = bounds.height();
 
                 state.canvas.drawText(name,
-                                      (pt.x + 12) * state.pixelScale,
-                                      (pt.y + 8) * state.pixelScale - (textHeight / 2),
+                                      (float) (pt.x + 12) * state.pixelScale,
+                                      (float) (pt.y + 8) * state.pixelScale - (textHeight / 2),
                                       state.starPaint);
+                Vector2.pool.release(pt); pt = null;
                 i++;
             }
         }
@@ -691,7 +705,7 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView
                 Integer numShips = empireFleets.get(empireKey);
                 Empire emp = getEmpire(state, empireKey);
                 if (emp != null) {
-                    Point2D pt = new Point2D(0, -25.0f);
+                    Vector2 pt = Vector2.pool.borrow().reset(0, -25.0f);
                     pt.rotate((float)(Math.PI / 4.0) * -i);
                     pt.add(x, y);
 
@@ -700,7 +714,7 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView
                                                -(sFleetMultiBitmap.getHeight() / 2.0f));
                     state.matrix.postScale(16.0f * state.pixelScale / sFleetMultiBitmap.getWidth(),
                                       16.0f * state.pixelScale / sFleetMultiBitmap.getHeight());
-                    state.matrix.postTranslate(pt.x * state.pixelScale, pt.y * state.pixelScale);
+                    state.matrix.postTranslate((float) pt.x * state.pixelScale, (float) pt.y * state.pixelScale);
                     state.canvas.drawBitmap(sFleetMultiBitmap, state.matrix, state.starPaint);
 
                     String name = String.format(Locale.ENGLISH, "%s (%d)", emp.getDisplayName(), numShips);
@@ -711,9 +725,10 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView
                     float textWidth = bounds.width();
 
                     state.canvas.drawText(name,
-                                          (pt.x - 12) * state.pixelScale - textWidth,
-                                          (pt.y + 8) * state.pixelScale - (textHeight / 2),
+                                          (float) (pt.x - 12) * state.pixelScale - textWidth,
+                                          (float) (pt.y + 8) * state.pixelScale - (textHeight / 2),
                                           state.starPaint);
+                    Vector2.pool.release(pt); pt = null;
                 }
 
                 i++;
@@ -739,27 +754,27 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView
             return;
         }
 
-        Point2D srcPoint = new Point2D(offsetX, offsetY);
+        Vector2 srcPoint = Vector2.pool.borrow().reset(offsetX, offsetY);
         srcPoint.x += srcStar.getOffsetX();
         srcPoint.y += srcStar.getOffsetY();
 
-        Point2D destPoint = getSectorOffset(state, destStar.getSectorX(), destStar.getSectorY());
+        Vector2 destPoint = getSectorOffset(state, destStar.getSectorX(), destStar.getSectorY());
         destPoint.x += destStar.getOffsetX();
         destPoint.y += destStar.getOffsetY();
 
         // work out how far along the fleet has moved so we can draw the icon at the correct
         // spot. Also, we'll draw the name of the empire, number of ships etc.
         ShipDesign design = ShipDesignManager.getInstance().getDesign(fleet.getDesignID());
-        float distance = srcPoint.distanceTo(destPoint);
-        float totalTimeInHours = (distance / 10.0f) / (float) design.getSpeedInParsecPerHour();
+        double distance = srcPoint.distanceTo(destPoint);
+        double totalTimeInHours = (distance / 10.0) / design.getSpeedInParsecPerHour();
 
         DateTime startTime = fleet.getStateStartTime();
         DateTime now = DateTime.now(DateTimeZone.UTC);
         float timeSoFarInHours = Seconds.secondsBetween(startTime, now).getSeconds() / 3600.0f;
 
-        float fractionComplete = timeSoFarInHours / totalTimeInHours;
-        if (fractionComplete > 1.0f) {
-            fractionComplete = 1.0f;
+        double fractionComplete = timeSoFarInHours / totalTimeInHours;
+        if (fractionComplete > 1.0) {
+            fractionComplete = 1.0;
         }
 
         // we don't want to start the fleet over the top of the star, so we'll offset it a bit
@@ -768,23 +783,26 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView
             distance = 0;
         }
 
-        Point2D direction = new Point2D(destPoint);
+        Vector2 direction = Vector2.pool.borrow().reset(destPoint);
         direction.subtract(srcPoint);
         direction.normalize();
 
-        Point2D location = new Point2D(direction);
+        Vector2 location = Vector2.pool.borrow().reset(direction);
         location.scale(distance * fractionComplete);
         location.add(srcPoint);
+        Vector2.pool.release(srcPoint); srcPoint = null;
 
         Sprite fleetSprite = design.getSprite();
-        Point2D up = fleetSprite.getUp();
+        Vector2 up = fleetSprite.getUp();
 
-        float angle = Point2D.angleBetween(up, direction);
+        float angle = Vector2.angleBetween(up, direction);
 
         direction.scale(20.0f);
         location.add(direction);
+        Vector2.pool.release(direction); direction = null;
 
-        Point2D position = new Point2D(location.x * pixelScale, location.y * pixelScale);
+        Vector2 position = new Vector2(location.x * pixelScale, location.y * pixelScale);
+        Vector2.pool.release(location); location = null;
 
         // check if there's any other fleets nearby and offset this one by a bit so that they
         // don't overlap
@@ -797,9 +815,10 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView
 
             if (existing.position.distanceTo(position) < (15.0f * pixelScale)) {
                 // pick a random direction and offset it a bit
-                Point2D offset = new Point2D(0, 20.0f * pixelScale);
+                Vector2 offset = Vector2.pool.borrow().reset(0, 20.0 * pixelScale);
                 offset.rotate(rand.nextFloat() * 2 * (float) Math.PI);
                 position.add(offset);
+                Vector2.pool.release(offset);
                 i = -1; // start looping again...
             }
         }
@@ -818,7 +837,7 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView
         state.matrix.postScale(20.0f * pixelScale / fleetSprite.getWidth(),
                               20.0f * pixelScale / fleetSprite.getWidth());
         state.matrix.postRotate((float) (angle * 180.0 / Math.PI));
-        state.matrix.postTranslate(position.x, position.y);
+        state.matrix.postTranslate((float) position.x, (float) position.y);
         state.canvas.save();
         state.canvas.concat(state.matrix);
         fleetSprite.draw(state.canvas);
@@ -832,18 +851,18 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView
                 state.matrix.postTranslate(-(shield.getWidth() / 2.0f), -(shield.getHeight() / 2.0f));
                 state.matrix.postScale(16.0f * pixelScale / shield.getWidth(),
                                        16.0f * pixelScale / shield.getHeight());
-                state.matrix.postTranslate(position.x + (20.0f * pixelScale),
-                                           position.y);
+                state.matrix.postTranslate((float) position.x + (20.0f * pixelScale),
+                                           (float) position.y);
                 state.canvas.drawBitmap(shield, state.matrix, state.starPaint);
             }
 
             String msg = emp.getDisplayName();
-            state.canvas.drawText(msg, position.x + (30.0f * pixelScale),
-                    position.y, state.starPaint);
+            state.canvas.drawText(msg, (float) position.x + (30.0f * pixelScale),
+                    (float) position.y, state.starPaint);
 
             msg = String.format(Locale.ENGLISH, "%s (%d)", design.getDisplayName(), fleet.getNumShips());
-            state.canvas.drawText(msg, position.x + (30.0f * pixelScale),
-                    position.y + (10.0f * pixelScale), state.starPaint);
+            state.canvas.drawText(msg, (float) position.x + (30.0f * pixelScale),
+                    (float) position.y + (10.0f * pixelScale), state.starPaint);
         }
 
         List<VisibleEntityAttachedOverlay> fleetAttachedOverlays = state.fleetAttachedOverlays.get(fleet.getKey());
@@ -1083,16 +1102,16 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView
      * tap on them simpler. This class holds a reference to a single "visible" entity.
      */
     private static class VisibleEntity {
-        public Point2D position;
+        public Vector2 position;
         public Star star;
         public Fleet fleet;
 
-        public VisibleEntity(Point2D position, Star star) {
+        public VisibleEntity(Vector2 position, Star star) {
             this.position = position;
             this.star = star;
         }
 
-        public VisibleEntity(Point2D position, Fleet fleet) {
+        public VisibleEntity(Vector2 position, Fleet fleet) {
             this.position = position;
             this.fleet = fleet;
         }

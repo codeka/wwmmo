@@ -38,6 +38,7 @@ import au.com.codeka.warworlds.model.Colony;
 import au.com.codeka.warworlds.model.Empire;
 import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.Fleet;
+import au.com.codeka.warworlds.model.MyEmpire;
 import au.com.codeka.warworlds.model.Planet;
 import au.com.codeka.warworlds.model.PlanetImageManager;
 import au.com.codeka.warworlds.model.PurchaseManager;
@@ -82,6 +83,7 @@ public class StarfieldActivity extends BaseActivity
     private static final int SOLAR_SYSTEM_REQUEST = 1;
     private static final int EMPIRE_REQUEST = 2;
     private static final int SITREP_REQUEST = 3;
+    private static final int TACTICAL_MAP_REQUEST = 4;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -156,6 +158,15 @@ public class StarfieldActivity extends BaseActivity
             @Override
             public void onClick(View v) {
                 openSitrepActivity();
+            }
+        });
+
+        final Button tacticalBtn = (Button) findViewById(R.id.tactical_map_btn);
+        tacticalBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(mContext, TacticalMapActivity.class);
+                startActivityForResult(intent, TACTICAL_MAP_REQUEST);
             }
         });
 
@@ -481,6 +492,7 @@ public class StarfieldActivity extends BaseActivity
         final TextView starName = (TextView) findViewById(R.id.star_name);
         final TextView starKind = (TextView) findViewById(R.id.star_kind);
         final ImageView starIcon = (ImageView) findViewById(R.id.star_icon);
+        final Button renameButton = (Button) findViewById(R.id.rename_btn);
 
         mSelectedStar = star;
         selectionLoadingContainer.setVisibility(View.GONE);
@@ -489,6 +501,25 @@ public class StarfieldActivity extends BaseActivity
 
         mPlanetListAdapter.setStar(star);
         mFleetList.setStar(star);
+
+        MyEmpire myEmpire = EmpireManager.getInstance().getEmpire();
+        int numMyEmpire = 0;
+        int numOtherEmpire = 0;
+        for (Colony colony : star.getColonies()) {
+            if (colony.getEmpireKey() == null) {
+                continue;
+            }
+            if (colony.getEmpireKey().equals(myEmpire.getKey())) {
+                numMyEmpire ++;
+            } else {
+                numOtherEmpire ++;
+            }
+        }
+        if (numMyEmpire > numOtherEmpire) {
+            renameButton.setVisibility(View.VISIBLE);
+        } else {
+            renameButton.setVisibility(View.GONE);
+        }
 
         starName.setText(star.getName());
         starKind.setText(star.getStarType().getDisplayName());

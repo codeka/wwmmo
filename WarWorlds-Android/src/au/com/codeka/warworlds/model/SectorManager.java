@@ -16,7 +16,7 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.support.v4.util.LruCache;
 import au.com.codeka.Pair;
-import au.com.codeka.Point2D;
+import au.com.codeka.common.Vector2;
 import au.com.codeka.warworlds.api.ApiClient;
 import au.com.codeka.warworlds.game.StarfieldBackgroundRenderer;
 import au.com.codeka.warworlds.model.protobuf.Messages;
@@ -123,7 +123,7 @@ public class SectorManager {
      * Returns a {@link Point2D} that represents a line segment from {@link Star} a to
      * {@link Star} b. You can use the \c length() method to determine the distance between them.
      */
-    public Point2D directionBetween(StarSummary a, StarSummary b) {
+    public Vector2 directionBetween(StarSummary a, StarSummary b) {
         float dx = a.getOffsetX() - b.getOffsetX();
         float dy = a.getOffsetY() - b.getOffsetY();
 
@@ -133,15 +133,15 @@ public class SectorManager {
         float dsy = a.getSectorY() - b.getSectorY();
         dy += (dsy * SECTOR_SIZE);
 
-        return new Point2D(dx, dy);
+        return new Vector2(dx, dy);
     }
 
     /**
      * Calculates the distance (in "parsecs") between the two given stars.
      */
     public float distanceInParsecs(StarSummary a, StarSummary b) {
-        float distanceInPixels = directionBetween(a, b).scalarLength();
-        return distanceInPixels / 10.0f;
+        double distanceInPixels = directionBetween(a, b).length();
+        return (float) (distanceInPixels / 10.0);
     }
 
     /**

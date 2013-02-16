@@ -11,7 +11,7 @@ import android.util.AttributeSet;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
-import au.com.codeka.Point2D;
+import au.com.codeka.common.Vector2;
 
 /**
  * Base class for things like \c StarfieldSurfaceView and \c SolarSystemSurfaceView, etc.
@@ -191,13 +191,13 @@ public class UniverseElementSurfaceView extends View {
      * it's recentred whenever the view scrolls around.
      */
     public static abstract class VisibleEntityAttachedOverlay extends Overlay {
-        protected Point2D mCentre;
+        protected Vector2 mCentre;
 
         public VisibleEntityAttachedOverlay() {
-            mCentre = new Point2D();
+            mCentre = new Vector2();
         }
 
-        public Point2D getCentre() {
+        public Vector2 getCentre() {
             return mCentre;
         }
 

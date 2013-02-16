@@ -18,8 +18,8 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import au.com.codeka.Point2D;
 import au.com.codeka.RomanNumeralFormatter;
+import au.com.codeka.common.Vector2;
 import au.com.codeka.warworlds.BaseActivity;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.ServerGreeter;
@@ -354,7 +354,7 @@ public class SolarSystemActivity extends BaseActivity implements StarManager.Sta
             }
         }
 
-        Point2D planetCentre = mSolarSystemSurfaceView.getPlanetCentre(mPlanet);
+        Vector2 planetCentre = mSolarSystemSurfaceView.getPlanetCentre(mPlanet);
 
         String planetName = mStar.getName()+" "+RomanNumeralFormatter.format(mPlanet.getIndex());
         TextView planetNameTextView = (TextView) findViewById(R.id.planet_name);
