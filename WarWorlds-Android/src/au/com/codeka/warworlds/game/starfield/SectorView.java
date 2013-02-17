@@ -20,7 +20,7 @@ import au.com.codeka.warworlds.model.Star;
  */
 public class SectorView extends UniverseElementSurfaceView 
                         implements SectorManager.OnSectorListChangedListener {
-    private boolean mScrollToCentre = false;
+    protected boolean mScrollToCentre = false;
 
     protected int mSectorRadius = 1;
     protected long mSectorX;
@@ -196,8 +196,8 @@ public class SectorView extends UniverseElementSurfaceView
         super.onDraw(canvas);
 
         if (mScrollToCentre) {
-            mOffsetX += getWidth() / 2.0f / getPixelScale();
-            mOffsetY += getHeight() / 2.0f / getPixelScale();
+            scroll(getWidth() / 2.0f / getPixelScale(),
+                   getHeight() / 2.0f / getPixelScale());
             mScrollToCentre = false;
         }
     }

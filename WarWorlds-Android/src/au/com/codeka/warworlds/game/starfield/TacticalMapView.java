@@ -58,8 +58,15 @@ public class TacticalMapView extends SectorView {
 
     @Override
     public void onDraw(Canvas canvas) {
-        canvas.drawColor(Color.BLACK);
+        if (mScrollToCentre) {
+            scroll(getWidth() /*/ getPixelScale()*/,
+                   getHeight() /*/ getPixelScale()*/);
+            mScrollToCentre = false;
+        }
 
+        super.onDraw(canvas);
+
+        canvas.drawColor(Color.BLACK);
         List<Pair<Long, Long>> missingSectors = drawScene(canvas);
 
         if (missingSectors != null) {
