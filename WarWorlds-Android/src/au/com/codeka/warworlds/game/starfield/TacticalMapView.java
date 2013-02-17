@@ -30,11 +30,20 @@ import au.com.codeka.warworlds.model.Sector;
 import au.com.codeka.warworlds.model.SectorManager;
 import au.com.codeka.warworlds.model.Star;
 
-public class TacticalMapView extends SectorView {
+public class TacticalMapView extends SectorView
+                             implements SectorManager.OnSectorListChangedListener {
     private static final Logger log = LoggerFactory.getLogger(TacticalMapView.class);
 
     private Paint mPointPaint;
+    private Paint mInfluencePaint;
     private Context mContext;
+
+    private float mDragOffsetX;
+    private float mDragOffsetY;
+
+    TacticalPointCloud mPointCloud;
+    TacticalVoronoi mVoronoi;
+    TreeMap<String, TacticalControlField> mControlFields;
 
     public TacticalMapView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -48,7 +57,29 @@ public class TacticalMapView extends SectorView {
         log.info("Tactical map initializing...");
         mPointPaint = new Paint();
         mPointPaint.setARGB(255, 255, 0, 0);
-        mPointPaint.setStyle(Style.STROKE);
+        mPointPaint.setStyle(Style.FILL);
+
+        mInfluencePaint = new Paint();
+        mInfluencePaint.setStyle(Style.FILL);
+    }
+
+    @Override
+    protected void onAttachedToWindow() {
+        super.onAttachedToWindow();
+        SectorManager.getInstance().addSectorListChangedListener(this);
+    }
+
+    @Override
+    protected void onDetachedFromWindow() {
+        super.onDetachedFromWindow();
+        SectorManager.getInstance().removeSectorListChangedListener(this);
+    }
+
+    @Override
+    public void onSectorListChanged() {
+        super.onSectorListChanged();
+
+        refreshControlField();
     }
 
     @Override
@@ -66,15 +97,31 @@ public class TacticalMapView extends SectorView {
 
         super.onDraw(canvas);
 
-        canvas.drawColor(Color.BLACK);
-        List<Pair<Long, Long>> missingSectors = drawScene(canvas);
-
-        if (missingSectors != null) {
-            SectorManager.getInstance().requestSectors(missingSectors, false, null);
+        if (mControlFields == null) {
+            refreshControlField();
         }
+
+        canvas.drawColor(Color.BLACK);
+
+        for (String empireKey : mControlFields.keySet()) {
+            Empire empire = EmpireManager.getInstance().getEmpire(mContext, empireKey);
+            if (empire == null) {
+                EmpireManager.getInstance().fetchEmpire(mContext, empireKey, null);
+            }
+            TacticalControlField cf = mControlFields.get(empireKey);
+
+            if (empire == null) {
+                mInfluencePaint.setARGB(128, 255, 255, 255);
+            } else {
+                mInfluencePaint.setColor(empire.getShieldColor());
+            }
+            cf.render(canvas, mInfluencePaint);
+        }
+
+        mPointCloud.render(canvas);
     }
 
-    private List<Pair<Long, Long>> drawScene(Canvas canvas) {
+    private void refreshControlField() {
         SectorManager sm = SectorManager.getInstance();
 
         List<Pair<Long, Long>> missingSectors = null;
@@ -125,35 +172,27 @@ public class TacticalMapView extends SectorView {
             }
         }
 
-        TacticalPointCloud pc = new TacticalPointCloud(points);
-        TacticalVoronoi v = new TacticalVoronoi(pc);
-        TacticalControlField cf = new TacticalControlField(pc, v);
+        mDragOffsetX = 0.0f;
+        mDragOffsetY = 0.0f;
+
+        mControlFields = new TreeMap<String, TacticalControlField>();
+        mPointCloud = new TacticalPointCloud(points);
+        TacticalVoronoi v = new TacticalVoronoi(mPointCloud);
 
         for (String empireKey : empirePoints.keySet()) {
-            Empire empire = EmpireManager.getInstance().getEmpire(mContext, empireKey);
-            if (empire == null) {
-                EmpireManager.getInstance().fetchEmpire(mContext, empireKey, null);
-            }
+            TacticalControlField cf = new TacticalControlField(mPointCloud, v);
 
             List<Vector2> pts = empirePoints.get(empireKey);
             for (Vector2 pt : pts) {
                 cf.addPointToControlField(pt);
             }
 
-            Paint paint = new Paint();
-            paint.setStyle(Style.FILL);
-            if (empire == null) {
-                paint.setARGB(128, 255, 255, 255);
-            } else {
-                paint.setColor(empire.getShieldColor());
-            }
-            cf.render(canvas, paint);
-            cf.clear();
+            mControlFields.put(empireKey, cf);
         }
 
-        pc.render(canvas);
-
-        return missingSectors;
+        if (missingSectors != null) {
+            SectorManager.getInstance().requestSectors(missingSectors, false, null);
+        }
     }
 
     /**
@@ -168,7 +207,22 @@ public class TacticalMapView extends SectorView {
             scroll(-(float)(distanceX * 2.0 / getPixelScale()),
                    -(float)(distanceY * 2.0 / getPixelScale()));
 
+            mDragOffsetX += -(float)(distanceX * 2.0 / getPixelScale());
+            mDragOffsetY += -(float)(distanceY * 2.0 / getPixelScale());
+
             redraw();
+            return false;
+        }
+
+        /**
+         * Double-tapping will take you back to the Starfield view with that particular star
+         * in the centre.
+         */
+        @Override
+        public boolean onDoubleTap(MotionEvent e) {
+            int tapX = (int) e.getX();
+            int tapY = (int) e.getY();
+
             return false;
         }
     }
@@ -180,8 +234,8 @@ public class TacticalMapView extends SectorView {
 
         public void render(Canvas canvas) {
             for (Vector2 p : mPoints) {
-                float x = (float)(p.x * 256.0);
-                float y = (float)(p.y * 256.0);
+                float x = (float)(p.x * 256.0) + mDragOffsetX;
+                float y = (float)(p.y * 256.0) + mDragOffsetY;
                 canvas.drawCircle(x, y, 5.0f, mPointPaint);
             }
         }
@@ -200,14 +254,14 @@ public class TacticalMapView extends SectorView {
                     continue;
                 }
 
-                path.moveTo((float) triangles.get(0).centre.x * 256.0f,
-                            (float) triangles.get(0).centre.y * 256.0f);
+                path.moveTo((float) triangles.get(0).centre.x * 256.0f + mDragOffsetX,
+                            (float) triangles.get(0).centre.y * 256.0f + mDragOffsetY);
                 for (int i = 1; i < triangles.size(); i++) {
-                    path.lineTo((float) triangles.get(i).centre.x * 256.0f,
-                                (float) triangles.get(i).centre.y * 256.0f);
+                    path.lineTo((float) triangles.get(i).centre.x * 256.0f + mDragOffsetX,
+                                (float) triangles.get(i).centre.y * 256.0f + mDragOffsetY);
                 }
-                path.lineTo((float) triangles.get(0).centre.x * 256.0f,
-                            (float) triangles.get(0).centre.y * 256.0f);
+                path.lineTo((float) triangles.get(0).centre.x * 256.0f + mDragOffsetX,
+                            (float) triangles.get(0).centre.y * 256.0f + mDragOffsetY);
             }
             canvas.drawPath(path, paint);
         }

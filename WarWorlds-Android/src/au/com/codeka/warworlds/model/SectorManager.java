@@ -264,7 +264,7 @@ public class SectorManager {
         LruCache<String, Sector> mSectors;
 
         public SectorCache() {
-            mSectors = new LruCache<String, Sector>(20);
+            mSectors = new LruCache<String, Sector>(30);
             mBackgroundRenderers = new LruCache<String, StarfieldBackgroundRenderer>(9);
         }
 
