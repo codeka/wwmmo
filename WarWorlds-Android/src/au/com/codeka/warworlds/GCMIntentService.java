@@ -162,7 +162,7 @@ public class GCMIntentService extends GCMBaseIntentService {
                     return;
                 }
 
-                ChatManager.getInstance().addMessage(msg);
+                ChatManager.getInstance().addMessage(context, msg);
             }
         }
     }

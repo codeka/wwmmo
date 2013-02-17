@@ -200,7 +200,7 @@ public class FleetMoveDialog extends DialogFragment {
 
                     // the empire needs to be updated, too, since we'll have subtracted
                     // the cost of this move from your cash
-                    EmpireManager.getInstance().refreshEmpire(mFleet.getEmpireKey());
+                    EmpireManager.getInstance().refreshEmpire(activity, mFleet.getEmpireKey());
 
                     dismiss();
                 }

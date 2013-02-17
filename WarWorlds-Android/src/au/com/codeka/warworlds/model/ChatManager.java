@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.joda.time.DateTime;
 
+import android.content.Context;
 import android.os.AsyncTask;
 import au.com.codeka.warworlds.BackgroundDetector;
 import au.com.codeka.warworlds.Util;
@@ -39,19 +40,19 @@ public class ChatManager implements BackgroundDetector.BackgroundChangeHandler {
      * Called when the game starts up, we need to register with the channel and get
      * ready to start receiving chat messages.
      */
-    public void setup() {
+    public void setup(Context context) {
         BackgroundDetector.getInstance().addBackgroundChangeHandler(this);
 
         String chatEnabledProperty = Util.getProperties().getProperty("chat.enabled");
         if (chatEnabledProperty == null || !chatEnabledProperty.equals("false")) {
-            addMessage(new ChatMessage("Welcome to War Worlds!"));
+            addMessage(context, new ChatMessage("Welcome to War Worlds!"));
         } else {
-            addMessage(new ChatMessage("Chat has been disabled."));
+            addMessage(context, new ChatMessage("Chat has been disabled."));
         }
 
         // fetch all chats from the last 24 hours
         mMostRecentMsg = (new DateTime()).minusDays(1);
-        requestMessages(mMostRecentMsg);
+        requestMessages(context, mMostRecentMsg);
     }
 
     public void addMessageAddedListener(MessageAddedListener listener) {
@@ -85,7 +86,7 @@ public class ChatManager implements BackgroundDetector.BackgroundChangeHandler {
     /**
      * Posts a message from us to the server.
      */
-    public void postMessage(final ChatMessage msg) {
+    public void postMessage(final Context context, final ChatMessage msg) {
         new AsyncTask<Void, Void, Boolean>() {
             @Override
             protected Boolean doInBackground(Void... arg0) {
@@ -104,7 +105,7 @@ public class ChatManager implements BackgroundDetector.BackgroundChangeHandler {
             protected void onPostExecute(Boolean success) {
                 if (success) {
                    // msg.
-                    addMessage(msg);
+                    addMessage(context, msg);
                 }
             }
         }.execute();
@@ -148,7 +149,7 @@ public class ChatManager implements BackgroundDetector.BackgroundChangeHandler {
     /**
      * Adds a new message to the chat list.
      */
-    public void addMessage(final ChatMessage msg) {
+    public void addMessage(final Context context, final ChatMessage msg) {
         synchronized(mMessages) {
             while (mMessages.size() > MAX_CHAT_HISTORY) {
                 mMessages.removeFirst();
@@ -159,8 +160,8 @@ public class ChatManager implements BackgroundDetector.BackgroundChangeHandler {
                 mMostRecentMsg = msg.getDatePosted();
             }
 
-            if (msg.getEmpire() == null && msg.getEmpireKey() != null) {
-                EmpireManager.getInstance().fetchEmpire(msg.getEmpireKey(),
+            if (msg.getEmpire() == null && msg.getEmpireKey() != null && context != null) {
+                EmpireManager.getInstance().fetchEmpire(context, msg.getEmpireKey(),
                         new EmpireManager.EmpireFetchedHandler() {
                             @Override
                             public void onEmpireFetched(Empire empire) {
@@ -184,7 +185,7 @@ public class ChatManager implements BackgroundDetector.BackgroundChangeHandler {
         }
     }
 
-    private void requestMessages(final DateTime since) {
+    private void requestMessages(final Context context, final DateTime since) {
         new AsyncTask<Void, Void, ArrayList<ChatMessage>>() {
             @Override
             protected ArrayList<ChatMessage> doInBackground(Void... arg0) {
@@ -211,7 +212,7 @@ public class ChatManager implements BackgroundDetector.BackgroundChangeHandler {
             @Override
             protected void onPostExecute(ArrayList<ChatMessage> msgs) {
                 for (ChatMessage msg : msgs) {
-                    addMessage(msg);
+                    addMessage(context, msg);
                 }
             }
         }.execute();

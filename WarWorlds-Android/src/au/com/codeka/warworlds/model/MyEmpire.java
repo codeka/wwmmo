@@ -182,7 +182,7 @@ public class MyEmpire extends Empire {
                 }
 
                 // make sure we record the fact that the star is updated as well
-                EmpireManager.getInstance().refreshEmpire(getKey());
+                EmpireManager.getInstance().refreshEmpire(context, getKey());
                 StarManager.getInstance().refreshStar(context, star.getKey());
             }
         }.execute();

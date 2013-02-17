@@ -547,7 +547,7 @@ public class StarfieldActivity extends BaseActivity
         mSelectedStar = null;
 
         ShipDesign design = ShipDesignManager.getInstance().getDesign(fleet.getDesignID());
-        EmpireManager.getInstance().fetchEmpire(fleet.getEmpireKey(), new EmpireManager.EmpireFetchedHandler() {
+        EmpireManager.getInstance().fetchEmpire(mContext, fleet.getEmpireKey(), new EmpireManager.EmpireFetchedHandler() {
             @Override
             public void onEmpireFetched(Empire empire) {
                 if (mFetchingFleetKey == null ||
@@ -647,7 +647,7 @@ public class StarfieldActivity extends BaseActivity
             final TextView colonyTextView = (TextView) view.findViewById(R.id.starfield_planet_colony);
             if (colony != null) {
                 colonyTextView.setText("Colonized");
-                EmpireManager.getInstance().fetchEmpire(colony.getEmpireKey(), new EmpireManager.EmpireFetchedHandler() {
+                EmpireManager.getInstance().fetchEmpire(mContext, colony.getEmpireKey(), new EmpireManager.EmpireFetchedHandler() {
                     @Override
                     public void onEmpireFetched(Empire empire) {
                         colonyTextView.setText(empire.getDisplayName());

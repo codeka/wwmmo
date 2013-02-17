@@ -5,6 +5,7 @@ import java.util.Locale;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
+import android.app.Activity;
 import android.app.Dialog;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
@@ -45,7 +46,8 @@ public class CombatReportDialog extends DialogFragment {
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-        LayoutInflater inflater = getActivity().getLayoutInflater();
+        final Activity activity = getActivity();
+        LayoutInflater inflater = activity.getLayoutInflater();
         mView = inflater.inflate(R.layout.combat_report_dlg, null);
 
         final View progressBar = mView.findViewById(R.id.progress_bar);
@@ -80,7 +82,7 @@ public class CombatReportDialog extends DialogFragment {
                     }
                 }
                 for (String empireKey : empireKeys) {
-                    EmpireManager.getInstance().fetchEmpire(empireKey,
+                    EmpireManager.getInstance().fetchEmpire(activity, empireKey,
                             new EmpireManager.EmpireFetchedHandler() {
                                 @Override
                                 public void onEmpireFetched(Empire empire) {

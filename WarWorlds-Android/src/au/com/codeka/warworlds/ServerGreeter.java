@@ -170,8 +170,6 @@ public class ServerGreeter {
                         // we can keep going, though...
                     }
 
-                    ChatManager.getInstance().setup();
-
                     mColonies = new ArrayList<Colony>();
                     for (Messages.Colony c : resp.getColoniesList()) {
                         if (c.getPopulation() < 1.0) {
@@ -213,6 +211,7 @@ public class ServerGreeter {
                     mHelloComplete = true;
                 } else if (!mErrorOccured) {
                     Util.setup(activity);
+                    ChatManager.getInstance().setup(activity);
 
                     // make sure we're correctly registered as online.
                     BackgroundDetector.getInstance().onBackgroundStatusChange(activity);

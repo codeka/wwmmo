@@ -323,7 +323,8 @@ public class FleetList extends FrameLayout implements StarManager.StarFetchedHan
             row3.setVisibility(View.GONE);
 
             final MyEmpire myEmpire = EmpireManager.getInstance().getEmpire();
-            EmpireManager.getInstance().fetchEmpire(fleet.getEmpireKey(), new EmpireManager.EmpireFetchedHandler() {
+            EmpireManager.getInstance().fetchEmpire(context, fleet.getEmpireKey(),
+                    new EmpireManager.EmpireFetchedHandler() {
                 @Override
                 public void onEmpireFetched(Empire empire) {
                     row3.setVisibility(View.VISIBLE);

@@ -69,7 +69,7 @@ public class ChatActivity extends BaseActivity
         msg.setEmpire(EmpireManager.getInstance().getEmpire());
         chatMsg.setText("");
 
-        ChatManager.getInstance().postMessage(msg);
+        ChatManager.getInstance().postMessage(this, msg);
 
     }
 

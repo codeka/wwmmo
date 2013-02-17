@@ -434,7 +434,7 @@ public class SolarSystemActivity extends BaseActivity implements StarManager.Sta
             colonyDetailsContainer.setVisibility(View.GONE);
             enemyColonyDetailsContainer.setVisibility(View.GONE);
 
-            EmpireManager.getInstance().fetchEmpire(mColony.getEmpireKey(),
+            EmpireManager.getInstance().fetchEmpire(mContext, mColony.getEmpireKey(),
                 new EmpireManager.EmpireFetchedHandler() {
                     @Override
                     public void onEmpireFetched(Empire empire) {

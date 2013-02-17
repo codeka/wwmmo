@@ -34,12 +34,16 @@ public class TacticalMapView extends SectorView {
     private static final Logger log = LoggerFactory.getLogger(TacticalMapView.class);
 
     private Paint mPointPaint;
+    private Context mContext;
 
     public TacticalMapView(Context context, AttributeSet attrs) {
         super(context, attrs);
         if (this.isInEditMode()) {
             return;
         }
+
+        mContext = context;
+        mSectorRadius = 2;
 
         log.info("Tactical map initializing...");
         mPointPaint = new Paint();
@@ -119,21 +123,25 @@ public class TacticalMapView extends SectorView {
         TacticalControlField cf = new TacticalControlField(pc, v);
 
         for (String empireKey : empirePoints.keySet()) {
-            Empire empire = EmpireManager.getInstance().getEmpire(empireKey);
+            Empire empire = EmpireManager.getInstance().getEmpire(mContext, empireKey);
             if (empire == null) {
-                EmpireManager.getInstance().fetchEmpire(empireKey, null);
-            } else {
-                List<Vector2> pts = empirePoints.get(empireKey);
-                for (Vector2 pt : pts) {
-                    cf.addPointToControlField(pt);
-                }
-
-                Paint paint = new Paint();
-                paint.setStyle(Style.FILL);
-                paint.setColor(empire.getShieldColor());
-                cf.render(canvas, paint);
-                cf.clear();
+                EmpireManager.getInstance().fetchEmpire(mContext, empireKey, null);
             }
+
+            List<Vector2> pts = empirePoints.get(empireKey);
+            for (Vector2 pt : pts) {
+                cf.addPointToControlField(pt);
+            }
+
+            Paint paint = new Paint();
+            paint.setStyle(Style.FILL);
+            if (empire == null) {
+                paint.setARGB(128, 255, 255, 255);
+            } else {
+                paint.setColor(empire.getShieldColor());
+            }
+            cf.render(canvas, paint);
+            cf.clear();
         }
 
         pc.render(canvas);
@@ -202,7 +210,7 @@ public class TacticalMapView extends SectorView {
         public TacticalVoronoi(PointCloud pc) {
             super(pc);
         }
-
+/*
         public void renderVoronoi(Canvas canvas, Paint paint) {
             for (Vector2 pt : mPointCloud.getPoints()) {
                 List<Triangle> triangles = mPointCloudToTriangles.get(pt);
@@ -223,6 +231,6 @@ public class TacticalMapView extends SectorView {
                                 (float) p2.x * 256.0f, (float) p2.y * 256.0f, paint);
             }
         }
-
+*/
     }
 }

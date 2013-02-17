@@ -454,7 +454,7 @@ public class StarfieldSurfaceView extends SectorView
 
         Empire emp = state.visibleEmpires.get(empireKey);
         if (emp == null) {
-            EmpireManager.getInstance().fetchEmpire(empireKey, new EmpireManager.EmpireFetchedHandler() {
+            EmpireManager.getInstance().fetchEmpire(state.context, empireKey, new EmpireManager.EmpireFetchedHandler() {
                 @Override
                 public void onEmpireFetched(Empire empire) {
                     state.visibleEmpires.put(empire.getKey(), empire);

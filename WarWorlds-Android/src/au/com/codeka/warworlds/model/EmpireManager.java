@@ -1,5 +1,7 @@
 package au.com.codeka.warworlds.model;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -11,6 +13,13 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.protobuf.InvalidProtocolBufferException;
+
+import android.content.ContentValues;
+import android.content.Context;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
 import android.os.AsyncTask;
 import au.com.codeka.warworlds.api.ApiClient;
 import au.com.codeka.warworlds.model.protobuf.Messages;
@@ -48,9 +57,16 @@ public class EmpireManager {
         return mEmpire;
     }
 
-    public Empire getEmpire(String empireKey) {
+    public Empire getEmpire(Context context, String empireKey) {
         if (empireKey.equals(mEmpire.getKey())) {
             return mEmpire;
+        }
+
+        Messages.Empire pb = new LocalEmpireStore(context).getEmpire(empireKey);
+        if (pb != null) {
+            Empire empire = Empire.fromProtocolBuffer(pb);
+            mEmpireCache.put(empireKey, empire);
+            return empire;
         }
 
         return mEmpireCache.get(empireKey);
@@ -115,11 +131,13 @@ public class EmpireManager {
         mEmpire.refreshAllDetails(null);
     }
 
-    public void refreshEmpire(final String empireKey) {
-        refreshEmpire(empireKey, null);
+    public void refreshEmpire(final Context context, final String empireKey) {
+        refreshEmpire(context, empireKey, null);
     }
 
-    public void refreshEmpire(final String empireKey, final EmpireFetchedHandler handler) {
+    public void refreshEmpire(final Context context,
+                              final String empireKey,
+                              final EmpireFetchedHandler handler) {
         if (empireKey == null || empireKey.length() == 0) {
             if (handler != null) {
                 handler.onEmpireFetched(mNativeEmpire);
@@ -151,6 +169,8 @@ public class EmpireManager {
                     String url = "empires/"+empireKey;
 
                     Messages.Empire pb = ApiClient.getProtoBuf(url, Messages.Empire.class);
+                    new LocalEmpireStore(context).addEmpire(pb);
+
                     if (empireKey.equals(mEmpire.getKey())) {
                         empire = MyEmpire.fromProtocolBuffer(pb);
                     } else {
@@ -190,7 +210,9 @@ public class EmpireManager {
 
     }
 
-    public void fetchEmpire(final String empireKey, final EmpireFetchedHandler handler) {
+    public void fetchEmpire(final Context context,
+                            final String empireKey,
+                            final EmpireFetchedHandler handler) {
         if (empireKey == null) {
             if (handler != null) {
                 handler.onEmpireFetched(mNativeEmpire);
@@ -213,10 +235,81 @@ public class EmpireManager {
             return;
         }
 
-        refreshEmpire(empireKey, handler);
+        Messages.Empire pb = new LocalEmpireStore(context).getEmpire(empireKey);
+        if (pb != null) {
+            Empire empire = Empire.fromProtocolBuffer(pb);
+            mEmpireCache.put(empireKey, empire);
+            if (handler != null) {
+                handler.onEmpireFetched(empire);
+            }
+            return;
+        }
+
+        refreshEmpire(context, empireKey, handler);
     }
 
     public interface EmpireFetchedHandler {
         public void onEmpireFetched(Empire empire);
+    }
+
+    private static class LocalEmpireStore extends SQLiteOpenHelper {
+        public LocalEmpireStore(Context context) {
+            super(context, "empires.db", null, 1);
+        }
+
+        /**
+         * This is called the first time we open the database, in order to create the required
+         * tables, etc.
+         */
+        @Override
+        public void onCreate(SQLiteDatabase db) {
+            db.execSQL("CREATE TABLE empires ("
+                      +"  id INTEGER PRIMARY KEY,"
+                      +"  empire_key STRING,"
+                      +"  empire BLOB);");
+        }
+
+        @Override
+        public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        }
+
+        public void addEmpire(Messages.Empire empire) {
+            SQLiteDatabase db = getWritableDatabase();
+            try {
+                ByteArrayOutputStream empireBlob = new ByteArrayOutputStream();
+                try {
+                    empire.writeTo(empireBlob);
+                } catch (IOException e) {
+                    // we won't get the notification, but not the end of the world...
+                    return;
+                }
+
+                ContentValues values = new ContentValues();
+                values.put("empire", empireBlob.toByteArray());
+                values.put("empire_key", empire.getKey());
+                db.insert("empires", null, values);
+            } finally {
+                db.close();
+            }
+        }
+
+        public Messages.Empire getEmpire(String empireKey) {
+            SQLiteDatabase db = getReadableDatabase();
+            try {
+                Cursor cursor = db.query("empires", new String[] {"empire"},
+                        "empire_key = '"+empireKey.replace('\'', ' ')+"'",
+                        null, null, null, null);
+                if (!cursor.moveToFirst()) {
+                    cursor.close();
+                    return null;
+                }
+
+                return Messages.Empire.parseFrom(cursor.getBlob(0));
+            } catch (InvalidProtocolBufferException e) {
+                return null;
+            } finally {
+                db.close();
+            }
+        }
     }
 }

@@ -68,7 +68,7 @@ public class SectorManager {
     }
 
     public Collection<Sector> getSectors() {
-        return mSectors.snapshot().values();
+        return mSectors.getAllSectors();
     }
 
     /**
@@ -259,12 +259,13 @@ public class SectorManager {
         }
     }
 
-    private static class SectorCache extends LruCache<String, Sector> {
-        private Map<String, StarfieldBackgroundRenderer> mBackgroundRenderers;
+    private static class SectorCache {
+        LruCache<String, StarfieldBackgroundRenderer> mBackgroundRenderers;
+        LruCache<String, Sector> mSectors;
 
         public SectorCache() {
-            super(9);
-            mBackgroundRenderers = new TreeMap<String, StarfieldBackgroundRenderer>();
+            mSectors = new LruCache<String, Sector>(20);
+            mBackgroundRenderers = new LruCache<String, StarfieldBackgroundRenderer>(9);
         }
 
         public static String key(Pair<Long, Long> coord) {
@@ -275,7 +276,7 @@ public class SectorManager {
             String key = key(coords);
             StarfieldBackgroundRenderer renderer = mBackgroundRenderers.get(key);
             if (renderer == null) {
-                if (this.get(key) != null) {
+                if (mSectors.get(key) != null) {
                     long[] seeds = new long[9];
                     for (int y = -1; y <= 1; y++) {
                         for (int x = -1; x <= 1; x++) {
@@ -291,34 +292,15 @@ public class SectorManager {
         }
 
         public Sector get(Pair<Long, Long> coords) {
-            return get(key(coords));
+            return mSectors.get(key(coords));
         }
 
         public void put(Pair<Long, Long> coords, Sector s) {
-            put(key(coords), s);
+            mSectors.put(key(coords), s);
         }
 
-        @Override
-        protected void entryRemoved(boolean evicted,
-                                    String key,
-                                    Sector oldValue,
-                                    Sector newValue) {
-            if (newValue == null) {
-                StarfieldBackgroundRenderer renderer = mBackgroundRenderers.get(key);
-                if (renderer != null) {
-                    renderer.close();
-                    mBackgroundRenderers.remove(key);
-                }
-            }
-            /*if (newValue == null) {
-                log.debug(String.format("SectorCache.entryRemoved(%s) evictionCount=%d",
-                        key, evictionCount()));
-                StringBuilder msg = new StringBuilder();
-                for (StackTraceElement ste : Thread.currentThread().getStackTrace()) {
-                    msg.append(ste.toString()+"\r\n");
-                }
-                log.debug(msg.toString());
-            }*/
+        public Collection<Sector> getAllSectors() {
+            return mSectors.snapshot().values();
         }
     }
 
