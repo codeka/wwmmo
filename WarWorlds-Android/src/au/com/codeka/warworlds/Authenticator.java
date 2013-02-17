@@ -16,8 +16,8 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import au.com.codeka.warworlds.api.AppEngineAuthenticator;
 import au.com.codeka.warworlds.api.ApiClient;
+import au.com.codeka.warworlds.api.AppEngineAuthenticator;
 import au.com.codeka.warworlds.api.RequestManager;
 import au.com.codeka.warworlds.api.RequestRetryException;
 

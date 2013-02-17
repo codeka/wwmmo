@@ -48,6 +48,14 @@ public class EmpireManager {
         return mEmpire;
     }
 
+    public Empire getEmpire(String empireKey) {
+        if (empireKey.equals(mEmpire.getKey())) {
+            return mEmpire;
+        }
+
+        return mEmpireCache.get(empireKey);
+    }
+
     public NativeEmpire getNativeEmpire() {
         return mNativeEmpire;
     }
@@ -120,13 +128,17 @@ public class EmpireManager {
         }
 
         List<EmpireFetchedHandler> inProgress = mInProgress.get(empireKey);
-        if (inProgress != null && handler != null) {
+        if (inProgress != null) {
             // if there's already a call in progress, don't fetch again
-            inProgress.add(handler);
+            if (handler != null) {
+                inProgress.add(handler);
+            }
             return;
         } else {
             inProgress = new ArrayList<EmpireFetchedHandler>();
-            inProgress.add(handler);
+            if (handler != null) {
+                inProgress.add(handler);
+            }
             mInProgress.put(empireKey, inProgress);
         }
 
@@ -180,18 +192,24 @@ public class EmpireManager {
 
     public void fetchEmpire(final String empireKey, final EmpireFetchedHandler handler) {
         if (empireKey == null) {
-            handler.onEmpireFetched(mNativeEmpire);
+            if (handler != null) {
+                handler.onEmpireFetched(mNativeEmpire);
+            }
             return;
         }
 
         if (mEmpireCache.containsKey(empireKey)) {
-            handler.onEmpireFetched(mEmpireCache.get(empireKey));
+            if (handler != null) {
+                handler.onEmpireFetched(mEmpireCache.get(empireKey));
+            }
             return;
         }
 
         // if it's us, then that's good enough as well!
         if (mEmpire != null && mEmpire.getKey().equals(empireKey)) {
-            handler.onEmpireFetched(mEmpire);
+            if (handler != null) {
+                handler.onEmpireFetched(mEmpire);
+            }
             return;
         }
 

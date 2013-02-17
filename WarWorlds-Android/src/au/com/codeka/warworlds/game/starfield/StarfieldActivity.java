@@ -25,8 +25,8 @@ import au.com.codeka.TimeInHours;
 import au.com.codeka.warworlds.BaseActivity;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.ServerGreeter;
-import au.com.codeka.warworlds.StyledDialog;
 import au.com.codeka.warworlds.ServerGreeter.ServerGreeting;
+import au.com.codeka.warworlds.StyledDialog;
 import au.com.codeka.warworlds.ctrl.FleetListSimple;
 import au.com.codeka.warworlds.ctrl.SelectionView;
 import au.com.codeka.warworlds.game.EmpireActivity;
@@ -166,6 +166,15 @@ public class StarfieldActivity extends BaseActivity
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(mContext, TacticalMapActivity.class);
+                // get the star closest to the centre of the screen currently, that's what we'll focus
+                // on in the tactical map as well.
+                Star centreStar = mStarfield.findStarInCentre();
+                if (centreStar != null) {
+                    intent.putExtra("au.com.codeka.warworlds.SectorX", centreStar.getSectorX());
+                    intent.putExtra("au.com.codeka.warworlds.SectorY", centreStar.getSectorY());
+                    intent.putExtra("au.com.codeka.warworlds.OffsetX", centreStar.getOffsetX());
+                    intent.putExtra("au.com.codeka.warworlds.OffsetY", centreStar.getOffsetY());
+                }
                 startActivityForResult(intent, TACTICAL_MAP_REQUEST);
             }
         });
@@ -196,13 +205,6 @@ public class StarfieldActivity extends BaseActivity
             @Override
             public void onHelloComplete(boolean success, ServerGreeting greeting) {
                 findColony(greeting.getColonies());
-
-                Bundle extras = getIntent().getExtras();
-                if (extras != null) {
-                    String starKey = extras.getString("au.com.codeka.warworlds.StarKey");
-                    if (starKey != null) {
-                    }
-                }
             }
         });
     }

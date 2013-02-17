@@ -5,10 +5,10 @@ import java.util.Locale;
 import org.joda.time.Duration;
 
 import android.app.Dialog;
-import android.support.v4.app.DialogFragment;
 import android.content.DialogInterface;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.app.DialogFragment;
 import android.text.Html;
 import au.com.codeka.TimeInHours;
 import au.com.codeka.warworlds.StyledDialog;

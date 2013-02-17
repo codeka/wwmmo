@@ -16,6 +16,7 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.support.v4.util.LruCache;
 import au.com.codeka.Pair;
+import au.com.codeka.Point2D;
 import au.com.codeka.common.Vector2;
 import au.com.codeka.warworlds.api.ApiClient;
 import au.com.codeka.warworlds.game.StarfieldBackgroundRenderer;
@@ -149,7 +150,7 @@ public class SectorManager {
      */
     public void requestSectors(final List<Pair<Long, Long>> coords, boolean force,
                                final OnSectorsFetchedListener callback) {
-        //if (log.isDebugEnabled()) {
+        if (log.isDebugEnabled()) {
             String msg = "";
             for(Pair<Long, Long> coord : coords) {
                 if (msg.length() != 0) {
@@ -158,7 +159,7 @@ public class SectorManager {
                 msg += String.format("(%d, %d)", coord.one, coord.two);
             }
             log.debug(String.format("Requesting sectors %s...", msg));
-       // }
+        }
 
         Map<Pair<Long, Long>, Sector> existingSectors = new TreeMap<Pair<Long, Long>, Sector>();
         final List<Pair<Long, Long>> missingSectors = new ArrayList<Pair<Long, Long>>();

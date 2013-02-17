@@ -73,7 +73,9 @@ public class UniverseElementSurfaceView extends View {
             mGestureDetector = new GestureDetector(mContext, listener);
         }
 
-        mGestureDetector.onTouchEvent(event);
+        if (mGestureDetector != null) {
+            mGestureDetector.onTouchEvent(event);
+        }
         return true;
     }
 

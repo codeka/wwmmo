@@ -16,9 +16,9 @@ import au.com.codeka.common.Voronoi;
  * a "control field" around all of the stars the empire owns.
  */
 public class ControlField {
-    private PointCloud mPointCloud;
-    private Voronoi mVoronoi;
-    private ArrayList<Vector2> mOwnedPoints;
+    protected PointCloud mPointCloud;
+    protected Voronoi mVoronoi;
+    protected ArrayList<Vector2> mOwnedPoints;
 
     public ControlField(PointCloud pointCloud, Voronoi voronoi) {
         mPointCloud = pointCloud;
@@ -33,6 +33,10 @@ public class ControlField {
      */
     public void addPointToControlField(Vector2 pt) {
         mOwnedPoints.add(0, pt);
+    }
+
+    public void clear() {
+        mOwnedPoints.clear();
     }
 
     public void render(Image img, Colour c) {

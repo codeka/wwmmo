@@ -32,7 +32,18 @@ public class Star extends StarSummary {
         return mColonies;
     }
     public List<EmpirePresence> getEmpires() {
-        return mEmpires;
+        List<EmpirePresence> empires = new ArrayList<EmpirePresence>();
+        // note: we make sure there's actually a colony for that empire before we return it
+        for (EmpirePresence empire : mEmpires) {
+            for (Colony colony : mColonies) {
+                if (colony.getEmpireKey() != null && colony.getEmpireKey().equals(empire.getKey())) {
+                    empires.add(empire);
+                    break;
+                }
+            }
+        }
+
+        return empires;
     }
     public EmpirePresence getEmpire(String empireKey) {
         for (EmpirePresence ep : mEmpires) {

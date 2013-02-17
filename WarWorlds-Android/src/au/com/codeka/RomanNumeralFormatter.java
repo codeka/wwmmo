@@ -1,6 +1,5 @@
 package au.com.codeka;
 
-import java.lang.IllegalArgumentException;
 
 /**
  * Simple helper class that formats numbers as roman numerals.

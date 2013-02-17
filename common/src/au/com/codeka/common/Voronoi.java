@@ -17,10 +17,10 @@ public class Voronoi {
 
     // this mapping maps points in the point cloud to the triangles that share the
     // point as a vertex
-    private HashMap<Vector2, List<Triangle>> mPointCloudToTriangles;
+    protected HashMap<Vector2, List<Triangle>> mPointCloudToTriangles;
 
     // maps from points to a list of the neighbouring points
-    private HashMap<Vector2, List<Vector2>> mPointNeighbours;
+    protected HashMap<Vector2, List<Vector2>> mPointNeighbours;
 
     final static double EPSILON = 0.000000001;
 
@@ -322,10 +322,26 @@ public class Voronoi {
      *   a vertex with these will need to be removed as well.
      */
     private List<Triangle> createSuperTriangles(List<Vector2> points, List<Triangle> triangles) {
-        points.add(Vector2.pool.borrow().reset(-0.1, -0.1));
-        points.add(Vector2.pool.borrow().reset(-0.1, 1.1));
-        points.add(Vector2.pool.borrow().reset(1.1, 1.1));
-        points.add(Vector2.pool.borrow().reset(1.1, -0.1));
+        double minX = 1.0, minY = 1.0, maxX = 0.0, maxY = 0.0;
+        for (Vector2 pt : points) {
+            if (pt.x < minX) {
+                minX = pt.x;
+            }
+            if (pt.x > maxX) {
+                maxX = pt.x;
+            }
+            if (pt.y < minY) {
+                minY = pt.y;
+            }
+            if (pt.y > maxY) {
+                maxY = pt.y;
+            }
+        }
+
+        points.add(Vector2.pool.borrow().reset(minX - 0.1, minY - 0.1));
+        points.add(Vector2.pool.borrow().reset(minX - 0.1, maxY + 0.1));
+        points.add(Vector2.pool.borrow().reset(maxX + 0.1, maxY + 0.1));
+        points.add(Vector2.pool.borrow().reset(maxX + 0.1, minY - 0.1));
 
         ArrayList<Triangle> superTriangles = new ArrayList<Triangle>();
         superTriangles.add(new Triangle(points, points.size() - 4, points.size() - 3, points.size() - 2));

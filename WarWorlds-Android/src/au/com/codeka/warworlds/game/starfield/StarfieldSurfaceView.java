@@ -35,7 +35,6 @@ import au.com.codeka.common.Vector2;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.ctrl.SelectionView;
 import au.com.codeka.warworlds.game.StarfieldBackgroundRenderer;
-import au.com.codeka.warworlds.game.UniverseElementSurfaceView;
 import au.com.codeka.warworlds.model.Colony;
 import au.com.codeka.warworlds.model.Empire;
 import au.com.codeka.warworlds.model.EmpireManager;
@@ -48,15 +47,16 @@ import au.com.codeka.warworlds.model.ShipDesignManager;
 import au.com.codeka.warworlds.model.Sprite;
 import au.com.codeka.warworlds.model.Star;
 import au.com.codeka.warworlds.model.StarImageManager;
-import au.com.codeka.warworlds.model.StarSummary;
 import au.com.codeka.warworlds.model.StarManager;
+import au.com.codeka.warworlds.model.StarSummary;
 
 /**
  * \c SurfaceView that displays the starfield. You can scroll around, tap on stars to bring
  * up their details and so on.
  */
-public class StarfieldSurfaceView extends UniverseElementSurfaceView
-                                  implements StarManager.StarFetchedHandler {
+public class StarfieldSurfaceView extends SectorView
+                                  implements StarManager.StarFetchedHandler,
+                                             SectorManager.OnSectorListChangedListener {
     private static final Logger log = LoggerFactory.getLogger(StarfieldSurfaceView.class);
     private Context mContext;
     private ArrayList<OnSelectionChangedListener> mSelectionChangedListeners;
@@ -66,19 +66,11 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView
     private Map<String, List<VisibleEntityAttachedOverlay>> mFleetAttachedOverlays;
     private Map<String, Empire> mVisibleEmpires;
     private List<VisibleEntity> mVisibleEntities;
-    private boolean mScrollToCentre = false;
     private boolean mIsScrolling;
     private Handler mHandler;
 
     private static Bitmap sFleetMultiBitmap;
-    private static final int sRadius = 1;
 
-    private long mSectorX;
-    private long mSectorY;
-    private float mOffsetX;
-    private float mOffsetY;
-
-    private SectorManager.OnSectorListChangedListener mSectorListChangedListener;
     private ImageManager.BitmapGeneratedListener mBitmapGeneratedListener;
 
     public StarfieldSurfaceView(Context context, AttributeSet attrs) {
@@ -92,8 +84,6 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView
         mContext = context;
         mSelectionChangedListeners = new ArrayList<OnSelectionChangedListener>();
         mSelectedEntity = null;
-        mSectorX = mSectorY = 0;
-        mOffsetX = mOffsetY = 0;
         mStarAttachedOverlays = new TreeMap<String, List<VisibleEntityAttachedOverlay>>();
         mFleetAttachedOverlays = new TreeMap<String, List<VisibleEntityAttachedOverlay>>();
         mVisibleEmpires = new TreeMap<String, Empire>();
@@ -103,28 +93,6 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView
         if (sFleetMultiBitmap == null) {
             sFleetMultiBitmap = BitmapFactory.decodeResource(mContext.getResources(), R.drawable.fleet);
         }
-
-        // whenever the sector list changes (i.e. when we've refreshed from the server),
-        // redraw the screen.
-        mSectorListChangedListener = new SectorManager.OnSectorListChangedListener() {
-            @Override
-            public void onSectorListChanged() {
-                log.debug("Sector list has changed, redrawing.");
-
-                // make sure we re-select the entity we had selected before (if any)
-                if (mSelectedEntity != null) {
-                    if (mSelectedEntity.star != null) {
-                        Star newSelectedStar = SectorManager.getInstance().findStar(mSelectedEntity.star.getKey());
-                        // if it's the same instance, that's fine
-                        if (newSelectedStar != mSelectedEntity.star) {
-                           selectStar(newSelectedStar);
-                        }
-                    }
-                }
-
-                redraw();
-            }
-        };
 
         // whenever a new star bitmap is generated, redraw the screen
         mBitmapGeneratedListener = new ImageManager.BitmapGeneratedListener() {
@@ -145,7 +113,7 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView
     @Override
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
-        SectorManager.getInstance().addSectorListChangedListener(mSectorListChangedListener);
+        SectorManager.getInstance().addSectorListChangedListener(this);
         StarImageManager.getInstance().addBitmapGeneratedListener(mBitmapGeneratedListener);
         StarManager.getInstance().addStarUpdatedListener(null, this);
     }
@@ -153,7 +121,7 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView
     @Override
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
-        SectorManager.getInstance().removeSectorListChangedListener(mSectorListChangedListener);
+        SectorManager.getInstance().removeSectorListChangedListener(this);
         StarImageManager.getInstance().removeBitmapGeneratedListener(mBitmapGeneratedListener);
         StarManager.getInstance().removeStarUpdatedListener(this);
     }
@@ -162,6 +130,23 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView
         mSelectedEntity = null;
         if (mSelectionView != null) {
             mSelectionView.setVisibility(View.GONE);
+        }
+    }
+
+    @Override
+    public void onSectorListChanged() {
+        log.debug("Sector list has changed, redrawing.");
+        super.onSectorListChanged();
+
+        // make sure we re-select the entity we had selected before (if any)
+        if (mSelectedEntity != null) {
+            if (mSelectedEntity.star != null) {
+                Star newSelectedStar = SectorManager.getInstance().findStar(mSelectedEntity.star.getKey());
+                // if it's the same instance, that's fine
+                if (newSelectedStar != mSelectedEntity.star) {
+                   selectStar(newSelectedStar);
+                }
+            }
         }
     }
 
@@ -261,87 +246,23 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView
      * Gets the \c Star that's closest to the centre of the screen.
      */
     public Star findStarInCentre() {
-        //for (VisibleEntity entity : mVisibleEntities) {
-        //    if (entity.star != null) {
-        //        entity.position.x;
-        //    }
-        //}
-        return null;
-    }
+        Star centreStar = null;
+        double distance = 0;
 
-    /**
-     * Scroll to the given sector (x,y) and offset into the sector.
-     */
-    public void scrollTo(long sectorX, long sectorY, float offsetX, float offsetY) {
-        scrollTo(sectorX, sectorY, offsetX, offsetY, false);
-    }
+        Vector2 centre = Vector2.pool.borrow().reset(getWidth() / 2.0, getHeight() / 2.0);
 
-    /**
-     * Scroll to the given sector (x,y) and offset into the sector.
-     */
-    public void scrollTo(long sectorX, long sectorY, float offsetX, float offsetY, boolean centre) {
-        mSectorX = sectorX;
-        mSectorY = sectorY;
-        mOffsetX = -offsetX;
-        mOffsetY = -offsetY;
-
-        if (centre) {
-            mScrollToCentre = true;
-        }
-
-        List<Pair<Long, Long>> missingSectors = new ArrayList<Pair<Long, Long>>();
-
-        for(sectorY = mSectorY - sRadius; sectorY <= mSectorY + sRadius; sectorY++) {
-            for(sectorX = mSectorX - sRadius; sectorX <= mSectorX + sRadius; sectorX++) {
-                Pair<Long, Long> key = new Pair<Long, Long>(sectorX, sectorY);
-                Sector s = SectorManager.getInstance().getSector(sectorX, sectorY);
-                if (s == null) {
-                    missingSectors.add(key);
+        for (VisibleEntity entity : mVisibleEntities) {
+            if (entity.star != null) {
+                double thisDistance = entity.position.distanceTo(centre);
+                if (centreStar == null || thisDistance < distance) {
+                    centreStar = entity.star;
+                    distance = thisDistance;
                 }
             }
         }
 
-        if (!missingSectors.isEmpty()) {
-            SectorManager.getInstance().requestSectors(missingSectors, false, null);
-        }
-
-        redraw();
-    }
-
-    /**
-     * Scrolls the view by a relative amount.
-     * @param distanceX Number of pixels in the X direction to scroll.
-     * @param distanceY Number of pixels in the Y direction to scroll.
-     */
-    public void scroll(float distanceX, float distanceY) {
-        mOffsetX += distanceX;
-        mOffsetY += distanceY;
-
-        boolean needUpdate = false;
-        while (mOffsetX < -(SectorManager.SECTOR_SIZE / 2)) {
-            mOffsetX += SectorManager.SECTOR_SIZE;
-            mSectorX ++;
-            needUpdate = true;
-        }
-        while (mOffsetX > (SectorManager.SECTOR_SIZE / 2)) {
-            mOffsetX -= SectorManager.SECTOR_SIZE;
-            mSectorX --;
-            needUpdate = true;
-        }
-        while (mOffsetY < -(SectorManager.SECTOR_SIZE / 2)) {
-            mOffsetY += SectorManager.SECTOR_SIZE;
-            mSectorY ++;
-            needUpdate = true;
-        }
-        while (mOffsetY > (SectorManager.SECTOR_SIZE / 2)) {
-            mOffsetY -= SectorManager.SECTOR_SIZE;
-            mSectorY --;
-            needUpdate = true;
-        }
-
-        if (needUpdate) {
-            scrollTo(mSectorX, mSectorY, -mOffsetX, -mOffsetY);
-        }
+        Vector2.pool.release(centre);
+        return centreStar;
     }
 
     private void placeSelection() {
@@ -354,63 +275,6 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView
         lp.topMargin = (int) mSelectedEntity.position.y + getTop() - (mSelectionView.getHeight() / 2);
         mSelectionView.setLayoutParams(lp);
         mSelectionView.setVisibility(View.VISIBLE);
-    }
-
-    /**
-     * Gets the \c Star that's closest to the given (x,y), based on the current sector
-     * centre and offsets.
-     */
-    public Star getStarAt(int viewX, int viewY) {
-        // first, work out which sector your actually inside of. If (mOffsetX, mOffsetY) is (0,0)
-        // then (x,y) corresponds exactly to the offset into (mSectorX, mSectorY). Otherwise, we
-        // have to adjust (x,y) by the offset so that it works out like that.
-        int x = viewX - (int) mOffsetX;
-        int y = viewY - (int) mOffsetY;
-
-        long sectorX = mSectorX;
-        long sectorY = mSectorY;
-        while (x < 0) {
-            x += SectorManager.SECTOR_SIZE;
-            sectorX --;
-        }
-        while (x >= SectorManager.SECTOR_SIZE) {
-            x -= SectorManager.SECTOR_SIZE;
-            sectorX ++;
-        }
-        while (y < 0) {
-            y += SectorManager.SECTOR_SIZE;
-            sectorY --;
-        }
-        while (y >= SectorManager.SECTOR_SIZE) {
-            y -= SectorManager.SECTOR_SIZE;
-            sectorY ++;
-        }
-
-        Sector sector = SectorManager.getInstance().getSector(sectorX, sectorY);
-        if (sector == null) {
-            // if it's not loaded yet, you can't have tapped on anything...
-            return null;
-        }
-
-        int minDistance = 0;
-        Star closestStar = null;
-
-        for(Star star : sector.getStars()) {
-            int starX = star.getOffsetX();
-            int starY = star.getOffsetY();
-
-            int distance = (starX - x)*(starX - x) + (starY - y)*(starY - y);
-            if (closestStar == null || distance < minDistance) {
-                closestStar = star;
-                minDistance = distance;
-            }
-        }
-
-        // only return it if you tapped within a 48 pixel radius
-        if (Math.sqrt(minDistance) <= 48) {
-            return closestStar;
-        }
-        return null;
     }
 
     private List<VisibleEntity> getVisibleEntitiesAt(int viewX, int viewY) {
@@ -458,12 +322,6 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView
         }
         super.onDraw(canvas);
 
-        if (mScrollToCentre) {
-            mOffsetX += getWidth() / 2.0f / getPixelScale();
-            mOffsetY += getHeight() / 2.0f / getPixelScale();
-            mScrollToCentre = false;
-        }
-
         DrawState state = new DrawState(this, canvas);
         final List<Pair<Long, Long>> missingSectors = drawScene(state);
         mVisibleEntities = state.visibleEntities;
@@ -474,21 +332,15 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView
         if (missingSectors != null) {
             SectorManager.getInstance().requestSectors(missingSectors, false, null);
         }
-
-        //placeSelection();
     }
 
-    /**
-     * Draws the current "scene" to the internal buffer.
-     */
     private static List<Pair<Long, Long>> drawScene(DrawState state) {
-        long startTime = System.nanoTime();
         SectorManager sm = SectorManager.getInstance();
 
         List<Pair<Long, Long>> missingSectors = null;
 
-        for(int y = -sRadius; y <= sRadius; y++) {
-            for(int x = -sRadius; x <= sRadius; x++) {
+        for(int y = -state.sectorRadius; y <= state.sectorRadius; y++) {
+            for(int x = -state.sectorRadius; x <= state.sectorRadius; x++) {
                 long sX = state.sectorX + x;
                 long sY = state.sectorY + y;
 
@@ -512,13 +364,6 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView
 
                 drawSector(state, sx, sy, sector);
             }
-        }
-
-        long endTime = System.nanoTime();
-        double ms = (double)(endTime - startTime) / 1000000.0;
-        if (ms > 150.0) {
-            // only log if it's > 150ms (which it should never be!)
-            log.debug(String.format("Scene re-drawn in %.4fms", ms));
         }
 
         return missingSectors;
@@ -993,18 +838,17 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView
      * Implements the \c OnGestureListener methods that we use to respond to
      * various touch events.
      */
-    private class GestureListener extends GestureDetector.SimpleOnGestureListener {
+    private class GestureListener extends SectorView.GestureListener {
         @Override
         public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX,
                 float distanceY) {
-            scroll(-(float)(distanceX / getPixelScale()),
-                   -(float)(distanceY / getPixelScale()));
+            super.onScroll(e1, e2, distanceX, distanceY);
 
             if (mSelectionView != null) {
                 mSelectionView.setVisibility(View.GONE);
             }
             mIsScrolling = true;
-            redraw();
+
             return false;
         }
 
@@ -1054,6 +898,7 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView
         public long sectorY;
         public float offsetX;
         public float offsetY;
+        public int sectorRadius;
         public List<VisibleEntity> visibleEntities;
         public Canvas canvas;
         public float pixelScale;
@@ -1075,6 +920,7 @@ public class StarfieldSurfaceView extends UniverseElementSurfaceView
             sectorY = ssv.mSectorY;
             offsetX = ssv.mOffsetX;
             offsetY = ssv.mOffsetY;
+            sectorRadius = ssv.mSectorRadius;
             pixelScale = ssv.getPixelScale();
             visibleEntities = new ArrayList<VisibleEntity>();
             starAttachedOverlays = ssv.mStarAttachedOverlays;

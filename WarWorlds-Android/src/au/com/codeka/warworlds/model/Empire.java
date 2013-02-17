@@ -63,11 +63,7 @@ public class Empire implements Parcelable {
             int[] pixels = new int[width * height];
             sBaseShield.getPixels(pixels, 0, width, 0, 0, width, height);
 
-            Random rand = new Random(mKey.hashCode());
-            int newColour = Color.rgb(rand.nextInt(100) + 100,
-                                      rand.nextInt(100) + 100,
-                                      rand.nextInt(100) + 100);
-
+            int newColour = getShieldColor();
             for (int i = 0; i < pixels.length; i++) {
                 if (pixels[i] == Color.MAGENTA) {
                     pixels[i] = newColour;
@@ -78,6 +74,13 @@ public class Empire implements Parcelable {
         }
 
         return mEmpireShield;
+    }
+
+    public int getShieldColor() {
+        Random rand = new Random(mKey.hashCode());
+        return Color.rgb(rand.nextInt(100) + 100,
+                         rand.nextInt(100) + 100,
+                         rand.nextInt(100) + 100);
     }
 
     @Override

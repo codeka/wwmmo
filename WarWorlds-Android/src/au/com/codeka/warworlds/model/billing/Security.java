@@ -15,10 +15,6 @@
 
 package au.com.codeka.warworlds.model.billing;
 
-import android.text.TextUtils;
-import android.util.Base64;
-import android.util.Log;
-
 import java.security.InvalidKeyException;
 import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
@@ -27,6 +23,10 @@ import java.security.Signature;
 import java.security.SignatureException;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.X509EncodedKeySpec;
+
+import android.text.TextUtils;
+import android.util.Base64;
+import android.util.Log;
 
 /**
  * Security-related methods. For a secure implementation, all of this code

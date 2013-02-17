@@ -2,7 +2,8 @@ package au.com.codeka;
 
 import java.util.Iterator;
 
-import org.w3c.dom.*;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 
 /**
  * This is an implementation of \c Iterartor which lets you more easily iterator over
