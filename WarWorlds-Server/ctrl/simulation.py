@@ -758,7 +758,9 @@ class Simulation(object):
         effect.onFleetArrived(star_pb, new_fleet_pb, other_fleet_pb, self)
 
 
-  def update(self):
+  def update(self, update_stars = True, update_colonies=True, update_empires=True,
+                    update_build_requests=True, update_fleets=True, update_combat_reports=True,
+                    schedule_fleet_updates=True):
     """Apply all of the updates we've made to the data store."""
     if not self.need_update:
       return
@@ -770,14 +772,21 @@ class Simulation(object):
       keys_to_clear.append("buildqueue:for-empire:%s" % empire_pb.key)
 
     for star_pb in self.star_pbs:
-      self._updateStar(star_pb)
-      self._updateColonies(star_pb, keys_to_clear)
-      self._updateEmpirePresences(star_pb)
-      self._updateBuildRequests(star_pb)
-      self._updateFleets(star_pb)
-      self._updateCombatReport(star_pb)
-      self._scheduleFleetDestroy(star_pb)
-      self._scheduleFleetVictory(star_pb)
+      if update_stars:
+        self._updateStar(star_pb)
+      if update_colonies:
+        self._updateColonies(star_pb, keys_to_clear)
+      if update_empires:
+        self._updateEmpirePresences(star_pb)
+      if update_build_requests:
+        self._updateBuildRequests(star_pb)
+      if update_fleets:
+        self._updateFleets(star_pb)
+      if update_combat_reports:
+        self._updateCombatReport(star_pb)
+      if schedule_fleet_updates:
+        self._scheduleFleetDestroy(star_pb)
+        self._scheduleFleetVictory(star_pb)
 
       keys_to_clear.append("star:%s" % star_pb.key)
       keys_to_clear.append("sector:%d,%d" % (star_pb.sector_x, star_pb.sector_y))

@@ -436,7 +436,7 @@ def collectTaxesFromEmpire(empire_pb, sim):
   for colony_pb in colonies_pb.colonies:
     if colony_pb.star_key not in simulated_stars:
       simulated_stars.append(colony_pb.star_key)
-      sim.simulate(colony_pb.star_key)
+      sim.simulate(colony_pb.star_key, do_prediction=False)
 
   total_cash = empire_pb.cash
   for star_key in simulated_stars:
@@ -449,7 +449,9 @@ def collectTaxesFromEmpire(empire_pb, sim):
   empire_mdl = mdl.Empire.get(empire_pb.key)
   empire_mdl.cash = total_cash
   empire_mdl.put()
-  sim.update()
+  sim.update(update_stars = False, update_colonies=True, update_empires=False,
+             update_build_requests=False, update_fleets=False, update_combat_reports=False,
+             schedule_fleet_updates=False)
 
   ctrl.clearCached(["empire:%s" % (empire_pb.key),
                     "empire:for-user:%s" % (empire_mdl.user.email())])
