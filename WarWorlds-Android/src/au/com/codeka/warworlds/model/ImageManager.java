@@ -24,12 +24,12 @@ import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Handler;
 import android.support.v4.util.LruCache;
-import au.com.codeka.planetrender.Colour;
-import au.com.codeka.planetrender.Image;
+import au.com.codeka.common.Colour;
+import au.com.codeka.common.Image;
+import au.com.codeka.common.Vector3;
 import au.com.codeka.planetrender.PlanetRenderer;
 import au.com.codeka.planetrender.Template;
 import au.com.codeka.planetrender.TemplateException;
-import au.com.codeka.planetrender.Vector3;
 import au.com.codeka.warworlds.GlobalOptions;
 
 /**

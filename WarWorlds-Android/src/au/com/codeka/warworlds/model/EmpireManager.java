@@ -295,8 +295,9 @@ public class EmpireManager {
 
         public Messages.Empire getEmpire(String empireKey) {
             SQLiteDatabase db = getReadableDatabase();
+            Cursor cursor = null;
             try {
-                Cursor cursor = db.query("empires", new String[] {"empire"},
+                cursor = db.query("empires", new String[] {"empire"},
                         "empire_key = '"+empireKey.replace('\'', ' ')+"'",
                         null, null, null, null);
                 if (!cursor.moveToFirst()) {
@@ -308,6 +309,7 @@ public class EmpireManager {
             } catch (InvalidProtocolBufferException e) {
                 return null;
             } finally {
+                if (cursor != null) cursor.close();
                 db.close();
             }
         }

@@ -4,8 +4,8 @@ import java.util.Random;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import au.com.codeka.common.Vector3;
 import au.com.codeka.planetrender.Template;
-import au.com.codeka.planetrender.Vector3;
 
 public class StarImageManager extends ImageManager {
     private static StarImageManager sInstance = new StarImageManager();

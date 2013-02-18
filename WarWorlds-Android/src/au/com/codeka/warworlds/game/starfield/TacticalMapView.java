@@ -37,6 +37,7 @@ public class TacticalMapView extends SectorView
     private Paint mPointPaint;
     private Paint mInfluencePaint;
     private Context mContext;
+    private DoubleTapHandler mDoubleTapHandler;
 
     private float mDragOffsetX;
     private float mDragOffsetY;
@@ -61,6 +62,10 @@ public class TacticalMapView extends SectorView
 
         mInfluencePaint = new Paint();
         mInfluencePaint.setStyle(Style.FILL);
+    }
+
+    public void setDoubleTapHandler(DoubleTapHandler handler) {
+        mDoubleTapHandler = handler;
     }
 
     @Override
@@ -148,7 +153,8 @@ public class TacticalMapView extends SectorView
                 for (Star star : sector.getStars()) {
                     int starX = sx + star.getOffsetX();
                     int starY = sy + star.getOffsetY();
-                    Vector2 pt = Vector2.pool.borrow().reset(starX / 512.0, starY / 512.0);
+                    TacticalPointCloudVector2 pt = new TacticalPointCloudVector2(
+                            starX / 512.0, starY / 512.0, star);
 
                     TreeSet<String> doneEmpires = new TreeSet<String>();
                     for (Colony c : star.getColonies()) {
@@ -220,8 +226,15 @@ public class TacticalMapView extends SectorView
          */
         @Override
         public boolean onDoubleTap(MotionEvent e) {
-            int tapX = (int) e.getX();
-            int tapY = (int) e.getY();
+            float tapX = (e.getX() - mDragOffsetX) / 256.0f;
+            float tapY = (e.getY() - mDragOffsetY) / 256.0f;
+
+            Star star = mPointCloud.findStarNear(new Vector2(tapX, tapY));
+            if (star != null) {
+                if (mDoubleTapHandler != null) {
+                   mDoubleTapHandler.onDoubleTapped(star);
+                }
+            }
 
             return false;
         }
@@ -238,6 +251,33 @@ public class TacticalMapView extends SectorView
                 float y = (float)(p.y * 256.0) + mDragOffsetY;
                 canvas.drawCircle(x, y, 5.0f, mPointPaint);
             }
+        }
+
+        /**
+         * Finds the star nearest the given point.
+         */
+        public Star findStarNear(Vector2 pt) {
+            TacticalPointCloudVector2 closest = null;
+            double distance = 0.0;
+
+            for (Vector2 v : mPoints) {
+                TacticalPointCloudVector2 thisPoint = (TacticalPointCloudVector2) v;
+                double thisDistance = thisPoint.distanceTo(pt);
+                if (closest == null) {
+                    closest = thisPoint;
+                    distance = thisDistance;
+                } else {
+                    if (thisDistance < distance) {
+                        closest = thisPoint;
+                        distance = thisDistance;
+                    }
+                }
+            }
+
+            if (closest == null) {
+                return null;
+            }
+            return closest.star;
         }
     }
 
@@ -293,5 +333,18 @@ public class TacticalMapView extends SectorView
             }
         }
 */
+    }
+
+    private static class TacticalPointCloudVector2 extends Vector2 {
+        public Star star;
+
+        public TacticalPointCloudVector2(double x, double y, Star star) {
+            super(x, y);
+            this.star = star;
+        }
+    }
+
+    public interface DoubleTapHandler {
+        void onDoubleTapped(Star star);
     }
 }

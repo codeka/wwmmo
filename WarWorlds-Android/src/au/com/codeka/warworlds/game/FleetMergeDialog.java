@@ -127,7 +127,8 @@ public class FleetMergeDialog extends DialogFragment {
             return;
         }
 
-        ((StyledDialog) getDialog()).setCloseable(false);
+        final StyledDialog dialog = ((StyledDialog) getDialog());
+        dialog.setCloseable(false);
 
         final Activity activity = getActivity();
 
@@ -156,7 +157,7 @@ public class FleetMergeDialog extends DialogFragment {
                 StarManager.getInstance().refreshStar(
                         activity, mFleet.getStarKey());
 
-                ((StyledDialog) getDialog()).setCloseable(true);
+                dialog.setCloseable(true);
                 if (success) {
                     dismiss();
                 }

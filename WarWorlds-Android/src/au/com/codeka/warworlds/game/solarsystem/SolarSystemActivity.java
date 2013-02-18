@@ -461,7 +461,7 @@ public class SolarSystemActivity extends BaseActivity implements StarManager.Sta
     private void refreshColonyDetails() {
         final TextView populationCountTextView = (TextView) findViewById(
                 R.id.population_count);
-        populationCountTextView.setText(String.format("Population: %d / %d",
+        populationCountTextView.setText(String.format("Pop: %d / %d",
                 (int) mColony.getPopulation(), (int) mColony.getMaxPopulation()));
 
         TextView defenceTextView = (TextView) findViewById(R.id.colony_defence);

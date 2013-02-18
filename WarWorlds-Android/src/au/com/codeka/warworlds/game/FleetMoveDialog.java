@@ -268,10 +268,12 @@ public class FleetMoveDialog extends DialogFragment {
 
         @Override
         public void draw(Canvas canvas) {
-            canvas.save();
-            canvas.concat(mMatrix);
-            mSprite.draw(canvas);
-            canvas.restore();
+            if (mSprite != null) {
+                canvas.save();
+                canvas.concat(mMatrix);
+                mSprite.draw(canvas);
+                canvas.restore();
+            }
         }
     }
 
