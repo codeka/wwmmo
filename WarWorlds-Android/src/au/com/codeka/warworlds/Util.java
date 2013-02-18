@@ -53,6 +53,10 @@ public class Util {
         return true;
     }
 
+    public static boolean isSetup() {
+        return sWasSetup;
+    }
+
     /**
      * Must be called before other methods on this class. We load up the initial
      * properties, preferences and settings to make later calls easier (and not

@@ -253,6 +253,8 @@ public class EmpireManager {
     }
 
     private static class LocalEmpireStore extends SQLiteOpenHelper {
+        private static Object sLock = new Object();
+
         public LocalEmpireStore(Context context) {
             super(context, "empires.db", null, 1);
         }
@@ -274,43 +276,47 @@ public class EmpireManager {
         }
 
         public void addEmpire(Messages.Empire empire) {
-            SQLiteDatabase db = getWritableDatabase();
-            try {
-                ByteArrayOutputStream empireBlob = new ByteArrayOutputStream();
+            synchronized(sLock) {
+                SQLiteDatabase db = getWritableDatabase();
                 try {
-                    empire.writeTo(empireBlob);
-                } catch (IOException e) {
-                    // we won't get the notification, but not the end of the world...
-                    return;
+                    ByteArrayOutputStream empireBlob = new ByteArrayOutputStream();
+                    try {
+                        empire.writeTo(empireBlob);
+                    } catch (IOException e) {
+                        // we won't get the notification, but not the end of the world...
+                        return;
+                    }
+    
+                    ContentValues values = new ContentValues();
+                    values.put("empire", empireBlob.toByteArray());
+                    values.put("empire_key", empire.getKey());
+                    db.insert("empires", null, values);
+                } finally {
+                    db.close();
                 }
-
-                ContentValues values = new ContentValues();
-                values.put("empire", empireBlob.toByteArray());
-                values.put("empire_key", empire.getKey());
-                db.insert("empires", null, values);
-            } finally {
-                db.close();
             }
         }
 
         public Messages.Empire getEmpire(String empireKey) {
-            SQLiteDatabase db = getReadableDatabase();
-            Cursor cursor = null;
-            try {
-                cursor = db.query("empires", new String[] {"empire"},
-                        "empire_key = '"+empireKey.replace('\'', ' ')+"'",
-                        null, null, null, null);
-                if (!cursor.moveToFirst()) {
-                    cursor.close();
+            synchronized(sLock) {
+                SQLiteDatabase db = getReadableDatabase();
+                Cursor cursor = null;
+                try {
+                    cursor = db.query("empires", new String[] {"empire"},
+                            "empire_key = '"+empireKey.replace('\'', ' ')+"'",
+                            null, null, null, null);
+                    if (!cursor.moveToFirst()) {
+                        cursor.close();
+                        return null;
+                    }
+    
+                    return Messages.Empire.parseFrom(cursor.getBlob(0));
+                } catch (InvalidProtocolBufferException e) {
                     return null;
+                } finally {
+                    if (cursor != null) cursor.close();
+                    db.close();
                 }
-
-                return Messages.Empire.parseFrom(cursor.getBlob(0));
-            } catch (InvalidProtocolBufferException e) {
-                return null;
-            } finally {
-                if (cursor != null) cursor.close();
-                db.close();
             }
         }
     }

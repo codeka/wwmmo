@@ -88,9 +88,11 @@ public class BuildAccelerateConfirmDialog extends DialogFragment {
                 String url = "stars/"+mStar.getKey()+"/build/"+mBuildRequest.getKey()+"/accelerate";
 
                 try {
-                    Messages.BuildRequest build = ApiClient.postProtoBuf(url, null, Messages.BuildRequest.class);
-
-                    return BuildRequest.fromProtocolBuffer(build);
+                    Messages.BuildRequest pb = ApiClient.postProtoBuf(url, null, Messages.BuildRequest.class);
+                    if (pb == null) {
+                        return null;
+                    }
+                    return BuildRequest.fromProtocolBuffer(pb);
                 } catch (ApiException e) {
                     //log.error("Error issuing build request", e);
                 }

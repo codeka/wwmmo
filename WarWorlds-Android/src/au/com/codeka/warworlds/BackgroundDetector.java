@@ -76,6 +76,10 @@ public class BackgroundDetector {
     }
 
     public void onBackgroundStatusChange(final BaseActivity activity) {
+        if (!Util.isSetup()) {
+            return;
+        }
+
         final Messages.DeviceOnlineStatus dos_pb =
                 Messages.DeviceOnlineStatus.newBuilder()
                                            .setIsOnline(!mIsInBackground)

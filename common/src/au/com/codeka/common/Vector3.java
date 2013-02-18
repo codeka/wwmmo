@@ -13,7 +13,12 @@ public class Vector3 implements ObjectPool.Pooled {
     public double y;
     public double z;
 
-    private Vector3() {
+    public Vector3() {
+    }
+    public Vector3(double x, double y, double z) {
+        this.x = x;
+        this.y = y;
+        this.z = z;
     }
 
     @Override
