@@ -301,7 +301,13 @@ public class BuildQueueList extends FrameLayout implements MyEmpire.RefreshAllCo
             int lastPlanetIndex = -1;
             for (BuildRequest buildRequest : mBuildRequests) {
                 Colony colony = mColonies.get(buildRequest.getColonyKey());
+                if (colony == null) {
+                    continue;
+                }
                 Star star = mStars.get(colony.getStarKey());
+                if (star == null) {
+                    continue;
+                }
 
                 if (!colony.getStarKey().equals(lastStarKey) || colony.getPlanetIndex() != lastPlanetIndex) {
                     if (mShowStars) {

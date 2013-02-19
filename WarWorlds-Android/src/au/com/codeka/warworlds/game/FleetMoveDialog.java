@@ -104,8 +104,12 @@ public class FleetMoveDialog extends DialogFragment {
                     starDetailsRight.setText(Html.fromHtml(rightDetails));
                 }
 
-                ((StyledDialog) getDialog()).getPositiveButton()
-                                            .setEnabled(true);
+                StyledDialog dialog = ((StyledDialog) getDialog());
+                if (dialog == null) {
+                    // can happen if they dismiss the dialog (I think?)
+                    return;
+                }
+                dialog.getPositiveButton().setEnabled(true);
                 starDetailsView.setVisibility(View.VISIBLE);
                 instructionsView.setVisibility(View.GONE);
             }
