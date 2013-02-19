@@ -155,17 +155,21 @@ def renameStar(star_pb, rename_request_pb):
   star_mdl = mdl.Star.get(db.Key(star_pb.key))
   star_mdl.name = rename_request_pb.new_name
   star_mdl.put()
+  ctrl.clearCached(["star:%s" % (star_pb.key),
+                    "sector:%d,%d" % (star_pb.sector_x, star_pb.sector_y)])
+
   star_rename_mdl = mdl.StarRename()
   star_rename_mdl.star = db.Key(star_pb.key)
   star_rename_mdl.oldName = rename_request_pb.old_name
   star_rename_mdl.newName = rename_request_pb.new_name
   star_rename_mdl.purchaseOrderId = rename_request_pb.purchase_order_id
-  star_rename_mdl.purchaseTime = ctrl.epochToDateTime(rename_request_pb.purchase_time)
+  try:
+    star_rename_mdl.purchaseTime = ctrl.epochToDateTime(rename_request_pb.purchase_time)
+  except ValueError:
+    pass # ignore errors here..?
   star_rename_mdl.purchaseDeveloperPayload = rename_request_pb.purchase_developer_payload
   star_rename_mdl.purchasePrice = rename_request_pb.purchase_price
   star_rename_mdl.put()
-  ctrl.clearCached(["star:%s" % (star_pb.key),
-                    "sector:%d,%d" % (star_pb.sector_x, star_pb.sector_y)])
 
 
 def _addNativeColonies(star_pb):

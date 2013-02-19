@@ -415,16 +415,20 @@ public class BuildQueueList extends FrameLayout implements MyEmpire.RefreshAllCo
             Duration remainingDuration = buildRequest.getRemainingTime();
             String msg;
             if (remainingDuration.equals(Duration.ZERO)) {
-                msg = String.format(Locale.ENGLISH, "%s %d %%, not enough resources to complete.",
-                                    prefix, (int) buildRequest.getPercentComplete());
+                if (buildRequest.getPercentComplete() > 99.0) {
+                    msg = String.format(Locale.ENGLISH, "%s %d %%, almost done",
+                            prefix, (int) buildRequest.getPercentComplete());
+                } else {
+                    msg = String.format(Locale.ENGLISH, "%s %d %%, not enough resources to complete.",
+                            prefix, (int) buildRequest.getPercentComplete());
+                }
             } else if (remainingDuration.getStandardMinutes() > 0) {
                 msg = String.format(Locale.ENGLISH, "%s %d %%, %s left",
                                     prefix, (int) buildRequest.getPercentComplete(),
                                     TimeInHours.format(remainingDuration));
             } else {
                 msg = String.format(Locale.ENGLISH, "%s %d %%, almost done",
-                                    prefix, (int) buildRequest.getPercentComplete(),
-                                    TimeInHours.format(remainingDuration));
+                                    prefix, (int) buildRequest.getPercentComplete());
             }
             progressText.setText(Html.fromHtml(msg));
 
