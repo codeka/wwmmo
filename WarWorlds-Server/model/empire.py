@@ -233,19 +233,25 @@ class SituationReport(db.Model):
   report = db.BlobProperty()
 
   @staticmethod
-  def getForEmpire(empire_key):
+  def getForEmpire(empire_key, cursor=None):
     query = SituationReport.all().ancestor(db.Key(empire_key)).order("-reportTime")
+    if cursor:
+      query = query.with_cursor(cursor)
     return SituationReport._getForQuery(query)
 
   @staticmethod
-  def getForStar(empire_key, star_key):
+  def getForStar(empire_key, star_key, cursor=None):
     query = (SituationReport.all().ancestor(db.Key(empire_key))
                             .filter("star", db.Key(star_key)).order("-reportTime"))
+    if cursor:
+      query = query.with_cursor(cursor)
     return SituationReport._getForQuery(query)
 
   @staticmethod
-  def _getForQuery(query):
+  def _getForQuery(query, limit=100):
     sitrep_mdls = []
     for mdl in query:
       sitrep_mdls.append(mdl)
-    return sitrep_mdls
+      if len(sitrep_mdls) >= limit:
+        break
+    return (sitrep_mdls, query.cursor())

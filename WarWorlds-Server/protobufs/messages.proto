@@ -837,4 +837,7 @@ message SituationReport
 message SituationReports
 {
     repeated SituationReport situation_reports = 1;
+
+    // a cursor used to fetch the remaining reports
+    optional string cursor = 2;
 }

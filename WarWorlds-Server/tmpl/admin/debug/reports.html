@@ -13,6 +13,9 @@
             line-height: 28pt;
             width: 500pt;
         }
+        form#sitrep-form {
+            height: 56pt;
+        }
         form input[type=submit] {
             position: absolute;
             right: 0;
@@ -41,12 +44,17 @@
         form#scout-report-form input[type=text] {
             right: 95pt;
         }
-
+        form#sitrep-form input[name=sitrepKey] {
+            bottom: 50%;
+        }
+        form#sitrep-form input[name=sitrepCursor] {
+            top: 50%;
+        }
         #output {
             position: absolute;
             width: 800px;
             bottom: 0;
-            top: 240px;
+            top: 268px;
             overflow: auto;
             white-space: pre;
         }
@@ -73,7 +81,8 @@
     <form id="sitrep-form">
         <label>Sit. Rep.:</label>
         <input type="text" name="sitrepKey" value="" placeholder="Star Key, or blank for all">
-        <input type="submit" value="Fetch">
+        <input type="submit" value="Fetch"><br/>
+        <input type="text" name="sitrepCursor" value="" placeholder="Cursor (optional)">
     </form>
     <div id="output"></div>
     <script>
@@ -135,11 +144,15 @@
             evnt.preventDefault();
 
             var $sitrepKey = $("#sitrep-form input[name=sitrepKey]");
+            var $sitrepCursor = $("#sitrep-form input[name=sitrepCursor]");
 
             $("#output").text("");
             var url = "/api/v1/sit-reports";
             if ($sitrepKey.val() != "") {
                 url = "/api/v1/stars/"+$sitrepKey.val()+"/sit-reports";
+            }
+            if ($sitrepCursor.val() != "") {
+                url += "?cursor="+$sitrepCursor.val();
             }
             $.ajax({
                 url: url,

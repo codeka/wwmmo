@@ -707,7 +707,10 @@ class CombatReportPage(ApiPage):
 class SitrepPage(ApiPage):
   def get(self, star_key=None):
     empire_pb = empire.getEmpireForUser(self.user)
-    return empire.getSituationReports(empire_pb.key, star_key)
+    cursor = None
+    if self.request.get("cursor"):
+      cursor = self.request.get("cursor")
+    return empire.getSituationReports(empire_pb.key, star_key, cursor)
 
 
 class ApiApplication(webapp.WSGIApplication):

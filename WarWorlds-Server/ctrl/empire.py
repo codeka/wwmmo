@@ -1053,25 +1053,29 @@ def saveSituationReport(sitrep_pb):
     logging.warn("An error occurred sending notification, notification not sent")
 
 
-def getSituationReports(empire_key, star_key=None):
-  if star_key:
-    cache_key = "sitrep:for-star:%s:%s" % (empire_key, star_key)
-  else:
-    cache_key = "sitrep:for-empire:%s" % empire_key
-  values = ctrl.getCached([cache_key], pb.SituationReports)
-  if cache_key in values:
-    return values[cache_key]
+def getSituationReports(empire_key, star_key=None, cursor=None):
+  if not cursor:
+    if star_key:
+      cache_key = "sitrep:for-star:%s:%s" % (empire_key, star_key)
+    else:
+      cache_key = "sitrep:for-empire:%s" % empire_key
+    values = ctrl.getCached([cache_key], pb.SituationReports)
+    if cache_key in values:
+      return values[cache_key]
 
   if star_key:
-    sitrep_models = mdl.SituationReport.getForStar(empire_key, star_key)
+    (sitrep_models, new_cursor) = mdl.SituationReport.getForStar(empire_key, star_key, cursor)
   else:
-    sitrep_models = mdl.SituationReport.getForEmpire(empire_key)
+    (sitrep_models, new_cursor) = mdl.SituationReport.getForEmpire(empire_key, cursor)
   sitreps_pb = pb.SituationReports()
+  sitreps_pb.cursor = new_cursor
   for sitrep_model in sitrep_models:
     sitrep_pb = sitreps_pb.situation_reports.add()
     sitrep_pb.ParseFromString(sitrep_model.report)
 
-  ctrl.setCached({cache_key: sitreps_pb})
+  if not cursor:
+    ctrl.setCached({cache_key: sitreps_pb})
+
   return sitreps_pb
 
 
