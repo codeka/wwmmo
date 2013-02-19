@@ -464,9 +464,12 @@ public class SolarSystemActivity extends BaseActivity implements StarManager.Sta
         populationCountTextView.setText(String.format("Pop: %d / %d",
                 (int) mColony.getPopulation(), (int) mColony.getMaxPopulation()));
 
+        int defence = (int) (0.25 * mColony.getPopulation() * mColony.getDefenceBoost());
+        if (defence < 1) {
+            defence = 1;
+        }
         TextView defenceTextView = (TextView) findViewById(R.id.colony_defence);
-        defenceTextView.setText(String.format("Defence: %d",
-                (int) (0.25 * mColony.getPopulation() * mColony.getDefenceBoost())));
+        defenceTextView.setText(String.format("Defence: %d", defence));
 
         ProgressBar populationFocus = (ProgressBar) findViewById(
                 R.id.solarsystem_colony_population_focus);
@@ -517,10 +520,13 @@ public class SolarSystemActivity extends BaseActivity implements StarManager.Sta
         TextView enemyName = (TextView) findViewById(R.id.enemy_empire_name);
         TextView enemyDefence = (TextView) findViewById(R.id.enemy_empire_defence);
 
+        int defence = (int) (0.25 * mColony.getPopulation() * mColony.getDefenceBoost());
+        if (defence < 1) {
+            defence = 1;
+        }
         enemyIcon.setImageBitmap(empire.getShield(this));
         enemyName.setText(empire.getDisplayName());
-        enemyDefence.setText(String.format(Locale.ENGLISH, "Defence: %d",
-                (int)(0.25 * mColony.getPopulation() * mColony.getDefenceBoost())));
+        enemyDefence.setText(String.format(Locale.ENGLISH, "Defence: %d", defence));
     }
 
     private void onColonizeClick() {

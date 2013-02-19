@@ -587,7 +587,10 @@ def attackColony(empire_pb, colony_pb, sim):
       num_troop_carriers += fleet_pb.num_ships
       troop_carrier_fleet_pbs.append(fleet_pb)
 
-  remaining_ships = num_troop_carriers - (colony_pb.population * 0.25 * colony_pb.defence_bonus)
+  colony_defence = (colony_pb.population * 0.25 * colony_pb.defence_bonus)
+  if colony_defence < 1.0:
+    colony_defence = 1.0
+  remaining_ships = num_troop_carriers - colony_defence
   remaining_population = colony_pb.population - (num_troop_carriers * 4 / colony_pb.defence_bonus)
 
   if remaining_population <= 0:
