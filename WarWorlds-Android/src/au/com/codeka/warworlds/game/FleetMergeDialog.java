@@ -131,6 +131,7 @@ public class FleetMergeDialog extends DialogFragment {
         dialog.setCloseable(false);
 
         final Activity activity = getActivity();
+        dismiss();
 
         new AsyncTask<Void, Void, Boolean>() {
             @Override
@@ -156,11 +157,6 @@ public class FleetMergeDialog extends DialogFragment {
                 // the star this fleet is attached to needs to be refreshed...
                 StarManager.getInstance().refreshStar(
                         activity, mFleet.getStarKey());
-
-                dialog.setCloseable(true);
-                if (success) {
-                    dismiss();
-                }
             }
 
         }.execute();

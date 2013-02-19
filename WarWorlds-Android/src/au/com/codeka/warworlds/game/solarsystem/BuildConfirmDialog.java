@@ -191,11 +191,10 @@ public class BuildConfirmDialog extends DialogFragment {
     }
 
     private void onBuildClick() {
-        final StyledDialog dialog = ((StyledDialog) getDialog());
-        dialog.setCloseable(false);
-
         final EditText countEdit = (EditText) mView.findViewById(R.id.build_count_edit);
         final Activity activity = getActivity();
+
+        dismiss();
 
         new AsyncTask<Void, Void, BuildRequest>() {
             private int mErrorCode;
@@ -239,10 +238,8 @@ public class BuildConfirmDialog extends DialogFragment {
             }
             @Override
             protected void onPostExecute(BuildRequest buildRequest) {
-                dismiss();
-
                 if (mErrorCode > 0) {
-                    new StyledDialog.Builder(getActivity())
+                    new StyledDialog.Builder(activity)
                                     .setTitle("Cannot Build")
                                     .setMessage(mErrorMsg)
                                     .setPositiveButton("Close", true, null)

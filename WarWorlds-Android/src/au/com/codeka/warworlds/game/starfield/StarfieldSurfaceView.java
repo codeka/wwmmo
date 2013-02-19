@@ -361,7 +361,20 @@ public class StarfieldSurfaceView extends SectorView
                         state.context, sector);
                 bgRenderer.drawBackground(state.canvas, sx, sy,
                         sx+SectorManager.SECTOR_SIZE, sy+SectorManager.SECTOR_SIZE);
+            }
+        }
 
+        for (int y = -state.sectorRadius; y <= state.sectorRadius; y++) {
+            for(int x = -state.sectorRadius; x <= state.sectorRadius; x++) {
+                long sX = state.sectorX + x;
+                long sY = state.sectorY + y;
+                Sector sector = sm.getSector(sX, sY);
+                if (sector == null) {
+                    continue;
+                }
+
+                int sx = (int)((x * SectorManager.SECTOR_SIZE) + state.offsetX);
+                int sy = (int)((y * SectorManager.SECTOR_SIZE) + state.offsetY);
                 drawSector(state, sx, sy, sector);
             }
         }

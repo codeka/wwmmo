@@ -159,14 +159,13 @@ public class FocusDialog extends DialogFragment {
     }
 
     private void onSetClick() {
-        ((StyledDialog) getDialog()).setCloseable(false);
-
         mColony.setPopulationFocus(mSeekBars.get(0).getProgress() / 100.0f);
         mColony.setFarmingFocus(mSeekBars.get(1).getProgress() / 100.0f);
         mColony.setMiningFocus(mSeekBars.get(2).getProgress() / 100.0f);
         mColony.setConstructionFocus(mSeekBars.get(3).getProgress() / 100.0f);
 
         final Activity activity = getActivity();
+        dismiss();
 
         new AsyncTask<Void, Void, Void>() {
             @Override
@@ -189,8 +188,6 @@ public class FocusDialog extends DialogFragment {
                 // notify the StarManager that this star has been updated
                 StarManager.getInstance().refreshStar(activity,
                                                       mColony.getStarKey());
-
-                dismiss();
             }
         }.execute();
     }

@@ -166,6 +166,7 @@ public class FleetMoveDialog extends DialogFragment {
         dialog.getNegativeButton().setEnabled(false);
 
         final Activity activity = getActivity();
+        dismiss();
 
         new AsyncTask<Void, Void, Boolean>() {
             @Override
@@ -201,8 +202,6 @@ public class FleetMoveDialog extends DialogFragment {
                     // the empire needs to be updated, too, since we'll have subtracted
                     // the cost of this move from your cash
                     EmpireManager.getInstance().refreshEmpire(activity, mFleet.getEmpireKey());
-
-                    dismiss();
                 }
             }
 

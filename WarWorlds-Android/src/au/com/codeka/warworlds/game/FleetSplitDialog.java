@@ -100,7 +100,6 @@ public class FleetSplitDialog extends DialogFragment {
             public void onClick(DialogInterface dialog, int which) {
                 onSplitClick();
             }
-            
         });
 
         b.setNegativeButton("Cancel", null);
@@ -114,6 +113,7 @@ public class FleetSplitDialog extends DialogFragment {
         final TextView splitLeft = (TextView) mView.findViewById(R.id.split_left);
         final TextView splitRight = (TextView) mView.findViewById(R.id.split_right);
         final Activity activity = getActivity();
+        dismiss();
 
         new AsyncTask<Void, Void, Boolean>() {
             @Override
@@ -140,11 +140,6 @@ public class FleetSplitDialog extends DialogFragment {
                 // the star this fleet is attached to needs to be refreshed...
                 StarManager.getInstance().refreshStar(
                         activity, mFleet.getStarKey());
-
-                ((StyledDialog) getDialog()).setCloseable(true);
-                if (success) {
-                    dismiss();
-                }
             }
 
         }.execute();
