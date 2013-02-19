@@ -14,6 +14,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -50,6 +51,8 @@ public class SitrepActivity extends BaseActivity {
     private SituationReportAdapter mSituationReportAdapter;
     private String mStarKey;
     private Map<String, StarSummary> mStarSummaries;
+    private Handler mHandler;
+    private String mCursor;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -60,6 +63,7 @@ public class SitrepActivity extends BaseActivity {
         mSituationReportAdapter = new SituationReportAdapter();
 
         mStarKey = getIntent().getStringExtra("au.com.codeka.warworlds.StarKey");
+        mHandler = new Handler();
     }
 
     @Override
@@ -148,13 +152,46 @@ public class SitrepActivity extends BaseActivity {
         progressBar.setVisibility(View.VISIBLE);
         reportItems.setVisibility(View.GONE);
 
-        new AsyncTask<Void, Void, List<SituationReport>>() {
+        mCursor = null;
+        fetchReportItems(null, new FetchItemsCompleteHandler() {
+            @Override
+            public void onItemsFetched(List<SituationReport> items) {
+                progressBar.setVisibility(View.GONE);
+                reportItems.setVisibility(View.VISIBLE);
 
+                mSituationReportAdapter.setItems(items, mStarSummaries);
+            }
+        });
+    }
+
+    private void fetchNextReportItems() {
+        String cursor = mCursor;
+        mCursor = null;
+
+        fetchReportItems(cursor, new FetchItemsCompleteHandler() {
+            @Override
+            public void onItemsFetched(List<SituationReport> items) {
+                if (items.size() == 0) {
+                    // if there's no more, we set the cursor to null so the adapter knows
+                    // there's no more
+                    mCursor = null;
+                }
+
+                mSituationReportAdapter.appendItems(items, mStarSummaries);
+            }
+        });
+    }
+
+    private void fetchReportItems(final String cursor, final FetchItemsCompleteHandler handler) {
+        new AsyncTask<Void, Void, List<SituationReport>>() {
             @Override
             protected List<SituationReport> doInBackground(Void... params) {
                 String url = "/api/v1/sit-reports";
                 if (mStarKey != null) {
                     url = String.format("/api/v1/stars/%s/sit-reports", mStarKey);
+                }
+                if (cursor != null) {
+                    url += "?cursor="+cursor;
                 }
 
                 try {
@@ -176,6 +213,9 @@ public class SitrepActivity extends BaseActivity {
                         items.add(sitrep);
                     }
 
+                    // grab the cursor we'll need to fetch the next batch
+                    mCursor = pb.getCursor();
+
                     // here we want to fetch all of the star summaries for any
                     // stars that are new and we don't currently have summaries
                     // for.
@@ -194,12 +234,13 @@ public class SitrepActivity extends BaseActivity {
 
             @Override
             protected void onPostExecute(List<SituationReport> items) {
-                progressBar.setVisibility(View.GONE);
-                reportItems.setVisibility(View.VISIBLE);
-
-                mSituationReportAdapter.setItems(items, mStarSummaries);
+                handler.onItemsFetched(items);
             }
         }.execute();
+    }
+
+    private interface FetchItemsCompleteHandler {
+        public void onItemsFetched(List<SituationReport> items);
     }
 
     private void refresh() {
@@ -239,14 +280,54 @@ public class SitrepActivity extends BaseActivity {
             notifyDataSetChanged();
         }
 
+        public void appendItems(List<SituationReport> items,
+                                Map<String, StarSummary> starSummaries) {
+            if (items == null) {
+                items = new ArrayList<SituationReport>();
+            }
+
+            mStarSummaries = starSummaries;
+            mItems.addAll(items);
+            notifyDataSetChanged();
+        }
+
+        @Override
+        public int getViewTypeCount() {
+            // The other type is the "please wait..." at the bottom
+            return 2;
+        }
+
         @Override
         public int getCount() {
-            return mItems.size();
+            if (mCursor == null) {
+                return mItems.size();
+            }
+
+            return mItems.size() + 1;
         }
 
         @Override
         public Object getItem(int position) {
+            if (position == mItems.size())
+                return null;
             return mItems.get(position);
+        }
+
+        @Override
+        public int getItemViewType(int position) {
+            if (getItem(position) == null) {
+                return 1;
+            }
+            return 0;
+        }
+
+        @Override
+        public boolean isEnabled(int position) {
+            if (getItem(position) == null) {
+                return false;
+            }
+
+            return true;
         }
 
         @Override
@@ -256,15 +337,34 @@ public class SitrepActivity extends BaseActivity {
 
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
-            SituationReport sitrep = mItems.get(position);
             View view = convertView;
 
             if (view == null) {
                 LayoutInflater inflater = (LayoutInflater) getSystemService
                         (Context.LAYOUT_INFLATER_SERVICE);
-                view = inflater.inflate(R.layout.sitrep_row, null);
+                if (position < mItems.size()) {
+                    view = inflater.inflate(R.layout.sitrep_row, null);
+                } else {
+                    view = inflater.inflate(R.layout.sitrep_row_loading, null);
+                }
             }
 
+            if (position >= mItems.size()) {
+                // note: once this view comes into... view, we'll want to load the next
+                // lot of reports
+                if (mCursor != null) {
+                    mHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            fetchNextReportItems();
+                        }
+                    });
+                }
+
+                return view;
+            }
+
+            SituationReport sitrep = mItems.get(position);
             StarSummary starSummary = mStarSummaries.get(sitrep.getStarKey());
             String msg = sitrep.getDescription(starSummary);
 
