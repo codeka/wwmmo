@@ -649,6 +649,11 @@ def build(empire_pb, colony_pb, request_pb, sim):
         continue
       if building_pb.design_name == request_pb.design_name:
         num_existing += 1
+    for build_request_pb in star_pb.build_requests:
+      if build_request_pb.colony_key != colony_pb.key:
+        continue
+      if build_request_pb.design_name == request_pb.design_name:
+        num_existing += 1
     if num_existing >= design.maxPerColony:
       msg = "Cannot build %s, because we already have the maximum." % (
             request_pb.design_name)
