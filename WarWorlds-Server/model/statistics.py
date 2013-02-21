@@ -17,3 +17,5 @@ class EmpireRank(db.Model):
   totalStars = db.IntegerProperty()
   totalColonies = db.IntegerProperty()
   totalBuildings = db.IntegerProperty()
+  rank = db.IntegerProperty()
+  lastRank = db.IntegerProperty()

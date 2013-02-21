@@ -34,8 +34,14 @@ public class InfobarView extends FrameLayout
 
     @Override
     public void onEmpireFetched(Empire empire) {
-        TextView cash = (TextView) mView.findViewById(R.id.cash);
-        cash.setText(Cash.format(empire.getCash()));
+        MyEmpire myEmpire = EmpireManager.getInstance().getEmpire();
+        if (myEmpire != null && myEmpire.getKey().equals(empire.getKey())) {
+            TextView cash = (TextView) mView.findViewById(R.id.cash);
+            cash.setText(Cash.format(empire.getCash()));
+
+            TextView empireName = (TextView) mView.findViewById(R.id.empire_name);
+            empireName.setText(empire.getDisplayName());
+        }
     }
 
     @Override
@@ -76,15 +82,11 @@ public class InfobarView extends FrameLayout
 
             MyEmpire empire = EmpireManager.getInstance().getEmpire();
             if (empire != null) {
-                TextView empireName = (TextView) mView.findViewById(R.id.empire_name);
-                empireName.setText(empire.getDisplayName());
-
-                TextView cash = (TextView) mView.findViewById(R.id.cash);
-                cash.setText(Cash.format(empire.getCash()));
-
-                EmpireManager.getInstance()
-                             .addEmpireUpdatedListener(empire.getKey(), this);
+                onEmpireFetched(empire);
             }
+
+            EmpireManager.getInstance()
+                         .addEmpireUpdatedListener(null, this);
 
             RequestManager.addRequestManagerStateChangedHandler(this);
 

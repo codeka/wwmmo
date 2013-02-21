@@ -4,6 +4,7 @@ from datetime import datetime, timedelta
 import os
 import webapp2 as webapp
 
+from google.appengine.api import taskqueue
 from google.appengine.ext import deferred
 
 import model as mdl
@@ -40,7 +41,7 @@ def count_nday_actives(num_days):
   _count_nday_actives(num_days, first_day)
 
 
-def update_empire_rank(empire_key):
+def update_empire_score(empire_key):
   """Goes through the planets, stars & fleets for the given empire and updates their rank."""
   totalShips = 0
   for fleet_mdl in empire_mdl.Fleet.all(projection=("numShips",)).filter("empire", empire_key):
@@ -69,6 +70,17 @@ def update_empire_rank(empire_key):
   empire_rank_mdl.put()
 
 
+def update_rankings():
+  """Goes through all of the EmpireRank entries and updates their integer rank (i.e. "1" for the
+     first empire, "2" for second and so on."""
+  n = 1
+  for empire_rank_mdl in stats_mdl.EmpireRank.all().order("-totalColonies"):
+    empire_rank_mdl.lastRank = empire_rank_mdl.rank
+    empire_rank_mdl.rank = n
+    empire_rank_mdl.put()
+    n += 1
+
+
 class GeneratePage(tasks.TaskPage):
   def get(self):
     deferred.defer(count_nday_actives, 1,
@@ -76,8 +88,13 @@ class GeneratePage(tasks.TaskPage):
     deferred.defer(count_nday_actives, 7,
                    _queue="statistics")
     for empire_key in empire_mdl.Empire.all(keys_only=True):
-      deferred.defer(update_empire_rank, empire_key,
+      deferred.defer(update_empire_score, empire_key,
                      _queue="statistics")
+
+    # queue update_rankdings to run in 2 hours, which will hopefully be after all of the
+    # update_empire_score()s have finished...
+    deferred.defer(update_rankings,
+                   _queue="statistics", _countdown=(2*60*60))
 
 app = webapp.WSGIApplication([("/tasks/stats/generate", GeneratePage)],
                              debug=os.environ["SERVER_SOFTWARE"].startswith("Development"))

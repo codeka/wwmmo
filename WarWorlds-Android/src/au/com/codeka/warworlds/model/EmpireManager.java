@@ -81,6 +81,9 @@ public class EmpireManager {
      * empire is re-fetched from the server, your \c EmpireFetchedHandler will be called.
      */
     public void addEmpireUpdatedListener(String empireKey, EmpireFetchedHandler handler) {
+        if (empireKey == null) {
+            empireKey = "";
+        }
         synchronized(mEmpireUpdatedListeners) {
             List<EmpireFetchedHandler> listeners = mEmpireUpdatedListeners.get(empireKey);
             if (listeners == null) {
@@ -112,13 +115,19 @@ public class EmpireManager {
     public void fireEmpireUpdated(Empire empire) {
         synchronized(mEmpireUpdatedListeners) {
             List<EmpireFetchedHandler> oldListeners = mEmpireUpdatedListeners.get(empire.getKey());
-            if (oldListeners == null) {
-                return;
+            if (oldListeners != null) {
+                List<EmpireFetchedHandler> listeners = new ArrayList<EmpireFetchedHandler>(oldListeners);
+                for (EmpireFetchedHandler handler : listeners) {
+                    handler.onEmpireFetched(empire);
+                }
             }
-            List<EmpireFetchedHandler> listeners = new ArrayList<EmpireFetchedHandler>(
-                    mEmpireUpdatedListeners.get(empire.getKey()));
-            for (EmpireFetchedHandler handler : listeners) {
-                handler.onEmpireFetched(empire);
+
+            oldListeners = mEmpireUpdatedListeners.get("");
+            if (oldListeners != null) {
+                List<EmpireFetchedHandler> listeners = new ArrayList<EmpireFetchedHandler>(oldListeners);
+                for (EmpireFetchedHandler handler : listeners) {
+                    handler.onEmpireFetched(empire);
+                }
             }
         }
     }
@@ -309,7 +318,7 @@ public class EmpireManager {
                         cursor.close();
                         return null;
                     }
-    
+
                     return Messages.Empire.parseFrom(cursor.getBlob(0));
                 } catch (InvalidProtocolBufferException e) {
                     return null;
