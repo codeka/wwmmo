@@ -257,8 +257,56 @@ public class EmpireManager {
         refreshEmpire(context, empireKey, handler);
     }
 
+    /**
+     * Fetches empires in the given rank range. This will always include the top three
+     * empires as well (since that's usually what you want in addition to the specific
+     * range you asked for as well).
+     */
+    public void fetchEmpiresByRank(final Context context, final int minRank, final int maxRank,
+                                   final EmpiresFetchedHandler handler) {
+        new AsyncTask<Void, Void, List<Empire>>() {
+            @Override
+            protected List<Empire> doInBackground(Void... arg0) {
+                List<Empire> empires = new ArrayList<Empire>();
+
+                try {
+                    String url = "empires/search?minRank="+minRank+"&maxRank="+maxRank;
+
+                    Messages.Empires pb = ApiClient.getProtoBuf(url, Messages.Empires.class);
+
+                    LocalEmpireStore les = new LocalEmpireStore(context);
+                    for (Messages.Empire empire_pb : pb.getEmpiresList()) {
+                        les.addEmpire(empire_pb);
+                        empires.add(Empire.fromProtocolBuffer(empire_pb));
+                    }
+                } catch(Exception e) {
+                    // TODO: handle exceptions
+                    log.error(ExceptionUtils.getStackTrace(e));
+                }
+
+                return empires;
+            }
+
+            @Override
+            protected void onPostExecute(List<Empire> empires) {
+                for (Empire empire : empires) {
+                    if (!empire.getKey().equals(mEmpire.getKey())) {
+                        mEmpireCache.put(empire.getKey(), empire);
+                        fireEmpireUpdated(empire);
+                    }
+                }
+
+                handler.onEmpiresFetched(empires);
+            }
+        }.execute();
+    }
+
     public interface EmpireFetchedHandler {
         public void onEmpireFetched(Empire empire);
+    }
+
+    public interface EmpiresFetchedHandler {
+        public void onEmpiresFetched(List<Empire> empires);
     }
 
     private static class LocalEmpireStore extends SQLiteOpenHelper {

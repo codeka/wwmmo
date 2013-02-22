@@ -23,19 +23,37 @@
         android:layout_marginLeft="5dp"
         android:textAppearance="?android:attr/textAppearanceMedium" />
 
-    <TextView
-        android:id="@+id/overview_text"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/empire_icon"
-        android:layout_marginLeft="10dp"
-        android:layout_marginRight="10dp"
-        android:text="@string/empire_overview_format" />
-
     <au.com.codeka.warworlds.ctrl.InfobarView
         android:id="@+id/infobar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true" />
+
+    <au.com.codeka.warworlds.ctrl.HorizontalSeparator
+        android:id="@+id/ranking_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/empire_icon"
+        android:layout_alignParentLeft="true"
+        android:text="Rankings" />
+
+    <ListView
+        android:id="@+id/empire_rankings"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/ranking_title"
+        android:layout_above="@id/infobar"
+        android:layout_marginLeft="@dimen/tablet_margin"
+        android:layout_marginRight="@dimen/tablet_margin"  />
+
+    <ProgressBar
+        android:id="@+id/progress_bar"
+        style="?android:attr/progressBarStyleLarge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/empire_name"
+        android:layout_marginTop="100dp"
+        android:layout_centerHorizontal="true"
+        android:visibility="gone" />
 
 </RelativeLayout>

@@ -1,10 +1,14 @@
 package au.com.codeka.warworlds.game;
 
-import java.util.HashSet;
+import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -14,7 +18,11 @@ import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
+import android.widget.BaseAdapter;
 import android.widget.ImageView;
+import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.ServerGreeter;
@@ -26,7 +34,9 @@ import au.com.codeka.warworlds.ctrl.ColonyList;
 import au.com.codeka.warworlds.ctrl.FleetList;
 import au.com.codeka.warworlds.model.BuildRequest;
 import au.com.codeka.warworlds.model.Colony;
+import au.com.codeka.warworlds.model.Empire;
 import au.com.codeka.warworlds.model.EmpireManager;
+import au.com.codeka.warworlds.model.EmpireRank;
 import au.com.codeka.warworlds.model.Fleet;
 import au.com.codeka.warworlds.model.MyEmpire;
 import au.com.codeka.warworlds.model.Planet;
@@ -130,7 +140,8 @@ public class EmpireActivity extends TabFragmentActivity {
                 return getLoadingView(inflator);
             }
 
-            View v = inflator.inflate(R.layout.empire_overview_tab, null);
+            final View v = inflator.inflate(R.layout.empire_overview_tab, null);
+            final RankListAdapter rankListAdapter = new RankListAdapter();
 
             MyEmpire empire = EmpireManager.getInstance().getEmpire();
 
@@ -140,27 +151,156 @@ public class EmpireActivity extends TabFragmentActivity {
             empireName.setText(empire.getDisplayName());
             empireIcon.setImageBitmap(empire.getShield(getActivity()));
 
-            HashSet<String> colonizedStarKeys = new HashSet<String>();
-            for (Colony c : sCurrentEmpire.getAllColonies()) {
-                colonizedStarKeys.add(c.getStarKey());
+
+            final ProgressBar progress = (ProgressBar) v.findViewById(R.id.progress_bar);
+            final ListView rankList = (ListView) v.findViewById(R.id.empire_rankings);
+            progress.setVisibility(View.VISIBLE);
+            rankList.setVisibility(View.GONE);
+            rankList.setAdapter(rankListAdapter);
+
+            MyEmpire myEmpire = EmpireManager.getInstance().getEmpire();
+            int myRank = myEmpire.getRank().getRank();
+            int minRank = myRank - 2;
+            if (minRank < 1) {
+                minRank = 1;
             }
-
-            int totalShips = 0;
-            for (Fleet f : sCurrentEmpire.getAllFleets()) {
-                totalShips += f.getNumShips();
-            }
-
-            // Current value of R.id.empire_overview_format (in English):
-            // %1$d stars and %2$d planets colonised
-            // %3$d ships in %4$d fleets
-            String fmt = getActivity().getString(R.string.empire_overview_format);
-            final TextView overviewText = (TextView) v.findViewById(R.id.overview_text);
-            String overview = String.format(fmt,
-                    colonizedStarKeys.size(), sCurrentEmpire.getAllColonies().size(),
-                    totalShips, sCurrentEmpire.getAllFleets().size());
-            overviewText.setText(Html.fromHtml(overview));
-
+            EmpireManager.getInstance().fetchEmpiresByRank(getActivity(), minRank, minRank + 4,
+                    new EmpireManager.EmpiresFetchedHandler() {
+                        @Override
+                        public void onEmpiresFetched(List<Empire> empires) {
+                            rankListAdapter.setEmpires(empires);
+                            rankList.setVisibility(View.VISIBLE);
+                            progress.setVisibility(View.GONE);
+                        }
+                    });
             return v;
+        }
+
+        private class RankListAdapter extends BaseAdapter {
+            private ArrayList<ItemEntry> mEntries;
+
+            public void setEmpires(List<Empire> empires) {
+                mEntries = new ArrayList<ItemEntry>();
+
+                Collections.sort(empires, new Comparator<Empire>() {
+                    @Override
+                    public int compare(Empire lhs, Empire rhs) {
+                        if (lhs.getRank() == null || rhs.getRank() == null) {
+                            // should never happen, but just in case...
+                            return lhs.getDisplayName().compareTo(rhs.getDisplayName());
+                        }
+                        int lhsRank = lhs.getRank().getRank();
+                        int rhsRank = rhs.getRank().getRank();
+                        return lhsRank - rhsRank;
+                    }
+                });
+
+                int lastRank = 0;
+                for (Empire empire : empires) {
+                    if (lastRank != 0 && empire.getRank() != null &&
+                            empire.getRank().getRank() != lastRank + 1) {
+                        mEntries.add(new ItemEntry(null));
+                    }
+                    lastRank = empire.getRank().getRank();
+                    mEntries.add(new ItemEntry(empire));
+                }
+
+                notifyDataSetChanged();
+            }
+
+            @Override
+            public int getViewTypeCount() {
+                return 2;
+            }
+
+            @Override
+            public int getItemViewType(int position) {
+                if (mEntries == null)
+                    return 0;
+
+                if (mEntries.get(position).empire == null)
+                    return 1;
+                return 0;
+            }
+
+            @Override
+            public boolean isEnabled(int position) {
+                // TODO: tapping empire does something?
+                return false;
+            }
+
+            @Override
+            public int getCount() {
+                if (mEntries == null)
+                    return 0;
+                return mEntries.size();
+            }
+
+            @Override
+            public Object getItem(int position) {
+                if (mEntries == null)
+                    return null;
+                return mEntries.get(position);
+            }
+
+            @Override
+            public long getItemId(int position) {
+                return position;
+            }
+
+            @Override
+            public View getView(int position, View convertView, ViewGroup parent) {
+                ItemEntry entry = mEntries.get(position);
+                View view = convertView;
+
+                Activity activity = getActivity();
+
+                if (view == null) {
+                    LayoutInflater inflater = (LayoutInflater) activity.getSystemService
+                            (Context.LAYOUT_INFLATER_SERVICE);
+                    if (entry.empire == null) {
+                        view = new View(activity);
+                        view.setLayoutParams(new AbsListView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 10));
+                    } else {
+                        view = inflater.inflate(R.layout.empire_overview_rank_row, null);
+                    }
+                }
+                if (entry.empire == null) {
+                    return view;
+                }
+
+                TextView rankView = (TextView) view.findViewById(R.id.rank);
+                ImageView empireIcon = (ImageView) view.findViewById(R.id.empire_icon);
+                TextView empireName = (TextView) view.findViewById(R.id.empire_name);
+                TextView totalStars = (TextView) view.findViewById(R.id.total_stars);
+                TextView totalColonies = (TextView) view.findViewById(R.id.total_colonies);
+                TextView totalShips = (TextView) view.findViewById(R.id.total_ships);
+                TextView totalBuildings = (TextView) view.findViewById(R.id.total_buildings);
+
+                DecimalFormat formatter = new DecimalFormat("#,##0");
+                EmpireRank rank = entry.empire.getRank();
+                rankView.setText(formatter.format(rank.getRank()));
+                empireName.setText(entry.empire.getDisplayName());
+                empireIcon.setImageBitmap(entry.empire.getShield(activity));
+                totalStars.setText(Html.fromHtml(String.format("Stars: <b>%s</b>",
+                        formatter.format(rank.getTotalStars()))));
+                totalColonies.setText(Html.fromHtml(String.format("Colonies: <b>%s</b>",
+                        formatter.format(rank.getTotalColonies()))));
+                totalShips.setText(Html.fromHtml(String.format("Ships: <b>%s</b>",
+                        formatter.format(rank.getTotalShips()))));
+                totalBuildings.setText(Html.fromHtml(String.format("Buildings: <b>%s</b>",
+                        formatter.format(rank.getTotalBuildings()))));
+
+                return view;
+            }
+
+            public class ItemEntry {
+                public Empire empire;
+
+                public ItemEntry(Empire empire) {
+                    this.empire = empire;
+                }
+            }
         }
     }
 

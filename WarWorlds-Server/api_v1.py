@@ -249,10 +249,14 @@ class EmpiresSearchPage(ApiPage):
     if self.request.get("minRank", "") != "":
       minRank = int(self.request.get("minRank"))
       maxRank = minRank + 5
+      if minRank <= 3:
+        minRank = 1 # we'll always return the first 3 anyway
       if self.request.get("maxRank", "") != "":
         maxRank = int(self.request.get("maxRank"))
       empire_pbs = empire.getEmpiresByRank(minRank, maxRank)
       empires_pb.empires.extend(empire_pbs)
+      if minRank > 3:
+        empires_pb.empires.extend(empire.getEmpiresByRank(1, 3))
     if self.request.get("self", "") == "1":
       empires_pb.empires.extend([empire.getEmpireForUser(self.user)])
 

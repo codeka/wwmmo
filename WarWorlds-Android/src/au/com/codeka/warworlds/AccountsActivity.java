@@ -46,6 +46,7 @@ public class AccountsActivity extends BaseActivity {
         View rootView = findViewById(android.R.id.content);
         ActivityBackgroundGenerator.setBackground(rootView);
 
+        Util.setup(this);
         Util.loadProperties(mContext);
         SharedPreferences prefs = Util.getSharedPreferences(mContext);
         String accountName = prefs.getString("AccountName", null);

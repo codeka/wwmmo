@@ -19,6 +19,7 @@ public class Empire implements Parcelable {
     private String mDisplayName;
     private Bitmap mEmpireShield;
     private float mCash;
+    private EmpireRank mRank;
 
     private static Bitmap sBaseShield;
 
@@ -30,6 +31,9 @@ public class Empire implements Parcelable {
     }
     public float getCash() {
         return mCash;
+    }
+    public EmpireRank getRank() {
+        return mRank;
     }
 
     /**
@@ -128,5 +132,9 @@ public class Empire implements Parcelable {
         mKey = pb.getKey();
         mDisplayName = pb.getDisplayName();
         mCash = pb.getCash();
+
+        if (pb.getRank() != null && pb.getRank().getEmpireKey() != null) {
+            mRank = EmpireRank.fromProtocolBuffer(pb.getRank());
+        }
     }
 }
