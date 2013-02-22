@@ -38,6 +38,19 @@ message GenericError
 
 
 //
+// Details of an empire's rank (such as number of ships, number of colonies etc)
+message EmpireRank
+{
+    optional string empire_key = 1;
+    optional int32 rank = 2;
+    optional int32 last_rank = 3;
+    optional int32 total_stars = 4;
+    optional int32 total_colonies = 5;
+    optional int32 total_ships = 6;
+    optional int32 total_buildings = 7;
+}
+
+//
 // Contains details about an empire. Their "display" name, race (I guess?), display colour
 // and stuff like that.
 //
@@ -83,7 +96,17 @@ message Empire
     // the amount of cash the empire currently has (todo: provide an estimate on the
     // rate of change of cash, based on taxed income)
     optional float cash = 9;
+
+    // if specified, contains the details of the empire's rank
+    optional EmpireRank rank = 11;
 }
+
+
+message Empires
+{
+    repeated Empire empires = 1;
+}
+
 
 //
 // The "hello" request when you first join the game contains some info about yourself which we

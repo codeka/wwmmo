@@ -17,6 +17,7 @@ from ctrl import sectorgen
 from ctrl import designs
 from model import sector as sector_mdl
 from model import empire as mdl
+from model import statistics as stats_mdl
 from model import gcm as gcm_mdl
 from protobufs import messages_pb2 as pb
 
@@ -39,9 +40,35 @@ def getEmpireForUser(user):
 
 def getEmpireByName(name):
   """Searches for an empire by name."""
-  for empire_model in mdl.Empire.all().filter("displayName", name).fetch(1):
-    return getEmpire(str(empire_model.key()))
+  for empire_key in (mdl.Empire.all(keys_only=True)
+                               .filter("searchName >=", name)
+                               .filter("searchName <", name+u"\ufffd").fetch(1)):
+    return getEmpire(str(empire_key))
   return None
+
+
+def getEmpiresByName(name):
+  """Searches for an empire by name."""
+  empires = []
+  for empire_key in (mdl.Empire.all(keys_only=True)
+                               .filter("searchName >=", name)
+                               .filter("searchName <", name+u"\ufffd").fetch(1)):
+    empires.append(getEmpire(str(empire_key)))
+  return empires
+
+
+def getEmpiresByRank(minRank, maxRank):
+  if minRank < 1:
+    minRank = 1
+  if maxRank < minRank:
+    maxRank = minRank + 5
+
+  empires = []
+  for empire_rank_mdl in (stats_mdl.EmpireRank.all().filter("rank >=", minRank)
+                                                    .filter("rank <=", maxRank)):
+    empire_key = stats_mdl.EmpireRank.empire.get_value_for_datastore(empire_rank_mdl)
+    empires.append(getEmpire(str(empire_key)))
+  return empires
 
 
 def getEmpire(empire_key):
@@ -55,6 +82,32 @@ def getEmpire(empire_key):
   ctrl.empireModelToPb(empire_pb, empire_model)
   ctrl.setCached({cache_key: empire_pb})
   return empire_pb
+
+
+def getEmpireRanks(empire_keys):
+  cache_keys = []
+  for empire_key in empire_keys:
+    cache_keys.append("empire-rank:%s" % empire_key)
+  values = ctrl.getCached(cache_keys, pb.EmpireRank)
+
+  empire_ranks = []
+  missing_keys = []
+  for empire_key in empire_keys:
+    cache_key = "empire-rank:%s" % empire_key
+    if cache_key in values:
+      empire_ranks.append(values[cache_key])
+    else:
+      missing_keys.append(db.Key(empire_key))
+
+  new_cache_values = {}
+  for empire_rank_mdl in stats_mdl.EmpireRank.all().filter("empire IN", missing_keys):
+    empire_rank_pb = pb.EmpireRank()
+    ctrl.empireRankModelToPb(empire_rank_pb, empire_rank_mdl)
+    empire_ranks.append(empire_rank_pb)
+    new_cache_values["empire-rank:%s" % empire_rank_pb.empire_key] = empire_rank_pb
+  ctrl.setCached(new_cache_values)
+
+  return empire_ranks
 
 
 # findStarForNewEmpire will fill this with sectors that have all stors with
@@ -216,10 +269,21 @@ def findStarForNewEmpire():
   return (star_key, planet_index)
 
 
+def calculateEmpireSearchName(name):
+  """Given an empire name, calculate the "search name", which is actually a list of the individual
+     words in the name, normalized for easy searching."""
+  search_name = []
+  for name_component in name.split():
+    normalized = name_component.lower()
+    search_name.append(normalized)
+  return search_name
+
+
 def createEmpire(empire_pb, sim):
   empire_model = mdl.Empire()
   empire_model.cash = 500.0
   ctrl.empirePbToModel(empire_model, empire_pb)
+  empire_model.searchName = calculateEmpireSearchName(empire_model.displayName)
   empire_model.put()
 
   (star_key, planet_index) = findStarForNewEmpire()

@@ -11,6 +11,7 @@ class Empire(db.Model):
   user = db.UserProperty()
   state = db.IntegerProperty()
   cash = db.FloatProperty()
+  searchName = db.StringListProperty()
 
   class State:
     INITIAL = 1

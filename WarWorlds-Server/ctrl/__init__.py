@@ -18,6 +18,7 @@ from google.protobuf.message import Message
 import protobufs.messages_pb2 as pb
 from model import chat as chat_mdl
 from model import empire as empire_mdl
+from model import statistics as stats_mdl
 import model as mdl
 
 
@@ -80,6 +81,19 @@ def empirePbToModel(empire_model, empire_pb):
   if empire_pb.HasField("email"):
     empire_model.user = users.User(empire_pb.email)
   empire_model.state = empire_pb.state
+
+
+def empireRankModelToPb(empire_rank_pb, empire_rank_model):
+  empire_rank_pb.empire_key = str(stats_mdl.EmpireRank.empire.get_value_for_datastore(empire_rank_model))
+  empire_rank_pb.total_ships = empire_rank_model.totalShips
+  empire_rank_pb.total_stars = empire_rank_model.totalStars
+  empire_rank_pb.total_colonies = empire_rank_model.totalColonies
+  empire_rank_pb.total_buildings = empire_rank_model.totalBuildings
+  empire_rank_pb.rank = empire_rank_model.rank
+  if empire_rank_model.lastRank:
+    empire_rank_pb.last_rank = empire_rank_model.lastRank
+  else:
+    empire_rank_pb.last_rank = 0
 
 
 def colonyModelToPb(colony_pb, colony_model):

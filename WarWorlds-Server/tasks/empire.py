@@ -277,6 +277,13 @@ class FleetMoveFixPage(tasks.TaskPage):
         break
 
 
+class UpdateSearchNamePage(tasks.TaskPage):
+  def get(self):
+    for empire_mdl in mdl.Empire.all():
+      empire_mdl.searchName = ctl.calculateEmpireSearchName(empire_mdl.displayName)
+      empire_mdl.put()
+
+
 class FleetMoveCheckPage(tasks.TaskPage):
   def get(self):
     def _fetchOperationInTX(fleet_key, complete_time):
@@ -411,6 +418,7 @@ def _on_move_complete(fleet_mdl):
 
 app = webapp.WSGIApplication([("/tasks/empire/build-check", BuildCheckPage),
                               ("/tasks/empire/star-simulate", StarSimulatePage),
+                              ("/tasks/empire/update-search-name", UpdateSearchNamePage),
                               ("/tasks/empire/move-check", FleetMoveCheckPage),
                               ("/tasks/empire/move-fix", FleetMoveFixPage),
                               ("/tasks/empire/fleet/([^/]+)/move-complete", FleetMoveCompletePage)],

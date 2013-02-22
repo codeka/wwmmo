@@ -233,6 +233,56 @@ class EmpiresPage(ApiPage):
     sim.update()
 
 
+class EmpiresSearchPage(ApiPage):
+  def get(self):
+    empires_pb = pb.Empires()
+
+    if self.request.get("email", "") != "":
+      search = self.request.get("email")
+      user = users.User(search)
+      if user:
+        empires_pb.empires.extend([empire.getEmpireForUser(user)])
+    if self.request.get("name", "") != "":
+      search = self.request.get("name")
+      empire_pbs = empire.getEmpiresByName(search)
+      empires_pb.empires.extend(empire_pbs)
+    if self.request.get("minRank", "") != "":
+      minRank = int(self.request.get("minRank"))
+      maxRank = minRank + 5
+      if self.request.get("maxRank", "") != "":
+        maxRank = int(self.request.get("maxRank"))
+      empire_pbs = empire.getEmpiresByRank(minRank, maxRank)
+      empires_pb.empires.extend(empire_pbs)
+    if self.request.get("self", "") == "1":
+      empires_pb.empires.extend([empire.getEmpireForUser(self.user)])
+
+    if len(empires_pb.empires) == 0:
+      self.response.set_status(404)
+      return
+
+    empire_keys = []
+    for empire_pb in empires_pb.empires:
+      if empire_pb.email != self.user.email():
+        # it's not OUR empire, so block out a few details...
+        empire_pb.cash = 0;
+      empire_keys.append(empire_pb.key)
+
+    for empire_rank in empire.getEmpireRanks(empire_keys):
+      for empire_pb in empires_pb.empires:
+        if empire_pb.key == empire_rank.empire_key:
+          # is there a better way??
+          empire_pb.rank.empire_key = empire_rank.empire_key
+          empire_pb.rank.rank = empire_rank.rank
+          empire_pb.rank.last_rank = empire_rank.last_rank
+          empire_pb.rank.total_stars = empire_rank.total_stars
+          empire_pb.rank.total_colonies = empire_rank.total_colonies
+          empire_pb.rank.total_ships = empire_rank.total_ships
+          empire_pb.rank.total_buildings = empire_rank.total_buildings
+          break
+
+    return empires_pb
+
+
 class EmpireDetailsPage(ApiPage):
   """The EmpireDetailsPage returns detailed information about the empire including all
   of the empire's fleets, colonies and so on. It's only available to the owner of the
@@ -276,6 +326,18 @@ class EmpireDetailsPage(ApiPage):
       empire_pb.build_requests.extend(build_request_pbs)
       empire_pb.colonies.extend(colony_pbs)
       empire_pb.stars.extend(star_pbs)
+
+      for empire_rank in empire.getEmpireRanks([empire_pb.key]):
+        if empire_pb.key == empire_rank.empire_key:
+          # is there a better way??
+          empire_pb.rank.empire_key = empire_rank.empire_key
+          empire_pb.rank.rank = empire_rank.rank
+          empire_pb.rank.last_rank = empire_rank.last_rank
+          empire_pb.rank.total_stars = empire_rank.total_stars
+          empire_pb.rank.total_colonies = empire_rank.total_colonies
+          empire_pb.rank.total_ships = empire_rank.total_ships
+          empire_pb.rank.total_buildings = empire_rank.total_buildings
+          break
 
     return empire_pb
 
@@ -778,6 +840,7 @@ class ApiApplication(webapp.WSGIApplication):
 app = ApiApplication([("/api/v1/hello/([^/]+)", HelloPage),
                       ("/api/v1/chat", ChatPage),
                       ("/api/v1/empires", EmpiresPage),
+                      ("/api/v1/empires/search", EmpiresSearchPage),
                       ("/api/v1/empires/([^/]+)", EmpiresPage),
                       ("/api/v1/empires/([^/]+)/details", EmpireDetailsPage),
                       ("/api/v1/empires/([^/]+)/taxes", EmpireTaxesPage),

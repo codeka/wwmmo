@@ -76,7 +76,12 @@
       if ($(this).find("input[type=checkbox]").prop("checked")) {
         url = "/api/v1/empires/"+inp.val()+"/details";
       } else {
-        url = "/api/v1/empires?search="+inp.val();
+        url = "/api/v1/empires/search";
+        if (inp.val().indexOf("@") > 0) {
+          url += "?email="+inp.val();
+        } else {
+          url += "?name="+inp.val();
+        }
       }
 
       $.ajax({
