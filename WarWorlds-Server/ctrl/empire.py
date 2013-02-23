@@ -454,10 +454,16 @@ def updateColony(colony_key, updated_colony_pb, sim):
                  updated_colony_pb.focus_farming +
                  updated_colony_pb.focus_mining +
                  updated_colony_pb.focus_construction)
-  colony_pb.focus_population = updated_colony_pb.focus_population / focus_total
-  colony_pb.focus_farming = updated_colony_pb.focus_farming / focus_total
-  colony_pb.focus_mining = updated_colony_pb.focus_mining / focus_total
-  colony_pb.focus_construction = updated_colony_pb.focus_construction / focus_total
+  if focus_total <= 0.0:
+    colony_pb.focus_population = 0.25
+    colony_pb.focus_farming = 0.25
+    colony_pb.focus_mining = 0.25
+    colony_pb.focus_construction = 0.25
+  else:
+    colony_pb.focus_population = updated_colony_pb.focus_population / focus_total
+    colony_pb.focus_farming = updated_colony_pb.focus_farming / focus_total
+    colony_pb.focus_mining = updated_colony_pb.focus_mining / focus_total
+    colony_pb.focus_construction = updated_colony_pb.focus_construction / focus_total
 
   # We need to simulate once more to ensure the new end-time for builds, production rates and
   # whatnot are up to date. Then, because of the simulate, we need to update the colonies

@@ -75,8 +75,12 @@ public class TabFragmentActivity extends BaseActivity {
                 ft.attach(fragment);
             }
 
-            ft.commit();
-            getSupportFragmentManager().executePendingTransactions();
+            try {
+                ft.commit();
+                getSupportFragmentManager().executePendingTransactions();
+            } catch (IllegalStateException e) {
+                // we can ignore this since it probably just means the activity is gone.
+            }
         }
 
         @Override
