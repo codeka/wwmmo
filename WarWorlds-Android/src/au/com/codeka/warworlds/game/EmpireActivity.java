@@ -151,7 +151,6 @@ public class EmpireActivity extends TabFragmentActivity {
             empireName.setText(empire.getDisplayName());
             empireIcon.setImageBitmap(empire.getShield(getActivity()));
 
-
             final ProgressBar progress = (ProgressBar) v.findViewById(R.id.progress_bar);
             final ListView rankList = (ListView) v.findViewById(R.id.empire_rankings);
             progress.setVisibility(View.VISIBLE);
@@ -286,10 +285,17 @@ public class EmpireActivity extends TabFragmentActivity {
                         formatter.format(rank.getTotalStars()))));
                 totalColonies.setText(Html.fromHtml(String.format("Colonies: <b>%s</b>",
                         formatter.format(rank.getTotalColonies()))));
-                totalShips.setText(Html.fromHtml(String.format("Ships: <b>%s</b>",
-                        formatter.format(rank.getTotalShips()))));
-                totalBuildings.setText(Html.fromHtml(String.format("Buildings: <b>%s</b>",
-                        formatter.format(rank.getTotalBuildings()))));
+
+                MyEmpire myEmpire = EmpireManager.getInstance().getEmpire();
+                if (entry.empire.getKey().equals(myEmpire.getKey()) || rank.getTotalStars() >= 10) {
+                    totalShips.setText(Html.fromHtml(String.format("Ships: <b>%s</b>",
+                           formatter.format(rank.getTotalShips()))));
+                    totalBuildings.setText(Html.fromHtml(String.format("Buildings: <b>%s</b>",
+                           formatter.format(rank.getTotalBuildings()))));
+                } else {
+                    totalShips.setText("");
+                    totalBuildings.setText("");
+                }
 
                 return view;
             }
