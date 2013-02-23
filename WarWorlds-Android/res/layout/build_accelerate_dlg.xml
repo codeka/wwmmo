@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <TextView
+        android:id="@+id/accelerate_msg"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:text="You can accelerate the build by anywhere from 50 to 100%. Accelerating the build by 50% will halve the amount of time remaining, accelerating by 100% will cause the build to complete immediately." />
+
+    <SeekBar
+        android:id="@+id/accelerate_amount"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:layout_below="@id/accelerate_msg"
+        android:layout_alignParentLeft="true" />
+
+    <TextView
+        android:id="@+id/accelerate_pct"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/accelerate_amount"
+        android:layout_below="@+id/accelerate_amount"
+        android:text="50%"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
+
+    <TextView
+        android:id="@+id/accelerate_cost"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignRight="@+id/accelerate_amount"
+        android:layout_below="@+id/accelerate_amount"
+        android:text="$100"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+</RelativeLayout>

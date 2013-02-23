@@ -27,7 +27,7 @@ import au.com.codeka.warworlds.ServerGreeter.ServerGreeting;
 import au.com.codeka.warworlds.TabFragmentActivity;
 import au.com.codeka.warworlds.TabManager;
 import au.com.codeka.warworlds.ctrl.BuildQueueList;
-import au.com.codeka.warworlds.game.BuildAccelerateConfirmDialog;
+import au.com.codeka.warworlds.game.BuildAccelerateDialog;
 import au.com.codeka.warworlds.game.BuildStopConfirmDialog;
 import au.com.codeka.warworlds.model.BuildRequest;
 import au.com.codeka.warworlds.model.Building;
@@ -569,7 +569,7 @@ public class BuildActivity extends TabFragmentActivity implements StarManager.St
             mBuildQueueList.setBuildQueueActionListener(new BuildQueueList.BuildQueueActionListener() {
                 @Override
                 public void onAccelerateClick(Star star, BuildRequest buildRequest) {
-                    BuildAccelerateConfirmDialog dialog = new BuildAccelerateConfirmDialog();
+                    BuildAccelerateDialog dialog = new BuildAccelerateDialog();
                     dialog.setBuildRequest(star, buildRequest);
                     dialog.show(getActivity().getSupportFragmentManager(), "");
                 }

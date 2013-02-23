@@ -690,7 +690,15 @@ class BuildAcceleratePage(ApiPage):
           self.response.set_status(403)
           return
 
-        res = empire.accelerateBuild(empire_pb, star_pb, build_request_pb, sim)
+        accelerate_amount = 0.5
+        if self.request.get("amount"):
+          accelerate_amount = float(self.request.get("amount"))
+          if accelerate_amount < 0.5:
+            accelerate_amount = 0.5
+          if accelerate_amount > 1.0:
+            accelerate_amount = 1.0
+
+        res = empire.accelerateBuild(empire_pb, star_pb, build_request_pb, sim, accelerate_amount)
         sim.update()
         empire.scheduleBuildCheck(sim)
         return res

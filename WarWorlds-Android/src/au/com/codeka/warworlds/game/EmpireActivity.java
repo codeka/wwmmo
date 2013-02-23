@@ -365,7 +365,7 @@ public class EmpireActivity extends TabFragmentActivity {
             buildQueueList.setBuildQueueActionListener(new BuildQueueList.BuildQueueActionListener() {
                 @Override
                 public void onAccelerateClick(Star star, BuildRequest buildRequest) {
-                    BuildAccelerateConfirmDialog dialog = new BuildAccelerateConfirmDialog();
+                    BuildAccelerateDialog dialog = new BuildAccelerateDialog();
                     dialog.setBuildRequest(star, buildRequest);
                     dialog.show(getActivity().getSupportFragmentManager(), "");
                 }

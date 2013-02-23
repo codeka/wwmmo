@@ -791,18 +791,27 @@ def build(empire_pb, colony_pb, request_pb, sim):
   return request_pb
 
 
-def accelerateBuild(empire_pb, star_pb, build_request_pb, sim):
-  """Accelerates the given build by subtracting some cash from the owning empire and halving the
-  remaining time."""
-  seconds_remaining = build_request_pb.end_time - ctrl.dateTimeToEpoch(sim.now)
-  speed_up_time_in_hours = (seconds_remaining / 3600.0) / 2.0
-  complete_now = False
-  if speed_up_time_in_hours < (1/6.0):
-    # less than ten minutes, then we'll complete the build *now*
-    speed_up_time_in_hours = seconds_remaining / 3600.0
-    complete_now = True
+def accelerateBuild(empire_pb, star_pb, build_request_pb, sim, accelerate_amount):
+  """Accelerates the given build by subtracting some cash from the owning empire and updating the
+     'percent complete' accordingly
 
-  cost = speed_up_time_in_hours * 100.0
+  Args:
+    empire_pb: Empire whose build we're accelerating.
+    star_pb: Star of the build we're accelerating.
+    build_request_pb: The actual build request to accelerate.
+    sim: A Simulation object which we got the above values from.
+    accelerate_amount: A value between 0.5 and 1.0 which described how much of the remaining
+                       build to accelerate by (e.g. 0.5 = finish half the build, 1.0 = finish
+                       the whole build)
+  """
+  sim.simulate(star_pb.key)
+
+  remaining_progress = 1.0 - build_request_pb.progress
+  progress_to_complete = remaining_progress * accelerate_amount
+
+  design = designs.Design.getDesign(build_request_pb.build_kind, build_request_pb.design_name)
+  minerals_to_use = design.buildCostMinerals * progress_to_complete
+  cost = minerals_to_use * build_request_pb.count
   if not _subtractCash(empire_pb.key, cost):
     err = pb.GenericError()
     err.error_code = pb.GenericError.InsufficientCash
@@ -810,10 +819,7 @@ def accelerateBuild(empire_pb, star_pb, build_request_pb, sim):
     return err
 
   # adjust the progress, then re-simulate to re-calculate the end_time
-  if complete_now:
-    build_request_pb.progress = 0.9999
-  else:
-    build_request_pb.progress += (1.0 - build_request_pb.progress) / 2.0
+  build_request_pb.progress += progress_to_complete
   sim.simulate(star_pb.key)
 
   return build_request_pb
