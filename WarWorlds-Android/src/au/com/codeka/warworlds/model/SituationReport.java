@@ -151,7 +151,8 @@ public class SituationReport {
                 BuildingDesign design = BuildingDesignManager.getInstance().getDesign(mBuildCompleteRecord.getDesignID());
                 msg += design.getDisplayName();
             }
-            msg += String.format(Locale.ENGLISH, " complete on %s", starSummary.getName());
+            msg += String.format(Locale.ENGLISH, " complete on %s %s",
+                    starSummary.getName(), RomanNumeralFormatter.format(mPlanetIndex));
         }
 
         if (mFleetUnderAttackRecord != null) {

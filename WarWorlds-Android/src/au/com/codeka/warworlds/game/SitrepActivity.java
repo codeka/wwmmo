@@ -83,6 +83,10 @@ public class SitrepActivity extends BaseActivity {
                 Intent intent = new Intent(mContext, SolarSystemActivity.class);
                 intent.putExtra("au.com.codeka.warworlds.StarKey", sitrep.getStarKey());
 
+                if (sitrep.getPlanetIndex() >= 0) {
+                    intent.putExtra("au.com.codeka.warworlds.PlanetIndex", sitrep.getPlanetIndex());
+                }
+
                 SituationReport.MoveCompleteRecord mcr = sitrep.getMoveCompleteRecord();
                 if (mcr != null) {
                     if (mcr.getScoutReportKey() != null &&
