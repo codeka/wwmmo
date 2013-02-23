@@ -74,7 +74,9 @@ def update_rankings():
   """Goes through all of the EmpireRank entries and updates their integer rank (i.e. "1" for the
      first empire, "2" for second and so on."""
   n = 1
-  for empire_rank_mdl in stats_mdl.EmpireRank.all().order("-totalColonies"):
+  for empire_rank_mdl in (stats_mdl.EmpireRank.all().order("-totalColonies")
+                                                    .order("-totalStars")
+                                                    .order("-totalShips")):
     empire_rank_mdl.lastRank = empire_rank_mdl.rank
     empire_rank_mdl.rank = n
     empire_rank_mdl.put()

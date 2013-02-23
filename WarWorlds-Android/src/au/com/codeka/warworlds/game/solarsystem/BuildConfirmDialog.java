@@ -239,11 +239,17 @@ public class BuildConfirmDialog extends DialogFragment {
             @Override
             protected void onPostExecute(BuildRequest buildRequest) {
                 if (mErrorCode > 0) {
-                    new StyledDialog.Builder(activity)
-                                    .setTitle("Cannot Build")
-                                    .setMessage(mErrorMsg)
-                                    .setPositiveButton("Close", true, null)
-                                    .create().show();
+                    try {
+                        new StyledDialog.Builder(activity)
+                                        .setTitle("Cannot Build")
+                                        .setMessage(mErrorMsg)
+                                        .setPositiveButton("Close", true, null)
+                                        .create().show();
+                    } catch(Exception e) {
+                        // we can get a WindowManager.BadTokenException here if the activity has
+                        // finished, we should probably do something about it but it's kinda too
+                        // late...
+                    }
                 } else {
                     EmpireManager.getInstance().refreshEmpire();
                     StarManager.getInstance().refreshStar(activity, mColony.getStarKey());
