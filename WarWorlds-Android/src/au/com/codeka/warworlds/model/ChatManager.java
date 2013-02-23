@@ -9,7 +9,6 @@ import org.joda.time.DateTime;
 import android.content.Context;
 import android.os.AsyncTask;
 import au.com.codeka.warworlds.BackgroundDetector;
-import au.com.codeka.warworlds.Util;
 import au.com.codeka.warworlds.api.ApiClient;
 import au.com.codeka.warworlds.model.protobuf.Messages;
 
@@ -43,12 +42,7 @@ public class ChatManager implements BackgroundDetector.BackgroundChangeHandler {
     public void setup(Context context) {
         BackgroundDetector.getInstance().addBackgroundChangeHandler(this);
 
-        String chatEnabledProperty = Util.getProperties().getProperty("chat.enabled");
-        if (chatEnabledProperty == null || !chatEnabledProperty.equals("false")) {
-            addMessage(context, new ChatMessage("Welcome to War Worlds!"));
-        } else {
-            addMessage(context, new ChatMessage("Chat has been disabled."));
-        }
+        addMessage(context, new ChatMessage("Welcome to War Worlds!"));
 
         // fetch all chats from the last 24 hours
         mMostRecentMsg = (new DateTime()).minusDays(1);
