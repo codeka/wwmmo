@@ -133,13 +133,13 @@ public class FocusDialog extends DialogFragment {
                     .setProgress((int)(mColony.getConstructionFocus() * SEEKBAR_MAX));
 
         ((TextView) mView.findViewById(R.id.focus_population_value))
-                    .setText(Integer.toString((int)(mColony.getPopulationFocus() * SEEKBAR_MAX)));
+                    .setText(Integer.toString((int)(mColony.getPopulationFocus() * 100.0)));
         ((TextView) mView.findViewById(R.id.focus_farming_value))
-                    .setText(Integer.toString((int)(mColony.getFarmingFocus() * SEEKBAR_MAX)));
+                    .setText(Integer.toString((int)(mColony.getFarmingFocus() * 100.0)));
         ((TextView) mView.findViewById(R.id.focus_mining_value))
-                    .setText(Integer.toString((int)(mColony.getMiningFocus() * SEEKBAR_MAX)));
+                    .setText(Integer.toString((int)(mColony.getMiningFocus() * 100.0)));
         ((TextView) mView.findViewById(R.id.focus_construction_value))
-                    .setText(Integer.toString((int)(mColony.getConstructionFocus() * SEEKBAR_MAX)));
+                    .setText(Integer.toString((int)(mColony.getConstructionFocus() * 100.0)));
 
         updateDeltas();
 
