@@ -408,10 +408,12 @@ class Simulation(object):
           self.log("progress this turn: %.4f%% (%.4f hrs)" % (progress_this_turn * 100.0, dt_used))
 
           if progress_this_turn <= 0:
-            self.log("no progress this turn (building complete?)")
             time_remaining_in_hours = (1.0 - build_request.progress) * total_build_time_in_hours
             end_time = now + timedelta(hours=time_remaining_in_hours)
-            build_request.end_time = ctrl.dateTimeToEpoch(end_time)
+            min_end_time = ctrl.dateTimeToEpoch(end_time)
+            if build_request.end_time > min_end_time:
+               build_request.end_time = min_end_time
+            self.log("no progress this turn (building complete?), setting end_time = %s" % (end_time))
             continue
 
           # work out how many minerals we require for this turn

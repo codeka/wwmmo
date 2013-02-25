@@ -158,8 +158,11 @@ public class EmpireActivity extends TabFragmentActivity {
             rankList.setAdapter(rankListAdapter);
 
             MyEmpire myEmpire = EmpireManager.getInstance().getEmpire();
-            int myRank = myEmpire.getRank().getRank();
-            int minRank = myRank - 2;
+            int minRank = 1;
+            if (myEmpire.getRank() != null) {
+              int myRank = myEmpire.getRank().getRank();
+              minRank = myRank - 2;
+            }
             if (minRank < 1) {
                 minRank = 1;
             }

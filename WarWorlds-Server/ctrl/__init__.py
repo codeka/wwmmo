@@ -89,7 +89,10 @@ def empireRankModelToPb(empire_rank_pb, empire_rank_model):
   empire_rank_pb.total_stars = empire_rank_model.totalStars
   empire_rank_pb.total_colonies = empire_rank_model.totalColonies
   empire_rank_pb.total_buildings = empire_rank_model.totalBuildings
-  empire_rank_pb.rank = empire_rank_model.rank
+  if empire_rank_model.rank:
+    empire_rank_pb.rank = empire_rank_model.rank
+  else:
+    empire_rank_pb.rank = 0
   if empire_rank_model.lastRank:
     empire_rank_pb.last_rank = empire_rank_model.lastRank
   else:
