@@ -83,7 +83,6 @@ public class FleetActivity extends BaseActivity implements StarManager.StarFetch
         super.onResume();
 
         ServerGreeter.waitForHello(this, new ServerGreeter.HelloCompleteHandler() {
-            
             @Override
             public void onHelloComplete(boolean success, ServerGreeting greeting) {
                 if (!success) {

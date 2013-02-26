@@ -105,14 +105,14 @@
                               android:layout_marginLeft="6dp"
                               android:textAppearance="?android:attr/textAppearanceSmall"
                               android:text="Defence: 1234" />
-                    <Button android:id="@+id/enemy_empire_attack"
+                    <Button android:id="@+id/enemy_empire_view"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_below="@id/enemy_empire_icon"
                             android:layout_marginTop="10dp"
                             android:layout_marginLeft="10dp"
                             android:layout_marginRight="10dp"
-                            android:text="Attack" />
+                            android:text="View" />
                 </RelativeLayout>
 
                 <RelativeLayout

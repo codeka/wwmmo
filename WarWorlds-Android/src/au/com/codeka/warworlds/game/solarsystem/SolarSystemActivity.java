@@ -6,7 +6,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -37,8 +36,6 @@ import au.com.codeka.warworlds.model.EmpirePresence;
 import au.com.codeka.warworlds.model.Fleet;
 import au.com.codeka.warworlds.model.MyEmpire;
 import au.com.codeka.warworlds.model.Planet;
-import au.com.codeka.warworlds.model.ShipDesign;
-import au.com.codeka.warworlds.model.ShipDesignManager;
 import au.com.codeka.warworlds.model.Star;
 import au.com.codeka.warworlds.model.StarManager;
 
@@ -71,7 +68,7 @@ public class SolarSystemActivity extends BaseActivity implements StarManager.Sta
         final Button buildButton = (Button) findViewById(R.id.solarsystem_colony_build);
         final Button focusButton = (Button) findViewById(R.id.solarsystem_colony_focus);
         final Button sitrepButton = (Button) findViewById(R.id.sitrep_btn);
-        final Button attackButton = (Button) findViewById(R.id.enemy_empire_attack);
+        final Button planetViewButton = (Button) findViewById(R.id.enemy_empire_view);
         final FleetListSimple fleetList = (FleetListSimple) findViewById(R.id.fleet_list);
         final SelectionView selectionView = (SelectionView) findViewById(R.id.selection);
         mSolarSystemSurfaceView.setSelectionView(selectionView);
@@ -133,10 +130,10 @@ public class SolarSystemActivity extends BaseActivity implements StarManager.Sta
             }
         });
 
-        attackButton.setOnClickListener(new View.OnClickListener() {
+        planetViewButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                onAttackColony();
+                onViewColony();
             }
         });
 
@@ -302,7 +299,18 @@ public class SolarSystemActivity extends BaseActivity implements StarManager.Sta
         super.onBackPressed();
     }
 
-    private void onAttackColony() {
+    private void onViewColony() {
+        if (mPlanet == null) {
+            return;
+        }
+
+        // TODO: determine if enemy colony or not...
+        Intent intent = new Intent(this, EnemyPlanetActivity.class);
+        intent.putExtra("au.com.codeka.warworlds.StarKey", mStar.getKey());
+        intent.putExtra("au.com.codeka.warworlds.PlanetIndex", mPlanet.getIndex());
+        startActivity(intent);
+
+        /*
         int defence = (int)(0.25 * mColony.getPopulation() * mColony.getDefenceBoost());
 
         final MyEmpire myEmpire = EmpireManager.getInstance().getEmpire();
@@ -336,6 +344,7 @@ public class SolarSystemActivity extends BaseActivity implements StarManager.Sta
         });
         b.setNegativeButton("Cancel", null);
         b.create().show();
+        */
     }
 
     private void refreshSelectedPlanet() {

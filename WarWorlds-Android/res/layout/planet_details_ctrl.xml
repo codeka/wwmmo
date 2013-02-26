@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+
+    <ImageView
+        android:id="@+id/planet_icon"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_margin="10dp"
+        android:src="@drawable/app_icon" />
+
+    <au.com.codeka.warworlds.ctrl.HorizontalSeparator
+        android:id="@+id/horz_sep_1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true"
+        android:layout_toRightOf="@+id/planet_icon"
+        android:layout_marginTop="10dp"
+        android:layout_marginRight="10dp"
+        android:text="Congeniality" />
+
+    <ImageView
+        android:id="@+id/population_congeniality_icon"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:layout_alignLeft="@+id/horz_sep_1"
+        android:layout_below="@+id/horz_sep_1"
+        android:src="@drawable/solarsystem_icon_population" />
+
+    <TextView
+        android:id="@+id/population_congeniality_value"
+        android:layout_width="45dp"
+        android:layout_height="20dp"
+        android:layout_alignTop="@id/population_congeniality_icon"
+        android:layout_alignParentRight="true"
+        android:text="1024" />
+
+    <ProgressBar
+        android:id="@+id/population_congeniality"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:layout_height="20dp"
+        android:layout_alignTop="@id/population_congeniality_icon"
+        android:layout_toRightOf="@+id/population_congeniality_icon"
+        android:layout_toLeftOf="@id/population_congeniality_value" />
+
+    <ImageView
+        android:id="@+id/farming_congeniality_icon"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:layout_alignLeft="@+id/horz_sep_1"
+        android:layout_below="@+id/population_congeniality_icon"
+        android:src="@drawable/solarsystem_icon_farming" />
+
+    <TextView
+        android:id="@+id/farming_congeniality_value"
+        android:layout_width="45dp"
+        android:layout_height="20dp"
+        android:layout_alignTop="@id/farming_congeniality_icon"
+        android:layout_alignParentRight="true"
+        android:text="1024" />
+
+    <ProgressBar
+        android:id="@+id/farming_congeniality"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:layout_height="20dp"
+        android:layout_alignTop="@id/farming_congeniality_icon"
+        android:layout_toRightOf="@+id/farming_congeniality_icon"
+        android:layout_toLeftOf="@id/farming_congeniality_value" />
+
+    <ImageView
+        android:id="@+id/mining_congeniality_icon"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:layout_alignLeft="@+id/horz_sep_1"
+        android:layout_below="@+id/farming_congeniality_icon"
+        android:src="@drawable/solarsystem_icon_mining" />
+
+    <TextView
+        android:id="@+id/mining_congeniality_value"
+        android:layout_width="45dp"
+        android:layout_height="20dp"
+        android:layout_alignTop="@id/mining_congeniality_icon"
+        android:layout_alignParentRight="true"
+        android:text="1024" />
+
+    <ProgressBar
+        android:id="@+id/mining_congeniality"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:layout_height="20dp"
+        android:layout_alignTop="@id/mining_congeniality_icon"
+        android:layout_toRightOf="@+id/mining_congeniality_icon"
+        android:layout_toLeftOf="@id/mining_congeniality_value" />
+
+    <au.com.codeka.warworlds.ctrl.HorizontalSeparator
+        android:id="@+id/horz_sep_2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/mining_congeniality_icon"
+        android:layout_below="@+id/mining_congeniality_icon"
+        android:layout_marginTop="10dp"
+        android:layout_alignParentRight="true"
+        android:text="Stuff" />
+    
+</RelativeLayout>

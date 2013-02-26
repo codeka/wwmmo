@@ -81,8 +81,11 @@
 
         <activity android:name=".game.starfield.TacticalMapActivity"
                   android:screenOrientation="portrait" />
-        
+
         <activity android:name=".game.solarsystem.SolarSystemActivity"
+                  android:screenOrientation="portrait" />
+
+        <activity android:name=".game.solarsystem.EnemyPlanetActivity"
                   android:screenOrientation="portrait" />
 
         <activity android:name=".game.solarsystem.BuildActivity"
