@@ -371,11 +371,14 @@ public class FleetList extends FrameLayout implements StarManager.StarFetchedHan
         private ArrayList<Fleet> mFleets;
         private Map<String, Star> mStars;
         private ArrayList<ItemEntry> mEntries;
+        private Empire mMyEmpire;
 
         private static final int STAR_ITEM_TYPE = 0;
         private static final int FLEET_ITEM_TYPE = 1;
 
         public FleetListAdapter() {
+            mMyEmpire = EmpireManager.getInstance().getEmpire();
+
             // whenever a new star bitmap is generated, redraw the screen
             StarImageManager.getInstance().addBitmapGeneratedListener(
                     new ImageManager.BitmapGeneratedListener() {
@@ -441,6 +444,12 @@ public class FleetList extends FrameLayout implements StarManager.StarFetchedHan
         @Override
         public boolean isEnabled(int position) {
             if (mEntries.get(position).type == STAR_ITEM_TYPE) {
+                return false;
+            }
+
+            // if we don't own this fleet, we also can't do anything with it.
+            Fleet fleet = (Fleet) mEntries.get(position).value;
+            if (!fleet.getEmpireKey().equals(mMyEmpire.getKey())) {
                 return false;
             }
 
