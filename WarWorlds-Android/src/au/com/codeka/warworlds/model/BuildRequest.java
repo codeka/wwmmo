@@ -49,7 +49,7 @@ public class BuildRequest implements Parcelable {
     public String getExistingBuildingKey() {
         return mExistingBuildingKey;
     }
-    public float getProgress() {
+    public float getProgress(boolean interpolate) {
         // mProgress will be the accurate at the time this BuildRequest was refreshed from the
         // server. We'll do a little bit of interpolation so that it's a good estimate *after*
         // we've been refreshed from the server, too.
@@ -64,8 +64,11 @@ public class BuildRequest implements Parcelable {
 
         return mProgress + ((1.0f - mProgress) * percentRemaining);
     }
+    public void setProgress(float progress) {
+        mProgress = progress;
+    }
     public float getPercentComplete() {
-        float percent = getProgress() * 100.0f;
+        float percent = getProgress(true) * 100.0f;
         if (percent < 0)
             percent = 0;
         if (percent > 100)
@@ -87,6 +90,10 @@ public class BuildRequest implements Parcelable {
     }
     public String getColonyKey() {
         return mColonyKey;
+    }
+
+    public void setEndTime(DateTime dt) {
+        mEndTime = dt;
     }
 
     @Override

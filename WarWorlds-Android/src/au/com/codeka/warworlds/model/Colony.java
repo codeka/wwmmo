@@ -44,6 +44,9 @@ public class Colony implements Parcelable {
     public float getPopulation() {
         return mPopulation;
     }
+    public void setPopulation(float pop) {
+        mPopulation = pop;
+    }
     public float getFarmingFocus() {
         return mFarmingFocus;
     }
@@ -71,14 +74,26 @@ public class Colony implements Parcelable {
     public float getPopulationDelta() {
         return mPopulationDelta;
     }
+    public void setPopulationDelta(float dp) {
+        mPopulationDelta = dp;
+    }
     public float getGoodsDelta() {
         return mGoodsDelta;
+    }
+    public void setGoodsDelta(float d) {
+        mGoodsDelta = d;
     }
     public float getMineralsDelta() {
         return mMineralsDelta;
     }
+    public void setMineralsDelta(float d) {
+        mMineralsDelta = d;
+    }
     public float getUncollectedTaxes() {
         return mUncollectedTaxes;
+    }
+    public void setUncollectedTaxes(float taxes) {
+        mUncollectedTaxes = taxes;
     }
     public List<Building> getBuildings() {
         return mBuildings;
@@ -95,6 +110,9 @@ public class Colony implements Parcelable {
         }
         DateTime now = DateTime.now(DateTimeZone.UTC);
         return (now.compareTo(mCooldownTimeEnd) < 0);
+    }
+    public DateTime getCooldownEndTime() {
+        return mCooldownTimeEnd;
     }
 
     @Override

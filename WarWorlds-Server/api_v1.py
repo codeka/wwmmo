@@ -301,11 +301,13 @@ class EmpireDetailsPage(ApiPage):
   def get(self, empire_key):
     empire_pb = empire.getEmpire(empire_key)
 
-    if self._isAdmin() or empire_pb.email == self.user.email():
-      colonies_pb = empire.getColoniesForEmpire(empire_pb)
+    do_simulate = True
+    if self.request.get("do_simulate") == "0":
+      do_simulate = False
 
+    if self._isAdmin() or empire_pb.email == self.user.email():
       fleets_pb = empire.getFleetsForEmpire(empire_pb)
-      empire_pb.fleets.MergeFrom(fleets_pb.fleets)
+      colonies_pb = empire.getColoniesForEmpire(empire_pb)
 
       star_keys = []
       for colony_pb in colonies_pb.colonies:
@@ -320,21 +322,27 @@ class EmpireDetailsPage(ApiPage):
       star_pbs = []
       build_request_pbs = []
       for star_key in star_keys:
-        sim.simulate(star_key, do_prediction=False)
-        star_pb = sim.getStar(star_key)
+        if do_simulate:
+          sim.simulate(star_key, do_prediction=False)
+        star_pb = sim.getStar(star_key, fetch=True)
 
-        for star_colony_pb in star_pb.colonies:
-          for colony_pb in colonies_pb.colonies:
-            if colony_pb.key == star_colony_pb.key:
-              colony_pbs.append(star_colony_pb)
+        if do_simulate:
+          for star_colony_pb in star_pb.colonies:
+            for colony_pb in colonies_pb.colonies:
+              if colony_pb.key == star_colony_pb.key:
+                colony_pbs.append(star_colony_pb)
 
-        for build_request_pb in star_pb.build_requests:
-          build_request_pbs.append(build_request_pb)
+          for build_request_pb in star_pb.build_requests:
+            build_request_pbs.append(build_request_pb)
 
-        star_pbs.append(sector.sumarize(star_pb))
+          star_pbs.append(sector.sumarize(star_pb))
+        else:
+          star_pbs.append(star_pb)
 
-      empire_pb.build_requests.extend(build_request_pbs)
-      empire_pb.colonies.extend(colony_pbs)
+      if do_simulate:
+        empire_pb.build_requests.extend(build_request_pbs)
+        empire_pb.fleets.MergeFrom(fleets_pb.fleets)
+        empire_pb.colonies.extend(colony_pbs)
       empire_pb.stars.extend(star_pbs)
 
       for empire_rank in empire.getEmpireRanks([empire_pb.key]):

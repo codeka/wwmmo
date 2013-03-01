@@ -254,7 +254,7 @@ public class MyEmpire extends Empire {
             @Override
             protected Boolean doInBackground(Void... arg0) {
                 try {
-                    String url = "empires/"+getKey()+"/details";
+                    String url = "empires/"+getKey()+"/details?do_simulate=0";
 
                     Messages.Empire pb = ApiClient.getProtoBuf(url, Messages.Empire.class);
                     if (pb == null)
@@ -401,35 +401,9 @@ public class MyEmpire extends Empire {
     protected void populateFromProtocolBuffer(Messages.Empire pb) {
         super.populateFromProtocolBuffer(pb);
 
-        List<Messages.Colony> colony_pbs = pb.getColoniesList();
-        ArrayList<Colony> colonies = new ArrayList<Colony>();
-        if (colony_pbs != null && colony_pbs.size() > 0) {
-            for (int i = 0; i < colony_pbs.size(); i++) {
-                if (colony_pbs.get(i).getPopulation() < 1.0) {
-                    continue;
-                }
-                colonies.add(Colony.fromProtocolBuffer(colony_pbs.get(i)));
-            }
-        }
-        mAllColonies = colonies;
-
-        List<Messages.Fleet> fleet_pbs = pb.getFleetsList();
-        ArrayList<Fleet> fleets = new ArrayList<Fleet>();
-        if (fleet_pbs != null && fleet_pbs.size() > 0) {
-            for (int i = 0; i < fleet_pbs.size(); i++) {
-                fleets.add(Fleet.fromProtocolBuffer(fleet_pbs.get(i)));
-            }
-        }
-        mAllFleets = fleets;
-
-        List<Messages.BuildRequest> build_request_pbs = pb.getBuildRequestsList();
-        ArrayList<BuildRequest> buildRequests = new ArrayList<BuildRequest>();
-        if (build_request_pbs != null && build_request_pbs.size() > 0) {
-            for (int i = 0; i < build_request_pbs.size(); i++) {
-                buildRequests.add(BuildRequest.fromProtocolBuffer(build_request_pbs.get(i)));
-            }
-        }
-        mAllBuildRequests = buildRequests;
+        mAllColonies = new ArrayList<Colony>();
+        mAllFleets = new ArrayList<Fleet>();
+        mAllBuildRequests = new ArrayList<BuildRequest>();
 
         List<Messages.Star> star_pbs = pb.getStarsList();
         TreeMap<String, Star> stars = new TreeMap<String, Star>();
@@ -439,6 +413,28 @@ public class MyEmpire extends Empire {
             }
         }
         mStars = stars;
+
+        Simulation sim = new Simulation();
+        for (Star star : mStars.values()) {
+            sim.simulate(star);
+
+            for (Colony c : star.getColonies()) {
+                if (c.getEmpireKey() != null && c.getEmpireKey().equals(getKey())) {
+                    mAllColonies.add(c);
+
+                    for (BuildRequest br : star.getBuildRequests()) {
+                        if (br.getColonyKey().equals(c.getKey())) {
+                            mAllBuildRequests.add(br);
+                        }
+                    }
+                }
+            }
+            for (Fleet f : star.getFleets()) {
+                if (f.getEmpireKey() != null && f.getEmpireKey().equals(getKey())) {
+                    mAllFleets.add(f);
+                }
+            }
+        }
     }
 
     public static interface ColonizeCompleteHandler {

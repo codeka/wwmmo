@@ -77,7 +77,7 @@ public class BuildAccelerateDialog extends DialogFragment {
         TextView acceleratePct = (TextView) mView.findViewById(R.id.accelerate_pct);
         acceleratePct.setText(String.format(Locale.ENGLISH, "%d %%", (int)(accelerateAmount * 100)));
 
-        double remainingProgress = 1.0 - mBuildRequest.getProgress();
+        double remainingProgress = 1.0 - mBuildRequest.getProgress(true);
         double progressToComplete = remainingProgress * accelerateAmount;
 
         DesignManager dm = DesignManager.getInstance(mBuildRequest.getBuildKind());
