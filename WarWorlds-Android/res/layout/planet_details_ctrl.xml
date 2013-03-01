@@ -98,7 +98,7 @@
         android:layout_toRightOf="@+id/mining_congeniality_icon"
         android:layout_toLeftOf="@id/mining_congeniality_value" />
 
-    <au.com.codeka.warworlds.ctrl.HorizontalSeparator
+    <!--au.com.codeka.warworlds.ctrl.HorizontalSeparator
         android:id="@+id/horz_sep_2"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -106,6 +106,6 @@
         android:layout_below="@+id/mining_congeniality_icon"
         android:layout_marginTop="10dp"
         android:layout_alignParentRight="true"
-        android:text="Stuff" />
+        android:text="Stuff" /-->
     
 </RelativeLayout>

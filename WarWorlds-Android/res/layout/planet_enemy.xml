@@ -10,4 +10,45 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true" />
 
+    <RelativeLayout android:id="@+id/bottom_pane"
+                    style="@style/BottomPane"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_below="@id/planet_details"
+                    android:layout_alignParentBottom="true">
+        <ImageView android:id="@+id/enemy_empire_icon"
+                   android:layout_width="40dp"
+                   android:layout_height="40dp"
+                   android:layout_marginTop="6dp"
+                   android:layout_marginLeft="6dp" />
+        <TextView android:id="@+id/enemy_empire_name"
+                  android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  android:layout_toRightOf="@id/enemy_empire_icon"
+                  android:layout_marginTop="6dp"
+                  android:layout_marginLeft="6dp"
+                  android:textAppearance="?android:attr/textAppearanceSmall"
+                  android:singleLine="true"
+                  android:ellipsize="end"
+                  android:text="Empire Name" />
+        <TextView android:id="@+id/enemy_empire_defence"
+                  android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  android:layout_toRightOf="@id/enemy_empire_icon"
+                  android:layout_below="@id/enemy_empire_name"
+                  android:layout_marginLeft="6dp"
+                  android:textAppearance="?android:attr/textAppearanceSmall"
+                  android:text="Defence: 1234" />
+        <Button android:id="@+id/attack_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/enemy_empire_icon"
+                android:layout_alignLeft="@id/enemy_empire_icon"
+                android:layout_alignRight="@id/enemy_empire_defence"
+                android:layout_marginTop="10dp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:text="Attack" />
+    </RelativeLayout>
+
 </RelativeLayout>

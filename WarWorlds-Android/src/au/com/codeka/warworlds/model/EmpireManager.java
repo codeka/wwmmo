@@ -58,6 +58,10 @@ public class EmpireManager {
     }
 
     public Empire getEmpire(Context context, String empireKey) {
+        if (empireKey == null) {
+            return mNativeEmpire;
+        }
+
         if (empireKey.equals(mEmpire.getKey())) {
             return mEmpire;
         }
