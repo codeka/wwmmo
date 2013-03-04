@@ -29,6 +29,7 @@ message GenericError
     {
         InsufficientCash = 1;
         CannotAttackOwnColony = 2;
+        CannotAttackColonyGone = 7;
         CannotBuildDependencyNotMet = 3;
         CannotBuildMaxPerColonyReached = 4;
         CannotBuildMaxLevelReached = 5;

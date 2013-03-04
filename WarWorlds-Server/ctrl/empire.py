@@ -7,9 +7,10 @@ import logging
 import math
 import random
 
-from google.appengine.ext import db
 from google.appengine.api import memcache
 from google.appengine.api import taskqueue
+from google.appengine.ext import db
+from google.appengine.ext import deferred
 
 import ctrl
 from ctrl import sector
@@ -18,7 +19,6 @@ from ctrl import designs
 from model import sector as sector_mdl
 from model import empire as mdl
 from model import statistics as stats_mdl
-from model import gcm as gcm_mdl
 from protobufs import messages_pb2 as pb
 
 
@@ -498,7 +498,14 @@ def collectTaxesFromColony(colony_key, sim):
                     "empire:for-user:%s" % (empire_model.user.email())])
 
 
-def collectTaxesFromEmpire(empire_pb, sim):
+def collectTaxesFromEmpire(empire_pb, sim, async=False):
+  if async:
+    # if aysnc is true, we just defer ourself on a task queue, where we'll have longer to actually
+    # simulate all the stars, etc. Note that the client then takes the responsibility for simulating
+    deferred.defer(collectTaxesFromEmpire, empire_pb, sim, False)
+    return
+
+  logging.info("Collecting taxes from empire [%s] %s" % (empire_pb.key, empire_pb.display_name))
   colonies_pb = getColoniesForEmpire(empire_pb)
 
   # first, simulate all of the stars up to this point
@@ -519,12 +526,12 @@ def collectTaxesFromEmpire(empire_pb, sim):
   empire_mdl = mdl.Empire.get(empire_pb.key)
   empire_mdl.cash = total_cash
   empire_mdl.put()
-  sim.update(update_stars = False, update_colonies=True, update_empires=False,
-             update_build_requests=False, update_fleets=False, update_combat_reports=False,
-             schedule_fleet_updates=False)
-
+  sim.update()
   ctrl.clearCached(["empire:%s" % (empire_pb.key),
                     "empire:for-user:%s" % (empire_mdl.user.email())])
+
+  # send a notification that the empire has been updated
+  ctrl.sendNotificationToUser(empire_pb.email, {"empire_updated": 1})
 
 
 def _colonize(sector_key, empire_model, star_pb, planet_index, count_in_sector=True):
@@ -1123,18 +1130,8 @@ def saveSituationReport(sitrep_pb):
   ctrl.clearCached(["sitrep:for-empire:%s" % (sitrep_pb.empire_key),
                     "sitrep:for-star:%s:%s" % (sitrep_pb.empire_key, sitrep_pb.star_key)])
 
-  # todo: check settings before generating the notification?
-  try:
-    empire_pb = getEmpire(sitrep_pb.empire_key)
-    devices = ctrl.getDevicesForUser(empire_pb.email)
-    registration_ids = []
-    for device in devices.registrations:
-      registration_ids.append(device.gcm_registration_id)
-    gcm = gcm_mdl.GCM('AIzaSyADWOC-tWUbzj-SVW13Sz5UuUiGfcmHHDA')
-    gcm.json_request(registration_ids=registration_ids,
-                     data={"sitrep": base64.b64encode(sitrep_blob)})
-  except:
-    logging.warn("An error occurred sending notification, notification not sent")
+  empire_pb = getEmpire(sitrep_pb.empire_key)
+  ctrl.sendNotificationToUser(empire_pb.email, {"sitrep": base64.b64encode(sitrep_blob)})
 
 
 def getSituationReports(empire_key, star_key=None, cursor=None):

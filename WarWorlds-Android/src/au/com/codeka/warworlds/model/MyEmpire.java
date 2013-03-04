@@ -29,6 +29,9 @@ public class MyEmpire extends Empire {
     private Map<String, Star> mStars;
     private List<RefreshAllCompleteHandler> mRefreshAllCompleteHandlers;
 
+    // make sure we don't collect taxes twice
+    private boolean mCollectingTaxes = false;
+
     public MyEmpire() {
         mRefreshAllCompleteHandlers = new ArrayList<RefreshAllCompleteHandler>();
     }
@@ -126,11 +129,16 @@ public class MyEmpire extends Empire {
     }
 
     public void collectTaxes(final Context context) {
+        if (mCollectingTaxes) {
+            return;
+        }
+        mCollectingTaxes = true;
+
         new AsyncTask<Void, Void, Boolean>() {
             @Override
             protected Boolean doInBackground(Void... arg0) {
                 try {
-                    String url = String.format("empires/%s/taxes", getKey());
+                    String url = String.format("empires/%s/taxes?async=1", getKey());
                     ApiClient.postProtoBuf(url, null);
                 } catch(Exception e) {
                     // TODO: handle exceptions
@@ -138,17 +146,28 @@ public class MyEmpire extends Empire {
                     return false;
                 }
 
+                // update our copy of everything and reset the uncollected taxes to zero, this'll
+                // keep us accurate until the server notifies us that's finished as well.
+                Simulation sim = new Simulation();
+                float taxes = 0.0f;
+                for (Star star : mStars.values()) {
+                    sim.simulate(star);
+                    for (Colony colony : star.getColonies()) {
+                        if (colony.getEmpireKey() != null && colony.getEmpireKey().equals(getKey())) {
+                            taxes += colony.getUncollectedTaxes();
+                            colony.setUncollectedTaxes(0.0f);
+                        }
+                    }
+                }
+                mCash += taxes;
+
                 return true;
             }
 
             @Override
             protected void onPostExecute(Boolean success) {
-                if (!success) {
-                    return; // BAD!
-                }
-
-                // make sure we record the fact that the star is updated as well
-                refreshAllDetails(null);
+                mCollectingTaxes = false;
+                EmpireManager.getInstance().fireEmpireUpdated(MyEmpire.this);
             }
         }.execute();
     }

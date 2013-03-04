@@ -24,6 +24,7 @@ import au.com.codeka.Cash;
 import au.com.codeka.RomanNumeralFormatter;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.model.Colony;
+import au.com.codeka.warworlds.model.Empire;
 import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.ImageManager;
 import au.com.codeka.warworlds.model.MyEmpire;
@@ -35,7 +36,9 @@ import au.com.codeka.warworlds.model.Star;
 import au.com.codeka.warworlds.model.StarImageManager;
 import au.com.codeka.warworlds.model.StarManager;
 
-public class ColonyList extends FrameLayout implements MyEmpire.RefreshAllCompleteHandler {
+public class ColonyList extends FrameLayout
+                        implements MyEmpire.RefreshAllCompleteHandler,
+                                   EmpireManager.EmpireFetchedHandler {
     private Context mContext;
     private Map<String, Star> mStars;
     private Colony mSelectedColony;
@@ -76,17 +79,28 @@ public class ColonyList extends FrameLayout implements MyEmpire.RefreshAllComple
 
     @Override
     public void onAttachedToWindow() {
-        EmpireManager.getInstance().getEmpire().addRefreshAllCompleteHandler(this);
+        MyEmpire myEmpire = EmpireManager.getInstance().getEmpire();
+        myEmpire.addRefreshAllCompleteHandler(this);
+        EmpireManager.getInstance().addEmpireUpdatedListener(myEmpire.getKey(), this);
     }
 
     @Override
     public void onDetachedFromWindow() {
         EmpireManager.getInstance().getEmpire().removeRefreshAllCompleteHandler(this);
+        EmpireManager.getInstance().removeEmpireUpdatedListener(this);
     }
 
     @Override
     public void onRefreshAllComplete(MyEmpire empire) {
         refresh(empire.getAllColonies(), empire.getImportantStars());
+    }
+
+    @Override
+    public void onEmpireFetched(Empire empire) {
+        MyEmpire myEmpire = EmpireManager.getInstance().getEmpire();
+        if (empire.getKey().equals(myEmpire.getKey())) {
+            refresh(myEmpire.getAllColonies(), myEmpire.getImportantStars());
+        }
     }
 
     public void setOnColonyActionListener(ColonyActionHandler listener) {

@@ -643,9 +643,12 @@ class EmpireTaxesPage(ApiPage):
       self.set_status(403)
       return
 
+    async = False
+    if self.request.get("async") == "1":
+      async = True
+
     sim = simulation.Simulation()
-    empire.collectTaxesFromEmpire(empire_pb, sim)
-    sim.update()
+    empire.collectTaxesFromEmpire(empire_pb, sim, async)
 
 
 class ColoniesAttackPage(ApiPage):
@@ -654,6 +657,8 @@ class ColoniesAttackPage(ApiPage):
        you have some troopcarrier ships in the star and if so, work out whether
        you destroy the colony or not."""
     colony_pb = empire.getColony(colony_key)
+    if not colony_pb:
+      return self.raiseError(pb.GenericError.CannotAttackColonyGone, "There is no more colony to attack!")
     empire_pb = empire.getEmpireForUser(self.user)
     if colony_pb.empire_key == empire_pb.key:
       return self.raiseError(pb.GenericError.CannotAttackOwnColony, "")

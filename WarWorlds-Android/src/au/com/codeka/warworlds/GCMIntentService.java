@@ -163,6 +163,8 @@ public class GCMIntentService extends GCMBaseIntentService {
                 }
 
                 ChatManager.getInstance().addMessage(context, msg);
+            } else if (extras.containsKey("empire_updated")) {
+                EmpireManager.getInstance().refreshEmpire();
             }
         }
     }

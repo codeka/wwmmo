@@ -19,6 +19,7 @@ import protobufs.messages_pb2 as pb
 from model import chat as chat_mdl
 from model import empire as empire_mdl
 from model import statistics as stats_mdl
+from model import gcm as gcm_mdl
 import model as mdl
 
 
@@ -367,8 +368,21 @@ def epochToDateTime(epoch):
   return datetime.fromtimestamp(epoch)
 
 
-def updateDeviceRegistration(registration_pb, user):
+def sendNotificationToUser(user_email, data):
+  try:
+    devices = getDevicesForUser(user_email)
+    registration_ids = []
+    for device in devices.registrations:
+      registration_ids.append(device.gcm_registration_id)
+    gcm = gcm_mdl.GCM('AIzaSyADWOC-tWUbzj-SVW13Sz5UuUiGfcmHHDA')
+    gcm.json_request(registration_ids=registration_ids,
+                     data=data)
+    logging.info("Sent notification to %d devices", )
+  except:
+    logging.warn("An error occurred sending notification, notification not sent")
 
+
+def updateDeviceRegistration(registration_pb, user):
   # first, check if there's one already there for this device/user
   registration_mdl = None
   for this_mdl in mdl.DeviceRegistration.all().filter("deviceID", registration_pb.device_id):

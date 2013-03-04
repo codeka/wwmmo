@@ -763,7 +763,7 @@ class Simulation(object):
         effect.onFleetArrived(star_pb, new_fleet_pb, other_fleet_pb, self)
 
 
-  def update(self, update_stars = True, update_colonies=True, update_empires=True,
+  def update(self, update_stars=True, update_colonies=True, update_empires=True,
                     update_build_requests=True, update_fleets=True, update_combat_reports=True,
                     schedule_fleet_updates=True):
     """Apply all of the updates we've made to the data store."""

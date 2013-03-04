@@ -109,6 +109,8 @@ public class Simulation {
             //  for prediction_fleet_pb in prediction_star_pb.fleets:
             //    if fleet_pb.key == prediction_fleet_pb.key:
             //      fleet_pb.time_destroyed = prediction_fleet_pb.time_destroyed
+
+            star.setLastSimulation(mNow);
         }
     }
 

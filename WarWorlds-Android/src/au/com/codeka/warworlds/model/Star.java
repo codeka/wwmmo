@@ -34,6 +34,9 @@ public class Star extends StarSummary {
     public DateTime getLastSimulation() {
         return mLastSimulation;
     }
+    public void setLastSimulation(DateTime dt) {
+        mLastSimulation = dt;
+    }
 
     public List<Colony> getColonies() {
         return mColonies;

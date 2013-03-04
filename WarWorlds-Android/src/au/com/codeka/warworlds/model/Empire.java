@@ -18,7 +18,7 @@ public class Empire implements Parcelable {
     private String mKey;
     private String mDisplayName;
     private Bitmap mEmpireShield;
-    private float mCash;
+    protected float mCash;
     private EmpireRank mRank;
 
     private static Bitmap sBaseShield;
