@@ -23,7 +23,6 @@ import au.com.codeka.warworlds.BaseActivity;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.ServerGreeter;
 import au.com.codeka.warworlds.ServerGreeter.ServerGreeting;
-import au.com.codeka.warworlds.StyledDialog;
 import au.com.codeka.warworlds.ctrl.FleetListSimple;
 import au.com.codeka.warworlds.ctrl.SelectionView;
 import au.com.codeka.warworlds.game.CombatReportDialog;
@@ -34,7 +33,6 @@ import au.com.codeka.warworlds.model.Empire;
 import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.EmpirePresence;
 import au.com.codeka.warworlds.model.Fleet;
-import au.com.codeka.warworlds.model.MyEmpire;
 import au.com.codeka.warworlds.model.Planet;
 import au.com.codeka.warworlds.model.Star;
 import au.com.codeka.warworlds.model.StarManager;
@@ -46,11 +44,9 @@ public class SolarSystemActivity extends BaseActivity implements StarManager.Sta
     private static Logger log = LoggerFactory.getLogger(SolarSystemActivity.class);
     private SolarSystemSurfaceView mSolarSystemSurfaceView;
     private Context mContext = this;
-    private boolean mIsSectorUpdated;
     private Star mStar;
     private Planet mPlanet;
     private Colony mColony;
-    private Empire mColonyEmpire;
     private boolean mIsFirstRefresh;
 
     private static final int BUILD_REQUEST = 3000;
@@ -64,11 +60,11 @@ public class SolarSystemActivity extends BaseActivity implements StarManager.Sta
         setContentView(R.layout.solarsystem);
 
         mSolarSystemSurfaceView = (SolarSystemSurfaceView) findViewById(R.id.solarsystem_view);
-        final Button colonizeButton = (Button) findViewById(R.id.solarsystem_colonize);
         final Button buildButton = (Button) findViewById(R.id.solarsystem_colony_build);
         final Button focusButton = (Button) findViewById(R.id.solarsystem_colony_focus);
         final Button sitrepButton = (Button) findViewById(R.id.sitrep_btn);
         final Button planetViewButton = (Button) findViewById(R.id.enemy_empire_view);
+        final Button emptyViewButton = (Button) findViewById(R.id.empty_view_btn);
         final FleetListSimple fleetList = (FleetListSimple) findViewById(R.id.fleet_list);
         final SelectionView selectionView = (SelectionView) findViewById(R.id.selection);
         mSolarSystemSurfaceView.setSelectionView(selectionView);
@@ -84,13 +80,6 @@ public class SolarSystemActivity extends BaseActivity implements StarManager.Sta
             public void onPlanetSelected(Planet planet) {
                 mPlanet = planet;
                 refreshSelectedPlanet();
-            }
-        });
-
-        colonizeButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onColonizeClick();
             }
         });
 
@@ -131,6 +120,13 @@ public class SolarSystemActivity extends BaseActivity implements StarManager.Sta
         });
 
         planetViewButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onViewColony();
+            }
+        });
+
+        emptyViewButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 onViewColony();
@@ -289,7 +285,6 @@ public class SolarSystemActivity extends BaseActivity implements StarManager.Sta
     public void onBackPressed() {
         Intent intent = new Intent();
         if (mStar != null) {
-            intent.putExtra("au.com.codeka.warworlds.SectorUpdated", mIsSectorUpdated);
             intent.putExtra("au.com.codeka.warworlds.SectorX", mStar.getSectorX());
             intent.putExtra("au.com.codeka.warworlds.SectorY", mStar.getSectorY());
             intent.putExtra("au.com.codeka.warworlds.StarKey", mStar.getKey());
@@ -305,46 +300,15 @@ public class SolarSystemActivity extends BaseActivity implements StarManager.Sta
         }
 
         // TODO: determine if enemy colony or not...
-        Intent intent = new Intent(this, EnemyPlanetActivity.class);
+        Intent intent;
+        if (mColony != null) {
+            intent = new Intent(this, EnemyPlanetActivity.class);
+        } else {
+            intent = new Intent(this, EmptyPlanetActivity.class);
+        }
         intent.putExtra("au.com.codeka.warworlds.StarKey", mStar.getKey());
         intent.putExtra("au.com.codeka.warworlds.PlanetIndex", mPlanet.getIndex());
         startActivity(intent);
-
-        /*
-        int defence = (int)(0.25 * mColony.getPopulation() * mColony.getDefenceBoost());
-
-        final MyEmpire myEmpire = EmpireManager.getInstance().getEmpire();
-        int attack = 0;
-        for (Fleet fleet : mStar.getFleets()) {
-            if (fleet.getEmpireKey().equals(myEmpire.getKey())) {
-                ShipDesign design = ShipDesignManager.getInstance().getDesign(fleet.getDesignID());
-                if (design.hasEffect("troopcarrier")) {
-                    attack += fleet.getNumShips();
-                }
-            }
-        }
-
-        StyledDialog.Builder b = new StyledDialog.Builder(this);
-        b.setMessage(Html.fromHtml(String.format(Locale.ENGLISH,
-                "<p>Do you want to attack this %s colony?</p>" +
-                "<p><b>Colony defence:</b> %d<br />" +
-                "   <b>Your attack capability:</b> %d</p>",
-                mColonyEmpire.getDisplayName(), defence, attack)));
-        b.setPositiveButton("Attack!", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(final DialogInterface dialog, int which) {
-                myEmpire.attackColony(mContext, mStar, mColony,
-                    new MyEmpire.AttackColonyCompleteHandler() {
-                        @Override
-                        public void onComplete() {
-                            dialog.dismiss();
-                        }
-                    });
-            }
-        });
-        b.setNegativeButton("Cancel", null);
-        b.create().show();
-        */
     }
 
     private void refreshSelectedPlanet() {
@@ -429,17 +393,17 @@ public class SolarSystemActivity extends BaseActivity implements StarManager.Sta
         miningCongenialityProgressBar.setProgress(
                 (int)(miningCongenialityProgressBar.getMax() * (mPlanet.getMiningCongeniality() / 100.0)));
 
-        Button colonizeButton = (Button) findViewById(R.id.solarsystem_colonize);
+        Button emptyViewButton = (Button) findViewById(R.id.empty_view_btn);
         final View colonyDetailsContainer = findViewById(R.id.solarsystem_colony_details);
         final View enemyColonyDetailsContainer = findViewById(R.id.enemy_colony_details);
         if (mColony == null) {
-            colonizeButton.setVisibility(View.VISIBLE);
+            emptyViewButton.setVisibility(View.VISIBLE);
             colonyDetailsContainer.setVisibility(View.GONE);
             enemyColonyDetailsContainer.setVisibility(View.GONE);
 
             refreshUncolonizedDetails();
         } else {
-            colonizeButton.setVisibility(View.GONE);
+            emptyViewButton.setVisibility(View.GONE);
             colonyDetailsContainer.setVisibility(View.GONE);
             enemyColonyDetailsContainer.setVisibility(View.GONE);
 
@@ -448,7 +412,6 @@ public class SolarSystemActivity extends BaseActivity implements StarManager.Sta
                     @Override
                     public void onEmpireFetched(Empire empire) {
                         Empire thisEmpire = EmpireManager.getInstance().getEmpire();
-                        mColonyEmpire = empire;
                         if (thisEmpire.getKey().equals(empire.getKey())) {
                             colonyDetailsContainer.setVisibility(View.VISIBLE);
                             refreshColonyDetails();
@@ -536,51 +499,5 @@ public class SolarSystemActivity extends BaseActivity implements StarManager.Sta
         enemyIcon.setImageBitmap(empire.getShield(this));
         enemyName.setText(empire.getDisplayName());
         enemyDefence.setText(String.format(Locale.ENGLISH, "Defence: %d", defence));
-    }
-
-    private void onColonizeClick() {
-        Planet planet = mSolarSystemSurfaceView.getSelectedPlanet();
-        if (planet == null) {
-            return;
-        }
-
-        final Button colonizeButton = (Button) findViewById(R.id.solarsystem_colonize);
-        colonizeButton.setEnabled(false);
-
-        MyEmpire empire = EmpireManager.getInstance().getEmpire();
-
-        // check that we have a colony ship (the server will check too, but this is easy)
-        boolean hasColonyShip = false;
-        for (Fleet fleet : mStar.getFleets()) {
-            if (fleet.getEmpireKey() == null) {
-                continue;
-            }
-
-            if (fleet.getEmpireKey().equals(empire.getKey())) {
-                if (fleet.getDesignID().equals("colonyship")) { // TODO: hardcoded?
-                    hasColonyShip = true;
-                }
-            }
-        }
-
-        if (!hasColonyShip) {
-            // TODO: better errors...
-            StyledDialog dialog = new StyledDialog.Builder(this)
-                .setMessage("You don't have a colony ship around this star, so you cannot colonize this planet.")
-                .setPositiveButton("OK", null)
-                .create();
-            dialog.show();
-        }
-
-        empire.colonize(mContext, planet, new MyEmpire.ColonizeCompleteHandler() {
-            @Override
-            public void onColonizeComplete(Colony colony) {
-                colonizeButton.setEnabled(true);
-
-                // remember that the sector we're in has now been updated so we can pass that
-                // back to the StarfieldActivity
-                mIsSectorUpdated = true;
-            }
-        });
     }
 }

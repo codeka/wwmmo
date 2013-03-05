@@ -39,7 +39,7 @@ public class EmpireManager {
     private Map<String, List<EmpireFetchedHandler>> mInProgress = new HashMap<String, List<EmpireFetchedHandler>>();
     private Map<String, List<EmpireFetchedHandler>> mEmpireUpdatedListeners = new TreeMap<String, List<EmpireFetchedHandler>>();
     private MyEmpire mEmpire;
-    private NativeEmpire mNativeEmpire;
+    private NativeEmpire mNativeEmpire = new NativeEmpire();
 
     /**
      * This is called when you first connect to the server. We need to pass in details about
@@ -47,7 +47,6 @@ public class EmpireManager {
      */
     public void setup(MyEmpire empire) {
         mEmpire = empire;
-        mNativeEmpire = new NativeEmpire();
     }
 
     /**

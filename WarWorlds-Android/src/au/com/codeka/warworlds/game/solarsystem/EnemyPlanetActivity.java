@@ -136,6 +136,9 @@ public class EnemyPlanetActivity extends BaseActivity
         final MyEmpire myEmpire = EmpireManager.getInstance().getEmpire();
         int attack = 0;
         for (Fleet fleet : mStar.getFleets()) {
+            if (fleet.getEmpireKey() == null) {
+                continue;
+            }
             if (fleet.getEmpireKey().equals(myEmpire.getKey())) {
                 ShipDesign design = ShipDesignManager.getInstance().getDesign(fleet.getDesignID());
                 if (design.hasEffect("troopcarrier")) {

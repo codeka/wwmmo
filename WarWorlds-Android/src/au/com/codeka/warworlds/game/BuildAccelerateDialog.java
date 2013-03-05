@@ -101,8 +101,8 @@ public class BuildAccelerateDialog extends DialogFragment {
     }
 
     private void accelerateBuild() {
-        final StyledDialog dialog = ((StyledDialog) getDialog());
-        dialog.setCloseable(false);
+        final Activity activity = getActivity();
+        dismiss();
 
         new AsyncTask<Void, Void, BuildRequest>() {
             private String mErrorMsg;
@@ -129,19 +129,17 @@ public class BuildAccelerateDialog extends DialogFragment {
             @Override
             protected void onPostExecute(BuildRequest buildRequest) {
                 // tell the StarManager that this star has been updated
-                StarManager.getInstance().refreshStar(getActivity(), mStar.getKey());
+                StarManager.getInstance().refreshStar(activity.getApplicationContext(), mStar.getKey());
 
                 // tell the EmpireManager to update the empire (since our cash will have gone down)
                 EmpireManager.getInstance().refreshEmpire();
 
                 if (mErrorMsg != null) {
-                    new StyledDialog.Builder(getActivity())
+                    new StyledDialog.Builder(activity.getApplicationContext())
                                     .setMessage(mErrorMsg)
                                     .setTitle("Error accelerating")
                                     .setNeutralButton("OK", null)
-                                    .create().show();
-                } else {
-                    dismiss();
+                                    .create().show(false);
                 }
             }
         }.execute();

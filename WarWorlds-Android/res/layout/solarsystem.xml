@@ -69,12 +69,12 @@
                     android:text="" />
 
                 <Button
-                    android:id="@+id/solarsystem_colonize"
+                    android:id="@+id/empty_view_btn"
                     style="@style/Button"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_below="@id/population_count"
-                    android:text="@string/solarsystem_colonize"
+                    android:text="View"
                     android:visibility="gone" />
 
                 <RelativeLayout android:id="@+id/enemy_colony_details"

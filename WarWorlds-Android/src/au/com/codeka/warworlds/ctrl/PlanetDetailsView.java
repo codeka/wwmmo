@@ -79,7 +79,7 @@ public class PlanetDetailsView extends FrameLayout {
             planetIcon.setImageDrawable(new SpriteDrawable(planetSprite));
         }
 
-        populationCongenialityProgressBar.setMax(100);
+        populationCongenialityProgressBar.setMax(1000);
         populationCongenialityProgressBar.setProgress(mPlanet.getPopulationCongeniality());
         populationCongenialityTextView.setText(Integer.toString(mPlanet.getPopulationCongeniality()));
         farmingCongenialityProgressBar.setMax(100);

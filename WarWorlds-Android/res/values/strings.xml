@@ -27,7 +27,6 @@
 
 
     <!-- "solarsystem.xml" layout -->
-    <string name="solarsystem_colonize">Colonize</string>
     <string name="fleet">Fleet</string>
 
     <!-- "solarsystem_fleet_dlg.xml layout -->

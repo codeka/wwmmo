@@ -66,6 +66,19 @@ public class StyledDialog extends Dialog implements ViewTreeObserver.OnGlobalLay
     }
 
     @Override
+    public void show() {
+        super.show();
+    }
+
+    public void show(boolean ignoreErrors) {
+        try {
+            super.show();
+        } catch(Exception e) {
+            log.error("Error showing dialog.", e);
+        }
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstance) {
         super.onCreate(savedInstance);
         Window wnd = getWindow();
