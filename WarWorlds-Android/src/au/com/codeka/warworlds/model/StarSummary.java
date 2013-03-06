@@ -39,7 +39,7 @@ public class StarSummary implements Parcelable {
                               .setImageScale(4.0)
                               .build(),
         new StarType.Builder().setIndex(6)
-                              .setDisplayName("Back Hole")
+                              .setDisplayName("Black Hole")
                               .setInternalName("black-hole")
                               .build()
     };

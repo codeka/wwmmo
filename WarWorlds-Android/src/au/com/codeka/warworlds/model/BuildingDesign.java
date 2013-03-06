@@ -9,10 +9,14 @@ import au.com.codeka.XmlIterator;
 
 public class BuildingDesign extends Design {
     private int mMaxPerColony;
+    private int mMaxPerEmpire;
     private ArrayList<Upgrade> mUpgrades;
 
     public int getMaxPerColony() {
         return mMaxPerColony;
+    }
+    public int getMaxPerEmpire() {
+        return mMaxPerEmpire;
     }
 
     public List<Upgrade> getUpgrades() {
@@ -33,6 +37,7 @@ public class BuildingDesign extends Design {
             BuildingDesign design = new BuildingDesign();
             design.mDesignKind = Design.DesignKind.BUILDING;
             design.mMaxPerColony = 0;
+            design.mMaxPerEmpire = 0;
             design.mUpgrades = new ArrayList<Upgrade>();
 
             this.populateDesign(design);
@@ -45,8 +50,12 @@ public class BuildingDesign extends Design {
 
             if (elem.getTagName().equals("limits")) {
                 String s = elem.getAttribute("maxPerColony");
-                if (s != null) {
+                if (s != null && s.length() > 0) {
                     bd.mMaxPerColony = Integer.parseInt(s);
+                }
+                s = elem.getAttribute("maxPerEmpire");
+                if (s != null && s.length() > 0) {
+                    bd.mMaxPerEmpire = Integer.parseInt(s);
                 }
             }
 

@@ -37,6 +37,10 @@
       <rect location="64,84" size="71x29" />
       <direction>0,-1</direction>
     </sprite>
+    <sprite name="building.hq">
+      <rect location="102,30" size="66x57" />
+      <direction>0,1</direction>
+    </sprite>
   </sheet>
 
   <sheet filename="planets/planets.png">

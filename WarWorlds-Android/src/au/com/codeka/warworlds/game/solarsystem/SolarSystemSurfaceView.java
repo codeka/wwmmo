@@ -21,11 +21,13 @@ import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.ctrl.SelectionView;
 import au.com.codeka.warworlds.game.StarfieldBackgroundRenderer;
 import au.com.codeka.warworlds.game.UniverseElementSurfaceView;
+import au.com.codeka.warworlds.model.Building;
 import au.com.codeka.warworlds.model.Colony;
 import au.com.codeka.warworlds.model.ImageManager;
 import au.com.codeka.warworlds.model.Planet;
 import au.com.codeka.warworlds.model.PlanetImageManager;
 import au.com.codeka.warworlds.model.Sprite;
+import au.com.codeka.warworlds.model.SpriteManager;
 import au.com.codeka.warworlds.model.Star;
 import au.com.codeka.warworlds.model.StarImageManager;
 
@@ -135,6 +137,22 @@ public class SolarSystemSurfaceView extends UniverseElementSurfaceView {
 
             planetInfo.centre = centre;
             planetInfo.distanceFromSun = distanceFromSun;
+
+            List<Colony> colonies = mStar.getColonies();
+            if (colonies != null && !colonies.isEmpty()) {
+                for (Colony colony : colonies) {
+                    if (colony.getPlanetIndex() == mPlanetInfos[i].planet.getIndex()) {
+                        planetInfo.hasColony = true;
+
+                        for (Building building : colony.getBuildings()) {
+                            if (building.getDesignName().equals("hq")) {
+                                planetInfo.hasHQ = true;
+                            }
+                        }
+                    }
+                }
+            }
+
             mPlanetInfos[i] = planetInfo;
         }
 
@@ -278,16 +296,27 @@ public class SolarSystemSurfaceView extends UniverseElementSurfaceView {
             sprite.draw(canvas);
             canvas.restore();
 
-            List<Colony> colonies = mStar.getColonies();
-            if (colonies != null && !colonies.isEmpty()) {
-                for (Colony colony : colonies) {
-                    if (colony.getPlanetIndex() == mPlanetInfos[i].planet.getIndex()) {
-                        canvas.drawBitmap(mColonyIcon,
-                                (float) (planetInfo.centre.x + mColonyIcon.getWidth()),
-                                (float) (planetInfo.centre.y - mColonyIcon.getHeight()),
-                                mPlanetPaint);
-                    }
-                }
+            if (planetInfo.hasHQ) {
+                Sprite hqSprite = SpriteManager.getInstance().getSprite("building.hq"); // todo: hardcoded?
+
+                mMatrix.reset();
+                mMatrix.postTranslate(-(hqSprite.getWidth() / 2.0f), -(hqSprite.getHeight() / 2.0f));
+                mMatrix.postScale(30.0f * getPixelScale() / hqSprite.getWidth(),
+                                  30.0f * getPixelScale() / hqSprite.getHeight());
+                mMatrix.postTranslate((float) planetInfo.centre.x,
+                                      (float) planetInfo.centre.y - (30.0f * getPixelScale()));
+
+                canvas.save();
+                canvas.concat(mMatrix);
+                hqSprite.draw(canvas);
+                canvas.restore();
+            }
+
+            if (planetInfo.hasColony) {
+                canvas.drawBitmap(mColonyIcon,
+                        (float) (planetInfo.centre.x + mColonyIcon.getWidth()),
+                        (float) (planetInfo.centre.y - mColonyIcon.getHeight()),
+                        mPlanetPaint);
             }
         }
     }
@@ -344,6 +373,8 @@ public class SolarSystemSurfaceView extends UniverseElementSurfaceView {
         public Planet planet;
         public Vector2 centre;
         public float distanceFromSun;
+        public boolean hasColony;
+        public boolean hasHQ;
     }
 
     /**

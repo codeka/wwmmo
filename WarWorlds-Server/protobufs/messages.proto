@@ -32,6 +32,7 @@ message GenericError
         CannotAttackColonyGone = 7;
         CannotBuildDependencyNotMet = 3;
         CannotBuildMaxPerColonyReached = 4;
+        CannotBuildMaxPerEmpireReached = 8;
         CannotBuildMaxLevelReached = 5;
         RenameStarOldNameIncorrect = 6;
     }

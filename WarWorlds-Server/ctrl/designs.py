@@ -325,11 +325,15 @@ def _parseBuildingDesign(designXml):
   if effectsXml is not None:
     design.effects = _parseBuildingEffects(effectsXml)
   design.maxPerColony = 0
+  design.maxPerEmpire = 0
   limitsXml = designXml.find("limits")
   if limitsXml is not None:
     maxPerColony = limitsXml.get("maxPerColony")
-    if maxPerColony is not None:
+    if maxPerColony:
       design.maxPerColony = int(maxPerColony)
+    maxPerEmpire = limitsXml.get("maxPerEmpire")
+    if maxPerEmpire:
+      design.maxPerEmpire = int(maxPerEmpire)
   upgradesXml = designXml.find("upgrades")
   if upgradesXml is not None:
     for upgradeXml in upgradesXml.iterfind("upgrade"):

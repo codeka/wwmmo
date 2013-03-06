@@ -35,6 +35,7 @@ import au.com.codeka.warworlds.model.BuildingDesign;
 import au.com.codeka.warworlds.model.BuildingDesignManager;
 import au.com.codeka.warworlds.model.Colony;
 import au.com.codeka.warworlds.model.Design;
+import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.ShipDesign;
 import au.com.codeka.warworlds.model.ShipDesignManager;
 import au.com.codeka.warworlds.model.SpriteDrawable;
@@ -265,6 +266,25 @@ public class BuildActivity extends TabFragmentActivity implements StarManager.St
                             }
                         }
                         if (numExisting >= bd.getMaxPerColony()) {
+                            continue;
+                        }
+                    }
+                    if (bd.getMaxPerEmpire() > 0) {
+                        int numExisting = 0;
+                        for (Colony c : EmpireManager.getInstance().getEmpire().getAllColonies()) {
+                            for (Building building : c.getBuildings()) {
+                                String designName = building.getDesignName();
+                                if (designName.equals(bd.getID())) {
+                                    numExisting ++;
+                                }
+                            }
+                        }
+                        for (BuildRequest br : EmpireManager.getInstance().getEmpire().getAllBuildRequests()) {
+                            if (br.getDesignID().equals(bd.getID())) {
+                                numExisting ++;
+                            }
+                        }
+                        if (numExisting >= bd.getMaxPerEmpire()) {
                             continue;
                         }
                     }

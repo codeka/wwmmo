@@ -152,4 +152,16 @@
       </upgrade>
     </upgrades>
   </design>
+  <design id="hq">
+    <name>Galactic HQ</name>
+    <sprite>building.hq</sprite>
+    <description><![CDATA[
+      <p>Serves as the "headquarters" of your Empire. You can only have one HQ across all of your
+      planets and stars.</p>
+      <p>Once you build a Galactic HQ, a beacon will appear on the map screen that always points
+      back to your HQ so that you don't get lost navigating the starfield.</p>
+    ]]></description>
+    <cost minerals="100000" time="504" />
+    <limits maxPerEmpire="1" />
+  </design>
 </designs>
