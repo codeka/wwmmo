@@ -740,15 +740,15 @@ def build(empire_pb, colony_pb, request_pb, sim):
       and not request_pb.existing_building_key):
     num_existing = 0
     colonies_pb = getColoniesForEmpire(empire_pb)
-    for colony_pb in colonies_pb.colonies:
-      star_pb = sim.getStar(colony_pb.star_key, True)
+    for other_colony_pb in colonies_pb.colonies:
+      star_pb = sim.getStar(other_colony_pb.star_key, True)
       for building_pb in star_pb.buildings:
-        if building_pb.colony_key != colony_pb.key:
+        if building_pb.colony_key != other_colony_pb.key:
           continue
         if building_pb.design_name == request_pb.design_name:
           num_existing += 1
       for build_request_pb in star_pb.build_requests:
-        if build_request_pb.colony_key != colony_pb.key:
+        if build_request_pb.colony_key != other_colony_pb.key:
           continue
         if build_request_pb.design_name == request_pb.design_name:
           num_existing += 1
