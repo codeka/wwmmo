@@ -19,6 +19,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Path;
@@ -72,6 +73,7 @@ public class StarfieldSurfaceView extends SectorView
     private List<VisibleEntity> mVisibleEntities;
     private Matrix mMatrix;
     private Paint mStarPaint;
+    private Paint mStarNamePaint;
     private boolean mIsScrolling;
     private Handler mHandler;
     private Star mHqStar;
@@ -101,8 +103,12 @@ public class StarfieldSurfaceView extends SectorView
 
         mMatrix = new Matrix();
         mStarPaint = new Paint();
-        mStarPaint.setARGB(255, 255, 255, 255);
+        mStarPaint.setColor(Color.WHITE);
         mStarPaint.setStyle(Style.STROKE);
+
+        mStarNamePaint = new Paint();
+        mStarNamePaint.setColor(Color.WHITE);
+        mStarNamePaint.setStyle(Style.STROKE);
 
         if (sFleetMultiBitmap == null) {
             sFleetMultiBitmap = BitmapFactory.decodeResource(mContext.getResources(), R.drawable.fleet);
@@ -378,6 +384,8 @@ public class StarfieldSurfaceView extends SectorView
             return;
         }
         super.onDraw(canvas);
+
+        mStarNamePaint.setTextSize(15.0f * getPixelScale());
 
         mHqOverlay.setEnabled(true);
         mVisibleEntities.clear();
@@ -832,14 +840,14 @@ public class StarfieldSurfaceView extends SectorView
 
         final float pixelScale = getPixelScale();
 
-        float width = mStarPaint.measureText(star.getName()) / pixelScale;
+        float width = mStarNamePaint.measureText(star.getName()) / pixelScale;
         x -= (width / 2.0f);
         y += star.getSize() + 10.0f;
 
         canvas.drawText(star.getName(),
                         x * pixelScale,
                         y * pixelScale,
-                        mStarPaint);
+                        mStarNamePaint);
     }
 
     public void selectStar(String starKey) {

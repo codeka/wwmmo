@@ -26,6 +26,15 @@ indexes:
   - name: startTime
     direction: desc
 
+- kind: EmpireRank
+  properties:
+  - name: totalColonies
+    direction: desc
+  - name: totalStars
+    direction: desc
+  - name: totalShips
+    direction: desc
+
 - kind: Fleet
   properties:
   - name: empire

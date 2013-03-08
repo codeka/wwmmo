@@ -98,6 +98,13 @@ class GeneratePage(tasks.TaskPage):
     deferred.defer(update_rankings,
                    _queue="statistics", _countdown=(2*60*60))
 
-app = webapp.WSGIApplication([("/tasks/stats/generate", GeneratePage)],
+
+class UpdateRankingsPage(tasks.TaskPage):
+  def get(self):
+    update_rankings()
+
+
+app = webapp.WSGIApplication([("/tasks/stats/generate", GeneratePage),
+                              ("/tasks/stats/update-rankings", UpdateRankingsPage)],
                              debug=os.environ["SERVER_SOFTWARE"].startswith("Development"))
 

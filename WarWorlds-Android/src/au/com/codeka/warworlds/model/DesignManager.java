@@ -39,41 +39,31 @@ public abstract class DesignManager {
      * list.
      */
     public void setup(final Context context) {
-        new AsyncTask<Void, Void, List<Design>>() {
-            @Override
-            protected List<Design> doInBackground(Void... arg0) {
-                Document xmldoc;
-                try {
-                    InputStream ins = context.getAssets().open(getDesignPath());
-                    DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
-                    builderFactory.setValidating(false);
+        Document xmldoc;
+        try {
+            InputStream ins = context.getAssets().open(getDesignPath());
+            DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
+            builderFactory.setValidating(false);
 
-                    DocumentBuilder builder = builderFactory.newDocumentBuilder();
-                    xmldoc = builder.parse(ins);
-                } catch (Exception e) {
-                    log.error("Error loading "+getDesignPath(), e);
-                    return null;
-                }
+            DocumentBuilder builder = builderFactory.newDocumentBuilder();
+            xmldoc = builder.parse(ins);
+        } catch (Exception e) {
+            log.error("Error loading "+getDesignPath(), e);
+            return;
+        }
 
-                try {
-                    return parseDesigns(xmldoc);
-                } catch (ParseException e) {
-                    log.error("Error loading "+getDesignPath(), e);
-                    return null;
-                }
-            }
+        List<Design> designs = null;
+        try {
+            designs = parseDesigns(xmldoc);
+        } catch (ParseException e) {
+            log.error("Error loading "+getDesignPath(), e);
+            return;
+        }
 
-            @Override
-            protected void onPostExecute(List<Design> result) {
-                mDesigns = new TreeMap<String, Design>();
-                if (result == null)
-                    return;
-
-                for(Design design : result) {
-                    mDesigns.put(design.getID(), design);
-                }
-            }
-        }.execute();
+        mDesigns = new TreeMap<String, Design>();
+        for(Design design : designs) {
+            mDesigns.put(design.getID(), design);
+        }
     }
 
     protected abstract String getDesignPath();

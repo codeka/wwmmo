@@ -38,36 +38,24 @@ public class SpriteManager {
     }
 
     public void setup(final Context context) {
-        new AsyncTask<Void, Void, List<Sprite>>() {
-            @Override
-            protected List<Sprite> doInBackground(Void... arg0) {
-                Document xmldoc;
-                try {
-                    xmldoc = loadXml(context.getAssets().open("sprites.xml"));
-                } catch (IOException e) {
-                    log.error("Error loading sprites.xml", e);
-                    return null;
-                }
+        Document xmldoc;
+        try {
+            xmldoc = loadXml(context.getAssets().open("sprites.xml"));
+        } catch (IOException e) {
+            log.error("Error loading sprites.xml", e);
+            return;
+        }
 
-                if (xmldoc == null) {
-                    log.error("Error loading sprites.xml");
-                    return null;
-                }
+        if (xmldoc == null) {
+            log.error("Error loading sprites.xml");
+            return;
+        }
 
-                return parseSpritesXml(context, xmldoc);
-            }
-
-            @Override
-            protected void onPostExecute(List<Sprite> result) {
-                mSprites = new TreeMap<String, Sprite>();
-                if (result == null)
-                    return;
-
-                for(Sprite sprite : result) {
-                    mSprites.put(sprite.getName(), sprite);
-                }
-            }
-        }.execute();
+        List<Sprite> sprites = parseSpritesXml(context, xmldoc);
+        mSprites = new TreeMap<String, Sprite>();
+        for(Sprite sprite : sprites) {
+            mSprites.put(sprite.getName(), sprite);
+        }
     }
 
     public Sprite getSprite(String name) {
