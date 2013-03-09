@@ -4,6 +4,7 @@ import java.util.List;
 
 import android.os.Bundle;
 import android.os.Handler;
+import android.text.method.LinkMovementMethod;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.Window;
@@ -99,6 +100,7 @@ public class ChatActivity extends BaseActivity
     private void appendMessage(final ChatMessage msg) {
         TextView tv = new TextView(this);
         tv.setText(msg.format());
+        tv.setMovementMethod(LinkMovementMethod.getInstance());
         mChatOutput.addView(tv);
 
         // need to wait for it to settle before we scroll again

@@ -28,6 +28,7 @@ public class ChatManager implements BackgroundDetector.BackgroundChangeHandler {
     private ArrayList<MessageAddedListener> mMessageAddedListeners;
     private ArrayList<MessageUpdatedListener> mMessageUpdatedListeners;
     private DateTime mMostRecentMsg;
+    private boolean mRequesting;
 
     private ChatManager() {
         mMessages = new LinkedList<ChatMessage>();
@@ -180,6 +181,11 @@ public class ChatManager implements BackgroundDetector.BackgroundChangeHandler {
     }
 
     private void requestMessages(final Context context, final DateTime since) {
+        if (mRequesting) {
+            return;
+        }
+        mRequesting = true;
+
         new AsyncTask<Void, Void, ArrayList<ChatMessage>>() {
             @Override
             protected ArrayList<ChatMessage> doInBackground(Void... arg0) {
@@ -208,6 +214,8 @@ public class ChatManager implements BackgroundDetector.BackgroundChangeHandler {
                 for (ChatMessage msg : msgs) {
                     addMessage(context, msg);
                 }
+
+                mRequesting = false;
             }
         }.execute();
     }

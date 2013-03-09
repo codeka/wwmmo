@@ -107,7 +107,7 @@ public class BackgroundDetector {
 
         fireBackgroundChangeHandlers(activity);
     }
-    
+
     private void transitionToBackground(final BaseActivity activity) {
         if (mIsTransitioningToBackground) {
             return;
