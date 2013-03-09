@@ -1,6 +1,7 @@
 """chat.py: Module that handles the chat aspect of the game."""
 
 import base64
+import cgi
 from datetime import datetime, timedelta
 import logging
 
@@ -13,10 +14,15 @@ from model import chat as chat_mdl
 
 from protobufs import messages_pb2 as pb
 
+
+def _sanitizeMessage(msg):
+  return cgi.escape(msg)
+
+
 def postMessage(user, msg_pb):
   msg_model = chat_mdl.ChatMessage()
   msg_model.user = user
-  msg_model.message = msg_pb.message
+  msg_model.message = _sanitizeMessage(msg_pb.message)
   if msg_pb.empire_key:
     msg_model.empire = db.Key(msg_pb.empire_key)
   msg_model.put()
@@ -54,6 +60,7 @@ def getLatestChats(since=None, max_chats=None):
   for chat_msg_mdl in query:
     chat_msg_pb = chat_msgs_pb.messages.add()
     ctrl.chatMessageModelToPb(chat_msg_pb, chat_msg_mdl)
+    chat_msg_pb.message = _sanitizeMessage(chat_msg_pb.message)
     if max_chats and n >= max_chats:
       break
   return chat_msgs_pb

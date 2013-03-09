@@ -110,6 +110,7 @@ class BuildCheckPage(tasks.TaskPage):
           model.buildTime = datetime.now()
           model.put()
           log_msg["building"] = model.designName
+        ctrl.incrCount("buildings:"+str(empire_key))
       else:
         # if it's not a building, it must be a ship. We'll try to find a fleet that'll
         # work, but if we can't it's not a big deal -- just create a new one. Duplicates

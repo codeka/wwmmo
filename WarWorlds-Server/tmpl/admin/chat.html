@@ -45,18 +45,25 @@
       $val.val("").focus();
     });
 
-    var g_empires = {};
+    var g_empire_names = window.localStorage.getItem("empires");
+    if (!g_empire_names) {
+      g_empire_names = {};
+    } else {
+      g_empire_names = JSON.parse(g_empire_names);
+    }
+
     function getEmpire(empireKey, callback) {
-      if (typeof g_empires[empireKey] != "undefined") {
-        callback(g_empires[empireKey]);
+      if (typeof g_empire_names[empireKey] != "undefined") {
+        callback(g_empire_names[empireKey]);
       } else {
         $.ajax({
           "url": "/api/v1/empires/"+empireKey,
           "dataType": "json",
           "method": "GET",
           "success": function(data) {
-            g_empires[data.key] = data;
-            callback(data);
+            g_empire_names[data.key] = data.display_name;
+            window.localStorage.setItem("empires", JSON.stringify(g_empire_names));
+            callback(data.display_name);
           }
         });
       }
@@ -70,7 +77,7 @@
             appendMessage(msg);
           });
         } else {
-          msg.empire = {display_name: "[SERVER]"};
+          msg.empire = "[SERVER]";
           appendMessage(msg);
         }
         return;
@@ -86,16 +93,19 @@
       var dtstr = dt.getFullYear()+"-"+zeroPad(dt.getMonth() + 1, 2)+"-"+zeroPad(dt.getDay(), 2);
       dtstr += " "+zeroPad(dt.getHours(), 2)+":"+zeroPad(dt.getMinutes(), 2);
 
-      var msgstr = dtstr+" : "+msg.empire.display_name+" : "+msg.message;
+      var msgstr = dtstr+" : "+msg.empire+" : "+msg.message;
 
       var div = $("<div>"+msgstr+"</div>");
       div.data("dt", msg.date_posted);
       $("section#messages").append(div);
+    }
+
+    function sortMessages() {
       var items = $("section#messages").children().detach().sort(function(lhs, rhs) {
-        var n = $(rhs).data("dt") - $(lhs).data("dt");
-        return -(n < 0 ? -1 : (n > 0 ? 1 : 0));
-      });
-      $("section#messages").append(items);
+          var n = $(rhs).data("dt") - $(lhs).data("dt");
+          return -(n < 0 ? -1 : (n > 0 ? 1 : 0));
+        });
+        $("section#messages").append(items);
     }
 
     function sendMessage(msg) {
@@ -131,6 +141,7 @@
             var msg = data.messages[i];
             appendMessage(msg);
           }
+          sortMessages();
           lastFetch = new Date();
         }
       });

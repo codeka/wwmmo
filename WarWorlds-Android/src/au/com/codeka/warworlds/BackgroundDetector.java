@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Handler;
@@ -67,10 +68,10 @@ public class BackgroundDetector {
         }
     }
 
-    private void fireBackgroundChangeHandlers() {
+    private void fireBackgroundChangeHandlers(Context context) {
         synchronized(mBackgroundChangeHandlers) {
             for (BackgroundChangeHandler handler : mBackgroundChangeHandlers) {
-                handler.onBackgroundChange(mIsInBackground);
+                handler.onBackgroundChange(context, mIsInBackground);
             }
         }
     }
@@ -104,7 +105,7 @@ public class BackgroundDetector {
             }
         }.execute();
 
-        fireBackgroundChangeHandlers();
+        fireBackgroundChangeHandlers(activity);
     }
     
     private void transitionToBackground(final BaseActivity activity) {
@@ -174,6 +175,6 @@ public class BackgroundDetector {
     }
 
     public interface BackgroundChangeHandler {
-        public void onBackgroundChange(boolean isInBackground);
+        public void onBackgroundChange(Context context, boolean isInBackground);
     }
 }

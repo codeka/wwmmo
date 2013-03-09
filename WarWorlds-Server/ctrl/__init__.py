@@ -38,6 +38,21 @@ def clearCached(keys):
   mc.delete_multi(keys)
 
 
+def getCount(name):
+  mc = memcache.Client()
+  count = mc.get("counter:"+name)
+  if not count:
+    count = mdl.ShardedCounter.getCount(name)
+    mc.set("counter:"+name, count)
+  return count
+
+
+def incrCount(name, delta=1):
+  mc = memcache.Client()
+  mc.incr("counter:"+name, delta)
+  mdl.ShardedCounter.increment(name, delta)
+
+
 def deviceRegistrationPbToModel(model, pb):
   if pb.HasField("key"):
     model.key = pb.key

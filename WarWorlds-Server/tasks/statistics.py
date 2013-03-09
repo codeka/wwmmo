@@ -4,9 +4,9 @@ from datetime import datetime, timedelta
 import os
 import webapp2 as webapp
 
-from google.appengine.api import taskqueue
 from google.appengine.ext import deferred
 
+import ctrl as ctl 
 import model as mdl
 from model import empire as empire_mdl
 from model import statistics as stats_mdl
@@ -54,7 +54,7 @@ def update_empire_score(empire_key):
       stars.append(star_key)
     totalColonies += 1
   totalStars = len(stars)
-  totalBuildings = empire_mdl.Building.all().filter("empire", empire_key).count()
+  totalBuildings = ctl.getCount("buildings:"+str(empire_key))
 
   empire_rank_mdl = None
   for mdl in stats_mdl.EmpireRank.all().filter("empire", empire_key).fetch(1):
@@ -104,7 +104,20 @@ class UpdateRankingsPage(tasks.TaskPage):
     update_rankings()
 
 
+def _update_empire_building_count(empire_key):
+  totalBuildings = empire_mdl.Building.all().filter("empire", empire_key).count(limit=5000)
+  ctl.incrCount("buildings:"+str(empire_key), totalBuildings)
+
+
+class RefreshBuildingCountsPage(tasks.TaskPage):
+  def get(self):
+    for empire_key in empire_mdl.Empire.all(keys_only=True):
+      deferred.defer(_update_empire_building_count, empire_key,
+                     _queue="statistics")
+
+
 app = webapp.WSGIApplication([("/tasks/stats/generate", GeneratePage),
-                              ("/tasks/stats/update-rankings", UpdateRankingsPage)],
+                              ("/tasks/stats/update-rankings", UpdateRankingsPage),
+                              ("/tasks/stats/refresh-building-counts", RefreshBuildingCountsPage)],
                              debug=os.environ["SERVER_SOFTWARE"].startswith("Development"))
 
