@@ -52,7 +52,7 @@ def getEmpiresByName(name):
   empires = []
   for empire_key in (mdl.Empire.all(keys_only=True)
                                .filter("searchName >=", name)
-                               .filter("searchName <", name+u"\ufffd").fetch(1)):
+                               .filter("searchName <", name+u"\ufffd")):
     empires.append(getEmpire(str(empire_key)))
   return empires
 

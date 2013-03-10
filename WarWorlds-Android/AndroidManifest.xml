@@ -76,6 +76,9 @@
         <activity android:name=".game.EmpireActivity"
                   android:screenOrientation="portrait" />
 
+        <activity android:name=".game.EnemyEmpireActivity"
+                  android:screenOrientation="portrait" />
+
         <activity android:name=".game.starfield.StarfieldActivity"
                   android:screenOrientation="portrait" />
 

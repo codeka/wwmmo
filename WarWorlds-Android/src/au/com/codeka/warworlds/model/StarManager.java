@@ -148,7 +148,9 @@ public class StarManager {
 
             @Override
             protected void onPostExecute(StarSummary starSummary) {
-                callback.onStarSummaryFetched(starSummary);
+                if (starSummary != null) {
+                    callback.onStarSummaryFetched(starSummary);
+                }
             }
         }.execute();
     }

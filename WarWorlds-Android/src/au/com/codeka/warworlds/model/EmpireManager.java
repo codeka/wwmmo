@@ -304,6 +304,45 @@ public class EmpireManager {
         }.execute();
     }
 
+    public void searchEmpires(final Context context, final String nameSearch,
+                              final EmpiresFetchedHandler handler) {
+        new AsyncTask<Void, Void, List<Empire>>() {
+            @Override
+            protected List<Empire> doInBackground(Void... arg0) {
+                List<Empire> empires = new ArrayList<Empire>();
+
+                try {
+                    String url = "empires/search?name="+nameSearch;
+
+                    Messages.Empires pb = ApiClient.getProtoBuf(url, Messages.Empires.class);
+
+                    LocalEmpireStore les = new LocalEmpireStore(context);
+                    for (Messages.Empire empire_pb : pb.getEmpiresList()) {
+                        les.addEmpire(empire_pb);
+                        empires.add(Empire.fromProtocolBuffer(empire_pb));
+                    }
+                } catch(Exception e) {
+                    // TODO: handle exceptions
+                    log.error(ExceptionUtils.getStackTrace(e));
+                }
+
+                return empires;
+            }
+
+            @Override
+            protected void onPostExecute(List<Empire> empires) {
+                for (Empire empire : empires) {
+                    if (!empire.getKey().equals(mEmpire.getKey())) {
+                        mEmpireCache.put(empire.getKey(), empire);
+                        fireEmpireUpdated(empire);
+                    }
+                }
+
+                handler.onEmpiresFetched(empires);
+            }
+        }.execute();
+    }
+
     public interface EmpireFetchedHandler {
         public void onEmpireFetched(Empire empire);
     }

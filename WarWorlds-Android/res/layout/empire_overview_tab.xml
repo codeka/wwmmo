@@ -37,12 +37,33 @@
         android:layout_alignParentLeft="true"
         android:text="Rankings" />
 
+
+    <EditText
+        android:id="@+id/empire_search"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/infobar"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="84dp"
+        android:ems="10"
+        android:imeOptions="actionSearch" />
+
+    <Button
+        android:id="@+id/search_btn"
+        android:layout_width="80dp"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@id/empire_search"
+        android:layout_alignBottom="@id/empire_search"
+        android:layout_alignParentRight="true"
+        android:text="Search" />
+
     <ListView
         android:id="@+id/empire_rankings"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@id/ranking_title"
-        android:layout_above="@id/infobar"
+        android:layout_above="@id/empire_search"
         android:layout_marginLeft="@dimen/tablet_margin"
         android:layout_marginRight="@dimen/tablet_margin"  />
 

@@ -15,15 +15,21 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.text.Html;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AbsListView;
+import android.widget.AdapterView;
 import android.widget.BaseAdapter;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.TextView.OnEditorActionListener;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.ServerGreeter;
 import au.com.codeka.warworlds.ServerGreeter.ServerGreeting;
@@ -134,28 +140,44 @@ public class EmpireActivity extends TabFragmentActivity {
     }
 
     public static class OverviewFragment extends BaseFragment {
+        private View mView;
+        private RankListAdapter mRankListAdapter;
+
         @Override
         public View onCreateView(LayoutInflater inflator, ViewGroup container, Bundle savedInstanceState) {
             if (sCurrentEmpire == null) {
                 return getLoadingView(inflator);
             }
 
-            final View v = inflator.inflate(R.layout.empire_overview_tab, null);
-            final RankListAdapter rankListAdapter = new RankListAdapter();
+            mView = inflator.inflate(R.layout.empire_overview_tab, null);
+            mRankListAdapter = new RankListAdapter();
 
             MyEmpire empire = EmpireManager.getInstance().getEmpire();
 
-            TextView empireName = (TextView) v.findViewById(R.id.empire_name);
-            ImageView empireIcon = (ImageView) v.findViewById(R.id.empire_icon);
+            TextView empireName = (TextView) mView.findViewById(R.id.empire_name);
+            ImageView empireIcon = (ImageView) mView.findViewById(R.id.empire_icon);
 
             empireName.setText(empire.getDisplayName());
             empireIcon.setImageBitmap(empire.getShield(getActivity()));
 
-            final ProgressBar progress = (ProgressBar) v.findViewById(R.id.progress_bar);
-            final ListView rankList = (ListView) v.findViewById(R.id.empire_rankings);
+            final ProgressBar progress = (ProgressBar) mView.findViewById(R.id.progress_bar);
+            final ListView rankList = (ListView) mView.findViewById(R.id.empire_rankings);
             progress.setVisibility(View.VISIBLE);
             rankList.setVisibility(View.GONE);
-            rankList.setAdapter(rankListAdapter);
+            rankList.setAdapter(mRankListAdapter);
+
+            rankList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view,
+                        int position, long id) {
+                    RankListAdapter.ItemEntry item = (RankListAdapter.ItemEntry) mRankListAdapter.getItem(position);
+                    if (item.empire != null) {
+                        Intent intent = new Intent(getActivity(), EnemyEmpireActivity.class);
+                        intent.putExtra("au.com.codeka.warworlds.EmpireKey", item.empire.getKey());
+                        getActivity().startActivity(intent);
+                    }
+                }
+            });
 
             MyEmpire myEmpire = EmpireManager.getInstance().getEmpire();
             int minRank = 1;
@@ -170,18 +192,64 @@ public class EmpireActivity extends TabFragmentActivity {
                     new EmpireManager.EmpiresFetchedHandler() {
                         @Override
                         public void onEmpiresFetched(List<Empire> empires) {
-                            rankListAdapter.setEmpires(empires);
+                            mRankListAdapter.setEmpires(empires, true);
                             rankList.setVisibility(View.VISIBLE);
                             progress.setVisibility(View.GONE);
                         }
                     });
-            return v;
+
+            TextView empireSearch = (TextView) mView.findViewById(R.id.empire_search);
+            empireSearch.setOnEditorActionListener(new OnEditorActionListener() {
+                @Override
+                public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                    if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+                        onEmpireSearch();
+                        return true;
+                    }
+                    return false;
+                }
+            });
+
+            final Button searchBtn = (Button) mView.findViewById(R.id.search_btn);
+            searchBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    onEmpireSearch();
+                }
+            });
+
+            return mView;
+        }
+
+        private void onEmpireSearch() {
+            final TextView empireSearch = (TextView) mView.findViewById(R.id.empire_search);
+            final ProgressBar progress = (ProgressBar) mView.findViewById(R.id.progress_bar);
+            final ListView rankList = (ListView) mView.findViewById(R.id.empire_rankings);
+
+            progress.setVisibility(View.VISIBLE);
+            rankList.setVisibility(View.GONE);
+
+            // hide the soft keyboard (if showing) while the search happens
+            InputMethodManager imm = (InputMethodManager) mView.getContext().getSystemService(
+                    Context.INPUT_METHOD_SERVICE);
+            imm.hideSoftInputFromWindow(empireSearch.getWindowToken(), 0);
+
+            String nameSearch = empireSearch.getText().toString();
+            EmpireManager.getInstance().searchEmpires(getActivity(), nameSearch,
+                    new EmpireManager.EmpiresFetchedHandler() {
+                        @Override
+                        public void onEmpiresFetched(List<Empire> empires) {
+                            mRankListAdapter.setEmpires(empires, false);
+                            rankList.setVisibility(View.VISIBLE);
+                            progress.setVisibility(View.GONE);
+                        }
+                    });
         }
 
         private class RankListAdapter extends BaseAdapter {
             private ArrayList<ItemEntry> mEntries;
 
-            public void setEmpires(List<Empire> empires) {
+            public void setEmpires(List<Empire> empires, boolean addGaps) {
                 mEntries = new ArrayList<ItemEntry>();
 
                 Collections.sort(empires, new Comparator<Empire>() {
@@ -200,7 +268,8 @@ public class EmpireActivity extends TabFragmentActivity {
                 int lastRank = 0;
                 for (Empire empire : empires) {
                     if (lastRank != 0 && empire.getRank() != null &&
-                            empire.getRank().getRank() != lastRank + 1) {
+                            empire.getRank().getRank() != lastRank + 1 &&
+                            addGaps) {
                         mEntries.add(new ItemEntry(null));
                     }
                     lastRank = empire.getRank().getRank();
@@ -227,8 +296,11 @@ public class EmpireActivity extends TabFragmentActivity {
 
             @Override
             public boolean isEnabled(int position) {
-                // TODO: tapping empire does something?
-                return false;
+                if (mEntries == null)
+                    return false;
+                if (mEntries.get(position).empire == null)
+                    return false;
+                return true;
             }
 
             @Override
