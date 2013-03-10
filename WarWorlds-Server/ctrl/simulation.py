@@ -412,7 +412,7 @@ class Simulation(object):
             end_time = now + timedelta(hours=time_remaining_in_hours)
             min_end_time = ctrl.dateTimeToEpoch(end_time)
             if build_request.end_time > min_end_time:
-               build_request.end_time = min_end_time
+              build_request.end_time = min_end_time
             self.log("no progress this turn (building complete?), setting end_time = %s" % (end_time))
             continue
 
@@ -643,6 +643,9 @@ class Simulation(object):
             fleet_pb.state = pb.Fleet.IDLE
       if ((fleet_pb.stance == pb.Fleet.AGGRESSIVE or fleet_pb.state == pb.Fleet.ATTACKING) and
            not fleet_pb.target_fleet_key):
+        if fleet_pb.state == pb.Fleet.MOVING:
+          # fleeing fleets don't attack anything
+          continue
         state_start_time = ctrl.epochToDateTime(fleet_pb.state_start_time)
         if state_start_time >= now:
           continue
@@ -652,6 +655,9 @@ class Simulation(object):
           if potential_target_fleet_pb.time_destroyed:
             continue
           if potential_target_fleet_pb.empire_key == fleet_pb.empire_key:
+            continue
+          if potential_target_fleet_pb.state == pb.Fleet.MOVING:
+            # ignore fleeing fleets
             continue
           fleet_pb.target_fleet_key = potential_target_fleet_pb.key
           fleet_pb.state = pb.Fleet.ATTACKING
