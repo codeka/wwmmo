@@ -14,7 +14,6 @@ import au.com.codeka.warworlds.ServerGreeter;
 import au.com.codeka.warworlds.WarWorldsActivity;
 import au.com.codeka.warworlds.ServerGreeter.ServerGreeting;
 import au.com.codeka.warworlds.game.starfield.StarfieldActivity;
-import au.com.codeka.warworlds.game.starfield.TacticalMapActivity;
 import au.com.codeka.warworlds.model.Empire;
 import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.StarSummary;

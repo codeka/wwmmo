@@ -2,6 +2,7 @@ package au.com.codeka.warworlds.game;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -31,7 +32,7 @@ public class StarfieldBackgroundRenderer {
     private GlobalOptions.StarfieldDetail mStarfieldDetail;
     private long[] mSeeds;
     private Paint mBackgroundPaint;
-    private Bitmap mPreRendered;
+    private WeakReference<Bitmap> mPreRendered;
 
     private static List<Bitmap> sBgStars;
     private static List<Bitmap> sBgGases;
@@ -51,15 +52,16 @@ public class StarfieldBackgroundRenderer {
         initialize(context);
     }
 
-    public Bitmap getPreRenderer() {
-        return mPreRendered;
-    }
-
     public void drawBackground(Canvas canvas, float left, float top, float right, float bottom) {
         if (mPreRendered != null) {
+            Bitmap bmp = mPreRendered.get();
+            if (bmp == null) {
+                bmp = reload();
+            }
+
             Rect src = new Rect(0, 0, 512, 512);
             RectF dest = new RectF(left * mPixelScale, top * mPixelScale, right * mPixelScale, bottom * mPixelScale);
-            canvas.drawBitmap(mPreRendered, src, dest, mBackgroundPaint);
+            canvas.drawBitmap(bmp, src, dest, mBackgroundPaint);
         } else {
             canvas.drawRect(left * mPixelScale,
                             top * mPixelScale,
@@ -70,7 +72,10 @@ public class StarfieldBackgroundRenderer {
 
     public void close() {
         if (mPreRendered != null) {
-            mPreRendered.recycle();
+            Bitmap bmp = mPreRendered.get();
+            if (bmp != null) {
+                bmp.recycle();
+            }
         }
     }
 
@@ -87,13 +92,19 @@ public class StarfieldBackgroundRenderer {
         }
 
         if (shouldDrawStars() || shouldDrawGas()) {
-            mPreRendered = Bitmap.createBitmap(512, 512, Bitmap.Config.ARGB_8888);
-            render(mPreRendered);
+            reload();
         } else {
             mBackgroundPaint = new Paint();
             mBackgroundPaint.setStyle(Style.FILL);
             mBackgroundPaint.setARGB(255, 0, 0, 0);
         }
+    }
+
+    private Bitmap reload() {
+        Bitmap bmp = Bitmap.createBitmap(512, 512, Bitmap.Config.ARGB_8888);
+        render(bmp);
+        mPreRendered = new WeakReference<Bitmap>(bmp);
+        return bmp;
     }
 
     /**

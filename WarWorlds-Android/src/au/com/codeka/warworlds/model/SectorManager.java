@@ -163,109 +163,115 @@ public class SectorManager {
 
         Map<Pair<Long, Long>, Sector> existingSectors = new TreeMap<Pair<Long, Long>, Sector>();
         final List<Pair<Long, Long>> missingSectors = new ArrayList<Pair<Long, Long>>();
-        for (Pair<Long, Long> coord : coords) {
-            Sector s = mSectors.get(coord);
-            if (s != null && !force) {
-                existingSectors.put(coord, s);
-            } else if (mInTransitListeners.containsKey(coord) && callback != null) {
-                List<OnSectorsFetchedListener> listeners = mInTransitListeners.get(coord);
-                listeners.add(callback);
-            } else if (!mInTransitListeners.containsKey(coord)) {
-                missingSectors.add(coord);
-            }
-        }
-
-        if (!existingSectors.isEmpty() && callback != null) {
-            callback.onSectorsFetched(existingSectors);
-        }
-
-        if (!missingSectors.isEmpty()) {
-            // record the fact that we've now got these sectors in transit
-            for (Pair<Long, Long> coord : missingSectors) {
-                mInTransitListeners.put(coord, new ArrayList<OnSectorsFetchedListener>());
+        synchronized(this) {
+            for (Pair<Long, Long> coord : coords) {
+                Sector s = mSectors.get(coord);
+                if (s != null && !force) {
+                    existingSectors.put(coord, s);
+                } else if (mInTransitListeners.containsKey(coord)) {
+                    if (callback != null) {
+                        List<OnSectorsFetchedListener> listeners = mInTransitListeners.get(coord);
+                        listeners.add(callback);
+                    }
+                } else {
+                    missingSectors.add(coord);
+                }
             }
 
-            new AsyncTask<Void, Void, List<Sector>>() {
-                @Override
-                protected List<Sector> doInBackground(Void... arg0) {
-                    List<Sector> sectors = null;
+            if (!existingSectors.isEmpty() && callback != null) {
+                callback.onSectorsFetched(existingSectors);
+            }
 
-                    String url = "";
-                    for(Pair<Long, Long> coord : missingSectors) {
-                        if (url.length() != 0) {
-                            url += "%7C"; // Java doesn't like "|" for some reason (it's valid!!)
-                        }
-                        url += String.format("%d,%d", coord.one, coord.two);
-                    }
-                    url = "sectors?coords="+url;
-                    try {
-                        Messages.Sectors pb = ApiClient.getProtoBuf(url, Messages.Sectors.class);
-                        sectors = Sector.fromProtocolBuffer(pb.getSectorsList());
-                    } catch(Exception e) {
-                        log.error(ExceptionUtils.getStackTrace(e));
-                    }
-
-                    return sectors;
+            if (!missingSectors.isEmpty()) {
+                // record the fact that we've now got these sectors in transit
+                for (Pair<Long, Long> coord : missingSectors) {
+                    mInTransitListeners.put(coord, new ArrayList<OnSectorsFetchedListener>());
                 }
 
-                @Override
-                protected void onPostExecute(List<Sector> sectors) {
-                    if (sectors == null) {
-                        return; // BAD!
+                new AsyncTask<Void, Void, List<Sector>>() {
+                    @Override
+                    protected List<Sector> doInBackground(Void... arg0) {
+                        List<Sector> sectors = null;
+
+                        String url = "";
+                        for(Pair<Long, Long> coord : missingSectors) {
+                            if (url.length() != 0) {
+                                url += "%7C"; // Java doesn't like "|" for some reason (it's valid!!)
+                            }
+                            url += String.format("%d,%d", coord.one, coord.two);
+                        }
+                        url = "sectors?coords="+url;
+                        try {
+                            Messages.Sectors pb = ApiClient.getProtoBuf(url, Messages.Sectors.class);
+                            sectors = Sector.fromProtocolBuffer(pb.getSectorsList());
+                        } catch(Exception e) {
+                            log.error(ExceptionUtils.getStackTrace(e));
+                        }
+
+                        return sectors;
                     }
 
-                    Map<Pair<Long, Long>, Sector> theseSectors = null;
-                    if (callback != null)
-                        theseSectors = new TreeMap<Pair<Long, Long>, Sector>();
-                    for(Sector s : sectors) {
-                        Pair<Long, Long> key = new Pair<Long, Long>(s.getX(), s.getY());
-                        log.debug(String.format("Fetched sector (%d, %d)", s.getX(), s.getY()));
-
-                        mSectors.put(key, s);
-                        if (callback != null) {
-                            theseSectors.put(key, s);
+                    @Override
+                    protected void onPostExecute(List<Sector> sectors) {
+                        if (sectors == null) {
+                            return; // BAD!
                         }
 
-                        for (Star star : s.getStars()) {
-                            mSectorStars.put(star.getKey(), star);
-                        }
+                        Map<Pair<Long, Long>, Sector> theseSectors = null;
+                        synchronized(this) {
+                            if (callback != null)
+                                theseSectors = new TreeMap<Pair<Long, Long>, Sector>();
+                            for(Sector s : sectors) {
+                                Pair<Long, Long> key = new Pair<Long, Long>(s.getX(), s.getY());
+                                log.debug(String.format("Fetched sector (%d, %d)", s.getX(), s.getY()));
 
-                        Map<Pair<Long, Long>, Sector> thisSector = null;
-                        List<OnSectorsFetchedListener> listeners = mInTransitListeners.get(key);
-                        if (listeners != null) {
-                            for (OnSectorsFetchedListener listener : listeners) {
-                                if (listener != null) {
-                                    if (thisSector == null) {
-                                        thisSector = new TreeMap<Pair<Long, Long>, Sector>();
-                                        thisSector.put(key, s);
+                                mSectors.put(key, s);
+                                if (callback != null) {
+                                    theseSectors.put(key, s);
+                                }
+
+                                for (Star star : s.getStars()) {
+                                    mSectorStars.put(star.getKey(), star);
+                                }
+
+                                Map<Pair<Long, Long>, Sector> thisSector = null;
+                                List<OnSectorsFetchedListener> listeners = mInTransitListeners.get(key);
+                                if (listeners != null) {
+                                    for (OnSectorsFetchedListener listener : listeners) {
+                                        if (listener != null) {
+                                            if (thisSector == null) {
+                                                thisSector = new TreeMap<Pair<Long, Long>, Sector>();
+                                                thisSector.put(key, s);
+                                            }
+
+                                            listener.onSectorsFetched(thisSector);
+                                        }
                                     }
-
-                                    listener.onSectorsFetched(thisSector);
                                 }
                             }
+
+                            for (Pair<Long, Long> coord : missingSectors) {
+                                mInTransitListeners.remove(coord);
+                            }
                         }
-                    }
 
-                    for (Pair<Long, Long> coord : missingSectors) {
-                        mInTransitListeners.remove(coord);
+                        if (callback != null) {
+                            callback.onSectorsFetched(theseSectors);
+                        }
+                        fireSectorListChanged();
                     }
-
-                    if (callback != null) {
-                        callback.onSectorsFetched(theseSectors);
-                    }
-                    fireSectorListChanged();
-                }
-            }.execute();
+                }.execute();
+            }
         }
     }
 
     private static class SectorCache {
-        LruCache<String, StarfieldBackgroundRenderer> mBackgroundRenderers;
+        BackgroundRendererCache mBackgroundRenderers;
         LruCache<String, Sector> mSectors;
 
         public SectorCache() {
             mSectors = new LruCache<String, Sector>(30);
-            mBackgroundRenderers = new LruCache<String, StarfieldBackgroundRenderer>(9);
+            mBackgroundRenderers = new BackgroundRendererCache();
         }
 
         public static String key(Pair<Long, Long> coord) {
@@ -301,6 +307,23 @@ public class SectorManager {
 
         public Collection<Sector> getAllSectors() {
             return mSectors.snapshot().values();
+        }
+
+        private class BackgroundRendererCache extends LruCache<String, StarfieldBackgroundRenderer> {
+            public BackgroundRendererCache() {
+                super(9);
+            }
+
+            @Override
+            protected void entryRemoved(boolean evicted, String key,
+                                        StarfieldBackgroundRenderer oldValue,
+                                        StarfieldBackgroundRenderer newValue) {
+                if (oldValue != null) {
+                    // by explicitly calling close, we free the memory before the GC has to run,
+                    // which seems to be a little more robust than just relying on GC...
+                    oldValue.close();
+                }
+            }
         }
     }
 

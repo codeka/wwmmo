@@ -28,12 +28,22 @@ public class MyEmpire extends Empire {
     private List<BuildRequest> mAllBuildRequests;
     private Map<String, Star> mStars;
     private List<RefreshAllCompleteHandler> mRefreshAllCompleteHandlers;
+    private boolean mIsDirty;
 
     // make sure we don't collect taxes twice
     private boolean mCollectingTaxes = false;
 
     public MyEmpire() {
         mRefreshAllCompleteHandlers = new ArrayList<RefreshAllCompleteHandler>();
+        mIsDirty = true;
+    }
+
+    /**
+     * If you don't call setDirty() first, then refreshAll() just resimulates and doesn't actually
+     * refresh from the server.
+     */
+    public void setDirty() {
+        mIsDirty = true;
     }
 
     public void addRefreshAllCompleteHandler(RefreshAllCompleteHandler handler) {
@@ -265,46 +275,6 @@ public class MyEmpire extends Empire {
         }.execute();
     }
 
-    /**
-     * Refreshes all the details of this empire (e.g. collection of colonies, fleets etc)
-     */
-    public void refreshAllDetails(final RefreshAllCompleteHandler callback) {
-        new AsyncTask<Void, Void, Boolean>() {
-            @Override
-            protected Boolean doInBackground(Void... arg0) {
-                try {
-                    String url = "empires/"+getKey()+"/details?do_simulate=0";
-
-                    Messages.Empire pb = ApiClient.getProtoBuf(url, Messages.Empire.class);
-                    if (pb == null)
-                        return false;
-
-                    populateFromProtocolBuffer(pb);
-                    return true;
-                } catch(Exception e) {
-                    // TODO: handle exceptions
-                    log.error(ExceptionUtils.getStackTrace(e));
-                    return false;
-                }
-            }
-
-            @Override
-            protected void onPostExecute(Boolean success) {
-                if (!success) {
-                    return;
-                }
-
-                if (callback != null) {
-                    callback.onRefreshAllComplete(MyEmpire.this);
-                }
-                fireRefreshAllCompleteHandler();
-
-                // also, anybody waiting for updates from empires in general
-                EmpireManager.getInstance().fireEmpireUpdated(MyEmpire.this);
-            }
-        }.execute();
-    }
-
     public void attackColony(final Context context, final Star star,
                              final Colony colony,
                              final AttackColonyCompleteHandler callback) {
@@ -335,6 +305,51 @@ public class MyEmpire extends Empire {
                 if (callback != null) {
                     callback.onComplete();
                 }
+            }
+        }.execute();
+    }
+
+    /**
+     * Refreshes all the details of this empire (e.g. collection of colonies, fleets etc)
+     */
+    public void refreshAllDetails(final RefreshAllCompleteHandler callback) {
+        new AsyncTask<Void, Void, Boolean>() {
+            @Override
+            protected Boolean doInBackground(Void... arg0) {
+                try {
+                    if (!mIsDirty) {
+                        simulate();
+                    } else {
+                        String url = "empires/"+getKey()+"/details?do_simulate=0";
+
+                        Messages.Empire pb = ApiClient.getProtoBuf(url, Messages.Empire.class);
+                        if (pb == null)
+                            return false;
+
+                        populateFromProtocolBuffer(pb);
+                        mIsDirty = false;
+                    }
+                    return true;
+                } catch(Exception e) {
+                    // TODO: handle exceptions
+                    log.error(ExceptionUtils.getStackTrace(e));
+                    return false;
+                }
+            }
+
+            @Override
+            protected void onPostExecute(Boolean success) {
+                if (!success) {
+                    return;
+                }
+
+                if (callback != null) {
+                    callback.onRefreshAllComplete(MyEmpire.this);
+                }
+                fireRefreshAllCompleteHandler();
+
+                // also, anybody waiting for updates from empires in general
+                EmpireManager.getInstance().fireEmpireUpdated(MyEmpire.this);
             }
         }.execute();
     }
@@ -433,6 +448,10 @@ public class MyEmpire extends Empire {
         }
         mStars = stars;
 
+        simulate();
+    }
+
+    private void simulate() {
         Simulation sim = new Simulation();
         for (Star star : mStars.values()) {
             sim.simulate(star);

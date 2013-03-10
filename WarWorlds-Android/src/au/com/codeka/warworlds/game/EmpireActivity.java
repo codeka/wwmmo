@@ -267,9 +267,10 @@ public class EmpireActivity extends TabFragmentActivity {
 
                 int lastRank = 0;
                 for (Empire empire : empires) {
-                    if (lastRank != 0 && empire.getRank() != null &&
-                            empire.getRank().getRank() != lastRank + 1 &&
-                            addGaps) {
+                    if (empire.getRank() == null) {
+                        continue;
+                    }
+                    if (lastRank != 0 && empire.getRank().getRank() != lastRank + 1 && addGaps) {
                         mEntries.add(new ItemEntry(null));
                     }
                     lastRank = empire.getRank().getRank();

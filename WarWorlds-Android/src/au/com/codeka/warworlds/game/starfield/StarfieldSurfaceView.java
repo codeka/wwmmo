@@ -389,7 +389,6 @@ public class StarfieldSurfaceView extends SectorView
 
         mHqOverlay.setEnabled(true);
         mVisibleEntities.clear();
-        mVisibleEmpires.clear();
         final List<Pair<Long, Long>> missingSectors = drawScene(canvas);
 
         drawOverlays(canvas);
