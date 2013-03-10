@@ -15,7 +15,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import android.content.Context;
-import android.os.AsyncTask;
 import au.com.codeka.XmlIterator;
 
 /**

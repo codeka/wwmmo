@@ -1,5 +1,7 @@
 package au.com.codeka.warworlds;
 
+import java.util.Locale;
+
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.media.Ringtone;
@@ -141,8 +143,11 @@ public class GlobalOptionsActivity extends PreferenceActivity
 
             if (!options.isEnabled()) {
                 p.setSummary("Disabled");
+            } else if (ringtone != null) {
+                p.setSummary(String.format(Locale.ENGLISH, "%s, LED: %s",
+                                           ringtone.getTitle(this), colourName));
             } else {
-                p.setSummary(String.format("%s, LED: %s", ringtone.getTitle(this), colourName));
+                p.setSummary(String.format(Locale.ENGLISH, "LED: %s", colourName));
             }
 
             p = getPreferenceScreen().findPreference(prefBaseName+".LedColour");
@@ -152,7 +157,7 @@ public class GlobalOptionsActivity extends PreferenceActivity
 
 
             p = getPreferenceScreen().findPreference(prefBaseName+".Ringtone");
-            if (p != null &&ringtone != null) {
+            if (p != null && ringtone != null) {
                 p.setSummary(ringtone.getTitle(this));
             }
         }

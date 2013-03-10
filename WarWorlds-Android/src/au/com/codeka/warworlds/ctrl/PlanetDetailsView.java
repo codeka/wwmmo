@@ -22,8 +22,10 @@ public class PlanetDetailsView extends FrameLayout {
     private View mView;
     private Star mStar;
     private Planet mPlanet;
-    private Colony mColony;
     private boolean mIsAttachedToWindow;
+
+    @SuppressWarnings("unused") // for now...
+    private Colony mColony;
 
     public PlanetDetailsView(Context context, AttributeSet attrs) {
         super(context, attrs);

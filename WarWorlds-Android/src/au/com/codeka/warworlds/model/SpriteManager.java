@@ -18,7 +18,6 @@ import org.xml.sax.SAXException;
 
 import android.content.Context;
 import android.graphics.Rect;
-import android.os.AsyncTask;
 import au.com.codeka.XmlIterator;
 
 /**
