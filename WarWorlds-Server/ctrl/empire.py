@@ -284,14 +284,15 @@ def calculateEmpireSearchName(name):
 
 
 def createEmpire(empire_pb, sim):
+  (star_key, planet_index) = findStarForNewEmpire()
+  star_pb = sim.getStar(star_key, True)
+
   empire_model = mdl.Empire()
   empire_model.cash = 500.0
   ctrl.empirePbToModel(empire_model, empire_pb)
   empire_model.searchName = calculateEmpireSearchName(empire_model.displayName)
+  empire_model.homeStar = db.Key(star_pb.key)
   empire_model.put()
-
-  (star_key, planet_index) = findStarForNewEmpire()
-  star_pb = sim.getStar(star_key, True)
 
   # by default, the star will have a bunch of native colonies and fleets... drop those!
   for fleet_pb in star_pb.fleets:

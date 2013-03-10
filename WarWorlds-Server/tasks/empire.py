@@ -112,6 +112,12 @@ class BuildCheckPage(tasks.TaskPage):
           model.put()
           log_msg["building"] = model.designName
         ctrl.incrCount("buildings:"+str(empire_key))
+        if build_request_model.designName == "hq":
+          # if you built a HQ, the star you built it on becomes your 'home' star.
+          empire_mdl = mdl.Empire.get(empire_key)
+          empire_mdl.homeStar = star_key
+          empire_mdl.put()
+          keys_to_clear.append("empire:%s" % (str(empire_key)))
       else:
         # if it's not a building, it must be a ship. We'll try to find a fleet that'll
         # work, but if we can't it's not a big deal -- just create a new one. Duplicates
