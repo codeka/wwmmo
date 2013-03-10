@@ -3,7 +3,9 @@ package au.com.codeka.warworlds.game;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
 import android.view.Window;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import au.com.codeka.warworlds.BaseActivity;
@@ -25,6 +27,14 @@ public class EnemyEmpireActivity extends BaseActivity
         requestWindowFeature(Window.FEATURE_NO_TITLE);
 
         setContentView(R.layout.enemy_empire);
+
+        Button viewBtn = (Button) findViewById(R.id.view_btn);
+        viewBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onEmpireViewClick();
+            }
+        });
     }
 
     @Override
@@ -53,5 +63,9 @@ public class EnemyEmpireActivity extends BaseActivity
 
         empireName.setText(mEmpire.getDisplayName());
         empireIcon.setImageBitmap(mEmpire.getShield(mContext));
+    }
+
+    public void onEmpireViewClick() {
+        
     }
 }

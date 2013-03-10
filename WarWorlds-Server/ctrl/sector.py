@@ -243,12 +243,13 @@ def getDistanceBetweenStars(star_1_pb, star_2_pb):
   return distance_in_pixels / 10.0
 
 
-def sumarize(star_pb):
+def sumarize(star_pb, summary_pb=None):
   """Returns a new star_pb that contains only the star and planet details.
 
   We'll strip out colonies, fleets, builds, etc. To make sending this over the wire cheaper
   in cases where that level of detail is not required."""
-  summary_pb = pb.Star()
+  if not summary_pb:
+    summary_pb = pb.Star()
   summary_pb.key = star_pb.key
   summary_pb.sector_x = star_pb.sector_x
   summary_pb.sector_y = star_pb.sector_y

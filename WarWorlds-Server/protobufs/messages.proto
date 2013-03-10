@@ -101,6 +101,11 @@ message Empire
 
     // if specified, contains the details of the empire's rank
     optional EmpireRank rank = 11;
+
+    // if specified, this is the empire's "home star", which is the star we should centre on when
+    // we're asked to view the empire. It's usually the start that contains the HQ or, if they don't
+    // have one, basically just a random star they control.
+    optional Star home_star = 12;
 }
 
 

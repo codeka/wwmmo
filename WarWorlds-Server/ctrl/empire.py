@@ -80,6 +80,10 @@ def getEmpire(empire_key):
   empire_model = mdl.Empire.get(empire_key)
   empire_pb = pb.Empire()
   ctrl.empireModelToPb(empire_pb, empire_model)
+  home_star_key = mdl.Empire.homeStar.get_value_for_datastore(empire_model)
+  if home_star_key:
+    home_star_pb = sector.getStar(str(home_star_key))
+    sector.sumarize(home_star_pb, empire_pb.home_star)
   ctrl.setCached({cache_key: empire_pb})
   return empire_pb
 

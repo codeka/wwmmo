@@ -12,6 +12,7 @@ class Empire(db.Model):
   state = db.IntegerProperty()
   cash = db.FloatProperty()
   searchName = db.StringListProperty()
+  homeStar = db.ReferenceProperty(sector_mdl.Star)
 
   class State:
     INITIAL = 1

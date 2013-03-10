@@ -35,6 +35,8 @@ public class HorizontalSeparator extends TextView {
 
     @Override
     public void onDraw(Canvas canvas) {
+        super.onDraw(canvas);
+
         float y = canvas.getHeight() / 2.0f;
         float x = 0.0f;
 
@@ -43,7 +45,5 @@ public class HorizontalSeparator extends TextView {
             x += this.getPaint().measureText(text) + 8;
         }
         canvas.drawLine(x, y, canvas.getWidth(), y, mPaint);
-
-        super.onDraw(canvas);
     }
 }

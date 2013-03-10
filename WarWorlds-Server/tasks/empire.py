@@ -6,6 +6,7 @@ import os
 
 from google.appengine.ext import db
 from google.appengine.api import taskqueue
+from google.appengine.ext import deferred
 
 import import_fixer
 import_fixer.FixImports("google", "protobuf")
@@ -417,11 +418,69 @@ def _on_move_complete(fleet_mdl):
     ctl.saveSituationReport(sitrep_pb)
 
 
+def _get_home_star(empire_key):
+  empire_pb = ctl.getEmpire(str(empire_key))
+
+  colonies_pb = ctl.getColoniesForEmpire(empire_pb)
+  star_keys = []
+  for colony_pb in colonies_pb.colonies:
+    if colony_pb.star_key not in star_keys:
+      star_keys.append(colony_pb.star_key)
+
+  star_pbs = []
+  for star_key in star_keys:
+    star_pb = sector_ctl.getStar(star_key)
+    # if they're building a hq on this star, then this star is good enough.
+    for build_request_pb in star_pb.build_requests:
+      if build_request_pb.empire_key != str(empire_key):
+        continue
+      if build_request_pb.design_name != "hq":
+        continue
+      return star_pb
+    # if there's already a HQ here, same thing
+    for colony_pb in star_pb.colonies:
+      if colony_pb.empire_key != str(empire_key):
+        continue
+      for building_pb in star_pb.buildings:
+        if building_pb.colony_key != colony_pb.key:
+          continue
+        if building_pb.design_name != "hq":
+          continue
+        return star_pb
+    star_pbs.append(star_pb)
+
+  # if we get here, we shouldn't find a star with a HQ, so basically just choose
+  # a random one.
+  if len(star_pbs) == 0:
+    return None
+  return star_pbs[0]
+
+
+def _set_home_star(empire_key):
+  star_pb = _get_home_star(empire_key)
+  empire_mdl = mdl.Empire.get(empire_key)
+  if star_pb:
+    empire_mdl.homeStar = db.Key(star_pb.key)
+  else:
+    empire_mdl.homeStar = None
+  empire_mdl.put()
+
+
+class SetHomeStarPage(tasks.TaskPage):
+  """This is just a temporary helper that populates the homeStar property of all the empires
+     in the system."""
+  def get(self):
+    for empire_key in mdl.Empire.all(keys_only=True):
+      deferred.defer(_set_home_star, empire_key,
+                     _queue="statistics")
+
+
 app = webapp.WSGIApplication([("/tasks/empire/build-check", BuildCheckPage),
                               ("/tasks/empire/star-simulate", StarSimulatePage),
                               ("/tasks/empire/update-search-name", UpdateSearchNamePage),
                               ("/tasks/empire/move-check", FleetMoveCheckPage),
                               ("/tasks/empire/move-fix", FleetMoveFixPage),
-                              ("/tasks/empire/fleet/([^/]+)/move-complete", FleetMoveCompletePage)],
+                              ("/tasks/empire/fleet/([^/]+)/move-complete", FleetMoveCompletePage),
+                              ("/tasks/empire/set-home-star", SetHomeStarPage)],
                              debug=os.environ["SERVER_SOFTWARE"].startswith("Development"))
 
