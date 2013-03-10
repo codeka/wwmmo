@@ -204,7 +204,33 @@ public class StarfieldActivity extends BaseActivity
         ServerGreeter.waitForHello(this, new ServerGreeter.HelloCompleteHandler() {
             @Override
             public void onHelloComplete(boolean success, ServerGreeting greeting) {
-                findColony(greeting.getColonies());
+                if (!success) {
+                    return;
+                }
+
+                Intent intent = getIntent();
+                if (intent != null && intent.getExtras() != null) {
+                    String starKey = intent.getExtras().getString("au.com.codeka.warworlds.StarKey", null);
+                    if (starKey != null) {
+                        long sectorX = intent.getExtras().getLong("au.com.codeka.warworlds.SectorX");
+                        long sectorY = intent.getExtras().getLong("au.com.codeka.warworlds.SectorY");
+                        int offsetX = intent.getExtras().getInt("au.com.codeka.warworlds.OffsetX");
+                        int offsetY = intent.getExtras().getInt("au.com.codeka.warworlds.OffsetY");
+                        mStarfield.scrollTo(sectorX, sectorY, offsetX, offsetY, true);
+                        return;
+                    }
+                }
+
+                MyEmpire myEmpire = EmpireManager.getInstance().getEmpire();
+                StarSummary homeStar = myEmpire.getHomeStar();
+                if (homeStar != null) {
+                    mStarfield.scrollTo(homeStar.getSectorX(), homeStar.getSectorY(),
+                                        homeStar.getOffsetX(), homeStar.getOffsetY(),
+                                        true);
+                } else {
+                    // this should never happen...
+                    findColony(greeting.getColonies());
+                }
             }
         });
     }

@@ -23,19 +23,17 @@ from protobufs import messages_pb2 as pb
 
 
 def getEmpireForUser(user):
-  cache_key = "empire:for-user:%s" % (user.email())
+  cache_key = "empire-for-user:%s" % (user.email())
   values = ctrl.getCached([cache_key], pb.Empire)
   if cache_key in values:
-    return values[cache_key]
+    return getEmpire(values[cache_key])
 
-  empire_model = mdl.Empire.getForUser(user)
-  if not empire_model:
+  empire_key = mdl.Empire.getForUser(user)
+  if not empire_key:
     return None
 
-  empire_pb = pb.Empire()
-  ctrl.empireModelToPb(empire_pb, empire_model)
-  ctrl.setCached({cache_key: empire_pb})
-  return empire_pb
+  ctrl.setCached({cache_key: str(empire_key)})
+  return getEmpire(str(empire_key))
 
 
 def getEmpireByName(name):

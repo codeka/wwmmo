@@ -21,10 +21,9 @@ class Empire(db.Model):
 
   @staticmethod
   def getForUser(user):
-    result = Empire.all().filter("user", user).fetch(1, 0)
-    if len(result) != 1:
-      return None
-    return result[0]
+    for empire_key in Empire.all().filter("user", user).fetch(1, keys_only=True):
+      return empire_key
+    return None
 
 
 class Colony(db.Model):

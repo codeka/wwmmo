@@ -20,6 +20,7 @@ public class Empire implements Parcelable {
     private Bitmap mEmpireShield;
     protected float mCash;
     private EmpireRank mRank;
+    private StarSummary mHomeStar;
 
     private static Bitmap sBaseShield;
 
@@ -34,6 +35,9 @@ public class Empire implements Parcelable {
     }
     public EmpireRank getRank() {
         return mRank;
+    }
+    public StarSummary getHomeStar() {
+        return mHomeStar;
     }
 
     /**
@@ -96,11 +100,13 @@ public class Empire implements Parcelable {
     public void writeToParcel(Parcel parcel, int flags) {
         parcel.writeString(mKey);
         parcel.writeString(mDisplayName);
+        parcel.writeParcelable(mHomeStar, flags);
     }
 
     protected void readFromParcel(Parcel parcel) {
         mKey = parcel.readString();
         mDisplayName = parcel.readString();
+        mHomeStar = (StarSummary) parcel.readParcelable(StarSummary.class.getClassLoader());
     }
 
     public static final Parcelable.Creator<Empire> CREATOR
@@ -133,8 +139,14 @@ public class Empire implements Parcelable {
         mDisplayName = pb.getDisplayName();
         mCash = pb.getCash();
 
-        if (pb.getRank() != null && pb.getRank().getEmpireKey() != null) {
+        if (pb.getRank() != null && pb.getRank().getEmpireKey() != null &&
+                pb.getRank().getEmpireKey().length() > 0) {
             mRank = EmpireRank.fromProtocolBuffer(pb.getRank());
+        }
+
+        if (pb.getHomeStar() != null && pb.getHomeStar().getKey() != null &&
+                 pb.getHomeStar().getKey().length() > 0) {
+            mHomeStar = StarSummary.fromProtocolBuffer(pb.getHomeStar());
         }
     }
 }
