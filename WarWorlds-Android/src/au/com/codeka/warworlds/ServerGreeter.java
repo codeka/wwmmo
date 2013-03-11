@@ -124,6 +124,7 @@ public class ServerGreeter {
             private boolean mNeedsEmpireSetup;
             private boolean mErrorOccured;
             private boolean mNeedsReAuthenticate;
+            private boolean mWasEmpireReset;
             private ArrayList<Colony> mColonies;
 
             @Override
@@ -162,6 +163,10 @@ public class ServerGreeter {
                                 MyEmpire.fromProtocolBuffer(resp.getEmpire()));
                     } else {
                         mNeedsEmpireSetup = true;
+                    }
+
+                    if (resp.hasWasEmpireReset() && resp.getWasEmpireReset()) {
+                        mWasEmpireReset = true;
                     }
 
                     if (resp.hasRequireGcmRegister() && resp.getRequireGcmRegister()) {
@@ -248,6 +253,10 @@ public class ServerGreeter {
                         }, 3000);
                         mHelloComplete = false;
                     }
+                }
+
+                if (mWasEmpireReset) {
+                    mServerGreeting.mIntent = new Intent(activity, EmpireResetActivity.class);
                 }
 
                 if (mHelloComplete) {

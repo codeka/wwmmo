@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="au.com.codeka.warworlds"
-    android:versionCode="64"
-    android:versionName="0.1.20130308.479" >
+    android:versionCode="65"
+    android:versionName="0.1.20130310.488" >
 
     <!-- C2DM requires Android SDK version 2.2 (API level 8) or above, and we want to be
          able to run on the minimum version (test using a Galaxy S) -->
@@ -71,6 +71,9 @@
                   android:screenOrientation="portrait" />
 
         <activity android:name=".EmpireSetupActivity"
+                  android:screenOrientation="portrait" />
+
+        <activity android:name=".EmpireResetActivity"
                   android:screenOrientation="portrait" />
 
         <activity android:name=".game.EmpireActivity"

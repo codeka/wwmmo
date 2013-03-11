@@ -158,6 +158,10 @@ message HelloResponse
 
     // If true, it means we need to re-register with GCM (maybe because last time it failed)
     optional bool require_gcm_register = 6;
+
+    // If present and true, it means your empire was reset (probably because your last colony
+    // was destroyed). Display some kind of message to the user to that effect.
+    optional bool was_empire_reset = 7;
 }
 
 //

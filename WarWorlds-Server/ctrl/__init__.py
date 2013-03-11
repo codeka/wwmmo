@@ -34,6 +34,8 @@ def setCached(mapping):
 
 
 def clearCached(keys):
+  if len(key) <= 0:
+    return
   mc = memcache.Client()
   mc.delete_multi(keys)
 

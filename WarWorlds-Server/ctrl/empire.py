@@ -285,10 +285,15 @@ def createEmpire(empire_pb, sim):
   (star_key, planet_index) = findStarForNewEmpire()
   star_pb = sim.getStar(star_key, True)
 
-  empire_model = mdl.Empire()
+  keys_to_clear = []
+  if empire_pb.key:
+    empire_model = mdl.Empire.get(db.Key(empire_pb.key))
+    keys_to_clear.append("empire:%s" % (empire_pb.key))
+  else:
+    empire_model = mdl.Empire()
+    ctrl.empirePbToModel(empire_model, empire_pb)
+    empire_model.searchName = calculateEmpireSearchName(empire_model.displayName)
   empire_model.cash = 500.0
-  ctrl.empirePbToModel(empire_model, empire_pb)
-  empire_model.searchName = calculateEmpireSearchName(empire_model.displayName)
   empire_model.homeStar = db.Key(star_pb.key)
   empire_model.put()
 
@@ -334,6 +339,7 @@ def createEmpire(empire_pb, sim):
   fleet_model.stateStartTime = datetime.now()
   fleet_model.put()
 
+  ctrl.clearCached(keys_to_clear)
 
 def getColoniesForEmpire(empire_pb):
   cache_key = "colony:for-empire:%s" % empire_pb.key

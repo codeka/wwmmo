@@ -111,6 +111,20 @@ class HelloPage(ApiPage):
     else:
       colonies_pb = None
 
+    hello_resp_pb = pb.HelloResponse()
+
+    if colonies_pb and len(colonies_pb.colonies) == 0:
+      # note: if colonies_pb is None it means you haven't set up an empire yet. If colonies_pb
+      # is NOT None, but your colonies collection is empty, it means all your colonies were
+      # destroyed, and we'll want to re-colonize you somewhere else.
+      logging.info("User has no colonies, creating now!")
+      hello_resp_pb.was_empire_reset = True
+      sim = simulation.Simulation()
+      empire.createEmpire(empire_pb, sim)
+      sim.update()
+    else:
+      hello_resp_pb.was_empire_reset = False
+
     login_history_mdl = model.LoginHistory()
     login_history_mdl.userEmail = self.user.email()
     login_history_mdl.userID = self.user.user_id()
@@ -133,7 +147,6 @@ class HelloPage(ApiPage):
 
     motd_model = model.MessageOfTheDay.get()
 
-    hello_resp_pb = pb.HelloResponse()
     if motd_model is not None:
       hello_resp_pb.motd.message = motd_model.message
       hello_resp_pb.motd.last_update = motd_model.date.isoformat()
@@ -226,6 +239,7 @@ class EmpiresPage(ApiPage):
     if empire_pb is None:
       self.response.set_status(400)
       return
+    empire_pb.key = None
 
     sim = simulation.Simulation()
     empire_pb.email = self.user.email()

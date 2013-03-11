@@ -452,6 +452,10 @@ public class MyEmpire extends Empire {
     }
 
     private void simulate() {
+        mAllColonies.clear();
+        mAllBuildRequests.clear();
+        mAllFleets.clear();
+
         Simulation sim = new Simulation();
         for (Star star : mStars.values()) {
             sim.simulate(star);

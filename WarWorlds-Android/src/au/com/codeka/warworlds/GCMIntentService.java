@@ -137,7 +137,11 @@ public class GCMIntentService extends GCMBaseIntentService {
                         SectorManager.getInstance().refreshSector(star.getSectorX(), star.getSectorY());
                     }
                     // refresh the empire as well, since stuff has happened...
-                    EmpireManager.getInstance().refreshEmpire();
+                    MyEmpire myEmpire = EmpireManager.getInstance().getEmpire();
+                    if (myEmpire != null) {
+                        myEmpire.setDirty();
+                        myEmpire.refreshAllDetails(null);
+                    }
                 }
 
                 Notifications.displayNotification(context, pb);
