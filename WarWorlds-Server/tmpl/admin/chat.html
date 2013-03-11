@@ -52,6 +52,10 @@
       g_empire_names = JSON.parse(g_empire_names);
     }
 
+    var is_sorted = false;
+    var original_page_title = document.title;
+    var num_unread = 0;
+
     function getEmpire(empireKey, callback) {
       if (typeof g_empire_names[empireKey] != "undefined") {
         callback(g_empire_names[empireKey]);
@@ -80,6 +84,13 @@
           msg.empire = "[SERVER]";
           appendMessage(msg);
         }
+        if (is_sorted) {
+          // if it's already sorted, make sure it stays that way
+          sortMessages();
+
+          num_unread ++;
+          document.title = "("+num_unread+") "+original_page_title;
+        }
         return;
       }
 
@@ -102,10 +113,11 @@
 
     function sortMessages() {
       var items = $("section#messages").children().detach().sort(function(lhs, rhs) {
-          var n = $(rhs).data("dt") - $(lhs).data("dt");
-          return -(n < 0 ? -1 : (n > 0 ? 1 : 0));
-        });
-        $("section#messages").append(items);
+        var n = $(rhs).data("dt") - $(lhs).data("dt");
+        return -(n < 0 ? -1 : (n > 0 ? 1 : 0));
+      });
+      $("section#messages").append(items);
+      is_sorted = true;
     }
 
     function sendMessage(msg) {
@@ -141,11 +153,25 @@
             var msg = data.messages[i];
             appendMessage(msg);
           }
+
+          if (!is_sorted) {
+            var $section = $("section#messages");
+            $section.scrollTop($section[0].scrollHeight);
+          }
+
           sortMessages();
           lastFetch = new Date();
         }
       });
     }
+
+    $("section#messages").scroll(function() {
+      var $section = $("section#messages");
+      if ($section.scrollTop() + $section.height() >= $section[0].scrollHeight) {
+        num_unread = 0;
+        document.title = original_page_title;
+      }
+    });
 
     fetchMessages();
     setInterval(fetchMessages, 15000);

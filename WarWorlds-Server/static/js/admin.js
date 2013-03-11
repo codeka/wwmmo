@@ -20,7 +20,11 @@ $(function() {
 
     $(document).ajaxSuccess(function(evnt, xhr) {
         xhr.endTime = new Date();
-        xhr.elapsedMs = (xhr.endTime.getTime() - xhr.startTime.getTime());
+        if (xhr.startTime) {
+          xhr.elapsedMs = (xhr.endTime.getTime() - xhr.startTime.getTime());
+        } else {
+          xhr.elapsedMs = 0;
+        }
     });
 
     // TODO: store "on_behalf_of" in localStorage or something
