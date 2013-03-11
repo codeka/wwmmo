@@ -210,7 +210,7 @@ public class StarfieldActivity extends BaseActivity
 
                 Intent intent = getIntent();
                 if (intent != null && intent.getExtras() != null) {
-                    String starKey = intent.getExtras().getString("au.com.codeka.warworlds.StarKey", null);
+                    String starKey = intent.getExtras().getString("au.com.codeka.warworlds.StarKey");
                     if (starKey != null) {
                         long sectorX = intent.getExtras().getLong("au.com.codeka.warworlds.SectorX");
                         long sectorY = intent.getExtras().getLong("au.com.codeka.warworlds.SectorY");

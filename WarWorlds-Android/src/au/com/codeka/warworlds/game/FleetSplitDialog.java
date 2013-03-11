@@ -141,7 +141,6 @@ public class FleetSplitDialog extends DialogFragment {
                 StarManager.getInstance().refreshStar(
                         activity, mFleet.getStarKey());
             }
-
         }.execute();
     }
 }

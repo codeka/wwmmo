@@ -29,7 +29,7 @@ public class ChatMessage {
         sUrlPattern = new Pattern(
                 "((http|https)://|www\\.)([a-zA-Z0-9_-]{2,}\\.)+[a-zA-Z0-9_-]{2,}(/[a-zA-Z0-9/_.%#-]+)?");
         sMarkdownString = new Pattern(
-                "(?<=\\W)(\\*\\*|\\*|_|-)(.*?)\\1(?=\\W)");
+                "(?<=(^|\\W))(\\*\\*|\\*|_|-)(.*?)\\1(?=($|\\W))");
     }
 
     public ChatMessage() {
@@ -107,8 +107,8 @@ public class ChatMessage {
         Replacer replacer = sMarkdownString.replacer(new Substitution() {
             @Override
             public void appendSubstitution(MatchResult match, TextBuffer dest) {
-                String kind = match.group(1);
-                String text = match.group(2);
+                String kind = match.group(2);
+                String text = match.group(3);
                 if (kind.equals("**")) {
                     dest.append("<b>");
                     dest.append(text);
