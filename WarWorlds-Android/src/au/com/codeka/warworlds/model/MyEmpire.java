@@ -270,7 +270,9 @@ public class MyEmpire extends Empire {
 
             @Override
             protected void onPostExecute(CombatReport report) {
-                handler.onComplete(report);
+                if (report != null) {
+                    handler.onComplete(report);
+                }
             }
         }.execute();
     }
@@ -452,9 +454,9 @@ public class MyEmpire extends Empire {
     }
 
     private void simulate() {
-        mAllColonies.clear();
-        mAllBuildRequests.clear();
-        mAllFleets.clear();
+        List<Colony> allColonies = new ArrayList<Colony>();
+        List<BuildRequest> allBuildRequests = new ArrayList<BuildRequest>();
+        List<Fleet> allFleets = new ArrayList<Fleet>();
 
         Simulation sim = new Simulation();
         for (Star star : mStars.values()) {
@@ -462,21 +464,25 @@ public class MyEmpire extends Empire {
 
             for (Colony c : star.getColonies()) {
                 if (c.getEmpireKey() != null && c.getEmpireKey().equals(getKey())) {
-                    mAllColonies.add(c);
+                    allColonies.add(c);
 
                     for (BuildRequest br : star.getBuildRequests()) {
                         if (br.getColonyKey().equals(c.getKey())) {
-                            mAllBuildRequests.add(br);
+                            allBuildRequests.add(br);
                         }
                     }
                 }
             }
             for (Fleet f : star.getFleets()) {
                 if (f.getEmpireKey() != null && f.getEmpireKey().equals(getKey())) {
-                    mAllFleets.add(f);
+                    allFleets.add(f);
                 }
             }
         }
+
+        mAllColonies = allColonies;
+        mAllBuildRequests = allBuildRequests;
+        mAllFleets = allFleets;
     }
 
     public static interface ColonizeCompleteHandler {

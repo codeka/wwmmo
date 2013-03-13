@@ -109,8 +109,8 @@ public class EmpireSetupActivity extends BaseActivity {
                 }
                 pleaseWaitDialog.dismiss();
 
-                //TODO:
-                //EmpireManager.getInstance().setup(empire)
+                // say 'hello' again, to reset the empire details
+                ServerGreeter.clearHello();
 
                 EmpireSetupActivity.this.setResult(RESULT_OK);
                 EmpireSetupActivity.this.finish();

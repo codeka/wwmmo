@@ -239,7 +239,7 @@ class EmpiresPage(ApiPage):
     if empire_pb is None:
       self.response.set_status(400)
       return
-    empire_pb.key = None
+    empire_pb.key = ""
 
     sim = simulation.Simulation()
     empire_pb.email = self.user.email()

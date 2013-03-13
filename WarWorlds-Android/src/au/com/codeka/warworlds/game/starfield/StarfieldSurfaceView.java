@@ -271,7 +271,8 @@ public class StarfieldSurfaceView extends SectorView
     public void onEmpireFetched(Empire empire) {
         // if the player's empire changes, it might mean that the location of their HQ has changed,
         // so we'll want to make sure it's still correct.
-        if (empire.getKey().equals(EmpireManager.getInstance().getEmpire().getKey())) {
+        MyEmpire myEmpire = EmpireManager.getInstance().getEmpire();
+        if (empire.getKey().equals(myEmpire.getKey())) {
             findEmpireHQ();
         }
     }
@@ -283,13 +284,14 @@ public class StarfieldSurfaceView extends SectorView
     private void findEmpireHQ() {
         mHqStar = null;
         MyEmpire myEmpire = EmpireManager.getInstance().getEmpire();
-        if (myEmpire.getAllColonies().size() == 0) {
+        final List<Colony> colonies = myEmpire.getAllColonies();
+        if (colonies == null || colonies.size() == 0) {
             // we don't have all the details yet... fetch them now.
             myEmpire.refreshAllDetails(null);
             return;
         }
 
-        for (Colony colony : myEmpire.getAllColonies()) {
+        for (Colony colony : new ArrayList<Colony>(colonies)) {
             for (Building building : colony.getBuildings()) {
                 if (building.getDesignName().equals("hq")) { // todo: hardcoded?
                     Star star = myEmpire.getImportantStar(colony.getStarKey());

@@ -71,6 +71,8 @@ public class AccountsActivity extends BaseActivity {
                                 mPleaseWaitDialog.dismiss();
                             }
 
+                            ServerGreeter.clearHello();
+
                             finish();
                             return null;
                         }
@@ -84,6 +86,8 @@ public class AccountsActivity extends BaseActivity {
             final Button logOutButton = (Button) findViewById(R.id.log_out_btn);
             logOutButton.setOnClickListener(new OnClickListener() {
                 public void onClick(View v) {
+                    ServerGreeter.clearHello();
+
                     unregister();
                     finish();
                 }

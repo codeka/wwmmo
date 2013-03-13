@@ -207,8 +207,10 @@ public class BuildQueueList extends FrameLayout implements MyEmpire.RefreshAllCo
                 }
             }
 
-            refresh(empire.getImportantStar(mColony.getStarKey()),
-                    mColony, empire.getAllBuildRequests());
+            if (mColony != null) {
+                refresh(empire.getImportantStar(mColony.getStarKey()),
+                        mColony, empire.getAllBuildRequests());
+            }
         } else {
             Map<String, Colony> colonies = new TreeMap<String, Colony>();
             for (Colony colony : empire.getAllColonies()) {

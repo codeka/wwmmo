@@ -800,6 +800,9 @@ def build(empire_pb, colony_pb, request_pb, sim):
                 request_pb.design_name, dependency.designID)
         raise ctrl.ApiError(pb.GenericError.CannotBuildDependencyNotMet, msg)
 
+  if request_pb.count > 1000:
+    request_pb.count = 1000
+
   # make sure the star is simulated up to this point
   sim.simulate(colony_pb.star_key)
 

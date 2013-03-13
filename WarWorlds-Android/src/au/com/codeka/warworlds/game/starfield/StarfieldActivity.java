@@ -222,6 +222,10 @@ public class StarfieldActivity extends BaseActivity
                 }
 
                 MyEmpire myEmpire = EmpireManager.getInstance().getEmpire();
+                if (myEmpire == null) {
+                    return;
+                }
+
                 StarSummary homeStar = myEmpire.getHomeStar();
                 if (homeStar != null) {
                     mStarfield.scrollTo(homeStar.getSectorX(), homeStar.getSectorY(),
