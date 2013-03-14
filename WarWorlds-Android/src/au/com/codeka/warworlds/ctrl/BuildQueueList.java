@@ -3,6 +3,7 @@ package au.com.codeka.warworlds.ctrl;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -40,9 +41,12 @@ import au.com.codeka.warworlds.model.PlanetImageManager;
 import au.com.codeka.warworlds.model.Sprite;
 import au.com.codeka.warworlds.model.SpriteDrawable;
 import au.com.codeka.warworlds.model.Star;
+import au.com.codeka.warworlds.model.StarManager;
 import au.com.codeka.warworlds.model.StarImageManager;
 
-public class BuildQueueList extends FrameLayout implements MyEmpire.RefreshAllCompleteHandler {
+public class BuildQueueList extends FrameLayout
+                            implements MyEmpire.RefreshAllCompleteHandler,
+                                       StarManager.StarFetchedHandler {
     private Context mContext;
     private BuildQueueActionListener mActionListener;
     private BuildQueueListAdapter mBuildQueueListAdapter;
@@ -233,8 +237,28 @@ public class BuildQueueList extends FrameLayout implements MyEmpire.RefreshAllCo
     }
 
     @Override
+    public void onStarFetched(Star s) {
+        if (mStarKeys == null) {
+            return;
+        }
+
+        boolean ourStar = false;
+        for (String starKey : mStarKeys) {
+            if (starKey.equals(s.getKey())) {
+                ourStar = true;
+            }
+        }
+        if (!ourStar) {
+            return;
+        }
+
+        mBuildQueueListAdapter.onStarRefreshed(s);
+    }
+
+    @Override
     public void onAttachedToWindow() {
         EmpireManager.getInstance().getEmpire().addRefreshAllCompleteHandler(this);
+        StarManager.getInstance().addStarUpdatedListener(null, this);
 
         mProgressUpdater = new ProgressUpdater();
         mHandler.postDelayed(mProgressUpdater, 5000);
@@ -243,6 +267,7 @@ public class BuildQueueList extends FrameLayout implements MyEmpire.RefreshAllCo
     @Override
     public void onDetachedFromWindow() {
         EmpireManager.getInstance().getEmpire().removeRefreshAllCompleteHandler(this);
+        StarManager.getInstance().removeStarUpdatedListener(this);
 
         mHandler.removeCallbacks(mProgressUpdater);
         mProgressUpdater = null;
@@ -337,6 +362,35 @@ public class BuildQueueList extends FrameLayout implements MyEmpire.RefreshAllCo
             }
 
             notifyDataSetChanged();
+        }
+
+        /**
+         * Called when the given star refreshes, we'll refresh just the build requests in that
+         * star.
+         */
+        public void onStarRefreshed(Star s) {
+            HashSet<String> colonyKeys = new HashSet<String>();
+            Star oldStar = mStars.get(s.getKey());
+            for (Colony c : oldStar.getColonies()) {
+                mColonies.remove(c.getKey());
+                colonyKeys.add(c.getKey());
+            }
+            for (Colony c : s.getColonies()) {
+                mColonies.put(c.getKey(), c);
+            }
+
+            ArrayList<BuildRequest> newBuildRequests = new ArrayList<BuildRequest>();
+            for (BuildRequest br : mBuildRequests) {
+                if (colonyKeys.contains(br.getColonyKey())) {
+                    continue;
+                }
+                newBuildRequests.add(br);
+            }
+            for (BuildRequest br : s.getBuildRequests()) {
+                newBuildRequests.add(br);
+            }
+
+            setBuildQueue(mStars, mColonies, newBuildRequests);
         }
 
         @Override

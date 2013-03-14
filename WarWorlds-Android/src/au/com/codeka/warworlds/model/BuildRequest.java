@@ -50,6 +50,10 @@ public class BuildRequest implements Parcelable {
         return mExistingBuildingKey;
     }
     public float getProgress(boolean interpolate) {
+        if (!interpolate) {
+            return mProgress;
+        }
+
         // mProgress will be the accurate at the time this BuildRequest was refreshed from the
         // server. We'll do a little bit of interpolation so that it's a good estimate *after*
         // we've been refreshed from the server, too.
@@ -109,6 +113,7 @@ public class BuildRequest implements Parcelable {
         parcel.writeString(mColonyKey);
         parcel.writeLong(mEndTime.getMillis());
         parcel.writeLong(mStartTime.getMillis());
+        parcel.writeLong(mRefreshTime.getMillis());
         parcel.writeFloat(mProgress);
         parcel.writeInt(mCount);
         parcel.writeString(mExistingBuildingKey);
@@ -125,6 +130,7 @@ public class BuildRequest implements Parcelable {
             br.mColonyKey = parcel.readString();
             br.mEndTime = new DateTime(parcel.readLong(), DateTimeZone.UTC);
             br.mStartTime = new DateTime(parcel.readLong(), DateTimeZone.UTC);
+            br.mRefreshTime = new DateTime(parcel.readLong(), DateTimeZone.UTC);
             br.mProgress = parcel.readFloat();
             br.mCount = parcel.readInt();
             br.mExistingBuildingKey = parcel.readString();

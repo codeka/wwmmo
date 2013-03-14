@@ -132,6 +132,7 @@ public class BuildAccelerateDialog extends DialogFragment {
                 StarManager.getInstance().refreshStar(activity.getApplicationContext(), mStar.getKey());
 
                 // tell the EmpireManager to update the empire (since our cash will have gone down)
+                EmpireManager.getInstance().getEmpire().setDirty();
                 EmpireManager.getInstance().refreshEmpire();
 
                 if (mErrorMsg != null) {

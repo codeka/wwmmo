@@ -66,9 +66,6 @@ public class Simulation {
                 startTime = stepEndTime;
             } else if (stepEndTime.compareTo(predictionTime) < 0) {
                 if (predictionStar == null) {
-                    // self.log("")
-                    // self.log("---- Last simulation step before prediction phase")
-                    // self.log("")
                     mNow = endTime;
                     dt = new Interval(startTime, endTime).toDuration();
                     if (dt.getMillis() > 1000) {
@@ -77,9 +74,6 @@ public class Simulation {
                     }
                     startTime = startTime.plus(dt);
 
-                    // self.log("")
-                    // self.log("---- Prediction phase beginning")
-                    // self.log("")
                     Parcel parcel = Parcel.obtain();
                     star.writeToParcel(parcel, 0);
                     parcel.setDataPosition(0);
@@ -147,7 +141,6 @@ public class Simulation {
     }
 
     private void simulateStep(Duration dt, DateTime now, Star star, String empireKey) {
-        // self.log("Simulation @ %s (dt=%.4f hrs)" % (now, (dt.total_seconds() / 3600.0)))
         float totalGoods = 0.0f;
         float totalMinerals = 0.0f;
         float totalPopulation = 0.0f;
@@ -172,21 +165,13 @@ public class Simulation {
             if (!equalEmpireKey(colony.getEmpireKey(), empireKey)) {
                 continue;
             }
-            // self.log("--- Colony[%d]: pop=%.0f focus=(pop: %.2f, farm: %.2f, mine: %.2f, cons: %.2f)" % (
-            //         n, colony_pb.population,
-            //         colony_pb.focus_population, colony_pb.focus_farming,
-            //         colony_pb.focus_mining, colony_pb.focus_construction))
 
             Planet planet = star.getPlanets()[colony.getPlanetIndex() - 1];
-            // self.log("--- planet: congeniality=(pop: %.2f, farm: %.2f, mine: %.2f)" % (
-            //         planet_pb.population_congeniality, planet_pb.farming_congeniality,
-            //         planet_pb.mining_congeniality))
 
             // calculate the output from farming this turn and add it to the star global
             float goods = colony.getPopulation() * colony.getFarmingFocus() *
                           (planet.getFarmingCongeniality() / 100.0f);
             colony.setGoodsDelta(goods);
-            // self.log("goods: %.2f" % (goods * dt_in_hours))
             totalGoods += goods * dtInHours;
             goodsDeltaPerHour += goods;
 
@@ -194,7 +179,6 @@ public class Simulation {
             float minerals = colony.getPopulation() * colony.getMiningFocus() *
                              (planet.getMiningCongeniality() / 100.0f);
             colony.setMineralsDelta(minerals);
-            // self.log("minerals: %.2f" % (minerals * dt_in_hours))
             totalMinerals += minerals * dtInHours;
             mineralsDeltaPerHour += minerals;
 
@@ -234,11 +218,8 @@ public class Simulation {
 
             // If we have pending build requests, we'll have to update them as well
             if (numValidBuildRequests > 0) {
-                // self.log("--- Building:")
                 float totalWorkers = colony.getPopulation() * colony.getConstructionFocus();
                 float workersPerBuildRequest = totalWorkers / numValidBuildRequests;
-                // self.log("Total workers = %.2f, requests = %d, workers per build request = %.2f" %
-                //          (total_workers, num_valid_build_requests, workers_per_build_request))
 
                 // OK, we can spare at least ONE population
                 if (workersPerBuildRequest < 1.0f) {
@@ -247,11 +228,9 @@ public class Simulation {
 
                 for (BuildRequest br : buildRequests) {
                     Design design = DesignManager.getInstance(br.getBuildKind()).getDesign(br.getDesignID());
-                    // self.log("--- Building: %s" % build_request.design_name)
 
                     DateTime startTime = br.getStartTime();
                     if (startTime.compareTo(now.plus(dt)) > 0) {
-                        // self.log("Building not scheduled to be started until %s, skipping" % (startTime))
                         continue;
                     }
 
@@ -260,11 +239,9 @@ public class Simulation {
                     // the workers and you double the build time.
                     float totalBuildTimeInHours = br.getCount() * design.getBuildCost().getTimeInSeconds() / 3600.0f;
                     totalBuildTimeInHours *= (100.0 / workersPerBuildRequest);
-                    // self.log("total_build_time = %.2f hrs" % total_build_time_in_hours)
 
                     // the number of hours of work required, assuming we have all the minerals we need
                     float timeRemainingInHours = (1.0f - br.getProgress(false)) * totalBuildTimeInHours;
-                    //self.log("start_time = %s, time remaining = %.2f hrs" % (startTime, time_remaining_in_hours))
 
                     float dtUsed = dtInHours;
                     if (startTime.compareTo(now) > 0) {
@@ -278,24 +255,19 @@ public class Simulation {
                     // what is the current amount of time we have now as a percentage of the total build
                     // time?
                     float progressThisTurn = dtUsed / totalBuildTimeInHours;
-                    // self.log("progress this turn: %.4f%% (%.4f hrs)" % (progress_this_turn * 100.0, dt_used))
                     if (progressThisTurn <= 0) {
                         timeRemainingInHours = (1.0f - br.getProgress(false)) * totalBuildTimeInHours;
                         DateTime endTime = now.plus((long)(timeRemainingInHours * 3600.0f * 1000.0f));
                         if (br.getEndTime().compareTo(endTime) > 0) {
                             br.setEndTime(endTime);
                         }
-                        // self.log("no progress this turn (building complete?), setting end_time = %s" % (end_time))
                         continue;
                     }
 
                     // work out how many minerals we require for this turn
                     float mineralsRequired = br.getCount() * design.getBuildCost().getCostInMinerals() * progressThisTurn;
-                    // self.log("mineral_required = %.2f, minerals_available = %.2f"
-                    //          % (minerals_required, total_minerals))
-                    if (totalMinerals < mineralsRequired) {
+                    if (mineralsRequired < totalMinerals) {
                         // not enough minerals, no progress will be made this turn
-                        //self.log("no progress this turn (not enough minerals)")
                     } else {
                         // awesome, we have enough minerals so we can make some progress. We'll start by
                         // removing the minerals we need from the global pool...
@@ -306,15 +278,13 @@ public class Simulation {
 
                     // adjust the end_time for this turn
                     timeRemainingInHours = (1.0f - br.getProgress(false)) * totalBuildTimeInHours;
-                    br.setEndTime(now.plus((long)(dtUsed * 1000 * 3600) + (long)(timeRemainingInHours * 1000 * 3600)));
+                    DateTime endTime = now.plus((long)(dtUsed * 1000 * 3600) + (long)(timeRemainingInHours * 1000 * 3600));
+                    br.setEndTime(endTime);
 
                     if (br.getProgress(false) >= 1.0f) {
                         // if we've finished this turn, just set progress
                         br.setProgress(1.0f);
                     }
-
-                    // self.log("total progress: %.2f%% completion time: %s" %
-                    //          (build_request.progress * 100.0, end_time))
                 }
             }
 
@@ -322,17 +292,13 @@ public class Simulation {
             float taxPerPopulationPerHour = 0.012f;
             float taxThisTurn = taxPerPopulationPerHour * dtInHours * colony.getPopulation();
             colony.setUncollectedTaxes(colony.getUncollectedTaxes() + taxThisTurn);
-            //self.log("tax generated: %.4f; total: %.4f" % (tax_this_turn, colony_pb.uncollected_taxes))
         }
-
-        // self.log("--- Updating population:")
 
         // Finally, update the population. The first thing we need to do is evenly distribute goods
         // between all of the colonies.
         float totalGoodsPerHour = totalPopulation / 10.0f;
         float totalGoodsRequired = totalGoodsPerHour * dtInHours;
         goodsDeltaPerHour -= totalGoodsPerHour;
-        // self.log("total_goods_required: %.4f, goods_available: %.4f" % (total_goods_required, total_goods))
 
         // If we have more than total_goods_required stored, then we're cool. Otherwise, our population
         // suffers...
@@ -340,7 +306,6 @@ public class Simulation {
         if (totalGoodsRequired > totalGoods && totalGoodsRequired > 0) {
             goodsEfficiency = totalGoods / totalGoodsRequired;
         }
-        //self.log("goods_efficiency: %.4f" % (goods_efficiency))
 
         // subtract all the goods we'll need
         totalGoods -= totalGoodsRequired;
@@ -354,8 +319,6 @@ public class Simulation {
             if (!equalEmpireKey(colony.getEmpireKey(), empireKey)) {
                 continue;
             }
-
-            // self.log("--- Colony[%d]:" % (n))
 
             float populationIncrease = colony.getPopulation() * colony.getPopulationFocus();
             if (goodsEfficiency >= 1.0f) {
@@ -376,7 +339,6 @@ public class Simulation {
             if (maxFactor > 1.0f) {
                 // population is bigger than it should be...
                 populationIncrease = colony.getPopulation() * (1.0f - colony.getPopulationFocus()) * 0.5f;
-                // self.log("Adjusted population increase: %.2f" % population_increase)
 
                 maxFactor -= 1.0f;
                 populationIncrease = -maxFactor * populationIncrease;
@@ -387,15 +349,10 @@ public class Simulation {
 
             populationIncrease *= maxFactor;
             colony.setPopulationDelta(populationIncrease);
-
             populationIncrease *= dtInHours;
-            // self.log("max_population: %.2f factor=%.2f population_increase: %.2f new_population: %.2f" % (
-            //          float(colony_pb.max_population), max_factor, population_increase,
-            //          colony_pb.population + population_increase))
 
             colony.setPopulation(colony.getPopulation() + populationIncrease);
             if (colony.isInCooldown() && colony.getPopulation() < 100.0f) {
-                // self.log("In cooldown period, population capped at 100.")
                 colony.setPopulation(100.0f);
             }
         }
@@ -416,12 +373,6 @@ public class Simulation {
             empire.setDeltaGoodsPerHour(goodsDeltaPerHour);
             empire.setDeltaMineralsPerHour(mineralsDeltaPerHour);
         }
-
-        // self.log(("simulation step: empire=%s dt=%.2f (hrs), goods=%.2f (%.4f / hr), "
-        //           "minerals=%.2f (%.4f / hr), population=%.2f")
-        //          % (empire_key, dt_in_hours, total_goods, goods_delta_per_hour,
-        //             total_minerals, minerals_delta_per_hour, total_population))
-        // self.log("")
     }
 
     private void simulateCombat(Star star, DateTime now, Duration dt) {

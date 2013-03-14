@@ -46,6 +46,12 @@ public class MyEmpire extends Empire {
         mIsDirty = true;
     }
 
+    public void addCash(float amount) {
+        mCash += amount;
+        mIsDirty = true; // so we'll refresh next time
+        fireRefreshAllCompleteHandler(); // notify that we've changed
+    }
+
     public void addRefreshAllCompleteHandler(RefreshAllCompleteHandler handler) {
         synchronized(mRefreshAllCompleteHandlers) {
             mRefreshAllCompleteHandlers.add(handler);

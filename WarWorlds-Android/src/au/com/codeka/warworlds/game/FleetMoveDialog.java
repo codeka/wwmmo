@@ -41,6 +41,7 @@ public class FleetMoveDialog extends DialogFragment {
     private DestinationStarOverlay mDestinationStarOverlay;
     private StarSummary mSourceStarSummary;
     private View mView;
+    private float mEstimatedCost;
 
     public FleetMoveDialog() {
     }
@@ -88,12 +89,12 @@ public class FleetMoveDialog extends DialogFragment {
                     int hrs = (int) Math.floor(timeInHours);
                     int mins = (int) Math.floor((timeInHours - hrs) * 60.0f);
 
-                    float cost = design.getFuelCost(distanceInParsecs, mFleet.getNumShips());
-                    String cash = Cash.format(cost);
+                    mEstimatedCost = design.getFuelCost(distanceInParsecs, mFleet.getNumShips());
+                    String cash = Cash.format(mEstimatedCost);
 
                     String fontOpen = "";
                     String fontClose = "";
-                    if (cost > EmpireManager.getInstance().getEmpire().getCash()) {
+                    if (mEstimatedCost > EmpireManager.getInstance().getEmpire().getCash()) {
                         fontOpen = "<font color=\"#ff0000\">";
                         fontClose = "</font>";
                     }
@@ -169,6 +170,8 @@ public class FleetMoveDialog extends DialogFragment {
         dialog.getPositiveButton().setEnabled(false);
         dialog.getNegativeButton().setEnabled(false);
 
+        EmpireManager.getInstance().getEmpire().addCash(-mEstimatedCost);
+
         final Activity activity = getActivity();
         dismiss();
 
@@ -196,7 +199,6 @@ public class FleetMoveDialog extends DialogFragment {
                                             .setMessage("Could not move the fleet: do you have enough cash?")
                                             .create();
                     dialog.show();
-
                     dialog.getPositiveButton().setEnabled(true);
                     dialog.getNegativeButton().setEnabled(true);
                 } else {
@@ -208,7 +210,6 @@ public class FleetMoveDialog extends DialogFragment {
                     EmpireManager.getInstance().refreshEmpire(activity, mFleet.getEmpireKey());
                 }
             }
-
         }.execute();
     }
 
