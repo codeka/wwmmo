@@ -403,7 +403,11 @@ public class FleetList extends FrameLayout implements StarManager.StarFetchedHan
                     if (!lhs.getStarKey().equals(rhs.getStarKey())) {
                         Star lhsStar = mStars.get(lhs.getStarKey());
                         Star rhsStar = mStars.get(rhs.getStarKey());
-                        return lhsStar.getName().compareTo(rhsStar.getName());
+                        if (!lhsStar.getName().equals(rhsStar.getName())) {
+                            return lhsStar.getName().compareTo(rhsStar.getName());
+                        } else {
+                            return lhsStar.getKey().compareTo(rhsStar.getKey());
+                        }
                     } else if (!lhs.getDesignID().equals(rhs.getDesignID())) {
                         return lhs.getDesignID().compareTo(rhs.getDesignID());
                     } else {

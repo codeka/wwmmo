@@ -501,6 +501,15 @@ def collectTaxesFromColony(colony_key, sim):
       star_colony_pb.uncollected_taxes = 0.0
 
   empire_model = mdl.Empire.get(colony_pb.empire_key)
+
+  empire_cash_audit_mdl = mdl.EmpireCashAudit(parent=db.Key(colony_pb.empire_key))
+  empire_cash_audit_mdl.time = datetime.now()
+  empire_cash_audit_mdl.oldCash = empire_model.cash
+  empire_cash_audit_mdl.newCash = empire_pb.cash
+  empire_cash_audit_mdl.difference = empire_pb.cash - empire_model.cash
+  empire_cash_audit_mdl.reason = "Collected from colony [%s]" % (colony_pb.key)
+  empire_cash_audit_mdl.put()
+
   empire_model.cash = empire_pb.cash
   empire_model.put() 
   ctrl.clearCached(["empire:%s" % (colony_pb.empire_key),
@@ -533,6 +542,15 @@ def collectTaxesFromEmpire(empire_pb, sim, async=False):
         colony_pb.uncollected_taxes = 0.0
 
   empire_mdl = mdl.Empire.get(empire_pb.key)
+
+  empire_cash_audit_mdl = mdl.EmpireCashAudit(parent=db.Key(colony_pb.empire_key))
+  empire_cash_audit_mdl.time = datetime.now()
+  empire_cash_audit_mdl.oldCash = empire_mdl.cash
+  empire_cash_audit_mdl.newCash = total_cash
+  empire_cash_audit_mdl.difference = total_cash - empire_mdl.cash
+  empire_cash_audit_mdl.reason = "Collected from all colonies"
+  empire_cash_audit_mdl.put()
+
   empire_mdl.cash = total_cash
   empire_mdl.put()
   sim.update()
@@ -858,7 +876,9 @@ def accelerateBuild(empire_pb, star_pb, build_request_pb, sim, accelerate_amount
   design = designs.Design.getDesign(build_request_pb.build_kind, build_request_pb.design_name)
   minerals_to_use = design.buildCostMinerals * progress_to_complete
   cost = minerals_to_use * build_request_pb.count
-  if not _subtractCash(empire_pb.key, cost):
+  if not _subtractCash(empire_pb.key, cost, "Accelerate build colony=[%s] (%s x %d) %.2f percent" % (
+                       build_request_pb.colony_key, build_request_pb.design_name,
+                       build_request_pb.count, accelerate_amount * 100.0)):
     err = pb.GenericError()
     err.error_code = pb.GenericError.InsufficientCash
     err.error_message = "You don't have enough cash to accelerate this build."
@@ -1084,7 +1104,9 @@ def _orderFleet_move(star_pb, fleet_pb, order_pb):
 
   # work out how much this move operation is going to cost
   fuel_cost = design.fuelCostPerParsec * fleet_pb.num_ships * distance_in_pc
-  if not _subtractCash(fleet_pb.empire_key, fuel_cost):
+  if not _subtractCash(fleet_pb.empire_key, fuel_cost, "Fleet [%s] move to [%s], %s x %d, distance = %.2f" % (
+                       fleet_pb.key, order_pb.star_key, fleet_pb.design_name,
+                       fleet_pb.num_ships, distance_in_pc)):
     logging.info("Insufficient funds for move: distance=%.2f, num_ships=%d, cost=%.2f"
                  % (distance_in_pc, fleet_pb.num_ships, fuel_cost))
     return False
@@ -1102,7 +1124,7 @@ def _orderFleet_move(star_pb, fleet_pb, order_pb):
   return True
 
 
-def _subtractCash(empire_key, amount):
+def _subtractCash(empire_key, amount, reason):
   """Removes the given amount of cash from the given empire.
 
   Returns:
@@ -1113,6 +1135,15 @@ def _subtractCash(empire_key, amount):
     empire_mdl = mdl.Empire.get(empire_key)
     if empire_mdl.cash < amount:
       return False
+
+    empire_cash_audit_mdl = mdl.EmpireCashAudit(parent=empire_key)
+    empire_cash_audit_mdl.time = datetime.now()
+    empire_cash_audit_mdl.oldCash = empire_mdl.cash
+    empire_cash_audit_mdl.newCash = empire_mdl.cash - amount
+    empire_cash_audit_mdl.difference = float(amount)
+    empire_cash_audit_mdl.reason = reason
+    empire_cash_audit_mdl.put()
+
     empire_mdl.cash -= amount
     empire_mdl.put()
 

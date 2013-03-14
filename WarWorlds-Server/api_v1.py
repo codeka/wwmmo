@@ -258,8 +258,10 @@ class EmpiresSearchPage(ApiPage):
         empires_pb.empires.extend([empire.getEmpireForUser(user)])
     if self.request.get("name", "") != "":
       search = self.request.get("name")
-      empire_pbs = empire.getEmpiresByName(search)
-      empires_pb.empires.extend(empire_pbs)
+      for part in search.split():
+        empire_pbs = empire.getEmpiresByName(part.lower())
+        logging.debug("Searching for '%s' found %d empires" % (part.lower(), len(empire_pbs)))
+        empires_pb.empires.extend(empire_pbs)
     if self.request.get("minRank", "") != "":
       minRank = int(self.request.get("minRank"))
       maxRank = minRank + 5
@@ -277,6 +279,9 @@ class EmpiresSearchPage(ApiPage):
     if len(empires_pb.empires) == 0:
       self.response.set_status(404)
       return
+
+    if len(empires_pb.empires) > 10:
+      del empires_pb.empires[10:]
 
     empire_keys = []
     for empire_pb in empires_pb.empires:

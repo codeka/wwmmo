@@ -6,7 +6,6 @@ import model.sector as sector_mdl
 
 class Empire(db.Model):
   """Represents an empire, display name and whatnot."""
-
   displayName = db.StringProperty()
   user = db.UserProperty()
   state = db.IntegerProperty()
@@ -24,6 +23,17 @@ class Empire(db.Model):
     for empire_key in Empire.all().filter("user", user).fetch(1, keys_only=True):
       return empire_key
     return None
+
+
+class EmpireCashAudit(db.Model):
+  """Every time we add or subtract cash from an empire, an entry goes here for auditing.
+
+  The parent of this entity is the owner empire."""
+  time = db.DateTimeProperty()
+  oldCash = db.FloatProperty()
+  newCash = db.FloatProperty()
+  difference = db.FloatProperty()
+  reason = db.StringProperty()
 
 
 class Colony(db.Model):
