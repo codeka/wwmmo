@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+
+    <TextView android:id="@+id/alliance_help"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:layout_alignParentLeft="true"
+              android:layout_marginLeft="@dimen/tablet_margin_5dp"
+              android:layout_marginRight="@dimen/tablet_margin_5dp"
+              android:layout_marginTop="10dp"
+              android:text="Creating a new alliance costs $250,000. Give the alliance a name, and click &quot;Create&quot;" />
+
+    <EditText android:id="@+id/alliance_name"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:layout_below="@+id/alliance_help"
+              android:layout_marginLeft="@dimen/tablet_margin_5dp"
+              android:layout_marginRight="@dimen/tablet_margin_5dp"
+              android:layout_marginTop="16dp"
+              android:hint="Alliance name"
+              android:ems="10" >
+        <requestFocus />
+    </EditText>
+
+    <View android:layout_width="10dp"
+          android:layout_height="10dp"
+          android:layout_below="@id/alliance_name"
+          android:layout_centerHorizontal="true" />
+
+</RelativeLayout>

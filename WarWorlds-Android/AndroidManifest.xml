@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="au.com.codeka.warworlds"
-    android:versionCode="69"
-    android:versionName="0.1.20130313.492" >
+    android:versionCode="70"
+    android:versionName="0.1.20130314.494" >
 
     <!-- C2DM requires Android SDK version 2.2 (API level 8) or above, and we want to be
          able to run on the minimum version (test using a Galaxy S) -->
@@ -95,13 +95,16 @@
                   android:screenOrientation="portrait" />
         <activity android:name=".game.solarsystem.EmptyPlanetActivity"
                   android:screenOrientation="portrait" />
-        
+
         <activity android:name=".game.solarsystem.BuildActivity"
                   android:screenOrientation="portrait" />
 
         <activity android:name=".game.solarsystem.FleetActivity"
                   android:screenOrientation="portrait" />
-        
+
+        <activity android:name=".game.alliance.AllianceActivity"
+                  android:screenOrientation="portrait" />
+
         <activity android:name=".game.ChatActivity"
                   android:screenOrientation="portrait" />
 

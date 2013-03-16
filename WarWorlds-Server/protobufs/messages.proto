@@ -875,3 +875,36 @@ message SituationReports
     // a cursor used to fetch the remaining reports
     optional string cursor = 2;
 }
+
+
+//
+// This is the main contains for alliances.
+//
+message Alliance
+{
+    optional string key = 1;
+
+    // The name of the alliance
+    optional string name = 2;
+
+    // The time (in epoch form) the alliance was first created
+    optional int64 time_created = 3;
+
+    // The key of the empire that created this alliance
+    optional string creator_empire_key = 4;
+
+    // The current number of members in the alliance
+    optional int32 num_members = 5;
+
+    // If set, the actual collection of members
+    repeated AllianceMember members = 6;
+}
+
+
+message AllianceMember
+{
+    optional string key = 1;
+    optional string empire_key = 2;
+    optional string alliance_key = 3;
+    optional int64 time_joined = 4;
+}

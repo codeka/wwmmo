@@ -32,6 +32,10 @@ public class InfobarView extends FrameLayout
         this.addView(mView);
     }
 
+    public void hideEmpireName() {
+        mView.findViewById(R.id.empire_name).setVisibility(View.GONE);
+    }
+
     @Override
     public void onEmpireFetched(Empire empire) {
         MyEmpire myEmpire = EmpireManager.getInstance().getEmpire();

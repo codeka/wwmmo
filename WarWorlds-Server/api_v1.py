@@ -18,6 +18,7 @@ from ctrl import sector
 from ctrl import empire
 from ctrl import simulation
 from ctrl import chat
+from ctrl import alliance
 import ctrl
 
 from protobufs import protobuf_json, messages_pb2 as pb
@@ -377,6 +378,19 @@ class EmpireDetailsPage(ApiPage):
           break
 
     return empire_pb
+
+
+class AlliancesPage(ApiPage):
+  """This page is where you post a new alliance you're creating, fetch the list of alliances, etc."""
+  def get(self):
+    pass
+  def post(self):
+    """Post a new alliance here, we'll subtract the fee and get you going!"""
+    empire_pb = empire.getEmpireForUser(self.user)
+    alliance_pb = self._getRequestBody(pb.Alliance)
+    alliance_pb.time_created = ctrl.dateTimeToEpoch(datetime.now())
+    alliance_pb.creator_empire_key = empire_pb.key
+    return alliance.createAlliance(alliance_pb, empire_pb)
 
 
 class DevicesPage(ApiPage):
@@ -894,6 +908,7 @@ app = ApiApplication([("/api/v1/hello/([^/]+)", HelloPage),
                       ("/api/v1/empires/([^/]+)", EmpiresPage),
                       ("/api/v1/empires/([^/]+)/details", EmpireDetailsPage),
                       ("/api/v1/empires/([^/]+)/taxes", EmpireTaxesPage),
+                      ("/api/v1/alliances", AlliancesPage),
                       ("/api/v1/devices", DevicesPage),
                       ("/api/v1/devices/([^/]+)", DevicesPage),
                       ("/api/v1/devices/user:([^/]+)/messages", DeviceMessagesPage),

@@ -33,6 +33,18 @@ public class StyledDialog extends Dialog implements ViewTreeObserver.OnGlobalLay
         mContext = context;
     }
 
+    public static void showErrorMessage(Context context, String message) {
+        if (message == null || message.equals("")) {
+            message = "An unknown or unexpected error occured.";
+        }
+
+        new StyledDialog.Builder(context)
+                        .setMessage(message)
+                        .setTitle("Error")
+                        .setNeutralButton("OK", null)
+                        .create().show();
+    }
+
     public Button getPositiveButton() {
         return (Button) getWindow().findViewById(R.id.positive_btn);
     }

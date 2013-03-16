@@ -133,6 +133,10 @@ public class StarfieldSurfaceView extends SectorView
     @Override
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
+        if (this.isInEditMode()) {
+            return;
+        }
+
         SectorManager.getInstance().addSectorListChangedListener(this);
         StarImageManager.getInstance().addBitmapGeneratedListener(mBitmapGeneratedListener);
         StarManager.getInstance().addStarUpdatedListener(null, this);
@@ -150,6 +154,10 @@ public class StarfieldSurfaceView extends SectorView
     @Override
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
+        if (this.isInEditMode()) {
+            return;
+        }
+
         SectorManager.getInstance().removeSectorListChangedListener(this);
         StarImageManager.getInstance().removeBitmapGeneratedListener(mBitmapGeneratedListener);
         StarManager.getInstance().removeStarUpdatedListener(this);

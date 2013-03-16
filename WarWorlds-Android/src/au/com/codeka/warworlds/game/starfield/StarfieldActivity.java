@@ -28,11 +28,13 @@ import au.com.codeka.warworlds.ServerGreeter;
 import au.com.codeka.warworlds.ServerGreeter.ServerGreeting;
 import au.com.codeka.warworlds.StyledDialog;
 import au.com.codeka.warworlds.ctrl.FleetListSimple;
+import au.com.codeka.warworlds.ctrl.InfobarView;
 import au.com.codeka.warworlds.ctrl.SelectionView;
 import au.com.codeka.warworlds.game.EmpireActivity;
 import au.com.codeka.warworlds.game.ScoutReportDialog;
 import au.com.codeka.warworlds.game.SitrepActivity;
 import au.com.codeka.warworlds.game.StarRenameDialog;
+import au.com.codeka.warworlds.game.alliance.AllianceActivity;
 import au.com.codeka.warworlds.game.solarsystem.SolarSystemActivity;
 import au.com.codeka.warworlds.model.Colony;
 import au.com.codeka.warworlds.model.Empire;
@@ -105,6 +107,9 @@ public class StarfieldActivity extends BaseActivity
         mPlanetList.setAdapter(mPlanetListAdapter);
 
         mStarfield.addSelectionChangedListener(this);
+
+        InfobarView infobar = (InfobarView) findViewById(R.id.infobar);
+        infobar.hideEmpireName();
 
         mPlanetList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -198,6 +203,14 @@ public class StarfieldActivity extends BaseActivity
             @Override
             public void onClick(View v) {
                 onRenameClick();
+            }
+        });
+
+        final Button allianceBtn = (Button) findViewById(R.id.alliance_btn);
+        allianceBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onAllianceClick();
             }
         });
 
@@ -306,6 +319,11 @@ public class StarfieldActivity extends BaseActivity
     public void openSitrepActivity() {
         Intent intent = new Intent(mContext, SitrepActivity.class);
         startActivityForResult(intent, SITREP_REQUEST);
+    }
+
+    public void onAllianceClick() {
+        Intent intent = new Intent(mContext, AllianceActivity.class);
+        startActivity(intent);
     }
 
     /**

@@ -818,8 +818,8 @@ def build(empire_pb, colony_pb, request_pb, sim):
                 request_pb.design_name, dependency.designID)
         raise ctrl.ApiError(pb.GenericError.CannotBuildDependencyNotMet, msg)
 
-  if request_pb.count > 1000:
-    request_pb.count = 1000
+  if request_pb.count > 5000:
+    request_pb.count = 5000
 
   # make sure the star is simulated up to this point
   sim.simulate(colony_pb.star_key)
@@ -876,9 +876,9 @@ def accelerateBuild(empire_pb, star_pb, build_request_pb, sim, accelerate_amount
   design = designs.Design.getDesign(build_request_pb.build_kind, build_request_pb.design_name)
   minerals_to_use = design.buildCostMinerals * progress_to_complete
   cost = minerals_to_use * build_request_pb.count
-  if not _subtractCash(empire_pb.key, cost, "Accelerate build colony=[%s] (%s x %d) %.2f percent" % (
-                       build_request_pb.colony_key, build_request_pb.design_name,
-                       build_request_pb.count, accelerate_amount * 100.0)):
+  if not subtractCash(empire_pb.key, cost, "Accelerate build colony=[%s] (%s x %d) %.2f percent" % (
+                      build_request_pb.colony_key, build_request_pb.design_name,
+                      build_request_pb.count, accelerate_amount * 100.0)):
     err = pb.GenericError()
     err.error_code = pb.GenericError.InsufficientCash
     err.error_message = "You don't have enough cash to accelerate this build."
@@ -1104,9 +1104,9 @@ def _orderFleet_move(star_pb, fleet_pb, order_pb):
 
   # work out how much this move operation is going to cost
   fuel_cost = design.fuelCostPerParsec * fleet_pb.num_ships * distance_in_pc
-  if not _subtractCash(fleet_pb.empire_key, fuel_cost, "Fleet [%s] move to [%s], %s x %d, distance = %.2f" % (
-                       fleet_pb.key, order_pb.star_key, fleet_pb.design_name,
-                       fleet_pb.num_ships, distance_in_pc)):
+  if not subtractCash(fleet_pb.empire_key, fuel_cost, "Fleet [%s] move to [%s], %s x %d, distance = %.2f" % (
+                      fleet_pb.key, order_pb.star_key, fleet_pb.design_name,
+                      fleet_pb.num_ships, distance_in_pc)):
     logging.info("Insufficient funds for move: distance=%.2f, num_ships=%d, cost=%.2f"
                  % (distance_in_pc, fleet_pb.num_ships, fuel_cost))
     return False
@@ -1124,7 +1124,7 @@ def _orderFleet_move(star_pb, fleet_pb, order_pb):
   return True
 
 
-def _subtractCash(empire_key, amount, reason):
+def subtractCash(empire_key, amount, reason):
   """Removes the given amount of cash from the given empire.
 
   Returns:
