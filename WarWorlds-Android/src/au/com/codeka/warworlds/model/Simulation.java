@@ -148,7 +148,7 @@ public class Simulation {
         float maxMinerals = 500.0f;
 
         for (EmpirePresence empire : star.getEmpires()) {
-            if (!equalEmpireKey(empire.getKey(), empireKey)) {
+            if (!equalEmpireKey(empire.getEmpireKey(), empireKey)) {
                 continue;
             }
             totalGoods = empire.getTotalGoods();
@@ -266,7 +266,7 @@ public class Simulation {
 
                     // work out how many minerals we require for this turn
                     float mineralsRequired = br.getCount() * design.getBuildCost().getCostInMinerals() * progressThisTurn;
-                    if (mineralsRequired < totalMinerals) {
+                    if (mineralsRequired > totalMinerals) {
                         // not enough minerals, no progress will be made this turn
                     } else {
                         // awesome, we have enough minerals so we can make some progress. We'll start by
@@ -365,7 +365,7 @@ public class Simulation {
         }
 
         for (EmpirePresence empire : star.getEmpires()) {
-            if (!equalEmpireKey(empire.getKey(), empireKey)) {
+            if (!equalEmpireKey(empire.getEmpireKey(), empireKey)) {
                 continue;
             }
             empire.setTotalGoods(totalGoods);
