@@ -303,7 +303,7 @@ class EmpiresSearchPage(ApiPage):
           empire_pb.rank.total_colonies = empire_rank.total_colonies
           empire_pb.rank.total_ships = empire_rank.total_ships
           empire_pb.rank.total_buildings = empire_rank.total_buildings
-          if empire_pb.rank.total_stars < 10 and empire_pb.key != self_empire_pb.key:
+          if not self._isAdmin() and empire_pb.rank.total_stars < 10 and empire_pb.key != self_empire_pb.key:
             # if an enemy has < 10 stars under their control, we'll hide the number
             # of ships they have, since it's probably giving away a little too much info
             empire_pb.rank.total_ships = 0

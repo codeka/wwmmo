@@ -106,6 +106,9 @@ message Empire
     // we're asked to view the empire. It's usually the start that contains the HQ or, if they don't
     // have one, basically just a random star they control.
     optional Star home_star = 12;
+
+    // if this empire is part of an alliance, this will contain the details of the alliance.
+    optional Alliance alliance = 13;
 }
 
 

@@ -156,9 +156,15 @@ public class EmpireActivity extends TabFragmentActivity {
 
             TextView empireName = (TextView) mView.findViewById(R.id.empire_name);
             ImageView empireIcon = (ImageView) mView.findViewById(R.id.empire_icon);
+            TextView allianceName = (TextView) mView.findViewById(R.id.alliance_name);
 
             empireName.setText(empire.getDisplayName());
             empireIcon.setImageBitmap(empire.getShield(getActivity()));
+            if (empire.getAlliance() != null) {
+                allianceName.setText(empire.getAlliance().getName());
+            } else {
+                allianceName.setText("");
+            }
 
             final ProgressBar progress = (ProgressBar) mView.findViewById(R.id.progress_bar);
             final ListView rankList = (ListView) mView.findViewById(R.id.empire_rankings);

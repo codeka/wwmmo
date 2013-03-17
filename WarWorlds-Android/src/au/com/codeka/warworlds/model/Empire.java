@@ -21,6 +21,7 @@ public class Empire implements Parcelable {
     protected float mCash;
     private EmpireRank mRank;
     private StarSummary mHomeStar;
+    private Alliance mAlliance;
 
     private static Bitmap sBaseShield;
 
@@ -38,6 +39,9 @@ public class Empire implements Parcelable {
     }
     public StarSummary getHomeStar() {
         return mHomeStar;
+    }
+    public Alliance getAlliance() {
+        return mAlliance;
     }
 
     /**
@@ -101,12 +105,14 @@ public class Empire implements Parcelable {
         parcel.writeString(mKey);
         parcel.writeString(mDisplayName);
         parcel.writeParcelable(mHomeStar, flags);
+        parcel.writeParcelable(mAlliance, flags);
     }
 
     protected void readFromParcel(Parcel parcel) {
         mKey = parcel.readString();
         mDisplayName = parcel.readString();
         mHomeStar = (StarSummary) parcel.readParcelable(StarSummary.class.getClassLoader());
+        mAlliance = (Alliance) parcel.readParcelable(Alliance.class.getClassLoader());
     }
 
     public static final Parcelable.Creator<Empire> CREATOR
@@ -147,6 +153,11 @@ public class Empire implements Parcelable {
         if (pb.getHomeStar() != null && pb.getHomeStar().getKey() != null &&
                  pb.getHomeStar().getKey().length() > 0) {
             mHomeStar = StarSummary.fromProtocolBuffer(pb.getHomeStar());
+        }
+
+        if (pb.getAlliance() != null && pb.getAlliance().getKey() != null &&
+                pb.getAlliance().getKey().length() > 0) {
+            mAlliance = Alliance.fromProtocolBuffer(pb.getAlliance());
         }
     }
 }

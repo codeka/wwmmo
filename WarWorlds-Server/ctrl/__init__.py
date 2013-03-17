@@ -20,6 +20,7 @@ from model import chat as chat_mdl
 from model import empire as empire_mdl
 from model import statistics as stats_mdl
 from model import gcm as gcm_mdl
+from model import alliance as alliance_mdl
 import model as mdl
 
 
@@ -115,6 +116,14 @@ def empireRankModelToPb(empire_rank_pb, empire_rank_model):
     empire_rank_pb.last_rank = empire_rank_model.lastRank
   else:
     empire_rank_pb.last_rank = 0
+
+
+def allianceModelToPb(alliance_pb, alliance_model):
+  alliance_pb.key = str(alliance_model.key())
+  alliance_pb.name = alliance_model.name
+  alliance_pb.time_created = dateTimeToEpoch(alliance_model.createdDate)
+  alliance_pb.creator_empire_key = str(alliance_mdl.Alliance.creator.get_value_for_datastore(alliance_model))
+  alliance_pb.num_members = alliance_model.numMembers
 
 
 def colonyModelToPb(colony_pb, colony_model):

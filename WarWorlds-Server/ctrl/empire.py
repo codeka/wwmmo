@@ -19,6 +19,7 @@ from ctrl import designs
 from model import sector as sector_mdl
 from model import empire as mdl
 from model import statistics as stats_mdl
+from model import alliance as alliance_mdl
 from protobufs import messages_pb2 as pb
 
 
@@ -78,10 +79,21 @@ def getEmpire(empire_key):
   empire_model = mdl.Empire.get(empire_key)
   empire_pb = pb.Empire()
   ctrl.empireModelToPb(empire_pb, empire_model)
+
   home_star_key = mdl.Empire.homeStar.get_value_for_datastore(empire_model)
   if home_star_key:
     home_star_pb = sector.getStar(str(home_star_key))
     sector.sumarize(home_star_pb, empire_pb.home_star)
+
+  # if the empire belongs to an alliance, grab that as well
+  alliance_member_mdl = None
+  for this_mdl in alliance_mdl.AllianceMember.all().filter("empire", db.Key(empire_key)).fetch(1):
+    alliance_member_mdl = this_mdl
+    break
+  if alliance_member_mdl:
+    alliance_model = alliance_mdl.Alliance.get(alliance_member_mdl.key().parent())
+    ctrl.allianceModelToPb(empire_pb.alliance, alliance_model)
+
   ctrl.setCached({cache_key: empire_pb})
   return empire_pb
 
