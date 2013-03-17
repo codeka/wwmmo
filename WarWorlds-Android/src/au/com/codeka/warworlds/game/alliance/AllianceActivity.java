@@ -26,13 +26,12 @@ public class AllianceActivity extends TabFragmentActivity {
         getTabManager().addTab(mContext, new TabInfo("Overview", OverviewFragment.class, null));
     }
 
-
     public static class BaseFragment extends Fragment {
         /**
          * Gets a view to display if we're still loading the empire details.
          */
         protected View getLoadingView(LayoutInflater inflator) {
-            return inflator.inflate(R.layout.empire_loading_tab, null);
+            return inflator.inflate(R.layout.alliance_loading_tab, null);
         }
     }
 

@@ -159,7 +159,7 @@
                            android:layout_height="20dp"
                            android:layout_alignBottom="@+id/fleet_icon"
                            android:layout_toRightOf="@+id/fleet_icon"
-                           android:src="@drawable/fleet_single" />
+                           android:src="@drawable/app_icon" />
 
                 <TextView android:id="@+id/fleet_design"
                           android:layout_width="wrap_content"

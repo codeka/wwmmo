@@ -10,7 +10,7 @@
         android:layout_height="30dp"
         android:layout_alignParentLeft="true"
         android:layout_marginRight="4dp"
-        android:src="@drawable/fleet_single" />
+        android:src="@drawable/app_icon" />
 
     <ImageView
         android:id="@+id/overlay_icon"

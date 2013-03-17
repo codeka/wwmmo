@@ -16,8 +16,7 @@
         android:id="@+id/alliances"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentTop="true"
-        android:layout_above="@id/create_alliance_btn" />
+        android:layout_above="@id/create_alliance_btn"
+        android:layout_alignParentLeft="true" />
 
 </RelativeLayout>
