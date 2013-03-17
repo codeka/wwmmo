@@ -558,7 +558,7 @@ public class BuildQueueList extends FrameLayout
                 if (entry.buildRequest.getCount() == 1) {
                     row1.setText(design.getDisplayName());
                 } else {
-                    row1.setText(String.format("%d × %s)",
+                    row1.setText(String.format("%d × %s",
                             entry.buildRequest.getCount(), design.getDisplayName(entry.buildRequest.getCount() > 1)));
                 }
 

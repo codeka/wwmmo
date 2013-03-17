@@ -16,6 +16,7 @@ import android.os.Parcel;
  * on the server, and we go to great pains to keep them in sync.
  */
 public class Simulation {
+    //private static Logger log = LoggerFactory.getLogger(Simulation.class);
     private DateTime mNow;
 
     private static DateTime year2k = new DateTime(2000, 1, 1, 0, 0);
@@ -29,6 +30,8 @@ public class Simulation {
      * @param star
      */
     public void simulate(Star star) {
+        //log.debug(String.format("Begin simulation for '%s'", star.getName()));
+
         HashSet<String> empireKeys = new HashSet<String>();
         for (Colony colony : star.getColonies()) {
             if (!empireKeys.contains(colony.getEmpireKey())) {
@@ -66,6 +69,7 @@ public class Simulation {
                 startTime = stepEndTime;
             } else if (stepEndTime.compareTo(predictionTime) < 0) {
                 if (predictionStar == null) {
+                    //log.debug(String.format("Begin prediction for '%s'", star.getName()));
                     mNow = endTime;
                     dt = new Interval(startTime, endTime).toDuration();
                     if (dt.getMillis() > 1000) {
@@ -106,6 +110,8 @@ public class Simulation {
 
             star.setLastSimulation(mNow);
         }
+
+        //log.debug(String.format("End simulation for '%s'", star.getName()));
     }
 
     private DateTime getSimulateStartTime(Star star) {
@@ -247,9 +253,9 @@ public class Simulation {
                     if (startTime.compareTo(now) > 0) {
                         Duration startOffset = new Interval(startTime, now).toDuration();
                         dtUsed -= startOffset.getMillis() / (1000.0f * 3600.0f);
-                        if (dtUsed > timeRemainingInHours) {
-                            dtUsed = timeRemainingInHours;
-                        }
+                    }
+                    if (dtUsed > timeRemainingInHours) {
+                        dtUsed = timeRemainingInHours;
                     }
 
                     // what is the current amount of time we have now as a percentage of the total build

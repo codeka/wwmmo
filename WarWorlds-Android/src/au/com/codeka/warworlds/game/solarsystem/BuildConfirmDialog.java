@@ -251,7 +251,7 @@ public class BuildConfirmDialog extends DialogFragment {
                         // late...
                     }
                 } else {
-                    EmpireManager.getInstance().refreshEmpire();
+                    EmpireManager.getInstance().getEmpire().setDirty();
                     StarManager.getInstance().refreshStar(activity, mColony.getStarKey());
                 }
             }
