@@ -2,10 +2,11 @@
 
 import collections
 from datetime import datetime, timedelta
-
 import logging
 import math
 import random
+
+from google.appengine.api import memcache
 
 import ctrl
 from ctrl import designs
@@ -142,11 +143,17 @@ def getStar(star_key, force_nocache=False):
 def getStars(search_query):
   """Searches for stars based on the given query (by default, name of the star)."""
   stars_pb = pb.Stars()
-  query = (mdl.Star.all().filter("name >=", search_query)
-                         .filter("name <", search_query + u"\ufffd"))
-  for star_mdl in query:
+  # try to get it by key first
+  try:
+    star_mdl = mdl.Star.get(search_query)
     star_pb = stars_pb.stars.add()
     ctrl.starModelToPb(star_pb, star_mdl)
+  except:
+    query = (mdl.Star.all().filter("name >=", search_query)
+                           .filter("name <", search_query + u"\ufffd"))
+    for star_mdl in query:
+      star_pb = stars_pb.stars.add()
+      ctrl.starModelToPb(star_pb, star_mdl)
   return stars_pb
 
 
@@ -170,6 +177,52 @@ def renameStar(star_pb, rename_request_pb):
   star_rename_mdl.purchaseDeveloperPayload = rename_request_pb.purchase_developer_payload
   star_rename_mdl.purchasePrice = rename_request_pb.purchase_price
   star_rename_mdl.put()
+
+
+def swapStars(star1_pb, star2_pb):
+  """Swaps the location of the two stars on the sector map."""
+  star1_mdl = mdl.Star.get(db.Key(star1_pb.key))
+  star2_mdl = mdl.Star.get(db.Key(star2_pb.key))
+  tmp = star1_mdl.sector
+  star1_mdl.sector = star2_mdl.sector
+  star2_mdl.sector = tmp
+  tmp = star1_mdl.x
+  star1_mdl.x = star2_mdl.x
+  star2_mdl.x = tmp
+  tmp = star1_mdl.y
+  star1_mdl.y = star2_mdl.y
+  star2_mdl.y = tmp
+  star1_mdl.put()
+  star2_mdl.put()
+
+  sector1_mdl = star1_mdl.sector
+  sector2_mdl = star2_mdl.sector
+
+  # if the sectors are changed, we have to update anything else that references the sectors
+  if sector1_mdl.key() != sector2_mdl.key():
+    logging.debug("Sectors have changed, moving fleets")
+    for fleet_pb in star1_pb.fleets:
+      fleet_mdl = empire_mdl.Fleet.get(db.Key(fleet_pb.key))
+      fleet_mdl.sector = sector1_mdl
+      fleet_mdl.put()
+    for fleet_pb in star2_pb.fleets:
+      fleet_mdl = empire_mdl.Fleet.get(db.Key(fleet_pb.key))
+      fleet_mdl.sector = sector2_mdl
+      fleet_mdl.put()
+    logging.debug("... and colonies")
+    for colony_pb in star1_pb.colonies:
+      colony_mdl = empire_mdl.Colony.get(db.Key(colony_pb.key))
+      colony_mdl.sector = sector1_mdl
+      colony_mdl.put()
+    for colony_pb in star2_pb.colonies:
+      colony_mdl = empire_mdl.Colony.get(db.Key(colony_pb.key))
+      colony_mdl.sector = sector2_mdl
+      colony_mdl.put()
+
+  # this may be a bit heavy-handed, but it's easier... hopefully we won't be swapping stars
+  # all that often!
+  mc = memcache.Client()
+  mc.flush_all()
 
 
 def _addNativeColonies(star_pb):

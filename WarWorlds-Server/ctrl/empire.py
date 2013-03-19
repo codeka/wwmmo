@@ -755,6 +755,9 @@ def build(empire_pb, colony_pb, request_pb, sim):
     logging.warn("Asked to build design '%s', which does not exist." % (request_pb.design_name))
     return False
 
+  # make sure the star is simulated up to this point
+  sim.simulate(colony_pb.star_key)
+
   if (request_pb.build_kind == pb.BuildRequest.BUILDING
       and design.maxPerColony > 0
       and not request_pb.existing_building_key):
@@ -832,9 +835,6 @@ def build(empire_pb, colony_pb, request_pb, sim):
 
   if request_pb.count > 5000:
     request_pb.count = 5000
-
-  # make sure the star is simulated up to this point
-  sim.simulate(colony_pb.star_key)
 
   # Save the initial build model. There's two writes here, once now and once after it
   build_operation_model = mdl.BuildOperation(parent=db.Key(colony_pb.star_key))

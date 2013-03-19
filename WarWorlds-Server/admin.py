@@ -22,6 +22,7 @@ import model
 from model import session
 from model import statistics as stats_mdl
 from ctrl import empire
+from ctrl import sector
 
 
 Jinja = jinja2.Environment(loader=jinja2.FileSystemLoader(os.path.dirname(__file__)+"/tmpl"))
@@ -209,6 +210,32 @@ class DebugDataStorePage(AdminPage):
       self.response.set_status(400)
 
 
+class ActionsMoveStarPage(AdminPage):
+  def get(self):
+    self.render("admin/actions/move-star.html", {})
+  def post(self):
+    data = {"star1": self.request.POST.get("star1"),
+            "star2": self.request.POST.get("star2"),
+            "complete": True}
+    star1_pb = None
+    star2_pb = None
+    try:
+      star1_pb = sector.getStar(self.request.POST.get("star1"))
+      star2_pb = sector.getStar(self.request.POST.get("star2"))
+    except:
+      data["success"] = False
+      data["msg"] = "FAILED: error loading stars"
+    if star1_pb and star2_pb:
+      logging.debug("Swapping %s with %s" % (star1_pb.name, star2_pb.name))
+      try:
+        sector.swapStars(star1_pb, star2_pb)
+        data["success"] = True
+      except:
+        data["success"] = False
+        data["msg"] = "FAILED: error moving stars (check backend)"
+
+    self.render("admin/actions/move-star.html", data)
+
 class DevicesPage(AdminPage):
   """The "devices" page lets you view all devices that have registered and send them messages."""
 
@@ -225,6 +252,7 @@ app = webapp.WSGIApplication([("/admin", DashboardPage),
                               ("/admin/debug/data-store", DebugDataStorePage),
                               ("/admin/debug/colonies", DebugColoniesPage),
                               ("/admin/debug/reports", DebugReportsPage),
-                              ("/admin/debug/reports-ajax", DebugReportsAjaxPage)],
+                              ("/admin/debug/reports-ajax", DebugReportsAjaxPage),
+                              ("/admin/actions/move-star", ActionsMoveStarPage)],
                              debug=os.environ["SERVER_SOFTWARE"].startswith("Development"))
 
