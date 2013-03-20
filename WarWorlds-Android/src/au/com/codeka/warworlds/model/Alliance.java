@@ -1,5 +1,8 @@
 package au.com.codeka.warworlds.model;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
@@ -13,6 +16,7 @@ public class Alliance implements Parcelable {
     private DateTime mTimeCreated;
     private String mCreatorEmpireKey;
     private int mNumMembers;
+    private List<AllianceMember> mMembers;
 
     public String getKey() {
         return mKey;
@@ -29,6 +33,9 @@ public class Alliance implements Parcelable {
     public int getNumMembers() {
         return mNumMembers;
     }
+    public List<AllianceMember> getMembers() {
+        return mMembers;
+    }
 
     @Override
     public int describeContents() {
@@ -42,6 +49,7 @@ public class Alliance implements Parcelable {
         parcel.writeLong(mTimeCreated.getMillis());
         parcel.writeString(mCreatorEmpireKey);
         parcel.writeInt(mNumMembers);
+        //todo: members?
     }
 
     protected void readFromParcel(Parcel parcel) {
@@ -50,6 +58,7 @@ public class Alliance implements Parcelable {
         mTimeCreated = new DateTime(parcel.readLong(), DateTimeZone.UTC);
         mCreatorEmpireKey = parcel.readString();
         mNumMembers = parcel.readInt();
+        //todo: members?
     }
 
     public static final Parcelable.Creator<Alliance> CREATOR
@@ -74,6 +83,13 @@ public class Alliance implements Parcelable {
         alliance.mTimeCreated = new DateTime(pb.getTimeCreated() * 1000, DateTimeZone.UTC);
         alliance.mCreatorEmpireKey = pb.getCreatorEmpireKey();
         alliance.mNumMembers = pb.getNumMembers();
+
+        if (pb.getMembersCount() > 0) {
+            alliance.mMembers = new ArrayList<AllianceMember>();
+            for (Messages.AllianceMember member_pb : pb.getMembersList()) {
+                alliance.mMembers.add(AllianceMember.fromProtocolBuffer(member_pb));
+            }
+        }
         return alliance;
     }
 }

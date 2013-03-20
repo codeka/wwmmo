@@ -904,6 +904,12 @@ message Alliance
 }
 
 
+message Alliances
+{
+    repeated Alliance alliances = 1;
+}
+
+
 message AllianceMember
 {
     optional string key = 1;

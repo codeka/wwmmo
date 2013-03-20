@@ -109,7 +109,7 @@ public class StarfieldActivity extends BaseActivity
         mStarfield.addSelectionChangedListener(this);
 
         InfobarView infobar = (InfobarView) findViewById(R.id.infobar);
-        //infobar.hideEmpireName();
+        infobar.hideEmpireName();
 
         mPlanetList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -207,15 +207,12 @@ public class StarfieldActivity extends BaseActivity
         });
 
         final Button allianceBtn = (Button) findViewById(R.id.alliance_btn);
-        allianceBtn.setVisibility(View.GONE);
-        /*
         allianceBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 onAllianceClick();
             }
         });
-        */
 
         ServerGreeter.waitForHello(this, new ServerGreeter.HelloCompleteHandler() {
             @Override

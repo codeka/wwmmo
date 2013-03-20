@@ -383,7 +383,9 @@ class EmpireDetailsPage(ApiPage):
 class AlliancesPage(ApiPage):
   """This page is where you post a new alliance you're creating, fetch the list of alliances, etc."""
   def get(self):
-    pass
+    """Gets the list of all alliances on the server."""
+    alliances_pb = alliance.getAlliances()
+    return alliances_pb
   def post(self):
     """Post a new alliance here, we'll subtract the fee and get you going!"""
     empire_pb = empire.getEmpireForUser(self.user)
@@ -391,6 +393,16 @@ class AlliancesPage(ApiPage):
     alliance_pb.time_created = ctrl.dateTimeToEpoch(datetime.now())
     alliance_pb.creator_empire_key = empire_pb.key
     return alliance.createAlliance(alliance_pb, empire_pb)
+
+
+class AlliancePage(ApiPage):
+  def get(self, alliance_key):
+    """Gets details, including memberships, of the alliance with the given key."""
+    alliance_pb = alliance.getAlliance(alliance_key)
+    if not alliance_pb:
+      self.response.set_status(404)
+      return
+    return alliance_pb
 
 
 class DevicesPage(ApiPage):
@@ -909,6 +921,7 @@ app = ApiApplication([("/api/v1/hello/([^/]+)", HelloPage),
                       ("/api/v1/empires/([^/]+)/details", EmpireDetailsPage),
                       ("/api/v1/empires/([^/]+)/taxes", EmpireTaxesPage),
                       ("/api/v1/alliances", AlliancesPage),
+                      ("/api/v1/alliances/([^/]+)", AlliancePage),
                       ("/api/v1/devices", DevicesPage),
                       ("/api/v1/devices/([^/]+)", DevicesPage),
                       ("/api/v1/devices/user:([^/]+)/messages", DeviceMessagesPage),

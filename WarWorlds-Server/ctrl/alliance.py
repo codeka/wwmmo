@@ -33,5 +33,45 @@ def createAlliance(alliance_pb, empire_pb):
   alliance_member_mdl.joinDate = datetime.now()
   alliance_member_mdl.put()
 
+  ctrl.clearCached(["alliances:all"])
+
   alliance_pb.num_members = 1
   return alliance_pb
+
+
+def getAlliance(alliance_key):
+  """Fetches details of the given alliance, including members."""
+  cache_key = "alliances:%s" % alliance_key
+  values = ctrl.getCached([cache_key], pb.Alliance)
+  if cache_key in values:
+    return values[cache_key]
+
+  alliance_mdl = mdl.Alliance.get(db.Key(alliance_key))
+  if not alliance_mdl:
+    return None
+  alliance_pb = pb.Alliance()
+  ctrl.allianceModelToPb(alliance_pb, alliance_mdl)
+
+  # fetch the members for this alliance, too
+  for alliance_member_mdl in mdl.AllianceMember.all().ancestor(alliance_mdl):
+    alliance_member_pb = alliance_pb.members.add()
+    ctrl.allianceMemberModelToPb(alliance_member_pb, alliance_member_mdl)
+
+  ctrl.setCached({cache_key: alliance_pb})
+  return alliance_pb
+
+
+def getAlliances():
+  """Fetches all the alliances we have on the server."""
+  cache_key = "alliances:all"
+  values = ctrl.getCached([cache_key], pb.Alliances)
+  if cache_key in values:
+    return values[cache_key]
+
+  alliances_pb = pb.Alliances()
+  for alliance_mdl in mdl.Alliance.all():
+    alliance_pb = alliances_pb.alliances.add()
+    ctrl.allianceModelToPb(alliance_pb, alliance_mdl)
+
+  ctrl.setCached({cache_key: alliances_pb})
+  return alliances_pb

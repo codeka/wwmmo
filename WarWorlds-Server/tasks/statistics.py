@@ -101,7 +101,8 @@ class GeneratePage(tasks.TaskPage):
 
 class UpdateRankingsPage(tasks.TaskPage):
   def get(self):
-    update_rankings()
+    deferred.defer(update_rankings,
+                   _queue="statistics")
 
 
 def _update_empire_building_count(empire_key):

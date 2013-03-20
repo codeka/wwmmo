@@ -301,6 +301,7 @@ def createEmpire(empire_pb, sim):
   if empire_pb.key:
     empire_model = mdl.Empire.get(db.Key(empire_pb.key))
     keys_to_clear.append("empire:%s" % (empire_pb.key))
+    # todo: remove him from his existing alliance?
   else:
     empire_model = mdl.Empire()
     ctrl.empirePbToModel(empire_model, empire_pb)

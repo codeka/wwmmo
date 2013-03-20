@@ -17,6 +17,16 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_above="@id/create_alliance_btn"
+        android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true" />
+
+    <ProgressBar
+        android:id="@+id/loading"
+        style="?android:attr/progressBarStyleLarge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="100dp" />
 
 </RelativeLayout>

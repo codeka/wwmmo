@@ -105,6 +105,9 @@
         <activity android:name=".game.alliance.AllianceActivity"
                   android:screenOrientation="portrait" />
 
+        <activity android:name=".game.alliance.AllianceDetailsActivity"
+                  android:screenOrientation="portrait" />
+        
         <activity android:name=".game.ChatActivity"
                   android:screenOrientation="portrait" />
 
