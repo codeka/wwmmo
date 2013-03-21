@@ -256,12 +256,23 @@ class EmpiresSearchPage(ApiPage):
       search = self.request.get("email")
       user = users.User(search)
       if user:
-        empires_pb.empires.extend([empire.getEmpireForUser(user)])
+        empire_pb = empire.getEmpireForUser(user)
+        if empire_pb:
+          empires_pb.empires.extend([empire_pb])
     if self.request.get("name", "") != "":
       search = self.request.get("name")
       for part in search.split():
         empire_pbs = empire.getEmpiresByName(part.lower())
         logging.debug("Searching for '%s' found %d empires" % (part.lower(), len(empire_pbs)))
+        empires_pb.empires.extend(empire_pbs)
+    if self.request.get("ids", "") != "":
+      ids = self.request.get("ids").split(",")
+      empire_pbs = []
+      for empire_key in ids:
+        empire_pb = empire.getEmpire(empire_key)
+        if empire_pb:
+          empire_pbs.append(empire_pb)
+      if empire_pbs:
         empires_pb.empires.extend(empire_pbs)
     if self.request.get("minRank", "") != "":
       minRank = int(self.request.get("minRank"))

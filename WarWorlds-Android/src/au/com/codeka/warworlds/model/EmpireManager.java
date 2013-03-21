@@ -3,6 +3,7 @@ package au.com.codeka.warworlds.model;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -10,6 +11,8 @@ import java.util.TreeMap;
 
 import org.apache.commons.collections.IteratorUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -148,78 +151,104 @@ public class EmpireManager {
     }
 
     public void refreshEmpire(final Context context,
-                              final String empireKey,
-                              final EmpireFetchedHandler handler) {
+            final String empireKey,
+            final EmpireFetchedHandler handler) {
         if (empireKey == null || empireKey.length() == 0) {
             if (handler != null) {
                 handler.onEmpireFetched(mNativeEmpire);
             }
             return;
         }
+        
+        ArrayList<String> empireKeys = new ArrayList<String>();
+        empireKeys.add(empireKey);
+        refreshEmpires(context, empireKeys, handler);
+    }
 
-        List<EmpireFetchedHandler> inProgress = mInProgress.get(empireKey);
-        if (inProgress != null) {
-            // if there's already a call in progress, don't fetch again
-            if (handler != null) {
-                inProgress.add(handler);
+    public void refreshEmpires(final Context context,
+                               final Collection<String> empireKeys,
+                               final EmpireFetchedHandler handler) {
+        ArrayList<String> toFetch = new ArrayList<String>();
+
+        for (String empireKey : empireKeys) {
+            List<EmpireFetchedHandler> inProgress = mInProgress.get(empireKey);
+            if (inProgress != null) {
+                // if there's already a call in progress, don't fetch again
+                if (handler != null) {
+                    inProgress.add(handler);
+                }
+                continue;
+            } else {
+                inProgress = new ArrayList<EmpireFetchedHandler>();
+                if (handler != null) {
+                    inProgress.add(handler);
+                }
+                mInProgress.put(empireKey, inProgress);
+                toFetch.add(empireKey);
             }
-            return;
-        } else {
-            inProgress = new ArrayList<EmpireFetchedHandler>();
-            if (handler != null) {
-                inProgress.add(handler);
-            }
-            mInProgress.put(empireKey, inProgress);
         }
 
-        new AsyncTask<Void, Void, Empire>() {
+        new AsyncTask<Void, Void, List<Empire>>() {
             @Override
-            protected Empire doInBackground(Void... arg0) {
-                Empire empire = null;
-
+            protected List<Empire> doInBackground(Void... arg0) {
                 try {
-                    String url = "empires/"+empireKey;
-
-                    Messages.Empire pb = ApiClient.getProtoBuf(url, Messages.Empire.class);
-                    new LocalEmpireStore(context).addEmpire(pb);
-
-                    if (empireKey.equals(mEmpire.getKey())) {
-                        empire = MyEmpire.fromProtocolBuffer(pb);
-                    } else {
-                        empire = Empire.fromProtocolBuffer(pb);
+                    String url = null;
+                    for (String empireKey : empireKeys) {
+                        if (url == null) {
+                            url = "empires/search?ids=";
+                        } else {
+                            url += ",";
+                        }
+                        url += empireKey;
                     }
+
+                    Messages.Empires pb = ApiClient.getProtoBuf(url, Messages.Empires.class);
+                    ArrayList<Empire> empires = new ArrayList<Empire>();
+                    LocalEmpireStore store = new LocalEmpireStore(context);
+                    for (Messages.Empire empire_pb : pb.getEmpiresList()) {
+                        store.addEmpire(empire_pb);
+
+                        if (mEmpire != null && empire_pb.getKey().equals(mEmpire.getKey())) {
+                            empires.add(MyEmpire.fromProtocolBuffer(empire_pb));
+                        } else {
+                            empires.add(Empire.fromProtocolBuffer(empire_pb));
+                        }
+                    }
+                    return empires;
                 } catch(Exception e) {
                     // TODO: handle exceptions
                     log.error(ExceptionUtils.getStackTrace(e));
+                    return null;
                 }
-
-                return empire;
             }
 
             @Override
-            protected void onPostExecute(Empire empire) {
-                if (empire == null) {
+            protected void onPostExecute(List<Empire> empires) {
+                if (empires == null) {
                     return; // BAD!
                 }
 
-                if (empireKey.equals(mEmpire.getKey())) {
-                    mEmpire = (MyEmpire) empire;
-                } else {
-                    mEmpireCache.put(empireKey, empire);
-                }
+                for (Empire empire : empires) {
+                    String empireKey = empire.getKey();
 
-                List<EmpireFetchedHandler> inProgress = mInProgress.get(empireKey);
-                if (inProgress != null) for (EmpireFetchedHandler handler : inProgress) {
-                    if (handler != null) {
-                        handler.onEmpireFetched(empire);
+                    if (empireKey.equals(mEmpire.getKey())) {
+                        mEmpire = (MyEmpire) empire;
+                    } else {
+                        mEmpireCache.put(empireKey, empire);
                     }
-                }
-                mInProgress.remove(empireKey);
 
-                fireEmpireUpdated(empire);
+                    List<EmpireFetchedHandler> inProgress = mInProgress.get(empireKey);
+                    if (inProgress != null) for (EmpireFetchedHandler handler : inProgress) {
+                        if (handler != null) {
+                            handler.onEmpireFetched(empire);
+                        }
+                    }
+                    mInProgress.remove(empireKey);
+
+                    fireEmpireUpdated(empire);
+                }
             }
         }.execute();
-
     }
 
     public void fetchEmpire(final Context context,
@@ -355,7 +384,7 @@ public class EmpireManager {
         private static Object sLock = new Object();
 
         public LocalEmpireStore(Context context) {
-            super(context, "empires.db", null, 1);
+            super(context, "empires.db", null, 2);
         }
 
         /**
@@ -372,6 +401,10 @@ public class EmpireManager {
 
         @Override
         public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+            if (newVersion == 2) {
+                db.execSQL("ALTER TABLE empires "
+                          +"ADD COLUMN timestamp INTEGER DEFAULT 0;");
+            }
         }
 
         public void addEmpire(Messages.Empire empire) {
@@ -389,6 +422,7 @@ public class EmpireManager {
                     ContentValues values = new ContentValues();
                     values.put("empire", empireBlob.toByteArray());
                     values.put("empire_key", empire.getKey());
+                    values.put("timestamp", DateTime.now(DateTimeZone.UTC).getMillis());
                     db.insert("empires", null, values);
                 } finally {
                     db.close();
@@ -401,11 +435,18 @@ public class EmpireManager {
                 SQLiteDatabase db = getReadableDatabase();
                 Cursor cursor = null;
                 try {
-                    cursor = db.query("empires", new String[] {"empire"},
+                    cursor = db.query("empires", new String[] {"empire", "timestamp"},
                             "empire_key = '"+empireKey.replace('\'', ' ')+"'",
                             null, null, null, null);
                     if (!cursor.moveToFirst()) {
                         cursor.close();
+                        return null;
+                    }
+
+                    // if it's too old, we'll want to refresh it anyway from the server
+                    long timestamp = cursor.getLong(1);
+                    long oneDayAgo = DateTime.now(DateTimeZone.UTC).minusDays(1).getMillis();
+                    if (timestamp == 0 || timestamp < oneDayAgo) {
                         return null;
                     }
 

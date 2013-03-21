@@ -31,16 +31,27 @@
     form#find-byemailidname input[type=text] {
       right: 130pt;
     }
-    form#find-byemailidname input[type=checkbox] {
+    form#find-byemailidname input[id=search-details] {
       position: absolute;
       right: 110pt;
-      top: 6pt;
+      top: 1pt;
     }
     form#find-byemailidname label[for=search-details] {
       position: absolute;
-      top: 0; bottom: 0;
+      top: 0; height: 16pt;
       left: 392pt;
-      line-height: 28pt
+      line-height: 16pt;
+    }
+    form#find-byemailidname input[id=search-simulate] {
+      position: absolute;
+      right: 110pt;
+      top: 12pt;
+    }
+    form#find-byemailidname label[for=search-simulate] {
+      position: absolute;
+      top: 12pt; height: 16pt;
+      left: 392pt;
+      line-height: 16pt;
     }
 
     form input[type=text]#create-empire-name {
@@ -58,6 +69,8 @@
     <input type="text" id="search-value" placeholder="Key, email or name" />
     <input type="checkbox" id="search-details">
     <label for="search-details" title="(You must specify key for this)">Details</label>
+    <input type="checkbox" id="search-simulate">
+    <label for="search-simulate">Simulate</label>
     <input type="submit" value="Search" />
   </form>
   <form id="create-empire">
@@ -73,8 +86,11 @@
 
       var url = "";
       var inp = $(this).find("input[type=text]");
-      if ($(this).find("input[type=checkbox]").prop("checked")) {
+      if ($(this).find("#search-details").prop("checked")) {
         url = "/api/v1/empires/"+inp.val()+"/details";
+        if (!$(this).find("#search-simulate").prop("checked")) {
+          url += "?do_simulate=0";
+        }
       } else {
         url = "/api/v1/empires/search";
         if (inp.val().indexOf("@") > 0) {
