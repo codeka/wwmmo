@@ -11,6 +11,13 @@ indexes:
 # your application using appcfg.py.
 
 - kind: AllianceJoinRequest
+  properties:
+  - name: empire
+  - name: status
+  - name: requestDate
+    direction: desc
+
+- kind: AllianceJoinRequest
   ancestor: yes
   properties:
   - name: requestDate

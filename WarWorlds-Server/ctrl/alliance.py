@@ -105,6 +105,19 @@ def getJoinRequest(alliance_join_request_key):
   return alliance_join_request_pb
 
 
+def getPendingJoinRequestsForEmpire(empire_key):
+  """Gets all PENDING join requests for the given empire."""
+  cache_key = "alliance-join-requests-for-empire:%s" % empire_key
+  values = ctrl.getCached([cache_key], pb.AllianceJoinRequests)
+  if cache_key in values:
+    return values[cache_key]
+
+  query = (mdl.AllianceJoinRequest.all().filter("empire", db.Key(empire_key))
+                                        .filter("status", pb.AllianceJoinRequest.PENDING.number)
+                                        .order("-requestDate"))
+  return _getJoinRequestsForQuery(cache_key, query)
+
+
 def getJoinRequests(alliance_pb):
   """Fetches alliance join requests for the given alliance."""
   cache_key = "alliance-join-requests:%s" % (alliance_pb.key)
@@ -112,9 +125,13 @@ def getJoinRequests(alliance_pb):
   if cache_key in values:
     return values[cache_key]
 
-  alliance_join_requests_pb = pb.AllianceJoinRequests()
   query = (mdl.AllianceJoinRequest.all().ancestor(db.Key(alliance_pb.key))
                                         .order("-requestDate"))
+  return _getJoinRequestsForQuery(cache_key, query)
+
+
+def _getJoinRequestsForQuery(cache_key, query):
+  alliance_join_requests_pb = pb.AllianceJoinRequests()
   for alliance_join_request_mdl in query:
     alliance_join_request_pb = alliance_join_requests_pb.join_requests.add()
     ctrl.allianceJoinRequestModelToPb(alliance_join_request_pb, alliance_join_request_mdl)
@@ -129,6 +146,14 @@ def updateJoinRequest(alliance_join_request_pb):
 
   if (alliance_join_request_mdl.status == pb.AllianceJoinRequest.PENDING and
       alliance_join_request_pb.state == pb.AllianceJoinRequest.ACCEPTED):
+    # first, all other pending requests for this empire must become 'rejected'
+    alliance_join_requests_pb = getPendingJoinRequestsForEmpire(alliance_join_request_pb.empire_key)
+    for this_alliance_join_request_pb in alliance_join_requests_pb.join_requests:
+      if this_alliance_join_request_pb.key == alliance_join_request_pb.key:
+        continue
+      this_alliance_join_request_pb.state = pb.AllianceJoinRequest.REJECTED
+      updateJoinRequest(this_alliance_join_request_pb)
+
     # if we've gone from PENDING to ACCEPTED, we need to actually add them as a member now
     # TODO: transaction...
     alliance_mdl = mdl.Alliance.get(alliance_join_request_pb.alliance_key)
@@ -144,6 +169,9 @@ def updateJoinRequest(alliance_join_request_pb):
   alliance_join_request_mdl.message = alliance_join_request_pb.message
   alliance_join_request_mdl.put()
 
+  empire_pb = empire_ctl.getEmpire(alliance_join_request_pb.empire_key)
   ctrl.clearCached(["alliance-join-requests:%s" % (alliance_join_request_pb.alliance_key),
                     "alliances:all",
-                    "alliances:%s" % alliance_join_request_pb.alliance_key])
+                    "alliances:%s" % alliance_join_request_pb.alliance_key,
+                    "empire:%s" % alliance_join_request_pb.empire_key,
+                    "empire-for-user:%s" % empire_pb.email])

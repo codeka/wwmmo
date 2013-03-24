@@ -430,6 +430,17 @@ class AllianceJoinRequestsPage(ApiPage):
       self.response.set_status(404)
       return
     empire_pb = empire.getEmpireForUser(self.user)
+
+    # if they already have a pending one for this empire, just update it instead
+    alliance_join_requests_pb = alliance.getPendingJoinRequestsForEmpire(empire_pb.key)
+    for alliance_join_request_pb in alliance_join_requests_pb.join_requests:
+      logging.debug("checking this one")
+      if alliance_join_request_pb.alliance_key == alliance_pb.key:
+        new_join_request_pb = self._getRequestBody(pb.AllianceJoinRequest)
+        alliance_join_request_pb.message = new_join_request_pb.message
+        alliance.updateJoinRequest(alliance_join_request_pb)
+        return alliance_join_request_pb
+
     alliance_join_request_pb = self._getRequestBody(pb.AllianceJoinRequest)
     alliance_join_request_pb.alliance_key = alliance_pb.key
     alliance_join_request_pb.empire_key = empire_pb.key
