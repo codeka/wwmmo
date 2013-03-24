@@ -90,6 +90,21 @@ def requestJoin(alliance_pb, alliance_join_request_pb):
   ctrl.clearCached(["alliance-join-requests:%s" % (alliance_pb.key)])
 
 
+def getJoinRequest(alliance_join_request_key):
+  cache_key = "alliance-join-request:%s" % (alliance_join_request_key)
+  values = ctrl.getCached([cache_key], pb.AllianceJoinRequest)
+  if cache_key in values:
+    return values[cache_key]
+
+  alliance_join_request_mdl = mdl.AllianceJoinRequest.get(alliance_join_request_key)
+  if not alliance_join_request_mdl:
+    return None
+  alliance_join_request_pb = pb.AllianceJoinRequest()
+  ctrl.allianceJoinRequestModelToPb(alliance_join_request_pb, alliance_join_request_mdl)
+  ctrl.setCached({cache_key: alliance_join_request_pb})
+  return alliance_join_request_pb
+
+
 def getJoinRequests(alliance_pb):
   """Fetches alliance join requests for the given alliance."""
   cache_key = "alliance-join-requests:%s" % (alliance_pb.key)
@@ -107,3 +122,28 @@ def getJoinRequests(alliance_pb):
   ctrl.setCached({cache_key: alliance_join_requests_pb})
   return alliance_join_requests_pb
 
+
+def updateJoinRequest(alliance_join_request_pb):
+  alliance_join_request_mdl = mdl.AllianceJoinRequest.get(alliance_join_request_pb.key)
+  # note: we largely trust the PBs at this point, security is taken care of in the ApiPages.
+
+  if (alliance_join_request_mdl.status == pb.AllianceJoinRequest.PENDING and
+      alliance_join_request_pb.state == pb.AllianceJoinRequest.ACCEPTED):
+    # if we've gone from PENDING to ACCEPTED, we need to actually add them as a member now
+    # TODO: transaction...
+    alliance_mdl = mdl.Alliance.get(alliance_join_request_pb.alliance_key)
+    alliance_mdl.numMembers = alliance_mdl.numMembers + 1
+    alliance_mdl.put()
+
+    alliance_member_mdl = mdl.AllianceMember(parent=alliance_mdl)
+    alliance_member_mdl.empire = db.Key(alliance_join_request_pb.empire_key)
+    alliance_member_mdl.joinDate = datetime.now()
+    alliance_member_mdl.put()
+
+  alliance_join_request_mdl.status = alliance_join_request_pb.state
+  alliance_join_request_mdl.message = alliance_join_request_pb.message
+  alliance_join_request_mdl.put()
+
+  ctrl.clearCached(["alliance-join-requests:%s" % (alliance_join_request_pb.alliance_key),
+                    "alliances:all",
+                    "alliances:%s" % alliance_join_request_pb.alliance_key])

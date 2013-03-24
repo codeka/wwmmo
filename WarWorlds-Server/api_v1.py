@@ -430,14 +430,44 @@ class AllianceJoinRequestsPage(ApiPage):
       self.response.set_status(404)
       return
     empire_pb = empire.getEmpireForUser(self.user)
-    if not empire_pb:
-      self.response.set_status(403)
-      return
     alliance_join_request_pb = self._getRequestBody(pb.AllianceJoinRequest)
     alliance_join_request_pb.alliance_key = alliance_pb.key
     alliance_join_request_pb.empire_key = empire_pb.key
+    alliance_join_request_pb.time_requested = ctrl.dateTimeToEpoch(datetime.now())
     alliance.requestJoin(alliance_pb, alliance_join_request_pb)
     return alliance_join_request_pb
+
+  def put(self, alliance_key):
+    """Members of the alliance can update other people's pending requests (to approve or reject them)."""
+    alliance_pb = alliance.getAlliance(alliance_key)
+    if not alliance_pb:
+      self.response.set_status(404)
+      return
+    empire_pb = empire.getEmpireForUser(self.user)
+    alliance_join_request_pb = self._getRequestBody(pb.AllianceJoinRequest)
+
+    existing_join_request_pb = alliance.getJoinRequest(alliance_join_request_pb.key)
+    if not existing_join_request_pb:
+      self.response.set_status(400)
+      return
+
+    if existing_join_request_pb.alliance_key != alliance_key:
+      self.response.set_status(403)
+      return
+
+    # if it's your own request, that's OK. if you're a member of the alliance, that's OK
+    if alliance_join_request_pb.empire_key != empire_pb.key:
+      if existing_join_request_pb.alliance_key != empire_pb.alliance.key:
+        self.response.set_status(403)
+        return
+
+    # if the join request is pending, we can change the status, also, the owner empire can
+    # change the message. But that's it
+    if existing_join_request_pb.state == pb.AllianceJoinRequest.PENDING:
+      existing_join_request_pb.state = alliance_join_request_pb.state
+    if existing_join_request_pb.empire_key == empire_pb.key:
+      existing_join_request_pb.message = alliance_join_request_pb.message
+    alliance.updateJoinRequest(existing_join_request_pb)
 
 
 class DevicesPage(ApiPage):

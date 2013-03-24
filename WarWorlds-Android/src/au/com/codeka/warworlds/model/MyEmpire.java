@@ -94,6 +94,12 @@ public class MyEmpire extends Empire {
         return mStars.get(key);
     }
 
+    @Override
+    public void updateAlliance(Alliance alliance) {
+        super.updateAlliance(alliance);
+        fireRefreshAllCompleteHandler();
+    }
+
     /**
      * Colonizes the given planet. We'll call the given \c ColonizeCompleteHandler when the
      * operation completes (successfully or not).

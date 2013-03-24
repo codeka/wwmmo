@@ -14,9 +14,27 @@ import au.com.codeka.warworlds.model.protobuf.Messages;
 
 public class AllianceManager {
     private static AllianceManager sInstance = new AllianceManager();
-
     public static AllianceManager getInstance() {
         return sInstance;
+    }
+
+    private List<AllianceUpdatedHandler> mAllianceUpdatedHandlers;
+
+    private AllianceManager() {
+        mAllianceUpdatedHandlers = new ArrayList<AllianceUpdatedHandler>();
+    }
+
+    public void addAllianceUpdatedHandler(AllianceUpdatedHandler handler) {
+        mAllianceUpdatedHandlers.add(handler);
+    }
+    public void removeAllianceUpdatedHandler(AllianceUpdatedHandler handler) {
+        mAllianceUpdatedHandlers.remove(handler);
+    }
+    protected void fireAllianceUpdated(Alliance alliance) {
+        for (AllianceUpdatedHandler handler : mAllianceUpdatedHandlers) {
+            handler.onAllianceUpdated(alliance);
+        }
+        EmpireManager.getInstance().onAllianceUpdated(alliance);
     }
 
     /**
@@ -71,6 +89,7 @@ public class AllianceManager {
                 if (handler != null && alliance != null) {
                     handler.onAllianceFetched(alliance);
                 }
+                fireAllianceUpdated(alliance);
             }
         }.execute();
     }
@@ -141,17 +160,54 @@ public class AllianceManager {
 
             @Override
             protected void onPostExecute(Boolean success) {
-                // TODO?
+                if (success) {
+                    refreshAlliance(allianceKey);
+                }
             }
         }.execute();
+    }
 
+    public void updateJoinRequest(final AllianceJoinRequest joinRequest) {
+        new AsyncTask<Void, Void, Boolean>() {
+            @Override
+            protected Boolean doInBackground(Void... params) {
+                String url = "alliances/"+joinRequest.getAllianceKey()+"/join-requests";
+                Messages.AllianceJoinRequest pb = Messages.AllianceJoinRequest.newBuilder()
+                                    .setKey(joinRequest.getKey())
+                                    .setAllianceKey(joinRequest.getAllianceKey())
+                                    .setEmpireKey(joinRequest.getEmpireKey())
+                                    .setMessage(joinRequest.getMessage())
+                                    .setState(Messages.AllianceJoinRequest.RequestState.valueOf(joinRequest.getState().getValue()))
+                                    .build();
+                try {
+                    ApiClient.putProtoBuf(url, pb);
+                    return true;
+                } catch(ApiException e) {
+                    return false;
+                }
+            }
+
+            @Override
+            protected void onPostExecute(Boolean success) {
+                if (success) {
+                    refreshAlliance(joinRequest.getAllianceKey());
+                }
+            }
+        }.execute();
+    }
+
+    private void refreshAlliance(String allianceKey) {
+        fetchAlliance(allianceKey, null);
     }
 
     public interface FetchAlliancesCompleteHandler {
         void onAlliancesFetched(List<Alliance> alliances);
     }
     public interface FetchAllianceCompleteHandler {
-        void onAllianceFetched(Alliance alliances);
+        void onAllianceFetched(Alliance alliance);
+    }
+    public interface AllianceUpdatedHandler {
+        void onAllianceUpdated(Alliance alliance);
     }
     public interface FetchJoinRequestsCompleteHandler {
         void onJoinRequestsFetched(Map<String, Empire> empires, List<AllianceJoinRequest> joinRequests);

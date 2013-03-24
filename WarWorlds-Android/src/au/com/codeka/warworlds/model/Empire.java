@@ -44,6 +44,10 @@ public class Empire implements Parcelable {
         return mAlliance;
     }
 
+    public void updateAlliance(Alliance alliance) {
+        mAlliance = alliance;
+    }
+
     /**
      * Gets (or creates, if there isn't one) the \c Bitmap that represents this Empire's
      * shield (i.e. their icon).

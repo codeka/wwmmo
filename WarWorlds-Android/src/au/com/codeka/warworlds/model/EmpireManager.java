@@ -189,44 +189,64 @@ public class EmpireManager {
             }
         }
 
-        new AsyncTask<Void, Void, List<Empire>>() {
-            @Override
-            protected List<Empire> doInBackground(Void... arg0) {
-                try {
-                    return refreshEmpiresSync(context, toFetch);
-                } catch (ApiException e) {
-                    log.error("An error occured fetching empires.", e);
-                    return null;
-                }
-            }
-
-            @Override
-            protected void onPostExecute(List<Empire> empires) {
-                if (empires == null) {
-                    return; // BAD!
+        if (toFetch.size() > 0) {
+            new AsyncTask<Void, Void, List<Empire>>() {
+                @Override
+                protected List<Empire> doInBackground(Void... arg0) {
+                    try {
+                        return refreshEmpiresSync(context, toFetch);
+                    } catch (ApiException e) {
+                        log.error("An error occured fetching empires.", e);
+                        return null;
+                    }
                 }
 
-                for (Empire empire : empires) {
-                    String empireKey = empire.getKey();
-
-                    if (empireKey.equals(mEmpire.getKey())) {
-                        mEmpire = (MyEmpire) empire;
-                    } else {
-                        mEmpireCache.put(empireKey, empire);
+                @Override
+                protected void onPostExecute(List<Empire> empires) {
+                    if (empires == null) {
+                        return; // BAD!
                     }
 
-                    List<EmpireFetchedHandler> inProgress = mInProgress.get(empireKey);
-                    if (inProgress != null) for (EmpireFetchedHandler handler : inProgress) {
-                        if (handler != null) {
-                            handler.onEmpireFetched(empire);
+                    for (Empire empire : empires) {
+                        String empireKey = empire.getKey();
+
+                        if (empireKey.equals(mEmpire.getKey())) {
+                            mEmpire = (MyEmpire) empire;
+                        } else {
+                            mEmpireCache.put(empireKey, empire);
                         }
-                    }
-                    mInProgress.remove(empireKey);
 
-                    fireEmpireUpdated(empire);
+                        List<EmpireFetchedHandler> inProgress = mInProgress.get(empireKey);
+                        if (inProgress != null) for (EmpireFetchedHandler handler : inProgress) {
+                            if (handler != null) {
+                                handler.onEmpireFetched(empire);
+                            }
+                        }
+                        mInProgress.remove(empireKey);
+
+                        fireEmpireUpdated(empire);
+                    }
                 }
+            }.execute();
+        }
+    }
+
+    /**
+     * This is called by the AllianceManager when an alliance changes, we'll want to refresh
+     * any empires we have cached with the new data.
+     */
+    public void onAllianceUpdated(Alliance alliance) {
+        if (mEmpire != null && mEmpire.getAlliance() != null && mEmpire.getAlliance().getKey().equals(alliance.getKey())) {
+            mEmpire.updateAlliance(alliance);
+            fireEmpireUpdated(mEmpire);
+        }
+
+        for (Empire empire : mEmpireCache.values()) {
+            if (empire.getAlliance() != null && empire.getAlliance().getKey().equals(alliance.getKey())) {
+                empire.updateAlliance(alliance);
+                fireEmpireUpdated(empire);
             }
-        }.execute();
+        }
     }
 
     /**

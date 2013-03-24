@@ -31,6 +31,9 @@ public class AllianceJoinRequest {
     public RequestState getState() {
         return mRequestState;
     }
+    public void setState(RequestState state) {
+        mRequestState = state;
+    }
 
     public static AllianceJoinRequest fromProtocolBuffer(Messages.AllianceJoinRequest pb) {
         AllianceJoinRequest ajr = new AllianceJoinRequest();

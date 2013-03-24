@@ -41,13 +41,17 @@ public class AllianceActivity extends TabFragmentActivity {
         super.onCreate(savedInstanceState);
 
         getTabManager().addTab(mContext, new TabInfo("Overview", OverviewFragment.class, null));
-        getTabManager().addTab(mContext, new TabInfo("Join Requests", JoinRequestsFragment.class, null));
+        MyEmpire myEmpire = EmpireManager.getInstance().getEmpire();
+        if (myEmpire.getAlliance() != null) {
+            getTabManager().addTab(mContext, new TabInfo("Join Requests", JoinRequestsFragment.class, null));
+        }
     }
 
     public static class BaseFragment extends Fragment {
     }
 
-    public static class OverviewFragment extends BaseFragment {
+    public static class OverviewFragment extends BaseFragment
+                                         implements AllianceManager.AllianceUpdatedHandler {
         private View mView;
         private RankListAdapter mRankListAdapter;
 
@@ -64,22 +68,8 @@ public class AllianceActivity extends TabFragmentActivity {
                 }
             });
 
-            final ProgressBar progressBar = (ProgressBar) mView.findViewById(R.id.loading);
-            final ListView alliancesList = (ListView) mView.findViewById(R.id.alliances);
-            alliancesList.setVisibility(View.GONE);
-            progressBar.setVisibility(View.VISIBLE);
+            ListView alliancesList = (ListView) mView.findViewById(R.id.alliances);
             alliancesList.setAdapter(mRankListAdapter);
-
-            AllianceManager.getInstance().fetchAlliances(new AllianceManager.FetchAlliancesCompleteHandler() {
-                @Override
-                public void onAlliancesFetched(List<Alliance> alliances) {
-                    mRankListAdapter.setAlliances(alliances);
-
-                    alliancesList.setVisibility(View.VISIBLE);
-                    progressBar.setVisibility(View.GONE);
-                }
-            });
-
             alliancesList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -93,12 +83,47 @@ public class AllianceActivity extends TabFragmentActivity {
                 }
             });
 
+            refresh();
             return mView;
+        }
+
+        @Override
+        public void onAttach(Activity activity) {
+            super.onAttach(activity);
+            AllianceManager.getInstance().addAllianceUpdatedHandler(this);
+        }
+
+        @Override
+        public void onDetach() {
+            super.onDetach();
+            AllianceManager.getInstance().removeAllianceUpdatedHandler(this);
+        }
+
+        @Override
+        public void onAllianceUpdated(Alliance alliance) {
+            refresh();
         }
 
         private void onAllianceCreate() {
             AllianceCreateDialog dialog = new AllianceCreateDialog();
             dialog.show(getActivity().getSupportFragmentManager(), "");
+        }
+
+        private void refresh() {
+            final ProgressBar progressBar = (ProgressBar) mView.findViewById(R.id.loading);
+            final ListView alliancesList = (ListView) mView.findViewById(R.id.alliances);
+            alliancesList.setVisibility(View.GONE);
+            progressBar.setVisibility(View.VISIBLE);
+
+            AllianceManager.getInstance().fetchAlliances(new AllianceManager.FetchAlliancesCompleteHandler() {
+                @Override
+                public void onAlliancesFetched(List<Alliance> alliances) {
+                    mRankListAdapter.setAlliances(alliances);
+
+                    alliancesList.setVisibility(View.VISIBLE);
+                    progressBar.setVisibility(View.GONE);
+                }
+            });
         }
 
         private class RankListAdapter extends BaseAdapter {
@@ -204,22 +229,59 @@ public class AllianceActivity extends TabFragmentActivity {
         }
     }
 
-    public static class JoinRequestsFragment extends BaseFragment {
+    public static class JoinRequestsFragment extends BaseFragment
+                                             implements AllianceManager.AllianceUpdatedHandler {
         private View mView;
         private JoinRequestListAdapter mJoinRequestListAdapter;
+
+        @Override
+        public void onAllianceUpdated(Alliance alliance) {
+            MyEmpire myEmpire = EmpireManager.getInstance().getEmpire();
+            if (alliance.getKey().equals(myEmpire.getAlliance().getKey())) {
+                refresh();
+            }
+        }
+
+        @Override
+        public void onAttach(Activity activity) {
+            super.onAttach(activity);
+            AllianceManager.getInstance().addAllianceUpdatedHandler(this);
+        }
+
+        @Override
+        public void onDetach() {
+            super.onDetach();
+            AllianceManager.getInstance().removeAllianceUpdatedHandler(this);
+        }
 
         @Override
         public View onCreateView(LayoutInflater inflator, ViewGroup container, Bundle savedInstanceState) {
             mView = inflator.inflate(R.layout.alliance_join_requests_tab, null);
             mJoinRequestListAdapter = new JoinRequestListAdapter();
 
-            AllianceActivity activity = (AllianceActivity) getActivity();
+            ListView joinRequestsList = (ListView) mView.findViewById(R.id.join_requests);
+            joinRequestsList.setAdapter(mJoinRequestListAdapter);
 
+            joinRequestsList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    JoinRequestListAdapter.ItemEntry entry = (JoinRequestListAdapter.ItemEntry) mJoinRequestListAdapter.getItem(position);
+                    JoinConfirmDialog dialog = new JoinConfirmDialog();
+                    dialog.setJoinRequest(entry.joinRequest);
+                    dialog.show(getActivity().getSupportFragmentManager(), "");
+                }
+            });
+
+            refresh();
+            return mView;
+        }
+
+        private void refresh() {
+            AllianceActivity activity = (AllianceActivity) getActivity();
             final ProgressBar progressBar = (ProgressBar) mView.findViewById(R.id.loading);
             final ListView joinRequestsList = (ListView) mView.findViewById(R.id.join_requests);
             joinRequestsList.setVisibility(View.GONE);
             progressBar.setVisibility(View.VISIBLE);
-            joinRequestsList.setAdapter(mJoinRequestListAdapter);
 
             MyEmpire myEmpire = EmpireManager.getInstance().getEmpire();
             if (myEmpire != null && myEmpire.getAlliance() != null) {
@@ -235,7 +297,6 @@ public class AllianceActivity extends TabFragmentActivity {
                 });
             }
 
-            return mView;
         }
 
         private class JoinRequestListAdapter extends BaseAdapter {
@@ -256,6 +317,15 @@ public class AllianceActivity extends TabFragmentActivity {
                 if (mEntries == null)
                     return 0;
                 return mEntries.size();
+            }
+
+            @Override
+            public boolean isEnabled(int position) {
+                if (mEntries == null) 
+                    return false;
+                if (mEntries.get(position).joinRequest.getState().equals(AllianceJoinRequest.RequestState.PENDING))
+                    return true;
+                return false;
             }
 
             @Override
