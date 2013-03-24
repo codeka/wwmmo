@@ -75,3 +75,35 @@ def getAlliances():
 
   ctrl.setCached({cache_key: alliances_pb})
   return alliances_pb
+
+
+def requestJoin(alliance_pb, alliance_join_request_pb):
+  """Adds a request to join an alliance to the queue of join requests."""
+  alliance_join_request_mdl = mdl.AllianceJoinRequest(parent=db.Key(alliance_pb.key))
+  alliance_join_request_mdl.empire = db.Key(alliance_join_request_pb.empire_key)
+  alliance_join_request_mdl.message = alliance_join_request_pb.message
+  alliance_join_request_mdl.requestDate = ctrl.epochToDateTime(alliance_join_request_pb.time_requested)
+  alliance_join_request_mdl.status = pb.AllianceJoinRequest.PENDING
+  alliance_join_request_mdl.put()
+  alliance_join_request_pb.key = str(alliance_join_request_mdl.key())
+
+  ctrl.clearCached(["alliance-join-requests:%s" % (alliance_pb.key)])
+
+
+def getJoinRequests(alliance_pb):
+  """Fetches alliance join requests for the given alliance."""
+  cache_key = "alliance-join-requests:%s" % (alliance_pb.key)
+  values = ctrl.getCached([cache_key], pb.AllianceJoinRequests)
+  if cache_key in values:
+    return values[cache_key]
+
+  alliance_join_requests_pb = pb.AllianceJoinRequests()
+  query = (mdl.AllianceJoinRequest.all().ancestor(db.Key(alliance_pb.key))
+                                        .order("-requestDate"))
+  for alliance_join_request_mdl in query:
+    alliance_join_request_pb = alliance_join_requests_pb.join_requests.add()
+    ctrl.allianceJoinRequestModelToPb(alliance_join_request_pb, alliance_join_request_mdl)
+
+  ctrl.setCached({cache_key: alliance_join_requests_pb})
+  return alliance_join_requests_pb
+

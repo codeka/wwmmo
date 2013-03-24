@@ -89,9 +89,7 @@ public class InfobarView extends FrameLayout
                 onEmpireFetched(empire);
             }
 
-            EmpireManager.getInstance()
-                         .addEmpireUpdatedListener(null, this);
-
+            EmpireManager.getInstance().addEmpireUpdatedListener(null, this);
             RequestManager.addRequestManagerStateChangedHandler(this);
 
             // set up the initial state

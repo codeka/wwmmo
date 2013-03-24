@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
 import android.app.Activity;
 import android.content.Context;
@@ -17,14 +19,19 @@ import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import au.com.codeka.TimeInHours;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.TabFragmentActivity;
 import au.com.codeka.warworlds.model.Alliance;
+import au.com.codeka.warworlds.model.AllianceJoinRequest;
 import au.com.codeka.warworlds.model.AllianceManager;
+import au.com.codeka.warworlds.model.Empire;
 import au.com.codeka.warworlds.model.EmpireManager;
+import au.com.codeka.warworlds.model.MyEmpire;
 
 public class AllianceActivity extends TabFragmentActivity {
     private Context mContext = this;
@@ -34,6 +41,7 @@ public class AllianceActivity extends TabFragmentActivity {
         super.onCreate(savedInstanceState);
 
         getTabManager().addTab(mContext, new TabInfo("Overview", OverviewFragment.class, null));
+        getTabManager().addTab(mContext, new TabInfo("Join Requests", JoinRequestsFragment.class, null));
     }
 
     public static class BaseFragment extends Fragment {
@@ -196,4 +204,114 @@ public class AllianceActivity extends TabFragmentActivity {
         }
     }
 
+    public static class JoinRequestsFragment extends BaseFragment {
+        private View mView;
+        private JoinRequestListAdapter mJoinRequestListAdapter;
+
+        @Override
+        public View onCreateView(LayoutInflater inflator, ViewGroup container, Bundle savedInstanceState) {
+            mView = inflator.inflate(R.layout.alliance_join_requests_tab, null);
+            mJoinRequestListAdapter = new JoinRequestListAdapter();
+
+            AllianceActivity activity = (AllianceActivity) getActivity();
+
+            final ProgressBar progressBar = (ProgressBar) mView.findViewById(R.id.loading);
+            final ListView joinRequestsList = (ListView) mView.findViewById(R.id.join_requests);
+            joinRequestsList.setVisibility(View.GONE);
+            progressBar.setVisibility(View.VISIBLE);
+            joinRequestsList.setAdapter(mJoinRequestListAdapter);
+
+            MyEmpire myEmpire = EmpireManager.getInstance().getEmpire();
+            if (myEmpire != null && myEmpire.getAlliance() != null) {
+                AllianceManager.getInstance().fetchJoinRequests(activity, myEmpire.getAlliance().getKey(),
+                    new AllianceManager.FetchJoinRequestsCompleteHandler() {
+                        @Override
+                        public void onJoinRequestsFetched(Map<String, Empire> empires, List<AllianceJoinRequest> joinRequests) {
+                            mJoinRequestListAdapter.setJoinRequests(empires, joinRequests);
+
+                            joinRequestsList.setVisibility(View.VISIBLE);
+                            progressBar.setVisibility(View.GONE);
+                        }
+                });
+            }
+
+            return mView;
+        }
+
+        private class JoinRequestListAdapter extends BaseAdapter {
+            private ArrayList<ItemEntry> mEntries;
+
+            public void setJoinRequests(Map<String, Empire> empires, List<AllianceJoinRequest> joinRequests) {
+                mEntries = new ArrayList<ItemEntry>();
+                for (AllianceJoinRequest joinRequest : joinRequests) {
+                    Empire empire = empires.get(joinRequest.getEmpireKey());
+                    mEntries.add(new ItemEntry(empire, joinRequest));
+                }
+
+                notifyDataSetChanged();
+            }
+
+            @Override
+            public int getCount() {
+                if (mEntries == null)
+                    return 0;
+                return mEntries.size();
+            }
+
+            @Override
+            public Object getItem(int position) {
+                if (mEntries == null)
+                    return null;
+                return mEntries.get(position);
+            }
+
+            @Override
+            public long getItemId(int position) {
+                return position;
+            }
+
+            @Override
+            public View getView(int position, View convertView, ViewGroup parent) {
+                ItemEntry entry = mEntries.get(position);
+                Activity activity = getActivity();
+                View view = convertView;
+
+                if (view == null) {
+                    LayoutInflater inflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                    view = inflater.inflate(R.layout.alliance_join_requests_row, null);
+                }
+
+                TextView empireName = (TextView) view.findViewById(R.id.empire_name);
+                ImageView empireIcon = (ImageView) view.findViewById(R.id.empire_icon);
+                TextView requestDate = (TextView) view.findViewById(R.id.request_date);
+                ImageView requestStatus = (ImageView) view.findViewById(R.id.request_status);
+                TextView message = (TextView) view.findViewById(R.id.message);
+
+                empireName.setText(entry.empire.getDisplayName());
+                empireIcon.setImageBitmap(entry.empire.getShield(activity));
+                requestDate.setText(String.format(Locale.ENGLISH, "Requested: %s", TimeInHours.format(entry.joinRequest.getTimeRequested())));
+                message.setText(entry.joinRequest.getMessage());
+
+                if (entry.joinRequest.getState().equals(AllianceJoinRequest.RequestState.PENDING)) {
+                    requestStatus.setImageResource(R.drawable.question);
+                } else if (entry.joinRequest.getState().equals(AllianceJoinRequest.RequestState.ACCEPTED)) {
+                    requestStatus.setImageResource(R.drawable.tick);
+                } else if (entry.joinRequest.getState().equals(AllianceJoinRequest.RequestState.REJECTED)) {
+                    requestStatus.setImageResource(R.drawable.cross);
+                }
+
+                return view;
+            }
+
+            public class ItemEntry {
+                public Empire empire;
+                public AllianceJoinRequest joinRequest;
+
+                public ItemEntry(Empire empire, AllianceJoinRequest joinRequest) {
+                    this.empire = empire;
+                    this.joinRequest = joinRequest;
+                }
+            }
+        }
+    }
 }

@@ -917,3 +917,26 @@ message AllianceMember
     optional string alliance_key = 3;
     optional int64 time_joined = 4;
 }
+
+
+message AllianceJoinRequest
+{
+    optional string key = 1;
+    optional string alliance_key = 2;
+    optional string empire_key = 3;
+    optional string message = 4;
+    optional int64 time_requested = 5;
+    optional RequestState state = 6;
+
+    enum RequestState
+    {
+        PENDING = 0;
+        ACCEPTED = 1;
+        REJECTED = 2;
+    }
+}
+
+message AllianceJoinRequests
+{
+    repeated AllianceJoinRequest join_requests = 1;
+}

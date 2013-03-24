@@ -16,3 +16,11 @@ class AllianceMember(db.Model):
   """Describes a member of an alliance."""
   empire = db.ReferenceProperty(empire_mdl.Empire)
   joinDate = db.DateTimeProperty()
+
+
+class AllianceJoinRequest(db.Model):
+  """Represents a request to join an alliance."""
+  empire = db.ReferenceProperty(empire_mdl.Empire)
+  message = db.StringProperty()
+  requestDate = db.DateTimeProperty()
+  status = db.IntegerProperty()

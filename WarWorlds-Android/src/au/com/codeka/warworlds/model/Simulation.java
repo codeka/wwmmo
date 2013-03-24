@@ -8,6 +8,8 @@ import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.Duration;
 import org.joda.time.Interval;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import android.os.Parcel;
 
@@ -16,7 +18,7 @@ import android.os.Parcel;
  * on the server, and we go to great pains to keep them in sync.
  */
 public class Simulation {
-    //private static Logger log = LoggerFactory.getLogger(Simulation.class);
+    private static Logger log = LoggerFactory.getLogger(Simulation.class);
     private DateTime mNow;
 
     private static DateTime year2k = new DateTime(2000, 1, 1, 0, 0);
@@ -30,7 +32,7 @@ public class Simulation {
      * @param star
      */
     public void simulate(Star star) {
-        //log.debug(String.format("Begin simulation for '%s'", star.getName()));
+        log.debug(String.format("Begin simulation for '%s'", star.getName()));
 
         HashSet<String> empireKeys = new HashSet<String>();
         for (Colony colony : star.getColonies()) {

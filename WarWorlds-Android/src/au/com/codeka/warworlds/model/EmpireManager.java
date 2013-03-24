@@ -25,6 +25,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.os.AsyncTask;
 import au.com.codeka.warworlds.api.ApiClient;
+import au.com.codeka.warworlds.api.ApiException;
 import au.com.codeka.warworlds.model.protobuf.Messages;
 
 /**
@@ -159,7 +160,7 @@ public class EmpireManager {
             }
             return;
         }
-        
+
         ArrayList<String> empireKeys = new ArrayList<String>();
         empireKeys.add(empireKey);
         refreshEmpires(context, empireKeys, handler);
@@ -168,7 +169,7 @@ public class EmpireManager {
     public void refreshEmpires(final Context context,
                                final Collection<String> empireKeys,
                                final EmpireFetchedHandler handler) {
-        ArrayList<String> toFetch = new ArrayList<String>();
+        final ArrayList<String> toFetch = new ArrayList<String>();
 
         for (String empireKey : empireKeys) {
             List<EmpireFetchedHandler> inProgress = mInProgress.get(empireKey);
@@ -192,32 +193,9 @@ public class EmpireManager {
             @Override
             protected List<Empire> doInBackground(Void... arg0) {
                 try {
-                    String url = null;
-                    for (String empireKey : empireKeys) {
-                        if (url == null) {
-                            url = "empires/search?ids=";
-                        } else {
-                            url += ",";
-                        }
-                        url += empireKey;
-                    }
-
-                    Messages.Empires pb = ApiClient.getProtoBuf(url, Messages.Empires.class);
-                    ArrayList<Empire> empires = new ArrayList<Empire>();
-                    LocalEmpireStore store = new LocalEmpireStore(context);
-                    for (Messages.Empire empire_pb : pb.getEmpiresList()) {
-                        store.addEmpire(empire_pb);
-
-                        if (mEmpire != null && empire_pb.getKey().equals(mEmpire.getKey())) {
-                            empires.add(MyEmpire.fromProtocolBuffer(empire_pb));
-                        } else {
-                            empires.add(Empire.fromProtocolBuffer(empire_pb));
-                        }
-                    }
-                    return empires;
-                } catch(Exception e) {
-                    // TODO: handle exceptions
-                    log.error(ExceptionUtils.getStackTrace(e));
+                    return refreshEmpiresSync(context, toFetch);
+                } catch (ApiException e) {
+                    log.error("An error occured fetching empires.", e);
                     return null;
                 }
             }
@@ -249,6 +227,38 @@ public class EmpireManager {
                 }
             }
         }.execute();
+    }
+
+    /**
+     * Synchronously fetch a list of empires. Note that we \i may return fewer empires than you
+     * requested, if some of them are already in-progress.
+     */
+    public List<Empire> refreshEmpiresSync(final Context context,
+                                           final Collection<String> empireKeys) throws ApiException {
+        String url = null;
+        for (String empireKey : empireKeys) {
+            if (url == null) {
+                url = "empires/search?ids=";
+            } else {
+                url += ",";
+            }
+            url += empireKey;
+        }
+
+        Messages.Empires pb = ApiClient.getProtoBuf(url, Messages.Empires.class);
+        ArrayList<Empire> empires = new ArrayList<Empire>();
+        LocalEmpireStore store = new LocalEmpireStore(context);
+        for (Messages.Empire empire_pb : pb.getEmpiresList()) {
+            store.addEmpire(empire_pb);
+
+            if (mEmpire != null && empire_pb.getKey().equals(mEmpire.getKey())) {
+                empires.add(MyEmpire.fromProtocolBuffer(empire_pb));
+            } else {
+                empires.add(Empire.fromProtocolBuffer(empire_pb));
+            }
+        }
+
+        return empires;
     }
 
     public void fetchEmpire(final Context context,
@@ -287,6 +297,33 @@ public class EmpireManager {
         }
 
         refreshEmpire(context, empireKey, handler);
+    }
+
+    public List<Empire> fetchEmpiresSync(Context context, Collection<String> empireKeys) {
+        ArrayList<Empire> empires = new ArrayList<Empire>();
+        ArrayList<String> missingKeys = new ArrayList<String>();
+
+        for (String empireKey : empireKeys) {
+            Empire empire = getEmpire(context, empireKey);
+            if (empire != null) {
+                empires.add(empire);
+            } else {
+                missingKeys.add(empireKey);
+            }
+        }
+
+        if (missingKeys.size() > 0) {
+            try {
+                List<Empire> fetchedEmpires = refreshEmpiresSync(context, missingKeys);
+                for (Empire empire : fetchedEmpires) {
+                    empires.add(empire);
+                }
+            } catch (ApiException e) {
+                log.error("An error occured fetching empires.", e);
+            }
+        }
+
+        return empires;
     }
 
     /**

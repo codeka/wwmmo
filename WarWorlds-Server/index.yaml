@@ -10,6 +10,12 @@ indexes:
 # automatically uploaded to the admin console when you next deploy
 # your application using appcfg.py.
 
+- kind: AllianceJoinRequest
+  ancestor: yes
+  properties:
+  - name: requestDate
+    direction: desc
+
 - kind: Colony
   properties:
   - name: empire

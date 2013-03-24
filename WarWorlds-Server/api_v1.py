@@ -416,6 +416,30 @@ class AlliancePage(ApiPage):
     return alliance_pb
 
 
+class AllianceJoinRequestsPage(ApiPage):
+  def get(self, alliance_key):
+    alliance_pb = alliance.getAlliance(alliance_key)
+    if not alliance_pb:
+      self.response.set_status(404)
+      return
+    return alliance.getJoinRequests(alliance_pb)
+
+  def post(self, alliance_key):
+    alliance_pb = alliance.getAlliance(alliance_key)
+    if not alliance_pb:
+      self.response.set_status(404)
+      return
+    empire_pb = empire.getEmpireForUser(self.user)
+    if not empire_pb:
+      self.response.set_status(403)
+      return
+    alliance_join_request_pb = self._getRequestBody(pb.AllianceJoinRequest)
+    alliance_join_request_pb.alliance_key = alliance_pb.key
+    alliance_join_request_pb.empire_key = empire_pb.key
+    alliance.requestJoin(alliance_pb, alliance_join_request_pb)
+    return alliance_join_request_pb
+
+
 class DevicesPage(ApiPage):
   def post(self):
     registration_pb = self._getRequestBody(pb.DeviceRegistration)
@@ -933,6 +957,7 @@ app = ApiApplication([("/api/v1/hello/([^/]+)", HelloPage),
                       ("/api/v1/empires/([^/]+)/taxes", EmpireTaxesPage),
                       ("/api/v1/alliances", AlliancesPage),
                       ("/api/v1/alliances/([^/]+)", AlliancePage),
+                      ("/api/v1/alliances/([^/]+)/join-requests", AllianceJoinRequestsPage),
                       ("/api/v1/devices", DevicesPage),
                       ("/api/v1/devices/([^/]+)", DevicesPage),
                       ("/api/v1/devices/user:([^/]+)/messages", DeviceMessagesPage),

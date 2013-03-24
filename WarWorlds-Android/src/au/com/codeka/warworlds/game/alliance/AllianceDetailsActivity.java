@@ -18,6 +18,7 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.AbsListView;
 import android.widget.BaseAdapter;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -36,6 +37,8 @@ public class AllianceDetailsActivity extends BaseActivity {
     private EmpireListAdapter mEmpireListAdapter;
     private Handler mHandler;
     private boolean mRefreshPosted;
+    private String mAllianceKey;
+    private Alliance mAlliance;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -47,12 +50,12 @@ public class AllianceDetailsActivity extends BaseActivity {
         Intent intent = getIntent();
         Bundle extras = intent.getExtras();
         if (extras != null) {
-            String allianceKey = extras.getString("au.com.codeka.warworlds.AllianceKey");
+            mAllianceKey = extras.getString("au.com.codeka.warworlds.AllianceKey");
 
             Alliance myAlliance = EmpireManager.getInstance().getEmpire().getAlliance();
             if (myAlliance == null) {
                 setContentView(R.layout.alliance_details_potential);
-            } else if (myAlliance.getKey().equals(allianceKey)) {
+            } else if (myAlliance.getKey().equals(mAllianceKey)) {
                 setContentView(R.layout.alliance_details_mine);
             } else {
                 setContentView(R.layout.alliance_details_enemy);
@@ -62,33 +65,44 @@ public class AllianceDetailsActivity extends BaseActivity {
             ListView members = (ListView) findViewById(R.id.members);
             members.setAdapter(mEmpireListAdapter);
 
-            Alliance alliance = (Alliance) extras.getParcelable("au.com.codeka.warworlds.Alliance");
-            if (alliance != null) {
-                refreshAlliance(alliance);
+            mAlliance = (Alliance) extras.getParcelable("au.com.codeka.warworlds.Alliance");
+            if (mAlliance != null) {
+                refreshAlliance();
             }
 
-            AllianceManager.getInstance().fetchAlliance(allianceKey, new AllianceManager.FetchAllianceCompleteHandler() {
+            AllianceManager.getInstance().fetchAlliance(mAllianceKey, new AllianceManager.FetchAllianceCompleteHandler() {
                 @Override
                 public void onAllianceFetched(Alliance alliance) {
-                    refreshAlliance(alliance);
+                    mAlliance = alliance;
+                    refreshAlliance();
                 }
             });
         }
+
+        Button joinBtn = (Button) findViewById(R.id.join_btn);
+        if (joinBtn != null) joinBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                JoinRequestDialog dialog = new JoinRequestDialog();
+                dialog.setAllianceKey(mAllianceKey);
+                dialog.show(getSupportFragmentManager(), "");
+            }
+        });
     }
 
-    private void refreshAlliance(final Alliance alliance) {
+    private void refreshAlliance() {
         mRefreshPosted = false;
 
         TextView allianceName = (TextView) findViewById(R.id.alliance_name);
-        allianceName.setText(alliance.getName());
+        allianceName.setText(mAlliance.getName());
 
         TextView allianceMembers = (TextView) findViewById(R.id.alliance_num_members);
-        allianceMembers.setText(String.format("Members: %d", alliance.getNumMembers()));
+        allianceMembers.setText(String.format("Members: %d", mAlliance.getNumMembers()));
 
-        if (alliance.getMembers() != null) {
+        if (mAlliance.getMembers() != null) {
             ArrayList<Empire> members = new ArrayList<Empire>();
             ArrayList<String> missingMembers = new ArrayList<String>();
-            for (AllianceMember am : alliance.getMembers()) {
+            for (AllianceMember am : mAlliance.getMembers()) {
                 Empire member = EmpireManager.getInstance().getEmpire(this, am.getEmpireKey());
                 if (member == null) {
                     missingMembers.add(am.getEmpireKey());
@@ -109,7 +123,7 @@ public class AllianceDetailsActivity extends BaseActivity {
                         mHandler.postDelayed(new Runnable() {
                             @Override
                             public void run() {
-                                refreshAlliance(alliance);
+                                refreshAlliance();
                             }
                         }, 250);
                     }

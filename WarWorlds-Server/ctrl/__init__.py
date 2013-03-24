@@ -133,6 +133,15 @@ def allianceMemberModelToPb(alliance_member_pb, alliance_member_mdl):
   alliance_member_pb.time_joined = dateTimeToEpoch(alliance_member_mdl.joinDate)
 
 
+def allianceJoinRequestModelToPb(alliance_join_request_pb, alliance_join_request_mdl):
+  alliance_join_request_pb.key = str(alliance_join_request_mdl.key())
+  alliance_join_request_pb.alliance_key = str(alliance_join_request_mdl.key().parent())
+  alliance_join_request_pb.empire_key = str(alliance_mdl.AllianceJoinRequest.empire.get_value_for_datastore(alliance_join_request_mdl))
+  alliance_join_request_pb.message = alliance_join_request_mdl.message
+  alliance_join_request_pb.time_requested = dateTimeToEpoch(alliance_join_request_mdl.requestDate)
+  alliance_join_request_pb.state = alliance_join_request_mdl.status
+
+
 def colonyModelToPb(colony_pb, colony_model):
   colony_pb.key = str(colony_model.key())
   empire_key = empire_mdl.Colony.empire.get_value_for_datastore(colony_model)
