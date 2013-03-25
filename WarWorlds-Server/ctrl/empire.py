@@ -546,7 +546,7 @@ def collectTaxesFromEmpire(empire_pb, sim, async=False):
       simulated_stars.append(colony_pb.star_key)
       sim.simulate(colony_pb.star_key, do_prediction=False)
 
-  total_cash = empire_pb.cash
+  total_cash = 0.0
   for star_key in simulated_stars:
     star_pb = sim.getStar(star_key)
     for colony_pb in star_pb.colonies:
@@ -559,12 +559,16 @@ def collectTaxesFromEmpire(empire_pb, sim, async=False):
   empire_cash_audit_mdl = mdl.EmpireCashAudit(parent=db.Key(colony_pb.empire_key))
   empire_cash_audit_mdl.time = datetime.now()
   empire_cash_audit_mdl.oldCash = empire_mdl.cash
-  empire_cash_audit_mdl.newCash = total_cash
-  empire_cash_audit_mdl.difference = total_cash - empire_mdl.cash
+  empire_cash_audit_mdl.newCash = total_cash + empire_mdl.cash
+  empire_cash_audit_mdl.difference = total_cash
   empire_cash_audit_mdl.reason = "Collected from all colonies"
   empire_cash_audit_mdl.put()
 
-  empire_mdl.cash = total_cash
+  logging.info("Taxes collected: (old=%.0f new=%.0f diff=%.0f)" % (empire_mdl.cash,
+                                                                   total_cash + empire_mdl.cash,
+                                                                   total_cash))
+
+  empire_mdl.cash = total_cash + empire_mdl.cash
   empire_mdl.put()
   sim.update()
   ctrl.clearCached(["empire:%s" % (empire_pb.key),

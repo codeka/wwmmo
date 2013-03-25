@@ -419,7 +419,7 @@ def sendNotificationToUser(user_email, data):
     gcm = gcm_mdl.GCM('AIzaSyADWOC-tWUbzj-SVW13Sz5UuUiGfcmHHDA')
     gcm.json_request(registration_ids=registration_ids,
                      data=data)
-    logging.info("Sent notification to %d devices", )
+    logging.info("Sent notification to %d devices", len(registration_ids))
   except:
     logging.warn("An error occurred sending notification, notification not sent")
 
