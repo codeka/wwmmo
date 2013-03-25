@@ -6,7 +6,7 @@ threadsafe: true
 
 libraries:
 - name: jinja2
-  version: latest
+  version: 2.6
 
 builtins:
 - deferred: on

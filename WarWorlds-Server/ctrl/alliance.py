@@ -113,7 +113,7 @@ def getPendingJoinRequestsForEmpire(empire_key):
     return values[cache_key]
 
   query = (mdl.AllianceJoinRequest.all().filter("empire", db.Key(empire_key))
-                                        .filter("status", pb.AllianceJoinRequest.PENDING.number)
+                                        .filter("status", pb.AllianceJoinRequest.PENDING)
                                         .order("-requestDate"))
   return _getJoinRequestsForQuery(cache_key, query)
 

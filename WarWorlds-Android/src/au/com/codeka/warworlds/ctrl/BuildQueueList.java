@@ -369,11 +369,11 @@ public class BuildQueueList extends FrameLayout
          * star.
          */
         public void onStarRefreshed(Star s) {
-            HashSet<String> colonyKeys = new HashSet<String>();
+            HashSet<String> oldColonyKeys = new HashSet<String>();
             Star oldStar = mStars.get(s.getKey());
             for (Colony c : oldStar.getColonies()) {
                 mColonies.remove(c.getKey());
-                colonyKeys.add(c.getKey());
+                oldColonyKeys.add(c.getKey());
             }
             for (Colony c : s.getColonies()) {
                 mColonies.put(c.getKey(), c);
@@ -381,13 +381,18 @@ public class BuildQueueList extends FrameLayout
 
             ArrayList<BuildRequest> newBuildRequests = new ArrayList<BuildRequest>();
             for (BuildRequest br : mBuildRequests) {
-                if (colonyKeys.contains(br.getColonyKey())) {
+                if (oldColonyKeys.contains(br.getColonyKey())) {
                     continue;
                 }
                 newBuildRequests.add(br);
             }
             for (BuildRequest br : s.getBuildRequests()) {
-                newBuildRequests.add(br);
+                // only add the build request if it's for a colony we're displaying
+                for (Colony c : mColonies.values()) {
+                    if (br.getColonyKey().equals(c.getKey())) {
+                        newBuildRequests.add(br);
+                    }
+                }
             }
 
             setBuildQueue(mStars, mColonies, newBuildRequests);

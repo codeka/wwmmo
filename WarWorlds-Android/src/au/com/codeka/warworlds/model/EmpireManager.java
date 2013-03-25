@@ -16,8 +16,6 @@ import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.protobuf.InvalidProtocolBufferException;
-
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -453,14 +451,17 @@ public class EmpireManager {
             db.execSQL("CREATE TABLE empires ("
                       +"  id INTEGER PRIMARY KEY,"
                       +"  empire_key STRING,"
-                      +"  empire BLOB);");
+                      +"  empire BLOB,"
+                      +"  timestamp INTEGER);");
         }
 
         @Override
         public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-            if (newVersion == 2) {
+            try {
                 db.execSQL("ALTER TABLE empires "
                           +"ADD COLUMN timestamp INTEGER DEFAULT 0;");
+            } catch (Exception e) {
+                // who cares?
             }
         }
 
@@ -475,12 +476,14 @@ public class EmpireManager {
                         // we won't get the notification, but not the end of the world...
                         return;
                     }
-    
+
                     ContentValues values = new ContentValues();
                     values.put("empire", empireBlob.toByteArray());
                     values.put("empire_key", empire.getKey());
                     values.put("timestamp", DateTime.now(DateTimeZone.UTC).getMillis());
                     db.insert("empires", null, values);
+                } catch(Exception e) {
+                    // ignore errors... todo: log them
                 } finally {
                     db.close();
                 }
@@ -508,7 +511,8 @@ public class EmpireManager {
                     }
 
                     return Messages.Empire.parseFrom(cursor.getBlob(0));
-                } catch (InvalidProtocolBufferException e) {
+                } catch (Exception e) {
+                    // todo: log errors
                     return null;
                 } finally {
                     if (cursor != null) cursor.close();

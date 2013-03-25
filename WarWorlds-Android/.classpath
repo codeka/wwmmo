@@ -18,10 +18,10 @@
 	<classpathentry exported="true" kind="lib" path="libs/joda-time-2.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="libs/commons-collections-3.2.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="libs/gcm.jar"/>
-	<classpathentry exported="true" kind="lib" path="libs/protobuf-java-2.4.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="libs/slf4j-android-1.6.1-RC1.jar"/>
 	<classpathentry exported="true" kind="lib" path="libs/GoogleAdMobAdsSdk-6.2.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="libs/common.jar"/>
 	<classpathentry exported="true" kind="lib" path="libs/jregex1.2_01.jar"/>
+	<classpathentry exported="true" kind="lib" path="libs/protobuf-java-2.5.0.jar"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>
