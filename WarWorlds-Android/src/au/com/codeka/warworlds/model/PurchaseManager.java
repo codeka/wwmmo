@@ -37,6 +37,7 @@ public class PurchaseManager {
     {
         sAllSkus = new ArrayList<String>();
         sAllSkus.add("star_rename");
+        sAllSkus.add("remove_ads");
     }
 
     private IabHelper mHelper;
@@ -77,6 +78,9 @@ public class PurchaseManager {
     }
 
     public Inventory getInventory() throws IabException {
+        if (mSetupResult == null) {
+            return null;
+        }
         if (!mSetupResult.isSuccess()) {
             throw new IabException(mSetupResult);
         }
