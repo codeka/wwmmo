@@ -772,6 +772,16 @@ class EmpireTaxesPage(ApiPage):
     empire.collectTaxesFromEmpire(empire_pb, sim, async)
 
 
+class EmpireCashAuditPage(ApiPage):
+  def get(self, empire_key):
+    empire_pb = empire.getEmpire(empire_key)
+    if not self._isAdmin() and empire_pb.email() != self.user.email():
+      self.set_status(403)
+      return
+
+    return empire.getCashAudit(empire_pb)
+
+
 class ColoniesAttackPage(ApiPage):
   def post(self, star_key, colony_key):
     """This is called when you want to attack an enemy colony. We check that
@@ -996,6 +1006,7 @@ app = ApiApplication([("/api/v1/hello/([^/]+)", HelloPage),
                       ("/api/v1/empires/([^/]+)", EmpiresPage),
                       ("/api/v1/empires/([^/]+)/details", EmpireDetailsPage),
                       ("/api/v1/empires/([^/]+)/taxes", EmpireTaxesPage),
+                      ("/api/v1/empires/([^/]+)/cash-audit", EmpireCashAuditPage),
                       ("/api/v1/alliances", AlliancesPage),
                       ("/api/v1/alliances/([^/]+)", AlliancePage),
                       ("/api/v1/alliances/([^/]+)/join-requests", AllianceJoinRequestsPage),

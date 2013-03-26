@@ -124,6 +124,22 @@ def getEmpireRanks(empire_keys):
   return empire_ranks
 
 
+def getCashAudit(empire_pb):
+  """Fetches a cash audit for the given empire."""
+  cash_audit_pb = pb.EmpireCashAudit()
+  for cash_audit_entry_mdl in (mdl.EmpireCashAudit.all().ancestor(db.Key(empire_pb.key))
+                                                        .order("-time")):
+    cash_audit_entry_pb = cash_audit_pb.entries.add()
+    cash_audit_entry_pb.key = str(cash_audit_entry_mdl.key())
+    cash_audit_entry_pb.empire_key = str(cash_audit_entry_mdl.key().parent())
+    cash_audit_entry_pb.difference = float(cash_audit_entry_mdl.difference)
+    cash_audit_entry_pb.old_cash = float(cash_audit_entry_mdl.oldCash)
+    cash_audit_entry_pb.new_cash = float(cash_audit_entry_mdl.newCash)
+    cash_audit_entry_pb.reason = cash_audit_entry_mdl.reason
+    cash_audit_entry_pb.time = ctrl.dateTimeToEpoch(cash_audit_entry_mdl.time)
+  return cash_audit_pb
+
+
 # findStarForNewEmpire will fill this with sectors that have all stors with
 # a zero (or at least very low) score. We know not to look at these...
 _fullSectors = []

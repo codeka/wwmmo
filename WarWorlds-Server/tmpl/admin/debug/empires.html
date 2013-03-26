@@ -54,6 +54,10 @@
       line-height: 16pt;
     }
 
+    form input[type=text]#cash-audit-empire-key {
+      right: 85pt;
+    }
+
     form input[type=text]#create-empire-name {
       right: 100pt;
     }
@@ -73,12 +77,17 @@
     <label for="search-simulate">Simulate</label>
     <input type="submit" value="Search" />
   </form>
+  <form id="cash-audit">
+    <label for="cash-audit-empire-key">Key:</label>
+    <input type="text" id="cash-audit-empire-key" placeholder="Empire key" />
+    <input type="submit" value="Cash Audit" />
+  </form>
   <form id="create-empire">
     <label for="create-empire-name">Name:</label>
     <input type="text" id="create-empire-name" />
     <input type="submit" value="Create Empire" />
   </form>
-  <textarea id="search-results"></textarea>
+  <textarea id="search-results" wrap="off"></textarea>
   <div id="search-time"></div>
   <script>
     $("#find-byemailidname").on("submit", function(evnt) {
@@ -115,6 +124,42 @@
           } else {
             alert("An error occured, check server logs: " + xhr.status);
           }
+        }
+      });
+    });
+
+    function zeroPad(str, n) {
+      var padded = "0000000000"+str;
+      return padded.substr(padded.length - n);
+    }
+    function spacePad(str, n) {
+      var padded = "                                           "+str;
+      return padded.substr(padded.length - n);
+    }
+
+    $("#cash-audit").on("submit", function(evnt) {
+      evnt.preventDefault();
+      var url = "/api/v1/empires/"+$(this).find("input[type=text]").val()+"/cash-audit";
+      $.ajax({
+        url: url,
+        type: "GET",
+        dataType: "json",
+        success: function(data) {
+          var text = "";
+          for(var i = 0; i < data.entries.length; i++) {
+            var entry = data.entries[i];
+            var dt = new Date(entry["time"] * 1000);
+            text += dt.getFullYear()+"-"+zeroPad(dt.getMonth()+1, 2)+"-"+zeroPad(dt.getDate(), 2);
+            text += " "+zeroPad(dt.getHours(), 2)+":"+zeroPad(dt.getMinutes(), 2)+":"+zeroPad(dt.getSeconds(), 2);
+            text += " : "+spacePad(parseInt(entry["new_cash"]), 10);
+            text += " : "+spacePad("diff: "+parseInt(entry["difference"]), 15);
+            text += " : "+entry["reason"];
+            text += "\r\n";
+          }
+          $("#search-results").val(text);
+        },
+        error: function(xhr, status, err) {
+          alert("An error occured, check server logs: " + xhr.status);
         }
       });
     });

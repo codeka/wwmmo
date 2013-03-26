@@ -119,6 +119,28 @@ message Empires
 
 
 //
+// Represents an entry in the "cash audit" which is a history of all the cash that the empire
+// has spent/collected.
+//
+message EmpireCashAuditEntry
+{
+    optional string key = 1;
+    optional string empire_key = 2;
+    optional float difference = 3;
+    optional float old_cash = 4;
+    optional float new_cash = 5;
+    optional string reason = 6;
+    optional int64 time = 7;
+}
+
+
+message EmpireCashAudit
+{
+    repeated EmpireCashAuditEntry entries = 1;
+}
+
+
+//
 // The "hello" request when you first join the game contains some info about yourself which we
 // record for posterity.
 //

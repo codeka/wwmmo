@@ -39,6 +39,12 @@ indexes:
   - name: startTime
     direction: desc
 
+- kind: EmpireCashAudit
+  ancestor: yes
+  properties:
+  - name: time
+    direction: desc
+
 - kind: EmpireRank
   properties:
   - name: totalColonies
