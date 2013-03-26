@@ -101,7 +101,7 @@
         var padded = "0000000000"+str;
         return padded.substr(padded.length - n);
       }
-      var dtstr = dt.getFullYear()+"-"+zeroPad(dt.getMonth() + 1, 2)+"-"+zeroPad(dt.getDay(), 2);
+      var dtstr = dt.getFullYear()+"-"+zeroPad(dt.getMonth() + 1, 2)+"-"+zeroPad(dt.getDate(), 2);
       dtstr += " "+zeroPad(dt.getHours(), 2)+":"+zeroPad(dt.getMinutes(), 2);
 
       var msgstr = dtstr+" : "+msg.empire+" : "+msg.message;
