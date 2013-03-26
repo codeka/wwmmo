@@ -6,6 +6,7 @@ import logging
 import json
 
 from google.appengine.api import users
+from google.appengine.ext import db
 from google.appengine.ext.db.metadata import Kind
 
 import import_fixer
@@ -21,6 +22,9 @@ from mapreduce import control
 import model
 from model import session
 from model import statistics as stats_mdl
+from model import empire as empire_mdl
+from model import sector as sector_mdl
+import ctrl
 from ctrl import empire
 from ctrl import sector
 
@@ -236,6 +240,46 @@ class ActionsMoveStarPage(AdminPage):
 
     self.render("admin/actions/move-star.html", data)
 
+
+class ActionsCreateFleetPage(AdminPage):
+  def get(self):
+    self.render("admin/actions/create-fleet.html", {})
+  def post(self):
+    data = {"complete": True,
+            "star": self.request.POST.get("star"),
+            "empire": self.request.POST.get("empire"),
+            "designName": self.request.POST.get("designName"),
+            "numShips": self.request.POST.get("numShips")}
+    star_pb = sector.getStar(data["star"])
+    if not star_pb:
+      data["success"] = False
+      data["msg"] = "Invalid star key."
+    else:
+      empire_pb = empire.getEmpire(data["empire"])
+      if not empire_pb:
+        data["success"] = False
+        data["msg"] = "Invalid empire key."
+      else:
+        model = empire_mdl.Fleet(parent=db.Key(data["star"]))
+        model.empire = db.Key(data["empire"])
+        model.sector = sector_mdl.SectorManager.getSectorKey(star_pb.sector_x, star_pb.sector_y)
+        model.designName = data["designName"]
+        model.numShips = float(data["numShips"])
+        model.state = pb.Fleet.IDLE
+        model.stance = pb.Fleet.AGGRESSIVE
+        model.stateStartTime = datetime.now()
+        model.put()
+        data["success"] = True
+
+        keys_to_clear = []
+        keys_to_clear.append("star:%s" % (star_pb.key))
+        keys_to_clear.append("fleet:for-empire:%s" % (empire_pb.key))
+        keys_to_clear.append("colonies:for-empire:%s" % (empire_pb.key))
+        keys_to_clear.append("sector:%d,%d" % (star_pb.sector_x, star_pb.sector_y))
+        ctrl.clearCached(keys_to_clear)
+    self.render("admin/actions/create-fleet.html", data)
+
+
 class DevicesPage(AdminPage):
   """The "devices" page lets you view all devices that have registered and send them messages."""
 
@@ -253,6 +297,7 @@ app = webapp.WSGIApplication([("/admin", DashboardPage),
                               ("/admin/debug/colonies", DebugColoniesPage),
                               ("/admin/debug/reports", DebugReportsPage),
                               ("/admin/debug/reports-ajax", DebugReportsAjaxPage),
-                              ("/admin/actions/move-star", ActionsMoveStarPage)],
+                              ("/admin/actions/move-star", ActionsMoveStarPage),
+                              ("/admin/actions/create-fleet", ActionsCreateFleetPage)],
                              debug=os.environ["SERVER_SOFTWARE"].startswith("Development"))
 
