@@ -138,8 +138,10 @@ def pb2obj(pb):
           # we want to check that it's a valid number and not NaN or +/- Inf
           # which will cause problems when encoded in JSON
           val = ftype(value)
-          if math.isnan(val) or math.isinf(val):
-            val = None
+          if math.isnan(val):
+            val = "NaN"
+          elif math.isinf(val):
+            val = "Inf"
         else:
             val = ftype(value)
         obj[field.name] = val

@@ -81,12 +81,15 @@ public class EmpireSetupActivity extends BaseActivity {
         final String accountName = prefs.getString("AccountName", null);
         if (accountName == null) {
             // TODO error!
+            return;
         }
 
         final ProgressDialog pleaseWaitDialog = ProgressDialog.show(mContext, null, 
                 "Please wait...", true);
 
         new AsyncTask<Void, Void, Boolean>() {
+            private String mErrorMsg;
+
             @Override
             protected Boolean doInBackground(Void... arg0) {
                 Messages.Empire empire = Messages.Empire.newBuilder().setDisplayName(empireName)
@@ -98,19 +101,26 @@ public class EmpireSetupActivity extends BaseActivity {
                     return ApiClient.putProtoBuf("empires", empire);
                 } catch(ApiException e) {
                     log.error("An unexpected error occured!", e); // TODO??
+                    mErrorMsg = e.getServerErrorMessage();
                     return false;
                 }
             }
 
             @Override
             protected void onPostExecute(Boolean wasSuccessful) {
-                if (!wasSuccessful) {
-                    // TODO: display error
-                }
                 pleaseWaitDialog.dismiss();
 
                 // say 'hello' again, to reset the empire details
                 ServerGreeter.clearHello();
+
+                if (!wasSuccessful) {
+                    new StyledDialog.Builder(mContext)
+                            .setTitle("Error")
+                            .setMessage(mErrorMsg)
+                            .setNeutralButton("OK", null)
+                            .create().show();
+                    return;
+                }
 
                 EmpireSetupActivity.this.setResult(RESULT_OK);
                 EmpireSetupActivity.this.finish();

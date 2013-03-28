@@ -313,12 +313,18 @@ def createEmpire(empire_pb, sim):
   (star_key, planet_index) = findStarForNewEmpire()
   star_pb = sim.getStar(star_key, True)
 
+  if empire_pb.display_name == "":
+    raise ctrl.ApiError(pb.GenericError.CannotCreateEmpireBlankName, "You must given your empire a name.")
+
   keys_to_clear = []
   if empire_pb.key:
     empire_model = mdl.Empire.get(db.Key(empire_pb.key))
     keys_to_clear.append("empire:%s" % (empire_pb.key))
     # todo: remove him from his existing alliance?
   else:
+    # check that the name of this empire is unique
+    for _ in mdl.Empire().all().filter("displayName", empire_pb.display_name):
+      raise ctrl.ApiError(pb.GenericError.CannotCreateEmpireDuplicateName, "An empire with the same name already exists.")
     empire_model = mdl.Empire()
     ctrl.empirePbToModel(empire_model, empire_pb)
     empire_model.searchName = calculateEmpireSearchName(empire_model.displayName)

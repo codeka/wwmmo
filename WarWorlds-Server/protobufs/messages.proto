@@ -35,6 +35,8 @@ message GenericError
         CannotBuildMaxPerEmpireReached = 8;
         CannotBuildMaxLevelReached = 5;
         RenameStarOldNameIncorrect = 6;
+        CannotCreateEmpireDuplicateName = 9;
+        CannotCreateEmpireBlankName = 10;
     }
 }
 
