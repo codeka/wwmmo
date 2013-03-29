@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -253,26 +254,39 @@ public class EmpireManager {
      */
     public List<Empire> refreshEmpiresSync(final Context context,
                                            final Collection<String> empireKeys) throws ApiException {
-        String url = null;
-        for (String empireKey : empireKeys) {
-            if (url == null) {
-                url = "empires/search?ids=";
-            } else {
-                url += ",";
-            }
-            url += empireKey;
-        }
-
-        Messages.Empires pb = ApiClient.getProtoBuf(url, Messages.Empires.class);
         ArrayList<Empire> empires = new ArrayList<Empire>();
         LocalEmpireStore store = new LocalEmpireStore(context);
-        for (Messages.Empire empire_pb : pb.getEmpiresList()) {
-            store.addEmpire(empire_pb);
 
-            if (mEmpire != null && empire_pb.getKey().equals(mEmpire.getKey())) {
-                empires.add(MyEmpire.fromProtocolBuffer(empire_pb));
-            } else {
-                empires.add(Empire.fromProtocolBuffer(empire_pb));
+        Iterator<String> iter = empireKeys.iterator();
+        while (iter.hasNext()) {
+            String url = null;
+            int num = 0;
+            while (iter.hasNext()) {
+                String empireKey = iter.next();
+                if (url == null) {
+                    url = "empires/search?ids=";
+                } else {
+                    url += ",";
+                }
+                url += empireKey;
+                num ++;
+                if (num >= 25 || url.length() > 1000) {
+                    break;
+                }
+            }
+            if (url == null) {
+                break;
+            }
+
+            Messages.Empires pb = ApiClient.getProtoBuf(url, Messages.Empires.class);
+            for (Messages.Empire empire_pb : pb.getEmpiresList()) {
+                store.addEmpire(empire_pb);
+
+                if (mEmpire != null && empire_pb.getKey().equals(mEmpire.getKey())) {
+                    empires.add(MyEmpire.fromProtocolBuffer(empire_pb));
+                } else {
+                    empires.add(Empire.fromProtocolBuffer(empire_pb));
+                }
             }
         }
 
@@ -315,6 +329,51 @@ public class EmpireManager {
         }
 
         refreshEmpire(context, empireKey, handler);
+    }
+
+    public void fetchEmpires(Context context, Collection<String> empireKeys, EmpireFetchedHandler handler) {
+        ArrayList<String> toFetch = new ArrayList<String>();
+        for (String empireKey : empireKeys) {
+            if (empireKey == null) {
+                if (handler != null) {
+                    handler.onEmpireFetched(mNativeEmpire);
+                }
+                continue;
+            }
+
+            if (mEmpireCache.containsKey(empireKey)) {
+                if (handler != null) {
+                    handler.onEmpireFetched(mEmpireCache.get(empireKey));
+                }
+                continue;
+            }
+
+            // if it's us, then that's good enough as well!
+            if (mEmpire != null && mEmpire.getKey().equals(empireKey)) {
+                if (handler != null) {
+                    handler.onEmpireFetched(mEmpire);
+                }
+                continue;
+            }
+
+            // if it's in the local store, that's fine as well
+            Messages.Empire pb = new LocalEmpireStore(context).getEmpire(empireKey);
+            if (pb != null) {
+                Empire empire = Empire.fromProtocolBuffer(pb);
+                mEmpireCache.put(empireKey, empire);
+                if (handler != null) {
+                    handler.onEmpireFetched(empire);
+                }
+                continue;
+            }
+
+            // otherwise, we'll have to fetch it
+            toFetch.add(empireKey);
+        }
+
+        if (toFetch.size() > 0) {
+            refreshEmpires(context, toFetch, handler);
+        }
     }
 
     public List<Empire> fetchEmpiresSync(Context context, Collection<String> empireKeys) {

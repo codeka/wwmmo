@@ -1081,20 +1081,26 @@ def getFleetsForEmpire(empire_pb):
 
 
 def _orderFleet_split(star_pb, fleet_pb, order_pb):
+  if fleet_pb.state != pb.Fleet.IDLE:
+    logging.warn("Cannot split a fleet that's not IDLE")
+    raise ctrl.ApiError(pb.GenericError.CannotOrderFleetNotIdle,
+                        "Cannot split this fleet, as it is not Idle.")
+
   left_size = order_pb.split_left
   right_size = order_pb.split_right
   if left_size + right_size != fleet_pb.num_ships:
-    logging.debug("Number of ships in left/right split (%d/%d) don't match total "
-                  "ships in current fleet (%d)" % (left_size, right_size, fleet_pb.num_ships))
-    return False
+    logging.warn("Number of ships in left/right split (%d/%d) don't match total "
+                 "ships in current fleet (%d)" % (left_size, right_size, fleet_pb.num_ships))
+    raise ctrl.ApiError(pb.GenericError.CannotSplitFleetUnequalSizes,
+                        "The sizes specified do not add up to the total size of the fleet.")
+  logging.debug("Splitting fleet [%s] %d:%d" % (fleet_pb.key, left_size, right_size))
 
   # This can happen if the original size is 1, or you move the slider all the way
   # over, essentially, it's no change
   if left_size <= 0 or right_size <= 0:
-    return True
+    return
 
   fleet_pb.num_ships = float(left_size)
-
   new_fleet_pb = star_pb.fleets.add()
   new_fleet_pb.empire_key = fleet_pb.empire_key
   new_fleet_pb.design_name = fleet_pb.design_name
@@ -1103,37 +1109,41 @@ def _orderFleet_split(star_pb, fleet_pb, order_pb):
   new_fleet_pb.num_ships = float(right_size)
   new_fleet_pb.state_start_time = ctrl.dateTimeToEpoch(datetime.now())
 
-  return True
-
 
 def _orderFleet_merge(star_pb, fleet_pb, order_pb):
   if fleet_pb.state != pb.Fleet.IDLE:
-    logging.info("Cannot merge a (src) fleet that's not IDLE")
-    return False
+    logging.warn("Cannot merge a (src) fleet that's not IDLE")
+    raise ctrl.ApiError(pb.GenericError.CannotOrderFleetNotIdle,
+                        "Cannot merge this fleet, as it is not Idle.")
+
   merged = False
   for other_fleet_pb in star_pb.fleets:
     if other_fleet_pb.key == order_pb.merge_fleet_key:
       if other_fleet_pb.state != pb.Fleet.IDLE:
-        logging.info("Cannot merge a (dest) fleet that's not IDLE")
-        return False
+        logging.warn("Cannot merge a (dest) fleet that's not IDLE")
+        raise ctrl.ApiError(pb.GenericError.CannotOrderFleetNotIdle,
+                            "Cannot merge this fleet, as it is not Idle.")
       if other_fleet_pb.design_name != fleet_pb.design_name:
-        logging.info("Cannot merge fleets of different designs")
-        return False
-      logging.info("Merging fleet [%s] into [%s]" % (
+        logging.warn("Cannot merge fleets of different designs (%s and %s)" % (
+                     other_fleet_pb.design_name, fleet_pb.design_name))
+        raise ctrl.ApiError(pb.GenericError.CannotMergeFleetDifferentDesign,
+                            "Cannot merge fleets of a different design (%s and %s)" % (
+                            other_fleet_pb.design_name, fleet_pb.design_name))
+      logging.debug("Merging fleet [%s] into [%s]" % (
           other_fleet_pb.key, fleet_pb.key))
       fleet_pb.num_ships += other_fleet_pb.num_ships
       other_fleet_pb.time_destroyed = ctrl.dateTimeToEpoch(datetime.now())
       other_fleet_pb.block_notification_on_destroy = True
       merged = True
   if not merged:
-    logging.info("No fleet to merge: %s" % (order_pb.merge_fleet_key))
-  return merged
+    logging.warn("No fleet to merge: %s" % (order_pb.merge_fleet_key))
 
 
 def _orderFleet_move(star_pb, fleet_pb, order_pb):
   if fleet_pb.state != pb.Fleet.IDLE:
     logging.debug("Cannot move fleet, it's not currently idle.")
-    return False
+    raise ctrl.ApiError(pb.GenericError.CannotOrderFleetNotIdle,
+                        "Cannot move this fleet, as it is not Idle.")
 
   src_star = star_pb
   dst_star = sector.getStar(order_pb.star_key)
@@ -1148,7 +1158,10 @@ def _orderFleet_move(star_pb, fleet_pb, order_pb):
                       fleet_pb.num_ships, distance_in_pc)):
     logging.info("Insufficient funds for move: distance=%.2f, num_ships=%d, cost=%.2f"
                  % (distance_in_pc, fleet_pb.num_ships, fuel_cost))
-    return False
+    raise ctrl.ApiError(pb.GenericError.InsufficientCash,
+                        "Insufficient funds for move: distance=%.2f, num ships=%d, cost=%.2f" % (
+                        distance_in_pc, fleet_pb.num_ships, fuel_cost))
+
 
   fleet_pb.state = pb.Fleet.MOVING
   fleet_pb.state_start_time = ctrl.dateTimeToEpoch(datetime.now())
@@ -1159,8 +1172,6 @@ def _orderFleet_move(star_pb, fleet_pb, order_pb):
   logging.info("Fleet [%s]: distance=%.2f pc, speed=%.2f pc/hr, cost=%.2f, fleet will reach it's destination at %s"
                % (fleet_pb.key, distance_in_pc, design.speed, fuel_cost, time))
   fleet_pb.eta = ctrl.dateTimeToEpoch(time)
-
-  return True
 
 
 def subtractCash(empire_key, amount, reason):
@@ -1195,9 +1206,9 @@ def subtractCash(empire_key, amount, reason):
 
 def _orderFleet_setStance(star_pb, fleet_pb, order_pb, sim):
   fleet_pb.stance = order_pb.stance
+  logging.debug("Changing stance of fleet [%s] to %d" % (fleet_pb.key, order_pb.stance))
   if order_pb.stance == pb.Fleet.AGGRESSIVE:
     sim.onFleetArrived(fleet_pb.key, star_pb.key)
-  return True
 
 
 def orderFleet(star_pb, fleet_pb, order_pb, sim):
@@ -1216,8 +1227,6 @@ def orderFleet(star_pb, fleet_pb, order_pb, sim):
     ctrl.clearCached(["fleet:for-empire:%s" % (fleet_pb.empire_key),
                       "star:%s" % (fleet_pb.star_key),
                       "sector:%d,%d" % (star_pb.sector_x, star_pb.sector_y)])
-
-  return success
 
 
 def saveSituationReport(sitrep_pb):

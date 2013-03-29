@@ -26,6 +26,7 @@ public class ChatActivity extends BaseActivity
     private ScrollView mScrollView;
     private LinearLayout mChatOutput;
     private Handler mHandler;
+    private boolean mScrollPosted;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -104,12 +105,16 @@ public class ChatActivity extends BaseActivity
         mChatOutput.addView(tv);
 
         // need to wait for it to settle before we scroll again
-        mScrollView.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                mScrollView.fullScroll(ScrollView.FOCUS_DOWN);
-            }
-        }, 1);
+        if (!mScrollPosted) {
+            mScrollPosted = true;
+            mScrollView.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    mScrollPosted = false;
+                    mScrollView.fullScroll(ScrollView.FOCUS_DOWN);
+                }
+            }, 15);
+        }
     }
 
     private void refreshMessages() {

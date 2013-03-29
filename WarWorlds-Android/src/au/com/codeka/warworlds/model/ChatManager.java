@@ -3,11 +3,13 @@ package au.com.codeka.warworlds.model;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.TreeSet;
 
 import org.joda.time.DateTime;
 
 import android.content.Context;
 import android.os.AsyncTask;
+import android.os.Handler;
 import au.com.codeka.warworlds.BackgroundDetector;
 import au.com.codeka.warworlds.api.ApiClient;
 import au.com.codeka.warworlds.model.protobuf.Messages;
@@ -29,11 +31,14 @@ public class ChatManager implements BackgroundDetector.BackgroundChangeHandler {
     private ArrayList<MessageUpdatedListener> mMessageUpdatedListeners;
     private DateTime mMostRecentMsg;
     private boolean mRequesting;
+    private TreeSet<String> mEmpiresToRefresh;
+    private Handler mHandler;
 
     private ChatManager() {
         mMessages = new LinkedList<ChatMessage>();
         mMessageAddedListeners = new ArrayList<MessageAddedListener>();
         mMessageUpdatedListeners = new ArrayList<MessageUpdatedListener>();
+        mEmpiresToRefresh = new TreeSet<String>();
     }
 
     /**
@@ -43,6 +48,7 @@ public class ChatManager implements BackgroundDetector.BackgroundChangeHandler {
     public void setup(Context context) {
         BackgroundDetector.getInstance().addBackgroundChangeHandler(this);
 
+        mHandler = new Handler();
         addMessage(context, new ChatMessage("Welcome to War Worlds!"));
 
         // fetch all chats from the last 24 hours
@@ -99,7 +105,6 @@ public class ChatManager implements BackgroundDetector.BackgroundChangeHandler {
             @Override
             protected void onPostExecute(Boolean success) {
                 if (success) {
-                   // msg.
                     addMessage(context, msg);
                 }
             }
@@ -146,27 +151,67 @@ public class ChatManager implements BackgroundDetector.BackgroundChangeHandler {
      */
     public void addMessage(final Context context, final ChatMessage msg) {
         synchronized(mMessages) {
+            // make sure we don't have this chat already...
+            for (ChatMessage existing : mMessages) {
+                if (existing.getEmpireKey() != null &&
+                    existing.getDatePosted().equals(msg.getDatePosted()) &&
+                    existing.getEmpireKey().equals(msg.getEmpireKey())) {
+                    return;
+                }
+            }
             while (mMessages.size() > MAX_CHAT_HISTORY) {
                 mMessages.removeFirst();
             }
             mMessages.add(msg);
 
             if (msg.getDatePosted() != null) {
-                mMostRecentMsg = msg.getDatePosted();
+                if (msg.getDatePosted().compareTo(mMostRecentMsg) > 0) {
+                    mMostRecentMsg = msg.getDatePosted();
+                }
             }
 
             if (msg.getEmpire() == null && msg.getEmpireKey() != null && context != null) {
-                EmpireManager.getInstance().fetchEmpire(context, msg.getEmpireKey(),
-                        new EmpireManager.EmpireFetchedHandler() {
-                            @Override
-                            public void onEmpireFetched(Empire empire) {
-                                msg.setEmpire(empire);
-                                fireMessageUpdatedListeners(msg);
-                            }
-                        });
+                synchronized(mEmpiresToRefresh) {
+                    if (!mEmpiresToRefresh.contains(msg.getEmpireKey())) {
+                        mEmpiresToRefresh.add(msg.getEmpireKey());
+                        if (mEmpiresToRefresh.size() == 1) {
+                            // first one, so schedule the function to actually fetch them
+                            mHandler.postDelayed(new Runnable() {
+                                @Override
+                                public void run() {
+                                    refreshEmpires(context);
+                                }
+                            }, 100);
+                        }
+                    }
+                }
             }
         }
         fireMessageAddedListeners(msg);
+    }
+
+    private void refreshEmpires(final Context context) {
+        List<String> empireKeys;
+        synchronized(mEmpiresToRefresh) {
+            empireKeys = new ArrayList<String>(mEmpiresToRefresh);
+            mEmpiresToRefresh.clear();
+        }
+
+        EmpireManager.getInstance().fetchEmpires(context, empireKeys,
+                new EmpireManager.EmpireFetchedHandler() {
+                    @Override
+                    public void onEmpireFetched(Empire empire) {
+                        for (ChatMessage msg : mMessages) {
+                            if (msg.getEmpireKey() == null) {
+                                continue;
+                            }
+                            if (msg.getEmpireKey().equals(empire.getKey())) {
+                                msg.setEmpire(empire);
+                                fireMessageUpdatedListeners(msg);
+                            }
+                        }
+                    }
+                });
     }
 
     public int getNumMessages() {

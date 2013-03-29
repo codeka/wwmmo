@@ -37,6 +37,9 @@ message GenericError
         RenameStarOldNameIncorrect = 6;
         CannotCreateEmpireDuplicateName = 9;
         CannotCreateEmpireBlankName = 10;
+        CannotSplitFleetUnequalSizes = 11;
+        CannotOrderFleetNotIdle = 12;
+        CannotMergeFleetDifferentDesign = 13;
     }
 }
 

@@ -229,9 +229,19 @@ class EmpiresPage(ApiPage):
       self.response.set_status(404)
       return
 
-    if empire_pb.email != self.user.email():
+    for empire_rank in empire.getEmpireRanks([empire_pb.key]):
+      if empire_pb.key == empire_rank.empire_key:
+        empire_pb.rank.CopyFrom(empire_rank)
+        break
+
+    if empire_pb.email != self.user.email() and not self._isAdmin():
       # it's not OUR empire, so block out a few details...
       empire_pb.cash = 0;
+      if empire_pb.rank.total_stars < 10:
+        # if an enemy has < 10 stars under their control, we'll hide the number
+        # of ships they have, since it's probably giving away a little too much info
+        empire_pb.rank.total_ships = 0
+        empire_pb.rank.total_buildings = 0
 
     return empire_pb
 
@@ -292,8 +302,8 @@ class EmpiresSearchPage(ApiPage):
       self.response.set_status(404)
       return
 
-    if len(empires_pb.empires) > 10:
-      del empires_pb.empires[10:]
+    if len(empires_pb.empires) > 25:
+      del empires_pb.empires[25:]
 
     empire_keys = []
     for empire_pb in empires_pb.empires:
@@ -307,13 +317,7 @@ class EmpiresSearchPage(ApiPage):
       for empire_pb in empires_pb.empires:
         if empire_pb.key == empire_rank.empire_key:
           # is there a better way??
-          empire_pb.rank.empire_key = empire_rank.empire_key
-          empire_pb.rank.rank = empire_rank.rank
-          empire_pb.rank.last_rank = empire_rank.last_rank
-          empire_pb.rank.total_stars = empire_rank.total_stars
-          empire_pb.rank.total_colonies = empire_rank.total_colonies
-          empire_pb.rank.total_ships = empire_rank.total_ships
-          empire_pb.rank.total_buildings = empire_rank.total_buildings
+          empire_pb.rank.CopyFrom(empire_rank)
           if not self._isAdmin() and empire_pb.rank.total_stars < 10 and empire_pb.key != self_empire_pb.key:
             # if an enemy has < 10 stars under their control, we'll hide the number
             # of ships they have, since it's probably giving away a little too much info
@@ -895,10 +899,7 @@ class FleetOrdersPage(ApiPage):
           self.response.set_status(403)
           return
 
-        if not empire.orderFleet(star_pb, fleet_pb, order_pb, sim):
-          self.response.set_status(400)
-        else:
-          self.response.set_status(200)
+        empire.orderFleet(star_pb, fleet_pb, order_pb, sim):
         sim.update()
         return
 
