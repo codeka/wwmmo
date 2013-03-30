@@ -230,7 +230,10 @@ public class StarManager {
         ArrayList<StarSummary> starSummaries = new ArrayList<StarSummary>();
         for (String starKey : starKeys) {
             // TODO: this could be more efficient...
-            starSummaries.add(requestStarSummarySync(context, starKey));
+            StarSummary ss = requestStarSummarySync(context, starKey);
+            if (ss != null) {
+                starSummaries.add(ss);
+            }
         }
         return starSummaries;
     }

@@ -206,6 +206,7 @@ public class ColonyList extends FrameLayout {
             @Override
             protected void onPostExecute(Star star) {
                 StarManager.getInstance().fireStarUpdated(star);
+                sSimulatingStars.remove(star.getKey());
             }
         }.execute();
     }
