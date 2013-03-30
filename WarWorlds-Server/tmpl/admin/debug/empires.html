@@ -54,8 +54,19 @@
       line-height: 16pt;
     }
 
-    form input[type=text]#cash-audit-empire-key {
-      right: 85pt;
+    form#empire-query {
+        width: 550pt;
+    }
+    form#empire-query input[type=text] {
+      right: 180pt;
+    }
+    form#empire-query input[value="Cash Audit"] {
+      position: absolute;
+      right: 95pt;
+    }
+    form#empire-query input[value="Building Stats"] {
+      position: absolute;
+      right: 0;
     }
 
     form input[type=text]#create-empire-name {
@@ -77,10 +88,11 @@
     <label for="search-simulate">Simulate</label>
     <input type="submit" value="Search" />
   </form>
-  <form id="cash-audit">
-    <label for="cash-audit-empire-key">Key:</label>
-    <input type="text" id="cash-audit-empire-key" placeholder="Empire key" />
+  <form id="empire-query">
+    <label for="empire-key">Key:</label>
+    <input type="text" id="empire-key" placeholder="Empire key" />
     <input type="submit" value="Cash Audit" />
+    <input type="submit" value="Building Stats" />
   </form>
   <form id="create-empire">
     <label for="create-empire-name">Name:</label>
@@ -137,31 +149,46 @@
       return padded.substr(padded.length - n);
     }
 
-    $("#cash-audit").on("submit", function(evnt) {
+    $("#empire-query").on("click", ":submit", function(evnt) {
       evnt.preventDefault();
-      var url = "/api/v1/empires/"+$(this).find("input[type=text]").val()+"/cash-audit";
-      $.ajax({
-        url: url,
-        type: "GET",
-        dataType: "json",
-        success: function(data) {
-          var text = "";
-          for(var i = 0; i < data.entries.length; i++) {
-            var entry = data.entries[i];
-            var dt = new Date(entry["time"] * 1000);
-            text += dt.getFullYear()+"-"+zeroPad(dt.getMonth()+1, 2)+"-"+zeroPad(dt.getDate(), 2);
-            text += " "+zeroPad(dt.getHours(), 2)+":"+zeroPad(dt.getMinutes(), 2)+":"+zeroPad(dt.getSeconds(), 2);
-            text += " : "+spacePad(parseInt(entry["new_cash"]), 10);
-            text += " : "+spacePad("diff: "+parseInt(entry["difference"]), 15);
-            text += " : "+entry["reason"];
-            text += "\r\n";
+      if($(this).val() == "Cash Audit") {
+        var url = "/api/v1/empires/"+$("#empire-key").val()+"/cash-audit";
+        $.ajax({
+          url: url,
+          type: "GET",
+          dataType: "json",
+          success: function(data) {
+            var text = "";
+            for(var i = 0; i < data.entries.length; i++) {
+              var entry = data.entries[i];
+              var dt = new Date(entry["time"] * 1000);
+              text += dt.getFullYear()+"-"+zeroPad(dt.getMonth()+1, 2)+"-"+zeroPad(dt.getDate(), 2);
+              text += " "+zeroPad(dt.getHours(), 2)+":"+zeroPad(dt.getMinutes(), 2)+":"+zeroPad(dt.getSeconds(), 2);
+              text += " : "+spacePad(parseInt(entry["new_cash"]), 10);
+              text += " : "+spacePad("diff: "+parseInt(entry["difference"]), 15);
+              text += " : "+entry["reason"];
+              text += "\r\n";
+            }
+            $("#search-results").val(text);
+          },
+          error: function(xhr, status, err) {
+            alert("An error occured, check server logs: " + xhr.status);
           }
-          $("#search-results").val(text);
-        },
-        error: function(xhr, status, err) {
-          alert("An error occured, check server logs: " + xhr.status);
-        }
-      });
+        });
+      } else {
+        var url = "/api/v1/empires/"+$("#empire-key").val()+"/building-statistics";
+        $.ajax({
+          url: url,
+          type: "GET",
+          dataType: "json",
+          success: function(data) {
+            $("#search-results").val(JSON.stringify(data, null, "  "));
+          },
+          error: function(xhr, status, err) {
+            alert("An error occured, check server logs: " + xhr.status);
+          }
+        });
+      }
     });
 
     $("#create-empire").on("submit", function(evnt) {

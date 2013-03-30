@@ -1,12 +1,8 @@
 package au.com.codeka.warworlds.game.solarsystem;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.DialogInterface;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.text.Editable;
@@ -21,19 +17,13 @@ import android.widget.TextView;
 import au.com.codeka.TimeInHours;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.StyledDialog;
-import au.com.codeka.warworlds.api.ApiClient;
-import au.com.codeka.warworlds.api.ApiException;
-import au.com.codeka.warworlds.model.BuildRequest;
+import au.com.codeka.warworlds.model.BuildManager;
 import au.com.codeka.warworlds.model.Building;
 import au.com.codeka.warworlds.model.Colony;
 import au.com.codeka.warworlds.model.Design;
-import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.SpriteDrawable;
-import au.com.codeka.warworlds.model.StarManager;
-import au.com.codeka.warworlds.model.protobuf.Messages;
 
 public class BuildConfirmDialog extends DialogFragment {
-    private static Logger log = LoggerFactory.getLogger(BuildConfirmDialog.class);
     private Colony mColony;
     private Design mDesign;
     private Building mExistingBuilding;
@@ -194,67 +184,13 @@ public class BuildConfirmDialog extends DialogFragment {
         final EditText countEdit = (EditText) mView.findViewById(R.id.build_count_edit);
         final Activity activity = getActivity();
 
+        int count = 1;
+        if (mDesign.canBuildMultiple()) {
+            count = Integer.parseInt(countEdit.getText().toString());
+        }
+
+        BuildManager.getInstance().build(activity, mColony, mDesign, mExistingBuilding, count);
+
         dismiss();
-
-        new AsyncTask<Void, Void, BuildRequest>() {
-            private int mErrorCode;
-            private String mErrorMsg;
-
-            @Override
-            protected BuildRequest doInBackground(Void... arg0) {
-                Messages.BuildRequest.BUILD_KIND kind;
-                if (mDesign.getDesignKind() == Design.DesignKind.BUILDING) {
-                    kind = Messages.BuildRequest.BUILD_KIND.BUILDING;
-                } else {
-                    kind = Messages.BuildRequest.BUILD_KIND.SHIP;
-                }
-
-                int count = 1;
-                if (mDesign.canBuildMultiple()) {
-                    count = Integer.parseInt(countEdit.getText().toString());
-                }
-
-                Messages.BuildRequest build = Messages.BuildRequest.newBuilder()
-                        .setBuildKind(kind)
-                        .setColonyKey(mColony.getKey())
-                        .setEmpireKey(mColony.getEmpireKey())
-                        .setDesignName(mDesign.getID())
-                        .setCount(count)
-                        .setExistingBuildingKey(mExistingBuilding == null ? "" : mExistingBuilding.getKey())
-                        .build();
-                try {
-                    build = ApiClient.postProtoBuf("buildqueue", build, Messages.BuildRequest.class);
-
-                    return BuildRequest.fromProtocolBuffer(build);
-                } catch (ApiException e) {
-                    log.error("Error issuing build request", e);
-                    if (e.getServerErrorCode() > 0) {
-                        mErrorCode = e.getServerErrorCode();
-                        mErrorMsg = e.getServerErrorMessage();
-                    }
-                }
-
-                return null;
-            }
-            @Override
-            protected void onPostExecute(BuildRequest buildRequest) {
-                if (mErrorCode > 0) {
-                    try {
-                        new StyledDialog.Builder(activity)
-                                        .setTitle("Cannot Build")
-                                        .setMessage(mErrorMsg)
-                                        .setPositiveButton("Close", true, null)
-                                        .create().show();
-                    } catch(Exception e) {
-                        // we can get a WindowManager.BadTokenException here if the activity has
-                        // finished, we should probably do something about it but it's kinda too
-                        // late...
-                    }
-                } else {
-                    EmpireManager.getInstance().getEmpire().setDirty();
-                    StarManager.getInstance().refreshStar(activity, mColony.getStarKey());
-                }
-            }
-        }.execute();
     }
 }

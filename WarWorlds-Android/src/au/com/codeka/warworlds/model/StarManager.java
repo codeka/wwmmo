@@ -6,6 +6,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.TreeMap;
 
@@ -97,8 +98,9 @@ public class StarManager {
             }
         }
 
-        // also let the SectorManager know, it's interested in certain kinds of updates
+        // also let a couple of the other Managers know
         SectorManager.getInstance().onStarUpdate(star);
+        BuildManager.getInstance().onStarUpdate(star);
     }
 
     public void refreshStar(Context context, Star s) {
@@ -155,6 +157,49 @@ public class StarManager {
         }.execute();
     }
 
+    public void requestStarSummaries(final Context context, final Collection<String> starKeys,
+                                     final StarSummariesFetchedHandler callback) {
+        final ArrayList<StarSummary> summaries = new ArrayList<StarSummary>();
+        final ArrayList<String> toFetch = new ArrayList<String>();
+
+        for (String starKey : starKeys) {
+            StarSummary ss = mStarSummaries.get(starKey);
+            if (ss != null) {
+                summaries.add(ss);
+                continue;
+            }
+
+            ss = mStars.get(starKey);
+            if (ss != null) {
+                summaries.add(ss);
+                continue;
+            }
+
+            toFetch.add(starKey);
+        }
+
+        if (toFetch.size() == 0) {
+            callback.onStarSummariesFetched(summaries);
+        } else {
+            new AsyncTask<Void, Void, List<StarSummary>>() {
+                @Override
+                protected List<StarSummary> doInBackground(Void... arg0) {
+                    return requestStarSummariesSync(context, toFetch);
+                }
+
+                @Override
+                protected void onPostExecute(List<StarSummary> stars) {
+                    if (stars != null) {
+                        for (StarSummary star : stars) {
+                            summaries.add(star);
+                        }
+                    }
+                    callback.onStarSummariesFetched(summaries);
+                }
+            }.execute();
+        }
+    }
+
     /**
      * Like \c requestStarSummary but runs synchronously. Useful if you're
      * @param context
@@ -179,6 +224,15 @@ public class StarManager {
 
         // no cache StarSummary, fetch the full star
         return doFetchStar(context, starKey);
+    }
+
+    public List<StarSummary> requestStarSummariesSync(Context context, Collection<String> starKeys) {
+        ArrayList<StarSummary> starSummaries = new ArrayList<StarSummary>();
+        for (String starKey : starKeys) {
+            // TODO: this could be more efficient...
+            starSummaries.add(requestStarSummarySync(context, starKey));
+        }
+        return starSummaries;
     }
 
     /**
@@ -368,5 +422,8 @@ public class StarManager {
     }
     public interface StarSummaryFetchedHandler {
         void onStarSummaryFetched(StarSummary s);
+    }
+    public interface StarSummariesFetchedHandler {
+        void onStarSummariesFetched(Collection<StarSummary> stars);
     }
 }

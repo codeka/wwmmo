@@ -1,5 +1,6 @@
 package au.com.codeka.warworlds.game;
 
+import android.app.Activity;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.AsyncTask;
@@ -11,14 +12,14 @@ import au.com.codeka.warworlds.api.ApiClient;
 import au.com.codeka.warworlds.api.ApiException;
 import au.com.codeka.warworlds.model.BuildRequest;
 import au.com.codeka.warworlds.model.EmpireManager;
-import au.com.codeka.warworlds.model.Star;
+import au.com.codeka.warworlds.model.StarSummary;
 import au.com.codeka.warworlds.model.StarManager;
 
 public class BuildStopConfirmDialog extends DialogFragment {
     private BuildRequest mBuildRequest;
-    private Star mStar;
+    private StarSummary mStar;
 
-    public void setBuildRequest(Star star, BuildRequest buildRequest) {
+    public void setBuildRequest(StarSummary star, BuildRequest buildRequest) {
         mBuildRequest = buildRequest;
         mStar = star;
     }
@@ -47,6 +48,8 @@ public class BuildStopConfirmDialog extends DialogFragment {
         final StyledDialog dialog = ((StyledDialog) getDialog());
         dialog.setCloseable(false);
 
+        final Activity activity = getActivity();
+
         new AsyncTask<Void, Void, Boolean>() {
             @Override
             protected Boolean doInBackground(Void... arg0) {
@@ -62,7 +65,7 @@ public class BuildStopConfirmDialog extends DialogFragment {
             }
             @Override
             protected void onPostExecute(Boolean success) {
-                EmpireManager.getInstance().refreshEmpire();
+                EmpireManager.getInstance().refreshEmpire(activity);
                 StarManager.getInstance().refreshStar(getActivity(), mStar.getKey());
                 dismiss();
             }

@@ -6,11 +6,14 @@ import webapp2 as webapp
 
 from google.appengine.ext import deferred
 
-import ctrl as ctl 
+import ctrl as ctl
+from ctrl import statistics as stats_ctl
 import model as mdl
 from model import empire as empire_mdl
 from model import statistics as stats_mdl
 import tasks
+
+from protobufs import messages_pb2 as pb
 
 
 def _count_nday_actives(num_days, first_day):
@@ -117,8 +120,33 @@ class RefreshBuildingCountsPage(tasks.TaskPage):
                      _queue="statistics")
 
 
+def _update_empire_building_stats(empire_key):
+  stats = {}
+  for building_mdl in empire_mdl.Building.all().filter("empire", empire_key):
+    if building_mdl.designName not in stats:
+      stats[building_mdl.designName] = 1
+    else:
+      stats[building_mdl.designName] += 1
+
+  empire_building_statistics_pb = pb.EmpireBuildingStatistics()
+  for design_id,count in stats.items():
+    design_count_pb = empire_building_statistics_pb.counts.add()
+    design_count_pb.design_id = design_id
+    design_count_pb.num_buildings = count
+  key_name = "building-statistics:%s" % (str(empire_key))
+  stats_ctl.updateStandingQuery(key_name, empire_building_statistics_pb)
+
+
+class RefreshEmpireBuildingStatsPage(tasks.TaskPage):
+  def get(self):
+    for empire_key in empire_mdl.Empire.all(keys_only=True):
+      deferred.defer(_update_empire_building_stats, empire_key,
+                     _queue="statistics")
+
+
 app = webapp.WSGIApplication([("/tasks/stats/generate", GeneratePage),
                               ("/tasks/stats/update-rankings", UpdateRankingsPage),
-                              ("/tasks/stats/refresh-building-counts", RefreshBuildingCountsPage)],
+                              ("/tasks/stats/refresh-building-counts", RefreshBuildingCountsPage),
+                              ("/tasks/stats/recalc-empire-building-stats", RefreshEmpireBuildingStatsPage)],
                              debug=os.environ["SERVER_SOFTWARE"].startswith("Development"))
 

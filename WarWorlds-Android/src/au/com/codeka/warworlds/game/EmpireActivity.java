@@ -5,8 +5,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
 
 import android.app.Activity;
 import android.content.Context;
@@ -38,6 +36,7 @@ import au.com.codeka.warworlds.WarWorldsActivity;
 import au.com.codeka.warworlds.ctrl.BuildQueueList;
 import au.com.codeka.warworlds.ctrl.ColonyList;
 import au.com.codeka.warworlds.ctrl.FleetList;
+import au.com.codeka.warworlds.model.BuildManager;
 import au.com.codeka.warworlds.model.BuildRequest;
 import au.com.codeka.warworlds.model.Colony;
 import au.com.codeka.warworlds.model.Empire;
@@ -47,11 +46,13 @@ import au.com.codeka.warworlds.model.Fleet;
 import au.com.codeka.warworlds.model.MyEmpire;
 import au.com.codeka.warworlds.model.Planet;
 import au.com.codeka.warworlds.model.Star;
+import au.com.codeka.warworlds.model.StarSummary;
 
 /**
  * This dialog shows the status of the empire. You can see all your colonies, all your fleets, etc.
  */
-public class EmpireActivity extends TabFragmentActivity {
+public class EmpireActivity extends TabFragmentActivity
+                            implements EmpireManager.EmpireFetchedHandler {
     private static MyEmpire sCurrentEmpire;
 
     Context mContext = this;
@@ -106,10 +107,7 @@ public class EmpireActivity extends TabFragmentActivity {
     @Override
     public void onResume() {
         super.onResume();
-        refresh();
-    }
 
-    public void refresh() {
         ServerGreeter.waitForHello(this, new ServerGreeter.HelloCompleteHandler() {
             @Override
             public void onHelloComplete(boolean success, ServerGreeting greeting) {
@@ -118,16 +116,27 @@ public class EmpireActivity extends TabFragmentActivity {
                     return;
                 }
 
-                EmpireManager.getInstance().getEmpire().refreshAllDetails(new MyEmpire.RefreshAllCompleteHandler() {
-                    @Override
-                    public void onRefreshAllComplete(MyEmpire empire) {
-                        sCurrentEmpire = empire;
-                        getTabManager().reloadTab();
-                        mFirstRefresh = false;
-                    }
-                });
+                MyEmpire myEmpire = EmpireManager.getInstance().getEmpire();
+                EmpireManager.getInstance().addEmpireUpdatedListener(myEmpire.getKey(), EmpireActivity.this);
+                EmpireManager.getInstance().refreshEmpire(mContext);
             }
         });
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        EmpireManager.getInstance().removeEmpireUpdatedListener(this);
+    }
+
+    @Override
+    public void onEmpireFetched(Empire empire) {
+        MyEmpire myEmpire = EmpireManager.getInstance().getEmpire();
+        if (myEmpire.getKey().equals(empire.getKey())) {
+            sCurrentEmpire = (MyEmpire) empire;
+            getTabManager().reloadTab();
+            mFirstRefresh = false;
+        }
     }
 
     public static class BaseFragment extends Fragment {
@@ -403,7 +412,7 @@ public class EmpireActivity extends TabFragmentActivity {
 
             View v = inflator.inflate(R.layout.empire_colonies_tab, null);
             ColonyList colonyList = (ColonyList) v.findViewById(R.id.colony_list);
-            colonyList.refresh(sCurrentEmpire.getAllColonies(), sCurrentEmpire.getImportantStars());
+//TODO            colonyList.refresh(sCurrentEmpire.getAllColonies(), sCurrentEmpire.getImportantStars());
 
             colonyList.setOnColonyActionListener(new ColonyList.ColonyActionHandler() {
                 @Override
@@ -440,26 +449,20 @@ public class EmpireActivity extends TabFragmentActivity {
             }
 
             View v = inflator.inflate(R.layout.empire_buildqueue_tab, null);
-
-            Map<String, Colony> colonies = new TreeMap<String, Colony>();
-            for (Colony colony : sCurrentEmpire.getAllColonies()) {
-                colonies.put(colony.getKey(), colony);
-            }
             BuildQueueList buildQueueList = (BuildQueueList) v.findViewById(R.id.build_queue);
-            buildQueueList.refresh(sCurrentEmpire.getImportantStars(),
-                                   colonies,
-                                   sCurrentEmpire.getAllBuildRequests());
+
+            buildQueueList.refresh(BuildManager.getInstance().getBuildRequests());
 
             buildQueueList.setBuildQueueActionListener(new BuildQueueList.BuildQueueActionListener() {
                 @Override
-                public void onAccelerateClick(Star star, BuildRequest buildRequest) {
+                public void onAccelerateClick(StarSummary star, BuildRequest buildRequest) {
                     BuildAccelerateDialog dialog = new BuildAccelerateDialog();
                     dialog.setBuildRequest(star, buildRequest);
                     dialog.show(getActivity().getSupportFragmentManager(), "");
                 }
 
                 @Override
-                public void onStopClick(Star star, BuildRequest buildRequest) {
+                public void onStopClick(StarSummary star, BuildRequest buildRequest) {
                     BuildStopConfirmDialog dialog = new BuildStopConfirmDialog();
                     dialog.setBuildRequest(star, buildRequest);
                     dialog.show(getActivity().getSupportFragmentManager(), "");
@@ -479,7 +482,7 @@ public class EmpireActivity extends TabFragmentActivity {
 
             View v = inflator.inflate(R.layout.empire_fleets_tab, null);
             FleetList fleetList = (FleetList) v.findViewById(R.id.fleet_list);
-            fleetList.refresh(sCurrentEmpire.getAllFleets(), sCurrentEmpire.getImportantStars());
+//TODO            fleetList.refresh(sCurrentEmpire.getAllFleets(), sCurrentEmpire.getImportantStars());
 
             final Context context = getActivity();
 

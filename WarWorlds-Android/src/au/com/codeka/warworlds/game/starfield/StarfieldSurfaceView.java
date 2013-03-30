@@ -36,7 +36,6 @@ import au.com.codeka.common.Vector2;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.ctrl.SelectionView;
 import au.com.codeka.warworlds.game.StarfieldBackgroundRenderer;
-import au.com.codeka.warworlds.model.Building;
 import au.com.codeka.warworlds.model.Colony;
 import au.com.codeka.warworlds.model.Empire;
 import au.com.codeka.warworlds.model.EmpireManager;
@@ -76,7 +75,7 @@ public class StarfieldSurfaceView extends SectorView
     private Paint mStarNamePaint;
     private boolean mIsScrolling;
     private Handler mHandler;
-    private Star mHqStar;
+    private StarSummary mHqStar;
     private Sprite mHqSprite;
     private HqDirectionOverlay mHqOverlay;
 
@@ -144,7 +143,7 @@ public class StarfieldSurfaceView extends SectorView
 
         MyEmpire myEmpire = EmpireManager.getInstance().getEmpire();
         if (myEmpire != null) {
-            findEmpireHQ();
+            mHqStar = myEmpire.getHomeStar();
         }
 
         mHqOverlay = new HqDirectionOverlay();
@@ -281,31 +280,7 @@ public class StarfieldSurfaceView extends SectorView
         // so we'll want to make sure it's still correct.
         MyEmpire myEmpire = EmpireManager.getInstance().getEmpire();
         if (empire.getKey().equals(myEmpire.getKey())) {
-            findEmpireHQ();
-        }
-    }
-
-    /**
-     * Searches the current empire's stars for one with a HQ building and saves it as mHqStar.
-     * We'll use this later to draw the beacon.
-     */
-    private void findEmpireHQ() {
-        mHqStar = null;
-        MyEmpire myEmpire = EmpireManager.getInstance().getEmpire();
-        final List<Colony> colonies = myEmpire.getAllColonies();
-        if (colonies == null || colonies.size() == 0) {
-            // we don't have all the details yet... fetch them now.
-            myEmpire.refreshAllDetails(null);
-            return;
-        }
-
-        for (Colony colony : new ArrayList<Colony>(colonies)) {
-            for (Building building : colony.getBuildings()) {
-                if (building.getDesignName().equals("hq")) { // todo: hardcoded?
-                    Star star = myEmpire.getImportantStar(colony.getStarKey());
-                    mHqStar = star;
-                }
-            }
+            mHqStar = empire.getHomeStar();
         }
     }
 

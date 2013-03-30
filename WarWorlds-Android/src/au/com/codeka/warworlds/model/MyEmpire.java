@@ -2,8 +2,6 @@ package au.com.codeka.warworlds.model;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
@@ -23,81 +21,14 @@ import au.com.codeka.warworlds.model.protobuf.Messages;
 public class MyEmpire extends Empire {
     private static final Logger log = LoggerFactory.getLogger(MyEmpire.class);
 
-    private List<Fleet> mAllFleets;
-    private List<Colony> mAllColonies;
-    private List<BuildRequest> mAllBuildRequests;
-    private Map<String, Star> mStars;
-    private List<RefreshAllCompleteHandler> mRefreshAllCompleteHandlers;
-    private boolean mIsDirty;
-
     // make sure we don't collect taxes twice
     private boolean mCollectingTaxes = false;
 
     public MyEmpire() {
-        mRefreshAllCompleteHandlers = new ArrayList<RefreshAllCompleteHandler>();
-        mIsDirty = true;
-    }
-
-    /**
-     * If you don't call setDirty() first, then refreshAll() just resimulates and doesn't actually
-     * refresh from the server.
-     */
-    public void setDirty() {
-        mIsDirty = true;
     }
 
     public void addCash(float amount) {
         mCash += amount;
-        mIsDirty = true; // so we'll refresh next time
-        fireRefreshAllCompleteHandler(); // notify that we've changed
-    }
-
-    public void addRefreshAllCompleteHandler(RefreshAllCompleteHandler handler) {
-        synchronized(mRefreshAllCompleteHandlers) {
-            mRefreshAllCompleteHandlers.add(handler);
-        }
-    }
-    public void removeRefreshAllCompleteHandler(RefreshAllCompleteHandler handler) {
-        synchronized(mRefreshAllCompleteHandlers) {
-            mRefreshAllCompleteHandlers.remove(handler);
-        }
-    }
-    private void fireRefreshAllCompleteHandler() {
-        synchronized(mRefreshAllCompleteHandlers) {
-            for (RefreshAllCompleteHandler handler : mRefreshAllCompleteHandlers) {
-                handler.onRefreshAllComplete(this);
-            }
-        }
-    }
-
-    public List<Fleet> getAllFleets() {
-        return mAllFleets;
-    }
-
-    public List<Colony> getAllColonies() {
-        return mAllColonies;
-    }
-
-    public List<BuildRequest> getAllBuildRequests() {
-        return mAllBuildRequests;
-    }
-
-    /**
-     * Gets a \c List<Star> of the "important" stars (that is, the stars when one of our colonies,
-     * fleets, etc are).
-     */
-    public Map<String, Star> getImportantStars() {
-        return mStars;
-    }
-
-    public Star getImportantStar(String key) {
-        return mStars.get(key);
-    }
-
-    @Override
-    public void updateAlliance(Alliance alliance) {
-        super.updateAlliance(alliance);
-        fireRefreshAllCompleteHandler();
     }
 
     /**
@@ -167,7 +98,7 @@ public class MyEmpire extends Empire {
                     log.error(ExceptionUtils.getStackTrace(e));
                     return false;
                 }
-
+/*TODO
                 // update our copy of everything and reset the uncollected taxes to zero, this'll
                 // keep us accurate until the server notifies us that's finished as well.
                 Simulation sim = new Simulation();
@@ -182,6 +113,7 @@ public class MyEmpire extends Empire {
                     }
                 }
                 mCash += taxes;
+                */
 
                 return true;
             }
@@ -323,107 +255,6 @@ public class MyEmpire extends Empire {
         }.execute();
     }
 
-    /**
-     * Refreshes all the details of this empire (e.g. collection of colonies, fleets etc)
-     */
-    public void refreshAllDetails(final RefreshAllCompleteHandler callback) {
-        new AsyncTask<Void, Void, Boolean>() {
-            @Override
-            protected Boolean doInBackground(Void... arg0) {
-                try {
-                    if (!mIsDirty) {
-                        simulate();
-                    } else {
-                        String url = "empires/"+getKey()+"/details?do_simulate=0";
-
-                        Messages.Empire pb = ApiClient.getProtoBuf(url, Messages.Empire.class);
-                        if (pb == null)
-                            return false;
-
-                        populateFromProtocolBuffer(pb);
-                        mIsDirty = false;
-                    }
-                    return true;
-                } catch(Exception e) {
-                    // TODO: handle exceptions
-                    log.error(ExceptionUtils.getStackTrace(e));
-                    return false;
-                }
-            }
-
-            @Override
-            protected void onPostExecute(Boolean success) {
-                if (!success) {
-                    return;
-                }
-
-                if (callback != null) {
-                    callback.onRefreshAllComplete(MyEmpire.this);
-                }
-                fireRefreshAllCompleteHandler();
-
-                // also, anybody waiting for updates from empires in general
-                EmpireManager.getInstance().fireEmpireUpdated(MyEmpire.this);
-            }
-        }.execute();
-    }
-
-    @Override
-    public void writeToParcel(Parcel parcel, int flags) {
-        super.writeToParcel(parcel, flags);
-
-        if (mAllFleets == null) {
-            mAllFleets = new ArrayList<Fleet>();
-        }
-        Fleet[] fleets = new Fleet[mAllFleets.size()];
-        parcel.writeParcelableArray(mAllFleets.toArray(fleets), flags);
-
-        if (mAllColonies == null) {
-            mAllColonies = new ArrayList<Colony>();
-        }
-        Colony[] colonies = new Colony[mAllColonies.size()];
-        parcel.writeParcelableArray(mAllColonies.toArray(colonies), flags);
-
-        if (mAllBuildRequests == null) {
-            mAllBuildRequests = new ArrayList<BuildRequest>();
-        }
-        BuildRequest[] buildRequests = new BuildRequest[mAllBuildRequests.size()];
-        parcel.writeParcelableArray(mAllBuildRequests.toArray(buildRequests), flags);
-
-        Star[] stars = new Star[mStars.size()];
-        parcel.writeParcelableArray(mStars.values().toArray(stars), flags);
-    }
-
-    @Override
-    protected void readFromParcel(Parcel parcel) {
-        super.readFromParcel(parcel);
-
-        Parcelable[] fleets = parcel.readParcelableArray(Fleet.class.getClassLoader());
-        mAllFleets = new ArrayList<Fleet>();
-        for (int i = 0; i < fleets.length; i++) {
-            mAllFleets.add((Fleet) fleets[i]);
-        }
-
-        Parcelable[] colonies = parcel.readParcelableArray(Colony.class.getClassLoader());
-        mAllColonies = new ArrayList<Colony>();
-        for (int i = 0; i < colonies.length; i++) {
-            mAllColonies.add((Colony) colonies[i]);
-        }
-
-        Parcelable[] buildRequests = parcel.readParcelableArray(BuildRequest.class.getClassLoader());
-        mAllBuildRequests = new ArrayList<BuildRequest>();
-        for (int i = 0; i < buildRequests.length; i++) {
-            mAllBuildRequests.add((BuildRequest) buildRequests[i]);
-        }
-
-        Parcelable[] stars = parcel.readParcelableArray(Star.class.getClassLoader());
-        mStars = new TreeMap<String, Star>();
-        for (Parcelable p : stars) {
-            Star star = (Star) p;
-            mStars.put(star.getKey(), star);
-        }
-    }
-
     public static final Parcelable.Creator<MyEmpire> CREATOR
                 = new Parcelable.Creator<MyEmpire>() {
         @Override
@@ -445,64 +276,8 @@ public class MyEmpire extends Empire {
         return empire;
     }
 
-    @Override
-    protected void populateFromProtocolBuffer(Messages.Empire pb) {
-        super.populateFromProtocolBuffer(pb);
-
-        mAllColonies = new ArrayList<Colony>();
-        mAllFleets = new ArrayList<Fleet>();
-        mAllBuildRequests = new ArrayList<BuildRequest>();
-
-        List<Messages.Star> star_pbs = pb.getStarsList();
-        TreeMap<String, Star> stars = new TreeMap<String, Star>();
-        if (star_pbs != null && star_pbs.size() > 0) {
-            for (int i = 0; i < star_pbs.size(); i++) {
-                stars.put(star_pbs.get(i).getKey(), Star.fromProtocolBuffer(star_pbs.get(i)));
-            }
-        }
-        mStars = stars;
-
-        simulate();
-    }
-
-    private void simulate() {
-        List<Colony> allColonies = new ArrayList<Colony>();
-        List<BuildRequest> allBuildRequests = new ArrayList<BuildRequest>();
-        List<Fleet> allFleets = new ArrayList<Fleet>();
-
-        Simulation sim = new Simulation();
-        for (Star star : mStars.values()) {
-            sim.simulate(star);
-
-            for (Colony c : star.getColonies()) {
-                if (c.getEmpireKey() != null && c.getEmpireKey().equals(getKey())) {
-                    allColonies.add(c);
-
-                    for (BuildRequest br : star.getBuildRequests()) {
-                        if (br.getColonyKey().equals(c.getKey())) {
-                            allBuildRequests.add(br);
-                        }
-                    }
-                }
-            }
-            for (Fleet f : star.getFleets()) {
-                if (f.getEmpireKey() != null && f.getEmpireKey().equals(getKey())) {
-                    allFleets.add(f);
-                }
-            }
-        }
-
-        mAllColonies = allColonies;
-        mAllBuildRequests = allBuildRequests;
-        mAllFleets = allFleets;
-    }
-
     public static interface ColonizeCompleteHandler {
         public void onColonizeComplete(Colony colony);
-    }
-
-    public static interface RefreshAllCompleteHandler {
-        public void onRefreshAllComplete(MyEmpire empire);
     }
 
     public static interface FetchScoutReportCompleteHandler {

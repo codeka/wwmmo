@@ -19,6 +19,7 @@ from ctrl import empire
 from ctrl import simulation
 from ctrl import chat
 from ctrl import alliance
+from ctrl import statistics as stats
 import ctrl
 
 from protobufs import protobuf_json, messages_pb2 as pb
@@ -147,7 +148,6 @@ class HelloPage(ApiPage):
     login_history_mdl.put()
 
     motd_model = model.MessageOfTheDay.get()
-
     if motd_model is not None:
       hello_resp_pb.motd.message = motd_model.message
       hello_resp_pb.motd.last_update = motd_model.date.isoformat()
@@ -164,6 +164,13 @@ class HelloPage(ApiPage):
 
     if empire_pb is not None:
       hello_resp_pb.empire.MergeFrom(empire_pb)
+      building_statistics_pb = stats.getStandingQuery("building-statistics:%s" % empire_pb.key,
+                                                      pb.EmpireBuildingStatistics)
+      if building_statistics_pb:
+        hello_resp_pb.building_statistics.MergeFrom(building_statistics_pb)
+
+      build_queue_pb = empire.getBuildQueueForEmpire(empire_pb.key)
+      hello_resp_pb.build_requests.MergeFrom(build_queue_pb.requests)
 
     if colonies_pb is not None:
       hello_resp_pb.colonies.MergeFrom(colonies_pb.colonies)
@@ -786,6 +793,13 @@ class EmpireCashAuditPage(ApiPage):
     return empire.getCashAudit(empire_pb)
 
 
+class EmpireBuildingStatisticsPage(ApiPage):
+  """This page returns statistics about the buildings in your empire."""
+  def get(self, empire_key):
+    return stats.getStandingQuery("building-statistics:%s" % empire_key,
+                                  pb.EmpireBuildingStatistics)
+
+
 class ColoniesAttackPage(ApiPage):
   def post(self, star_key, colony_key):
     """This is called when you want to attack an enemy colony. We check that
@@ -899,7 +913,7 @@ class FleetOrdersPage(ApiPage):
           self.response.set_status(403)
           return
 
-        empire.orderFleet(star_pb, fleet_pb, order_pb, sim):
+        empire.orderFleet(star_pb, fleet_pb, order_pb, sim)
         sim.update()
         return
 
@@ -1008,6 +1022,7 @@ app = ApiApplication([("/api/v1/hello/([^/]+)", HelloPage),
                       ("/api/v1/empires/([^/]+)/details", EmpireDetailsPage),
                       ("/api/v1/empires/([^/]+)/taxes", EmpireTaxesPage),
                       ("/api/v1/empires/([^/]+)/cash-audit", EmpireCashAuditPage),
+                      ("/api/v1/empires/([^/]+)/building-statistics", EmpireBuildingStatisticsPage),
                       ("/api/v1/alliances", AlliancesPage),
                       ("/api/v1/alliances/([^/]+)", AlliancePage),
                       ("/api/v1/alliances/([^/]+)/join-requests", AllianceJoinRequestsPage),

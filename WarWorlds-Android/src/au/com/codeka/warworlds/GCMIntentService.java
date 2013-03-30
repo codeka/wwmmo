@@ -11,6 +11,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Base64;
+import au.com.codeka.warworlds.model.BuildManager;
 import au.com.codeka.warworlds.model.ChatManager;
 import au.com.codeka.warworlds.model.ChatMessage;
 import au.com.codeka.warworlds.model.EmpireManager;
@@ -137,12 +138,11 @@ public class GCMIntentService extends GCMBaseIntentService {
                         SectorManager.getInstance().refreshSector(star.getSectorX(), star.getSectorY());
                     }
                     // refresh the empire as well, since stuff has happened...
-                    MyEmpire myEmpire = EmpireManager.getInstance().getEmpire();
-                    if (myEmpire != null) {
-                        myEmpire.setDirty();
-                        myEmpire.refreshAllDetails(null);
-                    }
+                    EmpireManager.getInstance().refreshEmpire(this);
                 }
+
+                // notify the build manager, in case it's a 'build complete' or something
+                BuildManager.getInstance().notifySituationReport(pb);
 
                 Notifications.displayNotification(context, pb);
             } else if (extras.containsKey("chat")) {
@@ -168,8 +168,7 @@ public class GCMIntentService extends GCMBaseIntentService {
 
                 ChatManager.getInstance().addMessage(context, msg);
             } else if (extras.containsKey("empire_updated")) {
-                EmpireManager.getInstance().getEmpire().setDirty();
-                EmpireManager.getInstance().refreshEmpire();
+                EmpireManager.getInstance().refreshEmpire(this);
             }
         }
     }

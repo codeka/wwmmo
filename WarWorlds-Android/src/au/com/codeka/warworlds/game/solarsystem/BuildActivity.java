@@ -29,18 +29,19 @@ import au.com.codeka.warworlds.TabManager;
 import au.com.codeka.warworlds.ctrl.BuildQueueList;
 import au.com.codeka.warworlds.game.BuildAccelerateDialog;
 import au.com.codeka.warworlds.game.BuildStopConfirmDialog;
+import au.com.codeka.warworlds.model.BuildManager;
 import au.com.codeka.warworlds.model.BuildRequest;
 import au.com.codeka.warworlds.model.Building;
 import au.com.codeka.warworlds.model.BuildingDesign;
 import au.com.codeka.warworlds.model.BuildingDesignManager;
 import au.com.codeka.warworlds.model.Colony;
 import au.com.codeka.warworlds.model.Design;
-import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.ShipDesign;
 import au.com.codeka.warworlds.model.ShipDesignManager;
 import au.com.codeka.warworlds.model.SpriteDrawable;
 import au.com.codeka.warworlds.model.Star;
 import au.com.codeka.warworlds.model.StarManager;
+import au.com.codeka.warworlds.model.StarSummary;
 
 /**
  * When you click "Build" shows you the list of buildings/ships that are/can be built by your
@@ -270,16 +271,8 @@ public class BuildActivity extends TabFragmentActivity implements StarManager.St
                         }
                     }
                     if (bd.getMaxPerEmpire() > 0) {
-                        int numExisting = 0;
-                        for (Colony c : EmpireManager.getInstance().getEmpire().getAllColonies()) {
-                            for (Building building : c.getBuildings()) {
-                                String designName = building.getDesignName();
-                                if (designName.equals(bd.getID())) {
-                                    numExisting ++;
-                                }
-                            }
-                        }
-                        for (BuildRequest br : EmpireManager.getInstance().getEmpire().getAllBuildRequests()) {
+                        int numExisting = BuildManager.getInstance().getTotalBuildingsInEmpire(bd.getID());
+                        for (BuildRequest br : BuildManager.getInstance().getBuildRequests()) {
                             if (br.getDesignID().equals(bd.getID())) {
                                 numExisting ++;
                             }
@@ -588,14 +581,14 @@ public class BuildActivity extends TabFragmentActivity implements StarManager.St
 
             mBuildQueueList.setBuildQueueActionListener(new BuildQueueList.BuildQueueActionListener() {
                 @Override
-                public void onAccelerateClick(Star star, BuildRequest buildRequest) {
+                public void onAccelerateClick(StarSummary star, BuildRequest buildRequest) {
                     BuildAccelerateDialog dialog = new BuildAccelerateDialog();
                     dialog.setBuildRequest(star, buildRequest);
                     dialog.show(getActivity().getSupportFragmentManager(), "");
                 }
 
                 @Override
-                public void onStopClick(Star star, BuildRequest buildRequest) {
+                public void onStopClick(StarSummary star, BuildRequest buildRequest) {
                     BuildStopConfirmDialog dialog = new BuildStopConfirmDialog();
                     dialog.setBuildRequest(star, buildRequest);
                     dialog.show(getActivity().getSupportFragmentManager(), "");

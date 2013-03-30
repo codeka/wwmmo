@@ -17,6 +17,7 @@ import ctrl
 from ctrl import empire as ctl
 from ctrl import sector as sector_ctl
 from ctrl import simulation as simulation_ctl
+from ctrl import statistics as stats_ctl
 from ctrl import designs as designs_ctl
 from model import empire as mdl
 from model import sector as sector_mdl
@@ -112,6 +113,7 @@ class BuildCheckPage(tasks.TaskPage):
           model.put()
           log_msg["building"] = model.designName
         ctrl.incrCount("buildings:"+str(empire_key))
+        stats_ctl.onBuildingConstructed(str(empire_key), build_request_model.designName, 1)
         if build_request_model.designName == "hq":
           # if you built a HQ, the star you built it on becomes your 'home' star.
           empire_mdl = mdl.Empire.get(empire_key)
@@ -194,6 +196,7 @@ class BuildCheckPage(tasks.TaskPage):
       sitrep_pb.build_complete_record.build_kind = build_request_model.designKind
       sitrep_pb.build_complete_record.design_id = build_request_model.designName
       sitrep_pb.build_complete_record.count = build_request_model.count
+      sitrep_pb.build_complete_record.build_request_key = str(build_request_model.key())
 
       ctl.saveSituationReport(sitrep_pb)
 

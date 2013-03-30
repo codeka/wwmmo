@@ -21,16 +21,16 @@ import au.com.codeka.warworlds.model.BuildRequest;
 import au.com.codeka.warworlds.model.Design;
 import au.com.codeka.warworlds.model.DesignManager;
 import au.com.codeka.warworlds.model.EmpireManager;
-import au.com.codeka.warworlds.model.Star;
 import au.com.codeka.warworlds.model.StarManager;
+import au.com.codeka.warworlds.model.StarSummary;
 import au.com.codeka.warworlds.model.protobuf.Messages;
 
 public class BuildAccelerateDialog extends DialogFragment {
     private BuildRequest mBuildRequest;
-    private Star mStar;
+    private StarSummary mStar;
     private View mView;
 
-    public void setBuildRequest(Star star, BuildRequest buildRequest) {
+    public void setBuildRequest(StarSummary star, BuildRequest buildRequest) {
         mBuildRequest = buildRequest;
         mStar = star;
     }
@@ -132,8 +132,7 @@ public class BuildAccelerateDialog extends DialogFragment {
                 StarManager.getInstance().refreshStar(activity.getApplicationContext(), mStar.getKey());
 
                 // tell the EmpireManager to update the empire (since our cash will have gone down)
-                EmpireManager.getInstance().getEmpire().setDirty();
-                EmpireManager.getInstance().refreshEmpire();
+                EmpireManager.getInstance().refreshEmpire(activity);
 
                 if (mErrorMsg != null) {
                     new StyledDialog.Builder(activity.getApplicationContext())

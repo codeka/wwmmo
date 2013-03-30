@@ -275,19 +275,27 @@ def buildingModelToPb(building_pb, building_model):
     building_pb.level = 1
 
 
-def buildRequestModelToPb(build_pb, build_model):
+def buildRequestModelToPb(build_pb, build_model, colony_pb=None):
   build_pb.key = str(build_model.key())
   build_pb.colony_key = str(empire_mdl.BuildOperation.colony.get_value_for_datastore(build_model))
   build_pb.empire_key = str(empire_mdl.BuildOperation.empire.get_value_for_datastore(build_model))
+  build_pb.star_key = str(build_model.key().parent())
+  if colony_pb:
+    build_pb.planet_index = colony_pb.planet_index
+  elif build_model.planetIndex:
+    build_pb.planet_index = build_model.planetIndex
+  else:
+    build_pb.planet_index = build_model.colony.planetIndex
   build_pb.design_name = build_model.designName
   build_pb.start_time = dateTimeToEpoch(build_model.startTime)
   build_pb.end_time = dateTimeToEpoch(build_model.endTime)
   build_pb.build_kind = build_model.designKind
   build_pb.progress = build_model.progress
   build_pb.count = build_model.count
-  existing_building_key = empire_mdl.BuildOperation.existingBuilding.get_value_for_datastore(build_model)
-  if existing_building_key:
-    build_pb.existing_building_key = str(existing_building_key)
+  existing_building = build_model.existingBuilding
+  if existing_building:
+    build_pb.existing_building_key = str(existing_building.key())
+    build_pb.existing_building_level = existing_building.level
 
 
 def buildRequestPbToModel(build_model, build_pb):

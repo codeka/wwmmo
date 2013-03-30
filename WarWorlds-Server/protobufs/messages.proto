@@ -146,6 +146,23 @@ message EmpireCashAudit
 
 
 //
+// Contains a mapping of building designs to the number of buildings of that design in
+// your empire. Used to decide whether you can build a certain building, when it has
+// a "maxPerEmpire" restriction.
+//
+message EmpireBuildingStatistics
+{
+    message DesignCount
+    {
+        required string design_id = 1;
+        required int32 num_buildings = 2;
+    }
+
+    repeated DesignCount counts = 1;
+}
+
+
+//
 // The "hello" request when you first join the game contains some info about yourself which we
 // record for posterity.
 //
@@ -192,6 +209,14 @@ message HelloResponse
     // If present and true, it means your empire was reset (probably because your last colony
     // was destroyed). Display some kind of message to the user to that effect.
     optional bool was_empire_reset = 7;
+
+    // Building statistics that details the number of buildings of each design your empire
+    // has, once you've got it on the client, it can be kept track there...
+    optional EmpireBuildingStatistics building_statistics = 8;
+
+    // The collection of build requests. Once we've got the initial list from the server, the
+    // client is able to track them itself.
+    repeated BuildRequest build_requests = 9;
 }
 
 //
@@ -551,6 +576,10 @@ message BuildRequest
     // The empire this build operation belongs to.
     required string empire_key = 3;
 
+    // The key of the star/planet this build request is happening on
+    optional string star_key = 11;
+    optional int32 planet_index = 12;
+
     // What are you trying to build? A building or a ship?
     // The values here should be in sync with com.codeka.warworlds.model.Design.DesignKind.
     enum BUILD_KIND
@@ -579,6 +608,7 @@ message BuildRequest
     // valid if build_kind is set to BUILDING and obviously the building has to exist in the
     // current colony as well.
     optional string existing_building_key = 10;
+    optional int32 existing_building_level = 13;
 }
 
 
@@ -849,6 +879,7 @@ message SituationReport
         optional BuildRequest.BUILD_KIND build_kind = 1;
         optional string design_id = 2;
         optional int32 count = 3;
+        optional string build_request_key = 4;
     }
     optional BuildCompleteRecord build_complete_record = 6;
 

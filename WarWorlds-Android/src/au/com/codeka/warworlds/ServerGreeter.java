@@ -16,6 +16,7 @@ import android.os.StrictMode;
 import android.preference.PreferenceManager;
 import au.com.codeka.warworlds.api.ApiClient;
 import au.com.codeka.warworlds.api.ApiException;
+import au.com.codeka.warworlds.model.BuildManager;
 import au.com.codeka.warworlds.model.ChatManager;
 import au.com.codeka.warworlds.model.Colony;
 import au.com.codeka.warworlds.model.EmpireManager;
@@ -182,6 +183,8 @@ public class ServerGreeter {
                         }
                         mColonies.add(Colony.fromProtocolBuffer(c));
                     }
+
+                    BuildManager.getInstance().setup(resp.getBuildingStatistics(), resp.getBuildRequestsList());
 
                     message = resp.getMotd().getMessage();
                     mErrorOccured = false;

@@ -873,10 +873,11 @@ def build(empire_pb, colony_pb, request_pb, sim):
   build_operation_model.endTime = sim.now + timedelta(seconds=15)
   build_operation_model.progress = 0.0
   build_operation_model.count = request_pb.count
+  build_operation_model.planetIndex = colony_pb.planet_index
   if request_pb.existing_building_key:
     build_operation_model.existingBuilding = db.Key(request_pb.existing_building_key)
   build_operation_model.put()
-  ctrl.buildRequestModelToPb(request_pb, build_operation_model)
+  ctrl.buildRequestModelToPb(request_pb, build_operation_model, colony_pb)
 
   # make sure we clear the cache so we get the latest version with the new build
   keys = ["buildqueue:for-empire:%s" % empire_pb.key,
@@ -891,6 +892,10 @@ def build(empire_pb, colony_pb, request_pb, sim):
   # Schedule a build check so that we make sure we'll update everybody when this build completes
   scheduleBuildCheck(sim)
 
+  star_pb = sim.getStar(colony_pb.star_key)
+  for build_request_pb in star_pb.build_requests:
+    if build_request_pb.key == request_pb.key:
+      return build_request_pb
   return request_pb
 
 
@@ -955,7 +960,6 @@ def stopBuild(empire_pb, star_pb, build_request_pb, sim):
 
 def getBuildQueueForEmpire(empire_key):
   """Gets the current build queue for the given empire."""
-
   cache_key = "buildqueue:for-empire:%s" % empire_key
   build_queue = ctrl.getCached([cache_key], pb.BuildQueue)
   if cache_key in build_queue:

@@ -117,6 +117,7 @@ class BuildOperation(db.Model):
   progress = db.FloatProperty()
   count = db.IntegerProperty()
   existingBuilding = db.ReferenceProperty(Building)
+  planetIndex = db.IntegerProperty() # easier than querying the colony for it...
 
   @staticmethod
   def getForStar(star_model):

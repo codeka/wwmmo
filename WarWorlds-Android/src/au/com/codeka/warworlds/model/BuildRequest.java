@@ -23,6 +23,9 @@ public class BuildRequest implements Parcelable {
     private float mProgress;
     private int mCount;
     private String mExistingBuildingKey;
+    private int mExistingBuildingLevel;
+    private String mStarKey;
+    private int mPlanetIndex;
 
     public BuildRequest() {
         mRefreshTime = DateTime.now(DateTimeZone.UTC);
@@ -48,6 +51,15 @@ public class BuildRequest implements Parcelable {
     }
     public String getExistingBuildingKey() {
         return mExistingBuildingKey;
+    }
+    public int getExistingBuildingLevel() {
+        return mExistingBuildingLevel;
+    }
+    public String getStarKey() {
+        return mStarKey;
+    }
+    public int getPlanetIndex() {
+        return mPlanetIndex;
     }
     public float getProgress(boolean interpolate) {
         if (!interpolate) {
@@ -117,6 +129,9 @@ public class BuildRequest implements Parcelable {
         parcel.writeFloat(mProgress);
         parcel.writeInt(mCount);
         parcel.writeString(mExistingBuildingKey);
+        parcel.writeInt(mExistingBuildingLevel);
+        parcel.writeString(mStarKey);
+        parcel.writeInt(mPlanetIndex);
     }
 
     public static final Parcelable.Creator<BuildRequest> CREATOR
@@ -134,6 +149,9 @@ public class BuildRequest implements Parcelable {
             br.mProgress = parcel.readFloat();
             br.mCount = parcel.readInt();
             br.mExistingBuildingKey = parcel.readString();
+            br.mExistingBuildingLevel = parcel.readInt();
+            br.mStarKey = parcel.readString();
+            br.mPlanetIndex = parcel.readInt();
             return br;
         }
 
@@ -153,8 +171,11 @@ public class BuildRequest implements Parcelable {
         request.mStartTime = new DateTime(pb.getStartTime() * 1000, DateTimeZone.UTC);
         request.mProgress = pb.getProgress();
         request.mCount = pb.getCount();
+        request.mStarKey = pb.getStarKey();
+        request.mPlanetIndex = pb.getPlanetIndex();
         if (pb.getExistingBuildingKey() != null && !pb.getExistingBuildingKey().equals("")) {
             request.mExistingBuildingKey = pb.getExistingBuildingKey();
+            request.mExistingBuildingLevel = pb.getExistingBuildingLevel(); 
         }
         return request;
     }

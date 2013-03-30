@@ -138,12 +138,12 @@ public class EmpireManager {
         }
     }
 
-    public void refreshEmpire() {
+    public void refreshEmpire(final Context context) {
         if (mEmpire == null) {
             // todo?
             return;
         }
-        mEmpire.refreshAllDetails(null);
+        refreshEmpire(context, mEmpire.getKey());
     }
 
     public void refreshEmpire(final Context context, final String empireKey) {

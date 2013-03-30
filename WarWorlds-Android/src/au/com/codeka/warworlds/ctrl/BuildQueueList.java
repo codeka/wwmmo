@@ -1,13 +1,14 @@
 package au.com.codeka.warworlds.ctrl;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.TreeSet;
 
 import org.joda.time.Duration;
 
@@ -30,27 +31,24 @@ import au.com.codeka.RomanNumeralFormatter;
 import au.com.codeka.TimeInHours;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.model.BuildRequest;
-import au.com.codeka.warworlds.model.Building;
 import au.com.codeka.warworlds.model.Colony;
 import au.com.codeka.warworlds.model.Design;
 import au.com.codeka.warworlds.model.DesignManager;
-import au.com.codeka.warworlds.model.EmpireManager;
-import au.com.codeka.warworlds.model.MyEmpire;
 import au.com.codeka.warworlds.model.Planet;
 import au.com.codeka.warworlds.model.PlanetImageManager;
 import au.com.codeka.warworlds.model.Sprite;
 import au.com.codeka.warworlds.model.SpriteDrawable;
 import au.com.codeka.warworlds.model.Star;
-import au.com.codeka.warworlds.model.StarManager;
 import au.com.codeka.warworlds.model.StarImageManager;
+import au.com.codeka.warworlds.model.StarManager;
+import au.com.codeka.warworlds.model.StarSummary;
 
 public class BuildQueueList extends FrameLayout
-                            implements MyEmpire.RefreshAllCompleteHandler,
-                                       StarManager.StarFetchedHandler {
+                            implements StarManager.StarFetchedHandler {
     private Context mContext;
     private BuildQueueActionListener mActionListener;
     private BuildQueueListAdapter mBuildQueueListAdapter;
-    private Colony mColony;
+    private String mColonyKey;
     private List<String> mStarKeys;
     private Handler mHandler;
     private ProgressUpdater mProgressUpdater;
@@ -122,7 +120,7 @@ public class BuildQueueList extends FrameLayout
     }
 
     public void refresh(final Star star, final Colony colony, List<BuildRequest> allBuildRequests) {
-        Map<String, Star> stars = new TreeMap<String, Star>();
+        Map<String, StarSummary> stars = new TreeMap<String, StarSummary>();
         stars.put(star.getKey(), star);
 
         Map<String, Colony> colonies = new TreeMap<String, Colony>();
@@ -135,20 +133,39 @@ public class BuildQueueList extends FrameLayout
             }
         }
 
-        mColony = colony;
-        refresh(stars, colonies, buildRequests);
+        mColonyKey = colony.getKey();
+        refresh(stars, buildRequests);
     }
 
-    public void refresh(final Map<String, Star> stars,
-                        final Map<String, Colony> colonies,
+    public void refresh(final List<BuildRequest> buildRequests) {
+        TreeSet<String> starKeys = new TreeSet<String>();
+        for (BuildRequest buildRequest : buildRequests) {
+            if (!starKeys.contains(buildRequest.getStarKey())) {
+                starKeys.add(buildRequest.getStarKey());
+            }
+        }
+
+        StarManager.getInstance().requestStarSummaries(mContext, starKeys, new StarManager.StarSummariesFetchedHandler() {
+            @Override
+            public void onStarSummariesFetched(Collection<StarSummary> stars) {
+                TreeMap<String, StarSummary> summaries = new TreeMap<String, StarSummary>();
+                for (StarSummary star : stars) {
+                    summaries.put(star.getKey(), star);
+                }
+                refresh(summaries, buildRequests);
+            }
+        });
+    }
+
+    public void refresh(final Map<String, StarSummary> stars,
                         final List<BuildRequest> buildRequests) {
         // save the list of star keys we're interested in here
         mStarKeys = new ArrayList<String>();
-        for (Star star : stars.values()) {
+        for (StarSummary star : stars.values()) {
             mStarKeys.add(star.getKey());
         }
 
-        mBuildQueueListAdapter.setBuildQueue(stars, colonies, buildRequests);
+        mBuildQueueListAdapter.setBuildQueue(stars, buildRequests);
     }
 
     public void refreshSelection() {
@@ -189,53 +206,6 @@ public class BuildQueueList extends FrameLayout
         mBuildQueueListAdapter.refreshEntryProgress(mSelectedBuildRequest, progressBar, progressText);
     }
 
-    /**
-     * When the empire is updated, make sure we display the latest build queue.
-     */
-    @Override
-    public void onRefreshAllComplete(MyEmpire empire) {
-        String selectedBuildRequestKey = null;
-        if (mSelectedBuildRequest != null) {
-            selectedBuildRequestKey = mSelectedBuildRequest.getKey();
-        }
-
-        if (mColony != null) {
-            String colonyKey = mColony.getKey();
-            mColony = null;
-
-            for (int i = 0; i < empire.getAllColonies().size(); i++) {
-                Colony colony = empire.getAllColonies().get(i);
-                if (colony.getKey().equals(colonyKey)) {
-                    mColony = colony;
-                    break;
-                }
-            }
-
-            if (mColony != null) {
-                refresh(empire.getImportantStar(mColony.getStarKey()),
-                        mColony, empire.getAllBuildRequests());
-            }
-        } else {
-            Map<String, Colony> colonies = new TreeMap<String, Colony>();
-            for (Colony colony : empire.getAllColonies()) {
-                colonies.put(colony.getKey(), colony);
-            }
-
-            refresh(empire.getImportantStars(), colonies, empire.getAllBuildRequests());
-        }
-
-        mSelectedBuildRequest = null;
-        if (selectedBuildRequestKey != null) {
-            for (BuildRequest buildRequest : empire.getAllBuildRequests()) {
-                if (buildRequest.getKey().equals(selectedBuildRequestKey)) {
-                    mSelectedBuildRequest = buildRequest;
-                    break;
-                }
-            }
-        }
-        refreshSelection();
-    }
-
     @Override
     public void onStarFetched(Star s) {
         if (mStarKeys == null) {
@@ -257,7 +227,6 @@ public class BuildQueueList extends FrameLayout
 
     @Override
     public void onAttachedToWindow() {
-        EmpireManager.getInstance().getEmpire().addRefreshAllCompleteHandler(this);
         StarManager.getInstance().addStarUpdatedListener(null, this);
 
         mProgressUpdater = new ProgressUpdater();
@@ -266,7 +235,6 @@ public class BuildQueueList extends FrameLayout
 
     @Override
     public void onDetachedFromWindow() {
-        EmpireManager.getInstance().getEmpire().removeRefreshAllCompleteHandler(this);
         StarManager.getInstance().removeStarUpdatedListener(this);
 
         mHandler.removeCallbacks(mProgressUpdater);
@@ -278,34 +246,22 @@ public class BuildQueueList extends FrameLayout
      */
     private class BuildQueueListAdapter extends BaseAdapter {
         private List<BuildRequest> mBuildRequests;
-        private Map<String, Star> mStars;
-        private Map<String, Colony> mColonies;
+        private Map<String, StarSummary> mStarSummaries;
         private List<ItemEntry> mEntries;
 
-        public void setBuildQueue(Map<String, Star> stars,
-                                  Map<String, Colony> colonies,
+        public void setBuildQueue(Map<String, StarSummary> stars,
                                   List<BuildRequest> buildRequests) {
             mBuildRequests = new ArrayList<BuildRequest>(buildRequests);
-            mStars = stars;
-            mColonies = colonies;
+            mStarSummaries = stars;
 
             Collections.sort(mBuildRequests, new Comparator<BuildRequest>() {
                 @Override
                 public int compare(BuildRequest lhs, BuildRequest rhs) {
                     // sort by star, then by design, then by count
                     if (!lhs.getColonyKey().equals(rhs.getColonyKey())) {
-                        Colony lhsColony = mColonies.get(lhs.getColonyKey());
-                        Colony rhsColony = mColonies.get(rhs.getColonyKey());
-
-                        if (lhsColony == null) {
-                            return -1;
-                        } else if (rhsColony == null) {
-                            return 1;
-                        }
-
-                        if (!lhsColony.getStarKey().equals(rhsColony.getStarKey())) {
-                            Star lhsStar = mStars.get(lhsColony.getStarKey());
-                            Star rhsStar = mStars.get(rhsColony.getStarKey());
+                        if (!lhs.getStarKey().equals(rhs.getStarKey())) {
+                            StarSummary lhsStar = mStarSummaries.get(lhs.getStarKey());
+                            StarSummary rhsStar = mStarSummaries.get(rhs.getStarKey());
 
                             if (lhsStar == null) {
                                 return -1;
@@ -315,7 +271,7 @@ public class BuildQueueList extends FrameLayout
 
                             return lhsStar.getName().compareTo(rhsStar.getName());
                         } else {
-                            return lhsColony.getPlanetIndex() - rhsColony.getPlanetIndex();
+                            return lhs.getPlanetIndex() - rhs.getPlanetIndex();
                         }
                     } else {
                         return lhs.getStartTime().compareTo(rhs.getStartTime());
@@ -327,35 +283,28 @@ public class BuildQueueList extends FrameLayout
             String lastStarKey = "";
             int lastPlanetIndex = -1;
             for (BuildRequest buildRequest : mBuildRequests) {
-                Colony colony = mColonies.get(buildRequest.getColonyKey());
-                if (colony == null) {
-                    continue;
-                }
-                Star star = mStars.get(colony.getStarKey());
+                StarSummary star = mStarSummaries.get(buildRequest.getStarKey());
                 if (star == null) {
                     continue;
                 }
 
-                if (!colony.getStarKey().equals(lastStarKey) || colony.getPlanetIndex() != lastPlanetIndex) {
+                if (!buildRequest.getStarKey().equals(lastStarKey) || buildRequest.getPlanetIndex() != lastPlanetIndex) {
                     if (mShowStars) {
                         ItemEntry entry = new ItemEntry();
                         entry.star = star;
-                        entry.planet = star.getPlanets()[colony.getPlanetIndex() - 1];
+                        entry.planet = star.getPlanets()[buildRequest.getPlanetIndex() - 1];
                         mEntries.add(entry);
                     }
-                    lastStarKey = colony.getStarKey();
-                    lastPlanetIndex = colony.getPlanetIndex();
+                    lastStarKey = buildRequest.getStarKey();
+                    lastPlanetIndex = buildRequest.getPlanetIndex();
                 }
 
                 ItemEntry entry = new ItemEntry();
                 entry.buildRequest = buildRequest;
 
                 if (buildRequest.getExistingBuildingKey() != null) {
-                    for (Building building : colony.getBuildings()) {
-                        if (building.getKey().equals(buildRequest.getExistingBuildingKey())) {
-                            entry.existingBuilding = building;
-                        }
-                    }
+                    entry.existingBuildingKey = buildRequest.getExistingBuildingKey();
+                    entry.existingBuildingLevel = buildRequest.getExistingBuildingLevel();
                 }
 
                 mEntries.add(entry);
@@ -365,37 +314,28 @@ public class BuildQueueList extends FrameLayout
         }
 
         /**
-         * Called when the given star refreshes, we'll refresh just the build requests in that
+         * Called when a given star refreshes, we'll refresh just the build requests in that
          * star.
          */
         public void onStarRefreshed(Star s) {
-            HashSet<String> oldColonyKeys = new HashSet<String>();
-            Star oldStar = mStars.get(s.getKey());
-            for (Colony c : oldStar.getColonies()) {
-                mColonies.remove(c.getKey());
-                oldColonyKeys.add(c.getKey());
-            }
-            for (Colony c : s.getColonies()) {
-                mColonies.put(c.getKey(), c);
+            ArrayList<BuildRequest> newBuildRequests = new ArrayList<BuildRequest>();
+
+            // copy old build requests that are not for this star over
+            for (BuildRequest br : mBuildRequests) {
+                if (!br.getStarKey().equals(s.getKey())) {
+                    newBuildRequests.add(br);
+                }
             }
 
-            ArrayList<BuildRequest> newBuildRequests = new ArrayList<BuildRequest>();
-            for (BuildRequest br : mBuildRequests) {
-                if (oldColonyKeys.contains(br.getColonyKey())) {
-                    continue;
-                }
-                newBuildRequests.add(br);
-            }
+            // copy build requests from the new star over
             for (BuildRequest br : s.getBuildRequests()) {
                 // only add the build request if it's for a colony we're displaying
-                for (Colony c : mColonies.values()) {
-                    if (br.getColonyKey().equals(c.getKey())) {
-                        newBuildRequests.add(br);
-                    }
+                if (mColonyKey == null || br.getColonyKey().equals(mColonyKey)) {
+                    newBuildRequests.add(br);
                 }
             }
 
-            setBuildQueue(mStars, mColonies, newBuildRequests);
+            setBuildQueue(mStarSummaries, newBuildRequests);
         }
 
         @Override
@@ -451,9 +391,8 @@ public class BuildQueueList extends FrameLayout
             }
         }
 
-        public Star getStarForBuildRequest(BuildRequest buildRequest) {
-            Colony colony = mColonies.get(buildRequest.getColonyKey());
-            return mStars.get(colony.getStarKey());
+        public StarSummary getStarForBuildRequest(BuildRequest buildRequest) {
+            return mStarSummaries.get(buildRequest.getStarKey());
         }
 
         public void refreshEntryProgress(ItemEntry entry) {
@@ -553,8 +492,8 @@ public class BuildQueueList extends FrameLayout
 
                 icon.setImageDrawable(new SpriteDrawable(design.getSprite()));
 
-                if (entry.existingBuilding != null) {
-                    level.setText(Integer.toString(entry.existingBuilding.getLevel()));
+                if (entry.existingBuildingKey != null) {
+                    level.setText(Integer.toString(entry.existingBuildingLevel));
                 } else {
                     level.setVisibility(View.GONE);
                     levelLabel.setVisibility(View.GONE);
@@ -583,12 +522,13 @@ public class BuildQueueList extends FrameLayout
         }
 
         private class ItemEntry {
-            public Star star;
+            public StarSummary star;
             public Planet planet;
             public SpriteDrawable starDrawable;
             public SpriteDrawable planetDrawable;
             public BuildRequest buildRequest;
-            public Building existingBuilding;
+            public String existingBuildingKey;
+            public int existingBuildingLevel;
             public ProgressBar progressBar;
             public TextView progressText;
         }
@@ -609,7 +549,7 @@ public class BuildQueueList extends FrameLayout
     }
 
     public interface BuildQueueActionListener {
-        void onAccelerateClick(Star star, BuildRequest buildRequest);
-        void onStopClick(Star star, BuildRequest buildRequest);
+        void onAccelerateClick(StarSummary star, BuildRequest buildRequest);
+        void onStopClick(StarSummary star, BuildRequest buildRequest);
     }
 }
