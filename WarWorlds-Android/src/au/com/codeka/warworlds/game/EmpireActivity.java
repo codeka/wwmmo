@@ -473,9 +473,7 @@ public class EmpireActivity extends TabFragmentActivity
 
             View v = inflator.inflate(R.layout.empire_buildqueue_tab, null);
             BuildQueueList buildQueueList = (BuildQueueList) v.findViewById(R.id.build_queue);
-
             buildQueueList.refresh(BuildManager.getInstance().getBuildRequests());
-
             buildQueueList.setBuildQueueActionListener(new BuildQueueList.BuildQueueActionListener() {
                 @Override
                 public void onAccelerateClick(StarSummary star, BuildRequest buildRequest) {

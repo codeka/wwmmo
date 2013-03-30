@@ -5,9 +5,14 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeSet;
+
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.os.AsyncTask;
 import android.text.Html;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
@@ -27,6 +32,7 @@ import au.com.codeka.warworlds.model.Colony;
 import au.com.codeka.warworlds.model.ImageManager;
 import au.com.codeka.warworlds.model.Planet;
 import au.com.codeka.warworlds.model.PlanetImageManager;
+import au.com.codeka.warworlds.model.Simulation;
 import au.com.codeka.warworlds.model.Sprite;
 import au.com.codeka.warworlds.model.SpriteDrawable;
 import au.com.codeka.warworlds.model.Star;
@@ -40,6 +46,9 @@ public class ColonyList extends FrameLayout {
     private boolean mIsInitialized;
     private ColonyListAdapter mColonyListAdapter;
     private ColonyActionHandler mColonyActionListener;
+
+    // collection of stars we're currently simulating
+    private static TreeSet<String> sSimulatingStars = new TreeSet<String>();
 
     public ColonyList(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -165,9 +174,40 @@ public class ColonyList extends FrameLayout {
         planetIcon.setImageDrawable(new SpriteDrawable(sprite));
 
         colonyName.setText(String.format("%s %s", star.getName(), RomanNumeralFormatter.format(planet.getIndex())));
-        colonySummary.setText(String.format("Pop: %d", (int) colony.getPopulation()));
 
-        uncollectedTaxes.setText(String.format("Taxes: %s", Cash.format(colony.getUncollectedTaxes())));
+        if (star.getLastSimulation().compareTo(DateTime.now(DateTimeZone.UTC).minusMinutes(5)) < 0) {
+            // if the star hasn't been simulated for > 5 minutes, schedule a simulation now and
+            // just display ??? for the various parameters
+            colonySummary.setText("Pop: ?");
+            uncollectedTaxes.setText("Taxes: ?");
+            scheduleSimulate(star);
+        } else {
+            colonySummary.setText(String.format("Pop: %d", (int) colony.getPopulation()));
+            uncollectedTaxes.setText(String.format("Taxes: %s", Cash.format(colony.getUncollectedTaxes())));
+        }
+    }
+
+    private static void scheduleSimulate(final Star star) {
+        synchronized(sSimulatingStars) {
+            if (sSimulatingStars.contains(star.getKey())) {
+                return;
+            }
+            sSimulatingStars.add(star.getKey());
+        }
+
+        new AsyncTask<Void, Void, Star>() {
+            @Override
+            protected Star doInBackground(Void... params) {
+                Simulation sim = new Simulation();
+                sim.simulate(star);
+                return star;
+            }
+
+            @Override
+            protected void onPostExecute(Star star) {
+                StarManager.getInstance().fireStarUpdated(star);
+            }
+        }.execute();
     }
 
     /**

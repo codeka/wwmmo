@@ -266,11 +266,9 @@ public class MyEmpire extends Empire {
                     if (pb == null)
                         return null;
 
-                    Simulation sim = new Simulation();
                     ArrayList<Star> stars = new ArrayList<Star>();
                     for (Messages.Star star_pb : pb.getStarsList()) {
                         Star star = Star.fromProtocolBuffer(star_pb);
-                        sim.simulate(star);
                         stars.add(star);
                     }
 

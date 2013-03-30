@@ -83,7 +83,7 @@ public class StarManager {
         mAllStarUpdatedListeners.remove(handler);
     }
 
-    protected void fireStarUpdated(Star star) {
+    public void fireStarUpdated(Star star) {
         synchronized(mStarUpdatedListeners) {
             List<StarFetchedHandler> listeners = mStarUpdatedListeners.get(star.getKey());
             if (listeners != null) {

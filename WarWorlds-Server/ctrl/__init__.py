@@ -285,7 +285,11 @@ def buildRequestModelToPb(build_pb, build_model, colony_pb=None):
   elif build_model.planetIndex:
     build_pb.planet_index = build_model.planetIndex
   else:
-    build_pb.planet_index = build_model.colony.planetIndex
+    try:
+      build_pb.planet_index = build_model.colony.planet_index
+    except:
+      # we can get this if the colony is destroyed...
+      build_pb.planet_index = 0
   build_pb.design_name = build_model.designName
   build_pb.start_time = dateTimeToEpoch(build_model.startTime)
   build_pb.end_time = dateTimeToEpoch(build_model.endTime)
@@ -295,7 +299,10 @@ def buildRequestModelToPb(build_pb, build_model, colony_pb=None):
   existing_building = build_model.existingBuilding
   if existing_building:
     build_pb.existing_building_key = str(existing_building.key())
-    build_pb.existing_building_level = existing_building.level
+    if not existing_building.level:
+      build_pb.existing_building_level = 1
+    else:
+      build_pb.existing_building_level = existing_building.level
 
 
 def buildRequestPbToModel(build_model, build_pb):
