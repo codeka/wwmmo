@@ -800,6 +800,32 @@ class EmpireBuildingStatisticsPage(ApiPage):
                                   pb.EmpireBuildingStatistics)
 
 
+class EmpireStarsPage(ApiPage):
+  def get(self, empire_key):
+    empire_pb = empire.getEmpire(empire_key)
+    if not self._isAdmin() and empire_pb.key != empire.getEmpireForUser(self.user).key:
+      self.response.set_status(403)
+      return
+
+    fleets_pb = empire.getFleetsForEmpire(empire_pb)
+    colonies_pb = empire.getColoniesForEmpire(empire_pb)
+
+    star_keys = []
+    for colony_pb in colonies_pb.colonies:
+      if colony_pb.star_key not in star_keys:
+        star_keys.append(colony_pb.star_key)
+    for fleet_pb in fleets_pb.fleets:
+      if fleet_pb.star_key not in star_keys:
+        star_keys.append(fleet_pb.star_key)
+
+    star_pbs = []
+    for star_key in star_keys:
+      star_pbs.append(sector.getStar(star_key))
+    stars_pb = pb.Stars()
+    stars_pb.stars.extend(star_pbs)
+    return stars_pb
+
+
 class ColoniesAttackPage(ApiPage):
   def post(self, star_key, colony_key):
     """This is called when you want to attack an enemy colony. We check that
@@ -1023,6 +1049,7 @@ app = ApiApplication([("/api/v1/hello/([^/]+)", HelloPage),
                       ("/api/v1/empires/([^/]+)/taxes", EmpireTaxesPage),
                       ("/api/v1/empires/([^/]+)/cash-audit", EmpireCashAuditPage),
                       ("/api/v1/empires/([^/]+)/building-statistics", EmpireBuildingStatisticsPage),
+                      ("/api/v1/empires/([^/]+)/stars", EmpireStarsPage),
                       ("/api/v1/alliances", AlliancesPage),
                       ("/api/v1/alliances/([^/]+)", AlliancePage),
                       ("/api/v1/alliances/([^/]+)/join-requests", AllianceJoinRequestsPage),

@@ -255,6 +255,48 @@ public class MyEmpire extends Empire {
         }.execute();
     }
 
+    public void requestStars(final FetchStarsCompleteHandler callback) {
+        new AsyncTask<Void, Void, List<Star>>() {
+            @Override
+            protected List<Star> doInBackground(Void... arg0) {
+                try {
+                    String url = "empires/"+getKey()+"/stars";
+
+                    Messages.Stars pb = ApiClient.getProtoBuf(url, Messages.Stars.class);
+                    if (pb == null)
+                        return null;
+
+                    Simulation sim = new Simulation();
+                    ArrayList<Star> stars = new ArrayList<Star>();
+                    for (Messages.Star star_pb : pb.getStarsList()) {
+                        Star star = Star.fromProtocolBuffer(star_pb);
+                        sim.simulate(star);
+                        stars.add(star);
+                    }
+
+                    return stars;
+                } catch(Exception e) {
+                    // TODO: handle exceptions
+                    log.error(ExceptionUtils.getStackTrace(e));
+                    return null;
+                }
+            }
+
+            @Override
+            protected void onPostExecute(List<Star> stars) {
+                if (stars != null) {
+                    for (Star star : stars) {
+                        StarManager.getInstance().fireStarUpdated(star);
+                    }
+                }
+
+                if (callback != null) {
+                    callback.onComplete(stars);
+                }
+            }
+        }.execute();
+    }
+
     public static final Parcelable.Creator<MyEmpire> CREATOR
                 = new Parcelable.Creator<MyEmpire>() {
         @Override
@@ -286,6 +328,10 @@ public class MyEmpire extends Empire {
 
     public static interface FetchCombatReportCompleteHandler {
         public void onComplete(CombatReport report);
+    }
+
+    public static interface FetchStarsCompleteHandler {
+        public void onComplete(List<Star> stars);
     }
 
     public static interface AttackColonyCompleteHandler {

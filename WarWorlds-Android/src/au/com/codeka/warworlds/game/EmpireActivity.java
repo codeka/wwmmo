@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 import android.app.Activity;
 import android.content.Context;
@@ -54,6 +56,7 @@ import au.com.codeka.warworlds.model.StarSummary;
 public class EmpireActivity extends TabFragmentActivity
                             implements EmpireManager.EmpireFetchedHandler {
     private static MyEmpire sCurrentEmpire;
+    private static Map<String, Star> sStars;
 
     Context mContext = this;
     Bundle mExtras = null;
@@ -136,6 +139,18 @@ public class EmpireActivity extends TabFragmentActivity
             sCurrentEmpire = (MyEmpire) empire;
             getTabManager().reloadTab();
             mFirstRefresh = false;
+
+            sCurrentEmpire.requestStars(new MyEmpire.FetchStarsCompleteHandler() {
+                @Override
+                public void onComplete(List<Star> stars) {
+                    TreeMap<String, Star> starMap = new TreeMap<String, Star>();
+                    for (Star s : stars) {
+                        starMap.put(s.getKey(), s);
+                    }
+                    sStars = starMap;
+                    getTabManager().reloadTab();
+                }
+            });
         }
     }
 
@@ -404,15 +419,23 @@ public class EmpireActivity extends TabFragmentActivity
     public static class ColoniesFragment extends BaseFragment {
         @Override
         public View onCreateView(LayoutInflater inflator, ViewGroup container, Bundle savedInstanceState) {
-            if (sCurrentEmpire == null) {
+            if (sStars == null) {
                 return getLoadingView(inflator);
             }
 
-            final Context context = getActivity();
+            ArrayList<Colony> colonies = new ArrayList<Colony>();
+            for (Star s : sStars.values()) {
+                for (Colony c : s.getColonies()) {
+                    if (c.getEmpireKey() != null && c.getEmpireKey().equals(sCurrentEmpire.getKey())) {
+                        colonies.add(c);
+                    }
+                }
+            }
 
+            final Context context = getActivity();
             View v = inflator.inflate(R.layout.empire_colonies_tab, null);
             ColonyList colonyList = (ColonyList) v.findViewById(R.id.colony_list);
-//TODO            colonyList.refresh(sCurrentEmpire.getAllColonies(), sCurrentEmpire.getImportantStars());
+            colonyList.refresh(colonies, sStars);
 
             colonyList.setOnColonyActionListener(new ColonyList.ColonyActionHandler() {
                 @Override
@@ -476,13 +499,22 @@ public class EmpireActivity extends TabFragmentActivity
     public static class FleetsFragment extends BaseFragment {
         @Override
         public View onCreateView(LayoutInflater inflator, ViewGroup container, Bundle savedInstanceState) {
-            if (sCurrentEmpire == null) {
+            if (sStars == null) {
                 return getLoadingView(inflator);
+            }
+
+            ArrayList<Fleet> fleets = new ArrayList<Fleet>();
+            for (Star s : sStars.values()) {
+                for (Fleet f : s.getFleets()) {
+                    if (f.getEmpireKey() != null && f.getEmpireKey().equals(sCurrentEmpire.getKey())) {
+                        fleets.add(f);
+                    }
+                }
             }
 
             View v = inflator.inflate(R.layout.empire_fleets_tab, null);
             FleetList fleetList = (FleetList) v.findViewById(R.id.fleet_list);
-//TODO            fleetList.refresh(sCurrentEmpire.getAllFleets(), sCurrentEmpire.getImportantStars());
+            fleetList.refresh(fleets, sStars);
 
             final Context context = getActivity();
 
