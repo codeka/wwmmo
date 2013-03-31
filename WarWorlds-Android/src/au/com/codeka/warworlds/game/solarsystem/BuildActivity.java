@@ -122,7 +122,7 @@ public class BuildActivity extends BaseActivity implements StarManager.StarFetch
 
             if (mInitialColony != null) {
                 int colonyIndex = 0;
-                for (Colony colony : mStar.getColonies()) {
+                for (Colony colony : mColonies) {
                     if (colony.getKey().equals(mInitialColony.getKey())) {
                         break;
                     }

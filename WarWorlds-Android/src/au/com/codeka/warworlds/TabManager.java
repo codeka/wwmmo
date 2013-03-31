@@ -3,6 +3,8 @@ package au.com.codeka.warworlds;
 import java.util.TreeMap;
 
 import android.content.Context;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.TabHost;
@@ -53,7 +55,7 @@ public class TabManager {
             return;
         }
 
-        changeTab(mLastTab, true);
+        mLastTab.recreate();
     }
 
     private void changeTab(TabInfo newTab, boolean force) {
@@ -89,6 +91,7 @@ public class TabManager {
         public abstract View createTabContent(String tag);
 
         public abstract void switchTo(TabInfo lastTab);
+        public abstract void recreate();
 
         /**
          * If possible, try to reload this tab, to avoid destroying it and recreating it.

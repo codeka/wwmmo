@@ -70,20 +70,29 @@ public abstract class TabFragmentFragment extends Fragment {
 
         @Override
         public void switchTo(TabManager.TabInfo lastTabBase) {
-            TabInfo lastTab = (TabInfo) lastTabBase;
-
             FragmentTransaction ft = mContainerFragment.getChildFragmentManager().beginTransaction();
-            if (lastTab != null) {
-                if (lastTab.fragment != null) {
-                    ft.detach(lastTab.fragment);
-                }
-            }
-
             if (fragment == null) {
                 fragment = Fragment.instantiate(mContainerFragment.getActivity(), fragmentClass.getName(), args);
-                ft.add(R.id.real_tabcontent, fragment, title);
-            } else {
+            }
+            ft.replace(R.id.real_tabcontent, fragment, title);
+
+            try {
+                ft.commit();
+                mContainerFragment.getChildFragmentManager().executePendingTransactions();
+            } catch (IllegalStateException e) {
+                // we can ignore this since it probably just means the activity is gone.
+            }
+        }
+
+        @Override
+        public void recreate() {
+            FragmentTransaction ft = mContainerFragment.getChildFragmentManager().beginTransaction();
+            if (fragment != null) {
+                ft.detach(fragment);
                 ft.attach(fragment);
+            } else {
+                fragment = Fragment.instantiate(mContainerFragment.getActivity(), fragmentClass.getName(), args);
+                ft.add(R.id.real_tabcontent, fragment, title);
             }
 
             try {

@@ -7,6 +7,7 @@ import android.support.v4.app.FragmentTransaction;
 import android.view.View;
 import android.view.Window;
 import android.widget.TabHost;
+import au.com.codeka.warworlds.TabFragmentFragment.TabInfo;
 
 /**
  * This is our base \c FragmentActivity class for a tabbed activity. We'll define the code
@@ -67,20 +68,29 @@ public class TabFragmentActivity extends BaseActivity {
 
         @Override
         public void switchTo(TabManager.TabInfo lastTabBase) {
-            TabInfo lastTab = (TabInfo) lastTabBase;
-
             FragmentTransaction ft = mActivity.getSupportFragmentManager().beginTransaction();
-            if (lastTab != null) {
-                if (lastTab.fragment != null) {
-                    ft.detach(lastTab.fragment);
-                }
-            }
-
             if (fragment == null) {
                 fragment = Fragment.instantiate(mActivity, fragmentClass.getName(), args);
-                ft.add(R.id.real_tabcontent, fragment, title);
-            } else {
+            }
+            ft.replace(R.id.real_tabcontent, fragment, title);
+
+            try {
+                ft.commit();
+                mActivity.getSupportFragmentManager().executePendingTransactions();
+            } catch (IllegalStateException e) {
+                // we can ignore this since it probably just means the activity is gone.
+            }
+        }
+
+        @Override
+        public void recreate() {
+            FragmentTransaction ft = mActivity.getSupportFragmentManager().beginTransaction();
+            if (fragment != null) {
+                ft.detach(fragment);
                 ft.attach(fragment);
+            } else {
+                fragment = Fragment.instantiate(mActivity, fragmentClass.getName(), args);
+                ft.add(R.id.real_tabcontent, fragment, title);
             }
 
             try {
