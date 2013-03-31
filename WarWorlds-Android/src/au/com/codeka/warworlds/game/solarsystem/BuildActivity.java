@@ -207,7 +207,8 @@ public class BuildActivity extends BaseActivity implements StarManager.StarFetch
         return required;
     }
 
-    private static class BuildFragment extends TabFragmentFragment {
+    private static class BuildFragment extends TabFragmentFragment
+                                       implements StarManager.StarFetchedHandler {
         @Override
         protected void createTabs() {
             BuildActivity activity = (BuildActivity) getActivity();
@@ -216,6 +217,23 @@ public class BuildActivity extends BaseActivity implements StarManager.StarFetch
             getTabManager().addTab(activity, new TabInfo(this, "Buildings", BuildingsFragment.class, args));
             getTabManager().addTab(activity, new TabInfo(this, "Ships", ShipsFragment.class, args));
             getTabManager().addTab(activity, new TabInfo(this, "Queue", QueueFragment.class, args));
+        }
+
+        @Override
+        public void onStarFetched(Star s) {
+            getTabManager().reloadTab();
+        }
+
+        @Override
+        public void onResume() {
+            super.onResume();
+            StarManager.getInstance().addStarUpdatedListener(null, this);
+        }
+
+        @Override
+        public void onPause() {
+            super.onPause();
+            StarManager.getInstance().removeStarUpdatedListener(this);
         }
     }
 

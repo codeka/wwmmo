@@ -552,12 +552,18 @@ def collectTaxesFromColony(colony_key, sim):
 
 
 def collectTaxesFromEmpire(empire_pb, sim, async=False):
+  concurrent_check_key = "collecting-taxes:%s" % empire_pb.key
+  values = ctrl.getCached([concurrent_check_key])
+  if concurrent_check_key in values and values[concurrent_check_key]:
+    raise ctrl.ApiError(pb.GenericError.CannotCollectTaxesAlreadyInProgress, "Cannot collect taxes, collection already in progress.")
+
   if async:
     # if aysnc is true, we just defer ourself on a task queue, where we'll have longer to actually
     # simulate all the stars, etc. Note that the client then takes the responsibility for simulating
     deferred.defer(collectTaxesFromEmpire, empire_pb, sim, False)
     return
 
+  ctrl.setCached({concurrent_check_key: True})
   logging.info("Collecting taxes from empire [%s] %s" % (empire_pb.key, empire_pb.display_name))
   colonies_pb = getColoniesForEmpire(empire_pb)
 
@@ -598,6 +604,7 @@ def collectTaxesFromEmpire(empire_pb, sim, async=False):
 
   # send a notification that the empire has been updated
   ctrl.sendNotificationToUser(empire_pb.email, {"empire_updated": 1})
+  ctrl.setCached({concurrent_check_key: False})
 
 
 def _colonize(sector_key, empire_model, star_pb, planet_index, count_in_sector=True):

@@ -11,7 +11,9 @@ import android.content.Context;
 import android.os.Parcel;
 import android.os.Parcelable;
 import au.com.codeka.BackgroundRunner;
+import au.com.codeka.warworlds.StyledDialog;
 import au.com.codeka.warworlds.api.ApiClient;
+import au.com.codeka.warworlds.api.ApiException;
 import au.com.codeka.warworlds.model.protobuf.Messages;
 
 /**
@@ -88,15 +90,14 @@ public class MyEmpire extends Empire {
         mCollectingTaxes = true;
 
         new BackgroundRunner<Boolean>() {
+            private String mErrorMsg;
             @Override
             protected Boolean doInBackground() {
                 try {
                     String url = String.format("empires/%s/taxes?async=1", getKey());
                     ApiClient.postProtoBuf(url, null);
-                } catch(Exception e) {
-                    // TODO: handle exceptions
-                    log.error(ExceptionUtils.getStackTrace(e));
-                    return false;
+                } catch(ApiException e) {
+                    mErrorMsg = e.getServerErrorMessage();
                 }
 /*TODO
                 // update our copy of everything and reset the uncollected taxes to zero, this'll
@@ -121,6 +122,12 @@ public class MyEmpire extends Empire {
             @Override
             protected void onComplete(Boolean success) {
                 mCollectingTaxes = false;
+                if (mErrorMsg != null) {
+                    new StyledDialog.Builder(context)
+                                    .setTitle("Error")
+                                    .setMessage(mErrorMsg)
+                                    .create().show();
+                }
                 EmpireManager.getInstance().fireEmpireUpdated(MyEmpire.this);
             }
         }.execute();

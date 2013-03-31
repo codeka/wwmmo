@@ -24,7 +24,7 @@ from model import alliance as alliance_mdl
 import model as mdl
 
 
-def getCached(keys, ProtoBuffClass):
+def getCached(keys, ProtoBuffClass=None):
   mc = memcache.Client()
   return mc.get_multi(keys, for_cas=True)
 
