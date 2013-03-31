@@ -92,6 +92,7 @@ public class EmpireActivity extends TabFragmentActivity
         super.onCreate(savedInstanceState);
 
         sCurrentEmpire = null;
+        sStars = null;
 
         getTabManager().addTab(mContext, new TabInfo("Overview", OverviewFragment.class, null));
         getTabManager().addTab(mContext, new TabInfo("Colonies", ColoniesFragment.class, null));
@@ -419,7 +420,7 @@ public class EmpireActivity extends TabFragmentActivity
     public static class ColoniesFragment extends BaseFragment {
         @Override
         public View onCreateView(LayoutInflater inflator, ViewGroup container, Bundle savedInstanceState) {
-            if (sStars == null) {
+            if (sStars == null || sCurrentEmpire == null) {
                 return getLoadingView(inflator);
             }
 
@@ -497,7 +498,7 @@ public class EmpireActivity extends TabFragmentActivity
     public static class FleetsFragment extends BaseFragment {
         @Override
         public View onCreateView(LayoutInflater inflator, ViewGroup container, Bundle savedInstanceState) {
-            if (sStars == null) {
+            if (sStars == null || sCurrentEmpire == null) {
                 return getLoadingView(inflator);
             }
 
