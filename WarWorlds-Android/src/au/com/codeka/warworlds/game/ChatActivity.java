@@ -22,7 +22,8 @@ import au.com.codeka.warworlds.model.ChatMessage;
 import au.com.codeka.warworlds.model.EmpireManager;
 
 public class ChatActivity extends BaseActivity
-                          implements ChatManager.MessageAddedListener {
+                          implements ChatManager.MessageAddedListener,
+                                     ChatManager.MessageUpdatedListener {
     private ScrollView mScrollView;
     private LinearLayout mChatOutput;
     private Handler mHandler;
@@ -79,6 +80,7 @@ public class ChatActivity extends BaseActivity
     public void onResume() {
         super.onResume();
         ChatManager.getInstance().addMessageAddedListener(this);
+        ChatManager.getInstance().addMessageUpdatedListener(this);
         refreshMessages();
     }
 
@@ -86,6 +88,7 @@ public class ChatActivity extends BaseActivity
     public void onPause() {
         super.onPause();
         ChatManager.getInstance().removeMessageAddedListener(this);
+        ChatManager.getInstance().removeMessageUpdatedListener(this);
     }
 
     @Override
@@ -98,10 +101,31 @@ public class ChatActivity extends BaseActivity
         });
     }
 
+    @Override
+    public void onMessageUpdated(ChatMessage msg) {
+        for (int i = 0; i < mChatOutput.getChildCount(); i++) {
+            TextView tv = (TextView) mChatOutput.getChildAt(i);
+            ChatMessage other = (ChatMessage) tv.getTag();
+            if (other == null || other.getDatePosted() == null) {
+                continue;
+            }
+
+            if (other.getEmpireKey() == null | msg.getEmpireKey() == null) {
+                continue;
+            }
+
+            if (other.getDatePosted().equals(msg.getDatePosted()) &&
+                other.getEmpireKey().equals(msg.getEmpireKey())) {
+                tv.setText(msg.format());
+            }
+        }
+    }
+
     private void appendMessage(final ChatMessage msg) {
         TextView tv = new TextView(this);
         tv.setText(msg.format());
         tv.setMovementMethod(LinkMovementMethod.getInstance());
+        tv.setTag(msg);
         mChatOutput.addView(tv);
 
         // need to wait for it to settle before we scroll again
