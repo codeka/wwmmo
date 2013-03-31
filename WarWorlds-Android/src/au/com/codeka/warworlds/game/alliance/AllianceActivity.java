@@ -40,10 +40,10 @@ public class AllianceActivity extends TabFragmentActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        getTabManager().addTab(mContext, new TabInfo("Overview", OverviewFragment.class, null));
+        getTabManager().addTab(mContext, new TabInfo(this, "Overview", OverviewFragment.class, null));
         MyEmpire myEmpire = EmpireManager.getInstance().getEmpire();
         if (myEmpire.getAlliance() != null) {
-            getTabManager().addTab(mContext, new TabInfo("Join Requests", JoinRequestsFragment.class, null));
+            getTabManager().addTab(mContext, new TabInfo(this, "Join Requests", JoinRequestsFragment.class, null));
         }
     }
 

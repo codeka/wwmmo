@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+         android:id="@android:id/tabhost"
+         android:layout_width="match_parent"
+         android:layout_height="match_parent">
+
+    <ImageView android:id="@+id/planet_icon"
+               android:layout_width="48dp"
+               android:layout_height="48dp"
+               android:layout_alignParentLeft="true"
+               android:layout_alignParentTop="true"
+               android:layout_marginRight="4dp" />
+
+    <TextView android:id="@+id/planet_name"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:layout_alignTop="@+id/planet_icon"
+              android:layout_toRightOf="@+id/planet_icon"
+              android:textAppearance="?android:attr/textAppearanceMedium"
+              android:text="Planet Name" />
+
+    <TextView android:id="@+id/build_queue_description"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:layout_below="@+id/planet_name"
+              android:layout_alignLeft="@+id/planet_name"
+              android:text="Build queue: idle"
+              android:textAppearance="?android:attr/textAppearanceSmall" />
+
+    <android.support.v4.view.ViewPager android:id="@+id/pager"
+                                       android:layout_width="match_parent"
+                                       android:layout_height="match_parent"
+                                       android:layout_below="@id/planet_icon" />
+</RelativeLayout>
+

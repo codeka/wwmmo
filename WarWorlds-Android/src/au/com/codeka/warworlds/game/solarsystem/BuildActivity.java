@@ -10,21 +10,27 @@ import java.util.Map;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v4.view.ViewPager;
 import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import au.com.codeka.RomanNumeralFormatter;
 import au.com.codeka.TimeInHours;
+import au.com.codeka.warworlds.BaseActivity;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.ServerGreeter;
 import au.com.codeka.warworlds.ServerGreeter.ServerGreeting;
-import au.com.codeka.warworlds.TabFragmentActivity;
+import au.com.codeka.warworlds.TabFragmentFragment;
 import au.com.codeka.warworlds.TabManager;
 import au.com.codeka.warworlds.ctrl.BuildQueueList;
 import au.com.codeka.warworlds.game.BuildAccelerateDialog;
@@ -36,8 +42,13 @@ import au.com.codeka.warworlds.model.BuildingDesign;
 import au.com.codeka.warworlds.model.BuildingDesignManager;
 import au.com.codeka.warworlds.model.Colony;
 import au.com.codeka.warworlds.model.Design;
+import au.com.codeka.warworlds.model.EmpireManager;
+import au.com.codeka.warworlds.model.MyEmpire;
+import au.com.codeka.warworlds.model.Planet;
+import au.com.codeka.warworlds.model.PlanetImageManager;
 import au.com.codeka.warworlds.model.ShipDesign;
 import au.com.codeka.warworlds.model.ShipDesignManager;
+import au.com.codeka.warworlds.model.Sprite;
 import au.com.codeka.warworlds.model.SpriteDrawable;
 import au.com.codeka.warworlds.model.Star;
 import au.com.codeka.warworlds.model.StarManager;
@@ -45,34 +56,38 @@ import au.com.codeka.warworlds.model.StarSummary;
 
 /**
  * When you click "Build" shows you the list of buildings/ships that are/can be built by your
- * colony.
+ * colony. You can swipe left/right to switch between your colonies in this star.
  */
-public class BuildActivity extends TabFragmentActivity implements StarManager.StarFetchedHandler {
-    private Context mContext = this;
+public class BuildActivity extends BaseActivity implements StarManager.StarFetchedHandler {
     private Star mStar;
-    private Colony mColony;
+    private List<Colony> mColonies;
+    private ViewPager mViewPager;
+    private ColonyPagerAdapter mColonyPagerAdapter;
+    private Colony mInitialColony;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        getTabManager().addTab(mContext, new TabInfo("Buildings", BuildingsFragment.class, null));
-        getTabManager().addTab(mContext, new TabInfo("Ships", ShipsFragment.class, null));
-        getTabManager().addTab(mContext, new TabInfo("Queue", QueueFragment.class, null));
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
+        setContentView(R.layout.solarsystem_build);
+
+        mColonyPagerAdapter = new ColonyPagerAdapter(getSupportFragmentManager());
+        mViewPager = (ViewPager) findViewById(R.id.pager);
+        mViewPager.setAdapter(mColonyPagerAdapter); 
     }
 
     @Override
     public void onResume() {
         super.onResume();
-
         ServerGreeter.waitForHello(this, new ServerGreeter.HelloCompleteHandler() {
             @Override
             public void onHelloComplete(boolean success, ServerGreeting greeting) {
                 Bundle extras = getIntent().getExtras();
                 String starKey = extras.getString("au.com.codeka.warworlds.StarKey");
-                mColony = (Colony) extras.getParcelable("au.com.codeka.warworlds.Colony");
+                mInitialColony = (Colony) extras.getParcelable("au.com.codeka.warworlds.Colony");
 
-                StarManager.getInstance().requestStar(mContext, starKey, false, BuildActivity.this);
+                StarManager.getInstance().requestStar(BuildActivity.this, starKey, false, BuildActivity.this);
                 StarManager.getInstance().addStarUpdatedListener(starKey, BuildActivity.this);
             }
         });
@@ -91,27 +106,70 @@ public class BuildActivity extends TabFragmentActivity implements StarManager.St
     public void onStarFetched(Star s) {
         if (mStar == null || mStar.getKey().equals(s.getKey())) {
             mStar = s;
-            if (mColony != null) {
-                for (Colony colony : mStar.getColonies()) {
-                    if (colony.getKey().equals(mColony.getKey())) {
-                        mColony = colony;
-                    }
+            mColonies = new ArrayList<Colony>();
+            MyEmpire myEmpire = EmpireManager.getInstance().getEmpire();
+            for (Colony c : mStar.getColonies()) {
+                if (c.getEmpireKey() != null && c.getEmpireKey().equals(myEmpire.getKey())) {
+                    mColonies.add(c);
                 }
             }
+            Collections.sort(mColonies, new Comparator<Colony>() {
+                @Override
+                public int compare(Colony lhs, Colony rhs) {
+                    return lhs.getPlanetIndex() - rhs.getPlanetIndex();
+                }
+            });
 
-            getTabManager().reloadTab();
+            if (mInitialColony != null) {
+                int colonyIndex = 0;
+                for (Colony colony : mStar.getColonies()) {
+                    if (colony.getKey().equals(mInitialColony.getKey())) {
+                        break;
+                    }
+                    colonyIndex ++;
+                }
+
+                mViewPager.setCurrentItem(colonyIndex);
+                mInitialColony = null;
+            }
+
+            mColonyPagerAdapter.notifyDataSetChanged();
         }
     }
 
-    private String getDependenciesList(Design design) {
-        return getDependenciesList(design, 1);
+    private void refreshColonyDetails(Colony colony) {
+        ImageView planetIcon = (ImageView) findViewById(R.id.planet_icon);
+        Planet planet = mStar.getPlanets()[colony.getPlanetIndex() - 1];
+        Sprite planetSprite = PlanetImageManager.getInstance().getSprite(this, planet);
+        planetIcon.setImageDrawable(new SpriteDrawable(planetSprite));
+
+        TextView planetName = (TextView) findViewById(R.id.planet_name);
+        planetName.setText(String.format(Locale.ENGLISH, "%s %s",
+                mStar.getName(), RomanNumeralFormatter.format(colony.getPlanetIndex())));
+
+        TextView buildQueueDescription = (TextView) findViewById(R.id.build_queue_description);
+        int buildQueueLength = 0;
+        for (BuildRequest br : mStar.getBuildRequests()) {
+            if (br.getColonyKey().equals(colony.getKey())) {
+                buildQueueLength ++;
+            }
+        }
+        if (buildQueueLength == 0) {
+            buildQueueDescription.setText("Build queue: idle");
+        } else {
+            buildQueueDescription.setText(String.format(Locale.ENGLISH, "Build queue: %d", buildQueueLength));
+        }
+    }
+
+    private String getDependenciesList(Colony colony, Design design) {
+        return getDependenciesList(colony, design, 1);
     }
 
     /**
      * Returns the dependencies of the given design a string for display to
      * the user. Dependencies that we don't meet will be coloured red.
      */
-    private String getDependenciesList(Design design, int level) {
+    private String getDependenciesList(Colony colony, Design design, int level) {
         String required = "Required: ";
         List<Design.Dependency> dependencies;
         if (level == 1 || design.getDesignKind() != Design.DesignKind.BUILDING) {
@@ -132,7 +190,7 @@ public class BuildActivity extends TabFragmentActivity implements StarManager.St
                 }
 
                 boolean dependencyMet = false;
-                for (Building b : mColony.getBuildings()) {
+                for (Building b : colony.getBuildings()) {
                     if (b.getDesign().getID().equals(dep.getDesignID())) {
                         // TODO: check level
                         dependencyMet = true;
@@ -149,15 +207,74 @@ public class BuildActivity extends TabFragmentActivity implements StarManager.St
         return required;
     }
 
-    public static class BuildingsFragment extends Fragment {
+    private static class BuildFragment extends TabFragmentFragment {
+        @Override
+        protected void createTabs() {
+            BuildActivity activity = (BuildActivity) getActivity();
+            Bundle args = getArguments();
+
+            getTabManager().addTab(activity, new TabInfo(this, "Buildings", BuildingsFragment.class, args));
+            getTabManager().addTab(activity, new TabInfo(this, "Ships", ShipsFragment.class, args));
+            getTabManager().addTab(activity, new TabInfo(this, "Queue", QueueFragment.class, args));
+        }
+    }
+
+     public class ColonyPagerAdapter extends FragmentStatePagerAdapter {
+         public ColonyPagerAdapter(FragmentManager fm) {
+             super(fm);
+         }
+
+         @Override
+         public Fragment getItem(int i) {
+             Fragment fragment = new BuildFragment();
+             Bundle args = new Bundle();
+             args.putParcelable("au.com.codeka.warworlds.Colony", mColonies.get(i));
+             fragment.setArguments(args);
+             return fragment;
+         }
+
+         @Override
+         public int getCount() {
+             if (mColonies == null) {
+                 return 0;
+             }
+
+             return mColonies.size();
+         }
+
+         @Override
+         public CharSequence getPageTitle(int position) {
+             return "Colony " + (position + 1);
+         }
+
+         @Override
+         public void setPrimaryItem(ViewGroup container, int position, Object object) {
+             super.setPrimaryItem(container, position, object);
+             refreshColonyDetails(mColonies.get(position));
+         }
+    }
+
+    public static class BaseTabFragment extends Fragment {
+        private Colony mColony;
+
+        protected Colony getColony() {
+            if (mColony == null) {
+                Bundle args = getArguments();
+                mColony = (Colony) args.getParcelable("au.com.codeka.warworlds.Colony");
+            }
+            return mColony;
+        }
+    }
+
+    public static class BuildingsFragment extends BaseTabFragment {
         private BuildingListAdapter mBuildingListAdapter;
 
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-            View v = inflater.inflate(R.layout.solarsystem_build_buildings_tab, null);
+            View v = inflater.inflate(R.layout.solarsystem_build_buildings_tab, container, false);
 
             final Star star = ((BuildActivity) getActivity()).mStar;
-            final Colony colony = ((BuildActivity) getActivity()).mColony;
+            final Colony colony = getColony();
 
             mBuildingListAdapter = new BuildingListAdapter();
             if (colony != null) {
@@ -361,7 +478,7 @@ public class BuildActivity extends TabFragmentActivity implements StarManager.St
                     if (viewType == HEADING_TYPE) {
                         view = new TextView(getActivity());
                     } else {
-                        view = inflater.inflate(R.layout.solarsystem_buildings_design, null);
+                        view = inflater.inflate(R.layout.solarsystem_buildings_design, parent, false);
                     }
                 }
 
@@ -420,7 +537,8 @@ public class BuildActivity extends TabFragmentActivity implements StarManager.St
                                     "Upgrade: %.2f hours",
                                     (float) design.getBuildCost().getTimeInSeconds() / 3600.0f));
 
-                            String required = ((BuildActivity) getActivity()).getDependenciesList(design, building.getLevel());
+                            String required = ((BuildActivity) getActivity()).getDependenciesList(
+                                    getColony(), design, building.getLevel());
                             row3.setVisibility(View.VISIBLE);
                             row3.setText(Html.fromHtml(required));
                         }
@@ -444,7 +562,7 @@ public class BuildActivity extends TabFragmentActivity implements StarManager.St
                     row2.setText(String.format("%.2f hours",
                             (float) design.getBuildCost().getTimeInSeconds() / 3600.0f));
 
-                    String required = ((BuildActivity) getActivity()).getDependenciesList(design);
+                    String required = ((BuildActivity) getActivity()).getDependenciesList(getColony(), design);
                     row3.setText(required);
                 }
 
@@ -460,12 +578,12 @@ public class BuildActivity extends TabFragmentActivity implements StarManager.St
         }
     }
 
-    public static class ShipsFragment extends Fragment {
+    public static class ShipsFragment extends BaseTabFragment {
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-            View v = inflater.inflate(R.layout.solarsystem_build_ships_tab, null);
+            View v = inflater.inflate(R.layout.solarsystem_build_ships_tab, container, false);
 
-            final Colony colony = ((BuildActivity) getActivity()).mColony;
+            final Colony colony = getColony();
 
             final ShipDesignListAdapter adapter = new ShipDesignListAdapter();
             adapter.setDesigns(ShipDesignManager.getInstance().getDesigns());
@@ -536,7 +654,7 @@ public class BuildActivity extends TabFragmentActivity implements StarManager.St
                 if (view == null) {
                     LayoutInflater inflater = (LayoutInflater) getActivity().getSystemService
                             (Context.LAYOUT_INFLATER_SERVICE);
-                    view = inflater.inflate(R.layout.solarsystem_buildings_design, null);
+                    view = inflater.inflate(R.layout.solarsystem_buildings_design, parent, false);
                 }
 
                 ImageView icon = (ImageView) view.findViewById(R.id.building_icon);
@@ -555,7 +673,7 @@ public class BuildActivity extends TabFragmentActivity implements StarManager.St
                 row2.setText(String.format("%.2f hours",
                         (float) design.getBuildCost().getTimeInSeconds() / 3600.0f));
 
-                String required = ((BuildActivity) getActivity()).getDependenciesList(design);
+                String required = ((BuildActivity) getActivity()).getDependenciesList(getColony(), design);
                 row3.setText(Html.fromHtml(required));
 
                 return view;
@@ -563,17 +681,17 @@ public class BuildActivity extends TabFragmentActivity implements StarManager.St
         }
     }
 
-    public static class QueueFragment extends Fragment implements TabManager.Reloadable {
+    public static class QueueFragment extends BaseTabFragment implements TabManager.Reloadable {
         private BuildQueueList mBuildQueueList;
 
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-            View v = inflater.inflate(R.layout.solarsystem_build_queue_tab, null);
+            View v = inflater.inflate(R.layout.solarsystem_build_queue_tab, container, false);
 
             final Star star = ((BuildActivity) getActivity()).mStar;
-            final Colony colony = ((BuildActivity) getActivity()).mColony;
+            final Colony colony = getColony();
             if (star == null)
-                return inflater.inflate(R.layout.solarsystem_build_loading_tab, null);
+                return inflater.inflate(R.layout.solarsystem_build_loading_tab, container, false);
 
             mBuildQueueList = (BuildQueueList) v.findViewById(R.id.build_queue);
             mBuildQueueList.setShowStars(false);

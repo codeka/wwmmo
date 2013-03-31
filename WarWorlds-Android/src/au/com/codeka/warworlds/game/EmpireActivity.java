@@ -94,10 +94,10 @@ public class EmpireActivity extends TabFragmentActivity
         sCurrentEmpire = null;
         sStars = null;
 
-        getTabManager().addTab(mContext, new TabInfo("Overview", OverviewFragment.class, null));
-        getTabManager().addTab(mContext, new TabInfo("Colonies", ColoniesFragment.class, null));
-        getTabManager().addTab(mContext, new TabInfo("Build", BuildQueueFragment.class, null));
-        getTabManager().addTab(mContext, new TabInfo("Fleets", FleetsFragment.class, null));
+        getTabManager().addTab(mContext, new TabInfo(this, "Overview", OverviewFragment.class, null));
+        getTabManager().addTab(mContext, new TabInfo(this, "Colonies", ColoniesFragment.class, null));
+        getTabManager().addTab(mContext, new TabInfo(this, "Build", BuildQueueFragment.class, null));
+        getTabManager().addTab(mContext, new TabInfo(this, "Fleets", FleetsFragment.class, null));
 
         mExtras = getIntent().getExtras();
         if (mExtras != null) {

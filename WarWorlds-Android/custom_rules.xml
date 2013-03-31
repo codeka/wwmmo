@@ -31,9 +31,15 @@
 
 	<!-- make sure on_behalf_of is commented out -->
 	<replaceregexp file="assets/warworlds.properties"
-	               match="^user.on_behalf_of=.*$"
+	               match="^#?user.on_behalf_of=.*$"
 	               flags="gm"
 	               replace="#user.on_behalf_of=nobody" />
+
+    <!-- make sure debug is set to 'auto' -->
+    <replaceregexp file="assets/warworlds.properties"
+                   match="^debug=.*$"
+                   flags="gm"
+                   replace="debug=auto" />
 
 	<!-- update the version number -->
         <replaceregexp file="AndroidManifest.xml"
