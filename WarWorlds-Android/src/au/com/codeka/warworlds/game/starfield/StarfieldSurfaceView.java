@@ -36,6 +36,7 @@ import au.com.codeka.common.Vector2;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.ctrl.SelectionView;
 import au.com.codeka.warworlds.game.StarfieldBackgroundRenderer;
+import au.com.codeka.warworlds.model.BuildManager;
 import au.com.codeka.warworlds.model.Colony;
 import au.com.codeka.warworlds.model.Empire;
 import au.com.codeka.warworlds.model.EmpireManager;
@@ -143,7 +144,11 @@ public class StarfieldSurfaceView extends SectorView
 
         MyEmpire myEmpire = EmpireManager.getInstance().getEmpire();
         if (myEmpire != null) {
-            mHqStar = myEmpire.getHomeStar();
+            StarSummary homeStar = myEmpire.getHomeStar();
+            int numHqs = BuildManager.getInstance().getTotalBuildingsInEmpire("hq");
+            if (numHqs > 0) {
+                mHqStar = homeStar;
+            }
         }
 
         mHqOverlay = new HqDirectionOverlay();

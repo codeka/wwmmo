@@ -126,6 +126,15 @@ public class Util {
      * Returns true if we are running against a dev mode appengine instance.
      */
     public static boolean isDebug() {
+        final String debugValue = sProperties.getProperty("debug");
+        if (debugValue.equals("auto")) {
+            return isLocalDevServer();
+        } else {
+            return debugValue.equals("true");
+        }
+    }
+
+    public static boolean isLocalDevServer() {
         final String serverDefault = sProperties.getProperty("server.default");
         return (serverDefault.equals("debug") || serverDefault.equals("emulator"));
     }

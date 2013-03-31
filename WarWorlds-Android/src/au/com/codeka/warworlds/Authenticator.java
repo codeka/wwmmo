@@ -112,7 +112,7 @@ public class Authenticator {
         for (Account acct : accts) {
             final Account account = acct;
             if (account.name.equals(accountName)) {
-                if (Util.isDebug()) {
+                if (Util.isLocalDevServer()) {
                     log.info("Account found, setting up with debug auth cookie.");
                     // Use a fake cookie for the dev mode app engine server. The cookie has the
                     // form email:isAdmin:userId (we set the userId to be the same as the email)
