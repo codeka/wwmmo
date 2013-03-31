@@ -6,8 +6,8 @@ import org.slf4j.LoggerFactory;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.os.AsyncTask;
 import android.provider.Settings.Secure;
+import au.com.codeka.BackgroundRunner;
 import au.com.codeka.warworlds.api.ApiClient;
 import au.com.codeka.warworlds.api.ApiException;
 import au.com.codeka.warworlds.model.protobuf.Messages;
@@ -50,9 +50,9 @@ public class DeviceRegistrar {
 
     public static void updateGcmRegistration(final Context context,
                                              final String gcmRegistrationID) {
-        new AsyncTask<Void, Void, Void>() {
+        new BackgroundRunner<Void>() {
             @Override
-            protected Void doInBackground(Void... arg0) {
+            protected Void doInBackground() {
                 String deviceRegistrationKey = getDeviceRegistrationKey(context);
                 Messages.DeviceRegistration regpb = Messages.DeviceRegistration.newBuilder()
                         .setGcmRegistrationId(gcmRegistrationID)
@@ -67,6 +67,10 @@ public class DeviceRegistrar {
                 }
 
                 return null;
+            }
+
+            @Override
+            protected void onComplete(Void arg) {
             }
         }.execute();
     }

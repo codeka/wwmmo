@@ -6,7 +6,6 @@ import org.slf4j.LoggerFactory;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.View;
@@ -15,6 +14,7 @@ import android.view.Window;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
+import au.com.codeka.BackgroundRunner;
 import au.com.codeka.warworlds.api.ApiClient;
 import au.com.codeka.warworlds.api.ApiException;
 import au.com.codeka.warworlds.model.protobuf.Messages;
@@ -87,11 +87,11 @@ public class EmpireSetupActivity extends BaseActivity {
         final ProgressDialog pleaseWaitDialog = ProgressDialog.show(mContext, null, 
                 "Please wait...", true);
 
-        new AsyncTask<Void, Void, Boolean>() {
+        new BackgroundRunner<Boolean>() {
             private String mErrorMsg;
 
             @Override
-            protected Boolean doInBackground(Void... arg0) {
+            protected Boolean doInBackground() {
                 Messages.Empire empire = Messages.Empire.newBuilder().setDisplayName(empireName)
                         .setState(Messages.Empire.EmpireState.INITIAL)
                         .setEmail(accountName)
@@ -107,7 +107,7 @@ public class EmpireSetupActivity extends BaseActivity {
             }
 
             @Override
-            protected void onPostExecute(Boolean wasSuccessful) {
+            protected void onComplete(Boolean wasSuccessful) {
                 pleaseWaitDialog.dismiss();
 
                 // say 'hello' again, to reset the empire details

@@ -8,9 +8,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import android.content.Context;
-import android.os.AsyncTask;
 import android.os.Parcel;
 import android.os.Parcelable;
+import au.com.codeka.BackgroundRunner;
 import au.com.codeka.warworlds.api.ApiClient;
 import au.com.codeka.warworlds.model.protobuf.Messages;
 
@@ -40,9 +40,9 @@ public class MyEmpire extends Empire {
         log.debug(String.format("Colonizing: Star=%s Planet=%d",
                                 planet.getStarSummary().getKey(),
                                 planet.getIndex()));
-        new AsyncTask<Void, Void, Colony>() {
+        new BackgroundRunner<Colony>() {
             @Override
-            protected Colony doInBackground(Void... arg0) {
+            protected Colony doInBackground() {
                 try {
                     if (planet.getStarSummary() == null) {
                         log.warn("planet.getStarSummary() returned null!");
@@ -66,7 +66,7 @@ public class MyEmpire extends Empire {
             }
 
             @Override
-            protected void onPostExecute(Colony colony) {
+            protected void onComplete(Colony colony) {
                 if (colony == null) {
                     return; // BAD!
                 }
@@ -87,9 +87,9 @@ public class MyEmpire extends Empire {
         }
         mCollectingTaxes = true;
 
-        new AsyncTask<Void, Void, Boolean>() {
+        new BackgroundRunner<Boolean>() {
             @Override
-            protected Boolean doInBackground(Void... arg0) {
+            protected Boolean doInBackground() {
                 try {
                     String url = String.format("empires/%s/taxes?async=1", getKey());
                     ApiClient.postProtoBuf(url, null);
@@ -119,7 +119,7 @@ public class MyEmpire extends Empire {
             }
 
             @Override
-            protected void onPostExecute(Boolean success) {
+            protected void onComplete(Boolean success) {
                 mCollectingTaxes = false;
                 EmpireManager.getInstance().fireEmpireUpdated(MyEmpire.this);
             }
@@ -128,9 +128,9 @@ public class MyEmpire extends Empire {
 
     public void updateFleetStance(final Context context, final Star star, final Fleet fleet,
                                   final Fleet.Stance newStance) {
-        new AsyncTask<Void, Void, Boolean>() {
+        new BackgroundRunner<Boolean>() {
             @Override
-            protected Boolean doInBackground(Void... arg0) {
+            protected Boolean doInBackground() {
                 try {
                     String url = String.format("stars/%s/fleets/%s/orders",
                             fleet.getStarKey(),
@@ -149,7 +149,7 @@ public class MyEmpire extends Empire {
             }
 
             @Override
-            protected void onPostExecute(Boolean success) {
+            protected void onComplete(Boolean success) {
                 if (!success) {
                     return; // BAD!
                 }
@@ -163,9 +163,9 @@ public class MyEmpire extends Empire {
     }
 
     public void fetchScoutReports(final Star star, final FetchScoutReportCompleteHandler handler) {
-        new AsyncTask<Void, Void, List<ScoutReport>>() {
+        new BackgroundRunner<List<ScoutReport>>() {
             @Override
-            protected List<ScoutReport> doInBackground(Void... arg0) {
+            protected List<ScoutReport> doInBackground() {
                 try {
                     String url = String.format("stars/%s/scout-reports", star.getKey());
                     Messages.ScoutReports pb = ApiClient.getProtoBuf(url, Messages.ScoutReports.class);
@@ -185,7 +185,7 @@ public class MyEmpire extends Empire {
             }
 
             @Override
-            protected void onPostExecute(List<ScoutReport> reports) {
+            protected void onComplete(List<ScoutReport> reports) {
                 handler.onComplete(reports);
             }
         }.execute();
@@ -193,9 +193,9 @@ public class MyEmpire extends Empire {
 
     public void fetchCombatReport(final String starKey, final String combatReportKey,
             final FetchCombatReportCompleteHandler handler ) {
-        new AsyncTask<Void, Void, CombatReport>() {
+        new BackgroundRunner<CombatReport>() {
             @Override
-            protected CombatReport doInBackground(Void... arg0) {
+            protected CombatReport doInBackground() {
                 try {
                     String url = String.format("stars/%s/combat-reports/%s",
                                                starKey, combatReportKey);
@@ -213,7 +213,7 @@ public class MyEmpire extends Empire {
             }
 
             @Override
-            protected void onPostExecute(CombatReport report) {
+            protected void onComplete(CombatReport report) {
                 if (report != null) {
                     handler.onComplete(report);
                 }
@@ -224,9 +224,9 @@ public class MyEmpire extends Empire {
     public void attackColony(final Context context, final Star star,
                              final Colony colony,
                              final AttackColonyCompleteHandler callback) {
-        new AsyncTask<Void, Void, Star>() {
+        new BackgroundRunner<Star>() {
             @Override
-            protected Star doInBackground(Void... arg0) {
+            protected Star doInBackground() {
                 try {
                     String url = "stars/"+star.getKey()+"/colonies/"+colony.getKey()+"/attack";
 
@@ -243,7 +243,7 @@ public class MyEmpire extends Empire {
             }
 
             @Override
-            protected void onPostExecute(Star star) {
+            protected void onComplete(Star star) {
                 if (star != null) {
                     StarManager.getInstance().refreshStar(context, star.getKey());
                 }
@@ -256,9 +256,9 @@ public class MyEmpire extends Empire {
     }
 
     public void requestStars(final FetchStarsCompleteHandler callback) {
-        new AsyncTask<Void, Void, List<Star>>() {
+        new BackgroundRunner<List<Star>>() {
             @Override
-            protected List<Star> doInBackground(Void... arg0) {
+            protected List<Star> doInBackground() {
                 try {
                     String url = "empires/"+getKey()+"/stars";
 
@@ -281,7 +281,7 @@ public class MyEmpire extends Empire {
             }
 
             @Override
-            protected void onPostExecute(List<Star> stars) {
+            protected void onComplete(List<Star> stars) {
                 if (stars != null) {
                     for (Star star : stars) {
                         StarManager.getInstance().fireStarUpdated(star);

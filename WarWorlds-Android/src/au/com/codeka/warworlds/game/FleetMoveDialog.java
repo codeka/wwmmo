@@ -9,13 +9,13 @@ import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Paint.Style;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.TextView;
+import au.com.codeka.BackgroundRunner;
 import au.com.codeka.Cash;
 import au.com.codeka.common.Vector2;
 import au.com.codeka.warworlds.R;
@@ -175,9 +175,9 @@ public class FleetMoveDialog extends DialogFragment {
         final Activity activity = getActivity();
         dismiss();
 
-        new AsyncTask<Void, Void, Boolean>() {
+        new BackgroundRunner<Boolean>() {
             @Override
-            protected Boolean doInBackground(Void... params) {
+            protected Boolean doInBackground() {
                 String url = String.format("stars/%s/fleets/%s/orders",
                                            mFleet.getStarKey(),
                                            mFleet.getKey());
@@ -193,7 +193,7 @@ public class FleetMoveDialog extends DialogFragment {
             }
 
             @Override
-            protected void onPostExecute(Boolean success) {
+            protected void onComplete(Boolean success) {
                 if (!success) {
                     StyledDialog dialog = new StyledDialog.Builder(activity)
                                             .setMessage("Could not move the fleet: do you have enough cash?")

@@ -13,8 +13,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import android.content.Context;
-import android.os.AsyncTask;
 import android.support.v4.util.LruCache;
+import au.com.codeka.BackgroundRunner;
 import au.com.codeka.Pair;
 import au.com.codeka.Point2D;
 import au.com.codeka.common.Vector2;
@@ -188,9 +188,9 @@ public class SectorManager {
                     mInTransitListeners.put(coord, new ArrayList<OnSectorsFetchedListener>());
                 }
 
-                new AsyncTask<Void, Void, List<Sector>>() {
+                new BackgroundRunner<List<Sector>>() {
                     @Override
-                    protected List<Sector> doInBackground(Void... arg0) {
+                    protected List<Sector> doInBackground() {
                         List<Sector> sectors = null;
 
                         String url = "";
@@ -212,7 +212,7 @@ public class SectorManager {
                     }
 
                     @Override
-                    protected void onPostExecute(List<Sector> sectors) {
+                    protected void onComplete(List<Sector> sectors) {
                         if (sectors == null) {
                             return; // BAD!
                         }

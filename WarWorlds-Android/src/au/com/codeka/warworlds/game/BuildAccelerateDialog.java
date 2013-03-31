@@ -5,7 +5,6 @@ import java.util.Locale;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.DialogInterface;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.text.Html;
@@ -13,6 +12,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.SeekBar;
 import android.widget.TextView;
+import au.com.codeka.BackgroundRunner;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.StyledDialog;
 import au.com.codeka.warworlds.api.ApiClient;
@@ -104,11 +104,11 @@ public class BuildAccelerateDialog extends DialogFragment {
         final Activity activity = getActivity();
         dismiss();
 
-        new AsyncTask<Void, Void, BuildRequest>() {
+        new BackgroundRunner<BuildRequest>() {
             private String mErrorMsg;
 
             @Override
-            protected BuildRequest doInBackground(Void... arg0) {
+            protected BuildRequest doInBackground() {
                 String url = "stars/"+mStar.getKey()+"/build/"+mBuildRequest.getKey()+"/accelerate";
                 url += "?amount="+getAccelerateAmount();
 
@@ -127,7 +127,7 @@ public class BuildAccelerateDialog extends DialogFragment {
                 return null;
             }
             @Override
-            protected void onPostExecute(BuildRequest buildRequest) {
+            protected void onComplete(BuildRequest buildRequest) {
                 // tell the StarManager that this star has been updated
                 StarManager.getInstance().refreshStar(activity.getApplicationContext(), mStar.getKey());
 

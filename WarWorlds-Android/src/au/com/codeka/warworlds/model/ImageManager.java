@@ -21,9 +21,9 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.os.AsyncTask;
 import android.os.Handler;
 import android.support.v4.util.LruCache;
+import au.com.codeka.BackgroundRunner;
 import au.com.codeka.common.Colour;
 import au.com.codeka.common.Image;
 import au.com.codeka.common.Vector3;
@@ -98,9 +98,9 @@ public abstract class ImageManager {
         if (cacheFile.exists()) {
             log.debug("Loading cached image: "+cacheFile.getAbsolutePath());
 
-            new AsyncTask<Void, Void, Void>() {
+            new BackgroundRunner<Void>() {
                 @Override
-                protected Void doInBackground(Void... params) {
+                protected Void doInBackground() {
                     BitmapFactory.Options opts = new BitmapFactory.Options();
                     Bitmap bmp;
                     try {
@@ -122,7 +122,7 @@ public abstract class ImageManager {
                 }
 
                 @Override
-                protected void onPostExecute(Void v) {
+                protected void onComplete(Void v) {
                     fireBitmapGeneratedListeners(key, mLoadedBitmaps.get(cacheKey));
                 }
             }.execute();

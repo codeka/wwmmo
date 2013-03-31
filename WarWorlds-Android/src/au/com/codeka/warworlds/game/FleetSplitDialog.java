@@ -3,13 +3,13 @@ package au.com.codeka.warworlds.game;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.DialogInterface;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.SeekBar;
 import android.widget.TextView;
+import au.com.codeka.BackgroundRunner;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.StyledDialog;
 import au.com.codeka.warworlds.api.ApiClient;
@@ -115,9 +115,9 @@ public class FleetSplitDialog extends DialogFragment {
         final Activity activity = getActivity();
         dismiss();
 
-        new AsyncTask<Void, Void, Boolean>() {
+        new BackgroundRunner<Boolean>() {
             @Override
-            protected Boolean doInBackground(Void... params) {
+            protected Boolean doInBackground() {
                 String url = String.format("stars/%s/fleets/%s/orders",
                                            mFleet.getStarKey(),
                                            mFleet.getKey());
@@ -136,7 +136,7 @@ public class FleetSplitDialog extends DialogFragment {
             }
 
             @Override
-            protected void onPostExecute(Boolean success) {
+            protected void onComplete(Boolean success) {
                 // the star this fleet is attached to needs to be refreshed...
                 StarManager.getInstance().refreshStar(
                         activity, mFleet.getStarKey());

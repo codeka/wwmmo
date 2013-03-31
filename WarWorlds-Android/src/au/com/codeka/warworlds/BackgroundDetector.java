@@ -8,8 +8,8 @@ import org.slf4j.LoggerFactory;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Handler;
+import au.com.codeka.BackgroundRunner;
 import au.com.codeka.warworlds.api.ApiClient;
 import au.com.codeka.warworlds.api.ApiException;
 import au.com.codeka.warworlds.model.protobuf.Messages;
@@ -91,9 +91,9 @@ public class BackgroundDetector {
             return;
         }
 
-        new AsyncTask<Void, Void, Void>() {
+        new BackgroundRunner<Void>() {
             @Override
-            protected Void doInBackground(Void... params) {
+            protected Void doInBackground() {
                 String url = "/api/v1/devices/"+deviceRegistrationKey+"?online_status=1";
                 try {
                     ApiClient.putProtoBuf(url, dos_pb);
@@ -102,6 +102,10 @@ public class BackgroundDetector {
                 }
 
                 return null;
+            }
+
+            @Override
+            protected void onComplete(Void arg) {
             }
         }.execute();
 

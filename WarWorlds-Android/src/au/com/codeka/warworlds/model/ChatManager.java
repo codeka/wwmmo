@@ -8,8 +8,8 @@ import java.util.TreeSet;
 import org.joda.time.DateTime;
 
 import android.content.Context;
-import android.os.AsyncTask;
 import android.os.Handler;
+import au.com.codeka.BackgroundRunner;
 import au.com.codeka.warworlds.BackgroundDetector;
 import au.com.codeka.warworlds.api.ApiClient;
 import au.com.codeka.warworlds.model.protobuf.Messages;
@@ -88,9 +88,9 @@ public class ChatManager implements BackgroundDetector.BackgroundChangeHandler {
      * Posts a message from us to the server.
      */
     public void postMessage(final Context context, final ChatMessage msg) {
-        new AsyncTask<Void, Void, Boolean>() {
+        new BackgroundRunner<Boolean>() {
             @Override
-            protected Boolean doInBackground(Void... arg0) {
+            protected Boolean doInBackground() {
                 try {
                     Messages.ChatMessage pb = Messages.ChatMessage.newBuilder()
                             .setMessage(msg.getMessage())
@@ -103,7 +103,7 @@ public class ChatManager implements BackgroundDetector.BackgroundChangeHandler {
             }
 
             @Override
-            protected void onPostExecute(Boolean success) {
+            protected void onComplete(Boolean success) {
                 if (success) {
                     addMessage(context, msg);
                 }
@@ -231,9 +231,9 @@ public class ChatManager implements BackgroundDetector.BackgroundChangeHandler {
         }
         mRequesting = true;
 
-        new AsyncTask<Void, Void, ArrayList<ChatMessage>>() {
+        new BackgroundRunner<ArrayList<ChatMessage>>() {
             @Override
-            protected ArrayList<ChatMessage> doInBackground(Void... arg0) {
+            protected ArrayList<ChatMessage> doInBackground() {
                 ArrayList<ChatMessage> msgs = new ArrayList<ChatMessage>();
 
                 try {
@@ -255,7 +255,7 @@ public class ChatManager implements BackgroundDetector.BackgroundChangeHandler {
             }
 
             @Override
-            protected void onPostExecute(ArrayList<ChatMessage> msgs) {
+            protected void onComplete(ArrayList<ChatMessage> msgs) {
                 for (ChatMessage msg : msgs) {
                     addMessage(context, msg);
                 }

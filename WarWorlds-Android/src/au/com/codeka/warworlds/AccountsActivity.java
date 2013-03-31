@@ -15,7 +15,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.view.View;
@@ -25,6 +24,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
+import au.com.codeka.BackgroundRunner;
 import au.com.codeka.warworlds.api.ApiClient;
 
 /**
@@ -175,9 +175,9 @@ public class AccountsActivity extends BaseActivity {
         mPleaseWaitDialog = ProgressDialog.show(mContext, null, "Logging in...", true);
 
         // Obtain an auth token and register, on a background thread
-        new AsyncTask<Void, Void, Void>() {
+        new BackgroundRunner<Void>() {
             @Override
-            protected Void doInBackground(Void... arg0) {
+            protected Void doInBackground() {
                 String authCookie = Authenticator.authenticate(AccountsActivity.this, accountName);
                 ApiClient.getCookies().clear();
                 ApiClient.getCookies().add(authCookie);
@@ -195,7 +195,7 @@ public class AccountsActivity extends BaseActivity {
             }
 
             @Override
-            protected void onPostExecute(Void param) {
+            protected void onComplete(Void param) {
                 try {
                     onComplete.call();
                 } catch (Exception e) {

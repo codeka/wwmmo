@@ -9,7 +9,6 @@ import org.slf4j.LoggerFactory;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.DialogInterface;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.view.LayoutInflater;
@@ -17,6 +16,7 @@ import android.view.View;
 import android.widget.ImageButton;
 import android.widget.SeekBar;
 import android.widget.TextView;
+import au.com.codeka.BackgroundRunner;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.StyledDialog;
 import au.com.codeka.warworlds.api.ApiClient;
@@ -236,9 +236,9 @@ public class FocusDialog extends DialogFragment {
         final Activity activity = getActivity();
         dismiss();
 
-        new AsyncTask<Void, Void, Void>() {
+        new BackgroundRunner<Void>() {
             @Override
-            protected Void doInBackground(Void... arg0) {
+            protected Void doInBackground() {
                 String url = String.format("stars/%s/colonies/%s",
                                            mColony.getStarKey(),
                                            mColony.getKey());
@@ -253,7 +253,7 @@ public class FocusDialog extends DialogFragment {
                 return null;
             }
             @Override
-            protected void onPostExecute(Void unused) {
+            protected void onComplete(Void unused) {
                 // notify the StarManager that this star has been updated
                 StarManager.getInstance().refreshStar(activity,
                                                       mColony.getStarKey());

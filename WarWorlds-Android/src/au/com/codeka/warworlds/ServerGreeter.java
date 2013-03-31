@@ -10,10 +10,10 @@ import android.app.Activity;
 import android.app.ActivityManager;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.StrictMode;
 import android.preference.PreferenceManager;
+import au.com.codeka.BackgroundRunner;
 import au.com.codeka.warworlds.api.ApiClient;
 import au.com.codeka.warworlds.api.ApiException;
 import au.com.codeka.warworlds.model.BuildManager;
@@ -121,7 +121,7 @@ public class ServerGreeter {
             mHandler = new Handler();
         }
 
-        new AsyncTask<Void, Void, String>() {
+        new BackgroundRunner<String>() {
             private boolean mNeedsEmpireSetup;
             private boolean mErrorOccured;
             private boolean mNeedsReAuthenticate;
@@ -129,7 +129,7 @@ public class ServerGreeter {
             private ArrayList<Colony> mColonies;
 
             @Override
-            protected String doInBackground(Void... arg0) {
+            protected String doInBackground() {
                 // re-authenticate and get a new cookie
                 String authCookie = Authenticator.authenticate(activity, accountName);
                 ApiClient.getCookies().clear();
@@ -211,7 +211,7 @@ public class ServerGreeter {
             }
 
             @Override
-            protected void onPostExecute(String result) {
+            protected void onComplete(String result) {
                 mServerGreeting.mIsConnected = true;
 
                 if (mNeedsEmpireSetup) {

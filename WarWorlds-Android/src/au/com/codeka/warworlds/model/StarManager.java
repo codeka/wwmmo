@@ -16,7 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import android.content.Context;
-import android.os.AsyncTask;
+import au.com.codeka.BackgroundRunner;
 import au.com.codeka.warworlds.api.ApiClient;
 import au.com.codeka.warworlds.api.ApiException;
 import au.com.codeka.warworlds.model.billing.IabException;
@@ -142,14 +142,14 @@ public class StarManager {
             return;
         }
 
-        new AsyncTask<Void, Void, StarSummary>() {
+        new BackgroundRunner<StarSummary>() {
             @Override
-            protected StarSummary doInBackground(Void... arg0) {
+            protected StarSummary doInBackground() {
                 return requestStarSummarySync(context, starKey);
             }
 
             @Override
-            protected void onPostExecute(StarSummary starSummary) {
+            protected void onComplete(StarSummary starSummary) {
                 if (starSummary != null) {
                     callback.onStarSummaryFetched(starSummary);
                 }
@@ -181,14 +181,14 @@ public class StarManager {
         if (toFetch.size() == 0) {
             callback.onStarSummariesFetched(summaries);
         } else {
-            new AsyncTask<Void, Void, List<StarSummary>>() {
+            new BackgroundRunner<List<StarSummary>>() {
                 @Override
-                protected List<StarSummary> doInBackground(Void... arg0) {
+                protected List<StarSummary> doInBackground() {
                     return requestStarSummariesSync(context, toFetch);
                 }
 
                 @Override
-                protected void onPostExecute(List<StarSummary> stars) {
+                protected void onComplete(List<StarSummary> stars) {
                     if (stars != null) {
                         for (StarSummary star : stars) {
                             summaries.add(star);
@@ -250,9 +250,9 @@ public class StarManager {
             return;
         }
 
-        new AsyncTask<Void, Void, Star>() {
+        new BackgroundRunner<Star>() {
             @Override
-            protected Star doInBackground(Void... arg0) {
+            protected Star doInBackground() {
                 Star star = doFetchStar(context, starKey);
                 if (star != null) {
                     log.debug(String.format("STAR[%s] has %d fleets.", star.getKey(),
@@ -262,7 +262,7 @@ public class StarManager {
             }
 
             @Override
-            protected void onPostExecute(Star star) {
+            protected void onComplete(Star star) {
                 if (star == null) {
                     return; // BAD!
                 }
@@ -281,9 +281,9 @@ public class StarManager {
 
     public void renameStar(final Context context, final Purchase purchase,
                            final Star star, final String newName) {
-        new AsyncTask<Void, Void, Star>() {
+        new BackgroundRunner<Star>() {
             @Override
-            protected Star doInBackground(Void... arg0) {
+            protected Star doInBackground() {
                 String url = "stars/"+star.getKey();
 
                 String price = "???";
@@ -320,7 +320,7 @@ public class StarManager {
             }
 
             @Override
-            protected void onPostExecute(Star star) {
+            protected void onComplete(Star star) {
                 if (star == null) {
                     return; //TODO: bad!
                 }

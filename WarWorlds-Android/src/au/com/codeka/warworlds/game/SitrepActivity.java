@@ -12,7 +12,6 @@ import org.slf4j.LoggerFactory;
 
 import android.content.Context;
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.LayoutInflater;
@@ -25,6 +24,7 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import au.com.codeka.BackgroundRunner;
 import au.com.codeka.TimeInHours;
 import au.com.codeka.warworlds.BaseActivity;
 import au.com.codeka.warworlds.Notifications;
@@ -187,9 +187,9 @@ public class SitrepActivity extends BaseActivity {
     }
 
     private void fetchReportItems(final String cursor, final FetchItemsCompleteHandler handler) {
-        new AsyncTask<Void, Void, List<SituationReport>>() {
+        new BackgroundRunner<List<SituationReport>>() {
             @Override
-            protected List<SituationReport> doInBackground(Void... params) {
+            protected List<SituationReport> doInBackground() {
                 String url = "/api/v1/sit-reports";
                 if (mStarKey != null) {
                     url = String.format("/api/v1/stars/%s/sit-reports", mStarKey);
@@ -237,7 +237,7 @@ public class SitrepActivity extends BaseActivity {
             }
 
             @Override
-            protected void onPostExecute(List<SituationReport> items) {
+            protected void onComplete(List<SituationReport> items) {
                 handler.onItemsFetched(items);
             }
         }.execute();

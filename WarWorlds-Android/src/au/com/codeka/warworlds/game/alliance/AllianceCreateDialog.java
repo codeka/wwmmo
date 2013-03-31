@@ -4,12 +4,12 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.TextView;
+import au.com.codeka.BackgroundRunner;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.StyledDialog;
 import au.com.codeka.warworlds.api.ApiClient;
@@ -46,11 +46,11 @@ public class AllianceCreateDialog extends DialogFragment {
         final Context context = getActivity();
         dismiss();
 
-        new AsyncTask<Void, Void, Boolean>() {
+        new BackgroundRunner<Boolean>() {
             private String mErrorMsg;
 
             @Override
-            protected Boolean doInBackground(Void... params) {
+            protected Boolean doInBackground() {
                 Messages.Alliance alliance_pb = Messages.Alliance.newBuilder()
                                .setName(allianceName)
                                .build();
@@ -64,7 +64,7 @@ public class AllianceCreateDialog extends DialogFragment {
             }
 
             @Override
-            protected void onPostExecute(Boolean success) {
+            protected void onComplete(Boolean success) {
                 if (!success) {
                     StyledDialog.showErrorMessage(context, mErrorMsg);
                 } else {

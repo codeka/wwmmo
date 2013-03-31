@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.TreeMap;
 
 import android.content.Context;
-import android.os.AsyncTask;
+import au.com.codeka.BackgroundRunner;
 import au.com.codeka.warworlds.StyledDialog;
 import au.com.codeka.warworlds.api.ApiClient;
 import au.com.codeka.warworlds.api.ApiException;
@@ -87,12 +87,12 @@ public class BuildManager {
 
     public void build(final Context context, final Colony colony,
                       final Design design, final Building existingBuilding, final int count) {
-        new AsyncTask<Void, Void, BuildRequest>() {
+        new BackgroundRunner<BuildRequest>() {
             private int mErrorCode;
             private String mErrorMsg;
 
             @Override
-            protected BuildRequest doInBackground(Void... arg0) {
+            protected BuildRequest doInBackground() {
                 Messages.BuildRequest.BUILD_KIND kind;
                 if (design.getDesignKind() == Design.DesignKind.BUILDING) {
                     kind = Messages.BuildRequest.BUILD_KIND.BUILDING;
@@ -122,7 +122,7 @@ public class BuildManager {
                 return null;
             }
             @Override
-            protected void onPostExecute(BuildRequest buildRequest) {
+            protected void onComplete(BuildRequest buildRequest) {
                 if (mErrorCode > 0) {
                     try {
                         new StyledDialog.Builder(context)

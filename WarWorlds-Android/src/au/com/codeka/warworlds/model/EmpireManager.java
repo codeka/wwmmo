@@ -22,7 +22,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.os.AsyncTask;
+import au.com.codeka.BackgroundRunner;
 import au.com.codeka.warworlds.api.ApiClient;
 import au.com.codeka.warworlds.api.ApiException;
 import au.com.codeka.warworlds.model.protobuf.Messages;
@@ -189,9 +189,9 @@ public class EmpireManager {
         }
 
         if (toFetch.size() > 0) {
-            new AsyncTask<Void, Void, List<Empire>>() {
+            new BackgroundRunner<List<Empire>>() {
                 @Override
-                protected List<Empire> doInBackground(Void... arg0) {
+                protected List<Empire> doInBackground() {
                     try {
                         return refreshEmpiresSync(context, toFetch);
                     } catch (ApiException e) {
@@ -201,7 +201,7 @@ public class EmpireManager {
                 }
 
                 @Override
-                protected void onPostExecute(List<Empire> empires) {
+                protected void onComplete(List<Empire> empires) {
                     if (empires == null) {
                         return; // BAD!
                     }
@@ -410,9 +410,9 @@ public class EmpireManager {
      */
     public void fetchEmpiresByRank(final Context context, final int minRank, final int maxRank,
                                    final EmpiresFetchedHandler handler) {
-        new AsyncTask<Void, Void, List<Empire>>() {
+        new BackgroundRunner<List<Empire>>() {
             @Override
-            protected List<Empire> doInBackground(Void... arg0) {
+            protected List<Empire> doInBackground() {
                 List<Empire> empires = new ArrayList<Empire>();
 
                 try {
@@ -434,7 +434,7 @@ public class EmpireManager {
             }
 
             @Override
-            protected void onPostExecute(List<Empire> empires) {
+            protected void onComplete(List<Empire> empires) {
                 for (Empire empire : empires) {
                     if (!empire.getKey().equals(mEmpire.getKey())) {
                         mEmpireCache.put(empire.getKey(), empire);
@@ -449,9 +449,9 @@ public class EmpireManager {
 
     public void searchEmpires(final Context context, final String nameSearch,
                               final EmpiresFetchedHandler handler) {
-        new AsyncTask<Void, Void, List<Empire>>() {
+        new BackgroundRunner<List<Empire>>() {
             @Override
-            protected List<Empire> doInBackground(Void... arg0) {
+            protected List<Empire> doInBackground() {
                 List<Empire> empires = new ArrayList<Empire>();
 
                 try {
@@ -473,7 +473,7 @@ public class EmpireManager {
             }
 
             @Override
-            protected void onPostExecute(List<Empire> empires) {
+            protected void onComplete(List<Empire> empires) {
                 for (Empire empire : empires) {
                     if (!empire.getKey().equals(mEmpire.getKey())) {
                         mEmpireCache.put(empire.getKey(), empire);

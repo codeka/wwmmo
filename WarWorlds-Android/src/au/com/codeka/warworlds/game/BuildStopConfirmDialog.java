@@ -3,10 +3,10 @@ package au.com.codeka.warworlds.game;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.DialogInterface;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.text.Html;
+import au.com.codeka.BackgroundRunner;
 import au.com.codeka.warworlds.StyledDialog;
 import au.com.codeka.warworlds.api.ApiClient;
 import au.com.codeka.warworlds.api.ApiException;
@@ -50,9 +50,9 @@ public class BuildStopConfirmDialog extends DialogFragment {
 
         final Activity activity = getActivity();
 
-        new AsyncTask<Void, Void, Boolean>() {
+        new BackgroundRunner<Boolean>() {
             @Override
-            protected Boolean doInBackground(Void... arg0) {
+            protected Boolean doInBackground() {
                 String url = "stars/"+mStar.getKey()+"/build/"+mBuildRequest.getKey()+"/stop";
 
                 try {
@@ -64,7 +64,7 @@ public class BuildStopConfirmDialog extends DialogFragment {
                 }
             }
             @Override
-            protected void onPostExecute(Boolean success) {
+            protected void onComplete(Boolean success) {
                 EmpireManager.getInstance().refreshEmpire(activity);
                 StarManager.getInstance().refreshStar(getActivity(), mStar.getKey());
                 dismiss();

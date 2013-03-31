@@ -7,7 +7,7 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 
 import android.content.Context;
-import android.os.AsyncTask;
+import au.com.codeka.BackgroundRunner;
 import au.com.codeka.warworlds.api.ApiClient;
 import au.com.codeka.warworlds.api.ApiException;
 import au.com.codeka.warworlds.model.protobuf.Messages;
@@ -41,9 +41,9 @@ public class AllianceManager {
      * Fetches all alliances from the server.
      */
     public void fetchAlliances(final FetchAlliancesCompleteHandler handler) {
-        new AsyncTask<Void, Void, List<Alliance>>() {
+        new BackgroundRunner<List<Alliance>>() {
             @Override
-            protected List<Alliance> doInBackground(Void... params) {
+            protected List<Alliance> doInBackground() {
                 ArrayList<Alliance> alliances;
 
                 String url = "alliances";
@@ -60,7 +60,7 @@ public class AllianceManager {
             }
 
             @Override
-            protected void onPostExecute(List<Alliance> alliances) {
+            protected void onComplete(List<Alliance> alliances) {
                 if (handler != null) {
                     handler.onAlliancesFetched(alliances);
                 }
@@ -72,9 +72,9 @@ public class AllianceManager {
      * Fetches details, including memberships, of the alliance with the given key.
      */
     public void fetchAlliance(final String allianceKey, final FetchAllianceCompleteHandler handler) {
-        new AsyncTask<Void, Void, Alliance>() {
+        new BackgroundRunner<Alliance>() {
             @Override
-            protected Alliance doInBackground(Void... params) {
+            protected Alliance doInBackground() {
                 String url = "alliances/"+allianceKey;
                 try {
                     Messages.Alliance pb = ApiClient.getProtoBuf(url, Messages.Alliance.class);
@@ -85,7 +85,7 @@ public class AllianceManager {
             }
 
             @Override
-            protected void onPostExecute(Alliance alliance) {
+            protected void onComplete(Alliance alliance) {
                 if (handler != null && alliance != null) {
                     handler.onAllianceFetched(alliance);
                 }
@@ -97,11 +97,11 @@ public class AllianceManager {
     public void fetchJoinRequests(final Context context,
                                   final String allianceKey,
                                   final FetchJoinRequestsCompleteHandler handler) {
-        new AsyncTask<Void, Void, List<AllianceJoinRequest>>() {
+        new BackgroundRunner<List<AllianceJoinRequest>>() {
             private TreeMap<String, Empire> mEmpires;
 
             @Override
-            protected List<AllianceJoinRequest> doInBackground(Void... params) {
+            protected List<AllianceJoinRequest> doInBackground() {
                 String url = "alliances/"+allianceKey+"/join-requests";
                 try {
                     Messages.AllianceJoinRequests pb = ApiClient.getProtoBuf(url, Messages.AllianceJoinRequests.class);
@@ -127,7 +127,7 @@ public class AllianceManager {
             }
 
             @Override
-            protected void onPostExecute(List<AllianceJoinRequest> joinRequests) {
+            protected void onComplete(List<AllianceJoinRequest> joinRequests) {
                 if (handler != null && joinRequests != null) {
                     handler.onJoinRequestsFetched(mEmpires, joinRequests);
                 }
@@ -141,9 +141,9 @@ public class AllianceManager {
     public void requestJoin(final String allianceKey, final String message) {
         final MyEmpire myEmpire = EmpireManager.getInstance().getEmpire();
 
-        new AsyncTask<Void, Void, Boolean>() {
+        new BackgroundRunner<Boolean>() {
             @Override
-            protected Boolean doInBackground(Void... params) {
+            protected Boolean doInBackground() {
                 String url = "alliances/"+allianceKey+"/join-requests";
                 Messages.AllianceJoinRequest pb = Messages.AllianceJoinRequest.newBuilder()
                                     .setAllianceKey(allianceKey)
@@ -159,7 +159,7 @@ public class AllianceManager {
             }
 
             @Override
-            protected void onPostExecute(Boolean success) {
+            protected void onComplete(Boolean success) {
                 if (success) {
                     refreshAlliance(allianceKey);
                 }
@@ -168,9 +168,9 @@ public class AllianceManager {
     }
 
     public void updateJoinRequest(final AllianceJoinRequest joinRequest) {
-        new AsyncTask<Void, Void, Boolean>() {
+        new BackgroundRunner<Boolean>() {
             @Override
-            protected Boolean doInBackground(Void... params) {
+            protected Boolean doInBackground() {
                 String url = "alliances/"+joinRequest.getAllianceKey()+"/join-requests";
                 Messages.AllianceJoinRequest pb = Messages.AllianceJoinRequest.newBuilder()
                                     .setKey(joinRequest.getKey())
@@ -188,7 +188,7 @@ public class AllianceManager {
             }
 
             @Override
-            protected void onPostExecute(Boolean success) {
+            protected void onComplete(Boolean success) {
                 if (success) {
                     refreshAlliance(joinRequest.getAllianceKey());
                 }
