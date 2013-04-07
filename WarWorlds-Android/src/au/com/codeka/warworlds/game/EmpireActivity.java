@@ -61,6 +61,7 @@ public class EmpireActivity extends TabFragmentActivity
     Context mContext = this;
     Bundle mExtras = null;
     boolean mFirstRefresh = true;
+    boolean mFirstStarsRefresh = true;
 
     public enum EmpireActivityResult {
         NavigateToPlanet(1),
@@ -150,6 +151,7 @@ public class EmpireActivity extends TabFragmentActivity
                     }
                     sStars = starMap;
                     getTabManager().reloadTab();
+                    mFirstStarsRefresh = false;
                 }
             });
         }
@@ -518,7 +520,7 @@ public class EmpireActivity extends TabFragmentActivity
             final Context context = getActivity();
 
             EmpireActivity activity = (EmpireActivity) getActivity();
-            if (activity.mFirstRefresh && activity.mExtras != null) {
+            if (activity.mFirstStarsRefresh && activity.mExtras != null) {
                 String fleetKey = activity.mExtras.getString("au.com.codeka.warworlds.FleetKey");
                 if (fleetKey != null) {
                     fleetList.selectFleet(fleetKey, true);
