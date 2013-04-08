@@ -154,6 +154,7 @@ public class ChatManager implements BackgroundDetector.BackgroundChangeHandler {
             // make sure we don't have this chat already...
             for (ChatMessage existing : mMessages) {
                 if (existing.getEmpireKey() != null &&
+                    msg.getEmpireKey() != null &&
                     existing.getDatePosted().equals(msg.getDatePosted()) &&
                     existing.getEmpireKey().equals(msg.getEmpireKey())) {
                     return;

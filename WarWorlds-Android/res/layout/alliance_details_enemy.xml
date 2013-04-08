@@ -30,43 +30,54 @@
         android:text="Members: 123"
         android:textAppearance="?android:attr/textAppearanceSmall" />
 
-    <au.com.codeka.warworlds.ctrl.HorizontalSeparator
-        android:id="@+id/horz_sep_1"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_marginLeft="5dp"
-        android:layout_marginRight="5dp"
-        android:layout_below="@+id/alliance_icon"
-        android:text="Diplomacy" />
+    <ScrollView android:id="@+id/scrollview"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_below="@+id/alliance_icon">
+        <RelativeLayout android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
 
-    <TextView
-        android:id="@+id/placeholder"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/horz_sep_1"
-        android:layout_centerHorizontal="true"
-        android:layout_margin="10dp"
-        android:text="(not implemented yet)" />
+            <au.com.codeka.warworlds.ctrl.HorizontalSeparator
+                android:id="@+id/horz_sep_1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="5dp"
+                android:layout_below="@+id/alliance_icon"
+                android:text="Diplomacy" />
 
-    <au.com.codeka.warworlds.ctrl.HorizontalSeparator
-        android:id="@+id/horz_sep_2"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_marginLeft="5dp"
-        android:layout_marginRight="5dp"
-        android:layout_below="@+id/placeholder"
-        android:text="Members" />
+            <TextView
+                android:id="@+id/placeholder"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/horz_sep_1"
+                android:layout_centerHorizontal="true"
+                android:layout_margin="10dp"
+                android:text="(not implemented yet)" />
 
-    <ListView
-        android:id="@+id/members"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentBottom="true"
-        android:layout_below="@+id/horz_sep_2"
-        android:layout_marginTop="10dp" >
-    </ListView>
+            <au.com.codeka.warworlds.ctrl.HorizontalSeparator
+                android:id="@+id/horz_sep_2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="5dp"
+                android:layout_below="@+id/placeholder"
+                android:text="Members" />
+
+            <LinearLayout
+                android:id="@+id/members"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentBottom="true"
+                android:layout_below="@+id/horz_sep_2"
+                android:layout_marginTop="10dp"
+                android:orientation="vertical" >
+            </LinearLayout>
+
+        </RelativeLayout>
+    </ScrollView>
 
 </RelativeLayout>

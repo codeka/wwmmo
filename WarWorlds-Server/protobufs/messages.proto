@@ -999,3 +999,12 @@ message AllianceJoinRequests
 {
     repeated AllianceJoinRequest join_requests = 1;
 }
+
+//
+// A request to leave an alliance.
+//
+message AllianceLeaveRequest
+{
+    optional string alliance_key = 1;
+    optional string empire_key = 2;
+}

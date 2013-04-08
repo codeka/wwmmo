@@ -33,7 +33,8 @@ import au.com.codeka.warworlds.model.Empire;
 import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.MyEmpire;
 
-public class AllianceActivity extends TabFragmentActivity {
+public class AllianceActivity extends TabFragmentActivity
+                              implements EmpireManager.EmpireFetchedHandler {
     private Context mContext = this;
 
     @Override
@@ -44,6 +45,26 @@ public class AllianceActivity extends TabFragmentActivity {
         MyEmpire myEmpire = EmpireManager.getInstance().getEmpire();
         if (myEmpire.getAlliance() != null) {
             getTabManager().addTab(mContext, new TabInfo(this, "Join Requests", JoinRequestsFragment.class, null));
+        }
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        EmpireManager.getInstance().addEmpireUpdatedListener(null, this);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        EmpireManager.getInstance().removeEmpireUpdatedListener(this);
+    }
+
+    @Override
+    public void onEmpireFetched(Empire empire) {
+        MyEmpire myEmpire = EmpireManager.getInstance().getEmpire();
+        if (myEmpire.getKey().equals(empire.getKey())) {
+            getTabManager().reloadTab();
         }
     }
 

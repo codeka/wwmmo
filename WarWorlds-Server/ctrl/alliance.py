@@ -157,7 +157,7 @@ def updateJoinRequest(alliance_join_request_pb):
     # if we've gone from PENDING to ACCEPTED, we need to actually add them as a member now
     # TODO: transaction...
     alliance_mdl = mdl.Alliance.get(alliance_join_request_pb.alliance_key)
-    alliance_mdl.numMembers = alliance_mdl.numMembers + 1
+    alliance_mdl.numMembers += 1
     alliance_mdl.put()
 
     alliance_member_mdl = mdl.AllianceMember(parent=alliance_mdl)
@@ -174,4 +174,21 @@ def updateJoinRequest(alliance_join_request_pb):
                     "alliances:all",
                     "alliances:%s" % alliance_join_request_pb.alliance_key,
                     "empire:%s" % alliance_join_request_pb.empire_key,
+                    "empire-for-user:%s" % empire_pb.email])
+
+
+def leaveAlliance(alliance_leave_request_pb):
+  alliance_mdl = mdl.Alliance.get(db.Key(alliance_leave_request_pb.alliance_key))
+  if not alliance_mdl:
+    return # todo: error?
+  for alliance_member_mdl in (mdl.AllianceMember.all()
+                .filter("empire", db.Key(alliance_leave_request_pb.empire_key))):
+    alliance_member_mdl.delete()
+    alliance_mdl.numMembers -= 1
+  alliance_mdl.put()
+
+  empire_pb = empire_ctl.getEmpire(alliance_leave_request_pb.empire_key)
+  ctrl.clearCached(["alliances:all",
+                    "alliances:%s" % alliance_leave_request_pb.alliance_key,
+                    "empire:%s" % alliance_leave_request_pb.empire_key,
                     "empire-for-user:%s" % empire_pb.email])

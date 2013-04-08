@@ -207,8 +207,8 @@ public class BuildActivity extends BaseActivity implements StarManager.StarFetch
         return required;
     }
 
-    private static class BuildFragment extends TabFragmentFragment
-                                       implements StarManager.StarFetchedHandler {
+    public static class BuildFragment extends TabFragmentFragment
+                                      implements StarManager.StarFetchedHandler {
         @Override
         protected void createTabs() {
             BuildActivity activity = (BuildActivity) getActivity();
@@ -237,39 +237,39 @@ public class BuildActivity extends BaseActivity implements StarManager.StarFetch
         }
     }
 
-     public class ColonyPagerAdapter extends FragmentStatePagerAdapter {
-         public ColonyPagerAdapter(FragmentManager fm) {
-             super(fm);
-         }
+    public class ColonyPagerAdapter extends FragmentStatePagerAdapter {
+        public ColonyPagerAdapter(FragmentManager fm) {
+            super(fm);
+        }
 
-         @Override
-         public Fragment getItem(int i) {
-             Fragment fragment = new BuildFragment();
-             Bundle args = new Bundle();
-             args.putParcelable("au.com.codeka.warworlds.Colony", mColonies.get(i));
-             fragment.setArguments(args);
-             return fragment;
-         }
+        @Override
+        public Fragment getItem(int i) {
+            Fragment fragment = new BuildFragment();
+            Bundle args = new Bundle();
+            args.putParcelable("au.com.codeka.warworlds.Colony", mColonies.get(i));
+            fragment.setArguments(args);
+            return fragment;
+        }
 
-         @Override
-         public int getCount() {
-             if (mColonies == null) {
-                 return 0;
-             }
+        @Override
+        public int getCount() {
+            if (mColonies == null) {
+                return 0;
+            }
 
-             return mColonies.size();
-         }
+            return mColonies.size();
+        }
 
-         @Override
-         public CharSequence getPageTitle(int position) {
-             return "Colony " + (position + 1);
-         }
+        @Override
+        public CharSequence getPageTitle(int position) {
+            return "Colony " + (position + 1);
+        }
 
-         @Override
-         public void setPrimaryItem(ViewGroup container, int position, Object object) {
-             super.setPrimaryItem(container, position, object);
-             refreshColonyDetails(mColonies.get(position));
-         }
+        @Override
+        public void setPrimaryItem(ViewGroup container, int position, Object object) {
+            super.setPrimaryItem(container, position, object);
+            refreshColonyDetails(mColonies.get(position));
+        }
     }
 
     public static class BaseTabFragment extends Fragment {

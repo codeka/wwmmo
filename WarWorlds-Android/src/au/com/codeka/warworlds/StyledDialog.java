@@ -12,6 +12,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
@@ -79,7 +80,11 @@ public class StyledDialog extends Dialog implements ViewTreeObserver.OnGlobalLay
 
     @Override
     public void show() {
-        super.show();
+        try {
+            super.show();
+        } catch(WindowManager.BadTokenException e) {
+            // this can happen if the activity has been stopped... just ignore it.
+        }
     }
 
     public void show(boolean ignoreErrors) {

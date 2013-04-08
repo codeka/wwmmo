@@ -204,6 +204,22 @@ public class ApiClient {
     }
 
     /**
+     * Sends a HTTP 'DELETE' to the given URL.
+     */
+    public static <T> T delete(String url, Message pb, Class<T> protoBuffFactory)
+            throws ApiException {
+        return putOrPostProtoBuff("DELETE", url, pb, protoBuffFactory);
+    }
+
+    /**
+     * Sends a HTTP 'DELETE' to the given URL.
+     */
+    public static void delete(String url, Message pb)
+            throws ApiException {
+        putOrPostProtoBuf("DELETE", url, pb);
+    }
+
+    /**
      * Gets the headers that we'll add to all of our requests.
      */
     private static Map<String, List<String>> getHeaders() {
@@ -223,11 +239,6 @@ public class ApiClient {
     /**
      * Parses the response from a request and returns the protocol buffer returned therein 
      * (if any).
-     * 
-     * @param url
-     * @param resp
-     * @param protoBuffFactory
-     * @return
      */
     @SuppressWarnings({"unchecked"})
     public static <T> T parseResponseBody(HttpResponse resp, Class<T> protoBuffFactory) {

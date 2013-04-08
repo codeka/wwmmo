@@ -30,43 +30,81 @@
         android:text="Members: 123"
         android:textAppearance="?android:attr/textAppearanceSmall" />
 
-    <au.com.codeka.warworlds.ctrl.HorizontalSeparator
-        android:id="@+id/horz_sep_1"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_marginLeft="5dp"
-        android:layout_marginRight="5dp"
-        android:layout_below="@+id/alliance_icon"
-        android:text="Bank" />
+    <ScrollView android:id="@+id/scrollview"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_below="@+id/alliance_icon">
+        <RelativeLayout android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
 
-    <TextView
-        android:id="@+id/placeholder"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/horz_sep_1"
-        android:layout_centerHorizontal="true"
-        android:layout_margin="10dp"
-        android:text="(not implemented yet)" />
+            <au.com.codeka.warworlds.ctrl.HorizontalSeparator
+                android:id="@+id/horz_sep_1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="5dp"
+                android:layout_below="@+id/alliance_icon"
+                android:text="Bank" />
 
-    <au.com.codeka.warworlds.ctrl.HorizontalSeparator
-        android:id="@+id/horz_sep_2"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_marginLeft="5dp"
-        android:layout_marginRight="5dp"
-        android:layout_below="@+id/placeholder"
-        android:text="Members" />
+            <TextView
+                android:id="@+id/placeholder"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/horz_sep_1"
+                android:layout_centerHorizontal="true"
+                android:layout_margin="10dp"
+                android:text="(not implemented yet)" />
 
-    <ListView
-        android:id="@+id/members"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentBottom="true"
-        android:layout_below="@+id/horz_sep_2"
-        android:layout_marginTop="10dp" >
-    </ListView>
+            <au.com.codeka.warworlds.ctrl.HorizontalSeparator
+                android:id="@+id/horz_sep_2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="5dp"
+                android:layout_below="@+id/placeholder"
+                android:text="Leave" />
+
+            <TextView
+                android:id="@+id/leave_instructions"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/horz_sep_2"
+                android:layout_margin="10dp"
+                android:text="You can leave your alliance at any time, but to re-join, you'll need to re-apply." />
+
+            <Button
+                android:id="@+id/leave_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/leave_instructions"
+                android:layout_centerHorizontal="true"
+                android:text="Leave Alliance" />
+
+            <au.com.codeka.warworlds.ctrl.HorizontalSeparator
+                android:id="@+id/horz_sep_3"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="5dp"
+                android:layout_marginTop="10dp"
+                android:layout_below="@+id/leave_btn"
+                android:text="Members" />
+
+            <LinearLayout
+                android:id="@+id/members"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentBottom="true"
+                android:layout_below="@+id/horz_sep_3"
+                android:layout_marginTop="10dp"
+                android:orientation="vertical" >
+            </LinearLayout>
+
+        </RelativeLayout>
+    </ScrollView>
 
 </RelativeLayout>

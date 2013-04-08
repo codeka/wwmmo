@@ -492,6 +492,19 @@ class AllianceJoinRequestsPage(ApiPage):
     alliance.updateJoinRequest(existing_join_request_pb)
 
 
+class AllianceMembersPage(ApiPage):
+  def delete(self, alliance_key):
+    alliance_leave_request_pb = self._getRequestBody(pb.AllianceLeaveRequest)
+    empire_pb = empire.getEmpireForUser(self.user)
+    if empire_pb.key != alliance_leave_request_pb.empire_key:
+      self.response.set_status(403)
+      return
+    if alliance_leave_request_pb.alliance_key != alliance_key:
+      self.response.set_status(400)
+      return
+    alliance.leaveAlliance(alliance_leave_request_pb)
+
+
 class DevicesPage(ApiPage):
   def post(self):
     registration_pb = self._getRequestBody(pb.DeviceRegistration)
@@ -1053,6 +1066,7 @@ app = ApiApplication([("/api/v1/hello/([^/]+)", HelloPage),
                       ("/api/v1/alliances", AlliancesPage),
                       ("/api/v1/alliances/([^/]+)", AlliancePage),
                       ("/api/v1/alliances/([^/]+)/join-requests", AllianceJoinRequestsPage),
+                      ("/api/v1/alliances/([^/]+)/members", AllianceMembersPage),
                       ("/api/v1/devices", DevicesPage),
                       ("/api/v1/devices/([^/]+)", DevicesPage),
                       ("/api/v1/devices/user:([^/]+)/messages", DeviceMessagesPage),

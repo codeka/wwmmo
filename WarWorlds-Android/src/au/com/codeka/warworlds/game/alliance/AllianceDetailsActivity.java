@@ -6,7 +6,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -14,13 +13,10 @@ import android.os.Handler;
 import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.Window;
-import android.widget.AbsListView;
-import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.ListView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import au.com.codeka.warworlds.BaseActivity;
 import au.com.codeka.warworlds.R;
@@ -32,9 +28,10 @@ import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.EmpireRank;
 import au.com.codeka.warworlds.model.MyEmpire;
 
-public class AllianceDetailsActivity extends BaseActivity {
+public class AllianceDetailsActivity extends BaseActivity
+                                     implements AllianceManager.AllianceUpdatedHandler,
+                                                EmpireManager.EmpireFetchedHandler {
     private Context mContext = this;
-    private EmpireListAdapter mEmpireListAdapter;
     private Handler mHandler;
     private boolean mRefreshPosted;
     private String mAllianceKey;
@@ -51,24 +48,7 @@ public class AllianceDetailsActivity extends BaseActivity {
         Bundle extras = intent.getExtras();
         if (extras != null) {
             mAllianceKey = extras.getString("au.com.codeka.warworlds.AllianceKey");
-
-            Alliance myAlliance = EmpireManager.getInstance().getEmpire().getAlliance();
-            if (myAlliance == null) {
-                setContentView(R.layout.alliance_details_potential);
-            } else if (myAlliance.getKey().equals(mAllianceKey)) {
-                setContentView(R.layout.alliance_details_mine);
-            } else {
-                setContentView(R.layout.alliance_details_enemy);
-            }
-
-            mEmpireListAdapter = new EmpireListAdapter();
-            ListView members = (ListView) findViewById(R.id.members);
-            members.setAdapter(mEmpireListAdapter);
-
             mAlliance = (Alliance) extras.getParcelable("au.com.codeka.warworlds.Alliance");
-            if (mAlliance != null) {
-                refreshAlliance();
-            }
 
             AllianceManager.getInstance().fetchAlliance(mAllianceKey, new AllianceManager.FetchAllianceCompleteHandler() {
                 @Override
@@ -77,6 +57,49 @@ public class AllianceDetailsActivity extends BaseActivity {
                     refreshAlliance();
                 }
             });
+        }
+
+        fullRefresh();
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        AllianceManager.getInstance().addAllianceUpdatedHandler(this);
+        EmpireManager.getInstance().addEmpireUpdatedListener(null, this);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        AllianceManager.getInstance().removeAllianceUpdatedHandler(this);
+        EmpireManager.getInstance().removeEmpireUpdatedListener(this);
+    }
+
+    @Override
+    public void onAllianceUpdated(Alliance alliance) {
+        if (alliance.getKey().equals(mAllianceKey)) {
+            mAlliance = alliance;
+            fullRefresh();
+        }
+    }
+
+    @Override
+    public void onEmpireFetched(Empire empire) {
+        MyEmpire myEmpire = EmpireManager.getInstance().getEmpire();
+        if (myEmpire.getKey().equals(empire.getKey())) {
+            fullRefresh();
+        }
+    }
+
+    private void fullRefresh() {
+        Alliance myAlliance = EmpireManager.getInstance().getEmpire().getAlliance();
+        if (myAlliance == null) {
+            setContentView(R.layout.alliance_details_potential);
+        } else if (myAlliance.getKey().equals(mAllianceKey)) {
+            setContentView(R.layout.alliance_details_mine);
+        } else {
+            setContentView(R.layout.alliance_details_enemy);
         }
 
         Button joinBtn = (Button) findViewById(R.id.join_btn);
@@ -88,6 +111,19 @@ public class AllianceDetailsActivity extends BaseActivity {
                 dialog.show(getSupportFragmentManager(), "");
             }
         });
+
+        Button leaveBtn = (Button) findViewById(R.id.leave_btn);
+        if (leaveBtn != null) leaveBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                LeaveConfirmDialog dialog = new LeaveConfirmDialog();
+                dialog.show(getSupportFragmentManager(), "");
+            }
+        });
+
+        if (mAlliance != null) {
+            refreshAlliance();
+        }
     }
 
     private void refreshAlliance() {
@@ -110,7 +146,9 @@ public class AllianceDetailsActivity extends BaseActivity {
                     members.add(member);
                 }
             }
-            mEmpireListAdapter.setEmpires(members, false);
+            LinearLayout membersList = (LinearLayout) findViewById(R.id.members);
+            membersList.removeAllViews();
+            populateEmpireList(membersList, members);
 
             if (missingMembers.size() > 0) {
                 EmpireManager.getInstance().refreshEmpires(mContext, missingMembers, new EmpireManager.EmpireFetchedHandler() {
@@ -132,66 +170,25 @@ public class AllianceDetailsActivity extends BaseActivity {
         }
     }
 
-
-    private class EmpireListAdapter extends BaseAdapter {
-        private ArrayList<ItemEntry> mEntries;
-
-        public void setEmpires(List<Empire> empires, boolean addGaps) {
-            mEntries = new ArrayList<ItemEntry>();
-
-            Collections.sort(empires, new Comparator<Empire>() {
-                @Override
-                public int compare(Empire lhs, Empire rhs) {
-                    return lhs.getDisplayName().compareTo(rhs.getDisplayName());
-                }
-            });
-
-            for (Empire empire : empires) {
-                mEntries.add(new ItemEntry(empire));
+    private void populateEmpireList(LinearLayout parent, List<Empire> empires) {
+        Collections.sort(empires, new Comparator<Empire>() {
+            @Override
+            public int compare(Empire lhs, Empire rhs) {
+                return lhs.getDisplayName().compareTo(rhs.getDisplayName());
             }
+        });
 
-            notifyDataSetChanged();
-        }
+        LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
-        @Override
-        public int getCount() {
-            if (mEntries == null)
-                return 0;
-            return mEntries.size();
-        }
-
-        @Override
-        public Object getItem(int position) {
-            if (mEntries == null)
-                return null;
-            return mEntries.get(position);
-        }
-
-        @Override
-        public long getItemId(int position) {
-            return position;
-        }
-
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            ItemEntry entry = mEntries.get(position);
-            View view = convertView;
-
-            Activity activity = AllianceDetailsActivity.this;
-
-            if (view == null) {
-                LayoutInflater inflater = (LayoutInflater) activity.getSystemService
-                        (Context.LAYOUT_INFLATER_SERVICE);
-                if (entry.empire == null) {
-                    view = new View(activity);
-                    view.setLayoutParams(new AbsListView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 10));
-                } else {
-                    view = inflater.inflate(R.layout.empire_overview_rank_row, null);
-                }
+        View.OnClickListener onClickListener = new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // TODO
             }
-            if (entry.empire == null) {
-                return view;
-            }
+        };
+
+        for (Empire empire : empires) {
+            View view = inflater.inflate(R.layout.alliance_empire_row, null);
 
             ImageView empireIcon = (ImageView) view.findViewById(R.id.empire_icon);
             TextView empireName = (TextView) view.findViewById(R.id.empire_name);
@@ -202,10 +199,10 @@ public class AllianceDetailsActivity extends BaseActivity {
             view.findViewById(R.id.rank).setVisibility(View.INVISIBLE);
 
             DecimalFormat formatter = new DecimalFormat("#,##0");
-            empireName.setText(entry.empire.getDisplayName());
-            empireIcon.setImageBitmap(entry.empire.getShield(activity));
+            empireName.setText(empire.getDisplayName());
+            empireIcon.setImageBitmap(empire.getShield(this));
 
-            EmpireRank rank = entry.empire.getRank();
+            EmpireRank rank = empire.getRank();
             if (rank != null) {
                 totalStars.setText(Html.fromHtml(String.format("Stars: <b>%s</b>",
                         formatter.format(rank.getTotalStars()))));
@@ -213,7 +210,7 @@ public class AllianceDetailsActivity extends BaseActivity {
                         formatter.format(rank.getTotalColonies()))));
 
                 MyEmpire myEmpire = EmpireManager.getInstance().getEmpire();
-                if (entry.empire.getKey().equals(myEmpire.getKey()) || rank.getTotalStars() >= 10) {
+                if (empire.getKey().equals(myEmpire.getKey()) || rank.getTotalStars() >= 10) {
                     totalShips.setText(Html.fromHtml(String.format("Ships: <b>%s</b>",
                            formatter.format(rank.getTotalShips()))));
                     totalBuildings.setText(Html.fromHtml(String.format("Buildings: <b>%s</b>",
@@ -229,15 +226,10 @@ public class AllianceDetailsActivity extends BaseActivity {
                 totalBuildings.setText("");
             }
 
-            return view;
-        }
+            // they all get the same instance...
+            view.setOnClickListener(onClickListener);
 
-        public class ItemEntry {
-            public Empire empire;
-
-            public ItemEntry(Empire empire) {
-                this.empire = empire;
-            }
+            parent.addView(view);
         }
     }
 }

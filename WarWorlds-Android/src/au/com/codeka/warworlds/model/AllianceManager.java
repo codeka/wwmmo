@@ -196,6 +196,43 @@ public class AllianceManager {
         }.execute();
     }
 
+    public void leaveAlliance(final Context context) {
+        final MyEmpire myEmpire = EmpireManager.getInstance().getEmpire();
+        if (myEmpire == null) {
+            return;
+        }
+        final Alliance myAlliance = myEmpire.getAlliance();
+        if (myAlliance == null) {
+            return;
+        }
+
+        new BackgroundRunner<Boolean>() {
+            @Override
+            protected Boolean doInBackground() {
+                String url = "alliances/"+myAlliance.getKey()+"/members";
+                try {
+                    Messages.AllianceLeaveRequest pb = Messages.AllianceLeaveRequest.newBuilder()
+                                                               .setAllianceKey(myAlliance.getKey())
+                                                               .setEmpireKey(myEmpire.getKey())
+                                                               .build();
+
+                    ApiClient.delete(url, pb);
+                    return true;
+                } catch(ApiException e) {
+                    return false;
+                }
+            }
+
+            @Override
+            protected void onComplete(Boolean success) {
+                if (success) {
+                    EmpireManager.getInstance().refreshEmpire(context);
+                    refreshAlliance(myAlliance.getKey());
+                }
+            }
+        }.execute();
+    }
+
     private void refreshAlliance(String allianceKey) {
         fetchAlliance(allianceKey, null);
     }
