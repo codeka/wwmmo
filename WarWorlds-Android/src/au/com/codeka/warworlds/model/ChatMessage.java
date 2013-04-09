@@ -19,6 +19,7 @@ public class ChatMessage {
     private String mEmpireKey;
     private Empire mEmpire;
     private DateTime mDatePosted;
+    private String mDetectedLanguage;
 
     private static DateTimeFormatter sChatDateFormat;
     private static Pattern sUrlPattern;
@@ -59,6 +60,12 @@ public class ChatMessage {
     }
     public DateTime getDatePosted() {
         return mDatePosted;
+    }
+    public String getDetectedLanguage() {
+        return mDetectedLanguage;
+    }
+    public void setDetectedLanguage(String langCode) {
+        mDetectedLanguage = langCode;
     }
 
     /**
