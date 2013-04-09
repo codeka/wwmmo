@@ -93,7 +93,7 @@ public class MiniChatView extends RelativeLayout
 
     private void appendMessage(final ChatMessage msg) {
         TextView tv = new TextView(mContext);
-        tv.setText(msg.format());
+        tv.setText(msg.format(ChatMessage.Location.PUBLIC_CHANNEL));
         tv.setTag(msg);
 
         while (mMsgsContainer.getChildCount() >= MAX_ROWS) {
@@ -124,7 +124,7 @@ public class MiniChatView extends RelativeLayout
 
             if (other.getDatePosted().equals(msg.getDatePosted()) &&
                 other.getEmpireKey().equals(msg.getEmpireKey())) {
-                tv.setText(msg.format());
+                tv.setText(msg.format(ChatMessage.Location.PUBLIC_CHANNEL));
             }
         }
     }

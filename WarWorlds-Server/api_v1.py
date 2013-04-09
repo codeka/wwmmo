@@ -197,15 +197,23 @@ class ChatPage(ApiPage):
     else:
       max_chats = 100
 
-    return chat.getLatestChats(since=since, max_chats=max_chats)
+    alliance_key = None
+    empire_pb = empire.getEmpireForUser(self.user)
+    if empire_pb:
+      alliance_key = empire_pb.alliance.key
+
+    return chat.getLatestChats(since=since, max_chats=max_chats, alliance_key=alliance_key)
 
   def post(self):
     msg_pb = self._getRequestBody(pb.ChatMessage)
     empire_pb = empire.getEmpireForUser(self.user)
     if empire_pb and not self._isAdmin():
       msg_pb.empire_key = empire_pb.key
+      if msg_pb.alliance_key != "":
+        msg_pb.alliance_key = empire_pb.alliance.key
     else:
       msg_pb.empire_key = ""
+      msg_pb.alliance_key = ""
     msg_pb.date_posted = ctrl.dateTimeToEpoch(datetime.now())
 
     chat.postMessage(self.user, msg_pb)

@@ -25,6 +25,8 @@ def postMessage(user, msg_pb):
   msg_model.message = _sanitizeMessage(msg_pb.message)
   if msg_pb.empire_key:
     msg_model.empire = db.Key(msg_pb.empire_key)
+  if msg_pb.alliance_key:
+    msg_model.alliance = db.Key(msg_pb.alliance_key)
   msg_model.put()
 
   one_day_ago = datetime.now() - timedelta(hours=24)
@@ -47,7 +49,7 @@ def postMessage(user, msg_pb):
     logging.warn("An error occurred sending notification, notification not sent")
 
 
-def getLatestChats(since=None, max_chats=None):
+def getLatestChats(since=None, max_chats=None, alliance_key=None):
   query = chat_mdl.ChatMessage.all()
   if since:
     query.filter("postedDate >", since)
@@ -58,6 +60,9 @@ def getLatestChats(since=None, max_chats=None):
   n = 0
   chat_msgs_pb = pb.ChatMessages()
   for chat_msg_mdl in query:
+    msg_alliance_key = chat_mdl.ChatMessage.alliance.get_value_for_datastore(chat_msg_mdl)
+    if msg_alliance_key and str(msg_alliance_key) != alliance_key:
+      continue
     chat_msg_pb = chat_msgs_pb.messages.add()
     ctrl.chatMessageModelToPb(chat_msg_pb, chat_msg_mdl)
     chat_msg_pb.message = _sanitizeMessage(chat_msg_pb.message)

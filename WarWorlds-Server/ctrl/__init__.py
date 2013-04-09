@@ -414,6 +414,9 @@ def chatMessageModelToPb(chat_message_pb, chat_message_mdl):
   empire_key = chat_mdl.ChatMessage.empire.get_value_for_datastore(chat_message_mdl)
   if empire_key:
     chat_message_pb.empire_key = str(empire_key)
+  alliance_key = chat_mdl.ChatMessage.alliance.get_value_for_datastore(chat_message_mdl)
+  if alliance_key:
+    chat_message_pb.alliance_key = str(alliance_key)
   chat_message_pb.date_posted = dateTimeToEpoch(chat_message_mdl.postedDate)
 
 

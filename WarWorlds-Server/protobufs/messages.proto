@@ -294,6 +294,7 @@ message ChatMessage
     required string message = 1;
     optional string empire_key = 2;
     optional int64 date_posted = 3;
+    optional string alliance_key = 4;
 }
 
 message ChatMessages

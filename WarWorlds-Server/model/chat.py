@@ -3,6 +3,7 @@
 from google.appengine.ext import db
 
 from model import empire as empire_mdl
+from model import alliance as alliance_mdl
 
 class ChatMessage(db.Model):
   """A chat message that was sent.
@@ -15,3 +16,4 @@ class ChatMessage(db.Model):
   message = db.StringProperty()
   postedDate = db.DateTimeProperty(auto_now=True)
   empire = db.ReferenceProperty(empire_mdl.Empire)
+  alliance = db.ReferenceProperty(alliance_mdl.Alliance)

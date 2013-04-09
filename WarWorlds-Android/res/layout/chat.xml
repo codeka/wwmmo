@@ -3,16 +3,16 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <ScrollView android:id="@+id/scroll_view"
+    <android.support.v4.view.ViewPager android:id="@+id/pager"
+                                       android:layout_width="match_parent"
+                                       android:layout_height="match_parent"
+                                       android:layout_alignParentTop="true"
+                                       android:layout_above="@+id/chat_text">
+        <android.support.v4.view.PagerTitleStrip
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_alignParentTop="true"
-                android:layout_above="@+id/chat_text">
-        <LinearLayout android:id="@+id/chat_output"
-                      android:layout_width="match_parent"
-                      android:layout_height="wrap_content"
-                      android:orientation="vertical" />
-    </ScrollView>
+                android:layout_gravity="top" />
+    </android.support.v4.view.ViewPager>
 
     <EditText android:id="@+id/chat_text"
               android:layout_width="match_parent"

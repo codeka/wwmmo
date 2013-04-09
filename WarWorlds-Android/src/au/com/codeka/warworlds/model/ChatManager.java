@@ -7,12 +7,7 @@ import java.util.TreeSet;
 
 import org.joda.time.DateTime;
 
-import com.cybozu.labs.langdetect.Detector;
-import com.cybozu.labs.langdetect.DetectorFactory;
-import com.cybozu.labs.langdetect.LangDetectException;
-
 import android.content.Context;
-import android.content.res.AssetManager;
 import android.os.Handler;
 import au.com.codeka.BackgroundRunner;
 import au.com.codeka.warworlds.BackgroundDetector;
@@ -99,6 +94,7 @@ public class ChatManager implements BackgroundDetector.BackgroundChangeHandler {
                 try {
                     Messages.ChatMessage pb = Messages.ChatMessage.newBuilder()
                             .setMessage(msg.getMessage())
+                            .setAllianceKey(msg.getAllianceKey() == null ? "" : msg.getAllianceKey())
                             .build();
                     ApiClient.postProtoBuf("chat", pb);
                     return true;

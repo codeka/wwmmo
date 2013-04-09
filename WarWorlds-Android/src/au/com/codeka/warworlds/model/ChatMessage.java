@@ -17,6 +17,7 @@ import au.com.codeka.warworlds.model.protobuf.Messages;
 public class ChatMessage {
     private String mMessage;
     private String mEmpireKey;
+    private String mAllianceKey;
     private Empire mEmpire;
     private DateTime mDatePosted;
     private String mDetectedLanguage;
@@ -58,8 +59,18 @@ public class ChatMessage {
             mEmpireKey = emp.getKey();
         }
     }
+    public void setAllianceChat(boolean isAllianceChat) {
+        if (isAllianceChat && mEmpire != null && mEmpire.getAlliance() != null) {
+            mAllianceKey = mEmpire.getAlliance().getKey();
+        } else {
+            mAllianceKey = null;
+        }
+    }
     public DateTime getDatePosted() {
         return mDatePosted;
+    }
+    public String getAllianceKey() {
+        return mAllianceKey;
     }
     public String getDetectedLanguage() {
         return mDetectedLanguage;
@@ -69,11 +80,46 @@ public class ChatMessage {
     }
 
     /**
+     * We format messages slightly differently depending on whether it's an
+     * alliance chat, private message, public message and where it's actually being
+     * displayed. This enum is used to describe which channel we're displaying.
+     */
+    public enum Location {
+        PUBLIC_CHANNEL(0),
+        ALLIANCE_CHANNEL(1);
+
+        private int mNumber;
+
+        Location(int number) {
+            mNumber = number;
+        }
+
+        public int getNumber() {
+            return mNumber;
+        }
+
+        public static Location fromNumber(int number) {
+            return Location.values()[number];
+        }
+    }
+
+    /**
+     * Determines whether this chat message should be visible in the given location.
+     */
+    public boolean shouldDisplay(Location location) {
+        if (location == Location.ALLIANCE_CHANNEL) {
+            return (mAllianceKey != null);
+        } else {
+            return true;
+        }
+    }
+
+    /**
      * Formats this message for display in the mini chat view and/or
      * ChatActivity. It actually returns a snippet of formatted text, hence the
      * CharSequence.
      */
-    public CharSequence format() {
+    public CharSequence format(Location location) {
         String msg = mMessage;
         msg = linkify(markdown(msg));
 
@@ -96,12 +142,28 @@ public class ChatMessage {
             msg = mDatePosted.withZone(DateTimeZone.getDefault()).toString(sChatDateFormat) + " : " + msg;
         }
 
-        if (isServer) {
-            msg = "<font color=\"#00ffff\"><b>"+msg+"</b></font>";
-        } else if (isEnemy) {
-            msg = "<font color=\"#ff9999\">"+msg+"</font>";
-        } else if (isFriendly) {
-            msg = "<font color=\"#99ff99\">"+msg+"</font>";
+        if (location == Location.PUBLIC_CHANNEL) {
+            if (isServer) {
+                msg = "<font color=\"#00ffff\"><b>"+msg+"</b></font>";
+            } else if (mAllianceKey != null) {
+                msg = "[Alliance] "+msg;
+                if (isFriendly) {
+                    msg = "<font color=\"#99ff99\">"+msg+"</font>";
+                } else {
+                    msg = "<font color=\"#9999ff\">"+msg+"</font>";
+                }
+            } else if (isEnemy) {
+                msg = "<font color=\"#ff9999\">"+msg+"</font>";
+            } else if (isFriendly) {
+                msg = "<font color=\"#99ff99\">"+msg+"</font>";
+            }
+        } else if (location == Location.ALLIANCE_CHANNEL) {
+            if (isFriendly) {
+                msg = "<font color=\"#99ff99\">"+msg+"</font>";
+            } else {
+                msg = "<font color=\"#9999ff\">"+msg+"</font>";
+            }
+        } else {
         }
 
         return Html.fromHtml(msg);
@@ -161,6 +223,9 @@ public class ChatMessage {
         chatMessage.mMessage = pb.getMessage();
         if (pb.getEmpireKey() != null && !pb.getEmpireKey().equals("")) {
             chatMessage.mEmpireKey = pb.getEmpireKey();
+        }
+        if (pb.getAllianceKey() != null && !pb.getAllianceKey().equals("")) {
+            chatMessage.mAllianceKey = pb.getAllianceKey();
         }
         chatMessage.mDatePosted = new DateTime(pb.getDatePosted() * 1000, DateTimeZone.UTC);
         return chatMessage;
