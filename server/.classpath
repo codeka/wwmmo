@@ -22,5 +22,10 @@
 	<classpathentry kind="lib" path="/home/dean/software/wwmmo/trunk/jetty/lib/jetty-xml-9.0.1.v20130408.jar"/>
 	<classpathentry kind="lib" path="/home/dean/software/wwmmo/trunk/jetty/lib/jetty-proxy-9.0.1.v20130408.jar"/>
 	<classpathentry kind="lib" path="/home/dean/software/wwmmo/trunk/jetty/lib/jetty-server-9.0.1.v20130408.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/common"/>
+	<classpathentry kind="lib" path="/common/libs/protobuf-java-2.5.0.jar"/>
+	<classpathentry kind="lib" path="/common/libs/jregex1.2_01.jar"/>
+	<classpathentry kind="lib" path="/common/libs/slf4j-api-1.7.5.jar"/>
+	<classpathentry kind="lib" path="/common/libs/slf4j-jdk14-1.7.5.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

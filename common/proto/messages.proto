@@ -27,6 +27,7 @@ message GenericError
 
     enum ErrorCode
     {
+        UnknownError = 15;
         InsufficientCash = 1;
         CannotAttackOwnColony = 2;
         CannotAttackColonyGone = 7;
