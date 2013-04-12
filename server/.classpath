@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.7"/>
+	<classpathentry kind="lib" path="/home/dean/software/wwmmo/trunk/jetty/lib/jetty-http-9.0.1.v20130408.jar"/>
+	<classpathentry kind="lib" path="/home/dean/software/wwmmo/trunk/jetty/lib/jetty-servlet-9.0.1.v20130408.jar"/>
+	<classpathentry kind="lib" path="/home/dean/software/wwmmo/trunk/jetty/lib/servlet-api-3.0.jar"/>
+	<classpathentry kind="lib" path="/home/dean/software/wwmmo/trunk/jetty/lib/jetty-annotations-9.0.1.v20130408.jar"/>
+	<classpathentry kind="lib" path="/home/dean/software/wwmmo/trunk/jetty/lib/jetty-continuation-9.0.1.v20130408.jar"/>
+	<classpathentry kind="lib" path="/home/dean/software/wwmmo/trunk/jetty/lib/jetty-security-9.0.1.v20130408.jar"/>
+	<classpathentry kind="lib" path="/home/dean/software/wwmmo/trunk/jetty/lib/jetty-servlets-9.0.1.v20130408.jar"/>
+	<classpathentry kind="lib" path="/home/dean/software/wwmmo/trunk/jetty/lib/jetty-jmx-9.0.1.v20130408.jar"/>
+	<classpathentry kind="lib" path="/home/dean/software/wwmmo/trunk/jetty/lib/jetty-rewrite-9.0.1.v20130408.jar"/>
+	<classpathentry kind="lib" path="/home/dean/software/wwmmo/trunk/jetty/lib/jetty-plus-9.0.1.v20130408.jar"/>
+	<classpathentry kind="lib" path="/home/dean/software/wwmmo/trunk/jetty/lib/jetty-client-9.0.1.v20130408.jar"/>
+	<classpathentry kind="lib" path="/home/dean/software/wwmmo/trunk/jetty/lib/jetty-jaas-9.0.1.v20130408.jar"/>
+	<classpathentry kind="lib" path="/home/dean/software/wwmmo/trunk/jetty/lib/jetty-jndi-9.0.1.v20130408.jar"/>
+	<classpathentry kind="lib" path="/home/dean/software/wwmmo/trunk/jetty/lib/jetty-webapp-9.0.1.v20130408.jar"/>
+	<classpathentry kind="lib" path="/home/dean/software/wwmmo/trunk/jetty/lib/jetty-io-9.0.1.v20130408.jar"/>
+	<classpathentry kind="lib" path="/home/dean/software/wwmmo/trunk/jetty/lib/jetty-util-9.0.1.v20130408.jar"/>
+	<classpathentry kind="lib" path="/home/dean/software/wwmmo/trunk/jetty/lib/jetty-deploy-9.0.1.v20130408.jar"/>
+	<classpathentry kind="lib" path="/home/dean/software/wwmmo/trunk/jetty/lib/jetty-xml-9.0.1.v20130408.jar"/>
+	<classpathentry kind="lib" path="/home/dean/software/wwmmo/trunk/jetty/lib/jetty-proxy-9.0.1.v20130408.jar"/>
+	<classpathentry kind="lib" path="/home/dean/software/wwmmo/trunk/jetty/lib/jetty-server-9.0.1.v20130408.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>

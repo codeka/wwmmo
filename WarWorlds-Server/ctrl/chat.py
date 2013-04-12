@@ -36,6 +36,10 @@ def postMessage(user, msg_pb):
   for online_device_mdl in model.OnlineDevice.all():
     if online_device_mdl.onlineSince >= one_day_ago:
       try:
+        device_alliance_key = str(model.OnlineDevice.alliance.get_value_for_datastore(online_device_mdl))
+        if msg_pb.alliance_key:
+          if not device_alliance_key or device_alliance_key != msg_pb.alliance_key:
+            continue
         device_mdl = online_device_mdl.device
         registration_ids.append(device_mdl.gcmRegistrationID)
       except:

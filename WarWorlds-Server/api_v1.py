@@ -559,10 +559,13 @@ class DevicesPage(ApiPage):
         device.delete()
 
       if device_online_status_pb.is_online:
+        empire_pb = empire.getEmpireForUser(self.user)
         online_device_mdl = model.OnlineDevice()
         online_device_mdl.device = db.Key(key)
         online_device_mdl.user = self.user
         online_device_mdl.onlineSince = datetime.now()
+        if empire_pb.alliance.key:
+          online_device_mdl.alliance = db.Key(empire_pb.alliance.key)
         online_device_mdl.put()
     else:
       device_registration_pb = self._getRequestBody(pb.DeviceRegistration)

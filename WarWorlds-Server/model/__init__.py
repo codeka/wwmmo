@@ -6,6 +6,7 @@ import random
 from google.appengine.ext import db
 
 from model import empire as empire_mdl
+from model import alliance as alliance_mdl
 
 
 class MessageOfTheDay(db.Model):
@@ -103,5 +104,5 @@ class OnlineDevice(db.Model):
   device = db.ReferenceProperty(DeviceRegistration)
   user = db.UserProperty()
   onlineSince = db.DateTimeProperty()
-
+  alliance = db.ReferenceProperty(alliance_mdl.Alliance)
 
