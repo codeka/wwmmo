@@ -22,6 +22,5 @@
 	<classpathentry exported="true" kind="lib" path="libs/GoogleAdMobAdsSdk-6.2.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="/common/libs/protobuf-java-2.5.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="/common/libs/jregex1.2_01.jar"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/common"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>

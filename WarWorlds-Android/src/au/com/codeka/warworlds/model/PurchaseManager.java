@@ -2,12 +2,14 @@ package au.com.codeka.warworlds.model;
 
 import java.util.ArrayList;
 
+import org.json.JSONException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import au.com.codeka.warworlds.Util;
 import au.com.codeka.warworlds.model.billing.IabException;
 import au.com.codeka.warworlds.model.billing.IabHelper;
@@ -44,7 +46,19 @@ public class PurchaseManager {
     private IabResult mSetupResult;
     private Inventory mInventory;
 
-    public void setup(Context context) {
+    public void setup(final Context context) {
+        // try to load the inventory from SharedPreferences first, so that we don't have to wait
+        // on the play store...
+        try {
+            SharedPreferences prefs = Util.getSharedPreferences(context);
+            String json = prefs.getString("au.com.codeka.warworlds.PurchaseInventory", null);
+            if (json != null) {
+                mInventory = Inventory.fromJson(json);
+            }
+        } catch (JSONException e) {
+            // ignore... for now
+        }
+
         mHelper = new IabHelper(context, sPublicKey);
         mHelper.enableDebugLogging(true, "In-AppBilling");
         mHelper.startSetup(new IabHelper.OnIabSetupFinishedListener() {
@@ -57,6 +71,14 @@ public class PurchaseManager {
                         public void onQueryInventoryFinished(IabResult result, Inventory inv) {
                             if (result.isSuccess()) {
                                 mInventory = inv;
+
+                                try {
+                                    SharedPreferences prefs = Util.getSharedPreferences(context);
+                                    prefs.edit().putString("au.com.codeka.warworlds.PurchaseInventory", inv.toJson())
+                                         .commit();
+                                } catch (JSONException e) {
+                                    // ignore... for now
+                                }
                             }
                         }
                     });
@@ -78,8 +100,8 @@ public class PurchaseManager {
     }
 
     public Inventory getInventory() throws IabException {
-        if (mSetupResult == null) {
-            return null;
+        if (mInventory != null) {
+            return mInventory;
         }
         if (!mSetupResult.isSuccess()) {
             throw new IabException(mSetupResult);

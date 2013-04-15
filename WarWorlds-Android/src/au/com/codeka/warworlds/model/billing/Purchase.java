@@ -22,15 +22,15 @@ import org.json.JSONObject;
  * Represents an in-app billing purchase.
  */
 public class Purchase {
-    String mOrderId;
-    String mPackageName;
-    String mSku;
-    long mPurchaseTime;
-    int mPurchaseState;
-    String mDeveloperPayload;
-    String mToken;
-    String mOriginalJson;
-    String mSignature;
+    private String mOriginalJson;
+    private String mOrderId;
+    private String mPackageName;
+    private String mSku;
+    private long mPurchaseTime;
+    private int mPurchaseState;
+    private String mDeveloperPayload;
+    private String mToken;
+    private String mSignature;
 
     public Purchase(String jsonPurchaseInfo, String signature) throws JSONException {
         mOriginalJson = jsonPurchaseInfo;
@@ -54,6 +54,10 @@ public class Purchase {
     public String getToken() { return mToken; }
     public String getOriginalJson() { return mOriginalJson; }
     public String getSignature() { return mSignature; }
+
+    public String toJson() {
+        return mOriginalJson;
+    }
 
     @Override
     public String toString() { return "PurchaseInfo:" + mOriginalJson; }

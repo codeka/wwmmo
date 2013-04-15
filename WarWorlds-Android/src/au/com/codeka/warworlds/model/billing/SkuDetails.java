@@ -22,16 +22,16 @@ import org.json.JSONObject;
  * Represents an in-app product's listing details.
  */
 public class SkuDetails {
-    String mSku;
-    String mType;
-    String mPrice;
-    String mTitle;
-    String mDescription;
-    String mJson;
+    private String mOriginalJson;
+    private String mSku;
+    private String mType;
+    private String mPrice;
+    private String mTitle;
+    private String mDescription;
 
     public SkuDetails(String jsonSkuDetails) throws JSONException {
-        mJson = jsonSkuDetails;
-        JSONObject o = new JSONObject(mJson);
+        mOriginalJson = jsonSkuDetails;
+        JSONObject o = new JSONObject(mOriginalJson);
         mSku = o.optString("productId");
         mType = o.optString("type");
         mPrice = o.optString("price");
@@ -45,8 +45,12 @@ public class SkuDetails {
     public String getTitle() { return mTitle; }
     public String getDescription() { return mDescription; }
 
+    public String toJson() {
+        return mOriginalJson;
+    }
+
     @Override
     public String toString() {
-        return "SkuDetails:" + mJson;
+        return "SkuDetails:" + mOriginalJson;
     }
 }
