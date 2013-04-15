@@ -6,6 +6,8 @@
   <taskdef resource="net/sf/antcontrib/antcontrib.properties"/>
 
   <target name="-pre-build">
+    <ant antfile="build_dependencies.xml" target="build_dependencies" />
+
     <exec executable="svnversion" outputproperty="svnversion"/>
     <propertyregex property="svnversion"
                    input="${svnversion}"

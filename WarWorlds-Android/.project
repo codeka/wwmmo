@@ -2,6 +2,8 @@
 <projectDescription>
 	<name>WarWorlds-Android</name>
 	<comment></comment>
+	<projects>
+	</projects>
 	<buildSpec>
 		<buildCommand>
 			<name>com.android.ide.eclipse.adt.ResourceManagerBuilder</name>
@@ -21,6 +23,16 @@
 		<buildCommand>
 			<name>com.android.ide.eclipse.adt.ApkBuilder</name>
 			<arguments>
+			</arguments>
+		</buildCommand>
+		<buildCommand>
+			<name>org.eclipse.ui.externaltools.ExternalToolBuilder</name>
+			<triggers>full,incremental,</triggers>
+			<arguments>
+				<dictionary>
+					<key>LaunchConfigHandle</key>
+					<value>&lt;project&gt;/.externalToolBuilders/WarWorlds-Android build_dependencies.xml [Builder].launch</value>
+				</dictionary>
 			</arguments>
 		</buildCommand>
 	</buildSpec>
