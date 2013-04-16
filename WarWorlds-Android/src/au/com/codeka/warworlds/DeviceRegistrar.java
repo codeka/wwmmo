@@ -19,7 +19,7 @@ import au.com.codeka.warworlds.model.protobuf.Messages;
 public class DeviceRegistrar {
     private static Logger log = LoggerFactory.getLogger(DeviceRegistrar.class);
 
-    public static void register(final Context context) {
+    public static String register(final Context context) {
         final SharedPreferences settings = Util.getSharedPreferences(context);
 
         String registrationKey = null;
@@ -40,12 +40,14 @@ public class DeviceRegistrar {
         } catch(Exception ex) {
             log.error("Failure registring device.", ex);
             forgetDeviceRegistration(context);
-            return;
+            return null;
         }
 
         SharedPreferences.Editor editor = settings.edit();
         editor.putString("DeviceRegistrar.registrationKey", registrationKey);
         editor.commit();
+
+        return registrationKey;
     }
 
     public static void updateGcmRegistration(final Context context,

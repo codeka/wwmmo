@@ -7,7 +7,6 @@ import android.support.v4.app.FragmentTransaction;
 import android.view.View;
 import android.view.Window;
 import android.widget.TabHost;
-import au.com.codeka.warworlds.TabFragmentFragment.TabInfo;
 
 /**
  * This is our base \c FragmentActivity class for a tabbed activity. We'll define the code

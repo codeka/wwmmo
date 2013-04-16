@@ -73,6 +73,9 @@
         <activity android:name=".EmpireSetupActivity"
                   android:screenOrientation="portrait" />
 
+        <activity android:name=".RealmSelectActivity"
+                  android:screenOrientation="portrait" />
+        
         <activity android:name=".EmpireResetActivity"
                   android:screenOrientation="portrait" />
 

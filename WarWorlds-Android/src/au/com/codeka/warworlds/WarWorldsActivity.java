@@ -21,6 +21,7 @@ import android.widget.Button;
 import android.widget.TextView;
 import au.com.codeka.warworlds.ctrl.TransparentWebView;
 import au.com.codeka.warworlds.game.starfield.StarfieldActivity;
+import au.com.codeka.warworlds.model.RealmManager;
 
 /**
  * Main activity. Displays the message of the day and lets you select "Start Game", "Options", etc.
@@ -32,6 +33,7 @@ public class WarWorldsActivity extends BaseActivity {
     private TextView mConnectionStatus;
     private String mStarKey;
     private HelloWatcher mHelloWatcher;
+    private TextView mRealmName;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -40,18 +42,21 @@ public class WarWorldsActivity extends BaseActivity {
         requestWindowFeature(Window.FEATURE_NO_TITLE); // remove the title bar
 
         setContentView(R.layout.home);
+        Util.setup(mContext);
 
         View rootView = findViewById(android.R.id.content);
         ActivityBackgroundGenerator.setBackground(rootView);
 
         mStartGameButton = (Button) findViewById(R.id.start_game_btn);
         mConnectionStatus = (TextView) findViewById(R.id.connection_status);
-        final Button logOutButton = (Button) findViewById(R.id.log_out_btn);
+        mRealmName = (TextView) findViewById(R.id.realm_name);
+        final Button realmSelectButton = (Button) findViewById(R.id.realm_select_btn);
         final Button optionsButton = (Button) findViewById(R.id.options_btn);
 
-        logOutButton.setOnClickListener(new OnClickListener() {
+        realmSelectButton.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
-                startActivity(new Intent(mContext, AccountsActivity.class));
+                RealmManager.i.selectRealm(mContext, null);
+                startActivity(new Intent(mContext, RealmSelectActivity.class));
             }
         });
 
@@ -90,8 +95,15 @@ public class WarWorldsActivity extends BaseActivity {
             return;
         }
 
+        if (RealmManager.i.getRealm() == null) {
+            log.info("Not realm selected, switching to RealmSelectActivity");
+            startActivity(new Intent(this, RealmSelectActivity.class));
+            return;
+        }
+
         mStartGameButton.setEnabled(false);
         mConnectionStatus.setText("Connecting...");
+        mRealmName.setText(String.format(Locale.ENGLISH, "Realm: %s", RealmManager.i.getRealm().getDisplayName()));
 
         mHelloWatcher = new HelloWatcher();
         ServerGreeter.addHelloWatcher(mHelloWatcher);

@@ -20,6 +20,8 @@ import au.com.codeka.warworlds.api.ApiClient;
 import au.com.codeka.warworlds.api.AppEngineAuthenticator;
 import au.com.codeka.warworlds.api.RequestManager;
 import au.com.codeka.warworlds.api.RequestRetryException;
+import au.com.codeka.warworlds.model.Realm;
+import au.com.codeka.warworlds.model.RealmManager;
 
 /**
  * This class works in concert with \c ApiAuthenticator to authenticate the current
@@ -106,18 +108,23 @@ public class Authenticator {
      * @return The authCookie we can use in subsequent calls to App Engine.
      */
     public static String authenticate(Activity activity, String accountName) {
-        log.info("(re-)authenticating \""+accountName+"\"...");
+        Realm realm = RealmManager.i.getRealm();
+        log.info("(re-)authenticating \""+accountName+"\" to realm "+realm.getDisplayName()+"...");
+
 
         Account[] accts = sAccountManager.getAccountsByType("com.google");
         for (Account acct : accts) {
             final Account account = acct;
             if (account.name.equals(accountName)) {
-                if (Util.isLocalDevServer()) {
+                if (realm.getAuthentciationMethod() == Realm.AuthenticationMethod.Default) {
+                    // TODO: not implemented yet
+                    return "";
+                } else if (realm.getAuthentciationMethod() == Realm.AuthenticationMethod.LocalAppEngine) {
                     log.info("Account found, setting up with debug auth cookie.");
                     // Use a fake cookie for the dev mode app engine server. The cookie has the
                     // form email:isAdmin:userId (we set the userId to be the same as the email)
                     return "dev_appserver_login="+accountName+":false:"+accountName;
-                } else {
+                } else if (realm.getAuthentciationMethod() == Realm.AuthenticationMethod.AppEngine) {
                     log.info("Account found, fetching authentication token...");
 
                     // Get the auth token from the AccountManager and convert it into a cookie 

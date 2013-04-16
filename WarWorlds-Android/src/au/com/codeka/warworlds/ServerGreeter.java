@@ -136,17 +136,17 @@ public class ServerGreeter {
                 ApiClient.getCookies().add(authCookie);
                 log.debug("Got auth cookie: "+authCookie);
 
+                // Schedule registration with GCM, which will update our device
+                // when we get the registration ID
+                GCMIntentService.register(activity);
+                String deviceRegistrationKey = DeviceRegistrar.getDeviceRegistrationKey(activity);
+                if (deviceRegistrationKey == null || deviceRegistrationKey.length() == 0) {
+                    deviceRegistrationKey = DeviceRegistrar.register(activity);
+                }
+
                 // say hello to the server
                 String message;
                 try {
-                    String deviceRegistrationKey = DeviceRegistrar.getDeviceRegistrationKey(activity);
-                    if (deviceRegistrationKey.length() == 0) {
-                        mNeedsReAuthenticate = true;
-                        mErrorOccured = true;
-                        message = "<p>Re-authentication needed...</p>";
-                        return message;
-                    }
-
                     int memoryClass = ((ActivityManager) activity.getSystemService(Activity.ACTIVITY_SERVICE)).getMemoryClass();
                     Messages.HelloRequest req = Messages.HelloRequest.newBuilder()
                             .setDeviceBuild(android.os.Build.DISPLAY)

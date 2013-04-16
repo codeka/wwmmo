@@ -65,4 +65,16 @@ public class ApiException extends Exception {
     public String getServerErrorMessage() {
         return mServerErrorMessage;
     }
+
+    @Override
+    public String toString() {
+        String str = "";
+        if (mHttpStatusLine != null) {
+            str += mHttpStatusLine.toString() + "\r\n";
+        }
+        if (mServerErrorMessage != null) {
+            str += "Server Error: " + mServerErrorMessage + "\r\n";
+        }
+        return str + super.toString();
+    }
 }

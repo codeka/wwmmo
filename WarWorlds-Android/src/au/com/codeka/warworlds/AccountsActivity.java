@@ -3,14 +3,12 @@ package au.com.codeka.warworlds;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.Callable;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -24,8 +22,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
-import au.com.codeka.BackgroundRunner;
-import au.com.codeka.warworlds.api.ApiClient;
+import au.com.codeka.warworlds.model.RealmManager;
 
 /**
  * Account selections activity - handles device registration and unregistration.
@@ -34,14 +31,12 @@ public class AccountsActivity extends BaseActivity {
     final Logger log = LoggerFactory.getLogger(AccountsActivity.class);
     private int mAccountSelectedPosition = 0;
     private Context mContext = this;
-    private ProgressDialog mPleaseWaitDialog;
     private boolean mIsLogIn;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        requestWindowFeature(Window.FEATURE_NO_TITLE); // remove the title bar
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
 
         View rootView = findViewById(android.R.id.content);
         ActivityBackgroundGenerator.setBackground(rootView);
@@ -63,20 +58,11 @@ public class AccountsActivity extends BaseActivity {
                     TextView account = (TextView) listView.getChildAt(mAccountSelectedPosition);
 
                     // Register
-                    register((String) account.getText(), new Callable<Void>() {
-                        public Void call() {
-                            log.debug("Authentication complete.");
+                    register((String) account.getText());
+                    ServerGreeter.clearHello();
+                    RealmManager.i.selectRealm(mContext, null);
 
-                            if (mPleaseWaitDialog != null) {
-                                mPleaseWaitDialog.dismiss();
-                            }
-
-                            ServerGreeter.clearHello();
-
-                            finish();
-                            return null;
-                        }
-                    });
+                    finish();
                 }
             });
         } else {
@@ -164,44 +150,12 @@ public class AccountsActivity extends BaseActivity {
      * 
      * @param accountName a String containing a Google account name
      */
-    private void register(final String accountName, final Callable<Void> onComplete) {
+    private void register(final String accountName) {
         // Store the account name in shared preferences
         final SharedPreferences prefs = Util.getSharedPreferences(mContext);
         SharedPreferences.Editor editor = prefs.edit();
         editor.putString("AccountName", accountName);
         editor.commit();
-
-        log.info("Registering \"{}\"...", accountName);
-        mPleaseWaitDialog = ProgressDialog.show(mContext, null, "Logging in...", true);
-
-        // Obtain an auth token and register, on a background thread
-        new BackgroundRunner<Void>() {
-            @Override
-            protected Void doInBackground() {
-                String authCookie = Authenticator.authenticate(AccountsActivity.this, accountName);
-                ApiClient.getCookies().clear();
-                ApiClient.getCookies().add(authCookie);
-
-                // Schedule registration with GCM, which will update our device
-                // when we get the registration ID
-                GCMIntentService.register(AccountsActivity.this);
-
-                // re-configure the authenticator, making sure it has details of the new user.
-                Authenticator.configure(mContext);
-
-                // register the fact that this device exists on the server
-                DeviceRegistrar.register(mContext);
-                return null;
-            }
-
-            @Override
-            protected void onComplete(Void param) {
-                try {
-                    onComplete.call();
-                } catch (Exception e) {
-                }
-            }
-        }.execute();
     }
 
     private void unregister() {

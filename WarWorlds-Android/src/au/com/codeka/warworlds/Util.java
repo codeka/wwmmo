@@ -3,12 +3,7 @@ package au.com.codeka.warworlds;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.Properties;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -16,6 +11,7 @@ import android.content.res.AssetManager;
 import au.com.codeka.warworlds.api.ApiClient;
 import au.com.codeka.warworlds.model.BuildingDesignManager;
 import au.com.codeka.warworlds.model.PurchaseManager;
+import au.com.codeka.warworlds.model.RealmManager;
 import au.com.codeka.warworlds.model.ShipDesignManager;
 import au.com.codeka.warworlds.model.SpriteManager;
 
@@ -24,8 +20,6 @@ import au.com.codeka.warworlds.model.SpriteManager;
  * retrieving shared preferences.
  */
 public class Util {
-    private static Logger log = LoggerFactory.getLogger(Util.class);
-
     /**
      * Key for shared preferences.
      */
@@ -48,6 +42,7 @@ public class Util {
         BuildingDesignManager.getInstance().setup(context);
         ShipDesignManager.getInstance().setup(context);
         PurchaseManager.getInstance().setup(context);
+        RealmManager.i.setup(context);
 
         sWasSetup = true;
         return true;
@@ -87,15 +82,6 @@ public class Util {
             }
         }
 
-        try {
-            URI uri = new URI(getBaseUrl());
-            if (ApiClient.getBaseUri() == null || !ApiClient.getBaseUri().equals(uri)) {
-                ApiClient.configure(uri);
-            }
-        } catch(URISyntaxException e) {
-            // !!!
-        }
-
         String impersonateUser = sProperties.getProperty("user.on_behalf_of", null);
         if (impersonateUser != null) {
             ApiClient.impersonate(impersonateUser);
@@ -113,54 +99,17 @@ public class Util {
     }
 
     /**
-     * Returns the (debug or production) URL associated with the registration
-     * service.
-     */
-    public static String getBaseUrl() {
-        final String serverDefault = sProperties.getProperty("server.default");
-        final String url = sProperties.getProperty("server."+serverDefault);
-        return url;
-    }
-
-    /**
      * Returns true if we are running against a dev mode appengine instance.
      */
     public static boolean isDebug() {
         final String debugValue = sProperties.getProperty("debug");
-        if (debugValue.equals("auto")) {
-            return isLocalDevServer();
-        } else {
-            return debugValue.equals("true");
-        }
-    }
-
-    public static boolean isLocalDevServer() {
-        final String serverDefault = sProperties.getProperty("server.default");
-        return (serverDefault.equals("debug") || serverDefault.equals("emulator"));
+        return debugValue.equals("true");
     }
 
     /**
      * Helper method to get a SharedPreferences instance.
      */
     public static SharedPreferences getSharedPreferences(Context context) {
-        SharedPreferences prefs = context.getSharedPreferences(SHARED_PREFS, 0);
-
-        String savedBaseUrl = prefs.getString("Util.baseUrl", "");
-        String baseUrl = getBaseUrl();
-        if (!savedBaseUrl.equalsIgnoreCase(baseUrl)) {
-            // if the base URL has changed, it means we're now talking to a
-            // different instance of the app (debug vs. release probably). We'll need
-            // to clear out some preferences first.
-            log.warn("BaseURL has changed (\""+baseUrl+"\" != \""+savedBaseUrl+"\"), clearing device registration");
-
-            prefs = context.getSharedPreferences(SHARED_PREFS, 0);
-            SharedPreferences.Editor editor = prefs.edit();
-            editor.remove("DeviceRegistrar.registrationKey");
-            editor.remove("AccountName");
-            editor.putString("Util.baseUrl", baseUrl);
-            editor.commit();
-        }
-
-        return prefs;
+        return context.getSharedPreferences(SHARED_PREFS, 0);
     }
 }

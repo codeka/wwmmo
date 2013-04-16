@@ -25,25 +25,19 @@
     <if>
       <condition><equals arg1="${build.target}" arg2="release" /></condition>
       <then>
-        <!-- make sure we set server.default to "prod" in release mode -->
+        <!-- make sure on_behalf_of is commented out -->
         <replaceregexp file="assets/warworlds.properties"
-                       match="^server.default=.*$"
+                       match="^#?user.on_behalf_of=.*$"
                        flags="gm"
-                       replace="server.default=prod" />
+                       replace="#user.on_behalf_of=nobody" />
 
-	<!-- make sure on_behalf_of is commented out -->
-	<replaceregexp file="assets/warworlds.properties"
-	               match="^#?user.on_behalf_of=.*$"
-	               flags="gm"
-	               replace="#user.on_behalf_of=nobody" />
+        <!-- make sure debug is set to 'false' -->
+        <replaceregexp file="assets/warworlds.properties"
+                       match="^debug=.*$"
+                       flags="gm"
+                       replace="debug=false" />
 
-    <!-- make sure debug is set to 'auto' -->
-    <replaceregexp file="assets/warworlds.properties"
-                   match="^debug=.*$"
-                   flags="gm"
-                   replace="debug=auto" />
-
-	<!-- update the version number -->
+        <!-- update the version number -->
         <replaceregexp file="AndroidManifest.xml"
                        match="android:versionCode=&quot;(.*)&quot;"
                        flags="g"
@@ -57,12 +51,10 @@
   </target>
 
   <target name="-post-build">
-    <!-- Put the server.default back to "debug" (technically, it might've been "emulator"
-         as well, but this is easier than explicitly remembering... -->
+    <!-- put debug back to 'true' -->
     <replaceregexp file="assets/warworlds.properties"
-                   match="^server.default=.*$"
+                   match="^debug=.*$"
                    flags="gm"
-                   replace="server.default=debug" />
+                   replace="debug=true" />
   </target>
-
 </project>

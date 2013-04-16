@@ -22,6 +22,15 @@
         android:text="War Worlds"
         style="@style/TitleText" />
 
+    <TextView
+        android:id="@+id/realm_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/title"
+        android:layout_toRightOf="@+id/title_icon"
+        android:text="Realm: Alpha"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+
     <LinearLayout
         android:id="@+id/button_wrapper"
         android:layout_width="match_parent"
@@ -42,14 +51,14 @@
             android:text="@string/options" />
 
         <Button
-            android:id="@+id/log_out_btn"
+            android:id="@+id/realm_select_btn"
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="wrap_content"
             android:layout_marginTop="5dp"
             android:layout_marginBottom="5dp"
             android:layout_marginLeft="5dp"
-            android:text="@string/log_out" />
+            android:text="Switch Realm" />
     </LinearLayout>
 
     <Button
@@ -75,7 +84,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_above="@id/connection_status"
-        android:layout_below="@id/title"
+        android:layout_below="@id/realm_name"
         android:layout_marginLeft="@dimen/tablet_margin"
         android:layout_marginRight="@dimen/tablet_margin" />
 
