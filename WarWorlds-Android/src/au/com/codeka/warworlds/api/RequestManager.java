@@ -133,7 +133,7 @@ public class RequestManager {
                     requestUrl += "on_behalf_of="+sImpersonateUser;
                 }
                 if (sVerboseLog) {
-                    log.debug("requestUrl = "+requestUrl);
+                    log.debug(String.format("> %s %s", method, requestUrl));
                 }
 
                 BasicHttpRequest request;
@@ -152,9 +152,6 @@ public class RequestManager {
                         (uri.getScheme().equals("https") && uri.getPort() != 443))) {
                     host += ":"+uri.getPort();
                 }
-                if (sVerboseLog) {
-                    log.debug("Adding host header: "+host);
-                }
                 request.addHeader("Host", host);
 
                 if (extraHeaders != null) {
@@ -172,7 +169,9 @@ public class RequestManager {
                 }
 
                 BasicHttpResponse response = conn.sendRequest(request, body);
-
+                if (sVerboseLog) {
+                    log.debug(String.format("< %s", response.getStatusLine()));
+                }
                 fireResponseReceivedHandlers(request, response);
 
                 return new ResultWrapper(conn, response);

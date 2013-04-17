@@ -94,7 +94,7 @@ public class BackgroundDetector {
         new BackgroundRunner<Void>() {
             @Override
             protected Void doInBackground() {
-                String url = "/api/v1/devices/"+deviceRegistrationKey+"?online_status=1";
+                String url = "devices/"+deviceRegistrationKey+"?online_status=1";
                 try {
                     ApiClient.putProtoBuf(url, dos_pb);
                 } catch (ApiException e) {

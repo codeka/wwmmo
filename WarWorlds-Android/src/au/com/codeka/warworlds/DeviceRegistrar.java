@@ -61,7 +61,7 @@ public class DeviceRegistrar {
                         .setKey(deviceRegistrationKey)
                         .build();
 
-                String url = "/api/v1/devices/"+deviceRegistrationKey;
+                String url = "devices/"+deviceRegistrationKey;
                 try {
                     ApiClient.putProtoBuf(url, regpb);
                 } catch (ApiException e) {

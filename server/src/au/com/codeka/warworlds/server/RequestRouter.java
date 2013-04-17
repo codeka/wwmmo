@@ -22,8 +22,9 @@ public class RequestRouter extends AbstractHandler {
     {
         sRoutes = new ArrayList<Route>();
         sRoutes.add(new Route("^/login", LoginHandler.class));
-        sRoutes.add(new Route("^/realms/([^/]+)/devices", DevicesHandler.class));
-        sRoutes.add(new Route("^/realms/([^/]+)/hello", HelloHandler.class));
+        sRoutes.add(new Route("^/realms/({realm}[^/]+)/devices/({id}[^/]+)", DevicesHandler.class));
+        sRoutes.add(new Route("^/realms/({realm}[^/]+)/devices", DevicesHandler.class));
+        sRoutes.add(new Route("^/realms/({realm}[^/]+)/hello", HelloHandler.class));
     }
 
     @Override
@@ -32,7 +33,7 @@ public class RequestRouter extends AbstractHandler {
         for (Route route : sRoutes) {
             Matcher matcher = route.pattern.matcher(target);
             if (matcher.find()) {
-                handle(route, request, response);
+                handle(matcher, route, request, response);
                 baseRequest.setHandled(true);
                 return;
             }
@@ -41,7 +42,7 @@ public class RequestRouter extends AbstractHandler {
         response.setStatus(404);
     }
 
-    private void handle(Route route, HttpServletRequest request,
+    private void handle(Matcher matcher, Route route, HttpServletRequest request,
                         HttpServletResponse response) {
         RequestHandler handler;
         try {
@@ -50,7 +51,7 @@ public class RequestRouter extends AbstractHandler {
             return; // TODO: error
         }
 
-        handler.handle(request, response);
+        handler.handle(matcher, request, response);
     }
 
     private static class Route {

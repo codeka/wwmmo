@@ -190,9 +190,9 @@ public class SitrepActivity extends BaseActivity {
         new BackgroundRunner<List<SituationReport>>() {
             @Override
             protected List<SituationReport> doInBackground() {
-                String url = "/api/v1/sit-reports";
+                String url = "sit-reports";
                 if (mStarKey != null) {
-                    url = String.format("/api/v1/stars/%s/sit-reports", mStarKey);
+                    url = String.format("stars/%s/sit-reports", mStarKey);
                 }
                 if (cursor != null) {
                     url += "?cursor="+cursor;

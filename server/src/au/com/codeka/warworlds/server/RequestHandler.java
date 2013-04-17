@@ -10,6 +10,8 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import jregex.Matcher;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,12 +29,24 @@ public class RequestHandler {
     private final Logger log = LoggerFactory.getLogger(RequestHandler.class);
     private HttpServletRequest mRequest;
     private HttpServletResponse mResponse;
+    private Matcher mRouteMatcher;
     private String mCurrentUser;
 
-    public void handle(HttpServletRequest request,
+    protected String getUrlParameter(String name) {
+        StringBuffer sb = new StringBuffer();
+        mRouteMatcher.getGroup(name, sb);
+        return sb.toString();
+    }
+
+    protected String getRealm() {
+        return getUrlParameter("realm");
+    }
+
+    public void handle(Matcher matcher, HttpServletRequest request,
                        HttpServletResponse response) {
         mRequest = request;
         mResponse = response;
+        mRouteMatcher = matcher;
 
         Message pb = null;
         try {

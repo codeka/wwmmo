@@ -5,15 +5,22 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.sql.Types;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.TimeZone;
 
 import org.joda.time.DateTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import au.com.codeka.warworlds.server.RequestHandler;
 
 /**
  * This is a wrapper around a \c PreparedStatement, for ease-of-use.
  */
 public class SqlStmt implements AutoCloseable {
+    private final Logger log = LoggerFactory.getLogger(SqlStmt.class);
     private static Calendar sUTC;
 
     static {
@@ -22,26 +29,55 @@ public class SqlStmt implements AutoCloseable {
 
     private Connection mConn;
     private PreparedStatement mStmt;
+    private String mSql;
+    private ArrayList<Object> mParameters;
 
-    public SqlStmt(Connection conn, PreparedStatement stmt) {
+    public SqlStmt(Connection conn, String sql, PreparedStatement stmt) {
         mConn = conn;
         mStmt = stmt;
+        mSql = sql;
+        mParameters = new ArrayList<Object>();
     }
 
     public void setInt(int position, int value) throws SQLException {
         mStmt.setInt(position, value);
+        saveParameter(position, value);
     }
     public void setString(int position, String value) throws SQLException {
         mStmt.setString(position, value);
+        saveParameter(position, value);
     }
     public void setDateTime(int position, DateTime value) throws SQLException {
         mStmt.setTimestamp(position, new Timestamp(value.getMillis()), sUTC);
+        saveParameter(position, value);
+    }
+    public void setNull(int position) throws SQLException {
+        mStmt.setNull(position, Types.NULL);
+        saveParameter(position, "<NULL>");
+    }
+
+    private void saveParameter(int position, Object value) {
+        int index = position - 1;
+        while (mParameters.size() < position) {
+            mParameters.add(null);
+        }
+        mParameters.set(index, value);
     }
 
     /**
      * Execute an 'update' query. That is, anything but "SELECT".
      */
     public int update() throws SQLException {
+        if (log.isInfoEnabled()) {
+            StringBuffer sb = new StringBuffer();
+            sb.append(mSql);
+            sb.append(System.lineSeparator());
+            for (Object obj : mParameters) {
+                sb.append(String.format("? = %s", obj));
+                sb.append(System.lineSeparator());
+            }
+            log.info(sb.toString());
+        }
         return mStmt.executeUpdate();
     }
 

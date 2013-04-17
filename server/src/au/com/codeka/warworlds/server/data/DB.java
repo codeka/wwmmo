@@ -26,11 +26,11 @@ public class DB {
 
     public static SqlStmt prepare(String sql) throws SQLException {
         Connection conn = DriverManager.getConnection(sConnUrl, sConnUser, sConnPass);
-        return new SqlStmt(conn, conn.prepareStatement(sql));
+        return new SqlStmt(conn, sql, conn.prepareStatement(sql));
     }
 
     public static SqlStmt prepare(String sql, int autoGenerateKeys) throws SQLException {
         Connection conn = DriverManager.getConnection(sConnUrl, sConnUser, sConnPass);
-        return new SqlStmt(conn, conn.prepareStatement(sql, autoGenerateKeys));
+        return new SqlStmt(conn, sql, conn.prepareStatement(sql, autoGenerateKeys));
     }
 }
