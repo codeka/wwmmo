@@ -44,15 +44,16 @@ public class RequestHandler {
                 throw new RequestException(501);
             }
         } catch(RequestException e) {
+            log.error("Unhandled error!", e);
             e.populate(mResponse);
             setResponseBody(e.getGenericError());
             return;
         } catch(Exception e) {
+            log.error("Unhandled error!", e);
             mResponse.setStatus(500);
             return;
         }
 
-        log.info("Here we go!");
         mResponse.setStatus(200);
         setResponseBody(pb);
     }
@@ -112,6 +113,13 @@ public class RequestHandler {
             mResponse.getWriter().write(PbFormatter.toJson(pb));
         } catch (IOException e) {
         }
+    }
+
+    protected HttpServletRequest getRequest() {
+        return mRequest;
+    }
+    protected HttpServletResponse getResponse() {
+        return mResponse;
     }
 
     @SuppressWarnings({"unchecked"})

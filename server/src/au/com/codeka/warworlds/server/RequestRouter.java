@@ -24,6 +24,7 @@ public class RequestRouter extends AbstractHandler {
 
     {
         sRoutes = new ArrayList<Route>();
+        sRoutes.add(new Route("^/login", LoginHandler.class));
         sRoutes.add(new Route("^/realms/([^/]+)/hello", HelloHandler.class));
     }
 

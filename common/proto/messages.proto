@@ -2,8 +2,8 @@
 // Copyright (c) 2012, Dean Harding (dean@codeka.com.au)
 //
 
-// TODO: separate these into separate packages?
 package au.com.codeka.warworlds.model.protobuf;
+
 
 //
 // This is used when you first connect, we display some news, important announcements,

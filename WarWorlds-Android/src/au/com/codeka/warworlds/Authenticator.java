@@ -18,6 +18,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import au.com.codeka.warworlds.api.ApiClient;
 import au.com.codeka.warworlds.api.AppEngineAuthenticator;
+import au.com.codeka.warworlds.api.DefaultAuthenticator;
 import au.com.codeka.warworlds.api.RequestManager;
 import au.com.codeka.warworlds.api.RequestRetryException;
 import au.com.codeka.warworlds.model.Realm;
@@ -117,27 +118,37 @@ public class Authenticator {
             final Account account = acct;
             if (account.name.equals(accountName)) {
                 if (realm.getAuthentciationMethod() == Realm.AuthenticationMethod.Default) {
-                    // TODO: not implemented yet
-                    return "";
+                    log.info("Account found, fetching authentication token (authmethod = default)");
+
+                    final String scope = "oauth2:https://www.googleapis.com/auth/userinfo.email";
+                    String authToken = getAuthToken(account, activity, scope);
+                    String authCookie = DefaultAuthenticator.authenticate(authToken);
+                    if (authCookie == null) {
+                        sAccountManager.invalidateAuthToken(account.type, authToken);
+                        authToken = getAuthToken(account, activity, scope);
+                        authCookie = DefaultAuthenticator.authenticate(authToken);
+                    }
+
+                    return authCookie;
                 } else if (realm.getAuthentciationMethod() == Realm.AuthenticationMethod.LocalAppEngine) {
                     log.info("Account found, setting up with debug auth cookie.");
                     // Use a fake cookie for the dev mode app engine server. The cookie has the
                     // form email:isAdmin:userId (we set the userId to be the same as the email)
                     return "dev_appserver_login="+accountName+":false:"+accountName;
                 } else if (realm.getAuthentciationMethod() == Realm.AuthenticationMethod.AppEngine) {
-                    log.info("Account found, fetching authentication token...");
+                    log.info("Account found, fetching authentication token (authmethod = AppEngine)");
 
                     // Get the auth token from the AccountManager and convert it into a cookie 
                     // that's usable by App Engine
-                    String authToken = getAuthToken(account, activity);
+                    String authToken = getAuthToken(account, activity, "ah");
+                    String authCookie = AppEngineAuthenticator.authenticate(authToken);
+                    if (authCookie == null) {
+                        sAccountManager.invalidateAuthToken(account.type, authToken);
+                        authToken = getAuthToken(account, activity, "ah");
+                        authCookie = AppEngineAuthenticator.authenticate(authToken);
+                    }
 
-                    // Ensure the token is not expired by invalidating
-                    // it and obtaining a new one
-                    sAccountManager.invalidateAuthToken(account.type, authToken);
-                    authToken = getAuthToken(account, activity);
-
-                    // Convert the token into a cookie for future use
-                    return AppEngineAuthenticator.authenticate(authToken);
+                    return authCookie;
                 }
             }
         }
@@ -145,10 +156,10 @@ public class Authenticator {
         return null; // no account found!
     }
 
-    private static String getAuthToken(Account account, Activity activity) {
+    private static String getAuthToken(Account account, Activity activity, String scope) {
         if (activity != null) {
             AccountManagerFuture<Bundle>future = sAccountManager.getAuthToken(
-                    account, "ah", null, activity, null, null);
+                    account, scope, null, activity, null, null);
             return getAuthToken(future);
         } else {
             return getAuthTokenNoActivity(account);
