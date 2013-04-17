@@ -6,6 +6,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 import javax.servlet.ServletInputStream;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -13,6 +14,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import au.com.codeka.common.protoformat.PbFormatter;
+import au.com.codeka.warworlds.server.data.DB;
+import au.com.codeka.warworlds.server.data.SqlStmt;
 
 import com.google.protobuf.Message;
 
@@ -24,6 +27,7 @@ public class RequestHandler {
     private final Logger log = LoggerFactory.getLogger(RequestHandler.class);
     private HttpServletRequest mRequest;
     private HttpServletResponse mResponse;
+    private String mCurrentUser;
 
     public void handle(HttpServletRequest request,
                        HttpServletResponse response) {
@@ -120,6 +124,30 @@ public class RequestHandler {
     }
     protected HttpServletResponse getResponse() {
         return mResponse;
+    }
+
+    protected String getCurrentUser() throws RequestException {
+        if (mCurrentUser == null) {
+            for (Cookie cookie : mRequest.getCookies()) {
+                if (cookie.getName().equals("SESSION")) {
+                    String cookieValue = cookie.getValue();
+
+                    // TODO: cache these!
+                    try (SqlStmt sql = DB.prepare("SELECT user_email FROM sessions WHERE session_cookie=?")) {
+                        sql.setString(1, cookieValue);
+                        mCurrentUser = sql.selectFirstValue(String.class);
+                    } catch (Exception e) {
+                        throw new RequestException(500, e);
+                    }
+                }
+            }
+
+            if (mCurrentUser == null) {
+                throw new RequestException(403);
+            }
+        }
+
+        return mCurrentUser;
     }
 
     @SuppressWarnings({"unchecked"})

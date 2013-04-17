@@ -12,19 +12,17 @@ import jregex.Pattern;
 
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.handler.AbstractHandler;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import au.com.codeka.warworlds.server.handlers.*;
 
 
 public class RequestRouter extends AbstractHandler {
-    private final Logger log = LoggerFactory.getLogger(RequestRouter.class);
     private static ArrayList<Route> sRoutes;
 
     {
         sRoutes = new ArrayList<Route>();
         sRoutes.add(new Route("^/login", LoginHandler.class));
+        sRoutes.add(new Route("^/realms/([^/]+)/devices", DevicesHandler.class));
         sRoutes.add(new Route("^/realms/([^/]+)/hello", HelloHandler.class));
     }
 

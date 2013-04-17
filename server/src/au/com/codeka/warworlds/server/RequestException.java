@@ -20,6 +20,7 @@ public class RequestException extends Exception {
 
     public RequestException(int httpErrorCode, Throwable innerException) {
         super(String.format("HTTP Error: %d", httpErrorCode), innerException);
+        mHttpErrorCode = httpErrorCode;
     }
 
     public RequestException(int httpErrorCode, Messages.GenericError.ErrorCode errorCode, String errorMsg) {

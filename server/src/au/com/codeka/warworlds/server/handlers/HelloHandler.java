@@ -14,7 +14,8 @@ public class HelloHandler extends RequestHandler {
 
         return Messages.HelloResponse.newBuilder()
                 .setMotd(Messages.MessageOfTheDay.newBuilder()
-                                 .setMessage("<p>Welcome to the new client!!</p>"))
+                                 .setMessage("<p>Welcome to the new client!!</p>")
+                                 .setLastUpdate("stuff"))
                 .build();
     }
 

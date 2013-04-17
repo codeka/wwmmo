@@ -28,4 +28,9 @@ public class DB {
         Connection conn = DriverManager.getConnection(sConnUrl, sConnUser, sConnPass);
         return new SqlStmt(conn, conn.prepareStatement(sql));
     }
+
+    public static SqlStmt prepare(String sql, int autoGenerateKeys) throws SQLException {
+        Connection conn = DriverManager.getConnection(sConnUrl, sConnUser, sConnPass);
+        return new SqlStmt(conn, conn.prepareStatement(sql, autoGenerateKeys));
+    }
 }

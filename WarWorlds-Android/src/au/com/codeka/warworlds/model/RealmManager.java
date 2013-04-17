@@ -23,7 +23,7 @@ public class RealmManager {
         try {
             if (Util.isDebug()) {
                 mRealms.add(new Realm("http://192.168.1.4:8271/api/v1/", "Debug Alpha", Realm.AuthenticationMethod.LocalAppEngine));
-                mRealms.add(new Realm("http://192.168.1.4:8080/realm/beta/", "Debug Beta", Realm.AuthenticationMethod.Default));
+                mRealms.add(new Realm("http://192.168.1.4:8080/realms/beta/", "Debug Beta", Realm.AuthenticationMethod.Default));
             }
             mRealms.add(new Realm("https://warworldsmmo.appspot.com/api/v1/", "Alpha", Realm.AuthenticationMethod.AppEngine));
         } catch(URISyntaxException e) {

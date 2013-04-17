@@ -10,7 +10,6 @@ import java.security.SecureRandom;
 import java.util.Locale;
 
 import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,7 +24,7 @@ import com.google.protobuf.Message;
 public class LoginHandler extends RequestHandler {
     private final Logger log = LoggerFactory.getLogger(RequestHandler.class);
 
-    private static char[] SESSION_CHARS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-_$#@.<>[]{}:;0123456789".toCharArray();
+    private static char[] SESSION_CHARS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789".toCharArray();
 
     @Override
     protected Message get() throws RequestException {
