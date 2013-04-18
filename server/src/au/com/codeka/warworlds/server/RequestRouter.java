@@ -28,7 +28,10 @@ public class RequestRouter extends AbstractHandler {
         sRoutes.add(new Route("^/realms/({realm}[^/]+)/hello$", HelloHandler.class));
         sRoutes.add(new Route("^/realms/({realm}[^/]+)/empires$", EmpiresHandler.class));
 
-        sRoutes.add(new Route("^/admin/({path}.*)", HtmlPageHandler.class));
+        sRoutes.add(new Route("^/admin/?({path}.*)", HtmlPageHandler.class, "admin/"));
+        sRoutes.add(new Route("^/css/({path}.*)", StaticFileHandler.class, "css/"));
+        sRoutes.add(new Route("^/js/({path}.*)", StaticFileHandler.class, "js/"));
+        sRoutes.add(new Route("^/img/({path}.*)", StaticFileHandler.class, "img/"));
     }
 
     @Override
@@ -55,16 +58,21 @@ public class RequestRouter extends AbstractHandler {
             return; // TODO: error
         }
 
-        handler.handle(matcher, request, response);
+        handler.handle(matcher, route.extraOption, request, response);
     }
 
     private static class Route {
         public Pattern pattern;
         public Class<?> handlerClass;
+        public String extraOption;
 
         public Route(String pattern, Class<?> handlerClass) {
+            this(pattern, handlerClass, null);
+        }
+        public Route(String pattern, Class<?> handlerClass, String extraOption) {
             this.pattern = new Pattern(pattern);
             this.handlerClass = handlerClass;
+            this.extraOption = extraOption;
         }
     }
 }

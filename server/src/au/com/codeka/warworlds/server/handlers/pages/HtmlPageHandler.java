@@ -18,14 +18,14 @@ public class HtmlPageHandler extends RequestHandler {
         sTemplateEngine = new TemplateEngine();
 
         String path = HtmlPageHandler.class.getClassLoader().getResource("").getPath();
-        sTemplateEngine.getConfiguration().setWorkspace(path+"../data/tmpl/");
+        sTemplateEngine.getConfiguration().setWorkspace(path+"../data/tmpl");
     }
 
     @Override
     protected void get() throws RequestException {
-        String path = getUrlParameter("path") + ".html";
-        if (path.equals(".html")) {
-            path = "dashboard.html";
+        String path = getExtraOption() + getUrlParameter("path") + ".html";
+        if (path.equals("admin/.html")) {
+            path = "admin/dashboard.html";
         }
 
         getResponse().setContentType("text/html");

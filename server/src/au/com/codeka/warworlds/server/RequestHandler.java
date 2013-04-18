@@ -31,6 +31,7 @@ public class RequestHandler {
     private HttpServletResponse mResponse;
     private Matcher mRouteMatcher;
     private String mCurrentUser;
+    private String mExtraOption;
 
     protected String getUrlParameter(String name) {
         StringBuffer sb = new StringBuffer();
@@ -42,11 +43,16 @@ public class RequestHandler {
         return getUrlParameter("realm");
     }
 
-    public void handle(Matcher matcher, HttpServletRequest request,
+    protected String getExtraOption() {
+        return mExtraOption;
+    }
+
+    public void handle(Matcher matcher, String extraOption, HttpServletRequest request,
                        HttpServletResponse response) {
         mRequest = request;
         mResponse = response;
         mRouteMatcher = matcher;
+        mExtraOption = extraOption;
 
         // start off with status 200, but the handler might change it
         mResponse.setStatus(200);
