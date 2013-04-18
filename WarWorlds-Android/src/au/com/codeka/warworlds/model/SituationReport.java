@@ -6,8 +6,10 @@ import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
 import au.com.codeka.RomanNumeralFormatter;
-import au.com.codeka.warworlds.model.BuildRequest.BuildKind;
-import au.com.codeka.warworlds.model.protobuf.Messages;
+import au.com.codeka.common.model.BuildingDesign;
+import au.com.codeka.common.model.Design;
+import au.com.codeka.common.model.DesignKind;
+import au.com.codeka.common.protobuf.Messages;
 
 public class SituationReport {
     private String mKey;
@@ -92,10 +94,10 @@ public class SituationReport {
         }
 
         if (mBuildCompleteRecord != null) {
-            if (mBuildCompleteRecord.getBuildKind().equals(BuildKind.SHIP)) {
+            if (mBuildCompleteRecord.getDesignKind().equals(DesignKind.SHIP)) {
                 msg += getFleetLine(mBuildCompleteRecord.getDesignID(), 1);
             } else {
-                BuildingDesign design = BuildingDesignManager.getInstance().getDesign(mBuildCompleteRecord.getDesignID());
+                Design design = DesignManager.i.getDesign(DesignKind.BUILDING, mBuildCompleteRecord.getDesignID());
                 msg += design.getDisplayName();
             }
             msg += " built";
@@ -145,10 +147,10 @@ public class SituationReport {
 
         if (mBuildCompleteRecord != null) {
             msg = "Construction of ";
-            if (mBuildCompleteRecord.getBuildKind().equals(BuildKind.SHIP)) {
+            if (mBuildCompleteRecord.getDesignKind().equals(DesignKind.SHIP)) {
                 msg += getFleetLine(mBuildCompleteRecord.getDesignID(), 1);
             } else {
-                BuildingDesign design = BuildingDesignManager.getInstance().getDesign(mBuildCompleteRecord.getDesignID());
+                Design design = DesignManager.i.getDesign(DesignKind.BUILDING, mBuildCompleteRecord.getDesignID());
                 msg += design.getDisplayName();
             }
             msg += String.format(Locale.ENGLISH, " complete on %s %s",

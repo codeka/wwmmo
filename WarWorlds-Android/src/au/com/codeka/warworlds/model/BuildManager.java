@@ -9,7 +9,7 @@ import au.com.codeka.BackgroundRunner;
 import au.com.codeka.warworlds.StyledDialog;
 import au.com.codeka.warworlds.api.ApiClient;
 import au.com.codeka.warworlds.api.ApiException;
-import au.com.codeka.warworlds.model.protobuf.Messages;
+import au.com.codeka.common.protobuf.Messages;
 
 public class BuildManager {
     private static BuildManager sInstance = new BuildManager();

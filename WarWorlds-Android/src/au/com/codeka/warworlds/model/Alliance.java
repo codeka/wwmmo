@@ -8,33 +8,17 @@ import org.joda.time.DateTimeZone;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-import au.com.codeka.warworlds.model.protobuf.Messages;
+import au.com.codeka.common.model.BaseAlliance;
+import au.com.codeka.common.model.BaseAllianceMember;
+import au.com.codeka.common.protobuf.Messages;
 
-public class Alliance implements Parcelable {
-    private String mKey;
-    private String mName;
-    private DateTime mTimeCreated;
-    private String mCreatorEmpireKey;
-    private int mNumMembers;
-    private List<AllianceMember> mMembers;
+public class Alliance extends BaseAlliance implements Parcelable {
 
-    public String getKey() {
-        return mKey;
-    }
-    public String getName() {
-        return mName;
-    }
-    public DateTime getTimeCreated() {
-        return mTimeCreated;
-    }
-    public String getCreatorEmpireKey() {
-        return mCreatorEmpireKey;
-    }
-    public int getNumMembers() {
-        return mNumMembers;
-    }
-    public List<AllianceMember> getMembers() {
-        return mMembers;
+    @Override
+    protected BaseAllianceMember createAllianceMember(Messages.AllianceMember pb) {
+        AllianceMember am = new AllianceMember();
+        am.fromProtocolBuffer(pb);
+        return am;
     }
 
     @Override
@@ -75,21 +59,4 @@ public class Alliance implements Parcelable {
             return new Alliance[size];
         }
     };
-
-    public static Alliance fromProtocolBuffer(Messages.Alliance pb) {
-        Alliance alliance = new Alliance();
-        alliance.mKey = pb.getKey();
-        alliance.mName = pb.getName();
-        alliance.mTimeCreated = new DateTime(pb.getTimeCreated() * 1000, DateTimeZone.UTC);
-        alliance.mCreatorEmpireKey = pb.getCreatorEmpireKey();
-        alliance.mNumMembers = pb.getNumMembers();
-
-        if (pb.getMembersCount() > 0) {
-            alliance.mMembers = new ArrayList<AllianceMember>();
-            for (Messages.AllianceMember member_pb : pb.getMembersList()) {
-                alliance.mMembers.add(AllianceMember.fromProtocolBuffer(member_pb));
-            }
-        }
-        return alliance;
-    }
 }

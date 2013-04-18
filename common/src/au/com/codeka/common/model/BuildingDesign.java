@@ -1,11 +1,11 @@
-package au.com.codeka.warworlds.model;
+package au.com.codeka.common.model;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import org.w3c.dom.Element;
 
-import au.com.codeka.XmlIterator;
+import au.com.codeka.common.XmlIterator;
 
 public class BuildingDesign extends Design {
     private int mMaxPerColony;
@@ -35,7 +35,7 @@ public class BuildingDesign extends Design {
 
         public BuildingDesign get() {
             BuildingDesign design = new BuildingDesign();
-            design.mDesignKind = Design.DesignKind.BUILDING;
+            design.mDesignKind = DesignKind.BUILDING;
             design.mMaxPerColony = 0;
             design.mMaxPerEmpire = 0;
             design.mUpgrades = new ArrayList<Upgrade>();

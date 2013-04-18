@@ -2,7 +2,7 @@
 // Copyright (c) 2012, Dean Harding (dean@codeka.com.au)
 //
 
-package au.com.codeka.warworlds.model.protobuf;
+package au.com.codeka.common.protobuf;
 
 
 //

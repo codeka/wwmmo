@@ -2,7 +2,14 @@ package au.com.codeka.warworlds.model;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-import au.com.codeka.warworlds.model.protobuf.Messages;
+import au.com.codeka.common.model.BaseBuildRequest;
+import au.com.codeka.common.model.BaseBuilding;
+import au.com.codeka.common.model.BaseColony;
+import au.com.codeka.common.model.BaseEmpirePresence;
+import au.com.codeka.common.model.BaseFleet;
+import au.com.codeka.common.model.BasePlanet;
+import au.com.codeka.common.model.BaseStar;
+import au.com.codeka.common.protobuf.Messages;
 
 /**
  * A \c StarSummary is a snapshot of information about a star that we can cache for a much
@@ -10,89 +17,7 @@ import au.com.codeka.warworlds.model.protobuf.Messages;
  * is fetched). This is so we can do quicker look-ups of things like star names/icons without
  * having to do a full round-trip.
  */
-public class StarSummary implements Parcelable {
-    protected static StarType[] sStarTypes = {
-        new StarType.Builder().setIndex(0)
-                              .setDisplayName("Blue")
-                              .setInternalName("blue")
-                              .build(),
-        new StarType.Builder().setIndex(1)
-                              .setDisplayName("White")
-                              .setInternalName("white")
-                              .build(),
-        new StarType.Builder().setIndex(2)
-                              .setDisplayName("Yellow")
-                              .setInternalName("yellow")
-                              .build(),
-        new StarType.Builder().setIndex(3)
-                              .setDisplayName("Orange")
-                              .setInternalName("orange")
-                              .build(),
-        new StarType.Builder().setIndex(4)
-                              .setDisplayName("Red")
-                              .setInternalName("red")
-                              .build(),
-        new StarType.Builder().setIndex(5)
-                              .setDisplayName("Neutron")
-                              .setInternalName("neutron")
-                              .setBaseSize(1.0)
-                              .setImageScale(4.0)
-                              .build(),
-        new StarType.Builder().setIndex(6)
-                              .setDisplayName("Black Hole")
-                              .setInternalName("black-hole")
-                              .build()
-    };
-
-    private String mKey;
-    private String mName;
-    private StarType mStarType;
-    private int mSize;
-    private long mSectorX;
-    private long mSectorY;
-    private int mOffsetX;
-    private int mOffsetY;
-    private Planet[] mPlanets;
-
-    public String getKey() {
-        return mKey;
-    }
-    public String getName() {
-        return mName;
-    }
-    public StarType getStarType() {
-        return mStarType;
-    }
-    public int getSize() {
-        return mSize;
-    }
-    public long getSectorX() {
-        return mSectorX;
-    }
-    public long getSectorY() {
-        return mSectorY;
-    }
-    public int getOffsetX() {
-        return mOffsetX;
-    }
-    public int getOffsetY() {
-        return mOffsetY;
-    }
-    public int getNumPlanets() {
-        if (mPlanets == null) {
-            return 0;
-        } else {
-            return mPlanets.length;
-        }
-    }
-    public Planet[] getPlanets() {
-        return mPlanets;
-    }
-
-    public void setName(String name) {
-        mName = name;
-    }
-
+public class StarSummary extends BaseStar implements Parcelable {
     @Override
     public int describeContents() {
         return 0;
@@ -108,7 +33,12 @@ public class StarSummary implements Parcelable {
         parcel.writeLong(mSectorY);
         parcel.writeInt(mOffsetX);
         parcel.writeInt(mOffsetY);
-        parcel.writeParcelableArray(mPlanets, flags);
+
+        Planet[] planets = new Planet[mPlanets.length];
+        for (int i = 0; i < mPlanets.length; i++) {
+            planets[i] = (Planet) mPlanets[i];
+        }
+        parcel.writeParcelableArray(planets, flags);
     }
 
     protected void populateFromParcel(Parcel parcel) {
@@ -143,125 +73,66 @@ public class StarSummary implements Parcelable {
         }
     };
 
-    public void populateFromProtocolBuffer(Messages.Star pb) {
-        mKey = pb.getKey();
-        mName = pb.getName();
-        mStarType = sStarTypes[pb.getClassification().getNumber()];
-        mSize = pb.getSize();
-        mSectorX = pb.getSectorX();
-        mSectorY = pb.getSectorY();
-        mOffsetX = pb.getOffsetX();
-        mOffsetY = pb.getOffsetY();
-
-        int numPlanets = pb.getPlanetsCount();
-        mPlanets = new Planet[numPlanets];
-        for (int i = 0; i < numPlanets; i++) {
-            mPlanets[i] = Planet.fromProtocolBuffer(this, pb.getPlanets(i));
+    @Override
+    protected BasePlanet createPlanet(Messages.Planet pb) {
+        Planet p = new Planet();
+        if (pb != null) {
+            p.fromProtocolBuffer(this, pb);
         }
+        return p;
     }
 
-    public static StarSummary fromProtocolBuffer(Messages.Star pb) {
-        StarSummary starSummary = new StarSummary();
-        starSummary.populateFromProtocolBuffer(pb);
-        return starSummary;
+    @Override
+    protected BaseColony createColony(Messages.Colony pb) {
+        Colony c = new Colony();
+        if (pb != null) {
+            c.fromProtocolBuffer(pb);
+        }
+        return c;
     }
 
-    public void toProtocolBuffer(Messages.Star.Builder pb) {
-        pb.setKey(mKey);
-        pb.setName(mName);
-        pb.setClassification(Messages.Star.CLASSIFICATION.valueOf(mStarType.getIndex()));
-        pb.setSize(mSize);
-        pb.setSectorX(mSectorX);
-        pb.setSectorY(mSectorY);
-        pb.setOffsetX(mOffsetX);
-        pb.setOffsetY(mOffsetY);
-
-        for (int i = 0; i < mPlanets.length; i++) {
-            Messages.Planet.Builder planet = Messages.Planet.newBuilder();
-            mPlanets[i].toProtocolBuffer(planet);
-            pb.addPlanets(planet);
+    @Override
+    protected BaseBuilding createBuilding(Messages.Building pb) {
+        Building b = new Building();
+        if (pb != null) {
+            b.fromProtocolBuffer(pb);
         }
+        return b;
     }
 
-    public Messages.Star toProtocolBuffer() {
-        Messages.Star.Builder pb = Messages.Star.newBuilder();
-        toProtocolBuffer(pb);
-        return pb.build();
+    @Override
+    protected BaseEmpirePresence createEmpirePresence(Messages.EmpirePresence pb) {
+        EmpirePresence ep = new EmpirePresence();
+        if (pb != null) {
+            ep.fromProtocolBuffer(pb);
+        }
+        return ep;
     }
 
-    public static class StarType {
-        private int mIndex;
-        private String mDisplayName;
-        private String mInternalName;
-        private double mBaseSize;
-        private double mImageScale;
-
-        public int getIndex() {
-            return mIndex;
+    @Override
+    protected BaseFleet createFleet(Messages.Fleet pb) {
+        Fleet f = new Fleet();
+        if (pb != null) {
+            f.fromProtocolBuffer(pb);
         }
-        public String getDisplayName() {
-            return mDisplayName;
-        }
-        public String getInternalName() {
-            return mInternalName;
-        }
-        public String getBitmapBasePath() {
-            return "stars/"+mInternalName;
-        }
-
-        /**
-         * Gets the 'base size' of the star, which controls the "planet size" setting when
-         * we render the image.
-         */
-        public double getBaseSize() {
-            return mBaseSize;
-        }
-
-        /**
-         * When generating the image, we scale the final bitmap by this amount. Default is 1.0
-         * obviously.
-         */
-        public double getImageScale() {
-            return mImageScale;
-        }
-
-        public static class Builder {
-            private StarType mStarType;
-
-            public Builder() {
-                mStarType = new StarType();
-                mStarType.mBaseSize = 8.0;
-                mStarType.mImageScale = 1.0;
-            }
-
-            public Builder setIndex(int index) {
-                mStarType.mIndex = index;
-                return this;
-            }
-
-            public Builder setDisplayName(String displayName) {
-                mStarType.mDisplayName = displayName;
-                return this;
-            }
-
-            public Builder setInternalName(String internalName) {
-                mStarType.mInternalName = internalName;
-                return this;
-            }
-
-            public Builder setBaseSize(double baseSize) {
-                mStarType.mBaseSize = baseSize;
-                return this;
-            }
-
-            public Builder setImageScale(double scale) {
-                mStarType.mImageScale = scale;
-                return this;
-            }
-
-            public StarType build() {
-                return mStarType;
-            }
-        }
+        return f;
     }
+
+    @Override
+    protected BaseBuildRequest createBuildRequest(Messages.BuildRequest pb) {
+        BuildRequest br = new BuildRequest();
+        if (pb != null) {
+            br.fromProtocolBuffer(pb);
+        }
+        return br;
+    }
+
+    @Override
+    public BaseStar clone() {
+        Parcel parcel = Parcel.obtain();
+        this.writeToParcel(parcel, 0);
+        parcel.setDataPosition(0);
+        return Star.CREATOR.createFromParcel(parcel);
+    }
+
 }

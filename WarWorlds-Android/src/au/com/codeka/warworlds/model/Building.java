@@ -2,31 +2,17 @@ package au.com.codeka.warworlds.model;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-import au.com.codeka.warworlds.model.protobuf.Messages;
+import au.com.codeka.common.model.BaseBuilding;
+import au.com.codeka.common.model.BaseDesignManager;
+import au.com.codeka.common.model.BuildingDesign;
+import au.com.codeka.common.model.DesignKind;
 
 /**
  * Represents a single building on a colony.
  */
-public class Building implements Parcelable {
-    private String mKey;
-    private String mColonyKey;
-    private String mDesignName;
-    private int mLevel;
-
-    public String getKey() {
-        return mKey;
-    }
-    public String getColonyKey() {
-        return mColonyKey;
-    }
-    public String getDesignName() {
-        return mDesignName;
-    }
-    public int getLevel() {
-        return mLevel;
-    }
+public class Building extends BaseBuilding implements Parcelable {
     public BuildingDesign getDesign() {
-        return BuildingDesignManager.getInstance().getDesign(mDesignName);
+        return (BuildingDesign) BaseDesignManager.i.getDesign(DesignKind.BUILDING, mDesignName);
     }
 
     @Override
@@ -59,13 +45,4 @@ public class Building implements Parcelable {
             return new Building[size];
         }
     };
-
-    public static Building fromProtocolBuffer(Messages.Building pb) {
-        Building building = new Building();
-        building.mKey = pb.getKey();
-        building.mColonyKey = pb.getColonyKey();
-        building.mDesignName = pb.getDesignName();
-        building.mLevel = pb.getLevel();
-        return building;
-    }
 }

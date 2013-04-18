@@ -1,4 +1,4 @@
-package au.com.codeka.warworlds.model;
+package au.com.codeka.common.model;
 
 import org.w3c.dom.Element;
 
@@ -31,7 +31,7 @@ public class ShipDesign extends Design {
 
         public ShipDesign get() {
             ShipDesign design = new ShipDesign();
-            design.mDesignKind = Design.DesignKind.SHIP;
+            design.mDesignKind = DesignKind.SHIP;
             this.populateDesign(design);
             return design;
         }

@@ -1,10 +1,10 @@
-package au.com.codeka.warworlds.model;
+package au.com.codeka.common.model;
 
 import java.util.ArrayList;
 
 import org.w3c.dom.Element;
 
-import au.com.codeka.XmlIterator;
+import au.com.codeka.common.XmlIterator;
 
 /**
  * This is the base "design" class which both \c ShipDesign and \c BuildingDesign inherit from.
@@ -37,8 +37,8 @@ public class Design {
     public DesignKind getDesignKind() {
         return mDesignKind;
     }
-    public Sprite getSprite() {
-        return SpriteManager.getInstance().getSprite(mSpriteName);
+    public String getSpriteName() {
+        return mSpriteName;
     }
     public boolean canBuildMultiple() {
         return true;
@@ -64,33 +64,6 @@ public class Design {
             }
         }
         return false;
-    }
-
-    /**
-     * The values here should be kept in sync with with the BuildRequest.BUILD_KIND protocol buffer.
-     */
-    public enum DesignKind {
-        BUILDING(1),
-        SHIP(2);
-
-        private int mValue;
-        DesignKind(int value) {
-            mValue = value;
-        }
-
-        public int getValue() {
-            return mValue;
-        }
-
-        public static DesignKind fromInt(int value) {
-            for (DesignKind dk : DesignKind.values()) {
-                if (dk.getValue() == value) {
-                    return dk;
-                }
-            }
-
-            return DesignKind.BUILDING; //??
-        }
     }
 
     public abstract static class Factory {

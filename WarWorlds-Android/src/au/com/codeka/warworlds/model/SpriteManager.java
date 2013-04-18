@@ -18,7 +18,7 @@ import org.xml.sax.SAXException;
 
 import android.content.Context;
 import android.graphics.Rect;
-import au.com.codeka.XmlIterator;
+import au.com.codeka.common.XmlIterator;
 
 /**
  * This class manages sprites as described in the assets/sprites.xml file.
@@ -26,10 +26,7 @@ import au.com.codeka.XmlIterator;
 public class SpriteManager {
     private static Logger log = LoggerFactory.getLogger(SpriteManager.class);
 
-    private static SpriteManager sInstance = new SpriteManager();
-    public static SpriteManager getInstance() {
-        return sInstance;
-    }
+    public static SpriteManager i = new SpriteManager();
 
     private TreeMap<String, Sprite> mSprites;
 

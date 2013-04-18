@@ -10,7 +10,7 @@ import org.slf4j.LoggerFactory;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-import au.com.codeka.warworlds.model.protobuf.Messages;
+import au.com.codeka.common.protobuf.Messages;
 
 
 /**

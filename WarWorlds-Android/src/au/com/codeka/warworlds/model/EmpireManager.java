@@ -25,7 +25,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 import au.com.codeka.BackgroundRunner;
 import au.com.codeka.warworlds.api.ApiClient;
 import au.com.codeka.warworlds.api.ApiException;
-import au.com.codeka.warworlds.model.protobuf.Messages;
+import au.com.codeka.common.protobuf.Messages;
 
 /**
  * Manages stuff about your empire (e.g. colonising planets and what-not).

@@ -11,41 +11,42 @@ import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.os.Parcel;
 import android.os.Parcelable;
-import au.com.codeka.warworlds.model.protobuf.Messages;
+import au.com.codeka.common.model.BaseAlliance;
+import au.com.codeka.common.model.BaseEmpire;
+import au.com.codeka.common.model.BaseEmpireRank;
+import au.com.codeka.common.model.BaseStar;
+import au.com.codeka.common.protobuf.Messages;
 
 
-public class Empire implements Parcelable {
-    private String mKey;
-    private String mDisplayName;
-    private Bitmap mEmpireShield;
-    protected float mCash;
-    private EmpireRank mRank;
-    private StarSummary mHomeStar;
-    private Alliance mAlliance;
-
+public class Empire extends BaseEmpire implements Parcelable {
     private static Bitmap sBaseShield;
+    private Bitmap mEmpireShield;
 
-    public String getKey() {
-        return mKey;
-    }
-    public String getDisplayName() {
-        return mDisplayName;
-    }
-    public float getCash() {
-        return mCash;
-    }
-    public EmpireRank getRank() {
-        return mRank;
-    }
-    public StarSummary getHomeStar() {
-        return mHomeStar;
-    }
-    public Alliance getAlliance() {
-        return mAlliance;
+    @Override
+    protected BaseEmpireRank createEmpireRank(Messages.EmpireRank pb) {
+        EmpireRank er = new EmpireRank();
+        if (pb != null) {
+            er.fromProtocolBuffer(pb);
+        }
+        return er;
     }
 
-    public void updateAlliance(Alliance alliance) {
-        mAlliance = alliance;
+    @Override
+    protected BaseStar createStar(Messages.Star pb) {
+        StarSummary s = new StarSummary();
+        if (pb != null) {
+            s.fromProtocolBuffer(pb);
+        }
+        return s;
+    }
+
+    @Override
+    protected BaseAlliance createAlliance(Messages.Alliance pb) {
+        Alliance a = new Alliance();
+        if (pb != null) {
+            a.fromProtocolBuffer(pb);
+        }
+        return a;
     }
 
     /**
@@ -108,8 +109,8 @@ public class Empire implements Parcelable {
     public void writeToParcel(Parcel parcel, int flags) {
         parcel.writeString(mKey);
         parcel.writeString(mDisplayName);
-        parcel.writeParcelable(mHomeStar, flags);
-        parcel.writeParcelable(mAlliance, flags);
+        parcel.writeParcelable((Star) mHomeStar, flags);
+        parcel.writeParcelable((Alliance) mAlliance, flags);
     }
 
     protected void readFromParcel(Parcel parcel) {
@@ -133,35 +134,4 @@ public class Empire implements Parcelable {
             return new Empire[size];
         }
     };
-
-    public static Empire fromProtocolBuffer(Messages.Empire pb) {
-        if (!pb.hasKey() || pb.getKey() == null) {
-            return new NativeEmpire();
-        }
-
-        Empire empire = new Empire();
-        empire.populateFromProtocolBuffer(pb);
-        return empire;
-    }
-
-    protected void populateFromProtocolBuffer(Messages.Empire pb) {
-        mKey = pb.getKey();
-        mDisplayName = pb.getDisplayName();
-        mCash = pb.getCash();
-
-        if (pb.getRank() != null && pb.getRank().getEmpireKey() != null &&
-                pb.getRank().getEmpireKey().length() > 0) {
-            mRank = EmpireRank.fromProtocolBuffer(pb.getRank());
-        }
-
-        if (pb.getHomeStar() != null && pb.getHomeStar().getKey() != null &&
-                 pb.getHomeStar().getKey().length() > 0) {
-            mHomeStar = StarSummary.fromProtocolBuffer(pb.getHomeStar());
-        }
-
-        if (pb.getAlliance() != null && pb.getAlliance().getKey() != null &&
-                pb.getAlliance().getKey().length() > 0) {
-            mAlliance = Alliance.fromProtocolBuffer(pb.getAlliance());
-        }
-    }
 }

@@ -5,27 +5,9 @@ import org.joda.time.DateTimeZone;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-import au.com.codeka.warworlds.model.protobuf.Messages;
+import au.com.codeka.common.model.BaseAllianceMember;
 
-public class AllianceMember implements Parcelable {
-    private String mKey;
-    private String mAllianceKey;
-    private String mEmpireKey;
-    private DateTime mTimeJoined;
-
-    public String getKey() {
-        return mKey;
-    }
-    public String getAllianceKey() {
-        return mAllianceKey;
-    }
-    public String getEmpireKey() {
-        return mEmpireKey;
-    }
-    public DateTime getTimeJoined() {
-        return mTimeJoined;
-    }
-
+public class AllianceMember extends BaseAllianceMember implements Parcelable {
     @Override
     public int describeContents() {
         return 0;
@@ -60,13 +42,4 @@ public class AllianceMember implements Parcelable {
             return new AllianceMember[size];
         }
     };
-
-    public static AllianceMember fromProtocolBuffer(Messages.AllianceMember pb) {
-        AllianceMember member = new AllianceMember();
-        member.mKey = pb.getKey();
-        member.mAllianceKey = pb.getAllianceKey();
-        member.mEmpireKey = pb.getEmpireKey();
-        member.mTimeJoined = new DateTime(pb.getTimeJoined() * 1000, DateTimeZone.UTC);
-        return member;
-    }
 }

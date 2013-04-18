@@ -20,7 +20,7 @@ import au.com.codeka.Point2D;
 import au.com.codeka.common.Vector2;
 import au.com.codeka.warworlds.api.ApiClient;
 import au.com.codeka.warworlds.game.StarfieldBackgroundRenderer;
-import au.com.codeka.warworlds.model.protobuf.Messages;
+import au.com.codeka.common.protobuf.Messages;
 
 /**
  * This class "manages" the list of \c StarfieldSector's that we have loaded

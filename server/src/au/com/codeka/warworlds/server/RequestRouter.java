@@ -21,10 +21,11 @@ public class RequestRouter extends AbstractHandler {
 
     {
         sRoutes = new ArrayList<Route>();
-        sRoutes.add(new Route("^/login", LoginHandler.class));
-        sRoutes.add(new Route("^/realms/({realm}[^/]+)/devices/({id}[^/]+)", DevicesHandler.class));
-        sRoutes.add(new Route("^/realms/({realm}[^/]+)/devices", DevicesHandler.class));
-        sRoutes.add(new Route("^/realms/({realm}[^/]+)/hello", HelloHandler.class));
+        sRoutes.add(new Route("^/login$", LoginHandler.class));
+        sRoutes.add(new Route("^/realms/({realm}[^/]+)/devices/({id}[0-9]+)$", DevicesHandler.class));
+        sRoutes.add(new Route("^/realms/({realm}[^/]+)/devices$", DevicesHandler.class));
+        sRoutes.add(new Route("^/realms/({realm}[^/]+)/hello$", HelloHandler.class));
+        sRoutes.add(new Route("^/realms/({realm}[^/]+)/empires$", EmpiresHandler.class));
     }
 
     @Override

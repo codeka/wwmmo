@@ -2,7 +2,7 @@ package au.com.codeka.warworlds.server;
 
 import javax.servlet.http.HttpServletResponse;
 
-import au.com.codeka.warworlds.model.protobuf.Messages;
+import au.com.codeka.common.protobuf.Messages;
 
 /**
  * This exception is thrown when you want to pass an error back to the client.

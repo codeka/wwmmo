@@ -33,11 +33,14 @@ import android.view.View;
 import android.widget.RelativeLayout;
 import au.com.codeka.Pair;
 import au.com.codeka.common.Vector2;
+import au.com.codeka.common.model.DesignKind;
+import au.com.codeka.common.model.ShipDesign;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.ctrl.SelectionView;
 import au.com.codeka.warworlds.game.StarfieldBackgroundRenderer;
 import au.com.codeka.warworlds.model.BuildManager;
 import au.com.codeka.warworlds.model.Colony;
+import au.com.codeka.warworlds.model.DesignManager;
 import au.com.codeka.warworlds.model.Empire;
 import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.Fleet;
@@ -45,8 +48,6 @@ import au.com.codeka.warworlds.model.ImageManager;
 import au.com.codeka.warworlds.model.MyEmpire;
 import au.com.codeka.warworlds.model.Sector;
 import au.com.codeka.warworlds.model.SectorManager;
-import au.com.codeka.warworlds.model.ShipDesign;
-import au.com.codeka.warworlds.model.ShipDesignManager;
 import au.com.codeka.warworlds.model.Sprite;
 import au.com.codeka.warworlds.model.SpriteManager;
 import au.com.codeka.warworlds.model.Star;
@@ -694,7 +695,7 @@ public class StarfieldSurfaceView extends SectorView
 
         // work out how far along the fleet has moved so we can draw the icon at the correct
         // spot. Also, we'll draw the name of the empire, number of ships etc.
-        ShipDesign design = ShipDesignManager.getInstance().getDesign(fleet.getDesignID());
+        ShipDesign design = (ShipDesign) DesignManager.i.getDesign(DesignKind.SHIP, fleet.getDesignID());
         double distance = srcPoint.distanceTo(destPoint);
         double totalTimeInHours = (distance / 10.0) / design.getSpeedInParsecPerHour();
 
@@ -722,7 +723,7 @@ public class StarfieldSurfaceView extends SectorView
         location.add(srcPoint);
         Vector2.pool.release(srcPoint); srcPoint = null;
 
-        Sprite fleetSprite = design.getSprite();
+        Sprite fleetSprite = SpriteManager.i.getSprite(design.getSpriteName());
         Vector2 up = fleetSprite.getUp();
 
         float angle = Vector2.angleBetween(up, direction);

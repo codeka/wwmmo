@@ -1,4 +1,4 @@
-package au.com.codeka.warworlds.model;
+package au.com.codeka.common.model;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -10,8 +10,6 @@ import org.joda.time.Duration;
 import org.joda.time.Interval;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import android.os.Parcel;
 
 /**
  * This class is used to simulate a \c Star. It need to have the same logic as ctrl/simulation.py
@@ -31,11 +29,11 @@ public class Simulation {
      * Simulate the given star, and make sure it's "current".
      * @param star
      */
-    public void simulate(Star star) {
+    public void simulate(BaseStar star) {
         log.debug(String.format("Begin simulation for '%s'", star.getName()));
 
         HashSet<String> empireKeys = new HashSet<String>();
-        for (Colony colony : star.getColonies()) {
+        for (BaseColony colony : star.getColonies()) {
             if (!empireKeys.contains(colony.getEmpireKey())) {
                 empireKeys.add(colony.getEmpireKey());
             }
@@ -61,7 +59,7 @@ public class Simulation {
         // growth and such, just the end time of builds. We'll also record the time that the
         // population drops below a certain threshold so that we can warn the player.
         DateTime predictionTime = endTime.plusHours(24);
-        Star predictionStar = null;
+        BaseStar predictionStar = null;
 
         while (true) {
             Duration dt = Duration.standardMinutes(15);
@@ -80,10 +78,7 @@ public class Simulation {
                     }
                     startTime = startTime.plus(dt);
 
-                    Parcel parcel = Parcel.obtain();
-                    star.writeToParcel(parcel, 0);
-                    parcel.setDataPosition(0);
-                    predictionStar = Star.CREATOR.createFromParcel(parcel);
+                    predictionStar = star.clone();
                     dt = Duration.standardMinutes(15);
                 }
 
@@ -96,8 +91,8 @@ public class Simulation {
 
         if (predictionStar != null) {
             // copy the end times for builds from prediction_star_pb
-            for (BuildRequest starBuildRequest : star.getBuildRequests()) {
-                for (BuildRequest predictedBuildRequest : predictionStar.getBuildRequests()) {
+            for (BaseBuildRequest starBuildRequest : star.getBuildRequests()) {
+                for (BaseBuildRequest predictedBuildRequest : predictionStar.getBuildRequests()) {
                     if (starBuildRequest.getKey().equals(predictedBuildRequest.getKey())) {
                         starBuildRequest.setEndTime(predictedBuildRequest.getEndTime());
                     }
@@ -116,10 +111,10 @@ public class Simulation {
         //log.debug(String.format("End simulation for '%s'", star.getName()));
     }
 
-    private DateTime getSimulateStartTime(Star star) {
+    private DateTime getSimulateStartTime(BaseStar star) {
         DateTime lastSimulation = star.getLastSimulation();
         if (lastSimulation == null) {
-            for (Fleet fleet : star.getFleets()) {
+            for (BaseFleet fleet : star.getFleets()) {
                 if (lastSimulation == null || fleet.getStateStartTime().compareTo(lastSimulation) < 0) {
                     lastSimulation = fleet.getStateStartTime();
                 }
@@ -128,7 +123,7 @@ public class Simulation {
         return lastSimulation;
     }
 
-    private void simulateStepForAllEmpires(Duration dt, DateTime now, Star star, Set<String> empireKeys) {
+    private void simulateStepForAllEmpires(Duration dt, DateTime now, BaseStar star, Set<String> empireKeys) {
         for (String empireKey : empireKeys) {
             simulateStep(dt, now, star, empireKey);
         }
@@ -148,14 +143,14 @@ public class Simulation {
         return keyOne.equals(keyTwo);
     }
 
-    private void simulateStep(Duration dt, DateTime now, Star star, String empireKey) {
+    private void simulateStep(Duration dt, DateTime now, BaseStar star, String empireKey) {
         float totalGoods = 0.0f;
         float totalMinerals = 0.0f;
         float totalPopulation = 0.0f;
         float maxGoods = 500.0f;
         float maxMinerals = 500.0f;
 
-        for (EmpirePresence empire : star.getEmpires()) {
+        for (BaseEmpirePresence empire : star.getEmpires()) {
             if (!equalEmpireKey(empire.getEmpireKey(), empireKey)) {
                 continue;
             }
@@ -169,12 +164,12 @@ public class Simulation {
         float goodsDeltaPerHour = 0.0f;
         float mineralsDeltaPerHour = 0.0f;
 
-        for (Colony colony : star.getColonies()) {
+        for (BaseColony colony : star.getColonies()) {
             if (!equalEmpireKey(colony.getEmpireKey(), empireKey)) {
                 continue;
             }
 
-            Planet planet = star.getPlanets()[colony.getPlanetIndex() - 1];
+            BasePlanet planet = star.getPlanets()[colony.getPlanetIndex() - 1];
 
             // calculate the output from farming this turn and add it to the star global
             float goods = colony.getPopulation() * colony.getFarmingFocus() *
@@ -195,13 +190,13 @@ public class Simulation {
 
         // A second loop though the colonies, once the goods/minerals have been calculated. This way,
         // goods minerals are shared between colonies
-        for (Colony colony : star.getColonies()) {
+        for (BaseColony colony : star.getColonies()) {
             if (!equalEmpireKey(colony.getEmpireKey(), empireKey)) {
                 continue;
             }
 
-            ArrayList<BuildRequest> buildRequests = new ArrayList<BuildRequest>();
-            for (BuildRequest br : star.getBuildRequests()) {
+            ArrayList<BaseBuildRequest> buildRequests = new ArrayList<BaseBuildRequest>();
+            for (BaseBuildRequest br : star.getBuildRequests()) {
                 if (br.getColonyKey().equals(colony.getKey())) {
                     buildRequests.add(br);
                 }
@@ -210,7 +205,7 @@ public class Simulation {
             // not all build requests will be processed this turn. We divide up the population
             // based on the number of ACTUAL build requests they'll be working on this turn
             int numValidBuildRequests = 0;
-            for (BuildRequest br : buildRequests) {
+            for (BaseBuildRequest br : buildRequests) {
                 if (br.getStartTime().compareTo(now.plus(dt)) > 0) {
                     continue;
                 }
@@ -234,8 +229,8 @@ public class Simulation {
                     workersPerBuildRequest = 1.0f;
                 }
 
-                for (BuildRequest br : buildRequests) {
-                    Design design = DesignManager.getInstance(br.getBuildKind()).getDesign(br.getDesignID());
+                for (BaseBuildRequest br : buildRequests) {
+                    Design design = BaseDesignManager.i.getDesign(br.getDesignKind(), br.getDesignID());
 
                     DateTime startTime = br.getStartTime();
                     if (startTime.compareTo(now.plus(dt)) > 0) {
@@ -323,7 +318,7 @@ public class Simulation {
         }
 
         // now loop through the colonies and update the population/goods counter
-        for (Colony colony : star.getColonies()) {
+        for (BaseColony colony : star.getColonies()) {
             if (!equalEmpireKey(colony.getEmpireKey(), empireKey)) {
                 continue;
             }
@@ -372,7 +367,7 @@ public class Simulation {
             totalMinerals = maxMinerals;
         }
 
-        for (EmpirePresence empire : star.getEmpires()) {
+        for (BaseEmpirePresence empire : star.getEmpires()) {
             if (!equalEmpireKey(empire.getEmpireKey(), empireKey)) {
                 continue;
             }
@@ -383,7 +378,7 @@ public class Simulation {
         }
     }
 
-    private void simulateCombat(Star star, DateTime now, Duration dt) {
+    private void simulateCombat(BaseStar star, DateTime now, Duration dt) {
         // We don't actually simulate combat on the client... todo?
     }
 }
