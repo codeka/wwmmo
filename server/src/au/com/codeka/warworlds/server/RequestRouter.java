@@ -14,6 +14,7 @@ import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.handler.AbstractHandler;
 
 import au.com.codeka.warworlds.server.handlers.*;
+import au.com.codeka.warworlds.server.handlers.pages.*;
 
 
 public class RequestRouter extends AbstractHandler {
@@ -26,6 +27,8 @@ public class RequestRouter extends AbstractHandler {
         sRoutes.add(new Route("^/realms/({realm}[^/]+)/devices$", DevicesHandler.class));
         sRoutes.add(new Route("^/realms/({realm}[^/]+)/hello$", HelloHandler.class));
         sRoutes.add(new Route("^/realms/({realm}[^/]+)/empires$", EmpiresHandler.class));
+
+        sRoutes.add(new Route("^/admin/({path}.*)", HtmlPageHandler.class));
     }
 
     @Override

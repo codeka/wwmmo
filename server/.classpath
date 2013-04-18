@@ -31,5 +31,6 @@
 	<classpathentry kind="lib" path="/common/libs/joda-convert-1.2.jar"/>
 	<classpathentry kind="lib" path="/common/libs/joda-time-2.1.jar"/>
 	<classpathentry kind="lib" path="libs/spymemcached-2.8.7.jar"/>
+	<classpathentry kind="lib" path="libs/jangod-template.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

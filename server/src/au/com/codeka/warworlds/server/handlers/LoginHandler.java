@@ -27,7 +27,7 @@ public class LoginHandler extends RequestHandler {
     private static char[] SESSION_CHARS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789".toCharArray();
 
     @Override
-    protected Message get() throws RequestException {
+    protected void get() throws RequestException {
         String authToken = getRequest().getParameter("authToken");
         if (authToken == null) {
             throw new RequestException(400);
@@ -95,6 +95,5 @@ public class LoginHandler extends RequestHandler {
         } catch (IOException e) {
             throw new RequestException(500, e);
         }
-        return null;
     }
 }

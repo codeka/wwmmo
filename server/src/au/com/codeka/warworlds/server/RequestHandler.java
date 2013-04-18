@@ -48,16 +48,18 @@ public class RequestHandler {
         mResponse = response;
         mRouteMatcher = matcher;
 
-        Message pb = null;
+        // start off with status 200, but the handler might change it
+        mResponse.setStatus(200);
+
         try {
             if (request.getMethod().equals("GET")) {
-                pb = get();
+                get();
             } else if (request.getMethod().equals("POST")) {
-                pb = post();
+                post();
             } else if (request.getMethod().equals("PUT")) {
-                pb = put();
+                put();
             } else if (request.getMethod().equals("DELETE")) {
-                pb = delete();
+                delete();
             } else {
                 throw new RequestException(501);
             }
@@ -71,28 +73,25 @@ public class RequestHandler {
             mResponse.setStatus(500);
             return;
         }
-
-        mResponse.setStatus(200);
-        setResponseBody(pb);
     }
 
-    protected Message get() throws RequestException {
+    protected void get() throws RequestException {
         throw new RequestException(501);
     }
 
-    protected Message put() throws RequestException {
+    protected void put() throws RequestException {
         throw new RequestException(501);
     }
 
-    protected Message post() throws RequestException {
+    protected void post() throws RequestException {
         throw new RequestException(501);
     }
 
-    protected Message delete() throws RequestException {
+    protected void delete() throws RequestException {
         throw new RequestException(501);
     }
 
-    private void setResponseBody(Message pb) {
+    protected void setResponseBody(Message pb) {
         if (pb == null) {
             return;
         }
