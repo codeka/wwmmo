@@ -31,7 +31,7 @@ import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.RelativeLayout;
-import au.com.codeka.Pair;
+import au.com.codeka.common.Pair;
 import au.com.codeka.common.Vector2;
 import au.com.codeka.common.model.DesignKind;
 import au.com.codeka.common.model.ShipDesign;

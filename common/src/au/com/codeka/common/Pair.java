@@ -1,4 +1,4 @@
-package au.com.codeka;
+package au.com.codeka.common;
 
 /**
  * Helper class that represents a pair of values. This can be used as the key

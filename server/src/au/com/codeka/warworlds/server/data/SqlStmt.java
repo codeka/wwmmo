@@ -14,8 +14,6 @@ import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import au.com.codeka.warworlds.server.RequestHandler;
-
 /**
  * This is a wrapper around a \c PreparedStatement, for ease-of-use.
  */
@@ -31,16 +29,26 @@ public class SqlStmt implements AutoCloseable {
     private PreparedStatement mStmt;
     private String mSql;
     private ArrayList<Object> mParameters;
+    private ArrayList<ResultSet> mResultSets;
 
     public SqlStmt(Connection conn, String sql, PreparedStatement stmt) {
         mConn = conn;
         mStmt = stmt;
         mSql = sql;
         mParameters = new ArrayList<Object>();
+        mResultSets = new ArrayList<ResultSet>();
     }
 
     public void setInt(int position, int value) throws SQLException {
         mStmt.setInt(position, value);
+        saveParameter(position, value);
+    }
+    public void setLong(int position, long value) throws SQLException {
+        mStmt.setLong(position, value);
+        saveParameter(position, value);
+    }
+    public void setDouble(int position, double value) throws SQLException {
+        mStmt.setDouble(position, value);
         saveParameter(position, value);
     }
     public void setString(int position, String value) throws SQLException {
@@ -99,6 +107,17 @@ public class SqlStmt implements AutoCloseable {
 
     @SuppressWarnings("unchecked")
     public <T> T selectFirstValue(Class<T> type) throws SQLException {
+        if (log.isInfoEnabled()) {
+            StringBuffer sb = new StringBuffer();
+            sb.append(mSql);
+            sb.append(System.lineSeparator());
+            for (Object obj : mParameters) {
+                sb.append(String.format("? = %s", obj));
+                sb.append(System.lineSeparator());
+            }
+            log.info(sb.toString());
+        }
+
         ResultSet rs = null;
         try {
             rs = mStmt.executeQuery();
@@ -111,8 +130,28 @@ public class SqlStmt implements AutoCloseable {
         }
     }
 
+    public ResultSet select() throws SQLException {
+        if (log.isInfoEnabled()) {
+            StringBuffer sb = new StringBuffer();
+            sb.append(mSql);
+            sb.append(System.lineSeparator());
+            for (Object obj : mParameters) {
+                sb.append(String.format("? = %s", obj));
+                sb.append(System.lineSeparator());
+            }
+            log.info(sb.toString());
+        }
+
+        ResultSet rs = mStmt.executeQuery();
+        mResultSets.add(rs);
+        return rs;
+    }
+
     @Override
     public void close() throws Exception {
+        for (ResultSet rs : mResultSets) {
+            rs.close();
+        }
         mStmt.close();
         mConn.close();
     }

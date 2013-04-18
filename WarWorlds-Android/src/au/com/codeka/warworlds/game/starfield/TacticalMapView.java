@@ -17,7 +17,7 @@ import android.graphics.Path;
 import android.util.AttributeSet;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
-import au.com.codeka.Pair;
+import au.com.codeka.common.Pair;
 import au.com.codeka.common.PointCloud;
 import au.com.codeka.common.Triangle;
 import au.com.codeka.common.Vector2;
