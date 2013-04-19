@@ -30,6 +30,8 @@ public class RequestRouter extends AbstractHandler {
         sRoutes.add(new Route("^/realms/({realm}[^/]+)/sectors$", SectorsHandler.class));
 
         sRoutes.add(new Route("^/admin/?({path}.*)", HtmlPageHandler.class, "admin/"));
+        sRoutes.add(new Route("^/intel/?$", HtmlPageHandler.class, "intel/"));
+        sRoutes.add(new Route("^/intel/({path}.*)", StaticFileHandler.class, "intel/"));
         sRoutes.add(new Route("^/css/({path}.*)", StaticFileHandler.class, "css/"));
         sRoutes.add(new Route("^/js/({path}.*)", StaticFileHandler.class, "js/"));
         sRoutes.add(new Route("^/img/({path}.*)", StaticFileHandler.class, "img/"));

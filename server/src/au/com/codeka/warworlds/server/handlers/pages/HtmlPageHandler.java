@@ -24,8 +24,8 @@ public class HtmlPageHandler extends RequestHandler {
     @Override
     protected void get() throws RequestException {
         String path = getExtraOption() + getUrlParameter("path") + ".html";
-        if (path.equals("admin/.html")) {
-            path = "admin/dashboard.html";
+        if (path.equals(getExtraOption()+".html")) {
+            path = getExtraOption()+"index.html";
         }
 
         getResponse().setContentType("text/html");

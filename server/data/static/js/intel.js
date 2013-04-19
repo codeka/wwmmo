@@ -210,43 +210,43 @@ $(function() {
   });
   Star.small = {
     img: new Image(),
-    "CLASSIFICATION.BLACKHOLE": [
+    "BLACKHOLE": [
       {x: 0, y: 0, width: 32, height: 32, scale: 1},
       {x: 32, y: 0, width: 32, height: 32, scale: 1},
       {x: 64, y: 0, width: 32, height: 32, scale: 1},
       {x: 96, y: 0, width: 32, height: 32, scale: 1}
     ],
-    "CLASSIFICATION.BLUE": [
+    "BLUE": [
       {x: 0, y: 32, width: 32, height: 32, scale: 1},
       {x: 32, y: 32, width: 32, height: 32, scale: 1},
       {x: 64, y: 32, width: 32, height: 32, scale: 1},
       {x: 96, y: 32, width: 32, height: 32, scale: 1}
     ],
-    "CLASSIFICATION.NEUTRON": [
+    "NEUTRON": [
       {x: 0, y: 64, width: 64, height: 64, scale: 4},
       {x: 64, y: 64, width: 64, height: 64, scale: 4},
       {x: 0, y: 128, width: 64, height: 64, scale: 4},
       {x: 64, y: 128, width: 64, height: 64, scale: 4}
     ],
-    "CLASSIFICATION.ORANGE": [
+    "ORANGE": [
       {x: 0, y: 192, width: 32, height: 32, scale: 1},
       {x: 32, y: 192, width: 32, height: 32, scale: 1},
       {x: 64, y: 192, width: 32, height: 32, scale: 1},
       {x: 96, y: 192, width: 32, height: 32, scale: 1}
     ],
-    "CLASSIFICATION.RED": [
+    "RED": [
       {x: 0, y: 224, width: 32, height: 32, scale: 1},
       {x: 32, y: 224, width: 32, height: 32, scale: 1},
       {x: 64, y: 224, width: 32, height: 32, scale: 1},
       {x: 96, y: 224, width: 32, height: 32, scale: 1}
     ],
-    "CLASSIFICATION.WHITE": [
+    "WHITE": [
       {x: 0, y: 256, width: 32, height: 32, scale: 1},
       {x: 32, y: 256, width: 32, height: 32, scale: 1},
       {x: 64, y: 256, width: 32, height: 32, scale: 1},
       {x: 96, y: 256, width: 32, height: 32, scale: 1}
     ],
-    "CLASSIFICATION.YELLOW": [
+    "YELLOW": [
       {x: 0, y: 288, width: 32, height: 32, scale: 1},
       {x: 32, y: 288, width: 32, height: 32, scale: 1},
       {x: 64, y: 288, width: 32, height: 32, scale: 1},
@@ -515,7 +515,7 @@ $(function() {
         console.log("fetching sectors: "+missingSectors.join("|"));
         var world = this;
         $.ajax({
-          url: "/api/v1/sectors?coords="+missingSectors.join("|")+"&gen=0",
+          url: "/realms/beta/sectors?coords="+missingSectors.join("|")/*+"&gen=0"*/,
           dataType: "json",
           success: function (data) {
             if (!data || !data.sectors) {
@@ -685,11 +685,11 @@ $(function() {
   function showStarDetails(star) {
     Math.seedrandom(star.key);
     var $details = $("#star-details");
-    var className = star.type.split(".")[1].toLowerCase();
+    var className = star.type.toLowerCase();
     className += "-"+randomInt(1, 4);
     $details.find("div.star-icon-big").attr("class", "star-icon-big "+className);
     $details.find("div.star-name").html(star.name);
-    $details.find("div.star-classification").html(star.type.split(".")[1].toLowerCase());
+    $details.find("div.star-classification").html(star.type.toLowerCase());
     $details.find("div.star-key input").val(star.key);
     $details.fadeIn("fast");
   }
@@ -746,7 +746,7 @@ $(function() {
   $(function() {
     $("#debug-new-empire").click(function() {
       $.ajax({
-        url: "/api/v1/stars?find_for_empire=1",
+        url: "/realms/beta/stars?find_for_empire=1",
         "dataType": "json",
         "success": function(star_pb) {
           var star = new Star(star_pb);

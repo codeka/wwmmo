@@ -34,9 +34,13 @@ public class RequestHandler {
     private String mExtraOption;
 
     protected String getUrlParameter(String name) {
-        StringBuffer sb = new StringBuffer();
-        mRouteMatcher.getGroup(name, sb);
-        return sb.toString();
+        try {
+            if (mRouteMatcher.isCaptured(name)) {
+                return mRouteMatcher.group(name);
+            }
+        } catch(IllegalArgumentException e) {
+        }
+        return "";
     }
 
     protected String getRealm() {
