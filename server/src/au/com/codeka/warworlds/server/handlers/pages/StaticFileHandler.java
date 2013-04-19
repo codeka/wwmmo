@@ -4,7 +4,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.TreeMap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,7 +16,10 @@ public class StaticFileHandler extends RequestHandler {
 
     private static String sBasePath;
     static {
-        sBasePath = StaticFileHandler.class.getClassLoader().getResource("").getPath();
+        sBasePath = System.getProperty("au.com.codeka.warworlds.server.basePath");
+        if (sBasePath == null) {
+            sBasePath = StaticFileHandler.class.getClassLoader().getResource("").getPath();
+        }
         sBasePath += "../data/static/";
     }
 

@@ -12,7 +12,10 @@ import java.util.TreeMap;
 public class NameGenerator {
     private static ArrayList<Vocabulary> sVocabularies;
     static {
-        String path = NameGenerator.class.getClassLoader().getResource("").getPath();
+        String path = System.getProperty("au.com.codeka.warworlds.server.basePath");
+        if (path == null) {
+            path = NameGenerator.class.getClassLoader().getResource("").getPath();
+        }
         path += "../data/vocab";
         File rootPath = new File(path);
 

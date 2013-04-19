@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- WARNING: Eclipse auto-generated file.
+              Any modifications will be overwritten.
+              To include a user specific buildfile here, simply create one in the same
+              directory with the processing instruction <?eclipse.ant.import?>
+              as the first entry and export the buildfile again. -->
+<project basedir="." default="build" name="server">
+    <property environment="env"/>
+    <property name="common.location" value="../common"/>
+    <property name="ECLIPSE_HOME" value="../../../../eclipse"/>
+    <property name="debuglevel" value="source,lines,vars"/>
+    <property name="target" value="1.7"/>
+    <property name="source" value="1.7"/>
+    <import file="build-installer.xml"/>
+    <path id="common.classpath">
+        <pathelement location="${common.location}/bin"/>
+        <pathelement location="${common.location}/libs/protobuf-java-2.5.0.jar"/>
+        <pathelement location="${common.location}/libs/joda-convert-1.2.jar"/>
+        <pathelement location="${common.location}/libs/joda-time-2.1.jar"/>
+        <pathelement location="${common.location}/libs/slf4j-api-1.7.5.jar"/>
+    </path>
+    <path id="server.classpath">
+        <pathelement location="bin"/>
+        <pathelement location="../jetty/lib/jetty-http-9.0.1.v20130408.jar"/>
+        <pathelement location="../jetty/lib/jetty-servlet-9.0.1.v20130408.jar"/>
+        <pathelement location="../jetty/lib/servlet-api-3.0.jar"/>
+        <pathelement location="../jetty/lib/jetty-annotations-9.0.1.v20130408.jar"/>
+        <pathelement location="../jetty/lib/jetty-continuation-9.0.1.v20130408.jar"/>
+        <pathelement location="../jetty/lib/jetty-security-9.0.1.v20130408.jar"/>
+        <pathelement location="../jetty/lib/jetty-servlets-9.0.1.v20130408.jar"/>
+        <pathelement location="../jetty/lib/jetty-jmx-9.0.1.v20130408.jar"/>
+        <pathelement location="../jetty/lib/jetty-rewrite-9.0.1.v20130408.jar"/>
+        <pathelement location="../jetty/lib/jetty-plus-9.0.1.v20130408.jar"/>
+        <pathelement location="../jetty/lib/jetty-client-9.0.1.v20130408.jar"/>
+        <pathelement location="../jetty/lib/jetty-jaas-9.0.1.v20130408.jar"/>
+        <pathelement location="../jetty/lib/jetty-jndi-9.0.1.v20130408.jar"/>
+        <pathelement location="../jetty/lib/jetty-webapp-9.0.1.v20130408.jar"/>
+        <pathelement location="../jetty/lib/jetty-io-9.0.1.v20130408.jar"/>
+        <pathelement location="../jetty/lib/jetty-util-9.0.1.v20130408.jar"/>
+        <pathelement location="../jetty/lib/jetty-deploy-9.0.1.v20130408.jar"/>
+        <pathelement location="../jetty/lib/jetty-xml-9.0.1.v20130408.jar"/>
+        <pathelement location="../jetty/lib/jetty-proxy-9.0.1.v20130408.jar"/>
+        <pathelement location="../jetty/lib/jetty-server-9.0.1.v20130408.jar"/>
+        <path refid="common.classpath"/>
+        <pathelement location="${common.location}/libs/protobuf-java-2.5.0.jar"/>
+        <pathelement location="${common.location}/libs/jregex1.2_01.jar"/>
+        <pathelement location="${common.location}/libs/slf4j-api-1.7.5.jar"/>
+        <pathelement location="${common.location}/libs/slf4j-jdk14-1.7.5.jar"/>
+        <pathelement location="libs/mysql-connector-java-5.1.24-bin.jar"/>
+        <pathelement location="${common.location}/libs/joda-convert-1.2.jar"/>
+        <pathelement location="${common.location}/libs/joda-time-2.1.jar"/>
+        <pathelement location="libs/spymemcached-2.8.7.jar"/>
+        <pathelement location="libs/jangod-template.jar"/>
+    </path>
+    <target name="init">
+        <mkdir dir="bin"/>
+        <copy includeemptydirs="false" todir="bin">
+            <fileset dir="src">
+                <exclude name="**/*.java"/>
+            </fileset>
+        </copy>
+    </target>
+    <target name="clean">
+        <delete dir="bin"/>
+    </target>
+    <target depends="clean" name="cleanall">
+        <ant antfile="build.xml" dir="${common.location}" inheritAll="false" target="clean"/>
+    </target>
+    <target depends="build-subprojects,build-project" name="build"/>
+    <target name="build-subprojects">
+        <ant antfile="build.xml" dir="${common.location}" inheritAll="false" target="build-project">
+            <propertyset>
+                <propertyref name="build.compiler"/>
+            </propertyset>
+        </ant>
+    </target>
+    <target depends="init" name="build-project">
+        <echo message="${ant.project.name}: ${ant.file}"/>
+        <javac debug="true" debuglevel="${debuglevel}" destdir="bin" includeantruntime="false" source="${source}" target="${target}">
+            <src path="src"/>
+            <classpath refid="server.classpath"/>
+        </javac>
+    </target>
+    <target description="Build all projects which reference this project. Useful to propagate changes." name="build-refprojects"/>
+    <target description="copy Eclipse compiler jars to ant lib directory" name="init-eclipse-compiler">
+        <copy todir="${ant.library.dir}">
+            <fileset dir="${ECLIPSE_HOME}/plugins" includes="org.eclipse.jdt.core_*.jar"/>
+        </copy>
+        <unzip dest="${ant.library.dir}">
+            <patternset includes="jdtCompilerAdapter.jar"/>
+            <fileset dir="${ECLIPSE_HOME}/plugins" includes="org.eclipse.jdt.core_*.jar"/>
+        </unzip>
+    </target>
+    <target description="compile project with Eclipse compiler" name="build-eclipse-compiler">
+        <property name="build.compiler" value="org.eclipse.jdt.core.JDTCompilerAdapter"/>
+        <antcall target="build"/>
+    </target>
+    <target name="Runner">
+        <java classname="au.com.codeka.warworlds.server.Runner" failonerror="true" fork="yes">
+            <jvmarg line="-Djava.util.logging.config.file=/home/dean/software/wwmmo/trunk/server/logging.properties"/>
+            <classpath refid="server.classpath"/>
+        </java>
+    </target>
+</project>

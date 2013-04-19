@@ -17,7 +17,10 @@ public class HtmlPageHandler extends RequestHandler {
     static {
         sTemplateEngine = new TemplateEngine();
 
-        String path = HtmlPageHandler.class.getClassLoader().getResource("").getPath();
+        String path = System.getProperty("au.com.codeka.warworlds.server.basePath");
+        if (path == null) {
+            path = HtmlPageHandler.class.getClassLoader().getResource("").getPath();
+        }
         sTemplateEngine.getConfiguration().setWorkspace(path+"../data/tmpl");
     }
 
