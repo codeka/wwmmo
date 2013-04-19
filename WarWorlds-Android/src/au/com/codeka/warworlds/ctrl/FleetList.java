@@ -31,17 +31,20 @@ import android.widget.Spinner;
 import android.widget.SpinnerAdapter;
 import android.widget.TextView;
 import au.com.codeka.TimeInHours;
+import au.com.codeka.common.model.BaseFleet;
+import au.com.codeka.common.model.DesignKind;
+import au.com.codeka.common.model.ShipDesign;
 import au.com.codeka.warworlds.R;
+import au.com.codeka.warworlds.model.DesignManager;
 import au.com.codeka.warworlds.model.Empire;
 import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.Fleet;
 import au.com.codeka.warworlds.model.ImageManager;
 import au.com.codeka.warworlds.model.MyEmpire;
 import au.com.codeka.warworlds.model.SectorManager;
-import au.com.codeka.warworlds.model.ShipDesign;
-import au.com.codeka.warworlds.model.ShipDesignManager;
 import au.com.codeka.warworlds.model.Sprite;
 import au.com.codeka.warworlds.model.SpriteDrawable;
+import au.com.codeka.warworlds.model.SpriteManager;
 import au.com.codeka.warworlds.model.Star;
 import au.com.codeka.warworlds.model.StarImageManager;
 import au.com.codeka.warworlds.model.StarManager;
@@ -80,8 +83,13 @@ public class FleetList extends FrameLayout implements StarManager.StarFetchedHan
         mFleetActionListener = listener;
     }
 
-    public void refresh(List<Fleet> fleets, Map<String, Star> stars) {
-        mFleets = fleets;
+    public void refresh(List<BaseFleet> fleets, Map<String, Star> stars) {
+        if (fleets != null) {
+            mFleets = new ArrayList<Fleet>();
+            for (BaseFleet f : fleets) {
+                mFleets.add((Fleet) f);
+            }
+        }
         mStars = stars;
 
         initialize();
@@ -100,7 +108,7 @@ public class FleetList extends FrameLayout implements StarManager.StarFetchedHan
             }
         }
 
-        mFleetListAdapter.setFleets(stars, fleets);
+        mFleetListAdapter.setFleets(stars, mFleets);
     }
 
     public void selectFleet(String fleetKey, boolean recentre) {
@@ -257,10 +265,10 @@ public class FleetList extends FrameLayout implements StarManager.StarFetchedHan
                 }
 
                 for (int j = 0; j < s.getFleets().size(); j++) {
-                    mFleets.add(s.getFleets().get(j));
+                    mFleets.add((Fleet) s.getFleets().get(j));
                 }
 
-                refresh(mFleets, mStars);
+                refresh(null, mStars);
                 break;
             }
         }
@@ -276,10 +284,8 @@ public class FleetList extends FrameLayout implements StarManager.StarFetchedHan
         final TextView row2 = (TextView) view.findViewById(R.id.ship_row2);
         final TextView row3 = (TextView) view.findViewById(R.id.ship_row3);
 
-        ShipDesignManager dm = ShipDesignManager.getInstance();
-        ShipDesign design = dm.getDesign(fleet.getDesignID());
-
-        icon.setImageDrawable(new SpriteDrawable(design.getSprite()));
+        ShipDesign design = (ShipDesign) DesignManager.i.getDesign(DesignKind.SHIP, fleet.getDesignID());
+        icon.setImageDrawable(new SpriteDrawable(SpriteManager.i.getSprite(design.getSpriteName())));
 
         String text = String.format(Locale.ENGLISH, "%d × %s",
                     fleet.getNumShips(), design.getDisplayName(fleet.getNumShips() > 1));

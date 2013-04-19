@@ -41,7 +41,8 @@ public class ScoutReport {
         Messages.Star starPb;
         try {
             starPb = Messages.Star.parseFrom(starSnapshotSerialized);
-            scoutReport.mStarSnapshot = Star.fromProtocolBuffer(starPb);
+            scoutReport.mStarSnapshot = new Star();
+            scoutReport.mStarSnapshot.fromProtocolBuffer(starPb);
         } catch (InvalidProtocolBufferException e) {
             // TODO: handle errors?
         }

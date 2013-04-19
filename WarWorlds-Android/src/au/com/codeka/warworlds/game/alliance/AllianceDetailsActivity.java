@@ -18,14 +18,14 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import au.com.codeka.common.model.BaseAllianceMember;
+import au.com.codeka.common.model.BaseEmpireRank;
 import au.com.codeka.warworlds.BaseActivity;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.model.Alliance;
 import au.com.codeka.warworlds.model.AllianceManager;
-import au.com.codeka.warworlds.model.AllianceMember;
 import au.com.codeka.warworlds.model.Empire;
 import au.com.codeka.warworlds.model.EmpireManager;
-import au.com.codeka.warworlds.model.EmpireRank;
 import au.com.codeka.warworlds.model.MyEmpire;
 
 public class AllianceDetailsActivity extends BaseActivity
@@ -93,7 +93,7 @@ public class AllianceDetailsActivity extends BaseActivity
     }
 
     private void fullRefresh() {
-        Alliance myAlliance = EmpireManager.getInstance().getEmpire().getAlliance();
+        Alliance myAlliance = (Alliance) EmpireManager.getInstance().getEmpire().getAlliance();
         if (myAlliance == null) {
             setContentView(R.layout.alliance_details_potential);
         } else if (myAlliance.getKey().equals(mAllianceKey)) {
@@ -138,7 +138,7 @@ public class AllianceDetailsActivity extends BaseActivity
         if (mAlliance.getMembers() != null) {
             ArrayList<Empire> members = new ArrayList<Empire>();
             ArrayList<String> missingMembers = new ArrayList<String>();
-            for (AllianceMember am : mAlliance.getMembers()) {
+            for (BaseAllianceMember am : mAlliance.getMembers()) {
                 Empire member = EmpireManager.getInstance().getEmpire(this, am.getEmpireKey());
                 if (member == null) {
                     missingMembers.add(am.getEmpireKey());
@@ -202,7 +202,7 @@ public class AllianceDetailsActivity extends BaseActivity
             empireName.setText(empire.getDisplayName());
             empireIcon.setImageBitmap(empire.getShield(this));
 
-            EmpireRank rank = empire.getRank();
+            BaseEmpireRank rank = empire.getRank();
             if (rank != null) {
                 totalStars.setText(Html.fromHtml(String.format("Stars: <b>%s</b>",
                         formatter.format(rank.getTotalStars()))));

@@ -10,6 +10,7 @@ import android.content.Context;
 import au.com.codeka.BackgroundRunner;
 import au.com.codeka.warworlds.api.ApiClient;
 import au.com.codeka.warworlds.api.ApiException;
+import au.com.codeka.common.model.BaseAlliance;
 import au.com.codeka.common.protobuf.Messages;
 
 public class AllianceManager {
@@ -51,7 +52,9 @@ public class AllianceManager {
                     Messages.Alliances pb = ApiClient.getProtoBuf(url, Messages.Alliances.class);
                     alliances = new ArrayList<Alliance>();
                     for (Messages.Alliance alliance_pb : pb.getAlliancesList()) {
-                        alliances.add(Alliance.fromProtocolBuffer(alliance_pb));
+                        Alliance alliance = new Alliance();
+                        alliance.fromProtocolBuffer(alliance_pb);
+                        alliances.add(alliance);
                     }
                     return alliances;
                 } catch(ApiException e) {
@@ -78,7 +81,9 @@ public class AllianceManager {
                 String url = "alliances/"+allianceKey;
                 try {
                     Messages.Alliance pb = ApiClient.getProtoBuf(url, Messages.Alliance.class);
-                    return Alliance.fromProtocolBuffer(pb);
+                    Alliance alliance = new Alliance();
+                    alliance.fromProtocolBuffer(pb);
+                    return alliance;
                 } catch(ApiException e) {
                     return null;
                 }
@@ -201,7 +206,7 @@ public class AllianceManager {
         if (myEmpire == null) {
             return;
         }
-        final Alliance myAlliance = myEmpire.getAlliance();
+        final BaseAlliance myAlliance = myEmpire.getAlliance();
         if (myAlliance == null) {
             return;
         }

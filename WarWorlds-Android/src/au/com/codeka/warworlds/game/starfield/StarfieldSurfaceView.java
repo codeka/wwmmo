@@ -22,9 +22,9 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
+import android.graphics.Paint.Style;
 import android.graphics.Path;
 import android.graphics.Rect;
-import android.graphics.Paint.Style;
 import android.os.Handler;
 import android.util.AttributeSet;
 import android.view.GestureDetector;
@@ -33,13 +33,15 @@ import android.view.View;
 import android.widget.RelativeLayout;
 import au.com.codeka.common.Pair;
 import au.com.codeka.common.Vector2;
+import au.com.codeka.common.model.BaseColony;
+import au.com.codeka.common.model.BaseFleet;
+import au.com.codeka.common.model.BaseStar;
 import au.com.codeka.common.model.DesignKind;
 import au.com.codeka.common.model.ShipDesign;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.ctrl.SelectionView;
 import au.com.codeka.warworlds.game.StarfieldBackgroundRenderer;
 import au.com.codeka.warworlds.model.BuildManager;
-import au.com.codeka.warworlds.model.Colony;
 import au.com.codeka.warworlds.model.DesignManager;
 import au.com.codeka.warworlds.model.Empire;
 import au.com.codeka.warworlds.model.EmpireManager;
@@ -77,7 +79,7 @@ public class StarfieldSurfaceView extends SectorView
     private Paint mStarNamePaint;
     private boolean mIsScrolling;
     private Handler mHandler;
-    private StarSummary mHqStar;
+    private BaseStar mHqStar;
     private Sprite mHqSprite;
     private HqDirectionOverlay mHqOverlay;
 
@@ -145,7 +147,7 @@ public class StarfieldSurfaceView extends SectorView
 
         MyEmpire myEmpire = EmpireManager.getInstance().getEmpire();
         if (myEmpire != null) {
-            StarSummary homeStar = myEmpire.getHomeStar();
+            BaseStar homeStar = myEmpire.getHomeStar();
             int numHqs = BuildManager.getInstance().getTotalBuildingsInEmpire("hq");
             if (numHqs > 0) {
                 mHqStar = homeStar;
@@ -452,16 +454,16 @@ public class StarfieldSurfaceView extends SectorView
      * Draws a sector, which is a 1024x1024 area of stars.
      */
     private void drawSector(Canvas canvas, int offsetX, int offsetY, Sector sector) {
-        for(Star star : sector.getStars()) {
-            drawStar(canvas, star, offsetX, offsetY);
+        for(BaseStar star : sector.getStars()) {
+            drawStar(canvas, (Star) star, offsetX, offsetY);
         }
-        for(Star star : sector.getStars()) {
-            drawStarName(canvas, star, offsetX, offsetY);
+        for(BaseStar star : sector.getStars()) {
+            drawStarName(canvas, (Star) star, offsetX, offsetY);
         }
-        for (Star star : sector.getStars()) {
-            for (Fleet fleet : star.getFleets()) {
+        for (BaseStar star : sector.getStars()) {
+            for (BaseFleet fleet : star.getFleets()) {
                 if (fleet.getState() == Fleet.State.MOVING) {
-                    drawMovingFleet(canvas, fleet, star, offsetX, offsetY);
+                    drawMovingFleet(canvas, (Fleet) fleet, (Star) star, offsetX, offsetY);
                 }
             }
         }
@@ -496,7 +498,7 @@ public class StarfieldSurfaceView extends SectorView
             drawStarIcons(canvas, star, x, y);
             if (mHqStar != null && star.getKey().equals(mHqStar.getKey())) {
                 if (mHqSprite == null) {
-                    mHqSprite = SpriteManager.getInstance().getSprite("building.hq");
+                    mHqSprite = SpriteManager.i.getSprite("building.hq");
                 }
 
                 mMatrix.reset();
@@ -553,12 +555,12 @@ public class StarfieldSurfaceView extends SectorView
     private void drawStarIcons(Canvas canvas, Star star, int x, int y) {
         final float pixelScale = getPixelScale();
 
-        List<Colony> colonies = star.getColonies();
+        List<BaseColony> colonies = star.getColonies();
         if (colonies != null && !colonies.isEmpty()) {
             Map<String, Integer> colonyEmpires = new TreeMap<String, Integer>();
 
             for (int i = 0; i < colonies.size(); i++) {
-                Colony colony = colonies.get(i);
+                BaseColony colony = colonies.get(i);
                 if (colony.getEmpireKey() == null) {
                     continue;
                 }
@@ -613,11 +615,11 @@ public class StarfieldSurfaceView extends SectorView
             }
         }
 
-        List<Fleet> fleets = star.getFleets();
+        List<BaseFleet> fleets = star.getFleets();
         if (fleets != null && !fleets.isEmpty()) {
             Map<String, Integer> empireFleets = new TreeMap<String, Integer>();
             for (int i = 0; i < fleets.size(); i++) {
-                Fleet f = fleets.get(i);
+                BaseFleet f = fleets.get(i);
                 if (f.getState() == Fleet.State.MOVING) {
                     // ignore moving fleets, we'll draw them separately
                     continue;
@@ -858,7 +860,7 @@ public class StarfieldSurfaceView extends SectorView
         }
     }
 
-    public void selectFleet(Fleet fleet) {
+    public void selectFleet(BaseFleet fleet) {
         if (fleet != null && fleet.getState() == Fleet.State.MOVING) {
             log.info("Selecting fleet: "+fleet.getKey());
             mSelectedEntity = null;

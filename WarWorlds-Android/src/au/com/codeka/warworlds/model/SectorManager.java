@@ -20,6 +20,7 @@ import au.com.codeka.common.Pair;
 import au.com.codeka.common.Vector2;
 import au.com.codeka.warworlds.api.ApiClient;
 import au.com.codeka.warworlds.game.StarfieldBackgroundRenderer;
+import au.com.codeka.common.model.BaseStar;
 import au.com.codeka.common.protobuf.Messages;
 
 /**
@@ -203,7 +204,12 @@ public class SectorManager {
                         url = "sectors?coords="+url;
                         try {
                             Messages.Sectors pb = ApiClient.getProtoBuf(url, Messages.Sectors.class);
-                            sectors = Sector.fromProtocolBuffer(pb.getSectorsList());
+                            sectors = new ArrayList<Sector>();
+                            for (Messages.Sector sector_pb : pb.getSectorsList()) {
+                                Sector sector = new Sector();
+                                sector.fromProtocolBuffer(sector_pb);
+                                sectors.add(sector);
+                            }
                         } catch(Exception e) {
                             log.error(ExceptionUtils.getStackTrace(e));
                         }
@@ -230,8 +236,8 @@ public class SectorManager {
                                     theseSectors.put(key, s);
                                 }
 
-                                for (Star star : s.getStars()) {
-                                    mSectorStars.put(star.getKey(), star);
+                                for (BaseStar star : s.getStars()) {
+                                    mSectorStars.put(star.getKey(), (Star) star);
                                 }
 
                                 Map<Pair<Long, Long>, Sector> thisSector = null;

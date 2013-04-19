@@ -16,11 +16,14 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+import au.com.codeka.common.model.BaseFleet;
+import au.com.codeka.common.model.Design;
+import au.com.codeka.common.model.DesignKind;
 import au.com.codeka.warworlds.R;
+import au.com.codeka.warworlds.model.DesignManager;
 import au.com.codeka.warworlds.model.Fleet;
-import au.com.codeka.warworlds.model.ShipDesign;
-import au.com.codeka.warworlds.model.ShipDesignManager;
 import au.com.codeka.warworlds.model.SpriteDrawable;
+import au.com.codeka.warworlds.model.SpriteManager;
 import au.com.codeka.warworlds.model.Star;
 
 public class FleetListSimple extends ListView {
@@ -82,9 +85,9 @@ public class FleetListSimple extends ListView {
             mFleets = new ArrayList<Fleet>();
 
             if (star.getFleets() != null) {
-                for (Fleet f : star.getFleets()) {
+                for (BaseFleet f : star.getFleets()) {
                     if (!f.getState().equals(Fleet.State.MOVING)) {
-                        mFleets.add(f);
+                        mFleets.add((Fleet) f);
                     }
                 }
             }
@@ -127,10 +130,9 @@ public class FleetListSimple extends ListView {
 
             final ImageView icon = (ImageView) view.findViewById(R.id.starfield_planet_icon);
             final Fleet fleet = mFleets.get(position);
-            ShipDesignManager designManager = ShipDesignManager.getInstance();
-            ShipDesign design = designManager.getDesign(fleet.getDesignID());
+            Design design = DesignManager.i.getDesign(DesignKind.SHIP, fleet.getDesignID());
 
-            icon.setImageDrawable(new SpriteDrawable(design.getSprite()));
+            icon.setImageDrawable(new SpriteDrawable(SpriteManager.i.getSprite(design.getSpriteName())));
 
             TextView shipKindTextView = (TextView) view.findViewById(R.id.starfield_planet_type);
             shipKindTextView.setText(String.format("%d × %s",

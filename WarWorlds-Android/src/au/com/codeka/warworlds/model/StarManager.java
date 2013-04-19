@@ -17,12 +17,12 @@ import org.slf4j.LoggerFactory;
 
 import android.content.Context;
 import au.com.codeka.BackgroundRunner;
+import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.api.ApiClient;
 import au.com.codeka.warworlds.api.ApiException;
 import au.com.codeka.warworlds.model.billing.IabException;
 import au.com.codeka.warworlds.model.billing.Purchase;
 import au.com.codeka.warworlds.model.billing.SkuDetails;
-import au.com.codeka.warworlds.model.protobuf.Messages;
 
 public class StarManager {
     private static StarManager sInstance = new StarManager();
@@ -309,7 +309,8 @@ public class StarManager {
                 Messages.Star star_pb;
                 try {
                     star_pb = ApiClient.putProtoBuf(url, pb, Messages.Star.class);
-                    Star star = Star.fromProtocolBuffer(star_pb);
+                    Star star = new Star();
+                    star.fromProtocolBuffer(star_pb);
 
                     updateStarSummary(context, star);
                     return star;
@@ -341,7 +342,8 @@ public class StarManager {
             String url = "stars/"+starKey;
 
             Messages.Star pb = ApiClient.getProtoBuf(url, Messages.Star.class);
-            star = Star.fromProtocolBuffer(pb);
+            star = new Star();
+            star.fromProtocolBuffer(pb);
         } catch(Exception e) {
             // TODO: handle exceptions
             log.error(ExceptionUtils.getStackTrace(e));
@@ -395,7 +397,7 @@ public class StarManager {
             Messages.Star pb = Messages.Star.newBuilder().mergeFrom(fis).build();
 
             StarSummary ss = new StarSummary();
-            ss.populateFromProtocolBuffer(pb);
+            ss.fromProtocolBuffer(pb);
             return ss;
         } catch (FileNotFoundException e) {
         } catch (IOException e) {

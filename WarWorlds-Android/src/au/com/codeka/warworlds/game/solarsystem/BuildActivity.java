@@ -26,6 +26,13 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import au.com.codeka.RomanNumeralFormatter;
 import au.com.codeka.TimeInHours;
+import au.com.codeka.common.model.BaseBuildRequest;
+import au.com.codeka.common.model.BaseBuilding;
+import au.com.codeka.common.model.BaseColony;
+import au.com.codeka.common.model.BuildingDesign;
+import au.com.codeka.common.model.Design;
+import au.com.codeka.common.model.DesignKind;
+import au.com.codeka.common.model.ShipDesign;
 import au.com.codeka.warworlds.BaseActivity;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.ServerGreeter;
@@ -38,18 +45,15 @@ import au.com.codeka.warworlds.game.BuildStopConfirmDialog;
 import au.com.codeka.warworlds.model.BuildManager;
 import au.com.codeka.warworlds.model.BuildRequest;
 import au.com.codeka.warworlds.model.Building;
-import au.com.codeka.warworlds.model.BuildingDesign;
-import au.com.codeka.warworlds.model.BuildingDesignManager;
 import au.com.codeka.warworlds.model.Colony;
-import au.com.codeka.warworlds.model.Design;
+import au.com.codeka.warworlds.model.DesignManager;
 import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.MyEmpire;
 import au.com.codeka.warworlds.model.Planet;
 import au.com.codeka.warworlds.model.PlanetImageManager;
-import au.com.codeka.warworlds.model.ShipDesign;
-import au.com.codeka.warworlds.model.ShipDesignManager;
 import au.com.codeka.warworlds.model.Sprite;
 import au.com.codeka.warworlds.model.SpriteDrawable;
+import au.com.codeka.warworlds.model.SpriteManager;
 import au.com.codeka.warworlds.model.Star;
 import au.com.codeka.warworlds.model.StarManager;
 import au.com.codeka.warworlds.model.StarSummary;
@@ -108,9 +112,9 @@ public class BuildActivity extends BaseActivity implements StarManager.StarFetch
             mStar = s;
             mColonies = new ArrayList<Colony>();
             MyEmpire myEmpire = EmpireManager.getInstance().getEmpire();
-            for (Colony c : mStar.getColonies()) {
+            for (BaseColony c : mStar.getColonies()) {
                 if (c.getEmpireKey() != null && c.getEmpireKey().equals(myEmpire.getKey())) {
-                    mColonies.add(c);
+                    mColonies.add((Colony) c);
                 }
             }
             Collections.sort(mColonies, new Comparator<Colony>() {
@@ -139,7 +143,7 @@ public class BuildActivity extends BaseActivity implements StarManager.StarFetch
 
     private void refreshColonyDetails(Colony colony) {
         ImageView planetIcon = (ImageView) findViewById(R.id.planet_icon);
-        Planet planet = mStar.getPlanets()[colony.getPlanetIndex() - 1];
+        Planet planet = (Planet) mStar.getPlanets()[colony.getPlanetIndex() - 1];
         Sprite planetSprite = PlanetImageManager.getInstance().getSprite(this, planet);
         planetIcon.setImageDrawable(new SpriteDrawable(planetSprite));
 
@@ -149,7 +153,7 @@ public class BuildActivity extends BaseActivity implements StarManager.StarFetch
 
         TextView buildQueueDescription = (TextView) findViewById(R.id.build_queue_description);
         int buildQueueLength = 0;
-        for (BuildRequest br : mStar.getBuildRequests()) {
+        for (BaseBuildRequest br : mStar.getBuildRequests()) {
             if (br.getColonyKey().equals(colony.getKey())) {
                 buildQueueLength ++;
             }
@@ -172,7 +176,7 @@ public class BuildActivity extends BaseActivity implements StarManager.StarFetch
     private String getDependenciesList(Colony colony, Design design, int level) {
         String required = "Required: ";
         List<Design.Dependency> dependencies;
-        if (level == 1 || design.getDesignKind() != Design.DesignKind.BUILDING) {
+        if (level == 1 || design.getDesignKind() != DesignKind.BUILDING) {
             dependencies = design.getDependencies();
         } else {
             BuildingDesign bd = (BuildingDesign) design;
@@ -190,14 +194,14 @@ public class BuildActivity extends BaseActivity implements StarManager.StarFetch
                 }
 
                 boolean dependencyMet = false;
-                for (Building b : colony.getBuildings()) {
-                    if (b.getDesign().getID().equals(dep.getDesignID())) {
+                for (BaseBuilding b : colony.getBuildings()) {
+                    if (b.getDesignName().equals(dep.getDesignID())) {
                         // TODO: check level
                         dependencyMet = true;
                     }
                 }
 
-                Design dependentDesign = BuildingDesignManager.getInstance().getDesign(dep.getDesignID());
+                Design dependentDesign = DesignManager.i.getDesign(DesignKind.BUILDING, dep.getDesignID());
                 required += "<font color=\""+(dependencyMet ? "green" : "red")+"\">";
                 required += dependentDesign.getDisplayName();
                 required += "</font>";
@@ -308,7 +312,7 @@ public class BuildActivity extends BaseActivity implements StarManager.StarFetch
                     Entry entry = (Entry) mBuildingListAdapter.getItem(position);
                     int buildQueueSize = 0;
                     BuildActivity activity = (BuildActivity) getActivity();
-                    for (BuildRequest br : activity.mStar.getBuildRequests()) {
+                    for (BaseBuildRequest br : activity.mStar.getBuildRequests()) {
                         if (br.getColonyKey().equals(colony.getKey())) {
                             buildQueueSize ++;
                         }
@@ -340,31 +344,31 @@ public class BuildActivity extends BaseActivity implements StarManager.StarFetch
             private static final int NEW_BUILDING_TYPE = 2;
 
             public void setColony(Star star, Colony colony) {
-                List<Building> buildings = colony.getBuildings();
+                List<BaseBuilding> buildings = colony.getBuildings();
                 if (buildings == null) {
-                    buildings = new ArrayList<Building>();
+                    buildings = new ArrayList<BaseBuilding>();
                 }
 
                 mEntries = new ArrayList<Entry>();
-                for (Building b : buildings) {
+                for (BaseBuilding b : buildings) {
                     Entry entry = new Entry();
-                    entry.building = b;
+                    entry.building = (Building) b;
                     // if the building is being upgraded (i.e. if there's a build request that
                     // references this building) then add the build request as well
-                    for (BuildRequest br : star.getBuildRequests()) {
+                    for (BaseBuildRequest br : star.getBuildRequests()) {
                         if (br.getExistingBuildingKey() != null && br.getExistingBuildingKey().equals(b.getKey())) {
-                            entry.buildRequest = br;
+                            entry.buildRequest = (BuildRequest) br;
                         }
                     }
                     mEntries.add(entry);
                 }
 
-                for (BuildRequest br : star.getBuildRequests()) {
+                for (BaseBuildRequest br : star.getBuildRequests()) {
                     if (br.getColonyKey().equals(colony.getKey()) &&
-                        br.getBuildKind().equals(BuildRequest.BuildKind.BUILDING) &&
+                        br.getDesignKind().equals(DesignKind.BUILDING) &&
                         br.getExistingBuildingKey() == null) {
                         Entry entry = new Entry();
-                        entry.buildRequest = br;
+                        entry.buildRequest = (BuildRequest) br;
                         mEntries.add(entry);
                     }
                 }
@@ -386,7 +390,7 @@ public class BuildActivity extends BaseActivity implements StarManager.StarFetch
                 title.title = "Available Buildings";
                 mEntries.add(title);
 
-                for (Design d : BuildingDesignManager.getInstance().getDesigns().values()) {
+                for (Design d : DesignManager.i.getDesigns(DesignKind.BUILDING).values()) {
                     BuildingDesign bd = (BuildingDesign) d;
                     if (bd.getMaxPerColony() > 0) {
                         int numExisting = 0;
@@ -516,11 +520,10 @@ public class BuildActivity extends BaseActivity implements StarManager.StarFetch
 
                     Building building = entry.building;
                     BuildRequest buildRequest = entry.buildRequest;
-                    BuildingDesign design = (building != null
-                            ? building.getDesign()
-                            : BuildingDesignManager.getInstance().getDesign(buildRequest.getDesignID()));
+                    BuildingDesign design = (BuildingDesign) DesignManager.i.getDesign(DesignKind.BUILDING,
+                            (building != null ? building.getDesignName() : buildRequest.getDesignID()));
 
-                    icon.setImageDrawable(new SpriteDrawable(design.getSprite()));
+                    icon.setImageDrawable(new SpriteDrawable(SpriteManager.i.getSprite(design.getSpriteName())));
 
                     int numUpgrades = design.getUpgrades().size();
 
@@ -574,7 +577,7 @@ public class BuildActivity extends BaseActivity implements StarManager.StarFetch
 
                     BuildingDesign design = mEntries.get(position).design;
 
-                    icon.setImageDrawable(new SpriteDrawable(design.getSprite()));
+                    icon.setImageDrawable(new SpriteDrawable(SpriteManager.i.getSprite(design.getSpriteName())));
 
                     row1.setText(design.getDisplayName());
                     row2.setText(String.format("%.2f hours",
@@ -604,7 +607,7 @@ public class BuildActivity extends BaseActivity implements StarManager.StarFetch
             final Colony colony = getColony();
 
             final ShipDesignListAdapter adapter = new ShipDesignListAdapter();
-            adapter.setDesigns(ShipDesignManager.getInstance().getDesigns());
+            adapter.setDesigns(DesignManager.i.getDesigns(DesignKind.SHIP));
 
             ListView availableDesignsList = (ListView) v.findViewById(R.id.ship_list);
             availableDesignsList.setAdapter(adapter);
@@ -613,7 +616,7 @@ public class BuildActivity extends BaseActivity implements StarManager.StarFetch
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                     int buildQueueSize = 0;
                     BuildActivity activity = (BuildActivity) getActivity();
-                    for (BuildRequest br : activity.mStar.getBuildRequests()) {
+                    for (BaseBuildRequest br : activity.mStar.getBuildRequests()) {
                         if (br.getColonyKey().equals(colony.getKey())) {
                             buildQueueSize ++;
                         }
@@ -685,7 +688,7 @@ public class BuildActivity extends BaseActivity implements StarManager.StarFetch
 
                 ShipDesign design = mDesigns.get(position);
 
-                icon.setImageDrawable(new SpriteDrawable(design.getSprite()));
+                icon.setImageDrawable(new SpriteDrawable(SpriteManager.i.getSprite(design.getSpriteName())));
 
                 row1.setText(design.getDisplayName());
                 row2.setText(String.format("%.2f hours",

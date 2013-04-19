@@ -12,7 +12,7 @@ import android.os.Handler;
 import au.com.codeka.BackgroundRunner;
 import au.com.codeka.warworlds.api.ApiClient;
 import au.com.codeka.warworlds.api.ApiException;
-import au.com.codeka.warworlds.model.protobuf.Messages;
+import au.com.codeka.common.protobuf.Messages;
 
 /**
  * This class is used to detect when the app goes into the background. Basically

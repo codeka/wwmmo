@@ -43,7 +43,7 @@ import au.com.codeka.warworlds.model.SpriteDrawable;
 import au.com.codeka.warworlds.model.StarImageManager;
 import au.com.codeka.warworlds.model.StarManager;
 import au.com.codeka.warworlds.model.StarSummary;
-import au.com.codeka.warworlds.model.protobuf.Messages;
+import au.com.codeka.common.protobuf.Messages;
 
 public class SitrepActivity extends BaseActivity {
     private static Logger log = LoggerFactory.getLogger(SitrepActivity.class);

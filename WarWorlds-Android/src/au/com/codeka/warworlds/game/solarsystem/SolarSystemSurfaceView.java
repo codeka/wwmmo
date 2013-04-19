@@ -17,12 +17,13 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.RelativeLayout;
 import au.com.codeka.common.Vector2;
+import au.com.codeka.common.model.BaseBuilding;
+import au.com.codeka.common.model.BaseColony;
+import au.com.codeka.common.model.BasePlanet;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.ctrl.SelectionView;
 import au.com.codeka.warworlds.game.StarfieldBackgroundRenderer;
 import au.com.codeka.warworlds.game.UniverseElementSurfaceView;
-import au.com.codeka.warworlds.model.Building;
-import au.com.codeka.warworlds.model.Colony;
 import au.com.codeka.warworlds.model.ImageManager;
 import au.com.codeka.warworlds.model.Planet;
 import au.com.codeka.warworlds.model.PlanetImageManager;
@@ -79,12 +80,12 @@ public class SolarSystemSurfaceView extends UniverseElementSurfaceView {
     public void setStar(Star star) {
         mStar = star;
 
-        Planet[] planets = mStar.getPlanets();
+        BasePlanet[] planets = mStar.getPlanets();
         mPlanetInfos = new PlanetInfo[planets.length];
 
         for (int i = 0; i < planets.length; i++) {
             PlanetInfo planetInfo = new PlanetInfo();
-            planetInfo.planet = planets[i];
+            planetInfo.planet = (Planet) planets[i];
             planetInfo.centre = new Vector2(0, 0);
             planetInfo.distanceFromSun = 0.0f;
             mPlanetInfos[i] = planetInfo;
@@ -138,13 +139,13 @@ public class SolarSystemSurfaceView extends UniverseElementSurfaceView {
             planetInfo.centre = centre;
             planetInfo.distanceFromSun = distanceFromSun;
 
-            List<Colony> colonies = mStar.getColonies();
+            List<BaseColony> colonies = mStar.getColonies();
             if (colonies != null && !colonies.isEmpty()) {
-                for (Colony colony : colonies) {
+                for (BaseColony colony : colonies) {
                     if (colony.getPlanetIndex() == mPlanetInfos[i].planet.getIndex()) {
                         planetInfo.hasColony = true;
 
-                        for (Building building : colony.getBuildings()) {
+                        for (BaseBuilding building : colony.getBuildings()) {
                             if (building.getDesignName().equals("hq")) {
                                 planetInfo.hasHQ = true;
                             }
@@ -297,7 +298,7 @@ public class SolarSystemSurfaceView extends UniverseElementSurfaceView {
             canvas.restore();
 
             if (planetInfo.hasHQ) {
-                Sprite hqSprite = SpriteManager.getInstance().getSprite("building.hq"); // todo: hardcoded?
+                Sprite hqSprite = SpriteManager.i.getSprite("building.hq"); // todo: hardcoded?
 
                 mMatrix.reset();
                 mMatrix.postTranslate(-(hqSprite.getWidth() / 2.0f), -(hqSprite.getHeight() / 2.0f));

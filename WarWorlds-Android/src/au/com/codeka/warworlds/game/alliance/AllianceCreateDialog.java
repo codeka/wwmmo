@@ -10,12 +10,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.TextView;
 import au.com.codeka.BackgroundRunner;
+import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.StyledDialog;
 import au.com.codeka.warworlds.api.ApiClient;
 import au.com.codeka.warworlds.api.ApiException;
 import au.com.codeka.warworlds.model.EmpireManager;
-import au.com.codeka.warworlds.model.protobuf.Messages;
 
 public class AllianceCreateDialog extends DialogFragment {
     private View mView;

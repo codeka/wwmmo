@@ -6,17 +6,17 @@ import android.os.Bundle;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
+import au.com.codeka.common.model.BaseFleet;
 import au.com.codeka.warworlds.ActivityBackgroundGenerator;
 import au.com.codeka.warworlds.BaseActivity;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.ServerGreeter;
-import au.com.codeka.warworlds.StyledDialog;
 import au.com.codeka.warworlds.ServerGreeter.ServerGreeting;
+import au.com.codeka.warworlds.StyledDialog;
 import au.com.codeka.warworlds.WarWorldsActivity;
 import au.com.codeka.warworlds.ctrl.PlanetDetailsView;
 import au.com.codeka.warworlds.model.Colony;
 import au.com.codeka.warworlds.model.EmpireManager;
-import au.com.codeka.warworlds.model.Fleet;
 import au.com.codeka.warworlds.model.MyEmpire;
 import au.com.codeka.warworlds.model.Planet;
 import au.com.codeka.warworlds.model.Star;
@@ -70,7 +70,7 @@ public class EmptyPlanetActivity extends BaseActivity
         int planetIndex = getIntent().getExtras().getInt("au.com.codeka.warworlds.PlanetIndex");
 
         mStar = s;
-        mPlanet = s.getPlanets()[planetIndex - 1];
+        mPlanet = (Planet) s.getPlanets()[planetIndex - 1];
 
         PlanetDetailsView planetDetails = (PlanetDetailsView) findViewById(R.id.planet_details);
         planetDetails.setup(mStar, mPlanet, null);
@@ -82,7 +82,7 @@ public class EmptyPlanetActivity extends BaseActivity
 
         // check that we have a colony ship (the server will check too, but this is easy)
         boolean hasColonyShip = false;
-        for (Fleet fleet : mStar.getFleets()) {
+        for (BaseFleet fleet : mStar.getFleets()) {
             if (fleet.getEmpireKey() == null) {
                 continue;
             }

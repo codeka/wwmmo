@@ -40,13 +40,13 @@ public class MyEmpire extends Empire {
     public void colonize(final Context context, final Planet planet,
                          final ColonizeCompleteHandler callback) {
         log.debug(String.format("Colonizing: Star=%s Planet=%d",
-                                planet.getStarSummary().getKey(),
+                                planet.getStar().getKey(),
                                 planet.getIndex()));
         new BackgroundRunner<Colony>() {
             @Override
             protected Colony doInBackground() {
                 try {
-                    if (planet.getStarSummary() == null) {
+                    if (planet.getStar() == null) {
                         log.warn("planet.getStarSummary() returned null!");
                         return null;
                     }
@@ -55,11 +55,14 @@ public class MyEmpire extends Empire {
                             .setPlanetIndex(planet.getIndex())
                             .build();
 
-                    String url = String.format("stars/%s/colonies", planet.getStarSummary().getKey());
+                    String url = String.format("stars/%s/colonies", planet.getStar().getKey());
                     Messages.Colony pb = ApiClient.postProtoBuf(url, request, Messages.Colony.class);
                     if (pb == null)
                         return null;
-                    return Colony.fromProtocolBuffer(pb);
+
+                    Colony colony = new Colony();
+                    colony.fromProtocolBuffer(pb);
+                    return colony;
                 } catch(Exception e) {
                     // TODO: handle exceptions
                     log.error(ExceptionUtils.getStackTrace(e));
@@ -241,7 +244,9 @@ public class MyEmpire extends Empire {
                     if (pb == null)
                         return null;
 
-                    return Star.fromProtocolBuffer(pb);
+                    Star star = new Star();
+                    star.fromProtocolBuffer(pb);
+                    return star;
                 } catch(Exception e) {
                     // TODO: handle exceptions
                     log.error(ExceptionUtils.getStackTrace(e));
@@ -275,7 +280,8 @@ public class MyEmpire extends Empire {
 
                     ArrayList<Star> stars = new ArrayList<Star>();
                     for (Messages.Star star_pb : pb.getStarsList()) {
-                        Star star = Star.fromProtocolBuffer(star_pb);
+                        Star star = new Star();
+                        star.fromProtocolBuffer(star_pb);
                         stars.add(star);
                     }
 
@@ -316,12 +322,6 @@ public class MyEmpire extends Empire {
             return new MyEmpire[size];
         }
     };
-
-    public static MyEmpire fromProtocolBuffer(Messages.Empire pb) {
-        MyEmpire empire = new MyEmpire();
-        empire.populateFromProtocolBuffer(pb);
-        return empire;
-    }
 
     public static interface ColonizeCompleteHandler {
         public void onColonizeComplete(Colony colony);

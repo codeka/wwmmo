@@ -12,22 +12,24 @@ import android.view.Window;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import au.com.codeka.common.model.BaseColony;
+import au.com.codeka.common.model.BaseFleet;
+import au.com.codeka.common.model.DesignKind;
+import au.com.codeka.common.model.ShipDesign;
 import au.com.codeka.warworlds.ActivityBackgroundGenerator;
 import au.com.codeka.warworlds.BaseActivity;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.ServerGreeter;
+import au.com.codeka.warworlds.ServerGreeter.ServerGreeting;
 import au.com.codeka.warworlds.StyledDialog;
 import au.com.codeka.warworlds.WarWorldsActivity;
-import au.com.codeka.warworlds.ServerGreeter.ServerGreeting;
 import au.com.codeka.warworlds.ctrl.PlanetDetailsView;
 import au.com.codeka.warworlds.model.Colony;
+import au.com.codeka.warworlds.model.DesignManager;
 import au.com.codeka.warworlds.model.Empire;
 import au.com.codeka.warworlds.model.EmpireManager;
-import au.com.codeka.warworlds.model.Fleet;
 import au.com.codeka.warworlds.model.MyEmpire;
 import au.com.codeka.warworlds.model.Planet;
-import au.com.codeka.warworlds.model.ShipDesign;
-import au.com.codeka.warworlds.model.ShipDesignManager;
 import au.com.codeka.warworlds.model.Star;
 import au.com.codeka.warworlds.model.StarManager;
 
@@ -85,10 +87,10 @@ public class EnemyPlanetActivity extends BaseActivity
         int planetIndex = getIntent().getExtras().getInt("au.com.codeka.warworlds.PlanetIndex");
 
         mStar = s;
-        mPlanet = s.getPlanets()[planetIndex - 1];
-        for (Colony colony : s.getColonies()) {
+        mPlanet = (Planet) s.getPlanets()[planetIndex - 1];
+        for (BaseColony colony : s.getColonies()) {
             if (colony.getPlanetIndex() == planetIndex) {
-                mColony = colony;
+                mColony = (Colony) colony;
             }
         }
 
@@ -135,12 +137,12 @@ public class EnemyPlanetActivity extends BaseActivity
 
         final MyEmpire myEmpire = EmpireManager.getInstance().getEmpire();
         int attack = 0;
-        for (Fleet fleet : mStar.getFleets()) {
+        for (BaseFleet fleet : mStar.getFleets()) {
             if (fleet.getEmpireKey() == null) {
                 continue;
             }
             if (fleet.getEmpireKey().equals(myEmpire.getKey())) {
-                ShipDesign design = ShipDesignManager.getInstance().getDesign(fleet.getDesignID());
+                ShipDesign design = (ShipDesign) DesignManager.i.getDesign(DesignKind.SHIP, fleet.getDesignID());
                 if (design.hasEffect("troopcarrier")) {
                     attack += fleet.getNumShips();
                 }

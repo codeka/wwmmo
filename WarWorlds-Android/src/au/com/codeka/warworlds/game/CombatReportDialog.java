@@ -16,15 +16,17 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+import au.com.codeka.common.model.DesignKind;
+import au.com.codeka.common.model.ShipDesign;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.StyledDialog;
 import au.com.codeka.warworlds.model.CombatReport;
+import au.com.codeka.warworlds.model.DesignManager;
 import au.com.codeka.warworlds.model.Empire;
 import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.MyEmpire;
-import au.com.codeka.warworlds.model.ShipDesign;
-import au.com.codeka.warworlds.model.ShipDesignManager;
 import au.com.codeka.warworlds.model.SpriteDrawable;
+import au.com.codeka.warworlds.model.SpriteManager;
 import au.com.codeka.warworlds.model.Star;
 
 public class CombatReportDialog extends DialogFragment {
@@ -209,15 +211,13 @@ public class CombatReportDialog extends DialogFragment {
                 targetEmpireIcon.setImageBitmap(null);
                 recordDescription.setText("");
 
-                ShipDesignManager sdm = ShipDesignManager.getInstance();
-
                 if (record.fleetJoinedRecord != null) {
                     CombatReport.FleetSummary fleet = record.fleetJoinedRecord.getFleet();
-                    ShipDesign design = sdm.getDesign(fleet.getDesignID());
+                    ShipDesign design = (ShipDesign) DesignManager.i.getDesign(DesignKind.SHIP, fleet.getDesignID());
                     Empire empire = mEmpires.get(fleet.getEmpireKey());
 
                     recordTitle.setText("Fleet Joined Battle");
-                    fleetIcon.setImageDrawable(new SpriteDrawable(design.getSprite()));
+                    fleetIcon.setImageDrawable(new SpriteDrawable(SpriteManager.i.getSprite(design.getSpriteName())));
                     if (empire != null) {
                         empireIcon.setImageBitmap(empire.getShield(getActivity()));
                         recordDescription.setText(String.format(Locale.ENGLISH,
@@ -228,14 +228,14 @@ public class CombatReportDialog extends DialogFragment {
                 } else if (record.fleetTargetRecord != null) {
                     CombatReport.FleetSummary fleet = record.fleetTargetRecord.getFleet();
                     CombatReport.FleetSummary target = record.fleetTargetRecord.getTarget();
-                    ShipDesign design = sdm.getDesign(fleet.getDesignID());
-                    ShipDesign targetDesign = sdm.getDesign(target.getDesignID());
+                    ShipDesign design = (ShipDesign) DesignManager.i.getDesign(DesignKind.SHIP, fleet.getDesignID());
+                    ShipDesign targetDesign = (ShipDesign) DesignManager.i.getDesign(DesignKind.SHIP, target.getDesignID());
                     Empire empire = mEmpires.get(fleet.getEmpireKey());
                     Empire targetEmpire = mEmpires.get(target.getEmpireKey());
 
                     recordTitle.setText("Fleet Targetted");
-                    fleetIcon.setImageDrawable(new SpriteDrawable(design.getSprite()));
-                    targetFleetIcon.setImageDrawable(new SpriteDrawable(targetDesign.getSprite()));
+                    fleetIcon.setImageDrawable(new SpriteDrawable(SpriteManager.i.getSprite(design.getSpriteName())));
+                    targetFleetIcon.setImageDrawable(new SpriteDrawable(SpriteManager.i.getSprite(targetDesign.getSpriteName())));
                     if (empire != null && targetEmpire != null) {
                         empireIcon.setImageBitmap(empire.getShield(getActivity()));
                         targetEmpireIcon.setImageBitmap(targetEmpire.getShield(getActivity()));
@@ -248,14 +248,14 @@ public class CombatReportDialog extends DialogFragment {
                 } else if (record.fleetAttackRecord != null) {
                     CombatReport.FleetSummary fleet = record.fleetAttackRecord.getFleet();
                     CombatReport.FleetSummary target = record.fleetAttackRecord.getTarget();
-                    ShipDesign design = sdm.getDesign(fleet.getDesignID());
-                    ShipDesign targetDesign = sdm.getDesign(target.getDesignID());
+                    ShipDesign design = (ShipDesign) DesignManager.i.getDesign(DesignKind.SHIP, fleet.getDesignID());
+                    ShipDesign targetDesign = (ShipDesign) DesignManager.i.getDesign(DesignKind.SHIP, target.getDesignID());
                     Empire empire = mEmpires.get(fleet.getEmpireKey());
                     Empire targetEmpire = mEmpires.get(target.getEmpireKey());
 
                     recordTitle.setText("Fleet Attacked");
-                    fleetIcon.setImageDrawable(new SpriteDrawable(design.getSprite()));
-                    targetFleetIcon.setImageDrawable(new SpriteDrawable(targetDesign.getSprite()));
+                    fleetIcon.setImageDrawable(new SpriteDrawable(SpriteManager.i.getSprite(design.getSpriteName())));
+                    targetFleetIcon.setImageDrawable(new SpriteDrawable(SpriteManager.i.getSprite(targetDesign.getSpriteName())));
                     if (empire != null && targetEmpire != null) {
                         empireIcon.setImageBitmap(empire.getShield(getActivity()));
                         targetEmpireIcon.setImageBitmap(targetEmpire.getShield(getActivity()));
@@ -268,11 +268,11 @@ public class CombatReportDialog extends DialogFragment {
                     }
                 } else if (record.fleetDamagedRecord != null) {
                     CombatReport.FleetSummary fleet = record.fleetDamagedRecord.getFleet();
-                    ShipDesign design = sdm.getDesign(fleet.getDesignID());
+                    ShipDesign design = (ShipDesign) DesignManager.i.getDesign(DesignKind.SHIP, fleet.getDesignID());
                     Empire empire = mEmpires.get(fleet.getEmpireKey());
 
                     recordTitle.setText("Fleet Damaged");
-                    fleetIcon.setImageDrawable(new SpriteDrawable(design.getSprite()));
+                    fleetIcon.setImageDrawable(new SpriteDrawable(SpriteManager.i.getSprite(design.getSpriteName())));
                     if (empire != null) {
                         empireIcon.setImageBitmap(empire.getShield(getActivity()));
 

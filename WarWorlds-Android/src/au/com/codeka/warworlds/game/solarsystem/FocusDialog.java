@@ -17,6 +17,7 @@ import android.widget.ImageButton;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import au.com.codeka.BackgroundRunner;
+import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.StyledDialog;
 import au.com.codeka.warworlds.api.ApiClient;
@@ -25,7 +26,6 @@ import au.com.codeka.warworlds.model.Colony;
 import au.com.codeka.warworlds.model.Planet;
 import au.com.codeka.warworlds.model.Star;
 import au.com.codeka.warworlds.model.StarManager;
-import au.com.codeka.warworlds.model.protobuf.Messages;
 
 public class FocusDialog extends DialogFragment {
     private static Logger log = LoggerFactory.getLogger(FocusDialog.class);
@@ -44,7 +44,7 @@ public class FocusDialog extends DialogFragment {
 
     public void setColony(Star star, Colony colony) {
         mColony = colony;
-        mPlanet = star.getPlanets()[colony.getPlanetIndex() - 1];
+        mPlanet = (Planet) star.getPlanets()[colony.getPlanetIndex() - 1];
     }
 
     @Override
@@ -243,9 +243,10 @@ public class FocusDialog extends DialogFragment {
                                            mColony.getStarKey(),
                                            mColony.getKey());
 
-                Messages.Colony pb = mColony.toProtocolBuffer();
+                Messages.Colony.Builder pb = Messages.Colony.newBuilder();
+                mColony.toProtocolBuffer(pb);
                 try {
-                    pb = ApiClient.putProtoBuf(url, pb, Messages.Colony.class);
+                    ApiClient.putProtoBuf(url, pb.build(), Messages.Colony.class);
                 } catch (ApiException e) {
                     log.error("Error updating colony!", e);
                 }

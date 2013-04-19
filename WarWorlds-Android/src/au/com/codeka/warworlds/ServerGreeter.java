@@ -21,7 +21,7 @@ import au.com.codeka.warworlds.model.ChatManager;
 import au.com.codeka.warworlds.model.Colony;
 import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.MyEmpire;
-import au.com.codeka.warworlds.model.protobuf.Messages;
+import au.com.codeka.common.protobuf.Messages;
 
 import com.google.android.gcm.GCMRegistrar;
 
@@ -160,8 +160,9 @@ public class ServerGreeter {
                     Messages.HelloResponse resp = ApiClient.putProtoBuf(url, req, Messages.HelloResponse.class);
                     if (resp.hasEmpire()) {
                         mNeedsEmpireSetup = false;
-                        EmpireManager.getInstance().setup(
-                                MyEmpire.fromProtocolBuffer(resp.getEmpire()));
+                        MyEmpire myEmpire = new MyEmpire();
+                        myEmpire.fromProtocolBuffer(resp.getEmpire());
+                        EmpireManager.getInstance().setup(myEmpire);
                     } else {
                         mNeedsEmpireSetup = true;
                     }
@@ -181,7 +182,9 @@ public class ServerGreeter {
                         if (c.getPopulation() < 1.0) {
                             continue;
                         }
-                        mColonies.add(Colony.fromProtocolBuffer(c));
+                        Colony colony = new Colony();
+                        colony.fromProtocolBuffer(c);
+                        mColonies.add(colony);
                     }
 
                     BuildManager.getInstance().setup(resp.getBuildingStatistics(), resp.getBuildRequestsList());

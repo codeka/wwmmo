@@ -18,21 +18,23 @@ import android.widget.TextView;
 import au.com.codeka.BackgroundRunner;
 import au.com.codeka.Cash;
 import au.com.codeka.common.Vector2;
+import au.com.codeka.common.model.DesignKind;
+import au.com.codeka.common.model.ShipDesign;
+import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.StyledDialog;
 import au.com.codeka.warworlds.api.ApiClient;
 import au.com.codeka.warworlds.api.ApiException;
 import au.com.codeka.warworlds.game.starfield.StarfieldSurfaceView;
+import au.com.codeka.warworlds.model.DesignManager;
 import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.Fleet;
 import au.com.codeka.warworlds.model.SectorManager;
-import au.com.codeka.warworlds.model.ShipDesign;
-import au.com.codeka.warworlds.model.ShipDesignManager;
 import au.com.codeka.warworlds.model.Sprite;
+import au.com.codeka.warworlds.model.SpriteManager;
 import au.com.codeka.warworlds.model.Star;
 import au.com.codeka.warworlds.model.StarManager;
 import au.com.codeka.warworlds.model.StarSummary;
-import au.com.codeka.warworlds.model.protobuf.Messages;
 
 public class FleetMoveDialog extends DialogFragment {
     private Fleet mFleet;
@@ -78,7 +80,7 @@ public class FleetMoveDialog extends DialogFragment {
                 if (mSourceStarSummary != null) {
                     float distanceInParsecs = SectorManager.getInstance()
                                               .distanceInParsecs(mSourceStarSummary, star);
-                    ShipDesign design = ShipDesignManager.getInstance().getDesign(mFleet.getDesignID());
+                    ShipDesign design = (ShipDesign) DesignManager.i.getDesign(DesignKind.SHIP, mFleet.getDesignID());
 
                     String leftDetails = String.format(Locale.ENGLISH,
                             "<b>Star:</b> %s<br /><b>Distance:</b> %.2f pc",
@@ -243,8 +245,8 @@ public class FleetMoveDialog extends DialogFragment {
          * fleet will move in.
          */
         public void reset() {
-            ShipDesignManager designManager = ShipDesignManager.getInstance();
-            mSprite = designManager.getDesign(mFleet.getDesignID()).getSprite();
+            mSprite = SpriteManager.i.getSprite(
+                    DesignManager.i.getDesign(DesignKind.SHIP, mFleet.getDesignID()).getSpriteName());
 
             float pixelScale = getPixelScale();
 

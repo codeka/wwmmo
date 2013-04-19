@@ -3,7 +3,7 @@ package au.com.codeka.warworlds.api;
 import org.apache.http.HttpResponse;
 import org.apache.http.StatusLine;
 
-import au.com.codeka.warworlds.model.protobuf.Messages;
+import au.com.codeka.common.protobuf.Messages;
 
 public class ApiException extends Exception {
     private static final long serialVersionUID = 1L;

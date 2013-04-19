@@ -10,6 +10,7 @@ import android.view.View;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import au.com.codeka.BackgroundRunner;
+import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.StyledDialog;
 import au.com.codeka.warworlds.api.ApiClient;
@@ -17,7 +18,6 @@ import au.com.codeka.warworlds.api.ApiException;
 import au.com.codeka.warworlds.ctrl.FleetList;
 import au.com.codeka.warworlds.model.Fleet;
 import au.com.codeka.warworlds.model.StarManager;
-import au.com.codeka.warworlds.model.protobuf.Messages;
 
 public class FleetSplitDialog extends DialogFragment {
     private Fleet mFleet;

@@ -9,10 +9,9 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.AssetManager;
 import au.com.codeka.warworlds.api.ApiClient;
-import au.com.codeka.warworlds.model.BuildingDesignManager;
+import au.com.codeka.warworlds.model.DesignManager;
 import au.com.codeka.warworlds.model.PurchaseManager;
 import au.com.codeka.warworlds.model.RealmManager;
-import au.com.codeka.warworlds.model.ShipDesignManager;
 import au.com.codeka.warworlds.model.SpriteManager;
 
 /**
@@ -38,9 +37,8 @@ public class Util {
         }
 
         Authenticator.configure(context);
-        SpriteManager.getInstance().setup(context);
-        BuildingDesignManager.getInstance().setup(context);
-        ShipDesignManager.getInstance().setup(context);
+        SpriteManager.i.setup(context);
+        DesignManager.setup(context);
         PurchaseManager.getInstance().setup(context);
         RealmManager.i.setup(context);
 

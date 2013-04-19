@@ -70,7 +70,8 @@ public class EmpireManager {
 
         Messages.Empire pb = new LocalEmpireStore(context).getEmpire(empireKey);
         if (pb != null) {
-            Empire empire = Empire.fromProtocolBuffer(pb);
+            Empire empire = new Empire();
+            empire.fromProtocolBuffer(pb);
             mEmpireCache.put(empireKey, empire);
             return empire;
         }
@@ -283,9 +284,13 @@ public class EmpireManager {
                 store.addEmpire(empire_pb);
 
                 if (mEmpire != null && empire_pb.getKey().equals(mEmpire.getKey())) {
-                    empires.add(MyEmpire.fromProtocolBuffer(empire_pb));
+                    MyEmpire empire = new MyEmpire();
+                    empire.fromProtocolBuffer(empire_pb);
+                    empires.add(empire);
                 } else {
-                    empires.add(Empire.fromProtocolBuffer(empire_pb));
+                    Empire empire = new Empire();
+                    empire.fromProtocolBuffer(empire_pb);
+                    empires.add(empire);
                 }
             }
         }
@@ -320,7 +325,8 @@ public class EmpireManager {
 
         Messages.Empire pb = new LocalEmpireStore(context).getEmpire(empireKey);
         if (pb != null) {
-            Empire empire = Empire.fromProtocolBuffer(pb);
+            Empire empire = new Empire();
+            empire.fromProtocolBuffer(pb);
             mEmpireCache.put(empireKey, empire);
             if (handler != null) {
                 handler.onEmpireFetched(empire);
@@ -359,7 +365,8 @@ public class EmpireManager {
             // if it's in the local store, that's fine as well
             Messages.Empire pb = new LocalEmpireStore(context).getEmpire(empireKey);
             if (pb != null) {
-                Empire empire = Empire.fromProtocolBuffer(pb);
+                Empire empire = new Empire();
+                empire.fromProtocolBuffer(pb);
                 mEmpireCache.put(empireKey, empire);
                 if (handler != null) {
                     handler.onEmpireFetched(empire);
@@ -423,7 +430,9 @@ public class EmpireManager {
                     LocalEmpireStore les = new LocalEmpireStore(context);
                     for (Messages.Empire empire_pb : pb.getEmpiresList()) {
                         les.addEmpire(empire_pb);
-                        empires.add(Empire.fromProtocolBuffer(empire_pb));
+                        Empire empire = new Empire();
+                        empire.fromProtocolBuffer(empire_pb);
+                        empires.add(empire);
                     }
                 } catch(Exception e) {
                     // TODO: handle exceptions
@@ -462,7 +471,9 @@ public class EmpireManager {
                     LocalEmpireStore les = new LocalEmpireStore(context);
                     for (Messages.Empire empire_pb : pb.getEmpiresList()) {
                         les.addEmpire(empire_pb);
-                        empires.add(Empire.fromProtocolBuffer(empire_pb));
+                        Empire empire = new Empire();
+                        empire.fromProtocolBuffer(empire_pb);
+                        empires.add(empire);
                     }
                 } catch(Exception e) {
                     // TODO: handle exceptions

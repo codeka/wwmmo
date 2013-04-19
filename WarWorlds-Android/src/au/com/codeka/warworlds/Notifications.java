@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import android.annotation.SuppressLint;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -23,14 +24,16 @@ import android.net.Uri;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
 import android.text.Html;
+import au.com.codeka.common.model.DesignKind;
+import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.game.SitrepActivity;
 import au.com.codeka.warworlds.model.BuildRequest;
 import au.com.codeka.warworlds.model.SituationReport;
 import au.com.codeka.warworlds.model.Sprite;
+import au.com.codeka.warworlds.model.Star;
 import au.com.codeka.warworlds.model.StarImageManager;
 import au.com.codeka.warworlds.model.StarManager;
 import au.com.codeka.warworlds.model.StarSummary;
-import au.com.codeka.warworlds.model.protobuf.Messages;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 
@@ -54,7 +57,10 @@ public class Notifications {
                 public void onStarSummaryFetched(StarSummary starSummary) {
                     NotificationDetails notification = new NotificationDetails();
                     notification.sitrep = sitrep;
-                    notification.star = starSummary.toProtocolBuffer();
+
+                    Messages.Star.Builder star_pb = Messages.Star.newBuilder();
+                    starSummary.toProtocolBuffer(star_pb);
+                    notification.star = star_pb.build();
 
                     DatabaseHelper db = new DatabaseHelper(context);
                     db.addNotification(notification);
@@ -102,7 +108,9 @@ public class Notifications {
         boolean first = true;
         for (NotificationDetails notification : notifications) {
             SituationReport sitrep = SituationReport.fromProtocolBuffer(notification.sitrep);
-            StarSummary star = StarSummary.fromProtocolBuffer(notification.star);
+
+            Star star = new Star();
+            star.fromProtocolBuffer(notification.star);
 
             GlobalOptions.NotificationKind kind = getNotificationKind(sitrep);
             GlobalOptions.NotificationOptions thisOptions = new GlobalOptions(context).getNotificationOptions(kind);
@@ -112,7 +120,9 @@ public class Notifications {
 
             if (first) {
                 try {
+                    @SuppressLint("InlinedApi")
                     int iconWidth = context.getResources().getDimensionPixelSize(android.R.dimen.notification_large_icon_width);
+                    @SuppressLint("InlinedApi")
                     int iconHeight = context.getResources().getDimensionPixelSize(android.R.dimen.notification_large_icon_height);
 
                     Bitmap largeIcon = Bitmap.createBitmap(iconWidth, iconHeight, Bitmap.Config.ARGB_8888);
@@ -172,7 +182,7 @@ public class Notifications {
 
     private static GlobalOptions.NotificationKind getNotificationKind(SituationReport sitrep) {
         if (sitrep.getBuildCompleteRecord() != null) {
-            if (sitrep.getBuildCompleteRecord().getBuildKind() == BuildRequest.BuildKind.BUILDING) {
+            if (sitrep.getBuildCompleteRecord().getDesignKind() == DesignKind.BUILDING) {
                 return GlobalOptions.NotificationKind.BUILDING_BUILD_COMPLETE;
             } else {
                 return GlobalOptions.NotificationKind.FLEET_BUILD_COMPLETE;

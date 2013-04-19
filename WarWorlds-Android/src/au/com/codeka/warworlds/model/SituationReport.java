@@ -9,6 +9,7 @@ import au.com.codeka.RomanNumeralFormatter;
 import au.com.codeka.common.model.BuildingDesign;
 import au.com.codeka.common.model.Design;
 import au.com.codeka.common.model.DesignKind;
+import au.com.codeka.common.model.ShipDesign;
 import au.com.codeka.common.protobuf.Messages;
 
 public class SituationReport {
@@ -198,10 +199,10 @@ public class SituationReport {
 
     public Sprite getDesignSprite() {
         String designID = null;
-        BuildKind buildKind = BuildKind.SHIP;
+        DesignKind designKind = DesignKind.SHIP;
         if (mBuildCompleteRecord != null) {
             SituationReport.BuildCompleteRecord bcr = mBuildCompleteRecord;
-            buildKind = bcr.getBuildKind();
+            designKind = bcr.getDesignKind();
             designID = bcr.getDesignID();
         } else if (mMoveCompleteRecord != null) {
             designID = mMoveCompleteRecord.getFleetDesignID();
@@ -214,15 +215,15 @@ public class SituationReport {
         }
 
         if (designID != null) {
-            Design design = DesignManager.getInstance(buildKind).getDesign(designID);
-            return design.getSprite();
+            Design design = DesignManager.i.getDesign(designKind, designID);
+            return SpriteManager.i.getSprite(design.getSpriteName());
         } else {
             return null;
         }
     }
 
     private static String getFleetLine(String designID, float numShips) {
-        ShipDesign design = ShipDesignManager.getInstance().getDesign(designID);
+        ShipDesign design = (ShipDesign) DesignManager.i.getDesign(DesignKind.SHIP, designID);
         int n = (int)(Math.ceil(numShips));
         return String.format(Locale.ENGLISH, "%d × %s",
                 n, design.getDisplayName(n > 1));
@@ -270,11 +271,11 @@ public class SituationReport {
     }
 
     public static class BuildCompleteRecord {
-        private BuildRequest.BuildKind mBuildKind;
+        private DesignKind mDesignKind;
         private String mDesignID;
 
-        public BuildRequest.BuildKind getBuildKind() {
-            return mBuildKind;
+        public DesignKind getDesignKind() {
+            return mDesignKind;
         }
         public String getDesignID() {
             return mDesignID;
@@ -282,7 +283,7 @@ public class SituationReport {
 
         private static BuildCompleteRecord fromProtocolBuffer(Messages.SituationReport.BuildCompleteRecord pb) {
             BuildCompleteRecord bcr = new BuildCompleteRecord();
-            bcr.mBuildKind = BuildRequest.BuildKind.fromNumber(pb.getBuildKind().getNumber());
+            bcr.mDesignKind = DesignKind.fromNumber(pb.getBuildKind().getNumber());
             bcr.mDesignID = pb.getDesignId();
             return bcr;
         }

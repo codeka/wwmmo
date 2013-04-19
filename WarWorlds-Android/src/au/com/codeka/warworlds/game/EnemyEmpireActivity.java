@@ -8,15 +8,15 @@ import android.view.Window;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import au.com.codeka.common.model.BaseStar;
 import au.com.codeka.warworlds.BaseActivity;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.ServerGreeter;
-import au.com.codeka.warworlds.WarWorldsActivity;
 import au.com.codeka.warworlds.ServerGreeter.ServerGreeting;
+import au.com.codeka.warworlds.WarWorldsActivity;
 import au.com.codeka.warworlds.game.starfield.StarfieldActivity;
 import au.com.codeka.warworlds.model.Empire;
 import au.com.codeka.warworlds.model.EmpireManager;
-import au.com.codeka.warworlds.model.StarSummary;
 
 public class EnemyEmpireActivity extends BaseActivity
                                  implements EmpireManager.EmpireFetchedHandler {
@@ -69,7 +69,7 @@ public class EnemyEmpireActivity extends BaseActivity
 
     public void onEmpireViewClick() {
         if (mEmpire.getHomeStar() != null) {
-            StarSummary homeStar = mEmpire.getHomeStar();
+            BaseStar homeStar = mEmpire.getHomeStar();
             Intent intent = new Intent(mContext, StarfieldActivity.class);
             intent.putExtra("au.com.codeka.warworlds.StarKey", homeStar.getKey());
             intent.putExtra("au.com.codeka.warworlds.SectorX", homeStar.getSectorX());

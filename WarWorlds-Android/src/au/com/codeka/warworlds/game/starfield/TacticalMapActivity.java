@@ -6,9 +6,9 @@ import org.slf4j.LoggerFactory;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Window;
+import au.com.codeka.common.model.BaseStar;
 import au.com.codeka.warworlds.BaseActivity;
 import au.com.codeka.warworlds.R;
-import au.com.codeka.warworlds.model.Star;
 
 public class TacticalMapActivity extends BaseActivity {
     private static final Logger log = LoggerFactory.getLogger(TacticalMapActivity.class);
@@ -35,7 +35,7 @@ public class TacticalMapActivity extends BaseActivity {
 
         mTacticalMapView.setDoubleTapHandler(new TacticalMapView.DoubleTapHandler() {
             @Override
-            public void onDoubleTapped(Star star) {
+            public void onDoubleTapped(BaseStar star) {
                 Intent intent = new Intent();
                 intent.putExtra("au.com.codeka.warworlds.SectorX", star.getSectorX());
                 intent.putExtra("au.com.codeka.warworlds.SectorY", star.getSectorY());

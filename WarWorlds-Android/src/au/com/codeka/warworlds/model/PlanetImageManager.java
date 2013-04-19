@@ -6,6 +6,7 @@ import java.util.Random;
 import android.content.Context;
 import android.graphics.Bitmap;
 import au.com.codeka.common.Vector3;
+import au.com.codeka.common.model.BasePlanet;
 import au.com.codeka.planetrender.Template;
 
 /**
@@ -22,14 +23,13 @@ public class PlanetImageManager extends ImageManager {
     /**
      * Gets a \c Sprite for the given planet.
      */
-    public Sprite getSprite(Context context, Planet planet) {
+    public Sprite getSprite(Context context, BasePlanet planet) {
         String key = String.format(Locale.ENGLISH, "%s-%d",
                                    planet.getStar().getKey(), planet.getIndex());
         PlanetExtra planetExtra = new PlanetExtra(context, planet);
         Bitmap bmp = getBitmap(context, key, 100, planetExtra);
         if (bmp == null) {
-            SpriteManager spriteManager = SpriteManager.getInstance();
-            Sprite s = spriteManager.getSprite("planet."+planet.getPlanetType().getInternalName());
+            Sprite s = SpriteManager.i.getSprite("planet."+planet.getPlanetType().getInternalName());
 
             if (s.getNumFrames() <= 1) {
                 return s;
@@ -84,10 +84,10 @@ public class PlanetImageManager extends ImageManager {
     }
 
     private static class PlanetExtra {
-        public Planet planet;
+        public BasePlanet planet;
         public Context context;
 
-        public PlanetExtra(Context context, Planet planet) {
+        public PlanetExtra(Context context, BasePlanet planet) {
             this.context = context;
             this.planet = planet;
         }

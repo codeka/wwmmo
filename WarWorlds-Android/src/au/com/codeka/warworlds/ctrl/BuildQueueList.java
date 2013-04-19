@@ -29,15 +29,17 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import au.com.codeka.RomanNumeralFormatter;
 import au.com.codeka.TimeInHours;
+import au.com.codeka.common.model.BaseBuildRequest;
+import au.com.codeka.common.model.Design;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.model.BuildRequest;
 import au.com.codeka.warworlds.model.Colony;
-import au.com.codeka.warworlds.model.Design;
 import au.com.codeka.warworlds.model.DesignManager;
 import au.com.codeka.warworlds.model.Planet;
 import au.com.codeka.warworlds.model.PlanetImageManager;
 import au.com.codeka.warworlds.model.Sprite;
 import au.com.codeka.warworlds.model.SpriteDrawable;
+import au.com.codeka.warworlds.model.SpriteManager;
 import au.com.codeka.warworlds.model.Star;
 import au.com.codeka.warworlds.model.StarImageManager;
 import au.com.codeka.warworlds.model.StarManager;
@@ -116,7 +118,11 @@ public class BuildQueueList extends FrameLayout
     }
 
     public void refresh(final Star star, final Colony colony) {
-        refresh(star, colony, star.getBuildRequests());
+        ArrayList<BuildRequest> buildRequests = new ArrayList<BuildRequest>();
+        for (BaseBuildRequest br : star.getBuildRequests()) {
+            buildRequests.add((BuildRequest) br);
+        }
+        refresh(star, colony, buildRequests);
     }
 
     public void refresh(final Star star, final Colony colony, List<BuildRequest> allBuildRequests) {
@@ -191,10 +197,10 @@ public class BuildQueueList extends FrameLayout
         progressBar.setVisibility(View.VISIBLE);
         progressText.setVisibility(View.VISIBLE);
 
-        DesignManager dm = DesignManager.getInstance(mSelectedBuildRequest.getBuildKind());
-        Design design = dm.getDesign(mSelectedBuildRequest.getDesignID());
+        Design design = DesignManager.i.getDesign(mSelectedBuildRequest.getDesignKind(),
+                                                  mSelectedBuildRequest.getDesignID());
 
-        icon.setImageDrawable(new SpriteDrawable(design.getSprite()));
+        icon.setImageDrawable(new SpriteDrawable(SpriteManager.i.getSprite(design.getSpriteName())));
 
         if (mSelectedBuildRequest.getCount() == 1) {
             buildingName.setText(design.getDisplayName());
@@ -292,7 +298,7 @@ public class BuildQueueList extends FrameLayout
                     if (mShowStars) {
                         ItemEntry entry = new ItemEntry();
                         entry.star = star;
-                        entry.planet = star.getPlanets()[buildRequest.getPlanetIndex() - 1];
+                        entry.planet = (Planet) star.getPlanets()[buildRequest.getPlanetIndex() - 1];
                         mEntries.add(entry);
                     }
                     lastStarKey = buildRequest.getStarKey();
@@ -328,10 +334,10 @@ public class BuildQueueList extends FrameLayout
             }
 
             // copy build requests from the new star over
-            for (BuildRequest br : s.getBuildRequests()) {
+            for (BaseBuildRequest br : s.getBuildRequests()) {
                 // only add the build request if it's for a colony we're displaying
                 if (mColonyKey == null || br.getColonyKey().equals(mColonyKey)) {
-                    newBuildRequests.add(br);
+                    newBuildRequests.add((BuildRequest) br);
                 }
             }
 
@@ -487,10 +493,10 @@ public class BuildQueueList extends FrameLayout
                 entry.progressText.setTag(entry);
                 entry.progressBar.setTag(entry);
 
-                DesignManager dm = DesignManager.getInstance(entry.buildRequest.getBuildKind());
-                Design design = dm.getDesign(entry.buildRequest.getDesignID());
+                Design design = DesignManager.i.getDesign(entry.buildRequest.getDesignKind(),
+                                                          entry.buildRequest.getDesignID());
 
-                icon.setImageDrawable(new SpriteDrawable(design.getSprite()));
+                icon.setImageDrawable(new SpriteDrawable(SpriteManager.i.getSprite(design.getSpriteName())));
 
                 if (entry.existingBuildingKey != null) {
                     level.setText(Integer.toString(entry.existingBuildingLevel));

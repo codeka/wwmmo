@@ -27,12 +27,13 @@ import android.widget.ListView;
 import android.widget.TextView;
 import au.com.codeka.Cash;
 import au.com.codeka.RomanNumeralFormatter;
+import au.com.codeka.common.model.BaseColony;
+import au.com.codeka.common.model.Simulation;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.model.Colony;
 import au.com.codeka.warworlds.model.ImageManager;
 import au.com.codeka.warworlds.model.Planet;
 import au.com.codeka.warworlds.model.PlanetImageManager;
-import au.com.codeka.warworlds.model.Simulation;
 import au.com.codeka.warworlds.model.Sprite;
 import au.com.codeka.warworlds.model.SpriteDrawable;
 import au.com.codeka.warworlds.model.Star;
@@ -158,7 +159,7 @@ public class ColonyList extends FrameLayout {
     }
 
     public static void populateColonyListRow(Context context, View view, Colony colony, Star star) {
-        Planet planet = star.getPlanets()[colony.getPlanetIndex() - 1];
+        Planet planet = (Planet) star.getPlanets()[colony.getPlanetIndex() - 1];
 
         ImageView starIcon = (ImageView) view.findViewById(R.id.star_icon);
         ImageView planetIcon = (ImageView) view.findViewById(R.id.planet_icon);
@@ -239,10 +240,10 @@ public class ColonyList extends FrameLayout {
                 public void onStarFetched(Star s) {
                     // if a star is updated, we'll want to refresh our colony list because the
                     // colony inside it might've changed too...
-                    for (Colony starColony : s.getColonies()) {
+                    for (BaseColony starColony : s.getColonies()) {
                         for (int i = 0; i < mColonies.size(); i++) {
                             if (mColonies.get(i).getKey().equals(starColony.getKey())) {
-                                mColonies.set(i, starColony);
+                                mColonies.set(i, (Colony) starColony);
                                 break;
                             }
                         }

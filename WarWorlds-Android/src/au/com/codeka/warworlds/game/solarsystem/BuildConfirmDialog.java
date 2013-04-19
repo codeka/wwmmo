@@ -15,13 +15,14 @@ import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import au.com.codeka.TimeInHours;
+import au.com.codeka.common.model.Design;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.StyledDialog;
 import au.com.codeka.warworlds.model.BuildManager;
 import au.com.codeka.warworlds.model.Building;
 import au.com.codeka.warworlds.model.Colony;
-import au.com.codeka.warworlds.model.Design;
 import au.com.codeka.warworlds.model.SpriteDrawable;
+import au.com.codeka.warworlds.model.SpriteManager;
 
 public class BuildConfirmDialog extends DialogFragment {
     private Colony mColony;
@@ -59,7 +60,7 @@ public class BuildConfirmDialog extends DialogFragment {
         TextView descriptionTextView = (TextView) mView.findViewById(R.id.building_description);
 
         nameTextView.setText(mDesign.getDisplayName());
-        iconImageView.setImageDrawable(new SpriteDrawable(mDesign.getSprite()));
+        iconImageView.setImageDrawable(new SpriteDrawable(SpriteManager.i.getSprite(mDesign.getSpriteName())));
         descriptionTextView.setText(Html.fromHtml(mDesign.getDescription()));
 
         View upgradeContainer = mView.findViewById(R.id.upgrade_container);

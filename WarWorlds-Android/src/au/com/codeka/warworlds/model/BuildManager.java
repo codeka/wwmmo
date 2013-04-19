@@ -9,6 +9,9 @@ import au.com.codeka.BackgroundRunner;
 import au.com.codeka.warworlds.StyledDialog;
 import au.com.codeka.warworlds.api.ApiClient;
 import au.com.codeka.warworlds.api.ApiException;
+import au.com.codeka.common.model.BaseBuildRequest;
+import au.com.codeka.common.model.Design;
+import au.com.codeka.common.model.DesignKind;
 import au.com.codeka.common.protobuf.Messages;
 
 public class BuildManager {
@@ -34,7 +37,9 @@ public class BuildManager {
 
         mBuildRequests.clear();
         for (Messages.BuildRequest build_request_pb : build_request_pbs) {
-            mBuildRequests.add(BuildRequest.fromProtocolBuffer(build_request_pb));
+            BuildRequest br = new BuildRequest();
+            br.fromProtocolBuffer(build_request_pb);
+            mBuildRequests.add(br);
         }
     }
 
@@ -79,8 +84,8 @@ public class BuildManager {
             }
             newBuildRequests.add(br);
         }
-        for (BuildRequest br : star.getBuildRequests()) {
-            newBuildRequests.add(br);
+        for (BaseBuildRequest br : star.getBuildRequests()) {
+            newBuildRequests.add((BuildRequest) br);
         }
         mBuildRequests = newBuildRequests;
     }
@@ -94,7 +99,7 @@ public class BuildManager {
             @Override
             protected BuildRequest doInBackground() {
                 Messages.BuildRequest.BUILD_KIND kind;
-                if (design.getDesignKind() == Design.DesignKind.BUILDING) {
+                if (design.getDesignKind() == DesignKind.BUILDING) {
                     kind = Messages.BuildRequest.BUILD_KIND.BUILDING;
                 } else {
                     kind = Messages.BuildRequest.BUILD_KIND.SHIP;
@@ -111,7 +116,9 @@ public class BuildManager {
                 try {
                     build = ApiClient.postProtoBuf("buildqueue", build, Messages.BuildRequest.class);
 
-                    return BuildRequest.fromProtocolBuffer(build);
+                    BuildRequest br = new BuildRequest();
+                    br.fromProtocolBuffer(build);
+                    return br;
                 } catch (ApiException e) {
                     if (e.getServerErrorCode() > 0) {
                         mErrorCode = e.getServerErrorCode();

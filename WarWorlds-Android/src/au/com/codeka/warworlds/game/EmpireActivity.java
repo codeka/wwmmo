@@ -30,6 +30,10 @@ import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
+import au.com.codeka.common.model.BaseColony;
+import au.com.codeka.common.model.BaseEmpireRank;
+import au.com.codeka.common.model.BaseFleet;
+import au.com.codeka.common.model.BasePlanet;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.ServerGreeter;
 import au.com.codeka.warworlds.ServerGreeter.ServerGreeting;
@@ -43,10 +47,8 @@ import au.com.codeka.warworlds.model.BuildRequest;
 import au.com.codeka.warworlds.model.Colony;
 import au.com.codeka.warworlds.model.Empire;
 import au.com.codeka.warworlds.model.EmpireManager;
-import au.com.codeka.warworlds.model.EmpireRank;
 import au.com.codeka.warworlds.model.Fleet;
 import au.com.codeka.warworlds.model.MyEmpire;
-import au.com.codeka.warworlds.model.Planet;
 import au.com.codeka.warworlds.model.Star;
 import au.com.codeka.warworlds.model.StarSummary;
 
@@ -386,7 +388,7 @@ public class EmpireActivity extends TabFragmentActivity
                 TextView totalBuildings = (TextView) view.findViewById(R.id.total_buildings);
 
                 DecimalFormat formatter = new DecimalFormat("#,##0");
-                EmpireRank rank = entry.empire.getRank();
+                BaseEmpireRank rank = entry.empire.getRank();
                 rankView.setText(formatter.format(rank.getRank()));
                 empireName.setText(entry.empire.getDisplayName());
                 empireIcon.setImageBitmap(entry.empire.getShield(activity));
@@ -428,9 +430,9 @@ public class EmpireActivity extends TabFragmentActivity
 
             ArrayList<Colony> colonies = new ArrayList<Colony>();
             for (Star s : sStars.values()) {
-                for (Colony c : s.getColonies()) {
+                for (BaseColony c : s.getColonies()) {
                     if (c.getEmpireKey() != null && c.getEmpireKey().equals(sCurrentEmpire.getKey())) {
-                        colonies.add(c);
+                        colonies.add((Colony) c);
                     }
                 }
             }
@@ -443,7 +445,7 @@ public class EmpireActivity extends TabFragmentActivity
             colonyList.setOnColonyActionListener(new ColonyList.ColonyActionHandler() {
                 @Override
                 public void onViewColony(Star star, Colony colony) {
-                    Planet planet = star.getPlanets()[colony.getPlanetIndex() - 1];
+                    BasePlanet planet = star.getPlanets()[colony.getPlanetIndex() - 1];
                     // end this activity, go back to the starfield and navigate to the given colony
 
                     Intent intent = new Intent();
@@ -504,9 +506,9 @@ public class EmpireActivity extends TabFragmentActivity
                 return getLoadingView(inflator);
             }
 
-            ArrayList<Fleet> fleets = new ArrayList<Fleet>();
+            ArrayList<BaseFleet> fleets = new ArrayList<BaseFleet>();
             for (Star s : sStars.values()) {
-                for (Fleet f : s.getFleets()) {
+                for (BaseFleet f : s.getFleets()) {
                     if (f.getEmpireKey() != null && f.getEmpireKey().equals(sCurrentEmpire.getKey())) {
                         fleets.add(f);
                     }

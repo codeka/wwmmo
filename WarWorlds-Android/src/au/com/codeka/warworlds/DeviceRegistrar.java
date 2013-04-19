@@ -10,7 +10,7 @@ import android.provider.Settings.Secure;
 import au.com.codeka.BackgroundRunner;
 import au.com.codeka.warworlds.api.ApiClient;
 import au.com.codeka.warworlds.api.ApiException;
-import au.com.codeka.warworlds.model.protobuf.Messages;
+import au.com.codeka.common.protobuf.Messages;
 
 /**
  * Register/unregister with the third-party App Engine server using

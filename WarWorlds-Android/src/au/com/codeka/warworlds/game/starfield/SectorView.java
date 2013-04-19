@@ -9,6 +9,7 @@ import android.util.AttributeSet;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import au.com.codeka.common.Pair;
+import au.com.codeka.common.model.BaseStar;
 import au.com.codeka.warworlds.game.UniverseElementSurfaceView;
 import au.com.codeka.warworlds.model.Sector;
 import au.com.codeka.warworlds.model.SectorManager;
@@ -168,9 +169,9 @@ public class SectorView extends UniverseElementSurfaceView
         }
 
         int minDistance = 0;
-        Star closestStar = null;
+        BaseStar closestStar = null;
 
-        for(Star star : sector.getStars()) {
+        for(BaseStar star : sector.getStars()) {
             int starX = star.getOffsetX();
             int starY = star.getOffsetY();
 
@@ -183,7 +184,7 @@ public class SectorView extends UniverseElementSurfaceView
 
         // only return it if you tapped within a 48 pixel radius
         if (Math.sqrt(minDistance) <= 48) {
-            return closestStar;
+            return (Star) closestStar;
         }
         return null;
     }

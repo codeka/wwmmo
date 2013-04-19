@@ -151,7 +151,7 @@ public class AllianceActivity extends TabFragmentActivity
             private ArrayList<ItemEntry> mEntries;
 
             public void setAlliances(List<Alliance> alliances) {
-                Alliance myAlliance = EmpireManager.getInstance().getEmpire().getAlliance();
+                Alliance myAlliance = (Alliance) EmpireManager.getInstance().getEmpire().getAlliance();
                 // remove my alliance from the list, it'll always go at the front
                 if (myAlliance != null) {
                     for (int i = 0; i < alliances.size(); i++) {

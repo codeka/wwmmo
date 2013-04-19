@@ -13,17 +13,17 @@ import android.view.View;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import au.com.codeka.BackgroundRunner;
+import au.com.codeka.common.model.Design;
+import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.StyledDialog;
 import au.com.codeka.warworlds.api.ApiClient;
 import au.com.codeka.warworlds.api.ApiException;
 import au.com.codeka.warworlds.model.BuildRequest;
-import au.com.codeka.warworlds.model.Design;
 import au.com.codeka.warworlds.model.DesignManager;
 import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.StarManager;
 import au.com.codeka.warworlds.model.StarSummary;
-import au.com.codeka.warworlds.model.protobuf.Messages;
 
 public class BuildAccelerateDialog extends DialogFragment {
     private BuildRequest mBuildRequest;
@@ -80,9 +80,7 @@ public class BuildAccelerateDialog extends DialogFragment {
         double remainingProgress = 1.0 - mBuildRequest.getProgress(true);
         double progressToComplete = remainingProgress * accelerateAmount;
 
-        DesignManager dm = DesignManager.getInstance(mBuildRequest.getBuildKind());
-        Design design = dm.getDesign(mBuildRequest.getDesignID());
-
+        Design design = DesignManager.i.getDesign(mBuildRequest.getDesignKind(), mBuildRequest.getDesignID());
         double mineralsToUse = design.getBuildCost().getCostInMinerals() * progressToComplete;
         double cost = mineralsToUse * mBuildRequest.getCount();
 
@@ -117,7 +115,10 @@ public class BuildAccelerateDialog extends DialogFragment {
                     if (pb == null) {
                         return null;
                     }
-                    return BuildRequest.fromProtocolBuffer(pb);
+                    
+                    BuildRequest br = new BuildRequest();
+                    br.fromProtocolBuffer(pb);
+                    return br;
                 } catch (ApiException e) {
                     if (e.getServerErrorCode() > 0) {
                         mErrorMsg = e.getServerErrorMessage();

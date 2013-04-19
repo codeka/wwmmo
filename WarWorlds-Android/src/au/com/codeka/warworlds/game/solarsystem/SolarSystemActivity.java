@@ -19,6 +19,9 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import au.com.codeka.RomanNumeralFormatter;
 import au.com.codeka.common.Vector2;
+import au.com.codeka.common.model.BaseColony;
+import au.com.codeka.common.model.BaseEmpirePresence;
+import au.com.codeka.common.model.BasePlanet;
 import au.com.codeka.warworlds.BaseActivity;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.ServerGreeter;
@@ -31,7 +34,6 @@ import au.com.codeka.warworlds.game.SitrepActivity;
 import au.com.codeka.warworlds.model.Colony;
 import au.com.codeka.warworlds.model.Empire;
 import au.com.codeka.warworlds.model.EmpireManager;
-import au.com.codeka.warworlds.model.EmpirePresence;
 import au.com.codeka.warworlds.model.Fleet;
 import au.com.codeka.warworlds.model.Planet;
 import au.com.codeka.warworlds.model.Star;
@@ -199,9 +201,9 @@ public class SolarSystemActivity extends BaseActivity implements StarManager.Sta
             mSolarSystemSurfaceView.redraw();
         }
 
-        Planet planet = null;
+        BasePlanet planet = null;
         if (selectedPlanetIndex >= 0) {
-            for (Planet p : star.getPlanets()) {
+            for (BasePlanet p : star.getPlanets()) {
                 if (p.getIndex() == selectedPlanetIndex) {
                     planet = p;
                     break;
@@ -219,7 +221,7 @@ public class SolarSystemActivity extends BaseActivity implements StarManager.Sta
 
         fleetList.setStar(star);
 
-        EmpirePresence ep = star.getEmpire(EmpireManager.getInstance().getEmpire().getKey());
+        BaseEmpirePresence ep = star.getEmpire(EmpireManager.getInstance().getEmpire().getKey());
         if (ep == null) {
             storedGoodsTextView.setVisibility(View.GONE);
             deltaGoodsTextView.setVisibility(View.GONE);
@@ -260,7 +262,7 @@ public class SolarSystemActivity extends BaseActivity implements StarManager.Sta
         }
 
         mStar = star;
-        mPlanet = planet;
+        mPlanet = (Planet) planet;
 
         if (mIsFirstRefresh) {
             mIsFirstRefresh = false;
@@ -319,10 +321,9 @@ public class SolarSystemActivity extends BaseActivity implements StarManager.Sta
         }
 
         mColony = null;
-        for (Colony colony : mStar.getColonies()) {
+        for (BaseColony colony : mStar.getColonies()) {
             if (colony.getPlanetIndex() == mPlanet.getIndex()) {
-                mColony = colony;
-                log.debug("Planet has colony "+mColony.getKey()+" on it.");
+                mColony = (Colony) colony;
                 break;
             }
         }

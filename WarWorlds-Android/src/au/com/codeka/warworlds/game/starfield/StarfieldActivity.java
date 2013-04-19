@@ -22,6 +22,12 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import au.com.codeka.TimeInHours;
+import au.com.codeka.common.model.BaseColony;
+import au.com.codeka.common.model.BaseFleet;
+import au.com.codeka.common.model.BasePlanet;
+import au.com.codeka.common.model.BaseStar;
+import au.com.codeka.common.model.DesignKind;
+import au.com.codeka.common.model.ShipDesign;
 import au.com.codeka.warworlds.BaseActivity;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.ServerGreeter;
@@ -37,6 +43,7 @@ import au.com.codeka.warworlds.game.StarRenameDialog;
 import au.com.codeka.warworlds.game.alliance.AllianceActivity;
 import au.com.codeka.warworlds.game.solarsystem.SolarSystemActivity;
 import au.com.codeka.warworlds.model.Colony;
+import au.com.codeka.warworlds.model.DesignManager;
 import au.com.codeka.warworlds.model.Empire;
 import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.Fleet;
@@ -45,10 +52,9 @@ import au.com.codeka.warworlds.model.Planet;
 import au.com.codeka.warworlds.model.PlanetImageManager;
 import au.com.codeka.warworlds.model.PurchaseManager;
 import au.com.codeka.warworlds.model.SectorManager;
-import au.com.codeka.warworlds.model.ShipDesign;
-import au.com.codeka.warworlds.model.ShipDesignManager;
 import au.com.codeka.warworlds.model.Sprite;
 import au.com.codeka.warworlds.model.SpriteDrawable;
+import au.com.codeka.warworlds.model.SpriteManager;
 import au.com.codeka.warworlds.model.Star;
 import au.com.codeka.warworlds.model.StarImageManager;
 import au.com.codeka.warworlds.model.StarManager;
@@ -120,7 +126,7 @@ public class StarfieldActivity extends BaseActivity
 
                 Planet planet = null;
                 if (position >= 0 && position < mSelectedStar.getPlanets().length) {
-                    planet = mSelectedStar.getPlanets()[position];
+                    planet = (Planet) mSelectedStar.getPlanets()[position];
                 }
 
                 navigateToPlanet(mSelectedStar, planet, false);
@@ -239,7 +245,7 @@ public class StarfieldActivity extends BaseActivity
                     return;
                 }
 
-                StarSummary homeStar = myEmpire.getHomeStar();
+                BaseStar homeStar = myEmpire.getHomeStar();
                 if (homeStar != null) {
                     mStarfield.scrollTo(homeStar.getSectorX(), homeStar.getSectorY(),
                                         homeStar.getOffsetX(), homeStar.getOffsetY(),
@@ -361,7 +367,7 @@ public class StarfieldActivity extends BaseActivity
                 new StarManager.StarFetchedHandler() {
                     @Override
                     public void onStarFetched(Star s) {
-                        Fleet fleet = s.findFleet(fleetKey);
+                        BaseFleet fleet = s.findFleet(fleetKey);
                         navigateToFleet(s, fleet);
                     }
                 });
@@ -370,7 +376,7 @@ public class StarfieldActivity extends BaseActivity
         }
     }
 
-    public void navigateToFleet(Star star, Fleet fleet) {
+    public void navigateToFleet(Star star, BaseFleet fleet) {
         int offsetX = star.getOffsetX() - (int) ((mStarfield.getWidth() / 2) / mStarfield.getPixelScale());
         int offsetY = star.getOffsetY() - (int) ((mStarfield.getHeight() / 2) / mStarfield.getPixelScale());
 
@@ -564,7 +570,7 @@ public class StarfieldActivity extends BaseActivity
         MyEmpire myEmpire = EmpireManager.getInstance().getEmpire();
         int numMyEmpire = 0;
         int numOtherEmpire = 0;
-        for (Colony colony : star.getColonies()) {
+        for (BaseColony colony : star.getColonies()) {
             if (colony.getEmpireKey() == null) {
                 continue;
             }
@@ -603,7 +609,7 @@ public class StarfieldActivity extends BaseActivity
         mFetchingStarKey = null;
         mSelectedStar = null;
 
-        ShipDesign design = ShipDesignManager.getInstance().getDesign(fleet.getDesignID());
+        ShipDesign design = (ShipDesign) DesignManager.i.getDesign(DesignKind.SHIP, fleet.getDesignID());
         EmpireManager.getInstance().fetchEmpire(mContext, fleet.getEmpireKey(), new EmpireManager.EmpireFetchedHandler() {
             @Override
             public void onEmpireFetched(Empire empire) {
@@ -617,7 +623,7 @@ public class StarfieldActivity extends BaseActivity
         });
 
         fleetDesign.setText(design.getDisplayName());
-        fleetIcon.setImageDrawable(new SpriteDrawable(design.getSprite()));
+        fleetIcon.setImageDrawable(new SpriteDrawable(SpriteManager.i.getSprite(design.getSpriteName())));
 
         String eta = "???";
         Star srcStar = SectorManager.getInstance().findStar(fleet.getStarKey());
@@ -684,17 +690,17 @@ public class StarfieldActivity extends BaseActivity
             }
 
             final ImageView icon = (ImageView) view.findViewById(R.id.starfield_planet_icon);
-            final Planet planet = mStar.getPlanets()[position];
+            final BasePlanet planet = mStar.getPlanets()[position];
             final PlanetImageManager pim = PlanetImageManager.getInstance();
 
-            Sprite sprite= pim.getSprite(mContext, planet);
+            Sprite sprite = pim.getSprite(mContext, planet);
             icon.setImageDrawable(new SpriteDrawable(sprite));
 
             TextView planetTypeTextView = (TextView) view.findViewById(R.id.starfield_planet_type);
             planetTypeTextView.setText(planet.getPlanetType().getDisplayName());
 
-            Colony colony = null;
-            for(Colony c : mStar.getColonies()) {
+            BaseColony colony = null;
+            for(BaseColony c : mStar.getColonies()) {
                 if (c.getPlanetIndex() == planet.getIndex()) {
                     colony = c;
                     break;
