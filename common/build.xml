@@ -6,7 +6,7 @@
               as the first entry and export the buildfile again. -->
 <project basedir="." default="build" name="common">
     <property environment="env"/>
-    <property name="WarWorlds-Android.location" value="../WarWorlds-Android"/>
+    <property name="client.location" value="../client"/>
     <property name="control-field.location" value="../control-field"/>
     <property name="control-field-test.location" value="../control-field-test"/>
     <property name="planet-render.location" value="../planet-render"/>
@@ -17,6 +17,7 @@
     <property name="debuglevel" value="source,lines,vars"/>
     <property name="target" value="1.6"/>
     <property name="source" value="1.6"/>
+    <import file="build-custom.xml"/>
     <path id="common.classpath">
         <pathelement location="bin"/>
         <pathelement location="libs/protobuf-java-2.5.0.jar"/>
@@ -46,8 +47,8 @@
         </javac>
     </target>
     <target description="Build all projects which reference this project. Useful to propagate changes." name="build-refprojects">
-        <ant antfile="build.xml" dir="${WarWorlds-Android.location}" inheritAll="false" target="clean"/>
-        <ant antfile="build.xml" dir="${WarWorlds-Android.location}" inheritAll="false" target="build">
+        <ant antfile="build.xml" dir="${client.location}" inheritAll="false" target="clean"/>
+        <ant antfile="build.xml" dir="${client.location}" inheritAll="false" target="build">
             <propertyset>
                 <propertyref name="build.compiler"/>
             </propertyset>

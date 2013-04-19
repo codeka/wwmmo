@@ -11,7 +11,7 @@
     <property name="debuglevel" value="source,lines,vars"/>
     <property name="target" value="1.7"/>
     <property name="source" value="1.7"/>
-    <import file="build-installer.xml"/>
+    <import file="build-custom.xml"/>
     <path id="common.classpath">
         <pathelement location="${common.location}/bin"/>
         <pathelement location="${common.location}/libs/protobuf-java-2.5.0.jar"/>
