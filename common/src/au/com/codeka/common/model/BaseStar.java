@@ -236,6 +236,29 @@ public abstract class BaseStar {
         }
     }
 
+    public void toProtocolBuffer(Messages.Star.Builder pb) {
+        toProtocolBuffer(pb, false);
+    }
+
+    /**
+     * Convert this star to a protocol buffer. If summary is true, we'll skip a bunch of
+     * fields (fleets, build requests, empires, colonies, etc)
+     */
+    public void toProtocolBuffer(Messages.Star.Builder pb, boolean summary) {
+        pb.setKey(mKey);
+        pb.setName(mName);
+        pb.setClassification(Messages.Star.CLASSIFICATION.valueOf(mStarType.getIndex()));
+        pb.setSize(mSize);
+        pb.setSectorX(mSectorX);
+        pb.setSectorY(mSectorY);
+        pb.setOffsetX(mOffsetX);
+        pb.setOffsetY(mOffsetY);
+
+        if (!summary) {
+            // TODO: more
+        }
+    }
+
     public static class StarType {
         private int mIndex;
         private String mDisplayName;

@@ -11,11 +11,13 @@ import au.com.codeka.common.protobuf.Messages;
 public abstract class BaseSector {
     protected long mX;
     protected long mY;
-    private List<BaseStar> mStars = new ArrayList<BaseStar>();
+    protected List<BaseStar> mStars = new ArrayList<BaseStar>();
 
     protected abstract BaseStar createStar(Messages.Star pb);
     protected abstract BaseColony createColony(Messages.Colony pb);
     protected abstract BaseFleet createFleet(Messages.Fleet pb);
+
+    public static int SECTOR_SIZE = 1024;
 
     public long getX() {
         return mX;
@@ -63,7 +65,12 @@ public abstract class BaseSector {
         pb.setX(mX);
         pb.setY(mY);
 
-        // TODO stars
+        for (BaseStar star : mStars) {
+            Messages.Star.Builder star_pb = Messages.Star.newBuilder();
+            star.toProtocolBuffer(star_pb, true);
+            pb.addStars(star_pb);
+        }
+
         // TODO colonies
         // TODO fleets
     }

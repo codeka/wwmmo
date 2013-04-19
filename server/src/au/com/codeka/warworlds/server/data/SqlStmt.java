@@ -10,6 +10,8 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.TimeZone;
 
+import javax.sql.rowset.serial.SerialBlob;
+
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,6 +60,9 @@ public class SqlStmt implements AutoCloseable {
     public void setDateTime(int position, DateTime value) throws SQLException {
         mStmt.setTimestamp(position, new Timestamp(value.getMillis()), sUTC);
         saveParameter(position, value);
+    }
+    public void setBlob(int position, byte[] blob) throws SQLException {
+        mStmt.setBlob(position, new SerialBlob(blob));
     }
     public void setNull(int position) throws SQLException {
         mStmt.setNull(position, Types.NULL);
