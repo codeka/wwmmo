@@ -116,7 +116,7 @@ public class SectorGenerator {
         int x = (int) ((Sector.SECTOR_SIZE - 64) * point.x) + 32;
         int y = (int) ((Sector.SECTOR_SIZE - 64) * point.y) + 32;
         int starTypeID = select(StarTypeBonuses);
-        String name = "Star ("+x+","+y+")";// namegen.generate(1)[0]
+        String name = new NameGenerator().generate(mRandom);
         int size = mRandom.nextInt(8) + 16;
 
         String sql = "INSERT INTO stars (sector_id, x, y, size, name, star_type, planets, last_simulation, time_emptied) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
