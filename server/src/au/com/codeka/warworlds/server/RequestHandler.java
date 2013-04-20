@@ -150,6 +150,10 @@ public class RequestHandler {
     }
 
     protected String getCurrentUser() throws RequestException {
+        return getCurrentUser(true);
+    }
+
+    protected String getCurrentUser(boolean errorOnNotAuth) throws RequestException {
         if (mCurrentUser == null) {
             for (Cookie cookie : mRequest.getCookies()) {
                 if (cookie.getName().equals("SESSION")) {
@@ -165,7 +169,7 @@ public class RequestHandler {
                 }
             }
 
-            if (mCurrentUser == null) {
+            if (mCurrentUser == null && errorOnNotAuth) {
                 throw new RequestException(403);
             }
         }

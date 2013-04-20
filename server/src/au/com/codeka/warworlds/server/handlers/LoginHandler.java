@@ -9,11 +9,14 @@ import java.net.URLConnection;
 import java.security.SecureRandom;
 import java.util.Locale;
 
+import javax.servlet.http.Cookie;
+
 import org.joda.time.DateTime;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import au.com.codeka.warworlds.server.OpenIdAuth;
 import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.RequestHandler;
 import au.com.codeka.warworlds.server.data.DB;
@@ -28,6 +31,11 @@ public class LoginHandler extends RequestHandler {
     protected void get() throws RequestException {
         String authToken = getRequest().getParameter("authToken");
         if (authToken == null) {
+            String openIdMode = getRequest().getParameter("openid.mode");
+            if (openIdMode != null) {
+                openIdAuthenticate();
+                return;
+            }
             throw new RequestException(400);
         }
 
@@ -68,7 +76,29 @@ public class LoginHandler extends RequestHandler {
             throw new RequestException(401);
         }
         String emailAddr = json.getString("email");
+        String cookie = generateCookie(emailAddr);
 
+        getResponse().setContentType("text/plain");
+        try {
+            getResponse().getWriter().write(cookie);
+        } catch (IOException e) {
+            throw new RequestException(500, e);
+        }
+    }
+
+    private void openIdAuthenticate() throws RequestException {
+        String emailAddr = OpenIdAuth.getAuthenticatedEmail(getRequest());
+        String cookie = generateCookie(emailAddr);
+
+        getResponse().addCookie(new Cookie("SESSION", cookie));
+        getResponse().setStatus(302);
+        getResponse().addHeader("Location", "/admin"); // TODO: hard-coded?
+    }
+
+    /**
+     * Generates a cookie, assuming we've just finihed authenticating as the given email.
+     */
+    private String generateCookie(String emailAddr) throws RequestException {
         // generate a random string for the session cookie
         SecureRandom rand = new SecureRandom();
         StringBuilder cookie = new StringBuilder();
@@ -86,12 +116,6 @@ public class LoginHandler extends RequestHandler {
         }
 
         log.info(String.format(Locale.ENGLISH, "Authenticated: email=%s cookie=%s", emailAddr, cookie));
-
-        getResponse().setContentType("text/plain");
-        try {
-            getResponse().getWriter().write(cookie.toString());
-        } catch (IOException e) {
-            throw new RequestException(500, e);
-        }
+        return cookie.toString();
     }
 }

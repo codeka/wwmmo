@@ -3,10 +3,12 @@ package au.com.codeka.warworlds.server.handlers.pages;
 import java.io.IOException;
 import java.util.TreeMap;
 
+import net.asfun.jangod.template.TemplateEngine;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import net.asfun.jangod.template.TemplateEngine;
+import au.com.codeka.warworlds.server.OpenIdAuth;
 import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.RequestHandler;
 
@@ -26,6 +28,12 @@ public class HtmlPageHandler extends RequestHandler {
 
     @Override
     protected void get() throws RequestException {
+        if (getCurrentUser(false) == null) {
+            // if they're not authenticated yet, we'll have to redirect them to the authentication
+            // page first.
+            authenticate();
+            return;
+        }
         String path = getExtraOption() + getUrlParameter("path") + ".html";
         if (path.equals(getExtraOption()+".html")) {
             path = getExtraOption()+"index.html";
@@ -39,5 +47,11 @@ public class HtmlPageHandler extends RequestHandler {
         } catch (IOException e) {
             log.error("Error rendering template!", e);
         }
+    }
+
+    private void authenticate() {
+        String url = OpenIdAuth.getAuthenticateUrl(getRequest());
+        getResponse().setStatus(302);
+        getResponse().addHeader("Location", url);
     }
 }
