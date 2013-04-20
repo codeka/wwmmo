@@ -254,6 +254,12 @@ public abstract class BaseStar {
         pb.setOffsetX(mOffsetX);
         pb.setOffsetY(mOffsetY);
 
+        for (BasePlanet planet : mPlanets) {
+            Messages.Planet.Builder planet_pb = Messages.Planet.newBuilder();
+            planet.toProtocolBuffer(planet_pb);
+            pb.addPlanets(planet_pb);
+        }
+
         if (!summary) {
             // TODO: more
         }
