@@ -12,11 +12,14 @@ import java.util.TreeMap;
 
 import org.apache.commons.collections.IteratorUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import android.content.Context;
 import au.com.codeka.BackgroundRunner;
+import au.com.codeka.common.model.Simulation;
 import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.api.ApiClient;
 import au.com.codeka.warworlds.api.ApiException;
@@ -257,6 +260,13 @@ public class StarManager {
                 if (star != null) {
                     log.debug(String.format("STAR[%s] has %d fleets.", star.getKey(),
                               star.getFleets() == null ? 0 : star.getFleets().size()));
+                }
+
+                if (star.getLastSimulation() != null &&
+                        star.getLastSimulation().plusMinutes(2).compareTo(DateTime.now(DateTimeZone.UTC)) < 0) {
+                    // if it hasn't been simulated in the last two minutes, do it now
+                    Simulation sim = new Simulation();
+                    sim.simulate(star);
                 }
                 return star;
             }

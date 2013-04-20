@@ -253,6 +253,9 @@ public abstract class BaseStar {
         pb.setSectorY(mSectorY);
         pb.setOffsetX(mOffsetX);
         pb.setOffsetY(mOffsetY);
+        if (mLastSimulation != null) {
+            pb.setLastSimulation(mLastSimulation.getMillis() / 1000);
+        }
 
         for (BasePlanet planet : mPlanets) {
             Messages.Planet.Builder planet_pb = Messages.Planet.newBuilder();

@@ -3,7 +3,10 @@ package au.com.codeka.warworlds.server.model;
 import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
+
+import org.joda.time.DateTime;
 
 import au.com.codeka.common.model.BaseBuildRequest;
 import au.com.codeka.common.model.BaseBuilding;
@@ -42,6 +45,11 @@ public class Star extends BaseStar {
         mName = rs.getString("name");
         mSize = rs.getInt("size");
         mStarType = sStarTypes[rs.getInt("star_type")];
+
+        Timestamp lastSimulation = rs.getTimestamp("last_simulation");
+        if (lastSimulation != null) {
+            mLastSimulation = new DateTime(lastSimulation.getTime());
+        }
 
         try {
             Messages.Planets planets_pb = Messages.Planets.parseFrom(rs.getBlob("planets").getBinaryStream());

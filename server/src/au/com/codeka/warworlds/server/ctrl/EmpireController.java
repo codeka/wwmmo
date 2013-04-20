@@ -57,24 +57,14 @@ public class EmpireController {
             throw new RequestException(500, e);
         }
 
-        // add the initial colony and fleets to the star
-        sql = "INSERT INTO colonies (sector_id, star_id, planet_index, empire_id," +
-                                   " focus_population, focus_construction, focus_farming," +
-                                   " focus_mining, population, uncollected_taxes," +
-                                   " cooldown_end_time)" +
-             " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        colonize(empire, star, starFinder.getPlanetIndex());
+
+        sql = "INSERT INTO empire_presences (empire_id, star_id, total_goods, total_minerals) VALUES (?, ?, ?, ?)";
         try (SqlStmt stmt = DB.prepare(sql)) {
-            stmt.setInt(1, star.getSectorID());
+            stmt.setInt(1, empire.getID());
             stmt.setInt(2, star.getID());
-            stmt.setInt(3, starFinder.getPlanetIndex());
-            stmt.setInt(4, empire.getID());
-            stmt.setDouble(5, 0.25);
-            stmt.setDouble(6, 0.25);
-            stmt.setDouble(7, 0.25);
-            stmt.setDouble(8, 0.25);
-            stmt.setDouble(9, 100.0);
-            stmt.setDouble(10, 0.0);
-            stmt.setDateTime(11, DateTime.now().plusHours(8));
+            stmt.setDouble(3, 500.0);
+            stmt.setDouble(4, 500.0);
             stmt.update();
         } catch(Exception e) {
             throw new RequestException(500, e);
@@ -113,20 +103,45 @@ public class EmpireController {
             throw new RequestException(500, e);
         }
 
-        // update the count of colonies in the sector
-        sql = "UPDATE sectors SET num_colonies = num_colonies+1 WHERE id = ?";
-        try (SqlStmt stmt = DB.prepare(sql)) {
-            stmt.setInt(1, star.getSectorID());
-            stmt.update();
-        } catch(Exception e) {
-            throw new RequestException(500, e);
-        }
-
         // update the last simulation time for the star so that it doesn't simulate until we
         // actually arrived...
         sql = "UPDATE stars SET last_simulation = ?";
         try (SqlStmt stmt = DB.prepare(sql)) {
             stmt.setDateTime(1, DateTime.now());
+            stmt.update();
+        } catch(Exception e) {
+            throw new RequestException(500, e);
+        }
+    }
+
+    private void colonize(Empire empire, Star star, int planetIndex) throws RequestException {
+        // add the initial colony and fleets to the star
+        String sql = "INSERT INTO colonies (sector_id, star_id, planet_index, empire_id," +
+                                          " focus_population, focus_construction, focus_farming," +
+                                          " focus_mining, population, uncollected_taxes," +
+                                          " cooldown_end_time)" +
+             " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        try (SqlStmt stmt = DB.prepare(sql)) {
+            stmt.setInt(1, star.getSectorID());
+            stmt.setInt(2, star.getID());
+            stmt.setInt(3, planetIndex);
+            stmt.setInt(4, empire.getID());
+            stmt.setDouble(5, 0.25);
+            stmt.setDouble(6, 0.25);
+            stmt.setDouble(7, 0.25);
+            stmt.setDouble(8, 0.25);
+            stmt.setDouble(9, 100.0);
+            stmt.setDouble(10, 0.0);
+            stmt.setDateTime(11, DateTime.now().plusHours(8));
+            stmt.update();
+        } catch(Exception e) {
+            throw new RequestException(500, e);
+        }
+
+        // update the count of colonies in the sector
+        sql = "UPDATE sectors SET num_colonies = num_colonies+1 WHERE id = ?";
+        try (SqlStmt stmt = DB.prepare(sql)) {
+            stmt.setInt(1, star.getSectorID());
             stmt.update();
         } catch(Exception e) {
             throw new RequestException(500, e);
