@@ -46,10 +46,6 @@ public abstract class BaseEmpire {
     }
 
     public void fromProtocolBuffer(Messages.Empire pb) {
-        if (!pb.hasKey() || pb.getKey() == null) {
-            return;
-        }
-
         mKey = pb.getKey();
         mDisplayName = pb.getDisplayName();
         mCash = pb.getCash();
@@ -68,6 +64,20 @@ public abstract class BaseEmpire {
         if (pb.getAlliance() != null && pb.getAlliance().getKey() != null &&
                 pb.getAlliance().getKey().length() > 0) {
             mAlliance = createAlliance(pb.getAlliance());
+        }
+    }
+
+    public void toProtocolBuffer(Messages.Empire.Builder pb) {
+        pb.setKey(mKey);
+        pb.setDisplayName(mDisplayName);
+        pb.setCash(mCash);
+        pb.setEmail(mEmailAddr);
+        pb.setState(Messages.Empire.EmpireState.INITIAL);
+
+        if (mHomeStar != null) {
+            Messages.Star.Builder star_pb = Messages.Star.newBuilder();
+            mHomeStar.toProtocolBuffer(star_pb);
+            pb.setHomeStar(star_pb);
         }
     }
 }

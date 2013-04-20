@@ -260,6 +260,24 @@ public abstract class BaseStar {
             pb.addPlanets(planet_pb);
         }
 
+        if (mColonies != null) for (BaseColony colony : mColonies) {
+            Messages.Colony.Builder colony_pb = Messages.Colony.newBuilder();
+            colony.toProtocolBuffer(colony_pb);
+            pb.addColonies(colony_pb);
+        }
+
+        if (mFleets != null) for (BaseFleet fleet : mFleets) {
+            Messages.Fleet.Builder fleet_pb = Messages.Fleet.newBuilder();
+            fleet.toProtocolBuffer(fleet_pb);
+            pb.addFleets(fleet_pb);
+        }
+
+        if (mEmpires != null) for (BaseEmpirePresence empire : mEmpires) {
+            Messages.EmpirePresence.Builder empire_pb = Messages.EmpirePresence.newBuilder();
+            empire.toProtocolBuffer(empire_pb);
+            pb.addEmpires(empire_pb);
+        }
+
         if (!summary) {
             // TODO: more
         }

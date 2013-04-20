@@ -9,7 +9,7 @@ public class BaseFleet {
     protected String mKey;
     protected String mEmpireKey;
     protected String mDesignID;
-    protected int mNumShips;
+    protected float mNumShips;
     protected State mState;
     protected DateTime mStateStartTime;
     protected String mStarKey;
@@ -17,6 +17,7 @@ public class BaseFleet {
     protected String mTargetFleetKey;
     protected String mTargetColonyKey;
     protected Stance mStance;
+    protected DateTime mEta;
 
     public String getKey() {
         return mKey;
@@ -27,7 +28,7 @@ public class BaseFleet {
     public String getDesignID() {
         return mDesignID;
     }
-    public int getNumShips() {
+    public float getNumShips() {
         return mNumShips;
     }
     public State getState() {
@@ -70,7 +71,7 @@ public class BaseFleet {
             mEmpireKey = pb.getEmpireKey();
         }
         mDesignID = pb.getDesignName();
-        mNumShips = (int) Math.ceil(pb.getNumShips());
+        mNumShips = pb.getNumShips();
         mState = State.fromNumber(pb.getState().getNumber());
         mStateStartTime = new DateTime(pb.getStateStartTime() * 1000, DateTimeZone.UTC);
         mStarKey = pb.getStarKey();
@@ -81,6 +82,28 @@ public class BaseFleet {
             mStance = Stance.fromNumber(pb.getStance().getNumber());
         } else {
             mStance = Stance.NEUTRAL;
+        }
+    }
+
+    public void toProtocolBuffer(Messages.Fleet.Builder pb) {
+        pb.setKey(mKey);
+        if (mEmpireKey != null) {
+            pb.setEmpireKey(mEmpireKey);
+        }
+        pb.setDesignName(mDesignID);
+        pb.setNumShips(mNumShips);
+        pb.setState(Messages.Fleet.FLEET_STATE.valueOf(mState.getValue()));
+        pb.setStance(Messages.Fleet.FLEET_STANCE.valueOf(mStance.getValue()));
+        pb.setStateStartTime(mStateStartTime.getMillis() / 1000);
+        pb.setStarKey(mStarKey);
+        if (mDestinationStarKey != null) {
+            pb.setDestinationStarKey(mDestinationStarKey);
+        }
+        if (mTargetFleetKey != null) {
+            pb.setTargetFleetKey(mTargetFleetKey);
+        }
+        if (mTargetColonyKey != null) {
+            pb.setTargetColonyKey(mTargetColonyKey);
         }
     }
 

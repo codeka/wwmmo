@@ -70,4 +70,16 @@ public abstract class BaseEmpirePresence {
         mMaxGoods = pb.getMaxGoods();
         mMaxMinerals = pb.getMaxMinerals();
     }
+
+    public void toProtocolBuffer(Messages.EmpirePresence.Builder pb) {
+        pb.setKey(mKey);
+        pb.setEmpireKey(mEmpireKey);
+        pb.setStarKey(mStarKey);
+        pb.setTotalGoods(mTotalGoods);
+        pb.setTotalMinerals(mTotalMinerals);
+        pb.setGoodsDeltaPerHour(mDeltaGoodsPerHour);
+        pb.setMineralsDeltaPerHour(mDeltaMineralsPerHour);
+        pb.setMaxGoods(mMaxGoods);
+        pb.setMaxMinerals(mMaxMinerals);
+    }
 }

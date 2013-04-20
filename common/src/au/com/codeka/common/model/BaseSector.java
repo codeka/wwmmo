@@ -37,6 +37,7 @@ public abstract class BaseSector {
         }
 
         // could this be more efficient? there's not a lot of stars, so maybe not a big deal
+        // TODO: these fields will be removed when the ALPHA server is closed...
         for (Messages.Colony colony_pb : pb.getColoniesList()) {
             if (colony_pb.getPopulation() < 1.0) {
                 // colonies with zero population are dead -- they just don't know it yet.

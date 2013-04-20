@@ -7,9 +7,12 @@ import java.util.List;
 import au.com.codeka.common.Pair;
 import au.com.codeka.common.model.BaseColony;
 import au.com.codeka.common.model.BaseFleet;
+import au.com.codeka.common.model.BaseStar;
 import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.data.DB;
 import au.com.codeka.warworlds.server.data.SqlStmt;
+import au.com.codeka.warworlds.server.model.Colony;
+import au.com.codeka.warworlds.server.model.Fleet;
 import au.com.codeka.warworlds.server.model.Sector;
 import au.com.codeka.warworlds.server.model.Star;
 
@@ -63,8 +66,7 @@ public class SectorController {
             ids[i] = sectors.get(i).getID();
         }
 
-        List<Star> stars = DataBase.getStarsForSectors(ids);
-        for (Star star : stars) {
+        for (Star star : DataBase.getStarsForSectors(ids)) {
             // add the star to the correct sector
             for (Sector sector : sectors) {
                 if (star.getSectorID() == sector.getID()) {
@@ -77,8 +79,31 @@ public class SectorController {
             star.setFleets(new ArrayList<BaseFleet>());
         }
 
-        // todo: colonies
-        // todo: fleets
+        for (Colony colony : DataBase.getColoniesForSectors(ids)) {
+            for (Sector sector : sectors) {
+                if (colony.getSectorID() == sector.getID()) {
+                    for (BaseStar baseStar : sector.getStars()) {
+                        Star star = (Star) baseStar;
+                        if (star.getID() == colony.getStarID()) {
+                            star.getColonies().add(colony);
+                        }
+                    }
+                }
+            }
+        }
+
+        for (Fleet fleet : DataBase.getFleetsForSectors(ids)) {
+            for (Sector sector : sectors) {
+                if (fleet.getSectorID() == sector.getID()) {
+                    for (BaseStar baseStar : sector.getStars()) {
+                        Star star = (Star) baseStar;
+                        if (star.getID() == fleet.getStarID()) {
+                            star.getFleets().add(fleet);
+                        }
+                    }
+                }
+            }
+        }
     }
 
     private static class DataBase {
@@ -130,6 +155,40 @@ public class SectorController {
             } catch(Exception e) {
                 throw new RequestException(500, e);
             }
+        }
+
+        public static List<Colony> getColoniesForSectors(int[] sectorIds) throws RequestException {
+            String sql = "SELECT colonies.*" +
+                         " FROM colonies" +
+                         " WHERE sector_id IN "+buildInClause(sectorIds);
+             try (SqlStmt stmt = DB.prepare(sql)) {
+                 ResultSet rs = stmt.select();
+
+                 List<Colony> colonies = new ArrayList<Colony>();
+                 while (rs.next()) {
+                     colonies.add(new Colony(rs));
+                 }
+                 return colonies;
+             } catch(Exception e) {
+                 throw new RequestException(500, e);
+             }
+        }
+
+        public static List<Fleet> getFleetsForSectors(int[] sectorIds) throws RequestException {
+            String sql = "SELECT fleets.*" +
+                         " FROM fleets" +
+                         " WHERE sector_id IN "+buildInClause(sectorIds);
+             try (SqlStmt stmt = DB.prepare(sql)) {
+                 ResultSet rs = stmt.select();
+
+                 List<Fleet> fleets = new ArrayList<Fleet>();
+                 while (rs.next()) {
+                     fleets.add(new Fleet(rs));
+                 }
+                 return fleets;
+             } catch(Exception e) {
+                 throw new RequestException(500, e);
+             }
         }
 
         private static String buildInClause(int[] ids) {

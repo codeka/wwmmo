@@ -12,12 +12,15 @@ import jregex.Pattern;
 
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.handler.AbstractHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import au.com.codeka.warworlds.server.handlers.*;
 import au.com.codeka.warworlds.server.handlers.pages.*;
 
 
 public class RequestRouter extends AbstractHandler {
+    private final Logger log = LoggerFactory.getLogger(RequestRouter.class);
     private static ArrayList<Route> sRoutes;
 
     {
@@ -25,7 +28,7 @@ public class RequestRouter extends AbstractHandler {
         sRoutes.add(new Route("^/login$", LoginHandler.class));
         sRoutes.add(new Route("^/realms/({realm}[^/]+)/devices/({id}[0-9]+)$", DevicesHandler.class));
         sRoutes.add(new Route("^/realms/({realm}[^/]+)/devices$", DevicesHandler.class));
-        sRoutes.add(new Route("^/realms/({realm}[^/]+)/hello$", HelloHandler.class));
+        sRoutes.add(new Route("^/realms/({realm}[^/]+)/hello/({device_id}[0-9]+)$", HelloHandler.class));
         sRoutes.add(new Route("^/realms/({realm}[^/]+)/empires$", EmpiresHandler.class));
         sRoutes.add(new Route("^/realms/({realm}[^/]+)/sectors$", SectorsHandler.class));
         sRoutes.add(new Route("^/realms/({realm}[^/]+)/stars$", StarsHandler.class));
@@ -51,6 +54,7 @@ public class RequestRouter extends AbstractHandler {
             }
         }
 
+        log.info(String.format("Could not find handler for URL: %s", target));
         response.setStatus(404);
     }
 

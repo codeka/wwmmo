@@ -1,5 +1,8 @@
 package au.com.codeka.warworlds.server.model;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
 import au.com.codeka.common.model.BaseAlliance;
 import au.com.codeka.common.model.BaseEmpire;
 import au.com.codeka.common.model.BaseEmpireRank;
@@ -7,6 +10,29 @@ import au.com.codeka.common.model.BaseStar;
 import au.com.codeka.common.protobuf.Messages;
 
 public class Empire extends BaseEmpire {
+    private int mID;
+
+    public Empire() {
+    }
+    public Empire(ResultSet rs) throws SQLException {
+        mID = rs.getInt("id");
+        mKey = Integer.toString(mID);
+        mDisplayName = rs.getString("name");
+        mCash = rs.getFloat("cash");
+        mEmailAddr = rs.getString("user_email");
+    }
+
+    public int getID() {
+        return mID;
+    }
+    public void setID(int id) {
+        mID = id;
+        mKey = Integer.toString(id);
+    }
+
+    public void setHomeStar(Star star) {
+        mHomeStar = star;
+    }
 
     @Override
     protected BaseEmpireRank createEmpireRank(Messages.EmpireRank pb) {
