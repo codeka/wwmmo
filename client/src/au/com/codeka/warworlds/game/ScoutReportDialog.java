@@ -218,7 +218,7 @@ public class ScoutReportDialog extends DialogFragment {
                         final Fleet rhsFleet = rhs.fleet;
 
                         if (lhsFleet.getDesignID().equals(rhsFleet.getDesignID())) {
-                            return lhsFleet.getNumShips() - rhsFleet.getNumShips();
+                            return (int)(lhsFleet.getNumShips() - rhsFleet.getNumShips());
                         } else {
                             return lhsFleet.getDesignID().compareTo(rhsFleet.getDesignID());
                         }

@@ -18,7 +18,7 @@ public class Fleet extends BaseFleet implements Parcelable {
         parcel.writeString(mKey);
         parcel.writeString(mEmpireKey);
         parcel.writeString(mDesignID);
-        parcel.writeInt(mNumShips);
+        parcel.writeFloat(mNumShips);
         parcel.writeInt(mState.getValue());
         parcel.writeLong(mStateStartTime.getMillis());
         parcel.writeString(mStarKey);
@@ -36,7 +36,7 @@ public class Fleet extends BaseFleet implements Parcelable {
             f.mKey = parcel.readString();
             f.mEmpireKey = parcel.readString();
             f.mDesignID = parcel.readString();
-            f.mNumShips = parcel.readInt();
+            f.mNumShips = parcel.readFloat();
             f.mState = BaseFleet.State.fromNumber(parcel.readInt());
             f.mStateStartTime = new DateTime(parcel.readLong(), DateTimeZone.UTC);
             f.mStarKey = parcel.readString();

@@ -14,7 +14,7 @@ public class ShipDesign extends Design {
     public float getFuelCostPerParsec() {
         return mFuelCostPerParsec;
     }
-    public float getFuelCost(float parsecs, int numShips) {
+    public float getFuelCost(float parsecs, float numShips) {
         return mFuelCostPerParsec * parsecs * numShips;
     }
     public float getBaseAttack() {

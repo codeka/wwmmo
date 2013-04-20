@@ -138,14 +138,23 @@ public abstract class BaseColony {
     }
 
     public void toProtocolBuffer(Messages.Colony.Builder pb) {
-        pb.setKey(getKey());
-        pb.setPlanetIndex(getPlanetIndex());
-        pb.setStarKey(getStarKey());
-        pb.setEmpireKey(getEmpireKey());
-        pb.setPopulation(getPopulation());
-        pb.setFocusPopulation(getPopulationFocus());
-        pb.setFocusFarming(getFarmingFocus());
-        pb.setFocusMining(getMiningFocus());
-        pb.setFocusConstruction(getConstructionFocus());
+        pb.setKey(mKey);
+        pb.setPlanetIndex(mPlanetIndex);
+        pb.setStarKey(mStarKey);
+        pb.setEmpireKey(mEmpireKey);
+        pb.setPopulation(mPopulation);
+        pb.setFocusPopulation(mPopulationFocus);
+        pb.setFocusFarming(mFarmingFocus);
+        pb.setFocusMining(mMiningFocus);
+        pb.setFocusConstruction(mConstructionFocus);
+        pb.setDeltaMinerals(mMineralsDelta);
+        pb.setDeltaGoods(mGoodsDelta);
+        pb.setDeltaPopulation(mPopulationDelta);
+        pb.setMaxPopulation(mMaxPopulation);
+        pb.setUncollectedTaxes(mUncollectedTaxes);
+        pb.setDefenceBonus(mDefenceBoost);
+        if (mCooldownTimeEnd != null) {
+            pb.setCooldownEndTime(mCooldownTimeEnd.getMillis() / 1000);
+        }
     }
 }

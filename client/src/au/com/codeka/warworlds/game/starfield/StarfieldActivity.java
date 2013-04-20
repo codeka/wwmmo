@@ -638,7 +638,7 @@ public class StarfieldActivity extends BaseActivity
             "<b>Speed:</b> %.2f pc/hr<br />" +
             "<b>Destination:</b> %s<br />" +
             "<b>ETA:</b> %s",
-            fleet.getNumShips(), design.getSpeedInParsecPerHour(),
+            (int) Math.ceil(fleet.getNumShips()), design.getSpeedInParsecPerHour(),
             (destStar == null ? "???" : destStar.getName()),
             eta);
         fleetDetails.setText(Html.fromHtml(details));

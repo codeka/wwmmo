@@ -178,7 +178,7 @@ public class FleetMergeDialog extends DialogFragment {
                 public int compare(Fleet lhs, Fleet rhs) {
                     // by definition, they'll all be the same design so just
                     // sort based on number of ships
-                    return rhs.getNumShips() - lhs.getNumShips();
+                    return (int)(rhs.getNumShips() - lhs.getNumShips());
                 }
             });
 

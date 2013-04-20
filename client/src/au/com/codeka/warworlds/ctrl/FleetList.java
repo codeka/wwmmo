@@ -417,7 +417,7 @@ public class FleetList extends FrameLayout implements StarManager.StarFetchedHan
                     } else if (!lhs.getDesignID().equals(rhs.getDesignID())) {
                         return lhs.getDesignID().compareTo(rhs.getDesignID());
                     } else {
-                        return rhs.getNumShips() - lhs.getNumShips();
+                        return (int) (rhs.getNumShips() - lhs.getNumShips());
                     }
                 }
             });

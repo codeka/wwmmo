@@ -627,9 +627,9 @@ public class StarfieldSurfaceView extends SectorView
 
                 Integer n = empireFleets.get(f.getEmpireKey());
                 if (n == null) {
-                    empireFleets.put(f.getEmpireKey(), f.getNumShips());
+                    empireFleets.put(f.getEmpireKey(), (int) Math.ceil(f.getNumShips()));
                 } else {
-                    empireFleets.put(f.getEmpireKey(), n + f.getNumShips());
+                    empireFleets.put(f.getEmpireKey(), n + (int) Math.ceil(f.getNumShips()));
                 }
             }
 
@@ -793,7 +793,7 @@ public class StarfieldSurfaceView extends SectorView
             canvas.drawText(msg, (float) position.x + (30.0f * pixelScale),
                             (float) position.y, mStarPaint);
 
-            msg = String.format(Locale.ENGLISH, "%s (%d)", design.getDisplayName(), fleet.getNumShips());
+            msg = String.format(Locale.ENGLISH, "%s (%d)", design.getDisplayName(), (int) Math.ceil(fleet.getNumShips()));
             canvas.drawText(msg, (float) position.x + (30.0f * pixelScale),
                             (float) position.y + (10.0f * pixelScale), mStarPaint);
         }

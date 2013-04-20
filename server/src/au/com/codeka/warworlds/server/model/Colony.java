@@ -35,6 +35,13 @@ public class Colony extends BaseColony {
         mPopulation = rs.getFloat("population");
     }
 
+    public void setMaxPopulation(float maxPopulation) {
+        mMaxPopulation = maxPopulation;
+    }
+
+    public int getID() {
+        return mID;
+    }
     public int getSectorID() {
         return mSectorID;
     }

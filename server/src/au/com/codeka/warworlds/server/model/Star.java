@@ -82,6 +82,9 @@ public class Star extends BaseStar {
     public void setEmpires(ArrayList<BaseEmpirePresence> empires) {
         mEmpires = empires;
     }
+    public void setBuildRequests(ArrayList<BaseBuildRequest> buildRequests) {
+        mBuildRequests = buildRequests;
+    }
 
     @Override
     protected BasePlanet createPlanet(Messages.Planet pb) {
@@ -139,6 +142,11 @@ public class Star extends BaseStar {
 
     @Override
     public BaseStar clone() {
-        return null; //TODO
+        Messages.Star.Builder star_pb = Messages.Star.newBuilder();
+        toProtocolBuffer(star_pb);
+
+        Star clone = new Star();
+        clone.fromProtocolBuffer(star_pb.build());
+        return clone;
     }
 }

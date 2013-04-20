@@ -12,7 +12,7 @@ import au.com.codeka.warworlds.server.model.Star;
 public class StarHandler extends RequestHandler {
     @Override
     protected void get() throws RequestException {
-        int id = Integer.parseInt(getUrlParameter("id"));
+        int id = Integer.parseInt(getUrlParameter("star_id"));
         Star star = new StarController().getStar(id);
         if (star == null) {
             throw new RequestException(404);

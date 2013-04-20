@@ -144,7 +144,7 @@ public class EnemyPlanetActivity extends BaseActivity
             if (fleet.getEmpireKey().equals(myEmpire.getKey())) {
                 ShipDesign design = (ShipDesign) DesignManager.i.getDesign(DesignKind.SHIP, fleet.getDesignID());
                 if (design.hasEffect("troopcarrier")) {
-                    attack += fleet.getNumShips();
+                    attack += Math.ceil(fleet.getNumShips());
                 }
             }
         }

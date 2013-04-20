@@ -50,6 +50,9 @@ public class Fleet extends BaseFleet {
         }
     }
 
+    public int getID() {
+        return mID;
+    }
     public int getStarID() {
         return mStarID;
     }
@@ -58,5 +61,11 @@ public class Fleet extends BaseFleet {
     }
     public int getEmpireID() {
         return mEmpireID;
+    }
+    public int getDestinationStarID() {
+        return mDestinationStarID;
+    }
+    public int getTargetFleetID() {
+        return mTargetFleetID;
     }
 }

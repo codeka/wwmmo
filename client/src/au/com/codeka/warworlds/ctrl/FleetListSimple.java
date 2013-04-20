@@ -136,7 +136,7 @@ public class FleetListSimple extends ListView {
 
             TextView shipKindTextView = (TextView) view.findViewById(R.id.starfield_planet_type);
             shipKindTextView.setText(String.format("%d × %s",
-                    fleet.getNumShips(), design.getDisplayName(fleet.getNumShips() > 1)));
+                    (int) Math.ceil(fleet.getNumShips()), design.getDisplayName(fleet.getNumShips() > 1)));
 
             final TextView shipCountTextView = (TextView) view.findViewById(R.id.starfield_planet_colony);
             shipCountTextView.setText(String.format("%s",

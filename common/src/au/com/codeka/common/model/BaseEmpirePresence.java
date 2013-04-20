@@ -55,8 +55,14 @@ public abstract class BaseEmpirePresence {
     public float getMaxGoods() {
         return mMaxGoods;
     }
+    public void setMaxGoods(float value) {
+        mMaxGoods = value;
+    }
     public float getMaxMinerals() {
         return mMaxMinerals;
+    }
+    public void setMaxMinerals(float value) {
+        mMaxMinerals = value;
     }
 
     public void fromProtocolBuffer(Messages.EmpirePresence pb) {

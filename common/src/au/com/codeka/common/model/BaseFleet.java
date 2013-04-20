@@ -52,6 +52,9 @@ public class BaseFleet {
     public Stance getStance() {
         return mStance;
     }
+    public DateTime getEta() {
+        return mEta;
+    }
 
     public float getTimeToDestination(BaseStar srcStar, BaseStar destStar) {/*
         ShipDesign design = ShipDesignManager.getInstance().getDesign(mDesignID);

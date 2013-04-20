@@ -42,10 +42,11 @@ public class FleetSplitDialog extends DialogFragment {
         View fleetView = mView.findViewById(R.id.fleet);
         FleetList.populateFleetRow(getActivity(), null, fleetView, mFleet);
 
-        splitRatio.setMax(mFleet.getNumShips());
-        splitRatio.setProgress(mFleet.getNumShips() / 2);
-        splitLeft.setText(Integer.toString(mFleet.getNumShips() / 2));
-        splitRight.setText(Integer.toString(mFleet.getNumShips() - (mFleet.getNumShips() / 2)));
+        int numShips = (int) Math.ceil(mFleet.getNumShips());
+        splitRatio.setMax(numShips);
+        splitRatio.setProgress(numShips / 2);
+        splitLeft.setText(Integer.toString(numShips / 2));
+        splitRight.setText(Integer.toString(numShips - (numShips / 2)));
 
         splitRatio.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override

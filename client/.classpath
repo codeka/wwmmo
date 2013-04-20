@@ -22,6 +22,8 @@
 	<classpathentry exported="true" kind="lib" path="libs/GoogleAdMobAdsSdk-6.2.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="libs/jcl-over-slf4j-1.7.5.jar"/>
 	<classpathentry exported="true" kind="lib" path="libs/protobuf-java-2.5.0.jar"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/common"/>
+	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/common"/>
+	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/control-field"/>
+	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/planet-render"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>

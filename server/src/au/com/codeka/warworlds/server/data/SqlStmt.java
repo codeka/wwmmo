@@ -58,8 +58,12 @@ public class SqlStmt implements AutoCloseable {
         saveParameter(position, value);
     }
     public void setDateTime(int position, DateTime value) throws SQLException {
-        mStmt.setTimestamp(position, new Timestamp(value.getMillis()), sUTC);
-        saveParameter(position, value);
+        if (value == null) {
+            setNull(position);
+        } else {
+            mStmt.setTimestamp(position, new Timestamp(value.getMillis()), sUTC);
+            saveParameter(position, value);
+        }
     }
     public void setBlob(int position, byte[] blob) throws SQLException {
         mStmt.setBlob(position, new SerialBlob(blob));
