@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import au.com.codeka.common.Pair;
+import au.com.codeka.common.model.BaseColony;
+import au.com.codeka.common.model.BaseFleet;
 import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.data.DB;
 import au.com.codeka.warworlds.server.data.SqlStmt;
@@ -15,27 +17,8 @@ public class SectorController {
 
     public List<Sector> getSectors(List<Pair<Long, Long>> coords, boolean generate) throws RequestException {
         List<Sector> sectors = DataBase.getSectors(coords);
-
-        // for the sectors we fetched, we'll also need the stars, colonies & fleets
         if (sectors.size() > 0) {
-            int[] ids = new int[sectors.size()];
-            for (int i = 0; i < sectors.size(); i++) {
-                ids[i] = sectors.get(i).getID();
-            }
-
-            List<Star> stars = DataBase.getStarsForSectors(ids);
-            for (Star star : stars) {
-                // add the star to the correct sector
-                for (Sector sector : sectors) {
-                    if (star.getSectorID() == sector.getID()) {
-                        sector.getStars().add(star);
-                        break;
-                    }
-                }
-            }
-
-            // todo: colonies
-            // todo: fleets
+            populateSectors(sectors);
         }
 
         if (generate && sectors.size() < coords.size()) {
@@ -64,6 +47,40 @@ public class SectorController {
         return sectors;
     }
 
+    public Sector getSector(int sectorId) throws RequestException {
+        List<Sector> sectors = DataBase.getSectors(new int[] {sectorId});
+        if (sectors.size() > 0) {
+            populateSectors(sectors);
+            return sectors.get(0);
+        }
+        return null;
+    }
+
+    private void populateSectors(List<Sector> sectors) throws RequestException {
+        // for the sectors we fetched, we'll also need the stars, colonies & fleets
+        int[] ids = new int[sectors.size()];
+        for (int i = 0; i < sectors.size(); i++) {
+            ids[i] = sectors.get(i).getID();
+        }
+
+        List<Star> stars = DataBase.getStarsForSectors(ids);
+        for (Star star : stars) {
+            // add the star to the correct sector
+            for (Sector sector : sectors) {
+                if (star.getSectorID() == sector.getID()) {
+                    sector.getStars().add(star);
+                    break;
+                }
+            }
+
+            star.setColonies(new ArrayList<BaseColony>());
+            star.setFleets(new ArrayList<BaseFleet>());
+        }
+
+        // todo: colonies
+        // todo: fleets
+    }
+
     private static class DataBase {
         public static List<Sector> getSectors(List<Pair<Long, Long>> coords) throws RequestException {
             String sql = "SELECT id, x, y, distance_to_centre, num_colonies FROM sectors WHERE (1=0";
@@ -71,7 +88,16 @@ public class SectorController {
                 sql += " OR (x="+coord.one+" AND y="+coord.two+")";
             }
             sql += ")";
+            return getSectors(sql);
+        }
 
+        public static List<Sector> getSectors(int[] sectorIds) throws RequestException {
+            String sql = "SELECT id, x, y, distance_to_centre, num_colonies FROM sectors WHERE id IN ";
+            sql += buildInClause(sectorIds);
+            return getSectors(sql);
+        }
+
+        private static List<Sector> getSectors(String sql) throws RequestException {
             try (SqlStmt stmt = DB.prepare(sql)) {
                 ResultSet rs = stmt.select();
 

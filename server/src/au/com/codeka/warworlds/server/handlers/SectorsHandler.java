@@ -10,6 +10,9 @@ import au.com.codeka.warworlds.server.RequestHandler;
 import au.com.codeka.warworlds.server.ctrl.SectorController;
 import au.com.codeka.warworlds.server.model.Sector;
 
+/**
+ * Handles /realm/.../sectors URL
+ */
 public class SectorsHandler extends RequestHandler {
 
     private List<Pair<Long, Long>> getCoords() throws RequestException {

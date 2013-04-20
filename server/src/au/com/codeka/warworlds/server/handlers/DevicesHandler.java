@@ -10,8 +10,6 @@ import au.com.codeka.warworlds.server.RequestHandler;
 import au.com.codeka.warworlds.server.data.DB;
 import au.com.codeka.warworlds.server.data.SqlStmt;
 
-import com.google.protobuf.Message;
-
 public class DevicesHandler extends RequestHandler {
 
     @Override

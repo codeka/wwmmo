@@ -1,5 +1,23 @@
 package au.com.codeka.warworlds.server.ctrl;
 
+import java.sql.ResultSet;
+import java.util.ArrayList;
+import java.util.Locale;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import au.com.codeka.common.model.BaseColony;
+import au.com.codeka.common.model.BaseFleet;
+import au.com.codeka.common.model.BasePlanet;
+import au.com.codeka.common.model.BaseSector;
+import au.com.codeka.common.model.BaseStar;
+import au.com.codeka.warworlds.server.RequestException;
+import au.com.codeka.warworlds.server.data.DB;
+import au.com.codeka.warworlds.server.data.SqlStmt;
+import au.com.codeka.warworlds.server.model.Sector;
+import au.com.codeka.warworlds.server.model.Star;
+
 /** Find a star which is suitable for a new empire.
  *
  * When a new player joins the game, we want to find a star for their initial
@@ -9,6 +27,7 @@ package au.com.codeka.warworlds.server.ctrl;
  * @return A \see NewEmpireStarDetails with details of the new star.
  */
 public class NewEmpireStarFinder {
+    private final Logger log = LoggerFactory.getLogger(NewEmpireStarFinder.class);
     private int mStarID;
     private int mPlanetIndex;
 
@@ -19,154 +38,189 @@ public class NewEmpireStarFinder {
         return mPlanetIndex;
     }
 
-    public boolean findStarForNewEmpire() {
-        return false; /*
-        sector_model = None
-        while not sector_model:
-          query = (sector_mdl.Sector.all().filter("numColonies <", 30)
-                                          .filter("numColonies >=", 1)
-                                          .order("numColonies")
-                                          .order("distanceToCentre")
-                                          .fetch(10))
-          models = []
-          for s in query:
-            key = "%d:%d" % (s.x, s.y)
-            if key not in _fullSectors:
-              models.append(s)
+    public boolean findStarForNewEmpire() throws RequestException {
+        ArrayList<Integer> sectorIds = findSectors();
+        for (int sectorId : sectorIds) {
+            Sector sector = new SectorController().getSector(sectorId);
+            Star star = findHighestScoreStar(sector);
+            if (star == null) {
+                continue;
+            }
 
-          if len(models) == 0:
-            query = (sector_mdl.Sector.all().filter("numColonies <", 30)
-                                            .order("numColonies")
-                                            .order("distanceToCentre")
-                                            .fetch(10))
-            for s in query:
-              models.append(s)
+            // if we get here, then we've found the star. Also find which planet to
+            // put the colony on.
+            mStarID = star.getID();
 
-          if len(models) == 0:
-            # this would happen if there's no sectors loaded that have no colonies... that's bad!!
-            logging.warn("Could not find any sectors for new empire, creating some...")
-            sectorgen.expandUniverse(immediate=True)
-          else:
-            index = random.randint(0, len(models) - 1)
-            logging.info("Found %d potential sectors, index=%d" % (len(models), index))
-            sector_model = models[index]
+            int highestPopulationCongeniality = 0;
+            for (BasePlanet planet : star.getPlanets()) {
+                if (planet.getPopulationCongeniality() > highestPopulationCongeniality) {
+                    highestPopulationCongeniality = planet.getPopulationCongeniality();
+                    mPlanetIndex = planet.getIndex();
+                }
+            }
 
-        # get the existing colonies/fleets in this sector, stars with colonies
-        # or fleets are not candidates for new empires
-        colonized_stars = []
-        for colony_model in mdl.Colony.all().filter("sector", sector_model):
-          empire_key = mdl.Colony.empire.get_value_for_datastore(colony_model)
-          if empire_key:
-            star_key = str(colony_model.key().parent())
-            if star_key not in colonized_stars:
-              colonized_stars.append(star_key)
-        for fleet_model in mdl.Fleet.all().filter("sector", sector_model):
-          empire_key = mdl.Fleet.empire.get_value_for_datastore(fleet_model)
-          if empire_key:
-            star_key = (fleet_model.key().parent())
-            if star_key not in colonized_stars:
-              colonized_stars.append(star_key)
+            return true;
+        }
 
-        stars = []
-        for star_model in sector_mdl.Star.all().filter("sector", sector_model):
-          star = {"star_model": star_model}
-          star["is_colonized"] = (str(star_model.key()) in colonized_stars)
-          stars.append(star)
+        return false;
+    }
 
-        # Now find a star within that sector. We'll want one with two terran planets
-        # with highish population stats, close to the centre of the sector, but far
-        # from any existing (non-Native) colonies. We'll score each of the stars
-        # based on these factors and then choose the one with the highest score
-        starScores = []
-        for star in stars:
-          if star["is_colonized"]:
-            # colonized stars are right out...
-            continue
-          star_model = star["star_model"]
+    private Star findHighestScoreStar(Sector sector) {
+        double highestScore = 5.0; // scores lower than 5.0 don't count
+        Star highestScoreStar = null;
 
-          centre = sector.SECTOR_SIZE / 2
-          distance_to_centre = math.sqrt((star_model.x - centre) * (star_model.x - centre) +
-                                         (star_model.y - centre) * (star_model.y - centre))
+        for (BaseStar star : sector.getStars()) {
+            // ignore colonized stars, they're no good
+            if (isColonized(star)) {
+                continue;
+            }
 
-          # 0 -- 10 (0 is edge of sector, 10 is centre of sector)
-          distance_to_centre_score = (centre - distance_to_centre) / (centre / 10)
-          if distance_to_centre_score < 1:
-            distance_to_centre_score = 1.0
+            // similarly, colonies with fleets are right out
+            boolean hasFleets = false;
+            for (BaseFleet fleet : star.getFleets()) {
+                if (fleet.getEmpireKey() != null) {
+                    hasFleets = true;
+                    break;
+                }
+            }
+            if (hasFleets) {
+                continue;
+            }
 
-          # figure out the distance to the closest colony
-          distance_to_colony_score = 1.0
-          distance_to_other_colony = 0
-          other_colony = None
-          for other_star in stars:
-            if other_star["is_colonized"]:
-              distance_to_this_colony = math.sqrt(
-                  (star_model.x - other_star["star_model"].x) * (star_model.x - other_star["star_model"].x) +
-                  (star_model.y - other_star["star_model"].y) * (star_model.y - other_star["star_model"].y))
-              if not other_colony or distance_to_this_colony < distance_to_other_colony:
-                other_colony = other_star
-                distance_to_other_colony = distance_to_this_colony
-          if other_colony:
-            if distance_to_other_colony < 400:
-              distance_to_colony_score = 0
-            else:
-              distance_to_colony_score = 400 / distance_to_other_colony
-            distance_to_colony_score *= distance_to_colony_score
+            double score = scoreStar(sector, star);
+            if (score > highestScore) {
+                highestScore = score;
+                highestScoreStar = (Star) star;
+            }
+        }
 
-          num_terran_planets = 0
-          population_congeniality = 0
-          farming_congeniality = 0
-          mining_congeniality = 0
-          for planet in star_model.planets:
-            if planet.planet_type == pb.Planet.TERRAN:
-              num_terran_planets += 1
-              population_congeniality += planet.population_congeniality
-              farming_congeniality += planet.farming_congeniality
-              mining_congeniality += planet.mining_congeniality
+        return highestScoreStar;
+    }
 
-          planet_score = 0
-          if num_terran_planets >= 2:
-            planet_score = num_terran_planets
+    private boolean isColonized(BaseStar star) {
+        for (BaseColony colony : star.getColonies()) {
+            if (colony.getEmpireKey() != null) {
+                return true;
+            }
+        }
+        return false;
+    }
 
-          # if there's no terran planets at all, just ignore this star
-          if num_terran_planets == 0:
-            continue
+    private double scoreStar(Sector sector, BaseStar star) {
+        int centre = BaseSector.SECTOR_SIZE / 2;
+        double distanceToCentre = Math.sqrt((star.getOffsetX() - centre) * (star.getOffsetX() - centre) +
+                                            (star.getOffsetY() - centre) * (star.getOffsetY() - centre));
+        // 0..10 (0 means the star is on the edge of the sector, 10 means it's the very centre)
+        double distanceToCentreScore = (centre - distanceToCentre) / (centre / 10.0);
+        if (distanceToCentreScore < 1.0) {
+            distanceToCentreScore = 1.0;
+        }
 
-          # the average of the congenialities / 100 (should make it approximately 0..10)
-          congeniality_score = (population_congeniality / num_terran_planets +
-                                farming_congeniality / num_terran_planets +
-                                mining_congeniality / num_terran_planets)
-          congeniality_score /= 100
+        // figure out the distance to the closest colonized star and give it a score based on that
+        // basically, we want to be about 400 pixels away, no closer but a litter further away is
+        // OK as well
+        double distanceToOtherColonyScore = 1.0;
+        double distanceToOtherColony = 0.0;
+        BaseStar otherColony = null;
+        for (BaseStar otherStar : sector.getStars()) {
+            if (otherStar.getKey().equals(star.getKey())) {
+                continue;
+            }
+            if (isColonized(otherStar)) {
+                double distanceToColony = Math.sqrt(
+                        (star.getOffsetX() - otherStar.getOffsetX()) * (star.getOffsetX() - otherStar.getOffsetX()) +
+                        (star.getOffsetY() - otherStar.getOffsetY()) * (star.getOffsetY() - otherStar.getOffsetY()));
+                if (otherColony == null || distanceToColony < distanceToOtherColony) {
+                    otherColony = otherStar;
+                    distanceToOtherColony = distanceToColony;
+                }
+            }
+        }
+        if (otherColony != null) {
+            if (distanceToOtherColony < 400.0) {
+                distanceToOtherColonyScore = 0.0;
+            } else {
+                distanceToOtherColonyScore = 400.0 / distanceToOtherColony;
+                distanceToOtherColonyScore *= distanceToOtherColonyScore;
+            }
+        }
 
-          score = (distance_to_centre_score * planet_score * congeniality_score *
-                   distance_to_colony_score)
-          logging.debug("Star[%s] score=%.2f distance_to_centre_score=%.2f planet_score=%.2f congeniality_score=%.2f distance_to_colony_score=%.2f distance_to_nearest_colony=%.2f" % (
-                        star_model.name, score, distance_to_centre_score,
-                        planet_score, congeniality_score, distance_to_colony_score,
-                        distance_to_other_colony))
+        double numTerranPlanets = 0.0;
+        double populationCongeniality = 0.0;
+        double farmingCongeniality = 0.0;
+        double miningCongeniality = 0.0;
+        for (BasePlanet planet : star.getPlanets()) {
+            if (planet.getPlanetType().getInternalName().equals("terran")) {
+                numTerranPlanets ++;
+            }
+            populationCongeniality += planet.getPopulationCongeniality();
+            farmingCongeniality += planet.getFarmingCongeniality();
+            miningCongeniality += planet.getMiningCongeniality();
+        }
+        double planetScore = 0.0;
+        if (numTerranPlanets >= 2) {
+            planetScore = numTerranPlanets;
+        }
 
-          starScores.append((score, star_model))
+        double congenialityScore = (populationCongeniality / numTerranPlanets) +
+                                   (farmingCongeniality / numTerranPlanets) +
+                                   (miningCongeniality / numTerranPlanets);
+        congenialityScore /= 100.0;
 
-        # just choose the star with the highest score
-        (score, star_model) = sorted(starScores, reverse=True)[0]
-        if score < 5:
-          logging.warn("Highest score was %.2f, which is too low. Marking this sector full and trying again." % (score))
-          key = "%d:%d" % (star_model.sector.x, star_model.sector.y)
-          _fullSectors.append(key)
-          return findStarForNewEmpire()
-        logging.info("Chose star with score=%d (%s)" % (score, star_model.name))
+        double score = (distanceToCentreScore * planetScore * congenialityScore *
+                        distanceToOtherColonyScore);
 
-        # next, choose the planet on this star with the highest population congeniality, that'll
-        # be the one we start out on
-        max_population_congeniality = 0
-        planet_index = 0
-        for index,planet in enumerate(star_model.planets):
-          if planet.planet_type == pb.Planet.TERRAN:
-            if planet.population_congeniality > max_population_congeniality:
-              planet_index = index + 1
-              max_population_congeniality = planet.population_congeniality
+        log.info(String.format(Locale.ENGLISH,
+                "Star[%s] score=%.2f distance_to_centre_score=%.2f planet_score=%.2f congeniality_score=%.2f distance_to_colony_score=%.2f distance_to_nearest_colony=%.2f",
+                star.getName(), score, distanceToCentreScore,
+                planetScore, congenialityScore, distanceToOtherColonyScore,
+                distanceToOtherColony));
 
-        star_key = str(star_model.key())
-        return (star_key, planet_index)
-*/
+        return score;
+    }
+
+    private ArrayList<Integer> findSectors() throws RequestException {
+        ArrayList<Integer> ids = new ArrayList<Integer>();
+        String sql = "SELECT id FROM sectors WHERE num_colonies < ? AND num_colonies >= ?" +
+                    " ORDER BY num_colonies ASC, distance_to_centre ASC";
+        try (SqlStmt stmt = DB.prepare(sql)) {
+            stmt.setInt(1, 30);
+            stmt.setInt(2, 1);
+            ResultSet rs = stmt.select();
+            while (rs.next()) {
+                ids.add(rs.getInt(1));
+                if (ids.size() > 15) {
+                    break;
+                }
+            }
+        } catch(Exception e) {
+            throw new RequestException(500, e);
+        }
+        if (!ids.isEmpty()) {
+            return ids;
+        }
+
+        sql = "SELECT id FROM sectors WHERE num_colonies < ?" +
+                " ORDER BY num_colonies ASC, distance_to_centre ASC";
+        try (SqlStmt stmt = DB.prepare(sql)) {
+            stmt.setInt(1, 30);
+            ResultSet rs = stmt.select();
+            while (rs.next()) {
+                ids.add(rs.getInt(1));
+                if (ids.size() > 15) {
+                    break;
+                }
+            }
+        } catch(Exception e) {
+            throw new RequestException(500, e);
+        }
+        if (!ids.isEmpty()) {
+            return ids;
+        }
+
+        // if we get here, the universe needs to be expanded by a bit so we have some new sectors
+        // to colonies...
+        // TODO
+        throw new RequestException(500);
     }
 }

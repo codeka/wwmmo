@@ -19,8 +19,6 @@ import au.com.codeka.warworlds.server.RequestHandler;
 import au.com.codeka.warworlds.server.data.DB;
 import au.com.codeka.warworlds.server.data.SqlStmt;
 
-import com.google.protobuf.Message;
-
 public class LoginHandler extends RequestHandler {
     private final Logger log = LoggerFactory.getLogger(RequestHandler.class);
 

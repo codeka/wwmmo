@@ -1,7 +1,9 @@
 package au.com.codeka.warworlds.server.model;
 
+import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 
 import au.com.codeka.common.model.BaseBuildRequest;
 import au.com.codeka.common.model.BaseBuilding;
@@ -40,6 +42,16 @@ public class Star extends BaseStar {
         mName = rs.getString("name");
         mSize = rs.getInt("size");
         mStarType = sStarTypes[rs.getInt("star_type")];
+
+        try {
+            Messages.Planets planets_pb = Messages.Planets.parseFrom(rs.getBlob("planets").getBinaryStream());
+            mPlanets = new BasePlanet[planets_pb.getPlanetsCount()];
+            for (int i = 0; i < planets_pb.getPlanetsCount(); i++) {
+                mPlanets[i] = new Planet();
+                mPlanets[i].fromProtocolBuffer(this, planets_pb.getPlanets(i));
+            }
+        } catch (IOException e) {
+        }
     }
 
     public int getSectorID() {
@@ -51,6 +63,16 @@ public class Star extends BaseStar {
     public void setID(int id) {
         mID = id;
         mKey = Integer.toString(mID);
+    }
+
+    public void setColonies(ArrayList<BaseColony> colonies) {
+        mColonies = colonies;
+    }
+    public void setFleets(ArrayList<BaseFleet> fleets) {
+        mFleets = fleets;
+    }
+    public void setEmpires(ArrayList<BaseEmpirePresence> empires) {
+        mEmpires = empires;
     }
 
     @Override

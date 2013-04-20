@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <?eclipse.ant.import?>
-<project name="server-installer">
+<project name="common">
     <property name="output.location" value="../../deploy"/>
     <property name="deploy.filename" value="../../server.zip" />
 
