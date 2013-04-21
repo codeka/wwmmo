@@ -112,7 +112,6 @@ public class Authenticator {
         Realm realm = RealmManager.i.getRealm();
         log.info("(re-)authenticating \""+accountName+"\" to realm "+realm.getDisplayName()+"...");
 
-
         Account[] accts = sAccountManager.getAccountsByType("com.google");
         for (Account acct : accts) {
             final Account account = acct;
@@ -124,6 +123,7 @@ public class Authenticator {
                     String authToken = getAuthToken(account, activity, scope);
                     String authCookie = DefaultAuthenticator.authenticate(authToken);
                     if (authCookie == null) {
+                        log.info("Marking authToken invalid and trying again...");
                         sAccountManager.invalidateAuthToken(account.type, authToken);
                         authToken = getAuthToken(account, activity, scope);
                         authCookie = DefaultAuthenticator.authenticate(authToken);

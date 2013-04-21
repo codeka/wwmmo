@@ -14,7 +14,7 @@ public class EmpiresHandler extends RequestHandler {
         Empire empire = new Empire();
         empire.fromProtocolBuffer(empire_pb);
 
-        empire.setEmailAddr(getCurrentUser());
+        empire.setEmailAddr(getSession().getEmail());
 
         Simulation sim = new Simulation();
         EmpireController ctrl = new EmpireController(sim);

@@ -26,14 +26,15 @@ public class RequestRouter extends AbstractHandler {
     {
         sRoutes = new ArrayList<Route>();
         sRoutes.add(new Route("^/login$", LoginHandler.class));
-        sRoutes.add(new Route("^/realms/({realm}[^/]+)/devices/({id}[0-9]+)$", DevicesHandler.class));
-        sRoutes.add(new Route("^/realms/({realm}[^/]+)/devices$", DevicesHandler.class));
-        sRoutes.add(new Route("^/realms/({realm}[^/]+)/hello/({device_id}[0-9]+)$", HelloHandler.class));
-        sRoutes.add(new Route("^/realms/({realm}[^/]+)/empires$", EmpiresHandler.class));
-        sRoutes.add(new Route("^/realms/({realm}[^/]+)/sectors$", SectorsHandler.class));
-        sRoutes.add(new Route("^/realms/({realm}[^/]+)/stars$", StarsHandler.class));
-        sRoutes.add(new Route("^/realms/({realm}[^/]+)/stars/({star_id}[0-9]+)$", StarHandler.class));
-        sRoutes.add(new Route("^/realms/({realm}[^/]+)/stars/({star_id}[0-9]+)/colonies/({colony_id}[0-9]+)$", ColonyHandler.class));
+        sRoutes.add(new Route("^/realms/[a-z]+/devices/({id}[0-9]+)$", DevicesHandler.class));
+        sRoutes.add(new Route("^/realms/[a-z]+/devices$", DevicesHandler.class));
+        sRoutes.add(new Route("^/realms/[a-z]+/hello/({device_id}[0-9]+)$", HelloHandler.class));
+        sRoutes.add(new Route("^/realms/[a-z]+/chat$", ChatHandler.class));
+        sRoutes.add(new Route("^/realms/[a-z]+/empires$", EmpiresHandler.class));
+        sRoutes.add(new Route("^/realms/[a-z]+/sectors$", SectorsHandler.class));
+        sRoutes.add(new Route("^/realms/[a-z]+/stars$", StarsHandler.class));
+        sRoutes.add(new Route("^/realms/[a-z]+/stars/({star_id}[0-9]+)$", StarHandler.class));
+        sRoutes.add(new Route("^/realms/[a-z]+/stars/({star_id}[0-9]+)/colonies/({colony_id}[0-9]+)$", ColonyHandler.class));
 
         sRoutes.add(new Route("^/admin/?({path}.*)", HtmlPageHandler.class, "admin/"));
         sRoutes.add(new Route("^/intel/?$", HtmlPageHandler.class, "intel/"));

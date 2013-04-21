@@ -20,8 +20,10 @@ public class DevicesHandler extends RequestHandler {
         try(SqlStmt sql = DB.prepare(
                 "SELECT id FROM devices WHERE device_id=? AND user_email=?")) {
             sql.setString(1, registration.getDeviceId());
-            sql.setString(2, getCurrentUser());
+            sql.setString(2, getSession().getEmail());
             id = sql.selectFirstValue(Integer.class);
+        } catch (RequestException e) {
+            throw e;
         } catch (Exception e) {
             throw new RequestException(500, e);
         }
@@ -35,7 +37,7 @@ public class DevicesHandler extends RequestHandler {
 
         try (SqlStmt sql = DB.prepare(stmt, Statement.RETURN_GENERATED_KEYS)) {
             sql.setString(1, registration.getDeviceId());
-            sql.setString(2, getCurrentUser());
+            sql.setString(2, getSession().getEmail());
             sql.setString(3, registration.getDeviceModel());
             sql.setString(4, registration.getDeviceManufacturer());
             sql.setString(5, registration.getDeviceBuild());
@@ -71,7 +73,7 @@ public class DevicesHandler extends RequestHandler {
                     sql.setNull(1);
                 }
                 sql.setInt(2, id);
-                sql.setString(3, getCurrentUser());
+                sql.setString(3, getSession().getEmail());
                 sql.update();
             } catch (Exception e) {
                 throw new RequestException(500, e);
@@ -82,7 +84,7 @@ public class DevicesHandler extends RequestHandler {
             try (SqlStmt sql = DB.prepare("UPDATE devices SET gcm_registration_id=? WHERE id=? AND user_email=?")) {
                 sql.setString(1, device_registration_pb.getGcmRegistrationId());
                 sql.setInt(2, id);
-                sql.setString(3, getCurrentUser());
+                sql.setString(3, getSession().getEmail());
                 sql.update();
             } catch (Exception e) {
                 throw new RequestException(500, e);
@@ -96,7 +98,7 @@ public class DevicesHandler extends RequestHandler {
 
         try (SqlStmt sql = DB.prepare("DELETE FROM devices WHERE id=? and user_email=?")) {
             sql.setInt(1, id);
-            sql.setString(2, getCurrentUser());
+            sql.setString(2, getSession().getEmail());
             sql.update();
         } catch (Exception e) {
             throw new RequestException(500, e);

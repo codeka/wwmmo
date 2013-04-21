@@ -18,11 +18,14 @@ public class HelloHandler extends RequestHandler {
                                           .setMessage("<p>Welcome to the new client!!</p>")
                                           .setLastUpdate(""));
 
-        Empire empire = new EmpireController(new Simulation()).getEmpireForUser(getCurrentUser());
-        if (empire != null) {
-            Messages.Empire.Builder empire_pb = Messages.Empire.newBuilder();
-            empire.toProtocolBuffer(empire_pb);
-            hello_response_pb.setEmpire(empire_pb);
+        int empireID = getSession().getEmpireID();
+        if (empireID > 0) {
+            Empire empire = new EmpireController(new Simulation()).getEmpire(empireID);
+            if (empire != null) {
+                Messages.Empire.Builder empire_pb = Messages.Empire.newBuilder();
+                empire.toProtocolBuffer(empire_pb);
+                hello_response_pb.setEmpire(empire_pb);
+            }
         }
 
         setResponseBody(hello_response_pb.build());

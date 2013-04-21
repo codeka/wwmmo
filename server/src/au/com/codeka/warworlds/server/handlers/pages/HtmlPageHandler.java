@@ -28,7 +28,7 @@ public class HtmlPageHandler extends RequestHandler {
 
     @Override
     protected void get() throws RequestException {
-        if (getCurrentUser(false) == null) {
+        if (getSession(false) == null) {
             // if they're not authenticated yet, we'll have to redirect them to the authentication
             // page first.
             authenticate();

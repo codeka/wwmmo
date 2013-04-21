@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.sql.ResultSet;
 
 import javax.servlet.ServletInputStream;
 import javax.servlet.http.Cookie;
@@ -30,7 +31,7 @@ public class RequestHandler {
     private HttpServletRequest mRequest;
     private HttpServletResponse mResponse;
     private Matcher mRouteMatcher;
-    private String mCurrentUser;
+    private Session mSession;
     private String mExtraOption;
 
     protected String getUrlParameter(String name) {
@@ -149,32 +150,35 @@ public class RequestHandler {
         return mResponse;
     }
 
-    protected String getCurrentUser() throws RequestException {
-        return getCurrentUser(true);
+    protected Session getSession() throws RequestException {
+        return getSession(true);
     }
 
-    protected String getCurrentUser(boolean errorOnNotAuth) throws RequestException {
-        if (mCurrentUser == null) {
+    protected Session getSession(boolean errorOnNotAuth) throws RequestException {
+        if (mSession == null) {
             for (Cookie cookie : mRequest.getCookies()) {
                 if (cookie.getName().equals("SESSION")) {
                     String cookieValue = cookie.getValue();
 
                     // TODO: cache these!
-                    try (SqlStmt sql = DB.prepare("SELECT user_email FROM sessions WHERE session_cookie=?")) {
-                        sql.setString(1, cookieValue);
-                        mCurrentUser = sql.selectFirstValue(String.class);
+                    try (SqlStmt stmt = DB.prepare("SELECT * FROM sessions WHERE session_cookie=?")) {
+                        stmt.setString(1, cookieValue);
+                        ResultSet rs = stmt.select();
+                        if (rs.next()) {
+                            mSession = new Session(rs);
+                        }
                     } catch (Exception e) {
                         throw new RequestException(500, e);
                     }
                 }
             }
 
-            if (mCurrentUser == null && errorOnNotAuth) {
+            if (mSession == null && errorOnNotAuth) {
                 throw new RequestException(403);
             }
         }
 
-        return mCurrentUser;
+        return mSession;
     }
 
     @SuppressWarnings({"unchecked"})

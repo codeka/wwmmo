@@ -21,8 +21,8 @@ public class EmpireController {
         mSimulation = sim;
     }
 
-    public Empire getEmpireForUser(String userEmail) throws RequestException {
-        return DataBase.getEmpireForUser(userEmail);
+    public Empire getEmpire(int id) throws RequestException {
+        return DataBase.getEmpire(id);
     }
 
     public void createEmpire(Empire empire) throws RequestException {
@@ -163,10 +163,10 @@ public class EmpireController {
             }
         }
 
-        public static Empire getEmpireForUser(String userEmail) throws RequestException {
-            String sql = "SELECT id, name, cash, home_star_id, user_email FROM empires WHERE user_email = ?";
+        public static Empire getEmpire(int id) throws RequestException {
+            String sql = "SELECT id, name, cash, home_star_id, user_email FROM empires WHERE id = ?";
             try (SqlStmt stmt = DB.prepare(sql)) {
-                stmt.setString(1, userEmail);
+                stmt.setInt(1, id);
                 ResultSet rs = stmt.select();
                 if (rs.next()) {
                     Empire empire = new Empire(rs);

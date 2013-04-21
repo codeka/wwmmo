@@ -103,7 +103,7 @@ public class PurchaseManager {
         if (mInventory != null) {
             return mInventory;
         }
-        if (!mSetupResult.isSuccess()) {
+        if (mSetupResult != null && !mSetupResult.isSuccess()) {
             throw new IabException(mSetupResult);
         }
         return mInventory;

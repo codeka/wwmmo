@@ -28,7 +28,7 @@ import com.google.protobuf.Message;
  */
 public class ApiClient {
     final static Logger log = LoggerFactory.getLogger(ApiClient.class);
-    private static ArrayList<String> sCookies;
+    private static ArrayList<String> sCookies = new ArrayList<String>();
 
     /**
      * Configures the client to talk to the given "baseUri". All URLs will then be relative
@@ -224,7 +224,7 @@ public class ApiClient {
      */
     private static Map<String, List<String>> getHeaders() {
         TreeMap<String, List<String>> headers = new TreeMap<String, List<String>>();
-        if (!sCookies.isEmpty()) {
+        if (sCookies != null && !sCookies.isEmpty()) {
             headers.put("Cookie", sCookies);
         } else {
             log.warn("Cookies collection is empty, possible error!");

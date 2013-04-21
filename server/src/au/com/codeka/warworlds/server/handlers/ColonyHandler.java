@@ -5,10 +5,9 @@ import au.com.codeka.common.model.Simulation;
 import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.RequestHandler;
-import au.com.codeka.warworlds.server.ctrl.EmpireController;
+import au.com.codeka.warworlds.server.Session;
 import au.com.codeka.warworlds.server.ctrl.StarController;
 import au.com.codeka.warworlds.server.model.Colony;
-import au.com.codeka.warworlds.server.model.Empire;
 import au.com.codeka.warworlds.server.model.Star;
 
 public class ColonyHandler extends RequestHandler {
@@ -19,13 +18,13 @@ public class ColonyHandler extends RequestHandler {
         int colonyID = Integer.parseInt(getUrlParameter("colony_id"));
         Simulation sim = new Simulation();
 
-        Empire myEmpire = new EmpireController(sim).getEmpireForUser(getCurrentUser());
+        Session session = getSession();
 
         Star star = new StarController().getStar(starID);
         Colony colony = null;
         for (BaseColony baseColony : star.getColonies()) {
             if (((Colony) baseColony).getID() == colonyID) {
-                if (((Colony) baseColony).getEmpireID() != myEmpire.getID()) {
+                if (((Colony) baseColony).getEmpireID() != session.getEmpireID()) {
                     // if the colony isn't own by this user's empire, then it's an error!
                     throw new RequestException(403);
                 }
