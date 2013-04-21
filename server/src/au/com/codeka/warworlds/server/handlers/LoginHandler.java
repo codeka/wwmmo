@@ -31,6 +31,7 @@ public class LoginHandler extends RequestHandler {
     protected void get() throws RequestException {
         String authToken = getRequest().getParameter("authToken");
         if (authToken == null) {
+            // it could be an OpenID authentication response.
             String openIdMode = getRequest().getParameter("openid.mode");
             if (openIdMode != null) {
                 openIdAuthenticate();
