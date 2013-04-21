@@ -12,16 +12,10 @@ import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
 import android.text.Html;
+import au.com.codeka.common.model.BaseChatMessage;
 import au.com.codeka.common.protobuf.Messages;
 
-public class ChatMessage {
-    private String mMessage;
-    private String mEmpireKey;
-    private String mAllianceKey;
-    private Empire mEmpire;
-    private DateTime mDatePosted;
-    private String mDetectedLanguage;
-
+public class ChatMessage extends BaseChatMessage {
     private static DateTimeFormatter sChatDateFormat;
     private static Pattern sUrlPattern;
     private static Pattern sMarkdownString;
@@ -35,48 +29,10 @@ public class ChatMessage {
     }
 
     public ChatMessage() {
-        mDatePosted = new DateTime(DateTimeZone.UTC);
+        super();
     }
     public ChatMessage(String message) {
-        mMessage = message;
-    }
-
-    public String getMessage() {
-        return mMessage;
-    }
-    public void setMessage(String msg) {
-        mMessage = msg;
-    }
-    public String getEmpireKey() {
-        return mEmpireKey;
-    }
-    public Empire getEmpire() {
-        return mEmpire;
-    }
-    public void setEmpire(Empire emp) {
-        mEmpire = emp;
-        if (emp != null) {
-            mEmpireKey = emp.getKey();
-        }
-    }
-    public void setAllianceChat(boolean isAllianceChat) {
-        if (isAllianceChat && mEmpire != null && mEmpire.getAlliance() != null) {
-            mAllianceKey = mEmpire.getAlliance().getKey();
-        } else {
-            mAllianceKey = null;
-        }
-    }
-    public DateTime getDatePosted() {
-        return mDatePosted;
-    }
-    public String getAllianceKey() {
-        return mAllianceKey;
-    }
-    public String getDetectedLanguage() {
-        return mDetectedLanguage;
-    }
-    public void setDetectedLanguage(String langCode) {
-        mDetectedLanguage = langCode;
+        super(message);
     }
 
     /**
@@ -216,18 +172,5 @@ public class ChatMessage {
         });
 
         return replacer.replace(line);
-    }
-
-    public static ChatMessage fromProtocolBuffer(Messages.ChatMessage pb) {
-        ChatMessage chatMessage = new ChatMessage();
-        chatMessage.mMessage = pb.getMessage();
-        if (pb.getEmpireKey() != null && !pb.getEmpireKey().equals("")) {
-            chatMessage.mEmpireKey = pb.getEmpireKey();
-        }
-        if (pb.getAllianceKey() != null && !pb.getAllianceKey().equals("")) {
-            chatMessage.mAllianceKey = pb.getAllianceKey();
-        }
-        chatMessage.mDatePosted = new DateTime(pb.getDatePosted() * 1000, DateTimeZone.UTC);
-        return chatMessage;
     }
 }
