@@ -1,6 +1,5 @@
 package au.com.codeka.warworlds.server.handlers;
 
-import au.com.codeka.common.model.Simulation;
 import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.RequestHandler;
@@ -16,8 +15,7 @@ public class EmpiresHandler extends RequestHandler {
 
         empire.setEmailAddr(getSession().getEmail());
 
-        Simulation sim = new Simulation();
-        EmpireController ctrl = new EmpireController(sim);
+        EmpireController ctrl = new EmpireController();
         ctrl.createEmpire(empire);
     }
 }

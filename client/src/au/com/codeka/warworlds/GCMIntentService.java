@@ -151,7 +151,8 @@ public class GCMIntentService extends GCMBaseIntentService {
                 ChatMessage msg;
                 try {
                     Messages.ChatMessage pb = Messages.ChatMessage.parseFrom(blob);
-                    msg = ChatMessage.fromProtocolBuffer(pb);
+                    msg = new ChatMessage();
+                    msg.fromProtocolBuffer(pb);
                 } catch(InvalidProtocolBufferException e) {
                     log.error("Could not parse chat message!", e);
                     return;

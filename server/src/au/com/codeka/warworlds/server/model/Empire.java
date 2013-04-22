@@ -11,6 +11,7 @@ import au.com.codeka.common.protobuf.Messages;
 
 public class Empire extends BaseEmpire {
     private int mID;
+    private int mHomeStarID;
 
     public Empire() {
     }
@@ -20,6 +21,7 @@ public class Empire extends BaseEmpire {
         mDisplayName = rs.getString("name");
         mCash = rs.getFloat("cash");
         mEmailAddr = rs.getString("user_email");
+        mHomeStarID = rs.getInt("home_star_id");
     }
 
     public int getID() {
@@ -30,6 +32,9 @@ public class Empire extends BaseEmpire {
         mKey = Integer.toString(id);
     }
 
+    public int getHomeStarID() {
+        return mHomeStarID;
+    }
     public void setHomeStar(Star star) {
         mHomeStar = star;
     }

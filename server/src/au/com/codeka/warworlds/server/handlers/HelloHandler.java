@@ -1,6 +1,5 @@
 package au.com.codeka.warworlds.server.handlers;
 
-import au.com.codeka.common.model.Simulation;
 import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.RequestHandler;
@@ -20,7 +19,7 @@ public class HelloHandler extends RequestHandler {
 
         int empireID = getSession().getEmpireID();
         if (empireID > 0) {
-            Empire empire = new EmpireController(new Simulation()).getEmpire(empireID);
+            Empire empire = new EmpireController().getEmpire(empireID);
             if (empire != null) {
                 Messages.Empire.Builder empire_pb = Messages.Empire.newBuilder();
                 empire.toProtocolBuffer(empire_pb);

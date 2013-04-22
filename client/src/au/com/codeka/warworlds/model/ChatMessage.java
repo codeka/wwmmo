@@ -6,14 +6,12 @@ import jregex.Replacer;
 import jregex.Substitution;
 import jregex.TextBuffer;
 
-import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
 import android.text.Html;
 import au.com.codeka.common.model.BaseChatMessage;
-import au.com.codeka.common.protobuf.Messages;
 
 public class ChatMessage extends BaseChatMessage {
     private static DateTimeFormatter sChatDateFormat;

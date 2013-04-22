@@ -246,7 +246,8 @@ public class ChatManager implements BackgroundDetector.BackgroundChangeHandler {
                     // this comes back most recent first, but we work in the
                     // opposite order...
                     for (int i = pb.getMessagesCount() - 1; i >= 0; i--) {
-                        ChatMessage msg = ChatMessage.fromProtocolBuffer(pb.getMessages(i));
+                        ChatMessage msg = new ChatMessage();
+                        msg.fromProtocolBuffer(pb.getMessages(i));
                         msgs.add(msg);
                     }
                 } catch (Exception e) {

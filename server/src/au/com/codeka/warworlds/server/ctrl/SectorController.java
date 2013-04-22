@@ -106,7 +106,7 @@ public class SectorController {
         }
     }
 
-    private static class DataBase {
+    private static class DataBase extends BaseDataBase {
         public static List<Sector> getSectors(List<Pair<Long, Long>> coords) throws RequestException {
             String sql = "SELECT id, x, y, distance_to_centre, num_colonies FROM sectors WHERE (1=0";
             for (Pair<Long, Long> coord : coords) {
@@ -191,17 +191,5 @@ public class SectorController {
              }
         }
 
-        private static String buildInClause(int[] ids) {
-            StringBuffer sb = new StringBuffer();
-            sb.append("(");
-            for (int i = 0; i < ids.length; i++) {
-                if (i > 0) {
-                    sb.append(", ");
-                }
-                sb.append(ids[i]);
-            }
-            sb.append(")");
-            return sb.toString();
-        }
     }
 }
