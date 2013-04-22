@@ -6,6 +6,8 @@ import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.RequestHandler;
 import au.com.codeka.warworlds.server.ctrl.StarController;
+import au.com.codeka.warworlds.server.data.DB;
+import au.com.codeka.warworlds.server.data.SqlStmt;
 import au.com.codeka.warworlds.server.model.Fleet;
 import au.com.codeka.warworlds.server.model.Star;
 
@@ -49,6 +51,11 @@ public class FleetOrdersHandler extends RequestHandler {
     }
 
     private void orderFleetSplit(Star star, Fleet fleet, Messages.FleetOrder fleet_order_pb, Simulation sim) throws RequestException {
+        if (fleet.getState() != Fleet.State.IDLE) {
+            throw new RequestException(400, Messages.GenericError.ErrorCode.CannotOrderFleetNotIdle,
+                                       "Cannot split a fleet that is not currently idle.");
+        }
+
         float totalShips = fleet.getNumShips();
         int leftShips = fleet_order_pb.getSplitLeft();
         float rightShips = totalShips - leftShips;
@@ -56,17 +63,41 @@ public class FleetOrdersHandler extends RequestHandler {
             return; // can't split to less than 1
         }
 
-        if (fleet.getState() != Fleet.State.IDLE) {
-            throw new RequestException(400, Messages.GenericError.ErrorCode.CannotOrderFleetNotIdle,
-                                       "Cannot split a fleet that is not currently idle.");
-        }
-
         Fleet newFleet = fleet.split(rightShips);
         star.getFleets().add(newFleet);
     }
 
-    private void orderFleetMerge(Star star, Fleet fleet, Messages.FleetOrder fleet_order_pb, Simulation sim) {
-        
+    private void orderFleetMerge(Star star, Fleet fleet, Messages.FleetOrder fleet_order_pb, Simulation sim) throws RequestException {
+        if (fleet.getState() != Fleet.State.IDLE) {
+            throw new RequestException(400, Messages.GenericError.ErrorCode.CannotOrderFleetNotIdle,
+                                       "Cannot merge a fleet that is not currently idle.");
+        }
+
+        for (BaseFleet baseFleet : star.getFleets()) {
+            if (baseFleet.getKey().equals(fleet_order_pb.getMergeFleetKey())) {
+                Fleet otherFleet = (Fleet) baseFleet;
+                if (otherFleet.getState() != Fleet.State.IDLE) {
+                    throw new RequestException(400, Messages.GenericError.ErrorCode.CannotOrderFleetNotIdle,
+                            "Cannot merge a fleet that is not currently idle.");
+                }
+
+                if (!otherFleet.getDesignID().equals(fleet.getDesignID())) {
+                    throw new RequestException(400, Messages.GenericError.ErrorCode.CannotMergeFleetDifferentDesign,
+                            "Cannot merge two fleets of a different design.");
+                }
+
+                fleet.setNumShips(fleet.getNumShips() + otherFleet.getNumShips());
+
+                // TODO: probably not the best place for this to go...
+                String sql = "DELETE FROM fleets WHERE id = ?";
+                try (SqlStmt stmt = DB.prepare(sql)) {
+                    stmt.setInt(1, otherFleet.getID());
+                    stmt.update();
+                } catch (Exception e) {
+                    throw new RequestException(500, e);
+                }
+            }
+        }
     }
 
     private void orderFleetMove(Star star, Fleet fleet, Messages.FleetOrder fleet_order_pb, Simulation sim) {

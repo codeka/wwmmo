@@ -95,4 +95,8 @@ public class Fleet extends BaseFleet {
         other.mStateStartTime = DateTime.now();
         return other;
     }
+
+    public void setNumShips(float numShips) {
+        mNumShips = numShips;
+    }
 }
