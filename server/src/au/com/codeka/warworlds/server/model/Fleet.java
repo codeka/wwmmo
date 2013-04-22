@@ -68,4 +68,31 @@ public class Fleet extends BaseFleet {
     public int getTargetFleetID() {
         return mTargetFleetID;
     }
+
+    public void setStance(Stance stance) {
+        mStance = stance;
+    }
+
+    /**
+     * Split this fleet into two. The one we create will have size "otherSize" and we'll
+     * have whatever is left over.
+     */
+    public Fleet split(float otherSize) {
+        mNumShips -= otherSize;
+
+        Fleet other = new Fleet();
+        other.mID = 0;
+        other.mKey = null;
+        other.mStarID = mStarID;
+        other.mStarKey = mStarKey;
+        other.mSectorID = mSectorID;
+        other.mDesignID = mDesignID;
+        other.mEmpireID = mEmpireID;
+        other.mEmpireKey = mEmpireKey;
+        other.mNumShips = otherSize;
+        other.mStance = mStance;
+        other.mState = State.IDLE;
+        other.mStateStartTime = DateTime.now();
+        return other;
+    }
 }

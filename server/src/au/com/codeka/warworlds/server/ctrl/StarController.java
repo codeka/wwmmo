@@ -1,6 +1,7 @@
 package au.com.codeka.warworlds.server.ctrl;
 
 import java.sql.ResultSet;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -114,18 +115,24 @@ public class StarController {
         }
 
         private static void updateFleets(Star star) throws RequestException {
-            final String sql = "UPDATE fleets SET" +
-                                 " num_ships = ?," +
-                                 " stance = ?," +
-                                 " state = ?," +
-                                 " state_start_time = ?," +
-                                 " eta = ?," +
-                                 " target_star_id = ?," +
-                                 " target_fleet_id = ?," +
-                                 " time_destroyed = ?" +
-                              " WHERE id = ?";
+            boolean needInsert = false;
+            String sql = "UPDATE fleets SET" +
+                            " num_ships = ?," +
+                            " stance = ?," +
+                            " state = ?," +
+                            " state_start_time = ?," +
+                            " eta = ?," +
+                            " target_star_id = ?," +
+                            " target_fleet_id = ?," +
+                            " time_destroyed = ?" +
+                        " WHERE id = ?";
             try (SqlStmt stmt = DB.prepare(sql)) {
                 for (BaseFleet baseFleet : star.getFleets()) {
+                    if (baseFleet.getKey() == null) {
+                        needInsert = true;
+                        continue;
+                    }
+
                     Fleet fleet = (Fleet) baseFleet;
                     stmt.setDouble(1, fleet.getNumShips());
                     stmt.setInt(2, fleet.getStance().getValue());
@@ -146,6 +153,52 @@ public class StarController {
                     stmt.setInt(9, fleet.getID());
                     stmt.update();
                 }
+            } catch(Exception e) {
+                throw new RequestException(500, e);
+            }
+
+            if (!needInsert) {
+                return;
+            }
+
+            sql = "INSERT INTO fleets (star_id, sector_id, design_name, empire_id, num_ships," +
+                                     " stance, state, state_start_time, eta, target_star_id," +
+                                     " target_fleet_id, time_destroyed)" +
+                 " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            try (SqlStmt stmt = DB.prepare(sql, Statement.RETURN_GENERATED_KEYS)) {
+                for (BaseFleet baseFleet : star.getFleets()) {
+                    if (baseFleet.getKey() != null) {
+                        continue;
+                    }
+
+                    Fleet fleet = (Fleet) baseFleet;
+                    stmt.setInt(1, fleet.getStarID());
+                    stmt.setInt(2, fleet.getSectorID());
+                    stmt.setString(3, fleet.getDesignID());
+                    if (fleet.getEmpireKey() != null) {
+                        stmt.setInt(4, fleet.getEmpireID());
+                    } else {
+                        stmt.setNull(4);
+                    }
+                    stmt.setDouble(5, fleet.getNumShips());
+                    stmt.setInt(6, fleet.getStance().getValue());
+                    stmt.setInt(7, fleet.getState().getValue());
+                    stmt.setDateTime(8, fleet.getStateStartTime());
+                    stmt.setDateTime(9, fleet.getEta());
+                    if (fleet.getDestinationStarKey() != null) {
+                        stmt.setInt(10, fleet.getDestinationStarID());
+                    } else {
+                        stmt.setNull(10);
+                    }
+                    if (fleet.getTargetFleetKey() != null) {
+                        stmt.setInt(11, fleet.getTargetFleetID());
+                    } else {
+                        stmt.setNull(11);
+                    }
+                    stmt.setDateTime(12, null);
+                    stmt.update();
+                }
+
             } catch(Exception e) {
                 throw new RequestException(500, e);
             }
