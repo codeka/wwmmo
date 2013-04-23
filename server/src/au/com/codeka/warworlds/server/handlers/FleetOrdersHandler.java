@@ -1,14 +1,22 @@
 package au.com.codeka.warworlds.server.handlers;
 
+import org.joda.time.DateTime;
+
 import au.com.codeka.common.model.BaseFleet;
+import au.com.codeka.common.model.DesignKind;
+import au.com.codeka.common.model.ShipDesign;
 import au.com.codeka.common.model.Simulation;
 import au.com.codeka.common.protobuf.Messages;
+import au.com.codeka.warworlds.server.EventProcessor;
 import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.RequestHandler;
+import au.com.codeka.warworlds.server.ctrl.EmpireController;
 import au.com.codeka.warworlds.server.ctrl.StarController;
 import au.com.codeka.warworlds.server.data.DB;
 import au.com.codeka.warworlds.server.data.SqlStmt;
+import au.com.codeka.warworlds.server.model.DesignManager;
 import au.com.codeka.warworlds.server.model.Fleet;
+import au.com.codeka.warworlds.server.model.Sector;
 import au.com.codeka.warworlds.server.model.Star;
 
 public class FleetOrdersHandler extends RequestHandler {
@@ -25,14 +33,17 @@ public class FleetOrdersHandler extends RequestHandler {
         for (BaseFleet baseFleet : star.getFleets()) {
             Fleet fleet = (Fleet) baseFleet;
             if (fleet.getID() == fleetID && fleet.getEmpireID() == empireID) {
-                orderFleet(star, fleet, fleet_order_pb, sim);
+                boolean pingEventProcessor = orderFleet(star, fleet, fleet_order_pb, sim);
                 new StarController().update(star);
+                if (pingEventProcessor) {
+                    EventProcessor.i.ping();
+                }
                 break;
             }
         }
     }
 
-    private void orderFleet(Star star, Fleet fleet, Messages.FleetOrder fleet_order_pb, Simulation sim) throws RequestException {
+    private boolean orderFleet(Star star, Fleet fleet, Messages.FleetOrder fleet_order_pb, Simulation sim) throws RequestException {
         if (fleet_order_pb.getOrder() == Messages.FleetOrder.FLEET_ORDER.SET_STANCE) {
             orderFleetSetStance(star, fleet, fleet_order_pb, sim);
         } else if (fleet_order_pb.getOrder() == Messages.FleetOrder.FLEET_ORDER.SPLIT) {
@@ -41,7 +52,10 @@ public class FleetOrdersHandler extends RequestHandler {
             orderFleetMerge(star, fleet, fleet_order_pb, sim);
         } else if (fleet_order_pb.getOrder() == Messages.FleetOrder.FLEET_ORDER.MOVE) {
             orderFleetMove(star, fleet, fleet_order_pb, sim);
+            return true;
         }
+
+        return false;
     }
 
     private void orderFleetSetStance(Star star, Fleet fleet, Messages.FleetOrder fleet_order_pb, Simulation sim) {
@@ -100,7 +114,34 @@ public class FleetOrdersHandler extends RequestHandler {
         }
     }
 
-    private void orderFleetMove(Star star, Fleet fleet, Messages.FleetOrder fleet_order_pb, Simulation sim) {
-        
+    private void orderFleetMove(Star star, Fleet fleet, Messages.FleetOrder fleet_order_pb, Simulation sim) throws RequestException {
+        if (fleet.getState() != Fleet.State.IDLE) {
+            throw new RequestException(400, Messages.GenericError.ErrorCode.CannotOrderFleetNotIdle,
+                                       "Cannot move a fleet that is not currently idle.");
+        }
+
+        Star srcStar = star;
+        Star destStar = new StarController().getStar(Integer.parseInt(fleet_order_pb.getStarKey()));
+        float distanceInParsecs = Sector.distanceInParsecs(srcStar, destStar);
+
+        ShipDesign design = (ShipDesign) DesignManager.i.getDesign(DesignKind.SHIP, fleet.getDesignID());
+        float fuelCost = design.getFuelCost(distanceInParsecs, fleet.getNumShips());
+
+        Messages.CashAuditRecord.Builder audit_record_pb = Messages.CashAuditRecord.newBuilder()
+                .setEmpireId(getSession().getEmpireID())
+                .setFleetDesignId(fleet.getDesignID())
+                .setFleetId(fleet.getID())
+                .setNumShips(fleet.getNumShips())
+                .setStarId(destStar.getID())
+                .setStarName(destStar.getName())
+                .setMoveDistance(distanceInParsecs);
+
+        if (!new EmpireController().withdrawCash(getSession().getEmpireID(), fuelCost, audit_record_pb)) {
+            throw new RequestException(400, Messages.GenericError.ErrorCode.InsufficientCash,
+                                       "Insufficient cash for move.");
+        }
+
+        float moveTimeInHours = distanceInParsecs / design.getSpeedInParsecPerHour();
+        fleet.move(destStar.getID(), DateTime.now().plusSeconds((int)(moveTimeInHours * 3600.0f)));
     }
 }

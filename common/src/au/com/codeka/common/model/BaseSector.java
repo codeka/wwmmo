@@ -3,6 +3,7 @@ package au.com.codeka.common.model;
 import java.util.ArrayList;
 import java.util.List;
 
+import au.com.codeka.common.Vector2;
 import au.com.codeka.common.protobuf.Messages;
 
 /**
@@ -27,6 +28,31 @@ public abstract class BaseSector {
     }
     public List<BaseStar> getStars() {
         return mStars;
+    }
+
+    /**
+     * Returns a {@link Vector2} that represents a line segment from {@link Star} a to
+     * {@link Star} b. You can use the \c length() method to determine the distance between them.
+     */
+    public static Vector2 directionBetween(BaseStar a, BaseStar b) {
+        float dx = a.getOffsetX() - b.getOffsetX();
+        float dy = a.getOffsetY() - b.getOffsetY();
+
+        float dsx = a.getSectorX() - b.getSectorX();
+        dx += (dsx * SECTOR_SIZE);
+
+        float dsy = a.getSectorY() - b.getSectorY();
+        dy += (dsy * SECTOR_SIZE);
+
+        return new Vector2(dx, dy);
+    }
+
+    /**
+     * Calculates the distance (in "parsecs") between the two given stars.
+     */
+    public static float distanceInParsecs(BaseStar a, BaseStar b) {
+        double distanceInPixels = directionBetween(a, b).length();
+        return (float) (distanceInPixels / 10.0);
     }
 
     public void fromProtocolBuffer(Messages.Sector pb) {

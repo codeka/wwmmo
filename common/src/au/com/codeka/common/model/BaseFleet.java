@@ -2,6 +2,7 @@ package au.com.codeka.common.model;
 
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
+import org.joda.time.Seconds;
 
 import au.com.codeka.common.protobuf.Messages;
 
@@ -56,16 +57,13 @@ public class BaseFleet {
         return mEta;
     }
 
-    public float getTimeToDestination(BaseStar srcStar, BaseStar destStar) {/*
-        ShipDesign design = ShipDesignManager.getInstance().getDesign(mDesignID);
-        float distanceInParsecs = SectorManager.getInstance().distanceInParsecs(srcStar, destStar);
-        float totalTimeInHours = distanceInParsecs / design.getSpeedInParsecPerHour();
+    public float getTimeToDestination(BaseStar srcStar, BaseStar destStar) {
+        if (mEta == null) {
+            return 0.0f;
+        }
 
         DateTime now = DateTime.now(DateTimeZone.UTC);
-        float timeSoFarInHours = (Seconds.secondsBetween(mStateStartTime, now).getSeconds() / 3600.0f);
-
-        return totalTimeInHours - timeSoFarInHours;*/
-        return 0;
+        return (Seconds.secondsBetween(now, mEta).getSeconds() / 3600.0f);
     }
 
     public void fromProtocolBuffer(Messages.Fleet pb) {
@@ -85,6 +83,9 @@ public class BaseFleet {
             mStance = Stance.fromNumber(pb.getStance().getNumber());
         } else {
             mStance = Stance.NEUTRAL;
+        }
+        if (pb.hasEta()) {
+            mEta = new DateTime(pb.getEta() * 1000, DateTimeZone.UTC);
         }
     }
 
@@ -107,6 +108,9 @@ public class BaseFleet {
         }
         if (mTargetColonyKey != null) {
             pb.setTargetColonyKey(mTargetColonyKey);
+        }
+        if (mEta != null) {
+            pb.setEta(mEta.getMillis() / 1000);
         }
     }
 

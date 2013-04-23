@@ -105,23 +105,23 @@ public class SectorView extends UniverseElementSurfaceView
         mOffsetY += distanceY;
 
         boolean needUpdate = false;
-        while (mOffsetX < -(SectorManager.SECTOR_SIZE / 2)) {
-            mOffsetX += SectorManager.SECTOR_SIZE;
+        while (mOffsetX < -(Sector.SECTOR_SIZE / 2)) {
+            mOffsetX += Sector.SECTOR_SIZE;
             mSectorX ++;
             needUpdate = true;
         }
-        while (mOffsetX > (SectorManager.SECTOR_SIZE / 2)) {
-            mOffsetX -= SectorManager.SECTOR_SIZE;
+        while (mOffsetX > (Sector.SECTOR_SIZE / 2)) {
+            mOffsetX -= Sector.SECTOR_SIZE;
             mSectorX --;
             needUpdate = true;
         }
-        while (mOffsetY < -(SectorManager.SECTOR_SIZE / 2)) {
-            mOffsetY += SectorManager.SECTOR_SIZE;
+        while (mOffsetY < -(Sector.SECTOR_SIZE / 2)) {
+            mOffsetY += Sector.SECTOR_SIZE;
             mSectorY ++;
             needUpdate = true;
         }
-        while (mOffsetY > (SectorManager.SECTOR_SIZE / 2)) {
-            mOffsetY -= SectorManager.SECTOR_SIZE;
+        while (mOffsetY > (Sector.SECTOR_SIZE / 2)) {
+            mOffsetY -= Sector.SECTOR_SIZE;
             mSectorY --;
             needUpdate = true;
         }
@@ -146,19 +146,19 @@ public class SectorView extends UniverseElementSurfaceView
         long sectorX = mSectorX;
         long sectorY = mSectorY;
         while (x < 0) {
-            x += SectorManager.SECTOR_SIZE;
+            x += Sector.SECTOR_SIZE;
             sectorX --;
         }
-        while (x >= SectorManager.SECTOR_SIZE) {
-            x -= SectorManager.SECTOR_SIZE;
+        while (x >= Sector.SECTOR_SIZE) {
+            x -= Sector.SECTOR_SIZE;
             sectorX ++;
         }
         while (y < 0) {
-            y += SectorManager.SECTOR_SIZE;
+            y += Sector.SECTOR_SIZE;
             sectorY --;
         }
-        while (y >= SectorManager.SECTOR_SIZE) {
-            y -= SectorManager.SECTOR_SIZE;
+        while (y >= Sector.SECTOR_SIZE) {
+            y -= Sector.SECTOR_SIZE;
             sectorY ++;
         }
 

@@ -33,4 +33,8 @@ public class DB {
         Connection conn = DriverManager.getConnection(sConnUrl, sConnUser, sConnPass);
         return new SqlStmt(conn, sql, conn.prepareStatement(sql, autoGenerateKeys));
     }
+
+    public static Transaction beginTransaction() throws SQLException {
+        return new Transaction(DriverManager.getConnection(sConnUrl, sConnUser, sConnPass));
+    }
 }

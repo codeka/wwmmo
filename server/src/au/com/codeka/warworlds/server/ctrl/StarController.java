@@ -117,6 +117,8 @@ public class StarController {
         private static void updateFleets(Star star) throws RequestException {
             boolean needInsert = false;
             String sql = "UPDATE fleets SET" +
+                            " star_id = ?," +
+                            " sector_id = ?," +
                             " num_ships = ?," +
                             " stance = ?," +
                             " state = ?," +
@@ -134,23 +136,25 @@ public class StarController {
                     }
 
                     Fleet fleet = (Fleet) baseFleet;
-                    stmt.setDouble(1, fleet.getNumShips());
-                    stmt.setInt(2, fleet.getStance().getValue());
-                    stmt.setInt(3, fleet.getState().getValue());
-                    stmt.setDateTime(4, fleet.getStateStartTime());
-                    stmt.setDateTime(5, fleet.getEta());
+                    stmt.setInt(1, star.getID());
+                    stmt.setInt(2, star.getSectorID());
+                    stmt.setDouble(3, fleet.getNumShips());
+                    stmt.setInt(4, fleet.getStance().getValue());
+                    stmt.setInt(5, fleet.getState().getValue());
+                    stmt.setDateTime(6, fleet.getStateStartTime());
+                    stmt.setDateTime(7, fleet.getEta());
                     if (fleet.getDestinationStarKey() != null) {
-                        stmt.setInt(6, fleet.getDestinationStarID());
+                        stmt.setInt(8, fleet.getDestinationStarID());
                     } else {
-                        stmt.setNull(6);
+                        stmt.setNull(8);
                     }
                     if (fleet.getTargetFleetKey() != null) {
-                        stmt.setInt(7, fleet.getTargetFleetID());
+                        stmt.setInt(9, fleet.getTargetFleetID());
                     } else {
-                        stmt.setNull(7);
+                        stmt.setNull(9);
                     }
-                    stmt.setDateTime(8, null); // todo
-                    stmt.setInt(9, fleet.getID());
+                    stmt.setDateTime(10, null); // todo
+                    stmt.setInt(11, fleet.getID());
                     stmt.update();
                 }
             } catch(Exception e) {

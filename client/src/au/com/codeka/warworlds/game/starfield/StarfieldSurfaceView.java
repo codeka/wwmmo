@@ -411,13 +411,13 @@ public class StarfieldSurfaceView extends SectorView
                     continue;
                 }
 
-                int sx = (int)((x * SectorManager.SECTOR_SIZE) + mOffsetX);
-                int sy = (int)((y * SectorManager.SECTOR_SIZE) + mOffsetY);
+                int sx = (int)((x * Sector.SECTOR_SIZE) + mOffsetX);
+                int sy = (int)((y * Sector.SECTOR_SIZE) + mOffsetY);
 
                 StarfieldBackgroundRenderer bgRenderer = SectorManager.getInstance().getBackgroundRenderer(
                         mContext, sector);
                 bgRenderer.drawBackground(canvas, sx, sy,
-                        sx+SectorManager.SECTOR_SIZE, sy+SectorManager.SECTOR_SIZE);
+                        sx+Sector.SECTOR_SIZE, sy+Sector.SECTOR_SIZE);
             }
         }
 
@@ -430,8 +430,8 @@ public class StarfieldSurfaceView extends SectorView
                     continue;
                 }
 
-                int sx = (int)((x * SectorManager.SECTOR_SIZE) + mOffsetX);
-                int sy = (int)((y * SectorManager.SECTOR_SIZE) + mOffsetY);
+                int sx = (int)((x * Sector.SECTOR_SIZE) + mOffsetX);
+                int sy = (int)((y * Sector.SECTOR_SIZE) + mOffsetY);
                 drawSector(canvas, sx, sy, sector);
             }
         }
@@ -446,8 +446,8 @@ public class StarfieldSurfaceView extends SectorView
     private Vector2 getSectorOffset(long sx, long sy) {
         sx -= mSectorX;
         sy -= mSectorY;
-        return new Vector2((sx * SectorManager.SECTOR_SIZE) + mOffsetX,
-                           (sy * SectorManager.SECTOR_SIZE) + mOffsetY);
+        return new Vector2((sx * Sector.SECTOR_SIZE) + mOffsetX,
+                           (sy * Sector.SECTOR_SIZE) + mOffsetY);
     }
 
     /**
@@ -1027,7 +1027,7 @@ public class StarfieldSurfaceView extends SectorView
             long sectorX = mHqStar.getSectorX() - mSectorX;
             long sectorY = mHqStar.getSectorY() - mSectorY;
             Vector2 starDirection = Vector2.pool.borrow().reset((double) sectorX, (double) sectorY);
-            starDirection.scale(SectorManager.SECTOR_SIZE);
+            starDirection.scale(Sector.SECTOR_SIZE);
             starDirection.add(mHqStar.getOffsetX() + mOffsetX, mHqStar.getOffsetY() + mOffsetY);
             starDirection.scale(getPixelScale());
 

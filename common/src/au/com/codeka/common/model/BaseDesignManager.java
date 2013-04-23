@@ -65,7 +65,6 @@ public abstract class BaseDesignManager {
     }
 
     protected abstract InputStream open(DesignKind designKind) throws IOException;
-    protected abstract Design parseDesign(DesignKind kind, Element designElement);
 
     /**
      * Gets the collection of designs.
@@ -95,6 +94,16 @@ public abstract class BaseDesignManager {
             designs.add(parseDesign(kind, designElement));
         }
         return designs;
+    }
+
+    private Design parseDesign(DesignKind kind, Element designElement) {
+        if (kind == DesignKind.BUILDING) {
+            return new BuildingDesign.Factory(designElement).get();
+        } else if (kind == DesignKind.SHIP) {
+            return new ShipDesign.Factory(designElement).get();
+        }
+
+        return null;
     }
 
     private static class ParseException extends Exception {

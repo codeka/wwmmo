@@ -941,6 +941,32 @@ message SituationReports
 }
 
 
+message CashAuditRecord
+{
+    optional int32 id = 1;
+    optional int32 empire_id = 2;
+
+    enum Reason
+    {
+        FleetMove = 0;
+        BuildAccelerate = 1;
+        CollectFromColonies = 2;
+    }
+    optional Reason reason = 3;
+
+    optional float before_cash = 4;
+    optional float after_cash = 5;
+
+    // these will be filled out if it's a "FleetMove" operation
+    optional int32 fleet_id = 6;
+    optional string fleet_design_id = 7;
+    optional float num_ships = 8;
+    optional int32 star_id = 9;
+    optional string star_name = 10;
+    optional float move_distance = 11;
+}
+
+
 //
 // This is the main contains for alliances.
 //

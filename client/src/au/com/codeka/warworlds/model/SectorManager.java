@@ -15,13 +15,11 @@ import org.slf4j.LoggerFactory;
 import android.content.Context;
 import android.support.v4.util.LruCache;
 import au.com.codeka.BackgroundRunner;
-import au.com.codeka.Point2D;
 import au.com.codeka.common.Pair;
-import au.com.codeka.common.Vector2;
-import au.com.codeka.warworlds.api.ApiClient;
-import au.com.codeka.warworlds.game.StarfieldBackgroundRenderer;
 import au.com.codeka.common.model.BaseStar;
 import au.com.codeka.common.protobuf.Messages;
+import au.com.codeka.warworlds.api.ApiClient;
+import au.com.codeka.warworlds.game.StarfieldBackgroundRenderer;
 
 /**
  * This class "manages" the list of \c StarfieldSector's that we have loaded
@@ -48,8 +46,6 @@ public class SectorManager {
     private Map<Pair<Long, Long>, List<OnSectorsFetchedListener>> mInTransitListeners;
     private CopyOnWriteArrayList<OnSectorListChangedListener> mSectorListChangedListeners;
     private Map<String, Star> mSectorStars;
-
-    public static int SECTOR_SIZE = 1024;
 
     private SectorManager() {
         mSectors = new SectorCache();
@@ -119,31 +115,6 @@ public class SectorManager {
         ArrayList<Pair<Long, Long>> coords = new ArrayList<Pair<Long, Long>>();
         coords.add(new Pair<Long, Long>(sectorX, sectorY));
         requestSectors(coords, true, null);
-    }
-
-    /**
-     * Returns a {@link Point2D} that represents a line segment from {@link Star} a to
-     * {@link Star} b. You can use the \c length() method to determine the distance between them.
-     */
-    public Vector2 directionBetween(StarSummary a, StarSummary b) {
-        float dx = a.getOffsetX() - b.getOffsetX();
-        float dy = a.getOffsetY() - b.getOffsetY();
-
-        float dsx = a.getSectorX() - b.getSectorX();
-        dx += (dsx * SECTOR_SIZE);
-
-        float dsy = a.getSectorY() - b.getSectorY();
-        dy += (dsy * SECTOR_SIZE);
-
-        return new Vector2(dx, dy);
-    }
-
-    /**
-     * Calculates the distance (in "parsecs") between the two given stars.
-     */
-    public float distanceInParsecs(StarSummary a, StarSummary b) {
-        double distanceInPixels = directionBetween(a, b).length();
-        return (float) (distanceInPixels / 10.0);
     }
 
     /**

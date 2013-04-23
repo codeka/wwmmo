@@ -29,7 +29,7 @@ import au.com.codeka.warworlds.game.starfield.StarfieldSurfaceView;
 import au.com.codeka.warworlds.model.DesignManager;
 import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.Fleet;
-import au.com.codeka.warworlds.model.SectorManager;
+import au.com.codeka.warworlds.model.Sector;
 import au.com.codeka.warworlds.model.Sprite;
 import au.com.codeka.warworlds.model.SpriteManager;
 import au.com.codeka.warworlds.model.Star;
@@ -78,8 +78,7 @@ public class FleetMoveDialog extends DialogFragment {
                 mSourceStarOverlay.reset();
 
                 if (mSourceStarSummary != null) {
-                    float distanceInParsecs = SectorManager.getInstance()
-                                              .distanceInParsecs(mSourceStarSummary, star);
+                    float distanceInParsecs = Sector.distanceInParsecs(mSourceStarSummary, star);
                     ShipDesign design = (ShipDesign) DesignManager.i.getDesign(DesignKind.SHIP, mFleet.getDesignID());
 
                     String leftDetails = String.format(Locale.ENGLISH,

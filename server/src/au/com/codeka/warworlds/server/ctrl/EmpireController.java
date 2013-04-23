@@ -11,6 +11,7 @@ import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.data.DB;
 import au.com.codeka.warworlds.server.data.SqlStmt;
+import au.com.codeka.warworlds.server.data.Transaction;
 import au.com.codeka.warworlds.server.model.Empire;
 import au.com.codeka.warworlds.server.model.Fleet;
 import au.com.codeka.warworlds.server.model.Star;
@@ -34,6 +35,39 @@ public class EmpireController {
 
     public int[] getStarsForEmpire(int empireId) throws RequestException {
         return DataBase.getStarsForEmpire(empireId);
+    }
+
+    public boolean withdrawCash(int empireId, float amount, Messages.CashAuditRecord.Builder audit_record_pb) throws RequestException {
+        try (Transaction t = DB.beginTransaction()) {
+            SqlStmt stmt = t.prepare("SELECT cash FROM empires WHERE id = ?");
+            stmt.setInt(1, empireId);
+            double cashBefore = stmt.selectFirstValue(Double.class);
+            if (cashBefore <= amount) {
+                return false;
+            }
+
+            audit_record_pb.setBeforeCash((float) cashBefore);
+            audit_record_pb.setAfterCash((float) (cashBefore - amount));
+
+            stmt = t.prepare("UPDATE empires SET cash = cash - ? WHERE id = ?");
+            stmt.setDouble(1, amount);
+            stmt.setInt(2, empireId);
+            stmt.update();
+
+            stmt = t.prepare("INSERT INTO empire_cash_audit (empire_id, cash_before, cash_after," +
+                                                           " time, reason) VALUES (?, ?, ?, ?, ?)");
+            stmt.setInt(1, empireId);
+            stmt.setDouble(2, cashBefore);
+            stmt.setDouble(3, cashBefore - amount);
+            stmt.setDateTime(4, DateTime.now());
+            stmt.setBlob(5, audit_record_pb.build().toByteArray());
+            stmt.update();
+
+            t.commit();
+            return true;
+        } catch(Exception e) {
+            throw new RequestException(500, e);
+        }
     }
 
     public void createEmpire(Empire empire) throws RequestException {
@@ -246,7 +280,7 @@ public class EmpireController {
                 ResultSet rs = stmt.select();
 
                 ArrayList<Integer> starIds = new ArrayList<Integer>();
-                if (rs.next()) {
+                while (rs.next()) {
                     starIds.add(rs.getInt(1));
                 }
 

@@ -73,6 +73,25 @@ public class Fleet extends BaseFleet {
         mStance = stance;
     }
 
+    public void move(int destinationStarID, DateTime eta) {
+        mState = State.MOVING;
+        mStateStartTime = DateTime.now();
+        mDestinationStarID = destinationStarID;
+        mDestinationStarKey = Integer.toString(mDestinationStarID);
+        mEta = eta;
+    }
+
+    /**
+     * When the fleet stops attacking, moving, etc it goes back to being idle
+     */
+    public void idle() {
+        mState = State.IDLE;
+        mStateStartTime = DateTime.now();
+        mDestinationStarID = 0;
+        mDestinationStarKey = null;
+        mEta = null;
+    }
+
     /**
      * Split this fleet into two. The one we create will have size "otherSize" and we'll
      * have whatever is left over.

@@ -147,8 +147,8 @@ public class TacticalMapView extends SectorView
                     continue;
                 }
 
-                int sx = (int)((x * SectorManager.SECTOR_SIZE) + mOffsetX);
-                int sy = (int)((y * SectorManager.SECTOR_SIZE) + mOffsetY);
+                int sx = (int)((x * Sector.SECTOR_SIZE) + mOffsetX);
+                int sy = (int)((y * Sector.SECTOR_SIZE) + mOffsetY);
 
                 for (BaseStar star : sector.getStars()) {
                     int starX = sx + star.getOffsetX();

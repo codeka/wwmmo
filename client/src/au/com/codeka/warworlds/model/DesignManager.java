@@ -3,16 +3,9 @@ package au.com.codeka.warworlds.model;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.w3c.dom.Element;
-
 import android.content.Context;
 import au.com.codeka.common.model.BaseDesignManager;
-import au.com.codeka.common.model.BuildingDesign;
-import au.com.codeka.common.model.Design;
 import au.com.codeka.common.model.DesignKind;
-import au.com.codeka.common.model.ShipDesign;
 
 /**
  * This is the base "manager" class that manages designs for ships and buildings.
@@ -41,17 +34,6 @@ public class DesignManager extends BaseDesignManager {
             return mContext.getAssets().open("buildings.xml");
         } else if (kind == DesignKind.SHIP) {
             return mContext.getAssets().open("ships.xml");
-        }
-
-        return null;
-    }
-
-    @Override
-    protected Design parseDesign(DesignKind kind, Element designElement) {
-        if (kind == DesignKind.BUILDING) {
-            return new BuildingDesign.Factory(designElement).get();
-        } else if (kind == DesignKind.SHIP) {
-            return new ShipDesign.Factory(designElement).get();
         }
 
         return null;
