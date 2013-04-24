@@ -107,6 +107,7 @@ public class BuildManager {
 
                 Messages.BuildRequest build = Messages.BuildRequest.newBuilder()
                         .setBuildKind(kind)
+                        .setStarKey(colony.getStarKey())
                         .setColonyKey(colony.getKey())
                         .setEmpireKey(colony.getEmpireKey())
                         .setDesignName(design.getID())
@@ -142,7 +143,7 @@ public class BuildManager {
                         // finished, we should probably do something about it but it's kinda too
                         // late...
                     }
-                } else {
+                } else if (buildRequest != null) {
                     mBuildRequests.add(buildRequest);
 
                     StarManager.getInstance().refreshStar(context, colony.getStarKey());

@@ -15,11 +15,11 @@ public class Transaction implements AutoCloseable {
     }
 
     public SqlStmt prepare(String sql) throws SQLException {
-        return new SqlStmt(mConnection, sql, mConnection.prepareStatement(sql));
+        return new SqlStmt(mConnection, sql, mConnection.prepareStatement(sql), false);
     }
 
     public SqlStmt prepare(String sql, int autoGenerateKeys) throws SQLException {
-        return new SqlStmt(mConnection, sql, mConnection.prepareStatement(sql, autoGenerateKeys));
+        return new SqlStmt(mConnection, sql, mConnection.prepareStatement(sql, autoGenerateKeys), false);
     }
 
     public void commit() throws SQLException {
@@ -35,5 +35,6 @@ public class Transaction implements AutoCloseable {
         for (SqlStmt stmt : mStatements) {
             stmt.close();
         }
+        mConnection.close();
     }
 }

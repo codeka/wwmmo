@@ -123,6 +123,9 @@ public abstract class BaseStar {
     public List<BaseColony> getColonies() {
         return mColonies;
     }
+    public List<BaseEmpirePresence> getEmpirePresences() {
+        return mEmpires;
+    }
     public List<BaseEmpirePresence> getEmpires() {
         List<BaseEmpirePresence> empires = new ArrayList<BaseEmpirePresence>();
         // note: we make sure there's actually a colony for that empire before we return it
@@ -282,7 +285,11 @@ public abstract class BaseStar {
         }
 
         if (!summary) {
-            // TODO: more
+            if (mBuildRequests != null) for (BaseBuildRequest buildRequest : mBuildRequests) {
+                Messages.BuildRequest.Builder build_request_pb = Messages.BuildRequest.newBuilder();
+                buildRequest.toProtocolBuffer(build_request_pb);
+                pb.addBuildRequests(build_request_pb);
+            }
         }
     }
 

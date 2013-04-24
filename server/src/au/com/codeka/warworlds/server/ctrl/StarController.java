@@ -11,29 +11,45 @@ import au.com.codeka.common.model.BaseEmpirePresence;
 import au.com.codeka.common.model.BaseFleet;
 import au.com.codeka.common.model.BasePlanet;
 import au.com.codeka.warworlds.server.RequestException;
-import au.com.codeka.warworlds.server.data.DB;
 import au.com.codeka.warworlds.server.data.SqlStmt;
+import au.com.codeka.warworlds.server.data.Transaction;
+import au.com.codeka.warworlds.server.model.BuildRequest;
 import au.com.codeka.warworlds.server.model.Colony;
 import au.com.codeka.warworlds.server.model.EmpirePresence;
 import au.com.codeka.warworlds.server.model.Fleet;
 import au.com.codeka.warworlds.server.model.Star;
 
 public class StarController {
+    private DataBase db;
+
+    public StarController() {
+        db = new DataBase();
+    }
+    public StarController(Transaction trans) {
+        db = new DataBase(trans);
+    }
 
     public Star getStar(int id) throws RequestException {
-        return DataBase.getStars(new int[] {id}).get(0);
+        return db.getStars(new int[] {id}).get(0);
     }
 
     public List<Star> getStars(int[] ids) throws RequestException {
-        return DataBase.getStars(ids);
+        return db.getStars(ids);
     }
 
     public void update(Star star) throws RequestException {
-        DataBase.updateStar(star);
+        db.updateStar(star);
     }
 
     private static class DataBase extends BaseDataBase {
-        public static List<Star> getStars(int[] ids) throws RequestException {
+        public DataBase() {
+            super();
+        }
+        public DataBase(Transaction trans) {
+            super(trans);
+        }
+
+        public List<Star> getStars(int[] ids) throws RequestException {
             final String sql = "SELECT stars.id, sector_id, name, sectors.x AS sector_x," +
                                      " sectors.y AS sector_y, stars.x, stars.y, size, star_type, planets," +
                                      " last_simulation, time_emptied" +
@@ -41,7 +57,7 @@ public class StarController {
                               " INNER JOIN sectors ON stars.sector_id = sectors.id" +
                               " WHERE stars.id IN "+buildInClause(ids);
 
-            try (SqlStmt stmt = DB.prepare(sql)) {
+            try (SqlStmt stmt = prepare(sql)) {
                 ResultSet rs = stmt.select();
 
                 ArrayList<Star> stars = new ArrayList<Star>();
@@ -55,11 +71,11 @@ public class StarController {
             }
         }
 
-        public static void updateStar(Star star) throws RequestException {
+        public void updateStar(Star star) throws RequestException {
             final String sql = "UPDATE stars SET" +
                                  " last_simulation = ?" +
                               " WHERE id = ?";
-            try (SqlStmt stmt = DB.prepare(sql)) {
+            try (SqlStmt stmt = prepare(sql)) {
                 stmt.setDateTime(1, star.getLastSimulation());
                 stmt.setInt(2, star.getID());
                 stmt.update();
@@ -67,17 +83,18 @@ public class StarController {
                 updateEmpires(star);
                 updateColonies(star);
                 updateFleets(star);
+                updateBuildRequests(star);
             } catch(Exception e) {
                 throw new RequestException(500, e);
             }
         }
 
-        private static void updateEmpires(Star star) throws RequestException {
+        private void updateEmpires(Star star) throws RequestException {
             final String sql = "UPDATE empire_presences SET" +
                                  " total_goods = ?," +
                                  " total_minerals = ?" +
                               " WHERE id = ?";
-            try (SqlStmt stmt = DB.prepare(sql)) {
+            try (SqlStmt stmt = prepare(sql)) {
                 for (BaseEmpirePresence empire : star.getEmpires()) {
                     stmt.setDouble(1, empire.getTotalGoods());
                     stmt.setDouble(2, empire.getTotalMinerals());
@@ -89,7 +106,7 @@ public class StarController {
             }
         }
 
-        private static void updateColonies(Star star) throws RequestException {
+        private void updateColonies(Star star) throws RequestException {
             final String sql = "UPDATE colonies SET" +
                                  " focus_population = ?," +
                                  " focus_construction = ?," +
@@ -98,7 +115,7 @@ public class StarController {
                                  " population = ?," +
                                  " uncollected_taxes = ?" +
                               " WHERE id = ?";
-            try (SqlStmt stmt = DB.prepare(sql)) {
+            try (SqlStmt stmt = prepare(sql)) {
                 for (BaseColony colony : star.getColonies()) {
                     stmt.setDouble(1, colony.getPopulationFocus());
                     stmt.setDouble(2, colony.getConstructionFocus());
@@ -114,7 +131,7 @@ public class StarController {
             }
         }
 
-        private static void updateFleets(Star star) throws RequestException {
+        private void updateFleets(Star star) throws RequestException {
             boolean needInsert = false;
             String sql = "UPDATE fleets SET" +
                             " star_id = ?," +
@@ -128,7 +145,7 @@ public class StarController {
                             " target_fleet_id = ?," +
                             " time_destroyed = ?" +
                         " WHERE id = ?";
-            try (SqlStmt stmt = DB.prepare(sql)) {
+            try (SqlStmt stmt = prepare(sql)) {
                 for (BaseFleet baseFleet : star.getFleets()) {
                     if (baseFleet.getKey() == null) {
                         needInsert = true;
@@ -169,7 +186,7 @@ public class StarController {
                                      " stance, state, state_start_time, eta, target_star_id," +
                                      " target_fleet_id, time_destroyed)" +
                  " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-            try (SqlStmt stmt = DB.prepare(sql, Statement.RETURN_GENERATED_KEYS)) {
+            try (SqlStmt stmt = prepare(sql, Statement.RETURN_GENERATED_KEYS)) {
                 for (BaseFleet baseFleet : star.getFleets()) {
                     if (baseFleet.getKey() != null) {
                         continue;
@@ -208,7 +225,22 @@ public class StarController {
             }
         }
 
-        private static void populateStars(List<Star> stars) throws RequestException {
+        private void updateBuildRequests(Star star) throws RequestException {
+            String sql = "UPDATE build_requests SET progress = ?, end_time = ? WHERE id = ?";
+            try (SqlStmt stmt = prepare(sql)) {
+                for (BaseBuildRequest baseBuildRequest : star.getBuildRequests()) {
+                    BuildRequest buildRequest = (BuildRequest) baseBuildRequest;
+                    stmt.setDouble(1, buildRequest.getProgress(false));
+                    stmt.setDateTime(2, buildRequest.getEndTime());
+                    stmt.setInt(3, buildRequest.getID());
+                    stmt.update();
+                }
+            } catch(Exception e) {
+                throw new RequestException(500, e);
+            }
+        }
+
+        private void populateStars(List<Star> stars) throws RequestException {
             int[] starIds = new int[stars.size()];
             for (int i = 0; i < stars.size(); i++) {
                 Star star = stars.get(i);
@@ -219,10 +251,8 @@ public class StarController {
                 starIds[i] = star.getID();
             }
 
-            String sql = "SELECT colonies.*" +
-                        " FROM colonies" +
-                        " WHERE star_id IN "+buildInClause(starIds);
-            try (SqlStmt stmt = DB.prepare(sql)) {
+            String sql = "SELECT * FROM colonies WHERE star_id IN "+buildInClause(starIds);
+            try (SqlStmt stmt = prepare(sql)) {
                 ResultSet rs = stmt.select();
 
                 while (rs.next()) {
@@ -242,10 +272,8 @@ public class StarController {
                 throw new RequestException(500, e);
             }
 
-            sql = "SELECT fleets.*" +
-                 " FROM fleets" +
-                 " WHERE star_id IN "+buildInClause(starIds);
-            try (SqlStmt stmt = DB.prepare(sql)) {
+            sql = "SELECT * FROM fleets WHERE star_id IN "+buildInClause(starIds);
+            try (SqlStmt stmt = prepare(sql)) {
                 ResultSet rs = stmt.select();
 
                 while (rs.next()) {
@@ -261,22 +289,20 @@ public class StarController {
                 throw new RequestException(500, e);
             }
 
-            sql = "SELECT empire_presences.*" +
-                 " FROM empire_presences" +
-                 " WHERE empire_presences.star_id IN "+buildInClause(starIds);
-            try (SqlStmt stmt = DB.prepare(sql)) {
+            sql = "SELECT * FROM empire_presences WHERE star_id IN "+buildInClause(starIds);
+            try (SqlStmt stmt = prepare(sql)) {
                 ResultSet rs = stmt.select();
 
                 while (rs.next()) {
-                    EmpirePresence empire = new EmpirePresence(rs);
+                    EmpirePresence empirePresence = new EmpirePresence(rs);
 
                     for (Star star : stars) {
-                        if (star.getID() == empire.getStarID()) {
+                        if (star.getID() == empirePresence.getStarID()) {
                             // by default, you get 500 max goods/minerals
-                            empire.setMaxGoods(500);
-                            empire.setMaxMinerals(500);
+                            empirePresence.setMaxGoods(500);
+                            empirePresence.setMaxMinerals(500);
 
-                            star.getEmpires().add(empire);
+                            star.getEmpirePresences().add(empirePresence);
                         }
                     }
                 }
@@ -284,7 +310,22 @@ public class StarController {
                 throw new RequestException(500, e);
             }
 
-            // TODO: build requests
+            sql = "SELECT * FROM build_requests WHERE star_id IN "+buildInClause(starIds);
+            try (SqlStmt stmt = prepare(sql)) {
+                ResultSet rs = stmt.select();
+
+                while (rs.next()) {
+                    BuildRequest buildRequest = new BuildRequest(rs);
+
+                    for (Star star : stars) {
+                        if (star.getID() == buildRequest.getStarID()) {
+                            star.getBuildRequests().add(buildRequest);
+                        }
+                    }
+                }
+            } catch(Exception e) {
+                throw new RequestException(500, e);
+            }
         }
     }
 }

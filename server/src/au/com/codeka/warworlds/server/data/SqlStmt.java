@@ -29,14 +29,16 @@ public class SqlStmt implements AutoCloseable {
 
     private Connection mConn;
     private PreparedStatement mStmt;
+    private boolean mAutoCloseConnection;
     private String mSql;
     private ArrayList<Object> mParameters;
     private ArrayList<ResultSet> mResultSets;
 
-    public SqlStmt(Connection conn, String sql, PreparedStatement stmt) {
+    public SqlStmt(Connection conn, String sql, PreparedStatement stmt, boolean autoCloseConnection) {
         mConn = conn;
         mStmt = stmt;
         mSql = sql;
+        mAutoCloseConnection = autoCloseConnection;
         mParameters = new ArrayList<Object>();
         mResultSets = new ArrayList<ResultSet>();
     }
@@ -162,6 +164,8 @@ public class SqlStmt implements AutoCloseable {
             rs.close();
         }
         mStmt.close();
-        mConn.close();
+        if (mAutoCloseConnection) {
+            mConn.close();
+        }
     }
 }

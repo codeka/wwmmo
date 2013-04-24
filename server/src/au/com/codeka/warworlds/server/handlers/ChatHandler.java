@@ -1,7 +1,6 @@
 package au.com.codeka.warworlds.server.handlers;
 
 import java.sql.ResultSet;
-import java.util.ArrayList;
 
 import org.expressme.openid.Base64;
 import org.joda.time.DateTime;

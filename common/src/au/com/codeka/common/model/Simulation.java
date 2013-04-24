@@ -247,8 +247,8 @@ public class Simulation {
                     float timeRemainingInHours = (1.0f - br.getProgress(false)) * totalBuildTimeInHours;
 
                     float dtUsed = dtInHours;
-                    if (startTime.compareTo(now) > 0) {
-                        Duration startOffset = new Interval(startTime, now).toDuration();
+                    if (startTime.isAfter(now)) {
+                        Duration startOffset = new Interval(now, startTime).toDuration();
                         dtUsed -= startOffset.getMillis() / (1000.0f * 3600.0f);
                     }
                     if (dtUsed > timeRemainingInHours) {

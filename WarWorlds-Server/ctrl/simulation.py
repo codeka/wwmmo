@@ -446,7 +446,7 @@ class Simulation(object):
       # work out the amount of taxes this colony has generated in the last turn
       tax_per_population_per_hour = 0.012
       tax_this_turn = tax_per_population_per_hour * dt_in_hours * colony_pb.population
-      if not math.isnan(tax_this_turn):
+      if not math.isnan(tax_this_turn) and tax_this_turn > 0.0 and not math.isinf(tax_this_turn):
         colony_pb.uncollected_taxes += tax_this_turn
       self.log("tax generated: %.4f; total: %.4f" % (tax_this_turn, colony_pb.uncollected_taxes))
 
@@ -518,6 +518,8 @@ class Simulation(object):
       if in_cooldown and colony_pb.population < 100.0:
         self.log("In cooldown period, population capped at 100.")
         colony_pb.population = 100.0
+      if colony_pb.population < 0 or math.isnan(colony_pb.population) or math.isinf(colony_pb.population):
+        colony_pb.population = 0.0
 
     if total_goods > max_goods:
       total_goods = max_goods

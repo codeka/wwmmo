@@ -24,6 +24,7 @@ public abstract class BaseBuildRequest  {
     protected int mExistingBuildingLevel;
     protected String mStarKey;
     protected int mPlanetIndex;
+    protected String mEmpireKey;
 
     public BaseBuildRequest() {
         mRefreshTime = DateTime.now(DateTimeZone.UTC);
@@ -58,6 +59,9 @@ public abstract class BaseBuildRequest  {
     }
     public int getPlanetIndex() {
         return mPlanetIndex;
+    }
+    public String getEmpireKey() {
+        return mEmpireKey;
     }
     public float getProgress(boolean interpolate) {
         if (!interpolate) {
@@ -106,12 +110,17 @@ public abstract class BaseBuildRequest  {
         return mColonyKey;
     }
 
+    public void setStartTime(DateTime dt) {
+        mStartTime = dt;
+    }
     public void setEndTime(DateTime dt) {
         mEndTime = dt;
     }
 
     public void fromProtocolBuffer(Messages.BuildRequest pb) {
-        mKey = pb.getKey();
+        if (pb.hasKey()) {
+            mKey = pb.getKey();
+        }
         mDesignKind = DesignKind.fromNumber(pb.getBuildKind().getNumber());
         mDesignID = pb.getDesignName();
         mColonyKey = pb.getColonyKey();
@@ -121,9 +130,28 @@ public abstract class BaseBuildRequest  {
         mCount = pb.getCount();
         mStarKey = pb.getStarKey();
         mPlanetIndex = pb.getPlanetIndex();
+        mEmpireKey = pb.getEmpireKey();
         if (pb.getExistingBuildingKey() != null && !pb.getExistingBuildingKey().equals("")) {
             mExistingBuildingKey = pb.getExistingBuildingKey();
             mExistingBuildingLevel = pb.getExistingBuildingLevel(); 
+        }
+    }
+
+    public void toProtocolBuffer(Messages.BuildRequest.Builder pb) {
+        pb.setKey(mKey);
+        pb.setBuildKind(Messages.BuildRequest.BUILD_KIND.valueOf(mDesignKind.getValue()));
+        pb.setDesignName(mDesignID);
+        pb.setColonyKey(mColonyKey);
+        pb.setEndTime(mEndTime.getMillis() / 1000);
+        pb.setStartTime(mStartTime.getMillis() /1000);
+        pb.setProgress(mProgress);
+        pb.setCount(mCount);
+        pb.setStarKey(mStarKey);
+        pb.setPlanetIndex(mPlanetIndex);
+        pb.setEmpireKey(mEmpireKey);
+        if (mExistingBuildingKey != null) {
+            pb.setExistingBuildingKey(mExistingBuildingKey);
+            pb.setExistingBuildingLevel(mExistingBuildingLevel);
         }
     }
 }

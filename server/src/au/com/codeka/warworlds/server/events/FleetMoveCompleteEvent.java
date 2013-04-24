@@ -69,6 +69,7 @@ public class FleetMoveCompleteEvent extends Event {
                 destStar.getFleets().add(fleet);
 
                 fleet.idle();
+                break;
             }
         }
 
