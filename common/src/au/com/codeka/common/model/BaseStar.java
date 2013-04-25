@@ -63,6 +63,7 @@ public abstract class BaseStar {
     protected ArrayList<BaseFleet> mFleets;
     protected ArrayList<BaseBuildRequest> mBuildRequests;
     protected DateTime mLastSimulation;
+    protected DateTime mTimeEmptied;
 
     protected BaseStar() {
         mColonies = null;
@@ -118,6 +119,9 @@ public abstract class BaseStar {
     }
     public void setLastSimulation(DateTime dt) {
         mLastSimulation = dt;
+    }
+    public DateTime getTimeEmptied() {
+        return mTimeEmptied;
     }
 
     public List<BaseColony> getColonies() {
@@ -191,6 +195,9 @@ public abstract class BaseStar {
         mSectorY = pb.getSectorY();
         mOffsetX = pb.getOffsetX();
         mOffsetY = pb.getOffsetY();
+        if (pb.hasTimeEmptied()) {
+            mTimeEmptied = new DateTime(pb.getTimeEmptied() * 1000, DateTimeZone.UTC);
+        }
 
         int numPlanets = pb.getPlanetsCount();
         mPlanets = new BasePlanet[numPlanets];
@@ -258,6 +265,9 @@ public abstract class BaseStar {
         pb.setOffsetY(mOffsetY);
         if (mLastSimulation != null) {
             pb.setLastSimulation(mLastSimulation.getMillis() / 1000);
+        }
+        if (mTimeEmptied != null) {
+            pb.setTimeEmptied(mTimeEmptied.getMillis() / 1000);
         }
 
         for (BasePlanet planet : mPlanets) {

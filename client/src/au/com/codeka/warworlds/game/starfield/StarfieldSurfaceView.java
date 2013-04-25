@@ -620,11 +620,12 @@ public class StarfieldSurfaceView extends SectorView
             Map<String, Integer> empireFleets = new TreeMap<String, Integer>();
             for (int i = 0; i < fleets.size(); i++) {
                 BaseFleet f = fleets.get(i);
-                if (f.getState() == Fleet.State.MOVING) {
+                if (f.getEmpireKey() == null || f.getState() == Fleet.State.MOVING) {
                     // ignore moving fleets, we'll draw them separately
                     continue;
                 }
 
+                
                 Integer n = empireFleets.get(f.getEmpireKey());
                 if (n == null) {
                     empireFleets.put(f.getEmpireKey(), (int) Math.ceil(f.getNumShips()));

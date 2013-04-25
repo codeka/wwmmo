@@ -49,6 +49,20 @@ public class Fleet extends BaseFleet {
             mTargetFleetKey = Integer.toString(mTargetFleetID);
         }
     }
+    public Fleet(Empire empire, Star star, String designID, float numShips) {
+        mStarID = star.getID();
+        mStarKey = Integer.toString(mStarID);
+        mSectorID = star.getSectorID();
+        mDesignID = designID;
+        if (empire != null) {
+            mEmpireID = empire.getID();
+            mEmpireKey = Integer.toString(mEmpireID);
+        }
+        mNumShips = numShips;
+        mStance = Stance.AGGRESSIVE;
+        mState = State.IDLE;
+        mStateStartTime = DateTime.now();
+    }
 
     public int getID() {
         return mID;
@@ -69,6 +83,10 @@ public class Fleet extends BaseFleet {
         return mTargetFleetID;
     }
 
+    public void setID(int id) {
+        mID = id;
+        mKey = Integer.toString(id);
+    }
     public void setStance(Stance stance) {
         mStance = stance;
     }

@@ -3,13 +3,19 @@ package au.com.codeka.warworlds.server.ctrl;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Random;
+
+import org.joda.time.DateTime;
 
 import au.com.codeka.common.model.BaseBuildRequest;
 import au.com.codeka.common.model.BaseColony;
 import au.com.codeka.common.model.BaseEmpirePresence;
 import au.com.codeka.common.model.BaseFleet;
 import au.com.codeka.common.model.BasePlanet;
+import au.com.codeka.common.model.Simulation;
 import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.data.SqlStmt;
 import au.com.codeka.warworlds.server.data.Transaction;
@@ -17,6 +23,7 @@ import au.com.codeka.warworlds.server.model.BuildRequest;
 import au.com.codeka.warworlds.server.model.Colony;
 import au.com.codeka.warworlds.server.model.EmpirePresence;
 import au.com.codeka.warworlds.server.model.Fleet;
+import au.com.codeka.warworlds.server.model.Planet;
 import au.com.codeka.warworlds.server.model.Star;
 
 public class StarController {
@@ -30,7 +37,11 @@ public class StarController {
     }
 
     public Star getStar(int id) throws RequestException {
-        return db.getStars(new int[] {id}).get(0);
+        List<Star> stars = db.getStars(new int[] {id});
+        if (stars.isEmpty()) {
+            throw new RequestException(404);
+        }
+        return stars.get(0);
     }
 
     public List<Star> getStars(int[] ids) throws RequestException {
@@ -64,7 +75,27 @@ public class StarController {
                 while (rs.next()) {
                     stars.add(new Star(rs));
                 }
-                populateStars(stars);
+
+                if (stars.isEmpty()) {
+                    return stars;
+                }
+
+                int[] starIds = new int[stars.size()];
+                for (int i = 0; i < stars.size(); i++) {
+                    Star star = stars.get(i);
+                    star.setColonies(new ArrayList<BaseColony>());
+                    star.setFleets(new ArrayList<BaseFleet>());
+                    star.setEmpires(new ArrayList<BaseEmpirePresence>());
+                    star.setBuildRequests(new ArrayList<BaseBuildRequest>());
+                    starIds[i] = star.getID();
+                }
+
+                String inClause = buildInClause(starIds);
+                populateEmpires(stars, inClause);
+                populateColonies(stars, inClause);
+                populateFleets(stars, inClause);
+                populateBuildRequests(stars, inClause);
+                checkNativeColonies(stars);
                 return stars;
             } catch(Exception e) {
                 throw new RequestException(500, e);
@@ -240,92 +271,143 @@ public class StarController {
             }
         }
 
-        private void populateStars(List<Star> stars) throws RequestException {
-            int[] starIds = new int[stars.size()];
-            for (int i = 0; i < stars.size(); i++) {
-                Star star = stars.get(i);
-                star.setColonies(new ArrayList<BaseColony>());
-                star.setFleets(new ArrayList<BaseFleet>());
-                star.setEmpires(new ArrayList<BaseEmpirePresence>());
-                star.setBuildRequests(new ArrayList<BaseBuildRequest>());
-                starIds[i] = star.getID();
-            }
+        private void populateColonies(List<Star> stars, String inClause) throws Exception {
+            String sql = "SELECT * FROM colonies WHERE star_id IN "+inClause;
+            SqlStmt stmt = prepare(sql);
+            ResultSet rs = stmt.select();
 
-            String sql = "SELECT * FROM colonies WHERE star_id IN "+buildInClause(starIds);
-            try (SqlStmt stmt = prepare(sql)) {
-                ResultSet rs = stmt.select();
+            while (rs.next()) {
+                Colony colony = new Colony(rs);
 
-                while (rs.next()) {
-                    Colony colony = new Colony(rs);
+                for (Star star : stars) {
+                    if (star.getID() == colony.getStarID()) {
+                        // max population for the colony is initially just it's congeniality
+                        BasePlanet planet = star.getPlanets()[colony.getPlanetIndex() - 1];
+                        colony.setMaxPopulation(planet.getPopulationCongeniality());
 
-                    for (Star star : stars) {
-                        if (star.getID() == colony.getStarID()) {
-                            // max population for the colony is initially just it's congeniality
-                            BasePlanet planet = star.getPlanets()[colony.getPlanetIndex() - 1];
-                            colony.setMaxPopulation(planet.getPopulationCongeniality());
-
-                            star.getColonies().add(colony);
-                        }
+                        star.getColonies().add(colony);
                     }
                 }
-            } catch(Exception e) {
-                throw new RequestException(500, e);
             }
+        }
 
-            sql = "SELECT * FROM fleets WHERE star_id IN "+buildInClause(starIds);
-            try (SqlStmt stmt = prepare(sql)) {
-                ResultSet rs = stmt.select();
+        private void populateFleets(List<Star> stars, String inClause) throws Exception {
+            String sql = "SELECT * FROM fleets WHERE star_id IN "+inClause;
+            SqlStmt stmt = prepare(sql);
+            ResultSet rs = stmt.select();
 
-                while (rs.next()) {
-                    Fleet fleet = new Fleet(rs);
+            while (rs.next()) {
+                Fleet fleet = new Fleet(rs);
 
-                    for (Star star : stars) {
-                        if (star.getID() == fleet.getStarID()) {
-                            star.getFleets().add(fleet);
-                        }
+                for (Star star : stars) {
+                    if (star.getID() == fleet.getStarID()) {
+                        star.getFleets().add(fleet);
                     }
                 }
-            } catch(Exception e) {
-                throw new RequestException(500, e);
             }
+        }
 
-            sql = "SELECT * FROM empire_presences WHERE star_id IN "+buildInClause(starIds);
-            try (SqlStmt stmt = prepare(sql)) {
-                ResultSet rs = stmt.select();
+        private void populateEmpires(List<Star> stars, String inClause) throws Exception {
+            String sql = "SELECT * FROM empire_presences WHERE star_id IN "+inClause;
+            SqlStmt stmt = prepare(sql);
+            ResultSet rs = stmt.select();
 
-                while (rs.next()) {
-                    EmpirePresence empirePresence = new EmpirePresence(rs);
+            while (rs.next()) {
+                EmpirePresence empirePresence = new EmpirePresence(rs);
 
-                    for (Star star : stars) {
-                        if (star.getID() == empirePresence.getStarID()) {
-                            // by default, you get 500 max goods/minerals
-                            empirePresence.setMaxGoods(500);
-                            empirePresence.setMaxMinerals(500);
+                for (Star star : stars) {
+                    if (star.getID() == empirePresence.getStarID()) {
+                        // by default, you get 500 max goods/minerals
+                        empirePresence.setMaxGoods(500);
+                        empirePresence.setMaxMinerals(500);
 
-                            star.getEmpirePresences().add(empirePresence);
-                        }
+                        star.getEmpirePresences().add(empirePresence);
                     }
                 }
-            } catch(Exception e) {
-                throw new RequestException(500, e);
             }
+        }
 
-            sql = "SELECT * FROM build_requests WHERE star_id IN "+buildInClause(starIds);
-            try (SqlStmt stmt = prepare(sql)) {
-                ResultSet rs = stmt.select();
+        private void populateBuildRequests(List<Star> stars, String inClause) throws Exception {
+            String sql = "SELECT * FROM build_requests WHERE star_id IN "+inClause;
+            SqlStmt stmt = prepare(sql);
+            ResultSet rs = stmt.select();
 
-                while (rs.next()) {
-                    BuildRequest buildRequest = new BuildRequest(rs);
+            while (rs.next()) {
+                BuildRequest buildRequest = new BuildRequest(rs);
 
-                    for (Star star : stars) {
-                        if (star.getID() == buildRequest.getStarID()) {
-                            star.getBuildRequests().add(buildRequest);
-                        }
+                for (Star star : stars) {
+                    if (star.getID() == buildRequest.getStarID()) {
+                        star.getBuildRequests().add(buildRequest);
                     }
                 }
-            } catch(Exception e) {
-                throw new RequestException(500, e);
             }
+        }
+
+        /**
+         * Checks if any of the stars in the given list need native colonies added, and adds them
+         * if so.
+         */
+        private void checkNativeColonies(List<Star> stars) throws Exception {
+            for (Star star : stars) {
+                // first, make sure there's no colonies and no fleets
+                if (!star.getColonies().isEmpty() || !star.getFleets().isEmpty()) {
+                    continue;
+                }
+
+                // next, if it was only emptied 3 days ago, don't add more just yet
+                if (star.getTimeEmptied() != null && star.getTimeEmptied().isAfter(DateTime.now().minusDays(3))) {
+                    continue;
+                }
+
+                // OK, add those native colonies!
+                addNativeColonies(star);
+            }
+        }
+
+        private void addNativeColonies(Star star) throws Exception {
+            ArrayList<Planet> planets = new ArrayList<Planet>();
+            for (int i = 0; i < star.getPlanets().length; i++) {
+                planets.add((Planet) star.getPlanets()[i]);
+            }
+
+            // sort the planets in order of most desirable to least desirable
+            Collections.sort(planets, new Comparator<Planet>() {
+                @Override
+                public int compare(Planet lhs, Planet rhs) {
+                    double lhsScore = lhs.getPopulationCongeniality() +
+                                      (lhs.getFarmingCongeniality() * 0.75) +
+                                      (lhs.getMiningCongeniality() * 0.5);
+                    double rhsScore = rhs.getPopulationCongeniality() +
+                                      (rhs.getFarmingCongeniality() * 0.75) +
+                                      (rhs.getMiningCongeniality() * 0.5);
+                    return Double.compare(rhsScore, lhsScore);
+                }
+            });
+
+            Random rand = new Random();
+            int numColonies = rand.nextInt(Math.min(3, planets.size() - 1)) + 1;
+            for (int i = 0; i < numColonies; i++) {
+                Planet planet = planets.get(i);
+                Colony colony = new EmpireController(getTransaction()).colonize(null, star, planet.getIndex());
+                colony.setConstructionFocus(0.0f);
+                colony.setPopulationFocus(0.5f);
+                colony.setFarmingFocus(0.5f);
+                colony.setMiningFocus(0.0f);
+                colony.setMaxPopulation(planet.getPopulationCongeniality());
+            }
+
+            int numFleets = rand.nextInt(4) + 1;
+            for (int i = 0; i < numFleets; i++) {
+                float numShips = (rand.nextInt(5) + 1) * 5;
+                new FleetController(getTransaction()).createFleet(null, star, "fighter", numShips);
+            }
+
+            // simulate for 24 hours to make it look like it's being doing stuff before you got here...
+            star.setLastSimulation(DateTime.now().minusHours(24));
+            Simulation sim = new Simulation();
+            sim.simulate(star);
+
+            updateStar(star);
         }
     }
 }

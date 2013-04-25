@@ -18,6 +18,10 @@ public class BaseDataBase {
         mTransaction = trans;
     }
 
+    public Transaction getTransaction() {
+        return mTransaction;
+    }
+
     protected SqlStmt prepare(String sql) throws SQLException {
         if (mTransaction != null) {
             return mTransaction.prepare(sql);

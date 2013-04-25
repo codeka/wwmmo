@@ -141,7 +141,9 @@ public abstract class BaseColony {
         pb.setKey(mKey);
         pb.setPlanetIndex(mPlanetIndex);
         pb.setStarKey(mStarKey);
-        pb.setEmpireKey(mEmpireKey);
+        if (mEmpireKey != null) {
+            pb.setEmpireKey(mEmpireKey);
+        }
         pb.setPopulation(mPopulation);
         pb.setFocusPopulation(mPopulationFocus);
         pb.setFocusFarming(mFarmingFocus);

@@ -1,6 +1,7 @@
 package au.com.codeka.warworlds.server.ctrl;
 
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
@@ -12,29 +13,58 @@ import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.data.DB;
 import au.com.codeka.warworlds.server.data.SqlStmt;
 import au.com.codeka.warworlds.server.data.Transaction;
+import au.com.codeka.warworlds.server.model.Colony;
 import au.com.codeka.warworlds.server.model.Empire;
-import au.com.codeka.warworlds.server.model.Fleet;
 import au.com.codeka.warworlds.server.model.Star;
 
 public class EmpireController {
+    private DataBase db;
+
+    public EmpireController() {
+        db = new DataBase();
+    }
+    public EmpireController(Transaction trans) {
+        db = new DataBase(trans);
+    }
+
     public Empire getEmpire(int id) throws RequestException {
-        return DataBase.getEmpires(new int[] {id}).get(0);
+        try {
+            return db.getEmpires(new int[] {id}).get(0);
+        } catch (SQLException e) {
+            throw new RequestException(500, e);
+        }
     }
 
     public List<Empire> getEmpires(int[] ids) throws RequestException {
-        return DataBase.getEmpires(ids);
+        try {
+            return db.getEmpires(ids);
+        } catch (SQLException e) {
+            throw new RequestException(500, e);
+        }
     }
 
     public Empire getEmpireByEmail(String email) throws RequestException {
-        return DataBase.getEmpireByEmail(email);
+        try {
+            return db.getEmpireByEmail(email);
+        } catch (SQLException e) {
+            throw new RequestException(500, e);
+        }
     }
 
     public List<Empire> getEmpiresByName(String name, int limit) throws RequestException {
-        return DataBase.getEmpiresByName(name, limit);
+        try {
+            return db.getEmpiresByName(name, limit);
+        } catch (SQLException e) {
+            throw new RequestException(500, e);
+        }
     }
 
     public int[] getStarsForEmpire(int empireId) throws RequestException {
-        return DataBase.getStarsForEmpire(empireId);
+        try {
+            return db.getStarsForEmpire(empireId);
+        } catch (SQLException e) {
+            throw new RequestException(500, e);
+        }
     }
 
     public boolean withdrawCash(int empireId, float amount, Messages.CashAuditRecord.Builder audit_record_pb) throws RequestException {
@@ -84,7 +114,7 @@ public class EmpireController {
         empire.setHomeStar(star);
 
         // create the empire
-        DataBase.createEmpire(empire);
+        db.createEmpire(empire);
 
         // empty the star of it's current (native) inhabitants
         String sql = "DELETE FROM colonies WHERE star_id = ?";
@@ -115,38 +145,8 @@ public class EmpireController {
             throw new RequestException(500, e);
         }
 
-        sql = "INSERT INTO fleets (sector_id, star_id, design_name, empire_id," +
-                                 " num_ships, stance, state, state_start_time)" +
-             " VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
-        try (SqlStmt stmt = DB.prepare(sql)) {
-            stmt.setInt(1, star.getSectorID());
-            stmt.setInt(2, star.getID());
-            stmt.setString(3, "colonyship");
-            stmt.setInt(4, empire.getID());
-            stmt.setDouble(5, 1.0);
-            stmt.setInt(6, Fleet.Stance.AGGRESSIVE.getValue());
-            stmt.setInt(7, Fleet.State.IDLE.getValue());
-            stmt.setDateTime(8, DateTime.now());
-            stmt.update();
-        } catch(Exception e) {
-            throw new RequestException(500, e);
-        }
-        sql = "INSERT INTO fleets (sector_id, star_id, design_name, empire_id," +
-                                 " num_ships, stance, state, state_start_time)" +
-             " VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
-        try (SqlStmt stmt = DB.prepare(sql)) {
-            stmt.setInt(1, star.getSectorID());
-            stmt.setInt(2, star.getID());
-            stmt.setString(3, "scout");
-            stmt.setInt(4, empire.getID());
-            stmt.setDouble(5, 10.0);
-            stmt.setInt(6, Fleet.Stance.AGGRESSIVE.getValue());
-            stmt.setInt(7, Fleet.State.IDLE.getValue());
-            stmt.setDateTime(8, DateTime.now());
-            stmt.update();
-        } catch(Exception e) {
-            throw new RequestException(500, e);
-        }
+        new FleetController(db.getTransaction()).createFleet(empire, star, "colonyship", 1.0f);
+        new FleetController(db.getTransaction()).createFleet(empire, star, "scoute", 10.0f);
 
         // update the last simulation time for the star so that it doesn't simulate until we
         // actually arrived...
@@ -159,44 +159,65 @@ public class EmpireController {
         }
     }
 
-    private void colonize(Empire empire, Star star, int planetIndex) throws RequestException {
+    public Colony colonize(Empire empire, Star star, int planetIndex) throws RequestException {
+        Colony colony = null;
+
         // add the initial colony and fleets to the star
         String sql = "INSERT INTO colonies (sector_id, star_id, planet_index, empire_id," +
                                           " focus_population, focus_construction, focus_farming," +
                                           " focus_mining, population, uncollected_taxes," +
                                           " cooldown_end_time)" +
              " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-        try (SqlStmt stmt = DB.prepare(sql)) {
-            stmt.setInt(1, star.getSectorID());
-            stmt.setInt(2, star.getID());
-            stmt.setInt(3, planetIndex);
-            stmt.setInt(4, empire.getID());
-            stmt.setDouble(5, 0.25);
-            stmt.setDouble(6, 0.25);
-            stmt.setDouble(7, 0.25);
-            stmt.setDouble(8, 0.25);
-            stmt.setDouble(9, 100.0);
-            stmt.setDouble(10, 0.0);
-            stmt.setDateTime(11, DateTime.now().plusHours(8));
+        try (SqlStmt stmt = db.prepare(sql, Statement.RETURN_GENERATED_KEYS)) {
+            colony = new Colony(0, star.getSectorID(), star.getID(), planetIndex,
+                    empire == null ? null : empire.getID());
+            stmt.setInt(1, colony.getSectorID());
+            stmt.setInt(2, colony.getStarID());
+            stmt.setInt(3, colony.getPlanetIndex());
+            if (colony.getEmpireKey() == null) {
+                stmt.setNull(4);
+            } else {
+                stmt.setInt(4, colony.getEmpireID());
+            }
+            stmt.setDouble(5, colony.getPopulationFocus());
+            stmt.setDouble(6, colony.getConstructionFocus());
+            stmt.setDouble(7, colony.getFarmingFocus());
+            stmt.setDouble(8, colony.getMiningFocus());
+            stmt.setDouble(9, colony.getPopulation());
+            stmt.setDouble(10, colony.getUncollectedTaxes());
+            stmt.setDateTime(11, colony.getCooldownEndTime());
             stmt.update();
+            colony.setID(stmt.getAutoGeneratedID());
         } catch(Exception e) {
             throw new RequestException(500, e);
         }
 
         // update the count of colonies in the sector
-        sql = "UPDATE sectors SET num_colonies = num_colonies+1 WHERE id = ?";
-        try (SqlStmt stmt = DB.prepare(sql)) {
-            stmt.setInt(1, star.getSectorID());
-            stmt.update();
-        } catch(Exception e) {
-            throw new RequestException(500, e);
+        if (empire != null) {
+            sql = "UPDATE sectors SET num_colonies = num_colonies+1 WHERE id = ?";
+            try (SqlStmt stmt = db.prepare(sql)) {
+                stmt.setInt(1, star.getSectorID());
+                stmt.update();
+            } catch(Exception e) {
+                throw new RequestException(500, e);
+            }
         }
+
+        star.getColonies().add(colony);
+        return colony;
     }
 
     private static class DataBase extends BaseDataBase {
-        public static void createEmpire(Empire empire) throws RequestException {
+        public DataBase() {
+            super();
+        }
+        public DataBase(Transaction trans) {
+            super(trans);
+        }
+
+        public void createEmpire(Empire empire) throws RequestException {
             String sql = "INSERT INTO empires (name, cash, home_star_id, user_email) VALUES (?, ?, ?, ?)";
-            try (SqlStmt stmt = DB.prepare(sql, Statement.RETURN_GENERATED_KEYS)) {
+            try (SqlStmt stmt = prepare(sql, Statement.RETURN_GENERATED_KEYS)) {
                 stmt.setString(1, empire.getDisplayName());
                 stmt.setDouble(2, 500.0);
                 stmt.setInt(3, ((Star) empire.getHomeStar()).getID());
@@ -208,90 +229,82 @@ public class EmpireController {
             }
         }
 
-        public static List<Empire> getEmpires(int[] ids) throws RequestException {
+        public List<Empire> getEmpires(int[] ids) throws SQLException {
             String sql = "SELECT * FROM empires WHERE id IN "+buildInClause(ids);
 
-            try (SqlStmt stmt = DB.prepare(sql)) {
-                ResultSet rs = stmt.select();
+            SqlStmt stmt = prepare(sql);
+            ResultSet rs = stmt.select();
 
-                ArrayList<Empire> empires = new ArrayList<Empire>();
-                while (rs.next()) {
-                    empires.add(new Empire(rs));
-                }
-                populateEmpires(empires);
-                return empires;
-            } catch(Exception e) {
-                throw new RequestException(500, e);
+            ArrayList<Empire> empires = new ArrayList<Empire>();
+            while (rs.next()) {
+                empires.add(new Empire(rs));
             }
+            populateEmpires(empires);
+            return empires;
         }
 
-        public static Empire getEmpireByEmail(String email) throws RequestException {
+        public Empire getEmpireByEmail(String email) throws SQLException {
             String sql = "SELECT * FROM empires WHERE user_email = ?";
-            try (SqlStmt stmt = DB.prepare(sql)) {
-                stmt.setString(1, email);
-                ResultSet rs = stmt.select();
+            SqlStmt stmt = prepare(sql);
+            stmt.setString(1, email);
+            ResultSet rs = stmt.select();
 
-                ArrayList<Empire> empires = new ArrayList<Empire>();
-                if (rs.next()) {
-                    empires.add(new Empire(rs));
-                }
-                if (empires.size() == 0) {
-                    return null;
-                }
-
-                populateEmpires(empires);
-                return empires.get(0);
-            } catch(Exception e) {
-                throw new RequestException(500, e);
+            ArrayList<Empire> empires = new ArrayList<Empire>();
+            if (rs.next()) {
+                empires.add(new Empire(rs));
             }
+            if (empires.size() == 0) {
+                return null;
+            }
+
+            populateEmpires(empires);
+            return empires.get(0);
         }
 
-        public static List<Empire> getEmpiresByName(String name, int limit) throws RequestException {
+        public List<Empire> getEmpiresByName(String name, int limit) throws SQLException {
             String sql = "SELECT * FROM empires WHERE name LIKE ? LIMIT ?";
-            try (SqlStmt stmt = DB.prepare(sql)) {
-                stmt.setString(1, "%"+name+"%"); // TODO: escape?
-                stmt.setInt(2, limit);
-                ResultSet rs = stmt.select();
+            SqlStmt stmt = prepare(sql);
+            stmt.setString(1, "%"+name+"%"); // TODO: escape?
+            stmt.setInt(2, limit);
+            ResultSet rs = stmt.select();
 
-                ArrayList<Empire> empires = new ArrayList<Empire>();
-                if (rs.next()) {
-                    empires.add(new Empire(rs));
-                }
-
-                populateEmpires(empires);
-                return empires;
-            } catch(Exception e) {
-                throw new RequestException(500, e);
+            ArrayList<Empire> empires = new ArrayList<Empire>();
+            if (rs.next()) {
+                empires.add(new Empire(rs));
             }
+
+            populateEmpires(empires);
+            return empires;
         }
 
-        private static void populateEmpires(List<Empire> empires) throws RequestException {
+        private void populateEmpires(List<Empire> empires) throws SQLException {
             for (Empire empire : empires) {
-                empire.setHomeStar(new StarController().getStar(empire.getHomeStarID()));
+                try {
+                    empire.setHomeStar(new StarController().getStar(empire.getHomeStarID()));
+                } catch (RequestException e) {
+                    // TODO: ignore??
+                }
             }
         }
 
-        private static int[] getStarsForEmpire(int empireId) throws RequestException {
+        private int[] getStarsForEmpire(int empireId) throws SQLException {
             String sql = "SELECT star_id FROM fleets WHERE empire_id = ?" +
                         " UNION SELECT star_id FROM colonies WHERE empire_id = ?";
-            try (SqlStmt stmt = DB.prepare(sql)) {
-                stmt.setInt(1, empireId);
-                stmt.setInt(2, empireId);
-                ResultSet rs = stmt.select();
+            SqlStmt stmt = prepare(sql);
+            stmt.setInt(1, empireId);
+            stmt.setInt(2, empireId);
+            ResultSet rs = stmt.select();
 
-                ArrayList<Integer> starIds = new ArrayList<Integer>();
-                while (rs.next()) {
-                    starIds.add(rs.getInt(1));
-                }
-
-                int[] array = new int[starIds.size()];
-                for (int i = 0; i < array.length; i++) {
-                    array[i] = starIds.get(i);
-                }
-                return array;
-            } catch(Exception e) {
-                throw new RequestException(500, e);
+            ArrayList<Integer> starIds = new ArrayList<Integer>();
+            while (rs.next()) {
+                starIds.add(rs.getInt(1));
             }
+
+            int[] array = new int[starIds.size()];
+            for (int i = 0; i < array.length; i++) {
+                array[i] = starIds.get(i);
+            }
+            return array;
         }
     }
 }

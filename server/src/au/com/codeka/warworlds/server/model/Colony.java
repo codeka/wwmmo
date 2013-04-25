@@ -34,7 +34,30 @@ public class Colony extends BaseColony {
         mCooldownTimeEnd = new DateTime(rs.getTimestamp("cooldown_end_time").getTime());
         mPopulation = rs.getFloat("population");
     }
+    public Colony(int id, int sectorID, int starID, int planetIndex, Integer empireID) {
+        mID = id;
+        mKey = Integer.toString(mID);
+        mSectorID = sectorID;
+        mStarID = starID;
+        mStarKey = Integer.toString(mStarID);
+        mPlanetIndex = planetIndex;
+        if (empireID != null) {
+            mEmpireID = empireID;
+            mEmpireKey = Integer.toString(mEmpireID);
+        }
+        mPopulationFocus = 0.25f;
+        mConstructionFocus = 0.25f;
+        mFarmingFocus = 0.25f;
+        mMiningFocus = 0.25f;
+        mUncollectedTaxes = 0.0f;
+        mCooldownTimeEnd = new DateTime().plusHours(8);
+        mPopulation = 100.0f;
+    }
 
+    public void setID(int id) {
+        mID = id;
+        mKey = Integer.toString(id);
+    }
     public void setMaxPopulation(float maxPopulation) {
         mMaxPopulation = maxPopulation;
     }

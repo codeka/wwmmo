@@ -8,15 +8,13 @@ import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.Duration;
 import org.joda.time.Interval;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * This class is used to simulate a \c Star. It need to have the same logic as ctrl/simulation.py
  * on the server, and we go to great pains to keep them in sync.
  */
 public class Simulation {
-    private static Logger log = LoggerFactory.getLogger(Simulation.class);
+    private LogHandler mLogHandler;
     private DateTime mNow;
 
     private static DateTime year2k = new DateTime(2000, 1, 1, 0, 0);
@@ -24,13 +22,23 @@ public class Simulation {
     public Simulation() {
         mNow = DateTime.now(DateTimeZone.UTC);
     }
+    public Simulation(LogHandler log) {
+        mNow = DateTime.now(DateTimeZone.UTC);
+        mLogHandler = log;
+    }
+
+    protected void log(String message) {
+        if (mLogHandler != null) {
+            mLogHandler.log(message);
+        }
+    }
 
     /**
      * Simulate the given star, and make sure it's "current".
      * @param star
      */
     public void simulate(BaseStar star) {
-        log.debug(String.format("Begin simulation for '%s'", star.getName()));
+        log(String.format("Begin simulation for '%s'", star.getName()));
 
         HashSet<String> empireKeys = new HashSet<String>();
         for (BaseColony colony : star.getColonies()) {
@@ -69,7 +77,9 @@ public class Simulation {
                 startTime = stepEndTime;
             } else if (stepEndTime.compareTo(predictionTime) < 0) {
                 if (predictionStar == null) {
-                    //log.debug(String.format("Begin prediction for '%s'", star.getName()));
+                    log("--------------------------------------------------");
+                    log("Prediction phase beginning...");
+                    log("--------------------------------------------------");
                     mNow = endTime;
                     dt = new Interval(startTime, endTime).toDuration();
                     if (dt.getMillis() > 1000) {
@@ -124,7 +134,9 @@ public class Simulation {
     }
 
     private void simulateStepForAllEmpires(Duration dt, DateTime now, BaseStar star, Set<String> empireKeys) {
+        log(String.format("- Step [dt=%.2f hrs] [now=%s]", (float)(dt.toStandardSeconds().getSeconds()) / 3600.0f, now));
         for (String empireKey : empireKeys) {
+            log(String.format("-- Empire [%s]", empireKey == null ? "Native" : empireKey));
             simulateStep(dt, now, star, empireKey);
         }
 
@@ -144,11 +156,11 @@ public class Simulation {
     }
 
     private void simulateStep(Duration dt, DateTime now, BaseStar star, String empireKey) {
-        float totalGoods = 0.0f;
-        float totalMinerals = 0.0f;
+        float totalGoods = 50.0f;
+        float totalMinerals = 50.0f;
         float totalPopulation = 0.0f;
-        float maxGoods = 500.0f;
-        float maxMinerals = 500.0f;
+        float maxGoods = 50.0f;
+        float maxMinerals = 50.0f;
 
         for (BaseEmpirePresence empire : star.getEmpires()) {
             if (!equalEmpireKey(empire.getEmpireKey(), empireKey)) {
@@ -169,6 +181,8 @@ public class Simulation {
                 continue;
             }
 
+            log(String.format("--- Colony [planetIndex=%d] [population=%.2f]",
+                    colony.getPlanetIndex(), colony.getPopulation()));
             BasePlanet planet = star.getPlanets()[colony.getPlanetIndex() - 1];
 
             // calculate the output from farming this turn and add it to the star global
@@ -177,6 +191,7 @@ public class Simulation {
             colony.setGoodsDelta(goods);
             totalGoods += goods * dtInHours;
             goodsDeltaPerHour += goods;
+            log(String.format("    Goods: [delta=%.2f / hr] [this turn=%.2f]", goods, goods * dtInHours));
 
             // calculate the output from mining this turn and add it to the star global
             float minerals = colony.getPopulation() * colony.getMiningFocus() *
@@ -184,6 +199,7 @@ public class Simulation {
             colony.setMineralsDelta(minerals);
             totalMinerals += minerals * dtInHours;
             mineralsDeltaPerHour += minerals;
+            log(String.format("    Minerals: [delta=%.2f / hr] [this turn=%.2f]", goods, goods * dtInHours));
 
             totalPopulation += colony.getPopulation();
         }
@@ -380,5 +396,13 @@ public class Simulation {
 
     private void simulateCombat(BaseStar star, DateTime now, Duration dt) {
         // We don't actually simulate combat on the client... todo?
+    }
+
+    /**
+     * This interface is used to help debug the simulation code. Implement it to receive a bunch
+     * of debug log messages during the simulation process.
+     */
+    public interface LogHandler {
+        void log(String message);
     }
 }
