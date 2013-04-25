@@ -37,7 +37,7 @@ public abstract class BackgroundRunner<Result> {
             1, TimeUnit.SECONDS, // keep-alive time
             sPoolWorkQueue, sThreadFactory);
 
-    private static InternalHandler sHandler = new InternalHandler();
+    private InternalHandler mHandler = new InternalHandler();
 
     private Callable<Result> mWorker;
     private FutureTask<Result> mFuture;
@@ -86,7 +86,7 @@ public abstract class BackgroundRunner<Result> {
 
     private Result postResult(Result result) {
         @SuppressWarnings("unchecked")
-        Message message = sHandler.obtainMessage(0,
+        Message message = mHandler.obtainMessage(0,
                 new BackgroundRunnerResult<Result>(this, result));
         message.sendToTarget();
         return result;

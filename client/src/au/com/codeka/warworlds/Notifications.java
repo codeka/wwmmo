@@ -27,7 +27,6 @@ import android.text.Html;
 import au.com.codeka.common.model.DesignKind;
 import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.game.SitrepActivity;
-import au.com.codeka.warworlds.model.BuildRequest;
 import au.com.codeka.warworlds.model.SituationReport;
 import au.com.codeka.warworlds.model.Sprite;
 import au.com.codeka.warworlds.model.Star;

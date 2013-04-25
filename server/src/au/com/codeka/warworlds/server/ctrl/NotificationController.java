@@ -8,6 +8,8 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.joda.time.DateTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.data.DB;
@@ -19,31 +21,49 @@ import com.google.android.gcm.server.Result;
 import com.google.android.gcm.server.Sender;
 
 public class NotificationController {
-
+    private final Logger log = LoggerFactory.getLogger(NotificationController.class);
     private static String API_KEY = "AIzaSyADWOC-tWUbzj-SVW13Sz5UuUiGfcmHHDA";
 
     public void sendNotification(String name, String value) throws RequestException {
-        TreeMap<String, String> values = new TreeMap<String, String>();
-        values.put(name, value);
-        sendNotification(values);
+        sendNotification(null, name, value);
     }
 
-    /**
-     * Sends the given \c JSONObject to all connected devices.
-     */
+    public void sendNotification(Integer empireID, String name, String value) throws RequestException {
+        TreeMap<String, String> values = new TreeMap<String, String>();
+        values.put(name, value);
+        sendNotification(empireID, values);
+    }
+
     public void sendNotification(Map<String, String> values) throws RequestException {
+        sendNotification((Integer) null, values);
+    }
+
+    public void sendNotification(Integer empireID, Map<String, String> values) throws RequestException {
         Message.Builder msgBuilder = new Message.Builder();
         for (Map.Entry<String, String> value : values.entrySet()) {
             msgBuilder.addData(value.getKey(), value.getValue());
         }
 
-        List<String> devices = new ArrayList<String>();
-        String sql = "SELECT gcm_registration_id FROM devices WHERE online_since > ? AND gcm_registration_id IS NOT NULL";
+        Map<String, String> devices = new TreeMap<String, String>();
+        String sql;
+        if (empireID == null) {
+            sql = "SELECT gcm_registration_id FROM devices WHERE online_since > ? AND gcm_registration_id IS NOT NULL";
+        } else {
+            sql = "SELECT gcm_registration_id, devices.user_email" +
+                 " FROM devices" +
+                 " INNER JOIN empires ON devices.user_email = empires.user_email" +
+                 " WHERE empires.id = ?";
+        }
         try (SqlStmt stmt = DB.prepare(sql)) {
-            stmt.setDateTime(1, DateTime.now().minusHours(1));
+            if (empireID == null) {
+                stmt.setDateTime(1, DateTime.now().minusHours(1));
+            } else {
+                stmt.setInt(1, empireID);
+            }
+
             ResultSet rs = stmt.select();
             while (rs.next()) {
-                devices.add(rs.getString(1));
+                devices.put(rs.getString(1), rs.getString(2));
             }
         } catch(Exception e) {
             throw new RequestException(500, e);
@@ -52,24 +72,36 @@ public class NotificationController {
         sendNotification(msgBuilder.build(), devices);
     }
 
-    private void sendNotification(Message msg, List<String> registrationIds) throws RequestException {
+    private void sendNotification(Message msg, Map<String, String> devices) throws RequestException {
         Sender sender = new Sender(API_KEY);
         try {
+            List<String> registrationIds = new ArrayList<String>();
+            for (String registrationId : devices.keySet()) {
+                registrationIds.add(registrationId);
+            }
+
             List<Result> results = sender.send(msg, registrationIds, 5).getResults();
             for (int i = 0; i < results.size(); i++) {
                 Result result = results.get(i);
                 String registrationId = registrationIds.get(i);
 
+                boolean success = true;
                 if (result.getMessageId() != null) {
                     String canonicalRegistrationId = result.getCanonicalRegistrationId();
                     if (canonicalRegistrationId != null) {
-                        handleCanonicalRegistrationId(registrationId, result);
+                        handleCanonicalRegistrationId(registrationId, devices.get(registrationId), result);
+                        success = false;
                     }
                 } else {
                     String errorCodeName = result.getErrorCodeName();
                     if (errorCodeName.equals(Constants.ERROR_NOT_REGISTERED)) {
-                        handleNotRegisteredError(registrationId, result);
+                        handleNotRegisteredError(registrationId, devices.get(registrationId), result);
+                        success = false;
                     }
+                }
+                if (success) {
+                    log.info(String.format("Notification successfully sent: user=%s registration=%s",
+                             devices.get(registrationId), registrationId));
                 }
             }
         } catch (IOException e) {
@@ -77,7 +109,8 @@ public class NotificationController {
         }
     }
 
-    private void handleNotRegisteredError(String registrationId, Result result) throws RequestException {
+    private void handleNotRegisteredError(String registrationId, String userEmail, Result result) throws RequestException {
+        log.warn(String.format("Could not send notification: DeviceNotRegistered: user=%s registration=%s", userEmail, registrationId));
         String sql = "UPDATE devices SET gcm_registration_id = NULL WHERE gcm_registration_id = ?";
         try (SqlStmt stmt = DB.prepare(sql)) {
             stmt.setString(1, registrationId);
@@ -87,7 +120,8 @@ public class NotificationController {
         }
     }
 
-    private void handleCanonicalRegistrationId(String registrationId, Result result) throws RequestException {
+    private void handleCanonicalRegistrationId(String registrationId, String userEmail, Result result) throws RequestException {
+        log.info(String.format("Notification registration changed: user=%s registration=%s", userEmail, result.getCanonicalRegistrationId()));
         String sql = "UPDATE devices SET gcm_registration_id = ? WHERE gcm_registration_id = ?";
         try (SqlStmt stmt = DB.prepare(sql)) {
             stmt.setString(1, result.getCanonicalRegistrationId());

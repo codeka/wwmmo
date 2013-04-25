@@ -9,8 +9,10 @@ import org.slf4j.LoggerFactory;
 import au.com.codeka.common.model.BaseFleet;
 import au.com.codeka.common.model.BaseStar;
 import au.com.codeka.common.model.Simulation;
+import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.server.Event;
 import au.com.codeka.warworlds.server.RequestException;
+import au.com.codeka.warworlds.server.ctrl.SituationReportController;
 import au.com.codeka.warworlds.server.ctrl.StarController;
 import au.com.codeka.warworlds.server.data.DB;
 import au.com.codeka.warworlds.server.data.SqlStmt;
@@ -62,8 +64,9 @@ public class FleetMoveCompleteEvent extends Event {
         sim.simulate(destStar);
 
         // remove the fleet from the source star and add it to the dest star
+        Fleet fleet = null;
         for (BaseFleet baseFleet : srcStar.getFleets()) {
-            Fleet fleet = (Fleet) baseFleet;
+            fleet = (Fleet) baseFleet;
             if (fleet.getID() == fleetID) {
                 srcStar.getFleets().remove(fleet);
                 destStar.getFleets().add(fleet);
@@ -73,7 +76,22 @@ public class FleetMoveCompleteEvent extends Event {
             }
         }
 
+        Messages.SituationReport.Builder sitrep_pb = Messages.SituationReport.newBuilder();
+        sitrep_pb.setEmpireKey(fleet.getEmpireKey());
+        sitrep_pb.setReportTime(DateTime.now().getMillis() / 1000);
+        sitrep_pb.setStarKey(destStar.getKey());
+        sitrep_pb.setPlanetIndex(-1);
+        Messages.SituationReport.MoveCompleteRecord.Builder move_complete_pb = Messages.SituationReport.MoveCompleteRecord.newBuilder();
+        move_complete_pb.setFleetKey(fleet.getKey());
+        move_complete_pb.setFleetDesignId(fleet.getDesignID());
+        move_complete_pb.setNumShips(fleet.getNumShips());
+        //move_complete_pb.setScoutReportKey(...);
+        sitrep_pb.setMoveCompleteRecord(move_complete_pb);
+        //TODO: combat
+
         new StarController().update(srcStar);
         new StarController().update(destStar);
+
+        new SituationReportController().saveSituationReport(sitrep_pb.build());
     }
 }

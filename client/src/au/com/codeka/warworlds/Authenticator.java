@@ -42,9 +42,7 @@ public class Authenticator {
     }
 
     public static void configure(Context context) {
-        if (sAccountManager == null) {
-            sAccountManager = AccountManager.get(context);
-        }
+        sAccountManager = AccountManager.get(context);
 
         SharedPreferences prefs = Util.getSharedPreferences(context);
         final String accountName = prefs.getString("AccountName", null);

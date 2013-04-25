@@ -7,12 +7,11 @@ import au.com.codeka.warworlds.server.data.DB;
 import au.com.codeka.warworlds.server.data.SqlStmt;
 import au.com.codeka.warworlds.server.data.Transaction;
 import au.com.codeka.warworlds.server.model.BuildRequest;
-import au.com.codeka.warworlds.server.model.Star;
 
 public class BuildQueueController {
     public void build(BuildRequest buildRequest) throws RequestException {
         try (Transaction t = DB.beginTransaction()) {
-            Star star = new StarController(t).getStar(buildRequest.getStarID());
+            //Star star = new StarController(t).getStar(buildRequest.getStarID());
 
             // TODO: check dependencies
             // TODO: check build limits
