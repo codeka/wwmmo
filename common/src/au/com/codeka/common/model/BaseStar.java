@@ -300,6 +300,14 @@ public abstract class BaseStar {
                 buildRequest.toProtocolBuffer(build_request_pb);
                 pb.addBuildRequests(build_request_pb);
             }
+
+            if (mColonies != null) for (BaseColony colony : mColonies) {
+                for (BaseBuilding building : colony.getBuildings()) {
+                    Messages.Building.Builder building_pb = Messages.Building.newBuilder();
+                    building.toProtocolBuffer(building_pb);
+                    pb.addBuildings(building_pb);
+                }
+            }
         }
     }
 

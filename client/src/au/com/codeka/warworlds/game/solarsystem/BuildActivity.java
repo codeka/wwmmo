@@ -195,7 +195,7 @@ public class BuildActivity extends BaseActivity implements StarManager.StarFetch
 
                 boolean dependencyMet = false;
                 for (BaseBuilding b : colony.getBuildings()) {
-                    if (b.getDesignName().equals(dep.getDesignID())) {
+                    if (b.getDesignID().equals(dep.getDesignID())) {
                         // TODO: check level
                         dependencyMet = true;
                     }

@@ -8,7 +8,8 @@ import au.com.codeka.common.protobuf.Messages;
 public class BaseBuilding {
     protected String mKey;
     protected String mColonyKey;
-    protected String mDesignName;
+    protected String mEmpireKey;
+    protected String mDesignID;
     protected int mLevel;
 
     public String getKey() {
@@ -17,8 +18,8 @@ public class BaseBuilding {
     public String getColonyKey() {
         return mColonyKey;
     }
-    public String getDesignName() {
-        return mDesignName;
+    public String getDesignID() {
+        return mDesignID;
     }
     public int getLevel() {
         return mLevel;
@@ -27,7 +28,14 @@ public class BaseBuilding {
     public void fromProtocolBuffer(Messages.Building pb) {
         mKey = pb.getKey();
         mColonyKey = pb.getColonyKey();
-        mDesignName = pb.getDesignName();
+        mDesignID = pb.getDesignName();
         mLevel = pb.getLevel();
+    }
+
+    public void toProtocolBuffer(Messages.Building.Builder pb) {
+        pb.setKey(mKey);
+        pb.setColonyKey(mColonyKey);
+        pb.setDesignName(mDesignID);
+        pb.setLevel(mLevel);
     }
 }

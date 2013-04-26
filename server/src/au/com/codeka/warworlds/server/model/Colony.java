@@ -2,9 +2,11 @@ package au.com.codeka.warworlds.server.model;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 
 import org.joda.time.DateTime;
 
+import au.com.codeka.common.model.BaseBuilding;
 import au.com.codeka.common.model.BaseColony;
 
 public class Colony extends BaseColony {
@@ -33,6 +35,7 @@ public class Colony extends BaseColony {
         mUncollectedTaxes = rs.getFloat("uncollected_taxes");
         mCooldownTimeEnd = new DateTime(rs.getTimestamp("cooldown_end_time").getTime());
         mPopulation = rs.getFloat("population");
+        mBuildings = new ArrayList<BaseBuilding>();
     }
     public Colony(int id, int sectorID, int starID, int planetIndex, Integer empireID) {
         mID = id;

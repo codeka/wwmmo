@@ -39,7 +39,7 @@ public class FleetController {
         }
 
         public void createFleet(Fleet fleet) throws Exception {
-            String sql = "INSERT INTO fleets (sector_id, star_id, design_name, empire_id," +
+            String sql = "INSERT INTO fleets (sector_id, star_id, design_id, empire_id," +
                     " num_ships, stance, state, state_start_time)" +
                  " VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
             SqlStmt stmt = prepare(sql, Statement.RETURN_GENERATED_KEYS);

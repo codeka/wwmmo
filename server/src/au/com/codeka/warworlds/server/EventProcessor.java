@@ -7,7 +7,7 @@ import org.joda.time.Seconds;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import au.com.codeka.warworlds.server.events.FleetMoveCompleteEvent;
+import au.com.codeka.warworlds.server.events.*;
 
 /**
  * The \c EventProcessor looks at all events scheduled for the future (e.g. fleet arrives at
@@ -22,6 +22,7 @@ public class EventProcessor {
     static {
         sEventClasses = new ArrayList<Class<?>>();
         sEventClasses.add(FleetMoveCompleteEvent.class);
+        sEventClasses.add(BuildCompleteEvent.class);
     }
 
     private Thread mThread;

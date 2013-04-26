@@ -24,7 +24,7 @@ public class Fleet extends BaseFleet {
         mStarID = rs.getInt("star_id");
         mStarKey = Integer.toString(mStarID);
         mSectorID = rs.getInt("sector_id");
-        mDesignID = rs.getString("design_name");
+        mDesignID = rs.getString("design_id");
         mEmpireID = rs.getInt("empire_id");
         if (!rs.wasNull()) {
             mEmpireKey = Integer.toString(mEmpireID);

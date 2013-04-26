@@ -20,6 +20,7 @@ import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.data.SqlStmt;
 import au.com.codeka.warworlds.server.data.Transaction;
 import au.com.codeka.warworlds.server.model.BuildRequest;
+import au.com.codeka.warworlds.server.model.Building;
 import au.com.codeka.warworlds.server.model.Colony;
 import au.com.codeka.warworlds.server.model.EmpirePresence;
 import au.com.codeka.warworlds.server.model.Fleet;
@@ -95,6 +96,7 @@ public class StarController {
                 populateColonies(stars, inClause);
                 populateFleets(stars, inClause);
                 populateBuildRequests(stars, inClause);
+                populateBuildings(stars, inClause);
                 checkNativeColonies(stars);
                 return stars;
             } catch(Exception e) {
@@ -213,7 +215,7 @@ public class StarController {
                 return;
             }
 
-            sql = "INSERT INTO fleets (star_id, sector_id, design_name, empire_id, num_ships," +
+            sql = "INSERT INTO fleets (star_id, sector_id, design_id, empire_id, num_ships," +
                                      " stance, state, state_start_time, eta, target_star_id," +
                                      " target_fleet_id, time_destroyed)" +
                  " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
@@ -338,6 +340,25 @@ public class StarController {
                 for (Star star : stars) {
                     if (star.getID() == buildRequest.getStarID()) {
                         star.getBuildRequests().add(buildRequest);
+                    }
+                }
+            }
+        }
+
+        private void populateBuildings(List<Star> stars, String inClause) throws Exception {
+            String sql = "SELECT * FROM buildings WHERE star_id IN "+inClause;
+            SqlStmt stmt = prepare(sql);
+            ResultSet rs = stmt.select();
+
+            while (rs.next()) {
+                Building building = new Building(rs);
+
+                for (Star star : stars) {
+                    for (BaseColony baseColony : star.getColonies()) {
+                        Colony colony = (Colony) baseColony;
+                        if (colony.getID() == building.getColonyID()) {
+                            colony.getBuildings().add(building);
+                        }
                     }
                 }
             }
