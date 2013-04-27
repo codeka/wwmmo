@@ -12,7 +12,7 @@ import au.com.codeka.common.model.DesignKind;
  */
 public class Building extends BaseBuilding implements Parcelable {
     public BuildingDesign getDesign() {
-        return (BuildingDesign) BaseDesignManager.i.getDesign(DesignKind.BUILDING, mDesignName);
+        return (BuildingDesign) BaseDesignManager.i.getDesign(DesignKind.BUILDING, mDesignID);
     }
 
     @Override
@@ -24,7 +24,7 @@ public class Building extends BaseBuilding implements Parcelable {
     public void writeToParcel(Parcel parcel, int flags) {
         parcel.writeString(mKey);
         parcel.writeString(mColonyKey);
-        parcel.writeString(mDesignName);
+        parcel.writeString(mDesignID);
         parcel.writeInt(mLevel);
     }
 
@@ -35,7 +35,7 @@ public class Building extends BaseBuilding implements Parcelable {
             Building b = new Building();
             b.mKey = parcel.readString();
             b.mColonyKey = parcel.readString();
-            b.mDesignName = parcel.readString();
+            b.mDesignID = parcel.readString();
             b.mLevel = parcel.readInt();
             return b;
         }

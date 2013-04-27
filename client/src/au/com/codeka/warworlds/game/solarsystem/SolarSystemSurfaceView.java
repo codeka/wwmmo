@@ -146,7 +146,7 @@ public class SolarSystemSurfaceView extends UniverseElementSurfaceView {
                         planetInfo.hasColony = true;
 
                         for (BaseBuilding building : colony.getBuildings()) {
-                            if (building.getDesignName().equals("hq")) {
+                            if (building.getDesignID().equals("hq")) {
                                 planetInfo.hasHQ = true;
                             }
                         }

@@ -30,7 +30,7 @@ public class StarSimulateHandler extends RequestHandler {
         try {
             printWriter = getResponse().getWriter();
         } catch (IOException e) {
-            throw new RequestException(500, e);
+            throw new RequestException(e);
         }
         final PrintWriter outw = printWriter;
 

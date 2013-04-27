@@ -22,12 +22,12 @@ public class RealmManager {
         mRealms = new ArrayList<Realm>();
         try {
             if (Util.isDebug()) {
-                mRealms.add(new Realm("http://192.168.1.4:8271/api/v1/", "Debug Alpha", Realm.AuthenticationMethod.LocalAppEngine));
-                mRealms.add(new Realm("http://192.168.1.4:8080/realms/beta/", "Debug Beta", Realm.AuthenticationMethod.Default));
+                mRealms.add(new Realm("http://192.168.1.4:8271/api/v1/", "Debug Alpha", Realm.AuthenticationMethod.LocalAppEngine, true));
+                mRealms.add(new Realm("http://192.168.1.4:8080/realms/beta/", "Debug Beta", Realm.AuthenticationMethod.Default, false));
             }
-            mRealms.add(new Realm("https://warworldsmmo.appspot.com/api/v1/", "Alpha", Realm.AuthenticationMethod.AppEngine));
+            mRealms.add(new Realm("https://warworldsmmo.appspot.com/api/v1/", "Alpha", Realm.AuthenticationMethod.AppEngine, true));
             if (Util.isDebug()) {
-                mRealms.add(new Realm("http://backend.war-worlds.com/realms/beta/", "Beta", Realm.AuthenticationMethod.Default));
+                mRealms.add(new Realm("http://backend.war-worlds.com/realms/beta/", "Beta", Realm.AuthenticationMethod.Default, false));
             }
         } catch(URISyntaxException e) {
             // should never happen

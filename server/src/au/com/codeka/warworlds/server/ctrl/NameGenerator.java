@@ -6,25 +6,33 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 import java.util.TreeMap;
 
+import org.apache.commons.lang3.text.WordUtils;
+
 public class NameGenerator {
     private static ArrayList<Vocabulary> sVocabularies;
-    static {
-        String path = System.getProperty("au.com.codeka.warworlds.server.basePath");
-        if (path == null) {
-            path = NameGenerator.class.getClassLoader().getResource("").getPath();
-        }
-        path += "../data/vocab";
-        File rootPath = new File(path);
 
-        sVocabularies = new ArrayList<Vocabulary>();
-        for (File vocabFile : rootPath.listFiles()) {
+    public static void setup(String basePath) {
+        File path = new File(basePath + "../data/vocab");
+
+        ArrayList<String> files = new ArrayList<String>();
+        for (File vocabFile : path.listFiles()) {
             if (vocabFile.isDirectory()) {
                 continue;
             }
-            sVocabularies.add(parseVocabularyFile(vocabFile.getAbsolutePath()));
+            files.add(vocabFile.getAbsolutePath());
+        }
+
+        loadVocabularies(files);
+    }
+
+    public static void loadVocabularies(List<String> files) {
+        sVocabularies = new ArrayList<Vocabulary>();
+        for (String file : files) {
+            sVocabularies.add(parseVocabularyFile(file));
         }
     }
 
@@ -43,7 +51,11 @@ public class NameGenerator {
             }
         }
 
-        return word.toString();
+        if (word.length() > 10) {
+            return generate(rand);
+        }
+
+        return WordUtils.capitalize(word.toString().toLowerCase());
     }
 
     private static Vocabulary parseVocabularyFile(String path) {
@@ -54,7 +66,8 @@ public class NameGenerator {
             Vocabulary vocab = new Vocabulary();
             String line;
             while ((line = ins.readLine()) != null) {
-                for (String word : line.split("[ \t]+")) {
+                for (String word : line.split("[^a-zA-Z]+")) {
+                    word = word.trim();
                     String lastLetters = "  ";
                     for (int i = 0; i < word.length(); i++) {
                         char letter = word.charAt(i);
@@ -103,6 +116,9 @@ public class NameGenerator {
 
         public char getLetter(String lastLetters, Random rand) {
             TreeMap<Character, Integer> frequencies = mLetterFrequencies.get(lastLetters);
+            if (frequencies == null) {
+                throw new RuntimeException("No frequencies for letters: '"+lastLetters+"'");
+            }
             int maxFrequency = 0;
             for (int frequency : frequencies.values()) {
                 maxFrequency += frequency;

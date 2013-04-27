@@ -18,9 +18,28 @@ public class RequestException extends Exception {
         mHttpErrorCode = httpErrorCode;
     }
 
-    public RequestException(int httpErrorCode, Throwable innerException) {
-        super(String.format("HTTP Error: %d", httpErrorCode), innerException);
+    public RequestException(int httpErrorCode, String message) {
+        super(String.format(message, httpErrorCode));
         mHttpErrorCode = httpErrorCode;
+    }
+
+    public RequestException(int httpErrorCode, String message, Throwable innerException) {
+        super(String.format(message, httpErrorCode), innerException);
+        mHttpErrorCode = httpErrorCode;
+    }
+
+    public RequestException(Throwable innerException) {
+        super((innerException instanceof RequestException) 
+                ? "HTTP Error: "+((RequestException) innerException).mHttpErrorCode
+                : "HTTP Error: 500", innerException);
+
+        if (innerException instanceof RequestException) {
+            RequestException innerRequestException = (RequestException) innerException;
+            mHttpErrorCode = innerRequestException.mHttpErrorCode;
+            mGenericError = innerRequestException.mGenericError;
+        } else {
+            mHttpErrorCode = 500;
+        }
     }
 
     public RequestException(int httpErrorCode, Messages.GenericError.ErrorCode errorCode, String errorMsg) {

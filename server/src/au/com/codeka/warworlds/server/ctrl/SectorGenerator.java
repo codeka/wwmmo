@@ -108,7 +108,7 @@ public class SectorGenerator {
 
             return sector;
         } catch (Exception e) {
-            throw new RequestException(500, e);
+            throw new RequestException(e);
         }
     }
 
@@ -146,7 +146,7 @@ public class SectorGenerator {
 
             return star;
         } catch(Exception e) {
-            throw new RequestException(500, e);
+            throw new RequestException(e);
         }
     }
 

@@ -75,7 +75,7 @@ public class RequestHandler {
                 throw new RequestException(501);
             }
         } catch(RequestException e) {
-            log.error("Unhandled error!", e);
+            log.error("Unhandled error in URL: "+request.getRequestURI(), e);
             e.populate(mResponse);
             setResponseBody(e.getGenericError());
             return;
@@ -156,25 +156,26 @@ public class RequestHandler {
 
     protected Session getSession(boolean errorOnNotAuth) throws RequestException {
         if (mSession == null) {
+            String sessionCookieValue = "";
             for (Cookie cookie : mRequest.getCookies()) {
                 if (cookie.getName().equals("SESSION")) {
-                    String cookieValue = cookie.getValue();
+                    sessionCookieValue = cookie.getValue();
 
                     // TODO: cache these!
                     try (SqlStmt stmt = DB.prepare("SELECT * FROM sessions WHERE session_cookie=?")) {
-                        stmt.setString(1, cookieValue);
+                        stmt.setString(1, sessionCookieValue);
                         ResultSet rs = stmt.select();
                         if (rs.next()) {
                             mSession = new Session(rs);
                         }
                     } catch (Exception e) {
-                        throw new RequestException(500, e);
+                        throw new RequestException(e);
                     }
                 }
             }
 
             if (mSession == null && errorOnNotAuth) {
-                throw new RequestException(403);
+                throw new RequestException(403, "Could not find session, session cookie: "+sessionCookieValue);
             }
         }
 

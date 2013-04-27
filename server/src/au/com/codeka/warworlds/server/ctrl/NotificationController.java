@@ -66,7 +66,7 @@ public class NotificationController {
                 devices.put(rs.getString(1), rs.getString(2));
             }
         } catch(Exception e) {
-            throw new RequestException(500, e);
+            throw new RequestException(e);
         }
 
         sendNotification(msgBuilder.build(), devices);
@@ -105,7 +105,7 @@ public class NotificationController {
                 }
             }
         } catch (IOException e) {
-            throw new RequestException(500, e);
+            throw new RequestException(e);
         }
     }
 
@@ -116,7 +116,7 @@ public class NotificationController {
             stmt.setString(1, registrationId);
             stmt.update();
         } catch(Exception e) {
-            throw new RequestException(500, e);
+            throw new RequestException(e);
         }
     }
 
@@ -128,7 +128,7 @@ public class NotificationController {
             stmt.setString(2, registrationId);
             stmt.update();
         } catch(Exception e) {
-            throw new RequestException(500, e);
+            throw new RequestException(e);
         }
     }
 }

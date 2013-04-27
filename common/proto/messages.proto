@@ -42,6 +42,8 @@ message GenericError
         CannotOrderFleetNotIdle = 12;
         CannotMergeFleetDifferentDesign = 13;
         CannotCollectTaxesAlreadyInProgress = 14;
+        CannotColonizePlanetAlreadyHasColony = 16;
+        CannotColonizePlanetNoColonyShips = 17;
     }
 }
 

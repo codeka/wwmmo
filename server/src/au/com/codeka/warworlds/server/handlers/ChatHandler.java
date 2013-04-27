@@ -52,7 +52,7 @@ public class ChatHandler extends RequestHandler {
 
             setResponseBody(chat_msgs_pb.build());
         } catch(Exception e) {
-            throw new RequestException(500, e);
+            throw new RequestException(e);
         }
     }
 
@@ -83,7 +83,7 @@ public class ChatHandler extends RequestHandler {
             stmt.setDateTime(4, now);
             stmt.update();
         } catch(Exception e) {
-            throw new RequestException(500, e);
+            throw new RequestException(e);
         }
 
         new NotificationController().sendNotification(

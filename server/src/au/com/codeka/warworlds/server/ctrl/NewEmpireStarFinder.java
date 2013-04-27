@@ -194,7 +194,7 @@ public class NewEmpireStarFinder {
                 }
             }
         } catch(Exception e) {
-            throw new RequestException(500, e);
+            throw new RequestException(e);
         }
         if (!ids.isEmpty()) {
             return ids;
@@ -212,7 +212,7 @@ public class NewEmpireStarFinder {
                 }
             }
         } catch(Exception e) {
-            throw new RequestException(500, e);
+            throw new RequestException(e);
         }
         if (!ids.isEmpty()) {
             return ids;

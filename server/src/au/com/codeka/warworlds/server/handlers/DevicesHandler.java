@@ -25,7 +25,7 @@ public class DevicesHandler extends RequestHandler {
         } catch (RequestException e) {
             throw e;
         } catch (Exception e) {
-            throw new RequestException(500, e);
+            throw new RequestException(e);
         }
 
         String stmt;
@@ -54,7 +54,7 @@ public class DevicesHandler extends RequestHandler {
                                     .setKey(id.toString())
                                     .build());
         } catch (Exception e) {
-            throw new RequestException(500, e);
+            throw new RequestException(e);
         }
     }
 
@@ -76,7 +76,7 @@ public class DevicesHandler extends RequestHandler {
                 sql.setString(3, getSession().getEmail());
                 sql.update();
             } catch (Exception e) {
-                throw new RequestException(500, e);
+                throw new RequestException(e);
             }
         } else {
             Messages.DeviceRegistration device_registration_pb = getRequestBody(Messages.DeviceRegistration.class);
@@ -87,7 +87,7 @@ public class DevicesHandler extends RequestHandler {
                 sql.setString(3, getSession().getEmail());
                 sql.update();
             } catch (Exception e) {
-                throw new RequestException(500, e);
+                throw new RequestException(e);
             }
         }
     }
@@ -101,7 +101,7 @@ public class DevicesHandler extends RequestHandler {
             sql.setString(2, getSession().getEmail());
             sql.update();
         } catch (Exception e) {
-            throw new RequestException(500, e);
+            throw new RequestException(e);
         }
     }
 }

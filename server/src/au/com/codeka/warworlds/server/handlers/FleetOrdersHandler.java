@@ -108,7 +108,7 @@ public class FleetOrdersHandler extends RequestHandler {
                     stmt.setInt(1, otherFleet.getID());
                     stmt.update();
                 } catch (Exception e) {
-                    throw new RequestException(500, e);
+                    throw new RequestException(e);
                 }
             }
         }

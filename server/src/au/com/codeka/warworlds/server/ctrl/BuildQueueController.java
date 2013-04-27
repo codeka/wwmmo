@@ -45,7 +45,7 @@ public class BuildQueueController {
 
             t.commit();
         } catch(Exception e) {
-            throw new RequestException(500, e);
+            throw new RequestException(e);
         }
     }
 }

@@ -2,6 +2,7 @@ package au.com.codeka.warworlds.server;
 
 import org.eclipse.jetty.server.Server;
 
+import au.com.codeka.warworlds.server.ctrl.NameGenerator;
 import au.com.codeka.warworlds.server.handlers.pages.HtmlPageHandler;
 import au.com.codeka.warworlds.server.model.DesignManager;
 
@@ -13,6 +14,7 @@ public class Runner {
         }
 
         DesignManager.setup(basePath);
+        NameGenerator.setup(basePath);
 
         // kick off the event processor thread
         EventProcessor.i.ping();

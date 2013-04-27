@@ -92,6 +92,11 @@ public class BackgroundDetector {
             return;
         }
 
+        if (!ServerGreeter.isHelloComplete()) {
+            // if we haven't said 'hello' to the server yet, no point continuing.
+            return;
+        }
+
         new BackgroundRunner<Void>() {
             @Override
             protected Void doInBackground() {

@@ -100,7 +100,7 @@ public class StarController {
                 checkNativeColonies(stars);
                 return stars;
             } catch(Exception e) {
-                throw new RequestException(500, e);
+                throw new RequestException(e);
             }
         }
 
@@ -118,7 +118,7 @@ public class StarController {
                 updateFleets(star);
                 updateBuildRequests(star);
             } catch(Exception e) {
-                throw new RequestException(500, e);
+                throw new RequestException(e);
             }
         }
 
@@ -135,7 +135,7 @@ public class StarController {
                     stmt.update();
                 }
             } catch(Exception e) {
-               throw new RequestException(500, e);
+               throw new RequestException(e);
             }
         }
 
@@ -160,7 +160,7 @@ public class StarController {
                     stmt.update();
                 }
             } catch(Exception e) {
-                throw new RequestException(500, e);
+                throw new RequestException(e);
             }
         }
 
@@ -208,7 +208,7 @@ public class StarController {
                     stmt.update();
                 }
             } catch(Exception e) {
-                throw new RequestException(500, e);
+                throw new RequestException(e);
             }
 
             if (!needInsert) {
@@ -254,7 +254,7 @@ public class StarController {
                 }
 
             } catch(Exception e) {
-                throw new RequestException(500, e);
+                throw new RequestException(e);
             }
         }
 
@@ -269,7 +269,7 @@ public class StarController {
                     stmt.update();
                 }
             } catch(Exception e) {
-                throw new RequestException(500, e);
+                throw new RequestException(e);
             }
         }
 

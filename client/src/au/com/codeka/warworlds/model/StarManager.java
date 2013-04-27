@@ -262,9 +262,9 @@ public class StarManager {
                               star.getFleets() == null ? 0 : star.getFleets().size()));
                 }
 
-                if (star.getLastSimulation() != null &&
-                        star.getLastSimulation().plusMinutes(2).compareTo(DateTime.now(DateTimeZone.UTC)) < 0) {
-                    // if it hasn't been simulated in the last two minutes, do it now
+                if (!RealmManager.i.getRealm().isAlpha()) {
+                    // the alpha realm will have already simulated the star, but other realms
+                    // will need to simulate first.
                     Simulation sim = new Simulation();
                     sim.simulate(star);
                 }

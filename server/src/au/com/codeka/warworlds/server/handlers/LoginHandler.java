@@ -50,7 +50,7 @@ public class LoginHandler extends RequestHandler {
         try {
             url = new URL("https://www.googleapis.com/oauth2/v1/userinfo?access_token="+authToken);
         } catch (MalformedURLException e) {
-            throw new RequestException(500, e); // should never happen
+            throw new RequestException(e); // should never happen
         }
 
         JSONObject json;
@@ -65,9 +65,9 @@ public class LoginHandler extends RequestHandler {
             json = (JSONObject) JSONValue.parse(isr);
         } catch (IOException e) {
             if (e.getMessage().indexOf("401") >= 0) {
-                throw new RequestException(403, e);
+                throw new RequestException(403, "Error requesting user info, token expired?", e);
             }
-            throw new RequestException(500, e);
+            throw new RequestException(e);
         }
 
         if (!json.containsKey("email")) {
@@ -80,7 +80,7 @@ public class LoginHandler extends RequestHandler {
         try {
             getResponse().getWriter().write(cookie);
         } catch (IOException e) {
-            throw new RequestException(500, e);
+            throw new RequestException(e);
         }
     }
 
@@ -122,7 +122,7 @@ public class LoginHandler extends RequestHandler {
                 empireID = rs.getInt(1);
             }
         } catch (Exception e) {
-            throw new RequestException(500, e);
+            throw new RequestException(e);
         }
 
         String sql = "INSERT INTO sessions (session_cookie, user_email, login_time, empire_id," +
@@ -145,7 +145,7 @@ public class LoginHandler extends RequestHandler {
             stmt.setInt(6, isAdmin ? 1 : 0);
             stmt.update();
         } catch (Exception e) {
-            throw new RequestException(500, e);
+            throw new RequestException(e);
         }
 
         log.info(String.format(Locale.ENGLISH, "Authenticated: email=%s cookie=%s", emailAddr, cookie));

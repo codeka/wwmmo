@@ -29,7 +29,7 @@ public class SituationReportController {
             String base64 = Base64.encodeBytes(sitrep_pb.toByteArray());
             new NotificationController().sendNotification(empireID, "sitrep", base64);
         } catch (SQLException e) {
-            throw new RequestException(500, e);
+            throw new RequestException(e);
         }
     }
 

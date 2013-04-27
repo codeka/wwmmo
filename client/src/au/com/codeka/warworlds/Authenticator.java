@@ -64,8 +64,10 @@ public class Authenticator {
             public void onResponseReceived(BasicHttpRequest request,
                                            BasicHttpResponse response)
                     throws RequestRetryException {
-                // if we get a 403, it means we need to re-authenticate, so do that
-                if (response.getStatusLine().getStatusCode() == 403) {
+                // if we get a 403 (and not on a 'login' URL), it means we need to re-authenticate,
+                // so do that
+                if (response.getStatusLine().getStatusCode() == 403 &&
+                    request.getRequestLine().getUri().indexOf("login") < 0) {
                     dump(request);
                     dump(response);
 
@@ -104,7 +106,7 @@ public class Authenticator {
      * 
      * @param activity
      * @param accountName
-     * @return The authCookie we can use in subsequent calls to App Engine.
+     * @return The authCookie we can use in subsequent calls to the server.
      */
     public static String authenticate(Activity activity, String accountName) {
         Realm realm = RealmManager.i.getRealm();
@@ -119,15 +121,9 @@ public class Authenticator {
 
                     final String scope = "oauth2:https://www.googleapis.com/auth/userinfo.email";
                     String authToken = getAuthToken(account, activity, scope);
-                    String authCookie = DefaultAuthenticator.authenticate(authToken);
-                    if (authCookie == null) {
-                        log.info("Marking authToken invalid and trying again...");
-                        sAccountManager.invalidateAuthToken(account.type, authToken);
-                        authToken = getAuthToken(account, activity, scope);
-                        authCookie = DefaultAuthenticator.authenticate(authToken);
-                    }
-
-                    return authCookie;
+                    sAccountManager.invalidateAuthToken(account.type, authToken);
+                    authToken = getAuthToken(account, activity, scope);
+                    return DefaultAuthenticator.authenticate(authToken);
                 } else if (realm.getAuthentciationMethod() == Realm.AuthenticationMethod.LocalAppEngine) {
                     log.info("Account found, setting up with debug auth cookie.");
                     // Use a fake cookie for the dev mode app engine server. The cookie has the
@@ -139,14 +135,9 @@ public class Authenticator {
                     // Get the auth token from the AccountManager and convert it into a cookie 
                     // that's usable by App Engine
                     String authToken = getAuthToken(account, activity, "ah");
-                    String authCookie = AppEngineAuthenticator.authenticate(authToken);
-                    if (authCookie == null) {
-                        sAccountManager.invalidateAuthToken(account.type, authToken);
-                        authToken = getAuthToken(account, activity, "ah");
-                        authCookie = AppEngineAuthenticator.authenticate(authToken);
-                    }
-
-                    return authCookie;
+                    sAccountManager.invalidateAuthToken(account.type, authToken);
+                    authToken = getAuthToken(account, activity, "ah");
+                    return AppEngineAuthenticator.authenticate(authToken);
                 }
             }
         }

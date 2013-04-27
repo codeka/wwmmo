@@ -61,6 +61,10 @@ public class ServerGreeter {
         mServerGreeting = new ServerGreeting();
     }
 
+    public static boolean isHelloComplete() {
+        return mHelloComplete;
+    }
+
     public static void waitForHello(BaseActivity activity, HelloCompleteHandler handler) {
         if (mHelloComplete) {
             log.debug("Already said 'hello', not saying it again...");

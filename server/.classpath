@@ -35,5 +35,9 @@
 	<classpathentry kind="lib" path="libs/JOpenId-1.08.jar" sourcepath="libs-sources/JOpenId-1.08-sources.jar"/>
 	<classpathentry kind="lib" path="libs/gcm-server.jar"/>
 	<classpathentry kind="lib" path="libs/json_simple-1.1.jar"/>
+	<classpathentry kind="lib" path="/common/libs/commons-codec-1.4.jar"/>
+	<classpathentry kind="lib" path="/common/libs/commons-collections-3.2.1.jar"/>
+	<classpathentry kind="lib" path="/common/libs/commons-io-2.1.jar"/>
+	<classpathentry kind="lib" path="/common/libs/commons-lang3-3.1.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

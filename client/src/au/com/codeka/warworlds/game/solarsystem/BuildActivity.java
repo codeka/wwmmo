@@ -376,8 +376,8 @@ public class BuildActivity extends BaseActivity implements StarManager.StarFetch
                 Collections.sort(mEntries, new Comparator<Entry>() {
                     @Override
                     public int compare(Entry lhs, Entry rhs) {
-                        String a = (lhs.building != null ? lhs.building.getDesignName() : lhs.buildRequest.getDesignID());
-                        String b = (rhs.building != null ? rhs.building.getDesignName() : rhs.buildRequest.getDesignID());
+                        String a = (lhs.building != null ? lhs.building.getDesignID() : lhs.buildRequest.getDesignID());
+                        String b = (rhs.building != null ? rhs.building.getDesignID() : rhs.buildRequest.getDesignID());
                         return a.compareTo(b);
                     }
                 });
@@ -396,7 +396,7 @@ public class BuildActivity extends BaseActivity implements StarManager.StarFetch
                         int numExisting = 0;
                         for (Entry e : mEntries) {
                             if (e.building != null) {
-                                if (e.building.getDesignName().equals(bd.getID())) {
+                                if (e.building.getDesignID().equals(bd.getID())) {
                                     numExisting ++;
                                 }
                             } else if (e.buildRequest != null) {
@@ -521,7 +521,7 @@ public class BuildActivity extends BaseActivity implements StarManager.StarFetch
                     Building building = entry.building;
                     BuildRequest buildRequest = entry.buildRequest;
                     BuildingDesign design = (BuildingDesign) DesignManager.i.getDesign(DesignKind.BUILDING,
-                            (building != null ? building.getDesignName() : buildRequest.getDesignID()));
+                            (building != null ? building.getDesignID() : buildRequest.getDesignID()));
 
                     icon.setImageDrawable(new SpriteDrawable(SpriteManager.i.getSprite(design.getSpriteName())));
 

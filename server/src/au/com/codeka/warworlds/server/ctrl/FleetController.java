@@ -26,7 +26,32 @@ public class FleetController {
             star.getFleets().add(fleet);
             return fleet;
         } catch(Exception e) {
-            throw new RequestException(500, e);
+            throw new RequestException(e);
+        }
+    }
+
+    /**
+     * Removes the given number of ships from the given fleet. Possibly removes the whole fleet
+     * if there's not enough ships left.
+     */
+    public void removeShips(Fleet fleet, float numShips) throws RequestException {
+        if (fleet.getNumShips() <= numShips) {
+            String sql = "DELETE FROM fleets WHERE id = ?";
+            try (SqlStmt stmt = db.prepare(sql)) {
+                stmt.setInt(1, fleet.getID());
+                stmt.update();
+            } catch(Exception e) {
+                throw new RequestException(e);
+            }
+        } else {
+            String sql = "UPDATE fleets SET num_ships = num_ships - ? WHERE id = ?";
+            try (SqlStmt stmt = db.prepare(sql)) {
+                stmt.setDouble(1, numShips);
+                stmt.setInt(2, fleet.getID());
+                stmt.update();
+            } catch(Exception e) {
+                throw new RequestException(e);
+            }
         }
     }
 

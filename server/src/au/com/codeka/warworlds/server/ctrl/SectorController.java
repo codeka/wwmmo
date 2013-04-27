@@ -132,7 +132,7 @@ public class SectorController {
                 }
                 return sectors;
             } catch(Exception e) {
-                throw new RequestException(500, e);
+                throw new RequestException(e);
             }
         }
 
@@ -153,7 +153,7 @@ public class SectorController {
                 }
                 return stars;
             } catch(Exception e) {
-                throw new RequestException(500, e);
+                throw new RequestException(e);
             }
         }
 
@@ -170,7 +170,7 @@ public class SectorController {
                  }
                  return colonies;
              } catch(Exception e) {
-                 throw new RequestException(500, e);
+                 throw new RequestException(e);
              }
         }
 
@@ -187,7 +187,7 @@ public class SectorController {
                  }
                  return fleets;
              } catch(Exception e) {
-                 throw new RequestException(500, e);
+                 throw new RequestException(e);
              }
         }
 
