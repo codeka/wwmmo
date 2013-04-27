@@ -62024,6 +62024,53 @@ public final class Messages {
      * <code>optional float move_distance = 11;</code>
      */
     float getMoveDistance();
+
+    // optional string build_design_id = 12;
+    /**
+     * <code>optional string build_design_id = 12;</code>
+     *
+     * <pre>
+     * these will be filled out if it's a "BuildAccelerate" operation
+     * </pre>
+     */
+    boolean hasBuildDesignId();
+    /**
+     * <code>optional string build_design_id = 12;</code>
+     *
+     * <pre>
+     * these will be filled out if it's a "BuildAccelerate" operation
+     * </pre>
+     */
+    java.lang.String getBuildDesignId();
+    /**
+     * <code>optional string build_design_id = 12;</code>
+     *
+     * <pre>
+     * these will be filled out if it's a "BuildAccelerate" operation
+     * </pre>
+     */
+    com.google.protobuf.ByteString
+        getBuildDesignIdBytes();
+
+    // optional int32 build_count = 13;
+    /**
+     * <code>optional int32 build_count = 13;</code>
+     */
+    boolean hasBuildCount();
+    /**
+     * <code>optional int32 build_count = 13;</code>
+     */
+    int getBuildCount();
+
+    // optional float accelerate_amount = 14;
+    /**
+     * <code>optional float accelerate_amount = 14;</code>
+     */
+    boolean hasAccelerateAmount();
+    /**
+     * <code>optional float accelerate_amount = 14;</code>
+     */
+    float getAccelerateAmount();
   }
   /**
    * Protobuf type {@code au.com.codeka.common.protobuf.CashAuditRecord}
@@ -62135,6 +62182,21 @@ public final class Messages {
             case 93: {
               bitField0_ |= 0x00000400;
               moveDistance_ = input.readFloat();
+              break;
+            }
+            case 98: {
+              bitField0_ |= 0x00000800;
+              buildDesignId_ = input.readBytes();
+              break;
+            }
+            case 104: {
+              bitField0_ |= 0x00001000;
+              buildCount_ = input.readInt32();
+              break;
+            }
+            case 117: {
+              bitField0_ |= 0x00002000;
+              accelerateAmount_ = input.readFloat();
               break;
             }
           }
@@ -62506,6 +62568,93 @@ public final class Messages {
       return moveDistance_;
     }
 
+    // optional string build_design_id = 12;
+    public static final int BUILD_DESIGN_ID_FIELD_NUMBER = 12;
+    private java.lang.Object buildDesignId_;
+    /**
+     * <code>optional string build_design_id = 12;</code>
+     *
+     * <pre>
+     * these will be filled out if it's a "BuildAccelerate" operation
+     * </pre>
+     */
+    public boolean hasBuildDesignId() {
+      return ((bitField0_ & 0x00000800) == 0x00000800);
+    }
+    /**
+     * <code>optional string build_design_id = 12;</code>
+     *
+     * <pre>
+     * these will be filled out if it's a "BuildAccelerate" operation
+     * </pre>
+     */
+    public java.lang.String getBuildDesignId() {
+      java.lang.Object ref = buildDesignId_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        if (bs.isValidUtf8()) {
+          buildDesignId_ = s;
+        }
+        return s;
+      }
+    }
+    /**
+     * <code>optional string build_design_id = 12;</code>
+     *
+     * <pre>
+     * these will be filled out if it's a "BuildAccelerate" operation
+     * </pre>
+     */
+    public com.google.protobuf.ByteString
+        getBuildDesignIdBytes() {
+      java.lang.Object ref = buildDesignId_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        buildDesignId_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    // optional int32 build_count = 13;
+    public static final int BUILD_COUNT_FIELD_NUMBER = 13;
+    private int buildCount_;
+    /**
+     * <code>optional int32 build_count = 13;</code>
+     */
+    public boolean hasBuildCount() {
+      return ((bitField0_ & 0x00001000) == 0x00001000);
+    }
+    /**
+     * <code>optional int32 build_count = 13;</code>
+     */
+    public int getBuildCount() {
+      return buildCount_;
+    }
+
+    // optional float accelerate_amount = 14;
+    public static final int ACCELERATE_AMOUNT_FIELD_NUMBER = 14;
+    private float accelerateAmount_;
+    /**
+     * <code>optional float accelerate_amount = 14;</code>
+     */
+    public boolean hasAccelerateAmount() {
+      return ((bitField0_ & 0x00002000) == 0x00002000);
+    }
+    /**
+     * <code>optional float accelerate_amount = 14;</code>
+     */
+    public float getAccelerateAmount() {
+      return accelerateAmount_;
+    }
+
     private void initFields() {
       id_ = 0;
       empireId_ = 0;
@@ -62518,6 +62667,9 @@ public final class Messages {
       starId_ = 0;
       starName_ = "";
       moveDistance_ = 0F;
+      buildDesignId_ = "";
+      buildCount_ = 0;
+      accelerateAmount_ = 0F;
     }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
@@ -62563,6 +62715,15 @@ public final class Messages {
       }
       if (((bitField0_ & 0x00000400) == 0x00000400)) {
         output.writeFloat(11, moveDistance_);
+      }
+      if (((bitField0_ & 0x00000800) == 0x00000800)) {
+        output.writeBytes(12, getBuildDesignIdBytes());
+      }
+      if (((bitField0_ & 0x00001000) == 0x00001000)) {
+        output.writeInt32(13, buildCount_);
+      }
+      if (((bitField0_ & 0x00002000) == 0x00002000)) {
+        output.writeFloat(14, accelerateAmount_);
       }
       getUnknownFields().writeTo(output);
     }
@@ -62616,6 +62777,18 @@ public final class Messages {
       if (((bitField0_ & 0x00000400) == 0x00000400)) {
         size += com.google.protobuf.CodedOutputStream
           .computeFloatSize(11, moveDistance_);
+      }
+      if (((bitField0_ & 0x00000800) == 0x00000800)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBytesSize(12, getBuildDesignIdBytes());
+      }
+      if (((bitField0_ & 0x00001000) == 0x00001000)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt32Size(13, buildCount_);
+      }
+      if (((bitField0_ & 0x00002000) == 0x00002000)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeFloatSize(14, accelerateAmount_);
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
@@ -62755,6 +62928,12 @@ public final class Messages {
         bitField0_ = (bitField0_ & ~0x00000200);
         moveDistance_ = 0F;
         bitField0_ = (bitField0_ & ~0x00000400);
+        buildDesignId_ = "";
+        bitField0_ = (bitField0_ & ~0x00000800);
+        buildCount_ = 0;
+        bitField0_ = (bitField0_ & ~0x00001000);
+        accelerateAmount_ = 0F;
+        bitField0_ = (bitField0_ & ~0x00002000);
         return this;
       }
 
@@ -62827,6 +63006,18 @@ public final class Messages {
           to_bitField0_ |= 0x00000400;
         }
         result.moveDistance_ = moveDistance_;
+        if (((from_bitField0_ & 0x00000800) == 0x00000800)) {
+          to_bitField0_ |= 0x00000800;
+        }
+        result.buildDesignId_ = buildDesignId_;
+        if (((from_bitField0_ & 0x00001000) == 0x00001000)) {
+          to_bitField0_ |= 0x00001000;
+        }
+        result.buildCount_ = buildCount_;
+        if (((from_bitField0_ & 0x00002000) == 0x00002000)) {
+          to_bitField0_ |= 0x00002000;
+        }
+        result.accelerateAmount_ = accelerateAmount_;
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
@@ -62879,6 +63070,17 @@ public final class Messages {
         }
         if (other.hasMoveDistance()) {
           setMoveDistance(other.getMoveDistance());
+        }
+        if (other.hasBuildDesignId()) {
+          bitField0_ |= 0x00000800;
+          buildDesignId_ = other.buildDesignId_;
+          onChanged();
+        }
+        if (other.hasBuildCount()) {
+          setBuildCount(other.getBuildCount());
+        }
+        if (other.hasAccelerateAmount()) {
+          setAccelerateAmount(other.getAccelerateAmount());
         }
         this.mergeUnknownFields(other.getUnknownFields());
         return this;
@@ -63367,6 +63569,170 @@ public final class Messages {
       public Builder clearMoveDistance() {
         bitField0_ = (bitField0_ & ~0x00000400);
         moveDistance_ = 0F;
+        onChanged();
+        return this;
+      }
+
+      // optional string build_design_id = 12;
+      private java.lang.Object buildDesignId_ = "";
+      /**
+       * <code>optional string build_design_id = 12;</code>
+       *
+       * <pre>
+       * these will be filled out if it's a "BuildAccelerate" operation
+       * </pre>
+       */
+      public boolean hasBuildDesignId() {
+        return ((bitField0_ & 0x00000800) == 0x00000800);
+      }
+      /**
+       * <code>optional string build_design_id = 12;</code>
+       *
+       * <pre>
+       * these will be filled out if it's a "BuildAccelerate" operation
+       * </pre>
+       */
+      public java.lang.String getBuildDesignId() {
+        java.lang.Object ref = buildDesignId_;
+        if (!(ref instanceof java.lang.String)) {
+          java.lang.String s = ((com.google.protobuf.ByteString) ref)
+              .toStringUtf8();
+          buildDesignId_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>optional string build_design_id = 12;</code>
+       *
+       * <pre>
+       * these will be filled out if it's a "BuildAccelerate" operation
+       * </pre>
+       */
+      public com.google.protobuf.ByteString
+          getBuildDesignIdBytes() {
+        java.lang.Object ref = buildDesignId_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          buildDesignId_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>optional string build_design_id = 12;</code>
+       *
+       * <pre>
+       * these will be filled out if it's a "BuildAccelerate" operation
+       * </pre>
+       */
+      public Builder setBuildDesignId(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000800;
+        buildDesignId_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional string build_design_id = 12;</code>
+       *
+       * <pre>
+       * these will be filled out if it's a "BuildAccelerate" operation
+       * </pre>
+       */
+      public Builder clearBuildDesignId() {
+        bitField0_ = (bitField0_ & ~0x00000800);
+        buildDesignId_ = getDefaultInstance().getBuildDesignId();
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional string build_design_id = 12;</code>
+       *
+       * <pre>
+       * these will be filled out if it's a "BuildAccelerate" operation
+       * </pre>
+       */
+      public Builder setBuildDesignIdBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000800;
+        buildDesignId_ = value;
+        onChanged();
+        return this;
+      }
+
+      // optional int32 build_count = 13;
+      private int buildCount_ ;
+      /**
+       * <code>optional int32 build_count = 13;</code>
+       */
+      public boolean hasBuildCount() {
+        return ((bitField0_ & 0x00001000) == 0x00001000);
+      }
+      /**
+       * <code>optional int32 build_count = 13;</code>
+       */
+      public int getBuildCount() {
+        return buildCount_;
+      }
+      /**
+       * <code>optional int32 build_count = 13;</code>
+       */
+      public Builder setBuildCount(int value) {
+        bitField0_ |= 0x00001000;
+        buildCount_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional int32 build_count = 13;</code>
+       */
+      public Builder clearBuildCount() {
+        bitField0_ = (bitField0_ & ~0x00001000);
+        buildCount_ = 0;
+        onChanged();
+        return this;
+      }
+
+      // optional float accelerate_amount = 14;
+      private float accelerateAmount_ ;
+      /**
+       * <code>optional float accelerate_amount = 14;</code>
+       */
+      public boolean hasAccelerateAmount() {
+        return ((bitField0_ & 0x00002000) == 0x00002000);
+      }
+      /**
+       * <code>optional float accelerate_amount = 14;</code>
+       */
+      public float getAccelerateAmount() {
+        return accelerateAmount_;
+      }
+      /**
+       * <code>optional float accelerate_amount = 14;</code>
+       */
+      public Builder setAccelerateAmount(float value) {
+        bitField0_ |= 0x00002000;
+        accelerateAmount_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional float accelerate_amount = 14;</code>
+       */
+      public Builder clearAccelerateAmount() {
+        bitField0_ = (bitField0_ & ~0x00002000);
+        accelerateAmount_ = 0F;
         onChanged();
         return this;
       }
@@ -69568,35 +69934,37 @@ public final class Messages {
       "emy_empire_key\030\002 \001(\t\"m\n\020SituationReports" +
       "\022I\n\021situation_reports\030\001 \003(\0132..au.com.cod" +
       "eka.common.protobuf.SituationReport\022\016\n\006c" +
-      "ursor\030\002 \001(\t\"\340\002\n\017CashAuditRecord\022\n\n\002id\030\001 " +
+      "ursor\030\002 \001(\t\"\251\003\n\017CashAuditRecord\022\n\n\002id\030\001 " +
       "\001(\005\022\021\n\tempire_id\030\002 \001(\005\022E\n\006reason\030\003 \001(\01625" +
       ".au.com.codeka.common.protobuf.CashAudit" +
       "Record.Reason\022\023\n\013before_cash\030\004 \001(\002\022\022\n\naf" +
       "ter_cash\030\005 \001(\002\022\020\n\010fleet_id\030\006 \001(\005\022\027\n\017flee" +
       "t_design_id\030\007 \001(\t\022\021\n\tnum_ships\030\010 \001(\002\022\017\n\007" +
       "star_id\030\t \001(\005\022\021\n\tstar_name\030\n \001(\t\022\025\n\rmove",
-      "_distance\030\013 \001(\002\"E\n\006Reason\022\r\n\tFleetMove\020\000" +
-      "\022\023\n\017BuildAccelerate\020\001\022\027\n\023CollectFromColo" +
-      "nies\020\002\"\254\001\n\010Alliance\022\013\n\003key\030\001 \001(\t\022\014\n\004name" +
-      "\030\002 \001(\t\022\024\n\014time_created\030\003 \001(\003\022\032\n\022creator_" +
-      "empire_key\030\004 \001(\t\022\023\n\013num_members\030\005 \001(\005\022>\n" +
-      "\007members\030\006 \003(\0132-.au.com.codeka.common.pr" +
-      "otobuf.AllianceMember\"G\n\tAlliances\022:\n\tal" +
-      "liances\030\001 \003(\0132\'.au.com.codeka.common.pro" +
-      "tobuf.Alliance\"\\\n\016AllianceMember\022\013\n\003key\030" +
-      "\001 \001(\t\022\022\n\nempire_key\030\002 \001(\t\022\024\n\014alliance_ke",
-      "y\030\003 \001(\t\022\023\n\013time_joined\030\004 \001(\003\"\376\001\n\023Allianc" +
-      "eJoinRequest\022\013\n\003key\030\001 \001(\t\022\024\n\014alliance_ke" +
-      "y\030\002 \001(\t\022\022\n\nempire_key\030\003 \001(\t\022\017\n\007message\030\004" +
-      " \001(\t\022\026\n\016time_requested\030\005 \001(\003\022N\n\005state\030\006 " +
-      "\001(\0162?.au.com.codeka.common.protobuf.Alli" +
-      "anceJoinRequest.RequestState\"7\n\014RequestS" +
-      "tate\022\013\n\007PENDING\020\000\022\014\n\010ACCEPTED\020\001\022\014\n\010REJEC" +
-      "TED\020\002\"a\n\024AllianceJoinRequests\022I\n\rjoin_re" +
-      "quests\030\001 \003(\01322.au.com.codeka.common.prot" +
-      "obuf.AllianceJoinRequest\"@\n\024AllianceLeav",
-      "eRequest\022\024\n\014alliance_key\030\001 \001(\t\022\022\n\nempire" +
-      "_key\030\002 \001(\t"
+      "_distance\030\013 \001(\002\022\027\n\017build_design_id\030\014 \001(\t" +
+      "\022\023\n\013build_count\030\r \001(\005\022\031\n\021accelerate_amou" +
+      "nt\030\016 \001(\002\"E\n\006Reason\022\r\n\tFleetMove\020\000\022\023\n\017Bui" +
+      "ldAccelerate\020\001\022\027\n\023CollectFromColonies\020\002\"" +
+      "\254\001\n\010Alliance\022\013\n\003key\030\001 \001(\t\022\014\n\004name\030\002 \001(\t\022" +
+      "\024\n\014time_created\030\003 \001(\003\022\032\n\022creator_empire_" +
+      "key\030\004 \001(\t\022\023\n\013num_members\030\005 \001(\005\022>\n\007member" +
+      "s\030\006 \003(\0132-.au.com.codeka.common.protobuf." +
+      "AllianceMember\"G\n\tAlliances\022:\n\talliances" +
+      "\030\001 \003(\0132\'.au.com.codeka.common.protobuf.A",
+      "lliance\"\\\n\016AllianceMember\022\013\n\003key\030\001 \001(\t\022\022" +
+      "\n\nempire_key\030\002 \001(\t\022\024\n\014alliance_key\030\003 \001(\t" +
+      "\022\023\n\013time_joined\030\004 \001(\003\"\376\001\n\023AllianceJoinRe" +
+      "quest\022\013\n\003key\030\001 \001(\t\022\024\n\014alliance_key\030\002 \001(\t" +
+      "\022\022\n\nempire_key\030\003 \001(\t\022\017\n\007message\030\004 \001(\t\022\026\n" +
+      "\016time_requested\030\005 \001(\003\022N\n\005state\030\006 \001(\0162?.a" +
+      "u.com.codeka.common.protobuf.AllianceJoi" +
+      "nRequest.RequestState\"7\n\014RequestState\022\013\n" +
+      "\007PENDING\020\000\022\014\n\010ACCEPTED\020\001\022\014\n\010REJECTED\020\002\"a" +
+      "\n\024AllianceJoinRequests\022I\n\rjoin_requests\030",
+      "\001 \003(\01322.au.com.codeka.common.protobuf.Al" +
+      "lianceJoinRequest\"@\n\024AllianceLeaveReques" +
+      "t\022\024\n\014alliance_key\030\001 \001(\t\022\022\n\nempire_key\030\002 " +
+      "\001(\t"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
       new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
@@ -69920,7 +70288,7 @@ public final class Messages {
           internal_static_au_com_codeka_common_protobuf_CashAuditRecord_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_au_com_codeka_common_protobuf_CashAuditRecord_descriptor,
-              new java.lang.String[] { "Id", "EmpireId", "Reason", "BeforeCash", "AfterCash", "FleetId", "FleetDesignId", "NumShips", "StarId", "StarName", "MoveDistance", });
+              new java.lang.String[] { "Id", "EmpireId", "Reason", "BeforeCash", "AfterCash", "FleetId", "FleetDesignId", "NumShips", "StarId", "StarName", "MoveDistance", "BuildDesignId", "BuildCount", "AccelerateAmount", });
           internal_static_au_com_codeka_common_protobuf_Alliance_descriptor =
             getDescriptor().getMessageTypes().get(41);
           internal_static_au_com_codeka_common_protobuf_Alliance_fieldAccessorTable = new

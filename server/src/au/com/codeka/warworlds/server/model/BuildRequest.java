@@ -6,6 +6,7 @@ import java.sql.SQLException;
 import org.joda.time.DateTime;
 
 import au.com.codeka.common.model.BaseBuildRequest;
+import au.com.codeka.common.model.Design;
 import au.com.codeka.common.model.DesignKind;
 import au.com.codeka.common.protobuf.Messages;
 
@@ -55,6 +56,10 @@ public class BuildRequest extends BaseBuildRequest {
     }
     public int getExistingBuildingID() {
         return mExistingBuildingID;
+    }
+
+    public Design getDesign() {
+        return DesignManager.i.getDesign(mDesignKind, mDesignID);
     }
 
     public void setID(int id) {

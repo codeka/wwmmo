@@ -970,6 +970,12 @@ message CashAuditRecord
     optional int32 star_id = 9;
     optional string star_name = 10;
     optional float move_distance = 11;
+
+    // these will be filled out if it's a "BuildAccelerate" operation
+    optional string build_design_id = 12;
+    optional int32 build_count = 13;
+    optional float accelerate_amount = 14;
+
 }
 
 

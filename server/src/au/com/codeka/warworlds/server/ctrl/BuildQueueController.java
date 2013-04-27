@@ -2,11 +2,15 @@ package au.com.codeka.warworlds.server.ctrl;
 
 import java.sql.Statement;
 
+import au.com.codeka.common.model.Design;
+import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.data.DB;
 import au.com.codeka.warworlds.server.data.SqlStmt;
 import au.com.codeka.warworlds.server.data.Transaction;
 import au.com.codeka.warworlds.server.model.BuildRequest;
+import au.com.codeka.warworlds.server.model.Empire;
+import au.com.codeka.warworlds.server.model.Star;
 
 public class BuildQueueController {
     public void build(BuildRequest buildRequest) throws RequestException {
@@ -47,5 +51,37 @@ public class BuildQueueController {
         } catch(Exception e) {
             throw new RequestException(e);
         }
+    }
+
+    public void stop(Star star, BuildRequest buildRequest) throws RequestException {
+        star.getBuildRequests().remove(buildRequest);
+
+        String sql = "DELETE FROM build_requests WHERE id = ?";
+        try (SqlStmt stmt = DB.prepare(sql)) {
+            stmt.setInt(1, buildRequest.getID());
+            stmt.update();
+        } catch(Exception e) {
+            throw new RequestException(e);
+        }
+    }
+
+    public void accelerate(Star star, BuildRequest buildRequest, float accelerateAmount) throws RequestException {
+        float remainingProgress = 1.0f - buildRequest.getProgress(false);
+        float progressToComplete = remainingProgress * accelerateAmount;
+
+        Design design = buildRequest.getDesign();
+        float mineralsToUse = design.getBuildCost().getCostInMinerals() * progressToComplete;
+        float cost = mineralsToUse * buildRequest.getCount();
+
+        Messages.CashAuditRecord.Builder audit_record_pb = Messages.CashAuditRecord.newBuilder();
+        audit_record_pb.setEmpireId(buildRequest.getEmpireID());
+        audit_record_pb.setBuildDesignId(buildRequest.getDesignID());
+        audit_record_pb.setBuildCount(buildRequest.getCount());
+        audit_record_pb.setAccelerateAmount(accelerateAmount);
+        if (!new EmpireController().withdrawCash(buildRequest.getEmpireID(), cost, audit_record_pb)) {
+            throw new RequestException(400, Messages.GenericError.ErrorCode.InsufficientCash,
+                    "You don't have enough cash to accelerate this build.");
+        }
+        buildRequest.setProgress(buildRequest.getProgress(false) + progressToComplete);
     }
 }

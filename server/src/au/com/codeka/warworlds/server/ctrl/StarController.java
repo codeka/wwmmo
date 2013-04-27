@@ -55,10 +55,8 @@ public class StarController {
     public void update(Star star) throws RequestException {
         db.updateStar(star);
 
-        // if there was a combat report, we may need to re-schedule a fleet destroyed event
-        if (star.getCombatReport() != null) {
-            EventProcessor.i.ping();
-        }
+        // we may need to ping the event processor if a build time change, or whatever.
+        EventProcessor.i.ping();
     }
 
     private static class DataBase extends BaseDataBase {
