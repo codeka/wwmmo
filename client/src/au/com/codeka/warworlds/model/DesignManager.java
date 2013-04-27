@@ -24,11 +24,10 @@ public class DesignManager extends BaseDesignManager {
      * list.
      */
     public static void setup(final Context context) {
-        DesignManager dm = new DesignManager();
-        dm.mContext = context;
-        dm.setup();
-        dm.mContext = null;
-        BaseDesignManager.i = dm;
+        BaseDesignManager.i = new DesignManager();
+        ((DesignManager) BaseDesignManager.i).mContext = context;
+        BaseDesignManager.i.setup();
+        ((DesignManager) BaseDesignManager.i).mContext = null;
     }
 
     @Override
@@ -44,7 +43,6 @@ public class DesignManager extends BaseDesignManager {
 
     @Override
     public Design.Effect createEffect(DesignKind designKind, Element effectElement) {
-        // TODO Auto-generated method stub
-        return null;
+        return new Design.Effect();
     }
 }

@@ -5,6 +5,7 @@ import android.os.Parcelable;
 import au.com.codeka.common.model.BaseBuildRequest;
 import au.com.codeka.common.model.BaseBuilding;
 import au.com.codeka.common.model.BaseColony;
+import au.com.codeka.common.model.BaseCombatReport;
 import au.com.codeka.common.model.BaseEmpirePresence;
 import au.com.codeka.common.model.BaseFleet;
 import au.com.codeka.common.model.BasePlanet;
@@ -128,11 +129,22 @@ public class StarSummary extends BaseStar implements Parcelable {
     }
 
     @Override
+    public BaseCombatReport createCombatReport(Messages.CombatReport pb) {
+        CombatReport report = new CombatReport();
+        if (pb != null) {
+            report.fromProtocolBuffer(pb);
+        }
+        report.setStarKey(mKey);
+        return report;
+    }
+
+    @Override
     public BaseStar clone() {
         Parcel parcel = Parcel.obtain();
         this.writeToParcel(parcel, 0);
         parcel.setDataPosition(0);
         return Star.CREATOR.createFromParcel(parcel);
     }
+
 
 }

@@ -214,7 +214,9 @@ public class MyEmpire extends Empire {
                     if (pb == null)
                         return null;
 
-                    return CombatReport.fromProtocolBuffer(pb);
+                    CombatReport combatReport = new CombatReport();
+                    combatReport.fromProtocolBuffer(pb);
+                    return combatReport;
                 } catch(Exception e) {
                     // TODO: handle exceptions
                     log.error(ExceptionUtils.getStackTrace(e));
