@@ -22,6 +22,7 @@ import au.com.codeka.warworlds.server.data.DB;
 import au.com.codeka.warworlds.server.data.SqlStmt;
 import au.com.codeka.warworlds.server.model.Colony;
 import au.com.codeka.warworlds.server.model.Empire;
+import au.com.codeka.warworlds.server.model.Fleet;
 import au.com.codeka.warworlds.server.model.Star;
 
 public class BuildCompleteEvent extends Event {
@@ -124,7 +125,9 @@ public class BuildCompleteEvent extends Event {
     private void processFleetBuild(Star star, Colony colony, int empireID, String designID,
                                    float count) throws RequestException {
         Empire empire = new EmpireController().getEmpire(empireID);
-        new FleetController().createFleet(empire, star, designID, count);
+        Fleet newFleet = new FleetController().createFleet(empire, star, designID, count);
+
+        FleetMoveCompleteEvent.fireFleetArrivedEvents(star, newFleet);
     }
 
     private void processBuildingBuild(Star star, Colony colony, int empireID, Integer existingBuildingID,

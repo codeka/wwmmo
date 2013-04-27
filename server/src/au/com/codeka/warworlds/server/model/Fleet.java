@@ -7,6 +7,8 @@ import java.sql.Timestamp;
 import org.joda.time.DateTime;
 
 import au.com.codeka.common.model.BaseFleet;
+import au.com.codeka.common.model.DesignKind;
+import au.com.codeka.common.model.ShipDesign;
 
 public class Fleet extends BaseFleet {
     private int mID;
@@ -90,6 +92,14 @@ public class Fleet extends BaseFleet {
     public void setStance(Stance stance) {
         mStance = stance;
     }
+    public void setTargetFleetID(int id) {
+        mTargetFleetID = id;
+        mTargetFleetKey = Integer.toString(id);
+    }
+
+    public ShipDesign getDesign() {
+        return (ShipDesign) DesignManager.i.getDesign(DesignKind.SHIP, mDesignID);
+    }
 
     public void move(int destinationStarID, DateTime eta) {
         mState = State.MOVING;
@@ -97,6 +107,8 @@ public class Fleet extends BaseFleet {
         mDestinationStarID = destinationStarID;
         mDestinationStarKey = Integer.toString(mDestinationStarID);
         mEta = eta;
+        mTargetFleetID = 0;
+        mTargetFleetKey = null;
     }
 
     /**
@@ -108,6 +120,21 @@ public class Fleet extends BaseFleet {
         mDestinationStarID = 0;
         mDestinationStarKey = null;
         mEta = null;
+        mTargetFleetID = 0;
+        mTargetFleetKey = null;
+    }
+
+    /**
+     * Switch to attack mode
+     */
+    public void attack() {
+        mState = State.ATTACKING;
+        mStateStartTime = DateTime.now();
+        mDestinationStarID = 0;
+        mDestinationStarKey = null;
+        mEta = null;
+        mTargetFleetID = 0;
+        mTargetFleetKey = null;
     }
 
     /**

@@ -3,8 +3,11 @@ package au.com.codeka.warworlds.model;
 import java.io.IOException;
 import java.io.InputStream;
 
+import org.w3c.dom.Element;
+
 import android.content.Context;
 import au.com.codeka.common.model.BaseDesignManager;
+import au.com.codeka.common.model.Design;
 import au.com.codeka.common.model.DesignKind;
 
 /**
@@ -36,6 +39,12 @@ public class DesignManager extends BaseDesignManager {
             return mContext.getAssets().open("ships.xml");
         }
 
+        return null;
+    }
+
+    @Override
+    public Design.Effect createEffect(DesignKind designKind, Element effectElement) {
+        // TODO Auto-generated method stub
         return null;
     }
 }

@@ -19,6 +19,7 @@ public class BaseFleet {
     protected String mTargetColonyKey;
     protected Stance mStance;
     protected DateTime mEta;
+    protected DateTime mTimeDestroyed;
 
     public String getKey() {
         return mKey;
@@ -32,8 +33,19 @@ public class BaseFleet {
     public float getNumShips() {
         return mNumShips;
     }
+    public void setNumShips(float numShips) {
+        if (numShips < 0.75f) {
+            mNumShips = 0.0f;
+        } else {
+            mNumShips = numShips;
+        }
+    }
     public State getState() {
         return mState;
+    }
+    public void setState(State state, DateTime now) {
+        mState = state;
+        mStateStartTime = now;
     }
     public DateTime getStateStartTime() {
         return mStateStartTime;
@@ -47,6 +59,9 @@ public class BaseFleet {
     public String getTargetFleetKey() {
         return mTargetFleetKey;
     }
+    public void setTargetFleetKey(String fleetKey) {
+        mTargetFleetKey = fleetKey;
+    }
     public String getTargetColonyKey() {
         return mTargetColonyKey;
     }
@@ -55,6 +70,12 @@ public class BaseFleet {
     }
     public DateTime getEta() {
         return mEta;
+    }
+    public DateTime getTimeDestroyed() {
+        return mTimeDestroyed;
+    }
+    public void setTimeDestroyed(DateTime time) {
+        mTimeDestroyed = time;
     }
 
     public float getTimeToDestination(BaseStar srcStar, BaseStar destStar) {
@@ -87,6 +108,9 @@ public class BaseFleet {
         if (pb.hasEta()) {
             mEta = new DateTime(pb.getEta() * 1000, DateTimeZone.UTC);
         }
+        if (pb.hasTimeDestroyed()) {
+            mTimeDestroyed = new DateTime(pb.getTimeDestroyed() * 1000, DateTimeZone.UTC);
+        }
     }
 
     public void toProtocolBuffer(Messages.Fleet.Builder pb) {
@@ -111,6 +135,9 @@ public class BaseFleet {
         }
         if (mEta != null) {
             pb.setEta(mEta.getMillis() / 1000);
+        }
+        if (mTimeDestroyed != null) {
+            pb.setTimeDestroyed(mTimeDestroyed.getMillis() / 1000);
         }
     }
 

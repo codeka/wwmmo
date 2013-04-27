@@ -43,5 +43,9 @@ public class StarSimulateHandler extends RequestHandler {
 
         Star star = new StarController().getStar(starID);
         sim.simulate(star);
+
+        if (update) {
+            new StarController().update(star);
+        }
     }
 }

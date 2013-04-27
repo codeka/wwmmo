@@ -23,6 +23,7 @@ public class EventProcessor {
         sEventClasses = new ArrayList<Class<?>>();
         sEventClasses.add(FleetMoveCompleteEvent.class);
         sEventClasses.add(BuildCompleteEvent.class);
+        sEventClasses.add(FleetDestroyedEvent.class);
     }
 
     private Thread mThread;

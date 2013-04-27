@@ -16,12 +16,15 @@ import au.com.codeka.common.model.BaseEmpirePresence;
 import au.com.codeka.common.model.BaseFleet;
 import au.com.codeka.common.model.BasePlanet;
 import au.com.codeka.common.model.Simulation;
+import au.com.codeka.common.protobuf.Messages;
+import au.com.codeka.warworlds.server.EventProcessor;
 import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.data.SqlStmt;
 import au.com.codeka.warworlds.server.data.Transaction;
 import au.com.codeka.warworlds.server.model.BuildRequest;
 import au.com.codeka.warworlds.server.model.Building;
 import au.com.codeka.warworlds.server.model.Colony;
+import au.com.codeka.warworlds.server.model.CombatReport;
 import au.com.codeka.warworlds.server.model.EmpirePresence;
 import au.com.codeka.warworlds.server.model.Fleet;
 import au.com.codeka.warworlds.server.model.Planet;
@@ -51,6 +54,11 @@ public class StarController {
 
     public void update(Star star) throws RequestException {
         db.updateStar(star);
+
+        // if there was a combat report, we may need to re-schedule a fleet destroyed event
+        if (star.getCombatReport() != null) {
+            EventProcessor.i.ping();
+        }
     }
 
     private static class DataBase extends BaseDataBase {
@@ -98,6 +106,7 @@ public class StarController {
                 populateBuildRequests(stars, inClause);
                 populateBuildings(stars, inClause);
                 checkNativeColonies(stars);
+                populateCombatReports(stars, inClause);
                 return stars;
             } catch(Exception e) {
                 throw new RequestException(e);
@@ -117,6 +126,10 @@ public class StarController {
                 updateColonies(star);
                 updateFleets(star);
                 updateBuildRequests(star);
+                CombatReport combatReport = (CombatReport) star.getCombatReport();
+                if (combatReport != null) {
+                    updateCombatReport(star, combatReport);
+                }
             } catch(Exception e) {
                 throw new RequestException(e);
             }
@@ -166,6 +179,7 @@ public class StarController {
 
         private void updateFleets(Star star) throws RequestException {
             boolean needInsert = false;
+            boolean needDelete = false;
             String sql = "UPDATE fleets SET" +
                             " star_id = ?," +
                             " sector_id = ?," +
@@ -184,6 +198,10 @@ public class StarController {
                         needInsert = true;
                         continue;
                     }
+                    if (baseFleet.getTimeDestroyed() != null && baseFleet.getTimeDestroyed().isBefore(DateTime.now())) {
+                        needDelete = true;
+                        continue;
+                    }
 
                     Fleet fleet = (Fleet) baseFleet;
                     stmt.setInt(1, star.getID());
@@ -198,12 +216,12 @@ public class StarController {
                     } else {
                         stmt.setNull(8);
                     }
-                    if (fleet.getTargetFleetKey() != null) {
+                    if (fleet.getTargetFleetKey() != null && fleet.getTargetFleetID() != 0) {
                         stmt.setInt(9, fleet.getTargetFleetID());
                     } else {
                         stmt.setNull(9);
                     }
-                    stmt.setDateTime(10, null); // todo
+                    stmt.setDateTime(10, fleet.getTimeDestroyed());
                     stmt.setInt(11, fleet.getID());
                     stmt.update();
                 }
@@ -211,50 +229,66 @@ public class StarController {
                 throw new RequestException(e);
             }
 
-            if (!needInsert) {
-                return;
+            if (needInsert) {
+                sql = "INSERT INTO fleets (star_id, sector_id, design_id, empire_id, num_ships," +
+                                         " stance, state, state_start_time, eta, target_star_id," +
+                                         " target_fleet_id, time_destroyed)" +
+                     " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                try (SqlStmt stmt = prepare(sql, Statement.RETURN_GENERATED_KEYS)) {
+                    for (BaseFleet baseFleet : star.getFleets()) {
+                        if (baseFleet.getKey() != null) {
+                            continue;
+                        }
+
+                        Fleet fleet = (Fleet) baseFleet;
+                        stmt.setInt(1, fleet.getStarID());
+                        stmt.setInt(2, fleet.getSectorID());
+                        stmt.setString(3, fleet.getDesignID());
+                        if (fleet.getEmpireKey() != null) {
+                            stmt.setInt(4, fleet.getEmpireID());
+                        } else {
+                            stmt.setNull(4);
+                        }
+                        stmt.setDouble(5, fleet.getNumShips());
+                        stmt.setInt(6, fleet.getStance().getValue());
+                        stmt.setInt(7, fleet.getState().getValue());
+                        stmt.setDateTime(8, fleet.getStateStartTime());
+                        stmt.setDateTime(9, fleet.getEta());
+                        if (fleet.getDestinationStarKey() != null) {
+                            stmt.setInt(10, fleet.getDestinationStarID());
+                        } else {
+                            stmt.setNull(10);
+                        }
+                        if (fleet.getTargetFleetKey() != null && fleet.getTargetFleetID() != 0) {
+                            stmt.setInt(11, fleet.getTargetFleetID());
+                        } else {
+                            stmt.setNull(11);
+                        }
+                        stmt.setDateTime(12, fleet.getTimeDestroyed());
+                        stmt.update();
+                    }
+                } catch(Exception e) {
+                    throw new RequestException(e);
+                }
             }
 
-            sql = "INSERT INTO fleets (star_id, sector_id, design_id, empire_id, num_ships," +
-                                     " stance, state, state_start_time, eta, target_star_id," +
-                                     " target_fleet_id, time_destroyed)" +
-                 " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-            try (SqlStmt stmt = prepare(sql, Statement.RETURN_GENERATED_KEYS)) {
-                for (BaseFleet baseFleet : star.getFleets()) {
-                    if (baseFleet.getKey() != null) {
-                        continue;
+            if (needDelete) {
+                sql = "DELETE FROM fleets WHERE id = ?";
+                ArrayList<BaseFleet> toRemove = new ArrayList<BaseFleet>();
+                try (SqlStmt stmt = prepare(sql)) {
+                    for (BaseFleet baseFleet : star.getFleets()) {
+                        if (baseFleet.getTimeDestroyed() != null && baseFleet.getTimeDestroyed().isBefore(DateTime.now())) {
+                            Fleet fleet = (Fleet) baseFleet;
+                            stmt.setInt(1, fleet.getID());
+                            stmt.update();
+                            toRemove.add(baseFleet);
+                        }
                     }
 
-                    Fleet fleet = (Fleet) baseFleet;
-                    stmt.setInt(1, fleet.getStarID());
-                    stmt.setInt(2, fleet.getSectorID());
-                    stmt.setString(3, fleet.getDesignID());
-                    if (fleet.getEmpireKey() != null) {
-                        stmt.setInt(4, fleet.getEmpireID());
-                    } else {
-                        stmt.setNull(4);
-                    }
-                    stmt.setDouble(5, fleet.getNumShips());
-                    stmt.setInt(6, fleet.getStance().getValue());
-                    stmt.setInt(7, fleet.getState().getValue());
-                    stmt.setDateTime(8, fleet.getStateStartTime());
-                    stmt.setDateTime(9, fleet.getEta());
-                    if (fleet.getDestinationStarKey() != null) {
-                        stmt.setInt(10, fleet.getDestinationStarID());
-                    } else {
-                        stmt.setNull(10);
-                    }
-                    if (fleet.getTargetFleetKey() != null) {
-                        stmt.setInt(11, fleet.getTargetFleetID());
-                    } else {
-                        stmt.setNull(11);
-                    }
-                    stmt.setDateTime(12, null);
-                    stmt.update();
+                    star.getFleets().removeAll(toRemove);
+                } catch(Exception e) {
+                    throw new RequestException(e);
                 }
-
-            } catch(Exception e) {
-                throw new RequestException(e);
             }
         }
 
@@ -273,21 +307,44 @@ public class StarController {
             }
         }
 
+        private void updateCombatReport(Star star, CombatReport combatReport) throws Exception {
+            Messages.CombatReport.Builder pb = Messages.CombatReport.newBuilder();
+            combatReport.toProtocolBuffer(pb);
+
+            String sql;
+            if (combatReport.getKey() == null) {
+                sql = "INSERT INTO combat_reports (star_id, start_time, end_time, rounds) VALUES (?, ?, ?, ?)";
+            } else {
+                sql = "UPDATE combat_reports SET star_id = ?, start_time = ?, end_time = ?, rounds = ? WHERE id = ?";
+            }
+            try (SqlStmt stmt = prepare(sql)) {
+                stmt.setInt(1, star.getID());
+                stmt.setDateTime(2, combatReport.getStartTime());
+                stmt.setDateTime(3, combatReport.getEndTime());
+                stmt.setBlob(4, pb.build().toByteArray());
+                if (combatReport.getKey() != null) {
+                    stmt.setInt(5, Integer.parseInt(combatReport.getKey()));
+                }
+                stmt.update();
+            }
+        }
+
         private void populateColonies(List<Star> stars, String inClause) throws Exception {
             String sql = "SELECT * FROM colonies WHERE star_id IN "+inClause;
-            SqlStmt stmt = prepare(sql);
-            ResultSet rs = stmt.select();
+            try (SqlStmt stmt = prepare(sql)) {
+                ResultSet rs = stmt.select();
 
-            while (rs.next()) {
-                Colony colony = new Colony(rs);
+                while (rs.next()) {
+                    Colony colony = new Colony(rs);
 
-                for (Star star : stars) {
-                    if (star.getID() == colony.getStarID()) {
-                        // max population for the colony is initially just it's congeniality
-                        BasePlanet planet = star.getPlanets()[colony.getPlanetIndex() - 1];
-                        colony.setMaxPopulation(planet.getPopulationCongeniality());
+                    for (Star star : stars) {
+                        if (star.getID() == colony.getStarID()) {
+                            // max population for the colony is initially just it's congeniality
+                            BasePlanet planet = star.getPlanets()[colony.getPlanetIndex() - 1];
+                            colony.setMaxPopulation(planet.getPopulationCongeniality());
 
-                        star.getColonies().add(colony);
+                            star.getColonies().add(colony);
+                        }
                     }
                 }
             }
@@ -295,15 +352,16 @@ public class StarController {
 
         private void populateFleets(List<Star> stars, String inClause) throws Exception {
             String sql = "SELECT * FROM fleets WHERE star_id IN "+inClause;
-            SqlStmt stmt = prepare(sql);
-            ResultSet rs = stmt.select();
+            try (SqlStmt stmt = prepare(sql)) {
+                ResultSet rs = stmt.select();
 
-            while (rs.next()) {
-                Fleet fleet = new Fleet(rs);
+                while (rs.next()) {
+                    Fleet fleet = new Fleet(rs);
 
-                for (Star star : stars) {
-                    if (star.getID() == fleet.getStarID()) {
-                        star.getFleets().add(fleet);
+                    for (Star star : stars) {
+                        if (star.getID() == fleet.getStarID()) {
+                            star.getFleets().add(fleet);
+                        }
                     }
                 }
             }
@@ -311,19 +369,20 @@ public class StarController {
 
         private void populateEmpires(List<Star> stars, String inClause) throws Exception {
             String sql = "SELECT * FROM empire_presences WHERE star_id IN "+inClause;
-            SqlStmt stmt = prepare(sql);
-            ResultSet rs = stmt.select();
+            try (SqlStmt stmt = prepare(sql)) {
+                ResultSet rs = stmt.select();
 
-            while (rs.next()) {
-                EmpirePresence empirePresence = new EmpirePresence(rs);
+                while (rs.next()) {
+                    EmpirePresence empirePresence = new EmpirePresence(rs);
 
-                for (Star star : stars) {
-                    if (star.getID() == empirePresence.getStarID()) {
-                        // by default, you get 500 max goods/minerals
-                        empirePresence.setMaxGoods(500);
-                        empirePresence.setMaxMinerals(500);
+                    for (Star star : stars) {
+                        if (star.getID() == empirePresence.getStarID()) {
+                            // by default, you get 500 max goods/minerals
+                            empirePresence.setMaxGoods(500);
+                            empirePresence.setMaxMinerals(500);
 
-                        star.getEmpirePresences().add(empirePresence);
+                            star.getEmpirePresences().add(empirePresence);
+                        }
                     }
                 }
             }
@@ -331,15 +390,16 @@ public class StarController {
 
         private void populateBuildRequests(List<Star> stars, String inClause) throws Exception {
             String sql = "SELECT * FROM build_requests WHERE star_id IN "+inClause;
-            SqlStmt stmt = prepare(sql);
-            ResultSet rs = stmt.select();
+            try (SqlStmt stmt = prepare(sql)) {
+                ResultSet rs = stmt.select();
 
-            while (rs.next()) {
-                BuildRequest buildRequest = new BuildRequest(rs);
+                while (rs.next()) {
+                    BuildRequest buildRequest = new BuildRequest(rs);
 
-                for (Star star : stars) {
-                    if (star.getID() == buildRequest.getStarID()) {
-                        star.getBuildRequests().add(buildRequest);
+                    for (Star star : stars) {
+                        if (star.getID() == buildRequest.getStarID()) {
+                            star.getBuildRequests().add(buildRequest);
+                        }
                     }
                 }
             }
@@ -347,21 +407,45 @@ public class StarController {
 
         private void populateBuildings(List<Star> stars, String inClause) throws Exception {
             String sql = "SELECT * FROM buildings WHERE star_id IN "+inClause;
-            SqlStmt stmt = prepare(sql);
-            ResultSet rs = stmt.select();
+            try (SqlStmt stmt = prepare(sql)) {
+                ResultSet rs = stmt.select();
 
-            while (rs.next()) {
-                Building building = new Building(rs);
+                while (rs.next()) {
+                    Building building = new Building(rs);
 
-                for (Star star : stars) {
-                    for (BaseColony baseColony : star.getColonies()) {
-                        Colony colony = (Colony) baseColony;
-                        if (colony.getID() == building.getColonyID()) {
-                            colony.getBuildings().add(building);
+                    for (Star star : stars) {
+                        for (BaseColony baseColony : star.getColonies()) {
+                            Colony colony = (Colony) baseColony;
+                            if (colony.getID() == building.getColonyID()) {
+                                colony.getBuildings().add(building);
+                            }
                         }
                     }
                 }
             }
+        }
+
+        private void populateCombatReports(List<Star> stars, String inClause) throws Exception {
+            String sql = "SELECT star_id, rounds FROM combat_reports WHERE star_id IN "+inClause;
+            sql += " AND end_time > ?";
+            try (SqlStmt stmt = prepare(sql)) {
+                stmt.setDateTime(1, DateTime.now());
+                ResultSet rs = stmt.select();
+
+                while (rs.next()) {
+                    int starID = rs.getInt(1);
+                    Messages.CombatReport pb = Messages.CombatReport.parseFrom(rs.getBytes(2));
+                    CombatReport combatReport = new CombatReport();
+                    combatReport.fromProtocolBuffer(pb);
+
+                    for (Star star : stars) {
+                        if (star.getID() == starID) {
+                            star.setCombatReport(combatReport);
+                        }
+                    }
+                }
+            }
+            
         }
 
         /**

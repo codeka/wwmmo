@@ -65,6 +65,7 @@ public abstract class BaseDesignManager {
     }
 
     protected abstract InputStream open(DesignKind designKind) throws IOException;
+    public abstract Design.Effect createEffect(DesignKind designKind, Element effectElement);
 
     /**
      * Gets the collection of designs.

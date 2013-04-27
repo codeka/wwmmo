@@ -1,6 +1,7 @@
 package au.com.codeka.warworlds.server.events;
 
 import java.sql.ResultSet;
+import java.util.ArrayList;
 
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
@@ -8,6 +9,8 @@ import org.slf4j.LoggerFactory;
 
 import au.com.codeka.common.model.BaseFleet;
 import au.com.codeka.common.model.BaseStar;
+import au.com.codeka.common.model.ShipDesign;
+import au.com.codeka.common.model.ShipEffect;
 import au.com.codeka.common.model.Simulation;
 import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.server.Event;
@@ -75,6 +78,15 @@ public class FleetMoveCompleteEvent extends Event {
                 break;
             }
         }
+        if (fleet == null) {
+            return;
+        }
+
+        // fire off the effects to let them know we've arrived
+        fireFleetArrivedEvents(destStar, fleet);
+
+        // simulate the destination star again, in case there's any combat
+        sim.simulate(destStar);
 
         Messages.SituationReport.Builder sitrep_pb = Messages.SituationReport.newBuilder();
         sitrep_pb.setEmpireKey(fleet.getEmpireKey());
@@ -93,5 +105,27 @@ public class FleetMoveCompleteEvent extends Event {
         new StarController().update(destStar);
 
         new SituationReportController().saveSituationReport(sitrep_pb.build());
+    }
+
+    public static void fireFleetArrivedEvents(Star star, Fleet newFleet) {
+        ShipDesign fleetDesign = newFleet.getDesign();
+        ArrayList<ShipEffect> effects = fleetDesign.getEffects(ShipEffect.class);
+        for (ShipEffect effect : effects) {
+            effect.onArrived(star, newFleet);
+        }
+
+        for (BaseFleet existingBaseFleet : star.getFleets()) {
+            Fleet existingFleet = (Fleet) existingBaseFleet;
+            if (existingFleet.getID() == newFleet.getID()) {
+                continue;
+            }
+
+            fleetDesign = existingFleet.getDesign();
+            effects = fleetDesign.getEffects(ShipEffect.class);
+            for (ShipEffect effect : effects) {
+                effect.onOtherArrived(star, existingFleet, newFleet);
+            }
+
+        }
     }
 }

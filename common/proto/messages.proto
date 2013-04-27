@@ -392,6 +392,10 @@ message Star
 
     // Time, that this star was last simulated
     optional int64 last_simulation = 18;
+
+    // If we're in the middle of combat, this will be the combat report for what's currently
+    // going on.
+    optional CombatReport current_combat_report = 19;
 }
 
 

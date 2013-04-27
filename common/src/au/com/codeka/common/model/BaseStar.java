@@ -64,6 +64,7 @@ public abstract class BaseStar {
     protected ArrayList<BaseBuildRequest> mBuildRequests;
     protected DateTime mLastSimulation;
     protected DateTime mTimeEmptied;
+    protected BaseCombatReport mCombatReport;
 
     protected BaseStar() {
         mColonies = null;
@@ -78,6 +79,7 @@ public abstract class BaseStar {
     protected abstract BaseEmpirePresence createEmpirePresence(Messages.EmpirePresence pb);
     protected abstract BaseFleet createFleet(Messages.Fleet pb);
     protected abstract BaseBuildRequest createBuildRequest(Messages.BuildRequest pb);
+    public abstract BaseCombatReport createCombatReport(Messages.CombatReport pb);
     public abstract BaseStar clone();
 
     public String getKey() {
@@ -186,6 +188,13 @@ public abstract class BaseStar {
         mName = name;
     }
 
+    public BaseCombatReport getCombatReport() {
+        return mCombatReport;
+    }
+    public void setCombatReport(BaseCombatReport report) {
+        mCombatReport = report;
+    }
+
     public void fromProtocolBuffer(Messages.Star pb) {
         mKey = pb.getKey();
         mName = pb.getName();
@@ -244,6 +253,11 @@ public abstract class BaseStar {
         for (Messages.Fleet fleetPb : pb.getFleetsList()) {
             mFleets.add(createFleet(fleetPb));
         }
+
+        if (pb.hasCurrentCombatReport()) {
+            mCombatReport = createCombatReport(pb.getCurrentCombatReport());
+        }
+
     }
 
     public void toProtocolBuffer(Messages.Star.Builder pb) {
@@ -307,6 +321,12 @@ public abstract class BaseStar {
                     building.toProtocolBuffer(building_pb);
                     pb.addBuildings(building_pb);
                 }
+            }
+
+            if (mCombatReport != null) {
+                Messages.CombatReport.Builder combat_report_pb = Messages.CombatReport.newBuilder();
+                mCombatReport.toProtocolBuffer(combat_report_pb);
+                pb.setCurrentCombatReport(combat_report_pb);
             }
         }
     }

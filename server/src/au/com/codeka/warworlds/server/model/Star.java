@@ -11,6 +11,7 @@ import org.joda.time.DateTime;
 import au.com.codeka.common.model.BaseBuildRequest;
 import au.com.codeka.common.model.BaseBuilding;
 import au.com.codeka.common.model.BaseColony;
+import au.com.codeka.common.model.BaseCombatReport;
 import au.com.codeka.common.model.BaseEmpirePresence;
 import au.com.codeka.common.model.BaseFleet;
 import au.com.codeka.common.model.BasePlanet;
@@ -138,6 +139,16 @@ public class Star extends BaseStar {
             br.fromProtocolBuffer( pb);
         }
         return br;
+    }
+
+    @Override
+    public BaseCombatReport createCombatReport(Messages.CombatReport pb) {
+        CombatReport report = new CombatReport();
+        if (pb != null) {
+            report.fromProtocolBuffer(pb);
+        }
+        report.setStarID(mID);
+        return report;
     }
 
     @Override

@@ -16,6 +16,7 @@ public class Colony extends BaseColony {
     private int mEmpireID;
 
     public Colony() {
+        mBuildings = new ArrayList<BaseBuilding>();
     }
     public Colony(ResultSet rs) throws SQLException {
         mID = rs.getInt("id");
@@ -55,6 +56,7 @@ public class Colony extends BaseColony {
         mUncollectedTaxes = 0.0f;
         mCooldownTimeEnd = new DateTime().plusHours(8);
         mPopulation = 100.0f;
+        mBuildings = new ArrayList<BaseBuilding>();
     }
 
     public void setID(int id) {

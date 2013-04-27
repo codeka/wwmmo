@@ -49,9 +49,27 @@ public class Design {
     public ArrayList<Effect> getEffects() {
         return mEffects;
     }
+    @SuppressWarnings("unchecked")
+    public <T> ArrayList<T> getEffects(Class<?> effectClass) {
+        ArrayList<T> effects = new ArrayList<T>();
+        for (Effect e : mEffects) {
+            if (effectClass.isInstance(e)) {
+                effects.add((T) e);
+            }
+        }
+        return effects;
+    }
     public boolean hasEffect(String kind) {
         for (Effect e : mEffects) {
             if (e.getKind().equals(kind)) {
+                return true;
+            }
+        }
+        return false;
+    }
+    public boolean hasEffect(Class<?> effectClass) {
+        for (Effect e : mEffects) {
+            if (effectClass.isInstance(e)) {
                 return true;
             }
         }
@@ -91,8 +109,10 @@ public class Design {
                     design.mDependencies = Dependency.parse(elem);
                 } else if (elem.getNodeName().equals("effects")) {
                     for (Element effectElem : XmlIterator.childElements(elem, "effect")) {
-                        Effect effect = createEffect();
-                        populateEffect(effectElem, effect);
+                        Effect effect = BaseDesignManager.i.createEffect(design.mDesignKind, effectElem);
+                        if (effect == null) {
+                            continue;
+                        }
                         design.mEffects.add(effect);
                     }
                 } else {
@@ -101,9 +121,6 @@ public class Design {
             }
         }
 
-        protected Effect createEffect() {
-            return new Effect();
-        }
         protected void populateEffect(Element effectElem, Effect effect) {
             effect.mKind = effectElem.getAttribute("kind");
 
