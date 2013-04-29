@@ -7,6 +7,7 @@ import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import au.com.codeka.common.model.BaseCombatReport;
 import au.com.codeka.common.model.BaseFleet;
 import au.com.codeka.common.model.BaseStar;
 import au.com.codeka.common.model.ShipDesign;
@@ -19,6 +20,7 @@ import au.com.codeka.warworlds.server.ctrl.SituationReportController;
 import au.com.codeka.warworlds.server.ctrl.StarController;
 import au.com.codeka.warworlds.server.data.DB;
 import au.com.codeka.warworlds.server.data.SqlStmt;
+import au.com.codeka.warworlds.server.model.CombatReport;
 import au.com.codeka.warworlds.server.model.Fleet;
 import au.com.codeka.warworlds.server.model.Star;
 
@@ -88,6 +90,9 @@ public class FleetMoveCompleteEvent extends Event {
         // simulate the destination star again, in case there's any combat
         sim.simulate(destStar);
 
+        new StarController().update(srcStar);
+        new StarController().update(destStar);
+
         Messages.SituationReport.Builder sitrep_pb = Messages.SituationReport.newBuilder();
         sitrep_pb.setEmpireKey(fleet.getEmpireKey());
         sitrep_pb.setReportTime(DateTime.now().getMillis() / 1000);
@@ -99,12 +104,28 @@ public class FleetMoveCompleteEvent extends Event {
         move_complete_pb.setNumShips(fleet.getNumShips());
         //move_complete_pb.setScoutReportKey(...);
         sitrep_pb.setMoveCompleteRecord(move_complete_pb);
-        //TODO: combat
-
-        new StarController().update(srcStar);
-        new StarController().update(destStar);
+        if (destStar.getCombatReport() != null && isFleetInCombatReport(fleet.getKey(), (CombatReport) destStar.getCombatReport())) {
+            Messages.SituationReport.FleetUnderAttackRecord.Builder fleet_under_attack_pb = Messages.SituationReport.FleetUnderAttackRecord.newBuilder();
+            fleet_under_attack_pb.setCombatReportKey(destStar.getCombatReport().getKey());
+            fleet_under_attack_pb.setFleetDesignId(fleet.getDesignID());
+            fleet_under_attack_pb.setFleetKey(fleet.getKey());
+            fleet_under_attack_pb.setNumShips(fleet.getNumShips());
+            sitrep_pb.setFleetUnderAttackRecord(fleet_under_attack_pb);
+        }
 
         new SituationReportController().saveSituationReport(sitrep_pb.build());
+    }
+
+    private boolean isFleetInCombatReport(String fleetKey, CombatReport combatReport) {
+        for (BaseCombatReport.CombatRound round : combatReport.getCombatRounds()) {
+            for (BaseCombatReport.FleetSummary fleetSummary : round.getFleets()) {
+                if ((fleetSummary.getFleetKey() == null && fleetKey == null) ||
+                    (fleetSummary.getFleetKey() != null && fleetKey != null && fleetSummary.getFleetKey().equals(fleetKey))) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     public static void fireFleetArrivedEvents(Star star, Fleet newFleet) {

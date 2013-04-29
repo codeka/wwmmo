@@ -13,6 +13,10 @@ public class CombatReport extends BaseCombatReport {
         return mStarID;
     }
 
+    public void setID(int id) {
+        mID = id;
+        mKey = Integer.toString(id);
+    }
     public void setStarID(int id) {
         mStarID = id;
         mStarKey = Integer.toString(id);

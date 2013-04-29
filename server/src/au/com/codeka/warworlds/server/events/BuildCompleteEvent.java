@@ -100,10 +100,11 @@ public class BuildCompleteEvent extends Event {
         Simulation sim = new Simulation();
         sim.simulate(star);
 
+        Fleet fleet = null;
         if (designKind == DesignKind.BUILDING) {
             processBuildingBuild(star, colony, empireID, existingBuildingID, designID);
         } else {
-            processFleetBuild(star, colony, empireID, designID, count);
+            fleet = processFleetBuild(star, colony, empireID, designID, count);
         }
 
         Messages.SituationReport.Builder sitrep_pb = Messages.SituationReport.newBuilder();
@@ -116,18 +117,25 @@ public class BuildCompleteEvent extends Event {
         build_complete_pb.setBuildRequestKey(Integer.toString(buildRequestID));
         build_complete_pb.setDesignId(designID);
         sitrep_pb.setBuildCompleteRecord(build_complete_pb);
-        //TODO: combat
+        if (star.getCombatReport() != null && fleet != null) {
+            Messages.SituationReport.FleetUnderAttackRecord.Builder fleet_under_attack_pb = Messages.SituationReport.FleetUnderAttackRecord.newBuilder();
+            fleet_under_attack_pb.setCombatReportKey(star.getCombatReport().getKey());
+            fleet_under_attack_pb.setFleetDesignId(fleet.getDesignID());
+            fleet_under_attack_pb.setFleetKey(fleet.getKey());
+            fleet_under_attack_pb.setNumShips(fleet.getNumShips());
+            sitrep_pb.setFleetUnderAttackRecord(fleet_under_attack_pb);
+        }
 
         new StarController().update(star);
         new SituationReportController().saveSituationReport(sitrep_pb.build());
     }
 
-    private void processFleetBuild(Star star, Colony colony, int empireID, String designID,
+    private Fleet processFleetBuild(Star star, Colony colony, int empireID, String designID,
                                    float count) throws RequestException {
         Empire empire = new EmpireController().getEmpire(empireID);
         Fleet newFleet = new FleetController().createFleet(empire, star, designID, count);
-
         FleetMoveCompleteEvent.fireFleetArrivedEvents(star, newFleet);
+        return newFleet;
     }
 
     private void processBuildingBuild(Star star, Colony colony, int empireID, Integer existingBuildingID,
