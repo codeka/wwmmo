@@ -9,7 +9,6 @@ import au.com.codeka.warworlds.server.data.DB;
 import au.com.codeka.warworlds.server.data.SqlStmt;
 import au.com.codeka.warworlds.server.data.Transaction;
 import au.com.codeka.warworlds.server.model.BuildRequest;
-import au.com.codeka.warworlds.server.model.Empire;
 import au.com.codeka.warworlds.server.model.Star;
 
 public class BuildQueueController {

@@ -42,6 +42,7 @@ public class RequestRouter extends AbstractHandler {
         sRoutes.add(new Route("^/realms/[a-z]+/stars/({star_id}[0-9]+)/build/({build_id}[0-9]+)/stop", BuildStopHandler.class));
         sRoutes.add(new Route("^/realms/[a-z]+/stars/({star_id}[0-9]+)/colonies$", ColoniesHandler.class));
         sRoutes.add(new Route("^/realms/[a-z]+/stars/({star_id}[0-9]+)/colonies/({colony_id}[0-9]+)$", ColonyHandler.class));
+        sRoutes.add(new Route("^/realms/[a-z]+/stars/({star_id}[0-9]+)/combat-reports/({combat_report_id}[0-9]+)$", CombatReportHandler.class));
         sRoutes.add(new Route("^/realms/[a-z]+/stars/({star_id}[0-9]+)/fleets/({fleet_id}[0-9]+)/orders$", FleetOrdersHandler.class));
         sRoutes.add(new Route("^/realms/[a-z]+/stars/({star_id}[0-9]+)/sit-reports", SitReportsHandler.class));
         sRoutes.add(new Route("^/realms/[a-z]+/sit-reports", SitReportsHandler.class));
