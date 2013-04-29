@@ -41,7 +41,7 @@ public class RequestHandler {
             }
         } catch(IllegalArgumentException e) {
         }
-        return "";
+        return null;
     }
 
     protected String getRealm() {

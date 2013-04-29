@@ -1,6 +1,8 @@
 package au.com.codeka.warworlds.server.ctrl;
 
-import java.sql.SQLException;
+import java.sql.ResultSet;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.expressme.openid.Base64;
 import org.joda.time.DateTime;
@@ -28,7 +30,15 @@ public class SituationReportController {
             int empireID = Integer.parseInt(sitrep_pb.getEmpireKey());
             String base64 = Base64.encodeBytes(sitrep_pb.toByteArray());
             new NotificationController().sendNotification(empireID, "sitrep", base64);
-        } catch (SQLException e) {
+        } catch (Exception e) {
+            throw new RequestException(e);
+        }
+    }
+
+    public List<Messages.SituationReport> fetch(int empireID, Integer starID, DateTime after, int limit) throws RequestException {
+        try {
+            return db.fetch(empireID, starID, after);
+        } catch(Exception e) {
             throw new RequestException(e);
         }
     }
@@ -41,15 +51,42 @@ public class SituationReportController {
             super(trans);
         }
 
-        public void saveSituationReport(Messages.SituationReport sitrep_pb) throws SQLException {
+        public void saveSituationReport(Messages.SituationReport sitrep_pb) throws Exception {
             String sql = "INSERT INTO situation_reports (empire_id, star_id, report_time, report)" +
                         " VALUES (?, ?, ?, ?)";
-            SqlStmt stmt = prepare(sql);
-            stmt.setInt(1, Integer.parseInt(sitrep_pb.getEmpireKey()));
-            stmt.setInt(2, Integer.parseInt(sitrep_pb.getStarKey()));
-            stmt.setDateTime(3, new DateTime(sitrep_pb.getReportTime() * 1000, DateTimeZone.UTC));
-            stmt.setBlob(4, sitrep_pb.toByteArray());
-            stmt.update();
+            try (SqlStmt stmt = prepare(sql)) {
+                stmt.setInt(1, Integer.parseInt(sitrep_pb.getEmpireKey()));
+                stmt.setInt(2, Integer.parseInt(sitrep_pb.getStarKey()));
+                stmt.setDateTime(3, new DateTime(sitrep_pb.getReportTime() * 1000, DateTimeZone.UTC));
+                stmt.setBlob(4, sitrep_pb.toByteArray());
+                stmt.update();
+            }
+        }
+
+        public List<Messages.SituationReport> fetch(int empireID, Integer starID, DateTime after)
+                        throws Exception {
+            String sql = "SELECT report" +
+                        " FROM situation_reports" +
+                        " WHERE empire_id = ?" +
+                        (starID == null ? "" : " AND star_id = ?") +
+                          " AND report_time < ?" +
+                        " ORDER BY report_time DESC";
+            try (SqlStmt stmt = prepare(sql)) {
+                stmt.setInt(1, empireID);
+                if (starID == null) {
+                    stmt.setDateTime(2, after);
+                } else {
+                    stmt.setInt(2, starID);
+                    stmt.setDateTime(3, after);
+                }
+                ResultSet rs = stmt.select();
+
+                ArrayList<Messages.SituationReport> reports = new ArrayList<Messages.SituationReport>();
+                while (rs.next()) {
+                    reports.add(Messages.SituationReport.parseFrom(rs.getBytes(1)));
+                }
+                return reports;
+            }
         }
     }
 }
