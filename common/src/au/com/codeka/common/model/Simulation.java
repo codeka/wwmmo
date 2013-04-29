@@ -417,9 +417,10 @@ public class Simulation {
         // if there's no fleets in ATTACKING mode, then there's nothing to do
         int numAttacking = 0;
         for (BaseFleet fleet : star.getFleets()) {
-            if (fleet.getState() == BaseFleet.State.ATTACKING) {
-                numAttacking ++;
+            if (fleet.getState() != BaseFleet.State.ATTACKING || isDestroyed(fleet, now)) {
+                continue;
             }
+            numAttacking ++;
         }
         if (numAttacking == 0) {
             return;
@@ -483,7 +484,7 @@ public class Simulation {
     private boolean simulateCombatRound(DateTime now, BaseStar star, BaseCombatReport.CombatRound round) {
         TreeMap<String, Integer> fleetIndices = new TreeMap<String, Integer>();
         for (BaseFleet fleet : star.getFleets()) {
-            if (fleet.getState() != BaseFleet.State.ATTACKING) {
+            if (fleet.getState() != BaseFleet.State.ATTACKING || isDestroyed(fleet, now)) {
                 continue;
             }
 
@@ -502,10 +503,7 @@ public class Simulation {
 
         // look for fleets whose targets have been destroyed and un-target them
         for (BaseFleet fleet : star.getFleets()) {
-            if (fleet.getState() != BaseFleet.State.ATTACKING) {
-                continue;
-            }
-            if (fleet.getTimeDestroyed() != null && fleet.getTimeDestroyed().isBefore(now)) {
+            if (fleet.getState() != BaseFleet.State.ATTACKING || isDestroyed(fleet, now)) {
                 continue;
             }
             String targetFleetKey = fleet.getTargetFleetKey();
@@ -516,7 +514,7 @@ public class Simulation {
             BaseFleet targetFleet = star.findFleet(targetFleetKey);
             if (targetFleet == null) {
                 fleet.setTargetFleetKey(null);
-            } else if (targetFleet.getTimeDestroyed() != null && targetFleet.getTimeDestroyed().isBefore(now)) {
+            } else if (isDestroyed(targetFleet, now)) {
                 log(String.format("    Fleet #%s target destroyed, finding new target", fleet.getKey()));
                 fleet.setTargetFleetKey(null);
             }
@@ -524,10 +522,7 @@ public class Simulation {
 
         // look for fleets that are ATTACKING but are not currently targetting anything
         for (BaseFleet fleet : star.getFleets()) {
-            if (fleet.getState() != BaseFleet.State.ATTACKING) {
-                continue;
-            }
-            if (fleet.getTimeDestroyed() != null && fleet.getTimeDestroyed().isBefore(now)) {
+            if (fleet.getState() != BaseFleet.State.ATTACKING || isDestroyed(fleet, now)) {
                 continue;
             }
             String targetFleetKey = fleet.getTargetFleetKey();
@@ -554,13 +549,10 @@ public class Simulation {
         // all combatting fleets fire at once...
         TreeMap<String, Double> hits = new TreeMap<String, Double>();
         for (BaseFleet fleet : star.getFleets()) {
-            if (fleet.getState() != BaseFleet.State.ATTACKING) {
+            if (fleet.getState() != BaseFleet.State.ATTACKING || isDestroyed(fleet, now)) {
                 continue;
             }
             if (fleet.getStateStartTime().isAfter(now)) {
-                continue;
-            }
-            if (fleet.getTimeDestroyed() != null && fleet.getTimeDestroyed().isBefore(now)) {
                 continue;
             }
 
@@ -619,13 +611,19 @@ public class Simulation {
 
         // if there's any fleets still attacking then we need to keep going
         for (BaseFleet fleet : star.getFleets()) {
-            if (fleet.getState() == BaseFleet.State.ATTACKING && 
-                    (fleet.getTimeDestroyed() == null || fleet.getTimeDestroyed().isAfter(now))) {
+            if (fleet.getState() == BaseFleet.State.ATTACKING && !isDestroyed(fleet, now)) {
                 return true;
             }
         }
 
         // TODO: victorious?
+        return false;
+    }
+
+    private boolean isDestroyed(BaseFleet fleet, DateTime now) {
+        if (fleet.getTimeDestroyed() != null && fleet.getTimeDestroyed().isBefore(now)) {
+            return true;
+        }
         return false;
     }
 
@@ -643,7 +641,7 @@ public class Simulation {
                 // TODO: alliances
                 continue;
             }
-            if (targetFleet.getTimeDestroyed() != null && targetFleet.getTimeDestroyed().isBefore(now)) {
+            if (isDestroyed(targetFleet, now)) {
                 continue;
             }
 

@@ -10,7 +10,7 @@ public class HelloHandler extends RequestHandler {
 
     @Override
     protected void put() throws RequestException {
-        Messages.HelloRequest pbHelloRequest = getRequestBody(Messages.HelloRequest.class);
+        //Messages.HelloRequest pbHelloRequest = getRequestBody(Messages.HelloRequest.class);
 
         Messages.HelloResponse.Builder hello_response_pb = Messages.HelloResponse.newBuilder();
         hello_response_pb.setMotd(Messages.MessageOfTheDay.newBuilder()
