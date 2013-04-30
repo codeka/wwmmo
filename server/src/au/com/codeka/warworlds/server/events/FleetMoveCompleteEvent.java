@@ -22,6 +22,7 @@ import au.com.codeka.warworlds.server.data.DB;
 import au.com.codeka.warworlds.server.data.SqlStmt;
 import au.com.codeka.warworlds.server.model.CombatReport;
 import au.com.codeka.warworlds.server.model.Fleet;
+import au.com.codeka.warworlds.server.model.ScoutReport;
 import au.com.codeka.warworlds.server.model.Star;
 
 public class FleetMoveCompleteEvent extends Event {
@@ -102,7 +103,9 @@ public class FleetMoveCompleteEvent extends Event {
         move_complete_pb.setFleetKey(fleet.getKey());
         move_complete_pb.setFleetDesignId(fleet.getDesignID());
         move_complete_pb.setNumShips(fleet.getNumShips());
-        //move_complete_pb.setScoutReportKey(...);
+        for (ScoutReport scoutReport : destStar.getScoutReports()) {
+            move_complete_pb.setScoutReportKey(scoutReport.getKey());
+        }
         sitrep_pb.setMoveCompleteRecord(move_complete_pb);
         if (destStar.getCombatReport() != null && isFleetInCombatReport(fleet.getKey(), (CombatReport) destStar.getCombatReport())) {
             Messages.SituationReport.FleetUnderAttackRecord.Builder fleet_under_attack_pb = Messages.SituationReport.FleetUnderAttackRecord.newBuilder();

@@ -178,6 +178,7 @@ public class StarController {
         private void updateFleets(Star star) throws RequestException {
             boolean needInsert = false;
             boolean needDelete = false;
+            DateTime now = DateTime.now();
             String sql = "UPDATE fleets SET" +
                             " star_id = ?," +
                             " sector_id = ?," +
@@ -196,7 +197,7 @@ public class StarController {
                         needInsert = true;
                         continue;
                     }
-                    if (baseFleet.getTimeDestroyed() != null && baseFleet.getTimeDestroyed().isBefore(DateTime.now())) {
+                    if (baseFleet.getTimeDestroyed() != null && baseFleet.getTimeDestroyed().isBefore(now)) {
                         needDelete = true;
                         continue;
                     }
@@ -275,7 +276,7 @@ public class StarController {
                 ArrayList<BaseFleet> toRemove = new ArrayList<BaseFleet>();
                 try (SqlStmt stmt = prepare(sql)) {
                     for (BaseFleet baseFleet : star.getFleets()) {
-                        if (baseFleet.getTimeDestroyed() != null && baseFleet.getTimeDestroyed().isBefore(DateTime.now())) {
+                        if (baseFleet.getTimeDestroyed() != null && baseFleet.getTimeDestroyed().isBefore(now)) {
                             Fleet fleet = (Fleet) baseFleet;
                             stmt.setInt(1, fleet.getID());
                             stmt.update();

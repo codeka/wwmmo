@@ -75,6 +75,7 @@ public class BaseFleet {
         return mTimeDestroyed;
     }
     public void setTimeDestroyed(DateTime time) {
+        mNumShips = 0.0f;
         mTimeDestroyed = time;
     }
 

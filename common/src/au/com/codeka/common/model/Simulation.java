@@ -444,6 +444,10 @@ public class Simulation {
             }
         }
 
+        if (attackStartTime.isBefore(now)) {
+            attackStartTime = now;
+        }
+
         // round up to the next minute
         attackStartTime = new DateTime(
                 attackStartTime.getYear(), attackStartTime.getMonthOfYear(), attackStartTime.getDayOfMonth(),
@@ -460,13 +464,16 @@ public class Simulation {
         while (now.isBefore(attackEndTime)) {
             if (now.isBefore(attackStartTime)) {
                 now = now.plusMinutes(1);
+                if (now.isAfter(attackStartTime)) {
+                    now = attackStartTime;
+                }
                 continue;
             }
 
             BaseCombatReport.CombatRound round = new BaseCombatReport.CombatRound();
             round.setStarKey(star.getKey());
             round.setRoundTime(now);
-            log(String.format("--- Round #%d", combatReport.getCombatRounds().size() + 1));
+            log(String.format("--- Round #%d [%s]", combatReport.getCombatRounds().size() + 1, now));
             boolean stillAttacking = simulateCombatRound(now, star, round);
             if (combatReport.getStartTime() == null) {
                 combatReport.setStartTime(now);
@@ -621,7 +628,7 @@ public class Simulation {
     }
 
     private boolean isDestroyed(BaseFleet fleet, DateTime now) {
-        if (fleet.getTimeDestroyed() != null && fleet.getTimeDestroyed().isBefore(now)) {
+        if (fleet.getTimeDestroyed() != null && !fleet.getTimeDestroyed().isAfter(now)) {
             return true;
         }
         return false;

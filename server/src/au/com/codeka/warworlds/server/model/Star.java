@@ -21,6 +21,7 @@ import au.com.codeka.common.protobuf.Messages;
 public class Star extends BaseStar {
     private int mID;
     private int mSectorID;
+    private ArrayList<ScoutReport> mScoutReports = new ArrayList<ScoutReport>();
 
     public Star() {
     }
@@ -85,6 +86,10 @@ public class Star extends BaseStar {
     }
     public void setBuildRequests(ArrayList<BaseBuildRequest> buildRequests) {
         mBuildRequests = buildRequests;
+    }
+
+    public ArrayList<ScoutReport> getScoutReports() {
+        return mScoutReports;
     }
 
     @Override

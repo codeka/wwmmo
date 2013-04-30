@@ -184,7 +184,9 @@ public class MyEmpire extends Empire {
 
                     ArrayList<ScoutReport> reports = new ArrayList<ScoutReport>();
                     for (Messages.ScoutReport srpb : pb.getReportsList()) {
-                        reports.add(ScoutReport.fromProtocolBuffer(srpb));
+                        ScoutReport scoutReport = new ScoutReport();
+                        scoutReport.fromProtocolBuffer(srpb);
+                        reports.add(scoutReport);
                     }
                     return reports;
                 } catch(Exception e) {

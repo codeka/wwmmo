@@ -184,9 +184,9 @@ public class ScoutReportDialog extends DialogFragment {
 
         public void setReport(ScoutReport report) {
             mItems.clear();
-            mStar = report.getStarSnapshot();
+            mStar = (Star) report.getStarSnapshot();
 
-            Star star = report.getStarSnapshot();
+            Star star = (Star) report.getStarSnapshot();
             for (BaseColony colony : star.getColonies()) {
                 ReportItem item = new ReportItem();
                 item.colony = (Colony) colony;
