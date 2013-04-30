@@ -52,13 +52,42 @@
   <h1>Message of the Day</h1>
   <fieldset class="curr-motd">
     <legend>Current Message</legend>
-    <div>{{ motd.message }}</div>
+    <div id="currMotd"></div>
   </fieldset>
 
   <div class="new-motd">
-    <form method="post">
-      <textarea id="newMotd" name="new-motd">{{ motd.message }}</textarea>
-      <input type="submit" value="Update">
-    </form>
+    <textarea id="newMotd" name="new-motd">{{ motd.message }}</textarea>
+    <input type="submit" value="Update">
   </div>
+  <script>
+    $("input[type=submit]").on("click", function() {
+      $.ajax({
+        url: "/realms/beta/motd",
+        contentType: "text/html",
+        type: "POST",
+        data: $("#newMotd").val(),
+        success: function() {
+          refresh(false);
+        }
+      });
+    });
+
+    function refresh(updateNew) {
+        $.ajax({
+          url: "/realms/beta/motd",
+          dataType: "html",
+          type: "GET",
+          success: function(data) {
+            $("#currMotd").html(data);
+            if (updateNew) {
+              $("#newMotd").val(data);
+            }
+          },
+          error: function(xhr, status, error) {
+            alert("An error occured...\r\n\r\nStatus: "+status+"\r\nError: "+error);
+          }
+        });
+    }
+    refresh(true);
+  </script>
 {% endblock %}

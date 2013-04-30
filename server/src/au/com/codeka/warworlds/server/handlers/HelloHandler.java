@@ -4,6 +4,8 @@ import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.RequestHandler;
 import au.com.codeka.warworlds.server.ctrl.EmpireController;
+import au.com.codeka.warworlds.server.data.DB;
+import au.com.codeka.warworlds.server.data.SqlStmt;
 import au.com.codeka.warworlds.server.model.Empire;
 
 public class HelloHandler extends RequestHandler {
@@ -13,8 +15,16 @@ public class HelloHandler extends RequestHandler {
         //Messages.HelloRequest pbHelloRequest = getRequestBody(Messages.HelloRequest.class);
 
         Messages.HelloResponse.Builder hello_response_pb = Messages.HelloResponse.newBuilder();
+
+        // TODO: this could be cached...
+        String motd = "";
+        try (SqlStmt stmt = DB.prepare("SELECT motd FROM motd")) {
+            motd = stmt.selectFirstValue(String.class);
+        } catch (Exception e) {
+            throw new RequestException(e);
+        }
         hello_response_pb.setMotd(Messages.MessageOfTheDay.newBuilder()
-                                          .setMessage("<p>Welcome to the new client!!</p>")
+                                          .setMessage(motd)
                                           .setLastUpdate(""));
 
         int empireID = getSession().getEmpireID();
