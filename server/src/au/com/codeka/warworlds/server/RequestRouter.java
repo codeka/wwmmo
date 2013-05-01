@@ -48,6 +48,7 @@ public class RequestRouter extends AbstractHandler {
         sRoutes.add(new Route("^/realms/[a-z]+/stars/({star_id}[0-9]+)/sit-reports", SitReportsHandler.class));
         sRoutes.add(new Route("^/realms/[a-z]+/alliances$", AlliancesHandler.class));
         sRoutes.add(new Route("^/realms/[a-z]+/alliances/({alliance_id}[0-9]+)$", AllianceHandler.class));
+        sRoutes.add(new Route("^/realms/[a-z]+/alliances/({alliance_id}[0-9]+)/join-requests$", AllianceJoinRequestsHandler.class));
         sRoutes.add(new Route("^/realms/[a-z]+/sit-reports", SitReportsHandler.class));
         sRoutes.add(new Route("^/realms/[a-z]+/motd", MotdHandler.class));
 
