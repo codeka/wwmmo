@@ -38,16 +38,40 @@ public abstract class BaseAlliance {
     }
 
     public void fromProtocolBuffer(Messages.Alliance pb) {
-        mKey = pb.getKey();
+        if (pb.hasKey()) {
+            mKey = pb.getKey();
+        }
         mName = pb.getName();
         mTimeCreated = new DateTime(pb.getTimeCreated() * 1000, DateTimeZone.UTC);
-        mCreatorEmpireKey = pb.getCreatorEmpireKey();
-        mNumMembers = pb.getNumMembers();
+        if (pb.hasCreatorEmpireKey()) {
+            mCreatorEmpireKey = pb.getCreatorEmpireKey();
+        }
+        if (pb.hasNumMembers()) {
+            mNumMembers = pb.getNumMembers();
+        }
 
         if (pb.getMembersCount() > 0) {
             mMembers = new ArrayList<BaseAllianceMember>();
             for (Messages.AllianceMember member_pb : pb.getMembersList()) {
                 mMembers.add(createAllianceMember(member_pb));
+            }
+        }
+    }
+
+    public void toProtocolBuffer(Messages.Alliance.Builder pb) {
+        if (mKey != null) {
+            pb.setKey(mKey);
+        }
+        pb.setName(mName);
+        pb.setTimeCreated(mTimeCreated.getMillis() / 1000);
+        pb.setCreatorEmpireKey(mCreatorEmpireKey);
+        pb.setNumMembers(mNumMembers);
+
+        if (mMembers != null) {
+            for (BaseAllianceMember member : mMembers) {
+                Messages.AllianceMember.Builder member_pb = Messages.AllianceMember.newBuilder();
+                member.toProtocolBuffer(member_pb);
+                pb.addMembers(member_pb);
             }
         }
     }

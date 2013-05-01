@@ -230,7 +230,7 @@ public class EmpireController {
         }
 
         public List<Empire> getEmpires(int[] ids) throws SQLException {
-            String sql = "SELECT * FROM empires WHERE id IN "+buildInClause(ids);
+            String sql = getSelectEmpire("empires.id IN "+buildInClause(ids));
 
             SqlStmt stmt = prepare(sql);
             ResultSet rs = stmt.select();
@@ -244,7 +244,7 @@ public class EmpireController {
         }
 
         public Empire getEmpireByEmail(String email) throws SQLException {
-            String sql = "SELECT * FROM empires WHERE user_email = ?";
+            String sql = getSelectEmpire("user_email = ?");
             SqlStmt stmt = prepare(sql);
             stmt.setString(1, email);
             ResultSet rs = stmt.select();
@@ -262,7 +262,7 @@ public class EmpireController {
         }
 
         public List<Empire> getEmpiresByName(String name, int limit) throws SQLException {
-            String sql = "SELECT * FROM empires WHERE name LIKE ? LIMIT ?";
+            String sql = getSelectEmpire("name LIKE ? LIMIT ?");
             SqlStmt stmt = prepare(sql);
             stmt.setString(1, "%"+name+"%"); // TODO: escape?
             stmt.setInt(2, limit);
@@ -275,6 +275,14 @@ public class EmpireController {
 
             populateEmpires(empires);
             return empires;
+        }
+
+        private String getSelectEmpire(String whereClause) {
+            return "SELECT *, alliances.id AS alliance_id," +
+                         " (SELECT COUNT(*) FROM empires WHERE alliance_id = empires.alliance_id) AS num_empires" +
+                  " FROM empires" +
+                  " LEFT JOIN alliances ON empires.alliance_id = alliances.id" +
+                  " WHERE " + whereClause;
         }
 
         private void populateEmpires(List<Empire> empires) throws SQLException {

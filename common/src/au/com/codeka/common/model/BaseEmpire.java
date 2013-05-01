@@ -79,5 +79,11 @@ public abstract class BaseEmpire {
             mHomeStar.toProtocolBuffer(star_pb);
             pb.setHomeStar(star_pb);
         }
+
+        if (mAlliance != null) {
+            Messages.Alliance.Builder alliance_pb = Messages.Alliance.newBuilder();
+            mAlliance.toProtocolBuffer(alliance_pb);
+            pb.setAlliance(alliance_pb);
+        }
     }
 }

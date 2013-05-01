@@ -25,9 +25,20 @@ public class BaseAllianceMember {
     }
 
     public void fromProtocolBuffer(Messages.AllianceMember pb) {
-        mKey = pb.getKey();
+        if (pb.hasKey()) {
+            mKey = pb.getKey();
+        }
         mAllianceKey = pb.getAllianceKey();
         mEmpireKey = pb.getEmpireKey();
         mTimeJoined = new DateTime(pb.getTimeJoined() * 1000, DateTimeZone.UTC);
+    }
+
+    public void toProtocolBuffer(Messages.AllianceMember.Builder pb) {
+        if (mKey != null) {
+            pb.setKey(mKey);
+        }
+        pb.setAllianceKey(mAllianceKey);
+        pb.setEmpireKey(mEmpireKey);
+        pb.setTimeJoined(mTimeJoined.getMillis() / 1000);
     }
 }

@@ -957,6 +957,7 @@ message CashAuditRecord
         FleetMove = 0;
         BuildAccelerate = 1;
         CollectFromColonies = 2;
+        CreateAlliance = 3;
     }
     optional Reason reason = 3;
 
@@ -976,6 +977,8 @@ message CashAuditRecord
     optional int32 build_count = 13;
     optional float accelerate_amount = 14;
 
+    // these will be filled out for the "CreateAlliance" operation
+    optional string alliance_name = 15;
 }
 
 

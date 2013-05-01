@@ -62071,6 +62071,39 @@ public final class Messages {
      * <code>optional float accelerate_amount = 14;</code>
      */
     float getAccelerateAmount();
+
+    // optional int32 alliance_id = 15;
+    /**
+     * <code>optional int32 alliance_id = 15;</code>
+     *
+     * <pre>
+     * these will be filled out for the "CreateAlliance" operation
+     * </pre>
+     */
+    boolean hasAllianceId();
+    /**
+     * <code>optional int32 alliance_id = 15;</code>
+     *
+     * <pre>
+     * these will be filled out for the "CreateAlliance" operation
+     * </pre>
+     */
+    int getAllianceId();
+
+    // optional string alliance_name = 16;
+    /**
+     * <code>optional string alliance_name = 16;</code>
+     */
+    boolean hasAllianceName();
+    /**
+     * <code>optional string alliance_name = 16;</code>
+     */
+    java.lang.String getAllianceName();
+    /**
+     * <code>optional string alliance_name = 16;</code>
+     */
+    com.google.protobuf.ByteString
+        getAllianceNameBytes();
   }
   /**
    * Protobuf type {@code au.com.codeka.common.protobuf.CashAuditRecord}
@@ -62199,6 +62232,16 @@ public final class Messages {
               accelerateAmount_ = input.readFloat();
               break;
             }
+            case 120: {
+              bitField0_ |= 0x00004000;
+              allianceId_ = input.readInt32();
+              break;
+            }
+            case 130: {
+              bitField0_ |= 0x00008000;
+              allianceName_ = input.readBytes();
+              break;
+            }
           }
         }
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
@@ -62255,6 +62298,10 @@ public final class Messages {
        * <code>CollectFromColonies = 2;</code>
        */
       CollectFromColonies(2, 2),
+      /**
+       * <code>CreateAlliance = 3;</code>
+       */
+      CreateAlliance(3, 3),
       ;
 
       /**
@@ -62269,6 +62316,10 @@ public final class Messages {
        * <code>CollectFromColonies = 2;</code>
        */
       public static final int CollectFromColonies_VALUE = 2;
+      /**
+       * <code>CreateAlliance = 3;</code>
+       */
+      public static final int CreateAlliance_VALUE = 3;
 
 
       public final int getNumber() { return value; }
@@ -62278,6 +62329,7 @@ public final class Messages {
           case 0: return FleetMove;
           case 1: return BuildAccelerate;
           case 2: return CollectFromColonies;
+          case 3: return CreateAlliance;
           default: return null;
         }
       }
@@ -62655,6 +62707,73 @@ public final class Messages {
       return accelerateAmount_;
     }
 
+    // optional int32 alliance_id = 15;
+    public static final int ALLIANCE_ID_FIELD_NUMBER = 15;
+    private int allianceId_;
+    /**
+     * <code>optional int32 alliance_id = 15;</code>
+     *
+     * <pre>
+     * these will be filled out for the "CreateAlliance" operation
+     * </pre>
+     */
+    public boolean hasAllianceId() {
+      return ((bitField0_ & 0x00004000) == 0x00004000);
+    }
+    /**
+     * <code>optional int32 alliance_id = 15;</code>
+     *
+     * <pre>
+     * these will be filled out for the "CreateAlliance" operation
+     * </pre>
+     */
+    public int getAllianceId() {
+      return allianceId_;
+    }
+
+    // optional string alliance_name = 16;
+    public static final int ALLIANCE_NAME_FIELD_NUMBER = 16;
+    private java.lang.Object allianceName_;
+    /**
+     * <code>optional string alliance_name = 16;</code>
+     */
+    public boolean hasAllianceName() {
+      return ((bitField0_ & 0x00008000) == 0x00008000);
+    }
+    /**
+     * <code>optional string alliance_name = 16;</code>
+     */
+    public java.lang.String getAllianceName() {
+      java.lang.Object ref = allianceName_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        if (bs.isValidUtf8()) {
+          allianceName_ = s;
+        }
+        return s;
+      }
+    }
+    /**
+     * <code>optional string alliance_name = 16;</code>
+     */
+    public com.google.protobuf.ByteString
+        getAllianceNameBytes() {
+      java.lang.Object ref = allianceName_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        allianceName_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
     private void initFields() {
       id_ = 0;
       empireId_ = 0;
@@ -62670,6 +62789,8 @@ public final class Messages {
       buildDesignId_ = "";
       buildCount_ = 0;
       accelerateAmount_ = 0F;
+      allianceId_ = 0;
+      allianceName_ = "";
     }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
@@ -62724,6 +62845,12 @@ public final class Messages {
       }
       if (((bitField0_ & 0x00002000) == 0x00002000)) {
         output.writeFloat(14, accelerateAmount_);
+      }
+      if (((bitField0_ & 0x00004000) == 0x00004000)) {
+        output.writeInt32(15, allianceId_);
+      }
+      if (((bitField0_ & 0x00008000) == 0x00008000)) {
+        output.writeBytes(16, getAllianceNameBytes());
       }
       getUnknownFields().writeTo(output);
     }
@@ -62789,6 +62916,14 @@ public final class Messages {
       if (((bitField0_ & 0x00002000) == 0x00002000)) {
         size += com.google.protobuf.CodedOutputStream
           .computeFloatSize(14, accelerateAmount_);
+      }
+      if (((bitField0_ & 0x00004000) == 0x00004000)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt32Size(15, allianceId_);
+      }
+      if (((bitField0_ & 0x00008000) == 0x00008000)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBytesSize(16, getAllianceNameBytes());
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
@@ -62934,6 +63069,10 @@ public final class Messages {
         bitField0_ = (bitField0_ & ~0x00001000);
         accelerateAmount_ = 0F;
         bitField0_ = (bitField0_ & ~0x00002000);
+        allianceId_ = 0;
+        bitField0_ = (bitField0_ & ~0x00004000);
+        allianceName_ = "";
+        bitField0_ = (bitField0_ & ~0x00008000);
         return this;
       }
 
@@ -63018,6 +63157,14 @@ public final class Messages {
           to_bitField0_ |= 0x00002000;
         }
         result.accelerateAmount_ = accelerateAmount_;
+        if (((from_bitField0_ & 0x00004000) == 0x00004000)) {
+          to_bitField0_ |= 0x00004000;
+        }
+        result.allianceId_ = allianceId_;
+        if (((from_bitField0_ & 0x00008000) == 0x00008000)) {
+          to_bitField0_ |= 0x00008000;
+        }
+        result.allianceName_ = allianceName_;
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
@@ -63081,6 +63228,14 @@ public final class Messages {
         }
         if (other.hasAccelerateAmount()) {
           setAccelerateAmount(other.getAccelerateAmount());
+        }
+        if (other.hasAllianceId()) {
+          setAllianceId(other.getAllianceId());
+        }
+        if (other.hasAllianceName()) {
+          bitField0_ |= 0x00008000;
+          allianceName_ = other.allianceName_;
+          onChanged();
         }
         this.mergeUnknownFields(other.getUnknownFields());
         return this;
@@ -63733,6 +63888,129 @@ public final class Messages {
       public Builder clearAccelerateAmount() {
         bitField0_ = (bitField0_ & ~0x00002000);
         accelerateAmount_ = 0F;
+        onChanged();
+        return this;
+      }
+
+      // optional int32 alliance_id = 15;
+      private int allianceId_ ;
+      /**
+       * <code>optional int32 alliance_id = 15;</code>
+       *
+       * <pre>
+       * these will be filled out for the "CreateAlliance" operation
+       * </pre>
+       */
+      public boolean hasAllianceId() {
+        return ((bitField0_ & 0x00004000) == 0x00004000);
+      }
+      /**
+       * <code>optional int32 alliance_id = 15;</code>
+       *
+       * <pre>
+       * these will be filled out for the "CreateAlliance" operation
+       * </pre>
+       */
+      public int getAllianceId() {
+        return allianceId_;
+      }
+      /**
+       * <code>optional int32 alliance_id = 15;</code>
+       *
+       * <pre>
+       * these will be filled out for the "CreateAlliance" operation
+       * </pre>
+       */
+      public Builder setAllianceId(int value) {
+        bitField0_ |= 0x00004000;
+        allianceId_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional int32 alliance_id = 15;</code>
+       *
+       * <pre>
+       * these will be filled out for the "CreateAlliance" operation
+       * </pre>
+       */
+      public Builder clearAllianceId() {
+        bitField0_ = (bitField0_ & ~0x00004000);
+        allianceId_ = 0;
+        onChanged();
+        return this;
+      }
+
+      // optional string alliance_name = 16;
+      private java.lang.Object allianceName_ = "";
+      /**
+       * <code>optional string alliance_name = 16;</code>
+       */
+      public boolean hasAllianceName() {
+        return ((bitField0_ & 0x00008000) == 0x00008000);
+      }
+      /**
+       * <code>optional string alliance_name = 16;</code>
+       */
+      public java.lang.String getAllianceName() {
+        java.lang.Object ref = allianceName_;
+        if (!(ref instanceof java.lang.String)) {
+          java.lang.String s = ((com.google.protobuf.ByteString) ref)
+              .toStringUtf8();
+          allianceName_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>optional string alliance_name = 16;</code>
+       */
+      public com.google.protobuf.ByteString
+          getAllianceNameBytes() {
+        java.lang.Object ref = allianceName_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          allianceName_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>optional string alliance_name = 16;</code>
+       */
+      public Builder setAllianceName(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00008000;
+        allianceName_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional string alliance_name = 16;</code>
+       */
+      public Builder clearAllianceName() {
+        bitField0_ = (bitField0_ & ~0x00008000);
+        allianceName_ = getDefaultInstance().getAllianceName();
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional string alliance_name = 16;</code>
+       */
+      public Builder setAllianceNameBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00008000;
+        allianceName_ = value;
         onChanged();
         return this;
       }
@@ -69934,7 +70212,7 @@ public final class Messages {
       "emy_empire_key\030\002 \001(\t\"m\n\020SituationReports" +
       "\022I\n\021situation_reports\030\001 \003(\0132..au.com.cod" +
       "eka.common.protobuf.SituationReport\022\016\n\006c" +
-      "ursor\030\002 \001(\t\"\251\003\n\017CashAuditRecord\022\n\n\002id\030\001 " +
+      "ursor\030\002 \001(\t\"\351\003\n\017CashAuditRecord\022\n\n\002id\030\001 " +
       "\001(\005\022\021\n\tempire_id\030\002 \001(\005\022E\n\006reason\030\003 \001(\01625" +
       ".au.com.codeka.common.protobuf.CashAudit" +
       "Record.Reason\022\023\n\013before_cash\030\004 \001(\002\022\022\n\naf" +
@@ -69943,28 +70221,29 @@ public final class Messages {
       "star_id\030\t \001(\005\022\021\n\tstar_name\030\n \001(\t\022\025\n\rmove",
       "_distance\030\013 \001(\002\022\027\n\017build_design_id\030\014 \001(\t" +
       "\022\023\n\013build_count\030\r \001(\005\022\031\n\021accelerate_amou" +
-      "nt\030\016 \001(\002\"E\n\006Reason\022\r\n\tFleetMove\020\000\022\023\n\017Bui" +
-      "ldAccelerate\020\001\022\027\n\023CollectFromColonies\020\002\"" +
-      "\254\001\n\010Alliance\022\013\n\003key\030\001 \001(\t\022\014\n\004name\030\002 \001(\t\022" +
-      "\024\n\014time_created\030\003 \001(\003\022\032\n\022creator_empire_" +
-      "key\030\004 \001(\t\022\023\n\013num_members\030\005 \001(\005\022>\n\007member" +
-      "s\030\006 \003(\0132-.au.com.codeka.common.protobuf." +
-      "AllianceMember\"G\n\tAlliances\022:\n\talliances" +
-      "\030\001 \003(\0132\'.au.com.codeka.common.protobuf.A",
-      "lliance\"\\\n\016AllianceMember\022\013\n\003key\030\001 \001(\t\022\022" +
-      "\n\nempire_key\030\002 \001(\t\022\024\n\014alliance_key\030\003 \001(\t" +
-      "\022\023\n\013time_joined\030\004 \001(\003\"\376\001\n\023AllianceJoinRe" +
-      "quest\022\013\n\003key\030\001 \001(\t\022\024\n\014alliance_key\030\002 \001(\t" +
-      "\022\022\n\nempire_key\030\003 \001(\t\022\017\n\007message\030\004 \001(\t\022\026\n" +
-      "\016time_requested\030\005 \001(\003\022N\n\005state\030\006 \001(\0162?.a" +
-      "u.com.codeka.common.protobuf.AllianceJoi" +
-      "nRequest.RequestState\"7\n\014RequestState\022\013\n" +
-      "\007PENDING\020\000\022\014\n\010ACCEPTED\020\001\022\014\n\010REJECTED\020\002\"a" +
-      "\n\024AllianceJoinRequests\022I\n\rjoin_requests\030",
-      "\001 \003(\01322.au.com.codeka.common.protobuf.Al" +
-      "lianceJoinRequest\"@\n\024AllianceLeaveReques" +
-      "t\022\024\n\014alliance_key\030\001 \001(\t\022\022\n\nempire_key\030\002 " +
-      "\001(\t"
+      "nt\030\016 \001(\002\022\023\n\013alliance_id\030\017 \001(\005\022\025\n\rallianc" +
+      "e_name\030\020 \001(\t\"Y\n\006Reason\022\r\n\tFleetMove\020\000\022\023\n" +
+      "\017BuildAccelerate\020\001\022\027\n\023CollectFromColonie" +
+      "s\020\002\022\022\n\016CreateAlliance\020\003\"\254\001\n\010Alliance\022\013\n\003" +
+      "key\030\001 \001(\t\022\014\n\004name\030\002 \001(\t\022\024\n\014time_created\030" +
+      "\003 \001(\003\022\032\n\022creator_empire_key\030\004 \001(\t\022\023\n\013num" +
+      "_members\030\005 \001(\005\022>\n\007members\030\006 \003(\0132-.au.com" +
+      ".codeka.common.protobuf.AllianceMember\"G",
+      "\n\tAlliances\022:\n\talliances\030\001 \003(\0132\'.au.com." +
+      "codeka.common.protobuf.Alliance\"\\\n\016Allia" +
+      "nceMember\022\013\n\003key\030\001 \001(\t\022\022\n\nempire_key\030\002 \001" +
+      "(\t\022\024\n\014alliance_key\030\003 \001(\t\022\023\n\013time_joined\030" +
+      "\004 \001(\003\"\376\001\n\023AllianceJoinRequest\022\013\n\003key\030\001 \001" +
+      "(\t\022\024\n\014alliance_key\030\002 \001(\t\022\022\n\nempire_key\030\003" +
+      " \001(\t\022\017\n\007message\030\004 \001(\t\022\026\n\016time_requested\030" +
+      "\005 \001(\003\022N\n\005state\030\006 \001(\0162?.au.com.codeka.com" +
+      "mon.protobuf.AllianceJoinRequest.Request" +
+      "State\"7\n\014RequestState\022\013\n\007PENDING\020\000\022\014\n\010AC",
+      "CEPTED\020\001\022\014\n\010REJECTED\020\002\"a\n\024AllianceJoinRe" +
+      "quests\022I\n\rjoin_requests\030\001 \003(\01322.au.com.c" +
+      "odeka.common.protobuf.AllianceJoinReques" +
+      "t\"@\n\024AllianceLeaveRequest\022\024\n\014alliance_ke" +
+      "y\030\001 \001(\t\022\022\n\nempire_key\030\002 \001(\t"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
       new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
@@ -70288,7 +70567,7 @@ public final class Messages {
           internal_static_au_com_codeka_common_protobuf_CashAuditRecord_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_au_com_codeka_common_protobuf_CashAuditRecord_descriptor,
-              new java.lang.String[] { "Id", "EmpireId", "Reason", "BeforeCash", "AfterCash", "FleetId", "FleetDesignId", "NumShips", "StarId", "StarName", "MoveDistance", "BuildDesignId", "BuildCount", "AccelerateAmount", });
+              new java.lang.String[] { "Id", "EmpireId", "Reason", "BeforeCash", "AfterCash", "FleetId", "FleetDesignId", "NumShips", "StarId", "StarName", "MoveDistance", "BuildDesignId", "BuildCount", "AccelerateAmount", "AllianceId", "AllianceName", });
           internal_static_au_com_codeka_common_protobuf_Alliance_descriptor =
             getDescriptor().getMessageTypes().get(41);
           internal_static_au_com_codeka_common_protobuf_Alliance_fieldAccessorTable = new
