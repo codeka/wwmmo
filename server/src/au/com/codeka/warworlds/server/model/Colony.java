@@ -36,6 +36,7 @@ public class Colony extends BaseColony {
         mUncollectedTaxes = rs.getFloat("uncollected_taxes");
         mCooldownTimeEnd = new DateTime(rs.getTimestamp("cooldown_end_time").getTime());
         mPopulation = rs.getFloat("population");
+        mDefenceBoost = 1.0f;
         mBuildings = new ArrayList<BaseBuilding>();
     }
     public Colony(int id, int sectorID, int starID, int planetIndex, Integer empireID) {
@@ -56,6 +57,7 @@ public class Colony extends BaseColony {
         mUncollectedTaxes = 0.0f;
         mCooldownTimeEnd = new DateTime().plusHours(8);
         mPopulation = 100.0f;
+        mDefenceBoost = 1.0f;
         mBuildings = new ArrayList<BaseBuilding>();
     }
 

@@ -66,7 +66,7 @@ public class ColoniesHandler extends RequestHandler {
 
             // remove a ship from your colonyship fleet
             if (colonyShipFleet.getNumShips() <= 1.0f) {
-                new FleetController(t).removeShips(colonyShipFleet, 1.0f);
+                new FleetController(t).removeShips(star, colonyShipFleet, 1.0f);
             }
 
             // and colonize the planet!

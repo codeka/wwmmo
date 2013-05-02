@@ -171,6 +171,12 @@ public class Design {
         private String mKind;
         private int mLevel;
 
+        public Effect() {
+        }
+        public Effect(String kind) {
+            mKind = kind;
+        }
+
         public int getLevel() {
             return mLevel;
         }

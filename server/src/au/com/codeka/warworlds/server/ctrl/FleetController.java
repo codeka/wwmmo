@@ -34,12 +34,13 @@ public class FleetController {
      * Removes the given number of ships from the given fleet. Possibly removes the whole fleet
      * if there's not enough ships left.
      */
-    public void removeShips(Fleet fleet, float numShips) throws RequestException {
+    public void removeShips(Star star, Fleet fleet, float numShips) throws RequestException {
         if (fleet.getNumShips() <= numShips) {
             String sql = "DELETE FROM fleets WHERE id = ?";
             try (SqlStmt stmt = db.prepare(sql)) {
                 stmt.setInt(1, fleet.getID());
                 stmt.update();
+                star.getFleets().remove(fleet);
             } catch(Exception e) {
                 throw new RequestException(e);
             }

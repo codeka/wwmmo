@@ -43,6 +43,6 @@ public class DesignManager extends BaseDesignManager {
 
     @Override
     public Design.Effect createEffect(DesignKind designKind, Element effectElement) {
-        return new Design.Effect();
+        return new Design.Effect(effectElement.getAttribute("kind"));
     }
 }
