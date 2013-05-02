@@ -22,7 +22,7 @@ public class ChatHandler extends RequestHandler {
     protected void get() throws RequestException {
         DateTime since = DateTime.now().minusDays(7);
         if (getRequest().getParameter("since") != null) {
-            int epoch = Integer.parseInt(getRequest().getParameter("since"));
+            long epoch = Long.parseLong(getRequest().getParameter("since"));
             since = new DateTime(epoch * 1000);
         }
 
@@ -36,10 +36,12 @@ public class ChatHandler extends RequestHandler {
 
         String sql = "SELECT * FROM chat_messages" +
                     " WHERE posted_date > ?" +
+                      " AND (alliance_id IS NULL OR alliance_id = ?)" +
                     " ORDER BY posted_date DESC" +
                     " LIMIT "+max;
         try (SqlStmt stmt = DB.prepare(sql)) {
             stmt.setDateTime(1, since);
+            stmt.setInt(2, getSession().getAllianceID());
             ResultSet rs = stmt.select();
 
             Messages.ChatMessages.Builder chat_msgs_pb = Messages.ChatMessages.newBuilder();
@@ -67,10 +69,22 @@ public class ChatHandler extends RequestHandler {
         try (SqlStmt stmt = DB.prepare(sql)) {
             if (!session.isAdmin()) {
                 chat_msg_pb.setEmpireKey(Integer.toString(session.getEmpireID()));
-                // todo: alliance
+                if (inp_chat_msg_pb.hasAllianceKey() && inp_chat_msg_pb.getAllianceKey().length() > 0) {
+                    // confirm that if they've specified an alliance, that it's actually their
+                    // own alliance...
+                    int allianceID = Integer.parseInt(inp_chat_msg_pb.getAllianceKey());
+                    if (allianceID != getSession().getAllianceID()) {
+                        throw new RequestException(400);
+                    }
+                    chat_msg_pb.setAllianceKey(Integer.toString(allianceID));
+                }
 
                 stmt.setInt(1, Integer.parseInt(chat_msg_pb.getEmpireKey()));
-                stmt.setNull(2); // TODO: alliance
+                if (chat_msg_pb.hasAllianceKey()) {
+                    stmt.setInt(2, Integer.parseInt(chat_msg_pb.getAllianceKey()));
+                } else {
+                    stmt.setNull(2);
+                }
             } else {
                 stmt.setNull(1);
                 stmt.setNull(2);

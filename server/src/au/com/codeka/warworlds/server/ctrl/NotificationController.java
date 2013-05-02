@@ -47,7 +47,7 @@ public class NotificationController {
         Map<String, String> devices = new TreeMap<String, String>();
         String sql;
         if (empireID == null) {
-            sql = "SELECT gcm_registration_id FROM devices WHERE online_since > ? AND gcm_registration_id IS NOT NULL";
+            sql = "SELECT gcm_registration_id, user_email FROM devices WHERE online_since > ? AND gcm_registration_id IS NOT NULL";
         } else {
             sql = "SELECT gcm_registration_id, devices.user_email" +
                  " FROM devices" +
@@ -78,6 +78,9 @@ public class NotificationController {
             List<String> registrationIds = new ArrayList<String>();
             for (String registrationId : devices.keySet()) {
                 registrationIds.add(registrationId);
+            }
+            if (registrationIds.size() == 0) {
+                return;
             }
 
             List<Result> results = sender.send(msg, registrationIds, 5).getResults();
