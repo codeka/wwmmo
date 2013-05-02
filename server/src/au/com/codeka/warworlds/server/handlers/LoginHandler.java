@@ -115,11 +115,12 @@ public class LoginHandler extends RequestHandler {
 
         int empireID = 0;
         int allianceID = 0;
-        try (SqlStmt stmt = DB.prepare("SELECT id FROM empires WHERE user_email = ?")) {
+        try (SqlStmt stmt = DB.prepare("SELECT id, alliance_id FROM empires WHERE user_email = ?")) {
             stmt.setString(1, emailAddr);
             ResultSet rs = stmt.select();
             if (rs.next()) {
                 empireID = rs.getInt(1);
+                allianceID = rs.getInt(2);
             }
         } catch (Exception e) {
             throw new RequestException(e);

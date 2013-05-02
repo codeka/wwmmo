@@ -113,7 +113,9 @@ public class AllianceManager {
                     ArrayList<AllianceJoinRequest> joinRequests = new ArrayList<AllianceJoinRequest>();
                     TreeSet<String> empireKeys = new TreeSet<String>();
                     for (Messages.AllianceJoinRequest join_request_pb : pb.getJoinRequestsList()) {
-                        joinRequests.add(AllianceJoinRequest.fromProtocolBuffer(join_request_pb));
+                        AllianceJoinRequest joinRequest = new AllianceJoinRequest();
+                        joinRequest.fromProtocolBuffer(join_request_pb);
+                        joinRequests.add(joinRequest);
                         if (!empireKeys.contains(join_request_pb.getEmpireKey())) {
                             empireKeys.add(join_request_pb.getEmpireKey());
                         }

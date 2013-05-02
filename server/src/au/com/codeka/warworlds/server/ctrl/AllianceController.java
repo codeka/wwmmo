@@ -53,9 +53,25 @@ public class AllianceController {
         }
     }
 
+    public void updateJoinRequest(AllianceJoinRequest joinRequest) throws RequestException {
+        try {
+            db.updateJoinRequest(joinRequest);
+        } catch (Exception e) {
+            throw new RequestException(e);
+        }
+    }
+
     public List<AllianceJoinRequest> getJoinRequests(int allianceID) throws RequestException {
         try {
             return db.getJoinRequests(allianceID);
+        } catch (Exception e) {
+            throw new RequestException(e);
+        }
+    }
+
+    public void leaveAlliance(int empireID, int allianceID) throws RequestException {
+        try {
+            db.leaveAlliance(empireID, allianceID);
         } catch (Exception e) {
             throw new RequestException(e);
         }
@@ -180,6 +196,36 @@ public class AllianceController {
                 } else {
                     return joinRequestID;
                 }
+            }
+        }
+
+        public void updateJoinRequest(AllianceJoinRequest joinRequest) throws Exception {
+            String sql = "UPDATE alliance_join_requests SET state = ?" +
+                        " WHERE empire_id = ? AND alliance_id = ?";
+            try (SqlStmt stmt = prepare(sql)) {
+                stmt.setInt(1, joinRequest.getState().getValue());
+                stmt.setInt(2, joinRequest.getEmpireID());
+                stmt.setInt(3, joinRequest.getAllianceID());
+                stmt.update();
+            }
+
+            // if we've set it to "ACCEPTED" then we'll want to make them an actual member
+            if (joinRequest.getState() == BaseAllianceJoinRequest.RequestState.ACCEPTED) {
+                sql = "UPDATE empires SET alliance_id = ? WHERE id = ?";
+                try (SqlStmt stmt = prepare(sql)) {
+                    stmt.setInt(1, joinRequest.getAllianceID());
+                    stmt.setInt(2, joinRequest.getEmpireID());
+                    stmt.update();
+                }
+            }
+        }
+
+        public void leaveAlliance(int empireID, int allianceID) throws Exception {
+            String sql = "UPDATE empires SET alliance_id = NULL WHERE id = ? AND alliance_id = ?";
+            try (SqlStmt stmt = prepare(sql)) {
+                stmt.setInt(1, empireID);
+                stmt.setInt(2, allianceID);
+                stmt.update();
             }
         }
 

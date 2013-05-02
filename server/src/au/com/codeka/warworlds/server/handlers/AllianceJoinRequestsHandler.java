@@ -8,6 +8,7 @@ import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.RequestHandler;
 import au.com.codeka.warworlds.server.ctrl.AllianceController;
+import au.com.codeka.warworlds.server.model.Alliance;
 import au.com.codeka.warworlds.server.model.AllianceJoinRequest;
 
 public class AllianceJoinRequestsHandler extends RequestHandler {
@@ -46,6 +47,20 @@ public class AllianceJoinRequestsHandler extends RequestHandler {
 
     @Override
     protected void put() throws RequestException {
-        // TODO
+        Alliance alliance = new AllianceController().getAlliance(Integer.parseInt(getUrlParameter("alliance_id")), false);
+        if (alliance.getID() != getSession().getAllianceID()) {
+            // you can't edit other alliance's requests
+            throw new RequestException(403);
+        }
+
+        Messages.AllianceJoinRequest join_request_pb = getRequestBody(Messages.AllianceJoinRequest.class);
+        if (!join_request_pb.getAllianceKey().equals(alliance.getKey())) {
+            // alliance ID in the request should be the same as the one in the URL
+            throw new RequestException(403);
+        }
+
+        AllianceJoinRequest joinRequest = new AllianceJoinRequest();
+        joinRequest.fromProtocolBuffer(join_request_pb);
+        new AllianceController().updateJoinRequest(joinRequest);
     }
 }
