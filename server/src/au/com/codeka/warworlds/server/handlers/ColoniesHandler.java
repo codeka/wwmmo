@@ -6,6 +6,7 @@ import au.com.codeka.common.model.Simulation;
 import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.RequestHandler;
+import au.com.codeka.warworlds.server.ctrl.ColonyController;
 import au.com.codeka.warworlds.server.ctrl.EmpireController;
 import au.com.codeka.warworlds.server.ctrl.FleetController;
 import au.com.codeka.warworlds.server.ctrl.StarController;
@@ -65,12 +66,10 @@ public class ColoniesHandler extends RequestHandler {
             }
 
             // remove a ship from your colonyship fleet
-            if (colonyShipFleet.getNumShips() <= 1.0f) {
-                new FleetController(t).removeShips(star, colonyShipFleet, 1.0f);
-            }
+            new FleetController(t).removeShips(star, colonyShipFleet, 1.0f);
 
             // and colonize the planet!
-            Colony colony = new EmpireController(t).colonize(myEmpire, star, planetIndex);
+            Colony colony = new ColonyController(t).colonize(myEmpire, star, planetIndex);
 
             Messages.Colony.Builder colony_pb = Messages.Colony.newBuilder();
             colony.toProtocolBuffer(colony_pb);

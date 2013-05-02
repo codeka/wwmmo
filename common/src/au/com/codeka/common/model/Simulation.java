@@ -48,6 +48,8 @@ public class Simulation {
             }
         }
 
+        // if there's any missing EmpirePresence objects, add them now
+
         // figure out the start time, which is the oldest last_simulation time
         DateTime startTime = getSimulateStartTime(star);
         if (startTime == null) {
