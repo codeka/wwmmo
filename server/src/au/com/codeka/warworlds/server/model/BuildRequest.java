@@ -69,6 +69,9 @@ public class BuildRequest extends BaseBuildRequest {
     public void setCount(int count) {
         mCount = count;
     }
+    public void setPlanetIndex(int planetIndex) {
+        mPlanetIndex = planetIndex;
+    }
 
     @Override
     public void fromProtocolBuffer(Messages.BuildRequest pb) {

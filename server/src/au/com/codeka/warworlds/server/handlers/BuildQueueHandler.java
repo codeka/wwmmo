@@ -41,6 +41,7 @@ public class BuildQueueHandler extends RequestHandler {
 
         BuildRequest buildRequest = new BuildRequest();
         buildRequest.fromProtocolBuffer(build_request_pb);
+        buildRequest.setPlanetIndex(colony.getPlanetIndex());
         buildRequest.setStartTime(DateTime.now());
         buildRequest.setEndTime(DateTime.now().plusMinutes(5));
         new BuildQueueController().build(buildRequest);

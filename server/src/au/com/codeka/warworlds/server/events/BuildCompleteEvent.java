@@ -143,7 +143,7 @@ public class BuildCompleteEvent extends Event {
         if (existingBuildingID == null) {
             new BuildingController().createBuilding(star, colony, designID);
         } else {
-            // todo: upgrade building
+            new BuildingController().upgradeBuilding(star, colony, existingBuildingID);
         }
     }
 }

@@ -37,4 +37,7 @@ public class Building extends BaseBuilding {
         mID = id;
         mKey = Integer.toString(id);
     }
+    public void setLevel(int level) {
+        mLevel = level;
+    }
 }
