@@ -67,18 +67,36 @@ public class EmpireController {
     }
 
     public boolean withdrawCash(int empireId, float amount, Messages.CashAuditRecord.Builder audit_record_pb) throws RequestException {
-        try (Transaction t = DB.beginTransaction()) {
+        return adjustBalance(empireId, -amount, audit_record_pb);
+    }
+
+    public void depositCash(int empireId, float amount, Messages.CashAuditRecord.Builder audit_record_pb) throws RequestException {
+        adjustBalance(empireId, amount, audit_record_pb);
+    }
+
+    public boolean adjustBalance(int empireId, float amount, Messages.CashAuditRecord.Builder audit_record_pb) throws RequestException {
+        Transaction t = db.getTransaction();
+        boolean existingTransaction = (t != null);
+        if (t == null) {
+            try {
+                t = DB.beginTransaction();
+            } catch (SQLException e) {
+                throw new RequestException(e);
+            }
+        }
+
+        try {
             SqlStmt stmt = t.prepare("SELECT cash FROM empires WHERE id = ?");
             stmt.setInt(1, empireId);
             double cashBefore = stmt.selectFirstValue(Double.class);
-            if (cashBefore <= amount) {
+            if (amount < 0 && cashBefore <= Math.abs(amount)) {
                 return false;
             }
 
             audit_record_pb.setBeforeCash((float) cashBefore);
-            audit_record_pb.setAfterCash((float) (cashBefore - amount));
+            audit_record_pb.setAfterCash((float) (cashBefore + amount));
 
-            stmt = t.prepare("UPDATE empires SET cash = cash - ? WHERE id = ?");
+            stmt = t.prepare("UPDATE empires SET cash = cash + ? WHERE id = ?");
             stmt.setDouble(1, amount);
             stmt.setInt(2, empireId);
             stmt.update();
@@ -92,10 +110,20 @@ public class EmpireController {
             stmt.setBlob(5, audit_record_pb.build().toByteArray());
             stmt.update();
 
-            t.commit();
+            if (!existingTransaction) {
+                t.commit();
+            }
             return true;
         } catch(Exception e) {
             throw new RequestException(e);
+        } finally {
+            if (!existingTransaction) {
+                try {
+                    t.close();
+                } catch (Exception e) {
+                    throw new RequestException(e);
+                }
+            }
         }
     }
 

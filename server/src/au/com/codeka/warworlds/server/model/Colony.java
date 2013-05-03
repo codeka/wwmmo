@@ -81,4 +81,10 @@ public class Colony extends BaseColony {
     public int getEmpireID() {
         return mEmpireID;
     }
+
+    public float collectTaxes() {
+        float taxes = mUncollectedTaxes;
+        mUncollectedTaxes = 0;
+        return taxes;
+    }
 }
