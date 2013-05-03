@@ -28,7 +28,6 @@ public class EmpiresTaxesHandler extends RequestHandler {
             List<Star> stars = new StarController(t).getStars(starIds);
 
             // simulate all of the stars
-            
             Simulation sim = new Simulation();
             for (Star star : stars) {
                 sim.simulate(star);
