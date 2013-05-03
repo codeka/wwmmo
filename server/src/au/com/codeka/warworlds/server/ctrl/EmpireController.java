@@ -13,7 +13,6 @@ import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.data.DB;
 import au.com.codeka.warworlds.server.data.SqlStmt;
 import au.com.codeka.warworlds.server.data.Transaction;
-import au.com.codeka.warworlds.server.model.Colony;
 import au.com.codeka.warworlds.server.model.Empire;
 import au.com.codeka.warworlds.server.model.Star;
 
@@ -134,7 +133,7 @@ public class EmpireController {
 
         new ColonyController(db.getTransaction()).colonize(empire, star, starFinder.getPlanetIndex());
         new FleetController(db.getTransaction()).createFleet(empire, star, "colonyship", 1.0f);
-        new FleetController(db.getTransaction()).createFleet(empire, star, "scoute", 10.0f);
+        new FleetController(db.getTransaction()).createFleet(empire, star, "scout", 10.0f);
 
         // update the last simulation time for the star so that it doesn't simulate until we
         // actually arrived...
@@ -202,7 +201,7 @@ public class EmpireController {
         }
 
         public List<Empire> getEmpiresByName(String name, int limit) throws SQLException {
-            String sql = getSelectEmpire("name LIKE ? LIMIT ?");
+            String sql = getSelectEmpire("empires.name LIKE ? LIMIT ?");
             SqlStmt stmt = prepare(sql);
             stmt.setString(1, "%"+name+"%"); // TODO: escape?
             stmt.setInt(2, limit);

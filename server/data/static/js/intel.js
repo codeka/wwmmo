@@ -644,7 +644,7 @@ $(function() {
       if (evnt.which == 13) {
         var $results = $("#search-results");
         var $tmpl = $("#search-result-tmpl");
-        var url = "/api/v1/stars?q="+$("#search input[type=text]").val();
+        var url = "/realms/beta/stars?q="+$("#search input[type=text]").val();
 
         $results.empty();
 
@@ -656,7 +656,7 @@ $(function() {
             for (var n = 0; n < data.stars.length; n++) {
               var star_pb = data.stars[n];
               Math.seedrandom(star_pb.key);
-              star_pb.icon_class = star_pb.classification.split(".")[1].toLowerCase();
+              star_pb.icon_class = star_pb.classification.toLowerCase();
               star_pb.icon_class += "-"+(parseInt(Math.random() * 4) + 1);
 
               $html = $($tmpl.applyTemplate(star_pb));

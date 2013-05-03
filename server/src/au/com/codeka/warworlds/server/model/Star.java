@@ -87,6 +87,9 @@ public class Star extends BaseStar {
     public void setBuildRequests(ArrayList<BaseBuildRequest> buildRequests) {
         mBuildRequests = buildRequests;
     }
+    public void setPlanets(Planet[] planets) {
+        mPlanets = planets;
+    }
 
     public ArrayList<ScoutReport> getScoutReports() {
         return mScoutReports;

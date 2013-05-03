@@ -43,11 +43,17 @@ public class NameGenerator {
         word.append(vocab.getLetter("  ", rand));
         word.append(vocab.getLetter(" "+word.charAt(0), rand));
         while (true) {
-            char ch = vocab.getLetter(word.substring(word.length() - 2, word.length()), rand);
-            if (ch == ' ') {
+            try {
+                char ch = vocab.getLetter(word.substring(word.length() - 2, word.length()), rand);
+                if (ch == ' ') {
+                    break;
+                } else {
+                    word.append(ch);
+                }
+            } catch (Exception e) {
+                // make it really long so we reject it and try again...
+                word.append("....................");
                 break;
-            } else {
-                word.append(ch);
             }
         }
 

@@ -1,8 +1,12 @@
 package au.com.codeka.warworlds.server.ctrl;
 
+import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Random;
+import java.util.Set;
+import java.util.TreeMap;
+import java.util.TreeSet;
 
 import org.joda.time.DateTime;
 
@@ -112,6 +116,66 @@ public class SectorGenerator {
         }
     }
 
+    /**
+     * Expands the universe by one sector.
+     */
+    public void expandUniverse() throws RequestException {
+        TreeMap<Long, Set<Long>> existingSectors = new TreeMap<Long, Set<Long>>();
+        long minX = 0, minY = 0, maxX = 0, maxY = 0;
+        String sql = "SELECT x, y FROM sectors";
+        try (SqlStmt stmt = DB.prepare(sql)) {
+            ResultSet rs = stmt.select();
+            while (rs.next()) {
+                long x = rs.getLong(0);
+                long y = rs.getLong(1);
+
+                Set<Long> xs = existingSectors.get(y);
+                if (xs == null) {
+                    xs = new TreeSet<Long>();
+                    existingSectors.put(y, xs);
+                }
+                xs.add(x);
+
+                if (minX > x) {
+                    minX = x;
+                }
+                if (minY > y) {
+                    minY = y;
+                }
+                if (maxX < x) {
+                    maxX = x;
+                }
+                if (maxY < y) {
+                    maxY = y;
+                }
+            }
+        } catch (Exception e) {
+            throw new RequestException(e);
+        }
+
+        int numGenerated = 0;
+        while (numGenerated < 50) {
+            for (long x = minX; x <= maxX; x++) {
+                for (long y = minY; y <= maxY; y++) {
+                    Set<Long> xs = existingSectors.get(y);
+                    if (xs == null || !xs.contains(x)) {
+                        generate(x, y);
+                        numGenerated ++;
+                        if (numGenerated > 50) {
+                            return;
+                        }
+                    }
+                }
+            }
+
+            // if we get here, we ran out of coordinates
+            minX --;
+            maxX ++;
+            minY --;
+            maxY ++;
+        }
+    }
+
     private Star generateStar(Sector sector, Vector2 point) throws RequestException {
         int x = (int) ((Sector.SECTOR_SIZE - 64) * point.x) + 32;
         int y = (int) ((Sector.SECTOR_SIZE - 64) * point.y) + 32;
@@ -131,6 +195,9 @@ public class SectorGenerator {
                 planet.toProtocolBuffer(planet_pb);
                 planets_pb.addPlanets(planet_pb);
             }
+
+            Planet[] planetArray = new Planet[planets.size()];
+            star.setPlanets(planets.toArray(planetArray));
 
             stmt.setInt(1, star.getSectorID());
             stmt.setInt(2, star.getOffsetX());

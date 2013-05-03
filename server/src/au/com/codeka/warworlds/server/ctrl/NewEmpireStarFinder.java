@@ -39,7 +39,18 @@ public class NewEmpireStarFinder {
     }
 
     public boolean findStarForNewEmpire() throws RequestException {
-        ArrayList<Integer> sectorIds = findSectors();
+        if (!findStarForNewEmpire(true)) {
+            if (!findStarForNewEmpire(false)) {
+                new SectorGenerator().expandUniverse();
+                return findStarForNewEmpire(false);
+            }
+        }
+
+        return true;
+    }
+
+    private boolean findStarForNewEmpire(boolean allowEmptySectors) throws RequestException {
+        ArrayList<Integer> sectorIds = findSectors(allowEmptySectors);
         for (int sectorId : sectorIds) {
             Sector sector = new SectorController().getSector(sectorId);
             Star star = findHighestScoreStar(sector);
@@ -64,6 +75,7 @@ public class NewEmpireStarFinder {
 
         return false;
     }
+
 
     private Star findHighestScoreStar(Sector sector) {
         double highestScore = 5.0; // scores lower than 5.0 don't count
@@ -137,10 +149,10 @@ public class NewEmpireStarFinder {
             }
         }
         if (otherColony != null) {
-            if (distanceToOtherColony < 400.0) {
+            if (distanceToOtherColony < 500.0) {
                 distanceToOtherColonyScore = 0.0;
             } else {
-                distanceToOtherColonyScore = 400.0 / distanceToOtherColony;
+                distanceToOtherColonyScore = 500.0 / distanceToOtherColony;
                 distanceToOtherColonyScore *= distanceToOtherColonyScore;
             }
         }
@@ -150,7 +162,9 @@ public class NewEmpireStarFinder {
         double farmingCongeniality = 0.0;
         double miningCongeniality = 0.0;
         for (BasePlanet planet : star.getPlanets()) {
-            if (planet.getPlanetType().getInternalName().equals("terran")) {
+            if (planet.getPlanetType().getInternalName().equals("terran") ||
+                planet.getPlanetType().getInternalName().equals("swamp") ||
+                planet.getPlanetType().getInternalName().equals("water")) {
                 numTerranPlanets ++;
             }
             populationCongeniality += planet.getPopulationCongeniality();
@@ -160,6 +174,9 @@ public class NewEmpireStarFinder {
         double planetScore = 0.0;
         if (numTerranPlanets >= 2) {
             planetScore = numTerranPlanets;
+        }
+        if (numTerranPlanets == 0) {
+            return 0.0;
         }
 
         double congenialityScore = (populationCongeniality / numTerranPlanets) +
@@ -171,36 +188,38 @@ public class NewEmpireStarFinder {
                         distanceToOtherColonyScore);
 
         log.info(String.format(Locale.ENGLISH,
-                "Star[%s] score=%.2f distance_to_centre_score=%.2f planet_score=%.2f congeniality_score=%.2f distance_to_colony_score=%.2f distance_to_nearest_colony=%.2f",
+                "Star[%s] score=%.2f distance_to_centre_score=%.2f planet_score=%.2f num_terran_planets=%.0f congeniality_score=%.2f distance_to_colony_score=%.2f distance_to_nearest_colony=%.2f",
                 star.getName(), score, distanceToCentreScore,
-                planetScore, congenialityScore, distanceToOtherColonyScore,
+                planetScore, numTerranPlanets, congenialityScore, distanceToOtherColonyScore,
                 distanceToOtherColony));
 
         return score;
     }
 
-    private ArrayList<Integer> findSectors() throws RequestException {
+    private ArrayList<Integer> findSectors(boolean tryNonEmptyFirst) throws RequestException {
         ArrayList<Integer> ids = new ArrayList<Integer>();
-        String sql = "SELECT id FROM sectors WHERE num_colonies < ? AND num_colonies >= ?" +
-                    " ORDER BY num_colonies ASC, distance_to_centre ASC";
-        try (SqlStmt stmt = DB.prepare(sql)) {
-            stmt.setInt(1, 30);
-            stmt.setInt(2, 1);
-            ResultSet rs = stmt.select();
-            while (rs.next()) {
-                ids.add(rs.getInt(1));
-                if (ids.size() > 15) {
-                    break;
+        if (tryNonEmptyFirst) {
+            String sql = "SELECT id FROM sectors WHERE num_colonies < ? AND num_colonies >= ?" +
+                        " ORDER BY num_colonies ASC, distance_to_centre ASC";
+            try (SqlStmt stmt = DB.prepare(sql)) {
+                stmt.setInt(1, 30);
+                stmt.setInt(2, 1);
+                ResultSet rs = stmt.select();
+                while (rs.next()) {
+                    ids.add(rs.getInt(1));
+                    if (ids.size() > 15) {
+                        break;
+                    }
                 }
+            } catch(Exception e) {
+                throw new RequestException(e);
             }
-        } catch(Exception e) {
-            throw new RequestException(e);
-        }
-        if (!ids.isEmpty()) {
-            return ids;
+            if (!ids.isEmpty()) {
+                return ids;
+            }
         }
 
-        sql = "SELECT id FROM sectors WHERE num_colonies < ?" +
+        String sql = "SELECT id FROM sectors WHERE num_colonies < ?" +
                 " ORDER BY num_colonies ASC, distance_to_centre ASC";
         try (SqlStmt stmt = DB.prepare(sql)) {
             stmt.setInt(1, 30);
@@ -220,7 +239,7 @@ public class NewEmpireStarFinder {
 
         // if we get here, the universe needs to be expanded by a bit so we have some new sectors
         // to colonies...
-        // TODO
-        throw new RequestException(500);
+        new SectorGenerator().expandUniverse();
+        return findSectors(tryNonEmptyFirst);
     }
 }

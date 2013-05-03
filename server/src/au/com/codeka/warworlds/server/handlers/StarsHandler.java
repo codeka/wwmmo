@@ -26,5 +26,23 @@ public class StarsHandler extends RequestHandler {
             star.toProtocolBuffer(star_pb);
             setResponseBody(star_pb.build());
         }
+
+        String query = getRequest().getParameter("q");
+        if (query != null) {
+            int starID;
+            try {
+                starID = Integer.parseInt(query);
+            } catch (Exception e) {
+                return;
+            }
+
+            Star star = new StarController().getStar(starID);
+
+            Messages.Stars.Builder stars_pb = Messages.Stars.newBuilder();
+            Messages.Star.Builder star_pb = Messages.Star.newBuilder();
+            star.toProtocolBuffer(star_pb);
+            stars_pb.addStars(star_pb);
+            setResponseBody(stars_pb.build());
+        }
     }
 }
