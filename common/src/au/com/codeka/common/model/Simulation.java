@@ -605,14 +605,18 @@ public class Simulation {
 
             ShipDesign fleetDesign = (ShipDesign) BaseDesignManager.i.getDesign(DesignKind.SHIP, fleet.getDesignID());
             damage /= fleetDesign.getBaseDefence();
-            fleet.setNumShips((float) (fleet.getNumShips() - damage));
+            float newNumShips = (float) (fleet.getNumShips() - damage);
+            if (newNumShips < 0.0f) {
+                newNumShips = 0.0f;
+            }
+            fleet.setNumShips(newNumShips);
 
             BaseCombatReport.FleetDamagedRecord damageRecord = new BaseCombatReport.FleetDamagedRecord(
                     round.getFleets(), fleetIndices.get(fleet.getKey()), (float) damage.doubleValue());
             round.getFleetDamagedRecords().add(damageRecord);
 
             // if it's destroyed, mark it as such
-            if (fleet.getNumShips() <= 0.0f) {
+            if (newNumShips == 0.0f) {
                 log(String.format("    Fleet #%s DESTROYED", fleet.getKey()));
                 fleet.setTimeDestroyed(now);
             }

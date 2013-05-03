@@ -76,9 +76,6 @@ public class BaseFleet {
     }
     public void setTimeDestroyed(DateTime time) {
         mTimeDestroyed = time;
-        if (mTimeDestroyed != null) {
-            mNumShips = 0.0f;
-        }
     }
 
     public float getTimeToDestination(BaseStar srcStar, BaseStar destStar) {
