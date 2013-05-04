@@ -26,7 +26,7 @@
         (function(name, fn){
           return function() {
             var tmp = this._super;
-            
+
             // Add a new ._super() method that is the same method
             // but on the super-class
             this._super = _super[name];
@@ -158,14 +158,25 @@ $(function() {
     init: function(star, pb) {
       this.star = star;
       this.empireKey = pb.empire_key;
+      this.empireName = null;
+
+      if (typeof this.empireKey != "undefined") {
+        var $this = this;
+        empireStore.getEmpire(this.empireKey, function(empire) {
+          $this.empireName = empire;
+        });
+      }
     },
 
     render: function(context, offsetX, offsetY) {
       if (typeof this.empireKey == "undefined") {
         return;
       }
-      context.fillText("Colony",
-                       offsetX, offsetY);
+      var empireName = this.empireName;
+      if (empireName == null) {
+        empireName = "Colony";
+      }
+      context.fillText(empireName, offsetX, offsetY);
     }
   });
 
@@ -180,6 +191,13 @@ $(function() {
       this.key = pb.key;
       this.size = pb.size * 1.5;
       this.colonies = [];
+
+      if (pb.colonies) {
+        for (var i = 0; i < pb.colonies.length; i++) {
+          var colony = new Colony(this, pb.colonies[i]);
+          this.colonies.push(colony);
+        }
+      }
 
       Math.seedrandom(this.key);
       this.imgIndex = randomInt(0, 3);
@@ -264,19 +282,6 @@ $(function() {
       for (var i = 0; i < pb.stars.length; i++) {
         var star = new Star(pb.stars[i]);
         this.stars.push(star);
-      }
-
-      if (pb.colonies) {
-        for (var i = 0; i < pb.colonies.length; i++) {
-          var star_key = pb.colonies[i].star_key;
-          for (var j = 0; j < this.stars.length; j++) {
-            if (this.stars[j].key == star_key) {
-              var colony = new Colony(this.stars[j], pb.colonies[i]);
-              this.stars[j].colonies.push(colony);
-              break;
-            }
-          }
-        }
       }
 
       Math.seedrandom(this.sectorX+","+this.sectorY);

@@ -19,7 +19,7 @@ public class DB {
             // TODO: should never happen!
         }
 
-        sConnUrl = "jdbc:mysql://localhost:3306/wwmmo";
+        sConnUrl = "jdbc:mysql://localhost:3306/wwmmo?useUnicode=true&characterEncoding=utf-8";
         sConnUser = "wwmmo_user";
         sConnPass = "H98765gf!s876#Hdf2%7f";
     }
