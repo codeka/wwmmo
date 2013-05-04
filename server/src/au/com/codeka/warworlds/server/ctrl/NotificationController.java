@@ -63,7 +63,11 @@ public class NotificationController {
 
             ResultSet rs = stmt.select();
             while (rs.next()) {
-                devices.put(rs.getString(1), rs.getString(2));
+                String registrationId = rs.getString(1);
+                String email = rs.getString(2);
+                if (registrationId != null && email != null) {
+                    devices.put(registrationId, email);
+                }
             }
         } catch(Exception e) {
             throw new RequestException(e);

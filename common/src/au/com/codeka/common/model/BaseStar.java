@@ -231,7 +231,6 @@ public abstract class BaseStar {
             for (int i = 0; i < pb.getBuildingsCount(); i++) {
                 Messages.Building bpb = pb.getBuildings(i);
                 if (bpb.getColonyKey().equals(c.getKey())) {
-                    log.info("Adding building: " + bpb.getDesignName());
                     c.getBuildings().add(createBuilding(bpb));
                 }
             }
