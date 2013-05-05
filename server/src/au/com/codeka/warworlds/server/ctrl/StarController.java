@@ -15,6 +15,8 @@ import au.com.codeka.common.model.BaseColony;
 import au.com.codeka.common.model.BaseEmpirePresence;
 import au.com.codeka.common.model.BaseFleet;
 import au.com.codeka.common.model.BasePlanet;
+import au.com.codeka.common.model.BuildingEffect;
+import au.com.codeka.common.model.Design;
 import au.com.codeka.common.model.Simulation;
 import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.server.EventProcessor;
@@ -421,6 +423,10 @@ public class StarController {
                         for (BaseColony baseColony : star.getColonies()) {
                             Colony colony = (Colony) baseColony;
                             if (colony.getID() == building.getColonyID()) {
+                                for (Design.Effect effect : building.getDesign().getEffects(building.getLevel())) {
+                                    BuildingEffect buildingEffect = (BuildingEffect) effect;
+                                    buildingEffect.apply(star, colony, building);
+                                }
                                 colony.getBuildings().add(building);
                             }
                         }

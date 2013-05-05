@@ -41,15 +41,19 @@ public class DesignManager extends BaseDesignManager {
             return null;
         }
 
-        // todo: populate settings...
-
+        effect.load(effectElement);
         return effect;
     }
 
     private Design.Effect createEffect(DesignKind designKind, String effectKind) {
         if (designKind == DesignKind.BUILDING) {
-            // TODO
-            return null;
+            if (effectKind.equals("storage")) {
+                return new StorageBuildingEffect();
+            } else if (effectKind.equals("defence")) {
+                return new DefenceBuildingEffect();
+            } else if (effectKind.equals("populationBoost")) {
+                return new PopulationBoostBuildingEffect();
+            }
         } else {
             if (effectKind.equals("scout")) {
                 return new ScoutShipEffect();

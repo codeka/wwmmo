@@ -68,6 +68,9 @@ public class Colony extends BaseColony {
     public void setMaxPopulation(float maxPopulation) {
         mMaxPopulation = maxPopulation;
     }
+    public void setDefenceBoost(float boost) {
+        mDefenceBoost = boost;
+    }
 
     public int getID() {
         return mID;

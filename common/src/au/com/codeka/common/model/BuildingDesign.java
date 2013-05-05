@@ -23,6 +23,47 @@ public class BuildingDesign extends Design {
         return mUpgrades;
     }
 
+    public List<Effect> getEffects(int level) {
+        if (level <= 1) {
+            return mEffects;
+        } else {
+            return mUpgrades.get(level - 2).getEffects();
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T> ArrayList<T> getEffects(int level, Class<?> effectClass) {
+        List<Effect> allEffects = getEffects(level);
+
+        ArrayList<T> effects = new ArrayList<T>();
+        for (Effect e : allEffects) {
+            if (effectClass.isInstance(e)) {
+                effects.add((T) e);
+            }
+        }
+        return effects;
+    }
+    public boolean hasEffect(int level, String kind) {
+        List<Effect> allEffects = getEffects(level);
+
+        for (Effect e : allEffects) {
+            if (e.getKind().equals(kind)) {
+                return true;
+            }
+        }
+        return false;
+    }
+    public boolean hasEffect(int level, Class<?> effectClass) {
+        List<Effect> allEffects = getEffects(level);
+
+        for (Effect e : allEffects) {
+            if (effectClass.isInstance(e)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     @Override
     public boolean canBuildMultiple() {
         return false;
@@ -76,6 +117,7 @@ public class BuildingDesign extends Design {
     public static class Upgrade {
         private BuildCost mBuildCost;
         protected ArrayList<Dependency> mDependencies;
+        protected ArrayList<Effect> mEffects;
 
         public Upgrade(Element upgradeElem) {
             for(Element elem : XmlIterator.childElements(upgradeElem)) {
@@ -83,6 +125,8 @@ public class BuildingDesign extends Design {
                     mBuildCost = new BuildCost(elem);
                 } else if (elem.getNodeName().equals("dependencies")) {
                     mDependencies = Dependency.parse(elem);
+                } else if (elem.getNodeName().equals("effects")) {
+                    mEffects = Effect.parse(DesignKind.BUILDING, elem);
                 }
             }
         }
@@ -92,6 +136,9 @@ public class BuildingDesign extends Design {
         }
         public List<Dependency> getDependencies() {
             return mDependencies;
+        }
+        public List<Effect> getEffects() {
+            return mEffects;
         }
     }
 }

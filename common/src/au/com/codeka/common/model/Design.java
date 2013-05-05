@@ -1,6 +1,7 @@
 package au.com.codeka.common.model;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.w3c.dom.Element;
 
@@ -75,14 +76,6 @@ public class Design {
         }
         return false;
     }
-    public boolean hasEffect(String kind, int level) {
-        for (Effect e : mEffects) {
-            if (e.getKind().equals(kind) && (e.getLevel() == 0 || e.getLevel() == level)) {
-                return true;
-            }
-        }
-        return false;
-    }
 
     public abstract static class Factory {
         protected Element mDesignElement;
@@ -108,16 +101,20 @@ public class Design {
                 } else if (elem.getNodeName().equals("dependencies")) {
                     design.mDependencies = Dependency.parse(elem);
                 } else if (elem.getNodeName().equals("effects")) {
-                    for (Element effectElem : XmlIterator.childElements(elem, "effect")) {
-                        Effect effect = BaseDesignManager.i.createEffect(design.mDesignKind, effectElem);
-                        if (effect == null) {
-                            continue;
-                        }
-                        design.mEffects.add(effect);
-                    }
+                    design.mEffects = Effect.parse(design.mDesignKind, elem);
                 } else {
                     parseElement(elem, design);
                 }
+            }
+        }
+
+        protected void parseEffects(List<Effect> effects, DesignKind designKind, Element effectsElem) {
+            for (Element effectElem : XmlIterator.childElements(effectsElem, "effect")) {
+                Effect effect = BaseDesignManager.i.createEffect(designKind, effectElem);
+                if (effect == null) {
+                    continue;
+                }
+                effects.add(effect);
             }
         }
 
@@ -177,11 +174,26 @@ public class Design {
             mKind = kind;
         }
 
+        public static ArrayList<Effect> parse(DesignKind designKind, Element effectsElem) {
+            ArrayList<Effect> effects = new ArrayList<Effect>();
+            for (Element effectElem : XmlIterator.childElements(effectsElem, "effect")) {
+                Effect effect = BaseDesignManager.i.createEffect(designKind, effectElem);
+                if (effect == null) {
+                    continue;
+                }
+                effects.add(effect);
+            }
+            return effects;
+        }
+
         public int getLevel() {
             return mLevel;
         }
         public String getKind() {
             return mKind;
+        }
+
+        public void load(Element effectElement) {
         }
     }
 
