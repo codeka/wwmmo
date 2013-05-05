@@ -68,6 +68,10 @@ public class StarController {
         }
 
         public List<Star> getStars(int[] ids) throws RequestException {
+            if (ids.length == 0) {
+                return new ArrayList<Star>();
+            }
+
             final String sql = "SELECT stars.id, sector_id, name, sectors.x AS sector_x," +
                                      " sectors.y AS sector_y, stars.x, stars.y, size, star_type, planets," +
                                      " last_simulation, time_emptied" +

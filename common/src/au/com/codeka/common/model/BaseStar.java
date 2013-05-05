@@ -5,8 +5,6 @@ import java.util.List;
 
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import au.com.codeka.common.protobuf.Messages;
 
@@ -48,7 +46,6 @@ public abstract class BaseStar {
                               .build()
     };
 
-    private static Logger log = LoggerFactory.getLogger(BaseStar.class);
     protected String mKey;
     protected String mName;
     protected StarType mStarType;
