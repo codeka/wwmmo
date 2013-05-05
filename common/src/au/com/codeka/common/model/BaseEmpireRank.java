@@ -3,13 +3,13 @@ package au.com.codeka.common.model;
 import au.com.codeka.common.protobuf.Messages;
 
 public class BaseEmpireRank {
-    private String mEmpireKey;
-    private int mTotalStars;
-    private int mTotalColonies;
-    private int mTotalBuildings;
-    private int mTotalShips;
-    private int mRank;
-    private int mLastRank;
+    protected String mEmpireKey;
+    protected int mTotalStars;
+    protected int mTotalColonies;
+    protected int mTotalBuildings;
+    protected int mTotalShips;
+    protected int mRank;
+    protected int mLastRank;
 
     public String getEmpireKey() {
         return mEmpireKey;
@@ -41,5 +41,15 @@ public class BaseEmpireRank {
         mTotalShips = pb.getTotalShips();
         mRank = pb.getRank();
         mLastRank = pb.getLastRank();
+    }
+
+    public void toProtocolBuffer(Messages.EmpireRank.Builder pb) {
+        pb.setEmpireKey(mEmpireKey);
+        pb.setTotalStars(mTotalStars);
+        pb.setTotalColonies(mTotalColonies);
+        pb.setTotalBuildings(mTotalBuildings);
+        pb.setTotalShips(mTotalShips);
+        pb.setRank(mRank);
+        pb.setLastRank(mLastRank);
     }
 }
