@@ -22,7 +22,7 @@ public class ChatHandler extends RequestHandler {
     protected void get() throws RequestException {
         DateTime since = DateTime.now().minusDays(7);
         if (getRequest().getParameter("since") != null) {
-            long epoch = Long.parseLong(getRequest().getParameter("since"));
+            long epoch = Long.parseLong(getRequest().getParameter("since")) + 1;
             since = new DateTime(epoch * 1000);
         }
 

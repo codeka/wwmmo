@@ -31,6 +31,11 @@ public class LoginHandler extends RequestHandler {
 
     private static String[] ADMIN_USERS = {"dean@codeka.com.au"};
 
+    // list of users that are allowed to impersonate others
+    private static String[] IMPERSONATE_USERS = {"dean@codeka.com.au", "warworldstest1@gmail.com",
+                                                 "warworldstest2@gmail.com", "warworldstest3@gmail.com",
+                                                 "warworldstest4@gmail.com"};
+
     @Override
     protected void get() throws RequestException {
         String authToken = getRequest().getParameter("authToken");
@@ -74,7 +79,8 @@ public class LoginHandler extends RequestHandler {
             throw new RequestException(401);
         }
         String emailAddr = (String) json.get("email");
-        String cookie = generateCookie(emailAddr, false);
+        String impersonateUser = getRequest().getParameter("impersonate");
+        String cookie = generateCookie(emailAddr, false, impersonateUser);
 
         getResponse().setContentType("text/plain");
         try {
@@ -86,7 +92,7 @@ public class LoginHandler extends RequestHandler {
 
     private void openIdAuthenticate() throws RequestException {
         String emailAddr = OpenIdAuth.getAuthenticatedEmail(getRequest());
-        String cookie = generateCookie(emailAddr, true);
+        String cookie = generateCookie(emailAddr, true, null);
 
         getResponse().addCookie(new Cookie("SESSION", cookie));
         getResponse().setStatus(302);
@@ -96,7 +102,8 @@ public class LoginHandler extends RequestHandler {
     /**
      * Generates a cookie, assuming we've just finihed authenticating as the given email.
      */
-    private String generateCookie(String emailAddr, boolean doAdminTest) throws RequestException {
+    private String generateCookie(String emailAddr, boolean doAdminTest, String impersonateUser)
+                                 throws RequestException {
         // generate a random string for the session cookie
         SecureRandom rand = new SecureRandom();
         StringBuilder cookie = new StringBuilder();
@@ -113,10 +120,26 @@ public class LoginHandler extends RequestHandler {
             }
         }
 
+        if (impersonateUser != null) {
+            boolean allowed = false;
+            for (String impersonator : IMPERSONATE_USERS) {
+                if (impersonator.equals(emailAddr)) {
+                    allowed = true;
+                }
+            }
+            if (!allowed) {
+                impersonateUser = null;
+            }
+        }
+
         int empireID = 0;
         int allianceID = 0;
         try (SqlStmt stmt = DB.prepare("SELECT id, alliance_id FROM empires WHERE user_email = ?")) {
-            stmt.setString(1, emailAddr);
+            if (impersonateUser != null) {
+                stmt.setString(1, impersonateUser);
+            } else {
+                stmt.setString(1, emailAddr);
+            }
             ResultSet rs = stmt.select();
             if (rs.next()) {
                 empireID = rs.getInt(1);

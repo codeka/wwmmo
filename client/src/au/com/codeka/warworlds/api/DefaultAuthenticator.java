@@ -8,6 +8,8 @@ import org.apache.http.HttpEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import au.com.codeka.warworlds.Util;
+
 /**
  * This is the "default" authenticator, which basically passes the auth token to our web
  * service, which verifies it and gives us back a session cookie.
@@ -17,6 +19,12 @@ public class DefaultAuthenticator {
 
     public static String authenticate(String authToken) {
         String url = "/login?authToken="+authToken;
+
+        String impersonate = Util.getProperties().getProperty("user.on_behalf_of", null);
+        if (impersonate != null) {
+            url += "&impersonate="+impersonate;
+        }
+
         RequestManager.ResultWrapper resp = null;
         try {
             resp = RequestManager.request("GET", url);

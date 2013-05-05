@@ -80,6 +80,7 @@ public class Util {
             }
         }
 
+        // TODO: remove when we shut down the alpha realm
         String impersonateUser = sProperties.getProperty("user.on_behalf_of", null);
         if (impersonateUser != null) {
             ApiClient.impersonate(impersonateUser);

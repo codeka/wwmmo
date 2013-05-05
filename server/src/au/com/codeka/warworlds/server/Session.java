@@ -12,6 +12,7 @@ import org.joda.time.DateTime;
  */
 public class Session {
     private String mCookie;
+    private String mActualEmail;
     private String mEmail;
     private DateTime mLoginTime;
     private int mEmpireID;
@@ -22,7 +23,8 @@ public class Session {
     }
     public Session(ResultSet rs) throws SQLException {
         mCookie = rs.getString("session_cookie");
-        mEmail = rs.getString("user_email");
+        mActualEmail = rs.getString("user_email");
+        mEmail = mActualEmail;
         mLoginTime = new DateTime(rs.getTimestamp("login_time").getTime());
         mEmpireID = rs.getInt("empire_id");
         mAllianceID = rs.getInt("alliance_id");
@@ -35,6 +37,9 @@ public class Session {
     public String getEmail() {
         return mEmail;
     }
+    public String getActualEmail() {
+        return mActualEmail;
+    }
     public DateTime getLoginTime() {
         return mLoginTime;
     }
@@ -46,5 +51,9 @@ public class Session {
     }
     public boolean isAdmin() {
         return mIsAdmin;
+    }
+
+    public void impersonate(String email) {
+        mEmail = email;
     }
 }
