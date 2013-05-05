@@ -1,8 +1,9 @@
 package au.com.codeka.warworlds.server;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.reflect.InvocationTargetException;
+import java.io.InputStreamReader;
 import java.lang.reflect.Method;
 import java.sql.ResultSet;
 
@@ -127,16 +128,18 @@ public class RequestHandler {
 
     private void setResponseBodyText(Message pb) {
         mResponse.setContentType("text/plain");
-        mResponse.setHeader("Content-Type", "text/plain");
+        mResponse.setHeader("Content-Type", "text/plain; charset=utf-8");
+        mResponse.setCharacterEncoding("utf-8");
         try {
-            mResponse.getWriter().write(PbFormatter.toJson(pb, true));
+            mResponse.getWriter().write(PbFormatter.toJson(pb));
         } catch (IOException e) {
         }
     }
 
     private void setResponseBodyJson(Message pb) {
         mResponse.setContentType("application/json");
-        mResponse.setHeader("Content-Type", "application/json");
+        mResponse.setHeader("Content-Type", "application/json; charset=utf-8");
+        mResponse.setCharacterEncoding("utf-8");
         try {
             mResponse.getWriter().write(PbFormatter.toJson(pb));
         } catch (IOException e) {
@@ -184,6 +187,10 @@ public class RequestHandler {
 
     @SuppressWarnings({"unchecked"})
     protected <T> T getRequestBody(Class<T> protoBuffFactory) {
+        if (mRequest.getHeader("Content-Type").equals("application/json")) {
+            return getRequestBodyJson(protoBuffFactory);
+        }
+
         T result = null;
         ServletInputStream ins = null;
 
@@ -191,12 +198,7 @@ public class RequestHandler {
             ins = mRequest.getInputStream();
             Method m = protoBuffFactory.getDeclaredMethod("parseFrom", InputStream.class);
             result = (T) m.invoke(null, ins);
-        } catch (NoSuchMethodException e) {
-        } catch (SecurityException e) {
-        } catch (IllegalAccessException e) {
-        } catch (IllegalArgumentException e) {
-        } catch (InvocationTargetException e) {
-        } catch (IOException e) {
+        } catch (Exception e) {
         } finally {
             if (ins != null) {
                 try {
@@ -207,5 +209,36 @@ public class RequestHandler {
         }
 
         return result;
+    }
+
+    @SuppressWarnings("unchecked")
+    private <T> T getRequestBodyJson(Class<T> protoBuffFactory) {
+        String json = null;
+
+        InputStream ins;
+        try {
+            ins = mRequest.getInputStream();
+            BufferedReader reader = new BufferedReader(new InputStreamReader(ins));
+
+            StringBuilder sb = new StringBuilder();
+            String line;
+            while ((line = reader.readLine()) != null) {
+                sb.append(line+" ");
+            }
+
+            json = sb.toString();
+        } catch (Exception e) {
+            return null;
+        }
+
+        try {
+            Method m = protoBuffFactory.getDeclaredMethod("newBuilder");
+            Message.Builder builder = (Message.Builder) m.invoke(null);
+
+            PbFormatter.fromJson(json, builder);
+            return (T) builder.build();
+        } catch (Exception e) {
+            return null;
+        }
     }
 }

@@ -18,7 +18,7 @@ import com.google.protobuf.Message;
 import com.google.protobuf.UnknownFieldSet;
 
 public abstract class ProtobufFormatter {
-    private static Charset defaultCharset = Charset.defaultCharset();
+    private static Charset defaultCharset = Charset.forName("UTF-8");
 
     /**
      * Set the default character set to use for input / output data streams

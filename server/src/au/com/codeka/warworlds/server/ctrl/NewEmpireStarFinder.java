@@ -197,36 +197,14 @@ public class NewEmpireStarFinder {
     }
 
     private ArrayList<Integer> findSectors(boolean tryNonEmptyFirst) throws RequestException {
+        String sql = "SELECT id FROM sectors WHERE num_colonies = 0" +
+                " ORDER BY distance_to_centre ASC";
         ArrayList<Integer> ids = new ArrayList<Integer>();
-        if (tryNonEmptyFirst) {
-            String sql = "SELECT id FROM sectors WHERE num_colonies < ? AND num_colonies >= ?" +
-                        " ORDER BY num_colonies ASC, distance_to_centre ASC";
-            try (SqlStmt stmt = DB.prepare(sql)) {
-                stmt.setInt(1, 30);
-                stmt.setInt(2, 1);
-                ResultSet rs = stmt.select();
-                while (rs.next()) {
-                    ids.add(rs.getInt(1));
-                    if (ids.size() > 15) {
-                        break;
-                    }
-                }
-            } catch(Exception e) {
-                throw new RequestException(e);
-            }
-            if (!ids.isEmpty()) {
-                return ids;
-            }
-        }
-
-        String sql = "SELECT id FROM sectors WHERE num_colonies < ?" +
-                " ORDER BY num_colonies ASC, distance_to_centre ASC";
         try (SqlStmt stmt = DB.prepare(sql)) {
-            stmt.setInt(1, 30);
             ResultSet rs = stmt.select();
             while (rs.next()) {
                 ids.add(rs.getInt(1));
-                if (ids.size() > 15) {
+                if (ids.size() > 10) {
                     break;
                 }
             }

@@ -46,6 +46,8 @@
       $val.val("").focus();
     });
 
+    var is_sorted = false;
+
     function appendMessage(msg) {
       if (typeof msg.empire == "undefined") {
         if (msg.empire_key) {
@@ -94,7 +96,7 @@
     }
 
     function sendMessage(msg) {
-      var url = "/api/v1/chat";
+      var url = "/realms/beta/chat";
       $.ajax({
         url: url, type: "POST", contentType: "application/json",
         data: JSON.stringify({
@@ -114,7 +116,7 @@
     lastFetch.setDate(lastFetch.getDate() - 4);
     function fetchMessages() {
       $.ajax({
-        "url": "/api/v1/chat?since="+parseInt(lastFetch.getTime() / 1000),
+        "url": "/realms/beta/chat?since="+parseInt(lastFetch.getTime() / 1000),
         "method": "get",
         "dataType": "json",
         "success": function(data) {

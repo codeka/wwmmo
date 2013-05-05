@@ -66,22 +66,21 @@ import static au.com.codeka.common.protoformat.TextUtils.*;
  * @author kenton@google.com Kenton Varda
  */
 public class PbFormatter extends AbstractCharBasedFormatter {
-    private String mIndent = "";
-
     /**
      * Like {@code print()}, but writes directly to a {@code String} and returns
      * it.
      */
     public static String toJson(final Message msg) {
-        return toJson(msg, false);
+        PbFormatter formatter = new PbFormatter();
+        return formatter.printToString(msg);
     }
 
-    public static String toJson(final Message msg, boolean indent) {
+    public static void fromJson(CharSequence input, Message.Builder builder) {
         PbFormatter formatter = new PbFormatter();
-        if (indent) {
-            formatter.mIndent = "  ";
+        try {
+            formatter.merge(input, ExtensionRegistry.getEmptyRegistry(), builder);
+        } catch(ParseException e) {
         }
-        return formatter.printToString(msg);
     }
 
     /**
