@@ -89,13 +89,21 @@ public class StarManager {
             List<StarFetchedHandler> listeners = mStarUpdatedListeners.get(star.getKey());
             if (listeners != null) {
                 for (StarFetchedHandler handler : listeners) {
-                    handler.onStarFetched(star);
+                    try {
+                        handler.onStarFetched(star);
+                    } catch (Exception e) {
+                        log.warn("Ignored exception in onStarFetched...", e);
+                    }
                 }
             }
 
             // also anybody who's interested in ALL stars
             for (StarFetchedHandler handler : mAllStarUpdatedListeners) {
-                handler.onStarFetched(star);
+                try {
+                    handler.onStarFetched(star);
+                } catch (Exception e) {
+                    log.warn("Ignored exception in onStarFetched...", e);
+                }
             }
         }
 
@@ -260,7 +268,7 @@ public class StarManager {
                               star.getFleets() == null ? 0 : star.getFleets().size()));
                 }
 
-                if (!RealmManager.i.getRealm().isAlpha()) {
+                if (star != null && !RealmManager.i.getRealm().isAlpha()) {
                     // the alpha realm will have already simulated the star, but other realms
                     // will need to simulate first.
                     Simulation sim = new Simulation();

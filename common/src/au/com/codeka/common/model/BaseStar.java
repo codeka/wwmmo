@@ -265,7 +265,9 @@ public abstract class BaseStar {
      * fields (fleets, build requests, empires, colonies, etc)
      */
     public void toProtocolBuffer(Messages.Star.Builder pb, boolean summary) {
-        pb.setKey(mKey);
+        if (mKey != null) {
+            pb.setKey(mKey);
+        }
         pb.setName(mName);
         pb.setClassification(Messages.Star.CLASSIFICATION.valueOf(mStarType.getIndex()));
         pb.setSize(mSize);

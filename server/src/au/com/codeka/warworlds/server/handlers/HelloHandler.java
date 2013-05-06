@@ -1,5 +1,7 @@
 package au.com.codeka.warworlds.server.handlers;
 
+import java.sql.ResultSet;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -60,6 +62,27 @@ public class HelloHandler extends RequestHandler {
         Messages.Empire.Builder empire_pb = Messages.Empire.newBuilder();
         empire.toProtocolBuffer(empire_pb);
         hello_response_pb.setEmpire(empire_pb);
+
+        // set up the initial building statistics
+        String sql = "SELECT design_id, COUNT(*) FROM buildings WHERE empire_id = ? GROUP BY design_id";
+        try (SqlStmt stmt = DB.prepare(sql)) {
+            stmt.setInt(1, empire.getID());
+            ResultSet rs = stmt.select();
+
+            Messages.EmpireBuildingStatistics.Builder build_stats_pb = Messages.EmpireBuildingStatistics.newBuilder();
+            while (rs.next()) {
+                String designID = rs.getString(1);
+                int num = rs.getInt(2);
+
+                Messages.EmpireBuildingStatistics.DesignCount.Builder design_count_pb = Messages.EmpireBuildingStatistics.DesignCount.newBuilder();
+                design_count_pb.setDesignId(designID);
+                design_count_pb.setNumBuildings(num);
+                build_stats_pb.addCounts(design_count_pb);
+            }
+            hello_response_pb.setBuildingStatistics(build_stats_pb);
+        } catch (Exception e) {
+            throw new RequestException(e);
+        }
 
         setResponseBody(hello_response_pb.build());
     }

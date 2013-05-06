@@ -288,7 +288,9 @@ public class StarfieldSurfaceView extends SectorView
         // so we'll want to make sure it's still correct.
         MyEmpire myEmpire = EmpireManager.getInstance().getEmpire();
         if (empire.getKey().equals(myEmpire.getKey())) {
-            mHqStar = empire.getHomeStar();
+            if (mHqStar != null) {
+                mHqStar = empire.getHomeStar();
+            }
         }
     }
 

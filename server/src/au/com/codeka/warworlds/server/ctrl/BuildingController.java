@@ -51,7 +51,7 @@ public class BuildingController {
 
         BuildingDesign design = (BuildingDesign) DesignManager.i.getDesign(DesignKind.BUILDING, existingBuilding.getDesignID());
         if (existingBuilding.getLevel() >= design.getUpgrades().size()) {
-            throw new RequestException(400, Messages.GenericError.ErrorCode.CannotBuildMaxLevelReached, "");
+            return existingBuilding;
         }
 
         try {
