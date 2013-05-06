@@ -44,20 +44,27 @@ public class EmpiresSearchHandler extends RequestHandler {
 
         str = getRequest().getParameter("minRank");
         if (str != null) {
-            // todo: fetch by rank
-/*
-                if self.request.get("minRank", "") != "":
-                  minRank = int(self.request.get("minRank"))
-                  maxRank = minRank + 5
-                  if minRank <= 3:
-                    minRank = 1 # we'll always return the first 3 anyway
-                  if self.request.get("maxRank", "") != "":
-                    maxRank = int(self.request.get("maxRank"))
-                  empire_pbs = empire.getEmpiresByRank(minRank, maxRank)
-                  empires_pb.empires.extend(empire_pbs)
-                  if minRank > 3:
-                    empires_pb.empires.extend(empire.getEmpiresByRank(1, 3))
- */
+            int minRank = Integer.parseInt(str);
+            int maxRank = minRank + 5;
+            if (minRank <= 3) {
+                minRank = 1;
+            }
+            str = getRequest().getParameter("maxRank");
+            if (str != null) {
+                maxRank = Integer.parseInt(str);
+            }
+            if (maxRank <= minRank) {
+                maxRank = minRank + 5;
+            }
+
+            for (Empire empire : ctrl.getEmpiresByRank(minRank, maxRank)) {
+                empires.add(empire);
+            }
+            if (minRank > 3) {
+                for (Empire empire : ctrl.getEmpiresByRank(1, 3)) {
+                    empires.add(empire);
+                }
+            }
         }
 
         str = getRequest().getParameter("self");
@@ -69,41 +76,13 @@ public class EmpiresSearchHandler extends RequestHandler {
         for (Empire empire : empires) {
             Messages.Empire.Builder empire_pb = Messages.Empire.newBuilder();
             empire.toProtocolBuffer(empire_pb);
+            if (empire.getID() != getSession().getEmpireID() && !getSession().isAdmin()) {
+                // if it's not our empire....
+                empire_pb.setCash(0);
+            }
             pb.addEmpires(empire_pb);
         }
         setResponseBody(pb.build());
-        /*
-        empires_pb = pb.Empires()
-
-                if len(empires_pb.empires) == 0:
-                  self.response.set_status(404)
-                  return
-
-                if len(empires_pb.empires) > 25:
-                  del empires_pb.empires[25:]
-
-                empire_keys = []
-                for empire_pb in empires_pb.empires:
-                  if empire_pb.email != self.user.email():
-                    # it's not OUR empire, so block out a few details...
-                    empire_pb.cash = 0;
-                  empire_keys.append(empire_pb.key)
-
-                self_empire_pb = empire.getEmpireForUser(self.user)
-                for empire_rank in empire.getEmpireRanks(empire_keys):
-                  for empire_pb in empires_pb.empires:
-                    if empire_pb.key == empire_rank.empire_key:
-                      # is there a better way??
-                      empire_pb.rank.CopyFrom(empire_rank)
-                      if not self._isAdmin() and empire_pb.rank.total_stars < 10 and empire_pb.key != self_empire_pb.key:
-                        # if an enemy has < 10 stars under their control, we'll hide the number
-                        # of ships they have, since it's probably giving away a little too much info
-                        empire_pb.rank.total_ships = 0
-                        empire_pb.rank.total_buildings = 0
-                      break
-
-                return empires_pb
-*/
     }
 
 }

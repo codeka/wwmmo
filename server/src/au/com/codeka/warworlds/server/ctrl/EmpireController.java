@@ -58,6 +58,14 @@ public class EmpireController {
         }
     }
 
+    public List<Empire> getEmpiresByRank(int minRank, int maxRank) throws RequestException {
+        try {
+            return db.getEmpiresByRank(minRank, maxRank);
+        } catch (SQLException e) {
+            throw new RequestException(e);
+        }
+    }
+
     public int[] getStarsForEmpire(int empireId) throws RequestException {
         try {
             return db.getStarsForEmpire(empireId);
@@ -247,7 +255,23 @@ public class EmpireController {
             ResultSet rs = stmt.select();
 
             ArrayList<Empire> empires = new ArrayList<Empire>();
-            if (rs.next()) {
+            while (rs.next()) {
+                empires.add(new Empire(rs));
+            }
+
+            populateEmpires(empires);
+            return empires;
+        }
+
+        public List<Empire> getEmpiresByRank(int minRank, int maxRank) throws SQLException {
+            String sql = getSelectEmpire("empires.id IN (SELECT empire_id FROM empire_ranks WHERE rank BETWEEN ? AND ?)");
+            SqlStmt stmt = prepare(sql);
+            stmt.setInt(1, minRank);
+            stmt.setInt(2, maxRank);
+            ResultSet rs = stmt.select();
+
+            ArrayList<Empire> empires = new ArrayList<Empire>();
+            while (rs.next()) {
                 empires.add(new Empire(rs));
             }
 
@@ -260,6 +284,7 @@ public class EmpireController {
                          " (SELECT COUNT(*) FROM empires WHERE alliance_id = empires.alliance_id) AS num_empires" +
                   " FROM empires" +
                   " LEFT JOIN alliances ON empires.alliance_id = alliances.id" +
+                  " LEFT JOIN empire_ranks ON empires.id = empire_ranks.empire_id" +
                   " WHERE " + whereClause;
         }
 

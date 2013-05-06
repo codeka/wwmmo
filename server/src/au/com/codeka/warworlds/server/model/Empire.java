@@ -27,6 +27,11 @@ public class Empire extends BaseEmpire {
         if (!rs.wasNull()) {
             mAlliance = new Alliance(mAllianceID, rs);
         }
+
+        rs.getInt("rank");
+        if (!rs.wasNull()) {
+            mRank = new EmpireRank(rs);
+        }
     }
 
     public int getID() {

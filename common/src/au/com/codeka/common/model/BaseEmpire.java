@@ -76,7 +76,7 @@ public abstract class BaseEmpire {
 
         if (mHomeStar != null) {
             Messages.Star.Builder star_pb = Messages.Star.newBuilder();
-            mHomeStar.toProtocolBuffer(star_pb);
+            mHomeStar.toProtocolBuffer(star_pb, true);
             pb.setHomeStar(star_pb);
         }
 
@@ -84,6 +84,12 @@ public abstract class BaseEmpire {
             Messages.Alliance.Builder alliance_pb = Messages.Alliance.newBuilder();
             mAlliance.toProtocolBuffer(alliance_pb);
             pb.setAlliance(alliance_pb);
+        }
+
+        if (mRank != null) {
+            Messages.EmpireRank.Builder empire_rank_pb = Messages.EmpireRank.newBuilder();
+            mRank.toProtocolBuffer(empire_rank_pb);
+            pb.setRank(empire_rank_pb);
         }
     }
 }

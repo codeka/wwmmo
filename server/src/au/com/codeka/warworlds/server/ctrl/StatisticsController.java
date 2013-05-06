@@ -7,8 +7,6 @@ import java.util.Comparator;
 import java.util.TreeMap;
 
 import org.joda.time.DateTime;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.server.RequestException;
@@ -17,7 +15,6 @@ import au.com.codeka.warworlds.server.data.Transaction;
 import au.com.codeka.warworlds.server.model.EmpireRank;
 
 public class StatisticsController {
-    private final Logger log = LoggerFactory.getLogger(StatisticsController.class);
     private DataBase db;
 
     public StatisticsController() {
@@ -44,7 +41,7 @@ public class StatisticsController {
     public void updateRanks() throws Exception {
         TreeMap<Integer, EmpireRank> ranks = new TreeMap<Integer, EmpireRank>();
 
-        String sql = "SELECT id FROM empires";
+        String sql = "SELECT id AS empire_id FROM empires";
         try (SqlStmt stmt = db.prepare(sql)) {
             ResultSet rs = stmt.select();
             while (rs.next()) {
