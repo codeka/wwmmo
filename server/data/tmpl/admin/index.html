@@ -14,11 +14,10 @@
       var dataTable = new google.visualization.DataTable();
       dataTable.addColumn("date", "Date");
       dataTable.addColumn("number", "1-day actives");
-      dataTable.addColumn("number", "7-day actives");
       dataTable.addRows([
-      {%- for nda in empire_nda %}
-        [new Date({{nda["date"].year}}, {{nda["date"].month - 1}}, {{nda["date"].day}}), {{nda["1da"] if nda["1da"] else 0}}, {{nda["7da"] if nda["7da"] else 0}}],
-      {%- endfor %}
+      {% for nda in empire_nda %}
+        [new Date({{nda.year}}, {{nda.month}}, {{nda.day}}), {{nda.oneda}}],
+      {% endfor %}
       ]);
 
       var dataView = new google.visualization.DataView(dataTable);
@@ -36,16 +35,16 @@
     <tr>
       <th>Rank</th><th>Empire</th><th>Stars</th><th>Colonies</th><th>Buildings</th><th>Ships</th>
     </tr>
-  {%- for rank in empire_rank %}
+  {% for rank in empire_ranks %}
     <tr>
       <td>{{ loop.index }}</td>
-      <td>{{ rank.empire_name }}</td>
+      <td>{{ rank.empireName }}</td>
       <td>{{ rank.totalStars|number }}</td>
       <td>{{ rank.totalColonies|number }}</td>
       <td>{{ rank.totalBuildings|number }}</td>
       <td>{{ rank.totalShips|number }}</td>
     </tr>
-  {% endfor -%}
+  {% endfor %}
   </table>
 
 {% endblock %}
