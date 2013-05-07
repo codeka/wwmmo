@@ -33,7 +33,7 @@ public class EmpireController {
                 return null;
             }
             return empires.get(0);
-        } catch (SQLException e) {
+        } catch (Exception e) {
             throw new RequestException(e);
         }
     }
@@ -41,7 +41,7 @@ public class EmpireController {
     public List<Empire> getEmpires(int[] ids) throws RequestException {
         try {
             return db.getEmpires(ids);
-        } catch (SQLException e) {
+        } catch (Exception e) {
             throw new RequestException(e);
         }
     }
@@ -49,7 +49,7 @@ public class EmpireController {
     public Empire getEmpireByEmail(String email) throws RequestException {
         try {
             return db.getEmpireByEmail(email);
-        } catch (SQLException e) {
+        } catch (Exception e) {
             throw new RequestException(e);
         }
     }
@@ -57,7 +57,7 @@ public class EmpireController {
     public List<Empire> getEmpiresByName(String name, int limit) throws RequestException {
         try {
             return db.getEmpiresByName(name, limit);
-        } catch (SQLException e) {
+        } catch (Exception e) {
             throw new RequestException(e);
         }
     }
@@ -65,7 +65,7 @@ public class EmpireController {
     public List<Empire> getEmpiresByRank(int minRank, int maxRank) throws RequestException {
         try {
             return db.getEmpiresByRank(minRank, maxRank);
-        } catch (SQLException e) {
+        } catch (Exception e) {
             throw new RequestException(e);
         }
     }
@@ -73,7 +73,7 @@ public class EmpireController {
     public int[] getStarsForEmpire(int empireId) throws RequestException {
         try {
             return db.getStarsForEmpire(empireId);
-        } catch (SQLException e) {
+        } catch (Exception e) {
             throw new RequestException(e);
         }
     }
@@ -219,68 +219,72 @@ public class EmpireController {
             }
         }
 
-        public List<Empire> getEmpires(int[] ids) throws SQLException {
+        public List<Empire> getEmpires(int[] ids) throws Exception {
             String sql = getSelectEmpire("empires.id IN "+buildInClause(ids));
 
-            SqlStmt stmt = prepare(sql);
-            ResultSet rs = stmt.select();
+            try (SqlStmt stmt = prepare(sql)) {
+                ResultSet rs = stmt.select();
 
-            ArrayList<Empire> empires = new ArrayList<Empire>();
-            while (rs.next()) {
-                empires.add(new Empire(rs));
+                ArrayList<Empire> empires = new ArrayList<Empire>();
+                while (rs.next()) {
+                    empires.add(new Empire(rs));
+                }
+                populateEmpires(empires);
+                return empires;
             }
-            populateEmpires(empires);
-            return empires;
         }
 
-        public Empire getEmpireByEmail(String email) throws SQLException {
+        public Empire getEmpireByEmail(String email) throws Exception {
             String sql = getSelectEmpire("user_email = ?");
-            SqlStmt stmt = prepare(sql);
-            stmt.setString(1, email);
-            ResultSet rs = stmt.select();
+            try (SqlStmt stmt = prepare(sql)) {
+                stmt.setString(1, email);
+                ResultSet rs = stmt.select();
 
-            ArrayList<Empire> empires = new ArrayList<Empire>();
-            if (rs.next()) {
-                empires.add(new Empire(rs));
-            }
-            if (empires.size() == 0) {
-                return null;
-            }
+                ArrayList<Empire> empires = new ArrayList<Empire>();
+                if (rs.next()) {
+                    empires.add(new Empire(rs));
+                }
+                if (empires.size() == 0) {
+                    return null;
+                }
 
-            populateEmpires(empires);
-            return empires.get(0);
+                populateEmpires(empires);
+                return empires.get(0);
+            }
         }
 
-        public List<Empire> getEmpiresByName(String name, int limit) throws SQLException {
+        public List<Empire> getEmpiresByName(String name, int limit) throws Exception {
             String sql = getSelectEmpire("empires.name LIKE ? LIMIT ?");
-            SqlStmt stmt = prepare(sql);
-            stmt.setString(1, "%"+name+"%"); // TODO: escape?
-            stmt.setInt(2, limit);
-            ResultSet rs = stmt.select();
+            try (SqlStmt stmt = prepare(sql)) {
+                stmt.setString(1, "%"+name+"%"); // TODO: escape?
+                stmt.setInt(2, limit);
+                ResultSet rs = stmt.select();
 
-            ArrayList<Empire> empires = new ArrayList<Empire>();
-            while (rs.next()) {
-                empires.add(new Empire(rs));
+                ArrayList<Empire> empires = new ArrayList<Empire>();
+                while (rs.next()) {
+                    empires.add(new Empire(rs));
+                }
+
+                populateEmpires(empires);
+                return empires;
             }
-
-            populateEmpires(empires);
-            return empires;
         }
 
-        public List<Empire> getEmpiresByRank(int minRank, int maxRank) throws SQLException {
+        public List<Empire> getEmpiresByRank(int minRank, int maxRank) throws Exception {
             String sql = getSelectEmpire("empires.id IN (SELECT empire_id FROM empire_ranks WHERE rank BETWEEN ? AND ?)");
-            SqlStmt stmt = prepare(sql);
-            stmt.setInt(1, minRank);
-            stmt.setInt(2, maxRank);
-            ResultSet rs = stmt.select();
+            try (SqlStmt stmt = prepare(sql)) {
+                stmt.setInt(1, minRank);
+                stmt.setInt(2, maxRank);
+                ResultSet rs = stmt.select();
 
-            ArrayList<Empire> empires = new ArrayList<Empire>();
-            while (rs.next()) {
-                empires.add(new Empire(rs));
+                ArrayList<Empire> empires = new ArrayList<Empire>();
+                while (rs.next()) {
+                    empires.add(new Empire(rs));
+                }
+
+                populateEmpires(empires);
+                return empires;
             }
-
-            populateEmpires(empires);
-            return empires;
         }
 
         private String getSelectEmpire(String whereClause) {
@@ -302,24 +306,25 @@ public class EmpireController {
             }
         }
 
-        private int[] getStarsForEmpire(int empireId) throws SQLException {
+        private int[] getStarsForEmpire(int empireId) throws Exception {
             String sql = "SELECT star_id FROM fleets WHERE empire_id = ?" +
                         " UNION SELECT star_id FROM colonies WHERE empire_id = ?";
-            SqlStmt stmt = prepare(sql);
-            stmt.setInt(1, empireId);
-            stmt.setInt(2, empireId);
-            ResultSet rs = stmt.select();
+            try (SqlStmt stmt = prepare(sql)) {
+                stmt.setInt(1, empireId);
+                stmt.setInt(2, empireId);
+                ResultSet rs = stmt.select();
 
-            ArrayList<Integer> starIds = new ArrayList<Integer>();
-            while (rs.next()) {
-                starIds.add(rs.getInt(1));
-            }
+                ArrayList<Integer> starIds = new ArrayList<Integer>();
+                while (rs.next()) {
+                    starIds.add(rs.getInt(1));
+                }
 
-            int[] array = new int[starIds.size()];
-            for (int i = 0; i < array.length; i++) {
-                array[i] = starIds.get(i);
+                int[] array = new int[starIds.size()];
+                for (int i = 0; i < array.length; i++) {
+                    array[i] = starIds.get(i);
+                }
+                return array;
             }
-            return array;
         }
     }
 }

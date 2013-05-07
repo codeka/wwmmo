@@ -64,7 +64,11 @@ public class BuildCompleteEvent extends Event {
                     }
                 }
 
-                processBuildRequest(id, star, colony, empireID, existingBuildingID, designKind, designID, count);
+                try {
+                    processBuildRequest(id, star, colony, empireID, existingBuildingID, designKind, designID, count);
+                } catch (Exception e) {
+                    log.error("Error processing build-complete event!", e);
+                }
                 processedIDs.add(id);
             }
         } catch(Exception e) {
@@ -107,6 +111,8 @@ public class BuildCompleteEvent extends Event {
             fleet = processFleetBuild(star, colony, empireID, designID, count);
         }
 
+        new StarController().update(star);
+
         Messages.SituationReport.Builder sitrep_pb = Messages.SituationReport.newBuilder();
         sitrep_pb.setEmpireKey(Integer.toString(empireID));
         sitrep_pb.setReportTime(DateTime.now().getMillis() / 1000);
@@ -126,7 +132,6 @@ public class BuildCompleteEvent extends Event {
             sitrep_pb.setFleetUnderAttackRecord(fleet_under_attack_pb);
         }
 
-        new StarController().update(star);
         new SituationReportController().saveSituationReport(sitrep_pb.build());
     }
 

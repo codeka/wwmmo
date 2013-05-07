@@ -51,6 +51,8 @@
         <pathelement location="${common.location}/libs/joda-time-2.1.jar"/>
         <pathelement location="libs/spymemcached-2.8.7.jar"/>
         <pathelement location="libs/jangod-template.jar"/>
+        <pathelement location="libs/bonecp-0.7.1.jar"/>
+        <pathelement location="libs/guava-14.0.1.jar"/>
     </path>
     <target name="init">
         <mkdir dir="bin"/>

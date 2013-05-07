@@ -39,5 +39,7 @@
 	<classpathentry kind="lib" path="/common/libs/commons-collections-3.2.1.jar"/>
 	<classpathentry kind="lib" path="/common/libs/commons-io-2.1.jar"/>
 	<classpathentry kind="lib" path="/common/libs/commons-lang3-3.1.jar"/>
+	<classpathentry kind="lib" path="libs/bonecp-0.7.1.jar" sourcepath="libs-sources/bonecp-0.7.1.sources.jar"/>
+	<classpathentry kind="lib" path="libs/guava-14.0.1.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

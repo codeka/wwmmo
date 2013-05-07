@@ -56,7 +56,11 @@ public class FleetMoveCompleteEvent extends Event {
                     }
                 }
 
-                processFleet(fleetID, srcStar, destStar);
+                try {
+                    processFleet(fleetID, srcStar, destStar);
+                } catch (Exception e) {
+                    log.error("Error processing fleet-move event!", e);
+                }
             }
         } catch(Exception e) {
             log.error("Error processing fleet-move event!", e);

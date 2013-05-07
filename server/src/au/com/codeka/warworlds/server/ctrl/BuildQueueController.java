@@ -24,9 +24,9 @@ public class BuildQueueController {
             }
 
             SqlStmt stmt = t.prepare("INSERT INTO build_requests (star_id, planet_index, colony_id, empire_id," +
-                                       " existing_building_id, design_kind, design_id," +
-                                       " count, progress, start_time, end_time)" +
-                                    " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                                           " existing_building_id, design_kind, design_id," +
+                                           " count, progress, start_time, end_time)" +
+                                         " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                                     Statement.RETURN_GENERATED_KEYS);
             stmt.setInt(1, buildRequest.getStarID());
             stmt.setInt(2, buildRequest.getPlanetIndex());
