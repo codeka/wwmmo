@@ -39,6 +39,7 @@ public class Transaction implements AutoCloseable {
         for (SqlStmt stmt : mStatements) {
             stmt.close();
         }
+        mConnection.setAutoCommit(true);
         mConnection.close();
     }
 }
