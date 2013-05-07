@@ -41,47 +41,48 @@ public class HelloHandler extends RequestHandler {
 
         // fetch the empire we're interested in
         Empire empire = new EmpireController().getEmpire(getSession().getEmpireID());
-
-        // make sure they still have some colonies...
-        int numColonies = 0;
-        int[] stars = new EmpireController().getStarsForEmpire(getSession().getEmpireID());
-        for (Star star : new StarController().getStars(stars)) {
-            for (BaseColony baseColony : star.getColonies()) {
-                Colony colony = (Colony) baseColony;
-                if (colony.getEmpireID() == empire.getID()) {
-                    numColonies ++;
+        if (empire != null) {
+            // make sure they still have some colonies...
+            int numColonies = 0;
+            int[] stars = new EmpireController().getStarsForEmpire(getSession().getEmpireID());
+            for (Star star : new StarController().getStars(stars)) {
+                for (BaseColony baseColony : star.getColonies()) {
+                    Colony colony = (Colony) baseColony;
+                    if (colony.getEmpireID() == empire.getID()) {
+                        numColonies ++;
+                    }
                 }
             }
-        }
-        if (numColonies == 0) {
-            log.info(String.format("Empire #%d [%s] has been wiped out, resetting.", empire.getID(), empire.getDisplayName()));
-            new EmpireController().createEmpire(empire);
-            hello_response_pb.setWasEmpireReset(true);
-        }
-
-        Messages.Empire.Builder empire_pb = Messages.Empire.newBuilder();
-        empire.toProtocolBuffer(empire_pb);
-        hello_response_pb.setEmpire(empire_pb);
-
-        // set up the initial building statistics
-        String sql = "SELECT design_id, COUNT(*) FROM buildings WHERE empire_id = ? GROUP BY design_id";
-        try (SqlStmt stmt = DB.prepare(sql)) {
-            stmt.setInt(1, empire.getID());
-            ResultSet rs = stmt.select();
-
-            Messages.EmpireBuildingStatistics.Builder build_stats_pb = Messages.EmpireBuildingStatistics.newBuilder();
-            while (rs.next()) {
-                String designID = rs.getString(1);
-                int num = rs.getInt(2);
-
-                Messages.EmpireBuildingStatistics.DesignCount.Builder design_count_pb = Messages.EmpireBuildingStatistics.DesignCount.newBuilder();
-                design_count_pb.setDesignId(designID);
-                design_count_pb.setNumBuildings(num);
-                build_stats_pb.addCounts(design_count_pb);
+            if (numColonies == 0) {
+                log.info(String.format("Empire #%d [%s] has been wiped out, resetting.", empire.getID(), empire.getDisplayName()));
+                new EmpireController().createEmpire(empire);
+                hello_response_pb.setWasEmpireReset(true);
             }
-            hello_response_pb.setBuildingStatistics(build_stats_pb);
-        } catch (Exception e) {
-            throw new RequestException(e);
+
+            Messages.Empire.Builder empire_pb = Messages.Empire.newBuilder();
+            empire.toProtocolBuffer(empire_pb);
+            hello_response_pb.setEmpire(empire_pb);
+
+            // set up the initial building statistics
+            String sql = "SELECT design_id, COUNT(*) FROM buildings WHERE empire_id = ? GROUP BY design_id";
+            try (SqlStmt stmt = DB.prepare(sql)) {
+                stmt.setInt(1, empire.getID());
+                ResultSet rs = stmt.select();
+
+                Messages.EmpireBuildingStatistics.Builder build_stats_pb = Messages.EmpireBuildingStatistics.newBuilder();
+                while (rs.next()) {
+                    String designID = rs.getString(1);
+                    int num = rs.getInt(2);
+
+                    Messages.EmpireBuildingStatistics.DesignCount.Builder design_count_pb = Messages.EmpireBuildingStatistics.DesignCount.newBuilder();
+                    design_count_pb.setDesignId(designID);
+                    design_count_pb.setNumBuildings(num);
+                    build_stats_pb.addCounts(design_count_pb);
+                }
+                hello_response_pb.setBuildingStatistics(build_stats_pb);
+            } catch (Exception e) {
+                throw new RequestException(e);
+            }
         }
 
         setResponseBody(hello_response_pb.build());
