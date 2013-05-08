@@ -248,6 +248,15 @@ public class SectorController {
                         stmt.update();
                     }
                 }
+
+                sql = "UPDATE sectors SET num_colonies =" +
+                      " (SELECT COUNT(*) FROM colonies WHERE sector_id = sectors.id AND empire_id IS NOT NULL)" +
+                     " WHERE sectors.id IN (?, ?)";
+                try (SqlStmt stmt = prepare(sql)) {
+                    stmt.setInt(1, star1.getSectorID());
+                    stmt.setInt(2, star1.getSectorID());
+                    stmt.update();
+                }
             }
 
             String sql = "UPDATE stars SET x = ?, y = ? WHERE id = ?";
@@ -284,7 +293,6 @@ public class SectorController {
                 stmt.setInt(1, star2.getID());
                 stmt.update();
             }
-
         }
     }
 }

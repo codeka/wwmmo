@@ -2,6 +2,8 @@ package au.com.codeka.warworlds.server.handlers;
 
 import java.util.ArrayList;
 
+import org.joda.time.DateTime;
+
 import au.com.codeka.common.model.BaseBuildRequest;
 import au.com.codeka.common.model.BaseFleet;
 import au.com.codeka.common.model.BaseScoutReport;
@@ -9,6 +11,8 @@ import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.RequestHandler;
 import au.com.codeka.warworlds.server.ctrl.StarController;
+import au.com.codeka.warworlds.server.data.DB;
+import au.com.codeka.warworlds.server.data.SqlStmt;
 import au.com.codeka.warworlds.server.model.BuildRequest;
 import au.com.codeka.warworlds.server.model.Fleet;
 import au.com.codeka.warworlds.server.model.ScoutReport;
@@ -64,6 +68,49 @@ public class StarHandler extends RequestHandler {
             star.getScoutReports().removeAll(toRemove);
         }
 
+        Messages.Star.Builder star_pb = Messages.Star.newBuilder();
+        star.toProtocolBuffer(star_pb);
+        setResponseBody(star_pb.build());
+    }
+
+    @Override
+    protected void put() throws RequestException {
+        Messages.StarRenameRequest star_rename_request_pb = getRequestBody(Messages.StarRenameRequest.class);
+        if (!star_rename_request_pb.getStarKey().equals(getUrlParameter("star_id"))) {
+            throw new RequestException(404);
+        }
+        int starID = Integer.parseInt(getUrlParameter("star_id"));
+
+        if (star_rename_request_pb.getNewName().trim().equals("")) {
+            throw new RequestException(400);
+        }
+
+        String sql = "UPDATE stars SET name = ? WHERE id = ?";
+        try (SqlStmt stmt = DB.prepare(sql)) {
+            stmt.setString(1, star_rename_request_pb.getNewName().trim());
+            stmt.setInt(2, starID);
+            stmt.update();
+        } catch(Exception e) {
+            throw new RequestException(e);
+        }
+
+        sql = "INSERT INTO star_renames (star_id, old_name, new_name, purchase_developer_payload," +
+                                       " purchase_order_id, purchase_price, purchase_time)" +
+             " VALUES (?, ?, ?, ?, ?, ?, ?)";
+        try (SqlStmt stmt = DB.prepare(sql)) {
+            stmt.setInt(1, starID);
+            stmt.setString(2, star_rename_request_pb.getOldName());
+            stmt.setString(3, star_rename_request_pb.getNewName().trim());
+            stmt.setString(4, star_rename_request_pb.getPurchaseDeveloperPayload());
+            stmt.setString(5, star_rename_request_pb.getPurchaseOrderId());
+            stmt.setString(6, star_rename_request_pb.getPurchasePrice());
+            stmt.setDateTime(7, DateTime.now());
+            stmt.update();
+        } catch(Exception e) {
+            throw new RequestException(e);
+        }
+
+        Star star = new StarController().getStar(starID);
         Messages.Star.Builder star_pb = Messages.Star.newBuilder();
         star.toProtocolBuffer(star_pb);
         setResponseBody(star_pb.build());

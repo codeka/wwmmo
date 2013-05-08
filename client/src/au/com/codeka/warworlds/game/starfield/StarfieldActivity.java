@@ -266,8 +266,8 @@ public class StarfieldActivity extends BaseActivity
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
+    public void onPostResume() {
+        super.onPostResume();
 
         if (mStarRenamePurchase != null) {
             showStarRenamePopup(mStarRenamePurchase);
