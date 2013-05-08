@@ -56,6 +56,7 @@ public class RequestRouter extends AbstractHandler {
         sRoutes.add(new Route("^/realms/[a-z]+/motd", MotdHandler.class));
 
         sRoutes.add(new Route("^/admin/?$", DashboardPageHandler.class));
+        sRoutes.add(new Route("^/admin/({path}actions/move-star)$", ActionsMoveStarPageHandler.class, "admin/"));
         sRoutes.add(new Route("^/admin/?({path}.*)", HtmlPageHandler.class, "admin/"));
         sRoutes.add(new Route("^/intel/?({path}$)", HtmlPageHandler.class, "intel/"));
         sRoutes.add(new Route("^/intel/({path}.*)", StaticFileHandler.class, "intel/"));

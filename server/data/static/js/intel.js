@@ -154,6 +154,58 @@ $(function() {
     }
   });
 
+  var Fleet = WorldObject.extend({
+    init: function(star, pb) {
+      this.star = star;
+      this.empireKey = pb.empire_key;
+      this.empireName = null;
+      this.designName = pb.design_name;
+      this.numShips = pb.num_ships;
+      this.state = pb.state;
+      this.moveProgress = ((new Date().getTime() / 1000) - pb.state_start_time) / (pb.eta - pb.state_start_time);
+      this.destinationStarKey = pb.destination_star_key;
+      this.destinationStar = null;
+
+      if (typeof this.empireKey != "undefined") {
+        var $this = this;
+        empireStore.getEmpire(this.empireKey, function(empire) {
+          $this.empireName = empire;
+        });
+      }
+    },
+
+    render: function(context, offsetX, offsetY) {
+      if (typeof this.empireKey == "undefined") {
+        return;
+      }
+      var empireName = this.empireName;
+      if (empireName == null) {
+        empireName = "??";
+      }
+      context.fillText(empireName+": "+this.designName+" (x"+this.numShips+")", offsetX, offsetY+20);
+    },
+
+    renderMoving: function(context, offsetX, offsetY, directionToDest) {
+      if (typeof this.empireKey == "undefined") {
+        return;
+      }
+      var empireName = this.empireName;
+      if (empireName == null) {
+        empireName = "??";
+      }
+
+      var pt = new Vector2(directionToDest.x, directionToDest.y);
+      pt.scale(this.moveProgress);
+
+      context.fillText(empireName+": "+this.designName+" (x"+this.numShips+")", offsetX+pt.x, offsetY+pt.y-20);
+
+      context.beginPath();
+      context.arc(offsetX+pt.x, offsetY+pt.y, 10, 0, 2*Math.PI, false);
+      context.closePath();
+      context.fill();
+    }
+  });
+
   var Colony = WorldObject.extend({
     init: function(star, pb) {
       this.star = star;
@@ -191,11 +243,18 @@ $(function() {
       this.key = pb.key;
       this.size = pb.size * 1.5;
       this.colonies = [];
+      this.fleets = [];
 
       if (pb.colonies) {
         for (var i = 0; i < pb.colonies.length; i++) {
           var colony = new Colony(this, pb.colonies[i]);
           this.colonies.push(colony);
+        }
+      }
+      if (pb.fleets) {
+        for (var i = 0; i < pb.fleets.length; i++) {
+          var fleet = new Fleet(this, pb.fleets[i]);
+          this.fleets.push(fleet);
         }
       }
 
@@ -215,8 +274,25 @@ $(function() {
 
       for (var i = 0; i < this.colonies.length; i++) {
         var colony = this.colonies[i];
-        colony.render(context,
-                      offsetX + this.offsetX, offsetY + this.offsetY);
+        colony.render(context, offsetX + this.offsetX, offsetY + this.offsetY);
+      }
+
+      var n = 0;
+      for (var i = 0; i < this.fleets.length; i++) {
+        var fleet = this.fleets[i];
+        if (fleet.state == "MOVING") {
+          if (fleet.destinationStar == null) {
+            fleet.destinationStar = world.findStar(fleet.destinationStarKey);
+            fleet.destinationStarDirection = world.direction(fleet.destinationStar, this);
+          }
+          var dest = fleet.destinationStar;
+          fleet.renderMoving(context,
+                             offsetX + this.offsetX, offsetY + this.offsetY,
+                             fleet.destinationStarDirection);
+        } else {
+          fleet.render(context, offsetX + this.offsetX, offsetY + this.offsetY + (n * 20));
+          n ++;
+        }
       }
 
       context.textAlign = "center";
@@ -401,6 +477,18 @@ $(function() {
       dy += (dsy * Sector.SIZE);
 
       return new Vector2(dx, dy);
+    },
+
+    findStar: function(key) {
+      for (var i = 0; i < this._sectors.length; i++) {
+        var sector = this._sectors[i];
+        for (var j = 0; j < sector.stars.length; j++) {
+          var star = sector.stars[j];
+          if (star.key == key) {
+            return star;
+          }
+        }
+      }
     },
 
     findClosestStar: function(pos) {
