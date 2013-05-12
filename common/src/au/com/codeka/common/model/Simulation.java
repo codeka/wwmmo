@@ -493,7 +493,7 @@ public class Simulation {
     private boolean simulateCombatRound(DateTime now, BaseStar star, BaseCombatReport.CombatRound round) {
         TreeMap<String, Integer> fleetIndices = new TreeMap<String, Integer>();
         for (BaseFleet fleet : star.getFleets()) {
-            if (fleet.getState() != BaseFleet.State.ATTACKING || isDestroyed(fleet, now)) {
+            if (isDestroyed(fleet, now)) {
                 continue;
             }
 
@@ -501,6 +501,10 @@ public class Simulation {
             round.getFleets().add(fleetSummary);
             int fleetIndex = round.getFleets().size() - 1;
             fleetIndices.put(fleet.getKey(), fleetIndex);
+
+            if (fleet.getState() != BaseFleet.State.ATTACKING) {
+                continue;
+            }
 
             // if its stateStartTime is less than now, but more than a minute ago then it's just
             // joined the fray this round.

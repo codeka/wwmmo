@@ -42,7 +42,7 @@ public class RealmSelectActivity extends BaseActivity {
         realmsListView.setAdapter(new ArrayAdapter<String>(mContext, R.layout.account, realmNames));
         realmsListView.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
         for (int i = 0; i < realmNames.length; i++) {
-            if (realmNames[i].equals("Alpha")) {
+            if (realmNames[i].equals("Beta")) {
                 realmsListView.setItemChecked(i, true);
             }
         }

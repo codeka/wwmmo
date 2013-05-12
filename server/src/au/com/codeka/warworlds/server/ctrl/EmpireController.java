@@ -13,6 +13,7 @@ import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.data.DB;
 import au.com.codeka.warworlds.server.data.SqlStmt;
 import au.com.codeka.warworlds.server.data.Transaction;
+import au.com.codeka.warworlds.server.model.Colony;
 import au.com.codeka.warworlds.server.model.Empire;
 import au.com.codeka.warworlds.server.model.Star;
 
@@ -171,20 +172,18 @@ public class EmpireController {
             throw new RequestException(e);
         }
 
-        new ColonyController(db.getTransaction()).colonize(empire, star, starFinder.getPlanetIndex());
-        new FleetController(db.getTransaction()).createFleet(empire, star, "colonyship", 1.0f);
+        Colony colony = new ColonyController(db.getTransaction()).colonize(empire, star, starFinder.getPlanetIndex());
+        colony.setPopulation(colony.getMaxPopulation() * 0.8f);
+
+        new FleetController(db.getTransaction()).createFleet(empire, star, "colonyship", 2.0f);
         new FleetController(db.getTransaction()).createFleet(empire, star, "scout", 10.0f);
+        new FleetController(db.getTransaction()).createFleet(empire, star, "fighter", 50.0f);
+        new FleetController(db.getTransaction()).createFleet(empire, star, "troopcarrier", 150.0f);
 
         // update the last simulation time for the star so that it doesn't simulate until we
         // actually arrived...
-        sql = "UPDATE stars SET last_simulation = ? WHERE id = ?";
-        try (SqlStmt stmt = DB.prepare(sql)) {
-            stmt.setDateTime(1, DateTime.now());
-            stmt.setInt(2, star.getID());
-            stmt.update();
-        } catch(Exception e) {
-            throw new RequestException(e);
-        }
+        star.setLastSimulation(DateTime.now());
+        new StarController().update(star);
     }
 
     private static class DataBase extends BaseDataBase {

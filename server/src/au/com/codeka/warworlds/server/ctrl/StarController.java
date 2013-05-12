@@ -61,6 +61,34 @@ public class StarController {
         EventProcessor.i.ping();
     }
 
+    public void simulateAllStarsOlderThan(DateTime dt) {
+        ArrayList<Integer> starIDs = new ArrayList<Integer>();
+        String sql = "SELECT id FROM stars WHERE last_simulation < ? AND" +
+                    " (SELECT COUNT(*) FROM colonies WHERE star_id = stars.id) > 0";
+        try (SqlStmt stmt = db.prepare(sql)) {
+            stmt.setDateTime(1, dt);
+            ResultSet rs = stmt.select();
+            while (rs.next()) {
+                starIDs.add(rs.getInt(1));
+            }
+        } catch (Exception e) {
+        }
+
+        int[] ids = new int[starIDs.size()];
+        for (int i = 0; i < starIDs.size(); i++) {
+            ids[i] = starIDs.get(i);
+        }
+
+        try {
+            Simulation sim = new Simulation();
+            for (Star star : getStars(ids)) {
+                sim.simulate(star);
+                update(star);
+            }
+        } catch(RequestException e) {
+        }
+    }
+
     private static class DataBase extends BaseDataBase {
         public DataBase() {
             super();

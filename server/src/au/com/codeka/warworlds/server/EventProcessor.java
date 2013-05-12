@@ -60,7 +60,7 @@ public class EventProcessor {
         while (true) {
             // work out when the next event is scheduled
             DateTime nextEventDateTime = null;
-            Event nextEvent = null;
+            ArrayList<Event> events = new ArrayList<Event>();
             for (Class<?> eventClass : sEventClasses) {
                 Event event;
                 try {
@@ -70,9 +70,11 @@ public class EventProcessor {
                 }
 
                 DateTime next = event.getNextEventTime();
-                if (next != null && (nextEvent == null || next.isBefore(nextEventDateTime))) {
+                if (next != null && next.isBefore(DateTime.now())) {
+                    events.add(event);
+                }
+                if (next != null && next.isBefore(nextEventDateTime)) {
                     nextEventDateTime = next;
-                    nextEvent = event;
                 }
             }
 
@@ -95,11 +97,9 @@ public class EventProcessor {
                 }
             }
 
-            if (nextEvent == null) {
-                continue;
+            for (Event event : events) {
+                event.process();
             }
-
-            nextEvent.process();
         }
     }
 }

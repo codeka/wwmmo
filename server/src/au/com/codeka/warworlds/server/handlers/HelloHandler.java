@@ -24,7 +24,6 @@ public class HelloHandler extends RequestHandler {
     @Override
     protected void put() throws RequestException {
         Messages.HelloRequest hello_request_pb = getRequestBody(Messages.HelloRequest.class);
-        new StatisticsController().registerLogin(getSession().getEmpireID(), hello_request_pb);
 
         Messages.HelloResponse.Builder hello_response_pb = Messages.HelloResponse.newBuilder();
 
@@ -42,6 +41,8 @@ public class HelloHandler extends RequestHandler {
         // fetch the empire we're interested in
         Empire empire = new EmpireController().getEmpire(getSession().getEmpireID());
         if (empire != null) {
+            new StatisticsController().registerLogin(getSession().getEmpireID(), hello_request_pb);
+
             // make sure they still have some colonies...
             int numColonies = 0;
             int[] stars = new EmpireController().getStarsForEmpire(getSession().getEmpireID());

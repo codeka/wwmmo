@@ -111,6 +111,7 @@ public class BuildCompleteEvent extends Event {
             fleet = processFleetBuild(star, colony, empireID, designID, count);
         }
 
+        sim.simulate(star); // simulate again to re-calculate the end times
         new StarController().update(star);
 
         Messages.SituationReport.Builder sitrep_pb = Messages.SituationReport.newBuilder();
