@@ -162,6 +162,17 @@ public class Design {
         public int getLevel() {
             return mLevel;
         }
+
+        public boolean isMet(BaseColony colony) {
+            for (BaseBuilding building : colony.getBuildings()) {
+                if (building.getDesignID().equals(mDesignID)) {
+                    if (building.getLevel() >= mLevel) {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
     }
 
     public static class Effect {

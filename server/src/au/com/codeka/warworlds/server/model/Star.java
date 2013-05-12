@@ -80,6 +80,16 @@ public class Star extends BaseStar {
         mKey = Integer.toString(mID);
     }
 
+    public Colony getColony(int id) {
+        for (BaseColony colony : mColonies) {
+            Colony c = (Colony) colony;
+            if (c.getID() == id) {
+                return c;
+            }
+        }
+        return null;
+    }
+
     public void setColonies(ArrayList<BaseColony> colonies) {
         mColonies = colonies;
     }

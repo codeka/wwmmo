@@ -193,14 +193,7 @@ public class BuildActivity extends BaseActivity implements StarManager.StarFetch
                     required += ", ";
                 }
 
-                boolean dependencyMet = false;
-                for (BaseBuilding b : colony.getBuildings()) {
-                    if (b.getDesignID().equals(dep.getDesignID())) {
-                        // TODO: check level
-                        dependencyMet = true;
-                    }
-                }
-
+                boolean dependencyMet = dep.isMet(colony);
                 Design dependentDesign = DesignManager.i.getDesign(DesignKind.BUILDING, dep.getDesignID());
                 required += "<font color=\""+(dependencyMet ? "green" : "red")+"\">";
                 required += dependentDesign.getDisplayName();

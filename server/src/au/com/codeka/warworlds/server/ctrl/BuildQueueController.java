@@ -2,22 +2,90 @@ package au.com.codeka.warworlds.server.ctrl;
 
 import java.sql.Statement;
 
+import au.com.codeka.common.model.BaseBuildRequest;
+import au.com.codeka.common.model.BaseBuilding;
+import au.com.codeka.common.model.BuildingDesign;
 import au.com.codeka.common.model.Design;
+import au.com.codeka.common.model.DesignKind;
 import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.data.DB;
 import au.com.codeka.warworlds.server.data.SqlStmt;
 import au.com.codeka.warworlds.server.data.Transaction;
 import au.com.codeka.warworlds.server.model.BuildRequest;
+import au.com.codeka.warworlds.server.model.Colony;
+import au.com.codeka.warworlds.server.model.DesignManager;
 import au.com.codeka.warworlds.server.model.Star;
 
 public class BuildQueueController {
     public void build(BuildRequest buildRequest) throws RequestException {
         try (Transaction t = DB.beginTransaction()) {
-            //Star star = new StarController(t).getStar(buildRequest.getStarID());
+            Star star = new StarController(t).getStar(buildRequest.getStarID());
+            Colony colony = star.getColony(buildRequest.getColonyID());
 
-            // TODO: check dependencies
-            // TODO: check build limits
+            Design design = DesignManager.i.getDesign(buildRequest.getDesignKind(), buildRequest.getDesignID());
+
+            // check dependencies
+            for (Design.Dependency dependency : design.getDependencies()) {
+                if (!dependency.isMet(colony)) {
+                    throw new RequestException(400, Messages.GenericError.ErrorCode.CannotBuildDependencyNotMet,
+                            String.format("Cannot build %s as level %d %s is required.",
+                                          buildRequest.getDesign().getDisplayName(),
+                                          dependency.getLevel(),
+                                          DesignManager.i.getDesign(DesignKind.BUILDING, dependency.getDesignID()).getDisplayName()));
+                }
+            }
+
+            // check build limits
+            if (design.getDesignKind() == DesignKind.BUILDING) {
+                BuildingDesign buildingDesign = (BuildingDesign) design;
+                if (buildingDesign.getMaxPerColony() > 0) {
+                    int maxPerColony = buildingDesign.getMaxPerColony();
+                    int numThisColony = 0;
+                    for (BaseBuilding building : colony.getBuildings()) {
+                        if (building.getDesignID().equals(buildRequest.getDesignID())) {
+                            numThisColony ++;
+                        }
+                    }
+                    for (BaseBuildRequest baseBuildRequest : star.getBuildRequests()) {
+                        BuildRequest otherBuildRequest = (BuildRequest) baseBuildRequest;
+                        if (otherBuildRequest.getColonyID() == colony.getID() &&
+                            otherBuildRequest.getDesignID().equals(buildRequest.getDesignID())) {
+                            numThisColony ++;
+                        }
+                    }
+
+                    if (numThisColony >= maxPerColony) {
+                        throw new RequestException(400, Messages.GenericError.ErrorCode.CannotBuildMaxPerColonyReached,
+                                String.format("Cannot build %s, maximum per colony reached.",
+                                              buildRequest.getDesign().getDisplayName()));
+                    }
+                }
+
+                if (buildingDesign.getMaxPerEmpire() > 0) {
+                    SqlStmt stmt = t.prepare("SELECT (" +
+                                            "   SELECT COUNT(*)" +
+                                            "   FROM buildings" +
+                                            "   WHERE empire_id = ?" +
+                                            "     AND design_id = ?" +
+                                            " ) + (" +
+                                            "   SELECT COUNT(*)" +
+                                            "   FROM build_requests" +
+                                            "   WHERE empire_id = ?" +
+                                            "     AND design_id = ?" +
+                                            " )");
+                    stmt.setInt(1, buildRequest.getEmpireID());
+                    stmt.setString(2, buildRequest.getDesignID());
+                    stmt.setInt(3, buildRequest.getEmpireID());
+                    stmt.setString(4, buildRequest.getDesignID());
+                    Long numPerEmpire = stmt.selectFirstValue(Long.class);
+                    if (numPerEmpire >= buildingDesign.getMaxPerEmpire()) {
+                        throw new RequestException(400, Messages.GenericError.ErrorCode.CannotBuildMaxPerColonyReached,
+                                String.format("Cannot build %s, maximum per empire reached.",
+                                              buildRequest.getDesign().getDisplayName()));
+                    }
+                }
+            }
 
             if (buildRequest.getCount() > 5000) {
                 buildRequest.setCount(5000);
