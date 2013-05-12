@@ -15,6 +15,7 @@ import au.com.codeka.warworlds.server.data.SqlStmt;
 import au.com.codeka.warworlds.server.data.Transaction;
 import au.com.codeka.warworlds.server.model.Colony;
 import au.com.codeka.warworlds.server.model.Empire;
+import au.com.codeka.warworlds.server.model.Planet;
 import au.com.codeka.warworlds.server.model.Star;
 
 public class EmpireController {
@@ -171,9 +172,21 @@ public class EmpireController {
         } catch(Exception e) {
             throw new RequestException(e);
         }
+        sql = "UPDATE stars SET time_emptied = ? WHERE id = ?";
+        try (SqlStmt stmt = DB.prepare(sql)) {
+            stmt.setDateTime(1, DateTime.now());
+            stmt.setInt(2, star.getID());
+            stmt.update();
+        } catch(Exception e) {
+            throw new RequestException(e);
+        }
+
+        // re-fetch the star with it's new details...
+        star = new StarController().getStar(star.getID());
+        Planet planet = (Planet) star.getPlanets()[starFinder.getPlanetIndex() - 1];
 
         Colony colony = new ColonyController(db.getTransaction()).colonize(empire, star, starFinder.getPlanetIndex());
-        colony.setPopulation(colony.getMaxPopulation() * 0.8f);
+        colony.setPopulation(planet.getPopulationCongeniality() * 0.8f);
 
         new FleetController(db.getTransaction()).createFleet(empire, star, "colonyship", 2.0f);
         new FleetController(db.getTransaction()).createFleet(empire, star, "scout", 10.0f);

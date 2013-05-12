@@ -53,6 +53,11 @@ public class Star extends BaseStar {
             mLastSimulation = new DateTime(lastSimulation.getTime());
         }
 
+        Timestamp timeEmptied = rs.getTimestamp("time_emptied");
+        if (timeEmptied != null) {
+            mTimeEmptied = new DateTime(timeEmptied.getTime());
+        }
+
         try {
             Messages.Planets planets_pb = Messages.Planets.parseFrom(rs.getBlob("planets").getBinaryStream());
             mPlanets = new BasePlanet[planets_pb.getPlanetsCount()];

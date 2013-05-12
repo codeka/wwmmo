@@ -37,6 +37,12 @@
                        flags="gm"
                        replace="debug=false" />
 
+        <!-- change all of the in-app purchase fields to their defaults -->
+        <replaceregexp file="assets/warworlds.properties"
+                       match="^iap\.([^=]+)=.*$"
+                       flags="gm"
+                       replace="iap.\1=\1" />
+
         <!-- update the version number -->
         <replaceregexp file="AndroidManifest.xml"
                        match="android:versionCode=&quot;(.*)&quot;"

@@ -3,11 +3,13 @@ package au.com.codeka.warworlds.server.ctrl;
 import java.sql.Statement;
 import java.util.ArrayList;
 
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import au.com.codeka.common.model.BaseFleet;
 import au.com.codeka.warworlds.server.RequestException;
+import au.com.codeka.warworlds.server.data.DB;
 import au.com.codeka.warworlds.server.data.SqlStmt;
 import au.com.codeka.warworlds.server.data.Transaction;
 import au.com.codeka.warworlds.server.designeffects.TroopCarrierShipEffect;
@@ -86,7 +88,7 @@ public class ColonyController {
             }
 
             try {
-                db.destroyColony(colony.getID());
+                db.destroyColony(colony.getStarID(), colony.getID());
             } catch (Exception e) {
                 throw new RequestException(e);
             }
@@ -145,7 +147,7 @@ public class ColonyController {
 
             sql = "INSERT IGNORE INTO empire_presences" +
                     " (empire_id, star_id, total_goods, total_minerals)" +
-                    " VALUES (?, ?, 500, 500)";
+                    " VALUES (?, ?, 100, 100)";
             try (SqlStmt stmt = db.prepare(sql)) {
                 stmt.setInt(1, empire.getID());
                 stmt.setInt(2, star.getID());
@@ -167,11 +169,20 @@ public class ColonyController {
             super(trans);
         }
 
-        public void destroyColony(int colonyID) throws Exception {
+        public void destroyColony(int starID, int colonyID) throws Exception {
             String sql = "DELETE FROM colonies WHERE id = ?";
             try (SqlStmt stmt = prepare(sql)) {
                 stmt.setInt(1, colonyID);
                 stmt.update();
+            }
+
+            sql = "UPDATE stars SET time_emptied = ? WHERE id = ?";
+            try (SqlStmt stmt = DB.prepare(sql)) {
+                stmt.setDateTime(1, DateTime.now());
+                stmt.setInt(2, starID);
+                stmt.update();
+            } catch(Exception e) {
+                throw new RequestException(e);
             }
         }
     }
