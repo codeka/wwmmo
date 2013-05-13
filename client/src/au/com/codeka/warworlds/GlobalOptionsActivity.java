@@ -116,6 +116,13 @@ public class GlobalOptionsActivity extends PreferenceActivity
             p.setSummary("Use generic star and planet images");
         }
 
+        p = getPreferenceScreen().findPreference("GlobalOptions.AutoTranslateChatMessages");
+        if (opts.autoTranslateChatMessages()) {
+            p.setSummary("Auto-translate non-English chat messages to English.");
+        } else {
+            p.setSummary("Display chat messages in their native language.");
+        }
+
         p = getPreferenceScreen().findPreference("GlobalOptions.EnableNotifications");
         if (opts.notificationsEnabled()) {
             p.setSummary("Notifications are enabled");

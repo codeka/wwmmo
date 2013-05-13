@@ -70,6 +70,15 @@ public class GlobalOptions {
         return mPreferences.getBoolean("GlobalOptions.GenUniqueStarsAndPlanets", false);
     }
 
+    public boolean autoTranslateChatMessages() {
+        return mPreferences.getBoolean("GlobalOptions.AutoTranslateChatMessages", false);
+    }
+    public void autoTranslateChatMessages(boolean value) {
+        mPreferences.edit()
+                    .putBoolean("GlobalOptions.AutoTranslateChatMessages", value)
+                    .commit();
+    }
+
     public boolean notificationsEnabled() {
         return mPreferences.getBoolean("GlobalOptions.EnableNotifications", true);
     }

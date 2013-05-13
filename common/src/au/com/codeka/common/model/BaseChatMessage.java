@@ -11,7 +11,7 @@ public class BaseChatMessage {
     protected String mAllianceKey;
     protected BaseEmpire mEmpire;
     protected DateTime mDatePosted;
-    protected String mDetectedLanguage;
+    protected String mMessageEn;
 
     public BaseChatMessage() {
         mDatePosted = new DateTime(DateTimeZone.UTC);
@@ -51,11 +51,8 @@ public class BaseChatMessage {
     public String getAllianceKey() {
         return mAllianceKey;
     }
-    public String getDetectedLanguage() {
-        return mDetectedLanguage;
-    }
-    public void setDetectedLanguage(String langCode) {
-        mDetectedLanguage = langCode;
+    public String getEnglishMessage() {
+        return mMessageEn;
     }
 
     /**
@@ -102,6 +99,9 @@ public class BaseChatMessage {
             mAllianceKey = pb.getAllianceKey();
         }
         mDatePosted = new DateTime(pb.getDatePosted() * 1000, DateTimeZone.UTC);
+        if (pb.hasMessageEn() && !pb.getMessageEn().equals("")) {
+            mMessageEn = pb.getMessageEn();
+        }
     }
 
     public void toProtocolBuffer(Messages.ChatMessage.Builder pb) {
@@ -113,5 +113,8 @@ public class BaseChatMessage {
             pb.setAllianceKey(mAllianceKey);
         }
         pb.setDatePosted(mDatePosted.getMillis() / 1000);
+        if (mMessageEn != null && mMessageEn.length() > 0) {
+            pb.setMessageEn(mMessageEn);
+        }
     }
 }

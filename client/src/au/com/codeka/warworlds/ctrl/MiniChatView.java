@@ -13,6 +13,7 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
+import au.com.codeka.warworlds.GlobalOptions;
 import au.com.codeka.warworlds.game.ChatActivity;
 import au.com.codeka.warworlds.model.ChatManager;
 import au.com.codeka.warworlds.model.ChatMessage;
@@ -28,6 +29,7 @@ public class MiniChatView extends RelativeLayout
 
     private ScrollView mScrollView;
     private LinearLayout mMsgsContainer;
+    private boolean mAutoTranslate;
 
     private static final int MAX_ROWS = 10;
 
@@ -58,6 +60,8 @@ public class MiniChatView extends RelativeLayout
         mMsgsContainer.setLayoutParams(lp);
         mMsgsContainer.setId(id++);
         mScrollView.addView(mMsgsContainer);
+
+        mAutoTranslate = new GlobalOptions(context).autoTranslateChatMessages();
 
         refreshMessages();
 
@@ -93,7 +97,7 @@ public class MiniChatView extends RelativeLayout
 
     private void appendMessage(final ChatMessage msg) {
         TextView tv = new TextView(mContext);
-        tv.setText(msg.format(ChatMessage.Location.PUBLIC_CHANNEL));
+        tv.setText(msg.format(ChatMessage.Location.PUBLIC_CHANNEL, mAutoTranslate));
         tv.setTag(msg);
 
         while (mMsgsContainer.getChildCount() >= MAX_ROWS) {
@@ -124,7 +128,7 @@ public class MiniChatView extends RelativeLayout
 
             if (other.getDatePosted().equals(msg.getDatePosted()) &&
                 other.getEmpireKey().equals(msg.getEmpireKey())) {
-                tv.setText(msg.format(ChatMessage.Location.PUBLIC_CHANNEL));
+                tv.setText(msg.format(ChatMessage.Location.PUBLIC_CHANNEL, mAutoTranslate));
             }
         }
     }

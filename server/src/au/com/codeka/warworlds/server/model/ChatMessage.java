@@ -26,6 +26,7 @@ public class ChatMessage extends BaseChatMessage {
         }
         mDatePosted = new DateTime(rs.getTimestamp("posted_date").getTime());
         mMessage = rs.getString("message");
+        mMessageEn = rs.getString("message_en");
     }
 
     public int getID() {

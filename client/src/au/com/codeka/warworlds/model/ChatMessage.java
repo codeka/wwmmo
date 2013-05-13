@@ -73,9 +73,17 @@ public class ChatMessage extends BaseChatMessage {
      * ChatActivity. It actually returns a snippet of formatted text, hence the
      * CharSequence.
      */
-    public CharSequence format(Location location) {
+    public CharSequence format(Location location, boolean autoTranslate) {
         String msg = mMessage;
+        boolean wasTranslated = false;
+        if (mMessageEn != null && autoTranslate) {
+            msg = mMessageEn;
+            wasTranslated = true;
+        }
         msg = linkify(markdown(msg));
+        if (wasTranslated) {
+            msg = "<i>‹"+msg+"›</i>";
+        }
 
         boolean isEnemy = false;
         boolean isFriendly = false;

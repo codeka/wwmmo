@@ -10,6 +10,7 @@ import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.RequestHandler;
 import au.com.codeka.warworlds.server.Session;
 import au.com.codeka.warworlds.server.ctrl.NotificationController;
+import au.com.codeka.warworlds.server.ctrl.TranslateController;
 import au.com.codeka.warworlds.server.data.DB;
 import au.com.codeka.warworlds.server.data.SqlStmt;
 import au.com.codeka.warworlds.server.model.ChatMessage;
@@ -18,6 +19,7 @@ import au.com.codeka.warworlds.server.model.ChatMessage;
  * Handles the /realms/.../chat URL.
  */
 public class ChatHandler extends RequestHandler {
+
     @Override
     protected void get() throws RequestException {
         DateTime since = DateTime.now().minusDays(7);
@@ -64,8 +66,8 @@ public class ChatHandler extends RequestHandler {
         Messages.ChatMessage.Builder chat_msg_pb = Messages.ChatMessage.newBuilder();
 
         Session session = getSession();
-        String sql = "INSERT INTO chat_messages (empire_id, alliance_id, message, posted_date)" +
-                    " VALUES (?, ?, ?, ?)";
+        String sql = "INSERT INTO chat_messages (empire_id, alliance_id, message, message_en, posted_date)" +
+                    " VALUES (?, ?, ?, ?, ?)";
         try (SqlStmt stmt = DB.prepare(sql)) {
             if (!session.isAdmin()) {
                 chat_msg_pb.setEmpireKey(Integer.toString(session.getEmpireID()));
@@ -89,12 +91,18 @@ public class ChatHandler extends RequestHandler {
                 stmt.setNull(1);
                 stmt.setNull(2);
             }
-            chat_msg_pb.setMessage(inp_chat_msg_pb.getMessage()); // TODO: sanitize this
-            stmt.setString(3, chat_msg_pb.getMessage());
+            String msg = inp_chat_msg_pb.getMessage(); // TODO: sanitize this
+            String msg_en = new TranslateController().translate(msg);
+            chat_msg_pb.setMessage(msg);
+            if (msg_en != null) {
+                chat_msg_pb.setMessageEn(msg_en);
+            }
+            stmt.setString(3, msg);
+            stmt.setString(4, msg_en);
 
             DateTime now = DateTime.now();
             chat_msg_pb.setDatePosted(now.getMillis() / 1000);
-            stmt.setDateTime(4, now);
+            stmt.setDateTime(5, now);
             stmt.update();
         } catch(Exception e) {
             throw new RequestException(e);

@@ -9,6 +9,12 @@
                             android:title="Unique Stars &amp; Planets"
                             android:defaultValue="false" />
     </PreferenceCategory>
+    <PreferenceCategory android:title="Chat"
+                        android:key="pref_key_chat">
+        <CheckBoxPreference android:key="GlobalOptions.AutoTranslateChatMessages"
+                            android:title="Auto-translate"
+                            android:defaultValue="false" />
+    </PreferenceCategory>
     <PreferenceCategory android:title="Notifications"
                         android:key="pref_key_notifications">
         <CheckBoxPreference android:key="GlobalOptions.EnableNotifications"

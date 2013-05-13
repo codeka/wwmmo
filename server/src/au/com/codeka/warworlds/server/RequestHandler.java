@@ -128,7 +128,6 @@ public class RequestHandler {
 
     private void setResponseBodyText(Message pb) {
         mResponse.setContentType("text/plain");
-        mResponse.setHeader("Content-Type", "text/plain; charset=utf-8");
         mResponse.setCharacterEncoding("utf-8");
         try {
             mResponse.getWriter().write(PbFormatter.toJson(pb));
@@ -138,7 +137,6 @@ public class RequestHandler {
 
     private void setResponseBodyJson(Message pb) {
         mResponse.setContentType("application/json");
-        mResponse.setHeader("Content-Type", "application/json; charset=utf-8");
         mResponse.setCharacterEncoding("utf-8");
         try {
             mResponse.getWriter().write(PbFormatter.toJson(pb));

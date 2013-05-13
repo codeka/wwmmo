@@ -37,7 +37,7 @@ public class BuildQueueController {
             }
 
             // check build limits
-            if (design.getDesignKind() == DesignKind.BUILDING) {
+            if (design.getDesignKind() == DesignKind.BUILDING && buildRequest.getExistingBuildingKey() == null) {
                 BuildingDesign buildingDesign = (BuildingDesign) design;
                 if (buildingDesign.getMaxPerColony() > 0) {
                     int maxPerColony = buildingDesign.getMaxPerColony();

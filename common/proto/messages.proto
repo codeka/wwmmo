@@ -298,6 +298,10 @@ message ChatMessage
     optional string empire_key = 2;
     optional int64 date_posted = 3;
     optional string alliance_key = 4;
+
+    // if the message was auto-translated to english, this will be the english
+    // translation.
+    optional string message_en = 5;
 }
 
 message ChatMessages

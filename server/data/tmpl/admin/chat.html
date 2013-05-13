@@ -26,6 +26,9 @@
       position: absolute;
       top: 0; right: 30px;
     }
+    section#messages span.translated {
+      color: #a00;
+    }
   </style>
 {% endblock %}
 
@@ -80,7 +83,12 @@
       var dtstr = dt.getFullYear()+"-"+zeroPad(dt.getMonth() + 1, 2)+"-"+zeroPad(dt.getDate(), 2);
       dtstr += " "+zeroPad(dt.getHours(), 2)+":"+zeroPad(dt.getMinutes(), 2);
 
-      var msgstr = dtstr+" : "+msg.empire+" : "+msg.message;
+      var msgstr = dtstr+" : "+msg.empire+" : ";
+      if (msg.message_en) {
+        msgstr += "<span class=\"translated\">"+msg.message_en+"</span>";
+      } else {
+        msgstr += msg.message;
+      }
 
       var div = $("<div>"+msgstr+"</div>");
       div.data("dt", msg.date_posted);
