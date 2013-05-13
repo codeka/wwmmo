@@ -40,6 +40,9 @@ public abstract class BaseColony {
         return mEmpireKey;
     }
     public float getPopulation() {
+        if (mPopulation <= 0.0f) {
+            return 0.0f;
+        }
         return mPopulation;
     }
     public void setPopulation(float pop) {

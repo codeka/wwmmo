@@ -62,6 +62,9 @@ public class ColonyController {
             if (!fleet.getDesign().hasEffect(TroopCarrierShipEffect.class)) {
                 continue;
             }
+            if (fleet.getState() != Fleet.State.IDLE) {
+                continue;
+            }
             totalTroopCarriers += fleet.getNumShips();
             troopCarriers.add(fleet);
         }
@@ -99,6 +102,17 @@ public class ColonyController {
             for (Fleet fleet : troopCarriers) {
                 new FleetController(db.getTransaction()).removeShips(star, fleet, fleet.getNumShips());
             }
+        }
+    }
+
+    public void reducePopulation(Colony colony, float amount) throws RequestException {
+        String sql = "UPDATE colonies SET population = GREATEST(0, population - ?) WHERE id = ?";
+        try (SqlStmt stmt = db.prepare(sql)) {
+            stmt.setDouble(1, amount);
+            stmt.setInt(2, colony.getID());
+            stmt.update();
+        } catch(Exception e) {
+            throw new RequestException(e);
         }
     }
 

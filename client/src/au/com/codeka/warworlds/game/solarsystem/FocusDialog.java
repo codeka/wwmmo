@@ -37,7 +37,7 @@ public class FocusDialog extends DialogFragment {
     private int mLockedIndex;
     private View mView;
 
-    private static double SEEKBAR_MAX = 1000.0;
+    private static float SEEKBAR_MAX = 1000.0f;
 
     public FocusDialog() {
     }
@@ -133,13 +133,13 @@ public class FocusDialog extends DialogFragment {
                     .setProgress((int)(mColony.getConstructionFocus() * SEEKBAR_MAX));
 
         ((TextView) mView.findViewById(R.id.focus_population_value))
-                    .setText(Integer.toString((int)(mColony.getPopulationFocus() * 100.0)));
+                    .setText(focusToString(mColony.getPopulationFocus()));
         ((TextView) mView.findViewById(R.id.focus_farming_value))
-                    .setText(Integer.toString((int)(mColony.getFarmingFocus() * 100.0)));
+                    .setText(focusToString(mColony.getFarmingFocus()));
         ((TextView) mView.findViewById(R.id.focus_mining_value))
-                    .setText(Integer.toString((int)(mColony.getMiningFocus() * 100.0)));
+                    .setText(focusToString(mColony.getMiningFocus()));
         ((TextView) mView.findViewById(R.id.focus_construction_value))
-                    .setText(Integer.toString((int)(mColony.getConstructionFocus() * 100.0)));
+                    .setText(focusToString(mColony.getConstructionFocus()));
 
         updateDeltas();
 
@@ -157,6 +157,10 @@ public class FocusDialog extends DialogFragment {
         return b.create();
     }
 
+    private static String focusToString(float focus) {
+        return String.format("%d", Math.round(focus * 100.0f));
+    }
+
     private void redistribute(SeekBar changedSeekBar, double newValue) {
         SeekBar lockedSeekBar = null;
         if (mLockedIndex >= 0) {
@@ -168,9 +172,6 @@ public class FocusDialog extends DialogFragment {
             if (seekBar == changedSeekBar)
                 continue;
             int progress = seekBar.getProgress();
-            if (progress < 5) {
-                progress = 5;
-            }
             otherValuesTotal += (progress / SEEKBAR_MAX);
         }
 
@@ -187,7 +188,7 @@ public class FocusDialog extends DialogFragment {
                 if (seekBar != changedSeekBar && seekBar != lockedSeekBar) {
                     seekBar.setProgress(0);
                 }
-                textView.setText(Integer.toString(seekBar.getProgress()));
+                textView.setText("0");
             }
         }
         double ratio = otherValuesTotal / desiredOtherValuesTotal;
@@ -197,13 +198,10 @@ public class FocusDialog extends DialogFragment {
             TextView textView = mTextViews.get(i);
             if (seekBar != changedSeekBar && seekBar != lockedSeekBar) {
                 int progress = seekBar.getProgress();
-                if (progress < 5) {
-                    progress = 5;
-                }
                 seekBar.setProgress((int)(progress / ratio));
             }
 
-            textView.setText(Integer.toString((int)(seekBar.getProgress() / SEEKBAR_MAX * 100.0)));
+            textView.setText(focusToString(seekBar.getProgress() / SEEKBAR_MAX));
         }
 
         updateDeltas();

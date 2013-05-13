@@ -360,7 +360,11 @@ public class Simulation {
                 continue;
             }
 
-            float populationIncrease = colony.getPopulation() * colony.getPopulationFocus();
+            float populationIncrease = colony.getPopulation();
+            if (populationIncrease < 10.0f) {
+                populationIncrease = 10.0f;
+            }
+            populationIncrease *= colony.getPopulationFocus();
             if (goodsEfficiency >= 1.0f) {
                 populationIncrease *= 0.5f;
             } else {
@@ -368,33 +372,18 @@ public class Simulation {
                 populationIncrease *= 0.5f * (goodsEfficiency - 1.0f);
             }
 
-            // if we're increasing population, it slows down the closer you get to the
-            // max population. If population is decreasing, it slows down the FURTHER
-            // you get.
-            float maxFactor = colony.getMaxPopulation();
-            if (maxFactor < 10.0f) {
-                maxFactor = 10.0f;
-            }
-            maxFactor = colony.getPopulation() / maxFactor;
-            if (maxFactor > 1.0f) {
-                // population is bigger than it should be...
-                populationIncrease = colony.getPopulation() * (1.0f - colony.getPopulationFocus()) * 0.5f;
-
-                maxFactor -= 1.0f;
-                populationIncrease = -maxFactor * populationIncrease;
-            }
-            if (populationIncrease > 0.0f) {
-                maxFactor = 1.0f - maxFactor;
-            }
-
-            populationIncrease *= maxFactor;
             colony.setPopulationDelta(populationIncrease);
             populationIncrease *= dtInHours;
 
-            colony.setPopulation(colony.getPopulation() + populationIncrease);
-            if (colony.isInCooldown() && colony.getPopulation() < 100.0f) {
-                colony.setPopulation(100.0f);
+            float newPopulation = colony.getPopulation() + populationIncrease;
+            if (newPopulation < 0.0f) {
+                newPopulation = 0.0f;
+            } else if (newPopulation > colony.getMaxPopulation()) {
+                newPopulation = colony.getMaxPopulation();
+            }else if (newPopulation < 100.0f && colony.isInCooldown()) {
+                newPopulation = 100.0f;
             }
+            colony.setPopulation(newPopulation);
         }
 
         if (totalGoods > maxGoods) {

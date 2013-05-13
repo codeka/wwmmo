@@ -14,6 +14,7 @@ import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.server.Event;
 import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.ctrl.BuildingController;
+import au.com.codeka.warworlds.server.ctrl.ColonyController;
 import au.com.codeka.warworlds.server.ctrl.EmpireController;
 import au.com.codeka.warworlds.server.ctrl.FleetController;
 import au.com.codeka.warworlds.server.ctrl.SituationReportController;
@@ -141,6 +142,13 @@ public class BuildCompleteEvent extends Event {
         Empire empire = new EmpireController().getEmpire(empireID);
         Fleet newFleet = new FleetController().createFleet(empire, star, designID, count);
         FleetMoveCompleteEvent.fireFleetArrivedEvents(star, newFleet);
+
+        // todo: hard-coded?
+        if (designID.equals("colonyship")) {
+            // remove 100 population from the colony that built this guy
+            new ColonyController().reducePopulation(colony, 100.0f);
+        }
+
         return newFleet;
     }
 
