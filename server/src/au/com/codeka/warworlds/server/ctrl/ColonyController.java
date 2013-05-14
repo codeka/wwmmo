@@ -95,6 +95,7 @@ public class ColonyController {
             } catch (Exception e) {
                 throw new RequestException(e);
             }
+            star.getColonies().remove(colony);
         } else {
             log.info(String.format("Fleets destroyed: remainingPopulation=%.2f, remainingShips=%.2f",
                     remainingPopulation, remainingShips));

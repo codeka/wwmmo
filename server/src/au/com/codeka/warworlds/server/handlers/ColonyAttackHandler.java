@@ -43,6 +43,7 @@ public class ColonyAttackHandler extends RequestHandler {
             sim.simulate(star);
 
             new ColonyController(t).attack(getSession().getEmpireID(), star, colony);
+            new StarController(t).update(star);
             t.commit();
 
             Messages.Star.Builder star_pb = Messages.Star.newBuilder();

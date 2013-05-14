@@ -102,22 +102,6 @@ public class MyEmpire extends Empire {
                 } catch(ApiException e) {
                     mErrorMsg = e.getServerErrorMessage();
                 }
-/*TODO
-                // update our copy of everything and reset the uncollected taxes to zero, this'll
-                // keep us accurate until the server notifies us that's finished as well.
-                Simulation sim = new Simulation();
-                float taxes = 0.0f;
-                for (Star star : mStars.values()) {
-                    sim.simulate(star);
-                    for (Colony colony : star.getColonies()) {
-                        if (colony.getEmpireKey() != null && colony.getEmpireKey().equals(getKey())) {
-                            taxes += colony.getUncollectedTaxes();
-                            colony.setUncollectedTaxes(0.0f);
-                        }
-                    }
-                }
-                mCash += taxes;
-                */
 
                 return true;
             }
@@ -131,7 +115,8 @@ public class MyEmpire extends Empire {
                                     .setMessage(mErrorMsg)
                                     .create().show();
                 }
-                EmpireManager.getInstance().fireEmpireUpdated(MyEmpire.this);
+                
+                EmpireManager.getInstance().refreshEmpire(context);
             }
         }.execute();
     }

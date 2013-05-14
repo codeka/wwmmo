@@ -50,7 +50,7 @@ public class ChatHandler extends RequestHandler {
             while (rs.next()) {
                 ChatMessage msg = new ChatMessage(rs);
                 Messages.ChatMessage.Builder chat_msg_pb = Messages.ChatMessage.newBuilder();
-                msg.toProtocolBuffer(chat_msg_pb);
+                msg.toProtocolBuffer(chat_msg_pb, true);
                 chat_msgs_pb.addMessages(chat_msg_pb);
             }
 

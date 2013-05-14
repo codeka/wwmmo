@@ -1,5 +1,6 @@
 package au.com.codeka.common.model;
 
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
@@ -104,8 +105,12 @@ public class BaseChatMessage {
         }
     }
 
-    public void toProtocolBuffer(Messages.ChatMessage.Builder pb) {
-        pb.setMessage(mMessage);
+    public void toProtocolBuffer(Messages.ChatMessage.Builder pb, boolean encodeHtml) {
+        if (encodeHtml) {
+            pb.setMessage(StringEscapeUtils.escapeHtml4(mMessage));
+        } else {
+            pb.setMessage(mMessage);
+        }
         if (mEmpireKey != null) {
             pb.setEmpireKey(mEmpireKey);
         }
