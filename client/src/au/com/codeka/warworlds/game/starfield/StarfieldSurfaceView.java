@@ -89,7 +89,7 @@ public class StarfieldSurfaceView extends SectorView
 
     public StarfieldSurfaceView(Context context, AttributeSet attrs) {
         super(context, attrs);
-        if (this.isInEditMode()) {
+        if (isInEditMode()) {
             return;
         }
 

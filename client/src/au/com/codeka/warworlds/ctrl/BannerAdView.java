@@ -75,6 +75,10 @@ public class BannerAdView extends FrameLayout {
 
     @Override
     protected void onWindowVisibilityChanged(int visibility) {
+        if (isInEditMode()) {
+            return;
+        }
+
         if (visibility == View.VISIBLE) {
             setup();
         }
