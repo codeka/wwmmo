@@ -52,71 +52,33 @@
         <!-- Main activity -->
         <activity
             android:name=".WarWorldsActivity"
-            android:launchMode="singleTop"
-            android:screenOrientation="portrait" >
+            android:launchMode="singleTop">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
 
         <activity android:name=".AccountsActivity"
-                  android:label="@string/app_name"
-                  android:screenOrientation="portrait" />
-
-        <activity android:name=".WarmWelcomeActivity"
-                  android:screenOrientation="portrait" />
-
-        <activity android:name=".GlobalOptionsActivity"
-                  android:screenOrientation="portrait" />
-
-        <activity android:name=".EmpireSetupActivity"
-                  android:screenOrientation="portrait" />
-
-        <activity android:name=".RealmSelectActivity"
-                  android:screenOrientation="portrait" />
-        
-        <activity android:name=".EmpireResetActivity"
-                  android:screenOrientation="portrait" />
-
-        <activity android:name=".game.EmpireActivity"
-                  android:screenOrientation="portrait" />
-
-        <activity android:name=".game.EnemyEmpireActivity"
-                  android:screenOrientation="portrait" />
-
-        <activity android:name=".game.starfield.StarfieldActivity"
-                  android:screenOrientation="portrait" />
-
-        <activity android:name=".game.starfield.TacticalMapActivity"
-                  android:screenOrientation="portrait" />
-
-        <activity android:name=".game.solarsystem.SolarSystemActivity"
-                  android:screenOrientation="portrait" />
-
-        <activity android:name=".game.solarsystem.EnemyPlanetActivity"
-                  android:screenOrientation="portrait" />
-        <activity android:name=".game.solarsystem.EmptyPlanetActivity"
-                  android:screenOrientation="portrait" />
-
-        <activity android:name=".game.solarsystem.BuildActivity"
-                  android:screenOrientation="portrait" />
-
-        <activity android:name=".game.solarsystem.FleetActivity"
-                  android:screenOrientation="portrait" />
-
-        <activity android:name=".game.alliance.AllianceActivity"
-                  android:screenOrientation="portrait" />
-
-        <activity android:name=".game.alliance.AllianceDetailsActivity"
-                  android:screenOrientation="portrait" />
-        
-        <activity android:name=".game.ChatActivity"
-                  android:screenOrientation="portrait" />
-
-        <activity android:name=".game.SitrepActivity"
-                  android:screenOrientation="portrait">
+                  android:label="@string/app_name" />
+        <activity android:name=".WarmWelcomeActivity" />
+        <activity android:name=".GlobalOptionsActivity" />
+        <activity android:name=".EmpireSetupActivity" />
+        <activity android:name=".RealmSelectActivity" />
+        <activity android:name=".EmpireResetActivity" />
+        <activity android:name=".game.EmpireActivity" />
+        <activity android:name=".game.EnemyEmpireActivity" />
+        <activity android:name=".game.starfield.StarfieldActivity" />
+        <activity android:name=".game.starfield.TacticalMapActivity" />
+        <activity android:name=".game.solarsystem.SolarSystemActivity" />
+        <activity android:name=".game.solarsystem.EnemyPlanetActivity" />
+        <activity android:name=".game.solarsystem.EmptyPlanetActivity" />
+        <activity android:name=".game.solarsystem.BuildActivity" />
+        <activity android:name=".game.solarsystem.FleetActivity" />
+        <activity android:name=".game.alliance.AllianceActivity" />
+        <activity android:name=".game.alliance.AllianceDetailsActivity" />
+        <activity android:name=".game.ChatActivity" />
+        <activity android:name=".game.SitrepActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".game.starfield.StarfieldActivity" />
