@@ -27,9 +27,11 @@ public class ColoniesHandler extends RequestHandler {
         Empire myEmpire = new EmpireController().getEmpire(getSession().getEmpireID());
 
         try (Transaction t = DB.beginTransaction()) {
+            // fetch the star, simulate & update it
             Star star = new StarController(t).getStar(Integer.parseInt(getUrlParameter("star_id")));
             Simulation sim = new Simulation();
             sim.simulate(star);
+            new StarController(t).update(star);
 
             int planetIndex = colonize_request_pb.getPlanetIndex();
 

@@ -127,8 +127,6 @@ public class Simulation {
 
             star.setLastSimulation(mNow);
         }
-
-        //log.debug(String.format("End simulation for '%s'", star.getName()));
     }
 
     private DateTime getSimulateStartTime(BaseStar star) {
