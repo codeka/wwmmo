@@ -423,6 +423,15 @@ public class Simulation {
             combatReport = star.createCombatReport(null);
             star.setCombatReport(combatReport);
         } else {
+            // remove any rounds that are in the future
+            for (int i = 0; i < combatReport.getCombatRounds().size(); i++) {
+                BaseCombatReport.CombatRound round = combatReport.getCombatRounds().get(i);
+                if (round.getRoundTime().isAfter(now)) {
+                    combatReport.getCombatRounds().remove(i);
+                    i--;
+                }
+            }
+
             log(String.format("-- Combat, [loaded %d rounds] [%d attacking]", combatReport.getCombatRounds().size(), numAttacking));
         }
 
