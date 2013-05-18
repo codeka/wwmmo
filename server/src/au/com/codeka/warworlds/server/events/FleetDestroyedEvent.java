@@ -115,7 +115,7 @@ public class FleetDestroyedEvent extends Event {
                     Messages.SituationReport.FleetVictoriousRecord.Builder fleet_victorious_pb = Messages.SituationReport.FleetVictoriousRecord.newBuilder();
                     fleet_victorious_pb.setCombatReportKey(combatReport.getKey());
                     fleet_victorious_pb.setFleetDesignId(victoriousFleetSummary.getDesignID()); // TODO: more than one?
-                    fleet_victorious_pb.setFleetKey(victoriousFleetSummary.getFleetKey());
+                    fleet_victorious_pb.setFleetKey(victoriousFleetSummary.getFleetKeys().get(0)); // TODO: more than one!
                     fleet_victorious_pb.setNumShips(victoriousFleetSummary.getNumShips());
                     sitrep_pb.setFleetVictoriousRecord(fleet_victorious_pb);
                     new SituationReportController().saveSituationReport(sitrep_pb.build());

@@ -109,6 +109,7 @@ public class EmpireController {
 
             audit_record_pb.setBeforeCash((float) cashBefore);
             audit_record_pb.setAfterCash((float) (cashBefore + amount));
+            audit_record_pb.setTime(DateTime.now().getMillis() / 1000);
 
             stmt = t.prepare("UPDATE empires SET cash = cash + ? WHERE id = ?");
             stmt.setDouble(1, amount);

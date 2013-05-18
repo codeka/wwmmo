@@ -7,6 +7,7 @@ public class ShipDesign extends Design {
     private float mFuelCostPerParsec;
     private float mBaseAttack;
     private float mBaseDefence;
+    private int mCombatPriority;
 
     public float getSpeedInParsecPerHour() {
         return mSpeedParsecPerHour;
@@ -22,6 +23,9 @@ public class ShipDesign extends Design {
     }
     public float getBaseDefence() {
         return mBaseDefence;
+    }
+    public int getCombatPriority() {
+        return mCombatPriority;
     }
 
     public static class Factory extends Design.Factory {
@@ -44,6 +48,9 @@ public class ShipDesign extends Design {
                 design.mSpeedParsecPerHour = Float.parseFloat(elem.getAttribute("speed"));
                 design.mBaseAttack = Float.parseFloat(elem.getAttribute("baseAttack"));
                 design.mBaseDefence = Float.parseFloat(elem.getAttribute("baseDefence"));
+                if (elem.getAttribute("combatPriority") != null) {
+                    design.mCombatPriority = Integer.parseInt(elem.getAttribute("combatPriority"));
+                }
             }
 
             if (elem.getNodeName().equals("fuel")) {

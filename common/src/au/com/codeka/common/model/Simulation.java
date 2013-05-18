@@ -212,6 +212,12 @@ public class Simulation {
             log(String.format("    Minerals: [delta=%.2f / hr] [this turn=%.2f]", goods, goods * dtInHours));
 
             totalPopulation += colony.getPopulation();
+
+            // work out the amount of taxes this colony has generated in the last turn
+            float taxPerPopulationPerHour = 0.012f;
+            float taxThisTurn = taxPerPopulationPerHour * dtInHours * colony.getPopulation();
+            log(String.format("    Taxes %.2f + %.2f = %.2f uncollected", colony.getUncollectedTaxes(), taxThisTurn, colony.getUncollectedTaxes() + taxThisTurn));
+            colony.setUncollectedTaxes(colony.getUncollectedTaxes() + taxThisTurn);
         }
 
         // A second loop though the colonies, once the goods/minerals have been calculated. This way,
@@ -327,11 +333,6 @@ public class Simulation {
                     }
                 }
             }
-
-            // work out the amount of taxes this colony has generated in the last turn
-            float taxPerPopulationPerHour = 0.012f;
-            float taxThisTurn = taxPerPopulationPerHour * dtInHours * colony.getPopulation();
-            colony.setUncollectedTaxes(colony.getUncollectedTaxes() + taxThisTurn);
         }
 
         // Finally, update the population. The first thing we need to do is evenly distribute goods
@@ -420,11 +421,13 @@ public class Simulation {
         // get the existing combat report, or create a new one
         BaseCombatReport combatReport = star.getCombatReport();
         if (combatReport == null) {
+            log(String.format("-- Combat [new combat report] [%d attacking]", numAttacking));
             combatReport = star.createCombatReport(null);
             star.setCombatReport(combatReport);
+        } else {
+            log(String.format("-- Combat, [loaded %d rounds] [%d attacking]", combatReport.getCombatRounds().size(), numAttacking));
         }
 
-        log(String.format("-- Combat (%d fleets attacking)", numAttacking));
         DateTime attackStartTime = null;
         for (BaseFleet fleet : star.getFleets()) {
             if (fleet.getState() != BaseFleet.State.ATTACKING) {
@@ -473,6 +476,7 @@ public class Simulation {
             combatReport.getCombatRounds().add(round);
 
             if (!stillAttacking) {
+                log(String.format("--- Combat finished."));
                 break;
             }
             now = now.plusMinutes(1);
@@ -480,7 +484,6 @@ public class Simulation {
     }
 
     private boolean simulateCombatRound(DateTime now, BaseStar star, BaseCombatReport.CombatRound round) {
-        TreeMap<String, Integer> fleetIndices = new TreeMap<String, Integer>();
         for (BaseFleet fleet : star.getFleets()) {
             if (isDestroyed(fleet, now)) {
                 continue;
@@ -488,142 +491,179 @@ public class Simulation {
 
             BaseCombatReport.FleetSummary fleetSummary = new BaseCombatReport.FleetSummary(fleet);
             round.getFleets().add(fleetSummary);
-            int fleetIndex = round.getFleets().size() - 1;
-            fleetIndices.put(fleet.getKey(), fleetIndex);
 
             if (fleet.getState() != BaseFleet.State.ATTACKING) {
                 continue;
             }
-
+/*
             // if its stateStartTime is less than now, but more than a minute ago then it's just
             // joined the fray this round.
             if (fleet.getStateStartTime().isBefore(now) && fleet.getStateStartTime().isAfter(now.minusMinutes(1))) {
                 round.getFleetJoinedRecords().add(new BaseCombatReport.FleetJoinedRecord(
                         round.getFleets(), fleetIndex));
             }
+*/
         }
 
-        // look for fleets whose targets have been destroyed and un-target them
-        for (BaseFleet fleet : star.getFleets()) {
-            if (fleet.getState() != BaseFleet.State.ATTACKING || isDestroyed(fleet, now)) {
-                continue;
-            }
-            String targetFleetKey = fleet.getTargetFleetKey();
-            if (targetFleetKey == null) {
-                continue;
-            }
+        // now we go through the fleet summaries and join them together
+        for (int i = 0; i < round.getFleets().size(); i++) {
+            BaseCombatReport.FleetSummary fs1 = round.getFleets().get(i);
+            for (int j = i + 1; j < round.getFleets().size(); j++) {
+                BaseCombatReport.FleetSummary fs2 = round.getFleets().get(j);
 
-            BaseFleet targetFleet = star.findFleet(targetFleetKey);
-            if (targetFleet == null) {
-                fleet.setTargetFleetKey(null);
-            } else if (isDestroyed(targetFleet, now)) {
-                log(String.format("    Fleet #%s target destroyed, finding new target", fleet.getKey()));
-                fleet.setTargetFleetKey(null);
-            }
-        }
+                if (!isSameEmpire(fs1.getEmpireKey(), fs2.getEmpireKey())) {
+                    continue;
+                }
+                if (!fs1.getDesignID().equals(fs2.getDesignID())) {
+                    continue;
+                }
 
-        // look for fleets that are ATTACKING but are not currently targetting anything
-        for (BaseFleet fleet : star.getFleets()) {
-            if (fleet.getState() != BaseFleet.State.ATTACKING || isDestroyed(fleet, now)) {
-                continue;
-            }
-            String targetFleetKey = fleet.getTargetFleetKey();
-            if (targetFleetKey != null) {
-                continue;
-            }
-
-            BaseFleet targetFleet = findTarget(star, fleet, now);
-            if (targetFleet == null) {
-                // if there's no more available targets, then we're no longer attacking
-                log(String.format("    Fleet #%s no suitable target, switching to idle.", fleet.getKey()));
-                fleet.setState(BaseFleet.State.IDLE, now);
-            } else {
-                log(String.format("    Fleet #%s targetting fleet #%s", fleet.getKey(), targetFleet.getKey()));
-                fleet.setTargetFleetKey(targetFleet.getKey());
-
-                BaseCombatReport.FleetTargetRecord fleetTargetted = new BaseCombatReport.FleetTargetRecord(
-                        round.getFleets(), fleetIndices.get(fleet.getKey()),
-                        fleetIndices.get(targetFleet.getKey()));
-                round.getFleetTargetRecords().add(fleetTargetted);
+                // same empire, same design -- join 'em!
+                fs1.addShips(fs2);
+                round.getFleets().remove(j);
+                j--;
             }
         }
 
-        // all combatting fleets fire at once...
-        TreeMap<String, Double> hits = new TreeMap<String, Double>();
-        for (BaseFleet fleet : star.getFleets()) {
-            if (fleet.getState() != BaseFleet.State.ATTACKING || isDestroyed(fleet, now)) {
-                continue;
-            }
-            if (fleet.getStateStartTime().isAfter(now)) {
-                continue;
-            }
+        for (int i = 0; i < round.getFleets().size(); i++) {
+            BaseCombatReport.FleetSummary fleet = round.getFleets().get(i);
+            fleet.setIndex(i);
+        }
 
-            BaseFleet target = star.findFleet(fleet.getTargetFleetKey());
+        // each fleet targets and fires at once
+        TreeMap<Integer, Double> hits = new TreeMap<Integer, Double>();
+        for (BaseCombatReport.FleetSummary fleet : round.getFleets()) {
+            BaseCombatReport.FleetSummary target = findTarget(round, fleet);
             if (target == null) {
+                // if there's no more available targets, then we're no longer attacking
+                log(String.format("    Fleet #%d no suitable target.", fleet.getIndex()));
                 continue;
+            } else {
+                log(String.format("    Fleet #%d attacking fleet #%d", fleet.getIndex(), target.getIndex()));
             }
 
             ShipDesign fleetDesign = (ShipDesign) BaseDesignManager.i.getDesign(DesignKind.SHIP, fleet.getDesignID());
             float damage = fleet.getNumShips() * fleetDesign.getBaseAttack();
-            log(String.format("    Fleet #%s (%s x %.2f) hit by fleet %s (%s x %.2f) for %.2f damage",
-                    target.getKey(), target.getDesignID(), target.getNumShips(),
-                    fleet.getKey(), fleet.getDesignID(), fleet.getNumShips(), damage));
+            log(String.format("    Fleet #%d (%s x %.2f) hit by fleet #%d (%s x %.2f) for %.2f damage",
+                    target.getIndex(), target.getDesignID(), target.getNumShips(),
+                    fleet.getIndex(), fleet.getDesignID(), fleet.getNumShips(), damage));
 
-            Double totalDamage = hits.get(target.getKey());
+            Double totalDamage = hits.get(target.getIndex());
             if (totalDamage == null) {
-                hits.put(target.getKey(), new Double(damage));
+                hits.put(target.getIndex(), new Double(damage));
             } else {
-                hits.put(target.getKey(), new Double(totalDamage + damage));
+                hits.put(target.getIndex(), new Double(totalDamage + damage));
             }
 
             BaseCombatReport.FleetAttackRecord attackRecord = new BaseCombatReport.FleetAttackRecord(
-                    round.getFleets(), fleetIndices.get(fleet.getKey()), fleetIndices.get(target.getKey()), damage);
+                    round.getFleets(), fleet.getIndex(), target.getIndex(), damage);
             round.getFleetAttackRecords().add(attackRecord);
 
-            if (target.getState() == BaseFleet.State.IDLE) {
-                ShipDesign targetDesign = (ShipDesign) BaseDesignManager.i.getDesign(DesignKind.SHIP, target.getDesignID());
-                ArrayList<ShipEffect> effects = targetDesign.getEffects(ShipEffect.class);
-                for (ShipEffect effect : effects) {
-                    effect.onAttacked(star, target, fleet);
+            for (String fleetKey : target.getFleetKeys()) {
+                BaseFleet targetFleet = star.findFleet(fleetKey);
+                BaseFleet attackingFleet = star.findFleet(fleet.getFleetKeys().get(0));
+                if (targetFleet.getState() == BaseFleet.State.IDLE) {
+                    ShipDesign targetDesign = (ShipDesign) BaseDesignManager.i.getDesign(DesignKind.SHIP, target.getDesignID());
+                    ArrayList<ShipEffect> effects = targetDesign.getEffects(ShipEffect.class);
+                    for (ShipEffect effect : effects) {
+                        effect.onAttacked(star, targetFleet, attackingFleet);
+                    }
                 }
             }
         }
 
         // next, apply the damage from this round
-        for (BaseFleet fleet : star.getFleets()) {
-            Double damage = hits.get(fleet.getKey());
+        for (BaseCombatReport.FleetSummary fleet : round.getFleets()) {
+            Double damage = hits.get(fleet.getIndex());
             if (damage == null) {
                 continue;
             }
 
             ShipDesign fleetDesign = (ShipDesign) BaseDesignManager.i.getDesign(DesignKind.SHIP, fleet.getDesignID());
             damage /= fleetDesign.getBaseDefence();
-            float newNumShips = (float) (fleet.getNumShips() - damage);
-            if (newNumShips < 0.0f) {
-                newNumShips = 0.0f;
-            }
-            fleet.setNumShips(newNumShips);
+            fleet.removeShips((float) (double) damage);
+            log(String.format("    Fleet #%d %.2f ships lost (%.2f ships remaining)", fleet.getIndex(), damage, fleet.getNumShips()));
 
             BaseCombatReport.FleetDamagedRecord damageRecord = new BaseCombatReport.FleetDamagedRecord(
-                    round.getFleets(), fleetIndices.get(fleet.getKey()), (float) damage.doubleValue());
+                    round.getFleets(), fleet.getIndex(), (float) damage.doubleValue());
             round.getFleetDamagedRecords().add(damageRecord);
 
-            // if it's destroyed, mark it as such
-            if (newNumShips == 0.0f) {
-                log(String.format("    Fleet #%s DESTROYED", fleet.getKey()));
-                fleet.setTimeDestroyed(now);
+            // go through the "real" fleets and apply the damage as well
+            for (String fleetKey : fleet.getFleetKeys()) {
+                BaseFleet realFleet = star.findFleet(fleetKey);
+                float newNumShips = (float)(realFleet.getNumShips() - damage);
+                if (newNumShips <= 0) {
+                    newNumShips = 0;
+                }
+                realFleet.setNumShips(newNumShips);
+                if (realFleet.getNumShips() <= 0.0f) {
+                    realFleet.setTimeDestroyed(now);
+                }
+
+                if (damage <= 0) {
+                    break;
+                }
             }
         }
 
-        // if there's any fleets still attacking then we need to keep going
-        for (BaseFleet fleet : star.getFleets()) {
-            if (fleet.getState() == BaseFleet.State.ATTACKING && !isDestroyed(fleet, now)) {
-                return true;
+        // if all the fleets are friendly, we can stop attacking
+        boolean enemyExists = false;
+        for (int i = 0; i < star.getFleets().size(); i++) {
+            BaseFleet fleet1 = star.getFleets().get(i);
+            if (isDestroyed(fleet1, now)) {
+                continue;
+            }
+
+            for (int j = i + 1; j < star.getFleets().size(); j++) {
+                BaseFleet fleet2 = star.getFleets().get(j);
+                if (isDestroyed(fleet2, now)) {
+                    continue;
+                }
+
+                if (!isSameEmpire(fleet1.getEmpireKey(), fleet2.getEmpireKey())) {
+                    enemyExists = true;
+                }
+            }
+        }
+        if (!enemyExists) {
+            for (BaseFleet fleet : star.getFleets()) {
+                fleet.idle(now);
+            }
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * Searches for an enemy fleet with the lowest priority.
+     */
+    private BaseCombatReport.FleetSummary findTarget(BaseCombatReport.CombatRound round,
+                                                     BaseCombatReport.FleetSummary fleet) {
+        int foundPriority = 9999;
+        BaseCombatReport.FleetSummary foundFleet = null;
+
+        for (BaseCombatReport.FleetSummary otherFleet : round.getFleets()) {
+            if (isSameEmpire(fleet.getEmpireKey(), otherFleet.getEmpireKey())) {
+                continue;
+            }
+            ShipDesign design = (ShipDesign) BaseDesignManager.i.getDesign(DesignKind.SHIP, otherFleet.getDesignID());
+            if (foundFleet == null || design.getCombatPriority() < foundPriority) {
+                foundFleet = otherFleet;
+                foundPriority = design.getCombatPriority();
             }
         }
 
-        // TODO: victorious?
-        return false;
+        return foundFleet;
+    }
+
+    private static boolean isSameEmpire(String key1, String key2) {
+        if (key1 == null && key2 == null) {
+            return true;
+        }
+        if (key1 == null || key2 == null) {
+            return false;
+        }
+        return key1.equals(key2);
     }
 
     private boolean isDestroyed(BaseFleet fleet, DateTime now) {
@@ -631,36 +671,6 @@ public class Simulation {
             return true;
         }
         return false;
-    }
-
-    private BaseFleet findTarget(BaseStar star, BaseFleet fleet, DateTime now) {
-        BaseFleet currentTarget = null;
-        ShipDesign currentTargetDesign = null;
-        for (BaseFleet targetFleet : star.getFleets()) {
-            if (targetFleet.getState() == BaseFleet.State.MOVING) {
-                // if this target is moving, it's not a potential taret
-                continue;
-            }
-            if ((targetFleet.getEmpireKey() == null && fleet.getEmpireKey() == null) ||
-                (targetFleet.getEmpireKey() != null && fleet.getEmpireKey() != null && targetFleet.getEmpireKey().equals(fleet.getEmpireKey()))) {
-                // if this target belongs to the same empire, it's not a potential
-                // TODO: alliances
-                continue;
-            }
-            if (isDestroyed(targetFleet, now)) {
-                continue;
-            }
-
-            // choose this target if it's attack capability is higher than the existing target
-            ShipDesign thisDesign = (ShipDesign) BaseDesignManager.i.getDesign(DesignKind.SHIP, targetFleet.getDesignID());
-            if (currentTarget == null ||
-                    (currentTargetDesign.getBaseAttack() < thisDesign.getBaseAttack())) {
-                currentTarget = targetFleet;
-                currentTargetDesign = thisDesign;
-            }
-        }
-
-        return currentTarget;
     }
 
     /**

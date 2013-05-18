@@ -1,5 +1,6 @@
 package au.com.codeka.warworlds.server.designeffects;
 
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,7 +45,7 @@ public class FighterShipEffect extends ShipEffect {
 
             log.info(String.format("Fleet #%s arrived at star #%s, found enemy fleet, switching to attack mode.",
                                    fleet.getKey(), star.getKey()));
-            ((Fleet) fleet).attack();
+            ((Fleet) fleet).attack(DateTime.now());
             break;
         }
     }
@@ -72,7 +73,7 @@ public class FighterShipEffect extends ShipEffect {
 
         log.info(String.format("Fleet #%s arrived at star #%s, switching to attack mode.",
                 otherFleet.getKey(), star.getKey()));
-        ((Fleet) fleet).attack();
+        ((Fleet) fleet).attack(DateTime.now());
     }
 
 
@@ -80,7 +81,7 @@ public class FighterShipEffect extends ShipEffect {
      * This is called if we're idle and someone attacks us.
      */
     public void onAttacked(BaseStar star, BaseFleet fleet, BaseFleet otherFleet) {
-        log.info(String.format("Fleet #%d has been attacked, switching to attack mode."));
-        ((Fleet) fleet).attack();
+        log.info(String.format("Fleet #%s has been attacked, switching to attack mode.", fleet.getKey()));
+        ((Fleet) fleet).attack(DateTime.now());
     }
 }

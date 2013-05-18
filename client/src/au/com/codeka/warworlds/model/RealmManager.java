@@ -58,7 +58,7 @@ public class RealmManager {
                     mCurrentRealm = realm;
 
                     // make sure the ApiClient knows which base URL to use
-                    ApiClient.configure(mCurrentRealm.getBaseUrl());
+                    ApiClient.configure(context, mCurrentRealm.getBaseUrl());
                 }
             }
         }

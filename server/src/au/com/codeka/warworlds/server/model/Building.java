@@ -6,7 +6,6 @@ import java.sql.SQLException;
 import au.com.codeka.common.model.BaseBuilding;
 import au.com.codeka.common.model.BuildingDesign;
 import au.com.codeka.common.model.DesignKind;
-import au.com.codeka.common.model.ShipDesign;
 
 public class Building extends BaseBuilding {
     private int mID;

@@ -15,7 +15,7 @@
     </dependencies>
     <cost minerals="1000" time="4.0" />
     <fuel costPerParsec="35" />
-    <stats speed="1" baseAttack="1" baseDefence="1" />
+    <stats speed="1" baseAttack="1" baseDefence="1" combatPriority="100" />
   </design>
   <design id="scout">
     <name>Scout</name>
@@ -30,7 +30,7 @@
     </dependencies>
     <cost minerals="50" time="0.1667" />
     <fuel costPerParsec="0.1" />
-    <stats speed="23" baseAttack="1" baseDefence="1" />
+    <stats speed="23" baseAttack="1" baseDefence="1" combatPriority="100" />
     <effects>
       <effect kind="scout" />
       <effect kind="fighter" />
@@ -49,7 +49,7 @@
     </dependencies>
     <cost minerals="45" time="0.15" />
     <fuel costPerParsec="0.2" />
-    <stats speed="10" baseAttack="5" baseDefence="15" />
+    <stats speed="10" baseAttack="5" baseDefence="15" combatPriority="10"  />
     <effects>
       <effect kind="fighter" />
     </effects>
@@ -66,7 +66,7 @@
     </dependencies>
     <cost minerals="50" time="0.17" />
     <fuel costPerParsec="0.2" />
-    <stats speed="10" baseAttack="1" baseDefence="1" />
+    <stats speed="10" baseAttack="1" baseDefence="1" combatPriority="50"  />
     <effects>
       <effect kind="troopcarrier" />
     </effects>

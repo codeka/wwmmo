@@ -87,6 +87,21 @@ public class BuildQueueController {
                 }
             }
 
+            // if we're upgrading a building, make sure we don't upgrade it twice!
+            if (buildRequest.getDesignKind() == DesignKind.BUILDING && buildRequest.getExistingBuildingKey() != null) {
+                for (BaseBuildRequest baseBuildRequest : star.getBuildRequests()) {
+                    BuildRequest otherBuildRequest = (BuildRequest) baseBuildRequest;
+                    if (otherBuildRequest.getExistingBuildingKey() == null) {
+                        continue;
+                    }
+                    if (otherBuildRequest.getExistingBuildingID() == buildRequest.getExistingBuildingID()) {
+                        throw new RequestException(400, Messages.GenericError.ErrorCode.CannotBuildDependencyNotMet,
+                                String.format("Cannot upgrade %s, upgrade is already in progress.",
+                                              buildRequest.getDesign().getDisplayName()));
+                    }
+                }
+            }
+
             if (buildRequest.getCount() > 5000) {
                 buildRequest.setCount(5000);
             }

@@ -21,6 +21,8 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
+import android.content.Context;
+
 import com.google.protobuf.Message;
 
 /**
@@ -36,10 +38,10 @@ public class ApiClient {
      * 
      * @param baseUri The base URI that all APIs calls are made against.
      */
-    public static void configure(URI baseUri) {
+    public static void configure(Context context, URI baseUri) {
         log.info("Resetting cookies... configuring baseUri: "+baseUri);
         sCookies = new ArrayList<String>();
-        RequestManager.configure(baseUri);
+        RequestManager.configure(context, baseUri);
     }
 
     public static void impersonate(String user) {

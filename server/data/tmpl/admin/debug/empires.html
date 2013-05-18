@@ -116,6 +116,8 @@
         url = "/realms/beta/empires/search";
         if (inp.val().indexOf("@") > 0) {
           url += "?email="+inp.val();
+        } else if (parseInt(inp.val()) == inp.val()) {
+          url += "?ids="+inp.val();
         } else {
           url += "?name="+inp.val();
         }
@@ -158,7 +160,7 @@
           type: "GET",
           dataType: "json",
           success: function(data) {
-            var text = "";
+/*            var text = "";
             for(var i = 0; i < data.entries.length; i++) {
               var entry = data.entries[i];
               var dt = new Date(entry["time"] * 1000);
@@ -168,8 +170,8 @@
               text += " : "+spacePad("diff: "+parseInt(entry["difference"]), 15);
               text += " : "+entry["reason"];
               text += "\r\n";
-            }
-            $("#search-results").val(text);
+            }*/
+            $("#search-results").val(JSON.stringify(data, null, "  "));
           },
           error: function(xhr, status, err) {
             alert("An error occured, check server logs: " + xhr.status);

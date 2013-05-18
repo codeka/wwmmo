@@ -4,11 +4,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 public class Transaction implements AutoCloseable {
-    private final Logger log = LoggerFactory.getLogger(Transaction.class);
     private Connection mConnection;
     private ArrayList<SqlStmt> mStatements;
 

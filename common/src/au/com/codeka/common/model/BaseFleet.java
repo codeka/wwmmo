@@ -78,6 +78,36 @@ public class BaseFleet {
         mTimeDestroyed = time;
     }
 
+    public void move(DateTime now, String destinationStarKey, DateTime eta) {
+        mState = State.MOVING;
+        mStateStartTime = now;
+        mDestinationStarKey = destinationStarKey;
+        mEta = eta;
+        mTargetFleetKey = null;
+    }
+
+    /**
+     * When the fleet stops attacking, moving, etc it goes back to being idle
+     */
+    public void idle(DateTime now) {
+        mState = State.IDLE;
+        mStateStartTime = now;
+        mDestinationStarKey = null;
+        mEta = null;
+        mTargetFleetKey = null;
+    }
+
+    /**
+     * Switch to attack mode
+     */
+    public void attack(DateTime now) {
+        mState = State.ATTACKING;
+        mStateStartTime = now;
+        mDestinationStarKey = null;
+        mEta = null;
+        mTargetFleetKey = null;
+    }
+
     public float getTimeToDestination(BaseStar srcStar, BaseStar destStar) {
         if (mEta == null) {
             return 0.0f;

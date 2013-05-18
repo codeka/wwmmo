@@ -1,17 +1,28 @@
 package au.com.codeka.warworlds.api;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.ConnectException;
 import java.net.Socket;
 import java.net.URI;
 import java.net.UnknownHostException;
+import java.security.KeyStore;
+import java.security.cert.Certificate;
+import java.security.cert.CertificateFactory;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 
 import javax.net.SocketFactory;
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLHandshakeException;
+import javax.net.ssl.SSLSession;
+import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
+import javax.net.ssl.TrustManagerFactory;
 
 import org.apache.http.HttpClientConnection;
 import org.apache.http.HttpConnectionMetrics;
@@ -27,6 +38,9 @@ import org.apache.http.params.BasicHttpParams;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import android.content.Context;
+import au.com.codeka.warworlds.R;
+
 /**
  * Provides the low-level interface for making requests to the API.
  */
@@ -39,10 +53,10 @@ public class RequestManager {
     private static List<RequestManagerStateChangedHandler> sRequestManagerStateChangedHandlers =
             new ArrayList<RequestManagerStateChangedHandler>();
     private static String sImpersonateUser;
-
+    private static SSLContext mSslContext;
     private static boolean sVerboseLog = true;
 
-    public static void configure(URI baseUri) {
+    public static void configure(Context context, URI baseUri) {
         boolean ssl = false;
         if (baseUri.getScheme().equalsIgnoreCase("https")) {
             ssl = true;
@@ -51,10 +65,51 @@ public class RequestManager {
             log.error("Invalid URI scheme \"{}\", assuming http.", baseUri.getScheme());
         }
 
+        if (baseUri.getHost().equals("game.war-worlds.com")) {
+            setupRootCa(context);
+        }
+
         sConnectionPool = new ConnectionPool(ssl, baseUri.getHost(), baseUri.getPort());
         sBaseUri = baseUri;
 
         log.info("Configured to use base URI: {}", baseUri);
+    }
+
+    /**
+     * Loads the Root CA from memory and uses that instead of the system-installed one. This is more
+     * secure (because it can't be spoofed if a CA is compromized). It's also compatible with more
+     * devices (since not all devices have the RapidSSL CA installed, it seems).
+     */
+    private static void setupRootCa(Context context) {
+        log.info("Setting up root certificate to our own custom CA");
+        try {
+            CertificateFactory cf = CertificateFactory.getInstance("X.509");
+            InputStream ins = context.getResources().openRawResource(R.raw.server_keystore);
+            Certificate ca;
+            try {
+                ca = cf.generateCertificate(ins);
+            } finally {
+                ins.close();
+            }
+
+            // Create a KeyStore containing our trusted CAs
+            String keyStoreType = KeyStore.getDefaultType();
+            KeyStore keyStore = KeyStore.getInstance(keyStoreType);
+            keyStore.load(null, null);
+            keyStore.setCertificateEntry("ca", ca);
+
+            // Create a TrustManager that trusts the CAs in our KeyStore
+            String tmfAlgorithm = TrustManagerFactory.getDefaultAlgorithm();
+            TrustManagerFactory tmf;
+            tmf = TrustManagerFactory.getInstance(tmfAlgorithm);
+            tmf.init(keyStore);
+
+            // Create an SSLContext that uses our TrustManager
+            mSslContext = SSLContext.getInstance("TLS");
+            mSslContext.init(null, tmf.getTrustManagers(), null);
+        } catch (Exception e) {
+            log.error("Error setting up SSLContext", e);
+        }
     }
 
     public static void impersonate(String user) {
@@ -367,14 +422,19 @@ public class RequestManager {
         private List<Connection> mBusyConnections;
         private SocketFactory mSocketFactory;
         private String mHost;
+        private HostnameVerifier mHostnameVerifier;
         private int mPort;
 
         public ConnectionPool(boolean ssl, String host, int port) {
             mFreeConnections = new Stack<Connection>();
             mBusyConnections = new ArrayList<Connection>();
             if (ssl) {
-                log.debug("Will create SSL connections");
-                mSocketFactory = SSLSocketFactory.getDefault();
+                if (mSslContext != null) {
+                    mSocketFactory = mSslContext.getSocketFactory();
+                } else {
+                    mSocketFactory = SSLSocketFactory.getDefault();
+                }
+                mHostnameVerifier = HttpsURLConnection.getDefaultHostnameVerifier();
             } else {
                 mSocketFactory = SocketFactory.getDefault();
             }
@@ -471,6 +531,17 @@ public class RequestManager {
          */
         private Connection createConnection() throws UnknownHostException, IOException {
             Socket s = mSocketFactory.createSocket(mHost, mPort);
+
+            // Verify that the certicate hostname is for mail.google.com
+            // This is due to lack of SNI support in the current SSLSocket.
+            if (mHostnameVerifier != null) {
+                SSLSocket sslSocket = (SSLSocket) s;
+                SSLSession sslSession = sslSocket.getSession();
+                if (!mHostnameVerifier.verify(mHost, sslSession)) {
+                    throw new SSLHandshakeException("Expected " + mHost + ", found "
+                            + sslSession.getPeerPrincipal());
+                }
+            }
 
             BasicHttpParams params = new BasicHttpParams();
             DefaultHttpClientConnection conn = new DefaultHttpClientConnection();

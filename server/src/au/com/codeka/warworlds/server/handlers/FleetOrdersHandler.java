@@ -129,6 +129,7 @@ public class FleetOrdersHandler extends RequestHandler {
 
         Messages.CashAuditRecord.Builder audit_record_pb = Messages.CashAuditRecord.newBuilder()
                 .setEmpireId(getSession().getEmpireID())
+                .setReason(Messages.CashAuditRecord.Reason.FleetMove)
                 .setFleetDesignId(fleet.getDesignID())
                 .setFleetId(fleet.getID())
                 .setNumShips(fleet.getNumShips())
@@ -142,6 +143,7 @@ public class FleetOrdersHandler extends RequestHandler {
         }
 
         float moveTimeInHours = distanceInParsecs / design.getSpeedInParsecPerHour();
-        fleet.move(destStar.getID(), DateTime.now().plusSeconds((int)(moveTimeInHours * 3600.0f)));
+        DateTime now = DateTime.now();
+        fleet.move(now, destStar.getKey(), now.plusSeconds((int)(moveTimeInHours * 3600.0f)));
     }
 }

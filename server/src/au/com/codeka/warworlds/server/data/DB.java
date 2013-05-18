@@ -45,7 +45,7 @@ public class DB {
         Transaction beginTransaction() throws SQLException;
     }
 
-    @SuppressWarnings("unused")
+    //@SuppressWarnings("unused")
     private static class BoneCPStrategy implements Strategy {
         private BoneCP mConnPool;
 
@@ -84,7 +84,7 @@ public class DB {
         }
     }
 
-    @SuppressWarnings("unused")
+    @SuppressWarnings("unused") // we're using BoneCP now
     private static class NoConnectionPoolStrategy implements Strategy {
         @Override
         public SqlStmt prepare(String sql) throws SQLException {

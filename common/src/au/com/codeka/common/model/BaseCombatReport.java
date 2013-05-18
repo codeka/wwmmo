@@ -163,7 +163,7 @@ public class BaseCombatReport {
             pb.setRoundTime(mRoundTime.getMillis() / 1000);
             for (FleetSummary fleetSummary : mFleets) {
                 Messages.CombatRound.FleetSummary.Builder fleet_summary_pb = Messages.CombatRound.FleetSummary.newBuilder();
-                fleet_summary_pb.setFleetKey(fleetSummary.mFleetKey);
+                fleet_summary_pb.addAllFleetKeys(fleetSummary.mFleetKeys);
                 if (fleetSummary.mEmpireKey != null) {
                     fleet_summary_pb.setEmpireKey(fleetSummary.mEmpireKey);
                 }
@@ -199,22 +199,24 @@ public class BaseCombatReport {
     }
 
     public static class FleetSummary {
-        private String mFleetKey;
+        private List<String> mFleetKeys;
         private String mEmpireKey;
         private String mDesignID;
         private float mNumShips;
+        private int mIndex;
 
         public FleetSummary() {
         }
         public FleetSummary(BaseFleet fleet) {
-            mFleetKey = fleet.getKey();
+            mFleetKeys = new ArrayList<String>();
+            mFleetKeys.add(fleet.getKey());
             mEmpireKey = fleet.getEmpireKey();
             mDesignID = fleet.getDesignID();
             mNumShips = fleet.getNumShips();
         }
 
-        public String getFleetKey() {
-            return mFleetKey;
+        public List<String> getFleetKeys() {
+            return mFleetKeys;
         }
         public String getEmpireKey() {
             return mEmpireKey;
@@ -225,10 +227,27 @@ public class BaseCombatReport {
         public float getNumShips() {
             return mNumShips;
         }
+        public void addShips(FleetSummary otherFleet) {
+            mFleetKeys.addAll(otherFleet.getFleetKeys());
+            mNumShips += otherFleet.getNumShips();
+        }
+        public void removeShips(float numShips) {
+            mNumShips -= numShips;
+            if (mNumShips < 0) {
+                mNumShips = 0;
+            }
+        }
+
+        public int getIndex() {
+            return mIndex;
+        }
+        public void setIndex(int index) {
+            mIndex = index;
+        }
 
         public static FleetSummary fromProtocolBuffer(Messages.CombatRound.FleetSummary pb) {
             FleetSummary fleetSummary = new FleetSummary();
-            fleetSummary.mFleetKey = pb.getFleetKey();
+            fleetSummary.mFleetKeys = pb.getFleetKeysList();
             fleetSummary.mEmpireKey = pb.getEmpireKey();
             fleetSummary.mDesignID = pb.getDesignId();
             fleetSummary.mNumShips = pb.getNumShips();

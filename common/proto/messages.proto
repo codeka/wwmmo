@@ -796,7 +796,7 @@ message CombatRound
     // to them by index.
     message FleetSummary
     {
-        optional string fleet_key = 1;
+        repeated string fleet_keys = 1;
         optional string empire_key = 2;
         optional string design_id = 3;
         optional float num_ships = 4;
@@ -967,6 +967,7 @@ message CashAuditRecord
 
     optional float before_cash = 4;
     optional float after_cash = 5;
+    optional int64 time = 16;
 
     // these will be filled out if it's a "FleetMove" operation
     optional int32 fleet_id = 6;
@@ -983,6 +984,12 @@ message CashAuditRecord
 
     // these will be filled out for the "CreateAlliance" operation
     optional string alliance_name = 15;
+}
+
+
+message CashAuditRecords
+{
+    repeated CashAuditRecord records = 1;
 }
 
 

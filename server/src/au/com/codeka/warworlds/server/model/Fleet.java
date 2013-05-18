@@ -101,40 +101,25 @@ public class Fleet extends BaseFleet {
         return (ShipDesign) DesignManager.i.getDesign(DesignKind.SHIP, mDesignID);
     }
 
-    public void move(int destinationStarID, DateTime eta) {
-        mState = State.MOVING;
-        mStateStartTime = DateTime.now();
-        mDestinationStarID = destinationStarID;
-        mDestinationStarKey = Integer.toString(mDestinationStarID);
-        mEta = eta;
+    @Override
+    public void move(DateTime now, String destinationStarKey, DateTime eta) {
+        super.move(now, destinationStarKey, eta);
+        mDestinationStarID = Integer.parseInt(destinationStarKey);
         mTargetFleetID = 0;
-        mTargetFleetKey = null;
     }
 
-    /**
-     * When the fleet stops attacking, moving, etc it goes back to being idle
-     */
-    public void idle() {
-        mState = State.IDLE;
-        mStateStartTime = DateTime.now();
+    @Override
+    public void idle(DateTime now) {
+        super.idle(now);
         mDestinationStarID = 0;
-        mDestinationStarKey = null;
-        mEta = null;
         mTargetFleetID = 0;
-        mTargetFleetKey = null;
     }
 
-    /**
-     * Switch to attack mode
-     */
-    public void attack() {
-        mState = State.ATTACKING;
-        mStateStartTime = DateTime.now();
+    @Override
+    public void attack(DateTime now) {
+        super.attack(now);
         mDestinationStarID = 0;
-        mDestinationStarKey = null;
-        mEta = null;
         mTargetFleetID = 0;
-        mTargetFleetKey = null;
     }
 
     /**

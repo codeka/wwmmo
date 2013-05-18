@@ -46971,20 +46971,25 @@ public final class Messages {
     public interface FleetSummaryOrBuilder
         extends com.google.protobuf.MessageOrBuilder {
 
-      // optional string fleet_key = 1;
+      // repeated string fleet_keys = 1;
       /**
-       * <code>optional string fleet_key = 1;</code>
+       * <code>repeated string fleet_keys = 1;</code>
        */
-      boolean hasFleetKey();
+      java.util.List<java.lang.String>
+      getFleetKeysList();
       /**
-       * <code>optional string fleet_key = 1;</code>
+       * <code>repeated string fleet_keys = 1;</code>
        */
-      java.lang.String getFleetKey();
+      int getFleetKeysCount();
       /**
-       * <code>optional string fleet_key = 1;</code>
+       * <code>repeated string fleet_keys = 1;</code>
+       */
+      java.lang.String getFleetKeys(int index);
+      /**
+       * <code>repeated string fleet_keys = 1;</code>
        */
       com.google.protobuf.ByteString
-          getFleetKeyBytes();
+          getFleetKeysBytes(int index);
 
       // optional string empire_key = 2;
       /**
@@ -47086,22 +47091,25 @@ public final class Messages {
                 break;
               }
               case 10: {
-                bitField0_ |= 0x00000001;
-                fleetKey_ = input.readBytes();
+                if (!((mutable_bitField0_ & 0x00000001) == 0x00000001)) {
+                  fleetKeys_ = new com.google.protobuf.LazyStringArrayList();
+                  mutable_bitField0_ |= 0x00000001;
+                }
+                fleetKeys_.add(input.readBytes());
                 break;
               }
               case 18: {
-                bitField0_ |= 0x00000002;
+                bitField0_ |= 0x00000001;
                 empireKey_ = input.readBytes();
                 break;
               }
               case 26: {
-                bitField0_ |= 0x00000004;
+                bitField0_ |= 0x00000002;
                 designId_ = input.readBytes();
                 break;
               }
               case 37: {
-                bitField0_ |= 0x00000008;
+                bitField0_ |= 0x00000004;
                 numShips_ = input.readFloat();
                 break;
               }
@@ -47113,6 +47121,9 @@ public final class Messages {
           throw new com.google.protobuf.InvalidProtocolBufferException(
               e.getMessage()).setUnfinishedMessage(this);
         } finally {
+          if (((mutable_bitField0_ & 0x00000001) == 0x00000001)) {
+            fleetKeys_ = new com.google.protobuf.UnmodifiableLazyStringList(fleetKeys_);
+          }
           this.unknownFields = unknownFields.build();
           makeExtensionsImmutable();
         }
@@ -47145,47 +47156,34 @@ public final class Messages {
       }
 
       private int bitField0_;
-      // optional string fleet_key = 1;
-      public static final int FLEET_KEY_FIELD_NUMBER = 1;
-      private java.lang.Object fleetKey_;
+      // repeated string fleet_keys = 1;
+      public static final int FLEET_KEYS_FIELD_NUMBER = 1;
+      private com.google.protobuf.LazyStringList fleetKeys_;
       /**
-       * <code>optional string fleet_key = 1;</code>
+       * <code>repeated string fleet_keys = 1;</code>
        */
-      public boolean hasFleetKey() {
-        return ((bitField0_ & 0x00000001) == 0x00000001);
+      public java.util.List<java.lang.String>
+          getFleetKeysList() {
+        return fleetKeys_;
       }
       /**
-       * <code>optional string fleet_key = 1;</code>
+       * <code>repeated string fleet_keys = 1;</code>
        */
-      public java.lang.String getFleetKey() {
-        java.lang.Object ref = fleetKey_;
-        if (ref instanceof java.lang.String) {
-          return (java.lang.String) ref;
-        } else {
-          com.google.protobuf.ByteString bs = 
-              (com.google.protobuf.ByteString) ref;
-          java.lang.String s = bs.toStringUtf8();
-          if (bs.isValidUtf8()) {
-            fleetKey_ = s;
-          }
-          return s;
-        }
+      public int getFleetKeysCount() {
+        return fleetKeys_.size();
       }
       /**
-       * <code>optional string fleet_key = 1;</code>
+       * <code>repeated string fleet_keys = 1;</code>
+       */
+      public java.lang.String getFleetKeys(int index) {
+        return fleetKeys_.get(index);
+      }
+      /**
+       * <code>repeated string fleet_keys = 1;</code>
        */
       public com.google.protobuf.ByteString
-          getFleetKeyBytes() {
-        java.lang.Object ref = fleetKey_;
-        if (ref instanceof java.lang.String) {
-          com.google.protobuf.ByteString b = 
-              com.google.protobuf.ByteString.copyFromUtf8(
-                  (java.lang.String) ref);
-          fleetKey_ = b;
-          return b;
-        } else {
-          return (com.google.protobuf.ByteString) ref;
-        }
+          getFleetKeysBytes(int index) {
+        return fleetKeys_.getByteString(index);
       }
 
       // optional string empire_key = 2;
@@ -47195,7 +47193,7 @@ public final class Messages {
        * <code>optional string empire_key = 2;</code>
        */
       public boolean hasEmpireKey() {
-        return ((bitField0_ & 0x00000002) == 0x00000002);
+        return ((bitField0_ & 0x00000001) == 0x00000001);
       }
       /**
        * <code>optional string empire_key = 2;</code>
@@ -47238,7 +47236,7 @@ public final class Messages {
        * <code>optional string design_id = 3;</code>
        */
       public boolean hasDesignId() {
-        return ((bitField0_ & 0x00000004) == 0x00000004);
+        return ((bitField0_ & 0x00000002) == 0x00000002);
       }
       /**
        * <code>optional string design_id = 3;</code>
@@ -47281,7 +47279,7 @@ public final class Messages {
        * <code>optional float num_ships = 4;</code>
        */
       public boolean hasNumShips() {
-        return ((bitField0_ & 0x00000008) == 0x00000008);
+        return ((bitField0_ & 0x00000004) == 0x00000004);
       }
       /**
        * <code>optional float num_ships = 4;</code>
@@ -47291,7 +47289,7 @@ public final class Messages {
       }
 
       private void initFields() {
-        fleetKey_ = "";
+        fleetKeys_ = com.google.protobuf.LazyStringArrayList.EMPTY;
         empireKey_ = "";
         designId_ = "";
         numShips_ = 0F;
@@ -47308,16 +47306,16 @@ public final class Messages {
       public void writeTo(com.google.protobuf.CodedOutputStream output)
                           throws java.io.IOException {
         getSerializedSize();
-        if (((bitField0_ & 0x00000001) == 0x00000001)) {
-          output.writeBytes(1, getFleetKeyBytes());
+        for (int i = 0; i < fleetKeys_.size(); i++) {
+          output.writeBytes(1, fleetKeys_.getByteString(i));
         }
-        if (((bitField0_ & 0x00000002) == 0x00000002)) {
+        if (((bitField0_ & 0x00000001) == 0x00000001)) {
           output.writeBytes(2, getEmpireKeyBytes());
         }
-        if (((bitField0_ & 0x00000004) == 0x00000004)) {
+        if (((bitField0_ & 0x00000002) == 0x00000002)) {
           output.writeBytes(3, getDesignIdBytes());
         }
-        if (((bitField0_ & 0x00000008) == 0x00000008)) {
+        if (((bitField0_ & 0x00000004) == 0x00000004)) {
           output.writeFloat(4, numShips_);
         }
         getUnknownFields().writeTo(output);
@@ -47329,19 +47327,24 @@ public final class Messages {
         if (size != -1) return size;
 
         size = 0;
-        if (((bitField0_ & 0x00000001) == 0x00000001)) {
-          size += com.google.protobuf.CodedOutputStream
-            .computeBytesSize(1, getFleetKeyBytes());
+        {
+          int dataSize = 0;
+          for (int i = 0; i < fleetKeys_.size(); i++) {
+            dataSize += com.google.protobuf.CodedOutputStream
+              .computeBytesSizeNoTag(fleetKeys_.getByteString(i));
+          }
+          size += dataSize;
+          size += 1 * getFleetKeysList().size();
         }
-        if (((bitField0_ & 0x00000002) == 0x00000002)) {
+        if (((bitField0_ & 0x00000001) == 0x00000001)) {
           size += com.google.protobuf.CodedOutputStream
             .computeBytesSize(2, getEmpireKeyBytes());
         }
-        if (((bitField0_ & 0x00000004) == 0x00000004)) {
+        if (((bitField0_ & 0x00000002) == 0x00000002)) {
           size += com.google.protobuf.CodedOutputStream
             .computeBytesSize(3, getDesignIdBytes());
         }
-        if (((bitField0_ & 0x00000008) == 0x00000008)) {
+        if (((bitField0_ & 0x00000004) == 0x00000004)) {
           size += com.google.protobuf.CodedOutputStream
             .computeFloatSize(4, numShips_);
         }
@@ -47469,7 +47472,7 @@ public final class Messages {
 
         public Builder clear() {
           super.clear();
-          fleetKey_ = "";
+          fleetKeys_ = com.google.protobuf.LazyStringArrayList.EMPTY;
           bitField0_ = (bitField0_ & ~0x00000001);
           empireKey_ = "";
           bitField0_ = (bitField0_ & ~0x00000002);
@@ -47505,20 +47508,22 @@ public final class Messages {
           au.com.codeka.common.protobuf.Messages.CombatRound.FleetSummary result = new au.com.codeka.common.protobuf.Messages.CombatRound.FleetSummary(this);
           int from_bitField0_ = bitField0_;
           int to_bitField0_ = 0;
-          if (((from_bitField0_ & 0x00000001) == 0x00000001)) {
-            to_bitField0_ |= 0x00000001;
+          if (((bitField0_ & 0x00000001) == 0x00000001)) {
+            fleetKeys_ = new com.google.protobuf.UnmodifiableLazyStringList(
+                fleetKeys_);
+            bitField0_ = (bitField0_ & ~0x00000001);
           }
-          result.fleetKey_ = fleetKey_;
+          result.fleetKeys_ = fleetKeys_;
           if (((from_bitField0_ & 0x00000002) == 0x00000002)) {
-            to_bitField0_ |= 0x00000002;
+            to_bitField0_ |= 0x00000001;
           }
           result.empireKey_ = empireKey_;
           if (((from_bitField0_ & 0x00000004) == 0x00000004)) {
-            to_bitField0_ |= 0x00000004;
+            to_bitField0_ |= 0x00000002;
           }
           result.designId_ = designId_;
           if (((from_bitField0_ & 0x00000008) == 0x00000008)) {
-            to_bitField0_ |= 0x00000008;
+            to_bitField0_ |= 0x00000004;
           }
           result.numShips_ = numShips_;
           result.bitField0_ = to_bitField0_;
@@ -47537,9 +47542,14 @@ public final class Messages {
 
         public Builder mergeFrom(au.com.codeka.common.protobuf.Messages.CombatRound.FleetSummary other) {
           if (other == au.com.codeka.common.protobuf.Messages.CombatRound.FleetSummary.getDefaultInstance()) return this;
-          if (other.hasFleetKey()) {
-            bitField0_ |= 0x00000001;
-            fleetKey_ = other.fleetKey_;
+          if (!other.fleetKeys_.isEmpty()) {
+            if (fleetKeys_.isEmpty()) {
+              fleetKeys_ = other.fleetKeys_;
+              bitField0_ = (bitField0_ & ~0x00000001);
+            } else {
+              ensureFleetKeysIsMutable();
+              fleetKeys_.addAll(other.fleetKeys_);
+            }
             onChanged();
           }
           if (other.hasEmpireKey()) {
@@ -47582,76 +47592,95 @@ public final class Messages {
         }
         private int bitField0_;
 
-        // optional string fleet_key = 1;
-        private java.lang.Object fleetKey_ = "";
-        /**
-         * <code>optional string fleet_key = 1;</code>
-         */
-        public boolean hasFleetKey() {
-          return ((bitField0_ & 0x00000001) == 0x00000001);
+        // repeated string fleet_keys = 1;
+        private com.google.protobuf.LazyStringList fleetKeys_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+        private void ensureFleetKeysIsMutable() {
+          if (!((bitField0_ & 0x00000001) == 0x00000001)) {
+            fleetKeys_ = new com.google.protobuf.LazyStringArrayList(fleetKeys_);
+            bitField0_ |= 0x00000001;
+           }
         }
         /**
-         * <code>optional string fleet_key = 1;</code>
+         * <code>repeated string fleet_keys = 1;</code>
          */
-        public java.lang.String getFleetKey() {
-          java.lang.Object ref = fleetKey_;
-          if (!(ref instanceof java.lang.String)) {
-            java.lang.String s = ((com.google.protobuf.ByteString) ref)
-                .toStringUtf8();
-            fleetKey_ = s;
-            return s;
-          } else {
-            return (java.lang.String) ref;
-          }
+        public java.util.List<java.lang.String>
+            getFleetKeysList() {
+          return java.util.Collections.unmodifiableList(fleetKeys_);
         }
         /**
-         * <code>optional string fleet_key = 1;</code>
+         * <code>repeated string fleet_keys = 1;</code>
+         */
+        public int getFleetKeysCount() {
+          return fleetKeys_.size();
+        }
+        /**
+         * <code>repeated string fleet_keys = 1;</code>
+         */
+        public java.lang.String getFleetKeys(int index) {
+          return fleetKeys_.get(index);
+        }
+        /**
+         * <code>repeated string fleet_keys = 1;</code>
          */
         public com.google.protobuf.ByteString
-            getFleetKeyBytes() {
-          java.lang.Object ref = fleetKey_;
-          if (ref instanceof String) {
-            com.google.protobuf.ByteString b = 
-                com.google.protobuf.ByteString.copyFromUtf8(
-                    (java.lang.String) ref);
-            fleetKey_ = b;
-            return b;
-          } else {
-            return (com.google.protobuf.ByteString) ref;
-          }
+            getFleetKeysBytes(int index) {
+          return fleetKeys_.getByteString(index);
         }
         /**
-         * <code>optional string fleet_key = 1;</code>
+         * <code>repeated string fleet_keys = 1;</code>
          */
-        public Builder setFleetKey(
+        public Builder setFleetKeys(
+            int index, java.lang.String value) {
+          if (value == null) {
+    throw new NullPointerException();
+  }
+  ensureFleetKeysIsMutable();
+          fleetKeys_.set(index, value);
+          onChanged();
+          return this;
+        }
+        /**
+         * <code>repeated string fleet_keys = 1;</code>
+         */
+        public Builder addFleetKeys(
             java.lang.String value) {
           if (value == null) {
     throw new NullPointerException();
   }
-  bitField0_ |= 0x00000001;
-          fleetKey_ = value;
+  ensureFleetKeysIsMutable();
+          fleetKeys_.add(value);
           onChanged();
           return this;
         }
         /**
-         * <code>optional string fleet_key = 1;</code>
+         * <code>repeated string fleet_keys = 1;</code>
          */
-        public Builder clearFleetKey() {
+        public Builder addAllFleetKeys(
+            java.lang.Iterable<java.lang.String> values) {
+          ensureFleetKeysIsMutable();
+          super.addAll(values, fleetKeys_);
+          onChanged();
+          return this;
+        }
+        /**
+         * <code>repeated string fleet_keys = 1;</code>
+         */
+        public Builder clearFleetKeys() {
+          fleetKeys_ = com.google.protobuf.LazyStringArrayList.EMPTY;
           bitField0_ = (bitField0_ & ~0x00000001);
-          fleetKey_ = getDefaultInstance().getFleetKey();
           onChanged();
           return this;
         }
         /**
-         * <code>optional string fleet_key = 1;</code>
+         * <code>repeated string fleet_keys = 1;</code>
          */
-        public Builder setFleetKeyBytes(
+        public Builder addFleetKeysBytes(
             com.google.protobuf.ByteString value) {
           if (value == null) {
     throw new NullPointerException();
   }
-  bitField0_ |= 0x00000001;
-          fleetKey_ = value;
+  ensureFleetKeysIsMutable();
+          fleetKeys_.add(value);
           onChanged();
           return this;
         }
@@ -62163,6 +62192,16 @@ public final class Messages {
      */
     float getAfterCash();
 
+    // optional int64 time = 16;
+    /**
+     * <code>optional int64 time = 16;</code>
+     */
+    boolean hasTime();
+    /**
+     * <code>optional int64 time = 16;</code>
+     */
+    long getTime();
+
     // optional int32 fleet_id = 6;
     /**
      * <code>optional int32 fleet_id = 6;</code>
@@ -62398,53 +62437,58 @@ public final class Messages {
               break;
             }
             case 48: {
-              bitField0_ |= 0x00000020;
+              bitField0_ |= 0x00000040;
               fleetId_ = input.readInt32();
               break;
             }
             case 58: {
-              bitField0_ |= 0x00000040;
+              bitField0_ |= 0x00000080;
               fleetDesignId_ = input.readBytes();
               break;
             }
             case 69: {
-              bitField0_ |= 0x00000080;
+              bitField0_ |= 0x00000100;
               numShips_ = input.readFloat();
               break;
             }
             case 72: {
-              bitField0_ |= 0x00000100;
+              bitField0_ |= 0x00000200;
               starId_ = input.readInt32();
               break;
             }
             case 82: {
-              bitField0_ |= 0x00000200;
+              bitField0_ |= 0x00000400;
               starName_ = input.readBytes();
               break;
             }
             case 93: {
-              bitField0_ |= 0x00000400;
+              bitField0_ |= 0x00000800;
               moveDistance_ = input.readFloat();
               break;
             }
             case 98: {
-              bitField0_ |= 0x00000800;
+              bitField0_ |= 0x00001000;
               buildDesignId_ = input.readBytes();
               break;
             }
             case 104: {
-              bitField0_ |= 0x00001000;
+              bitField0_ |= 0x00002000;
               buildCount_ = input.readInt32();
               break;
             }
             case 117: {
-              bitField0_ |= 0x00002000;
+              bitField0_ |= 0x00004000;
               accelerateAmount_ = input.readFloat();
               break;
             }
             case 122: {
-              bitField0_ |= 0x00004000;
+              bitField0_ |= 0x00008000;
               allianceName_ = input.readBytes();
+              break;
+            }
+            case 128: {
+              bitField0_ |= 0x00000020;
+              time_ = input.readInt64();
               break;
             }
           }
@@ -62667,6 +62711,22 @@ public final class Messages {
       return afterCash_;
     }
 
+    // optional int64 time = 16;
+    public static final int TIME_FIELD_NUMBER = 16;
+    private long time_;
+    /**
+     * <code>optional int64 time = 16;</code>
+     */
+    public boolean hasTime() {
+      return ((bitField0_ & 0x00000020) == 0x00000020);
+    }
+    /**
+     * <code>optional int64 time = 16;</code>
+     */
+    public long getTime() {
+      return time_;
+    }
+
     // optional int32 fleet_id = 6;
     public static final int FLEET_ID_FIELD_NUMBER = 6;
     private int fleetId_;
@@ -62678,7 +62738,7 @@ public final class Messages {
      * </pre>
      */
     public boolean hasFleetId() {
-      return ((bitField0_ & 0x00000020) == 0x00000020);
+      return ((bitField0_ & 0x00000040) == 0x00000040);
     }
     /**
      * <code>optional int32 fleet_id = 6;</code>
@@ -62698,7 +62758,7 @@ public final class Messages {
      * <code>optional string fleet_design_id = 7;</code>
      */
     public boolean hasFleetDesignId() {
-      return ((bitField0_ & 0x00000040) == 0x00000040);
+      return ((bitField0_ & 0x00000080) == 0x00000080);
     }
     /**
      * <code>optional string fleet_design_id = 7;</code>
@@ -62741,7 +62801,7 @@ public final class Messages {
      * <code>optional float num_ships = 8;</code>
      */
     public boolean hasNumShips() {
-      return ((bitField0_ & 0x00000080) == 0x00000080);
+      return ((bitField0_ & 0x00000100) == 0x00000100);
     }
     /**
      * <code>optional float num_ships = 8;</code>
@@ -62757,7 +62817,7 @@ public final class Messages {
      * <code>optional int32 star_id = 9;</code>
      */
     public boolean hasStarId() {
-      return ((bitField0_ & 0x00000100) == 0x00000100);
+      return ((bitField0_ & 0x00000200) == 0x00000200);
     }
     /**
      * <code>optional int32 star_id = 9;</code>
@@ -62773,7 +62833,7 @@ public final class Messages {
      * <code>optional string star_name = 10;</code>
      */
     public boolean hasStarName() {
-      return ((bitField0_ & 0x00000200) == 0x00000200);
+      return ((bitField0_ & 0x00000400) == 0x00000400);
     }
     /**
      * <code>optional string star_name = 10;</code>
@@ -62816,7 +62876,7 @@ public final class Messages {
      * <code>optional float move_distance = 11;</code>
      */
     public boolean hasMoveDistance() {
-      return ((bitField0_ & 0x00000400) == 0x00000400);
+      return ((bitField0_ & 0x00000800) == 0x00000800);
     }
     /**
      * <code>optional float move_distance = 11;</code>
@@ -62836,7 +62896,7 @@ public final class Messages {
      * </pre>
      */
     public boolean hasBuildDesignId() {
-      return ((bitField0_ & 0x00000800) == 0x00000800);
+      return ((bitField0_ & 0x00001000) == 0x00001000);
     }
     /**
      * <code>optional string build_design_id = 12;</code>
@@ -62887,7 +62947,7 @@ public final class Messages {
      * <code>optional int32 build_count = 13;</code>
      */
     public boolean hasBuildCount() {
-      return ((bitField0_ & 0x00001000) == 0x00001000);
+      return ((bitField0_ & 0x00002000) == 0x00002000);
     }
     /**
      * <code>optional int32 build_count = 13;</code>
@@ -62903,7 +62963,7 @@ public final class Messages {
      * <code>optional float accelerate_amount = 14;</code>
      */
     public boolean hasAccelerateAmount() {
-      return ((bitField0_ & 0x00002000) == 0x00002000);
+      return ((bitField0_ & 0x00004000) == 0x00004000);
     }
     /**
      * <code>optional float accelerate_amount = 14;</code>
@@ -62923,7 +62983,7 @@ public final class Messages {
      * </pre>
      */
     public boolean hasAllianceName() {
-      return ((bitField0_ & 0x00004000) == 0x00004000);
+      return ((bitField0_ & 0x00008000) == 0x00008000);
     }
     /**
      * <code>optional string alliance_name = 15;</code>
@@ -62973,6 +63033,7 @@ public final class Messages {
       reason_ = au.com.codeka.common.protobuf.Messages.CashAuditRecord.Reason.FleetMove;
       beforeCash_ = 0F;
       afterCash_ = 0F;
+      time_ = 0L;
       fleetId_ = 0;
       fleetDesignId_ = "";
       numShips_ = 0F;
@@ -63011,35 +63072,38 @@ public final class Messages {
       if (((bitField0_ & 0x00000010) == 0x00000010)) {
         output.writeFloat(5, afterCash_);
       }
-      if (((bitField0_ & 0x00000020) == 0x00000020)) {
+      if (((bitField0_ & 0x00000040) == 0x00000040)) {
         output.writeInt32(6, fleetId_);
       }
-      if (((bitField0_ & 0x00000040) == 0x00000040)) {
+      if (((bitField0_ & 0x00000080) == 0x00000080)) {
         output.writeBytes(7, getFleetDesignIdBytes());
       }
-      if (((bitField0_ & 0x00000080) == 0x00000080)) {
+      if (((bitField0_ & 0x00000100) == 0x00000100)) {
         output.writeFloat(8, numShips_);
       }
-      if (((bitField0_ & 0x00000100) == 0x00000100)) {
+      if (((bitField0_ & 0x00000200) == 0x00000200)) {
         output.writeInt32(9, starId_);
       }
-      if (((bitField0_ & 0x00000200) == 0x00000200)) {
+      if (((bitField0_ & 0x00000400) == 0x00000400)) {
         output.writeBytes(10, getStarNameBytes());
       }
-      if (((bitField0_ & 0x00000400) == 0x00000400)) {
+      if (((bitField0_ & 0x00000800) == 0x00000800)) {
         output.writeFloat(11, moveDistance_);
       }
-      if (((bitField0_ & 0x00000800) == 0x00000800)) {
+      if (((bitField0_ & 0x00001000) == 0x00001000)) {
         output.writeBytes(12, getBuildDesignIdBytes());
       }
-      if (((bitField0_ & 0x00001000) == 0x00001000)) {
+      if (((bitField0_ & 0x00002000) == 0x00002000)) {
         output.writeInt32(13, buildCount_);
       }
-      if (((bitField0_ & 0x00002000) == 0x00002000)) {
+      if (((bitField0_ & 0x00004000) == 0x00004000)) {
         output.writeFloat(14, accelerateAmount_);
       }
-      if (((bitField0_ & 0x00004000) == 0x00004000)) {
+      if (((bitField0_ & 0x00008000) == 0x00008000)) {
         output.writeBytes(15, getAllianceNameBytes());
+      }
+      if (((bitField0_ & 0x00000020) == 0x00000020)) {
+        output.writeInt64(16, time_);
       }
       getUnknownFields().writeTo(output);
     }
@@ -63070,45 +63134,49 @@ public final class Messages {
         size += com.google.protobuf.CodedOutputStream
           .computeFloatSize(5, afterCash_);
       }
-      if (((bitField0_ & 0x00000020) == 0x00000020)) {
+      if (((bitField0_ & 0x00000040) == 0x00000040)) {
         size += com.google.protobuf.CodedOutputStream
           .computeInt32Size(6, fleetId_);
       }
-      if (((bitField0_ & 0x00000040) == 0x00000040)) {
+      if (((bitField0_ & 0x00000080) == 0x00000080)) {
         size += com.google.protobuf.CodedOutputStream
           .computeBytesSize(7, getFleetDesignIdBytes());
       }
-      if (((bitField0_ & 0x00000080) == 0x00000080)) {
+      if (((bitField0_ & 0x00000100) == 0x00000100)) {
         size += com.google.protobuf.CodedOutputStream
           .computeFloatSize(8, numShips_);
       }
-      if (((bitField0_ & 0x00000100) == 0x00000100)) {
+      if (((bitField0_ & 0x00000200) == 0x00000200)) {
         size += com.google.protobuf.CodedOutputStream
           .computeInt32Size(9, starId_);
       }
-      if (((bitField0_ & 0x00000200) == 0x00000200)) {
+      if (((bitField0_ & 0x00000400) == 0x00000400)) {
         size += com.google.protobuf.CodedOutputStream
           .computeBytesSize(10, getStarNameBytes());
       }
-      if (((bitField0_ & 0x00000400) == 0x00000400)) {
+      if (((bitField0_ & 0x00000800) == 0x00000800)) {
         size += com.google.protobuf.CodedOutputStream
           .computeFloatSize(11, moveDistance_);
       }
-      if (((bitField0_ & 0x00000800) == 0x00000800)) {
+      if (((bitField0_ & 0x00001000) == 0x00001000)) {
         size += com.google.protobuf.CodedOutputStream
           .computeBytesSize(12, getBuildDesignIdBytes());
       }
-      if (((bitField0_ & 0x00001000) == 0x00001000)) {
+      if (((bitField0_ & 0x00002000) == 0x00002000)) {
         size += com.google.protobuf.CodedOutputStream
           .computeInt32Size(13, buildCount_);
       }
-      if (((bitField0_ & 0x00002000) == 0x00002000)) {
+      if (((bitField0_ & 0x00004000) == 0x00004000)) {
         size += com.google.protobuf.CodedOutputStream
           .computeFloatSize(14, accelerateAmount_);
       }
-      if (((bitField0_ & 0x00004000) == 0x00004000)) {
+      if (((bitField0_ & 0x00008000) == 0x00008000)) {
         size += com.google.protobuf.CodedOutputStream
           .computeBytesSize(15, getAllianceNameBytes());
+      }
+      if (((bitField0_ & 0x00000020) == 0x00000020)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt64Size(16, time_);
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
@@ -63236,26 +63304,28 @@ public final class Messages {
         bitField0_ = (bitField0_ & ~0x00000008);
         afterCash_ = 0F;
         bitField0_ = (bitField0_ & ~0x00000010);
-        fleetId_ = 0;
+        time_ = 0L;
         bitField0_ = (bitField0_ & ~0x00000020);
-        fleetDesignId_ = "";
+        fleetId_ = 0;
         bitField0_ = (bitField0_ & ~0x00000040);
-        numShips_ = 0F;
+        fleetDesignId_ = "";
         bitField0_ = (bitField0_ & ~0x00000080);
-        starId_ = 0;
+        numShips_ = 0F;
         bitField0_ = (bitField0_ & ~0x00000100);
-        starName_ = "";
+        starId_ = 0;
         bitField0_ = (bitField0_ & ~0x00000200);
-        moveDistance_ = 0F;
+        starName_ = "";
         bitField0_ = (bitField0_ & ~0x00000400);
-        buildDesignId_ = "";
+        moveDistance_ = 0F;
         bitField0_ = (bitField0_ & ~0x00000800);
-        buildCount_ = 0;
+        buildDesignId_ = "";
         bitField0_ = (bitField0_ & ~0x00001000);
-        accelerateAmount_ = 0F;
+        buildCount_ = 0;
         bitField0_ = (bitField0_ & ~0x00002000);
-        allianceName_ = "";
+        accelerateAmount_ = 0F;
         bitField0_ = (bitField0_ & ~0x00004000);
+        allianceName_ = "";
+        bitField0_ = (bitField0_ & ~0x00008000);
         return this;
       }
 
@@ -63307,41 +63377,45 @@ public final class Messages {
         if (((from_bitField0_ & 0x00000020) == 0x00000020)) {
           to_bitField0_ |= 0x00000020;
         }
-        result.fleetId_ = fleetId_;
+        result.time_ = time_;
         if (((from_bitField0_ & 0x00000040) == 0x00000040)) {
           to_bitField0_ |= 0x00000040;
         }
-        result.fleetDesignId_ = fleetDesignId_;
+        result.fleetId_ = fleetId_;
         if (((from_bitField0_ & 0x00000080) == 0x00000080)) {
           to_bitField0_ |= 0x00000080;
         }
-        result.numShips_ = numShips_;
+        result.fleetDesignId_ = fleetDesignId_;
         if (((from_bitField0_ & 0x00000100) == 0x00000100)) {
           to_bitField0_ |= 0x00000100;
         }
-        result.starId_ = starId_;
+        result.numShips_ = numShips_;
         if (((from_bitField0_ & 0x00000200) == 0x00000200)) {
           to_bitField0_ |= 0x00000200;
         }
-        result.starName_ = starName_;
+        result.starId_ = starId_;
         if (((from_bitField0_ & 0x00000400) == 0x00000400)) {
           to_bitField0_ |= 0x00000400;
         }
-        result.moveDistance_ = moveDistance_;
+        result.starName_ = starName_;
         if (((from_bitField0_ & 0x00000800) == 0x00000800)) {
           to_bitField0_ |= 0x00000800;
         }
-        result.buildDesignId_ = buildDesignId_;
+        result.moveDistance_ = moveDistance_;
         if (((from_bitField0_ & 0x00001000) == 0x00001000)) {
           to_bitField0_ |= 0x00001000;
         }
-        result.buildCount_ = buildCount_;
+        result.buildDesignId_ = buildDesignId_;
         if (((from_bitField0_ & 0x00002000) == 0x00002000)) {
           to_bitField0_ |= 0x00002000;
         }
-        result.accelerateAmount_ = accelerateAmount_;
+        result.buildCount_ = buildCount_;
         if (((from_bitField0_ & 0x00004000) == 0x00004000)) {
           to_bitField0_ |= 0x00004000;
+        }
+        result.accelerateAmount_ = accelerateAmount_;
+        if (((from_bitField0_ & 0x00008000) == 0x00008000)) {
+          to_bitField0_ |= 0x00008000;
         }
         result.allianceName_ = allianceName_;
         result.bitField0_ = to_bitField0_;
@@ -63375,11 +63449,14 @@ public final class Messages {
         if (other.hasAfterCash()) {
           setAfterCash(other.getAfterCash());
         }
+        if (other.hasTime()) {
+          setTime(other.getTime());
+        }
         if (other.hasFleetId()) {
           setFleetId(other.getFleetId());
         }
         if (other.hasFleetDesignId()) {
-          bitField0_ |= 0x00000040;
+          bitField0_ |= 0x00000080;
           fleetDesignId_ = other.fleetDesignId_;
           onChanged();
         }
@@ -63390,7 +63467,7 @@ public final class Messages {
           setStarId(other.getStarId());
         }
         if (other.hasStarName()) {
-          bitField0_ |= 0x00000200;
+          bitField0_ |= 0x00000400;
           starName_ = other.starName_;
           onChanged();
         }
@@ -63398,7 +63475,7 @@ public final class Messages {
           setMoveDistance(other.getMoveDistance());
         }
         if (other.hasBuildDesignId()) {
-          bitField0_ |= 0x00000800;
+          bitField0_ |= 0x00001000;
           buildDesignId_ = other.buildDesignId_;
           onChanged();
         }
@@ -63409,7 +63486,7 @@ public final class Messages {
           setAccelerateAmount(other.getAccelerateAmount());
         }
         if (other.hasAllianceName()) {
-          bitField0_ |= 0x00004000;
+          bitField0_ |= 0x00008000;
           allianceName_ = other.allianceName_;
           onChanged();
         }
@@ -63608,6 +63685,39 @@ public final class Messages {
         return this;
       }
 
+      // optional int64 time = 16;
+      private long time_ ;
+      /**
+       * <code>optional int64 time = 16;</code>
+       */
+      public boolean hasTime() {
+        return ((bitField0_ & 0x00000020) == 0x00000020);
+      }
+      /**
+       * <code>optional int64 time = 16;</code>
+       */
+      public long getTime() {
+        return time_;
+      }
+      /**
+       * <code>optional int64 time = 16;</code>
+       */
+      public Builder setTime(long value) {
+        bitField0_ |= 0x00000020;
+        time_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional int64 time = 16;</code>
+       */
+      public Builder clearTime() {
+        bitField0_ = (bitField0_ & ~0x00000020);
+        time_ = 0L;
+        onChanged();
+        return this;
+      }
+
       // optional int32 fleet_id = 6;
       private int fleetId_ ;
       /**
@@ -63618,7 +63728,7 @@ public final class Messages {
        * </pre>
        */
       public boolean hasFleetId() {
-        return ((bitField0_ & 0x00000020) == 0x00000020);
+        return ((bitField0_ & 0x00000040) == 0x00000040);
       }
       /**
        * <code>optional int32 fleet_id = 6;</code>
@@ -63638,7 +63748,7 @@ public final class Messages {
        * </pre>
        */
       public Builder setFleetId(int value) {
-        bitField0_ |= 0x00000020;
+        bitField0_ |= 0x00000040;
         fleetId_ = value;
         onChanged();
         return this;
@@ -63651,7 +63761,7 @@ public final class Messages {
        * </pre>
        */
       public Builder clearFleetId() {
-        bitField0_ = (bitField0_ & ~0x00000020);
+        bitField0_ = (bitField0_ & ~0x00000040);
         fleetId_ = 0;
         onChanged();
         return this;
@@ -63663,7 +63773,7 @@ public final class Messages {
        * <code>optional string fleet_design_id = 7;</code>
        */
       public boolean hasFleetDesignId() {
-        return ((bitField0_ & 0x00000040) == 0x00000040);
+        return ((bitField0_ & 0x00000080) == 0x00000080);
       }
       /**
        * <code>optional string fleet_design_id = 7;</code>
@@ -63703,7 +63813,7 @@ public final class Messages {
         if (value == null) {
     throw new NullPointerException();
   }
-  bitField0_ |= 0x00000040;
+  bitField0_ |= 0x00000080;
         fleetDesignId_ = value;
         onChanged();
         return this;
@@ -63712,7 +63822,7 @@ public final class Messages {
        * <code>optional string fleet_design_id = 7;</code>
        */
       public Builder clearFleetDesignId() {
-        bitField0_ = (bitField0_ & ~0x00000040);
+        bitField0_ = (bitField0_ & ~0x00000080);
         fleetDesignId_ = getDefaultInstance().getFleetDesignId();
         onChanged();
         return this;
@@ -63725,7 +63835,7 @@ public final class Messages {
         if (value == null) {
     throw new NullPointerException();
   }
-  bitField0_ |= 0x00000040;
+  bitField0_ |= 0x00000080;
         fleetDesignId_ = value;
         onChanged();
         return this;
@@ -63737,7 +63847,7 @@ public final class Messages {
        * <code>optional float num_ships = 8;</code>
        */
       public boolean hasNumShips() {
-        return ((bitField0_ & 0x00000080) == 0x00000080);
+        return ((bitField0_ & 0x00000100) == 0x00000100);
       }
       /**
        * <code>optional float num_ships = 8;</code>
@@ -63749,7 +63859,7 @@ public final class Messages {
        * <code>optional float num_ships = 8;</code>
        */
       public Builder setNumShips(float value) {
-        bitField0_ |= 0x00000080;
+        bitField0_ |= 0x00000100;
         numShips_ = value;
         onChanged();
         return this;
@@ -63758,7 +63868,7 @@ public final class Messages {
        * <code>optional float num_ships = 8;</code>
        */
       public Builder clearNumShips() {
-        bitField0_ = (bitField0_ & ~0x00000080);
+        bitField0_ = (bitField0_ & ~0x00000100);
         numShips_ = 0F;
         onChanged();
         return this;
@@ -63770,7 +63880,7 @@ public final class Messages {
        * <code>optional int32 star_id = 9;</code>
        */
       public boolean hasStarId() {
-        return ((bitField0_ & 0x00000100) == 0x00000100);
+        return ((bitField0_ & 0x00000200) == 0x00000200);
       }
       /**
        * <code>optional int32 star_id = 9;</code>
@@ -63782,7 +63892,7 @@ public final class Messages {
        * <code>optional int32 star_id = 9;</code>
        */
       public Builder setStarId(int value) {
-        bitField0_ |= 0x00000100;
+        bitField0_ |= 0x00000200;
         starId_ = value;
         onChanged();
         return this;
@@ -63791,7 +63901,7 @@ public final class Messages {
        * <code>optional int32 star_id = 9;</code>
        */
       public Builder clearStarId() {
-        bitField0_ = (bitField0_ & ~0x00000100);
+        bitField0_ = (bitField0_ & ~0x00000200);
         starId_ = 0;
         onChanged();
         return this;
@@ -63803,7 +63913,7 @@ public final class Messages {
        * <code>optional string star_name = 10;</code>
        */
       public boolean hasStarName() {
-        return ((bitField0_ & 0x00000200) == 0x00000200);
+        return ((bitField0_ & 0x00000400) == 0x00000400);
       }
       /**
        * <code>optional string star_name = 10;</code>
@@ -63843,7 +63953,7 @@ public final class Messages {
         if (value == null) {
     throw new NullPointerException();
   }
-  bitField0_ |= 0x00000200;
+  bitField0_ |= 0x00000400;
         starName_ = value;
         onChanged();
         return this;
@@ -63852,7 +63962,7 @@ public final class Messages {
        * <code>optional string star_name = 10;</code>
        */
       public Builder clearStarName() {
-        bitField0_ = (bitField0_ & ~0x00000200);
+        bitField0_ = (bitField0_ & ~0x00000400);
         starName_ = getDefaultInstance().getStarName();
         onChanged();
         return this;
@@ -63865,7 +63975,7 @@ public final class Messages {
         if (value == null) {
     throw new NullPointerException();
   }
-  bitField0_ |= 0x00000200;
+  bitField0_ |= 0x00000400;
         starName_ = value;
         onChanged();
         return this;
@@ -63877,7 +63987,7 @@ public final class Messages {
        * <code>optional float move_distance = 11;</code>
        */
       public boolean hasMoveDistance() {
-        return ((bitField0_ & 0x00000400) == 0x00000400);
+        return ((bitField0_ & 0x00000800) == 0x00000800);
       }
       /**
        * <code>optional float move_distance = 11;</code>
@@ -63889,7 +63999,7 @@ public final class Messages {
        * <code>optional float move_distance = 11;</code>
        */
       public Builder setMoveDistance(float value) {
-        bitField0_ |= 0x00000400;
+        bitField0_ |= 0x00000800;
         moveDistance_ = value;
         onChanged();
         return this;
@@ -63898,7 +64008,7 @@ public final class Messages {
        * <code>optional float move_distance = 11;</code>
        */
       public Builder clearMoveDistance() {
-        bitField0_ = (bitField0_ & ~0x00000400);
+        bitField0_ = (bitField0_ & ~0x00000800);
         moveDistance_ = 0F;
         onChanged();
         return this;
@@ -63914,7 +64024,7 @@ public final class Messages {
        * </pre>
        */
       public boolean hasBuildDesignId() {
-        return ((bitField0_ & 0x00000800) == 0x00000800);
+        return ((bitField0_ & 0x00001000) == 0x00001000);
       }
       /**
        * <code>optional string build_design_id = 12;</code>
@@ -63966,7 +64076,7 @@ public final class Messages {
         if (value == null) {
     throw new NullPointerException();
   }
-  bitField0_ |= 0x00000800;
+  bitField0_ |= 0x00001000;
         buildDesignId_ = value;
         onChanged();
         return this;
@@ -63979,7 +64089,7 @@ public final class Messages {
        * </pre>
        */
       public Builder clearBuildDesignId() {
-        bitField0_ = (bitField0_ & ~0x00000800);
+        bitField0_ = (bitField0_ & ~0x00001000);
         buildDesignId_ = getDefaultInstance().getBuildDesignId();
         onChanged();
         return this;
@@ -63996,7 +64106,7 @@ public final class Messages {
         if (value == null) {
     throw new NullPointerException();
   }
-  bitField0_ |= 0x00000800;
+  bitField0_ |= 0x00001000;
         buildDesignId_ = value;
         onChanged();
         return this;
@@ -64008,7 +64118,7 @@ public final class Messages {
        * <code>optional int32 build_count = 13;</code>
        */
       public boolean hasBuildCount() {
-        return ((bitField0_ & 0x00001000) == 0x00001000);
+        return ((bitField0_ & 0x00002000) == 0x00002000);
       }
       /**
        * <code>optional int32 build_count = 13;</code>
@@ -64020,7 +64130,7 @@ public final class Messages {
        * <code>optional int32 build_count = 13;</code>
        */
       public Builder setBuildCount(int value) {
-        bitField0_ |= 0x00001000;
+        bitField0_ |= 0x00002000;
         buildCount_ = value;
         onChanged();
         return this;
@@ -64029,7 +64139,7 @@ public final class Messages {
        * <code>optional int32 build_count = 13;</code>
        */
       public Builder clearBuildCount() {
-        bitField0_ = (bitField0_ & ~0x00001000);
+        bitField0_ = (bitField0_ & ~0x00002000);
         buildCount_ = 0;
         onChanged();
         return this;
@@ -64041,7 +64151,7 @@ public final class Messages {
        * <code>optional float accelerate_amount = 14;</code>
        */
       public boolean hasAccelerateAmount() {
-        return ((bitField0_ & 0x00002000) == 0x00002000);
+        return ((bitField0_ & 0x00004000) == 0x00004000);
       }
       /**
        * <code>optional float accelerate_amount = 14;</code>
@@ -64053,7 +64163,7 @@ public final class Messages {
        * <code>optional float accelerate_amount = 14;</code>
        */
       public Builder setAccelerateAmount(float value) {
-        bitField0_ |= 0x00002000;
+        bitField0_ |= 0x00004000;
         accelerateAmount_ = value;
         onChanged();
         return this;
@@ -64062,7 +64172,7 @@ public final class Messages {
        * <code>optional float accelerate_amount = 14;</code>
        */
       public Builder clearAccelerateAmount() {
-        bitField0_ = (bitField0_ & ~0x00002000);
+        bitField0_ = (bitField0_ & ~0x00004000);
         accelerateAmount_ = 0F;
         onChanged();
         return this;
@@ -64078,7 +64188,7 @@ public final class Messages {
        * </pre>
        */
       public boolean hasAllianceName() {
-        return ((bitField0_ & 0x00004000) == 0x00004000);
+        return ((bitField0_ & 0x00008000) == 0x00008000);
       }
       /**
        * <code>optional string alliance_name = 15;</code>
@@ -64130,7 +64240,7 @@ public final class Messages {
         if (value == null) {
     throw new NullPointerException();
   }
-  bitField0_ |= 0x00004000;
+  bitField0_ |= 0x00008000;
         allianceName_ = value;
         onChanged();
         return this;
@@ -64143,7 +64253,7 @@ public final class Messages {
        * </pre>
        */
       public Builder clearAllianceName() {
-        bitField0_ = (bitField0_ & ~0x00004000);
+        bitField0_ = (bitField0_ & ~0x00008000);
         allianceName_ = getDefaultInstance().getAllianceName();
         onChanged();
         return this;
@@ -64160,7 +64270,7 @@ public final class Messages {
         if (value == null) {
     throw new NullPointerException();
   }
-  bitField0_ |= 0x00004000;
+  bitField0_ |= 0x00008000;
         allianceName_ = value;
         onChanged();
         return this;
@@ -64175,6 +64285,680 @@ public final class Messages {
     }
 
     // @@protoc_insertion_point(class_scope:au.com.codeka.common.protobuf.CashAuditRecord)
+  }
+
+  public interface CashAuditRecordsOrBuilder
+      extends com.google.protobuf.MessageOrBuilder {
+
+    // repeated .au.com.codeka.common.protobuf.CashAuditRecord records = 1;
+    /**
+     * <code>repeated .au.com.codeka.common.protobuf.CashAuditRecord records = 1;</code>
+     */
+    java.util.List<au.com.codeka.common.protobuf.Messages.CashAuditRecord> 
+        getRecordsList();
+    /**
+     * <code>repeated .au.com.codeka.common.protobuf.CashAuditRecord records = 1;</code>
+     */
+    au.com.codeka.common.protobuf.Messages.CashAuditRecord getRecords(int index);
+    /**
+     * <code>repeated .au.com.codeka.common.protobuf.CashAuditRecord records = 1;</code>
+     */
+    int getRecordsCount();
+    /**
+     * <code>repeated .au.com.codeka.common.protobuf.CashAuditRecord records = 1;</code>
+     */
+    java.util.List<? extends au.com.codeka.common.protobuf.Messages.CashAuditRecordOrBuilder> 
+        getRecordsOrBuilderList();
+    /**
+     * <code>repeated .au.com.codeka.common.protobuf.CashAuditRecord records = 1;</code>
+     */
+    au.com.codeka.common.protobuf.Messages.CashAuditRecordOrBuilder getRecordsOrBuilder(
+        int index);
+  }
+  /**
+   * Protobuf type {@code au.com.codeka.common.protobuf.CashAuditRecords}
+   */
+  public static final class CashAuditRecords extends
+      com.google.protobuf.GeneratedMessage
+      implements CashAuditRecordsOrBuilder {
+    // Use CashAuditRecords.newBuilder() to construct.
+    private CashAuditRecords(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
+      super(builder);
+      this.unknownFields = builder.getUnknownFields();
+    }
+    private CashAuditRecords(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
+
+    private static final CashAuditRecords defaultInstance;
+    public static CashAuditRecords getDefaultInstance() {
+      return defaultInstance;
+    }
+
+    public CashAuditRecords getDefaultInstanceForType() {
+      return defaultInstance;
+    }
+
+    private final com.google.protobuf.UnknownFieldSet unknownFields;
+    @java.lang.Override
+    public final com.google.protobuf.UnknownFieldSet
+        getUnknownFields() {
+      return this.unknownFields;
+    }
+    private CashAuditRecords(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      initFields();
+      int mutable_bitField0_ = 0;
+      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder();
+      try {
+        boolean done = false;
+        while (!done) {
+          int tag = input.readTag();
+          switch (tag) {
+            case 0:
+              done = true;
+              break;
+            default: {
+              if (!parseUnknownField(input, unknownFields,
+                                     extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
+            case 10: {
+              if (!((mutable_bitField0_ & 0x00000001) == 0x00000001)) {
+                records_ = new java.util.ArrayList<au.com.codeka.common.protobuf.Messages.CashAuditRecord>();
+                mutable_bitField0_ |= 0x00000001;
+              }
+              records_.add(input.readMessage(au.com.codeka.common.protobuf.Messages.CashAuditRecord.PARSER, extensionRegistry));
+              break;
+            }
+          }
+        }
+      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+        throw e.setUnfinishedMessage(this);
+      } catch (java.io.IOException e) {
+        throw new com.google.protobuf.InvalidProtocolBufferException(
+            e.getMessage()).setUnfinishedMessage(this);
+      } finally {
+        if (((mutable_bitField0_ & 0x00000001) == 0x00000001)) {
+          records_ = java.util.Collections.unmodifiableList(records_);
+        }
+        this.unknownFields = unknownFields.build();
+        makeExtensionsImmutable();
+      }
+    }
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_CashAuditRecords_descriptor;
+    }
+
+    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_CashAuditRecords_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              au.com.codeka.common.protobuf.Messages.CashAuditRecords.class, au.com.codeka.common.protobuf.Messages.CashAuditRecords.Builder.class);
+    }
+
+    public static com.google.protobuf.Parser<CashAuditRecords> PARSER =
+        new com.google.protobuf.AbstractParser<CashAuditRecords>() {
+      public CashAuditRecords parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return new CashAuditRecords(input, extensionRegistry);
+      }
+    };
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<CashAuditRecords> getParserForType() {
+      return PARSER;
+    }
+
+    // repeated .au.com.codeka.common.protobuf.CashAuditRecord records = 1;
+    public static final int RECORDS_FIELD_NUMBER = 1;
+    private java.util.List<au.com.codeka.common.protobuf.Messages.CashAuditRecord> records_;
+    /**
+     * <code>repeated .au.com.codeka.common.protobuf.CashAuditRecord records = 1;</code>
+     */
+    public java.util.List<au.com.codeka.common.protobuf.Messages.CashAuditRecord> getRecordsList() {
+      return records_;
+    }
+    /**
+     * <code>repeated .au.com.codeka.common.protobuf.CashAuditRecord records = 1;</code>
+     */
+    public java.util.List<? extends au.com.codeka.common.protobuf.Messages.CashAuditRecordOrBuilder> 
+        getRecordsOrBuilderList() {
+      return records_;
+    }
+    /**
+     * <code>repeated .au.com.codeka.common.protobuf.CashAuditRecord records = 1;</code>
+     */
+    public int getRecordsCount() {
+      return records_.size();
+    }
+    /**
+     * <code>repeated .au.com.codeka.common.protobuf.CashAuditRecord records = 1;</code>
+     */
+    public au.com.codeka.common.protobuf.Messages.CashAuditRecord getRecords(int index) {
+      return records_.get(index);
+    }
+    /**
+     * <code>repeated .au.com.codeka.common.protobuf.CashAuditRecord records = 1;</code>
+     */
+    public au.com.codeka.common.protobuf.Messages.CashAuditRecordOrBuilder getRecordsOrBuilder(
+        int index) {
+      return records_.get(index);
+    }
+
+    private void initFields() {
+      records_ = java.util.Collections.emptyList();
+    }
+    private byte memoizedIsInitialized = -1;
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized != -1) return isInitialized == 1;
+
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      getSerializedSize();
+      for (int i = 0; i < records_.size(); i++) {
+        output.writeMessage(1, records_.get(i));
+      }
+      getUnknownFields().writeTo(output);
+    }
+
+    private int memoizedSerializedSize = -1;
+    public int getSerializedSize() {
+      int size = memoizedSerializedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      for (int i = 0; i < records_.size(); i++) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(1, records_.get(i));
+      }
+      size += getUnknownFields().getSerializedSize();
+      memoizedSerializedSize = size;
+      return size;
+    }
+
+    private static final long serialVersionUID = 0L;
+    @java.lang.Override
+    protected java.lang.Object writeReplace()
+        throws java.io.ObjectStreamException {
+      return super.writeReplace();
+    }
+
+    public static au.com.codeka.common.protobuf.Messages.CashAuditRecords parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static au.com.codeka.common.protobuf.Messages.CashAuditRecords parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static au.com.codeka.common.protobuf.Messages.CashAuditRecords parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static au.com.codeka.common.protobuf.Messages.CashAuditRecords parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static au.com.codeka.common.protobuf.Messages.CashAuditRecords parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input);
+    }
+    public static au.com.codeka.common.protobuf.Messages.CashAuditRecords parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input, extensionRegistry);
+    }
+    public static au.com.codeka.common.protobuf.Messages.CashAuditRecords parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return PARSER.parseDelimitedFrom(input);
+    }
+    public static au.com.codeka.common.protobuf.Messages.CashAuditRecords parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseDelimitedFrom(input, extensionRegistry);
+    }
+    public static au.com.codeka.common.protobuf.Messages.CashAuditRecords parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input);
+    }
+    public static au.com.codeka.common.protobuf.Messages.CashAuditRecords parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input, extensionRegistry);
+    }
+
+    public static Builder newBuilder() { return Builder.create(); }
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder(au.com.codeka.common.protobuf.Messages.CashAuditRecords prototype) {
+      return newBuilder().mergeFrom(prototype);
+    }
+    public Builder toBuilder() { return newBuilder(this); }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * Protobuf type {@code au.com.codeka.common.protobuf.CashAuditRecords}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessage.Builder<Builder>
+       implements au.com.codeka.common.protobuf.Messages.CashAuditRecordsOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_CashAuditRecords_descriptor;
+      }
+
+      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_CashAuditRecords_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                au.com.codeka.common.protobuf.Messages.CashAuditRecords.class, au.com.codeka.common.protobuf.Messages.CashAuditRecords.Builder.class);
+      }
+
+      // Construct using au.com.codeka.common.protobuf.Messages.CashAuditRecords.newBuilder()
+      private Builder() {
+        maybeForceBuilderInitialization();
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+        super(parent);
+        maybeForceBuilderInitialization();
+      }
+      private void maybeForceBuilderInitialization() {
+        if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
+          getRecordsFieldBuilder();
+        }
+      }
+      private static Builder create() {
+        return new Builder();
+      }
+
+      public Builder clear() {
+        super.clear();
+        if (recordsBuilder_ == null) {
+          records_ = java.util.Collections.emptyList();
+          bitField0_ = (bitField0_ & ~0x00000001);
+        } else {
+          recordsBuilder_.clear();
+        }
+        return this;
+      }
+
+      public Builder clone() {
+        return create().mergeFrom(buildPartial());
+      }
+
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_CashAuditRecords_descriptor;
+      }
+
+      public au.com.codeka.common.protobuf.Messages.CashAuditRecords getDefaultInstanceForType() {
+        return au.com.codeka.common.protobuf.Messages.CashAuditRecords.getDefaultInstance();
+      }
+
+      public au.com.codeka.common.protobuf.Messages.CashAuditRecords build() {
+        au.com.codeka.common.protobuf.Messages.CashAuditRecords result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      public au.com.codeka.common.protobuf.Messages.CashAuditRecords buildPartial() {
+        au.com.codeka.common.protobuf.Messages.CashAuditRecords result = new au.com.codeka.common.protobuf.Messages.CashAuditRecords(this);
+        int from_bitField0_ = bitField0_;
+        if (recordsBuilder_ == null) {
+          if (((bitField0_ & 0x00000001) == 0x00000001)) {
+            records_ = java.util.Collections.unmodifiableList(records_);
+            bitField0_ = (bitField0_ & ~0x00000001);
+          }
+          result.records_ = records_;
+        } else {
+          result.records_ = recordsBuilder_.build();
+        }
+        onBuilt();
+        return result;
+      }
+
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof au.com.codeka.common.protobuf.Messages.CashAuditRecords) {
+          return mergeFrom((au.com.codeka.common.protobuf.Messages.CashAuditRecords)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(au.com.codeka.common.protobuf.Messages.CashAuditRecords other) {
+        if (other == au.com.codeka.common.protobuf.Messages.CashAuditRecords.getDefaultInstance()) return this;
+        if (recordsBuilder_ == null) {
+          if (!other.records_.isEmpty()) {
+            if (records_.isEmpty()) {
+              records_ = other.records_;
+              bitField0_ = (bitField0_ & ~0x00000001);
+            } else {
+              ensureRecordsIsMutable();
+              records_.addAll(other.records_);
+            }
+            onChanged();
+          }
+        } else {
+          if (!other.records_.isEmpty()) {
+            if (recordsBuilder_.isEmpty()) {
+              recordsBuilder_.dispose();
+              recordsBuilder_ = null;
+              records_ = other.records_;
+              bitField0_ = (bitField0_ & ~0x00000001);
+              recordsBuilder_ = 
+                com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders ?
+                   getRecordsFieldBuilder() : null;
+            } else {
+              recordsBuilder_.addAllMessages(other.records_);
+            }
+          }
+        }
+        this.mergeUnknownFields(other.getUnknownFields());
+        return this;
+      }
+
+      public final boolean isInitialized() {
+        return true;
+      }
+
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        au.com.codeka.common.protobuf.Messages.CashAuditRecords parsedMessage = null;
+        try {
+          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          parsedMessage = (au.com.codeka.common.protobuf.Messages.CashAuditRecords) e.getUnfinishedMessage();
+          throw e;
+        } finally {
+          if (parsedMessage != null) {
+            mergeFrom(parsedMessage);
+          }
+        }
+        return this;
+      }
+      private int bitField0_;
+
+      // repeated .au.com.codeka.common.protobuf.CashAuditRecord records = 1;
+      private java.util.List<au.com.codeka.common.protobuf.Messages.CashAuditRecord> records_ =
+        java.util.Collections.emptyList();
+      private void ensureRecordsIsMutable() {
+        if (!((bitField0_ & 0x00000001) == 0x00000001)) {
+          records_ = new java.util.ArrayList<au.com.codeka.common.protobuf.Messages.CashAuditRecord>(records_);
+          bitField0_ |= 0x00000001;
+         }
+      }
+
+      private com.google.protobuf.RepeatedFieldBuilder<
+          au.com.codeka.common.protobuf.Messages.CashAuditRecord, au.com.codeka.common.protobuf.Messages.CashAuditRecord.Builder, au.com.codeka.common.protobuf.Messages.CashAuditRecordOrBuilder> recordsBuilder_;
+
+      /**
+       * <code>repeated .au.com.codeka.common.protobuf.CashAuditRecord records = 1;</code>
+       */
+      public java.util.List<au.com.codeka.common.protobuf.Messages.CashAuditRecord> getRecordsList() {
+        if (recordsBuilder_ == null) {
+          return java.util.Collections.unmodifiableList(records_);
+        } else {
+          return recordsBuilder_.getMessageList();
+        }
+      }
+      /**
+       * <code>repeated .au.com.codeka.common.protobuf.CashAuditRecord records = 1;</code>
+       */
+      public int getRecordsCount() {
+        if (recordsBuilder_ == null) {
+          return records_.size();
+        } else {
+          return recordsBuilder_.getCount();
+        }
+      }
+      /**
+       * <code>repeated .au.com.codeka.common.protobuf.CashAuditRecord records = 1;</code>
+       */
+      public au.com.codeka.common.protobuf.Messages.CashAuditRecord getRecords(int index) {
+        if (recordsBuilder_ == null) {
+          return records_.get(index);
+        } else {
+          return recordsBuilder_.getMessage(index);
+        }
+      }
+      /**
+       * <code>repeated .au.com.codeka.common.protobuf.CashAuditRecord records = 1;</code>
+       */
+      public Builder setRecords(
+          int index, au.com.codeka.common.protobuf.Messages.CashAuditRecord value) {
+        if (recordsBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          ensureRecordsIsMutable();
+          records_.set(index, value);
+          onChanged();
+        } else {
+          recordsBuilder_.setMessage(index, value);
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .au.com.codeka.common.protobuf.CashAuditRecord records = 1;</code>
+       */
+      public Builder setRecords(
+          int index, au.com.codeka.common.protobuf.Messages.CashAuditRecord.Builder builderForValue) {
+        if (recordsBuilder_ == null) {
+          ensureRecordsIsMutable();
+          records_.set(index, builderForValue.build());
+          onChanged();
+        } else {
+          recordsBuilder_.setMessage(index, builderForValue.build());
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .au.com.codeka.common.protobuf.CashAuditRecord records = 1;</code>
+       */
+      public Builder addRecords(au.com.codeka.common.protobuf.Messages.CashAuditRecord value) {
+        if (recordsBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          ensureRecordsIsMutable();
+          records_.add(value);
+          onChanged();
+        } else {
+          recordsBuilder_.addMessage(value);
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .au.com.codeka.common.protobuf.CashAuditRecord records = 1;</code>
+       */
+      public Builder addRecords(
+          int index, au.com.codeka.common.protobuf.Messages.CashAuditRecord value) {
+        if (recordsBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          ensureRecordsIsMutable();
+          records_.add(index, value);
+          onChanged();
+        } else {
+          recordsBuilder_.addMessage(index, value);
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .au.com.codeka.common.protobuf.CashAuditRecord records = 1;</code>
+       */
+      public Builder addRecords(
+          au.com.codeka.common.protobuf.Messages.CashAuditRecord.Builder builderForValue) {
+        if (recordsBuilder_ == null) {
+          ensureRecordsIsMutable();
+          records_.add(builderForValue.build());
+          onChanged();
+        } else {
+          recordsBuilder_.addMessage(builderForValue.build());
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .au.com.codeka.common.protobuf.CashAuditRecord records = 1;</code>
+       */
+      public Builder addRecords(
+          int index, au.com.codeka.common.protobuf.Messages.CashAuditRecord.Builder builderForValue) {
+        if (recordsBuilder_ == null) {
+          ensureRecordsIsMutable();
+          records_.add(index, builderForValue.build());
+          onChanged();
+        } else {
+          recordsBuilder_.addMessage(index, builderForValue.build());
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .au.com.codeka.common.protobuf.CashAuditRecord records = 1;</code>
+       */
+      public Builder addAllRecords(
+          java.lang.Iterable<? extends au.com.codeka.common.protobuf.Messages.CashAuditRecord> values) {
+        if (recordsBuilder_ == null) {
+          ensureRecordsIsMutable();
+          super.addAll(values, records_);
+          onChanged();
+        } else {
+          recordsBuilder_.addAllMessages(values);
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .au.com.codeka.common.protobuf.CashAuditRecord records = 1;</code>
+       */
+      public Builder clearRecords() {
+        if (recordsBuilder_ == null) {
+          records_ = java.util.Collections.emptyList();
+          bitField0_ = (bitField0_ & ~0x00000001);
+          onChanged();
+        } else {
+          recordsBuilder_.clear();
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .au.com.codeka.common.protobuf.CashAuditRecord records = 1;</code>
+       */
+      public Builder removeRecords(int index) {
+        if (recordsBuilder_ == null) {
+          ensureRecordsIsMutable();
+          records_.remove(index);
+          onChanged();
+        } else {
+          recordsBuilder_.remove(index);
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .au.com.codeka.common.protobuf.CashAuditRecord records = 1;</code>
+       */
+      public au.com.codeka.common.protobuf.Messages.CashAuditRecord.Builder getRecordsBuilder(
+          int index) {
+        return getRecordsFieldBuilder().getBuilder(index);
+      }
+      /**
+       * <code>repeated .au.com.codeka.common.protobuf.CashAuditRecord records = 1;</code>
+       */
+      public au.com.codeka.common.protobuf.Messages.CashAuditRecordOrBuilder getRecordsOrBuilder(
+          int index) {
+        if (recordsBuilder_ == null) {
+          return records_.get(index);  } else {
+          return recordsBuilder_.getMessageOrBuilder(index);
+        }
+      }
+      /**
+       * <code>repeated .au.com.codeka.common.protobuf.CashAuditRecord records = 1;</code>
+       */
+      public java.util.List<? extends au.com.codeka.common.protobuf.Messages.CashAuditRecordOrBuilder> 
+           getRecordsOrBuilderList() {
+        if (recordsBuilder_ != null) {
+          return recordsBuilder_.getMessageOrBuilderList();
+        } else {
+          return java.util.Collections.unmodifiableList(records_);
+        }
+      }
+      /**
+       * <code>repeated .au.com.codeka.common.protobuf.CashAuditRecord records = 1;</code>
+       */
+      public au.com.codeka.common.protobuf.Messages.CashAuditRecord.Builder addRecordsBuilder() {
+        return getRecordsFieldBuilder().addBuilder(
+            au.com.codeka.common.protobuf.Messages.CashAuditRecord.getDefaultInstance());
+      }
+      /**
+       * <code>repeated .au.com.codeka.common.protobuf.CashAuditRecord records = 1;</code>
+       */
+      public au.com.codeka.common.protobuf.Messages.CashAuditRecord.Builder addRecordsBuilder(
+          int index) {
+        return getRecordsFieldBuilder().addBuilder(
+            index, au.com.codeka.common.protobuf.Messages.CashAuditRecord.getDefaultInstance());
+      }
+      /**
+       * <code>repeated .au.com.codeka.common.protobuf.CashAuditRecord records = 1;</code>
+       */
+      public java.util.List<au.com.codeka.common.protobuf.Messages.CashAuditRecord.Builder> 
+           getRecordsBuilderList() {
+        return getRecordsFieldBuilder().getBuilderList();
+      }
+      private com.google.protobuf.RepeatedFieldBuilder<
+          au.com.codeka.common.protobuf.Messages.CashAuditRecord, au.com.codeka.common.protobuf.Messages.CashAuditRecord.Builder, au.com.codeka.common.protobuf.Messages.CashAuditRecordOrBuilder> 
+          getRecordsFieldBuilder() {
+        if (recordsBuilder_ == null) {
+          recordsBuilder_ = new com.google.protobuf.RepeatedFieldBuilder<
+              au.com.codeka.common.protobuf.Messages.CashAuditRecord, au.com.codeka.common.protobuf.Messages.CashAuditRecord.Builder, au.com.codeka.common.protobuf.Messages.CashAuditRecordOrBuilder>(
+                  records_,
+                  ((bitField0_ & 0x00000001) == 0x00000001),
+                  getParentForChildren(),
+                  isClean());
+          records_ = null;
+        }
+        return recordsBuilder_;
+      }
+
+      // @@protoc_insertion_point(builder_scope:au.com.codeka.common.protobuf.CashAuditRecords)
+    }
+
+    static {
+      defaultInstance = new CashAuditRecords(true);
+      defaultInstance.initFields();
+    }
+
+    // @@protoc_insertion_point(class_scope:au.com.codeka.common.protobuf.CashAuditRecords)
   }
 
   public interface AllianceOrBuilder
@@ -70082,6 +70866,11 @@ public final class Messages {
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_au_com_codeka_common_protobuf_CashAuditRecord_fieldAccessorTable;
   private static com.google.protobuf.Descriptors.Descriptor
+    internal_static_au_com_codeka_common_protobuf_CashAuditRecords_descriptor;
+  private static
+    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      internal_static_au_com_codeka_common_protobuf_CashAuditRecords_fieldAccessorTable;
+  private static com.google.protobuf.Descriptors.Descriptor
     internal_static_au_com_codeka_common_protobuf_Alliance_descriptor;
   private static
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
@@ -70298,7 +71087,7 @@ public final class Messages {
       "key\030\001 \001(\t\022\022\n\nempire_key\030\002 \001(\t\022\020\n\010star_ke" +
       "y\030\003 \001(\t\022\014\n\004date\030\005 \001(\003\022\017\n\007star_pb\030\004 \001(\014\"K" +
       "\n\014ScoutReports\022;\n\007reports\030\001 \003(\0132*.au.com" +
-      ".codeka.common.protobuf.ScoutReport\"\251\006\n\013" +
+      ".codeka.common.protobuf.ScoutReport\"\252\006\n\013" +
       "CombatRound\022\020\n\010star_key\030\001 \001(\t\022\022\n\nround_t",
       "ime\030\002 \001(\003\022G\n\006fleets\030\003 \003(\01327.au.com.codek" +
       "a.common.protobuf.CombatRound.FleetSumma" +
@@ -70310,91 +71099,94 @@ public final class Messages {
       "2<.au.com.codeka.common.protobuf.CombatR" +
       "ound.FleetAttackRecord\022U\n\016fleets_damaged" +
       "\030\007 \003(\0132=.au.com.codeka.common.protobuf.C",
-      "ombatRound.FleetDamagedRecord\032[\n\014FleetSu" +
-      "mmary\022\021\n\tfleet_key\030\001 \001(\t\022\022\n\nempire_key\030\002" +
-      " \001(\t\022\021\n\tdesign_id\030\003 \001(\t\022\021\n\tnum_ships\030\004 \001" +
-      "(\002\032(\n\021FleetJoinedRecord\022\023\n\013fleet_index\030\001" +
-      " \001(\005\032>\n\021FleetTargetRecord\022\023\n\013fleet_index" +
-      "\030\001 \001(\005\022\024\n\014target_index\030\002 \001(\005\032N\n\021FleetAtt" +
-      "ackRecord\022\023\n\013fleet_index\030\001 \001(\005\022\024\n\014target" +
-      "_index\030\002 \001(\005\022\016\n\006damage\030\003 \001(\002\0329\n\022FleetDam" +
-      "agedRecord\022\023\n\013fleet_index\030\001 \001(\005\022\016\n\006damag" +
-      "e\030\002 \001(\002\"\332\001\n\014CombatReport\022\013\n\003key\030\001 \001(\t\022\020\n",
-      "\010star_key\030\002 \001(\t\022\022\n\nstart_time\030\003 \001(\003\022\020\n\010e" +
-      "nd_time\030\004 \001(\003\022\031\n\021start_empire_keys\030\005 \003(\t" +
-      "\022\027\n\017end_empire_keys\030\006 \003(\t\022\025\n\rnum_destroy" +
-      "ed\030\007 \001(\005\022:\n\006rounds\030\010 \003(\0132*.au.com.codeka" +
-      ".common.protobuf.CombatRound\"M\n\rCombatRe" +
-      "ports\022<\n\007reports\030\001 \003(\0132+.au.com.codeka.c" +
-      "ommon.protobuf.CombatReport\"\332\n\n\017Situatio" +
-      "nReport\022\013\n\003key\030\001 \001(\t\022\022\n\nempire_key\030\002 \001(\t" +
-      "\022\023\n\013report_time\030\003 \001(\003\022\020\n\010star_key\030\004 \001(\t\022" +
-      "\024\n\014planet_index\030\005 \001(\005\022a\n\025build_complete_",
-      "record\030\006 \001(\0132B.au.com.codeka.common.prot" +
-      "obuf.SituationReport.BuildCompleteRecord" +
-      "\022_\n\024move_complete_record\030\007 \001(\0132A.au.com." +
-      "codeka.common.protobuf.SituationReport.M" +
-      "oveCompleteRecord\022h\n\031fleet_under_attack_" +
-      "record\030\010 \001(\0132E.au.com.codeka.common.prot" +
-      "obuf.SituationReport.FleetUnderAttackRec" +
-      "ord\022c\n\026fleet_destroyed_record\030\t \001(\0132C.au" +
-      ".com.codeka.common.protobuf.SituationRep" +
-      "ort.FleetDestroyedRecord\022e\n\027fleet_victor",
-      "ious_record\030\n \001(\0132D.au.com.codeka.common" +
-      ".protobuf.SituationReport.FleetVictoriou" +
-      "sRecord\022e\n\027colony_destroyed_record\030\013 \001(\013" +
-      "2D.au.com.codeka.common.protobuf.Situati" +
-      "onReport.ColonyDestroyedRecord\032\236\001\n\023Build" +
-      "CompleteRecord\022J\n\nbuild_kind\030\001 \001(\01626.au." +
-      "com.codeka.common.protobuf.BuildRequest." +
-      "BUILD_KIND\022\021\n\tdesign_id\030\002 \001(\t\022\r\n\005count\030\003" +
-      " \001(\005\022\031\n\021build_request_key\030\004 \001(\t\032m\n\022MoveC" +
-      "ompleteRecord\022\021\n\tfleet_key\030\001 \001(\t\022\027\n\017flee",
-      "t_design_id\030\003 \001(\t\022\021\n\tnum_ships\030\004 \001(\002\022\030\n\020" +
-      "scout_report_key\030\005 \001(\t\032r\n\026FleetUnderAtta" +
-      "ckRecord\022\021\n\tfleet_key\030\001 \001(\t\022\027\n\017fleet_des" +
-      "ign_id\030\002 \001(\t\022\021\n\tnum_ships\030\003 \001(\002\022\031\n\021comba" +
-      "t_report_key\030\004 \001(\t\032J\n\024FleetDestroyedReco" +
-      "rd\022\027\n\017fleet_design_id\030\001 \001(\t\022\031\n\021combat_re" +
-      "port_key\030\002 \001(\t\032q\n\025FleetVictoriousRecord\022" +
-      "\021\n\tfleet_key\030\001 \001(\t\022\027\n\017fleet_design_id\030\002 " +
-      "\001(\t\022\021\n\tnum_ships\030\003 \001(\002\022\031\n\021combat_report_" +
-      "key\030\004 \001(\t\032E\n\025ColonyDestroyedRecord\022\022\n\nco",
-      "lony_key\030\001 \001(\t\022\030\n\020enemy_empire_key\030\002 \001(\t" +
-      "\"m\n\020SituationReports\022I\n\021situation_report" +
-      "s\030\001 \003(\0132..au.com.codeka.common.protobuf." +
-      "SituationReport\022\016\n\006cursor\030\002 \001(\t\"\324\003\n\017Cash" +
-      "AuditRecord\022\n\n\002id\030\001 \001(\005\022\021\n\tempire_id\030\002 \001" +
-      "(\005\022E\n\006reason\030\003 \001(\01625.au.com.codeka.commo" +
-      "n.protobuf.CashAuditRecord.Reason\022\023\n\013bef" +
-      "ore_cash\030\004 \001(\002\022\022\n\nafter_cash\030\005 \001(\002\022\020\n\010fl" +
-      "eet_id\030\006 \001(\005\022\027\n\017fleet_design_id\030\007 \001(\t\022\021\n" +
-      "\tnum_ships\030\010 \001(\002\022\017\n\007star_id\030\t \001(\005\022\021\n\tsta",
-      "r_name\030\n \001(\t\022\025\n\rmove_distance\030\013 \001(\002\022\027\n\017b" +
-      "uild_design_id\030\014 \001(\t\022\023\n\013build_count\030\r \001(" +
-      "\005\022\031\n\021accelerate_amount\030\016 \001(\002\022\025\n\ralliance" +
-      "_name\030\017 \001(\t\"Y\n\006Reason\022\r\n\tFleetMove\020\000\022\023\n\017" +
-      "BuildAccelerate\020\001\022\027\n\023CollectFromColonies" +
-      "\020\002\022\022\n\016CreateAlliance\020\003\"\254\001\n\010Alliance\022\013\n\003k" +
-      "ey\030\001 \001(\t\022\014\n\004name\030\002 \001(\t\022\024\n\014time_created\030\003" +
-      " \001(\003\022\032\n\022creator_empire_key\030\004 \001(\t\022\023\n\013num_" +
-      "members\030\005 \001(\005\022>\n\007members\030\006 \003(\0132-.au.com." +
-      "codeka.common.protobuf.AllianceMember\"G\n",
-      "\tAlliances\022:\n\talliances\030\001 \003(\0132\'.au.com.c" +
-      "odeka.common.protobuf.Alliance\"\\\n\016Allian" +
-      "ceMember\022\013\n\003key\030\001 \001(\t\022\022\n\nempire_key\030\002 \001(" +
-      "\t\022\024\n\014alliance_key\030\003 \001(\t\022\023\n\013time_joined\030\004" +
-      " \001(\003\"\376\001\n\023AllianceJoinRequest\022\013\n\003key\030\001 \001(" +
-      "\t\022\024\n\014alliance_key\030\002 \001(\t\022\022\n\nempire_key\030\003 " +
-      "\001(\t\022\017\n\007message\030\004 \001(\t\022\026\n\016time_requested\030\005" +
-      " \001(\003\022N\n\005state\030\006 \001(\0162?.au.com.codeka.comm" +
-      "on.protobuf.AllianceJoinRequest.RequestS" +
-      "tate\"7\n\014RequestState\022\013\n\007PENDING\020\000\022\014\n\010ACC",
-      "EPTED\020\001\022\014\n\010REJECTED\020\002\"a\n\024AllianceJoinReq" +
-      "uests\022I\n\rjoin_requests\030\001 \003(\01322.au.com.co" +
-      "deka.common.protobuf.AllianceJoinRequest" +
-      "\"@\n\024AllianceLeaveRequest\022\024\n\014alliance_key" +
-      "\030\001 \001(\t\022\022\n\nempire_key\030\002 \001(\t"
+      "ombatRound.FleetDamagedRecord\032\\\n\014FleetSu" +
+      "mmary\022\022\n\nfleet_keys\030\001 \003(\t\022\022\n\nempire_key\030" +
+      "\002 \001(\t\022\021\n\tdesign_id\030\003 \001(\t\022\021\n\tnum_ships\030\004 " +
+      "\001(\002\032(\n\021FleetJoinedRecord\022\023\n\013fleet_index\030" +
+      "\001 \001(\005\032>\n\021FleetTargetRecord\022\023\n\013fleet_inde" +
+      "x\030\001 \001(\005\022\024\n\014target_index\030\002 \001(\005\032N\n\021FleetAt" +
+      "tackRecord\022\023\n\013fleet_index\030\001 \001(\005\022\024\n\014targe" +
+      "t_index\030\002 \001(\005\022\016\n\006damage\030\003 \001(\002\0329\n\022FleetDa" +
+      "magedRecord\022\023\n\013fleet_index\030\001 \001(\005\022\016\n\006dama" +
+      "ge\030\002 \001(\002\"\332\001\n\014CombatReport\022\013\n\003key\030\001 \001(\t\022\020",
+      "\n\010star_key\030\002 \001(\t\022\022\n\nstart_time\030\003 \001(\003\022\020\n\010" +
+      "end_time\030\004 \001(\003\022\031\n\021start_empire_keys\030\005 \003(" +
+      "\t\022\027\n\017end_empire_keys\030\006 \003(\t\022\025\n\rnum_destro" +
+      "yed\030\007 \001(\005\022:\n\006rounds\030\010 \003(\0132*.au.com.codek" +
+      "a.common.protobuf.CombatRound\"M\n\rCombatR" +
+      "eports\022<\n\007reports\030\001 \003(\0132+.au.com.codeka." +
+      "common.protobuf.CombatReport\"\332\n\n\017Situati" +
+      "onReport\022\013\n\003key\030\001 \001(\t\022\022\n\nempire_key\030\002 \001(" +
+      "\t\022\023\n\013report_time\030\003 \001(\003\022\020\n\010star_key\030\004 \001(\t" +
+      "\022\024\n\014planet_index\030\005 \001(\005\022a\n\025build_complete",
+      "_record\030\006 \001(\0132B.au.com.codeka.common.pro" +
+      "tobuf.SituationReport.BuildCompleteRecor" +
+      "d\022_\n\024move_complete_record\030\007 \001(\0132A.au.com" +
+      ".codeka.common.protobuf.SituationReport." +
+      "MoveCompleteRecord\022h\n\031fleet_under_attack" +
+      "_record\030\010 \001(\0132E.au.com.codeka.common.pro" +
+      "tobuf.SituationReport.FleetUnderAttackRe" +
+      "cord\022c\n\026fleet_destroyed_record\030\t \001(\0132C.a" +
+      "u.com.codeka.common.protobuf.SituationRe" +
+      "port.FleetDestroyedRecord\022e\n\027fleet_victo",
+      "rious_record\030\n \001(\0132D.au.com.codeka.commo" +
+      "n.protobuf.SituationReport.FleetVictorio" +
+      "usRecord\022e\n\027colony_destroyed_record\030\013 \001(" +
+      "\0132D.au.com.codeka.common.protobuf.Situat" +
+      "ionReport.ColonyDestroyedRecord\032\236\001\n\023Buil" +
+      "dCompleteRecord\022J\n\nbuild_kind\030\001 \001(\01626.au" +
+      ".com.codeka.common.protobuf.BuildRequest" +
+      ".BUILD_KIND\022\021\n\tdesign_id\030\002 \001(\t\022\r\n\005count\030" +
+      "\003 \001(\005\022\031\n\021build_request_key\030\004 \001(\t\032m\n\022Move" +
+      "CompleteRecord\022\021\n\tfleet_key\030\001 \001(\t\022\027\n\017fle",
+      "et_design_id\030\003 \001(\t\022\021\n\tnum_ships\030\004 \001(\002\022\030\n" +
+      "\020scout_report_key\030\005 \001(\t\032r\n\026FleetUnderAtt" +
+      "ackRecord\022\021\n\tfleet_key\030\001 \001(\t\022\027\n\017fleet_de" +
+      "sign_id\030\002 \001(\t\022\021\n\tnum_ships\030\003 \001(\002\022\031\n\021comb" +
+      "at_report_key\030\004 \001(\t\032J\n\024FleetDestroyedRec" +
+      "ord\022\027\n\017fleet_design_id\030\001 \001(\t\022\031\n\021combat_r" +
+      "eport_key\030\002 \001(\t\032q\n\025FleetVictoriousRecord" +
+      "\022\021\n\tfleet_key\030\001 \001(\t\022\027\n\017fleet_design_id\030\002" +
+      " \001(\t\022\021\n\tnum_ships\030\003 \001(\002\022\031\n\021combat_report" +
+      "_key\030\004 \001(\t\032E\n\025ColonyDestroyedRecord\022\022\n\nc",
+      "olony_key\030\001 \001(\t\022\030\n\020enemy_empire_key\030\002 \001(" +
+      "\t\"m\n\020SituationReports\022I\n\021situation_repor" +
+      "ts\030\001 \003(\0132..au.com.codeka.common.protobuf" +
+      ".SituationReport\022\016\n\006cursor\030\002 \001(\t\"\342\003\n\017Cas" +
+      "hAuditRecord\022\n\n\002id\030\001 \001(\005\022\021\n\tempire_id\030\002 " +
+      "\001(\005\022E\n\006reason\030\003 \001(\01625.au.com.codeka.comm" +
+      "on.protobuf.CashAuditRecord.Reason\022\023\n\013be" +
+      "fore_cash\030\004 \001(\002\022\022\n\nafter_cash\030\005 \001(\002\022\014\n\004t" +
+      "ime\030\020 \001(\003\022\020\n\010fleet_id\030\006 \001(\005\022\027\n\017fleet_des" +
+      "ign_id\030\007 \001(\t\022\021\n\tnum_ships\030\010 \001(\002\022\017\n\007star_",
+      "id\030\t \001(\005\022\021\n\tstar_name\030\n \001(\t\022\025\n\rmove_dist" +
+      "ance\030\013 \001(\002\022\027\n\017build_design_id\030\014 \001(\t\022\023\n\013b" +
+      "uild_count\030\r \001(\005\022\031\n\021accelerate_amount\030\016 " +
+      "\001(\002\022\025\n\ralliance_name\030\017 \001(\t\"Y\n\006Reason\022\r\n\t" +
+      "FleetMove\020\000\022\023\n\017BuildAccelerate\020\001\022\027\n\023Coll" +
+      "ectFromColonies\020\002\022\022\n\016CreateAlliance\020\003\"S\n" +
+      "\020CashAuditRecords\022?\n\007records\030\001 \003(\0132..au." +
+      "com.codeka.common.protobuf.CashAuditReco" +
+      "rd\"\254\001\n\010Alliance\022\013\n\003key\030\001 \001(\t\022\014\n\004name\030\002 \001" +
+      "(\t\022\024\n\014time_created\030\003 \001(\003\022\032\n\022creator_empi",
+      "re_key\030\004 \001(\t\022\023\n\013num_members\030\005 \001(\005\022>\n\007mem" +
+      "bers\030\006 \003(\0132-.au.com.codeka.common.protob" +
+      "uf.AllianceMember\"G\n\tAlliances\022:\n\tallian" +
+      "ces\030\001 \003(\0132\'.au.com.codeka.common.protobu" +
+      "f.Alliance\"\\\n\016AllianceMember\022\013\n\003key\030\001 \001(" +
+      "\t\022\022\n\nempire_key\030\002 \001(\t\022\024\n\014alliance_key\030\003 " +
+      "\001(\t\022\023\n\013time_joined\030\004 \001(\003\"\376\001\n\023AllianceJoi" +
+      "nRequest\022\013\n\003key\030\001 \001(\t\022\024\n\014alliance_key\030\002 " +
+      "\001(\t\022\022\n\nempire_key\030\003 \001(\t\022\017\n\007message\030\004 \001(\t" +
+      "\022\026\n\016time_requested\030\005 \001(\003\022N\n\005state\030\006 \001(\0162",
+      "?.au.com.codeka.common.protobuf.Alliance" +
+      "JoinRequest.RequestState\"7\n\014RequestState" +
+      "\022\013\n\007PENDING\020\000\022\014\n\010ACCEPTED\020\001\022\014\n\010REJECTED\020" +
+      "\002\"a\n\024AllianceJoinRequests\022I\n\rjoin_reques" +
+      "ts\030\001 \003(\01322.au.com.codeka.common.protobuf" +
+      ".AllianceJoinRequest\"@\n\024AllianceLeaveReq" +
+      "uest\022\024\n\014alliance_key\030\001 \001(\t\022\022\n\nempire_key" +
+      "\030\002 \001(\t"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
       new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
@@ -70628,7 +71420,7 @@ public final class Messages {
           internal_static_au_com_codeka_common_protobuf_CombatRound_FleetSummary_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_au_com_codeka_common_protobuf_CombatRound_FleetSummary_descriptor,
-              new java.lang.String[] { "FleetKey", "EmpireKey", "DesignId", "NumShips", });
+              new java.lang.String[] { "FleetKeys", "EmpireKey", "DesignId", "NumShips", });
           internal_static_au_com_codeka_common_protobuf_CombatRound_FleetJoinedRecord_descriptor =
             internal_static_au_com_codeka_common_protobuf_CombatRound_descriptor.getNestedTypes().get(1);
           internal_static_au_com_codeka_common_protobuf_CombatRound_FleetJoinedRecord_fieldAccessorTable = new
@@ -70718,39 +71510,45 @@ public final class Messages {
           internal_static_au_com_codeka_common_protobuf_CashAuditRecord_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_au_com_codeka_common_protobuf_CashAuditRecord_descriptor,
-              new java.lang.String[] { "Id", "EmpireId", "Reason", "BeforeCash", "AfterCash", "FleetId", "FleetDesignId", "NumShips", "StarId", "StarName", "MoveDistance", "BuildDesignId", "BuildCount", "AccelerateAmount", "AllianceName", });
-          internal_static_au_com_codeka_common_protobuf_Alliance_descriptor =
+              new java.lang.String[] { "Id", "EmpireId", "Reason", "BeforeCash", "AfterCash", "Time", "FleetId", "FleetDesignId", "NumShips", "StarId", "StarName", "MoveDistance", "BuildDesignId", "BuildCount", "AccelerateAmount", "AllianceName", });
+          internal_static_au_com_codeka_common_protobuf_CashAuditRecords_descriptor =
             getDescriptor().getMessageTypes().get(41);
+          internal_static_au_com_codeka_common_protobuf_CashAuditRecords_fieldAccessorTable = new
+            com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+              internal_static_au_com_codeka_common_protobuf_CashAuditRecords_descriptor,
+              new java.lang.String[] { "Records", });
+          internal_static_au_com_codeka_common_protobuf_Alliance_descriptor =
+            getDescriptor().getMessageTypes().get(42);
           internal_static_au_com_codeka_common_protobuf_Alliance_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_au_com_codeka_common_protobuf_Alliance_descriptor,
               new java.lang.String[] { "Key", "Name", "TimeCreated", "CreatorEmpireKey", "NumMembers", "Members", });
           internal_static_au_com_codeka_common_protobuf_Alliances_descriptor =
-            getDescriptor().getMessageTypes().get(42);
+            getDescriptor().getMessageTypes().get(43);
           internal_static_au_com_codeka_common_protobuf_Alliances_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_au_com_codeka_common_protobuf_Alliances_descriptor,
               new java.lang.String[] { "Alliances", });
           internal_static_au_com_codeka_common_protobuf_AllianceMember_descriptor =
-            getDescriptor().getMessageTypes().get(43);
+            getDescriptor().getMessageTypes().get(44);
           internal_static_au_com_codeka_common_protobuf_AllianceMember_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_au_com_codeka_common_protobuf_AllianceMember_descriptor,
               new java.lang.String[] { "Key", "EmpireKey", "AllianceKey", "TimeJoined", });
           internal_static_au_com_codeka_common_protobuf_AllianceJoinRequest_descriptor =
-            getDescriptor().getMessageTypes().get(44);
+            getDescriptor().getMessageTypes().get(45);
           internal_static_au_com_codeka_common_protobuf_AllianceJoinRequest_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_au_com_codeka_common_protobuf_AllianceJoinRequest_descriptor,
               new java.lang.String[] { "Key", "AllianceKey", "EmpireKey", "Message", "TimeRequested", "State", });
           internal_static_au_com_codeka_common_protobuf_AllianceJoinRequests_descriptor =
-            getDescriptor().getMessageTypes().get(45);
+            getDescriptor().getMessageTypes().get(46);
           internal_static_au_com_codeka_common_protobuf_AllianceJoinRequests_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_au_com_codeka_common_protobuf_AllianceJoinRequests_descriptor,
               new java.lang.String[] { "JoinRequests", });
           internal_static_au_com_codeka_common_protobuf_AllianceLeaveRequest_descriptor =
-            getDescriptor().getMessageTypes().get(46);
+            getDescriptor().getMessageTypes().get(47);
           internal_static_au_com_codeka_common_protobuf_AllianceLeaveRequest_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_au_com_codeka_common_protobuf_AllianceLeaveRequest_descriptor,

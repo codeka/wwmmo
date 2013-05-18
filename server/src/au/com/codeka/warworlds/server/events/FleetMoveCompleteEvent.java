@@ -81,7 +81,7 @@ public class FleetMoveCompleteEvent extends Event {
                 srcStar.getFleets().remove(fleet);
                 destStar.getFleets().add(fleet);
 
-                fleet.idle();
+                fleet.idle(DateTime.now());
                 break;
             }
         }
@@ -126,9 +126,11 @@ public class FleetMoveCompleteEvent extends Event {
     private boolean isFleetInCombatReport(String fleetKey, CombatReport combatReport) {
         for (BaseCombatReport.CombatRound round : combatReport.getCombatRounds()) {
             for (BaseCombatReport.FleetSummary fleetSummary : round.getFleets()) {
-                if ((fleetSummary.getFleetKey() == null && fleetKey == null) ||
-                    (fleetSummary.getFleetKey() != null && fleetKey != null && fleetSummary.getFleetKey().equals(fleetKey))) {
-                    return true;
+                for (String combatFleetKey : fleetSummary.getFleetKeys()) {
+                    if ((combatFleetKey == null && fleetKey == null) ||
+                        (combatFleetKey != null && fleetKey != null && combatFleetKey.equals(fleetKey))) {
+                        return true;
+                    }
                 }
             }
         }

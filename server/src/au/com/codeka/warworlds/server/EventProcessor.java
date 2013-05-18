@@ -70,10 +70,13 @@ public class EventProcessor {
                 }
 
                 DateTime next = event.getNextEventTime();
+                if (next != null) {
+                    log.info(String.format("Event %s says next event is at %s", eventClass.getName(), next));
+                }
                 if (next != null && next.isBefore(DateTime.now())) {
                     events.add(event);
                 }
-                if (next != null && next.isBefore(nextEventDateTime)) {
+                if (next != null && (nextEventDateTime == null || next.isBefore(nextEventDateTime))) {
                     nextEventDateTime = next;
                 }
             }
