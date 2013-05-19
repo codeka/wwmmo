@@ -11,10 +11,13 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.Html;
+import android.view.Display;
 import android.view.LayoutInflater;
+import android.view.Surface;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.Button;
@@ -114,8 +117,10 @@ public class StarfieldActivity extends BaseActivity
 
         mStarfield.addSelectionChangedListener(this);
 
-        InfobarView infobar = (InfobarView) findViewById(R.id.infobar);
-        infobar.hideEmpireName();
+        if (isPortrait()) {
+            InfobarView infobar = (InfobarView) findViewById(R.id.infobar);
+            infobar.hideEmpireName();
+        }
 
         mPlanetList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override

@@ -18,11 +18,14 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore.Images;
 import android.support.v4.app.FragmentActivity;
+import android.view.Display;
 import android.view.Gravity;
+import android.view.Surface;
 import android.view.View;
 import android.view.WindowManager;
 import au.com.codeka.common.Vector3;
 import au.com.codeka.warworlds.ctrl.DebugView;
+import au.com.codeka.warworlds.ctrl.InfobarView;
 import au.com.codeka.warworlds.model.PurchaseManager;
 
 @SuppressLint("Registered") // it's a base class
@@ -101,6 +104,18 @@ public class BaseActivity extends FragmentActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
         PurchaseManager.getInstance().onActivityResult(requestCode, resultCode, intent);
+    }
+
+    /**
+     * Helper function to determine whether we're in portrait orientation or not.
+     */
+    protected boolean isPortrait() {
+        Display display = ((WindowManager) getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
+        int rotation = display.getRotation();
+        if (rotation == Surface.ROTATION_0 || rotation == Surface.ROTATION_180) {
+            return true;
+        }
+        return false;
     }
 
     private void triggerBugPopup() {
