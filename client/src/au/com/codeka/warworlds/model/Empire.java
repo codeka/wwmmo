@@ -99,6 +99,13 @@ public class Empire extends BaseEmpire implements Parcelable {
                          rand.nextInt(100) + 100,
                          rand.nextInt(100) + 100);
     }
+    public float[] getShieldColorFloats() {
+        Random rand = new Random(mKey.hashCode());
+        return new float[] {((float) rand.nextInt(100) + 100) / 256.0f,
+                            ((float) rand.nextInt(100) + 100) / 256.0f,
+                            ((float) rand.nextInt(100) + 100) / 256.0f,
+                            1.0f};
+    }
 
     @Override
     public int describeContents() {
