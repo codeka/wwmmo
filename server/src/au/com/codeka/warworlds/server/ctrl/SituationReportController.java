@@ -4,7 +4,7 @@ import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.expressme.openid.Base64;
+import org.apache.commons.codec.binary.Base64;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
@@ -28,7 +28,7 @@ public class SituationReportController {
             db.saveSituationReport(sitrep_pb);
 
             int empireID = Integer.parseInt(sitrep_pb.getEmpireKey());
-            String base64 = Base64.encodeBytes(sitrep_pb.toByteArray());
+            String base64 = Base64.encodeBase64String(sitrep_pb.toByteArray());
             new NotificationController().sendNotification(empireID, "sitrep", base64);
         } catch (Exception e) {
             throw new RequestException(e);

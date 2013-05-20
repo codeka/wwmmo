@@ -54,7 +54,7 @@ public class BasePageHandler extends RequestHandler {
         return true;
     }
 
-    protected void authenticate() {
+    protected void authenticate() throws RequestException {
         String url = OpenIdAuth.getAuthenticateUrl(getRequest());
         getResponse().setStatus(302);
         getResponse().addHeader("Location", url);

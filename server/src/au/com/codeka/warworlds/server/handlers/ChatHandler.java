@@ -2,7 +2,7 @@ package au.com.codeka.warworlds.server.handlers;
 
 import java.sql.ResultSet;
 
-import org.expressme.openid.Base64;
+import org.apache.commons.codec.binary.Base64;
 import org.joda.time.DateTime;
 
 import au.com.codeka.common.protobuf.Messages;
@@ -109,6 +109,6 @@ public class ChatHandler extends RequestHandler {
         }
 
         new NotificationController().sendNotification(
-                "chat", Base64.encodeBytes(chat_msg_pb.build().toByteArray()));
+                "chat", Base64.encodeBase64String(chat_msg_pb.build().toByteArray()));
     }
 }

@@ -32,7 +32,6 @@
 	<classpathentry kind="lib" path="/common/libs/joda-time-2.1.jar"/>
 	<classpathentry kind="lib" path="libs/spymemcached-2.8.7.jar"/>
 	<classpathentry kind="lib" path="libs/jangod-template.jar"/>
-	<classpathentry kind="lib" path="libs/JOpenId-1.08.jar" sourcepath="libs-sources/JOpenId-1.08-sources.jar"/>
 	<classpathentry kind="lib" path="libs/gcm-server.jar"/>
 	<classpathentry kind="lib" path="libs/json_simple-1.1.jar"/>
 	<classpathentry kind="lib" path="/common/libs/commons-codec-1.4.jar"/>
@@ -41,5 +40,12 @@
 	<classpathentry kind="lib" path="/common/libs/commons-lang3-3.1.jar"/>
 	<classpathentry kind="lib" path="libs/bonecp-0.7.1.jar" sourcepath="libs-sources/bonecp-0.7.1.sources.jar"/>
 	<classpathentry kind="lib" path="libs/guava-14.0.1.jar"/>
+	<classpathentry kind="lib" path="libs/guice-2.0.jar"/>
+	<classpathentry kind="lib" path="libs/nekohtml-1.9.14.jar"/>
+	<classpathentry kind="lib" path="libs/openid4java-0.9.8.jar"/>
+	<classpathentry kind="lib" path="libs/xercesImpl-2.8.1.jar"/>
+	<classpathentry kind="lib" path="/common/libs/jcl-over-slf4j-1.7.5.jar"/>
+	<classpathentry kind="lib" path="libs/httpclient-4.2.2.jar"/>
+	<classpathentry kind="lib" path="libs/httpcore-4.2.2.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
