@@ -68,9 +68,14 @@ public class EmpireManager {
             return mEmpire;
         }
 
+        Empire empire = mEmpireCache.get(empireKey);
+        if (empire != null) {
+            return empire;
+        }
+
         Messages.Empire pb = new LocalEmpireStore(context).getEmpire(empireKey);
         if (pb != null) {
-            Empire empire = new Empire();
+            empire = new Empire();
             empire.fromProtocolBuffer(pb);
             mEmpireCache.put(empireKey, empire);
             return empire;
