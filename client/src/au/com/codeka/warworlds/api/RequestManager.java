@@ -67,6 +67,8 @@ public class RequestManager {
 
         if (baseUri.getHost().equals("game.war-worlds.com")) {
             setupRootCa(context);
+        } else {
+            mSslContext = null;
         }
 
         sConnectionPool = new ConnectionPool(ssl, baseUri.getHost(), baseUri.getPort());

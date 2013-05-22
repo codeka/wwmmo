@@ -50,7 +50,7 @@ public class FleetController {
                 stmt.setDouble(1, numShips);
                 stmt.setInt(2, fleet.getID());
                 stmt.update();
-                fleet.setNumShips(numShips);
+                fleet.setNumShips(fleet.getNumShips() - numShips);
             } catch(Exception e) {
                 throw new RequestException(e);
             }

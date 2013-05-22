@@ -156,6 +156,7 @@ $(function() {
 
   var Fleet = WorldObject.extend({
     init: function(star, pb) {
+      this.key = pb.key;
       this.star = star;
       this.empireKey = pb.empire_key;
       this.empireName = null;
@@ -283,12 +284,18 @@ $(function() {
         if (fleet.state == "MOVING") {
           if (fleet.destinationStar == null) {
             fleet.destinationStar = world.findStar(fleet.destinationStarKey);
-            fleet.destinationStarDirection = world.direction(fleet.destinationStar, this);
+            if (fleet.destinationStar == null) {
+              console.log("Warning: could not find destination star: "+fleet.destinationStarKey+" for fleet: "+fleet.key);
+            } else {
+              fleet.destinationStarDirection = world.direction(fleet.destinationStar, this);
+            }
           }
           var dest = fleet.destinationStar;
-          fleet.renderMoving(context,
-                             offsetX + this.offsetX, offsetY + this.offsetY,
-                             fleet.destinationStarDirection);
+          if (dest != null) {
+            fleet.renderMoving(context,
+                               offsetX + this.offsetX, offsetY + this.offsetY,
+                               fleet.destinationStarDirection);
+          }
         } else {
           fleet.render(context, offsetX + this.offsetX, offsetY + this.offsetY + (n * 20));
           n ++;
