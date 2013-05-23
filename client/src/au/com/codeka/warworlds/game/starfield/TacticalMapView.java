@@ -228,13 +228,15 @@ public class TacticalMapView extends GlSectorView
          */
         @Override
         public boolean onDoubleTap(MotionEvent e) {
-            float tapX = (e.getX() - mDragOffsetX) / 256.0f;
-            float tapY = (e.getY() - mDragOffsetY) / 256.0f;
+            float tapX = (e.getX() - (getWidth() / 2.0f) - mDragOffsetX) / 256.0f;
+            float tapY = (e.getY() - (getHeight() / 2.0f) - mDragOffsetY) / 256.0f;
+            log.info(String.format("drag = %.2f %.2f", mDragOffsetX, mDragOffsetY));
+            log.info(String.format("evnt = %.2f %.2f", e.getX(), e.getY()));
 
             BaseStar star = mPointCloud.findStarNear(new Vector2(tapX, tapY));
             if (star != null) {
                 if (mDoubleTapHandler != null) {
-                   mDoubleTapHandler.onDoubleTapped(star);
+                    mDoubleTapHandler.onDoubleTapped(star);
                 }
             }
 
@@ -352,14 +354,9 @@ public class TacticalMapView extends GlSectorView
             for (Vector2 v : mPoints) {
                 TacticalPointCloudVector2 thisPoint = (TacticalPointCloudVector2) v;
                 double thisDistance = thisPoint.distanceTo(pt);
-                if (closest == null) {
+                if (closest == null || thisDistance < distance) {
                     closest = thisPoint;
                     distance = thisDistance;
-                } else {
-                    if (thisDistance < distance) {
-                        closest = thisPoint;
-                        distance = thisDistance;
-                    }
                 }
             }
 
