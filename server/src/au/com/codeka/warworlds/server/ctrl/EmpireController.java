@@ -91,7 +91,7 @@ public class EmpireController {
     public boolean adjustBalance(int empireId, float amount, Messages.CashAuditRecord.Builder audit_record_pb) throws RequestException {
         Transaction t = db.getTransaction();
         boolean existingTransaction = (t != null);
-        if (t == null) {
+        if (!existingTransaction) {
             try {
                 t = DB.beginTransaction();
             } catch (SQLException e) {
@@ -198,6 +198,33 @@ public class EmpireController {
         // actually arrived...
         star.setLastSimulation(DateTime.now());
         new StarController().update(star);
+    }
+
+    /**
+     * Gets the reason (if any) for the resetting of the given empire. Once we're returned this, we'll
+     * reset the reason back to NULL.
+     */
+    public String getResetReason(int empireID) throws RequestException{
+        String reason = null;
+
+        // empty the star of it's current (native) inhabitants
+        String sql = "SELECT reset_reason FROM empires WHERE id = ?";
+        try (SqlStmt stmt = DB.prepare(sql)) {
+            stmt.setInt(1, empireID);
+            reason = stmt.selectFirstValue(String.class);
+        } catch(Exception e) {
+            throw new RequestException(e);
+        }
+
+        sql = "UPDATE empires SET reset_reason = NULL WHERE id = ?";
+        try (SqlStmt stmt = DB.prepare(sql)) {
+            stmt.setInt(1, empireID);
+            stmt.update();
+        } catch(Exception e) {
+            throw new RequestException(e);
+        }
+
+        return reason;
     }
 
     private static class DataBase extends BaseDataBase {

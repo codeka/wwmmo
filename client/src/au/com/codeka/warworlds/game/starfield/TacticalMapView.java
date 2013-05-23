@@ -14,9 +14,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import android.content.Context;
-import android.graphics.Canvas;
-import android.graphics.Paint;
-import android.graphics.Paint.Style;
 import android.opengl.GLES20;
 import android.opengl.Matrix;
 import android.util.AttributeSet;
@@ -40,8 +37,6 @@ public class TacticalMapView extends GlSectorView
                              implements SectorManager.OnSectorListChangedListener {
     private static final Logger log = LoggerFactory.getLogger(TacticalMapView.class);
 
-    private Paint mPointPaint;
-    private Paint mInfluencePaint;
     private DoubleTapHandler mDoubleTapHandler;
     private Context mContext;
 
@@ -62,12 +57,6 @@ public class TacticalMapView extends GlSectorView
         mSectorRadius = 2;
 
         log.info("Tactical map initializing...");
-        mPointPaint = new Paint();
-        mPointPaint.setARGB(255, 255, 0, 0);
-        mPointPaint.setStyle(Style.FILL);
-
-        mInfluencePaint = new Paint();
-        mInfluencePaint.setStyle(Style.FILL);
     }
 
     @Override
@@ -80,20 +69,6 @@ public class TacticalMapView extends GlSectorView
     }
 
     @Override
-    protected void onAttachedToWindow() {
-        super.onAttachedToWindow();
-        SectorManager.getInstance().addSectorListChangedListener(this);
-
-        refreshControlField();
-    }
-
-    @Override
-    protected void onDetachedFromWindow() {
-        super.onDetachedFromWindow();
-        SectorManager.getInstance().removeSectorListChangedListener(this);
-    }
-
-    @Override
     public void onSectorListChanged() {
         super.onSectorListChanged();
 
@@ -103,17 +78,6 @@ public class TacticalMapView extends GlSectorView
     @Override
     protected GestureDetector.OnGestureListener createGestureListener() {
         return new GestureListener();
-    }
-
-    @Override
-    public void onDraw(Canvas canvas) {
-        if (mScrollToCentre) {
-            scroll(getWidth() /*/ getPixelScale()*/,
-                   getHeight() /*/ getPixelScale()*/);
-            mScrollToCentre = false;
-        }
-
-        super.onDraw(canvas);
     }
 
     private static class ControlFieldState {
@@ -231,7 +195,6 @@ public class TacticalMapView extends GlSectorView
         log.info("Refresh complete.");
     }
 
-
     protected int loadShader(int type, String shaderCode){
         int shader = GLES20.glCreateShader(type);
         GLES20.glShaderSource(shader, shaderCode);
@@ -252,8 +215,8 @@ public class TacticalMapView extends GlSectorView
             scroll(-(float)(distanceX / getPixelScale()),
                    -(float)(distanceY / getPixelScale()));
 
-            mDragOffsetX += (float)(distanceX / getPixelScale());
-            mDragOffsetY += (float)(distanceY / getPixelScale());
+            mDragOffsetX -= (float)(distanceX / getPixelScale());
+            mDragOffsetY -= (float)(distanceY / getPixelScale());
 
             requestRender();
             return false;
@@ -328,8 +291,8 @@ public class TacticalMapView extends GlSectorView
             float[] modelMatrix = new float[16];
             float[] mvpMatrix = new float[16];
             for (Vector2 p : mPoints) {
-                float x = (float)p.x + (dragOffsetX / 256.0f);
-                float y = (float)p.y + (dragOffsetY / 256.0f);
+                float x = (float)p.x - (dragOffsetX / 256.0f);
+                float y = (float)p.y - (dragOffsetY / 256.0f);
 
                 Matrix.setIdentityM(modelMatrix, 0);
                 Matrix.translateM(modelMatrix, 0, modelMatrix, 0, x, y, 0.0f);
@@ -343,7 +306,6 @@ public class TacticalMapView extends GlSectorView
         }
 
         private void setup() {
-
             float[] fpts = new float[3 * 10];
             fpts[0 + 0] = 0.0f;
             fpts[0 + 1] = 0.0f;
@@ -460,7 +422,6 @@ public class TacticalMapView extends GlSectorView
         }
 
         private void setup() {
-            log.info("in setup()");
             numVertices = 0;
             for (Vector2 pt : mOwnedPoints) {
                 List<Triangle> triangles = mVoronoi.getTrianglesForPoint(pt);
@@ -549,8 +510,8 @@ public class TacticalMapView extends GlSectorView
             float[] modelMatrix = new float[16];
             float[] mvpMatrix = new float[16];
 
-            float x = dragOffsetX / 256.0f;
-            float y = dragOffsetY / 256.0f;
+            float x = -dragOffsetX / 256.0f;
+            float y = -dragOffsetY / 256.0f;
 
             Matrix.setIdentityM(modelMatrix, 0);
             Matrix.translateM(modelMatrix, 0, modelMatrix, 0, x, y, 0.0f);
@@ -574,7 +535,6 @@ public class TacticalMapView extends GlSectorView
 
             mPointCloud.render(mViewProjMatrix, dragOffsetX, dragOffsetY);
         }
-
     }
 
     public interface DoubleTapHandler {

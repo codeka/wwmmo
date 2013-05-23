@@ -58,6 +58,11 @@ public class HelloHandler extends RequestHandler {
                 log.info(String.format("Empire #%d [%s] has been wiped out, resetting.", empire.getID(), empire.getDisplayName()));
                 new EmpireController().createEmpire(empire);
                 hello_response_pb.setWasEmpireReset(true);
+
+                String resetReason = new EmpireController().getResetReason(empire.getID());
+                if (resetReason != null) {
+                    hello_response_pb.setEmpireResetReason(resetReason);
+                }
             }
 
             Messages.Empire.Builder empire_pb = Messages.Empire.newBuilder();

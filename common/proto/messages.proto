@@ -211,8 +211,12 @@ message HelloResponse
     optional bool require_gcm_register = 6;
 
     // If present and true, it means your empire was reset (probably because your last colony
-    // was destroyed). Display some kind of message to the user to that effect.
+    // was destroyed). Display some kind of message to the user to that effect. If
+    // empire_reset_reason is set, this is an administrator-specified reason for the reset
+    // (eg violation of rules, etc etc). If it's not set, the reason is just that you've run
+    // out of colonies.
     optional bool was_empire_reset = 7;
+    optional string empire_reset_reason = 10;
 
     // Building statistics that details the number of buildings of each design your empire
     // has, once you've got it on the client, it can be kept track there...

@@ -1,0 +1,46 @@
+{% extends "admin/skeleton.html" %}
+{% block title %}Reset Empire{% endblock %}
+
+{% block head %}
+  <style>
+    form div.field label {
+      display: inline-block;
+      width: 50pt;
+    }
+    form div.field input[type=text] {
+      width: 300pt;
+      border: solid 1px #666;
+      padding: 4pt;
+    }
+    p.big-warning {
+      border: solid 3px #a00;
+      background: #f99;
+      padding: 8pt;
+      width: 300pt;
+    }
+  </style>
+{% endblock %}
+
+{% block content %}
+  <h1>Reset Empire</h1>
+  <p class="big-warning">
+    Be very careful who you reset! The empire will lose all stars, colonies, ships and progress
+    in the game so far!
+  </p>
+  {% if complete %}
+    <p class="{% if success %}success{% else %}error{% endif %}">{% if msg %}{{ msg }}{% else %}Empire has been reset!{% endif %}</p>
+  {% endif %}
+  <form method="post">
+    <div class="field">
+      <label for="empire_id">Empire:</label>
+      <input type="text" name="empire_id" id="empire_id" value="{{empire_id}}" placeholder="Empire ID">
+    </div>
+    <div class="field">
+      <label for="reason">Reason:</label>
+      <input type="text" name="reason" id="reason" value="{{reason}}" placeholder="Reason for resetting">
+    </div>
+    <div class="field">
+      <input type="submit" value="RESET">
+    </div>
+  </form>
+{% endblock %}

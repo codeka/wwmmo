@@ -130,6 +130,7 @@ public class ServerGreeter {
             private boolean mErrorOccured;
             private boolean mNeedsReAuthenticate;
             private boolean mWasEmpireReset;
+            private String mResetReason;
             private ArrayList<Colony> mColonies;
 
             @Override
@@ -173,6 +174,9 @@ public class ServerGreeter {
 
                     if (resp.hasWasEmpireReset() && resp.getWasEmpireReset()) {
                         mWasEmpireReset = true;
+                        if (resp.hasEmpireResetReason() && resp.getEmpireResetReason().length() > 0) {
+                            mResetReason = resp.getEmpireResetReason();
+                        }
                     }
 
                     if (resp.hasRequireGcmRegister() && resp.getRequireGcmRegister()) {
@@ -267,6 +271,9 @@ public class ServerGreeter {
 
                 if (mWasEmpireReset) {
                     mServerGreeting.mIntent = new Intent(activity, EmpireResetActivity.class);
+                    if (mResetReason != null) {
+                        mServerGreeting.mIntent.putExtra("au.com.codeka.warworlds.ResetReason", mResetReason);
+                    }
                 }
 
                 if (mHelloComplete) {

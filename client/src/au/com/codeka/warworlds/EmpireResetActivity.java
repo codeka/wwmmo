@@ -25,7 +25,15 @@ public class EmpireResetActivity extends BaseActivity {
         ActivityBackgroundGenerator.setBackground(rootView);
 
         TransparentWebView welcome = (TransparentWebView) findViewById(R.id.welcome);
-        String msg = TransparentWebView.getHtmlFile(this, "html/empire-reset.html");
+        String msg;
+
+        String reason = getIntent().getStringExtra("au.com.codeka.warworlds.ResetReason");
+        if (reason == null) {
+            msg = TransparentWebView.getHtmlFile(this, "html/empire-reset.html");
+        } else {
+            msg = TransparentWebView.getHtmlFile(this, "html/empire-reset-reason.html");
+            msg = String.format(msg, reason);
+        }
         welcome.loadHtml("html/skeleton.html", msg);
 
         Button startBtn = (Button) findViewById(R.id.start_btn);

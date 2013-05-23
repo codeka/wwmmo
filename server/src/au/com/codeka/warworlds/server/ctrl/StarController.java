@@ -188,16 +188,22 @@ public class StarController {
         }
 
         private void updateColonies(Star star) throws RequestException {
-            final String sql = "UPDATE colonies SET" +
-                                 " focus_population = ?," +
-                                 " focus_construction = ?," +
-                                 " focus_farming = ?," +
-                                 " focus_mining = ?," +
-                                 " population = ?," +
-                                 " uncollected_taxes = ?" +
-                              " WHERE id = ?";
+            boolean needDelete = false;
+
+            String sql = "UPDATE colonies SET" +
+                           " focus_population = ?," +
+                           " focus_construction = ?," +
+                           " focus_farming = ?," +
+                           " focus_mining = ?," +
+                           " population = ?," +
+                           " uncollected_taxes = ?" +
+                        " WHERE id = ?";
             try (SqlStmt stmt = prepare(sql)) {
                 for (BaseColony colony : star.getColonies()) {
+                    if (colony.getPopulation() <= 0.0f) {
+                        needDelete = true;
+                        continue;
+                    }
                     stmt.setDouble(1, colony.getPopulationFocus());
                     stmt.setDouble(2, colony.getConstructionFocus());
                     stmt.setDouble(3, colony.getFarmingFocus());
@@ -209,6 +215,26 @@ public class StarController {
                 }
             } catch(Exception e) {
                 throw new RequestException(e);
+            }
+
+            if (needDelete) {
+                ArrayList<BaseColony> toRemove = new ArrayList<BaseColony>();
+                sql = "DELETE FROM colonies WHERE id = ?";
+                try (SqlStmt stmt = prepare(sql)) {
+                    for (BaseColony colony : star.getColonies()) {
+                        if (colony.getPopulation() > 0.0f) {
+                            continue;
+                        }
+                        stmt.setInt(1, ((Colony) colony).getID());
+                        stmt.update();
+                        toRemove.add(colony);
+                    }
+
+                    star.getColonies().removeAll(toRemove);
+                } catch(Exception e) {
+                    throw new RequestException(e);
+                }
+
             }
         }
 

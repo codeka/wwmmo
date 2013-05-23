@@ -124,6 +124,7 @@ public class BuildCompleteEvent extends Event {
         build_complete_pb.setBuildKind(Messages.BuildRequest.BUILD_KIND.valueOf(designKind.getValue()));
         build_complete_pb.setBuildRequestKey(Integer.toString(buildRequestID));
         build_complete_pb.setDesignId(designID);
+        build_complete_pb.setCount(Math.round(count));
         sitrep_pb.setBuildCompleteRecord(build_complete_pb);
         if (star.getCombatReport() != null && fleet != null) {
             Messages.SituationReport.FleetUnderAttackRecord.Builder fleet_under_attack_pb = Messages.SituationReport.FleetUnderAttackRecord.newBuilder();
