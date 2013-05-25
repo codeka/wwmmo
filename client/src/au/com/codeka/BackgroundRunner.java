@@ -13,6 +13,10 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import android.os.Handler;
 import android.os.Message;
 import android.os.Process;
@@ -21,6 +25,10 @@ import android.os.Process;
  * This class is similar to AsyncTask, except we get to control all the parameters.
  */
 public abstract class BackgroundRunner<Result> {
+    private static Logger log = LoggerFactory.getLogger(BackgroundRunner.class);
+    private String mCreatorStackTrace;
+
+    private static boolean sThreadDebug = true;
 
     private static final ThreadFactory sThreadFactory = new ThreadFactory() {
         private final AtomicInteger mCount = new AtomicInteger(1);
@@ -44,6 +52,10 @@ public abstract class BackgroundRunner<Result> {
     private final AtomicBoolean mTaskInvoked = new AtomicBoolean();
 
     public BackgroundRunner() {
+        if (sThreadDebug) {
+            mCreatorStackTrace = ExceptionUtils.getStackTrace(new Throwable());
+        }
+
         mWorker = new Callable<Result>() {
             @Override
             public Result call() throws Exception {
@@ -88,7 +100,14 @@ public abstract class BackgroundRunner<Result> {
         @SuppressWarnings("unchecked")
         Message message = mHandler.obtainMessage(0,
                 new BackgroundRunnerResult<Result>(this, result));
-        message.sendToTarget();
+        try {
+            message.sendToTarget();
+        } catch(Exception e) {
+            log.error("Error caught posting message to target thread.", e);
+            if (mCreatorStackTrace != null) {
+                log.warn("Original stack trace:\r\n"+mCreatorStackTrace);
+            }
+        }
         return result;
     }
 

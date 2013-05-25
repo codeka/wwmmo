@@ -13,6 +13,7 @@ import au.com.codeka.warworlds.server.data.DB;
 import au.com.codeka.warworlds.server.data.SqlStmt;
 import au.com.codeka.warworlds.server.data.Transaction;
 import au.com.codeka.warworlds.server.model.BuildRequest;
+import au.com.codeka.warworlds.server.model.Building;
 import au.com.codeka.warworlds.server.model.Colony;
 import au.com.codeka.warworlds.server.model.DesignManager;
 import au.com.codeka.warworlds.server.model.Star;
@@ -39,6 +40,7 @@ public class BuildQueueController {
             // check build limits
             if (design.getDesignKind() == DesignKind.BUILDING && buildRequest.getExistingBuildingKey() == null) {
                 BuildingDesign buildingDesign = (BuildingDesign) design;
+
                 if (buildingDesign.getMaxPerColony() > 0) {
                     int maxPerColony = buildingDesign.getMaxPerColony();
                     int numThisColony = 0;
@@ -87,8 +89,10 @@ public class BuildQueueController {
                 }
             }
 
-            // if we're upgrading a building, make sure we don't upgrade it twice!
             if (buildRequest.getDesignKind() == DesignKind.BUILDING && buildRequest.getExistingBuildingKey() != null) {
+                BuildingDesign buildingDesign = (BuildingDesign) design;
+
+                // if we're upgrading a building, make sure we don't upgrade it twice!
                 for (BaseBuildRequest baseBuildRequest : star.getBuildRequests()) {
                     BuildRequest otherBuildRequest = (BuildRequest) baseBuildRequest;
                     if (otherBuildRequest.getExistingBuildingKey() == null) {
@@ -98,6 +102,29 @@ public class BuildQueueController {
                         throw new RequestException(400, Messages.GenericError.ErrorCode.CannotBuildDependencyNotMet,
                                 String.format("Cannot upgrade %s, upgrade is already in progress.",
                                               buildRequest.getDesign().getDisplayName()));
+                    }
+                }
+
+                Building existingBuilding = null;
+                for (BaseBuilding baseBuilding : colony.getBuildings()) {
+                    if (baseBuilding.getKey().equals(buildRequest.getExistingBuildingKey())) {
+                        existingBuilding = (Building) baseBuilding;
+                    }
+                }
+                if (existingBuilding == null) {
+                    throw new RequestException(400, Messages.GenericError.ErrorCode.CannotBuildDependencyNotMet,
+                            String.format("Cannot upgrade %s, original building no longer exists.",
+                                          buildRequest.getDesign().getDisplayName()));
+                }
+
+                // check dependencies for this specific level
+                for (Design.Dependency dependency : buildingDesign.getDependencies(existingBuilding.getLevel() + 1)) {
+                    if (!dependency.isMet(colony)) {
+                        throw new RequestException(400, Messages.GenericError.ErrorCode.CannotBuildDependencyNotMet,
+                                String.format("Cannot upgrade %s as level %d %s is required.",
+                                              buildRequest.getDesign().getDisplayName(),
+                                              dependency.getLevel(),
+                                              DesignManager.i.getDesign(DesignKind.BUILDING, dependency.getDesignID()).getDisplayName()));
                     }
                 }
             }

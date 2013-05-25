@@ -31,7 +31,19 @@ public class StarHandler extends RequestHandler {
         }
 
         int myEmpireID = getSession().getEmpireID();
+        sanitizeStar(star, myEmpireID);
 
+        Messages.Star.Builder star_pb = Messages.Star.newBuilder();
+        star.toProtocolBuffer(star_pb);
+        setResponseBody(star_pb.build());
+    }
+
+    /**
+     * "Sanitizes" a star and removes all info specific to other empires.
+     * @param star
+     * @param myEmpireID
+     */
+    public static void sanitizeStar(Star star, int myEmpireID) {
         // if we don't have any fleets here, remove all the others
         boolean ourFleetExists = false;
         for (BaseFleet baseFleet : star.getFleets()) {
@@ -67,10 +79,6 @@ public class StarHandler extends RequestHandler {
             }
             star.getScoutReports().removeAll(toRemove);
         }
-
-        Messages.Star.Builder star_pb = Messages.Star.newBuilder();
-        star.toProtocolBuffer(star_pb);
-        setResponseBody(star_pb.build());
     }
 
     @Override

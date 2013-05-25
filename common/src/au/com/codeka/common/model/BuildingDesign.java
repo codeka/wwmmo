@@ -31,6 +31,14 @@ public class BuildingDesign extends Design {
         }
     }
 
+    public List<Dependency> getDependencies(int level) {
+        if (level <= 1) {
+            return mDependencies;
+        } else {
+            return mUpgrades.get(level - 2).getDependencies();
+        }
+    }
+
     @SuppressWarnings("unchecked")
     public <T> ArrayList<T> getEffects(int level, Class<?> effectClass) {
         List<Effect> allEffects = getEffects(level);
@@ -128,6 +136,13 @@ public class BuildingDesign extends Design {
                 } else if (elem.getNodeName().equals("effects")) {
                     mEffects = Effect.parse(DesignKind.BUILDING, elem);
                 }
+            }
+
+            if (mDependencies == null) {
+                mDependencies = new ArrayList<Dependency>();
+            }
+            if (mEffects == null) {
+                mEffects = new ArrayList<Effect>();
             }
         }
 

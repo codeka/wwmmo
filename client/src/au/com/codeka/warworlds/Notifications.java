@@ -50,23 +50,19 @@ public class Notifications {
     public static void displayNotification(final Context context,
                                            final Messages.SituationReport sitrep) {
         String starKey = sitrep.getStarKey();
-        StarManager.getInstance().requestStarSummary(context, starKey,
-            new StarManager.StarSummaryFetchedHandler() {
-                @Override
-                public void onStarSummaryFetched(StarSummary starSummary) {
-                    NotificationDetails notification = new NotificationDetails();
-                    notification.sitrep = sitrep;
+        StarSummary starSummary = StarManager.getInstance().requestStarSummarySync(context, starKey);
 
-                    Messages.Star.Builder star_pb = Messages.Star.newBuilder();
-                    starSummary.toProtocolBuffer(star_pb);
-                    notification.star = star_pb.build();
+        NotificationDetails notification = new NotificationDetails();
+        notification.sitrep = sitrep;
 
-                    DatabaseHelper db = new DatabaseHelper(context);
-                    db.addNotification(notification);
+        Messages.Star.Builder star_pb = Messages.Star.newBuilder();
+        starSummary.toProtocolBuffer(star_pb);
+        notification.star = star_pb.build();
 
-                    displayNotification(context, buildNotification(context, db.getNotifications()));
-                }
-            });
+        DatabaseHelper db = new DatabaseHelper(context);
+        db.addNotification(notification);
+
+        displayNotification(context, buildNotification(context, db.getNotifications()));
     }
 
     private static void displayNotification(Context context, Notification notification) {
@@ -301,3 +297,4 @@ public class Notifications {
         public Messages.Star star;
     }
 }
+

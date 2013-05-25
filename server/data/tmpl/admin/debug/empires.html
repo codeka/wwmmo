@@ -160,18 +160,41 @@
           type: "GET",
           dataType: "json",
           success: function(data) {
-/*            var text = "";
-            for(var i = 0; i < data.entries.length; i++) {
-              var entry = data.entries[i];
+            var text = "";
+            text += spacePad("Date", 19);
+            text += " | "+spacePad("Before", 10);
+            text += " | "+spacePad("After", 10);
+            text += " | "+spacePad("Reason", 20);
+            for(var i = 0; i < data.records.length; i++) {
+              var entry = data.records[i];
               var dt = new Date(entry["time"] * 1000);
-              text += dt.getFullYear()+"-"+zeroPad(dt.getMonth()+1, 2)+"-"+zeroPad(dt.getDate(), 2);
+              text += zeroPad(dt.getFullYear(), 4)+"-"+zeroPad(dt.getMonth()+1, 2)+"-"+zeroPad(dt.getDate(), 2);
               text += " "+zeroPad(dt.getHours(), 2)+":"+zeroPad(dt.getMinutes(), 2)+":"+zeroPad(dt.getSeconds(), 2);
-              text += " : "+spacePad(parseInt(entry["new_cash"]), 10);
-              text += " : "+spacePad("diff: "+parseInt(entry["difference"]), 15);
-              text += " : "+entry["reason"];
+              text += " | "+spacePad(parseInt(entry["before_cash"]), 10);
+              text += " | "+spacePad(parseInt(entry["after_cash"]), 10);
+              var reason = entry["reason"];
+              if (!reason) {
+                if (entry["accelerate_amount"]) {
+                  reason = "AccelerateBuild";
+                } else if (entry["move_distance"]) {
+                  reason = "FleetMove";
+                }
+              }
+              text += " | "+spacePad(reason, 20);
+              if (reason == "FleetMove") {
+                text += " | fleet_id="+entry["fleet_id"];
+                text += " design_id="+entry["fleet_design_id"];
+                text += " x "+entry["num_ships"];
+                text += " distance="+entry["move_distance"];
+                text += " destination="+entry["star_name"]+" "+entry["star_id"]; 
+              } else if (reason == "AccelerateBuild") {
+                text += " | design_id="+entry["build_design_id"];
+                text += " x "+entry["build_count"];
+                text += " accelerate_amount="+parseInt(entry["accelerate_amount"] * 100.0)+"%";
+              }
               text += "\r\n";
-            }*/
-            $("#search-results").val(JSON.stringify(data, null, "  "));
+            }
+            $("#search-results").val(text);
           },
           error: function(xhr, status, err) {
             alert("An error occured, check server logs: " + xhr.status);

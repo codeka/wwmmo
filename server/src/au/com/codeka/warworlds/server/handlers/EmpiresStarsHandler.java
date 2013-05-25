@@ -23,6 +23,8 @@ public class EmpiresStarsHandler extends RequestHandler {
 
         Messages.Stars.Builder pb = Messages.Stars.newBuilder();
         for (Star star : stars) {
+            StarHandler.sanitizeStar(star, empire.getID());
+
             Messages.Star.Builder star_pb = Messages.Star.newBuilder();
             star.toProtocolBuffer(star_pb);
             pb.addStars(star_pb);

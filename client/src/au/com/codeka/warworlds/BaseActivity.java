@@ -25,7 +25,6 @@ import android.view.View;
 import android.view.WindowManager;
 import au.com.codeka.common.Vector3;
 import au.com.codeka.warworlds.ctrl.DebugView;
-import au.com.codeka.warworlds.ctrl.InfobarView;
 import au.com.codeka.warworlds.model.PurchaseManager;
 
 @SuppressLint("Registered") // it's a base class

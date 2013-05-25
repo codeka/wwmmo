@@ -943,6 +943,14 @@ message SituationReport
         optional string enemy_empire_key = 2;
     }
     optional ColonyDestroyedRecord colony_destroyed_record = 11;
+
+    message ColonyAttackedRecord
+    {
+        optional string colony_key = 1;
+        optional string enemy_empire_key = 2;
+        optional float num_ships = 3;
+    }
+    optional ColonyAttackedRecord colony_attacked_record = 12;
 }
 
 
