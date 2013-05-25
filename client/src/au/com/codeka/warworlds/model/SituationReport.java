@@ -23,6 +23,7 @@ public class SituationReport {
     private FleetDestroyedRecord mFleetDestroyedRecord;
     private FleetVictoriousRecord mFleetVictoriousRecord;
     private ColonyDestroyedRecord mColonyDestroyedRecord;
+    private ColonyAttackedRecord mColonyAttackedRecord;
 
     public String getKey() {
         return mKey;
@@ -57,6 +58,9 @@ public class SituationReport {
     public ColonyDestroyedRecord getColonyDestroyedRecord() {
         return mColonyDestroyedRecord;
     }
+    public ColonyAttackedRecord getColonyAttackedRecord() {
+        return mColonyAttackedRecord;
+    }
 
     public String getTitle() {
         if (mBuildCompleteRecord != null) {
@@ -71,6 +75,8 @@ public class SituationReport {
             return "Fleet Under Attack";
         } else if (mColonyDestroyedRecord != null) {
             return "Colony Destroyed";
+        } else if (mColonyAttackedRecord != null) {
+            return "Colony Attacked";
         }
 
         return "War Worlds";
@@ -130,6 +136,10 @@ public class SituationReport {
             msg += "Colony <em>destroyed!</em>";
         }
 
+        if (mColonyAttackedRecord != null) {
+            msg += "Colony <em>attacked!</em>";
+        }
+
         if (msg.length() == 0) {
             msg = "Unknown situation";
         }
@@ -187,6 +197,12 @@ public class SituationReport {
         if (mColonyDestroyedRecord != null) {
             msg += String.format(Locale.ENGLISH, "Colony on %s %s destroyed",
                     starSummary.getName(), RomanNumeralFormatter.format(mPlanetIndex));
+        }
+
+        if (mColonyAttackedRecord != null) {
+            msg += String.format(Locale.ENGLISH, "Colony on %s %s attacked by %d ships",
+                    starSummary.getName(), RomanNumeralFormatter.format(mPlanetIndex),
+                    (int) Math.ceil(mColonyAttackedRecord.getNumShips()));
         }
 
         if (msg.length() == 0) {
@@ -264,6 +280,11 @@ public class SituationReport {
         if (pb.getColonyDestroyedRecord() != null &&
             pb.getColonyDestroyedRecord().hasColonyKey()) {
             sitrep.mColonyDestroyedRecord = ColonyDestroyedRecord.fromProtocolBuffer(pb.getColonyDestroyedRecord());
+        }
+
+        if (pb.getColonyAttackedRecord() != null &&
+            pb.getColonyAttackedRecord().hasColonyKey()) {
+            sitrep.mColonyAttackedRecord = ColonyAttackedRecord.fromProtocolBuffer(pb.getColonyAttackedRecord());
         }
 
         return sitrep;
@@ -413,6 +434,33 @@ public class SituationReport {
                 cdr.mEnemyEmpireKey = null;
             }
             return cdr;
+        }
+    }
+
+    public static class ColonyAttackedRecord {
+        private String mColonyKey;
+        private String mEnemyEmpireKey;
+        private float mNumShips;
+
+        public String getColonyKey() {
+            return mColonyKey;
+        }
+        public String getEnemyEmpireKey() {
+            return mEnemyEmpireKey;
+        }
+        public float getNumShips() {
+            return mNumShips;
+        }
+
+        private static ColonyAttackedRecord fromProtocolBuffer(Messages.SituationReport.ColonyAttackedRecord pb) {
+            ColonyAttackedRecord car = new ColonyAttackedRecord();
+            car.mColonyKey = pb.getColonyKey();
+            car.mEnemyEmpireKey = pb.getEnemyEmpireKey();
+            if (car.mEnemyEmpireKey != null && car.mEnemyEmpireKey.length() == 0) {
+                car.mEnemyEmpireKey = null;
+            }
+            car.mNumShips = pb.getNumShips();
+            return car;
         }
     }
 }

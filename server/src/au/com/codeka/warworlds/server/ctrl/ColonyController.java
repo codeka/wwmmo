@@ -123,7 +123,9 @@ public class ColonyController {
             sitrep_pb.setColonyAttackedRecord(colony_attacked_pb);
         }
 
-        new SituationReportController().saveSituationReport(sitrep_pb.build());
+        if (colony.getEmpireKey() != null) {
+            new SituationReportController().saveSituationReport(sitrep_pb.build());
+        }
     }
 
     public void reducePopulation(Colony colony, float amount) throws RequestException {
