@@ -91,7 +91,7 @@ public class SectorController {
             for (int i = 0; i < sectors.size(); i++) {
                 ids[i] = sectors.get(i).getID();
             }
-    
+
             for (Star star : db.getStarsForSectors(ids)) {
                 // add the star to the correct sector
                 for (Sector sector : sectors) {
@@ -100,11 +100,11 @@ public class SectorController {
                         break;
                     }
                 }
-    
+
                 star.setColonies(new ArrayList<BaseColony>());
                 star.setFleets(new ArrayList<BaseFleet>());
             }
-    
+
             for (Colony colony : db.getColoniesForSectors(ids)) {
                 for (Sector sector : sectors) {
                     if (colony.getSectorID() == sector.getID()) {
@@ -117,7 +117,7 @@ public class SectorController {
                     }
                 }
             }
-    
+
             for (Fleet fleet : db.getFleetsForSectors(ids)) {
                 for (Sector sector : sectors) {
                     if (fleet.getSectorID() == sector.getID()) {

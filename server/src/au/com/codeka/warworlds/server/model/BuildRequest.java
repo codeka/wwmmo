@@ -6,6 +6,8 @@ import java.sql.SQLException;
 import org.joda.time.DateTime;
 
 import au.com.codeka.common.model.BaseBuildRequest;
+import au.com.codeka.common.model.BaseBuilding;
+import au.com.codeka.common.model.BaseColony;
 import au.com.codeka.common.model.Design;
 import au.com.codeka.common.model.DesignKind;
 import au.com.codeka.common.protobuf.Messages;
@@ -19,7 +21,7 @@ public class BuildRequest extends BaseBuildRequest {
 
     public BuildRequest() {
     }
-    public BuildRequest(ResultSet rs) throws SQLException {
+    public BuildRequest(Star star, ResultSet rs) throws SQLException {
         mID = rs.getInt("id");
         mKey = Integer.toString(mID);
         mDesignKind = DesignKind.fromNumber(rs.getInt("design_kind"));
@@ -38,7 +40,15 @@ public class BuildRequest extends BaseBuildRequest {
         mExistingBuildingID = rs.getInt("existing_building_id");
         if (!rs.wasNull()) {
             mExistingBuildingKey = Integer.toString(mExistingBuildingID);
-            mExistingBuildingLevel = 1; // TODO
+            mExistingBuildingLevel = 1;
+            for (BaseColony baseColony : star.getColonies()) {
+                for (BaseBuilding baseBuilding : baseColony.getBuildings()) {
+                    Building building = (Building) baseBuilding;
+                    if (building.getID() == mExistingBuildingID) {
+                        mExistingBuildingLevel = building.getLevel();
+                    }
+                }
+            }
         }
     }
 

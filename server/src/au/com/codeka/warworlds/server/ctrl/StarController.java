@@ -138,8 +138,8 @@ public class StarController {
                 populateEmpires(stars, inClause);
                 populateColonies(stars, inClause);
                 populateFleets(stars, inClause);
-                populateBuildRequests(stars, inClause);
                 populateBuildings(stars, inClause);
+                populateBuildRequests(stars, inClause);
                 checkNativeColonies(stars);
                 populateCombatReports(stars, inClause);
             } catch(Exception e) {
@@ -459,13 +459,17 @@ public class StarController {
                 ResultSet rs = stmt.select();
 
                 while (rs.next()) {
-                    BuildRequest buildRequest = new BuildRequest(rs);
-
-                    for (Star star : stars) {
-                        if (star.getID() == buildRequest.getStarID()) {
-                            star.getBuildRequests().add(buildRequest);
+                    int starID = rs.getInt("star_id");
+                    Star star = null;
+                    for (Star thisStar : stars) {
+                        if (thisStar.getID() == starID) {
+                            star = thisStar;
+                            break;
                         }
                     }
+
+                    BuildRequest buildRequest = new BuildRequest(star, rs);
+                    star.getBuildRequests().add(buildRequest);
                 }
             }
         }

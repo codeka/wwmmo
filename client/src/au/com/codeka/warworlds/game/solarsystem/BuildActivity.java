@@ -346,11 +346,13 @@ public class BuildActivity extends BaseActivity implements StarManager.StarFetch
                 for (BaseBuilding b : buildings) {
                     Entry entry = new Entry();
                     entry.building = (Building) b;
-                    // if the building is being upgraded (i.e. if there's a build request that
-                    // references this building) then add the build request as well
-                    for (BaseBuildRequest br : star.getBuildRequests()) {
-                        if (br.getExistingBuildingKey() != null && br.getExistingBuildingKey().equals(b.getKey())) {
-                            entry.buildRequest = (BuildRequest) br;
+                    if (star.getBuildRequests() != null) {
+                        // if the building is being upgraded (i.e. if there's a build request that
+                        // references this building) then add the build request as well
+                        for (BaseBuildRequest br : star.getBuildRequests()) {
+                            if (br.getExistingBuildingKey() != null && br.getExistingBuildingKey().equals(b.getKey())) {
+                                entry.buildRequest = (BuildRequest) br;
+                            }
                         }
                     }
                     mEntries.add(entry);
@@ -736,6 +738,5 @@ public class BuildActivity extends BaseActivity implements StarManager.StarFetch
                 mBuildQueueList.refreshSelection();
             }
         }
-
     }
 }

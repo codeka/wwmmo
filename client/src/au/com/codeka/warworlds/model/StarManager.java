@@ -16,6 +16,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import android.content.Context;
+import android.content.ContextWrapper;
+import android.os.Handler;
 import au.com.codeka.BackgroundRunner;
 import au.com.codeka.common.model.Simulation;
 import au.com.codeka.common.protobuf.Messages;
@@ -84,32 +86,42 @@ public class StarManager {
         mAllStarUpdatedListeners.remove(handler);
     }
 
-    public void fireStarUpdated(Star star) {
+    public void fireStarUpdated(final Star star) {
         synchronized(mStarUpdatedListeners) {
             List<StarFetchedHandler> listeners = mStarUpdatedListeners.get(star.getKey());
             if (listeners != null) {
                 for (StarFetchedHandler handler : listeners) {
-                    try {
-                        handler.onStarFetched(star);
-                    } catch (Exception e) {
-                        log.warn("Ignored exception in onStarFetched...", e);
-                    }
+                    fireHandler(handler, star);
                 }
             }
 
             // also anybody who's interested in ALL stars
             for (StarFetchedHandler handler : mAllStarUpdatedListeners) {
-                try {
-                    handler.onStarFetched(star);
-                } catch (Exception e) {
-                    log.warn("Ignored exception in onStarFetched...", e);
-                }
+                fireHandler(handler, star);
             }
         }
 
         // also let a couple of the other Managers know
         SectorManager.getInstance().onStarUpdate(star);
         BuildManager.getInstance().onStarUpdate(star);
+    }
+
+    private void fireHandler(final StarFetchedHandler handler, final Star star) {
+        try {
+            if (handler instanceof ContextWrapper) {
+                ContextWrapper ctx = (ContextWrapper) handler;
+                new Handler(ctx.getMainLooper()).post(new Runnable() {
+                    @Override
+                    public void run() {
+                        handler.onStarFetched(star);
+                    }
+                });
+            } else {
+                handler.onStarFetched(star);
+            }
+        } catch (Exception e) {
+            log.warn("Ignored exception in onStarFetched...", e);
+        }
     }
 
     public void refreshStar(Context context, Star s) {

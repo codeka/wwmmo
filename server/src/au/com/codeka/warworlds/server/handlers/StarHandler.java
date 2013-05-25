@@ -57,7 +57,7 @@ public class StarHandler extends RequestHandler {
         }
 
         // remove build requests that aren't ours
-        {
+        if (star.getBuildRequests() != null) {
             ArrayList<BaseBuildRequest> toRemove = new ArrayList<BaseBuildRequest>();
             for (BaseBuildRequest baseBuildRequest : star.getBuildRequests()) {
                 BuildRequest buildRequest = (BuildRequest) baseBuildRequest;
@@ -69,7 +69,7 @@ public class StarHandler extends RequestHandler {
         }
 
         // remove all scout reports that aren't ours
-        {
+        if (star.getScoutReports() != null) {
             ArrayList<BaseScoutReport> toRemove = new ArrayList<BaseScoutReport>();
             for (BaseScoutReport baseScoutReport : star.getScoutReports()) {
                 ScoutReport scoutReport = (ScoutReport) baseScoutReport;

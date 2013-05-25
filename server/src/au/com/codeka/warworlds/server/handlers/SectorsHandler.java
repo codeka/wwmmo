@@ -4,11 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import au.com.codeka.common.Pair;
+import au.com.codeka.common.model.BaseStar;
 import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.RequestHandler;
 import au.com.codeka.warworlds.server.ctrl.SectorController;
 import au.com.codeka.warworlds.server.model.Sector;
+import au.com.codeka.warworlds.server.model.Star;
 
 /**
  * Handles /realm/.../sectors URL
@@ -36,6 +38,8 @@ public class SectorsHandler extends RequestHandler {
 
     @Override
     protected void get() throws RequestException {
+        int myEmpireID = getSession().getEmpireID();
+
         List<Pair<Long, Long>> coords = getCoords();
         boolean generate = true;
         if (getRequest().getParameter("gen") != null && getRequest().getParameter("gen").equals("0")) {
@@ -45,6 +49,11 @@ public class SectorsHandler extends RequestHandler {
         SectorController ctrl = new SectorController();
         Messages.Sectors.Builder sectors_pb = Messages.Sectors.newBuilder();
         for (Sector sector : ctrl.getSectors(coords, generate)) {
+            for (BaseStar baseStar : sector.getStars()) {
+                Star star = (Star) baseStar;
+                StarHandler.sanitizeStar(star, myEmpireID);
+            }
+
             sector.toProtocolBuffer(sectors_pb.addSectorsBuilder());
         }
         setResponseBody(sectors_pb.build());
