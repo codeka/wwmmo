@@ -1,8 +1,5 @@
 package au.com.codeka.warworlds.game.starfield;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Window;
@@ -11,7 +8,6 @@ import au.com.codeka.warworlds.BaseActivity;
 import au.com.codeka.warworlds.R;
 
 public class TacticalMapActivity extends BaseActivity {
-    private static final Logger log = LoggerFactory.getLogger(StarfieldActivity.class);
     private TacticalMapView mTacticalMapView;
 
     @Override
@@ -29,7 +25,7 @@ public class TacticalMapActivity extends BaseActivity {
             long sectorY = extra.getLong("au.com.codeka.warworlds.SectorY", 0);
             int offsetX = extra.getInt("au.com.codeka.warworlds.OffsetX", 0);
             int offsetY = extra.getInt("au.com.codeka.warworlds.OffsetY", 0);
-            log.info(String.format("Scrolling to: %d %d - %d %d", (int) sectorX, (int) sectorY, offsetX, offsetY));
+
             mTacticalMapView.scrollTo(sectorX, sectorY, offsetX, offsetY, true);
         }
 
@@ -43,25 +39,9 @@ public class TacticalMapActivity extends BaseActivity {
                 intent.putExtra("au.com.codeka.warworlds.OffsetY", star.getOffsetY());
                 intent.putExtra("au.com.codeka.warworlds.StarKey", star.getKey());
 
-                log.info(String.format("Double-tapped: %d %d - %d %d", 
-                        (int) star.getSectorX(), (int) star.getSectorY(),
-                        star.getOffsetX(), star.getOffsetY()));
-
                 setResult(RESULT_OK, intent);
                 finish();
             }
         });
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-        mTacticalMapView.onPause();
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        mTacticalMapView.onResume();
     }
 }
