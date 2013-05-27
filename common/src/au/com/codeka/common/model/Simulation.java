@@ -379,7 +379,8 @@ public class Simulation {
                 newPopulation = 0.0f;
             } else if (newPopulation > colony.getMaxPopulation()) {
                 newPopulation = colony.getMaxPopulation();
-            }else if (newPopulation < 100.0f && colony.isInCooldown()) {
+            }
+            if (newPopulation < 100.0f && colony.isInCooldown()) {
                 newPopulation = 100.0f;
             }
             colony.setPopulation(newPopulation);
