@@ -100,14 +100,11 @@ public abstract class BackgroundRunner<Result> {
         @SuppressWarnings("unchecked")
         Message message = mHandler.obtainMessage(0,
                 new BackgroundRunnerResult<Result>(this, result));
-        try {
-            message.sendToTarget();
-        } catch(Exception e) {
-            log.error("Error caught posting message to target thread.", e);
-            if (mCreatorStackTrace != null) {
-                log.warn("Original stack trace:\r\n"+mCreatorStackTrace);
-            }
+
+        if (mCreatorStackTrace != null) {
+            log.info("Posting message back to target from original stack trace:\r\n"+mCreatorStackTrace);
         }
+        message.sendToTarget();
         return result;
     }
 

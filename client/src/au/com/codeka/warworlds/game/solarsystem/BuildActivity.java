@@ -22,14 +22,10 @@ import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 import au.com.codeka.RomanNumeralFormatter;
-import au.com.codeka.TimeInHours;
 import au.com.codeka.common.model.BaseBuildRequest;
-import au.com.codeka.common.model.BaseBuilding;
 import au.com.codeka.common.model.BaseColony;
-import au.com.codeka.common.model.BuildingDesign;
 import au.com.codeka.common.model.Design;
 import au.com.codeka.common.model.DesignKind;
 import au.com.codeka.common.model.ShipDesign;
@@ -40,11 +36,10 @@ import au.com.codeka.warworlds.ServerGreeter.ServerGreeting;
 import au.com.codeka.warworlds.TabFragmentFragment;
 import au.com.codeka.warworlds.TabManager;
 import au.com.codeka.warworlds.ctrl.BuildQueueList;
+import au.com.codeka.warworlds.ctrl.BuildingsList;
 import au.com.codeka.warworlds.game.BuildAccelerateDialog;
 import au.com.codeka.warworlds.game.BuildStopConfirmDialog;
-import au.com.codeka.warworlds.model.BuildManager;
 import au.com.codeka.warworlds.model.BuildRequest;
-import au.com.codeka.warworlds.model.Building;
 import au.com.codeka.warworlds.model.Colony;
 import au.com.codeka.warworlds.model.DesignManager;
 import au.com.codeka.warworlds.model.EmpireManager;
@@ -109,6 +104,8 @@ public class BuildActivity extends BaseActivity implements StarManager.StarFetch
     @Override
     public void onStarFetched(Star s) {
         if (mStar == null || mStar.getKey().equals(s.getKey())) {
+            boolean dataSetChanged = (mStar == null);
+
             mStar = s;
             mColonies = new ArrayList<Colony>();
             MyEmpire myEmpire = EmpireManager.getInstance().getEmpire();
@@ -137,7 +134,9 @@ public class BuildActivity extends BaseActivity implements StarManager.StarFetch
                 mInitialColony = null;
             }
 
-            mColonyPagerAdapter.notifyDataSetChanged();
+            if (dataSetChanged) {
+                mColonyPagerAdapter.notifyDataSetChanged();
+            }
         }
     }
 
@@ -165,47 +164,7 @@ public class BuildActivity extends BaseActivity implements StarManager.StarFetch
         }
     }
 
-    private String getDependenciesList(Colony colony, Design design) {
-        return getDependenciesList(colony, design, 1);
-    }
-
-    /**
-     * Returns the dependencies of the given design a string for display to
-     * the user. Dependencies that we don't meet will be coloured red.
-     */
-    private String getDependenciesList(Colony colony, Design design, int level) {
-        String required = "Required: ";
-        List<Design.Dependency> dependencies;
-        if (level == 1 || design.getDesignKind() != DesignKind.BUILDING) {
-            dependencies = design.getDependencies();
-        } else {
-            BuildingDesign bd = (BuildingDesign) design;
-            BuildingDesign.Upgrade upgrade = bd.getUpgrades().get(level - 1);
-            dependencies = upgrade.getDependencies();
-        }
-
-        if (dependencies == null || dependencies.size() == 0) {
-            required += "none";
-        } else {
-            int n = 0;
-            for (Design.Dependency dep : dependencies) {
-                if (n > 0) {
-                    required += ", ";
-                }
-
-                boolean dependencyMet = dep.isMet(colony);
-                Design dependentDesign = DesignManager.i.getDesign(DesignKind.BUILDING, dep.getDesignID());
-                required += "<font color=\""+(dependencyMet ? "green" : "red")+"\">";
-                required += dependentDesign.getDisplayName();
-                required += "</font>";
-            }
-        }
-
-        return required;
-    }
-
-    public static class BuildFragment extends TabFragmentFragment
-                                      implements StarManager.StarFetchedHandler {
+    public static class BuildFragment extends TabFragmentFragment {
         @Override
         protected void createTabs() {
             BuildActivity activity = (BuildActivity) getActivity();
@@ -214,23 +173,6 @@ public class BuildActivity extends BaseActivity implements StarManager.StarFetch
             getTabManager().addTab(activity, new TabInfo(this, "Buildings", BuildingsFragment.class, args));
             getTabManager().addTab(activity, new TabInfo(this, "Ships", ShipsFragment.class, args));
             getTabManager().addTab(activity, new TabInfo(this, "Queue", QueueFragment.class, args));
-        }
-
-        @Override
-        public void onStarFetched(Star s) {
-            getTabManager().reloadTab();
-        }
-
-        @Override
-        public void onResume() {
-            super.onResume();
-            StarManager.getInstance().addStarUpdatedListener(null, this);
-        }
-
-        @Override
-        public void onPause() {
-            super.onPause();
-            StarManager.getInstance().removeStarUpdatedListener(this);
         }
     }
 
@@ -243,7 +185,7 @@ public class BuildActivity extends BaseActivity implements StarManager.StarFetch
         public Fragment getItem(int i) {
             Fragment fragment = new BuildFragment();
             Bundle args = new Bundle();
-            args.putParcelable("au.com.codeka.warworlds.Colony", mColonies.get(i));
+            args.putString("au.com.codeka.warworlds.ColonyKey", mColonies.get(i).getKey());
             fragment.setArguments(args);
             return fragment;
         }
@@ -270,39 +212,42 @@ public class BuildActivity extends BaseActivity implements StarManager.StarFetch
     }
 
     public static class BaseTabFragment extends Fragment {
-        private Colony mColony;
+        private String mColonyKey;
 
         protected Colony getColony() {
-            if (mColony == null) {
+            if (mColonyKey == null) {
                 Bundle args = getArguments();
-                mColony = (Colony) args.getParcelable("au.com.codeka.warworlds.Colony");
+                mColonyKey = args.getString("au.com.codeka.warworlds.ColonyKey");
             }
-            return mColony;
+            Star star = ((BuildActivity) getActivity()).mStar;
+            for (BaseColony baseColony : star.getColonies()) {
+                if (baseColony.getKey().equals(mColonyKey)) {
+                    return (Colony) baseColony;
+                }
+            }
+
+            return null;
         }
     }
 
     public static class BuildingsFragment extends BaseTabFragment {
-        private BuildingListAdapter mBuildingListAdapter;
+        private BuildingsList mBuildingsList;
 
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
             View v = inflater.inflate(R.layout.solarsystem_build_buildings_tab, container, false);
-
             final Star star = ((BuildActivity) getActivity()).mStar;
             final Colony colony = getColony();
 
-            mBuildingListAdapter = new BuildingListAdapter();
+            mBuildingsList = (BuildingsList) v.findViewById(R.id.building_list);
             if (colony != null) {
-                mBuildingListAdapter.setColony(star, colony);
+                mBuildingsList.setColony(star, colony);
             }
 
-            ListView buildingsList = (ListView) v.findViewById(R.id.building_list);
-            buildingsList.setAdapter(mBuildingListAdapter);
-
-            buildingsList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            mBuildingsList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                    Entry entry = (Entry) mBuildingListAdapter.getItem(position);
+                    BuildingsList.Entry entry = mBuildingsList.getItem(position);
                     int buildQueueSize = 0;
                     BuildActivity activity = (BuildActivity) getActivity();
                     for (BaseBuildRequest br : activity.mStar.getBuildRequests()) {
@@ -324,273 +269,6 @@ public class BuildActivity extends BaseActivity implements StarManager.StarFetch
             });
 
             return v;
-        }
-
-        /**
-         * This adapter is used to populate a list of buildings in a list view.
-         */
-        private class BuildingListAdapter extends BaseAdapter {
-            private ArrayList<Entry> mEntries;
-
-            private static final int HEADING_TYPE = 0;
-            private static final int EXISTING_BUILDING_TYPE = 1;
-            private static final int NEW_BUILDING_TYPE = 2;
-
-            public void setColony(Star star, Colony colony) {
-                List<BaseBuilding> buildings = colony.getBuildings();
-                if (buildings == null) {
-                    buildings = new ArrayList<BaseBuilding>();
-                }
-
-                mEntries = new ArrayList<Entry>();
-                for (BaseBuilding b : buildings) {
-                    Entry entry = new Entry();
-                    entry.building = (Building) b;
-                    if (star.getBuildRequests() != null) {
-                        // if the building is being upgraded (i.e. if there's a build request that
-                        // references this building) then add the build request as well
-                        for (BaseBuildRequest br : star.getBuildRequests()) {
-                            if (br.getExistingBuildingKey() != null && br.getExistingBuildingKey().equals(b.getKey())) {
-                                entry.buildRequest = (BuildRequest) br;
-                            }
-                        }
-                    }
-                    mEntries.add(entry);
-                }
-
-                for (BaseBuildRequest br : star.getBuildRequests()) {
-                    if (br.getColonyKey().equals(colony.getKey()) &&
-                        br.getDesignKind().equals(DesignKind.BUILDING) &&
-                        br.getExistingBuildingKey() == null) {
-                        Entry entry = new Entry();
-                        entry.buildRequest = (BuildRequest) br;
-                        mEntries.add(entry);
-                    }
-                }
-
-                Collections.sort(mEntries, new Comparator<Entry>() {
-                    @Override
-                    public int compare(Entry lhs, Entry rhs) {
-                        String a = (lhs.building != null ? lhs.building.getDesignID() : lhs.buildRequest.getDesignID());
-                        String b = (rhs.building != null ? rhs.building.getDesignID() : rhs.buildRequest.getDesignID());
-                        return a.compareTo(b);
-                    }
-                });
-
-                Entry title = new Entry();
-                title.title = "Existing Buildings";
-                mEntries.add(0, title);
-
-                title = new Entry();
-                title.title = "Available Buildings";
-                mEntries.add(title);
-
-                for (Design d : DesignManager.i.getDesigns(DesignKind.BUILDING).values()) {
-                    BuildingDesign bd = (BuildingDesign) d;
-                    if (bd.getMaxPerColony() > 0) {
-                        int numExisting = 0;
-                        for (Entry e : mEntries) {
-                            if (e.building != null) {
-                                if (e.building.getDesignID().equals(bd.getID())) {
-                                    numExisting ++;
-                                }
-                            } else if (e.buildRequest != null) {
-                                if (e.buildRequest.getDesignID().equals(bd.getID())) {
-                                    numExisting ++;
-                                }
-                            }
-                        }
-                        if (numExisting >= bd.getMaxPerColony()) {
-                            continue;
-                        }
-                    }
-                    if (bd.getMaxPerEmpire() > 0) {
-                        int numExisting = BuildManager.getInstance().getTotalBuildingsInEmpire(bd.getID());
-                        for (BuildRequest br : BuildManager.getInstance().getBuildRequests()) {
-                            if (br.getDesignID().equals(bd.getID())) {
-                                numExisting ++;
-                            }
-                        }
-                        if (numExisting >= bd.getMaxPerEmpire()) {
-                            continue;
-                        }
-                    }
-                    Entry entry = new Entry();
-                    entry.design = bd;
-                    mEntries.add(entry);
-                }
-
-                notifyDataSetChanged();
-            }
-
-            /**
-             * We have three types of items, the "headings", the list of existing buildings
-             * and the list of building designs.
-             */
-            @Override
-            public int getViewTypeCount() {
-                return 3;
-            }
-
-            @Override
-            public int getItemViewType(int position) {
-                if (mEntries == null)
-                    return 0;
-
-                if (mEntries.get(position).title != null)
-                    return HEADING_TYPE;
-                if (mEntries.get(position).design != null)
-                    return NEW_BUILDING_TYPE;
-                return EXISTING_BUILDING_TYPE;
-            }
-
-            @Override
-            public boolean isEnabled(int position) {
-                if (getItemViewType(position) == HEADING_TYPE) {
-                    return false;
-                }
-
-                // also, if it's an existing building that's at the max level it can't be
-                // upgraded any more, so also disabled.
-                Entry entry = mEntries.get(position);
-                if (entry.building != null) {
-                    int maxUpgrades = entry.building.getDesign().getUpgrades().size();
-                    if (entry.building.getLevel() > maxUpgrades) {
-                        return false;
-                    }
-                }
-
-                return true;
-            }
-
-            @Override
-            public int getCount() {
-                if (mEntries == null)
-                    return 0;
-
-                return mEntries.size();
-            }
-
-            @Override
-            public Object getItem(int position) {
-                if (mEntries == null)
-                    return null;
-
-                return mEntries.get(position);
-            }
-
-            @Override
-            public long getItemId(int position) {
-                return position;
-            }
-
-            @Override
-            public View getView(int position, View convertView, ViewGroup parent) {
-                View view = convertView;
-                if (view == null) {
-                    LayoutInflater inflater = (LayoutInflater) getActivity().getSystemService
-                            (Context.LAYOUT_INFLATER_SERVICE);
-
-                    int viewType = getItemViewType(position);
-                    if (viewType == HEADING_TYPE) {
-                        view = new TextView(getActivity());
-                    } else {
-                        view = inflater.inflate(R.layout.solarsystem_buildings_design, parent, false);
-                    }
-                }
-
-                Entry entry = mEntries.get(position);
-                if (entry.title != null) {
-                    TextView tv = (TextView) view;
-                    tv.setText(entry.title);
-                } else if (entry.building != null || entry.buildRequest != null) {
-                    // existing building/upgrading building
-                    ImageView icon = (ImageView) view.findViewById(R.id.building_icon);
-                    TextView row1 = (TextView) view.findViewById(R.id.building_row1);
-                    TextView row2 = (TextView) view.findViewById(R.id.building_row2);
-                    TextView row3 = (TextView) view.findViewById(R.id.building_row3);
-                    TextView level = (TextView) view.findViewById(R.id.building_level);
-                    TextView levelLabel = (TextView) view.findViewById(R.id.building_level_label);
-                    ProgressBar progress = (ProgressBar) view.findViewById(R.id.building_progress);
-
-                    Building building = entry.building;
-                    BuildRequest buildRequest = entry.buildRequest;
-                    BuildingDesign design = (BuildingDesign) DesignManager.i.getDesign(DesignKind.BUILDING,
-                            (building != null ? building.getDesignID() : buildRequest.getDesignID()));
-
-                    icon.setImageDrawable(new SpriteDrawable(SpriteManager.i.getSprite(design.getSpriteName())));
-
-                    int numUpgrades = design.getUpgrades().size();
-
-                    if (numUpgrades == 0 || building == null) {
-                        level.setVisibility(View.GONE);
-                        levelLabel.setVisibility(View.GONE);
-                    } else {
-                        level.setText(Integer.toString(building.getLevel()));
-                        level.setVisibility(View.VISIBLE);
-                        levelLabel.setVisibility(View.VISIBLE);
-                    }
-
-                    row1.setText(design.getDisplayName());
-                    if (buildRequest != null) {
-                        String verb = (building == null ? "Building" : "Upgrading");
-                        row2.setText(Html.fromHtml(String.format(Locale.ENGLISH,
-                                "<font color=\"#0c6476\">%s:</font> %d %%, %s left",
-                                verb, (int) buildRequest.getPercentComplete(),
-                                 TimeInHours.format(buildRequest.getRemainingTime()))));
-
-                        row3.setVisibility(View.GONE);
-                        progress.setVisibility(View.VISIBLE);
-                        progress.setProgress((int) buildRequest.getPercentComplete());
-                    } else {
-                        if (numUpgrades < building.getLevel()) {
-                            row2.setText("No more upgrades");
-                            row3.setVisibility(View.GONE);
-                            progress.setVisibility(View.GONE);
-                        } else {
-                            progress.setVisibility(View.GONE);
-                            row2.setText(String.format(Locale.ENGLISH,
-                                    "Upgrade: %.2f hours",
-                                    (float) design.getBuildCost().getTimeInSeconds() / 3600.0f));
-
-                            String required = ((BuildActivity) getActivity()).getDependenciesList(
-                                    getColony(), design, building.getLevel());
-                            row3.setVisibility(View.VISIBLE);
-                            row3.setText(Html.fromHtml(required));
-                        }
-                    }
-                } else {
-                    // new building
-                    ImageView icon = (ImageView) view.findViewById(R.id.building_icon);
-                    TextView row1 = (TextView) view.findViewById(R.id.building_row1);
-                    TextView row2 = (TextView) view.findViewById(R.id.building_row2);
-                    TextView row3 = (TextView) view.findViewById(R.id.building_row3);
-
-                    view.findViewById(R.id.building_progress).setVisibility(View.GONE);
-                    view.findViewById(R.id.building_level).setVisibility(View.GONE);
-                    view.findViewById(R.id.building_level_label).setVisibility(View.GONE);
-
-                    BuildingDesign design = mEntries.get(position).design;
-
-                    icon.setImageDrawable(new SpriteDrawable(SpriteManager.i.getSprite(design.getSpriteName())));
-
-                    row1.setText(design.getDisplayName());
-                    row2.setText(String.format("%.2f hours",
-                            (float) design.getBuildCost().getTimeInSeconds() / 3600.0f));
-
-                    String required = ((BuildActivity) getActivity()).getDependenciesList(getColony(), design);
-                    row3.setText(required);
-                }
-
-                return view;
-            }
-        }
-
-        private static class Entry {
-            public String title;
-            public BuildRequest buildRequest;
-            public Building building;
-            public BuildingDesign design;
         }
     }
 
@@ -689,7 +367,7 @@ public class BuildActivity extends BaseActivity implements StarManager.StarFetch
                 row2.setText(String.format("%.2f hours",
                         (float) design.getBuildCost().getTimeInSeconds() / 3600.0f));
 
-                String required = ((BuildActivity) getActivity()).getDependenciesList(getColony(), design);
+                String required = design.getDependenciesList(getColony());
                 row3.setText(Html.fromHtml(required));
 
                 return view;

@@ -18,6 +18,7 @@ import org.slf4j.LoggerFactory;
 import android.content.Context;
 import android.content.ContextWrapper;
 import android.os.Handler;
+import android.view.View;
 import au.com.codeka.BackgroundRunner;
 import au.com.codeka.common.model.Simulation;
 import au.com.codeka.common.protobuf.Messages;
@@ -90,13 +91,13 @@ public class StarManager {
         synchronized(mStarUpdatedListeners) {
             List<StarFetchedHandler> listeners = mStarUpdatedListeners.get(star.getKey());
             if (listeners != null) {
-                for (StarFetchedHandler handler : listeners) {
+                for (StarFetchedHandler handler : new ArrayList<StarFetchedHandler>(listeners)) {
                     fireHandler(handler, star);
                 }
             }
 
             // also anybody who's interested in ALL stars
-            for (StarFetchedHandler handler : mAllStarUpdatedListeners) {
+            for (StarFetchedHandler handler : new ArrayList<StarFetchedHandler>(mAllStarUpdatedListeners)) {
                 fireHandler(handler, star);
             }
         }
@@ -111,6 +112,14 @@ public class StarManager {
             if (handler instanceof ContextWrapper) {
                 ContextWrapper ctx = (ContextWrapper) handler;
                 new Handler(ctx.getMainLooper()).post(new Runnable() {
+                    @Override
+                    public void run() {
+                        handler.onStarFetched(star);
+                    }
+                });
+            } else if (handler instanceof View) {
+                View view = (View) handler;
+                new Handler(view.getContext().getMainLooper()).post(new Runnable() {
                     @Override
                     public void run() {
                         handler.onStarFetched(star);
@@ -147,6 +156,18 @@ public class StarManager {
         });
 
         return true;
+    }
+
+    public Star refreshStarSync(Context context, String starKey, boolean onlyIfCached) {
+        if (onlyIfCached && !mStars.containsKey(starKey)) {
+            return null;
+        }
+
+        Star star = requestStarSync(context, starKey, true);
+        // When a star is explicitly refreshed, it's usually because it's changed somehow.
+        // Generally that also means the sector has changed.
+        SectorManager.getInstance().refreshSector(star.getSectorX(), star.getSectorY());
+        return star;
     }
 
     public void requestStarSummary(final Context context, final String starKey,
@@ -263,7 +284,7 @@ public class StarManager {
      * Requests the details of a star from the server, and calls the given callback when it's
      * received. The callback is called on the main thread.
      */
-    public void requestStar(final Context context, final String starKey, boolean force,
+    public void requestStar(final Context context, final String starKey, final boolean force,
                             final StarFetchedHandler callback) {
         Star s = mStars.get(starKey);
         if (s != null && !force) {
@@ -274,19 +295,7 @@ public class StarManager {
         new BackgroundRunner<Star>() {
             @Override
             protected Star doInBackground() {
-                Star star = doFetchStar(context, starKey);
-                if (star != null) {
-                    log.debug(String.format("STAR[%s] has %d fleets.", star.getKey(),
-                              star.getFleets() == null ? 0 : star.getFleets().size()));
-                }
-
-                if (star != null && !RealmManager.i.getRealm().isAlpha()) {
-                    // the alpha realm will have already simulated the star, but other realms
-                    // will need to simulate first.
-                    Simulation sim = new Simulation();
-                    sim.simulate(star);
-                }
-                return star;
+                return requestStarSync(context, starKey, force);
             }
 
             @Override
@@ -305,6 +314,27 @@ public class StarManager {
                 fireStarUpdated(star);
             }
         }.execute();
+    }
+
+    public Star requestStarSync(final Context context, final String starKey, boolean force) {
+        Star s = mStars.get(starKey);
+        if (s != null && !force) {
+            return s;
+        }
+
+        Star star = doFetchStar(context, starKey);
+        if (star != null) {
+            log.debug(String.format("STAR[%s] has %d fleets.", star.getKey(),
+                      star.getFleets() == null ? 0 : star.getFleets().size()));
+        }
+
+        if (star != null && !RealmManager.i.getRealm().isAlpha()) {
+            // the alpha realm will have already simulated the star, but other realms
+            // will need to simulate first.
+            Simulation sim = new Simulation();
+            sim.simulate(star);
+        }
+        return star;
     }
 
     public void renameStar(final Context context, final Purchase purchase,

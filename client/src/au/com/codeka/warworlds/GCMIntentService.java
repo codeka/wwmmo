@@ -126,19 +126,20 @@ public class GCMIntentService extends GCMBaseIntentService {
 
                 // refresh the star this situation report is for, obviously
                 // something happened that we'll want to know about
-                if (!StarManager.getInstance().refreshStar(
+                Star star = StarManager.getInstance().refreshStarSync(
                             context,
                             pb.getStarKey(),
-                            true)) { // <-- only refresh the star if we have one cached
+                            true);
+                if (star == null) { // <-- only refresh the star if we have one cached
                     // if we didn't refresh the star, then at least refresh
                     // the sector it was in (could have been a moving
                     // fleet, say)
-                    Star star = SectorManager.getInstance().findStar(pb.getStarKey());
+                    star = SectorManager.getInstance().findStar(pb.getStarKey());
                     if (star != null) {
                         SectorManager.getInstance().refreshSector(star.getSectorX(), star.getSectorY());
                     }
-                    // refresh the empire as well, since stuff has happened...
-                    EmpireManager.getInstance().refreshEmpire(this);
+                } else {
+                    StarManager.getInstance().fireStarUpdated(star);
                 }
 
                 // notify the build manager, in case it's a 'build complete' or something

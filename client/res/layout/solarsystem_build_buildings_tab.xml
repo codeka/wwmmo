@@ -9,12 +9,11 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true" />
 
-    <ListView
+    <au.com.codeka.warworlds.ctrl.BuildingsList
         android:id="@+id/building_list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_alignParentTop="true"
-        android:layout_above="@+id/infobar"
-        android:listSelector="@drawable/list_selector" />
+        android:layout_above="@+id/infobar" />
 
 </RelativeLayout>

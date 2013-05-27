@@ -81,16 +81,5 @@ public class ColoniesHandler extends RequestHandler {
         } catch(Exception e) {
             throw new RequestException(e);
         }
-
-        
-/*
-    # TODO: make sure they're actually allow to do this, have a free colonization
-    # ship (or require that the pass in the colonization ship), etc etc etc
-    empire_pb = empire.getEmpireForUser(self.user)
-    colony_pb = empire.colonize(empire_pb, star_key, self._getRequestBody(pb.ColonizeRequest))
-    if colony_pb is None:
-      self.response.set_status(400)
-    return colony_pb
-*/
     }
 }

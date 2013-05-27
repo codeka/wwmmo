@@ -77,6 +77,45 @@ public class Design {
         return false;
     }
 
+    public String getDependenciesList(BaseColony colony) {
+        return getDependenciesList(colony, 1);
+    }
+
+    /**
+     * Returns the dependencies of the given design a string for display to
+     * the user. Dependencies that we don't meet will be coloured red.
+     */
+    public String getDependenciesList(BaseColony colony, int level) {
+        String required = "Required: ";
+        List<Design.Dependency> dependencies;
+        if (level == 1 || mDesignKind != DesignKind.BUILDING) {
+            dependencies = getDependencies();
+        } else {
+            BuildingDesign bd = (BuildingDesign) this;
+            BuildingDesign.Upgrade upgrade = bd.getUpgrades().get(level - 1);
+            dependencies = upgrade.getDependencies();
+        }
+
+        if (dependencies == null || dependencies.size() == 0) {
+            required += "none";
+        } else {
+            int n = 0;
+            for (Design.Dependency dep : dependencies) {
+                if (n > 0) {
+                    required += ", ";
+                }
+
+                boolean dependencyMet = dep.isMet(colony);
+                Design dependentDesign = BaseDesignManager.i.getDesign(DesignKind.BUILDING, dep.getDesignID());
+                required += "<font color=\""+(dependencyMet ? "green" : "red")+"\">";
+                required += dependentDesign.getDisplayName();
+                required += "</font>";
+            }
+        }
+
+        return required;
+    }
+
     public abstract static class Factory {
         protected Element mDesignElement;
 
