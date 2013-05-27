@@ -200,23 +200,42 @@ public class BaseCombatReport {
 
     public static class FleetSummary {
         private List<String> mFleetKeys;
+        private List<BaseFleet> mFleets;
         private String mEmpireKey;
         private String mDesignID;
         private float mNumShips;
         private int mIndex;
 
         public FleetSummary() {
+            mFleetKeys = new ArrayList<String>();
+            mFleets = new ArrayList<BaseFleet>();
         }
         public FleetSummary(BaseFleet fleet) {
-            mFleetKeys = new ArrayList<String>();
+            this();
             mFleetKeys.add(fleet.getKey());
             mEmpireKey = fleet.getEmpireKey();
             mDesignID = fleet.getDesignID();
             mNumShips = fleet.getNumShips();
+            mFleets.add(fleet);
         }
 
         public List<String> getFleetKeys() {
             return mFleetKeys;
+        }
+        public List<BaseFleet> getFleets() {
+            return mFleets;
+        }
+        public BaseFleet.Stance getFleetStance() {
+            if (mFleets.size() <= 0) {
+                return BaseFleet.Stance.PASSIVE;
+            }
+            return mFleets.get(0).getStance();
+        }
+        public BaseFleet.State getFleetState() {
+            if (mFleets.size() <= 0) {
+                return BaseFleet.State.IDLE;
+            }
+            return mFleets.get(0).getState();
         }
         public String getEmpireKey() {
             return mEmpireKey;
@@ -229,6 +248,7 @@ public class BaseCombatReport {
         }
         public void addShips(FleetSummary otherFleet) {
             mFleetKeys.addAll(otherFleet.getFleetKeys());
+            mFleets.addAll(otherFleet.getFleets());
             mNumShips += otherFleet.getNumShips();
         }
         public void removeShips(float numShips) {

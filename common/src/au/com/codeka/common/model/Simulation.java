@@ -499,18 +499,6 @@ public class Simulation {
 
             BaseCombatReport.FleetSummary fleetSummary = new BaseCombatReport.FleetSummary(fleet);
             round.getFleets().add(fleetSummary);
-
-            if (fleet.getState() != BaseFleet.State.ATTACKING) {
-                continue;
-            }
-/*
-            // if its stateStartTime is less than now, but more than a minute ago then it's just
-            // joined the fray this round.
-            if (fleet.getStateStartTime().isBefore(now) && fleet.getStateStartTime().isAfter(now.minusMinutes(1))) {
-                round.getFleetJoinedRecords().add(new BaseCombatReport.FleetJoinedRecord(
-                        round.getFleets(), fleetIndex));
-            }
-*/
         }
 
         // now we go through the fleet summaries and join them together
@@ -525,8 +513,14 @@ public class Simulation {
                 if (!fs1.getDesignID().equals(fs2.getDesignID())) {
                     continue;
                 }
+                if (fs1.getFleetStance() != fs2.getFleetStance()) {
+                    continue;
+                }
+                if (fs1.getFleetState() != fs2.getFleetState()) {
+                    continue;
+                }
 
-                // same empire, same design -- join 'em!
+                // same empire, same design, same stance/state -- join 'em!
                 fs1.addShips(fs2);
                 round.getFleets().remove(j);
                 j--;
@@ -541,6 +535,10 @@ public class Simulation {
         // each fleet targets and fires at once
         TreeMap<Integer, Double> hits = new TreeMap<Integer, Double>();
         for (BaseCombatReport.FleetSummary fleet : round.getFleets()) {
+            if (fleet.getFleetState() != BaseFleet.State.ATTACKING) {
+                continue;
+            }
+
             BaseCombatReport.FleetSummary target = findTarget(round, fleet);
             if (target == null) {
                 // if there's no more available targets, then we're no longer attacking
@@ -566,18 +564,24 @@ public class Simulation {
             BaseCombatReport.FleetAttackRecord attackRecord = new BaseCombatReport.FleetAttackRecord(
                     round.getFleets(), fleet.getIndex(), target.getIndex(), damage);
             round.getFleetAttackRecords().add(attackRecord);
+        }
 
-            for (String fleetKey : target.getFleetKeys()) {
-                BaseFleet targetFleet = star.findFleet(fleetKey);
-                BaseFleet attackingFleet = star.findFleet(fleet.getFleetKeys().get(0));
+        // any fleets that were attacked this round will want to change to attacking for the next
+        // round, if they're not attacking already...
+        for (BaseCombatReport.FleetSummary fleet : round.getFleets()) {
+            if (!hits.keySet().contains(fleet.getIndex())) {
+                continue;
+            }
+            for (BaseFleet targetFleet : fleet.getFleets()) {
                 if (targetFleet.getState() == BaseFleet.State.IDLE) {
-                    ShipDesign targetDesign = (ShipDesign) BaseDesignManager.i.getDesign(DesignKind.SHIP, target.getDesignID());
+                    ShipDesign targetDesign = (ShipDesign) BaseDesignManager.i.getDesign(DesignKind.SHIP, fleet.getDesignID());
                     ArrayList<ShipEffect> effects = targetDesign.getEffects(ShipEffect.class);
                     for (ShipEffect effect : effects) {
-                        effect.onAttacked(star, targetFleet, attackingFleet);
+                        effect.onAttacked(star, targetFleet);
                     }
                 }
             }
+
         }
 
         // next, apply the damage from this round

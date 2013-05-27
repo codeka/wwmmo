@@ -28,7 +28,7 @@ public abstract class BackgroundRunner<Result> {
     private static Logger log = LoggerFactory.getLogger(BackgroundRunner.class);
     private String mCreatorStackTrace;
 
-    private static boolean sThreadDebug = true;
+    private static boolean sThreadDebug = false;
 
     private static final ThreadFactory sThreadFactory = new ThreadFactory() {
         private final AtomicInteger mCount = new AtomicInteger(1);

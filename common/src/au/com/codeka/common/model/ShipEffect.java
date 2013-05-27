@@ -24,6 +24,6 @@ public class ShipEffect extends Design.Effect {
     /**
      * This is called if we're idle and someone attacks us.
      */
-    public void onAttacked(BaseStar star, BaseFleet fleet, BaseFleet otherFleet) {
+    public void onAttacked(BaseStar star, BaseFleet fleet) {
     }
 }

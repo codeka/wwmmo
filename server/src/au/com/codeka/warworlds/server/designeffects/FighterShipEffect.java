@@ -25,6 +25,10 @@ public class FighterShipEffect extends ShipEffect {
      */
     @Override
     public void onArrived(BaseStar star, BaseFleet fleet) {
+        if (fleet.getStance() != Fleet.Stance.AGGRESSIVE) {
+            return;
+        }
+
         for (BaseFleet existingBaseFleet : star.getFleets()) {
             Fleet existingFleet = (Fleet) existingBaseFleet;
             if (existingFleet.getID() == ((Fleet) fleet).getID()) {
@@ -59,6 +63,9 @@ public class FighterShipEffect extends ShipEffect {
         if (fleet.getState() != Fleet.State.IDLE) {
             return;
         }
+        if (fleet.getStance() != Fleet.Stance.AGGRESSIVE) {
+            return;
+        }
 
         // if the other fleet is the same empire, that's fine
         if (((Fleet) fleet).getEmpireID() == ((Fleet) otherFleet).getEmpireID()) {
@@ -76,11 +83,11 @@ public class FighterShipEffect extends ShipEffect {
         ((Fleet) fleet).attack(DateTime.now());
     }
 
-
     /**
      * This is called if we're idle and someone attacks us.
      */
-    public void onAttacked(BaseStar star, BaseFleet fleet, BaseFleet otherFleet) {
+    @Override
+    public void onAttacked(BaseStar star, BaseFleet fleet) {
         log.info(String.format("Fleet #%s has been attacked, switching to attack mode.", fleet.getKey()));
         ((Fleet) fleet).attack(DateTime.now());
     }

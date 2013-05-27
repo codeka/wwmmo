@@ -16,6 +16,9 @@
     <cost minerals="1000" time="4.0" />
     <fuel costPerParsec="35" />
     <stats speed="1" baseAttack="1" baseDefence="1" combatPriority="100" />
+    <effects>
+      <effect kind="fighter" />
+    </effects>
   </design>
   <design id="scout">
     <name>Scout</name>
@@ -69,6 +72,7 @@
     <stats speed="10" baseAttack="1" baseDefence="1" combatPriority="50"  />
     <effects>
       <effect kind="troopcarrier" />
+      <effect kind="fighter" />
     </effects>
   </design>
 </designs>
