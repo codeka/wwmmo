@@ -19,6 +19,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import au.com.codeka.RomanNumeralFormatter;
 import au.com.codeka.common.Vector2;
+import au.com.codeka.common.model.BaseBuildRequest;
 import au.com.codeka.common.model.BaseColony;
 import au.com.codeka.common.model.BaseEmpirePresence;
 import au.com.codeka.common.model.BasePlanet;
@@ -480,7 +481,18 @@ public class SolarSystemActivity extends BaseActivity implements StarManager.Sta
         constructionFocus.setProgress((int)(100.0f * mColony.getConstructionFocus()));
         TextView constructionValue = (TextView) findViewById(
                 R.id.solarsystem_colony_construction_value);
-        constructionValue.setText("todo");
+
+        int numBuildRequests = 0;
+        for (BaseBuildRequest buildRequest : mStar.getBuildRequests()) {
+            if (buildRequest.getColonyKey().equals(mColony.getKey())) {
+                numBuildRequests ++;
+            }
+        }
+        if (numBuildRequests == 0) {
+            constructionValue.setText(String.format("idle"));
+        } else {
+            constructionValue.setText(String.format("Q: %d", numBuildRequests));
+        }
     }
 
     private void refreshEnemyColonyDetails(Empire empire) {

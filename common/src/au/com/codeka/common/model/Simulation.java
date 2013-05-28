@@ -9,6 +9,7 @@ import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.Duration;
 import org.joda.time.Interval;
+import org.joda.time.Seconds;
 
 /**
  * This class is used to simulate a \c Star. It need to have the same logic as ctrl/simulation.py
@@ -261,6 +262,11 @@ public class Simulation {
                     workersPerBuildRequest = 1.0f;
                 }
 
+                // divide the minerals up per build request, so they each get a share. I'm not sure
+                // if we should portion minerals out by how 'big' the build request is, but we'll
+                // see how this goes initially
+                float mineralsPerBuildRequest = totalMinerals / numValidBuildRequests;
+
                 for (BaseBuildRequest br : buildRequests) {
                     Design design = BaseDesignManager.i.getDesign(br.getDesignKind(), br.getDesignID());
                     log(String.format("---- Building [design=%s %s] [count=%d]",
@@ -302,28 +308,34 @@ public class Simulation {
                         }
                         continue;
                     }
-                    log(String.format("     Progress %.2f%% + %.2f%% (this turn)",
-                            br.getProgress(false), progressThisTurn));
 
                     // work out how many minerals we require for this turn
                     float mineralsRequired = br.getCount() * design.getBuildCost().getCostInMinerals() * progressThisTurn;
-                    if (mineralsRequired > totalMinerals) {
-                        // not enough minerals, no progress will be made this turn
+                    if (mineralsRequired > mineralsPerBuildRequest) {
+                        // if we don't have enough minerals, we'll just do a percentage of the work
+                        // this turn
+                        totalMinerals -= mineralsPerBuildRequest;
+                        float percentMineralsAvailable = mineralsPerBuildRequest / mineralsRequired;
+                        br.setProgress(br.getProgress(false) + (progressThisTurn * percentMineralsAvailable));
+                        log(String.format("     Progress %.4f%% + %.4f%% (this turn, adjusted - %.4f%% originally) ",
+                            br.getProgress(false), progressThisTurn * percentMineralsAvailable, progressThisTurn));
                     } else {
                         // awesome, we have enough minerals so we can make some progress. We'll start by
                         // removing the minerals we need from the global pool...
                         totalMinerals -= mineralsRequired;
                         br.setProgress(br.getProgress(false) + progressThisTurn);
-                        mineralsDeltaPerHour -= mineralsRequired / dtInHours;
+                        log(String.format("     Progress %.4f%% + %.4f%% (this turn)",
+                            br.getProgress(false), progressThisTurn));
                     }
-                    log(String.format("     Minerals [required=%.2f] [available=%.2f]",
-                            mineralsRequired, totalMinerals));
+                    mineralsDeltaPerHour -= mineralsRequired / dtInHours;
+                    log(String.format("     Minerals [required=%.2f] [available=%.2f] [available per build=%.2f]",
+                            mineralsRequired, totalMinerals, mineralsPerBuildRequest));
 
                     // adjust the end_time for this turn
                     timeRemainingInHours = (1.0f - br.getProgress(false)) * totalBuildTimeInHours;
                     DateTime endTime = now.plus((long)(dtUsed * 1000 * 3600) + (long)(timeRemainingInHours * 1000 * 3600));
                     br.setEndTime(endTime);
-                    log(String.format("     End Time: %s", endTime));
+                    log(String.format("     End Time: %s (%.2f hrs)", endTime, Seconds.secondsBetween(now, endTime).getSeconds() / 3600.0f));
 
                     if (br.getProgress(false) >= 1.0f) {
                         // if we've finished this turn, just set progress
