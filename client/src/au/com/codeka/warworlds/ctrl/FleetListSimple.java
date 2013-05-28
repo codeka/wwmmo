@@ -11,10 +11,8 @@ import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.BaseAdapter;
 import android.widget.ImageView;
-import android.widget.ListView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import au.com.codeka.common.model.BaseFleet;
 import au.com.codeka.common.model.Design;
@@ -26,11 +24,12 @@ import au.com.codeka.warworlds.model.SpriteDrawable;
 import au.com.codeka.warworlds.model.SpriteManager;
 import au.com.codeka.warworlds.model.Star;
 
-public class FleetListSimple extends ListView {
+public class FleetListSimple extends LinearLayout {
     private Context mContext;
     private Star mStar;
-    private FleetListAdapter mFleetListAdapter;
+    private List<Fleet> mFleets;
     private FleetSelectedHandler mFleetSelectedHandler;
+    private View.OnClickListener mOnClickListener;
 
     public FleetListSimple(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -57,93 +56,55 @@ public class FleetListSimple extends ListView {
     }
 
     private void refresh() {
-        if (mFleetListAdapter == null) {
-            mFleetListAdapter = new FleetListAdapter();
-            setAdapter(mFleetListAdapter);
-
-            setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        if (mOnClickListener == null) {
+            mOnClickListener = new View.OnClickListener() {
                 @Override
-                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                    Fleet fleet = (Fleet) mFleetListAdapter.getItem(position);
+                public void onClick(View v) {
+                    Fleet fleet = (Fleet) v.getTag();
                     if (mFleetSelectedHandler != null) {
                         mFleetSelectedHandler.onFleetSelected(fleet);
                     }
                 }
-            });
+            };
         }
 
-        mFleetListAdapter.setStar(mStar);
-    }
-
-
-    class FleetListAdapter extends BaseAdapter {
-        private Star mStar;
-        private List<Fleet> mFleets;
-
-        public void setStar(Star star) {
-            mStar = star;
-            mFleets = new ArrayList<Fleet>();
-
-            if (star.getFleets() != null) {
-                for (BaseFleet f : star.getFleets()) {
-                    if (!f.getState().equals(Fleet.State.MOVING)) {
-                        mFleets.add((Fleet) f);
-                    }
+        mFleets = new ArrayList<Fleet>();
+        if (mStar.getFleets() != null) {
+            for (BaseFleet f : mStar.getFleets()) {
+                if (!f.getState().equals(Fleet.State.MOVING)) {
+                    mFleets.add((Fleet) f);
                 }
             }
-
-            notifyDataSetChanged();
         }
 
-        @Override
-        public int getCount() {
-            if (mStar == null) {
-                return 0;
-            }
-
-            return mFleets.size();
+        removeAllViews();
+        LayoutInflater inflater = (LayoutInflater) mContext.getSystemService
+                (Context.LAYOUT_INFLATER_SERVICE);
+        for (Fleet fleet : mFleets) {
+            View rowView = getRowView(inflater, fleet);
+            addView(rowView);
         }
+    }
 
-        @Override
-        public Object getItem(int position) {
-            return mFleets.get(position);
-        }
+    private View getRowView(LayoutInflater inflater, Fleet fleet) {
+        View view = (ViewGroup) inflater.inflate(R.layout.starfield_planet, null);
 
-        @Override
-        public long getItemId(int position) {
-            return position;
-        }
+        final ImageView icon = (ImageView) view.findViewById(R.id.starfield_planet_icon);
+        Design design = DesignManager.i.getDesign(DesignKind.SHIP, fleet.getDesignID());
 
-        @Override
-        public int getViewTypeCount() {
-            return 1;
-        }
+        icon.setImageDrawable(new SpriteDrawable(SpriteManager.i.getSprite(design.getSpriteName())));
 
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            View view = convertView;
-            if (view == null) {
-                LayoutInflater inflater = (LayoutInflater)mContext.getSystemService
-                        (Context.LAYOUT_INFLATER_SERVICE);
-                view = (ViewGroup) inflater.inflate(R.layout.starfield_planet, null);
-            }
+        TextView shipKindTextView = (TextView) view.findViewById(R.id.starfield_planet_type);
+        shipKindTextView.setText(String.format("%d × %s",
+                (int) Math.ceil(fleet.getNumShips()), design.getDisplayName(fleet.getNumShips() > 1)));
 
-            final ImageView icon = (ImageView) view.findViewById(R.id.starfield_planet_icon);
-            final Fleet fleet = mFleets.get(position);
-            Design design = DesignManager.i.getDesign(DesignKind.SHIP, fleet.getDesignID());
+        final TextView shipCountTextView = (TextView) view.findViewById(R.id.starfield_planet_colony);
+        shipCountTextView.setText(String.format("%s",
+                StringUtils.capitalize(fleet.getStance().toString().toLowerCase(Locale.ENGLISH))));
 
-            icon.setImageDrawable(new SpriteDrawable(SpriteManager.i.getSprite(design.getSpriteName())));
-
-            TextView shipKindTextView = (TextView) view.findViewById(R.id.starfield_planet_type);
-            shipKindTextView.setText(String.format("%d × %s",
-                    (int) Math.ceil(fleet.getNumShips()), design.getDisplayName(fleet.getNumShips() > 1)));
-
-            final TextView shipCountTextView = (TextView) view.findViewById(R.id.starfield_planet_colony);
-            shipCountTextView.setText(String.format("%s",
-                    StringUtils.capitalize(fleet.getStance().toString().toLowerCase(Locale.ENGLISH))));
-
-            return view;
-        }
+        view.setOnClickListener(mOnClickListener);
+        view.setTag(fleet);
+        return view;
     }
 
     public interface FleetSelectedHandler {

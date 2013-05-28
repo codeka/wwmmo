@@ -121,7 +121,7 @@
             android:layout_height="wrap_content"
             android:layout_below="@id/sitrep_btn"
             android:layout_marginTop="4dp"
-            android:visibility="visible">
+            android:visibility="gone">
 
             <TextView android:id="@+id/colony_defence"
                       android:layout_width="wrap_content"
@@ -280,13 +280,16 @@
                 android:text="@string/focus" />
         </RelativeLayout>
 
-        <au.com.codeka.warworlds.ctrl.FleetListSimple
-                  android:id="@+id/fleet_list"
-                  android:layout_width="match_parent"
-                  android:layout_height="match_parent"
-                  android:layout_alignParentBottom="true"
-                  android:layout_marginTop="4dp"
-                  android:layout_below="@+id/solarsystem_colony_details" />
+        <ScrollView android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                      android:layout_below="@+id/solarsystem_colony_details">
+            <au.com.codeka.warworlds.ctrl.FleetListSimple
+                      android:id="@+id/fleet_list"
+                      android:layout_width="match_parent"
+                      android:layout_height="wrap_content"
+                      android:layout_marginTop="4dp"
+                      android:orientation="vertical" />
+        </ScrollView>
     </RelativeLayout>
 
     <au.com.codeka.warworlds.ctrl.SelectionView

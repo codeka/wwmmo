@@ -2,41 +2,39 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:baselineAligned="false" >
+    android:baselineAligned="false"
+    android:background="@drawable/list_selector" >
 
     <ImageView
         android:id="@+id/starfield_planet_icon"
         android:layout_width="32dp"
         android:layout_height="32dp" />
 
-    <RelativeLayout
+    <TextView
+        android:id="@+id/starfield_planet_type"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-        android:layout_toRightOf="@+id/starfield_planet_icon" >
+        android:layout_toRightOf="@+id/starfield_planet_icon"
+        android:layout_alignParentTop="true"
+        android:text=""
+        android:singleLine="true"
+        android:ellipsize="end"
+        android:textAppearance="?android:attr/textAppearanceSmall" />
 
-        <TextView
-            android:id="@+id/starfield_planet_type"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentTop="true"
-            android:text=""
-            android:singleLine="true"
-            android:ellipsize="end"
-            android:textAppearance="?android:attr/textAppearanceSmall" />
+    <TextView
+        android:id="@+id/starfield_planet_colony"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@+id/starfield_planet_icon"
+        android:layout_below="@id/starfield_planet_type"
+        android:text=""
+        android:singleLine="true"
+        android:ellipsize="end"
+        android:textAppearance="?android:attr/textAppearanceSmall" />
 
-        <TextView
-            android:id="@+id/starfield_planet_colony"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_below="@id/starfield_planet_type"
-            android:text=""
-            android:singleLine="true"
-            android:ellipsize="end"
-            android:textAppearance="?android:attr/textAppearanceSmall" />
-
-        </RelativeLayout>
-
+    <View android:id="@+id/separator"
+          android:layout_width="match_parent"
+          android:layout_height="1px"
+          android:layout_alignParentBottom="true"
+          android:background="#33ffffff" />
 </RelativeLayout>

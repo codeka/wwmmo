@@ -126,27 +126,39 @@
                         android:layout_marginRight="4dp"
                         android:text="Intel." />
 
-                <LinearLayout
+                <ScrollView
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_below="@+id/view_btn"
-                    android:layout_alignParentBottom="true"
-                    android:orientation="horizontal">
+                    android:layout_alignParentBottom="true">
+                    <RelativeLayout android:layout_width="match_parent"
+                                    android:layout_height="wrap_content">
+                        <au.com.codeka.warworlds.ctrl.FleetListSimple
+                            android:id="@+id/fleet_list"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentTop="true"
+                            android:orientation="vertical" />
 
-                    <ListView
-                        android:id="@+id/planet_list"
-                        android:layout_width="0dp"
-                        android:layout_weight="1"
-                        android:layout_height="wrap_content"
-                        android:listSelector="@drawable/list_selector" >
-                    </ListView>
+                        <View android:id="@+id/fleet_planet_separator1"
+                              android:layout_width="match_parent"
+                              android:layout_below="@+id/fleet_list"
+                              android:layout_height="10dp" />
 
-                    <au.com.codeka.warworlds.ctrl.FleetListSimple
-                        android:id="@+id/fleet_list"
-                        android:layout_width="0dp"
-                        android:layout_weight="1"
-                        android:layout_height="wrap_content" />
-                </LinearLayout>
+                        <View android:id="@+id/fleet_planet_separator2"
+                              android:layout_width="match_parent"
+                              android:layout_height="1px"
+                              android:layout_below="@+id/fleet_planet_separator1"
+                              android:background="#33ffffff" />
+
+                        <au.com.codeka.warworlds.ctrl.PlanetListSimple
+                            android:id="@+id/planet_list"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_below="@+id/fleet_planet_separator2"
+                            android:orientation="vertical" />
+                    </RelativeLayout>
+                </ScrollView>
 
             </RelativeLayout>
 

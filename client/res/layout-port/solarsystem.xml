@@ -316,11 +316,15 @@
                     android:layout_marginTop="10dp"
                     android:text="Sit. Rep." />
 
-                <au.com.codeka.warworlds.ctrl.FleetListSimple
-                          android:id="@+id/fleet_list"
-                          android:layout_width="match_parent"
-                          android:layout_height="match_parent"
-                          android:layout_below="@+id/sitrep_btn" />
+                <ScrollView android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_below="@+id/sitrep_btn">
+                    <au.com.codeka.warworlds.ctrl.FleetListSimple
+                              android:id="@+id/fleet_list"
+                              android:layout_width="match_parent"
+                              android:layout_height="wrap_content"
+                              android:orientation="vertical" />
+                </ScrollView>
             </RelativeLayout>
         </LinearLayout>
     </RelativeLayout>

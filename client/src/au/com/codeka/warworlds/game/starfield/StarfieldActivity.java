@@ -11,20 +11,14 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.Html;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.Window;
-import android.widget.AdapterView;
-import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.TextView;
 import au.com.codeka.TimeInHours;
 import au.com.codeka.common.model.BaseColony;
 import au.com.codeka.common.model.BaseFleet;
-import au.com.codeka.common.model.BasePlanet;
 import au.com.codeka.common.model.BaseStar;
 import au.com.codeka.common.model.DesignKind;
 import au.com.codeka.common.model.ShipDesign;
@@ -35,6 +29,7 @@ import au.com.codeka.warworlds.ServerGreeter.ServerGreeting;
 import au.com.codeka.warworlds.StyledDialog;
 import au.com.codeka.warworlds.ctrl.FleetListSimple;
 import au.com.codeka.warworlds.ctrl.InfobarView;
+import au.com.codeka.warworlds.ctrl.PlanetListSimple;
 import au.com.codeka.warworlds.ctrl.SelectionView;
 import au.com.codeka.warworlds.game.EmpireActivity;
 import au.com.codeka.warworlds.game.ScoutReportDialog;
@@ -49,7 +44,6 @@ import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.Fleet;
 import au.com.codeka.warworlds.model.MyEmpire;
 import au.com.codeka.warworlds.model.Planet;
-import au.com.codeka.warworlds.model.PlanetImageManager;
 import au.com.codeka.warworlds.model.PurchaseManager;
 import au.com.codeka.warworlds.model.SectorManager;
 import au.com.codeka.warworlds.model.Sprite;
@@ -75,8 +69,7 @@ public class StarfieldActivity extends BaseActivity
     private static final Logger log = LoggerFactory.getLogger(StarfieldActivity.class);
     private Context mContext = this;
     private StarfieldSurfaceView mStarfield;
-    private ListView mPlanetList;
-    private PlanetListAdapter mPlanetListAdapter;
+    private PlanetListSimple mPlanetList;
     private FleetListSimple mFleetList;
     private Star mSelectedStar;
 
@@ -103,14 +96,11 @@ public class StarfieldActivity extends BaseActivity
         mStarfield = (StarfieldSurfaceView) findViewById(R.id.starfield);
         mStarfield.setSelectionView((SelectionView) findViewById(R.id.selection));
 
-        mPlanetList = (ListView) findViewById(R.id.planet_list);
+        mPlanetList = (PlanetListSimple) findViewById(R.id.planet_list);
         mFleetList = (FleetListSimple) findViewById(R.id.fleet_list);
 
         findViewById(R.id.selected_star).setVisibility(View.GONE);
         findViewById(R.id.selected_fleet).setVisibility(View.GONE);
-
-        mPlanetListAdapter = new PlanetListAdapter();
-        mPlanetList.setAdapter(mPlanetListAdapter);
 
         mStarfield.addSelectionChangedListener(this);
 
@@ -119,22 +109,12 @@ public class StarfieldActivity extends BaseActivity
             infobar.hideEmpireName();
         }
 
-        mPlanetList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        mPlanetList.setPlanetSelectedHandler(new PlanetListSimple.PlanetSelectedHandler() {
             @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                if (mSelectedStar == null) {
-                    return; //??
-                }
-
-                Planet planet = null;
-                if (position >= 0 && position < mSelectedStar.getPlanets().length) {
-                    planet = (Planet) mSelectedStar.getPlanets()[position];
-                }
-
+            public void onPlanetSelected(Planet planet) {
                 navigateToPlanet(mSelectedStar, planet, false);
             }
         });
-
         mFleetList.setFleetSelectedHandler(new FleetListSimple.FleetSelectedHandler() {
             @Override
             public void onFleetSelected(Fleet fleet) {
@@ -566,7 +546,7 @@ public class StarfieldActivity extends BaseActivity
         selectedStarContainer.setVisibility(View.VISIBLE);
         selectedFleetContainer.setVisibility(View.GONE);
 
-        mPlanetListAdapter.setStar(star);
+        mPlanetList.setStar(star);
         mFleetList.setStar(star);
 
         MyEmpire myEmpire = EmpireManager.getInstance().getEmpire();
@@ -648,81 +628,5 @@ public class StarfieldActivity extends BaseActivity
         selectionLoadingContainer.setVisibility(View.GONE);
         selectedStarContainer.setVisibility(View.GONE);
         selectedFleetContainer.setVisibility(View.VISIBLE);
-    }
-
-    class PlanetListAdapter extends BaseAdapter {
-        private Star mStar;
-
-        public void setStar(Star star) {
-            mStar = star;
-            notifyDataSetChanged();
-        }
-
-        @Override
-        public int getCount() {
-            if (mStar == null) {
-                return 0;
-            }
-
-            return mStar.getNumPlanets();
-        }
-
-        @Override
-        public Object getItem(int position) {
-            return mStar.getPlanets()[position];
-        }
-
-        @Override
-        public long getItemId(int position) {
-            return position;
-        }
-
-        @Override
-        public int getViewTypeCount() {
-            return 1;
-        }
-
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            View view = convertView;
-            if (view == null) {
-                LayoutInflater inflater = (LayoutInflater)mContext.getSystemService
-                        (Context.LAYOUT_INFLATER_SERVICE);
-                view = (ViewGroup) inflater.inflate(R.layout.starfield_planet, null);
-            }
-
-            final ImageView icon = (ImageView) view.findViewById(R.id.starfield_planet_icon);
-            final BasePlanet planet = mStar.getPlanets()[position];
-            final PlanetImageManager pim = PlanetImageManager.getInstance();
-
-            Sprite sprite = pim.getSprite(mContext, planet);
-            icon.setImageDrawable(new SpriteDrawable(sprite));
-
-            TextView planetTypeTextView = (TextView) view.findViewById(R.id.starfield_planet_type);
-            planetTypeTextView.setText(planet.getPlanetType().getDisplayName());
-
-            BaseColony colony = null;
-            for(BaseColony c : mStar.getColonies()) {
-                if (c.getPlanetIndex() == planet.getIndex()) {
-                    colony = c;
-                    break;
-                }
-            }
-
-            final TextView colonyTextView = (TextView) view.findViewById(R.id.starfield_planet_colony);
-            if (colony != null) {
-                colonyTextView.setText("Colonized");
-                EmpireManager.getInstance().fetchEmpire(mContext, colony.getEmpireKey(), new EmpireManager.EmpireFetchedHandler() {
-                    @Override
-                    public void onEmpireFetched(Empire empire) {
-                        colonyTextView.setText(empire.getDisplayName());
-                    }
-                });
-            } else {
-                colonyTextView.setText("");
-            }
-
-            return view;
-        }
     }
 }

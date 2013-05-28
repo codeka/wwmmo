@@ -44,7 +44,6 @@
                 android:layout_alignParentLeft="true"
                 android:layout_marginLeft="5dp"
                 android:layout_marginRight="5dp"
-                android:layout_below="@+id/alliance_icon"
                 android:text="Diplomacy" />
 
             <TextView
