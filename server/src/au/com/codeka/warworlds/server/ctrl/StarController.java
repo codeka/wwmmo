@@ -200,7 +200,7 @@ public class StarController {
                         " WHERE id = ?";
             try (SqlStmt stmt = prepare(sql)) {
                 for (BaseColony colony : star.getColonies()) {
-                    if (colony.getPopulation() <= 0.0f) {
+                    if (colony.getPopulation() <= 0.0001f) {
                         needDelete = true;
                         continue;
                     }
