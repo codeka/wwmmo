@@ -53,7 +53,8 @@ public class Session {
         return mIsAdmin;
     }
 
-    public void impersonate(String email) {
+    public void impersonate(String email, int empireID) {
         mEmail = email;
+        mEmpireID = empireID;
     }
 }

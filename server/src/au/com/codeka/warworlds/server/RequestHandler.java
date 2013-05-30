@@ -76,7 +76,11 @@ public class RequestHandler {
                 throw new RequestException(501);
             }
         } catch(RequestException e) {
-            log.error("Unhandled error in URL: "+request.getRequestURI(), e);
+            if (e.getHttpErrorCode() < 500) {
+                log.warn("Unhandled error in URL: "+request.getRequestURI(), e);
+            } else {
+                log.error("Unhandled error in URL: "+request.getRequestURI(), e);
+            }
             e.populate(mResponse);
             setResponseBody(e.getGenericError());
             return;
@@ -177,6 +181,21 @@ public class RequestHandler {
 
             if (mSession == null && errorOnNotAuth) {
                 throw new RequestException(403, "Could not find session, session cookie: "+sessionCookieValue);
+            }
+        }
+
+        if (mSession != null) {
+            String impersonate = getRequest().getParameter("on_behalf_of");
+            if (impersonate != null) {
+                try (SqlStmt stmt = DB.prepare("SELECT id FROM empires WHERE user_email = ?")) {
+                    stmt.setString(1, impersonate);
+                    ResultSet rs = stmt.select();
+                    if (rs.next()) {
+                        mSession.impersonate(impersonate, rs.getInt(1));
+                    }
+                } catch (Exception e) {
+                    throw new RequestException(e);
+                }
             }
         }
 

@@ -56,6 +56,10 @@ public class RequestException extends Exception {
         response.setStatus(mHttpErrorCode);
     }
 
+    public int getHttpErrorCode() {
+        return mHttpErrorCode;
+    }
+
     public Messages.GenericError getGenericError() {
         return mGenericError;
     }

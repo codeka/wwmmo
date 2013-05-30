@@ -1,5 +1,8 @@
 package au.com.codeka.common.model;
 
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
+
 import au.com.codeka.common.protobuf.Messages;
 
 /**
@@ -18,6 +21,7 @@ public abstract class BaseEmpirePresence {
     protected float mDeltaMineralsPerHour;
     protected float mMaxGoods;
     protected float mMaxMinerals;
+    protected DateTime mGoodsZeroTime;
 
     public String getKey() {
         return mKey;
@@ -65,6 +69,17 @@ public abstract class BaseEmpirePresence {
         mMaxMinerals = value;
     }
 
+    /**
+     * Gets the \c DateTime the goods will drop to zero. We'll want to notify the player
+     * that they need to pay attention to this star.
+     */
+    public DateTime getGoodsZeroTime() {
+        return mGoodsZeroTime;
+    }
+    public void setGoodsZeroTime(DateTime dt) {
+        mGoodsZeroTime = dt;
+    }
+
     public void fromProtocolBuffer(Messages.EmpirePresence pb) {
         mKey = pb.getKey();
         mEmpireKey = pb.getEmpireKey();
@@ -75,6 +90,9 @@ public abstract class BaseEmpirePresence {
         mDeltaMineralsPerHour = pb.getMineralsDeltaPerHour();
         mMaxGoods = pb.getMaxGoods();
         mMaxMinerals = pb.getMaxMinerals();
+        if (pb.hasGoodsZeroTime()) {
+            mGoodsZeroTime = new DateTime(pb.getGoodsZeroTime() * 1000, DateTimeZone.UTC);
+        }
     }
 
     public void toProtocolBuffer(Messages.EmpirePresence.Builder pb) {
@@ -87,5 +105,8 @@ public abstract class BaseEmpirePresence {
         pb.setMineralsDeltaPerHour(mDeltaMineralsPerHour);
         pb.setMaxGoods(mMaxGoods);
         pb.setMaxMinerals(mMaxMinerals);
+        if (mGoodsZeroTime != null) {
+            pb.setGoodsZeroTime(mGoodsZeroTime.getMillis() / 1000);
+        }
     }
 }

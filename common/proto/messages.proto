@@ -505,6 +505,8 @@ message EmpirePresence
 
     optional float max_goods = 8;
     optional float max_minerals = 9;
+
+    optional int64 goods_zero_time = 10;
 }
 
 //
@@ -951,6 +953,12 @@ message SituationReport
         optional float num_ships = 3;
     }
     optional ColonyAttackedRecord colony_attacked_record = 12;
+
+    message StarRunOutOfGoodsRecord
+    {
+        optional string colony_key = 1;
+    }
+    optional StarRunOutOfGoodsRecord star_ran_out_of_goods_record = 13;
 }
 
 

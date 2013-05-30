@@ -123,6 +123,15 @@ public class Simulation {
                 }
             }
 
+            // if the empire is going to run out of resources, save that time as well.
+            for (BaseEmpirePresence empirePresence : star.getEmpirePresences()) {
+                for (BaseEmpirePresence predictedEmpirePresence : predictionStar.getEmpirePresences()) {
+                    if (empirePresence.getKey().equals(predictedEmpirePresence.getKey())) {
+                        empirePresence.setGoodsZeroTime(predictedEmpirePresence.getGoodsZeroTime());
+                    }
+                }
+            }
+
             // also, the prediction combat report (if any) is the one to use
             star.setCombatReport(predictionStar.getCombatReport());
 
@@ -171,10 +180,12 @@ public class Simulation {
         float maxGoods = 50.0f;
         float maxMinerals = 50.0f;
 
-        for (BaseEmpirePresence empire : star.getEmpires()) {
-            if (!equalEmpireKey(empire.getEmpireKey(), empireKey)) {
+        BaseEmpirePresence empire = null;
+        for (BaseEmpirePresence e : star.getEmpires()) {
+            if (!equalEmpireKey(e.getEmpireKey(), empireKey)) {
                 continue;
             }
+            empire = e;
             totalGoods = empire.getTotalGoods();
             totalMinerals = empire.getTotalMinerals();
             maxGoods = empire.getMaxGoods();
@@ -318,14 +329,16 @@ public class Simulation {
                         float percentMineralsAvailable = mineralsPerBuildRequest / mineralsRequired;
                         br.setProgress(br.getProgress(false) + (progressThisTurn * percentMineralsAvailable));
                         log(String.format("     Progress %.4f%% + %.4f%% (this turn, adjusted - %.4f%% originally) ",
-                            br.getProgress(false), progressThisTurn * percentMineralsAvailable, progressThisTurn));
+                            br.getProgress(false) * 100.0f,
+                            progressThisTurn * percentMineralsAvailable * 100.0f,
+                            progressThisTurn * 100.0f));
                     } else {
                         // awesome, we have enough minerals so we can make some progress. We'll start by
                         // removing the minerals we need from the global pool...
                         totalMinerals -= mineralsRequired;
                         br.setProgress(br.getProgress(false) + progressThisTurn);
                         log(String.format("     Progress %.4f%% + %.4f%% (this turn)",
-                            br.getProgress(false), progressThisTurn));
+                            br.getProgress(false) * 100.0f, progressThisTurn * 100.0f));
                     }
                     mineralsDeltaPerHour -= mineralsRequired / dtInHours;
                     log(String.format("     Minerals [required=%.2f] [available=%.2f] [available per build=%.2f]",
@@ -358,11 +371,21 @@ public class Simulation {
             goodsEfficiency = totalGoods / totalGoodsRequired;
         }
 
+        log(String.format("--- Updating Populating [goods required=%.2f] [goods available=%.2f] [efficiency=%.2f]",
+                          totalGoodsRequired, totalGoods, goodsEfficiency));
+
         // subtract all the goods we'll need
         totalGoods -= totalGoodsRequired;
-        if (totalGoods < 0.0f) {
+        if (totalGoods <= 0.0f) {
             // We've run out of goods! That's bad...
             totalGoods = 0.0f;
+
+            if (empire != null) {
+                if (empire.getGoodsZeroTime() == null || empire.getGoodsZeroTime().isAfter(now.plus(dt))) {
+                    log(String.format("    GOODS HAVE HIT ZERO"));
+                    empire.setGoodsZeroTime(now.plus(dt));
+                }
+            }
         }
 
         // now loop through the colonies and update the population/goods counter
@@ -380,13 +403,13 @@ public class Simulation {
                 populationIncrease *= 0.5f;
             } else {
                 populationIncrease = colony.getPopulation() * (1.0f - colony.getPopulationFocus());
-                populationIncrease *= 0.5f * (goodsEfficiency - 1.0f);
+                populationIncrease *= 0.25f * (goodsEfficiency - 1.0f);
             }
 
             colony.setPopulationDelta(populationIncrease);
-            populationIncrease *= dtInHours;
+            float populationIncreaseThisTurn = populationIncrease * dtInHours;
 
-            float newPopulation = colony.getPopulation() + populationIncrease;
+            float newPopulation = colony.getPopulation() + populationIncreaseThisTurn;
             if (newPopulation < 0.0f) {
                 newPopulation = 0.0f;
             } else if (newPopulation > colony.getMaxPopulation()) {
@@ -395,6 +418,8 @@ public class Simulation {
             if (newPopulation < 100.0f && colony.isInCooldown()) {
                 newPopulation = 100.0f;
             }
+            log(String.format("    Colony[%d]: [delta=%.2f] [new=%.2f]",
+                              colony.getPlanetIndex(), populationIncrease, newPopulation));
             colony.setPopulation(newPopulation);
         }
 
@@ -405,10 +430,7 @@ public class Simulation {
             totalMinerals = maxMinerals;
         }
 
-        for (BaseEmpirePresence empire : star.getEmpires()) {
-            if (!equalEmpireKey(empire.getEmpireKey(), empireKey)) {
-                continue;
-            }
+        if (empire != null) {
             empire.setTotalGoods(totalGoods);
             empire.setTotalMinerals(totalMinerals);
             empire.setDeltaGoodsPerHour(goodsDeltaPerHour);

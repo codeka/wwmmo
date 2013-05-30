@@ -6,9 +6,13 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Random;
 
 import org.joda.time.DateTime;
+import org.joda.time.Seconds;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import au.com.codeka.common.model.BaseBuildRequest;
 import au.com.codeka.common.model.BaseColony;
@@ -33,6 +37,7 @@ import au.com.codeka.warworlds.server.model.Planet;
 import au.com.codeka.warworlds.server.model.Star;
 
 public class StarController {
+    private static final Logger log = LoggerFactory.getLogger(StarController.class);
     private DataBase db;
 
     public StarController() {
@@ -153,7 +158,19 @@ public class StarController {
                                  " last_simulation = ?" +
                               " WHERE id = ?";
             try (SqlStmt stmt = prepare(sql)) {
-                stmt.setDateTime(1, star.getLastSimulation());
+                DateTime lastSimulation = star.getLastSimulation();
+                DateTime now = DateTime.now();
+                if (lastSimulation.isAfter(now)) {
+                    int difference = Seconds.secondsBetween(now, lastSimulation).getSeconds();
+                    if (difference > 120) {
+                        log.error(String.format(Locale.ENGLISH,
+                                    "last_simulation is after now! [last_simulation=%s] [now=%s] [difference=%d seconds]",
+                                    lastSimulation, now, difference),
+                                  new Throwable());
+                        lastSimulation = DateTime.now();
+                    }
+                }
+                stmt.setDateTime(1, lastSimulation);
                 stmt.setInt(2, star.getID());
                 stmt.update();
             } catch(Exception e) {
@@ -173,13 +190,15 @@ public class StarController {
         private void updateEmpires(Star star) throws RequestException {
             final String sql = "UPDATE empire_presences SET" +
                                  " total_goods = ?," +
-                                 " total_minerals = ?" +
+                                 " total_minerals = ?," +
+                                 " goods_zero_time = ?" +
                               " WHERE id = ?";
             try (SqlStmt stmt = prepare(sql)) {
                 for (BaseEmpirePresence empire : star.getEmpires()) {
                     stmt.setDouble(1, empire.getTotalGoods());
                     stmt.setDouble(2, empire.getTotalMinerals());
-                    stmt.setInt(3, ((EmpirePresence) empire).getID());
+                    stmt.setDateTime(3, empire.getGoodsZeroTime());
+                    stmt.setInt(4, ((EmpirePresence) empire).getID());
                     stmt.update();
                 }
             } catch(Exception e) {
@@ -189,6 +208,8 @@ public class StarController {
 
         private void updateColonies(Star star) throws RequestException {
             boolean needDelete = false;
+
+            final float MIN_POPULATION = 0.0001f;
 
             String sql = "UPDATE colonies SET" +
                            " focus_population = ?," +
@@ -200,7 +221,7 @@ public class StarController {
                         " WHERE id = ?";
             try (SqlStmt stmt = prepare(sql)) {
                 for (BaseColony colony : star.getColonies()) {
-                    if (colony.getPopulation() <= 0.0001f) {
+                    if (colony.getPopulation() <= MIN_POPULATION) {
                         needDelete = true;
                         continue;
                     }
@@ -222,7 +243,7 @@ public class StarController {
                 sql = "DELETE FROM colonies WHERE id = ?";
                 try (SqlStmt stmt = prepare(sql)) {
                     for (BaseColony colony : star.getColonies()) {
-                        if (colony.getPopulation() > 0.0f) {
+                        if (colony.getPopulation() > MIN_POPULATION) {
                             continue;
                         }
                         stmt.setInt(1, ((Colony) colony).getID());

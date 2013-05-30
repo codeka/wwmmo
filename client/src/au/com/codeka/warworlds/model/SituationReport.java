@@ -24,6 +24,7 @@ public class SituationReport {
     private FleetVictoriousRecord mFleetVictoriousRecord;
     private ColonyDestroyedRecord mColonyDestroyedRecord;
     private ColonyAttackedRecord mColonyAttackedRecord;
+    private StarRunOutOfGoodsRecord mStarRunOutOfGoodsRecord;
 
     public String getKey() {
         return mKey;
@@ -61,6 +62,9 @@ public class SituationReport {
     public ColonyAttackedRecord getColonyAttackedRecord() {
         return mColonyAttackedRecord;
     }
+    public StarRunOutOfGoodsRecord getStarRunOutOfGoodsRecord() {
+        return mStarRunOutOfGoodsRecord;
+    }
 
     public String getTitle() {
         if (mBuildCompleteRecord != null) {
@@ -77,6 +81,8 @@ public class SituationReport {
             return "Colony Destroyed";
         } else if (mColonyAttackedRecord != null) {
             return "Colony Attacked";
+        } else if (mStarRunOutOfGoodsRecord != null) {
+            return "Goods Exhausted";
         }
 
         return "War Worlds";
@@ -138,6 +144,10 @@ public class SituationReport {
 
         if (mColonyAttackedRecord != null) {
             msg += "Colony <em>attacked!</em>";
+        }
+
+        if (mStarRunOutOfGoodsRecord != null) {
+            msg += "Goods <em>exhausted!</em>";
         }
 
         if (msg.length() == 0) {
@@ -203,6 +213,11 @@ public class SituationReport {
             msg += String.format(Locale.ENGLISH, "Colony on %s %s attacked by %d ships",
                     starSummary.getName(), RomanNumeralFormatter.format(mPlanetIndex),
                     (int) Math.ceil(mColonyAttackedRecord.getNumShips()));
+        }
+
+        if (mStarRunOutOfGoodsRecord != null) {
+            msg += String.format(Locale.ENGLISH, "%s has run out of goods, beware population decline!",
+                                 starSummary.getName());
         }
 
         if (msg.length() == 0) {
@@ -285,6 +300,11 @@ public class SituationReport {
         if (pb.getColonyAttackedRecord() != null &&
             pb.getColonyAttackedRecord().hasColonyKey()) {
             sitrep.mColonyAttackedRecord = ColonyAttackedRecord.fromProtocolBuffer(pb.getColonyAttackedRecord());
+        }
+
+        if (pb.getStarRanOutOfGoodsRecord() != null &&
+            pb.getStarRanOutOfGoodsRecord().hasColonyKey()) {
+            sitrep.mStarRunOutOfGoodsRecord = StarRunOutOfGoodsRecord.fromProtocolBuffer(pb.getStarRanOutOfGoodsRecord());
         }
 
         return sitrep;
@@ -461,6 +481,12 @@ public class SituationReport {
             }
             car.mNumShips = pb.getNumShips();
             return car;
+        }
+    }
+
+    public static class StarRunOutOfGoodsRecord {
+        private static StarRunOutOfGoodsRecord fromProtocolBuffer(Messages.SituationReport.StarRunOutOfGoodsRecord pb) {
+            return new StarRunOutOfGoodsRecord();
         }
     }
 }
