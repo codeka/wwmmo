@@ -28,6 +28,7 @@ public class BuildStopHandler extends RequestHandler {
 
                 new BuildQueueController().stop(star, buildRequest);
                 new StarController().update(star);
+                break;
             }
         }
     }
