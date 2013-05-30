@@ -64,7 +64,7 @@ public class FleetDestroyedEvent extends Event {
         }
 
         CombatReport combatReport = (CombatReport) star.getCombatReport();
-        if (fleetWasDestroyed && fleet.getEmpireKey() != null) {
+        if (fleetWasDestroyed && fleet != null && fleet.getEmpireKey() != null) {
             // send a notification that this fleet was destroyed
             Messages.SituationReport.Builder sitrep_pb = Messages.SituationReport.newBuilder();
             sitrep_pb.setEmpireKey(fleet.getEmpireKey());
