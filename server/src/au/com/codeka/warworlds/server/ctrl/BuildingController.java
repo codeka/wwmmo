@@ -1,6 +1,8 @@
 package au.com.codeka.warworlds.server.ctrl;
 
+import java.sql.ResultSet;
 import java.sql.Statement;
+import java.util.ArrayList;
 
 import org.joda.time.DateTime;
 
@@ -11,6 +13,7 @@ import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.data.SqlStmt;
 import au.com.codeka.warworlds.server.data.Transaction;
 import au.com.codeka.warworlds.server.model.Building;
+import au.com.codeka.warworlds.server.model.BuildingPosition;
 import au.com.codeka.warworlds.server.model.Colony;
 import au.com.codeka.warworlds.server.model.DesignManager;
 import au.com.codeka.warworlds.server.model.Star;
@@ -61,6 +64,15 @@ public class BuildingController {
         }
     }
 
+    public ArrayList<BuildingPosition> getBuildings(int empireID, long minSectorX, long minSectorY,
+            long maxSectorX, long maxSectorY) throws RequestException {
+        try {
+            return db.getBuildings(empireID, minSectorX, minSectorY, maxSectorX, maxSectorY);
+        } catch(Exception e) {
+            throw new RequestException(e);
+        }
+    }
+
     private static class DataBase extends BaseDataBase {
         public DataBase() {
             super();
@@ -95,6 +107,32 @@ public class BuildingController {
                 stmt.setInt(1, building.getID());
                 stmt.update();
                 building.setLevel(building.getLevel()+1);
+            }
+        }
+
+        public ArrayList<BuildingPosition> getBuildings(int empireID, long minSectorX, long minSectorY,
+                                                long maxSectorX, long maxSectorY) throws Exception {
+            String sql = "SELECT buildings.*, sectors.x AS sector_x, sectors.y AS sector_y," +
+                               " stars.x AS offset_x, stars.y AS offset_y " +
+                        " FROM buildings" +
+                        " INNER JOIN  stars ON buildings.star_id = stars.id" +
+                        " INNER JOIN sectors ON stars.sector_id = sectors.id" +
+                        " WHERE buildings.empire_id = ?" +
+                          " AND sectors.x >= ? AND sectors.x <= ?" +
+                          " AND sectors.y >= ? AND sectors.y <= ?";
+            try (SqlStmt stmt = prepare(sql)) {
+                stmt.setInt(1, empireID);
+                stmt.setLong(2, minSectorX);
+                stmt.setLong(3, maxSectorX);
+                stmt.setLong(4, minSectorY);
+                stmt.setLong(5, maxSectorY);
+                ResultSet rs = stmt.select();
+
+                ArrayList<BuildingPosition> buildings = new ArrayList<BuildingPosition>();
+                while (rs.next()) {
+                    buildings.add(new BuildingPosition(rs));
+                }
+                return buildings;
             }
         }
     }

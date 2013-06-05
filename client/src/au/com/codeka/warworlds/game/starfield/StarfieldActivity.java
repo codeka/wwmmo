@@ -72,6 +72,7 @@ public class StarfieldActivity extends BaseActivity
     private PlanetListSimple mPlanetList;
     private FleetListSimple mFleetList;
     private Star mSelectedStar;
+    private Fleet mSelectedFleet;
 
     private Purchase mStarRenamePurchase;
 
@@ -87,7 +88,7 @@ public class StarfieldActivity extends BaseActivity
     private static final int TACTICAL_MAP_REQUEST = 4;
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
+    public void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE); // remove the title bar
 
@@ -209,16 +210,32 @@ public class StarfieldActivity extends BaseActivity
                     return;
                 }
 
-                Intent intent = getIntent();
-                if (intent != null && intent.getExtras() != null) {
-                    String starKey = intent.getExtras().getString("au.com.codeka.warworlds.StarKey");
-                    if (starKey != null) {
-                        long sectorX = intent.getExtras().getLong("au.com.codeka.warworlds.SectorX");
-                        long sectorY = intent.getExtras().getLong("au.com.codeka.warworlds.SectorY");
-                        int offsetX = intent.getExtras().getInt("au.com.codeka.warworlds.OffsetX");
-                        int offsetY = intent.getExtras().getInt("au.com.codeka.warworlds.OffsetY");
-                        mStarfield.scrollTo(sectorX, sectorY, offsetX, offsetY, true);
-                        return;
+                if (savedInstanceState != null) {
+                    Star selectedStar = savedInstanceState.getParcelable("au.com.codeka.warworlds.SelectedStar");
+                    Fleet selectedFleet = savedInstanceState.getParcelable("au.com.codeka.warworlds.SelectedFleet");
+                    if (selectedStar != null) {
+                        mSelectedStar = selectedStar;
+                        mStarfield.selectStar(selectedStar.getKey());
+                        mStarfield.scrollTo(selectedStar.getSectorX(), selectedStar.getSectorY(),
+                                            selectedStar.getOffsetX(), selectedStar.getOffsetY(),
+                                            true);
+                    }
+                    if (selectedFleet != null) {
+                        mStarfield.selectFleet(selectedFleet);
+                    }
+                }
+                if (savedInstanceState == null) {
+                    Intent intent = getIntent();
+                    if (intent != null && intent.getExtras() != null) {
+                        String starKey = intent.getExtras().getString("au.com.codeka.warworlds.StarKey");
+                        if (starKey != null) {
+                            long sectorX = intent.getExtras().getLong("au.com.codeka.warworlds.SectorX");
+                            long sectorY = intent.getExtras().getLong("au.com.codeka.warworlds.SectorY");
+                            int offsetX = intent.getExtras().getInt("au.com.codeka.warworlds.OffsetX");
+                            int offsetY = intent.getExtras().getInt("au.com.codeka.warworlds.OffsetY");
+                            mStarfield.scrollTo(sectorX, sectorY, offsetX, offsetY, true);
+                            return;
+                        }
                     }
                 }
 
@@ -262,6 +279,13 @@ public class StarfieldActivity extends BaseActivity
         super.onStop();
 
         StarManager.getInstance().removeStarUpdatedListener(this);
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle state) {
+        super.onSaveInstanceState(state);
+        state.putParcelable("au.com.codeka.warworlds.SelectedStar", mSelectedStar);
+        state.putParcelable("au.com.codeka.warworlds.SelectedFleet", mSelectedFleet);
     }
 
     /**
@@ -446,12 +470,6 @@ public class StarfieldActivity extends BaseActivity
     }
 
     @Override
-    public void onSaveInstanceState(Bundle state) {
-        super.onSaveInstanceState(state);
-        state.putBoolean("au.com.codeka.warworlds.IsFirstRefresh", false);
-    }
-
-    @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
         super.onActivityResult(requestCode, resultCode, intent);
 
@@ -503,7 +521,7 @@ public class StarfieldActivity extends BaseActivity
     @Override
     public void onStarSelected(Star star) {
         if (mSelectedStar != null && mSelectedStar.getKey().equals(star.getKey())) {
-            // same star, ignore...
+            updateStarSelection();
             return;
         }
 
@@ -517,6 +535,7 @@ public class StarfieldActivity extends BaseActivity
         selectedFleetContainer.setVisibility(View.GONE);
         mFetchingStarKey = star.getKey();
         mFetchingFleetKey = null;
+        mSelectedFleet = null;
 
         StarManager.getInstance().requestStar(mContext, star.getKey(), true, this);
     }
@@ -533,6 +552,11 @@ public class StarfieldActivity extends BaseActivity
             return;
         }
 
+        mSelectedStar = star;
+        updateStarSelection();
+    }
+
+    private void updateStarSelection() {
         final View selectionLoadingContainer = findViewById(R.id.loading_container);
         final View selectedStarContainer = findViewById(R.id.selected_star);
         final View selectedFleetContainer = findViewById(R.id.selected_fleet);
@@ -541,18 +565,17 @@ public class StarfieldActivity extends BaseActivity
         final ImageView starIcon = (ImageView) findViewById(R.id.star_icon);
         final Button renameButton = (Button) findViewById(R.id.rename_btn);
 
-        mSelectedStar = star;
         selectionLoadingContainer.setVisibility(View.GONE);
         selectedStarContainer.setVisibility(View.VISIBLE);
         selectedFleetContainer.setVisibility(View.GONE);
 
-        mPlanetList.setStar(star);
-        mFleetList.setStar(star);
+        mPlanetList.setStar(mSelectedStar);
+        mFleetList.setStar(mSelectedStar);
 
         MyEmpire myEmpire = EmpireManager.getInstance().getEmpire();
         int numMyEmpire = 0;
         int numOtherEmpire = 0;
-        for (BaseColony colony : star.getColonies()) {
+        for (BaseColony colony : mSelectedStar.getColonies()) {
             if (colony.getEmpireKey() == null) {
                 continue;
             }
@@ -568,9 +591,9 @@ public class StarfieldActivity extends BaseActivity
             renameButton.setVisibility(View.GONE);
         }
 
-        starName.setText(star.getName());
-        starKind.setText(star.getStarType().getDisplayName());
-        Sprite starImage = StarImageManager.getInstance().getSprite(mContext, star, 80);
+        starName.setText(mSelectedStar.getName());
+        starKind.setText(mSelectedStar.getStarType().getDisplayName());
+        Sprite starImage = StarImageManager.getInstance().getSprite(mContext, mSelectedStar, 80);
         starIcon.setImageDrawable(new SpriteDrawable(starImage));
     }
 
@@ -590,6 +613,7 @@ public class StarfieldActivity extends BaseActivity
         mFetchingFleetKey = fleet.getKey();
         mFetchingStarKey = null;
         mSelectedStar = null;
+        mSelectedFleet = fleet;
 
         ShipDesign design = (ShipDesign) DesignManager.i.getDesign(DesignKind.SHIP, fleet.getDesignID());
         EmpireManager.getInstance().fetchEmpire(mContext, fleet.getEmpireKey(), new EmpireManager.EmpireFetchedHandler() {

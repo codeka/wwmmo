@@ -26,7 +26,7 @@ public class RequestRouter extends AbstractHandler {
     {
         sRoutes = new ArrayList<Route>();
         sRoutes.add(new Route("^/login$", LoginHandler.class));
-        sRoutes.add(new Route("^/realms/[a-z]+/devices/({id}[0-9]+)$", DevicesHandler.class));
+        sRoutes.add(new Route("^/realms/[a-z]+/devices/({id}[0-9]*)$", DevicesHandler.class));
         sRoutes.add(new Route("^/realms/[a-z]+/devices$", DevicesHandler.class));
         sRoutes.add(new Route("^/realms/[a-z]+/hello/({device_id}[0-9]+)$", HelloHandler.class));
         sRoutes.add(new Route("^/realms/[a-z]+/chat$", ChatHandler.class));

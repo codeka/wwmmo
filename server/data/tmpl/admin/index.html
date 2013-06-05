@@ -16,7 +16,7 @@
       dataTable.addColumn("number", "1-day actives");
       dataTable.addRows([
       {% for nda in empire_nda %}
-        [new Date({{nda.year}}, {{nda.month}}, {{nda.day}}), {{nda.oneda}}],
+        [new Date({{nda.year}}, {{nda.month}}+1, {{nda.day}}), {{nda.oneda}}],
       {% endfor %}
       ]);
 

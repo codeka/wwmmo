@@ -9,6 +9,7 @@ import android.content.Context;
 import au.com.codeka.common.model.BaseDesignManager;
 import au.com.codeka.common.model.Design;
 import au.com.codeka.common.model.DesignKind;
+import au.com.codeka.warworlds.model.designeffects.*;
 
 /**
  * This is the base "manager" class that manages designs for ships and buildings.
@@ -43,6 +44,15 @@ public class DesignManager extends BaseDesignManager {
 
     @Override
     public Design.Effect createEffect(DesignKind designKind, Element effectElement) {
-        return new Design.Effect(effectElement.getAttribute("kind"));
+        final String kind = effectElement.getAttribute("kind");
+        if (designKind == DesignKind.SHIP) {
+            return new ShipEffect(effectElement);
+        } else {
+            if (kind.equals("radar")) {
+                return new RadarBuildingEffect(effectElement);
+            } else {
+                return new BuildingEffect(effectElement);
+            }
+        }
     }
 }

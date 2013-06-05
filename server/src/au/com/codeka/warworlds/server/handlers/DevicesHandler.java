@@ -60,7 +60,11 @@ public class DevicesHandler extends RequestHandler {
 
     @Override
     protected void put() throws RequestException {
-        int id = Integer.parseInt(getUrlParameter("id"));
+        String strid = getUrlParameter("id");
+        if (strid == null || strid.isEmpty()) {
+            throw new RequestException(400);
+        }
+        int id = Integer.parseInt(strid);
 
         String onlineStatusParameterValue = getRequest().getParameter("online_status");
         if (onlineStatusParameterValue != null && onlineStatusParameterValue.equals("1")) {

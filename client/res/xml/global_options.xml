@@ -124,5 +124,56 @@
                             android:defaultValue="#FF0000"
                             android:dependency="GlobalOptions.Notifications[FLEET_VICTORIOUS].Enabled" />
         </PreferenceScreen>
+        <PreferenceScreen android:key="GlobalOptions.Notifications[COLONY_DESTROYED]"
+                          android:title="Colony Destroyed"
+                          android:dependency="GlobalOptions.EnableNotifications">
+            <CheckBoxPreference android:key="GlobalOptions.Notifications[COLONY_DESTROYED].Enabled"
+                                android:title="Notification Enabled"
+                                android:defaultValue="true" />
+            <RingtonePreference android:key="GlobalOptions.Notifications[COLONY_DESTROYED].Ringtone"
+                                android:ringtoneType="notification"
+                                android:title="Ringtone"
+                                android:showDefault="true"
+                                android:showSilent="true"
+                                android:dependency="GlobalOptions.Notifications[COLONY_DESTROYED].Enabled" />
+            <ListPreference android:key="GlobalOptions.Notifications[COLONY_DESTROYED].LedColour"
+                            android:title="LED Color"
+                            android:defaultValue="#FF0000"
+                            android:dependency="GlobalOptions.Notifications[COLONY_DESTROYED].Enabled" />
+        </PreferenceScreen>
+        <PreferenceScreen android:key="GlobalOptions.Notifications[COLONY_ATTACKED]"
+                          android:title="Colony Attacked"
+                          android:dependency="GlobalOptions.EnableNotifications">
+            <CheckBoxPreference android:key="GlobalOptions.Notifications[COLONY_ATTACKED].Enabled"
+                                android:title="Notification Enabled"
+                                android:defaultValue="true" />
+            <RingtonePreference android:key="GlobalOptions.Notifications[COLONY_ATTACKED].Ringtone"
+                                android:ringtoneType="notification"
+                                android:title="Ringtone"
+                                android:showDefault="true"
+                                android:showSilent="true"
+                                android:dependency="GlobalOptions.Notifications[COLONY_ATTACKED].Enabled" />
+            <ListPreference android:key="GlobalOptions.Notifications[COLONY_ATTACKED].LedColour"
+                            android:title="LED Color"
+                            android:defaultValue="#FF0000"
+                            android:dependency="GlobalOptions.Notifications[COLONY_ATTACKED].Enabled" />
+        </PreferenceScreen>
+        <PreferenceScreen android:key="GlobalOptions.Notifications[STAR_GOODS_ZERO]"
+                          android:title="Food Depleted"
+                          android:dependency="GlobalOptions.EnableNotifications">
+            <CheckBoxPreference android:key="GlobalOptions.Notifications[STAR_GOODS_ZERO].Enabled"
+                                android:title="Notification Enabled"
+                                android:defaultValue="true" />
+            <RingtonePreference android:key="GlobalOptions.Notifications[STAR_GOODS_ZERO].Ringtone"
+                                android:ringtoneType="notification"
+                                android:title="Ringtone"
+                                android:showDefault="true"
+                                android:showSilent="true"
+                                android:dependency="GlobalOptions.Notifications[STAR_GOODS_ZERO].Enabled" />
+            <ListPreference android:key="GlobalOptions.Notifications[STAR_GOODS_ZERO].LedColour"
+                            android:title="LED Color"
+                            android:defaultValue="#FF0000"
+                            android:dependency="GlobalOptions.Notifications[STAR_GOODS_ZERO].Enabled" />
+        </PreferenceScreen>
     </PreferenceCategory>
 </PreferenceScreen>

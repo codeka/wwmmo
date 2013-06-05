@@ -40,7 +40,7 @@ public class BuildingDesign extends Design {
     }
 
     @SuppressWarnings("unchecked")
-    public <T> ArrayList<T> getEffects(int level, Class<?> effectClass) {
+    public <T> ArrayList<T> getEffects(int level, Class<T> effectClass) {
         List<Effect> allEffects = getEffects(level);
 
         ArrayList<T> effects = new ArrayList<T>();

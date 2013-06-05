@@ -35,13 +35,17 @@ public abstract class BaseSector {
      * {@link Star} b. You can use the \c length() method to determine the distance between them.
      */
     public static Vector2 directionBetween(BaseStar a, BaseStar b) {
-        float dx = a.getOffsetX() - b.getOffsetX();
-        float dy = a.getOffsetY() - b.getOffsetY();
+        return directionBetween(a, b.getSectorX(), b.getSectorY(), b.getOffsetX(), b.getOffsetY());
+    }
 
-        float dsx = a.getSectorX() - b.getSectorX();
+    public static Vector2 directionBetween(BaseStar a, long sectorX, long sectorY, int offsetX, int offsetY) {
+        float dx = a.getOffsetX() - offsetX;
+        float dy = a.getOffsetY() - offsetY;
+
+        float dsx = a.getSectorX() - sectorX;
         dx += (dsx * SECTOR_SIZE);
 
-        float dsy = a.getSectorY() - b.getSectorY();
+        float dsy = a.getSectorY() - sectorY;
         dy += (dsy * SECTOR_SIZE);
 
         return new Vector2(dx, dy);
@@ -52,6 +56,11 @@ public abstract class BaseSector {
      */
     public static float distanceInParsecs(BaseStar a, BaseStar b) {
         double distanceInPixels = directionBetween(a, b).length();
+        return (float) (distanceInPixels / 10.0);
+    }
+
+    public static float distanceInParsecs(BaseStar a, long sectorX, long sectorY, int offsetX, int offsetY) {
+        double distanceInPixels = directionBetween(a, sectorX, sectorY, offsetX, offsetY).length();
         return (float) (distanceInPixels / 10.0);
     }
 

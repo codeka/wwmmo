@@ -38,8 +38,7 @@ public class BuildQueueHandler extends RequestHandler {
                 throw new RequestException(403);
             }
 
-            Simulation sim = new Simulation();
-            sim.simulate(star);
+            new Simulation().simulate(star);
 
             BuildRequest buildRequest = new BuildRequest();
             buildRequest.fromProtocolBuffer(build_request_pb);
@@ -50,7 +49,7 @@ public class BuildQueueHandler extends RequestHandler {
 
             // add the build request to the star and simulate again
             star.getBuildRequests().add(buildRequest);
-            sim.simulate(star);
+            new Simulation().simulate(star);
             new StarController(t).update(star);
 
             t.commit();

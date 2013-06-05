@@ -7,15 +7,20 @@ import org.joda.time.DateTime;
 import au.com.codeka.common.model.BaseBuildRequest;
 import au.com.codeka.common.model.BaseFleet;
 import au.com.codeka.common.model.BaseScoutReport;
+import au.com.codeka.common.model.BuildingDesign;
 import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.RequestHandler;
+import au.com.codeka.warworlds.server.ctrl.BuildingController;
 import au.com.codeka.warworlds.server.ctrl.StarController;
 import au.com.codeka.warworlds.server.data.DB;
 import au.com.codeka.warworlds.server.data.SqlStmt;
+import au.com.codeka.warworlds.server.designeffects.RadarBuildingEffect;
 import au.com.codeka.warworlds.server.model.BuildRequest;
+import au.com.codeka.warworlds.server.model.BuildingPosition;
 import au.com.codeka.warworlds.server.model.Fleet;
 import au.com.codeka.warworlds.server.model.ScoutReport;
+import au.com.codeka.warworlds.server.model.Sector;
 import au.com.codeka.warworlds.server.model.Star;
 
 /**
@@ -31,7 +36,11 @@ public class StarHandler extends RequestHandler {
         }
 
         int myEmpireID = getSession().getEmpireID();
-        sanitizeStar(star, myEmpireID);
+        ArrayList<BuildingPosition> buildings = new BuildingController().getBuildings(
+                myEmpireID, star.getSectorX() - 1, star.getSectorY() - 1,
+                star.getSectorX() + 1, star.getSectorY() + 1);
+
+        sanitizeStar(star, myEmpireID, buildings);
 
         Messages.Star.Builder star_pb = Messages.Star.newBuilder();
         star.toProtocolBuffer(star_pb);
@@ -43,16 +52,36 @@ public class StarHandler extends RequestHandler {
      * @param star
      * @param myEmpireID
      */
-    public static void sanitizeStar(Star star, int myEmpireID) {
+    public static void sanitizeStar(Star star, int myEmpireID,
+                                    ArrayList<BuildingPosition> buildings) {
         // if we don't have any fleets here, remove all the others
-        boolean ourFleetExists = false;
+        boolean removeFleets = true;
         for (BaseFleet baseFleet : star.getFleets()) {
             Fleet fleet = (Fleet) baseFleet;
             if (fleet.getEmpireID() == myEmpireID) {
-                ourFleetExists = true;
+                removeFleets = false;
             }
         }
-        if (!ourFleetExists) {
+        // ... unless we have a radar on a nearby star
+        if (buildings != null) for (BuildingPosition building : buildings) {
+            BuildingDesign design = building.getDesign();
+            float radarRange = 0.0f;
+            for (RadarBuildingEffect effect : design.getEffects(building.getLevel(), RadarBuildingEffect.class)) {
+                if (effect.getRange() > radarRange) {
+                    radarRange = effect.getRange();
+                }
+            }
+
+            if (radarRange > 0.0f) {
+                float distanceToBuilding = Sector.distanceInParsecs(star,
+                        building.getSectorX(), building.getSectorY(),
+                        building.getOffsetX(), building.getOffsetY());
+                if (distanceToBuilding < radarRange) {
+                    removeFleets = false;
+                }
+            }
+        }
+        if (removeFleets) {
             star.getFleets().clear();
         }
 

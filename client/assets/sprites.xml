@@ -41,6 +41,10 @@
       <rect location="102,30" size="66x57" />
       <direction>0,1</direction>
     </sprite>
+    <sprite name="building.radar">
+      <rect location="136,88" size="48x56" />
+      <direction>0,1</direction>
+    </sprite>
   </sheet>
 
   <sheet filename="planets/planets.png">

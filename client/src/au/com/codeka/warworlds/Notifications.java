@@ -200,6 +200,18 @@ public class Notifications {
             return GlobalOptions.NotificationKind.FLEET_VICTORIOUS;
         }
 
+        if (sitrep.getColonyDestroyedRecord() != null) {
+            return GlobalOptions.NotificationKind.COLONY_DESTROYED;
+        }
+
+        if (sitrep.getColonyAttackedRecord() != null) {
+            return GlobalOptions.NotificationKind.COLONY_ATTACKED;
+        }
+
+        if (sitrep.getStarRunOutOfGoodsRecord() != null) {
+            return GlobalOptions.NotificationKind.STAR_GOODS_ZERO;
+        }
+
         return GlobalOptions.NotificationKind.OTHER;
     }
 

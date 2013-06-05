@@ -22,8 +22,10 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
+import android.graphics.Shader;
 import android.graphics.Paint.Style;
 import android.graphics.Path;
+import android.graphics.RadialGradient;
 import android.graphics.Rect;
 import android.os.Handler;
 import android.util.AttributeSet;
@@ -82,6 +84,10 @@ public class StarfieldSurfaceView extends SectorView
     private BaseStar mHqStar;
     private Sprite mHqSprite;
     private HqDirectionOverlay mHqOverlay;
+    private RadarOverlay mRadarOverlay;
+
+    private Star mSelectStarAfterDraw;
+    private BaseFleet mSelectFleetAfterDraw;
 
     private static Bitmap sFleetMultiBitmap;
 
@@ -103,6 +109,8 @@ public class StarfieldSurfaceView extends SectorView
         mVisibleEmpires = new TreeMap<String, Empire>();
         mVisibleEntities = new ArrayList<VisibleEntity>();
         mHandler = new Handler();
+
+        mRadarOverlay = new RadarOverlay();
 
         mMatrix = new Matrix();
         mStarPaint = new Paint();
@@ -390,6 +398,15 @@ public class StarfieldSurfaceView extends SectorView
 
         if (missingSectors != null) {
             SectorManager.getInstance().requestSectors(missingSectors, false, null);
+        }
+
+        if (mSelectStarAfterDraw != null) {
+            selectStar(mSelectStarAfterDraw);
+            mSelectStarAfterDraw = null;
+        }
+        if (mSelectFleetAfterDraw != null) {
+            selectFleet(mSelectFleetAfterDraw);
+            mSelectFleetAfterDraw = null;
         }
     }
 
@@ -850,7 +867,7 @@ public class StarfieldSurfaceView extends SectorView
         selectStar(star);
     }
 
-    private void selectStar(Star star) {
+    public void selectStar(Star star) {
         if (star != null) {
             log.info("Selecting star: "+star.getKey());
             mSelectedEntity = null;
@@ -859,6 +876,10 @@ public class StarfieldSurfaceView extends SectorView
                     selectEntity(entity);
                     break;
                 }
+            }
+
+            if (mSelectedEntity == null) {
+                mSelectStarAfterDraw = star;
             }
         }
     }
@@ -873,6 +894,11 @@ public class StarfieldSurfaceView extends SectorView
                     break;
                 }
             }
+
+
+            if (mSelectedEntity == null) {
+                mSelectFleetAfterDraw = fleet;
+            }
         }
     }
 
@@ -886,6 +912,8 @@ public class StarfieldSurfaceView extends SectorView
             }
         }
 
+        removeOverlay(mRadarOverlay);
+
         mSelectedEntity = entity;
         if (mSelectionView != null && mSelectedEntity != null) {
             RelativeLayout.LayoutParams lp = (RelativeLayout.LayoutParams) mSelectionView.getLayoutParams();
@@ -897,6 +925,14 @@ public class StarfieldSurfaceView extends SectorView
             }
             mSelectionView.setLayoutParams(lp);
             mSelectionView.setVisibility(View.VISIBLE);
+
+            if (mSelectedEntity.star != null) {
+                float radarRange = mSelectedEntity.star.getRadarRange(EmpireManager.getInstance().getEmpire().getKey());
+                if (radarRange > 0.0f) {
+                    mRadarOverlay.setRange(radarRange);
+                    addOverlay(mRadarOverlay, mSelectedEntity.star);
+                }
+            }
         }
 
         redraw();
@@ -918,6 +954,12 @@ public class StarfieldSurfaceView extends SectorView
         boolean needRedraw = false;
         for (VisibleEntity entity : mVisibleEntities) {
             if (entity.star != null && entity.star.getKey().equals(s.getKey())) {
+                entity.star = s;
+                if (mSelectedEntity == entity) {
+                    // re-selecting the star will cause it to refresh things like whether it
+                    // has a radar array or not, etc...
+                    selectStar(s);
+                }
                 needRedraw = true;
             }
         }
@@ -1081,6 +1123,68 @@ public class StarfieldSurfaceView extends SectorView
             Vector2.pool.release(pt2);
             Vector2.pool.release(starDirection);
             Vector2.pool.release(edge);
+        }
+    }
+
+    /**
+     * This overlay is used on the selected star to show you the area-of-effect of the radar
+     * (if there's one on the star).
+     */
+    private static class RadarOverlay extends VisibleEntityAttachedOverlay {
+        private float mRange;
+        private Paint mOutlinePaint;
+        private Paint mInnerPaint;
+
+        public RadarOverlay() {
+            mOutlinePaint = new Paint();
+            mOutlinePaint.setARGB(255, 0, 150, 0);
+            mOutlinePaint.setStyle(Style.STROKE);
+            mOutlinePaint.setStrokeWidth(3);
+        }
+
+        public void setRange(float range) {
+            mRange = range;
+            refreshGradient();
+        }
+
+        @Override
+        public void setCentre(double x, double y) {
+            super.setCentre(x, y);
+            refreshGradient();
+        }
+
+        private void refreshGradient() {
+            if (mRange < 1.0f || getPixelScale() == 0.0f) {
+                return;
+            }
+
+            if (mInnerPaint == null) {
+                mInnerPaint = new Paint();
+                mInnerPaint.setColor(0xff000000);
+                mInnerPaint.setStyle(Style.FILL);
+            }
+
+            RadialGradient gradient = new RadialGradient(
+                    (float) getCentre().x, (float) getCentre().y,
+                    mRange * getPixelScale(),
+                    new int[] { Color.argb(0, 0, 150, 0), Color.argb(0, 0, 150, 0), Color.argb(30, 0, 150, 0)},
+                    new float[] { 0.0f, 0.333f, 1.0f },
+                    Shader.TileMode.CLAMP
+                );
+            mInnerPaint.setShader(gradient);
+        }
+
+        @Override
+        public void draw(Canvas canvas) {
+            if (mInnerPaint == null || mOutlinePaint == null) {
+                return;
+            }
+
+            Vector2 centre = getCentre();
+            canvas.drawCircle((float) centre.x, (float) centre.y,
+                    mRange * getPixelScale(), mInnerPaint);
+            canvas.drawCircle((float) centre.x, (float) centre.y,
+                              mRange * getPixelScale(), mOutlinePaint);
         }
     }
 

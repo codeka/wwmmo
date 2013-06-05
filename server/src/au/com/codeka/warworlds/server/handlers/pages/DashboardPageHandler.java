@@ -4,6 +4,7 @@ import java.sql.Date;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.TreeMap;
 
 import au.com.codeka.warworlds.server.RequestException;
@@ -27,8 +28,8 @@ public class DashboardPageHandler extends BasePageHandler {
                       " GROUP BY DATE(date), empire_id" +
                      ") AS logins" +
                     " GROUP BY date" +
-                    " ORDER BY date ASC" +
-                    " LIMIT 30";
+                    " ORDER BY date DESC" +
+                    " LIMIT 60";
         try (SqlStmt stmt = DB.prepare(sql)) {
             ResultSet rs = stmt.select();
             while (rs.next()) {
@@ -47,6 +48,7 @@ public class DashboardPageHandler extends BasePageHandler {
         } catch(Exception e) {
             throw new RequestException(e);
         }
+        Collections.reverse(ndas);
         data.put("empire_nda", ndas);
 
         ArrayList<TreeMap<String, Object>> empireRanks = new ArrayList<TreeMap<String, Object>>();

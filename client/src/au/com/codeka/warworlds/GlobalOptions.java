@@ -143,7 +143,10 @@ public class GlobalOptions {
         FLEET_MOVE_COMPLETE,
         FLEET_UNDER_ATTACK,
         FLEET_DESTROYED,
-        FLEET_VICTORIOUS
+        FLEET_VICTORIOUS,
+        COLONY_DESTROYED,
+        COLONY_ATTACKED,
+        STAR_GOODS_ZERO
     }
 
     public static class NotificationOptions {

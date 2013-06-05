@@ -50,6 +50,10 @@ public class FleetDestroyedEvent extends Event {
 
     private void processFleetDestroyed(Star star, int fleetID) throws Exception {
         Fleet fleet = (Fleet) star.findFleet(Integer.toString(fleetID));
+        if (fleet == null) {
+            return;
+        }
+
         Simulation sim = new Simulation();
         sim.simulate(star);
         new StarController().update(star);
@@ -64,7 +68,7 @@ public class FleetDestroyedEvent extends Event {
         }
 
         CombatReport combatReport = (CombatReport) star.getCombatReport();
-        if (fleetWasDestroyed && fleet != null && fleet.getEmpireKey() != null) {
+        if (fleetWasDestroyed && fleet.getEmpireKey() != null) {
             // send a notification that this fleet was destroyed
             Messages.SituationReport.Builder sitrep_pb = Messages.SituationReport.newBuilder();
             sitrep_pb.setEmpireKey(fleet.getEmpireKey());
@@ -104,7 +108,9 @@ public class FleetDestroyedEvent extends Event {
                     }
                 }
 
-                if (onlyOneOtherEmpire && numDestroyedFleetEmpireFleets == 1) {
+                if (onlyOneOtherEmpire && numDestroyedFleetEmpireFleets == 1 &&
+                        victoriousFleetSummary.getEmpireKey() != null &&
+                        !victoriousFleetSummary.getEmpireKey().isEmpty()) {
                     // if there's only one other empire, and only one fleet from the empire
                     // that was just destroyed, it means the other empire was victorious!
                     Messages.SituationReport.Builder sitrep_pb = Messages.SituationReport.newBuilder();

@@ -164,4 +164,52 @@
     <cost minerals="100000" time="504" />
     <limits maxPerEmpire="1" />
   </design>
+  <design id="radar">
+    <name>Sensor Array</name>
+    <sprite>building.radar</sprite>
+    <description><![CDATA[
+      <p>The Sensor Array lets you detect enemy ships (not from native colonies, though) up
+      to 200 parsecs away for 1st level, 300 for 2nd level and so on. There's no point building
+      more than on per star, though nothing will stop you if you try.</p>
+      <p>A level 5 Sensor Array will send you a notification when it detects enemy ships inbound
+      for your planet.</p>
+    ]]></description>
+    <effects>
+      <effect kind="radar" range="200" />
+    </effects>
+    <cost minerals="500" time="4.6" />
+    <limits maxPerColony="1" />
+    <upgrades>
+      <upgrade level="2">
+        <cost minerals="500" time="4.6" />
+        <effects>
+          <effect kind="radar" range="300" />
+        </effects>
+      </upgrade>
+      <upgrade level="3">
+        <cost minerals="500" time="4.6" />
+        <effects>
+          <effect kind="radar" range="400" />
+        </effects>
+      </upgrade>
+      <upgrade level="4">
+        <cost minerals="500" time="4.6" />
+        <effects>
+          <effect kind="radar" range="500" />
+        </effects>
+        <dependencies>
+          <requires building="research" level="1" />
+        </dependencies>
+      </upgrade>
+      <upgrade level="5">
+        <cost minerals="500" time="4.6" />
+        <effects>
+          <effect kind="radar" range="600" />
+        </effects>
+        <dependencies>
+          <requires building="research" level="1" />
+        </dependencies>
+      </upgrade>
+    </upgrades>
+  </design>
 </designs>

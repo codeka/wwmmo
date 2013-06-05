@@ -8,7 +8,9 @@ import au.com.codeka.common.model.BaseStar;
 import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.RequestHandler;
+import au.com.codeka.warworlds.server.ctrl.BuildingController;
 import au.com.codeka.warworlds.server.ctrl.SectorController;
+import au.com.codeka.warworlds.server.model.BuildingPosition;
 import au.com.codeka.warworlds.server.model.Sector;
 import au.com.codeka.warworlds.server.model.Star;
 
@@ -46,12 +48,33 @@ public class SectorsHandler extends RequestHandler {
             generate = false;
         }
 
+        long minSectorX, minSectorY, maxSectorX, maxSectorY;
+        minSectorX = maxSectorX = coords.get(0).one;
+        minSectorY = maxSectorY = coords.get(0).two;
+        for (Pair<Long, Long> xy : coords) {
+            if (xy.one < minSectorX) {
+                minSectorX = xy.one;
+            }
+            if (xy.one > maxSectorX) {
+                maxSectorX = xy.one;
+            }
+            if (xy.two < minSectorY) {
+                minSectorY = xy.two;
+            }
+            if (xy.two > maxSectorY) {
+                maxSectorY = xy.two;
+            }
+        }
+
+        ArrayList<BuildingPosition> buildings = new BuildingController().getBuildings(
+                myEmpireID, minSectorX, minSectorY, maxSectorX, maxSectorY);
+
         SectorController ctrl = new SectorController();
         Messages.Sectors.Builder sectors_pb = Messages.Sectors.newBuilder();
         for (Sector sector : ctrl.getSectors(coords, generate)) {
             for (BaseStar baseStar : sector.getStars()) {
                 Star star = (Star) baseStar;
-                StarHandler.sanitizeStar(star, myEmpireID);
+                StarHandler.sanitizeStar(star, myEmpireID, buildings);
             }
 
             sector.toProtocolBuffer(sectors_pb.addSectorsBuilder());

@@ -86,7 +86,7 @@
 
         <RelativeLayout android:id="@+id/enemy_colony_details"
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent"
+                        android:layout_height="wrap_content"
                         android:layout_below="@id/sitrep_btn"
                         android:layout_marginTop="8dp"
                         android:visibility="gone">
@@ -119,7 +119,7 @@
             android:id="@+id/solarsystem_colony_details"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/sitrep_btn"
+            android:layout_below="@id/enemy_colony_details"
             android:layout_marginTop="4dp"
             android:visibility="gone">
 

@@ -135,7 +135,7 @@ public class Simulation {
             // also, the prediction combat report (if any) is the one to use
             star.setCombatReport(predictionStar.getCombatReport());
 
-            star.setLastSimulation(mNow);
+            star.setLastSimulation(endTime);
         }
     }
 
