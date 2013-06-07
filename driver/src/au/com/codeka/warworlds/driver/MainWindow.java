@@ -1,18 +1,20 @@
 package au.com.codeka.warworlds.driver;
 
 import java.awt.BorderLayout;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 import javax.swing.BorderFactory;
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import java.awt.GridBagLayout;
-import javax.swing.JLabel;
-import java.awt.GridBagConstraints;
-import javax.swing.JTextField;
-import java.awt.Insets;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.JSlider;
+import javax.swing.JTextField;
 
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
@@ -86,7 +88,7 @@ public class MainWindow {
         constraints.gridx = 0;
         constraints.gridy = 1;
         controlPanel.add(mBaseUrl, constraints);
-        mBaseUrl.setText("https://game.war-worlds.com/realms/beta/");
+        mBaseUrl.setText("http://localhost:8080/realms/beta/");
 
         label = new JLabel("Users:");
         constraints = new GridBagConstraints();
@@ -199,9 +201,23 @@ public class MainWindow {
 
         JButton button = new JButton("Start");
         panel.add(button);
+        button.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent _) {
+                UserManager.i.start(mBaseUrl.getText(),
+                                    Integer.parseInt(mUsers.getText()),
+                                    Integer.parseInt(mThinkTime.getText()));
+            }
+        });
 
         button = new JButton("Stop");
         panel.add(button);
+        button.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent _) {
+                UserManager.i.stop();
+            }
+        });
 
         panel = new JPanel();
         constraints = new GridBagConstraints();

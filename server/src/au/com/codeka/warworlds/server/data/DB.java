@@ -4,6 +4,11 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import au.com.codeka.warworlds.server.EventProcessor;
+
 import com.jolbox.bonecp.BoneCP;
 import com.jolbox.bonecp.BoneCPConfig;
 
@@ -11,12 +16,29 @@ import com.jolbox.bonecp.BoneCPConfig;
  * This is a wrapper class that helps us with connecting to the database.
  */
 public class DB {
-    private static String sJdbcUrl = "jdbc:mysql://localhost:3306/wwmmo?useUnicode=true&characterEncoding=utf-8";
-    private static String sUsername = "wwmmo_user";
-    private static String sPassword = "H98765gf!s876#Hdf2%7f";
+    private static final Logger log = LoggerFactory.getLogger(DB.class);
+    private static String sJdbcUrl;
+    private static String sUsername;
+    private static String sPassword;
     private static Strategy sStrategy;
 
     static {
+        String dbName = System.getProperty("au.com.codeka.warworlds.server.dbName");
+        if (dbName == null) {
+            dbName = "wwmmo";
+        }
+        sJdbcUrl = String.format("jdbc:mysql://localhost:3306/%s?useUnicode=true&characterEncoding=utf-8", dbName);
+
+        sUsername = System.getProperty("au.com.codeka.warworlds.server.dbUser");
+        if (sUsername == null) {
+            sUsername = "wwmmo_user";
+        }
+
+        sPassword = System.getProperty("au.com.codeka.warworlds.server.dbPass");
+        if (sPassword == null) {
+            sPassword = "H98765gf!s876#Hdf2%7f";
+        }
+
         try {
             Class.forName("com.mysql.jdbc.Driver");
         } catch (ClassNotFoundException e) {
@@ -62,7 +84,7 @@ public class DB {
             try {
                 mConnPool = new BoneCP(config);
             } catch (SQLException e) {
-                // TODO: should never happen!
+                log.error("Could not create connection pool!", e);
             }
         }
 

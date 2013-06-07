@@ -289,7 +289,7 @@ public class SectorGenerator {
     /**
      * Generates a random number that has an approximate normal distribution around the midpoint.
 
-     * For example, is maxValue=100 then you'll most get values around 50 and only occasionally 0
+     * For example, if maxValue=100 then you'll most get values around 50 and only occasionally 0
      * or 100. Depending on the number of rounds, the tighter the distribution around the midpoint.
      */
     private int normalRandom(int max) {

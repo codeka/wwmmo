@@ -28,14 +28,14 @@ public class HelloHandler extends RequestHandler {
         Messages.HelloResponse.Builder hello_response_pb = Messages.HelloResponse.newBuilder();
 
         // TODO: this could be cached...
-        String motd = "";
+        String motd = null;
         try (SqlStmt stmt = DB.prepare("SELECT motd FROM motd")) {
             motd = stmt.selectFirstValue(String.class);
         } catch (Exception e) {
             throw new RequestException(e);
         }
         hello_response_pb.setMotd(Messages.MessageOfTheDay.newBuilder()
-                                          .setMessage(motd)
+                                          .setMessage(motd == null ? "" : motd)
                                           .setLastUpdate(""));
 
         // fetch the empire we're interested in

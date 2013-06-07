@@ -13,5 +13,9 @@
 	<classpathentry kind="lib" path="libs/junit.jar"/>
 	<classpathentry kind="lib" path="libs/servlet.jar"/>
 	<classpathentry kind="lib" path="libs/swtgraphics2d.jar"/>
+	<classpathentry kind="lib" path="/common/libs/httpclient-4.2.2.jar"/>
+	<classpathentry kind="lib" path="/common/libs/httpcore-4.2.2.jar"/>
+	<classpathentry kind="lib" path="/common/libs/jcl-over-slf4j-1.7.5.jar"/>
+	<classpathentry kind="lib" path="/common/libs/protobuf-java-2.5.0.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

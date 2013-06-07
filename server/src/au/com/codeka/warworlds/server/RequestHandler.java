@@ -112,13 +112,15 @@ public class RequestHandler {
             return;
         }
 
-        for (String acceptValue : mRequest.getHeader("Accept").split(",")) {
-            if (acceptValue.startsWith("text/")) {
-                setResponseBodyText(pb);
-                return;
-            } else if (acceptValue.startsWith("application/json")) {
-                setResponseBodyJson(pb);
-                return;
+        if (mRequest.getHeader("Accept") != null) {
+            for (String acceptValue : mRequest.getHeader("Accept").split(",")) {
+                if (acceptValue.startsWith("text/")) {
+                    setResponseBodyText(pb);
+                    return;
+                } else if (acceptValue.startsWith("application/json")) {
+                    setResponseBodyJson(pb);
+                    return;
+                }
             }
         }
 

@@ -45,7 +45,7 @@
 	<classpathentry kind="lib" path="libs/openid4java-0.9.8.jar"/>
 	<classpathentry kind="lib" path="libs/xercesImpl-2.8.1.jar"/>
 	<classpathentry kind="lib" path="/common/libs/jcl-over-slf4j-1.7.5.jar"/>
-	<classpathentry kind="lib" path="libs/httpclient-4.2.2.jar"/>
-	<classpathentry kind="lib" path="libs/httpcore-4.2.2.jar"/>
+	<classpathentry kind="lib" path="/common/libs/httpclient-4.2.2.jar"/>
+	<classpathentry kind="lib" path="/common/libs/httpcore-4.2.2.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

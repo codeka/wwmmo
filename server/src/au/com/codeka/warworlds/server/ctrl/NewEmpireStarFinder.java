@@ -76,7 +76,6 @@ public class NewEmpireStarFinder {
         return false;
     }
 
-
     private Star findHighestScoreStar(Sector sector) {
         double highestScore = 5.0; // scores lower than 5.0 don't count
         Star highestScoreStar = null;

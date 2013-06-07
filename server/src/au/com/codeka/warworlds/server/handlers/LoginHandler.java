@@ -38,6 +38,17 @@ public class LoginHandler extends RequestHandler {
 
     @Override
     protected void get() throws RequestException {
+        boolean isLoadTest = false;
+        String propValue = System.getProperty("au.com.codeka.warworlds.server.loadTest");
+        if (propValue != null && propValue.equals("true")) {
+            isLoadTest = true;
+        }
+
+        if (isLoadTest) {
+            loadTestAuthenticate();
+            return;
+        }
+
         String authToken = getRequest().getParameter("authToken");
         if (authToken == null) {
             // it could be an OpenID authentication response.
@@ -88,6 +99,18 @@ public class LoginHandler extends RequestHandler {
         } catch (IOException e) {
             throw new RequestException(e);
         }
+    }
+
+    /**
+     * Authentication for load tests is just based on trust. You pass in the email address you
+     * want to use directly.
+     */
+    private void loadTestAuthenticate() throws RequestException {
+        String emailAddr = getRequest().getParameter("email");
+        String cookie = generateCookie(emailAddr, false, null);
+
+        getResponse().addCookie(new Cookie("SESSION", cookie));
+        getResponse().setStatus(200);
     }
 
     private void openIdAuthenticate() throws RequestException {

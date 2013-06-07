@@ -53,6 +53,7 @@
         <pathelement location="libs/mysql-connector-java-5.1.24-bin.jar"/>
         <pathelement location="${common.location}/libs/joda-convert-1.2.jar"/>
         <pathelement location="${common.location}/libs/joda-time-2.1.jar"/>
+        <pathelement location="libs/json_simple-1.1.jar" />
         <pathelement location="libs/spymemcached-2.8.7.jar"/>
         <pathelement location="libs/jangod-template.jar"/>
         <pathelement location="libs/bonecp-0.7.1.jar"/>
