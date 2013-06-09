@@ -374,7 +374,7 @@ public class Simulation {
             goodsEfficiency = totalGoods / totalGoodsRequired;
         }
 
-        log(String.format("--- Updating Populating [goods required=%.2f] [goods available=%.2f] [efficiency=%.2f]",
+        log(String.format("--- Updating Population [goods required=%.2f] [goods available=%.2f] [efficiency=%.2f]",
                           totalGoodsRequired, totalGoods, goodsEfficiency));
 
         // subtract all the goods we'll need
@@ -397,15 +397,13 @@ public class Simulation {
                 continue;
             }
 
-            float populationIncrease = colony.getPopulation();
-            if (populationIncrease < 10.0f) {
-                populationIncrease = 10.0f;
-            }
-            populationIncrease *= colony.getPopulationFocus();
+            float populationIncrease;
             if (goodsEfficiency >= 1.0f) {
-                populationIncrease *= 0.5f;
+                populationIncrease = Math.max(colony.getPopulation(), 10.0f);
+                populationIncrease *= colony.getPopulationFocus() * 0.5f;
             } else {
-                populationIncrease = colony.getPopulation() * (1.0f - colony.getPopulationFocus());
+                populationIncrease = Math.max(colony.getPopulation(), 10.0f);
+                populationIncrease *= (1.0f - colony.getPopulationFocus());
                 populationIncrease *= 0.25f * (goodsEfficiency - 1.0f);
             }
 

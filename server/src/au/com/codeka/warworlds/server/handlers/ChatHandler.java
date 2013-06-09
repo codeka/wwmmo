@@ -3,6 +3,7 @@ package au.com.codeka.warworlds.server.handlers;
 import java.sql.ResultSet;
 
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.joda.time.DateTime;
 
 import au.com.codeka.common.protobuf.Messages;
@@ -95,7 +96,7 @@ public class ChatHandler extends RequestHandler {
                 stmt.setNull(1);
                 stmt.setNull(2);
             }
-            String msg = inp_chat_msg_pb.getMessage(); // TODO: sanitize this
+            String msg = inp_chat_msg_pb.getMessage();
             String msg_en = new TranslateController().translate(msg);
             chat_msg_pb.setMessage(msg);
             if (msg_en != null) {
@@ -111,6 +112,9 @@ public class ChatHandler extends RequestHandler {
         } catch(Exception e) {
             throw new RequestException(e);
         }
+
+        // escape the HTML before sending the notification out
+        chat_msg_pb.setMessage(StringEscapeUtils.escapeHtml4(chat_msg_pb.getMessage()));
 
         String encoded = Base64.encodeBase64String(chat_msg_pb.build().toByteArray());
         if (chat_msg_pb.hasAllianceKey()) {
