@@ -38,12 +38,16 @@ public class ChatHandler extends RequestHandler {
 
         String sql = "SELECT * FROM chat_messages" +
                     " WHERE posted_date > ?" +
-                      " AND (alliance_id IS NULL OR alliance_id = ?)" +
+                    (getSession().isAdmin()
+                        ? "" // admin can see all alliance chat
+                        : " AND (alliance_id IS NULL OR alliance_id = ?)") +
                     " ORDER BY posted_date DESC" +
                     " LIMIT "+max;
         try (SqlStmt stmt = DB.prepare(sql)) {
             stmt.setDateTime(1, since);
-            stmt.setInt(2, getSession().getAllianceID());
+            if (!getSession().isAdmin()) {
+                stmt.setInt(2, getSession().getAllianceID());
+            }
             ResultSet rs = stmt.select();
 
             Messages.ChatMessages.Builder chat_msgs_pb = Messages.ChatMessages.newBuilder();
@@ -108,7 +112,13 @@ public class ChatHandler extends RequestHandler {
             throw new RequestException(e);
         }
 
-        new NotificationController().sendNotification(
-                "chat", Base64.encodeBase64String(chat_msg_pb.build().toByteArray()));
+        String encoded = Base64.encodeBase64String(chat_msg_pb.build().toByteArray());
+        if (chat_msg_pb.hasAllianceKey()) {
+            new NotificationController().sendNotificationToOnlineAlliance(
+                    Integer.parseInt(chat_msg_pb.getAllianceKey()), "chat", encoded);
+        } else {
+            new NotificationController().sendNotificationToAllOnline(
+                    "chat", encoded);
+        }
     }
 }

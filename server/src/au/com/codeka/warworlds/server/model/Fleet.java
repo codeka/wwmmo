@@ -5,6 +5,7 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 
 import org.joda.time.DateTime;
+import org.joda.time.Seconds;
 
 import au.com.codeka.common.model.BaseFleet;
 import au.com.codeka.common.model.DesignKind;
@@ -99,6 +100,28 @@ public class Fleet extends BaseFleet {
 
     public ShipDesign getDesign() {
         return (ShipDesign) DesignManager.i.getDesign(DesignKind.SHIP, mDesignID);
+    }
+
+    /**
+     * Returns a float, between 0 and 1, that indicates how close we are to our destination.
+     * This method assumes we're actually moving...
+     */
+    public float getMovementProgress() {
+        if (mEta == null) {
+            return 0.0f;
+        }
+
+        float totalMovementTimeInHours = Seconds.secondsBetween(mStateStartTime, mEta).getSeconds() / 3600.0f;
+        if (totalMovementTimeInHours < 0.0001) {
+            return 0.0f;
+        }
+
+        float currentMovementTimeInHours = Seconds.secondsBetween(mStateStartTime, DateTime.now()).getSeconds() / 3600.0f;
+        if (currentMovementTimeInHours > totalMovementTimeInHours) {
+            return 1.0f;
+        }
+
+        return currentMovementTimeInHours / totalMovementTimeInHours;
     }
 
     @Override

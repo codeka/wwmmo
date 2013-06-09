@@ -22,6 +22,8 @@
         <pathelement location="${common.location}/libs/joda-convert-1.2.jar"/>
         <pathelement location="${common.location}/libs/joda-time-2.1.jar"/>
         <pathelement location="${common.location}/libs/slf4j-api-1.7.5.jar"/>
+        <pathelement location="${common.location}/libs/slf4j-jdk14-1.7.5.jar"/>
+        <pathelement location="${common.location}/libs/jregex1.2_01.jar"/>
     </path>
     <path id="server.classpath">
         <pathelement location="bin"/>
@@ -45,19 +47,15 @@
         <pathelement location="../jetty/lib/jetty-xml-9.0.1.v20130408.jar"/>
         <pathelement location="../jetty/lib/jetty-proxy-9.0.1.v20130408.jar"/>
         <pathelement location="../jetty/lib/jetty-server-9.0.1.v20130408.jar"/>
-        <path refid="common.classpath"/>
-        <pathelement location="${common.location}/libs/protobuf-java-2.5.0.jar"/>
-        <pathelement location="${common.location}/libs/jregex1.2_01.jar"/>
-        <pathelement location="${common.location}/libs/slf4j-api-1.7.5.jar"/>
-        <pathelement location="${common.location}/libs/slf4j-jdk14-1.7.5.jar"/>
         <pathelement location="libs/mysql-connector-java-5.1.24-bin.jar"/>
-        <pathelement location="${common.location}/libs/joda-convert-1.2.jar"/>
-        <pathelement location="${common.location}/libs/joda-time-2.1.jar"/>
         <pathelement location="libs/json_simple-1.1.jar" />
         <pathelement location="libs/spymemcached-2.8.7.jar"/>
+        <pathelement location="libs/gcm-server.jar"/>
         <pathelement location="libs/jangod-template.jar"/>
         <pathelement location="libs/bonecp-0.7.1.jar"/>
         <pathelement location="libs/guava-14.0.1.jar"/>
+        <pathelement location="lib/guice-2.0.jar"/>
+        <path refid="common.classpath"/>
     </path>
     <target name="init">
         <mkdir dir="bin"/>

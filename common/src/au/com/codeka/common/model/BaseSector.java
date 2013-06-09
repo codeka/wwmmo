@@ -19,6 +19,7 @@ public abstract class BaseSector {
     protected abstract BaseFleet createFleet(Messages.Fleet pb);
 
     public static int SECTOR_SIZE = 1024;
+    public static float PIXELS_PER_PARSEC = 10.0f;
 
     public long getX() {
         return mX;
@@ -35,33 +36,40 @@ public abstract class BaseSector {
      * {@link Star} b. You can use the \c length() method to determine the distance between them.
      */
     public static Vector2 directionBetween(BaseStar a, BaseStar b) {
-        return directionBetween(a, b.getSectorX(), b.getSectorY(), b.getOffsetX(), b.getOffsetY());
+        return directionBetween(a.getSectorX(), a.getSectorY(), a.getOffsetX(), a.getOffsetY(),
+                                b.getSectorX(), b.getSectorY(), b.getOffsetX(), b.getOffsetY());
     }
 
-    public static Vector2 directionBetween(BaseStar a, long sectorX, long sectorY, int offsetX, int offsetY) {
-        float dx = a.getOffsetX() - offsetX;
-        float dy = a.getOffsetY() - offsetY;
+    public static Vector2 directionBetween(long sector1X, long sector1Y, int offset1X, int offset1Y,
+                                           long sector2X, long sector2Y, int offset2X, int offset2Y) {
+        float dx = offset2X - offset1X;
+        float dy = offset2Y - offset1Y;
 
-        float dsx = a.getSectorX() - sectorX;
+        float dsx = sector2X - sector1X;
         dx += (dsx * SECTOR_SIZE);
 
-        float dsy = a.getSectorY() - sectorY;
+        float dsy = sector2Y - sector1Y;
         dy += (dsy * SECTOR_SIZE);
 
-        return new Vector2(dx, dy);
+        return new Vector2(dx / PIXELS_PER_PARSEC, dy / PIXELS_PER_PARSEC);
     }
 
     /**
      * Calculates the distance (in "parsecs") between the two given stars.
      */
     public static float distanceInParsecs(BaseStar a, BaseStar b) {
-        double distanceInPixels = directionBetween(a, b).length();
-        return (float) (distanceInPixels / 10.0);
+        return (float) directionBetween(a, b).length();
     }
 
     public static float distanceInParsecs(BaseStar a, long sectorX, long sectorY, int offsetX, int offsetY) {
-        double distanceInPixels = directionBetween(a, sectorX, sectorY, offsetX, offsetY).length();
-        return (float) (distanceInPixels / 10.0);
+        return (float) directionBetween(a.getSectorX(), a.getSectorY(), a.getOffsetX(), a.getOffsetY(),
+                                        sectorX, sectorY, offsetX, offsetY).length();
+    }
+
+    public static float distanceInParsecs(long sector1X, long sector1Y, int offset1X, int offset1Y,
+                                          long sector2X, long sector2Y, int offset2X, int offset2Y) {
+        return (float) directionBetween(sector1X, sector1Y, offset1X, offset1Y,
+                                        sector2X, sector2Y, offset2X, offset2Y).length();
     }
 
     public void fromProtocolBuffer(Messages.Sector pb) {

@@ -70,11 +70,19 @@ public class SectorsHandler extends RequestHandler {
                 myEmpireID, minSectorX, minSectorY, maxSectorX, maxSectorY);
 
         SectorController ctrl = new SectorController();
+        List<Sector> sectors = ctrl.getSectors(coords, generate);
+        ArrayList<Star> allStars = new ArrayList<Star>();
+        for (Sector sector : sectors) {
+            for (BaseStar baseStar : sector.getStars()) {
+                allStars.add((Star) baseStar);
+            }
+        }
+
         Messages.Sectors.Builder sectors_pb = Messages.Sectors.newBuilder();
-        for (Sector sector : ctrl.getSectors(coords, generate)) {
+        for (Sector sector : sectors) {
             for (BaseStar baseStar : sector.getStars()) {
                 Star star = (Star) baseStar;
-                StarHandler.sanitizeStar(star, myEmpireID, buildings);
+                StarHandler.sanitizeStar(star, myEmpireID, buildings, allStars);
             }
 
             sector.toProtocolBuffer(sectors_pb.addSectorsBuilder());

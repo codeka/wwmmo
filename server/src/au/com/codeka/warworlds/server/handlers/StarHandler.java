@@ -3,7 +3,10 @@ package au.com.codeka.warworlds.server.handlers;
 import java.util.ArrayList;
 
 import org.joda.time.DateTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import au.com.codeka.common.Vector2;
 import au.com.codeka.common.model.BaseBuildRequest;
 import au.com.codeka.common.model.BaseFleet;
 import au.com.codeka.common.model.BaseScoutReport;
@@ -27,6 +30,8 @@ import au.com.codeka.warworlds.server.model.Star;
  * Handles /realm/.../stars/{id} URL
  */
 public class StarHandler extends RequestHandler {
+    private static final Logger log = LoggerFactory.getLogger(StarHandler.class);
+
     @Override
     protected void get() throws RequestException {
         int id = Integer.parseInt(getUrlParameter("star_id"));
@@ -40,7 +45,7 @@ public class StarHandler extends RequestHandler {
                 myEmpireID, star.getSectorX() - 1, star.getSectorY() - 1,
                 star.getSectorX() + 1, star.getSectorY() + 1);
 
-        sanitizeStar(star, myEmpireID, buildings);
+        sanitizeStar(star, myEmpireID, buildings, null);
 
         Messages.Star.Builder star_pb = Messages.Star.newBuilder();
         star.toProtocolBuffer(star_pb);
@@ -53,9 +58,13 @@ public class StarHandler extends RequestHandler {
      * @param myEmpireID
      */
     public static void sanitizeStar(Star star, int myEmpireID,
-                                    ArrayList<BuildingPosition> buildings) {
+                                    ArrayList<BuildingPosition> buildings,
+                                    ArrayList<Star> otherStars) {
+        log.debug(String.format("Sanitizing star %s (%d, %d) (%d, %d)",
+                star.getName(), star.getSectorX(), star.getSectorY(), star.getOffsetX(), star.getOffsetY()));
         // if we don't have any fleets here, remove all the others
         boolean removeFleets = true;
+        ArrayList<Fleet> fleetsToAddBack = null;
         for (BaseFleet baseFleet : star.getFleets()) {
             Fleet fleet = (Fleet) baseFleet;
             if (fleet.getEmpireID() == myEmpireID) {
@@ -73,16 +82,64 @@ public class StarHandler extends RequestHandler {
             }
 
             if (radarRange > 0.0f) {
+                log.debug(String.format("Building position: (%d, %d) (%d, %d)",
+                        building.getSectorX(), building.getSectorY(), building.getOffsetX(), building.getOffsetY()));
                 float distanceToBuilding = Sector.distanceInParsecs(star,
                         building.getSectorX(), building.getSectorY(),
                         building.getOffsetX(), building.getOffsetY());
                 if (distanceToBuilding < radarRange) {
+                    log.debug(String.format("Distance to building (%.2f) > radar range (%.2f), keeping fleets.",
+                            distanceToBuilding, radarRange));
                     removeFleets = false;
+                }
+
+                if (removeFleets && otherStars != null) {
+                    // check any moving fleets, we'll want to add those back
+                    for (BaseFleet baseFleet : star.getFleets()) {
+                        if (baseFleet.getState() != Fleet.State.MOVING) {
+                            continue;
+                        }
+                        Fleet fleet = (Fleet) baseFleet;
+
+                        Star destinationStar = null;
+                        for (Star otherStar : otherStars) {
+                            if (otherStar.getID() == fleet.getDestinationStarID()) {
+                                destinationStar = otherStar;
+                                break;
+                            }
+                        }
+                        if (destinationStar != null) {
+                            Vector2 dir = Sector.directionBetween(star, destinationStar);
+                            float progress = fleet.getMovementProgress();
+                            log.debug(String.format("Fleet's distance to destination: %.2f, progress=%.2f", dir.length(), progress));
+                            dir.scale(progress);
+
+                            float distanceToFleet = Sector.distanceInParsecs(
+                                    star.getSectorX(), star.getSectorY(),
+                                    star.getOffsetX() + (int) (dir.x * Sector.PIXELS_PER_PARSEC),
+                                    star.getOffsetY() + (int) (dir.y * Sector.PIXELS_PER_PARSEC),
+                                    building.getSectorX(), building.getSectorY(),
+                                    building.getOffsetX(), building.getOffsetY());
+                            if (distanceToFleet < radarRange) {
+                                if (fleetsToAddBack == null) {
+                                    fleetsToAddBack = new ArrayList<Fleet>();
+                                }
+                                log.debug(String.format("Adding fleet %d (%s x %.2f) back.",
+                                        fleet.getID(), fleet.getDesignID(), fleet.getNumShips()));
+                                fleetsToAddBack.add(fleet);
+                            } else {
+                                log.debug(String.format("distance to fleet (%.2f) >= radar range (%.2f)", distanceToFleet, radarRange));
+                            }
+                        }
+                    }
                 }
             }
         }
         if (removeFleets) {
             star.getFleets().clear();
+            if (fleetsToAddBack != null) {
+                star.getFleets().addAll(fleetsToAddBack);
+            }
         }
 
         // remove build requests that aren't ours

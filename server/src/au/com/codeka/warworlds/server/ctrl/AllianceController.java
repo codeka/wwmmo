@@ -230,7 +230,7 @@ public class AllianceController {
         }
 
         public List<AllianceJoinRequest> getJoinRequests(int allianceID) throws Exception {
-            String sql = "SELECT * FROM alliance_join_requests WHERE alliance_id = ?";
+            String sql = "SELECT * FROM alliance_join_requests WHERE alliance_id = ? ORDER BY request_date DESC";
             try (SqlStmt stmt = prepare(sql)) {
                 stmt.setInt(1, allianceID);
                 ResultSet rs = stmt.select();

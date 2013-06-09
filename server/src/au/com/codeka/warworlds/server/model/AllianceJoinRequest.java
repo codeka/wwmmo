@@ -34,7 +34,7 @@ public class AllianceJoinRequest extends BaseAllianceJoinRequest {
         return mEmpireID;
     }
     public int getAllianceID() {
-        return mID;
+        return mAllianceID;
     }
 
     @Override

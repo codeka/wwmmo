@@ -53,6 +53,8 @@ public class DesignManager extends BaseDesignManager {
                 return new DefenceBuildingEffect();
             } else if (effectKind.equals("populationBoost")) {
                 return new PopulationBoostBuildingEffect();
+            } else if (effectKind.equals("radar")) {
+                return new RadarBuildingEffect();
             }
         } else {
             if (effectKind.equals("scout")) {

@@ -29,7 +29,7 @@ public class SituationReportController {
 
             int empireID = Integer.parseInt(sitrep_pb.getEmpireKey());
             String base64 = Base64.encodeBase64String(sitrep_pb.toByteArray());
-            new NotificationController().sendNotification(empireID, "sitrep", base64);
+            new NotificationController().sendNotificationToEmpire(empireID, "sitrep", base64);
         } catch (Exception e) {
             throw new RequestException(e);
         }

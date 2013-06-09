@@ -82,8 +82,15 @@
       }
       var dtstr = dt.getFullYear()+"-"+zeroPad(dt.getMonth() + 1, 2)+"-"+zeroPad(dt.getDate(), 2);
       dtstr += " "+zeroPad(dt.getHours(), 2)+":"+zeroPad(dt.getMinutes(), 2);
+      var msgstr = dtstr;
 
-      var msgstr = dtstr+" : "+msg.empire+" : ";
+      if (msg.alliance_key) {
+        msgstr += " : <em>Alliance</em>";
+      } else {
+        msgstr += " : <em>Global</em>";
+      }
+
+      msgstr += " : "+msg.empire+" : ";
       if (msg.message_en) {
         msgstr += "<span class=\"translated\">"+msg.message_en+"</span>";
       } else {
@@ -121,14 +128,16 @@
       });
     }
 
-    var lastFetch = new Date();
-    lastFetch.setDate(lastFetch.getDate() - 4);
+    window.lastFetch = new Date();
+    window.lastFetch.setDate(lastFetch.getDate() - 4);
     function fetchMessages() {
       $.ajax({
-        "url": "/realms/beta/chat?since="+parseInt(lastFetch.getTime() / 1000),
+        "url": "/realms/beta/chat?since="+parseInt(window.lastFetch.getTime() / 1000),
         "method": "get",
         "dataType": "json",
         "success": function(data) {
+          window.lastFetch = new Date();
+
           if (typeof data.messages == "undefined") {
             return;
           }
@@ -144,7 +153,6 @@
           }
 
           sortMessages();
-          lastFetch = new Date();
         }
       });
     }

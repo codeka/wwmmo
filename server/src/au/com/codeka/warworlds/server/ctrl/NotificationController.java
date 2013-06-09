@@ -24,21 +24,25 @@ public class NotificationController {
     private final Logger log = LoggerFactory.getLogger(NotificationController.class);
     private static String API_KEY = "AIzaSyADWOC-tWUbzj-SVW13Sz5UuUiGfcmHHDA";
 
-    public void sendNotification(String name, String value) throws RequestException {
-        sendNotification(null, name, value);
-    }
-
-    public void sendNotification(Integer empireID, String name, String value) throws RequestException {
+    public void sendNotificationToEmpire(int empireID, String name, String value) throws RequestException {
         TreeMap<String, String> values = new TreeMap<String, String>();
         values.put(name, value);
-        sendNotification(empireID, values);
+        sendNotification(empireID, null, values);
     }
 
-    public void sendNotification(Map<String, String> values) throws RequestException {
-        sendNotification((Integer) null, values);
+    public void sendNotificationToOnlineAlliance(int allianceID, String name, String value) throws RequestException {
+        TreeMap<String, String> values = new TreeMap<String, String>();
+        values.put(name, value);
+        sendNotification(null, allianceID, values);
     }
 
-    public void sendNotification(Integer empireID, Map<String, String> values) throws RequestException {
+    public void sendNotificationToAllOnline(String name, String value) throws RequestException {
+        TreeMap<String, String> values = new TreeMap<String, String>();
+        values.put(name, value);
+        sendNotification(null, null, values);
+    }
+
+    private void sendNotification(Integer empireID, Integer allianceID, Map<String, String> values) throws RequestException {
         Message.Builder msgBuilder = new Message.Builder();
         for (Map.Entry<String, String> value : values.entrySet()) {
             msgBuilder.addData(value.getKey(), value.getValue());
@@ -46,8 +50,14 @@ public class NotificationController {
 
         Map<String, String> devices = new TreeMap<String, String>();
         String sql;
-        if (empireID == null) {
+        if (empireID == null && allianceID == null) {
             sql = "SELECT gcm_registration_id, user_email FROM devices WHERE online_since > ? AND gcm_registration_id IS NOT NULL";
+        } else if (allianceID != null) {
+            sql = "SELECT gcm_registration_id, devices.user_email" +
+                 " FROM devices" +
+                 " INNER JOIN empires ON devices.user_email = empires.user_email" +
+                 " WHERE online_since > ?" +
+                   " AND alliance_id = ?";
         } else {
             sql = "SELECT gcm_registration_id, devices.user_email" +
                  " FROM devices" +
@@ -55,8 +65,11 @@ public class NotificationController {
                  " WHERE empires.id = ?";
         }
         try (SqlStmt stmt = DB.prepare(sql)) {
-            if (empireID == null) {
+            if (empireID == null && allianceID == null) {
                 stmt.setDateTime(1, DateTime.now().minusHours(1));
+            } else if (allianceID != null) {
+                stmt.setDateTime(1, DateTime.now().minusHours(1));
+                stmt.setInt(2, allianceID);
             } else {
                 stmt.setInt(1, empireID);
             }

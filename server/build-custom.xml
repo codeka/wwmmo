@@ -35,7 +35,8 @@
         <zip destfile="${deploy.filename}" basedir="${output.location}" />
         <exec executable="gcutil">
             <arg value="push" />
-            <arg value="warworlds-cpu1" />
+            <arg value="--zone=us-central1-a" />
+            <arg value="warworlds-main" />
             <arg value="${deploy.filename}" />
             <arg value="/home/dean" />
         </exec> 

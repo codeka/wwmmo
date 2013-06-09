@@ -497,9 +497,15 @@ public class StarfieldSurfaceView extends SectorView
         y += star.getOffsetY();
         final float pixelScale = getPixelScale();
 
-        // only draw the star if it's actually visible...
+        boolean isSelected = false;
+        if (mSelectedEntity != null && mSelectedEntity.star != null) {
+            isSelected = (mSelectedEntity.star == star);
+        }
+
+        // only draw the star if it's actually visible (or selected)...
         if (isVisible(canvas, (x - 100) * pixelScale, (y - 100) * pixelScale,
-                              (x + 100) * pixelScale, (y + 100) * pixelScale)) {
+                              (x + 100) * pixelScale, (y + 100) * pixelScale)
+            || isSelected) {
 
             float imageScale = (float) star.getStarType().getImageScale();
             int imageSize = (int)(star.getSize() * imageScale * 2);
@@ -1166,7 +1172,7 @@ public class StarfieldSurfaceView extends SectorView
 
             RadialGradient gradient = new RadialGradient(
                     (float) getCentre().x, (float) getCentre().y,
-                    mRange * getPixelScale(),
+                    mRange * getPixelScale() * Sector.PIXELS_PER_PARSEC,
                     new int[] { Color.argb(0, 0, 150, 0), Color.argb(0, 0, 150, 0), Color.argb(30, 0, 150, 0)},
                     new float[] { 0.0f, 0.333f, 1.0f },
                     Shader.TileMode.CLAMP
@@ -1182,9 +1188,9 @@ public class StarfieldSurfaceView extends SectorView
 
             Vector2 centre = getCentre();
             canvas.drawCircle((float) centre.x, (float) centre.y,
-                    mRange * getPixelScale(), mInnerPaint);
+                    mRange * getPixelScale() * Sector.PIXELS_PER_PARSEC, mInnerPaint);
             canvas.drawCircle((float) centre.x, (float) centre.y,
-                              mRange * getPixelScale(), mOutlinePaint);
+                              mRange * getPixelScale() * Sector.PIXELS_PER_PARSEC, mOutlinePaint);
         }
     }
 
