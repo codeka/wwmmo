@@ -62,7 +62,7 @@
   <script>
     $("input[type=submit]").on("click", function() {
       $.ajax({
-        url: "/realms/beta/motd",
+        url: "/realms/{{realm}}/motd",
         contentType: "text/html",
         type: "POST",
         data: $("#newMotd").val(),
@@ -74,7 +74,7 @@
 
     function refresh(updateNew) {
         $.ajax({
-          url: "/realms/beta/motd",
+          url: "/realms/{{realm}}/motd",
           dataType: "html",
           type: "GET",
           success: function(data) {

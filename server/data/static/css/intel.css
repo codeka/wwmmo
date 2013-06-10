@@ -154,7 +154,7 @@ body {
   color: #ccc;
 }
 
-div.star-icon-small { background: url(/intel/stars_small.png) no-repeat; }
+div.star-icon-small { background: url(../intel/stars_small.png) no-repeat; }
 div.star-icon-small.blackhole-1 { background-position: 0 0; }
 div.star-icon-small.blackhole-2 { background-position: -32px 0; }
 div.star-icon-small.blackhole-3 { background-position: -64px 0; }
@@ -186,7 +186,7 @@ div.star-icon-small.yellow-2 { background-position: -32px -288px; }
 div.star-icon-small.yellow-3 { background-position: -64px -288px; }
 div.star-icon-small.yellow-4 { background-position: -96px -288px; }
 
-div.star-icon-big { background: url(/intel/stars_big.png) no-repeat; }
+div.star-icon-big { background: url(../intel/stars_big.png) no-repeat; }
 div.star-icon-big.blackhole-1 { background-position: 0 0; }
 div.star-icon-big.blackhole-2 { background-position: -256px 0; }
 div.star-icon-big.blackhole-3 { background-position: 0px 0; }

@@ -17,7 +17,7 @@ var empireStore = (function() {
           callback(empire_names[empireKey]);
         } else {
           $.ajax({
-            "url": "/realms/beta/empires/search?ids="+empireKey,
+            "url": "/realms/"+window.realm+"/empires/search?ids="+empireKey,
             "dataType": "json",
             "method": "GET",
             "success": function(data) {

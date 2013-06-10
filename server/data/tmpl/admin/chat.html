@@ -1,8 +1,8 @@
 {% extends "admin/skeleton.html" %}
 {% block title %}Chat{% endblock %}
 {% block head %}
-  <script src="/js/tmpl.js"></script>
-  <script src="/js/empirestore.js"></script>
+  <script src="/realms/{{realm}}/js/tmpl.js"></script>
+  <script src="/realms/{{realm}}/js/empirestore.js"></script>
   <style>
     section#messages {
       position: absolute;
@@ -112,7 +112,7 @@
     }
 
     function sendMessage(msg) {
-      var url = "/realms/beta/chat";
+      var url = "/realms/{{realm}}/chat";
       $.ajax({
         url: url, type: "POST", contentType: "application/json",
         data: JSON.stringify({
@@ -132,7 +132,7 @@
     window.lastFetch.setDate(lastFetch.getDate() - 4);
     function fetchMessages() {
       $.ajax({
-        "url": "/realms/beta/chat?since="+parseInt(window.lastFetch.getTime() / 1000),
+        "url": "/realms/{{realm}}/chat?since="+parseInt(window.lastFetch.getTime() / 1000),
         "method": "get",
         "dataType": "json",
         "success": function(data) {

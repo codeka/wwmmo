@@ -123,7 +123,7 @@ public class Authenticator {
                     String authToken = getAuthToken(account, activity, scope);
                     sAccountManager.invalidateAuthToken(account.type, authToken);
                     authToken = getAuthToken(account, activity, scope);
-                    return DefaultAuthenticator.authenticate(authToken);
+                    return DefaultAuthenticator.authenticate(authToken, realm);
                 } else if (realm.getAuthentciationMethod() == Realm.AuthenticationMethod.LocalAppEngine) {
                     log.info("Account found, setting up with debug auth cookie.");
                     // Use a fake cookie for the dev mode app engine server. The cookie has the

@@ -58,15 +58,9 @@ public class OpenIdAuth {
         }
     }
 
-    public static String getAuthenticateUrl(HttpServletRequest request) throws RequestException {
-        String returnUrl = getRequestUrl(request);
-        try {
-            returnUrl = new URI(returnUrl).resolve("/login").toString();
-        } catch (URISyntaxException e) {
-            throw new RequestException(e);
-        }
-
-        // Google is the only provider we support
+    public static String getAuthenticateUrl(HttpServletRequest request,
+                                            String returnUrl) throws RequestException {
+        // note: Google is the only provider we support
         try {
             DiscoveryInformation discovered = getDiscoveryInformation();
 

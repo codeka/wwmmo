@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.reflect.Method;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.sql.ResultSet;
 
 import javax.servlet.ServletInputStream;
@@ -159,6 +161,22 @@ public class RequestHandler {
 
     protected Session getSession() throws RequestException {
         return getSession(true);
+    }
+
+    protected String getRequestUrl() {
+        URI requestURI = null;
+        try {
+            requestURI = new URI(mRequest.getRequestURL().toString());
+        } catch (URISyntaxException e) {
+            return null; // should never happen!
+        }
+
+        // TODO(deanh): is hard-coding the https part for game.war-worlds.com the best way? no...
+        if (requestURI.getHost().equals("game.war-worlds.com")) {
+            return "https://game.war-worlds.com"+requestURI.getPath();
+        } else {
+            return requestURI.toString();
+        }
     }
 
     protected Session getSession(boolean errorOnNotAuth) throws RequestException {

@@ -108,12 +108,12 @@
       var url = "";
       var inp = $(this).find("input[type=text]");
       if ($(this).find("#search-details").prop("checked")) {
-        url = "/realms/beta/empires/"+inp.val()+"/details";
+        url = "/realms/{{realm}}/empires/"+inp.val()+"/details";
         if (!$(this).find("#search-simulate").prop("checked")) {
           url += "?do_simulate=0";
         }
       } else {
-        url = "/realms/beta/empires/search";
+        url = "/realms/{{realm}}/empires/search";
         if (inp.val().indexOf("@") > 0) {
           url += "?email="+inp.val();
         } else if (parseInt(inp.val()) == inp.val()) {
@@ -154,7 +154,7 @@
     $("#empire-query").on("click", ":submit", function(evnt) {
       evnt.preventDefault();
       if($(this).val() == "Cash Audit") {
-        var url = "/realms/beta/empires/"+$("#empire-key").val()+"/cash-audit";
+        var url = "/realms/{{realm}}/empires/"+$("#empire-key").val()+"/cash-audit";
         $.ajax({
           url: url,
           type: "GET",
@@ -201,7 +201,7 @@
           }
         });
       } else {
-        var url = "/realms/beta/empires/"+$("#empire-key").val()+"/building-statistics";
+        var url = "/realms/{{realm}}/empires/"+$("#empire-key").val()+"/building-statistics";
         $.ajax({
           url: url,
           type: "GET",
@@ -219,7 +219,7 @@
     $("#create-empire").on("submit", function(evnt) {
       evnt.preventDefault();
 
-      var url = "/realms/beta/empires";
+      var url = "/realms/{{realm}}/empires";
 
       $.ajax({
         url: url,

@@ -1,6 +1,10 @@
 package au.com.codeka.warworlds.server.handlers.pages;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URLEncoder;
 import java.text.DecimalFormat;
 import java.util.Map;
 
@@ -34,6 +38,8 @@ public class BasePageHandler extends RequestHandler {
     }
 
     protected void render(String path, Map<String, Object> data) {
+        data.put("realm", getRealm());
+
         getResponse().setContentType("text/html");
         getResponse().setHeader("Content-Type", "text/html");
         try {
@@ -55,7 +61,22 @@ public class BasePageHandler extends RequestHandler {
     }
 
     protected void authenticate() throws RequestException {
-        String url = OpenIdAuth.getAuthenticateUrl(getRequest());
+        URI requestUrl;
+        try {
+            requestUrl = new URI(getRequestUrl());
+        } catch (URISyntaxException e) {
+            throw new RequestException(e);
+        }
+
+        String finalUrl = requestUrl.getPath();
+        String returnUrl = requestUrl.resolve("/realms/"+getRealm()+"/login").toString();
+        try {
+            returnUrl += "?continue="+URLEncoder.encode(finalUrl, "utf-8");
+        } catch (UnsupportedEncodingException e) {
+            throw new RequestException(e);
+        }
+
+        String url = OpenIdAuth.getAuthenticateUrl(getRequest(), returnUrl);
         getResponse().setStatus(302);
         getResponse().addHeader("Location", url);
     }

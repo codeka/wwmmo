@@ -11,13 +11,14 @@
         overflow: hidden;
       }
     </style>
-    <link rel="stylesheet" href="/css/ww-style.css" />
-    <link rel="stylesheet" href="/css/intel.css" />
+    <link rel="stylesheet" href="/realms/{{realm}}/css/ww-style.css" />
+    <link rel="stylesheet" href="/realms/{{realm}}/css/intel.css" />
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
-    <script src="/js/tmpl.js"></script>
-    <script src="/js/seedrandom.js"></script>
-    <script src="/js/empirestore.js"></script>
-    <script src="/js/intel.js"></script>
+    <script>window.realm = "{{realm}}";</script>
+    <script src="/realms/{{realm}}/js/tmpl.js"></script>
+    <script src="/realms/{{realm}}/js/seedrandom.js"></script>
+    <script src="/realms/{{realm}}/js/empirestore.js"></script>
+    <script src="/realms/{{realm}}/js/intel.js"></script>
   </head>
   <body>
     <canvas id="main-canvas"></canvas>

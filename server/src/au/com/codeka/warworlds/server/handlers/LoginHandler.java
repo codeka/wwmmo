@@ -119,7 +119,12 @@ public class LoginHandler extends RequestHandler {
 
         getResponse().addCookie(new Cookie("SESSION", cookie));
         getResponse().setStatus(302);
-        getResponse().addHeader("Location", "/admin"); // TODO: hard-coded?
+
+        String continueUrl = getRequest().getParameter("continue");
+        if (continueUrl == null) {
+            continueUrl = "/admin";
+        }
+        getResponse().addHeader("Location", continueUrl);
     }
 
     /**

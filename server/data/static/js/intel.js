@@ -354,7 +354,7 @@ $(function() {
       {x: 96, y: 288, width: 32, height: 32, scale: 1}
     ]
   };
-  Star.small.img.src = "/intel/stars_small.png";
+  Star.small.img.src = "/realms/"+window.realm+"/intel/stars_small.png";
   Star.small.img.onload = function() { world.draw(); }
 
   var Sector = WorldObject.extend({
@@ -408,14 +408,14 @@ $(function() {
   });
   Sector.SIZE = 1024;
   Sector.backgrounds = [new Image(), new Image()];
-  Sector.backgrounds[0].src = "/intel/decoration/starfield/01.png";
-  Sector.backgrounds[1].src = "/intel/decoration/starfield/02.png";
+  Sector.backgrounds[0].src = "/realms/"+window.realm+"/intel/decoration/starfield/01.png";
+  Sector.backgrounds[1].src = "/realms/"+window.realm+"/intel/decoration/starfield/02.png";
   Sector.gases = [];
   for (var i = 0; i <= 13; i++) {
     var img = new Image();
     var name = "00"+i;
     name = name.substr(name.length - 2);
-    img.src = "/intel/decoration/gas/"+name+".png";
+    img.src = "/realms/"+window.realm+"/intel/decoration/gas/"+name+".png";
     img.onload = function () {
       world.draw();
     }
@@ -615,7 +615,7 @@ $(function() {
         console.log("fetching sectors: "+missingSectors.join("|"));
         var world = this;
         $.ajax({
-          url: "/realms/beta/sectors?coords="+missingSectors.join("|")/*+"&gen=0"*/,
+          url: "/realms/"+window.realm+"/sectors?coords="+missingSectors.join("|")/*+"&gen=0"*/,
           dataType: "json",
           success: function (data) {
             if (!data || !data.sectors) {
@@ -744,7 +744,7 @@ $(function() {
       if (evnt.which == 13) {
         var $results = $("#search-results");
         var $tmpl = $("#search-result-tmpl");
-        var url = "/realms/beta/stars?q="+$("#search input[type=text]").val();
+        var url = "/realms/"+window.realm+"/stars?q="+$("#search input[type=text]").val();
 
         $results.empty();
 
@@ -846,7 +846,7 @@ $(function() {
   $(function() {
     $("#debug-new-empire").click(function() {
       $.ajax({
-        url: "/realms/beta/stars?find_for_empire=1",
+        url: "/realms/"+window.realm+"/stars?find_for_empire=1",
         "dataType": "json",
         "success": function(star_pb) {
           var star = new Star(star_pb);

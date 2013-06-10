@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import au.com.codeka.warworlds.Util;
+import au.com.codeka.warworlds.model.Realm;
 
 /**
  * This is the "default" authenticator, which basically passes the auth token to our web
@@ -17,8 +18,8 @@ import au.com.codeka.warworlds.Util;
 public class DefaultAuthenticator {
     final static Logger log = LoggerFactory.getLogger(DefaultAuthenticator.class);
 
-    public static String authenticate(String authToken) {
-        String url = "/login?authToken="+authToken;
+    public static String authenticate(String authToken, Realm realm) {
+        String url = realm.getBaseUrl().resolve("login?authToken="+authToken).toString();
 
         String impersonate = Util.getProperties().getProperty("user.on_behalf_of", null);
         if (impersonate != null) {

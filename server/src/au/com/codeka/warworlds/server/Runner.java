@@ -30,13 +30,7 @@ public class Runner {
             }
             cronMain(args[1], extra);
         } else {
-            // kick off the event processor thread
-            EventProcessor.i.ping();
-
-            Server server = new Server(8080);
-            server.setHandler(new RequestRouter());
-            server.start();
-            server.join();
+            gameMain();
         }
     }
 
@@ -54,5 +48,20 @@ public class Runner {
         } catch(Exception e) {
             log.error("Error running CRON", e);
         }
+    }
+
+    private static void gameMain() throws Exception {
+        EventProcessor.i.ping();
+
+        int port = 8080;
+        String portName = System.getProperty("au.com.codeka.warworlds.server.listenPort");
+        if (portName != null) {
+            port = Integer.parseInt(portName);
+        }
+
+        Server server = new Server(port);
+        server.setHandler(new RequestRouter());
+        server.start();
+        server.join();
     }
 }

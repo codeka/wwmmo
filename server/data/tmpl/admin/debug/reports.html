@@ -109,7 +109,7 @@
             var $starKey = $("#combat-reports-form input[name=starKey]");
 
             $("#output").text("");
-            var url = "/realms/beta/stars/"+$starKey.val()+"/combat-reports";
+            var url = "/realms/{{realm}}/stars/"+$starKey.val()+"/combat-reports";
             $.ajax({
                 url: url,
                 dataType: "json",
@@ -127,7 +127,7 @@
             var $combatReportKey = $("#combat-report-form input[name=combatReportKey]");
 
             $("#output").text("");
-            var url = "/realms/beta/stars/123/combat-reports/"+$combatReportKey.val();
+            var url = "/realms/{{realm}}/stars/123/combat-reports/"+$combatReportKey.val();
             $.ajax({
                 url: url,
                 dataType: "json",
@@ -147,9 +147,9 @@
             var $sitrepCursor = $("#sitrep-form input[name=sitrepCursor]");
 
             $("#output").text("");
-            var url = "/realms/beta/sit-reports";
+            var url = "/realms/{{realm}}/sit-reports";
             if ($sitrepKey.val() != "") {
-                url = "/realms/beta/stars/"+$sitrepKey.val()+"/sit-reports";
+                url = "/realms/{{realm}}/stars/"+$sitrepKey.val()+"/sit-reports";
             }
             if ($sitrepCursor.val() != "") {
                 url += "?cursor="+$sitrepCursor.val();
