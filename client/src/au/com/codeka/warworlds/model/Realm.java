@@ -6,6 +6,7 @@ import java.net.URISyntaxException;
 public class Realm {
     private URI mBaseUrl;
     private String mDisplayName;
+    private String mDescription;
     private AuthenticationMethod mAuthenticationMethod;
     private boolean mIsAlpha;
 
@@ -15,10 +16,11 @@ public class Realm {
         LocalAppEngine
     }
 
-    public Realm(String baseUrl, String displayName, AuthenticationMethod authMethod, boolean isAlpha)
+    public Realm(String baseUrl, String displayName, String description, AuthenticationMethod authMethod, boolean isAlpha)
             throws URISyntaxException {
         mBaseUrl = new URI(baseUrl);
         mDisplayName = displayName;
+        mDescription = description;
         mAuthenticationMethod = authMethod;
         mIsAlpha = isAlpha;
     }
@@ -36,6 +38,9 @@ public class Realm {
     }
     public String getDisplayName() {
         return mDisplayName;
+    }
+    public String getDescription() {
+        return mDescription;
     }
     public AuthenticationMethod getAuthentciationMethod() {
         return mAuthenticationMethod;

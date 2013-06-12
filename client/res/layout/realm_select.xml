@@ -24,7 +24,7 @@
               android:layout_below="@+id/title_icon"
               android:layout_marginLeft="@dimen/tablet_margin_5dp"
               android:layout_marginRight="@dimen/tablet_margin_5dp"
-              android:text="Choose a realm to join, if you're not sure the default is a good start." />
+              android:text="Choose a realm to join. If you're not sure, Beta is a good start." />
 
     <View android:id="@+id/separator"
           android:layout_width="1dp"

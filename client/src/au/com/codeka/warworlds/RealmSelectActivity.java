@@ -3,6 +3,7 @@ package au.com.codeka.warworlds;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.Html;
 import android.view.View;
 import android.view.Window;
 import android.view.View.OnClickListener;
@@ -10,6 +11,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
+import au.com.codeka.warworlds.model.Realm;
 import au.com.codeka.warworlds.model.RealmManager;
 
 public class RealmSelectActivity extends BaseActivity {
@@ -33,16 +35,20 @@ public class RealmSelectActivity extends BaseActivity {
             return;
         }
 
-        String[] realmNames = new String[RealmManager.i.getRealms().size()];
+        CharSequence[] realmNames = new CharSequence[RealmManager.i.getRealms().size()];
         for (int i = 0; i < realmNames.length; i++) {
-            realmNames[i] = RealmManager.i.getRealms().get(i).getDisplayName();
+            Realm realm = RealmManager.i.getRealms().get(i);
+            realmNames[i] = Html.fromHtml(String.format("<font color=\"#ffffff\"><b>%s</b></font><br/><small>%s</small>",
+                        realm.getDisplayName(), realm.getDescription()
+                    ));
         }
 
         final ListView realmsListView = (ListView) findViewById(R.id.realms);
-        realmsListView.setAdapter(new ArrayAdapter<String>(mContext, R.layout.account, realmNames));
+        realmsListView.setAdapter(new ArrayAdapter<CharSequence>(mContext, R.layout.account, realmNames));
         realmsListView.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
         for (int i = 0; i < realmNames.length; i++) {
-            if (realmNames[i].equals("Beta")) {
+            Realm realm = RealmManager.i.getRealms().get(i);
+            if (realm.getDisplayName().equals("Beta")) {
                 realmsListView.setItemChecked(i, true);
             }
         }

@@ -22,11 +22,25 @@ public class RealmManager {
         mRealms = new ArrayList<Realm>();
         try {
             if (Util.isDebug()) {
-                mRealms.add(new Realm("http://192.168.1.4:8271/api/v1/", "Debug Alpha", Realm.AuthenticationMethod.LocalAppEngine, true));
-                mRealms.add(new Realm("http://192.168.1.4:8080/realms/beta/", "Debug Beta", Realm.AuthenticationMethod.Default, false));
+                mRealms.add(new Realm("http://192.168.1.4:8080/realms/beta/",
+                                      "Debug",
+                                      "The debug realm runs on my local dev box for testing.",
+                                      Realm.AuthenticationMethod.Default, false));
             }
-            mRealms.add(new Realm("https://warworldsmmo.appspot.com/api/v1/", "Alpha", Realm.AuthenticationMethod.AppEngine, true));
-            mRealms.add(new Realm("https://game.war-worlds.com/realms/beta/", "Beta", Realm.AuthenticationMethod.Default, false));
+            mRealms.add(new Realm("https://warworldsmmo.appspot.com/api/v1/",
+                                  "Alpha",
+                                  "",
+                                  Realm.AuthenticationMethod.AppEngine, true));
+            mRealms.add(new Realm("https://game.war-worlds.com/realms/beta/",
+                                  "Beta",
+                                  "If you're new to War Worlds, you should join this realm. eXplore, eXpand, eXploit, eXterminate!",
+                                  Realm.AuthenticationMethod.Default, false));
+            if (Util.isDebug()) {
+                mRealms.add(new Realm("https://game.war-worlds.com/realms/blitz/",
+                                      "Blitz",
+                                      "The goal of Blitz is to build as big an empire as you can in 1 month. Each month, the universe is reset and a winner announced.",
+                                      Realm.AuthenticationMethod.Default, false));
+            }
         } catch(URISyntaxException e) {
             // should never happen
         }
