@@ -11,6 +11,8 @@ import org.joda.time.Duration;
 import org.joda.time.Interval;
 import org.joda.time.Seconds;
 
+import au.com.codeka.common.protobuf.Messages.Fleet;
+
 /**
  * This class is used to simulate a \c Star. It need to have the same logic as ctrl/simulation.py
  * on the server, and we go to great pains to keep them in sync.
@@ -411,7 +413,7 @@ public class Simulation {
             float populationIncreaseThisTurn = populationIncrease * dtInHours;
 
             float newPopulation = colony.getPopulation() + populationIncreaseThisTurn;
-            if (newPopulation < 0.0f) {
+            if (newPopulation < 1.0f) {
                 newPopulation = 0.0f;
             } else if (newPopulation > colony.getMaxPopulation()) {
                 newPopulation = colony.getMaxPopulation();
@@ -691,6 +693,9 @@ public class Simulation {
 
         for (BaseCombatReport.FleetSummary otherFleet : round.getFleets()) {
             if (isSameEmpire(fleet.getEmpireKey(), otherFleet.getEmpireKey())) {
+                continue;
+            }
+            if (otherFleet.getFleetState() == BaseFleet.State.MOVING) {
                 continue;
             }
             ShipDesign design = (ShipDesign) BaseDesignManager.i.getDesign(DesignKind.SHIP, otherFleet.getDesignID());
