@@ -65,7 +65,7 @@ public class BuildStopConfirmDialog extends DialogFragment {
             }
             @Override
             protected void onComplete(Boolean success) {
-                EmpireManager.getInstance().refreshEmpire(activity);
+                EmpireManager.i.refreshEmpire(activity);
                 StarManager.getInstance().refreshStar(getActivity(), mStar.getKey());
                 dismiss();
             }

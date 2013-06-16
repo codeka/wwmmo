@@ -42,7 +42,7 @@ public class AllianceActivity extends TabFragmentActivity
         super.onCreate(savedInstanceState);
 
         getTabManager().addTab(mContext, new TabInfo(this, "Overview", OverviewFragment.class, null));
-        MyEmpire myEmpire = EmpireManager.getInstance().getEmpire();
+        MyEmpire myEmpire = EmpireManager.i.getEmpire();
         if (myEmpire.getAlliance() != null) {
             getTabManager().addTab(mContext, new TabInfo(this, "Join Requests", JoinRequestsFragment.class, null));
         }
@@ -51,18 +51,18 @@ public class AllianceActivity extends TabFragmentActivity
     @Override
     public void onStart() {
         super.onStart();
-        EmpireManager.getInstance().addEmpireUpdatedListener(null, this);
+        EmpireManager.i.addEmpireUpdatedListener(null, this);
     }
 
     @Override
     public void onStop() {
         super.onStop();
-        EmpireManager.getInstance().removeEmpireUpdatedListener(this);
+        EmpireManager.i.removeEmpireUpdatedListener(this);
     }
 
     @Override
     public void onEmpireFetched(Empire empire) {
-        MyEmpire myEmpire = EmpireManager.getInstance().getEmpire();
+        MyEmpire myEmpire = EmpireManager.i.getEmpire();
         if (myEmpire.getKey().equals(empire.getKey())) {
             getTabManager().reloadTab();
         }
@@ -111,13 +111,13 @@ public class AllianceActivity extends TabFragmentActivity
         @Override
         public void onAttach(Activity activity) {
             super.onAttach(activity);
-            AllianceManager.getInstance().addAllianceUpdatedHandler(this);
+            AllianceManager.i.addAllianceUpdatedHandler(this);
         }
 
         @Override
         public void onDetach() {
             super.onDetach();
-            AllianceManager.getInstance().removeAllianceUpdatedHandler(this);
+            AllianceManager.i.removeAllianceUpdatedHandler(this);
         }
 
         @Override
@@ -136,7 +136,7 @@ public class AllianceActivity extends TabFragmentActivity
             alliancesList.setVisibility(View.GONE);
             progressBar.setVisibility(View.VISIBLE);
 
-            AllianceManager.getInstance().fetchAlliances(new AllianceManager.FetchAlliancesCompleteHandler() {
+            AllianceManager.i.fetchAlliances(new AllianceManager.FetchAlliancesCompleteHandler() {
                 @Override
                 public void onAlliancesFetched(List<Alliance> alliances) {
                     mRankListAdapter.setAlliances(alliances);
@@ -151,7 +151,7 @@ public class AllianceActivity extends TabFragmentActivity
             private ArrayList<ItemEntry> mEntries;
 
             public void setAlliances(List<Alliance> alliances) {
-                Alliance myAlliance = (Alliance) EmpireManager.getInstance().getEmpire().getAlliance();
+                Alliance myAlliance = (Alliance) EmpireManager.i.getEmpire().getAlliance();
                 // remove my alliance from the list, it'll always go at the front
                 if (myAlliance != null) {
                     for (int i = 0; i < alliances.size(); i++) {
@@ -257,7 +257,7 @@ public class AllianceActivity extends TabFragmentActivity
 
         @Override
         public void onAllianceUpdated(Alliance alliance) {
-            MyEmpire myEmpire = EmpireManager.getInstance().getEmpire();
+            MyEmpire myEmpire = EmpireManager.i.getEmpire();
             if (alliance.getKey().equals(myEmpire.getAlliance().getKey())) {
                 refresh();
             }
@@ -266,13 +266,13 @@ public class AllianceActivity extends TabFragmentActivity
         @Override
         public void onAttach(Activity activity) {
             super.onAttach(activity);
-            AllianceManager.getInstance().addAllianceUpdatedHandler(this);
+            AllianceManager.i.addAllianceUpdatedHandler(this);
         }
 
         @Override
         public void onDetach() {
             super.onDetach();
-            AllianceManager.getInstance().removeAllianceUpdatedHandler(this);
+            AllianceManager.i.removeAllianceUpdatedHandler(this);
         }
 
         @Override
@@ -304,9 +304,9 @@ public class AllianceActivity extends TabFragmentActivity
             joinRequestsList.setVisibility(View.GONE);
             progressBar.setVisibility(View.VISIBLE);
 
-            MyEmpire myEmpire = EmpireManager.getInstance().getEmpire();
+            MyEmpire myEmpire = EmpireManager.i.getEmpire();
             if (myEmpire != null && myEmpire.getAlliance() != null) {
-                AllianceManager.getInstance().fetchJoinRequests(activity, myEmpire.getAlliance().getKey(),
+                AllianceManager.i.fetchJoinRequests(activity, myEmpire.getAlliance().getKey(),
                     new AllianceManager.FetchJoinRequestsCompleteHandler() {
                         @Override
                         public void onJoinRequestsFetched(Map<String, Empire> empires, List<AllianceJoinRequest> joinRequests) {
@@ -317,7 +317,6 @@ public class AllianceActivity extends TabFragmentActivity
                         }
                 });
             }
-
         }
 
         private class JoinRequestListAdapter extends BaseAdapter {

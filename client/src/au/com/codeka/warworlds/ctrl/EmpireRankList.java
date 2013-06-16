@@ -207,7 +207,7 @@ public class EmpireRankList extends ListView {
             totalColonies.setText(Html.fromHtml(String.format("Colonies: <b>%s</b>",
                     formatter.format(rank.getTotalColonies()))));
 
-            MyEmpire myEmpire = EmpireManager.getInstance().getEmpire();
+            MyEmpire myEmpire = EmpireManager.i.getEmpire();
             if (rank.getTotalStars() > 10 || 
                     (empire != null && empire.getKey().equals(myEmpire.getKey()))) {
                 totalShips.setText(Html.fromHtml(String.format("Ships: <b>%s</b>",
@@ -251,7 +251,7 @@ public class EmpireRankList extends ListView {
                                 empireKeys.add(entry.rank.getEmpireKey());
                             }
 
-                            EmpireManager.getInstance().fetchEmpires(mContext, empireKeys, new EmpireManager.EmpireFetchedHandler() {
+                            EmpireManager.i.fetchEmpires(mContext, empireKeys, new EmpireManager.EmpireFetchedHandler() {
                                 @Override
                                 public void onEmpireFetched(Empire empire) {
                                     boolean refreshedAll = true;

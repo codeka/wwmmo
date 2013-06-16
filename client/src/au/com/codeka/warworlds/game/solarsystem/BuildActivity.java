@@ -108,7 +108,7 @@ public class BuildActivity extends BaseActivity implements StarManager.StarFetch
 
             mStar = s;
             mColonies = new ArrayList<Colony>();
-            MyEmpire myEmpire = EmpireManager.getInstance().getEmpire();
+            MyEmpire myEmpire = EmpireManager.i.getEmpire();
             for (BaseColony c : mStar.getColonies()) {
                 if (c.getEmpireKey() != null && c.getEmpireKey().equals(myEmpire.getKey())) {
                     mColonies.add((Colony) c);

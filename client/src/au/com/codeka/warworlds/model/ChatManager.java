@@ -199,7 +199,7 @@ public class ChatManager implements BackgroundDetector.BackgroundChangeHandler {
             mEmpiresToRefresh.clear();
         }
 
-        EmpireManager.getInstance().fetchEmpires(context, empireKeys,
+        EmpireManager.i.fetchEmpires(context, empireKeys,
                 new EmpireManager.EmpireFetchedHandler() {
                     @Override
                     public void onEmpireFetched(Empire empire) {

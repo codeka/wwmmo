@@ -109,9 +109,9 @@ public class TacticalMapView extends SectorView
         canvas.drawColor(Color.BLACK);
 
         for (String empireKey : mControlFields.keySet()) {
-            Empire empire = EmpireManager.getInstance().getEmpire(mContext, empireKey);
+            Empire empire = EmpireManager.i.getEmpire(mContext, empireKey);
             if (empire == null) {
-                EmpireManager.getInstance().fetchEmpire(mContext, empireKey, null);
+                EmpireManager.i.fetchEmpire(mContext, empireKey, null);
             }
             TacticalControlField cf = mControlFields.get(empireKey);
 

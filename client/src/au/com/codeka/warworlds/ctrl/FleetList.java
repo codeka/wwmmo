@@ -328,8 +328,8 @@ public class FleetList extends FrameLayout implements StarManager.StarFetchedHan
             row3.setText("");
             row3.setVisibility(View.GONE);
 
-            final MyEmpire myEmpire = EmpireManager.getInstance().getEmpire();
-            EmpireManager.getInstance().fetchEmpire(context, fleet.getEmpireKey(),
+            final MyEmpire myEmpire = EmpireManager.i.getEmpire();
+            EmpireManager.i.fetchEmpire(context, fleet.getEmpireKey(),
                     new EmpireManager.EmpireFetchedHandler() {
                 @Override
                 public void onEmpireFetched(Empire empire) {
@@ -383,7 +383,7 @@ public class FleetList extends FrameLayout implements StarManager.StarFetchedHan
         private static final int FLEET_ITEM_TYPE = 1;
 
         public FleetListAdapter() {
-            mMyEmpire = EmpireManager.getInstance().getEmpire();
+            mMyEmpire = EmpireManager.i.getEmpire();
 
             // whenever a new star bitmap is generated, redraw the screen
             StarImageManager.getInstance().addBitmapGeneratedListener(

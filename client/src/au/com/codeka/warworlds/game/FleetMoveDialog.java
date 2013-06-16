@@ -95,7 +95,7 @@ public class FleetMoveDialog extends DialogFragment {
 
                     String fontOpen = "";
                     String fontClose = "";
-                    if (mEstimatedCost > EmpireManager.getInstance().getEmpire().getCash()) {
+                    if (mEstimatedCost > EmpireManager.i.getEmpire().getCash()) {
                         fontOpen = "<font color=\"#ff0000\">";
                         fontClose = "</font>";
                     }
@@ -171,7 +171,7 @@ public class FleetMoveDialog extends DialogFragment {
         dialog.getPositiveButton().setEnabled(false);
         dialog.getNegativeButton().setEnabled(false);
 
-        EmpireManager.getInstance().getEmpire().addCash(-mEstimatedCost);
+        EmpireManager.i.getEmpire().addCash(-mEstimatedCost);
 
         final Activity activity = getActivity();
         dismiss();
@@ -208,7 +208,7 @@ public class FleetMoveDialog extends DialogFragment {
 
                     // the empire needs to be updated, too, since we'll have subtracted
                     // the cost of this move from your cash
-                    EmpireManager.getInstance().refreshEmpire(activity, mFleet.getEmpireKey());
+                    EmpireManager.i.refreshEmpire(activity, mFleet.getEmpireKey());
                 }
             }
         }.execute();

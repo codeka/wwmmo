@@ -160,7 +160,7 @@ public class GCMIntentService extends GCMBaseIntentService {
                 }
 
                 // don't add our own chats, since they'll have been added automatically
-                MyEmpire myEmpire = EmpireManager.getInstance().getEmpire();
+                MyEmpire myEmpire = EmpireManager.i.getEmpire();
                 if (myEmpire == null) {
                     return;
                 }
@@ -170,7 +170,7 @@ public class GCMIntentService extends GCMBaseIntentService {
 
                 ChatManager.getInstance().addMessage(context, msg);
             } else if (extras.containsKey("empire_updated")) {
-                EmpireManager.getInstance().refreshEmpire(this);
+                EmpireManager.i.refreshEmpire(this);
             }
         }
     }

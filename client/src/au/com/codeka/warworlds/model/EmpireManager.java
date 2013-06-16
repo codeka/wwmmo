@@ -32,11 +32,7 @@ import au.com.codeka.common.protobuf.Messages;
  */
 public class EmpireManager {
     private static Logger log = LoggerFactory.getLogger(EmpireManager.class);
-    private static EmpireManager sInstance = new EmpireManager();
-
-    public static EmpireManager getInstance() {
-        return sInstance;
-    }
+    public static EmpireManager i = new EmpireManager();
 
     private Map<String, Empire> mEmpireCache = new HashMap<String, Empire>();
     private Map<String, List<EmpireFetchedHandler>> mInProgress = new HashMap<String, List<EmpireFetchedHandler>>();

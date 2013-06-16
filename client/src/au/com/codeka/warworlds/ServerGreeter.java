@@ -167,7 +167,7 @@ public class ServerGreeter {
                         mNeedsEmpireSetup = false;
                         MyEmpire myEmpire = new MyEmpire();
                         myEmpire.fromProtocolBuffer(resp.getEmpire());
-                        EmpireManager.getInstance().setup(myEmpire);
+                        EmpireManager.i.setup(myEmpire);
                     } else {
                         mNeedsEmpireSetup = true;
                     }

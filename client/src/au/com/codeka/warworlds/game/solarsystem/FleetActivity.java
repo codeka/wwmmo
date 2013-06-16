@@ -69,7 +69,7 @@ public class FleetActivity extends BaseActivity implements StarManager.StarFetch
 
             @Override
             public void onFleetStanceModified(Star star, Fleet fleet, Fleet.Stance newStance) {
-                EmpireManager.getInstance().getEmpire().updateFleetStance(
+                EmpireManager.i.getEmpire().updateFleetStance(
                         FleetActivity.this, star, fleet, newStance);
             }
         });

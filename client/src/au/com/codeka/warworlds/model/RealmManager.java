@@ -37,7 +37,7 @@ public class RealmManager {
             }
             mRealms.add(new Realm(ALPHA_REALM_ID, "https://warworldsmmo.appspot.com/api/v1/",
                                   "Alpha",
-                                  "",
+                                  "The Alpha realm is officially deprecated and new players should join Beta.",
                                   Realm.AuthenticationMethod.AppEngine, true));
             mRealms.add(new Realm(BETA_REALM_ID, "https://game.war-worlds.com/realms/beta/",
                                   "Beta",

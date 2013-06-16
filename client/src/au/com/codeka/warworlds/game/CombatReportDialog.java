@@ -41,8 +41,8 @@ public class CombatReportDialog extends DialogFragment {
         mCombatReportKey = combatReportKey;
 
         if (mEmpires == null) {
-            mEmpires = new TreeMap<String, Empire>();;
-            mEmpires.put("", EmpireManager.getInstance().getNativeEmpire());
+            mEmpires = new TreeMap<String, Empire>();
+            mEmpires.put("", EmpireManager.i.getNativeEmpire());
         }
     }
 
@@ -61,7 +61,7 @@ public class CombatReportDialog extends DialogFragment {
         mReportAdapter = new ReportAdapter();
         reportItems.setAdapter(mReportAdapter);
 
-        EmpireManager.getInstance().getEmpire().fetchCombatReport(
+        EmpireManager.i.getEmpire().fetchCombatReport(
                 mStar.getKey(), mCombatReportKey, 
                 new MyEmpire.FetchCombatReportCompleteHandler() {
             @Override
@@ -84,7 +84,7 @@ public class CombatReportDialog extends DialogFragment {
                     }
                 }
                 for (String empireKey : empireKeys) {
-                    EmpireManager.getInstance().fetchEmpire(activity, empireKey,
+                    EmpireManager.i.fetchEmpire(activity, empireKey,
                             new EmpireManager.EmpireFetchedHandler() {
                                 @Override
                                 public void onEmpireFetched(Empire empire) {

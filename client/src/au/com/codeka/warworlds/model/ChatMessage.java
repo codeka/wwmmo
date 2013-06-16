@@ -89,7 +89,7 @@ public class ChatMessage extends BaseChatMessage {
         boolean isFriendly = false;
         boolean isServer = false;
         if (mEmpireKey != null && mEmpire != null) {
-            if (!mEmpireKey.equals(EmpireManager.getInstance().getEmpire().getKey())) {
+            if (!mEmpireKey.equals(EmpireManager.i.getEmpire().getKey())) {
                 isEnemy = true;
             } else {
                 isFriendly = true;

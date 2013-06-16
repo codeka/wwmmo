@@ -50,7 +50,7 @@ public class EnemyEmpireActivity extends BaseActivity
                     startActivity(new Intent(EnemyEmpireActivity.this, WarWorldsActivity.class));
                 } else {
                     String empireKey = getIntent().getExtras().getString("au.com.codeka.warworlds.EmpireKey");
-                    EmpireManager.getInstance().fetchEmpire(mContext, empireKey, EnemyEmpireActivity.this);
+                    EmpireManager.i.fetchEmpire(mContext, empireKey, EnemyEmpireActivity.this);
                 }
             }
         });

@@ -26,6 +26,6 @@ public class LeaveConfirmDialog extends DialogFragment {
     }
 
     private void onLeaveClick() {
-        AllianceManager.getInstance().leaveAlliance(getActivity());
+        AllianceManager.i.leaveAlliance(getActivity());
     }
 }

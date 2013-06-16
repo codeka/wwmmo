@@ -115,8 +115,8 @@ public class MyEmpire extends Empire {
                                     .setMessage(mErrorMsg)
                                     .create().show();
                 }
-                
-                EmpireManager.getInstance().refreshEmpire(context);
+
+                EmpireManager.i.refreshEmpire(context);
             }
         }.execute();
     }
@@ -150,7 +150,7 @@ public class MyEmpire extends Empire {
                 }
 
                 // make sure we record the fact that the star is updated as well
-                EmpireManager.getInstance().refreshEmpire(context, getKey());
+                EmpireManager.i.refreshEmpire(context, getKey());
                 StarManager.getInstance().refreshStar(context, star.getKey());
             }
         }.execute();

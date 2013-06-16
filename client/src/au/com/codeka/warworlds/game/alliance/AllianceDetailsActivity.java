@@ -50,7 +50,7 @@ public class AllianceDetailsActivity extends BaseActivity
             mAllianceKey = extras.getString("au.com.codeka.warworlds.AllianceKey");
             mAlliance = (Alliance) extras.getParcelable("au.com.codeka.warworlds.Alliance");
 
-            AllianceManager.getInstance().fetchAlliance(mAllianceKey, new AllianceManager.FetchAllianceCompleteHandler() {
+            AllianceManager.i.fetchAlliance(mAllianceKey, new AllianceManager.FetchAllianceCompleteHandler() {
                 @Override
                 public void onAllianceFetched(Alliance alliance) {
                     mAlliance = alliance;
@@ -65,15 +65,15 @@ public class AllianceDetailsActivity extends BaseActivity
     @Override
     public void onStart() {
         super.onStart();
-        AllianceManager.getInstance().addAllianceUpdatedHandler(this);
-        EmpireManager.getInstance().addEmpireUpdatedListener(null, this);
+        AllianceManager.i.addAllianceUpdatedHandler(this);
+        EmpireManager.i.addEmpireUpdatedListener(null, this);
     }
 
     @Override
     public void onStop() {
         super.onStop();
-        AllianceManager.getInstance().removeAllianceUpdatedHandler(this);
-        EmpireManager.getInstance().removeEmpireUpdatedListener(this);
+        AllianceManager.i.removeAllianceUpdatedHandler(this);
+        EmpireManager.i.removeEmpireUpdatedListener(this);
     }
 
     @Override
@@ -86,14 +86,14 @@ public class AllianceDetailsActivity extends BaseActivity
 
     @Override
     public void onEmpireFetched(Empire empire) {
-        MyEmpire myEmpire = EmpireManager.getInstance().getEmpire();
+        MyEmpire myEmpire = EmpireManager.i.getEmpire();
         if (myEmpire.getKey().equals(empire.getKey())) {
             fullRefresh();
         }
     }
 
     private void fullRefresh() {
-        Alliance myAlliance = (Alliance) EmpireManager.getInstance().getEmpire().getAlliance();
+        Alliance myAlliance = (Alliance) EmpireManager.i.getEmpire().getAlliance();
         if (myAlliance == null) {
             setContentView(R.layout.alliance_details_potential);
         } else if (myAlliance.getKey().equals(mAllianceKey)) {
@@ -139,7 +139,7 @@ public class AllianceDetailsActivity extends BaseActivity
             ArrayList<Empire> members = new ArrayList<Empire>();
             ArrayList<String> missingMembers = new ArrayList<String>();
             for (BaseAllianceMember am : mAlliance.getMembers()) {
-                Empire member = EmpireManager.getInstance().getEmpire(this, am.getEmpireKey());
+                Empire member = EmpireManager.i.getEmpire(this, am.getEmpireKey());
                 if (member == null) {
                     missingMembers.add(am.getEmpireKey());
                 } else {
@@ -151,7 +151,7 @@ public class AllianceDetailsActivity extends BaseActivity
             populateEmpireList(membersList, members);
 
             if (missingMembers.size() > 0) {
-                EmpireManager.getInstance().refreshEmpires(mContext, missingMembers, new EmpireManager.EmpireFetchedHandler() {
+                EmpireManager.i.refreshEmpires(mContext, missingMembers, new EmpireManager.EmpireFetchedHandler() {
                     @Override
                     public void onEmpireFetched(Empire empire) {
                         if (mRefreshPosted) {
@@ -209,7 +209,7 @@ public class AllianceDetailsActivity extends BaseActivity
                 totalColonies.setText(Html.fromHtml(String.format("Colonies: <b>%s</b>",
                         formatter.format(rank.getTotalColonies()))));
 
-                MyEmpire myEmpire = EmpireManager.getInstance().getEmpire();
+                MyEmpire myEmpire = EmpireManager.i.getEmpire();
                 if (empire.getKey().equals(myEmpire.getKey()) || rank.getTotalStars() >= 10) {
                     totalShips.setText(Html.fromHtml(String.format("Ships: <b>%s</b>",
                            formatter.format(rank.getTotalShips()))));

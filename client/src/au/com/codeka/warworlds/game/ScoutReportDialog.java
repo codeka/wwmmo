@@ -82,7 +82,7 @@ public class ScoutReportDialog extends DialogFragment {
         progressBar.setVisibility(View.VISIBLE);
         reportItems.setVisibility(View.GONE);
 
-        EmpireManager.getInstance().getEmpire().fetchScoutReports(
+        EmpireManager.i.getEmpire().fetchScoutReports(
                 mStar, new MyEmpire.FetchScoutReportCompleteHandler() {
             @Override
             public void onComplete(List<ScoutReport> reports) {

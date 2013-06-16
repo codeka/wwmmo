@@ -14,10 +14,7 @@ import au.com.codeka.common.model.BaseAlliance;
 import au.com.codeka.common.protobuf.Messages;
 
 public class AllianceManager {
-    private static AllianceManager sInstance = new AllianceManager();
-    public static AllianceManager getInstance() {
-        return sInstance;
-    }
+    public static AllianceManager i = new AllianceManager();
 
     private List<AllianceUpdatedHandler> mAllianceUpdatedHandlers;
 
@@ -35,7 +32,7 @@ public class AllianceManager {
         for (AllianceUpdatedHandler handler : mAllianceUpdatedHandlers) {
             handler.onAllianceUpdated(alliance);
         }
-        EmpireManager.getInstance().onAllianceUpdated(alliance);
+        EmpireManager.i.onAllianceUpdated(alliance);
     }
 
     /**
@@ -121,7 +118,7 @@ public class AllianceManager {
                         }
                     }
 
-                    List<Empire> empires = EmpireManager.getInstance().fetchEmpiresSync(context, empireKeys);
+                    List<Empire> empires = EmpireManager.i.fetchEmpiresSync(context, empireKeys);
                     mEmpires = new TreeMap<String, Empire>();
                     for (Empire empire : empires) {
                         mEmpires.put(empire.getKey(), empire);
@@ -146,7 +143,7 @@ public class AllianceManager {
      * Sends a request to join the specified alliance.
      */
     public void requestJoin(final String allianceKey, final String message) {
-        final MyEmpire myEmpire = EmpireManager.getInstance().getEmpire();
+        final MyEmpire myEmpire = EmpireManager.i.getEmpire();
 
         new BackgroundRunner<Boolean>() {
             @Override
@@ -204,7 +201,7 @@ public class AllianceManager {
     }
 
     public void leaveAlliance(final Context context) {
-        final MyEmpire myEmpire = EmpireManager.getInstance().getEmpire();
+        final MyEmpire myEmpire = EmpireManager.i.getEmpire();
         if (myEmpire == null) {
             return;
         }
@@ -233,7 +230,7 @@ public class AllianceManager {
             @Override
             protected void onComplete(Boolean success) {
                 if (success) {
-                    EmpireManager.getInstance().refreshEmpire(context);
+                    EmpireManager.i.refreshEmpire(context);
                     refreshAlliance(myAlliance.getKey());
                 }
             }

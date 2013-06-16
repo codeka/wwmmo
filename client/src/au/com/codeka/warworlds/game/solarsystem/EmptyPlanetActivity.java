@@ -78,7 +78,7 @@ public class EmptyPlanetActivity extends BaseActivity
 
 
     private void onColonizeClick() {
-        MyEmpire empire = EmpireManager.getInstance().getEmpire();
+        MyEmpire empire = EmpireManager.i.getEmpire();
 
         // check that we have a colony ship (the server will check too, but this is easy)
         boolean hasColonyShip = false;

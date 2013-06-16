@@ -239,7 +239,7 @@ public class StarfieldActivity extends BaseActivity
                     }
                 }
 
-                MyEmpire myEmpire = EmpireManager.getInstance().getEmpire();
+                MyEmpire myEmpire = EmpireManager.i.getEmpire();
                 if (myEmpire == null) {
                     return;
                 }
@@ -572,7 +572,7 @@ public class StarfieldActivity extends BaseActivity
         mPlanetList.setStar(mSelectedStar);
         mFleetList.setStar(mSelectedStar);
 
-        MyEmpire myEmpire = EmpireManager.getInstance().getEmpire();
+        MyEmpire myEmpire = EmpireManager.i.getEmpire();
         int numMyEmpire = 0;
         int numOtherEmpire = 0;
         for (BaseColony colony : mSelectedStar.getColonies()) {
@@ -616,7 +616,7 @@ public class StarfieldActivity extends BaseActivity
         mSelectedFleet = fleet;
 
         ShipDesign design = (ShipDesign) DesignManager.i.getDesign(DesignKind.SHIP, fleet.getDesignID());
-        EmpireManager.getInstance().fetchEmpire(mContext, fleet.getEmpireKey(), new EmpireManager.EmpireFetchedHandler() {
+        EmpireManager.i.fetchEmpire(mContext, fleet.getEmpireKey(), new EmpireManager.EmpireFetchedHandler() {
             @Override
             public void onEmpireFetched(Empire empire) {
                 if (mFetchingFleetKey == null ||

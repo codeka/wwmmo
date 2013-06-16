@@ -41,7 +41,7 @@ public class JoinRequestDialog extends DialogFragment {
 
     private void onAllianceJoin() {
         TextView message = (TextView) mView.findViewById(R.id.message);
-        AllianceManager.getInstance().requestJoin(mAllianceKey, message.getText().toString());
+        AllianceManager.i.requestJoin(mAllianceKey, message.getText().toString());
 
         new StyledDialog.Builder(getActivity())
                         .setMessage("The request to join this alliance has been sent, you'll get a notification when your application is approved.")

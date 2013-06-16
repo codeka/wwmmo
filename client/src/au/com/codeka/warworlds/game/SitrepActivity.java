@@ -129,7 +129,7 @@ public class SitrepActivity extends BaseActivity {
             // clear all our notifications
             Notifications.clearNotifications(mContext);
 
-            MyEmpire empire = EmpireManager.getInstance().getEmpire();
+            MyEmpire empire = EmpireManager.i.getEmpire();
 
             if (empire != null) {
                 // TODO: add an "empire updated" listener here!

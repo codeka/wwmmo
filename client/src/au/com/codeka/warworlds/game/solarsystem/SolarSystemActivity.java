@@ -222,7 +222,7 @@ public class SolarSystemActivity extends BaseActivity implements StarManager.Sta
 
         fleetList.setStar(star);
 
-        BaseEmpirePresence ep = star.getEmpire(EmpireManager.getInstance().getEmpire().getKey());
+        BaseEmpirePresence ep = star.getEmpire(EmpireManager.i.getEmpire().getKey());
         if (ep == null) {
             storedGoodsTextView.setVisibility(View.GONE);
             deltaGoodsTextView.setVisibility(View.GONE);
@@ -409,11 +409,11 @@ public class SolarSystemActivity extends BaseActivity implements StarManager.Sta
             colonyDetailsContainer.setVisibility(View.GONE);
             enemyColonyDetailsContainer.setVisibility(View.GONE);
 
-            EmpireManager.getInstance().fetchEmpire(mContext, mColony.getEmpireKey(),
+            EmpireManager.i.fetchEmpire(mContext, mColony.getEmpireKey(),
                 new EmpireManager.EmpireFetchedHandler() {
                     @Override
                     public void onEmpireFetched(Empire empire) {
-                        Empire thisEmpire = EmpireManager.getInstance().getEmpire();
+                        Empire thisEmpire = EmpireManager.i.getEmpire();
                         if (thisEmpire.getKey().equals(empire.getKey())) {
                             colonyDetailsContainer.setVisibility(View.VISIBLE);
                             refreshColonyDetails();

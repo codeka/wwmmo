@@ -116,9 +116,9 @@ public class EmpireActivity extends TabFragmentActivity
                     return;
                 }
 
-                MyEmpire myEmpire = EmpireManager.getInstance().getEmpire();
-                EmpireManager.getInstance().addEmpireUpdatedListener(myEmpire.getKey(), EmpireActivity.this);
-                EmpireManager.getInstance().refreshEmpire(mContext);
+                MyEmpire myEmpire = EmpireManager.i.getEmpire();
+                EmpireManager.i.addEmpireUpdatedListener(myEmpire.getKey(), EmpireActivity.this);
+                EmpireManager.i.refreshEmpire(mContext);
             }
         });
     }
@@ -126,12 +126,12 @@ public class EmpireActivity extends TabFragmentActivity
     @Override
     public void onPause() {
         super.onPause();
-        EmpireManager.getInstance().removeEmpireUpdatedListener(this);
+        EmpireManager.i.removeEmpireUpdatedListener(this);
     }
 
     @Override
     public void onEmpireFetched(Empire empire) {
-        MyEmpire myEmpire = EmpireManager.getInstance().getEmpire();
+        MyEmpire myEmpire = EmpireManager.i.getEmpire();
         if (myEmpire.getKey().equals(empire.getKey())) {
             sCurrentEmpire = (MyEmpire) empire;
             getTabManager().reloadTab();
@@ -174,7 +174,7 @@ public class EmpireActivity extends TabFragmentActivity
             mView = inflator.inflate(R.layout.empire_overview_tab, null);
             mEmpireList = (EmpireRankList) mView.findViewById(R.id.empire_rankings);
 
-            MyEmpire empire = EmpireManager.getInstance().getEmpire();
+            MyEmpire empire = EmpireManager.i.getEmpire();
 
             TextView empireName = (TextView) mView.findViewById(R.id.empire_name);
             ImageView empireIcon = (ImageView) mView.findViewById(R.id.empire_icon);
@@ -205,7 +205,7 @@ public class EmpireActivity extends TabFragmentActivity
                 }
             });
 
-            MyEmpire myEmpire = EmpireManager.getInstance().getEmpire();
+            MyEmpire myEmpire = EmpireManager.i.getEmpire();
             int minRank = 1;
             if (myEmpire.getRank() != null) {
               int myRank = myEmpire.getRank().getRank();
@@ -214,7 +214,7 @@ public class EmpireActivity extends TabFragmentActivity
             if (minRank < 1) {
                 minRank = 1;
             }
-            EmpireManager.getInstance().fetchEmpiresByRank(getActivity(), minRank, minRank + 4,
+            EmpireManager.i.fetchEmpiresByRank(getActivity(), minRank, minRank + 4,
                     new EmpireManager.EmpiresFetchedHandler() {
                         @Override
                         public void onEmpiresFetched(List<Empire> empires) {
@@ -261,7 +261,7 @@ public class EmpireActivity extends TabFragmentActivity
             imm.hideSoftInputFromWindow(empireSearch.getWindowToken(), 0);
 
             String nameSearch = empireSearch.getText().toString();
-            EmpireManager.getInstance().searchEmpires(getActivity(), nameSearch,
+            EmpireManager.i.searchEmpires(getActivity(), nameSearch,
                     new EmpireManager.EmpiresFetchedHandler() {
                         @Override
                         public void onEmpiresFetched(List<Empire> empires) {
@@ -315,7 +315,7 @@ public class EmpireActivity extends TabFragmentActivity
 
                 @Override
                 public void onCollectTaxes() {
-                    EmpireManager.getInstance().getEmpire().collectTaxes(context);
+                    EmpireManager.i.getEmpire().collectTaxes(context);
                 }
             });
 
@@ -426,8 +426,8 @@ public class EmpireActivity extends TabFragmentActivity
 
                 @Override
                 public void onFleetStanceModified(Star star, Fleet fleet, Fleet.Stance newStance) {
-                    EmpireManager.getInstance().getEmpire().updateFleetStance(context, star,
-                                                                              fleet, newStance);
+                    EmpireManager.i.getEmpire().updateFleetStance(context, star,
+                                                                  fleet, newStance);
                 }
             });
 

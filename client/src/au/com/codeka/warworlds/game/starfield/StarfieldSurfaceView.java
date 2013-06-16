@@ -151,9 +151,9 @@ public class StarfieldSurfaceView extends SectorView
         SectorManager.getInstance().addSectorListChangedListener(this);
         StarImageManager.getInstance().addBitmapGeneratedListener(mBitmapGeneratedListener);
         StarManager.getInstance().addStarUpdatedListener(null, this);
-        EmpireManager.getInstance().addEmpireUpdatedListener(null, this);
+        EmpireManager.i.addEmpireUpdatedListener(null, this);
 
-        MyEmpire myEmpire = EmpireManager.getInstance().getEmpire();
+        MyEmpire myEmpire = EmpireManager.i.getEmpire();
         if (myEmpire != null) {
             BaseStar homeStar = myEmpire.getHomeStar();
             int numHqs = BuildManager.getInstance().getTotalBuildingsInEmpire("hq");
@@ -176,7 +176,7 @@ public class StarfieldSurfaceView extends SectorView
         SectorManager.getInstance().removeSectorListChangedListener(this);
         StarImageManager.getInstance().removeBitmapGeneratedListener(mBitmapGeneratedListener);
         StarManager.getInstance().removeStarUpdatedListener(this);
-        EmpireManager.getInstance().removeEmpireUpdatedListener(this);
+        EmpireManager.i.removeEmpireUpdatedListener(this);
 
         removeOverlay(mHqOverlay);
     }
@@ -294,7 +294,7 @@ public class StarfieldSurfaceView extends SectorView
     public void onEmpireFetched(Empire empire) {
         // if the player's empire changes, it might mean that the location of their HQ has changed,
         // so we'll want to make sure it's still correct.
-        MyEmpire myEmpire = EmpireManager.getInstance().getEmpire();
+        MyEmpire myEmpire = EmpireManager.i.getEmpire();
         if (empire.getKey().equals(myEmpire.getKey())) {
             if (mHqStar != null) {
                 mHqStar = empire.getHomeStar();
@@ -561,12 +561,12 @@ public class StarfieldSurfaceView extends SectorView
      */
     private Empire getEmpire(String empireKey) {
         if (empireKey == null) {
-            return EmpireManager.getInstance().getNativeEmpire();
+            return EmpireManager.i.getNativeEmpire();
         }
 
         Empire emp = mVisibleEmpires.get(empireKey);
         if (emp == null) {
-            EmpireManager.getInstance().fetchEmpire(mContext, empireKey, new EmpireManager.EmpireFetchedHandler() {
+            EmpireManager.i.fetchEmpire(mContext, empireKey, new EmpireManager.EmpireFetchedHandler() {
                 @Override
                 public void onEmpireFetched(Empire empire) {
                     mVisibleEmpires.put(empire.getKey(), empire);
@@ -933,7 +933,7 @@ public class StarfieldSurfaceView extends SectorView
             mSelectionView.setVisibility(View.VISIBLE);
 
             if (mSelectedEntity.star != null) {
-                float radarRange = mSelectedEntity.star.getRadarRange(EmpireManager.getInstance().getEmpire().getKey());
+                float radarRange = mSelectedEntity.star.getRadarRange(EmpireManager.i.getEmpire().getKey());
                 if (radarRange > 0.0f) {
                     mRadarOverlay.setRange(radarRange);
                     addOverlay(mRadarOverlay, mSelectedEntity.star);

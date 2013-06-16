@@ -96,10 +96,10 @@ public class EnemyPlanetActivity extends BaseActivity
 
         final Button attackBtn = (Button) findViewById(R.id.attack_btn);
         if (mColony != null) {
-            mColonyEmpire = EmpireManager.getInstance().getEmpire(mContext, mColony.getEmpireKey());
+            mColonyEmpire = EmpireManager.i.getEmpire(mContext, mColony.getEmpireKey());
             if (mColonyEmpire == null) {
                 attackBtn.setEnabled(false);
-                EmpireManager.getInstance().fetchEmpire(mContext, mColony.getEmpireKey(), new EmpireManager.EmpireFetchedHandler() {
+                EmpireManager.i.fetchEmpire(mContext, mColony.getEmpireKey(), new EmpireManager.EmpireFetchedHandler() {
                     @Override
                     public void onEmpireFetched(Empire empire) {
                         mColonyEmpire = empire;
@@ -135,7 +135,7 @@ public class EnemyPlanetActivity extends BaseActivity
     private void onAttackClick() {
         int defence = (int)(0.25 * mColony.getPopulation() * mColony.getDefenceBoost());
 
-        final MyEmpire myEmpire = EmpireManager.getInstance().getEmpire();
+        final MyEmpire myEmpire = EmpireManager.i.getEmpire();
         int attack = 0;
         for (BaseFleet fleet : mStar.getFleets()) {
             if (fleet.getEmpireKey() == null) {

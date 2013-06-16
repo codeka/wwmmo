@@ -38,7 +38,7 @@ public class InfobarView extends FrameLayout
 
     @Override
     public void onEmpireFetched(Empire empire) {
-        MyEmpire myEmpire = EmpireManager.getInstance().getEmpire();
+        MyEmpire myEmpire = EmpireManager.i.getEmpire();
         if (myEmpire != null && myEmpire.getKey().equals(empire.getKey())) {
             TextView cash = (TextView) mView.findViewById(R.id.cash);
             cash.setText(Cash.format(empire.getCash()));
@@ -65,7 +65,7 @@ public class InfobarView extends FrameLayout
                                                    state.lastUri);
                         empireName.setText(str);
                     } else {
-                        String name = EmpireManager.getInstance().getEmpire().getDisplayName();
+                        String name = EmpireManager.i.getEmpire().getDisplayName();
                         empireName.setText(name);
                     }
                 }
@@ -84,12 +84,12 @@ public class InfobarView extends FrameLayout
         if (!isInEditMode()) {
             mHandler = new Handler();
 
-            MyEmpire empire = EmpireManager.getInstance().getEmpire();
+            MyEmpire empire = EmpireManager.i.getEmpire();
             if (empire != null) {
                 onEmpireFetched(empire);
             }
 
-            EmpireManager.getInstance().addEmpireUpdatedListener(null, this);
+            EmpireManager.i.addEmpireUpdatedListener(null, this);
             RequestManager.addRequestManagerStateChangedHandler(this);
 
             // set up the initial state
@@ -100,7 +100,7 @@ public class InfobarView extends FrameLayout
     @Override
     public void onDetachedFromWindow() {
         if (!isInEditMode()) {
-            EmpireManager.getInstance().removeEmpireUpdatedListener(this);
+            EmpireManager.i.removeEmpireUpdatedListener(this);
             RequestManager.removeRequestManagerStateChangedHandler(this);
         }
     }

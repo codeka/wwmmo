@@ -85,7 +85,7 @@ public class BuildAccelerateDialog extends DialogFragment {
         double cost = mineralsToUse * mBuildRequest.getCount();
 
         TextView accelerateCost = (TextView) mView.findViewById(R.id.accelerate_cost);
-        if (cost < EmpireManager.getInstance().getEmpire().getCash()) {
+        if (cost < EmpireManager.i.getEmpire().getCash()) {
             accelerateCost.setText(String.format(Locale.ENGLISH, "$%d", (int) cost));
         } else {
             accelerateCost.setText(Html.fromHtml(String.format(Locale.ENGLISH,
@@ -115,7 +115,7 @@ public class BuildAccelerateDialog extends DialogFragment {
                     if (pb == null) {
                         return null;
                     }
-                    
+
                     BuildRequest br = new BuildRequest();
                     br.fromProtocolBuffer(pb);
                     return br;
@@ -133,7 +133,7 @@ public class BuildAccelerateDialog extends DialogFragment {
                 StarManager.getInstance().refreshStar(activity.getApplicationContext(), mStar.getKey());
 
                 // tell the EmpireManager to update the empire (since our cash will have gone down)
-                EmpireManager.getInstance().refreshEmpire(activity);
+                EmpireManager.i.refreshEmpire(activity);
 
                 if (mErrorMsg != null) {
                     new StyledDialog.Builder(activity.getApplicationContext())

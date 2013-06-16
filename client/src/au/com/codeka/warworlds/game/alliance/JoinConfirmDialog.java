@@ -48,7 +48,7 @@ public class JoinConfirmDialog extends DialogFragment {
     private void updateJoinRequest(boolean approve) {
         mJoinRequest.setState(approve ? AllianceJoinRequest.RequestState.ACCEPTED
                                       : AllianceJoinRequest.RequestState.REJECTED);
-        AllianceManager.getInstance().updateJoinRequest(mJoinRequest);
+        AllianceManager.i.updateJoinRequest(mJoinRequest);
         dismiss();
     }
 }

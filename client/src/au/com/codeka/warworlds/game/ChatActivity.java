@@ -226,7 +226,7 @@ public class ChatActivity extends BaseActivity {
 
         ChatMessage msg = new ChatMessage();
         msg.setMessage(message);
-        msg.setEmpire(EmpireManager.getInstance().getEmpire());
+        msg.setEmpire(EmpireManager.i.getEmpire());
 
         ChatMessage.Location location = ChatMessage.Location.fromNumber(mViewPager.getCurrentItem());
         if (location == ChatMessage.Location.ALLIANCE_CHANNEL) {
