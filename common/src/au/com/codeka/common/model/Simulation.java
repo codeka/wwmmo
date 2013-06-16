@@ -11,7 +11,6 @@ import org.joda.time.Duration;
 import org.joda.time.Interval;
 import org.joda.time.Seconds;
 
-import au.com.codeka.common.protobuf.Messages.Fleet;
 
 /**
  * This class is used to simulate a \c Star. It need to have the same logic as ctrl/simulation.py

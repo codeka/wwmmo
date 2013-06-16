@@ -20,6 +20,7 @@ public class EmpireRank extends BaseEmpireRank {
             mTotalColonies = rs.getInt("total_colonies");
             mTotalBuildings = rs.getInt("total_buildings");
             mTotalShips = rs.getInt("total_ships");
+            mTotalPopulation = rs.getInt("total_population");
         } catch (SQLException e) {
             // these may not exist... doesn't matter
         }
@@ -40,5 +41,8 @@ public class EmpireRank extends BaseEmpireRank {
     }
     public void setTotalStars(int num) {
         mTotalStars = num;
+    }
+    public void setTotalPopulation(int num) {
+        mTotalPopulation = num;
     }
 }

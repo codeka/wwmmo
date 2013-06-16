@@ -59,6 +59,13 @@ message EmpireRank
     optional int32 total_colonies = 5;
     optional int32 total_ships = 6;
     optional int32 total_buildings = 7;
+    optional int32 total_population = 8;
+}
+
+message EmpireRanks
+{
+    repeated EmpireRank ranks = 1;
+    optional int64 date = 2;
 }
 
 //

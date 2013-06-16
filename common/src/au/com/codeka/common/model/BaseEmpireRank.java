@@ -8,6 +8,7 @@ public class BaseEmpireRank {
     protected int mTotalColonies;
     protected int mTotalBuildings;
     protected int mTotalShips;
+    protected int mTotalPopulation;
     protected int mRank;
     protected int mLastRank;
 
@@ -26,6 +27,9 @@ public class BaseEmpireRank {
     public int getTotalShips() {
         return mTotalShips;
     }
+    public int getTotalPopulation() {
+        return mTotalPopulation;
+    }
     public int getRank() {
         return mRank;
     }
@@ -39,6 +43,7 @@ public class BaseEmpireRank {
         mTotalColonies = pb.getTotalColonies();
         mTotalBuildings = pb.getTotalBuildings();
         mTotalShips = pb.getTotalShips();
+        mTotalPopulation = pb.getTotalPopulation();
         mRank = pb.getRank();
         mLastRank = pb.getLastRank();
     }
@@ -49,6 +54,7 @@ public class BaseEmpireRank {
         pb.setTotalColonies(mTotalColonies);
         pb.setTotalBuildings(mTotalBuildings);
         pb.setTotalShips(mTotalShips);
+        pb.setTotalPopulation(mTotalPopulation);
         pb.setRank(mRank);
         pb.setLastRank(mLastRank);
     }

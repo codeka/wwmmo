@@ -219,7 +219,12 @@ public class BuildActivity extends BaseActivity implements StarManager.StarFetch
                 Bundle args = getArguments();
                 mColonyKey = args.getString("au.com.codeka.warworlds.ColonyKey");
             }
+
             Star star = ((BuildActivity) getActivity()).mStar;
+            if (star.getColonies() == null) {
+                return null;
+            }
+
             for (BaseColony baseColony : star.getColonies()) {
                 if (baseColony.getKey().equals(mColonyKey)) {
                     return (Colony) baseColony;

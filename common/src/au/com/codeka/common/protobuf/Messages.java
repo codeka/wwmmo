@@ -1569,6 +1569,16 @@ public final class Messages {
      * <code>optional int32 total_buildings = 7;</code>
      */
     int getTotalBuildings();
+
+    // optional int32 total_population = 8;
+    /**
+     * <code>optional int32 total_population = 8;</code>
+     */
+    boolean hasTotalPopulation();
+    /**
+     * <code>optional int32 total_population = 8;</code>
+     */
+    int getTotalPopulation();
   }
   /**
    * Protobuf type {@code au.com.codeka.common.protobuf.EmpireRank}
@@ -1659,6 +1669,11 @@ public final class Messages {
             case 56: {
               bitField0_ |= 0x00000040;
               totalBuildings_ = input.readInt32();
+              break;
+            }
+            case 64: {
+              bitField0_ |= 0x00000080;
+              totalPopulation_ = input.readInt32();
               break;
             }
           }
@@ -1840,6 +1855,22 @@ public final class Messages {
       return totalBuildings_;
     }
 
+    // optional int32 total_population = 8;
+    public static final int TOTAL_POPULATION_FIELD_NUMBER = 8;
+    private int totalPopulation_;
+    /**
+     * <code>optional int32 total_population = 8;</code>
+     */
+    public boolean hasTotalPopulation() {
+      return ((bitField0_ & 0x00000080) == 0x00000080);
+    }
+    /**
+     * <code>optional int32 total_population = 8;</code>
+     */
+    public int getTotalPopulation() {
+      return totalPopulation_;
+    }
+
     private void initFields() {
       empireKey_ = "";
       rank_ = 0;
@@ -1848,6 +1879,7 @@ public final class Messages {
       totalColonies_ = 0;
       totalShips_ = 0;
       totalBuildings_ = 0;
+      totalPopulation_ = 0;
     }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
@@ -1881,6 +1913,9 @@ public final class Messages {
       }
       if (((bitField0_ & 0x00000040) == 0x00000040)) {
         output.writeInt32(7, totalBuildings_);
+      }
+      if (((bitField0_ & 0x00000080) == 0x00000080)) {
+        output.writeInt32(8, totalPopulation_);
       }
       getUnknownFields().writeTo(output);
     }
@@ -1918,6 +1953,10 @@ public final class Messages {
       if (((bitField0_ & 0x00000040) == 0x00000040)) {
         size += com.google.protobuf.CodedOutputStream
           .computeInt32Size(7, totalBuildings_);
+      }
+      if (((bitField0_ & 0x00000080) == 0x00000080)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt32Size(8, totalPopulation_);
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
@@ -2054,6 +2093,8 @@ public final class Messages {
         bitField0_ = (bitField0_ & ~0x00000020);
         totalBuildings_ = 0;
         bitField0_ = (bitField0_ & ~0x00000040);
+        totalPopulation_ = 0;
+        bitField0_ = (bitField0_ & ~0x00000080);
         return this;
       }
 
@@ -2110,6 +2151,10 @@ public final class Messages {
           to_bitField0_ |= 0x00000040;
         }
         result.totalBuildings_ = totalBuildings_;
+        if (((from_bitField0_ & 0x00000080) == 0x00000080)) {
+          to_bitField0_ |= 0x00000080;
+        }
+        result.totalPopulation_ = totalPopulation_;
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
@@ -2148,6 +2193,9 @@ public final class Messages {
         }
         if (other.hasTotalBuildings()) {
           setTotalBuildings(other.getTotalBuildings());
+        }
+        if (other.hasTotalPopulation()) {
+          setTotalPopulation(other.getTotalPopulation());
         }
         this.mergeUnknownFields(other.getUnknownFields());
         return this;
@@ -2448,6 +2496,39 @@ public final class Messages {
         return this;
       }
 
+      // optional int32 total_population = 8;
+      private int totalPopulation_ ;
+      /**
+       * <code>optional int32 total_population = 8;</code>
+       */
+      public boolean hasTotalPopulation() {
+        return ((bitField0_ & 0x00000080) == 0x00000080);
+      }
+      /**
+       * <code>optional int32 total_population = 8;</code>
+       */
+      public int getTotalPopulation() {
+        return totalPopulation_;
+      }
+      /**
+       * <code>optional int32 total_population = 8;</code>
+       */
+      public Builder setTotalPopulation(int value) {
+        bitField0_ |= 0x00000080;
+        totalPopulation_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional int32 total_population = 8;</code>
+       */
+      public Builder clearTotalPopulation() {
+        bitField0_ = (bitField0_ & ~0x00000080);
+        totalPopulation_ = 0;
+        onChanged();
+        return this;
+      }
+
       // @@protoc_insertion_point(builder_scope:au.com.codeka.common.protobuf.EmpireRank)
     }
 
@@ -2457,6 +2538,764 @@ public final class Messages {
     }
 
     // @@protoc_insertion_point(class_scope:au.com.codeka.common.protobuf.EmpireRank)
+  }
+
+  public interface EmpireRanksOrBuilder
+      extends com.google.protobuf.MessageOrBuilder {
+
+    // repeated .au.com.codeka.common.protobuf.EmpireRank ranks = 1;
+    /**
+     * <code>repeated .au.com.codeka.common.protobuf.EmpireRank ranks = 1;</code>
+     */
+    java.util.List<au.com.codeka.common.protobuf.Messages.EmpireRank> 
+        getRanksList();
+    /**
+     * <code>repeated .au.com.codeka.common.protobuf.EmpireRank ranks = 1;</code>
+     */
+    au.com.codeka.common.protobuf.Messages.EmpireRank getRanks(int index);
+    /**
+     * <code>repeated .au.com.codeka.common.protobuf.EmpireRank ranks = 1;</code>
+     */
+    int getRanksCount();
+    /**
+     * <code>repeated .au.com.codeka.common.protobuf.EmpireRank ranks = 1;</code>
+     */
+    java.util.List<? extends au.com.codeka.common.protobuf.Messages.EmpireRankOrBuilder> 
+        getRanksOrBuilderList();
+    /**
+     * <code>repeated .au.com.codeka.common.protobuf.EmpireRank ranks = 1;</code>
+     */
+    au.com.codeka.common.protobuf.Messages.EmpireRankOrBuilder getRanksOrBuilder(
+        int index);
+
+    // optional int64 date = 2;
+    /**
+     * <code>optional int64 date = 2;</code>
+     */
+    boolean hasDate();
+    /**
+     * <code>optional int64 date = 2;</code>
+     */
+    long getDate();
+  }
+  /**
+   * Protobuf type {@code au.com.codeka.common.protobuf.EmpireRanks}
+   */
+  public static final class EmpireRanks extends
+      com.google.protobuf.GeneratedMessage
+      implements EmpireRanksOrBuilder {
+    // Use EmpireRanks.newBuilder() to construct.
+    private EmpireRanks(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
+      super(builder);
+      this.unknownFields = builder.getUnknownFields();
+    }
+    private EmpireRanks(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
+
+    private static final EmpireRanks defaultInstance;
+    public static EmpireRanks getDefaultInstance() {
+      return defaultInstance;
+    }
+
+    public EmpireRanks getDefaultInstanceForType() {
+      return defaultInstance;
+    }
+
+    private final com.google.protobuf.UnknownFieldSet unknownFields;
+    @java.lang.Override
+    public final com.google.protobuf.UnknownFieldSet
+        getUnknownFields() {
+      return this.unknownFields;
+    }
+    private EmpireRanks(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      initFields();
+      int mutable_bitField0_ = 0;
+      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder();
+      try {
+        boolean done = false;
+        while (!done) {
+          int tag = input.readTag();
+          switch (tag) {
+            case 0:
+              done = true;
+              break;
+            default: {
+              if (!parseUnknownField(input, unknownFields,
+                                     extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
+            case 10: {
+              if (!((mutable_bitField0_ & 0x00000001) == 0x00000001)) {
+                ranks_ = new java.util.ArrayList<au.com.codeka.common.protobuf.Messages.EmpireRank>();
+                mutable_bitField0_ |= 0x00000001;
+              }
+              ranks_.add(input.readMessage(au.com.codeka.common.protobuf.Messages.EmpireRank.PARSER, extensionRegistry));
+              break;
+            }
+            case 16: {
+              bitField0_ |= 0x00000001;
+              date_ = input.readInt64();
+              break;
+            }
+          }
+        }
+      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+        throw e.setUnfinishedMessage(this);
+      } catch (java.io.IOException e) {
+        throw new com.google.protobuf.InvalidProtocolBufferException(
+            e.getMessage()).setUnfinishedMessage(this);
+      } finally {
+        if (((mutable_bitField0_ & 0x00000001) == 0x00000001)) {
+          ranks_ = java.util.Collections.unmodifiableList(ranks_);
+        }
+        this.unknownFields = unknownFields.build();
+        makeExtensionsImmutable();
+      }
+    }
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_EmpireRanks_descriptor;
+    }
+
+    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_EmpireRanks_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              au.com.codeka.common.protobuf.Messages.EmpireRanks.class, au.com.codeka.common.protobuf.Messages.EmpireRanks.Builder.class);
+    }
+
+    public static com.google.protobuf.Parser<EmpireRanks> PARSER =
+        new com.google.protobuf.AbstractParser<EmpireRanks>() {
+      public EmpireRanks parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return new EmpireRanks(input, extensionRegistry);
+      }
+    };
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<EmpireRanks> getParserForType() {
+      return PARSER;
+    }
+
+    private int bitField0_;
+    // repeated .au.com.codeka.common.protobuf.EmpireRank ranks = 1;
+    public static final int RANKS_FIELD_NUMBER = 1;
+    private java.util.List<au.com.codeka.common.protobuf.Messages.EmpireRank> ranks_;
+    /**
+     * <code>repeated .au.com.codeka.common.protobuf.EmpireRank ranks = 1;</code>
+     */
+    public java.util.List<au.com.codeka.common.protobuf.Messages.EmpireRank> getRanksList() {
+      return ranks_;
+    }
+    /**
+     * <code>repeated .au.com.codeka.common.protobuf.EmpireRank ranks = 1;</code>
+     */
+    public java.util.List<? extends au.com.codeka.common.protobuf.Messages.EmpireRankOrBuilder> 
+        getRanksOrBuilderList() {
+      return ranks_;
+    }
+    /**
+     * <code>repeated .au.com.codeka.common.protobuf.EmpireRank ranks = 1;</code>
+     */
+    public int getRanksCount() {
+      return ranks_.size();
+    }
+    /**
+     * <code>repeated .au.com.codeka.common.protobuf.EmpireRank ranks = 1;</code>
+     */
+    public au.com.codeka.common.protobuf.Messages.EmpireRank getRanks(int index) {
+      return ranks_.get(index);
+    }
+    /**
+     * <code>repeated .au.com.codeka.common.protobuf.EmpireRank ranks = 1;</code>
+     */
+    public au.com.codeka.common.protobuf.Messages.EmpireRankOrBuilder getRanksOrBuilder(
+        int index) {
+      return ranks_.get(index);
+    }
+
+    // optional int64 date = 2;
+    public static final int DATE_FIELD_NUMBER = 2;
+    private long date_;
+    /**
+     * <code>optional int64 date = 2;</code>
+     */
+    public boolean hasDate() {
+      return ((bitField0_ & 0x00000001) == 0x00000001);
+    }
+    /**
+     * <code>optional int64 date = 2;</code>
+     */
+    public long getDate() {
+      return date_;
+    }
+
+    private void initFields() {
+      ranks_ = java.util.Collections.emptyList();
+      date_ = 0L;
+    }
+    private byte memoizedIsInitialized = -1;
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized != -1) return isInitialized == 1;
+
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      getSerializedSize();
+      for (int i = 0; i < ranks_.size(); i++) {
+        output.writeMessage(1, ranks_.get(i));
+      }
+      if (((bitField0_ & 0x00000001) == 0x00000001)) {
+        output.writeInt64(2, date_);
+      }
+      getUnknownFields().writeTo(output);
+    }
+
+    private int memoizedSerializedSize = -1;
+    public int getSerializedSize() {
+      int size = memoizedSerializedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      for (int i = 0; i < ranks_.size(); i++) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(1, ranks_.get(i));
+      }
+      if (((bitField0_ & 0x00000001) == 0x00000001)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt64Size(2, date_);
+      }
+      size += getUnknownFields().getSerializedSize();
+      memoizedSerializedSize = size;
+      return size;
+    }
+
+    private static final long serialVersionUID = 0L;
+    @java.lang.Override
+    protected java.lang.Object writeReplace()
+        throws java.io.ObjectStreamException {
+      return super.writeReplace();
+    }
+
+    public static au.com.codeka.common.protobuf.Messages.EmpireRanks parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static au.com.codeka.common.protobuf.Messages.EmpireRanks parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static au.com.codeka.common.protobuf.Messages.EmpireRanks parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static au.com.codeka.common.protobuf.Messages.EmpireRanks parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static au.com.codeka.common.protobuf.Messages.EmpireRanks parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input);
+    }
+    public static au.com.codeka.common.protobuf.Messages.EmpireRanks parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input, extensionRegistry);
+    }
+    public static au.com.codeka.common.protobuf.Messages.EmpireRanks parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return PARSER.parseDelimitedFrom(input);
+    }
+    public static au.com.codeka.common.protobuf.Messages.EmpireRanks parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseDelimitedFrom(input, extensionRegistry);
+    }
+    public static au.com.codeka.common.protobuf.Messages.EmpireRanks parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input);
+    }
+    public static au.com.codeka.common.protobuf.Messages.EmpireRanks parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input, extensionRegistry);
+    }
+
+    public static Builder newBuilder() { return Builder.create(); }
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder(au.com.codeka.common.protobuf.Messages.EmpireRanks prototype) {
+      return newBuilder().mergeFrom(prototype);
+    }
+    public Builder toBuilder() { return newBuilder(this); }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * Protobuf type {@code au.com.codeka.common.protobuf.EmpireRanks}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessage.Builder<Builder>
+       implements au.com.codeka.common.protobuf.Messages.EmpireRanksOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_EmpireRanks_descriptor;
+      }
+
+      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_EmpireRanks_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                au.com.codeka.common.protobuf.Messages.EmpireRanks.class, au.com.codeka.common.protobuf.Messages.EmpireRanks.Builder.class);
+      }
+
+      // Construct using au.com.codeka.common.protobuf.Messages.EmpireRanks.newBuilder()
+      private Builder() {
+        maybeForceBuilderInitialization();
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+        super(parent);
+        maybeForceBuilderInitialization();
+      }
+      private void maybeForceBuilderInitialization() {
+        if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
+          getRanksFieldBuilder();
+        }
+      }
+      private static Builder create() {
+        return new Builder();
+      }
+
+      public Builder clear() {
+        super.clear();
+        if (ranksBuilder_ == null) {
+          ranks_ = java.util.Collections.emptyList();
+          bitField0_ = (bitField0_ & ~0x00000001);
+        } else {
+          ranksBuilder_.clear();
+        }
+        date_ = 0L;
+        bitField0_ = (bitField0_ & ~0x00000002);
+        return this;
+      }
+
+      public Builder clone() {
+        return create().mergeFrom(buildPartial());
+      }
+
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_EmpireRanks_descriptor;
+      }
+
+      public au.com.codeka.common.protobuf.Messages.EmpireRanks getDefaultInstanceForType() {
+        return au.com.codeka.common.protobuf.Messages.EmpireRanks.getDefaultInstance();
+      }
+
+      public au.com.codeka.common.protobuf.Messages.EmpireRanks build() {
+        au.com.codeka.common.protobuf.Messages.EmpireRanks result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      public au.com.codeka.common.protobuf.Messages.EmpireRanks buildPartial() {
+        au.com.codeka.common.protobuf.Messages.EmpireRanks result = new au.com.codeka.common.protobuf.Messages.EmpireRanks(this);
+        int from_bitField0_ = bitField0_;
+        int to_bitField0_ = 0;
+        if (ranksBuilder_ == null) {
+          if (((bitField0_ & 0x00000001) == 0x00000001)) {
+            ranks_ = java.util.Collections.unmodifiableList(ranks_);
+            bitField0_ = (bitField0_ & ~0x00000001);
+          }
+          result.ranks_ = ranks_;
+        } else {
+          result.ranks_ = ranksBuilder_.build();
+        }
+        if (((from_bitField0_ & 0x00000002) == 0x00000002)) {
+          to_bitField0_ |= 0x00000001;
+        }
+        result.date_ = date_;
+        result.bitField0_ = to_bitField0_;
+        onBuilt();
+        return result;
+      }
+
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof au.com.codeka.common.protobuf.Messages.EmpireRanks) {
+          return mergeFrom((au.com.codeka.common.protobuf.Messages.EmpireRanks)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(au.com.codeka.common.protobuf.Messages.EmpireRanks other) {
+        if (other == au.com.codeka.common.protobuf.Messages.EmpireRanks.getDefaultInstance()) return this;
+        if (ranksBuilder_ == null) {
+          if (!other.ranks_.isEmpty()) {
+            if (ranks_.isEmpty()) {
+              ranks_ = other.ranks_;
+              bitField0_ = (bitField0_ & ~0x00000001);
+            } else {
+              ensureRanksIsMutable();
+              ranks_.addAll(other.ranks_);
+            }
+            onChanged();
+          }
+        } else {
+          if (!other.ranks_.isEmpty()) {
+            if (ranksBuilder_.isEmpty()) {
+              ranksBuilder_.dispose();
+              ranksBuilder_ = null;
+              ranks_ = other.ranks_;
+              bitField0_ = (bitField0_ & ~0x00000001);
+              ranksBuilder_ = 
+                com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders ?
+                   getRanksFieldBuilder() : null;
+            } else {
+              ranksBuilder_.addAllMessages(other.ranks_);
+            }
+          }
+        }
+        if (other.hasDate()) {
+          setDate(other.getDate());
+        }
+        this.mergeUnknownFields(other.getUnknownFields());
+        return this;
+      }
+
+      public final boolean isInitialized() {
+        return true;
+      }
+
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        au.com.codeka.common.protobuf.Messages.EmpireRanks parsedMessage = null;
+        try {
+          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          parsedMessage = (au.com.codeka.common.protobuf.Messages.EmpireRanks) e.getUnfinishedMessage();
+          throw e;
+        } finally {
+          if (parsedMessage != null) {
+            mergeFrom(parsedMessage);
+          }
+        }
+        return this;
+      }
+      private int bitField0_;
+
+      // repeated .au.com.codeka.common.protobuf.EmpireRank ranks = 1;
+      private java.util.List<au.com.codeka.common.protobuf.Messages.EmpireRank> ranks_ =
+        java.util.Collections.emptyList();
+      private void ensureRanksIsMutable() {
+        if (!((bitField0_ & 0x00000001) == 0x00000001)) {
+          ranks_ = new java.util.ArrayList<au.com.codeka.common.protobuf.Messages.EmpireRank>(ranks_);
+          bitField0_ |= 0x00000001;
+         }
+      }
+
+      private com.google.protobuf.RepeatedFieldBuilder<
+          au.com.codeka.common.protobuf.Messages.EmpireRank, au.com.codeka.common.protobuf.Messages.EmpireRank.Builder, au.com.codeka.common.protobuf.Messages.EmpireRankOrBuilder> ranksBuilder_;
+
+      /**
+       * <code>repeated .au.com.codeka.common.protobuf.EmpireRank ranks = 1;</code>
+       */
+      public java.util.List<au.com.codeka.common.protobuf.Messages.EmpireRank> getRanksList() {
+        if (ranksBuilder_ == null) {
+          return java.util.Collections.unmodifiableList(ranks_);
+        } else {
+          return ranksBuilder_.getMessageList();
+        }
+      }
+      /**
+       * <code>repeated .au.com.codeka.common.protobuf.EmpireRank ranks = 1;</code>
+       */
+      public int getRanksCount() {
+        if (ranksBuilder_ == null) {
+          return ranks_.size();
+        } else {
+          return ranksBuilder_.getCount();
+        }
+      }
+      /**
+       * <code>repeated .au.com.codeka.common.protobuf.EmpireRank ranks = 1;</code>
+       */
+      public au.com.codeka.common.protobuf.Messages.EmpireRank getRanks(int index) {
+        if (ranksBuilder_ == null) {
+          return ranks_.get(index);
+        } else {
+          return ranksBuilder_.getMessage(index);
+        }
+      }
+      /**
+       * <code>repeated .au.com.codeka.common.protobuf.EmpireRank ranks = 1;</code>
+       */
+      public Builder setRanks(
+          int index, au.com.codeka.common.protobuf.Messages.EmpireRank value) {
+        if (ranksBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          ensureRanksIsMutable();
+          ranks_.set(index, value);
+          onChanged();
+        } else {
+          ranksBuilder_.setMessage(index, value);
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .au.com.codeka.common.protobuf.EmpireRank ranks = 1;</code>
+       */
+      public Builder setRanks(
+          int index, au.com.codeka.common.protobuf.Messages.EmpireRank.Builder builderForValue) {
+        if (ranksBuilder_ == null) {
+          ensureRanksIsMutable();
+          ranks_.set(index, builderForValue.build());
+          onChanged();
+        } else {
+          ranksBuilder_.setMessage(index, builderForValue.build());
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .au.com.codeka.common.protobuf.EmpireRank ranks = 1;</code>
+       */
+      public Builder addRanks(au.com.codeka.common.protobuf.Messages.EmpireRank value) {
+        if (ranksBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          ensureRanksIsMutable();
+          ranks_.add(value);
+          onChanged();
+        } else {
+          ranksBuilder_.addMessage(value);
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .au.com.codeka.common.protobuf.EmpireRank ranks = 1;</code>
+       */
+      public Builder addRanks(
+          int index, au.com.codeka.common.protobuf.Messages.EmpireRank value) {
+        if (ranksBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          ensureRanksIsMutable();
+          ranks_.add(index, value);
+          onChanged();
+        } else {
+          ranksBuilder_.addMessage(index, value);
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .au.com.codeka.common.protobuf.EmpireRank ranks = 1;</code>
+       */
+      public Builder addRanks(
+          au.com.codeka.common.protobuf.Messages.EmpireRank.Builder builderForValue) {
+        if (ranksBuilder_ == null) {
+          ensureRanksIsMutable();
+          ranks_.add(builderForValue.build());
+          onChanged();
+        } else {
+          ranksBuilder_.addMessage(builderForValue.build());
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .au.com.codeka.common.protobuf.EmpireRank ranks = 1;</code>
+       */
+      public Builder addRanks(
+          int index, au.com.codeka.common.protobuf.Messages.EmpireRank.Builder builderForValue) {
+        if (ranksBuilder_ == null) {
+          ensureRanksIsMutable();
+          ranks_.add(index, builderForValue.build());
+          onChanged();
+        } else {
+          ranksBuilder_.addMessage(index, builderForValue.build());
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .au.com.codeka.common.protobuf.EmpireRank ranks = 1;</code>
+       */
+      public Builder addAllRanks(
+          java.lang.Iterable<? extends au.com.codeka.common.protobuf.Messages.EmpireRank> values) {
+        if (ranksBuilder_ == null) {
+          ensureRanksIsMutable();
+          super.addAll(values, ranks_);
+          onChanged();
+        } else {
+          ranksBuilder_.addAllMessages(values);
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .au.com.codeka.common.protobuf.EmpireRank ranks = 1;</code>
+       */
+      public Builder clearRanks() {
+        if (ranksBuilder_ == null) {
+          ranks_ = java.util.Collections.emptyList();
+          bitField0_ = (bitField0_ & ~0x00000001);
+          onChanged();
+        } else {
+          ranksBuilder_.clear();
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .au.com.codeka.common.protobuf.EmpireRank ranks = 1;</code>
+       */
+      public Builder removeRanks(int index) {
+        if (ranksBuilder_ == null) {
+          ensureRanksIsMutable();
+          ranks_.remove(index);
+          onChanged();
+        } else {
+          ranksBuilder_.remove(index);
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .au.com.codeka.common.protobuf.EmpireRank ranks = 1;</code>
+       */
+      public au.com.codeka.common.protobuf.Messages.EmpireRank.Builder getRanksBuilder(
+          int index) {
+        return getRanksFieldBuilder().getBuilder(index);
+      }
+      /**
+       * <code>repeated .au.com.codeka.common.protobuf.EmpireRank ranks = 1;</code>
+       */
+      public au.com.codeka.common.protobuf.Messages.EmpireRankOrBuilder getRanksOrBuilder(
+          int index) {
+        if (ranksBuilder_ == null) {
+          return ranks_.get(index);  } else {
+          return ranksBuilder_.getMessageOrBuilder(index);
+        }
+      }
+      /**
+       * <code>repeated .au.com.codeka.common.protobuf.EmpireRank ranks = 1;</code>
+       */
+      public java.util.List<? extends au.com.codeka.common.protobuf.Messages.EmpireRankOrBuilder> 
+           getRanksOrBuilderList() {
+        if (ranksBuilder_ != null) {
+          return ranksBuilder_.getMessageOrBuilderList();
+        } else {
+          return java.util.Collections.unmodifiableList(ranks_);
+        }
+      }
+      /**
+       * <code>repeated .au.com.codeka.common.protobuf.EmpireRank ranks = 1;</code>
+       */
+      public au.com.codeka.common.protobuf.Messages.EmpireRank.Builder addRanksBuilder() {
+        return getRanksFieldBuilder().addBuilder(
+            au.com.codeka.common.protobuf.Messages.EmpireRank.getDefaultInstance());
+      }
+      /**
+       * <code>repeated .au.com.codeka.common.protobuf.EmpireRank ranks = 1;</code>
+       */
+      public au.com.codeka.common.protobuf.Messages.EmpireRank.Builder addRanksBuilder(
+          int index) {
+        return getRanksFieldBuilder().addBuilder(
+            index, au.com.codeka.common.protobuf.Messages.EmpireRank.getDefaultInstance());
+      }
+      /**
+       * <code>repeated .au.com.codeka.common.protobuf.EmpireRank ranks = 1;</code>
+       */
+      public java.util.List<au.com.codeka.common.protobuf.Messages.EmpireRank.Builder> 
+           getRanksBuilderList() {
+        return getRanksFieldBuilder().getBuilderList();
+      }
+      private com.google.protobuf.RepeatedFieldBuilder<
+          au.com.codeka.common.protobuf.Messages.EmpireRank, au.com.codeka.common.protobuf.Messages.EmpireRank.Builder, au.com.codeka.common.protobuf.Messages.EmpireRankOrBuilder> 
+          getRanksFieldBuilder() {
+        if (ranksBuilder_ == null) {
+          ranksBuilder_ = new com.google.protobuf.RepeatedFieldBuilder<
+              au.com.codeka.common.protobuf.Messages.EmpireRank, au.com.codeka.common.protobuf.Messages.EmpireRank.Builder, au.com.codeka.common.protobuf.Messages.EmpireRankOrBuilder>(
+                  ranks_,
+                  ((bitField0_ & 0x00000001) == 0x00000001),
+                  getParentForChildren(),
+                  isClean());
+          ranks_ = null;
+        }
+        return ranksBuilder_;
+      }
+
+      // optional int64 date = 2;
+      private long date_ ;
+      /**
+       * <code>optional int64 date = 2;</code>
+       */
+      public boolean hasDate() {
+        return ((bitField0_ & 0x00000002) == 0x00000002);
+      }
+      /**
+       * <code>optional int64 date = 2;</code>
+       */
+      public long getDate() {
+        return date_;
+      }
+      /**
+       * <code>optional int64 date = 2;</code>
+       */
+      public Builder setDate(long value) {
+        bitField0_ |= 0x00000002;
+        date_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional int64 date = 2;</code>
+       */
+      public Builder clearDate() {
+        bitField0_ = (bitField0_ & ~0x00000002);
+        date_ = 0L;
+        onChanged();
+        return this;
+      }
+
+      // @@protoc_insertion_point(builder_scope:au.com.codeka.common.protobuf.EmpireRanks)
+    }
+
+    static {
+      defaultInstance = new EmpireRanks(true);
+      defaultInstance.initFields();
+    }
+
+    // @@protoc_insertion_point(class_scope:au.com.codeka.common.protobuf.EmpireRanks)
   }
 
   public interface EmpireOrBuilder
@@ -72440,6 +73279,11 @@ public final class Messages {
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_au_com_codeka_common_protobuf_EmpireRank_fieldAccessorTable;
   private static com.google.protobuf.Descriptors.Descriptor
+    internal_static_au_com_codeka_common_protobuf_EmpireRanks_descriptor;
+  private static
+    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      internal_static_au_com_codeka_common_protobuf_EmpireRanks_fieldAccessorTable;
+  private static com.google.protobuf.Descriptors.Descriptor
     internal_static_au_com_codeka_common_protobuf_Empire_descriptor;
   private static
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
@@ -72761,276 +73605,278 @@ public final class Messages {
       "rentDesign\020\r\022\'\n#CannotCollectTaxesAlread" +
       "yInProgress\020\016\022(\n$CannotColonizePlanetAlr" +
       "eadyHasColony\020\020\022%\n!CannotColonizePlanetN" +
-      "oColonyShips\020\021\"\234\001\n\nEmpireRank\022\022\n\nempire_" +
+      "oColonyShips\020\021\"\266\001\n\nEmpireRank\022\022\n\nempire_" +
       "key\030\001 \001(\t\022\014\n\004rank\030\002 \001(\005\022\021\n\tlast_rank\030\003 \001",
       "(\005\022\023\n\013total_stars\030\004 \001(\005\022\026\n\016total_colonie" +
       "s\030\005 \001(\005\022\023\n\013total_ships\030\006 \001(\005\022\027\n\017total_bu" +
-      "ildings\030\007 \001(\005\"\344\004\n\006Empire\022\013\n\003key\030\001 \001(\t\022\024\n" +
-      "\014display_name\030\002 \002(\t\022\014\n\004user\030\003 \001(\t\022\r\n\005ema" +
-      "il\030\004 \001(\t\022@\n\005state\030\005 \002(\01621.au.com.codeka." +
-      "common.protobuf.Empire.EmpireState\0224\n\006fl" +
-      "eets\030\006 \003(\0132$.au.com.codeka.common.protob" +
-      "uf.Fleet\0227\n\010colonies\030\007 \003(\0132%.au.com.code" +
-      "ka.common.protobuf.Colony\022C\n\016build_reque" +
-      "sts\030\n \003(\0132+.au.com.codeka.common.protobu",
-      "f.BuildRequest\0222\n\005stars\030\010 \003(\0132#.au.com.c" +
-      "odeka.common.protobuf.Star\022\014\n\004cash\030\t \001(\002" +
-      "\0227\n\004rank\030\013 \001(\0132).au.com.codeka.common.pr" +
-      "otobuf.EmpireRank\0226\n\thome_star\030\014 \001(\0132#.a" +
-      "u.com.codeka.common.protobuf.Star\0229\n\010all" +
-      "iance\030\r \001(\0132\'.au.com.codeka.common.proto" +
-      "buf.Alliance\"6\n\013EmpireState\022\013\n\007INITIAL\020\001" +
-      "\022\016\n\nREGISTERED\020\002\022\n\n\006BANNED\020\003\"A\n\007Empires\022" +
-      "6\n\007empires\030\001 \003(\0132%.au.com.codeka.common." +
-      "protobuf.Empire\"\215\001\n\024EmpireCashAuditEntry",
-      "\022\013\n\003key\030\001 \001(\t\022\022\n\nempire_key\030\002 \001(\t\022\022\n\ndif" +
-      "ference\030\003 \001(\002\022\020\n\010old_cash\030\004 \001(\002\022\020\n\010new_c" +
-      "ash\030\005 \001(\002\022\016\n\006reason\030\006 \001(\t\022\014\n\004time\030\007 \001(\003\"" +
-      "W\n\017EmpireCashAudit\022D\n\007entries\030\001 \003(\01323.au" +
-      ".com.codeka.common.protobuf.EmpireCashAu" +
-      "ditEntry\"\250\001\n\030EmpireBuildingStatistics\022S\n" +
-      "\006counts\030\001 \003(\0132C.au.com.codeka.common.pro" +
-      "tobuf.EmpireBuildingStatistics.DesignCou" +
-      "nt\0327\n\013DesignCount\022\021\n\tdesign_id\030\001 \002(\t\022\025\n\r" +
-      "num_buildings\030\002 \002(\005\"\205\001\n\014HelloRequest\022\024\n\014",
-      "device_model\030\001 \001(\t\022\033\n\023device_manufacture" +
-      "r\030\002 \001(\t\022\024\n\014device_build\030\003 \001(\t\022\026\n\016device_" +
-      "version\030\004 \001(\t\022\024\n\014memory_class\030\005 \001(\005\"\255\003\n\r" +
-      "HelloResponse\022<\n\004motd\030\001 \002(\0132..au.com.cod" +
-      "eka.common.protobuf.MessageOfTheDay\0225\n\006e" +
-      "mpire\030\002 \001(\0132%.au.com.codeka.common.proto" +
-      "buf.Empire\0227\n\010colonies\030\003 \003(\0132%.au.com.co" +
-      "deka.common.protobuf.Colony\022\034\n\024require_g" +
-      "cm_register\030\006 \001(\010\022\030\n\020was_empire_reset\030\007 " +
-      "\001(\010\022\033\n\023empire_reset_reason\030\n \001(\t\022T\n\023buil",
-      "ding_statistics\030\010 \001(\01327.au.com.codeka.co" +
-      "mmon.protobuf.EmpireBuildingStatistics\022C" +
-      "\n\016build_requests\030\t \003(\0132+.au.com.codeka.c" +
-      "ommon.protobuf.BuildRequest\"\300\001\n\022DeviceRe" +
-      "gistration\022\013\n\003key\030\001 \001(\t\022\021\n\tdevice_id\030\002 \001" +
-      "(\t\022\033\n\023gcm_registration_id\030\003 \001(\t\022\024\n\014devic" +
-      "e_model\030\004 \001(\t\022\033\n\023device_manufacturer\030\005 \001" +
-      "(\t\022\024\n\014device_build\030\006 \001(\t\022\026\n\016device_versi" +
-      "on\030\007 \001(\t\022\014\n\004user\030\010 \001(\t\"_\n\023DeviceRegistra" +
-      "tions\022H\n\rregistrations\030\001 \003(\01321.au.com.co",
-      "deka.common.protobuf.DeviceRegistration\"" +
-      "\'\n\022DeviceOnlineStatus\022\021\n\tis_online\030\001 \001(\010" +
-      "\" \n\rDeviceMessage\022\017\n\007message\030\001 \002(\t\"q\n\013Ch" +
-      "atMessage\022\017\n\007message\030\001 \002(\t\022\022\n\nempire_key" +
-      "\030\002 \001(\t\022\023\n\013date_posted\030\003 \001(\003\022\024\n\014alliance_" +
-      "key\030\004 \001(\t\022\022\n\nmessage_en\030\005 \001(\t\"L\n\014ChatMes" +
-      "sages\022<\n\010messages\030\001 \003(\0132*.au.com.codeka." +
-      "common.protobuf.ChatMessage\"\327\001\n\006Sector\022\t" +
-      "\n\001x\030\001 \002(\003\022\t\n\001y\030\002 \002(\003\022\024\n\014num_colonies\030\005 \001" +
-      "(\005\0222\n\005stars\030\003 \003(\0132#.au.com.codeka.common",
-      ".protobuf.Star\0227\n\010colonies\030\004 \003(\0132%.au.co" +
-      "m.codeka.common.protobuf.Colony\0224\n\006fleet" +
-      "s\030\006 \003(\0132$.au.com.codeka.common.protobuf." +
-      "Fleet\"\212\006\n\004Star\022\013\n\003key\030\001 \001(\t\022\020\n\010sector_x\030" +
-      "\013 \001(\003\022\020\n\010sector_y\030\014 \001(\003\022\014\n\004name\030\002 \001(\t\022J\n" +
-      "\016classification\030\003 \001(\01622.au.com.codeka.co" +
-      "mmon.protobuf.Star.CLASSIFICATION\022\014\n\004siz" +
-      "e\030\005 \001(\005\022\020\n\010offset_x\030\006 \001(\005\022\020\n\010offset_y\030\007 " +
-      "\001(\005\0226\n\007planets\030\t \003(\0132%.au.com.codeka.com" +
-      "mon.protobuf.Planet\0227\n\010colonies\030\n \003(\0132%.",
-      "au.com.codeka.common.protobuf.Colony\022:\n\t" +
-      "buildings\030\r \003(\0132\'.au.com.codeka.common.p" +
-      "rotobuf.Building\022>\n\007empires\030\016 \003(\0132-.au.c" +
-      "om.codeka.common.protobuf.EmpirePresence" +
-      "\022C\n\016build_requests\030\017 \003(\0132+.au.com.codeka" +
-      ".common.protobuf.BuildRequest\0224\n\006fleets\030" +
-      "\020 \003(\0132$.au.com.codeka.common.protobuf.Fl" +
-      "eet\022\024\n\014time_emptied\030\021 \001(\003\022\027\n\017last_simula" +
-      "tion\030\022 \001(\003\022J\n\025current_combat_report\030\023 \001(" +
-      "\0132+.au.com.codeka.common.protobuf.Combat",
-      "Report\"b\n\016CLASSIFICATION\022\010\n\004BLUE\020\000\022\t\n\005WH" +
-      "ITE\020\001\022\n\n\006YELLOW\020\002\022\n\n\006ORANGE\020\003\022\007\n\003RED\020\004\022\013" +
-      "\n\007NEUTRON\020\005\022\r\n\tBLACKHOLE\020\006\";\n\005Stars\0222\n\005s" +
-      "tars\030\001 \003(\0132#.au.com.codeka.common.protob" +
-      "uf.Star\"\267\001\n\021StarRenameRequest\022\020\n\010star_ke" +
-      "y\030\001 \002(\t\022\020\n\010old_name\030\002 \002(\t\022\020\n\010new_name\030\003 " +
-      "\002(\t\022\031\n\021purchase_order_id\030\004 \001(\t\022\025\n\rpurcha" +
-      "se_time\030\005 \001(\003\022\"\n\032purchase_developer_payl" +
-      "oad\030\006 \001(\t\022\026\n\016purchase_price\030\007 \001(\t\"\311\002\n\006Pl" +
-      "anet\022\r\n\005index\030\002 \002(\005\022F\n\013planet_type\030\003 \002(\016",
-      "21.au.com.codeka.common.protobuf.Planet." +
-      "PLANET_TYPE\022\014\n\004size\030\004 \001(\005\022\037\n\027population_" +
-      "congeniality\030\005 \001(\005\022\034\n\024farming_congeniali" +
-      "ty\030\006 \001(\005\022\033\n\023mining_congeniality\030\007 \001(\005\"~\n" +
-      "\013PLANET_TYPE\022\014\n\010GASGIANT\020\001\022\014\n\010RADIATED\020\002" +
-      "\022\013\n\007INFERNO\020\003\022\r\n\tASTEROIDS\020\004\022\t\n\005WATER\020\005\022" +
-      "\t\n\005TOXIC\020\006\022\n\n\006DESERT\020\007\022\t\n\005SWAMP\020\010\022\n\n\006TER" +
-      "RAN\020\t\"A\n\007Planets\0226\n\007planets\030\001 \003(\0132%.au.c" +
-      "om.codeka.common.protobuf.Planet\"A\n\007Sect" +
-      "ors\0226\n\007sectors\030\001 \003(\0132%.au.com.codeka.com",
-      "mon.protobuf.Sector\"\361\001\n\016EmpirePresence\022\013" +
-      "\n\003key\030\001 \002(\t\022\022\n\nempire_key\030\002 \001(\t\022\020\n\010star_" +
-      "key\030\003 \001(\t\022\023\n\013total_goods\030\004 \001(\002\022\026\n\016total_" +
-      "minerals\030\005 \001(\002\022\034\n\024goods_delta_per_hour\030\006" +
-      " \001(\002\022\037\n\027minerals_delta_per_hour\030\007 \001(\002\022\021\n" +
-      "\tmax_goods\030\010 \001(\002\022\024\n\014max_minerals\030\t \001(\002\022\027" +
-      "\n\017goods_zero_time\030\n \001(\003\"\'\n\017ColonizeReque" +
-      "st\022\024\n\014planet_index\030\001 \002(\005\"\230\003\n\006Colony\022\013\n\003k" +
-      "ey\030\001 \001(\t\022\022\n\nempire_key\030\002 \001(\t\022\020\n\010star_key" +
-      "\030\004 \001(\t\022\024\n\014planet_index\030\016 \001(\005\022\022\n\npopulati",
-      "on\030\005 \001(\002\022\"\n\032DEPRECATED_last_simulation\030\006" +
-      " \001(\003\022\030\n\020focus_population\030\007 \001(\002\022\025\n\rfocus_" +
-      "farming\030\010 \001(\002\022\024\n\014focus_mining\030\t \001(\002\022\032\n\022f" +
-      "ocus_construction\030\n \001(\002\022\030\n\020delta_populat" +
-      "ion\030\013 \001(\002\022\023\n\013delta_goods\030\014 \001(\002\022\026\n\016delta_" +
-      "minerals\030\r \001(\002\022\031\n\021uncollected_taxes\030\017 \001(" +
-      "\002\022\025\n\rdefence_bonus\030\020 \001(\002\022\026\n\016max_populati" +
-      "on\030\021 \001(\002\022\031\n\021cooldown_end_time\030\022 \001(\003\"C\n\010C" +
-      "olonies\0227\n\010colonies\030\001 \003(\0132%.au.com.codek" +
-      "a.common.protobuf.Colony\"\371\002\n\014BuildReques",
-      "t\022\013\n\003key\030\001 \001(\t\022\022\n\ncolony_key\030\002 \002(\t\022\022\n\nem" +
-      "pire_key\030\003 \002(\t\022\020\n\010star_key\030\013 \001(\t\022\024\n\014plan" +
-      "et_index\030\014 \001(\005\022J\n\nbuild_kind\030\004 \002(\01626.au." +
-      "com.codeka.common.protobuf.BuildRequest." +
-      "BUILD_KIND\022\023\n\013design_name\030\005 \002(\t\022\r\n\005count" +
-      "\030\t \001(\005\022\022\n\nstart_time\030\006 \001(\003\022\020\n\010end_time\030\007" +
-      " \001(\003\022\020\n\010progress\030\010 \001(\002\022\035\n\025existing_build" +
-      "ing_key\030\n \001(\t\022\037\n\027existing_building_level" +
-      "\030\r \001(\005\"$\n\nBUILD_KIND\022\014\n\010BUILDING\020\001\022\010\n\004SH" +
-      "IP\020\002\"K\n\nBuildQueue\022=\n\010requests\030\001 \003(\0132+.a",
-      "u.com.codeka.common.protobuf.BuildReques" +
-      "t\"O\n\010Building\022\013\n\003key\030\001 \002(\t\022\022\n\ncolony_key" +
-      "\030\002 \002(\t\022\023\n\013design_name\030\003 \002(\t\022\r\n\005level\030\004 \001" +
-      "(\005\"\243\004\n\005Fleet\022\013\n\003key\030\001 \002(\t\022\022\n\nempire_key\030" +
-      "\002 \001(\t\022\023\n\013design_name\030\003 \001(\t\022\021\n\tnum_ships\030" +
-      "\004 \001(\002\022?\n\005state\030\005 \001(\01620.au.com.codeka.com" +
-      "mon.protobuf.Fleet.FLEET_STATE\022\030\n\020state_" +
-      "start_time\030\006 \001(\003\022\020\n\010star_key\030\007 \001(\t\022\034\n\024de" +
-      "stination_star_key\030\010 \001(\t\022\030\n\020target_fleet" +
-      "_key\030\t \001(\t\022\031\n\021target_colony_key\030\n \001(\t\022A\n",
-      "\006stance\030\013 \001(\01621.au.com.codeka.common.pro" +
-      "tobuf.Fleet.FLEET_STANCE\022\026\n\016time_destroy" +
-      "ed\030\014 \001(\003\022%\n\035block_notification_on_destro" +
-      "y\030\016 \001(\010\022\024\n\014last_victory\030\r \001(\003\022\013\n\003eta\030\017 \001" +
-      "(\003\"2\n\013FLEET_STATE\022\010\n\004IDLE\020\001\022\n\n\006MOVING\020\002\022" +
-      "\r\n\tATTACKING\020\003\"8\n\014FLEET_STANCE\022\013\n\007PASSIV" +
-      "E\020\001\022\013\n\007NEUTRAL\020\002\022\016\n\nAGGRESSIVE\020\003\">\n\006Flee" +
-      "ts\0224\n\006fleets\030\001 \003(\0132$.au.com.codeka.commo" +
-      "n.protobuf.Fleet\"\250\002\n\nFleetOrder\022D\n\005order" +
-      "\030\001 \002(\01625.au.com.codeka.common.protobuf.F",
-      "leetOrder.FLEET_ORDER\022\022\n\nsplit_left\030\002 \001(" +
-      "\005\022\023\n\013split_right\030\003 \001(\005\022\020\n\010star_key\030\004 \001(\t" +
-      "\022A\n\006stance\030\005 \001(\01621.au.com.codeka.common." +
-      "protobuf.Fleet.FLEET_STANCE\022\027\n\017merge_fle" +
-      "et_key\030\006 \001(\t\"=\n\013FLEET_ORDER\022\t\n\005SPLIT\020\001\022\t" +
-      "\n\005MERGE\020\002\022\010\n\004MOVE\020\003\022\016\n\nSET_STANCE\020\005\"_\n\013S" +
-      "coutReport\022\013\n\003key\030\001 \001(\t\022\022\n\nempire_key\030\002 " +
-      "\001(\t\022\020\n\010star_key\030\003 \001(\t\022\014\n\004date\030\005 \001(\003\022\017\n\007s" +
-      "tar_pb\030\004 \001(\014\"K\n\014ScoutReports\022;\n\007reports\030" +
-      "\001 \003(\0132*.au.com.codeka.common.protobuf.Sc",
-      "outReport\"\252\006\n\013CombatRound\022\020\n\010star_key\030\001 " +
-      "\001(\t\022\022\n\nround_time\030\002 \001(\003\022G\n\006fleets\030\003 \003(\0132" +
-      "7.au.com.codeka.common.protobuf.CombatRo" +
-      "und.FleetSummary\022S\n\rfleets_joined\030\004 \003(\0132" +
-      "<.au.com.codeka.common.protobuf.CombatRo" +
-      "und.FleetJoinedRecord\022V\n\020fleets_targette" +
-      "d\030\005 \003(\0132<.au.com.codeka.common.protobuf." +
-      "CombatRound.FleetTargetRecord\022U\n\017fleets_" +
-      "attacked\030\006 \003(\0132<.au.com.codeka.common.pr" +
-      "otobuf.CombatRound.FleetAttackRecord\022U\n\016",
-      "fleets_damaged\030\007 \003(\0132=.au.com.codeka.com" +
-      "mon.protobuf.CombatRound.FleetDamagedRec" +
-      "ord\032\\\n\014FleetSummary\022\022\n\nfleet_keys\030\001 \003(\t\022" +
-      "\022\n\nempire_key\030\002 \001(\t\022\021\n\tdesign_id\030\003 \001(\t\022\021" +
-      "\n\tnum_ships\030\004 \001(\002\032(\n\021FleetJoinedRecord\022\023" +
-      "\n\013fleet_index\030\001 \001(\005\032>\n\021FleetTargetRecord" +
-      "\022\023\n\013fleet_index\030\001 \001(\005\022\024\n\014target_index\030\002 " +
-      "\001(\005\032N\n\021FleetAttackRecord\022\023\n\013fleet_index\030" +
-      "\001 \001(\005\022\024\n\014target_index\030\002 \001(\005\022\016\n\006damage\030\003 " +
-      "\001(\002\0329\n\022FleetDamagedRecord\022\023\n\013fleet_index",
-      "\030\001 \001(\005\022\016\n\006damage\030\002 \001(\002\"\332\001\n\014CombatReport\022" +
-      "\013\n\003key\030\001 \001(\t\022\020\n\010star_key\030\002 \001(\t\022\022\n\nstart_" +
-      "time\030\003 \001(\003\022\020\n\010end_time\030\004 \001(\003\022\031\n\021start_em" +
-      "pire_keys\030\005 \003(\t\022\027\n\017end_empire_keys\030\006 \003(\t" +
-      "\022\025\n\rnum_destroyed\030\007 \001(\005\022:\n\006rounds\030\010 \003(\0132" +
-      "*.au.com.codeka.common.protobuf.CombatRo" +
-      "und\"M\n\rCombatReports\022<\n\007reports\030\001 \003(\0132+." +
-      "au.com.codeka.common.protobuf.CombatRepo" +
-      "rt\"\265\r\n\017SituationReport\022\013\n\003key\030\001 \001(\t\022\022\n\ne" +
-      "mpire_key\030\002 \001(\t\022\023\n\013report_time\030\003 \001(\003\022\020\n\010",
-      "star_key\030\004 \001(\t\022\024\n\014planet_index\030\005 \001(\005\022a\n\025" +
-      "build_complete_record\030\006 \001(\0132B.au.com.cod" +
-      "eka.common.protobuf.SituationReport.Buil" +
-      "dCompleteRecord\022_\n\024move_complete_record\030" +
-      "\007 \001(\0132A.au.com.codeka.common.protobuf.Si" +
-      "tuationReport.MoveCompleteRecord\022h\n\031flee" +
-      "t_under_attack_record\030\010 \001(\0132E.au.com.cod" +
-      "eka.common.protobuf.SituationReport.Flee" +
-      "tUnderAttackRecord\022c\n\026fleet_destroyed_re" +
-      "cord\030\t \001(\0132C.au.com.codeka.common.protob",
-      "uf.SituationReport.FleetDestroyedRecord\022" +
-      "e\n\027fleet_victorious_record\030\n \001(\0132D.au.co" +
-      "m.codeka.common.protobuf.SituationReport" +
-      ".FleetVictoriousRecord\022e\n\027colony_destroy" +
-      "ed_record\030\013 \001(\0132D.au.com.codeka.common.p" +
-      "rotobuf.SituationReport.ColonyDestroyedR" +
-      "ecord\022c\n\026colony_attacked_record\030\014 \001(\0132C." +
-      "au.com.codeka.common.protobuf.SituationR" +
-      "eport.ColonyAttackedRecord\022l\n\034star_ran_o" +
-      "ut_of_goods_record\030\r \001(\0132F.au.com.codeka",
-      ".common.protobuf.SituationReport.StarRun" +
-      "OutOfGoodsRecord\032\236\001\n\023BuildCompleteRecord" +
-      "\022J\n\nbuild_kind\030\001 \001(\01626.au.com.codeka.com" +
-      "mon.protobuf.BuildRequest.BUILD_KIND\022\021\n\t" +
-      "design_id\030\002 \001(\t\022\r\n\005count\030\003 \001(\005\022\031\n\021build_" +
-      "request_key\030\004 \001(\t\032m\n\022MoveCompleteRecord\022" +
-      "\021\n\tfleet_key\030\001 \001(\t\022\027\n\017fleet_design_id\030\003 " +
-      "\001(\t\022\021\n\tnum_ships\030\004 \001(\002\022\030\n\020scout_report_k" +
-      "ey\030\005 \001(\t\032r\n\026FleetUnderAttackRecord\022\021\n\tfl" +
-      "eet_key\030\001 \001(\t\022\027\n\017fleet_design_id\030\002 \001(\t\022\021",
-      "\n\tnum_ships\030\003 \001(\002\022\031\n\021combat_report_key\030\004" +
-      " \001(\t\032J\n\024FleetDestroyedRecord\022\027\n\017fleet_de" +
-      "sign_id\030\001 \001(\t\022\031\n\021combat_report_key\030\002 \001(\t" +
-      "\032q\n\025FleetVictoriousRecord\022\021\n\tfleet_key\030\001" +
-      " \001(\t\022\027\n\017fleet_design_id\030\002 \001(\t\022\021\n\tnum_shi" +
-      "ps\030\003 \001(\002\022\031\n\021combat_report_key\030\004 \001(\t\032E\n\025C" +
-      "olonyDestroyedRecord\022\022\n\ncolony_key\030\001 \001(\t" +
-      "\022\030\n\020enemy_empire_key\030\002 \001(\t\032W\n\024ColonyAtta" +
-      "ckedRecord\022\022\n\ncolony_key\030\001 \001(\t\022\030\n\020enemy_" +
-      "empire_key\030\002 \001(\t\022\021\n\tnum_ships\030\003 \001(\002\032-\n\027S",
-      "tarRunOutOfGoodsRecord\022\022\n\ncolony_key\030\001 \001" +
-      "(\t\"m\n\020SituationReports\022I\n\021situation_repo" +
-      "rts\030\001 \003(\0132..au.com.codeka.common.protobu" +
-      "f.SituationReport\022\016\n\006cursor\030\002 \001(\t\"\342\003\n\017Ca" +
-      "shAuditRecord\022\n\n\002id\030\001 \001(\005\022\021\n\tempire_id\030\002" +
-      " \001(\005\022E\n\006reason\030\003 \001(\01625.au.com.codeka.com" +
-      "mon.protobuf.CashAuditRecord.Reason\022\023\n\013b" +
-      "efore_cash\030\004 \001(\002\022\022\n\nafter_cash\030\005 \001(\002\022\014\n\004" +
-      "time\030\020 \001(\003\022\020\n\010fleet_id\030\006 \001(\005\022\027\n\017fleet_de" +
-      "sign_id\030\007 \001(\t\022\021\n\tnum_ships\030\010 \001(\002\022\017\n\007star",
-      "_id\030\t \001(\005\022\021\n\tstar_name\030\n \001(\t\022\025\n\rmove_dis" +
-      "tance\030\013 \001(\002\022\027\n\017build_design_id\030\014 \001(\t\022\023\n\013" +
-      "build_count\030\r \001(\005\022\031\n\021accelerate_amount\030\016" +
-      " \001(\002\022\025\n\ralliance_name\030\017 \001(\t\"Y\n\006Reason\022\r\n" +
-      "\tFleetMove\020\000\022\023\n\017BuildAccelerate\020\001\022\027\n\023Col" +
-      "lectFromColonies\020\002\022\022\n\016CreateAlliance\020\003\"S" +
-      "\n\020CashAuditRecords\022?\n\007records\030\001 \003(\0132..au" +
-      ".com.codeka.common.protobuf.CashAuditRec" +
-      "ord\"\254\001\n\010Alliance\022\013\n\003key\030\001 \001(\t\022\014\n\004name\030\002 " +
-      "\001(\t\022\024\n\014time_created\030\003 \001(\003\022\032\n\022creator_emp",
-      "ire_key\030\004 \001(\t\022\023\n\013num_members\030\005 \001(\005\022>\n\007me" +
-      "mbers\030\006 \003(\0132-.au.com.codeka.common.proto" +
-      "buf.AllianceMember\"G\n\tAlliances\022:\n\tallia" +
-      "nces\030\001 \003(\0132\'.au.com.codeka.common.protob" +
-      "uf.Alliance\"\\\n\016AllianceMember\022\013\n\003key\030\001 \001" +
-      "(\t\022\022\n\nempire_key\030\002 \001(\t\022\024\n\014alliance_key\030\003" +
-      " \001(\t\022\023\n\013time_joined\030\004 \001(\003\"\376\001\n\023AllianceJo" +
-      "inRequest\022\013\n\003key\030\001 \001(\t\022\024\n\014alliance_key\030\002" +
-      " \001(\t\022\022\n\nempire_key\030\003 \001(\t\022\017\n\007message\030\004 \001(" +
-      "\t\022\026\n\016time_requested\030\005 \001(\003\022N\n\005state\030\006 \001(\016",
-      "2?.au.com.codeka.common.protobuf.Allianc" +
-      "eJoinRequest.RequestState\"7\n\014RequestStat" +
-      "e\022\013\n\007PENDING\020\000\022\014\n\010ACCEPTED\020\001\022\014\n\010REJECTED" +
-      "\020\002\"a\n\024AllianceJoinRequests\022I\n\rjoin_reque" +
-      "sts\030\001 \003(\01322.au.com.codeka.common.protobu" +
-      "f.AllianceJoinRequest\"@\n\024AllianceLeaveRe" +
-      "quest\022\024\n\014alliance_key\030\001 \001(\t\022\022\n\nempire_ke" +
-      "y\030\002 \001(\t"
+      "ildings\030\007 \001(\005\022\030\n\020total_population\030\010 \001(\005\"" +
+      "U\n\013EmpireRanks\0228\n\005ranks\030\001 \003(\0132).au.com.c" +
+      "odeka.common.protobuf.EmpireRank\022\014\n\004date" +
+      "\030\002 \001(\003\"\344\004\n\006Empire\022\013\n\003key\030\001 \001(\t\022\024\n\014displa" +
+      "y_name\030\002 \002(\t\022\014\n\004user\030\003 \001(\t\022\r\n\005email\030\004 \001(" +
+      "\t\022@\n\005state\030\005 \002(\01621.au.com.codeka.common." +
+      "protobuf.Empire.EmpireState\0224\n\006fleets\030\006 " +
+      "\003(\0132$.au.com.codeka.common.protobuf.Flee",
+      "t\0227\n\010colonies\030\007 \003(\0132%.au.com.codeka.comm" +
+      "on.protobuf.Colony\022C\n\016build_requests\030\n \003" +
+      "(\0132+.au.com.codeka.common.protobuf.Build" +
+      "Request\0222\n\005stars\030\010 \003(\0132#.au.com.codeka.c" +
+      "ommon.protobuf.Star\022\014\n\004cash\030\t \001(\002\0227\n\004ran" +
+      "k\030\013 \001(\0132).au.com.codeka.common.protobuf." +
+      "EmpireRank\0226\n\thome_star\030\014 \001(\0132#.au.com.c" +
+      "odeka.common.protobuf.Star\0229\n\010alliance\030\r" +
+      " \001(\0132\'.au.com.codeka.common.protobuf.All" +
+      "iance\"6\n\013EmpireState\022\013\n\007INITIAL\020\001\022\016\n\nREG",
+      "ISTERED\020\002\022\n\n\006BANNED\020\003\"A\n\007Empires\0226\n\007empi" +
+      "res\030\001 \003(\0132%.au.com.codeka.common.protobu" +
+      "f.Empire\"\215\001\n\024EmpireCashAuditEntry\022\013\n\003key" +
+      "\030\001 \001(\t\022\022\n\nempire_key\030\002 \001(\t\022\022\n\ndifference" +
+      "\030\003 \001(\002\022\020\n\010old_cash\030\004 \001(\002\022\020\n\010new_cash\030\005 \001" +
+      "(\002\022\016\n\006reason\030\006 \001(\t\022\014\n\004time\030\007 \001(\003\"W\n\017Empi" +
+      "reCashAudit\022D\n\007entries\030\001 \003(\01323.au.com.co" +
+      "deka.common.protobuf.EmpireCashAuditEntr" +
+      "y\"\250\001\n\030EmpireBuildingStatistics\022S\n\006counts" +
+      "\030\001 \003(\0132C.au.com.codeka.common.protobuf.E",
+      "mpireBuildingStatistics.DesignCount\0327\n\013D" +
+      "esignCount\022\021\n\tdesign_id\030\001 \002(\t\022\025\n\rnum_bui" +
+      "ldings\030\002 \002(\005\"\205\001\n\014HelloRequest\022\024\n\014device_" +
+      "model\030\001 \001(\t\022\033\n\023device_manufacturer\030\002 \001(\t" +
+      "\022\024\n\014device_build\030\003 \001(\t\022\026\n\016device_version" +
+      "\030\004 \001(\t\022\024\n\014memory_class\030\005 \001(\005\"\255\003\n\rHelloRe" +
+      "sponse\022<\n\004motd\030\001 \002(\0132..au.com.codeka.com" +
+      "mon.protobuf.MessageOfTheDay\0225\n\006empire\030\002" +
+      " \001(\0132%.au.com.codeka.common.protobuf.Emp" +
+      "ire\0227\n\010colonies\030\003 \003(\0132%.au.com.codeka.co",
+      "mmon.protobuf.Colony\022\034\n\024require_gcm_regi" +
+      "ster\030\006 \001(\010\022\030\n\020was_empire_reset\030\007 \001(\010\022\033\n\023" +
+      "empire_reset_reason\030\n \001(\t\022T\n\023building_st" +
+      "atistics\030\010 \001(\01327.au.com.codeka.common.pr" +
+      "otobuf.EmpireBuildingStatistics\022C\n\016build" +
+      "_requests\030\t \003(\0132+.au.com.codeka.common.p" +
+      "rotobuf.BuildRequest\"\300\001\n\022DeviceRegistrat" +
+      "ion\022\013\n\003key\030\001 \001(\t\022\021\n\tdevice_id\030\002 \001(\t\022\033\n\023g" +
+      "cm_registration_id\030\003 \001(\t\022\024\n\014device_model" +
+      "\030\004 \001(\t\022\033\n\023device_manufacturer\030\005 \001(\t\022\024\n\014d",
+      "evice_build\030\006 \001(\t\022\026\n\016device_version\030\007 \001(" +
+      "\t\022\014\n\004user\030\010 \001(\t\"_\n\023DeviceRegistrations\022H" +
+      "\n\rregistrations\030\001 \003(\01321.au.com.codeka.co" +
+      "mmon.protobuf.DeviceRegistration\"\'\n\022Devi" +
+      "ceOnlineStatus\022\021\n\tis_online\030\001 \001(\010\" \n\rDev" +
+      "iceMessage\022\017\n\007message\030\001 \002(\t\"q\n\013ChatMessa" +
+      "ge\022\017\n\007message\030\001 \002(\t\022\022\n\nempire_key\030\002 \001(\t\022" +
+      "\023\n\013date_posted\030\003 \001(\003\022\024\n\014alliance_key\030\004 \001" +
+      "(\t\022\022\n\nmessage_en\030\005 \001(\t\"L\n\014ChatMessages\022<" +
+      "\n\010messages\030\001 \003(\0132*.au.com.codeka.common.",
+      "protobuf.ChatMessage\"\327\001\n\006Sector\022\t\n\001x\030\001 \002" +
+      "(\003\022\t\n\001y\030\002 \002(\003\022\024\n\014num_colonies\030\005 \001(\005\0222\n\005s" +
+      "tars\030\003 \003(\0132#.au.com.codeka.common.protob" +
+      "uf.Star\0227\n\010colonies\030\004 \003(\0132%.au.com.codek" +
+      "a.common.protobuf.Colony\0224\n\006fleets\030\006 \003(\013" +
+      "2$.au.com.codeka.common.protobuf.Fleet\"\212" +
+      "\006\n\004Star\022\013\n\003key\030\001 \001(\t\022\020\n\010sector_x\030\013 \001(\003\022\020" +
+      "\n\010sector_y\030\014 \001(\003\022\014\n\004name\030\002 \001(\t\022J\n\016classi" +
+      "fication\030\003 \001(\01622.au.com.codeka.common.pr" +
+      "otobuf.Star.CLASSIFICATION\022\014\n\004size\030\005 \001(\005",
+      "\022\020\n\010offset_x\030\006 \001(\005\022\020\n\010offset_y\030\007 \001(\005\0226\n\007" +
+      "planets\030\t \003(\0132%.au.com.codeka.common.pro" +
+      "tobuf.Planet\0227\n\010colonies\030\n \003(\0132%.au.com." +
+      "codeka.common.protobuf.Colony\022:\n\tbuildin" +
+      "gs\030\r \003(\0132\'.au.com.codeka.common.protobuf" +
+      ".Building\022>\n\007empires\030\016 \003(\0132-.au.com.code" +
+      "ka.common.protobuf.EmpirePresence\022C\n\016bui" +
+      "ld_requests\030\017 \003(\0132+.au.com.codeka.common" +
+      ".protobuf.BuildRequest\0224\n\006fleets\030\020 \003(\0132$" +
+      ".au.com.codeka.common.protobuf.Fleet\022\024\n\014",
+      "time_emptied\030\021 \001(\003\022\027\n\017last_simulation\030\022 " +
+      "\001(\003\022J\n\025current_combat_report\030\023 \001(\0132+.au." +
+      "com.codeka.common.protobuf.CombatReport\"" +
+      "b\n\016CLASSIFICATION\022\010\n\004BLUE\020\000\022\t\n\005WHITE\020\001\022\n" +
+      "\n\006YELLOW\020\002\022\n\n\006ORANGE\020\003\022\007\n\003RED\020\004\022\013\n\007NEUTR" +
+      "ON\020\005\022\r\n\tBLACKHOLE\020\006\";\n\005Stars\0222\n\005stars\030\001 " +
+      "\003(\0132#.au.com.codeka.common.protobuf.Star" +
+      "\"\267\001\n\021StarRenameRequest\022\020\n\010star_key\030\001 \002(\t" +
+      "\022\020\n\010old_name\030\002 \002(\t\022\020\n\010new_name\030\003 \002(\t\022\031\n\021" +
+      "purchase_order_id\030\004 \001(\t\022\025\n\rpurchase_time",
+      "\030\005 \001(\003\022\"\n\032purchase_developer_payload\030\006 \001" +
+      "(\t\022\026\n\016purchase_price\030\007 \001(\t\"\311\002\n\006Planet\022\r\n" +
+      "\005index\030\002 \002(\005\022F\n\013planet_type\030\003 \002(\01621.au.c" +
+      "om.codeka.common.protobuf.Planet.PLANET_" +
+      "TYPE\022\014\n\004size\030\004 \001(\005\022\037\n\027population_congeni" +
+      "ality\030\005 \001(\005\022\034\n\024farming_congeniality\030\006 \001(" +
+      "\005\022\033\n\023mining_congeniality\030\007 \001(\005\"~\n\013PLANET" +
+      "_TYPE\022\014\n\010GASGIANT\020\001\022\014\n\010RADIATED\020\002\022\013\n\007INF" +
+      "ERNO\020\003\022\r\n\tASTEROIDS\020\004\022\t\n\005WATER\020\005\022\t\n\005TOXI" +
+      "C\020\006\022\n\n\006DESERT\020\007\022\t\n\005SWAMP\020\010\022\n\n\006TERRAN\020\t\"A",
+      "\n\007Planets\0226\n\007planets\030\001 \003(\0132%.au.com.code" +
+      "ka.common.protobuf.Planet\"A\n\007Sectors\0226\n\007" +
+      "sectors\030\001 \003(\0132%.au.com.codeka.common.pro" +
+      "tobuf.Sector\"\361\001\n\016EmpirePresence\022\013\n\003key\030\001" +
+      " \002(\t\022\022\n\nempire_key\030\002 \001(\t\022\020\n\010star_key\030\003 \001" +
+      "(\t\022\023\n\013total_goods\030\004 \001(\002\022\026\n\016total_mineral" +
+      "s\030\005 \001(\002\022\034\n\024goods_delta_per_hour\030\006 \001(\002\022\037\n" +
+      "\027minerals_delta_per_hour\030\007 \001(\002\022\021\n\tmax_go" +
+      "ods\030\010 \001(\002\022\024\n\014max_minerals\030\t \001(\002\022\027\n\017goods" +
+      "_zero_time\030\n \001(\003\"\'\n\017ColonizeRequest\022\024\n\014p",
+      "lanet_index\030\001 \002(\005\"\230\003\n\006Colony\022\013\n\003key\030\001 \001(" +
+      "\t\022\022\n\nempire_key\030\002 \001(\t\022\020\n\010star_key\030\004 \001(\t\022" +
+      "\024\n\014planet_index\030\016 \001(\005\022\022\n\npopulation\030\005 \001(" +
+      "\002\022\"\n\032DEPRECATED_last_simulation\030\006 \001(\003\022\030\n" +
+      "\020focus_population\030\007 \001(\002\022\025\n\rfocus_farming" +
+      "\030\010 \001(\002\022\024\n\014focus_mining\030\t \001(\002\022\032\n\022focus_co" +
+      "nstruction\030\n \001(\002\022\030\n\020delta_population\030\013 \001" +
+      "(\002\022\023\n\013delta_goods\030\014 \001(\002\022\026\n\016delta_mineral" +
+      "s\030\r \001(\002\022\031\n\021uncollected_taxes\030\017 \001(\002\022\025\n\rde" +
+      "fence_bonus\030\020 \001(\002\022\026\n\016max_population\030\021 \001(",
+      "\002\022\031\n\021cooldown_end_time\030\022 \001(\003\"C\n\010Colonies" +
+      "\0227\n\010colonies\030\001 \003(\0132%.au.com.codeka.commo" +
+      "n.protobuf.Colony\"\371\002\n\014BuildRequest\022\013\n\003ke" +
+      "y\030\001 \001(\t\022\022\n\ncolony_key\030\002 \002(\t\022\022\n\nempire_ke" +
+      "y\030\003 \002(\t\022\020\n\010star_key\030\013 \001(\t\022\024\n\014planet_inde" +
+      "x\030\014 \001(\005\022J\n\nbuild_kind\030\004 \002(\01626.au.com.cod" +
+      "eka.common.protobuf.BuildRequest.BUILD_K" +
+      "IND\022\023\n\013design_name\030\005 \002(\t\022\r\n\005count\030\t \001(\005\022" +
+      "\022\n\nstart_time\030\006 \001(\003\022\020\n\010end_time\030\007 \001(\003\022\020\n" +
+      "\010progress\030\010 \001(\002\022\035\n\025existing_building_key",
+      "\030\n \001(\t\022\037\n\027existing_building_level\030\r \001(\005\"" +
+      "$\n\nBUILD_KIND\022\014\n\010BUILDING\020\001\022\010\n\004SHIP\020\002\"K\n" +
+      "\nBuildQueue\022=\n\010requests\030\001 \003(\0132+.au.com.c" +
+      "odeka.common.protobuf.BuildRequest\"O\n\010Bu" +
+      "ilding\022\013\n\003key\030\001 \002(\t\022\022\n\ncolony_key\030\002 \002(\t\022" +
+      "\023\n\013design_name\030\003 \002(\t\022\r\n\005level\030\004 \001(\005\"\243\004\n\005" +
+      "Fleet\022\013\n\003key\030\001 \002(\t\022\022\n\nempire_key\030\002 \001(\t\022\023" +
+      "\n\013design_name\030\003 \001(\t\022\021\n\tnum_ships\030\004 \001(\002\022?" +
+      "\n\005state\030\005 \001(\01620.au.com.codeka.common.pro" +
+      "tobuf.Fleet.FLEET_STATE\022\030\n\020state_start_t",
+      "ime\030\006 \001(\003\022\020\n\010star_key\030\007 \001(\t\022\034\n\024destinati" +
+      "on_star_key\030\010 \001(\t\022\030\n\020target_fleet_key\030\t " +
+      "\001(\t\022\031\n\021target_colony_key\030\n \001(\t\022A\n\006stance" +
+      "\030\013 \001(\01621.au.com.codeka.common.protobuf.F" +
+      "leet.FLEET_STANCE\022\026\n\016time_destroyed\030\014 \001(" +
+      "\003\022%\n\035block_notification_on_destroy\030\016 \001(\010" +
+      "\022\024\n\014last_victory\030\r \001(\003\022\013\n\003eta\030\017 \001(\003\"2\n\013F" +
+      "LEET_STATE\022\010\n\004IDLE\020\001\022\n\n\006MOVING\020\002\022\r\n\tATTA" +
+      "CKING\020\003\"8\n\014FLEET_STANCE\022\013\n\007PASSIVE\020\001\022\013\n\007" +
+      "NEUTRAL\020\002\022\016\n\nAGGRESSIVE\020\003\">\n\006Fleets\0224\n\006f",
+      "leets\030\001 \003(\0132$.au.com.codeka.common.proto" +
+      "buf.Fleet\"\250\002\n\nFleetOrder\022D\n\005order\030\001 \002(\0162" +
+      "5.au.com.codeka.common.protobuf.FleetOrd" +
+      "er.FLEET_ORDER\022\022\n\nsplit_left\030\002 \001(\005\022\023\n\013sp" +
+      "lit_right\030\003 \001(\005\022\020\n\010star_key\030\004 \001(\t\022A\n\006sta" +
+      "nce\030\005 \001(\01621.au.com.codeka.common.protobu" +
+      "f.Fleet.FLEET_STANCE\022\027\n\017merge_fleet_key\030" +
+      "\006 \001(\t\"=\n\013FLEET_ORDER\022\t\n\005SPLIT\020\001\022\t\n\005MERGE" +
+      "\020\002\022\010\n\004MOVE\020\003\022\016\n\nSET_STANCE\020\005\"_\n\013ScoutRep" +
+      "ort\022\013\n\003key\030\001 \001(\t\022\022\n\nempire_key\030\002 \001(\t\022\020\n\010",
+      "star_key\030\003 \001(\t\022\014\n\004date\030\005 \001(\003\022\017\n\007star_pb\030" +
+      "\004 \001(\014\"K\n\014ScoutReports\022;\n\007reports\030\001 \003(\0132*" +
+      ".au.com.codeka.common.protobuf.ScoutRepo" +
+      "rt\"\252\006\n\013CombatRound\022\020\n\010star_key\030\001 \001(\t\022\022\n\n" +
+      "round_time\030\002 \001(\003\022G\n\006fleets\030\003 \003(\01327.au.co" +
+      "m.codeka.common.protobuf.CombatRound.Fle" +
+      "etSummary\022S\n\rfleets_joined\030\004 \003(\0132<.au.co" +
+      "m.codeka.common.protobuf.CombatRound.Fle" +
+      "etJoinedRecord\022V\n\020fleets_targetted\030\005 \003(\013" +
+      "2<.au.com.codeka.common.protobuf.CombatR",
+      "ound.FleetTargetRecord\022U\n\017fleets_attacke" +
+      "d\030\006 \003(\0132<.au.com.codeka.common.protobuf." +
+      "CombatRound.FleetAttackRecord\022U\n\016fleets_" +
+      "damaged\030\007 \003(\0132=.au.com.codeka.common.pro" +
+      "tobuf.CombatRound.FleetDamagedRecord\032\\\n\014" +
+      "FleetSummary\022\022\n\nfleet_keys\030\001 \003(\t\022\022\n\nempi" +
+      "re_key\030\002 \001(\t\022\021\n\tdesign_id\030\003 \001(\t\022\021\n\tnum_s" +
+      "hips\030\004 \001(\002\032(\n\021FleetJoinedRecord\022\023\n\013fleet" +
+      "_index\030\001 \001(\005\032>\n\021FleetTargetRecord\022\023\n\013fle" +
+      "et_index\030\001 \001(\005\022\024\n\014target_index\030\002 \001(\005\032N\n\021",
+      "FleetAttackRecord\022\023\n\013fleet_index\030\001 \001(\005\022\024" +
+      "\n\014target_index\030\002 \001(\005\022\016\n\006damage\030\003 \001(\002\0329\n\022" +
+      "FleetDamagedRecord\022\023\n\013fleet_index\030\001 \001(\005\022" +
+      "\016\n\006damage\030\002 \001(\002\"\332\001\n\014CombatReport\022\013\n\003key\030" +
+      "\001 \001(\t\022\020\n\010star_key\030\002 \001(\t\022\022\n\nstart_time\030\003 " +
+      "\001(\003\022\020\n\010end_time\030\004 \001(\003\022\031\n\021start_empire_ke" +
+      "ys\030\005 \003(\t\022\027\n\017end_empire_keys\030\006 \003(\t\022\025\n\rnum" +
+      "_destroyed\030\007 \001(\005\022:\n\006rounds\030\010 \003(\0132*.au.co" +
+      "m.codeka.common.protobuf.CombatRound\"M\n\r" +
+      "CombatReports\022<\n\007reports\030\001 \003(\0132+.au.com.",
+      "codeka.common.protobuf.CombatReport\"\265\r\n\017" +
+      "SituationReport\022\013\n\003key\030\001 \001(\t\022\022\n\nempire_k" +
+      "ey\030\002 \001(\t\022\023\n\013report_time\030\003 \001(\003\022\020\n\010star_ke" +
+      "y\030\004 \001(\t\022\024\n\014planet_index\030\005 \001(\005\022a\n\025build_c" +
+      "omplete_record\030\006 \001(\0132B.au.com.codeka.com" +
+      "mon.protobuf.SituationReport.BuildComple" +
+      "teRecord\022_\n\024move_complete_record\030\007 \001(\0132A" +
+      ".au.com.codeka.common.protobuf.Situation" +
+      "Report.MoveCompleteRecord\022h\n\031fleet_under" +
+      "_attack_record\030\010 \001(\0132E.au.com.codeka.com",
+      "mon.protobuf.SituationReport.FleetUnderA" +
+      "ttackRecord\022c\n\026fleet_destroyed_record\030\t " +
+      "\001(\0132C.au.com.codeka.common.protobuf.Situ" +
+      "ationReport.FleetDestroyedRecord\022e\n\027flee" +
+      "t_victorious_record\030\n \001(\0132D.au.com.codek" +
+      "a.common.protobuf.SituationReport.FleetV" +
+      "ictoriousRecord\022e\n\027colony_destroyed_reco" +
+      "rd\030\013 \001(\0132D.au.com.codeka.common.protobuf" +
+      ".SituationReport.ColonyDestroyedRecord\022c" +
+      "\n\026colony_attacked_record\030\014 \001(\0132C.au.com.",
+      "codeka.common.protobuf.SituationReport.C" +
+      "olonyAttackedRecord\022l\n\034star_ran_out_of_g" +
+      "oods_record\030\r \001(\0132F.au.com.codeka.common" +
+      ".protobuf.SituationReport.StarRunOutOfGo" +
+      "odsRecord\032\236\001\n\023BuildCompleteRecord\022J\n\nbui" +
+      "ld_kind\030\001 \001(\01626.au.com.codeka.common.pro" +
+      "tobuf.BuildRequest.BUILD_KIND\022\021\n\tdesign_" +
+      "id\030\002 \001(\t\022\r\n\005count\030\003 \001(\005\022\031\n\021build_request" +
+      "_key\030\004 \001(\t\032m\n\022MoveCompleteRecord\022\021\n\tflee" +
+      "t_key\030\001 \001(\t\022\027\n\017fleet_design_id\030\003 \001(\t\022\021\n\t",
+      "num_ships\030\004 \001(\002\022\030\n\020scout_report_key\030\005 \001(" +
+      "\t\032r\n\026FleetUnderAttackRecord\022\021\n\tfleet_key" +
+      "\030\001 \001(\t\022\027\n\017fleet_design_id\030\002 \001(\t\022\021\n\tnum_s" +
+      "hips\030\003 \001(\002\022\031\n\021combat_report_key\030\004 \001(\t\032J\n" +
+      "\024FleetDestroyedRecord\022\027\n\017fleet_design_id" +
+      "\030\001 \001(\t\022\031\n\021combat_report_key\030\002 \001(\t\032q\n\025Fle" +
+      "etVictoriousRecord\022\021\n\tfleet_key\030\001 \001(\t\022\027\n" +
+      "\017fleet_design_id\030\002 \001(\t\022\021\n\tnum_ships\030\003 \001(" +
+      "\002\022\031\n\021combat_report_key\030\004 \001(\t\032E\n\025ColonyDe" +
+      "stroyedRecord\022\022\n\ncolony_key\030\001 \001(\t\022\030\n\020ene",
+      "my_empire_key\030\002 \001(\t\032W\n\024ColonyAttackedRec" +
+      "ord\022\022\n\ncolony_key\030\001 \001(\t\022\030\n\020enemy_empire_" +
+      "key\030\002 \001(\t\022\021\n\tnum_ships\030\003 \001(\002\032-\n\027StarRunO" +
+      "utOfGoodsRecord\022\022\n\ncolony_key\030\001 \001(\t\"m\n\020S" +
+      "ituationReports\022I\n\021situation_reports\030\001 \003" +
+      "(\0132..au.com.codeka.common.protobuf.Situa" +
+      "tionReport\022\016\n\006cursor\030\002 \001(\t\"\342\003\n\017CashAudit" +
+      "Record\022\n\n\002id\030\001 \001(\005\022\021\n\tempire_id\030\002 \001(\005\022E\n" +
+      "\006reason\030\003 \001(\01625.au.com.codeka.common.pro" +
+      "tobuf.CashAuditRecord.Reason\022\023\n\013before_c",
+      "ash\030\004 \001(\002\022\022\n\nafter_cash\030\005 \001(\002\022\014\n\004time\030\020 " +
+      "\001(\003\022\020\n\010fleet_id\030\006 \001(\005\022\027\n\017fleet_design_id" +
+      "\030\007 \001(\t\022\021\n\tnum_ships\030\010 \001(\002\022\017\n\007star_id\030\t \001" +
+      "(\005\022\021\n\tstar_name\030\n \001(\t\022\025\n\rmove_distance\030\013" +
+      " \001(\002\022\027\n\017build_design_id\030\014 \001(\t\022\023\n\013build_c" +
+      "ount\030\r \001(\005\022\031\n\021accelerate_amount\030\016 \001(\002\022\025\n" +
+      "\ralliance_name\030\017 \001(\t\"Y\n\006Reason\022\r\n\tFleetM" +
+      "ove\020\000\022\023\n\017BuildAccelerate\020\001\022\027\n\023CollectFro" +
+      "mColonies\020\002\022\022\n\016CreateAlliance\020\003\"S\n\020CashA" +
+      "uditRecords\022?\n\007records\030\001 \003(\0132..au.com.co",
+      "deka.common.protobuf.CashAuditRecord\"\254\001\n" +
+      "\010Alliance\022\013\n\003key\030\001 \001(\t\022\014\n\004name\030\002 \001(\t\022\024\n\014" +
+      "time_created\030\003 \001(\003\022\032\n\022creator_empire_key" +
+      "\030\004 \001(\t\022\023\n\013num_members\030\005 \001(\005\022>\n\007members\030\006" +
+      " \003(\0132-.au.com.codeka.common.protobuf.All" +
+      "ianceMember\"G\n\tAlliances\022:\n\talliances\030\001 " +
+      "\003(\0132\'.au.com.codeka.common.protobuf.Alli" +
+      "ance\"\\\n\016AllianceMember\022\013\n\003key\030\001 \001(\t\022\022\n\ne" +
+      "mpire_key\030\002 \001(\t\022\024\n\014alliance_key\030\003 \001(\t\022\023\n" +
+      "\013time_joined\030\004 \001(\003\"\376\001\n\023AllianceJoinReque",
+      "st\022\013\n\003key\030\001 \001(\t\022\024\n\014alliance_key\030\002 \001(\t\022\022\n" +
+      "\nempire_key\030\003 \001(\t\022\017\n\007message\030\004 \001(\t\022\026\n\016ti" +
+      "me_requested\030\005 \001(\003\022N\n\005state\030\006 \001(\0162?.au.c" +
+      "om.codeka.common.protobuf.AllianceJoinRe" +
+      "quest.RequestState\"7\n\014RequestState\022\013\n\007PE" +
+      "NDING\020\000\022\014\n\010ACCEPTED\020\001\022\014\n\010REJECTED\020\002\"a\n\024A" +
+      "llianceJoinRequests\022I\n\rjoin_requests\030\001 \003" +
+      "(\01322.au.com.codeka.common.protobuf.Allia" +
+      "nceJoinRequest\"@\n\024AllianceLeaveRequest\022\024" +
+      "\n\014alliance_key\030\001 \001(\t\022\022\n\nempire_key\030\002 \001(\t"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
       new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
@@ -73054,33 +73900,39 @@ public final class Messages {
           internal_static_au_com_codeka_common_protobuf_EmpireRank_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_au_com_codeka_common_protobuf_EmpireRank_descriptor,
-              new java.lang.String[] { "EmpireKey", "Rank", "LastRank", "TotalStars", "TotalColonies", "TotalShips", "TotalBuildings", });
-          internal_static_au_com_codeka_common_protobuf_Empire_descriptor =
+              new java.lang.String[] { "EmpireKey", "Rank", "LastRank", "TotalStars", "TotalColonies", "TotalShips", "TotalBuildings", "TotalPopulation", });
+          internal_static_au_com_codeka_common_protobuf_EmpireRanks_descriptor =
             getDescriptor().getMessageTypes().get(3);
+          internal_static_au_com_codeka_common_protobuf_EmpireRanks_fieldAccessorTable = new
+            com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+              internal_static_au_com_codeka_common_protobuf_EmpireRanks_descriptor,
+              new java.lang.String[] { "Ranks", "Date", });
+          internal_static_au_com_codeka_common_protobuf_Empire_descriptor =
+            getDescriptor().getMessageTypes().get(4);
           internal_static_au_com_codeka_common_protobuf_Empire_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_au_com_codeka_common_protobuf_Empire_descriptor,
               new java.lang.String[] { "Key", "DisplayName", "User", "Email", "State", "Fleets", "Colonies", "BuildRequests", "Stars", "Cash", "Rank", "HomeStar", "Alliance", });
           internal_static_au_com_codeka_common_protobuf_Empires_descriptor =
-            getDescriptor().getMessageTypes().get(4);
+            getDescriptor().getMessageTypes().get(5);
           internal_static_au_com_codeka_common_protobuf_Empires_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_au_com_codeka_common_protobuf_Empires_descriptor,
               new java.lang.String[] { "Empires", });
           internal_static_au_com_codeka_common_protobuf_EmpireCashAuditEntry_descriptor =
-            getDescriptor().getMessageTypes().get(5);
+            getDescriptor().getMessageTypes().get(6);
           internal_static_au_com_codeka_common_protobuf_EmpireCashAuditEntry_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_au_com_codeka_common_protobuf_EmpireCashAuditEntry_descriptor,
               new java.lang.String[] { "Key", "EmpireKey", "Difference", "OldCash", "NewCash", "Reason", "Time", });
           internal_static_au_com_codeka_common_protobuf_EmpireCashAudit_descriptor =
-            getDescriptor().getMessageTypes().get(6);
+            getDescriptor().getMessageTypes().get(7);
           internal_static_au_com_codeka_common_protobuf_EmpireCashAudit_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_au_com_codeka_common_protobuf_EmpireCashAudit_descriptor,
               new java.lang.String[] { "Entries", });
           internal_static_au_com_codeka_common_protobuf_EmpireBuildingStatistics_descriptor =
-            getDescriptor().getMessageTypes().get(7);
+            getDescriptor().getMessageTypes().get(8);
           internal_static_au_com_codeka_common_protobuf_EmpireBuildingStatistics_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_au_com_codeka_common_protobuf_EmpireBuildingStatistics_descriptor,
@@ -73092,169 +73944,169 @@ public final class Messages {
               internal_static_au_com_codeka_common_protobuf_EmpireBuildingStatistics_DesignCount_descriptor,
               new java.lang.String[] { "DesignId", "NumBuildings", });
           internal_static_au_com_codeka_common_protobuf_HelloRequest_descriptor =
-            getDescriptor().getMessageTypes().get(8);
+            getDescriptor().getMessageTypes().get(9);
           internal_static_au_com_codeka_common_protobuf_HelloRequest_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_au_com_codeka_common_protobuf_HelloRequest_descriptor,
               new java.lang.String[] { "DeviceModel", "DeviceManufacturer", "DeviceBuild", "DeviceVersion", "MemoryClass", });
           internal_static_au_com_codeka_common_protobuf_HelloResponse_descriptor =
-            getDescriptor().getMessageTypes().get(9);
+            getDescriptor().getMessageTypes().get(10);
           internal_static_au_com_codeka_common_protobuf_HelloResponse_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_au_com_codeka_common_protobuf_HelloResponse_descriptor,
               new java.lang.String[] { "Motd", "Empire", "Colonies", "RequireGcmRegister", "WasEmpireReset", "EmpireResetReason", "BuildingStatistics", "BuildRequests", });
           internal_static_au_com_codeka_common_protobuf_DeviceRegistration_descriptor =
-            getDescriptor().getMessageTypes().get(10);
+            getDescriptor().getMessageTypes().get(11);
           internal_static_au_com_codeka_common_protobuf_DeviceRegistration_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_au_com_codeka_common_protobuf_DeviceRegistration_descriptor,
               new java.lang.String[] { "Key", "DeviceId", "GcmRegistrationId", "DeviceModel", "DeviceManufacturer", "DeviceBuild", "DeviceVersion", "User", });
           internal_static_au_com_codeka_common_protobuf_DeviceRegistrations_descriptor =
-            getDescriptor().getMessageTypes().get(11);
+            getDescriptor().getMessageTypes().get(12);
           internal_static_au_com_codeka_common_protobuf_DeviceRegistrations_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_au_com_codeka_common_protobuf_DeviceRegistrations_descriptor,
               new java.lang.String[] { "Registrations", });
           internal_static_au_com_codeka_common_protobuf_DeviceOnlineStatus_descriptor =
-            getDescriptor().getMessageTypes().get(12);
+            getDescriptor().getMessageTypes().get(13);
           internal_static_au_com_codeka_common_protobuf_DeviceOnlineStatus_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_au_com_codeka_common_protobuf_DeviceOnlineStatus_descriptor,
               new java.lang.String[] { "IsOnline", });
           internal_static_au_com_codeka_common_protobuf_DeviceMessage_descriptor =
-            getDescriptor().getMessageTypes().get(13);
+            getDescriptor().getMessageTypes().get(14);
           internal_static_au_com_codeka_common_protobuf_DeviceMessage_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_au_com_codeka_common_protobuf_DeviceMessage_descriptor,
               new java.lang.String[] { "Message", });
           internal_static_au_com_codeka_common_protobuf_ChatMessage_descriptor =
-            getDescriptor().getMessageTypes().get(14);
+            getDescriptor().getMessageTypes().get(15);
           internal_static_au_com_codeka_common_protobuf_ChatMessage_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_au_com_codeka_common_protobuf_ChatMessage_descriptor,
               new java.lang.String[] { "Message", "EmpireKey", "DatePosted", "AllianceKey", "MessageEn", });
           internal_static_au_com_codeka_common_protobuf_ChatMessages_descriptor =
-            getDescriptor().getMessageTypes().get(15);
+            getDescriptor().getMessageTypes().get(16);
           internal_static_au_com_codeka_common_protobuf_ChatMessages_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_au_com_codeka_common_protobuf_ChatMessages_descriptor,
               new java.lang.String[] { "Messages", });
           internal_static_au_com_codeka_common_protobuf_Sector_descriptor =
-            getDescriptor().getMessageTypes().get(16);
+            getDescriptor().getMessageTypes().get(17);
           internal_static_au_com_codeka_common_protobuf_Sector_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_au_com_codeka_common_protobuf_Sector_descriptor,
               new java.lang.String[] { "X", "Y", "NumColonies", "Stars", "Colonies", "Fleets", });
           internal_static_au_com_codeka_common_protobuf_Star_descriptor =
-            getDescriptor().getMessageTypes().get(17);
+            getDescriptor().getMessageTypes().get(18);
           internal_static_au_com_codeka_common_protobuf_Star_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_au_com_codeka_common_protobuf_Star_descriptor,
               new java.lang.String[] { "Key", "SectorX", "SectorY", "Name", "Classification", "Size", "OffsetX", "OffsetY", "Planets", "Colonies", "Buildings", "Empires", "BuildRequests", "Fleets", "TimeEmptied", "LastSimulation", "CurrentCombatReport", });
           internal_static_au_com_codeka_common_protobuf_Stars_descriptor =
-            getDescriptor().getMessageTypes().get(18);
+            getDescriptor().getMessageTypes().get(19);
           internal_static_au_com_codeka_common_protobuf_Stars_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_au_com_codeka_common_protobuf_Stars_descriptor,
               new java.lang.String[] { "Stars", });
           internal_static_au_com_codeka_common_protobuf_StarRenameRequest_descriptor =
-            getDescriptor().getMessageTypes().get(19);
+            getDescriptor().getMessageTypes().get(20);
           internal_static_au_com_codeka_common_protobuf_StarRenameRequest_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_au_com_codeka_common_protobuf_StarRenameRequest_descriptor,
               new java.lang.String[] { "StarKey", "OldName", "NewName", "PurchaseOrderId", "PurchaseTime", "PurchaseDeveloperPayload", "PurchasePrice", });
           internal_static_au_com_codeka_common_protobuf_Planet_descriptor =
-            getDescriptor().getMessageTypes().get(20);
+            getDescriptor().getMessageTypes().get(21);
           internal_static_au_com_codeka_common_protobuf_Planet_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_au_com_codeka_common_protobuf_Planet_descriptor,
               new java.lang.String[] { "Index", "PlanetType", "Size", "PopulationCongeniality", "FarmingCongeniality", "MiningCongeniality", });
           internal_static_au_com_codeka_common_protobuf_Planets_descriptor =
-            getDescriptor().getMessageTypes().get(21);
+            getDescriptor().getMessageTypes().get(22);
           internal_static_au_com_codeka_common_protobuf_Planets_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_au_com_codeka_common_protobuf_Planets_descriptor,
               new java.lang.String[] { "Planets", });
           internal_static_au_com_codeka_common_protobuf_Sectors_descriptor =
-            getDescriptor().getMessageTypes().get(22);
+            getDescriptor().getMessageTypes().get(23);
           internal_static_au_com_codeka_common_protobuf_Sectors_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_au_com_codeka_common_protobuf_Sectors_descriptor,
               new java.lang.String[] { "Sectors", });
           internal_static_au_com_codeka_common_protobuf_EmpirePresence_descriptor =
-            getDescriptor().getMessageTypes().get(23);
+            getDescriptor().getMessageTypes().get(24);
           internal_static_au_com_codeka_common_protobuf_EmpirePresence_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_au_com_codeka_common_protobuf_EmpirePresence_descriptor,
               new java.lang.String[] { "Key", "EmpireKey", "StarKey", "TotalGoods", "TotalMinerals", "GoodsDeltaPerHour", "MineralsDeltaPerHour", "MaxGoods", "MaxMinerals", "GoodsZeroTime", });
           internal_static_au_com_codeka_common_protobuf_ColonizeRequest_descriptor =
-            getDescriptor().getMessageTypes().get(24);
+            getDescriptor().getMessageTypes().get(25);
           internal_static_au_com_codeka_common_protobuf_ColonizeRequest_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_au_com_codeka_common_protobuf_ColonizeRequest_descriptor,
               new java.lang.String[] { "PlanetIndex", });
           internal_static_au_com_codeka_common_protobuf_Colony_descriptor =
-            getDescriptor().getMessageTypes().get(25);
+            getDescriptor().getMessageTypes().get(26);
           internal_static_au_com_codeka_common_protobuf_Colony_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_au_com_codeka_common_protobuf_Colony_descriptor,
               new java.lang.String[] { "Key", "EmpireKey", "StarKey", "PlanetIndex", "Population", "DEPRECATEDLastSimulation", "FocusPopulation", "FocusFarming", "FocusMining", "FocusConstruction", "DeltaPopulation", "DeltaGoods", "DeltaMinerals", "UncollectedTaxes", "DefenceBonus", "MaxPopulation", "CooldownEndTime", });
           internal_static_au_com_codeka_common_protobuf_Colonies_descriptor =
-            getDescriptor().getMessageTypes().get(26);
+            getDescriptor().getMessageTypes().get(27);
           internal_static_au_com_codeka_common_protobuf_Colonies_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_au_com_codeka_common_protobuf_Colonies_descriptor,
               new java.lang.String[] { "Colonies", });
           internal_static_au_com_codeka_common_protobuf_BuildRequest_descriptor =
-            getDescriptor().getMessageTypes().get(27);
+            getDescriptor().getMessageTypes().get(28);
           internal_static_au_com_codeka_common_protobuf_BuildRequest_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_au_com_codeka_common_protobuf_BuildRequest_descriptor,
               new java.lang.String[] { "Key", "ColonyKey", "EmpireKey", "StarKey", "PlanetIndex", "BuildKind", "DesignName", "Count", "StartTime", "EndTime", "Progress", "ExistingBuildingKey", "ExistingBuildingLevel", });
           internal_static_au_com_codeka_common_protobuf_BuildQueue_descriptor =
-            getDescriptor().getMessageTypes().get(28);
+            getDescriptor().getMessageTypes().get(29);
           internal_static_au_com_codeka_common_protobuf_BuildQueue_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_au_com_codeka_common_protobuf_BuildQueue_descriptor,
               new java.lang.String[] { "Requests", });
           internal_static_au_com_codeka_common_protobuf_Building_descriptor =
-            getDescriptor().getMessageTypes().get(29);
+            getDescriptor().getMessageTypes().get(30);
           internal_static_au_com_codeka_common_protobuf_Building_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_au_com_codeka_common_protobuf_Building_descriptor,
               new java.lang.String[] { "Key", "ColonyKey", "DesignName", "Level", });
           internal_static_au_com_codeka_common_protobuf_Fleet_descriptor =
-            getDescriptor().getMessageTypes().get(30);
+            getDescriptor().getMessageTypes().get(31);
           internal_static_au_com_codeka_common_protobuf_Fleet_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_au_com_codeka_common_protobuf_Fleet_descriptor,
               new java.lang.String[] { "Key", "EmpireKey", "DesignName", "NumShips", "State", "StateStartTime", "StarKey", "DestinationStarKey", "TargetFleetKey", "TargetColonyKey", "Stance", "TimeDestroyed", "BlockNotificationOnDestroy", "LastVictory", "Eta", });
           internal_static_au_com_codeka_common_protobuf_Fleets_descriptor =
-            getDescriptor().getMessageTypes().get(31);
+            getDescriptor().getMessageTypes().get(32);
           internal_static_au_com_codeka_common_protobuf_Fleets_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_au_com_codeka_common_protobuf_Fleets_descriptor,
               new java.lang.String[] { "Fleets", });
           internal_static_au_com_codeka_common_protobuf_FleetOrder_descriptor =
-            getDescriptor().getMessageTypes().get(32);
+            getDescriptor().getMessageTypes().get(33);
           internal_static_au_com_codeka_common_protobuf_FleetOrder_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_au_com_codeka_common_protobuf_FleetOrder_descriptor,
               new java.lang.String[] { "Order", "SplitLeft", "SplitRight", "StarKey", "Stance", "MergeFleetKey", });
           internal_static_au_com_codeka_common_protobuf_ScoutReport_descriptor =
-            getDescriptor().getMessageTypes().get(33);
+            getDescriptor().getMessageTypes().get(34);
           internal_static_au_com_codeka_common_protobuf_ScoutReport_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_au_com_codeka_common_protobuf_ScoutReport_descriptor,
               new java.lang.String[] { "Key", "EmpireKey", "StarKey", "Date", "StarPb", });
           internal_static_au_com_codeka_common_protobuf_ScoutReports_descriptor =
-            getDescriptor().getMessageTypes().get(34);
+            getDescriptor().getMessageTypes().get(35);
           internal_static_au_com_codeka_common_protobuf_ScoutReports_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_au_com_codeka_common_protobuf_ScoutReports_descriptor,
               new java.lang.String[] { "Reports", });
           internal_static_au_com_codeka_common_protobuf_CombatRound_descriptor =
-            getDescriptor().getMessageTypes().get(35);
+            getDescriptor().getMessageTypes().get(36);
           internal_static_au_com_codeka_common_protobuf_CombatRound_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_au_com_codeka_common_protobuf_CombatRound_descriptor,
@@ -73290,19 +74142,19 @@ public final class Messages {
               internal_static_au_com_codeka_common_protobuf_CombatRound_FleetDamagedRecord_descriptor,
               new java.lang.String[] { "FleetIndex", "Damage", });
           internal_static_au_com_codeka_common_protobuf_CombatReport_descriptor =
-            getDescriptor().getMessageTypes().get(36);
+            getDescriptor().getMessageTypes().get(37);
           internal_static_au_com_codeka_common_protobuf_CombatReport_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_au_com_codeka_common_protobuf_CombatReport_descriptor,
               new java.lang.String[] { "Key", "StarKey", "StartTime", "EndTime", "StartEmpireKeys", "EndEmpireKeys", "NumDestroyed", "Rounds", });
           internal_static_au_com_codeka_common_protobuf_CombatReports_descriptor =
-            getDescriptor().getMessageTypes().get(37);
+            getDescriptor().getMessageTypes().get(38);
           internal_static_au_com_codeka_common_protobuf_CombatReports_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_au_com_codeka_common_protobuf_CombatReports_descriptor,
               new java.lang.String[] { "Reports", });
           internal_static_au_com_codeka_common_protobuf_SituationReport_descriptor =
-            getDescriptor().getMessageTypes().get(38);
+            getDescriptor().getMessageTypes().get(39);
           internal_static_au_com_codeka_common_protobuf_SituationReport_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_au_com_codeka_common_protobuf_SituationReport_descriptor,
@@ -73356,55 +74208,55 @@ public final class Messages {
               internal_static_au_com_codeka_common_protobuf_SituationReport_StarRunOutOfGoodsRecord_descriptor,
               new java.lang.String[] { "ColonyKey", });
           internal_static_au_com_codeka_common_protobuf_SituationReports_descriptor =
-            getDescriptor().getMessageTypes().get(39);
+            getDescriptor().getMessageTypes().get(40);
           internal_static_au_com_codeka_common_protobuf_SituationReports_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_au_com_codeka_common_protobuf_SituationReports_descriptor,
               new java.lang.String[] { "SituationReports", "Cursor", });
           internal_static_au_com_codeka_common_protobuf_CashAuditRecord_descriptor =
-            getDescriptor().getMessageTypes().get(40);
+            getDescriptor().getMessageTypes().get(41);
           internal_static_au_com_codeka_common_protobuf_CashAuditRecord_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_au_com_codeka_common_protobuf_CashAuditRecord_descriptor,
               new java.lang.String[] { "Id", "EmpireId", "Reason", "BeforeCash", "AfterCash", "Time", "FleetId", "FleetDesignId", "NumShips", "StarId", "StarName", "MoveDistance", "BuildDesignId", "BuildCount", "AccelerateAmount", "AllianceName", });
           internal_static_au_com_codeka_common_protobuf_CashAuditRecords_descriptor =
-            getDescriptor().getMessageTypes().get(41);
+            getDescriptor().getMessageTypes().get(42);
           internal_static_au_com_codeka_common_protobuf_CashAuditRecords_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_au_com_codeka_common_protobuf_CashAuditRecords_descriptor,
               new java.lang.String[] { "Records", });
           internal_static_au_com_codeka_common_protobuf_Alliance_descriptor =
-            getDescriptor().getMessageTypes().get(42);
+            getDescriptor().getMessageTypes().get(43);
           internal_static_au_com_codeka_common_protobuf_Alliance_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_au_com_codeka_common_protobuf_Alliance_descriptor,
               new java.lang.String[] { "Key", "Name", "TimeCreated", "CreatorEmpireKey", "NumMembers", "Members", });
           internal_static_au_com_codeka_common_protobuf_Alliances_descriptor =
-            getDescriptor().getMessageTypes().get(43);
+            getDescriptor().getMessageTypes().get(44);
           internal_static_au_com_codeka_common_protobuf_Alliances_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_au_com_codeka_common_protobuf_Alliances_descriptor,
               new java.lang.String[] { "Alliances", });
           internal_static_au_com_codeka_common_protobuf_AllianceMember_descriptor =
-            getDescriptor().getMessageTypes().get(44);
+            getDescriptor().getMessageTypes().get(45);
           internal_static_au_com_codeka_common_protobuf_AllianceMember_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_au_com_codeka_common_protobuf_AllianceMember_descriptor,
               new java.lang.String[] { "Key", "EmpireKey", "AllianceKey", "TimeJoined", });
           internal_static_au_com_codeka_common_protobuf_AllianceJoinRequest_descriptor =
-            getDescriptor().getMessageTypes().get(45);
+            getDescriptor().getMessageTypes().get(46);
           internal_static_au_com_codeka_common_protobuf_AllianceJoinRequest_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_au_com_codeka_common_protobuf_AllianceJoinRequest_descriptor,
               new java.lang.String[] { "Key", "AllianceKey", "EmpireKey", "Message", "TimeRequested", "State", });
           internal_static_au_com_codeka_common_protobuf_AllianceJoinRequests_descriptor =
-            getDescriptor().getMessageTypes().get(46);
+            getDescriptor().getMessageTypes().get(47);
           internal_static_au_com_codeka_common_protobuf_AllianceJoinRequests_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_au_com_codeka_common_protobuf_AllianceJoinRequests_descriptor,
               new java.lang.String[] { "JoinRequests", });
           internal_static_au_com_codeka_common_protobuf_AllianceLeaveRequest_descriptor =
-            getDescriptor().getMessageTypes().get(47);
+            getDescriptor().getMessageTypes().get(48);
           internal_static_au_com_codeka_common_protobuf_AllianceLeaveRequest_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_au_com_codeka_common_protobuf_AllianceLeaveRequest_descriptor,

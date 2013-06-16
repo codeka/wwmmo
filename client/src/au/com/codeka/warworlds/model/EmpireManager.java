@@ -514,7 +514,7 @@ public class EmpireManager {
         private static Object sLock = new Object();
 
         public LocalEmpireStore(Context context) {
-            super(context, "empires.db", null, 2);
+            super(context, "empires.db", null, 3);
         }
 
         /**
@@ -525,18 +525,23 @@ public class EmpireManager {
         public void onCreate(SQLiteDatabase db) {
             db.execSQL("CREATE TABLE empires ("
                       +"  id INTEGER PRIMARY KEY,"
+                      +"  realm_id INTEGER,"
                       +"  empire_key STRING,"
                       +"  empire BLOB,"
                       +"  timestamp INTEGER);");
+            db.execSQL("CREATE INDEX IX_empire_key_realm_id ON empires (empire_key, realm_id)");
         }
 
         @Override
         public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-            try {
+            if (newVersion == 2) {
                 db.execSQL("ALTER TABLE empires "
                           +"ADD COLUMN timestamp INTEGER DEFAULT 0;");
-            } catch (Exception e) {
-                // who cares?
+            }
+            if (newVersion == 3) {
+                db.execSQL("ALTER TABLE empires "
+                          +"ADD COLUMN realm_id INTEGER DEFAULT "+RealmManager.BETA_REALM_ID);
+                db.execSQL("CREATE INDEX IX_empire_key_realm_id ON empires (empire_key, realm_id)");
             }
         }
 
@@ -555,6 +560,7 @@ public class EmpireManager {
                     ContentValues values = new ContentValues();
                     values.put("empire", empireBlob.toByteArray());
                     values.put("empire_key", empire.getKey());
+                    values.put("realm_id", RealmManager.i.getRealm().getID());
                     values.put("timestamp", DateTime.now(DateTimeZone.UTC).getMillis());
                     db.insert("empires", null, values);
                 } catch(Exception e) {
@@ -571,7 +577,7 @@ public class EmpireManager {
                 Cursor cursor = null;
                 try {
                     cursor = db.query("empires", new String[] {"empire", "timestamp"},
-                            "empire_key = '"+empireKey.replace('\'', ' ')+"'",
+                            "empire_key = '"+empireKey.replace('\'', ' ')+"' AND realm_id="+RealmManager.i.getRealm().getID(),
                             null, null, null, null);
                     if (!cursor.moveToFirst()) {
                         cursor.close();

@@ -43,7 +43,11 @@ public class Runner {
                 if (extra != null) {
                     numHours = Integer.parseInt(extra);
                 }
-                new StarController().simulateAllStarsOlderThan(DateTime.now().minusHours(numHours));
+                DateTime dt = DateTime.now();
+                if (numHours > 0) {
+                    dt = dt.minusHours(numHours);
+                }
+                new StarController().simulateAllStarsOlderThan(dt);
             }
         } catch(Exception e) {
             log.error("Error running CRON", e);

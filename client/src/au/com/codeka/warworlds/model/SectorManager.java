@@ -242,13 +242,15 @@ public class SectorManager {
         }
     }
 
-    private static class SectorCache {
+    private static class SectorCache implements RealmManager.RealmChangedHandler {
         BackgroundRendererCache mBackgroundRenderers;
         LruCache<String, Sector> mSectors;
 
         public SectorCache() {
             mSectors = new LruCache<String, Sector>(30);
             mBackgroundRenderers = new BackgroundRendererCache();
+
+            RealmManager.i.addRealmChangedHandler(this);
         }
 
         public static String key(Pair<Long, Long> coord) {
@@ -301,6 +303,15 @@ public class SectorManager {
                     oldValue.close();
                 }
             }
+        }
+
+        /**
+         * When we switch realms, we'll want to clear out the cache.
+         */
+        @Override
+        public void onRealmChanged(Realm newRealm) {
+            mSectors.evictAll();
+            mBackgroundRenderers.evictAll();
         }
     }
 

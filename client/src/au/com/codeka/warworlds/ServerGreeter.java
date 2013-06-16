@@ -270,9 +270,13 @@ public class ServerGreeter {
                 }
 
                 if (mWasEmpireReset) {
-                    mServerGreeting.mIntent = new Intent(activity, EmpireResetActivity.class);
-                    if (mResetReason != null) {
-                        mServerGreeting.mIntent.putExtra("au.com.codeka.warworlds.ResetReason", mResetReason);
+                    if (mResetReason != null && mResetReason.equals("blitz")) {
+                        mServerGreeting.mIntent = new Intent(activity, BlitzResetActivity.class);
+                    } else {
+                        mServerGreeting.mIntent = new Intent(activity, EmpireResetActivity.class);
+                        if (mResetReason != null) {
+                            mServerGreeting.mIntent.putExtra("au.com.codeka.warworlds.ResetReason", mResetReason);
+                        }
                     }
                 }
 

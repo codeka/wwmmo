@@ -10,7 +10,6 @@ import android.view.View.OnClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
-import android.widget.TextView;
 import au.com.codeka.warworlds.model.Realm;
 import au.com.codeka.warworlds.model.RealmManager;
 
@@ -58,10 +57,10 @@ public class RealmSelectActivity extends BaseActivity {
             @Override
             public void onClick(View v) {
                 int selectedPosition = realmsListView.getCheckedItemPosition();
-                TextView realmName = (TextView) realmsListView.getChildAt(selectedPosition);
+                Realm realm = RealmManager.i.getRealms().get(selectedPosition);
 
                 DeviceRegistrar.unregister(mContext); // need to register device in new realm
-                RealmManager.i.selectRealm(mContext, (String) realmName.getText());
+                RealmManager.i.selectRealm(mContext, realm.getDisplayName());
                 ServerGreeter.clearHello();
 
                 // this activity is finished, move to the main WarWorldsActivity

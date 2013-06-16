@@ -1,9 +1,6 @@
 package au.com.codeka.warworlds.model;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -12,11 +9,17 @@ import java.util.TreeMap;
 
 import org.apache.commons.collections.IteratorUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.ContextWrapper;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
 import android.os.Handler;
 import android.view.View;
 import au.com.codeka.BackgroundRunner;
@@ -418,68 +421,111 @@ public class StarManager {
      * This is called when we fetch a new \c StarSummary, we'll want to cache it.
      */
     private static void updateStarSummary(Context context, StarSummary summary) {
-        File summaryFile = getSummaryFile(context, summary.getKey());
-
         Messages.Star.Builder starpb = Messages.Star.newBuilder();
         summary.toProtocolBuffer(starpb);
-        Messages.Star pb = starpb.build();
+        Messages.Star star_pb = starpb.build();
 
-        FileOutputStream fos = null;
-        try {
-            fos = new FileOutputStream(summaryFile.getCanonicalPath());
-            pb.writeTo(fos);
-        } catch (FileNotFoundException e) {
-        } catch (IOException e) {
-        } finally {
-            if (fos != null) {
-                try {
-                    fos.close();
-                } catch (IOException e) {
-                }
-            }
-        }
+        new LocalStarsStore(context).addStar(star_pb);
     }
 
     /**
      * Attempts to load a \c StarSummary back from the cache directory.
      */
     private static StarSummary loadStarSummary(Context context, String starKey) {
-        File summaryFile = getSummaryFile(context, starKey);
-        if (!summaryFile.exists()) {
+        Messages.Star star_pb = new LocalStarsStore(context).getStar(starKey); 
+        if (star_pb == null) {
             return null;
         }
 
-        FileInputStream fis = null;
-        try {
-            fis = new FileInputStream(summaryFile.getCanonicalPath());
-            Messages.Star pb = Messages.Star.newBuilder().mergeFrom(fis).build();
+        StarSummary ss = new StarSummary();
+        ss.fromProtocolBuffer(star_pb);
 
-            StarSummary ss = new StarSummary();
-            ss.fromProtocolBuffer(pb);
-            return ss;
-        } catch (FileNotFoundException e) {
-        } catch (IOException e) {
-        } finally {
-            if (fis != null) {
+        return ss;
+    }
+
+    private static class LocalStarsStore extends SQLiteOpenHelper {
+        private static Object sLock = new Object();
+
+        public LocalStarsStore(Context context) {
+            super(context, "stars.db", null, 1);
+        }
+
+        /**
+         * This is called the first time we open the database, in order to create the required
+         * tables, etc.
+         */
+        @Override
+        public void onCreate(SQLiteDatabase db) {
+            db.execSQL("CREATE TABLE stars ("
+                      +"  id INTEGER PRIMARY KEY,"
+                      +"  realm_id INTEGER,"
+                      +"  star_key STRING,"
+                      +"  star BLOB,"
+                      +"  timestamp INTEGER);");
+            db.execSQL("CREATE INDEX IX_star_key_realm_id ON stars (star_key, realm_id)");
+        }
+
+        @Override
+        public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        }
+
+        public void addStar(Messages.Star star) {
+            synchronized(sLock) {
+                SQLiteDatabase db = getWritableDatabase();
                 try {
-                    fis.close();
-                } catch (IOException e) {
+                    ByteArrayOutputStream starBlob = new ByteArrayOutputStream();
+                    try {
+                        star.writeTo(starBlob);
+                    } catch (IOException e) {
+                        // we won't get the notification, but not the end of the world...
+                        return;
+                    }
+
+                    ContentValues values = new ContentValues();
+                    values.put("star", starBlob.toByteArray());
+                    values.put("star_key", star.getKey());
+                    values.put("realm_id", RealmManager.i.getRealm().getID());
+                    values.put("timestamp", DateTime.now(DateTimeZone.UTC).getMillis());
+                    db.insert("empires", null, values);
+                } catch(Exception e) {
+                    // ignore errors... todo: log them
+                } finally {
+                    db.close();
                 }
             }
         }
 
-        return null;
+        public Messages.Star getStar(String starKey) {
+            synchronized(sLock) {
+                SQLiteDatabase db = getReadableDatabase();
+                Cursor cursor = null;
+                try {
+                    cursor = db.query("stars", new String[] {"star", "timestamp"},
+                            "star_key = '"+starKey.replace('\'', ' ')+"' AND realm_id="+RealmManager.i.getRealm().getID(),
+                            null, null, null, null);
+                    if (!cursor.moveToFirst()) {
+                        cursor.close();
+                        return null;
+                    }
+
+                    // if it's too old, we'll want to refresh it anyway from the server
+                    long timestamp = cursor.getLong(1);
+                    long oneDayAgo = DateTime.now(DateTimeZone.UTC).minusDays(1).getMillis();
+                    if (timestamp == 0 || timestamp < oneDayAgo) {
+                        return null;
+                    }
+
+                    return Messages.Star.parseFrom(cursor.getBlob(0));
+                } catch (Exception e) {
+                    // todo: log errors
+                    return null;
+                } finally {
+                    if (cursor != null) cursor.close();
+                    db.close();
+                }
+            }
+        }
     }
-
-    private static File getSummaryFile(Context context, String starKey) {
-        File cacheDir = context.getCacheDir();
-
-        File starsDir = new File(cacheDir, "stars");
-        starsDir.mkdirs();
-
-        return new File(starsDir, starKey+".cache");
-    }
-
     public interface StarFetchedHandler {
         void onStarFetched(Star s);
     }

@@ -32,7 +32,11 @@ public class EmpireResetActivity extends BaseActivity {
             msg = TransparentWebView.getHtmlFile(this, "html/empire-reset.html");
         } else {
             msg = TransparentWebView.getHtmlFile(this, "html/empire-reset-reason.html");
-            msg = String.format(msg, reason);
+            if (reason.equals("blitz")) {
+                msg = String.format(msg, "The Blitz realm has been reset! Good luck this month!");
+            } else {
+                msg = String.format(msg, reason);
+            }
         }
         welcome.loadHtml("html/skeleton.html", msg);
 

@@ -31,7 +31,6 @@ public class WarWorldsActivity extends BaseActivity {
     private Context mContext = this;
     private Button mStartGameButton;
     private TextView mConnectionStatus;
-    private String mStarKey;
     private HelloWatcher mHelloWatcher;
     private TextView mRealmName;
 
@@ -70,7 +69,6 @@ public class WarWorldsActivity extends BaseActivity {
         mStartGameButton.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
                 final Intent intent = new Intent(mContext, StarfieldActivity.class);
-                intent.putExtra("au.com.codeka.warworlds.StarKey", mStarKey);
                 startActivity(intent);
             }
         });

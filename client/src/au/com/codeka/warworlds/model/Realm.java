@@ -4,6 +4,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 public class Realm {
+    private int mID;
     private URI mBaseUrl;
     private String mDisplayName;
     private String mDescription;
@@ -16,8 +17,9 @@ public class Realm {
         LocalAppEngine
     }
 
-    public Realm(String baseUrl, String displayName, String description, AuthenticationMethod authMethod, boolean isAlpha)
-            throws URISyntaxException {
+    public Realm(int id, String baseUrl, String displayName, String description,
+                 AuthenticationMethod authMethod, boolean isAlpha) throws URISyntaxException {
+        mID = id;
         mBaseUrl = new URI(baseUrl);
         mDisplayName = displayName;
         mDescription = description;
@@ -32,6 +34,9 @@ public class Realm {
      */
     public boolean isAlpha() {
         return mIsAlpha;
+    }
+    public int getID() {
+        return mID;
     }
     public URI getBaseUrl() {
         return mBaseUrl;

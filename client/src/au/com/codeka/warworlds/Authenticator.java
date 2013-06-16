@@ -110,6 +110,9 @@ public class Authenticator {
      */
     public static String authenticate(Activity activity, String accountName) {
         Realm realm = RealmManager.i.getRealm();
+        if (realm == null) {
+            return null;
+        }
         log.info("(re-)authenticating \""+accountName+"\" to realm "+realm.getDisplayName()+"...");
 
         Account[] accts = sAccountManager.getAccountsByType("com.google");

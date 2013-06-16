@@ -80,13 +80,15 @@ public class StatisticsController {
             }
         }
 
-        sql = "SELECT empire_id, COUNT(*) FROM colonies WHERE empire_id IS NOT NULL GROUP BY empire_id";
+        sql = "SELECT empire_id, COUNT(*), SUM(population) FROM colonies WHERE empire_id IS NOT NULL GROUP BY empire_id";
         try (SqlStmt stmt = db.prepare(sql)) {
             ResultSet rs = stmt.select();
             while (rs.next()) {
                 int empireID = rs.getInt(1);
                 int totalColonies = rs.getInt(2);
+                int totalPopulation = rs.getInt(3);
                 ranks.get(empireID).setTotalColonies(totalColonies);
+                ranks.get(empireID).setTotalPopulation(totalPopulation);
             }
         }
 
@@ -111,7 +113,11 @@ public class StatisticsController {
         Collections.sort(sortedRanks, new Comparator<EmpireRank>() {
             @Override
             public int compare(EmpireRank left, EmpireRank right) {
-                int diff = right.getTotalColonies() - left.getTotalColonies();
+                int diff = right.getTotalPopulation() - left.getTotalPopulation();
+                if (diff != 0)
+                    return diff;
+
+                diff = right.getTotalColonies() - left.getTotalColonies();
                 if (diff != 0)
                     return diff;
 
@@ -125,11 +131,11 @@ public class StatisticsController {
         });
 
         sql = "INSERT INTO empire_ranks (empire_id, rank, total_stars, total_colonies," +
-                                       " total_buildings, total_ships)" +
-             " VALUES (?, ?, ?, ?, ?, ?)" +
+                                       " total_buildings, total_ships, total_population)" +
+             " VALUES (?, ?, ?, ?, ?, ?, ?)" +
              " ON DUPLICATE KEY UPDATE" +
                  " rank = ?, total_stars = ?, total_colonies = ?, total_buildings = ?," +
-                 " total_ships = ?";
+                 " total_ships = ?, total_population = ?";
         try (SqlStmt stmt = db.prepare(sql)) {
             int rankValue = 1;
             for (EmpireRank rank : sortedRanks) {
@@ -139,11 +145,13 @@ public class StatisticsController {
                 stmt.setInt(4, rank.getTotalColonies());
                 stmt.setInt(5, rank.getTotalBuildings());
                 stmt.setInt(6, rank.getTotalShips());
-                stmt.setInt(7, rankValue);
-                stmt.setInt(8, rank.getTotalStars());
-                stmt.setInt(9, rank.getTotalColonies());
-                stmt.setInt(10, rank.getTotalBuildings());
-                stmt.setInt(11, rank.getTotalShips());
+                stmt.setInt(7, rank.getTotalPopulation());
+                stmt.setInt(8, rankValue);
+                stmt.setInt(9, rank.getTotalStars());
+                stmt.setInt(10, rank.getTotalColonies());
+                stmt.setInt(11, rank.getTotalBuildings());
+                stmt.setInt(12, rank.getTotalShips());
+                stmt.setInt(13, rank.getTotalPopulation());
                 stmt.update();
 
                 rankValue ++;

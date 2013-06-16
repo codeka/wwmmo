@@ -14,29 +14,37 @@ public class RealmManager {
 
     private List<Realm> mRealms;
     private Realm mCurrentRealm;
+    private ArrayList<RealmChangedHandler> mRealmChangedHandlers;
 
     private RealmManager() {
+        mRealmChangedHandlers = new ArrayList<RealmChangedHandler>();
     }
+
+    // The IDs for the realms can NEVER change, once set
+    public static int DEBUG_REALM_ID = 1000;
+    public static int ALPHA_REALM_ID = 1;
+    public static int BETA_REALM_ID = 2;
+    public static int BLITZ_REALM_ID = 10;
 
     public void setup(Context context) {
         mRealms = new ArrayList<Realm>();
         try {
             if (Util.isDebug()) {
-                mRealms.add(new Realm("http://192.168.1.4:8080/realms/beta/",
+                mRealms.add(new Realm(DEBUG_REALM_ID, "http://192.168.1.4:8080/realms/beta/",
                                       "Debug",
                                       "The debug realm runs on my local dev box for testing.",
                                       Realm.AuthenticationMethod.Default, false));
             }
-            mRealms.add(new Realm("https://warworldsmmo.appspot.com/api/v1/",
+            mRealms.add(new Realm(ALPHA_REALM_ID, "https://warworldsmmo.appspot.com/api/v1/",
                                   "Alpha",
                                   "",
                                   Realm.AuthenticationMethod.AppEngine, true));
-            mRealms.add(new Realm("https://game.war-worlds.com/realms/beta/",
+            mRealms.add(new Realm(BETA_REALM_ID, "https://game.war-worlds.com/realms/beta/",
                                   "Beta",
                                   "If you're new to War Worlds, you should join this realm. eXplore, eXpand, eXploit, eXterminate!",
                                   Realm.AuthenticationMethod.Default, false));
             if (Util.isDebug()) {
-                mRealms.add(new Realm("https://game.war-worlds.com/realms/blitz/",
+                mRealms.add(new Realm(BLITZ_REALM_ID, "https://game.war-worlds.com/realms/blitz/",
                                       "Blitz",
                                       "The goal of Blitz is to build as big an empire as you can in 1 month. Each month, the universe is reset and a winner announced.",
                                       Realm.AuthenticationMethod.Default, false));
@@ -48,6 +56,24 @@ public class RealmManager {
         SharedPreferences prefs = Util.getSharedPreferences(context);
         if (prefs.getString("RealmName", null) != null) {
             selectRealm(context, prefs.getString("RealmName", null), false);
+        }
+    }
+
+    public void addRealmChangedHandler(RealmChangedHandler handler) {
+        synchronized(mRealmChangedHandlers) {
+            mRealmChangedHandlers.add(handler);
+        }
+    }
+    public void removeRealmChangedHandler(RealmChangedHandler handler) {
+        synchronized(mRealmChangedHandlers) {
+            mRealmChangedHandlers.remove(handler);
+        }
+    }
+    protected void fireRealmChangedHandler(Realm newRealm) {
+        synchronized(mRealmChangedHandlers) {
+            for (RealmChangedHandler handler : mRealmChangedHandlers) {
+                handler.onRealmChanged(newRealm);
+            }
         }
     }
 
@@ -82,5 +108,11 @@ public class RealmManager {
                 .putString("RealmName",  mCurrentRealm == null ? null : mCurrentRealm.getDisplayName())
                 .commit();
         }
+
+        fireRealmChangedHandler(mCurrentRealm);
+    }
+
+    public interface RealmChangedHandler {
+        public void onRealmChanged(Realm newRealm);
     }
 }

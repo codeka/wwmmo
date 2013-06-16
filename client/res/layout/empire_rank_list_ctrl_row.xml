@@ -30,12 +30,20 @@
         android:layout_toRightOf="@id/empire_icon"
         android:text="Empire Name"
         android:textAppearance="?android:attr/textAppearanceMedium" />
-    
+
+    <TextView android:id="@+id/total_population"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:layout_below="@id/empire_name"
+              android:layout_toRightOf="@id/empire_icon"
+              android:text="Population: 123,456"
+              android:textAppearance="?android:attr/textAppearanceSmall" />
+
     <TextView
         android:id="@+id/total_stars"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/empire_name"
+        android:layout_below="@id/total_population"
         android:layout_toRightOf="@id/empire_icon"
         android:text="Stars: 12"
         android:textAppearance="?android:attr/textAppearanceSmall" />

@@ -35,6 +35,8 @@ public class Star extends BaseStar {
         mName = name;
         mSize = size;
         mStarType = sStarTypes[starTypeID];
+        mColonies = new ArrayList<BaseColony>();
+        mFleets = new ArrayList<BaseFleet>();
     }
     public Star(ResultSet rs) throws SQLException {
         mID = rs.getInt("id");
