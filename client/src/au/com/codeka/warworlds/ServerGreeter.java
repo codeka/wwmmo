@@ -92,6 +92,7 @@ public class ServerGreeter {
 
     private static void sayHello(final BaseActivity activity, final int retries) {
         log.debug("Saying 'hello'...");
+        Util.setup(activity);
 
         Util.loadProperties(activity);
         if (Util.isDebug()) {

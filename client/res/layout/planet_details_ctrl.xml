@@ -29,7 +29,7 @@
         android:layout_height="20dp"
         android:layout_alignLeft="@+id/horz_sep_1"
         android:layout_below="@+id/horz_sep_1"
-        android:src="@drawable/solarsystem_icon_population" />
+        android:src="@drawable/population_white" />
 
     <TextView
         android:id="@+id/population_congeniality_value"
@@ -54,7 +54,7 @@
         android:layout_height="20dp"
         android:layout_alignLeft="@+id/horz_sep_1"
         android:layout_below="@+id/population_congeniality_icon"
-        android:src="@drawable/solarsystem_icon_farming" />
+        android:src="@drawable/farming_white" />
 
     <TextView
         android:id="@+id/farming_congeniality_value"
@@ -79,7 +79,7 @@
         android:layout_height="20dp"
         android:layout_alignLeft="@+id/horz_sep_1"
         android:layout_below="@+id/farming_congeniality_icon"
-        android:src="@drawable/solarsystem_icon_mining" />
+        android:src="@drawable/mining_white" />
 
     <TextView
         android:id="@+id/mining_congeniality_value"

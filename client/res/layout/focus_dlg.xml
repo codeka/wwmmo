@@ -29,7 +29,7 @@
                android:layout_alignBottom="@+id/focus_population"
                android:layout_alignParentLeft="true"
                android:layout_marginLeft="10dp"
-               android:src="@drawable/colony_population_icon" />
+               android:src="@drawable/population_white" />
 
     <TextView android:id="@+id/focus_population_value"
               android:layout_width="wrap_content"
@@ -69,7 +69,7 @@
                android:layout_alignBottom="@+id/focus_farming"
                android:layout_alignParentLeft="true"
                android:layout_marginLeft="10dp"
-               android:src="@drawable/colony_farming_icon" />
+               android:src="@drawable/farming_white" />
 
     <TextView android:id="@+id/focus_farming_value"
               android:layout_width="wrap_content"
@@ -118,7 +118,7 @@
                android:layout_alignBottom="@+id/focus_mining"
                android:layout_alignParentLeft="true"
                android:layout_marginLeft="10dp"
-               android:src="@drawable/colony_mining_icon" />
+               android:src="@drawable/mining_white" />
 
     <TextView android:id="@+id/focus_mining_value"
               android:layout_width="wrap_content"
@@ -168,7 +168,7 @@
                android:layout_alignBottom="@+id/focus_construction"
                android:layout_alignParentLeft="true"
                android:layout_marginLeft="10dp"
-               android:src="@drawable/colony_construction_icon" />
+               android:src="@drawable/construction_white" />
 
     <TextView android:id="@+id/focus_construction_value"
               android:layout_width="wrap_content"

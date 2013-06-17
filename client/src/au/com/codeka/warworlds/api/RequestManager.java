@@ -163,6 +163,10 @@ public class RequestManager {
             Map<String, List<String>> extraHeaders, HttpEntity body) throws ApiException {
         Connection conn = null;
 
+        if (sBaseUri == null) {
+            throw new ApiException("Not yet configured, cannot execute "+method+" "+url);
+        }
+
         URI uri = sBaseUri.resolve(url);
         if (sVerboseLog) {
             log.debug("Requesting: {}", uri);

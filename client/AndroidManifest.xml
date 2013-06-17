@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="au.com.codeka.warworlds"
-    android:versionCode="123"
-    android:versionName="0.1.20130616.647"
+    android:versionCode="125"
+    android:versionName="0.1.20130617.648"
     android:installLocation="auto" >
 
     <!-- C2DM requires Android SDK version 2.2 (API level 8) or above, and we want to be

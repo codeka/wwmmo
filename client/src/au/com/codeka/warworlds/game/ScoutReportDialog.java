@@ -281,7 +281,7 @@ public class ScoutReportDialog extends DialogFragment {
                 LayoutInflater inflater = (LayoutInflater) getActivity().getSystemService
                         (Context.LAYOUT_INFLATER_SERVICE);
                 if (item.colony != null) {
-                    view = inflater.inflate(R.layout.colony_list_row, null);
+                    view = inflater.inflate(R.layout.colony_list_colony_row, null);
                 } else {
                     view = inflater.inflate(R.layout.fleet_list_row, null);
                 }

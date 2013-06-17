@@ -111,7 +111,7 @@
         android:layout_height="16dp"
         android:layout_below="@+id/building_timetobuild_label"
         android:layout_alignRight="@+id/building_timetobuild_label"
-        android:src="@drawable/colony_mining_icon" />
+        android:src="@drawable/mining_white" />
 
     <TextView
         android:id="@+id/building_mineralstobuild"

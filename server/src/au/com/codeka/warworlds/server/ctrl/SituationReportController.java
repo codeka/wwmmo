@@ -35,9 +35,10 @@ public class SituationReportController {
         }
     }
 
-    public List<Messages.SituationReport> fetch(int empireID, Integer starID, DateTime after, int limit) throws RequestException {
+    public List<Messages.SituationReport> fetch(int empireID, Integer starID, DateTime after,
+                                                int limit) throws RequestException {
         try {
-            return db.fetch(empireID, starID, after);
+            return db.fetch(empireID, starID, after, limit);
         } catch(Exception e) {
             throw new RequestException(e);
         }
@@ -63,14 +64,15 @@ public class SituationReportController {
             }
         }
 
-        public List<Messages.SituationReport> fetch(int empireID, Integer starID, DateTime after)
-                        throws Exception {
+        public List<Messages.SituationReport> fetch(int empireID, Integer starID, DateTime after,
+                                                    int limit) throws Exception {
             String sql = "SELECT report" +
                         " FROM situation_reports" +
                         " WHERE empire_id = ?" +
                         (starID == null ? "" : " AND star_id = ?") +
                           " AND report_time < ?" +
-                        " ORDER BY report_time DESC";
+                        " ORDER BY report_time DESC" +
+                        " LIMIT "+limit;
             try (SqlStmt stmt = prepare(sql)) {
                 stmt.setInt(1, empireID);
                 if (starID == null) {

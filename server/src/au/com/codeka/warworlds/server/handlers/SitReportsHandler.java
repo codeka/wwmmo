@@ -28,7 +28,7 @@ public class SitReportsHandler extends RequestHandler {
         }
 
         List<Messages.SituationReport> sitreps = new SituationReportController().fetch(
-                getSession().getEmpireID(), starID, after, 100);
+                getSession().getEmpireID(), starID, after, 50);
 
         Messages.SituationReports.Builder sitreps_pb = Messages.SituationReports.newBuilder();
         for (Messages.SituationReport sitrep : sitreps) {
