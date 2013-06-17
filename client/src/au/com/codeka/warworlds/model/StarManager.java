@@ -486,7 +486,7 @@ public class StarManager {
                     values.put("star_key", star.getKey());
                     values.put("realm_id", RealmManager.i.getRealm().getID());
                     values.put("timestamp", DateTime.now(DateTimeZone.UTC).getMillis());
-                    db.insert("empires", null, values);
+                    db.insert("stars", null, values);
                 } catch(Exception e) {
                     // ignore errors... todo: log them
                 } finally {
