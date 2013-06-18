@@ -66,6 +66,7 @@ public class DashboardPageHandler extends BasePageHandler {
                 int totalColonies = rs.getInt("total_colonies");
                 int totalBuildings = rs.getInt("total_buildings");
                 int totalShips = rs.getInt("total_ships");
+                int totalPopulation = rs.getInt("total_population");
 
                 TreeMap<String, Object> empireRank = new TreeMap<String, Object>();
                 empireRank.put("rank", rank);
@@ -74,6 +75,7 @@ public class DashboardPageHandler extends BasePageHandler {
                 empireRank.put("totalColonies", totalColonies);
                 empireRank.put("totalBuildings", totalBuildings);
                 empireRank.put("totalShips", totalShips);
+                empireRank.put("totalPopulation", totalPopulation);
                 empireRanks.add(empireRank);
             }
         } catch(Exception e) {
