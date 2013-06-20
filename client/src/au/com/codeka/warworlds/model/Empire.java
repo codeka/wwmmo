@@ -9,8 +9,6 @@ import android.content.res.AssetManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.os.Parcel;
-import android.os.Parcelable;
 import au.com.codeka.common.model.BaseAlliance;
 import au.com.codeka.common.model.BaseEmpire;
 import au.com.codeka.common.model.BaseEmpireRank;
@@ -18,7 +16,7 @@ import au.com.codeka.common.model.BaseStar;
 import au.com.codeka.common.protobuf.Messages;
 
 
-public class Empire extends BaseEmpire implements Parcelable {
+public class Empire extends BaseEmpire {
     private static Bitmap sBaseShield;
     private Bitmap mEmpireShield;
 
@@ -106,39 +104,4 @@ public class Empire extends BaseEmpire implements Parcelable {
                             ((float) rand.nextInt(100) + 100) / 256.0f,
                             1.0f};
     }
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel parcel, int flags) {
-        parcel.writeString(mKey);
-        parcel.writeString(mDisplayName);
-        parcel.writeParcelable((Star) mHomeStar, flags);
-        parcel.writeParcelable((Alliance) mAlliance, flags);
-    }
-
-    protected void readFromParcel(Parcel parcel) {
-        mKey = parcel.readString();
-        mDisplayName = parcel.readString();
-        mHomeStar = (StarSummary) parcel.readParcelable(StarSummary.class.getClassLoader());
-        mAlliance = (Alliance) parcel.readParcelable(Alliance.class.getClassLoader());
-    }
-
-    public static final Parcelable.Creator<Empire> CREATOR
-                = new Parcelable.Creator<Empire>() {
-        @Override
-        public Empire createFromParcel(Parcel parcel) {
-            Empire e = new Empire();
-            e.readFromParcel(parcel);
-            return e;
-        }
-
-        @Override
-        public Empire[] newArray(int size) {
-            return new Empire[size];
-        }
-    };
 }

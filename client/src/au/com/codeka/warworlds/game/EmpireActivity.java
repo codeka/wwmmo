@@ -26,6 +26,7 @@ import android.widget.TextView.OnEditorActionListener;
 import au.com.codeka.common.model.BaseColony;
 import au.com.codeka.common.model.BaseFleet;
 import au.com.codeka.common.model.BasePlanet;
+import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.ServerGreeter;
 import au.com.codeka.warworlds.ServerGreeter.ServerGreeting;
@@ -400,7 +401,10 @@ public class EmpireActivity extends TabFragmentActivity
                 @Override
                 public void onFleetSplit(Star star, Fleet fleet) {
                     Bundle args = new Bundle();
-                    args.putParcelable("au.com.codeka.warworlds.Fleet", fleet);
+
+                    Messages.Fleet.Builder fleet_pb = Messages.Fleet.newBuilder();
+                    fleet.toProtocolBuffer(fleet_pb);
+                    args.putByteArray("au.com.codeka.warworlds.Fleet", fleet_pb.build().toByteArray());
 
                     FragmentManager fm = getActivity().getSupportFragmentManager();
                     FleetSplitDialog dialog = new FleetSplitDialog();

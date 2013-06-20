@@ -8,13 +8,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import android.content.Context;
-import android.os.Parcel;
-import android.os.Parcelable;
 import au.com.codeka.BackgroundRunner;
+import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.StyledDialog;
 import au.com.codeka.warworlds.api.ApiClient;
 import au.com.codeka.warworlds.api.ApiException;
-import au.com.codeka.common.protobuf.Messages;
 
 /**
  * This is a sub-class of \c Empire that represents \em my Empire. We have extra methods
@@ -296,21 +294,6 @@ public class MyEmpire extends Empire {
             }
         }.execute();
     }
-
-    public static final Parcelable.Creator<MyEmpire> CREATOR
-                = new Parcelable.Creator<MyEmpire>() {
-        @Override
-        public MyEmpire createFromParcel(Parcel parcel) {
-            MyEmpire e = new MyEmpire();
-            e.readFromParcel(parcel);
-            return e;
-        }
-
-        @Override
-        public MyEmpire[] newArray(int size) {
-            return new MyEmpire[size];
-        }
-    };
 
     public static interface ColonizeCompleteHandler {
         public void onColonizeComplete(Colony colony);

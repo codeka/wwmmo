@@ -6,6 +6,8 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import com.google.protobuf.InvalidProtocolBufferException;
+
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -20,6 +22,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import au.com.codeka.common.model.BaseAllianceMember;
 import au.com.codeka.common.model.BaseEmpireRank;
+import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.BaseActivity;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.model.Alliance;
@@ -48,7 +51,15 @@ public class AllianceDetailsActivity extends BaseActivity
         Bundle extras = intent.getExtras();
         if (extras != null) {
             mAllianceKey = extras.getString("au.com.codeka.warworlds.AllianceKey");
-            mAlliance = (Alliance) extras.getParcelable("au.com.codeka.warworlds.Alliance");
+            byte[] alliance_bytes = extras.getByteArray("au.com.codeka.warworlds.Alliance");
+            if (alliance_bytes != null) {
+                try {
+                    Messages.Alliance alliance_pb = Messages.Alliance.parseFrom(alliance_bytes);
+                    mAlliance = new Alliance();
+                    mAlliance.fromProtocolBuffer(alliance_pb);
+                } catch (InvalidProtocolBufferException e) {
+                }
+            }
 
             AllianceManager.i.fetchAlliance(mAllianceKey, new AllianceManager.FetchAllianceCompleteHandler() {
                 @Override

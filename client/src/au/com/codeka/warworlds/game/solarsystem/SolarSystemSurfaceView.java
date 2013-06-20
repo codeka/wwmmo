@@ -219,6 +219,10 @@ public class SolarSystemSurfaceView extends UniverseElementSurfaceView {
     @Override
     public void onDetachedFromWindow() {
         PlanetImageManager.getInstance().removeBitmapGeneratedListener(mBitmapGeneratedListener);
+        if (mBackgroundRenderer != null) {
+            mBackgroundRenderer.close();
+            mBackgroundRenderer = null;
+        }
     }
 
     @Override

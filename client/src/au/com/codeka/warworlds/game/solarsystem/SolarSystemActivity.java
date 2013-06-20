@@ -23,6 +23,7 @@ import au.com.codeka.common.model.BaseBuildRequest;
 import au.com.codeka.common.model.BaseColony;
 import au.com.codeka.common.model.BaseEmpirePresence;
 import au.com.codeka.common.model.BasePlanet;
+import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.BaseActivity;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.ServerGreeter;
@@ -95,7 +96,11 @@ public class SolarSystemActivity extends BaseActivity implements StarManager.Sta
 
                 Intent intent = new Intent(SolarSystemActivity.this, BuildActivity.class);
                 intent.putExtra("au.com.codeka.warworlds.StarKey", mStar.getKey());
-                intent.putExtra("au.com.codeka.warworlds.Colony", mColony);
+
+                Messages.Colony.Builder colony_pb = Messages.Colony.newBuilder();
+                mColony.toProtocolBuffer(colony_pb);
+                intent.putExtra("au.com.codeka.warworlds.Colony", colony_pb.build().toByteArray());
+
                 startActivityForResult(intent, BUILD_REQUEST);
             }
         });

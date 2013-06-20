@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import com.google.protobuf.InvalidProtocolBufferException;
+
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -29,6 +31,7 @@ import au.com.codeka.common.model.BaseColony;
 import au.com.codeka.common.model.Design;
 import au.com.codeka.common.model.DesignKind;
 import au.com.codeka.common.model.ShipDesign;
+import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.BaseActivity;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.ServerGreeter;
@@ -84,7 +87,13 @@ public class BuildActivity extends BaseActivity implements StarManager.StarFetch
             public void onHelloComplete(boolean success, ServerGreeting greeting) {
                 Bundle extras = getIntent().getExtras();
                 String starKey = extras.getString("au.com.codeka.warworlds.StarKey");
-                mInitialColony = (Colony) extras.getParcelable("au.com.codeka.warworlds.Colony");
+                byte[] colonyBytes = extras.getByteArray("au.com.codeka.warworlds.Colony");
+                try {
+                    Messages.Colony colony_pb = Messages.Colony.parseFrom(colonyBytes);
+                    mInitialColony = new Colony();
+                    mInitialColony.fromProtocolBuffer(colony_pb);
+                } catch (InvalidProtocolBufferException e) {
+                }
 
                 StarManager.getInstance().requestStar(BuildActivity.this, starKey, false, BuildActivity.this);
                 StarManager.getInstance().addStarUpdatedListener(starKey, BuildActivity.this);

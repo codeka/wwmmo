@@ -24,6 +24,7 @@ import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import au.com.codeka.TimeInHours;
+import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.TabFragmentActivity;
 import au.com.codeka.warworlds.model.Alliance;
@@ -98,7 +99,11 @@ public class AllianceActivity extends TabFragmentActivity
                     if (item.alliance != null) {
                         Intent intent = new Intent(getActivity(), AllianceDetailsActivity.class);
                         intent.putExtra("au.com.codeka.warworlds.AllianceKey", item.alliance.getKey());
-                        intent.putExtra("au.com.codeka.warworlds.Alliance", item.alliance);
+
+                        Messages.Alliance.Builder alliance_pb = Messages.Alliance.newBuilder();
+                        item.alliance.toProtocolBuffer(alliance_pb);
+                        intent.putExtra("au.com.codeka.warworlds.Alliance", alliance_pb.build().toByteArray());
+
                         getActivity().startActivity(intent);
                     }
                 }

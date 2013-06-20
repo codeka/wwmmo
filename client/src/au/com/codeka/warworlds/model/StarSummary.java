@@ -1,7 +1,5 @@
 package au.com.codeka.warworlds.model;
 
-import android.os.Parcel;
-import android.os.Parcelable;
 import au.com.codeka.common.model.BaseBuildRequest;
 import au.com.codeka.common.model.BaseBuilding;
 import au.com.codeka.common.model.BaseColony;
@@ -18,62 +16,7 @@ import au.com.codeka.common.protobuf.Messages;
  * is fetched). This is so we can do quicker look-ups of things like star names/icons without
  * having to do a full round-trip.
  */
-public class StarSummary extends BaseStar implements Parcelable {
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel parcel, int flags) {
-        parcel.writeString(mKey);
-        parcel.writeString(mName);
-        parcel.writeInt(mStarType.getIndex());
-        parcel.writeInt(mSize);
-        parcel.writeLong(mSectorX);
-        parcel.writeLong(mSectorY);
-        parcel.writeInt(mOffsetX);
-        parcel.writeInt(mOffsetY);
-
-        Planet[] planets = new Planet[mPlanets.length];
-        for (int i = 0; i < mPlanets.length; i++) {
-            planets[i] = (Planet) mPlanets[i];
-        }
-        parcel.writeParcelableArray(planets, flags);
-    }
-
-    protected void populateFromParcel(Parcel parcel) {
-        mKey = parcel.readString();
-        mName = parcel.readString();
-        mStarType = sStarTypes[parcel.readInt()];
-        mSize = parcel.readInt();
-        mSectorX = parcel.readLong();
-        mSectorY = parcel.readLong();
-        mOffsetX = parcel.readInt();
-        mOffsetY = parcel.readInt();
-
-        Parcelable[] planets = parcel.readParcelableArray(Planet.class.getClassLoader());
-        mPlanets = new Planet[planets.length];
-        for (int i = 0; i < planets.length; i++) {
-            mPlanets[i] = (Planet) planets[i];
-        }
-    }
-
-    public static final Parcelable.Creator<StarSummary> CREATOR
-                = new Parcelable.Creator<StarSummary>() {
-        @Override
-        public StarSummary createFromParcel(Parcel parcel) {
-            StarSummary s = new StarSummary();
-            s.populateFromParcel(parcel);
-            return s;
-        }
-
-        @Override
-        public StarSummary[] newArray(int size) {
-            return new StarSummary[size];
-        }
-    };
-
+public class StarSummary extends BaseStar {
     @Override
     protected BasePlanet createPlanet(Messages.Planet pb) {
         Planet p = new Planet();
@@ -140,10 +83,12 @@ public class StarSummary extends BaseStar implements Parcelable {
 
     @Override
     public BaseStar clone() {
-        Parcel parcel = Parcel.obtain();
-        this.writeToParcel(parcel, 0);
-        parcel.setDataPosition(0);
-        return Star.CREATOR.createFromParcel(parcel);
+        Messages.Star.Builder star_pb = Messages.Star.newBuilder();
+        toProtocolBuffer(star_pb);
+
+        Star clone = new Star();
+        clone.fromProtocolBuffer(star_pb.build());
+        return clone;
     }
 
 

@@ -6,6 +6,8 @@ import java.util.Locale;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.protobuf.InvalidProtocolBufferException;
+
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -22,6 +24,7 @@ import au.com.codeka.common.model.BaseFleet;
 import au.com.codeka.common.model.BaseStar;
 import au.com.codeka.common.model.DesignKind;
 import au.com.codeka.common.model.ShipDesign;
+import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.BaseActivity;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.ServerGreeter;
@@ -211,8 +214,29 @@ public class StarfieldActivity extends BaseActivity
                 }
 
                 if (savedInstanceState != null) {
-                    Star selectedStar = savedInstanceState.getParcelable("au.com.codeka.warworlds.SelectedStar");
-                    Fleet selectedFleet = savedInstanceState.getParcelable("au.com.codeka.warworlds.SelectedFleet");
+                    Star selectedStar = null;
+                    Fleet selectedFleet = null;
+
+                    try {
+                        byte[] star_bytes = savedInstanceState.getByteArray("au.com.codeka.warworlds.SelectedStar");
+                        if (star_bytes != null) {
+                            Messages.Star star_pb = Messages.Star.parseFrom(star_bytes);
+                            selectedStar = new Star();
+                            selectedStar.fromProtocolBuffer(star_pb);
+                        }
+                    } catch (InvalidProtocolBufferException e) {
+                    }
+
+                    try {
+                        byte[] fleet_bytes = savedInstanceState.getByteArray("au.com.codeka.warworlds.SelectedFleet");
+                        if (fleet_bytes != null) {
+                            Messages.Fleet fleet_pb = Messages.Fleet.parseFrom(fleet_bytes);
+                            selectedFleet = new Fleet();
+                            selectedFleet.fromProtocolBuffer(fleet_pb);
+                        }
+                    } catch (InvalidProtocolBufferException e) {
+                    }
+
                     if (selectedStar != null) {
                         mSelectedStar = selectedStar;
                         mStarfield.selectStar(selectedStar.getKey());
@@ -284,8 +308,17 @@ public class StarfieldActivity extends BaseActivity
     @Override
     public void onSaveInstanceState(Bundle state) {
         super.onSaveInstanceState(state);
-        state.putParcelable("au.com.codeka.warworlds.SelectedStar", mSelectedStar);
-        state.putParcelable("au.com.codeka.warworlds.SelectedFleet", mSelectedFleet);
+        if (mSelectedStar != null) {
+            Messages.Star.Builder star_pb = Messages.Star.newBuilder();
+            mSelectedStar.toProtocolBuffer(star_pb);
+            state.putByteArray("au.com.codeka.warworlds.SelectedStar", star_pb.build().toByteArray());
+        }
+
+        if (mSelectedFleet != null) {
+            Messages.Fleet.Builder fleet_pb = Messages.Fleet.newBuilder();
+            mSelectedFleet.toProtocolBuffer(fleet_pb);
+            state.putByteArray("au.com.codeka.warworlds.SelectedFleet", fleet_pb.build().toByteArray());
+        }
     }
 
     /**
