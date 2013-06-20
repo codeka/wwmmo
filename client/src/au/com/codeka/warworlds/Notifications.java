@@ -50,7 +50,9 @@ public class Notifications {
     public static void displayNotification(final Context context,
                                            final Messages.SituationReport sitrep) {
         String starKey = sitrep.getStarKey();
-        StarSummary starSummary = StarManager.getInstance().requestStarSummarySync(context, starKey);
+        StarSummary starSummary = StarManager.getInstance().requestStarSummarySync(context, starKey,
+                Float.MAX_VALUE // always prefer a cached version, no matter how old
+            );
 
         NotificationDetails notification = new NotificationDetails();
         notification.sitrep = sitrep;
@@ -135,7 +137,7 @@ public class Notifications {
                         canvas.restore();
                     }
 
-                    Sprite starSprite = StarImageManager.getInstance().getSprite(context, star, iconWidth / 2);
+                    Sprite starSprite = StarImageManager.getInstance().getSprite(context, star, iconWidth / 2, true);
                     starSprite.draw(canvas);
 
                     builder.setLargeIcon(largeIcon);

@@ -85,6 +85,18 @@ public class Colony extends BaseColony {
         return mEmpireID;
     }
 
+    /**
+     * Sanitize this colony for viewing by other empires. Basically, we just zero-out various
+     * "sensitive" bits of data.
+     */
+    public void sanitize() {
+        mPopulationDelta = 0.0f;
+        mGoodsDelta = 0.0f;
+        mMineralsDelta = 0.0f;
+        mUncollectedTaxes = 0.0f;
+        mBuildings.clear();
+    }
+
     public float collectTaxes() {
         float taxes = mUncollectedTaxes;
         mUncollectedTaxes = 0;

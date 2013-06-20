@@ -509,7 +509,7 @@ public class StarfieldSurfaceView extends SectorView
 
             float imageScale = (float) star.getStarType().getImageScale();
             int imageSize = (int)(star.getSize() * imageScale * 2);
-            Sprite sprite = StarImageManager.getInstance().getSprite(mContext, star, imageSize);
+            Sprite sprite = StarImageManager.getInstance().getSprite(mContext, star, imageSize, true);
             mMatrix.reset();
             mMatrix.postTranslate(-(sprite.getWidth() / 2.0f), -(sprite.getHeight() / 2.0f));
             mMatrix.postScale(40.0f * imageScale * pixelScale / sprite.getWidth(),

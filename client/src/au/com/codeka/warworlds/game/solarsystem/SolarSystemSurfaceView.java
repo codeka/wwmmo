@@ -267,7 +267,7 @@ public class SolarSystemSurfaceView extends UniverseElementSurfaceView {
         float pixelScale = getPixelScale();
 
         int imageSize = (int)(300.0f * pixelScale);
-        Sprite sprite = StarImageManager.getInstance().getSprite(mContext, mStar, imageSize);
+        Sprite sprite = StarImageManager.getInstance().getSprite(mContext, mStar, imageSize, false);
 
         mMatrix.reset();
         mMatrix.postTranslate(-(sprite.getWidth() / 2.0f), -(sprite.getHeight() / 2.0f));

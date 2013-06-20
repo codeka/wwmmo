@@ -626,7 +626,7 @@ public class StarfieldActivity extends BaseActivity
 
         starName.setText(mSelectedStar.getName());
         starKind.setText(mSelectedStar.getStarType().getDisplayName());
-        Sprite starImage = StarImageManager.getInstance().getSprite(mContext, mSelectedStar, 80);
+        Sprite starImage = StarImageManager.getInstance().getSprite(mContext, mSelectedStar, 80, true);
         starIcon.setImageDrawable(new SpriteDrawable(starImage));
     }
 

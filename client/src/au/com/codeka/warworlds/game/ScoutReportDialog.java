@@ -66,7 +66,7 @@ public class ScoutReportDialog extends DialogFragment {
 
         int imageSize = (int)(mStar.getSize() * mStar.getStarType().getImageScale() * 2);
         starIcon.setImageDrawable(new SpriteDrawable(
-                StarImageManager.getInstance().getSprite(getActivity(), mStar, imageSize)));
+                StarImageManager.getInstance().getSprite(getActivity(), mStar, imageSize, true)));
         starName.setText(mStar.getName());
         reportSummary.setText("Scout Report");
 

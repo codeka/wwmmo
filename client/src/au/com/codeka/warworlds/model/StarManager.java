@@ -16,12 +16,9 @@ import org.slf4j.LoggerFactory;
 
 import android.content.ContentValues;
 import android.content.Context;
-import android.content.ContextWrapper;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.os.Handler;
-import android.view.View;
 import au.com.codeka.BackgroundRunner;
 import au.com.codeka.common.model.Simulation;
 import au.com.codeka.common.protobuf.Messages;
@@ -31,7 +28,7 @@ import au.com.codeka.warworlds.model.billing.IabException;
 import au.com.codeka.warworlds.model.billing.Purchase;
 import au.com.codeka.warworlds.model.billing.SkuDetails;
 
-public class StarManager {
+public class StarManager extends BaseManager {
     private static StarManager sInstance = new StarManager();
     public static StarManager getInstance() {
         return sInstance;
@@ -42,6 +39,8 @@ public class StarManager {
     private TreeMap<String, StarSummary> mStarSummaries;
     private TreeMap<String, List<StarFetchedHandler>> mStarUpdatedListeners;
     private List<StarFetchedHandler> mAllStarUpdatedListeners;
+
+    public static float DEFAULT_MAX_CACHE_HOURS = 24.0f;
 
     private StarManager() {
         mStars = new TreeMap<String, Star>();
@@ -94,46 +93,26 @@ public class StarManager {
         synchronized(mStarUpdatedListeners) {
             List<StarFetchedHandler> listeners = mStarUpdatedListeners.get(star.getKey());
             if (listeners != null) {
-                for (StarFetchedHandler handler : new ArrayList<StarFetchedHandler>(listeners)) {
-                    fireHandler(handler, star);
+                for (final StarFetchedHandler handler : new ArrayList<StarFetchedHandler>(listeners)) {
+                    fireHandler(handler, new Runnable() {
+                        @Override
+                        public void run() { handler.onStarFetched(star); }
+                    });
                 }
             }
 
             // also anybody who's interested in ALL stars
-            for (StarFetchedHandler handler : new ArrayList<StarFetchedHandler>(mAllStarUpdatedListeners)) {
-                fireHandler(handler, star);
+            for (final StarFetchedHandler handler : new ArrayList<StarFetchedHandler>(mAllStarUpdatedListeners)) {
+                fireHandler(handler, new Runnable() {
+                    @Override
+                    public void run() { handler.onStarFetched(star); }
+                });
             }
         }
 
         // also let a couple of the other Managers know
         SectorManager.getInstance().onStarUpdate(star);
         BuildManager.getInstance().onStarUpdate(star);
-    }
-
-    private void fireHandler(final StarFetchedHandler handler, final Star star) {
-        try {
-            if (handler instanceof ContextWrapper) {
-                ContextWrapper ctx = (ContextWrapper) handler;
-                new Handler(ctx.getMainLooper()).post(new Runnable() {
-                    @Override
-                    public void run() {
-                        handler.onStarFetched(star);
-                    }
-                });
-            } else if (handler instanceof View) {
-                View view = (View) handler;
-                new Handler(view.getContext().getMainLooper()).post(new Runnable() {
-                    @Override
-                    public void run() {
-                        handler.onStarFetched(star);
-                    }
-                });
-            } else {
-                handler.onStarFetched(star);
-            }
-        } catch (Exception e) {
-            log.warn("Ignored exception in onStarFetched...", e);
-        }
     }
 
     public void refreshStar(Context context, Star s) {
@@ -190,7 +169,7 @@ public class StarManager {
         new BackgroundRunner<StarSummary>() {
             @Override
             protected StarSummary doInBackground() {
-                return requestStarSummarySync(context, starKey);
+                return requestStarSummarySync(context, starKey, DEFAULT_MAX_CACHE_HOURS);
             }
 
             @Override
@@ -229,7 +208,7 @@ public class StarManager {
             new BackgroundRunner<List<StarSummary>>() {
                 @Override
                 protected List<StarSummary> doInBackground() {
-                    return requestStarSummariesSync(context, toFetch);
+                    return requestStarSummariesSync(context, toFetch, DEFAULT_MAX_CACHE_HOURS);
                 }
 
                 @Override
@@ -251,7 +230,7 @@ public class StarManager {
      * @param starKey
      * @return
      */
-    public StarSummary requestStarSummarySync(Context context, String starKey) {
+    public StarSummary requestStarSummarySync(Context context, String starKey, float maxCacheAgeHours) {
         StarSummary ss = mStarSummaries.get(starKey);
         if (ss != null) {
             return ss;
@@ -262,7 +241,7 @@ public class StarManager {
             return ss;
         }
 
-        ss = loadStarSummary(context, starKey);
+        ss = loadStarSummary(context, starKey, maxCacheAgeHours);
         if (ss != null) {
             return ss;
         }
@@ -271,11 +250,11 @@ public class StarManager {
         return doFetchStar(context, starKey);
     }
 
-    public List<StarSummary> requestStarSummariesSync(Context context, Collection<String> starKeys) {
+    public List<StarSummary> requestStarSummariesSync(Context context, Collection<String> starKeys, float maxCacheAgeHours) {
         ArrayList<StarSummary> starSummaries = new ArrayList<StarSummary>();
         for (String starKey : starKeys) {
             // TODO: this could be more efficient...
-            StarSummary ss = requestStarSummarySync(context, starKey);
+            StarSummary ss = requestStarSummarySync(context, starKey, DEFAULT_MAX_CACHE_HOURS);
             if (ss != null) {
                 starSummaries.add(ss);
             }
@@ -431,8 +410,8 @@ public class StarManager {
     /**
      * Attempts to load a \c StarSummary back from the cache directory.
      */
-    private static StarSummary loadStarSummary(Context context, String starKey) {
-        Messages.Star star_pb = new LocalStarsStore(context).getStar(starKey); 
+    private static StarSummary loadStarSummary(Context context, String starKey, float maxCacheAgeHours) {
+        Messages.Star star_pb = new LocalStarsStore(context).getStar(starKey, maxCacheAgeHours); 
         if (star_pb == null) {
             return null;
         }
@@ -495,7 +474,7 @@ public class StarManager {
             }
         }
 
-        public Messages.Star getStar(String starKey) {
+        public Messages.Star getStar(String starKey, float maxCacheAgeHours) {
             synchronized(sLock) {
                 SQLiteDatabase db = getReadableDatabase();
                 Cursor cursor = null;
@@ -509,10 +488,12 @@ public class StarManager {
                     }
 
                     // if it's too old, we'll want to refresh it anyway from the server
-                    long timestamp = cursor.getLong(1);
-                    long oneDayAgo = DateTime.now(DateTimeZone.UTC).minusDays(1).getMillis();
-                    if (timestamp == 0 || timestamp < oneDayAgo) {
-                        return null;
+                    if (maxCacheAgeHours < Float.MAX_VALUE) {
+                        long timestamp = cursor.getLong(1);
+                        long oldest = DateTime.now(DateTimeZone.UTC).minusSeconds((int)(maxCacheAgeHours * 3600)).getMillis();
+                        if (timestamp == 0 || timestamp < oldest) {
+                            return null;
+                        }
                     }
 
                     return Messages.Star.parseFrom(cursor.getBlob(0));

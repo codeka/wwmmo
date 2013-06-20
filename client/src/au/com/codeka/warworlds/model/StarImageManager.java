@@ -17,10 +17,10 @@ public class StarImageManager extends ImageManager {
     /**
      * Gets the \c Bitmap for the given star.
      */
-    public Sprite getSprite(Context context, StarSummary star, int size) {
+    public Sprite getSprite(Context context, StarSummary star, int size, boolean forceGeneric) {
         StarExtra starExtra = new StarExtra(context, star);
         Bitmap bmp = null;
-        if (size > 0) {
+        if (size > 0 && !forceGeneric) {
             bmp = getBitmap(context, star.getKey(), size, starExtra);
         }
 

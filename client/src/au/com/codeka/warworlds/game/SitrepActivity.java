@@ -141,7 +141,7 @@ public class SitrepActivity extends BaseActivity {
                 @Override
                 public void onStarSummaryFetched(StarSummary s) {
                     empireName.setText(s.getName());
-                    Sprite starSprite = StarImageManager.getInstance().getSprite(mContext, s, empireIcon.getWidth());
+                    Sprite starSprite = StarImageManager.getInstance().getSprite(mContext, s, empireIcon.getWidth(), true);
                     empireIcon.setImageDrawable(new SpriteDrawable(starSprite));
                 }
             });
@@ -225,7 +225,9 @@ public class SitrepActivity extends BaseActivity {
                     // for.
                     for (String starKey : missingStarSummaries) {
                         StarSummary starSummary = StarManager.getInstance()
-                                .requestStarSummarySync(mContext, starKey);
+                                .requestStarSummarySync(mContext, starKey,
+                                        Float.MAX_VALUE // always prefer a cached version, no matter how old
+                                    );
                         mStarSummaries.put(starKey, starSummary);
                     }
 
@@ -380,7 +382,7 @@ public class SitrepActivity extends BaseActivity {
 
             int imageSize = (int)(starSummary.getSize() * starSummary.getStarType().getImageScale() * 2);
             Sprite starSprite = StarImageManager.getInstance().getSprite(
-                    SitrepActivity.this, starSummary, imageSize);
+                    SitrepActivity.this, starSummary, imageSize, true);
             starIcon.setImageDrawable(new SpriteDrawable(starSprite));
 
             reportTime.setText(TimeInHours.format(sitrep.getReportTime()));

@@ -463,7 +463,7 @@ public class BuildQueueList extends FrameLayout
 
                 int imageSize = (int)(entry.star.getSize() * entry.star.getStarType().getImageScale() * 2);
                 if (entry.starDrawable == null) {
-                    Sprite sprite = StarImageManager.getInstance().getSprite(mContext, entry.star, imageSize);
+                    Sprite sprite = StarImageManager.getInstance().getSprite(mContext, entry.star, imageSize, true);
                     entry.starDrawable = new SpriteDrawable(sprite);
                 }
                 if (entry.starDrawable != null) {

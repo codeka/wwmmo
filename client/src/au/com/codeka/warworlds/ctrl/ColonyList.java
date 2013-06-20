@@ -15,7 +15,6 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.AsyncTask;
-import android.text.Html;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -141,10 +140,10 @@ public class ColonyList extends FrameLayout {
     }
 
     private void refreshSelectedColony() {
-        final TextView colonyInfo = (TextView) findViewById(R.id.colony_info);
+        final PlanetDetailsView planetDetailsView = (PlanetDetailsView) findViewById(R.id.colony_info);
 
         if (mSelectedColony == null) {
-            colonyInfo.setText("");
+            planetDetailsView.setup(null, null, null);
         } else {
             // the colony might've changed so update it first
             for(ColonyListAdapter.ItemEntry entry : mColonyListAdapter.getEntries()) {
@@ -153,14 +152,9 @@ public class ColonyList extends FrameLayout {
                 }
             }
 
-            String fmt = mContext.getString(R.string.colony_overview_format);
-            String html = String.format(fmt,
-                    (int) mSelectedColony.getPopulation(),
-                    mSelectedColony.getFarmingFocus(),
-                    mSelectedColony.getMiningFocus(),
-                    mSelectedColony.getConstructionFocus()
-                );
-            colonyInfo.setText(Html.fromHtml(html));
+            Star star = mStars.get(mSelectedColony.getStarKey());
+            Planet planet = (Planet) star.getPlanets()[mSelectedColony.getPlanetIndex() - 1];
+            planetDetailsView.setup(star, planet, mSelectedColony);
         }
     }
 
@@ -198,7 +192,7 @@ public class ColonyList extends FrameLayout {
         TextView starMineralsTotal = (TextView) view.findViewById(R.id.star_minerals_total);
 
         int imageSize = (int)(star.getSize() * star.getStarType().getImageScale() * 2);
-        Sprite sprite = StarImageManager.getInstance().getSprite(context, star, imageSize);
+        Sprite sprite = StarImageManager.getInstance().getSprite(context, star, imageSize, true);
         starIcon.setImageDrawable(new SpriteDrawable(sprite));
 
         starName.setText(star.getName());

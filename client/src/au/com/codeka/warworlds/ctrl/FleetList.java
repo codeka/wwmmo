@@ -360,7 +360,7 @@ public class FleetList extends FrameLayout implements StarManager.StarFetchedHan
         @Override
         public Drawable getDrawable(String source) {
             if (mStarSummary != null) {
-                Sprite sprite = StarImageManager.getInstance().getSprite(mContext, mStarSummary, -1);
+                Sprite sprite = StarImageManager.getInstance().getSprite(mContext, mStarSummary, -1, true);
                 Drawable d = new SpriteDrawable(sprite);
                 d.setBounds(0, 0, d.getIntrinsicWidth(), d.getIntrinsicHeight());
                 return d;
@@ -522,7 +522,7 @@ public class FleetList extends FrameLayout implements StarManager.StarFetchedHan
 
                 int imageSize = (int)(star.getSize() * star.getStarType().getImageScale() * 2);
                 if (entry.drawable == null) {
-                    Sprite sprite = StarImageManager.getInstance().getSprite(mContext, star, imageSize);
+                    Sprite sprite = StarImageManager.getInstance().getSprite(mContext, star, imageSize, true);
                     entry.drawable = new SpriteDrawable(sprite);
                 }
                 if (entry.drawable != null) {

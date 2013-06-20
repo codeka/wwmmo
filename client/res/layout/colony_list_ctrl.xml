@@ -19,10 +19,11 @@
         android:layout_height="200dp"
         android:layout_alignParentBottom="true" >
 
-        <TextView
+        <au.com.codeka.warworlds.ctrl.PlanetDetailsView
             android:id="@+id/colony_info"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent"
+            android:layout_above="@+id/view_btn" />
 
         <Button
             android:id="@+id/view_btn"

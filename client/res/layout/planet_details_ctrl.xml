@@ -9,103 +9,133 @@
         android:layout_height="150dp"
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
-        android:layout_margin="10dp"
-        android:src="@drawable/app_icon" />
+        android:layout_margin="10dp" />
 
-    <au.com.codeka.warworlds.ctrl.HorizontalSeparator
-        android:id="@+id/horz_sep_1"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentRight="true"
-        android:layout_toRightOf="@+id/planet_icon"
-        android:layout_marginTop="10dp"
-        android:layout_marginRight="10dp"
-        android:text="Congeniality" />
+    <RelativeLayout android:id="@+id/congeniality_container"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentTop="true"
+                    android:layout_alignParentRight="true"
+                    android:layout_toRightOf="@+id/planet_icon"
+                    android:visibility="gone">
 
-    <ImageView
-        android:id="@+id/population_congeniality_icon"
-        android:layout_width="20dp"
-        android:layout_height="20dp"
-        android:layout_alignLeft="@+id/horz_sep_1"
-        android:layout_below="@+id/horz_sep_1"
-        android:src="@drawable/population_white" />
+        <au.com.codeka.warworlds.ctrl.HorizontalSeparator
+            android:id="@+id/horz_sep_1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginTop="10dp"
+            android:layout_marginRight="10dp"
+            android:text="Congeniality" />
 
-    <TextView
-        android:id="@+id/population_congeniality_value"
-        android:layout_width="45dp"
-        android:layout_height="20dp"
-        android:layout_alignTop="@id/population_congeniality_icon"
-        android:layout_alignParentRight="true"
-        android:text="1024" />
+        <ImageView
+            android:id="@+id/population_congeniality_icon"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_alignLeft="@+id/horz_sep_1"
+            android:layout_below="@+id/horz_sep_1"
+            android:src="@drawable/population_white" />
 
-    <ProgressBar
-        android:id="@+id/population_congeniality"
-        style="?android:attr/progressBarStyleHorizontal"
-        android:layout_width="match_parent"
-        android:layout_height="20dp"
-        android:layout_alignTop="@id/population_congeniality_icon"
-        android:layout_toRightOf="@+id/population_congeniality_icon"
-        android:layout_toLeftOf="@id/population_congeniality_value" />
+        <TextView
+            android:id="@+id/population_congeniality_value"
+            android:layout_width="45dp"
+            android:layout_height="20dp"
+            android:layout_alignTop="@id/population_congeniality_icon"
+            android:layout_alignParentRight="true"
+            android:text="1024" />
 
-    <ImageView
-        android:id="@+id/farming_congeniality_icon"
-        android:layout_width="20dp"
-        android:layout_height="20dp"
-        android:layout_alignLeft="@+id/horz_sep_1"
-        android:layout_below="@+id/population_congeniality_icon"
-        android:src="@drawable/farming_white" />
+        <ProgressBar
+            android:id="@+id/population_congeniality"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="match_parent"
+            android:layout_height="20dp"
+            android:layout_alignTop="@id/population_congeniality_icon"
+            android:layout_toRightOf="@+id/population_congeniality_icon"
+            android:layout_toLeftOf="@id/population_congeniality_value" />
 
-    <TextView
-        android:id="@+id/farming_congeniality_value"
-        android:layout_width="45dp"
-        android:layout_height="20dp"
-        android:layout_alignTop="@id/farming_congeniality_icon"
-        android:layout_alignParentRight="true"
-        android:text="1024" />
+        <ImageView
+            android:id="@+id/farming_congeniality_icon"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_alignLeft="@+id/horz_sep_1"
+            android:layout_below="@+id/population_congeniality_icon"
+            android:src="@drawable/farming_white" />
 
-    <ProgressBar
-        android:id="@+id/farming_congeniality"
-        style="?android:attr/progressBarStyleHorizontal"
-        android:layout_width="match_parent"
-        android:layout_height="20dp"
-        android:layout_alignTop="@id/farming_congeniality_icon"
-        android:layout_toRightOf="@+id/farming_congeniality_icon"
-        android:layout_toLeftOf="@id/farming_congeniality_value" />
+        <TextView
+            android:id="@+id/farming_congeniality_value"
+            android:layout_width="45dp"
+            android:layout_height="20dp"
+            android:layout_alignTop="@id/farming_congeniality_icon"
+            android:layout_alignParentRight="true"
+            android:text="1024" />
 
-    <ImageView
-        android:id="@+id/mining_congeniality_icon"
-        android:layout_width="20dp"
-        android:layout_height="20dp"
-        android:layout_alignLeft="@+id/horz_sep_1"
-        android:layout_below="@+id/farming_congeniality_icon"
-        android:src="@drawable/mining_white" />
+        <ProgressBar
+            android:id="@+id/farming_congeniality"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="match_parent"
+            android:layout_height="20dp"
+            android:layout_alignTop="@id/farming_congeniality_icon"
+            android:layout_toRightOf="@+id/farming_congeniality_icon"
+            android:layout_toLeftOf="@id/farming_congeniality_value" />
 
-    <TextView
-        android:id="@+id/mining_congeniality_value"
-        android:layout_width="45dp"
-        android:layout_height="20dp"
-        android:layout_alignTop="@id/mining_congeniality_icon"
-        android:layout_alignParentRight="true"
-        android:text="1024" />
+        <ImageView
+            android:id="@+id/mining_congeniality_icon"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_alignLeft="@+id/horz_sep_1"
+            android:layout_below="@+id/farming_congeniality_icon"
+            android:src="@drawable/mining_white" />
 
-    <ProgressBar
-        android:id="@+id/mining_congeniality"
-        style="?android:attr/progressBarStyleHorizontal"
-        android:layout_width="match_parent"
-        android:layout_height="20dp"
-        android:layout_alignTop="@id/mining_congeniality_icon"
-        android:layout_toRightOf="@+id/mining_congeniality_icon"
-        android:layout_toLeftOf="@id/mining_congeniality_value" />
+        <TextView
+            android:id="@+id/mining_congeniality_value"
+            android:layout_width="45dp"
+            android:layout_height="20dp"
+            android:layout_alignTop="@id/mining_congeniality_icon"
+            android:layout_alignParentRight="true"
+            android:text="1024" />
 
-    <!--au.com.codeka.warworlds.ctrl.HorizontalSeparator
-        android:id="@+id/horz_sep_2"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/mining_congeniality_icon"
-        android:layout_below="@+id/mining_congeniality_icon"
-        android:layout_marginTop="10dp"
-        android:layout_alignParentRight="true"
-        android:text="Stuff" /-->
-    
+        <ProgressBar
+            android:id="@+id/mining_congeniality"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="match_parent"
+            android:layout_height="20dp"
+            android:layout_alignTop="@id/mining_congeniality_icon"
+            android:layout_toRightOf="@+id/mining_congeniality_icon"
+            android:layout_toLeftOf="@id/mining_congeniality_value" />
+    </RelativeLayout>
+
+    <RelativeLayout android:id="@+id/colony_container"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:layout_toRightOf="@+id/planet_icon"
+                    android:layout_below="@id/congeniality_container"
+                    android:visibility="gone">
+
+        <au.com.codeka.warworlds.ctrl.HorizontalSeparator
+            android:id="@+id/horz_sep_2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginTop="10dp"
+            android:layout_marginRight="10dp"
+            android:text="Colony" />
+
+        <TextView
+            android:id="@+id/population_count"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/horz_sep_2"
+            android:layout_marginLeft="6dp"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:text="Population: 123" />
+
+        <au.com.codeka.warworlds.ctrl.ColonyFocusView
+                android:id="@+id/colony_focus_view"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/population_count" />
+    </RelativeLayout>
 </RelativeLayout>

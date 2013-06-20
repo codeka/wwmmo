@@ -31,7 +31,7 @@ import au.com.codeka.warworlds.game.StarfieldBackgroundRenderer;
  * an "offsetX, offsetY" which is a pixel offset to apply when drawing the
  * sectors (so you can smoothly scroll, of course).
  */
-public class SectorManager {
+public class SectorManager extends BaseManager {
     private static Logger log = LoggerFactory.getLogger(SectorManager.class);
     private static SectorManager sInstance;
 
@@ -88,8 +88,11 @@ public class SectorManager {
     }
 
     protected void fireSectorListChanged() {
-        for(OnSectorListChangedListener listener : mSectorListChangedListeners) {
-            listener.onSectorListChanged();
+        for(final OnSectorListChangedListener listener : mSectorListChangedListeners) {
+            fireHandler(listener, new Runnable() {
+                @Override
+                public void run() { listener.onSectorListChanged(); }
+            });
         }
     }
 

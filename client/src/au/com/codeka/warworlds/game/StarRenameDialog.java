@@ -47,7 +47,7 @@ public class StarRenameDialog extends DialogFragment {
         starNewName.setText(mStar.getName());
 
         int imageSize = (int)(mStar.getSize() * mStar.getStarType().getImageScale() * 2);
-        Sprite starSprite = StarImageManager.getInstance().getSprite(getActivity(), mStar, imageSize);
+        Sprite starSprite = StarImageManager.getInstance().getSprite(getActivity(), mStar, imageSize, true);
         starIcon.setImageDrawable(new SpriteDrawable(starSprite));
 
         starNewName.requestFocus();

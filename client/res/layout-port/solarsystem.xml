@@ -122,147 +122,23 @@
                     android:layout_below="@id/population_count"
                     android:visibility="gone">
 
-                    <TextView android:id="@+id/colony_defence"
-                              android:layout_width="wrap_content"
-                              android:layout_height="wrap_content"
-                              android:layout_alignParentTop="true"
-                              android:layout_marginLeft="6dp"
-                              android:textAppearance="?android:attr/textAppearanceSmall"
-                              android:text="" />
+                    <au.com.codeka.warworlds.ctrl.ColonyFocusView
+                        android:id="@+id/colony_focus_view"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentTop="true" />
 
                     <View android:id="@+id/colony_center_marker"
                           android:layout_width="2dp"
-                          android:layout_height="match_parent"
-                          android:layout_below="@+id/colony_defence"
+                          android:layout_height="2dp"
+                          android:layout_below="@id/colony_focus_view"
                           android:layout_centerHorizontal="true" />
-
-                    <ImageView
-                        android:id="@+id/solarsystem_colony_population_icon"
-                        android:layout_width="20dp"
-                        android:layout_height="20dp"
-                        android:layout_alignParentLeft="true"
-                        android:layout_below="@+id/colony_defence"
-                        android:src="@drawable/population_white" />
-
-                    <ProgressBar
-                        android:id="@+id/solarsystem_colony_population_focus"
-                        android:layout_width="wrap_content"
-                        android:layout_height="10dp"
-                        android:layout_toRightOf="@id/solarsystem_colony_population_icon"
-                        android:layout_toLeftOf="@id/colony_center_marker"
-                        android:layout_below="@+id/colony_defence"
-                        android:paddingRight="10dp"
-                        android:paddingLeft="2dp"
-                        style="?android:attr/progressBarStyleHorizontal" />
-
-                    <TextView
-                        android:id="@+id/solarsystem_colony_population_value"
-                        android:layout_width="wrap_content"
-                        android:layout_height="14dp"
-                        android:layout_toLeftOf="@id/colony_center_marker"
-                        android:layout_below="@id/solarsystem_colony_population_focus"
-                        android:paddingRight="10dp"
-                        android:text="-1.0"
-                        android:textAppearance="?android:attr/textAppearanceSmall"
-                        android:textSize="10sp" />
-
-                    <ImageView
-                        android:id="@+id/solarsystem_colony_farming_icon"
-                        android:layout_width="20dp"
-                        android:layout_height="20dp"
-                        android:layout_toRightOf="@id/colony_center_marker"
-                          android:layout_below="@+id/colony_defence"
-                        android:src="@drawable/farming_white" />
-
-                    <ProgressBar
-                        android:id="@+id/solarsystem_colony_farming_focus"
-                        android:layout_width="wrap_content"
-                        android:layout_height="10dp"
-                        android:layout_toRightOf="@id/solarsystem_colony_farming_icon"
-                        android:layout_alignParentRight="true"
-                        android:layout_below="@+id/colony_defence"
-                        android:paddingRight="10dp"
-                        android:paddingLeft="2dp"
-                        style="?android:attr/progressBarStyleHorizontal" />
-
-                    <TextView
-                        android:id="@+id/solarsystem_colony_farming_value"
-                        android:layout_width="wrap_content"
-                        android:layout_height="14dp"
-                        android:layout_alignParentRight="true"
-                        android:layout_below="@id/solarsystem_colony_farming_focus"
-                        android:paddingRight="10dp"
-                        android:text="+1.0"
-                        android:textAppearance="?android:attr/textAppearanceSmall"
-                        android:textSize="10sp" />
-
-                    <ImageView
-                        android:id="@+id/solarsystem_colony_mining_icon"
-                        android:layout_width="20dp"
-                        android:layout_height="20dp"
-                        android:layout_below="@id/solarsystem_colony_population_icon"
-                        android:layout_alignParentLeft="true"
-                        android:layout_marginTop="8dp"
-                        android:src="@drawable/mining_white" />
-
-                    <ProgressBar
-                        android:id="@+id/solarsystem_colony_mining_focus"
-                        android:layout_width="wrap_content"
-                        android:layout_height="10dp"
-                        android:layout_alignTop="@id/solarsystem_colony_mining_icon"
-                        android:layout_toRightOf="@id/solarsystem_colony_mining_icon"
-                        android:layout_toLeftOf="@id/colony_center_marker"
-                        android:paddingRight="10dp"
-                        android:paddingLeft="2dp"
-                        style="?android:attr/progressBarStyleHorizontal" />
-
-                    <TextView
-                        android:id="@+id/solarsystem_colony_mining_value"
-                        android:layout_width="wrap_content"
-                        android:layout_height="14dp"
-                        android:layout_below="@id/solarsystem_colony_mining_focus"
-                        android:layout_toLeftOf="@id/colony_center_marker"
-                        android:paddingRight="10dp"
-                        android:text="999"
-                        android:textAppearance="?android:attr/textAppearanceSmall"
-                        android:textSize="10sp" />
-
-                    <ImageView
-                        android:id="@+id/solarsystem_colony_construction_icon"
-                        android:layout_width="20dp"
-                        android:layout_height="20dp"
-                        android:layout_below="@id/solarsystem_colony_farming_icon"
-                        android:layout_toRightOf="@id/colony_center_marker"
-                        android:layout_marginTop="8dp"
-                        android:src="@drawable/construction_white" />
-
-                    <ProgressBar
-                        android:id="@+id/solarsystem_colony_construction_focus"
-                        android:layout_width="wrap_content"
-                        android:layout_height="10dp"
-                        android:layout_alignTop="@id/solarsystem_colony_construction_icon"
-                        android:layout_toRightOf="@id/solarsystem_colony_construction_icon"
-                        android:layout_alignParentRight="true"
-                        android:paddingRight="10dp"
-                        android:paddingLeft="2dp"
-                        style="?android:attr/progressBarStyleHorizontal" />
-
-                    <TextView
-                        android:id="@+id/solarsystem_colony_construction_value"
-                        android:layout_width="wrap_content"
-                        android:layout_height="14dp"
-                        android:layout_below="@id/solarsystem_colony_construction_focus"
-                        android:layout_alignParentRight="true"
-                        android:paddingRight="10dp"
-                        android:text="999"
-                        android:textAppearance="?android:attr/textAppearanceSmall"
-                        android:textSize="10sp" />
 
                     <Button
                         android:id="@+id/solarsystem_colony_build"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_below="@id/solarsystem_colony_mining_icon"
+                        android:layout_below="@id/colony_focus_view"
                         android:layout_alignParentLeft="true"
                         android:layout_toLeftOf="@id/colony_center_marker"
                         android:layout_margin="8dp"
@@ -272,7 +148,7 @@
                         android:id="@+id/solarsystem_colony_focus"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_below="@id/solarsystem_colony_construction_icon"
+                        android:layout_below="@id/colony_focus_view"
                         android:layout_alignParentRight="true"
                         android:layout_toRightOf="@id/colony_center_marker"
                         android:layout_margin="8dp"

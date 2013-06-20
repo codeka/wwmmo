@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 
 import au.com.codeka.common.Vector2;
 import au.com.codeka.common.model.BaseBuildRequest;
+import au.com.codeka.common.model.BaseColony;
 import au.com.codeka.common.model.BaseFleet;
 import au.com.codeka.common.model.BaseScoutReport;
 import au.com.codeka.common.model.BuildingDesign;
@@ -21,6 +22,7 @@ import au.com.codeka.warworlds.server.data.SqlStmt;
 import au.com.codeka.warworlds.server.designeffects.RadarBuildingEffect;
 import au.com.codeka.warworlds.server.model.BuildRequest;
 import au.com.codeka.warworlds.server.model.BuildingPosition;
+import au.com.codeka.warworlds.server.model.Colony;
 import au.com.codeka.warworlds.server.model.Fleet;
 import au.com.codeka.warworlds.server.model.ScoutReport;
 import au.com.codeka.warworlds.server.model.Sector;
@@ -164,6 +166,14 @@ public class StarHandler extends RequestHandler {
                 }
             }
             star.getScoutReports().removeAll(toRemove);
+        }
+
+        // for any colonies that are not ours, hide some "secret" information
+        for (BaseColony baseColony : star.getColonies()) {
+            Colony colony = (Colony) baseColony;
+            if (colony.getEmpireID() != myEmpireID) {
+                colony.sanitize();
+            }
         }
     }
 
