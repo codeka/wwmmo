@@ -91,7 +91,8 @@ public class PlanetDetailsView extends FrameLayout {
                 planetIcon.setImageDrawable(new SpriteDrawable(planetSprite));
             }
 
-            if (mColony == null || !mColony.getEmpireKey().equals(EmpireManager.i.getEmpire().getKey())) {
+            if (mColony == null || mColony.getEmpireKey() == null ||
+                    !mColony.getEmpireKey().equals(EmpireManager.i.getEmpire().getKey())) {
                 congenialityContainer.setVisibility(View.VISIBLE);
                 colonyContainer.setVisibility(View.GONE);
 
