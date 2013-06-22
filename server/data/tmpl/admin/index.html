@@ -14,9 +14,10 @@
       var dataTable = new google.visualization.DataTable();
       dataTable.addColumn("date", "Date");
       dataTable.addColumn("number", "1-day actives");
+      dataTable.addColumn("number", "7-day actives");
       dataTable.addRows([
       {% for nda in empire_nda %}
-        [new Date({{nda.year}}, {{nda.month}}+1, {{nda.day}}), {{nda.oneda}}],
+        [new Date({{nda.year}}, {{nda.month}}+1, {{nda.day}}), {{nda.oneda}}, {{nda.sevenda}}],
       {% endfor %}
       ]);
 

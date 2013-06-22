@@ -21,13 +21,10 @@ public class DashboardPageHandler extends BasePageHandler {
         TreeMap<String, Object> data = new TreeMap<String, Object>();
 
         ArrayList<TreeMap<String, Object>> ndas = new ArrayList<TreeMap<String, Object>>();
-        String sql = "SELECT date, COUNT(*) AS unique_logins" +
-                    " FROM ("+
-                      " SELECT DATE(date) AS date, empire_id, COUNT(*) AS num_logins" +
-                      " FROM empire_logins" +
-                      " GROUP BY DATE(date), empire_id" +
-                     ") AS logins" +
-                    " GROUP BY date" +
+        String sql = "SELECT DATE(date) AS date, COUNT(DISTINCT empire_id)," +
+                           " (SELECT COUNT(DISTINCT empire_id) FROM empire_logins AS sub WHERE sub.date BETWEEN DATE_SUB(DATE(l.date), INTERVAL 6 DAY) AND DATE_ADD(DATE(l.date), INTERVAL 1 DAY))" +
+                    " FROM empire_logins l" +
+                    " GROUP BY DATE(date)" +
                     " ORDER BY date DESC" +
                     " LIMIT 60";
         try (SqlStmt stmt = DB.prepare(sql)) {
@@ -35,6 +32,7 @@ public class DashboardPageHandler extends BasePageHandler {
             while (rs.next()) {
                 Date dt = rs.getDate(1);
                 int oneDA = rs.getInt(2);
+                int sevenDA = rs.getInt(3);
 
                 TreeMap<String, Object> nda = new TreeMap<String, Object>();
                 Calendar c = Calendar.getInstance();
@@ -43,6 +41,7 @@ public class DashboardPageHandler extends BasePageHandler {
                 nda.put("month", c.get(Calendar.MONTH) - 1);
                 nda.put("day", c.get(Calendar.DAY_OF_MONTH));
                 nda.put("oneda", oneDA);
+                nda.put("sevenda", sevenDA);
                 ndas.add(nda);
             }
         } catch(Exception e) {
