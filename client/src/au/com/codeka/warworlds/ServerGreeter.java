@@ -16,6 +16,7 @@ import android.preference.PreferenceManager;
 import au.com.codeka.BackgroundRunner;
 import au.com.codeka.warworlds.api.ApiClient;
 import au.com.codeka.warworlds.api.ApiException;
+import au.com.codeka.warworlds.ctrl.BannerAdView;
 import au.com.codeka.warworlds.model.BuildManager;
 import au.com.codeka.warworlds.model.ChatManager;
 import au.com.codeka.warworlds.model.Colony;
@@ -178,6 +179,10 @@ public class ServerGreeter {
                         if (resp.hasEmpireResetReason() && resp.getEmpireResetReason().length() > 0) {
                             mResetReason = resp.getEmpireResetReason();
                         }
+                    }
+
+                    if (resp.hasForceRemoveAds() && resp.getForceRemoveAds()) {
+                        BannerAdView.removeAds();
                     }
 
                     if (resp.hasRequireGcmRegister() && resp.getRequireGcmRegister()) {

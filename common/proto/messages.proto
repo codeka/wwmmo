@@ -232,6 +232,10 @@ message HelloResponse
     // The collection of build requests. Once we've got the initial list from the server, the
     // client is able to track them itself.
     repeated BuildRequest build_requests = 9;
+
+    // If true, we'll force the ads to be removed. If false, or not specified, we'll check
+    // whatever the In-App Purchase API has to say.
+    optional bool force_remove_ads = 11;
 }
 
 //

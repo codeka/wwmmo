@@ -1,7 +1,6 @@
 package au.com.codeka.warworlds.model;
 
-import android.content.Context;
-import android.graphics.Bitmap;
+import android.graphics.Color;
 import au.com.codeka.warworlds.Util;
 
 /**
@@ -19,7 +18,12 @@ public class NativeEmpire extends Empire {
     }
 
     @Override
-    public Bitmap getShield(Context context) {
-        return null; // TODO, something?
+    public int getShieldColor() {
+        return Color.TRANSPARENT;
+    }
+
+    @Override
+    public float[] getShieldColorFloats() {
+        return new float[] {0.0f, 0.0f, 0.0f, 0.0f};
     }
 }

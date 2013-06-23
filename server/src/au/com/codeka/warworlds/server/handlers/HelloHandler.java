@@ -86,6 +86,8 @@ public class HelloHandler extends RequestHandler {
                     build_stats_pb.addCounts(design_count_pb);
                 }
                 hello_response_pb.setBuildingStatistics(build_stats_pb);
+
+                hello_response_pb.setForceRemoveAds(empire.getForceRemoveAds());
             } catch (Exception e) {
                 throw new RequestException(e);
             }

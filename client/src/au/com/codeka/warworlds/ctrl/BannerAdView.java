@@ -73,6 +73,10 @@ public class BannerAdView extends FrameLayout {
         mAdView.loadAd(request);
     }
 
+    public static void removeAds() {
+        sAdsRemoved = true;
+    }
+
     @Override
     protected void onWindowVisibilityChanged(int visibility) {
         if (isInEditMode()) {

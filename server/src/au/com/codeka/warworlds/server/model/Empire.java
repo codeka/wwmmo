@@ -13,6 +13,7 @@ public class Empire extends BaseEmpire {
     private int mID;
     private int mHomeStarID;
     private int mAllianceID;
+    private boolean mForceRemoveAds;
 
     public Empire() {
     }
@@ -32,6 +33,8 @@ public class Empire extends BaseEmpire {
         if (!rs.wasNull()) {
             mRank = new EmpireRank(rs);
         }
+
+        mForceRemoveAds = rs.getInt("remove_ads") != 0;
     }
 
     public int getID() {
@@ -47,6 +50,14 @@ public class Empire extends BaseEmpire {
     }
     public void setHomeStar(Star star) {
         mHomeStar = star;
+    }
+
+    /**
+     * Gets a value which indicates whether the flag in the database has been set that will
+     * force ads to be removed from the game. To be used when people complain of ads coming back.
+     */
+    public boolean getForceRemoveAds() {
+        return mForceRemoveAds;
     }
 
     @Override

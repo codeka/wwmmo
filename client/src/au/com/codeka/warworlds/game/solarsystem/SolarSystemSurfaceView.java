@@ -5,7 +5,6 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
@@ -20,10 +19,12 @@ import au.com.codeka.common.Vector2;
 import au.com.codeka.common.model.BaseBuilding;
 import au.com.codeka.common.model.BaseColony;
 import au.com.codeka.common.model.BasePlanet;
-import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.ctrl.SelectionView;
 import au.com.codeka.warworlds.game.StarfieldBackgroundRenderer;
 import au.com.codeka.warworlds.game.UniverseElementSurfaceView;
+import au.com.codeka.warworlds.model.Colony;
+import au.com.codeka.warworlds.model.Empire;
+import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.ImageManager;
 import au.com.codeka.warworlds.model.Planet;
 import au.com.codeka.warworlds.model.PlanetImageManager;
@@ -43,7 +44,6 @@ public class SolarSystemSurfaceView extends UniverseElementSurfaceView {
     private PlanetInfo mSelectedPlanet;
     private Paint mPlanetPaint;
     private SelectionView mSelectionView;
-    private Bitmap mColonyIcon;
     private CopyOnWriteArrayList<OnPlanetSelectedListener> mPlanetSelectedListeners;
     private StarfieldBackgroundRenderer mBackgroundRenderer;
     private BitmapGeneratedListener mBitmapGeneratedListener;
@@ -62,8 +62,6 @@ public class SolarSystemSurfaceView extends UniverseElementSurfaceView {
         mPlanetPaint.setARGB(255, 255, 255, 255);
         mPlanetPaint.setStyle(Style.STROKE);
         mMatrix = new Matrix();
-
-        mColonyIcon = BitmapFactory.decodeResource(getResources(), R.drawable.starfield_colony);
 
         mBitmapGeneratedListener = new BitmapGeneratedListener();
         PlanetImageManager.getInstance().addBitmapGeneratedListener(mBitmapGeneratedListener);
@@ -143,7 +141,7 @@ public class SolarSystemSurfaceView extends UniverseElementSurfaceView {
             if (colonies != null && !colonies.isEmpty()) {
                 for (BaseColony colony : colonies) {
                     if (colony.getPlanetIndex() == mPlanetInfos[i].planet.getIndex()) {
-                        planetInfo.hasColony = true;
+                        planetInfo.colony = (Colony) colony;
 
                         for (BaseBuilding building : colony.getBuildings()) {
                             if (building.getDesignID().equals("hq")) {
@@ -317,11 +315,20 @@ public class SolarSystemSurfaceView extends UniverseElementSurfaceView {
                 canvas.restore();
             }
 
-            if (planetInfo.hasColony) {
-                canvas.drawBitmap(mColonyIcon,
-                        (float) (planetInfo.centre.x + mColonyIcon.getWidth()),
-                        (float) (planetInfo.centre.y - mColonyIcon.getHeight()),
-                        mPlanetPaint);
+            if (planetInfo.colony != null) {
+                Empire empire = EmpireManager.i.getEmpire(mContext, planetInfo.colony.getEmpireKey());
+                if (empire != null) {
+                    Bitmap shield = empire.getShield(mContext);
+                    if (shield != null) {
+                        mMatrix.reset();
+                        mMatrix.postTranslate(-shield.getWidth() / 2.0f, -shield.getHeight() / 2.0f);
+                        mMatrix.postScale(20.0f * getPixelScale() / shield.getWidth(),
+                                          20.0f * getPixelScale() / shield.getHeight());
+                        mMatrix.postTranslate((float) planetInfo.centre.x,
+                                              (float) planetInfo.centre.y + (30.0f * getPixelScale()));
+                        canvas.drawBitmap(shield, mMatrix, mPlanetPaint);
+                    }
+                }
             }
         }
     }
@@ -378,7 +385,7 @@ public class SolarSystemSurfaceView extends UniverseElementSurfaceView {
         public Planet planet;
         public Vector2 centre;
         public float distanceFromSun;
-        public boolean hasColony;
+        public Colony colony;
         public boolean hasHQ;
     }
 
