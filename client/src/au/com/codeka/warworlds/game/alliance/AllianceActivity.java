@@ -303,7 +303,6 @@ public class AllianceActivity extends TabFragmentActivity
         }
 
         private void refresh() {
-            AllianceActivity activity = (AllianceActivity) getActivity();
             final ProgressBar progressBar = (ProgressBar) mView.findViewById(R.id.loading);
             final ListView joinRequestsList = (ListView) mView.findViewById(R.id.join_requests);
             joinRequestsList.setVisibility(View.GONE);
@@ -311,7 +310,7 @@ public class AllianceActivity extends TabFragmentActivity
 
             MyEmpire myEmpire = EmpireManager.i.getEmpire();
             if (myEmpire != null && myEmpire.getAlliance() != null) {
-                AllianceManager.i.fetchJoinRequests(activity, myEmpire.getAlliance().getKey(),
+                AllianceManager.i.fetchJoinRequests(myEmpire.getAlliance().getKey(),
                     new AllianceManager.FetchJoinRequestsCompleteHandler() {
                         @Override
                         public void onJoinRequestsFetched(Map<String, Empire> empires, List<AllianceJoinRequest> joinRequests) {

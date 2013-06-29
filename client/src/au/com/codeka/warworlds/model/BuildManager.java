@@ -146,7 +146,7 @@ public class BuildManager {
                 } else if (buildRequest != null) {
                     mBuildRequests.add(buildRequest);
 
-                    StarManager.getInstance().refreshStar(context, colony.getStarKey());
+                    StarManager.getInstance().refreshStar(colony.getStarKey());
                 }
             }
         }.execute();

@@ -119,7 +119,7 @@ public class EmpireActivity extends TabFragmentActivity
 
                 MyEmpire myEmpire = EmpireManager.i.getEmpire();
                 EmpireManager.i.addEmpireUpdatedListener(myEmpire.getKey(), EmpireActivity.this);
-                EmpireManager.i.refreshEmpire(mContext);
+                EmpireManager.i.refreshEmpire();
             }
         });
     }
@@ -215,7 +215,7 @@ public class EmpireActivity extends TabFragmentActivity
             if (minRank < 1) {
                 minRank = 1;
             }
-            EmpireManager.i.fetchEmpiresByRank(getActivity(), minRank, minRank + 4,
+            EmpireManager.i.fetchEmpiresByRank(minRank, minRank + 4,
                     new EmpireManager.EmpiresFetchedHandler() {
                         @Override
                         public void onEmpiresFetched(List<Empire> empires) {
@@ -291,7 +291,6 @@ public class EmpireActivity extends TabFragmentActivity
                 }
             }
 
-            final Context context = getActivity();
             View v = inflator.inflate(R.layout.empire_colonies_tab, null);
             ColonyList colonyList = (ColonyList) v.findViewById(R.id.colony_list);
             colonyList.refresh(colonies, sStars);
@@ -316,7 +315,7 @@ public class EmpireActivity extends TabFragmentActivity
 
                 @Override
                 public void onCollectTaxes() {
-                    EmpireManager.i.getEmpire().collectTaxes(context);
+                    EmpireManager.i.getEmpire().collectTaxes();
                 }
             });
 
@@ -373,8 +372,6 @@ public class EmpireActivity extends TabFragmentActivity
             FleetList fleetList = (FleetList) v.findViewById(R.id.fleet_list);
             fleetList.refresh(fleets, sStars);
 
-            final Context context = getActivity();
-
             EmpireActivity activity = (EmpireActivity) getActivity();
             if (activity.mFirstStarsRefresh && activity.mExtras != null) {
                 String fleetKey = activity.mExtras.getString("au.com.codeka.warworlds.FleetKey");
@@ -430,8 +427,7 @@ public class EmpireActivity extends TabFragmentActivity
 
                 @Override
                 public void onFleetStanceModified(Star star, Fleet fleet, Fleet.Stance newStance) {
-                    EmpireManager.i.getEmpire().updateFleetStance(context, star,
-                                                                  fleet, newStance);
+                    EmpireManager.i.getEmpire().updateFleetStance(star, fleet, newStance);
                 }
             });
 

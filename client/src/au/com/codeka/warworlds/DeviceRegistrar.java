@@ -19,13 +19,13 @@ import au.com.codeka.common.protobuf.Messages;
 public class DeviceRegistrar {
     private static Logger log = LoggerFactory.getLogger(DeviceRegistrar.class);
 
-    public static String register(final Context context) {
-        final SharedPreferences settings = Util.getSharedPreferences(context);
+    public static String register() {
+        final SharedPreferences settings = Util.getSharedPreferences();
 
         String registrationKey = null;
         try {
             Messages.DeviceRegistration registration = Messages.DeviceRegistration.newBuilder()
-                .setDeviceId(Secure.getString(context.getContentResolver(), Secure.ANDROID_ID))
+                .setDeviceId(Secure.getString(App.i.getContentResolver(), Secure.ANDROID_ID))
                 .setDeviceBuild(android.os.Build.DISPLAY)
                 .setDeviceManufacturer(android.os.Build.MANUFACTURER)
                 .setDeviceModel(android.os.Build.MODEL)
@@ -39,7 +39,7 @@ public class DeviceRegistrar {
             log.info("Got registration key: "+registrationKey);
         } catch(Exception ex) {
             log.error("Failure registring device.", ex);
-            forgetDeviceRegistration(context);
+            forgetDeviceRegistration();
             return null;
         }
 
@@ -55,7 +55,7 @@ public class DeviceRegistrar {
         new BackgroundRunner<Void>() {
             @Override
             protected Void doInBackground() {
-                String deviceRegistrationKey = getDeviceRegistrationKey(context);
+                String deviceRegistrationKey = getDeviceRegistrationKey();
                 Messages.DeviceRegistration regpb = Messages.DeviceRegistration.newBuilder()
                         .setGcmRegistrationId(gcmRegistrationID)
                         .setKey(deviceRegistrationKey)
@@ -77,8 +77,8 @@ public class DeviceRegistrar {
         }.execute();
     }
 
-    public static void unregister(final Context context) {
-        final SharedPreferences settings = Util.getSharedPreferences(context);
+    public static void unregister() {
+        final SharedPreferences settings = Util.getSharedPreferences();
         String registrationKey = settings.getString("DeviceRegistrar.registrationKey", "");
         if (registrationKey == "") {
             log.info("No unregistration required, device not registered.");
@@ -92,16 +92,16 @@ public class DeviceRegistrar {
             log.error("Failure unregistering device.", ex);
         }
 
-        forgetDeviceRegistration(context);
+        forgetDeviceRegistration();
     }
 
-    public static String getDeviceRegistrationKey(Context context) {
-        final SharedPreferences settings = Util.getSharedPreferences(context);
+    public static String getDeviceRegistrationKey() {
+        final SharedPreferences settings = Util.getSharedPreferences();
         return settings.getString("DeviceRegistrar.registrationKey", "");
     }
 
-    private static void forgetDeviceRegistration(Context context) {
-        final SharedPreferences settings = Util.getSharedPreferences(context);
+    private static void forgetDeviceRegistration() {
+        final SharedPreferences settings = Util.getSharedPreferences();
         SharedPreferences.Editor editor = settings.edit();
         editor.remove("DeviceRegistrar.registrationKey");
         editor.commit();

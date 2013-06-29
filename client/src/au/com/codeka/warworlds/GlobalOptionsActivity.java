@@ -94,7 +94,7 @@ public class GlobalOptionsActivity extends PreferenceActivity
     }
 
     private void refreshPreferenceSummaries() {
-        GlobalOptions opts = new GlobalOptions(this);
+        GlobalOptions opts = new GlobalOptions();
 
         Preference p = getPreferenceScreen().findPreference("GlobalOptions.StarfieldDetail");
         switch (opts.getStarfieldDetail()) {

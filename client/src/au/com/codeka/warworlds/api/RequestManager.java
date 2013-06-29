@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Stack;
+import java.util.TreeMap;
 
 import javax.net.SocketFactory;
 import javax.net.ssl.HostnameVerifier;
@@ -38,88 +39,59 @@ import org.apache.http.params.BasicHttpParams;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import android.content.Context;
+import au.com.codeka.warworlds.App;
 import au.com.codeka.warworlds.R;
+import au.com.codeka.warworlds.RealmContext;
+import au.com.codeka.warworlds.model.Realm;
 
 /**
  * Provides the low-level interface for making requests to the API.
  */
 public class RequestManager {
     final static Logger log = LoggerFactory.getLogger(RequestManager.class);
-    private static ConnectionPool sConnectionPool;
-    private static URI sBaseUri;
+    private static Map<Integer, ConnectionPool> sConnectionPools;
     private static List<ResponseReceivedHandler> sResponseReceivedHandlers =
             new ArrayList<ResponseReceivedHandler>();
     private static List<RequestManagerStateChangedHandler> sRequestManagerStateChangedHandlers =
             new ArrayList<RequestManagerStateChangedHandler>();
     private static String sImpersonateUser;
-    private static SSLContext mSslContext;
     private static boolean sVerboseLog = true;
 
-    public static void configure(Context context, URI baseUri) {
-        boolean ssl = false;
-        if (baseUri.getScheme().equalsIgnoreCase("https")) {
-            ssl = true;
-        } else if (!baseUri.getScheme().equalsIgnoreCase("http")) {
-            // should never happen
-            log.error("Invalid URI scheme \"{}\", assuming http.", baseUri.getScheme());
-        }
-
-        if (baseUri.getHost().equals("game.war-worlds.com")) {
-            setupRootCa(context);
-        } else {
-            mSslContext = null;
-        }
-
-        sConnectionPool = new ConnectionPool(ssl, baseUri.getHost(), baseUri.getPort());
-        sBaseUri = baseUri;
-
-        log.info("Configured to use base URI: {}", baseUri);
+    static {
+        sConnectionPools = new TreeMap<Integer, ConnectionPool>();
     }
 
-    /**
-     * Loads the Root CA from memory and uses that instead of the system-installed one. This is more
-     * secure (because it can't be spoofed if a CA is compromized). It's also compatible with more
-     * devices (since not all devices have the RapidSSL CA installed, it seems).
-     */
-    private static void setupRootCa(Context context) {
-        log.info("Setting up root certificate to our own custom CA");
-        try {
-            CertificateFactory cf = CertificateFactory.getInstance("X.509");
-            InputStream ins = context.getResources().openRawResource(R.raw.server_keystore);
-            Certificate ca;
-            try {
-                ca = cf.generateCertificate(ins);
-            } finally {
-                ins.close();
-            }
-
-            // Create a KeyStore containing our trusted CAs
-            String keyStoreType = KeyStore.getDefaultType();
-            KeyStore keyStore = KeyStore.getInstance(keyStoreType);
-            keyStore.load(null, null);
-            keyStore.setCertificateEntry("ca", ca);
-
-            // Create a TrustManager that trusts the CAs in our KeyStore
-            String tmfAlgorithm = TrustManagerFactory.getDefaultAlgorithm();
-            TrustManagerFactory tmf;
-            tmf = TrustManagerFactory.getInstance(tmfAlgorithm);
-            tmf.init(keyStore);
-
-            // Create an SSLContext that uses our TrustManager
-            mSslContext = SSLContext.getInstance("TLS");
-            mSslContext.init(null, tmf.getTrustManagers(), null);
-        } catch (Exception e) {
-            log.error("Error setting up SSLContext", e);
+    private static ConnectionPool getConnectionPool() {
+        Realm realm = RealmContext.i.getCurrentRealm();
+        if (realm == null) {
+            return null;
         }
+
+        synchronized (sConnectionPools) {
+            if (!sConnectionPools.containsKey(realm.getID())) {
+                ConnectionPool cp = configureConnectionPool(realm);
+                sConnectionPools.put(realm.getID(), cp);
+                return cp;
+            }
+        }
+        return sConnectionPools.get(realm.getID());
+    }
+
+    private static ConnectionPool configureConnectionPool(Realm realm) {
+        URI baseUrl = realm.getBaseUrl();
+        boolean ssl = false;
+        if (baseUrl.getScheme().equalsIgnoreCase("https")) {
+            ssl = true;
+        } else if (!baseUrl.getScheme().equalsIgnoreCase("http")) {
+            // should never happen
+            log.error("Invalid URI scheme \"{}\", assuming http.", baseUrl.getScheme());
+        }
+
+        return new ConnectionPool(ssl, baseUrl.getHost(), baseUrl.getPort());
     }
 
     public static void impersonate(String user) {
         sImpersonateUser = user;
-    }
-
-    public static URI getBaseUri() {
-        return sBaseUri;
     }
 
     /**
@@ -163,11 +135,13 @@ public class RequestManager {
             Map<String, List<String>> extraHeaders, HttpEntity body) throws ApiException {
         Connection conn = null;
 
-        if (sBaseUri == null) {
+        ConnectionPool cp = getConnectionPool();
+        Realm realm = RealmContext.i.getCurrentRealm();
+        if (cp == null || realm == null) {
             throw new ApiException("Not yet configured, cannot execute "+method+" "+url);
         }
 
-        URI uri = sBaseUri.resolve(url);
+        URI uri = realm.getBaseUrl().resolve(url);
         if (sVerboseLog) {
             log.debug("Requesting: {}", uri);
         }
@@ -176,10 +150,9 @@ public class RequestManager {
             try {
                 // Note: we only allow connections from the pool on the first attempt, if
                 // requests fail, we force creating a new connection
-                conn = sConnectionPool.getConnection(numAttempts > 0);
+                conn = cp.getConnection(numAttempts > 0);
 
-                RequestManagerState state = getCurrentState();
-                fireRequestManagerStateChangedHandlers(state);
+                fireRequestManagerStateChangedHandlers();
 
                 String requestUrl = uri.getPath();
                 if (uri.getQuery() != null && uri.getQuery() != "") {
@@ -246,7 +219,7 @@ public class RequestManager {
                     // one, it's probably no good anyway...
                     if (conn != null) {
                         conn.close();
-                        sConnectionPool.returnConnection(conn);
+                        cp.returnConnection(conn);
                     }
                 } else {
                     if (numAttempts >= 5) {
@@ -263,11 +236,12 @@ public class RequestManager {
 
     public static RequestManagerState getCurrentState() {
         RequestManagerState state = new RequestManagerState();
-        if (sConnectionPool == null) {
+        ConnectionPool cp = getConnectionPool();
+        if (cp == null) {
             return state;
         }
-        state.numInProgressRequests = sConnectionPool.getNumBusyConnections();
-        state.lastUri = sConnectionPool.getLastUri();
+        state.numInProgressRequests = cp.getNumBusyConnections();
+        state.lastUri = cp.getLastUri();
         return state;
     }
 
@@ -290,9 +264,9 @@ public class RequestManager {
         sRequestManagerStateChangedHandlers.remove(handler);
     }
 
-    private static void fireRequestManagerStateChangedHandlers(RequestManagerState state) {
+    private static void fireRequestManagerStateChangedHandlers() {
         for(RequestManagerStateChangedHandler handler : sRequestManagerStateChangedHandlers) {
-            handler.onStateChanged(state);
+            handler.onStateChanged();
         }
     }
 
@@ -336,7 +310,7 @@ public class RequestManager {
      * (e.g. a new request is made, a request completes, etc).
      */
     public interface RequestManagerStateChangedHandler {
-        void onStateChanged(RequestManagerState state);
+        void onStateChanged();
     }
 
     /**
@@ -363,10 +337,9 @@ public class RequestManager {
                 // ignore....
             }
 
-            sConnectionPool.returnConnection(mConnection);
+            mConnection.getConnectionPool().returnConnection(mConnection);
 
-            RequestManagerState state = getCurrentState();
-            fireRequestManagerStateChangedHandlers(state);
+            fireRequestManagerStateChangedHandlers();
         }
     }
 
@@ -377,8 +350,10 @@ public class RequestManager {
     private static class Connection {
         private HttpClientConnection mHttpClientConnection;
         private String mLastUri;
+        private ConnectionPool mConnectionPool;
 
-        public Connection(HttpClientConnection httpClientConnection) {
+        public Connection(ConnectionPool cp, HttpClientConnection httpClientConnection) {
+            mConnectionPool = cp;
             mHttpClientConnection = httpClientConnection;
             mLastUri = "";
         }
@@ -397,6 +372,10 @@ public class RequestManager {
             mHttpClientConnection.receiveResponseEntity(response);
 
             return response;
+        }
+
+        public ConnectionPool getConnectionPool() {
+            return mConnectionPool;
         }
 
         public HttpConnectionMetrics getMetrics() {
@@ -423,13 +402,14 @@ public class RequestManager {
      * A pool of connections to the server. So we don't have to reconnect over-and-over.
      */
     private static class ConnectionPool {
-        private final Logger log = LoggerFactory.getLogger(ConnectionPool.class);
+        private final static Logger log = LoggerFactory.getLogger(ConnectionPool.class);
         private Stack<Connection> mFreeConnections;
         private List<Connection> mBusyConnections;
         private SocketFactory mSocketFactory;
         private String mHost;
         private HostnameVerifier mHostnameVerifier;
         private int mPort;
+        private static SSLContext mSslContext;
 
         public ConnectionPool(boolean ssl, String host, int port) {
             mFreeConnections = new Stack<Connection>();
@@ -449,6 +429,10 @@ public class RequestManager {
             mPort = port;
             if (port <= 0) {
                 mPort = (ssl ? 443 : 80);
+            }
+
+            if (ssl) {
+                setupRootCa();
             }
         }
 
@@ -557,7 +541,44 @@ public class RequestManager {
                 log.debug(String.format("Connection [%s] to %s:%d created.",
                                         conn, s.getInetAddress().toString(), mPort));
             }
-            return new Connection(conn);
+            return new Connection(this, conn);
+        }
+
+        /**
+         * Loads the Root CA from memory and uses that instead of the system-installed one. This is more
+         * secure (because it can't be spoofed if a CA is compromized). It's also compatible with more
+         * devices (since not all devices have the RapidSSL CA installed, it seems).
+         */
+        private static void setupRootCa() {
+            log.info("Setting up root certificate to our own custom CA");
+            try {
+                CertificateFactory cf = CertificateFactory.getInstance("X.509");
+                InputStream ins = App.i.getResources().openRawResource(R.raw.server_keystore);
+                Certificate ca;
+                try {
+                    ca = cf.generateCertificate(ins);
+                } finally {
+                    ins.close();
+                }
+
+                // Create a KeyStore containing our trusted CAs
+                String keyStoreType = KeyStore.getDefaultType();
+                KeyStore keyStore = KeyStore.getInstance(keyStoreType);
+                keyStore.load(null, null);
+                keyStore.setCertificateEntry("ca", ca);
+
+                // Create a TrustManager that trusts the CAs in our KeyStore
+                String tmfAlgorithm = TrustManagerFactory.getDefaultAlgorithm();
+                TrustManagerFactory tmf;
+                tmf = TrustManagerFactory.getInstance(tmfAlgorithm);
+                tmf.init(keyStore);
+
+                // Create an SSLContext that uses our TrustManager
+                mSslContext = SSLContext.getInstance("TLS");
+                mSslContext.init(null, tmf.getTrustManagers(), null);
+            } catch (Exception e) {
+                log.error("Error setting up SSLContext", e);
+            }
         }
     }
 }

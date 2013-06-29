@@ -2,7 +2,6 @@ package au.com.codeka.warworlds.game.solarsystem;
 
 import java.util.Locale;
 
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -43,7 +42,6 @@ public class EnemyPlanetActivity extends BaseActivity
     private Planet mPlanet;
     private Colony mColony;
     private Empire mColonyEmpire;
-    private Context mContext = this;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -75,7 +73,7 @@ public class EnemyPlanetActivity extends BaseActivity
                     startActivity(new Intent(EnemyPlanetActivity.this, WarWorldsActivity.class));
                 } else {
                     String starKey = getIntent().getExtras().getString("au.com.codeka.warworlds.StarKey");
-                    StarManager.getInstance().requestStar(EnemyPlanetActivity.this, starKey, false, EnemyPlanetActivity.this);
+                    StarManager.getInstance().requestStar(starKey, false, EnemyPlanetActivity.this);
                     StarManager.getInstance().addStarUpdatedListener(starKey, EnemyPlanetActivity.this);
                 }
             }
@@ -96,10 +94,10 @@ public class EnemyPlanetActivity extends BaseActivity
 
         final Button attackBtn = (Button) findViewById(R.id.attack_btn);
         if (mColony != null) {
-            mColonyEmpire = EmpireManager.i.getEmpire(mContext, mColony.getEmpireKey());
+            mColonyEmpire = EmpireManager.i.getEmpire(mColony.getEmpireKey());
             if (mColonyEmpire == null) {
                 attackBtn.setEnabled(false);
-                EmpireManager.i.fetchEmpire(mContext, mColony.getEmpireKey(), new EmpireManager.EmpireFetchedHandler() {
+                EmpireManager.i.fetchEmpire(mColony.getEmpireKey(), new EmpireManager.EmpireFetchedHandler() {
                     @Override
                     public void onEmpireFetched(Empire empire) {
                         mColonyEmpire = empire;
@@ -158,7 +156,7 @@ public class EnemyPlanetActivity extends BaseActivity
         b.setPositiveButton("Attack!", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(final DialogInterface dialog, int which) {
-                myEmpire.attackColony(mContext, mStar, mColony,
+                myEmpire.attackColony(mStar, mColony,
                     new MyEmpire.AttackColonyCompleteHandler() {
                         @Override
                         public void onComplete() {

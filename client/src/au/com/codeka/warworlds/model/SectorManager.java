@@ -12,7 +12,6 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import android.content.Context;
 import android.support.v4.util.LruCache;
 import au.com.codeka.BackgroundRunner;
 import au.com.codeka.common.Pair;
@@ -59,9 +58,9 @@ public class SectorManager extends BaseManager {
         return mSectors.get(key);
     }
 
-    public StarfieldBackgroundRenderer getBackgroundRenderer(Context context, Sector s) {
+    public StarfieldBackgroundRenderer getBackgroundRenderer(Sector s) {
         Pair<Long, Long> coords = new Pair<Long, Long>(s.getX(), s.getY());
-        return mSectors.getBackgroundRenderer(context, coords);
+        return mSectors.getBackgroundRenderer(coords);
     }
 
     public Collection<Sector> getSectors() {
@@ -123,8 +122,8 @@ public class SectorManager extends BaseManager {
     /**
      * Fetches the details of a bunch of sectors from the server.
      */
-    public void requestSectors(final List<Pair<Long, Long>> coords, boolean force,
-                               final OnSectorsFetchedListener callback) {
+    public void requestSectors(final List<Pair<Long, Long>> coords,
+                               boolean force, final OnSectorsFetchedListener callback) {
         if (log.isDebugEnabled()) {
             String msg = "";
             for(Pair<Long, Long> coord : coords) {
@@ -260,7 +259,7 @@ public class SectorManager extends BaseManager {
             return String.format(Locale.ENGLISH, "%d:%d", coord.one, coord.two);
         }
 
-        public StarfieldBackgroundRenderer getBackgroundRenderer(Context context, Pair<Long, Long> coords) {
+        public StarfieldBackgroundRenderer getBackgroundRenderer(Pair<Long, Long> coords) {
             String key = key(coords);
             StarfieldBackgroundRenderer renderer = mBackgroundRenderers.get(key);
             if (renderer == null) {
@@ -272,7 +271,7 @@ public class SectorManager extends BaseManager {
                             seeds[n] = (coords.one + x) ^ (coords.two + y) + (coords.one + x);
                         }
                     }
-                    renderer = new StarfieldBackgroundRenderer(context, seeds);
+                    renderer = new StarfieldBackgroundRenderer(seeds);
                     mBackgroundRenderers.put(key, renderer);
                 }
             }

@@ -298,7 +298,7 @@ public class FleetList extends FrameLayout implements StarManager.StarFetchedHan
 
         if (fleet.getState() == Fleet.State.MOVING) {
             row3.setVisibility(View.GONE);
-            StarManager.getInstance().requestStarSummary(context, fleet.getDestinationStarKey(),
+            StarManager.getInstance().requestStarSummary(fleet.getDestinationStarKey(),
                     new StarManager.StarSummaryFetchedHandler() {
                         @Override
                         public void onStarSummaryFetched(StarSummary destStar) {
@@ -318,7 +318,7 @@ public class FleetList extends FrameLayout implements StarManager.StarFetchedHan
                                 String html = String.format("→ <img src=\"star\" width=\"16\" height=\"16\" /> %s <b>ETA:</b> %s",
                                                             destStar.getName(), eta);
                                 row3.setText(Html.fromHtml(html, 
-                                                           new FleetListImageGetter(context, destStar),
+                                                           new FleetListImageGetter(destStar),
                                                            null));
                             }
                             row3.setVisibility(View.VISIBLE);
@@ -329,7 +329,7 @@ public class FleetList extends FrameLayout implements StarManager.StarFetchedHan
             row3.setVisibility(View.GONE);
 
             final MyEmpire myEmpire = EmpireManager.i.getEmpire();
-            EmpireManager.i.fetchEmpire(context, fleet.getEmpireKey(),
+            EmpireManager.i.fetchEmpire(fleet.getEmpireKey(),
                     new EmpireManager.EmpireFetchedHandler() {
                 @Override
                 public void onEmpireFetched(Empire empire) {
@@ -349,18 +349,16 @@ public class FleetList extends FrameLayout implements StarManager.StarFetchedHan
      * Fetches the inline images we use to display star icons and whatnot.
      */
     private static class FleetListImageGetter implements Html.ImageGetter {
-        private Context mContext;
         private StarSummary mStarSummary;
 
-        public FleetListImageGetter(Context context, StarSummary starSummary) {
-            mContext = context;
+        public FleetListImageGetter(StarSummary starSummary) {
             mStarSummary = starSummary;
         }
 
         @Override
         public Drawable getDrawable(String source) {
             if (mStarSummary != null) {
-                Sprite sprite = StarImageManager.getInstance().getSprite(mContext, mStarSummary, -1, true);
+                Sprite sprite = StarImageManager.getInstance().getSprite(mStarSummary, -1, true);
                 Drawable d = new SpriteDrawable(sprite);
                 d.setBounds(0, 0, d.getIntrinsicWidth(), d.getIntrinsicHeight());
                 return d;
@@ -522,7 +520,7 @@ public class FleetList extends FrameLayout implements StarManager.StarFetchedHan
 
                 int imageSize = (int)(star.getSize() * star.getStarType().getImageScale() * 2);
                 if (entry.drawable == null) {
-                    Sprite sprite = StarImageManager.getInstance().getSprite(mContext, star, imageSize, true);
+                    Sprite sprite = StarImageManager.getInstance().getSprite(star, imageSize, true);
                     entry.drawable = new SpriteDrawable(sprite);
                 }
                 if (entry.drawable != null) {

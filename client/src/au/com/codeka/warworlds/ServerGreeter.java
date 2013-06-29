@@ -95,7 +95,7 @@ public class ServerGreeter {
         log.debug("Saying 'hello'...");
         Util.setup(activity);
 
-        Util.loadProperties(activity);
+        Util.loadProperties();
         if (Util.isDebug()) {
             enableStrictMode();
         }
@@ -110,11 +110,11 @@ public class ServerGreeter {
         if (memoryClass < 40) {
             // on low memory devices, we want to make sure the background detail is always BLACK
             // this is a bit of a hack, but should stop the worst of the memory issues (I hope!)
-            new GlobalOptions(activity).setStarfieldDetail(GlobalOptions.StarfieldDetail.BLACK);
+            new GlobalOptions().setStarfieldDetail(GlobalOptions.StarfieldDetail.BLACK);
         }
 
         // if we've saved off the authentication cookie, cool!
-        SharedPreferences prefs = Util.getSharedPreferences(activity);
+        SharedPreferences prefs = Util.getSharedPreferences();
         final String accountName = prefs.getString("AccountName", null);
         if (accountName == null) {
             fireHelloComplete(false);
@@ -146,9 +146,9 @@ public class ServerGreeter {
                 // Schedule registration with GCM, which will update our device
                 // when we get the registration ID
                 GCMIntentService.register(activity);
-                String deviceRegistrationKey = DeviceRegistrar.getDeviceRegistrationKey(activity);
+                String deviceRegistrationKey = DeviceRegistrar.getDeviceRegistrationKey();
                 if (deviceRegistrationKey == null || deviceRegistrationKey.length() == 0) {
-                    deviceRegistrationKey = DeviceRegistrar.register(activity);
+                    deviceRegistrationKey = DeviceRegistrar.register();
                 }
 
                 // say hello to the server
@@ -250,7 +250,7 @@ public class ServerGreeter {
                     if (mNeedsReAuthenticate) {
                         // if we need to re-authenticate, first forget the current credentials
                         // the switch to the AccountsActivity.
-                        final SharedPreferences prefs = Util.getSharedPreferences(activity);
+                        final SharedPreferences prefs = Util.getSharedPreferences();
                         SharedPreferences.Editor editor = prefs.edit();
                         editor.remove("AccountName");
                         editor.commit();

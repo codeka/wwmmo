@@ -12,7 +12,6 @@ import android.os.Handler;
 import au.com.codeka.BackgroundRunner;
 import au.com.codeka.warworlds.api.ApiClient;
 import au.com.codeka.warworlds.api.ApiException;
-import au.com.codeka.warworlds.api.RequestManager;
 import au.com.codeka.common.protobuf.Messages;
 
 /**
@@ -78,7 +77,7 @@ public class BackgroundDetector {
     }
 
     public void onBackgroundStatusChange(final BaseActivity activity) {
-        if (!Util.isSetup() || RequestManager.getBaseUri() == null) {
+        if (!Util.isSetup() || RealmContext.i.getCurrentRealm() == null) {
             return;
         }
 
@@ -87,7 +86,7 @@ public class BackgroundDetector {
                                            .setIsOnline(!mIsInBackground)
                                            .build();
 
-        final String deviceRegistrationKey = DeviceRegistrar.getDeviceRegistrationKey(activity);
+        final String deviceRegistrationKey = DeviceRegistrar.getDeviceRegistrationKey();
         if (deviceRegistrationKey == null || deviceRegistrationKey.length() == 0) {
             return;
         }

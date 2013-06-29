@@ -34,7 +34,6 @@ import au.com.codeka.warworlds.model.MyEmpire;
 public class AllianceDetailsActivity extends BaseActivity
                                      implements AllianceManager.AllianceUpdatedHandler,
                                                 EmpireManager.EmpireFetchedHandler {
-    private Context mContext = this;
     private Handler mHandler;
     private boolean mRefreshPosted;
     private String mAllianceKey;
@@ -150,7 +149,7 @@ public class AllianceDetailsActivity extends BaseActivity
             ArrayList<Empire> members = new ArrayList<Empire>();
             ArrayList<String> missingMembers = new ArrayList<String>();
             for (BaseAllianceMember am : mAlliance.getMembers()) {
-                Empire member = EmpireManager.i.getEmpire(this, am.getEmpireKey());
+                Empire member = EmpireManager.i.getEmpire(am.getEmpireKey());
                 if (member == null) {
                     missingMembers.add(am.getEmpireKey());
                 } else {
@@ -162,7 +161,7 @@ public class AllianceDetailsActivity extends BaseActivity
             populateEmpireList(membersList, members);
 
             if (missingMembers.size() > 0) {
-                EmpireManager.i.refreshEmpires(mContext, missingMembers, new EmpireManager.EmpireFetchedHandler() {
+                EmpireManager.i.refreshEmpires(missingMembers, new EmpireManager.EmpireFetchedHandler() {
                     @Override
                     public void onEmpireFetched(Empire empire) {
                         if (mRefreshPosted) {

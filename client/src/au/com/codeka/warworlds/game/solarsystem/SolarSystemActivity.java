@@ -167,8 +167,7 @@ public class SolarSystemActivity extends BaseActivity implements StarManager.Sta
                 Bundle extras = getIntent().getExtras();
                 String starKey = extras.getString("au.com.codeka.warworlds.StarKey");
 
-                StarManager.getInstance().requestStar(SolarSystemActivity.this, starKey, true,
-                                                      SolarSystemActivity.this);
+                StarManager.getInstance().requestStar(starKey, true, SolarSystemActivity.this);
                 StarManager.getInstance().addStarUpdatedListener(starKey, SolarSystemActivity.this);
             }
         });
@@ -413,7 +412,7 @@ public class SolarSystemActivity extends BaseActivity implements StarManager.Sta
             colonyDetailsContainer.setVisibility(View.GONE);
             enemyColonyDetailsContainer.setVisibility(View.GONE);
 
-            EmpireManager.i.fetchEmpire(mContext, mColony.getEmpireKey(),
+            EmpireManager.i.fetchEmpire(mColony.getEmpireKey(),
                 new EmpireManager.EmpireFetchedHandler() {
                     @Override
                     public void onEmpireFetched(Empire empire) {

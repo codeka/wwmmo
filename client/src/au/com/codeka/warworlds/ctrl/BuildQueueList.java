@@ -151,7 +151,7 @@ public class BuildQueueList extends FrameLayout
             }
         }
 
-        StarManager.getInstance().requestStarSummaries(mContext, starKeys, new StarManager.StarSummariesFetchedHandler() {
+        StarManager.getInstance().requestStarSummaries(starKeys, new StarManager.StarSummariesFetchedHandler() {
             @Override
             public void onStarSummariesFetched(Collection<StarSummary> stars) {
                 TreeMap<String, StarSummary> summaries = new TreeMap<String, StarSummary>();
@@ -463,7 +463,7 @@ public class BuildQueueList extends FrameLayout
 
                 int imageSize = (int)(entry.star.getSize() * entry.star.getStarType().getImageScale() * 2);
                 if (entry.starDrawable == null) {
-                    Sprite sprite = StarImageManager.getInstance().getSprite(mContext, entry.star, imageSize, true);
+                    Sprite sprite = StarImageManager.getInstance().getSprite(entry.star, imageSize, true);
                     entry.starDrawable = new SpriteDrawable(sprite);
                 }
                 if (entry.starDrawable != null) {
@@ -471,7 +471,7 @@ public class BuildQueueList extends FrameLayout
                 }
 
                 if (entry.planetDrawable == null) {
-                    Sprite sprite = PlanetImageManager.getInstance().getSprite(mContext, entry.planet);
+                    Sprite sprite = PlanetImageManager.getInstance().getSprite(entry.planet);
                     entry.planetDrawable = new SpriteDrawable(sprite);
                 }
                 if (entry.planetDrawable != null) {

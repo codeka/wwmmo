@@ -10,6 +10,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import au.com.codeka.warworlds.App;
 import au.com.codeka.warworlds.Util;
 import au.com.codeka.warworlds.model.billing.IabException;
 import au.com.codeka.warworlds.model.billing.IabHelper;
@@ -46,11 +47,11 @@ public class PurchaseManager {
     private IabResult mSetupResult;
     private Inventory mInventory;
 
-    public void setup(final Context context) {
+    public void setup() {
         // try to load the inventory from SharedPreferences first, so that we don't have to wait
         // on the play store...
         try {
-            SharedPreferences prefs = Util.getSharedPreferences(context);
+            SharedPreferences prefs = Util.getSharedPreferences();
             String json = prefs.getString("au.com.codeka.warworlds.PurchaseInventory", null);
             if (json != null) {
                 mInventory = Inventory.fromJson(json);
@@ -59,7 +60,7 @@ public class PurchaseManager {
             // ignore... for now
         }
 
-        mHelper = new IabHelper(context, sPublicKey);
+        mHelper = new IabHelper(App.i, sPublicKey);
         mHelper.enableDebugLogging(true, "In-AppBilling");
         mHelper.startSetup(new IabHelper.OnIabSetupFinishedListener() {
             @Override
@@ -73,7 +74,7 @@ public class PurchaseManager {
                                 mInventory = inv;
 
                                 try {
-                                    SharedPreferences prefs = Util.getSharedPreferences(context);
+                                    SharedPreferences prefs = Util.getSharedPreferences();
                                     prefs.edit().putString("au.com.codeka.warworlds.PurchaseInventory", inv.toJson())
                                          .commit();
                                 } catch (JSONException e) {

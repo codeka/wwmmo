@@ -3,7 +3,6 @@ package au.com.codeka.warworlds.api;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Method;
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -21,8 +20,6 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
-import android.content.Context;
-
 import com.google.protobuf.Message;
 
 /**
@@ -38,18 +35,13 @@ public class ApiClient {
      * 
      * @param baseUri The base URI that all APIs calls are made against.
      */
-    public static void configure(Context context, URI baseUri) {
-        log.info("Resetting cookies... configuring baseUri: "+baseUri);
+    public static void reset() {
+        log.info("Resetting cookies...");
         sCookies = new ArrayList<String>();
-        RequestManager.configure(context, baseUri);
     }
 
     public static void impersonate(String user) {
         RequestManager.impersonate(user);
-    }
-
-    public static URI getBaseUri() {
-        return RequestManager.getBaseUri();
     }
 
     /**

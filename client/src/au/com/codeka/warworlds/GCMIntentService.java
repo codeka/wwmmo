@@ -1,4 +1,3 @@
-
 package au.com.codeka.warworlds;
 
 import java.io.IOException;
@@ -26,7 +25,7 @@ import com.google.android.gcm.GCMRegistrar;
 import com.google.protobuf.InvalidProtocolBufferException;
 
 /**
- * Receive a push message from the Cloud to Device Messaging (C2DM) service.
+ * Receive a push message from the Google Cloud Messaging.
  */
 public class GCMIntentService extends GCMBaseIntentService {
     private static Logger log = LoggerFactory.getLogger(GCMIntentService.class);
@@ -77,7 +76,7 @@ public class GCMIntentService extends GCMBaseIntentService {
     @Override
     public void onUnregistered(Context context, String deviceRegistrationID) {
         log.info("Unregistered from GCM, deviceRegistrationID = "+deviceRegistrationID);
-        DeviceRegistrar.unregister(context);
+        DeviceRegistrar.unregister();
     }
 
     /**
@@ -104,7 +103,7 @@ public class GCMIntentService extends GCMBaseIntentService {
     public void onMessage(Context context, Intent intent) {
         // since this can be called when the application is not running, make sure we're
         // set to go still.
-        Util.loadProperties(context);
+        Util.loadProperties();
         Util.setup(context);
 
         log.debug("GCM message received.");
@@ -126,10 +125,7 @@ public class GCMIntentService extends GCMBaseIntentService {
 
                 // refresh the star this situation report is for, obviously
                 // something happened that we'll want to know about
-                Star star = StarManager.getInstance().refreshStarSync(
-                            context,
-                            pb.getStarKey(),
-                            true);
+                Star star = StarManager.getInstance().refreshStarSync(pb.getStarKey(), true);
                 if (star == null) { // <-- only refresh the star if we have one cached
                     // if we didn't refresh the star, then at least refresh
                     // the sector it was in (could have been a moving
@@ -168,9 +164,9 @@ public class GCMIntentService extends GCMBaseIntentService {
                     return;
                 }
 
-                ChatManager.getInstance().addMessage(context, msg);
+                ChatManager.getInstance().addMessage(msg);
             } else if (extras.containsKey("empire_updated")) {
-                EmpireManager.i.refreshEmpire(this);
+                EmpireManager.i.refreshEmpire();
             }
         }
     }

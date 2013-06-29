@@ -95,7 +95,7 @@ public class BuildActivity extends BaseActivity implements StarManager.StarFetch
                 } catch (InvalidProtocolBufferException e) {
                 }
 
-                StarManager.getInstance().requestStar(BuildActivity.this, starKey, false, BuildActivity.this);
+                StarManager.getInstance().requestStar(starKey, false, BuildActivity.this);
                 StarManager.getInstance().addStarUpdatedListener(starKey, BuildActivity.this);
             }
         });
@@ -152,7 +152,7 @@ public class BuildActivity extends BaseActivity implements StarManager.StarFetch
     private void refreshColonyDetails(Colony colony) {
         ImageView planetIcon = (ImageView) findViewById(R.id.planet_icon);
         Planet planet = (Planet) mStar.getPlanets()[colony.getPlanetIndex() - 1];
-        Sprite planetSprite = PlanetImageManager.getInstance().getSprite(this, planet);
+        Sprite planetSprite = PlanetImageManager.getInstance().getSprite(planet);
         planetIcon.setImageDrawable(new SpriteDrawable(planetSprite));
 
         TextView planetName = (TextView) findViewById(R.id.planet_name);

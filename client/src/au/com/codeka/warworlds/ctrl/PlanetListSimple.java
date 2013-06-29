@@ -86,7 +86,7 @@ public class PlanetListSimple extends LinearLayout {
         final ImageView icon = (ImageView) view.findViewById(R.id.starfield_planet_icon);
         final PlanetImageManager pim = PlanetImageManager.getInstance();
 
-        Sprite sprite = pim.getSprite(mContext, planet);
+        Sprite sprite = pim.getSprite(planet);
         icon.setImageDrawable(new SpriteDrawable(sprite));
 
         TextView planetTypeTextView = (TextView) view.findViewById(R.id.starfield_planet_type);
@@ -103,7 +103,7 @@ public class PlanetListSimple extends LinearLayout {
         final TextView colonyTextView = (TextView) view.findViewById(R.id.starfield_planet_colony);
         if (colony != null) {
             colonyTextView.setText("Colonized");
-            EmpireManager.i.fetchEmpire(mContext, colony.getEmpireKey(), new EmpireManager.EmpireFetchedHandler() {
+            EmpireManager.i.fetchEmpire(colony.getEmpireKey(), new EmpireManager.EmpireFetchedHandler() {
                 @Override
                 public void onEmpireFetched(Empire empire) {
                     colonyTextView.setText(empire.getDisplayName());

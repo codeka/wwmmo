@@ -38,7 +38,7 @@ public class DebugView extends FrameLayout
             mHandler = new Handler();
 
             RequestManager.addRequestManagerStateChangedHandler(this);
-            onStateChanged(RequestManager.getCurrentState());
+            onStateChanged();
         }
     }
 
@@ -50,13 +50,14 @@ public class DebugView extends FrameLayout
     }
 
     @Override
-    public void onStateChanged(final RequestManagerState state) {
+    public void onStateChanged() {
         // this is not called on the UI, so we have to send a request to the
         // UI thread to update the UI
         mHandler.post(new Runnable() {
             @Override
             public void run() {
                 TextView connectionInfo = (TextView) mView.findViewById(R.id.connection_info);
+                RequestManagerState state = RequestManager.getCurrentState();
                 if (state.numInProgressRequests > 0) {
                     String str = String.format(Locale.ENGLISH, "Conn: %d %s",
                                                state.numInProgressRequests,

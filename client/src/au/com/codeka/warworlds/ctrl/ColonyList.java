@@ -166,7 +166,7 @@ public class ColonyList extends FrameLayout {
         TextView colonySummary = (TextView) view.findViewById(R.id.colony_summary);
         TextView uncollectedTaxes = (TextView) view.findViewById(R.id.colony_taxes);
 
-        Sprite sprite = PlanetImageManager.getInstance().getSprite(context, planet);
+        Sprite sprite = PlanetImageManager.getInstance().getSprite(planet);
         planetIcon.setImageDrawable(new SpriteDrawable(sprite));
 
         colonyName.setText(String.format("%s %s", star.getName(), RomanNumeralFormatter.format(planet.getIndex())));
@@ -192,7 +192,7 @@ public class ColonyList extends FrameLayout {
         TextView starMineralsTotal = (TextView) view.findViewById(R.id.star_minerals_total);
 
         int imageSize = (int)(star.getSize() * star.getStarType().getImageScale() * 2);
-        Sprite sprite = StarImageManager.getInstance().getSprite(context, star, imageSize, true);
+        Sprite sprite = StarImageManager.getInstance().getSprite(star, imageSize, true);
         starIcon.setImageDrawable(new SpriteDrawable(sprite));
 
         starName.setText(star.getName());

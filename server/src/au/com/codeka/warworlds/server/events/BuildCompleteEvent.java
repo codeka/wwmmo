@@ -17,6 +17,7 @@ import au.com.codeka.warworlds.server.ctrl.BuildingController;
 import au.com.codeka.warworlds.server.ctrl.ColonyController;
 import au.com.codeka.warworlds.server.ctrl.EmpireController;
 import au.com.codeka.warworlds.server.ctrl.FleetController;
+import au.com.codeka.warworlds.server.ctrl.RealmController;
 import au.com.codeka.warworlds.server.ctrl.SituationReportController;
 import au.com.codeka.warworlds.server.ctrl.StarController;
 import au.com.codeka.warworlds.server.data.DB;
@@ -116,6 +117,7 @@ public class BuildCompleteEvent extends Event {
         new StarController().update(star);
 
         Messages.SituationReport.Builder sitrep_pb = Messages.SituationReport.newBuilder();
+        sitrep_pb.setRealm(new RealmController().getRealmName());
         sitrep_pb.setEmpireKey(Integer.toString(empireID));
         sitrep_pb.setReportTime(DateTime.now().getMillis() / 1000);
         sitrep_pb.setStarKey(star.getKey());

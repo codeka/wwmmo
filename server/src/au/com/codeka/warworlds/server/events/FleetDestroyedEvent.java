@@ -11,6 +11,7 @@ import au.com.codeka.common.model.BaseFleet;
 import au.com.codeka.common.model.Simulation;
 import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.server.Event;
+import au.com.codeka.warworlds.server.ctrl.RealmController;
 import au.com.codeka.warworlds.server.ctrl.SituationReportController;
 import au.com.codeka.warworlds.server.ctrl.StarController;
 import au.com.codeka.warworlds.server.data.DB;
@@ -71,6 +72,7 @@ public class FleetDestroyedEvent extends Event {
         if (fleetWasDestroyed && fleet.getEmpireKey() != null) {
             // send a notification that this fleet was destroyed
             Messages.SituationReport.Builder sitrep_pb = Messages.SituationReport.newBuilder();
+            sitrep_pb.setRealm(new RealmController().getRealmName());
             sitrep_pb.setEmpireKey(fleet.getEmpireKey());
             sitrep_pb.setReportTime(DateTime.now().getMillis() / 1000);
             sitrep_pb.setStarKey(star.getKey());
@@ -114,6 +116,7 @@ public class FleetDestroyedEvent extends Event {
                     // if there's only one other empire, and only one fleet from the empire
                     // that was just destroyed, it means the other empire was victorious!
                     Messages.SituationReport.Builder sitrep_pb = Messages.SituationReport.newBuilder();
+                    sitrep_pb.setRealm(new RealmController().getRealmName());
                     sitrep_pb.setEmpireKey(victoriousFleetSummary.getEmpireKey());
                     sitrep_pb.setReportTime(DateTime.now().getMillis() / 1000);
                     sitrep_pb.setStarKey(star.getKey());

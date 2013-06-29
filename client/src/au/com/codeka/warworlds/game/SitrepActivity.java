@@ -137,11 +137,11 @@ public class SitrepActivity extends BaseActivity {
                 empireIcon.setImageBitmap(empire.getShield(this));
             }
         } else {
-            StarManager.getInstance().requestStarSummary(mContext, mStarKey, new StarManager.StarSummaryFetchedHandler() {
+            StarManager.getInstance().requestStarSummary(mStarKey, new StarManager.StarSummaryFetchedHandler() {
                 @Override
                 public void onStarSummaryFetched(StarSummary s) {
                     empireName.setText(s.getName());
-                    Sprite starSprite = StarImageManager.getInstance().getSprite(mContext, s, empireIcon.getWidth(), true);
+                    Sprite starSprite = StarImageManager.getInstance().getSprite(s, empireIcon.getWidth(), true);
                     empireIcon.setImageDrawable(new SpriteDrawable(starSprite));
                 }
             });
@@ -225,7 +225,7 @@ public class SitrepActivity extends BaseActivity {
                     // for.
                     for (String starKey : missingStarSummaries) {
                         StarSummary starSummary = StarManager.getInstance()
-                                .requestStarSummarySync(mContext, starKey,
+                                .requestStarSummarySync(starKey,
                                         Float.MAX_VALUE // always prefer a cached version, no matter how old
                                     );
                         mStarSummaries.put(starKey, starSummary);
@@ -381,8 +381,7 @@ public class SitrepActivity extends BaseActivity {
             ImageView overlayIcon = (ImageView) view.findViewById(R.id.overlay_icon);
 
             int imageSize = (int)(starSummary.getSize() * starSummary.getStarType().getImageScale() * 2);
-            Sprite starSprite = StarImageManager.getInstance().getSprite(
-                    SitrepActivity.this, starSummary, imageSize, true);
+            Sprite starSprite = StarImageManager.getInstance().getSprite(starSummary, imageSize, true);
             starIcon.setImageDrawable(new SpriteDrawable(starSprite));
 
             reportTime.setText(TimeInHours.format(sitrep.getReportTime()));

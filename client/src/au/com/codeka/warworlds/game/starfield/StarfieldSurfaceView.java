@@ -433,8 +433,7 @@ public class StarfieldSurfaceView extends SectorView
                 int sx = (int)((x * Sector.SECTOR_SIZE) + mOffsetX);
                 int sy = (int)((y * Sector.SECTOR_SIZE) + mOffsetY);
 
-                StarfieldBackgroundRenderer bgRenderer = SectorManager.getInstance().getBackgroundRenderer(
-                        mContext, sector);
+                StarfieldBackgroundRenderer bgRenderer = SectorManager.getInstance().getBackgroundRenderer(sector);
                 bgRenderer.drawBackground(canvas, sx, sy,
                         sx+Sector.SECTOR_SIZE, sy+Sector.SECTOR_SIZE);
             }
@@ -509,7 +508,7 @@ public class StarfieldSurfaceView extends SectorView
 
             float imageScale = (float) star.getStarType().getImageScale();
             int imageSize = (int)(star.getSize() * imageScale * 2);
-            Sprite sprite = StarImageManager.getInstance().getSprite(mContext, star, imageSize, true);
+            Sprite sprite = StarImageManager.getInstance().getSprite(star, imageSize, true);
             mMatrix.reset();
             mMatrix.postTranslate(-(sprite.getWidth() / 2.0f), -(sprite.getHeight() / 2.0f));
             mMatrix.postScale(40.0f * imageScale * pixelScale / sprite.getWidth(),
@@ -566,7 +565,7 @@ public class StarfieldSurfaceView extends SectorView
 
         Empire emp = mVisibleEmpires.get(empireKey);
         if (emp == null) {
-            EmpireManager.i.fetchEmpire(mContext, empireKey, new EmpireManager.EmpireFetchedHandler() {
+            EmpireManager.i.fetchEmpire(empireKey, new EmpireManager.EmpireFetchedHandler() {
                 @Override
                 public void onEmpireFetched(Empire empire) {
                     mVisibleEmpires.put(empire.getKey(), empire);

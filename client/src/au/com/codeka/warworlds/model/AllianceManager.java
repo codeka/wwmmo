@@ -6,12 +6,11 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-import android.content.Context;
 import au.com.codeka.BackgroundRunner;
-import au.com.codeka.warworlds.api.ApiClient;
-import au.com.codeka.warworlds.api.ApiException;
 import au.com.codeka.common.model.BaseAlliance;
 import au.com.codeka.common.protobuf.Messages;
+import au.com.codeka.warworlds.api.ApiClient;
+import au.com.codeka.warworlds.api.ApiException;
 
 public class AllianceManager {
     public static AllianceManager i = new AllianceManager();
@@ -96,8 +95,7 @@ public class AllianceManager {
         }.execute();
     }
 
-    public void fetchJoinRequests(final Context context,
-                                  final String allianceKey,
+    public void fetchJoinRequests(final String allianceKey,
                                   final FetchJoinRequestsCompleteHandler handler) {
         new BackgroundRunner<List<AllianceJoinRequest>>() {
             private TreeMap<String, Empire> mEmpires;
@@ -118,7 +116,7 @@ public class AllianceManager {
                         }
                     }
 
-                    List<Empire> empires = EmpireManager.i.fetchEmpiresSync(context, empireKeys);
+                    List<Empire> empires = EmpireManager.i.fetchEmpiresSync(empireKeys);
                     mEmpires = new TreeMap<String, Empire>();
                     for (Empire empire : empires) {
                         mEmpires.put(empire.getKey(), empire);
@@ -200,7 +198,7 @@ public class AllianceManager {
         }.execute();
     }
 
-    public void leaveAlliance(final Context context) {
+    public void leaveAlliance() {
         final MyEmpire myEmpire = EmpireManager.i.getEmpire();
         if (myEmpire == null) {
             return;
@@ -230,7 +228,7 @@ public class AllianceManager {
             @Override
             protected void onComplete(Boolean success) {
                 if (success) {
-                    EmpireManager.i.refreshEmpire(context);
+                    EmpireManager.i.refreshEmpire();
                     refreshAlliance(myAlliance.getKey());
                 }
             }

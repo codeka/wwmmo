@@ -337,8 +337,7 @@ public class StarfieldActivity extends BaseActivity
         }
 
         if (starKey != null) {
-            StarManager.getInstance().requestStarSummary(StarfieldActivity.this, starKey,
-                    new StarManager.StarSummaryFetchedHandler() {
+            StarManager.getInstance().requestStarSummary(starKey, new StarManager.StarSummaryFetchedHandler() {
                 @Override
                 public void onStarSummaryFetched(StarSummary s) {
                     mStarfield.scrollTo(s.getSectorX(), s.getSectorY(),
@@ -402,7 +401,7 @@ public class StarfieldActivity extends BaseActivity
     public void navigateToFleet(final String starKey, final String fleetKey) {
         Star star = SectorManager.getInstance().findStar(starKey);
         if (star == null) {
-            StarManager.getInstance().requestStar(mContext, starKey, false,
+            StarManager.getInstance().requestStar(starKey, false,
                 new StarManager.StarFetchedHandler() {
                     @Override
                     public void onStarFetched(Star s) {
@@ -570,7 +569,7 @@ public class StarfieldActivity extends BaseActivity
         mFetchingFleetKey = null;
         mSelectedFleet = null;
 
-        StarManager.getInstance().requestStar(mContext, star.getKey(), true, this);
+        StarManager.getInstance().requestStar(star.getKey(), true, this);
     }
 
     @Override
@@ -626,7 +625,7 @@ public class StarfieldActivity extends BaseActivity
 
         starName.setText(mSelectedStar.getName());
         starKind.setText(mSelectedStar.getStarType().getDisplayName());
-        Sprite starImage = StarImageManager.getInstance().getSprite(mContext, mSelectedStar, 80, true);
+        Sprite starImage = StarImageManager.getInstance().getSprite(mSelectedStar, 80, true);
         starIcon.setImageDrawable(new SpriteDrawable(starImage));
     }
 
@@ -649,7 +648,7 @@ public class StarfieldActivity extends BaseActivity
         mSelectedFleet = fleet;
 
         ShipDesign design = (ShipDesign) DesignManager.i.getDesign(DesignKind.SHIP, fleet.getDesignID());
-        EmpireManager.i.fetchEmpire(mContext, fleet.getEmpireKey(), new EmpireManager.EmpireFetchedHandler() {
+        EmpireManager.i.fetchEmpire(fleet.getEmpireKey(), new EmpireManager.EmpireFetchedHandler() {
             @Override
             public void onEmpireFetched(Empire empire) {
                 if (mFetchingFleetKey == null ||

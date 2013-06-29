@@ -123,7 +123,7 @@ public class ChatActivity extends BaseActivity {
             mChatLocation = ChatMessage.Location.fromNumber(args.getInt("au.com.codeka.warworlds.ChatLocation"));
             mHandler = new Handler();
 
-            mAutoTranslate = new GlobalOptions(getActivity()).autoTranslateChatMessages();
+            mAutoTranslate = new GlobalOptions().autoTranslateChatMessages();
         }
 
         @Override
@@ -234,11 +234,11 @@ public class ChatActivity extends BaseActivity {
         }
 
         // if this is our first chat after the update ...
-        if (!Util.getSharedPreferences(this).getBoolean("au.com.codeka.warworlds.ChatAskedAboutTranslation", false)) {
+        if (!Util.getSharedPreferences().getBoolean("au.com.codeka.warworlds.ChatAskedAboutTranslation", false)) {
             // ... and this message is all in English ...
             if (isEnglish(message)) {
                 // ... and they haven't already set the 'auto-translate' setting ...
-                if (!new GlobalOptions(this).autoTranslateChatMessages()) {
+                if (!new GlobalOptions().autoTranslateChatMessages()) {
                     // ... then ask whether they want to enable auto-translate
                     showConfirmAutoTranslateDialog();
                 }
@@ -247,11 +247,11 @@ public class ChatActivity extends BaseActivity {
 
         chatMsg.setText("");
 
-        ChatManager.getInstance().postMessage(this, msg);
+        ChatManager.getInstance().postMessage(msg);
     }
 
     private void showConfirmAutoTranslateDialog() {
-        Util.getSharedPreferences(this).edit()
+        Util.getSharedPreferences().edit()
             .putBoolean("au.com.codeka.warworlds.ChatAskedAboutTranslation", true)
             .commit();
 
@@ -261,7 +261,7 @@ public class ChatActivity extends BaseActivity {
             .setPositiveButton("Enable", true, new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
-                    new GlobalOptions(ChatActivity.this).autoTranslateChatMessages(true);
+                    new GlobalOptions().autoTranslateChatMessages(true);
                 }
             })
             .setNegativeButton("Don't Enable", null)

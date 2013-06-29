@@ -69,8 +69,7 @@ public class FleetActivity extends BaseActivity implements StarManager.StarFetch
 
             @Override
             public void onFleetStanceModified(Star star, Fleet fleet, Fleet.Stance newStance) {
-                EmpireManager.i.getEmpire().updateFleetStance(
-                        FleetActivity.this, star, fleet, newStance);
+                EmpireManager.i.getEmpire().updateFleetStance(star, fleet, newStance);
             }
         });
 
@@ -89,7 +88,7 @@ public class FleetActivity extends BaseActivity implements StarManager.StarFetch
                     startActivity(new Intent(FleetActivity.this, WarWorldsActivity.class));
                 } else {
                     String starKey = getIntent().getExtras().getString("au.com.codeka.warworlds.StarKey");
-                    StarManager.getInstance().requestStar(FleetActivity.this, starKey, false, FleetActivity.this);
+                    StarManager.getInstance().requestStar(starKey, false, FleetActivity.this);
                     StarManager.getInstance().addStarUpdatedListener(starKey, FleetActivity.this);
                 }
             }

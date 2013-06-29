@@ -54,7 +54,7 @@ public class WarWorldsActivity extends BaseActivity {
 
         realmSelectButton.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
-                RealmManager.i.selectRealm(mContext, null);
+                RealmManager.i.selectRealm(null);
                 startActivity(new Intent(mContext, RealmSelectActivity.class));
             }
         });
@@ -79,7 +79,7 @@ public class WarWorldsActivity extends BaseActivity {
         super.onResume();
         log.debug("WarWorldsActivity.onResume...");
 
-        SharedPreferences prefs = Util.getSharedPreferences(mContext);
+        SharedPreferences prefs = Util.getSharedPreferences();
         if (prefs.getBoolean("WarmWelcome",  false) == false) {
             // if we've never done the warm-welcome, do it now
             log.info("Starting Warm Welcome");
@@ -93,7 +93,7 @@ public class WarWorldsActivity extends BaseActivity {
             return;
         }
 
-        if (RealmManager.i.getRealm() == null) {
+        if (RealmContext.i.getCurrentRealm() == null) {
             log.info("Not realm selected, switching to RealmSelectActivity");
             startActivity(new Intent(this, RealmSelectActivity.class));
             return;
@@ -101,7 +101,7 @@ public class WarWorldsActivity extends BaseActivity {
 
         mStartGameButton.setEnabled(false);
         mConnectionStatus.setText("Connecting...");
-        mRealmName.setText(String.format(Locale.ENGLISH, "Realm: %s", RealmManager.i.getRealm().getDisplayName()));
+        mRealmName.setText(String.format(Locale.ENGLISH, "Realm: %s", RealmContext.i.getCurrentRealm().getDisplayName()));
 
         mHelloWatcher = new HelloWatcher();
         ServerGreeter.addHelloWatcher(mHelloWatcher);

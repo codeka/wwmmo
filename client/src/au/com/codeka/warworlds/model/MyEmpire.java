@@ -7,10 +7,8 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import android.content.Context;
 import au.com.codeka.BackgroundRunner;
 import au.com.codeka.common.protobuf.Messages;
-import au.com.codeka.warworlds.StyledDialog;
 import au.com.codeka.warworlds.api.ApiClient;
 import au.com.codeka.warworlds.api.ApiException;
 
@@ -35,8 +33,7 @@ public class MyEmpire extends Empire {
      * Colonizes the given planet. We'll call the given \c ColonizeCompleteHandler when the
      * operation completes (successfully or not).
      */
-    public void colonize(final Context context, final Planet planet,
-                         final ColonizeCompleteHandler callback) {
+    public void colonize(final Planet planet, final ColonizeCompleteHandler callback) {
         log.debug(String.format("Colonizing: Star=%s Planet=%d",
                                 planet.getStar().getKey(),
                                 planet.getIndex()));
@@ -54,7 +51,8 @@ public class MyEmpire extends Empire {
                             .build();
 
                     String url = String.format("stars/%s/colonies", planet.getStar().getKey());
-                    Messages.Colony pb = ApiClient.postProtoBuf(url, request, Messages.Colony.class);
+                    Messages.Colony pb = ApiClient.postProtoBuf(url, request,
+                            Messages.Colony.class);
                     if (pb == null)
                         return null;
 
@@ -79,12 +77,12 @@ public class MyEmpire extends Empire {
                 }
 
                 // make sure we record the fact that the star is updated as well
-                StarManager.getInstance().refreshStar(context, colony.getStarKey());
+                StarManager.getInstance().refreshStar(colony.getStarKey());
             }
         }.execute();
     }
 
-    public void collectTaxes(final Context context) {
+    public void collectTaxes() {
         if (mCollectingTaxes) {
             return;
         }
@@ -108,18 +106,15 @@ public class MyEmpire extends Empire {
             protected void onComplete(Boolean success) {
                 mCollectingTaxes = false;
                 if (mErrorMsg != null) {
-                    new StyledDialog.Builder(context)
-                                    .setTitle("Error")
-                                    .setMessage(mErrorMsg)
-                                    .create().show();
+                    //TODO: ERROR
                 }
 
-                EmpireManager.i.refreshEmpire(context);
+                EmpireManager.i.refreshEmpire();
             }
         }.execute();
     }
 
-    public void updateFleetStance(final Context context, final Star star, final Fleet fleet,
+    public void updateFleetStance(final Star star, final Fleet fleet,
                                   final Fleet.Stance newStance) {
         new BackgroundRunner<Boolean>() {
             @Override
@@ -148,14 +143,15 @@ public class MyEmpire extends Empire {
                 }
 
                 // make sure we record the fact that the star is updated as well
-                EmpireManager.i.refreshEmpire(context, getKey());
-                StarManager.getInstance().refreshStar(context, star.getKey());
+                EmpireManager.i.refreshEmpire(getKey());
+                StarManager.getInstance().refreshStar(star.getKey());
             }
         }.execute();
 
     }
 
-    public void fetchScoutReports(final Star star, final FetchScoutReportCompleteHandler handler) {
+    public void fetchScoutReports(final Star star,
+                                  final FetchScoutReportCompleteHandler handler) {
         new BackgroundRunner<List<ScoutReport>>() {
             @Override
             protected List<ScoutReport> doInBackground() {
@@ -186,16 +182,15 @@ public class MyEmpire extends Empire {
         }.execute();
     }
 
-    public void fetchCombatReport(final String starKey, final String combatReportKey,
-            final FetchCombatReportCompleteHandler handler ) {
+    public void fetchCombatReport(final String starKey,
+            final String combatReportKey, final FetchCombatReportCompleteHandler handler ) {
         new BackgroundRunner<CombatReport>() {
             @Override
             protected CombatReport doInBackground() {
                 try {
                     String url = String.format("stars/%s/combat-reports/%s",
                                                starKey, combatReportKey);
-                    Messages.CombatReport pb = ApiClient.getProtoBuf(url,
-                                                 Messages.CombatReport.class);
+                    Messages.CombatReport pb = ApiClient.getProtoBuf(url, Messages.CombatReport.class);
                     if (pb == null)
                         return null;
 
@@ -218,7 +213,7 @@ public class MyEmpire extends Empire {
         }.execute();
     }
 
-    public void attackColony(final Context context, final Star star,
+    public void attackColony(final Star star,
                              final Colony colony,
                              final AttackColonyCompleteHandler callback) {
         new BackgroundRunner<Star>() {
@@ -244,7 +239,7 @@ public class MyEmpire extends Empire {
             @Override
             protected void onComplete(Star star) {
                 if (star != null) {
-                    StarManager.getInstance().refreshStar(context, star.getKey());
+                    StarManager.getInstance().refreshStar(star.getKey());
                 }
 
                 if (callback != null) {

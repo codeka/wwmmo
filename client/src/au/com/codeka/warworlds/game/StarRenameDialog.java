@@ -1,6 +1,5 @@
 package au.com.codeka.warworlds.game;
 
-import android.app.Activity;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
@@ -47,7 +46,7 @@ public class StarRenameDialog extends DialogFragment {
         starNewName.setText(mStar.getName());
 
         int imageSize = (int)(mStar.getSize() * mStar.getStarType().getImageScale() * 2);
-        Sprite starSprite = StarImageManager.getInstance().getSprite(getActivity(), mStar, imageSize, true);
+        Sprite starSprite = StarImageManager.getInstance().getSprite(mStar, imageSize, true);
         starIcon.setImageDrawable(new SpriteDrawable(starSprite));
 
         starNewName.requestFocus();
@@ -67,7 +66,6 @@ public class StarRenameDialog extends DialogFragment {
     public void onRenameClicked() {
         EditText starNewName = (EditText) mView.findViewById(R.id.star_newname);
         final String newStarName = starNewName.getText().toString();
-        final Activity activity = getActivity();
 
         PurchaseManager.getInstance().consume(mPurchase, new IabHelper.OnConsumeFinishedListener() {
             @Override
@@ -77,7 +75,7 @@ public class StarRenameDialog extends DialogFragment {
                     return;
                 }
 
-                StarManager.getInstance().renameStar(activity, purchase, mStar, newStarName);
+                StarManager.getInstance().renameStar(purchase, mStar, newStarName);
             }
         });
     }

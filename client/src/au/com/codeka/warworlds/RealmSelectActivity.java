@@ -28,7 +28,7 @@ public class RealmSelectActivity extends BaseActivity {
         Util.setup(mContext);
         if (RealmManager.i.getRealms().size() == 1) {
             // if there's only one realm, select it an move on.
-            RealmManager.i.selectRealm(mContext, RealmManager.i.getRealms().get(0).getDisplayName());
+            RealmManager.i.selectRealm(RealmManager.i.getRealms().get(0).getDisplayName());
             finish();
             startActivity(new Intent(mContext, WarWorldsActivity.class));
             return;
@@ -59,8 +59,8 @@ public class RealmSelectActivity extends BaseActivity {
                 int selectedPosition = realmsListView.getCheckedItemPosition();
                 Realm realm = RealmManager.i.getRealms().get(selectedPosition);
 
-                DeviceRegistrar.unregister(mContext); // need to register device in new realm
-                RealmManager.i.selectRealm(mContext, realm.getDisplayName());
+                DeviceRegistrar.unregister(); // need to register device in new realm
+                RealmManager.i.selectRealm(realm.getDisplayName());
                 ServerGreeter.clearHello();
 
                 // this activity is finished, move to the main WarWorldsActivity

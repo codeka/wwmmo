@@ -49,7 +49,7 @@ public class ChatManager implements BackgroundDetector.BackgroundChangeHandler {
         BackgroundDetector.getInstance().addBackgroundChangeHandler(this);
 
         mHandler = new Handler();
-        addMessage(context, new ChatMessage("Welcome to War Worlds!"));
+        addMessage(new ChatMessage("Welcome to War Worlds!"));
 
         // fetch all chats from the last 24 hours
         mMostRecentMsg = (new DateTime()).minusDays(1);
@@ -87,7 +87,7 @@ public class ChatManager implements BackgroundDetector.BackgroundChangeHandler {
     /**
      * Posts a message from us to the server.
      */
-    public void postMessage(final Context context, final ChatMessage msg) {
+    public void postMessage(final ChatMessage msg) {
         new BackgroundRunner<Boolean>() {
             @Override
             protected Boolean doInBackground() {
@@ -106,7 +106,7 @@ public class ChatManager implements BackgroundDetector.BackgroundChangeHandler {
             @Override
             protected void onComplete(Boolean success) {
                 if (success) {
-                    addMessage(context, msg);
+                    addMessage(msg);
                 }
             }
         }.execute();
@@ -150,7 +150,7 @@ public class ChatManager implements BackgroundDetector.BackgroundChangeHandler {
     /**
      * Adds a new message to the chat list.
      */
-    public void addMessage(final Context context, final ChatMessage msg) {
+    public void addMessage(final ChatMessage msg) {
         synchronized(mMessages) {
             // make sure we don't have this chat already...
             for (ChatMessage existing : mMessages) {
@@ -172,7 +172,7 @@ public class ChatManager implements BackgroundDetector.BackgroundChangeHandler {
                 }
             }
 
-            if (msg.getEmpire() == null && msg.getEmpireKey() != null && context != null) {
+            if (msg.getEmpire() == null && msg.getEmpireKey() != null) {
                 synchronized(mEmpiresToRefresh) {
                     if (!mEmpiresToRefresh.contains(msg.getEmpireKey())) {
                         mEmpiresToRefresh.add(msg.getEmpireKey());
@@ -181,7 +181,7 @@ public class ChatManager implements BackgroundDetector.BackgroundChangeHandler {
                             mHandler.postDelayed(new Runnable() {
                                 @Override
                                 public void run() {
-                                    refreshEmpires(context);
+                                    refreshEmpires();
                                 }
                             }, 100);
                         }
@@ -192,14 +192,14 @@ public class ChatManager implements BackgroundDetector.BackgroundChangeHandler {
         fireMessageAddedListeners(msg);
     }
 
-    private void refreshEmpires(final Context context) {
+    private void refreshEmpires() {
         List<String> empireKeys;
         synchronized(mEmpiresToRefresh) {
             empireKeys = new ArrayList<String>(mEmpiresToRefresh);
             mEmpiresToRefresh.clear();
         }
 
-        EmpireManager.i.fetchEmpires(context, empireKeys,
+        EmpireManager.i.fetchEmpires(empireKeys,
                 new EmpireManager.EmpireFetchedHandler() {
                     @Override
                     public void onEmpireFetched(Empire empire) {
@@ -260,7 +260,7 @@ public class ChatManager implements BackgroundDetector.BackgroundChangeHandler {
             @Override
             protected void onComplete(ArrayList<ChatMessage> msgs) {
                 for (ChatMessage msg : msgs) {
-                    addMessage(context, msg);
+                    addMessage(msg);
                 }
 
                 mRequesting = false;

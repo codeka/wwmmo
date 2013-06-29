@@ -15,13 +15,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import android.content.ContentValues;
-import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import au.com.codeka.BackgroundRunner;
 import au.com.codeka.common.model.Simulation;
 import au.com.codeka.common.protobuf.Messages;
+import au.com.codeka.warworlds.App;
+import au.com.codeka.warworlds.RealmContext;
 import au.com.codeka.warworlds.api.ApiClient;
 import au.com.codeka.warworlds.api.ApiException;
 import au.com.codeka.warworlds.model.billing.IabException;
@@ -115,20 +116,20 @@ public class StarManager extends BaseManager {
         BuildManager.getInstance().onStarUpdate(star);
     }
 
-    public void refreshStar(Context context, Star s) {
-        refreshStar(context, s.getKey());
+    public void refreshStar(Star s) {
+        refreshStar(s.getKey());
     }
 
-    public void refreshStar(Context context, String starKey) {
-        refreshStar(context, starKey, false);
+    public void refreshStar(String starKey) {
+        refreshStar(starKey, false);
     }
 
-    public boolean refreshStar(Context context, String starKey, boolean onlyIfCached) {
+    public boolean refreshStar(String starKey, boolean onlyIfCached) {
         if (onlyIfCached && !mStars.containsKey(starKey)) {
             return false;
         }
 
-        requestStar(context, starKey, true, new StarFetchedHandler() {
+        requestStar(starKey, true, new StarFetchedHandler() {
             @Override
             public void onStarFetched(Star s) {
                 // When a star is explicitly refreshed, it's usually because it's changed somehow.
@@ -140,20 +141,19 @@ public class StarManager extends BaseManager {
         return true;
     }
 
-    public Star refreshStarSync(Context context, String starKey, boolean onlyIfCached) {
+    public Star refreshStarSync(String starKey, boolean onlyIfCached) {
         if (onlyIfCached && !mStars.containsKey(starKey)) {
             return null;
         }
 
-        Star star = requestStarSync(context, starKey, true);
+        Star star = requestStarSync(starKey, true);
         // When a star is explicitly refreshed, it's usually because it's changed somehow.
         // Generally that also means the sector has changed.
         SectorManager.getInstance().refreshSector(star.getSectorX(), star.getSectorY());
         return star;
     }
 
-    public void requestStarSummary(final Context context, final String starKey,
-                                   final StarSummaryFetchedHandler callback) {
+    public void requestStarSummary(final String starKey, final StarSummaryFetchedHandler callback) {
         StarSummary ss = mStarSummaries.get(starKey);
         if (ss != null) {
             callback.onStarSummaryFetched(ss);
@@ -169,7 +169,7 @@ public class StarManager extends BaseManager {
         new BackgroundRunner<StarSummary>() {
             @Override
             protected StarSummary doInBackground() {
-                return requestStarSummarySync(context, starKey, DEFAULT_MAX_CACHE_HOURS);
+                return requestStarSummarySync(starKey, DEFAULT_MAX_CACHE_HOURS);
             }
 
             @Override
@@ -181,8 +181,7 @@ public class StarManager extends BaseManager {
         }.execute();
     }
 
-    public void requestStarSummaries(final Context context, final Collection<String> starKeys,
-                                     final StarSummariesFetchedHandler callback) {
+    public void requestStarSummaries(final Collection<String> starKeys, final StarSummariesFetchedHandler callback) {
         final ArrayList<StarSummary> summaries = new ArrayList<StarSummary>();
         final ArrayList<String> toFetch = new ArrayList<String>();
 
@@ -208,7 +207,7 @@ public class StarManager extends BaseManager {
             new BackgroundRunner<List<StarSummary>>() {
                 @Override
                 protected List<StarSummary> doInBackground() {
-                    return requestStarSummariesSync(context, toFetch, DEFAULT_MAX_CACHE_HOURS);
+                    return requestStarSummariesSync(toFetch, DEFAULT_MAX_CACHE_HOURS);
                 }
 
                 @Override
@@ -230,7 +229,7 @@ public class StarManager extends BaseManager {
      * @param starKey
      * @return
      */
-    public StarSummary requestStarSummarySync(Context context, String starKey, float maxCacheAgeHours) {
+    public StarSummary requestStarSummarySync(String starKey, float maxCacheAgeHours) {
         StarSummary ss = mStarSummaries.get(starKey);
         if (ss != null) {
             return ss;
@@ -241,20 +240,20 @@ public class StarManager extends BaseManager {
             return ss;
         }
 
-        ss = loadStarSummary(context, starKey, maxCacheAgeHours);
+        ss = loadStarSummary(starKey, maxCacheAgeHours);
         if (ss != null) {
             return ss;
         }
 
         // no cache StarSummary, fetch the full star
-        return doFetchStar(context, starKey);
+        return doFetchStar(starKey);
     }
 
-    public List<StarSummary> requestStarSummariesSync(Context context, Collection<String> starKeys, float maxCacheAgeHours) {
+    public List<StarSummary> requestStarSummariesSync(Collection<String> starKeys, float maxCacheAgeHours) {
         ArrayList<StarSummary> starSummaries = new ArrayList<StarSummary>();
         for (String starKey : starKeys) {
             // TODO: this could be more efficient...
-            StarSummary ss = requestStarSummarySync(context, starKey, DEFAULT_MAX_CACHE_HOURS);
+            StarSummary ss = requestStarSummarySync(starKey, DEFAULT_MAX_CACHE_HOURS);
             if (ss != null) {
                 starSummaries.add(ss);
             }
@@ -266,7 +265,7 @@ public class StarManager extends BaseManager {
      * Requests the details of a star from the server, and calls the given callback when it's
      * received. The callback is called on the main thread.
      */
-    public void requestStar(final Context context, final String starKey, final boolean force,
+    public void requestStar(final String starKey, final boolean force,
                             final StarFetchedHandler callback) {
         Star s = mStars.get(starKey);
         if (s != null && !force) {
@@ -277,7 +276,7 @@ public class StarManager extends BaseManager {
         new BackgroundRunner<Star>() {
             @Override
             protected Star doInBackground() {
-                return requestStarSync(context, starKey, force);
+                return requestStarSync(starKey, force);
             }
 
             @Override
@@ -298,19 +297,19 @@ public class StarManager extends BaseManager {
         }.execute();
     }
 
-    public Star requestStarSync(final Context context, final String starKey, boolean force) {
+    public Star requestStarSync(final String starKey, boolean force) {
         Star s = mStars.get(starKey);
         if (s != null && !force) {
             return s;
         }
 
-        Star star = doFetchStar(context, starKey);
+        Star star = doFetchStar(starKey);
         if (star != null) {
             log.debug(String.format("STAR[%s] has %d fleets.", star.getKey(),
                       star.getFleets() == null ? 0 : star.getFleets().size()));
         }
 
-        if (star != null && !RealmManager.i.getRealm().isAlpha()) {
+        if (star != null && !RealmContext.i.getCurrentRealm().isAlpha()) {
             // the alpha realm will have already simulated the star, but other realms
             // will need to simulate first.
             Simulation sim = new Simulation();
@@ -319,8 +318,7 @@ public class StarManager extends BaseManager {
         return star;
     }
 
-    public void renameStar(final Context context, final Purchase purchase,
-                           final Star star, final String newName) {
+    public void renameStar(final Purchase purchase, final Star star, final String newName) {
         new BackgroundRunner<Star>() {
             @Override
             protected Star doInBackground() {
@@ -352,7 +350,7 @@ public class StarManager extends BaseManager {
                     Star star = new Star();
                     star.fromProtocolBuffer(star_pb);
 
-                    updateStarSummary(context, star);
+                    updateStarSummary(star);
                     return star;
                 } catch (ApiException e) {
                     log.error("Error renaming star!", e);
@@ -375,7 +373,7 @@ public class StarManager extends BaseManager {
         }.execute();
     }
 
-    private Star doFetchStar(final Context context, final String starKey) {
+    private Star doFetchStar(final String starKey) {
         Star star = null;
 
         try {
@@ -390,7 +388,7 @@ public class StarManager extends BaseManager {
         }
 
         if (star != null) {
-            updateStarSummary(context, star);
+            updateStarSummary(star);
         }
 
         return star;
@@ -399,19 +397,19 @@ public class StarManager extends BaseManager {
     /**
      * This is called when we fetch a new \c StarSummary, we'll want to cache it.
      */
-    private static void updateStarSummary(Context context, StarSummary summary) {
+    private static void updateStarSummary(StarSummary summary) {
         Messages.Star.Builder starpb = Messages.Star.newBuilder();
         summary.toProtocolBuffer(starpb);
         Messages.Star star_pb = starpb.build();
 
-        new LocalStarsStore(context).addStar(star_pb);
+        new LocalStarsStore().addStar(star_pb);
     }
 
     /**
      * Attempts to load a \c StarSummary back from the cache directory.
      */
-    private static StarSummary loadStarSummary(Context context, String starKey, float maxCacheAgeHours) {
-        Messages.Star star_pb = new LocalStarsStore(context).getStar(starKey, maxCacheAgeHours); 
+    private static StarSummary loadStarSummary(String starKey, float maxCacheAgeHours) {
+        Messages.Star star_pb = new LocalStarsStore().getStar(starKey, maxCacheAgeHours); 
         if (star_pb == null) {
             return null;
         }
@@ -425,8 +423,8 @@ public class StarManager extends BaseManager {
     private static class LocalStarsStore extends SQLiteOpenHelper {
         private static Object sLock = new Object();
 
-        public LocalStarsStore(Context context) {
-            super(context, "stars.db", null, 1);
+        public LocalStarsStore() {
+            super(App.i, "stars.db", null, 1);
         }
 
         /**
@@ -463,7 +461,7 @@ public class StarManager extends BaseManager {
                     ContentValues values = new ContentValues();
                     values.put("star", starBlob.toByteArray());
                     values.put("star_key", star.getKey());
-                    values.put("realm_id", RealmManager.i.getRealm().getID());
+                    values.put("realm_id", RealmContext.i.getCurrentRealm().getID());
                     values.put("timestamp", DateTime.now(DateTimeZone.UTC).getMillis());
                     db.insert("stars", null, values);
                 } catch(Exception e) {
@@ -480,7 +478,7 @@ public class StarManager extends BaseManager {
                 Cursor cursor = null;
                 try {
                     cursor = db.query("stars", new String[] {"star", "timestamp"},
-                            "star_key = '"+starKey.replace('\'', ' ')+"' AND realm_id="+RealmManager.i.getRealm().getID(),
+                            "star_key = '"+starKey.replace('\'', ' ')+"' AND realm_id="+RealmContext.i.getCurrentRealm().getID(),
                             null, null, null, null);
                     if (!cursor.moveToFirst()) {
                         cursor.close();

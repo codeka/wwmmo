@@ -121,7 +121,7 @@ public class FleetMoveDialog extends DialogFragment {
             }
         });
 
-        StarManager.getInstance().requestStarSummary(getActivity(), mFleet.getStarKey(),
+        StarManager.getInstance().requestStarSummary(mFleet.getStarKey(),
                 new StarManager.StarSummaryFetchedHandler() {
             @Override
             public void onStarSummaryFetched(StarSummary s) {
@@ -204,11 +204,11 @@ public class FleetMoveDialog extends DialogFragment {
                     dialog.getNegativeButton().setEnabled(true);
                 } else {
                     // the star this fleet is attached to needs to be refreshed...
-                    StarManager.getInstance().refreshStar(activity, mFleet.getStarKey());
+                    StarManager.getInstance().refreshStar(mFleet.getStarKey());
 
                     // the empire needs to be updated, too, since we'll have subtracted
                     // the cost of this move from your cash
-                    EmpireManager.i.refreshEmpire(activity, mFleet.getEmpireKey());
+                    EmpireManager.i.refreshEmpire(mFleet.getEmpireKey());
                 }
             }
         }.execute();

@@ -19,7 +19,6 @@ import au.com.codeka.warworlds.model.SpriteDrawable;
 import au.com.codeka.warworlds.model.Star;
 
 public class PlanetDetailsView extends FrameLayout {
-    private Context mContext;
     private View mView;
     private Star mStar;
     private Planet mPlanet;
@@ -28,10 +27,8 @@ public class PlanetDetailsView extends FrameLayout {
 
     public PlanetDetailsView(Context context, AttributeSet attrs) {
         super(context, attrs);
-        mContext = context;
-
         mView = inflate(context, R.layout.planet_details_ctrl, null);
-        this.addView(mView);
+        addView(mView);
     }
 
     public void setup(Star star, Planet planet, Colony colony) {
@@ -86,7 +83,7 @@ public class PlanetDetailsView extends FrameLayout {
         } else {
             planetIcon.setVisibility(View.VISIBLE);
 
-            Sprite planetSprite = PlanetImageManager.getInstance().getSprite(mContext, mPlanet);
+            Sprite planetSprite = PlanetImageManager.getInstance().getSprite(mPlanet);
             if (planetSprite != null) {
                 planetIcon.setImageDrawable(new SpriteDrawable(planetSprite));
             }

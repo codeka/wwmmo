@@ -39,8 +39,8 @@ public class Util {
         Authenticator.configure(context);
         SpriteManager.i.setup(context);
         DesignManager.setup(context);
-        PurchaseManager.getInstance().setup(context);
-        RealmManager.i.setup(context);
+        PurchaseManager.getInstance().setup();
+        RealmManager.i.setup();
 
         sWasSetup = true;
         return true;
@@ -55,14 +55,14 @@ public class Util {
      * properties, preferences and settings to make later calls easier (and not
      * require a \c Context parameter)
      */
-    public static Properties loadProperties(Context context) {
+    public static Properties loadProperties() {
         if (sProperties != null) {
             // if it's already loaded, don't do it again
             return sProperties;
         }
 
         // load the warworlds.properties file and populate mProperties.
-        AssetManager assetManager = context.getAssets();
+        AssetManager assetManager = App.i.getAssets();
 
         InputStream inputStream = null;
         try {
@@ -108,7 +108,7 @@ public class Util {
     /**
      * Helper method to get a SharedPreferences instance.
      */
-    public static SharedPreferences getSharedPreferences(Context context) {
-        return context.getSharedPreferences(SHARED_PREFS, 0);
+    public static SharedPreferences getSharedPreferences() {
+        return App.i.getSharedPreferences(SHARED_PREFS, 0);
     }
 }

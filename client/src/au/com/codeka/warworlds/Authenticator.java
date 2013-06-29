@@ -22,7 +22,6 @@ import au.com.codeka.warworlds.api.DefaultAuthenticator;
 import au.com.codeka.warworlds.api.RequestManager;
 import au.com.codeka.warworlds.api.RequestRetryException;
 import au.com.codeka.warworlds.model.Realm;
-import au.com.codeka.warworlds.model.RealmManager;
 
 /**
  * This class works in concert with \c ApiAuthenticator to authenticate the current
@@ -44,7 +43,7 @@ public class Authenticator {
     public static void configure(Context context) {
         sAccountManager = AccountManager.get(context);
 
-        SharedPreferences prefs = Util.getSharedPreferences(context);
+        SharedPreferences prefs = Util.getSharedPreferences();
         final String accountName = prefs.getString("AccountName", null);
 
         RequestManager.addResponseReceivedHandler(new RequestManager.ResponseReceivedHandler() {
@@ -109,7 +108,7 @@ public class Authenticator {
      * @return The authCookie we can use in subsequent calls to the server.
      */
     public static String authenticate(Activity activity, String accountName) {
-        Realm realm = RealmManager.i.getRealm();
+        Realm realm = RealmContext.i.getCurrentRealm();
         if (realm == null) {
             return null;
         }

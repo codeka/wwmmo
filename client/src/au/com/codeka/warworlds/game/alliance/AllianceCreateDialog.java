@@ -68,7 +68,7 @@ public class AllianceCreateDialog extends DialogFragment {
                 if (!success) {
                     StyledDialog.showErrorMessage(context, mErrorMsg);
                 } else {
-                    EmpireManager.i.refreshEmpire(context);
+                    EmpireManager.i.refreshEmpire();
                 }
             }
         }.execute();

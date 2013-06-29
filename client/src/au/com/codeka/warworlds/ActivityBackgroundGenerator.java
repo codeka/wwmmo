@@ -29,8 +29,7 @@ public class ActivityBackgroundGenerator {
         android.util.DisplayMetrics metrics = new DisplayMetrics();
         display.getMetrics(metrics);
 
-        StarfieldBackgroundRenderer renderer = new StarfieldBackgroundRenderer(view.getContext(),
-                new long[] {new Random().nextLong()});
+        StarfieldBackgroundRenderer renderer = new StarfieldBackgroundRenderer(new long[] {new Random().nextLong()});
         BackgroundDrawable drawable = new BackgroundDrawable(renderer, metrics.heightPixels);
         setBackground(view, drawable);
     }

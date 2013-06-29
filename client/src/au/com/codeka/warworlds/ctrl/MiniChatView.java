@@ -61,7 +61,7 @@ public class MiniChatView extends RelativeLayout
         mMsgsContainer.setId(id++);
         mScrollView.addView(mMsgsContainer);
 
-        mAutoTranslate = new GlobalOptions(context).autoTranslateChatMessages();
+        mAutoTranslate = new GlobalOptions().autoTranslateChatMessages();
 
         refreshMessages();
 

@@ -5,7 +5,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -129,8 +128,6 @@ public class FleetMergeDialog extends DialogFragment {
 
         final StyledDialog dialog = ((StyledDialog) getDialog());
         dialog.setCloseable(false);
-
-        final Activity activity = getActivity();
         dismiss();
 
         new BackgroundRunner<Boolean>() {
@@ -155,8 +152,7 @@ public class FleetMergeDialog extends DialogFragment {
             @Override
             protected void onComplete(Boolean success) {
                 // the star this fleet is attached to needs to be refreshed...
-                StarManager.getInstance().refreshStar(
-                        activity, mFleet.getStarKey());
+                StarManager.getInstance().refreshStar(mFleet.getStarKey());
             }
 
         }.execute();

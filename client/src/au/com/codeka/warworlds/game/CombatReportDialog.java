@@ -84,7 +84,7 @@ public class CombatReportDialog extends DialogFragment {
                     }
                 }
                 for (String empireKey : empireKeys) {
-                    EmpireManager.i.fetchEmpire(activity, empireKey,
+                    EmpireManager.i.fetchEmpire(empireKey,
                             new EmpireManager.EmpireFetchedHandler() {
                                 @Override
                                 public void onEmpireFetched(Empire empire) {

@@ -49,7 +49,7 @@ public class InfobarView extends FrameLayout
     }
 
     @Override
-    public void onStateChanged(final RequestManagerState state) {
+    public void onStateChanged() {
         // this is not called on the UI, so we have to send a request to the
         // UI thread to update the UI
         mHandler.post(new Runnable() {
@@ -70,6 +70,7 @@ public class InfobarView extends FrameLayout
                     }
                 }
 */
+                RequestManagerState state = RequestManager.getCurrentState();
                 if (state.numInProgressRequests > 0) {
                     working.setVisibility(View.VISIBLE);
                 } else {
@@ -93,7 +94,7 @@ public class InfobarView extends FrameLayout
             RequestManager.addRequestManagerStateChangedHandler(this);
 
             // set up the initial state
-            onStateChanged(RequestManager.getCurrentState());
+            onStateChanged();
         }
     }
 

@@ -66,7 +66,7 @@ public class ScoutReportDialog extends DialogFragment {
 
         int imageSize = (int)(mStar.getSize() * mStar.getStarType().getImageScale() * 2);
         starIcon.setImageDrawable(new SpriteDrawable(
-                StarImageManager.getInstance().getSprite(getActivity(), mStar, imageSize, true)));
+                StarImageManager.getInstance().getSprite(mStar, imageSize, true)));
         starName.setText(mStar.getName());
         reportSummary.setText("Scout Report");
 
@@ -82,8 +82,7 @@ public class ScoutReportDialog extends DialogFragment {
         progressBar.setVisibility(View.VISIBLE);
         reportItems.setVisibility(View.GONE);
 
-        EmpireManager.i.getEmpire().fetchScoutReports(
-                mStar, new MyEmpire.FetchScoutReportCompleteHandler() {
+        EmpireManager.i.getEmpire().fetchScoutReports(mStar, new MyEmpire.FetchScoutReportCompleteHandler() {
             @Override
             public void onComplete(List<ScoutReport> reports) {
                 progressBar.setVisibility(View.GONE);

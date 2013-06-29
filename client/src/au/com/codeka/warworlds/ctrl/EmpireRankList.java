@@ -251,7 +251,7 @@ public class EmpireRankList extends ListView {
                                 empireKeys.add(entry.rank.getEmpireKey());
                             }
 
-                            EmpireManager.i.fetchEmpires(mContext, empireKeys, new EmpireManager.EmpireFetchedHandler() {
+                            EmpireManager.i.fetchEmpires(empireKeys, new EmpireManager.EmpireFetchedHandler() {
                                 @Override
                                 public void onEmpireFetched(Empire empire) {
                                     boolean refreshedAll = true;

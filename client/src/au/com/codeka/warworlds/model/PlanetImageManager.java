@@ -3,7 +3,6 @@ package au.com.codeka.warworlds.model;
 import java.util.Locale;
 import java.util.Random;
 
-import android.content.Context;
 import android.graphics.Bitmap;
 import au.com.codeka.common.Vector3;
 import au.com.codeka.common.model.BasePlanet;
@@ -23,11 +22,11 @@ public class PlanetImageManager extends ImageManager {
     /**
      * Gets a \c Sprite for the given planet.
      */
-    public Sprite getSprite(Context context, BasePlanet planet) {
+    public Sprite getSprite(BasePlanet planet) {
         String key = String.format(Locale.ENGLISH, "%s-%d",
                                    planet.getStar().getKey(), planet.getIndex());
-        PlanetExtra planetExtra = new PlanetExtra(context, planet);
-        Bitmap bmp = getBitmap(context, key, 100, planetExtra);
+        PlanetExtra planetExtra = new PlanetExtra(planet);
+        Bitmap bmp = getBitmap(key, 100, planetExtra);
         if (bmp == null) {
             Sprite s = SpriteManager.i.getSprite("planet."+planet.getPlanetType().getInternalName());
 
@@ -53,9 +52,7 @@ public class PlanetImageManager extends ImageManager {
         String key = String.format(Locale.ENGLISH, "%s-%d",
                                    planetExtra.planet.getStar().getKey(),
                                    planetExtra.planet.getIndex());
-        return loadTemplate(planetExtra.context,
-                             planetExtra.planet.getPlanetType().getBitmapBasePath(),
-                             key);
+        return loadTemplate(planetExtra.planet.getPlanetType().getBitmapBasePath(), key);
     }
 
     /**
@@ -85,10 +82,8 @@ public class PlanetImageManager extends ImageManager {
 
     private static class PlanetExtra {
         public BasePlanet planet;
-        public Context context;
 
-        public PlanetExtra(Context context, BasePlanet planet) {
-            this.context = context;
+        public PlanetExtra(BasePlanet planet) {
             this.planet = planet;
         }
     }

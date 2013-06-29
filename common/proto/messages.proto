@@ -903,6 +903,10 @@ message SituationReport
     optional string star_key = 4;
     optional int32 planet_index = 5;
 
+    // This is the name of the realm the situation report was generated from. Used so that we can
+    // fetch the correct star definitions, and display separate notifications for separate realms.
+    optional string realm = 14;
+
     // This record is used when a building has finished being built.
     message BuildCompleteRecord
     {

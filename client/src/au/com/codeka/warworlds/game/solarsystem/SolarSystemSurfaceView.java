@@ -247,8 +247,7 @@ public class SolarSystemSurfaceView extends UniverseElementSurfaceView {
             canvas.drawColor(Color.BLACK);
 
             if (mBackgroundRenderer == null) {
-                mBackgroundRenderer = new StarfieldBackgroundRenderer(mContext,
-                        new long[] {mStar.getKey().hashCode()});
+                mBackgroundRenderer = new StarfieldBackgroundRenderer(new long[] {mStar.getKey().hashCode()});
             }
             mBackgroundRenderer.drawBackground(canvas, 0, 0,
                     canvas.getWidth() / getPixelScale(),
@@ -265,7 +264,7 @@ public class SolarSystemSurfaceView extends UniverseElementSurfaceView {
         float pixelScale = getPixelScale();
 
         int imageSize = (int)(300.0f * pixelScale);
-        Sprite sprite = StarImageManager.getInstance().getSprite(mContext, mStar, imageSize, false);
+        Sprite sprite = StarImageManager.getInstance().getSprite(mStar, imageSize, false);
 
         mMatrix.reset();
         mMatrix.postTranslate(-(sprite.getWidth() / 2.0f), -(sprite.getHeight() / 2.0f));
@@ -288,7 +287,7 @@ public class SolarSystemSurfaceView extends UniverseElementSurfaceView {
         for (int i = 0; i < mPlanetInfos.length; i++) {
             final PlanetInfo planetInfo = mPlanetInfos[i];
 
-            Sprite sprite = pim.getSprite(mContext, planetInfo.planet);
+            Sprite sprite = pim.getSprite(planetInfo.planet);
             mMatrix.reset();
             mMatrix.postTranslate(-(sprite.getWidth() / 2.0f), -(sprite.getHeight() / 2.0f));
             mMatrix.postScale(100.0f * getPixelScale() / sprite.getWidth(),
@@ -316,7 +315,7 @@ public class SolarSystemSurfaceView extends UniverseElementSurfaceView {
             }
 
             if (planetInfo.colony != null) {
-                Empire empire = EmpireManager.i.getEmpire(mContext, planetInfo.colony.getEmpireKey());
+                Empire empire = EmpireManager.i.getEmpire(planetInfo.colony.getEmpireKey());
                 if (empire != null) {
                     Bitmap shield = empire.getShield(mContext);
                     if (shield != null) {

@@ -50,7 +50,7 @@ public class Notifications {
     public static void displayNotification(final Context context,
                                            final Messages.SituationReport sitrep) {
         String starKey = sitrep.getStarKey();
-        StarSummary starSummary = StarManager.getInstance().requestStarSummarySync(context, starKey,
+        StarSummary starSummary = StarManager.getInstance().requestStarSummarySync(starKey,
                 Float.MAX_VALUE // always prefer a cached version, no matter how old
             );
 
@@ -72,7 +72,7 @@ public class Notifications {
             return;
         }
 
-        if (!new GlobalOptions(context).notificationsEnabled()) {
+        if (!new GlobalOptions().notificationsEnabled()) {
             return;
         }
 
@@ -110,7 +110,7 @@ public class Notifications {
             star.fromProtocolBuffer(notification.star);
 
             GlobalOptions.NotificationKind kind = getNotificationKind(sitrep);
-            GlobalOptions.NotificationOptions thisOptions = new GlobalOptions(context).getNotificationOptions(kind);
+            GlobalOptions.NotificationOptions thisOptions = new GlobalOptions().getNotificationOptions(kind);
             if (!thisOptions.isEnabled()) {
                 continue;
             }
@@ -137,7 +137,7 @@ public class Notifications {
                         canvas.restore();
                     }
 
-                    Sprite starSprite = StarImageManager.getInstance().getSprite(context, star, iconWidth / 2, true);
+                    Sprite starSprite = StarImageManager.getInstance().getSprite(star, iconWidth / 2, true);
                     starSprite.draw(canvas);
 
                     builder.setLargeIcon(largeIcon);
@@ -150,7 +150,7 @@ public class Notifications {
                 builder.setContentText(sitrep.getDescription(star));
                 builder.setWhen(sitrep.getReportTime().getMillis());
 
-                String ringtone = new GlobalOptions(context).getNotificationOptions(kind).getRingtone();
+                String ringtone = new GlobalOptions().getNotificationOptions(kind).getRingtone();
                 if (ringtone != null && ringtone.length() > 0) {
                     builder.setSound(Uri.parse(ringtone));
                 }

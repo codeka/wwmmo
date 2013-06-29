@@ -79,6 +79,7 @@ public class ColonyController {
         float remainingPopulation = colony.getPopulation() - (totalTroopCarriers * 4.0f / colony.getDefenceBoost());
 
         Messages.SituationReport.Builder sitrep_pb = Messages.SituationReport.newBuilder();
+        sitrep_pb.setRealm(new RealmController().getRealmName());
         sitrep_pb.setEmpireKey(Integer.toString(colony.getEmpireID()));
         sitrep_pb.setReportTime(DateTime.now().getMillis() / 1000);
         sitrep_pb.setStarKey(star.getKey());

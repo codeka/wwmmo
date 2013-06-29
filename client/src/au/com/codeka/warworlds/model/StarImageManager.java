@@ -2,7 +2,6 @@ package au.com.codeka.warworlds.model;
 
 import java.util.Random;
 
-import android.content.Context;
 import android.graphics.Bitmap;
 import au.com.codeka.common.Vector3;
 import au.com.codeka.planetrender.Template;
@@ -17,11 +16,11 @@ public class StarImageManager extends ImageManager {
     /**
      * Gets the \c Bitmap for the given star.
      */
-    public Sprite getSprite(Context context, StarSummary star, int size, boolean forceGeneric) {
-        StarExtra starExtra = new StarExtra(context, star);
+    public Sprite getSprite(StarSummary star, int size, boolean forceGeneric) {
+        StarExtra starExtra = new StarExtra(star);
         Bitmap bmp = null;
         if (size > 0 && !forceGeneric) {
-            bmp = getBitmap(context, star.getKey(), size, starExtra);
+            bmp = getBitmap(star.getKey(), size, starExtra);
         }
 
         if (bmp == null) {
@@ -46,9 +45,7 @@ public class StarImageManager extends ImageManager {
      */
     protected Template getTemplate(Object extra) {
         StarExtra starExtra = (StarExtra) extra;
-        return loadTemplate(starExtra.context,
-                             starExtra.star.getStarType().getBitmapBasePath(),
-                             starExtra.star.getKey());
+        return loadTemplate(starExtra.star.getStarType().getBitmapBasePath(), starExtra.star.getKey());
     }
 
     @Override
@@ -65,10 +62,8 @@ public class StarImageManager extends ImageManager {
 
     private static class StarExtra {
         public StarSummary star;
-        public Context context;
 
-        public StarExtra(Context context, StarSummary star) {
-            this.context = context;
+        public StarExtra(StarSummary star) {
             this.star = star;
         }
     }

@@ -4,8 +4,8 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
-import android.content.Context;
 import android.content.SharedPreferences;
+import au.com.codeka.warworlds.RealmContext;
 import au.com.codeka.warworlds.Util;
 import au.com.codeka.warworlds.api.ApiClient;
 
@@ -13,7 +13,6 @@ public class RealmManager {
     public static RealmManager i = new RealmManager();
 
     private List<Realm> mRealms;
-    private Realm mCurrentRealm;
     private ArrayList<RealmChangedHandler> mRealmChangedHandlers;
 
     private RealmManager() {
@@ -26,7 +25,7 @@ public class RealmManager {
     public static int BETA_REALM_ID = 2;
     public static int BLITZ_REALM_ID = 10;
 
-    public void setup(Context context) {
+    public void setup() {
         mRealms = new ArrayList<Realm>();
         try {
             if (Util.isDebug()) {
@@ -53,9 +52,9 @@ public class RealmManager {
             // should never happen
         }
 
-        SharedPreferences prefs = Util.getSharedPreferences(context);
+        SharedPreferences prefs = Util.getSharedPreferences();
         if (prefs.getString("RealmName", null) != null) {
-            selectRealm(context, prefs.getString("RealmName", null), false);
+            selectRealm(prefs.getString("RealmName", null), false);
         }
     }
 
@@ -77,39 +76,37 @@ public class RealmManager {
         }
     }
 
-    public Realm getRealm() {
-        return mCurrentRealm;
-    }
-
     public List<Realm> getRealms() {
         return mRealms;
     }
 
-    public void selectRealm(Context context, String realmName) {
-        selectRealm(context, realmName, true);
+    public void selectRealm(String realmName) {
+        selectRealm(realmName, true);
     }
 
-    private void selectRealm(Context context, String realmName, boolean saveSelection) {
+    private void selectRealm(String realmName, boolean saveSelection) {
+        Realm currentRealm = null;
         if (realmName == null) {
-            mCurrentRealm = null;
+            RealmContext.i.setGlobalRealm(null);
         } else {
             for (Realm realm : mRealms) {
                 if (realm.getDisplayName().equals(realmName)) {
-                    mCurrentRealm = realm;
+                    currentRealm = realm;
+                    RealmContext.i.setGlobalRealm(realm);
 
                     // make sure the ApiClient knows which base URL to use
-                    ApiClient.configure(context, mCurrentRealm.getBaseUrl());
+                    ApiClient.reset();
                 }
             }
         }
 
         if (saveSelection) {
-            Util.getSharedPreferences(context).edit()
-                .putString("RealmName",  mCurrentRealm == null ? null : mCurrentRealm.getDisplayName())
+            Util.getSharedPreferences().edit()
+                .putString("RealmName",  currentRealm == null ? null : currentRealm.getDisplayName())
                 .commit();
         }
 
-        fireRealmChangedHandler(mCurrentRealm);
+        fireRealmChangedHandler(currentRealm);
     }
 
     public interface RealmChangedHandler {

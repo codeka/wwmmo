@@ -4,7 +4,6 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.media.RingtoneManager;
@@ -32,8 +31,8 @@ public class GlobalOptions {
         }
     }
 
-    public GlobalOptions(Context context) {
-        mPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+    public GlobalOptions() {
+        mPreferences = PreferenceManager.getDefaultSharedPreferences(App.i);
 
         mPreferences.registerOnSharedPreferenceChangeListener(new SharedPreferences.OnSharedPreferenceChangeListener() {
             @Override

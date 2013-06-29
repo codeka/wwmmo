@@ -36,7 +36,6 @@ public class TacticalMapView extends SectorView
 
     private Paint mPointPaint;
     private Paint mInfluencePaint;
-    private Context mContext;
     private DoubleTapHandler mDoubleTapHandler;
 
     private float mDragOffsetX;
@@ -52,7 +51,6 @@ public class TacticalMapView extends SectorView
             return;
         }
 
-        mContext = context;
         mSectorRadius = 2;
 
         log.info("Tactical map initializing...");
@@ -109,9 +107,9 @@ public class TacticalMapView extends SectorView
         canvas.drawColor(Color.BLACK);
 
         for (String empireKey : mControlFields.keySet()) {
-            Empire empire = EmpireManager.i.getEmpire(mContext, empireKey);
+            Empire empire = EmpireManager.i.getEmpire(empireKey);
             if (empire == null) {
-                EmpireManager.i.fetchEmpire(mContext, empireKey, null);
+                EmpireManager.i.fetchEmpire(empireKey, null);
             }
             TacticalControlField cf = mControlFields.get(empireKey);
 

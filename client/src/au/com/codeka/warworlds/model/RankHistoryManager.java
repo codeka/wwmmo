@@ -21,8 +21,7 @@ public class RankHistoryManager {
         getRankHistory(dt.getYear(), dt.getMonthOfYear(), handler);
     }
 
-    public void getRankHistory(final int year, final int month,
-                               final RankHistoryFetchedHandler handler) {
+    public void getRankHistory(final int year, final int month, final RankHistoryFetchedHandler handler) {
         new BackgroundRunner<RankHistory>() {
             @Override
             protected RankHistory doInBackground() {

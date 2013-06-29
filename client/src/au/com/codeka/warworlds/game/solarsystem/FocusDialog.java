@@ -6,7 +6,6 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import android.app.Activity;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
@@ -230,8 +229,6 @@ public class FocusDialog extends DialogFragment {
         mColony.setFarmingFocus((float) (mSeekBars.get(1).getProgress() / SEEKBAR_MAX));
         mColony.setMiningFocus((float) (mSeekBars.get(2).getProgress() / SEEKBAR_MAX));
         mColony.setConstructionFocus((float) (mSeekBars.get(3).getProgress() / SEEKBAR_MAX));
-
-        final Activity activity = getActivity();
         dismiss();
 
         new BackgroundRunner<Void>() {
@@ -254,8 +251,7 @@ public class FocusDialog extends DialogFragment {
             @Override
             protected void onComplete(Void unused) {
                 // notify the StarManager that this star has been updated
-                StarManager.getInstance().refreshStar(activity,
-                                                      mColony.getStarKey());
+                StarManager.getInstance().refreshStar(mColony.getStarKey());
             }
         }.execute();
     }

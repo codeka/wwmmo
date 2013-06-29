@@ -1,6 +1,5 @@
 package au.com.codeka.warworlds.game.solarsystem;
 
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -26,7 +25,6 @@ public class EmptyPlanetActivity extends BaseActivity
                                  implements StarManager.StarFetchedHandler {
     private Star mStar;
     private Planet mPlanet;
-    private Context mContext = this;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -58,7 +56,7 @@ public class EmptyPlanetActivity extends BaseActivity
                     startActivity(new Intent(EmptyPlanetActivity.this, WarWorldsActivity.class));
                 } else {
                     String starKey = getIntent().getExtras().getString("au.com.codeka.warworlds.StarKey");
-                    StarManager.getInstance().requestStar(EmptyPlanetActivity.this, starKey, false, EmptyPlanetActivity.this);
+                    StarManager.getInstance().requestStar(starKey, false, EmptyPlanetActivity.this);
                     StarManager.getInstance().addStarUpdatedListener(starKey, EmptyPlanetActivity.this);
                 }
             }
@@ -103,7 +101,7 @@ public class EmptyPlanetActivity extends BaseActivity
             dialog.show();
         }
 
-        empire.colonize(mContext, mPlanet, new MyEmpire.ColonizeCompleteHandler() {
+        empire.colonize(mPlanet, new MyEmpire.ColonizeCompleteHandler() {
             @Override
             public void onColonizeComplete(Colony colony) {
                 finish();

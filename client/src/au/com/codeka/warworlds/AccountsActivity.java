@@ -42,8 +42,8 @@ public class AccountsActivity extends BaseActivity {
         ActivityBackgroundGenerator.setBackground(rootView);
 
         Util.setup(this);
-        Util.loadProperties(mContext);
-        SharedPreferences prefs = Util.getSharedPreferences(mContext);
+        Util.loadProperties();
+        SharedPreferences prefs = Util.getSharedPreferences();
         String accountName = prefs.getString("AccountName", null);
         if (accountName == null) {
             mIsLogIn = true;
@@ -60,7 +60,7 @@ public class AccountsActivity extends BaseActivity {
                     // Register
                     register((String) account.getText());
                     ServerGreeter.clearHello();
-                    RealmManager.i.selectRealm(mContext, null);
+                    RealmManager.i.selectRealm(null);
 
                     finish();
                 }
@@ -135,7 +135,7 @@ public class AccountsActivity extends BaseActivity {
      * Sets up the 'disconnected' screen.
      */
     private void setLogOutScreenContent() {
-        final SharedPreferences prefs = Util.getSharedPreferences(mContext);
+        final SharedPreferences prefs = Util.getSharedPreferences();
         String accountName = prefs.getString("AccountName", "Unknown");
 
         // Format the disconnect message with the currently connected account name
@@ -152,7 +152,7 @@ public class AccountsActivity extends BaseActivity {
      */
     private void register(final String accountName) {
         // Store the account name in shared preferences
-        final SharedPreferences prefs = Util.getSharedPreferences(mContext);
+        final SharedPreferences prefs = Util.getSharedPreferences();
         SharedPreferences.Editor editor = prefs.edit();
         editor.putString("AccountName", accountName);
         editor.commit();
@@ -161,7 +161,7 @@ public class AccountsActivity extends BaseActivity {
     private void unregister() {
         GCMIntentService.unregister(this);
 
-        final SharedPreferences prefs = Util.getSharedPreferences(mContext);
+        final SharedPreferences prefs = Util.getSharedPreferences();
         SharedPreferences.Editor editor = prefs.edit();
         editor.remove("AccountName");
         editor.commit();

@@ -10,7 +10,6 @@ import java.util.Random;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import android.content.Context;
 import android.content.res.AssetManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -20,6 +19,7 @@ import android.graphics.Paint;
 import android.graphics.Paint.Style;
 import android.graphics.Rect;
 import android.graphics.RectF;
+import au.com.codeka.warworlds.App;
 import au.com.codeka.warworlds.GlobalOptions;
 
 /**
@@ -37,8 +37,8 @@ public class StarfieldBackgroundRenderer {
     private static List<Bitmap> sBgStars;
     private static List<Bitmap> sBgGases;
 
-    public StarfieldBackgroundRenderer(Context context, long[] seeds) {
-        mPixelScale = context.getResources().getDisplayMetrics().density;
+    public StarfieldBackgroundRenderer(long[] seeds) {
+        mPixelScale = App.i.getResources().getDisplayMetrics().density;
 
         mSeeds = seeds;
         if (mSeeds.length != 9) {
@@ -49,7 +49,7 @@ public class StarfieldBackgroundRenderer {
             }
         }
 
-        initialize(context);
+        initialize();
     }
 
     public void drawBackground(Canvas canvas, float left, float top, float right, float bottom) {
@@ -79,11 +79,11 @@ public class StarfieldBackgroundRenderer {
         }
     }
 
-    private void initialize(Context context) {
-        GlobalOptions globalOptions = new GlobalOptions(context);
+    private void initialize() {
+        GlobalOptions globalOptions = new GlobalOptions();
         mStarfieldDetail = globalOptions.getStarfieldDetail();
 
-        AssetManager assetMgr = context.getAssets();
+        AssetManager assetMgr = App.i.getAssets();
         if (sBgStars == null && shouldDrawStars()) {
             sBgStars = loadBitmaps(assetMgr, "decoration/starfield");
         }

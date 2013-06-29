@@ -23,6 +23,8 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import au.com.codeka.BackgroundRunner;
+import au.com.codeka.warworlds.App;
+import au.com.codeka.warworlds.RealmContext;
 import au.com.codeka.warworlds.api.ApiClient;
 import au.com.codeka.warworlds.api.ApiException;
 import au.com.codeka.common.protobuf.Messages;
@@ -55,7 +57,7 @@ public class EmpireManager {
         return mEmpire;
     }
 
-    public Empire getEmpire(Context context, String empireKey) {
+    public Empire getEmpire(String empireKey) {
         if (empireKey == null) {
             return mNativeEmpire;
         }
@@ -69,7 +71,7 @@ public class EmpireManager {
             return empire;
         }
 
-        Messages.Empire pb = new LocalEmpireStore(context).getEmpire(empireKey);
+        Messages.Empire pb = new LocalEmpireStore().getEmpire(empireKey);
         if (pb != null) {
             empire = new Empire();
             empire.fromProtocolBuffer(pb);
@@ -140,20 +142,19 @@ public class EmpireManager {
         }
     }
 
-    public void refreshEmpire(final Context context) {
+    public void refreshEmpire() {
         if (mEmpire == null) {
             // todo?
             return;
         }
-        refreshEmpire(context, mEmpire.getKey());
+        refreshEmpire(mEmpire.getKey());
     }
 
-    public void refreshEmpire(final Context context, final String empireKey) {
-        refreshEmpire(context, empireKey, null);
+    public void refreshEmpire(final String empireKey) {
+        refreshEmpire(empireKey, null);
     }
 
-    public void refreshEmpire(final Context context,
-            final String empireKey,
+    public void refreshEmpire(final String empireKey,
             final EmpireFetchedHandler handler) {
         if (empireKey == null || empireKey.length() == 0) {
             if (handler != null) {
@@ -164,11 +165,10 @@ public class EmpireManager {
 
         ArrayList<String> empireKeys = new ArrayList<String>();
         empireKeys.add(empireKey);
-        refreshEmpires(context, empireKeys, handler);
+        refreshEmpires(empireKeys, handler);
     }
 
-    public void refreshEmpires(final Context context,
-                               final Collection<String> empireKeys,
+    public void refreshEmpires(final Collection<String> empireKeys,
                                final EmpireFetchedHandler handler) {
         final ArrayList<String> toFetch = new ArrayList<String>();
 
@@ -195,7 +195,7 @@ public class EmpireManager {
                 @Override
                 protected List<Empire> doInBackground() {
                     try {
-                        return refreshEmpiresSync(context, toFetch);
+                        return refreshEmpiresSync(toFetch);
                     } catch (ApiException e) {
                         log.error("An error occured fetching empires.", e);
                         return null;
@@ -254,10 +254,9 @@ public class EmpireManager {
      * Synchronously fetch a list of empires. Note that we \i may return fewer empires than you
      * requested, if some of them are already in-progress.
      */
-    public List<Empire> refreshEmpiresSync(final Context context,
-                                           final Collection<String> empireKeys) throws ApiException {
+    public List<Empire> refreshEmpiresSync(final Collection<String> empireKeys) throws ApiException {
         ArrayList<Empire> empires = new ArrayList<Empire>();
-        LocalEmpireStore store = new LocalEmpireStore(context);
+        LocalEmpireStore store = new LocalEmpireStore();
 
         Iterator<String> iter = empireKeys.iterator();
         while (iter.hasNext()) {
@@ -299,8 +298,7 @@ public class EmpireManager {
         return empires;
     }
 
-    public void fetchEmpire(final Context context,
-                            final String empireKey,
+    public void fetchEmpire(final String empireKey,
                             final EmpireFetchedHandler handler) {
         if (empireKey == null) {
             if (handler != null) {
@@ -324,7 +322,7 @@ public class EmpireManager {
             return;
         }
 
-        Messages.Empire pb = new LocalEmpireStore(context).getEmpire(empireKey);
+        Messages.Empire pb = new LocalEmpireStore().getEmpire(empireKey);
         if (pb != null) {
             Empire empire = new Empire();
             empire.fromProtocolBuffer(pb);
@@ -335,10 +333,10 @@ public class EmpireManager {
             return;
         }
 
-        refreshEmpire(context, empireKey, handler);
+        refreshEmpire(empireKey, handler);
     }
 
-    public void fetchEmpires(Context context, Collection<String> empireKeys, EmpireFetchedHandler handler) {
+    public void fetchEmpires(Collection<String> empireKeys, EmpireFetchedHandler handler) {
         ArrayList<String> toFetch = new ArrayList<String>();
         for (String empireKey : empireKeys) {
             if (empireKey == null) {
@@ -364,7 +362,7 @@ public class EmpireManager {
             }
 
             // if it's in the local store, that's fine as well
-            Messages.Empire pb = new LocalEmpireStore(context).getEmpire(empireKey);
+            Messages.Empire pb = new LocalEmpireStore().getEmpire(empireKey);
             if (pb != null) {
                 Empire empire = new Empire();
                 empire.fromProtocolBuffer(pb);
@@ -380,16 +378,16 @@ public class EmpireManager {
         }
 
         if (toFetch.size() > 0) {
-            refreshEmpires(context, toFetch, handler);
+            refreshEmpires(toFetch, handler);
         }
     }
 
-    public List<Empire> fetchEmpiresSync(Context context, Collection<String> empireKeys) {
+    public List<Empire> fetchEmpiresSync(Collection<String> empireKeys) {
         ArrayList<Empire> empires = new ArrayList<Empire>();
         ArrayList<String> missingKeys = new ArrayList<String>();
 
         for (String empireKey : empireKeys) {
-            Empire empire = getEmpire(context, empireKey);
+            Empire empire = getEmpire(empireKey);
             if (empire != null) {
                 empires.add(empire);
             } else {
@@ -399,7 +397,7 @@ public class EmpireManager {
 
         if (missingKeys.size() > 0) {
             try {
-                List<Empire> fetchedEmpires = refreshEmpiresSync(context, missingKeys);
+                List<Empire> fetchedEmpires = refreshEmpiresSync(missingKeys);
                 for (Empire empire : fetchedEmpires) {
                     empires.add(empire);
                 }
@@ -416,7 +414,7 @@ public class EmpireManager {
      * empires as well (since that's usually what you want in addition to the specific
      * range you asked for as well).
      */
-    public void fetchEmpiresByRank(final Context context, final int minRank, final int maxRank,
+    public void fetchEmpiresByRank(final int minRank, final int maxRank,
                                    final EmpiresFetchedHandler handler) {
         new BackgroundRunner<List<Empire>>() {
             @Override
@@ -428,7 +426,7 @@ public class EmpireManager {
 
                     Messages.Empires pb = ApiClient.getProtoBuf(url, Messages.Empires.class);
 
-                    LocalEmpireStore les = new LocalEmpireStore(context);
+                    LocalEmpireStore les = new LocalEmpireStore();
                     for (Messages.Empire empire_pb : pb.getEmpiresList()) {
                         les.addEmpire(empire_pb);
                         Empire empire = new Empire();
@@ -469,7 +467,7 @@ public class EmpireManager {
 
                     Messages.Empires pb = ApiClient.getProtoBuf(url, Messages.Empires.class);
 
-                    LocalEmpireStore les = new LocalEmpireStore(context);
+                    LocalEmpireStore les = new LocalEmpireStore();
                     for (Messages.Empire empire_pb : pb.getEmpiresList()) {
                         les.addEmpire(empire_pb);
                         Empire empire = new Empire();
@@ -509,8 +507,8 @@ public class EmpireManager {
     private static class LocalEmpireStore extends SQLiteOpenHelper {
         private static Object sLock = new Object();
 
-        public LocalEmpireStore(Context context) {
-            super(context, "empires.db", null, 3);
+        public LocalEmpireStore() {
+            super(App.i, "empires.db", null, 3);
         }
 
         /**
@@ -556,7 +554,7 @@ public class EmpireManager {
                     ContentValues values = new ContentValues();
                     values.put("empire", empireBlob.toByteArray());
                     values.put("empire_key", empire.getKey());
-                    values.put("realm_id", RealmManager.i.getRealm().getID());
+                    values.put("realm_id", RealmContext.i.getCurrentRealm().getID());
                     values.put("timestamp", DateTime.now(DateTimeZone.UTC).getMillis());
                     db.insert("empires", null, values);
                 } catch(Exception e) {
@@ -573,7 +571,7 @@ public class EmpireManager {
                 Cursor cursor = null;
                 try {
                     cursor = db.query("empires", new String[] {"empire", "timestamp"},
-                            "empire_key = '"+empireKey.replace('\'', ' ')+"' AND realm_id="+RealmManager.i.getRealm().getID(),
+                            "empire_key = '"+empireKey.replace('\'', ' ')+"' AND realm_id="+RealmContext.i.getCurrentRealm().getID(),
                             null, null, null, null);
                     if (!cursor.moveToFirst()) {
                         cursor.close();

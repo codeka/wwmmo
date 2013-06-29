@@ -43,7 +43,7 @@ public class BaseActivity extends FragmentActivity {
         mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
 
-        Util.loadProperties(this);
+        Util.loadProperties();
         if (Util.isDebug()) {
             mDebugView = new DebugView(this);
             mDebugViewLayout = new WindowManager.LayoutParams(
@@ -69,7 +69,7 @@ public class BaseActivity extends FragmentActivity {
 
     @Override
     public void onResume() {
-        Util.loadProperties(this);
+        Util.loadProperties();
 
         mSensorManager.registerListener(mBugReportShakeListener, mAccelerometer,
                                         SensorManager.SENSOR_DELAY_UI);

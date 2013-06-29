@@ -1,6 +1,5 @@
 package au.com.codeka.warworlds.game;
 
-import android.app.Activity;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
@@ -113,7 +112,6 @@ public class FleetSplitDialog extends DialogFragment {
 
         final TextView splitLeft = (TextView) mView.findViewById(R.id.split_left);
         final TextView splitRight = (TextView) mView.findViewById(R.id.split_right);
-        final Activity activity = getActivity();
         dismiss();
 
         new BackgroundRunner<Boolean>() {
@@ -139,8 +137,7 @@ public class FleetSplitDialog extends DialogFragment {
             @Override
             protected void onComplete(Boolean success) {
                 // the star this fleet is attached to needs to be refreshed...
-                StarManager.getInstance().refreshStar(
-                        activity, mFleet.getStarKey());
+                StarManager.getInstance().refreshStar(mFleet.getStarKey());
             }
         }.execute();
     }

@@ -55764,6 +55764,36 @@ public final class Messages {
      */
     int getPlanetIndex();
 
+    // optional string realm = 14;
+    /**
+     * <code>optional string realm = 14;</code>
+     *
+     * <pre>
+     * This is the name of the realm the situation report was generated from. Used so that we can
+     * fetch the correct star definitions, and display separate notifications for separate realms.
+     * </pre>
+     */
+    boolean hasRealm();
+    /**
+     * <code>optional string realm = 14;</code>
+     *
+     * <pre>
+     * This is the name of the realm the situation report was generated from. Used so that we can
+     * fetch the correct star definitions, and display separate notifications for separate realms.
+     * </pre>
+     */
+    java.lang.String getRealm();
+    /**
+     * <code>optional string realm = 14;</code>
+     *
+     * <pre>
+     * This is the name of the realm the situation report was generated from. Used so that we can
+     * fetch the correct star definitions, and display separate notifications for separate realms.
+     * </pre>
+     */
+    com.google.protobuf.ByteString
+        getRealmBytes();
+
     // optional .au.com.codeka.common.protobuf.SituationReport.BuildCompleteRecord build_complete_record = 6;
     /**
      * <code>optional .au.com.codeka.common.protobuf.SituationReport.BuildCompleteRecord build_complete_record = 6;</code>
@@ -55962,7 +55992,7 @@ public final class Messages {
             }
             case 50: {
               au.com.codeka.common.protobuf.Messages.SituationReport.BuildCompleteRecord.Builder subBuilder = null;
-              if (((bitField0_ & 0x00000020) == 0x00000020)) {
+              if (((bitField0_ & 0x00000040) == 0x00000040)) {
                 subBuilder = buildCompleteRecord_.toBuilder();
               }
               buildCompleteRecord_ = input.readMessage(au.com.codeka.common.protobuf.Messages.SituationReport.BuildCompleteRecord.PARSER, extensionRegistry);
@@ -55970,12 +56000,12 @@ public final class Messages {
                 subBuilder.mergeFrom(buildCompleteRecord_);
                 buildCompleteRecord_ = subBuilder.buildPartial();
               }
-              bitField0_ |= 0x00000020;
+              bitField0_ |= 0x00000040;
               break;
             }
             case 58: {
               au.com.codeka.common.protobuf.Messages.SituationReport.MoveCompleteRecord.Builder subBuilder = null;
-              if (((bitField0_ & 0x00000040) == 0x00000040)) {
+              if (((bitField0_ & 0x00000080) == 0x00000080)) {
                 subBuilder = moveCompleteRecord_.toBuilder();
               }
               moveCompleteRecord_ = input.readMessage(au.com.codeka.common.protobuf.Messages.SituationReport.MoveCompleteRecord.PARSER, extensionRegistry);
@@ -55983,12 +56013,12 @@ public final class Messages {
                 subBuilder.mergeFrom(moveCompleteRecord_);
                 moveCompleteRecord_ = subBuilder.buildPartial();
               }
-              bitField0_ |= 0x00000040;
+              bitField0_ |= 0x00000080;
               break;
             }
             case 66: {
               au.com.codeka.common.protobuf.Messages.SituationReport.FleetUnderAttackRecord.Builder subBuilder = null;
-              if (((bitField0_ & 0x00000080) == 0x00000080)) {
+              if (((bitField0_ & 0x00000100) == 0x00000100)) {
                 subBuilder = fleetUnderAttackRecord_.toBuilder();
               }
               fleetUnderAttackRecord_ = input.readMessage(au.com.codeka.common.protobuf.Messages.SituationReport.FleetUnderAttackRecord.PARSER, extensionRegistry);
@@ -55996,12 +56026,12 @@ public final class Messages {
                 subBuilder.mergeFrom(fleetUnderAttackRecord_);
                 fleetUnderAttackRecord_ = subBuilder.buildPartial();
               }
-              bitField0_ |= 0x00000080;
+              bitField0_ |= 0x00000100;
               break;
             }
             case 74: {
               au.com.codeka.common.protobuf.Messages.SituationReport.FleetDestroyedRecord.Builder subBuilder = null;
-              if (((bitField0_ & 0x00000100) == 0x00000100)) {
+              if (((bitField0_ & 0x00000200) == 0x00000200)) {
                 subBuilder = fleetDestroyedRecord_.toBuilder();
               }
               fleetDestroyedRecord_ = input.readMessage(au.com.codeka.common.protobuf.Messages.SituationReport.FleetDestroyedRecord.PARSER, extensionRegistry);
@@ -56009,12 +56039,12 @@ public final class Messages {
                 subBuilder.mergeFrom(fleetDestroyedRecord_);
                 fleetDestroyedRecord_ = subBuilder.buildPartial();
               }
-              bitField0_ |= 0x00000100;
+              bitField0_ |= 0x00000200;
               break;
             }
             case 82: {
               au.com.codeka.common.protobuf.Messages.SituationReport.FleetVictoriousRecord.Builder subBuilder = null;
-              if (((bitField0_ & 0x00000200) == 0x00000200)) {
+              if (((bitField0_ & 0x00000400) == 0x00000400)) {
                 subBuilder = fleetVictoriousRecord_.toBuilder();
               }
               fleetVictoriousRecord_ = input.readMessage(au.com.codeka.common.protobuf.Messages.SituationReport.FleetVictoriousRecord.PARSER, extensionRegistry);
@@ -56022,12 +56052,12 @@ public final class Messages {
                 subBuilder.mergeFrom(fleetVictoriousRecord_);
                 fleetVictoriousRecord_ = subBuilder.buildPartial();
               }
-              bitField0_ |= 0x00000200;
+              bitField0_ |= 0x00000400;
               break;
             }
             case 90: {
               au.com.codeka.common.protobuf.Messages.SituationReport.ColonyDestroyedRecord.Builder subBuilder = null;
-              if (((bitField0_ & 0x00000400) == 0x00000400)) {
+              if (((bitField0_ & 0x00000800) == 0x00000800)) {
                 subBuilder = colonyDestroyedRecord_.toBuilder();
               }
               colonyDestroyedRecord_ = input.readMessage(au.com.codeka.common.protobuf.Messages.SituationReport.ColonyDestroyedRecord.PARSER, extensionRegistry);
@@ -56035,12 +56065,12 @@ public final class Messages {
                 subBuilder.mergeFrom(colonyDestroyedRecord_);
                 colonyDestroyedRecord_ = subBuilder.buildPartial();
               }
-              bitField0_ |= 0x00000400;
+              bitField0_ |= 0x00000800;
               break;
             }
             case 98: {
               au.com.codeka.common.protobuf.Messages.SituationReport.ColonyAttackedRecord.Builder subBuilder = null;
-              if (((bitField0_ & 0x00000800) == 0x00000800)) {
+              if (((bitField0_ & 0x00001000) == 0x00001000)) {
                 subBuilder = colonyAttackedRecord_.toBuilder();
               }
               colonyAttackedRecord_ = input.readMessage(au.com.codeka.common.protobuf.Messages.SituationReport.ColonyAttackedRecord.PARSER, extensionRegistry);
@@ -56048,12 +56078,12 @@ public final class Messages {
                 subBuilder.mergeFrom(colonyAttackedRecord_);
                 colonyAttackedRecord_ = subBuilder.buildPartial();
               }
-              bitField0_ |= 0x00000800;
+              bitField0_ |= 0x00001000;
               break;
             }
             case 106: {
               au.com.codeka.common.protobuf.Messages.SituationReport.StarRunOutOfGoodsRecord.Builder subBuilder = null;
-              if (((bitField0_ & 0x00001000) == 0x00001000)) {
+              if (((bitField0_ & 0x00002000) == 0x00002000)) {
                 subBuilder = starRanOutOfGoodsRecord_.toBuilder();
               }
               starRanOutOfGoodsRecord_ = input.readMessage(au.com.codeka.common.protobuf.Messages.SituationReport.StarRunOutOfGoodsRecord.PARSER, extensionRegistry);
@@ -56061,7 +56091,12 @@ public final class Messages {
                 subBuilder.mergeFrom(starRanOutOfGoodsRecord_);
                 starRanOutOfGoodsRecord_ = subBuilder.buildPartial();
               }
-              bitField0_ |= 0x00001000;
+              bitField0_ |= 0x00002000;
+              break;
+            }
+            case 114: {
+              bitField0_ |= 0x00000020;
+              realm_ = input.readBytes();
               break;
             }
           }
@@ -62114,6 +62149,64 @@ public final class Messages {
       return planetIndex_;
     }
 
+    // optional string realm = 14;
+    public static final int REALM_FIELD_NUMBER = 14;
+    private java.lang.Object realm_;
+    /**
+     * <code>optional string realm = 14;</code>
+     *
+     * <pre>
+     * This is the name of the realm the situation report was generated from. Used so that we can
+     * fetch the correct star definitions, and display separate notifications for separate realms.
+     * </pre>
+     */
+    public boolean hasRealm() {
+      return ((bitField0_ & 0x00000020) == 0x00000020);
+    }
+    /**
+     * <code>optional string realm = 14;</code>
+     *
+     * <pre>
+     * This is the name of the realm the situation report was generated from. Used so that we can
+     * fetch the correct star definitions, and display separate notifications for separate realms.
+     * </pre>
+     */
+    public java.lang.String getRealm() {
+      java.lang.Object ref = realm_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        if (bs.isValidUtf8()) {
+          realm_ = s;
+        }
+        return s;
+      }
+    }
+    /**
+     * <code>optional string realm = 14;</code>
+     *
+     * <pre>
+     * This is the name of the realm the situation report was generated from. Used so that we can
+     * fetch the correct star definitions, and display separate notifications for separate realms.
+     * </pre>
+     */
+    public com.google.protobuf.ByteString
+        getRealmBytes() {
+      java.lang.Object ref = realm_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        realm_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
     // optional .au.com.codeka.common.protobuf.SituationReport.BuildCompleteRecord build_complete_record = 6;
     public static final int BUILD_COMPLETE_RECORD_FIELD_NUMBER = 6;
     private au.com.codeka.common.protobuf.Messages.SituationReport.BuildCompleteRecord buildCompleteRecord_;
@@ -62121,7 +62214,7 @@ public final class Messages {
      * <code>optional .au.com.codeka.common.protobuf.SituationReport.BuildCompleteRecord build_complete_record = 6;</code>
      */
     public boolean hasBuildCompleteRecord() {
-      return ((bitField0_ & 0x00000020) == 0x00000020);
+      return ((bitField0_ & 0x00000040) == 0x00000040);
     }
     /**
      * <code>optional .au.com.codeka.common.protobuf.SituationReport.BuildCompleteRecord build_complete_record = 6;</code>
@@ -62143,7 +62236,7 @@ public final class Messages {
      * <code>optional .au.com.codeka.common.protobuf.SituationReport.MoveCompleteRecord move_complete_record = 7;</code>
      */
     public boolean hasMoveCompleteRecord() {
-      return ((bitField0_ & 0x00000040) == 0x00000040);
+      return ((bitField0_ & 0x00000080) == 0x00000080);
     }
     /**
      * <code>optional .au.com.codeka.common.protobuf.SituationReport.MoveCompleteRecord move_complete_record = 7;</code>
@@ -62165,7 +62258,7 @@ public final class Messages {
      * <code>optional .au.com.codeka.common.protobuf.SituationReport.FleetUnderAttackRecord fleet_under_attack_record = 8;</code>
      */
     public boolean hasFleetUnderAttackRecord() {
-      return ((bitField0_ & 0x00000080) == 0x00000080);
+      return ((bitField0_ & 0x00000100) == 0x00000100);
     }
     /**
      * <code>optional .au.com.codeka.common.protobuf.SituationReport.FleetUnderAttackRecord fleet_under_attack_record = 8;</code>
@@ -62187,7 +62280,7 @@ public final class Messages {
      * <code>optional .au.com.codeka.common.protobuf.SituationReport.FleetDestroyedRecord fleet_destroyed_record = 9;</code>
      */
     public boolean hasFleetDestroyedRecord() {
-      return ((bitField0_ & 0x00000100) == 0x00000100);
+      return ((bitField0_ & 0x00000200) == 0x00000200);
     }
     /**
      * <code>optional .au.com.codeka.common.protobuf.SituationReport.FleetDestroyedRecord fleet_destroyed_record = 9;</code>
@@ -62209,7 +62302,7 @@ public final class Messages {
      * <code>optional .au.com.codeka.common.protobuf.SituationReport.FleetVictoriousRecord fleet_victorious_record = 10;</code>
      */
     public boolean hasFleetVictoriousRecord() {
-      return ((bitField0_ & 0x00000200) == 0x00000200);
+      return ((bitField0_ & 0x00000400) == 0x00000400);
     }
     /**
      * <code>optional .au.com.codeka.common.protobuf.SituationReport.FleetVictoriousRecord fleet_victorious_record = 10;</code>
@@ -62231,7 +62324,7 @@ public final class Messages {
      * <code>optional .au.com.codeka.common.protobuf.SituationReport.ColonyDestroyedRecord colony_destroyed_record = 11;</code>
      */
     public boolean hasColonyDestroyedRecord() {
-      return ((bitField0_ & 0x00000400) == 0x00000400);
+      return ((bitField0_ & 0x00000800) == 0x00000800);
     }
     /**
      * <code>optional .au.com.codeka.common.protobuf.SituationReport.ColonyDestroyedRecord colony_destroyed_record = 11;</code>
@@ -62253,7 +62346,7 @@ public final class Messages {
      * <code>optional .au.com.codeka.common.protobuf.SituationReport.ColonyAttackedRecord colony_attacked_record = 12;</code>
      */
     public boolean hasColonyAttackedRecord() {
-      return ((bitField0_ & 0x00000800) == 0x00000800);
+      return ((bitField0_ & 0x00001000) == 0x00001000);
     }
     /**
      * <code>optional .au.com.codeka.common.protobuf.SituationReport.ColonyAttackedRecord colony_attacked_record = 12;</code>
@@ -62275,7 +62368,7 @@ public final class Messages {
      * <code>optional .au.com.codeka.common.protobuf.SituationReport.StarRunOutOfGoodsRecord star_ran_out_of_goods_record = 13;</code>
      */
     public boolean hasStarRanOutOfGoodsRecord() {
-      return ((bitField0_ & 0x00001000) == 0x00001000);
+      return ((bitField0_ & 0x00002000) == 0x00002000);
     }
     /**
      * <code>optional .au.com.codeka.common.protobuf.SituationReport.StarRunOutOfGoodsRecord star_ran_out_of_goods_record = 13;</code>
@@ -62296,6 +62389,7 @@ public final class Messages {
       reportTime_ = 0L;
       starKey_ = "";
       planetIndex_ = 0;
+      realm_ = "";
       buildCompleteRecord_ = au.com.codeka.common.protobuf.Messages.SituationReport.BuildCompleteRecord.getDefaultInstance();
       moveCompleteRecord_ = au.com.codeka.common.protobuf.Messages.SituationReport.MoveCompleteRecord.getDefaultInstance();
       fleetUnderAttackRecord_ = au.com.codeka.common.protobuf.Messages.SituationReport.FleetUnderAttackRecord.getDefaultInstance();
@@ -62332,29 +62426,32 @@ public final class Messages {
       if (((bitField0_ & 0x00000010) == 0x00000010)) {
         output.writeInt32(5, planetIndex_);
       }
-      if (((bitField0_ & 0x00000020) == 0x00000020)) {
+      if (((bitField0_ & 0x00000040) == 0x00000040)) {
         output.writeMessage(6, buildCompleteRecord_);
       }
-      if (((bitField0_ & 0x00000040) == 0x00000040)) {
+      if (((bitField0_ & 0x00000080) == 0x00000080)) {
         output.writeMessage(7, moveCompleteRecord_);
       }
-      if (((bitField0_ & 0x00000080) == 0x00000080)) {
+      if (((bitField0_ & 0x00000100) == 0x00000100)) {
         output.writeMessage(8, fleetUnderAttackRecord_);
       }
-      if (((bitField0_ & 0x00000100) == 0x00000100)) {
+      if (((bitField0_ & 0x00000200) == 0x00000200)) {
         output.writeMessage(9, fleetDestroyedRecord_);
       }
-      if (((bitField0_ & 0x00000200) == 0x00000200)) {
+      if (((bitField0_ & 0x00000400) == 0x00000400)) {
         output.writeMessage(10, fleetVictoriousRecord_);
       }
-      if (((bitField0_ & 0x00000400) == 0x00000400)) {
+      if (((bitField0_ & 0x00000800) == 0x00000800)) {
         output.writeMessage(11, colonyDestroyedRecord_);
       }
-      if (((bitField0_ & 0x00000800) == 0x00000800)) {
+      if (((bitField0_ & 0x00001000) == 0x00001000)) {
         output.writeMessage(12, colonyAttackedRecord_);
       }
-      if (((bitField0_ & 0x00001000) == 0x00001000)) {
+      if (((bitField0_ & 0x00002000) == 0x00002000)) {
         output.writeMessage(13, starRanOutOfGoodsRecord_);
+      }
+      if (((bitField0_ & 0x00000020) == 0x00000020)) {
+        output.writeBytes(14, getRealmBytes());
       }
       getUnknownFields().writeTo(output);
     }
@@ -62385,37 +62482,41 @@ public final class Messages {
         size += com.google.protobuf.CodedOutputStream
           .computeInt32Size(5, planetIndex_);
       }
-      if (((bitField0_ & 0x00000020) == 0x00000020)) {
+      if (((bitField0_ & 0x00000040) == 0x00000040)) {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(6, buildCompleteRecord_);
       }
-      if (((bitField0_ & 0x00000040) == 0x00000040)) {
+      if (((bitField0_ & 0x00000080) == 0x00000080)) {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(7, moveCompleteRecord_);
       }
-      if (((bitField0_ & 0x00000080) == 0x00000080)) {
+      if (((bitField0_ & 0x00000100) == 0x00000100)) {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(8, fleetUnderAttackRecord_);
       }
-      if (((bitField0_ & 0x00000100) == 0x00000100)) {
+      if (((bitField0_ & 0x00000200) == 0x00000200)) {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(9, fleetDestroyedRecord_);
       }
-      if (((bitField0_ & 0x00000200) == 0x00000200)) {
+      if (((bitField0_ & 0x00000400) == 0x00000400)) {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(10, fleetVictoriousRecord_);
       }
-      if (((bitField0_ & 0x00000400) == 0x00000400)) {
+      if (((bitField0_ & 0x00000800) == 0x00000800)) {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(11, colonyDestroyedRecord_);
       }
-      if (((bitField0_ & 0x00000800) == 0x00000800)) {
+      if (((bitField0_ & 0x00001000) == 0x00001000)) {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(12, colonyAttackedRecord_);
       }
-      if (((bitField0_ & 0x00001000) == 0x00001000)) {
+      if (((bitField0_ & 0x00002000) == 0x00002000)) {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(13, starRanOutOfGoodsRecord_);
+      }
+      if (((bitField0_ & 0x00000020) == 0x00000020)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBytesSize(14, getRealmBytes());
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
@@ -62559,54 +62660,56 @@ public final class Messages {
         bitField0_ = (bitField0_ & ~0x00000008);
         planetIndex_ = 0;
         bitField0_ = (bitField0_ & ~0x00000010);
+        realm_ = "";
+        bitField0_ = (bitField0_ & ~0x00000020);
         if (buildCompleteRecordBuilder_ == null) {
           buildCompleteRecord_ = au.com.codeka.common.protobuf.Messages.SituationReport.BuildCompleteRecord.getDefaultInstance();
         } else {
           buildCompleteRecordBuilder_.clear();
         }
-        bitField0_ = (bitField0_ & ~0x00000020);
+        bitField0_ = (bitField0_ & ~0x00000040);
         if (moveCompleteRecordBuilder_ == null) {
           moveCompleteRecord_ = au.com.codeka.common.protobuf.Messages.SituationReport.MoveCompleteRecord.getDefaultInstance();
         } else {
           moveCompleteRecordBuilder_.clear();
         }
-        bitField0_ = (bitField0_ & ~0x00000040);
+        bitField0_ = (bitField0_ & ~0x00000080);
         if (fleetUnderAttackRecordBuilder_ == null) {
           fleetUnderAttackRecord_ = au.com.codeka.common.protobuf.Messages.SituationReport.FleetUnderAttackRecord.getDefaultInstance();
         } else {
           fleetUnderAttackRecordBuilder_.clear();
         }
-        bitField0_ = (bitField0_ & ~0x00000080);
+        bitField0_ = (bitField0_ & ~0x00000100);
         if (fleetDestroyedRecordBuilder_ == null) {
           fleetDestroyedRecord_ = au.com.codeka.common.protobuf.Messages.SituationReport.FleetDestroyedRecord.getDefaultInstance();
         } else {
           fleetDestroyedRecordBuilder_.clear();
         }
-        bitField0_ = (bitField0_ & ~0x00000100);
+        bitField0_ = (bitField0_ & ~0x00000200);
         if (fleetVictoriousRecordBuilder_ == null) {
           fleetVictoriousRecord_ = au.com.codeka.common.protobuf.Messages.SituationReport.FleetVictoriousRecord.getDefaultInstance();
         } else {
           fleetVictoriousRecordBuilder_.clear();
         }
-        bitField0_ = (bitField0_ & ~0x00000200);
+        bitField0_ = (bitField0_ & ~0x00000400);
         if (colonyDestroyedRecordBuilder_ == null) {
           colonyDestroyedRecord_ = au.com.codeka.common.protobuf.Messages.SituationReport.ColonyDestroyedRecord.getDefaultInstance();
         } else {
           colonyDestroyedRecordBuilder_.clear();
         }
-        bitField0_ = (bitField0_ & ~0x00000400);
+        bitField0_ = (bitField0_ & ~0x00000800);
         if (colonyAttackedRecordBuilder_ == null) {
           colonyAttackedRecord_ = au.com.codeka.common.protobuf.Messages.SituationReport.ColonyAttackedRecord.getDefaultInstance();
         } else {
           colonyAttackedRecordBuilder_.clear();
         }
-        bitField0_ = (bitField0_ & ~0x00000800);
+        bitField0_ = (bitField0_ & ~0x00001000);
         if (starRanOutOfGoodsRecordBuilder_ == null) {
           starRanOutOfGoodsRecord_ = au.com.codeka.common.protobuf.Messages.SituationReport.StarRunOutOfGoodsRecord.getDefaultInstance();
         } else {
           starRanOutOfGoodsRecordBuilder_.clear();
         }
-        bitField0_ = (bitField0_ & ~0x00001000);
+        bitField0_ = (bitField0_ & ~0x00002000);
         return this;
       }
 
@@ -62658,61 +62761,65 @@ public final class Messages {
         if (((from_bitField0_ & 0x00000020) == 0x00000020)) {
           to_bitField0_ |= 0x00000020;
         }
+        result.realm_ = realm_;
+        if (((from_bitField0_ & 0x00000040) == 0x00000040)) {
+          to_bitField0_ |= 0x00000040;
+        }
         if (buildCompleteRecordBuilder_ == null) {
           result.buildCompleteRecord_ = buildCompleteRecord_;
         } else {
           result.buildCompleteRecord_ = buildCompleteRecordBuilder_.build();
         }
-        if (((from_bitField0_ & 0x00000040) == 0x00000040)) {
-          to_bitField0_ |= 0x00000040;
+        if (((from_bitField0_ & 0x00000080) == 0x00000080)) {
+          to_bitField0_ |= 0x00000080;
         }
         if (moveCompleteRecordBuilder_ == null) {
           result.moveCompleteRecord_ = moveCompleteRecord_;
         } else {
           result.moveCompleteRecord_ = moveCompleteRecordBuilder_.build();
         }
-        if (((from_bitField0_ & 0x00000080) == 0x00000080)) {
-          to_bitField0_ |= 0x00000080;
+        if (((from_bitField0_ & 0x00000100) == 0x00000100)) {
+          to_bitField0_ |= 0x00000100;
         }
         if (fleetUnderAttackRecordBuilder_ == null) {
           result.fleetUnderAttackRecord_ = fleetUnderAttackRecord_;
         } else {
           result.fleetUnderAttackRecord_ = fleetUnderAttackRecordBuilder_.build();
         }
-        if (((from_bitField0_ & 0x00000100) == 0x00000100)) {
-          to_bitField0_ |= 0x00000100;
+        if (((from_bitField0_ & 0x00000200) == 0x00000200)) {
+          to_bitField0_ |= 0x00000200;
         }
         if (fleetDestroyedRecordBuilder_ == null) {
           result.fleetDestroyedRecord_ = fleetDestroyedRecord_;
         } else {
           result.fleetDestroyedRecord_ = fleetDestroyedRecordBuilder_.build();
         }
-        if (((from_bitField0_ & 0x00000200) == 0x00000200)) {
-          to_bitField0_ |= 0x00000200;
+        if (((from_bitField0_ & 0x00000400) == 0x00000400)) {
+          to_bitField0_ |= 0x00000400;
         }
         if (fleetVictoriousRecordBuilder_ == null) {
           result.fleetVictoriousRecord_ = fleetVictoriousRecord_;
         } else {
           result.fleetVictoriousRecord_ = fleetVictoriousRecordBuilder_.build();
         }
-        if (((from_bitField0_ & 0x00000400) == 0x00000400)) {
-          to_bitField0_ |= 0x00000400;
+        if (((from_bitField0_ & 0x00000800) == 0x00000800)) {
+          to_bitField0_ |= 0x00000800;
         }
         if (colonyDestroyedRecordBuilder_ == null) {
           result.colonyDestroyedRecord_ = colonyDestroyedRecord_;
         } else {
           result.colonyDestroyedRecord_ = colonyDestroyedRecordBuilder_.build();
         }
-        if (((from_bitField0_ & 0x00000800) == 0x00000800)) {
-          to_bitField0_ |= 0x00000800;
+        if (((from_bitField0_ & 0x00001000) == 0x00001000)) {
+          to_bitField0_ |= 0x00001000;
         }
         if (colonyAttackedRecordBuilder_ == null) {
           result.colonyAttackedRecord_ = colonyAttackedRecord_;
         } else {
           result.colonyAttackedRecord_ = colonyAttackedRecordBuilder_.build();
         }
-        if (((from_bitField0_ & 0x00001000) == 0x00001000)) {
-          to_bitField0_ |= 0x00001000;
+        if (((from_bitField0_ & 0x00002000) == 0x00002000)) {
+          to_bitField0_ |= 0x00002000;
         }
         if (starRanOutOfGoodsRecordBuilder_ == null) {
           result.starRanOutOfGoodsRecord_ = starRanOutOfGoodsRecord_;
@@ -62755,6 +62862,11 @@ public final class Messages {
         }
         if (other.hasPlanetIndex()) {
           setPlanetIndex(other.getPlanetIndex());
+        }
+        if (other.hasRealm()) {
+          bitField0_ |= 0x00000020;
+          realm_ = other.realm_;
+          onChanged();
         }
         if (other.hasBuildCompleteRecord()) {
           mergeBuildCompleteRecord(other.getBuildCompleteRecord());
@@ -63095,6 +63207,110 @@ public final class Messages {
         return this;
       }
 
+      // optional string realm = 14;
+      private java.lang.Object realm_ = "";
+      /**
+       * <code>optional string realm = 14;</code>
+       *
+       * <pre>
+       * This is the name of the realm the situation report was generated from. Used so that we can
+       * fetch the correct star definitions, and display separate notifications for separate realms.
+       * </pre>
+       */
+      public boolean hasRealm() {
+        return ((bitField0_ & 0x00000020) == 0x00000020);
+      }
+      /**
+       * <code>optional string realm = 14;</code>
+       *
+       * <pre>
+       * This is the name of the realm the situation report was generated from. Used so that we can
+       * fetch the correct star definitions, and display separate notifications for separate realms.
+       * </pre>
+       */
+      public java.lang.String getRealm() {
+        java.lang.Object ref = realm_;
+        if (!(ref instanceof java.lang.String)) {
+          java.lang.String s = ((com.google.protobuf.ByteString) ref)
+              .toStringUtf8();
+          realm_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>optional string realm = 14;</code>
+       *
+       * <pre>
+       * This is the name of the realm the situation report was generated from. Used so that we can
+       * fetch the correct star definitions, and display separate notifications for separate realms.
+       * </pre>
+       */
+      public com.google.protobuf.ByteString
+          getRealmBytes() {
+        java.lang.Object ref = realm_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          realm_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>optional string realm = 14;</code>
+       *
+       * <pre>
+       * This is the name of the realm the situation report was generated from. Used so that we can
+       * fetch the correct star definitions, and display separate notifications for separate realms.
+       * </pre>
+       */
+      public Builder setRealm(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000020;
+        realm_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional string realm = 14;</code>
+       *
+       * <pre>
+       * This is the name of the realm the situation report was generated from. Used so that we can
+       * fetch the correct star definitions, and display separate notifications for separate realms.
+       * </pre>
+       */
+      public Builder clearRealm() {
+        bitField0_ = (bitField0_ & ~0x00000020);
+        realm_ = getDefaultInstance().getRealm();
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional string realm = 14;</code>
+       *
+       * <pre>
+       * This is the name of the realm the situation report was generated from. Used so that we can
+       * fetch the correct star definitions, and display separate notifications for separate realms.
+       * </pre>
+       */
+      public Builder setRealmBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000020;
+        realm_ = value;
+        onChanged();
+        return this;
+      }
+
       // optional .au.com.codeka.common.protobuf.SituationReport.BuildCompleteRecord build_complete_record = 6;
       private au.com.codeka.common.protobuf.Messages.SituationReport.BuildCompleteRecord buildCompleteRecord_ = au.com.codeka.common.protobuf.Messages.SituationReport.BuildCompleteRecord.getDefaultInstance();
       private com.google.protobuf.SingleFieldBuilder<
@@ -63103,7 +63319,7 @@ public final class Messages {
        * <code>optional .au.com.codeka.common.protobuf.SituationReport.BuildCompleteRecord build_complete_record = 6;</code>
        */
       public boolean hasBuildCompleteRecord() {
-        return ((bitField0_ & 0x00000020) == 0x00000020);
+        return ((bitField0_ & 0x00000040) == 0x00000040);
       }
       /**
        * <code>optional .au.com.codeka.common.protobuf.SituationReport.BuildCompleteRecord build_complete_record = 6;</code>
@@ -63128,7 +63344,7 @@ public final class Messages {
         } else {
           buildCompleteRecordBuilder_.setMessage(value);
         }
-        bitField0_ |= 0x00000020;
+        bitField0_ |= 0x00000040;
         return this;
       }
       /**
@@ -63142,7 +63358,7 @@ public final class Messages {
         } else {
           buildCompleteRecordBuilder_.setMessage(builderForValue.build());
         }
-        bitField0_ |= 0x00000020;
+        bitField0_ |= 0x00000040;
         return this;
       }
       /**
@@ -63150,7 +63366,7 @@ public final class Messages {
        */
       public Builder mergeBuildCompleteRecord(au.com.codeka.common.protobuf.Messages.SituationReport.BuildCompleteRecord value) {
         if (buildCompleteRecordBuilder_ == null) {
-          if (((bitField0_ & 0x00000020) == 0x00000020) &&
+          if (((bitField0_ & 0x00000040) == 0x00000040) &&
               buildCompleteRecord_ != au.com.codeka.common.protobuf.Messages.SituationReport.BuildCompleteRecord.getDefaultInstance()) {
             buildCompleteRecord_ =
               au.com.codeka.common.protobuf.Messages.SituationReport.BuildCompleteRecord.newBuilder(buildCompleteRecord_).mergeFrom(value).buildPartial();
@@ -63161,7 +63377,7 @@ public final class Messages {
         } else {
           buildCompleteRecordBuilder_.mergeFrom(value);
         }
-        bitField0_ |= 0x00000020;
+        bitField0_ |= 0x00000040;
         return this;
       }
       /**
@@ -63174,14 +63390,14 @@ public final class Messages {
         } else {
           buildCompleteRecordBuilder_.clear();
         }
-        bitField0_ = (bitField0_ & ~0x00000020);
+        bitField0_ = (bitField0_ & ~0x00000040);
         return this;
       }
       /**
        * <code>optional .au.com.codeka.common.protobuf.SituationReport.BuildCompleteRecord build_complete_record = 6;</code>
        */
       public au.com.codeka.common.protobuf.Messages.SituationReport.BuildCompleteRecord.Builder getBuildCompleteRecordBuilder() {
-        bitField0_ |= 0x00000020;
+        bitField0_ |= 0x00000040;
         onChanged();
         return getBuildCompleteRecordFieldBuilder().getBuilder();
       }
@@ -63220,7 +63436,7 @@ public final class Messages {
        * <code>optional .au.com.codeka.common.protobuf.SituationReport.MoveCompleteRecord move_complete_record = 7;</code>
        */
       public boolean hasMoveCompleteRecord() {
-        return ((bitField0_ & 0x00000040) == 0x00000040);
+        return ((bitField0_ & 0x00000080) == 0x00000080);
       }
       /**
        * <code>optional .au.com.codeka.common.protobuf.SituationReport.MoveCompleteRecord move_complete_record = 7;</code>
@@ -63245,7 +63461,7 @@ public final class Messages {
         } else {
           moveCompleteRecordBuilder_.setMessage(value);
         }
-        bitField0_ |= 0x00000040;
+        bitField0_ |= 0x00000080;
         return this;
       }
       /**
@@ -63259,7 +63475,7 @@ public final class Messages {
         } else {
           moveCompleteRecordBuilder_.setMessage(builderForValue.build());
         }
-        bitField0_ |= 0x00000040;
+        bitField0_ |= 0x00000080;
         return this;
       }
       /**
@@ -63267,7 +63483,7 @@ public final class Messages {
        */
       public Builder mergeMoveCompleteRecord(au.com.codeka.common.protobuf.Messages.SituationReport.MoveCompleteRecord value) {
         if (moveCompleteRecordBuilder_ == null) {
-          if (((bitField0_ & 0x00000040) == 0x00000040) &&
+          if (((bitField0_ & 0x00000080) == 0x00000080) &&
               moveCompleteRecord_ != au.com.codeka.common.protobuf.Messages.SituationReport.MoveCompleteRecord.getDefaultInstance()) {
             moveCompleteRecord_ =
               au.com.codeka.common.protobuf.Messages.SituationReport.MoveCompleteRecord.newBuilder(moveCompleteRecord_).mergeFrom(value).buildPartial();
@@ -63278,7 +63494,7 @@ public final class Messages {
         } else {
           moveCompleteRecordBuilder_.mergeFrom(value);
         }
-        bitField0_ |= 0x00000040;
+        bitField0_ |= 0x00000080;
         return this;
       }
       /**
@@ -63291,14 +63507,14 @@ public final class Messages {
         } else {
           moveCompleteRecordBuilder_.clear();
         }
-        bitField0_ = (bitField0_ & ~0x00000040);
+        bitField0_ = (bitField0_ & ~0x00000080);
         return this;
       }
       /**
        * <code>optional .au.com.codeka.common.protobuf.SituationReport.MoveCompleteRecord move_complete_record = 7;</code>
        */
       public au.com.codeka.common.protobuf.Messages.SituationReport.MoveCompleteRecord.Builder getMoveCompleteRecordBuilder() {
-        bitField0_ |= 0x00000040;
+        bitField0_ |= 0x00000080;
         onChanged();
         return getMoveCompleteRecordFieldBuilder().getBuilder();
       }
@@ -63337,7 +63553,7 @@ public final class Messages {
        * <code>optional .au.com.codeka.common.protobuf.SituationReport.FleetUnderAttackRecord fleet_under_attack_record = 8;</code>
        */
       public boolean hasFleetUnderAttackRecord() {
-        return ((bitField0_ & 0x00000080) == 0x00000080);
+        return ((bitField0_ & 0x00000100) == 0x00000100);
       }
       /**
        * <code>optional .au.com.codeka.common.protobuf.SituationReport.FleetUnderAttackRecord fleet_under_attack_record = 8;</code>
@@ -63362,7 +63578,7 @@ public final class Messages {
         } else {
           fleetUnderAttackRecordBuilder_.setMessage(value);
         }
-        bitField0_ |= 0x00000080;
+        bitField0_ |= 0x00000100;
         return this;
       }
       /**
@@ -63376,7 +63592,7 @@ public final class Messages {
         } else {
           fleetUnderAttackRecordBuilder_.setMessage(builderForValue.build());
         }
-        bitField0_ |= 0x00000080;
+        bitField0_ |= 0x00000100;
         return this;
       }
       /**
@@ -63384,7 +63600,7 @@ public final class Messages {
        */
       public Builder mergeFleetUnderAttackRecord(au.com.codeka.common.protobuf.Messages.SituationReport.FleetUnderAttackRecord value) {
         if (fleetUnderAttackRecordBuilder_ == null) {
-          if (((bitField0_ & 0x00000080) == 0x00000080) &&
+          if (((bitField0_ & 0x00000100) == 0x00000100) &&
               fleetUnderAttackRecord_ != au.com.codeka.common.protobuf.Messages.SituationReport.FleetUnderAttackRecord.getDefaultInstance()) {
             fleetUnderAttackRecord_ =
               au.com.codeka.common.protobuf.Messages.SituationReport.FleetUnderAttackRecord.newBuilder(fleetUnderAttackRecord_).mergeFrom(value).buildPartial();
@@ -63395,7 +63611,7 @@ public final class Messages {
         } else {
           fleetUnderAttackRecordBuilder_.mergeFrom(value);
         }
-        bitField0_ |= 0x00000080;
+        bitField0_ |= 0x00000100;
         return this;
       }
       /**
@@ -63408,14 +63624,14 @@ public final class Messages {
         } else {
           fleetUnderAttackRecordBuilder_.clear();
         }
-        bitField0_ = (bitField0_ & ~0x00000080);
+        bitField0_ = (bitField0_ & ~0x00000100);
         return this;
       }
       /**
        * <code>optional .au.com.codeka.common.protobuf.SituationReport.FleetUnderAttackRecord fleet_under_attack_record = 8;</code>
        */
       public au.com.codeka.common.protobuf.Messages.SituationReport.FleetUnderAttackRecord.Builder getFleetUnderAttackRecordBuilder() {
-        bitField0_ |= 0x00000080;
+        bitField0_ |= 0x00000100;
         onChanged();
         return getFleetUnderAttackRecordFieldBuilder().getBuilder();
       }
@@ -63454,7 +63670,7 @@ public final class Messages {
        * <code>optional .au.com.codeka.common.protobuf.SituationReport.FleetDestroyedRecord fleet_destroyed_record = 9;</code>
        */
       public boolean hasFleetDestroyedRecord() {
-        return ((bitField0_ & 0x00000100) == 0x00000100);
+        return ((bitField0_ & 0x00000200) == 0x00000200);
       }
       /**
        * <code>optional .au.com.codeka.common.protobuf.SituationReport.FleetDestroyedRecord fleet_destroyed_record = 9;</code>
@@ -63479,7 +63695,7 @@ public final class Messages {
         } else {
           fleetDestroyedRecordBuilder_.setMessage(value);
         }
-        bitField0_ |= 0x00000100;
+        bitField0_ |= 0x00000200;
         return this;
       }
       /**
@@ -63493,7 +63709,7 @@ public final class Messages {
         } else {
           fleetDestroyedRecordBuilder_.setMessage(builderForValue.build());
         }
-        bitField0_ |= 0x00000100;
+        bitField0_ |= 0x00000200;
         return this;
       }
       /**
@@ -63501,7 +63717,7 @@ public final class Messages {
        */
       public Builder mergeFleetDestroyedRecord(au.com.codeka.common.protobuf.Messages.SituationReport.FleetDestroyedRecord value) {
         if (fleetDestroyedRecordBuilder_ == null) {
-          if (((bitField0_ & 0x00000100) == 0x00000100) &&
+          if (((bitField0_ & 0x00000200) == 0x00000200) &&
               fleetDestroyedRecord_ != au.com.codeka.common.protobuf.Messages.SituationReport.FleetDestroyedRecord.getDefaultInstance()) {
             fleetDestroyedRecord_ =
               au.com.codeka.common.protobuf.Messages.SituationReport.FleetDestroyedRecord.newBuilder(fleetDestroyedRecord_).mergeFrom(value).buildPartial();
@@ -63512,7 +63728,7 @@ public final class Messages {
         } else {
           fleetDestroyedRecordBuilder_.mergeFrom(value);
         }
-        bitField0_ |= 0x00000100;
+        bitField0_ |= 0x00000200;
         return this;
       }
       /**
@@ -63525,14 +63741,14 @@ public final class Messages {
         } else {
           fleetDestroyedRecordBuilder_.clear();
         }
-        bitField0_ = (bitField0_ & ~0x00000100);
+        bitField0_ = (bitField0_ & ~0x00000200);
         return this;
       }
       /**
        * <code>optional .au.com.codeka.common.protobuf.SituationReport.FleetDestroyedRecord fleet_destroyed_record = 9;</code>
        */
       public au.com.codeka.common.protobuf.Messages.SituationReport.FleetDestroyedRecord.Builder getFleetDestroyedRecordBuilder() {
-        bitField0_ |= 0x00000100;
+        bitField0_ |= 0x00000200;
         onChanged();
         return getFleetDestroyedRecordFieldBuilder().getBuilder();
       }
@@ -63571,7 +63787,7 @@ public final class Messages {
        * <code>optional .au.com.codeka.common.protobuf.SituationReport.FleetVictoriousRecord fleet_victorious_record = 10;</code>
        */
       public boolean hasFleetVictoriousRecord() {
-        return ((bitField0_ & 0x00000200) == 0x00000200);
+        return ((bitField0_ & 0x00000400) == 0x00000400);
       }
       /**
        * <code>optional .au.com.codeka.common.protobuf.SituationReport.FleetVictoriousRecord fleet_victorious_record = 10;</code>
@@ -63596,7 +63812,7 @@ public final class Messages {
         } else {
           fleetVictoriousRecordBuilder_.setMessage(value);
         }
-        bitField0_ |= 0x00000200;
+        bitField0_ |= 0x00000400;
         return this;
       }
       /**
@@ -63610,7 +63826,7 @@ public final class Messages {
         } else {
           fleetVictoriousRecordBuilder_.setMessage(builderForValue.build());
         }
-        bitField0_ |= 0x00000200;
+        bitField0_ |= 0x00000400;
         return this;
       }
       /**
@@ -63618,7 +63834,7 @@ public final class Messages {
        */
       public Builder mergeFleetVictoriousRecord(au.com.codeka.common.protobuf.Messages.SituationReport.FleetVictoriousRecord value) {
         if (fleetVictoriousRecordBuilder_ == null) {
-          if (((bitField0_ & 0x00000200) == 0x00000200) &&
+          if (((bitField0_ & 0x00000400) == 0x00000400) &&
               fleetVictoriousRecord_ != au.com.codeka.common.protobuf.Messages.SituationReport.FleetVictoriousRecord.getDefaultInstance()) {
             fleetVictoriousRecord_ =
               au.com.codeka.common.protobuf.Messages.SituationReport.FleetVictoriousRecord.newBuilder(fleetVictoriousRecord_).mergeFrom(value).buildPartial();
@@ -63629,7 +63845,7 @@ public final class Messages {
         } else {
           fleetVictoriousRecordBuilder_.mergeFrom(value);
         }
-        bitField0_ |= 0x00000200;
+        bitField0_ |= 0x00000400;
         return this;
       }
       /**
@@ -63642,14 +63858,14 @@ public final class Messages {
         } else {
           fleetVictoriousRecordBuilder_.clear();
         }
-        bitField0_ = (bitField0_ & ~0x00000200);
+        bitField0_ = (bitField0_ & ~0x00000400);
         return this;
       }
       /**
        * <code>optional .au.com.codeka.common.protobuf.SituationReport.FleetVictoriousRecord fleet_victorious_record = 10;</code>
        */
       public au.com.codeka.common.protobuf.Messages.SituationReport.FleetVictoriousRecord.Builder getFleetVictoriousRecordBuilder() {
-        bitField0_ |= 0x00000200;
+        bitField0_ |= 0x00000400;
         onChanged();
         return getFleetVictoriousRecordFieldBuilder().getBuilder();
       }
@@ -63688,7 +63904,7 @@ public final class Messages {
        * <code>optional .au.com.codeka.common.protobuf.SituationReport.ColonyDestroyedRecord colony_destroyed_record = 11;</code>
        */
       public boolean hasColonyDestroyedRecord() {
-        return ((bitField0_ & 0x00000400) == 0x00000400);
+        return ((bitField0_ & 0x00000800) == 0x00000800);
       }
       /**
        * <code>optional .au.com.codeka.common.protobuf.SituationReport.ColonyDestroyedRecord colony_destroyed_record = 11;</code>
@@ -63713,7 +63929,7 @@ public final class Messages {
         } else {
           colonyDestroyedRecordBuilder_.setMessage(value);
         }
-        bitField0_ |= 0x00000400;
+        bitField0_ |= 0x00000800;
         return this;
       }
       /**
@@ -63727,7 +63943,7 @@ public final class Messages {
         } else {
           colonyDestroyedRecordBuilder_.setMessage(builderForValue.build());
         }
-        bitField0_ |= 0x00000400;
+        bitField0_ |= 0x00000800;
         return this;
       }
       /**
@@ -63735,7 +63951,7 @@ public final class Messages {
        */
       public Builder mergeColonyDestroyedRecord(au.com.codeka.common.protobuf.Messages.SituationReport.ColonyDestroyedRecord value) {
         if (colonyDestroyedRecordBuilder_ == null) {
-          if (((bitField0_ & 0x00000400) == 0x00000400) &&
+          if (((bitField0_ & 0x00000800) == 0x00000800) &&
               colonyDestroyedRecord_ != au.com.codeka.common.protobuf.Messages.SituationReport.ColonyDestroyedRecord.getDefaultInstance()) {
             colonyDestroyedRecord_ =
               au.com.codeka.common.protobuf.Messages.SituationReport.ColonyDestroyedRecord.newBuilder(colonyDestroyedRecord_).mergeFrom(value).buildPartial();
@@ -63746,7 +63962,7 @@ public final class Messages {
         } else {
           colonyDestroyedRecordBuilder_.mergeFrom(value);
         }
-        bitField0_ |= 0x00000400;
+        bitField0_ |= 0x00000800;
         return this;
       }
       /**
@@ -63759,14 +63975,14 @@ public final class Messages {
         } else {
           colonyDestroyedRecordBuilder_.clear();
         }
-        bitField0_ = (bitField0_ & ~0x00000400);
+        bitField0_ = (bitField0_ & ~0x00000800);
         return this;
       }
       /**
        * <code>optional .au.com.codeka.common.protobuf.SituationReport.ColonyDestroyedRecord colony_destroyed_record = 11;</code>
        */
       public au.com.codeka.common.protobuf.Messages.SituationReport.ColonyDestroyedRecord.Builder getColonyDestroyedRecordBuilder() {
-        bitField0_ |= 0x00000400;
+        bitField0_ |= 0x00000800;
         onChanged();
         return getColonyDestroyedRecordFieldBuilder().getBuilder();
       }
@@ -63805,7 +64021,7 @@ public final class Messages {
        * <code>optional .au.com.codeka.common.protobuf.SituationReport.ColonyAttackedRecord colony_attacked_record = 12;</code>
        */
       public boolean hasColonyAttackedRecord() {
-        return ((bitField0_ & 0x00000800) == 0x00000800);
+        return ((bitField0_ & 0x00001000) == 0x00001000);
       }
       /**
        * <code>optional .au.com.codeka.common.protobuf.SituationReport.ColonyAttackedRecord colony_attacked_record = 12;</code>
@@ -63830,7 +64046,7 @@ public final class Messages {
         } else {
           colonyAttackedRecordBuilder_.setMessage(value);
         }
-        bitField0_ |= 0x00000800;
+        bitField0_ |= 0x00001000;
         return this;
       }
       /**
@@ -63844,7 +64060,7 @@ public final class Messages {
         } else {
           colonyAttackedRecordBuilder_.setMessage(builderForValue.build());
         }
-        bitField0_ |= 0x00000800;
+        bitField0_ |= 0x00001000;
         return this;
       }
       /**
@@ -63852,7 +64068,7 @@ public final class Messages {
        */
       public Builder mergeColonyAttackedRecord(au.com.codeka.common.protobuf.Messages.SituationReport.ColonyAttackedRecord value) {
         if (colonyAttackedRecordBuilder_ == null) {
-          if (((bitField0_ & 0x00000800) == 0x00000800) &&
+          if (((bitField0_ & 0x00001000) == 0x00001000) &&
               colonyAttackedRecord_ != au.com.codeka.common.protobuf.Messages.SituationReport.ColonyAttackedRecord.getDefaultInstance()) {
             colonyAttackedRecord_ =
               au.com.codeka.common.protobuf.Messages.SituationReport.ColonyAttackedRecord.newBuilder(colonyAttackedRecord_).mergeFrom(value).buildPartial();
@@ -63863,7 +64079,7 @@ public final class Messages {
         } else {
           colonyAttackedRecordBuilder_.mergeFrom(value);
         }
-        bitField0_ |= 0x00000800;
+        bitField0_ |= 0x00001000;
         return this;
       }
       /**
@@ -63876,14 +64092,14 @@ public final class Messages {
         } else {
           colonyAttackedRecordBuilder_.clear();
         }
-        bitField0_ = (bitField0_ & ~0x00000800);
+        bitField0_ = (bitField0_ & ~0x00001000);
         return this;
       }
       /**
        * <code>optional .au.com.codeka.common.protobuf.SituationReport.ColonyAttackedRecord colony_attacked_record = 12;</code>
        */
       public au.com.codeka.common.protobuf.Messages.SituationReport.ColonyAttackedRecord.Builder getColonyAttackedRecordBuilder() {
-        bitField0_ |= 0x00000800;
+        bitField0_ |= 0x00001000;
         onChanged();
         return getColonyAttackedRecordFieldBuilder().getBuilder();
       }
@@ -63922,7 +64138,7 @@ public final class Messages {
        * <code>optional .au.com.codeka.common.protobuf.SituationReport.StarRunOutOfGoodsRecord star_ran_out_of_goods_record = 13;</code>
        */
       public boolean hasStarRanOutOfGoodsRecord() {
-        return ((bitField0_ & 0x00001000) == 0x00001000);
+        return ((bitField0_ & 0x00002000) == 0x00002000);
       }
       /**
        * <code>optional .au.com.codeka.common.protobuf.SituationReport.StarRunOutOfGoodsRecord star_ran_out_of_goods_record = 13;</code>
@@ -63947,7 +64163,7 @@ public final class Messages {
         } else {
           starRanOutOfGoodsRecordBuilder_.setMessage(value);
         }
-        bitField0_ |= 0x00001000;
+        bitField0_ |= 0x00002000;
         return this;
       }
       /**
@@ -63961,7 +64177,7 @@ public final class Messages {
         } else {
           starRanOutOfGoodsRecordBuilder_.setMessage(builderForValue.build());
         }
-        bitField0_ |= 0x00001000;
+        bitField0_ |= 0x00002000;
         return this;
       }
       /**
@@ -63969,7 +64185,7 @@ public final class Messages {
        */
       public Builder mergeStarRanOutOfGoodsRecord(au.com.codeka.common.protobuf.Messages.SituationReport.StarRunOutOfGoodsRecord value) {
         if (starRanOutOfGoodsRecordBuilder_ == null) {
-          if (((bitField0_ & 0x00001000) == 0x00001000) &&
+          if (((bitField0_ & 0x00002000) == 0x00002000) &&
               starRanOutOfGoodsRecord_ != au.com.codeka.common.protobuf.Messages.SituationReport.StarRunOutOfGoodsRecord.getDefaultInstance()) {
             starRanOutOfGoodsRecord_ =
               au.com.codeka.common.protobuf.Messages.SituationReport.StarRunOutOfGoodsRecord.newBuilder(starRanOutOfGoodsRecord_).mergeFrom(value).buildPartial();
@@ -63980,7 +64196,7 @@ public final class Messages {
         } else {
           starRanOutOfGoodsRecordBuilder_.mergeFrom(value);
         }
-        bitField0_ |= 0x00001000;
+        bitField0_ |= 0x00002000;
         return this;
       }
       /**
@@ -63993,14 +64209,14 @@ public final class Messages {
         } else {
           starRanOutOfGoodsRecordBuilder_.clear();
         }
-        bitField0_ = (bitField0_ & ~0x00001000);
+        bitField0_ = (bitField0_ & ~0x00002000);
         return this;
       }
       /**
        * <code>optional .au.com.codeka.common.protobuf.SituationReport.StarRunOutOfGoodsRecord star_ran_out_of_goods_record = 13;</code>
        */
       public au.com.codeka.common.protobuf.Messages.SituationReport.StarRunOutOfGoodsRecord.Builder getStarRanOutOfGoodsRecordBuilder() {
-        bitField0_ |= 0x00001000;
+        bitField0_ |= 0x00002000;
         onChanged();
         return getStarRanOutOfGoodsRecordFieldBuilder().getBuilder();
       }
@@ -73919,86 +74135,87 @@ public final class Messages {
       "(\005\022:\n\006rounds\030\010 \003(\0132*.au.com.codeka.commo" +
       "n.protobuf.CombatRound\"M\n\rCombatReports\022",
       "<\n\007reports\030\001 \003(\0132+.au.com.codeka.common." +
-      "protobuf.CombatReport\"\265\r\n\017SituationRepor" +
+      "protobuf.CombatReport\"\304\r\n\017SituationRepor" +
       "t\022\013\n\003key\030\001 \001(\t\022\022\n\nempire_key\030\002 \001(\t\022\023\n\013re" +
       "port_time\030\003 \001(\003\022\020\n\010star_key\030\004 \001(\t\022\024\n\014pla" +
-      "net_index\030\005 \001(\005\022a\n\025build_complete_record" +
-      "\030\006 \001(\0132B.au.com.codeka.common.protobuf.S" +
-      "ituationReport.BuildCompleteRecord\022_\n\024mo" +
-      "ve_complete_record\030\007 \001(\0132A.au.com.codeka" +
-      ".common.protobuf.SituationReport.MoveCom" +
-      "pleteRecord\022h\n\031fleet_under_attack_record",
-      "\030\010 \001(\0132E.au.com.codeka.common.protobuf.S" +
-      "ituationReport.FleetUnderAttackRecord\022c\n" +
-      "\026fleet_destroyed_record\030\t \001(\0132C.au.com.c" +
-      "odeka.common.protobuf.SituationReport.Fl" +
-      "eetDestroyedRecord\022e\n\027fleet_victorious_r" +
-      "ecord\030\n \001(\0132D.au.com.codeka.common.proto" +
-      "buf.SituationReport.FleetVictoriousRecor" +
-      "d\022e\n\027colony_destroyed_record\030\013 \001(\0132D.au." +
-      "com.codeka.common.protobuf.SituationRepo" +
-      "rt.ColonyDestroyedRecord\022c\n\026colony_attac",
-      "ked_record\030\014 \001(\0132C.au.com.codeka.common." +
-      "protobuf.SituationReport.ColonyAttackedR" +
-      "ecord\022l\n\034star_ran_out_of_goods_record\030\r " +
-      "\001(\0132F.au.com.codeka.common.protobuf.Situ" +
-      "ationReport.StarRunOutOfGoodsRecord\032\236\001\n\023" +
-      "BuildCompleteRecord\022J\n\nbuild_kind\030\001 \001(\0162" +
-      "6.au.com.codeka.common.protobuf.BuildReq" +
-      "uest.BUILD_KIND\022\021\n\tdesign_id\030\002 \001(\t\022\r\n\005co" +
-      "unt\030\003 \001(\005\022\031\n\021build_request_key\030\004 \001(\t\032m\n\022" +
-      "MoveCompleteRecord\022\021\n\tfleet_key\030\001 \001(\t\022\027\n",
-      "\017fleet_design_id\030\003 \001(\t\022\021\n\tnum_ships\030\004 \001(" +
-      "\002\022\030\n\020scout_report_key\030\005 \001(\t\032r\n\026FleetUnde" +
-      "rAttackRecord\022\021\n\tfleet_key\030\001 \001(\t\022\027\n\017flee" +
-      "t_design_id\030\002 \001(\t\022\021\n\tnum_ships\030\003 \001(\002\022\031\n\021" +
-      "combat_report_key\030\004 \001(\t\032J\n\024FleetDestroye" +
-      "dRecord\022\027\n\017fleet_design_id\030\001 \001(\t\022\031\n\021comb" +
-      "at_report_key\030\002 \001(\t\032q\n\025FleetVictoriousRe" +
-      "cord\022\021\n\tfleet_key\030\001 \001(\t\022\027\n\017fleet_design_" +
-      "id\030\002 \001(\t\022\021\n\tnum_ships\030\003 \001(\002\022\031\n\021combat_re" +
-      "port_key\030\004 \001(\t\032E\n\025ColonyDestroyedRecord\022",
-      "\022\n\ncolony_key\030\001 \001(\t\022\030\n\020enemy_empire_key\030" +
-      "\002 \001(\t\032W\n\024ColonyAttackedRecord\022\022\n\ncolony_" +
-      "key\030\001 \001(\t\022\030\n\020enemy_empire_key\030\002 \001(\t\022\021\n\tn" +
-      "um_ships\030\003 \001(\002\032-\n\027StarRunOutOfGoodsRecor" +
-      "d\022\022\n\ncolony_key\030\001 \001(\t\"m\n\020SituationReport" +
-      "s\022I\n\021situation_reports\030\001 \003(\0132..au.com.co" +
-      "deka.common.protobuf.SituationReport\022\016\n\006" +
-      "cursor\030\002 \001(\t\"\342\003\n\017CashAuditRecord\022\n\n\002id\030\001" +
-      " \001(\005\022\021\n\tempire_id\030\002 \001(\005\022E\n\006reason\030\003 \001(\0162" +
-      "5.au.com.codeka.common.protobuf.CashAudi",
-      "tRecord.Reason\022\023\n\013before_cash\030\004 \001(\002\022\022\n\na" +
-      "fter_cash\030\005 \001(\002\022\014\n\004time\030\020 \001(\003\022\020\n\010fleet_i" +
-      "d\030\006 \001(\005\022\027\n\017fleet_design_id\030\007 \001(\t\022\021\n\tnum_" +
-      "ships\030\010 \001(\002\022\017\n\007star_id\030\t \001(\005\022\021\n\tstar_nam" +
-      "e\030\n \001(\t\022\025\n\rmove_distance\030\013 \001(\002\022\027\n\017build_" +
-      "design_id\030\014 \001(\t\022\023\n\013build_count\030\r \001(\005\022\031\n\021" +
-      "accelerate_amount\030\016 \001(\002\022\025\n\ralliance_name" +
-      "\030\017 \001(\t\"Y\n\006Reason\022\r\n\tFleetMove\020\000\022\023\n\017Build" +
-      "Accelerate\020\001\022\027\n\023CollectFromColonies\020\002\022\022\n" +
-      "\016CreateAlliance\020\003\"S\n\020CashAuditRecords\022?\n",
-      "\007records\030\001 \003(\0132..au.com.codeka.common.pr" +
-      "otobuf.CashAuditRecord\"\254\001\n\010Alliance\022\013\n\003k" +
-      "ey\030\001 \001(\t\022\014\n\004name\030\002 \001(\t\022\024\n\014time_created\030\003" +
-      " \001(\003\022\032\n\022creator_empire_key\030\004 \001(\t\022\023\n\013num_" +
-      "members\030\005 \001(\005\022>\n\007members\030\006 \003(\0132-.au.com." +
-      "codeka.common.protobuf.AllianceMember\"G\n" +
-      "\tAlliances\022:\n\talliances\030\001 \003(\0132\'.au.com.c" +
-      "odeka.common.protobuf.Alliance\"\\\n\016Allian" +
-      "ceMember\022\013\n\003key\030\001 \001(\t\022\022\n\nempire_key\030\002 \001(" +
-      "\t\022\024\n\014alliance_key\030\003 \001(\t\022\023\n\013time_joined\030\004",
-      " \001(\003\"\376\001\n\023AllianceJoinRequest\022\013\n\003key\030\001 \001(" +
-      "\t\022\024\n\014alliance_key\030\002 \001(\t\022\022\n\nempire_key\030\003 " +
-      "\001(\t\022\017\n\007message\030\004 \001(\t\022\026\n\016time_requested\030\005" +
-      " \001(\003\022N\n\005state\030\006 \001(\0162?.au.com.codeka.comm" +
-      "on.protobuf.AllianceJoinRequest.RequestS" +
-      "tate\"7\n\014RequestState\022\013\n\007PENDING\020\000\022\014\n\010ACC" +
-      "EPTED\020\001\022\014\n\010REJECTED\020\002\"a\n\024AllianceJoinReq" +
-      "uests\022I\n\rjoin_requests\030\001 \003(\01322.au.com.co" +
-      "deka.common.protobuf.AllianceJoinRequest" +
-      "\"@\n\024AllianceLeaveRequest\022\024\n\014alliance_key",
-      "\030\001 \001(\t\022\022\n\nempire_key\030\002 \001(\t"
+      "net_index\030\005 \001(\005\022\r\n\005realm\030\016 \001(\t\022a\n\025build_" +
+      "complete_record\030\006 \001(\0132B.au.com.codeka.co" +
+      "mmon.protobuf.SituationReport.BuildCompl" +
+      "eteRecord\022_\n\024move_complete_record\030\007 \001(\0132" +
+      "A.au.com.codeka.common.protobuf.Situatio" +
+      "nReport.MoveCompleteRecord\022h\n\031fleet_unde",
+      "r_attack_record\030\010 \001(\0132E.au.com.codeka.co" +
+      "mmon.protobuf.SituationReport.FleetUnder" +
+      "AttackRecord\022c\n\026fleet_destroyed_record\030\t" +
+      " \001(\0132C.au.com.codeka.common.protobuf.Sit" +
+      "uationReport.FleetDestroyedRecord\022e\n\027fle" +
+      "et_victorious_record\030\n \001(\0132D.au.com.code" +
+      "ka.common.protobuf.SituationReport.Fleet" +
+      "VictoriousRecord\022e\n\027colony_destroyed_rec" +
+      "ord\030\013 \001(\0132D.au.com.codeka.common.protobu" +
+      "f.SituationReport.ColonyDestroyedRecord\022",
+      "c\n\026colony_attacked_record\030\014 \001(\0132C.au.com" +
+      ".codeka.common.protobuf.SituationReport." +
+      "ColonyAttackedRecord\022l\n\034star_ran_out_of_" +
+      "goods_record\030\r \001(\0132F.au.com.codeka.commo" +
+      "n.protobuf.SituationReport.StarRunOutOfG" +
+      "oodsRecord\032\236\001\n\023BuildCompleteRecord\022J\n\nbu" +
+      "ild_kind\030\001 \001(\01626.au.com.codeka.common.pr" +
+      "otobuf.BuildRequest.BUILD_KIND\022\021\n\tdesign" +
+      "_id\030\002 \001(\t\022\r\n\005count\030\003 \001(\005\022\031\n\021build_reques" +
+      "t_key\030\004 \001(\t\032m\n\022MoveCompleteRecord\022\021\n\tfle",
+      "et_key\030\001 \001(\t\022\027\n\017fleet_design_id\030\003 \001(\t\022\021\n" +
+      "\tnum_ships\030\004 \001(\002\022\030\n\020scout_report_key\030\005 \001" +
+      "(\t\032r\n\026FleetUnderAttackRecord\022\021\n\tfleet_ke" +
+      "y\030\001 \001(\t\022\027\n\017fleet_design_id\030\002 \001(\t\022\021\n\tnum_" +
+      "ships\030\003 \001(\002\022\031\n\021combat_report_key\030\004 \001(\t\032J" +
+      "\n\024FleetDestroyedRecord\022\027\n\017fleet_design_i" +
+      "d\030\001 \001(\t\022\031\n\021combat_report_key\030\002 \001(\t\032q\n\025Fl" +
+      "eetVictoriousRecord\022\021\n\tfleet_key\030\001 \001(\t\022\027" +
+      "\n\017fleet_design_id\030\002 \001(\t\022\021\n\tnum_ships\030\003 \001" +
+      "(\002\022\031\n\021combat_report_key\030\004 \001(\t\032E\n\025ColonyD",
+      "estroyedRecord\022\022\n\ncolony_key\030\001 \001(\t\022\030\n\020en" +
+      "emy_empire_key\030\002 \001(\t\032W\n\024ColonyAttackedRe" +
+      "cord\022\022\n\ncolony_key\030\001 \001(\t\022\030\n\020enemy_empire" +
+      "_key\030\002 \001(\t\022\021\n\tnum_ships\030\003 \001(\002\032-\n\027StarRun" +
+      "OutOfGoodsRecord\022\022\n\ncolony_key\030\001 \001(\t\"m\n\020" +
+      "SituationReports\022I\n\021situation_reports\030\001 " +
+      "\003(\0132..au.com.codeka.common.protobuf.Situ" +
+      "ationReport\022\016\n\006cursor\030\002 \001(\t\"\342\003\n\017CashAudi" +
+      "tRecord\022\n\n\002id\030\001 \001(\005\022\021\n\tempire_id\030\002 \001(\005\022E" +
+      "\n\006reason\030\003 \001(\01625.au.com.codeka.common.pr",
+      "otobuf.CashAuditRecord.Reason\022\023\n\013before_" +
+      "cash\030\004 \001(\002\022\022\n\nafter_cash\030\005 \001(\002\022\014\n\004time\030\020" +
+      " \001(\003\022\020\n\010fleet_id\030\006 \001(\005\022\027\n\017fleet_design_i" +
+      "d\030\007 \001(\t\022\021\n\tnum_ships\030\010 \001(\002\022\017\n\007star_id\030\t " +
+      "\001(\005\022\021\n\tstar_name\030\n \001(\t\022\025\n\rmove_distance\030" +
+      "\013 \001(\002\022\027\n\017build_design_id\030\014 \001(\t\022\023\n\013build_" +
+      "count\030\r \001(\005\022\031\n\021accelerate_amount\030\016 \001(\002\022\025" +
+      "\n\ralliance_name\030\017 \001(\t\"Y\n\006Reason\022\r\n\tFleet" +
+      "Move\020\000\022\023\n\017BuildAccelerate\020\001\022\027\n\023CollectFr" +
+      "omColonies\020\002\022\022\n\016CreateAlliance\020\003\"S\n\020Cash",
+      "AuditRecords\022?\n\007records\030\001 \003(\0132..au.com.c" +
+      "odeka.common.protobuf.CashAuditRecord\"\254\001" +
+      "\n\010Alliance\022\013\n\003key\030\001 \001(\t\022\014\n\004name\030\002 \001(\t\022\024\n" +
+      "\014time_created\030\003 \001(\003\022\032\n\022creator_empire_ke" +
+      "y\030\004 \001(\t\022\023\n\013num_members\030\005 \001(\005\022>\n\007members\030" +
+      "\006 \003(\0132-.au.com.codeka.common.protobuf.Al" +
+      "lianceMember\"G\n\tAlliances\022:\n\talliances\030\001" +
+      " \003(\0132\'.au.com.codeka.common.protobuf.All" +
+      "iance\"\\\n\016AllianceMember\022\013\n\003key\030\001 \001(\t\022\022\n\n" +
+      "empire_key\030\002 \001(\t\022\024\n\014alliance_key\030\003 \001(\t\022\023",
+      "\n\013time_joined\030\004 \001(\003\"\376\001\n\023AllianceJoinRequ" +
+      "est\022\013\n\003key\030\001 \001(\t\022\024\n\014alliance_key\030\002 \001(\t\022\022" +
+      "\n\nempire_key\030\003 \001(\t\022\017\n\007message\030\004 \001(\t\022\026\n\016t" +
+      "ime_requested\030\005 \001(\003\022N\n\005state\030\006 \001(\0162?.au." +
+      "com.codeka.common.protobuf.AllianceJoinR" +
+      "equest.RequestState\"7\n\014RequestState\022\013\n\007P" +
+      "ENDING\020\000\022\014\n\010ACCEPTED\020\001\022\014\n\010REJECTED\020\002\"a\n\024" +
+      "AllianceJoinRequests\022I\n\rjoin_requests\030\001 " +
+      "\003(\01322.au.com.codeka.common.protobuf.Alli" +
+      "anceJoinRequest\"@\n\024AllianceLeaveRequest\022",
+      "\024\n\014alliance_key\030\001 \001(\t\022\022\n\nempire_key\030\002 \001(" +
+      "\t"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
       new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
@@ -74280,7 +74497,7 @@ public final class Messages {
           internal_static_au_com_codeka_common_protobuf_SituationReport_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_au_com_codeka_common_protobuf_SituationReport_descriptor,
-              new java.lang.String[] { "Key", "EmpireKey", "ReportTime", "StarKey", "PlanetIndex", "BuildCompleteRecord", "MoveCompleteRecord", "FleetUnderAttackRecord", "FleetDestroyedRecord", "FleetVictoriousRecord", "ColonyDestroyedRecord", "ColonyAttackedRecord", "StarRanOutOfGoodsRecord", });
+              new java.lang.String[] { "Key", "EmpireKey", "ReportTime", "StarKey", "PlanetIndex", "Realm", "BuildCompleteRecord", "MoveCompleteRecord", "FleetUnderAttackRecord", "FleetDestroyedRecord", "FleetVictoriousRecord", "ColonyDestroyedRecord", "ColonyAttackedRecord", "StarRanOutOfGoodsRecord", });
           internal_static_au_com_codeka_common_protobuf_SituationReport_BuildCompleteRecord_descriptor =
             internal_static_au_com_codeka_common_protobuf_SituationReport_descriptor.getNestedTypes().get(0);
           internal_static_au_com_codeka_common_protobuf_SituationReport_BuildCompleteRecord_fieldAccessorTable = new

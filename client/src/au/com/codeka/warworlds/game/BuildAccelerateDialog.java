@@ -1,4 +1,4 @@
-package au.com.codeka.warworlds.game;
+    package au.com.codeka.warworlds.game;
 
 import java.util.Locale;
 
@@ -130,10 +130,10 @@ public class BuildAccelerateDialog extends DialogFragment {
             @Override
             protected void onComplete(BuildRequest buildRequest) {
                 // tell the StarManager that this star has been updated
-                StarManager.getInstance().refreshStar(activity.getApplicationContext(), mStar.getKey());
+                StarManager.getInstance().refreshStar(mStar.getKey());
 
                 // tell the EmpireManager to update the empire (since our cash will have gone down)
-                EmpireManager.i.refreshEmpire(activity);
+                EmpireManager.i.refreshEmpire();
 
                 if (mErrorMsg != null) {
                     new StyledDialog.Builder(activity.getApplicationContext())
