@@ -3,6 +3,8 @@ package au.com.codeka.warworlds.model;
 import java.net.URI;
 import java.net.URISyntaxException;
 
+import au.com.codeka.warworlds.api.Authenticator;
+
 public class Realm {
     private int mID;
     private URI mBaseUrl;
@@ -10,6 +12,7 @@ public class Realm {
     private String mDescription;
     private AuthenticationMethod mAuthenticationMethod;
     private boolean mIsAlpha;
+    private Authenticator mAuthenticator;
 
     public enum AuthenticationMethod {
         Default,
@@ -25,6 +28,7 @@ public class Realm {
         mDescription = description;
         mAuthenticationMethod = authMethod;
         mIsAlpha = isAlpha;
+        mAuthenticator = new Authenticator();
     }
 
     /**
@@ -49,5 +53,9 @@ public class Realm {
     }
     public AuthenticationMethod getAuthentciationMethod() {
         return mAuthenticationMethod;
+    }
+
+    public Authenticator getAuthenticator() {
+        return mAuthenticator;
     }
 }

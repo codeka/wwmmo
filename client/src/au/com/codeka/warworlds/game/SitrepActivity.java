@@ -37,6 +37,7 @@ import au.com.codeka.warworlds.api.ApiException;
 import au.com.codeka.warworlds.game.solarsystem.SolarSystemActivity;
 import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.MyEmpire;
+import au.com.codeka.warworlds.model.RealmManager;
 import au.com.codeka.warworlds.model.SituationReport;
 import au.com.codeka.warworlds.model.Sprite;
 import au.com.codeka.warworlds.model.SpriteDrawable;
@@ -64,6 +65,11 @@ public class SitrepActivity extends BaseActivity {
 
         mStarKey = getIntent().getStringExtra("au.com.codeka.warworlds.StarKey");
         mHandler = new Handler();
+
+        int realmID = getIntent().getIntExtra("au.com.codeka.warworlds.RealmID", 0);
+        if (realmID != 0) {
+            RealmManager.i.selectRealm(realmID);
+        }
     }
 
     @Override
@@ -127,7 +133,7 @@ public class SitrepActivity extends BaseActivity {
 
         if (mStarKey == null) {
             // clear all our notifications
-            Notifications.clearNotifications(mContext);
+            Notifications.clearNotifications();
 
             MyEmpire empire = EmpireManager.i.getEmpire();
 

@@ -36,7 +36,6 @@ public class Util {
             return false;
         }
 
-        Authenticator.configure(context);
         SpriteManager.i.setup(context);
         DesignManager.setup(context);
         PurchaseManager.getInstance().setup();

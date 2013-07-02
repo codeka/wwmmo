@@ -159,6 +159,7 @@ public class AccountsActivity extends BaseActivity {
     }
 
     private void unregister() {
+        DeviceRegistrar.unregister(true);
         GCMIntentService.unregister(this);
 
         final SharedPreferences prefs = Util.getSharedPreferences();

@@ -14,6 +14,7 @@ import android.os.Handler;
 import android.os.StrictMode;
 import android.preference.PreferenceManager;
 import au.com.codeka.BackgroundRunner;
+import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.api.ApiClient;
 import au.com.codeka.warworlds.api.ApiException;
 import au.com.codeka.warworlds.ctrl.BannerAdView;
@@ -22,7 +23,8 @@ import au.com.codeka.warworlds.model.ChatManager;
 import au.com.codeka.warworlds.model.Colony;
 import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.MyEmpire;
-import au.com.codeka.common.protobuf.Messages;
+import au.com.codeka.warworlds.model.Realm;
+import au.com.codeka.warworlds.model.RealmManager;
 
 import com.google.android.gcm.GCMRegistrar;
 
@@ -39,10 +41,21 @@ public class ServerGreeter {
     private static boolean mHelloComplete;
     private static ServerGreeting mServerGreeting;
 
+    /**
+     * When we change realms, we'll want to make sure we say 'hello' again.
+     */
+    private static RealmManager.RealmChangedHandler mRealmChangedHandler = new RealmManager.RealmChangedHandler() {
+        @Override
+        public void onRealmChanged(Realm newRealm) {
+            clearHello();
+        }
+    };
+
     static {
         mHelloCompleteHandlers = new ArrayList<HelloCompleteHandler>();
         mHelloWatchers = new ArrayList<HelloWatcher>();
         clearHello();
+        RealmManager.i.addRealmChangedHandler(mRealmChangedHandler);
     }
 
     public static void addHelloWatcher(HelloWatcher watcher) {
@@ -103,7 +116,6 @@ public class ServerGreeter {
         GCMRegistrar.checkDevice(activity);
         GCMRegistrar.checkManifest(activity);
 
-        Authenticator.configure(activity);
         PreferenceManager.setDefaultValues(activity, R.xml.global_options, false);
 
         int memoryClass = ((ActivityManager) activity.getSystemService(BaseActivity.ACTIVITY_SERVICE)).getMemoryClass();
@@ -137,11 +149,13 @@ public class ServerGreeter {
 
             @Override
             protected String doInBackground() {
-                // re-authenticate and get a new cookie
-                String authCookie = Authenticator.authenticate(activity, accountName);
-                ApiClient.getCookies().clear();
-                ApiClient.getCookies().add(authCookie);
-                log.debug("Got auth cookie: "+authCookie);
+                Realm realm = RealmContext.i.getCurrentRealm();
+                if (!realm.getAuthenticator().isAuthenticated()) {
+                    try {
+                        realm.getAuthenticator().authenticate(activity, realm);
+                    } catch (ApiException e) {
+                    }
+                }
 
                 // Schedule registration with GCM, which will update our device
                 // when we get the registration ID

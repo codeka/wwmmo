@@ -76,7 +76,26 @@ public class BuildActivity extends BaseActivity implements StarManager.StarFetch
 
         mColonyPagerAdapter = new ColonyPagerAdapter(getSupportFragmentManager());
         mViewPager = (ViewPager) findViewById(R.id.pager);
-        mViewPager.setAdapter(mColonyPagerAdapter); 
+        mViewPager.setAdapter(mColonyPagerAdapter);
+
+        if (savedInstanceState != null) {
+            Star s = null;
+
+            try {
+                byte[] bytes = savedInstanceState.getByteArray("au.com.codeka.warworlds.Star");
+                Messages.Star star_pb = Messages.Star.parseFrom(bytes);
+                s = new Star();
+                s.fromProtocolBuffer(star_pb);
+
+                bytes = savedInstanceState.getByteArray("au.com.codeka.warworlds.CurrentColony");
+                Messages.Colony colony_pb = Messages.Colony.parseFrom(bytes);
+                mInitialColony = new Colony();
+                mInitialColony.fromProtocolBuffer(colony_pb);
+            } catch (InvalidProtocolBufferException e) {
+            }
+
+            onStarFetched(s);
+        }
     }
 
     @Override
@@ -105,6 +124,23 @@ public class BuildActivity extends BaseActivity implements StarManager.StarFetch
     public void onPause() {
         super.onPause();
         StarManager.getInstance().removeStarUpdatedListener(this);
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle state) {
+        super.onSaveInstanceState(state);
+        if (mStar != null) {
+            Messages.Star.Builder star_pb = Messages.Star.newBuilder();
+            mStar.toProtocolBuffer(star_pb);
+            state.putByteArray("au.com.codeka.warworlds.Star", star_pb.build().toByteArray());
+        }
+
+        Colony currentColony = mColonies.get(mViewPager.getCurrentItem());
+        if (currentColony != null) {
+            Messages.Colony.Builder colony_pb = Messages.Colony.newBuilder();
+            currentColony.toProtocolBuffer(colony_pb);
+            state.putByteArray("au.com.codeka.warworlds.CurrentColony", colony_pb.build().toByteArray());
+        }
     }
 
     /**

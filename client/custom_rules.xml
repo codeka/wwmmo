@@ -51,7 +51,7 @@
         <replaceregexp file="AndroidManifest.xml"
                        match="android:versionName=&quot;(.*)&quot;"
                        flags="g"
-                       replace="android:versionName=&quot;0.1.${build.date}.${build.svn}&quot;" />
+                       replace="android:versionName=&quot;0.3.${build.svn}&quot;" />
       </then>
     </if>
   </target>

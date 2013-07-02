@@ -52,6 +52,7 @@ public class ChatManager implements BackgroundDetector.BackgroundChangeHandler {
         addMessage(new ChatMessage("Welcome to War Worlds!"));
 
         // fetch all chats from the last 24 hours
+        mMessages.clear();
         mMostRecentMsg = (new DateTime()).minusDays(1);
         requestMessages(context, mMostRecentMsg);
     }

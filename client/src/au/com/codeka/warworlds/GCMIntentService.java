@@ -1,7 +1,5 @@
 package au.com.codeka.warworlds;
 
-import java.io.IOException;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,6 +14,8 @@ import au.com.codeka.warworlds.model.ChatManager;
 import au.com.codeka.warworlds.model.ChatMessage;
 import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.MyEmpire;
+import au.com.codeka.warworlds.model.Realm;
+import au.com.codeka.warworlds.model.RealmManager;
 import au.com.codeka.warworlds.model.SectorManager;
 import au.com.codeka.warworlds.model.Star;
 import au.com.codeka.warworlds.model.StarManager;
@@ -36,47 +36,24 @@ public class GCMIntentService extends GCMBaseIntentService {
         super(PROJECT_ID);
     }
 
-    /**
-     * Registers for C2DM notifications. Calls
-     * AccountsActivity.registrationComplete() when finished.
-     */
     public static void register(Activity activity) {
         GCMRegistrar.register(activity, PROJECT_ID);
     }
 
-    /**
-     * Unregisters ourselves from C2DM notifications.
-     */
     public static void unregister(Activity activity) {
         GCMRegistrar.unregister(activity);
     }
 
-    /**
-     * Called when a registration token has been received.
-     * 
-     * @param context
-     *            the Context
-     * @param registrationId
-     *            the registration id as a String
-     * @throws IOException
-     *             if registration cannot be performed
-     */
     @Override
     public void onRegistered(Context context, String gcmRegistrationID) {
         log.info("GCM device registration complete, gcmRegistrationID = "+gcmRegistrationID);
         DeviceRegistrar.updateGcmRegistration(context, gcmRegistrationID);
     }
 
-    /**
-     * Called when the device has been unregistered.
-     * 
-     * @param context
-     *            the Context
-     */
     @Override
     public void onUnregistered(Context context, String deviceRegistrationID) {
         log.info("Unregistered from GCM, deviceRegistrationID = "+deviceRegistrationID);
-        DeviceRegistrar.unregister();
+        DeviceRegistrar.unregister(false);
     }
 
     /**
@@ -123,25 +100,34 @@ public class GCMIntentService extends GCMBaseIntentService {
                     return;
                 }
 
-                // refresh the star this situation report is for, obviously
-                // something happened that we'll want to know about
-                Star star = StarManager.getInstance().refreshStarSync(pb.getStarKey(), true);
-                if (star == null) { // <-- only refresh the star if we have one cached
-                    // if we didn't refresh the star, then at least refresh
-                    // the sector it was in (could have been a moving
-                    // fleet, say)
-                    star = SectorManager.getInstance().findStar(pb.getStarKey());
-                    if (star != null) {
-                        SectorManager.getInstance().refreshSector(star.getSectorX(), star.getSectorY());
+                // we could currently be in a game, and that game could be running in a different
+                // realm to this notification. So we switch this thread temporarily to whatever
+                // realm this notification is for.
+                Realm thisRealm = RealmManager.i.getRealmByName(pb.getRealm());
+                RealmContext.i.setThreadRealm(thisRealm);
+                try {
+                    // refresh the star this situation report is for, obviously
+                    // something happened that we'll want to know about
+                    Star star = StarManager.getInstance().refreshStarSync(pb.getStarKey(), true);
+                    if (star == null) { // <-- only refresh the star if we have one cached
+                        // if we didn't refresh the star, then at least refresh
+                        // the sector it was in (could have been a moving
+                        // fleet, say)
+                        star = SectorManager.getInstance().findStar(pb.getStarKey());
+                        if (star != null) {
+                            SectorManager.getInstance().refreshSector(star.getSectorX(), star.getSectorY());
+                        }
+                    } else {
+                        StarManager.getInstance().fireStarUpdated(star);
                     }
-                } else {
-                    StarManager.getInstance().fireStarUpdated(star);
+
+                    // notify the build manager, in case it's a 'build complete' or something
+                    BuildManager.getInstance().notifySituationReport(pb);
+
+                    Notifications.displayNotification(context, pb);
+                } finally {
+                    RealmContext.i.setThreadRealm(null);
                 }
-
-                // notify the build manager, in case it's a 'build complete' or something
-                BuildManager.getInstance().notifySituationReport(pb);
-
-                Notifications.displayNotification(context, pb);
             } else if (extras.containsKey("chat")) {
                 byte[] blob = Base64.decode(extras.getString("chat"), Base64.DEFAULT);
 

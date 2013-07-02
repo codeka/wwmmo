@@ -59,9 +59,11 @@ public class RealmSelectActivity extends BaseActivity {
                 int selectedPosition = realmsListView.getCheckedItemPosition();
                 Realm realm = RealmManager.i.getRealms().get(selectedPosition);
 
-                DeviceRegistrar.unregister(); // need to register device in new realm
+                // we need to register on the new realm, but we don't nessecarily want to
+                // unregister from the old realm...
+                DeviceRegistrar.unregister(false);
+
                 RealmManager.i.selectRealm(realm.getDisplayName());
-                ServerGreeter.clearHello();
 
                 // this activity is finished, move to the main WarWorldsActivity
                 finish();

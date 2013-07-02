@@ -6,5 +6,6 @@ pushd $DIR
 java -cp "bin/*" \
      -Dau.com.codeka.warworlds.server.basePath=$DIR/bin/ \
      -Djava.util.logging.config.file=logging-debug.properties \
+     -Dau.com.codeka.warworlds.server.realmName=Debug \
      au.com.codeka.warworlds.server.Runner $*
 popd

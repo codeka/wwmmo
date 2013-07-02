@@ -27,29 +27,9 @@ import com.google.protobuf.Message;
  */
 public class ApiClient {
     final static Logger log = LoggerFactory.getLogger(ApiClient.class);
-    private static ArrayList<String> sCookies = new ArrayList<String>();
-
-    /**
-     * Configures the client to talk to the given "baseUri". All URLs will then be relative
-     * to this URL. Usually, this will be something like https://warworldsmmo.appspot.com/api/v1
-     * 
-     * @param baseUri The base URI that all APIs calls are made against.
-     */
-    public static void reset() {
-        log.info("Resetting cookies...");
-        sCookies = new ArrayList<String>();
-    }
 
     public static void impersonate(String user) {
         RequestManager.impersonate(user);
-    }
-
-    /**
-     * Gets the collection of cookies we'll add to all requests (useful for authentication, 
-     * or whatever)
-     */
-    public static List<String> getCookies() {
-        return sCookies;
     }
 
     /**
@@ -218,11 +198,7 @@ public class ApiClient {
      */
     private static Map<String, List<String>> getHeaders() {
         TreeMap<String, List<String>> headers = new TreeMap<String, List<String>>();
-        if (sCookies != null && !sCookies.isEmpty()) {
-            headers.put("Cookie", sCookies);
-        } else {
-            log.warn("Cookies collection is empty, possible error!");
-        }
+
         ArrayList<String> accept = new ArrayList<String>();
         accept.add("application/x-protobuf");
         headers.put("Accept", accept);

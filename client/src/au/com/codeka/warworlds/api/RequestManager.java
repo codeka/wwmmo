@@ -57,6 +57,10 @@ public class RequestManager {
     private static String sImpersonateUser;
     private static boolean sVerboseLog = true;
 
+    // we record the last status code we got from the server, don't try to re-authenticate if we
+    // get two 403's in a row, for example.
+    private static int sLastRequestStatusCode = 200;
+
     static {
         sConnectionPools = new TreeMap<Integer, ConnectionPool>();
     }
@@ -141,6 +145,10 @@ public class RequestManager {
             throw new ApiException("Not yet configured, cannot execute "+method+" "+url);
         }
 
+        if (!realm.getAuthenticator().isAuthenticated()) {
+            realm.getAuthenticator().authenticate(null, realm);
+        }
+
         URI uri = realm.getBaseUrl().resolve(url);
         if (sVerboseLog) {
             log.debug("Requesting: {}", uri);
@@ -195,6 +203,11 @@ public class RequestManager {
                         }
                     }
                 }
+                if (realm != null && realm.getAuthenticator().isAuthenticated()) {
+                    String cookie = realm.getAuthenticator().getAuthCookie();
+                    log.debug("Adding session cookie: "+cookie);
+                    request.addHeader("Cookie", cookie);
+                }
                 if (body != null) {
                     request.addHeader(body.getContentType());
                     request.addHeader("Content-Length", Long.toString(body.getContentLength()));
@@ -206,6 +219,7 @@ public class RequestManager {
                 if (sVerboseLog) {
                     log.debug(String.format("< %s", response.getStatusLine()));
                 }
+                checkForAuthenticationError(request, response);
                 fireResponseReceivedHandlers(request, response);
 
                 return new ResultWrapper(conn, response);
@@ -232,6 +246,39 @@ public class RequestManager {
                 }
             }
         }
+    }
+
+    /**
+     * If we get a 403 (and not on a 'login' URL), we'll reset the authenticated status of the
+     * current Authenticator, and try the request again.
+     * @throws RequestRetryException 
+     */
+    private static void checkForAuthenticationError(HttpRequest request, HttpResponse response)
+                throws ApiException, RequestRetryException {
+        // if we get a 403 (and not on a 'login' URL), it means we need to re-authenticate,
+        // so do that
+        if (response.getStatusLine().getStatusCode() == 403 &&
+            request.getRequestLine().getUri().indexOf("login") < 0) {
+
+            if (sLastRequestStatusCode == 403) {
+                // if the last status code we received was 403, then re-authenticating
+                // again isn't going to help. This is only useful if, for example, the
+                // token has expired.
+                return;
+            }
+            // record the fact that the last status code was 403, so we can fail on the
+            // next request if we get another 403 (no point retrying that over and over)
+            sLastRequestStatusCode = 403;
+
+            log.info("403 HTTP response code received, attempting to re-authenticate.");
+            Realm realm = RealmContext.i.getCurrentRealm();
+            realm.getAuthenticator().authenticate(null, realm);
+
+            // throw an exception so that we try the request for a second time.
+            throw new RequestRetryException();
+        }
+
+        sLastRequestStatusCode = response.getStatusLine().getStatusCode();
     }
 
     public static RequestManagerState getCurrentState() {

@@ -6,6 +6,8 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.protobuf.InvalidProtocolBufferException;
+
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
@@ -50,6 +52,24 @@ public class FocusDialog extends DialogFragment {
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         LayoutInflater inflater = getActivity().getLayoutInflater();
         mView = inflater.inflate(R.layout.focus_dlg, null);
+
+        if (savedInstanceState != null) {
+            byte[] bytes = savedInstanceState.getByteArray("au.com.codeka.warworlds.Colony");
+            if (bytes != null) {
+                try {
+                    Messages.Colony colony_pb;
+                    colony_pb = Messages.Colony.parseFrom(bytes);
+                    mColony = new Colony();
+                    mColony.fromProtocolBuffer(colony_pb);
+    
+                    bytes = savedInstanceState.getByteArray("au.com.codeka.warworlds.Planet");
+                    Messages.Planet planet_pb = Messages.Planet.parseFrom(bytes);
+                    mPlanet = new Planet();
+                    mPlanet.fromProtocolBuffer(null, planet_pb);
+                } catch (InvalidProtocolBufferException e) {
+                }
+            }
+        }
 
         mLockedIndex = -1;
         mSeekBars = new ArrayList<SeekBar>();
@@ -154,6 +174,21 @@ public class FocusDialog extends DialogFragment {
         b.setNegativeButton("Cancel", null);
 
         return b.create();
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle state) {
+        super.onSaveInstanceState(state);
+        if (mColony != null) {
+            Messages.Colony.Builder colony_pb = Messages.Colony.newBuilder();
+            mColony.toProtocolBuffer(colony_pb);
+            state.putByteArray("au.com.codeka.warworlds.Colony", colony_pb.build().toByteArray());
+        }
+        if (mPlanet != null) {
+            Messages.Planet.Builder planet_pb = Messages.Planet.newBuilder();
+            mPlanet.toProtocolBuffer(planet_pb);
+            state.putByteArray("au.com.codeka.warworlds.Planet", planet_pb.build().toByteArray());
+        }
     }
 
     private static String focusToString(float focus) {

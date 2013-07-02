@@ -42,8 +42,12 @@ public class FleetSplitDialog extends DialogFragment {
         FleetList.populateFleetRow(getActivity(), null, fleetView, mFleet);
 
         int numShips = (int) Math.ceil(mFleet.getNumShips());
-        splitRatio.setMax(numShips);
-        splitRatio.setProgress(numShips / 2);
+        if (numShips >= 2) {
+            splitRatio.setMax(numShips - 2);
+        } else {
+            splitRatio.setMax(numShips - 1);
+        }
+        splitRatio.setProgress(numShips / 2 - 1);
         splitLeft.setText(Integer.toString(numShips / 2));
         splitRight.setText(Integer.toString(numShips - (numShips / 2)));
 
@@ -54,8 +58,8 @@ public class FleetSplitDialog extends DialogFragment {
             public void onStartTrackingTouch(SeekBar seekBar) { }
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                splitLeft.setText(Integer.toString(progress));
-                splitRight.setText(Integer.toString(seekBar.getMax() - progress));
+                splitLeft.setText(Integer.toString(progress + 1));
+                splitRight.setText(Integer.toString(seekBar.getMax() - progress + 1));
             }
         });
 
@@ -70,7 +74,7 @@ public class FleetSplitDialog extends DialogFragment {
                     if (val > splitRatio.getMax()) {
                         val = splitRatio.getMax();
                     }
-                    splitRatio.setProgress(val);
+                    splitRatio.setProgress(val - 1);
                 }
             }
         });
@@ -86,7 +90,7 @@ public class FleetSplitDialog extends DialogFragment {
                     if (val > splitRatio.getMax()) {
                         val = splitRatio.getMax();
                     }
-                    splitRatio.setProgress(splitRatio.getMax() - val);
+                    splitRatio.setProgress(splitRatio.getMax() - val + 1);
                 }
             }
         });

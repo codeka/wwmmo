@@ -27,6 +27,8 @@ import android.text.Html;
 import au.com.codeka.common.model.DesignKind;
 import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.game.SitrepActivity;
+import au.com.codeka.warworlds.model.Realm;
+import au.com.codeka.warworlds.model.RealmManager;
 import au.com.codeka.warworlds.model.SituationReport;
 import au.com.codeka.warworlds.model.Sprite;
 import au.com.codeka.warworlds.model.Star;
@@ -40,11 +42,11 @@ public class Notifications {
     private Notifications() {
     }
 
-    public static void clearNotifications(Context context) {
-        NotificationManager nm = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-        nm.cancelAll();
+    public static void clearNotifications() {
+        NotificationManager nm = (NotificationManager) App.i.getSystemService(Context.NOTIFICATION_SERVICE);
+        nm.cancel(RealmContext.i.getCurrentRealm().getID());
 
-        new DatabaseHelper(context).clearNotifications();
+        new DatabaseHelper().clearNotifications();
     }
 
     public static void displayNotification(final Context context,
@@ -56,12 +58,13 @@ public class Notifications {
 
         NotificationDetails notification = new NotificationDetails();
         notification.sitrep = sitrep;
+        notification.realm = RealmContext.i.getCurrentRealm();
 
         Messages.Star.Builder star_pb = Messages.Star.newBuilder();
         starSummary.toProtocolBuffer(star_pb);
         notification.star = star_pb.build();
 
-        DatabaseHelper db = new DatabaseHelper(context);
+        DatabaseHelper db = new DatabaseHelper();
         db.addNotification(notification);
 
         displayNotification(context, buildNotification(context, db.getNotifications()));
@@ -78,16 +81,15 @@ public class Notifications {
 
         NotificationManager nm = (NotificationManager) context
                 .getSystemService(Context.NOTIFICATION_SERVICE);
-        nm.notify(1, notification);
+        nm.notify(RealmContext.i.getCurrentRealm().getID(), notification);
     }
 
     private static Notification buildNotification(Context context,
                                                   List<NotificationDetails> notifications) {
-
-        Intent intent = new Intent(context, SitrepActivity.class);
-
         // we want to add the StarfieldActivity to the "back stack" of the situation report so that
         // when you press "back" from the sitrep you go to the starfield.
+        Intent intent = new Intent(context, SitrepActivity.class);
+        intent.putExtra("au.com.codeka.warworlds.RealmID", notifications.get(0).realm.getID());
         PendingIntent pendingIntent = TaskStackBuilder.create(context)
                                         .addParentStack(SitrepActivity.class)
                                         .addNextIntent(intent)
@@ -169,7 +171,8 @@ public class Notifications {
             return null;
         }
 
-        inboxStyle.setBigContentTitle(String.format("%d events have happend", num));
+        Realm realm = RealmContext.i.getCurrentRealm();
+        inboxStyle.setBigContentTitle(String.format("%s: %d events", realm.getDisplayName(), num));
         builder.setStyle(inboxStyle);
         builder.setNumber(num);
         builder.setLights(options.getLedColour(), 1000, 5000);
@@ -222,8 +225,8 @@ public class Notifications {
      * is the helper for that database.
      */
     private static class DatabaseHelper extends SQLiteOpenHelper {
-        public DatabaseHelper(Context context) {
-            super(context, "notifications.db", null, 1);
+        public DatabaseHelper() {
+            super(App.i, "notifications.db", null, 2);
         }
 
         /**
@@ -234,13 +237,20 @@ public class Notifications {
         public void onCreate(SQLiteDatabase db) {
             db.execSQL("CREATE TABLE notifications ("
                       +"  id INTEGER PRIMARY KEY,"
+                      +"  realm_id INTEGER,"
                       +"  star BLOB,"
                       +"  sitrep BLOB,"
                       +"  timestamp INTEGER);");
+            db.execSQL("CREATE INDEX IX_realm_id_timestamp ON notifications (realm_id, timestamp)");
         }
 
         @Override
         public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+            if (newVersion == 2) {
+                db.execSQL("ALTER TABLE notifications "
+                          +"ADD COLUMN realm_id INTEGER DEFAULT "+RealmManager.BETA_REALM_ID);
+                db.execSQL("CREATE INDEX IX_realm_id_timestamp ON notifications (realm_id, timestamp)");
+            }
         }
 
         public void addNotification(NotificationDetails details) {
@@ -260,6 +270,7 @@ public class Notifications {
                 values.put("star", star.toByteArray());
                 values.put("sitrep", sitrep.toByteArray());
                 values.put("timestamp", details.sitrep.getReportTime());
+                values.put("realm_id", details.realm.getID());
                 db.insert("notifications", null, values);
             } finally {
                 db.close();
@@ -269,10 +280,11 @@ public class Notifications {
         public List<NotificationDetails> getNotifications() {
             ArrayList<NotificationDetails> notifications = new ArrayList<NotificationDetails>();
 
+            Realm realm = RealmContext.i.getCurrentRealm();
             SQLiteDatabase db = getReadableDatabase();
             try {
                 Cursor cursor = db.query("notifications", new String[] {"star", "sitrep"},
-                                         null, null, null, null, "timestamp DESC");
+                                         "realm_id = "+realm.getID(), null, null, null, "timestamp DESC");
                 if (!cursor.moveToFirst()) {
                     cursor.close();
                     return notifications;
@@ -283,6 +295,7 @@ public class Notifications {
                         NotificationDetails notification = new NotificationDetails();
                         notification.star = Messages.Star.parseFrom(cursor.getBlob(0));
                         notification.sitrep = Messages.SituationReport.parseFrom(cursor.getBlob(1));
+                        notification.realm = realm;
                         notifications.add(notification);
                     } catch (InvalidProtocolBufferException e) {
                         // any errors here and we'll just skip this notification
@@ -297,9 +310,11 @@ public class Notifications {
         }
 
         public void clearNotifications() {
+            Realm realm = RealmContext.i.getCurrentRealm();
+
             SQLiteDatabase db = getReadableDatabase();
             try {
-                db.execSQL("DELETE FROM notifications;");
+                db.execSQL("DELETE FROM notifications WHERE realm_id="+realm.getID());
             } finally {
                 db.close();
             }
@@ -309,6 +324,7 @@ public class Notifications {
     private static class NotificationDetails {
         public Messages.SituationReport sitrep;
         public Messages.Star star;
+        public Realm realm;
     }
 }
 

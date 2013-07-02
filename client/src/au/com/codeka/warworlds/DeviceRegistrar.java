@@ -77,7 +77,15 @@ public class DeviceRegistrar {
         }.execute();
     }
 
-    public static void unregister() {
+    /**
+     * "Forget's" this device's registration.
+     * 
+     * @param unregisterFromServer If true, we'll let the server know to no longer send us
+     *        notifications by also removing our registration. If false, we won't tell the server
+     *        so that we continue to receive notifications. This is useful if you just want to
+     *        switch realms, for example.
+     */
+    public static void unregister(boolean unregisterFromServer) {
         final SharedPreferences settings = Util.getSharedPreferences();
         String registrationKey = settings.getString("DeviceRegistrar.registrationKey", "");
         if (registrationKey == "") {
@@ -85,11 +93,13 @@ public class DeviceRegistrar {
             return;
         }
 
-        try {
-            String url = "devices/" + registrationKey;
-            ApiClient.delete(url);
-        } catch(Exception ex) {
-            log.error("Failure unregistering device.", ex);
+        if (unregisterFromServer) {
+            try {
+                String url = "devices/" + registrationKey;
+                ApiClient.delete(url);
+            } catch(Exception ex) {
+                log.error("Failure unregistering device.", ex);
+            }
         }
 
         forgetDeviceRegistration();
