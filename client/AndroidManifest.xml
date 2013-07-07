@@ -1,18 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="au.com.codeka.warworlds"
-    android:versionCode="136"
-    android:versionName="0.3.657"
+    android:versionCode="140"
+    android:versionName="0.3.658"
     android:installLocation="auto" >
 
-    <!-- C2DM requires Android SDK version 2.2 (API level 8) or above, and we want to be
-         able to run on the minimum version (test using a Galaxy S) -->
-    <uses-sdk
-        android:minSdkVersion="8"
-        android:targetSdkVersion="17" />
+    <!-- Android SDK version 2.2 (API level 8) is the minimum we can viably support, since
+         that's what GCM required. We'd prefer ICS+ though... -->
+    <uses-sdk android:minSdkVersion="8"
+              android:targetSdkVersion="17" />
 
     <!-- We use OpenGL ES 2.0 -->
-    <uses-feature android:glEsVersion="0x00020000" android:required="true" />
+    <!-- uses-feature android:glEsVersion="0x00020000" android:required="true" /-->
 
     <!-- Only this application can receive the messages and registration result -->
     <permission

@@ -19,6 +19,14 @@
         android:layout_toLeftOf="@+id/bottom_pane"
         android:layout_marginRight="-4px" />
 
+    <ProgressBar android:id="@+id/progress_bar"
+                 android:layout_width="50dp"
+                 android:layout_height="50dp"
+                 android:layout_alignTop="@+id/solarsystem_view"
+                 android:layout_toLeftOf="@+id/bottom_pane"
+                 android:layout_marginTop="50dp"
+                 android:layout_marginRight="100dp" />
+
     <au.com.codeka.warworlds.ctrl.MiniChatView
         android:id="@+id/mini_chat"
         android:layout_height="50dp"

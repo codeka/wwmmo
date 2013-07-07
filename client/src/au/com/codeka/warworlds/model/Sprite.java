@@ -2,15 +2,16 @@ package au.com.codeka.warworlds.model;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.ref.SoftReference;
 import java.util.ArrayList;
 
-import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import au.com.codeka.common.Vector2;
+import au.com.codeka.warworlds.App;
 
 public class Sprite {
     private SpriteImage mImage;
@@ -95,6 +96,7 @@ public class Sprite {
     public void draw(Canvas canvas) {
         draw(canvas, 0);
     }
+
     public void draw(Canvas canvas, int frameNo) {
         if (sPaint == null) {
             sPaint = new Paint();
@@ -145,28 +147,40 @@ public class Sprite {
     public static class SpriteImage {
         private String mFileName;
         private Bitmap mBitmap;
+        private SoftReference<Bitmap> mSoftBitmap;
 
         public String getFileName() {
             return mFileName;
         }
         public Bitmap getBitmap() {
-            return mBitmap;
+            Bitmap bmp = mBitmap;
+            if (bmp == null && mSoftBitmap != null) {
+                bmp = mSoftBitmap.get();
+            }
+            if (bmp == null && mFileName != null) {
+                mSoftBitmap = loadBitmap();
+                bmp = mSoftBitmap.get();
+            }
+
+            return bmp;
         }
 
         public SpriteImage(Bitmap bmp) {
             mBitmap = bmp;
-            mFileName = "";
+            mFileName = null;
         }
 
-        public SpriteImage(Context context, String fileName) {
+        public SpriteImage(String fileName) {
             mFileName = fileName;
+        }
 
+        private SoftReference<Bitmap> loadBitmap() {
             InputStream ins;
             try {
-                ins = context.getAssets().open(fileName);
-                mBitmap = BitmapFactory.decodeStream(ins);
+                ins = App.i.getAssets().open(mFileName);
+                return new SoftReference<Bitmap>(BitmapFactory.decodeStream(ins));
             } catch (IOException e) {
-                // TODO: errors? shouldn't happen...
+                return null;
             }
         }
     }

@@ -62,5 +62,8 @@
                    match="^debug=.*$"
                    flags="gm"
                    replace="debug=true" />
+
+  	<!-- delete the java-projects.jar file that was created. -->
+  	<delete file="libs/java-projects.jar" />
   </target>
 </project>

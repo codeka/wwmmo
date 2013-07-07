@@ -86,8 +86,26 @@ public class HelloHandler extends RequestHandler {
                     build_stats_pb.addCounts(design_count_pb);
                 }
                 hello_response_pb.setBuildingStatistics(build_stats_pb);
+            } catch (Exception e) {
+                throw new RequestException(e);
+            }
 
-                hello_response_pb.setForceRemoveAds(empire.getForceRemoveAds());
+            // if we're set to force ignore ads, make sure we pass that along
+            hello_response_pb.setForceRemoveAds(empire.getForceRemoveAds());
+
+            // grab all of the empire's stars and send across the identifiers
+            sql = "SELECT id FROM stars WHERE id IN (" +
+                    "SELECT DISTINCT star_id FROM colonies WHERE empire_id = ?" +
+                   " UNION SELECT DISTINCT star_id FROM fleets WHERE empire_id = ?" +
+                  ") ORDER BY name ASC";
+            try (SqlStmt stmt = DB.prepare(sql)) {
+                stmt.setInt(1, empire.getID());
+                stmt.setInt(2, empire.getID());
+                ResultSet rs = stmt.select();
+
+                while (rs.next()) {
+                    hello_response_pb.addStarIds(rs.getLong(1));
+                }
             } catch (Exception e) {
                 throw new RequestException(e);
             }

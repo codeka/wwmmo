@@ -109,7 +109,7 @@ message Empire
     // colonies and build requests. This is useful because you often want details of the stars the
     // colony/fleet is on (so you can draw the icon, etc). Note that it will *only*
     // be the stars and the planets, not colonies, build requests, etc.
-    repeated Star stars = 8;
+    //repeated Star stars = 8;
 
     // the amount of cash the empire currently has (todo: provide an estimate on the
     // rate of change of cash, based on taxed income)
@@ -236,6 +236,9 @@ message HelloResponse
     // If true, we'll force the ads to be removed. If false, or not specified, we'll check
     // whatever the In-App Purchase API has to say.
     optional bool force_remove_ads = 11;
+
+    // this is the list of all the stars this empire owns
+    repeated int64 star_ids = 12;
 }
 
 //

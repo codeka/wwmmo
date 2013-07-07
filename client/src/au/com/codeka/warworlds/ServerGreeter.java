@@ -146,6 +146,7 @@ public class ServerGreeter {
             private boolean mWasEmpireReset;
             private String mResetReason;
             private ArrayList<Colony> mColonies;
+            private ArrayList<Long> mStarIDs;
 
             @Override
             protected String doInBackground() {
@@ -215,6 +216,11 @@ public class ServerGreeter {
                         mColonies.add(colony);
                     }
 
+                    mStarIDs = new ArrayList<Long>();
+                    for (Long id : resp.getStarIdsList()) {
+                        mStarIDs.add(id);
+                    }
+
                     BuildManager.getInstance().setup(resp.getBuildingStatistics(), resp.getBuildRequestsList());
 
                     message = resp.getMotd().getMessage();
@@ -244,6 +250,7 @@ public class ServerGreeter {
             @Override
             protected void onComplete(String result) {
                 mServerGreeting.mIsConnected = true;
+                mServerGreeting.mStarIDs = mStarIDs;
 
                 if (mNeedsEmpireSetup) {
                     mServerGreeting.mIntent = new Intent(activity, EmpireSetupActivity.class);
@@ -335,6 +342,7 @@ public class ServerGreeter {
         private String mMessageOfTheDay;
         private Intent mIntent;
         private ArrayList<Colony> mColonies;
+        private ArrayList<Long> mStarIDs;
 
         public boolean isConnected() {
             return mIsConnected;
@@ -350,6 +358,10 @@ public class ServerGreeter {
 
         public ArrayList<Colony> getColonies() {
             return mColonies;
+        }
+
+        public ArrayList<Long> getStarIDs() {
+            return mStarIDs;
         }
     }
 

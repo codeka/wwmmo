@@ -87,7 +87,7 @@ public class SpriteManager {
 
         for (Element sheetElement : XmlIterator.childElements(spritesElement, "sheet")) {
             String fileName = sheetElement.getAttribute("filename");
-            Sprite.SpriteImage img = new Sprite.SpriteImage(context, fileName);
+            Sprite.SpriteImage img = new Sprite.SpriteImage(fileName);
 
             for (Element spriteElement : XmlIterator.childElements(sheetElement, "sprite")) {
                 Sprite sprite = parseSpriteXml(img, spriteElement);

@@ -89,10 +89,12 @@ public class Authenticator {
 
     private String getAuthToken(AccountManager accountManager, Account account, Activity activity, String scope) {
         if (activity != null) {
+            log.info("Fetching auth token with activity");
             AccountManagerFuture<Bundle>future = accountManager.getAuthToken(
-                    account, scope, null, activity, null, null);
+                    account, scope, new Bundle(), activity, null, null);
             return getAuthToken(future);
         } else {
+            log.info("Fetching auth token withOUT activity");
             return getAuthTokenNoActivity(accountManager, account);
         }
     }
@@ -109,7 +111,7 @@ public class Authenticator {
             future = accountManager.getAuthToken(account, "ah", false,
                                                  null, null);
         } else {
-            future = accountManager.getAuthToken(account, "ah", null,
+            future = accountManager.getAuthToken(account, "ah", new Bundle(),
                                                  false, null, null);
         }
         return getAuthToken(future);
@@ -124,7 +126,7 @@ public class Authenticator {
             String authToken = authTokenBundle.get(AccountManager.KEY_AUTHTOKEN).toString();
             return authToken;
         } catch (Exception e) {
-            log.warn("Got Exception " + e);
+            log.error("Error fetching auth token", e);
             return null;
         }
     }
