@@ -16,15 +16,7 @@ public class RealmManager {
 
     private RealmManager() {
         mRealmChangedHandlers = new ArrayList<RealmChangedHandler>();
-    }
 
-    // The IDs for the realms can NEVER change, once set
-    public static int DEBUG_REALM_ID = 1000;
-    public static int ALPHA_REALM_ID = 1;
-    public static int BETA_REALM_ID = 2;
-    public static int BLITZ_REALM_ID = 10;
-
-    public void setup() {
         mRealms = new ArrayList<Realm>();
         try {
             if (Util.isDebug()) {
@@ -48,7 +40,15 @@ public class RealmManager {
         } catch(URISyntaxException e) {
             // should never happen
         }
+    }
 
+    // The IDs for the realms can NEVER change, once set
+    public static int DEBUG_REALM_ID = 1000;
+    public static int ALPHA_REALM_ID = 1;
+    public static int BETA_REALM_ID = 2;
+    public static int BLITZ_REALM_ID = 10;
+
+    public void setup() {
         SharedPreferences prefs = Util.getSharedPreferences();
         if (prefs.getString("RealmName", null) != null) {
             selectRealm(prefs.getString("RealmName", null), false);
