@@ -125,8 +125,15 @@ public class SolarSystemActivity extends BaseActivity implements StarManager.Sta
         }
     }
 
+    private SolarSystemFragment getCurrentPage() {
+        int index = mViewPager.getCurrentItem();
+        return mStarPagerAdapter.get
+    }
+
     @Override
-    public void onBackPressed() {/*
+    public void onBackPressed() {
+        
+        /*
         Intent intent = new Intent();
         if (mStar != null) {
             intent.putExtra("au.com.codeka.warworlds.SectorX", mStar.getSectorX());

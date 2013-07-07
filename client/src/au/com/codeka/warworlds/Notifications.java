@@ -299,9 +299,14 @@ public class Notifications {
                         notifications.add(notification);
                     } catch (InvalidProtocolBufferException e) {
                         // any errors here and we'll just skip this notification
+                    } catch (IllegalStateException e) {
+                        // we can sometimes get this if there's issues with the database
+                        break;
                     }
                 } while (cursor.moveToNext());
                 cursor.close();
+            } catch (Exception e) {
+                // ignore....
             } finally {
                 db.close();
             }

@@ -406,11 +406,16 @@ public class StarfieldActivity extends BaseActivity
                     @Override
                     public void onStarFetched(Star s) {
                         BaseFleet fleet = s.findFleet(fleetKey);
-                        navigateToFleet(s, fleet);
+                        if (fleet != null) {
+                            navigateToFleet(s, fleet);
+                        }
                     }
                 });
         } else {
-            navigateToFleet(star, star.findFleet(fleetKey));
+            BaseFleet fleet = star.findFleet(fleetKey);
+            if (fleet != null) {
+                navigateToFleet(star, star.findFleet(fleetKey));
+            }
         }
     }
 

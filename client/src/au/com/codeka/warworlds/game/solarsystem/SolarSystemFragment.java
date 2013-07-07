@@ -57,6 +57,10 @@ public class SolarSystemFragment extends Fragment
 
     private static final int BUILD_REQUEST = 3000;
 
+    public Star getStar() {
+        return mStar;
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         mView = inflater.inflate(R.layout.solarsystem, container, false);
