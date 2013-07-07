@@ -94,7 +94,7 @@ public class WarWorldsActivity extends BaseActivity {
         }
 
         if (RealmContext.i.getCurrentRealm() == null) {
-            log.info("Not realm selected, switching to RealmSelectActivity");
+            log.info("No realm selected, switching to RealmSelectActivity");
             startActivity(new Intent(this, RealmSelectActivity.class));
             return;
         }

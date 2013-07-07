@@ -28,6 +28,8 @@ import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.ctrl.ColonyFocusView;
 import au.com.codeka.warworlds.ctrl.FleetListSimple;
 import au.com.codeka.warworlds.ctrl.SelectionView;
+import au.com.codeka.warworlds.game.CombatReportDialog;
+import au.com.codeka.warworlds.game.ScoutReportDialog;
 import au.com.codeka.warworlds.game.SitrepActivity;
 import au.com.codeka.warworlds.model.Colony;
 import au.com.codeka.warworlds.model.Empire;
@@ -36,6 +38,7 @@ import au.com.codeka.warworlds.model.Fleet;
 import au.com.codeka.warworlds.model.Planet;
 import au.com.codeka.warworlds.model.Star;
 import au.com.codeka.warworlds.model.StarManager;
+import au.com.codeka.warworlds.model.StarSummary;
 
 /**
  * This is a fragment which displays details about a single solar system.
@@ -46,6 +49,7 @@ public class SolarSystemFragment extends Fragment
     private SolarSystemSurfaceView mSolarSystemSurfaceView;
     private ProgressBar mProgressBar;
     private Context mContext;
+    private StarSummary mStarSummary;
     private Star mStar;
     private Planet mPlanet;
     private Colony mColony;
@@ -166,7 +170,7 @@ public class SolarSystemFragment extends Fragment
         StarManager.getInstance().addStarUpdatedListener(starKey, this);
 
         // get as much details about the star as we can, until it gets refreshes anyway.
-        mStar = StarManager.getInstance().requestStarSync(starKey, false);
+        mStarSummary = StarManager.getInstance().getStarSummaryNoFetch(starKey, Float.MAX_VALUE);
         StarManager.getInstance().requestStar(starKey, false, this);
 
         refreshSelectedPlanet();
@@ -215,16 +219,15 @@ public class SolarSystemFragment extends Fragment
         // if we don't have a star yet, we'll need to figure out which planet to select
         // initially from the intent that started us. Otherwise, we'll want to select
         // whatever planet we have currently
-        //int selectedPlanetIndex;
-        //if (mStar == null) {
-        //    Bundle extras = getIntent().getExtras();
-        //    selectedPlanetIndex = extras.getInt("au.com.codeka.warworlds.PlanetIndex");
-        //} else if (mPlanet != null) {
-        //    selectedPlanetIndex = mPlanet.getIndex();
-        //} else {
-        //    selectedPlanetIndex = -1;
-        //}
-        int selectedPlanetIndex = -1;
+        int selectedPlanetIndex;
+        if (mIsFirstRefresh) {
+            Bundle extras = getArguments();
+            selectedPlanetIndex = extras.getInt("au.com.codeka.warworlds.PlanetIndex");
+        } else if (mPlanet != null) {
+            selectedPlanetIndex = mPlanet.getIndex();
+        } else {
+            selectedPlanetIndex = -1;
+        }
 
         mSolarSystemSurfaceView.setStar(star);
         if (selectedPlanetIndex >= 0) {
@@ -295,7 +298,7 @@ public class SolarSystemFragment extends Fragment
             }
         }
 
-        mStar = star;
+        mStarSummary = mStar = star;
         mPlanet = (Planet) planet;
         mProgressBar.setVisibility(View.GONE);
 
@@ -304,22 +307,22 @@ public class SolarSystemFragment extends Fragment
             planetNameTextView.setText(mStar.getName());
         }
 
-        if (mIsFirstRefresh) {/*
+        if (mIsFirstRefresh) {
             mIsFirstRefresh = false;
-            Bundle extras = getIntent().getExtras();
+            Bundle extras = getArguments();
             boolean showScoutReport = extras.getBoolean("au.com.codeka.warworlds.ShowScoutReport");
             if (showScoutReport) {
                 ScoutReportDialog dialog = new ScoutReportDialog();
                 dialog.setStar(mStar);
-                dialog.show(getSupportFragmentManager(), "");
+                dialog.show(getFragmentManager(), "");
             }
 
             String combatReportKey = extras.getString("au.com.codeka.warworlds.CombatReportKey");
             if (!showScoutReport && combatReportKey != null) {
                 CombatReportDialog dialog = new CombatReportDialog();
                 dialog.loadCombatReport(mStar, combatReportKey);
-                dialog.show(getSupportFragmentManager(), "");
-            }*/
+                dialog.show(getFragmentManager(), "");
+            }
         }
     }
 
@@ -348,14 +351,14 @@ public class SolarSystemFragment extends Fragment
 
     private void refreshSelectedPlanet() {
         log.debug("refreshing selected planet...");
-        if (mStar == null) {
-            return;
-        }
 
         TextView planetNameTextView = (TextView) mView.findViewById(R.id.planet_name);
 
-        if (mPlanet == null) {
-            planetNameTextView.setText(mStar.getName());
+        if (mStarSummary != null && mPlanet == null) {
+            planetNameTextView.setText(mStarSummary.getName());
+            return;
+        }
+        if (mStar == null || mPlanet == null) {
             return;
         }
 

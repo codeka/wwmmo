@@ -224,12 +224,9 @@ public class StarManager extends BaseManager {
     }
 
     /**
-     * Like \c requestStarSummary but runs synchronously. Useful if you're
-     * @param context
-     * @param starKey
-     * @return
+     * Gets a StarSummary, but only if it's cached locally.
      */
-    public StarSummary requestStarSummarySync(String starKey, float maxCacheAgeHours) {
+    public StarSummary getStarSummaryNoFetch(String starKey, float maxCacheAgeHours) {
         StarSummary ss = mStarSummaries.get(starKey);
         if (ss != null) {
             return ss;
@@ -241,6 +238,20 @@ public class StarManager extends BaseManager {
         }
 
         ss = loadStarSummary(starKey, maxCacheAgeHours);
+        if (ss != null) {
+            return ss;
+        }
+
+        return null;
+    }
+
+    /**
+     * Like \c requestStarSummary but runs synchronously. Useful if you're
+     * @param starKey
+     * @return
+     */
+    public StarSummary requestStarSummarySync(String starKey, float maxCacheAgeHours) {
+        StarSummary ss = getStarSummaryNoFetch(starKey, maxCacheAgeHours);
         if (ss != null) {
             return ss;
         }

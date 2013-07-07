@@ -1,10 +1,13 @@
 package au.com.codeka.warworlds.game.solarsystem;
 
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -73,6 +76,9 @@ public class SolarSystemActivity extends BaseActivity implements StarManager.Sta
                 mStarPagerAdapter.setStarIDs(starIDs);
                 if (selectedIndex >= 0) {
                     mViewPager.setCurrentItem(selectedIndex);
+
+                    mStarPagerAdapter.setFragmentExtras(starIDs.get(selectedIndex),
+                                                        getIntent().getExtras());
                 }
             }
         });
@@ -90,10 +96,16 @@ public class SolarSystemActivity extends BaseActivity implements StarManager.Sta
     }
 
     public class StarPagerAdapter extends FragmentStatePagerAdapter {
-        List<Long> mStarIDs;
+        private List<Long> mStarIDs;
+        private Map<Long, Bundle> mFragmentExtras;
 
         public StarPagerAdapter(FragmentManager fm) {
             super(fm);
+            mFragmentExtras = new TreeMap<Long, Bundle>();
+        }
+
+        public void setFragmentExtras(long starID, Bundle extras) {
+            mFragmentExtras.put(starID, extras);
         }
 
         public void setStarIDs(List<Long> starIDs) {
@@ -104,7 +116,10 @@ public class SolarSystemActivity extends BaseActivity implements StarManager.Sta
         @Override
         public Fragment getItem(int i) {
             Fragment fragment = new SolarSystemFragment();
-            Bundle args = new Bundle();
+            Bundle args = mFragmentExtras.get(mStarIDs.get(i));
+            if (args == null) {
+                args = new Bundle();
+            }
             args.putLong("au.com.codeka.warworlds.StarID", mStarIDs.get(i));
             fragment.setArguments(args);
             return fragment;
@@ -125,23 +140,25 @@ public class SolarSystemActivity extends BaseActivity implements StarManager.Sta
         }
     }
 
-    private SolarSystemFragment getCurrentPage() {
+    private SolarSystemFragment getCurrentFragment() {
         int index = mViewPager.getCurrentItem();
-        return mStarPagerAdapter.get
+        return (SolarSystemFragment) mStarPagerAdapter.instantiateItem(mViewPager, index);
     }
 
     @Override
     public void onBackPressed() {
-        
-        /*
-        Intent intent = new Intent();
-        if (mStar != null) {
-            intent.putExtra("au.com.codeka.warworlds.SectorX", mStar.getSectorX());
-            intent.putExtra("au.com.codeka.warworlds.SectorY", mStar.getSectorY());
-            intent.putExtra("au.com.codeka.warworlds.StarKey", mStar.getKey());
+        SolarSystemFragment currentFragment = getCurrentFragment();
+        if (currentFragment != null) {
+            Star star = currentFragment.getStar();
+            Intent intent = new Intent();
+            if (star != null) {
+                intent.putExtra("au.com.codeka.warworlds.SectorX", star.getSectorX());
+                intent.putExtra("au.com.codeka.warworlds.SectorY", star.getSectorY());
+                intent.putExtra("au.com.codeka.warworlds.StarKey", star.getKey());
+            }
+            setResult(RESULT_OK, intent);
         }
-        setResult(RESULT_OK, intent);
-*/
+
         super.onBackPressed();
     }
 }

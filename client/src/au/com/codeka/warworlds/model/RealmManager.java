@@ -14,6 +14,12 @@ public class RealmManager {
     private List<Realm> mRealms;
     private ArrayList<RealmChangedHandler> mRealmChangedHandlers;
 
+    // The IDs for the realms can NEVER change, once set
+    public static final int DEBUG_REALM_ID = 1000;
+    public static final int ALPHA_REALM_ID = 1;
+    public static final int BETA_REALM_ID = 2;
+    public static final int BLITZ_REALM_ID = 10;
+
     private RealmManager() {
         mRealmChangedHandlers = new ArrayList<RealmChangedHandler>();
 
@@ -41,12 +47,6 @@ public class RealmManager {
             // should never happen
         }
     }
-
-    // The IDs for the realms can NEVER change, once set
-    public static int DEBUG_REALM_ID = 1000;
-    public static int ALPHA_REALM_ID = 1;
-    public static int BETA_REALM_ID = 2;
-    public static int BLITZ_REALM_ID = 10;
 
     public void setup() {
         SharedPreferences prefs = Util.getSharedPreferences();
