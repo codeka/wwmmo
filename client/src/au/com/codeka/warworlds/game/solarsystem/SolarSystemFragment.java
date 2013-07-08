@@ -5,7 +5,6 @@ import java.util.Locale;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -48,7 +47,6 @@ public class SolarSystemFragment extends Fragment
     private static Logger log = LoggerFactory.getLogger(SolarSystemFragment.class);
     private SolarSystemSurfaceView mSolarSystemSurfaceView;
     private ProgressBar mProgressBar;
-    private Context mContext;
     private StarSummary mStarSummary;
     private Star mStar;
     private Planet mPlanet;
@@ -115,6 +113,10 @@ public class SolarSystemFragment extends Fragment
         focusButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if (mStar == null || mStar.getPlanets() == null) {
+                    return;
+                }
+
                 FocusDialog dialog = new FocusDialog();
                 dialog.setColony(mStar, mColony);
                 dialog.show(getActivity().getSupportFragmentManager(), "");
@@ -128,7 +130,7 @@ public class SolarSystemFragment extends Fragment
                     return; // can happen before the star loads
                 }
 
-                Intent intent = new Intent(mContext, SitrepActivity.class);
+                Intent intent = new Intent(getActivity(), SitrepActivity.class);
                 intent.putExtra("au.com.codeka.warworlds.StarKey", mStar.getKey());
                 startActivity(intent);
             }

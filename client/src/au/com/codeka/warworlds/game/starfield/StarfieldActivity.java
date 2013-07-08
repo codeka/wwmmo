@@ -48,6 +48,7 @@ import au.com.codeka.warworlds.model.Fleet;
 import au.com.codeka.warworlds.model.MyEmpire;
 import au.com.codeka.warworlds.model.Planet;
 import au.com.codeka.warworlds.model.PurchaseManager;
+import au.com.codeka.warworlds.model.Sector;
 import au.com.codeka.warworlds.model.SectorManager;
 import au.com.codeka.warworlds.model.Sprite;
 import au.com.codeka.warworlds.model.SpriteDrawable;
@@ -629,7 +630,20 @@ public class StarfieldActivity extends BaseActivity
         }
 
         starName.setText(mSelectedStar.getName());
-        starKind.setText(mSelectedStar.getStarType().getDisplayName());
+        int offsetX = (int)(mSelectedStar.getOffsetX() / (float) Sector.SECTOR_SIZE * 1000.0f);
+        if (mSelectedStar.getSectorX() < 0) {
+            offsetX = 1000 - offsetX;
+        }
+        offsetX /= Sector.PIXELS_PER_PARSEC;
+        int offsetY = (int)(mSelectedStar.getOffsetY() / (float) Sector.SECTOR_SIZE * 1000.0f);
+        if (mSelectedStar.getSectorY() < 0) {
+            offsetY = 1000 - offsetY;
+        }
+        offsetY /= Sector.PIXELS_PER_PARSEC;
+        starKind.setText(String.format(Locale.ENGLISH, "%s [%d.%02d,%d.%02d]",
+                mSelectedStar.getStarType().getShortName(),
+                mSelectedStar.getSectorX(), offsetX,
+                mSelectedStar.getSectorY(), offsetY));
         Sprite starImage = StarImageManager.getInstance().getSprite(mSelectedStar, 80, true);
         starIcon.setImageDrawable(new SpriteDrawable(starImage));
     }

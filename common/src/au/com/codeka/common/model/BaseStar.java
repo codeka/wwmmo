@@ -17,32 +17,39 @@ public abstract class BaseStar {
         new StarType.Builder().setIndex(0)
                               .setDisplayName("Blue")
                               .setInternalName("blue")
+                              .setShortName("B")
                               .build(),
         new StarType.Builder().setIndex(1)
                               .setDisplayName("White")
                               .setInternalName("white")
+                              .setShortName("W")
                               .build(),
         new StarType.Builder().setIndex(2)
                               .setDisplayName("Yellow")
                               .setInternalName("yellow")
+                              .setShortName("Y")
                               .build(),
         new StarType.Builder().setIndex(3)
                               .setDisplayName("Orange")
                               .setInternalName("orange")
+                              .setShortName("O")
                               .build(),
         new StarType.Builder().setIndex(4)
                               .setDisplayName("Red")
                               .setInternalName("red")
+                              .setShortName("R")
                               .build(),
         new StarType.Builder().setIndex(5)
                               .setDisplayName("Neutron")
                               .setInternalName("neutron")
+                              .setShortName("N")
                               .setBaseSize(1.0)
                               .setImageScale(4.0)
                               .build(),
         new StarType.Builder().setIndex(6)
                               .setDisplayName("Black Hole")
                               .setInternalName("black-hole")
+                              .setShortName("BH")
                               .build()
     };
 
@@ -333,6 +340,7 @@ public abstract class BaseStar {
         private int mIndex;
         private String mDisplayName;
         private String mInternalName;
+        private String mShortName;
         private double mBaseSize;
         private double mImageScale;
 
@@ -344,6 +352,9 @@ public abstract class BaseStar {
         }
         public String getInternalName() {
             return mInternalName;
+        }
+        public String getShortName() {
+            return mShortName;
         }
         public String getBitmapBasePath() {
             return "stars/"+mInternalName;
@@ -386,6 +397,11 @@ public abstract class BaseStar {
 
             public Builder setInternalName(String internalName) {
                 mStarType.mInternalName = internalName;
+                return this;
+            }
+
+            public Builder setShortName(String shortName) {
+                mStarType.mShortName = shortName;
                 return this;
             }
 

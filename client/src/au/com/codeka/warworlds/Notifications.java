@@ -55,6 +55,10 @@ public class Notifications {
         StarSummary starSummary = StarManager.getInstance().requestStarSummarySync(starKey,
                 Float.MAX_VALUE // always prefer a cached version, no matter how old
             );
+        if (starSummary == null) {
+            // TODO: this is actually an error... we need better error reporting
+            return;
+        }
 
         NotificationDetails notification = new NotificationDetails();
         notification.sitrep = sitrep;

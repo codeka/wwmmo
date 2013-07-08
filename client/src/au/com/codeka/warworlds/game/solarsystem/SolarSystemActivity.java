@@ -28,6 +28,7 @@ public class SolarSystemActivity extends BaseActivity implements StarManager.Sta
     private static Logger log = LoggerFactory.getLogger(SolarSystemActivity.class);
     private ViewPager mViewPager;
     private StarPagerAdapter mStarPagerAdapter;
+    private int mInitialStarIndex = -1;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -38,6 +39,10 @@ public class SolarSystemActivity extends BaseActivity implements StarManager.Sta
         mStarPagerAdapter = new StarPagerAdapter(getSupportFragmentManager());
         mViewPager = (ViewPager) findViewById(R.id.pager);
         mViewPager.setAdapter(mStarPagerAdapter);
+
+        if (savedInstanceState != null) {
+            mInitialStarIndex = savedInstanceState.getInt("au.com.codeka.warworlds.CurrentIndex");
+        }
     }
 
     @Override
@@ -48,7 +53,6 @@ public class SolarSystemActivity extends BaseActivity implements StarManager.Sta
             @Override
             public void onHelloComplete(boolean success, ServerGreeting greeting) {
                 List<Long> starIDs = greeting.getStarIDs();
-                int selectedIndex = -1;
 
                 Bundle extras = getIntent().getExtras();
                 String starKey = extras.getString("au.com.codeka.warworlds.StarKey");
@@ -65,23 +69,38 @@ public class SolarSystemActivity extends BaseActivity implements StarManager.Sta
                         starIDs.add(starID);
                     }
 
-                    for (int i = 0; i < starIDs.size(); i++) {
-                        if (starIDs.get(i) == starID) {
-                            selectedIndex = i;
-                            break;
+                    if (mInitialStarIndex < 0) {
+                        for (int i = 0; i < starIDs.size(); i++) {
+                            if (starIDs.get(i) == starID) {
+                                mInitialStarIndex = i;
+                                break;
+                            }
                         }
                     }
                 }
 
                 mStarPagerAdapter.setStarIDs(starIDs);
-                if (selectedIndex >= 0) {
-                    mViewPager.setCurrentItem(selectedIndex);
+                if (mInitialStarIndex >= 0) {
+                    mViewPager.setCurrentItem(mInitialStarIndex);
 
-                    mStarPagerAdapter.setFragmentExtras(starIDs.get(selectedIndex),
+                    mStarPagerAdapter.setFragmentExtras(starIDs.get(mInitialStarIndex),
                                                         getIntent().getExtras());
                 }
             }
         });
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle instanceState) {
+        super.onSaveInstanceState(instanceState);
+        mInitialStarIndex = mViewPager.getCurrentItem();
+        instanceState.putInt("au.com.codeka.warworlds.CurrentIndex", mViewPager.getCurrentItem());
+    }
+
+    @Override
+    public void onRestoreInstanceState(Bundle instanceState) {
+        super.onRestoreInstanceState(instanceState);
+        mInitialStarIndex = instanceState.getInt("au.com.codeka.warworlds.CurrentIndex");
     }
 
     @Override
