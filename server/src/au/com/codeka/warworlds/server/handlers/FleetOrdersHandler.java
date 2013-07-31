@@ -1,5 +1,7 @@
 package au.com.codeka.warworlds.server.handlers;
 
+import java.sql.SQLException;
+
 import org.joda.time.DateTime;
 
 import au.com.codeka.common.model.BaseFleet;
@@ -14,6 +16,7 @@ import au.com.codeka.warworlds.server.ctrl.EmpireController;
 import au.com.codeka.warworlds.server.ctrl.StarController;
 import au.com.codeka.warworlds.server.data.DB;
 import au.com.codeka.warworlds.server.data.SqlStmt;
+import au.com.codeka.warworlds.server.data.Transaction;
 import au.com.codeka.warworlds.server.model.DesignManager;
 import au.com.codeka.warworlds.server.model.Fleet;
 import au.com.codeka.warworlds.server.model.Sector;
@@ -24,22 +27,28 @@ public class FleetOrdersHandler extends RequestHandler {
     protected void post() throws RequestException {
         Messages.FleetOrder fleet_order_pb = getRequestBody(Messages.FleetOrder.class);
 
-        Simulation sim = new Simulation();
-        Star star = new StarController().getStar(Integer.parseInt(getUrlParameter("star_id")));
-        sim.simulate(star);
+        try (Transaction t = DB.beginTransaction()) {
+            Simulation sim = new Simulation();
+            Star star = new StarController(t).getStar(Integer.parseInt(getUrlParameter("star_id")));
+            sim.simulate(star);
 
-        int fleetID = Integer.parseInt(getUrlParameter("fleet_id"));
-        int empireID = getSession().getEmpireID();
-        for (BaseFleet baseFleet : star.getFleets()) {
-            Fleet fleet = (Fleet) baseFleet;
-            if (fleet.getID() == fleetID && fleet.getEmpireID() == empireID) {
-                boolean pingEventProcessor = orderFleet(star, fleet, fleet_order_pb, sim);
-                new StarController().update(star);
-                if (pingEventProcessor) {
-                    EventProcessor.i.ping();
+            int fleetID = Integer.parseInt(getUrlParameter("fleet_id"));
+            int empireID = getSession().getEmpireID();
+            for (BaseFleet baseFleet : star.getFleets()) {
+                Fleet fleet = (Fleet) baseFleet;
+                if (fleet.getID() == fleetID && fleet.getEmpireID() == empireID) {
+                    boolean pingEventProcessor = orderFleet(star, fleet, fleet_order_pb, sim);
+                    new StarController(t).update(star);
+                    if (pingEventProcessor) {
+                        EventProcessor.i.ping();
+                    }
+                    break;
                 }
-                break;
             }
+
+            t.commit();
+        } catch (Exception e) {
+            throw new RequestException(e);
         }
     }
 
