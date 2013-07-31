@@ -37,7 +37,7 @@ public class FleetOrdersHandler extends RequestHandler {
             for (BaseFleet baseFleet : star.getFleets()) {
                 Fleet fleet = (Fleet) baseFleet;
                 if (fleet.getID() == fleetID && fleet.getEmpireID() == empireID) {
-                    boolean pingEventProcessor = orderFleet(star, fleet, fleet_order_pb, sim);
+                    boolean pingEventProcessor = orderFleet(t, star, fleet, fleet_order_pb, sim);
                     new StarController(t).update(star);
                     if (pingEventProcessor) {
                         EventProcessor.i.ping();
@@ -52,13 +52,15 @@ public class FleetOrdersHandler extends RequestHandler {
         }
     }
 
-    private boolean orderFleet(Star star, Fleet fleet, Messages.FleetOrder fleet_order_pb, Simulation sim) throws RequestException {
+    private boolean orderFleet(Transaction t, Star star, Fleet fleet,
+                               Messages.FleetOrder fleet_order_pb,
+                               Simulation sim) throws RequestException {
         if (fleet_order_pb.getOrder() == Messages.FleetOrder.FLEET_ORDER.SET_STANCE) {
             orderFleetSetStance(star, fleet, fleet_order_pb, sim);
         } else if (fleet_order_pb.getOrder() == Messages.FleetOrder.FLEET_ORDER.SPLIT) {
             orderFleetSplit(star, fleet, fleet_order_pb, sim);
         } else if (fleet_order_pb.getOrder() == Messages.FleetOrder.FLEET_ORDER.MERGE) {
-            orderFleetMerge(star, fleet, fleet_order_pb, sim);
+            orderFleetMerge(t, star, fleet, fleet_order_pb, sim);
         } else if (fleet_order_pb.getOrder() == Messages.FleetOrder.FLEET_ORDER.MOVE) {
             orderFleetMove(star, fleet, fleet_order_pb, sim);
             return true;
@@ -90,7 +92,9 @@ public class FleetOrdersHandler extends RequestHandler {
         star.getFleets().add(newFleet);
     }
 
-    private void orderFleetMerge(Star star, Fleet fleet, Messages.FleetOrder fleet_order_pb, Simulation sim) throws RequestException {
+    private void orderFleetMerge(Transaction t, Star star, Fleet fleet,
+                                 Messages.FleetOrder fleet_order_pb,
+                                 Simulation sim) throws RequestException {
         if (fleet.getState() != Fleet.State.IDLE) {
             throw new RequestException(400, Messages.GenericError.ErrorCode.CannotOrderFleetNotIdle,
                                        "Cannot merge a fleet that is not currently idle.");
@@ -113,7 +117,7 @@ public class FleetOrdersHandler extends RequestHandler {
 
                 // TODO: probably not the best place for this to go...
                 String sql = "DELETE FROM fleets WHERE id = ?";
-                try (SqlStmt stmt = DB.prepare(sql)) {
+                try (SqlStmt stmt = t.prepare(sql)) {
                     stmt.setInt(1, otherFleet.getID());
                     stmt.update();
                 } catch (Exception e) {
