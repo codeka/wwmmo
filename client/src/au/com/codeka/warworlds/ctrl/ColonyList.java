@@ -12,7 +12,6 @@ import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.util.AttributeSet;
@@ -283,17 +282,17 @@ public class ColonyList extends FrameLayout {
 
         public ColonyListAdapter() {
             // whenever a new star/planet bitmap is generated, redraw the list
-            StarImageManager.getInstance().addBitmapGeneratedListener(
-                    new ImageManager.BitmapGeneratedListener() {
+            StarImageManager.getInstance().addSpriteGeneratedListener(
+                    new ImageManager.SpriteGeneratedListener() {
                 @Override
-                public void onBitmapGenerated(String key, Bitmap bmp) {
+                public void onSpriteGenerated(String key, Sprite sprite) {
                     notifyDataSetChanged();
                 }
             });
-            PlanetImageManager.getInstance().addBitmapGeneratedListener(
-                    new ImageManager.BitmapGeneratedListener() {
+            PlanetImageManager.getInstance().addSpriteGeneratedListener(
+                    new ImageManager.SpriteGeneratedListener() {
                 @Override
-                public void onBitmapGenerated(String key, Bitmap bmp) {
+                public void onSpriteGenerated(String key, Sprite sprite) {
                     notifyDataSetChanged();
                 }
             });

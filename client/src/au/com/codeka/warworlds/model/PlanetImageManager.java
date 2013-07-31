@@ -3,7 +3,6 @@ package au.com.codeka.warworlds.model;
 import java.util.Locale;
 import java.util.Random;
 
-import android.graphics.Bitmap;
 import au.com.codeka.common.Vector3;
 import au.com.codeka.common.model.BasePlanet;
 import au.com.codeka.planetrender.Template;
@@ -26,21 +25,18 @@ public class PlanetImageManager extends ImageManager {
         String key = String.format(Locale.ENGLISH, "%s-%d",
                                    planet.getStar().getKey(), planet.getIndex());
         PlanetExtra planetExtra = new PlanetExtra(planet);
-        Bitmap bmp = getBitmap(key, 100, planetExtra);
-        if (bmp == null) {
-            Sprite s = SpriteManager.i.getSprite("planet."+planet.getPlanetType().getInternalName());
+        Sprite sprite = getSprite(key, 100, planetExtra);
+        if (sprite == null) {
+            sprite = SpriteManager.i.getSprite("planet."+planet.getPlanetType().getInternalName());
 
-            if (s.getNumFrames() <= 1) {
-                return s;
+            if (sprite.getNumFrames() > 1) {
+                int frameNo = new Random(planet.getStar().hashCode()).nextInt(sprite.getNumFrames());
+                sprite = sprite.extractFrame(frameNo);
+                sprite.setScale((float) getPlanetSize(planetExtra) / 10.0f);
             }
-
-            int frameNo = new Random(planet.getStar().hashCode()).nextInt(s.getNumFrames());
-            s = s.extractFrame(frameNo);
-            s.setScale((float) getPlanetSize(planetExtra) / 10.0f);
-            return s;
-        } else {
-            return Sprite.createSimpleSprite(bmp);
         }
+
+        return sprite;
     }
 
     /**

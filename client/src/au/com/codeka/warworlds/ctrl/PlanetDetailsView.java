@@ -1,7 +1,6 @@
 package au.com.codeka.warworlds.ctrl;
 
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.FrameLayout;
@@ -52,7 +51,7 @@ public class PlanetDetailsView extends FrameLayout {
             return;
         }
 
-        PlanetImageManager.getInstance().addBitmapGeneratedListener(mPlanetBitmapGeneratedListener);
+        PlanetImageManager.getInstance().addSpriteGeneratedListener(mPlanetSpriteGeneratedListener);
         refresh();
     }
 
@@ -60,7 +59,7 @@ public class PlanetDetailsView extends FrameLayout {
     public void onDetachedFromWindow() {
         mIsAttachedToWindow = false;
 
-        PlanetImageManager.getInstance().removeBitmapGeneratedListener(mPlanetBitmapGeneratedListener);
+        PlanetImageManager.getInstance().removeSpriteGeneratedListener(mPlanetSpriteGeneratedListener);
     }
 
     private void refresh() {
@@ -113,9 +112,9 @@ public class PlanetDetailsView extends FrameLayout {
         }
     }
 
-    private ImageManager.BitmapGeneratedListener mPlanetBitmapGeneratedListener = new ImageManager.BitmapGeneratedListener() {
+    private ImageManager.SpriteGeneratedListener mPlanetSpriteGeneratedListener = new ImageManager.SpriteGeneratedListener() {
         @Override
-        public void onBitmapGenerated(String key, Bitmap bmp) {
+        public void onSpriteGenerated(String key, Sprite sprite) {
             refresh();
         }
     };

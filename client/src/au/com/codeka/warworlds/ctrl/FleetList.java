@@ -11,7 +11,6 @@ import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.text.Html;
@@ -384,10 +383,10 @@ public class FleetList extends FrameLayout implements StarManager.StarFetchedHan
             mMyEmpire = EmpireManager.i.getEmpire();
 
             // whenever a new star bitmap is generated, redraw the screen
-            StarImageManager.getInstance().addBitmapGeneratedListener(
-                    new ImageManager.BitmapGeneratedListener() {
+            StarImageManager.getInstance().addSpriteGeneratedListener(
+                    new ImageManager.SpriteGeneratedListener() {
                 @Override
-                public void onBitmapGenerated(String key, Bitmap bmp) {
+                public void onSpriteGenerated(String key, Sprite sprite) {
                     notifyDataSetChanged();
                 }
             });

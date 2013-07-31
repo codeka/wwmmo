@@ -17,12 +17,8 @@ import java.util.concurrent.ArrayBlockingQueue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import android.annotation.SuppressLint;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Handler;
-import android.support.v4.util.LruCache;
-import au.com.codeka.BackgroundRunner;
 import au.com.codeka.common.Colour;
 import au.com.codeka.common.Image;
 import au.com.codeka.common.Vector3;
@@ -35,7 +31,6 @@ import au.com.codeka.warworlds.GlobalOptions;
 /**
  * This is the base class for the \c StarImageManagaer and \c PlanetImageManager.
  */
-@SuppressLint("NewApi") // for LruCache, we grab it from android.support.v4 anyway
 public abstract class ImageManager {
     private static Logger log = LoggerFactory.getLogger(ImageManager.class);
 
@@ -45,14 +40,13 @@ public abstract class ImageManager {
             new ArrayBlockingQueue<QueuedGenerate>(MAX_GENERATE_QUEUE_SIZE);
     private Thread mGenerateThread;
     private Handler mHandler = new Handler();
-    private List<BitmapGeneratedListener> mBitmapGeneratedListeners =
-            new ArrayList<BitmapGeneratedListener>();
-    private LruCache<String, Bitmap> mLoadedBitmaps = new LruCache<String, Bitmap>(100);
+    private List<SpriteGeneratedListener> mSpriteGeneratedListeners =
+            new ArrayList<SpriteGeneratedListener>();
     private Map<String, Template> mTemplates = new HashMap<String, Template>();
     private double mPixelScale;
 
     /**
-     * Gets the \c Bitmap for the given object at the given size.. If no image has been generated
+     * Gets the \c Sprite for the given object at the given size.. If no image has been generated
      * yet, \c null is returned and you should wait for the ImageGenerated event.
      * 
      * To facilitate adding new images more easily, we check the asset directory each
@@ -67,18 +61,13 @@ public abstract class ImageManager {
      * @return A \c Bitmap with an image of the planet or star, or \c null if the image has
      *          not been generated yet.
      */
-    protected Bitmap getBitmap(final String key, int size, Object extra) {
+    protected Sprite getSprite(final String key, int size, Object extra) {
         GlobalOptions opts = new GlobalOptions();
         if (!opts.uniqueStarsAndPlanets()) {
             return null;
         }
 
         final String cacheKey = String.format(Locale.ENGLISH, "%s_%d", key, size);
-        Bitmap loadedBitmap = mLoadedBitmaps.get(cacheKey);
-        if (loadedBitmap != null) {
-            return loadedBitmap;
-        }
-
         if (isInGenerateQueue(cacheKey)) {
             // if we've already queued up this planet/star, just give up now
             return null;
@@ -97,37 +86,7 @@ public abstract class ImageManager {
         final File cacheFile = new File(getCachePath(tmpl, cacheKey));
         if (cacheFile.exists()) {
             log.debug("Loading cached image: "+cacheFile.getAbsolutePath());
-
-            new BackgroundRunner<Void>() {
-                @Override
-                protected Void doInBackground() {
-                    BitmapFactory.Options opts = new BitmapFactory.Options();
-                    Bitmap bmp;
-                    try {
-                        bmp = BitmapFactory.decodeFile(cacheFile.getAbsolutePath(), opts);
-                    } catch(OutOfMemoryError e) {
-                        mLoadedBitmaps = new LruCache<String, Bitmap>(mLoadedBitmaps.maxSize() / 2);
-                        System.gc();
-
-                        bmp = BitmapFactory.decodeFile(cacheFile.getAbsolutePath(), opts);
-                    }
-
-                    if (bmp == null) {
-                        cacheFile.delete();
-                        return null;
-                    }
-
-                    mLoadedBitmaps.put(cacheKey, bmp);
-                    return null;
-                }
-
-                @Override
-                protected void onComplete(Void v) {
-                    fireBitmapGeneratedListeners(key, mLoadedBitmaps.get(cacheKey));
-                }
-            }.execute();
-
-            return null;
+            return SpriteManager.i.getSimpleSprite(cacheFile.getAbsolutePath(), false);
         } else {
             long endTime = System.nanoTime();
             log.debug(String.format("No cached image (after %.4fms), generating: %s",
@@ -143,24 +102,24 @@ public abstract class ImageManager {
     }
 
 
-    public void addBitmapGeneratedListener(BitmapGeneratedListener listener) {
-        mBitmapGeneratedListeners.add(listener);
+    public void addSpriteGeneratedListener(SpriteGeneratedListener listener) {
+        mSpriteGeneratedListeners.add(listener);
     }
 
-    public void removeBitmapGeneratedListener(BitmapGeneratedListener listener) {
-        mBitmapGeneratedListeners.remove(listener);
+    public void removeSpriteGeneratedListener(SpriteGeneratedListener listener) {
+        mSpriteGeneratedListeners.remove(listener);
     }
 
-    protected void fireBitmapGeneratedListeners(final String key, final Bitmap bmp) {
+    protected void fireSpriteGeneratedListeners(final String key, final Sprite sprite) {
         mHandler.post(new Runnable() {
             @Override
             public void run() {
                 // make a copy, because sometimes they'll remove themselves in their own callback
-                ArrayList<BitmapGeneratedListener> listeners =
-                        new ArrayList<BitmapGeneratedListener>(mBitmapGeneratedListeners);
+                ArrayList<SpriteGeneratedListener> listeners =
+                        new ArrayList<SpriteGeneratedListener>(mSpriteGeneratedListeners);
 
-                for (BitmapGeneratedListener listener : listeners) {
-                    listener.onBitmapGenerated(key, bmp);
+                for (SpriteGeneratedListener listener : listeners) {
+                    listener.onSpriteGenerated(key, sprite);
                 }
             }
         });
@@ -289,8 +248,10 @@ public abstract class ImageManager {
         } catch (FileNotFoundException e) {
             log.error("Error writing to cache file.", e);
         }
+        bmp.recycle();
 
-        fireBitmapGeneratedListeners(item.key, bmp);
+        Sprite sprite = SpriteManager.i.getSimpleSprite(outputFile.getAbsolutePath(), false);
+        fireSpriteGeneratedListeners(item.key, sprite);
         return true;
     }
 
@@ -329,8 +290,6 @@ public abstract class ImageManager {
 
         while (item != null) {
             if (!generateBitmap(item)) {
-                // if it failed, reduce the size of the cache, do a GC and try again...
-                mLoadedBitmaps = new LruCache<String, Bitmap>(mLoadedBitmaps.maxSize() / 2);
                 System.gc();
                 continue;
             }
@@ -389,10 +348,10 @@ public abstract class ImageManager {
         }
     }
 
-    public interface BitmapGeneratedListener {
+    public interface SpriteGeneratedListener {
         /**
          * This is called when the bitmap for the given planet/star has been generated.
          */
-        void onBitmapGenerated(String key, Bitmap bmp);
+        void onSpriteGenerated(String key, Sprite sprite);
     }
 }

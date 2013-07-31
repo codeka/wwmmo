@@ -91,7 +91,7 @@ public class StarfieldSurfaceView extends SectorView
 
     private static Bitmap sFleetMultiBitmap;
 
-    private ImageManager.BitmapGeneratedListener mBitmapGeneratedListener;
+    private ImageManager.SpriteGeneratedListener mSpriteGeneratedListener;
 
     public StarfieldSurfaceView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -126,9 +126,9 @@ public class StarfieldSurfaceView extends SectorView
         }
 
         // whenever a new star bitmap is generated, redraw the screen
-        mBitmapGeneratedListener = new ImageManager.BitmapGeneratedListener() {
+        mSpriteGeneratedListener = new ImageManager.SpriteGeneratedListener() {
             @Override
-            public void onBitmapGenerated(String key, Bitmap bmp) {
+            public void onSpriteGenerated(String key, Sprite sprite) {
                 redraw();
             }
         };
@@ -149,7 +149,7 @@ public class StarfieldSurfaceView extends SectorView
         }
 
         SectorManager.getInstance().addSectorListChangedListener(this);
-        StarImageManager.getInstance().addBitmapGeneratedListener(mBitmapGeneratedListener);
+        StarImageManager.getInstance().addSpriteGeneratedListener(mSpriteGeneratedListener);
         StarManager.getInstance().addStarUpdatedListener(null, this);
         EmpireManager.i.addEmpireUpdatedListener(null, this);
 
@@ -174,7 +174,7 @@ public class StarfieldSurfaceView extends SectorView
         }
 
         SectorManager.getInstance().removeSectorListChangedListener(this);
-        StarImageManager.getInstance().removeBitmapGeneratedListener(mBitmapGeneratedListener);
+        StarImageManager.getInstance().removeSpriteGeneratedListener(mSpriteGeneratedListener);
         StarManager.getInstance().removeStarUpdatedListener(this);
         EmpireManager.i.removeEmpireUpdatedListener(this);
 

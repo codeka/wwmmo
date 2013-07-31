@@ -1,12 +1,17 @@
 package au.com.codeka.warworlds.model;
 
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.ref.SoftReference;
 import java.util.ArrayList;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.BitmapFactory.Options;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
@@ -82,17 +87,6 @@ public class Sprite {
         return copy;
     }
 
-    /**
-     * Creates a "simple" sprite directly from the given bitmap. The sprite will just be
-     * the whole bitmap.
-     */
-    public static Sprite createSimpleSprite(Bitmap bmp) {
-        SpriteImage img = new SpriteImage(bmp);
-        Sprite sprite = new Sprite(img, "simple");
-        sprite.addFrame(new SpriteFrame(new Rect(0, 0, bmp.getWidth(), bmp.getHeight())));
-        return sprite;
-    }
-
     public void draw(Canvas canvas) {
         draw(canvas, 0);
     }
@@ -145,42 +139,92 @@ public class Sprite {
      * Represents an image that contains (possibly) more than one \c Sprite.
      */
     public static class SpriteImage {
+        private static Logger log = LoggerFactory.getLogger(SpriteImage.class);
+        private boolean mIsAsset;
         private String mFileName;
-        private Bitmap mBitmap;
         private SoftReference<Bitmap> mSoftBitmap;
+        private Rect mDimensions;
 
         public String getFileName() {
             return mFileName;
         }
         public Bitmap getBitmap() {
-            Bitmap bmp = mBitmap;
-            if (bmp == null && mSoftBitmap != null) {
+            Bitmap bmp = null;
+            if (mSoftBitmap != null) {
                 bmp = mSoftBitmap.get();
             }
             if (bmp == null && mFileName != null) {
-                mSoftBitmap = loadBitmap();
-                bmp = mSoftBitmap.get();
+                bmp = loadBitmap();
+                mSoftBitmap = new SoftReference<Bitmap>(bmp);
             }
 
             return bmp;
         }
 
-        public SpriteImage(Bitmap bmp) {
-            mBitmap = bmp;
-            mFileName = null;
-        }
-
-        public SpriteImage(String fileName) {
+        public SpriteImage(String fileName, boolean isAsset) {
             mFileName = fileName;
+            mIsAsset = isAsset;
         }
 
-        private SoftReference<Bitmap> loadBitmap() {
-            InputStream ins;
+        public int getWidth() {
+            if (mDimensions == null) {
+                calcDimensions();
+            }
+            return mDimensions.width();
+        }
+
+        public int getHeight() {
+            if (mDimensions == null) {
+                calcDimensions();
+            }
+            return mDimensions.height();
+        }
+
+        private void calcDimensions() {
+            // if we have a bitmap in memory already, just use that
+            Bitmap bmp = null;
+            if (mSoftBitmap != null) {
+                bmp = mSoftBitmap.get();
+            }
+            if (bmp != null) {
+                mDimensions = new Rect(0, 0, bmp.getWidth(), bmp.getHeight());
+            }
+
+            // otherwise, avoid loading the whole bitmap and just return the
+            // dimenions if possible.
             try {
-                ins = App.i.getAssets().open(mFileName);
-                return new SoftReference<Bitmap>(BitmapFactory.decodeStream(ins));
+                InputStream ins = load();
+                Options opt = new Options();
+                opt.inJustDecodeBounds = true;
+                BitmapFactory.decodeStream(ins, null, opt);
+                mDimensions = new Rect(0, 0, opt.outWidth, opt.outHeight);
+            } catch(IOException e) {
+                throw new RuntimeException("Error fetching dimensions of: "+mFileName, e);
+            }
+        }
+
+        private Bitmap loadBitmap() {
+            InputStream ins = null;
+            try {
+                ins = load();
+                return BitmapFactory.decodeStream(ins);
             } catch (IOException e) {
+                log.warn("Could not load image!", e);
                 return null;
+            } finally {
+                if (ins != null) {
+                    try {
+                        ins.close();
+                    } catch(Exception e) {}
+                }
+            }
+        }
+
+        private InputStream load() throws IOException {
+            if (mIsAsset) {
+                return App.i.getAssets().open(mFileName);
+            } else {
+                return new FileInputStream(mFileName);
             }
         }
     }

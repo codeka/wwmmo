@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="au.com.codeka.warworlds"
-    android:versionCode="142"
-    android:versionName="0.3.663"
+    android:versionCode="143"
+    android:versionName="0.3.664"
     android:installLocation="auto" >
 
     <!-- Android SDK version 2.2 (API level 8) is the minimum we can viably support, since

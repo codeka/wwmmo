@@ -19,16 +19,17 @@ import org.xml.sax.SAXException;
 import android.content.Context;
 import android.graphics.Rect;
 import au.com.codeka.common.XmlIterator;
+import au.com.codeka.warworlds.model.Sprite.SpriteFrame;
 
 /**
  * This class manages sprites as described in the assets/sprites.xml file.
  */
 public class SpriteManager {
+    public static SpriteManager i = new SpriteManager();
     private static Logger log = LoggerFactory.getLogger(SpriteManager.class);
 
-    public static SpriteManager i = new SpriteManager();
-
     private TreeMap<String, Sprite> mSprites;
+    private SpriteImageManager mSpriteImageManager = new SpriteImageManager();
 
     private SpriteManager() {
     }
@@ -56,6 +57,13 @@ public class SpriteManager {
 
     public Sprite getSprite(String name) {
         return mSprites.get(name);
+    }
+
+    public Sprite getSimpleSprite(String fileName, boolean isAsset) {
+        Sprite.SpriteImage img = mSpriteImageManager.getSpriteImage(fileName, isAsset);
+        Sprite sprite = new Sprite(img, "simple");
+        sprite.addFrame(new SpriteFrame(new Rect(0, 0, img.getWidth(), img.getHeight())));
+        return sprite;
     }
 
     private static Document loadXml(InputStream inp) {
@@ -87,7 +95,7 @@ public class SpriteManager {
 
         for (Element sheetElement : XmlIterator.childElements(spritesElement, "sheet")) {
             String fileName = sheetElement.getAttribute("filename");
-            Sprite.SpriteImage img = new Sprite.SpriteImage(fileName);
+            Sprite.SpriteImage img = new Sprite.SpriteImage(fileName, true);
 
             for (Element spriteElement : XmlIterator.childElements(sheetElement, "sprite")) {
                 Sprite sprite = parseSpriteXml(img, spriteElement);
@@ -128,5 +136,25 @@ public class SpriteManager {
         }
 
         return sprite;
+    }
+
+    /**
+     * This class manages SpriteImages that are backed by files on disk.
+     */
+    private static class SpriteImageManager {
+        private TreeMap<String, Sprite.SpriteImage> mSpriteImages =
+                new TreeMap<String, Sprite.SpriteImage>();
+
+        public Sprite.SpriteImage getSpriteImage(String fileName, boolean isAsset) {
+            synchronized(mSpriteImages) {
+                if (mSpriteImages.containsKey(fileName)) {
+                    return mSpriteImages.get(fileName);
+                }
+            }
+
+            Sprite.SpriteImage img = new Sprite.SpriteImage(fileName, isAsset);
+            mSpriteImages.put(fileName, img);
+            return img;
+        }
     }
 }

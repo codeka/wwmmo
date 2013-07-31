@@ -46,7 +46,7 @@ public class SolarSystemSurfaceView extends UniverseElementSurfaceView {
     private SelectionView mSelectionView;
     private CopyOnWriteArrayList<OnPlanetSelectedListener> mPlanetSelectedListeners;
     private StarfieldBackgroundRenderer mBackgroundRenderer;
-    private BitmapGeneratedListener mBitmapGeneratedListener;
+    private ImageManager.SpriteGeneratedListener mSpriteGeneratedListener;
     private Matrix mMatrix;
 
     public SolarSystemSurfaceView(Context context, AttributeSet attrs) {
@@ -63,9 +63,9 @@ public class SolarSystemSurfaceView extends UniverseElementSurfaceView {
         mPlanetPaint.setStyle(Style.STROKE);
         mMatrix = new Matrix();
 
-        mBitmapGeneratedListener = new BitmapGeneratedListener();
-        PlanetImageManager.getInstance().addBitmapGeneratedListener(mBitmapGeneratedListener);
-        StarImageManager.getInstance().addBitmapGeneratedListener(mBitmapGeneratedListener);
+        mSpriteGeneratedListener = new SpriteGeneratedListener();
+        PlanetImageManager.getInstance().addSpriteGeneratedListener(mSpriteGeneratedListener);
+        StarImageManager.getInstance().addSpriteGeneratedListener(mSpriteGeneratedListener);
     }
 
     public void setSelectionView(SelectionView selectionView) {
@@ -216,7 +216,7 @@ public class SolarSystemSurfaceView extends UniverseElementSurfaceView {
 
     @Override
     public void onDetachedFromWindow() {
-        PlanetImageManager.getInstance().removeBitmapGeneratedListener(mBitmapGeneratedListener);
+        PlanetImageManager.getInstance().removeSpriteGeneratedListener(mSpriteGeneratedListener);
         if (mBackgroundRenderer != null) {
             mBackgroundRenderer.close();
             mBackgroundRenderer = null;
@@ -392,9 +392,9 @@ public class SolarSystemSurfaceView extends UniverseElementSurfaceView {
      * Our implementation of \c PlanetImageManager.BitmapGeneratedListener just causes us to
      * redraw the screen (with the new bitmap).
      */
-    private class BitmapGeneratedListener implements ImageManager.BitmapGeneratedListener {
+    private class SpriteGeneratedListener implements ImageManager.SpriteGeneratedListener {
         @Override
-        public void onBitmapGenerated(String planetKey, Bitmap bmp) {
+        public void onSpriteGenerated(String planetKey, Sprite sprite) {
             redraw();
         }
     }
