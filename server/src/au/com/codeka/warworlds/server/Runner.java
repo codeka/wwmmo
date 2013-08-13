@@ -5,6 +5,7 @@ import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import au.com.codeka.warworlds.server.ctrl.CombatReportController;
 import au.com.codeka.warworlds.server.ctrl.NameGenerator;
 import au.com.codeka.warworlds.server.ctrl.StarController;
 import au.com.codeka.warworlds.server.ctrl.StatisticsController;
@@ -48,6 +49,19 @@ public class Runner {
                     dt = dt.minusHours(numHours);
                 }
                 new StarController().simulateAllStarsOlderThan(dt);
+            } else if (method.equals("purge-combat-reports")) {
+                int numDays = 30;
+                if (extra != null) {
+                    numDays = Integer.parseInt(extra);
+                }
+                if (numDays < 7) {
+                    numDays = 7;
+                }
+                DateTime dt = DateTime.now();
+                dt = dt.minusDays(numDays);
+                new CombatReportController().purgeCombatReportsOlderThan(dt);
+            } else {
+                log.error("Unknown command: "+method);
             }
         } catch(Exception e) {
             log.error("Error running CRON", e);

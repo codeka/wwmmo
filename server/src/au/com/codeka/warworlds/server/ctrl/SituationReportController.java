@@ -35,7 +35,7 @@ public class SituationReportController {
         }
     }
 
-    public List<Messages.SituationReport> fetch(int empireID, Integer starID, DateTime after,
+    public List<Messages.SituationReport> fetch(Integer empireID, Integer starID, DateTime after,
                                                 int limit) throws RequestException {
         try {
             return db.fetch(empireID, starID, after, limit);
@@ -64,22 +64,25 @@ public class SituationReportController {
             }
         }
 
-        public List<Messages.SituationReport> fetch(int empireID, Integer starID, DateTime after,
+        public List<Messages.SituationReport> fetch(Integer empireID, Integer starID, DateTime after,
                                                     int limit) throws Exception {
             String sql = "SELECT report" +
                         " FROM situation_reports" +
-                        " WHERE empire_id = ?" +
+                        " WHERE report_time < ?" +
+                        (empireID == null ? "" : " AND empire_id = ?") +
                         (starID == null ? "" : " AND star_id = ?") +
-                          " AND report_time < ?" +
                         " ORDER BY report_time DESC" +
                         " LIMIT "+limit;
             try (SqlStmt stmt = prepare(sql)) {
-                stmt.setInt(1, empireID);
-                if (starID == null) {
-                    stmt.setDateTime(2, after);
-                } else {
-                    stmt.setInt(2, starID);
-                    stmt.setDateTime(3, after);
+                stmt.setDateTime(1, after);
+                int i = 2;
+                if (empireID != null) {
+                    stmt.setInt(i, empireID);
+                    i++;
+                }
+                if (starID != null) {
+                    stmt.setInt(i, starID);
+                    i++;
                 }
                 ResultSet rs = stmt.select();
 

@@ -12,7 +12,7 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry exported="true" kind="con" path="com.android.ide.eclipse.adt.ANDROID_FRAMEWORK"/>
-	<classpathentry kind="con" path="com.android.ide.eclipse.adt.LIBRARIES"/>
+	<classpathentry exported="true" kind="con" path="com.android.ide.eclipse.adt.LIBRARIES"/>
 	<classpathentry exported="true" kind="lib" path="libs/android-support-v4.jar"/>
 	<classpathentry exported="true" kind="lib" path="libs/validation-api-1.0.0.GA.jar"/>
 	<classpathentry exported="true" kind="lib" path="libs/commons-codec-1.4.jar"/>

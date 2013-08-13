@@ -28,8 +28,8 @@ import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.TabFragmentActivity;
 import au.com.codeka.warworlds.model.Alliance;
-import au.com.codeka.warworlds.model.AllianceJoinRequest;
 import au.com.codeka.warworlds.model.AllianceManager;
+import au.com.codeka.warworlds.model.AllianceRequest;
 import au.com.codeka.warworlds.model.Empire;
 import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.MyEmpire;
@@ -45,7 +45,7 @@ public class AllianceActivity extends TabFragmentActivity
         getTabManager().addTab(mContext, new TabInfo(this, "Overview", OverviewFragment.class, null));
         MyEmpire myEmpire = EmpireManager.i.getEmpire();
         if (myEmpire.getAlliance() != null) {
-            getTabManager().addTab(mContext, new TabInfo(this, "Join Requests", JoinRequestsFragment.class, null));
+            getTabManager().addTab(mContext, new TabInfo(this, "Requests", RequestsFragment.class, null));
         }
     }
 
@@ -255,10 +255,10 @@ public class AllianceActivity extends TabFragmentActivity
         }
     }
 
-    public static class JoinRequestsFragment extends BaseFragment
-                                             implements AllianceManager.AllianceUpdatedHandler {
+    public static class RequestsFragment extends BaseFragment
+                                         implements AllianceManager.AllianceUpdatedHandler {
         private View mView;
-        private JoinRequestListAdapter mJoinRequestListAdapter;
+        private RequestListAdapter mRequestListAdapter;
 
         @Override
         public void onAllianceUpdated(Alliance alliance) {
@@ -283,17 +283,17 @@ public class AllianceActivity extends TabFragmentActivity
         @Override
         public View onCreateView(LayoutInflater inflator, ViewGroup container, Bundle savedInstanceState) {
             mView = inflator.inflate(R.layout.alliance_join_requests_tab, null);
-            mJoinRequestListAdapter = new JoinRequestListAdapter();
+            mRequestListAdapter = new RequestListAdapter();
 
             ListView joinRequestsList = (ListView) mView.findViewById(R.id.join_requests);
-            joinRequestsList.setAdapter(mJoinRequestListAdapter);
+            joinRequestsList.setAdapter(mRequestListAdapter);
 
             joinRequestsList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                    JoinRequestListAdapter.ItemEntry entry = (JoinRequestListAdapter.ItemEntry) mJoinRequestListAdapter.getItem(position);
-                    JoinConfirmDialog dialog = new JoinConfirmDialog();
-                    dialog.setJoinRequest(entry.joinRequest);
+                    RequestListAdapter.ItemEntry entry = (RequestListAdapter.ItemEntry) mRequestListAdapter.getItem(position);
+                    RequestVoteDialog dialog = new RequestVoteDialog();
+                    dialog.setRequest(entry.request);
                     dialog.show(getActivity().getSupportFragmentManager(), "");
                 }
             });
@@ -310,11 +310,11 @@ public class AllianceActivity extends TabFragmentActivity
 
             MyEmpire myEmpire = EmpireManager.i.getEmpire();
             if (myEmpire != null && myEmpire.getAlliance() != null) {
-                AllianceManager.i.fetchJoinRequests(myEmpire.getAlliance().getKey(),
-                    new AllianceManager.FetchJoinRequestsCompleteHandler() {
+                AllianceManager.i.fetchRequests(myEmpire.getAlliance().getKey(),
+                    new AllianceManager.FetchRequestsCompleteHandler() {
                         @Override
-                        public void onJoinRequestsFetched(Map<String, Empire> empires, List<AllianceJoinRequest> joinRequests) {
-                            mJoinRequestListAdapter.setJoinRequests(empires, joinRequests);
+                        public void onRequestsFetched(Map<Integer, Empire> empires, List<AllianceRequest> requests) {
+                            mRequestListAdapter.setRequests(empires, requests);
 
                             joinRequestsList.setVisibility(View.VISIBLE);
                             progressBar.setVisibility(View.GONE);
@@ -323,14 +323,14 @@ public class AllianceActivity extends TabFragmentActivity
             }
         }
 
-        private class JoinRequestListAdapter extends BaseAdapter {
+        private class RequestListAdapter extends BaseAdapter {
             private ArrayList<ItemEntry> mEntries;
 
-            public void setJoinRequests(Map<String, Empire> empires, List<AllianceJoinRequest> joinRequests) {
+            public void setRequests(Map<Integer, Empire> empires, List<AllianceRequest> requests) {
                 mEntries = new ArrayList<ItemEntry>();
-                for (AllianceJoinRequest joinRequest : joinRequests) {
-                    Empire empire = empires.get(joinRequest.getEmpireKey());
-                    mEntries.add(new ItemEntry(empire, joinRequest));
+                for (AllianceRequest request : requests) {
+                    Empire empire = empires.get(request.getRequestEmpireID());
+                    mEntries.add(new ItemEntry(empire, request));
                 }
 
                 notifyDataSetChanged();
@@ -347,7 +347,7 @@ public class AllianceActivity extends TabFragmentActivity
             public boolean isEnabled(int position) {
                 if (mEntries == null) 
                     return false;
-                if (mEntries.get(position).joinRequest.getState().equals(AllianceJoinRequest.RequestState.PENDING))
+                if (mEntries.get(position).request.getState() == AllianceRequest.RequestState.PENDING)
                     return true;
                 return false;
             }
@@ -383,14 +383,14 @@ public class AllianceActivity extends TabFragmentActivity
 
                 empireName.setText(entry.empire.getDisplayName());
                 empireIcon.setImageBitmap(entry.empire.getShield(activity));
-                requestDate.setText(String.format(Locale.ENGLISH, "Requested: %s", TimeInHours.format(entry.joinRequest.getTimeRequested())));
-                message.setText(entry.joinRequest.getMessage());
+                requestDate.setText(String.format(Locale.ENGLISH, "Requested: %s", TimeInHours.format(entry.request.getRequestDate())));
+                message.setText(entry.request.getMessage());
 
-                if (entry.joinRequest.getState().equals(AllianceJoinRequest.RequestState.PENDING)) {
+                if (entry.request.getState().equals(AllianceRequest.RequestState.PENDING)) {
                     requestStatus.setImageResource(R.drawable.question);
-                } else if (entry.joinRequest.getState().equals(AllianceJoinRequest.RequestState.ACCEPTED)) {
+                } else if (entry.request.getState().equals(AllianceRequest.RequestState.ACCEPTED)) {
                     requestStatus.setImageResource(R.drawable.tick);
-                } else if (entry.joinRequest.getState().equals(AllianceJoinRequest.RequestState.REJECTED)) {
+                } else if (entry.request.getState().equals(AllianceRequest.RequestState.REJECTED)) {
                     requestStatus.setImageResource(R.drawable.cross);
                 }
 
@@ -399,11 +399,11 @@ public class AllianceActivity extends TabFragmentActivity
 
             public class ItemEntry {
                 public Empire empire;
-                public AllianceJoinRequest joinRequest;
+                public AllianceRequest request;
 
-                public ItemEntry(Empire empire, AllianceJoinRequest joinRequest) {
+                public ItemEntry(Empire empire, AllianceRequest request) {
                     this.empire = empire;
-                    this.joinRequest = joinRequest;
+                    this.request = request;
                 }
             }
         }

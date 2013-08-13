@@ -14,10 +14,10 @@ import au.com.codeka.warworlds.model.AllianceManager;
 
 public class JoinRequestDialog extends DialogFragment {
     private View mView;
-    private String mAllianceKey;
+    private int mAllianceID;
 
-    public void setAllianceKey(String allianceKey) {
-        mAllianceKey = allianceKey;
+    public void setAllianceID(int allianceID) {
+        mAllianceID = allianceID;
     }
 
     @Override
@@ -41,7 +41,7 @@ public class JoinRequestDialog extends DialogFragment {
 
     private void onAllianceJoin() {
         TextView message = (TextView) mView.findViewById(R.id.message);
-        AllianceManager.i.requestJoin(mAllianceKey, message.getText().toString());
+        AllianceManager.i.requestJoin(mAllianceID, message.getText().toString());
 
         new StyledDialog.Builder(getActivity())
                         .setMessage("The request to join this alliance has been sent, you'll get a notification when your application is approved.")

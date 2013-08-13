@@ -70,11 +70,11 @@ public class AllianceManager {
     /**
      * Fetches details, including memberships, of the alliance with the given key.
      */
-    public void fetchAlliance(final String allianceKey, final FetchAllianceCompleteHandler handler) {
+    public void fetchAlliance(final int allianceID, final FetchAllianceCompleteHandler handler) {
         new BackgroundRunner<Alliance>() {
             @Override
             protected Alliance doInBackground() {
-                String url = "alliances/"+allianceKey;
+                String url = "alliances/"+allianceID;
                 try {
                     Messages.Alliance pb = ApiClient.getProtoBuf(url, Messages.Alliance.class);
                     Alliance alliance = new Alliance();
@@ -95,43 +95,43 @@ public class AllianceManager {
         }.execute();
     }
 
-    public void fetchJoinRequests(final String allianceKey,
-                                  final FetchJoinRequestsCompleteHandler handler) {
-        new BackgroundRunner<List<AllianceJoinRequest>>() {
-            private TreeMap<String, Empire> mEmpires;
+    public void fetchRequests(final String allianceKey,
+                              final FetchRequestsCompleteHandler handler) {
+        new BackgroundRunner<List<AllianceRequest>>() {
+            private TreeMap<Integer, Empire> mEmpires;
 
             @Override
-            protected List<AllianceJoinRequest> doInBackground() {
-                String url = "alliances/"+allianceKey+"/join-requests";
+            protected List<AllianceRequest> doInBackground() {
+                String url = "alliances/"+allianceKey+"/requests";
                 try {
-                    Messages.AllianceJoinRequests pb = ApiClient.getProtoBuf(url, Messages.AllianceJoinRequests.class);
-                    ArrayList<AllianceJoinRequest> joinRequests = new ArrayList<AllianceJoinRequest>();
+                    Messages.AllianceRequests pb = ApiClient.getProtoBuf(url, Messages.AllianceRequests.class);
+                    ArrayList<AllianceRequest> requests = new ArrayList<AllianceRequest>();
                     TreeSet<String> empireKeys = new TreeSet<String>();
-                    for (Messages.AllianceJoinRequest join_request_pb : pb.getJoinRequestsList()) {
-                        AllianceJoinRequest joinRequest = new AllianceJoinRequest();
-                        joinRequest.fromProtocolBuffer(join_request_pb);
-                        joinRequests.add(joinRequest);
-                        if (!empireKeys.contains(join_request_pb.getEmpireKey())) {
-                            empireKeys.add(join_request_pb.getEmpireKey());
+                    for (Messages.AllianceRequest request_pb : pb.getRequestsList()) {
+                        AllianceRequest request = new AllianceRequest();
+                        request.fromProtocolBuffer(request_pb);
+                        requests.add(request);
+                        if (!empireKeys.contains(Integer.toString(request_pb.getRequestEmpireId()))) {
+                            empireKeys.add(Integer.toString(request_pb.getRequestEmpireId()));
                         }
                     }
 
                     List<Empire> empires = EmpireManager.i.fetchEmpiresSync(empireKeys);
-                    mEmpires = new TreeMap<String, Empire>();
+                    mEmpires = new TreeMap<Integer, Empire>();
                     for (Empire empire : empires) {
-                        mEmpires.put(empire.getKey(), empire);
+                        mEmpires.put(Integer.parseInt(empire.getKey()), empire);
                     }
 
-                    return joinRequests;
+                    return requests;
                 } catch(ApiException e) {
                     return null;
                 }
             }
 
             @Override
-            protected void onComplete(List<AllianceJoinRequest> joinRequests) {
-                if (handler != null && joinRequests != null) {
-                    handler.onJoinRequestsFetched(mEmpires, joinRequests);
+            protected void onComplete(List<AllianceRequest> requests) {
+                if (handler != null && requests != null) {
+                    handler.onRequestsFetched(mEmpires, requests);
                 }
             }
         }.execute();
@@ -140,16 +140,17 @@ public class AllianceManager {
     /**
      * Sends a request to join the specified alliance.
      */
-    public void requestJoin(final String allianceKey, final String message) {
+    public void requestJoin(final int allianceID, final String message) {
         final MyEmpire myEmpire = EmpireManager.i.getEmpire();
 
         new BackgroundRunner<Boolean>() {
             @Override
             protected Boolean doInBackground() {
-                String url = "alliances/"+allianceKey+"/join-requests";
-                Messages.AllianceJoinRequest pb = Messages.AllianceJoinRequest.newBuilder()
-                                    .setAllianceKey(allianceKey)
-                                    .setEmpireKey(myEmpire.getKey())
+                String url = "alliances/"+allianceID+"/requests";
+                Messages.AllianceRequest pb = Messages.AllianceRequest.newBuilder()
+                                    .setRequestType(Messages.AllianceRequest.RequestType.JOIN)
+                                    .setAllianceId(allianceID)
+                                    .setRequestEmpireId(Integer.parseInt(myEmpire.getKey()))
                                     .setMessage(message)
                                     .build();
                 try {
@@ -163,26 +164,23 @@ public class AllianceManager {
             @Override
             protected void onComplete(Boolean success) {
                 if (success) {
-                    refreshAlliance(allianceKey);
+                    refreshAlliance(allianceID);
                 }
             }
         }.execute();
     }
 
-    public void updateJoinRequest(final AllianceJoinRequest joinRequest) {
+    public void vote(final AllianceRequest request, final boolean approve) {
         new BackgroundRunner<Boolean>() {
             @Override
             protected Boolean doInBackground() {
-                String url = "alliances/"+joinRequest.getAllianceKey()+"/join-requests";
-                Messages.AllianceJoinRequest pb = Messages.AllianceJoinRequest.newBuilder()
-                                    .setKey(joinRequest.getKey())
-                                    .setAllianceKey(joinRequest.getAllianceKey())
-                                    .setEmpireKey(joinRequest.getEmpireKey())
-                                    .setMessage(joinRequest.getMessage())
-                                    .setState(Messages.AllianceJoinRequest.RequestState.valueOf(joinRequest.getState().getValue()))
-                                    .build();
+                String url = "alliances/"+request.getAllianceID()+"/requests/"+request.getID();
+                Messages.AllianceRequestVote.Builder pb = Messages.AllianceRequestVote.newBuilder()
+                        .setAllianceId(request.getAllianceID())
+                        .setAllianceRequestId(request.getID())
+                        .setVotes(approve ? 1 : -1);
                 try {
-                    ApiClient.putProtoBuf(url, pb);
+                    ApiClient.postProtoBuf(url, pb.build());
                     return true;
                 } catch(ApiException e) {
                     return false;
@@ -192,7 +190,7 @@ public class AllianceManager {
             @Override
             protected void onComplete(Boolean success) {
                 if (success) {
-                    refreshAlliance(joinRequest.getAllianceKey());
+                    refreshAlliance(request.getAllianceID());
                 }
             }
         }.execute();
@@ -211,14 +209,15 @@ public class AllianceManager {
         new BackgroundRunner<Boolean>() {
             @Override
             protected Boolean doInBackground() {
-                String url = "alliances/"+myAlliance.getKey()+"/members";
+                String url = "alliances/"+myAlliance.getKey()+"/requests";
                 try {
-                    Messages.AllianceLeaveRequest pb = Messages.AllianceLeaveRequest.newBuilder()
-                                                               .setAllianceKey(myAlliance.getKey())
-                                                               .setEmpireKey(myEmpire.getKey())
-                                                               .build();
+                    Messages.AllianceRequest pb = Messages.AllianceRequest.newBuilder()
+                                                          .setAllianceId(Integer.parseInt(myAlliance.getKey()))
+                                                          .setRequestEmpireId(Integer.parseInt(myEmpire.getKey()))
+                                                          .setRequestType(Messages.AllianceRequest.RequestType.LEAVE)
+                                                          .build();
 
-                    ApiClient.delete(url, pb);
+                    ApiClient.postProtoBuf(url, pb);
                     return true;
                 } catch(ApiException e) {
                     return false;
@@ -229,14 +228,14 @@ public class AllianceManager {
             protected void onComplete(Boolean success) {
                 if (success) {
                     EmpireManager.i.refreshEmpire();
-                    refreshAlliance(myAlliance.getKey());
+                    refreshAlliance(((Alliance) myAlliance).getID());
                 }
             }
         }.execute();
     }
 
-    private void refreshAlliance(String allianceKey) {
-        fetchAlliance(allianceKey, null);
+    private void refreshAlliance(int allianceID) {
+        fetchAlliance(allianceID, null);
     }
 
     public interface FetchAlliancesCompleteHandler {
@@ -248,7 +247,7 @@ public class AllianceManager {
     public interface AllianceUpdatedHandler {
         void onAllianceUpdated(Alliance alliance);
     }
-    public interface FetchJoinRequestsCompleteHandler {
-        void onJoinRequestsFetched(Map<String, Empire> empires, List<AllianceJoinRequest> joinRequests);
+    public interface FetchRequestsCompleteHandler {
+        void onRequestsFetched(Map<Integer, Empire> empires, List<AllianceRequest> requests);
     }
 }

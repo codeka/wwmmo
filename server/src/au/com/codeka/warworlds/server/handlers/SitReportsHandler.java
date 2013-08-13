@@ -27,8 +27,12 @@ public class SitReportsHandler extends RequestHandler {
             after = new DateTime(Long.parseLong(cursor), DateTimeZone.UTC);
         }
 
+        Integer empireID = getSession().getEmpireID();
+        if (getSession().isAdmin()) {
+            empireID = null;
+        }
         List<Messages.SituationReport> sitreps = new SituationReportController().fetch(
-                getSession().getEmpireID(), starID, after, 50);
+                empireID, starID, after, 50);
 
         Messages.SituationReports.Builder sitreps_pb = Messages.SituationReports.newBuilder();
         for (Messages.SituationReport sitrep : sitreps) {

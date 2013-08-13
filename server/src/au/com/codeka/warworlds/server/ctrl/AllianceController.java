@@ -7,14 +7,16 @@ import java.util.List;
 
 import org.joda.time.DateTime;
 
-import au.com.codeka.common.model.BaseAllianceJoinRequest;
+import au.com.codeka.common.model.BaseAllianceMember;
+import au.com.codeka.common.model.BaseAllianceRequest;
 import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.data.SqlStmt;
 import au.com.codeka.warworlds.server.data.Transaction;
 import au.com.codeka.warworlds.server.model.Alliance;
-import au.com.codeka.warworlds.server.model.AllianceJoinRequest;
 import au.com.codeka.warworlds.server.model.AllianceMember;
+import au.com.codeka.warworlds.server.model.AllianceRequest;
+import au.com.codeka.warworlds.server.model.AllianceRequestVote;
 import au.com.codeka.warworlds.server.model.Empire;
 
 public class AllianceController {
@@ -27,6 +29,10 @@ public class AllianceController {
         db = new DataBase(trans);
     }
 
+    public BaseDataBase getDB() {
+        return db;
+    }
+
     public List<Alliance> getAlliances() throws RequestException {
         try {
             return db.getAlliances();
@@ -35,35 +41,17 @@ public class AllianceController {
         }
     }
 
-    public Alliance getAlliance(int allianceID, boolean includeMembers) throws RequestException {
+    public Alliance getAlliance(int allianceID) throws RequestException {
         try {
-            return db.getAlliance(allianceID, includeMembers);
+            return db.getAlliance(allianceID);
         } catch (Exception e) {
             throw new RequestException(e);
         }
     }
 
-    public int requestJoin(int allianceID, int empireID, String message) throws RequestException {
-        // TODO: if you're in an alliance, you can't request to join another one
-
+    public List<AllianceRequest> getRequests(int allianceID) throws RequestException {
         try {
-            return db.requestJoin(allianceID, empireID, message);
-        } catch (Exception e) {
-            throw new RequestException(e);
-        }
-    }
-
-    public void updateJoinRequest(AllianceJoinRequest joinRequest) throws RequestException {
-        try {
-            db.updateJoinRequest(joinRequest);
-        } catch (Exception e) {
-            throw new RequestException(e);
-        }
-    }
-
-    public List<AllianceJoinRequest> getJoinRequests(int allianceID) throws RequestException {
-        try {
-            return db.getJoinRequests(allianceID);
+            return db.getRequests(allianceID);
         } catch (Exception e) {
             throw new RequestException(e);
         }
@@ -73,6 +61,49 @@ public class AllianceController {
         try {
             db.leaveAlliance(empireID, allianceID);
         } catch (Exception e) {
+            throw new RequestException(e);
+        }
+    }
+
+    public int addRequest(AllianceRequest request) throws RequestException {
+        try {
+            int requestID = db.addRequest(request);
+
+            // there's an implicit vote when you create a request (some requests require zero
+            // votes, which means it passes straight away)
+            Alliance alliance = db.getAlliance(request.getAllianceID());
+            AllianceRequestProcessor processor = AllianceRequestProcessor.get(alliance, request);
+            processor.onVote(this);
+
+            return requestID;
+        } catch (Exception e) {
+            throw new RequestException(e);
+        }
+    }
+
+    public void vote(AllianceRequestVote vote) throws RequestException {
+        try {
+            Alliance alliance = db.getAlliance(vote.getAllianceID());
+            // normalize the number of votes they get by their rank in the alliance
+            for (BaseAllianceMember member : alliance.getMembers()) {
+                if (Integer.parseInt(member.getEmpireKey()) == vote.getEmpireID()) {
+                    int numVotes = member.getRank().getNumVotes();
+                    if (vote.getVotes() < 0) {
+                        numVotes *= -1;
+                    }
+                    vote.setVotes(numVotes);
+                    break;
+                }
+            }
+
+            db.vote(vote);
+
+            // depending on the kind of request this is, check whether this is enough votes to
+            // complete the voting or not
+            AllianceRequest request = db.getRequest(vote.getAllianceRequestID());
+            AllianceRequestProcessor processor = AllianceRequestProcessor.get(alliance, request);
+            processor.onVote(this);
+        } catch(Exception e) {
             throw new RequestException(e);
         }
     }
@@ -117,7 +148,7 @@ public class AllianceController {
             }
         }
 
-        public Alliance getAlliance(int allianceID, boolean includeMembers) throws Exception {
+        public Alliance getAlliance(int allianceID) throws Exception {
             Alliance alliance = null;
             String sql = "SELECT *, 0 AS num_empires FROM alliances WHERE id = ?";
             try (SqlStmt stmt = prepare(sql)) {
@@ -132,7 +163,7 @@ public class AllianceController {
                 throw new RequestException(404);
             }
 
-            sql = "SELECT id, alliance_id FROM empires WHERE alliance_id = ?";
+            sql = "SELECT id, alliance_id, alliance_rank FROM empires WHERE alliance_id = ?";
             try (SqlStmt stmt = prepare(sql)) {
                 stmt.setInt(1, allianceID);
                 ResultSet rs = stmt.select();
@@ -163,60 +194,45 @@ public class AllianceController {
             }
         }
 
-        public int requestJoin(int allianceID, int empireID, String message) throws Exception {
-            // see if there's already a request to join this alliance
-            Integer joinRequestID = null;
-            String sql = "SELECT id FROM alliance_join_requests" +
-                        " WHERE empire_id = ? AND alliance_id = ?";
+        public int addRequest(AllianceRequest request) throws Exception {
+            // if you make another request while you've still got one pending, the new request
+            // will overwrite the old one.
+            String sql = "DELETE FROM alliance_requests" +
+                        " WHERE request_empire_id = ?" +
+                          " AND alliance_id = ?" +
+                          " AND request_type = ?" +
+                          " AND state = " + BaseAllianceRequest.RequestState.PENDING.getNumber();
             try (SqlStmt stmt = prepare(sql)) {
-                stmt.setInt(1, empireID);
-                stmt.setInt(2, allianceID);
-                joinRequestID = stmt.selectFirstValue(Integer.class);
+                stmt.setInt(1, request.getRequestEmpireID());
+                stmt.setInt(2, request.getAllianceID());
+                stmt.setInt(3, request.getRequestType().getNumber());
+                stmt.update();
             }
 
-            if (joinRequestID == null) {
-                sql = "INSERT INTO alliance_join_requests (empire_id, alliance_id, message, request_date, state) VALUES (?, ?, ?, ?, ?)";
-            } else {
-                sql = "UPDATE alliance_join_requests SET empire_id = ?, alliance_id = ?," +
-                            " message = ?, request_date = ?, state = ?" +
-                     " WHERE id = ?";
-            }
+            sql = "INSERT INTO alliance_requests (" +
+                    "alliance_id, request_empire_id, request_date, request_type, message, state," +
+                   " votes, target_empire_id, amount) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
             try (SqlStmt stmt = prepare(sql, Statement.RETURN_GENERATED_KEYS)) {
-                stmt.setInt(1, empireID);
-                stmt.setInt(2, allianceID);
-                stmt.setString(3, message);
-                stmt.setDateTime(4, DateTime.now());
-                stmt.setInt(5, BaseAllianceJoinRequest.RequestState.PENDING.getValue());
-                if (joinRequestID != null) {
-                    stmt.setInt(6, joinRequestID);
-                }
-                stmt.update();
-                if (joinRequestID == null) {
-                    return stmt.getAutoGeneratedID();
+                stmt.setInt(1, request.getAllianceID());
+                stmt.setInt(2, request.getRequestEmpireID());
+                stmt.setDateTime(3, DateTime.now());
+                stmt.setInt(4, request.getRequestType().getNumber());
+                stmt.setString(5, request.getMessage());
+                stmt.setInt(6, BaseAllianceRequest.RequestState.PENDING.getNumber());
+                stmt.setInt(7, 0);
+                if (request.getTargetEmpireID() > 0) {
+                    stmt.setInt(8, request.getTargetEmpireID());
                 } else {
-                    return joinRequestID;
+                    stmt.setNull(8);
                 }
-            }
-        }
-
-        public void updateJoinRequest(AllianceJoinRequest joinRequest) throws Exception {
-            String sql = "UPDATE alliance_join_requests SET state = ?" +
-                        " WHERE empire_id = ? AND alliance_id = ?";
-            try (SqlStmt stmt = prepare(sql)) {
-                stmt.setInt(1, joinRequest.getState().getValue());
-                stmt.setInt(2, joinRequest.getEmpireID());
-                stmt.setInt(3, joinRequest.getAllianceID());
+                if (request.getAmount() > 0) {
+                    stmt.setDouble(9, request.getAmount());
+                } else {
+                    stmt.setNull(9);
+                }
                 stmt.update();
-            }
 
-            // if we've set it to "ACCEPTED" then we'll want to make them an actual member
-            if (joinRequest.getState() == BaseAllianceJoinRequest.RequestState.ACCEPTED) {
-                sql = "UPDATE empires SET alliance_id = ? WHERE id = ?";
-                try (SqlStmt stmt = prepare(sql)) {
-                    stmt.setInt(1, joinRequest.getAllianceID());
-                    stmt.setInt(2, joinRequest.getEmpireID());
-                    stmt.update();
-                }
+                return stmt.getAutoGeneratedID();
             }
         }
 
@@ -229,17 +245,50 @@ public class AllianceController {
             }
         }
 
-        public List<AllianceJoinRequest> getJoinRequests(int allianceID) throws Exception {
-            String sql = "SELECT * FROM alliance_join_requests WHERE alliance_id = ? ORDER BY request_date DESC";
+        public List<AllianceRequest> getRequests(int allianceID) throws Exception {
+            String sql = "SELECT * FROM alliance_requests WHERE alliance_id = ? ORDER BY request_date DESC";
             try (SqlStmt stmt = prepare(sql)) {
-                stmt.setInt(1, allianceID);
+                stmt.setInt(1, allianceID); 
                 ResultSet rs = stmt.select();
 
-                ArrayList<AllianceJoinRequest> joinRequests = new ArrayList<AllianceJoinRequest>();
+                ArrayList<AllianceRequest> joinRequests = new ArrayList<AllianceRequest>();
                 while (rs.next()) {
-                    joinRequests.add(new AllianceJoinRequest(rs));
+                    joinRequests.add(new AllianceRequest(rs));
                 }
                 return joinRequests;
+            }
+        }
+
+        public AllianceRequest getRequest(int allianceRequestID) throws Exception {
+            String sql = "SELECT * FROM alliance_requests WHERE id = ?";
+            try (SqlStmt stmt = prepare(sql)) {
+                stmt.setInt(1, allianceRequestID); 
+                ResultSet rs = stmt.select();
+
+                if (rs.next()) {
+                    return new AllianceRequest(rs);
+                }
+            }
+
+            throw new RequestException(404, "No such alliance request found!");
+        }
+
+        public void vote(AllianceRequestVote vote) throws Exception {
+            String sql = "INSERT INTO alliance_request_votes (alliance_id, alliance_request_id," +
+                             " empire_id, votes, date) VALUES (?, ?, ?, ?, NOW())";
+            try (SqlStmt stmt = prepare(sql)) {
+                stmt.setInt(1, vote.getAllianceID());
+                stmt.setInt(2, vote.getAllianceRequestID());
+                stmt.setInt(3, vote.getEmpireID());
+                stmt.setInt(4, vote.getVotes());
+                stmt.update();
+            }
+
+            sql = "UPDATE alliance_requests SET votes = votes + ? WHERE id = ?";
+            try (SqlStmt stmt = prepare(sql)) {
+                stmt.setInt(1, vote.getVotes());
+                stmt.setInt(2, vote.getAllianceRequestID());
+                stmt.update();
             }
         }
     }

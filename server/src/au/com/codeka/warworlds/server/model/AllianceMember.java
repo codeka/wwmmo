@@ -19,5 +19,6 @@ public class AllianceMember extends BaseAllianceMember {
         mAllianceID = rs.getInt("alliance_id");
         mAllianceKey = Integer.toString(mAllianceID);
         mTimeJoined = DateTime.now(); // hrm
+        mRank = Rank.fromNumber(rs.getInt("alliance_rank"));
     }
 }

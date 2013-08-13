@@ -5,29 +5,29 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import au.com.codeka.warworlds.StyledDialog;
-import au.com.codeka.warworlds.model.AllianceJoinRequest;
+import au.com.codeka.warworlds.model.AllianceRequest;
 import au.com.codeka.warworlds.model.AllianceManager;
 
-public class JoinConfirmDialog extends DialogFragment {
-    private AllianceJoinRequest mJoinRequest;
+public class RequestVoteDialog extends DialogFragment {
+    private AllianceRequest mRequest;
 
-    public void setJoinRequest(AllianceJoinRequest joinRequest) {
-        mJoinRequest = joinRequest;
+    public void setRequest(AllianceRequest request) {
+        mRequest = request;
     }
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
 
         return new StyledDialog.Builder(getActivity())
-                           .setMessage("Do you want to approve or reject this join request? Approving it will cause this empire to become a member of the alliance.")
+                           .setMessage("Are you for or against this request?")
                            .setTitle("Approve / Reject")
-                           .setPositiveButton("Approve", new DialogInterface.OnClickListener() {
+                           .setPositiveButton("For", new DialogInterface.OnClickListener() {
                                @Override
                                public void onClick(DialogInterface dialog, int which) {
                                    onApprove();
                                }
                            })
-                           .setNegativeButton("Reject", new DialogInterface.OnClickListener() {
+                           .setNegativeButton("Against", new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
                                     onReject();
@@ -38,17 +38,15 @@ public class JoinConfirmDialog extends DialogFragment {
     }
 
     private void onApprove() {
-        updateJoinRequest(true);
+        updateRequest(true);
     }
 
     private void onReject() {
-        updateJoinRequest(false);
+        updateRequest(false);
     }
 
-    private void updateJoinRequest(boolean approve) {
-        mJoinRequest.setState(approve ? AllianceJoinRequest.RequestState.ACCEPTED
-                                      : AllianceJoinRequest.RequestState.REJECTED);
-        AllianceManager.i.updateJoinRequest(mJoinRequest);
+    private void updateRequest(boolean approve) {
+        AllianceManager.i.vote(mRequest, approve);
         dismiss();
     }
 }

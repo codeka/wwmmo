@@ -10,7 +10,7 @@ public class AllianceHandler extends RequestHandler {
     @Override
     protected void get() throws RequestException {
         int allianceID = Integer.parseInt(getUrlParameter("alliance_id"));
-        Alliance alliance = new AllianceController().getAlliance(allianceID, true);
+        Alliance alliance = new AllianceController().getAlliance(allianceID);
 
         Messages.Alliance.Builder alliance_pb = Messages.Alliance.newBuilder();
         alliance.toProtocolBuffer(alliance_pb);

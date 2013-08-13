@@ -65190,6 +65190,22 @@ public final class Messages {
        * <code>CreateAlliance = 3;</code>
        */
       CreateAlliance(3, 3),
+      /**
+       * <code>AllianceDeposit = 4;</code>
+       *
+       * <pre>
+       * deposited into alliance bank
+       * </pre>
+       */
+      AllianceDeposit(4, 4),
+      /**
+       * <code>AllianceWithdraw = 5;</code>
+       *
+       * <pre>
+       * withdrawn from alliance bank
+       * </pre>
+       */
+      AllianceWithdraw(5, 5),
       ;
 
       /**
@@ -65208,6 +65224,22 @@ public final class Messages {
        * <code>CreateAlliance = 3;</code>
        */
       public static final int CreateAlliance_VALUE = 3;
+      /**
+       * <code>AllianceDeposit = 4;</code>
+       *
+       * <pre>
+       * deposited into alliance bank
+       * </pre>
+       */
+      public static final int AllianceDeposit_VALUE = 4;
+      /**
+       * <code>AllianceWithdraw = 5;</code>
+       *
+       * <pre>
+       * withdrawn from alliance bank
+       * </pre>
+       */
+      public static final int AllianceWithdraw_VALUE = 5;
 
 
       public final int getNumber() { return value; }
@@ -65218,6 +65250,8 @@ public final class Messages {
           case 1: return BuildAccelerate;
           case 2: return CollectFromColonies;
           case 3: return CreateAlliance;
+          case 4: return AllianceDeposit;
+          case 5: return AllianceWithdraw;
           default: return null;
         }
       }
@@ -67690,6 +67724,24 @@ public final class Messages {
     com.google.protobuf.ByteString
         getCreatorEmpireKeyBytes();
 
+    // optional double bank_balance = 7;
+    /**
+     * <code>optional double bank_balance = 7;</code>
+     *
+     * <pre>
+     * If this is our own alliance, it'll have the bank balance
+     * </pre>
+     */
+    boolean hasBankBalance();
+    /**
+     * <code>optional double bank_balance = 7;</code>
+     *
+     * <pre>
+     * If this is our own alliance, it'll have the bank balance
+     * </pre>
+     */
+    double getBankBalance();
+
     // optional int32 num_members = 5;
     /**
      * <code>optional int32 num_members = 5;</code>
@@ -67830,16 +67882,21 @@ public final class Messages {
               break;
             }
             case 40: {
-              bitField0_ |= 0x00000010;
+              bitField0_ |= 0x00000020;
               numMembers_ = input.readInt32();
               break;
             }
             case 50: {
-              if (!((mutable_bitField0_ & 0x00000020) == 0x00000020)) {
+              if (!((mutable_bitField0_ & 0x00000040) == 0x00000040)) {
                 members_ = new java.util.ArrayList<au.com.codeka.common.protobuf.Messages.AllianceMember>();
-                mutable_bitField0_ |= 0x00000020;
+                mutable_bitField0_ |= 0x00000040;
               }
               members_.add(input.readMessage(au.com.codeka.common.protobuf.Messages.AllianceMember.PARSER, extensionRegistry));
+              break;
+            }
+            case 57: {
+              bitField0_ |= 0x00000010;
+              bankBalance_ = input.readDouble();
               break;
             }
           }
@@ -67850,7 +67907,7 @@ public final class Messages {
         throw new com.google.protobuf.InvalidProtocolBufferException(
             e.getMessage()).setUnfinishedMessage(this);
       } finally {
-        if (((mutable_bitField0_ & 0x00000020) == 0x00000020)) {
+        if (((mutable_bitField0_ & 0x00000040) == 0x00000040)) {
           members_ = java.util.Collections.unmodifiableList(members_);
         }
         this.unknownFields = unknownFields.build();
@@ -68062,6 +68119,30 @@ public final class Messages {
       }
     }
 
+    // optional double bank_balance = 7;
+    public static final int BANK_BALANCE_FIELD_NUMBER = 7;
+    private double bankBalance_;
+    /**
+     * <code>optional double bank_balance = 7;</code>
+     *
+     * <pre>
+     * If this is our own alliance, it'll have the bank balance
+     * </pre>
+     */
+    public boolean hasBankBalance() {
+      return ((bitField0_ & 0x00000010) == 0x00000010);
+    }
+    /**
+     * <code>optional double bank_balance = 7;</code>
+     *
+     * <pre>
+     * If this is our own alliance, it'll have the bank balance
+     * </pre>
+     */
+    public double getBankBalance() {
+      return bankBalance_;
+    }
+
     // optional int32 num_members = 5;
     public static final int NUM_MEMBERS_FIELD_NUMBER = 5;
     private int numMembers_;
@@ -68073,7 +68154,7 @@ public final class Messages {
      * </pre>
      */
     public boolean hasNumMembers() {
-      return ((bitField0_ & 0x00000010) == 0x00000010);
+      return ((bitField0_ & 0x00000020) == 0x00000020);
     }
     /**
      * <code>optional int32 num_members = 5;</code>
@@ -68147,6 +68228,7 @@ public final class Messages {
       name_ = "";
       timeCreated_ = 0L;
       creatorEmpireKey_ = "";
+      bankBalance_ = 0D;
       numMembers_ = 0;
       members_ = java.util.Collections.emptyList();
     }
@@ -68174,11 +68256,14 @@ public final class Messages {
       if (((bitField0_ & 0x00000008) == 0x00000008)) {
         output.writeBytes(4, getCreatorEmpireKeyBytes());
       }
-      if (((bitField0_ & 0x00000010) == 0x00000010)) {
+      if (((bitField0_ & 0x00000020) == 0x00000020)) {
         output.writeInt32(5, numMembers_);
       }
       for (int i = 0; i < members_.size(); i++) {
         output.writeMessage(6, members_.get(i));
+      }
+      if (((bitField0_ & 0x00000010) == 0x00000010)) {
+        output.writeDouble(7, bankBalance_);
       }
       getUnknownFields().writeTo(output);
     }
@@ -68205,13 +68290,17 @@ public final class Messages {
         size += com.google.protobuf.CodedOutputStream
           .computeBytesSize(4, getCreatorEmpireKeyBytes());
       }
-      if (((bitField0_ & 0x00000010) == 0x00000010)) {
+      if (((bitField0_ & 0x00000020) == 0x00000020)) {
         size += com.google.protobuf.CodedOutputStream
           .computeInt32Size(5, numMembers_);
       }
       for (int i = 0; i < members_.size(); i++) {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(6, members_.get(i));
+      }
+      if (((bitField0_ & 0x00000010) == 0x00000010)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeDoubleSize(7, bankBalance_);
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
@@ -68343,11 +68432,13 @@ public final class Messages {
         bitField0_ = (bitField0_ & ~0x00000004);
         creatorEmpireKey_ = "";
         bitField0_ = (bitField0_ & ~0x00000008);
-        numMembers_ = 0;
+        bankBalance_ = 0D;
         bitField0_ = (bitField0_ & ~0x00000010);
+        numMembers_ = 0;
+        bitField0_ = (bitField0_ & ~0x00000020);
         if (membersBuilder_ == null) {
           members_ = java.util.Collections.emptyList();
-          bitField0_ = (bitField0_ & ~0x00000020);
+          bitField0_ = (bitField0_ & ~0x00000040);
         } else {
           membersBuilder_.clear();
         }
@@ -68398,11 +68489,15 @@ public final class Messages {
         if (((from_bitField0_ & 0x00000010) == 0x00000010)) {
           to_bitField0_ |= 0x00000010;
         }
+        result.bankBalance_ = bankBalance_;
+        if (((from_bitField0_ & 0x00000020) == 0x00000020)) {
+          to_bitField0_ |= 0x00000020;
+        }
         result.numMembers_ = numMembers_;
         if (membersBuilder_ == null) {
-          if (((bitField0_ & 0x00000020) == 0x00000020)) {
+          if (((bitField0_ & 0x00000040) == 0x00000040)) {
             members_ = java.util.Collections.unmodifiableList(members_);
-            bitField0_ = (bitField0_ & ~0x00000020);
+            bitField0_ = (bitField0_ & ~0x00000040);
           }
           result.members_ = members_;
         } else {
@@ -68442,6 +68537,9 @@ public final class Messages {
           creatorEmpireKey_ = other.creatorEmpireKey_;
           onChanged();
         }
+        if (other.hasBankBalance()) {
+          setBankBalance(other.getBankBalance());
+        }
         if (other.hasNumMembers()) {
           setNumMembers(other.getNumMembers());
         }
@@ -68449,7 +68547,7 @@ public final class Messages {
           if (!other.members_.isEmpty()) {
             if (members_.isEmpty()) {
               members_ = other.members_;
-              bitField0_ = (bitField0_ & ~0x00000020);
+              bitField0_ = (bitField0_ & ~0x00000040);
             } else {
               ensureMembersIsMutable();
               members_.addAll(other.members_);
@@ -68462,7 +68560,7 @@ public final class Messages {
               membersBuilder_.dispose();
               membersBuilder_ = null;
               members_ = other.members_;
-              bitField0_ = (bitField0_ & ~0x00000020);
+              bitField0_ = (bitField0_ & ~0x00000040);
               membersBuilder_ = 
                 com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders ?
                    getMembersFieldBuilder() : null;
@@ -68817,6 +68915,55 @@ public final class Messages {
         return this;
       }
 
+      // optional double bank_balance = 7;
+      private double bankBalance_ ;
+      /**
+       * <code>optional double bank_balance = 7;</code>
+       *
+       * <pre>
+       * If this is our own alliance, it'll have the bank balance
+       * </pre>
+       */
+      public boolean hasBankBalance() {
+        return ((bitField0_ & 0x00000010) == 0x00000010);
+      }
+      /**
+       * <code>optional double bank_balance = 7;</code>
+       *
+       * <pre>
+       * If this is our own alliance, it'll have the bank balance
+       * </pre>
+       */
+      public double getBankBalance() {
+        return bankBalance_;
+      }
+      /**
+       * <code>optional double bank_balance = 7;</code>
+       *
+       * <pre>
+       * If this is our own alliance, it'll have the bank balance
+       * </pre>
+       */
+      public Builder setBankBalance(double value) {
+        bitField0_ |= 0x00000010;
+        bankBalance_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional double bank_balance = 7;</code>
+       *
+       * <pre>
+       * If this is our own alliance, it'll have the bank balance
+       * </pre>
+       */
+      public Builder clearBankBalance() {
+        bitField0_ = (bitField0_ & ~0x00000010);
+        bankBalance_ = 0D;
+        onChanged();
+        return this;
+      }
+
       // optional int32 num_members = 5;
       private int numMembers_ ;
       /**
@@ -68827,7 +68974,7 @@ public final class Messages {
        * </pre>
        */
       public boolean hasNumMembers() {
-        return ((bitField0_ & 0x00000010) == 0x00000010);
+        return ((bitField0_ & 0x00000020) == 0x00000020);
       }
       /**
        * <code>optional int32 num_members = 5;</code>
@@ -68847,7 +68994,7 @@ public final class Messages {
        * </pre>
        */
       public Builder setNumMembers(int value) {
-        bitField0_ |= 0x00000010;
+        bitField0_ |= 0x00000020;
         numMembers_ = value;
         onChanged();
         return this;
@@ -68860,7 +69007,7 @@ public final class Messages {
        * </pre>
        */
       public Builder clearNumMembers() {
-        bitField0_ = (bitField0_ & ~0x00000010);
+        bitField0_ = (bitField0_ & ~0x00000020);
         numMembers_ = 0;
         onChanged();
         return this;
@@ -68870,9 +69017,9 @@ public final class Messages {
       private java.util.List<au.com.codeka.common.protobuf.Messages.AllianceMember> members_ =
         java.util.Collections.emptyList();
       private void ensureMembersIsMutable() {
-        if (!((bitField0_ & 0x00000020) == 0x00000020)) {
+        if (!((bitField0_ & 0x00000040) == 0x00000040)) {
           members_ = new java.util.ArrayList<au.com.codeka.common.protobuf.Messages.AllianceMember>(members_);
-          bitField0_ |= 0x00000020;
+          bitField0_ |= 0x00000040;
          }
       }
 
@@ -69065,7 +69212,7 @@ public final class Messages {
       public Builder clearMembers() {
         if (membersBuilder_ == null) {
           members_ = java.util.Collections.emptyList();
-          bitField0_ = (bitField0_ & ~0x00000020);
+          bitField0_ = (bitField0_ & ~0x00000040);
           onChanged();
         } else {
           membersBuilder_.clear();
@@ -69170,7 +69317,7 @@ public final class Messages {
           membersBuilder_ = new com.google.protobuf.RepeatedFieldBuilder<
               au.com.codeka.common.protobuf.Messages.AllianceMember, au.com.codeka.common.protobuf.Messages.AllianceMember.Builder, au.com.codeka.common.protobuf.Messages.AllianceMemberOrBuilder>(
                   members_,
-                  ((bitField0_ & 0x00000020) == 0x00000020),
+                  ((bitField0_ & 0x00000040) == 0x00000040),
                   getParentForChildren(),
                   isClean());
           members_ = null;
@@ -69920,6 +70067,16 @@ public final class Messages {
      * <code>optional int64 time_joined = 4;</code>
      */
     long getTimeJoined();
+
+    // optional .au.com.codeka.common.protobuf.AllianceMember.Rank rank = 5;
+    /**
+     * <code>optional .au.com.codeka.common.protobuf.AllianceMember.Rank rank = 5;</code>
+     */
+    boolean hasRank();
+    /**
+     * <code>optional .au.com.codeka.common.protobuf.AllianceMember.Rank rank = 5;</code>
+     */
+    au.com.codeka.common.protobuf.Messages.AllianceMember.Rank getRank();
   }
   /**
    * Protobuf type {@code au.com.codeka.common.protobuf.AllianceMember}
@@ -69992,6 +70149,17 @@ public final class Messages {
               timeJoined_ = input.readInt64();
               break;
             }
+            case 40: {
+              int rawValue = input.readEnum();
+              au.com.codeka.common.protobuf.Messages.AllianceMember.Rank value = au.com.codeka.common.protobuf.Messages.AllianceMember.Rank.valueOf(rawValue);
+              if (value == null) {
+                unknownFields.mergeVarintField(5, rawValue);
+              } else {
+                bitField0_ |= 0x00000010;
+                rank_ = value;
+              }
+              break;
+            }
           }
         }
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
@@ -70029,6 +70197,97 @@ public final class Messages {
     @java.lang.Override
     public com.google.protobuf.Parser<AllianceMember> getParserForType() {
       return PARSER;
+    }
+
+    /**
+     * Protobuf enum {@code au.com.codeka.common.protobuf.AllianceMember.Rank}
+     */
+    public enum Rank
+        implements com.google.protobuf.ProtocolMessageEnum {
+      /**
+       * <code>CAPTAIN = 0;</code>
+       */
+      CAPTAIN(0, 0),
+      /**
+       * <code>LIEUTENANT = 1;</code>
+       */
+      LIEUTENANT(1, 1),
+      /**
+       * <code>MEMBER = 2;</code>
+       */
+      MEMBER(2, 2),
+      ;
+
+      /**
+       * <code>CAPTAIN = 0;</code>
+       */
+      public static final int CAPTAIN_VALUE = 0;
+      /**
+       * <code>LIEUTENANT = 1;</code>
+       */
+      public static final int LIEUTENANT_VALUE = 1;
+      /**
+       * <code>MEMBER = 2;</code>
+       */
+      public static final int MEMBER_VALUE = 2;
+
+
+      public final int getNumber() { return value; }
+
+      public static Rank valueOf(int value) {
+        switch (value) {
+          case 0: return CAPTAIN;
+          case 1: return LIEUTENANT;
+          case 2: return MEMBER;
+          default: return null;
+        }
+      }
+
+      public static com.google.protobuf.Internal.EnumLiteMap<Rank>
+          internalGetValueMap() {
+        return internalValueMap;
+      }
+      private static com.google.protobuf.Internal.EnumLiteMap<Rank>
+          internalValueMap =
+            new com.google.protobuf.Internal.EnumLiteMap<Rank>() {
+              public Rank findValueByNumber(int number) {
+                return Rank.valueOf(number);
+              }
+            };
+
+      public final com.google.protobuf.Descriptors.EnumValueDescriptor
+          getValueDescriptor() {
+        return getDescriptor().getValues().get(index);
+      }
+      public final com.google.protobuf.Descriptors.EnumDescriptor
+          getDescriptorForType() {
+        return getDescriptor();
+      }
+      public static final com.google.protobuf.Descriptors.EnumDescriptor
+          getDescriptor() {
+        return au.com.codeka.common.protobuf.Messages.AllianceMember.getDescriptor().getEnumTypes().get(0);
+      }
+
+      private static final Rank[] VALUES = values();
+
+      public static Rank valueOf(
+          com.google.protobuf.Descriptors.EnumValueDescriptor desc) {
+        if (desc.getType() != getDescriptor()) {
+          throw new java.lang.IllegalArgumentException(
+            "EnumValueDescriptor is not for this type.");
+        }
+        return VALUES[desc.getIndex()];
+      }
+
+      private final int index;
+      private final int value;
+
+      private Rank(int index, int value) {
+        this.index = index;
+        this.value = value;
+      }
+
+      // @@protoc_insertion_point(enum_scope:au.com.codeka.common.protobuf.AllianceMember.Rank)
     }
 
     private int bitField0_;
@@ -70177,11 +70436,28 @@ public final class Messages {
       return timeJoined_;
     }
 
+    // optional .au.com.codeka.common.protobuf.AllianceMember.Rank rank = 5;
+    public static final int RANK_FIELD_NUMBER = 5;
+    private au.com.codeka.common.protobuf.Messages.AllianceMember.Rank rank_;
+    /**
+     * <code>optional .au.com.codeka.common.protobuf.AllianceMember.Rank rank = 5;</code>
+     */
+    public boolean hasRank() {
+      return ((bitField0_ & 0x00000010) == 0x00000010);
+    }
+    /**
+     * <code>optional .au.com.codeka.common.protobuf.AllianceMember.Rank rank = 5;</code>
+     */
+    public au.com.codeka.common.protobuf.Messages.AllianceMember.Rank getRank() {
+      return rank_;
+    }
+
     private void initFields() {
       key_ = "";
       empireKey_ = "";
       allianceKey_ = "";
       timeJoined_ = 0L;
+      rank_ = au.com.codeka.common.protobuf.Messages.AllianceMember.Rank.CAPTAIN;
     }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
@@ -70207,6 +70483,9 @@ public final class Messages {
       if (((bitField0_ & 0x00000008) == 0x00000008)) {
         output.writeInt64(4, timeJoined_);
       }
+      if (((bitField0_ & 0x00000010) == 0x00000010)) {
+        output.writeEnum(5, rank_.getNumber());
+      }
       getUnknownFields().writeTo(output);
     }
 
@@ -70231,6 +70510,10 @@ public final class Messages {
       if (((bitField0_ & 0x00000008) == 0x00000008)) {
         size += com.google.protobuf.CodedOutputStream
           .computeInt64Size(4, timeJoined_);
+      }
+      if (((bitField0_ & 0x00000010) == 0x00000010)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeEnumSize(5, rank_.getNumber());
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
@@ -70356,6 +70639,8 @@ public final class Messages {
         bitField0_ = (bitField0_ & ~0x00000004);
         timeJoined_ = 0L;
         bitField0_ = (bitField0_ & ~0x00000008);
+        rank_ = au.com.codeka.common.protobuf.Messages.AllianceMember.Rank.CAPTAIN;
+        bitField0_ = (bitField0_ & ~0x00000010);
         return this;
       }
 
@@ -70400,6 +70685,10 @@ public final class Messages {
           to_bitField0_ |= 0x00000008;
         }
         result.timeJoined_ = timeJoined_;
+        if (((from_bitField0_ & 0x00000010) == 0x00000010)) {
+          to_bitField0_ |= 0x00000010;
+        }
+        result.rank_ = rank_;
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
@@ -70433,6 +70722,9 @@ public final class Messages {
         }
         if (other.hasTimeJoined()) {
           setTimeJoined(other.getTimeJoined());
+        }
+        if (other.hasRank()) {
+          setRank(other.getRank());
         }
         this.mergeUnknownFields(other.getUnknownFields());
         return this;
@@ -70716,6 +71008,42 @@ public final class Messages {
         return this;
       }
 
+      // optional .au.com.codeka.common.protobuf.AllianceMember.Rank rank = 5;
+      private au.com.codeka.common.protobuf.Messages.AllianceMember.Rank rank_ = au.com.codeka.common.protobuf.Messages.AllianceMember.Rank.CAPTAIN;
+      /**
+       * <code>optional .au.com.codeka.common.protobuf.AllianceMember.Rank rank = 5;</code>
+       */
+      public boolean hasRank() {
+        return ((bitField0_ & 0x00000010) == 0x00000010);
+      }
+      /**
+       * <code>optional .au.com.codeka.common.protobuf.AllianceMember.Rank rank = 5;</code>
+       */
+      public au.com.codeka.common.protobuf.Messages.AllianceMember.Rank getRank() {
+        return rank_;
+      }
+      /**
+       * <code>optional .au.com.codeka.common.protobuf.AllianceMember.Rank rank = 5;</code>
+       */
+      public Builder setRank(au.com.codeka.common.protobuf.Messages.AllianceMember.Rank value) {
+        if (value == null) {
+          throw new NullPointerException();
+        }
+        bitField0_ |= 0x00000010;
+        rank_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional .au.com.codeka.common.protobuf.AllianceMember.Rank rank = 5;</code>
+       */
+      public Builder clearRank() {
+        bitField0_ = (bitField0_ & ~0x00000010);
+        rank_ = au.com.codeka.common.protobuf.Messages.AllianceMember.Rank.CAPTAIN;
+        onChanged();
+        return this;
+      }
+
       // @@protoc_insertion_point(builder_scope:au.com.codeka.common.protobuf.AllianceMember)
     }
 
@@ -70727,108 +71055,149 @@ public final class Messages {
     // @@protoc_insertion_point(class_scope:au.com.codeka.common.protobuf.AllianceMember)
   }
 
-  public interface AllianceJoinRequestOrBuilder
+  public interface AllianceRequestOrBuilder
       extends com.google.protobuf.MessageOrBuilder {
 
-    // optional string key = 1;
+    // optional int32 id = 1;
     /**
-     * <code>optional string key = 1;</code>
+     * <code>optional int32 id = 1;</code>
      */
-    boolean hasKey();
+    boolean hasId();
     /**
-     * <code>optional string key = 1;</code>
+     * <code>optional int32 id = 1;</code>
      */
-    java.lang.String getKey();
-    /**
-     * <code>optional string key = 1;</code>
-     */
-    com.google.protobuf.ByteString
-        getKeyBytes();
+    int getId();
 
-    // optional string alliance_key = 2;
+    // optional int32 alliance_id = 2;
     /**
-     * <code>optional string alliance_key = 2;</code>
+     * <code>optional int32 alliance_id = 2;</code>
      */
-    boolean hasAllianceKey();
+    boolean hasAllianceId();
     /**
-     * <code>optional string alliance_key = 2;</code>
+     * <code>optional int32 alliance_id = 2;</code>
      */
-    java.lang.String getAllianceKey();
-    /**
-     * <code>optional string alliance_key = 2;</code>
-     */
-    com.google.protobuf.ByteString
-        getAllianceKeyBytes();
+    int getAllianceId();
 
-    // optional string empire_key = 3;
+    // optional int32 request_empire_id = 3;
     /**
-     * <code>optional string empire_key = 3;</code>
+     * <code>optional int32 request_empire_id = 3;</code>
      */
-    boolean hasEmpireKey();
+    boolean hasRequestEmpireId();
     /**
-     * <code>optional string empire_key = 3;</code>
+     * <code>optional int32 request_empire_id = 3;</code>
      */
-    java.lang.String getEmpireKey();
-    /**
-     * <code>optional string empire_key = 3;</code>
-     */
-    com.google.protobuf.ByteString
-        getEmpireKeyBytes();
+    int getRequestEmpireId();
 
-    // optional string message = 4;
+    // optional int64 request_date = 4;
     /**
-     * <code>optional string message = 4;</code>
+     * <code>optional int64 request_date = 4;</code>
+     */
+    boolean hasRequestDate();
+    /**
+     * <code>optional int64 request_date = 4;</code>
+     */
+    long getRequestDate();
+
+    // optional .au.com.codeka.common.protobuf.AllianceRequest.RequestType request_type = 5;
+    /**
+     * <code>optional .au.com.codeka.common.protobuf.AllianceRequest.RequestType request_type = 5;</code>
+     */
+    boolean hasRequestType();
+    /**
+     * <code>optional .au.com.codeka.common.protobuf.AllianceRequest.RequestType request_type = 5;</code>
+     */
+    au.com.codeka.common.protobuf.Messages.AllianceRequest.RequestType getRequestType();
+
+    // optional string message = 6;
+    /**
+     * <code>optional string message = 6;</code>
      */
     boolean hasMessage();
     /**
-     * <code>optional string message = 4;</code>
+     * <code>optional string message = 6;</code>
      */
     java.lang.String getMessage();
     /**
-     * <code>optional string message = 4;</code>
+     * <code>optional string message = 6;</code>
      */
     com.google.protobuf.ByteString
         getMessageBytes();
 
-    // optional int64 time_requested = 5;
+    // optional .au.com.codeka.common.protobuf.AllianceRequest.RequestState state = 7;
     /**
-     * <code>optional int64 time_requested = 5;</code>
-     */
-    boolean hasTimeRequested();
-    /**
-     * <code>optional int64 time_requested = 5;</code>
-     */
-    long getTimeRequested();
-
-    // optional .au.com.codeka.common.protobuf.AllianceJoinRequest.RequestState state = 6;
-    /**
-     * <code>optional .au.com.codeka.common.protobuf.AllianceJoinRequest.RequestState state = 6;</code>
+     * <code>optional .au.com.codeka.common.protobuf.AllianceRequest.RequestState state = 7;</code>
      */
     boolean hasState();
     /**
-     * <code>optional .au.com.codeka.common.protobuf.AllianceJoinRequest.RequestState state = 6;</code>
+     * <code>optional .au.com.codeka.common.protobuf.AllianceRequest.RequestState state = 7;</code>
      */
-    au.com.codeka.common.protobuf.Messages.AllianceJoinRequest.RequestState getState();
+    au.com.codeka.common.protobuf.Messages.AllianceRequest.RequestState getState();
+
+    // optional int32 votes = 8;
+    /**
+     * <code>optional int32 votes = 8;</code>
+     */
+    boolean hasVotes();
+    /**
+     * <code>optional int32 votes = 8;</code>
+     */
+    int getVotes();
+
+    // optional int32 target_empire_id = 9;
+    /**
+     * <code>optional int32 target_empire_id = 9;</code>
+     *
+     * <pre>
+     * for KICK requests, this is the empire we're kicking
+     * </pre>
+     */
+    boolean hasTargetEmpireId();
+    /**
+     * <code>optional int32 target_empire_id = 9;</code>
+     *
+     * <pre>
+     * for KICK requests, this is the empire we're kicking
+     * </pre>
+     */
+    int getTargetEmpireId();
+
+    // optional float amount = 10;
+    /**
+     * <code>optional float amount = 10;</code>
+     *
+     * <pre>
+     * for DEPOSIT_CASH and WITHDRAW_CASH, the amount of cash to deposit/withdraw
+     * </pre>
+     */
+    boolean hasAmount();
+    /**
+     * <code>optional float amount = 10;</code>
+     *
+     * <pre>
+     * for DEPOSIT_CASH and WITHDRAW_CASH, the amount of cash to deposit/withdraw
+     * </pre>
+     */
+    float getAmount();
   }
   /**
-   * Protobuf type {@code au.com.codeka.common.protobuf.AllianceJoinRequest}
+   * Protobuf type {@code au.com.codeka.common.protobuf.AllianceRequest}
    */
-  public static final class AllianceJoinRequest extends
+  public static final class AllianceRequest extends
       com.google.protobuf.GeneratedMessage
-      implements AllianceJoinRequestOrBuilder {
-    // Use AllianceJoinRequest.newBuilder() to construct.
-    private AllianceJoinRequest(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
+      implements AllianceRequestOrBuilder {
+    // Use AllianceRequest.newBuilder() to construct.
+    private AllianceRequest(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
       super(builder);
       this.unknownFields = builder.getUnknownFields();
     }
-    private AllianceJoinRequest(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
+    private AllianceRequest(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
 
-    private static final AllianceJoinRequest defaultInstance;
-    public static AllianceJoinRequest getDefaultInstance() {
+    private static final AllianceRequest defaultInstance;
+    public static AllianceRequest getDefaultInstance() {
       return defaultInstance;
     }
 
-    public AllianceJoinRequest getDefaultInstanceForType() {
+    public AllianceRequest getDefaultInstanceForType() {
       return defaultInstance;
     }
 
@@ -70838,7 +71207,7 @@ public final class Messages {
         getUnknownFields() {
       return this.unknownFields;
     }
-    private AllianceJoinRequest(
+    private AllianceRequest(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
@@ -70861,40 +71230,66 @@ public final class Messages {
               }
               break;
             }
-            case 10: {
+            case 8: {
               bitField0_ |= 0x00000001;
-              key_ = input.readBytes();
+              id_ = input.readInt32();
               break;
             }
-            case 18: {
+            case 16: {
               bitField0_ |= 0x00000002;
-              allianceKey_ = input.readBytes();
+              allianceId_ = input.readInt32();
               break;
             }
-            case 26: {
+            case 24: {
               bitField0_ |= 0x00000004;
-              empireKey_ = input.readBytes();
+              requestEmpireId_ = input.readInt32();
               break;
             }
-            case 34: {
+            case 32: {
               bitField0_ |= 0x00000008;
-              message_ = input.readBytes();
+              requestDate_ = input.readInt64();
               break;
             }
             case 40: {
-              bitField0_ |= 0x00000010;
-              timeRequested_ = input.readInt64();
+              int rawValue = input.readEnum();
+              au.com.codeka.common.protobuf.Messages.AllianceRequest.RequestType value = au.com.codeka.common.protobuf.Messages.AllianceRequest.RequestType.valueOf(rawValue);
+              if (value == null) {
+                unknownFields.mergeVarintField(5, rawValue);
+              } else {
+                bitField0_ |= 0x00000010;
+                requestType_ = value;
+              }
               break;
             }
-            case 48: {
+            case 50: {
+              bitField0_ |= 0x00000020;
+              message_ = input.readBytes();
+              break;
+            }
+            case 56: {
               int rawValue = input.readEnum();
-              au.com.codeka.common.protobuf.Messages.AllianceJoinRequest.RequestState value = au.com.codeka.common.protobuf.Messages.AllianceJoinRequest.RequestState.valueOf(rawValue);
+              au.com.codeka.common.protobuf.Messages.AllianceRequest.RequestState value = au.com.codeka.common.protobuf.Messages.AllianceRequest.RequestState.valueOf(rawValue);
               if (value == null) {
-                unknownFields.mergeVarintField(6, rawValue);
+                unknownFields.mergeVarintField(7, rawValue);
               } else {
-                bitField0_ |= 0x00000020;
+                bitField0_ |= 0x00000040;
                 state_ = value;
               }
+              break;
+            }
+            case 64: {
+              bitField0_ |= 0x00000080;
+              votes_ = input.readInt32();
+              break;
+            }
+            case 72: {
+              bitField0_ |= 0x00000100;
+              targetEmpireId_ = input.readInt32();
+              break;
+            }
+            case 85: {
+              bitField0_ |= 0x00000200;
+              amount_ = input.readFloat();
               break;
             }
           }
@@ -70911,33 +71306,142 @@ public final class Messages {
     }
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
-      return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_AllianceJoinRequest_descriptor;
+      return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_AllianceRequest_descriptor;
     }
 
     protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
         internalGetFieldAccessorTable() {
-      return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_AllianceJoinRequest_fieldAccessorTable
+      return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_AllianceRequest_fieldAccessorTable
           .ensureFieldAccessorsInitialized(
-              au.com.codeka.common.protobuf.Messages.AllianceJoinRequest.class, au.com.codeka.common.protobuf.Messages.AllianceJoinRequest.Builder.class);
+              au.com.codeka.common.protobuf.Messages.AllianceRequest.class, au.com.codeka.common.protobuf.Messages.AllianceRequest.Builder.class);
     }
 
-    public static com.google.protobuf.Parser<AllianceJoinRequest> PARSER =
-        new com.google.protobuf.AbstractParser<AllianceJoinRequest>() {
-      public AllianceJoinRequest parsePartialFrom(
+    public static com.google.protobuf.Parser<AllianceRequest> PARSER =
+        new com.google.protobuf.AbstractParser<AllianceRequest>() {
+      public AllianceRequest parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
-        return new AllianceJoinRequest(input, extensionRegistry);
+        return new AllianceRequest(input, extensionRegistry);
       }
     };
 
     @java.lang.Override
-    public com.google.protobuf.Parser<AllianceJoinRequest> getParserForType() {
+    public com.google.protobuf.Parser<AllianceRequest> getParserForType() {
       return PARSER;
     }
 
     /**
-     * Protobuf enum {@code au.com.codeka.common.protobuf.AllianceJoinRequest.RequestState}
+     * Protobuf enum {@code au.com.codeka.common.protobuf.AllianceRequest.RequestType}
+     */
+    public enum RequestType
+        implements com.google.protobuf.ProtocolMessageEnum {
+      /**
+       * <code>JOIN = 0;</code>
+       */
+      JOIN(0, 0),
+      /**
+       * <code>LEAVE = 1;</code>
+       */
+      LEAVE(1, 1),
+      /**
+       * <code>KICK = 2;</code>
+       */
+      KICK(2, 2),
+      /**
+       * <code>DEPOSIT_CASH = 3;</code>
+       */
+      DEPOSIT_CASH(3, 3),
+      /**
+       * <code>WITHDRAW_CASH = 4;</code>
+       */
+      WITHDRAW_CASH(4, 4),
+      ;
+
+      /**
+       * <code>JOIN = 0;</code>
+       */
+      public static final int JOIN_VALUE = 0;
+      /**
+       * <code>LEAVE = 1;</code>
+       */
+      public static final int LEAVE_VALUE = 1;
+      /**
+       * <code>KICK = 2;</code>
+       */
+      public static final int KICK_VALUE = 2;
+      /**
+       * <code>DEPOSIT_CASH = 3;</code>
+       */
+      public static final int DEPOSIT_CASH_VALUE = 3;
+      /**
+       * <code>WITHDRAW_CASH = 4;</code>
+       */
+      public static final int WITHDRAW_CASH_VALUE = 4;
+
+
+      public final int getNumber() { return value; }
+
+      public static RequestType valueOf(int value) {
+        switch (value) {
+          case 0: return JOIN;
+          case 1: return LEAVE;
+          case 2: return KICK;
+          case 3: return DEPOSIT_CASH;
+          case 4: return WITHDRAW_CASH;
+          default: return null;
+        }
+      }
+
+      public static com.google.protobuf.Internal.EnumLiteMap<RequestType>
+          internalGetValueMap() {
+        return internalValueMap;
+      }
+      private static com.google.protobuf.Internal.EnumLiteMap<RequestType>
+          internalValueMap =
+            new com.google.protobuf.Internal.EnumLiteMap<RequestType>() {
+              public RequestType findValueByNumber(int number) {
+                return RequestType.valueOf(number);
+              }
+            };
+
+      public final com.google.protobuf.Descriptors.EnumValueDescriptor
+          getValueDescriptor() {
+        return getDescriptor().getValues().get(index);
+      }
+      public final com.google.protobuf.Descriptors.EnumDescriptor
+          getDescriptorForType() {
+        return getDescriptor();
+      }
+      public static final com.google.protobuf.Descriptors.EnumDescriptor
+          getDescriptor() {
+        return au.com.codeka.common.protobuf.Messages.AllianceRequest.getDescriptor().getEnumTypes().get(0);
+      }
+
+      private static final RequestType[] VALUES = values();
+
+      public static RequestType valueOf(
+          com.google.protobuf.Descriptors.EnumValueDescriptor desc) {
+        if (desc.getType() != getDescriptor()) {
+          throw new java.lang.IllegalArgumentException(
+            "EnumValueDescriptor is not for this type.");
+        }
+        return VALUES[desc.getIndex()];
+      }
+
+      private final int index;
+      private final int value;
+
+      private RequestType(int index, int value) {
+        this.index = index;
+        this.value = value;
+      }
+
+      // @@protoc_insertion_point(enum_scope:au.com.codeka.common.protobuf.AllianceRequest.RequestType)
+    }
+
+    /**
+     * Protobuf enum {@code au.com.codeka.common.protobuf.AllianceRequest.RequestState}
      */
     public enum RequestState
         implements com.google.protobuf.ProtocolMessageEnum {
@@ -71002,7 +71506,7 @@ public final class Messages {
       }
       public static final com.google.protobuf.Descriptors.EnumDescriptor
           getDescriptor() {
-        return au.com.codeka.common.protobuf.Messages.AllianceJoinRequest.getDescriptor().getEnumTypes().get(0);
+        return au.com.codeka.common.protobuf.Messages.AllianceRequest.getDescriptor().getEnumTypes().get(1);
       }
 
       private static final RequestState[] VALUES = values();
@@ -71024,150 +71528,101 @@ public final class Messages {
         this.value = value;
       }
 
-      // @@protoc_insertion_point(enum_scope:au.com.codeka.common.protobuf.AllianceJoinRequest.RequestState)
+      // @@protoc_insertion_point(enum_scope:au.com.codeka.common.protobuf.AllianceRequest.RequestState)
     }
 
     private int bitField0_;
-    // optional string key = 1;
-    public static final int KEY_FIELD_NUMBER = 1;
-    private java.lang.Object key_;
+    // optional int32 id = 1;
+    public static final int ID_FIELD_NUMBER = 1;
+    private int id_;
     /**
-     * <code>optional string key = 1;</code>
+     * <code>optional int32 id = 1;</code>
      */
-    public boolean hasKey() {
+    public boolean hasId() {
       return ((bitField0_ & 0x00000001) == 0x00000001);
     }
     /**
-     * <code>optional string key = 1;</code>
+     * <code>optional int32 id = 1;</code>
      */
-    public java.lang.String getKey() {
-      java.lang.Object ref = key_;
-      if (ref instanceof java.lang.String) {
-        return (java.lang.String) ref;
-      } else {
-        com.google.protobuf.ByteString bs = 
-            (com.google.protobuf.ByteString) ref;
-        java.lang.String s = bs.toStringUtf8();
-        if (bs.isValidUtf8()) {
-          key_ = s;
-        }
-        return s;
-      }
-    }
-    /**
-     * <code>optional string key = 1;</code>
-     */
-    public com.google.protobuf.ByteString
-        getKeyBytes() {
-      java.lang.Object ref = key_;
-      if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
-            com.google.protobuf.ByteString.copyFromUtf8(
-                (java.lang.String) ref);
-        key_ = b;
-        return b;
-      } else {
-        return (com.google.protobuf.ByteString) ref;
-      }
+    public int getId() {
+      return id_;
     }
 
-    // optional string alliance_key = 2;
-    public static final int ALLIANCE_KEY_FIELD_NUMBER = 2;
-    private java.lang.Object allianceKey_;
+    // optional int32 alliance_id = 2;
+    public static final int ALLIANCE_ID_FIELD_NUMBER = 2;
+    private int allianceId_;
     /**
-     * <code>optional string alliance_key = 2;</code>
+     * <code>optional int32 alliance_id = 2;</code>
      */
-    public boolean hasAllianceKey() {
+    public boolean hasAllianceId() {
       return ((bitField0_ & 0x00000002) == 0x00000002);
     }
     /**
-     * <code>optional string alliance_key = 2;</code>
+     * <code>optional int32 alliance_id = 2;</code>
      */
-    public java.lang.String getAllianceKey() {
-      java.lang.Object ref = allianceKey_;
-      if (ref instanceof java.lang.String) {
-        return (java.lang.String) ref;
-      } else {
-        com.google.protobuf.ByteString bs = 
-            (com.google.protobuf.ByteString) ref;
-        java.lang.String s = bs.toStringUtf8();
-        if (bs.isValidUtf8()) {
-          allianceKey_ = s;
-        }
-        return s;
-      }
-    }
-    /**
-     * <code>optional string alliance_key = 2;</code>
-     */
-    public com.google.protobuf.ByteString
-        getAllianceKeyBytes() {
-      java.lang.Object ref = allianceKey_;
-      if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
-            com.google.protobuf.ByteString.copyFromUtf8(
-                (java.lang.String) ref);
-        allianceKey_ = b;
-        return b;
-      } else {
-        return (com.google.protobuf.ByteString) ref;
-      }
+    public int getAllianceId() {
+      return allianceId_;
     }
 
-    // optional string empire_key = 3;
-    public static final int EMPIRE_KEY_FIELD_NUMBER = 3;
-    private java.lang.Object empireKey_;
+    // optional int32 request_empire_id = 3;
+    public static final int REQUEST_EMPIRE_ID_FIELD_NUMBER = 3;
+    private int requestEmpireId_;
     /**
-     * <code>optional string empire_key = 3;</code>
+     * <code>optional int32 request_empire_id = 3;</code>
      */
-    public boolean hasEmpireKey() {
+    public boolean hasRequestEmpireId() {
       return ((bitField0_ & 0x00000004) == 0x00000004);
     }
     /**
-     * <code>optional string empire_key = 3;</code>
+     * <code>optional int32 request_empire_id = 3;</code>
      */
-    public java.lang.String getEmpireKey() {
-      java.lang.Object ref = empireKey_;
-      if (ref instanceof java.lang.String) {
-        return (java.lang.String) ref;
-      } else {
-        com.google.protobuf.ByteString bs = 
-            (com.google.protobuf.ByteString) ref;
-        java.lang.String s = bs.toStringUtf8();
-        if (bs.isValidUtf8()) {
-          empireKey_ = s;
-        }
-        return s;
-      }
-    }
-    /**
-     * <code>optional string empire_key = 3;</code>
-     */
-    public com.google.protobuf.ByteString
-        getEmpireKeyBytes() {
-      java.lang.Object ref = empireKey_;
-      if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
-            com.google.protobuf.ByteString.copyFromUtf8(
-                (java.lang.String) ref);
-        empireKey_ = b;
-        return b;
-      } else {
-        return (com.google.protobuf.ByteString) ref;
-      }
+    public int getRequestEmpireId() {
+      return requestEmpireId_;
     }
 
-    // optional string message = 4;
-    public static final int MESSAGE_FIELD_NUMBER = 4;
-    private java.lang.Object message_;
+    // optional int64 request_date = 4;
+    public static final int REQUEST_DATE_FIELD_NUMBER = 4;
+    private long requestDate_;
     /**
-     * <code>optional string message = 4;</code>
+     * <code>optional int64 request_date = 4;</code>
      */
-    public boolean hasMessage() {
+    public boolean hasRequestDate() {
       return ((bitField0_ & 0x00000008) == 0x00000008);
     }
     /**
-     * <code>optional string message = 4;</code>
+     * <code>optional int64 request_date = 4;</code>
+     */
+    public long getRequestDate() {
+      return requestDate_;
+    }
+
+    // optional .au.com.codeka.common.protobuf.AllianceRequest.RequestType request_type = 5;
+    public static final int REQUEST_TYPE_FIELD_NUMBER = 5;
+    private au.com.codeka.common.protobuf.Messages.AllianceRequest.RequestType requestType_;
+    /**
+     * <code>optional .au.com.codeka.common.protobuf.AllianceRequest.RequestType request_type = 5;</code>
+     */
+    public boolean hasRequestType() {
+      return ((bitField0_ & 0x00000010) == 0x00000010);
+    }
+    /**
+     * <code>optional .au.com.codeka.common.protobuf.AllianceRequest.RequestType request_type = 5;</code>
+     */
+    public au.com.codeka.common.protobuf.Messages.AllianceRequest.RequestType getRequestType() {
+      return requestType_;
+    }
+
+    // optional string message = 6;
+    public static final int MESSAGE_FIELD_NUMBER = 6;
+    private java.lang.Object message_;
+    /**
+     * <code>optional string message = 6;</code>
+     */
+    public boolean hasMessage() {
+      return ((bitField0_ & 0x00000020) == 0x00000020);
+    }
+    /**
+     * <code>optional string message = 6;</code>
      */
     public java.lang.String getMessage() {
       java.lang.Object ref = message_;
@@ -71184,7 +71639,7 @@ public final class Messages {
       }
     }
     /**
-     * <code>optional string message = 4;</code>
+     * <code>optional string message = 6;</code>
      */
     public com.google.protobuf.ByteString
         getMessageBytes() {
@@ -71200,45 +71655,97 @@ public final class Messages {
       }
     }
 
-    // optional int64 time_requested = 5;
-    public static final int TIME_REQUESTED_FIELD_NUMBER = 5;
-    private long timeRequested_;
+    // optional .au.com.codeka.common.protobuf.AllianceRequest.RequestState state = 7;
+    public static final int STATE_FIELD_NUMBER = 7;
+    private au.com.codeka.common.protobuf.Messages.AllianceRequest.RequestState state_;
     /**
-     * <code>optional int64 time_requested = 5;</code>
-     */
-    public boolean hasTimeRequested() {
-      return ((bitField0_ & 0x00000010) == 0x00000010);
-    }
-    /**
-     * <code>optional int64 time_requested = 5;</code>
-     */
-    public long getTimeRequested() {
-      return timeRequested_;
-    }
-
-    // optional .au.com.codeka.common.protobuf.AllianceJoinRequest.RequestState state = 6;
-    public static final int STATE_FIELD_NUMBER = 6;
-    private au.com.codeka.common.protobuf.Messages.AllianceJoinRequest.RequestState state_;
-    /**
-     * <code>optional .au.com.codeka.common.protobuf.AllianceJoinRequest.RequestState state = 6;</code>
+     * <code>optional .au.com.codeka.common.protobuf.AllianceRequest.RequestState state = 7;</code>
      */
     public boolean hasState() {
-      return ((bitField0_ & 0x00000020) == 0x00000020);
+      return ((bitField0_ & 0x00000040) == 0x00000040);
     }
     /**
-     * <code>optional .au.com.codeka.common.protobuf.AllianceJoinRequest.RequestState state = 6;</code>
+     * <code>optional .au.com.codeka.common.protobuf.AllianceRequest.RequestState state = 7;</code>
      */
-    public au.com.codeka.common.protobuf.Messages.AllianceJoinRequest.RequestState getState() {
+    public au.com.codeka.common.protobuf.Messages.AllianceRequest.RequestState getState() {
       return state_;
     }
 
+    // optional int32 votes = 8;
+    public static final int VOTES_FIELD_NUMBER = 8;
+    private int votes_;
+    /**
+     * <code>optional int32 votes = 8;</code>
+     */
+    public boolean hasVotes() {
+      return ((bitField0_ & 0x00000080) == 0x00000080);
+    }
+    /**
+     * <code>optional int32 votes = 8;</code>
+     */
+    public int getVotes() {
+      return votes_;
+    }
+
+    // optional int32 target_empire_id = 9;
+    public static final int TARGET_EMPIRE_ID_FIELD_NUMBER = 9;
+    private int targetEmpireId_;
+    /**
+     * <code>optional int32 target_empire_id = 9;</code>
+     *
+     * <pre>
+     * for KICK requests, this is the empire we're kicking
+     * </pre>
+     */
+    public boolean hasTargetEmpireId() {
+      return ((bitField0_ & 0x00000100) == 0x00000100);
+    }
+    /**
+     * <code>optional int32 target_empire_id = 9;</code>
+     *
+     * <pre>
+     * for KICK requests, this is the empire we're kicking
+     * </pre>
+     */
+    public int getTargetEmpireId() {
+      return targetEmpireId_;
+    }
+
+    // optional float amount = 10;
+    public static final int AMOUNT_FIELD_NUMBER = 10;
+    private float amount_;
+    /**
+     * <code>optional float amount = 10;</code>
+     *
+     * <pre>
+     * for DEPOSIT_CASH and WITHDRAW_CASH, the amount of cash to deposit/withdraw
+     * </pre>
+     */
+    public boolean hasAmount() {
+      return ((bitField0_ & 0x00000200) == 0x00000200);
+    }
+    /**
+     * <code>optional float amount = 10;</code>
+     *
+     * <pre>
+     * for DEPOSIT_CASH and WITHDRAW_CASH, the amount of cash to deposit/withdraw
+     * </pre>
+     */
+    public float getAmount() {
+      return amount_;
+    }
+
     private void initFields() {
-      key_ = "";
-      allianceKey_ = "";
-      empireKey_ = "";
+      id_ = 0;
+      allianceId_ = 0;
+      requestEmpireId_ = 0;
+      requestDate_ = 0L;
+      requestType_ = au.com.codeka.common.protobuf.Messages.AllianceRequest.RequestType.JOIN;
       message_ = "";
-      timeRequested_ = 0L;
-      state_ = au.com.codeka.common.protobuf.Messages.AllianceJoinRequest.RequestState.PENDING;
+      state_ = au.com.codeka.common.protobuf.Messages.AllianceRequest.RequestState.PENDING;
+      votes_ = 0;
+      targetEmpireId_ = 0;
+      amount_ = 0F;
     }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
@@ -71253,22 +71760,34 @@ public final class Messages {
                         throws java.io.IOException {
       getSerializedSize();
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
-        output.writeBytes(1, getKeyBytes());
+        output.writeInt32(1, id_);
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
-        output.writeBytes(2, getAllianceKeyBytes());
+        output.writeInt32(2, allianceId_);
       }
       if (((bitField0_ & 0x00000004) == 0x00000004)) {
-        output.writeBytes(3, getEmpireKeyBytes());
+        output.writeInt32(3, requestEmpireId_);
       }
       if (((bitField0_ & 0x00000008) == 0x00000008)) {
-        output.writeBytes(4, getMessageBytes());
+        output.writeInt64(4, requestDate_);
       }
       if (((bitField0_ & 0x00000010) == 0x00000010)) {
-        output.writeInt64(5, timeRequested_);
+        output.writeEnum(5, requestType_.getNumber());
       }
       if (((bitField0_ & 0x00000020) == 0x00000020)) {
-        output.writeEnum(6, state_.getNumber());
+        output.writeBytes(6, getMessageBytes());
+      }
+      if (((bitField0_ & 0x00000040) == 0x00000040)) {
+        output.writeEnum(7, state_.getNumber());
+      }
+      if (((bitField0_ & 0x00000080) == 0x00000080)) {
+        output.writeInt32(8, votes_);
+      }
+      if (((bitField0_ & 0x00000100) == 0x00000100)) {
+        output.writeInt32(9, targetEmpireId_);
+      }
+      if (((bitField0_ & 0x00000200) == 0x00000200)) {
+        output.writeFloat(10, amount_);
       }
       getUnknownFields().writeTo(output);
     }
@@ -71281,27 +71800,43 @@ public final class Messages {
       size = 0;
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeBytesSize(1, getKeyBytes());
+          .computeInt32Size(1, id_);
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeBytesSize(2, getAllianceKeyBytes());
+          .computeInt32Size(2, allianceId_);
       }
       if (((bitField0_ & 0x00000004) == 0x00000004)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeBytesSize(3, getEmpireKeyBytes());
+          .computeInt32Size(3, requestEmpireId_);
       }
       if (((bitField0_ & 0x00000008) == 0x00000008)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeBytesSize(4, getMessageBytes());
+          .computeInt64Size(4, requestDate_);
       }
       if (((bitField0_ & 0x00000010) == 0x00000010)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeInt64Size(5, timeRequested_);
+          .computeEnumSize(5, requestType_.getNumber());
       }
       if (((bitField0_ & 0x00000020) == 0x00000020)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeEnumSize(6, state_.getNumber());
+          .computeBytesSize(6, getMessageBytes());
+      }
+      if (((bitField0_ & 0x00000040) == 0x00000040)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeEnumSize(7, state_.getNumber());
+      }
+      if (((bitField0_ & 0x00000080) == 0x00000080)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt32Size(8, votes_);
+      }
+      if (((bitField0_ & 0x00000100) == 0x00000100)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt32Size(9, targetEmpireId_);
+      }
+      if (((bitField0_ & 0x00000200) == 0x00000200)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeFloatSize(10, amount_);
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
@@ -71315,53 +71850,53 @@ public final class Messages {
       return super.writeReplace();
     }
 
-    public static au.com.codeka.common.protobuf.Messages.AllianceJoinRequest parseFrom(
+    public static au.com.codeka.common.protobuf.Messages.AllianceRequest parseFrom(
         com.google.protobuf.ByteString data)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data);
     }
-    public static au.com.codeka.common.protobuf.Messages.AllianceJoinRequest parseFrom(
+    public static au.com.codeka.common.protobuf.Messages.AllianceRequest parseFrom(
         com.google.protobuf.ByteString data,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data, extensionRegistry);
     }
-    public static au.com.codeka.common.protobuf.Messages.AllianceJoinRequest parseFrom(byte[] data)
+    public static au.com.codeka.common.protobuf.Messages.AllianceRequest parseFrom(byte[] data)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data);
     }
-    public static au.com.codeka.common.protobuf.Messages.AllianceJoinRequest parseFrom(
+    public static au.com.codeka.common.protobuf.Messages.AllianceRequest parseFrom(
         byte[] data,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data, extensionRegistry);
     }
-    public static au.com.codeka.common.protobuf.Messages.AllianceJoinRequest parseFrom(java.io.InputStream input)
+    public static au.com.codeka.common.protobuf.Messages.AllianceRequest parseFrom(java.io.InputStream input)
         throws java.io.IOException {
       return PARSER.parseFrom(input);
     }
-    public static au.com.codeka.common.protobuf.Messages.AllianceJoinRequest parseFrom(
+    public static au.com.codeka.common.protobuf.Messages.AllianceRequest parseFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
       return PARSER.parseFrom(input, extensionRegistry);
     }
-    public static au.com.codeka.common.protobuf.Messages.AllianceJoinRequest parseDelimitedFrom(java.io.InputStream input)
+    public static au.com.codeka.common.protobuf.Messages.AllianceRequest parseDelimitedFrom(java.io.InputStream input)
         throws java.io.IOException {
       return PARSER.parseDelimitedFrom(input);
     }
-    public static au.com.codeka.common.protobuf.Messages.AllianceJoinRequest parseDelimitedFrom(
+    public static au.com.codeka.common.protobuf.Messages.AllianceRequest parseDelimitedFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
       return PARSER.parseDelimitedFrom(input, extensionRegistry);
     }
-    public static au.com.codeka.common.protobuf.Messages.AllianceJoinRequest parseFrom(
+    public static au.com.codeka.common.protobuf.Messages.AllianceRequest parseFrom(
         com.google.protobuf.CodedInputStream input)
         throws java.io.IOException {
       return PARSER.parseFrom(input);
     }
-    public static au.com.codeka.common.protobuf.Messages.AllianceJoinRequest parseFrom(
+    public static au.com.codeka.common.protobuf.Messages.AllianceRequest parseFrom(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
@@ -71370,7 +71905,7 @@ public final class Messages {
 
     public static Builder newBuilder() { return Builder.create(); }
     public Builder newBuilderForType() { return newBuilder(); }
-    public static Builder newBuilder(au.com.codeka.common.protobuf.Messages.AllianceJoinRequest prototype) {
+    public static Builder newBuilder(au.com.codeka.common.protobuf.Messages.AllianceRequest prototype) {
       return newBuilder().mergeFrom(prototype);
     }
     public Builder toBuilder() { return newBuilder(this); }
@@ -71382,24 +71917,24 @@ public final class Messages {
       return builder;
     }
     /**
-     * Protobuf type {@code au.com.codeka.common.protobuf.AllianceJoinRequest}
+     * Protobuf type {@code au.com.codeka.common.protobuf.AllianceRequest}
      */
     public static final class Builder extends
         com.google.protobuf.GeneratedMessage.Builder<Builder>
-       implements au.com.codeka.common.protobuf.Messages.AllianceJoinRequestOrBuilder {
+       implements au.com.codeka.common.protobuf.Messages.AllianceRequestOrBuilder {
       public static final com.google.protobuf.Descriptors.Descriptor
           getDescriptor() {
-        return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_AllianceJoinRequest_descriptor;
+        return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_AllianceRequest_descriptor;
       }
 
       protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
           internalGetFieldAccessorTable() {
-        return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_AllianceJoinRequest_fieldAccessorTable
+        return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_AllianceRequest_fieldAccessorTable
             .ensureFieldAccessorsInitialized(
-                au.com.codeka.common.protobuf.Messages.AllianceJoinRequest.class, au.com.codeka.common.protobuf.Messages.AllianceJoinRequest.Builder.class);
+                au.com.codeka.common.protobuf.Messages.AllianceRequest.class, au.com.codeka.common.protobuf.Messages.AllianceRequest.Builder.class);
       }
 
-      // Construct using au.com.codeka.common.protobuf.Messages.AllianceJoinRequest.newBuilder()
+      // Construct using au.com.codeka.common.protobuf.Messages.AllianceRequest.newBuilder()
       private Builder() {
         maybeForceBuilderInitialization();
       }
@@ -71419,18 +71954,26 @@ public final class Messages {
 
       public Builder clear() {
         super.clear();
-        key_ = "";
+        id_ = 0;
         bitField0_ = (bitField0_ & ~0x00000001);
-        allianceKey_ = "";
+        allianceId_ = 0;
         bitField0_ = (bitField0_ & ~0x00000002);
-        empireKey_ = "";
+        requestEmpireId_ = 0;
         bitField0_ = (bitField0_ & ~0x00000004);
-        message_ = "";
+        requestDate_ = 0L;
         bitField0_ = (bitField0_ & ~0x00000008);
-        timeRequested_ = 0L;
+        requestType_ = au.com.codeka.common.protobuf.Messages.AllianceRequest.RequestType.JOIN;
         bitField0_ = (bitField0_ & ~0x00000010);
-        state_ = au.com.codeka.common.protobuf.Messages.AllianceJoinRequest.RequestState.PENDING;
+        message_ = "";
         bitField0_ = (bitField0_ & ~0x00000020);
+        state_ = au.com.codeka.common.protobuf.Messages.AllianceRequest.RequestState.PENDING;
+        bitField0_ = (bitField0_ & ~0x00000040);
+        votes_ = 0;
+        bitField0_ = (bitField0_ & ~0x00000080);
+        targetEmpireId_ = 0;
+        bitField0_ = (bitField0_ & ~0x00000100);
+        amount_ = 0F;
+        bitField0_ = (bitField0_ & ~0x00000200);
         return this;
       }
 
@@ -71440,90 +71983,112 @@ public final class Messages {
 
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
-        return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_AllianceJoinRequest_descriptor;
+        return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_AllianceRequest_descriptor;
       }
 
-      public au.com.codeka.common.protobuf.Messages.AllianceJoinRequest getDefaultInstanceForType() {
-        return au.com.codeka.common.protobuf.Messages.AllianceJoinRequest.getDefaultInstance();
+      public au.com.codeka.common.protobuf.Messages.AllianceRequest getDefaultInstanceForType() {
+        return au.com.codeka.common.protobuf.Messages.AllianceRequest.getDefaultInstance();
       }
 
-      public au.com.codeka.common.protobuf.Messages.AllianceJoinRequest build() {
-        au.com.codeka.common.protobuf.Messages.AllianceJoinRequest result = buildPartial();
+      public au.com.codeka.common.protobuf.Messages.AllianceRequest build() {
+        au.com.codeka.common.protobuf.Messages.AllianceRequest result = buildPartial();
         if (!result.isInitialized()) {
           throw newUninitializedMessageException(result);
         }
         return result;
       }
 
-      public au.com.codeka.common.protobuf.Messages.AllianceJoinRequest buildPartial() {
-        au.com.codeka.common.protobuf.Messages.AllianceJoinRequest result = new au.com.codeka.common.protobuf.Messages.AllianceJoinRequest(this);
+      public au.com.codeka.common.protobuf.Messages.AllianceRequest buildPartial() {
+        au.com.codeka.common.protobuf.Messages.AllianceRequest result = new au.com.codeka.common.protobuf.Messages.AllianceRequest(this);
         int from_bitField0_ = bitField0_;
         int to_bitField0_ = 0;
         if (((from_bitField0_ & 0x00000001) == 0x00000001)) {
           to_bitField0_ |= 0x00000001;
         }
-        result.key_ = key_;
+        result.id_ = id_;
         if (((from_bitField0_ & 0x00000002) == 0x00000002)) {
           to_bitField0_ |= 0x00000002;
         }
-        result.allianceKey_ = allianceKey_;
+        result.allianceId_ = allianceId_;
         if (((from_bitField0_ & 0x00000004) == 0x00000004)) {
           to_bitField0_ |= 0x00000004;
         }
-        result.empireKey_ = empireKey_;
+        result.requestEmpireId_ = requestEmpireId_;
         if (((from_bitField0_ & 0x00000008) == 0x00000008)) {
           to_bitField0_ |= 0x00000008;
         }
-        result.message_ = message_;
+        result.requestDate_ = requestDate_;
         if (((from_bitField0_ & 0x00000010) == 0x00000010)) {
           to_bitField0_ |= 0x00000010;
         }
-        result.timeRequested_ = timeRequested_;
+        result.requestType_ = requestType_;
         if (((from_bitField0_ & 0x00000020) == 0x00000020)) {
           to_bitField0_ |= 0x00000020;
         }
+        result.message_ = message_;
+        if (((from_bitField0_ & 0x00000040) == 0x00000040)) {
+          to_bitField0_ |= 0x00000040;
+        }
         result.state_ = state_;
+        if (((from_bitField0_ & 0x00000080) == 0x00000080)) {
+          to_bitField0_ |= 0x00000080;
+        }
+        result.votes_ = votes_;
+        if (((from_bitField0_ & 0x00000100) == 0x00000100)) {
+          to_bitField0_ |= 0x00000100;
+        }
+        result.targetEmpireId_ = targetEmpireId_;
+        if (((from_bitField0_ & 0x00000200) == 0x00000200)) {
+          to_bitField0_ |= 0x00000200;
+        }
+        result.amount_ = amount_;
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
       }
 
       public Builder mergeFrom(com.google.protobuf.Message other) {
-        if (other instanceof au.com.codeka.common.protobuf.Messages.AllianceJoinRequest) {
-          return mergeFrom((au.com.codeka.common.protobuf.Messages.AllianceJoinRequest)other);
+        if (other instanceof au.com.codeka.common.protobuf.Messages.AllianceRequest) {
+          return mergeFrom((au.com.codeka.common.protobuf.Messages.AllianceRequest)other);
         } else {
           super.mergeFrom(other);
           return this;
         }
       }
 
-      public Builder mergeFrom(au.com.codeka.common.protobuf.Messages.AllianceJoinRequest other) {
-        if (other == au.com.codeka.common.protobuf.Messages.AllianceJoinRequest.getDefaultInstance()) return this;
-        if (other.hasKey()) {
-          bitField0_ |= 0x00000001;
-          key_ = other.key_;
-          onChanged();
+      public Builder mergeFrom(au.com.codeka.common.protobuf.Messages.AllianceRequest other) {
+        if (other == au.com.codeka.common.protobuf.Messages.AllianceRequest.getDefaultInstance()) return this;
+        if (other.hasId()) {
+          setId(other.getId());
         }
-        if (other.hasAllianceKey()) {
-          bitField0_ |= 0x00000002;
-          allianceKey_ = other.allianceKey_;
-          onChanged();
+        if (other.hasAllianceId()) {
+          setAllianceId(other.getAllianceId());
         }
-        if (other.hasEmpireKey()) {
-          bitField0_ |= 0x00000004;
-          empireKey_ = other.empireKey_;
-          onChanged();
+        if (other.hasRequestEmpireId()) {
+          setRequestEmpireId(other.getRequestEmpireId());
+        }
+        if (other.hasRequestDate()) {
+          setRequestDate(other.getRequestDate());
+        }
+        if (other.hasRequestType()) {
+          setRequestType(other.getRequestType());
         }
         if (other.hasMessage()) {
-          bitField0_ |= 0x00000008;
+          bitField0_ |= 0x00000020;
           message_ = other.message_;
           onChanged();
         }
-        if (other.hasTimeRequested()) {
-          setTimeRequested(other.getTimeRequested());
-        }
         if (other.hasState()) {
           setState(other.getState());
+        }
+        if (other.hasVotes()) {
+          setVotes(other.getVotes());
+        }
+        if (other.hasTargetEmpireId()) {
+          setTargetEmpireId(other.getTargetEmpireId());
+        }
+        if (other.hasAmount()) {
+          setAmount(other.getAmount());
         }
         this.mergeUnknownFields(other.getUnknownFields());
         return this;
@@ -71537,11 +72102,11 @@ public final class Messages {
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws java.io.IOException {
-        au.com.codeka.common.protobuf.Messages.AllianceJoinRequest parsedMessage = null;
+        au.com.codeka.common.protobuf.Messages.AllianceRequest parsedMessage = null;
         try {
           parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
         } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-          parsedMessage = (au.com.codeka.common.protobuf.Messages.AllianceJoinRequest) e.getUnfinishedMessage();
+          parsedMessage = (au.com.codeka.common.protobuf.Messages.AllianceRequest) e.getUnfinishedMessage();
           throw e;
         } finally {
           if (parsedMessage != null) {
@@ -71552,238 +72117,184 @@ public final class Messages {
       }
       private int bitField0_;
 
-      // optional string key = 1;
-      private java.lang.Object key_ = "";
+      // optional int32 id = 1;
+      private int id_ ;
       /**
-       * <code>optional string key = 1;</code>
+       * <code>optional int32 id = 1;</code>
        */
-      public boolean hasKey() {
+      public boolean hasId() {
         return ((bitField0_ & 0x00000001) == 0x00000001);
       }
       /**
-       * <code>optional string key = 1;</code>
+       * <code>optional int32 id = 1;</code>
        */
-      public java.lang.String getKey() {
-        java.lang.Object ref = key_;
-        if (!(ref instanceof java.lang.String)) {
-          java.lang.String s = ((com.google.protobuf.ByteString) ref)
-              .toStringUtf8();
-          key_ = s;
-          return s;
-        } else {
-          return (java.lang.String) ref;
-        }
+      public int getId() {
+        return id_;
       }
       /**
-       * <code>optional string key = 1;</code>
+       * <code>optional int32 id = 1;</code>
        */
-      public com.google.protobuf.ByteString
-          getKeyBytes() {
-        java.lang.Object ref = key_;
-        if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
-              com.google.protobuf.ByteString.copyFromUtf8(
-                  (java.lang.String) ref);
-          key_ = b;
-          return b;
-        } else {
-          return (com.google.protobuf.ByteString) ref;
-        }
-      }
-      /**
-       * <code>optional string key = 1;</code>
-       */
-      public Builder setKey(
-          java.lang.String value) {
-        if (value == null) {
-    throw new NullPointerException();
-  }
-  bitField0_ |= 0x00000001;
-        key_ = value;
+      public Builder setId(int value) {
+        bitField0_ |= 0x00000001;
+        id_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>optional string key = 1;</code>
+       * <code>optional int32 id = 1;</code>
        */
-      public Builder clearKey() {
+      public Builder clearId() {
         bitField0_ = (bitField0_ & ~0x00000001);
-        key_ = getDefaultInstance().getKey();
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>optional string key = 1;</code>
-       */
-      public Builder setKeyBytes(
-          com.google.protobuf.ByteString value) {
-        if (value == null) {
-    throw new NullPointerException();
-  }
-  bitField0_ |= 0x00000001;
-        key_ = value;
+        id_ = 0;
         onChanged();
         return this;
       }
 
-      // optional string alliance_key = 2;
-      private java.lang.Object allianceKey_ = "";
+      // optional int32 alliance_id = 2;
+      private int allianceId_ ;
       /**
-       * <code>optional string alliance_key = 2;</code>
+       * <code>optional int32 alliance_id = 2;</code>
        */
-      public boolean hasAllianceKey() {
+      public boolean hasAllianceId() {
         return ((bitField0_ & 0x00000002) == 0x00000002);
       }
       /**
-       * <code>optional string alliance_key = 2;</code>
+       * <code>optional int32 alliance_id = 2;</code>
        */
-      public java.lang.String getAllianceKey() {
-        java.lang.Object ref = allianceKey_;
-        if (!(ref instanceof java.lang.String)) {
-          java.lang.String s = ((com.google.protobuf.ByteString) ref)
-              .toStringUtf8();
-          allianceKey_ = s;
-          return s;
-        } else {
-          return (java.lang.String) ref;
-        }
+      public int getAllianceId() {
+        return allianceId_;
       }
       /**
-       * <code>optional string alliance_key = 2;</code>
+       * <code>optional int32 alliance_id = 2;</code>
        */
-      public com.google.protobuf.ByteString
-          getAllianceKeyBytes() {
-        java.lang.Object ref = allianceKey_;
-        if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
-              com.google.protobuf.ByteString.copyFromUtf8(
-                  (java.lang.String) ref);
-          allianceKey_ = b;
-          return b;
-        } else {
-          return (com.google.protobuf.ByteString) ref;
-        }
-      }
-      /**
-       * <code>optional string alliance_key = 2;</code>
-       */
-      public Builder setAllianceKey(
-          java.lang.String value) {
-        if (value == null) {
-    throw new NullPointerException();
-  }
-  bitField0_ |= 0x00000002;
-        allianceKey_ = value;
+      public Builder setAllianceId(int value) {
+        bitField0_ |= 0x00000002;
+        allianceId_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>optional string alliance_key = 2;</code>
+       * <code>optional int32 alliance_id = 2;</code>
        */
-      public Builder clearAllianceKey() {
+      public Builder clearAllianceId() {
         bitField0_ = (bitField0_ & ~0x00000002);
-        allianceKey_ = getDefaultInstance().getAllianceKey();
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>optional string alliance_key = 2;</code>
-       */
-      public Builder setAllianceKeyBytes(
-          com.google.protobuf.ByteString value) {
-        if (value == null) {
-    throw new NullPointerException();
-  }
-  bitField0_ |= 0x00000002;
-        allianceKey_ = value;
+        allianceId_ = 0;
         onChanged();
         return this;
       }
 
-      // optional string empire_key = 3;
-      private java.lang.Object empireKey_ = "";
+      // optional int32 request_empire_id = 3;
+      private int requestEmpireId_ ;
       /**
-       * <code>optional string empire_key = 3;</code>
+       * <code>optional int32 request_empire_id = 3;</code>
        */
-      public boolean hasEmpireKey() {
+      public boolean hasRequestEmpireId() {
         return ((bitField0_ & 0x00000004) == 0x00000004);
       }
       /**
-       * <code>optional string empire_key = 3;</code>
+       * <code>optional int32 request_empire_id = 3;</code>
        */
-      public java.lang.String getEmpireKey() {
-        java.lang.Object ref = empireKey_;
-        if (!(ref instanceof java.lang.String)) {
-          java.lang.String s = ((com.google.protobuf.ByteString) ref)
-              .toStringUtf8();
-          empireKey_ = s;
-          return s;
-        } else {
-          return (java.lang.String) ref;
-        }
+      public int getRequestEmpireId() {
+        return requestEmpireId_;
       }
       /**
-       * <code>optional string empire_key = 3;</code>
+       * <code>optional int32 request_empire_id = 3;</code>
        */
-      public com.google.protobuf.ByteString
-          getEmpireKeyBytes() {
-        java.lang.Object ref = empireKey_;
-        if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
-              com.google.protobuf.ByteString.copyFromUtf8(
-                  (java.lang.String) ref);
-          empireKey_ = b;
-          return b;
-        } else {
-          return (com.google.protobuf.ByteString) ref;
-        }
-      }
-      /**
-       * <code>optional string empire_key = 3;</code>
-       */
-      public Builder setEmpireKey(
-          java.lang.String value) {
-        if (value == null) {
-    throw new NullPointerException();
-  }
-  bitField0_ |= 0x00000004;
-        empireKey_ = value;
+      public Builder setRequestEmpireId(int value) {
+        bitField0_ |= 0x00000004;
+        requestEmpireId_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>optional string empire_key = 3;</code>
+       * <code>optional int32 request_empire_id = 3;</code>
        */
-      public Builder clearEmpireKey() {
+      public Builder clearRequestEmpireId() {
         bitField0_ = (bitField0_ & ~0x00000004);
-        empireKey_ = getDefaultInstance().getEmpireKey();
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>optional string empire_key = 3;</code>
-       */
-      public Builder setEmpireKeyBytes(
-          com.google.protobuf.ByteString value) {
-        if (value == null) {
-    throw new NullPointerException();
-  }
-  bitField0_ |= 0x00000004;
-        empireKey_ = value;
+        requestEmpireId_ = 0;
         onChanged();
         return this;
       }
 
-      // optional string message = 4;
-      private java.lang.Object message_ = "";
+      // optional int64 request_date = 4;
+      private long requestDate_ ;
       /**
-       * <code>optional string message = 4;</code>
+       * <code>optional int64 request_date = 4;</code>
        */
-      public boolean hasMessage() {
+      public boolean hasRequestDate() {
         return ((bitField0_ & 0x00000008) == 0x00000008);
       }
       /**
-       * <code>optional string message = 4;</code>
+       * <code>optional int64 request_date = 4;</code>
+       */
+      public long getRequestDate() {
+        return requestDate_;
+      }
+      /**
+       * <code>optional int64 request_date = 4;</code>
+       */
+      public Builder setRequestDate(long value) {
+        bitField0_ |= 0x00000008;
+        requestDate_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional int64 request_date = 4;</code>
+       */
+      public Builder clearRequestDate() {
+        bitField0_ = (bitField0_ & ~0x00000008);
+        requestDate_ = 0L;
+        onChanged();
+        return this;
+      }
+
+      // optional .au.com.codeka.common.protobuf.AllianceRequest.RequestType request_type = 5;
+      private au.com.codeka.common.protobuf.Messages.AllianceRequest.RequestType requestType_ = au.com.codeka.common.protobuf.Messages.AllianceRequest.RequestType.JOIN;
+      /**
+       * <code>optional .au.com.codeka.common.protobuf.AllianceRequest.RequestType request_type = 5;</code>
+       */
+      public boolean hasRequestType() {
+        return ((bitField0_ & 0x00000010) == 0x00000010);
+      }
+      /**
+       * <code>optional .au.com.codeka.common.protobuf.AllianceRequest.RequestType request_type = 5;</code>
+       */
+      public au.com.codeka.common.protobuf.Messages.AllianceRequest.RequestType getRequestType() {
+        return requestType_;
+      }
+      /**
+       * <code>optional .au.com.codeka.common.protobuf.AllianceRequest.RequestType request_type = 5;</code>
+       */
+      public Builder setRequestType(au.com.codeka.common.protobuf.Messages.AllianceRequest.RequestType value) {
+        if (value == null) {
+          throw new NullPointerException();
+        }
+        bitField0_ |= 0x00000010;
+        requestType_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional .au.com.codeka.common.protobuf.AllianceRequest.RequestType request_type = 5;</code>
+       */
+      public Builder clearRequestType() {
+        bitField0_ = (bitField0_ & ~0x00000010);
+        requestType_ = au.com.codeka.common.protobuf.Messages.AllianceRequest.RequestType.JOIN;
+        onChanged();
+        return this;
+      }
+
+      // optional string message = 6;
+      private java.lang.Object message_ = "";
+      /**
+       * <code>optional string message = 6;</code>
+       */
+      public boolean hasMessage() {
+        return ((bitField0_ & 0x00000020) == 0x00000020);
+      }
+      /**
+       * <code>optional string message = 6;</code>
        */
       public java.lang.String getMessage() {
         java.lang.Object ref = message_;
@@ -71797,7 +72308,7 @@ public final class Messages {
         }
       }
       /**
-       * <code>optional string message = 4;</code>
+       * <code>optional string message = 6;</code>
        */
       public com.google.protobuf.ByteString
           getMessageBytes() {
@@ -71813,168 +72324,281 @@ public final class Messages {
         }
       }
       /**
-       * <code>optional string message = 4;</code>
+       * <code>optional string message = 6;</code>
        */
       public Builder setMessage(
           java.lang.String value) {
         if (value == null) {
     throw new NullPointerException();
   }
-  bitField0_ |= 0x00000008;
+  bitField0_ |= 0x00000020;
         message_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>optional string message = 4;</code>
+       * <code>optional string message = 6;</code>
        */
       public Builder clearMessage() {
-        bitField0_ = (bitField0_ & ~0x00000008);
+        bitField0_ = (bitField0_ & ~0x00000020);
         message_ = getDefaultInstance().getMessage();
         onChanged();
         return this;
       }
       /**
-       * <code>optional string message = 4;</code>
+       * <code>optional string message = 6;</code>
        */
       public Builder setMessageBytes(
           com.google.protobuf.ByteString value) {
         if (value == null) {
     throw new NullPointerException();
   }
-  bitField0_ |= 0x00000008;
+  bitField0_ |= 0x00000020;
         message_ = value;
         onChanged();
         return this;
       }
 
-      // optional int64 time_requested = 5;
-      private long timeRequested_ ;
+      // optional .au.com.codeka.common.protobuf.AllianceRequest.RequestState state = 7;
+      private au.com.codeka.common.protobuf.Messages.AllianceRequest.RequestState state_ = au.com.codeka.common.protobuf.Messages.AllianceRequest.RequestState.PENDING;
       /**
-       * <code>optional int64 time_requested = 5;</code>
-       */
-      public boolean hasTimeRequested() {
-        return ((bitField0_ & 0x00000010) == 0x00000010);
-      }
-      /**
-       * <code>optional int64 time_requested = 5;</code>
-       */
-      public long getTimeRequested() {
-        return timeRequested_;
-      }
-      /**
-       * <code>optional int64 time_requested = 5;</code>
-       */
-      public Builder setTimeRequested(long value) {
-        bitField0_ |= 0x00000010;
-        timeRequested_ = value;
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>optional int64 time_requested = 5;</code>
-       */
-      public Builder clearTimeRequested() {
-        bitField0_ = (bitField0_ & ~0x00000010);
-        timeRequested_ = 0L;
-        onChanged();
-        return this;
-      }
-
-      // optional .au.com.codeka.common.protobuf.AllianceJoinRequest.RequestState state = 6;
-      private au.com.codeka.common.protobuf.Messages.AllianceJoinRequest.RequestState state_ = au.com.codeka.common.protobuf.Messages.AllianceJoinRequest.RequestState.PENDING;
-      /**
-       * <code>optional .au.com.codeka.common.protobuf.AllianceJoinRequest.RequestState state = 6;</code>
+       * <code>optional .au.com.codeka.common.protobuf.AllianceRequest.RequestState state = 7;</code>
        */
       public boolean hasState() {
-        return ((bitField0_ & 0x00000020) == 0x00000020);
+        return ((bitField0_ & 0x00000040) == 0x00000040);
       }
       /**
-       * <code>optional .au.com.codeka.common.protobuf.AllianceJoinRequest.RequestState state = 6;</code>
+       * <code>optional .au.com.codeka.common.protobuf.AllianceRequest.RequestState state = 7;</code>
        */
-      public au.com.codeka.common.protobuf.Messages.AllianceJoinRequest.RequestState getState() {
+      public au.com.codeka.common.protobuf.Messages.AllianceRequest.RequestState getState() {
         return state_;
       }
       /**
-       * <code>optional .au.com.codeka.common.protobuf.AllianceJoinRequest.RequestState state = 6;</code>
+       * <code>optional .au.com.codeka.common.protobuf.AllianceRequest.RequestState state = 7;</code>
        */
-      public Builder setState(au.com.codeka.common.protobuf.Messages.AllianceJoinRequest.RequestState value) {
+      public Builder setState(au.com.codeka.common.protobuf.Messages.AllianceRequest.RequestState value) {
         if (value == null) {
           throw new NullPointerException();
         }
-        bitField0_ |= 0x00000020;
+        bitField0_ |= 0x00000040;
         state_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>optional .au.com.codeka.common.protobuf.AllianceJoinRequest.RequestState state = 6;</code>
+       * <code>optional .au.com.codeka.common.protobuf.AllianceRequest.RequestState state = 7;</code>
        */
       public Builder clearState() {
-        bitField0_ = (bitField0_ & ~0x00000020);
-        state_ = au.com.codeka.common.protobuf.Messages.AllianceJoinRequest.RequestState.PENDING;
+        bitField0_ = (bitField0_ & ~0x00000040);
+        state_ = au.com.codeka.common.protobuf.Messages.AllianceRequest.RequestState.PENDING;
         onChanged();
         return this;
       }
 
-      // @@protoc_insertion_point(builder_scope:au.com.codeka.common.protobuf.AllianceJoinRequest)
+      // optional int32 votes = 8;
+      private int votes_ ;
+      /**
+       * <code>optional int32 votes = 8;</code>
+       */
+      public boolean hasVotes() {
+        return ((bitField0_ & 0x00000080) == 0x00000080);
+      }
+      /**
+       * <code>optional int32 votes = 8;</code>
+       */
+      public int getVotes() {
+        return votes_;
+      }
+      /**
+       * <code>optional int32 votes = 8;</code>
+       */
+      public Builder setVotes(int value) {
+        bitField0_ |= 0x00000080;
+        votes_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional int32 votes = 8;</code>
+       */
+      public Builder clearVotes() {
+        bitField0_ = (bitField0_ & ~0x00000080);
+        votes_ = 0;
+        onChanged();
+        return this;
+      }
+
+      // optional int32 target_empire_id = 9;
+      private int targetEmpireId_ ;
+      /**
+       * <code>optional int32 target_empire_id = 9;</code>
+       *
+       * <pre>
+       * for KICK requests, this is the empire we're kicking
+       * </pre>
+       */
+      public boolean hasTargetEmpireId() {
+        return ((bitField0_ & 0x00000100) == 0x00000100);
+      }
+      /**
+       * <code>optional int32 target_empire_id = 9;</code>
+       *
+       * <pre>
+       * for KICK requests, this is the empire we're kicking
+       * </pre>
+       */
+      public int getTargetEmpireId() {
+        return targetEmpireId_;
+      }
+      /**
+       * <code>optional int32 target_empire_id = 9;</code>
+       *
+       * <pre>
+       * for KICK requests, this is the empire we're kicking
+       * </pre>
+       */
+      public Builder setTargetEmpireId(int value) {
+        bitField0_ |= 0x00000100;
+        targetEmpireId_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional int32 target_empire_id = 9;</code>
+       *
+       * <pre>
+       * for KICK requests, this is the empire we're kicking
+       * </pre>
+       */
+      public Builder clearTargetEmpireId() {
+        bitField0_ = (bitField0_ & ~0x00000100);
+        targetEmpireId_ = 0;
+        onChanged();
+        return this;
+      }
+
+      // optional float amount = 10;
+      private float amount_ ;
+      /**
+       * <code>optional float amount = 10;</code>
+       *
+       * <pre>
+       * for DEPOSIT_CASH and WITHDRAW_CASH, the amount of cash to deposit/withdraw
+       * </pre>
+       */
+      public boolean hasAmount() {
+        return ((bitField0_ & 0x00000200) == 0x00000200);
+      }
+      /**
+       * <code>optional float amount = 10;</code>
+       *
+       * <pre>
+       * for DEPOSIT_CASH and WITHDRAW_CASH, the amount of cash to deposit/withdraw
+       * </pre>
+       */
+      public float getAmount() {
+        return amount_;
+      }
+      /**
+       * <code>optional float amount = 10;</code>
+       *
+       * <pre>
+       * for DEPOSIT_CASH and WITHDRAW_CASH, the amount of cash to deposit/withdraw
+       * </pre>
+       */
+      public Builder setAmount(float value) {
+        bitField0_ |= 0x00000200;
+        amount_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional float amount = 10;</code>
+       *
+       * <pre>
+       * for DEPOSIT_CASH and WITHDRAW_CASH, the amount of cash to deposit/withdraw
+       * </pre>
+       */
+      public Builder clearAmount() {
+        bitField0_ = (bitField0_ & ~0x00000200);
+        amount_ = 0F;
+        onChanged();
+        return this;
+      }
+
+      // @@protoc_insertion_point(builder_scope:au.com.codeka.common.protobuf.AllianceRequest)
     }
 
     static {
-      defaultInstance = new AllianceJoinRequest(true);
+      defaultInstance = new AllianceRequest(true);
       defaultInstance.initFields();
     }
 
-    // @@protoc_insertion_point(class_scope:au.com.codeka.common.protobuf.AllianceJoinRequest)
+    // @@protoc_insertion_point(class_scope:au.com.codeka.common.protobuf.AllianceRequest)
   }
 
-  public interface AllianceJoinRequestsOrBuilder
+  public interface AllianceRequestsOrBuilder
       extends com.google.protobuf.MessageOrBuilder {
 
-    // repeated .au.com.codeka.common.protobuf.AllianceJoinRequest join_requests = 1;
+    // repeated .au.com.codeka.common.protobuf.AllianceRequest requests = 1;
     /**
-     * <code>repeated .au.com.codeka.common.protobuf.AllianceJoinRequest join_requests = 1;</code>
+     * <code>repeated .au.com.codeka.common.protobuf.AllianceRequest requests = 1;</code>
      */
-    java.util.List<au.com.codeka.common.protobuf.Messages.AllianceJoinRequest> 
-        getJoinRequestsList();
+    java.util.List<au.com.codeka.common.protobuf.Messages.AllianceRequest> 
+        getRequestsList();
     /**
-     * <code>repeated .au.com.codeka.common.protobuf.AllianceJoinRequest join_requests = 1;</code>
+     * <code>repeated .au.com.codeka.common.protobuf.AllianceRequest requests = 1;</code>
      */
-    au.com.codeka.common.protobuf.Messages.AllianceJoinRequest getJoinRequests(int index);
+    au.com.codeka.common.protobuf.Messages.AllianceRequest getRequests(int index);
     /**
-     * <code>repeated .au.com.codeka.common.protobuf.AllianceJoinRequest join_requests = 1;</code>
+     * <code>repeated .au.com.codeka.common.protobuf.AllianceRequest requests = 1;</code>
      */
-    int getJoinRequestsCount();
+    int getRequestsCount();
     /**
-     * <code>repeated .au.com.codeka.common.protobuf.AllianceJoinRequest join_requests = 1;</code>
+     * <code>repeated .au.com.codeka.common.protobuf.AllianceRequest requests = 1;</code>
      */
-    java.util.List<? extends au.com.codeka.common.protobuf.Messages.AllianceJoinRequestOrBuilder> 
-        getJoinRequestsOrBuilderList();
+    java.util.List<? extends au.com.codeka.common.protobuf.Messages.AllianceRequestOrBuilder> 
+        getRequestsOrBuilderList();
     /**
-     * <code>repeated .au.com.codeka.common.protobuf.AllianceJoinRequest join_requests = 1;</code>
+     * <code>repeated .au.com.codeka.common.protobuf.AllianceRequest requests = 1;</code>
      */
-    au.com.codeka.common.protobuf.Messages.AllianceJoinRequestOrBuilder getJoinRequestsOrBuilder(
+    au.com.codeka.common.protobuf.Messages.AllianceRequestOrBuilder getRequestsOrBuilder(
         int index);
+
+    // optional string cursor = 2;
+    /**
+     * <code>optional string cursor = 2;</code>
+     */
+    boolean hasCursor();
+    /**
+     * <code>optional string cursor = 2;</code>
+     */
+    java.lang.String getCursor();
+    /**
+     * <code>optional string cursor = 2;</code>
+     */
+    com.google.protobuf.ByteString
+        getCursorBytes();
   }
   /**
-   * Protobuf type {@code au.com.codeka.common.protobuf.AllianceJoinRequests}
+   * Protobuf type {@code au.com.codeka.common.protobuf.AllianceRequests}
    */
-  public static final class AllianceJoinRequests extends
+  public static final class AllianceRequests extends
       com.google.protobuf.GeneratedMessage
-      implements AllianceJoinRequestsOrBuilder {
-    // Use AllianceJoinRequests.newBuilder() to construct.
-    private AllianceJoinRequests(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
+      implements AllianceRequestsOrBuilder {
+    // Use AllianceRequests.newBuilder() to construct.
+    private AllianceRequests(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
       super(builder);
       this.unknownFields = builder.getUnknownFields();
     }
-    private AllianceJoinRequests(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
+    private AllianceRequests(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
 
-    private static final AllianceJoinRequests defaultInstance;
-    public static AllianceJoinRequests getDefaultInstance() {
+    private static final AllianceRequests defaultInstance;
+    public static AllianceRequests getDefaultInstance() {
       return defaultInstance;
     }
 
-    public AllianceJoinRequests getDefaultInstanceForType() {
+    public AllianceRequests getDefaultInstanceForType() {
       return defaultInstance;
     }
 
@@ -71984,7 +72608,7 @@ public final class Messages {
         getUnknownFields() {
       return this.unknownFields;
     }
-    private AllianceJoinRequests(
+    private AllianceRequests(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
@@ -72009,10 +72633,15 @@ public final class Messages {
             }
             case 10: {
               if (!((mutable_bitField0_ & 0x00000001) == 0x00000001)) {
-                joinRequests_ = new java.util.ArrayList<au.com.codeka.common.protobuf.Messages.AllianceJoinRequest>();
+                requests_ = new java.util.ArrayList<au.com.codeka.common.protobuf.Messages.AllianceRequest>();
                 mutable_bitField0_ |= 0x00000001;
               }
-              joinRequests_.add(input.readMessage(au.com.codeka.common.protobuf.Messages.AllianceJoinRequest.PARSER, extensionRegistry));
+              requests_.add(input.readMessage(au.com.codeka.common.protobuf.Messages.AllianceRequest.PARSER, extensionRegistry));
+              break;
+            }
+            case 18: {
+              bitField0_ |= 0x00000001;
+              cursor_ = input.readBytes();
               break;
             }
           }
@@ -72024,7 +72653,7 @@ public final class Messages {
             e.getMessage()).setUnfinishedMessage(this);
       } finally {
         if (((mutable_bitField0_ & 0x00000001) == 0x00000001)) {
-          joinRequests_ = java.util.Collections.unmodifiableList(joinRequests_);
+          requests_ = java.util.Collections.unmodifiableList(requests_);
         }
         this.unknownFields = unknownFields.build();
         makeExtensionsImmutable();
@@ -72032,69 +72661,114 @@ public final class Messages {
     }
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
-      return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_AllianceJoinRequests_descriptor;
+      return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_AllianceRequests_descriptor;
     }
 
     protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
         internalGetFieldAccessorTable() {
-      return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_AllianceJoinRequests_fieldAccessorTable
+      return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_AllianceRequests_fieldAccessorTable
           .ensureFieldAccessorsInitialized(
-              au.com.codeka.common.protobuf.Messages.AllianceJoinRequests.class, au.com.codeka.common.protobuf.Messages.AllianceJoinRequests.Builder.class);
+              au.com.codeka.common.protobuf.Messages.AllianceRequests.class, au.com.codeka.common.protobuf.Messages.AllianceRequests.Builder.class);
     }
 
-    public static com.google.protobuf.Parser<AllianceJoinRequests> PARSER =
-        new com.google.protobuf.AbstractParser<AllianceJoinRequests>() {
-      public AllianceJoinRequests parsePartialFrom(
+    public static com.google.protobuf.Parser<AllianceRequests> PARSER =
+        new com.google.protobuf.AbstractParser<AllianceRequests>() {
+      public AllianceRequests parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
-        return new AllianceJoinRequests(input, extensionRegistry);
+        return new AllianceRequests(input, extensionRegistry);
       }
     };
 
     @java.lang.Override
-    public com.google.protobuf.Parser<AllianceJoinRequests> getParserForType() {
+    public com.google.protobuf.Parser<AllianceRequests> getParserForType() {
       return PARSER;
     }
 
-    // repeated .au.com.codeka.common.protobuf.AllianceJoinRequest join_requests = 1;
-    public static final int JOIN_REQUESTS_FIELD_NUMBER = 1;
-    private java.util.List<au.com.codeka.common.protobuf.Messages.AllianceJoinRequest> joinRequests_;
+    private int bitField0_;
+    // repeated .au.com.codeka.common.protobuf.AllianceRequest requests = 1;
+    public static final int REQUESTS_FIELD_NUMBER = 1;
+    private java.util.List<au.com.codeka.common.protobuf.Messages.AllianceRequest> requests_;
     /**
-     * <code>repeated .au.com.codeka.common.protobuf.AllianceJoinRequest join_requests = 1;</code>
+     * <code>repeated .au.com.codeka.common.protobuf.AllianceRequest requests = 1;</code>
      */
-    public java.util.List<au.com.codeka.common.protobuf.Messages.AllianceJoinRequest> getJoinRequestsList() {
-      return joinRequests_;
+    public java.util.List<au.com.codeka.common.protobuf.Messages.AllianceRequest> getRequestsList() {
+      return requests_;
     }
     /**
-     * <code>repeated .au.com.codeka.common.protobuf.AllianceJoinRequest join_requests = 1;</code>
+     * <code>repeated .au.com.codeka.common.protobuf.AllianceRequest requests = 1;</code>
      */
-    public java.util.List<? extends au.com.codeka.common.protobuf.Messages.AllianceJoinRequestOrBuilder> 
-        getJoinRequestsOrBuilderList() {
-      return joinRequests_;
+    public java.util.List<? extends au.com.codeka.common.protobuf.Messages.AllianceRequestOrBuilder> 
+        getRequestsOrBuilderList() {
+      return requests_;
     }
     /**
-     * <code>repeated .au.com.codeka.common.protobuf.AllianceJoinRequest join_requests = 1;</code>
+     * <code>repeated .au.com.codeka.common.protobuf.AllianceRequest requests = 1;</code>
      */
-    public int getJoinRequestsCount() {
-      return joinRequests_.size();
+    public int getRequestsCount() {
+      return requests_.size();
     }
     /**
-     * <code>repeated .au.com.codeka.common.protobuf.AllianceJoinRequest join_requests = 1;</code>
+     * <code>repeated .au.com.codeka.common.protobuf.AllianceRequest requests = 1;</code>
      */
-    public au.com.codeka.common.protobuf.Messages.AllianceJoinRequest getJoinRequests(int index) {
-      return joinRequests_.get(index);
+    public au.com.codeka.common.protobuf.Messages.AllianceRequest getRequests(int index) {
+      return requests_.get(index);
     }
     /**
-     * <code>repeated .au.com.codeka.common.protobuf.AllianceJoinRequest join_requests = 1;</code>
+     * <code>repeated .au.com.codeka.common.protobuf.AllianceRequest requests = 1;</code>
      */
-    public au.com.codeka.common.protobuf.Messages.AllianceJoinRequestOrBuilder getJoinRequestsOrBuilder(
+    public au.com.codeka.common.protobuf.Messages.AllianceRequestOrBuilder getRequestsOrBuilder(
         int index) {
-      return joinRequests_.get(index);
+      return requests_.get(index);
+    }
+
+    // optional string cursor = 2;
+    public static final int CURSOR_FIELD_NUMBER = 2;
+    private java.lang.Object cursor_;
+    /**
+     * <code>optional string cursor = 2;</code>
+     */
+    public boolean hasCursor() {
+      return ((bitField0_ & 0x00000001) == 0x00000001);
+    }
+    /**
+     * <code>optional string cursor = 2;</code>
+     */
+    public java.lang.String getCursor() {
+      java.lang.Object ref = cursor_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        if (bs.isValidUtf8()) {
+          cursor_ = s;
+        }
+        return s;
+      }
+    }
+    /**
+     * <code>optional string cursor = 2;</code>
+     */
+    public com.google.protobuf.ByteString
+        getCursorBytes() {
+      java.lang.Object ref = cursor_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        cursor_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
     }
 
     private void initFields() {
-      joinRequests_ = java.util.Collections.emptyList();
+      requests_ = java.util.Collections.emptyList();
+      cursor_ = "";
     }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
@@ -72108,8 +72782,11 @@ public final class Messages {
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       getSerializedSize();
-      for (int i = 0; i < joinRequests_.size(); i++) {
-        output.writeMessage(1, joinRequests_.get(i));
+      for (int i = 0; i < requests_.size(); i++) {
+        output.writeMessage(1, requests_.get(i));
+      }
+      if (((bitField0_ & 0x00000001) == 0x00000001)) {
+        output.writeBytes(2, getCursorBytes());
       }
       getUnknownFields().writeTo(output);
     }
@@ -72120,9 +72797,13 @@ public final class Messages {
       if (size != -1) return size;
 
       size = 0;
-      for (int i = 0; i < joinRequests_.size(); i++) {
+      for (int i = 0; i < requests_.size(); i++) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(1, joinRequests_.get(i));
+          .computeMessageSize(1, requests_.get(i));
+      }
+      if (((bitField0_ & 0x00000001) == 0x00000001)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBytesSize(2, getCursorBytes());
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
@@ -72136,53 +72817,53 @@ public final class Messages {
       return super.writeReplace();
     }
 
-    public static au.com.codeka.common.protobuf.Messages.AllianceJoinRequests parseFrom(
+    public static au.com.codeka.common.protobuf.Messages.AllianceRequests parseFrom(
         com.google.protobuf.ByteString data)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data);
     }
-    public static au.com.codeka.common.protobuf.Messages.AllianceJoinRequests parseFrom(
+    public static au.com.codeka.common.protobuf.Messages.AllianceRequests parseFrom(
         com.google.protobuf.ByteString data,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data, extensionRegistry);
     }
-    public static au.com.codeka.common.protobuf.Messages.AllianceJoinRequests parseFrom(byte[] data)
+    public static au.com.codeka.common.protobuf.Messages.AllianceRequests parseFrom(byte[] data)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data);
     }
-    public static au.com.codeka.common.protobuf.Messages.AllianceJoinRequests parseFrom(
+    public static au.com.codeka.common.protobuf.Messages.AllianceRequests parseFrom(
         byte[] data,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data, extensionRegistry);
     }
-    public static au.com.codeka.common.protobuf.Messages.AllianceJoinRequests parseFrom(java.io.InputStream input)
+    public static au.com.codeka.common.protobuf.Messages.AllianceRequests parseFrom(java.io.InputStream input)
         throws java.io.IOException {
       return PARSER.parseFrom(input);
     }
-    public static au.com.codeka.common.protobuf.Messages.AllianceJoinRequests parseFrom(
+    public static au.com.codeka.common.protobuf.Messages.AllianceRequests parseFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
       return PARSER.parseFrom(input, extensionRegistry);
     }
-    public static au.com.codeka.common.protobuf.Messages.AllianceJoinRequests parseDelimitedFrom(java.io.InputStream input)
+    public static au.com.codeka.common.protobuf.Messages.AllianceRequests parseDelimitedFrom(java.io.InputStream input)
         throws java.io.IOException {
       return PARSER.parseDelimitedFrom(input);
     }
-    public static au.com.codeka.common.protobuf.Messages.AllianceJoinRequests parseDelimitedFrom(
+    public static au.com.codeka.common.protobuf.Messages.AllianceRequests parseDelimitedFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
       return PARSER.parseDelimitedFrom(input, extensionRegistry);
     }
-    public static au.com.codeka.common.protobuf.Messages.AllianceJoinRequests parseFrom(
+    public static au.com.codeka.common.protobuf.Messages.AllianceRequests parseFrom(
         com.google.protobuf.CodedInputStream input)
         throws java.io.IOException {
       return PARSER.parseFrom(input);
     }
-    public static au.com.codeka.common.protobuf.Messages.AllianceJoinRequests parseFrom(
+    public static au.com.codeka.common.protobuf.Messages.AllianceRequests parseFrom(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
@@ -72191,7 +72872,7 @@ public final class Messages {
 
     public static Builder newBuilder() { return Builder.create(); }
     public Builder newBuilderForType() { return newBuilder(); }
-    public static Builder newBuilder(au.com.codeka.common.protobuf.Messages.AllianceJoinRequests prototype) {
+    public static Builder newBuilder(au.com.codeka.common.protobuf.Messages.AllianceRequests prototype) {
       return newBuilder().mergeFrom(prototype);
     }
     public Builder toBuilder() { return newBuilder(this); }
@@ -72203,24 +72884,24 @@ public final class Messages {
       return builder;
     }
     /**
-     * Protobuf type {@code au.com.codeka.common.protobuf.AllianceJoinRequests}
+     * Protobuf type {@code au.com.codeka.common.protobuf.AllianceRequests}
      */
     public static final class Builder extends
         com.google.protobuf.GeneratedMessage.Builder<Builder>
-       implements au.com.codeka.common.protobuf.Messages.AllianceJoinRequestsOrBuilder {
+       implements au.com.codeka.common.protobuf.Messages.AllianceRequestsOrBuilder {
       public static final com.google.protobuf.Descriptors.Descriptor
           getDescriptor() {
-        return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_AllianceJoinRequests_descriptor;
+        return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_AllianceRequests_descriptor;
       }
 
       protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
           internalGetFieldAccessorTable() {
-        return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_AllianceJoinRequests_fieldAccessorTable
+        return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_AllianceRequests_fieldAccessorTable
             .ensureFieldAccessorsInitialized(
-                au.com.codeka.common.protobuf.Messages.AllianceJoinRequests.class, au.com.codeka.common.protobuf.Messages.AllianceJoinRequests.Builder.class);
+                au.com.codeka.common.protobuf.Messages.AllianceRequests.class, au.com.codeka.common.protobuf.Messages.AllianceRequests.Builder.class);
       }
 
-      // Construct using au.com.codeka.common.protobuf.Messages.AllianceJoinRequests.newBuilder()
+      // Construct using au.com.codeka.common.protobuf.Messages.AllianceRequests.newBuilder()
       private Builder() {
         maybeForceBuilderInitialization();
       }
@@ -72232,7 +72913,7 @@ public final class Messages {
       }
       private void maybeForceBuilderInitialization() {
         if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
-          getJoinRequestsFieldBuilder();
+          getRequestsFieldBuilder();
         }
       }
       private static Builder create() {
@@ -72241,12 +72922,14 @@ public final class Messages {
 
       public Builder clear() {
         super.clear();
-        if (joinRequestsBuilder_ == null) {
-          joinRequests_ = java.util.Collections.emptyList();
+        if (requestsBuilder_ == null) {
+          requests_ = java.util.Collections.emptyList();
           bitField0_ = (bitField0_ & ~0x00000001);
         } else {
-          joinRequestsBuilder_.clear();
+          requestsBuilder_.clear();
         }
+        cursor_ = "";
+        bitField0_ = (bitField0_ & ~0x00000002);
         return this;
       }
 
@@ -72256,73 +72939,84 @@ public final class Messages {
 
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
-        return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_AllianceJoinRequests_descriptor;
+        return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_AllianceRequests_descriptor;
       }
 
-      public au.com.codeka.common.protobuf.Messages.AllianceJoinRequests getDefaultInstanceForType() {
-        return au.com.codeka.common.protobuf.Messages.AllianceJoinRequests.getDefaultInstance();
+      public au.com.codeka.common.protobuf.Messages.AllianceRequests getDefaultInstanceForType() {
+        return au.com.codeka.common.protobuf.Messages.AllianceRequests.getDefaultInstance();
       }
 
-      public au.com.codeka.common.protobuf.Messages.AllianceJoinRequests build() {
-        au.com.codeka.common.protobuf.Messages.AllianceJoinRequests result = buildPartial();
+      public au.com.codeka.common.protobuf.Messages.AllianceRequests build() {
+        au.com.codeka.common.protobuf.Messages.AllianceRequests result = buildPartial();
         if (!result.isInitialized()) {
           throw newUninitializedMessageException(result);
         }
         return result;
       }
 
-      public au.com.codeka.common.protobuf.Messages.AllianceJoinRequests buildPartial() {
-        au.com.codeka.common.protobuf.Messages.AllianceJoinRequests result = new au.com.codeka.common.protobuf.Messages.AllianceJoinRequests(this);
+      public au.com.codeka.common.protobuf.Messages.AllianceRequests buildPartial() {
+        au.com.codeka.common.protobuf.Messages.AllianceRequests result = new au.com.codeka.common.protobuf.Messages.AllianceRequests(this);
         int from_bitField0_ = bitField0_;
-        if (joinRequestsBuilder_ == null) {
+        int to_bitField0_ = 0;
+        if (requestsBuilder_ == null) {
           if (((bitField0_ & 0x00000001) == 0x00000001)) {
-            joinRequests_ = java.util.Collections.unmodifiableList(joinRequests_);
+            requests_ = java.util.Collections.unmodifiableList(requests_);
             bitField0_ = (bitField0_ & ~0x00000001);
           }
-          result.joinRequests_ = joinRequests_;
+          result.requests_ = requests_;
         } else {
-          result.joinRequests_ = joinRequestsBuilder_.build();
+          result.requests_ = requestsBuilder_.build();
         }
+        if (((from_bitField0_ & 0x00000002) == 0x00000002)) {
+          to_bitField0_ |= 0x00000001;
+        }
+        result.cursor_ = cursor_;
+        result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
       }
 
       public Builder mergeFrom(com.google.protobuf.Message other) {
-        if (other instanceof au.com.codeka.common.protobuf.Messages.AllianceJoinRequests) {
-          return mergeFrom((au.com.codeka.common.protobuf.Messages.AllianceJoinRequests)other);
+        if (other instanceof au.com.codeka.common.protobuf.Messages.AllianceRequests) {
+          return mergeFrom((au.com.codeka.common.protobuf.Messages.AllianceRequests)other);
         } else {
           super.mergeFrom(other);
           return this;
         }
       }
 
-      public Builder mergeFrom(au.com.codeka.common.protobuf.Messages.AllianceJoinRequests other) {
-        if (other == au.com.codeka.common.protobuf.Messages.AllianceJoinRequests.getDefaultInstance()) return this;
-        if (joinRequestsBuilder_ == null) {
-          if (!other.joinRequests_.isEmpty()) {
-            if (joinRequests_.isEmpty()) {
-              joinRequests_ = other.joinRequests_;
+      public Builder mergeFrom(au.com.codeka.common.protobuf.Messages.AllianceRequests other) {
+        if (other == au.com.codeka.common.protobuf.Messages.AllianceRequests.getDefaultInstance()) return this;
+        if (requestsBuilder_ == null) {
+          if (!other.requests_.isEmpty()) {
+            if (requests_.isEmpty()) {
+              requests_ = other.requests_;
               bitField0_ = (bitField0_ & ~0x00000001);
             } else {
-              ensureJoinRequestsIsMutable();
-              joinRequests_.addAll(other.joinRequests_);
+              ensureRequestsIsMutable();
+              requests_.addAll(other.requests_);
             }
             onChanged();
           }
         } else {
-          if (!other.joinRequests_.isEmpty()) {
-            if (joinRequestsBuilder_.isEmpty()) {
-              joinRequestsBuilder_.dispose();
-              joinRequestsBuilder_ = null;
-              joinRequests_ = other.joinRequests_;
+          if (!other.requests_.isEmpty()) {
+            if (requestsBuilder_.isEmpty()) {
+              requestsBuilder_.dispose();
+              requestsBuilder_ = null;
+              requests_ = other.requests_;
               bitField0_ = (bitField0_ & ~0x00000001);
-              joinRequestsBuilder_ = 
+              requestsBuilder_ = 
                 com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders ?
-                   getJoinRequestsFieldBuilder() : null;
+                   getRequestsFieldBuilder() : null;
             } else {
-              joinRequestsBuilder_.addAllMessages(other.joinRequests_);
+              requestsBuilder_.addAllMessages(other.requests_);
             }
           }
+        }
+        if (other.hasCursor()) {
+          bitField0_ |= 0x00000002;
+          cursor_ = other.cursor_;
+          onChanged();
         }
         this.mergeUnknownFields(other.getUnknownFields());
         return this;
@@ -72336,11 +73030,11 @@ public final class Messages {
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws java.io.IOException {
-        au.com.codeka.common.protobuf.Messages.AllianceJoinRequests parsedMessage = null;
+        au.com.codeka.common.protobuf.Messages.AllianceRequests parsedMessage = null;
         try {
           parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
         } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-          parsedMessage = (au.com.codeka.common.protobuf.Messages.AllianceJoinRequests) e.getUnfinishedMessage();
+          parsedMessage = (au.com.codeka.common.protobuf.Messages.AllianceRequests) e.getUnfinishedMessage();
           throw e;
         } finally {
           if (parsedMessage != null) {
@@ -72351,314 +73045,413 @@ public final class Messages {
       }
       private int bitField0_;
 
-      // repeated .au.com.codeka.common.protobuf.AllianceJoinRequest join_requests = 1;
-      private java.util.List<au.com.codeka.common.protobuf.Messages.AllianceJoinRequest> joinRequests_ =
+      // repeated .au.com.codeka.common.protobuf.AllianceRequest requests = 1;
+      private java.util.List<au.com.codeka.common.protobuf.Messages.AllianceRequest> requests_ =
         java.util.Collections.emptyList();
-      private void ensureJoinRequestsIsMutable() {
+      private void ensureRequestsIsMutable() {
         if (!((bitField0_ & 0x00000001) == 0x00000001)) {
-          joinRequests_ = new java.util.ArrayList<au.com.codeka.common.protobuf.Messages.AllianceJoinRequest>(joinRequests_);
+          requests_ = new java.util.ArrayList<au.com.codeka.common.protobuf.Messages.AllianceRequest>(requests_);
           bitField0_ |= 0x00000001;
          }
       }
 
       private com.google.protobuf.RepeatedFieldBuilder<
-          au.com.codeka.common.protobuf.Messages.AllianceJoinRequest, au.com.codeka.common.protobuf.Messages.AllianceJoinRequest.Builder, au.com.codeka.common.protobuf.Messages.AllianceJoinRequestOrBuilder> joinRequestsBuilder_;
+          au.com.codeka.common.protobuf.Messages.AllianceRequest, au.com.codeka.common.protobuf.Messages.AllianceRequest.Builder, au.com.codeka.common.protobuf.Messages.AllianceRequestOrBuilder> requestsBuilder_;
 
       /**
-       * <code>repeated .au.com.codeka.common.protobuf.AllianceJoinRequest join_requests = 1;</code>
+       * <code>repeated .au.com.codeka.common.protobuf.AllianceRequest requests = 1;</code>
        */
-      public java.util.List<au.com.codeka.common.protobuf.Messages.AllianceJoinRequest> getJoinRequestsList() {
-        if (joinRequestsBuilder_ == null) {
-          return java.util.Collections.unmodifiableList(joinRequests_);
+      public java.util.List<au.com.codeka.common.protobuf.Messages.AllianceRequest> getRequestsList() {
+        if (requestsBuilder_ == null) {
+          return java.util.Collections.unmodifiableList(requests_);
         } else {
-          return joinRequestsBuilder_.getMessageList();
+          return requestsBuilder_.getMessageList();
         }
       }
       /**
-       * <code>repeated .au.com.codeka.common.protobuf.AllianceJoinRequest join_requests = 1;</code>
+       * <code>repeated .au.com.codeka.common.protobuf.AllianceRequest requests = 1;</code>
        */
-      public int getJoinRequestsCount() {
-        if (joinRequestsBuilder_ == null) {
-          return joinRequests_.size();
+      public int getRequestsCount() {
+        if (requestsBuilder_ == null) {
+          return requests_.size();
         } else {
-          return joinRequestsBuilder_.getCount();
+          return requestsBuilder_.getCount();
         }
       }
       /**
-       * <code>repeated .au.com.codeka.common.protobuf.AllianceJoinRequest join_requests = 1;</code>
+       * <code>repeated .au.com.codeka.common.protobuf.AllianceRequest requests = 1;</code>
        */
-      public au.com.codeka.common.protobuf.Messages.AllianceJoinRequest getJoinRequests(int index) {
-        if (joinRequestsBuilder_ == null) {
-          return joinRequests_.get(index);
+      public au.com.codeka.common.protobuf.Messages.AllianceRequest getRequests(int index) {
+        if (requestsBuilder_ == null) {
+          return requests_.get(index);
         } else {
-          return joinRequestsBuilder_.getMessage(index);
+          return requestsBuilder_.getMessage(index);
         }
       }
       /**
-       * <code>repeated .au.com.codeka.common.protobuf.AllianceJoinRequest join_requests = 1;</code>
+       * <code>repeated .au.com.codeka.common.protobuf.AllianceRequest requests = 1;</code>
        */
-      public Builder setJoinRequests(
-          int index, au.com.codeka.common.protobuf.Messages.AllianceJoinRequest value) {
-        if (joinRequestsBuilder_ == null) {
+      public Builder setRequests(
+          int index, au.com.codeka.common.protobuf.Messages.AllianceRequest value) {
+        if (requestsBuilder_ == null) {
           if (value == null) {
             throw new NullPointerException();
           }
-          ensureJoinRequestsIsMutable();
-          joinRequests_.set(index, value);
+          ensureRequestsIsMutable();
+          requests_.set(index, value);
           onChanged();
         } else {
-          joinRequestsBuilder_.setMessage(index, value);
+          requestsBuilder_.setMessage(index, value);
         }
         return this;
       }
       /**
-       * <code>repeated .au.com.codeka.common.protobuf.AllianceJoinRequest join_requests = 1;</code>
+       * <code>repeated .au.com.codeka.common.protobuf.AllianceRequest requests = 1;</code>
        */
-      public Builder setJoinRequests(
-          int index, au.com.codeka.common.protobuf.Messages.AllianceJoinRequest.Builder builderForValue) {
-        if (joinRequestsBuilder_ == null) {
-          ensureJoinRequestsIsMutable();
-          joinRequests_.set(index, builderForValue.build());
+      public Builder setRequests(
+          int index, au.com.codeka.common.protobuf.Messages.AllianceRequest.Builder builderForValue) {
+        if (requestsBuilder_ == null) {
+          ensureRequestsIsMutable();
+          requests_.set(index, builderForValue.build());
           onChanged();
         } else {
-          joinRequestsBuilder_.setMessage(index, builderForValue.build());
+          requestsBuilder_.setMessage(index, builderForValue.build());
         }
         return this;
       }
       /**
-       * <code>repeated .au.com.codeka.common.protobuf.AllianceJoinRequest join_requests = 1;</code>
+       * <code>repeated .au.com.codeka.common.protobuf.AllianceRequest requests = 1;</code>
        */
-      public Builder addJoinRequests(au.com.codeka.common.protobuf.Messages.AllianceJoinRequest value) {
-        if (joinRequestsBuilder_ == null) {
+      public Builder addRequests(au.com.codeka.common.protobuf.Messages.AllianceRequest value) {
+        if (requestsBuilder_ == null) {
           if (value == null) {
             throw new NullPointerException();
           }
-          ensureJoinRequestsIsMutable();
-          joinRequests_.add(value);
+          ensureRequestsIsMutable();
+          requests_.add(value);
           onChanged();
         } else {
-          joinRequestsBuilder_.addMessage(value);
+          requestsBuilder_.addMessage(value);
         }
         return this;
       }
       /**
-       * <code>repeated .au.com.codeka.common.protobuf.AllianceJoinRequest join_requests = 1;</code>
+       * <code>repeated .au.com.codeka.common.protobuf.AllianceRequest requests = 1;</code>
        */
-      public Builder addJoinRequests(
-          int index, au.com.codeka.common.protobuf.Messages.AllianceJoinRequest value) {
-        if (joinRequestsBuilder_ == null) {
+      public Builder addRequests(
+          int index, au.com.codeka.common.protobuf.Messages.AllianceRequest value) {
+        if (requestsBuilder_ == null) {
           if (value == null) {
             throw new NullPointerException();
           }
-          ensureJoinRequestsIsMutable();
-          joinRequests_.add(index, value);
+          ensureRequestsIsMutable();
+          requests_.add(index, value);
           onChanged();
         } else {
-          joinRequestsBuilder_.addMessage(index, value);
+          requestsBuilder_.addMessage(index, value);
         }
         return this;
       }
       /**
-       * <code>repeated .au.com.codeka.common.protobuf.AllianceJoinRequest join_requests = 1;</code>
+       * <code>repeated .au.com.codeka.common.protobuf.AllianceRequest requests = 1;</code>
        */
-      public Builder addJoinRequests(
-          au.com.codeka.common.protobuf.Messages.AllianceJoinRequest.Builder builderForValue) {
-        if (joinRequestsBuilder_ == null) {
-          ensureJoinRequestsIsMutable();
-          joinRequests_.add(builderForValue.build());
+      public Builder addRequests(
+          au.com.codeka.common.protobuf.Messages.AllianceRequest.Builder builderForValue) {
+        if (requestsBuilder_ == null) {
+          ensureRequestsIsMutable();
+          requests_.add(builderForValue.build());
           onChanged();
         } else {
-          joinRequestsBuilder_.addMessage(builderForValue.build());
+          requestsBuilder_.addMessage(builderForValue.build());
         }
         return this;
       }
       /**
-       * <code>repeated .au.com.codeka.common.protobuf.AllianceJoinRequest join_requests = 1;</code>
+       * <code>repeated .au.com.codeka.common.protobuf.AllianceRequest requests = 1;</code>
        */
-      public Builder addJoinRequests(
-          int index, au.com.codeka.common.protobuf.Messages.AllianceJoinRequest.Builder builderForValue) {
-        if (joinRequestsBuilder_ == null) {
-          ensureJoinRequestsIsMutable();
-          joinRequests_.add(index, builderForValue.build());
+      public Builder addRequests(
+          int index, au.com.codeka.common.protobuf.Messages.AllianceRequest.Builder builderForValue) {
+        if (requestsBuilder_ == null) {
+          ensureRequestsIsMutable();
+          requests_.add(index, builderForValue.build());
           onChanged();
         } else {
-          joinRequestsBuilder_.addMessage(index, builderForValue.build());
+          requestsBuilder_.addMessage(index, builderForValue.build());
         }
         return this;
       }
       /**
-       * <code>repeated .au.com.codeka.common.protobuf.AllianceJoinRequest join_requests = 1;</code>
+       * <code>repeated .au.com.codeka.common.protobuf.AllianceRequest requests = 1;</code>
        */
-      public Builder addAllJoinRequests(
-          java.lang.Iterable<? extends au.com.codeka.common.protobuf.Messages.AllianceJoinRequest> values) {
-        if (joinRequestsBuilder_ == null) {
-          ensureJoinRequestsIsMutable();
-          super.addAll(values, joinRequests_);
+      public Builder addAllRequests(
+          java.lang.Iterable<? extends au.com.codeka.common.protobuf.Messages.AllianceRequest> values) {
+        if (requestsBuilder_ == null) {
+          ensureRequestsIsMutable();
+          super.addAll(values, requests_);
           onChanged();
         } else {
-          joinRequestsBuilder_.addAllMessages(values);
+          requestsBuilder_.addAllMessages(values);
         }
         return this;
       }
       /**
-       * <code>repeated .au.com.codeka.common.protobuf.AllianceJoinRequest join_requests = 1;</code>
+       * <code>repeated .au.com.codeka.common.protobuf.AllianceRequest requests = 1;</code>
        */
-      public Builder clearJoinRequests() {
-        if (joinRequestsBuilder_ == null) {
-          joinRequests_ = java.util.Collections.emptyList();
+      public Builder clearRequests() {
+        if (requestsBuilder_ == null) {
+          requests_ = java.util.Collections.emptyList();
           bitField0_ = (bitField0_ & ~0x00000001);
           onChanged();
         } else {
-          joinRequestsBuilder_.clear();
+          requestsBuilder_.clear();
         }
         return this;
       }
       /**
-       * <code>repeated .au.com.codeka.common.protobuf.AllianceJoinRequest join_requests = 1;</code>
+       * <code>repeated .au.com.codeka.common.protobuf.AllianceRequest requests = 1;</code>
        */
-      public Builder removeJoinRequests(int index) {
-        if (joinRequestsBuilder_ == null) {
-          ensureJoinRequestsIsMutable();
-          joinRequests_.remove(index);
+      public Builder removeRequests(int index) {
+        if (requestsBuilder_ == null) {
+          ensureRequestsIsMutable();
+          requests_.remove(index);
           onChanged();
         } else {
-          joinRequestsBuilder_.remove(index);
+          requestsBuilder_.remove(index);
         }
         return this;
       }
       /**
-       * <code>repeated .au.com.codeka.common.protobuf.AllianceJoinRequest join_requests = 1;</code>
+       * <code>repeated .au.com.codeka.common.protobuf.AllianceRequest requests = 1;</code>
        */
-      public au.com.codeka.common.protobuf.Messages.AllianceJoinRequest.Builder getJoinRequestsBuilder(
+      public au.com.codeka.common.protobuf.Messages.AllianceRequest.Builder getRequestsBuilder(
           int index) {
-        return getJoinRequestsFieldBuilder().getBuilder(index);
+        return getRequestsFieldBuilder().getBuilder(index);
       }
       /**
-       * <code>repeated .au.com.codeka.common.protobuf.AllianceJoinRequest join_requests = 1;</code>
+       * <code>repeated .au.com.codeka.common.protobuf.AllianceRequest requests = 1;</code>
        */
-      public au.com.codeka.common.protobuf.Messages.AllianceJoinRequestOrBuilder getJoinRequestsOrBuilder(
+      public au.com.codeka.common.protobuf.Messages.AllianceRequestOrBuilder getRequestsOrBuilder(
           int index) {
-        if (joinRequestsBuilder_ == null) {
-          return joinRequests_.get(index);  } else {
-          return joinRequestsBuilder_.getMessageOrBuilder(index);
+        if (requestsBuilder_ == null) {
+          return requests_.get(index);  } else {
+          return requestsBuilder_.getMessageOrBuilder(index);
         }
       }
       /**
-       * <code>repeated .au.com.codeka.common.protobuf.AllianceJoinRequest join_requests = 1;</code>
+       * <code>repeated .au.com.codeka.common.protobuf.AllianceRequest requests = 1;</code>
        */
-      public java.util.List<? extends au.com.codeka.common.protobuf.Messages.AllianceJoinRequestOrBuilder> 
-           getJoinRequestsOrBuilderList() {
-        if (joinRequestsBuilder_ != null) {
-          return joinRequestsBuilder_.getMessageOrBuilderList();
+      public java.util.List<? extends au.com.codeka.common.protobuf.Messages.AllianceRequestOrBuilder> 
+           getRequestsOrBuilderList() {
+        if (requestsBuilder_ != null) {
+          return requestsBuilder_.getMessageOrBuilderList();
         } else {
-          return java.util.Collections.unmodifiableList(joinRequests_);
+          return java.util.Collections.unmodifiableList(requests_);
         }
       }
       /**
-       * <code>repeated .au.com.codeka.common.protobuf.AllianceJoinRequest join_requests = 1;</code>
+       * <code>repeated .au.com.codeka.common.protobuf.AllianceRequest requests = 1;</code>
        */
-      public au.com.codeka.common.protobuf.Messages.AllianceJoinRequest.Builder addJoinRequestsBuilder() {
-        return getJoinRequestsFieldBuilder().addBuilder(
-            au.com.codeka.common.protobuf.Messages.AllianceJoinRequest.getDefaultInstance());
+      public au.com.codeka.common.protobuf.Messages.AllianceRequest.Builder addRequestsBuilder() {
+        return getRequestsFieldBuilder().addBuilder(
+            au.com.codeka.common.protobuf.Messages.AllianceRequest.getDefaultInstance());
       }
       /**
-       * <code>repeated .au.com.codeka.common.protobuf.AllianceJoinRequest join_requests = 1;</code>
+       * <code>repeated .au.com.codeka.common.protobuf.AllianceRequest requests = 1;</code>
        */
-      public au.com.codeka.common.protobuf.Messages.AllianceJoinRequest.Builder addJoinRequestsBuilder(
+      public au.com.codeka.common.protobuf.Messages.AllianceRequest.Builder addRequestsBuilder(
           int index) {
-        return getJoinRequestsFieldBuilder().addBuilder(
-            index, au.com.codeka.common.protobuf.Messages.AllianceJoinRequest.getDefaultInstance());
+        return getRequestsFieldBuilder().addBuilder(
+            index, au.com.codeka.common.protobuf.Messages.AllianceRequest.getDefaultInstance());
       }
       /**
-       * <code>repeated .au.com.codeka.common.protobuf.AllianceJoinRequest join_requests = 1;</code>
+       * <code>repeated .au.com.codeka.common.protobuf.AllianceRequest requests = 1;</code>
        */
-      public java.util.List<au.com.codeka.common.protobuf.Messages.AllianceJoinRequest.Builder> 
-           getJoinRequestsBuilderList() {
-        return getJoinRequestsFieldBuilder().getBuilderList();
+      public java.util.List<au.com.codeka.common.protobuf.Messages.AllianceRequest.Builder> 
+           getRequestsBuilderList() {
+        return getRequestsFieldBuilder().getBuilderList();
       }
       private com.google.protobuf.RepeatedFieldBuilder<
-          au.com.codeka.common.protobuf.Messages.AllianceJoinRequest, au.com.codeka.common.protobuf.Messages.AllianceJoinRequest.Builder, au.com.codeka.common.protobuf.Messages.AllianceJoinRequestOrBuilder> 
-          getJoinRequestsFieldBuilder() {
-        if (joinRequestsBuilder_ == null) {
-          joinRequestsBuilder_ = new com.google.protobuf.RepeatedFieldBuilder<
-              au.com.codeka.common.protobuf.Messages.AllianceJoinRequest, au.com.codeka.common.protobuf.Messages.AllianceJoinRequest.Builder, au.com.codeka.common.protobuf.Messages.AllianceJoinRequestOrBuilder>(
-                  joinRequests_,
+          au.com.codeka.common.protobuf.Messages.AllianceRequest, au.com.codeka.common.protobuf.Messages.AllianceRequest.Builder, au.com.codeka.common.protobuf.Messages.AllianceRequestOrBuilder> 
+          getRequestsFieldBuilder() {
+        if (requestsBuilder_ == null) {
+          requestsBuilder_ = new com.google.protobuf.RepeatedFieldBuilder<
+              au.com.codeka.common.protobuf.Messages.AllianceRequest, au.com.codeka.common.protobuf.Messages.AllianceRequest.Builder, au.com.codeka.common.protobuf.Messages.AllianceRequestOrBuilder>(
+                  requests_,
                   ((bitField0_ & 0x00000001) == 0x00000001),
                   getParentForChildren(),
                   isClean());
-          joinRequests_ = null;
+          requests_ = null;
         }
-        return joinRequestsBuilder_;
+        return requestsBuilder_;
       }
 
-      // @@protoc_insertion_point(builder_scope:au.com.codeka.common.protobuf.AllianceJoinRequests)
+      // optional string cursor = 2;
+      private java.lang.Object cursor_ = "";
+      /**
+       * <code>optional string cursor = 2;</code>
+       */
+      public boolean hasCursor() {
+        return ((bitField0_ & 0x00000002) == 0x00000002);
+      }
+      /**
+       * <code>optional string cursor = 2;</code>
+       */
+      public java.lang.String getCursor() {
+        java.lang.Object ref = cursor_;
+        if (!(ref instanceof java.lang.String)) {
+          java.lang.String s = ((com.google.protobuf.ByteString) ref)
+              .toStringUtf8();
+          cursor_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>optional string cursor = 2;</code>
+       */
+      public com.google.protobuf.ByteString
+          getCursorBytes() {
+        java.lang.Object ref = cursor_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          cursor_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>optional string cursor = 2;</code>
+       */
+      public Builder setCursor(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000002;
+        cursor_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional string cursor = 2;</code>
+       */
+      public Builder clearCursor() {
+        bitField0_ = (bitField0_ & ~0x00000002);
+        cursor_ = getDefaultInstance().getCursor();
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional string cursor = 2;</code>
+       */
+      public Builder setCursorBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000002;
+        cursor_ = value;
+        onChanged();
+        return this;
+      }
+
+      // @@protoc_insertion_point(builder_scope:au.com.codeka.common.protobuf.AllianceRequests)
     }
 
     static {
-      defaultInstance = new AllianceJoinRequests(true);
+      defaultInstance = new AllianceRequests(true);
       defaultInstance.initFields();
     }
 
-    // @@protoc_insertion_point(class_scope:au.com.codeka.common.protobuf.AllianceJoinRequests)
+    // @@protoc_insertion_point(class_scope:au.com.codeka.common.protobuf.AllianceRequests)
   }
 
-  public interface AllianceLeaveRequestOrBuilder
+  public interface AllianceRequestVoteOrBuilder
       extends com.google.protobuf.MessageOrBuilder {
 
-    // optional string alliance_key = 1;
+    // optional int32 id = 1;
     /**
-     * <code>optional string alliance_key = 1;</code>
+     * <code>optional int32 id = 1;</code>
      */
-    boolean hasAllianceKey();
+    boolean hasId();
     /**
-     * <code>optional string alliance_key = 1;</code>
+     * <code>optional int32 id = 1;</code>
      */
-    java.lang.String getAllianceKey();
-    /**
-     * <code>optional string alliance_key = 1;</code>
-     */
-    com.google.protobuf.ByteString
-        getAllianceKeyBytes();
+    int getId();
 
-    // optional string empire_key = 2;
+    // optional int32 alliance_id = 2;
     /**
-     * <code>optional string empire_key = 2;</code>
+     * <code>optional int32 alliance_id = 2;</code>
      */
-    boolean hasEmpireKey();
+    boolean hasAllianceId();
     /**
-     * <code>optional string empire_key = 2;</code>
+     * <code>optional int32 alliance_id = 2;</code>
      */
-    java.lang.String getEmpireKey();
+    int getAllianceId();
+
+    // optional int32 alliance_request_id = 3;
     /**
-     * <code>optional string empire_key = 2;</code>
+     * <code>optional int32 alliance_request_id = 3;</code>
      */
-    com.google.protobuf.ByteString
-        getEmpireKeyBytes();
+    boolean hasAllianceRequestId();
+    /**
+     * <code>optional int32 alliance_request_id = 3;</code>
+     */
+    int getAllianceRequestId();
+
+    // optional int32 empire_id = 4;
+    /**
+     * <code>optional int32 empire_id = 4;</code>
+     */
+    boolean hasEmpireId();
+    /**
+     * <code>optional int32 empire_id = 4;</code>
+     */
+    int getEmpireId();
+
+    // optional int32 votes = 5;
+    /**
+     * <code>optional int32 votes = 5;</code>
+     */
+    boolean hasVotes();
+    /**
+     * <code>optional int32 votes = 5;</code>
+     */
+    int getVotes();
+
+    // optional int64 date = 6;
+    /**
+     * <code>optional int64 date = 6;</code>
+     */
+    boolean hasDate();
+    /**
+     * <code>optional int64 date = 6;</code>
+     */
+    long getDate();
   }
   /**
-   * Protobuf type {@code au.com.codeka.common.protobuf.AllianceLeaveRequest}
-   *
-   * <pre>
-   *
-   * A request to leave an alliance.
-   * </pre>
+   * Protobuf type {@code au.com.codeka.common.protobuf.AllianceRequestVote}
    */
-  public static final class AllianceLeaveRequest extends
+  public static final class AllianceRequestVote extends
       com.google.protobuf.GeneratedMessage
-      implements AllianceLeaveRequestOrBuilder {
-    // Use AllianceLeaveRequest.newBuilder() to construct.
-    private AllianceLeaveRequest(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
+      implements AllianceRequestVoteOrBuilder {
+    // Use AllianceRequestVote.newBuilder() to construct.
+    private AllianceRequestVote(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
       super(builder);
       this.unknownFields = builder.getUnknownFields();
     }
-    private AllianceLeaveRequest(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
+    private AllianceRequestVote(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
 
-    private static final AllianceLeaveRequest defaultInstance;
-    public static AllianceLeaveRequest getDefaultInstance() {
+    private static final AllianceRequestVote defaultInstance;
+    public static AllianceRequestVote getDefaultInstance() {
       return defaultInstance;
     }
 
-    public AllianceLeaveRequest getDefaultInstanceForType() {
+    public AllianceRequestVote getDefaultInstanceForType() {
       return defaultInstance;
     }
 
@@ -72668,7 +73461,7 @@ public final class Messages {
         getUnknownFields() {
       return this.unknownFields;
     }
-    private AllianceLeaveRequest(
+    private AllianceRequestVote(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
@@ -72691,14 +73484,34 @@ public final class Messages {
               }
               break;
             }
-            case 10: {
+            case 8: {
               bitField0_ |= 0x00000001;
-              allianceKey_ = input.readBytes();
+              id_ = input.readInt32();
               break;
             }
-            case 18: {
+            case 16: {
               bitField0_ |= 0x00000002;
-              empireKey_ = input.readBytes();
+              allianceId_ = input.readInt32();
+              break;
+            }
+            case 24: {
+              bitField0_ |= 0x00000004;
+              allianceRequestId_ = input.readInt32();
+              break;
+            }
+            case 32: {
+              bitField0_ |= 0x00000008;
+              empireId_ = input.readInt32();
+              break;
+            }
+            case 40: {
+              bitField0_ |= 0x00000010;
+              votes_ = input.readInt32();
+              break;
+            }
+            case 48: {
+              bitField0_ |= 0x00000020;
+              date_ = input.readInt64();
               break;
             }
           }
@@ -72715,121 +73528,135 @@ public final class Messages {
     }
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
-      return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_AllianceLeaveRequest_descriptor;
+      return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_AllianceRequestVote_descriptor;
     }
 
     protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
         internalGetFieldAccessorTable() {
-      return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_AllianceLeaveRequest_fieldAccessorTable
+      return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_AllianceRequestVote_fieldAccessorTable
           .ensureFieldAccessorsInitialized(
-              au.com.codeka.common.protobuf.Messages.AllianceLeaveRequest.class, au.com.codeka.common.protobuf.Messages.AllianceLeaveRequest.Builder.class);
+              au.com.codeka.common.protobuf.Messages.AllianceRequestVote.class, au.com.codeka.common.protobuf.Messages.AllianceRequestVote.Builder.class);
     }
 
-    public static com.google.protobuf.Parser<AllianceLeaveRequest> PARSER =
-        new com.google.protobuf.AbstractParser<AllianceLeaveRequest>() {
-      public AllianceLeaveRequest parsePartialFrom(
+    public static com.google.protobuf.Parser<AllianceRequestVote> PARSER =
+        new com.google.protobuf.AbstractParser<AllianceRequestVote>() {
+      public AllianceRequestVote parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
-        return new AllianceLeaveRequest(input, extensionRegistry);
+        return new AllianceRequestVote(input, extensionRegistry);
       }
     };
 
     @java.lang.Override
-    public com.google.protobuf.Parser<AllianceLeaveRequest> getParserForType() {
+    public com.google.protobuf.Parser<AllianceRequestVote> getParserForType() {
       return PARSER;
     }
 
     private int bitField0_;
-    // optional string alliance_key = 1;
-    public static final int ALLIANCE_KEY_FIELD_NUMBER = 1;
-    private java.lang.Object allianceKey_;
+    // optional int32 id = 1;
+    public static final int ID_FIELD_NUMBER = 1;
+    private int id_;
     /**
-     * <code>optional string alliance_key = 1;</code>
+     * <code>optional int32 id = 1;</code>
      */
-    public boolean hasAllianceKey() {
+    public boolean hasId() {
       return ((bitField0_ & 0x00000001) == 0x00000001);
     }
     /**
-     * <code>optional string alliance_key = 1;</code>
+     * <code>optional int32 id = 1;</code>
      */
-    public java.lang.String getAllianceKey() {
-      java.lang.Object ref = allianceKey_;
-      if (ref instanceof java.lang.String) {
-        return (java.lang.String) ref;
-      } else {
-        com.google.protobuf.ByteString bs = 
-            (com.google.protobuf.ByteString) ref;
-        java.lang.String s = bs.toStringUtf8();
-        if (bs.isValidUtf8()) {
-          allianceKey_ = s;
-        }
-        return s;
-      }
-    }
-    /**
-     * <code>optional string alliance_key = 1;</code>
-     */
-    public com.google.protobuf.ByteString
-        getAllianceKeyBytes() {
-      java.lang.Object ref = allianceKey_;
-      if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
-            com.google.protobuf.ByteString.copyFromUtf8(
-                (java.lang.String) ref);
-        allianceKey_ = b;
-        return b;
-      } else {
-        return (com.google.protobuf.ByteString) ref;
-      }
+    public int getId() {
+      return id_;
     }
 
-    // optional string empire_key = 2;
-    public static final int EMPIRE_KEY_FIELD_NUMBER = 2;
-    private java.lang.Object empireKey_;
+    // optional int32 alliance_id = 2;
+    public static final int ALLIANCE_ID_FIELD_NUMBER = 2;
+    private int allianceId_;
     /**
-     * <code>optional string empire_key = 2;</code>
+     * <code>optional int32 alliance_id = 2;</code>
      */
-    public boolean hasEmpireKey() {
+    public boolean hasAllianceId() {
       return ((bitField0_ & 0x00000002) == 0x00000002);
     }
     /**
-     * <code>optional string empire_key = 2;</code>
+     * <code>optional int32 alliance_id = 2;</code>
      */
-    public java.lang.String getEmpireKey() {
-      java.lang.Object ref = empireKey_;
-      if (ref instanceof java.lang.String) {
-        return (java.lang.String) ref;
-      } else {
-        com.google.protobuf.ByteString bs = 
-            (com.google.protobuf.ByteString) ref;
-        java.lang.String s = bs.toStringUtf8();
-        if (bs.isValidUtf8()) {
-          empireKey_ = s;
-        }
-        return s;
-      }
+    public int getAllianceId() {
+      return allianceId_;
+    }
+
+    // optional int32 alliance_request_id = 3;
+    public static final int ALLIANCE_REQUEST_ID_FIELD_NUMBER = 3;
+    private int allianceRequestId_;
+    /**
+     * <code>optional int32 alliance_request_id = 3;</code>
+     */
+    public boolean hasAllianceRequestId() {
+      return ((bitField0_ & 0x00000004) == 0x00000004);
     }
     /**
-     * <code>optional string empire_key = 2;</code>
+     * <code>optional int32 alliance_request_id = 3;</code>
      */
-    public com.google.protobuf.ByteString
-        getEmpireKeyBytes() {
-      java.lang.Object ref = empireKey_;
-      if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
-            com.google.protobuf.ByteString.copyFromUtf8(
-                (java.lang.String) ref);
-        empireKey_ = b;
-        return b;
-      } else {
-        return (com.google.protobuf.ByteString) ref;
-      }
+    public int getAllianceRequestId() {
+      return allianceRequestId_;
+    }
+
+    // optional int32 empire_id = 4;
+    public static final int EMPIRE_ID_FIELD_NUMBER = 4;
+    private int empireId_;
+    /**
+     * <code>optional int32 empire_id = 4;</code>
+     */
+    public boolean hasEmpireId() {
+      return ((bitField0_ & 0x00000008) == 0x00000008);
+    }
+    /**
+     * <code>optional int32 empire_id = 4;</code>
+     */
+    public int getEmpireId() {
+      return empireId_;
+    }
+
+    // optional int32 votes = 5;
+    public static final int VOTES_FIELD_NUMBER = 5;
+    private int votes_;
+    /**
+     * <code>optional int32 votes = 5;</code>
+     */
+    public boolean hasVotes() {
+      return ((bitField0_ & 0x00000010) == 0x00000010);
+    }
+    /**
+     * <code>optional int32 votes = 5;</code>
+     */
+    public int getVotes() {
+      return votes_;
+    }
+
+    // optional int64 date = 6;
+    public static final int DATE_FIELD_NUMBER = 6;
+    private long date_;
+    /**
+     * <code>optional int64 date = 6;</code>
+     */
+    public boolean hasDate() {
+      return ((bitField0_ & 0x00000020) == 0x00000020);
+    }
+    /**
+     * <code>optional int64 date = 6;</code>
+     */
+    public long getDate() {
+      return date_;
     }
 
     private void initFields() {
-      allianceKey_ = "";
-      empireKey_ = "";
+      id_ = 0;
+      allianceId_ = 0;
+      allianceRequestId_ = 0;
+      empireId_ = 0;
+      votes_ = 0;
+      date_ = 0L;
     }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
@@ -72844,10 +73671,22 @@ public final class Messages {
                         throws java.io.IOException {
       getSerializedSize();
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
-        output.writeBytes(1, getAllianceKeyBytes());
+        output.writeInt32(1, id_);
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
-        output.writeBytes(2, getEmpireKeyBytes());
+        output.writeInt32(2, allianceId_);
+      }
+      if (((bitField0_ & 0x00000004) == 0x00000004)) {
+        output.writeInt32(3, allianceRequestId_);
+      }
+      if (((bitField0_ & 0x00000008) == 0x00000008)) {
+        output.writeInt32(4, empireId_);
+      }
+      if (((bitField0_ & 0x00000010) == 0x00000010)) {
+        output.writeInt32(5, votes_);
+      }
+      if (((bitField0_ & 0x00000020) == 0x00000020)) {
+        output.writeInt64(6, date_);
       }
       getUnknownFields().writeTo(output);
     }
@@ -72860,11 +73699,27 @@ public final class Messages {
       size = 0;
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeBytesSize(1, getAllianceKeyBytes());
+          .computeInt32Size(1, id_);
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeBytesSize(2, getEmpireKeyBytes());
+          .computeInt32Size(2, allianceId_);
+      }
+      if (((bitField0_ & 0x00000004) == 0x00000004)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt32Size(3, allianceRequestId_);
+      }
+      if (((bitField0_ & 0x00000008) == 0x00000008)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt32Size(4, empireId_);
+      }
+      if (((bitField0_ & 0x00000010) == 0x00000010)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt32Size(5, votes_);
+      }
+      if (((bitField0_ & 0x00000020) == 0x00000020)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt64Size(6, date_);
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
@@ -72878,53 +73733,53 @@ public final class Messages {
       return super.writeReplace();
     }
 
-    public static au.com.codeka.common.protobuf.Messages.AllianceLeaveRequest parseFrom(
+    public static au.com.codeka.common.protobuf.Messages.AllianceRequestVote parseFrom(
         com.google.protobuf.ByteString data)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data);
     }
-    public static au.com.codeka.common.protobuf.Messages.AllianceLeaveRequest parseFrom(
+    public static au.com.codeka.common.protobuf.Messages.AllianceRequestVote parseFrom(
         com.google.protobuf.ByteString data,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data, extensionRegistry);
     }
-    public static au.com.codeka.common.protobuf.Messages.AllianceLeaveRequest parseFrom(byte[] data)
+    public static au.com.codeka.common.protobuf.Messages.AllianceRequestVote parseFrom(byte[] data)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data);
     }
-    public static au.com.codeka.common.protobuf.Messages.AllianceLeaveRequest parseFrom(
+    public static au.com.codeka.common.protobuf.Messages.AllianceRequestVote parseFrom(
         byte[] data,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data, extensionRegistry);
     }
-    public static au.com.codeka.common.protobuf.Messages.AllianceLeaveRequest parseFrom(java.io.InputStream input)
+    public static au.com.codeka.common.protobuf.Messages.AllianceRequestVote parseFrom(java.io.InputStream input)
         throws java.io.IOException {
       return PARSER.parseFrom(input);
     }
-    public static au.com.codeka.common.protobuf.Messages.AllianceLeaveRequest parseFrom(
+    public static au.com.codeka.common.protobuf.Messages.AllianceRequestVote parseFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
       return PARSER.parseFrom(input, extensionRegistry);
     }
-    public static au.com.codeka.common.protobuf.Messages.AllianceLeaveRequest parseDelimitedFrom(java.io.InputStream input)
+    public static au.com.codeka.common.protobuf.Messages.AllianceRequestVote parseDelimitedFrom(java.io.InputStream input)
         throws java.io.IOException {
       return PARSER.parseDelimitedFrom(input);
     }
-    public static au.com.codeka.common.protobuf.Messages.AllianceLeaveRequest parseDelimitedFrom(
+    public static au.com.codeka.common.protobuf.Messages.AllianceRequestVote parseDelimitedFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
       return PARSER.parseDelimitedFrom(input, extensionRegistry);
     }
-    public static au.com.codeka.common.protobuf.Messages.AllianceLeaveRequest parseFrom(
+    public static au.com.codeka.common.protobuf.Messages.AllianceRequestVote parseFrom(
         com.google.protobuf.CodedInputStream input)
         throws java.io.IOException {
       return PARSER.parseFrom(input);
     }
-    public static au.com.codeka.common.protobuf.Messages.AllianceLeaveRequest parseFrom(
+    public static au.com.codeka.common.protobuf.Messages.AllianceRequestVote parseFrom(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
@@ -72933,7 +73788,7 @@ public final class Messages {
 
     public static Builder newBuilder() { return Builder.create(); }
     public Builder newBuilderForType() { return newBuilder(); }
-    public static Builder newBuilder(au.com.codeka.common.protobuf.Messages.AllianceLeaveRequest prototype) {
+    public static Builder newBuilder(au.com.codeka.common.protobuf.Messages.AllianceRequestVote prototype) {
       return newBuilder().mergeFrom(prototype);
     }
     public Builder toBuilder() { return newBuilder(this); }
@@ -72945,29 +73800,24 @@ public final class Messages {
       return builder;
     }
     /**
-     * Protobuf type {@code au.com.codeka.common.protobuf.AllianceLeaveRequest}
-     *
-     * <pre>
-     *
-     * A request to leave an alliance.
-     * </pre>
+     * Protobuf type {@code au.com.codeka.common.protobuf.AllianceRequestVote}
      */
     public static final class Builder extends
         com.google.protobuf.GeneratedMessage.Builder<Builder>
-       implements au.com.codeka.common.protobuf.Messages.AllianceLeaveRequestOrBuilder {
+       implements au.com.codeka.common.protobuf.Messages.AllianceRequestVoteOrBuilder {
       public static final com.google.protobuf.Descriptors.Descriptor
           getDescriptor() {
-        return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_AllianceLeaveRequest_descriptor;
+        return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_AllianceRequestVote_descriptor;
       }
 
       protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
           internalGetFieldAccessorTable() {
-        return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_AllianceLeaveRequest_fieldAccessorTable
+        return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_AllianceRequestVote_fieldAccessorTable
             .ensureFieldAccessorsInitialized(
-                au.com.codeka.common.protobuf.Messages.AllianceLeaveRequest.class, au.com.codeka.common.protobuf.Messages.AllianceLeaveRequest.Builder.class);
+                au.com.codeka.common.protobuf.Messages.AllianceRequestVote.class, au.com.codeka.common.protobuf.Messages.AllianceRequestVote.Builder.class);
       }
 
-      // Construct using au.com.codeka.common.protobuf.Messages.AllianceLeaveRequest.newBuilder()
+      // Construct using au.com.codeka.common.protobuf.Messages.AllianceRequestVote.newBuilder()
       private Builder() {
         maybeForceBuilderInitialization();
       }
@@ -72987,10 +73837,18 @@ public final class Messages {
 
       public Builder clear() {
         super.clear();
-        allianceKey_ = "";
+        id_ = 0;
         bitField0_ = (bitField0_ & ~0x00000001);
-        empireKey_ = "";
+        allianceId_ = 0;
         bitField0_ = (bitField0_ & ~0x00000002);
+        allianceRequestId_ = 0;
+        bitField0_ = (bitField0_ & ~0x00000004);
+        empireId_ = 0;
+        bitField0_ = (bitField0_ & ~0x00000008);
+        votes_ = 0;
+        bitField0_ = (bitField0_ & ~0x00000010);
+        date_ = 0L;
+        bitField0_ = (bitField0_ & ~0x00000020);
         return this;
       }
 
@@ -73000,58 +73858,82 @@ public final class Messages {
 
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
-        return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_AllianceLeaveRequest_descriptor;
+        return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_AllianceRequestVote_descriptor;
       }
 
-      public au.com.codeka.common.protobuf.Messages.AllianceLeaveRequest getDefaultInstanceForType() {
-        return au.com.codeka.common.protobuf.Messages.AllianceLeaveRequest.getDefaultInstance();
+      public au.com.codeka.common.protobuf.Messages.AllianceRequestVote getDefaultInstanceForType() {
+        return au.com.codeka.common.protobuf.Messages.AllianceRequestVote.getDefaultInstance();
       }
 
-      public au.com.codeka.common.protobuf.Messages.AllianceLeaveRequest build() {
-        au.com.codeka.common.protobuf.Messages.AllianceLeaveRequest result = buildPartial();
+      public au.com.codeka.common.protobuf.Messages.AllianceRequestVote build() {
+        au.com.codeka.common.protobuf.Messages.AllianceRequestVote result = buildPartial();
         if (!result.isInitialized()) {
           throw newUninitializedMessageException(result);
         }
         return result;
       }
 
-      public au.com.codeka.common.protobuf.Messages.AllianceLeaveRequest buildPartial() {
-        au.com.codeka.common.protobuf.Messages.AllianceLeaveRequest result = new au.com.codeka.common.protobuf.Messages.AllianceLeaveRequest(this);
+      public au.com.codeka.common.protobuf.Messages.AllianceRequestVote buildPartial() {
+        au.com.codeka.common.protobuf.Messages.AllianceRequestVote result = new au.com.codeka.common.protobuf.Messages.AllianceRequestVote(this);
         int from_bitField0_ = bitField0_;
         int to_bitField0_ = 0;
         if (((from_bitField0_ & 0x00000001) == 0x00000001)) {
           to_bitField0_ |= 0x00000001;
         }
-        result.allianceKey_ = allianceKey_;
+        result.id_ = id_;
         if (((from_bitField0_ & 0x00000002) == 0x00000002)) {
           to_bitField0_ |= 0x00000002;
         }
-        result.empireKey_ = empireKey_;
+        result.allianceId_ = allianceId_;
+        if (((from_bitField0_ & 0x00000004) == 0x00000004)) {
+          to_bitField0_ |= 0x00000004;
+        }
+        result.allianceRequestId_ = allianceRequestId_;
+        if (((from_bitField0_ & 0x00000008) == 0x00000008)) {
+          to_bitField0_ |= 0x00000008;
+        }
+        result.empireId_ = empireId_;
+        if (((from_bitField0_ & 0x00000010) == 0x00000010)) {
+          to_bitField0_ |= 0x00000010;
+        }
+        result.votes_ = votes_;
+        if (((from_bitField0_ & 0x00000020) == 0x00000020)) {
+          to_bitField0_ |= 0x00000020;
+        }
+        result.date_ = date_;
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
       }
 
       public Builder mergeFrom(com.google.protobuf.Message other) {
-        if (other instanceof au.com.codeka.common.protobuf.Messages.AllianceLeaveRequest) {
-          return mergeFrom((au.com.codeka.common.protobuf.Messages.AllianceLeaveRequest)other);
+        if (other instanceof au.com.codeka.common.protobuf.Messages.AllianceRequestVote) {
+          return mergeFrom((au.com.codeka.common.protobuf.Messages.AllianceRequestVote)other);
         } else {
           super.mergeFrom(other);
           return this;
         }
       }
 
-      public Builder mergeFrom(au.com.codeka.common.protobuf.Messages.AllianceLeaveRequest other) {
-        if (other == au.com.codeka.common.protobuf.Messages.AllianceLeaveRequest.getDefaultInstance()) return this;
-        if (other.hasAllianceKey()) {
-          bitField0_ |= 0x00000001;
-          allianceKey_ = other.allianceKey_;
-          onChanged();
+      public Builder mergeFrom(au.com.codeka.common.protobuf.Messages.AllianceRequestVote other) {
+        if (other == au.com.codeka.common.protobuf.Messages.AllianceRequestVote.getDefaultInstance()) return this;
+        if (other.hasId()) {
+          setId(other.getId());
         }
-        if (other.hasEmpireKey()) {
-          bitField0_ |= 0x00000002;
-          empireKey_ = other.empireKey_;
-          onChanged();
+        if (other.hasAllianceId()) {
+          setAllianceId(other.getAllianceId());
+        }
+        if (other.hasAllianceRequestId()) {
+          setAllianceRequestId(other.getAllianceRequestId());
+        }
+        if (other.hasEmpireId()) {
+          setEmpireId(other.getEmpireId());
+        }
+        if (other.hasVotes()) {
+          setVotes(other.getVotes());
+        }
+        if (other.hasDate()) {
+          setDate(other.getDate());
         }
         this.mergeUnknownFields(other.getUnknownFields());
         return this;
@@ -73065,11 +73947,11 @@ public final class Messages {
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws java.io.IOException {
-        au.com.codeka.common.protobuf.Messages.AllianceLeaveRequest parsedMessage = null;
+        au.com.codeka.common.protobuf.Messages.AllianceRequestVote parsedMessage = null;
         try {
           parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
         } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-          parsedMessage = (au.com.codeka.common.protobuf.Messages.AllianceLeaveRequest) e.getUnfinishedMessage();
+          parsedMessage = (au.com.codeka.common.protobuf.Messages.AllianceRequestVote) e.getUnfinishedMessage();
           throw e;
         } finally {
           if (parsedMessage != null) {
@@ -73080,163 +73962,213 @@ public final class Messages {
       }
       private int bitField0_;
 
-      // optional string alliance_key = 1;
-      private java.lang.Object allianceKey_ = "";
+      // optional int32 id = 1;
+      private int id_ ;
       /**
-       * <code>optional string alliance_key = 1;</code>
+       * <code>optional int32 id = 1;</code>
        */
-      public boolean hasAllianceKey() {
+      public boolean hasId() {
         return ((bitField0_ & 0x00000001) == 0x00000001);
       }
       /**
-       * <code>optional string alliance_key = 1;</code>
+       * <code>optional int32 id = 1;</code>
        */
-      public java.lang.String getAllianceKey() {
-        java.lang.Object ref = allianceKey_;
-        if (!(ref instanceof java.lang.String)) {
-          java.lang.String s = ((com.google.protobuf.ByteString) ref)
-              .toStringUtf8();
-          allianceKey_ = s;
-          return s;
-        } else {
-          return (java.lang.String) ref;
-        }
+      public int getId() {
+        return id_;
       }
       /**
-       * <code>optional string alliance_key = 1;</code>
+       * <code>optional int32 id = 1;</code>
        */
-      public com.google.protobuf.ByteString
-          getAllianceKeyBytes() {
-        java.lang.Object ref = allianceKey_;
-        if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
-              com.google.protobuf.ByteString.copyFromUtf8(
-                  (java.lang.String) ref);
-          allianceKey_ = b;
-          return b;
-        } else {
-          return (com.google.protobuf.ByteString) ref;
-        }
-      }
-      /**
-       * <code>optional string alliance_key = 1;</code>
-       */
-      public Builder setAllianceKey(
-          java.lang.String value) {
-        if (value == null) {
-    throw new NullPointerException();
-  }
-  bitField0_ |= 0x00000001;
-        allianceKey_ = value;
+      public Builder setId(int value) {
+        bitField0_ |= 0x00000001;
+        id_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>optional string alliance_key = 1;</code>
+       * <code>optional int32 id = 1;</code>
        */
-      public Builder clearAllianceKey() {
+      public Builder clearId() {
         bitField0_ = (bitField0_ & ~0x00000001);
-        allianceKey_ = getDefaultInstance().getAllianceKey();
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>optional string alliance_key = 1;</code>
-       */
-      public Builder setAllianceKeyBytes(
-          com.google.protobuf.ByteString value) {
-        if (value == null) {
-    throw new NullPointerException();
-  }
-  bitField0_ |= 0x00000001;
-        allianceKey_ = value;
+        id_ = 0;
         onChanged();
         return this;
       }
 
-      // optional string empire_key = 2;
-      private java.lang.Object empireKey_ = "";
+      // optional int32 alliance_id = 2;
+      private int allianceId_ ;
       /**
-       * <code>optional string empire_key = 2;</code>
+       * <code>optional int32 alliance_id = 2;</code>
        */
-      public boolean hasEmpireKey() {
+      public boolean hasAllianceId() {
         return ((bitField0_ & 0x00000002) == 0x00000002);
       }
       /**
-       * <code>optional string empire_key = 2;</code>
+       * <code>optional int32 alliance_id = 2;</code>
        */
-      public java.lang.String getEmpireKey() {
-        java.lang.Object ref = empireKey_;
-        if (!(ref instanceof java.lang.String)) {
-          java.lang.String s = ((com.google.protobuf.ByteString) ref)
-              .toStringUtf8();
-          empireKey_ = s;
-          return s;
-        } else {
-          return (java.lang.String) ref;
-        }
+      public int getAllianceId() {
+        return allianceId_;
       }
       /**
-       * <code>optional string empire_key = 2;</code>
+       * <code>optional int32 alliance_id = 2;</code>
        */
-      public com.google.protobuf.ByteString
-          getEmpireKeyBytes() {
-        java.lang.Object ref = empireKey_;
-        if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
-              com.google.protobuf.ByteString.copyFromUtf8(
-                  (java.lang.String) ref);
-          empireKey_ = b;
-          return b;
-        } else {
-          return (com.google.protobuf.ByteString) ref;
-        }
-      }
-      /**
-       * <code>optional string empire_key = 2;</code>
-       */
-      public Builder setEmpireKey(
-          java.lang.String value) {
-        if (value == null) {
-    throw new NullPointerException();
-  }
-  bitField0_ |= 0x00000002;
-        empireKey_ = value;
+      public Builder setAllianceId(int value) {
+        bitField0_ |= 0x00000002;
+        allianceId_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>optional string empire_key = 2;</code>
+       * <code>optional int32 alliance_id = 2;</code>
        */
-      public Builder clearEmpireKey() {
+      public Builder clearAllianceId() {
         bitField0_ = (bitField0_ & ~0x00000002);
-        empireKey_ = getDefaultInstance().getEmpireKey();
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>optional string empire_key = 2;</code>
-       */
-      public Builder setEmpireKeyBytes(
-          com.google.protobuf.ByteString value) {
-        if (value == null) {
-    throw new NullPointerException();
-  }
-  bitField0_ |= 0x00000002;
-        empireKey_ = value;
+        allianceId_ = 0;
         onChanged();
         return this;
       }
 
-      // @@protoc_insertion_point(builder_scope:au.com.codeka.common.protobuf.AllianceLeaveRequest)
+      // optional int32 alliance_request_id = 3;
+      private int allianceRequestId_ ;
+      /**
+       * <code>optional int32 alliance_request_id = 3;</code>
+       */
+      public boolean hasAllianceRequestId() {
+        return ((bitField0_ & 0x00000004) == 0x00000004);
+      }
+      /**
+       * <code>optional int32 alliance_request_id = 3;</code>
+       */
+      public int getAllianceRequestId() {
+        return allianceRequestId_;
+      }
+      /**
+       * <code>optional int32 alliance_request_id = 3;</code>
+       */
+      public Builder setAllianceRequestId(int value) {
+        bitField0_ |= 0x00000004;
+        allianceRequestId_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional int32 alliance_request_id = 3;</code>
+       */
+      public Builder clearAllianceRequestId() {
+        bitField0_ = (bitField0_ & ~0x00000004);
+        allianceRequestId_ = 0;
+        onChanged();
+        return this;
+      }
+
+      // optional int32 empire_id = 4;
+      private int empireId_ ;
+      /**
+       * <code>optional int32 empire_id = 4;</code>
+       */
+      public boolean hasEmpireId() {
+        return ((bitField0_ & 0x00000008) == 0x00000008);
+      }
+      /**
+       * <code>optional int32 empire_id = 4;</code>
+       */
+      public int getEmpireId() {
+        return empireId_;
+      }
+      /**
+       * <code>optional int32 empire_id = 4;</code>
+       */
+      public Builder setEmpireId(int value) {
+        bitField0_ |= 0x00000008;
+        empireId_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional int32 empire_id = 4;</code>
+       */
+      public Builder clearEmpireId() {
+        bitField0_ = (bitField0_ & ~0x00000008);
+        empireId_ = 0;
+        onChanged();
+        return this;
+      }
+
+      // optional int32 votes = 5;
+      private int votes_ ;
+      /**
+       * <code>optional int32 votes = 5;</code>
+       */
+      public boolean hasVotes() {
+        return ((bitField0_ & 0x00000010) == 0x00000010);
+      }
+      /**
+       * <code>optional int32 votes = 5;</code>
+       */
+      public int getVotes() {
+        return votes_;
+      }
+      /**
+       * <code>optional int32 votes = 5;</code>
+       */
+      public Builder setVotes(int value) {
+        bitField0_ |= 0x00000010;
+        votes_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional int32 votes = 5;</code>
+       */
+      public Builder clearVotes() {
+        bitField0_ = (bitField0_ & ~0x00000010);
+        votes_ = 0;
+        onChanged();
+        return this;
+      }
+
+      // optional int64 date = 6;
+      private long date_ ;
+      /**
+       * <code>optional int64 date = 6;</code>
+       */
+      public boolean hasDate() {
+        return ((bitField0_ & 0x00000020) == 0x00000020);
+      }
+      /**
+       * <code>optional int64 date = 6;</code>
+       */
+      public long getDate() {
+        return date_;
+      }
+      /**
+       * <code>optional int64 date = 6;</code>
+       */
+      public Builder setDate(long value) {
+        bitField0_ |= 0x00000020;
+        date_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional int64 date = 6;</code>
+       */
+      public Builder clearDate() {
+        bitField0_ = (bitField0_ & ~0x00000020);
+        date_ = 0L;
+        onChanged();
+        return this;
+      }
+
+      // @@protoc_insertion_point(builder_scope:au.com.codeka.common.protobuf.AllianceRequestVote)
     }
 
     static {
-      defaultInstance = new AllianceLeaveRequest(true);
+      defaultInstance = new AllianceRequestVote(true);
       defaultInstance.initFields();
     }
 
-    // @@protoc_insertion_point(class_scope:au.com.codeka.common.protobuf.AllianceLeaveRequest)
+    // @@protoc_insertion_point(class_scope:au.com.codeka.common.protobuf.AllianceRequestVote)
   }
 
   private static com.google.protobuf.Descriptors.Descriptor
@@ -73540,20 +74472,20 @@ public final class Messages {
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_au_com_codeka_common_protobuf_AllianceMember_fieldAccessorTable;
   private static com.google.protobuf.Descriptors.Descriptor
-    internal_static_au_com_codeka_common_protobuf_AllianceJoinRequest_descriptor;
+    internal_static_au_com_codeka_common_protobuf_AllianceRequest_descriptor;
   private static
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
-      internal_static_au_com_codeka_common_protobuf_AllianceJoinRequest_fieldAccessorTable;
+      internal_static_au_com_codeka_common_protobuf_AllianceRequest_fieldAccessorTable;
   private static com.google.protobuf.Descriptors.Descriptor
-    internal_static_au_com_codeka_common_protobuf_AllianceJoinRequests_descriptor;
+    internal_static_au_com_codeka_common_protobuf_AllianceRequests_descriptor;
   private static
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
-      internal_static_au_com_codeka_common_protobuf_AllianceJoinRequests_fieldAccessorTable;
+      internal_static_au_com_codeka_common_protobuf_AllianceRequests_fieldAccessorTable;
   private static com.google.protobuf.Descriptors.Descriptor
-    internal_static_au_com_codeka_common_protobuf_AllianceLeaveRequest_descriptor;
+    internal_static_au_com_codeka_common_protobuf_AllianceRequestVote_descriptor;
   private static
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
-      internal_static_au_com_codeka_common_protobuf_AllianceLeaveRequest_fieldAccessorTable;
+      internal_static_au_com_codeka_common_protobuf_AllianceRequestVote_fieldAccessorTable;
 
   public static com.google.protobuf.Descriptors.FileDescriptor
       getDescriptor() {
@@ -73819,7 +74751,7 @@ public final class Messages {
       "tarRunOutOfGoodsRecord\022\022\n\ncolony_key\030\001 \001" +
       "(\t\"m\n\020SituationReports\022I\n\021situation_repo" +
       "rts\030\001 \003(\0132..au.com.codeka.common.protobu" +
-      "f.SituationReport\022\016\n\006cursor\030\002 \001(\t\"\342\003\n\017Ca" +
+      "f.SituationReport\022\016\n\006cursor\030\002 \001(\t\"\216\004\n\017Ca" +
       "shAuditRecord\022\n\n\002id\030\001 \001(\005\022\021\n\tempire_id\030\002" +
       " \001(\005\022E\n\006reason\030\003 \001(\01625.au.com.codeka.com" +
       "mon.protobuf.CashAuditRecord.Reason\022\023\n\013b",
@@ -73829,31 +74761,42 @@ public final class Messages {
       "_id\030\t \001(\005\022\021\n\tstar_name\030\n \001(\t\022\025\n\rmove_dis" +
       "tance\030\013 \001(\002\022\027\n\017build_design_id\030\014 \001(\t\022\023\n\013" +
       "build_count\030\r \001(\005\022\031\n\021accelerate_amount\030\016" +
-      " \001(\002\022\025\n\ralliance_name\030\017 \001(\t\"Y\n\006Reason\022\r\n" +
-      "\tFleetMove\020\000\022\023\n\017BuildAccelerate\020\001\022\027\n\023Col" +
-      "lectFromColonies\020\002\022\022\n\016CreateAlliance\020\003\"S" +
-      "\n\020CashAuditRecords\022?\n\007records\030\001 \003(\0132..au",
-      ".com.codeka.common.protobuf.CashAuditRec" +
-      "ord\"\254\001\n\010Alliance\022\013\n\003key\030\001 \001(\t\022\014\n\004name\030\002 " +
-      "\001(\t\022\024\n\014time_created\030\003 \001(\003\022\032\n\022creator_emp" +
-      "ire_key\030\004 \001(\t\022\023\n\013num_members\030\005 \001(\005\022>\n\007me" +
-      "mbers\030\006 \003(\0132-.au.com.codeka.common.proto" +
-      "buf.AllianceMember\"G\n\tAlliances\022:\n\tallia" +
-      "nces\030\001 \003(\0132\'.au.com.codeka.common.protob" +
-      "uf.Alliance\"\\\n\016AllianceMember\022\013\n\003key\030\001 \001" +
-      "(\t\022\022\n\nempire_key\030\002 \001(\t\022\024\n\014alliance_key\030\003" +
-      " \001(\t\022\023\n\013time_joined\030\004 \001(\003\"\376\001\n\023AllianceJo",
-      "inRequest\022\013\n\003key\030\001 \001(\t\022\024\n\014alliance_key\030\002" +
-      " \001(\t\022\022\n\nempire_key\030\003 \001(\t\022\017\n\007message\030\004 \001(" +
-      "\t\022\026\n\016time_requested\030\005 \001(\003\022N\n\005state\030\006 \001(\016" +
-      "2?.au.com.codeka.common.protobuf.Allianc" +
-      "eJoinRequest.RequestState\"7\n\014RequestStat" +
-      "e\022\013\n\007PENDING\020\000\022\014\n\010ACCEPTED\020\001\022\014\n\010REJECTED" +
-      "\020\002\"a\n\024AllianceJoinRequests\022I\n\rjoin_reque" +
-      "sts\030\001 \003(\01322.au.com.codeka.common.protobu" +
-      "f.AllianceJoinRequest\"@\n\024AllianceLeaveRe" +
-      "quest\022\024\n\014alliance_key\030\001 \001(\t\022\022\n\nempire_ke",
-      "y\030\002 \001(\t"
+      " \001(\002\022\025\n\ralliance_name\030\017 \001(\t\"\204\001\n\006Reason\022\r" +
+      "\n\tFleetMove\020\000\022\023\n\017BuildAccelerate\020\001\022\027\n\023Co" +
+      "llectFromColonies\020\002\022\022\n\016CreateAlliance\020\003\022" +
+      "\023\n\017AllianceDeposit\020\004\022\024\n\020AllianceWithdraw",
+      "\020\005\"S\n\020CashAuditRecords\022?\n\007records\030\001 \003(\0132" +
+      "..au.com.codeka.common.protobuf.CashAudi" +
+      "tRecord\"\302\001\n\010Alliance\022\013\n\003key\030\001 \001(\t\022\014\n\004nam" +
+      "e\030\002 \001(\t\022\024\n\014time_created\030\003 \001(\003\022\032\n\022creator" +
+      "_empire_key\030\004 \001(\t\022\024\n\014bank_balance\030\007 \001(\001\022" +
+      "\023\n\013num_members\030\005 \001(\005\022>\n\007members\030\006 \003(\0132-." +
+      "au.com.codeka.common.protobuf.AllianceMe" +
+      "mber\"G\n\tAlliances\022:\n\talliances\030\001 \003(\0132\'.a" +
+      "u.com.codeka.common.protobuf.Alliance\"\317\001" +
+      "\n\016AllianceMember\022\013\n\003key\030\001 \001(\t\022\022\n\nempire_",
+      "key\030\002 \001(\t\022\024\n\014alliance_key\030\003 \001(\t\022\023\n\013time_" +
+      "joined\030\004 \001(\003\022@\n\004rank\030\005 \001(\01622.au.com.code" +
+      "ka.common.protobuf.AllianceMember.Rank\"/" +
+      "\n\004Rank\022\013\n\007CAPTAIN\020\000\022\016\n\nLIEUTENANT\020\001\022\n\n\006M" +
+      "EMBER\020\002\"\327\003\n\017AllianceRequest\022\n\n\002id\030\001 \001(\005\022" +
+      "\023\n\013alliance_id\030\002 \001(\005\022\031\n\021request_empire_i" +
+      "d\030\003 \001(\005\022\024\n\014request_date\030\004 \001(\003\022P\n\014request" +
+      "_type\030\005 \001(\0162:.au.com.codeka.common.proto" +
+      "buf.AllianceRequest.RequestType\022\017\n\007messa" +
+      "ge\030\006 \001(\t\022J\n\005state\030\007 \001(\0162;.au.com.codeka.",
+      "common.protobuf.AllianceRequest.RequestS" +
+      "tate\022\r\n\005votes\030\010 \001(\005\022\030\n\020target_empire_id\030" +
+      "\t \001(\005\022\016\n\006amount\030\n \001(\002\"Q\n\013RequestType\022\010\n\004" +
+      "JOIN\020\000\022\t\n\005LEAVE\020\001\022\010\n\004KICK\020\002\022\020\n\014DEPOSIT_C" +
+      "ASH\020\003\022\021\n\rWITHDRAW_CASH\020\004\"7\n\014RequestState" +
+      "\022\013\n\007PENDING\020\000\022\014\n\010ACCEPTED\020\001\022\014\n\010REJECTED\020" +
+      "\002\"d\n\020AllianceRequests\022@\n\010requests\030\001 \003(\0132" +
+      "..au.com.codeka.common.protobuf.Alliance" +
+      "Request\022\016\n\006cursor\030\002 \001(\t\"\203\001\n\023AllianceRequ" +
+      "estVote\022\n\n\002id\030\001 \001(\005\022\023\n\013alliance_id\030\002 \001(\005",
+      "\022\033\n\023alliance_request_id\030\003 \001(\005\022\021\n\tempire_" +
+      "id\030\004 \001(\005\022\r\n\005votes\030\005 \001(\005\022\014\n\004date\030\006 \001(\003"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
       new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
@@ -74207,7 +75150,7 @@ public final class Messages {
           internal_static_au_com_codeka_common_protobuf_Alliance_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_au_com_codeka_common_protobuf_Alliance_descriptor,
-              new java.lang.String[] { "Key", "Name", "TimeCreated", "CreatorEmpireKey", "NumMembers", "Members", });
+              new java.lang.String[] { "Key", "Name", "TimeCreated", "CreatorEmpireKey", "BankBalance", "NumMembers", "Members", });
           internal_static_au_com_codeka_common_protobuf_Alliances_descriptor =
             getDescriptor().getMessageTypes().get(44);
           internal_static_au_com_codeka_common_protobuf_Alliances_fieldAccessorTable = new
@@ -74219,25 +75162,25 @@ public final class Messages {
           internal_static_au_com_codeka_common_protobuf_AllianceMember_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_au_com_codeka_common_protobuf_AllianceMember_descriptor,
-              new java.lang.String[] { "Key", "EmpireKey", "AllianceKey", "TimeJoined", });
-          internal_static_au_com_codeka_common_protobuf_AllianceJoinRequest_descriptor =
+              new java.lang.String[] { "Key", "EmpireKey", "AllianceKey", "TimeJoined", "Rank", });
+          internal_static_au_com_codeka_common_protobuf_AllianceRequest_descriptor =
             getDescriptor().getMessageTypes().get(46);
-          internal_static_au_com_codeka_common_protobuf_AllianceJoinRequest_fieldAccessorTable = new
+          internal_static_au_com_codeka_common_protobuf_AllianceRequest_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
-              internal_static_au_com_codeka_common_protobuf_AllianceJoinRequest_descriptor,
-              new java.lang.String[] { "Key", "AllianceKey", "EmpireKey", "Message", "TimeRequested", "State", });
-          internal_static_au_com_codeka_common_protobuf_AllianceJoinRequests_descriptor =
+              internal_static_au_com_codeka_common_protobuf_AllianceRequest_descriptor,
+              new java.lang.String[] { "Id", "AllianceId", "RequestEmpireId", "RequestDate", "RequestType", "Message", "State", "Votes", "TargetEmpireId", "Amount", });
+          internal_static_au_com_codeka_common_protobuf_AllianceRequests_descriptor =
             getDescriptor().getMessageTypes().get(47);
-          internal_static_au_com_codeka_common_protobuf_AllianceJoinRequests_fieldAccessorTable = new
+          internal_static_au_com_codeka_common_protobuf_AllianceRequests_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
-              internal_static_au_com_codeka_common_protobuf_AllianceJoinRequests_descriptor,
-              new java.lang.String[] { "JoinRequests", });
-          internal_static_au_com_codeka_common_protobuf_AllianceLeaveRequest_descriptor =
+              internal_static_au_com_codeka_common_protobuf_AllianceRequests_descriptor,
+              new java.lang.String[] { "Requests", "Cursor", });
+          internal_static_au_com_codeka_common_protobuf_AllianceRequestVote_descriptor =
             getDescriptor().getMessageTypes().get(48);
-          internal_static_au_com_codeka_common_protobuf_AllianceLeaveRequest_fieldAccessorTable = new
+          internal_static_au_com_codeka_common_protobuf_AllianceRequestVote_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
-              internal_static_au_com_codeka_common_protobuf_AllianceLeaveRequest_descriptor,
-              new java.lang.String[] { "AllianceKey", "EmpireKey", });
+              internal_static_au_com_codeka_common_protobuf_AllianceRequestVote_descriptor,
+              new java.lang.String[] { "Id", "AllianceId", "AllianceRequestId", "EmpireId", "Votes", "Date", });
           return null;
         }
       };

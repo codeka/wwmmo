@@ -15,6 +15,7 @@ public abstract class BaseAlliance {
     protected String mCreatorEmpireKey;
     protected int mNumMembers;
     protected List<BaseAllianceMember> mMembers;
+    protected double mBankBalance;
 
     protected abstract BaseAllianceMember createAllianceMember(Messages.AllianceMember pb);
 
@@ -33,6 +34,9 @@ public abstract class BaseAlliance {
     public int getNumMembers() {
         return mNumMembers;
     }
+    public double getBankBalance() {
+        return mBankBalance;
+    }
     public List<BaseAllianceMember> getMembers() {
         return mMembers;
     }
@@ -49,6 +53,7 @@ public abstract class BaseAlliance {
         if (pb.hasNumMembers()) {
             mNumMembers = pb.getNumMembers();
         }
+        mBankBalance = pb.getBankBalance();
 
         if (pb.getMembersCount() > 0) {
             mMembers = new ArrayList<BaseAllianceMember>();
@@ -66,6 +71,7 @@ public abstract class BaseAlliance {
         pb.setTimeCreated(mTimeCreated.getMillis() / 1000);
         pb.setCreatorEmpireKey(mCreatorEmpireKey);
         pb.setNumMembers(mNumMembers);
+        pb.setBankBalance(mBankBalance);
 
         if (mMembers != null) {
             for (BaseAllianceMember member : mMembers) {

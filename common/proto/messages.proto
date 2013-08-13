@@ -1000,6 +1000,8 @@ message CashAuditRecord
         BuildAccelerate = 1;
         CollectFromColonies = 2;
         CreateAlliance = 3;
+        AllianceDeposit = 4;  // deposited into alliance bank
+        AllianceWithdraw = 5; // withdrawn from alliance bank
     }
     optional Reason reason = 3;
 
@@ -1047,6 +1049,9 @@ message Alliance
     // The key of the empire that created this alliance
     optional string creator_empire_key = 4;
 
+    // If this is our own alliance, it'll have the bank balance
+    optional double bank_balance = 7;
+
     // The current number of members in the alliance
     optional int32 num_members = 5;
 
@@ -1067,17 +1072,33 @@ message AllianceMember
     optional string empire_key = 2;
     optional string alliance_key = 3;
     optional int64 time_joined = 4;
+
+    enum Rank
+    {
+        CAPTAIN = 0;
+        LIEUTENANT = 1;
+        MEMBER = 2;
+    }
+    optional Rank rank = 5;
 }
 
-
-message AllianceJoinRequest
+message AllianceRequest
 {
-    optional string key = 1;
-    optional string alliance_key = 2;
-    optional string empire_key = 3;
-    optional string message = 4;
-    optional int64 time_requested = 5;
-    optional RequestState state = 6;
+    optional int32 id = 1;
+    optional int32 alliance_id = 2;
+    optional int32 request_empire_id = 3;
+    optional int64 request_date = 4;
+
+    enum RequestType
+    {
+        JOIN = 0;
+        LEAVE = 1;
+        KICK = 2;
+        DEPOSIT_CASH = 3;
+        WITHDRAW_CASH = 4;
+    }
+    optional RequestType request_type = 5;
+    optional string message = 6;
 
     enum RequestState
     {
@@ -1085,18 +1106,31 @@ message AllianceJoinRequest
         ACCEPTED = 1;
         REJECTED = 2;
     }
+    optional RequestState state = 7;
+
+    optional int32 votes = 8;
+
+    // for KICK requests, this is the empire we're kicking
+    optional int32 target_empire_id = 9;
+
+    // for DEPOSIT_CASH and WITHDRAW_CASH, the amount of cash to deposit/withdraw
+    optional float amount = 10;
 }
 
-message AllianceJoinRequests
+
+message AllianceRequests
 {
-    repeated AllianceJoinRequest join_requests = 1;
+    repeated AllianceRequest requests = 1;
+    optional string cursor = 2;
 }
 
-//
-// A request to leave an alliance.
-//
-message AllianceLeaveRequest
+
+message AllianceRequestVote
 {
-    optional string alliance_key = 1;
-    optional string empire_key = 2;
+    optional int32 id = 1;
+    optional int32 alliance_id = 2;
+    optional int32 alliance_request_id = 3;
+    optional int32 empire_id = 4;
+    optional int32 votes = 5;
+    optional int64 date = 6;
 }

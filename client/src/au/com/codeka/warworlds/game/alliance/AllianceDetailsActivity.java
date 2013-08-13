@@ -36,7 +36,7 @@ public class AllianceDetailsActivity extends BaseActivity
                                                 EmpireManager.EmpireFetchedHandler {
     private Handler mHandler;
     private boolean mRefreshPosted;
-    private String mAllianceKey;
+    private int mAllianceID;
     private Alliance mAlliance;
 
     @Override
@@ -49,7 +49,7 @@ public class AllianceDetailsActivity extends BaseActivity
         Intent intent = getIntent();
         Bundle extras = intent.getExtras();
         if (extras != null) {
-            mAllianceKey = extras.getString("au.com.codeka.warworlds.AllianceKey");
+            mAllianceID = Integer.parseInt(extras.getString("au.com.codeka.warworlds.AllianceKey"));
             byte[] alliance_bytes = extras.getByteArray("au.com.codeka.warworlds.Alliance");
             if (alliance_bytes != null) {
                 try {
@@ -60,7 +60,7 @@ public class AllianceDetailsActivity extends BaseActivity
                 }
             }
 
-            AllianceManager.i.fetchAlliance(mAllianceKey, new AllianceManager.FetchAllianceCompleteHandler() {
+            AllianceManager.i.fetchAlliance(mAllianceID, new AllianceManager.FetchAllianceCompleteHandler() {
                 @Override
                 public void onAllianceFetched(Alliance alliance) {
                     mAlliance = alliance;
@@ -88,7 +88,7 @@ public class AllianceDetailsActivity extends BaseActivity
 
     @Override
     public void onAllianceUpdated(Alliance alliance) {
-        if (alliance.getKey().equals(mAllianceKey)) {
+        if (alliance.getID() == mAllianceID) {
             mAlliance = alliance;
             fullRefresh();
         }
@@ -106,7 +106,7 @@ public class AllianceDetailsActivity extends BaseActivity
         Alliance myAlliance = (Alliance) EmpireManager.i.getEmpire().getAlliance();
         if (myAlliance == null) {
             setContentView(R.layout.alliance_details_potential);
-        } else if (myAlliance.getKey().equals(mAllianceKey)) {
+        } else if (myAlliance.getID() == mAllianceID) {
             setContentView(R.layout.alliance_details_mine);
         } else {
             setContentView(R.layout.alliance_details_enemy);
@@ -117,7 +117,7 @@ public class AllianceDetailsActivity extends BaseActivity
             @Override
             public void onClick(View v) {
                 JoinRequestDialog dialog = new JoinRequestDialog();
-                dialog.setAllianceKey(mAllianceKey);
+                dialog.setAllianceID(mAllianceID);
                 dialog.show(getSupportFragmentManager(), "");
             }
         });

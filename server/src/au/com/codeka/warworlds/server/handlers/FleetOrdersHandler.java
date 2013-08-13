@@ -1,7 +1,5 @@
 package au.com.codeka.warworlds.server.handlers;
 
-import java.sql.SQLException;
-
 import org.joda.time.DateTime;
 
 import au.com.codeka.common.model.BaseFleet;
