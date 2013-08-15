@@ -282,7 +282,7 @@ public class AllianceActivity extends TabFragmentActivity
 
         @Override
         public View onCreateView(LayoutInflater inflator, ViewGroup container, Bundle savedInstanceState) {
-            mView = inflator.inflate(R.layout.alliance_join_requests_tab, null);
+            mView = inflator.inflate(R.layout.alliance_requests_tab, null);
             mRequestListAdapter = new RequestListAdapter();
 
             ListView joinRequestsList = (ListView) mView.findViewById(R.id.join_requests);
@@ -372,25 +372,38 @@ public class AllianceActivity extends TabFragmentActivity
 
                 if (view == null) {
                     LayoutInflater inflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-                    view = inflater.inflate(R.layout.alliance_join_requests_row, null);
+                    view = inflater.inflate(R.layout.alliance_requests_row, null);
                 }
 
                 TextView empireName = (TextView) view.findViewById(R.id.empire_name);
                 ImageView empireIcon = (ImageView) view.findViewById(R.id.empire_icon);
-                TextView requestDate = (TextView) view.findViewById(R.id.request_date);
+                TextView requestDescription = (TextView) view.findViewById(R.id.request_description);
                 ImageView requestStatus = (ImageView) view.findViewById(R.id.request_status);
+                TextView requestVotes = (TextView) view.findViewById(R.id.request_votes);
                 TextView message = (TextView) view.findViewById(R.id.message);
 
                 empireName.setText(entry.empire.getDisplayName());
                 empireIcon.setImageBitmap(entry.empire.getShield(activity));
-                requestDate.setText(String.format(Locale.ENGLISH, "Requested: %s", TimeInHours.format(entry.request.getRequestDate())));
+                requestDescription.setText(String.format(Locale.ENGLISH, "%s requested %s",
+                        entry.request.getDescription(), TimeInHours.format(entry.request.getRequestDate())));
                 message.setText(entry.request.getMessage());
 
                 if (entry.request.getState().equals(AllianceRequest.RequestState.PENDING)) {
-                    requestStatus.setImageResource(R.drawable.question);
+                    requestStatus.setVisibility(View.GONE);
+                    requestVotes.setVisibility(View.VISIBLE);
+                    if (entry.request.getVotes() == 0) {
+                        requestVotes.setText("0");
+                    } else {
+                        requestVotes.setText(String.format(Locale.ENGLISH, "%s%d",
+                            entry.request.getVotes() < 0 ? "-" : "+", Math.abs(entry.request.getVotes())));
+                    }
                 } else if (entry.request.getState().equals(AllianceRequest.RequestState.ACCEPTED)) {
+                    requestStatus.setVisibility(View.VISIBLE);
+                    requestVotes.setVisibility(View.GONE);
                     requestStatus.setImageResource(R.drawable.tick);
                 } else if (entry.request.getState().equals(AllianceRequest.RequestState.REJECTED)) {
+                    requestStatus.setVisibility(View.VISIBLE);
+                    requestVotes.setVisibility(View.GONE);
                     requestStatus.setImageResource(R.drawable.cross);
                 }
 

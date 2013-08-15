@@ -137,22 +137,48 @@ public class AllianceManager {
         }.execute();
     }
 
-    /**
-     * Sends a request to join the specified alliance.
-     */
     public void requestJoin(final int allianceID, final String message) {
         final MyEmpire myEmpire = EmpireManager.i.getEmpire();
+        Messages.AllianceRequest pb = Messages.AllianceRequest.newBuilder()
+                            .setRequestType(Messages.AllianceRequest.RequestType.JOIN)
+                            .setAllianceId(allianceID)
+                            .setRequestEmpireId(Integer.parseInt(myEmpire.getKey()))
+                            .setMessage(message)
+                            .build();
+        request(pb);
+    }
+
+    public void requestDeposit(final int allianceID, final String message, int amount) {
+        final MyEmpire myEmpire = EmpireManager.i.getEmpire();
+        Messages.AllianceRequest pb = Messages.AllianceRequest.newBuilder()
+                            .setRequestType(Messages.AllianceRequest.RequestType.DEPOSIT_CASH)
+                            .setAmount(amount)
+                            .setAllianceId(allianceID)
+                            .setRequestEmpireId(Integer.parseInt(myEmpire.getKey()))
+                            .setMessage(message)
+                            .build();
+        request(pb);
+    }
+
+    public void requestWithdraw(final int allianceID, final String message, int amount) {
+        final MyEmpire myEmpire = EmpireManager.i.getEmpire();
+        Messages.AllianceRequest pb = Messages.AllianceRequest.newBuilder()
+                            .setRequestType(Messages.AllianceRequest.RequestType.WITHDRAW_CASH)
+                            .setAmount(amount)
+                            .setAllianceId(allianceID)
+                            .setRequestEmpireId(Integer.parseInt(myEmpire.getKey()))
+                            .setMessage(message)
+                            .build();
+        request(pb);
+    }
+
+    private void request(final Messages.AllianceRequest pb) {
+        final int allianceID = pb.getAllianceId();
 
         new BackgroundRunner<Boolean>() {
             @Override
             protected Boolean doInBackground() {
                 String url = "alliances/"+allianceID+"/requests";
-                Messages.AllianceRequest pb = Messages.AllianceRequest.newBuilder()
-                                    .setRequestType(Messages.AllianceRequest.RequestType.JOIN)
-                                    .setAllianceId(allianceID)
-                                    .setRequestEmpireId(Integer.parseInt(myEmpire.getKey()))
-                                    .setMessage(message)
-                                    .build();
                 try {
                     ApiClient.postProtoBuf(url, pb);
                     return true;
@@ -164,6 +190,7 @@ public class AllianceManager {
             @Override
             protected void onComplete(Boolean success) {
                 if (success) {
+                    EmpireManager.i.refreshEmpire();
                     refreshAlliance(allianceID);
                 }
             }

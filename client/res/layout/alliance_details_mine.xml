@@ -41,20 +41,38 @@
                 android:id="@+id/horz_sep_1"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
                 android:layout_alignParentLeft="true"
                 android:layout_marginLeft="5dp"
                 android:layout_marginRight="5dp"
-                android:layout_below="@+id/alliance_icon"
                 android:text="Bank" />
 
             <TextView
-                android:id="@+id/placeholder"
+                android:id="@+id/bank_balance"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/horz_sep_1"
-                android:layout_centerHorizontal="true"
+                android:layout_alignParentLeft="true"
                 android:layout_margin="10dp"
                 android:text="(not implemented yet)" />
+
+            <Button
+                android:id="@+id/bank_deposit"
+                android:layout_width="100dp"
+                android:layout_height="wrap_content"
+                android:layout_alignTop="@id/bank_balance"
+                android:layout_alignParentRight="true"
+                android:layout_marginRight="10dp"
+                android:text="Deposit" />
+
+            <Button
+                android:id="@+id/bank_withdraw"
+                android:layout_width="100dp"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/bank_deposit"
+                android:layout_alignParentRight="true"
+                android:layout_margin="10dp"
+                android:text="Withdraw" />
 
             <au.com.codeka.warworlds.ctrl.HorizontalSeparator
                 android:id="@+id/horz_sep_2"
@@ -63,7 +81,7 @@
                 android:layout_alignParentLeft="true"
                 android:layout_marginLeft="5dp"
                 android:layout_marginRight="5dp"
-                android:layout_below="@+id/placeholder"
+                android:layout_below="@+id/bank_withdraw"
                 android:text="Leave" />
 
             <TextView

@@ -68,6 +68,7 @@ public class AllianceController {
     public int addRequest(AllianceRequest request) throws RequestException {
         try {
             int requestID = db.addRequest(request);
+            request.setID(requestID);
 
             // there's an implicit vote when you create a request (some requests require zero
             // votes, which means it passes straight away)
@@ -220,12 +221,12 @@ public class AllianceController {
                 stmt.setString(5, request.getMessage());
                 stmt.setInt(6, BaseAllianceRequest.RequestState.PENDING.getNumber());
                 stmt.setInt(7, 0);
-                if (request.getTargetEmpireID() > 0) {
+                if (request.getTargetEmpireID() != null) {
                     stmt.setInt(8, request.getTargetEmpireID());
                 } else {
                     stmt.setNull(8);
                 }
-                if (request.getAmount() > 0) {
+                if (request.getAmount() != null) {
                     stmt.setDouble(9, request.getAmount());
                 } else {
                     stmt.setNull(9);

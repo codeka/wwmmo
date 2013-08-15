@@ -12,7 +12,7 @@ import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.StyledDialog;
 import au.com.codeka.warworlds.model.AllianceManager;
 
-public class JoinRequestDialog extends DialogFragment {
+public class WithdrawRequestDialog extends DialogFragment {
     private View mView;
     private int mAllianceID;
 
@@ -26,30 +26,27 @@ public class JoinRequestDialog extends DialogFragment {
         LayoutInflater inflater = activity.getLayoutInflater();
         mView = inflater.inflate(R.layout.alliance_request_dlg, null);
 
-        View amount = mView.findViewById(R.id.amount);
-        amount.setVisibility(View.GONE);
+        TextView instructions = (TextView) mView.findViewById(R.id.instructions);
+        instructions.setText("Enter the amount to withdraw, and the reason for wanting to withdraw cash, then click \"Withdraw\". Your request must be approved before the cash is given to you.");
 
         return new StyledDialog.Builder(getActivity())
                            .setView(mView)
-                           .setTitle("Join Alliance")
-                           .setPositiveButton("Join", new DialogInterface.OnClickListener() {
+                           .setTitle("Withdraw Cash")
+                           .setPositiveButton("Withdraw", new DialogInterface.OnClickListener() {
                                @Override
                                public void onClick(DialogInterface dialog, int which) {
-                                   onAllianceJoin();
+                                   onWithdraw();
                                }
                            })
                            .setNegativeButton("Cancel", null)
                            .create();
     }
 
-    private void onAllianceJoin() {
+    private void onWithdraw() {
         TextView message = (TextView) mView.findViewById(R.id.message);
-        AllianceManager.i.requestJoin(mAllianceID, message.getText().toString());
-
-        new StyledDialog.Builder(getActivity())
-                        .setMessage("The request to join this alliance has been sent, you'll get a notification when your application is approved.")
-                        .setNeutralButton("OK", null)
-                        .create().show();
+        TextView amount = (TextView) mView.findViewById(R.id.amount);
+        AllianceManager.i.requestWithdraw(mAllianceID, message.getText().toString(),
+                            Integer.parseInt(amount.getText().toString()));
 
         dismiss();
     }

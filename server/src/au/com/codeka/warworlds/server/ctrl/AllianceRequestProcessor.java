@@ -203,7 +203,7 @@ public abstract class AllianceRequestProcessor {
                     .setEmpireId(mRequest.getRequestEmpireID())
                     .setReason(Messages.CashAuditRecord.Reason.AllianceWithdraw);
             if (!new EmpireController(ctrl.getDB().getTransaction()).adjustBalance(
-                    mRequest.getRequestEmpireID(), mRequest.getAmount(), audit_record_pb)) {
+                    mRequest.getRequestEmpireID(), -mRequest.getAmount(), audit_record_pb)) {
                 // if the empire didn't have enough cash, then don't proceed...
                 return;
             }

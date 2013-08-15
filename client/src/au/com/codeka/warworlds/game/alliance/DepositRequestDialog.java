@@ -12,7 +12,7 @@ import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.StyledDialog;
 import au.com.codeka.warworlds.model.AllianceManager;
 
-public class JoinRequestDialog extends DialogFragment {
+public class DepositRequestDialog extends DialogFragment {
     private View mView;
     private int mAllianceID;
 
@@ -26,30 +26,27 @@ public class JoinRequestDialog extends DialogFragment {
         LayoutInflater inflater = activity.getLayoutInflater();
         mView = inflater.inflate(R.layout.alliance_request_dlg, null);
 
-        View amount = mView.findViewById(R.id.amount);
-        amount.setVisibility(View.GONE);
+        TextView instructions = (TextView) mView.findViewById(R.id.instructions);
+        instructions.setText("Enter the amount to deposit, and a brief description of why you're depositing (optional), then click \"Deposit\".");
 
         return new StyledDialog.Builder(getActivity())
                            .setView(mView)
-                           .setTitle("Join Alliance")
-                           .setPositiveButton("Join", new DialogInterface.OnClickListener() {
+                           .setTitle("Deposit Cash")
+                           .setPositiveButton("Deposit", new DialogInterface.OnClickListener() {
                                @Override
                                public void onClick(DialogInterface dialog, int which) {
-                                   onAllianceJoin();
+                                   onDeposit();
                                }
                            })
                            .setNegativeButton("Cancel", null)
                            .create();
     }
 
-    private void onAllianceJoin() {
+    private void onDeposit() {
         TextView message = (TextView) mView.findViewById(R.id.message);
-        AllianceManager.i.requestJoin(mAllianceID, message.getText().toString());
-
-        new StyledDialog.Builder(getActivity())
-                        .setMessage("The request to join this alliance has been sent, you'll get a notification when your application is approved.")
-                        .setNeutralButton("OK", null)
-                        .create().show();
+        TextView amount = (TextView) mView.findViewById(R.id.amount);
+        AllianceManager.i.requestDeposit(mAllianceID, message.getText().toString(),
+                            Integer.parseInt(amount.getText().toString()));
 
         dismiss();
     }

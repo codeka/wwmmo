@@ -20,6 +20,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import au.com.codeka.Cash;
 import au.com.codeka.common.model.BaseAllianceMember;
 import au.com.codeka.common.model.BaseEmpireRank;
 import au.com.codeka.common.protobuf.Messages;
@@ -112,6 +113,26 @@ public class AllianceDetailsActivity extends BaseActivity
             setContentView(R.layout.alliance_details_enemy);
         }
 
+        Button depositBtn = (Button) findViewById(R.id.bank_deposit);
+        if (depositBtn != null) depositBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                DepositRequestDialog dialog = new DepositRequestDialog();
+                dialog.setAllianceID(mAllianceID);
+                dialog.show(getSupportFragmentManager(), "");
+            }
+        });
+
+        Button withdrawBtn = (Button) findViewById(R.id.bank_withdraw);
+        if (withdrawBtn != null) withdrawBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                WithdrawRequestDialog dialog = new WithdrawRequestDialog();
+                dialog.setAllianceID(mAllianceID);
+                dialog.show(getSupportFragmentManager(), "");
+            }
+        });
+
         Button joinBtn = (Button) findViewById(R.id.join_btn);
         if (joinBtn != null) joinBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -141,6 +162,11 @@ public class AllianceDetailsActivity extends BaseActivity
 
         TextView allianceName = (TextView) findViewById(R.id.alliance_name);
         allianceName.setText(mAlliance.getName());
+
+        TextView bankBalance = (TextView) findViewById(R.id.bank_balance);
+        if (bankBalance != null) {
+            bankBalance.setText(Cash.format((float) mAlliance.getBankBalance()));
+        }
 
         TextView allianceMembers = (TextView) findViewById(R.id.alliance_num_members);
         allianceMembers.setText(String.format("Members: %d", mAlliance.getNumMembers()));

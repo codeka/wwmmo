@@ -29,6 +29,7 @@ public class Alliance extends BaseAlliance {
         mCreatorEmpireKey = Integer.toString(mCreatorEmpireID);
         mTimeCreated = new DateTime(rs.getTimestamp("created_date").getTime());
         mNumMembers = rs.getInt("num_empires");
+        mBankBalance = rs.getDouble("bank_balance");
         mMembers = new ArrayList<BaseAllianceMember>();
     }
 

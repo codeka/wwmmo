@@ -30,6 +30,10 @@ public class AllianceRequest extends BaseAllianceRequest {
         }
     }
 
+    public void setID(int id){
+        mID = id;
+    }
+
     public void setState(RequestState state) {
         mState = state;
     }
