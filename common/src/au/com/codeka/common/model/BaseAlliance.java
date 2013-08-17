@@ -2,6 +2,7 @@ package au.com.codeka.common.model;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -39,6 +40,19 @@ public abstract class BaseAlliance {
     }
     public List<BaseAllianceMember> getMembers() {
         return mMembers;
+    }
+
+    public int getTotalPossibleVotes(Set<Integer> excludingEmpires) {
+        int totalVotes = 0;
+        for (BaseAllianceMember member : mMembers) {
+            int memberEmpireID = Integer.parseInt(member.getEmpireKey());
+            if (excludingEmpires.contains(memberEmpireID)) {
+                continue;
+            }
+
+            totalVotes += member.getRank().getNumVotes();
+        }
+        return totalVotes;
     }
 
     public void fromProtocolBuffer(Messages.Alliance pb) {

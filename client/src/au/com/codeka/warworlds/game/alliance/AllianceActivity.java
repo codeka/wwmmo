@@ -259,13 +259,14 @@ public class AllianceActivity extends TabFragmentActivity
                                          implements AllianceManager.AllianceUpdatedHandler {
         private View mView;
         private RequestListAdapter mRequestListAdapter;
+        private Alliance mAlliance;
 
         @Override
         public void onAllianceUpdated(Alliance alliance) {
-            MyEmpire myEmpire = EmpireManager.i.getEmpire();
-            if (alliance.getKey().equals(myEmpire.getAlliance().getKey())) {
-                refresh();
+            if (mAlliance == null || mAlliance.getKey().equals(alliance.getKey())) {
+                mAlliance = alliance;
             }
+            refreshRequests();
         }
 
         @Override
@@ -293,7 +294,7 @@ public class AllianceActivity extends TabFragmentActivity
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                     RequestListAdapter.ItemEntry entry = (RequestListAdapter.ItemEntry) mRequestListAdapter.getItem(position);
                     RequestVoteDialog dialog = new RequestVoteDialog();
-                    dialog.setRequest(entry.request);
+                    dialog.setRequest(mAlliance, entry.request);
                     dialog.show(getActivity().getSupportFragmentManager(), "");
                 }
             });
@@ -308,9 +309,21 @@ public class AllianceActivity extends TabFragmentActivity
             joinRequestsList.setVisibility(View.GONE);
             progressBar.setVisibility(View.VISIBLE);
 
-            MyEmpire myEmpire = EmpireManager.i.getEmpire();
-            if (myEmpire != null && myEmpire.getAlliance() != null) {
-                AllianceManager.i.fetchRequests(myEmpire.getAlliance().getKey(),
+            if (mAlliance == null) {
+                MyEmpire myEmpire = EmpireManager.i.getEmpire();
+                if (myEmpire != null && myEmpire.getAlliance() != null) {
+                    AllianceManager.i.fetchAlliance(Integer.parseInt(myEmpire.getAlliance().getKey()), null);
+                }
+            } else {
+                refreshRequests();
+            }
+        }
+
+        private void refreshRequests() {
+            final ProgressBar progressBar = (ProgressBar) mView.findViewById(R.id.loading);
+            final ListView joinRequestsList = (ListView) mView.findViewById(R.id.join_requests);
+
+            AllianceManager.i.fetchRequests(mAlliance.getKey(),
                     new AllianceManager.FetchRequestsCompleteHandler() {
                         @Override
                         public void onRequestsFetched(Map<Integer, Empire> empires, List<AllianceRequest> requests) {
@@ -320,7 +333,6 @@ public class AllianceActivity extends TabFragmentActivity
                             progressBar.setVisibility(View.GONE);
                         }
                 });
-            }
         }
 
         private class RequestListAdapter extends BaseAdapter {

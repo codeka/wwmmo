@@ -275,20 +275,41 @@ public class AllianceController {
         }
 
         public void vote(AllianceRequestVote vote) throws Exception {
-            String sql = "INSERT INTO alliance_request_votes (alliance_id, alliance_request_id," +
-                             " empire_id, votes, date) VALUES (?, ?, ?, ?, NOW())";
+            // if they're already voted for this request, then update the existing vote
+            String sql = "SELECT id FROM alliance_request_votes " +
+                         "WHERE alliance_request_id = ? AND empire_id = ?";
+            Integer id = null;
             try (SqlStmt stmt = prepare(sql)) {
-                stmt.setInt(1, vote.getAllianceID());
-                stmt.setInt(2, vote.getAllianceRequestID());
-                stmt.setInt(3, vote.getEmpireID());
-                stmt.setInt(4, vote.getVotes());
-                stmt.update();
+                stmt.setInt(1, vote.getAllianceRequestID());
+                stmt.setInt(2, vote.getEmpireID());
+                id = stmt.selectFirstValue(Integer.class);
             }
 
-            sql = "UPDATE alliance_requests SET votes = votes + ? WHERE id = ?";
+            if (id != null) {
+                sql = "UPDATE alliance_request_votes SET votes = ? WHERE id = ?";
+                try (SqlStmt stmt = prepare(sql)) {
+                    stmt.setInt(1, vote.getVotes());
+                    stmt.setInt(2, (int) id);
+                    stmt.update();
+                }
+            } else {
+                sql = "INSERT INTO alliance_request_votes (alliance_id, alliance_request_id," +
+                         " empire_id, votes, date) VALUES (?, ?, ?, ?, NOW())";
+                try (SqlStmt stmt = prepare(sql)) {
+                    stmt.setInt(1, vote.getAllianceID());
+                    stmt.setInt(2, vote.getAllianceRequestID());
+                    stmt.setInt(3, vote.getEmpireID());
+                    stmt.setInt(4, vote.getVotes());
+                    stmt.update();
+                }
+            }
+
+            // update the alliance_requests table so it has an accurate vote count for this request
+            sql = "UPDATE alliance_requests SET votes = (" +
+                        "SELECT SUM(votes) FROM alliance_request_votes WHERE alliance_request_id = alliance_requests.id" +
+                    ") WHERE id = ?";
             try (SqlStmt stmt = prepare(sql)) {
-                stmt.setInt(1, vote.getVotes());
-                stmt.setInt(2, vote.getAllianceRequestID());
+                stmt.setInt(1, vote.getAllianceRequestID());
                 stmt.update();
             }
         }

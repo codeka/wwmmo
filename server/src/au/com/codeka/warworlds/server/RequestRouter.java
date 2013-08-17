@@ -54,7 +54,6 @@ public class RequestRouter extends AbstractHandler {
         sRoutes.add(new Route("alliances/({alliance_id}[0-9]+)$", AllianceHandler.class));
         sRoutes.add(new Route("alliances/({alliance_id}[0-9]+)/requests$", AllianceRequestsHandler.class));
         sRoutes.add(new Route("alliances/({alliance_id}[0-9]+)/requests/({request_id}[0-9]+)$", AllianceRequestHandler.class));
-        sRoutes.add(new Route("alliances/({alliance_id}[0-9]+)/members$", AllianceMembersHandler.class));
         sRoutes.add(new Route("sit-reports", SitReportsHandler.class));
         sRoutes.add(new Route("rankings/({year}[0-9]+)/({month}[0-9]+)$", RankingHistoryHandler.class));
         sRoutes.add(new Route("motd", MotdHandler.class));

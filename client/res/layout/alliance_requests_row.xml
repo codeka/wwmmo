@@ -3,7 +3,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent" >
 
-
     <ImageView
         android:id="@+id/empire_icon"
         android:layout_width="50dp"
@@ -66,5 +65,5 @@
         android:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit."
         android:singleLine="true"
         android:textAppearance="?android:attr/textAppearanceSmall" />
-    
+
 </RelativeLayout>

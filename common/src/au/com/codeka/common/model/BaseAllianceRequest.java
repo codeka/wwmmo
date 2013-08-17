@@ -85,24 +85,31 @@ public class BaseAllianceRequest {
     }
 
     public enum RequestType {
-        JOIN (0),
-        LEAVE(1),
-        KICK(2),
-        DEPOSIT_CASH(3),
-        WITHDRAW_CASH(4);
+        JOIN(0, 5),
+        LEAVE(1, 0),
+        KICK(2, 10),
+        DEPOSIT_CASH(3, 0),
+        WITHDRAW_CASH(4, 10);
 
         private int mNumber;
+        private int mRequiredVotes;
 
-        RequestType(int number) {
+        RequestType(int number, int requiredVotes) {
             mNumber = number;
+            mRequiredVotes = requiredVotes;
         }
 
         public int getNumber() {
             return mNumber;
         }
 
+        public int getRequiredVotes() {
+            return mRequiredVotes;
+        }
+
         public static RequestType fromNumber(int number) {
-            return RequestType.values()[number];
+            RequestType[] values = RequestType.values();
+            return values[number];
         }
     }
 

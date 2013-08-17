@@ -1,8 +1,10 @@
 package au.com.codeka.warworlds.server.ctrl;
 
+import java.util.Arrays;
+import java.util.TreeSet;
+
 import org.joda.time.DateTime;
 
-import au.com.codeka.common.model.BaseAllianceMember;
 import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.server.data.SqlStmt;
 import au.com.codeka.warworlds.server.model.Alliance;
@@ -49,7 +51,7 @@ public abstract class AllianceRequestProcessor {
      * request is passed. If we've received enough negative votes, the motion is denied.
      */
     public void onVote(AllianceController ctrl) throws Exception {
-        int requiredVotes = getRequiredVotes();
+        int requiredVotes = mRequest.getRequestType().getRequiredVotes();
         int totalPossibleVotes = getTotalPossibleVotes();
         if (requiredVotes > totalPossibleVotes) {
             requiredVotes = totalPossibleVotes - 1;
@@ -94,31 +96,14 @@ public abstract class AllianceRequestProcessor {
      * alliance can cast?
      */
     protected int getTotalPossibleVotes() {
-        int totalVotes = 0;
-        for (BaseAllianceMember member : mAlliance.getMembers()) {
-            int memberEmpireID = Integer.parseInt(member.getEmpireKey());
-            if (mRequest.getRequestEmpireID() == memberEmpireID) {
-                continue;
-            }
-
-            totalVotes += member.getRank().getNumVotes();
-        }
-        return totalVotes;
+        TreeSet<Integer> excludingEmpires = new TreeSet<Integer>(
+                Arrays.asList(new Integer[] {mRequest.getRequestEmpireID()}));
+        return mAlliance.getTotalPossibleVotes(excludingEmpires);
     }
-
-    /**
-     * Returns the number of votes for a successful request.
-     */
-    protected abstract int getRequiredVotes();
 
     private static class JoinRequestProcessor extends AllianceRequestProcessor {
         public JoinRequestProcessor(Alliance alliance, AllianceRequest request) {
             super(alliance, request);
-        }
-
-        @Override
-        protected int getRequiredVotes() {
-            return 5;
         }
 
         @Override
@@ -143,11 +128,6 @@ public abstract class AllianceRequestProcessor {
         }
 
         @Override
-        protected int getRequiredVotes() {
-            return 0;
-        }
-
-        @Override
         protected void onVotePassed(AllianceController ctrl) throws Exception {
             super.onVotePassed(ctrl);
 
@@ -167,11 +147,6 @@ public abstract class AllianceRequestProcessor {
         }
 
         @Override
-        protected int getRequiredVotes() {
-            return 10;
-        }
-
-        @Override
         protected void onVotePassed(AllianceController ctrl) throws Exception {
             super.onVotePassed(ctrl);
 
@@ -188,11 +163,6 @@ public abstract class AllianceRequestProcessor {
     private static class DepositCashRequestProcessor extends AllianceRequestProcessor {
         public DepositCashRequestProcessor(Alliance alliance, AllianceRequest request) {
             super(alliance, request);
-        }
-
-        @Override
-        protected int getRequiredVotes() {
-            return 0;
         }
 
         @Override
@@ -232,11 +202,6 @@ public abstract class AllianceRequestProcessor {
     private static class WithdrawCashRequestProcessor extends AllianceRequestProcessor {
         public WithdrawCashRequestProcessor(Alliance alliance, AllianceRequest request) {
             super(alliance, request);
-        }
-
-        @Override
-        protected int getRequiredVotes() {
-            return 10;
         }
 
         @Override
