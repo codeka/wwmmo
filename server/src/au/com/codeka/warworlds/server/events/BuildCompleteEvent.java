@@ -47,6 +47,8 @@ public class BuildCompleteEvent extends Event {
             ResultSet rs = stmt.select();
             while (rs.next()) {
                 int id = rs.getInt(1);
+                processedIDs.add(id);
+
                 int starID = rs.getInt(2);
                 int colonyID = rs.getInt(3);
                 int empireID = rs.getInt(4);
@@ -71,7 +73,6 @@ public class BuildCompleteEvent extends Event {
                 } catch (Exception e) {
                     log.error("Error processing build-complete event!", e);
                 }
-                processedIDs.add(id);
             }
         } catch(Exception e) {
             log.error("Error processing build-complete event!", e);
