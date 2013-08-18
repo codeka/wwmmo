@@ -50,6 +50,10 @@ public class InfobarView extends FrameLayout
 
     @Override
     public void onStateChanged() {
+        if (isInEditMode()) {
+            return;
+        }
+
         // this is not called on the UI, so we have to send a request to the
         // UI thread to update the UI
         mHandler.post(new Runnable() {
@@ -82,27 +86,29 @@ public class InfobarView extends FrameLayout
 
     @Override
     public void onAttachedToWindow() {
-        if (!isInEditMode()) {
-            mHandler = new Handler();
-
-            MyEmpire empire = EmpireManager.i.getEmpire();
-            if (empire != null) {
-                onEmpireFetched(empire);
-            }
-
-            EmpireManager.i.addEmpireUpdatedListener(null, this);
-            RequestManager.addRequestManagerStateChangedHandler(this);
-
-            // set up the initial state
-            onStateChanged();
+        if (isInEditMode()) {
+            return;
         }
+        mHandler = new Handler();
+
+        MyEmpire empire = EmpireManager.i.getEmpire();
+        if (empire != null) {
+            onEmpireFetched(empire);
+        }
+
+        EmpireManager.i.addEmpireUpdatedListener(null, this);
+        RequestManager.addRequestManagerStateChangedHandler(this);
+
+        // set up the initial state
+        onStateChanged();
     }
 
     @Override
     public void onDetachedFromWindow() {
-        if (!isInEditMode()) {
-            EmpireManager.i.removeEmpireUpdatedListener(this);
-            RequestManager.removeRequestManagerStateChangedHandler(this);
+        if (isInEditMode()) {
+            return;
         }
+        EmpireManager.i.removeEmpireUpdatedListener(this);
+        RequestManager.removeRequestManagerStateChangedHandler(this);
     }
 }

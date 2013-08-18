@@ -291,6 +291,7 @@ public class EmpireManager {
                     Empire empire = new Empire();
                     empire.fromProtocolBuffer(empire_pb);
                     empires.add(empire);
+                    mEmpireCache.put(empire.getKey(), empire);
                 }
             }
         }
@@ -551,6 +552,10 @@ public class EmpireManager {
                         return;
                     }
 
+                    // delete any old cached values first
+                    db.delete("empires", getWhereClause(empire.getKey()), null);
+
+                    // insert a new cached value
                     ContentValues values = new ContentValues();
                     values.put("empire", empireBlob.toByteArray());
                     values.put("empire_key", empire.getKey());
@@ -571,7 +576,7 @@ public class EmpireManager {
                 Cursor cursor = null;
                 try {
                     cursor = db.query("empires", new String[] {"empire", "timestamp"},
-                            "empire_key = '"+empireKey.replace('\'', ' ')+"' AND realm_id="+RealmContext.i.getCurrentRealm().getID(),
+                            getWhereClause(empireKey),
                             null, null, null, null);
                     if (!cursor.moveToFirst()) {
                         cursor.close();
@@ -594,6 +599,10 @@ public class EmpireManager {
                     db.close();
                 }
             }
+        }
+
+        private String getWhereClause(String empireKey) {
+            return "empire_key = '"+empireKey.replace('\'', ' ')+"' AND realm_id="+RealmContext.i.getCurrentRealm().getID();
         }
     }
 }

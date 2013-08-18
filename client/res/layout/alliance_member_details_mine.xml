@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/list_selector" >
+
+    <ImageView
+        android:id="@+id/empire_icon"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:src="@drawable/app_icon" />
+
+    <TextView
+        android:id="@+id/empire_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_toRightOf="@id/empire_icon"
+        android:text="Empire Name"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+    
+    <TextView
+        android:id="@+id/total_stars"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/empire_name"
+        android:layout_toRightOf="@id/empire_icon"
+        android:text="Stars: 12"
+        android:textAppearance="?android:attr/textAppearanceSmall" />
+
+    <TextView
+        android:id="@+id/total_colonies"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/total_stars"
+        android:layout_toRightOf="@id/empire_icon"
+        android:text="Colonies: 23"
+        android:textAppearance="?android:attr/textAppearanceSmall" />
+
+    <TextView
+        android:id="@+id/total_ships"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@id/total_stars"
+        android:layout_toRightOf="@id/total_colonies"
+        android:layout_marginLeft="20dp"
+        android:text="Ships: 12,345"
+        android:textAppearance="?android:attr/textAppearanceSmall" />
+
+    <TextView
+        android:id="@+id/total_buildings"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@id/total_colonies"
+        android:layout_alignLeft="@id/total_ships"
+        android:text="Buildings 145"
+        android:textAppearance="?android:attr/textAppearanceSmall" />
+
+    <Button
+        android:id="@+id/view_btn"
+        android:layout_width="100dp"
+        android:layout_height="30dp"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@+id/empire_icon"
+        android:layout_marginTop="16dp"
+        android:text="View" />
+
+    <au.com.codeka.warworlds.ctrl.HorizontalSeparator
+        android:id="@+id/horz_sep"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/view_btn"
+        android:layout_marginTop="15dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:text="Kick Empire" />
+
+    <TextView
+        android:id="@+id/kick_info"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/horz_sep"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:text="You can vote to kick this empire out of the alliance by clicking the button below." />
+
+    <Button
+        android:id="@+id/kick_btn"
+        android:layout_width="100dp"
+        android:layout_height="30dp"
+        android:layout_below="@+id/kick_info"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="15dp"
+        android:text="Kick" />
+
+    <au.com.codeka.warworlds.ctrl.InfobarView
+        android:id="@+id/infobar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true" />
+
+</RelativeLayout>

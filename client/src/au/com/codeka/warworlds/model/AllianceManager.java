@@ -7,7 +7,6 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 
 import au.com.codeka.BackgroundRunner;
-import au.com.codeka.common.model.BaseAlliance;
 import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.api.ApiClient;
 import au.com.codeka.warworlds.api.ApiException;
@@ -114,6 +113,9 @@ public class AllianceManager {
                         if (!empireKeys.contains(Integer.toString(request_pb.getRequestEmpireId()))) {
                             empireKeys.add(Integer.toString(request_pb.getRequestEmpireId()));
                         }
+                        if (request_pb.hasTargetEmpireId() && !empireKeys.contains(Integer.toString(request_pb.getTargetEmpireId()))) {
+                            empireKeys.add(Integer.toString(request_pb.getTargetEmpireId()));
+                        }
                     }
 
                     List<Empire> empires = EmpireManager.i.fetchEmpiresSync(empireKeys);
@@ -172,6 +174,29 @@ public class AllianceManager {
         request(pb);
     }
 
+    public void requestKick(final int allianceID, final String empireKey, final String message) {
+        final MyEmpire myEmpire = EmpireManager.i.getEmpire();
+        Messages.AllianceRequest pb = Messages.AllianceRequest.newBuilder()
+                            .setRequestType(Messages.AllianceRequest.RequestType.KICK)
+                            .setTargetEmpireId(Integer.parseInt(empireKey))
+                            .setAllianceId(allianceID)
+                            .setRequestEmpireId(Integer.parseInt(myEmpire.getKey()))
+                            .setMessage(message)
+                            .build();
+        request(pb);
+    }
+
+    public void requestLeave() {
+        final MyEmpire myEmpire = EmpireManager.i.getEmpire();
+        Messages.AllianceRequest pb = Messages.AllianceRequest.newBuilder()
+                            .setRequestType(Messages.AllianceRequest.RequestType.LEAVE)
+                            .setAllianceId(Integer.parseInt(myEmpire.getAlliance().getKey()))
+                            .setRequestEmpireId(Integer.parseInt(myEmpire.getKey()))
+                            .setMessage("")
+                            .build();
+        request(pb);
+    }
+
     private void request(final Messages.AllianceRequest pb) {
         final int allianceID = pb.getAllianceId();
 
@@ -218,44 +243,6 @@ public class AllianceManager {
             protected void onComplete(Boolean success) {
                 if (success) {
                     refreshAlliance(request.getAllianceID());
-                }
-            }
-        }.execute();
-    }
-
-    public void leaveAlliance() {
-        final MyEmpire myEmpire = EmpireManager.i.getEmpire();
-        if (myEmpire == null) {
-            return;
-        }
-        final BaseAlliance myAlliance = myEmpire.getAlliance();
-        if (myAlliance == null) {
-            return;
-        }
-
-        new BackgroundRunner<Boolean>() {
-            @Override
-            protected Boolean doInBackground() {
-                String url = "alliances/"+myAlliance.getKey()+"/requests";
-                try {
-                    Messages.AllianceRequest pb = Messages.AllianceRequest.newBuilder()
-                                                          .setAllianceId(Integer.parseInt(myAlliance.getKey()))
-                                                          .setRequestEmpireId(Integer.parseInt(myEmpire.getKey()))
-                                                          .setRequestType(Messages.AllianceRequest.RequestType.LEAVE)
-                                                          .build();
-
-                    ApiClient.postProtoBuf(url, pb);
-                    return true;
-                } catch(ApiException e) {
-                    return false;
-                }
-            }
-
-            @Override
-            protected void onComplete(Boolean success) {
-                if (success) {
-                    EmpireManager.i.refreshEmpire();
-                    refreshAlliance(((Alliance) myAlliance).getID());
                 }
             }
         }.execute();

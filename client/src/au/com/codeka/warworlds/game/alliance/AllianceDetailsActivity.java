@@ -219,12 +219,22 @@ public class AllianceDetailsActivity extends BaseActivity
         View.OnClickListener onClickListener = new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // TODO
+                Empire empire = (Empire) v.getTag();
+
+                Intent intent = new Intent(AllianceDetailsActivity.this, AllianceMemberDetailsActivity.class);
+                intent.putExtra("au.com.codeka.warworlds.AllianceKey", mAlliance.getKey());
+                Messages.Alliance.Builder alliance_pb = Messages.Alliance.newBuilder();
+                mAlliance.toProtocolBuffer(alliance_pb);
+                intent.putExtra("au.com.codeka.warworlds.Alliance", alliance_pb.build().toByteArray());
+                intent.putExtra("au.com.codeka.warworlds.EmpireKey", empire.getKey());
+
+                startActivity(intent);
             }
         };
 
         for (Empire empire : empires) {
             View view = inflater.inflate(R.layout.alliance_empire_row, null);
+            view.setTag(empire);
 
             ImageView empireIcon = (ImageView) view.findViewById(R.id.empire_icon);
             TextView empireName = (TextView) view.findViewById(R.id.empire_name);

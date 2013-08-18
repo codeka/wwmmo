@@ -341,7 +341,12 @@ public class AllianceActivity extends TabFragmentActivity
             public void setRequests(Map<Integer, Empire> empires, List<AllianceRequest> requests) {
                 mEntries = new ArrayList<ItemEntry>();
                 for (AllianceRequest request : requests) {
-                    Empire empire = empires.get(request.getRequestEmpireID());
+                    Empire empire;
+                    if (request.getTargetEmpireID() != null) {
+                        empire = empires.get(request.getTargetEmpireID());
+                    } else {
+                        empire = empires.get(request.getRequestEmpireID());
+                    }
                     mEntries.add(new ItemEntry(empire, request));
                 }
 

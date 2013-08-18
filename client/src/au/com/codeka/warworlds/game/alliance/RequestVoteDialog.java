@@ -44,8 +44,14 @@ public class RequestVoteDialog extends DialogFragment {
         TextView requestVotes = (TextView) mView.findViewById(R.id.request_votes);
         TextView requestRequiredVotes = (TextView) mView.findViewById(R.id.request_required_votes);
         TextView message = (TextView) mView.findViewById(R.id.message);
+        TextView requestBy = (TextView) mView.findViewById(R.id.request_by);
 
-        Empire empire = EmpireManager.i.getEmpire(Integer.toString(mRequest.getRequestEmpireID()));
+        Empire empire;
+        if (mRequest.getTargetEmpireID() != null) {
+            empire = EmpireManager.i.getEmpire(Integer.toString(mRequest.getTargetEmpireID()));
+        } else {
+            empire = EmpireManager.i.getEmpire(Integer.toString(mRequest.getRequestEmpireID()));
+        }
         if (empire != null) {
             // it should never be null, so we won't bother refreshing...
             empireName.setText(empire.getDisplayName());
@@ -63,12 +69,25 @@ public class RequestVoteDialog extends DialogFragment {
 
         TreeSet<Integer> excludingEmpires = new TreeSet<Integer>(
                 Arrays.asList(new Integer[] {mRequest.getRequestEmpireID()}));
+        if (mRequest.getTargetEmpireID() != null) {
+            excludingEmpires.add(mRequest.getTargetEmpireID());
+        }
         int totalPossibleVotes = mAlliance.getTotalPossibleVotes(excludingEmpires);
         int requiredVotes = mRequest.getRequestType().getRequiredVotes();
         if (requiredVotes > totalPossibleVotes) {
             requiredVotes = totalPossibleVotes;
         }
         requestRequiredVotes.setText(String.format(Locale.ENGLISH, "/ %d", requiredVotes));
+
+        if (mRequest.getTargetEmpireID() != null) {
+            empire = EmpireManager.i.getEmpire(Integer.toString(mRequest.getRequestEmpireID()));
+
+            requestBy.setVisibility(View.VISIBLE);
+            requestBy.setText(String.format(Locale.ENGLISH, "by %s",
+                    empire.getDisplayName()));
+        } else {
+            requestBy.setVisibility(View.GONE);
+        }
 
         return new StyledDialog.Builder(getActivity())
                    .setView(mView)

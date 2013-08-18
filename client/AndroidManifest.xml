@@ -81,6 +81,7 @@
         <activity android:name=".game.solarsystem.FleetActivity" />
         <activity android:name=".game.alliance.AllianceActivity" />
         <activity android:name=".game.alliance.AllianceDetailsActivity" />
+        <activity android:name=".game.alliance.AllianceMemberDetailsActivity" />
         <activity android:name=".game.ChatActivity" />
         <activity android:name=".game.SitrepActivity">
             <meta-data

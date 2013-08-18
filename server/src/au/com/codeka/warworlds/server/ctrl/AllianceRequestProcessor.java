@@ -98,6 +98,9 @@ public abstract class AllianceRequestProcessor {
     protected int getTotalPossibleVotes() {
         TreeSet<Integer> excludingEmpires = new TreeSet<Integer>(
                 Arrays.asList(new Integer[] {mRequest.getRequestEmpireID()}));
+        if (mRequest.getTargetEmpireID() != null) {
+            excludingEmpires.add(mRequest.getTargetEmpireID());
+        }
         return mAlliance.getTotalPossibleVotes(excludingEmpires);
     }
 
@@ -152,7 +155,7 @@ public abstract class AllianceRequestProcessor {
 
             String sql = "UPDATE empires SET alliance_id = NULL, alliance_rank = NULL WHERE id = ?";
             try (SqlStmt stmt = ctrl.getDB().prepare(sql)) {
-                stmt.setInt(1, mRequest.getRequestEmpireID());
+                stmt.setInt(1, mRequest.getTargetEmpireID());
                 stmt.update();
             }
 

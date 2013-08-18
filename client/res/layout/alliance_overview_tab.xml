@@ -3,11 +3,17 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent" >
 
+    <au.com.codeka.warworlds.ctrl.InfobarView
+        android:id="@+id/infobar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true" />
+
     <Button
         android:id="@+id/create_alliance_btn"
         android:layout_width="200dp"
         android:layout_height="40dp"
-        android:layout_alignParentBottom="true"
+        android:layout_above="@id/infobar"
         android:layout_centerHorizontal="true"
         android:layout_margin="8dp"
         android:text="Create Alliance" />

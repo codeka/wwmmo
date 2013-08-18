@@ -31,6 +31,15 @@
         android:textAppearance="?android:attr/textAppearanceSmall" />
 
     <TextView
+        android:id="@+id/request_by"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/request_description"
+        android:layout_toRightOf="@+id/empire_icon"
+        android:text="by Empire"
+        android:textAppearance="?android:attr/textAppearanceSmall" />
+
+    <TextView
         android:id="@+id/request_required_votes"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -60,7 +69,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_below="@+id/empire_icon"
-        android:layout_marginTop="4dp"
+        android:layout_marginTop="12dp"
         android:layout_marginLeft="10dp"
         android:layout_marginRight="10dp"
         android:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit."
@@ -100,4 +109,5 @@
             android:layout_marginRight="10dp"
             android:text="Nay" />
     </RadioGroup>
+
 </RelativeLayout>
