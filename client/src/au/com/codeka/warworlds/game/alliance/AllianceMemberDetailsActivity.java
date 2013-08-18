@@ -120,7 +120,7 @@ public class AllianceMemberDetailsActivity extends BaseActivity
         });
 
         Button kickBtn = (Button) findViewById(R.id.kick_btn);
-        kickBtn.setOnClickListener(new View.OnClickListener() {
+        if (kickBtn != null) kickBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 KickRequestDialog dialog = new KickRequestDialog();
