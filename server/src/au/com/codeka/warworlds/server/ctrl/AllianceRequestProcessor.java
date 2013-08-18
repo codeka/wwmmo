@@ -54,7 +54,7 @@ public abstract class AllianceRequestProcessor {
         int requiredVotes = mRequest.getRequestType().getRequiredVotes();
         int totalPossibleVotes = getTotalPossibleVotes();
         if (requiredVotes > totalPossibleVotes) {
-            requiredVotes = totalPossibleVotes - 1;
+            requiredVotes = totalPossibleVotes;
         }
         if (requiredVotes < 0) {
             requiredVotes = 0;
