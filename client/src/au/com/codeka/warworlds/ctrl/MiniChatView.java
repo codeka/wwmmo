@@ -52,6 +52,7 @@ public class MiniChatView extends RelativeLayout
         mScrollView = new ScrollView(mContext);
         mScrollView.setLayoutParams(lp);
         mScrollView.setId(id++);
+        mScrollView.setFillViewport(true);
         addView(mScrollView);
 
         lp = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
@@ -72,6 +73,7 @@ public class MiniChatView extends RelativeLayout
                 mContext.startActivity(intent);
             }
         });
+        mMsgsContainer.setClickable(true);;
     }
 
     @Override
