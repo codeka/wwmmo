@@ -195,6 +195,11 @@ message HelloRequest
     // The memory class of your device -- basically, how much memory can we assume is available
     // to the War Worlds app (in megabytes)
     optional int32 memory_class = 5;
+
+    // If present and set to true, we'll occasionally respond to requests with a protocol buffer
+    // wrapped in a NotficationWrapper message. This way, we can get notifications without having
+    // to wait for GCM.
+    optional bool allow_inline_notfications = 6;
 }
 
 
@@ -299,11 +304,20 @@ message DeviceOnlineStatus
 
 
 //
-// Represents a message that we'll be sending to a device.
+// Notifications are base-64 encoded strings (because that's all we can send via GCM).
 //
-message DeviceMessage
-{
-    required string message = 1;
+message Notification {
+    optional string name = 1;
+    optional string value = 2;
+}
+
+
+//
+// If we want to send a notification along with a message, this is what we wrap it in.
+//
+message NotificationWrapper {
+    required bytes original_message = 1;
+    repeated Notification notifications = 2;
 }
 
 

@@ -53,4 +53,9 @@ public class ColonyAttackHandler extends RequestHandler {
             throw new RequestException(e);
         }
     }
+
+    @Override
+    protected boolean supportsRetryOnDeadlock() {
+        return true;
+    }
 }

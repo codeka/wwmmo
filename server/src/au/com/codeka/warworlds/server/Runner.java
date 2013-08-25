@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 
 import au.com.codeka.warworlds.server.ctrl.CombatReportController;
 import au.com.codeka.warworlds.server.ctrl.NameGenerator;
+import au.com.codeka.warworlds.server.ctrl.SessionController;
 import au.com.codeka.warworlds.server.ctrl.StarController;
 import au.com.codeka.warworlds.server.ctrl.StatisticsController;
 import au.com.codeka.warworlds.server.handlers.pages.HtmlPageHandler;
@@ -40,32 +41,31 @@ public class Runner {
             if (method.equals("update-ranks")) {
                 new StatisticsController().updateRanks();
             } else if (method.equals("simulate-stars")) {
-                int numHours = 6;
-                if (extra != null) {
-                    numHours = Integer.parseInt(extra);
-                }
-                DateTime dt = DateTime.now();
-                if (numHours > 0) {
-                    dt = dt.minusHours(numHours);
-                }
+                DateTime dt = DateTime.now().minusHours(extraToNum(extra, 0, 6));
                 new StarController().simulateAllStarsOlderThan(dt);
             } else if (method.equals("purge-combat-reports")) {
-                int numDays = 30;
-                if (extra != null) {
-                    numDays = Integer.parseInt(extra);
-                }
-                if (numDays < 7) {
-                    numDays = 7;
-                }
-                DateTime dt = DateTime.now();
-                dt = dt.minusDays(numDays);
+                DateTime dt = DateTime.now().minusDays(extraToNum(extra, 7, 30));
                 new CombatReportController().purgeCombatReportsOlderThan(dt);
+            } else if (method.equals("purge-sessions")) {
+                DateTime dt = DateTime.now().minusDays(extraToNum(extra, 1, 7));
+                new SessionController().purgeSessionsOlderThan(dt);
             } else {
                 log.error("Unknown command: "+method);
             }
         } catch(Exception e) {
             log.error("Error running CRON", e);
         }
+    }
+
+    private static int extraToNum(String extra, int minNumber, int defaultNumber) {
+        int num = defaultNumber;
+        if (extra != null) {
+            num = Integer.parseInt(extra);
+        }
+        if (num < minNumber) {
+            num = minNumber;
+        }
+        return num;
     }
 
     private static void gameMain() throws Exception {

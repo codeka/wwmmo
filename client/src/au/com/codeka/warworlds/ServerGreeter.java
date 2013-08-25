@@ -176,6 +176,7 @@ public class ServerGreeter {
                             .setDeviceModel(android.os.Build.MODEL)
                             .setDeviceVersion(android.os.Build.VERSION.RELEASE)
                             .setMemoryClass(memoryClass)
+                            .setAllowInlineNotfications(true)
                             .build();
 
                     String url = "hello/"+deviceRegistrationKey;

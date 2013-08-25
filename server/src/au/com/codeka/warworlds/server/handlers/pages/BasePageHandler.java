@@ -50,7 +50,7 @@ public class BasePageHandler extends RequestHandler {
     }
 
     protected boolean isAdmin() throws RequestException {
-        if (getSession(false) == null || !getSession(false).isAdmin()) {
+        if (getSessionNoError() == null || !getSessionNoError().isAdmin()) {
             // if they're not authenticated yet, we'll have to redirect them to the authentication
             // page first.
             authenticate();

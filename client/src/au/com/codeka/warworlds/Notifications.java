@@ -6,6 +6,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import android.annotation.SuppressLint;
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -24,11 +27,18 @@ import android.net.Uri;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
 import android.text.Html;
+import android.util.Base64;
 import au.com.codeka.common.model.DesignKind;
 import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.game.SitrepActivity;
+import au.com.codeka.warworlds.model.BuildManager;
+import au.com.codeka.warworlds.model.ChatManager;
+import au.com.codeka.warworlds.model.ChatMessage;
+import au.com.codeka.warworlds.model.EmpireManager;
+import au.com.codeka.warworlds.model.MyEmpire;
 import au.com.codeka.warworlds.model.Realm;
 import au.com.codeka.warworlds.model.RealmManager;
+import au.com.codeka.warworlds.model.SectorManager;
 import au.com.codeka.warworlds.model.SituationReport;
 import au.com.codeka.warworlds.model.Sprite;
 import au.com.codeka.warworlds.model.Star;
@@ -39,6 +49,8 @@ import au.com.codeka.warworlds.model.StarSummary;
 import com.google.protobuf.InvalidProtocolBufferException;
 
 public class Notifications {
+    private static Logger log = LoggerFactory.getLogger(Notifications.class);
+
     private Notifications() {
     }
 
@@ -49,8 +61,74 @@ public class Notifications {
         new DatabaseHelper().clearNotifications();
     }
 
-    public static void displayNotification(final Context context,
-                                           final Messages.SituationReport sitrep) {
+    public static void displayNotfication(Context context, String name, String value) {
+        if (name.equals("sitrep")) {
+            byte[] blob = Base64.decode(value, Base64.DEFAULT);
+
+            Messages.SituationReport pb;
+            try {
+                pb = Messages.SituationReport.parseFrom(blob);
+            } catch (InvalidProtocolBufferException e) {
+                log.error("Could not parse situation report!", e);
+                return;
+            }
+
+            // we could currently be in a game, and that game could be running in a different
+            // realm to this notification. So we switch this thread temporarily to whatever
+            // realm this notification is for.
+            Realm thisRealm = RealmManager.i.getRealmByName(pb.getRealm());
+            RealmContext.i.setThreadRealm(thisRealm);
+            try {
+                // refresh the star this situation report is for, obviously
+                // something happened that we'll want to know about
+                Star star = StarManager.getInstance().refreshStarSync(pb.getStarKey(), true);
+                if (star == null) { // <-- only refresh the star if we have one cached
+                    // if we didn't refresh the star, then at least refresh
+                    // the sector it was in (could have been a moving
+                    // fleet, say)
+                    star = SectorManager.getInstance().findStar(pb.getStarKey());
+                    if (star != null) {
+                        SectorManager.getInstance().refreshSector(star.getSectorX(), star.getSectorY());
+                    }
+                } else {
+                    StarManager.getInstance().fireStarUpdated(star);
+                }
+
+                // notify the build manager, in case it's a 'build complete' or something
+                BuildManager.getInstance().notifySituationReport(pb);
+
+                Notifications.displayNotification(context, pb);
+            } finally {
+                RealmContext.i.setThreadRealm(null);
+            }
+        } else if (name.equals("chat")) {
+            byte[] blob = Base64.decode(value, Base64.DEFAULT);
+
+            ChatMessage msg;
+            try {
+                Messages.ChatMessage pb = Messages.ChatMessage.parseFrom(blob);
+                msg = new ChatMessage();
+                msg.fromProtocolBuffer(pb);
+            } catch(InvalidProtocolBufferException e) {
+                log.error("Could not parse chat message!", e);
+                return;
+            }
+
+            // don't add our own chats, since they'll have been added automatically
+            MyEmpire myEmpire = EmpireManager.i.getEmpire();
+            if (myEmpire == null) {
+                return;
+            }
+            if (msg.getEmpireKey() == null || msg.getEmpireKey().equals(myEmpire.getKey())) {
+                return;
+            }
+
+            ChatManager.getInstance().addMessage(msg);
+        }
+    }
+
+    private static void displayNotification(final Context context,
+                                            final Messages.SituationReport sitrep) {
         String starKey = sitrep.getStarKey();
         StarSummary starSummary = StarManager.getInstance().requestStarSummarySync(starKey,
                 Float.MAX_VALUE // always prefer a cached version, no matter how old

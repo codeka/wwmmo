@@ -21,6 +21,8 @@ import org.slf4j.LoggerFactory;
 import au.com.codeka.warworlds.server.OpenIdAuth;
 import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.RequestHandler;
+import au.com.codeka.warworlds.server.Session;
+import au.com.codeka.warworlds.server.ctrl.SessionController;
 import au.com.codeka.warworlds.server.data.DB;
 import au.com.codeka.warworlds.server.data.SqlStmt;
 
@@ -177,28 +179,9 @@ public class LoginHandler extends RequestHandler {
             throw new RequestException(e);
         }
 
-        String sql = "INSERT INTO sessions (session_cookie, user_email, login_time, empire_id," +
-                                          " alliance_id, is_admin)" +
-                    " VALUES (?, ?, ?, ?, ?, ?)";
-        try (SqlStmt stmt = DB.prepare(sql)) {
-            stmt.setString(1, cookie.toString());
-            stmt.setString(2, emailAddr);
-            stmt.setDateTime(3, DateTime.now());
-            if (empireID == 0) {
-                stmt.setNull(4);
-            } else {
-                stmt.setInt(4, empireID);
-            }
-            if (allianceID == 0) {
-                stmt.setNull(5);
-            } else {
-                stmt.setInt(5, allianceID);
-            }
-            stmt.setInt(6, isAdmin ? 1 : 0);
-            stmt.update();
-        } catch (Exception e) {
-            throw new RequestException(e);
-        }
+        Session session = new Session(cookie.toString(), emailAddr, DateTime.now(),
+                empireID, allianceID, isAdmin);
+        new SessionController().saveSession(session);
 
         log.info(String.format(Locale.ENGLISH, "Authenticated: email=%s cookie=%s", emailAddr, cookie));
         return cookie.toString();

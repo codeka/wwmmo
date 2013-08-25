@@ -7,7 +7,9 @@ import java.io.InputStreamReader;
 import java.lang.reflect.Method;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.sql.ResultSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
 
 import javax.servlet.ServletInputStream;
 import javax.servlet.http.Cookie;
@@ -19,11 +21,13 @@ import jregex.Matcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.common.protoformat.PbFormatter;
-import au.com.codeka.warworlds.server.data.DB;
-import au.com.codeka.warworlds.server.data.SqlStmt;
+import au.com.codeka.warworlds.server.ctrl.NotificationController;
+import au.com.codeka.warworlds.server.ctrl.SessionController;
 
 import com.google.protobuf.Message;
+import com.mysql.jdbc.exceptions.jdbc4.MySQLTransactionRollbackException;
 
 /**
  * This is the base class for the game's request handlers. It handles some common tasks such as
@@ -65,32 +69,53 @@ public class RequestHandler {
         // start off with status 200, but the handler might change it
         mResponse.setStatus(200);
 
-        try {
-            if (request.getMethod().equals("GET")) {
-                get();
-            } else if (request.getMethod().equals("POST")) {
-                post();
-            } else if (request.getMethod().equals("PUT")) {
-                put();
-            } else if (request.getMethod().equals("DELETE")) {
-                delete();
-            } else {
-                throw new RequestException(501);
+        RequestException lastException = null;
+        for (int retries = 0; retries < 10; retries++) {
+            try {
+                if (request.getMethod().equals("GET")) {
+                    get();
+                } else if (request.getMethod().equals("POST")) {
+                    post();
+                } else if (request.getMethod().equals("PUT")) {
+                    put();
+                } else if (request.getMethod().equals("DELETE")) {
+                    delete();
+                } else {
+                    throw new RequestException(501);
+                }
+
+                return; // break out of the retry loop
+            } catch(RequestException e) {
+                Throwable cause = e.getCause();
+                if (cause instanceof MySQLTransactionRollbackException && supportsRetryOnDeadlock()) {
+                    try {
+                        Thread.sleep(50 + new Random().nextInt(100));
+                    } catch (InterruptedException e1) {
+                    }
+                    log.warn("Retrying deadlock.", e);
+                    lastException = e;
+                    continue;
+                }
+                if (e.getHttpErrorCode() < 500) {
+                    log.warn("Unhandled error in URL: "+request.getRequestURI(), e);
+                } else {
+                    log.error("Unhandled error in URL: "+request.getRequestURI(), e);
+                }
+                e.populate(mResponse);
+                setResponseBody(e.getGenericError());
+                return;
+            } catch(Exception e) {
+                log.error("Unhandled error!", e);
+                mResponse.setStatus(500);
+                return;
             }
-        } catch(RequestException e) {
-            if (e.getHttpErrorCode() < 500) {
-                log.warn("Unhandled error in URL: "+request.getRequestURI(), e);
-            } else {
-                log.error("Unhandled error in URL: "+request.getRequestURI(), e);
-            }
-            e.populate(mResponse);
-            setResponseBody(e.getGenericError());
-            return;
-        } catch(Exception e) {
-            log.error("Unhandled error!", e);
-            mResponse.setStatus(500);
-            return;
         }
+
+        // if we get here, it's because we exceeded the number of retries.
+        log.error("Too many retries: "+request.getRequestURI(), lastException);
+        lastException.populate(mResponse);
+        setResponseBody(lastException.getGenericError());
+
     }
 
     protected void get() throws RequestException {
@@ -109,9 +134,40 @@ public class RequestHandler {
         throw new RequestException(501);
     }
 
+    /**
+     * You can override this in subclass to indicate that the request supports automatic
+     * retry on deadlock.
+     */
+    protected boolean supportsRetryOnDeadlock() {
+        return false;
+    }
+
     protected void setResponseBody(Message pb) {
         if (pb == null) {
             return;
+        }
+
+        if (getSessionNoError() != null && getSessionNoError().allowInlineNotifications()) {
+            int empireID = getSessionNoError().getEmpireID();
+            List<Map<String, String>> notifications = new NotificationController().getRecentNotifications(empireID);
+            if (notifications.size() > 0) {
+                Messages.NotificationWrapper.Builder notification_wrapper_pb = Messages.NotificationWrapper.newBuilder();
+                for (Map<String, String> notification : notifications) {
+                    for (String key : notification.keySet()) {
+                        String value = notification.get(key);
+                        Messages.Notification notification_pb = Messages.Notification.newBuilder()
+                                .setName(key)
+                                .setValue(value)
+                                .build();
+                        notification_wrapper_pb.addNotifications(notification_pb);
+                    }
+                }
+                notification_wrapper_pb.setOriginalMessage(pb.toByteString());
+                pb = notification_wrapper_pb.build();
+
+                // add a header so the client can know it's a notification wrapper
+                mResponse.setHeader("X-Notification-Wrapper", "1");
+            }
         }
 
         if (mRequest.getHeader("Accept") != null) {
@@ -159,10 +215,6 @@ public class RequestHandler {
         return mResponse;
     }
 
-    protected Session getSession() throws RequestException {
-        return getSession(true);
-    }
-
     protected String getRequestUrl() {
         URI requestURI = null;
         try {
@@ -179,47 +231,28 @@ public class RequestHandler {
         }
     }
 
-    protected Session getSession(boolean errorOnNotAuth) throws RequestException {
+    protected Session getSession() throws RequestException {
         if (mSession == null) {
+            String impersonate = getRequest().getParameter("on_behalf_of");
+
             String sessionCookieValue = "";
             for (Cookie cookie : mRequest.getCookies()) {
                 if (cookie.getName().equals("SESSION")) {
                     sessionCookieValue = cookie.getValue();
-
-                    // TODO: cache these!
-                    try (SqlStmt stmt = DB.prepare("SELECT * FROM sessions WHERE session_cookie=?")) {
-                        stmt.setString(1, sessionCookieValue);
-                        ResultSet rs = stmt.select();
-                        if (rs.next()) {
-                            mSession = new Session(rs);
-                        }
-                    } catch (Exception e) {
-                        throw new RequestException(e);
-                    }
-                }
-            }
-
-            if (mSession == null && errorOnNotAuth) {
-                throw new RequestException(403, "Could not find session, session cookie: "+sessionCookieValue);
-            }
-        }
-
-        if (mSession != null) {
-            String impersonate = getRequest().getParameter("on_behalf_of");
-            if (impersonate != null) {
-                try (SqlStmt stmt = DB.prepare("SELECT id FROM empires WHERE user_email = ?")) {
-                    stmt.setString(1, impersonate);
-                    ResultSet rs = stmt.select();
-                    if (rs.next()) {
-                        mSession.impersonate(impersonate, rs.getInt(1));
-                    }
-                } catch (Exception e) {
-                    throw new RequestException(e);
+                    mSession = new SessionController().getSession(sessionCookieValue, impersonate);
                 }
             }
         }
 
         return mSession;
+    }
+
+    protected Session getSessionNoError() {
+        try {
+            return getSession();
+        } catch(RequestException e) {
+            return null;
+        }
     }
 
     @SuppressWarnings({"unchecked"})

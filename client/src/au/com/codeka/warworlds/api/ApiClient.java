@@ -12,6 +12,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.entity.ByteArrayEntity;
@@ -20,6 +21,11 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
+import au.com.codeka.common.protobuf.Messages;
+import au.com.codeka.warworlds.App;
+import au.com.codeka.warworlds.Notifications;
+
+import com.google.protobuf.ByteString;
 import com.google.protobuf.Message;
 
 /**
@@ -210,24 +216,60 @@ public class ApiClient {
      * Parses the response from a request and returns the protocol buffer returned therein 
      * (if any).
      */
-    @SuppressWarnings({"unchecked"})
+    
     public static <T> T parseResponseBody(HttpResponse resp, Class<T> protoBuffFactory) {
         HttpEntity entity = resp.getEntity();
         if (entity != null) {
             T result = null;
 
-            try {
-                Method m = protoBuffFactory.getDeclaredMethod("parseFrom", InputStream.class);
-                result = (T) m.invoke(null, entity.getContent());
+            boolean isNotificationWrapper = false;
+            Header notificationWrapperHeader = resp.getFirstHeader("X-Notification-Wrapper");
+            if (notificationWrapperHeader != null) {
+                isNotificationWrapper = notificationWrapperHeader.getValue().equals("1");
+            }
 
-                entity.consumeContent();
-            } catch (Exception e) {
-                return null;
+            if (isNotificationWrapper) {
+                Messages.NotificationWrapper pb = extractBody(entity, Messages.NotificationWrapper.class);
+                for (Messages.Notification notification_pb : pb.getNotificationsList()) {
+                    log.info("got inline-notification: "+notification_pb.getName());
+                    Notifications.displayNotfication(App.i, notification_pb.getName(), notification_pb.getValue());
+                }
+
+                result = extractBody(pb.getOriginalMessage(), protoBuffFactory);
+            } else {
+                result = extractBody(entity, protoBuffFactory);
             }
 
             return result;
         }
 
         return null;
+    }
+
+    @SuppressWarnings({"unchecked"})
+    private static <T> T extractBody(HttpEntity entity, Class<T> protoBuffFactory) {
+        T result = null;
+        try {
+            Method m = protoBuffFactory.getDeclaredMethod("parseFrom", InputStream.class);
+            result = (T) m.invoke(null, entity.getContent());
+
+            entity.consumeContent();
+        } catch (Exception e) {
+            return null;
+        }
+        return result;
+    }
+
+
+    @SuppressWarnings({"unchecked"})
+    private static <T> T extractBody(ByteString bs, Class<T> protoBuffFactory) {
+        T result = null;
+        try {
+            Method m = protoBuffFactory.getDeclaredMethod("parseFrom", ByteString.class);
+            result = (T) m.invoke(null, bs);
+        } catch (Exception e) {
+            return null;
+        }
+        return result;
     }
 }

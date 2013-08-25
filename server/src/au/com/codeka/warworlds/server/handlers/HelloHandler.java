@@ -9,7 +9,9 @@ import au.com.codeka.common.model.BaseColony;
 import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.RequestHandler;
+import au.com.codeka.warworlds.server.Session;
 import au.com.codeka.warworlds.server.ctrl.EmpireController;
+import au.com.codeka.warworlds.server.ctrl.SessionController;
 import au.com.codeka.warworlds.server.ctrl.StarController;
 import au.com.codeka.warworlds.server.ctrl.StatisticsController;
 import au.com.codeka.warworlds.server.data.DB;
@@ -25,9 +27,14 @@ public class HelloHandler extends RequestHandler {
     protected void put() throws RequestException {
         Messages.HelloRequest hello_request_pb = getRequestBody(Messages.HelloRequest.class);
 
+        Session sess = getSession();
+        if (hello_request_pb.hasAllowInlineNotfications()) {
+            sess.setAllowInlineNotifications(hello_request_pb.getAllowInlineNotfications());
+            new SessionController().saveSession(sess);
+        }
+
         Messages.HelloResponse.Builder hello_response_pb = Messages.HelloResponse.newBuilder();
 
-        // TODO: this could be cached...
         String motd = null;
         try (SqlStmt stmt = DB.prepare("SELECT motd FROM motd")) {
             motd = stmt.selectFirstValue(String.class);
