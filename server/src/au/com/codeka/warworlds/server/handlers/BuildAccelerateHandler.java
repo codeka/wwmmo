@@ -12,7 +12,12 @@ import au.com.codeka.warworlds.server.model.Star;
 public class BuildAccelerateHandler extends RequestHandler {
     @Override
     protected void post() throws RequestException {
-        Simulation sim = new Simulation();
+        Simulation sim = new Simulation(new Simulation.LogHandler() {
+            @Override
+            public void log(String message) {
+                //log.info(message);
+            }
+        });
         Star star = new StarController().getStar(Integer.parseInt(getUrlParameter("star_id")));
         sim.simulate(star);
 

@@ -89,22 +89,19 @@ public class EventProcessor {
 
             log.info(String.format("Next event is scheduled at %s", nextEventDateTime));
 
-            // don't run in less than a few seconds, that'll stop it from overwhelming us and it
-            // also helps with some race conditions on the client (for example, if you accelerate
-            // a build, it should finish "now" but it's possible to get the notification BEFORE the
-            // "accelerate" command finishes if we don't put in an artificial delay).
-            if (nextEventDateTime.isBefore(DateTime.now().plusSeconds(2))) {
-                nextEventDateTime = DateTime.now().plusSeconds(2);
-            }
-
-            try {
-                int seconds = Seconds.secondsBetween(DateTime.now(), nextEventDateTime).getSeconds();
-                Thread.sleep(seconds * 1000);
-            } catch(InterruptedException e) {
-                // if we get interrupted it's because somebody pinged us and we need to
-                // check the next time again
-                log.info("EventProcessor pinged, checking for new events.");
-                continue;
+            // make sure we don't try to sleep for a negative amount of time...
+            if (nextEventDateTime.isBefore(DateTime.now())) {
+                nextEventDateTime = DateTime.now();
+            } else {
+                try {
+                    int seconds = Seconds.secondsBetween(DateTime.now(), nextEventDateTime).getSeconds();
+                    Thread.sleep(seconds * 1000);
+                } catch(InterruptedException e) {
+                    // if we get interrupted it's because somebody pinged us and we need to
+                    // check the next time again
+                    log.info("EventProcessor pinged, checking for new events.");
+                    continue;
+                }
             }
 
             for (Event event : events) {

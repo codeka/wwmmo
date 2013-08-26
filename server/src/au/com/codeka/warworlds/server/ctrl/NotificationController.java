@@ -3,8 +3,10 @@ package au.com.codeka.warworlds.server.ctrl;
 import java.io.IOException;
 import java.sql.ResultSet;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 
 import org.joda.time.DateTime;
@@ -93,6 +95,7 @@ public class NotificationController {
             }
 
             ResultSet rs = stmt.select();
+            Set<Integer> doneEmpires = new HashSet<Integer>();
             while (rs.next()) {
                 String registrationId = rs.getString(1);
                 String email = rs.getString(2);
@@ -100,7 +103,10 @@ public class NotificationController {
                 if (registrationId != null && email != null) {
                     devices.put(registrationId, email);
                 }
-                sRecentNotifications.addNotification(empireID, notification);
+                if (!doneEmpires.contains(empireID)) {
+                    doneEmpires.add(empireID);
+                    sRecentNotifications.addNotification(empireID, notification);
+                }
             }
         } catch(Exception e) {
             throw new RequestException(e);

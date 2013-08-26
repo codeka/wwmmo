@@ -297,6 +297,10 @@ public class Simulation {
 
                     // the number of hours of work required, assuming we have all the minerals we need
                     float timeRemainingInHours = (1.0f - br.getProgress(false)) * totalBuildTimeInHours;
+                    if (timeRemainingInHours < (10.0f / 3600.0f)) {
+                        // if there's less than 10 seconds to go, just say it's done now.
+                        timeRemainingInHours = 0.0f;
+                    }
                     log(String.format("     Time [total=%.2f hrs] [remaining=%.2f hrs]",
                             totalBuildTimeInHours, timeRemainingInHours));
 
@@ -313,8 +317,13 @@ public class Simulation {
                     // time?
                     float progressThisTurn = dtUsed / totalBuildTimeInHours;
                     if (progressThisTurn <= 0) {
+                        DateTime endTime;
                         timeRemainingInHours = (1.0f - br.getProgress(false)) * totalBuildTimeInHours;
-                        DateTime endTime = now.plus((long)(timeRemainingInHours * 3600.0f * 1000.0f));
+                        if (timeRemainingInHours < (10.0f / 3600.0f)) {
+                            endTime = now;
+                        } else {
+                            endTime = now.plus((long)(timeRemainingInHours * 3600.0f * 1000.0f));
+                        }
                         if (br.getEndTime().compareTo(endTime) > 0) {
                             br.setEndTime(endTime);
                         }

@@ -97,7 +97,7 @@ public class Notifications {
                 // notify the build manager, in case it's a 'build complete' or something
                 BuildManager.getInstance().notifySituationReport(pb);
 
-                Notifications.displayNotification(context, pb);
+                displayNotification(context, pb);
             } finally {
                 RealmContext.i.setThreadRealm(null);
             }
@@ -147,9 +147,9 @@ public class Notifications {
         notification.star = star_pb.build();
 
         DatabaseHelper db = new DatabaseHelper();
-        db.addNotification(notification);
-
-        displayNotification(context, buildNotification(context, db.getNotifications()));
+        if (!db.addNotification(notification)) {
+            displayNotification(context, buildNotification(context, db.getNotifications()));
+        }
     }
 
     private static void displayNotification(Context context, Notification notification) {
@@ -308,7 +308,7 @@ public class Notifications {
      */
     private static class DatabaseHelper extends SQLiteOpenHelper {
         public DatabaseHelper() {
-            super(App.i, "notifications.db", null, 2);
+            super(App.i, "notifications.db", null, 3);
         }
 
         /**
@@ -322,22 +322,36 @@ public class Notifications {
                       +"  realm_id INTEGER,"
                       +"  star BLOB,"
                       +"  sitrep BLOB,"
-                      +"  timestamp INTEGER);");
+                      +"  timestamp INTEGER,"
+                      +"  sitrep_key STRING);");
             db.execSQL("CREATE INDEX IX_realm_id_timestamp ON notifications (realm_id, timestamp)");
+            db.execSQL("CREATE INDEX IX_sitrep_key ON notifications(sitrep_key)");
         }
 
         @Override
         public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-            if (newVersion == 2) {
+            if (newVersion >= 2) {
                 db.execSQL("ALTER TABLE notifications "
                           +"ADD COLUMN realm_id INTEGER DEFAULT "+RealmManager.BETA_REALM_ID);
                 db.execSQL("CREATE INDEX IX_realm_id_timestamp ON notifications (realm_id, timestamp)");
             }
+            if (newVersion >= 3) {
+                db.execSQL("ALTER TABLE notifications ADD COLUMN sitrep_key STRING");
+                db.execSQL("CREATE INDEX IX_sitrep_key ON notifications(sitrep_key)");
+            }
         }
 
-        public void addNotification(NotificationDetails details) {
+        /**
+         * Adds a notification to the database.
+         *
+         * @return true if the notification already existed.
+         */
+        public boolean addNotification(NotificationDetails details) {
             SQLiteDatabase db = getWritableDatabase();
             try {
+                // if there's an existing one, delete it first
+                int rows = db.delete("notifications", "sitrep_key = '"+details.sitrep.getKey()+"'", null);
+
                 ByteArrayOutputStream sitrep = new ByteArrayOutputStream();
                 ByteArrayOutputStream star = new ByteArrayOutputStream();
                 try {
@@ -345,7 +359,7 @@ public class Notifications {
                     details.star.writeTo(star);
                 } catch (IOException e) {
                     // we won't get the notification, but not the end of the world...
-                    return;
+                    return false;
                 }
 
                 ContentValues values = new ContentValues();
@@ -354,6 +368,8 @@ public class Notifications {
                 values.put("timestamp", details.sitrep.getReportTime());
                 values.put("realm_id", details.realm.getID());
                 db.insert("notifications", null, values);
+
+                return (rows > 0);
             } finally {
                 db.close();
             }

@@ -184,6 +184,9 @@ public class BuildQueueController {
     }
 
     public void accelerate(Star star, BuildRequest buildRequest, float accelerateAmount) throws RequestException {
+        if (accelerateAmount > 0.99f) {
+            accelerateAmount = 1.0f;
+        }
         float remainingProgress = 1.0f - buildRequest.getProgress(false);
         float progressToComplete = remainingProgress * accelerateAmount;
 
