@@ -8,6 +8,165 @@ public final class Messages {
   public static void registerAllExtensions(
       com.google.protobuf.ExtensionRegistry registry) {
   }
+  /**
+   * Protobuf enum {@code au.com.codeka.common.protobuf.SituationReportFilter}
+   *
+   * <pre>
+   *
+   * When requesting situation reports, we can filter them by these values.
+   * </pre>
+   */
+  public enum SituationReportFilter
+      implements com.google.protobuf.ProtocolMessageEnum {
+    /**
+     * <code>ShowAll = 0;</code>
+     */
+    ShowAll(0, 0),
+    /**
+     * <code>MoveComplete = 1;</code>
+     */
+    MoveComplete(1, 1),
+    /**
+     * <code>BuildCompleteAny = 2;</code>
+     */
+    BuildCompleteAny(2, 2),
+    /**
+     * <code>FleetAttacked = 3;</code>
+     */
+    FleetAttacked(3, 3),
+    /**
+     * <code>FleetDestroyed = 4;</code>
+     */
+    FleetDestroyed(4, 4),
+    /**
+     * <code>FleetVictorious = 5;</code>
+     */
+    FleetVictorious(5, 5),
+    /**
+     * <code>ColonyAttacked = 6;</code>
+     */
+    ColonyAttacked(6, 6),
+    /**
+     * <code>ColonyDestroyed = 7;</code>
+     */
+    ColonyDestroyed(7, 7),
+    /**
+     * <code>BuildCompleteShips = 8;</code>
+     */
+    BuildCompleteShips(8, 8),
+    /**
+     * <code>BuildCompleteBuilding = 9;</code>
+     */
+    BuildCompleteBuilding(9, 9),
+    ;
+
+    /**
+     * <code>ShowAll = 0;</code>
+     */
+    public static final int ShowAll_VALUE = 0;
+    /**
+     * <code>MoveComplete = 1;</code>
+     */
+    public static final int MoveComplete_VALUE = 1;
+    /**
+     * <code>BuildCompleteAny = 2;</code>
+     */
+    public static final int BuildCompleteAny_VALUE = 2;
+    /**
+     * <code>FleetAttacked = 3;</code>
+     */
+    public static final int FleetAttacked_VALUE = 3;
+    /**
+     * <code>FleetDestroyed = 4;</code>
+     */
+    public static final int FleetDestroyed_VALUE = 4;
+    /**
+     * <code>FleetVictorious = 5;</code>
+     */
+    public static final int FleetVictorious_VALUE = 5;
+    /**
+     * <code>ColonyAttacked = 6;</code>
+     */
+    public static final int ColonyAttacked_VALUE = 6;
+    /**
+     * <code>ColonyDestroyed = 7;</code>
+     */
+    public static final int ColonyDestroyed_VALUE = 7;
+    /**
+     * <code>BuildCompleteShips = 8;</code>
+     */
+    public static final int BuildCompleteShips_VALUE = 8;
+    /**
+     * <code>BuildCompleteBuilding = 9;</code>
+     */
+    public static final int BuildCompleteBuilding_VALUE = 9;
+
+
+    public final int getNumber() { return value; }
+
+    public static SituationReportFilter valueOf(int value) {
+      switch (value) {
+        case 0: return ShowAll;
+        case 1: return MoveComplete;
+        case 2: return BuildCompleteAny;
+        case 3: return FleetAttacked;
+        case 4: return FleetDestroyed;
+        case 5: return FleetVictorious;
+        case 6: return ColonyAttacked;
+        case 7: return ColonyDestroyed;
+        case 8: return BuildCompleteShips;
+        case 9: return BuildCompleteBuilding;
+        default: return null;
+      }
+    }
+
+    public static com.google.protobuf.Internal.EnumLiteMap<SituationReportFilter>
+        internalGetValueMap() {
+      return internalValueMap;
+    }
+    private static com.google.protobuf.Internal.EnumLiteMap<SituationReportFilter>
+        internalValueMap =
+          new com.google.protobuf.Internal.EnumLiteMap<SituationReportFilter>() {
+            public SituationReportFilter findValueByNumber(int number) {
+              return SituationReportFilter.valueOf(number);
+            }
+          };
+
+    public final com.google.protobuf.Descriptors.EnumValueDescriptor
+        getValueDescriptor() {
+      return getDescriptor().getValues().get(index);
+    }
+    public final com.google.protobuf.Descriptors.EnumDescriptor
+        getDescriptorForType() {
+      return getDescriptor();
+    }
+    public static final com.google.protobuf.Descriptors.EnumDescriptor
+        getDescriptor() {
+      return au.com.codeka.common.protobuf.Messages.getDescriptor().getEnumTypes().get(0);
+    }
+
+    private static final SituationReportFilter[] VALUES = values();
+
+    public static SituationReportFilter valueOf(
+        com.google.protobuf.Descriptors.EnumValueDescriptor desc) {
+      if (desc.getType() != getDescriptor()) {
+        throw new java.lang.IllegalArgumentException(
+          "EnumValueDescriptor is not for this type.");
+      }
+      return VALUES[desc.getIndex()];
+    }
+
+    private final int index;
+    private final int value;
+
+    private SituationReportFilter(int index, int value) {
+      this.index = index;
+      this.value = value;
+    }
+
+    // @@protoc_insertion_point(enum_scope:au.com.codeka.common.protobuf.SituationReportFilter)
+  }
+
   public interface MessageOfTheDayOrBuilder
       extends com.google.protobuf.MessageOrBuilder {
 
@@ -75861,7 +76020,13 @@ public final class Messages {
       "nceRequest\022\016\n\006cursor\030\002 \001(\t\"\203\001\n\023AllianceR" +
       "equestVote\022\n\n\002id\030\001 \001(\005\022\023\n\013alliance_id\030\002 " +
       "\001(\005\022\033\n\023alliance_request_id\030\003 \001(\005\022\021\n\tempi" +
-      "re_id\030\004 \001(\005\022\r\n\005votes\030\005 \001(\005\022\014\n\004date\030\006 \001(\003"
+      "re_id\030\004 \001(\005\022\r\n\005votes\030\005 \001(\005\022\014\n\004date\030\006 \001(\003" +
+      "*\344\001\n\025SituationReportFilter\022\013\n\007ShowAll\020\000\022" +
+      "\020\n\014MoveComplete\020\001\022\024\n\020BuildCompleteAny\020\002\022" +
+      "\021\n\rFleetAttacked\020\003\022\022\n\016FleetDestroyed\020\004\022\023" +
+      "\n\017FleetVictorious\020\005\022\022\n\016ColonyAttacked\020\006\022",
+      "\023\n\017ColonyDestroyed\020\007\022\026\n\022BuildCompleteShi" +
+      "ps\020\010\022\031\n\025BuildCompleteBuilding\020\t"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
       new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {

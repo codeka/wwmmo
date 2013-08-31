@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import au.com.codeka.warworlds.server.ctrl.CombatReportController;
 import au.com.codeka.warworlds.server.ctrl.NameGenerator;
 import au.com.codeka.warworlds.server.ctrl.SessionController;
+import au.com.codeka.warworlds.server.ctrl.SituationReportController;
 import au.com.codeka.warworlds.server.ctrl.StarController;
 import au.com.codeka.warworlds.server.ctrl.StatisticsController;
 import au.com.codeka.warworlds.server.handlers.pages.HtmlPageHandler;
@@ -49,6 +50,8 @@ public class Runner {
             } else if (method.equals("purge-sessions")) {
                 DateTime dt = DateTime.now().minusDays(extraToNum(extra, 1, 7));
                 new SessionController().purgeSessionsOlderThan(dt);
+            } else if (method.equals("update-all-event-kinds")) {
+                new SituationReportController().updateAllEventKinds();
             } else {
                 log.error("Unknown command: "+method);
             }

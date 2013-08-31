@@ -12,20 +12,30 @@ import org.slf4j.LoggerFactory;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
+import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
+import android.widget.FrameLayout.LayoutParams;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
+import android.widget.Spinner;
+import android.widget.SpinnerAdapter;
 import android.widget.TextView;
 import au.com.codeka.BackgroundRunner;
 import au.com.codeka.TimeInHours;
+import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.BaseActivity;
 import au.com.codeka.warworlds.Notifications;
 import au.com.codeka.warworlds.R;
@@ -44,7 +54,6 @@ import au.com.codeka.warworlds.model.SpriteDrawable;
 import au.com.codeka.warworlds.model.StarImageManager;
 import au.com.codeka.warworlds.model.StarManager;
 import au.com.codeka.warworlds.model.StarSummary;
-import au.com.codeka.common.protobuf.Messages;
 
 public class SitrepActivity extends BaseActivity {
     private static Logger log = LoggerFactory.getLogger(SitrepActivity.class);
@@ -54,6 +63,8 @@ public class SitrepActivity extends BaseActivity {
     private Map<String, StarSummary> mStarSummaries;
     private Handler mHandler;
     private String mCursor;
+    private Messages.SituationReportFilter mFilter;
+    private boolean mShowOldItems;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -77,6 +88,40 @@ public class SitrepActivity extends BaseActivity {
         super.onResume();
 
         setContentView(R.layout.sitrep);
+
+        final Spinner filterSpinner = (Spinner) findViewById(R.id.filter);
+        filterSpinner.setAdapter(new FilterAdapter());
+        filterSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                mFilter = (Messages.SituationReportFilter) filterSpinner.getSelectedItem();
+                refreshReportItems();
+            }
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+            }
+        });
+
+        final Button markReadBtn = (Button) findViewById(R.id.mark_read);
+        if (mStarKey != null) {
+            markReadBtn.setVisibility(View.GONE);
+        } else {
+            markReadBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    markAsRead();
+                }
+            });
+        }
+
+        final CheckBox showOldItems = (CheckBox) findViewById(R.id.show_read);
+        showOldItems.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                mShowOldItems = showOldItems.isChecked();
+                refreshReportItems();
+            }
+        });
 
         final ListView reportItems = (ListView) findViewById(R.id.report_items);
         reportItems.setAdapter(mSituationReportAdapter);
@@ -181,7 +226,7 @@ public class SitrepActivity extends BaseActivity {
         fetchReportItems(cursor, new FetchItemsCompleteHandler() {
             @Override
             public void onItemsFetched(List<SituationReport> items) {
-                if (items.size() == 0) {
+                if (items == null || items.size() == 0) {
                     // if there's no more, we set the cursor to null so the adapter knows
                     // there's no more
                     mCursor = null;
@@ -200,8 +245,28 @@ public class SitrepActivity extends BaseActivity {
                 if (mStarKey != null) {
                     url = String.format("stars/%s/sit-reports", mStarKey);
                 }
+                boolean hasQuery = false;
                 if (cursor != null) {
                     url += "?cursor="+cursor;
+                    hasQuery = true;
+                }
+                if (mFilter != null && mFilter != Messages.SituationReportFilter.ShowAll) {
+                    if (hasQuery) {
+                        url += "&";
+                    } else {
+                        url += "?";
+                    }
+                    url += "filter="+mFilter;
+                    hasQuery = true;
+                }
+                if (mShowOldItems) {
+                    if (hasQuery) {
+                        url += "&";
+                    } else {
+                        url += "?";
+                    }
+                    url += "show-old-items=1";
+                    hasQuery = true;
                 }
 
                 try {
@@ -247,6 +312,28 @@ public class SitrepActivity extends BaseActivity {
             @Override
             protected void onComplete(List<SituationReport> items) {
                 handler.onItemsFetched(items);
+            }
+        }.execute();
+    }
+
+    private void markAsRead() {
+        new BackgroundRunner<Boolean>() {
+            @Override
+            protected Boolean doInBackground() {
+                String url = "sit-reports/read";
+
+                try {
+                    ApiClient.postProtoBuf(url, null, null);
+                } catch (ApiException e) {
+                    log.error("Error occured fetching situation reports.", e);
+                }
+
+                return true;
+            }
+
+            @Override
+            protected void onComplete(Boolean success) {
+                refreshReportItems();
             }
         }.execute();
     }
@@ -402,4 +489,87 @@ public class SitrepActivity extends BaseActivity {
             return view;
         }
     }
+
+    public class FilterAdapter extends BaseAdapter implements SpinnerAdapter {
+        Messages.SituationReportFilter[] mFilters;
+        String[] mFilterDescriptions;
+
+        public FilterAdapter() {
+            mFilters = new Messages.SituationReportFilter[] {
+                    Messages.SituationReportFilter.ShowAll,
+                    Messages.SituationReportFilter.MoveComplete,
+                    Messages.SituationReportFilter.BuildCompleteAny,
+                    Messages.SituationReportFilter.BuildCompleteShips,
+                    Messages.SituationReportFilter.BuildCompleteBuilding,
+                    Messages.SituationReportFilter.FleetAttacked,
+                    Messages.SituationReportFilter.FleetDestroyed,
+                    Messages.SituationReportFilter.FleetVictorious,
+                    Messages.SituationReportFilter.ColonyAttacked,
+                    Messages.SituationReportFilter.ColonyDestroyed,
+            };
+            mFilterDescriptions = new String[] {
+                    "Show All",
+                    "Move Complete",
+                    "Build Complete",
+                    "Build Complete (Ships)",
+                    "Build Complete (Building)",
+                    "Fleet Attacked",
+                    "Fleet Destroyed",
+                    "Fleet Victorious",
+                    "Colony Attacked",
+                    "Colony Destroyed",
+            };
+        }
+
+        @Override
+        public int getCount() {
+            return mFilters.length;
+        }
+
+        @Override
+        public Object getItem(int position) {
+            return mFilters[position];
+        }
+
+        @Override
+        public long getItemId(int position) {
+            return position;
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            TextView view = getCommonView(position, convertView, parent);
+
+            view.setTextColor(Color.WHITE);
+            return view;
+        }
+
+        @Override
+        public View getDropDownView(int position, View convertView, ViewGroup parent) {
+            TextView view = getCommonView(position, convertView, parent);
+
+            ViewGroup.LayoutParams lp = new AbsListView.LayoutParams(LayoutParams.MATCH_PARENT,
+                                                                     LayoutParams.MATCH_PARENT);
+            lp.height = 80;
+            view.setLayoutParams(lp);
+            view.setTextColor(Color.WHITE);
+            view.setText("  "+view.getText().toString());
+            return view;
+        }
+
+        private TextView getCommonView(int position, View convertView, ViewGroup parent) {
+            TextView view;
+            if (convertView != null) {
+                view = (TextView) convertView;
+            } else {
+                view = new TextView(mContext);
+                view.setGravity(Gravity.CENTER_VERTICAL);
+            }
+
+            String displayValue = mFilterDescriptions[position];
+            view.setText(displayValue);
+            return view;
+        }
+    }
+
 }

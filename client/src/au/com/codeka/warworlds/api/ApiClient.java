@@ -235,8 +235,10 @@ public class ApiClient {
                     Notifications.displayNotfication(App.i, notification_pb.getName(), notification_pb.getValue());
                 }
 
-                result = extractBody(pb.getOriginalMessage(), protoBuffFactory);
-            } else {
+                if (protoBuffFactory != null) {
+                    result = extractBody(pb.getOriginalMessage(), protoBuffFactory);
+                }
+            } else if (protoBuffFactory != null) {
                 result = extractBody(entity, protoBuffFactory);
             }
 

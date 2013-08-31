@@ -907,6 +907,23 @@ message CombatReports
 
 
 //
+// When requesting situation reports, we can filter them by these values.
+//
+enum SituationReportFilter {
+    ShowAll = 0;
+    MoveComplete = 1;
+    BuildCompleteAny = 2;
+    FleetAttacked = 3;
+    FleetDestroyed = 4;
+    FleetVictorious = 5;
+    ColonyAttacked = 6;
+    ColonyDestroyed = 7;
+    BuildCompleteShips = 8;
+    BuildCompleteBuilding = 9;
+}
+
+
+//
 // A SituationReport is basically anything of interest to the player. For example, when you
 // finish a build, a Sit. Rep. is generated. When your fleet moves to another star, a Sit. Rep.
 // is generated, if your fleet is involved in combat, a Sit. Rep. is generated (one when it's

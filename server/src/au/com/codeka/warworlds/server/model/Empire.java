@@ -2,6 +2,9 @@ package au.com.codeka.warworlds.server.model;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
+
+import org.joda.time.DateTime;
 
 import au.com.codeka.common.model.BaseAlliance;
 import au.com.codeka.common.model.BaseEmpire;
@@ -14,6 +17,7 @@ public class Empire extends BaseEmpire {
     private int mHomeStarID;
     private int mAllianceID;
     private boolean mForceRemoveAds;
+    private DateTime mLastSitrepReadTime;
 
     public Empire() {
     }
@@ -32,6 +36,11 @@ public class Empire extends BaseEmpire {
         rs.getInt("rank");
         if (!rs.wasNull()) {
             mRank = new EmpireRank(rs);
+        }
+
+        Timestamp ts = rs.getTimestamp("last_sitrep_read_time");
+        if (ts != null) {
+            mLastSitrepReadTime = new DateTime(ts.getTime());
         }
 
         mForceRemoveAds = rs.getInt("remove_ads") != 0;
@@ -58,6 +67,10 @@ public class Empire extends BaseEmpire {
      */
     public boolean getForceRemoveAds() {
         return mForceRemoveAds;
+    }
+
+    public DateTime getLastSitrepReadTime() {
+        return mLastSitrepReadTime;
     }
 
     @Override
