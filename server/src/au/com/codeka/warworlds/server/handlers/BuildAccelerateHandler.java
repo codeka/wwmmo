@@ -6,6 +6,7 @@ import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.RequestHandler;
 import au.com.codeka.warworlds.server.ctrl.BuildQueueController;
 import au.com.codeka.warworlds.server.ctrl.StarController;
+import au.com.codeka.warworlds.server.events.BuildCompleteEvent;
 import au.com.codeka.warworlds.server.model.BuildRequest;
 import au.com.codeka.warworlds.server.model.Star;
 
@@ -41,9 +42,16 @@ public class BuildAccelerateHandler extends RequestHandler {
                     throw new RequestException(403);
                 }
 
-                new BuildQueueController().accelerate(star, buildRequest, accelerateAmount);
-                sim.simulate(star);
-                new StarController().update(star);
+                if (new BuildQueueController().accelerate(star, buildRequest, accelerateAmount)) {
+                    // if it's complete, trigger the build complete event now, without going through
+                    // the event processor (saves a bit of time)
+                    new BuildQueueController().saveBuildRequest(buildRequest);
+                    new BuildCompleteEvent().process();
+                } else {
+                    // if it's not actually complete yet, just simulate the star again
+                    sim.simulate(star);
+                    new StarController().update(star);
+                }
                 return;
             }
         }

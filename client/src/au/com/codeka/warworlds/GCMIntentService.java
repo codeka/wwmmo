@@ -71,12 +71,8 @@ public class GCMIntentService extends GCMBaseIntentService {
         Util.loadProperties();
         Util.setup(context);
 
-        log.debug("GCM message received.");
         Bundle extras = intent.getExtras();
         if (extras != null) {
-            for(String key : extras.keySet()) {
-                log.debug(String.format("%s = %s", key, extras.get(key)));
-            }
             if (extras.containsKey("sitrep")) {
                 Notifications.displayNotfication(context, "sitrep", extras.getString("sitrep"));
             }

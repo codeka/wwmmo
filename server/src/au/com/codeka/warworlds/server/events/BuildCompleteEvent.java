@@ -32,7 +32,7 @@ public class BuildCompleteEvent extends Event {
 
     @Override
     public String getNextEventTimeSql() {
-        return "SELECT MIN(end_time) FROM build_requests";
+        return "SELECT MIN(end_time) FROM build_requests WHERE processing = 0";
     }
 
     @Override
@@ -41,12 +41,21 @@ public class BuildCompleteEvent extends Event {
         String sql = "SELECT id, star_id, colony_id, empire_id, existing_building_id," +
                            " design_kind, design_id, count" +
                     " FROM build_requests" +
-                    " WHERE end_time < ?";
+                    " WHERE end_time < ? AND processing = 0" +
+                    " LIMIT 10"; // just do ten at a time, which will allow us to interleve other events
         try (SqlStmt stmt = DB.prepare(sql)) {
             stmt.setDateTime(1, DateTime.now().plusSeconds(10)); // anything in the next 10 seconds is a candidate
             ResultSet rs = stmt.select();
             while (rs.next()) {
                 int id = rs.getInt(1);
+
+                sql = "UPDATE build_requests SET processing = 1 WHERE processing = 0 AND id = ?";
+                try (SqlStmt stmt2 = DB.prepare(sql)) {
+                    stmt2.setInt(1, id);
+                    if (stmt2.update() != 1) {
+                        continue;
+                    }
+                }
                 processedIDs.add(id);
 
                 int starID = rs.getInt(2);

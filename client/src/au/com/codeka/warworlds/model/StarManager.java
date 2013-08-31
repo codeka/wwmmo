@@ -149,7 +149,11 @@ public class StarManager extends BaseManager {
         Star star = requestStarSync(starKey, true);
         // When a star is explicitly refreshed, it's usually because it's changed somehow.
         // Generally that also means the sector has changed.
-        SectorManager.getInstance().refreshSector(star.getSectorX(), star.getSectorY());
+        try {
+            SectorManager.getInstance().refreshSector(star.getSectorX(), star.getSectorY());
+        } catch(Exception e) {
+            // this can happen if we're called from a background thread, but we're not too worried.
+        }
         return star;
     }
 

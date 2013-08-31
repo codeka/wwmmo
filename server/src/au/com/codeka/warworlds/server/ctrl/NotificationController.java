@@ -65,7 +65,7 @@ public class NotificationController {
         Map<String, String> devices = new TreeMap<String, String>();
         String sql;
         if (empireID == null && allianceID == null) {
-            sql = "SELECT gcm_registration_id, user_email, empires.id AS empire_id" +
+            sql = "SELECT gcm_registration_id, empires.user_email, empires.id AS empire_id" +
                  " FROM devices" +
                  " INNER JOIN empires ON devices.user_email = empires.user_email" +
                  " WHERE online_since > ?" +

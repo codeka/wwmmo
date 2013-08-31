@@ -122,6 +122,7 @@ public abstract class BackgroundRunner<Result> {
         final BackgroundRunner mRunner;
         final Data[] mData;
 
+        @SuppressWarnings("unchecked")
         BackgroundRunnerResult(BackgroundRunner runner, Data... data) {
             mRunner = runner;
             mData = data;

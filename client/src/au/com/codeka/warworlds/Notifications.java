@@ -330,12 +330,12 @@ public class Notifications {
 
         @Override
         public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-            if (newVersion >= 2) {
+            if (oldVersion < 2) {
                 db.execSQL("ALTER TABLE notifications "
                           +"ADD COLUMN realm_id INTEGER DEFAULT "+RealmManager.BETA_REALM_ID);
                 db.execSQL("CREATE INDEX IX_realm_id_timestamp ON notifications (realm_id, timestamp)");
             }
-            if (newVersion >= 3) {
+            if (oldVersion < 3) {
                 db.execSQL("ALTER TABLE notifications ADD COLUMN sitrep_key STRING");
                 db.execSQL("CREATE INDEX IX_sitrep_key ON notifications(sitrep_key)");
             }
@@ -350,7 +350,9 @@ public class Notifications {
             SQLiteDatabase db = getWritableDatabase();
             try {
                 // if there's an existing one, delete it first
-                int rows = db.delete("notifications", "sitrep_key = '"+details.sitrep.getKey()+"'", null);
+                int rows = db.delete("notifications",
+                        "sitrep_key = '"+details.sitrep.getKey()+"' AND realm_id = "+details.realm.getID(),
+                        null);
 
                 ByteArrayOutputStream sitrep = new ByteArrayOutputStream();
                 ByteArrayOutputStream star = new ByteArrayOutputStream();
@@ -365,6 +367,7 @@ public class Notifications {
                 ContentValues values = new ContentValues();
                 values.put("star", star.toByteArray());
                 values.put("sitrep", sitrep.toByteArray());
+                values.put("sitrep_key", details.sitrep.getKey());
                 values.put("timestamp", details.sitrep.getReportTime());
                 values.put("realm_id", details.realm.getID());
                 db.insert("notifications", null, values);

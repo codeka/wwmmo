@@ -2,6 +2,8 @@ package au.com.codeka.warworlds.server.ctrl;
 
 import java.sql.Statement;
 
+import org.joda.time.DateTime;
+
 import au.com.codeka.common.model.BaseBuildRequest;
 import au.com.codeka.common.model.BaseBuilding;
 import au.com.codeka.common.model.BuildingDesign;
@@ -146,8 +148,8 @@ public class BuildQueueController {
 
         String sql = "INSERT INTO build_requests (star_id, planet_index, colony_id, empire_id," +
                        " existing_building_id, design_kind, design_id," +
-                       " count, progress, start_time, end_time)" +
-                    " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                       " count, progress, processing, start_time, end_time)" +
+                    " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?, ?)";
         try (SqlStmt stmt = db.prepare(sql, Statement.RETURN_GENERATED_KEYS)) {
             stmt.setInt(1, buildRequest.getStarID());
             stmt.setInt(2, buildRequest.getPlanetIndex());
@@ -183,7 +185,10 @@ public class BuildQueueController {
         }
     }
 
-    public void accelerate(Star star, BuildRequest buildRequest, float accelerateAmount) throws RequestException {
+    /**
+     * Accelerate the given build. Returns {@code true} if the build is now complete.
+     */
+    public boolean accelerate(Star star, BuildRequest buildRequest, float accelerateAmount) throws RequestException {
         if (accelerateAmount > 0.99f) {
             accelerateAmount = 1.0f;
         }
@@ -203,7 +208,26 @@ public class BuildQueueController {
             throw new RequestException(400, Messages.GenericError.ErrorCode.InsufficientCash,
                     "You don't have enough cash to accelerate this build.");
         }
-        buildRequest.setProgress(buildRequest.getProgress(false) + progressToComplete);
+        float finalProgress = buildRequest.getProgress(false) + progressToComplete;
+        buildRequest.setProgress(finalProgress);
+        if (finalProgress > 0.999) {
+            buildRequest.setEndTime(DateTime.now());
+            return true;
+        }
+
+        return false;
+    }
+
+    public void saveBuildRequest(BuildRequest buildRequest) throws RequestException {
+        String sql = "UPDATE build_requests SET progress = ?, end_time = ? WHERE id = ?";
+        try (SqlStmt stmt = db.prepare(sql)) {
+            stmt.setDouble(1, buildRequest.getProgress(false));
+            stmt.setDateTime(2, buildRequest.getEndTime());
+            stmt.setInt(3, buildRequest.getID());
+            stmt.update();
+        } catch(Exception e) {
+            throw new RequestException(e);
+        }
     }
 
     private static class DataBase extends BaseDataBase {

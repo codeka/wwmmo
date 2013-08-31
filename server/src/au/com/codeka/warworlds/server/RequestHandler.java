@@ -242,6 +242,10 @@ public class RequestHandler {
                     mSession = new SessionController().getSession(sessionCookieValue, impersonate);
                 }
             }
+
+            if (mSession == null) {
+                throw new RequestException(403);
+            }
         }
 
         return mSession;

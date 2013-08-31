@@ -124,7 +124,7 @@ public class SectorManager extends BaseManager {
      */
     public void requestSectors(final List<Pair<Long, Long>> coords,
                                boolean force, final OnSectorsFetchedListener callback) {
-        if (log.isDebugEnabled()) {
+//        if (log.isDebugEnabled()) {
             String msg = "";
             for(Pair<Long, Long> coord : coords) {
                 if (msg.length() != 0) {
@@ -133,7 +133,7 @@ public class SectorManager extends BaseManager {
                 msg += String.format("(%d, %d)", coord.one, coord.two);
             }
             log.debug(String.format("Requesting sectors %s...", msg));
-        }
+//        }
 
         Map<Pair<Long, Long>, Sector> existingSectors = new TreeMap<Pair<Long, Long>, Sector>();
         final List<Pair<Long, Long>> missingSectors = new ArrayList<Pair<Long, Long>>();
@@ -192,15 +192,11 @@ public class SectorManager extends BaseManager {
 
                     @Override
                     protected void onComplete(List<Sector> sectors) {
-                        if (sectors == null) {
-                            return; // BAD!
-                        }
-
                         Map<Pair<Long, Long>, Sector> theseSectors = null;
                         synchronized(this) {
                             if (callback != null)
                                 theseSectors = new TreeMap<Pair<Long, Long>, Sector>();
-                            for(Sector s : sectors) {
+                            if (sectors != null) for(Sector s : sectors) {
                                 Pair<Long, Long> key = new Pair<Long, Long>(s.getX(), s.getY());
                                 log.debug(String.format("Fetched sector (%d, %d)", s.getX(), s.getY()));
 
