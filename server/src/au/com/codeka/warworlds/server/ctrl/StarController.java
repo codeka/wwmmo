@@ -3,6 +3,7 @@ package au.com.codeka.warworlds.server.ctrl;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -57,6 +58,15 @@ public class StarController {
 
     public List<Star> getStars(int[] ids) throws RequestException {
         return db.getStars(ids);
+    }
+
+    public List<Star> getStars(Collection<Integer> ids) throws RequestException {
+        int[] idArray = new int[ids.size()];
+        int i = 0;
+        for (Integer id : ids) {
+            idArray[i++] = id;
+        }
+        return db.getStars(idArray);
     }
 
     public void update(Star star) throws RequestException {

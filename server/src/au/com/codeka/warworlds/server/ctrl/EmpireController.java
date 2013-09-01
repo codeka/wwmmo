@@ -8,6 +8,7 @@ import java.util.List;
 
 import org.joda.time.DateTime;
 
+import au.com.codeka.common.model.BaseColony;
 import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.data.DB;
@@ -225,6 +226,67 @@ public class EmpireController {
         }
 
         return reason;
+    }
+
+    /**
+     * If your old home star has been destroyed, for example, this will find us a new one.
+     */
+    public void findNewHomeStar(int empireID) throws RequestException {
+        ArrayList<Integer> starIds = new ArrayList<Integer>();
+        String sql = "SELECT DISTINCT star_id" +
+                    " FROM colonies" +
+                    " WHERE empire_id = ?";
+        try (SqlStmt stmt = DB.prepare(sql)) {
+            stmt.setInt(1, empireID);
+            ResultSet rs = stmt.select();
+            while (rs.next()) {
+                starIds.add(rs.getInt(1));
+            }
+        } catch(Exception e) {
+            throw new RequestException(e);
+        }
+
+        // find the star with the biggest population, that'll be our new home.
+        Star bestStar = null;
+        float bestStarPopulation = 0;
+        for (Star star : new StarController().getStars(starIds)) {
+            if (bestStar == null) {
+                bestStar = star;
+                bestStarPopulation = getTotalPopulation(star, empireID);
+            } else {
+                float thisStarPopulation = getTotalPopulation(star, empireID);
+                if (thisStarPopulation > bestStarPopulation) {
+                    bestStar = star;
+                    bestStarPopulation = thisStarPopulation;
+                }
+            }
+        }
+
+        if (bestStar != null) {
+            setHomeStar(empireID, bestStar.getID());
+        }
+    }
+
+    public void setHomeStar(int empireID, int starID) throws RequestException {
+        String sql = "UPDATE empires SET home_star_id = ? WHERE id = ?";
+        try (SqlStmt stmt = DB.prepare(sql)) {
+            stmt.setInt(1, starID);
+            stmt.setInt(2, empireID);
+            stmt.update();
+        } catch(Exception e) {
+            throw new RequestException(e);
+        }
+    }
+
+    private static float getTotalPopulation(Star star, int empireID) {
+        float population = 0;
+        for (BaseColony baseColony : star.getColonies()) {
+            Colony colony = (Colony) baseColony;
+            if (colony.getEmpireID() == empireID) {
+                population += colony.getPopulation();
+            }
+        }
+        return population;
     }
 
     private static class DataBase extends BaseDataBase {

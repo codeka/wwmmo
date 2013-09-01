@@ -7,6 +7,7 @@ import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import au.com.codeka.common.model.BaseColony;
 import au.com.codeka.common.model.BaseFleet;
 import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.server.RequestException;
@@ -105,6 +106,18 @@ public class ColonyController {
             }
             star.getColonies().remove(colony);
 
+            // if this is the last colony for this empire on this star, make sure the empire's home
+            // star is reset
+            boolean anotherColonyExists = false;
+            for (BaseColony baseColony : star.getColonies()) {
+                if (baseColony.getEmpireKey() != null && baseColony.getEmpireKey().equals(colony.getEmpireKey())) {
+                    anotherColonyExists = true;
+                }
+            }
+            if (!anotherColonyExists && new EmpireController().getEmpire(empireID).getHomeStarID() == star.getID()) {
+                new EmpireController().findNewHomeStar(empireID);
+            }
+
             Messages.SituationReport.ColonyDestroyedRecord.Builder colony_destroyed_pb = Messages.SituationReport.ColonyDestroyedRecord.newBuilder();
             colony_destroyed_pb.setColonyKey(colony.getKey());
             colony_destroyed_pb.setEnemyEmpireKey(Integer.toString(empireID));
@@ -135,6 +148,8 @@ public class ColonyController {
             stmt.setDouble(1, amount);
             stmt.setInt(2, colony.getID());
             stmt.update();
+
+            colony.setPopulation(colony.getPopulation() - amount);
         } catch(Exception e) {
             throw new RequestException(e);
         }

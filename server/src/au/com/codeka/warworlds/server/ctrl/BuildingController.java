@@ -33,6 +33,12 @@ public class BuildingController {
             Building building = new Building(star, colony, designID);
             db.createBuilding(colony, building);
             colony.getBuildings().add(building);
+
+            // TODO: hard-coded?
+            if (building.getDesignID().equals("hq")) {
+                new EmpireController().setHomeStar(colony.getEmpireID(), star.getID());
+            }
+
             return building;
         } catch(Exception e) {
             throw new RequestException(e);

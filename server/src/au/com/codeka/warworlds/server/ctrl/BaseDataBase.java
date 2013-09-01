@@ -1,6 +1,7 @@
 package au.com.codeka.warworlds.server.ctrl;
 
 import java.sql.SQLException;
+import java.util.Collection;
 
 import au.com.codeka.warworlds.server.data.DB;
 import au.com.codeka.warworlds.server.data.SqlStmt;
@@ -46,6 +47,21 @@ public class BaseDataBase {
                 sb.append(", ");
             }
             sb.append(ids[i]);
+        }
+        sb.append(")");
+        return sb.toString();
+    }
+
+    protected static String buildInClause(Collection<Integer> ids) {
+        StringBuffer sb = new StringBuffer();
+        sb.append("(");
+        boolean first = true;
+        for (Integer id : ids) {
+            if (first) {
+                sb.append(", ");
+            }
+            first = false;
+            sb.append(id);
         }
         sb.append(")");
         return sb.toString();
