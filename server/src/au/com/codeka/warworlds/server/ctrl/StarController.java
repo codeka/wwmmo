@@ -77,30 +77,42 @@ public class StarController {
     }
 
     public void simulateAllStarsOlderThan(DateTime dt) {
-        ArrayList<Integer> starIDs = new ArrayList<Integer>();
-        String sql = "SELECT id FROM stars WHERE last_simulation < ? AND" +
-                    " (SELECT COUNT(*) FROM colonies WHERE star_id = stars.id) > 0";
-        try (SqlStmt stmt = db.prepare(sql)) {
-            stmt.setDateTime(1, dt);
-            ResultSet rs = stmt.select();
-            while (rs.next()) {
-                starIDs.add(rs.getInt(1));
+        // this'll be a number, 0..6. We want to try & spread out the load throughout the whole
+        // day, and this will ensure an individual star is only elligible once every 6 hours
+        int mod = dt.getHourOfDay() / 4;
+        while (true) {
+            ArrayList<Integer> starIDs = new ArrayList<Integer>();
+            String sql = "SELECT id FROM stars WHERE last_simulation < ? AND" +
+                        " (SELECT COUNT(*) FROM colonies WHERE star_id = stars.id) > 0" +
+                        " AND (id % 6 = "+mod+")" +
+                        " LIMIT 25";
+            try (SqlStmt stmt = db.prepare(sql)) {
+                stmt.setDateTime(1, dt);
+                ResultSet rs = stmt.select();
+                while (rs.next()) {
+                    starIDs.add(rs.getInt(1));
+                }
+            } catch (Exception e) {
             }
-        } catch (Exception e) {
-        }
 
-        int[] ids = new int[starIDs.size()];
-        for (int i = 0; i < starIDs.size(); i++) {
-            ids[i] = starIDs.get(i);
-        }
-
-        try {
-            Simulation sim = new Simulation();
-            for (Star star : getStars(ids)) {
-                sim.simulate(star);
-                update(star);
+            if (starIDs.size() == 0) {
+                break;
             }
-        } catch(RequestException e) {
+
+            int[] ids = new int[starIDs.size()];
+            for (int i = 0; i < starIDs.size(); i++) {
+                ids[i] = starIDs.get(i);
+            }
+
+            try {
+                Simulation sim = new Simulation();
+                for (Star star : getStars(ids)) {
+                    sim.simulate(star);
+                    update(star);
+                }
+            } catch(RequestException e) {
+                log.error("Unhandled exception simulating star", e);
+            }
         }
     }
 

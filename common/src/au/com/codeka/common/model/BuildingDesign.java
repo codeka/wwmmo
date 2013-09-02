@@ -27,6 +27,9 @@ public class BuildingDesign extends Design {
         if (level <= 1) {
             return mEffects;
         } else {
+            if (level - 2 >= mUpgrades.size()) {
+                return mUpgrades.get(mUpgrades.size() - 1) .getEffects();
+            }
             return mUpgrades.get(level - 2).getEffects();
         }
     }
