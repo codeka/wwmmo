@@ -18,7 +18,7 @@ public final class Sectors extends Message {
 
   private Sectors(Builder builder) {
     super(builder);
-    this.sectors = immutableCopyOf(builder.sectors);
+    this.sectors = copyOf(builder.sectors);
   }
 
   @Override

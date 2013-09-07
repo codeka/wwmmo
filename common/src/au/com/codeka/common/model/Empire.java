@@ -12,7 +12,6 @@ import static com.squareup.wire.Message.Datatype.ENUM;
 import static com.squareup.wire.Message.Datatype.FLOAT;
 import static com.squareup.wire.Message.Datatype.STRING;
 import static com.squareup.wire.Message.Label.REPEATED;
-import static com.squareup.wire.Message.Label.REQUIRED;
 
 public final class Empire extends Message {
 
@@ -39,7 +38,7 @@ public final class Empire extends Message {
   /**
    * The "display" name for the player, which is what other players see.
    */
-  @ProtoField(tag = 2, type = STRING, label = REQUIRED)
+  @ProtoField(tag = 2, type = STRING)
   public String display_name;
 
   /**
@@ -54,7 +53,7 @@ public final class Empire extends Message {
   @ProtoField(tag = 4, type = STRING)
   public String email;
 
-  @ProtoField(tag = 5, type = ENUM, label = REQUIRED)
+  @ProtoField(tag = 5, type = ENUM)
   public EmpireState state;
 
   /**
@@ -114,9 +113,9 @@ public final class Empire extends Message {
     this.user = builder.user;
     this.email = builder.email;
     this.state = builder.state;
-    this.fleets = immutableCopyOf(builder.fleets);
-    this.colonies = immutableCopyOf(builder.colonies);
-    this.build_requests = immutableCopyOf(builder.build_requests);
+    this.fleets = copyOf(builder.fleets);
+    this.colonies = copyOf(builder.colonies);
+    this.build_requests = copyOf(builder.build_requests);
     this.cash = builder.cash;
     this.rank = builder.rank;
     this.home_star = builder.home_star;
@@ -260,7 +259,6 @@ public final class Empire extends Message {
 
     @Override
     public Empire build() {
-      checkRequiredFields();
       return new Empire(this);
     }
   }

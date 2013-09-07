@@ -18,7 +18,7 @@ public final class CombatReports extends Message {
 
   private CombatReports(Builder builder) {
     super(builder);
-    this.reports = immutableCopyOf(builder.reports);
+    this.reports = copyOf(builder.reports);
   }
 
   @Override

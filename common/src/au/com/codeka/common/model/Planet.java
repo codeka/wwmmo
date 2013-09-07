@@ -8,7 +8,6 @@ import com.squareup.wire.ProtoField;
 
 import static com.squareup.wire.Message.Datatype.ENUM;
 import static com.squareup.wire.Message.Datatype.INT32;
-import static com.squareup.wire.Message.Label.REQUIRED;
 
 public final class Planet extends Message {
 
@@ -23,10 +22,10 @@ public final class Planet extends Message {
    * The "index" of the planet represents how far it is from the sun. Planets are always
    * in monotonically increasing order of distance (0, 1, 2, 3, etc)
    */
-  @ProtoField(tag = 2, type = INT32, label = REQUIRED)
+  @ProtoField(tag = 2, type = INT32)
   public Integer index;
 
-  @ProtoField(tag = 3, type = ENUM, label = REQUIRED)
+  @ProtoField(tag = 3, type = ENUM)
   public PLANET_TYPE planet_type;
 
   /**
@@ -147,7 +146,6 @@ public final class Planet extends Message {
 
     @Override
     public Planet build() {
-      checkRequiredFields();
       return new Planet(this);
     }
   }

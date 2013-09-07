@@ -1,8 +1,6 @@
 package au.com.codeka.warworlds.api;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -21,13 +19,14 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
-import com.squareup.wire.ByteString;
-import com.squareup.wire.Message;
-
+import au.com.codeka.common.model.Model;
 import au.com.codeka.common.model.Notification;
 import au.com.codeka.common.model.NotificationWrapper;
 import au.com.codeka.warworlds.App;
 import au.com.codeka.warworlds.Notifications;
+
+import com.squareup.wire.ByteString;
+import com.squareup.wire.Message;
 
 /**
  * This is the main "client" that accesses the War Worlds API.
@@ -77,7 +76,7 @@ public class ApiClient {
      * \param protoBuffFactory the class that we want to fetch, this will also determine
      *        the return value of this method.
      */
-    public static <T> T getProtoBuf(String url, Class<T> protoBuffFactory) throws ApiException {
+    public static <T extends Message> T getProtoBuf(String url, Class<T> protoBuffFactory) throws ApiException {
         Map<String, List<String>> headers = getHeaders();
 
         RequestManager.ResultWrapper res = RequestManager.request("GET", url, headers);
@@ -135,7 +134,7 @@ public class ApiClient {
     /**
      * Uses the "PUT" HTTP method to put a protocol buffer at the given URL.
      */
-    public static <T> T putProtoBuf(String url, Message pb, Class<T> protoBuffFactory)
+    public static <T extends Message> T putProtoBuf(String url, Message pb, Class<T> protoBuffFactory)
             throws ApiException {
         return putOrPostProtoBuff("PUT", url, pb, protoBuffFactory);
     }
@@ -143,12 +142,12 @@ public class ApiClient {
     /**
      * Uses the "POST" HTTP method to post a protocol buffer at the given URL.
      */
-    public static <T> T postProtoBuf(String url, Message pb, Class<T> protoBuffFactory)
+    public static <T extends Message> T postProtoBuf(String url, Message pb, Class<T> protoBuffFactory)
             throws ApiException {
         return putOrPostProtoBuff("POST", url, pb, protoBuffFactory);
     }
 
-    private static <T> T putOrPostProtoBuff(String method, String url, Message pb, 
+    private static <T extends Message> T putOrPostProtoBuff(String method, String url, Message pb, 
             Class<T> protoBuffFactory) throws ApiException {
         Map<String, List<String>> headers = getHeaders();
 
@@ -187,7 +186,7 @@ public class ApiClient {
     /**
      * Sends a HTTP 'DELETE' to the given URL.
      */
-    public static <T> T delete(String url, Message pb, Class<T> protoBuffFactory)
+    public static <T extends Message> T delete(String url, Message pb, Class<T> protoBuffFactory)
             throws ApiException {
         return putOrPostProtoBuff("DELETE", url, pb, protoBuffFactory);
     }
@@ -218,7 +217,7 @@ public class ApiClient {
      * (if any).
      */
     
-    public static <T> T parseResponseBody(HttpResponse resp, Class<T> protoBuffFactory) {
+    public static <T extends Message> T parseResponseBody(HttpResponse resp, Class<T> protoBuffFactory) {
         HttpEntity entity = resp.getEntity();
         if (entity != null) {
             T result = null;
@@ -249,30 +248,21 @@ public class ApiClient {
         return null;
     }
 
-    @SuppressWarnings({"unchecked"})
-    private static <T> T extractBody(HttpEntity entity, Class<T> protoBuffFactory) {
-        T result = null;
+    private static <T extends Message> T extractBody(HttpEntity entity, Class<T> protoBuffFactory)  {
         try {
-            Method m = protoBuffFactory.getDeclaredMethod("parseFrom", InputStream.class);
-            result = (T) m.invoke(null, entity.getContent());
-
-            entity.consumeContent();
-        } catch (Exception e) {
+            return (T) Model.wire.parseFrom(entity.getContent(), protoBuffFactory);
+        } catch (IOException e) {
+            log.error("Error parsing response: "+protoBuffFactory.getName(), e);
             return null;
         }
-        return result;
     }
 
-
-    @SuppressWarnings({"unchecked"})
-    private static <T> T extractBody(ByteString bs, Class<T> protoBuffFactory) {
-        T result = null;
+    private static <T extends Message> T extractBody(ByteString bs, Class<T> protoBuffFactory) {
         try {
-            Method m = protoBuffFactory.getDeclaredMethod("parseFrom", ByteString.class);
-            result = (T) m.invoke(null, bs);
-        } catch (Exception e) {
+            return (T) Model.wire.parseFrom(bs.toByteArray(), protoBuffFactory);
+        } catch (IOException e) {
+            log.error("Error parsing response: "+protoBuffFactory.getName(), e);
             return null;
         }
-        return result;
     }
 }

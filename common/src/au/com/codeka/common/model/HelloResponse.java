@@ -11,7 +11,6 @@ import static com.squareup.wire.Message.Datatype.BOOL;
 import static com.squareup.wire.Message.Datatype.INT64;
 import static com.squareup.wire.Message.Datatype.STRING;
 import static com.squareup.wire.Message.Label.REPEATED;
-import static com.squareup.wire.Message.Label.REQUIRED;
 
 public final class HelloResponse extends Message {
 
@@ -29,7 +28,7 @@ public final class HelloResponse extends Message {
   /**
    * The current message of the day.
    */
-  @ProtoField(tag = 1, label = REQUIRED)
+  @ProtoField(tag = 1)
   public MessageOfTheDay motd;
 
   /**
@@ -96,14 +95,14 @@ public final class HelloResponse extends Message {
     super(builder);
     this.motd = builder.motd;
     this.empire = builder.empire;
-    this.colonies = immutableCopyOf(builder.colonies);
+    this.colonies = copyOf(builder.colonies);
     this.require_gcm_register = builder.require_gcm_register;
     this.was_empire_reset = builder.was_empire_reset;
     this.empire_reset_reason = builder.empire_reset_reason;
     this.building_statistics = builder.building_statistics;
-    this.build_requests = immutableCopyOf(builder.build_requests);
+    this.build_requests = copyOf(builder.build_requests);
     this.force_remove_ads = builder.force_remove_ads;
-    this.star_ids = immutableCopyOf(builder.star_ids);
+    this.star_ids = copyOf(builder.star_ids);
   }
 
   @Override
@@ -225,7 +224,6 @@ public final class HelloResponse extends Message {
 
     @Override
     public HelloResponse build() {
-      checkRequiredFields();
       return new HelloResponse(this);
     }
   }

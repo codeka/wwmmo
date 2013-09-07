@@ -18,7 +18,7 @@ public final class Fleets extends Message {
 
   private Fleets(Builder builder) {
     super(builder);
-    this.fleets = immutableCopyOf(builder.fleets);
+    this.fleets = copyOf(builder.fleets);
   }
 
   @Override

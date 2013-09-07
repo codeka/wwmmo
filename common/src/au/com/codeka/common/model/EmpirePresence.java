@@ -8,7 +8,6 @@ import com.squareup.wire.ProtoField;
 import static com.squareup.wire.Message.Datatype.FLOAT;
 import static com.squareup.wire.Message.Datatype.INT64;
 import static com.squareup.wire.Message.Datatype.STRING;
-import static com.squareup.wire.Message.Label.REQUIRED;
 
 public final class EmpirePresence extends Message {
 
@@ -23,7 +22,7 @@ public final class EmpirePresence extends Message {
   public static final Float DEFAULT_MAX_MINERALS = 0F;
   public static final Long DEFAULT_GOODS_ZERO_TIME = 0L;
 
-  @ProtoField(tag = 1, type = STRING, label = REQUIRED)
+  @ProtoField(tag = 1, type = STRING)
   public String key;
 
   @ProtoField(tag = 2, type = STRING)
@@ -186,7 +185,6 @@ public final class EmpirePresence extends Message {
 
     @Override
     public EmpirePresence build() {
-      checkRequiredFields();
       return new EmpirePresence(this);
     }
   }

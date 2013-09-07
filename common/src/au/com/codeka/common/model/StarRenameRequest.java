@@ -7,7 +7,6 @@ import com.squareup.wire.ProtoField;
 
 import static com.squareup.wire.Message.Datatype.INT64;
 import static com.squareup.wire.Message.Datatype.STRING;
-import static com.squareup.wire.Message.Label.REQUIRED;
 
 public final class StarRenameRequest extends Message {
 
@@ -19,13 +18,13 @@ public final class StarRenameRequest extends Message {
   public static final String DEFAULT_PURCHASE_DEVELOPER_PAYLOAD = "";
   public static final String DEFAULT_PURCHASE_PRICE = "";
 
-  @ProtoField(tag = 1, type = STRING, label = REQUIRED)
+  @ProtoField(tag = 1, type = STRING)
   public String star_key;
 
-  @ProtoField(tag = 2, type = STRING, label = REQUIRED)
+  @ProtoField(tag = 2, type = STRING)
   public String old_name;
 
-  @ProtoField(tag = 3, type = STRING, label = REQUIRED)
+  @ProtoField(tag = 3, type = STRING)
   public String new_name;
 
   @ProtoField(tag = 4, type = STRING)
@@ -143,7 +142,6 @@ public final class StarRenameRequest extends Message {
 
     @Override
     public StarRenameRequest build() {
-      checkRequiredFields();
       return new StarRenameRequest(this);
     }
   }

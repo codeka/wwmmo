@@ -11,7 +11,6 @@ import static com.squareup.wire.Message.Datatype.FLOAT;
 import static com.squareup.wire.Message.Datatype.INT32;
 import static com.squareup.wire.Message.Datatype.INT64;
 import static com.squareup.wire.Message.Datatype.STRING;
-import static com.squareup.wire.Message.Label.REQUIRED;
 
 public final class BuildRequest extends Message {
 
@@ -36,13 +35,13 @@ public final class BuildRequest extends Message {
    * The key of the colony you're trying to build at. Must have a shipyard to build
    * a ship.
    */
-  @ProtoField(tag = 2, type = STRING, label = REQUIRED)
+  @ProtoField(tag = 2, type = STRING)
   public String colony_key;
 
   /**
    * The empire this build operation belongs to.
    */
-  @ProtoField(tag = 3, type = STRING, label = REQUIRED)
+  @ProtoField(tag = 3, type = STRING)
   public String empire_key;
 
   /**
@@ -54,13 +53,13 @@ public final class BuildRequest extends Message {
   @ProtoField(tag = 12, type = INT32)
   public Integer planet_index;
 
-  @ProtoField(tag = 4, type = ENUM, label = REQUIRED)
+  @ProtoField(tag = 4, type = ENUM)
   public BUILD_KIND build_kind;
 
   /**
    * The name of the design you're trying to build
    */
-  @ProtoField(tag = 5, type = STRING, label = REQUIRED)
+  @ProtoField(tag = 5, type = STRING)
   public String design_id;
 
   /**
@@ -260,7 +259,6 @@ public final class BuildRequest extends Message {
 
     @Override
     public BuildRequest build() {
-      checkRequiredFields();
       return new BuildRequest(this);
     }
   }

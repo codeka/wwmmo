@@ -6,17 +6,16 @@ import com.squareup.wire.Message;
 import com.squareup.wire.ProtoField;
 
 import static com.squareup.wire.Message.Datatype.STRING;
-import static com.squareup.wire.Message.Label.REQUIRED;
 
 public final class MessageOfTheDay extends Message {
 
   public static final String DEFAULT_MESSAGE = "";
   public static final String DEFAULT_LAST_UPDATE = "";
 
-  @ProtoField(tag = 1, type = STRING, label = REQUIRED)
+  @ProtoField(tag = 1, type = STRING)
   public String message;
 
-  @ProtoField(tag = 2, type = STRING, label = REQUIRED)
+  @ProtoField(tag = 2, type = STRING)
   public String last_update;
 
   private MessageOfTheDay(Builder builder) {
@@ -72,7 +71,6 @@ public final class MessageOfTheDay extends Message {
 
     @Override
     public MessageOfTheDay build() {
-      checkRequiredFields();
       return new MessageOfTheDay(this);
     }
   }

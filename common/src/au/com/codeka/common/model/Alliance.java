@@ -70,7 +70,7 @@ public final class Alliance extends Message {
     this.creator_empire_key = builder.creator_empire_key;
     this.bank_balance = builder.bank_balance;
     this.num_members = builder.num_members;
-    this.members = immutableCopyOf(builder.members);
+    this.members = copyOf(builder.members);
   }
 
   @Override

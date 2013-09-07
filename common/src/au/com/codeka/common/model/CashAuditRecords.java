@@ -18,7 +18,7 @@ public final class CashAuditRecords extends Message {
 
   private CashAuditRecords(Builder builder) {
     super(builder);
-    this.records = immutableCopyOf(builder.records);
+    this.records = copyOf(builder.records);
   }
 
   @Override

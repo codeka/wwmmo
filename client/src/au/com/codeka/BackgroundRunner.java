@@ -26,9 +26,10 @@ import android.os.Process;
  */
 public abstract class BackgroundRunner<Result> {
     private static Logger log = LoggerFactory.getLogger(BackgroundRunner.class);
-    private String mCreatorStackTrace;
 
-    private static boolean sThreadDebug = false;
+    private static boolean sThreadDebug = true;
+    private String mCreatorStackTrace;
+    private int mCreatorThreadID;
 
     private static final ThreadFactory sThreadFactory = new ThreadFactory() {
         private final AtomicInteger mCount = new AtomicInteger(1);
@@ -54,6 +55,7 @@ public abstract class BackgroundRunner<Result> {
     public BackgroundRunner() {
         if (sThreadDebug) {
             mCreatorStackTrace = ExceptionUtils.getStackTrace(new Throwable());
+            mCreatorThreadID = Process.myTid();
         }
 
         mWorker = new Callable<Result>() {
@@ -102,7 +104,7 @@ public abstract class BackgroundRunner<Result> {
                 new BackgroundRunnerResult<Result>(this, result));
 
         if (mCreatorStackTrace != null) {
-            log.info("Posting message back to target from original stack trace:\r\n"+mCreatorStackTrace);
+            log.info("Posting message back to target from original stack trace [TID="+mCreatorThreadID+"]:\r\n"+mCreatorStackTrace);
         }
         message.sendToTarget();
         return result;

@@ -18,7 +18,7 @@ public final class ScoutReports extends Message {
 
   private ScoutReports(Builder builder) {
     super(builder);
-    this.reports = immutableCopyOf(builder.reports);
+    this.reports = copyOf(builder.reports);
   }
 
   @Override

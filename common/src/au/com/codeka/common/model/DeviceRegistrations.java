@@ -18,7 +18,7 @@ public final class DeviceRegistrations extends Message {
 
   private DeviceRegistrations(Builder builder) {
     super(builder);
-    this.registrations = immutableCopyOf(builder.registrations);
+    this.registrations = copyOf(builder.registrations);
   }
 
   @Override

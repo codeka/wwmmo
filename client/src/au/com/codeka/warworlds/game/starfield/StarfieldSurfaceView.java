@@ -479,7 +479,7 @@ public class StarfieldSurfaceView extends SectorView
             drawStarName(canvas, (Star) star, offsetX, offsetY);
         }
         for (Star star : sector.stars) {
-            for (Fleet fleet : star.fleets) {
+            if (star.fleets != null) for (Fleet fleet : star.fleets) {
                 if (fleet.state == Fleet.FLEET_STATE.MOVING) {
                     drawMovingFleet(canvas, (Fleet) fleet, (Star) star, offsetX, offsetY);
                 }

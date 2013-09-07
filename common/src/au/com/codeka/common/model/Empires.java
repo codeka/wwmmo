@@ -18,7 +18,7 @@ public final class Empires extends Message {
 
   private Empires(Builder builder) {
     super(builder);
-    this.empires = immutableCopyOf(builder.empires);
+    this.empires = copyOf(builder.empires);
   }
 
   @Override

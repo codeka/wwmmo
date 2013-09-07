@@ -11,7 +11,6 @@ import static com.squareup.wire.Message.Datatype.ENUM;
 import static com.squareup.wire.Message.Datatype.FLOAT;
 import static com.squareup.wire.Message.Datatype.INT64;
 import static com.squareup.wire.Message.Datatype.STRING;
-import static com.squareup.wire.Message.Label.REQUIRED;
 
 public final class Fleet extends Message {
 
@@ -34,7 +33,7 @@ public final class Fleet extends Message {
   /**
    * The unique key for this fleet
    */
-  @ProtoField(tag = 1, type = STRING, label = REQUIRED)
+  @ProtoField(tag = 1, type = STRING)
   public String key;
 
   /**
@@ -295,7 +294,6 @@ public final class Fleet extends Message {
 
     @Override
     public Fleet build() {
-      checkRequiredFields();
       return new Fleet(this);
     }
   }

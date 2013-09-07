@@ -23,7 +23,7 @@ public final class AllianceRequests extends Message {
 
   private AllianceRequests(Builder builder) {
     super(builder);
-    this.requests = immutableCopyOf(builder.requests);
+    this.requests = copyOf(builder.requests);
     this.cursor = builder.cursor;
   }
 

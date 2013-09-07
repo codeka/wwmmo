@@ -23,7 +23,7 @@ public final class EmpireRanks extends Message {
 
   private EmpireRanks(Builder builder) {
     super(builder);
-    this.ranks = immutableCopyOf(builder.ranks);
+    this.ranks = copyOf(builder.ranks);
     this.date = builder.date;
   }
 

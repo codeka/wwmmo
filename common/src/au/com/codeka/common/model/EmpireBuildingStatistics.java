@@ -10,7 +10,6 @@ import java.util.List;
 import static com.squareup.wire.Message.Datatype.INT32;
 import static com.squareup.wire.Message.Datatype.STRING;
 import static com.squareup.wire.Message.Label.REPEATED;
-import static com.squareup.wire.Message.Label.REQUIRED;
 
 public final class EmpireBuildingStatistics extends Message {
 
@@ -21,7 +20,7 @@ public final class EmpireBuildingStatistics extends Message {
 
   private EmpireBuildingStatistics(Builder builder) {
     super(builder);
-    this.counts = immutableCopyOf(builder.counts);
+    this.counts = copyOf(builder.counts);
   }
 
   @Override
@@ -66,10 +65,10 @@ public final class EmpireBuildingStatistics extends Message {
     public static final String DEFAULT_DESIGN_ID = "";
     public static final Integer DEFAULT_NUM_BUILDINGS = 0;
 
-    @ProtoField(tag = 1, type = STRING, label = REQUIRED)
+    @ProtoField(tag = 1, type = STRING)
     public String design_id;
 
-    @ProtoField(tag = 2, type = INT32, label = REQUIRED)
+    @ProtoField(tag = 2, type = INT32)
     public Integer num_buildings;
 
     private DesignCount(Builder builder) {
@@ -125,7 +124,6 @@ public final class EmpireBuildingStatistics extends Message {
 
       @Override
       public DesignCount build() {
-        checkRequiredFields();
         return new DesignCount(this);
       }
     }

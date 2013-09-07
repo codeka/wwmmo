@@ -18,7 +18,7 @@ public final class Planets extends Message {
 
   private Planets(Builder builder) {
     super(builder);
-    this.planets = immutableCopyOf(builder.planets);
+    this.planets = copyOf(builder.planets);
   }
 
   @Override

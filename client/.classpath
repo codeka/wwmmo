@@ -31,6 +31,6 @@
 	<classpathentry exported="true" kind="con" path="com.android.ide.eclipse.adt.DEPENDENCIES"/>
 	<classpathentry exported="true" kind="lib" path="libs/joda-convert-1.2.jar"/>
 	<classpathentry exported="true" kind="lib" path="libs/jregex1.2_01.jar"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/wire-runtime"/>
+	<classpathentry kind="lib" path="libs/wire-runtime-1.0.2-SNAPSHOT.jar"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>

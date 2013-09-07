@@ -9,7 +9,6 @@ import com.squareup.wire.ProtoField;
 import static com.squareup.wire.Message.Datatype.ENUM;
 import static com.squareup.wire.Message.Datatype.INT32;
 import static com.squareup.wire.Message.Datatype.STRING;
-import static com.squareup.wire.Message.Label.REQUIRED;
 
 public final class FleetOrder extends Message {
 
@@ -20,7 +19,7 @@ public final class FleetOrder extends Message {
   public static final Fleet.FLEET_STANCE DEFAULT_STANCE = Fleet.FLEET_STANCE.PASSIVE;
   public static final String DEFAULT_MERGE_FLEET_KEY = "";
 
-  @ProtoField(tag = 1, type = ENUM, label = REQUIRED)
+  @ProtoField(tag = 1, type = ENUM)
   public FLEET_ORDER order;
 
   /**
@@ -145,7 +144,6 @@ public final class FleetOrder extends Message {
 
     @Override
     public FleetOrder build() {
-      checkRequiredFields();
       return new FleetOrder(this);
     }
   }

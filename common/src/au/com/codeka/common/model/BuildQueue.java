@@ -18,7 +18,7 @@ public final class BuildQueue extends Message {
 
   private BuildQueue(Builder builder) {
     super(builder);
-    this.requests = immutableCopyOf(builder.requests);
+    this.requests = copyOf(builder.requests);
   }
 
   @Override

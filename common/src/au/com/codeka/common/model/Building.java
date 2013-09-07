@@ -7,7 +7,6 @@ import com.squareup.wire.ProtoField;
 
 import static com.squareup.wire.Message.Datatype.INT32;
 import static com.squareup.wire.Message.Datatype.STRING;
-import static com.squareup.wire.Message.Label.REQUIRED;
 
 public final class Building extends Message {
 
@@ -19,19 +18,19 @@ public final class Building extends Message {
   /**
    * The unique key of this building.
    */
-  @ProtoField(tag = 1, type = STRING, label = REQUIRED)
+  @ProtoField(tag = 1, type = STRING)
   public String key;
 
   /**
    * The key of the colony to which this building belongs.
    */
-  @ProtoField(tag = 2, type = STRING, label = REQUIRED)
+  @ProtoField(tag = 2, type = STRING)
   public String colony_key;
 
   /**
    * The string ID of the design of this building (defined in data/buildings.xml)
    */
-  @ProtoField(tag = 3, type = STRING, label = REQUIRED)
+  @ProtoField(tag = 3, type = STRING)
   public String design_id;
 
   /**
@@ -113,7 +112,6 @@ public final class Building extends Message {
 
     @Override
     public Building build() {
-      checkRequiredFields();
       return new Building(this);
     }
   }

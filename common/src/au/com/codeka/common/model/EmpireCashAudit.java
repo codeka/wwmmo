@@ -18,7 +18,7 @@ public final class EmpireCashAudit extends Message {
 
   private EmpireCashAudit(Builder builder) {
     super(builder);
-    this.entries = immutableCopyOf(builder.entries);
+    this.entries = copyOf(builder.entries);
   }
 
   @Override

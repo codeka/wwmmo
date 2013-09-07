@@ -18,7 +18,7 @@ public final class Colonies extends Message {
 
   private Colonies(Builder builder) {
     super(builder);
-    this.colonies = immutableCopyOf(builder.colonies);
+    this.colonies = copyOf(builder.colonies);
   }
 
   @Override

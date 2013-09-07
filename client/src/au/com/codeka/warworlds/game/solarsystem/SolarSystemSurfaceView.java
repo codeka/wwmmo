@@ -135,12 +135,12 @@ public class SolarSystemSurfaceView extends UniverseElementSurfaceView {
             planetInfo.distanceFromSun = distanceFromSun;
 
             List<Colony> colonies = mStar.colonies;
-            if (colonies != null && !colonies.isEmpty()) {
+            if (colonies != null) {
                 for (Colony colony : colonies) {
                     if (colony.planet_index == mPlanetInfos[i].planet.index) {
                         planetInfo.colony = (Colony) colony;
 
-                        for (Building building : mStar.buildings) {
+                        if (mStar.buildings != null) for (Building building : mStar.buildings) {
                             if (building.design_id.equals("hq") && building.colony_key.equals(colony.key)) {
                                 planetInfo.hasHQ = true;
                             }

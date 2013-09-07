@@ -18,7 +18,7 @@ public final class ChatMessages extends Message {
 
   private ChatMessages(Builder builder) {
     super(builder);
-    this.messages = immutableCopyOf(builder.messages);
+    this.messages = copyOf(builder.messages);
   }
 
   @Override

@@ -7,7 +7,6 @@ import com.squareup.wire.ProtoField;
 
 import static com.squareup.wire.Message.Datatype.INT64;
 import static com.squareup.wire.Message.Datatype.STRING;
-import static com.squareup.wire.Message.Label.REQUIRED;
 
 public final class ChatMessage extends Message {
 
@@ -17,7 +16,7 @@ public final class ChatMessage extends Message {
   public static final String DEFAULT_ALLIANCE_KEY = "";
   public static final String DEFAULT_MESSAGE_EN = "";
 
-  @ProtoField(tag = 1, type = STRING, label = REQUIRED)
+  @ProtoField(tag = 1, type = STRING)
   public String message;
 
   @ProtoField(tag = 2, type = STRING)
@@ -119,7 +118,6 @@ public final class ChatMessage extends Message {
 
     @Override
     public ChatMessage build() {
-      checkRequiredFields();
       return new ChatMessage(this);
     }
   }

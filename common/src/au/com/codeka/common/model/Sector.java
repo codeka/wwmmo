@@ -10,7 +10,6 @@ import java.util.List;
 import static com.squareup.wire.Message.Datatype.INT32;
 import static com.squareup.wire.Message.Datatype.INT64;
 import static com.squareup.wire.Message.Label.REPEATED;
-import static com.squareup.wire.Message.Label.REQUIRED;
 
 public final class Sector extends Message {
 
@@ -25,10 +24,10 @@ public final class Sector extends Message {
    * these are the (x,y) coordinates of the sector. (0,0) is the "centre" of the universe,
    * (1,1) is one sector up and to the right, and so on.
    */
-  @ProtoField(tag = 1, type = INT64, label = REQUIRED)
+  @ProtoField(tag = 1, type = INT64)
   public Long x;
 
-  @ProtoField(tag = 2, type = INT64, label = REQUIRED)
+  @ProtoField(tag = 2, type = INT64)
   public Long y;
 
   /**
@@ -60,9 +59,9 @@ public final class Sector extends Message {
     this.x = builder.x;
     this.y = builder.y;
     this.num_colonies = builder.num_colonies;
-    this.stars = immutableCopyOf(builder.stars);
-    this.colonies = immutableCopyOf(builder.colonies);
-    this.fleets = immutableCopyOf(builder.fleets);
+    this.stars = copyOf(builder.stars);
+    this.colonies = copyOf(builder.colonies);
+    this.fleets = copyOf(builder.fleets);
   }
 
   @Override
@@ -148,7 +147,6 @@ public final class Sector extends Message {
 
     @Override
     public Sector build() {
-      checkRequiredFields();
       return new Sector(this);
     }
   }

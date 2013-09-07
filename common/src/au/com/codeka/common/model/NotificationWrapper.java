@@ -10,14 +10,13 @@ import java.util.List;
 
 import static com.squareup.wire.Message.Datatype.BYTES;
 import static com.squareup.wire.Message.Label.REPEATED;
-import static com.squareup.wire.Message.Label.REQUIRED;
 
 public final class NotificationWrapper extends Message {
 
   public static final ByteString DEFAULT_ORIGINAL_MESSAGE = ByteString.EMPTY;
   public static final List<Notification> DEFAULT_NOTIFICATIONS = Collections.emptyList();
 
-  @ProtoField(tag = 1, type = BYTES, label = REQUIRED)
+  @ProtoField(tag = 1, type = BYTES)
   public ByteString original_message;
 
   @ProtoField(tag = 2, label = REPEATED)
@@ -26,7 +25,7 @@ public final class NotificationWrapper extends Message {
   private NotificationWrapper(Builder builder) {
     super(builder);
     this.original_message = builder.original_message;
-    this.notifications = immutableCopyOf(builder.notifications);
+    this.notifications = copyOf(builder.notifications);
   }
 
   @Override
@@ -76,7 +75,6 @@ public final class NotificationWrapper extends Message {
 
     @Override
     public NotificationWrapper build() {
-      checkRequiredFields();
       return new NotificationWrapper(this);
     }
   }

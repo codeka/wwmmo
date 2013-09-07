@@ -18,7 +18,7 @@ public class StarHelper {
      */
     public static float getRadarRange(Star star, String empireKey) {
         float radarRange = 0.0f;
-        for (Building building : star.buildings) {
+        if (star.buildings != null) for (Building building : star.buildings) {
             BuildingDesign design = DesignManager.i.getDesign(building);
             for (RadarBuildingEffect effect : design.getEffects(building.level, RadarBuildingEffect.class)) {
                 if (radarRange < effect.getRange()) {

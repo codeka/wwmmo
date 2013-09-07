@@ -18,7 +18,7 @@ public final class Alliances extends Message {
 
   private Alliances(Builder builder) {
     super(builder);
-    this.alliances = immutableCopyOf(builder.alliances);
+    this.alliances = copyOf(builder.alliances);
   }
 
   @Override

@@ -6,7 +6,6 @@ import com.squareup.wire.Message;
 import com.squareup.wire.ProtoField;
 
 import static com.squareup.wire.Message.Datatype.INT32;
-import static com.squareup.wire.Message.Label.REQUIRED;
 
 public final class ColonizeRequest extends Message {
 
@@ -15,7 +14,7 @@ public final class ColonizeRequest extends Message {
   /**
    * The index of the planet you want to colonize
    */
-  @ProtoField(tag = 1, type = INT32, label = REQUIRED)
+  @ProtoField(tag = 1, type = INT32)
   public Integer planet_index;
 
   private ColonizeRequest(Builder builder) {
@@ -56,7 +55,6 @@ public final class ColonizeRequest extends Message {
 
     @Override
     public ColonizeRequest build() {
-      checkRequiredFields();
       return new ColonizeRequest(this);
     }
   }

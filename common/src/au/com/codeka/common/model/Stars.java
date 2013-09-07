@@ -18,7 +18,7 @@ public final class Stars extends Message {
 
   private Stars(Builder builder) {
     super(builder);
-    this.stars = immutableCopyOf(builder.stars);
+    this.stars = copyOf(builder.stars);
   }
 
   @Override

@@ -68,10 +68,10 @@ public final class CombatReport extends Message {
     this.star_key = builder.star_key;
     this.start_time = builder.start_time;
     this.end_time = builder.end_time;
-    this.start_empire_keys = immutableCopyOf(builder.start_empire_keys);
-    this.end_empire_keys = immutableCopyOf(builder.end_empire_keys);
+    this.start_empire_keys = copyOf(builder.start_empire_keys);
+    this.end_empire_keys = copyOf(builder.end_empire_keys);
     this.num_destroyed = builder.num_destroyed;
-    this.rounds = immutableCopyOf(builder.rounds);
+    this.rounds = copyOf(builder.rounds);
   }
 
   @Override

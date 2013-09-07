@@ -26,7 +26,7 @@ public final class SituationReports extends Message {
 
   private SituationReports(Builder builder) {
     super(builder);
-    this.situation_reports = immutableCopyOf(builder.situation_reports);
+    this.situation_reports = copyOf(builder.situation_reports);
     this.cursor = builder.cursor;
   }
 

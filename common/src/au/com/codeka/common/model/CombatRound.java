@@ -49,11 +49,11 @@ public final class CombatRound extends Message {
     super(builder);
     this.star_key = builder.star_key;
     this.round_time = builder.round_time;
-    this.fleets = immutableCopyOf(builder.fleets);
-    this.fleets_joined = immutableCopyOf(builder.fleets_joined);
-    this.fleets_targetted = immutableCopyOf(builder.fleets_targetted);
-    this.fleets_attacked = immutableCopyOf(builder.fleets_attacked);
-    this.fleets_damaged = immutableCopyOf(builder.fleets_damaged);
+    this.fleets = copyOf(builder.fleets);
+    this.fleets_joined = copyOf(builder.fleets_joined);
+    this.fleets_targetted = copyOf(builder.fleets_targetted);
+    this.fleets_attacked = copyOf(builder.fleets_attacked);
+    this.fleets_damaged = copyOf(builder.fleets_damaged);
   }
 
   @Override
@@ -181,7 +181,7 @@ public final class CombatRound extends Message {
 
     private FleetSummary(Builder builder) {
       super(builder);
-      this.fleet_keys = immutableCopyOf(builder.fleet_keys);
+      this.fleet_keys = copyOf(builder.fleet_keys);
       this.empire_key = builder.empire_key;
       this.design_id = builder.design_id;
       this.num_ships = builder.num_ships;

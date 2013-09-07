@@ -127,6 +127,9 @@ public class Simulation {
         if (predictionStar != null) {
             // copy the end times for builds from prediction_star_pb
             for (BuildRequest starBuildRequest : star.build_requests) {
+                if (predictionStar.build_requests == null) {
+                    predictionStar.build_requests = new ArrayList<BuildRequest>();
+                }
                 for (BuildRequest predictedBuildRequest : predictionStar.build_requests) {
                     if (starBuildRequest.key.equals(predictedBuildRequest.key)) {
                         starBuildRequest.end_time = predictedBuildRequest.end_time;
@@ -163,7 +166,7 @@ public class Simulation {
 
     private DateTime getSimulateStartTime(Star star) {
         DateTime lastSimulation = Model.toDateTime(star.last_simulation);
-        if (lastSimulation == null) {
+        if (lastSimulation == null && star.fleets != null) {
             for (Fleet fleet : star.fleets) {
                 DateTime dt = Model.toDateTime(fleet.state_start_time);
                 if (lastSimulation == null || dt.compareTo(lastSimulation) < 0) {
