@@ -35,7 +35,12 @@ import android.widget.SpinnerAdapter;
 import android.widget.TextView;
 import au.com.codeka.BackgroundRunner;
 import au.com.codeka.TimeInHours;
-import au.com.codeka.common.protobuf.Messages;
+import au.com.codeka.common.model.Empire;
+import au.com.codeka.common.model.Model;
+import au.com.codeka.common.model.SituationReport;
+import au.com.codeka.common.model.SituationReportFilter;
+import au.com.codeka.common.model.SituationReports;
+import au.com.codeka.common.model.Star;
 import au.com.codeka.warworlds.BaseActivity;
 import au.com.codeka.warworlds.Notifications;
 import au.com.codeka.warworlds.R;
@@ -45,25 +50,25 @@ import au.com.codeka.warworlds.WarWorldsActivity;
 import au.com.codeka.warworlds.api.ApiClient;
 import au.com.codeka.warworlds.api.ApiException;
 import au.com.codeka.warworlds.game.solarsystem.SolarSystemActivity;
+import au.com.codeka.warworlds.model.EmpireHelper;
 import au.com.codeka.warworlds.model.EmpireManager;
-import au.com.codeka.warworlds.model.MyEmpire;
 import au.com.codeka.warworlds.model.RealmManager;
-import au.com.codeka.warworlds.model.SituationReport;
+import au.com.codeka.warworlds.model.SituationReportHelper;
 import au.com.codeka.warworlds.model.Sprite;
 import au.com.codeka.warworlds.model.SpriteDrawable;
 import au.com.codeka.warworlds.model.StarImageManager;
 import au.com.codeka.warworlds.model.StarManager;
-import au.com.codeka.warworlds.model.StarSummary;
+import au.com.codeka.warworlds.model.StarType;
 
 public class SitrepActivity extends BaseActivity {
     private static Logger log = LoggerFactory.getLogger(SitrepActivity.class);
     private Context mContext = this;
     private SituationReportAdapter mSituationReportAdapter;
     private String mStarKey;
-    private Map<String, StarSummary> mStarSummaries;
+    private Map<String, Star> mStarSummaries;
     private Handler mHandler;
     private String mCursor;
-    private Messages.SituationReportFilter mFilter;
+    private SituationReportFilter mFilter;
     private boolean mShowOldItems;
 
     @Override
@@ -71,7 +76,7 @@ public class SitrepActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE); // remove the title bar
 
-        mStarSummaries = new TreeMap<String, StarSummary>();
+        mStarSummaries = new TreeMap<String, Star>();
         mSituationReportAdapter = new SituationReportAdapter();
 
         mStarKey = getIntent().getStringExtra("au.com.codeka.warworlds.StarKey");
@@ -94,7 +99,7 @@ public class SitrepActivity extends BaseActivity {
         filterSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                mFilter = (Messages.SituationReportFilter) filterSpinner.getSelectedItem();
+                mFilter = (SituationReportFilter) filterSpinner.getSelectedItem();
                 refreshReportItems();
             }
             @Override
@@ -132,33 +137,33 @@ public class SitrepActivity extends BaseActivity {
                 SituationReport sitrep = mSituationReportAdapter.getSituationReport(position);
 
                 Intent intent = new Intent(mContext, SolarSystemActivity.class);
-                intent.putExtra("au.com.codeka.warworlds.StarKey", sitrep.getStarKey());
+                intent.putExtra("au.com.codeka.warworlds.StarKey", sitrep.star_key);
 
-                if (sitrep.getPlanetIndex() >= 0) {
-                    intent.putExtra("au.com.codeka.warworlds.PlanetIndex", sitrep.getPlanetIndex());
+                if (sitrep.planet_index >= 0) {
+                    intent.putExtra("au.com.codeka.warworlds.PlanetIndex", sitrep.planet_index);
                 }
 
-                SituationReport.MoveCompleteRecord mcr = sitrep.getMoveCompleteRecord();
+                SituationReport.MoveCompleteRecord mcr = sitrep.move_complete_record;
                 if (mcr != null) {
-                    if (mcr.getScoutReportKey() != null &&
-                        mcr.getScoutReportKey().length() > 0) {
+                    if (mcr.scout_report_key != null &&
+                        mcr.scout_report_key.length() > 0) {
                         // if there's a scout report, we'll want to show that
                         intent.putExtra("au.com.codeka.warworlds.ShowScoutReport", true);
                     }
                 }
 
                 String combatReportKey = null;
-                SituationReport.FleetUnderAttackRecord fuar = sitrep.getFleetUnderAttackRecord();
+                SituationReport.FleetUnderAttackRecord fuar = sitrep.fleet_under_attack_record;
                 if (fuar != null) {
-                    combatReportKey = fuar.getCombatReportKey();
+                    combatReportKey = fuar.combat_report_key;
                 }
-                SituationReport.FleetDestroyedRecord fdr = sitrep.getFleetDestroyedRecord();
+                SituationReport.FleetDestroyedRecord fdr = sitrep.fleet_destroyed_record;
                 if (fdr != null) {
-                    combatReportKey = fdr.getCombatReportKey();
+                    combatReportKey = fdr.combat_report_key;
                 }
-                SituationReport.FleetVictoriousRecord fvr = sitrep.getFleetVictoriousRecord();
+                SituationReport.FleetVictoriousRecord fvr = sitrep.fleet_victorious_record;
                 if (fvr != null) {
-                    combatReportKey = fvr.getCombatReportKey();
+                    combatReportKey = fvr.combat_report_key;
                 }
 
                 if (combatReportKey != null) {
@@ -180,18 +185,18 @@ public class SitrepActivity extends BaseActivity {
             // clear all our notifications
             Notifications.clearNotifications();
 
-            MyEmpire empire = EmpireManager.i.getEmpire();
+            Empire empire = EmpireManager.i.getEmpire();
 
             if (empire != null) {
                 // TODO: add an "empire updated" listener here!
-                empireName.setText(empire.getDisplayName());
-                empireIcon.setImageBitmap(empire.getShield(this));
+                empireName.setText(empire.display_name);
+                empireIcon.setImageBitmap(EmpireHelper.getShield(this, empire));
             }
         } else {
-            StarManager.getInstance().requestStarSummary(mStarKey, new StarManager.StarSummaryFetchedHandler() {
+            StarManager.i.requestStarSummary(mStarKey, new StarManager.StarSummaryFetchedHandler() {
                 @Override
-                public void onStarSummaryFetched(StarSummary s) {
-                    empireName.setText(s.getName());
+                public void onStarSummaryFetched(Star s) {
+                    empireName.setText(s.name);
                     Sprite starSprite = StarImageManager.getInstance().getSprite(s, empireIcon.getWidth(), true);
                     empireIcon.setImageDrawable(new SpriteDrawable(starSprite));
                 }
@@ -250,7 +255,7 @@ public class SitrepActivity extends BaseActivity {
                     url += "?cursor="+cursor;
                     hasQuery = true;
                 }
-                if (mFilter != null && mFilter != Messages.SituationReportFilter.ShowAll) {
+                if (mFilter != null && mFilter != SituationReportFilter.ShowAll) {
                     if (hasQuery) {
                         url += "&";
                     } else {
@@ -270,15 +275,12 @@ public class SitrepActivity extends BaseActivity {
                 }
 
                 try {
-                    Messages.SituationReports pb = ApiClient.getProtoBuf(
-                            url, Messages.SituationReports.class);
+                    SituationReports pb = ApiClient.getProtoBuf(url, SituationReports.class);
 
                     Set<String> missingStarSummaries = new TreeSet<String>();
                     ArrayList<SituationReport> items = new ArrayList<SituationReport>();
-                    for(Messages.SituationReport srpb : pb.getSituationReportsList()) {
-                        SituationReport sitrep = SituationReport.fromProtocolBuffer(srpb);
-
-                        String starKey = sitrep.getStarKey();
+                    for(SituationReport sitrep : pb.situation_reports) {
+                        String starKey = sitrep.star_key;
                         if (!mStarSummaries.containsKey(starKey)) {
                             if (!missingStarSummaries.contains(starKey)) {
                                 missingStarSummaries.add(starKey);
@@ -289,17 +291,16 @@ public class SitrepActivity extends BaseActivity {
                     }
 
                     // grab the cursor we'll need to fetch the next batch
-                    mCursor = pb.getCursor();
+                    mCursor = pb.cursor;
 
                     // here we want to fetch all of the star summaries for any
                     // stars that are new and we don't currently have summaries
                     // for.
                     for (String starKey : missingStarSummaries) {
-                        StarSummary starSummary = StarManager.getInstance()
-                                .requestStarSummarySync(starKey,
+                        Star Star = StarManager.i.requestStarSummarySync(starKey,
                                         Float.MAX_VALUE // always prefer a cached version, no matter how old
                                     );
-                        mStarSummaries.put(starKey, starSummary);
+                        mStarSummaries.put(starKey, Star);
                     }
 
                     return items;
@@ -358,7 +359,7 @@ public class SitrepActivity extends BaseActivity {
 
     private class SituationReportAdapter extends BaseAdapter {
         private List<SituationReport> mItems;
-        private Map<String, StarSummary> mStarSummaries;
+        private Map<String, Star> mStarSummaries;
 
         public SituationReportAdapter() {
             mItems = new ArrayList<SituationReport>();
@@ -369,7 +370,7 @@ public class SitrepActivity extends BaseActivity {
         }
 
         public void setItems(List<SituationReport> items,
-                             Map<String, StarSummary> starSummaries) {
+                             Map<String, Star> starSummaries) {
             if (items == null) {
                 items = new ArrayList<SituationReport>();
             }
@@ -380,7 +381,7 @@ public class SitrepActivity extends BaseActivity {
         }
 
         public void appendItems(List<SituationReport> items,
-                                Map<String, StarSummary> starSummaries) {
+                                Map<String, Star> starSummaries) {
             if (items == null) {
                 items = new ArrayList<SituationReport>();
             }
@@ -464,8 +465,8 @@ public class SitrepActivity extends BaseActivity {
             }
 
             SituationReport sitrep = mItems.get(position);
-            StarSummary starSummary = mStarSummaries.get(sitrep.getStarKey());
-            String msg = sitrep.getDescription(starSummary);
+            Star starSummary = mStarSummaries.get(sitrep.star_key);
+            String msg = SituationReportHelper.getDescription(sitrep, starSummary);
 
             TextView reportTitle = (TextView) view.findViewById(R.id.report_title);
             TextView reportContent = (TextView) view.findViewById(R.id.report_content);
@@ -473,15 +474,15 @@ public class SitrepActivity extends BaseActivity {
             ImageView starIcon = (ImageView) view.findViewById(R.id.star_icon);
             ImageView overlayIcon = (ImageView) view.findViewById(R.id.overlay_icon);
 
-            int imageSize = (int)(starSummary.getSize() * starSummary.getStarType().getImageScale() * 2);
+            int imageSize = (int)(starSummary.size * StarType.get(starSummary).getImageScale() * 2);
             Sprite starSprite = StarImageManager.getInstance().getSprite(starSummary, imageSize, true);
             starIcon.setImageDrawable(new SpriteDrawable(starSprite));
 
-            reportTime.setText(TimeInHours.format(sitrep.getReportTime()));
+            reportTime.setText(TimeInHours.format(Model.toDateTime(sitrep.report_time)));
             reportContent.setText(msg);
-            reportTitle.setText(sitrep.getTitle());
+            reportTitle.setText(SituationReportHelper.getTitle(sitrep));
 
-            Sprite designSprite = sitrep.getDesignSprite();
+            Sprite designSprite = SituationReportHelper.getDesignSprite(sitrep);
             if (designSprite != null) {
                 overlayIcon.setImageDrawable(new SpriteDrawable(designSprite));
             }
@@ -491,21 +492,21 @@ public class SitrepActivity extends BaseActivity {
     }
 
     public class FilterAdapter extends BaseAdapter implements SpinnerAdapter {
-        Messages.SituationReportFilter[] mFilters;
+        SituationReportFilter[] mFilters;
         String[] mFilterDescriptions;
 
         public FilterAdapter() {
-            mFilters = new Messages.SituationReportFilter[] {
-                    Messages.SituationReportFilter.ShowAll,
-                    Messages.SituationReportFilter.MoveComplete,
-                    Messages.SituationReportFilter.BuildCompleteAny,
-                    Messages.SituationReportFilter.BuildCompleteShips,
-                    Messages.SituationReportFilter.BuildCompleteBuilding,
-                    Messages.SituationReportFilter.FleetAttacked,
-                    Messages.SituationReportFilter.FleetDestroyed,
-                    Messages.SituationReportFilter.FleetVictorious,
-                    Messages.SituationReportFilter.ColonyAttacked,
-                    Messages.SituationReportFilter.ColonyDestroyed,
+            mFilters = new SituationReportFilter[] {
+                    SituationReportFilter.ShowAll,
+                    SituationReportFilter.MoveComplete,
+                    SituationReportFilter.BuildCompleteAny,
+                    SituationReportFilter.BuildCompleteShips,
+                    SituationReportFilter.BuildCompleteBuilding,
+                    SituationReportFilter.FleetAttacked,
+                    SituationReportFilter.FleetDestroyed,
+                    SituationReportFilter.FleetVictorious,
+                    SituationReportFilter.ColonyAttacked,
+                    SituationReportFilter.ColonyDestroyed,
             };
             mFilterDescriptions = new String[] {
                     "Show All",

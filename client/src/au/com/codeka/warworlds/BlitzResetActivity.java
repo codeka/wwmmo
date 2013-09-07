@@ -9,8 +9,8 @@ import android.view.View;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.ProgressBar;
+import au.com.codeka.common.model.EmpireRanks;
 import au.com.codeka.warworlds.ctrl.EmpireRankList;
-import au.com.codeka.warworlds.model.RankHistory;
 import au.com.codeka.warworlds.model.RankHistoryManager;
 
 /*
@@ -47,8 +47,8 @@ public class BlitzResetActivity extends BaseActivity {
 
         RankHistoryManager.i.getRankHistory(DateTime.now().minusMonths(1), new RankHistoryManager.RankHistoryFetchedHandler() {
             @Override
-            public void onRankHistoryFetched(RankHistory rankHistory) {
-                mEmpireList.setEmpireRanks(rankHistory.getRanks());
+            public void onRankHistoryFetched(EmpireRanks rankHistory) {
+                mEmpireList.setEmpireRanks(rankHistory.ranks);
 
                 progress.setVisibility(View.GONE);
                 mEmpireList.setVisibility(View.VISIBLE);

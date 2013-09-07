@@ -18,13 +18,13 @@ import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 import au.com.codeka.BackgroundRunner;
-import au.com.codeka.common.protobuf.Messages;
+import au.com.codeka.common.model.Fleet;
+import au.com.codeka.common.model.FleetOrder;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.StyledDialog;
 import au.com.codeka.warworlds.api.ApiClient;
 import au.com.codeka.warworlds.api.ApiException;
 import au.com.codeka.warworlds.ctrl.FleetList;
-import au.com.codeka.warworlds.model.Fleet;
 import au.com.codeka.warworlds.model.StarManager;
 
 public class FleetMergeDialog extends DialogFragment {
@@ -53,25 +53,25 @@ public class FleetMergeDialog extends DialogFragment {
         final FleetListAdapter adapter = new FleetListAdapter();
         fleetList.setAdapter(adapter);
 
-        if (!mFleet.getState().equals(Fleet.State.IDLE)) {
+        if (!mFleet.state.equals(Fleet.FLEET_STATE.IDLE)) {
             note.setText("You cannot merge a fleet unless it is Idle.");
             isError = true;
         } else {
             ArrayList<Fleet> otherFleets = new ArrayList<Fleet>();
             for (Fleet f : mPotentialMergeTargets) {
-                if (f.getKey().equals(mFleet.getKey())) {
+                if (f.key.equals(mFleet.key)) {
                     continue;
                 }
-                if (!f.getStarKey().equals(mFleet.getStarKey())) {
+                if (!f.star_key.equals(mFleet.star_key)) {
                     continue;
                 }
-                if (!f.getEmpireKey().equals(mFleet.getEmpireKey())) {
+                if (!f.empire_key.equals(mFleet.empire_key)) {
                     continue;
                 }
-                if (!f.getDesignID().equals(mFleet.getDesignID())) {
+                if (!f.design_id.equals(mFleet.design_id)) {
                     continue;
                 }
-                if (!f.getState().equals(Fleet.State.IDLE)) {
+                if (!f.state.equals(Fleet.FLEET_STATE.IDLE)) {
                     continue;
                 }
                 otherFleets.add(f);
@@ -134,11 +134,11 @@ public class FleetMergeDialog extends DialogFragment {
             @Override
             protected Boolean doInBackground() {
                 String url = String.format("stars/%s/fleets/%s/orders",
-                                           mFleet.getStarKey(),
-                                           mFleet.getKey());
-                Messages.FleetOrder fleetOrder = Messages.FleetOrder.newBuilder()
-                               .setOrder(Messages.FleetOrder.FLEET_ORDER.MERGE)
-                               .setMergeFleetKey(mSelectedFleet.getKey())
+                                           mFleet.star_key,
+                                           mFleet.key);
+                FleetOrder fleetOrder = new FleetOrder.Builder()
+                               .order(FleetOrder.FLEET_ORDER.MERGE)
+                               .merge_fleet_key(mSelectedFleet.key)
                                .build();
 
                 try {
@@ -152,7 +152,7 @@ public class FleetMergeDialog extends DialogFragment {
             @Override
             protected void onComplete(Boolean success) {
                 // the star this fleet is attached to needs to be refreshed...
-                StarManager.getInstance().refreshStar(mFleet.getStarKey());
+                StarManager.i.refreshStar(mFleet.star_key);
             }
 
         }.execute();
@@ -174,7 +174,7 @@ public class FleetMergeDialog extends DialogFragment {
                 public int compare(Fleet lhs, Fleet rhs) {
                     // by definition, they'll all be the same design so just
                     // sort based on number of ships
-                    return (int)(rhs.getNumShips() - lhs.getNumShips());
+                    return (int)(rhs.num_ships - lhs.num_ships);
                 }
             });
 
@@ -213,7 +213,7 @@ public class FleetMergeDialog extends DialogFragment {
 
             FleetList.populateFleetRow(mContext, null, view, fleet);
 
-            if (mSelectedFleet != null && mSelectedFleet.getKey().equals(fleet.getKey())) {
+            if (mSelectedFleet != null && mSelectedFleet.key.equals(fleet.key)) {
                 view.setBackgroundColor(0xff0c6476);
             } else {
                 view.setBackgroundColor(0xff000000);

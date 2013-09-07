@@ -18,21 +18,19 @@ import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import au.com.codeka.TimeInHours;
-import au.com.codeka.common.model.BaseBuildRequest;
-import au.com.codeka.common.model.BaseBuilding;
-import au.com.codeka.common.model.BaseColony;
-import au.com.codeka.common.model.BuildingDesign;
-import au.com.codeka.common.model.Design;
-import au.com.codeka.common.model.DesignKind;
+import au.com.codeka.common.design.BuildingDesign;
+import au.com.codeka.common.design.Design;
+import au.com.codeka.common.design.DesignKind;
+import au.com.codeka.common.model.BuildRequest;
+import au.com.codeka.common.model.Building;
+import au.com.codeka.common.model.Colony;
+import au.com.codeka.common.model.Model;
+import au.com.codeka.common.model.Star;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.model.BuildManager;
-import au.com.codeka.warworlds.model.BuildRequest;
-import au.com.codeka.warworlds.model.Building;
-import au.com.codeka.warworlds.model.Colony;
 import au.com.codeka.warworlds.model.DesignManager;
 import au.com.codeka.warworlds.model.SpriteDrawable;
 import au.com.codeka.warworlds.model.SpriteManager;
-import au.com.codeka.warworlds.model.Star;
 import au.com.codeka.warworlds.model.StarManager;
 
 public class BuildingsList extends ListView
@@ -59,7 +57,7 @@ public class BuildingsList extends ListView
         mAdapter.setColony(mStar, mColony);
 
         if (!mIsAttachedToWindow) {
-            StarManager.getInstance().addStarUpdatedListener(mStar.getKey(), this);
+            StarManager.i.addStarUpdatedListener(mStar.key, this);
             mIsAttachedToWindow = true;
         }
     }
@@ -69,7 +67,7 @@ public class BuildingsList extends ListView
         super.onAttachedToWindow();
 
         if (!mIsAttachedToWindow && mStar != null) {
-            StarManager.getInstance().addStarUpdatedListener(mStar.getKey(), this);
+            StarManager.i.addStarUpdatedListener(mStar.key, this);
             mIsAttachedToWindow = true;
         }
     }
@@ -78,7 +76,7 @@ public class BuildingsList extends ListView
     public void onDetachedFromWindow() {
         super.onDetachedFromWindow();
 
-        StarManager.getInstance().removeStarUpdatedListener(this);
+        StarManager.i.removeStarUpdatedListener(this);
         mIsAttachedToWindow = false;
     }
 
@@ -92,8 +90,8 @@ public class BuildingsList extends ListView
             return;
         }
 
-        for (BaseColony baseColony : s.getColonies()) {
-            if (baseColony.getKey().equals(mColony.getKey())) {
+        for (Colony baseColony : s.colonies) {
+            if (baseColony.key.equals(mColony.key)) {
                 setColony(s, (Colony) baseColony);
             }
         }
@@ -110,20 +108,22 @@ public class BuildingsList extends ListView
         private static final int NEW_BUILDING_TYPE = 2;
 
         public void setColony(Star star, Colony colony) {
-            List<BaseBuilding> buildings = colony.getBuildings();
-            if (buildings == null) {
-                buildings = new ArrayList<BaseBuilding>();
+            List<Building> buildings = new ArrayList<Building>();
+            for (Building b : star.buildings) {
+                if (b.colony_key.equals(colony.key)){
+                    buildings.add(b);
+                }
             }
 
             mEntries = new ArrayList<Entry>();
-            for (BaseBuilding b : buildings) {
+            for (Building b : buildings) {
                 Entry entry = new Entry();
                 entry.building = (Building) b;
-                if (star.getBuildRequests() != null) {
+                if (star.build_requests != null) {
                     // if the building is being upgraded (i.e. if there's a build request that
                     // references this building) then add the build request as well
-                    for (BaseBuildRequest br : star.getBuildRequests()) {
-                        if (br.getExistingBuildingKey() != null && br.getExistingBuildingKey().equals(b.getKey())) {
+                    for (BuildRequest br : star.build_requests) {
+                        if (br.existing_building_key != null && br.existing_building_key.equals(b.key)) {
                             entry.buildRequest = (BuildRequest) br;
                         }
                     }
@@ -131,10 +131,10 @@ public class BuildingsList extends ListView
                 mEntries.add(entry);
             }
 
-            for (BaseBuildRequest br : star.getBuildRequests()) {
-                if (br.getColonyKey().equals(colony.getKey()) &&
-                    br.getDesignKind().equals(DesignKind.BUILDING) &&
-                    br.getExistingBuildingKey() == null) {
+            for (BuildRequest br : star.build_requests) {
+                if (br.colony_key.equals(colony.key) &&
+                        br.build_kind.equals(BuildRequest.BUILD_KIND.BUILDING) &&
+                        br.existing_building_key == null) {
                     Entry entry = new Entry();
                     entry.buildRequest = (BuildRequest) br;
                     mEntries.add(entry);
@@ -144,8 +144,8 @@ public class BuildingsList extends ListView
             Collections.sort(mEntries, new Comparator<Entry>() {
                 @Override
                 public int compare(Entry lhs, Entry rhs) {
-                    String a = (lhs.building != null ? lhs.building.getDesignID() : lhs.buildRequest.getDesignID());
-                    String b = (rhs.building != null ? rhs.building.getDesignID() : rhs.buildRequest.getDesignID());
+                    String a = (lhs.building != null ? lhs.building.design_id : lhs.buildRequest.design_id);
+                    String b = (rhs.building != null ? rhs.building.design_id : rhs.buildRequest.design_id);
                     return a.compareTo(b);
                 }
             });
@@ -164,11 +164,11 @@ public class BuildingsList extends ListView
                     int numExisting = 0;
                     for (Entry e : mEntries) {
                         if (e.building != null) {
-                            if (e.building.getDesignID().equals(bd.getID())) {
+                            if (e.building.design_id.equals(bd.getID())) {
                                 numExisting ++;
                             }
                         } else if (e.buildRequest != null) {
-                            if (e.buildRequest.getDesignID().equals(bd.getID())) {
+                            if (e.buildRequest.design_id.equals(bd.getID())) {
                                 numExisting ++;
                             }
                         }
@@ -180,7 +180,7 @@ public class BuildingsList extends ListView
                 if (bd.getMaxPerEmpire() > 0) {
                     int numExisting = BuildManager.getInstance().getTotalBuildingsInEmpire(bd.getID());
                     for (BuildRequest br : BuildManager.getInstance().getBuildRequests()) {
-                        if (br.getDesignID().equals(bd.getID())) {
+                        if (br.design_id.equals(bd.getID())) {
                             numExisting ++;
                         }
                     }
@@ -227,8 +227,8 @@ public class BuildingsList extends ListView
             // upgraded any more, so also disabled.
             Entry entry = mEntries.get(position);
             if (entry.building != null) {
-                int maxUpgrades = entry.building.getDesign().getUpgrades().size();
-                if (entry.building.getLevel() > maxUpgrades) {
+                int maxUpgrades = DesignManager.i.getDesign(entry.building).getUpgrades().size();
+                if (entry.building.level > maxUpgrades) {
                     return false;
                 }
             }
@@ -289,7 +289,7 @@ public class BuildingsList extends ListView
                 Building building = entry.building;
                 BuildRequest buildRequest = entry.buildRequest;
                 BuildingDesign design = (BuildingDesign) DesignManager.i.getDesign(DesignKind.BUILDING,
-                        (building != null ? building.getDesignID() : buildRequest.getDesignID()));
+                        (building != null ? building.design_id : buildRequest.design_id));
 
                 icon.setImageDrawable(new SpriteDrawable(SpriteManager.i.getSprite(design.getSpriteName())));
 
@@ -299,7 +299,7 @@ public class BuildingsList extends ListView
                     level.setVisibility(View.GONE);
                     levelLabel.setVisibility(View.GONE);
                 } else {
-                    level.setText(Integer.toString(building.getLevel()));
+                    level.setText(Integer.toString(building.level));
                     level.setVisibility(View.VISIBLE);
                     levelLabel.setVisibility(View.VISIBLE);
                 }
@@ -309,14 +309,14 @@ public class BuildingsList extends ListView
                     String verb = (building == null ? "Building" : "Upgrading");
                     row2.setText(Html.fromHtml(String.format(Locale.ENGLISH,
                             "<font color=\"#0c6476\">%s:</font> %d %%, %s left",
-                            verb, (int) buildRequest.getPercentComplete(),
-                             TimeInHours.format(buildRequest.getRemainingTime()))));
+                            verb, (int) Model.getPercentComplete(buildRequest),
+                             TimeInHours.format(Model.getRemainingTime(buildRequest)))));
 
                     row3.setVisibility(View.GONE);
                     progress.setVisibility(View.VISIBLE);
-                    progress.setProgress((int) buildRequest.getPercentComplete());
+                    progress.setProgress((int) Model.getPercentComplete(buildRequest));
                 } else {
-                    if (numUpgrades < building.getLevel()) {
+                    if (numUpgrades < building.level) {
                         row2.setText("No more upgrades");
                         row3.setVisibility(View.GONE);
                         progress.setVisibility(View.GONE);
@@ -326,7 +326,7 @@ public class BuildingsList extends ListView
                                 "Upgrade: %.2f hours",
                                 (float) design.getBuildCost().getTimeInSeconds() / 3600.0f));
 
-                        String required = design.getDependenciesList(mColony, building.getLevel());
+                        String required = design.getDependenciesList(mStar, mColony, building.level);
                         row3.setVisibility(View.VISIBLE);
                         row3.setText(Html.fromHtml(required));
                     }
@@ -350,7 +350,7 @@ public class BuildingsList extends ListView
                 row2.setText(String.format("%.2f hours",
                         (float) design.getBuildCost().getTimeInSeconds() / 3600.0f));
 
-                String required = design.getDependenciesList(mColony);
+                String required = design.getDependenciesList(mStar, mColony);
                 row3.setText(required);
             }
 

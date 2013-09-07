@@ -4,7 +4,8 @@ import java.util.Locale;
 import java.util.Random;
 
 import au.com.codeka.common.Vector3;
-import au.com.codeka.common.model.BasePlanet;
+import au.com.codeka.common.model.Planet;
+import au.com.codeka.common.model.Star;
 import au.com.codeka.planetrender.Template;
 
 /**
@@ -21,16 +22,15 @@ public class PlanetImageManager extends ImageManager {
     /**
      * Gets a \c Sprite for the given planet.
      */
-    public Sprite getSprite(BasePlanet planet) {
-        String key = String.format(Locale.ENGLISH, "%s-%d",
-                                   planet.getStar().getKey(), planet.getIndex());
-        PlanetExtra planetExtra = new PlanetExtra(planet);
+    public Sprite getSprite(Star star, Planet planet) {
+        String key = String.format(Locale.ENGLISH, "%s-%d", star.key, planet.index);
+        PlanetExtra planetExtra = new PlanetExtra(star, planet);
         Sprite sprite = getSprite(key, 100, planetExtra);
         if (sprite == null) {
-            sprite = SpriteManager.i.getSprite("planet."+planet.getPlanetType().getInternalName());
+            sprite = SpriteManager.i.getSprite("planet."+PlanetType.get(planet.planet_type).getInternalName());
 
             if (sprite.getNumFrames() > 1) {
-                int frameNo = new Random(planet.getStar().hashCode()).nextInt(sprite.getNumFrames());
+                int frameNo = new Random(star.hashCode()).nextInt(sprite.getNumFrames());
                 sprite = sprite.extractFrame(frameNo);
                 sprite.setScale((float) getPlanetSize(planetExtra) / 10.0f);
             }
@@ -46,9 +46,9 @@ public class PlanetImageManager extends ImageManager {
     protected Template getTemplate(Object extra) {
         PlanetExtra planetExtra = (PlanetExtra) extra;
         String key = String.format(Locale.ENGLISH, "%s-%d",
-                                   planetExtra.planet.getStar().getKey(),
-                                   planetExtra.planet.getIndex());
-        return loadTemplate(planetExtra.planet.getPlanetType().getBitmapBasePath(), key);
+                                   planetExtra.star.key,
+                                   planetExtra.planet.index);
+        return loadTemplate(PlanetType.get(planetExtra.planet.planet_type).getBitmapBasePath(), key);
     }
 
     /**
@@ -58,9 +58,9 @@ public class PlanetImageManager extends ImageManager {
     @Override
     protected Vector3 getSunDirection(Object extra) {
         PlanetExtra planetExtra = (PlanetExtra) extra;
-        int numPlanets = planetExtra.planet.getStar().getNumPlanets();
+        int numPlanets = planetExtra.star.planets.size();
         float angle = (0.5f/(numPlanets + 1));
-        angle = (float) ((angle*planetExtra.planet.getIndex()*Math.PI) + angle*Math.PI);
+        angle = (float) ((angle*planetExtra.planet.index*Math.PI) + angle*Math.PI);
 
         Vector3 sunDirection = Vector3.pool.borrow().reset(0.0, 1.0, -1.0);
         sunDirection.rotateZ(angle);
@@ -73,13 +73,15 @@ public class PlanetImageManager extends ImageManager {
      */
     protected double getPlanetSize(Object extra) {
         PlanetExtra planetExtra = (PlanetExtra) extra;
-        return ((planetExtra.planet.getSize() - 10.0) / 8.0) + 4.0;
+        return ((planetExtra.planet.size - 10.0) / 8.0) + 4.0;
     }
 
     private static class PlanetExtra {
-        public BasePlanet planet;
+        public Star star;
+        public Planet planet;
 
-        public PlanetExtra(BasePlanet planet) {
+        public PlanetExtra(Star star, Planet planet) {
+            this.star = star;
             this.planet = planet;
         }
     }

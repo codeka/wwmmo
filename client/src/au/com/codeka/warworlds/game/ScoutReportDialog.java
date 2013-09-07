@@ -1,5 +1,6 @@
 package au.com.codeka.warworlds.game;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -23,20 +24,19 @@ import android.widget.Spinner;
 import android.widget.SpinnerAdapter;
 import android.widget.TextView;
 import au.com.codeka.TimeInHours;
-import au.com.codeka.common.model.BaseColony;
-import au.com.codeka.common.model.BaseFleet;
+import au.com.codeka.common.model.Colony;
+import au.com.codeka.common.model.Fleet;
+import au.com.codeka.common.model.Model;
+import au.com.codeka.common.model.ScoutReport;
+import au.com.codeka.common.model.Star;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.StyledDialog;
 import au.com.codeka.warworlds.ctrl.ColonyList;
 import au.com.codeka.warworlds.ctrl.FleetList;
-import au.com.codeka.warworlds.model.Colony;
-import au.com.codeka.warworlds.model.EmpireManager;
-import au.com.codeka.warworlds.model.Fleet;
-import au.com.codeka.warworlds.model.MyEmpire;
-import au.com.codeka.warworlds.model.ScoutReport;
+import au.com.codeka.warworlds.model.MyEmpireManager;
 import au.com.codeka.warworlds.model.SpriteDrawable;
-import au.com.codeka.warworlds.model.Star;
 import au.com.codeka.warworlds.model.StarImageManager;
+import au.com.codeka.warworlds.model.StarType;
 
 public class ScoutReportDialog extends DialogFragment {
     private ReportAdapter mReportAdapter;
@@ -64,10 +64,10 @@ public class ScoutReportDialog extends DialogFragment {
         final View olderButton = mView.findViewById(R.id.older_btn);
         final ListView reportItems = (ListView) mView.findViewById(R.id.report_items);
 
-        int imageSize = (int)(mStar.getSize() * mStar.getStarType().getImageScale() * 2);
+        int imageSize = (int)(mStar.size * StarType.get(mStar).getImageScale() * 2);
         starIcon.setImageDrawable(new SpriteDrawable(
                 StarImageManager.getInstance().getSprite(mStar, imageSize, true)));
-        starName.setText(mStar.getName());
+        starName.setText(mStar.name);
         reportSummary.setText("Scout Report");
 
         progressBar.setVisibility(View.VISIBLE);
@@ -82,7 +82,7 @@ public class ScoutReportDialog extends DialogFragment {
         progressBar.setVisibility(View.VISIBLE);
         reportItems.setVisibility(View.GONE);
 
-        EmpireManager.i.getEmpire().fetchScoutReports(mStar, new MyEmpire.FetchScoutReportCompleteHandler() {
+        MyEmpireManager.i.fetchScoutReports(mStar, new MyEmpireManager.FetchScoutReportCompleteHandler() {
             @Override
             public void onComplete(List<ScoutReport> reports) {
                 progressBar.setVisibility(View.GONE);
@@ -168,7 +168,7 @@ public class ScoutReportDialog extends DialogFragment {
             }
 
             ScoutReport report = mReports.get(position);
-            view.setText(TimeInHours.format(report.getReportDate()));
+            view.setText(TimeInHours.format(Model.toDateTime(report.date)));
             return view;
         }
     }
@@ -183,16 +183,19 @@ public class ScoutReportDialog extends DialogFragment {
 
         public void setReport(ScoutReport report) {
             mItems.clear();
-            mStar = (Star) report.getStarSnapshot();
+            try {
+                mStar = Model.wire.parseFrom(report.star_pb.toByteArray(), Star.class);
+            } catch (IOException e) {
+                return;
+            }
 
-            Star star = (Star) report.getStarSnapshot();
-            for (BaseColony colony : star.getColonies()) {
+            for (Colony colony : mStar.colonies) {
                 ReportItem item = new ReportItem();
                 item.colony = (Colony) colony;
                 mItems.add(item);
             }
 
-            for (BaseFleet fleet : star.getFleets()) {
+            for (Fleet fleet : mStar.fleets) {
                 ReportItem item = new ReportItem();
                 item.fleet = (Fleet) fleet;
                 mItems.add(item);
@@ -211,15 +214,15 @@ public class ScoutReportDialog extends DialogFragment {
                         final Colony lhsColony = lhs.colony;
                         final Colony rhsColony = rhs.colony;
 
-                        return lhsColony.getPlanetIndex() - rhsColony.getPlanetIndex();
+                        return lhsColony.planet_index - rhsColony.planet_index;
                     } else {
                         final Fleet lhsFleet = lhs.fleet;
                         final Fleet rhsFleet = rhs.fleet;
 
-                        if (lhsFleet.getDesignID().equals(rhsFleet.getDesignID())) {
-                            return (int)(lhsFleet.getNumShips() - rhsFleet.getNumShips());
+                        if (lhsFleet.design_id.equals(rhsFleet.design_id)) {
+                            return (int)(lhsFleet.num_ships - rhsFleet.num_ships);
                         } else {
-                            return lhsFleet.getDesignID().compareTo(rhsFleet.getDesignID());
+                            return lhsFleet.design_id.compareTo(rhsFleet.design_id);
                         }
                     }
                 }

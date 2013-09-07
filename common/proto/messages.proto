@@ -2,7 +2,7 @@
 // Copyright (c) 2012, Dean Harding (dean@codeka.com.au)
 //
 
-package au.com.codeka.common.protobuf;
+package au.com.codeka.common.model;
 
 
 //
@@ -637,7 +637,7 @@ message BuildRequest
     required BUILD_KIND build_kind = 4;
 
     // The name of the design you're trying to build
-    required string design_name = 5;
+    required string design_id = 5;
 
     // The number of things we're building in this single operation
     optional int32 count = 9;
@@ -679,8 +679,8 @@ message Building
     // The key of the colony to which this building belongs.
     required string colony_key = 2;
 
-    // The name of the design of this building (defined in data/buildings.xml)
-    required string design_name = 3;
+    // The string ID of the design of this building (defined in data/buildings.xml)
+    required string design_id = 3;
 
     // The level of this building
     optional int32 level = 4;
@@ -699,7 +699,7 @@ message Fleet
     optional string empire_key = 2;
 
     // The name of the ship design of the ship(s) in this fleet
-    optional string design_name = 3;
+    optional string design_id = 3;
 
     // The number of ships in this fleet. This is a floating point number because of the way
     // damage is calculated in combat. We only ever display the Math.ceil() of this number to
@@ -834,6 +834,8 @@ message CombatRound
         optional string empire_key = 2;
         optional string design_id = 3;
         optional float num_ships = 4;
+        optional Fleet.FLEET_STANCE stance = 5;
+        optional Fleet.FLEET_STATE state = 6;
     }
 
     // This record is used when a fleet enters combat.

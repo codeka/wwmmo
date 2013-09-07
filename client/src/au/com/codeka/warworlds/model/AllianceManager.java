@@ -7,7 +7,12 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 
 import au.com.codeka.BackgroundRunner;
-import au.com.codeka.common.protobuf.Messages;
+import au.com.codeka.common.model.Alliance;
+import au.com.codeka.common.model.AllianceRequest;
+import au.com.codeka.common.model.AllianceRequestVote;
+import au.com.codeka.common.model.AllianceRequests;
+import au.com.codeka.common.model.Alliances;
+import au.com.codeka.common.model.Empire;
 import au.com.codeka.warworlds.api.ApiClient;
 import au.com.codeka.warworlds.api.ApiException;
 
@@ -40,18 +45,10 @@ public class AllianceManager {
         new BackgroundRunner<List<Alliance>>() {
             @Override
             protected List<Alliance> doInBackground() {
-                ArrayList<Alliance> alliances;
-
                 String url = "alliances";
                 try {
-                    Messages.Alliances pb = ApiClient.getProtoBuf(url, Messages.Alliances.class);
-                    alliances = new ArrayList<Alliance>();
-                    for (Messages.Alliance alliance_pb : pb.getAlliancesList()) {
-                        Alliance alliance = new Alliance();
-                        alliance.fromProtocolBuffer(alliance_pb);
-                        alliances.add(alliance);
-                    }
-                    return alliances;
+                    Alliances pb = ApiClient.getProtoBuf(url, Alliances.class);
+                    return new ArrayList<Alliance>(pb.alliances);
                 } catch(ApiException e) {
                     return null;
                 }
@@ -75,10 +72,7 @@ public class AllianceManager {
             protected Alliance doInBackground() {
                 String url = "alliances/"+allianceID;
                 try {
-                    Messages.Alliance pb = ApiClient.getProtoBuf(url, Messages.Alliance.class);
-                    Alliance alliance = new Alliance();
-                    alliance.fromProtocolBuffer(pb);
-                    return alliance;
+                    return ApiClient.getProtoBuf(url, Alliance.class);
                 } catch(ApiException e) {
                     return null;
                 }
@@ -103,25 +97,23 @@ public class AllianceManager {
             protected List<AllianceRequest> doInBackground() {
                 String url = "alliances/"+allianceKey+"/requests";
                 try {
-                    Messages.AllianceRequests pb = ApiClient.getProtoBuf(url, Messages.AllianceRequests.class);
+                    AllianceRequests pb = ApiClient.getProtoBuf(url, AllianceRequests.class);
                     ArrayList<AllianceRequest> requests = new ArrayList<AllianceRequest>();
                     TreeSet<String> empireKeys = new TreeSet<String>();
-                    for (Messages.AllianceRequest request_pb : pb.getRequestsList()) {
-                        AllianceRequest request = new AllianceRequest();
-                        request.fromProtocolBuffer(request_pb);
+                    for (AllianceRequest request : pb.requests) {
                         requests.add(request);
-                        if (!empireKeys.contains(Integer.toString(request_pb.getRequestEmpireId()))) {
-                            empireKeys.add(Integer.toString(request_pb.getRequestEmpireId()));
+                        if (!empireKeys.contains(Integer.toString(request.request_empire_id))) {
+                            empireKeys.add(Integer.toString(request.request_empire_id));
                         }
-                        if (request_pb.hasTargetEmpireId() && !empireKeys.contains(Integer.toString(request_pb.getTargetEmpireId()))) {
-                            empireKeys.add(Integer.toString(request_pb.getTargetEmpireId()));
+                        if (request.target_empire_id != null && !empireKeys.contains(Integer.toString(request.target_empire_id))) {
+                            empireKeys.add(Integer.toString(request.target_empire_id));
                         }
                     }
 
                     List<Empire> empires = EmpireManager.i.fetchEmpiresSync(empireKeys);
                     mEmpires = new TreeMap<Integer, Empire>();
                     for (Empire empire : empires) {
-                        mEmpires.put(Integer.parseInt(empire.getKey()), empire);
+                        mEmpires.put(Integer.parseInt(empire.key), empire);
                     }
 
                     return requests;
@@ -140,72 +132,72 @@ public class AllianceManager {
     }
 
     public void requestJoin(final int allianceID, final String message) {
-        final MyEmpire myEmpire = EmpireManager.i.getEmpire();
-        Messages.AllianceRequest pb = Messages.AllianceRequest.newBuilder()
-                            .setRequestType(Messages.AllianceRequest.RequestType.JOIN)
-                            .setAllianceId(allianceID)
-                            .setRequestEmpireId(Integer.parseInt(myEmpire.getKey()))
-                            .setMessage(message)
-                            .build();
+        final Empire myEmpire = EmpireManager.i.getEmpire();
+        AllianceRequest pb = new AllianceRequest.Builder()
+                .request_type(AllianceRequest.RequestType.JOIN)
+                .alliance_id(allianceID)
+                .request_empire_id(Integer.parseInt(myEmpire.key))
+                .message(message)
+                .build();
         request(pb);
     }
 
     public void requestDeposit(final int allianceID, final String message, int amount) {
-        final MyEmpire myEmpire = EmpireManager.i.getEmpire();
-        Messages.AllianceRequest pb = Messages.AllianceRequest.newBuilder()
-                            .setRequestType(Messages.AllianceRequest.RequestType.DEPOSIT_CASH)
-                            .setAmount(amount)
-                            .setAllianceId(allianceID)
-                            .setRequestEmpireId(Integer.parseInt(myEmpire.getKey()))
-                            .setMessage(message)
-                            .build();
+        final Empire myEmpire = EmpireManager.i.getEmpire();
+        AllianceRequest pb = new AllianceRequest.Builder()
+                .request_type(AllianceRequest.RequestType.DEPOSIT_CASH)
+                .amount((float) amount)
+                .alliance_id(allianceID)
+                .request_empire_id(Integer.parseInt(myEmpire.key))
+                .message(message)
+                .build();
         request(pb);
     }
 
     public void requestWithdraw(final int allianceID, final String message, int amount) {
-        final MyEmpire myEmpire = EmpireManager.i.getEmpire();
-        Messages.AllianceRequest pb = Messages.AllianceRequest.newBuilder()
-                            .setRequestType(Messages.AllianceRequest.RequestType.WITHDRAW_CASH)
-                            .setAmount(amount)
-                            .setAllianceId(allianceID)
-                            .setRequestEmpireId(Integer.parseInt(myEmpire.getKey()))
-                            .setMessage(message)
-                            .build();
+        final Empire myEmpire = EmpireManager.i.getEmpire();
+        AllianceRequest pb = new AllianceRequest.Builder()
+                .request_type(AllianceRequest.RequestType.WITHDRAW_CASH)
+                .amount((float) amount)
+                .alliance_id(allianceID)
+                .request_empire_id(Integer.parseInt(myEmpire.key))
+                .message(message)
+                .build();
         request(pb);
     }
 
     public void requestKick(final int allianceID, final String empireKey, final String message) {
-        final MyEmpire myEmpire = EmpireManager.i.getEmpire();
-        Messages.AllianceRequest pb = Messages.AllianceRequest.newBuilder()
-                            .setRequestType(Messages.AllianceRequest.RequestType.KICK)
-                            .setTargetEmpireId(Integer.parseInt(empireKey))
-                            .setAllianceId(allianceID)
-                            .setRequestEmpireId(Integer.parseInt(myEmpire.getKey()))
-                            .setMessage(message)
-                            .build();
+        final Empire myEmpire = EmpireManager.i.getEmpire();
+        AllianceRequest pb = new AllianceRequest.Builder()
+                .request_type(AllianceRequest.RequestType.KICK)
+                .target_empire_id(Integer.parseInt(empireKey))
+                .alliance_id(allianceID)
+                .request_empire_id(Integer.parseInt(myEmpire.key))
+                .message(message)
+                .build();
         request(pb);
     }
 
     public void requestLeave() {
-        final MyEmpire myEmpire = EmpireManager.i.getEmpire();
-        Messages.AllianceRequest pb = Messages.AllianceRequest.newBuilder()
-                            .setRequestType(Messages.AllianceRequest.RequestType.LEAVE)
-                            .setAllianceId(Integer.parseInt(myEmpire.getAlliance().getKey()))
-                            .setRequestEmpireId(Integer.parseInt(myEmpire.getKey()))
-                            .setMessage("")
-                            .build();
+        final Empire myEmpire = EmpireManager.i.getEmpire();
+        AllianceRequest pb = new AllianceRequest.Builder()
+                .request_type(AllianceRequest.RequestType.LEAVE)
+                .alliance_id(Integer.parseInt(myEmpire.alliance.key))
+                .request_empire_id(Integer.parseInt(myEmpire.key))
+                .message("")
+                .build();
         request(pb);
     }
 
-    private void request(final Messages.AllianceRequest pb) {
-        final int allianceID = pb.getAllianceId();
+    private void request(final AllianceRequest request) {
+        final int allianceID = request.alliance_id;
 
         new BackgroundRunner<Boolean>() {
             @Override
             protected Boolean doInBackground() {
                 String url = "alliances/"+allianceID+"/requests";
                 try {
-                    ApiClient.postProtoBuf(url, pb);
+                    ApiClient.postProtoBuf(url, request);
                     return true;
                 } catch(ApiException e) {
                     return false;
@@ -226,11 +218,11 @@ public class AllianceManager {
         new BackgroundRunner<Boolean>() {
             @Override
             protected Boolean doInBackground() {
-                String url = "alliances/"+request.getAllianceID()+"/requests/"+request.getID();
-                Messages.AllianceRequestVote.Builder pb = Messages.AllianceRequestVote.newBuilder()
-                        .setAllianceId(request.getAllianceID())
-                        .setAllianceRequestId(request.getID())
-                        .setVotes(approve ? 1 : -1);
+                String url = "alliances/"+request.alliance_id+"/requests/"+request.id;
+                AllianceRequestVote.Builder pb = new AllianceRequestVote.Builder()
+                        .alliance_id(request.alliance_id)
+                        .alliance_request_id(request.id)
+                        .votes(approve ? 1 : -1);
                 try {
                     ApiClient.postProtoBuf(url, pb.build());
                     return true;
@@ -242,7 +234,7 @@ public class AllianceManager {
             @Override
             protected void onComplete(Boolean success) {
                 if (success) {
-                    refreshAlliance(request.getAllianceID());
+                    refreshAlliance(request.alliance_id);
                 }
             }
         }.execute();

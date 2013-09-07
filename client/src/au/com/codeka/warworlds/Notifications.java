@@ -1,13 +1,9 @@
 
 package au.com.codeka.warworlds;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import android.annotation.SuppressLint;
 import android.app.Notification;
@@ -28,29 +24,26 @@ import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
 import android.text.Html;
 import android.util.Base64;
-import au.com.codeka.common.model.DesignKind;
-import au.com.codeka.common.protobuf.Messages;
+import au.com.codeka.common.model.BuildRequest;
+import au.com.codeka.common.model.ChatMessage;
+import au.com.codeka.common.model.Empire;
+import au.com.codeka.common.model.Model;
+import au.com.codeka.common.model.SituationReport;
+import au.com.codeka.common.model.Star;
 import au.com.codeka.warworlds.game.SitrepActivity;
 import au.com.codeka.warworlds.model.BuildManager;
 import au.com.codeka.warworlds.model.ChatManager;
-import au.com.codeka.warworlds.model.ChatMessage;
 import au.com.codeka.warworlds.model.EmpireManager;
-import au.com.codeka.warworlds.model.MyEmpire;
 import au.com.codeka.warworlds.model.Realm;
 import au.com.codeka.warworlds.model.RealmManager;
 import au.com.codeka.warworlds.model.SectorManager;
-import au.com.codeka.warworlds.model.SituationReport;
+import au.com.codeka.warworlds.model.SituationReportHelper;
 import au.com.codeka.warworlds.model.Sprite;
-import au.com.codeka.warworlds.model.Star;
 import au.com.codeka.warworlds.model.StarImageManager;
 import au.com.codeka.warworlds.model.StarManager;
-import au.com.codeka.warworlds.model.StarSummary;
 
-import com.google.protobuf.InvalidProtocolBufferException;
 
 public class Notifications {
-    private static Logger log = LoggerFactory.getLogger(Notifications.class);
-
     private Notifications() {
     }
 
@@ -64,62 +57,56 @@ public class Notifications {
     public static void displayNotfication(Context context, String name, String value) {
         if (name.equals("sitrep")) {
             byte[] blob = Base64.decode(value, Base64.DEFAULT);
-
-            Messages.SituationReport pb;
+            SituationReport sitrep;
             try {
-                pb = Messages.SituationReport.parseFrom(blob);
-            } catch (InvalidProtocolBufferException e) {
-                log.error("Could not parse situation report!", e);
-                return;
+                sitrep = Model.wire.parseFrom(blob, SituationReport.class);
+            } catch(IOException e) {
+                sitrep = null;
             }
 
             // we could currently be in a game, and that game could be running in a different
             // realm to this notification. So we switch this thread temporarily to whatever
             // realm this notification is for.
-            Realm thisRealm = RealmManager.i.getRealmByName(pb.getRealm());
+            Realm thisRealm = RealmManager.i.getRealmByName(sitrep.realm);
             RealmContext.i.setThreadRealm(thisRealm);
             try {
                 // refresh the star this situation report is for, obviously
                 // something happened that we'll want to know about
-                Star star = StarManager.getInstance().refreshStarSync(pb.getStarKey(), true);
+                Star star = StarManager.i.refreshStarSync(sitrep.star_key, true);
                 if (star == null) { // <-- only refresh the star if we have one cached
                     // if we didn't refresh the star, then at least refresh
                     // the sector it was in (could have been a moving
                     // fleet, say)
-                    star = SectorManager.getInstance().findStar(pb.getStarKey());
+                    star = SectorManager.i.findStar(sitrep.star_key);
                     if (star != null) {
-                        SectorManager.getInstance().refreshSector(star.getSectorX(), star.getSectorY());
+                        SectorManager.i.refreshSector(star.sector_x, star.sector_y);
                     }
                 } else {
-                    StarManager.getInstance().fireStarUpdated(star);
+                    StarManager.i.fireStarUpdated(star);
                 }
 
                 // notify the build manager, in case it's a 'build complete' or something
-                BuildManager.getInstance().notifySituationReport(pb);
+                BuildManager.getInstance().notifySituationReport(sitrep);
 
-                displayNotification(context, pb);
+                displayNotification(context, sitrep);
             } finally {
                 RealmContext.i.setThreadRealm(null);
             }
         } else if (name.equals("chat")) {
             byte[] blob = Base64.decode(value, Base64.DEFAULT);
-
             ChatMessage msg;
             try {
-                Messages.ChatMessage pb = Messages.ChatMessage.parseFrom(blob);
-                msg = new ChatMessage();
-                msg.fromProtocolBuffer(pb);
-            } catch(InvalidProtocolBufferException e) {
-                log.error("Could not parse chat message!", e);
-                return;
+                msg = Model.wire.parseFrom(blob, ChatMessage.class);
+            } catch (IOException e) {
+                msg = null;
             }
 
             // don't add our own chats, since they'll have been added automatically
-            MyEmpire myEmpire = EmpireManager.i.getEmpire();
+            Empire myEmpire = EmpireManager.i.getEmpire();
             if (myEmpire == null) {
                 return;
             }
-            if (msg.getEmpireKey() == null || msg.getEmpireKey().equals(myEmpire.getKey())) {
+            if (msg.empire_key == null || msg.empire_key.equals(myEmpire.key)) {
                 return;
             }
 
@@ -128,9 +115,9 @@ public class Notifications {
     }
 
     private static void displayNotification(final Context context,
-                                            final Messages.SituationReport sitrep) {
-        String starKey = sitrep.getStarKey();
-        StarSummary starSummary = StarManager.getInstance().requestStarSummarySync(starKey,
+                                            final SituationReport sitrep) {
+        String starKey = sitrep.star_key;
+        Star starSummary = StarManager.i.requestStarSummarySync(starKey,
                 Float.MAX_VALUE // always prefer a cached version, no matter how old
             );
         if (starSummary == null) {
@@ -141,10 +128,10 @@ public class Notifications {
         NotificationDetails notification = new NotificationDetails();
         notification.sitrep = sitrep;
         notification.realm = RealmContext.i.getCurrentRealm();
-
-        Messages.Star.Builder star_pb = Messages.Star.newBuilder();
-        starSummary.toProtocolBuffer(star_pb);
-        notification.star = star_pb.build();
+        try {
+            notification.star = Model.wire.parseFrom(starSummary.toByteArray(), Star.class);
+        } catch (IOException e) {
+        }
 
         DatabaseHelper db = new DatabaseHelper();
         if (!db.addNotification(notification)) {
@@ -188,12 +175,7 @@ public class Notifications {
         int num = 0;
         boolean first = true;
         for (NotificationDetails notification : notifications) {
-            SituationReport sitrep = SituationReport.fromProtocolBuffer(notification.sitrep);
-
-            Star star = new Star();
-            star.fromProtocolBuffer(notification.star);
-
-            GlobalOptions.NotificationKind kind = getNotificationKind(sitrep);
+            GlobalOptions.NotificationKind kind = getNotificationKind(notification.sitrep);
             GlobalOptions.NotificationOptions thisOptions = new GlobalOptions().getNotificationOptions(kind);
             if (!thisOptions.isEnabled()) {
                 continue;
@@ -209,7 +191,7 @@ public class Notifications {
                     Bitmap largeIcon = Bitmap.createBitmap(iconWidth, iconHeight, Bitmap.Config.ARGB_8888);
                     Canvas canvas = new Canvas(largeIcon);
 
-                    Sprite designSprite = sitrep.getDesignSprite();
+                    Sprite designSprite = SituationReportHelper.getDesignSprite(notification.sitrep);
                     if (designSprite != null) {
                         Matrix matrix = new Matrix();
                         matrix.setScale((float) iconWidth / (float) designSprite.getWidth(),
@@ -221,7 +203,7 @@ public class Notifications {
                         canvas.restore();
                     }
 
-                    Sprite starSprite = StarImageManager.getInstance().getSprite(star, iconWidth / 2, true);
+                    Sprite starSprite = StarImageManager.getInstance().getSprite(notification.star, iconWidth / 2, true);
                     starSprite.draw(canvas);
 
                     builder.setLargeIcon(largeIcon);
@@ -230,9 +212,9 @@ public class Notifications {
                     // large icons
                 }
 
-                builder.setContentTitle(sitrep.getTitle());
-                builder.setContentText(sitrep.getDescription(star));
-                builder.setWhen(sitrep.getReportTime().getMillis());
+                builder.setContentTitle(SituationReportHelper.getTitle(notification.sitrep));
+                builder.setContentText(SituationReportHelper.getDescription(notification.sitrep, notification.star));
+                builder.setWhen(notification.sitrep.report_time * 1000);
 
                 String ringtone = new GlobalOptions().getNotificationOptions(kind).getRingtone();
                 if (ringtone != null && ringtone.length() > 0) {
@@ -244,7 +226,7 @@ public class Notifications {
             first = false;
 
             // subsequent notifications go in the expanded view
-            inboxStyle.addLine(Html.fromHtml(sitrep.getSummaryLine(star)));
+            inboxStyle.addLine(Html.fromHtml(SituationReportHelper.getSummaryLine(notification.star, notification.sitrep)));
 
             num++;
         }
@@ -263,39 +245,39 @@ public class Notifications {
     }
 
     private static GlobalOptions.NotificationKind getNotificationKind(SituationReport sitrep) {
-        if (sitrep.getBuildCompleteRecord() != null) {
-            if (sitrep.getBuildCompleteRecord().getDesignKind() == DesignKind.BUILDING) {
+        if (sitrep.build_complete_record != null) {
+            if (sitrep.build_complete_record.build_kind == BuildRequest.BUILD_KIND.BUILDING) {
                 return GlobalOptions.NotificationKind.BUILDING_BUILD_COMPLETE;
             } else {
                 return GlobalOptions.NotificationKind.FLEET_BUILD_COMPLETE;
             }
         }
 
-        if (sitrep.getFleetUnderAttackRecord() != null) {
+        if (sitrep.fleet_under_attack_record != null) {
             return GlobalOptions.NotificationKind.FLEET_UNDER_ATTACK;
         }
 
-        if (sitrep.getMoveCompleteRecord() != null) {
+        if (sitrep.move_complete_record != null) {
             return GlobalOptions.NotificationKind.FLEET_MOVE_COMPLETE;
         }
 
-        if (sitrep.getFleetDestroyedRecord() != null) {
+        if (sitrep.fleet_destroyed_record != null) {
             return GlobalOptions.NotificationKind.FLEET_DESTROYED;
         }
 
-        if (sitrep.getFleetVictoriousRecord() != null) {
+        if (sitrep.fleet_victorious_record != null) {
             return GlobalOptions.NotificationKind.FLEET_VICTORIOUS;
         }
 
-        if (sitrep.getColonyDestroyedRecord() != null) {
+        if (sitrep.colony_destroyed_record != null) {
             return GlobalOptions.NotificationKind.COLONY_DESTROYED;
         }
 
-        if (sitrep.getColonyAttackedRecord() != null) {
+        if (sitrep.colony_attacked_record != null) {
             return GlobalOptions.NotificationKind.COLONY_ATTACKED;
         }
 
-        if (sitrep.getStarRunOutOfGoodsRecord() != null) {
+        if (sitrep.star_ran_out_of_goods_record != null) {
             return GlobalOptions.NotificationKind.STAR_GOODS_ZERO;
         }
 
@@ -351,24 +333,14 @@ public class Notifications {
             try {
                 // if there's an existing one, delete it first
                 int rows = db.delete("notifications",
-                        "sitrep_key = '"+details.sitrep.getKey()+"' AND realm_id = "+details.realm.getID(),
+                        "sitrep_key = '"+details.sitrep.key+"' AND realm_id = "+details.realm.getID(),
                         null);
 
-                ByteArrayOutputStream sitrep = new ByteArrayOutputStream();
-                ByteArrayOutputStream star = new ByteArrayOutputStream();
-                try {
-                    details.sitrep.writeTo(sitrep);
-                    details.star.writeTo(star);
-                } catch (IOException e) {
-                    // we won't get the notification, but not the end of the world...
-                    return false;
-                }
-
                 ContentValues values = new ContentValues();
-                values.put("star", star.toByteArray());
-                values.put("sitrep", sitrep.toByteArray());
-                values.put("sitrep_key", details.sitrep.getKey());
-                values.put("timestamp", details.sitrep.getReportTime());
+                values.put("star", details.star.toByteArray());
+                values.put("sitrep", details.sitrep.toByteArray());
+                values.put("sitrep_key", details.sitrep.key);
+                values.put("timestamp", (long) details.sitrep.report_time / 1000);
                 values.put("realm_id", details.realm.getID());
                 db.insert("notifications", null, values);
 
@@ -394,11 +366,11 @@ public class Notifications {
                 do {
                     try {
                         NotificationDetails notification = new NotificationDetails();
-                        notification.star = Messages.Star.parseFrom(cursor.getBlob(0));
-                        notification.sitrep = Messages.SituationReport.parseFrom(cursor.getBlob(1));
+                        notification.star = Model.wire.parseFrom(cursor.getBlob(0), Star.class);
+                        notification.sitrep = Model.wire.parseFrom(cursor.getBlob(1), SituationReport.class);
                         notification.realm = realm;
                         notifications.add(notification);
-                    } catch (InvalidProtocolBufferException e) {
+                    } catch (IOException e) {
                         // any errors here and we'll just skip this notification
                     } catch (IllegalStateException e) {
                         // we can sometimes get this if there's issues with the database
@@ -428,8 +400,8 @@ public class Notifications {
     }
 
     private static class NotificationDetails {
-        public Messages.SituationReport sitrep;
-        public Messages.Star star;
+        public SituationReport sitrep;
+        public Star star;
         public Realm realm;
     }
 }

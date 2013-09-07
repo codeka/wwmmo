@@ -15,8 +15,9 @@ import org.slf4j.LoggerFactory;
 import android.support.v4.util.LruCache;
 import au.com.codeka.BackgroundRunner;
 import au.com.codeka.common.Pair;
-import au.com.codeka.common.model.BaseStar;
-import au.com.codeka.common.protobuf.Messages;
+import au.com.codeka.common.model.Sector;
+import au.com.codeka.common.model.Sectors;
+import au.com.codeka.common.model.Star;
 import au.com.codeka.warworlds.api.ApiClient;
 import au.com.codeka.warworlds.game.StarfieldBackgroundRenderer;
 
@@ -32,14 +33,8 @@ import au.com.codeka.warworlds.game.StarfieldBackgroundRenderer;
  */
 public class SectorManager extends BaseManager {
     private static Logger log = LoggerFactory.getLogger(SectorManager.class);
-    private static SectorManager sInstance;
 
-    public static SectorManager getInstance() {
-        if (sInstance == null) {
-            sInstance = new SectorManager();
-        }
-        return sInstance;
-    }
+    public static SectorManager i = new SectorManager();
 
     private SectorCache mSectors;
     private Map<Pair<Long, Long>, List<OnSectorsFetchedListener>> mInTransitListeners;
@@ -59,7 +54,7 @@ public class SectorManager extends BaseManager {
     }
 
     public StarfieldBackgroundRenderer getBackgroundRenderer(Sector s) {
-        Pair<Long, Long> coords = new Pair<Long, Long>(s.getX(), s.getY());
+        Pair<Long, Long> coords = new Pair<Long, Long>(s.x, s.y);
         return mSectors.getBackgroundRenderer(coords);
     }
 
@@ -100,10 +95,10 @@ public class SectorManager extends BaseManager {
      * stars (e.g. when they're renamed), but not all...
      */
     public void onStarUpdate(Star star) {
-        Star ourStar = findStar(star.getKey());
+        Star ourStar = findStar(star.key);
         if (ourStar != null) {
-            if (!ourStar.getName().equals(star.getName())) {
-                ourStar.setName(star.getName());
+            if (!ourStar.name.equals(star.name)) {
+                ourStar.name = star.name;
                 fireSectorListChanged();
             }
         }
@@ -124,7 +119,7 @@ public class SectorManager extends BaseManager {
      */
     public void requestSectors(final List<Pair<Long, Long>> coords,
                                boolean force, final OnSectorsFetchedListener callback) {
-//        if (log.isDebugEnabled()) {
+        if (log.isDebugEnabled()) {
             String msg = "";
             for(Pair<Long, Long> coord : coords) {
                 if (msg.length() != 0) {
@@ -133,7 +128,7 @@ public class SectorManager extends BaseManager {
                 msg += String.format("(%d, %d)", coord.one, coord.two);
             }
             log.debug(String.format("Requesting sectors %s...", msg));
-//        }
+        }
 
         Map<Pair<Long, Long>, Sector> existingSectors = new TreeMap<Pair<Long, Long>, Sector>();
         final List<Pair<Long, Long>> missingSectors = new ArrayList<Pair<Long, Long>>();
@@ -165,8 +160,6 @@ public class SectorManager extends BaseManager {
                 new BackgroundRunner<List<Sector>>() {
                     @Override
                     protected List<Sector> doInBackground() {
-                        List<Sector> sectors = null;
-
                         String url = "";
                         for(Pair<Long, Long> coord : missingSectors) {
                             if (url.length() != 0) {
@@ -176,18 +169,15 @@ public class SectorManager extends BaseManager {
                         }
                         url = "sectors?coords="+url;
                         try {
-                            Messages.Sectors pb = ApiClient.getProtoBuf(url, Messages.Sectors.class);
-                            sectors = new ArrayList<Sector>();
-                            for (Messages.Sector sector_pb : pb.getSectorsList()) {
-                                Sector sector = new Sector();
-                                sector.fromProtocolBuffer(sector_pb);
-                                sectors.add(sector);
+                            Sectors sectors = ApiClient.getProtoBuf(url, Sectors.class);
+                            if (sectors == null) {
+                                return null;
                             }
+                            return sectors.sectors;
                         } catch(Exception e) {
                             log.error(ExceptionUtils.getStackTrace(e));
+                            return null;
                         }
-
-                        return sectors;
                     }
 
                     @Override
@@ -197,16 +187,16 @@ public class SectorManager extends BaseManager {
                             if (callback != null)
                                 theseSectors = new TreeMap<Pair<Long, Long>, Sector>();
                             if (sectors != null) for(Sector s : sectors) {
-                                Pair<Long, Long> key = new Pair<Long, Long>(s.getX(), s.getY());
-                                log.debug(String.format("Fetched sector (%d, %d)", s.getX(), s.getY()));
+                                Pair<Long, Long> key = new Pair<Long, Long>(s.x, s.y);
+                                log.debug(String.format("Fetched sector (%d, %d)", s.x, s.y));
 
                                 mSectors.put(key, s);
                                 if (callback != null) {
                                     theseSectors.put(key, s);
                                 }
 
-                                for (BaseStar star : s.getStars()) {
-                                    mSectorStars.put(star.getKey(), (Star) star);
+                                for (Star star : s.stars) {
+                                    mSectorStars.put(star.key, (Star) star);
                                 }
 
                                 Map<Pair<Long, Long>, Sector> thisSector = null;

@@ -6,19 +6,19 @@ import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.text.Html;
 import au.com.codeka.BackgroundRunner;
+import au.com.codeka.common.model.BuildRequest;
+import au.com.codeka.common.model.Star;
 import au.com.codeka.warworlds.StyledDialog;
 import au.com.codeka.warworlds.api.ApiClient;
 import au.com.codeka.warworlds.api.ApiException;
-import au.com.codeka.warworlds.model.BuildRequest;
 import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.StarManager;
-import au.com.codeka.warworlds.model.StarSummary;
 
 public class BuildStopConfirmDialog extends DialogFragment {
     private BuildRequest mBuildRequest;
-    private StarSummary mStar;
+    private Star mStar;
 
-    public void setBuildRequest(StarSummary star, BuildRequest buildRequest) {
+    public void setBuildRequest(Star star, BuildRequest buildRequest) {
         mBuildRequest = buildRequest;
         mStar = star;
     }
@@ -50,7 +50,7 @@ public class BuildStopConfirmDialog extends DialogFragment {
         new BackgroundRunner<Boolean>() {
             @Override
             protected Boolean doInBackground() {
-                String url = "stars/"+mStar.getKey()+"/build/"+mBuildRequest.getKey()+"/stop";
+                String url = "stars/"+mStar.key+"/build/"+mBuildRequest.key+"/stop";
 
                 try {
                     ApiClient.postProtoBuf(url, null);
@@ -63,7 +63,7 @@ public class BuildStopConfirmDialog extends DialogFragment {
             @Override
             protected void onComplete(Boolean success) {
                 EmpireManager.i.refreshEmpire();
-                StarManager.getInstance().refreshStar(mStar.getKey());
+                StarManager.i.refreshStar(mStar.key);
                 dismiss();
             }
         }.execute();

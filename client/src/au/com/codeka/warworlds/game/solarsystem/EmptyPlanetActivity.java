@@ -5,7 +5,11 @@ import android.os.Bundle;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
-import au.com.codeka.common.model.BaseFleet;
+import au.com.codeka.common.model.Colony;
+import au.com.codeka.common.model.Empire;
+import au.com.codeka.common.model.Fleet;
+import au.com.codeka.common.model.Planet;
+import au.com.codeka.common.model.Star;
 import au.com.codeka.warworlds.ActivityBackgroundGenerator;
 import au.com.codeka.warworlds.BaseActivity;
 import au.com.codeka.warworlds.R;
@@ -14,11 +18,8 @@ import au.com.codeka.warworlds.ServerGreeter.ServerGreeting;
 import au.com.codeka.warworlds.StyledDialog;
 import au.com.codeka.warworlds.WarWorldsActivity;
 import au.com.codeka.warworlds.ctrl.PlanetDetailsView;
-import au.com.codeka.warworlds.model.Colony;
 import au.com.codeka.warworlds.model.EmpireManager;
-import au.com.codeka.warworlds.model.MyEmpire;
-import au.com.codeka.warworlds.model.Planet;
-import au.com.codeka.warworlds.model.Star;
+import au.com.codeka.warworlds.model.MyEmpireManager;
 import au.com.codeka.warworlds.model.StarManager;
 
 public class EmptyPlanetActivity extends BaseActivity
@@ -56,8 +57,8 @@ public class EmptyPlanetActivity extends BaseActivity
                     startActivity(new Intent(EmptyPlanetActivity.this, WarWorldsActivity.class));
                 } else {
                     String starKey = getIntent().getExtras().getString("au.com.codeka.warworlds.StarKey");
-                    StarManager.getInstance().requestStar(starKey, false, EmptyPlanetActivity.this);
-                    StarManager.getInstance().addStarUpdatedListener(starKey, EmptyPlanetActivity.this);
+                    StarManager.i.requestStar(starKey, false, EmptyPlanetActivity.this);
+                    StarManager.i.addStarUpdatedListener(starKey, EmptyPlanetActivity.this);
                 }
             }
         });
@@ -68,7 +69,7 @@ public class EmptyPlanetActivity extends BaseActivity
         int planetIndex = getIntent().getExtras().getInt("au.com.codeka.warworlds.PlanetIndex");
 
         mStar = s;
-        mPlanet = (Planet) s.getPlanets()[planetIndex - 1];
+        mPlanet = (Planet) s.planets.get(planetIndex - 1);
 
         PlanetDetailsView planetDetails = (PlanetDetailsView) findViewById(R.id.planet_details);
         planetDetails.setup(mStar, mPlanet, null);
@@ -76,17 +77,17 @@ public class EmptyPlanetActivity extends BaseActivity
 
 
     private void onColonizeClick() {
-        MyEmpire empire = EmpireManager.i.getEmpire();
+        Empire empire = EmpireManager.i.getEmpire();
 
         // check that we have a colony ship (the server will check too, but this is easy)
         boolean hasColonyShip = false;
-        for (BaseFleet fleet : mStar.getFleets()) {
-            if (fleet.getEmpireKey() == null) {
+        for (Fleet fleet : mStar.fleets) {
+            if (fleet.empire_key == null) {
                 continue;
             }
 
-            if (fleet.getEmpireKey().equals(empire.getKey())) {
-                if (fleet.getDesignID().equals("colonyship")) { // TODO: hardcoded?
+            if (fleet.empire_key.equals(empire.key)) {
+                if (fleet.design_id.equals("colonyship")) { // TODO: hardcoded?
                     hasColonyShip = true;
                 }
             }
@@ -101,7 +102,7 @@ public class EmptyPlanetActivity extends BaseActivity
             dialog.show();
         }
 
-        empire.colonize(mPlanet, new MyEmpire.ColonizeCompleteHandler() {
+        MyEmpireManager.i.colonize(mStar, mPlanet, new MyEmpireManager.ColonizeCompleteHandler() {
             @Override
             public void onColonizeComplete(Colony colony) {
                 finish();

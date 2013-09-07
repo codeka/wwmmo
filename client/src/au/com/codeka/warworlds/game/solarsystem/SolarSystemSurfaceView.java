@@ -16,21 +16,20 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.RelativeLayout;
 import au.com.codeka.common.Vector2;
-import au.com.codeka.common.model.BaseBuilding;
-import au.com.codeka.common.model.BaseColony;
-import au.com.codeka.common.model.BasePlanet;
+import au.com.codeka.common.model.Building;
+import au.com.codeka.common.model.Colony;
+import au.com.codeka.common.model.Empire;
+import au.com.codeka.common.model.Planet;
+import au.com.codeka.common.model.Star;
 import au.com.codeka.warworlds.ctrl.SelectionView;
 import au.com.codeka.warworlds.game.StarfieldBackgroundRenderer;
 import au.com.codeka.warworlds.game.UniverseElementSurfaceView;
-import au.com.codeka.warworlds.model.Colony;
-import au.com.codeka.warworlds.model.Empire;
+import au.com.codeka.warworlds.model.EmpireHelper;
 import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.ImageManager;
-import au.com.codeka.warworlds.model.Planet;
 import au.com.codeka.warworlds.model.PlanetImageManager;
 import au.com.codeka.warworlds.model.Sprite;
 import au.com.codeka.warworlds.model.SpriteManager;
-import au.com.codeka.warworlds.model.Star;
 import au.com.codeka.warworlds.model.StarImageManager;
 
 /**
@@ -77,13 +76,11 @@ public class SolarSystemSurfaceView extends UniverseElementSurfaceView {
 
     public void setStar(Star star) {
         mStar = star;
+        mPlanetInfos = new PlanetInfo[star.planets.size()];
 
-        BasePlanet[] planets = mStar.getPlanets();
-        mPlanetInfos = new PlanetInfo[planets.length];
-
-        for (int i = 0; i < planets.length; i++) {
+        for (int i = 0; i < star.planets.size(); i++) {
             PlanetInfo planetInfo = new PlanetInfo();
-            planetInfo.planet = (Planet) planets[i];
+            planetInfo.planet = star.planets.get(i);
             planetInfo.centre = new Vector2(0, 0);
             planetInfo.distanceFromSun = 0.0f;
             mPlanetInfos[i] = planetInfo;
@@ -103,7 +100,7 @@ public class SolarSystemSurfaceView extends UniverseElementSurfaceView {
         }
 
         for(PlanetInfo planetInfo : mPlanetInfos) {
-            if (planetInfo.planet.getIndex() == planet.getIndex()) {
+            if (planetInfo.planet.index == planet.index) {
                 Vector2 pixels = planetInfo.centre;
                 return new Vector2(pixels.x / getPixelScale(),
                                    pixels.y / getPixelScale());
@@ -137,14 +134,14 @@ public class SolarSystemSurfaceView extends UniverseElementSurfaceView {
             planetInfo.centre = centre;
             planetInfo.distanceFromSun = distanceFromSun;
 
-            List<BaseColony> colonies = mStar.getColonies();
+            List<Colony> colonies = mStar.colonies;
             if (colonies != null && !colonies.isEmpty()) {
-                for (BaseColony colony : colonies) {
-                    if (colony.getPlanetIndex() == mPlanetInfos[i].planet.getIndex()) {
+                for (Colony colony : colonies) {
+                    if (colony.planet_index == mPlanetInfos[i].planet.index) {
                         planetInfo.colony = (Colony) colony;
 
-                        for (BaseBuilding building : colony.getBuildings()) {
-                            if (building.getDesignID().equals("hq")) {
+                        for (Building building : mStar.buildings) {
+                            if (building.design_id.equals("hq") && building.colony_key.equals(colony.key)) {
                                 planetInfo.hasHQ = true;
                             }
                         }
@@ -179,7 +176,7 @@ public class SolarSystemSurfaceView extends UniverseElementSurfaceView {
     }
     public void selectPlanet(int planetIndex) {
         for(PlanetInfo planetInfo : mPlanetInfos) {
-            if (planetInfo.planet.getIndex() == planetIndex) {
+            if (planetInfo.planet.index == planetIndex) {
                 mSelectedPlanet = planetInfo;
 
                 firePlanetSelected(mSelectedPlanet.planet);
@@ -198,7 +195,7 @@ public class SolarSystemSurfaceView extends UniverseElementSurfaceView {
             mSelectionView.setVisibility(View.VISIBLE);
 
             RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) mSelectionView.getLayoutParams();
-            params.width = (int) ((((mSelectedPlanet.planet.getSize() - 10.0) / 8.0) + 4.0) * 10.0) + (int) (40 * getPixelScale());
+            params.width = (int) ((((mSelectedPlanet.planet.size - 10.0) / 8.0) + 4.0) * 10.0) + (int) (40 * getPixelScale());
             params.height = params.width;
             params.leftMargin = (int) (getLeft() + mSelectedPlanet.centre.x - (params.width / 2));
             params.topMargin = (int) (getTop() + mSelectedPlanet.centre.y - (params.height / 2));
@@ -247,7 +244,7 @@ public class SolarSystemSurfaceView extends UniverseElementSurfaceView {
             canvas.drawColor(Color.BLACK);
 
             if (mBackgroundRenderer == null) {
-                mBackgroundRenderer = new StarfieldBackgroundRenderer(new long[] {mStar.getKey().hashCode()});
+                mBackgroundRenderer = new StarfieldBackgroundRenderer(new long[] {mStar.key.hashCode()});
             }
             mBackgroundRenderer.drawBackground(canvas, 0, 0,
                     canvas.getWidth() / getPixelScale(),
@@ -287,7 +284,7 @@ public class SolarSystemSurfaceView extends UniverseElementSurfaceView {
         for (int i = 0; i < mPlanetInfos.length; i++) {
             final PlanetInfo planetInfo = mPlanetInfos[i];
 
-            Sprite sprite = pim.getSprite(planetInfo.planet);
+            Sprite sprite = pim.getSprite(mStar, planetInfo.planet);
             mMatrix.reset();
             mMatrix.postTranslate(-(sprite.getWidth() / 2.0f), -(sprite.getHeight() / 2.0f));
             mMatrix.postScale(100.0f * getPixelScale() / sprite.getWidth(),
@@ -315,9 +312,9 @@ public class SolarSystemSurfaceView extends UniverseElementSurfaceView {
             }
 
             if (planetInfo.colony != null) {
-                Empire empire = EmpireManager.i.getEmpire(planetInfo.colony.getEmpireKey());
+                Empire empire = EmpireManager.i.getEmpire(planetInfo.colony.empire_key);
                 if (empire != null) {
-                    Bitmap shield = empire.getShield(mContext);
+                    Bitmap shield = EmpireHelper.getShield(mContext, empire);
                     if (shield != null) {
                         mMatrix.reset();
                         mMatrix.postTranslate(-shield.getWidth() / 2.0f, -shield.getHeight() / 2.0f);
@@ -364,7 +361,7 @@ public class SolarSystemSurfaceView extends UniverseElementSurfaceView {
             }
 
             if (newSelection != null) {
-                selectPlanet(newSelection.planet.getIndex());
+                selectPlanet(newSelection.planet.index);
 
                 // play the 'click' sound effect
                 playSoundEffect(android.view.SoundEffectConstants.CLICK);

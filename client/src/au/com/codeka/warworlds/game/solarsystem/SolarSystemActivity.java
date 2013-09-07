@@ -14,11 +14,11 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.view.Window;
+import au.com.codeka.common.model.Star;
 import au.com.codeka.warworlds.BaseActivity;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.ServerGreeter;
 import au.com.codeka.warworlds.ServerGreeter.ServerGreeting;
-import au.com.codeka.warworlds.model.Star;
 import au.com.codeka.warworlds.model.StarManager;
 
 /**
@@ -106,7 +106,7 @@ public class SolarSystemActivity extends BaseActivity implements StarManager.Sta
     @Override
     public void onDestroy() {
         super.onDestroy();
-        StarManager.getInstance().removeStarUpdatedListener(this);
+        StarManager.i.removeStarUpdatedListener(this);
     }
 
     @Override
@@ -171,9 +171,9 @@ public class SolarSystemActivity extends BaseActivity implements StarManager.Sta
             Star star = currentFragment.getStar();
             Intent intent = new Intent();
             if (star != null) {
-                intent.putExtra("au.com.codeka.warworlds.SectorX", star.getSectorX());
-                intent.putExtra("au.com.codeka.warworlds.SectorY", star.getSectorY());
-                intent.putExtra("au.com.codeka.warworlds.StarKey", star.getKey());
+                intent.putExtra("au.com.codeka.warworlds.SectorX", star.sector_x);
+                intent.putExtra("au.com.codeka.warworlds.SectorY", star.sector_y);
+                intent.putExtra("au.com.codeka.warworlds.StarKey", star.key);
             }
             setResult(RESULT_OK, intent);
         }

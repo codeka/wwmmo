@@ -9,13 +9,13 @@ import android.view.View;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import au.com.codeka.BackgroundRunner;
-import au.com.codeka.common.protobuf.Messages;
+import au.com.codeka.common.model.Fleet;
+import au.com.codeka.common.model.FleetOrder;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.StyledDialog;
 import au.com.codeka.warworlds.api.ApiClient;
 import au.com.codeka.warworlds.api.ApiException;
 import au.com.codeka.warworlds.ctrl.FleetList;
-import au.com.codeka.warworlds.model.Fleet;
 import au.com.codeka.warworlds.model.StarManager;
 
 public class FleetSplitDialog extends DialogFragment {
@@ -41,7 +41,7 @@ public class FleetSplitDialog extends DialogFragment {
         View fleetView = mView.findViewById(R.id.fleet);
         FleetList.populateFleetRow(getActivity(), null, fleetView, mFleet);
 
-        int numShips = (int) Math.ceil(mFleet.getNumShips());
+        int numShips = (int) Math.ceil(mFleet.num_ships);
         if (numShips >= 2) {
             splitRatio.setMax(numShips - 2);
         } else {
@@ -122,12 +122,12 @@ public class FleetSplitDialog extends DialogFragment {
             @Override
             protected Boolean doInBackground() {
                 String url = String.format("stars/%s/fleets/%s/orders",
-                                           mFleet.getStarKey(),
-                                           mFleet.getKey());
-                Messages.FleetOrder fleetOrder = Messages.FleetOrder.newBuilder()
-                               .setOrder(Messages.FleetOrder.FLEET_ORDER.SPLIT)
-                               .setSplitLeft(Integer.parseInt(splitLeft.getText().toString()))
-                               .setSplitRight(Integer.parseInt(splitRight.getText().toString()))
+                                           mFleet.star_key,
+                                           mFleet.key);
+                FleetOrder fleetOrder = new FleetOrder.Builder()
+                               .order(FleetOrder.FLEET_ORDER.SPLIT)
+                               .split_left(Integer.parseInt(splitLeft.getText().toString()))
+                               .split_right(Integer.parseInt(splitRight.getText().toString()))
                                .build();
 
                 try {
@@ -141,7 +141,7 @@ public class FleetSplitDialog extends DialogFragment {
             @Override
             protected void onComplete(Boolean success) {
                 // the star this fleet is attached to needs to be refreshed...
-                StarManager.getInstance().refreshStar(mFleet.getStarKey());
+                StarManager.i.refreshStar(mFleet.star_key);
             }
         }.execute();
     }

@@ -6,10 +6,11 @@ import android.util.AttributeSet;
 import android.widget.FrameLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import au.com.codeka.common.model.BaseBuildRequest;
+import au.com.codeka.common.model.BuildRequest;
+import au.com.codeka.common.model.Colony;
+import au.com.codeka.common.model.Model;
+import au.com.codeka.common.model.Star;
 import au.com.codeka.warworlds.R;
-import au.com.codeka.warworlds.model.Colony;
-import au.com.codeka.warworlds.model.Star;
 
 public class ColonyFocusView extends FrameLayout {
     private Star mStar;
@@ -25,7 +26,7 @@ public class ColonyFocusView extends FrameLayout {
         mStar = star;
         mColony = colony;
 
-        int defence = (int) (0.25 * mColony.getPopulation() * mColony.getDefenceBoost());
+        int defence = (int) (0.25 * mColony.population * mColony.defence_bonus);
         if (defence < 1) {
             defence = 1;
         }
@@ -34,44 +35,44 @@ public class ColonyFocusView extends FrameLayout {
 
         ProgressBar populationFocus = (ProgressBar) findViewById(
                 R.id.solarsystem_colony_population_focus);
-        populationFocus.setProgress((int)(100.0f * mColony.getPopulationFocus()));
+        populationFocus.setProgress((int)(100.0f * mColony.focus_population));
         TextView populationValue = (TextView) findViewById(
                 R.id.solarsystem_colony_population_value);
         String deltaPopulation = String.format("%s%d / hr",
-                (mColony.getPopulationDelta() > 0 ? "+" : "-"),
-                Math.abs((int) mColony.getPopulationDelta()));
-        if (mColony.getPopulationDelta() < 0 && mColony.getPopulation() < 110.0 && mColony.isInCooldown()) {
+                (mColony.delta_population > 0 ? "+" : "-"),
+                Math.abs((int) (float) mColony.delta_population));
+        if (mColony.delta_population < 0 && mColony.population < 110.0 && Model.isInCooldown(mColony)) {
             deltaPopulation = "<font color=\"#ffff00\">"+deltaPopulation+"</font>";
         }
         populationValue.setText(Html.fromHtml(deltaPopulation));
 
         ProgressBar farmingFocus = (ProgressBar) findViewById(
                 R.id.solarsystem_colony_farming_focus);
-        farmingFocus.setProgress((int)(100.0f * mColony.getFarmingFocus()));
+        farmingFocus.setProgress((int)(100.0f * mColony.focus_farming));
         TextView farmingValue= (TextView) findViewById(
                 R.id.solarsystem_colony_farming_value);
         farmingValue.setText(String.format("%s%d / hr",
-                mColony.getGoodsDelta() < 0 ? "-" : "+",
-                Math.abs((int) mColony.getGoodsDelta())));
+                mColony.delta_goods < 0 ? "-" : "+",
+                Math.abs((int) (float) mColony.delta_goods)));
 
         ProgressBar miningFocus = (ProgressBar) findViewById(
                 R.id.solarsystem_colony_mining_focus);
-        miningFocus.setProgress((int)(100.0f * mColony.getMiningFocus()));
+        miningFocus.setProgress((int)(100.0f * mColony.focus_mining));
         TextView miningValue = (TextView) findViewById(
                 R.id.solarsystem_colony_mining_value);
         miningValue.setText(String.format("%s%d / hr",
-                mColony.getMineralsDelta() < 0 ? "-" : "+",
-                Math.abs((int) mColony.getMineralsDelta())));
+                mColony.delta_minerals < 0 ? "-" : "+",
+                Math.abs((int) (float) mColony.delta_minerals)));
 
         ProgressBar constructionFocus = (ProgressBar) findViewById(
                 R.id.solarsystem_colony_construction_focus);
-        constructionFocus.setProgress((int)(100.0f * mColony.getConstructionFocus()));
+        constructionFocus.setProgress((int)(100.0f * mColony.focus_construction));
         TextView constructionValue = (TextView) findViewById(
                 R.id.solarsystem_colony_construction_value);
 
         int numBuildRequests = 0;
-        for (BaseBuildRequest buildRequest : mStar.getBuildRequests()) {
-            if (buildRequest.getColonyKey().equals(mColony.getKey())) {
+        for (BuildRequest buildRequest : mStar.build_requests) {
+            if (buildRequest.colony_key.equals(mColony.key)) {
                 numBuildRequests ++;
             }
         }

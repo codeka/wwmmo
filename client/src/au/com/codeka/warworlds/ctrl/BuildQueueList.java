@@ -29,21 +29,22 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import au.com.codeka.RomanNumeralFormatter;
 import au.com.codeka.TimeInHours;
-import au.com.codeka.common.model.BaseBuildRequest;
-import au.com.codeka.common.model.Design;
+import au.com.codeka.common.design.Design;
+import au.com.codeka.common.design.DesignKind;
+import au.com.codeka.common.model.BuildRequest;
+import au.com.codeka.common.model.Colony;
+import au.com.codeka.common.model.Model;
+import au.com.codeka.common.model.Planet;
+import au.com.codeka.common.model.Star;
 import au.com.codeka.warworlds.R;
-import au.com.codeka.warworlds.model.BuildRequest;
-import au.com.codeka.warworlds.model.Colony;
 import au.com.codeka.warworlds.model.DesignManager;
-import au.com.codeka.warworlds.model.Planet;
 import au.com.codeka.warworlds.model.PlanetImageManager;
 import au.com.codeka.warworlds.model.Sprite;
 import au.com.codeka.warworlds.model.SpriteDrawable;
 import au.com.codeka.warworlds.model.SpriteManager;
-import au.com.codeka.warworlds.model.Star;
 import au.com.codeka.warworlds.model.StarImageManager;
 import au.com.codeka.warworlds.model.StarManager;
-import au.com.codeka.warworlds.model.StarSummary;
+import au.com.codeka.warworlds.model.StarType;
 
 public class BuildQueueList extends FrameLayout
                             implements StarManager.StarFetchedHandler {
@@ -118,57 +119,54 @@ public class BuildQueueList extends FrameLayout
     }
 
     public void refresh(final Star star, final Colony colony) {
-        ArrayList<BuildRequest> buildRequests = new ArrayList<BuildRequest>();
-        for (BaseBuildRequest br : star.getBuildRequests()) {
-            buildRequests.add((BuildRequest) br);
-        }
+        ArrayList<BuildRequest> buildRequests = new ArrayList<BuildRequest>(star.build_requests);
         refresh(star, colony, buildRequests);
     }
 
     public void refresh(final Star star, final Colony colony, List<BuildRequest> allBuildRequests) {
-        Map<String, StarSummary> stars = new TreeMap<String, StarSummary>();
-        stars.put(star.getKey(), star);
+        Map<String, Star> stars = new TreeMap<String, Star>();
+        stars.put(star.key, star);
 
         Map<String, Colony> colonies = new TreeMap<String, Colony>();
-        colonies.put(colony.getKey(), colony);
+        colonies.put(colony.key, colony);
 
         List<BuildRequest> buildRequests = new ArrayList<BuildRequest>();
         for (BuildRequest request : allBuildRequests) {
-            if (request.getColonyKey().equals(colony.getKey())) {
+            if (request.colony_key.equals(colony.key)) {
                 buildRequests.add(request);
             }
         }
 
-        mColonyKey = colony.getKey();
+        mColonyKey = colony.key;
         refresh(stars, buildRequests);
     }
 
     public void refresh(final List<BuildRequest> buildRequests) {
         TreeSet<String> starKeys = new TreeSet<String>();
         for (BuildRequest buildRequest : buildRequests) {
-            if (!starKeys.contains(buildRequest.getStarKey())) {
-                starKeys.add(buildRequest.getStarKey());
+            if (!starKeys.contains(buildRequest.star_key)) {
+                starKeys.add(buildRequest.star_key);
             }
         }
 
-        StarManager.getInstance().requestStarSummaries(starKeys, new StarManager.StarSummariesFetchedHandler() {
+        StarManager.i.requestStarSummaries(starKeys, new StarManager.StarSummariesFetchedHandler() {
             @Override
-            public void onStarSummariesFetched(Collection<StarSummary> stars) {
-                TreeMap<String, StarSummary> summaries = new TreeMap<String, StarSummary>();
-                for (StarSummary star : stars) {
-                    summaries.put(star.getKey(), star);
+            public void onStarSummariesFetched(Collection<Star> stars) {
+                TreeMap<String, Star> summaries = new TreeMap<String, Star>();
+                for (Star star : stars) {
+                    summaries.put(star.key, star);
                 }
                 refresh(summaries, buildRequests);
             }
         });
     }
 
-    public void refresh(final Map<String, StarSummary> stars,
+    public void refresh(final Map<String, Star> stars,
                         final List<BuildRequest> buildRequests) {
         // save the list of star keys we're interested in here
         mStarKeys = new ArrayList<String>();
-        for (StarSummary star : stars.values()) {
-            mStarKeys.add(star.getKey());
+        for (Star star : stars.values()) {
+            mStarKeys.add(star.key);
         }
 
         mBuildQueueListAdapter.setBuildQueue(stars, buildRequests);
@@ -197,16 +195,16 @@ public class BuildQueueList extends FrameLayout
         progressBar.setVisibility(View.VISIBLE);
         progressText.setVisibility(View.VISIBLE);
 
-        Design design = DesignManager.i.getDesign(mSelectedBuildRequest.getDesignKind(),
-                                                  mSelectedBuildRequest.getDesignID());
+        Design design = DesignManager.i.getDesign(DesignKind.fromBuildKind(mSelectedBuildRequest.build_kind),
+                                                  mSelectedBuildRequest.design_id);
 
         icon.setImageDrawable(new SpriteDrawable(SpriteManager.i.getSprite(design.getSpriteName())));
 
-        if (mSelectedBuildRequest.getCount() == 1) {
+        if (mSelectedBuildRequest.count == 1) {
             buildingName.setText(design.getDisplayName());
         } else {
             buildingName.setText(String.format(Locale.ENGLISH, "%d × %s",
-                    mSelectedBuildRequest.getCount(), design.getDisplayName(mSelectedBuildRequest.getCount() > 1)));
+                    mSelectedBuildRequest.count, design.getDisplayName(mSelectedBuildRequest.count > 1)));
         }
 
         mBuildQueueListAdapter.refreshEntryProgress(mSelectedBuildRequest, progressBar, progressText);
@@ -220,7 +218,7 @@ public class BuildQueueList extends FrameLayout
 
         boolean ourStar = false;
         for (String starKey : mStarKeys) {
-            if (starKey.equals(s.getKey())) {
+            if (starKey.equals(s.key)) {
                 ourStar = true;
             }
         }
@@ -233,7 +231,7 @@ public class BuildQueueList extends FrameLayout
 
     @Override
     public void onAttachedToWindow() {
-        StarManager.getInstance().addStarUpdatedListener(null, this);
+        StarManager.i.addStarUpdatedListener(null, this);
 
         mProgressUpdater = new ProgressUpdater();
         mHandler.postDelayed(mProgressUpdater, 5000);
@@ -241,7 +239,7 @@ public class BuildQueueList extends FrameLayout
 
     @Override
     public void onDetachedFromWindow() {
-        StarManager.getInstance().removeStarUpdatedListener(this);
+        StarManager.i.removeStarUpdatedListener(this);
 
         mHandler.removeCallbacks(mProgressUpdater);
         mProgressUpdater = null;
@@ -252,10 +250,10 @@ public class BuildQueueList extends FrameLayout
      */
     private class BuildQueueListAdapter extends BaseAdapter {
         private List<BuildRequest> mBuildRequests;
-        private Map<String, StarSummary> mStarSummaries;
+        private Map<String, Star> mStarSummaries;
         private List<ItemEntry> mEntries;
 
-        public void setBuildQueue(Map<String, StarSummary> stars,
+        public void setBuildQueue(Map<String, Star> stars,
                                   List<BuildRequest> buildRequests) {
             mBuildRequests = new ArrayList<BuildRequest>(buildRequests);
             mStarSummaries = stars;
@@ -264,10 +262,10 @@ public class BuildQueueList extends FrameLayout
                 @Override
                 public int compare(BuildRequest lhs, BuildRequest rhs) {
                     // sort by star, then by design, then by count
-                    if (!lhs.getColonyKey().equals(rhs.getColonyKey())) {
-                        if (!lhs.getStarKey().equals(rhs.getStarKey())) {
-                            StarSummary lhsStar = mStarSummaries.get(lhs.getStarKey());
-                            StarSummary rhsStar = mStarSummaries.get(rhs.getStarKey());
+                    if (!lhs.colony_key.equals(rhs.colony_key)) {
+                        if (!lhs.star_key.equals(rhs.star_key)) {
+                            Star lhsStar = mStarSummaries.get(lhs.star_key);
+                            Star rhsStar = mStarSummaries.get(rhs.star_key);
 
                             if (lhsStar == null) {
                                 return -1;
@@ -275,12 +273,12 @@ public class BuildQueueList extends FrameLayout
                                 return 1;
                             }
 
-                            return lhsStar.getName().compareTo(rhsStar.getName());
+                            return lhsStar.name.compareTo(rhsStar.name);
                         } else {
-                            return lhs.getPlanetIndex() - rhs.getPlanetIndex();
+                            return lhs.planet_index - rhs.planet_index;
                         }
                     } else {
-                        return lhs.getStartTime().compareTo(rhs.getStartTime());
+                        return lhs.start_time.compareTo(rhs.start_time);
                     }
                 }
             });
@@ -289,28 +287,28 @@ public class BuildQueueList extends FrameLayout
             String lastStarKey = "";
             int lastPlanetIndex = -1;
             for (BuildRequest buildRequest : mBuildRequests) {
-                StarSummary star = mStarSummaries.get(buildRequest.getStarKey());
+                Star star = mStarSummaries.get(buildRequest.star_key);
                 if (star == null) {
                     continue;
                 }
 
-                if (!buildRequest.getStarKey().equals(lastStarKey) || buildRequest.getPlanetIndex() != lastPlanetIndex) {
+                if (!buildRequest.star_key.equals(lastStarKey) || buildRequest.planet_index != lastPlanetIndex) {
                     if (mShowStars) {
                         ItemEntry entry = new ItemEntry();
                         entry.star = star;
-                        entry.planet = (Planet) star.getPlanets()[buildRequest.getPlanetIndex() - 1];
+                        entry.planet = (Planet) star.planets.get(buildRequest.planet_index - 1);
                         mEntries.add(entry);
                     }
-                    lastStarKey = buildRequest.getStarKey();
-                    lastPlanetIndex = buildRequest.getPlanetIndex();
+                    lastStarKey = buildRequest.star_key;
+                    lastPlanetIndex = buildRequest.planet_index;
                 }
 
                 ItemEntry entry = new ItemEntry();
                 entry.buildRequest = buildRequest;
 
-                if (buildRequest.getExistingBuildingKey() != null) {
-                    entry.existingBuildingKey = buildRequest.getExistingBuildingKey();
-                    entry.existingBuildingLevel = buildRequest.getExistingBuildingLevel();
+                if (buildRequest.existing_building_key != null) {
+                    entry.existingBuildingKey = buildRequest.existing_building_key;
+                    entry.existingBuildingLevel = buildRequest.existing_building_level;
                 }
 
                 mEntries.add(entry);
@@ -328,15 +326,15 @@ public class BuildQueueList extends FrameLayout
 
             // copy old build requests that are not for this star over
             for (BuildRequest br : mBuildRequests) {
-                if (!br.getStarKey().equals(s.getKey())) {
+                if (!br.star_key.equals(s.key)) {
                     newBuildRequests.add(br);
                 }
             }
 
             // copy build requests from the new star over
-            for (BaseBuildRequest br : s.getBuildRequests()) {
+            for (BuildRequest br : s.build_requests) {
                 // only add the build request if it's for a colony we're displaying
-                if (mColonyKey == null || br.getColonyKey().equals(mColonyKey)) {
+                if (mColonyKey == null || br.colony_key.equals(mColonyKey)) {
                     newBuildRequests.add((BuildRequest) br);
                 }
             }
@@ -397,8 +395,8 @@ public class BuildQueueList extends FrameLayout
             }
         }
 
-        public StarSummary getStarForBuildRequest(BuildRequest buildRequest) {
-            return mStarSummaries.get(buildRequest.getStarKey());
+        public Star getStarForBuildRequest(BuildRequest buildRequest) {
+            return mStarSummaries.get(buildRequest.star_key);
         }
 
         public void refreshEntryProgress(ItemEntry entry) {
@@ -416,29 +414,29 @@ public class BuildQueueList extends FrameLayout
                                          ProgressBar progressBar,
                                          TextView progressText) {
             String prefix = String.format(Locale.ENGLISH, "<font color=\"#0c6476\">%s:</font> ",
-                    buildRequest.getExistingBuildingKey() == null ? "Building" : "Upgrading");
+                    buildRequest.existing_building_key == null ? "Building" : "Upgrading");
 
-            Duration remainingDuration = buildRequest.getRemainingTime();
+            Duration remainingDuration = Model.getRemainingTime(buildRequest);
             String msg;
             if (remainingDuration.equals(Duration.ZERO)) {
-                if (buildRequest.getPercentComplete() > 99.0) {
+                if (Model.getPercentComplete(buildRequest) > 99.0) {
                     msg = String.format(Locale.ENGLISH, "%s %d %%, almost done",
-                            prefix, (int) buildRequest.getPercentComplete());
+                            prefix, (int) Model.getPercentComplete(buildRequest));
                 } else {
                     msg = String.format(Locale.ENGLISH, "%s %d %%, not enough resources to complete.",
-                            prefix, (int) buildRequest.getPercentComplete());
+                            prefix, (int) Model.getPercentComplete(buildRequest));
                 }
             } else if (remainingDuration.getStandardMinutes() > 0) {
                 msg = String.format(Locale.ENGLISH, "%s %d %%, %s left",
-                                    prefix, (int) buildRequest.getPercentComplete(),
+                                    prefix, (int) Model.getPercentComplete(buildRequest),
                                     TimeInHours.format(remainingDuration));
             } else {
                 msg = String.format(Locale.ENGLISH, "%s %d %%, almost done",
-                                    prefix, (int) buildRequest.getPercentComplete());
+                                    prefix, (int) Model.getPercentComplete(buildRequest));
             }
             progressText.setText(Html.fromHtml(msg));
 
-            progressBar.setProgress((int) buildRequest.getPercentComplete());
+            progressBar.setProgress((int) Model.getPercentComplete(buildRequest));
         }
 
         @Override
@@ -461,7 +459,7 @@ public class BuildQueueList extends FrameLayout
                 ImageView planetIcon = (ImageView) view.findViewById(R.id.planet_icon);
                 TextView name = (TextView) view.findViewById(R.id.star_name);
 
-                int imageSize = (int)(entry.star.getSize() * entry.star.getStarType().getImageScale() * 2);
+                int imageSize = (int)(entry.star.size * StarType.get(entry.star).getImageScale() * 2);
                 if (entry.starDrawable == null) {
                     Sprite sprite = StarImageManager.getInstance().getSprite(entry.star, imageSize, true);
                     entry.starDrawable = new SpriteDrawable(sprite);
@@ -471,15 +469,15 @@ public class BuildQueueList extends FrameLayout
                 }
 
                 if (entry.planetDrawable == null) {
-                    Sprite sprite = PlanetImageManager.getInstance().getSprite(entry.planet);
+                    Sprite sprite = PlanetImageManager.getInstance().getSprite(entry.star, entry.planet);
                     entry.planetDrawable = new SpriteDrawable(sprite);
                 }
                 if (entry.planetDrawable != null) {
                     planetIcon.setImageDrawable(entry.planetDrawable);
                 }
 
-                name.setText(String.format(Locale.ENGLISH, "%s %s", entry.star.getName(),
-                             RomanNumeralFormatter.format(entry.planet.getIndex())));
+                name.setText(String.format(Locale.ENGLISH, "%s %s", entry.star.name,
+                             RomanNumeralFormatter.format(entry.planet.index)));
             } else {
                 ImageView icon = (ImageView) view.findViewById(R.id.building_icon);
                 TextView row1 = (TextView) view.findViewById(R.id.building_row1);
@@ -493,8 +491,8 @@ public class BuildQueueList extends FrameLayout
                 entry.progressText.setTag(entry);
                 entry.progressBar.setTag(entry);
 
-                Design design = DesignManager.i.getDesign(entry.buildRequest.getDesignKind(),
-                                                          entry.buildRequest.getDesignID());
+                Design design = DesignManager.i.getDesign(DesignKind.fromBuildKind(entry.buildRequest.build_kind),
+                                                          entry.buildRequest.design_id);
 
                 icon.setImageDrawable(new SpriteDrawable(SpriteManager.i.getSprite(design.getSpriteName())));
 
@@ -505,17 +503,17 @@ public class BuildQueueList extends FrameLayout
                     levelLabel.setVisibility(View.GONE);
                 }
 
-                if (entry.buildRequest.getCount() == 1) {
+                if (entry.buildRequest.count == 1) {
                     row1.setText(design.getDisplayName());
                 } else {
                     row1.setText(String.format("%d × %s",
-                            entry.buildRequest.getCount(), design.getDisplayName(entry.buildRequest.getCount() > 1)));
+                            entry.buildRequest.count, design.getDisplayName(entry.buildRequest.count > 1)));
                 }
 
                 row3.setVisibility(View.GONE);
                 entry.progressBar.setVisibility(View.VISIBLE);
 
-                if (mSelectedBuildRequest != null && mSelectedBuildRequest.getKey().equals(entry.buildRequest.getKey())) {
+                if (mSelectedBuildRequest != null && mSelectedBuildRequest.key.equals(entry.buildRequest.key)) {
                     view.setBackgroundColor(0xff0c6476);
                 } else {
                     view.setBackgroundColor(0xff000000);
@@ -528,7 +526,7 @@ public class BuildQueueList extends FrameLayout
         }
 
         private class ItemEntry {
-            public StarSummary star;
+            public Star star;
             public Planet planet;
             public SpriteDrawable starDrawable;
             public SpriteDrawable planetDrawable;
@@ -555,7 +553,7 @@ public class BuildQueueList extends FrameLayout
     }
 
     public interface BuildQueueActionListener {
-        void onAccelerateClick(StarSummary star, BuildRequest buildRequest);
-        void onStopClick(StarSummary star, BuildRequest buildRequest);
+        void onAccelerateClick(Star star, BuildRequest buildRequest);
+        void onStopClick(Star star, BuildRequest buildRequest);
     }
 }

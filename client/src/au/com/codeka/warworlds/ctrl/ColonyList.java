@@ -25,24 +25,24 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
-import au.com.codeka.Cash;
 import au.com.codeka.RomanNumeralFormatter;
-import au.com.codeka.common.model.BaseColony;
-import au.com.codeka.common.model.BaseEmpirePresence;
-import au.com.codeka.common.model.Simulation;
+import au.com.codeka.common.Cash;
+import au.com.codeka.common.model.Colony;
+import au.com.codeka.common.model.Empire;
+import au.com.codeka.common.model.EmpirePresence;
+import au.com.codeka.common.model.Model;
+import au.com.codeka.common.model.Planet;
+import au.com.codeka.common.model.Star;
+import au.com.codeka.common.sim.Simulation;
 import au.com.codeka.warworlds.R;
-import au.com.codeka.warworlds.model.Colony;
 import au.com.codeka.warworlds.model.EmpireManager;
-import au.com.codeka.warworlds.model.EmpirePresence;
 import au.com.codeka.warworlds.model.ImageManager;
-import au.com.codeka.warworlds.model.MyEmpire;
-import au.com.codeka.warworlds.model.Planet;
 import au.com.codeka.warworlds.model.PlanetImageManager;
 import au.com.codeka.warworlds.model.Sprite;
 import au.com.codeka.warworlds.model.SpriteDrawable;
-import au.com.codeka.warworlds.model.Star;
 import au.com.codeka.warworlds.model.StarImageManager;
 import au.com.codeka.warworlds.model.StarManager;
+import au.com.codeka.warworlds.model.StarType;
 
 public class ColonyList extends FrameLayout {
     private Context mContext;
@@ -75,7 +75,7 @@ public class ColonyList extends FrameLayout {
             mSelectedColony = null;
 
             for (Colony c : colonies) {
-                if (c.getKey().equals(selectedColony.getKey())) {
+                if (c.key.equals(selectedColony.key)) {
                     mSelectedColony = c;
                     break;
                 }
@@ -123,7 +123,7 @@ public class ColonyList extends FrameLayout {
             @Override
             public void onClick(View v) {
                 if (mSelectedColony != null && mColonyActionListener != null) {
-                    Star star = mStars.get(mSelectedColony.getStarKey());
+                    Star star = mStars.get(mSelectedColony.star_key);
                     mColonyActionListener.onViewColony(star, mSelectedColony);
                 }
             }
@@ -146,69 +146,70 @@ public class ColonyList extends FrameLayout {
         } else {
             // the colony might've changed so update it first
             for(ColonyListAdapter.ItemEntry entry : mColonyListAdapter.getEntries()) {
-                if (entry.colony != null && entry.colony.getKey().equals(mSelectedColony.getKey())) {
+                if (entry.colony != null && entry.colony.key.equals(mSelectedColony.key)) {
                     mSelectedColony = entry.colony;
                 }
             }
 
-            Star star = mStars.get(mSelectedColony.getStarKey());
-            Planet planet = (Planet) star.getPlanets()[mSelectedColony.getPlanetIndex() - 1];
+            Star star = mStars.get(mSelectedColony.star_key);
+            Planet planet = (Planet) star.planets.get(mSelectedColony.planet_index - 1);
             planetDetailsView.setup(star, planet, mSelectedColony);
         }
     }
 
     public static void populateColonyListRow(Context context, View view, Colony colony, Star star) {
-        Planet planet = (Planet) star.getPlanets()[colony.getPlanetIndex() - 1];
+        Planet planet = (Planet) star.planets.get(colony.planet_index - 1);
 
         ImageView planetIcon = (ImageView) view.findViewById(R.id.planet_icon);
         TextView colonyName = (TextView) view.findViewById(R.id.colony_name);
         TextView colonySummary = (TextView) view.findViewById(R.id.colony_summary);
         TextView uncollectedTaxes = (TextView) view.findViewById(R.id.colony_taxes);
 
-        Sprite sprite = PlanetImageManager.getInstance().getSprite(planet);
+        Sprite sprite = PlanetImageManager.getInstance().getSprite(star, planet);
         planetIcon.setImageDrawable(new SpriteDrawable(sprite));
 
-        colonyName.setText(String.format("%s %s", star.getName(), RomanNumeralFormatter.format(planet.getIndex())));
+        colonyName.setText(String.format("%s %s", star.name, RomanNumeralFormatter.format(planet.index)));
 
-        if (star.getLastSimulation().compareTo(DateTime.now(DateTimeZone.UTC).minusMinutes(5)) < 0) {
+        if (Model.toDateTime(star.last_simulation).isBefore(DateTime.now(DateTimeZone.UTC).minusMinutes(5))) {
             // if the star hasn't been simulated for > 5 minutes, just display ??? for the
             // various parameters (a simulation will be scheduled)
             colonySummary.setText("Pop: ?");
             uncollectedTaxes.setText("Taxes: ?");
         } else {
-            colonySummary.setText(String.format("Pop: %d", (int) colony.getPopulation()));
-            uncollectedTaxes.setText(String.format("Taxes: %s", Cash.format(colony.getUncollectedTaxes())));
+            colonySummary.setText(String.format("Pop: %d", (int) (float) colony.population));
+            uncollectedTaxes.setText(String.format("Taxes: %s", Cash.format(colony.uncollected_taxes)));
         }
     }
 
     private static void populateColonyListStarRow(Context context, View view, Star star) {
         ImageView starIcon = (ImageView) view.findViewById(R.id.star_icon);
         TextView starName = (TextView) view.findViewById(R.id.star_name);
-        TextView starType = (TextView) view.findViewById(R.id.star_type);
+        TextView starTypeName = (TextView) view.findViewById(R.id.star_type);
         TextView starGoodsDelta = (TextView) view.findViewById(R.id.star_goods_delta);
         TextView starGoodsTotal = (TextView) view.findViewById(R.id.star_goods_total);
         TextView starMineralsDelta = (TextView) view.findViewById(R.id.star_minerals_delta);
         TextView starMineralsTotal = (TextView) view.findViewById(R.id.star_minerals_total);
 
-        int imageSize = (int)(star.getSize() * star.getStarType().getImageScale() * 2);
+        StarType starType = StarType.get(star);
+        int imageSize = (int)(star.size * starType.getImageScale() * 2);
         Sprite sprite = StarImageManager.getInstance().getSprite(star, imageSize, true);
         starIcon.setImageDrawable(new SpriteDrawable(sprite));
 
-        starName.setText(star.getName());
-        starType.setText(star.getStarType().getDisplayName());
+        starName.setText(star.name);
+        starTypeName.setText(starType.getDisplayName());
 
-        MyEmpire myEmpire = EmpireManager.i.getEmpire();
+        Empire myEmpire = EmpireManager.i.getEmpire();
         EmpirePresence empirePresence = null;
-        for (BaseEmpirePresence baseEmpirePresence : star.getEmpirePresences()) {
-            if (baseEmpirePresence.getEmpireKey().equals(myEmpire.getKey())) {
-                empirePresence = (EmpirePresence) baseEmpirePresence;
+        for (EmpirePresence ep : star.empires) {
+            if (ep.empire_key != null && ep.empire_key.equals(myEmpire.key)) {
+                empirePresence = ep;
                 break;
             }
         }
 
-        boolean needSimulation = star.getLastSimulation().compareTo(DateTime.now(DateTimeZone.UTC).minusMinutes(5)) < 0;
+        boolean needSimulation = Model.toDateTime(star.last_simulation).isBefore(DateTime.now(DateTimeZone.UTC).minusMinutes(5));
         if (!needSimulation && empirePresence != null) {
-            if (empirePresence.getDeltaGoodsPerHour() == 0.0f && empirePresence.getDeltaMineralsPerHour() == 0.0f) {
+            if (empirePresence.goods_delta_per_hour == 0.0f && empirePresence.minerals_delta_per_hour == 0.0f) {
                 // this is so unlikely, it's probably because we didn't simulate.
                 needSimulation = true;
             }
@@ -224,37 +225,37 @@ public class ColonyList extends FrameLayout {
             scheduleSimulate(star);
         } else {
             starGoodsDelta.setText(String.format(Locale.ENGLISH, "%s%d/hr",
-                    empirePresence.getDeltaGoodsPerHour() < 0 ? "-" : "+",
-                    Math.abs(Math.round(empirePresence.getDeltaGoodsPerHour()))));
-            if (empirePresence.getDeltaGoodsPerHour() < 0) {
+                    empirePresence.goods_delta_per_hour < 0 ? "-" : "+",
+                    Math.abs(Math.round(empirePresence.goods_delta_per_hour))));
+            if (empirePresence.goods_delta_per_hour < 0) {
                 starGoodsDelta.setTextColor(Color.RED);
             } else {
                 starGoodsDelta.setTextColor(Color.GREEN);
             }
             starGoodsTotal.setText(String.format(Locale.ENGLISH, "%d / %d",
-                    Math.round(empirePresence.getTotalGoods()),
-                    Math.round(empirePresence.getMaxGoods())));
+                    Math.round(empirePresence.total_goods),
+                    Math.round(empirePresence.max_goods)));
 
             starMineralsDelta.setText(String.format(Locale.ENGLISH, "%s%d/hr",
-                    empirePresence.getDeltaMineralsPerHour() < 0 ? "-" : "+",
-                    Math.abs(Math.round(empirePresence.getDeltaMineralsPerHour()))));
-            if (empirePresence.getDeltaMineralsPerHour() < 0) {
+                    empirePresence.minerals_delta_per_hour < 0 ? "-" : "+",
+                    Math.abs(Math.round(empirePresence.minerals_delta_per_hour))));
+            if (empirePresence.minerals_delta_per_hour < 0) {
                 starMineralsDelta.setTextColor(Color.RED);
             } else {
                 starMineralsDelta.setTextColor(Color.GREEN);
             }
             starMineralsTotal.setText(String.format(Locale.ENGLISH, "%d / %d",
-                    Math.round(empirePresence.getTotalMinerals()),
-                    Math.round(empirePresence.getMaxMinerals())));
+                    Math.round(empirePresence.total_minerals),
+                    Math.round(empirePresence.max_minerals)));
         }
     }
 
     private static void scheduleSimulate(final Star star) {
         synchronized(sSimulatingStars) {
-            if (sSimulatingStars.contains(star.getKey())) {
+            if (sSimulatingStars.contains(star.key)) {
                 return;
             }
-            sSimulatingStars.add(star.getKey());
+            sSimulatingStars.add(star.key);
         }
 
         new AsyncTask<Void, Void, Star>() {
@@ -267,8 +268,8 @@ public class ColonyList extends FrameLayout {
 
             @Override
             protected void onPostExecute(Star star) {
-                StarManager.getInstance().fireStarUpdated(star);
-                sSimulatingStars.remove(star.getKey());
+                StarManager.i.fireStarUpdated(star);
+                sSimulatingStars.remove(star.key);
             }
         }.execute();
     }
@@ -296,15 +297,15 @@ public class ColonyList extends FrameLayout {
                     notifyDataSetChanged();
                 }
             });
-            StarManager.getInstance().addStarUpdatedListener(null, new StarManager.StarFetchedHandler() {
+            StarManager.i.addStarUpdatedListener(null, new StarManager.StarFetchedHandler() {
                 @Override
                 public void onStarFetched(Star s) {
                     // if a star is updated, we'll want to refresh our colony list because the
                     // colony inside it might've changed too...
-                    for (BaseColony starColony : s.getColonies()) {
+                    for (Colony starColony : s.colonies) {
                         for (int i = 0; i < mEntries.size(); i++) {
                             ItemEntry entry = mEntries.get(i);
-                            if (entry.colony != null && entry.colony.getKey().equals(starColony.getKey())) {
+                            if (entry.colony != null && entry.colony.key.equals(starColony.key)) {
                                 entry.colony = (Colony) starColony;
                                 break;
                             }
@@ -313,7 +314,7 @@ public class ColonyList extends FrameLayout {
 
                     for (int i = 0; i < mEntries.size(); i++) {
                         ItemEntry entry = mEntries.get(i);
-                        if (entry.star != null && entry.star.getKey().equals(s.getKey())) {
+                        if (entry.star != null && entry.star.key.equals(s.key)) {
                             entry.star = s;
                         }
                     }
@@ -335,20 +336,20 @@ public class ColonyList extends FrameLayout {
                 @Override
                 public int compare(Colony lhs, Colony rhs) {
                     // sort by star, then by planet index
-                    if (!lhs.getStarKey().equals(rhs.getStarKey())) {
-                        Star lhsStar = mStars.get(lhs.getStarKey());
-                        Star rhsStar = mStars.get(rhs.getStarKey());
-                        return lhsStar.getName().compareTo(rhsStar.getName());
+                    if (!lhs.star_key.equals(rhs.star_key)) {
+                        Star lhsStar = mStars.get(lhs.star_key);
+                        Star rhsStar = mStars.get(rhs.star_key);
+                        return lhsStar.name.compareTo(rhsStar.name);
                     } else {
-                        return lhs.getPlanetIndex() - rhs.getPlanetIndex();
+                        return lhs.planet_index - rhs.planet_index;
                     }
                 }
             });
 
             Star lastStar = null;
             for (Colony colony : colonies) {
-                if (lastStar == null || !lastStar.getKey().equals(colony.getStarKey())) {
-                    lastStar = mStars.get(colony.getStarKey());
+                if (lastStar == null || !lastStar.key.equals(colony.star_key)) {
+                    lastStar = mStars.get(colony.star_key);
                     mEntries.add(new ItemEntry(lastStar));
                 }
                 mEntries.add(new ItemEntry(colony));
@@ -423,10 +424,10 @@ public class ColonyList extends FrameLayout {
                 populateColonyListStarRow(mContext, view, entry.star);
             } else {
                 Colony colony = entry.colony;
-                Star star = mStars.get(colony.getStarKey());
+                Star star = mStars.get(colony.star_key);
                 populateColonyListRow(mContext, view, colony, star);
 
-                if (mSelectedColony != null && mSelectedColony.getKey().equals(colony.getKey())) {
+                if (mSelectedColony != null && mSelectedColony.key.equals(colony.key)) {
                     view.setBackgroundColor(0xff0c6476);
                 } else {
                     view.setBackgroundColor(0xff000000);

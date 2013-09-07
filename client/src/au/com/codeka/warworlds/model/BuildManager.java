@@ -6,13 +6,17 @@ import java.util.TreeMap;
 
 import android.content.Context;
 import au.com.codeka.BackgroundRunner;
+import au.com.codeka.common.design.Design;
+import au.com.codeka.common.design.DesignKind;
+import au.com.codeka.common.model.BuildRequest;
+import au.com.codeka.common.model.Building;
+import au.com.codeka.common.model.Colony;
+import au.com.codeka.common.model.EmpireBuildingStatistics;
+import au.com.codeka.common.model.SituationReport;
+import au.com.codeka.common.model.Star;
 import au.com.codeka.warworlds.StyledDialog;
 import au.com.codeka.warworlds.api.ApiClient;
 import au.com.codeka.warworlds.api.ApiException;
-import au.com.codeka.common.model.BaseBuildRequest;
-import au.com.codeka.common.model.Design;
-import au.com.codeka.common.model.DesignKind;
-import au.com.codeka.common.protobuf.Messages;
 
 public class BuildManager {
     private static BuildManager sInstance = new BuildManager();
@@ -28,19 +32,14 @@ public class BuildManager {
         mBuildRequests = new ArrayList<BuildRequest>();
     }
 
-    public void setup(Messages.EmpireBuildingStatistics empire_building_statistics_pb,
-                      List<Messages.BuildRequest> build_request_pbs) {
+    public void setup(EmpireBuildingStatistics empire_building_statistics_pb,
+                      List<BuildRequest> buildRequests) {
         mBuildingDesignCounts.clear();
-        for (Messages.EmpireBuildingStatistics.DesignCount design_count_pb : empire_building_statistics_pb.getCountsList()) {
-            mBuildingDesignCounts.put(design_count_pb.getDesignId(), design_count_pb.getNumBuildings());
+        for (EmpireBuildingStatistics.DesignCount design_count_pb : empire_building_statistics_pb.counts) {
+            mBuildingDesignCounts.put(design_count_pb.design_id, design_count_pb.num_buildings);
         }
 
-        mBuildRequests.clear();
-        for (Messages.BuildRequest build_request_pb : build_request_pbs) {
-            BuildRequest br = new BuildRequest();
-            br.fromProtocolBuffer(build_request_pb);
-            mBuildRequests.add(br);
-        }
+        mBuildRequests = new ArrayList<BuildRequest>(buildRequests);
     }
 
     public int getTotalBuildingsInEmpire(String designId) {
@@ -59,13 +58,12 @@ public class BuildManager {
      * Called when we get a situation report from the server. If it's a build complete, say, we'll
      * need to update our cache of things building...
      */
-    public void notifySituationReport(Messages.SituationReport sitrep) {
-        if (sitrep.getBuildCompleteRecord() != null &&
-                sitrep.getBuildCompleteRecord().getBuildRequestKey() != null &&
-                sitrep.getBuildCompleteRecord().getBuildRequestKey().length() > 0) {
-            String buildRequestKey = sitrep.getBuildCompleteRecord().getBuildRequestKey();
+    public void notifySituationReport(SituationReport sitrep) {
+        if (sitrep.build_complete_record != null &&
+                sitrep.build_complete_record.build_request_key != null) {
+            String buildRequestKey = sitrep.build_complete_record.build_request_key;
             for (int i = 0; i < mBuildRequests.size(); i++) {
-                if (mBuildRequests.get(i).getKey().equals(buildRequestKey)) {
+                if (mBuildRequests.get(i).key.equals(buildRequestKey)) {
                     mBuildRequests.remove(i);
                     break;
                 }
@@ -79,13 +77,13 @@ public class BuildManager {
     public void onStarUpdate(Star star) {
         ArrayList<BuildRequest> newBuildRequests = new ArrayList<BuildRequest>();
         for (BuildRequest br : mBuildRequests) {
-            if (br.getStarKey().equals(star.getKey())) {
+            if (br.star_key.equals(star.key)) {
                 continue;
             }
             newBuildRequests.add(br);
         }
-        for (BaseBuildRequest br : star.getBuildRequests()) {
-            newBuildRequests.add((BuildRequest) br);
+        if (star.build_requests != null) for (BuildRequest br : star.build_requests) {
+            newBuildRequests.add(br);
         }
         mBuildRequests = newBuildRequests;
     }
@@ -98,28 +96,24 @@ public class BuildManager {
 
             @Override
             protected BuildRequest doInBackground() {
-                Messages.BuildRequest.BUILD_KIND kind;
+                BuildRequest.BUILD_KIND kind;
                 if (design.getDesignKind() == DesignKind.BUILDING) {
-                    kind = Messages.BuildRequest.BUILD_KIND.BUILDING;
+                    kind = BuildRequest.BUILD_KIND.BUILDING;
                 } else {
-                    kind = Messages.BuildRequest.BUILD_KIND.SHIP;
+                    kind = BuildRequest.BUILD_KIND.SHIP;
                 }
 
-                Messages.BuildRequest build = Messages.BuildRequest.newBuilder()
-                        .setBuildKind(kind)
-                        .setStarKey(colony.getStarKey())
-                        .setColonyKey(colony.getKey())
-                        .setEmpireKey(colony.getEmpireKey())
-                        .setDesignName(design.getID())
-                        .setCount(count)
-                        .setExistingBuildingKey(existingBuilding == null ? "" : existingBuilding.getKey())
+                BuildRequest build = new BuildRequest.Builder()
+                        .build_kind(kind)
+                        .star_key(colony.star_key)
+                        .colony_key(colony.key)
+                        .empire_key(colony.empire_key)
+                        .design_id(design.getID())
+                        .count(count)
+                        .existing_building_key(existingBuilding == null ? "" : existingBuilding.key)
                         .build();
                 try {
-                    build = ApiClient.postProtoBuf("buildqueue", build, Messages.BuildRequest.class);
-
-                    BuildRequest br = new BuildRequest();
-                    br.fromProtocolBuffer(build);
-                    return br;
+                    return ApiClient.postProtoBuf("buildqueue", build, BuildRequest.class);
                 } catch (ApiException e) {
                     if (e.getServerErrorCode() > 0) {
                         mErrorCode = e.getServerErrorCode();
@@ -146,7 +140,7 @@ public class BuildManager {
                 } else if (buildRequest != null) {
                     mBuildRequests.add(buildRequest);
 
-                    StarManager.getInstance().refreshStar(colony.getStarKey());
+                    StarManager.i.refreshStar(colony.star_key);
                 }
             }
         }.execute();

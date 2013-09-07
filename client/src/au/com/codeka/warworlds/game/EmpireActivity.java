@@ -23,10 +23,12 @@ import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
-import au.com.codeka.common.model.BaseColony;
-import au.com.codeka.common.model.BaseFleet;
-import au.com.codeka.common.model.BasePlanet;
-import au.com.codeka.common.protobuf.Messages;
+import au.com.codeka.common.model.BuildRequest;
+import au.com.codeka.common.model.Colony;
+import au.com.codeka.common.model.Empire;
+import au.com.codeka.common.model.Fleet;
+import au.com.codeka.common.model.Planet;
+import au.com.codeka.common.model.Star;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.ServerGreeter;
 import au.com.codeka.warworlds.ServerGreeter.ServerGreeting;
@@ -37,21 +39,16 @@ import au.com.codeka.warworlds.ctrl.ColonyList;
 import au.com.codeka.warworlds.ctrl.EmpireRankList;
 import au.com.codeka.warworlds.ctrl.FleetList;
 import au.com.codeka.warworlds.model.BuildManager;
-import au.com.codeka.warworlds.model.BuildRequest;
-import au.com.codeka.warworlds.model.Colony;
-import au.com.codeka.warworlds.model.Empire;
+import au.com.codeka.warworlds.model.EmpireHelper;
 import au.com.codeka.warworlds.model.EmpireManager;
-import au.com.codeka.warworlds.model.Fleet;
-import au.com.codeka.warworlds.model.MyEmpire;
-import au.com.codeka.warworlds.model.Star;
-import au.com.codeka.warworlds.model.StarSummary;
+import au.com.codeka.warworlds.model.MyEmpireManager;
 
 /**
  * This dialog shows the status of the empire. You can see all your colonies, all your fleets, etc.
  */
 public class EmpireActivity extends TabFragmentActivity
                             implements EmpireManager.EmpireFetchedHandler {
-    private static MyEmpire sCurrentEmpire;
+    private static Empire sCurrentEmpire;
     private static Map<String, Star> sStars;
 
     Context mContext = this;
@@ -117,8 +114,8 @@ public class EmpireActivity extends TabFragmentActivity
                     return;
                 }
 
-                MyEmpire myEmpire = EmpireManager.i.getEmpire();
-                EmpireManager.i.addEmpireUpdatedListener(myEmpire.getKey(), EmpireActivity.this);
+                Empire myEmpire = EmpireManager.i.getEmpire();
+                EmpireManager.i.addEmpireUpdatedListener(myEmpire.key, EmpireActivity.this);
                 EmpireManager.i.refreshEmpire();
             }
         });
@@ -132,18 +129,18 @@ public class EmpireActivity extends TabFragmentActivity
 
     @Override
     public void onEmpireFetched(Empire empire) {
-        MyEmpire myEmpire = EmpireManager.i.getEmpire();
-        if (myEmpire.getKey().equals(empire.getKey())) {
-            sCurrentEmpire = (MyEmpire) empire;
+        Empire myEmpire = EmpireManager.i.getEmpire();
+        if (myEmpire.key.equals(empire.key)) {
+            sCurrentEmpire = (Empire) empire;
             getTabManager().reloadTab();
             mFirstRefresh = false;
 
-            sCurrentEmpire.requestStars(new MyEmpire.FetchStarsCompleteHandler() {
+            MyEmpireManager.i.requestStars(new MyEmpireManager.FetchStarsCompleteHandler() {
                 @Override
                 public void onComplete(List<Star> stars) {
                     TreeMap<String, Star> starMap = new TreeMap<String, Star>();
                     for (Star s : stars) {
-                        starMap.put(s.getKey(), s);
+                        starMap.put(s.key, s);
                     }
                     sStars = starMap;
                     getTabManager().reloadTab();
@@ -175,16 +172,16 @@ public class EmpireActivity extends TabFragmentActivity
             mView = inflator.inflate(R.layout.empire_overview_tab, null);
             mEmpireList = (EmpireRankList) mView.findViewById(R.id.empire_rankings);
 
-            MyEmpire empire = EmpireManager.i.getEmpire();
+            Empire empire = EmpireManager.i.getEmpire();
 
             TextView empireName = (TextView) mView.findViewById(R.id.empire_name);
             ImageView empireIcon = (ImageView) mView.findViewById(R.id.empire_icon);
             TextView allianceName = (TextView) mView.findViewById(R.id.alliance_name);
 
-            empireName.setText(empire.getDisplayName());
-            empireIcon.setImageBitmap(empire.getShield(getActivity()));
-            if (empire.getAlliance() != null) {
-                allianceName.setText(empire.getAlliance().getName());
+            empireName.setText(empire.display_name);
+            empireIcon.setImageBitmap(EmpireHelper.getShield(getActivity(), empire));
+            if (empire.alliance != null) {
+                allianceName.setText(empire.alliance.name);
             } else {
                 allianceName.setText("");
             }
@@ -200,16 +197,16 @@ public class EmpireActivity extends TabFragmentActivity
                     Empire empire = mEmpireList.getEmpireAt(position);
                     if (empire != null) {
                         Intent intent = new Intent(getActivity(), EnemyEmpireActivity.class);
-                        intent.putExtra("au.com.codeka.warworlds.EmpireKey", empire.getKey());
+                        intent.putExtra("au.com.codeka.warworlds.EmpireKey", empire.key);
                         getActivity().startActivity(intent);
                     }
                 }
             });
 
-            MyEmpire myEmpire = EmpireManager.i.getEmpire();
+            Empire myEmpire = EmpireManager.i.getEmpire();
             int minRank = 1;
-            if (myEmpire.getRank() != null) {
-              int myRank = myEmpire.getRank().getRank();
+            if (myEmpire.rank != null) {
+              int myRank = myEmpire.rank.rank;
               minRank = myRank - 2;
             }
             if (minRank < 1) {
@@ -284,8 +281,8 @@ public class EmpireActivity extends TabFragmentActivity
 
             ArrayList<Colony> colonies = new ArrayList<Colony>();
             for (Star s : sStars.values()) {
-                for (BaseColony c : s.getColonies()) {
-                    if (c.getEmpireKey() != null && c.getEmpireKey().equals(sCurrentEmpire.getKey())) {
+                for (Colony c : s.colonies) {
+                    if (c.empire_key != null && c.empire_key.equals(sCurrentEmpire.key)) {
                         colonies.add((Colony) c);
                     }
                 }
@@ -298,24 +295,24 @@ public class EmpireActivity extends TabFragmentActivity
             colonyList.setOnColonyActionListener(new ColonyList.ColonyActionHandler() {
                 @Override
                 public void onViewColony(Star star, Colony colony) {
-                    BasePlanet planet = star.getPlanets()[colony.getPlanetIndex() - 1];
+                    Planet planet = star.planets.get(colony.planet_index - 1);
                     // end this activity, go back to the starfield and navigate to the given colony
 
                     Intent intent = new Intent();
                     intent.putExtra("au.com.codeka.warworlds.Result", EmpireActivityResult.NavigateToPlanet.getValue());
-                    intent.putExtra("au.com.codeka.warworlds.SectorX", star.getSectorX());
-                    intent.putExtra("au.com.codeka.warworlds.SectorY", star.getSectorY());
-                    intent.putExtra("au.com.codeka.warworlds.StarOffsetX", star.getOffsetX());
-                    intent.putExtra("au.com.codeka.warworlds.StarOffsetY", star.getOffsetY());
-                    intent.putExtra("au.com.codeka.warworlds.StarKey", star.getKey());
-                    intent.putExtra("au.com.codeka.warworlds.PlanetIndex", planet.getIndex());
+                    intent.putExtra("au.com.codeka.warworlds.SectorX", star.sector_x);
+                    intent.putExtra("au.com.codeka.warworlds.SectorY", star.sector_y);
+                    intent.putExtra("au.com.codeka.warworlds.StarOffsetX", star.offset_x);
+                    intent.putExtra("au.com.codeka.warworlds.StarOffsetY", star.offset_y);
+                    intent.putExtra("au.com.codeka.warworlds.StarKey", star.key);
+                    intent.putExtra("au.com.codeka.warworlds.PlanetIndex", planet.index);
                     getActivity().setResult(RESULT_OK, intent);
                     getActivity().finish();
                 }
 
                 @Override
                 public void onCollectTaxes() {
-                    EmpireManager.i.getEmpire().collectTaxes();
+                    MyEmpireManager.i.collectTaxes();
                 }
             });
 
@@ -334,14 +331,14 @@ public class EmpireActivity extends TabFragmentActivity
             buildQueueList.refresh(BuildManager.getInstance().getBuildRequests());
             buildQueueList.setBuildQueueActionListener(new BuildQueueList.BuildQueueActionListener() {
                 @Override
-                public void onAccelerateClick(StarSummary star, BuildRequest buildRequest) {
+                public void onAccelerateClick(Star star, BuildRequest buildRequest) {
                     BuildAccelerateDialog dialog = new BuildAccelerateDialog();
                     dialog.setBuildRequest(star, buildRequest);
                     dialog.show(getActivity().getSupportFragmentManager(), "");
                 }
 
                 @Override
-                public void onStopClick(StarSummary star, BuildRequest buildRequest) {
+                public void onStopClick(Star star, BuildRequest buildRequest) {
                     BuildStopConfirmDialog dialog = new BuildStopConfirmDialog();
                     dialog.setBuildRequest(star, buildRequest);
                     dialog.show(getActivity().getSupportFragmentManager(), "");
@@ -359,10 +356,10 @@ public class EmpireActivity extends TabFragmentActivity
                 return getLoadingView(inflator);
             }
 
-            ArrayList<BaseFleet> fleets = new ArrayList<BaseFleet>();
+            ArrayList<Fleet> fleets = new ArrayList<Fleet>();
             for (Star s : sStars.values()) {
-                for (BaseFleet f : s.getFleets()) {
-                    if (f.getEmpireKey() != null && f.getEmpireKey().equals(sCurrentEmpire.getKey())) {
+                for (Fleet f : s.fleets) {
+                    if (f.empire_key != null && f.empire_key.equals(sCurrentEmpire.key)) {
                         fleets.add(f);
                     }
                 }
@@ -385,12 +382,12 @@ public class EmpireActivity extends TabFragmentActivity
                 public void onFleetView(Star star, Fleet fleet) {
                     Intent intent = new Intent();
                     intent.putExtra("au.com.codeka.warworlds.Result", EmpireActivityResult.NavigateToFleet.getValue());
-                    intent.putExtra("au.com.codeka.warworlds.SectorX", star.getSectorX());
-                    intent.putExtra("au.com.codeka.warworlds.SectorY", star.getSectorY());
-                    intent.putExtra("au.com.codeka.warworlds.StarOffsetX", star.getOffsetX());
-                    intent.putExtra("au.com.codeka.warworlds.StarOffsetY", star.getOffsetY());
-                    intent.putExtra("au.com.codeka.warworlds.StarKey", star.getKey());
-                    intent.putExtra("au.com.codeka.warworlds.FleetKey", fleet.getKey());
+                    intent.putExtra("au.com.codeka.warworlds.SectorX", star.sector_x);
+                    intent.putExtra("au.com.codeka.warworlds.SectorY", star.sector_y);
+                    intent.putExtra("au.com.codeka.warworlds.StarOffsetX", star.offset_x);
+                    intent.putExtra("au.com.codeka.warworlds.StarOffsetY", star.offset_y);
+                    intent.putExtra("au.com.codeka.warworlds.StarKey", star.key);
+                    intent.putExtra("au.com.codeka.warworlds.FleetKey", fleet.key);
                     getActivity().setResult(RESULT_OK, intent);
                     getActivity().finish();
                 }
@@ -398,10 +395,7 @@ public class EmpireActivity extends TabFragmentActivity
                 @Override
                 public void onFleetSplit(Star star, Fleet fleet) {
                     Bundle args = new Bundle();
-
-                    Messages.Fleet.Builder fleet_pb = Messages.Fleet.newBuilder();
-                    fleet.toProtocolBuffer(fleet_pb);
-                    args.putByteArray("au.com.codeka.warworlds.Fleet", fleet_pb.build().toByteArray());
+                    args.putByteArray("au.com.codeka.warworlds.Fleet", fleet.toByteArray());
 
                     FragmentManager fm = getActivity().getSupportFragmentManager();
                     FleetSplitDialog dialog = new FleetSplitDialog();
@@ -426,8 +420,8 @@ public class EmpireActivity extends TabFragmentActivity
                 }
 
                 @Override
-                public void onFleetStanceModified(Star star, Fleet fleet, Fleet.Stance newStance) {
-                    EmpireManager.i.getEmpire().updateFleetStance(star, fleet, newStance);
+                public void onFleetStanceModified(Star star, Fleet fleet, Fleet.FLEET_STANCE newStance) {
+                    MyEmpireManager.i.updateFleetStance(star, fleet, newStance);
                 }
             });
 

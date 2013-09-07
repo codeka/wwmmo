@@ -3,6 +3,7 @@ package au.com.codeka.warworlds.model;
 import java.util.Random;
 
 import au.com.codeka.common.Vector3;
+import au.com.codeka.common.model.Star;
 import au.com.codeka.planetrender.Template;
 
 public class StarImageManager extends ImageManager {
@@ -15,20 +16,21 @@ public class StarImageManager extends ImageManager {
     /**
      * Gets the \c Bitmap for the given star.
      */
-    public Sprite getSprite(StarSummary star, int size, boolean forceGeneric) {
-        StarExtra starExtra = new StarExtra(star);
+    public Sprite getSprite(Star starSummary, int size, boolean forceGeneric) {
+        StarExtra starExtra = new StarExtra(starSummary);
         Sprite sprite = null;
         if (size > 0 && !forceGeneric) {
-            sprite = getSprite(star.getKey(), size, starExtra);
+            sprite = getSprite(starSummary.key, size, starExtra);
         }
 
         if (sprite == null) {
-            double realSize = size * star.getStarType().getImageScale();
-            String spriteName = "star."+(realSize > 250 ? "big." : "small.")+star.getStarType().getInternalName();
+            StarType starType = StarType.get(starSummary);
+            double realSize = size * starType.getImageScale();
+            String spriteName = "star."+(realSize > 250 ? "big." : "small.")+starType.getInternalName();
             sprite = SpriteManager.i.getSprite(spriteName);
 
             if (sprite.getNumFrames() > 1) {
-                int frameNo = new Random(star.hashCode()).nextInt(sprite.getNumFrames());
+                int frameNo = new Random(starSummary.hashCode()).nextInt(sprite.getNumFrames());
                 sprite = sprite.extractFrame(frameNo);
             }
         }
@@ -41,7 +43,8 @@ public class StarImageManager extends ImageManager {
      */
     protected Template getTemplate(Object extra) {
         StarExtra starExtra = (StarExtra) extra;
-        return loadTemplate(starExtra.star.getStarType().getBitmapBasePath(), starExtra.star.getKey());
+        StarType starType = StarType.get(starExtra.starSummary);
+        return loadTemplate(starType.getBitmapBasePath(), starExtra.starSummary.key);
     }
 
     @Override
@@ -53,14 +56,15 @@ public class StarImageManager extends ImageManager {
     @Override
     protected double getPlanetSize(Object extra) {
         StarExtra starExtra = (StarExtra) extra;
-        return starExtra.star.getStarType().getBaseSize();
+        StarType starType = StarType.get(starExtra.starSummary);
+        return starType.getBaseSize();
     }
 
     private static class StarExtra {
-        public StarSummary star;
+        public Star starSummary;
 
-        public StarExtra(StarSummary star) {
-            this.star = star;
+        public StarExtra(Star starSummary) {
+            this.starSummary = starSummary;
         }
     }
 }

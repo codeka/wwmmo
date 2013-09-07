@@ -1,5 +1,6 @@
 package au.com.codeka.warworlds.game.alliance;
 
+import java.io.IOException;
 import java.text.DecimalFormat;
 
 import android.content.Intent;
@@ -10,19 +11,17 @@ import android.view.Window;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
-import au.com.codeka.common.model.BaseEmpireRank;
-import au.com.codeka.common.model.BaseStar;
-import au.com.codeka.common.protobuf.Messages;
+import au.com.codeka.common.model.Alliance;
+import au.com.codeka.common.model.Empire;
+import au.com.codeka.common.model.EmpireRank;
+import au.com.codeka.common.model.Model;
+import au.com.codeka.common.model.Star;
 import au.com.codeka.warworlds.BaseActivity;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.game.starfield.StarfieldActivity;
-import au.com.codeka.warworlds.model.Alliance;
 import au.com.codeka.warworlds.model.AllianceManager;
-import au.com.codeka.warworlds.model.Empire;
+import au.com.codeka.warworlds.model.EmpireHelper;
 import au.com.codeka.warworlds.model.EmpireManager;
-import au.com.codeka.warworlds.model.MyEmpire;
-
-import com.google.protobuf.InvalidProtocolBufferException;
 
 public class AllianceMemberDetailsActivity extends BaseActivity
                                            implements AllianceManager.AllianceUpdatedHandler,
@@ -44,10 +43,8 @@ public class AllianceMemberDetailsActivity extends BaseActivity
             byte[] alliance_bytes = extras.getByteArray("au.com.codeka.warworlds.Alliance");
             if (alliance_bytes != null) {
                 try {
-                    Messages.Alliance alliance_pb = Messages.Alliance.parseFrom(alliance_bytes);
-                    mAlliance = new Alliance();
-                    mAlliance.fromProtocolBuffer(alliance_pb);
-                } catch (InvalidProtocolBufferException e) {
+                    mAlliance = Model.wire.parseFrom(alliance_bytes, Alliance.class);
+                } catch (IOException e) {
                 }
             }
 
@@ -82,7 +79,7 @@ public class AllianceMemberDetailsActivity extends BaseActivity
 
     @Override
     public void onEmpireFetched(Empire empire) {
-        if (mEmpireKey.equals(empire.getKey())) {
+        if (mEmpireKey.equals(empire.key)) {
             mEmpire = empire;
             refresh();
         }
@@ -90,15 +87,15 @@ public class AllianceMemberDetailsActivity extends BaseActivity
 
     @Override
     public void onAllianceUpdated(Alliance alliance) {
-        if (alliance.getID() == mAllianceID) {
+        if (Integer.parseInt(alliance.key) == mAllianceID) {
             mAlliance = alliance;
             refresh();
         }
     }
 
     private void fullRefresh() {
-        Alliance myAlliance = (Alliance) EmpireManager.i.getEmpire().getAlliance();
-        if (myAlliance == null || myAlliance.getID() != mAllianceID) {
+        Alliance myAlliance = (Alliance) EmpireManager.i.getEmpire().alliance;
+        if (myAlliance == null || Integer.parseInt(myAlliance.key) != mAllianceID) {
             setContentView(R.layout.alliance_member_details_enemy);
         } else {
             setContentView(R.layout.alliance_member_details_mine);
@@ -108,13 +105,13 @@ public class AllianceMemberDetailsActivity extends BaseActivity
         viewBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                BaseStar star = mEmpire.getHomeStar();
+                Star star = mEmpire.home_star;
                 Intent intent = new Intent(AllianceMemberDetailsActivity.this, StarfieldActivity.class);
-                intent.putExtra("au.com.codeka.warworlds.StarKey", star.getKey());
-                intent.putExtra("au.com.codeka.warworlds.SectorX", star.getSectorX());
-                intent.putExtra("au.com.codeka.warworlds.SectorY", star.getSectorY());
-                intent.putExtra("au.com.codeka.warworlds.OffsetX", star.getOffsetX());
-                intent.putExtra("au.com.codeka.warworlds.OffsetY", star.getOffsetY());
+                intent.putExtra("au.com.codeka.warworlds.StarKey", star.key);
+                intent.putExtra("au.com.codeka.warworlds.SectorX", star.sector_x);
+                intent.putExtra("au.com.codeka.warworlds.SectorY", star.sector_y);
+                intent.putExtra("au.com.codeka.warworlds.OffsetX", star.offset_x);
+                intent.putExtra("au.com.codeka.warworlds.OffsetY", star.offset_y);
                 startActivity(intent);
             }
         });
@@ -142,22 +139,22 @@ public class AllianceMemberDetailsActivity extends BaseActivity
         Button kickBtn = (Button) findViewById(R.id.kick_btn);
 
         DecimalFormat formatter = new DecimalFormat("#,##0");
-        empireName.setText(mEmpire.getDisplayName());
-        empireIcon.setImageBitmap(mEmpire.getShield(this));
+        empireName.setText(mEmpire.display_name);
+        empireIcon.setImageBitmap(EmpireHelper.getShield(this, mEmpire));
 
-        BaseEmpireRank rank = mEmpire.getRank();
+        EmpireRank rank = mEmpire.rank;
         if (rank != null) {
             totalStars.setText(Html.fromHtml(String.format("Stars: <b>%s</b>",
-                    formatter.format(rank.getTotalStars()))));
+                    formatter.format(rank.total_stars))));
             totalColonies.setText(Html.fromHtml(String.format("Colonies: <b>%s</b>",
-                    formatter.format(rank.getTotalColonies()))));
+                    formatter.format(rank.total_colonies))));
 
-            MyEmpire myEmpire = EmpireManager.i.getEmpire();
-            if (mEmpire.getKey().equals(myEmpire.getKey()) || rank.getTotalStars() >= 10) {
+            Empire myEmpire = EmpireManager.i.getEmpire();
+            if (mEmpire.key.equals(myEmpire.key) || rank.total_stars >= 10) {
                 totalShips.setText(Html.fromHtml(String.format("Ships: <b>%s</b>",
-                       formatter.format(rank.getTotalShips()))));
+                       formatter.format(rank.total_ships))));
                 totalBuildings.setText(Html.fromHtml(String.format("Buildings: <b>%s</b>",
-                       formatter.format(rank.getTotalBuildings()))));
+                       formatter.format(rank.total_buildings))));
             } else {
                 totalShips.setText("");
                 totalBuildings.setText("");
@@ -170,7 +167,7 @@ public class AllianceMemberDetailsActivity extends BaseActivity
         }
 
         // you can't vote to kick yourself, so just disable the button
-        if (mEmpire == null || mEmpire.getKey().equals(EmpireManager.i.getEmpire().getKey())) {
+        if (mEmpire == null || mEmpire.key.equals(EmpireManager.i.getEmpire().key)) {
             kickBtn.setEnabled(false);
         } else {
             kickBtn.setEnabled(true);

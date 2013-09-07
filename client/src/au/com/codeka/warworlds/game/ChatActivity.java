@@ -22,15 +22,15 @@ import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
+import au.com.codeka.common.model.ChatMessage;
 import au.com.codeka.warworlds.BaseActivity;
 import au.com.codeka.warworlds.GlobalOptions;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.StyledDialog;
 import au.com.codeka.warworlds.Util;
 import au.com.codeka.warworlds.model.ChatManager;
-import au.com.codeka.warworlds.model.ChatMessage;
+import au.com.codeka.warworlds.model.ChatMessageHelper;
 import au.com.codeka.warworlds.model.EmpireManager;
-import au.com.codeka.warworlds.model.ChatMessage.Location;
 
 public class ChatActivity extends BaseActivity {
     private ChatPagerAdapter mChatPagerAdapter;
@@ -77,19 +77,19 @@ public class ChatActivity extends BaseActivity {
         public Fragment getItem(int i) {
             Fragment fragment = new ChatFragment();
             Bundle args = new Bundle();
-            args.putInt("au.com.codeka.warworlds.ChatLocation", ChatMessage.Location.values()[i].getNumber());
+            args.putInt("au.com.codeka.warworlds.ChatLocation", ChatMessageHelper.Location.values()[i].getNumber());
             fragment.setArguments(args);
             return fragment;
         }
 
         @Override
         public int getCount() {
-            return ChatMessage.Location.values().length;
+            return ChatMessageHelper.Location.values().length;
         }
 
         @Override
         public CharSequence getPageTitle(int position) {
-            switch(Location.fromNumber(position)) {
+            switch(ChatMessageHelper.Location.fromNumber(position)) {
             case PUBLIC_CHANNEL:
                 return "Global";
             case ALLIANCE_CHANNEL:
@@ -108,7 +108,7 @@ public class ChatActivity extends BaseActivity {
     public static class ChatFragment extends Fragment
                                      implements ChatManager.MessageAddedListener,
                                                 ChatManager.MessageUpdatedListener {
-        private ChatMessage.Location mChatLocation;
+        private ChatMessageHelper.Location mChatLocation;
         private ScrollView mScrollView;
         private LinearLayout mChatOutput;
         private Handler mHandler;
@@ -120,7 +120,7 @@ public class ChatActivity extends BaseActivity {
             super.onCreate(savedInstanceState);
 
             Bundle args = getArguments();
-            mChatLocation = ChatMessage.Location.fromNumber(args.getInt("au.com.codeka.warworlds.ChatLocation"));
+            mChatLocation = ChatMessageHelper.Location.fromNumber(args.getInt("au.com.codeka.warworlds.ChatLocation"));
             mHandler = new Handler();
 
             mAutoTranslate = new GlobalOptions().autoTranslateChatMessages();
@@ -151,17 +151,17 @@ public class ChatActivity extends BaseActivity {
             for (int i = 0; i < mChatOutput.getChildCount(); i++) {
                 TextView tv = (TextView) mChatOutput.getChildAt(i);
                 ChatMessage other = (ChatMessage) tv.getTag();
-                if (other == null || other.getDatePosted() == null) {
+                if (other == null || other.date_posted == null) {
                     continue;
                 }
 
-                if (other.getEmpireKey() == null | msg.getEmpireKey() == null) {
+                if (other.empire_key == null || msg.empire_key == null) {
                     continue;
                 }
 
-                if (other.getDatePosted().equals(msg.getDatePosted()) &&
-                    other.getEmpireKey().equals(msg.getEmpireKey())) {
-                    tv.setText(msg.format(mChatLocation, mAutoTranslate));
+                if (other.date_posted.equals(msg.date_posted) &&
+                    other.empire_key.equals(msg.empire_key)) {
+                    tv.setText(ChatMessageHelper.format(msg, mChatLocation, mAutoTranslate));
                 }
             }
         }
@@ -192,12 +192,12 @@ public class ChatActivity extends BaseActivity {
         }
 
         private void appendMessage(final ChatMessage msg) {
-            if (!msg.shouldDisplay(mChatLocation)) {
+            if (!ChatMessageHelper.shouldDisplay(msg, mChatLocation)) {
                 return;
             }
 
             TextView tv = new TextView(getActivity());
-            tv.setText(msg.format(mChatLocation, mAutoTranslate));
+            tv.setText(ChatMessageHelper.format(msg, mChatLocation, mAutoTranslate));
             tv.setMovementMethod(LinkMovementMethod.getInstance());
             tv.setTag(msg);
             mChatOutput.addView(tv);
@@ -224,13 +224,12 @@ public class ChatActivity extends BaseActivity {
 
         String message = chatMsg.getText().toString();
 
-        ChatMessage msg = new ChatMessage();
-        msg.setMessage(message);
-        msg.setEmpire(EmpireManager.i.getEmpire());
+        ChatMessage msg = new ChatMessage.Builder()
+                .message(message).empire_key(EmpireManager.i.getEmpire().key).build();
 
-        ChatMessage.Location location = ChatMessage.Location.fromNumber(mViewPager.getCurrentItem());
-        if (location == ChatMessage.Location.ALLIANCE_CHANNEL) {
-            msg.setAllianceChat(true);
+        ChatMessageHelper.Location location = ChatMessageHelper.Location.fromNumber(mViewPager.getCurrentItem());
+        if (location == ChatMessageHelper.Location.ALLIANCE_CHANNEL) {
+            msg.alliance_key = EmpireManager.i.getEmpire().alliance.key;
         }
 
         // if this is our first chat after the update ...

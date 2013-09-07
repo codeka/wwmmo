@@ -7,15 +7,15 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import au.com.codeka.common.model.Colony;
+import au.com.codeka.common.model.Planet;
+import au.com.codeka.common.model.Star;
 import au.com.codeka.warworlds.R;
-import au.com.codeka.warworlds.model.Colony;
 import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.ImageManager;
-import au.com.codeka.warworlds.model.Planet;
 import au.com.codeka.warworlds.model.PlanetImageManager;
 import au.com.codeka.warworlds.model.Sprite;
 import au.com.codeka.warworlds.model.SpriteDrawable;
-import au.com.codeka.warworlds.model.Star;
 
 public class PlanetDetailsView extends FrameLayout {
     private View mView;
@@ -82,31 +82,31 @@ public class PlanetDetailsView extends FrameLayout {
         } else {
             planetIcon.setVisibility(View.VISIBLE);
 
-            Sprite planetSprite = PlanetImageManager.getInstance().getSprite(mPlanet);
+            Sprite planetSprite = PlanetImageManager.getInstance().getSprite(mStar, mPlanet);
             if (planetSprite != null) {
                 planetIcon.setImageDrawable(new SpriteDrawable(planetSprite));
             }
 
-            if (mColony == null || mColony.getEmpireKey() == null ||
-                    !mColony.getEmpireKey().equals(EmpireManager.i.getEmpire().getKey())) {
+            if (mColony == null || mColony.empire_key == null ||
+                    !mColony.empire_key.equals(EmpireManager.i.getEmpire().key)) {
                 congenialityContainer.setVisibility(View.VISIBLE);
                 colonyContainer.setVisibility(View.GONE);
 
                 populationCongenialityProgressBar.setMax(1000);
-                populationCongenialityProgressBar.setProgress(mPlanet.getPopulationCongeniality());
-                populationCongenialityTextView.setText(Integer.toString(mPlanet.getPopulationCongeniality()));
+                populationCongenialityProgressBar.setProgress(mPlanet.population_congeniality);
+                populationCongenialityTextView.setText(Integer.toString(mPlanet.population_congeniality));
                 farmingCongenialityProgressBar.setMax(100);
-                farmingCongenialityProgressBar.setProgress(mPlanet.getFarmingCongeniality());
-                farmingCongenialityTextView.setText(Integer.toString(mPlanet.getFarmingCongeniality()));
+                farmingCongenialityProgressBar.setProgress(mPlanet.farming_congeniality);
+                farmingCongenialityTextView.setText(Integer.toString(mPlanet.farming_congeniality));
                 miningCongenialityProgressBar.setMax(100);
-                miningCongenialityProgressBar.setProgress(mPlanet.getMiningCongeniality());
-                miningCongenialityTextView.setText(Integer.toString(mPlanet.getMiningCongeniality()));
+                miningCongenialityProgressBar.setProgress(mPlanet.mining_congeniality);
+                miningCongenialityTextView.setText(Integer.toString(mPlanet.mining_congeniality));
             } else {
                 congenialityContainer.setVisibility(View.GONE);
                 colonyContainer.setVisibility(View.VISIBLE);
 
                 populationCount.setText(String.format("Pop: %d / %d",
-                        (int) mColony.getPopulation(), (int) mColony.getMaxPopulation()));
+                        (int) (float) mColony.population, (int) (float) mColony.max_population));
                 colonyFocusView.refresh(mStar, mColony);
             }
         }

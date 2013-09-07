@@ -21,12 +21,13 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
-import au.com.codeka.common.protobuf.Messages;
+import com.squareup.wire.ByteString;
+import com.squareup.wire.Message;
+
+import au.com.codeka.common.model.Notification;
+import au.com.codeka.common.model.NotificationWrapper;
 import au.com.codeka.warworlds.App;
 import au.com.codeka.warworlds.Notifications;
-
-import com.google.protobuf.ByteString;
-import com.google.protobuf.Message;
 
 /**
  * This is the main "client" that accesses the War Worlds API.
@@ -229,14 +230,14 @@ public class ApiClient {
             }
 
             if (isNotificationWrapper) {
-                Messages.NotificationWrapper pb = extractBody(entity, Messages.NotificationWrapper.class);
-                for (Messages.Notification notification_pb : pb.getNotificationsList()) {
-                    log.info("got inline-notification: "+notification_pb.getName());
-                    Notifications.displayNotfication(App.i, notification_pb.getName(), notification_pb.getValue());
+                NotificationWrapper pb = extractBody(entity, NotificationWrapper.class);
+                for (Notification notification_pb : pb.notifications) {
+                    log.info("got inline-notification: "+notification_pb.name);
+                    Notifications.displayNotfication(App.i, notification_pb.name, notification_pb.value);
                 }
 
                 if (protoBuffFactory != null) {
-                    result = extractBody(pb.getOriginalMessage(), protoBuffFactory);
+                    result = extractBody(pb.original_message, protoBuffFactory);
                 }
             } else if (protoBuffFactory != null) {
                 result = extractBody(entity, protoBuffFactory);

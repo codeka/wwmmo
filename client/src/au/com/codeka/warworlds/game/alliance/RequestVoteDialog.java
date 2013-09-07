@@ -14,12 +14,15 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.RadioButton;
 import android.widget.TextView;
+import au.com.codeka.common.model.Alliance;
+import au.com.codeka.common.model.AllianceRequest;
+import au.com.codeka.common.model.Empire;
+import au.com.codeka.common.model.Model;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.StyledDialog;
-import au.com.codeka.warworlds.model.Alliance;
-import au.com.codeka.warworlds.model.AllianceRequest;
 import au.com.codeka.warworlds.model.AllianceManager;
-import au.com.codeka.warworlds.model.Empire;
+import au.com.codeka.warworlds.model.AllianceRequestHelper;
+import au.com.codeka.warworlds.model.EmpireHelper;
 import au.com.codeka.warworlds.model.EmpireManager;
 
 public class RequestVoteDialog extends DialogFragment {
@@ -47,44 +50,44 @@ public class RequestVoteDialog extends DialogFragment {
         TextView requestBy = (TextView) mView.findViewById(R.id.request_by);
 
         Empire empire;
-        if (mRequest.getTargetEmpireID() != null) {
-            empire = EmpireManager.i.getEmpire(Integer.toString(mRequest.getTargetEmpireID()));
+        if (mRequest.target_empire_id != null) {
+            empire = EmpireManager.i.getEmpire(Integer.toString(mRequest.target_empire_id));
         } else {
-            empire = EmpireManager.i.getEmpire(Integer.toString(mRequest.getRequestEmpireID()));
+            empire = EmpireManager.i.getEmpire(Integer.toString(mRequest.request_empire_id));
         }
         if (empire != null) {
             // it should never be null, so we won't bother refreshing...
-            empireName.setText(empire.getDisplayName());
-            empireIcon.setImageBitmap(empire.getShield(activity));
+            empireName.setText(empire.display_name);
+            empireIcon.setImageBitmap(EmpireHelper.getShield(activity, empire));
         }
-        requestDescription.setText(mRequest.getDescription());
-        message.setText(mRequest.getMessage());
+        requestDescription.setText(AllianceRequestHelper.getDescription(mRequest));
+        message.setText(mRequest.message);
 
-        if (mRequest.getVotes() == 0) {
+        if (mRequest.votes == 0) {
             requestVotes.setText("0");
         } else {
             requestVotes.setText(String.format(Locale.ENGLISH, "%s%d",
-                    mRequest.getVotes() < 0 ? "-" : "+", Math.abs(mRequest.getVotes())));
+                    mRequest.votes < 0 ? "-" : "+", Math.abs(mRequest.votes)));
         }
 
         TreeSet<Integer> excludingEmpires = new TreeSet<Integer>(
-                Arrays.asList(new Integer[] {mRequest.getRequestEmpireID()}));
-        if (mRequest.getTargetEmpireID() != null) {
-            excludingEmpires.add(mRequest.getTargetEmpireID());
+                Arrays.asList(new Integer[] {mRequest.request_empire_id}));
+        if (mRequest.target_empire_id != null) {
+            excludingEmpires.add(mRequest.target_empire_id);
         }
-        int totalPossibleVotes = mAlliance.getTotalPossibleVotes(excludingEmpires);
-        int requiredVotes = mRequest.getRequestType().getRequiredVotes();
+        int totalPossibleVotes = Model.getTotalPossibleVotes(mAlliance, excludingEmpires);
+        int requiredVotes = Model.getRequiredVotes(mRequest.request_type);
         if (requiredVotes > totalPossibleVotes) {
             requiredVotes = totalPossibleVotes;
         }
         requestRequiredVotes.setText(String.format(Locale.ENGLISH, "/ %d", requiredVotes));
 
-        if (mRequest.getTargetEmpireID() != null) {
-            empire = EmpireManager.i.getEmpire(Integer.toString(mRequest.getRequestEmpireID()));
+        if (mRequest.target_empire_id != null) {
+            empire = EmpireManager.i.getEmpire(Integer.toString(mRequest.request_empire_id));
 
             requestBy.setVisibility(View.VISIBLE);
             requestBy.setText(String.format(Locale.ENGLISH, "by %s",
-                    empire.getDisplayName()));
+                    empire.display_name));
         } else {
             requestBy.setVisibility(View.GONE);
         }

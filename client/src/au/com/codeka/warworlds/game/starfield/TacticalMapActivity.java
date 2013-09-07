@@ -3,7 +3,7 @@ package au.com.codeka.warworlds.game.starfield;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Window;
-import au.com.codeka.common.model.BaseStar;
+import au.com.codeka.common.model.Star;
 import au.com.codeka.warworlds.BaseActivity;
 import au.com.codeka.warworlds.R;
 
@@ -31,13 +31,13 @@ public class TacticalMapActivity extends BaseActivity {
 
         mTacticalMapView.setDoubleTapHandler(new TacticalMapView.DoubleTapHandler() {
             @Override
-            public void onDoubleTapped(BaseStar star) {
+            public void onDoubleTapped(Star star) {
                 Intent intent = new Intent();
-                intent.putExtra("au.com.codeka.warworlds.SectorX", star.getSectorX());
-                intent.putExtra("au.com.codeka.warworlds.SectorY", star.getSectorY());
-                intent.putExtra("au.com.codeka.warworlds.OffsetX", star.getOffsetX());
-                intent.putExtra("au.com.codeka.warworlds.OffsetY", star.getOffsetY());
-                intent.putExtra("au.com.codeka.warworlds.StarKey", star.getKey());
+                intent.putExtra("au.com.codeka.warworlds.SectorX", star.sector_x);
+                intent.putExtra("au.com.codeka.warworlds.SectorY", star.sector_y);
+                intent.putExtra("au.com.codeka.warworlds.OffsetX", star.offset_x);
+                intent.putExtra("au.com.codeka.warworlds.OffsetY", star.offset_y);
+                intent.putExtra("au.com.codeka.warworlds.StarKey", star.key);
 
                 setResult(RESULT_OK, intent);
                 finish();

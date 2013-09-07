@@ -16,11 +16,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.TextView;
 import au.com.codeka.BackgroundRunner;
-import au.com.codeka.Cash;
+import au.com.codeka.common.Cash;
 import au.com.codeka.common.Vector2;
-import au.com.codeka.common.model.DesignKind;
-import au.com.codeka.common.model.ShipDesign;
-import au.com.codeka.common.protobuf.Messages;
+import au.com.codeka.common.design.DesignKind;
+import au.com.codeka.common.design.ShipDesign;
+import au.com.codeka.common.model.Fleet;
+import au.com.codeka.common.model.FleetOrder;
+import au.com.codeka.common.model.Model;
+import au.com.codeka.common.model.Star;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.StyledDialog;
 import au.com.codeka.warworlds.api.ApiClient;
@@ -28,20 +31,16 @@ import au.com.codeka.warworlds.api.ApiException;
 import au.com.codeka.warworlds.game.starfield.StarfieldSurfaceView;
 import au.com.codeka.warworlds.model.DesignManager;
 import au.com.codeka.warworlds.model.EmpireManager;
-import au.com.codeka.warworlds.model.Fleet;
-import au.com.codeka.warworlds.model.Sector;
 import au.com.codeka.warworlds.model.Sprite;
 import au.com.codeka.warworlds.model.SpriteManager;
-import au.com.codeka.warworlds.model.Star;
 import au.com.codeka.warworlds.model.StarManager;
-import au.com.codeka.warworlds.model.StarSummary;
 
 public class FleetMoveDialog extends DialogFragment {
     private Fleet mFleet;
     private StarfieldSurfaceView mStarfield;
     private SourceStarOverlay mSourceStarOverlay;
     private DestinationStarOverlay mDestinationStarOverlay;
-    private StarSummary mSourceStarSummary;
+    private Star mSourceStarSummary;
     private View mView;
     private float mEstimatedCost;
 
@@ -78,24 +77,24 @@ public class FleetMoveDialog extends DialogFragment {
                 mSourceStarOverlay.reset();
 
                 if (mSourceStarSummary != null) {
-                    float distanceInParsecs = Sector.distanceInParsecs(mSourceStarSummary, star);
-                    ShipDesign design = (ShipDesign) DesignManager.i.getDesign(DesignKind.SHIP, mFleet.getDesignID());
+                    float distanceInParsecs = Model.distanceInParsecs(mSourceStarSummary, star);
+                    ShipDesign design = (ShipDesign) DesignManager.i.getDesign(DesignKind.SHIP, mFleet.design_id);
 
                     String leftDetails = String.format(Locale.ENGLISH,
                             "<b>Star:</b> %s<br /><b>Distance:</b> %.2f pc",
-                            star.getName(), distanceInParsecs);
+                            star.name, distanceInParsecs);
                     starDetailsLeft.setText(Html.fromHtml(leftDetails));
 
                     float timeInHours = distanceInParsecs / design.getSpeedInParsecPerHour();
                     int hrs = (int) Math.floor(timeInHours);
                     int mins = (int) Math.floor((timeInHours - hrs) * 60.0f);
 
-                    mEstimatedCost = design.getFuelCost(distanceInParsecs, mFleet.getNumShips());
+                    mEstimatedCost = design.getFuelCost(distanceInParsecs, mFleet.num_ships);
                     String cash = Cash.format(mEstimatedCost);
 
                     String fontOpen = "";
                     String fontClose = "";
-                    if (mEstimatedCost > EmpireManager.i.getEmpire().getCash()) {
+                    if (mEstimatedCost > EmpireManager.i.getEmpire().cash) {
                         fontOpen = "<font color=\"#ff0000\">";
                         fontClose = "</font>";
                     }
@@ -121,16 +120,16 @@ public class FleetMoveDialog extends DialogFragment {
             }
         });
 
-        StarManager.getInstance().requestStarSummary(mFleet.getStarKey(),
+        StarManager.i.requestStarSummary(mFleet.star_key,
                 new StarManager.StarSummaryFetchedHandler() {
             @Override
-            public void onStarSummaryFetched(StarSummary s) {
+            public void onStarSummaryFetched(Star s) {
                 mSourceStarSummary = s;
 
-                long sectorX = s.getSectorX();
-                long sectorY = s.getSectorY();
-                int offsetX = s.getOffsetX();
-                int offsetY = s.getOffsetY();
+                long sectorX = s.sector_x;
+                long sectorY = s.sector_y;
+                int offsetX = s.offset_x;
+                int offsetY = s.offset_y;
                 offsetX = offsetX - (int) ((mStarfield.getWidth() / 2) / mStarfield.getPixelScale());
                 offsetY = offsetY -  (int) ((mStarfield.getHeight() / 2) / mStarfield.getPixelScale());
 
@@ -171,8 +170,6 @@ public class FleetMoveDialog extends DialogFragment {
         dialog.getPositiveButton().setEnabled(false);
         dialog.getNegativeButton().setEnabled(false);
 
-        EmpireManager.i.getEmpire().addCash(-mEstimatedCost);
-
         final Activity activity = getActivity();
         dismiss();
 
@@ -180,11 +177,11 @@ public class FleetMoveDialog extends DialogFragment {
             @Override
             protected Boolean doInBackground() {
                 String url = String.format("stars/%s/fleets/%s/orders",
-                                           mFleet.getStarKey(),
-                                           mFleet.getKey());
-                Messages.FleetOrder fleetOrder = Messages.FleetOrder.newBuilder()
-                               .setOrder(Messages.FleetOrder.FLEET_ORDER.MOVE)
-                               .setStarKey(selectedStar.getKey())
+                                           mFleet.star_key,
+                                           mFleet.key);
+                FleetOrder fleetOrder = new FleetOrder.Builder()
+                               .order(FleetOrder.FLEET_ORDER.MOVE)
+                               .star_key(selectedStar.key)
                                .build();
                 try {
                     return ApiClient.postProtoBuf(url, fleetOrder);
@@ -204,11 +201,11 @@ public class FleetMoveDialog extends DialogFragment {
                     dialog.getNegativeButton().setEnabled(true);
                 } else {
                     // the star this fleet is attached to needs to be refreshed...
-                    StarManager.getInstance().refreshStar(mFleet.getStarKey());
+                    StarManager.i.refreshStar(mFleet.star_key);
 
                     // the empire needs to be updated, too, since we'll have subtracted
                     // the cost of this move from your cash
-                    EmpireManager.i.refreshEmpire(mFleet.getEmpireKey());
+                    EmpireManager.i.refreshEmpire(mFleet.empire_key);
                 }
             }
         }.execute();
@@ -245,7 +242,7 @@ public class FleetMoveDialog extends DialogFragment {
          */
         public void reset() {
             mSprite = SpriteManager.i.getSprite(
-                    DesignManager.i.getDesign(DesignKind.SHIP, mFleet.getDesignID()).getSpriteName());
+                    DesignManager.i.getDesign(DesignKind.SHIP, mFleet.design_id).getSpriteName());
 
             float pixelScale = getPixelScale();
 

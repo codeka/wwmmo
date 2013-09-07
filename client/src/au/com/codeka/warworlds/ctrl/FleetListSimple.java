@@ -14,15 +14,14 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import au.com.codeka.common.model.BaseFleet;
-import au.com.codeka.common.model.Design;
-import au.com.codeka.common.model.DesignKind;
+import au.com.codeka.common.design.Design;
+import au.com.codeka.common.design.DesignKind;
+import au.com.codeka.common.model.Fleet;
+import au.com.codeka.common.model.Star;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.model.DesignManager;
-import au.com.codeka.warworlds.model.Fleet;
 import au.com.codeka.warworlds.model.SpriteDrawable;
 import au.com.codeka.warworlds.model.SpriteManager;
-import au.com.codeka.warworlds.model.Star;
 
 public class FleetListSimple extends LinearLayout {
     private Context mContext;
@@ -69,9 +68,9 @@ public class FleetListSimple extends LinearLayout {
         }
 
         mFleets = new ArrayList<Fleet>();
-        if (mStar.getFleets() != null) {
-            for (BaseFleet f : mStar.getFleets()) {
-                if (!f.getState().equals(Fleet.State.MOVING)) {
+        if (mStar.fleets != null) {
+            for (Fleet f : mStar.fleets) {
+                if (!f.state.equals(Fleet.FLEET_STATE.MOVING)) {
                     mFleets.add((Fleet) f);
                 }
             }
@@ -90,17 +89,17 @@ public class FleetListSimple extends LinearLayout {
         View view = (ViewGroup) inflater.inflate(R.layout.starfield_planet, null);
 
         final ImageView icon = (ImageView) view.findViewById(R.id.starfield_planet_icon);
-        Design design = DesignManager.i.getDesign(DesignKind.SHIP, fleet.getDesignID());
+        Design design = DesignManager.i.getDesign(DesignKind.SHIP, fleet.design_id);
 
         icon.setImageDrawable(new SpriteDrawable(SpriteManager.i.getSprite(design.getSpriteName())));
 
         TextView shipKindTextView = (TextView) view.findViewById(R.id.starfield_planet_type);
         shipKindTextView.setText(String.format("%d × %s",
-                (int) Math.ceil(fleet.getNumShips()), design.getDisplayName(fleet.getNumShips() > 1)));
+                (int) Math.ceil(fleet.num_ships), design.getDisplayName(fleet.num_ships > 1)));
 
         final TextView shipCountTextView = (TextView) view.findViewById(R.id.starfield_planet_colony);
         shipCountTextView.setText(String.format("%s",
-                StringUtils.capitalize(fleet.getStance().toString().toLowerCase(Locale.ENGLISH))));
+                StringUtils.capitalize(fleet.stance.toString().toLowerCase(Locale.ENGLISH))));
 
         view.setOnClickListener(mOnClickListener);
         view.setTag(fleet);
