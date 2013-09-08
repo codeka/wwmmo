@@ -16,6 +16,6 @@
 	<classpathentry kind="lib" path="/common/libs/httpclient-4.2.2.jar"/>
 	<classpathentry kind="lib" path="/common/libs/httpcore-4.2.2.jar"/>
 	<classpathentry kind="lib" path="/common/libs/jcl-over-slf4j-1.7.5.jar"/>
-	<classpathentry kind="lib" path="/common/libs/protobuf-java-2.5.0.jar"/>
+	<classpathentry kind="lib" path="/wire-runtime/target/wire-runtime-1.0.2-SNAPSHOT.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
