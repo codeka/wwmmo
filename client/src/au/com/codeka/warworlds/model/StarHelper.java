@@ -43,7 +43,7 @@ public class StarHelper {
 
     public static EmpirePresence getEmpire(Star star, String empireKey) {
         for (EmpirePresence empire : star.empires) {
-            if (empire.key != null && empire.key.equals(empireKey)) {
+            if (empire.empire_key != null && empire.empire_key.equals(empireKey)) {
                 return empire;
             }
         }

@@ -42,7 +42,7 @@ public class EmpireManager {
     private Map<String, List<EmpireFetchedHandler>> mMyEmpireUpdatedListeners = new TreeMap<String, List<EmpireFetchedHandler>>();
     private Empire mMyEmpire;
     private Empire mNativeEmpire = new Empire.Builder()
-                                        .display_name("Native").key("").build();
+                                        .display_name("Native").key(null).build();
 
     /**
      * This is called when you first connect to the server. We need to pass in details about

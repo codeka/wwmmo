@@ -622,7 +622,7 @@ public class StarfieldSurfaceView extends SectorView
                 if (n.equals(1)) {
                     name = emp.display_name;
                 } else {
-                    name = String.format(Locale.ENGLISH, "%s (%d)", emp.key, n);
+                    name = String.format(Locale.ENGLISH, "%s (%d)", emp.display_name, n);
                 }
 
                 Rect bounds = new Rect();

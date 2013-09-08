@@ -127,9 +127,6 @@ public class Simulation {
         if (predictionStar != null) {
             // copy the end times for builds from prediction_star_pb
             for (BuildRequest starBuildRequest : star.build_requests) {
-                if (predictionStar.build_requests == null) {
-                    predictionStar.build_requests = new ArrayList<BuildRequest>();
-                }
                 for (BuildRequest predictedBuildRequest : predictionStar.build_requests) {
                     if (starBuildRequest.key.equals(predictedBuildRequest.key)) {
                         starBuildRequest.end_time = predictedBuildRequest.end_time;
@@ -281,7 +278,7 @@ public class Simulation {
 
                 // the end_time will be accurate, since it'll have been updated last step
                 DateTime endTime = Model.toDateTime(br.end_time);
-                if (endTime.compareTo(now) < 0 && endTime.compareTo(year2k) > 0) {
+                if (endTime.isBefore(now) && endTime.isAfter(year2k)) {
                     continue;
                 }
 
@@ -351,9 +348,7 @@ public class Simulation {
                         } else {
                             endTime = now.plus((long)(timeRemainingInHours * 3600.0f * 1000.0f));
                         }
-                        if (Model.toDateTime(br.end_time).isBefore(endTime)) {
-                            br.end_time = Model.fromDateTime(endTime);
-                        }
+                        br.end_time = Model.fromDateTime(endTime);
                         continue;
                     }
 

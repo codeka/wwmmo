@@ -117,8 +117,9 @@ public class Model {
     }
 
     public static boolean isInCooldown(Colony colony) {
-        long now = System.currentTimeMillis();
-        return (now < colony.cooldown_end_time);
+        DateTime now = DateTime.now();
+        DateTime cooldownEndTime = Model.toDateTime(colony.cooldown_end_time);
+        return (cooldownEndTime.isAfter(now));
     }
 
     public static String getDescription(AllianceRequest request) {
@@ -168,12 +169,13 @@ public class Model {
 
     /** Calculates a {@see Duration} object that describes approximately how long the given build has left. */
     public static Duration getRemainingTime(BuildRequest br) {
-        long now = System.currentTimeMillis();
-        if (br.end_time < now) {
+        DateTime now = DateTime.now();
+        DateTime endTime = Model.toDateTime(br.end_time);
+        if (endTime.isBefore(now)) {
             return Duration.ZERO;
         }
 
-        Duration d = Duration.millis(br.end_time - now);
+        Duration d = new Duration(now, endTime);
         // if it's actually zero, add a few seconds (to differentiate between "REALLY now" and
         // "it'll never finish, so lets return zero")
         if (d.compareTo(Duration.standardSeconds(5)) <  0)
