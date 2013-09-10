@@ -10,8 +10,6 @@ import org.joda.time.Period;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
-import au.com.codeka.common.model.Model;
-
 public class TimeInHours {
     public static String format(float timeInHours) {
         if (timeInHours > 0.0f) {
@@ -40,10 +38,6 @@ public class TimeInHours {
             d = Duration.standardSeconds(5);
 
         return format(d.toPeriod());
-    }
-
-    public static String format(Long then) {
-        return format(Model.toDateTime(then));
     }
 
     public static String format(DateTime then) {

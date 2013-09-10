@@ -1,12 +1,13 @@
 package au.com.codeka.warworlds.game.solarsystem;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+
+import com.google.protobuf.InvalidProtocolBufferException;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -25,15 +26,12 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import au.com.codeka.RomanNumeralFormatter;
-import au.com.codeka.common.design.Design;
-import au.com.codeka.common.design.DesignKind;
-import au.com.codeka.common.design.ShipDesign;
-import au.com.codeka.common.model.BuildRequest;
-import au.com.codeka.common.model.Colony;
-import au.com.codeka.common.model.Empire;
-import au.com.codeka.common.model.Model;
-import au.com.codeka.common.model.Planet;
-import au.com.codeka.common.model.Star;
+import au.com.codeka.common.model.BaseBuildRequest;
+import au.com.codeka.common.model.BaseColony;
+import au.com.codeka.common.model.Design;
+import au.com.codeka.common.model.DesignKind;
+import au.com.codeka.common.model.ShipDesign;
+import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.BaseActivity;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.ServerGreeter;
@@ -44,13 +42,19 @@ import au.com.codeka.warworlds.ctrl.BuildQueueList;
 import au.com.codeka.warworlds.ctrl.BuildingsList;
 import au.com.codeka.warworlds.game.BuildAccelerateDialog;
 import au.com.codeka.warworlds.game.BuildStopConfirmDialog;
+import au.com.codeka.warworlds.model.BuildRequest;
+import au.com.codeka.warworlds.model.Colony;
 import au.com.codeka.warworlds.model.DesignManager;
 import au.com.codeka.warworlds.model.EmpireManager;
+import au.com.codeka.warworlds.model.MyEmpire;
+import au.com.codeka.warworlds.model.Planet;
 import au.com.codeka.warworlds.model.PlanetImageManager;
 import au.com.codeka.warworlds.model.Sprite;
 import au.com.codeka.warworlds.model.SpriteDrawable;
 import au.com.codeka.warworlds.model.SpriteManager;
+import au.com.codeka.warworlds.model.Star;
 import au.com.codeka.warworlds.model.StarManager;
+import au.com.codeka.warworlds.model.StarSummary;
 
 /**
  * When you click "Build" shows you the list of buildings/ships that are/can be built by your
@@ -79,11 +83,15 @@ public class BuildActivity extends BaseActivity implements StarManager.StarFetch
 
             try {
                 byte[] bytes = savedInstanceState.getByteArray("au.com.codeka.warworlds.Star");
-                mStar = Model.wire.parseFrom(bytes, Star.class);
+                Messages.Star star_pb = Messages.Star.parseFrom(bytes);
+                s = new Star();
+                s.fromProtocolBuffer(star_pb);
 
                 bytes = savedInstanceState.getByteArray("au.com.codeka.warworlds.CurrentColony");
-                mInitialColony = Model.wire.parseFrom(bytes, Colony.class);
-            } catch (IOException e) {
+                Messages.Colony colony_pb = Messages.Colony.parseFrom(bytes);
+                mInitialColony = new Colony();
+                mInitialColony.fromProtocolBuffer(colony_pb);
+            } catch (InvalidProtocolBufferException e) {
             }
 
             onStarFetched(s);
@@ -100,12 +108,14 @@ public class BuildActivity extends BaseActivity implements StarManager.StarFetch
                 String starKey = extras.getString("au.com.codeka.warworlds.StarKey");
                 byte[] colonyBytes = extras.getByteArray("au.com.codeka.warworlds.Colony");
                 try {
-                    mInitialColony = Model.wire.parseFrom(colonyBytes, Colony.class);
-                } catch (IOException e) {
+                    Messages.Colony colony_pb = Messages.Colony.parseFrom(colonyBytes);
+                    mInitialColony = new Colony();
+                    mInitialColony.fromProtocolBuffer(colony_pb);
+                } catch (InvalidProtocolBufferException e) {
                 }
 
-                StarManager.i.requestStar(starKey, false, BuildActivity.this);
-                StarManager.i.addStarUpdatedListener(starKey, BuildActivity.this);
+                StarManager.getInstance().requestStar(starKey, false, BuildActivity.this);
+                StarManager.getInstance().addStarUpdatedListener(starKey, BuildActivity.this);
             }
         });
     }
@@ -113,19 +123,23 @@ public class BuildActivity extends BaseActivity implements StarManager.StarFetch
     @Override
     public void onPause() {
         super.onPause();
-        StarManager.i.removeStarUpdatedListener(this);
+        StarManager.getInstance().removeStarUpdatedListener(this);
     }
 
     @Override
     public void onSaveInstanceState(Bundle state) {
         super.onSaveInstanceState(state);
         if (mStar != null) {
-            state.putByteArray("au.com.codeka.warworlds.Star", mStar.toByteArray());
+            Messages.Star.Builder star_pb = Messages.Star.newBuilder();
+            mStar.toProtocolBuffer(star_pb);
+            state.putByteArray("au.com.codeka.warworlds.Star", star_pb.build().toByteArray());
         }
 
         Colony currentColony = mColonies.get(mViewPager.getCurrentItem());
         if (currentColony != null) {
-            state.putByteArray("au.com.codeka.warworlds.CurrentColony", currentColony.toByteArray());
+            Messages.Colony.Builder colony_pb = Messages.Colony.newBuilder();
+            currentColony.toProtocolBuffer(colony_pb);
+            state.putByteArray("au.com.codeka.warworlds.CurrentColony", colony_pb.build().toByteArray());
         }
     }
 
@@ -134,28 +148,28 @@ public class BuildActivity extends BaseActivity implements StarManager.StarFetch
      */
     @Override
     public void onStarFetched(Star s) {
-        if (mStar == null || mStar.key.equals(s.key)) {
+        if (mStar == null || mStar.getKey().equals(s.getKey())) {
             boolean dataSetChanged = (mStar == null);
 
             mStar = s;
             mColonies = new ArrayList<Colony>();
-            Empire myEmpire = EmpireManager.i.getEmpire();
-            for (Colony c : mStar.colonies) {
-                if (c.empire_key != null && c.empire_key.equals(myEmpire.key)) {
+            MyEmpire myEmpire = EmpireManager.i.getEmpire();
+            for (BaseColony c : mStar.getColonies()) {
+                if (c.getEmpireKey() != null && c.getEmpireKey().equals(myEmpire.getKey())) {
                     mColonies.add((Colony) c);
                 }
             }
             Collections.sort(mColonies, new Comparator<Colony>() {
                 @Override
                 public int compare(Colony lhs, Colony rhs) {
-                    return lhs.planet_index - rhs.planet_index;
+                    return lhs.getPlanetIndex() - rhs.getPlanetIndex();
                 }
             });
 
             if (mInitialColony != null) {
                 int colonyIndex = 0;
                 for (Colony colony : mColonies) {
-                    if (colony.key.equals(mInitialColony.key)) {
+                    if (colony.getKey().equals(mInitialColony.getKey())) {
                         break;
                     }
                     colonyIndex ++;
@@ -173,18 +187,18 @@ public class BuildActivity extends BaseActivity implements StarManager.StarFetch
 
     private void refreshColonyDetails(Colony colony) {
         ImageView planetIcon = (ImageView) findViewById(R.id.planet_icon);
-        Planet planet = (Planet) mStar.planets.get(colony.planet_index - 1);
-        Sprite planetSprite = PlanetImageManager.getInstance().getSprite(mStar, planet);
+        Planet planet = (Planet) mStar.getPlanets()[colony.getPlanetIndex() - 1];
+        Sprite planetSprite = PlanetImageManager.getInstance().getSprite(planet);
         planetIcon.setImageDrawable(new SpriteDrawable(planetSprite));
 
         TextView planetName = (TextView) findViewById(R.id.planet_name);
         planetName.setText(String.format(Locale.ENGLISH, "%s %s",
-                mStar.name, RomanNumeralFormatter.format(colony.planet_index)));
+                mStar.getName(), RomanNumeralFormatter.format(colony.getPlanetIndex())));
 
         TextView buildQueueDescription = (TextView) findViewById(R.id.build_queue_description);
         int buildQueueLength = 0;
-        for (BuildRequest br : mStar.build_requests) {
-            if (br.colony_key.equals(colony.key)) {
+        for (BaseBuildRequest br : mStar.getBuildRequests()) {
+            if (br.getColonyKey().equals(colony.getKey())) {
                 buildQueueLength ++;
             }
         }
@@ -216,7 +230,7 @@ public class BuildActivity extends BaseActivity implements StarManager.StarFetch
         public Fragment getItem(int i) {
             Fragment fragment = new BuildFragment();
             Bundle args = new Bundle();
-            args.putString("au.com.codeka.warworlds.ColonyKey", mColonies.get(i).key);
+            args.putString("au.com.codeka.warworlds.ColonyKey", mColonies.get(i).getKey());
             fragment.setArguments(args);
             return fragment;
         }
@@ -252,12 +266,12 @@ public class BuildActivity extends BaseActivity implements StarManager.StarFetch
             }
 
             Star star = ((BuildActivity) getActivity()).mStar;
-            if (star.colonies == null) {
+            if (star.getColonies() == null) {
                 return null;
             }
 
-            for (Colony baseColony : star.colonies) {
-                if (baseColony.key.equals(mColonyKey)) {
+            for (BaseColony baseColony : star.getColonies()) {
+                if (baseColony.getKey().equals(mColonyKey)) {
                     return (Colony) baseColony;
                 }
             }
@@ -286,8 +300,8 @@ public class BuildActivity extends BaseActivity implements StarManager.StarFetch
                     BuildingsList.Entry entry = mBuildingsList.getItem(position);
                     int buildQueueSize = 0;
                     BuildActivity activity = (BuildActivity) getActivity();
-                    for (BuildRequest br : activity.mStar.build_requests) {
-                        if (br.colony_key.equals(colony.key)) {
+                    for (BaseBuildRequest br : activity.mStar.getBuildRequests()) {
+                        if (br.getColonyKey().equals(colony.getKey())) {
                             buildQueueSize ++;
                         }
                     }
@@ -314,9 +328,9 @@ public class BuildActivity extends BaseActivity implements StarManager.StarFetch
             View v = inflater.inflate(R.layout.solarsystem_build_ships_tab, container, false);
 
             final Colony colony = getColony();
-            final BuildActivity activity = (BuildActivity) getActivity();
+
             final ShipDesignListAdapter adapter = new ShipDesignListAdapter();
-            adapter.setDesigns(activity.mStar, DesignManager.i.getDesigns(DesignKind.SHIP));
+            adapter.setDesigns(DesignManager.i.getDesigns(DesignKind.SHIP));
 
             ListView availableDesignsList = (ListView) v.findViewById(R.id.ship_list);
             availableDesignsList.setAdapter(adapter);
@@ -324,8 +338,9 @@ public class BuildActivity extends BaseActivity implements StarManager.StarFetch
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                     int buildQueueSize = 0;
-                    for (BuildRequest br : activity.mStar.build_requests) {
-                        if (br.colony_key.equals(colony.key)) {
+                    BuildActivity activity = (BuildActivity) getActivity();
+                    for (BaseBuildRequest br : activity.mStar.getBuildRequests()) {
+                        if (br.getColonyKey().equals(colony.getKey())) {
                             buildQueueSize ++;
                         }
                     }
@@ -349,10 +364,8 @@ public class BuildActivity extends BaseActivity implements StarManager.StarFetch
          */
         private class ShipDesignListAdapter extends BaseAdapter {
             private List<ShipDesign> mDesigns;
-            private Star mStar;
 
-            public void setDesigns(Star star, Map<String, Design> designs) {
-                mStar = star;
+            public void setDesigns(Map<String, Design> designs) {
                 mDesigns = new ArrayList<ShipDesign>();
                 for (Design d : designs.values()) {
                     mDesigns.add((ShipDesign) d);
@@ -404,7 +417,7 @@ public class BuildActivity extends BaseActivity implements StarManager.StarFetch
                 row2.setText(String.format("%.2f hours",
                         (float) design.getBuildCost().getTimeInSeconds() / 3600.0f));
 
-                String required = design.getDependenciesList(mStar, getColony());
+                String required = design.getDependenciesList(getColony());
                 row3.setText(Html.fromHtml(required));
 
                 return view;
@@ -430,14 +443,14 @@ public class BuildActivity extends BaseActivity implements StarManager.StarFetch
 
             mBuildQueueList.setBuildQueueActionListener(new BuildQueueList.BuildQueueActionListener() {
                 @Override
-                public void onAccelerateClick(Star star, BuildRequest buildRequest) {
+                public void onAccelerateClick(StarSummary star, BuildRequest buildRequest) {
                     BuildAccelerateDialog dialog = new BuildAccelerateDialog();
                     dialog.setBuildRequest(star, buildRequest);
                     dialog.show(getActivity().getSupportFragmentManager(), "");
                 }
 
                 @Override
-                public void onStopClick(Star star, BuildRequest buildRequest) {
+                public void onStopClick(StarSummary star, BuildRequest buildRequest) {
                     BuildStopConfirmDialog dialog = new BuildStopConfirmDialog();
                     dialog.setBuildRequest(star, buildRequest);
                     dialog.show(getActivity().getSupportFragmentManager(), "");

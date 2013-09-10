@@ -2,6 +2,7 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="libs/protobuf-java-2.5.0.jar"/>
 	<classpathentry kind="lib" path="libs/joda-convert-1.2.jar"/>
 	<classpathentry kind="lib" path="libs/joda-time-2.1.jar"/>
 	<classpathentry kind="lib" path="libs/slf4j-api-1.7.5.jar"/>
@@ -9,6 +10,5 @@
 	<classpathentry kind="lib" path="libs/commons-collections-3.2.1.jar"/>
 	<classpathentry kind="lib" path="libs/commons-io-2.1.jar"/>
 	<classpathentry kind="lib" path="libs/commons-lang3-3.1.jar"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/wire-runtime"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

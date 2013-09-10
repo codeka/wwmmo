@@ -15,14 +15,12 @@ import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import au.com.codeka.TimeInHours;
-import au.com.codeka.common.design.Design;
-import au.com.codeka.common.design.DesignKind;
-import au.com.codeka.common.model.Building;
-import au.com.codeka.common.model.Colony;
+import au.com.codeka.common.model.Design;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.StyledDialog;
 import au.com.codeka.warworlds.model.BuildManager;
-import au.com.codeka.warworlds.model.DesignManager;
+import au.com.codeka.warworlds.model.Building;
+import au.com.codeka.warworlds.model.Colony;
 import au.com.codeka.warworlds.model.SpriteDrawable;
 import au.com.codeka.warworlds.model.SpriteManager;
 
@@ -44,7 +42,7 @@ public class BuildConfirmDialog extends DialogFragment {
 
     public void setup(Building existingBuilding, Colony colony, int buildQueueSize) {
         mExistingBuilding = existingBuilding;
-        mDesign = DesignManager.i.getDesign(DesignKind.BUILDING, existingBuilding.design_id);
+        mDesign = existingBuilding.getDesign();
         mColony = colony;
         mCurrentQueueSize = buildQueueSize;
     }
@@ -79,7 +77,7 @@ public class BuildConfirmDialog extends DialogFragment {
                 timeToBuildLabel.setText("Time to upgrade:");
 
                 TextView currentLevel = (TextView) mView.findViewById(R.id.upgrade_current_level);
-                currentLevel.setText(Integer.toString(mExistingBuilding.level));
+                currentLevel.setText(Integer.toString(mExistingBuilding.getLevel()));
             }
         }
 
@@ -159,7 +157,7 @@ public class BuildConfirmDialog extends DialogFragment {
 
     private void refreshBuildEstimates() {
         // estimate the build time, based on current queue size, construction focus, etc
-        float totalWorkers = mColony.population * mColony.focus_construction;
+        float totalWorkers = mColony.getPopulation() * mColony.getConstructionFocus();
         float workersPerBuildRequest = totalWorkers / (mCurrentQueueSize + 1);
         if (workersPerBuildRequest < 1) {
             workersPerBuildRequest = 1;

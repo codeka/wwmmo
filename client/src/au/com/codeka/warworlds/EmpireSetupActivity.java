@@ -15,9 +15,9 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
 import au.com.codeka.BackgroundRunner;
-import au.com.codeka.common.model.Empire;
 import au.com.codeka.warworlds.api.ApiClient;
 import au.com.codeka.warworlds.api.ApiException;
+import au.com.codeka.common.protobuf.Messages;
 
 /**
  * This activity lets you set up your Empire before you actually join the game. You need
@@ -92,9 +92,9 @@ public class EmpireSetupActivity extends BaseActivity {
 
             @Override
             protected Boolean doInBackground() {
-                Empire empire = new Empire.Builder().display_name(empireName)
-                        .state(Empire.EmpireState.INITIAL)
-                        .email(accountName)
+                Messages.Empire empire = Messages.Empire.newBuilder().setDisplayName(empireName)
+                        .setState(Messages.Empire.EmpireState.INITIAL)
+                        .setEmail(accountName)
                         .build();
 
                 try {

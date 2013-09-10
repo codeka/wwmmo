@@ -26,15 +26,10 @@ import org.apache.http.client.methods.HttpPut;
 import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 
-import com.squareup.wire.Message;
-
 import au.com.codeka.common.NormalRandom;
-import au.com.codeka.common.model.Empire;
-import au.com.codeka.common.model.HelloRequest;
-import au.com.codeka.common.model.HelloResponse;
-import au.com.codeka.common.model.Sector;
-import au.com.codeka.common.model.Sectors;
-import au.com.codeka.common.model.Star;
+import au.com.codeka.common.protobuf.Messages;
+
+import com.google.protobuf.Message;
 
 public class UserManager {
     public static UserManager i = new UserManager();
@@ -96,7 +91,7 @@ public class UserManager {
         private String mUsername;
         private HttpClient mHttpClient;
         private int mHomeStarID;
-        private Sector mHomeSector;
+        private Messages.Sector mHomeSector;
 
         public User(int index) {
             mIndex = index;
@@ -125,34 +120,34 @@ public class UserManager {
                 }
                 get.releaseConnection();
 
-                HelloResponse hello_response_pb = putOrPostProtoBuf(
+                Messages.HelloResponse hello_response_pb = putOrPostProtoBuf(
                         new HttpPut(new URI(mBaseUrl).resolve("hello/1234")), 
-                        new HelloRequest.Builder().build(), HelloResponse.class);
-                if (hello_response_pb.empire == null) {
+                        Messages.HelloRequest.newBuilder().build(), Messages.HelloResponse.class);
+                if (!hello_response_pb.hasEmpire()) {
                     // we have to create the initial empire...
                     putOrPostProtoBuf(
                             new HttpPut(new URI(mBaseUrl).resolve("empires")),
-                            new Empire.Builder()
-                               .display_name("Empire "+(mIndex + 1))
-                               .state(Empire.EmpireState.INITIAL)
-                               .build(),
+                            Messages.Empire.newBuilder()
+                                           .setDisplayName("Empire "+(mIndex + 1))
+                                           .setState(Messages.Empire.EmpireState.INITIAL)
+                                           .build(),
                             null);
 
                     hello_response_pb = putOrPostProtoBuf(
                             new HttpPut(new URI(mBaseUrl).resolve("hello/1234")), 
-                            new HelloRequest.Builder().build(), HelloResponse.class);
+                            Messages.HelloRequest.newBuilder().build(), Messages.HelloResponse.class);
                 }
 
-                Star home_star_pb = hello_response_pb.empire.home_star;
-                mHomeStarID = Integer.parseInt(home_star_pb.key);
+                Messages.Star home_star_pb = hello_response_pb.getEmpire().getHomeStar();
+                mHomeStarID = Integer.parseInt(home_star_pb.getKey());
                 System.out.format("Home Star ID: %d\n", mHomeStarID);
 
                 // get the sector our home star is in. This will let us choose from a bunch of
                 // stars for simulating and stuff.
-                Sectors sectors_pb = getProtoBuf(
-                        String.format("sectors?coords=%d,%d", home_star_pb.sector_x, home_star_pb.sector_y),
-                        Sectors.class);
-                mHomeSector = sectors_pb.sectors.get(0);
+                Messages.Sectors sectors_pb = getProtoBuf(
+                        String.format("sectors?coords=%d,%d", home_star_pb.getSectorX(), home_star_pb.getSectorY()),
+                        Messages.Sectors.class);
+                mHomeSector = sectors_pb.getSectors(0);
             }
 
             UserAction action = new SimulateStarAction(this);
@@ -263,12 +258,12 @@ public class UserManager {
 
         @Override
         protected void doExecute() throws Exception {
-            int numStars = mUser.mHomeSector.stars.size();
+            int numStars = mUser.mHomeSector.getStarsCount();
             int starIndex = mRand.nextInt(numStars);
-            Star star = mUser.mHomeSector.stars.get(starIndex);
+            Messages.Star star = mUser.mHomeSector.getStars(starIndex);
 
             mUser.putOrPostProtoBuf(
-                    new HttpPost(new URI(mBaseUrl).resolve("stars/"+star.key+"/simulate?update=0")),
+                    new HttpPost(new URI(mBaseUrl).resolve("stars/"+star.getKey()+"/simulate?update=0")),
                     null, null);
         }
     }

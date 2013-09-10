@@ -24,15 +24,15 @@ import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import au.com.codeka.TimeInHours;
-import au.com.codeka.common.model.Alliance;
-import au.com.codeka.common.model.AllianceRequest;
-import au.com.codeka.common.model.Empire;
+import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.TabFragmentActivity;
+import au.com.codeka.warworlds.model.Alliance;
 import au.com.codeka.warworlds.model.AllianceManager;
-import au.com.codeka.warworlds.model.AllianceRequestHelper;
-import au.com.codeka.warworlds.model.EmpireHelper;
+import au.com.codeka.warworlds.model.AllianceRequest;
+import au.com.codeka.warworlds.model.Empire;
 import au.com.codeka.warworlds.model.EmpireManager;
+import au.com.codeka.warworlds.model.MyEmpire;
 
 public class AllianceActivity extends TabFragmentActivity
                               implements EmpireManager.EmpireFetchedHandler {
@@ -43,8 +43,8 @@ public class AllianceActivity extends TabFragmentActivity
         super.onCreate(savedInstanceState);
 
         getTabManager().addTab(mContext, new TabInfo(this, "Overview", OverviewFragment.class, null));
-        Empire myEmpire = EmpireManager.i.getEmpire();
-        if (myEmpire.alliance != null) {
+        MyEmpire myEmpire = EmpireManager.i.getEmpire();
+        if (myEmpire.getAlliance() != null) {
             getTabManager().addTab(mContext, new TabInfo(this, "Requests", RequestsFragment.class, null));
         }
     }
@@ -63,8 +63,8 @@ public class AllianceActivity extends TabFragmentActivity
 
     @Override
     public void onEmpireFetched(Empire empire) {
-        Empire myEmpire = EmpireManager.i.getEmpire();
-        if (myEmpire.key.equals(empire.key)) {
+        MyEmpire myEmpire = EmpireManager.i.getEmpire();
+        if (myEmpire.getKey().equals(empire.getKey())) {
             getTabManager().reloadTab();
         }
     }
@@ -98,8 +98,11 @@ public class AllianceActivity extends TabFragmentActivity
                     RankListAdapter.ItemEntry item = (RankListAdapter.ItemEntry) mRankListAdapter.getItem(position);
                     if (item.alliance != null) {
                         Intent intent = new Intent(getActivity(), AllianceDetailsActivity.class);
-                        intent.putExtra("au.com.codeka.warworlds.AllianceKey", item.alliance.key);
-                        intent.putExtra("au.com.codeka.warworlds.Alliance", item.alliance.toByteArray());
+                        intent.putExtra("au.com.codeka.warworlds.AllianceKey", item.alliance.getKey());
+
+                        Messages.Alliance.Builder alliance_pb = Messages.Alliance.newBuilder();
+                        item.alliance.toProtocolBuffer(alliance_pb);
+                        intent.putExtra("au.com.codeka.warworlds.Alliance", alliance_pb.build().toByteArray());
 
                         getActivity().startActivity(intent);
                     }
@@ -153,11 +156,11 @@ public class AllianceActivity extends TabFragmentActivity
             private ArrayList<ItemEntry> mEntries;
 
             public void setAlliances(List<Alliance> alliances) {
-                Alliance myAlliance = (Alliance) EmpireManager.i.getEmpire().alliance;
+                Alliance myAlliance = (Alliance) EmpireManager.i.getEmpire().getAlliance();
                 // remove my alliance from the list, it'll always go at the front
                 if (myAlliance != null) {
                     for (int i = 0; i < alliances.size(); i++) {
-                        if (alliances.get(i).key.equals(myAlliance.key)) {
+                        if (alliances.get(i).getKey().equals(myAlliance.getKey())) {
                             myAlliance = alliances.get(i); // this'll ensure it's the most recent
                             alliances.remove(i);
                             break;
@@ -168,10 +171,10 @@ public class AllianceActivity extends TabFragmentActivity
                 Collections.sort(alliances, new Comparator<Alliance>() {
                     @Override
                     public int compare(Alliance lhs, Alliance rhs) {
-                        if (lhs.num_members == rhs.num_members) {
-                            return lhs.name.compareTo(rhs.name);
+                        if (lhs.getNumMembers() == rhs.getNumMembers()) {
+                            return lhs.getName().compareTo(rhs.getName());
                         } else {
-                            return lhs.num_members - rhs.num_members;
+                            return lhs.getNumMembers() - rhs.getNumMembers();
                         }
                     }
                 });
@@ -232,10 +235,10 @@ public class AllianceActivity extends TabFragmentActivity
 
                     if (entry.alliance != null) {
                         TextView allianceName = (TextView) view.findViewById(R.id.alliance_name);
-                        allianceName.setText(entry.alliance.name);
+                        allianceName.setText(entry.alliance.getName());
 
                         TextView allianceMembers = (TextView) view.findViewById(R.id.alliance_num_members);
-                        allianceMembers.setText(String.format("Members: %d", entry.alliance.num_members));
+                        allianceMembers.setText(String.format("Members: %d", entry.alliance.getNumMembers()));
                     }
                 }
 
@@ -260,7 +263,7 @@ public class AllianceActivity extends TabFragmentActivity
 
         @Override
         public void onAllianceUpdated(Alliance alliance) {
-            if (mAlliance == null || mAlliance.key.equals(alliance.key)) {
+            if (mAlliance == null || mAlliance.getKey().equals(alliance.getKey())) {
                 mAlliance = alliance;
             }
             refreshRequests();
@@ -307,9 +310,9 @@ public class AllianceActivity extends TabFragmentActivity
             progressBar.setVisibility(View.VISIBLE);
 
             if (mAlliance == null) {
-                Empire myEmpire = EmpireManager.i.getEmpire();
-                if (myEmpire != null && myEmpire.alliance != null) {
-                    AllianceManager.i.fetchAlliance(Integer.parseInt(myEmpire.alliance.key), null);
+                MyEmpire myEmpire = EmpireManager.i.getEmpire();
+                if (myEmpire != null && myEmpire.getAlliance() != null) {
+                    AllianceManager.i.fetchAlliance(Integer.parseInt(myEmpire.getAlliance().getKey()), null);
                 }
             } else {
                 refreshRequests();
@@ -320,7 +323,7 @@ public class AllianceActivity extends TabFragmentActivity
             final ProgressBar progressBar = (ProgressBar) mView.findViewById(R.id.loading);
             final ListView joinRequestsList = (ListView) mView.findViewById(R.id.join_requests);
 
-            AllianceManager.i.fetchRequests(mAlliance.key,
+            AllianceManager.i.fetchRequests(mAlliance.getKey(),
                     new AllianceManager.FetchRequestsCompleteHandler() {
                         @Override
                         public void onRequestsFetched(Map<Integer, Empire> empires, List<AllianceRequest> requests) {
@@ -339,10 +342,10 @@ public class AllianceActivity extends TabFragmentActivity
                 mEntries = new ArrayList<ItemEntry>();
                 for (AllianceRequest request : requests) {
                     Empire empire;
-                    if (request.target_empire_id != null) {
-                        empire = empires.get(request.target_empire_id);
+                    if (request.getTargetEmpireID() != null) {
+                        empire = empires.get(request.getTargetEmpireID());
                     } else {
-                        empire = empires.get(request.request_empire_id);
+                        empire = empires.get(request.getRequestEmpireID());
                     }
                     mEntries.add(new ItemEntry(empire, request));
                 }
@@ -361,7 +364,7 @@ public class AllianceActivity extends TabFragmentActivity
             public boolean isEnabled(int position) {
                 if (mEntries == null) 
                     return false;
-                if (mEntries.get(position).request.state == AllianceRequest.RequestState.PENDING)
+                if (mEntries.get(position).request.getState() == AllianceRequest.RequestState.PENDING)
                     return true;
                 return false;
             }
@@ -396,26 +399,26 @@ public class AllianceActivity extends TabFragmentActivity
                 TextView requestVotes = (TextView) view.findViewById(R.id.request_votes);
                 TextView message = (TextView) view.findViewById(R.id.message);
 
-                empireName.setText(entry.empire.display_name);
-                empireIcon.setImageBitmap(EmpireHelper.getShield(activity, entry.empire));
+                empireName.setText(entry.empire.getDisplayName());
+                empireIcon.setImageBitmap(entry.empire.getShield(activity));
                 requestDescription.setText(String.format(Locale.ENGLISH, "%s requested %s",
-                        AllianceRequestHelper.getDescription(entry.request), TimeInHours.format(entry.request.request_date)));
-                message.setText(entry.request.message);
+                        entry.request.getDescription(), TimeInHours.format(entry.request.getRequestDate())));
+                message.setText(entry.request.getMessage());
 
-                if (entry.request.state.equals(AllianceRequest.RequestState.PENDING)) {
+                if (entry.request.getState().equals(AllianceRequest.RequestState.PENDING)) {
                     requestStatus.setVisibility(View.GONE);
                     requestVotes.setVisibility(View.VISIBLE);
-                    if (entry.request.votes == 0) {
+                    if (entry.request.getVotes() == 0) {
                         requestVotes.setText("0");
                     } else {
                         requestVotes.setText(String.format(Locale.ENGLISH, "%s%d",
-                            entry.request.votes < 0 ? "-" : "+", Math.abs(entry.request.votes)));
+                            entry.request.getVotes() < 0 ? "-" : "+", Math.abs(entry.request.getVotes())));
                     }
-                } else if (entry.request.state.equals(AllianceRequest.RequestState.ACCEPTED)) {
+                } else if (entry.request.getState().equals(AllianceRequest.RequestState.ACCEPTED)) {
                     requestStatus.setVisibility(View.VISIBLE);
                     requestVotes.setVisibility(View.GONE);
                     requestStatus.setImageResource(R.drawable.tick);
-                } else if (entry.request.state.equals(AllianceRequest.RequestState.REJECTED)) {
+                } else if (entry.request.getState().equals(AllianceRequest.RequestState.REJECTED)) {
                     requestStatus.setVisibility(View.VISIBLE);
                     requestVotes.setVisibility(View.GONE);
                     requestStatus.setImageResource(R.drawable.cross);

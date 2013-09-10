@@ -1,11 +1,12 @@
 package au.com.codeka.warworlds.game.alliance;
 
-import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+
+import com.google.protobuf.InvalidProtocolBufferException;
 
 import android.content.Context;
 import android.content.Intent;
@@ -19,17 +20,17 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import au.com.codeka.common.Cash;
-import au.com.codeka.common.model.Alliance;
-import au.com.codeka.common.model.AllianceMember;
-import au.com.codeka.common.model.Empire;
-import au.com.codeka.common.model.EmpireRank;
-import au.com.codeka.common.model.Model;
+import au.com.codeka.Cash;
+import au.com.codeka.common.model.BaseAllianceMember;
+import au.com.codeka.common.model.BaseEmpireRank;
+import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.BaseActivity;
 import au.com.codeka.warworlds.R;
+import au.com.codeka.warworlds.model.Alliance;
 import au.com.codeka.warworlds.model.AllianceManager;
-import au.com.codeka.warworlds.model.EmpireHelper;
+import au.com.codeka.warworlds.model.Empire;
 import au.com.codeka.warworlds.model.EmpireManager;
+import au.com.codeka.warworlds.model.MyEmpire;
 
 public class AllianceDetailsActivity extends BaseActivity
                                      implements AllianceManager.AllianceUpdatedHandler,
@@ -53,9 +54,10 @@ public class AllianceDetailsActivity extends BaseActivity
             byte[] alliance_bytes = extras.getByteArray("au.com.codeka.warworlds.Alliance");
             if (alliance_bytes != null) {
                 try {
-                    mAlliance = Model.wire.parseFrom(alliance_bytes, Alliance.class);
-                } catch (IOException e) {
-                    // if it fails, we still have the key
+                    Messages.Alliance alliance_pb = Messages.Alliance.parseFrom(alliance_bytes);
+                    mAlliance = new Alliance();
+                    mAlliance.fromProtocolBuffer(alliance_pb);
+                } catch (InvalidProtocolBufferException e) {
                 }
             }
 
@@ -87,7 +89,7 @@ public class AllianceDetailsActivity extends BaseActivity
 
     @Override
     public void onAllianceUpdated(Alliance alliance) {
-        if (Integer.parseInt(alliance.key) == mAllianceID) {
+        if (alliance.getID() == mAllianceID) {
             mAlliance = alliance;
             fullRefresh();
         }
@@ -95,17 +97,17 @@ public class AllianceDetailsActivity extends BaseActivity
 
     @Override
     public void onEmpireFetched(Empire empire) {
-        Empire myEmpire = EmpireManager.i.getEmpire();
-        if (myEmpire.key.equals(empire.key)) {
+        MyEmpire myEmpire = EmpireManager.i.getEmpire();
+        if (myEmpire.getKey().equals(empire.getKey())) {
             fullRefresh();
         }
     }
 
     private void fullRefresh() {
-        Alliance myAlliance = (Alliance) EmpireManager.i.getEmpire().alliance;
+        Alliance myAlliance = (Alliance) EmpireManager.i.getEmpire().getAlliance();
         if (myAlliance == null) {
             setContentView(R.layout.alliance_details_potential);
-        } else if (Integer.parseInt(myAlliance.key) == mAllianceID) {
+        } else if (myAlliance.getID() == mAllianceID) {
             setContentView(R.layout.alliance_details_mine);
         } else {
             setContentView(R.layout.alliance_details_enemy);
@@ -159,23 +161,23 @@ public class AllianceDetailsActivity extends BaseActivity
         mRefreshPosted = false;
 
         TextView allianceName = (TextView) findViewById(R.id.alliance_name);
-        allianceName.setText(mAlliance.name);
+        allianceName.setText(mAlliance.getName());
 
         TextView bankBalance = (TextView) findViewById(R.id.bank_balance);
         if (bankBalance != null) {
-            bankBalance.setText(Cash.format((float) (double) mAlliance.bank_balance));
+            bankBalance.setText(Cash.format((float) mAlliance.getBankBalance()));
         }
 
         TextView allianceMembers = (TextView) findViewById(R.id.alliance_num_members);
-        allianceMembers.setText(String.format("Members: %d", mAlliance.num_members));
+        allianceMembers.setText(String.format("Members: %d", mAlliance.getNumMembers()));
 
-        if (mAlliance.members != null) {
+        if (mAlliance.getMembers() != null) {
             ArrayList<Empire> members = new ArrayList<Empire>();
             ArrayList<String> missingMembers = new ArrayList<String>();
-            for (AllianceMember am : mAlliance.members) {
-                Empire member = EmpireManager.i.getEmpire(am.empire_key);
+            for (BaseAllianceMember am : mAlliance.getMembers()) {
+                Empire member = EmpireManager.i.getEmpire(am.getEmpireKey());
                 if (member == null) {
-                    missingMembers.add(am.empire_key);
+                    missingMembers.add(am.getEmpireKey());
                 } else {
                     members.add(member);
                 }
@@ -208,7 +210,7 @@ public class AllianceDetailsActivity extends BaseActivity
         Collections.sort(empires, new Comparator<Empire>() {
             @Override
             public int compare(Empire lhs, Empire rhs) {
-                return lhs.display_name.compareTo(rhs.display_name);
+                return lhs.getDisplayName().compareTo(rhs.getDisplayName());
             }
         });
 
@@ -220,9 +222,11 @@ public class AllianceDetailsActivity extends BaseActivity
                 Empire empire = (Empire) v.getTag();
 
                 Intent intent = new Intent(AllianceDetailsActivity.this, AllianceMemberDetailsActivity.class);
-                intent.putExtra("au.com.codeka.warworlds.AllianceKey", mAlliance.key);
-                intent.putExtra("au.com.codeka.warworlds.Alliance", mAlliance.toByteArray());
-                intent.putExtra("au.com.codeka.warworlds.EmpireKey", empire.key);
+                intent.putExtra("au.com.codeka.warworlds.AllianceKey", mAlliance.getKey());
+                Messages.Alliance.Builder alliance_pb = Messages.Alliance.newBuilder();
+                mAlliance.toProtocolBuffer(alliance_pb);
+                intent.putExtra("au.com.codeka.warworlds.Alliance", alliance_pb.build().toByteArray());
+                intent.putExtra("au.com.codeka.warworlds.EmpireKey", empire.getKey());
 
                 startActivity(intent);
             }
@@ -241,22 +245,22 @@ public class AllianceDetailsActivity extends BaseActivity
             view.findViewById(R.id.rank).setVisibility(View.INVISIBLE);
 
             DecimalFormat formatter = new DecimalFormat("#,##0");
-            empireName.setText(empire.display_name);
-            empireIcon.setImageBitmap(EmpireHelper.getShield(this, empire));
+            empireName.setText(empire.getDisplayName());
+            empireIcon.setImageBitmap(empire.getShield(this));
 
-            EmpireRank rank = empire.rank;
+            BaseEmpireRank rank = empire.getRank();
             if (rank != null) {
                 totalStars.setText(Html.fromHtml(String.format("Stars: <b>%s</b>",
-                        formatter.format(rank.total_stars))));
+                        formatter.format(rank.getTotalStars()))));
                 totalColonies.setText(Html.fromHtml(String.format("Colonies: <b>%s</b>",
-                        formatter.format(rank.total_colonies))));
+                        formatter.format(rank.getTotalColonies()))));
 
-                Empire myEmpire = EmpireManager.i.getEmpire();
-                if (empire.key.equals(myEmpire.key) || rank.total_stars >= 10) {
+                MyEmpire myEmpire = EmpireManager.i.getEmpire();
+                if (empire.getKey().equals(myEmpire.getKey()) || rank.getTotalStars() >= 10) {
                     totalShips.setText(Html.fromHtml(String.format("Ships: <b>%s</b>",
-                           formatter.format(rank.total_ships))));
+                           formatter.format(rank.getTotalShips()))));
                     totalBuildings.setText(Html.fromHtml(String.format("Buildings: <b>%s</b>",
-                           formatter.format(rank.total_buildings))));
+                           formatter.format(rank.getTotalBuildings()))));
                 } else {
                     totalShips.setText("");
                     totalBuildings.setText("");

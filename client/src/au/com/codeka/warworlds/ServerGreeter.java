@@ -14,15 +14,15 @@ import android.os.Handler;
 import android.os.StrictMode;
 import android.preference.PreferenceManager;
 import au.com.codeka.BackgroundRunner;
-import au.com.codeka.common.model.Colony;
-import au.com.codeka.common.model.HelloRequest;
-import au.com.codeka.common.model.HelloResponse;
+import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.api.ApiClient;
 import au.com.codeka.warworlds.api.ApiException;
 import au.com.codeka.warworlds.ctrl.BannerAdView;
 import au.com.codeka.warworlds.model.BuildManager;
 import au.com.codeka.warworlds.model.ChatManager;
+import au.com.codeka.warworlds.model.Colony;
 import au.com.codeka.warworlds.model.EmpireManager;
+import au.com.codeka.warworlds.model.MyEmpire;
 import au.com.codeka.warworlds.model.Realm;
 import au.com.codeka.warworlds.model.RealmManager;
 
@@ -170,54 +170,61 @@ public class ServerGreeter {
                 String message;
                 try {
                     int memoryClass = ((ActivityManager) activity.getSystemService(Activity.ACTIVITY_SERVICE)).getMemoryClass();
-                    HelloRequest req = new HelloRequest.Builder()
-                            .device_build(android.os.Build.DISPLAY)
-                            .device_manufacturer(android.os.Build.MANUFACTURER)
-                            .device_model(android.os.Build.MODEL)
-                            .device_version(android.os.Build.VERSION.RELEASE)
-                            .memory_class(memoryClass)
-                            .allow_inline_notfications(true)
+                    Messages.HelloRequest req = Messages.HelloRequest.newBuilder()
+                            .setDeviceBuild(android.os.Build.DISPLAY)
+                            .setDeviceManufacturer(android.os.Build.MANUFACTURER)
+                            .setDeviceModel(android.os.Build.MODEL)
+                            .setDeviceVersion(android.os.Build.VERSION.RELEASE)
+                            .setMemoryClass(memoryClass)
+                            .setAllowInlineNotfications(true)
                             .build();
 
                     String url = "hello/"+deviceRegistrationKey;
-                    HelloResponse resp = ApiClient.putProtoBuf(url, req, HelloResponse.class);
-                    if (resp.empire != null) {
+                    Messages.HelloResponse resp = ApiClient.putProtoBuf(url, req, Messages.HelloResponse.class);
+                    if (resp.hasEmpire()) {
                         mNeedsEmpireSetup = false;
-                        EmpireManager.i.setup(resp.empire);
+                        MyEmpire myEmpire = new MyEmpire();
+                        myEmpire.fromProtocolBuffer(resp.getEmpire());
+                        EmpireManager.i.setup(myEmpire);
                     } else {
                         mNeedsEmpireSetup = true;
                     }
 
-                    if (resp.was_empire_reset != null && resp.was_empire_reset) {
+                    if (resp.hasWasEmpireReset() && resp.getWasEmpireReset()) {
                         mWasEmpireReset = true;
-                        if (resp.empire_reset_reason != null) {
-                            mResetReason = resp.empire_reset_reason;
+                        if (resp.hasEmpireResetReason() && resp.getEmpireResetReason().length() > 0) {
+                            mResetReason = resp.getEmpireResetReason();
                         }
                     }
 
-                    if (resp.force_remove_ads != null && resp.force_remove_ads) {
+                    if (resp.hasForceRemoveAds() && resp.getForceRemoveAds()) {
                         BannerAdView.removeAds();
                     }
 
-                    if (resp.require_gcm_register != null && resp.require_gcm_register) {
+                    if (resp.hasRequireGcmRegister() && resp.getRequireGcmRegister()) {
                         log.info("Re-registering for GCM...");
                         GCMIntentService.register(activity);
                         // we can keep going, though...
                     }
 
                     mColonies = new ArrayList<Colony>();
-                    for (Colony c : resp.colonies) {
-                        if (c.population < 1.0) {
+                    for (Messages.Colony c : resp.getColoniesList()) {
+                        if (c.getPopulation() < 1.0) {
                             continue;
                         }
-                        mColonies.add(c);
+                        Colony colony = new Colony();
+                        colony.fromProtocolBuffer(c);
+                        mColonies.add(colony);
                     }
 
-                    mStarIDs = new ArrayList<Long>(resp.star_ids);
+                    mStarIDs = new ArrayList<Long>();
+                    for (Long id : resp.getStarIdsList()) {
+                        mStarIDs.add(id);
+                    }
 
-                    BuildManager.getInstance().setup(resp.building_statistics, resp.build_requests);
+                    BuildManager.getInstance().setup(resp.getBuildingStatistics(), resp.getBuildRequestsList());
 
-                    message = resp.motd.message;
+                    message = resp.getMotd().getMessage();
                     mErrorOccured = false;
                 } catch(ApiException e) {
                     log.error("Error occurred in 'hello'", e);

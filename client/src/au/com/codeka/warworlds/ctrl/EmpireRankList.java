@@ -18,11 +18,11 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import au.com.codeka.BackgroundRunner;
-import au.com.codeka.common.model.Empire;
-import au.com.codeka.common.model.EmpireRank;
 import au.com.codeka.warworlds.R;
-import au.com.codeka.warworlds.model.EmpireHelper;
+import au.com.codeka.warworlds.model.Empire;
 import au.com.codeka.warworlds.model.EmpireManager;
+import au.com.codeka.warworlds.model.EmpireRank;
+import au.com.codeka.warworlds.model.MyEmpire;
 
 public class EmpireRankList extends ListView {
     private RankListAdapter mRankListAdapter;
@@ -63,7 +63,7 @@ public class EmpireRankList extends ListView {
         public void setEmpires(List<Empire> empires, boolean addGaps) {
             ArrayList<ItemEntry> entries = new ArrayList<ItemEntry>();
             for (Empire empire : empires) {
-                if (empire.rank == null) {
+                if (empire.getRank() == null) {
                     continue;
                 }
                 entries.add(new ItemEntry(empire));
@@ -93,22 +93,22 @@ public class EmpireRankList extends ListView {
                         if (lhs.empire == null || rhs.empire == null) {
                             return 0;
                         } else {
-                            return lhs.empire.display_name.compareTo(rhs.empire.display_name);
+                            return lhs.empire.getDisplayName().compareTo(rhs.empire.getDisplayName());
                         }
                     }
 
-                    int lhsRank = lhs.rank.rank;
-                    int rhsRank = rhs.rank.rank;
+                    int lhsRank = lhs.rank.getRank();
+                    int rhsRank = rhs.rank.getRank();
                     return lhsRank - rhsRank;
                 }
             });
 
             int lastRank = 0;
             for (ItemEntry entry : entries) {
-                if (lastRank != 0 && entry.rank.rank != lastRank + 1 && addGaps) {
+                if (lastRank != 0 && entry.rank.getRank() != lastRank + 1 && addGaps) {
                     mEntries.add(new ItemEntry());
                 }
-                lastRank = entry.rank.rank;
+                lastRank = entry.rank.getRank();
                 mEntries.add(entry);
             }
 
@@ -190,8 +190,8 @@ public class EmpireRankList extends ListView {
             EmpireRank rank = entry.rank;
 
             if (empire != null) {
-                empireName.setText(empire.display_name);
-                empireIcon.setImageBitmap(EmpireHelper.getShield(mContext, empire));
+                empireName.setText(empire.getDisplayName());
+                empireIcon.setImageBitmap(empire.getShield(mContext));
             } else {
                 empireName.setText("???");
                 empireIcon.setImageDrawable(null);
@@ -199,21 +199,21 @@ public class EmpireRankList extends ListView {
             }
 
             DecimalFormat formatter = new DecimalFormat("#,##0");
-            rankView.setText(formatter.format(rank.rank));
+            rankView.setText(formatter.format(rank.getRank()));
             totalPopulation.setText(Html.fromHtml(String.format("Population: <b>%s</b>",
-                    formatter.format(rank.total_population))));
+                    formatter.format(rank.getTotalPopulation()))));
             totalStars.setText(Html.fromHtml(String.format("Stars: <b>%s</b>",
-                    formatter.format(rank.total_stars))));
+                    formatter.format(rank.getTotalStars()))));
             totalColonies.setText(Html.fromHtml(String.format("Colonies: <b>%s</b>",
-                    formatter.format(rank.total_colonies))));
+                    formatter.format(rank.getTotalColonies()))));
 
-            Empire myEmpire = EmpireManager.i.getEmpire();
-            if (rank.total_stars > 10 || 
-                    (empire != null && empire.key.equals(myEmpire.key))) {
+            MyEmpire myEmpire = EmpireManager.i.getEmpire();
+            if (rank.getTotalStars() > 10 || 
+                    (empire != null && empire.getKey().equals(myEmpire.getKey()))) {
                 totalShips.setText(Html.fromHtml(String.format("Ships: <b>%s</b>",
-                       formatter.format(rank.total_ships))));
+                       formatter.format(rank.getTotalShips()))));
                 totalBuildings.setText(Html.fromHtml(String.format("Buildings: <b>%s</b>",
-                       formatter.format(rank.total_buildings))));
+                       formatter.format(rank.getTotalBuildings()))));
             } else {
                 totalShips.setText("");
                 totalBuildings.setText("");
@@ -248,7 +248,7 @@ public class EmpireRankList extends ListView {
                         protected void onComplete(final ArrayList<ItemEntry> toFetch) {
                             ArrayList<String> empireKeys = new ArrayList<String>();
                             for (ItemEntry entry : toFetch) {
-                                empireKeys.add(entry.rank.empire_key);
+                                empireKeys.add(entry.rank.getEmpireKey());
                             }
 
                             EmpireManager.i.fetchEmpires(empireKeys, new EmpireManager.EmpireFetchedHandler() {
@@ -256,7 +256,7 @@ public class EmpireRankList extends ListView {
                                 public void onEmpireFetched(Empire empire) {
                                     boolean refreshedAll = true;
                                     for (ItemEntry entry : toFetch) {
-                                        if (entry.rank.empire_key.equals(empire.key)) {
+                                        if (entry.rank.getEmpireKey().equals(empire.getKey())) {
                                             entry.empire = empire;
                                         }
                                         if (entry.empire == null) {
@@ -287,7 +287,7 @@ public class EmpireRankList extends ListView {
             }
             public ItemEntry(Empire empire) {
                 this.empire = empire;
-                this.rank = (EmpireRank) empire.rank;
+                this.rank = (EmpireRank) empire.getRank();
             }
             public ItemEntry(EmpireRank rank) {
                 this.rank = rank;

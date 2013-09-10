@@ -16,20 +16,18 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
-import au.com.codeka.common.design.DesignKind;
-import au.com.codeka.common.design.ShipDesign;
-import au.com.codeka.common.model.CombatReport;
-import au.com.codeka.common.model.CombatRound;
-import au.com.codeka.common.model.Empire;
-import au.com.codeka.common.model.Star;
+import au.com.codeka.common.model.DesignKind;
+import au.com.codeka.common.model.ShipDesign;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.StyledDialog;
+import au.com.codeka.warworlds.model.CombatReport;
 import au.com.codeka.warworlds.model.DesignManager;
-import au.com.codeka.warworlds.model.EmpireHelper;
+import au.com.codeka.warworlds.model.Empire;
 import au.com.codeka.warworlds.model.EmpireManager;
-import au.com.codeka.warworlds.model.MyEmpireManager;
+import au.com.codeka.warworlds.model.MyEmpire;
 import au.com.codeka.warworlds.model.SpriteDrawable;
 import au.com.codeka.warworlds.model.SpriteManager;
+import au.com.codeka.warworlds.model.Star;
 
 public class CombatReportDialog extends DialogFragment {
     private Star mStar;
@@ -63,25 +61,25 @@ public class CombatReportDialog extends DialogFragment {
         mReportAdapter = new ReportAdapter();
         reportItems.setAdapter(mReportAdapter);
 
-        MyEmpireManager.i.fetchCombatReport(
-                mStar.key, mCombatReportKey, 
-                new MyEmpireManager.FetchCombatReportCompleteHandler() {
+        EmpireManager.i.getEmpire().fetchCombatReport(
+                mStar.getKey(), mCombatReportKey, 
+                new MyEmpire.FetchCombatReportCompleteHandler() {
             @Override
             public void onComplete(CombatReport report) {
                 progressBar.setVisibility(View.GONE);
                 reportItems.setVisibility(View.VISIBLE);
 
                 TreeSet<String> empireKeys = new TreeSet<String>();
-                for (CombatRound round : report.rounds) {
-                    for (CombatRound.FleetSummary fleet : round.fleets) {
-                        if (fleet.empire_key == null || fleet.empire_key.length() == 0) {
+                for (CombatReport.CombatRound round : report.getCombatRounds()) {
+                    for (CombatReport.FleetSummary fleet : round.getFleets()) {
+                        if (fleet.getEmpireKey() == null || fleet.getEmpireKey().length() == 0) {
                             continue;
                         }
-                        if (mEmpires.containsKey(fleet.empire_key)) {
+                        if (mEmpires.containsKey(fleet.getEmpireKey())) {
                             continue;
                         }
-                        if (!empireKeys.contains(fleet.empire_key)) {
-                            empireKeys.add(fleet.empire_key);
+                        if (!empireKeys.contains(fleet.getEmpireKey())) {
+                            empireKeys.add(fleet.getEmpireKey());
                         }
                     }
                 }
@@ -90,7 +88,7 @@ public class CombatReportDialog extends DialogFragment {
                             new EmpireManager.EmpireFetchedHandler() {
                                 @Override
                                 public void onEmpireFetched(Empire empire) {
-                                    mEmpires.put(empire.key, empire);
+                                    mEmpires.put(empire.getKey(), empire);
                                     mReportAdapter.notifyDataSetChanged();
                                 }
                             });
@@ -117,18 +115,18 @@ public class CombatReportDialog extends DialogFragment {
         public void setReport(CombatReport combatReport) {
             mCombatReport = combatReport;
             mRecords = new ArrayList<Record>();
-            for (CombatRound round : mCombatReport.rounds) {
+            for (CombatReport.CombatRound round : mCombatReport.getCombatRounds()) {
                 mRecords.add(new Record(round));
-                for (CombatRound.FleetJoinedRecord record : round.fleets_joined) {
+                for (CombatReport.FleetJoinedRecord record : round.getFleetJoinedRecords()) {
                     mRecords.add(new Record(record));
                 }
-                for (CombatRound.FleetTargetRecord record : round.fleets_targetted) {
+                for (CombatReport.FleetTargetRecord record : round.getFleetTargetRecords()) {
                     mRecords.add(new Record(record));
                 }
-                for (CombatRound.FleetAttackRecord record : round.fleets_attacked) {
+                for (CombatReport.FleetAttackRecord record : round.getFleetAttackRecords()) {
                     mRecords.add(new Record(record));
                 }
-                for (CombatRound.FleetDamagedRecord record : round.fleets_damaged) {
+                for (CombatReport.FleetDamagedRecord record : round.getFleetDamagedRecords()) {
                     mRecords.add(new Record(record));
                 }
             }
@@ -188,8 +186,8 @@ public class CombatReportDialog extends DialogFragment {
 
             if (record.combatRound != null) {
                 int roundIndex = 0;
-                for (; roundIndex < mCombatReport.rounds.size(); roundIndex++) {
-                    if (mCombatReport.rounds.get(roundIndex) == record.combatRound)
+                for (; roundIndex < mCombatReport.getCombatRounds().size(); roundIndex++) {
+                    if (mCombatReport.getCombatRounds().get(roundIndex) == record.combatRound)
                         break;
                 }
 
@@ -214,74 +212,74 @@ public class CombatReportDialog extends DialogFragment {
                 recordDescription.setText("");
 
                 if (record.fleetJoinedRecord != null) {
-                    CombatRound.FleetSummary fleet = record.combatRound.fleets.get(record.fleetJoinedRecord.fleet_index);
-                    ShipDesign design = (ShipDesign) DesignManager.i.getDesign(DesignKind.SHIP, fleet.design_id);
-                    Empire empire = mEmpires.get(fleet.empire_key);
+                    CombatReport.FleetSummary fleet = record.fleetJoinedRecord.getFleet();
+                    ShipDesign design = (ShipDesign) DesignManager.i.getDesign(DesignKind.SHIP, fleet.getDesignID());
+                    Empire empire = mEmpires.get(fleet.getEmpireKey());
 
                     recordTitle.setText("Fleet Joined Battle");
                     fleetIcon.setImageDrawable(new SpriteDrawable(SpriteManager.i.getSprite(design.getSpriteName())));
                     if (empire != null) {
-                        empireIcon.setImageBitmap(EmpireHelper.getShield(getActivity(), empire));
+                        empireIcon.setImageBitmap(empire.getShield(getActivity()));
                         recordDescription.setText(String.format(Locale.ENGLISH,
                                 "%s %s joined the battle",
-                                empire.display_name,
-                                getFleetName(design, fleet.num_ships)));
+                                empire.getDisplayName(),
+                                getFleetName(design, fleet.getNumShips())));
                     }
                 } else if (record.fleetTargetRecord != null) {
-                    CombatRound.FleetSummary fleet = record.combatRound.fleets.get(record.fleetTargetRecord.fleet_index);
-                    CombatRound.FleetSummary target = record.combatRound.fleets.get(record.fleetTargetRecord.target_index);
-                    ShipDesign design = (ShipDesign) DesignManager.i.getDesign(DesignKind.SHIP, fleet.design_id);
-                    ShipDesign targetDesign = (ShipDesign) DesignManager.i.getDesign(DesignKind.SHIP, target.design_id);
-                    Empire empire = mEmpires.get(fleet.empire_key);
-                    Empire targetEmpire = mEmpires.get(target.empire_key);
+                    CombatReport.FleetSummary fleet = record.fleetTargetRecord.getFleet();
+                    CombatReport.FleetSummary target = record.fleetTargetRecord.getTarget();
+                    ShipDesign design = (ShipDesign) DesignManager.i.getDesign(DesignKind.SHIP, fleet.getDesignID());
+                    ShipDesign targetDesign = (ShipDesign) DesignManager.i.getDesign(DesignKind.SHIP, target.getDesignID());
+                    Empire empire = mEmpires.get(fleet.getEmpireKey());
+                    Empire targetEmpire = mEmpires.get(target.getEmpireKey());
 
                     recordTitle.setText("Fleet Targetted");
                     fleetIcon.setImageDrawable(new SpriteDrawable(SpriteManager.i.getSprite(design.getSpriteName())));
                     targetFleetIcon.setImageDrawable(new SpriteDrawable(SpriteManager.i.getSprite(targetDesign.getSpriteName())));
                     if (empire != null && targetEmpire != null) {
-                        empireIcon.setImageBitmap(EmpireHelper.getShield(getActivity(), empire));
-                        targetEmpireIcon.setImageBitmap(EmpireHelper.getShield(getActivity(), targetEmpire));
+                        empireIcon.setImageBitmap(empire.getShield(getActivity()));
+                        targetEmpireIcon.setImageBitmap(targetEmpire.getShield(getActivity()));
 
                         recordDescription.setText(String.format(Locale.ENGLISH,
                                 "%s %s targetted %s %s",
-                                empire.display_name, getFleetName(design, fleet.num_ships),
-                                targetEmpire.display_name, getFleetName(targetDesign, target.num_ships)));
+                                empire.getDisplayName(), getFleetName(design, fleet.getNumShips()),
+                                targetEmpire.getDisplayName(), getFleetName(targetDesign, target.getNumShips())));
                     }
                 } else if (record.fleetAttackRecord != null) {
-                    CombatRound.FleetSummary fleet = record.combatRound.fleets.get(record.fleetAttackRecord.fleet_index);
-                    CombatRound.FleetSummary target = record.combatRound.fleets.get(record.fleetAttackRecord.target_index);
-                    ShipDesign design = (ShipDesign) DesignManager.i.getDesign(DesignKind.SHIP, fleet.design_id);
-                    ShipDesign targetDesign = (ShipDesign) DesignManager.i.getDesign(DesignKind.SHIP, target.design_id);
-                    Empire empire = mEmpires.get(fleet.empire_key);
-                    Empire targetEmpire = mEmpires.get(target.empire_key);
+                    CombatReport.FleetSummary fleet = record.fleetAttackRecord.getFleet();
+                    CombatReport.FleetSummary target = record.fleetAttackRecord.getTarget();
+                    ShipDesign design = (ShipDesign) DesignManager.i.getDesign(DesignKind.SHIP, fleet.getDesignID());
+                    ShipDesign targetDesign = (ShipDesign) DesignManager.i.getDesign(DesignKind.SHIP, target.getDesignID());
+                    Empire empire = mEmpires.get(fleet.getEmpireKey());
+                    Empire targetEmpire = mEmpires.get(target.getEmpireKey());
 
                     recordTitle.setText("Fleet Attacked");
                     fleetIcon.setImageDrawable(new SpriteDrawable(SpriteManager.i.getSprite(design.getSpriteName())));
                     targetFleetIcon.setImageDrawable(new SpriteDrawable(SpriteManager.i.getSprite(targetDesign.getSpriteName())));
                     if (empire != null && targetEmpire != null) {
-                        empireIcon.setImageBitmap(EmpireHelper.getShield(getActivity(), empire));
-                        targetEmpireIcon.setImageBitmap(EmpireHelper.getShield(getActivity(), targetEmpire));
+                        empireIcon.setImageBitmap(empire.getShield(getActivity()));
+                        targetEmpireIcon.setImageBitmap(targetEmpire.getShield(getActivity()));
 
                         recordDescription.setText(String.format(Locale.ENGLISH,
                                 "%s %s attacked %s %s for %.1f points",
-                                empire.display_name, getFleetName(design, fleet.num_ships),
-                                targetEmpire.display_name, getFleetName(targetDesign, target.num_ships),
-                                record.fleetAttackRecord.damage));
+                                empire.getDisplayName(), getFleetName(design, fleet.getNumShips()),
+                                targetEmpire.getDisplayName(), getFleetName(targetDesign, target.getNumShips()),
+                                record.fleetAttackRecord.getDamage()));
                     }
                 } else if (record.fleetDamagedRecord != null) {
-                    CombatRound.FleetSummary fleet = record.combatRound.fleets.get(record.fleetDamagedRecord.fleet_index);
-                    ShipDesign design = (ShipDesign) DesignManager.i.getDesign(DesignKind.SHIP, fleet.design_id);
-                    Empire empire = mEmpires.get(fleet.empire_key);
+                    CombatReport.FleetSummary fleet = record.fleetDamagedRecord.getFleet();
+                    ShipDesign design = (ShipDesign) DesignManager.i.getDesign(DesignKind.SHIP, fleet.getDesignID());
+                    Empire empire = mEmpires.get(fleet.getEmpireKey());
 
                     recordTitle.setText("Fleet Damaged");
                     fleetIcon.setImageDrawable(new SpriteDrawable(SpriteManager.i.getSprite(design.getSpriteName())));
                     if (empire != null) {
-                        empireIcon.setImageBitmap(EmpireHelper.getShield(getActivity(), empire));
+                        empireIcon.setImageBitmap(empire.getShield(getActivity()));
 
                         recordDescription.setText(String.format(Locale.ENGLISH,
                                 "%s %s was hit for %.1f damage",
-                                empire.display_name, getFleetName(design, fleet.num_ships),
-                                record.fleetDamagedRecord.damage));
+                                empire.getDisplayName(), getFleetName(design, fleet.getNumShips()),
+                                record.fleetDamagedRecord.getDamage()));
                     }
                 }
             }
@@ -304,26 +302,26 @@ public class CombatReportDialog extends DialogFragment {
             // we're displaying in this particular row
 
             // if non-null, this is the "header" row for that round.
-            public CombatRound combatRound;
+            public CombatReport.CombatRound combatRound;
 
-            public CombatRound.FleetJoinedRecord fleetJoinedRecord;
-            public CombatRound.FleetTargetRecord fleetTargetRecord;
-            public CombatRound.FleetAttackRecord fleetAttackRecord;
-            public CombatRound.FleetDamagedRecord fleetDamagedRecord;
+            public CombatReport.FleetJoinedRecord fleetJoinedRecord;
+            public CombatReport.FleetTargetRecord fleetTargetRecord;
+            public CombatReport.FleetAttackRecord fleetAttackRecord;
+            public CombatReport.FleetDamagedRecord fleetDamagedRecord;
 
-            public Record(CombatRound combatRound) {
+            public Record(CombatReport.CombatRound combatRound) {
                 this.combatRound = combatRound;
             }
-            public Record(CombatRound.FleetJoinedRecord record) {
+            public Record(CombatReport.FleetJoinedRecord record) {
                 this.fleetJoinedRecord = record;
             }
-            public Record(CombatRound.FleetTargetRecord record) {
+            public Record(CombatReport.FleetTargetRecord record) {
                 this.fleetTargetRecord = record;
             }
-            public Record(CombatRound.FleetAttackRecord record) {
+            public Record(CombatReport.FleetAttackRecord record) {
                 this.fleetAttackRecord = record;
             }
-            public Record(CombatRound.FleetDamagedRecord record) {
+            public Record(CombatReport.FleetDamagedRecord record) {
                 this.fleetDamagedRecord = record;
             }
         }

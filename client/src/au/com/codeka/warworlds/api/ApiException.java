@@ -3,8 +3,7 @@ package au.com.codeka.warworlds.api;
 import org.apache.http.HttpResponse;
 import org.apache.http.StatusLine;
 
-import au.com.codeka.common.model.GenericError;
-
+import au.com.codeka.common.protobuf.Messages;
 
 public class ApiException extends Exception {
     private static final long serialVersionUID = 1L;
@@ -45,10 +44,10 @@ public class ApiException extends Exception {
     public static void throwApiException(HttpResponse resp) throws ApiException {
         ApiException ex = new ApiException();
 
-        GenericError err = ApiClient.parseResponseBody(resp, GenericError.class);
+        Messages.GenericError err = ApiClient.parseResponseBody(resp, Messages.GenericError.class);
         if (err != null) {
-            ex.mServerErrorCode = err.error_code;
-            ex.mServerErrorMessage = err.error_message;
+            ex.mServerErrorCode = err.getErrorCode();
+            ex.mServerErrorMessage = err.getErrorMessage();
         }
 
         ex.mHttpStatusLine = resp.getStatusLine();

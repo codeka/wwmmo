@@ -30,23 +30,24 @@ import android.widget.Spinner;
 import android.widget.SpinnerAdapter;
 import android.widget.TextView;
 import au.com.codeka.TimeInHours;
-import au.com.codeka.common.design.DesignKind;
-import au.com.codeka.common.design.ShipDesign;
-import au.com.codeka.common.model.Empire;
-import au.com.codeka.common.model.Fleet;
-import au.com.codeka.common.model.Model;
-import au.com.codeka.common.model.Star;
+import au.com.codeka.common.model.BaseFleet;
+import au.com.codeka.common.model.DesignKind;
+import au.com.codeka.common.model.ShipDesign;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.model.DesignManager;
+import au.com.codeka.warworlds.model.Empire;
 import au.com.codeka.warworlds.model.EmpireManager;
+import au.com.codeka.warworlds.model.Fleet;
 import au.com.codeka.warworlds.model.ImageManager;
+import au.com.codeka.warworlds.model.MyEmpire;
 import au.com.codeka.warworlds.model.SectorManager;
 import au.com.codeka.warworlds.model.Sprite;
 import au.com.codeka.warworlds.model.SpriteDrawable;
 import au.com.codeka.warworlds.model.SpriteManager;
+import au.com.codeka.warworlds.model.Star;
 import au.com.codeka.warworlds.model.StarImageManager;
 import au.com.codeka.warworlds.model.StarManager;
-import au.com.codeka.warworlds.model.StarType;
+import au.com.codeka.warworlds.model.StarSummary;
 
 /**
  * This control displays a list of fleets along with controls you can use to manage them (split
@@ -81,10 +82,10 @@ public class FleetList extends FrameLayout implements StarManager.StarFetchedHan
         mFleetActionListener = listener;
     }
 
-    public void refresh(List<Fleet> fleets, Map<String, Star> stars) {
+    public void refresh(List<BaseFleet> fleets, Map<String, Star> stars) {
         if (fleets != null) {
             mFleets = new ArrayList<Fleet>();
-            for (Fleet f : fleets) {
+            for (BaseFleet f : fleets) {
                 mFleets.add((Fleet) f);
             }
         }
@@ -99,7 +100,7 @@ public class FleetList extends FrameLayout implements StarManager.StarFetchedHan
             mSelectedFleet = null;
 
             for (Fleet f : mFleets) {
-                if (f.key.equals(selectedFleet.key)) {
+                if (f.getKey().equals(selectedFleet.getKey())) {
                     mSelectedFleet = f;
                     break;
                 }
@@ -112,14 +113,14 @@ public class FleetList extends FrameLayout implements StarManager.StarFetchedHan
     public void selectFleet(String fleetKey, boolean recentre) {
         mSelectedFleet = null;
         for (Fleet f : mFleets) {
-            if (f.key.equals(fleetKey)) {
+            if (f.getKey().equals(fleetKey)) {
                 mSelectedFleet = f;
             }
         }
 
         if (mSelectedFleet != null) {
             final Spinner stanceSpinner = (Spinner) findViewById(R.id.stance);
-            stanceSpinner.setSelection(mSelectedFleet.stance.ordinal());
+            stanceSpinner.setSelection(mSelectedFleet.getStance().getValue() - 1);
 
             if (recentre) {
                 int position = mFleetListAdapter.getItemPosition(mSelectedFleet);
@@ -149,14 +150,14 @@ public class FleetList extends FrameLayout implements StarManager.StarFetchedHan
         stanceSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                Fleet.FLEET_STANCE stance = Fleet.FLEET_STANCE.values()[position];
+                Fleet.Stance stance = Fleet.Stance.values()[position];
                 if (mSelectedFleet == null) {
                     return;
                 }
 
-                if (mSelectedFleet.stance != stance && mFleetActionListener != null) {
+                if (mSelectedFleet.getStance() != stance && mFleetActionListener != null) {
                     mFleetActionListener.onFleetStanceModified(
-                            mStars.get(mSelectedFleet.star_key),
+                            mStars.get(mSelectedFleet.getStarKey()),
                             mSelectedFleet, stance);
                 }
             }
@@ -172,7 +173,7 @@ public class FleetList extends FrameLayout implements StarManager.StarFetchedHan
                 FleetListAdapter.ItemEntry entry =
                         (FleetListAdapter.ItemEntry) mFleetListAdapter.getItem(position);
                 if (entry.type == FleetListAdapter.FLEET_ITEM_TYPE) {
-                    selectFleet(((Fleet) entry.value).key, false);
+                    selectFleet(((Fleet) entry.value).getKey(), false);
                 }
             }
         });
@@ -186,7 +187,7 @@ public class FleetList extends FrameLayout implements StarManager.StarFetchedHan
                 }
 
                 if (mFleetActionListener != null) {
-                    mFleetActionListener.onFleetSplit(mStars.get(mSelectedFleet.star_key),
+                    mFleetActionListener.onFleetSplit(mStars.get(mSelectedFleet.getStarKey()),
                                                       mSelectedFleet);
                 }
             }
@@ -201,7 +202,7 @@ public class FleetList extends FrameLayout implements StarManager.StarFetchedHan
                 }
 
                 if (mFleetActionListener != null) {
-                    mFleetActionListener.onFleetMove(mStars.get(mSelectedFleet.star_key),
+                    mFleetActionListener.onFleetMove(mStars.get(mSelectedFleet.getStarKey()),
                                                      mSelectedFleet);
                 }
             }
@@ -216,7 +217,7 @@ public class FleetList extends FrameLayout implements StarManager.StarFetchedHan
                 }
 
                 if (mFleetActionListener != null) {
-                    mFleetActionListener.onFleetView(mStars.get(mSelectedFleet.star_key),
+                    mFleetActionListener.onFleetView(mStars.get(mSelectedFleet.getStarKey()),
                                                      mSelectedFleet);
                 }
             }
@@ -237,12 +238,12 @@ public class FleetList extends FrameLayout implements StarManager.StarFetchedHan
             }
         });
 
-        StarManager.i.addStarUpdatedListener(null, this);
+        StarManager.getInstance().addStarUpdatedListener(null, this);
     }
 
     @Override
     public void onDetachedFromWindow() {
-        StarManager.i.removeStarUpdatedListener(this);
+        StarManager.getInstance().removeStarUpdatedListener(this);
     }
 
     /**
@@ -251,19 +252,19 @@ public class FleetList extends FrameLayout implements StarManager.StarFetchedHan
     @Override
     public void onStarFetched(Star s) {
         for (String starKey : mStars.keySet()) {
-            if (starKey.equals(s.key)) {
-                mStars.put(s.key, s);
+            if (starKey.equals(s.getKey())) {
+                mStars.put(s.getKey(), s);
 
                 Iterator<Fleet> it = mFleets.iterator();
                 while (it.hasNext()) {
                     Fleet f = it.next();
-                    if (f.star_key.equals(starKey)) {
+                    if (f.getStarKey().equals(starKey)) {
                         it.remove();
                     }
                 }
 
-                for (int j = 0; j < s.fleets.size(); j++) {
-                    mFleets.add((Fleet) s.fleets.get(j));
+                for (int j = 0; j < s.getFleets().size(); j++) {
+                    mFleets.add((Fleet) s.getFleets().get(j));
                 }
 
                 refresh(null, mStars);
@@ -282,39 +283,39 @@ public class FleetList extends FrameLayout implements StarManager.StarFetchedHan
         final TextView row2 = (TextView) view.findViewById(R.id.ship_row2);
         final TextView row3 = (TextView) view.findViewById(R.id.ship_row3);
 
-        ShipDesign design = (ShipDesign) DesignManager.i.getDesign(DesignKind.SHIP, fleet.design_id);
+        ShipDesign design = (ShipDesign) DesignManager.i.getDesign(DesignKind.SHIP, fleet.getDesignID());
         icon.setImageDrawable(new SpriteDrawable(SpriteManager.i.getSprite(design.getSpriteName())));
 
         String text = String.format(Locale.ENGLISH, "%d × %s",
-                    (int) Math.ceil(fleet.num_ships), design.getDisplayName(fleet.num_ships > 1));
+                    (int) Math.ceil(fleet.getNumShips()), design.getDisplayName(fleet.getNumShips() > 1));
         row1.setText(text);
 
         text = String.format("%s (stance: %s)",
-                             StringUtils.capitalize(fleet.state.toString().toLowerCase(Locale.ENGLISH)),
-                             StringUtils.capitalize(fleet.stance.toString().toLowerCase(Locale.ENGLISH)));
+                             StringUtils.capitalize(fleet.getState().toString().toLowerCase(Locale.ENGLISH)),
+                             StringUtils.capitalize(fleet.getStance().toString().toLowerCase(Locale.ENGLISH)));
         row2.setText(text);
 
-        if (fleet.state == Fleet.FLEET_STATE.MOVING) {
+        if (fleet.getState() == Fleet.State.MOVING) {
             row3.setVisibility(View.GONE);
-            StarManager.i.requestStarSummary(fleet.destination_star_key,
+            StarManager.getInstance().requestStarSummary(fleet.getDestinationStarKey(),
                     new StarManager.StarSummaryFetchedHandler() {
                         @Override
-                        public void onStarSummaryFetched(Star destStar) {
+                        public void onStarSummaryFetched(StarSummary destStar) {
                             Star srcStar = null;
                             if (stars != null) {
-                                srcStar = stars.get(fleet.star_key);
+                                srcStar = stars.get(fleet.getStarKey());
                             }
                             if (srcStar == null) {
-                                srcStar = SectorManager.i.findStar(fleet.star_key);
+                                srcStar = SectorManager.getInstance().findStar(fleet.getStarKey());
                             }
                             if (srcStar == null) {
                                 row3.setText("→ (unknown)");
                             } else {
-                                float timeRemainingInHours = Model.getTimeToDestination(fleet, srcStar, destStar);
+                                float timeRemainingInHours = fleet.getTimeToDestination(srcStar, destStar);
 
                                 String eta = TimeInHours.format(timeRemainingInHours);
                                 String html = String.format("→ <img src=\"star\" width=\"16\" height=\"16\" /> %s <b>ETA:</b> %s",
-                                                            destStar.name, eta);
+                                                            destStar.getName(), eta);
                                 row3.setText(Html.fromHtml(html, 
                                                            new FleetListImageGetter(destStar),
                                                            null));
@@ -326,17 +327,17 @@ public class FleetList extends FrameLayout implements StarManager.StarFetchedHan
             row3.setText("");
             row3.setVisibility(View.GONE);
 
-            final Empire myEmpire = EmpireManager.i.getEmpire();
-            EmpireManager.i.fetchEmpire(fleet.empire_key,
+            final MyEmpire myEmpire = EmpireManager.i.getEmpire();
+            EmpireManager.i.fetchEmpire(fleet.getEmpireKey(),
                     new EmpireManager.EmpireFetchedHandler() {
                 @Override
                 public void onEmpireFetched(Empire empire) {
                     row3.setVisibility(View.VISIBLE);
 
-                    if (myEmpire.key.equals(empire.key)) {
-                        row3.setText(empire.display_name);
+                    if (myEmpire.getKey().equals(empire.getKey())) {
+                        row3.setText(empire.getDisplayName());
                     } else {
-                        row3.setText(Html.fromHtml("<font color=\"red\">"+empire.display_name+"</font>"));
+                        row3.setText(Html.fromHtml("<font color=\"red\">"+empire.getDisplayName()+"</font>"));
                     }
                 }
             });
@@ -347,9 +348,9 @@ public class FleetList extends FrameLayout implements StarManager.StarFetchedHan
      * Fetches the inline images we use to display star icons and whatnot.
      */
     private static class FleetListImageGetter implements Html.ImageGetter {
-        private Star mStarSummary;
+        private StarSummary mStarSummary;
 
-        public FleetListImageGetter(Star starSummary) {
+        public FleetListImageGetter(StarSummary starSummary) {
             mStarSummary = starSummary;
         }
 
@@ -402,18 +403,18 @@ public class FleetList extends FrameLayout implements StarManager.StarFetchedHan
                 @Override
                 public int compare(Fleet lhs, Fleet rhs) {
                     // sort by star, then by design, then by count
-                    if (!lhs.star_key.equals(rhs.star_key)) {
-                        Star lhsStar = mStars.get(lhs.star_key);
-                        Star rhsStar = mStars.get(rhs.star_key);
-                        if (!lhsStar.name.equals(rhsStar.name)) {
-                            return lhsStar.name.compareTo(rhsStar.name);
+                    if (!lhs.getStarKey().equals(rhs.getStarKey())) {
+                        Star lhsStar = mStars.get(lhs.getStarKey());
+                        Star rhsStar = mStars.get(rhs.getStarKey());
+                        if (!lhsStar.getName().equals(rhsStar.getName())) {
+                            return lhsStar.getName().compareTo(rhsStar.getName());
                         } else {
-                            return lhsStar.key.compareTo(rhsStar.key);
+                            return lhsStar.getKey().compareTo(rhsStar.getKey());
                         }
-                    } else if (!lhs.design_id.equals(rhs.design_id)) {
-                        return lhs.design_id.compareTo(rhs.design_id);
+                    } else if (!lhs.getDesignID().equals(rhs.getDesignID())) {
+                        return lhs.getDesignID().compareTo(rhs.getDesignID());
                     } else {
-                        return (int) (rhs.num_ships - lhs.num_ships);
+                        return (int) (rhs.getNumShips() - lhs.getNumShips());
                     }
                 }
             });
@@ -421,9 +422,9 @@ public class FleetList extends FrameLayout implements StarManager.StarFetchedHan
             mEntries = new ArrayList<ItemEntry>();
             String lastStarKey = "";
             for (Fleet f : mFleets) {
-                if (!f.star_key.equals(lastStarKey)) {
-                    mEntries.add(new ItemEntry(STAR_ITEM_TYPE, mStars.get(f.star_key)));
-                    lastStarKey = f.star_key;
+                if (!f.getStarKey().equals(lastStarKey)) {
+                    mEntries.add(new ItemEntry(STAR_ITEM_TYPE, mStars.get(f.getStarKey())));
+                    lastStarKey = f.getStarKey();
                 }
                 mEntries.add(new ItemEntry(FLEET_ITEM_TYPE, f));
             }
@@ -455,7 +456,7 @@ public class FleetList extends FrameLayout implements StarManager.StarFetchedHan
 
             // if we don't own this fleet, we also can't do anything with it.
             Fleet fleet = (Fleet) mEntries.get(position).value;
-            if (!fleet.empire_key.equals(mMyEmpire.key)) {
+            if (!fleet.getEmpireKey().equals(mMyEmpire.getKey())) {
                 return false;
             }
 
@@ -482,7 +483,7 @@ public class FleetList extends FrameLayout implements StarManager.StarFetchedHan
                 ItemEntry entry = mEntries.get(index);
                 if (entry.type == FLEET_ITEM_TYPE) {
                     Fleet entryFleet = (Fleet) entry.value;
-                    if (entryFleet.key.equals(fleet.key)) {
+                    if (entryFleet.getKey().equals(fleet.getKey())) {
                         return index;
                     }
                 }
@@ -516,7 +517,7 @@ public class FleetList extends FrameLayout implements StarManager.StarFetchedHan
                 ImageView icon = (ImageView) view.findViewById(R.id.star_icon);
                 TextView name = (TextView) view.findViewById(R.id.star_name);
 
-                int imageSize = (int)(star.size * StarType.get(star).getImageScale() * 2);
+                int imageSize = (int)(star.getSize() * star.getStarType().getImageScale() * 2);
                 if (entry.drawable == null) {
                     Sprite sprite = StarImageManager.getInstance().getSprite(star, imageSize, true);
                     entry.drawable = new SpriteDrawable(sprite);
@@ -525,12 +526,12 @@ public class FleetList extends FrameLayout implements StarManager.StarFetchedHan
                     icon.setImageDrawable(entry.drawable);
                 }
 
-                name.setText(star.name);
+                name.setText(star.getName());
             } else {
                 Fleet fleet = (Fleet) entry.value;
                 populateFleetRow(mContext, mStars, view, fleet);
 
-                if (mSelectedFleet != null && mSelectedFleet.key.equals(fleet.key)) {
+                if (mSelectedFleet != null && mSelectedFleet.getKey().equals(fleet.getKey())) {
                     view.setBackgroundColor(0xff0c6476);
                 } else {
                     view.setBackgroundColor(0xff000000);
@@ -554,10 +555,10 @@ public class FleetList extends FrameLayout implements StarManager.StarFetchedHan
     }
 
     public class StanceAdapter extends BaseAdapter implements SpinnerAdapter {
-        Fleet.FLEET_STANCE[] mValues;
+        Fleet.Stance[] mValues;
 
         public StanceAdapter() {
-            mValues = Fleet.FLEET_STANCE.values();
+            mValues = Fleet.Stance.values();
         }
 
         @Override
@@ -572,7 +573,7 @@ public class FleetList extends FrameLayout implements StarManager.StarFetchedHan
 
         @Override
         public long getItemId(int position) {
-            return mValues[position].ordinal();
+            return mValues[position].getValue();
         }
 
         @Override
@@ -605,7 +606,7 @@ public class FleetList extends FrameLayout implements StarManager.StarFetchedHan
                 view.setGravity(Gravity.CENTER_VERTICAL);
             }
 
-            Fleet.FLEET_STANCE value = mValues[position];
+            Fleet.Stance value = mValues[position];
             view.setText(StringUtils.capitalize(value.toString().toLowerCase(Locale.ENGLISH)));
             return view;
         }
@@ -615,7 +616,7 @@ public class FleetList extends FrameLayout implements StarManager.StarFetchedHan
         void onFleetView(Star star, Fleet fleet);
         void onFleetSplit(Star star, Fleet fleet);
         void onFleetMove(Star star, Fleet fleet);
-        void onFleetStanceModified(Star star, Fleet fleet, Fleet.FLEET_STANCE newStance);
+        void onFleetStanceModified(Star star, Fleet fleet, Fleet.Stance newStance);
         void onFleetMerge(Fleet fleet, List<Fleet> potentialFleets);
     }
 }

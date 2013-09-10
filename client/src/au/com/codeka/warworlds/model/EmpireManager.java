@@ -1,5 +1,7 @@
 package au.com.codeka.warworlds.model;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -21,14 +23,11 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import au.com.codeka.BackgroundRunner;
-import au.com.codeka.common.model.Alliance;
-import au.com.codeka.common.model.Empire;
-import au.com.codeka.common.model.Empires;
-import au.com.codeka.common.model.Model;
 import au.com.codeka.warworlds.App;
 import au.com.codeka.warworlds.RealmContext;
 import au.com.codeka.warworlds.api.ApiClient;
 import au.com.codeka.warworlds.api.ApiException;
+import au.com.codeka.common.protobuf.Messages;
 
 /**
  * Manages stuff about your empire (e.g. colonising planets and what-not).
@@ -39,24 +38,23 @@ public class EmpireManager {
 
     private Map<String, Empire> mEmpireCache = new HashMap<String, Empire>();
     private Map<String, List<EmpireFetchedHandler>> mInProgress = new HashMap<String, List<EmpireFetchedHandler>>();
-    private Map<String, List<EmpireFetchedHandler>> mMyEmpireUpdatedListeners = new TreeMap<String, List<EmpireFetchedHandler>>();
-    private Empire mMyEmpire;
-    private Empire mNativeEmpire = new Empire.Builder()
-                                        .display_name("Native").key(null).build();
+    private Map<String, List<EmpireFetchedHandler>> mEmpireUpdatedListeners = new TreeMap<String, List<EmpireFetchedHandler>>();
+    private MyEmpire mEmpire;
+    private NativeEmpire mNativeEmpire = new NativeEmpire();
 
     /**
      * This is called when you first connect to the server. We need to pass in details about
      * the empire and stuff.
      */
-    public void setup(Empire myEmpire) {
-        mMyEmpire = myEmpire;
+    public void setup(MyEmpire empire) {
+        mEmpire = empire;
     }
 
     /**
      * Gets a reference to the current empire.
      */
-    public Empire getEmpire() {
-        return mMyEmpire;
+    public MyEmpire getEmpire() {
+        return mEmpire;
     }
 
     public Empire getEmpire(String empireKey) {
@@ -64,8 +62,8 @@ public class EmpireManager {
             return mNativeEmpire;
         }
 
-        if (empireKey.equals(mMyEmpire.key)) {
-            return mMyEmpire;
+        if (empireKey.equals(mEmpire.getKey())) {
+            return mEmpire;
         }
 
         Empire empire = mEmpireCache.get(empireKey);
@@ -73,8 +71,10 @@ public class EmpireManager {
             return empire;
         }
 
-        empire = new LocalEmpireStore().getEmpire(empireKey);
-        if (empire != null) {
+        Messages.Empire pb = new LocalEmpireStore().getEmpire(empireKey);
+        if (pb != null) {
+            empire = new Empire();
+            empire.fromProtocolBuffer(pb);
             mEmpireCache.put(empireKey, empire);
             return empire;
         }
@@ -82,7 +82,7 @@ public class EmpireManager {
         return mEmpireCache.get(empireKey);
     }
 
-    public Empire getNativeEmpire() {
+    public NativeEmpire getNativeEmpire() {
         return mNativeEmpire;
     }
 
@@ -94,11 +94,11 @@ public class EmpireManager {
         if (empireKey == null) {
             empireKey = "";
         }
-        synchronized(mMyEmpireUpdatedListeners) {
-            List<EmpireFetchedHandler> listeners = mMyEmpireUpdatedListeners.get(empireKey);
+        synchronized(mEmpireUpdatedListeners) {
+            List<EmpireFetchedHandler> listeners = mEmpireUpdatedListeners.get(empireKey);
             if (listeners == null) {
                 listeners = new ArrayList<EmpireFetchedHandler>();
-                mMyEmpireUpdatedListeners.put(empireKey, listeners);
+                mEmpireUpdatedListeners.put(empireKey, listeners);
             }
             listeners.add(handler);
         }
@@ -108,23 +108,23 @@ public class EmpireManager {
      * Removes the given \c EmpireFetchedHandler from receiving updates about refreshed empires.
      */
     public void removeEmpireUpdatedListener(EmpireFetchedHandler handler) {
-        synchronized(mMyEmpireUpdatedListeners) {
-            for (Object o : IteratorUtils.toList(mMyEmpireUpdatedListeners.keySet().iterator())) {
+        synchronized(mEmpireUpdatedListeners) {
+            for (Object o : IteratorUtils.toList(mEmpireUpdatedListeners.keySet().iterator())) {
                 String empireKey = (String) o;
 
-                List<EmpireFetchedHandler> listeners = mMyEmpireUpdatedListeners.get(empireKey);
+                List<EmpireFetchedHandler> listeners = mEmpireUpdatedListeners.get(empireKey);
                 listeners.remove(handler);
 
                 if (listeners.isEmpty()) {
-                    mMyEmpireUpdatedListeners.remove(empireKey);
+                    mEmpireUpdatedListeners.remove(empireKey);
                 }
             }
         }
     }
 
     public void fireEmpireUpdated(Empire empire) {
-        synchronized(mMyEmpireUpdatedListeners) {
-            List<EmpireFetchedHandler> oldListeners = mMyEmpireUpdatedListeners.get(empire.key);
+        synchronized(mEmpireUpdatedListeners) {
+            List<EmpireFetchedHandler> oldListeners = mEmpireUpdatedListeners.get(empire.getKey());
             if (oldListeners != null) {
                 List<EmpireFetchedHandler> listeners = new ArrayList<EmpireFetchedHandler>(oldListeners);
                 for (EmpireFetchedHandler handler : listeners) {
@@ -132,7 +132,7 @@ public class EmpireManager {
                 }
             }
 
-            oldListeners = mMyEmpireUpdatedListeners.get("");
+            oldListeners = mEmpireUpdatedListeners.get("");
             if (oldListeners != null) {
                 List<EmpireFetchedHandler> listeners = new ArrayList<EmpireFetchedHandler>(oldListeners);
                 for (EmpireFetchedHandler handler : listeners) {
@@ -143,11 +143,11 @@ public class EmpireManager {
     }
 
     public void refreshEmpire() {
-        if (mMyEmpire == null) {
+        if (mEmpire == null) {
             // todo?
             return;
         }
-        refreshEmpire(mMyEmpire.key);
+        refreshEmpire(mEmpire.getKey());
     }
 
     public void refreshEmpire(final String empireKey) {
@@ -209,10 +209,10 @@ public class EmpireManager {
                     }
 
                     for (Empire empire : empires) {
-                        String empireKey = empire.key;
+                        String empireKey = empire.getKey();
 
-                        if (empireKey.equals(mMyEmpire.key)) {
-                            mMyEmpire = empire;
+                        if (empireKey.equals(mEmpire.getKey())) {
+                            mEmpire = (MyEmpire) empire;
                         } else {
                             mEmpireCache.put(empireKey, empire);
                         }
@@ -237,14 +237,14 @@ public class EmpireManager {
      * any empires we have cached with the new data.
      */
     public void onAllianceUpdated(Alliance alliance) {
-        if (mMyEmpire != null && mMyEmpire.alliance != null && mMyEmpire.alliance.key.equals(alliance.key)) {
-            mMyEmpire.alliance = alliance;
-            fireEmpireUpdated(mMyEmpire);
+        if (mEmpire != null && mEmpire.getAlliance() != null && mEmpire.getAlliance().getKey().equals(alliance.getKey())) {
+            mEmpire.updateAlliance(alliance);
+            fireEmpireUpdated(mEmpire);
         }
 
         for (Empire empire : mEmpireCache.values()) {
-            if (empire.alliance != null && empire.alliance.key.equals(alliance.key)) {
-                empire.alliance = alliance;
+            if (empire.getAlliance() != null && empire.getAlliance().getKey().equals(alliance.getKey())) {
+                empire.updateAlliance(alliance);
                 fireEmpireUpdated(empire);
             }
         }
@@ -279,13 +279,19 @@ public class EmpireManager {
                 break;
             }
 
-            Empires pb = ApiClient.getProtoBuf(url, Empires.class);
-            for (Empire empire : pb.empires) {
-                store.addEmpire(empire);
+            Messages.Empires pb = ApiClient.getProtoBuf(url, Messages.Empires.class);
+            for (Messages.Empire empire_pb : pb.getEmpiresList()) {
+                store.addEmpire(empire_pb);
 
-                empires.add(empire);
-                if (mMyEmpire == null || !empire.key.equals(mMyEmpire.key)) {
-                    mEmpireCache.put(empire.key, empire);
+                if (mEmpire != null && empire_pb.getKey().equals(mEmpire.getKey())) {
+                    MyEmpire empire = new MyEmpire();
+                    empire.fromProtocolBuffer(empire_pb);
+                    empires.add(empire);
+                } else {
+                    Empire empire = new Empire();
+                    empire.fromProtocolBuffer(empire_pb);
+                    empires.add(empire);
+                    mEmpireCache.put(empire.getKey(), empire);
                 }
             }
         }
@@ -310,15 +316,17 @@ public class EmpireManager {
         }
 
         // if it's us, then that's good enough as well!
-        if (mMyEmpire != null && mMyEmpire.key.equals(empireKey)) {
+        if (mEmpire != null && mEmpire.getKey().equals(empireKey)) {
             if (handler != null) {
-                handler.onEmpireFetched(mMyEmpire);
+                handler.onEmpireFetched(mEmpire);
             }
             return;
         }
 
-        Empire empire = new LocalEmpireStore().getEmpire(empireKey);
-        if (empire != null) {
+        Messages.Empire pb = new LocalEmpireStore().getEmpire(empireKey);
+        if (pb != null) {
+            Empire empire = new Empire();
+            empire.fromProtocolBuffer(pb);
             mEmpireCache.put(empireKey, empire);
             if (handler != null) {
                 handler.onEmpireFetched(empire);
@@ -347,16 +355,18 @@ public class EmpireManager {
             }
 
             // if it's us, then that's good enough as well!
-            if (mMyEmpire != null && mMyEmpire.key.equals(empireKey)) {
+            if (mEmpire != null && mEmpire.getKey().equals(empireKey)) {
                 if (handler != null) {
-                    handler.onEmpireFetched(mMyEmpire);
+                    handler.onEmpireFetched(mEmpire);
                 }
                 continue;
             }
 
             // if it's in the local store, that's fine as well
-            Empire empire = new LocalEmpireStore().getEmpire(empireKey);
-            if (empire != null) {
+            Messages.Empire pb = new LocalEmpireStore().getEmpire(empireKey);
+            if (pb != null) {
+                Empire empire = new Empire();
+                empire.fromProtocolBuffer(pb);
                 mEmpireCache.put(empireKey, empire);
                 if (handler != null) {
                     handler.onEmpireFetched(empire);
@@ -415,11 +425,13 @@ public class EmpireManager {
                 try {
                     String url = "empires/search?minRank="+minRank+"&maxRank="+maxRank;
 
-                    Empires pb = ApiClient.getProtoBuf(url, Empires.class);
+                    Messages.Empires pb = ApiClient.getProtoBuf(url, Messages.Empires.class);
 
                     LocalEmpireStore les = new LocalEmpireStore();
-                    for (Empire empire : pb.empires) {
-                        les.addEmpire(empire);
+                    for (Messages.Empire empire_pb : pb.getEmpiresList()) {
+                        les.addEmpire(empire_pb);
+                        Empire empire = new Empire();
+                        empire.fromProtocolBuffer(empire_pb);
                         empires.add(empire);
                     }
                 } catch(Exception e) {
@@ -433,8 +445,8 @@ public class EmpireManager {
             @Override
             protected void onComplete(List<Empire> empires) {
                 for (Empire empire : empires) {
-                    if (!empire.key.equals(mMyEmpire.key)) {
-                        mEmpireCache.put(empire.key, empire);
+                    if (!empire.getKey().equals(mEmpire.getKey())) {
+                        mEmpireCache.put(empire.getKey(), empire);
                         fireEmpireUpdated(empire);
                     }
                 }
@@ -454,11 +466,13 @@ public class EmpireManager {
                 try {
                     String url = "empires/search?name="+nameSearch;
 
-                    Empires pb = ApiClient.getProtoBuf(url, Empires.class);
+                    Messages.Empires pb = ApiClient.getProtoBuf(url, Messages.Empires.class);
 
                     LocalEmpireStore les = new LocalEmpireStore();
-                    for (Empire empire : pb.empires) {
-                        les.addEmpire(empire);
+                    for (Messages.Empire empire_pb : pb.getEmpiresList()) {
+                        les.addEmpire(empire_pb);
+                        Empire empire = new Empire();
+                        empire.fromProtocolBuffer(empire_pb);
                         empires.add(empire);
                     }
                 } catch(Exception e) {
@@ -472,8 +486,8 @@ public class EmpireManager {
             @Override
             protected void onComplete(List<Empire> empires) {
                 for (Empire empire : empires) {
-                    if (!empire.key.equals(mMyEmpire.key)) {
-                        mEmpireCache.put(empire.key, empire);
+                    if (!empire.getKey().equals(mEmpire.getKey())) {
+                        mEmpireCache.put(empire.getKey(), empire);
                         fireEmpireUpdated(empire);
                     }
                 }
@@ -526,17 +540,25 @@ public class EmpireManager {
             }
         }
 
-        public void addEmpire(Empire empire) {
+        public void addEmpire(Messages.Empire empire) {
             synchronized(sLock) {
                 SQLiteDatabase db = getWritableDatabase();
                 try {
+                    ByteArrayOutputStream empireBlob = new ByteArrayOutputStream();
+                    try {
+                        empire.writeTo(empireBlob);
+                    } catch (IOException e) {
+                        // we won't get the notification, but not the end of the world...
+                        return;
+                    }
+
                     // delete any old cached values first
-                    db.delete("empires", getWhereClause(empire.key), null);
+                    db.delete("empires", getWhereClause(empire.getKey()), null);
 
                     // insert a new cached value
                     ContentValues values = new ContentValues();
-                    values.put("empire", empire.toByteArray());
-                    values.put("empire_key", empire.key);
+                    values.put("empire", empireBlob.toByteArray());
+                    values.put("empire_key", empire.getKey());
                     values.put("realm_id", RealmContext.i.getCurrentRealm().getID());
                     values.put("timestamp", DateTime.now(DateTimeZone.UTC).getMillis());
                     db.insert("empires", null, values);
@@ -548,7 +570,7 @@ public class EmpireManager {
             }
         }
 
-        public Empire getEmpire(String empireKey) {
+        public Messages.Empire getEmpire(String empireKey) {
             synchronized(sLock) {
                 SQLiteDatabase db = getReadableDatabase();
                 Cursor cursor = null;
@@ -568,7 +590,7 @@ public class EmpireManager {
                         return null;
                     }
 
-                    return Model.wire.parseFrom(cursor.getBlob(0), Empire.class);
+                    return Messages.Empire.parseFrom(cursor.getBlob(0));
                 } catch (Exception e) {
                     // todo: log errors
                     return null;

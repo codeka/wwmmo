@@ -10,11 +10,11 @@ import android.support.v4.app.DialogFragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.TextView;
-import au.com.codeka.common.model.Alliance;
-import au.com.codeka.common.model.Empire;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.StyledDialog;
+import au.com.codeka.warworlds.model.Alliance;
 import au.com.codeka.warworlds.model.AllianceManager;
+import au.com.codeka.warworlds.model.Empire;
 
 public class KickRequestDialog extends DialogFragment {
     private View mView;
@@ -34,7 +34,7 @@ public class KickRequestDialog extends DialogFragment {
 
         TextView instructions = (TextView) mView.findViewById(R.id.instructions);
         instructions.setText(String.format(Locale.ENGLISH, "Are you sure you want to kick \"%s\" out of %s? Give a reason below for other members to vote on.",
-                mEmpire.display_name, mAlliance.name));
+                mEmpire.getDisplayName(), mAlliance.getName()));
 
         View amount = mView.findViewById(R.id.amount);
         amount.setVisibility(View.GONE);
@@ -54,7 +54,7 @@ public class KickRequestDialog extends DialogFragment {
 
     private void onWithdraw() {
         TextView message = (TextView) mView.findViewById(R.id.message);
-        AllianceManager.i.requestKick(Integer.parseInt(mAlliance.key), mEmpire.key, message.getText().toString());
+        AllianceManager.i.requestKick(mAlliance.getID(), mEmpire.getKey(), message.getText().toString());
 
         dismiss();
     }

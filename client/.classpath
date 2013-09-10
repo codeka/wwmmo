@@ -25,12 +25,12 @@
 	<classpathentry exported="true" kind="lib" path="libs/slf4j-android-1.6.1-RC1.jar"/>
 	<classpathentry exported="true" kind="lib" path="libs/GoogleAdMobAdsSdk-6.2.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="libs/jcl-over-slf4j-1.7.5.jar"/>
+	<classpathentry exported="true" kind="lib" path="libs/protobuf-java-2.5.0.jar"/>
 	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/common"/>
 	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/control-field"/>
 	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/planet-render"/>
 	<classpathentry exported="true" kind="con" path="com.android.ide.eclipse.adt.DEPENDENCIES"/>
 	<classpathentry exported="true" kind="lib" path="libs/joda-convert-1.2.jar"/>
 	<classpathentry exported="true" kind="lib" path="libs/jregex1.2_01.jar"/>
-	<classpathentry kind="lib" path="libs/wire-runtime-1.0.2-SNAPSHOT.jar"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>

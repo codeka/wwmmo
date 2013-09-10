@@ -5,7 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import au.com.codeka.BackgroundRunner;
-import au.com.codeka.common.model.EmpireRanks;
+import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.api.ApiClient;
 import au.com.codeka.warworlds.api.ApiException;
 
@@ -22,12 +22,15 @@ public class RankHistoryManager {
     }
 
     public void getRankHistory(final int year, final int month, final RankHistoryFetchedHandler handler) {
-        new BackgroundRunner<EmpireRanks>() {
+        new BackgroundRunner<RankHistory>() {
             @Override
-            protected EmpireRanks doInBackground() {
+            protected RankHistory doInBackground() {
                 String url = "rankings/"+year+"/"+month;
                 try {
-                    return ApiClient.getProtoBuf(url, EmpireRanks.class);
+                    Messages.EmpireRanks pb = ApiClient.getProtoBuf(url, Messages.EmpireRanks.class);
+                    RankHistory rankHistory = new RankHistory();
+                    rankHistory.fromProtocolBuffer(pb);
+                    return rankHistory;
                 } catch(ApiException e) {
                     log.error("Error fetching rankings.", e);
                     return null;
@@ -35,7 +38,7 @@ public class RankHistoryManager {
             }
 
             @Override
-            protected void onComplete(EmpireRanks rankHistory) {
+            protected void onComplete(RankHistory rankHistory) {
                 if (rankHistory != null) {
                     handler.onRankHistoryFetched(rankHistory);
                 }
@@ -44,6 +47,6 @@ public class RankHistoryManager {
     }
 
     public interface RankHistoryFetchedHandler {
-        public void onRankHistoryFetched(EmpireRanks rankHistory);
+        public void onRankHistoryFetched(RankHistory rankHistory);
     }
 }

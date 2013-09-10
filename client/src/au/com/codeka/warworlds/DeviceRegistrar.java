@@ -8,9 +8,9 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.provider.Settings.Secure;
 import au.com.codeka.BackgroundRunner;
-import au.com.codeka.common.model.DeviceRegistration;
 import au.com.codeka.warworlds.api.ApiClient;
 import au.com.codeka.warworlds.api.ApiException;
+import au.com.codeka.common.protobuf.Messages;
 
 /**
  * Register/unregister with the third-party App Engine server using
@@ -24,18 +24,18 @@ public class DeviceRegistrar {
 
         String registrationKey = null;
         try {
-            DeviceRegistration registration = new DeviceRegistration.Builder()
-                .device_id(Secure.getString(App.i.getContentResolver(), Secure.ANDROID_ID))
-                .device_build(android.os.Build.DISPLAY)
-                .device_manufacturer(android.os.Build.MANUFACTURER)
-                .device_model(android.os.Build.MODEL)
-                .device_version(android.os.Build.VERSION.RELEASE)
+            Messages.DeviceRegistration registration = Messages.DeviceRegistration.newBuilder()
+                .setDeviceId(Secure.getString(App.i.getContentResolver(), Secure.ANDROID_ID))
+                .setDeviceBuild(android.os.Build.DISPLAY)
+                .setDeviceManufacturer(android.os.Build.MANUFACTURER)
+                .setDeviceModel(android.os.Build.MODEL)
+                .setDeviceVersion(android.os.Build.VERSION.RELEASE)
                 .build();
 
             // the post will update the key field in the protocol buffer for us
             registration = ApiClient.postProtoBuf("devices", registration,
-                    DeviceRegistration.class);
-            registrationKey = registration.key;
+                    Messages.DeviceRegistration.class);
+            registrationKey = registration.getKey();
             log.info("Got registration key: "+registrationKey);
         } catch(Exception ex) {
             log.error("Failure registring device.", ex);
@@ -56,14 +56,14 @@ public class DeviceRegistrar {
             @Override
             protected Void doInBackground() {
                 String deviceRegistrationKey = getDeviceRegistrationKey();
-                DeviceRegistration deviceRegistration = new DeviceRegistration.Builder()
-                        .gcm_registration_id(gcmRegistrationID)
-                        .key(deviceRegistrationKey)
+                Messages.DeviceRegistration regpb = Messages.DeviceRegistration.newBuilder()
+                        .setGcmRegistrationId(gcmRegistrationID)
+                        .setKey(deviceRegistrationKey)
                         .build();
 
                 String url = "devices/"+deviceRegistrationKey;
                 try {
-                    ApiClient.putProtoBuf(url, deviceRegistration);
+                    ApiClient.putProtoBuf(url, regpb);
                 } catch (ApiException e) {
                     log.error("Could not update online status, ignored.");
                 }

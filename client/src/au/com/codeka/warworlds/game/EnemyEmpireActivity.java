@@ -8,15 +8,14 @@ import android.view.Window;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
-import au.com.codeka.common.model.Empire;
-import au.com.codeka.common.model.Star;
+import au.com.codeka.common.model.BaseStar;
 import au.com.codeka.warworlds.BaseActivity;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.ServerGreeter;
 import au.com.codeka.warworlds.ServerGreeter.ServerGreeting;
 import au.com.codeka.warworlds.WarWorldsActivity;
 import au.com.codeka.warworlds.game.starfield.StarfieldActivity;
-import au.com.codeka.warworlds.model.EmpireHelper;
+import au.com.codeka.warworlds.model.Empire;
 import au.com.codeka.warworlds.model.EmpireManager;
 
 public class EnemyEmpireActivity extends BaseActivity
@@ -64,19 +63,19 @@ public class EnemyEmpireActivity extends BaseActivity
         TextView empireName = (TextView) findViewById(R.id.empire_name);
         ImageView empireIcon = (ImageView) findViewById(R.id.empire_icon);
 
-        empireName.setText(mEmpire.display_name);
-        empireIcon.setImageBitmap(EmpireHelper.getShield(mContext, mEmpire));
+        empireName.setText(mEmpire.getDisplayName());
+        empireIcon.setImageBitmap(mEmpire.getShield(mContext));
     }
 
     public void onEmpireViewClick() {
-        if (mEmpire.home_star != null) {
-            Star homeStar = mEmpire.home_star;
+        if (mEmpire.getHomeStar() != null) {
+            BaseStar homeStar = mEmpire.getHomeStar();
             Intent intent = new Intent(mContext, StarfieldActivity.class);
-            intent.putExtra("au.com.codeka.warworlds.StarKey", homeStar.key);
-            intent.putExtra("au.com.codeka.warworlds.SectorX", homeStar.sector_x);
-            intent.putExtra("au.com.codeka.warworlds.SectorY", homeStar.sector_y);
-            intent.putExtra("au.com.codeka.warworlds.OffsetX", homeStar.offset_x);
-            intent.putExtra("au.com.codeka.warworlds.OffsetY", homeStar.offset_y);
+            intent.putExtra("au.com.codeka.warworlds.StarKey", homeStar.getKey());
+            intent.putExtra("au.com.codeka.warworlds.SectorX", homeStar.getSectorX());
+            intent.putExtra("au.com.codeka.warworlds.SectorY", homeStar.getSectorY());
+            intent.putExtra("au.com.codeka.warworlds.OffsetX", homeStar.getOffsetX());
+            intent.putExtra("au.com.codeka.warworlds.OffsetY", homeStar.getOffsetY());
             startActivity(intent);
         }
     }

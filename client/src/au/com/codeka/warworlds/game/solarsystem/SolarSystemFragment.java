@@ -19,12 +19,10 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import au.com.codeka.RomanNumeralFormatter;
 import au.com.codeka.common.Vector2;
-import au.com.codeka.common.model.Colony;
-import au.com.codeka.common.model.Empire;
-import au.com.codeka.common.model.EmpirePresence;
-import au.com.codeka.common.model.Fleet;
-import au.com.codeka.common.model.Planet;
-import au.com.codeka.common.model.Star;
+import au.com.codeka.common.model.BaseColony;
+import au.com.codeka.common.model.BaseEmpirePresence;
+import au.com.codeka.common.model.BasePlanet;
+import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.ctrl.ColonyFocusView;
 import au.com.codeka.warworlds.ctrl.FleetListSimple;
@@ -32,10 +30,14 @@ import au.com.codeka.warworlds.ctrl.SelectionView;
 import au.com.codeka.warworlds.game.CombatReportDialog;
 import au.com.codeka.warworlds.game.ScoutReportDialog;
 import au.com.codeka.warworlds.game.SitrepActivity;
-import au.com.codeka.warworlds.model.EmpireHelper;
+import au.com.codeka.warworlds.model.Colony;
+import au.com.codeka.warworlds.model.Empire;
 import au.com.codeka.warworlds.model.EmpireManager;
-import au.com.codeka.warworlds.model.StarHelper;
+import au.com.codeka.warworlds.model.Fleet;
+import au.com.codeka.warworlds.model.Planet;
+import au.com.codeka.warworlds.model.Star;
 import au.com.codeka.warworlds.model.StarManager;
+import au.com.codeka.warworlds.model.StarSummary;
 
 /**
  * This is a fragment which displays details about a single solar system.
@@ -45,7 +47,7 @@ public class SolarSystemFragment extends Fragment
     private static Logger log = LoggerFactory.getLogger(SolarSystemFragment.class);
     private SolarSystemSurfaceView mSolarSystemSurfaceView;
     private ProgressBar mProgressBar;
-    private Star mStarSummary;
+    private StarSummary mStarSummary;
     private Star mStar;
     private Planet mPlanet;
     private Colony mColony;
@@ -98,8 +100,11 @@ public class SolarSystemFragment extends Fragment
                 }
 
                 Intent intent = new Intent(getActivity(), BuildActivity.class);
-                intent.putExtra("au.com.codeka.warworlds.StarKey", mStar.key);
-                intent.putExtra("au.com.codeka.warworlds.Colony", mColony.toByteArray());
+                intent.putExtra("au.com.codeka.warworlds.StarKey", mStar.getKey());
+
+                Messages.Colony.Builder colony_pb = Messages.Colony.newBuilder();
+                mColony.toProtocolBuffer(colony_pb);
+                intent.putExtra("au.com.codeka.warworlds.Colony", colony_pb.build().toByteArray());
 
                 startActivityForResult(intent, BUILD_REQUEST);
             }
@@ -108,7 +113,7 @@ public class SolarSystemFragment extends Fragment
         focusButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (mStar == null || mStar.planets == null) {
+                if (mStar == null || mStar.getPlanets() == null) {
                     return;
                 }
 
@@ -126,7 +131,7 @@ public class SolarSystemFragment extends Fragment
                 }
 
                 Intent intent = new Intent(getActivity(), SitrepActivity.class);
-                intent.putExtra("au.com.codeka.warworlds.StarKey", mStar.key);
+                intent.putExtra("au.com.codeka.warworlds.StarKey", mStar.getKey());
                 startActivity(intent);
             }
         });
@@ -149,8 +154,8 @@ public class SolarSystemFragment extends Fragment
             @Override
             public void onFleetSelected(Fleet fleet) {
                 Intent intent = new Intent(getActivity(), FleetActivity.class);
-                intent.putExtra("au.com.codeka.warworlds.StarKey", mStar.key);
-                intent.putExtra("au.com.codeka.warworlds.FleetKey", fleet.key);
+                intent.putExtra("au.com.codeka.warworlds.StarKey", mStar.getKey());
+                intent.putExtra("au.com.codeka.warworlds.FleetKey", fleet.getKey());
                 startActivity(intent);
             }
         });
@@ -164,11 +169,11 @@ public class SolarSystemFragment extends Fragment
         Bundle args = getArguments();
         long starID = args.getLong("au.com.codeka.warworlds.StarID");
         String starKey = Long.toString(starID);
-        StarManager.i.addStarUpdatedListener(starKey, this);
+        StarManager.getInstance().addStarUpdatedListener(starKey, this);
 
         // get as much details about the star as we can, until it gets refreshes anyway.
-        mStarSummary = StarManager.i.getStarSummaryNoFetch(starKey, Float.MAX_VALUE);
-        StarManager.i.requestStar(starKey, false, this);
+        mStarSummary = StarManager.getInstance().getStarSummaryNoFetch(starKey, Float.MAX_VALUE);
+        StarManager.getInstance().requestStar(starKey, false, this);
 
         refreshSelectedPlanet();
 
@@ -200,7 +205,7 @@ public class SolarSystemFragment extends Fragment
     @Override
     public void onStop() {
         super.onStop();
-        StarManager.i.removeStarUpdatedListener(this);
+        StarManager.getInstance().removeStarUpdatedListener(this);
 
         int sdk = android.os.Build.VERSION.SDK_INT;
         if (sdk >= android.os.Build.VERSION_CODES.HONEYCOMB) {
@@ -221,7 +226,7 @@ public class SolarSystemFragment extends Fragment
             Bundle extras = getArguments();
             selectedPlanetIndex = extras.getInt("au.com.codeka.warworlds.PlanetIndex");
         } else if (mPlanet != null) {
-            selectedPlanetIndex = mPlanet.index;
+            selectedPlanetIndex = mPlanet.getIndex();
         } else {
             selectedPlanetIndex = -1;
         }
@@ -235,10 +240,10 @@ public class SolarSystemFragment extends Fragment
             mSolarSystemSurfaceView.redraw();
         }
 
-        Planet planet = null;
+        BasePlanet planet = null;
         if (selectedPlanetIndex >= 0) {
-            for (Planet p : star.planets) {
-                if (p.index == selectedPlanetIndex) {
+            for (BasePlanet p : star.getPlanets()) {
+                if (p.getIndex() == selectedPlanetIndex) {
                     planet = p;
                     break;
                 }
@@ -255,7 +260,7 @@ public class SolarSystemFragment extends Fragment
 
         fleetList.setStar(star);
 
-        EmpirePresence ep = StarHelper.getEmpire(star, EmpireManager.i.getEmpire().key);
+        BaseEmpirePresence ep = star.getEmpire(EmpireManager.i.getEmpire().getKey());
         if (ep == null) {
             storedGoodsTextView.setVisibility(View.GONE);
             deltaGoodsTextView.setVisibility(View.GONE);
@@ -271,27 +276,27 @@ public class SolarSystemFragment extends Fragment
             deltaMineralsTextView.setVisibility(View.VISIBLE);
             storedMineralsIcon.setVisibility(View.VISIBLE);
 
-            String goods = String.format(Locale.ENGLISH, "%d / %d",
-                    (int) (float) ep.total_goods, (int) (float) ep.max_goods);
+            String goods = String.format(Locale.ENGLISH, "%d / %d", (int) ep.getTotalGoods(),
+                    (int) ep.getMaxGoods());
             storedGoodsTextView.setText(goods);
 
-            String minerals = String.format(Locale.ENGLISH, "%d / %d",
-                    (int) (float) ep.total_minerals, (int) (float) ep.max_minerals);
+            String minerals = String.format(Locale.ENGLISH, "%d / %d", (int)ep.getTotalMinerals(),
+                    (int) ep.getMaxMinerals());
             storedMineralsTextView.setText(minerals);
 
-            if (ep.goods_delta_per_hour >= 0) {
+            if (ep.getDeltaGoodsPerHour() >= 0) {
                 deltaGoodsTextView.setTextColor(Color.GREEN);
-                deltaGoodsTextView.setText(String.format("+%d/hr", (int) (float) ep.goods_delta_per_hour));
+                deltaGoodsTextView.setText(String.format("+%d/hr", (int) ep.getDeltaGoodsPerHour()));
             } else {
                 deltaGoodsTextView.setTextColor(Color.RED);
-                deltaGoodsTextView.setText(String.format("%d/hr", (int) (float) ep.goods_delta_per_hour));
+                deltaGoodsTextView.setText(String.format("%d/hr", (int) ep.getDeltaGoodsPerHour()));
             }
-            if (ep.minerals_delta_per_hour >= 0) {
+            if (ep.getDeltaMineralsPerHour() >= 0) {
                 deltaMineralsTextView.setTextColor(Color.GREEN);
-                deltaMineralsTextView.setText(String.format("+%d/hr", (int) (float) ep.minerals_delta_per_hour));
+                deltaMineralsTextView.setText(String.format("+%d/hr", (int) ep.getDeltaMineralsPerHour()));
             } else {
                 deltaMineralsTextView.setTextColor(Color.RED);
-                deltaMineralsTextView.setText(String.format("%d/hr", (int) (float) ep.minerals_delta_per_hour));
+                deltaMineralsTextView.setText(String.format("%d/hr", (int) ep.getDeltaMineralsPerHour()));
             }
         }
 
@@ -301,7 +306,7 @@ public class SolarSystemFragment extends Fragment
 
         if (mPlanet == null) {
             TextView planetNameTextView = (TextView) mView.findViewById(R.id.planet_name);
-            planetNameTextView.setText(mStar.name);
+            planetNameTextView.setText(mStar.getName());
         }
 
         if (mIsFirstRefresh) {
@@ -341,8 +346,8 @@ public class SolarSystemFragment extends Fragment
         } else {
             intent = new Intent(getActivity(), EmptyPlanetActivity.class);
         }
-        intent.putExtra("au.com.codeka.warworlds.StarKey", mStar.key);
-        intent.putExtra("au.com.codeka.warworlds.PlanetIndex", mPlanet.index);
+        intent.putExtra("au.com.codeka.warworlds.StarKey", mStar.getKey());
+        intent.putExtra("au.com.codeka.warworlds.PlanetIndex", mPlanet.getIndex());
         startActivity(intent);
     }
 
@@ -352,7 +357,7 @@ public class SolarSystemFragment extends Fragment
         TextView planetNameTextView = (TextView) mView.findViewById(R.id.planet_name);
 
         if (mStarSummary != null && mPlanet == null) {
-            planetNameTextView.setText(mStarSummary.name);
+            planetNameTextView.setText(mStarSummary.getName());
             return;
         }
         if (mStar == null || mPlanet == null) {
@@ -360,8 +365,8 @@ public class SolarSystemFragment extends Fragment
         }
 
         mColony = null;
-        for (Colony colony : mStar.colonies) {
-            if (colony.planet_index == mPlanet.index) {
+        for (BaseColony colony : mStar.getColonies()) {
+            if (colony.getPlanetIndex() == mPlanet.getIndex()) {
                 mColony = (Colony) colony;
                 break;
             }
@@ -369,7 +374,7 @@ public class SolarSystemFragment extends Fragment
 
         Vector2 planetCentre = mSolarSystemSurfaceView.getPlanetCentre(mPlanet);
 
-        String planetName = mStar.name+" "+RomanNumeralFormatter.format(mPlanet.index);
+        String planetName = mStar.getName()+" "+RomanNumeralFormatter.format(mPlanet.getIndex());
         planetNameTextView.setText(planetName);
 
         View congenialityContainer = mView.findViewById(R.id.congeniality_container);
@@ -410,27 +415,27 @@ public class SolarSystemFragment extends Fragment
         TextView populationCongenialityTextView = (TextView) mView.findViewById(
                 R.id.solarsystem_population_congeniality_value);
         populationCongenialityTextView.setText(Integer.toString(
-                mPlanet.population_congeniality));
+                mPlanet.getPopulationCongeniality()));
         populationCongenialityProgressBar.setProgress(
-                (int) (populationCongenialityProgressBar.getMax() * (mPlanet.population_congeniality / 1000.0)));
+                (int) (populationCongenialityProgressBar.getMax() * (mPlanet.getPopulationCongeniality() / 1000.0)));
 
         ProgressBar farmingCongenialityProgressBar = (ProgressBar) mView.findViewById(
                 R.id.solarsystem_farming_congeniality);
         TextView farmingCongenialityTextView = (TextView) mView.findViewById(
                 R.id.solarsystem_farming_congeniality_value);
         farmingCongenialityTextView.setText(Integer.toString(
-                mPlanet.farming_congeniality));
+                mPlanet.getFarmingCongeniality()));
         farmingCongenialityProgressBar.setProgress(
-                (int)(farmingCongenialityProgressBar.getMax() * (mPlanet.farming_congeniality / 100.0)));
+                (int)(farmingCongenialityProgressBar.getMax() * (mPlanet.getFarmingCongeniality() / 100.0)));
 
         ProgressBar miningCongenialityProgressBar = (ProgressBar) mView.findViewById(
                 R.id.solarsystem_mining_congeniality);
         TextView miningCongenialityTextView = (TextView) mView.findViewById(
                 R.id.solarsystem_mining_congeniality_value);
         miningCongenialityTextView.setText(Integer.toString(
-                mPlanet.mining_congeniality));
+                mPlanet.getMiningCongeniality()));
         miningCongenialityProgressBar.setProgress(
-                (int)(miningCongenialityProgressBar.getMax() * (mPlanet.mining_congeniality / 100.0)));
+                (int)(miningCongenialityProgressBar.getMax() * (mPlanet.getMiningCongeniality() / 100.0)));
 
         Button emptyViewButton = (Button) mView.findViewById(R.id.empty_view_btn);
         final View colonyDetailsContainer = mView.findViewById(R.id.solarsystem_colony_details);
@@ -446,12 +451,12 @@ public class SolarSystemFragment extends Fragment
             colonyDetailsContainer.setVisibility(View.GONE);
             enemyColonyDetailsContainer.setVisibility(View.GONE);
 
-            EmpireManager.i.fetchEmpire(mColony.empire_key,
+            EmpireManager.i.fetchEmpire(mColony.getEmpireKey(),
                 new EmpireManager.EmpireFetchedHandler() {
                     @Override
                     public void onEmpireFetched(Empire empire) {
                         Empire thisEmpire = EmpireManager.i.getEmpire();
-                        if (thisEmpire.key.equals(empire.key)) {
+                        if (thisEmpire.getKey().equals(empire.getKey())) {
                             colonyDetailsContainer.setVisibility(View.VISIBLE);
                             refreshColonyDetails();
                         } else {
@@ -473,7 +478,7 @@ public class SolarSystemFragment extends Fragment
         final TextView populationCountTextView = (TextView) mView.findViewById(
                 R.id.population_count);
         populationCountTextView.setText(String.format("Pop: %d / %d",
-                (int) (float) mColony.population, (int) (float) mColony.max_population));
+                (int) mColony.getPopulation(), (int) mColony.getMaxPopulation()));
 
         final ColonyFocusView colonyFocusView = (ColonyFocusView) mView.findViewById(
                 R.id.colony_focus_view);
@@ -484,18 +489,18 @@ public class SolarSystemFragment extends Fragment
         final TextView populationCountTextView = (TextView) mView.findViewById(
                 R.id.population_count);
         populationCountTextView.setText(String.format("Population: %d",
-                (int) (float) mColony.population));
+                (int) mColony.getPopulation()));
 
         ImageView enemyIcon = (ImageView) mView.findViewById(R.id.enemy_empire_icon);
         TextView enemyName = (TextView) mView.findViewById(R.id.enemy_empire_name);
         TextView enemyDefence = (TextView) mView.findViewById(R.id.enemy_empire_defence);
 
-        int defence = (int) (0.25 * mColony.population * mColony.defence_bonus);
+        int defence = (int) (0.25 * mColony.getPopulation() * mColony.getDefenceBoost());
         if (defence < 1) {
             defence = 1;
         }
-        enemyIcon.setImageBitmap(EmpireHelper.getShield(getActivity(), empire));
-        enemyName.setText(empire.display_name);
+        enemyIcon.setImageBitmap(empire.getShield(getActivity()));
+        enemyName.setText(empire.getDisplayName());
         enemyDefence.setText(String.format(Locale.ENGLISH, "Defence: %d", defence));
     }
 }

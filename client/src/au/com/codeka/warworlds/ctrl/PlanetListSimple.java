@@ -11,16 +11,16 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import au.com.codeka.common.model.Colony;
-import au.com.codeka.common.model.Empire;
-import au.com.codeka.common.model.Planet;
-import au.com.codeka.common.model.Star;
+import au.com.codeka.common.model.BaseColony;
+import au.com.codeka.common.model.BasePlanet;
 import au.com.codeka.warworlds.R;
+import au.com.codeka.warworlds.model.Empire;
 import au.com.codeka.warworlds.model.EmpireManager;
+import au.com.codeka.warworlds.model.Planet;
 import au.com.codeka.warworlds.model.PlanetImageManager;
-import au.com.codeka.warworlds.model.PlanetType;
 import au.com.codeka.warworlds.model.Sprite;
 import au.com.codeka.warworlds.model.SpriteDrawable;
+import au.com.codeka.warworlds.model.Star;
 
 public class PlanetListSimple extends LinearLayout {
     private Context mContext;
@@ -66,32 +66,35 @@ public class PlanetListSimple extends LinearLayout {
             };
         }
 
-        mPlanets = new ArrayList<Planet>(mStar.planets);
+        mPlanets = new ArrayList<Planet>();
+        for (BasePlanet p : mStar.getPlanets()) {
+            mPlanets.add((Planet) p);
+        }
 
         removeAllViews();
         LayoutInflater inflater = (LayoutInflater) mContext.getSystemService
                 (Context.LAYOUT_INFLATER_SERVICE);
         for (Planet planet : mPlanets) {
-            View rowView = getRowView(inflater, mStar, planet);
+            View rowView = getRowView(inflater, planet);
             addView(rowView);
         }
     }
 
-    private View getRowView(LayoutInflater inflater, Star star, Planet planet) {
+    private View getRowView(LayoutInflater inflater, Planet planet) {
         View view = (ViewGroup) inflater.inflate(R.layout.starfield_planet, null);
 
         final ImageView icon = (ImageView) view.findViewById(R.id.starfield_planet_icon);
         final PlanetImageManager pim = PlanetImageManager.getInstance();
 
-        Sprite sprite = pim.getSprite(star, planet);
+        Sprite sprite = pim.getSprite(planet);
         icon.setImageDrawable(new SpriteDrawable(sprite));
 
         TextView planetTypeTextView = (TextView) view.findViewById(R.id.starfield_planet_type);
-        planetTypeTextView.setText(PlanetType.get(planet).getDisplayName());
+        planetTypeTextView.setText(planet.getPlanetType().getDisplayName());
 
-        Colony colony = null;
-        for(Colony c : mStar.colonies) {
-            if (c.planet_index == planet.index) {
+        BaseColony colony = null;
+        for(BaseColony c : mStar.getColonies()) {
+            if (c.getPlanetIndex() == planet.getIndex()) {
                 colony = c;
                 break;
             }
@@ -100,10 +103,10 @@ public class PlanetListSimple extends LinearLayout {
         final TextView colonyTextView = (TextView) view.findViewById(R.id.starfield_planet_colony);
         if (colony != null) {
             colonyTextView.setText("Colonized");
-            EmpireManager.i.fetchEmpire(colony.empire_key, new EmpireManager.EmpireFetchedHandler() {
+            EmpireManager.i.fetchEmpire(colony.getEmpireKey(), new EmpireManager.EmpireFetchedHandler() {
                 @Override
                 public void onEmpireFetched(Empire empire) {
-                    colonyTextView.setText(empire.display_name);
+                    colonyTextView.setText(empire.getDisplayName());
                 }
             });
         } else {

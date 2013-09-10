@@ -6,9 +6,9 @@ import java.io.InputStream;
 import org.w3c.dom.Element;
 
 import android.content.Context;
-import au.com.codeka.common.design.BaseDesignManager;
-import au.com.codeka.common.design.Design;
-import au.com.codeka.common.design.DesignKind;
+import au.com.codeka.common.model.BaseDesignManager;
+import au.com.codeka.common.model.Design;
+import au.com.codeka.common.model.DesignKind;
 import au.com.codeka.warworlds.model.designeffects.*;
 
 /**

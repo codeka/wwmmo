@@ -1,11 +1,12 @@
 package au.com.codeka.warworlds.game.solarsystem;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.protobuf.InvalidProtocolBufferException;
 
 import android.app.Dialog;
 import android.content.DialogInterface;
@@ -17,14 +18,14 @@ import android.widget.ImageButton;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import au.com.codeka.BackgroundRunner;
-import au.com.codeka.common.model.Colony;
-import au.com.codeka.common.model.Model;
-import au.com.codeka.common.model.Planet;
-import au.com.codeka.common.model.Star;
+import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.StyledDialog;
 import au.com.codeka.warworlds.api.ApiClient;
 import au.com.codeka.warworlds.api.ApiException;
+import au.com.codeka.warworlds.model.Colony;
+import au.com.codeka.warworlds.model.Planet;
+import au.com.codeka.warworlds.model.Star;
 import au.com.codeka.warworlds.model.StarManager;
 
 public class FocusDialog extends DialogFragment {
@@ -44,7 +45,7 @@ public class FocusDialog extends DialogFragment {
 
     public void setColony(Star star, Colony colony) {
         mColony = colony;
-        mPlanet = (Planet) star.planets.get(colony.planet_index - 1);
+        mPlanet = (Planet) star.getPlanets()[colony.getPlanetIndex() - 1];
     }
 
     @Override
@@ -56,9 +57,16 @@ public class FocusDialog extends DialogFragment {
             byte[] bytes = savedInstanceState.getByteArray("au.com.codeka.warworlds.Colony");
             if (bytes != null) {
                 try {
-                    mColony = Model.wire.parseFrom(bytes, Colony.class);
-                    mPlanet = Model.wire.parseFrom(bytes, Planet.class);
-                } catch (IOException e) {
+                    Messages.Colony colony_pb;
+                    colony_pb = Messages.Colony.parseFrom(bytes);
+                    mColony = new Colony();
+                    mColony.fromProtocolBuffer(colony_pb);
+    
+                    bytes = savedInstanceState.getByteArray("au.com.codeka.warworlds.Planet");
+                    Messages.Planet planet_pb = Messages.Planet.parseFrom(bytes);
+                    mPlanet = new Planet();
+                    mPlanet.fromProtocolBuffer(null, planet_pb);
+                } catch (InvalidProtocolBufferException e) {
                 }
             }
         }
@@ -135,22 +143,22 @@ public class FocusDialog extends DialogFragment {
         }
 
         ((SeekBar) mView.findViewById(R.id.focus_population))
-                    .setProgress((int)(mColony.focus_population * SEEKBAR_MAX));
+                    .setProgress((int)(mColony.getPopulationFocus() * SEEKBAR_MAX));
         ((SeekBar) mView.findViewById(R.id.focus_farming))
-                    .setProgress((int)(mColony.focus_farming * SEEKBAR_MAX));
+                    .setProgress((int)(mColony.getFarmingFocus() * SEEKBAR_MAX));
         ((SeekBar) mView.findViewById(R.id.focus_mining))
-                    .setProgress((int)(mColony.focus_mining * SEEKBAR_MAX));
+                    .setProgress((int)(mColony.getMiningFocus() * SEEKBAR_MAX));
         ((SeekBar) mView.findViewById(R.id.focus_construction))
-                    .setProgress((int)(mColony.focus_construction * SEEKBAR_MAX));
+                    .setProgress((int)(mColony.getConstructionFocus() * SEEKBAR_MAX));
 
         ((TextView) mView.findViewById(R.id.focus_population_value))
-                    .setText(focusToString(mColony.focus_population));
+                    .setText(focusToString(mColony.getPopulationFocus()));
         ((TextView) mView.findViewById(R.id.focus_farming_value))
-                    .setText(focusToString(mColony.focus_farming));
+                    .setText(focusToString(mColony.getFarmingFocus()));
         ((TextView) mView.findViewById(R.id.focus_mining_value))
-                    .setText(focusToString(mColony.focus_mining));
+                    .setText(focusToString(mColony.getMiningFocus()));
         ((TextView) mView.findViewById(R.id.focus_construction_value))
-                    .setText(focusToString(mColony.focus_construction));
+                    .setText(focusToString(mColony.getConstructionFocus()));
 
         updateDeltas();
 
@@ -172,10 +180,14 @@ public class FocusDialog extends DialogFragment {
     public void onSaveInstanceState(Bundle state) {
         super.onSaveInstanceState(state);
         if (mColony != null) {
-            state.putByteArray("au.com.codeka.warworlds.Colony", mColony.toByteArray());
+            Messages.Colony.Builder colony_pb = Messages.Colony.newBuilder();
+            mColony.toProtocolBuffer(colony_pb);
+            state.putByteArray("au.com.codeka.warworlds.Colony", colony_pb.build().toByteArray());
         }
         if (mPlanet != null) {
-            state.putByteArray("au.com.codeka.warworlds.Planet", mPlanet.toByteArray());
+            Messages.Planet.Builder planet_pb = Messages.Planet.newBuilder();
+            mPlanet.toProtocolBuffer(planet_pb);
+            state.putByteArray("au.com.codeka.warworlds.Planet", planet_pb.build().toByteArray());
         }
     }
 
@@ -230,13 +242,13 @@ public class FocusDialog extends DialogFragment {
     }
 
     private void updateDeltas() {
-        float population = mColony.population;
+        float population = mColony.getPopulation();
 
         float focusFarming = (float) (((SeekBar) mView.findViewById(R.id.focus_farming)).getProgress() / SEEKBAR_MAX);
         float focusMining = (float) (((SeekBar) mView.findViewById(R.id.focus_mining)).getProgress() / SEEKBAR_MAX);
 
-        float congenialityFarming = (float) mPlanet.farming_congeniality / 100.0f;
-        float congenialityMining = (float) mPlanet.mining_congeniality / 100.0f;
+        float congenialityFarming = (float) mPlanet.getFarmingCongeniality() / 100.0f;
+        float congenialityMining = (float) mPlanet.getMiningCongeniality() / 100.0f;
 
         float rateFarming = population * focusFarming * congenialityFarming;
         float rateMining = population * focusMining * congenialityMining;
@@ -248,19 +260,23 @@ public class FocusDialog extends DialogFragment {
     }
 
     private void onSetClick() {
-        mColony.focus_population = (float) (mSeekBars.get(0).getProgress() / SEEKBAR_MAX);
-        mColony.focus_farming = (float) (mSeekBars.get(1).getProgress() / SEEKBAR_MAX);
-        mColony.focus_mining = (float) (mSeekBars.get(2).getProgress() / SEEKBAR_MAX);
-        mColony.focus_construction = (float) (mSeekBars.get(3).getProgress() / SEEKBAR_MAX);
+        mColony.setPopulationFocus((float) (mSeekBars.get(0).getProgress() / SEEKBAR_MAX));
+        mColony.setFarmingFocus((float) (mSeekBars.get(1).getProgress() / SEEKBAR_MAX));
+        mColony.setMiningFocus((float) (mSeekBars.get(2).getProgress() / SEEKBAR_MAX));
+        mColony.setConstructionFocus((float) (mSeekBars.get(3).getProgress() / SEEKBAR_MAX));
         dismiss();
 
         new BackgroundRunner<Void>() {
             @Override
             protected Void doInBackground() {
-                String url = String.format("stars/%s/colonies/%s", mColony.star_key, mColony.key);
+                String url = String.format("stars/%s/colonies/%s",
+                                           mColony.getStarKey(),
+                                           mColony.getKey());
 
+                Messages.Colony.Builder pb = Messages.Colony.newBuilder();
+                mColony.toProtocolBuffer(pb);
                 try {
-                    ApiClient.putProtoBuf(url, mColony, Colony.class);
+                    ApiClient.putProtoBuf(url, pb.build(), Messages.Colony.class);
                 } catch (ApiException e) {
                     log.error("Error updating colony!", e);
                 }
@@ -270,7 +286,7 @@ public class FocusDialog extends DialogFragment {
             @Override
             protected void onComplete(Void unused) {
                 // notify the StarManager that this star has been updated
-                StarManager.i.refreshStar(mColony.star_key);
+                StarManager.getInstance().refreshStar(mColony.getStarKey());
             }
         }.execute();
     }

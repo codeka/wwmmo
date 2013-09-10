@@ -1,11 +1,12 @@
 package au.com.codeka.warworlds.game.starfield;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.protobuf.InvalidProtocolBufferException;
 
 import android.content.Context;
 import android.content.DialogInterface;
@@ -18,14 +19,12 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import au.com.codeka.TimeInHours;
-import au.com.codeka.common.design.DesignKind;
-import au.com.codeka.common.design.ShipDesign;
-import au.com.codeka.common.model.Colony;
-import au.com.codeka.common.model.Empire;
-import au.com.codeka.common.model.Fleet;
-import au.com.codeka.common.model.Model;
-import au.com.codeka.common.model.Planet;
-import au.com.codeka.common.model.Star;
+import au.com.codeka.common.model.BaseColony;
+import au.com.codeka.common.model.BaseFleet;
+import au.com.codeka.common.model.BaseStar;
+import au.com.codeka.common.model.DesignKind;
+import au.com.codeka.common.model.ShipDesign;
+import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.BaseActivity;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.ServerGreeter;
@@ -41,17 +40,23 @@ import au.com.codeka.warworlds.game.SitrepActivity;
 import au.com.codeka.warworlds.game.StarRenameDialog;
 import au.com.codeka.warworlds.game.alliance.AllianceActivity;
 import au.com.codeka.warworlds.game.solarsystem.SolarSystemActivity;
+import au.com.codeka.warworlds.model.Colony;
 import au.com.codeka.warworlds.model.DesignManager;
-import au.com.codeka.warworlds.model.EmpireHelper;
+import au.com.codeka.warworlds.model.Empire;
 import au.com.codeka.warworlds.model.EmpireManager;
+import au.com.codeka.warworlds.model.Fleet;
+import au.com.codeka.warworlds.model.MyEmpire;
+import au.com.codeka.warworlds.model.Planet;
 import au.com.codeka.warworlds.model.PurchaseManager;
+import au.com.codeka.warworlds.model.Sector;
 import au.com.codeka.warworlds.model.SectorManager;
 import au.com.codeka.warworlds.model.Sprite;
 import au.com.codeka.warworlds.model.SpriteDrawable;
 import au.com.codeka.warworlds.model.SpriteManager;
+import au.com.codeka.warworlds.model.Star;
 import au.com.codeka.warworlds.model.StarImageManager;
 import au.com.codeka.warworlds.model.StarManager;
-import au.com.codeka.warworlds.model.StarType;
+import au.com.codeka.warworlds.model.StarSummary;
 import au.com.codeka.warworlds.model.billing.IabException;
 import au.com.codeka.warworlds.model.billing.IabHelper;
 import au.com.codeka.warworlds.model.billing.IabResult;
@@ -163,10 +168,10 @@ public class StarfieldActivity extends BaseActivity
                 // on in the tactical map as well.
                 Star centreStar = mStarfield.findStarInCentre();
                 if (centreStar != null) {
-                    intent.putExtra("au.com.codeka.warworlds.SectorX", centreStar.sector_x);
-                    intent.putExtra("au.com.codeka.warworlds.SectorY", centreStar.sector_y);
-                    intent.putExtra("au.com.codeka.warworlds.OffsetX", centreStar.offset_x);
-                    intent.putExtra("au.com.codeka.warworlds.OffsetY", centreStar.offset_y);
+                    intent.putExtra("au.com.codeka.warworlds.SectorX", centreStar.getSectorX());
+                    intent.putExtra("au.com.codeka.warworlds.SectorY", centreStar.getSectorY());
+                    intent.putExtra("au.com.codeka.warworlds.OffsetX", centreStar.getOffsetX());
+                    intent.putExtra("au.com.codeka.warworlds.OffsetY", centreStar.getOffsetY());
                 }
                 startActivityForResult(intent, TACTICAL_MAP_REQUEST);
             }
@@ -181,7 +186,7 @@ public class StarfieldActivity extends BaseActivity
                 }
 
                 Intent intent = new Intent(mContext, SolarSystemActivity.class);
-                intent.putExtra("au.com.codeka.warworlds.StarKey", mSelectedStar.key);
+                intent.putExtra("au.com.codeka.warworlds.StarKey", mSelectedStar.getKey());
                 startActivityForResult(intent, SOLAR_SYSTEM_REQUEST);
             }
         });
@@ -213,25 +218,31 @@ public class StarfieldActivity extends BaseActivity
                     Star selectedStar = null;
                     Fleet selectedFleet = null;
 
-                    byte[] star_bytes = savedInstanceState.getByteArray("au.com.codeka.warworlds.SelectedStar");
-                    if (star_bytes != null) {
-                        try {
-                            selectedStar = Model.wire.parseFrom(star_bytes, Star.class);
-                        } catch (IOException e) { }
+                    try {
+                        byte[] star_bytes = savedInstanceState.getByteArray("au.com.codeka.warworlds.SelectedStar");
+                        if (star_bytes != null) {
+                            Messages.Star star_pb = Messages.Star.parseFrom(star_bytes);
+                            selectedStar = new Star();
+                            selectedStar.fromProtocolBuffer(star_pb);
+                        }
+                    } catch (InvalidProtocolBufferException e) {
                     }
 
-                    byte[] fleet_bytes = savedInstanceState.getByteArray("au.com.codeka.warworlds.SelectedFleet");
-                    if (fleet_bytes != null) {
-                        try {
-                            selectedFleet = Model.wire.parseFrom(fleet_bytes, Fleet.class);
-                        } catch (IOException e) { }
+                    try {
+                        byte[] fleet_bytes = savedInstanceState.getByteArray("au.com.codeka.warworlds.SelectedFleet");
+                        if (fleet_bytes != null) {
+                            Messages.Fleet fleet_pb = Messages.Fleet.parseFrom(fleet_bytes);
+                            selectedFleet = new Fleet();
+                            selectedFleet.fromProtocolBuffer(fleet_pb);
+                        }
+                    } catch (InvalidProtocolBufferException e) {
                     }
 
                     if (selectedStar != null) {
                         mSelectedStar = selectedStar;
-                        mStarfield.selectStar(selectedStar.key);
-                        mStarfield.scrollTo(selectedStar.sector_x, selectedStar.sector_y,
-                                            selectedStar.offset_x, selectedStar.offset_y,
+                        mStarfield.selectStar(selectedStar.getKey());
+                        mStarfield.scrollTo(selectedStar.getSectorX(), selectedStar.getSectorY(),
+                                            selectedStar.getOffsetX(), selectedStar.getOffsetY(),
                                             true);
                     }
                     if (selectedFleet != null) {
@@ -253,15 +264,15 @@ public class StarfieldActivity extends BaseActivity
                     }
                 }
 
-                Empire myEmpire = EmpireManager.i.getEmpire();
+                MyEmpire myEmpire = EmpireManager.i.getEmpire();
                 if (myEmpire == null) {
                     return;
                 }
 
-                Star homeStar = myEmpire.home_star;
+                BaseStar homeStar = myEmpire.getHomeStar();
                 if (homeStar != null) {
-                    mStarfield.scrollTo(homeStar.sector_x, homeStar.sector_y,
-                                        homeStar.offset_x, homeStar.offset_y,
+                    mStarfield.scrollTo(homeStar.getSectorX(), homeStar.getSectorY(),
+                                        homeStar.getOffsetX(), homeStar.getOffsetY(),
                                         true);
                 } else {
                     // this should never happen...
@@ -275,7 +286,7 @@ public class StarfieldActivity extends BaseActivity
     public void onStart() {
         super.onStart();
 
-        StarManager.i.addStarUpdatedListener(null, this);
+        StarManager.getInstance().addStarUpdatedListener(null, this);
     }
 
     @Override
@@ -292,18 +303,22 @@ public class StarfieldActivity extends BaseActivity
     public void onStop() {
         super.onStop();
 
-        StarManager.i.removeStarUpdatedListener(this);
+        StarManager.getInstance().removeStarUpdatedListener(this);
     }
 
     @Override
     public void onSaveInstanceState(Bundle state) {
         super.onSaveInstanceState(state);
         if (mSelectedStar != null) {
-            state.putByteArray("au.com.codeka.warworlds.SelectedStar", mSelectedStar.toByteArray());
+            Messages.Star.Builder star_pb = Messages.Star.newBuilder();
+            mSelectedStar.toProtocolBuffer(star_pb);
+            state.putByteArray("au.com.codeka.warworlds.SelectedStar", star_pb.build().toByteArray());
         }
 
         if (mSelectedFleet != null) {
-            state.putByteArray("au.com.codeka.warworlds.SelectedFleet", mSelectedFleet.toByteArray());
+            Messages.Fleet.Builder fleet_pb = Messages.Fleet.newBuilder();
+            mSelectedFleet.toProtocolBuffer(fleet_pb);
+            state.putByteArray("au.com.codeka.warworlds.SelectedFleet", fleet_pb.build().toByteArray());
         }
     }
 
@@ -319,15 +334,15 @@ public class StarfieldActivity extends BaseActivity
             return;
         }
         for (Colony c : colonies) {
-            starKey = c.star_key;
+            starKey = c.getStarKey();
         }
 
         if (starKey != null) {
-            StarManager.i.requestStarSummary(starKey, new StarManager.StarSummaryFetchedHandler() {
+            StarManager.getInstance().requestStarSummary(starKey, new StarManager.StarSummaryFetchedHandler() {
                 @Override
-                public void onStarSummaryFetched(Star s) {
-                    mStarfield.scrollTo(s.sector_x, s.sector_y,
-                                        s.offset_x, s.offset_y,
+                public void onStarSummaryFetched(StarSummary s) {
+                    mStarfield.scrollTo(s.getSectorX(), s.getSectorY(),
+                                        s.getOffsetX(), s.getOffsetY(),
                                         true);
                 }
             });
@@ -336,8 +351,8 @@ public class StarfieldActivity extends BaseActivity
 
     public void openEmpireActivityAtFleet(Star star, Fleet fleet) {
         Intent intent = new Intent(mContext, EmpireActivity.class);
-        intent.putExtra("au.com.codeka.warworlds.StarKey", star.key);
-        intent.putExtra("au.com.codeka.warworlds.FleetKey", fleet.key);
+        intent.putExtra("au.com.codeka.warworlds.StarKey", star.getKey());
+        intent.putExtra("au.com.codeka.warworlds.FleetKey", fleet.getKey());
         startActivityForResult(intent, EMPIRE_REQUEST);
     }
 
@@ -365,8 +380,8 @@ public class StarfieldActivity extends BaseActivity
      *         is centered on the given star.
      */
     public void navigateToPlanet(Star star, Planet planet, boolean scrollView) {
-        navigateToPlanet(star.sector_x, star.sector_y, star.key,
-                         star.offset_x, star.offset_y, planet.index,
+        navigateToPlanet(star.getSectorX(), star.getSectorY(), star.getKey(),
+                         star.getOffsetX(), star.getOffsetY(), planet.getIndex(),
                          scrollView);
     }
 
@@ -385,38 +400,38 @@ public class StarfieldActivity extends BaseActivity
     }
 
     public void navigateToFleet(final String starKey, final String fleetKey) {
-        Star star = SectorManager.i.findStar(starKey);
+        Star star = SectorManager.getInstance().findStar(starKey);
         if (star == null) {
-            StarManager.i.requestStar(starKey, false,
+            StarManager.getInstance().requestStar(starKey, false,
                 new StarManager.StarFetchedHandler() {
                     @Override
                     public void onStarFetched(Star s) {
-                        Fleet fleet = Model.findFleet(s, fleetKey);
+                        BaseFleet fleet = s.findFleet(fleetKey);
                         if (fleet != null) {
                             navigateToFleet(s, fleet);
                         }
                     }
                 });
         } else {
-            Fleet fleet = Model.findFleet(star, fleetKey);
+            BaseFleet fleet = star.findFleet(fleetKey);
             if (fleet != null) {
-                navigateToFleet(star, fleet);
+                navigateToFleet(star, star.findFleet(fleetKey));
             }
         }
     }
 
-    public void navigateToFleet(Star star, Fleet fleet) {
-        int offsetX = star.offset_x - (int) ((mStarfield.getWidth() / 2) / mStarfield.getPixelScale());
-        int offsetY = star.offset_y - (int) ((mStarfield.getHeight() / 2) / mStarfield.getPixelScale());
+    public void navigateToFleet(Star star, BaseFleet fleet) {
+        int offsetX = star.getOffsetX() - (int) ((mStarfield.getWidth() / 2) / mStarfield.getPixelScale());
+        int offsetY = star.getOffsetY() - (int) ((mStarfield.getHeight() / 2) / mStarfield.getPixelScale());
 
         // todo: if the fleet is moving, scroll to it...
 
-        mStarfield.scrollTo(star.sector_x, star.sector_y, offsetX, offsetY);
+        mStarfield.scrollTo(star.getSectorX(), star.getSectorY(), offsetX, offsetY);
 
-        if (fleet.state == Fleet.FLEET_STATE.MOVING) {
+        if (fleet.getState() == Fleet.State.MOVING) {
             mStarfield.selectFleet(fleet);
         } else {
-            mStarfield.selectStar(star.key);
+            mStarfield.selectStar(star.getKey());
         }
     }
 
@@ -504,7 +519,7 @@ public class StarfieldActivity extends BaseActivity
             String starKey = intent.getStringExtra("au.com.codeka.warworlds.StarKey");
 
             if (wasSectorUpdated) {
-                SectorManager.i.refreshSector(sectorX, sectorY);
+                SectorManager.getInstance().refreshSector(sectorX, sectorY);
             } else if (starKey != null) {
                 // make sure we re-select the star you had selected before.
                 mStarfield.selectStar(starKey);
@@ -543,7 +558,7 @@ public class StarfieldActivity extends BaseActivity
 
     @Override
     public void onStarSelected(Star star) {
-        if (mSelectedStar != null && mSelectedStar.key.equals(star.key)) {
+        if (mSelectedStar != null && mSelectedStar.getKey().equals(star.getKey())) {
             updateStarSelection();
             return;
         }
@@ -556,22 +571,22 @@ public class StarfieldActivity extends BaseActivity
         selectionLoadingContainer.setVisibility(View.VISIBLE);
         selectedStarContainer.setVisibility(View.GONE);
         selectedFleetContainer.setVisibility(View.GONE);
-        mFetchingStarKey = star.key;
+        mFetchingStarKey = star.getKey();
         mFetchingFleetKey = null;
         mSelectedFleet = null;
 
-        StarManager.i.requestStar(star.key, true, this);
+        StarManager.getInstance().requestStar(star.getKey(), true, this);
     }
 
     @Override
     public void onStarFetched(Star star) {
-        if (mSelectedStar != null && mSelectedStar.key.equals(star.key)) {
+        if (mSelectedStar != null && mSelectedStar.getKey().equals(star.getKey())) {
             // if it's the star we already have selected, then we may as well refresh
             // whatever we've got.
-            mFetchingStarKey = mSelectedStar.key;
+            mFetchingStarKey = mSelectedStar.getKey();
         }
         if (mFetchingStarKey == null ||
-            !mFetchingStarKey.equals(star.key)) {
+            !mFetchingStarKey.equals(star.getKey())) {
             return;
         }
 
@@ -595,14 +610,14 @@ public class StarfieldActivity extends BaseActivity
         mPlanetList.setStar(mSelectedStar);
         mFleetList.setStar(mSelectedStar);
 
-        Empire myEmpire = EmpireManager.i.getEmpire();
+        MyEmpire myEmpire = EmpireManager.i.getEmpire();
         int numMyEmpire = 0;
         int numOtherEmpire = 0;
-        for (Colony colony : mSelectedStar.colonies) {
-            if (colony.empire_key == null) {
+        for (BaseColony colony : mSelectedStar.getColonies()) {
+            if (colony.getEmpireKey() == null) {
                 continue;
             }
-            if (colony.empire_key.equals(myEmpire.key)) {
+            if (colony.getEmpireKey().equals(myEmpire.getKey())) {
                 numMyEmpire ++;
             } else {
                 numOtherEmpire ++;
@@ -614,21 +629,21 @@ public class StarfieldActivity extends BaseActivity
             renameButton.setVisibility(View.GONE);
         }
 
-        starName.setText(mSelectedStar.name);
-        int offsetX = (int)(mSelectedStar.offset_x / (float) Model.SECTOR_SIZE * 1000.0f);
-        if (mSelectedStar.sector_x < 0) {
+        starName.setText(mSelectedStar.getName());
+        int offsetX = (int)(mSelectedStar.getOffsetX() / (float) Sector.SECTOR_SIZE * 1000.0f);
+        if (mSelectedStar.getSectorX() < 0) {
             offsetX = 1000 - offsetX;
         }
-        offsetX /= Model.PIXELS_PER_PARSEC;
-        int offsetY = (int)(mSelectedStar.offset_y / (float) Model.SECTOR_SIZE * 1000.0f);
-        if (mSelectedStar.sector_y < 0) {
+        offsetX /= Sector.PIXELS_PER_PARSEC;
+        int offsetY = (int)(mSelectedStar.getOffsetY() / (float) Sector.SECTOR_SIZE * 1000.0f);
+        if (mSelectedStar.getSectorY() < 0) {
             offsetY = 1000 - offsetY;
         }
-        offsetY /= Model.PIXELS_PER_PARSEC;
+        offsetY /= Sector.PIXELS_PER_PARSEC;
         starKind.setText(String.format(Locale.ENGLISH, "%s [%d.%02d,%d.%02d]",
-                StarType.get(mSelectedStar).getShortName(),
-                mSelectedStar.sector_x, offsetX,
-                mSelectedStar.sector_y, offsetY));
+                mSelectedStar.getStarType().getShortName(),
+                mSelectedStar.getSectorX(), offsetX,
+                mSelectedStar.getSectorY(), offsetY));
         Sprite starImage = StarImageManager.getInstance().getSprite(mSelectedStar, 80, true);
         starIcon.setImageDrawable(new SpriteDrawable(starImage));
     }
@@ -646,21 +661,21 @@ public class StarfieldActivity extends BaseActivity
 
         empireName.setText("");
         empireIcon.setImageBitmap(null);
-        mFetchingFleetKey = fleet.key;
+        mFetchingFleetKey = fleet.getKey();
         mFetchingStarKey = null;
         mSelectedStar = null;
         mSelectedFleet = fleet;
 
-        ShipDesign design = (ShipDesign) DesignManager.i.getDesign(DesignKind.SHIP, fleet.design_id);
-        EmpireManager.i.fetchEmpire(fleet.empire_key, new EmpireManager.EmpireFetchedHandler() {
+        ShipDesign design = (ShipDesign) DesignManager.i.getDesign(DesignKind.SHIP, fleet.getDesignID());
+        EmpireManager.i.fetchEmpire(fleet.getEmpireKey(), new EmpireManager.EmpireFetchedHandler() {
             @Override
             public void onEmpireFetched(Empire empire) {
                 if (mFetchingFleetKey == null ||
-                    !mFetchingFleetKey.equals(fleet.key)) {
+                    !mFetchingFleetKey.equals(fleet.getKey())) {
                     return;
                 }
-                empireName.setText(empire.display_name);
-                empireIcon.setImageBitmap(EmpireHelper.getShield(mContext, empire));
+                empireName.setText(empire.getDisplayName());
+                empireIcon.setImageBitmap(empire.getShield(mContext));
             }
         });
 
@@ -668,10 +683,10 @@ public class StarfieldActivity extends BaseActivity
         fleetIcon.setImageDrawable(new SpriteDrawable(SpriteManager.i.getSprite(design.getSpriteName())));
 
         String eta = "???";
-        Star srcStar = SectorManager.i.findStar(fleet.star_key);
-        Star destStar = SectorManager.i.findStar(fleet.destination_star_key);
+        Star srcStar = SectorManager.getInstance().findStar(fleet.getStarKey());
+        Star destStar = SectorManager.getInstance().findStar(fleet.getDestinationStarKey());
         if (srcStar != null && destStar != null) {
-            float timeRemainingInHours = Model.getTimeToDestination(fleet, srcStar, destStar);
+            float timeRemainingInHours = fleet.getTimeToDestination(srcStar, destStar);
             eta = TimeInHours.format(timeRemainingInHours);
         }
 
@@ -680,8 +695,8 @@ public class StarfieldActivity extends BaseActivity
             "<b>Speed:</b> %.2f pc/hr<br />" +
             "<b>Destination:</b> %s<br />" +
             "<b>ETA:</b> %s",
-            (int) Math.ceil(fleet.num_ships), design.getSpeedInParsecPerHour(),
-            (destStar == null ? "???" : destStar.name),
+            (int) Math.ceil(fleet.getNumShips()), design.getSpeedInParsecPerHour(),
+            (destStar == null ? "???" : destStar.getName()),
             eta);
         fleetDetails.setText(Html.fromHtml(details));
 

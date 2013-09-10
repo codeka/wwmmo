@@ -9,15 +9,14 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
-import au.com.codeka.common.model.Star;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.StyledDialog;
 import au.com.codeka.warworlds.model.PurchaseManager;
 import au.com.codeka.warworlds.model.Sprite;
 import au.com.codeka.warworlds.model.SpriteDrawable;
+import au.com.codeka.warworlds.model.Star;
 import au.com.codeka.warworlds.model.StarImageManager;
 import au.com.codeka.warworlds.model.StarManager;
-import au.com.codeka.warworlds.model.StarType;
 import au.com.codeka.warworlds.model.billing.IabHelper;
 import au.com.codeka.warworlds.model.billing.IabResult;
 import au.com.codeka.warworlds.model.billing.Purchase;
@@ -43,10 +42,10 @@ public class StarRenameDialog extends DialogFragment {
         TextView starName = (TextView) mView.findViewById(R.id.star_name);
         ImageView starIcon = (ImageView) mView.findViewById(R.id.star_icon);
 
-        starName.setText(mStar.name);
-        starNewName.setText(mStar.name);
+        starName.setText(mStar.getName());
+        starNewName.setText(mStar.getName());
 
-        int imageSize = (int)(mStar.size * StarType.get(mStar).getImageScale() * 2);
+        int imageSize = (int)(mStar.getSize() * mStar.getStarType().getImageScale() * 2);
         Sprite starSprite = StarImageManager.getInstance().getSprite(mStar, imageSize, true);
         starIcon.setImageDrawable(new SpriteDrawable(starSprite));
 
@@ -76,7 +75,7 @@ public class StarRenameDialog extends DialogFragment {
                     return;
                 }
 
-                StarManager.i.renameStar(purchase, mStar, newStarName);
+                StarManager.getInstance().renameStar(purchase, mStar, newStarName);
             }
         });
     }

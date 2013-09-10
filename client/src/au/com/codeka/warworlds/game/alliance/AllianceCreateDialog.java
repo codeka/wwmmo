@@ -10,7 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.TextView;
 import au.com.codeka.BackgroundRunner;
-import au.com.codeka.common.model.Alliance;
+import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.StyledDialog;
 import au.com.codeka.warworlds.api.ApiClient;
@@ -51,8 +51,8 @@ public class AllianceCreateDialog extends DialogFragment {
 
             @Override
             protected Boolean doInBackground() {
-                Alliance alliance_pb = new  Alliance.Builder()
-                               .name(allianceName)
+                Messages.Alliance alliance_pb = Messages.Alliance.newBuilder()
+                               .setName(allianceName)
                                .build();
 
                 try {

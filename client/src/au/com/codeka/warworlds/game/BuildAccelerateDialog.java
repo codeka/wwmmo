@@ -13,25 +13,24 @@ import android.view.View;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import au.com.codeka.BackgroundRunner;
-import au.com.codeka.common.design.Design;
-import au.com.codeka.common.design.DesignKind;
-import au.com.codeka.common.model.BuildRequest;
-import au.com.codeka.common.model.Model;
-import au.com.codeka.common.model.Star;
+import au.com.codeka.common.model.Design;
+import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.StyledDialog;
 import au.com.codeka.warworlds.api.ApiClient;
 import au.com.codeka.warworlds.api.ApiException;
+import au.com.codeka.warworlds.model.BuildRequest;
 import au.com.codeka.warworlds.model.DesignManager;
 import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.StarManager;
+import au.com.codeka.warworlds.model.StarSummary;
 
 public class BuildAccelerateDialog extends DialogFragment {
     private BuildRequest mBuildRequest;
-    private Star mStar;
+    private StarSummary mStar;
     private View mView;
 
-    public void setBuildRequest(Star star, BuildRequest buildRequest) {
+    public void setBuildRequest(StarSummary star, BuildRequest buildRequest) {
         mBuildRequest = buildRequest;
         mStar = star;
     }
@@ -78,15 +77,15 @@ public class BuildAccelerateDialog extends DialogFragment {
         TextView acceleratePct = (TextView) mView.findViewById(R.id.accelerate_pct);
         acceleratePct.setText(String.format(Locale.ENGLISH, "%d %%", (int)(accelerateAmount * 100)));
 
-        double remainingProgress = 1.0 - Model.getProgress(mBuildRequest);
+        double remainingProgress = 1.0 - mBuildRequest.getProgress(true);
         double progressToComplete = remainingProgress * accelerateAmount;
 
-        Design design = DesignManager.i.getDesign(DesignKind.fromBuildKind(mBuildRequest.build_kind), mBuildRequest.design_id);
+        Design design = DesignManager.i.getDesign(mBuildRequest.getDesignKind(), mBuildRequest.getDesignID());
         double mineralsToUse = design.getBuildCost().getCostInMinerals() * progressToComplete;
-        double cost = mineralsToUse * mBuildRequest.count;
+        double cost = mineralsToUse * mBuildRequest.getCount();
 
         TextView accelerateCost = (TextView) mView.findViewById(R.id.accelerate_cost);
-        if (cost < EmpireManager.i.getEmpire().cash) {
+        if (cost < EmpireManager.i.getEmpire().getCash()) {
             accelerateCost.setText(String.format(Locale.ENGLISH, "$%d", (int) cost));
         } else {
             accelerateCost.setText(Html.fromHtml(String.format(Locale.ENGLISH,
@@ -108,11 +107,18 @@ public class BuildAccelerateDialog extends DialogFragment {
 
             @Override
             protected BuildRequest doInBackground() {
-                String url = "stars/"+mStar.key+"/build/"+mBuildRequest.key+"/accelerate";
+                String url = "stars/"+mStar.getKey()+"/build/"+mBuildRequest.getKey()+"/accelerate";
                 url += "?amount="+getAccelerateAmount();
 
                 try {
-                    return ApiClient.postProtoBuf(url, null, BuildRequest.class);
+                    Messages.BuildRequest pb = ApiClient.postProtoBuf(url, null, Messages.BuildRequest.class);
+                    if (pb == null) {
+                        return null;
+                    }
+
+                    BuildRequest br = new BuildRequest();
+                    br.fromProtocolBuffer(pb);
+                    return br;
                 } catch (ApiException e) {
                     if (e.getServerErrorCode() > 0) {
                         mErrorMsg = e.getServerErrorMessage();
@@ -124,7 +130,7 @@ public class BuildAccelerateDialog extends DialogFragment {
             @Override
             protected void onComplete(BuildRequest buildRequest) {
                 // tell the StarManager that this star has been updated
-                StarManager.i.refreshStar(mStar.key);
+                StarManager.getInstance().refreshStar(mStar.getKey());
 
                 // tell the EmpireManager to update the empire (since our cash will have gone down)
                 EmpireManager.i.refreshEmpire();

@@ -10,9 +10,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Handler;
 import au.com.codeka.BackgroundRunner;
-import au.com.codeka.common.model.DeviceOnlineStatus;
 import au.com.codeka.warworlds.api.ApiClient;
 import au.com.codeka.warworlds.api.ApiException;
+import au.com.codeka.common.protobuf.Messages;
 
 /**
  * This class is used to detect when the app goes into the background. Basically
@@ -81,9 +81,10 @@ public class BackgroundDetector {
             return;
         }
 
-        final DeviceOnlineStatus deviceOnlineStatus = new DeviceOnlineStatus.Builder()
-                .is_online(!mIsInBackground)
-                .build();
+        final Messages.DeviceOnlineStatus dos_pb =
+                Messages.DeviceOnlineStatus.newBuilder()
+                                           .setIsOnline(!mIsInBackground)
+                                           .build();
 
         final String deviceRegistrationKey = DeviceRegistrar.getDeviceRegistrationKey();
         if (deviceRegistrationKey == null || deviceRegistrationKey.length() == 0) {
@@ -100,7 +101,7 @@ public class BackgroundDetector {
             protected Void doInBackground() {
                 String url = "devices/"+deviceRegistrationKey+"?online_status=1";
                 try {
-                    ApiClient.putProtoBuf(url, deviceOnlineStatus);
+                    ApiClient.putProtoBuf(url, dos_pb);
                 } catch (ApiException e) {
                     log.error("Could not update online status, ignored.");
                 }

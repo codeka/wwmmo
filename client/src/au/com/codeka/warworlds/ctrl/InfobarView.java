@@ -7,12 +7,13 @@ import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import au.com.codeka.common.Cash;
-import au.com.codeka.common.model.Empire;
+import au.com.codeka.Cash;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.api.RequestManager;
 import au.com.codeka.warworlds.api.RequestManager.RequestManagerState;
+import au.com.codeka.warworlds.model.Empire;
 import au.com.codeka.warworlds.model.EmpireManager;
+import au.com.codeka.warworlds.model.MyEmpire;
 
 /**
  * The "infobar" control displays the current empire name, your cash level
@@ -37,13 +38,13 @@ public class InfobarView extends FrameLayout
 
     @Override
     public void onEmpireFetched(Empire empire) {
-        Empire myEmpire = EmpireManager.i.getEmpire();
-        if (myEmpire != null && myEmpire.key.equals(empire.key)) {
+        MyEmpire myEmpire = EmpireManager.i.getEmpire();
+        if (myEmpire != null && myEmpire.getKey().equals(empire.getKey())) {
             TextView cash = (TextView) mView.findViewById(R.id.cash);
-            cash.setText(Cash.format(empire.cash));
+            cash.setText(Cash.format(empire.getCash()));
 
             TextView empireName = (TextView) mView.findViewById(R.id.empire_name);
-            empireName.setText(empire.display_name);
+            empireName.setText(empire.getDisplayName());
         }
     }
 
@@ -90,7 +91,7 @@ public class InfobarView extends FrameLayout
         }
         mHandler = new Handler();
 
-        Empire empire = EmpireManager.i.getEmpire();
+        MyEmpire empire = EmpireManager.i.getEmpire();
         if (empire != null) {
             onEmpireFetched(empire);
         }

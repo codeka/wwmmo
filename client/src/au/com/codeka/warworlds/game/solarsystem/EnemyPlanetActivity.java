@@ -11,13 +11,10 @@ import android.view.Window;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
-import au.com.codeka.common.design.DesignKind;
-import au.com.codeka.common.design.ShipDesign;
-import au.com.codeka.common.model.Colony;
-import au.com.codeka.common.model.Empire;
-import au.com.codeka.common.model.Fleet;
-import au.com.codeka.common.model.Planet;
-import au.com.codeka.common.model.Star;
+import au.com.codeka.common.model.BaseColony;
+import au.com.codeka.common.model.BaseFleet;
+import au.com.codeka.common.model.DesignKind;
+import au.com.codeka.common.model.ShipDesign;
 import au.com.codeka.warworlds.ActivityBackgroundGenerator;
 import au.com.codeka.warworlds.BaseActivity;
 import au.com.codeka.warworlds.R;
@@ -26,10 +23,13 @@ import au.com.codeka.warworlds.ServerGreeter.ServerGreeting;
 import au.com.codeka.warworlds.StyledDialog;
 import au.com.codeka.warworlds.WarWorldsActivity;
 import au.com.codeka.warworlds.ctrl.PlanetDetailsView;
+import au.com.codeka.warworlds.model.Colony;
 import au.com.codeka.warworlds.model.DesignManager;
-import au.com.codeka.warworlds.model.EmpireHelper;
+import au.com.codeka.warworlds.model.Empire;
 import au.com.codeka.warworlds.model.EmpireManager;
-import au.com.codeka.warworlds.model.MyEmpireManager;
+import au.com.codeka.warworlds.model.MyEmpire;
+import au.com.codeka.warworlds.model.Planet;
+import au.com.codeka.warworlds.model.Star;
 import au.com.codeka.warworlds.model.StarManager;
 
 /**
@@ -73,8 +73,8 @@ public class EnemyPlanetActivity extends BaseActivity
                     startActivity(new Intent(EnemyPlanetActivity.this, WarWorldsActivity.class));
                 } else {
                     String starKey = getIntent().getExtras().getString("au.com.codeka.warworlds.StarKey");
-                    StarManager.i.requestStar(starKey, false, EnemyPlanetActivity.this);
-                    StarManager.i.addStarUpdatedListener(starKey, EnemyPlanetActivity.this);
+                    StarManager.getInstance().requestStar(starKey, false, EnemyPlanetActivity.this);
+                    StarManager.getInstance().addStarUpdatedListener(starKey, EnemyPlanetActivity.this);
                 }
             }
         });
@@ -85,19 +85,19 @@ public class EnemyPlanetActivity extends BaseActivity
         int planetIndex = getIntent().getExtras().getInt("au.com.codeka.warworlds.PlanetIndex");
 
         mStar = s;
-        mPlanet = (Planet) s.planets.get(planetIndex - 1);
-        for (Colony colony : s.colonies) {
-            if (colony.planet_index == planetIndex) {
+        mPlanet = (Planet) s.getPlanets()[planetIndex - 1];
+        for (BaseColony colony : s.getColonies()) {
+            if (colony.getPlanetIndex() == planetIndex) {
                 mColony = (Colony) colony;
             }
         }
 
         final Button attackBtn = (Button) findViewById(R.id.attack_btn);
         if (mColony != null) {
-            mColonyEmpire = EmpireManager.i.getEmpire(mColony.empire_key);
+            mColonyEmpire = EmpireManager.i.getEmpire(mColony.getEmpireKey());
             if (mColonyEmpire == null) {
                 attackBtn.setEnabled(false);
-                EmpireManager.i.fetchEmpire(mColony.empire_key, new EmpireManager.EmpireFetchedHandler() {
+                EmpireManager.i.fetchEmpire(mColony.getEmpireKey(), new EmpireManager.EmpireFetchedHandler() {
                     @Override
                     public void onEmpireFetched(Empire empire) {
                         mColonyEmpire = empire;
@@ -121,28 +121,28 @@ public class EnemyPlanetActivity extends BaseActivity
         TextView enemyName = (TextView) findViewById(R.id.enemy_empire_name);
         TextView enemyDefence = (TextView) findViewById(R.id.enemy_empire_defence);
 
-        int defence = (int) (0.25 * mColony.population * mColony.defence_bonus);
+        int defence = (int) (0.25 * mColony.getPopulation() * mColony.getDefenceBoost());
         if (defence < 1) {
             defence = 1;
         }
-        enemyIcon.setImageBitmap(EmpireHelper.getShield(this, mColonyEmpire));
-        enemyName.setText(mColonyEmpire.display_name);
+        enemyIcon.setImageBitmap(mColonyEmpire.getShield(this));
+        enemyName.setText(mColonyEmpire.getDisplayName());
         enemyDefence.setText(String.format(Locale.ENGLISH, "Defence: %d", defence));
     }
 
     private void onAttackClick() {
-        int defence = (int)(0.25 * mColony.population * mColony.defence_bonus);
+        int defence = (int)(0.25 * mColony.getPopulation() * mColony.getDefenceBoost());
 
-        final Empire myEmpire = EmpireManager.i.getEmpire();
+        final MyEmpire myEmpire = EmpireManager.i.getEmpire();
         int attack = 0;
-        for (Fleet fleet : mStar.fleets) {
-            if (fleet.empire_key == null) {
+        for (BaseFleet fleet : mStar.getFleets()) {
+            if (fleet.getEmpireKey() == null) {
                 continue;
             }
-            if (fleet.empire_key.equals(myEmpire.key)) {
-                ShipDesign design = (ShipDesign) DesignManager.i.getDesign(DesignKind.SHIP, fleet.design_id);
+            if (fleet.getEmpireKey().equals(myEmpire.getKey())) {
+                ShipDesign design = (ShipDesign) DesignManager.i.getDesign(DesignKind.SHIP, fleet.getDesignID());
                 if (design.hasEffect("troopcarrier")) {
-                    attack += Math.ceil(fleet.num_ships);
+                    attack += Math.ceil(fleet.getNumShips());
                 }
             }
         }
@@ -152,12 +152,12 @@ public class EnemyPlanetActivity extends BaseActivity
                 "<p>Do you want to attack this %s colony?</p>" +
                 "<p><b>Colony defence:</b> %d<br />" +
                 "   <b>Your attack capability:</b> %d</p>",
-                mColonyEmpire.display_name, defence, attack)));
+                mColonyEmpire.getDisplayName(), defence, attack)));
         b.setPositiveButton("Attack!", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(final DialogInterface dialog, int which) {
-                MyEmpireManager.i.attackColony(mStar, mColony,
-                    new MyEmpireManager.AttackColonyCompleteHandler() {
+                myEmpire.attackColony(mStar, mColony,
+                    new MyEmpire.AttackColonyCompleteHandler() {
                         @Override
                         public void onComplete() {
                             dialog.dismiss();

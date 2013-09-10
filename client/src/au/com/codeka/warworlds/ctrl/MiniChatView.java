@@ -13,11 +13,10 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
-import au.com.codeka.common.model.ChatMessage;
 import au.com.codeka.warworlds.GlobalOptions;
 import au.com.codeka.warworlds.game.ChatActivity;
 import au.com.codeka.warworlds.model.ChatManager;
-import au.com.codeka.warworlds.model.ChatMessageHelper;
+import au.com.codeka.warworlds.model.ChatMessage;
 
 /**
  * This control displays the mini chat window, which displays recent chat
@@ -100,7 +99,7 @@ public class MiniChatView extends RelativeLayout
 
     private void appendMessage(final ChatMessage msg) {
         TextView tv = new TextView(mContext);
-        tv.setText(ChatMessageHelper.format(msg, ChatMessageHelper.Location.PUBLIC_CHANNEL, mAutoTranslate));
+        tv.setText(msg.format(ChatMessage.Location.PUBLIC_CHANNEL, mAutoTranslate));
         tv.setTag(msg);
 
         while (mMsgsContainer.getChildCount() >= MAX_ROWS) {
@@ -121,17 +120,17 @@ public class MiniChatView extends RelativeLayout
         for (int i = 0; i < mMsgsContainer.getChildCount(); i++) {
             TextView tv = (TextView) mMsgsContainer.getChildAt(i);
             ChatMessage other = (ChatMessage) tv.getTag();
-            if (other == null || other.date_posted == null) {
+            if (other == null || other.getDatePosted() == null) {
                 continue;
             }
 
-            if (other.empire_key == null || msg.empire_key == null) {
+            if (other.getEmpireKey() == null | msg.getEmpireKey() == null) {
                 continue;
             }
 
-            if (other.date_posted.equals(msg.date_posted) &&
-                other.empire_key.equals(msg.empire_key)) {
-                tv.setText(ChatMessageHelper.format(msg, ChatMessageHelper.Location.PUBLIC_CHANNEL, mAutoTranslate));
+            if (other.getDatePosted().equals(msg.getDatePosted()) &&
+                other.getEmpireKey().equals(msg.getEmpireKey())) {
+                tv.setText(msg.format(ChatMessage.Location.PUBLIC_CHANNEL, mAutoTranslate));
             }
         }
     }

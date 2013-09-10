@@ -22,14 +22,12 @@ import au.com.codeka.common.PointCloud;
 import au.com.codeka.common.Triangle;
 import au.com.codeka.common.Vector2;
 import au.com.codeka.common.Voronoi;
-import au.com.codeka.common.model.Colony;
-import au.com.codeka.common.model.Empire;
-import au.com.codeka.common.model.Model;
-import au.com.codeka.common.model.Sector;
-import au.com.codeka.common.model.Star;
+import au.com.codeka.common.model.BaseColony;
+import au.com.codeka.common.model.BaseStar;
 import au.com.codeka.controlfield.ControlField;
-import au.com.codeka.warworlds.model.EmpireHelper;
+import au.com.codeka.warworlds.model.Empire;
 import au.com.codeka.warworlds.model.EmpireManager;
+import au.com.codeka.warworlds.model.Sector;
 import au.com.codeka.warworlds.model.SectorManager;
 
 public class TacticalMapView extends SectorView
@@ -71,13 +69,13 @@ public class TacticalMapView extends SectorView
     @Override
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
-        SectorManager.i.addSectorListChangedListener(this);
+        SectorManager.getInstance().addSectorListChangedListener(this);
     }
 
     @Override
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
-        SectorManager.i.removeSectorListChangedListener(this);
+        SectorManager.getInstance().removeSectorListChangedListener(this);
     }
 
     @Override
@@ -118,7 +116,7 @@ public class TacticalMapView extends SectorView
             if (empire == null) {
                 mInfluencePaint.setARGB(128, 255, 255, 255);
             } else {
-                mInfluencePaint.setColor(EmpireHelper.getShieldColor(empire));
+                mInfluencePaint.setColor(empire.getShieldColor());
             }
             cf.render(canvas, mInfluencePaint);
         }
@@ -127,7 +125,7 @@ public class TacticalMapView extends SectorView
     }
 
     private void refreshControlField() {
-        SectorManager sm = SectorManager.i;
+        SectorManager sm = SectorManager.getInstance();
 
         List<Pair<Long, Long>> missingSectors = null;
         ArrayList<Vector2> points = new ArrayList<Vector2>();
@@ -147,18 +145,18 @@ public class TacticalMapView extends SectorView
                     continue;
                 }
 
-                int sx = (int)((x * Model.SECTOR_SIZE) + mOffsetX);
-                int sy = (int)((y * Model.SECTOR_SIZE) + mOffsetY);
+                int sx = (int)((x * Sector.SECTOR_SIZE) + mOffsetX);
+                int sy = (int)((y * Sector.SECTOR_SIZE) + mOffsetY);
 
-                for (Star star : sector.stars) {
-                    int starX = sx + star.offset_x;
-                    int starY = sy + star.offset_y;
+                for (BaseStar star : sector.getStars()) {
+                    int starX = sx + star.getOffsetX();
+                    int starY = sy + star.getOffsetY();
                     TacticalPointCloudVector2 pt = new TacticalPointCloudVector2(
                             starX / 512.0, starY / 512.0, star);
 
                     TreeSet<String> doneEmpires = new TreeSet<String>();
-                    for (Colony c : star.colonies) {
-                        String empireKey = c.empire_key;
+                    for (BaseColony c : star.getColonies()) {
+                        String empireKey = c.getEmpireKey();
                         if (empireKey == null || empireKey.length() == 0) {
                             continue;
                         }
@@ -197,7 +195,7 @@ public class TacticalMapView extends SectorView
         }
 
         if (missingSectors != null) {
-            SectorManager.i.requestSectors(missingSectors, false, null);
+            SectorManager.getInstance().requestSectors(missingSectors, false, null);
         }
     }
 
@@ -229,7 +227,7 @@ public class TacticalMapView extends SectorView
             float tapX = (e.getX() - mDragOffsetX) / 256.0f;
             float tapY = (e.getY() - mDragOffsetY) / 256.0f;
 
-            Star star = mPointCloud.findStarNear(new Vector2(tapX, tapY));
+            BaseStar star = mPointCloud.findStarNear(new Vector2(tapX, tapY));
             if (star != null) {
                 if (mDoubleTapHandler != null) {
                    mDoubleTapHandler.onDoubleTapped(star);
@@ -256,7 +254,7 @@ public class TacticalMapView extends SectorView
         /**
          * Finds the star nearest the given point.
          */
-        public Star findStarNear(Vector2 pt) {
+        public BaseStar findStarNear(Vector2 pt) {
             TacticalPointCloudVector2 closest = null;
             double distance = 0.0;
 
@@ -336,15 +334,15 @@ public class TacticalMapView extends SectorView
     }
 
     private static class TacticalPointCloudVector2 extends Vector2 {
-        public Star star;
+        public BaseStar star;
 
-        public TacticalPointCloudVector2(double x, double y, Star star) {
+        public TacticalPointCloudVector2(double x, double y, BaseStar star) {
             super(x, y);
             this.star = star;
         }
     }
 
     public interface DoubleTapHandler {
-        void onDoubleTapped(Star star);
+        void onDoubleTapped(BaseStar star);
     }
 }

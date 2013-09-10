@@ -9,11 +9,11 @@ import android.util.AttributeSet;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import au.com.codeka.common.Pair;
-import au.com.codeka.common.model.Model;
-import au.com.codeka.common.model.Sector;
-import au.com.codeka.common.model.Star;
+import au.com.codeka.common.model.BaseStar;
 import au.com.codeka.warworlds.game.UniverseElementSurfaceView;
+import au.com.codeka.warworlds.model.Sector;
 import au.com.codeka.warworlds.model.SectorManager;
+import au.com.codeka.warworlds.model.Star;
 
 /**
  * This is the base class for StarfieldSurfaceView and TacticalMapView, it contains the common code
@@ -42,13 +42,13 @@ public class SectorView extends UniverseElementSurfaceView
     @Override
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
-        SectorManager.i.addSectorListChangedListener(this);
+        SectorManager.getInstance().addSectorListChangedListener(this);
     }
 
     @Override
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
-        SectorManager.i.removeSectorListChangedListener(this);
+        SectorManager.getInstance().removeSectorListChangedListener(this);
     }
 
     @Override
@@ -81,7 +81,7 @@ public class SectorView extends UniverseElementSurfaceView
         for(sectorY = mSectorY - mSectorRadius; sectorY <= mSectorY + mSectorRadius; sectorY++) {
             for(sectorX = mSectorX - mSectorRadius; sectorX <= mSectorX + mSectorRadius; sectorX++) {
                 Pair<Long, Long> key = new Pair<Long, Long>(sectorX, sectorY);
-                Sector s = SectorManager.i.getSector(sectorX, sectorY);
+                Sector s = SectorManager.getInstance().getSector(sectorX, sectorY);
                 if (s == null) {
                     missingSectors.add(key);
                 }
@@ -89,7 +89,7 @@ public class SectorView extends UniverseElementSurfaceView
         }
 
         if (!missingSectors.isEmpty()) {
-            SectorManager.i.requestSectors(missingSectors, false, null);
+            SectorManager.getInstance().requestSectors(missingSectors, false, null);
         }
 
         redraw();
@@ -105,23 +105,23 @@ public class SectorView extends UniverseElementSurfaceView
         mOffsetY += distanceY;
 
         boolean needUpdate = false;
-        while (mOffsetX < -(Model.SECTOR_SIZE / 2)) {
-            mOffsetX += Model.SECTOR_SIZE;
+        while (mOffsetX < -(Sector.SECTOR_SIZE / 2)) {
+            mOffsetX += Sector.SECTOR_SIZE;
             mSectorX ++;
             needUpdate = true;
         }
-        while (mOffsetX > (Model.SECTOR_SIZE / 2)) {
-            mOffsetX -= Model.SECTOR_SIZE;
+        while (mOffsetX > (Sector.SECTOR_SIZE / 2)) {
+            mOffsetX -= Sector.SECTOR_SIZE;
             mSectorX --;
             needUpdate = true;
         }
-        while (mOffsetY < -(Model.SECTOR_SIZE / 2)) {
-            mOffsetY += Model.SECTOR_SIZE;
+        while (mOffsetY < -(Sector.SECTOR_SIZE / 2)) {
+            mOffsetY += Sector.SECTOR_SIZE;
             mSectorY ++;
             needUpdate = true;
         }
-        while (mOffsetY > (Model.SECTOR_SIZE / 2)) {
-            mOffsetY -= Model.SECTOR_SIZE;
+        while (mOffsetY > (Sector.SECTOR_SIZE / 2)) {
+            mOffsetY -= Sector.SECTOR_SIZE;
             mSectorY --;
             needUpdate = true;
         }
@@ -146,34 +146,34 @@ public class SectorView extends UniverseElementSurfaceView
         long sectorX = mSectorX;
         long sectorY = mSectorY;
         while (x < 0) {
-            x += Model.SECTOR_SIZE;
+            x += Sector.SECTOR_SIZE;
             sectorX --;
         }
-        while (x >= Model.SECTOR_SIZE) {
-            x -= Model.SECTOR_SIZE;
+        while (x >= Sector.SECTOR_SIZE) {
+            x -= Sector.SECTOR_SIZE;
             sectorX ++;
         }
         while (y < 0) {
-            y += Model.SECTOR_SIZE;
+            y += Sector.SECTOR_SIZE;
             sectorY --;
         }
-        while (y >= Model.SECTOR_SIZE) {
-            y -= Model.SECTOR_SIZE;
+        while (y >= Sector.SECTOR_SIZE) {
+            y -= Sector.SECTOR_SIZE;
             sectorY ++;
         }
 
-        Sector sector = SectorManager.i.getSector(sectorX, sectorY);
+        Sector sector = SectorManager.getInstance().getSector(sectorX, sectorY);
         if (sector == null) {
             // if it's not loaded yet, you can't have tapped on anything...
             return null;
         }
 
         int minDistance = 0;
-        Star closestStar = null;
+        BaseStar closestStar = null;
 
-        for(Star star : sector.stars) {
-            int starX = star.offset_x;
-            int starY = star.offset_y;
+        for(BaseStar star : sector.getStars()) {
+            int starX = star.getOffsetX();
+            int starY = star.getOffsetY();
 
             int distance = (starX - x)*(starX - x) + (starY - y)*(starY - y);
             if (closestStar == null || distance < minDistance) {
