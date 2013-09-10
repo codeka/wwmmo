@@ -81,6 +81,16 @@ public class EmpireController {
         }
     }
 
+    public void update(Empire empire) throws RequestException {
+        try (SqlStmt stmt = db.prepare("UPDATE empires SET name = ? WHERE id = ?")) {
+            stmt.setString(1, empire.getDisplayName());
+            stmt.setInt(2, empire.getID());
+            stmt.update();
+        } catch (Exception e) {
+            throw new RequestException(e);
+        }
+    }
+
     public boolean withdrawCash(int empireId, float amount, Messages.CashAuditRecord.Builder audit_record_pb) throws RequestException {
         return adjustBalance(empireId, -amount, audit_record_pb);
     }

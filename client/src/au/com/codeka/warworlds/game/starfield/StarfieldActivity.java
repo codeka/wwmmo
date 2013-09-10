@@ -438,8 +438,7 @@ public class StarfieldActivity extends BaseActivity
     public void onRenameClick() {
         SkuDetails starRenameSku;
         try {
-            starRenameSku = PurchaseManager.getInstance()
-                                           .getInventory().getSkuDetails("star_rename");
+            starRenameSku = PurchaseManager.i.getInventory().getSkuDetails("star_rename");
         } catch (IabException e) {
             log.error("Couldn't get SKU details!", e);
             return;
@@ -469,7 +468,7 @@ public class StarfieldActivity extends BaseActivity
         }
 
         try {
-            PurchaseManager.getInstance().launchPurchaseFlow(this, "star_rename", new IabHelper.OnIabPurchaseFinishedListener() {
+            PurchaseManager.i.launchPurchaseFlow(this, "star_rename", new IabHelper.OnIabPurchaseFinishedListener() {
                 @Override
                 public void onIabPurchaseFinished(IabResult result, final Purchase info) {
                     if (mSelectedStar == null) {

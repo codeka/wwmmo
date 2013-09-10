@@ -47,7 +47,7 @@ public class BannerAdView extends FrameLayout {
 
         if (!sAdsRemoved) {
             try {
-                Inventory inventory = PurchaseManager.getInstance().getInventory();
+                Inventory inventory = PurchaseManager.i.getInventory();
                 if (inventory != null) {
                     sAdsRemoved = inventory.hasPurchase("remove_ads");
                 }
@@ -148,7 +148,7 @@ public class BannerAdView extends FrameLayout {
 
     private void onRemoveAdsClick() {
         try {
-            PurchaseManager.getInstance().launchPurchaseFlow((Activity) mContext, "remove_ads",
+            PurchaseManager.i.launchPurchaseFlow((Activity) mContext, "remove_ads",
                         new IabHelper.OnIabPurchaseFinishedListener() {
                 @Override
                 public void onIabPurchaseFinished(IabResult result, final Purchase info) {

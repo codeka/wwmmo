@@ -60,6 +60,9 @@ public class Empire extends BaseEmpire {
     public void setHomeStar(Star star) {
         mHomeStar = star;
     }
+    public void setName(String name) {
+        mDisplayName = name.trim();
+    }
 
     /**
      * Gets a value which indicates whether the flag in the database has been set that will

@@ -11,6 +11,8 @@ import au.com.codeka.BackgroundRunner;
 import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.api.ApiClient;
 import au.com.codeka.warworlds.api.ApiException;
+import au.com.codeka.warworlds.model.billing.Purchase;
+import au.com.codeka.warworlds.model.billing.SkuDetails;
 
 /**
  * This is a sub-class of \c Empire that represents \em my Empire. We have extra methods
@@ -286,6 +288,42 @@ public class MyEmpire extends Empire {
                 if (callback != null) {
                     callback.onComplete(stars);
                 }
+            }
+        }.execute();
+    }
+
+    public void rename(final String newName, final Purchase purchaseInfo) {
+        new BackgroundRunner<String>() {
+            @Override
+            protected String doInBackground() {
+                String url = "empires/"+getKey()+"/display-name";
+
+                try {
+                    SkuDetails sku = PurchaseManager.i.getInventory().getSkuDetails("rename_empire");
+
+                    Messages.EmpireRenameRequest pb = Messages.EmpireRenameRequest.newBuilder()
+                            .setKey(getKey())
+                            .setNewName(newName)
+                            .setPurchaseInfo(Messages.PurchaseInfo.newBuilder()
+                                    .setSku("rename_empire")
+                                    .setToken(purchaseInfo.getToken())
+                                    .setOrderId(purchaseInfo.getOrderId())
+                                    .setPrice(sku.getPrice())
+                                    .setDeveloperPayload(purchaseInfo.getDeveloperPayload()))
+                            .build();
+                    Messages.Empire empire_pb = ApiClient.putProtoBuf(url, pb, Messages.Empire.class);
+                    return empire_pb.getDisplayName();
+                } catch(Exception e) {
+                    // TODO: handle exceptions
+                    log.error(ExceptionUtils.getStackTrace(e));
+                    return null;
+                }
+            }
+
+            @Override
+            protected void onComplete(String name) {
+                mDisplayName = name;
+                EmpireManager.i.fireEmpireUpdated(MyEmpire.this);
             }
         }.execute();
     }

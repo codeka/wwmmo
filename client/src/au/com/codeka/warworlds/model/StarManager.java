@@ -342,7 +342,7 @@ public class StarManager extends BaseManager {
                 String price = "???";
                 SkuDetails sku = null;
                 try {
-                    sku = PurchaseManager.getInstance().getInventory().getSkuDetails(purchase.getSku());
+                    sku = PurchaseManager.i.getInventory().getSkuDetails(purchase.getSku());
                 } catch (IabException e1) {
                 }
                 if (sku != null) {
@@ -353,10 +353,11 @@ public class StarManager extends BaseManager {
                         .setStarKey(star.getKey())
                         .setOldName(star.getName())
                         .setNewName(newName)
-                        .setPurchaseOrderId(purchase.getOrderId())
-                        .setPurchaseTime(purchase.getPurchaseTime())
-                        .setPurchasePrice(price)
-                        .setPurchaseDeveloperPayload(purchase.getDeveloperPayload())
+                        .setPurchaseInfo(Messages.PurchaseInfo.newBuilder()
+                                .setOrderId(purchase.getOrderId())
+                                .setPrice(price)
+                                .setToken(purchase.getToken())
+                                .setDeveloperPayload(purchase.getDeveloperPayload()))
                         .build();
 
                 Messages.Star star_pb;

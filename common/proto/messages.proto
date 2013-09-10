@@ -49,6 +49,20 @@ message GenericError
 
 
 //
+// Contains details about an in-app purchase, used by various requests which require in-app purchase
+// information.
+//
+message PurchaseInfo
+{
+    optional string sku = 1;
+    optional string token = 2;
+    optional string order_id = 3;
+    optional string price = 4;
+    optional string developer_payload = 5;
+}
+
+
+//
 // Details of an empire's rank (such as number of ships, number of colonies etc)
 message EmpireRank
 {
@@ -153,6 +167,18 @@ message EmpireCashAuditEntry
 message EmpireCashAudit
 {
     repeated EmpireCashAuditEntry entries = 1;
+}
+
+
+//
+// A request to rename an empire. The empire MUST be yourself, and we assume you've already
+// purchased the ability to do it...
+//
+message EmpireRenameRequest
+{
+    optional string key = 1;
+    optional string new_name = 2;
+    optional PurchaseInfo purchase_info = 3;
 }
 
 
@@ -449,10 +475,11 @@ message StarRenameRequest
     required string old_name = 2;
     required string new_name = 3;
 
-    optional string purchase_order_id = 4;
-    optional int64 purchase_time = 5;
-    optional string purchase_developer_payload = 6;
-    optional string purchase_price = 7;
+    optional string DEPRECATED_purchase_order_id = 4;
+    optional int64 DEPRECATED_purchase_time = 5;
+    optional string DEPRECATED_purchase_developer_payload = 6;
+    optional string DEPRECATED_purchase_price = 7;
+    optional PurchaseInfo purchase_info = 8;
 }
 
 

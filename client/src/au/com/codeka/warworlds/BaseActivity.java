@@ -102,7 +102,7 @@ public class BaseActivity extends FragmentActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
-        PurchaseManager.getInstance().onActivityResult(requestCode, resultCode, intent);
+        PurchaseManager.i.onActivityResult(requestCode, resultCode, intent);
     }
 
     /**

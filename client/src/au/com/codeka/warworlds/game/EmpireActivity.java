@@ -2,8 +2,12 @@ package au.com.codeka.warworlds.game;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.TreeMap;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import android.content.Context;
 import android.content.Intent;
@@ -18,6 +22,7 @@ import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
@@ -30,6 +35,7 @@ import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.ServerGreeter;
 import au.com.codeka.warworlds.ServerGreeter.ServerGreeting;
+import au.com.codeka.warworlds.StyledDialog;
 import au.com.codeka.warworlds.TabFragmentActivity;
 import au.com.codeka.warworlds.WarWorldsActivity;
 import au.com.codeka.warworlds.ctrl.BuildQueueList;
@@ -43,14 +49,21 @@ import au.com.codeka.warworlds.model.Empire;
 import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.Fleet;
 import au.com.codeka.warworlds.model.MyEmpire;
+import au.com.codeka.warworlds.model.PurchaseManager;
 import au.com.codeka.warworlds.model.Star;
 import au.com.codeka.warworlds.model.StarSummary;
+import au.com.codeka.warworlds.model.billing.IabException;
+import au.com.codeka.warworlds.model.billing.IabHelper;
+import au.com.codeka.warworlds.model.billing.IabResult;
+import au.com.codeka.warworlds.model.billing.Purchase;
+import au.com.codeka.warworlds.model.billing.SkuDetails;
 
 /**
  * This dialog shows the status of the empire. You can see all your colonies, all your fleets, etc.
  */
 public class EmpireActivity extends TabFragmentActivity
                             implements EmpireManager.EmpireFetchedHandler {
+    private static final Logger log = LoggerFactory.getLogger(EmpireActivity.class);
     private static MyEmpire sCurrentEmpire;
     private static Map<String, Star> sStars;
 
@@ -95,6 +108,7 @@ public class EmpireActivity extends TabFragmentActivity
         getTabManager().addTab(mContext, new TabInfo(this, "Colonies", ColoniesFragment.class, null));
         getTabManager().addTab(mContext, new TabInfo(this, "Build", BuildQueueFragment.class, null));
         getTabManager().addTab(mContext, new TabInfo(this, "Fleets", FleetsFragment.class, null));
+        getTabManager().addTab(mContext, new TabInfo(this, "Settings", SettingsFragment.class, null));
 
         mExtras = getIntent().getExtras();
         if (mExtras != null) {
@@ -434,4 +448,87 @@ public class EmpireActivity extends TabFragmentActivity
             return v;
         }
     }
+
+    public static class SettingsFragment extends BaseFragment {
+        public View onCreateView(LayoutInflater inflator, ViewGroup container, Bundle savedInstanceState) {
+            if (sCurrentEmpire == null) {
+                return getLoadingView(inflator);
+            }
+
+            View v = inflator.inflate(R.layout.empire_settings_tab, null);
+
+            try {
+                SkuDetails empireRenameSku = PurchaseManager.i.getInventory().getSkuDetails("rename_empire");
+                TextView txt = (TextView) v.findViewById(R.id.rename_desc);
+                txt.setText(String.format(Locale.ENGLISH, txt.getText().toString(),
+                        empireRenameSku.getPrice()));
+
+                SkuDetails decorateEmpireSku = PurchaseManager.i.getInventory().getSkuDetails("decorate_empire");
+                txt = (TextView) v.findViewById(R.id.custom_shield_desc);
+                txt.setText(String.format(Locale.ENGLISH, txt.getText().toString(),
+                        decorateEmpireSku.getPrice()));
+
+                SkuDetails resetEmpireSmallSku = PurchaseManager.i.getInventory().getSkuDetails("reset_empire_small");
+                SkuDetails resetEmpireBigSku = PurchaseManager.i.getInventory().getSkuDetails("reset_empire_big");
+                txt = (TextView) v.findViewById(R.id.reset_desc);
+                txt.setText(String.format(Locale.ENGLISH, txt.getText().toString(),
+                        resetEmpireSmallSku.getPrice(), resetEmpireBigSku.getPrice()));
+            } catch (IabException e) {
+                log.error("Couldn't get SKU details!", e);
+            }
+
+            final EditText renameEdit = (EditText) v.findViewById(R.id.rename);
+            renameEdit.setText(EmpireManager.i.getEmpire().getDisplayName());
+
+            final Button renameBtn = (Button) v.findViewById(R.id.rename_btn);
+            renameBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    final String newName = renameEdit.getText().toString().trim();
+                    if (newName.equals(EmpireManager.i.getEmpire().getDisplayName())) {
+                        new StyledDialog.Builder(getActivity())
+                            .setMessage("Please enter the new name you want before clicking 'Rename'.")
+                            .setTitle("Rename Empire")
+                            .setPositiveButton("OK", null)
+                            .create().show();
+                        return;
+                    }
+
+                    try {
+                        PurchaseManager.i.launchPurchaseFlow(getActivity(), "rename_empire", new IabHelper.OnIabPurchaseFinishedListener() {
+                            @Override
+                            public void onIabPurchaseFinished(IabResult result, final Purchase info) {
+                                boolean isSuccess = result.isSuccess();
+                                if (result.isFailure() && result.getResponse() == IabHelper.BILLING_RESPONSE_RESULT_ITEM_ALREADY_OWNED) {
+                                    // if they've already purchased a rename_empire, but not reclaimed it, then
+                                    // we let them through anyway.
+                                    isSuccess = true;
+                                }
+
+                                if (isSuccess) {
+                                    PurchaseManager.i.consume(info, new IabHelper.OnConsumeFinishedListener() {
+                                        @Override
+                                        public void onConsumeFinished(Purchase purchase, IabResult result) {
+                                            if (!result.isSuccess()) {
+                                                // TODO: error
+                                                return;
+                                            }
+
+                                            EmpireManager.i.getEmpire().rename(newName, info);
+                                        }
+                                    });
+                                }
+                            }
+                        });
+                    } catch (IabException e) {
+                        log.error("Couldn't get SKU details!", e);
+                        return;
+                    }
+                }
+            });
+
+            return v;
+        }
+    }
+
 }

@@ -67,7 +67,7 @@ public class StarRenameDialog extends DialogFragment {
         EditText starNewName = (EditText) mView.findViewById(R.id.star_newname);
         final String newStarName = starNewName.getText().toString();
 
-        PurchaseManager.getInstance().consume(mPurchase, new IabHelper.OnConsumeFinishedListener() {
+        PurchaseManager.i.consume(mPurchase, new IabHelper.OnConsumeFinishedListener() {
             @Override
             public void onConsumeFinished(Purchase purchase, IabResult result) {
                 if (!result.isSuccess()) {

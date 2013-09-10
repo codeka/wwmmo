@@ -19,10 +19,8 @@ import au.com.codeka.warworlds.model.billing.Purchase;
 
 public class PurchaseManager {
     private static final Logger log = LoggerFactory.getLogger(PurchaseManager.class);
-    private static PurchaseManager sInstance = new PurchaseManager();
-    public static PurchaseManager getInstance() {
-        return sInstance;
-    }
+    public static PurchaseManager i = new PurchaseManager();
+
     private PurchaseManager() {
     }
 
@@ -40,6 +38,10 @@ public class PurchaseManager {
         sAllSkus = new ArrayList<String>();
         sAllSkus.add("star_rename");
         sAllSkus.add("remove_ads");
+        sAllSkus.add("rename_empire");
+        sAllSkus.add("reset_empire_small");
+        sAllSkus.add("reset_empire_big");
+        sAllSkus.add("decorate_empire");
     }
 
     private IabHelper mHelper;

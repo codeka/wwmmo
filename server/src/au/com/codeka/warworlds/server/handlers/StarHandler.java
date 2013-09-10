@@ -205,9 +205,16 @@ public class StarHandler extends RequestHandler {
             stmt.setInt(1, starID);
             stmt.setString(2, star_rename_request_pb.getOldName());
             stmt.setString(3, star_rename_request_pb.getNewName().trim());
-            stmt.setString(4, star_rename_request_pb.getPurchaseDeveloperPayload());
-            stmt.setString(5, star_rename_request_pb.getPurchaseOrderId());
-            stmt.setString(6, star_rename_request_pb.getPurchasePrice());
+            Messages.PurchaseInfo purchase_info_pb = star_rename_request_pb.getPurchaseInfo();
+            if (purchase_info_pb != null && purchase_info_pb.hasSku()) {
+                stmt.setString(4, purchase_info_pb.getDeveloperPayload());
+                stmt.setString(5, purchase_info_pb.getOrderId());
+                stmt.setString(6, purchase_info_pb.getPrice());
+            } else {
+                stmt.setString(4, star_rename_request_pb.getDEPRECATEDPurchaseDeveloperPayload());
+                stmt.setString(5, star_rename_request_pb.getDEPRECATEDPurchaseOrderId());
+                stmt.setString(6, star_rename_request_pb.getDEPRECATEDPurchasePrice());
+            }
             stmt.setDateTime(7, DateTime.now());
             stmt.update();
         } catch(Exception e) {

@@ -38,7 +38,7 @@ public class Util {
 
         SpriteManager.i.setup(context);
         DesignManager.setup(context);
-        PurchaseManager.getInstance().setup();
+        PurchaseManager.i.setup();
         RealmManager.i.setup();
 
         sWasSetup = true;
