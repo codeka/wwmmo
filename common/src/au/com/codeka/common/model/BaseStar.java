@@ -53,6 +53,10 @@ public abstract class BaseStar {
                               .build()
     };
 
+    public static StarType getStarType(int index) {
+        return sStarTypes[index];
+    }
+
     protected String mKey;
     protected String mName;
     protected StarType mStarType;
@@ -202,7 +206,7 @@ public abstract class BaseStar {
     public void fromProtocolBuffer(Messages.Star pb) {
         mKey = pb.getKey();
         mName = pb.getName();
-        mStarType = sStarTypes[pb.getClassification().getNumber()];
+        mStarType = getStarType(pb.getClassification().getNumber());
         mSize = pb.getSize();
         mSectorX = pb.getSectorX();
         mSectorY = pb.getSectorY();
