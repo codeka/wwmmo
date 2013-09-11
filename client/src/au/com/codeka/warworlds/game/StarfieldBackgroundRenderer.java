@@ -181,7 +181,11 @@ public class StarfieldBackgroundRenderer {
             try {
                 log.info("loading "+fullPath+"...");
                 ins = assetMgr.open(fullPath);
-                bitmaps.add(BitmapFactory.decodeStream(ins));
+
+                BitmapFactory.Options opts = new BitmapFactory.Options();
+                opts.inPurgeable = true;
+                opts.inInputShareable = true;
+                bitmaps.add(BitmapFactory.decodeStream(ins, null, opts));
             } catch (IOException e) {
                 log.error("Error loading image "+fullPath, e); //??
             } finally {

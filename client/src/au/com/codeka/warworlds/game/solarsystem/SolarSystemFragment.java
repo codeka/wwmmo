@@ -33,6 +33,7 @@ import au.com.codeka.warworlds.game.SitrepActivity;
 import au.com.codeka.warworlds.model.Colony;
 import au.com.codeka.warworlds.model.Empire;
 import au.com.codeka.warworlds.model.EmpireManager;
+import au.com.codeka.warworlds.model.EmpireShieldManager;
 import au.com.codeka.warworlds.model.Fleet;
 import au.com.codeka.warworlds.model.Planet;
 import au.com.codeka.warworlds.model.Star;
@@ -499,7 +500,7 @@ public class SolarSystemFragment extends Fragment
         if (defence < 1) {
             defence = 1;
         }
-        enemyIcon.setImageBitmap(empire.getShield(getActivity()));
+        enemyIcon.setImageBitmap(EmpireShieldManager.i.getShield(getActivity(), empire));
         enemyName.setText(empire.getDisplayName());
         enemyDefence.setText(String.format(Locale.ENGLISH, "Defence: %d", defence));
     }

@@ -1,6 +1,5 @@
 package au.com.codeka.warworlds.model;
 
-import android.graphics.Color;
 import au.com.codeka.warworlds.Util;
 
 /**
@@ -15,15 +14,5 @@ public class NativeEmpire extends Empire {
         } else {
             return "Native";
         }
-    }
-
-    @Override
-    public int getShieldColor() {
-        return Color.TRANSPARENT;
-    }
-
-    @Override
-    public float[] getShieldColorFloats() {
-        return new float[] {0.0f, 0.0f, 0.0f, 0.0f};
     }
 }

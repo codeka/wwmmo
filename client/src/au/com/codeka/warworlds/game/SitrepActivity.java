@@ -46,6 +46,7 @@ import au.com.codeka.warworlds.api.ApiClient;
 import au.com.codeka.warworlds.api.ApiException;
 import au.com.codeka.warworlds.game.solarsystem.SolarSystemActivity;
 import au.com.codeka.warworlds.model.EmpireManager;
+import au.com.codeka.warworlds.model.EmpireShieldManager;
 import au.com.codeka.warworlds.model.MyEmpire;
 import au.com.codeka.warworlds.model.RealmManager;
 import au.com.codeka.warworlds.model.SituationReport;
@@ -185,7 +186,7 @@ public class SitrepActivity extends BaseActivity {
             if (empire != null) {
                 // TODO: add an "empire updated" listener here!
                 empireName.setText(empire.getDisplayName());
-                empireIcon.setImageBitmap(empire.getShield(this));
+                empireIcon.setImageBitmap(EmpireShieldManager.i.getShield(this, empire));
             }
         } else {
             StarManager.getInstance().requestStarSummary(mStarKey, new StarManager.StarSummaryFetchedHandler() {

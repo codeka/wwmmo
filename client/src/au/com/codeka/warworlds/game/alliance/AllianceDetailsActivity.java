@@ -30,6 +30,7 @@ import au.com.codeka.warworlds.model.Alliance;
 import au.com.codeka.warworlds.model.AllianceManager;
 import au.com.codeka.warworlds.model.Empire;
 import au.com.codeka.warworlds.model.EmpireManager;
+import au.com.codeka.warworlds.model.EmpireShieldManager;
 import au.com.codeka.warworlds.model.MyEmpire;
 
 public class AllianceDetailsActivity extends BaseActivity
@@ -246,7 +247,7 @@ public class AllianceDetailsActivity extends BaseActivity
 
             DecimalFormat formatter = new DecimalFormat("#,##0");
             empireName.setText(empire.getDisplayName());
-            empireIcon.setImageBitmap(empire.getShield(this));
+            empireIcon.setImageBitmap(EmpireShieldManager.i.getShield(this, empire));
 
             BaseEmpireRank rank = empire.getRank();
             if (rank != null) {

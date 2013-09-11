@@ -25,6 +25,7 @@ import au.com.codeka.warworlds.game.UniverseElementSurfaceView;
 import au.com.codeka.warworlds.model.Colony;
 import au.com.codeka.warworlds.model.Empire;
 import au.com.codeka.warworlds.model.EmpireManager;
+import au.com.codeka.warworlds.model.EmpireShieldManager;
 import au.com.codeka.warworlds.model.ImageManager;
 import au.com.codeka.warworlds.model.Planet;
 import au.com.codeka.warworlds.model.PlanetImageManager;
@@ -317,7 +318,7 @@ public class SolarSystemSurfaceView extends UniverseElementSurfaceView {
             if (planetInfo.colony != null) {
                 Empire empire = EmpireManager.i.getEmpire(planetInfo.colony.getEmpireKey());
                 if (empire != null) {
-                    Bitmap shield = empire.getShield(mContext);
+                    Bitmap shield = EmpireShieldManager.i.getShield(mContext, empire);
                     if (shield != null) {
                         mMatrix.reset();
                         mMatrix.postTranslate(-shield.getWidth() / 2.0f, -shield.getHeight() / 2.0f);

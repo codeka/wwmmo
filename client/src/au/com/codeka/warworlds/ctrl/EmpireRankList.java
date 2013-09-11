@@ -22,6 +22,7 @@ import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.model.Empire;
 import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.EmpireRank;
+import au.com.codeka.warworlds.model.EmpireShieldManager;
 import au.com.codeka.warworlds.model.MyEmpire;
 
 public class EmpireRankList extends ListView {
@@ -191,7 +192,7 @@ public class EmpireRankList extends ListView {
 
             if (empire != null) {
                 empireName.setText(empire.getDisplayName());
-                empireIcon.setImageBitmap(empire.getShield(mContext));
+                empireIcon.setImageBitmap(EmpireShieldManager.i.getShield(mContext, empire));
             } else {
                 empireName.setText("???");
                 empireIcon.setImageDrawable(null);

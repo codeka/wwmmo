@@ -24,6 +24,7 @@ import au.com.codeka.warworlds.model.CombatReport;
 import au.com.codeka.warworlds.model.DesignManager;
 import au.com.codeka.warworlds.model.Empire;
 import au.com.codeka.warworlds.model.EmpireManager;
+import au.com.codeka.warworlds.model.EmpireShieldManager;
 import au.com.codeka.warworlds.model.MyEmpire;
 import au.com.codeka.warworlds.model.SpriteDrawable;
 import au.com.codeka.warworlds.model.SpriteManager;
@@ -219,7 +220,7 @@ public class CombatReportDialog extends DialogFragment {
                     recordTitle.setText("Fleet Joined Battle");
                     fleetIcon.setImageDrawable(new SpriteDrawable(SpriteManager.i.getSprite(design.getSpriteName())));
                     if (empire != null) {
-                        empireIcon.setImageBitmap(empire.getShield(getActivity()));
+                        empireIcon.setImageBitmap(EmpireShieldManager.i.getShield(getActivity(), empire));
                         recordDescription.setText(String.format(Locale.ENGLISH,
                                 "%s %s joined the battle",
                                 empire.getDisplayName(),
@@ -237,8 +238,8 @@ public class CombatReportDialog extends DialogFragment {
                     fleetIcon.setImageDrawable(new SpriteDrawable(SpriteManager.i.getSprite(design.getSpriteName())));
                     targetFleetIcon.setImageDrawable(new SpriteDrawable(SpriteManager.i.getSprite(targetDesign.getSpriteName())));
                     if (empire != null && targetEmpire != null) {
-                        empireIcon.setImageBitmap(empire.getShield(getActivity()));
-                        targetEmpireIcon.setImageBitmap(targetEmpire.getShield(getActivity()));
+                        empireIcon.setImageBitmap(EmpireShieldManager.i.getShield(getActivity(), empire));
+                        targetEmpireIcon.setImageBitmap(EmpireShieldManager.i.getShield(getActivity(), targetEmpire));
 
                         recordDescription.setText(String.format(Locale.ENGLISH,
                                 "%s %s targetted %s %s",
@@ -257,8 +258,8 @@ public class CombatReportDialog extends DialogFragment {
                     fleetIcon.setImageDrawable(new SpriteDrawable(SpriteManager.i.getSprite(design.getSpriteName())));
                     targetFleetIcon.setImageDrawable(new SpriteDrawable(SpriteManager.i.getSprite(targetDesign.getSpriteName())));
                     if (empire != null && targetEmpire != null) {
-                        empireIcon.setImageBitmap(empire.getShield(getActivity()));
-                        targetEmpireIcon.setImageBitmap(targetEmpire.getShield(getActivity()));
+                        empireIcon.setImageBitmap(EmpireShieldManager.i.getShield(getActivity(), empire));
+                        targetEmpireIcon.setImageBitmap(EmpireShieldManager.i.getShield(getActivity(), targetEmpire));
 
                         recordDescription.setText(String.format(Locale.ENGLISH,
                                 "%s %s attacked %s %s for %.1f points",
@@ -274,7 +275,7 @@ public class CombatReportDialog extends DialogFragment {
                     recordTitle.setText("Fleet Damaged");
                     fleetIcon.setImageDrawable(new SpriteDrawable(SpriteManager.i.getSprite(design.getSpriteName())));
                     if (empire != null) {
-                        empireIcon.setImageBitmap(empire.getShield(getActivity()));
+                        empireIcon.setImageBitmap(EmpireShieldManager.i.getShield(getActivity(), empire));
 
                         recordDescription.setText(String.format(Locale.ENGLISH,
                                 "%s %s was hit for %.1f damage",

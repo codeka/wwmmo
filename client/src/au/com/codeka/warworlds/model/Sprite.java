@@ -207,7 +207,12 @@ public class Sprite {
             InputStream ins = null;
             try {
                 ins = load();
-                return BitmapFactory.decodeStream(ins);
+
+                BitmapFactory.Options opts = new BitmapFactory.Options();
+                opts.inPurgeable = true;
+                opts.inInputShareable = true;
+
+                return BitmapFactory.decodeStream(ins, null, opts);
             } catch (IOException e) {
                 log.warn("Could not load image!", e);
                 return null;

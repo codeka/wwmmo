@@ -20,6 +20,7 @@ import au.com.codeka.warworlds.model.Alliance;
 import au.com.codeka.warworlds.model.AllianceManager;
 import au.com.codeka.warworlds.model.Empire;
 import au.com.codeka.warworlds.model.EmpireManager;
+import au.com.codeka.warworlds.model.EmpireShieldManager;
 import au.com.codeka.warworlds.model.MyEmpire;
 
 import com.google.protobuf.InvalidProtocolBufferException;
@@ -143,7 +144,7 @@ public class AllianceMemberDetailsActivity extends BaseActivity
 
         DecimalFormat formatter = new DecimalFormat("#,##0");
         empireName.setText(mEmpire.getDisplayName());
-        empireIcon.setImageBitmap(mEmpire.getShield(this));
+        empireIcon.setImageBitmap(EmpireShieldManager.i.getShield(this, mEmpire));
 
         BaseEmpireRank rank = mEmpire.getRank();
         if (rank != null) {

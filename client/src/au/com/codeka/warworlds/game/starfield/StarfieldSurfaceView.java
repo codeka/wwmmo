@@ -22,11 +22,11 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
-import android.graphics.Shader;
 import android.graphics.Paint.Style;
 import android.graphics.Path;
 import android.graphics.RadialGradient;
 import android.graphics.Rect;
+import android.graphics.Shader;
 import android.os.Handler;
 import android.util.AttributeSet;
 import android.view.GestureDetector;
@@ -47,6 +47,7 @@ import au.com.codeka.warworlds.model.BuildManager;
 import au.com.codeka.warworlds.model.DesignManager;
 import au.com.codeka.warworlds.model.Empire;
 import au.com.codeka.warworlds.model.EmpireManager;
+import au.com.codeka.warworlds.model.EmpireShieldManager;
 import au.com.codeka.warworlds.model.Fleet;
 import au.com.codeka.warworlds.model.ImageManager;
 import au.com.codeka.warworlds.model.MyEmpire;
@@ -122,7 +123,10 @@ public class StarfieldSurfaceView extends SectorView
         mStarNamePaint.setStyle(Style.STROKE);
 
         if (sFleetMultiBitmap == null) {
-            sFleetMultiBitmap = BitmapFactory.decodeResource(mContext.getResources(), R.drawable.fleet);
+            BitmapFactory.Options opts = new BitmapFactory.Options();
+            opts.inPurgeable = true;
+            opts.inInputShareable = true;
+            sFleetMultiBitmap = BitmapFactory.decodeResource(mContext.getResources(), R.drawable.fleet, opts);
         }
 
         // whenever a new star bitmap is generated, redraw the screen
@@ -606,7 +610,7 @@ public class StarfieldSurfaceView extends SectorView
                 Integer n = colonyEmpires.get(empireKey);
                 Empire emp = mVisibleEmpires.get(empireKey);
 
-                Bitmap bmp = emp.getShield(mContext);
+                Bitmap bmp = EmpireShieldManager.i.getShield(mContext, emp);
 
                 Vector2 pt = Vector2.pool.borrow().reset(0, -25.0f);
                 pt.rotate((float)(Math.PI / 4.0) * i);
@@ -803,7 +807,7 @@ public class StarfieldSurfaceView extends SectorView
 
         Empire emp = getEmpire(fleet.getEmpireKey());
         if (emp != null) {
-            Bitmap shield = emp.getShield(mContext);
+            Bitmap shield = EmpireShieldManager.i.getShield(mContext, emp);
             if (shield != null) {
                 mMatrix.reset();
                 mMatrix.postTranslate(-(shield.getWidth() / 2.0f), -(shield.getHeight() / 2.0f));

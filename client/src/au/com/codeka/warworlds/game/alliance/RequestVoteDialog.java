@@ -21,6 +21,7 @@ import au.com.codeka.warworlds.model.AllianceRequest;
 import au.com.codeka.warworlds.model.AllianceManager;
 import au.com.codeka.warworlds.model.Empire;
 import au.com.codeka.warworlds.model.EmpireManager;
+import au.com.codeka.warworlds.model.EmpireShieldManager;
 
 public class RequestVoteDialog extends DialogFragment {
     private View mView;
@@ -55,7 +56,7 @@ public class RequestVoteDialog extends DialogFragment {
         if (empire != null) {
             // it should never be null, so we won't bother refreshing...
             empireName.setText(empire.getDisplayName());
-            empireIcon.setImageBitmap(empire.getShield(activity));
+            empireIcon.setImageBitmap(EmpireShieldManager.i.getShield(activity, empire));
         }
         requestDescription.setText(mRequest.getDescription());
         message.setText(mRequest.getMessage());

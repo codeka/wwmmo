@@ -27,6 +27,7 @@ import au.com.codeka.warworlds.model.Colony;
 import au.com.codeka.warworlds.model.DesignManager;
 import au.com.codeka.warworlds.model.Empire;
 import au.com.codeka.warworlds.model.EmpireManager;
+import au.com.codeka.warworlds.model.EmpireShieldManager;
 import au.com.codeka.warworlds.model.MyEmpire;
 import au.com.codeka.warworlds.model.Planet;
 import au.com.codeka.warworlds.model.Star;
@@ -125,7 +126,7 @@ public class EnemyPlanetActivity extends BaseActivity
         if (defence < 1) {
             defence = 1;
         }
-        enemyIcon.setImageBitmap(mColonyEmpire.getShield(this));
+        enemyIcon.setImageBitmap(EmpireShieldManager.i.getShield(this, mColonyEmpire));
         enemyName.setText(mColonyEmpire.getDisplayName());
         enemyDefence.setText(String.format(Locale.ENGLISH, "Defence: %d", defence));
     }

@@ -17,6 +17,7 @@ import au.com.codeka.warworlds.WarWorldsActivity;
 import au.com.codeka.warworlds.game.starfield.StarfieldActivity;
 import au.com.codeka.warworlds.model.Empire;
 import au.com.codeka.warworlds.model.EmpireManager;
+import au.com.codeka.warworlds.model.EmpireShieldManager;
 
 public class EnemyEmpireActivity extends BaseActivity
                                  implements EmpireManager.EmpireFetchedHandler {
@@ -64,7 +65,7 @@ public class EnemyEmpireActivity extends BaseActivity
         ImageView empireIcon = (ImageView) findViewById(R.id.empire_icon);
 
         empireName.setText(mEmpire.getDisplayName());
-        empireIcon.setImageBitmap(mEmpire.getShield(mContext));
+        empireIcon.setImageBitmap(EmpireShieldManager.i.getShield(mContext, mEmpire));
     }
 
     public void onEmpireViewClick() {

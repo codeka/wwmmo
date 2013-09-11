@@ -11,6 +11,10 @@ import org.slf4j.LoggerFactory;
 
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -47,6 +51,7 @@ import au.com.codeka.warworlds.model.BuildRequest;
 import au.com.codeka.warworlds.model.Colony;
 import au.com.codeka.warworlds.model.Empire;
 import au.com.codeka.warworlds.model.EmpireManager;
+import au.com.codeka.warworlds.model.EmpireShieldManager;
 import au.com.codeka.warworlds.model.Fleet;
 import au.com.codeka.warworlds.model.MyEmpire;
 import au.com.codeka.warworlds.model.PurchaseManager;
@@ -71,6 +76,9 @@ public class EmpireActivity extends TabFragmentActivity
     Bundle mExtras = null;
     boolean mFirstRefresh = true;
     boolean mFirstStarsRefresh = true;
+    String mShieldImagePath = null;
+
+    private static final int CHOOSE_SHIELD_RESULT_ID = 9876;
 
     public enum EmpireActivityResult {
         NavigateToPlanet(1),
@@ -145,6 +153,24 @@ public class EmpireActivity extends TabFragmentActivity
     }
 
     @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if(requestCode == CHOOSE_SHIELD_RESULT_ID && data != null && data.getData() != null) {
+            Uri uri = data.getData();
+
+            // user has picked an image, save it so the fragment can find it..
+            Cursor cursor = getContentResolver().query(uri, new String[] { android.provider.MediaStore.Images.ImageColumns.DATA }, null, null, null);
+            cursor.moveToFirst();
+            mShieldImagePath = cursor.getString(0);
+            cursor.close();
+
+            getTabHost().setCurrentTabByTag("Settings");
+            
+        }
+
+        super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    @Override
     public void onEmpireFetched(Empire empire) {
         MyEmpire myEmpire = EmpireManager.i.getEmpire();
         if (myEmpire.getKey().equals(empire.getKey())) {
@@ -196,7 +222,7 @@ public class EmpireActivity extends TabFragmentActivity
             TextView allianceName = (TextView) mView.findViewById(R.id.alliance_name);
 
             empireName.setText(empire.getDisplayName());
-            empireIcon.setImageBitmap(empire.getShield(getActivity()));
+            empireIcon.setImageBitmap(EmpireShieldManager.i.getShield(getActivity(), empire));
             if (empire.getAlliance() != null) {
                 allianceName.setText(empire.getAlliance().getName());
             } else {
@@ -450,84 +476,181 @@ public class EmpireActivity extends TabFragmentActivity
     }
 
     public static class SettingsFragment extends BaseFragment {
+        private View mView;
+        private Bitmap mNewShieldImage;
+
         public View onCreateView(LayoutInflater inflator, ViewGroup container, Bundle savedInstanceState) {
             if (sCurrentEmpire == null) {
                 return getLoadingView(inflator);
             }
 
-            View v = inflator.inflate(R.layout.empire_settings_tab, null);
+            mView = inflator.inflate(R.layout.empire_settings_tab, null);
 
             try {
                 SkuDetails empireRenameSku = PurchaseManager.i.getInventory().getSkuDetails("rename_empire");
-                TextView txt = (TextView) v.findViewById(R.id.rename_desc);
+                TextView txt = (TextView) mView.findViewById(R.id.rename_desc);
                 txt.setText(String.format(Locale.ENGLISH, txt.getText().toString(),
                         empireRenameSku.getPrice()));
 
                 SkuDetails decorateEmpireSku = PurchaseManager.i.getInventory().getSkuDetails("decorate_empire");
-                txt = (TextView) v.findViewById(R.id.custom_shield_desc);
+                txt = (TextView) mView.findViewById(R.id.custom_shield_desc);
                 txt.setText(String.format(Locale.ENGLISH, txt.getText().toString(),
                         decorateEmpireSku.getPrice()));
 
                 SkuDetails resetEmpireSmallSku = PurchaseManager.i.getInventory().getSkuDetails("reset_empire_small");
                 SkuDetails resetEmpireBigSku = PurchaseManager.i.getInventory().getSkuDetails("reset_empire_big");
-                txt = (TextView) v.findViewById(R.id.reset_desc);
+                txt = (TextView) mView.findViewById(R.id.reset_desc);
                 txt.setText(String.format(Locale.ENGLISH, txt.getText().toString(),
                         resetEmpireSmallSku.getPrice(), resetEmpireBigSku.getPrice()));
             } catch (IabException e) {
                 log.error("Couldn't get SKU details!", e);
             }
 
-            final EditText renameEdit = (EditText) v.findViewById(R.id.rename);
+            final EditText renameEdit = (EditText) mView.findViewById(R.id.rename);
             renameEdit.setText(EmpireManager.i.getEmpire().getDisplayName());
 
-            final Button renameBtn = (Button) v.findViewById(R.id.rename_btn);
+            final Button renameBtn = (Button) mView.findViewById(R.id.rename_btn);
             renameBtn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    final String newName = renameEdit.getText().toString().trim();
-                    if (newName.equals(EmpireManager.i.getEmpire().getDisplayName())) {
-                        new StyledDialog.Builder(getActivity())
-                            .setMessage("Please enter the new name you want before clicking 'Rename'.")
-                            .setTitle("Rename Empire")
-                            .setPositiveButton("OK", null)
-                            .create().show();
-                        return;
-                    }
-
-                    try {
-                        PurchaseManager.i.launchPurchaseFlow(getActivity(), "rename_empire", new IabHelper.OnIabPurchaseFinishedListener() {
-                            @Override
-                            public void onIabPurchaseFinished(IabResult result, final Purchase info) {
-                                boolean isSuccess = result.isSuccess();
-                                if (result.isFailure() && result.getResponse() == IabHelper.BILLING_RESPONSE_RESULT_ITEM_ALREADY_OWNED) {
-                                    // if they've already purchased a rename_empire, but not reclaimed it, then
-                                    // we let them through anyway.
-                                    isSuccess = true;
-                                }
-
-                                if (isSuccess) {
-                                    PurchaseManager.i.consume(info, new IabHelper.OnConsumeFinishedListener() {
-                                        @Override
-                                        public void onConsumeFinished(Purchase purchase, IabResult result) {
-                                            if (!result.isSuccess()) {
-                                                // TODO: error
-                                                return;
-                                            }
-
-                                            EmpireManager.i.getEmpire().rename(newName, info);
-                                        }
-                                    });
-                                }
-                            }
-                        });
-                    } catch (IabException e) {
-                        log.error("Couldn't get SKU details!", e);
-                        return;
-                    }
+                    onRenameClick();
                 }
             });
 
-            return v;
+            ImageView currentShield = (ImageView) mView.findViewById(R.id.current_shield);
+            currentShield.setImageBitmap(EmpireShieldManager.i.getShield(getActivity(), EmpireManager.i.getEmpire()));
+            ImageView currentShieldSmall = (ImageView) mView.findViewById(R.id.current_shield_small);
+            currentShieldSmall.setImageBitmap(EmpireShieldManager.i.getShield(getActivity(), EmpireManager.i.getEmpire()));
+
+            final Button shieldChangeBtn = (Button) mView.findViewById(R.id.shield_change_btn);
+            shieldChangeBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    onShieldChangeClick();
+                }
+            });
+
+            final Button shieldSaveBtn = (Button) mView.findViewById(R.id.save_btn);
+            shieldSaveBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    onShieldSaveClick();
+                }
+            });
+
+            String shieldImagePath = ((EmpireActivity) getActivity()).mShieldImagePath;
+            if (shieldImagePath != null) {
+                loadShieldImage(shieldImagePath);
+            }
+
+            return mView;
+        }
+
+        private void onRenameClick() {
+            final EditText renameEdit = (EditText) mView.findViewById(R.id.rename);
+
+            final String newName = renameEdit.getText().toString().trim();
+            if (newName.equals(EmpireManager.i.getEmpire().getDisplayName())) {
+                new StyledDialog.Builder(getActivity())
+                    .setMessage("Please enter the new name you want before clicking 'Rename'.")
+                    .setTitle("Rename Empire")
+                    .setPositiveButton("OK", null)
+                    .create().show();
+                return;
+            }
+
+            purchase("rename_empire", new PurchaseCompleteHandler() {
+                @Override
+                public void onPurchaseComplete(Purchase purchaseInfo) {
+                    EmpireManager.i.getEmpire().rename(newName, purchaseInfo);
+                }
+            });
+        }
+
+        private void onShieldChangeClick() {
+            // launch a new intent to find an image
+            Intent intent = new Intent();
+            intent.setType("image/*");
+            intent.setAction(Intent.ACTION_GET_CONTENT);
+            getActivity().startActivityForResult(Intent.createChooser(intent, "Choose Image"), CHOOSE_SHIELD_RESULT_ID);
+        }
+
+        private void onShieldSaveClick() {
+            if (mNewShieldImage == null) {
+                return;
+            }
+
+            purchase("decorate_empire", new PurchaseCompleteHandler() {
+                @Override
+                public void onPurchaseComplete(Purchase purchaseInfo) {
+                    EmpireManager.i.getEmpire().changeShieldImage(mNewShieldImage, purchaseInfo);
+                }
+            });
+
+        }
+
+        private void loadShieldImage(String path) {
+            BitmapFactory.Options opts = new BitmapFactory.Options();
+            opts.inJustDecodeBounds = true;
+            BitmapFactory.decodeFile(path, opts);
+
+            int scale = 1;
+            while (opts.outWidth / scale / 2 >= 100 && opts.outHeight / scale / 2 >= 100) {
+                scale *= 2;
+            }
+            log.info("Scale set to "+scale+" for image size "+opts.outWidth+"x"+opts.outHeight);
+
+            opts = new BitmapFactory.Options();
+            opts.inPurgeable = true;
+            opts.inInputShareable = true;
+            opts.inSampleSize = scale;
+            mNewShieldImage = BitmapFactory.decodeFile(path, opts);
+            Bitmap bmp = EmpireShieldManager.i.combineShieldImage(getActivity(), mNewShieldImage);
+
+            ImageView currentShield = (ImageView) mView.findViewById(R.id.current_shield);
+            currentShield.setImageBitmap(bmp);
+            ImageView currentShieldSmall = (ImageView) mView.findViewById(R.id.current_shield_small);
+            currentShieldSmall.setImageBitmap(bmp);
+
+            // and now we can enable the 'save' button
+            ((Button) mView.findViewById(R.id.save_btn)).setEnabled(true);;
+        }
+
+        private void purchase(String sku, final PurchaseCompleteHandler onComplete) {
+            try {
+                PurchaseManager.i.launchPurchaseFlow(getActivity(), sku, new IabHelper.OnIabPurchaseFinishedListener() {
+                    @Override
+                    public void onIabPurchaseFinished(IabResult result, final Purchase info) {
+                        boolean isSuccess = result.isSuccess();
+                        if (result.isFailure() && result.getResponse() == IabHelper.BILLING_RESPONSE_RESULT_ITEM_ALREADY_OWNED) {
+                            // if they've already purchased a rename_empire, but not reclaimed it, then
+                            // we let them through anyway.
+                            isSuccess = true;
+                        }
+
+                        if (isSuccess) {
+                            PurchaseManager.i.consume(info, new IabHelper.OnConsumeFinishedListener() {
+                                @Override
+                                public void onConsumeFinished(Purchase purchase, IabResult result) {
+                                    if (!result.isSuccess()) {
+                                        // TODO: error
+                                        return;
+                                    }
+
+                                    onComplete.onPurchaseComplete(info);
+                                }
+                            });
+                        }
+                    }
+                });
+            } catch (IabException e) {
+                log.error("Couldn't get SKU details!", e);
+                return;
+            }
+        }
+
+        private interface PurchaseCompleteHandler {
+            void onPurchaseComplete(Purchase purchaseInfo);
         }
     }
 

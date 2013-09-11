@@ -27,6 +27,7 @@ import au.com.codeka.common.model.BaseStar;
 import au.com.codeka.controlfield.ControlField;
 import au.com.codeka.warworlds.model.Empire;
 import au.com.codeka.warworlds.model.EmpireManager;
+import au.com.codeka.warworlds.model.EmpireShieldManager;
 import au.com.codeka.warworlds.model.Sector;
 import au.com.codeka.warworlds.model.SectorManager;
 
@@ -116,7 +117,7 @@ public class TacticalMapView extends SectorView
             if (empire == null) {
                 mInfluencePaint.setARGB(128, 255, 255, 255);
             } else {
-                mInfluencePaint.setColor(empire.getShieldColor());
+                mInfluencePaint.setColor(EmpireShieldManager.i.getShieldColour(empire));
             }
             cf.render(canvas, mInfluencePaint);
         }

@@ -1,5 +1,6 @@
 package au.com.codeka.warworlds.model;
 
+import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -7,12 +8,16 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import android.graphics.Bitmap;
+import android.graphics.Bitmap.CompressFormat;
 import au.com.codeka.BackgroundRunner;
 import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.api.ApiClient;
 import au.com.codeka.warworlds.api.ApiException;
 import au.com.codeka.warworlds.model.billing.Purchase;
 import au.com.codeka.warworlds.model.billing.SkuDetails;
+
+import com.google.protobuf.ByteString;
 
 /**
  * This is a sub-class of \c Empire that represents \em my Empire. We have extra methods
@@ -306,6 +311,45 @@ public class MyEmpire extends Empire {
                             .setNewName(newName)
                             .setPurchaseInfo(Messages.PurchaseInfo.newBuilder()
                                     .setSku("rename_empire")
+                                    .setToken(purchaseInfo.getToken())
+                                    .setOrderId(purchaseInfo.getOrderId())
+                                    .setPrice(sku.getPrice())
+                                    .setDeveloperPayload(purchaseInfo.getDeveloperPayload()))
+                            .build();
+                    Messages.Empire empire_pb = ApiClient.putProtoBuf(url, pb, Messages.Empire.class);
+                    return empire_pb.getDisplayName();
+                } catch(Exception e) {
+                    // TODO: handle exceptions
+                    log.error(ExceptionUtils.getStackTrace(e));
+                    return null;
+                }
+            }
+
+            @Override
+            protected void onComplete(String name) {
+                mDisplayName = name;
+                EmpireManager.i.fireEmpireUpdated(MyEmpire.this);
+            }
+        }.execute();
+    }
+
+    public void changeShieldImage(final Bitmap bmp, final Purchase purchaseInfo) {
+        new BackgroundRunner<String>() {
+            @Override
+            protected String doInBackground() {
+                String url = "empires/"+getKey()+"/shield";
+
+                try {
+                    SkuDetails sku = PurchaseManager.i.getInventory().getSkuDetails("decorate_empire");
+
+                    ByteArrayOutputStream outs = new ByteArrayOutputStream();
+                    bmp.compress(CompressFormat.PNG, 90, outs);
+
+                    Messages.EmpireChangeShieldRequest pb = Messages.EmpireChangeShieldRequest.newBuilder()
+                            .setKey(getKey())
+                            .setPngImage(ByteString.copyFrom(outs.toByteArray()))
+                            .setPurchaseInfo(Messages.PurchaseInfo.newBuilder()
+                                    .setSku("decorate_empire")
                                     .setToken(purchaseInfo.getToken())
                                     .setOrderId(purchaseInfo.getOrderId())
                                     .setPrice(sku.getPrice())

@@ -74,6 +74,15 @@
             android:layout_marginTop="10dp"
             android:src="@drawable/app_icon" />
 
+        <ImageView
+            android:id="@+id/current_shield_small"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_toRightOf="@+id/current_shield"
+            android:layout_alignBottom="@+id/current_shield"
+            android:layout_marginLeft="-10dp"
+            android:src="@drawable/app_icon" />
+
         <Button
             android:id="@+id/shield_change_btn"
             android:layout_width="wrap_content"
@@ -81,8 +90,19 @@
             android:layout_alignTop="@+id/current_shield"
             android:layout_marginTop="15dp"
             android:layout_marginLeft="10dp"
-            android:layout_toRightOf="@+id/current_shield"
+            android:layout_toRightOf="@+id/current_shield_small"
             android:text="Choose Shield" />
+
+        <Button
+            android:id="@+id/save_btn"
+            android:layout_width="100dp"
+            android:layout_height="30dp"
+            android:layout_alignTop="@+id/current_shield"
+            android:layout_marginTop="15dp"
+            android:layout_marginLeft="10dp"
+            android:layout_toRightOf="@+id/shield_change_btn"
+            android:enabled="false"
+            android:text="Save" />
 
         <au.com.codeka.warworlds.ctrl.HorizontalSeparator
             android:id="@+id/horz_sep_3"
@@ -113,6 +133,6 @@
             android:layout_centerHorizontal="true"
             android:layout_marginTop="15dp"
             android:text="Reset Empire" />
-        
+
     </RelativeLayout>
 </ScrollView>

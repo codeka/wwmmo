@@ -183,6 +183,18 @@ message EmpireRenameRequest
 
 
 //
+// A request to change an empire's shield image. The empire MUST be yourself, and we assume you've already
+// purchased the ability to do it...
+//
+message EmpireChangeShieldRequest
+{
+    optional string key = 1;
+    optional bytes png_image = 2;
+    optional PurchaseInfo purchase_info = 3;
+}
+
+
+//
 // Contains a mapping of building designs to the number of buildings of that design in
 // your empire. Used to decide whether you can build a certain building, when it has
 // a "maxPerEmpire" restriction.

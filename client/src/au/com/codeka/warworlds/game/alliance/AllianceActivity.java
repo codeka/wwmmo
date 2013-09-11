@@ -32,6 +32,7 @@ import au.com.codeka.warworlds.model.AllianceManager;
 import au.com.codeka.warworlds.model.AllianceRequest;
 import au.com.codeka.warworlds.model.Empire;
 import au.com.codeka.warworlds.model.EmpireManager;
+import au.com.codeka.warworlds.model.EmpireShieldManager;
 import au.com.codeka.warworlds.model.MyEmpire;
 
 public class AllianceActivity extends TabFragmentActivity
@@ -400,7 +401,7 @@ public class AllianceActivity extends TabFragmentActivity
                 TextView message = (TextView) view.findViewById(R.id.message);
 
                 empireName.setText(entry.empire.getDisplayName());
-                empireIcon.setImageBitmap(entry.empire.getShield(activity));
+                empireIcon.setImageBitmap(EmpireShieldManager.i.getShield(getActivity(), entry.empire));
                 requestDescription.setText(String.format(Locale.ENGLISH, "%s requested %s",
                         entry.request.getDescription(), TimeInHours.format(entry.request.getRequestDate())));
                 message.setText(entry.request.getMessage());

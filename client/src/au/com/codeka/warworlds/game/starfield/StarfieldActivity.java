@@ -44,6 +44,7 @@ import au.com.codeka.warworlds.model.Colony;
 import au.com.codeka.warworlds.model.DesignManager;
 import au.com.codeka.warworlds.model.Empire;
 import au.com.codeka.warworlds.model.EmpireManager;
+import au.com.codeka.warworlds.model.EmpireShieldManager;
 import au.com.codeka.warworlds.model.Fleet;
 import au.com.codeka.warworlds.model.MyEmpire;
 import au.com.codeka.warworlds.model.Planet;
@@ -674,7 +675,7 @@ public class StarfieldActivity extends BaseActivity
                     return;
                 }
                 empireName.setText(empire.getDisplayName());
-                empireIcon.setImageBitmap(empire.getShield(mContext));
+                empireIcon.setImageBitmap(EmpireShieldManager.i.getShield(mContext, empire));
             }
         });
 
