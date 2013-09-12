@@ -48,6 +48,7 @@
         <pathelement location="../jetty/lib/jetty-proxy-9.0.1.v20130408.jar"/>
         <pathelement location="../jetty/lib/jetty-server-9.0.1.v20130408.jar"/>
         <pathelement location="libs/bonecp-0.7.1.jar"/>
+        <pathelement location="libs/commons-imaging-1.0-SNAPSHOT.jar"/>
         <pathelement location="libs/gcm-server.jar"/>
         <pathelement location="libs/guava-14.0.1.jar"/>
         <pathelement location="libs/guice-2.0.jar"/>

@@ -32,18 +32,19 @@ public class Empire extends BaseEmpire {
         if (!rs.wasNull()) {
             mAlliance = new Alliance(mAllianceID, rs);
         }
-
         rs.getInt("rank");
         if (!rs.wasNull()) {
             mRank = new EmpireRank(rs);
         }
-
         Timestamp ts = rs.getTimestamp("last_sitrep_read_time");
         if (ts != null) {
             mLastSitrepReadTime = new DateTime(ts.getTime());
         }
-
         mForceRemoveAds = rs.getInt("remove_ads") != 0;
+        ts = rs.getTimestamp("shield_last_update");
+        if (ts != null) {
+            mShieldLastUpdate = new DateTime(ts.getTime());
+        }
     }
 
     public int getID() {

@@ -1,5 +1,8 @@
 package au.com.codeka.common.model;
 
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
+
 import au.com.codeka.common.protobuf.Messages;
 
 public abstract class BaseEmpire {
@@ -10,6 +13,7 @@ public abstract class BaseEmpire {
     protected BaseEmpireRank mRank;
     protected BaseStar mHomeStar;
     protected BaseAlliance mAlliance;
+    protected DateTime mShieldLastUpdate;
 
     protected abstract BaseEmpireRank createEmpireRank(Messages.EmpireRank pb);
     protected abstract BaseStar createStar(Messages.Star pb);
@@ -33,7 +37,9 @@ public abstract class BaseEmpire {
     public BaseAlliance getAlliance() {
         return mAlliance;
     }
-
+    public DateTime getShieldLastUpdate() {
+        return mShieldLastUpdate;
+    }
     public String getEmailAddr() {
         return mEmailAddr;
     }
@@ -65,6 +71,10 @@ public abstract class BaseEmpire {
                 pb.getAlliance().getKey().length() > 0) {
             mAlliance = createAlliance(pb.getAlliance());
         }
+
+        if (pb.hasShieldImageLastUpdate()) {
+            mShieldLastUpdate = new DateTime(pb.getShieldImageLastUpdate() * 1000, DateTimeZone.UTC);
+        }
     }
 
     public void toProtocolBuffer(Messages.Empire.Builder pb) {
@@ -90,6 +100,10 @@ public abstract class BaseEmpire {
             Messages.EmpireRank.Builder empire_rank_pb = Messages.EmpireRank.newBuilder();
             mRank.toProtocolBuffer(empire_rank_pb);
             pb.setRank(empire_rank_pb);
+        }
+
+        if (mShieldLastUpdate != null) {
+            pb.setShieldImageLastUpdate(mShieldLastUpdate.getMillis() / 1000);
         }
     }
 }

@@ -44,6 +44,8 @@ message GenericError
         CannotCollectTaxesAlreadyInProgress = 14;
         CannotColonizePlanetAlreadyHasColony = 16;
         CannotColonizePlanetNoColonyShips = 17;
+        InvalidImage = 18;
+        ShieldImageTooBig = 19;
     }
 }
 
@@ -139,6 +141,10 @@ message Empire
 
     // if this empire is part of an alliance, this will contain the details of the alliance.
     optional Alliance alliance = 13;
+
+    // if set, this is the last date/time the empire's shield was updated (so we can detect if we
+    // need to re-download it)
+    optional int64 shield_image_last_update = 14;
 }
 
 

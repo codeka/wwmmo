@@ -91,6 +91,32 @@ public class EmpireController {
         }
     }
 
+    public void changeEmpireShield(int empireID, byte[] pngImage) throws RequestException {
+        String sql = "INSERT INTO empire_shields (empire_id, create_date, rejected, image) VALUES (?, NOW(), 0, ?)";
+        try (SqlStmt stmt = db.prepare(sql)) {
+            stmt.setInt(1, empireID);
+            stmt.setBlob(2, pngImage);
+            stmt.update();
+        } catch (Exception e) {
+            throw new RequestException(e);
+        }
+    }
+
+    public byte[] getEmpireShield(int empireID) throws RequestException {
+        String sql = "SELECT image FROM empire_shields WHERE empire_id = ? AND rejected = 0 ORDER BY create_date DESC LIMIT 1";
+        try (SqlStmt stmt = db.prepare(sql)) {
+            stmt.setInt(1, empireID);
+            ResultSet rs = stmt.select();
+            if (rs.next()) {
+                return rs.getBytes(1);
+            }
+        } catch (Exception e) {
+            throw new RequestException(e);
+        }
+
+        return null;
+    }
+
     public boolean withdrawCash(int empireId, float amount, Messages.CashAuditRecord.Builder audit_record_pb) throws RequestException {
         return adjustBalance(empireId, -amount, audit_record_pb);
     }
@@ -401,7 +427,8 @@ public class EmpireController {
 
         private String getSelectEmpire(String whereClause) {
             return "SELECT *, alliances.id AS alliance_id," +
-                         " (SELECT COUNT(*) FROM empires WHERE alliance_id = empires.alliance_id) AS num_empires" +
+                         " (SELECT COUNT(*) FROM empires WHERE alliance_id = empires.alliance_id) AS num_empires," +
+                         " (SELECT MAX(create_date) FROM empire_shields WHERE empire_shields.empire_id = empires.id AND rejected = 0) AS shield_last_update" +
                   " FROM empires" +
                   " LEFT JOIN alliances ON empires.alliance_id = alliances.id" +
                   " LEFT JOIN empire_ranks ON empires.id = empire_ranks.empire_id" +

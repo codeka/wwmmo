@@ -47,5 +47,6 @@
 	<classpathentry kind="lib" path="/common/libs/jcl-over-slf4j-1.7.5.jar"/>
 	<classpathentry kind="lib" path="/common/libs/httpclient-4.2.2.jar"/>
 	<classpathentry kind="lib" path="/common/libs/httpcore-4.2.2.jar"/>
+	<classpathentry kind="lib" path="libs/commons-imaging-1.0-SNAPSHOT.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
