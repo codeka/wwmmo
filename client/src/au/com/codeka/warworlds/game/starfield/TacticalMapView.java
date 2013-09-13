@@ -32,7 +32,8 @@ import au.com.codeka.warworlds.model.Sector;
 import au.com.codeka.warworlds.model.SectorManager;
 
 public class TacticalMapView extends SectorView
-                             implements SectorManager.OnSectorListChangedListener {
+                             implements SectorManager.OnSectorListChangedListener,
+                                        EmpireShieldManager.EmpireShieldUpdatedHandler {
     private static final Logger log = LoggerFactory.getLogger(TacticalMapView.class);
 
     private Paint mPointPaint;
@@ -71,12 +72,14 @@ public class TacticalMapView extends SectorView
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
         SectorManager.getInstance().addSectorListChangedListener(this);
+        EmpireShieldManager.i.addEmpireShieldUpdatedHandler(this);
     }
 
     @Override
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
         SectorManager.getInstance().removeSectorListChangedListener(this);
+        EmpireShieldManager.i.removeEmpireShieldUpdatedHandler(this);
     }
 
     @Override
@@ -89,6 +92,12 @@ public class TacticalMapView extends SectorView
     @Override
     protected GestureDetector.OnGestureListener createGestureListener() {
         return new GestureListener();
+    }
+
+    /** Called when an empire's shield is updated, we'll have to refresh the list. */
+    @Override
+    public void onEmpireShieldUpdated(int empireID) {
+        invalidate();
     }
 
     @Override

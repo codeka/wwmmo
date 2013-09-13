@@ -1,6 +1,5 @@
 package au.com.codeka.warworlds.api;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -10,7 +9,6 @@ import java.util.TreeMap;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
@@ -19,8 +17,9 @@ import org.apache.http.entity.ByteArrayEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
-import org.xml.sax.SAXException;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.App;
 import au.com.codeka.warworlds.Notifications;
@@ -53,13 +52,24 @@ public class ApiClient {
         try {
             DocumentBuilder builder = builderFactory.newDocumentBuilder();
             return builder.parse(res.getResponse().getEntity().getContent());
-        } catch (ParserConfigurationException e) {
+        } catch (Exception e) {
             throw new ApiException(e);
-        } catch (IllegalStateException e) {
-            throw new ApiException(e);
-        } catch (SAXException e) {
-            throw new ApiException(e);
-        } catch (IOException e) {
+        } finally {
+            res.close();
+        }
+    }
+
+    /** Fetches an image from the given URL. */
+    public static Bitmap getImage(String url) throws ApiException {
+        Map<String, List<String>> headers = getHeaders();
+        List<String> accept = headers.get("Accept");
+        accept.add("image/png");
+        accept.add("image/jpeg");
+
+        RequestManager.ResultWrapper res = RequestManager.request("GET", url, headers);
+        try {
+            return BitmapFactory.decodeStream(res.getResponse().getEntity().getContent());
+        } catch(Exception e) {
             throw new ApiException(e);
         } finally {
             res.close();

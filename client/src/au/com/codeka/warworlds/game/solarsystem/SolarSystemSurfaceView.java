@@ -38,7 +38,8 @@ import au.com.codeka.warworlds.model.StarImageManager;
  * \c SurfaceView that displays a solar system. Star in the top-left, planets arrayed around,
  * and representations of the fleets, etc.
  */
-public class SolarSystemSurfaceView extends UniverseElementSurfaceView {
+public class SolarSystemSurfaceView extends UniverseElementSurfaceView
+                                    implements EmpireShieldManager.EmpireShieldUpdatedHandler {
     private Context mContext;
     private Star mStar;
     private PlanetInfo[] mPlanetInfos;
@@ -216,12 +217,19 @@ public class SolarSystemSurfaceView extends UniverseElementSurfaceView {
     }
 
     @Override
+    protected void onAttachedToWindow() {
+        super.onAttachedToWindow();
+        EmpireShieldManager.i.addEmpireShieldUpdatedHandler(this);
+    }
+
+    @Override
     public void onDetachedFromWindow() {
         PlanetImageManager.getInstance().removeSpriteGeneratedListener(mSpriteGeneratedListener);
         if (mBackgroundRenderer != null) {
             mBackgroundRenderer.close();
             mBackgroundRenderer = null;
         }
+        EmpireShieldManager.i.removeEmpireShieldUpdatedHandler(this);
     }
 
     @Override
@@ -231,6 +239,12 @@ public class SolarSystemSurfaceView extends UniverseElementSurfaceView {
             return;
         }
         placePlanets();
+    }
+
+    /** Called when an empire's shield is updated, we'll have to refresh the view. */
+    @Override
+    public void onEmpireShieldUpdated(int empireID) {
+        invalidate();
     }
 
     /**

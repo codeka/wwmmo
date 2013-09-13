@@ -38,7 +38,8 @@ import au.com.codeka.warworlds.model.StarManager;
  * could also be an ally or faction member).
  */
 public class EnemyPlanetActivity extends BaseActivity
-                                 implements StarManager.StarFetchedHandler {
+                                 implements StarManager.StarFetchedHandler,
+                                            EmpireShieldManager.EmpireShieldUpdatedHandler {
     private Star mStar;
     private Planet mPlanet;
     private Colony mColony;
@@ -64,6 +65,18 @@ public class EnemyPlanetActivity extends BaseActivity
     }
 
     @Override
+    protected void onStart() {
+        super.onStart();
+        EmpireShieldManager.i.addEmpireShieldUpdatedHandler(this);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        EmpireShieldManager.i.removeEmpireShieldUpdatedHandler(this);
+    }
+
+    @Override
     public void onResume() {
         super.onResume();
 
@@ -79,6 +92,14 @@ public class EnemyPlanetActivity extends BaseActivity
                 }
             }
         });
+    }
+
+    /** Called when an empire's shield is updated, we'll have to refresh the list. */
+    @Override
+    public void onEmpireShieldUpdated(int empireID) {
+        if (mColonyEmpire != null && Integer.parseInt(mColonyEmpire.getKey()) == empireID) {
+            refreshEmpireDetails();
+        }
     }
 
     @Override

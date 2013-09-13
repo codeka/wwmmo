@@ -56,7 +56,8 @@ import au.com.codeka.warworlds.model.StarImageManager;
 import au.com.codeka.warworlds.model.StarManager;
 import au.com.codeka.warworlds.model.StarSummary;
 
-public class SitrepActivity extends BaseActivity {
+public class SitrepActivity extends BaseActivity
+                            implements EmpireShieldManager.EmpireShieldUpdatedHandler {
     private static Logger log = LoggerFactory.getLogger(SitrepActivity.class);
     private Context mContext = this;
     private SituationReportAdapter mSituationReportAdapter;
@@ -171,6 +172,24 @@ public class SitrepActivity extends BaseActivity {
         });
 
         refresh();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        EmpireShieldManager.i.addEmpireShieldUpdatedHandler(this);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        EmpireShieldManager.i.removeEmpireShieldUpdatedHandler(this);
+    }
+
+    /** Called when an empire's shield is updated, we'll have to refresh the list. */
+    @Override
+    public void onEmpireShieldUpdated(int empireID) {
+        refreshTitle();
     }
 
     private void refreshTitle() {

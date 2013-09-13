@@ -35,7 +35,8 @@ import au.com.codeka.warworlds.model.MyEmpire;
 
 public class AllianceDetailsActivity extends BaseActivity
                                      implements AllianceManager.AllianceUpdatedHandler,
-                                                EmpireManager.EmpireFetchedHandler {
+                                                EmpireManager.EmpireFetchedHandler,
+                                                EmpireShieldManager.EmpireShieldUpdatedHandler {
     private Handler mHandler;
     private boolean mRefreshPosted;
     private int mAllianceID;
@@ -79,6 +80,7 @@ public class AllianceDetailsActivity extends BaseActivity
         super.onStart();
         AllianceManager.i.addAllianceUpdatedHandler(this);
         EmpireManager.i.addEmpireUpdatedListener(null, this);
+        EmpireShieldManager.i.addEmpireShieldUpdatedHandler(this);
     }
 
     @Override
@@ -86,6 +88,7 @@ public class AllianceDetailsActivity extends BaseActivity
         super.onStop();
         AllianceManager.i.removeAllianceUpdatedHandler(this);
         EmpireManager.i.removeEmpireUpdatedListener(this);
+        EmpireShieldManager.i.removeEmpireShieldUpdatedHandler(this);
     }
 
     @Override
@@ -102,6 +105,12 @@ public class AllianceDetailsActivity extends BaseActivity
         if (myEmpire.getKey().equals(empire.getKey())) {
             fullRefresh();
         }
+    }
+
+    /** Called when an empire's shield is updated, we'll have to refresh the list. */
+    @Override
+    public void onEmpireShieldUpdated(int empireID) {
+        refreshAlliance();
     }
 
     private void fullRefresh() {

@@ -202,9 +202,32 @@ public class EmpireActivity extends TabFragmentActivity
         }
     }
 
-    public static class OverviewFragment extends BaseFragment {
+    public static class OverviewFragment extends BaseFragment
+                                         implements EmpireShieldManager.EmpireShieldUpdatedHandler {
         private View mView;
         private EmpireRankList mEmpireList;
+
+        @Override
+        public void onStart() {
+            super.onStart();
+            EmpireShieldManager.i.addEmpireShieldUpdatedHandler(this);
+        }
+
+        @Override
+        public void onStop() {
+            super.onStop();
+            EmpireShieldManager.i.removeEmpireShieldUpdatedHandler(this);
+        }
+
+        /** Called when an empire's shield is updated, we'll have to refresh the list. */
+        @Override
+        public void onEmpireShieldUpdated(int empireID) {
+            MyEmpire empire = EmpireManager.i.getEmpire();
+            if (Integer.parseInt(empire.getKey()) == empireID) {
+                ImageView empireIcon = (ImageView) mView.findViewById(R.id.empire_icon);
+                empireIcon.setImageBitmap(EmpireShieldManager.i.getShield(getActivity(), empire));
+            }
+        }
 
         @Override
         public View onCreateView(LayoutInflater inflator, ViewGroup container, Bundle savedInstanceState) {
@@ -475,9 +498,34 @@ public class EmpireActivity extends TabFragmentActivity
         }
     }
 
-    public static class SettingsFragment extends BaseFragment {
+    public static class SettingsFragment extends BaseFragment
+                                         implements EmpireShieldManager.EmpireShieldUpdatedHandler {
         private View mView;
         private Bitmap mNewShieldImage;
+
+        @Override
+        public void onStart() {
+            super.onStart();
+            EmpireShieldManager.i.addEmpireShieldUpdatedHandler(this);
+        }
+
+        @Override
+        public void onStop() {
+            super.onStop();
+            EmpireShieldManager.i.removeEmpireShieldUpdatedHandler(this);
+        }
+
+        /** Called when an empire's shield is updated, we'll have to refresh the list. */
+        @Override
+        public void onEmpireShieldUpdated(int empireID) {
+            MyEmpire empire = EmpireManager.i.getEmpire();
+            if (Integer.parseInt(empire.getKey()) == empireID) {
+                ImageView currentShield = (ImageView) mView.findViewById(R.id.current_shield);
+                currentShield.setImageBitmap(EmpireShieldManager.i.getShield(getActivity(), EmpireManager.i.getEmpire()));
+                ImageView currentShieldSmall = (ImageView) mView.findViewById(R.id.current_shield_small);
+                currentShieldSmall.setImageBitmap(EmpireShieldManager.i.getShield(getActivity(), EmpireManager.i.getEmpire()));
+            }
+        }
 
         public View onCreateView(LayoutInflater inflator, ViewGroup container, Bundle savedInstanceState) {
             if (sCurrentEmpire == null) {

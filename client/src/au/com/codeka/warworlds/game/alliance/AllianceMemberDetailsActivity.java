@@ -27,7 +27,8 @@ import com.google.protobuf.InvalidProtocolBufferException;
 
 public class AllianceMemberDetailsActivity extends BaseActivity
                                            implements AllianceManager.AllianceUpdatedHandler,
-                                                      EmpireManager.EmpireFetchedHandler {
+                                                      EmpireManager.EmpireFetchedHandler,
+                                                      EmpireShieldManager.EmpireShieldUpdatedHandler {
     private int mAllianceID;
     private String mEmpireKey;
     private Alliance mAlliance;
@@ -72,6 +73,7 @@ public class AllianceMemberDetailsActivity extends BaseActivity
         super.onStart();
         AllianceManager.i.addAllianceUpdatedHandler(this);
         EmpireManager.i.addEmpireUpdatedListener(null, this);
+        EmpireShieldManager.i.addEmpireShieldUpdatedHandler(this);
     }
 
     @Override
@@ -79,6 +81,7 @@ public class AllianceMemberDetailsActivity extends BaseActivity
         super.onStop();
         AllianceManager.i.removeAllianceUpdatedHandler(this);
         EmpireManager.i.removeEmpireUpdatedListener(this);
+        EmpireShieldManager.i.removeEmpireShieldUpdatedHandler(this);
     }
 
     @Override
@@ -93,6 +96,14 @@ public class AllianceMemberDetailsActivity extends BaseActivity
     public void onAllianceUpdated(Alliance alliance) {
         if (alliance.getID() == mAllianceID) {
             mAlliance = alliance;
+            refresh();
+        }
+    }
+
+    /** Called when an empire's shield is updated, we'll have to refresh the list. */
+    @Override
+    public void onEmpireShieldUpdated(int empireID) {
+        if (Integer.parseInt(mEmpire.getKey()) == empireID) {
             refresh();
         }
     }

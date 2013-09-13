@@ -67,7 +67,8 @@ import au.com.codeka.warworlds.model.StarSummary;
 public class StarfieldSurfaceView extends SectorView
                                   implements StarManager.StarFetchedHandler,
                                              SectorManager.OnSectorListChangedListener,
-                                             EmpireManager.EmpireFetchedHandler {
+                                             EmpireManager.EmpireFetchedHandler,
+                                             EmpireShieldManager.EmpireShieldUpdatedHandler {
     private static final Logger log = LoggerFactory.getLogger(StarfieldSurfaceView.class);
     private Context mContext;
     private ArrayList<OnSelectionChangedListener> mSelectionChangedListeners;
@@ -156,6 +157,7 @@ public class StarfieldSurfaceView extends SectorView
         StarImageManager.getInstance().addSpriteGeneratedListener(mSpriteGeneratedListener);
         StarManager.getInstance().addStarUpdatedListener(null, this);
         EmpireManager.i.addEmpireUpdatedListener(null, this);
+        EmpireShieldManager.i.addEmpireShieldUpdatedHandler(this);
 
         MyEmpire myEmpire = EmpireManager.i.getEmpire();
         if (myEmpire != null) {
@@ -181,6 +183,7 @@ public class StarfieldSurfaceView extends SectorView
         StarImageManager.getInstance().removeSpriteGeneratedListener(mSpriteGeneratedListener);
         StarManager.getInstance().removeStarUpdatedListener(this);
         EmpireManager.i.removeEmpireUpdatedListener(this);
+        EmpireShieldManager.i.removeEmpireShieldUpdatedHandler(this);
 
         removeOverlay(mHqOverlay);
     }
@@ -207,6 +210,12 @@ public class StarfieldSurfaceView extends SectorView
                 }
             }
         }
+    }
+
+    /** Called when an empire's shield is updated, we'll have to refresh the list. */
+    @Override
+    public void onEmpireShieldUpdated(int empireID) {
+        invalidate();
     }
 
     /**

@@ -44,7 +44,8 @@ import au.com.codeka.warworlds.model.StarSummary;
  * This is a fragment which displays details about a single solar system.
  */
 public class SolarSystemFragment extends Fragment
-                                 implements StarManager.StarFetchedHandler {
+                                 implements StarManager.StarFetchedHandler,
+                                            EmpireShieldManager.EmpireShieldUpdatedHandler {
     private static Logger log = LoggerFactory.getLogger(SolarSystemFragment.class);
     private SolarSystemSurfaceView mSolarSystemSurfaceView;
     private ProgressBar mProgressBar;
@@ -171,6 +172,7 @@ public class SolarSystemFragment extends Fragment
         long starID = args.getLong("au.com.codeka.warworlds.StarID");
         String starKey = Long.toString(starID);
         StarManager.getInstance().addStarUpdatedListener(starKey, this);
+        EmpireShieldManager.i.addEmpireShieldUpdatedHandler(this);
 
         // get as much details about the star as we can, until it gets refreshes anyway.
         mStarSummary = StarManager.getInstance().getStarSummaryNoFetch(starKey, Float.MAX_VALUE);
@@ -207,12 +209,19 @@ public class SolarSystemFragment extends Fragment
     public void onStop() {
         super.onStop();
         StarManager.getInstance().removeStarUpdatedListener(this);
+        EmpireShieldManager.i.removeEmpireShieldUpdatedHandler(this);
 
         int sdk = android.os.Build.VERSION.SDK_INT;
         if (sdk >= android.os.Build.VERSION_CODES.HONEYCOMB) {
             mSolarSystemSurfaceView.removeOnLayoutChangeListener(
                     (View.OnLayoutChangeListener) mSolarSystemSurfaceViewOnLayoutChangedListener);
         }
+    }
+
+    /** Called when an empire's shield is updated, we'll have to refresh the list. */
+    @Override
+    public void onEmpireShieldUpdated(int empireID) {
+        refreshSelectedPlanet();
     }
 
     @Override
@@ -251,6 +260,37 @@ public class SolarSystemFragment extends Fragment
             }
         }
 
+        mStarSummary = mStar = star;
+        mPlanet = (Planet) planet;
+        mProgressBar.setVisibility(View.GONE);
+
+        refresh();
+
+        if (mPlanet == null) {
+            TextView planetNameTextView = (TextView) mView.findViewById(R.id.planet_name);
+            planetNameTextView.setText(mStar.getName());
+        }
+
+        if (mIsFirstRefresh) {
+            mIsFirstRefresh = false;
+            Bundle extras = getArguments();
+            boolean showScoutReport = extras.getBoolean("au.com.codeka.warworlds.ShowScoutReport");
+            if (showScoutReport) {
+                ScoutReportDialog dialog = new ScoutReportDialog();
+                dialog.setStar(mStar);
+                dialog.show(getFragmentManager(), "");
+            }
+
+            String combatReportKey = extras.getString("au.com.codeka.warworlds.CombatReportKey");
+            if (!showScoutReport && combatReportKey != null) {
+                CombatReportDialog dialog = new CombatReportDialog();
+                dialog.loadCombatReport(mStar, combatReportKey);
+                dialog.show(getFragmentManager(), "");
+            }
+        }
+    }
+
+    private void refresh() {
         TextView storedGoodsTextView = (TextView) mView.findViewById(R.id.stored_goods);
         TextView deltaGoodsTextView = (TextView) mView.findViewById(R.id.delta_goods);
         View storedGoodsIcon = mView.findViewById(R.id.stored_goods_icon);
@@ -259,9 +299,9 @@ public class SolarSystemFragment extends Fragment
         View storedMineralsIcon = mView.findViewById(R.id.stored_minerals_icon);
         FleetListSimple fleetList = (FleetListSimple) mView.findViewById(R.id.fleet_list);
 
-        fleetList.setStar(star);
+        fleetList.setStar(mStar);
 
-        BaseEmpirePresence ep = star.getEmpire(EmpireManager.i.getEmpire().getKey());
+        BaseEmpirePresence ep = mStar.getEmpire(EmpireManager.i.getEmpire().getKey());
         if (ep == null) {
             storedGoodsTextView.setVisibility(View.GONE);
             deltaGoodsTextView.setVisibility(View.GONE);
@@ -298,33 +338,6 @@ public class SolarSystemFragment extends Fragment
             } else {
                 deltaMineralsTextView.setTextColor(Color.RED);
                 deltaMineralsTextView.setText(String.format("%d/hr", (int) ep.getDeltaMineralsPerHour()));
-            }
-        }
-
-        mStarSummary = mStar = star;
-        mPlanet = (Planet) planet;
-        mProgressBar.setVisibility(View.GONE);
-
-        if (mPlanet == null) {
-            TextView planetNameTextView = (TextView) mView.findViewById(R.id.planet_name);
-            planetNameTextView.setText(mStar.getName());
-        }
-
-        if (mIsFirstRefresh) {
-            mIsFirstRefresh = false;
-            Bundle extras = getArguments();
-            boolean showScoutReport = extras.getBoolean("au.com.codeka.warworlds.ShowScoutReport");
-            if (showScoutReport) {
-                ScoutReportDialog dialog = new ScoutReportDialog();
-                dialog.setStar(mStar);
-                dialog.show(getFragmentManager(), "");
-            }
-
-            String combatReportKey = extras.getString("au.com.codeka.warworlds.CombatReportKey");
-            if (!showScoutReport && combatReportKey != null) {
-                CombatReportDialog dialog = new CombatReportDialog();
-                dialog.loadCombatReport(mStar, combatReportKey);
-                dialog.show(getFragmentManager(), "");
             }
         }
     }

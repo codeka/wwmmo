@@ -70,7 +70,8 @@ import au.com.codeka.warworlds.model.billing.SkuDetails;
  */
 public class StarfieldActivity extends BaseActivity
                                implements StarfieldSurfaceView.OnSelectionChangedListener,
-                                          StarManager.StarFetchedHandler {
+                                          StarManager.StarFetchedHandler,
+                                          EmpireShieldManager.EmpireShieldUpdatedHandler {
     private static final Logger log = LoggerFactory.getLogger(StarfieldActivity.class);
     private Context mContext = this;
     private StarfieldSurfaceView mStarfield;
@@ -286,8 +287,8 @@ public class StarfieldActivity extends BaseActivity
     @Override
     public void onStart() {
         super.onStart();
-
         StarManager.getInstance().addStarUpdatedListener(null, this);
+        EmpireShieldManager.i.addEmpireShieldUpdatedHandler(this);
     }
 
     @Override
@@ -303,8 +304,8 @@ public class StarfieldActivity extends BaseActivity
     @Override
     public void onStop() {
         super.onStop();
-
         StarManager.getInstance().removeStarUpdatedListener(this);
+        EmpireShieldManager.i.removeEmpireShieldUpdatedHandler(this);
     }
 
     @Override
@@ -320,6 +321,15 @@ public class StarfieldActivity extends BaseActivity
             Messages.Fleet.Builder fleet_pb = Messages.Fleet.newBuilder();
             mSelectedFleet.toProtocolBuffer(fleet_pb);
             state.putByteArray("au.com.codeka.warworlds.SelectedFleet", fleet_pb.build().toByteArray());
+        }
+    }
+
+    /** Called when an empire's shield is updated, we'll have to refresh the list. */
+    @Override
+    public void onEmpireShieldUpdated(int empireID) {
+        if (mSelectedFleet != null) {
+            // this will cause the selected fleet info to redraw and hence the shield
+            onFleetSelected(mSelectedFleet);
         }
     }
 
