@@ -23,7 +23,7 @@
             android:layout_marginBottom="5dp"
             android:layout_marginLeft="@dimen/tablet_margin_5dp"
             android:layout_marginRight="@dimen/tablet_margin_5dp"
-            android:text="You can purchase the ability to rename your empire for %1s below. This gives you the ability to rename your empire up to 3 times in 24 hours (to allow for typos and such)." />
+            android:text="You can purchase the ability to rename your empire for %1s below. Enter a new name and click &quot;Rename&quot;." />
 
        <EditText
             android:id="@+id/rename"
@@ -63,7 +63,7 @@
             android:layout_marginBottom="5dp"
             android:layout_marginLeft="@dimen/tablet_margin_5dp"
             android:layout_marginRight="@dimen/tablet_margin_5dp"
-            android:text="You can upload a custom shield image, and change your empire's colour on the Tactical Map for %1s. Purchasing this will allow you to change your shield image twice in a 24 hour period." />
+            android:text="You can upload a custom shield image for %1s. Note: shield images will be reviewed and inappropriate images will be removed.&lt;br/&gt;&lt;br/&gt;&lt;a href='http://www.war-worlds.com/doc/empire-settings/shield'&gt;Click here for more information.&lt;/a&gt;" />
 
         <ImageView
             android:id="@+id/current_shield"

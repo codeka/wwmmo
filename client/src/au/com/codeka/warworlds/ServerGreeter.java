@@ -69,6 +69,7 @@ public class ServerGreeter {
         }
     }
 
+    /** Resets the fact that we've said hello, and causes a new 'hello' to be issued. */
     public static void clearHello() {
         mHelloStarted = false;
         mHelloComplete = false;

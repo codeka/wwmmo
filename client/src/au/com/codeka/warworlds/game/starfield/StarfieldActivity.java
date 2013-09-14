@@ -1,12 +1,9 @@
 package au.com.codeka.warworlds.game.starfield;
 
-import java.util.List;
 import java.util.Locale;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.google.protobuf.InvalidProtocolBufferException;
 
 import android.content.Context;
 import android.content.DialogInterface;
@@ -40,7 +37,6 @@ import au.com.codeka.warworlds.game.SitrepActivity;
 import au.com.codeka.warworlds.game.StarRenameDialog;
 import au.com.codeka.warworlds.game.alliance.AllianceActivity;
 import au.com.codeka.warworlds.game.solarsystem.SolarSystemActivity;
-import au.com.codeka.warworlds.model.Colony;
 import au.com.codeka.warworlds.model.DesignManager;
 import au.com.codeka.warworlds.model.Empire;
 import au.com.codeka.warworlds.model.EmpireManager;
@@ -64,6 +60,8 @@ import au.com.codeka.warworlds.model.billing.IabResult;
 import au.com.codeka.warworlds.model.billing.Purchase;
 import au.com.codeka.warworlds.model.billing.SkuDetails;
 
+import com.google.protobuf.InvalidProtocolBufferException;
+
 /**
  * The \c StarfieldActivity is the "home" screen of the game, and displays the
  * starfield where you scroll around and interact with stars, etc.
@@ -79,6 +77,7 @@ public class StarfieldActivity extends BaseActivity
     private FleetListSimple mFleetList;
     private Star mSelectedStar;
     private Fleet mSelectedFleet;
+    private StarSummary mHomeStar;
 
     private Purchase mStarRenamePurchase;
 
@@ -87,6 +86,9 @@ public class StarfieldActivity extends BaseActivity
     // initiated will actually do anything
     private String mFetchingStarKey;
     private String mFetchingFleetKey;
+
+    private Star mStarToSelect;
+    private Fleet mFleetToSelect;
 
     private static final int SOLAR_SYSTEM_REQUEST = 1;
     private static final int EMPIRE_REQUEST = 2;
@@ -209,6 +211,53 @@ public class StarfieldActivity extends BaseActivity
             }
         });
 
+        if (savedInstanceState != null) {
+            Star selectedStar = null;
+            Fleet selectedFleet = null;
+
+            try {
+                byte[] star_bytes = savedInstanceState.getByteArray("au.com.codeka.warworlds.SelectedStar");
+                if (star_bytes != null) {
+                    Messages.Star star_pb = Messages.Star.parseFrom(star_bytes);
+                    selectedStar = new Star();
+                    selectedStar.fromProtocolBuffer(star_pb);
+                }
+            } catch (InvalidProtocolBufferException e) {
+            }
+
+            try {
+                byte[] fleet_bytes = savedInstanceState.getByteArray("au.com.codeka.warworlds.SelectedFleet");
+                if (fleet_bytes != null) {
+                    Messages.Fleet fleet_pb = Messages.Fleet.parseFrom(fleet_bytes);
+                    selectedFleet = new Fleet();
+                    selectedFleet.fromProtocolBuffer(fleet_pb);
+                }
+            } catch (InvalidProtocolBufferException e) {
+            }
+
+            mStarToSelect = selectedStar;
+            mFleetToSelect = selectedFleet;
+        }
+        if (savedInstanceState == null) {
+            Intent intent = getIntent();
+            if (intent != null && intent.getExtras() != null) {
+                String starKey = intent.getExtras().getString("au.com.codeka.warworlds.StarKey");
+                if (starKey != null) {
+                    long sectorX = intent.getExtras().getLong("au.com.codeka.warworlds.SectorX");
+                    long sectorY = intent.getExtras().getLong("au.com.codeka.warworlds.SectorY");
+                    int offsetX = intent.getExtras().getInt("au.com.codeka.warworlds.OffsetX");
+                    int offsetY = intent.getExtras().getInt("au.com.codeka.warworlds.OffsetY");
+                    mStarfield.scrollTo(sectorX, sectorY, offsetX, offsetY, true);
+                    return;
+                }
+            }
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
         ServerGreeter.waitForHello(this, new ServerGreeter.HelloCompleteHandler() {
             @Override
             public void onHelloComplete(boolean success, ServerGreeting greeting) {
@@ -216,54 +265,18 @@ public class StarfieldActivity extends BaseActivity
                     return;
                 }
 
-                if (savedInstanceState != null) {
-                    Star selectedStar = null;
-                    Fleet selectedFleet = null;
-
-                    try {
-                        byte[] star_bytes = savedInstanceState.getByteArray("au.com.codeka.warworlds.SelectedStar");
-                        if (star_bytes != null) {
-                            Messages.Star star_pb = Messages.Star.parseFrom(star_bytes);
-                            selectedStar = new Star();
-                            selectedStar.fromProtocolBuffer(star_pb);
-                        }
-                    } catch (InvalidProtocolBufferException e) {
-                    }
-
-                    try {
-                        byte[] fleet_bytes = savedInstanceState.getByteArray("au.com.codeka.warworlds.SelectedFleet");
-                        if (fleet_bytes != null) {
-                            Messages.Fleet fleet_pb = Messages.Fleet.parseFrom(fleet_bytes);
-                            selectedFleet = new Fleet();
-                            selectedFleet.fromProtocolBuffer(fleet_pb);
-                        }
-                    } catch (InvalidProtocolBufferException e) {
-                    }
-
-                    if (selectedStar != null) {
-                        mSelectedStar = selectedStar;
-                        mStarfield.selectStar(selectedStar.getKey());
-                        mStarfield.scrollTo(selectedStar.getSectorX(), selectedStar.getSectorY(),
-                                            selectedStar.getOffsetX(), selectedStar.getOffsetY(),
-                                            true);
-                    }
-                    if (selectedFleet != null) {
-                        mStarfield.selectFleet(selectedFleet);
-                    }
+                if (mStarToSelect != null) {
+                    mSelectedStar = mStarToSelect;
+                    mStarfield.selectStar(mStarToSelect.getKey());
+                    mStarfield.scrollTo(mStarToSelect.getSectorX(), mStarToSelect.getSectorY(),
+                            mStarToSelect.getOffsetX(), mStarToSelect.getOffsetY(),
+                                        true);
+                    mStarToSelect = null;
                 }
-                if (savedInstanceState == null) {
-                    Intent intent = getIntent();
-                    if (intent != null && intent.getExtras() != null) {
-                        String starKey = intent.getExtras().getString("au.com.codeka.warworlds.StarKey");
-                        if (starKey != null) {
-                            long sectorX = intent.getExtras().getLong("au.com.codeka.warworlds.SectorX");
-                            long sectorY = intent.getExtras().getLong("au.com.codeka.warworlds.SectorY");
-                            int offsetX = intent.getExtras().getInt("au.com.codeka.warworlds.OffsetX");
-                            int offsetY = intent.getExtras().getInt("au.com.codeka.warworlds.OffsetY");
-                            mStarfield.scrollTo(sectorX, sectorY, offsetX, offsetY, true);
-                            return;
-                        }
-                    }
+
+                if (mFleetToSelect != null) {
+                    mStarfield.selectFleet(mFleetToSelect);
+                    mFleetToSelect = null;
                 }
 
                 MyEmpire myEmpire = EmpireManager.i.getEmpire();
@@ -272,13 +285,11 @@ public class StarfieldActivity extends BaseActivity
                 }
 
                 BaseStar homeStar = myEmpire.getHomeStar();
-                if (homeStar != null) {
+                if (mHomeStar == null || !mHomeStar.getKey().equals(homeStar.getKey())) {
+                    mHomeStar = (StarSummary) homeStar;
                     mStarfield.scrollTo(homeStar.getSectorX(), homeStar.getSectorY(),
                                         homeStar.getOffsetX(), homeStar.getOffsetY(),
                                         true);
-                } else {
-                    // this should never happen...
-                    findColony(greeting.getColonies());
                 }
             }
         });
@@ -330,33 +341,6 @@ public class StarfieldActivity extends BaseActivity
         if (mSelectedFleet != null) {
             // this will cause the selected fleet info to redraw and hence the shield
             onFleetSelected(mSelectedFleet);
-        }
-    }
-
-    /**
-     * Finds one of our colony's stars and scrolls to it.
-     */
-    private void findColony(List<Colony> colonies) {
-        // we'll want to start off near one of your stars. If you
-        // only have one, that's easy -- but if you've got lots
-        // what then?
-        String starKey = null;
-        if (colonies == null) {
-            return;
-        }
-        for (Colony c : colonies) {
-            starKey = c.getStarKey();
-        }
-
-        if (starKey != null) {
-            StarManager.getInstance().requestStarSummary(starKey, new StarManager.StarSummaryFetchedHandler() {
-                @Override
-                public void onStarSummaryFetched(StarSummary s) {
-                    mStarfield.scrollTo(s.getSectorX(), s.getSectorY(),
-                                        s.getOffsetX(), s.getOffsetY(),
-                                        true);
-                }
-            });
         }
     }
 

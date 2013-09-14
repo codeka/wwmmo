@@ -238,6 +238,42 @@ public class EmpireController {
     }
 
     /**
+     * Resets the given empire. This is obviously fairly destructive, so be careful!
+     */
+    public void resetEmpire(int empireID, String resetReason) throws RequestException {
+        String[] sqls = {
+                "DELETE FROM alliance_join_requests WHERE empire_id = ?",
+                "DELETE FROM build_requests WHERE empire_id = ?",
+                "DELETE FROM buildings WHERE empire_id = ?",
+                "DELETE FROM colonies WHERE empire_id = ?",
+                "DELETE FROM empire_presences WHERE empire_id = ?",
+                "DELETE FROM fleets WHERE empire_id = ?",
+                "DELETE FROM scout_reports WHERE empire_id = ?",
+                "DELETE FROM situation_reports WHERE empire_id = ?",
+            };
+
+        try (Transaction t = DB.beginTransaction()) {
+            for (String sql : sqls) {
+                try (SqlStmt stmt = t.prepare(sql)) {
+                    stmt.setInt(1, empireID);
+                    stmt.update();
+                }
+            }
+
+            String sql = "UPDATE empires SET alliance_id = NULL, cash = 2000, reset_reason = ? WHERE id = ?";
+            try (SqlStmt stmt = t.prepare(sql)) {
+                stmt.setString(1, resetReason);
+                stmt.setInt(2, empireID);
+                stmt.update();
+            }
+
+            t.commit();
+        } catch (Exception e) {
+            throw new RequestException(e);
+        }
+    }
+
+    /**
      * Gets the reason (if any) for the resetting of the given empire. Once we're returned this, we'll
      * reset the reason back to NULL.
      */

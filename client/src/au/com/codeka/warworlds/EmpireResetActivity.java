@@ -8,7 +8,7 @@ import android.view.Window;
 import android.widget.Button;
 import au.com.codeka.warworlds.ctrl.TransparentWebView;
 
-/*
+/**
  * This activity is shown when we're notified by the server that the player's empire was
  * reset. Usually that's because their last colony was destroyed.
  */
@@ -30,13 +30,11 @@ public class EmpireResetActivity extends BaseActivity {
         String reason = getIntent().getStringExtra("au.com.codeka.warworlds.ResetReason");
         if (reason == null) {
             msg = TransparentWebView.getHtmlFile(this, "html/empire-reset.html");
+        } else if (reason.equals("as-requested")) {
+            msg = TransparentWebView.getHtmlFile(this, "html/empire-reset-requested.html");
         } else {
             msg = TransparentWebView.getHtmlFile(this, "html/empire-reset-reason.html");
-            if (reason.equals("blitz")) {
-                msg = String.format(msg, "The Blitz realm has been reset! Good luck this month!");
-            } else {
-                msg = String.format(msg, reason);
-            }
+            msg = String.format(msg, reason);
         }
         welcome.loadHtml("html/skeleton.html", msg);
 

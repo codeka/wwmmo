@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -18,6 +19,8 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.text.Html;
+import android.text.method.LinkMovementMethod;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -542,8 +545,9 @@ public class EmpireActivity extends TabFragmentActivity
 
                 SkuDetails decorateEmpireSku = PurchaseManager.i.getInventory().getSkuDetails("decorate_empire");
                 txt = (TextView) mView.findViewById(R.id.custom_shield_desc);
-                txt.setText(String.format(Locale.ENGLISH, txt.getText().toString(),
-                        decorateEmpireSku.getPrice()));
+                txt.setText(Html.fromHtml(String.format(Locale.ENGLISH, txt.getText().toString(),
+                        decorateEmpireSku.getPrice())));
+                txt.setMovementMethod(LinkMovementMethod.getInstance());
 
                 SkuDetails resetEmpireSmallSku = PurchaseManager.i.getInventory().getSkuDetails("reset_empire_small");
                 SkuDetails resetEmpireBigSku = PurchaseManager.i.getInventory().getSkuDetails("reset_empire_big");
@@ -583,6 +587,24 @@ public class EmpireActivity extends TabFragmentActivity
                 @Override
                 public void onClick(View v) {
                     onShieldSaveClick();
+                }
+            });
+
+            final Button empireResetBtn = (Button) mView.findViewById(R.id.reset_empire_btn);
+            empireResetBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    new StyledDialog.Builder(getActivity())
+                        .setMessage(Html.fromHtml("Are you sure you want to reset your empire? This operation is <b>permanent and non-reversible</b>!"))
+                        .setTitle("Reset Empire")
+                        .setPositiveButton("Reset Empire", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                onResetEmpireClick();
+                            }
+                        })
+                        .setNegativeButton("Cancel", null)
+                        .create().show();
                 }
             });
 
@@ -634,7 +656,57 @@ public class EmpireActivity extends TabFragmentActivity
                     EmpireManager.i.getEmpire().changeShieldImage(mNewShieldImage, purchaseInfo);
                 }
             });
+        }
 
+        private void onResetEmpireClick() {
+            final Button empireResetBtn = (Button) mView.findViewById(R.id.reset_empire_btn);
+            empireResetBtn.setEnabled(false);
+
+            // based on how many stars they have, we'll purchase a different in-app purchase for this
+            final MyEmpire myEmpire = EmpireManager.i.getEmpire();
+            myEmpire.requestStars(new MyEmpire.FetchStarsCompleteHandler() {
+                @Override
+                public void onComplete(List<Star> stars) {
+                    int numStarsWithColonies = 0;
+                    for (Star star : stars) {
+                        for (BaseColony colony : star.getColonies()) {
+                            if (colony.getEmpireKey() != null && colony.getEmpireKey().equals(myEmpire.getKey())) {
+                                numStarsWithColonies ++;
+                                break;
+                            }
+                        }
+                    }
+
+                    if (numStarsWithColonies < 5) {
+                        doEmpireReset(null, null);
+                    } else {
+                        String skuName = "reset_empire_small";
+                        if (numStarsWithColonies > 10) {
+                            skuName = "resetEmpire_big";
+                        }
+
+                        final String finalSkuName = skuName;
+                        purchase(skuName, new PurchaseCompleteHandler() {
+                            @Override
+                            public void onPurchaseComplete(Purchase purchaseInfo) {
+                                doEmpireReset(finalSkuName, purchaseInfo);
+                            }
+                        });
+                    }
+                }
+            });
+        }
+
+        private void doEmpireReset(String skuName, Purchase purchaseInfo) {
+            final MyEmpire myEmpire = EmpireManager.i.getEmpire();
+            myEmpire.resetEmpire(skuName, purchaseInfo, new MyEmpire.EmpireResetCompleteHandler() {
+                @Override
+                public void onEmpireReset() {
+                    // redirect you to the 
+                    ServerGreeter.clearHello();
+                    startActivity(new Intent(getActivity(), WarWorldsActivity.class));
+                }
+            });
         }
 
         private void loadShieldImage(String path) {

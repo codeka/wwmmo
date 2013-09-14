@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -334,9 +336,9 @@ public class MyEmpire extends Empire {
     }
 
     public void changeShieldImage(final Bitmap bmp, final Purchase purchaseInfo) {
-        new BackgroundRunner<String>() {
+        new BackgroundRunner<DateTime>() {
             @Override
-            protected String doInBackground() {
+            protected DateTime doInBackground() {
                 String url = "empires/"+getKey()+"/shield";
 
                 try {
@@ -356,7 +358,7 @@ public class MyEmpire extends Empire {
                                     .setDeveloperPayload(purchaseInfo.getDeveloperPayload()))
                             .build();
                     Messages.Empire empire_pb = ApiClient.putProtoBuf(url, pb, Messages.Empire.class);
-                    return empire_pb.getDisplayName();
+                    return new DateTime(empire_pb.getShieldImageLastUpdate() * 1000, DateTimeZone.UTC);
                 } catch(Exception e) {
                     // TODO: handle exceptions
                     log.error(ExceptionUtils.getStackTrace(e));
@@ -365,11 +367,49 @@ public class MyEmpire extends Empire {
             }
 
             @Override
-            protected void onComplete(String name) {
-                mDisplayName = name;
-                EmpireManager.i.fireEmpireUpdated(MyEmpire.this);
+            protected void onComplete(DateTime lastUpdateTime) {
+                if (lastUpdateTime != null) {
+                    mShieldLastUpdate = lastUpdateTime;
+                    EmpireManager.i.fireEmpireUpdated(MyEmpire.this);
+                }
             }
         }.execute();
+    }
+
+    public void resetEmpire(final String skuName, final Purchase purchaseInfo, final EmpireResetCompleteHandler handler) {
+        new BackgroundRunner<Boolean>() {
+            @Override
+            protected Boolean doInBackground() {
+                String url = "empires/"+getKey()+"/reset";
+
+                try {
+                    Messages.EmpireResetRequest.Builder pbuilder = Messages.EmpireResetRequest.newBuilder();
+                    if (purchaseInfo != null) {
+                        SkuDetails sku = PurchaseManager.i.getInventory().getSkuDetails(skuName);
+                        pbuilder.setPurchaseInfo(Messages.PurchaseInfo.newBuilder()
+                                    .setSku(skuName)
+                                    .setToken(purchaseInfo.getToken())
+                                    .setOrderId(purchaseInfo.getOrderId())
+                                    .setPrice(sku.getPrice())
+                                    .setDeveloperPayload(purchaseInfo.getDeveloperPayload()));
+                    }
+                    ApiClient.postProtoBuf(url, pbuilder.build(), null);
+                    return true;
+                } catch(Exception e) {
+                    // TODO: handle exceptions
+                    log.error(ExceptionUtils.getStackTrace(e));
+                    return false;
+                }
+            }
+
+            @Override
+            protected void onComplete(Boolean success) {
+                if (success) {
+                    handler.onEmpireReset();
+                }
+            }
+        }.execute();
+
     }
 
     public static interface ColonizeCompleteHandler {
@@ -390,5 +430,9 @@ public class MyEmpire extends Empire {
 
     public static interface AttackColonyCompleteHandler {
         public void onComplete();
+    }
+
+    public static interface EmpireResetCompleteHandler {
+        public void onEmpireReset();
     }
 }

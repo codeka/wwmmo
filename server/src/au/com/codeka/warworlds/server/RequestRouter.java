@@ -37,7 +37,8 @@ public class RequestRouter extends AbstractHandler {
         sRoutes.add(new Route("empires/({empire_id}[0-9]+)/taxes$", EmpiresTaxesHandler.class));
         sRoutes.add(new Route("empires/({empire_id}[0-9]+)/cash-audit$", EmpiresCashAuditHandler.class));
         sRoutes.add(new Route("empires/({empire_id}[0-9]+)/display-name$", EmpiresDisplayNameHandler.class));
-        sRoutes.add(new Route("empires/({empire_id}[0-9]+)/shield", EmpiresShieldHandler.class));
+        sRoutes.add(new Route("empires/({empire_id}[0-9]+)/shield$", EmpiresShieldHandler.class));
+        sRoutes.add(new Route("empires/({empire_id}[0-9]+)/reset$", EmpireResetHandler.class));
         sRoutes.add(new Route("buildqueue", BuildQueueHandler.class));
         sRoutes.add(new Route("sectors$", SectorsHandler.class));
         sRoutes.add(new Route("stars$", StarsHandler.class));

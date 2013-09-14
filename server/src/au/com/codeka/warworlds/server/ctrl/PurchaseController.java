@@ -1,18 +1,15 @@
 package au.com.codeka.warworlds.server.ctrl;
 
 import org.joda.time.DateTime;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.google.protobuf.Message;
 
 import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.data.SqlStmt;
 import au.com.codeka.warworlds.server.data.Transaction;
 
+import com.google.protobuf.Message;
+
 public class PurchaseController {
-    private static final Logger log = LoggerFactory.getLogger(PurchaseController.class);
     private DataBase db;
 
     public PurchaseController() {

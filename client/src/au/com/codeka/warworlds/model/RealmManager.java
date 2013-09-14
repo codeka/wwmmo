@@ -101,6 +101,8 @@ public class RealmManager {
                 return;
             }
         }
+
+        selectRealm(0, saveSelection);
     }
 
     private void selectRealm(int realmID, boolean saveSelection) {
@@ -111,6 +113,7 @@ public class RealmManager {
             for (Realm realm : mRealms) {
                 if (realm.getID() == realmID) {
                     currentRealm = realm;
+                    realm.getAuthenticator().logout();
                     RealmContext.i.setGlobalRealm(realm);
                 }
             }

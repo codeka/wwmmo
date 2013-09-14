@@ -59,6 +59,10 @@ public class EmpireShieldManager {
         }
     }
 
+    public void flushCachedImage(String empireKey) {
+        mEmpireShields.remove(empireKey);
+    }
+
     /**
      * Gets (or creates, if there isn't one) the \c Bitmap that represents this Empire's
      * shield (i.e. their icon).

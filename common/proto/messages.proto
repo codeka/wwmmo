@@ -201,6 +201,15 @@ message EmpireChangeShieldRequest
 
 
 //
+// A request to reset an empire.
+//
+message EmpireResetRequest
+{
+    optional PurchaseInfo purchase_info = 1;
+}
+
+
+//
 // Contains a mapping of building designs to the number of buildings of that design in
 // your empire. Used to decide whether you can build a certain building, when it has
 // a "maxPerEmpire" restriction.

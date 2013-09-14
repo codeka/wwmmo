@@ -23,6 +23,10 @@ public class Authenticator {
         return (mAuthCookie != null);
     }
 
+    public void logout() {
+        mAuthCookie = null;
+    }
+
     public String getAuthCookie() {
         return mAuthCookie;
     }

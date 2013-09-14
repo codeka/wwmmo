@@ -73,6 +73,7 @@ public class AccountsActivity extends BaseActivity {
             logOutButton.setOnClickListener(new OnClickListener() {
                 public void onClick(View v) {
                     ServerGreeter.clearHello();
+                    RealmManager.i.selectRealm(null);
 
                     unregister();
                     finish();

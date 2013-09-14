@@ -140,6 +140,8 @@ public class EmpireManager {
                 }
             }
         }
+
+        EmpireShieldManager.i.flushCachedImage(empire.getKey());
     }
 
     public void refreshEmpire() {
