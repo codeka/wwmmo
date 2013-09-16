@@ -31,6 +31,10 @@ public class FleetSplitDialog extends DialogFragment {
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
+        if (mFleet == null) {
+            return null;
+        }
+
         LayoutInflater inflater = getActivity().getLayoutInflater();
         mView = inflater.inflate(R.layout.fleet_split_dlg, null);
 

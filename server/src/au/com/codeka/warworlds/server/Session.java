@@ -67,6 +67,9 @@ public class Session {
     public int getEmpireID() {
         return mEmpireID;
     }
+    public void setEmpireID(int empireID) {
+        mEmpireID = empireID;
+    }
     public int getAllianceID() {
         return mAllianceID;
     }

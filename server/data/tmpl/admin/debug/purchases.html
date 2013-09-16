@@ -1,0 +1,38 @@
+{% extends "admin/skeleton.html" %}
+{% block title %}Purchases{% endblock %}
+{% block head %}
+  <style>
+    span.name {
+      font-weight: bold;
+    }
+  </style>
+{% endblock %}
+
+{% block content %}
+  <h1>Purchases</h1>
+  <script>
+    function display_extra(extra) {
+      if (extra.purchase_info.sku == "rename_empire") {
+        document.write("<div><span class='name'>Old name</span>: <span class='value'>"+extra.old_name+"</span></div>");
+        document.write("<div><span class='name'>New name</span>: <span class='value'>"+extra.new_name+"</span></div>");
+      } else if (extra.purchase_info.sku == "decorate_empire") {
+        document.write("<img src='data:image/png;base64,"+extra.png_image+"' />");
+      }
+    }
+  </script>
+  <table border="1" cellpadding="4" cellspacing="0">
+    <tr><th>Time</th><th>Empire</th><th>Purchase</th><th>Price</th><th>Details</th></tr>
+  {% for purchase in purchases %}
+    <tr>
+      <td>{{purchase.time}}</td>
+      <td>{{purchase.empireName}}</td>
+      <td>{{purchase.sku}}</td>
+      <td>{{purchase.price}}</td>
+      <td><script>
+        var extra = {{purchase.skuExtra}};
+        display_extra(extra);
+      </script></td>
+    </tr>
+  {% endfor %}
+  </table>
+{% endblock %}

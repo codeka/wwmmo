@@ -19,8 +19,12 @@ public class EmpiresDisplayNameHandler extends RequestHandler {
             throw new RequestException(403, "Cannot rename someone else's empire.");
         }
 
-        new PurchaseController().addPurchase(empireID, rename_request_pb.getPurchaseInfo(), rename_request_pb);
         Empire empire = new EmpireController().getEmpire(empireID);
+        rename_request_pb = Messages.EmpireRenameRequest.newBuilder(rename_request_pb)
+                .setOldName(empire.getDisplayName())
+                .build();
+
+        new PurchaseController().addPurchase(empireID, rename_request_pb.getPurchaseInfo(), rename_request_pb);
         empire.setName(rename_request_pb.getNewName().trim());
         new EmpireController().update(empire);
 

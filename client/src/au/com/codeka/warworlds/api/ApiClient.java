@@ -20,6 +20,7 @@ import org.w3c.dom.Document;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.os.Handler;
 import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.App;
 import au.com.codeka.warworlds.Notifications;
@@ -242,7 +243,16 @@ public class ApiClient {
                 Messages.NotificationWrapper pb = extractBody(entity, Messages.NotificationWrapper.class);
                 for (Messages.Notification notification_pb : pb.getNotificationsList()) {
                     log.info("got inline-notification: "+notification_pb.getName());
-                    Notifications.displayNotfication(App.i, notification_pb.getName(), notification_pb.getValue());
+
+                    final String name = notification_pb.getName();
+                    final String value = notification_pb.getValue();
+                    Handler handler = new Handler(App.i.getMainLooper());
+                    handler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            Notifications.displayNotfication(App.i, name, value);
+                        }
+                    });
                 }
 
                 if (protoBuffFactory != null) {

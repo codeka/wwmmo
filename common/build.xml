@@ -25,6 +25,7 @@
         <pathelement location="libs/joda-time-2.1.jar"/>
         <pathelement location="libs/slf4j-api-1.7.5.jar"/>
         <pathelement location="libs/commons-lang3-3.1.jar"/>
+        <pathelement location="libs/commons-codec-1.4.jar"/>
     </path>
     <target name="init">
         <mkdir dir="bin"/>

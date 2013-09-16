@@ -92,7 +92,7 @@ public class EnemyEmpireActivity extends BaseActivity
     }
 
     public void onEmpireViewClick() {
-        if (mEmpire.getHomeStar() != null) {
+        if (mEmpire != null && mEmpire.getHomeStar() != null) {
             BaseStar homeStar = mEmpire.getHomeStar();
             Intent intent = new Intent(mContext, StarfieldActivity.class);
             intent.putExtra("au.com.codeka.warworlds.StarKey", homeStar.getKey());

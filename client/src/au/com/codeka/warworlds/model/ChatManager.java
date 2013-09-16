@@ -152,6 +152,11 @@ public class ChatManager implements BackgroundDetector.BackgroundChangeHandler {
      * Adds a new message to the chat list.
      */
     public void addMessage(final ChatMessage msg) {
+        if (mMostRecentMsg == null) {
+            // setup hasn't been called yet...?
+            return;
+        }
+
         synchronized(mMessages) {
             // make sure we don't have this chat already...
             for (ChatMessage existing : mMessages) {

@@ -75,6 +75,9 @@ public abstract class BaseBuildRequest  {
         if (mEndTime.isBefore(now)) {
             return 1.0f;
         }
+        if (mRefreshTime.isAfter(now)) {
+            return mProgress;
+        }
 
         long numerator = new Interval(mRefreshTime, now).toDurationMillis();
         long denominator = new Interval(mRefreshTime, mEndTime).toDurationMillis();

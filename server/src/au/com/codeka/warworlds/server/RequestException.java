@@ -61,6 +61,12 @@ public class RequestException extends Exception {
     }
 
     public Messages.GenericError getGenericError() {
+        if (mGenericError == null) {
+            mGenericError = Messages.GenericError.newBuilder()
+                    .setErrorCode(Messages.GenericError.ErrorCode.UnknownError.getNumber())
+                    .setErrorMessage(getMessage())
+                    .build();
+        }
         return mGenericError;
     }
 }

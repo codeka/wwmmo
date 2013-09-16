@@ -6,6 +6,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.json.JSONException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,6 +45,7 @@ import au.com.codeka.warworlds.ServerGreeter;
 import au.com.codeka.warworlds.ServerGreeter.ServerGreeting;
 import au.com.codeka.warworlds.StyledDialog;
 import au.com.codeka.warworlds.TabFragmentActivity;
+import au.com.codeka.warworlds.Util;
 import au.com.codeka.warworlds.WarWorldsActivity;
 import au.com.codeka.warworlds.ctrl.BuildQueueList;
 import au.com.codeka.warworlds.ctrl.ColonyList;
@@ -737,6 +739,22 @@ public class EmpireActivity extends TabFragmentActivity
         }
 
         private void purchase(String sku, final PurchaseCompleteHandler onComplete) {
+            if (Util.isDebug()) {
+                try {
+                    onComplete.onPurchaseComplete(new Purchase("{" +
+                            "\"orderId\": \"\"," +
+                            "\"packageName\": \"au.com.codeka.warworlds\"," +
+                            "\"productId\": \"" + sku + "\"," +
+                            "\"purchaseTime\": 0," +
+                            "\"purchaseState\": 0," +
+                            "\"developerPayload\": \"\"," +
+                            "\"token\": \"\"" +
+                            "}", ""));
+                } catch (JSONException e) {
+                }
+                return;
+            }
+
             try {
                 PurchaseManager.i.launchPurchaseFlow(getActivity(), sku, new IabHelper.OnIabPurchaseFinishedListener() {
                     @Override

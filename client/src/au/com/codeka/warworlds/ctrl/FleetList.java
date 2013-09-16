@@ -456,6 +456,9 @@ public class FleetList extends FrameLayout implements StarManager.StarFetchedHan
 
             // if we don't own this fleet, we also can't do anything with it.
             Fleet fleet = (Fleet) mEntries.get(position).value;
+            if (fleet.getEmpireKey() == null) {
+                return false;
+            }
             if (!fleet.getEmpireKey().equals(mMyEmpire.getKey())) {
                 return false;
             }

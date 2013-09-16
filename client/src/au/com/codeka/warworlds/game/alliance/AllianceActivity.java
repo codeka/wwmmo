@@ -169,13 +169,14 @@ public class AllianceActivity extends TabFragmentActivity
                     }
                 }
 
-                Collections.sort(alliances, new Comparator<Alliance>() {
+                ArrayList<Alliance> sorted = new ArrayList<Alliance>(alliances);
+                Collections.sort(sorted, new Comparator<Alliance>() {
                     @Override
                     public int compare(Alliance lhs, Alliance rhs) {
                         if (lhs.getNumMembers() == rhs.getNumMembers()) {
                             return lhs.getName().compareTo(rhs.getName());
                         } else {
-                            return lhs.getNumMembers() - rhs.getNumMembers();
+                            return rhs.getNumMembers() - lhs.getNumMembers();
                         }
                     }
                 });
@@ -185,11 +186,22 @@ public class AllianceActivity extends TabFragmentActivity
                     mEntries.add(new ItemEntry(myAlliance));
                     mEntries.add(new ItemEntry(null));
                 }
-                for (Alliance alliance : alliances) {
+                for (Alliance alliance : sorted) {
                     mEntries.add(new ItemEntry(alliance));
                 }
 
                 notifyDataSetChanged();
+            }
+
+            @Override
+            public int getViewTypeCount() {
+                return 2;
+            }
+            
+            @Override
+            public int getItemViewType(int position) {
+                ItemEntry entry = mEntries.get(position);
+                return (entry.alliance == null ? 0 : 1);
             }
 
             @Override
@@ -233,14 +245,14 @@ public class AllianceActivity extends TabFragmentActivity
                     } else {
                         view = inflater.inflate(R.layout.alliance_overview_rank_row, null);
                     }
+                }
 
-                    if (entry.alliance != null) {
-                        TextView allianceName = (TextView) view.findViewById(R.id.alliance_name);
-                        allianceName.setText(entry.alliance.getName());
+                if (entry.alliance != null) {
+                    TextView allianceName = (TextView) view.findViewById(R.id.alliance_name);
+                    allianceName.setText(entry.alliance.getName() + ":" + entry.alliance.getKey());
 
-                        TextView allianceMembers = (TextView) view.findViewById(R.id.alliance_num_members);
-                        allianceMembers.setText(String.format("Members: %d", entry.alliance.getNumMembers()));
-                    }
+                    TextView allianceMembers = (TextView) view.findViewById(R.id.alliance_num_members);
+                    allianceMembers.setText(String.format("Members: %d", entry.alliance.getNumMembers()));
                 }
 
                 return view;

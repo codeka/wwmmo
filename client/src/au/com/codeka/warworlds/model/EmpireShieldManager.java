@@ -14,6 +14,9 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import android.content.Context;
 import android.content.res.AssetManager;
 import android.graphics.Bitmap;
@@ -26,6 +29,7 @@ import au.com.codeka.warworlds.api.ApiClient;
 import au.com.codeka.warworlds.api.ApiException;
 
 public class EmpireShieldManager {
+    private static final Logger log = LoggerFactory.getLogger(EmpireShieldManager.class);
     public static EmpireShieldManager i = new EmpireShieldManager();
 
     private Bitmap sBaseShield;
@@ -76,6 +80,8 @@ public class EmpireShieldManager {
 
         if (bmp == null) {
             if (empire.getShieldLastUpdate() != null) {
+                log.info(String.format("Getting shield image for empire [key=%s last_update=%s]",
+                        empire.getKey(), empire.getShieldLastUpdate()));
                 Bitmap shieldBitmap = loadCachedShieldImage(context, Integer.parseInt(empire.getKey()),
                         empire.getShieldLastUpdate().getMillis());
                 if (shieldBitmap == null) {

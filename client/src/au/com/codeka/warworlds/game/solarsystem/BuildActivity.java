@@ -252,7 +252,9 @@ public class BuildActivity extends BaseActivity implements StarManager.StarFetch
         @Override
         public void setPrimaryItem(ViewGroup container, int position, Object object) {
             super.setPrimaryItem(container, position, object);
-            refreshColonyDetails(mColonies.get(position));
+            if (mColonies != null) {
+                refreshColonyDetails(mColonies.get(position));
+            }
         }
     }
 

@@ -1,5 +1,8 @@
 package au.com.codeka.warworlds.server.handlers;
 
+import java.awt.Image;
+import java.awt.geom.AffineTransform;
+import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -39,8 +42,14 @@ public class EmpiresShieldHandler extends RequestHandler {
             log.error("Exception caught loading image, assuming invalid!", e);
             throw new RequestException(400, GenericError.ErrorCode.InvalidImage, "Supplied image is not valid.");
         }
-        if (img.getWidth() > 200 || img.getHeight() > 200) {
-            throw new RequestException(400, GenericError.ErrorCode.ShieldImageTooBig, "Image is too big.");
+        if (img.getWidth() > 128 || img.getHeight() > 128) {
+            // if it's bigger than 128x128, we'll resize it here so that we don't ever store images
+            // that are too big to actually display.
+            BufferedImage after = new BufferedImage(128, 128, BufferedImage.TYPE_INT_ARGB);
+            AffineTransform at = new AffineTransform();
+            at.scale(128.0 / img.getWidth(), 128.0 / img.getHeight());
+            AffineTransformOp scaleOp = new AffineTransformOp(at, AffineTransformOp.TYPE_BILINEAR);
+            after = scaleOp.filter(img, after);
         }
 
         ByteArrayOutputStream png = new ByteArrayOutputStream();
