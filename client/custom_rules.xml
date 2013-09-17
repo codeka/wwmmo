@@ -8,17 +8,8 @@
   <target name="-pre-build">
     <ant antfile="build_dependencies.xml" target="build_dependencies" />
 
-    <exec executable="svnversion" outputproperty="svnversion"/>
-    <propertyregex property="svnversion"
-                   input="${svnversion}"
-                   regexp="([0-9]+).*"
-                   replace="\1"
-                   global="true" />
-
     <propertyfile file="version.properties" comment="Version info">
-      <entry key="build.date" type="date" value="now" pattern="yyyyMMdd" />
       <entry key="build.number" default="0" type="int" operation="+" value="1" />
-      <entry key="build.svn" type="int" value="${svnversion}" />
     </propertyfile>
     <loadproperties srcFile="version.properties" />
 
@@ -51,7 +42,7 @@
         <replaceregexp file="AndroidManifest.xml"
                        match="android:versionName=&quot;(.*)&quot;"
                        flags="g"
-                       replace="android:versionName=&quot;0.3.${build.svn}&quot;" />
+                       replace="android:versionName=&quot;0.3.${build.number}&quot;" />
       </then>
     </if>
   </target>
