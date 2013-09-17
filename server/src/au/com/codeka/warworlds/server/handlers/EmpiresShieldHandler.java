@@ -1,6 +1,5 @@
 package au.com.codeka.warworlds.server.handlers;
 
-import java.awt.Image;
 import java.awt.geom.AffineTransform;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
