@@ -9,10 +9,11 @@ import org.joda.time.DateTime;
 
 import android.content.Context;
 import android.os.Handler;
+import android.util.SparseArray;
 import au.com.codeka.BackgroundRunner;
+import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.BackgroundDetector;
 import au.com.codeka.warworlds.api.ApiClient;
-import au.com.codeka.common.protobuf.Messages;
 
 /**
  * This class keeps track of chats and what-not.
@@ -33,12 +34,14 @@ public class ChatManager implements BackgroundDetector.BackgroundChangeHandler {
     private boolean mRequesting;
     private TreeSet<String> mEmpiresToRefresh;
     private Handler mHandler;
+    private SparseArray<ChatConversation> mConversations;
 
     private ChatManager() {
         mMessages = new LinkedList<ChatMessage>();
         mMessageAddedListeners = new ArrayList<MessageAddedListener>();
         mMessageUpdatedListeners = new ArrayList<MessageUpdatedListener>();
         mEmpiresToRefresh = new TreeSet<String>();
+        mConversations = new SparseArray<ChatConversation>();
     }
 
     /**
@@ -198,6 +201,52 @@ public class ChatManager implements BackgroundDetector.BackgroundChangeHandler {
         fireMessageAddedListeners(msg);
     }
 
+    /**
+     * Start a new conversation with the given empireID.
+     */
+    public void startConversation(final String empireID, final ConversationStartedListener handler) {
+        // if we already have a conversation going with this guy, just reuse that one.
+        for (int index = 0; index < mConversations.size(); index++) {
+            ChatConversation conversation = mConversations.valueAt(index);
+            List<Integer> empireIDs = conversation.getEmpireIDs();
+            if (empireIDs.size() != 2) {
+                continue;
+            }
+            if (empireIDs.get(0) == Integer.parseInt(empireID) ||
+                empireIDs.get(1) == Integer.parseInt(empireID)) {
+                handler.onConversationStarted(conversation);
+            }
+        }
+
+        new BackgroundRunner<ChatConversation>() {
+            @Override
+            protected ChatConversation doInBackground() {
+                try {
+                    Messages.ChatConversation conversation_pb = Messages.ChatConversation.newBuilder()
+                            .addEmpireIds(Integer.parseInt(EmpireManager.i.getEmpire().getKey()))
+                            .addEmpireIds(Integer.parseInt(empireID))
+                            .build();
+
+                    conversation_pb = ApiClient.postProtoBuf("chat/conversations", conversation_pb, Messages.ChatConversation.class);
+
+                    ChatConversation conversation = new ChatConversation();
+                    conversation.fromProtocolBuffer(conversation_pb);
+                    return conversation;
+                } catch (Exception e) {
+                    return null;
+                }
+            }
+
+            @Override
+            protected void onComplete(ChatConversation conversation) {
+                if (conversation != null) {
+                    mConversations.put(conversation.getID(), conversation);
+                    handler.onConversationStarted(conversation);
+                }
+            }
+        }.execute();
+    }
+
     private void refreshEmpires() {
         List<String> empireKeys;
         synchronized(mEmpiresToRefresh) {
@@ -279,5 +328,8 @@ public class ChatManager implements BackgroundDetector.BackgroundChangeHandler {
     }
     public interface MessageUpdatedListener {
         void onMessageUpdated(ChatMessage msg);
+    }
+    public interface ConversationStartedListener {
+        void onConversationStarted(ChatConversation conversation);
     }
 }

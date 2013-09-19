@@ -14,6 +14,8 @@ import au.com.codeka.Clipboard;
 import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.StyledDialog;
+import au.com.codeka.warworlds.model.ChatConversation;
+import au.com.codeka.warworlds.model.ChatManager;
 import au.com.codeka.warworlds.model.ChatMessage;
 import au.com.codeka.warworlds.model.Empire;
 import au.com.codeka.warworlds.model.EmpireManager;
@@ -59,6 +61,21 @@ public class ChatMessageDialog extends DialogFragment {
                     intent.putExtra("au.com.codeka.warworlds.EmpireKey", mEmpire.getKey());
                     getActivity().startActivity(intent);
                 }
+
+                dismiss();
+            }
+        });
+
+        Button privateMessageBtn = (Button) mView.findViewById(R.id.private_message_btn);
+        privateMessageBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ChatManager.getInstance().startConversation(mEmpire.getKey(), new ChatManager.ConversationStartedListener() {
+                    @Override
+                    public void onConversationStarted(ChatConversation conversation) {
+                        // TODO
+                    }
+                });
 
                 dismiss();
             }

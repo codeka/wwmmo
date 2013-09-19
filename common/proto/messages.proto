@@ -47,6 +47,7 @@ message GenericError
         InvalidImage = 18;
         ShieldImageTooBig = 19;
         EmpireNameExists = 20;
+        InvalidConversation = 21;
     }
 }
 
@@ -396,6 +397,21 @@ message ChatMessages
     repeated ChatMessage messages = 1;
 }
 
+
+//
+// A conversation is a private chat between two or more participants.
+//
+message ChatConversation
+{
+    optional int32 id = 1;
+    repeated int32 empire_ids = 2;
+}
+
+
+message ChatConversations
+{
+    repeated ChatConversation conversations = 1;
+}
 
 //
 // Represents a "sector" of space, containing a number of stars and whatnot.
