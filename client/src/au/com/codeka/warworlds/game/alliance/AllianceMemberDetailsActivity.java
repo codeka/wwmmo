@@ -182,10 +182,12 @@ public class AllianceMemberDetailsActivity extends BaseActivity
         }
 
         // you can't vote to kick yourself, so just disable the button
-        if (mEmpire == null || mEmpire.getKey().equals(EmpireManager.i.getEmpire().getKey())) {
-            kickBtn.setEnabled(false);
-        } else {
-            kickBtn.setEnabled(true);
+        if (kickBtn != null) {
+            if (mEmpire == null || mEmpire.getKey().equals(EmpireManager.i.getEmpire().getKey())) {
+                kickBtn.setEnabled(false);
+            } else {
+                kickBtn.setEnabled(true);
+            }
         }
     }
 }

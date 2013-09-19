@@ -12,6 +12,7 @@ import org.joda.time.format.DateTimeFormatter;
 
 import android.text.Html;
 import au.com.codeka.common.model.BaseChatMessage;
+import au.com.codeka.common.protobuf.Messages;
 
 public class ChatMessage extends BaseChatMessage {
     private static DateTimeFormatter sChatDateFormat;
@@ -73,7 +74,7 @@ public class ChatMessage extends BaseChatMessage {
      * ChatActivity. It actually returns a snippet of formatted text, hence the
      * CharSequence.
      */
-    public CharSequence format(Location location, boolean autoTranslate) {
+    public CharSequence format(Location location, boolean messageOnly, boolean autoTranslate) {
         String msg = mMessage;
         boolean wasTranslated = false;
         if (mMessageEn != null && autoTranslate) {
@@ -94,13 +95,17 @@ public class ChatMessage extends BaseChatMessage {
             } else {
                 isFriendly = true;
             }
-            msg = mEmpire.getDisplayName() + " : " + msg;
+            if (!messageOnly) {
+                msg = mEmpire.getDisplayName() + " : " + msg;
+            }
         } else if (mEmpireKey == null && mDatePosted != null) {
             isServer = true;
-            msg = "[SERVER] : " + msg;
+            if (!messageOnly) {
+                msg = "[SERVER] : " + msg;
+            }
         }
 
-        if (mDatePosted != null) {
+        if (mDatePosted != null && !messageOnly) {
             msg = mDatePosted.withZone(DateTimeZone.getDefault()).toString(sChatDateFormat) + " : " + msg;
         }
 
@@ -178,5 +183,16 @@ public class ChatMessage extends BaseChatMessage {
         });
 
         return replacer.replace(line);
+    }
+
+    @Override
+    public void toProtocolBuffer(Messages.ChatMessage.Builder pb, boolean encodeHtml) {
+        super.toProtocolBuffer(pb, encodeHtml);
+    }
+
+    public Messages.ChatMessage toProtocolBuffer() {
+        Messages.ChatMessage.Builder pb = Messages.ChatMessage.newBuilder();
+        toProtocolBuffer(pb, false);
+        return pb.build();
     }
 }

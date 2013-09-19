@@ -1,8 +1,12 @@
 package au.com.codeka.warworlds.game;
 
-import java.util.List;
+import java.util.ArrayList;
 
+import org.joda.time.DateTimeZone;
+
+import android.content.Context;
 import android.content.DialogInterface;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
@@ -10,16 +14,20 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.text.method.LinkMovementMethod;
+import android.view.ContextMenu;
+import android.view.ContextMenu.ContextMenuInfo;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.inputmethod.EditorInfo;
+import android.widget.AdapterView;
+import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.LinearLayout;
-import android.widget.ScrollView;
+import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
 import au.com.codeka.warworlds.BaseActivity;
@@ -29,8 +37,10 @@ import au.com.codeka.warworlds.StyledDialog;
 import au.com.codeka.warworlds.Util;
 import au.com.codeka.warworlds.model.ChatManager;
 import au.com.codeka.warworlds.model.ChatMessage;
-import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.ChatMessage.Location;
+import au.com.codeka.warworlds.model.Empire;
+import au.com.codeka.warworlds.model.EmpireManager;
+import au.com.codeka.warworlds.model.EmpireShieldManager;
 
 public class ChatActivity extends BaseActivity {
     private ChatPagerAdapter mChatPagerAdapter;
@@ -109,10 +119,8 @@ public class ChatActivity extends BaseActivity {
                                      implements ChatManager.MessageAddedListener,
                                                 ChatManager.MessageUpdatedListener {
         private ChatMessage.Location mChatLocation;
-        private ScrollView mScrollView;
-        private LinearLayout mChatOutput;
+        private ChatAdapter mChatAdapter;
         private Handler mHandler;
-        private boolean mScrollPosted;
         private boolean mAutoTranslate;
 
         @Override
@@ -127,11 +135,28 @@ public class ChatActivity extends BaseActivity {
         }
 
         @Override
-        public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        public View onCreateView(final LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
             View v = inflater.inflate(R.layout.chat_page, container, false);
 
-            mScrollView = (ScrollView) v;
-            mChatOutput = (LinearLayout) v.findViewById(R.id.chat_output);
+            mChatAdapter = new ChatAdapter();
+            final ListView chatOutput = (ListView) v.findViewById(R.id.chat_output);
+            chatOutput.setAdapter(mChatAdapter);
+           // registerForContextMenu(chatOutput);
+
+            chatOutput.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view,
+                        int position, long id) {
+                    ChatMessage msg = (ChatMessage) mChatAdapter.getItem(position);
+
+                    ChatMessageDialog dialog = new ChatMessageDialog();
+                    Bundle args = new Bundle();
+                    args.putByteArray("au.com.codeka.warworlds.ChatMessage", ((ChatMessage) msg).toProtocolBuffer().toByteArray());
+                    args.putByteArray("au.com.codeka.warworlds.Empire", ((Empire) msg.getEmpire()).toProtocolBuffer().toByteArray());
+                    dialog.setArguments(args);
+                    dialog.show(getActivity().getSupportFragmentManager(), "");
+                }
+            });
 
             return v;
         }
@@ -148,24 +173,8 @@ public class ChatActivity extends BaseActivity {
 
         @Override
         public void onMessageUpdated(ChatMessage msg) {
-            for (int i = 0; i < mChatOutput.getChildCount(); i++) {
-                TextView tv = (TextView) mChatOutput.getChildAt(i);
-                ChatMessage other = (ChatMessage) tv.getTag();
-                if (other == null || other.getDatePosted() == null) {
-                    continue;
-                }
-
-                if (other.getEmpireKey() == null | msg.getEmpireKey() == null) {
-                    continue;
-                }
-
-                if (other.getDatePosted().equals(msg.getDatePosted()) &&
-                    other.getEmpireKey().equals(msg.getEmpireKey())) {
-                    tv.setText(msg.format(mChatLocation, mAutoTranslate));
-                }
-            }
+            mChatAdapter.notifyDataSetChanged();
         }
-
 
         @Override
         public void onStart() {
@@ -183,12 +192,13 @@ public class ChatActivity extends BaseActivity {
         }
 
         private void refreshMessages() {
-            mChatOutput.removeAllViews();
-
-            List<ChatMessage> msgs = ChatManager.getInstance().getAllMessages();
-            for(ChatMessage msg : msgs) {
-                appendMessage(msg);
+            ArrayList<ChatMessage> allMessages = new ArrayList<ChatMessage>();
+            for (ChatMessage msg : ChatManager.getInstance().getAllMessages()) {
+                if (msg.shouldDisplay(mChatLocation)) {
+                    allMessages.add(msg);
+                }
             }
+            mChatAdapter.setMessages(allMessages);
         }
 
         private void appendMessage(final ChatMessage msg) {
@@ -196,23 +206,72 @@ public class ChatActivity extends BaseActivity {
                 return;
             }
 
-            TextView tv = new TextView(getActivity());
-            tv.setText(msg.format(mChatLocation, mAutoTranslate));
-            tv.setMovementMethod(LinkMovementMethod.getInstance());
-            tv.setTag(msg);
-            mChatOutput.addView(tv);
+            mChatAdapter.appendMessage(msg);
+        }
 
-            // need to wait for it to settle before we scroll again
-            if (!mScrollPosted) {
-                mScrollPosted = true;
-                mScrollView.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        mScrollPosted = false;
-                        mScrollView.fullScroll(ScrollView.FOCUS_DOWN);
-                    }
-                }, 15);
+        private class ChatAdapter extends BaseAdapter {
+            private ArrayList<ChatMessage> mMessages;
+
+            public ChatAdapter() {
+                mMessages = new ArrayList<ChatMessage>();
             }
+
+            public void setMessages(ArrayList<ChatMessage> messages) {
+                mMessages = messages;
+                notifyDataSetChanged();
+            }
+
+            public void appendMessage(ChatMessage msg) {
+                mMessages.add(msg);
+                notifyDataSetChanged();
+            }
+
+            @Override
+            public int getCount() {
+                return mMessages.size();
+            }
+
+            @Override
+            public Object getItem(int position) {
+                return mMessages.get(position);
+            }
+
+            @Override
+            public long getItemId(int position) {
+                return position;
+            }
+
+            @Override
+            public View getView(int position, View convertView, ViewGroup parent) {
+                View view = convertView;
+                if (view == null) {
+                    LayoutInflater inflater = (LayoutInflater) getActivity().getSystemService
+                            (Context.LAYOUT_INFLATER_SERVICE);
+                    view = inflater.inflate(R.layout.chat_row, null);
+                }
+
+                ImageView empireIcon = (ImageView) view.findViewById(R.id.empire_icon);
+                TextView empireName = (TextView) view.findViewById(R.id.empire_name);
+                TextView msgTime = (TextView) view.findViewById(R.id.msg_time);
+                TextView message = (TextView) view.findViewById(R.id.message);
+
+                ChatMessage msg = mMessages.get(position);
+                if (msg.getEmpire() != null) {
+                    Bitmap shield = EmpireShieldManager.i.getShield(getActivity(), (Empire) msg.getEmpire());
+                    empireName.setText(msg.getEmpire().getDisplayName());
+                    empireIcon.setImageBitmap(shield);
+                } else {
+                    empireIcon.setImageBitmap(null);
+                    empireName.setText("");
+                }
+
+                msgTime.setText(msg.getDatePosted().withZone(DateTimeZone.getDefault()).toString("h:mm a"));
+                message.setText(msg.format(mChatLocation, true, mAutoTranslate));
+                message.setMovementMethod(LinkMovementMethod.getInstance());
+
+                return view;
+            }
+            
         }
     }
 
