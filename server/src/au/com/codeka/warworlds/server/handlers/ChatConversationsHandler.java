@@ -10,6 +10,20 @@ import au.com.codeka.warworlds.server.model.ChatConversation;
 
 public class ChatConversationsHandler extends RequestHandler {
 
+    /** Gets the list of conversations the current empire is part of. */
+    @Override
+    protected void get() throws RequestException {
+        int empireID = getSession().getEmpireID();
+
+        Messages.ChatConversations.Builder conversations_pb = Messages.ChatConversations.newBuilder();
+        for (ChatConversation conversation : new ChatController().getConversationsForEmpire(empireID)) {
+            Messages.ChatConversation.Builder conversation_pb = Messages.ChatConversation.newBuilder();
+            conversation.toProtocolBuffer(conversation_pb);
+            conversations_pb.addConversations(conversation_pb);
+        }
+        setResponseBody(conversations_pb.build());
+    }
+
     @Override
     protected void post() throws RequestException {
         Messages.ChatConversation pb = getRequestBody(Messages.ChatConversation.class);

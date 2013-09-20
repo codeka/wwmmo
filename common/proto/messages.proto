@@ -382,6 +382,7 @@ message NotificationWrapper {
 //
 message ChatMessage
 {
+    optional int32 id = 7;
     required string message = 1;
     optional string empire_key = 2;
     optional int64 date_posted = 3;
@@ -390,6 +391,8 @@ message ChatMessage
     // if the message was auto-translated to english, this will be the english
     // translation.
     optional string message_en = 5;
+
+    optional int32 conversation_id = 6;
 }
 
 message ChatMessages

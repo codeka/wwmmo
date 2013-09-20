@@ -1,7 +1,6 @@
 package au.com.codeka.warworlds.server.model;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import au.com.codeka.common.model.BaseChatConversation;
 

@@ -259,7 +259,7 @@ public class ServerGreeter {
                     mHelloComplete = true;
                 } else if (!mErrorOccured) {
                     Util.setup(activity);
-                    ChatManager.getInstance().setup(activity);
+                    ChatManager.i.setup(activity);
 
                     // make sure we're correctly registered as online.
                     BackgroundDetector.getInstance().onBackgroundStatusChange(activity);

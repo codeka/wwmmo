@@ -1,6 +1,7 @@
 package au.com.codeka.warworlds.game;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.joda.time.DateTimeZone;
 
@@ -33,9 +34,9 @@ import au.com.codeka.warworlds.GlobalOptions;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.StyledDialog;
 import au.com.codeka.warworlds.Util;
+import au.com.codeka.warworlds.model.ChatConversation;
 import au.com.codeka.warworlds.model.ChatManager;
 import au.com.codeka.warworlds.model.ChatMessage;
-import au.com.codeka.warworlds.model.ChatMessage.Location;
 import au.com.codeka.warworlds.model.Empire;
 import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.EmpireShieldManager;
@@ -43,6 +44,7 @@ import au.com.codeka.warworlds.model.EmpireShieldManager;
 public class ChatActivity extends BaseActivity {
     private ChatPagerAdapter mChatPagerAdapter;
     private ViewPager mViewPager;
+    private List<ChatConversation> mConversations;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -50,7 +52,14 @@ public class ChatActivity extends BaseActivity {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.chat);
 
+        mConversations = ChatManager.i.getConversations();
+        // swap alliance and global around...
+        ChatConversation globalConversation = mConversations.get(1);
+        mConversations.set(1, mConversations.get(0));
+        mConversations.set(0, globalConversation);
+
         mChatPagerAdapter = new ChatPagerAdapter(getSupportFragmentManager());
+        mChatPagerAdapter.refresh(mConversations);
         mViewPager = (ViewPager) findViewById(R.id.pager);
         mViewPager.setAdapter(mChatPagerAdapter);
 
@@ -77,33 +86,36 @@ public class ChatActivity extends BaseActivity {
     }
 
     public class ChatPagerAdapter extends FragmentStatePagerAdapter {
+        List<ChatConversation> mConversations;
+
         public ChatPagerAdapter(FragmentManager fm) {
             super(fm);
+            mConversations = new ArrayList<ChatConversation>();
+        }
+
+        public void refresh(List<ChatConversation> conversations) {
+            mConversations = conversations;
+            notifyDataSetChanged();
         }
 
         @Override
         public Fragment getItem(int i) {
             Fragment fragment = new ChatFragment();
             Bundle args = new Bundle();
-            args.putInt("au.com.codeka.warworlds.ChatLocation", ChatMessage.Location.values()[i].getNumber());
+            args.putInt("au.com.codeka.warworlds.ConversationID", mConversations.get(i).getID());
             fragment.setArguments(args);
             return fragment;
         }
 
         @Override
         public int getCount() {
-            return ChatMessage.Location.values().length;
+            return mConversations.size();
         }
 
         @Override
         public CharSequence getPageTitle(int position) {
-            switch(Location.fromNumber(position)) {
-            case PUBLIC_CHANNEL:
-                return "Global";
-            case ALLIANCE_CHANNEL:
-                return "Alliance";
-            }
-            return "";
+            ChatConversation conversation = mConversations.get(position);
+            return String.format("Chat #"+conversation.getID());
         }
 
         @Override
@@ -116,7 +128,7 @@ public class ChatActivity extends BaseActivity {
     public static class ChatFragment extends Fragment
                                      implements ChatManager.MessageAddedListener,
                                                 ChatManager.MessageUpdatedListener {
-        private ChatMessage.Location mChatLocation;
+        private ChatConversation mConversation;
         private ChatAdapter mChatAdapter;
         private Handler mHandler;
         private boolean mAutoTranslate;
@@ -126,7 +138,7 @@ public class ChatActivity extends BaseActivity {
             super.onCreate(savedInstanceState);
 
             Bundle args = getArguments();
-            mChatLocation = ChatMessage.Location.fromNumber(args.getInt("au.com.codeka.warworlds.ChatLocation"));
+            mConversation = ChatManager.i.getConversationByID(args.getInt("au.com.codeka.warworlds.ConversationID"));
             mHandler = new Handler();
 
             mAutoTranslate = new GlobalOptions().autoTranslateChatMessages();
@@ -139,7 +151,6 @@ public class ChatActivity extends BaseActivity {
             mChatAdapter = new ChatAdapter();
             final ListView chatOutput = (ListView) v.findViewById(R.id.chat_output);
             chatOutput.setAdapter(mChatAdapter);
-           // registerForContextMenu(chatOutput);
 
             chatOutput.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
@@ -177,33 +188,24 @@ public class ChatActivity extends BaseActivity {
         @Override
         public void onStart() {
             super.onStart();
-            ChatManager.getInstance().addMessageAddedListener(this);
-            ChatManager.getInstance().addMessageUpdatedListener(this);
+            mConversation.addMessageAddedListener(this);
+            mConversation.addMessageUpdatedListener(this);
             refreshMessages();
         }
 
         @Override
         public void onStop() {
             super.onStop();
-            ChatManager.getInstance().removeMessageAddedListener(this);
-            ChatManager.getInstance().removeMessageUpdatedListener(this);
+            mConversation.removeMessageAddedListener(this);
+            mConversation.removeMessageUpdatedListener(this);
         }
 
         private void refreshMessages() {
-            ArrayList<ChatMessage> allMessages = new ArrayList<ChatMessage>();
-            for (ChatMessage msg : ChatManager.getInstance().getAllMessages()) {
-                if (msg.shouldDisplay(mChatLocation)) {
-                    allMessages.add(msg);
-                }
-            }
+            ArrayList<ChatMessage> allMessages = new ArrayList<ChatMessage>(mConversation.getAllMessages());
             mChatAdapter.setMessages(allMessages);
         }
 
         private void appendMessage(final ChatMessage msg) {
-            if (!msg.shouldDisplay(mChatLocation)) {
-                return;
-            }
-
             mChatAdapter.appendMessage(msg);
         }
 
@@ -264,7 +266,7 @@ public class ChatActivity extends BaseActivity {
                 }
 
                 msgTime.setText(msg.getDatePosted().withZone(DateTimeZone.getDefault()).toString("h:mm a"));
-                message.setText(msg.format(mChatLocation, true, mAutoTranslate));
+                message.setText(msg.format(mConversation.getID() == 0, true, mAutoTranslate));
                 message.setMovementMethod(LinkMovementMethod.getInstance());
 
                 return view;
@@ -285,10 +287,8 @@ public class ChatActivity extends BaseActivity {
         msg.setMessage(message);
         msg.setEmpire(EmpireManager.i.getEmpire());
 
-        ChatMessage.Location location = ChatMessage.Location.fromNumber(mViewPager.getCurrentItem());
-        if (location == ChatMessage.Location.ALLIANCE_CHANNEL) {
-            msg.setAllianceChat(true);
-        }
+        ChatConversation conversation = mConversations.get(mViewPager.getCurrentItem());
+        msg.setConversation(conversation);
 
         // if this is our first chat after the update ...
         if (!Util.getSharedPreferences().getBoolean("au.com.codeka.warworlds.ChatAskedAboutTranslation", false)) {
@@ -303,8 +303,7 @@ public class ChatActivity extends BaseActivity {
         }
 
         chatMsg.setText("");
-
-        ChatManager.getInstance().postMessage(msg);
+        ChatManager.i.postMessage(msg);
     }
 
     private void showConfirmAutoTranslateDialog() {

@@ -7,12 +7,14 @@ import org.joda.time.DateTimeZone;
 import au.com.codeka.common.protobuf.Messages;
 
 public class BaseChatMessage {
+    protected int mID;
     protected String mMessage;
     protected String mEmpireKey;
     protected String mAllianceKey;
     protected BaseEmpire mEmpire;
     protected DateTime mDatePosted;
     protected String mMessageEn;
+    protected Integer mConversationID;
 
     public BaseChatMessage() {
         mDatePosted = new DateTime(DateTimeZone.UTC);
@@ -21,6 +23,9 @@ public class BaseChatMessage {
         mMessage = message;
     }
 
+    public int getID() {
+        return mID;
+    }
     public String getMessage() {
         return mMessage;
     }
@@ -55,43 +60,14 @@ public class BaseChatMessage {
     public String getEnglishMessage() {
         return mMessageEn;
     }
-
-    /**
-     * We format messages slightly differently depending on whether it's an
-     * alliance chat, private message, public message and where it's actually being
-     * displayed. This enum is used to describe which channel we're displaying.
-     */
-    public enum Location {
-        PUBLIC_CHANNEL(0),
-        ALLIANCE_CHANNEL(1);
-
-        private int mNumber;
-
-        Location(int number) {
-            mNumber = number;
-        }
-
-        public int getNumber() {
-            return mNumber;
-        }
-
-        public static Location fromNumber(int number) {
-            return Location.values()[number];
-        }
-    }
-
-    /**
-     * Determines whether this chat message should be visible in the given location.
-     */
-    public boolean shouldDisplay(Location location) {
-        if (location == Location.ALLIANCE_CHANNEL) {
-            return (mAllianceKey != null);
-        } else {
-            return true;
-        }
+    public Integer getConversationID() {
+        return mConversationID;
     }
 
     public void fromProtocolBuffer(Messages.ChatMessage pb) {
+        if (pb.hasId()) {
+            mID = pb.getId();
+        }
         mMessage = pb.getMessage();
         if (pb.getEmpireKey() != null && !pb.getEmpireKey().equals("")) {
             mEmpireKey = pb.getEmpireKey();
@@ -103,9 +79,13 @@ public class BaseChatMessage {
         if (pb.hasMessageEn() && !pb.getMessageEn().equals("")) {
             mMessageEn = pb.getMessageEn();
         }
+        if (pb.hasConversationId()) {
+            mConversationID = pb.getConversationId();
+        }
     }
 
     public void toProtocolBuffer(Messages.ChatMessage.Builder pb, boolean encodeHtml) {
+        pb.setId(mID);
         if (encodeHtml) {
             pb.setMessage(StringEscapeUtils.escapeHtml4(mMessage));
         } else {
@@ -120,6 +100,9 @@ public class BaseChatMessage {
         pb.setDatePosted(mDatePosted.getMillis() / 1000);
         if (mMessageEn != null && mMessageEn.length() > 0) {
             pb.setMessageEn(mMessageEn);
+        }
+        if (mConversationID != null) {
+            pb.setConversationId(mConversationID);
         }
     }
 }

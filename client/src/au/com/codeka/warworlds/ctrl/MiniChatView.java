@@ -1,7 +1,5 @@
 package au.com.codeka.warworlds.ctrl;
 
-import java.util.List;
-
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
@@ -78,28 +76,29 @@ public class MiniChatView extends RelativeLayout
 
     @Override
     public void onAttachedToWindow() {
-        ChatManager.getInstance().addMessageAddedListener(this);
-        ChatManager.getInstance().addMessageUpdatedListener(this);
+        ChatManager.i.addMessageAddedListener(this);
+        ChatManager.i.addMessageUpdatedListener(this);
     }
 
     @Override
     public void onDetachedFromWindow() {
-        ChatManager.getInstance().removeMessageAddedListener(this);
-        ChatManager.getInstance().removeMessageUpdatedListener(this);
+        ChatManager.i.removeMessageAddedListener(this);
+        ChatManager.i.removeMessageUpdatedListener(this);
     }
 
     private void refreshMessages() {
         mMsgsContainer.removeAllViews();
-
-        List<ChatMessage> msgs = ChatManager.getInstance().getLastMessages(10);
+/*TODO: no way to get last 10 messages across all conversations...
+        List<ChatMessage> msgs = ChatManager.i.getLastMessages(10);
         for(ChatMessage msg : msgs) {
             appendMessage(msg);
         }
+*/
     }
 
     private void appendMessage(final ChatMessage msg) {
         TextView tv = new TextView(mContext);
-        tv.setText(msg.format(ChatMessage.Location.PUBLIC_CHANNEL, false, mAutoTranslate));
+        tv.setText(msg.format(true, false, mAutoTranslate));
         tv.setTag(msg);
 
         while (mMsgsContainer.getChildCount() >= MAX_ROWS) {
@@ -130,7 +129,7 @@ public class MiniChatView extends RelativeLayout
 
             if (other.getDatePosted().equals(msg.getDatePosted()) &&
                 other.getEmpireKey().equals(msg.getEmpireKey())) {
-                tv.setText(msg.format(ChatMessage.Location.PUBLIC_CHANNEL, false, mAutoTranslate));
+                tv.setText(msg.format(true, false, mAutoTranslate));
             }
         }
     }

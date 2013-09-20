@@ -1,11 +1,12 @@
 package au.com.codeka.warworlds.model;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.TreeSet;
 
 import org.joda.time.DateTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import android.content.Context;
 import android.os.Handler;
@@ -13,21 +14,16 @@ import android.util.SparseArray;
 import au.com.codeka.BackgroundRunner;
 import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.BackgroundDetector;
+import au.com.codeka.warworlds.Notifications;
 import au.com.codeka.warworlds.api.ApiClient;
 
 /**
  * This class keeps track of chats and what-not.
  */
 public class ChatManager implements BackgroundDetector.BackgroundChangeHandler {
-    private static ChatManager sInstance = new ChatManager();
+    public static ChatManager i = new ChatManager();
+    private static Logger log = LoggerFactory.getLogger(ChatManager.class);
 
-    public static ChatManager getInstance() {
-        return sInstance;
-    }
-
-    public static int MAX_CHAT_HISTORY = 1000;
-
-    private LinkedList<ChatMessage> mMessages;
     private ArrayList<MessageAddedListener> mMessageAddedListeners;
     private ArrayList<MessageUpdatedListener> mMessageUpdatedListeners;
     private DateTime mMostRecentMsg;
@@ -37,7 +33,6 @@ public class ChatManager implements BackgroundDetector.BackgroundChangeHandler {
     private SparseArray<ChatConversation> mConversations;
 
     private ChatManager() {
-        mMessages = new LinkedList<ChatMessage>();
         mMessageAddedListeners = new ArrayList<MessageAddedListener>();
         mMessageUpdatedListeners = new ArrayList<MessageUpdatedListener>();
         mEmpiresToRefresh = new TreeSet<String>();
@@ -52,12 +47,14 @@ public class ChatManager implements BackgroundDetector.BackgroundChangeHandler {
         BackgroundDetector.getInstance().addBackgroundChangeHandler(this);
 
         mHandler = new Handler();
-        addMessage(new ChatMessage("Welcome to War Worlds!"));
+        mConversations.clear();
+        mConversations.append(0, new ChatConversation(0));
+        mConversations.append(-1, new ChatConversation(-1));
+        refreshConversations();
 
-        // fetch all chats from the last 24 hours
-        mMessages.clear();
+        // fetch all chats from the last 24 hours -- todo: by day? or by number?
         mMostRecentMsg = (new DateTime()).minusDays(1);
-        requestMessages(context, mMostRecentMsg);
+        requestMessages(mMostRecentMsg);
     }
 
     public void addMessageAddedListener(MessageAddedListener listener) {
@@ -68,7 +65,7 @@ public class ChatManager implements BackgroundDetector.BackgroundChangeHandler {
     public void removeMessageAddedListener(MessageAddedListener listener) {
         mMessageAddedListeners.remove(listener);
     }
-    private void fireMessageAddedListeners(ChatMessage msg) {
+    public void fireMessageAddedListeners(ChatMessage msg) {
         for(MessageAddedListener listener : mMessageAddedListeners) {
             listener.onMessageAdded(msg);
         }
@@ -88,133 +85,107 @@ public class ChatManager implements BackgroundDetector.BackgroundChangeHandler {
         }
     }
 
-    /**
-     * Posts a message from us to the server.
-     */
+    /** Posts a message from us to the server. */
     public void postMessage(final ChatMessage msg) {
         new BackgroundRunner<Boolean>() {
             @Override
             protected Boolean doInBackground() {
                 try {
-                    Messages.ChatMessage pb = Messages.ChatMessage.newBuilder()
+                    Messages.ChatMessage.Builder pb = Messages.ChatMessage.newBuilder()
                             .setMessage(msg.getMessage())
-                            .setAllianceKey(msg.getAllianceKey() == null ? "" : msg.getAllianceKey())
-                            .build();
-                    ApiClient.postProtoBuf("chat", pb);
+                            .setAllianceKey(msg.getAllianceKey() == null ? "" : msg.getAllianceKey());
+                    if (msg.getConversationID() != null) {
+                        pb.setConversationId(msg.getConversationID());
+                    }
+                    Messages.ChatMessage chat_msg = ApiClient.postProtoBuf("chat", pb.build(), Messages.ChatMessage.class);
+                    ChatMessage respMsg = new ChatMessage();
+                    respMsg.fromProtocolBuffer(chat_msg);
                     return true;
                 } catch (Exception e) {
+                    log.error("Error posting chat!", e);
                     return false;
                 }
             }
 
             @Override
             protected void onComplete(Boolean success) {
-                if (success) {
-                    addMessage(msg);
-                }
             }
         }.execute();
     }
 
-    public ChatMessage getLastMessage() {
-        return getMessage(mMessages.size() - 1);
-    }
-
     /**
-     * Returns the nth message, where 0 is the {i most recent} message.
+     * This is called by the conversation when a message is added an the empire needs to be refreshed.
+     * @param empireKey
      */
-    public ChatMessage getMessage(int n) {
-        synchronized(mMessages) {
-            return mMessages.get(mMessages.size() - n - 1);
-        }
-    }
-
-    /**
-     * Returns the last {c n} messages.
-     */
-    public List<ChatMessage> getLastMessages(int n) {
-        ArrayList<ChatMessage> msgs = new ArrayList<ChatMessage>();
-
-        int startIndex = mMessages.size() - 1 - n;
-        if (startIndex < 0) {
-            startIndex = 0;
-        }
-
-        for(int i = startIndex; i < mMessages.size(); i++) {
-            msgs.add(mMessages.get(i));
-        }
-
-        return msgs;
-    }
-
-    public List<ChatMessage> getAllMessages() {
-        return mMessages;
-    }
-
-    /**
-     * Adds a new message to the chat list.
-     */
-    public void addMessage(final ChatMessage msg) {
-        if (mMostRecentMsg == null) {
-            // setup hasn't been called yet...?
-            return;
-        }
-
-        synchronized(mMessages) {
-            // make sure we don't have this chat already...
-            for (ChatMessage existing : mMessages) {
-                if (existing.getEmpireKey() != null &&
-                    msg.getEmpireKey() != null &&
-                    existing.getDatePosted().equals(msg.getDatePosted()) &&
-                    existing.getEmpireKey().equals(msg.getEmpireKey())) {
-                    return;
-                }
-            }
-            while (mMessages.size() > MAX_CHAT_HISTORY) {
-                mMessages.removeFirst();
-            }
-            mMessages.add(msg);
-
-            if (msg.getDatePosted() != null) {
-                if (msg.getDatePosted().compareTo(mMostRecentMsg) > 0) {
-                    mMostRecentMsg = msg.getDatePosted();
-                }
-            }
-
-            if (msg.getEmpire() == null && msg.getEmpireKey() != null) {
-                synchronized(mEmpiresToRefresh) {
-                    if (!mEmpiresToRefresh.contains(msg.getEmpireKey())) {
-                        mEmpiresToRefresh.add(msg.getEmpireKey());
-                        if (mEmpiresToRefresh.size() == 1) {
-                            // first one, so schedule the function to actually fetch them
-                            mHandler.postDelayed(new Runnable() {
-                                @Override
-                                public void run() {
-                                    refreshEmpires();
-                                }
-                            }, 100);
+    public void queueRefreshEmpire(String empireKey) {
+        synchronized(mEmpiresToRefresh) {
+            if (!mEmpiresToRefresh.contains(empireKey)) {
+                mEmpiresToRefresh.add(empireKey);
+                if (mEmpiresToRefresh.size() == 1) {
+                    // first one, so schedule the function to actually fetch them
+                    mHandler.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            refreshEmpires();
                         }
-                    }
+                    }, 100);
                 }
             }
         }
-        fireMessageAddedListeners(msg);
     }
 
-    /**
-     * Start a new conversation with the given empireID.
-     */
+    public ChatConversation getConversation(ChatMessage msg) {
+        if (msg.getConversationID() == null) {
+            if (msg.getAllianceKey() == null) {
+                return getGlobalConversation();
+            } else {
+                return getAllianceConversation();
+            }
+        }
+
+        return getConversationByID(msg.getConversationID());
+    }
+    public ChatConversation getGlobalConversation() {
+        return mConversations.get(0);
+    }
+    public ChatConversation getAllianceConversation() {
+        return mConversations.get(-1);
+    }
+
+    public ArrayList<ChatConversation> getConversations() {
+        ArrayList<ChatConversation> conversations = new ArrayList<ChatConversation>();
+        synchronized(mConversations) {
+            for (int i = 0; i < mConversations.size(); i++) {
+                conversations.add(mConversations.valueAt(i));
+            }
+        }
+        return conversations;
+    }
+
+    public ChatConversation getConversationByID(int conversationID) {
+        synchronized(mConversations) {
+            if (mConversations.indexOfKey(conversationID) < 0) {
+                mConversations.append(conversationID, new ChatConversation(conversationID));
+            }
+        }
+        return mConversations.get(conversationID);
+    }
+
+    /** Start a new conversation with the given empireID (can be null to start an empty conversation). */
     public void startConversation(final String empireID, final ConversationStartedListener handler) {
         // if we already have a conversation going with this guy, just reuse that one.
-        for (int index = 0; index < mConversations.size(); index++) {
-            ChatConversation conversation = mConversations.valueAt(index);
-            List<Integer> empireIDs = conversation.getEmpireIDs();
-            if (empireIDs.size() != 2) {
-                continue;
-            }
-            if (empireIDs.get(0) == Integer.parseInt(empireID) ||
-                empireIDs.get(1) == Integer.parseInt(empireID)) {
-                handler.onConversationStarted(conversation);
+        if (empireID != null) {
+            for (int index = 0; index < mConversations.size(); index++) {
+                ChatConversation conversation = mConversations.valueAt(index);
+                List<Integer> empireIDs = conversation.getEmpireIDs();
+                if (empireIDs.size() != 2) {
+                    continue;
+                }
+                if (empireIDs.get(0) == Integer.parseInt(empireID) ||
+                    empireIDs.get(1) == Integer.parseInt(empireID)) {
+                    handler.onConversationStarted(conversation);
+                    return;
+                }
             }
         }
 
@@ -222,14 +193,15 @@ public class ChatManager implements BackgroundDetector.BackgroundChangeHandler {
             @Override
             protected ChatConversation doInBackground() {
                 try {
-                    Messages.ChatConversation conversation_pb = Messages.ChatConversation.newBuilder()
-                            .addEmpireIds(Integer.parseInt(EmpireManager.i.getEmpire().getKey()))
-                            .addEmpireIds(Integer.parseInt(empireID))
-                            .build();
-
+                    Messages.ChatConversation.Builder conversation_pb_builder = Messages.ChatConversation.newBuilder()
+                            .addEmpireIds(Integer.parseInt(EmpireManager.i.getEmpire().getKey()));
+                    if (empireID != null) {
+                        conversation_pb_builder.addEmpireIds(Integer.parseInt(empireID));
+                    }
+                    Messages.ChatConversation conversation_pb = conversation_pb_builder.build();
                     conversation_pb = ApiClient.postProtoBuf("chat/conversations", conversation_pb, Messages.ChatConversation.class);
 
-                    ChatConversation conversation = new ChatConversation();
+                    ChatConversation conversation = new ChatConversation(conversation_pb.getId());
                     conversation.fromProtocolBuffer(conversation_pb);
                     return conversation;
                 } catch (Exception e) {
@@ -258,31 +230,59 @@ public class ChatManager implements BackgroundDetector.BackgroundChangeHandler {
                 new EmpireManager.EmpireFetchedHandler() {
                     @Override
                     public void onEmpireFetched(Empire empire) {
-                        for (ChatMessage msg : mMessages) {
-                            if (msg.getEmpireKey() == null) {
-                                continue;
-                            }
-                            if (msg.getEmpireKey().equals(empire.getKey())) {
-                                msg.setEmpire(empire);
-                                fireMessageUpdatedListeners(msg);
-                            }
+                        for (int i = 0; i < mConversations.size(); i++) {
+                            ChatConversation conversation = mConversations.valueAt(i);
+                            conversation.onEmpireRefreshed(empire);
                         }
                     }
                 });
     }
 
-    public int getNumMessages() {
-        return mMessages.size();
-    }
-
     @Override
     public void onBackgroundChange(Context context, boolean isInBackground) {
         if (!isInBackground) {
-            requestMessages(context, mMostRecentMsg);
+            requestMessages(mMostRecentMsg);
         }
     }
 
-    private void requestMessages(final Context context, final DateTime since) {
+    private void refreshConversations() {
+        new BackgroundRunner<Boolean>() {
+            @Override
+            protected Boolean doInBackground() {
+                try {
+                    String url = "chat/conversations";
+                    Messages.ChatConversations pb = ApiClient.getProtoBuf(url,
+                            Messages.ChatConversations.class);
+
+                    // this comes back most recent first, but we work in the
+                    // opposite order...
+                    for (Messages.ChatConversation conversation_pb : pb.getConversationsList()) {
+                        ChatConversation conversation = new ChatConversation(conversation_pb.getId());
+                        conversation.fromProtocolBuffer(conversation_pb);
+                        synchronized(mConversations) {
+                            if (mConversations.indexOfKey(conversation_pb.getId()) < 0) {
+                                mConversations.append(conversation_pb.getId(), conversation);
+                            } else {
+                                mConversations.get(conversation_pb.getId()).update(conversation);
+                            }
+                        }
+                    }
+                } catch (Exception e) {
+                    // TODO: errors?
+                    return false;
+                }
+
+                return true;
+            }
+
+            @Override
+            protected void onComplete(Boolean success) {
+                // TODO
+            }
+        }.execute();
+    }
+
+    private void requestMessages(final DateTime since) {
         if (mRequesting) {
             return;
         }
@@ -315,7 +315,8 @@ public class ChatManager implements BackgroundDetector.BackgroundChangeHandler {
             @Override
             protected void onComplete(ArrayList<ChatMessage> msgs) {
                 for (ChatMessage msg : msgs) {
-                    addMessage(msg);
+                    ChatConversation conversation = getConversation(msg);
+                    conversation.addMessage(msg);
                 }
 
                 mRequesting = false;

@@ -32,10 +32,9 @@ import au.com.codeka.common.model.DesignKind;
 import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.game.SitrepActivity;
 import au.com.codeka.warworlds.model.BuildManager;
+import au.com.codeka.warworlds.model.ChatConversation;
 import au.com.codeka.warworlds.model.ChatManager;
 import au.com.codeka.warworlds.model.ChatMessage;
-import au.com.codeka.warworlds.model.EmpireManager;
-import au.com.codeka.warworlds.model.MyEmpire;
 import au.com.codeka.warworlds.model.Realm;
 import au.com.codeka.warworlds.model.RealmManager;
 import au.com.codeka.warworlds.model.SectorManager;
@@ -114,16 +113,10 @@ public class Notifications {
                 return;
             }
 
-            // don't add our own chats, since they'll have been added automatically
-            MyEmpire myEmpire = EmpireManager.i.getEmpire();
-            if (myEmpire == null) {
-                return;
+            ChatConversation conversation = ChatManager.i.getConversation(msg);
+            if (conversation != null) {
+                conversation.addMessage(msg);
             }
-            if (msg.getEmpireKey() == null || msg.getEmpireKey().equals(myEmpire.getKey())) {
-                return;
-            }
-
-            ChatManager.getInstance().addMessage(msg);
         }
     }
 

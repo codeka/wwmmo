@@ -34,38 +34,14 @@ public class ChatMessage extends BaseChatMessage {
         super(message);
     }
 
-    /**
-     * We format messages slightly differently depending on whether it's an
-     * alliance chat, private message, public message and where it's actually being
-     * displayed. This enum is used to describe which channel we're displaying.
-     */
-    public enum Location {
-        PUBLIC_CHANNEL(0),
-        ALLIANCE_CHANNEL(1);
-
-        private int mNumber;
-
-        Location(int number) {
-            mNumber = number;
-        }
-
-        public int getNumber() {
-            return mNumber;
-        }
-
-        public static Location fromNumber(int number) {
-            return Location.values()[number];
-        }
-    }
-
-    /**
-     * Determines whether this chat message should be visible in the given location.
-     */
-    public boolean shouldDisplay(Location location) {
-        if (location == Location.ALLIANCE_CHANNEL) {
-            return (mAllianceKey != null);
+    public void setConversation(ChatConversation conversation) {
+        if (conversation.getID() == 0) {
+            mConversationID = null;
+        } else if (conversation.getID() < 0 && EmpireManager.i.getEmpire().getAlliance() != null) {
+            mConversationID = null;
+            mAllianceKey = EmpireManager.i.getEmpire().getAlliance().getKey();
         } else {
-            return true;
+            mConversationID = conversation.getID();
         }
     }
 
@@ -74,7 +50,7 @@ public class ChatMessage extends BaseChatMessage {
      * ChatActivity. It actually returns a snippet of formatted text, hence the
      * CharSequence.
      */
-    public CharSequence format(Location location, boolean messageOnly, boolean autoTranslate) {
+    public CharSequence format(boolean isPublic, boolean messageOnly, boolean autoTranslate) {
         String msg = mMessage;
         boolean wasTranslated = false;
         if (mMessageEn != null && autoTranslate) {
@@ -109,7 +85,7 @@ public class ChatMessage extends BaseChatMessage {
             msg = mDatePosted.withZone(DateTimeZone.getDefault()).toString(sChatDateFormat) + " : " + msg;
         }
 
-        if (location == Location.PUBLIC_CHANNEL) {
+        if (isPublic) {
             if (isServer) {
                 msg = "<font color=\"#00ffff\"><b>"+msg+"</b></font>";
             } else if (mAllianceKey != null) {
@@ -124,13 +100,12 @@ public class ChatMessage extends BaseChatMessage {
             } else if (isFriendly) {
                 msg = "<font color=\"#99ff99\">"+msg+"</font>";
             }
-        } else if (location == Location.ALLIANCE_CHANNEL) {
+        } else { // !isPublic (e.g. alliance or private conversation)
             if (isFriendly) {
                 msg = "<font color=\"#99ff99\">"+msg+"</font>";
             } else {
                 msg = "<font color=\"#9999ff\">"+msg+"</font>";
             }
-        } else {
         }
 
         return Html.fromHtml(msg);

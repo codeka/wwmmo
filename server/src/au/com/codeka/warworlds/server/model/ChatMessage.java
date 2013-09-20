@@ -8,7 +8,6 @@ import org.joda.time.DateTime;
 import au.com.codeka.common.model.BaseChatMessage;
 
 public class ChatMessage extends BaseChatMessage {
-    private int mID;
     private int mEmpireID;
     private int mAllianceID;
 
@@ -27,6 +26,10 @@ public class ChatMessage extends BaseChatMessage {
         mDatePosted = new DateTime(rs.getTimestamp("posted_date").getTime());
         mMessage = rs.getString("message");
         mMessageEn = rs.getString("message_en");
+        mConversationID = rs.getInt("conversation_id");
+        if (rs.wasNull()) {
+            mConversationID = null;
+        }
     }
 
     public int getID() {

@@ -70,7 +70,7 @@ public class ChatMessageDialog extends DialogFragment {
         privateMessageBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ChatManager.getInstance().startConversation(mEmpire.getKey(), new ChatManager.ConversationStartedListener() {
+                ChatManager.i.startConversation(mEmpire.getKey(), new ChatManager.ConversationStartedListener() {
                     @Override
                     public void onConversationStarted(ChatConversation conversation) {
                         // TODO

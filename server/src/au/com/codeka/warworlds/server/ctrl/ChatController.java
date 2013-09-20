@@ -25,6 +25,14 @@ public class ChatController {
         db = new DataBase(trans);
     }
 
+    public ArrayList<ChatConversation> getConversationsForEmpire(int empireID) throws RequestException {
+        try {
+            return db.getConversationsForEmpire(empireID);
+        } catch (Exception e) {
+            throw new RequestException(e);
+        }
+    }
+
     /**
      * Search for an existing conversation between the two given empires. An existing conversation is one
      * where the last message was sent within the last week and only the given two empires are participants.
@@ -91,12 +99,18 @@ public class ChatController {
             return conversations.get(0);
         }
 
+        public ArrayList<ChatConversation> getConversationsForEmpire(int empireID) throws Exception {
+            String whereClause = "chat_conversations.id IN (" +
+              "SELECT conversation_id FROM chat_conversation_participants WHERE empire_id = " + empireID +")";
+            return getConversations(whereClause);
+        }
+
         public ArrayList<ChatConversation> getConversations(String whereClause) throws Exception {
             Map<Integer, ChatConversation> conversations = new HashMap<Integer, ChatConversation>();
             String sql = "SELECT chat_conversations.id, chat_conversation_participants.empire_id" +
                         " FROM chat_conversations" +
                         " INNER JOIN chat_conversation_participants ON conversation_id = chat_conversations.id" +
-                        "WHERE " + whereClause;
+                        " WHERE " + whereClause;
             try (SqlStmt stmt = prepare(sql)) {
                 ResultSet rs = stmt.select();
                 while (rs.next()) {
