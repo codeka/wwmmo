@@ -82,6 +82,22 @@ public class EmpireManager {
         return mEmpireCache.get(empireKey);
     }
 
+    public List<Empire> getMatchingEmpiresFromCache(String filter) {
+        Messages.Empires empires_pb = new LocalEmpireStore().getMatchingEmpires(filter);
+        if (empires_pb == null) {
+            return null;
+        }
+
+        ArrayList<Empire> empires = new ArrayList<Empire>();
+        for (Messages.Empire empire_pb : empires_pb.getEmpiresList()) {
+            Empire empire = new Empire();
+            empire.fromProtocolBuffer(empire_pb);
+            empires.add(empire);
+        }
+
+        return empires;
+    }
+
     public NativeEmpire getNativeEmpire() {
         return mNativeEmpire;
     }
@@ -511,7 +527,7 @@ public class EmpireManager {
         private static Object sLock = new Object();
 
         public LocalEmpireStore() {
-            super(App.i, "empires.db", null, 3);
+            super(App.i, "empires.db", null, 4);
         }
 
         /**
@@ -524,21 +540,30 @@ public class EmpireManager {
                       +"  id INTEGER PRIMARY KEY,"
                       +"  realm_id INTEGER,"
                       +"  empire_key STRING,"
+                      +"  empire_name STRING,"
                       +"  empire BLOB,"
                       +"  timestamp INTEGER);");
             db.execSQL("CREATE INDEX IX_empire_key_realm_id ON empires (empire_key, realm_id)");
+            db.execSQL("CREATE INDEX IX_empire_name_realm_id ON empires (empire_name, realm_id)");
         }
 
         @Override
         public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-            if (newVersion == 2) {
+            if (oldVersion < 2) {
                 db.execSQL("ALTER TABLE empires "
                           +"ADD COLUMN timestamp INTEGER DEFAULT 0;");
             }
-            if (newVersion == 3) {
+            if (oldVersion < 3) {
                 db.execSQL("ALTER TABLE empires "
                           +"ADD COLUMN realm_id INTEGER DEFAULT "+RealmManager.BETA_REALM_ID);
                 db.execSQL("CREATE INDEX IX_empire_key_realm_id ON empires (empire_key, realm_id)");
+            }
+            if (oldVersion < 4) {
+                db.execSQL("ALTER TABLE empires "
+                          +"ADD COLUMN empire_name STRING");
+                db.execSQL("CREATE INDEX IX_empire_name_realm_id ON empires (empire_name, realm_id)");
+                // Note: we don't bother populating the empire_name column, since it's only used
+                // for filtering and it'll be populated anyway the next time the empire is fetched.
             }
         }
 
@@ -561,6 +586,7 @@ public class EmpireManager {
                     ContentValues values = new ContentValues();
                     values.put("empire", empireBlob.toByteArray());
                     values.put("empire_key", empire.getKey());
+                    values.put("empire_name", empire.getDisplayName());
                     values.put("realm_id", RealmContext.i.getCurrentRealm().getID());
                     values.put("timestamp", DateTime.now(DateTimeZone.UTC).getMillis());
                     db.insert("empires", null, values);
@@ -569,6 +595,40 @@ public class EmpireManager {
                 } finally {
                     db.close();
                 }
+            }
+        }
+
+        public Messages.Empires getMatchingEmpires(String filter) {
+            synchronized(sLock) {
+                SQLiteDatabase db = getReadableDatabase();
+                Cursor cursor = null;
+                try {
+                    cursor = db.query("empires", new String[] {"empire", "empire_name", "timestamp"},
+                            getFilterClause(filter),
+                            null, null, null, "empire_name");
+
+                    Messages.Empires.Builder empires_pb = Messages.Empires.newBuilder();
+                    if (cursor.moveToFirst()) {
+                        while (true) {
+                            // NOTE: we ignore the timestamp for this operation.
+                            Messages.Empire empire_pb = Messages.Empire.parseFrom(cursor.getBlob(0));
+                            empires_pb.addEmpires(empire_pb);
+    
+                            if (!cursor.moveToNext()) {
+                                break;
+                            }
+                        }
+                    }
+
+                    return empires_pb.build();
+                } catch (Exception e) {
+                    log.error("Error occured fetching matching empires.", e);
+                    return null;
+                } finally {
+                    if (cursor != null) cursor.close();
+                    db.close();
+                }
+
             }
         }
 
@@ -605,6 +665,10 @@ public class EmpireManager {
 
         private String getWhereClause(String empireKey) {
             return "empire_key = '"+empireKey.replace('\'', ' ')+"' AND realm_id="+RealmContext.i.getCurrentRealm().getID();
+        }
+
+        private String getFilterClause(String empireName) {
+            return "empire_name LIKE '%"+empireName.replace('\'', ' ').replace('%', ' ')+"%' AND realm_id="+RealmContext.i.getCurrentRealm().getID();
         }
     }
 }

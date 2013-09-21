@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                style="@style/TopPane">
+
+    <au.com.codeka.warworlds.ctrl.HorizontalSeparator
+        android:id="@+id/horz_sep_1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:text="Invite others" />
+    
+    <AutoCompleteTextView
+        android:id="@+id/empire_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/horz_sep_1"
+        android:layout_alignParentLeft="true"
+        android:layout_toLeftOf="@+id/invite_btn"
+        android:ems="10" >
+        <requestFocus />
+    </AutoCompleteTextView>
+
+    <Button
+        android:id="@+id/invite_btn"
+        android:layout_width="80dp"
+        android:layout_height="30dp"
+        android:layout_alignBaseline="@+id/empire_name"
+        android:layout_alignBottom="@+id/empire_name"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="4dp"
+        android:text="Invite" />
+
+</RelativeLayout>

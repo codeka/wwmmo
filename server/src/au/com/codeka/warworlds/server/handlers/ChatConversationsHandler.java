@@ -29,13 +29,13 @@ public class ChatConversationsHandler extends RequestHandler {
         Messages.ChatConversation pb = getRequestBody(Messages.ChatConversation.class);
 
         int empireID1 = getSession().getEmpireID();
-        if (pb.getEmpireIdsCount() != 2) {
+        if (pb.getEmpireIdsCount() > 2 || pb.getEmpireIdsCount() < 1) {
             throw new RequestException(400, Messages.GenericError.ErrorCode.InvalidConversation, "Cannot start new conversation.");
         }
         int empireID2 = 0;
-        if (pb.getEmpireIds(0) == empireID1) {
+        if (pb.getEmpireIdsCount() > 1 && pb.getEmpireIds(0) == empireID1) {
             empireID2 = pb.getEmpireIds(1);
-        } else if (pb.getEmpireIds(1) != empireID1) {
+        } else if (pb.getEmpireIdsCount() > 1 && pb.getEmpireIds(1) != empireID1) {
             throw new RequestException(400, Messages.GenericError.ErrorCode.InvalidConversation, "Cannot start new conversation.");
         } else {
             empireID2 = pb.getEmpireIds(0);

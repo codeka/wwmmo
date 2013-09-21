@@ -3,6 +3,7 @@
 
     <style name="WarWorlds" parent="@android:style/Theme">
         <item name="android:buttonStyle">@style/Button</item>
+        <item name="android:imageButtonStyle">@style/ImageButton</item>
         <item name="android:spinnerStyle">@style/Spinner</item>
     </style>
 

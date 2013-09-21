@@ -26,6 +26,7 @@ import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -293,7 +294,27 @@ public class ChatActivity extends BaseActivity {
         }
 
         private void setupGlobalChatHeader(View v) {
-            
+            ImageButton settingsBtn = (ImageButton) v.findViewById(R.id.settings_btn);
+            settingsBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    ChatGlobalSettingsDialog dialog = new ChatGlobalSettingsDialog();
+                    dialog.show(getActivity().getSupportFragmentManager(), "");
+                }
+            });
+
+            Button newGroupBtn = (Button) v.findViewById(R.id.new_group_btn);
+            newGroupBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    ChatManager.i.startConversation(null, new ChatManager.ConversationStartedListener() {
+                        @Override
+                        public void onConversationStarted(ChatConversation conversation) {
+                            // TODO? switch to that chat....
+                        }
+                    });
+                }
+            });
         }
 
         private void setupAllianceChatHeader(View v) {
@@ -320,6 +341,11 @@ public class ChatActivity extends BaseActivity {
             final TextView empireName = (TextView) v.findViewById(R.id.title);
             final double pixelScale = getActivity().getResources().getDisplayMetrics().density;
 
+            if (empireKeys.size() == 0) {
+                empireName.setText("Empty Chat");
+                return;
+            }
+
             EmpireManager.i.fetchEmpires(empireKeys, new EmpireManager.EmpireFetchedHandler() {
                 @Override
                 public void onEmpireFetched(Empire empire) {
@@ -336,6 +362,16 @@ public class ChatActivity extends BaseActivity {
                     empireIconContainer.addView(icon);
                 }
             });
+
+            ImageButton settingsBtn = (ImageButton) v.findViewById(R.id.settings_btn);
+            settingsBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    ChatPrivateSettingsDialog dialog = new ChatPrivateSettingsDialog();
+                    dialog.show(getActivity().getSupportFragmentManager(), "");
+                }
+            });
+
         }
     }
 

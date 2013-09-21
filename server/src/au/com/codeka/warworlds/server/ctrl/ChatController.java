@@ -136,17 +136,24 @@ public class ChatController {
             }
 
             sql = "INSERT INTO chat_conversation_participants (conversation_id, empire_id, is_muted) VALUES" +
-                 " (?, ?, 0), (?, ?, 0)";
+                 " (?, ?, 0)";
+            if (empireID1 != empireID2) {
+                sql += ", (?, ?, 0)";
+            }
             try (SqlStmt stmt = prepare(sql)) {
                 stmt.setInt(1, conversation.getID());
                 stmt.setInt(2, empireID1);
-                stmt.setInt(3, conversation.getID());
-                stmt.setInt(4, empireID2);
+                if (empireID1 != empireID2) {
+                    stmt.setInt(3, conversation.getID());
+                    stmt.setInt(4, empireID2);
+                }
                 stmt.update();
             }
 
             conversation.addEmpire(empireID1);
-            conversation.addEmpire(empireID2);
+            if (empireID1 != empireID2) {
+                conversation.addEmpire(empireID2);
+            }
             return conversation;
         }
     }

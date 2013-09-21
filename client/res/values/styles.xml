@@ -6,6 +6,11 @@
         <item name="android:textColor">#ffffff</item>
     </style>
 
+    <style name="ImageButton" parent="android:style/Widget.ImageButton">
+        <item name="android:background">@drawable/button_bg</item>
+        <item name="android:textColor">#ffffff</item>
+    </style>
+
     <style name="Spinner" parent="android:style/Widget.Spinner">
         <item name="android:background">@drawable/spinner_bg</item>
         <item name="android:textColor">#ffffff</item>
