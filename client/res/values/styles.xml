@@ -23,6 +23,10 @@
         <item name="android:background">@drawable/bottom_pane_bg</item>
     </style>
 
+    <style name="TopPane">
+        <item name="android:background">@drawable/top_pane_bg</item>
+    </style>
+
     <style name="RightPane">
         <item name="android:background">@drawable/right_pane_bg</item>
     </style>

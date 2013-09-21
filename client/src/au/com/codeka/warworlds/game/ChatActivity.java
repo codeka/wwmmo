@@ -25,7 +25,9 @@ import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
@@ -34,6 +36,7 @@ import au.com.codeka.warworlds.GlobalOptions;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.StyledDialog;
 import au.com.codeka.warworlds.Util;
+import au.com.codeka.warworlds.model.Alliance;
 import au.com.codeka.warworlds.model.ChatConversation;
 import au.com.codeka.warworlds.model.ChatManager;
 import au.com.codeka.warworlds.model.ChatMessage;
@@ -53,10 +56,12 @@ public class ChatActivity extends BaseActivity {
         setContentView(R.layout.chat);
 
         mConversations = ChatManager.i.getConversations();
-        // swap alliance and global around...
-        ChatConversation globalConversation = mConversations.get(1);
-        mConversations.set(1, mConversations.get(0));
-        mConversations.set(0, globalConversation);
+        if (EmpireManager.i.getEmpire().getAlliance() != null) {
+            // swap alliance and global around...
+            ChatConversation globalConversation = mConversations.get(1);
+            mConversations.set(1, mConversations.get(0));
+            mConversations.set(0, globalConversation);
+        }
 
         mChatPagerAdapter = new ChatPagerAdapter(getSupportFragmentManager());
         mChatPagerAdapter.refresh(mConversations);
@@ -147,6 +152,20 @@ public class ChatActivity extends BaseActivity {
         @Override
         public View onCreateView(final LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
             View v = inflater.inflate(R.layout.chat_page, container, false);
+
+            FrameLayout header = (FrameLayout) v.findViewById(R.id.header);
+            View headerContent;
+            if (mConversation.getID() == 0) {
+                headerContent = inflater.inflate(R.layout.chat_header_global, null, false);
+                setupGlobalChatHeader(headerContent);
+            } else if (mConversation.getID() < 0) {
+                headerContent = inflater.inflate(R.layout.chat_header_alliance, null, false);
+                setupAllianceChatHeader(headerContent);
+            } else {
+                headerContent = inflater.inflate(R.layout.chat_header_private, null, false);
+                setupPrivateChatHeader(headerContent);
+            }
+            header.addView(headerContent);
 
             mChatAdapter = new ChatAdapter();
             final ListView chatOutput = (ListView) v.findViewById(R.id.chat_output);
@@ -271,7 +290,52 @@ public class ChatActivity extends BaseActivity {
 
                 return view;
             }
+        }
+
+        private void setupGlobalChatHeader(View v) {
             
+        }
+
+        private void setupAllianceChatHeader(View v) {
+            Alliance alliance = (Alliance) EmpireManager.i.getEmpire().getAlliance();
+            if (alliance == null) {
+                return; // should never happen...
+            }
+
+            TextView title = (TextView) v.findViewById(R.id.title);
+            title.setText(alliance.getName());
+        }
+
+        private void setupPrivateChatHeader(View v) {
+            // remove our own ID from the list...
+            ArrayList<String> empireKeys = new ArrayList<String>();
+            for (Integer empireID : mConversation.getEmpireIDs()) {
+                String empireKey = Integer.toString(empireID);
+                if (!empireKey.equals(EmpireManager.i.getEmpire().getKey())) {
+                    empireKeys.add(empireKey);
+                }
+            }
+
+            final LinearLayout empireIconContainer = (LinearLayout) v.findViewById(R.id.empire_icon_container);
+            final TextView empireName = (TextView) v.findViewById(R.id.title);
+            final double pixelScale = getActivity().getResources().getDisplayMetrics().density;
+
+            EmpireManager.i.fetchEmpires(empireKeys, new EmpireManager.EmpireFetchedHandler() {
+                @Override
+                public void onEmpireFetched(Empire empire) {
+                    String currName = empireName.getText().toString();
+                    if (currName.length() > 0) {
+                        currName += ", ";
+                    }
+                    currName += empire.getDisplayName();
+                    empireName.setText(currName);
+
+                    ImageView icon = new ImageView(getActivity());
+                    icon.setLayoutParams(new LinearLayout.LayoutParams((int)(32 * pixelScale), (int)(32 * pixelScale)));
+                    icon.setImageBitmap(EmpireShieldManager.i.getShield(getActivity(), empire));
+                    empireIconContainer.addView(icon);
+                }
+            });
         }
     }
 

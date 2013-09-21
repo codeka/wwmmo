@@ -49,7 +49,9 @@ public class ChatManager implements BackgroundDetector.BackgroundChangeHandler {
         mHandler = new Handler();
         mConversations.clear();
         mConversations.append(0, new ChatConversation(0));
-        mConversations.append(-1, new ChatConversation(-1));
+        if (EmpireManager.i.getEmpire().getAlliance() != null) {
+            mConversations.append(-1, new ChatConversation(-1));
+        }
         refreshConversations();
 
         // fetch all chats from the last 24 hours -- todo: by day? or by number?
