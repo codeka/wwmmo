@@ -7,6 +7,7 @@ import java.util.List;
 import org.joda.time.DateTime;
 
 import au.com.codeka.common.model.BaseChatConversation;
+import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.model.ChatManager.MessageAddedListener;
 import au.com.codeka.warworlds.model.ChatManager.MessageUpdatedListener;
 
@@ -17,9 +18,14 @@ public class ChatConversation extends BaseChatConversation {
     private ArrayList<MessageAddedListener> mMessageAddedListeners = new ArrayList<MessageAddedListener>();
     private ArrayList<MessageUpdatedListener> mMessageUpdatedListeners = new ArrayList<MessageUpdatedListener>();
     private DateTime mMostRecentMsg;
+    private boolean mNeedUpdate;
 
     public ChatConversation(int id) {
         mID = id;
+        mNeedUpdate = true;
+        if (id > 0) {
+            mEmpireIDs = new ArrayList<Integer>();
+        }
     }
 
     public void addMessageAddedListener(MessageAddedListener listener) {
@@ -52,7 +58,10 @@ public class ChatConversation extends BaseChatConversation {
     }
 
     public void update(ChatConversation conversation) {
-        mEmpireIDs = new ArrayList<Integer>(conversation.getEmpireIDs());
+        if (conversation.getEmpireIDs() != null) {
+            mEmpireIDs = new ArrayList<Integer>(conversation.getEmpireIDs());
+        }
+        mNeedUpdate = false;
     }
 
     public ChatMessage getLastMessage() {
@@ -66,6 +75,14 @@ public class ChatConversation extends BaseChatConversation {
         synchronized(mMessages) {
             return mMessages.get(mMessages.size() - n - 1);
         }
+    }
+
+    /**
+     * If this returned true, it means an empty conversation was created and it needs to
+     * be updated from the server to add the participants and so on.
+     */
+    public boolean needUpdate() {
+        return mNeedUpdate;
     }
 
     /**
@@ -140,5 +157,11 @@ public class ChatConversation extends BaseChatConversation {
                 fireMessageUpdatedListeners(msg);
             }
         }
+    }
+
+    @Override
+    public void fromProtocolBuffer(Messages.ChatConversation pb) {
+        super.fromProtocolBuffer(pb);
+        mNeedUpdate = false;
     }
 }

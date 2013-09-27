@@ -54,6 +54,9 @@ public class NotificationHandler extends RequestHandler {
      * This is called by the notification controller when a notification is received.
      */
     public void sendNotification(NotificationController.Notification notification) {
+        if (mContinuation == null || !mContinuation.isSuspended()) {
+            return;
+        }
         mContinuation.setAttribute("notification", notification);
         mContinuation.resume();
     }

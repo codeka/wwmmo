@@ -14,7 +14,6 @@ import android.util.SparseArray;
 import au.com.codeka.BackgroundRunner;
 import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.BackgroundDetector;
-import au.com.codeka.warworlds.Notifications;
 import au.com.codeka.warworlds.api.ApiClient;
 
 /**
@@ -31,12 +30,15 @@ public class ChatManager implements BackgroundDetector.BackgroundChangeHandler {
     private TreeSet<String> mEmpiresToRefresh;
     private Handler mHandler;
     private SparseArray<ChatConversation> mConversations;
+    private boolean mConversationsRefreshing = false;
+    private List<ConversationsRefreshListener> mConversationsRefreshListeners;
 
     private ChatManager() {
         mMessageAddedListeners = new ArrayList<MessageAddedListener>();
         mMessageUpdatedListeners = new ArrayList<MessageUpdatedListener>();
         mEmpiresToRefresh = new TreeSet<String>();
         mConversations = new SparseArray<ChatConversation>();
+        mConversationsRefreshListeners = new ArrayList<ConversationsRefreshListener>();
     }
 
     /**
@@ -87,6 +89,20 @@ public class ChatManager implements BackgroundDetector.BackgroundChangeHandler {
         }
     }
 
+    public void addConversationsRefreshListener(ConversationsRefreshListener listener) {
+        if (!mConversationsRefreshListeners.contains(listener)) {
+            mConversationsRefreshListeners.add(listener);
+        }
+    }
+    public void removeConversationsRefreshListener(ConversationsRefreshListener listener) {
+        mConversationsRefreshListeners.remove(listener);
+    }
+    private void fireConversationsRefreshListeners() {
+        for(ConversationsRefreshListener listener : mConversationsRefreshListeners) {
+            listener.onConversationsRefreshed();
+        }
+    }
+
     /** Posts a message from us to the server. */
     public void postMessage(final ChatMessage msg) {
         new BackgroundRunner<Boolean>() {
@@ -111,6 +127,53 @@ public class ChatManager implements BackgroundDetector.BackgroundChangeHandler {
 
             @Override
             protected void onComplete(Boolean success) {
+            }
+        }.execute();
+    }
+
+    public void addParticipant(final Context context, final ChatConversation conversation, final String empireName) {
+        // look in the cache first, it'll be quicker and one less request to the server...
+        List<Empire> empires = EmpireManager.i.getMatchingEmpiresFromCache(empireName);
+        if (empires != null && empires.size() > 0) {
+            addParticipant(conversation, empires.get(0));
+            return;
+        }
+
+        // otherwise we'll have to query the server anyway.
+        EmpireManager.i.searchEmpires(context, empireName, new EmpireManager.EmpiresFetchedHandler() {
+            @Override
+            public void onEmpiresFetched(List<Empire> empires) {
+                addParticipant(conversation, empires.get(0));
+            }
+        });
+    }
+
+    /** Adds the given participant to the given conversation. */
+    private void addParticipant(final ChatConversation conversation, final Empire empire) {
+        new BackgroundRunner<Boolean>() {
+            @Override
+            protected Boolean doInBackground() {
+                try {
+                    Messages.ChatConversationParticipant pb = Messages.ChatConversationParticipant.newBuilder()
+                            .setEmpireId(Integer.parseInt(empire.getKey()))
+                            .build();
+
+                    String url = "chat/conversations/"+conversation.getID()+"/participants";
+                    ApiClient.postProtoBuf(url, pb);
+                    return true;
+                } catch (Exception e) {
+                    log.error("Error adding participant (maybe already there, etc?)", e);
+                    return false;
+                }
+            }
+
+            @Override
+            protected void onComplete(Boolean success) {
+                if (success) {
+                    // update our internal representation with the new empire
+                    ChatConversation realConvo = getConversationByID(conversation.getID());
+                    realConvo.getEmpireIDs().add(Integer.parseInt(empire.getKey()));
+                }
             }
         }.execute();
     }
@@ -167,7 +230,11 @@ public class ChatManager implements BackgroundDetector.BackgroundChangeHandler {
     public ChatConversation getConversationByID(int conversationID) {
         synchronized(mConversations) {
             if (mConversations.indexOfKey(conversationID) < 0) {
+                log.info("Conversation #"+conversationID+" hasn't been created yet, creating now.");
                 mConversations.append(conversationID, new ChatConversation(conversationID));
+
+                // it's OK to call this, it won't do anything if a refresh is already happening
+                refreshConversations();
             }
         }
         return mConversations.get(conversationID);
@@ -180,7 +247,7 @@ public class ChatManager implements BackgroundDetector.BackgroundChangeHandler {
             for (int index = 0; index < mConversations.size(); index++) {
                 ChatConversation conversation = mConversations.valueAt(index);
                 List<Integer> empireIDs = conversation.getEmpireIDs();
-                if (empireIDs.size() != 2) {
+                if (empireIDs == null || empireIDs.size() != 2) {
                     continue;
                 }
                 if (empireIDs.get(0) == Integer.parseInt(empireID) ||
@@ -207,6 +274,7 @@ public class ChatManager implements BackgroundDetector.BackgroundChangeHandler {
                     conversation.fromProtocolBuffer(conversation_pb);
                     return conversation;
                 } catch (Exception e) {
+                    log.error("Error starting conversation.", e);
                     return null;
                 }
             }
@@ -217,6 +285,32 @@ public class ChatManager implements BackgroundDetector.BackgroundChangeHandler {
                     mConversations.put(conversation.getID(), conversation);
                     handler.onConversationStarted(conversation);
                 }
+            }
+        }.execute();
+    }
+
+    public void leaveConversation(final ChatConversation conversation) {
+        new BackgroundRunner<Boolean>() {
+            @Override
+            protected Boolean doInBackground() {
+                try {
+                    String url = "chat/conversations/"+conversation.getID()+"/participants/"+EmpireManager.i.getEmpire().getKey();
+                    ApiClient.delete(url);
+
+                    synchronized(mConversations) {
+                        log.info("Leaving conversation #"+conversation.getID()+".");
+                        mConversations.remove(conversation.getID());
+                    }
+                    return true;
+                } catch (Exception e) {
+                    log.error("Error leaving conversation.", e);
+                    return false;
+                }
+            }
+
+            @Override
+            protected void onComplete(Boolean success) {
+                fireConversationsRefreshListeners();
             }
         }.execute();
     }
@@ -248,6 +342,11 @@ public class ChatManager implements BackgroundDetector.BackgroundChangeHandler {
     }
 
     private void refreshConversations() {
+        if (mConversationsRefreshing) {
+            return;
+        }
+        mConversationsRefreshing = true;
+
         new BackgroundRunner<Boolean>() {
             @Override
             protected Boolean doInBackground() {
@@ -279,7 +378,30 @@ public class ChatManager implements BackgroundDetector.BackgroundChangeHandler {
 
             @Override
             protected void onComplete(Boolean success) {
-                // TODO
+                mConversationsRefreshing = false;
+
+                // now that we've updated all of the conversations, if there's any left that are
+                // "needs update" then we'll have to queue another one... :/
+                boolean needsUpdate = false;
+                synchronized(mConversations) {
+                    for (int i = 0; i < mConversations.size(); i++) {
+                        ChatConversation conversation = mConversations.valueAt(i);
+                        if (conversation.getID() > 0 && conversation.needUpdate()) {
+                            needsUpdate = true;
+                            // However, we want to make sure this is the LAST time that "refreshConversations" is
+                            // called for this set of conversations (for example, if one of our conversations
+                            // doesn't exist on the server, it won't get updated by another call) so we call this
+                            // to make sure "needs update" is reset on all of them first.
+                            conversation.update(conversation);
+                        }
+                    }
+                }
+
+                if (needsUpdate) {
+                    refreshConversations();
+                } else {
+                    fireConversationsRefreshListeners();
+                }
             }
         }.execute();
     }
@@ -308,7 +430,7 @@ public class ChatManager implements BackgroundDetector.BackgroundChangeHandler {
                         msgs.add(msg);
                     }
                 } catch (Exception e) {
-                    // TODO: errors?
+                    log.error("Error fetching chat messages.", e);
                 }
 
                 return msgs;
@@ -334,5 +456,8 @@ public class ChatManager implements BackgroundDetector.BackgroundChangeHandler {
     }
     public interface ConversationStartedListener {
         void onConversationStarted(ChatConversation conversation);
+    }
+    public interface ConversationsRefreshListener {
+        void onConversationsRefreshed();
     }
 }

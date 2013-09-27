@@ -32,6 +32,8 @@ public class RequestRouter extends AbstractHandler {
         sRoutes.add(new Route("hello/({device_id}[0-9]+)$", HelloHandler.class));
         sRoutes.add(new Route("chat$", ChatHandler.class));
         sRoutes.add(new Route("chat/conversations$", ChatConversationsHandler.class));
+        sRoutes.add(new Route("chat/conversations/({conversation_id}[0-9]+)/participants$", ChatConversationParticipantsHandler.class));
+        sRoutes.add(new Route("chat/conversations/({conversation_id}[0-9]+)/participants/({empire_id}[0-9]+)$", ChatConversationParticipantHandler.class));
         sRoutes.add(new Route("empires$", EmpiresHandler.class));
         sRoutes.add(new Route("empires/search$", EmpiresSearchHandler.class));
         sRoutes.add(new Route("empires/({empire_id}[0-9]+)/stars$", EmpiresStarsHandler.class));
@@ -62,6 +64,7 @@ public class RequestRouter extends AbstractHandler {
         sRoutes.add(new Route("sit-reports", SitReportsHandler.class));
         sRoutes.add(new Route("rankings/({year}[0-9]+)/({month}[0-9]+)$", RankingHistoryHandler.class));
         sRoutes.add(new Route("motd", MotdHandler.class));
+        sRoutes.add(new Route("notifications$", NotificationHandler.class));
 
         sRoutes.add(new Route("admin/?$", DashboardPageHandler.class));
         sRoutes.add(new Route("admin/({path}actions/move-star)$", ActionsMoveStarPageHandler.class, "admin/"));

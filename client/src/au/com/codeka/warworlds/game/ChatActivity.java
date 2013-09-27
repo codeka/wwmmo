@@ -2,18 +2,21 @@ package au.com.codeka.warworlds.game;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import org.joda.time.DateTimeZone;
 
 import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.text.Html;
 import android.text.method.LinkMovementMethod;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -32,6 +35,7 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
+import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.BaseActivity;
 import au.com.codeka.warworlds.GlobalOptions;
 import au.com.codeka.warworlds.R;
@@ -45,7 +49,8 @@ import au.com.codeka.warworlds.model.Empire;
 import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.EmpireShieldManager;
 
-public class ChatActivity extends BaseActivity {
+public class ChatActivity extends BaseActivity
+                          implements ChatManager.ConversationsRefreshListener {
     private ChatPagerAdapter mChatPagerAdapter;
     private ViewPager mViewPager;
     private List<ChatConversation> mConversations;
@@ -91,6 +96,24 @@ public class ChatActivity extends BaseActivity {
         });
     }
 
+    @Override
+    public void onStart() {
+        super.onStart();
+        ChatManager.i.addConversationsRefreshListener(this);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        ChatManager.i.removeConversationsRefreshListener(this);
+    }
+
+    @Override
+    public void onConversationsRefreshed() {
+        mConversations = ChatManager.i.getConversations();
+        mChatPagerAdapter.refresh(mConversations);
+    }
+
     public class ChatPagerAdapter extends FragmentStatePagerAdapter {
         List<ChatConversation> mConversations;
 
@@ -111,6 +134,11 @@ public class ChatActivity extends BaseActivity {
             args.putInt("au.com.codeka.warworlds.ConversationID", mConversations.get(i).getID());
             fragment.setArguments(args);
             return fragment;
+        }
+
+        @Override
+        public int getItemPosition(Object item) {
+            return POSITION_NONE;
         }
 
         @Override
@@ -177,6 +205,10 @@ public class ChatActivity extends BaseActivity {
                 public void onItemClick(AdapterView<?> parent, View view,
                         int position, long id) {
                     ChatMessage msg = (ChatMessage) mChatAdapter.getItem(position);
+                    if (msg.getEmpire() == null) {
+                        // it'll be there in a sec.. better to just wait
+                        return;
+                    }
 
                     ChatMessageDialog dialog = new ChatMessageDialog();
                     Bundle args = new Bundle();
@@ -247,6 +279,24 @@ public class ChatActivity extends BaseActivity {
             }
 
             @Override
+            public int getViewTypeCount() {
+                return 2;
+            }
+
+            @Override
+            public int getItemViewType(int position) {
+                ChatMessage msg = mMessages.get(position);
+                if (msg.getAction() != null && msg.getAction() != ChatMessage.MessageAction.Normal) {
+                    return 1;
+                }
+                if (msg.getEmpireKey() == null) {
+                    return 1;
+                }
+
+                return 0;
+            }
+
+            @Override
             public int getCount() {
                 return mMessages.size();
             }
@@ -263,31 +313,68 @@ public class ChatActivity extends BaseActivity {
 
             @Override
             public View getView(int position, View convertView, ViewGroup parent) {
+                ChatMessage msg = mMessages.get(position);
+                ChatMessage.MessageAction action = ChatMessage.MessageAction.Normal;
+                if (msg.getAction() != null) {
+                    action = msg.getAction();
+                }
+
                 View view = convertView;
                 if (view == null) {
                     LayoutInflater inflater = (LayoutInflater) getActivity().getSystemService
                             (Context.LAYOUT_INFLATER_SERVICE);
-                    view = inflater.inflate(R.layout.chat_row, null);
+
+                    if (action != ChatMessage.MessageAction.Normal || msg.getEmpireKey() == null) {
+                        view = inflater.inflate(R.layout.chat_row_simple, null);
+                    } else {
+                        view = inflater.inflate(R.layout.chat_row, null);
+                    }
                 }
 
-                ImageView empireIcon = (ImageView) view.findViewById(R.id.empire_icon);
-                TextView empireName = (TextView) view.findViewById(R.id.empire_name);
-                TextView msgTime = (TextView) view.findViewById(R.id.msg_time);
-                TextView message = (TextView) view.findViewById(R.id.message);
-
-                ChatMessage msg = mMessages.get(position);
-                if (msg.getEmpire() != null) {
-                    Bitmap shield = EmpireShieldManager.i.getShield(getActivity(), (Empire) msg.getEmpire());
-                    empireName.setText(msg.getEmpire().getDisplayName());
-                    empireIcon.setImageBitmap(shield);
+                if (action != ChatMessage.MessageAction.Normal) {
+                    TextView message = (TextView) view.findViewById(R.id.message);
+                    message.setTextColor(Color.LTGRAY);
+                    Empire otherEmpire = EmpireManager.i.getEmpire(msg.getMessage());
+                    if (action == ChatMessage.MessageAction.ParticipantAdded) {
+                        if (msg.getEmpire() != null && otherEmpire != null) {
+                            String content = String.format(Locale.ENGLISH, "%s has added %s to the conversation.",
+                                    msg.getEmpire().getDisplayName(), otherEmpire.getDisplayName());
+                            message.setText(Html.fromHtml("<i>"+content+"</i>"));
+                        } else {
+                            message.setText(Html.fromHtml("<i>An empire has been added to the conversation."));
+                        }
+                    } else if (action == ChatMessage.MessageAction.ParticipantLeft) {
+                        if (msg.getEmpire() != null && otherEmpire != null) {
+                            String content = String.format(Locale.ENGLISH, "%s has left the conversation.",
+                                    otherEmpire.getDisplayName());
+                            message.setText(Html.fromHtml("<i>"+content+"</i>"));
+                        } else {
+                            message.setText(Html.fromHtml("<i>An empire has left the conversation."));
+                        }
+                    }
+                } else if (msg.getEmpireKey() == null) {
+                    TextView message = (TextView) view.findViewById(R.id.message);
+                    message.setTextColor(Color.CYAN);
+                    message.setText("[SERVER] "+msg.getMessage());
                 } else {
-                    empireIcon.setImageBitmap(null);
-                    empireName.setText("");
+                    ImageView empireIcon = (ImageView) view.findViewById(R.id.empire_icon);
+                    TextView empireName = (TextView) view.findViewById(R.id.empire_name);
+                    TextView msgTime = (TextView) view.findViewById(R.id.msg_time);
+                    TextView message = (TextView) view.findViewById(R.id.message);
+    
+                    if (msg.getEmpire() != null) {
+                        Bitmap shield = EmpireShieldManager.i.getShield(getActivity(), (Empire) msg.getEmpire());
+                        empireName.setText(msg.getEmpire().getDisplayName());
+                        empireIcon.setImageBitmap(shield);
+                    } else {
+                        empireIcon.setImageBitmap(null);
+                        empireName.setText("");
+                    }
+    
+                    msgTime.setText(msg.getDatePosted().withZone(DateTimeZone.getDefault()).toString("h:mm a"));
+                    message.setText(msg.format(mConversation.getID() == 0, true, mAutoTranslate));
+                    message.setMovementMethod(LinkMovementMethod.getInstance());
                 }
-
-                msgTime.setText(msg.getDatePosted().withZone(DateTimeZone.getDefault()).toString("h:mm a"));
-                message.setText(msg.format(mConversation.getID() == 0, true, mAutoTranslate));
-                message.setMovementMethod(LinkMovementMethod.getInstance());
 
                 return view;
             }
@@ -310,7 +397,16 @@ public class ChatActivity extends BaseActivity {
                     ChatManager.i.startConversation(null, new ChatManager.ConversationStartedListener() {
                         @Override
                         public void onConversationStarted(ChatConversation conversation) {
-                            // TODO? switch to that chat....
+                            ChatPagerAdapter adapter = ((ChatActivity) getActivity()).mChatPagerAdapter;
+                            ViewPager pager = ((ChatActivity) getActivity()).mViewPager;
+
+                            List<ChatConversation> conversations = ChatManager.i.getConversations();
+                            adapter.refresh(conversations);
+
+                            int index = conversations.indexOf(conversation);
+                            if (index >= 0) {
+                                pager.setCurrentItem(index);
+                            }
                         }
                     });
                 }
@@ -341,37 +437,40 @@ public class ChatActivity extends BaseActivity {
             final TextView empireName = (TextView) v.findViewById(R.id.title);
             final double pixelScale = getActivity().getResources().getDisplayMetrics().density;
 
-            if (empireKeys.size() == 0) {
-                empireName.setText("Empty Chat");
-                return;
-            }
-
-            EmpireManager.i.fetchEmpires(empireKeys, new EmpireManager.EmpireFetchedHandler() {
-                @Override
-                public void onEmpireFetched(Empire empire) {
-                    String currName = empireName.getText().toString();
-                    if (currName.length() > 0) {
-                        currName += ", ";
-                    }
-                    currName += empire.getDisplayName();
-                    empireName.setText(currName);
-
-                    ImageView icon = new ImageView(getActivity());
-                    icon.setLayoutParams(new LinearLayout.LayoutParams((int)(32 * pixelScale), (int)(32 * pixelScale)));
-                    icon.setImageBitmap(EmpireShieldManager.i.getShield(getActivity(), empire));
-                    empireIconContainer.addView(icon);
-                }
-            });
-
             ImageButton settingsBtn = (ImageButton) v.findViewById(R.id.settings_btn);
             settingsBtn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     ChatPrivateSettingsDialog dialog = new ChatPrivateSettingsDialog();
+                    Bundle args = new Bundle();
+                    Messages.ChatConversation.Builder chat_conversation_pb = Messages.ChatConversation.newBuilder();
+                    mConversation.toProtocolBuffer(chat_conversation_pb);
+                    args.putByteArray("au.com.codeka.warworlds.ChatConversation", chat_conversation_pb.build().toByteArray());
+                    dialog.setArguments(args);
                     dialog.show(getActivity().getSupportFragmentManager(), "");
                 }
             });
 
+            if (empireKeys.size() == 0) {
+                empireName.setText("Empty Chat");
+            } else {
+                EmpireManager.i.fetchEmpires(empireKeys, new EmpireManager.EmpireFetchedHandler() {
+                    @Override
+                    public void onEmpireFetched(Empire empire) {
+                        String currName = empireName.getText().toString();
+                        if (currName.length() > 0) {
+                            currName += ", ";
+                        }
+                        currName += empire.getDisplayName();
+                        empireName.setText(currName);
+    
+                        ImageView icon = new ImageView(getActivity());
+                        icon.setLayoutParams(new LinearLayout.LayoutParams((int)(32 * pixelScale), (int)(32 * pixelScale)));
+                        icon.setImageBitmap(EmpireShieldManager.i.getShield(getActivity(), empire));
+                        empireIconContainer.addView(icon);
+                    }
+                });
+            }
         }
     }
 

@@ -15,6 +15,7 @@ public class BaseChatMessage {
     protected DateTime mDatePosted;
     protected String mMessageEn;
     protected Integer mConversationID;
+    protected MessageAction mAction;
 
     public BaseChatMessage() {
         mDatePosted = new DateTime(DateTimeZone.UTC);
@@ -63,6 +64,9 @@ public class BaseChatMessage {
     public Integer getConversationID() {
         return mConversationID;
     }
+    public MessageAction getAction() {
+        return mAction;
+    }
 
     public void fromProtocolBuffer(Messages.ChatMessage pb) {
         if (pb.hasId()) {
@@ -81,6 +85,11 @@ public class BaseChatMessage {
         }
         if (pb.hasConversationId()) {
             mConversationID = pb.getConversationId();
+        }
+        if (pb.hasAction()) {
+            mAction = MessageAction.fromNumber(pb.getAction().getNumber());
+        } else {
+            mAction = MessageAction.Normal;
         }
     }
 
@@ -104,5 +113,35 @@ public class BaseChatMessage {
         if (mConversationID != null) {
             pb.setConversationId(mConversationID);
         }
+        if (mAction != null && mAction != MessageAction.Normal) {
+            pb.setAction(Messages.ChatMessage.MessageAction.valueOf(mAction.getValue()));
+        }
+    }
+
+    public enum MessageAction {
+        Normal(0),
+        ParticipantAdded(1),
+        ParticipantLeft(2);
+
+        private int mValue;
+
+        MessageAction(int value) {
+            mValue = value;
+        }
+
+        public int getValue() {
+            return mValue;
+        }
+
+        public static MessageAction fromNumber(int value) {
+            for(MessageAction s : MessageAction.values()) {
+                if (s.getValue() == value) {
+                    return s;
+                }
+            }
+
+            return MessageAction.Normal;
+        }
+
     }
 }

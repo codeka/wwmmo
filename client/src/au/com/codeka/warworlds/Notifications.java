@@ -24,12 +24,14 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.net.Uri;
+import android.os.Handler;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
 import android.text.Html;
 import android.util.Base64;
 import au.com.codeka.common.model.DesignKind;
 import au.com.codeka.common.protobuf.Messages;
+import au.com.codeka.warworlds.api.ApiClient;
 import au.com.codeka.warworlds.game.SitrepActivity;
 import au.com.codeka.warworlds.model.BuildManager;
 import au.com.codeka.warworlds.model.ChatConversation;
@@ -49,6 +51,17 @@ import com.google.protobuf.InvalidProtocolBufferException;
 
 public class Notifications {
     private static Logger log = LoggerFactory.getLogger(Notifications.class);
+
+    private static NotificationLongPoller sLongPoller;
+
+    public static void startLongPoll() {
+        if (sLongPoller != null) {
+            return;
+        }
+
+        sLongPoller = new NotificationLongPoller();
+        sLongPoller.start();
+    }
 
     private Notifications() {
     }
@@ -141,11 +154,11 @@ public class Notifications {
 
         DatabaseHelper db = new DatabaseHelper();
         if (!db.addNotification(notification)) {
-            displayNotification(context, buildNotification(context, db.getNotifications()));
+            displayNotification(buildNotification(context, db.getNotifications()));
         }
     }
 
-    private static void displayNotification(Context context, Notification notification) {
+    private static void displayNotification(Notification notification) {
         if (notification == null) {
             return;
         }
@@ -154,8 +167,7 @@ public class Notifications {
             return;
         }
 
-        NotificationManager nm = (NotificationManager) context
-                .getSystemService(Context.NOTIFICATION_SERVICE);
+        NotificationManager nm = (NotificationManager) App.i.getSystemService(Context.NOTIFICATION_SERVICE);
         nm.notify(RealmContext.i.getCurrentRealm().getID(), notification);
     }
 
@@ -424,6 +436,56 @@ public class Notifications {
         public Messages.SituationReport sitrep;
         public Messages.Star star;
         public Realm realm;
+    }
+
+    /**
+     * This class manages the long poll we do to the server to receive notifications.
+     */
+    private static class NotificationLongPoller implements Runnable {
+        private static Logger log = LoggerFactory.getLogger(NotificationLongPoller.class);
+
+        private Thread mPollThread;
+        private Handler mHandler;
+
+        public void start() {
+            log.debug("Notification long-poll starting.");
+            mHandler = new Handler();
+            mPollThread = new Thread(this);
+            mPollThread.setDaemon(true);
+            mPollThread.start();
+        }
+
+        @Override
+        public void run() {
+            while (true) {
+                try {
+                    Messages.Notifications notifications_pb = ApiClient.getProtoBuf("notifications", Messages.Notifications.class);
+                    if (notifications_pb == null) {
+                        log.info("Long-poll timed out, re-requesting.");;
+                        continue;
+                    }
+
+                    log.info("Long-poll complete, got "+notifications_pb.getNotificationsCount()+" notifications.");
+                    for (Messages.Notification pb : notifications_pb.getNotificationsList()) {
+                        final String name = pb.getName();
+                        final String value = pb.getValue();
+                        log.info("["+name+"]="+value);
+                        mHandler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                Notifications.displayNotfication(App.i, name, value);
+                            }
+                        });
+                    }
+                } catch(Exception e) {
+                    log.error("Exception caught in long-polling, waiting a bit then re-trying.", e);
+                    try {
+                        Thread.sleep(1000 + ((int) (Math.random() * 9000))); // wait from 1 to 10 seconds...
+                    } catch (InterruptedException e1) { }
+                }
+            }
+        }
+
     }
 }
 

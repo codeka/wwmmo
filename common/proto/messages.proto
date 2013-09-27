@@ -48,6 +48,7 @@ message GenericError
         ShieldImageTooBig = 19;
         EmpireNameExists = 20;
         InvalidConversation = 21;
+        EmpireAlreadyInConversation = 22;
     }
 }
 
@@ -367,6 +368,9 @@ message Notification {
     optional string value = 2;
 }
 
+message Notifications {
+    repeated Notification notifications = 1;
+}
 
 //
 // If we want to send a notification along with a message, this is what we wrap it in.
@@ -393,6 +397,16 @@ message ChatMessage
     optional string message_en = 5;
 
     optional int32 conversation_id = 6;
+
+    // The "action" of this message, allows us to notify participants of a conversation
+    // via special messages with a custom action.
+    enum MessageAction
+    {
+        Normal = 0; // a "normal" chat message, the default
+        ParticipantAdded = 1; // a new participant was added
+        ParticipantLeft = 2; // someone left the conversation
+    }
+    optional MessageAction action = 8;
 }
 
 message ChatMessages
@@ -415,6 +429,17 @@ message ChatConversations
 {
     repeated ChatConversation conversations = 1;
 }
+
+
+//
+// Refers to a participant of a chat conversation.
+//
+message ChatConversationParticipant
+{
+    optional int32 empire_id = 1;
+    optional bool is_muted = 2;
+}
+
 
 //
 // Represents a "sector" of space, containing a number of stars and whatnot.

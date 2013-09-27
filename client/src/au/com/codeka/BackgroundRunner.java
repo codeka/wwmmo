@@ -45,11 +45,12 @@ public abstract class BackgroundRunner<Result> {
             1, TimeUnit.SECONDS, // keep-alive time
             sPoolWorkQueue, sThreadFactory);
 
-    private InternalHandler mHandler = new InternalHandler();
+    private static InternalHandler sHandler = new InternalHandler();
 
     private Callable<Result> mWorker;
     private FutureTask<Result> mFuture;
     private final AtomicBoolean mTaskInvoked = new AtomicBoolean();
+    private boolean mIsFinished;
 
     public BackgroundRunner() {
         if (sThreadDebug) {
@@ -86,6 +87,10 @@ public abstract class BackgroundRunner<Result> {
         sExecutor.execute(mFuture);
     }
 
+    public boolean isFinished() {
+        return mIsFinished;
+    }
+
     protected abstract Result doInBackground();
     protected abstract void onComplete(Result result);
 
@@ -98,13 +103,14 @@ public abstract class BackgroundRunner<Result> {
 
     private Result postResult(Result result) {
         @SuppressWarnings("unchecked")
-        Message message = mHandler.obtainMessage(0,
+        Message message = sHandler.obtainMessage(0,
                 new BackgroundRunnerResult<Result>(this, result));
 
         if (mCreatorStackTrace != null) {
             log.info("Posting message back to target from original stack trace:\r\n"+mCreatorStackTrace);
         }
         message.sendToTarget();
+        mIsFinished = true;
         return result;
     }
 

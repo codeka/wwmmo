@@ -177,7 +177,7 @@ public class ServerGreeter {
                             .setDeviceModel(android.os.Build.MODEL)
                             .setDeviceVersion(android.os.Build.VERSION.RELEASE)
                             .setMemoryClass(memoryClass)
-                            .setAllowInlineNotfications(true)
+                            .setAllowInlineNotfications(false)
                             .build();
 
                     String url = "hello/"+deviceRegistrationKey;
@@ -260,6 +260,7 @@ public class ServerGreeter {
                 } else if (!mErrorOccured) {
                     Util.setup(activity);
                     ChatManager.i.setup(activity);
+                    Notifications.startLongPoll();
 
                     // make sure we're correctly registered as online.
                     BackgroundDetector.getInstance().onBackgroundStatusChange(activity);

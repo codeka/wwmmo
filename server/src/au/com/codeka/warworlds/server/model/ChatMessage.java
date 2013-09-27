@@ -6,6 +6,7 @@ import java.sql.SQLException;
 import org.joda.time.DateTime;
 
 import au.com.codeka.common.model.BaseChatMessage;
+import au.com.codeka.common.protobuf.Messages;
 
 public class ChatMessage extends BaseChatMessage {
     private int mEmpireID;
@@ -30,15 +31,42 @@ public class ChatMessage extends BaseChatMessage {
         if (rs.wasNull()) {
             mConversationID = null;
         }
+        int action = rs.getInt("action");
+        if (!rs.wasNull()) {
+            mAction = MessageAction.fromNumber(action);
+        }
+    }
+    public ChatMessage(int empireID, String message, MessageAction action, int conversationID) {
+        mEmpireID = empireID;
+        mEmpireKey = Integer.toString(empireID);
+        mMessage = message;
+        mAction = action;
+        mConversationID = conversationID;
+        mDatePosted = DateTime.now();
     }
 
-    public int getID() {
-        return mID;
+    public void setID(int id) {
+        mID = id;
     }
     public int getEmpireID() {
         return mEmpireID;
     }
     public int getAllianceID() {
         return mAllianceID;
+    }
+    public void setAction(MessageAction action) {
+        mAction = action;
+    }
+
+    @Override
+    public void fromProtocolBuffer(Messages.ChatMessage pb) {
+        super.fromProtocolBuffer(pb);
+
+        if (mEmpireKey != null) {
+            mEmpireID = Integer.parseInt(mEmpireKey);
+        }
+        if (mAllianceKey != null) {
+            mAllianceID = Integer.parseInt(mAllianceKey);
+        }
     }
 }

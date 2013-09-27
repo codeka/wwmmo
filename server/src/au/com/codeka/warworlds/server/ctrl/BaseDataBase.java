@@ -52,6 +52,19 @@ public class BaseDataBase {
         return sb.toString();
     }
 
+    protected static String buildInClause(Integer[] ids) {
+        StringBuffer sb = new StringBuffer();
+        sb.append("(");
+        for (int i = 0; i < ids.length; i++) {
+            if (i > 0) {
+                sb.append(", ");
+            }
+            sb.append(ids[i]);
+        }
+        sb.append(")");
+        return sb.toString();
+    }
+
     protected static String buildInClause(Collection<Integer> ids) {
         StringBuffer sb = new StringBuffer();
         sb.append("(");

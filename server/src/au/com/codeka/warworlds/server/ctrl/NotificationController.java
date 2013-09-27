@@ -3,6 +3,7 @@ package au.com.codeka.warworlds.server.ctrl;
 import java.io.IOException;
 import java.sql.ResultSet;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -16,6 +17,8 @@ import org.slf4j.LoggerFactory;
 import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.data.DB;
 import au.com.codeka.warworlds.server.data.SqlStmt;
+import au.com.codeka.warworlds.server.handlers.NotificationHandler;
+import au.com.codeka.warworlds.server.model.ChatConversation;
 
 import com.google.android.gcm.server.Constants;
 import com.google.android.gcm.server.Message;
@@ -28,9 +31,27 @@ public class NotificationController {
     private static String API_KEY = "AIzaSyADWOC-tWUbzj-SVW13Sz5UuUiGfcmHHDA";
 
     private static RecentNotificationCache sRecentNotifications = new RecentNotificationCache();
+    private static NotificationHandlerCache sHandlers = new NotificationHandlerCache();
+
+    public void sendNotificationToConversation(int conversationID, String name, String value) throws RequestException {
+        ChatConversation conversation = new ChatController().getConversation(conversationID);
+        ArrayList<Integer> empireIDs = new ArrayList<Integer>();
+        if (conversation == null || conversation.getEmpireIDs() == null) {
+            return;
+        }
+
+        for (Integer empireID : conversation.getEmpireIDs()) {
+            // TODO: muted?
+            empireIDs.add(empireID);
+        }
+
+        Integer[] arr = new Integer[empireIDs.size()];
+        empireIDs.toArray(arr);
+        sendNotification(arr, null, new Notification(name, value));
+    }
 
     public void sendNotificationToEmpire(int empireID, String name, String value) throws RequestException {
-        sendNotification(empireID, null, new Notification(name, value));
+        sendNotification(new Integer[] {empireID}, null, new Notification(name, value));
     }
 
     public void sendNotificationToOnlineAlliance(int allianceID, String name, String value) throws RequestException {
@@ -56,7 +77,11 @@ public class NotificationController {
         return notifications;
     }
 
-    private void sendNotification(Integer empireID, Integer allianceID, Notification notification) throws RequestException {
+    public void addNotificationHandler(int empireID, NotificationHandler handler) {
+        sHandlers.addNotificationHandler(empireID, handler);
+    }
+
+    private void sendNotification(Integer[] empireIDs, Integer allianceID, Notification notification) throws RequestException {
         Message.Builder msgBuilder = new Message.Builder();
         for (Map.Entry<String, String> value : notification.values.entrySet()) {
             msgBuilder.addData(value.getKey(), value.getValue());
@@ -64,7 +89,7 @@ public class NotificationController {
 
         Map<String, String> devices = new TreeMap<String, String>();
         String sql;
-        if (empireID == null && allianceID == null) {
+        if (empireIDs == null && allianceID == null) {
             sql = "SELECT gcm_registration_id, empires.user_email, empires.id AS empire_id" +
                  " FROM devices" +
                  " INNER JOIN empires ON devices.user_email = empires.user_email" +
@@ -81,17 +106,17 @@ public class NotificationController {
             sql = "SELECT gcm_registration_id, devices.user_email, empires.id AS empire_id" +
                  " FROM devices" +
                  " INNER JOIN empires ON devices.user_email = empires.user_email" +
-                 " WHERE empires.id = ?" +
+                 " WHERE empires.id IN " + BaseDataBase.buildInClause(empireIDs) +
                    " AND gcm_registration_id IS NOT NULL";
         }
         try (SqlStmt stmt = DB.prepare(sql)) {
-            if (empireID == null && allianceID == null) {
+            if (empireIDs == null && allianceID == null) {
                 stmt.setDateTime(1, DateTime.now().minusHours(1));
             } else if (allianceID != null) {
                 stmt.setDateTime(1, DateTime.now().minusHours(1));
                 stmt.setInt(2, allianceID);
             } else {
-                stmt.setInt(1, empireID);
+                // nothing to do for empireIDs...
             }
 
             ResultSet rs = stmt.select();
@@ -99,13 +124,21 @@ public class NotificationController {
             while (rs.next()) {
                 String registrationId = rs.getString(1);
                 String email = rs.getString(2);
-                empireID = rs.getInt(3);
-                if (registrationId != null && email != null) {
-                    devices.put(registrationId, email);
-                }
+                int empireID = rs.getInt(3);
+
                 if (!doneEmpires.contains(empireID)) {
                     doneEmpires.add(empireID);
+
+                    if (sHandlers.sendNotification(empireID, notification)) {
+                        // if an attached handler handled it, then we're all done!
+                        continue;
+                    }
+
                     sRecentNotifications.addNotification(empireID, notification);
+                }
+
+                if (registrationId != null && email != null) {
+                    devices.put(registrationId, email);
                 }
             }
         } catch(Exception e) {
@@ -245,10 +278,47 @@ public class NotificationController {
         }
     }
 
+    private static class NotificationHandlerCache {
+        private HashMap<Integer, List<NotificationHandler>> mHandlers;
+
+        public NotificationHandlerCache() {
+            mHandlers = new HashMap<Integer, List<NotificationHandler>>();
+        }
+
+        public void addNotificationHandler(int empireID, NotificationHandler handler) {
+            synchronized(mHandlers) {
+                List<NotificationHandler> handlers = mHandlers.get(empireID);
+                if (handlers == null) {
+                    handlers = new ArrayList<NotificationHandler>();
+                    mHandlers.put(empireID, handlers);
+                }
+                handlers.add(handler);
+            }
+        }
+
+        public boolean sendNotification(int empireID, Notification notification) {
+            synchronized(mHandlers) {
+                List<NotificationHandler> handlers = mHandlers.get(empireID);
+                if (handlers != null && handlers.size() > 0) {
+                    for (NotificationHandler handler : handlers) {
+                        handler.sendNotification(notification);
+                    }
+
+                    // once a handler has processed a notification, it's finished and
+                    // the client is expected to re-establish it.
+                    handlers.clear();
+                    return true;
+                }
+            }
+
+            return false;
+        }
+    }
+
     /**
      * A wrapper around the data we need for a notification.
      */
-    private static class Notification {
+    public static class Notification {
         public DateTime creation;
         public Map<String, String> values;
 

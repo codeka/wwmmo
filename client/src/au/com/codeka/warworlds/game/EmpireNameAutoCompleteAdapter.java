@@ -3,6 +3,7 @@ package au.com.codeka.warworlds.game;
 import java.util.List;
 
 import android.content.Context;
+import android.os.Handler;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -23,9 +24,11 @@ public class EmpireNameAutoCompleteAdapter extends BaseAdapter implements Filter
     private Context mContext;
     private EmpireFilter mFilter = new EmpireFilter();
     private List<Empire> mEmpires;
+    private Handler mHandler;
 
     public EmpireNameAutoCompleteAdapter(Context context) {
         mContext = context;
+        mHandler = new Handler();
     }
 
     @Override
@@ -38,7 +41,7 @@ public class EmpireNameAutoCompleteAdapter extends BaseAdapter implements Filter
 
     @Override
     public Object getItem(int position) {
-        return mEmpires.get(position);
+        return mEmpires.get(position).getDisplayName();
     }
 
     @Override
@@ -51,6 +54,7 @@ public class EmpireNameAutoCompleteAdapter extends BaseAdapter implements Filter
         TextView v = (TextView) convertView;
         if (v == null) {
             v = new TextView(mContext);
+            v.setPadding(10, 20, 10, 20);
         }
 
         v.setText(mEmpires.get(position).getDisplayName());
@@ -63,6 +67,9 @@ public class EmpireNameAutoCompleteAdapter extends BaseAdapter implements Filter
     }
 
     private class EmpireFilter extends Filter {
+        private boolean mIsSearching;
+        private String mScheduleAgainConstraint;
+
         /**
          * Performs the actual filters. We actually do two "levels" of filters. First, we
          * fetch any empires that are cached which match the filter, at the same time we
@@ -75,8 +82,40 @@ public class EmpireNameAutoCompleteAdapter extends BaseAdapter implements Filter
                 mEmpires = EmpireManager.i.getMatchingEmpiresFromCache(constraint.toString());
                 results.values = mEmpires;
                 results.count = mEmpires.size();
+
+                fetchFromServer(constraint.toString());
             }
             return results;
+        }
+
+        /**
+         * Along with fetching from the cache, we'll do a more thorough search from the server.
+         */
+        private void fetchFromServer(final String constraint) {
+            if (mIsSearching) {
+                mScheduleAgainConstraint = constraint;
+                return;
+            }
+            mIsSearching = true;
+
+            mHandler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    EmpireManager.i.searchEmpires(mContext, constraint, new EmpireManager.EmpiresFetchedHandler() {
+                        @Override
+                        public void onEmpiresFetched(List<Empire> empires) {
+                            mEmpires = empires;
+                            notifyDataSetChanged();
+
+                            mIsSearching = false;
+                            if (mScheduleAgainConstraint != null) {
+                                fetchFromServer(mScheduleAgainConstraint);
+                                mScheduleAgainConstraint = null;
+                            }
+                        }
+                    });
+                }
+            }, 100); // wait 100ms to avoid overloading the server
         }
 
         /** Called when we're done fetching results. */
@@ -88,6 +127,5 @@ public class EmpireNameAutoCompleteAdapter extends BaseAdapter implements Filter
                 notifyDataSetInvalidated();
             }
         }
-        
     }
 }

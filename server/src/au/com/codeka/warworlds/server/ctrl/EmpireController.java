@@ -470,7 +470,7 @@ public class EmpireController {
         }
 
         private String getSelectEmpire(String whereClause) {
-            return "SELECT *, alliances.id AS alliance_id," +
+            return "SELECT *, alliances.id AS alliance_id, alliances.name as alliance_name," +
                          " (SELECT COUNT(*) FROM empires WHERE alliance_id = empires.alliance_id) AS num_empires," +
                          " (SELECT MAX(create_date) FROM empire_shields WHERE empire_shields.empire_id = empires.id AND rejected = 0) AS shield_last_update" +
                   " FROM empires" +

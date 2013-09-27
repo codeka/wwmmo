@@ -24,7 +24,11 @@ public class Alliance extends BaseAlliance {
             mID = (int) id;
         }
         mKey = Integer.toString(mID);
-        mName = rs.getString("name");
+        try {
+            mName = rs.getString("alliance_name");
+        } catch (Exception e) {
+            mName = rs.getString("name");
+        }
         mCreatorEmpireID = rs.getInt("creator_empire_id");
         mCreatorEmpireKey = Integer.toString(mCreatorEmpireID);
         mTimeCreated = new DateTime(rs.getTimestamp("created_date").getTime());

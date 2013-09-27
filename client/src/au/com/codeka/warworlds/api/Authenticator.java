@@ -50,6 +50,7 @@ public class Authenticator {
         SharedPreferences prefs = Util.getSharedPreferences();
         final String accountName = prefs.getString("AccountName", null);
         if (accountName == null) {
+            mAuthenticating = false;
             throw new ApiException("No account has been selected yet!");
         }
 
