@@ -49,7 +49,7 @@ public class ChatController {
     public void addParticipant(ChatConversation conversation, int empireID) throws RequestException {
         try {
             db.addParticipant(conversation.getID(), empireID);
-            conversation.getEmpireIDs().add(empireID);
+            conversation.addParticipant(empireID, false);
         } catch (Exception e) {
             throw new RequestException(e);
         }
@@ -58,7 +58,15 @@ public class ChatController {
     public void removeParticipant(ChatConversation conversation, int empireID) throws RequestException {
         try {
             db.removeParticipant(conversation.getID(), empireID);
-            conversation.getEmpireIDs().remove(new Integer(empireID));
+            int index = -1;
+            for (int i = 0; i < conversation.getParticipants().size(); i++) {
+                if (conversation.getParticipants().get(i).getEmpireID() == empireID) {
+                    index = i;
+                }
+            }
+            if (index >= 0) {
+                conversation.getParticipants().remove(index);
+            }
         } catch (Exception e) {
             throw new RequestException(e);
         }
@@ -196,7 +204,7 @@ public class ChatController {
 
         public ArrayList<ChatConversation> getConversations(String whereClause) throws Exception {
             Map<Integer, ChatConversation> conversations = new HashMap<Integer, ChatConversation>();
-            String sql = "SELECT chat_conversations.id, chat_conversation_participants.empire_id" +
+            String sql = "SELECT chat_conversations.id, chat_conversation_participants.empire_id, chat_conversation_participants.is_muted" +
                         " FROM chat_conversations" +
                         " INNER JOIN chat_conversation_participants ON conversation_id = chat_conversations.id" +
                         " WHERE " + whereClause;
@@ -209,7 +217,7 @@ public class ChatController {
                         conversation = new ChatConversation(conversationID);
                         conversations.put(conversationID, conversation);
                     }
-                    conversation.addEmpire(rs.getInt(2));
+                    conversation.addParticipant(rs.getInt(2), rs.getBoolean(3));
                 }
             }
             return new ArrayList<ChatConversation>(conversations.values());
@@ -266,9 +274,9 @@ public class ChatController {
                 stmt.update();
             }
 
-            conversation.addEmpire(empireID1);
+            conversation.addParticipant(empireID1, false);
             if (empireID1 != empireID2) {
-                conversation.addEmpire(empireID2);
+                conversation.addParticipant(empireID2, false);
             }
             return conversation;
         }

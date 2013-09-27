@@ -5,27 +5,33 @@ import java.util.List;
 
 import au.com.codeka.common.protobuf.Messages;
 
-public class BaseChatConversation {
+public abstract class BaseChatConversation {
     protected int mID;
-    protected List<Integer> mEmpireIDs;
+    protected List<BaseChatConversationParticipant> mParticipants;
 
     public int getID() {
         return mID;
     }
-    public List<Integer> getEmpireIDs() {
-        return mEmpireIDs;
+    public List<BaseChatConversationParticipant> getParticipants() {
+        return mParticipants;
     }
 
     public void fromProtocolBuffer(Messages.ChatConversation pb) {
         mID = pb.getId();
-        mEmpireIDs = new ArrayList<Integer>();
-        for (int i = 0; i < pb.getEmpireIdsCount(); i++) {
-            mEmpireIDs.add(pb.getEmpireIds(i));
+        mParticipants = new ArrayList<BaseChatConversationParticipant>();
+        for (Messages.ChatConversationParticipant participant_pb : pb.getParticipantsList()) {
+            mParticipants.add(createChatConversationParticipant(participant_pb));
         }
     }
 
     public void toProtocolBuffer(Messages.ChatConversation.Builder pb) {
         pb.setId(mID);
-        pb.addAllEmpireIds(mEmpireIDs);
+        for (BaseChatConversationParticipant participant : mParticipants) {
+            Messages.ChatConversationParticipant.Builder participant_pb = Messages.ChatConversationParticipant.newBuilder();
+            participant.toProtocolBuffer(participant_pb);
+            pb.addParticipants(participant_pb);
+        }
     }
+
+    protected abstract BaseChatConversationParticipant createChatConversationParticipant(Messages.ChatConversationParticipant pb);
 }

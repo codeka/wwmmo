@@ -35,6 +35,7 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
+import au.com.codeka.common.model.BaseChatConversationParticipant;
 import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.BaseActivity;
 import au.com.codeka.warworlds.GlobalOptions;
@@ -426,8 +427,8 @@ public class ChatActivity extends BaseActivity
         private void setupPrivateChatHeader(View v) {
             // remove our own ID from the list...
             ArrayList<String> empireKeys = new ArrayList<String>();
-            for (Integer empireID : mConversation.getEmpireIDs()) {
-                String empireKey = Integer.toString(empireID);
+            for (BaseChatConversationParticipant participant : mConversation.getParticipants()) {
+                String empireKey = Integer.toString(participant.getEmpireID());
                 if (!empireKey.equals(EmpireManager.i.getEmpire().getKey())) {
                     empireKeys.add(empireKey);
                 }

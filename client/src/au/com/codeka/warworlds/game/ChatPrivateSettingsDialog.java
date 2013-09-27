@@ -55,16 +55,18 @@ public class ChatPrivateSettingsDialog extends DialogFragment {
                 dismiss();
             }
         });
-
+/*
+        final Button muteBtn = (Button) mView.findViewById(R.id.mute_btn);
+        muteBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                
+            }
+        });
+*/
         return new StyledDialog.Builder(getActivity())
             .setTitle("Chat Settings")
             .setView(mView)
-            .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    dismiss();
-                }
-            })
             .setNegativeButton("Cancel", null)
             .create();
     }

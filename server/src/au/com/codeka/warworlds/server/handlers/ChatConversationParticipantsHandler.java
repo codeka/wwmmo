@@ -1,5 +1,6 @@
 package au.com.codeka.warworlds.server.handlers;
 
+import au.com.codeka.common.model.BaseChatConversationParticipant;
 import au.com.codeka.common.model.BaseChatMessage.MessageAction;
 import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.server.RequestException;
@@ -8,6 +9,7 @@ import au.com.codeka.warworlds.server.ctrl.ChatController;
 import au.com.codeka.warworlds.server.data.DB;
 import au.com.codeka.warworlds.server.data.Transaction;
 import au.com.codeka.warworlds.server.model.ChatConversation;
+import au.com.codeka.warworlds.server.model.ChatConversationParticipant;
 import au.com.codeka.warworlds.server.model.ChatMessage;
 
 /**
@@ -28,11 +30,13 @@ public class ChatConversationParticipantsHandler extends RequestHandler {
 
             boolean isThisEmpireInConversation = false;
             boolean isNewEmpireInConversation = false;
-            for (int empireID : conversation.getEmpireIDs()) {
-                if (empireID == getSession().getEmpireID()) {
+            for (BaseChatConversationParticipant baseParticipant : conversation.getParticipants()) {
+                ChatConversationParticipant participant = (ChatConversationParticipant) baseParticipant;
+
+                if (participant.getEmpireID() == getSession().getEmpireID()) {
                     isThisEmpireInConversation = true;
                 }
-                if (empireID == pb.getEmpireId()) {
+                if (participant.getEmpireID() == pb.getEmpireId()) {
                     isNewEmpireInConversation = true;
                 }
             }

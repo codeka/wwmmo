@@ -409,6 +409,7 @@ message ChatMessage
     optional MessageAction action = 8;
 }
 
+
 message ChatMessages
 {
     repeated ChatMessage messages = 1;
@@ -421,7 +422,7 @@ message ChatMessages
 message ChatConversation
 {
     optional int32 id = 1;
-    repeated int32 empire_ids = 2;
+    repeated ChatConversationParticipant participants = 2;
 }
 
 

@@ -12,6 +12,7 @@ import android.content.Context;
 import android.os.Handler;
 import android.util.SparseArray;
 import au.com.codeka.BackgroundRunner;
+import au.com.codeka.common.model.BaseChatConversationParticipant;
 import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.BackgroundDetector;
 import au.com.codeka.warworlds.api.ApiClient;
@@ -172,7 +173,7 @@ public class ChatManager implements BackgroundDetector.BackgroundChangeHandler {
                 if (success) {
                     // update our internal representation with the new empire
                     ChatConversation realConvo = getConversationByID(conversation.getID());
-                    realConvo.getEmpireIDs().add(Integer.parseInt(empire.getKey()));
+                    realConvo.getParticipants().add(new ChatConversationParticipant(Integer.parseInt(empire.getKey())));
                 }
             }
         }.execute();
@@ -246,12 +247,12 @@ public class ChatManager implements BackgroundDetector.BackgroundChangeHandler {
         if (empireID != null) {
             for (int index = 0; index < mConversations.size(); index++) {
                 ChatConversation conversation = mConversations.valueAt(index);
-                List<Integer> empireIDs = conversation.getEmpireIDs();
-                if (empireIDs == null || empireIDs.size() != 2) {
+                List<BaseChatConversationParticipant> participants = conversation.getParticipants();
+                if (participants == null || participants.size() != 2) {
                     continue;
                 }
-                if (empireIDs.get(0) == Integer.parseInt(empireID) ||
-                    empireIDs.get(1) == Integer.parseInt(empireID)) {
+                if (participants.get(0).getEmpireID() == Integer.parseInt(empireID) ||
+                    participants.get(1).getEmpireID() == Integer.parseInt(empireID)) {
                     handler.onConversationStarted(conversation);
                     return;
                 }
@@ -263,9 +264,13 @@ public class ChatManager implements BackgroundDetector.BackgroundChangeHandler {
             protected ChatConversation doInBackground() {
                 try {
                     Messages.ChatConversation.Builder conversation_pb_builder = Messages.ChatConversation.newBuilder()
-                            .addEmpireIds(Integer.parseInt(EmpireManager.i.getEmpire().getKey()));
+                            .addParticipants(Messages.ChatConversationParticipant.newBuilder()
+                                                .setEmpireId(Integer.parseInt(EmpireManager.i.getEmpire().getKey()))
+                                                .setIsMuted(false));
                     if (empireID != null) {
-                        conversation_pb_builder.addEmpireIds(Integer.parseInt(empireID));
+                        conversation_pb_builder.addParticipants(Messages.ChatConversationParticipant.newBuilder()
+                                                                        .setEmpireId(Integer.parseInt(empireID))
+                                                                        .setIsMuted(false));
                     }
                     Messages.ChatConversation conversation_pb = conversation_pb_builder.build();
                     conversation_pb = ApiClient.postProtoBuf("chat/conversations", conversation_pb, Messages.ChatConversation.class);

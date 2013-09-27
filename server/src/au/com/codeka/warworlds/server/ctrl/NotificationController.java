@@ -14,11 +14,13 @@ import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import au.com.codeka.common.model.BaseChatConversationParticipant;
 import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.data.DB;
 import au.com.codeka.warworlds.server.data.SqlStmt;
 import au.com.codeka.warworlds.server.handlers.NotificationHandler;
 import au.com.codeka.warworlds.server.model.ChatConversation;
+import au.com.codeka.warworlds.server.model.ChatConversationParticipant;
 
 import com.google.android.gcm.server.Constants;
 import com.google.android.gcm.server.Message;
@@ -35,23 +37,22 @@ public class NotificationController {
 
     public void sendNotificationToConversation(int conversationID, String name, String value) throws RequestException {
         ChatConversation conversation = new ChatController().getConversation(conversationID);
-        ArrayList<Integer> empireIDs = new ArrayList<Integer>();
-        if (conversation == null || conversation.getEmpireIDs() == null) {
+        if (conversation == null || conversation.getParticipants() == null) {
             return;
         }
 
-        for (Integer empireID : conversation.getEmpireIDs()) {
-            // TODO: muted?
-            empireIDs.add(empireID);
+        ArrayList<ChatConversationParticipant> participants = new ArrayList<ChatConversationParticipant>();
+        for (BaseChatConversationParticipant participant : conversation.getParticipants()) {
+            participants.add((ChatConversationParticipant) participant);
         }
 
-        Integer[] arr = new Integer[empireIDs.size()];
-        empireIDs.toArray(arr);
+        ChatConversationParticipant[] arr = new ChatConversationParticipant[participants.size()];
+        participants.toArray(arr);
         sendNotification(arr, null, new Notification(name, value));
     }
 
     public void sendNotificationToEmpire(int empireID, String name, String value) throws RequestException {
-        sendNotification(new Integer[] {empireID}, null, new Notification(name, value));
+        sendNotification(new ChatConversationParticipant[] {new ChatConversationParticipant(empireID, false)}, null, new Notification(name, value));
     }
 
     public void sendNotificationToOnlineAlliance(int allianceID, String name, String value) throws RequestException {
@@ -81,7 +82,7 @@ public class NotificationController {
         sHandlers.addNotificationHandler(empireID, handler);
     }
 
-    private void sendNotification(Integer[] empireIDs, Integer allianceID, Notification notification) throws RequestException {
+    private void sendNotification(ChatConversationParticipant[] participants, Integer allianceID, Notification notification) throws RequestException {
         Message.Builder msgBuilder = new Message.Builder();
         for (Map.Entry<String, String> value : notification.values.entrySet()) {
             msgBuilder.addData(value.getKey(), value.getValue());
@@ -89,7 +90,7 @@ public class NotificationController {
 
         Map<String, String> devices = new TreeMap<String, String>();
         String sql;
-        if (empireIDs == null && allianceID == null) {
+        if (participants == null && allianceID == null) {
             sql = "SELECT gcm_registration_id, empires.user_email, empires.id AS empire_id" +
                  " FROM devices" +
                  " INNER JOIN empires ON devices.user_email = empires.user_email" +
@@ -106,11 +107,11 @@ public class NotificationController {
             sql = "SELECT gcm_registration_id, devices.user_email, empires.id AS empire_id" +
                  " FROM devices" +
                  " INNER JOIN empires ON devices.user_email = empires.user_email" +
-                 " WHERE empires.id IN " + BaseDataBase.buildInClause(empireIDs) +
+                 " WHERE empires.id IN " + BaseDataBase.buildInClause(participants) +
                    " AND gcm_registration_id IS NOT NULL";
         }
         try (SqlStmt stmt = DB.prepare(sql)) {
-            if (empireIDs == null && allianceID == null) {
+            if (participants == null && allianceID == null) {
                 stmt.setDateTime(1, DateTime.now().minusHours(1));
             } else if (allianceID != null) {
                 stmt.setDateTime(1, DateTime.now().minusHours(1));
@@ -126,6 +127,14 @@ public class NotificationController {
                 String email = rs.getString(2);
                 int empireID = rs.getInt(3);
 
+                ChatConversationParticipant participant = null;
+                for (ChatConversationParticipant p : participants) {
+                    if (p.getEmpireID() == empireID) {
+                        participant = p;
+                        break;
+                    }
+                }
+
                 if (!doneEmpires.contains(empireID)) {
                     doneEmpires.add(empireID);
 
@@ -134,10 +143,13 @@ public class NotificationController {
                         continue;
                     }
 
-                    sRecentNotifications.addNotification(empireID, notification);
+                    // only send a notification if they're not muted
+                    if (!participant.isMuted()) {
+                        sRecentNotifications.addNotification(empireID, notification);
+                    }
                 }
 
-                if (registrationId != null && email != null) {
+                if (!participant.isMuted() && registrationId != null && email != null) {
                     devices.put(registrationId, email);
                 }
             }

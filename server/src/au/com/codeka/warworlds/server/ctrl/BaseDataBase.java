@@ -6,6 +6,7 @@ import java.util.Collection;
 import au.com.codeka.warworlds.server.data.DB;
 import au.com.codeka.warworlds.server.data.SqlStmt;
 import au.com.codeka.warworlds.server.data.Transaction;
+import au.com.codeka.warworlds.server.model.ChatConversationParticipant;
 
 /**
  * This is our base "database" class that includes some common methods for working with the database.
@@ -37,6 +38,19 @@ public class BaseDataBase {
         } else {
             return DB.prepare(sql, autoGenerateKeys);
         }
+    }
+
+    protected static String buildInClause(ChatConversationParticipant[] participants) {
+        StringBuffer sb = new StringBuffer();
+        sb.append("(");
+        for (int i = 0; i < participants.length; i++) {
+            if (i > 0) {
+                sb.append(", ");
+            }
+            sb.append(participants[i].getEmpireID());
+        }
+        sb.append(")");
+        return sb.toString();
     }
 
     protected static String buildInClause(int[] ids) {
