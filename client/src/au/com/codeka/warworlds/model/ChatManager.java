@@ -84,7 +84,7 @@ public class ChatManager implements BackgroundDetector.BackgroundChangeHandler {
     public void removeMessageUpdatedListener(MessageUpdatedListener listener) {
         mMessageUpdatedListeners.remove(listener);
     }
-    private void fireMessageUpdatedListeners(ChatMessage msg) {
+    public void fireMessageUpdatedListeners(ChatMessage msg) {
         for(MessageUpdatedListener listener : mMessageUpdatedListeners) {
             listener.onMessageUpdated(msg);
         }
@@ -411,7 +411,20 @@ public class ChatManager implements BackgroundDetector.BackgroundChangeHandler {
         }.execute();
     }
 
-    private void requestMessages(final DateTime since) {
+    private void requestMessages(final DateTime after) {
+        requestMessages(after, null, null, null, new MessagesFetchedListener() {
+            @Override
+            public void onMessagesFetched(List<ChatMessage> msgs) {
+                for (ChatMessage msg : msgs) {
+                    ChatConversation conversation = getConversation(msg);
+                    conversation.addMessage(msg);
+                }
+            }
+        });
+    }
+
+    public void requestMessages(final DateTime after, final DateTime before, final Integer max,
+            final Integer conversationID, final MessagesFetchedListener handler) {
         if (mRequesting) {
             return;
         }
@@ -423,7 +436,16 @@ public class ChatManager implements BackgroundDetector.BackgroundChangeHandler {
                 ArrayList<ChatMessage> msgs = new ArrayList<ChatMessage>();
 
                 try {
-                    String url = "chat?since="+(since.getMillis()/1000);
+                    String url = "chat?after="+(after.getMillis()/1000);
+                    if (before != null) {
+                        url += "&before="+(before.getMillis()/1000);
+                    }
+                    if (max != null) {
+                        url += "&max="+max;
+                    }
+                    if (conversationID != null) {
+                        url += "&conversation="+conversationID;
+                    }
                     Messages.ChatMessages pb = ApiClient.getProtoBuf(url,
                             Messages.ChatMessages.class);
 
@@ -443,10 +465,7 @@ public class ChatManager implements BackgroundDetector.BackgroundChangeHandler {
 
             @Override
             protected void onComplete(ArrayList<ChatMessage> msgs) {
-                for (ChatMessage msg : msgs) {
-                    ChatConversation conversation = getConversation(msg);
-                    conversation.addMessage(msg);
-                }
+                handler.onMessagesFetched(msgs);
 
                 mRequesting = false;
             }
@@ -464,5 +483,8 @@ public class ChatManager implements BackgroundDetector.BackgroundChangeHandler {
     }
     public interface ConversationsRefreshListener {
         void onConversationsRefreshed();
+    }
+    public interface MessagesFetchedListener {
+        void onMessagesFetched(List<ChatMessage> msgs);
     }
 }

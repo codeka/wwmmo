@@ -6,6 +6,8 @@ import java.util.Locale;
 
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import android.content.Context;
 import android.content.DialogInterface;
@@ -54,6 +56,7 @@ import au.com.codeka.warworlds.model.EmpireShieldManager;
 
 public class ChatActivity extends BaseActivity
                           implements ChatManager.ConversationsRefreshListener {
+    private static Logger log = LoggerFactory.getLogger(ChatActivity.class);
     private ChatPagerAdapter mChatPagerAdapter;
     private ViewPager mViewPager;
     private List<ChatConversation> mConversations;
@@ -169,6 +172,8 @@ public class ChatActivity extends BaseActivity
         private ChatAdapter mChatAdapter;
         private Handler mHandler;
         private boolean mAutoTranslate;
+        private ListView mChatOutput;
+        private boolean mNoMoreChats;
 
         @Override
         public void onCreate(Bundle savedInstanceState) {
@@ -200,16 +205,16 @@ public class ChatActivity extends BaseActivity
             header.addView(headerContent);
 
             mChatAdapter = new ChatAdapter();
-            final ListView chatOutput = (ListView) v.findViewById(R.id.chat_output);
-            chatOutput.setAdapter(mChatAdapter);
+            mChatOutput = (ListView) v.findViewById(R.id.chat_output);
+            mChatOutput.setAdapter(mChatAdapter);
 
-            chatOutput.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            mChatOutput.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view,
                         int position, long id) {
                     ChatMessage msg = (ChatMessage) mChatAdapter.getItem(position);
                     if (msg.getEmpire() == null) {
-                        // it'll be there in a sec.. better to just wait
+                        // it'll be there in a sec. better to just wait
                         return;
                     }
 
@@ -260,6 +265,50 @@ public class ChatActivity extends BaseActivity
             mChatAdapter.setMessages(allMessages);
         }
 
+        private void fetchChatItems() {
+            mConversation.fetchOlderMessages(new ChatManager.MessagesFetchedListener() {
+                @Override
+                public void onMessagesFetched(List<ChatMessage> msgs) {
+                    log.info("msgs.size() = "+msgs.size());
+                    if (msgs.size() == 0) {
+                        mNoMoreChats = true;
+                    }
+
+                    // get the current item at the top
+                    refreshMessages();
+
+                    // figure out which position the item we had before was at
+                    int position = -1;
+                    if (msgs.size() == 0) {
+                        position = 0;
+                    } else {
+                        int lastMsgID = msgs.get(msgs.size() - 1).getID();
+                        for (int i = 0; i < mChatAdapter.getCount(); i++) {
+                            ChatAdapter.ItemEntry thisEntry = (ChatAdapter.ItemEntry) mChatAdapter.getItem(i);
+                            if (thisEntry.message != null && thisEntry.message.getID() == lastMsgID) {
+                                position = i;
+                                break;
+                            }
+                        }
+                    }
+
+                    if (position >= 0) {
+                        if (position > 0) {
+                            position -= 1;
+                        }
+
+                        final int finalPosition = position;
+                        mHandler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                mChatOutput.setSelection(finalPosition);
+                            }
+                        });
+                    }
+                }
+            });
+        }
+
         private void appendMessage(final ChatMessage msg) {
             mChatAdapter.appendMessage(msg);
         }
@@ -273,6 +322,12 @@ public class ChatActivity extends BaseActivity
 
             public void setMessages(ArrayList<ChatMessage> messages) {
                 mEntries.clear();
+                if (!mNoMoreChats) {
+                    // we always add an empty entry to mark the end of the messages, well,
+                    // unless there's no more chats left
+                    mEntries.add(new ItemEntry());
+                }
+
                 for (ChatMessage msg : messages) {
                     appendMessage(msg);
                 }
@@ -302,13 +357,19 @@ public class ChatActivity extends BaseActivity
 
             @Override
             public int getViewTypeCount() {
-                return 2;
+                return 3;
             }
 
             @Override
             public int getItemViewType(int position) {
                 ItemEntry entry = mEntries.get(position);
+                if (entry.message == null && entry.date == null) {
+                    // 2 == "loading"
+                    return 2;
+                }
+
                 if (entry.date != null) {
+                    // 1 == "simple"
                     return 1;
                 }
                 if (entry.message.getAction() != null && entry.message.getAction() != ChatMessage.MessageAction.Normal) {
@@ -318,6 +379,7 @@ public class ChatActivity extends BaseActivity
                     return 1;
                 }
 
+                // 0 == "normal"
                 return 0;
             }
 
@@ -349,20 +411,29 @@ public class ChatActivity extends BaseActivity
                     LayoutInflater inflater = (LayoutInflater) getActivity().getSystemService
                             (Context.LAYOUT_INFLATER_SERVICE);
 
-                    if (entry.date != null || action != ChatMessage.MessageAction.Normal || entry.message.getEmpireKey() == null) {
+                    if (entry.date == null && entry.message == null) {
+                        view = inflater.inflate(R.layout.chat_row_loading, null);
+                    } else if (entry.date != null || action != ChatMessage.MessageAction.Normal || entry.message.getEmpireKey() == null) {
                         view = inflater.inflate(R.layout.chat_row_simple, null);
                     } else {
                         view = inflater.inflate(R.layout.chat_row, null);
                     }
                 }
 
-                if (entry.date != null) {
+                if (entry.date == null && entry.message == null) {
+                    // this implies we're at the end of the list, fetch the next bunch
+                    mHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            fetchChatItems();
+                        }
+                    });
+                } else if (entry.date != null) {
                     TextView message = (TextView) view.findViewById(R.id.message);
                     message.setTextColor(Color.LTGRAY);
                     message.setGravity(Gravity.RIGHT);
                     message.setText(entry.date.toString("EE, dd MMM yyyy"));
-                }
-                else if (action != ChatMessage.MessageAction.Normal) {
+                } else if (action != ChatMessage.MessageAction.Normal) {
                     TextView message = (TextView) view.findViewById(R.id.message);
                     message.setTextColor(Color.LTGRAY);
                     message.setGravity(Gravity.LEFT);
@@ -387,6 +458,7 @@ public class ChatActivity extends BaseActivity
                 } else if (entry.message.getEmpireKey() == null) {
                     TextView message = (TextView) view.findViewById(R.id.message);
                     message.setTextColor(Color.CYAN);
+                    message.setGravity(Gravity.LEFT);
                     message.setText("[SERVER] "+entry.message.getMessage());
                 } else {
                     ImageView empireIcon = (ImageView) view.findViewById(R.id.empire_icon);
@@ -416,6 +488,8 @@ public class ChatActivity extends BaseActivity
                 public ChatMessage message;
                 public DateTime date;
 
+                public ItemEntry() {
+                }
                 public ItemEntry(ChatMessage message) {
                     this.message = message;
                 }

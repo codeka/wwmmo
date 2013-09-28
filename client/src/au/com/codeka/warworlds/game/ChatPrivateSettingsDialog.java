@@ -1,9 +1,6 @@
 package au.com.codeka.warworlds.game;
 
-import com.google.protobuf.InvalidProtocolBufferException;
-
 import android.app.Dialog;
-import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.view.LayoutInflater;
@@ -15,6 +12,8 @@ import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.StyledDialog;
 import au.com.codeka.warworlds.model.ChatConversation;
 import au.com.codeka.warworlds.model.ChatManager;
+
+import com.google.protobuf.InvalidProtocolBufferException;
 
 public class ChatPrivateSettingsDialog extends DialogFragment {
     private View mView;

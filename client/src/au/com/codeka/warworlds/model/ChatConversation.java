@@ -9,13 +9,10 @@ import org.joda.time.DateTime;
 import au.com.codeka.common.model.BaseChatConversation;
 import au.com.codeka.common.model.BaseChatConversationParticipant;
 import au.com.codeka.common.protobuf.Messages;
-import au.com.codeka.warworlds.model.ChatConversationParticipant;
 import au.com.codeka.warworlds.model.ChatManager.MessageAddedListener;
 import au.com.codeka.warworlds.model.ChatManager.MessageUpdatedListener;
 
 public class ChatConversation extends BaseChatConversation {
-    public static int MAX_CHAT_HISTORY = 1000;
-
     private LinkedList<ChatMessage> mMessages = new LinkedList<ChatMessage>();
     private ArrayList<MessageAddedListener> mMessageAddedListeners = new ArrayList<MessageAddedListener>();
     private ArrayList<MessageUpdatedListener> mMessageUpdatedListeners = new ArrayList<MessageUpdatedListener>();
@@ -57,6 +54,7 @@ public class ChatConversation extends BaseChatConversation {
         for(MessageUpdatedListener listener : mMessageUpdatedListeners) {
             listener.onMessageUpdated(msg);
         }
+        ChatManager.i.fireMessageUpdatedListeners(msg);
     }
 
     public void update(ChatConversation conversation) {
@@ -105,6 +103,27 @@ public class ChatConversation extends BaseChatConversation {
         return msgs;
     }
 
+    /** Fetches from the server another page of older messages. */
+    public void fetchOlderMessages(final ChatManager.MessagesFetchedListener handler) {
+        DateTime before = DateTime.now();
+        if (mMessages.size() > 0) {
+            before = mMessages.get(0).getDatePosted();
+        }
+        DateTime after = before.minusDays(7);
+
+        ChatManager.i.requestMessages(after, before, 100, getID() > 0 ? getID() : null,
+                new ChatManager.MessagesFetchedListener() {
+            @Override
+            public void onMessagesFetched(List<ChatMessage> msgs) {
+                for (int i = msgs.size() - 1; i >= 0; i--) {
+                    addMessage(0, msgs.get(i), false);
+                }
+
+                handler.onMessagesFetched(msgs);
+            }
+        });
+    }
+
     public List<ChatMessage> getAllMessages() {
         return mMessages;
     }
@@ -113,10 +132,13 @@ public class ChatConversation extends BaseChatConversation {
         return mMessages.size();
     }
 
-    /**
-     * Adds a new message to the chat list.
-     */
-    public void addMessage(final ChatMessage msg) {
+    /** Adds a new message to the chat list. */
+    public void addMessage(ChatMessage msg) {
+        addMessage(mMessages.size(), msg, true);
+    }
+
+    /** Adds a new message to the chat list at the given index. */
+    public void addMessage(int index, ChatMessage msg, boolean fireListeners) {
         synchronized(mMessages) {
             // make sure we don't have this chat already...
             for (ChatMessage existing : mMessages) {
@@ -124,15 +146,12 @@ public class ChatConversation extends BaseChatConversation {
                     return;
                 }
             }
-            while (mMessages.size() > MAX_CHAT_HISTORY) {
-                mMessages.removeFirst();
-            }
-            mMessages.add(msg);
+            mMessages.add(index, msg);
 
             if (mMostRecentMsg == null) {
                 mMostRecentMsg = msg.getDatePosted();
             } else if (msg.getDatePosted() != null) {
-                if (msg.getDatePosted().compareTo(mMostRecentMsg) > 0) {
+                if (msg.getDatePosted().isAfter(mMostRecentMsg)) {
                     mMostRecentMsg = msg.getDatePosted();
                 }
             }
@@ -146,7 +165,9 @@ public class ChatConversation extends BaseChatConversation {
                 }
             }
         }
-        fireMessageAddedListeners(msg);
+        if (fireListeners) {
+            fireMessageAddedListeners(msg);
+        }
     }
 
     public void onEmpireRefreshed(Empire empire) {

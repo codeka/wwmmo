@@ -19,10 +19,28 @@ public class ChatHandler extends RequestHandler {
 
     @Override
     protected void get() throws RequestException {
-        DateTime since = DateTime.now().minusDays(7);
-        if (getRequest().getParameter("since") != null) {
+        DateTime after = DateTime.now().minusDays(14);
+        if (getRequest().getParameter("since") != null) { // note: synonym for 'after'
             long epoch = Long.parseLong(getRequest().getParameter("since")) + 1;
-            since = new DateTime(epoch * 1000);
+            after = new DateTime(epoch * 1000);
+        }
+        if (getRequest().getParameter("after") != null) {
+            long epoch = Long.parseLong(getRequest().getParameter("after")) + 1;
+            after = new DateTime(epoch * 1000);
+        }
+
+        DateTime before = DateTime.now().plusHours(1);
+        if (getRequest().getParameter("before") != null) {
+            long epoch = Long.parseLong(getRequest().getParameter("before")) - 1;
+            before = new DateTime(epoch * 1000);
+        }
+
+        DateTime minDate = DateTime.now().minusDays(14);
+        if (after.isBefore(minDate)) {
+            after = minDate;
+        }
+        if (before.isBefore(minDate)) {
+            before = minDate;
         }
 
         int max = 100;
@@ -35,6 +53,7 @@ public class ChatHandler extends RequestHandler {
 
         String sql = "SELECT * FROM chat_messages" +
                     " WHERE posted_date > ?" +
+                      " AND posted_date <= ?" +
                       " AND (conversation_id IN (SELECT conversation_id FROM chat_conversation_participants WHERE empire_id = ?)" +
                        " OR conversation_id IS NULL" +
                       (getSession().isAdmin()
@@ -44,12 +63,13 @@ public class ChatHandler extends RequestHandler {
                     " ORDER BY posted_date DESC" +
                     " LIMIT "+max;
         try (SqlStmt stmt = DB.prepare(sql)) {
-            stmt.setDateTime(1, since);
+            stmt.setDateTime(1, after);
+            stmt.setDateTime(2, before);
             if (!getSession().isAdmin()) {
-                stmt.setInt(2, getSession().getEmpireID());
-                stmt.setInt(3, getSession().getAllianceID());
+                stmt.setInt(3, getSession().getEmpireID());
+                stmt.setInt(4, getSession().getAllianceID());
             } else {
-                stmt.setInt(2, 0); // TODO: admin won't see any private conversations...
+                stmt.setInt(3, 0); // TODO: admin won't see any private conversations...
             }
             ResultSet rs = stmt.select();
 
