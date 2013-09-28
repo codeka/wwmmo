@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
 import android.content.Context;
@@ -18,6 +19,7 @@ import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.text.Html;
 import android.text.method.LinkMovementMethod;
+import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -62,16 +64,9 @@ public class ChatActivity extends BaseActivity
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.chat);
 
-        mConversations = ChatManager.i.getConversations();
-        if (EmpireManager.i.getEmpire().getAlliance() != null) {
-            // swap alliance and global around...
-            ChatConversation globalConversation = mConversations.get(1);
-            mConversations.set(1, mConversations.get(0));
-            mConversations.set(0, globalConversation);
-        }
-
         mChatPagerAdapter = new ChatPagerAdapter(getSupportFragmentManager());
-        mChatPagerAdapter.refresh(mConversations);
+        onConversationsRefreshed();
+
         mViewPager = (ViewPager) findViewById(R.id.pager);
         mViewPager.setAdapter(mChatPagerAdapter);
 
@@ -112,6 +107,13 @@ public class ChatActivity extends BaseActivity
     @Override
     public void onConversationsRefreshed() {
         mConversations = ChatManager.i.getConversations();
+        if (EmpireManager.i.getEmpire().getAlliance() != null) {
+            // swap alliance and global around...
+            ChatConversation globalConversation = mConversations.get(1);
+            mConversations.set(1, mConversations.get(0));
+            mConversations.set(0, globalConversation);
+        }
+
         mChatPagerAdapter.refresh(mConversations);
     }
 
@@ -263,19 +265,38 @@ public class ChatActivity extends BaseActivity
         }
 
         private class ChatAdapter extends BaseAdapter {
-            private ArrayList<ChatMessage> mMessages;
+            private ArrayList<ItemEntry> mEntries;
 
             public ChatAdapter() {
-                mMessages = new ArrayList<ChatMessage>();
+                mEntries = new ArrayList<ItemEntry>();
             }
 
             public void setMessages(ArrayList<ChatMessage> messages) {
-                mMessages = messages;
+                mEntries.clear();
+                for (ChatMessage msg : messages) {
+                    appendMessage(msg);
+                }
                 notifyDataSetChanged();
             }
 
             public void appendMessage(ChatMessage msg) {
-                mMessages.add(msg);
+                boolean needsDateHeader = false;
+                if (mEntries.size() == 0) {
+                    needsDateHeader = true;
+                } else if (mEntries.get(mEntries.size() - 1).message != null) {
+                    DateTime lastDate = mEntries.get(mEntries.size() - 1).message.getDatePosted().withZone(DateTimeZone.getDefault());
+                    DateTime thisDate = msg.getDatePosted().withZone(DateTimeZone.getDefault());
+
+                    if (lastDate.getYear() != thisDate.getYear() ||
+                            lastDate.getDayOfYear() != thisDate.getDayOfYear()) {
+                        needsDateHeader = true;
+                    }
+                }
+
+                if (needsDateHeader) {
+                    mEntries.add(new ItemEntry(msg.getDatePosted()));
+                }
+                mEntries.add(new ItemEntry(msg));
                 notifyDataSetChanged();
             }
 
@@ -286,11 +307,14 @@ public class ChatActivity extends BaseActivity
 
             @Override
             public int getItemViewType(int position) {
-                ChatMessage msg = mMessages.get(position);
-                if (msg.getAction() != null && msg.getAction() != ChatMessage.MessageAction.Normal) {
+                ItemEntry entry = mEntries.get(position);
+                if (entry.date != null) {
                     return 1;
                 }
-                if (msg.getEmpireKey() == null) {
+                if (entry.message.getAction() != null && entry.message.getAction() != ChatMessage.MessageAction.Normal) {
+                    return 1;
+                }
+                if (entry.message.getEmpireKey() == null) {
                     return 1;
                 }
 
@@ -299,12 +323,12 @@ public class ChatActivity extends BaseActivity
 
             @Override
             public int getCount() {
-                return mMessages.size();
+                return mEntries.size();
             }
 
             @Override
             public Object getItem(int position) {
-                return mMessages.get(position);
+                return mEntries.get(position);
             }
 
             @Override
@@ -314,10 +338,10 @@ public class ChatActivity extends BaseActivity
 
             @Override
             public View getView(int position, View convertView, ViewGroup parent) {
-                ChatMessage msg = mMessages.get(position);
+                ItemEntry entry = mEntries.get(position);
                 ChatMessage.MessageAction action = ChatMessage.MessageAction.Normal;
-                if (msg.getAction() != null) {
-                    action = msg.getAction();
+                if (entry.message != null && entry.message.getAction() != null) {
+                    action = entry.message.getAction();
                 }
 
                 View view = convertView;
@@ -325,27 +349,34 @@ public class ChatActivity extends BaseActivity
                     LayoutInflater inflater = (LayoutInflater) getActivity().getSystemService
                             (Context.LAYOUT_INFLATER_SERVICE);
 
-                    if (action != ChatMessage.MessageAction.Normal || msg.getEmpireKey() == null) {
+                    if (entry.date != null || action != ChatMessage.MessageAction.Normal || entry.message.getEmpireKey() == null) {
                         view = inflater.inflate(R.layout.chat_row_simple, null);
                     } else {
                         view = inflater.inflate(R.layout.chat_row, null);
                     }
                 }
 
-                if (action != ChatMessage.MessageAction.Normal) {
+                if (entry.date != null) {
                     TextView message = (TextView) view.findViewById(R.id.message);
                     message.setTextColor(Color.LTGRAY);
-                    Empire otherEmpire = EmpireManager.i.getEmpire(msg.getMessage());
+                    message.setGravity(Gravity.RIGHT);
+                    message.setText(entry.date.toString("EE, dd MMM yyyy"));
+                }
+                else if (action != ChatMessage.MessageAction.Normal) {
+                    TextView message = (TextView) view.findViewById(R.id.message);
+                    message.setTextColor(Color.LTGRAY);
+                    message.setGravity(Gravity.LEFT);
+                    Empire otherEmpire = EmpireManager.i.getEmpire(entry.message.getMessage());
                     if (action == ChatMessage.MessageAction.ParticipantAdded) {
-                        if (msg.getEmpire() != null && otherEmpire != null) {
+                        if (entry.message.getEmpire() != null && otherEmpire != null) {
                             String content = String.format(Locale.ENGLISH, "%s has added %s to the conversation.",
-                                    msg.getEmpire().getDisplayName(), otherEmpire.getDisplayName());
+                                    entry.message.getEmpire().getDisplayName(), otherEmpire.getDisplayName());
                             message.setText(Html.fromHtml("<i>"+content+"</i>"));
                         } else {
                             message.setText(Html.fromHtml("<i>An empire has been added to the conversation."));
                         }
                     } else if (action == ChatMessage.MessageAction.ParticipantLeft) {
-                        if (msg.getEmpire() != null && otherEmpire != null) {
+                        if (entry.message.getEmpire() != null && otherEmpire != null) {
                             String content = String.format(Locale.ENGLISH, "%s has left the conversation.",
                                     otherEmpire.getDisplayName());
                             message.setText(Html.fromHtml("<i>"+content+"</i>"));
@@ -353,31 +384,44 @@ public class ChatActivity extends BaseActivity
                             message.setText(Html.fromHtml("<i>An empire has left the conversation."));
                         }
                     }
-                } else if (msg.getEmpireKey() == null) {
+                } else if (entry.message.getEmpireKey() == null) {
                     TextView message = (TextView) view.findViewById(R.id.message);
                     message.setTextColor(Color.CYAN);
-                    message.setText("[SERVER] "+msg.getMessage());
+                    message.setText("[SERVER] "+entry.message.getMessage());
                 } else {
                     ImageView empireIcon = (ImageView) view.findViewById(R.id.empire_icon);
                     TextView empireName = (TextView) view.findViewById(R.id.empire_name);
                     TextView msgTime = (TextView) view.findViewById(R.id.msg_time);
                     TextView message = (TextView) view.findViewById(R.id.message);
     
-                    if (msg.getEmpire() != null) {
-                        Bitmap shield = EmpireShieldManager.i.getShield(getActivity(), (Empire) msg.getEmpire());
-                        empireName.setText(msg.getEmpire().getDisplayName());
+                    if (entry.message.getEmpire() != null) {
+                        Bitmap shield = EmpireShieldManager.i.getShield(getActivity(),
+                                (Empire) entry.message.getEmpire());
+                        empireName.setText(entry.message.getEmpire().getDisplayName());
                         empireIcon.setImageBitmap(shield);
                     } else {
                         empireIcon.setImageBitmap(null);
                         empireName.setText("");
                     }
-    
-                    msgTime.setText(msg.getDatePosted().withZone(DateTimeZone.getDefault()).toString("h:mm a"));
-                    message.setText(msg.format(mConversation.getID() == 0, true, mAutoTranslate));
+
+                    msgTime.setText(entry.message.getDatePosted().withZone(DateTimeZone.getDefault()).toString("h:mm a"));
+                    message.setText(entry.message.format(mConversation.getID() == 0, true, mAutoTranslate));
                     message.setMovementMethod(LinkMovementMethod.getInstance());
                 }
 
                 return view;
+            }
+
+            private class ItemEntry {
+                public ChatMessage message;
+                public DateTime date;
+
+                public ItemEntry(ChatMessage message) {
+                    this.message = message;
+                }
+                public ItemEntry(DateTime date) {
+                    this.date = date;
+                }
             }
         }
 

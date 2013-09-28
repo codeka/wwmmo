@@ -57,6 +57,9 @@ public class ChatMessage extends BaseChatMessage {
     public void setAction(MessageAction action) {
         mAction = action;
     }
+    public void setDatePosted(DateTime dt) {
+        mDatePosted = dt;
+    }
 
     @Override
     public void fromProtocolBuffer(Messages.ChatMessage pb) {

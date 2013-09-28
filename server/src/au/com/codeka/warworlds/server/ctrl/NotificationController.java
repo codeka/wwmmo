@@ -128,7 +128,7 @@ public class NotificationController {
                 int empireID = rs.getInt(3);
 
                 ChatConversationParticipant participant = null;
-                for (ChatConversationParticipant p : participants) {
+                if (participants != null) for (ChatConversationParticipant p : participants) {
                     if (p.getEmpireID() == empireID) {
                         participant = p;
                         break;
@@ -144,12 +144,12 @@ public class NotificationController {
                     }
 
                     // only send a notification if they're not muted
-                    if (!participant.isMuted()) {
+                    if (participant != null && !participant.isMuted()) {
                         sRecentNotifications.addNotification(empireID, notification);
                     }
                 }
 
-                if (!participant.isMuted() && registrationId != null && email != null) {
+                if ((participant == null || !participant.isMuted()) && registrationId != null && email != null) {
                     devices.put(registrationId, email);
                 }
             }

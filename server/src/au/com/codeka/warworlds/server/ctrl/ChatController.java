@@ -93,7 +93,8 @@ public class ChatController {
             stmt.setString(3, msg_native);
             stmt.setString(4, msg_en);
 
-            stmt.setDateTime(5, DateTime.now());
+            msg.setDatePosted(DateTime.now());
+            stmt.setDateTime(5, msg.getDatePosted());
 
             if (msg.getConversationID() != null && msg.getConversationID() > 0) {
                 stmt.setInt(6, msg.getConversationID());
