@@ -161,7 +161,9 @@ public class ChatActivity extends BaseActivity
         @Override
         public void setPrimaryItem(ViewGroup container, int position, Object object) {
             super.setPrimaryItem(container, position, object);
-            // TODO?
+
+            ChatConversation conversation = mConversations.get(position);
+            conversation.markAllRead();
         }
     }
 
@@ -530,6 +532,8 @@ public class ChatActivity extends BaseActivity
                     });
                 }
             });
+
+            setupUnreadMessageCount(v);
         }
 
         private void setupAllianceChatHeader(View v) {
@@ -540,6 +544,8 @@ public class ChatActivity extends BaseActivity
 
             TextView title = (TextView) v.findViewById(R.id.title);
             title.setText(alliance.getName());
+
+            setupUnreadMessageCount(v);
         }
 
         private void setupPrivateChatHeader(View v) {
@@ -590,6 +596,58 @@ public class ChatActivity extends BaseActivity
                     }
                 });
             }
+        }
+
+        private static int getTotalUnreadCount() {
+            int numUnread = 0;
+            for (ChatConversation conversation : ChatManager.i.getConversations()) {
+                numUnread += conversation.getUnreadCount();
+            }
+            return numUnread;
+        }
+
+        private static void refreshUnreadCountButton(Button btn) {
+            int numUnread = getTotalUnreadCount();
+
+            if (numUnread > 0) {
+                btn.setVisibility(View.VISIBLE);
+                btn.setText(String.format("  %d  ", numUnread));
+            } else {
+                btn.setVisibility(View.GONE);
+            }
+        }
+
+        private void setupUnreadMessageCount(View v) {
+            final Button btn = (Button) v.findViewById(R.id.unread_btn);
+            refreshUnreadCountButton(btn);
+
+            ChatManager.i.addMessageAddedListener(new ChatManager.MessageAddedListener() {
+                @Override
+                public void onMessageAdded(ChatMessage msg) {
+                    refreshUnreadCountButton(btn);
+                }
+            });
+            ChatManager.i.addUnreadMessageCountListener(new ChatManager.UnreadMessageCountListener() {
+                @Override
+                public void onUnreadMessageCountChanged() {
+                    refreshUnreadCountButton(btn);
+                }
+            });
+
+            btn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    // move to the first conversation with an unread message
+                    List<ChatConversation> conversations = ((ChatActivity) getActivity()).mConversations;
+                    ViewPager viewPager = ((ChatActivity) getActivity()).mViewPager;
+                    for (int i = 0; i < conversations.size(); i++) {
+                        if (conversations.get(i).getUnreadCount() > 0) {
+                            viewPager.setCurrentItem(i);
+                            break;
+                        }
+                    }
+                }
+            });
         }
     }
 

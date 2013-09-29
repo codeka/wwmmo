@@ -26,20 +26,22 @@ public class ChatManager implements BackgroundDetector.BackgroundChangeHandler {
 
     private ArrayList<MessageAddedListener> mMessageAddedListeners;
     private ArrayList<MessageUpdatedListener> mMessageUpdatedListeners;
+    private ArrayList<ConversationsRefreshListener> mConversationsRefreshListeners;
+    private ArrayList<UnreadMessageCountListener> mUnreadMessageCountListeners;
     private DateTime mMostRecentMsg;
     private boolean mRequesting;
     private TreeSet<String> mEmpiresToRefresh;
     private Handler mHandler;
     private SparseArray<ChatConversation> mConversations;
     private boolean mConversationsRefreshing = false;
-    private List<ConversationsRefreshListener> mConversationsRefreshListeners;
 
     private ChatManager() {
         mMessageAddedListeners = new ArrayList<MessageAddedListener>();
         mMessageUpdatedListeners = new ArrayList<MessageUpdatedListener>();
+        mConversationsRefreshListeners = new ArrayList<ConversationsRefreshListener>();
+        mUnreadMessageCountListeners = new ArrayList<UnreadMessageCountListener>();
         mEmpiresToRefresh = new TreeSet<String>();
         mConversations = new SparseArray<ChatConversation>();
-        mConversationsRefreshListeners = new ArrayList<ConversationsRefreshListener>();
     }
 
     /**
@@ -76,6 +78,20 @@ public class ChatManager implements BackgroundDetector.BackgroundChangeHandler {
         }
     }
 
+    public void addUnreadMessageCountListener(UnreadMessageCountListener listener) {
+        if (!mUnreadMessageCountListeners.contains(listener)) {
+            mUnreadMessageCountListeners.add(listener);
+        }
+    }
+    public void removeUnreadMessageCountListener(UnreadMessageCountListener listener) {
+        mUnreadMessageCountListeners.remove(listener);
+    }
+    public void fireUnreadMessageCountListeners() {
+        for(UnreadMessageCountListener listener : mUnreadMessageCountListeners) {
+            listener.onUnreadMessageCountChanged();
+        }
+    }
+
     public void addMessageUpdatedListener(MessageUpdatedListener listener) {
         if (!mMessageUpdatedListeners.contains(listener)) {
             mMessageUpdatedListeners.add(listener);
@@ -98,7 +114,7 @@ public class ChatManager implements BackgroundDetector.BackgroundChangeHandler {
     public void removeConversationsRefreshListener(ConversationsRefreshListener listener) {
         mConversationsRefreshListeners.remove(listener);
     }
-    private void fireConversationsRefreshListeners() {
+    public void fireConversationsRefreshListeners() {
         for(ConversationsRefreshListener listener : mConversationsRefreshListeners) {
             listener.onConversationsRefreshed();
         }
@@ -486,5 +502,8 @@ public class ChatManager implements BackgroundDetector.BackgroundChangeHandler {
     }
     public interface MessagesFetchedListener {
         void onMessagesFetched(List<ChatMessage> msgs);
+    }
+    public interface UnreadMessageCountListener {
+        void onUnreadMessageCountChanged();
     }
 }

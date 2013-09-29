@@ -5,10 +5,17 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 
+import android.content.ContentValues;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
 import au.com.codeka.common.model.BaseChatConversation;
 import au.com.codeka.common.model.BaseChatConversationParticipant;
 import au.com.codeka.common.protobuf.Messages;
+import au.com.codeka.warworlds.App;
+import au.com.codeka.warworlds.RealmContext;
 import au.com.codeka.warworlds.model.ChatManager.MessageAddedListener;
 import au.com.codeka.warworlds.model.ChatManager.MessageUpdatedListener;
 
@@ -170,6 +177,30 @@ public class ChatConversation extends BaseChatConversation {
         }
     }
 
+    public int getUnreadCount() {
+        if (mID <= 0) {
+            return 0;
+        }
+
+        DateTime lastReadCount = new ChatStore().getLastReadDate(mID);
+        if (lastReadCount == null) {
+            return mMessages.size();
+        }
+
+        int numUnread = 0;
+        for (ChatMessage msg : mMessages) {
+            if (msg.getDatePosted().isAfter(lastReadCount)) {
+                numUnread ++;
+            }
+        }
+        return numUnread;
+    }
+
+    public void markAllRead() {
+        new ChatStore().setLastReadDate(mID, mMostRecentMsg);
+        ChatManager.i.fireUnreadMessageCountListeners();
+    }
+
     public void onEmpireRefreshed(Empire empire) {
         for (ChatMessage msg : mMessages) {
             if (msg.getEmpireKey() == null) {
@@ -196,5 +227,80 @@ public class ChatConversation extends BaseChatConversation {
             participant.fromProtocolBuffer(pb);
         }
         return participant;
+    }
+
+    private static class ChatStore extends SQLiteOpenHelper {
+        private static Object sLock = new Object();
+
+        public ChatStore() {
+            super(App.i, "chat.db", null, 1);
+        }
+
+        /**
+         * This is called the first time we open the database, in order to create the required
+         * tables, etc.
+         */
+        @Override
+        public void onCreate(SQLiteDatabase db) {
+            db.execSQL("CREATE TABLE read_counter ("
+                      +"  conversation_id INTEGER PRIMARY KEY,"
+                      +"  realm_id INTEGER,"
+                      +"  last_read_date INTEGER);");
+        }
+
+        @Override
+        public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        }
+
+        public void setLastReadDate(int conversationID, DateTime dt) {
+            synchronized(sLock) {
+                SQLiteDatabase db = getWritableDatabase();
+                try {
+                    // delete any old cached values first
+                    db.delete("read_counter", getWhereClause(conversationID), null);
+
+                    // insert a new cached value
+                    ContentValues values = new ContentValues();
+                    values.put("conversation_id", conversationID);
+                    values.put("realm_id", RealmContext.i.getCurrentRealm().getID());
+                    values.put("last_read_date", dt.getMillis());
+                    db.insert("read_counter", null, values);
+                } catch(Exception e) {
+                    // ignore errors... todo: log them
+                } finally {
+                    db.close();
+                }
+            }
+        }
+
+        public DateTime getLastReadDate(int conversationID) {
+            synchronized(sLock) {
+                SQLiteDatabase db = getReadableDatabase();
+                Cursor cursor = null;
+                try {
+                    cursor = db.query("read_counter", new String[] {"conversation_id", "last_read_date"},
+                            getWhereClause(conversationID),
+                            null, null, null, null);
+                    if (!cursor.moveToFirst()) {
+                        cursor.close();
+                        return null;
+                    }
+
+                    // if it's too old, we'll want to refresh it anyway from the server
+                    long epoch = cursor.getLong(1);
+                    return new DateTime(epoch, DateTimeZone.UTC);
+                } catch (Exception e) {
+                    // todo: log errors
+                    return null;
+                } finally {
+                    if (cursor != null) cursor.close();
+                    db.close();
+                }
+            }
+        }
+
+        private String getWhereClause(int conversationID) {
+            return "conversation_id = '"+conversationID+"' AND realm_id="+RealmContext.i.getCurrentRealm().getID();
+        }
     }
 }

@@ -35,4 +35,14 @@
         android:scaleType="fitCenter"
         android:src="@drawable/cog" />
 
+    <Button android:id="@+id/unread_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="28dp"
+            android:layout_alignBaseline="@+id/title"
+            android:layout_alignBottom="@+id/title"
+            android:layout_toLeftOf="@+id/settings_btn"
+            android:layout_marginRight="10dp"
+            android:background="@drawable/button_red_bg"
+            android:text="  0  " />
+
 </RelativeLayout>
