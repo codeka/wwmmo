@@ -187,12 +187,14 @@ public class NotificationController {
                     String errorCodeName = result.getErrorCodeName();
                     if (errorCodeName.equals(Constants.ERROR_NOT_REGISTERED)) {
                         handleNotRegisteredError(registrationId, devices.get(registrationId), result);
-                        success = false;
+                    } else {
+                        handleOtherError(registrationId, devices.get(registrationId), result);
                     }
+                    success = false;
                 }
                 if (success) {
-                    log.info(String.format("Notification successfully sent: user=%s registration=%s",
-                             devices.get(registrationId), registrationId));
+                    log.info(String.format("Notification successfully sent: %s %s, user=%s registration=%s",
+                            new RealmController().getRealmName(), result.getMessageId(), devices.get(registrationId), registrationId));
                 }
             }
         } catch (IOException e) {
@@ -209,6 +211,10 @@ public class NotificationController {
         } catch(Exception e) {
             throw new RequestException(e);
         }
+    }
+
+    private void handleOtherError(String registrationId, String userEmail, Result result) throws RequestException {
+        log.warn(String.format("Could not send notification: %s: user=%s registration=%s", result.getErrorCodeName(), userEmail, registrationId));
     }
 
     private void handleCanonicalRegistrationId(String registrationId, String userEmail, Result result) throws RequestException {

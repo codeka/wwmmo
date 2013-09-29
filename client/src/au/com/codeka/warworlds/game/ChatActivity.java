@@ -60,6 +60,7 @@ public class ChatActivity extends BaseActivity
     private ChatPagerAdapter mChatPagerAdapter;
     private ViewPager mViewPager;
     private List<ChatConversation> mConversations;
+    private Handler mHandler;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -72,6 +73,29 @@ public class ChatActivity extends BaseActivity
 
         mViewPager = (ViewPager) findViewById(R.id.pager);
         mViewPager.setAdapter(mChatPagerAdapter);
+        mHandler = new Handler();
+
+        Bundle extras = getIntent().getExtras();
+        if (extras != null) {
+            final int conversationID = extras.getInt("au.com.codeka.warworlds.ConversationID", 0);
+            if (conversationID != 0) {
+                int position = 0;
+                for (; position < mConversations.size(); position++) {
+                    if (mConversations.get(position).getID() == conversationID) {
+                        break;
+                    }
+                }
+                if (position < mConversations.size()) {
+                    final int finalPosition = position;
+                    mHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            mViewPager.setCurrentItem(finalPosition);
+                        }
+                    });
+                }
+            }
+        }
 
         final EditText chatMsg = (EditText) findViewById(R.id.chat_text);
 
@@ -214,16 +238,16 @@ public class ChatActivity extends BaseActivity
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view,
                         int position, long id) {
-                    ChatMessage msg = (ChatMessage) mChatAdapter.getItem(position);
-                    if (msg.getEmpire() == null) {
+                    ChatAdapter.ItemEntry entry = (ChatAdapter.ItemEntry) mChatAdapter.getItem(position);
+                    if (entry.message == null || entry.message.getEmpire() == null) {
                         // it'll be there in a sec. better to just wait
                         return;
                     }
 
                     ChatMessageDialog dialog = new ChatMessageDialog();
                     Bundle args = new Bundle();
-                    args.putByteArray("au.com.codeka.warworlds.ChatMessage", ((ChatMessage) msg).toProtocolBuffer().toByteArray());
-                    args.putByteArray("au.com.codeka.warworlds.Empire", ((Empire) msg.getEmpire()).toProtocolBuffer().toByteArray());
+                    args.putByteArray("au.com.codeka.warworlds.ChatMessage", entry.message.toProtocolBuffer().toByteArray());
+                    args.putByteArray("au.com.codeka.warworlds.Empire", ((Empire) entry.message.getEmpire()).toProtocolBuffer().toByteArray());
                     dialog.setArguments(args);
                     dialog.show(getActivity().getSupportFragmentManager(), "");
                 }

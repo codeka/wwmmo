@@ -1,18 +1,21 @@
 package au.com.codeka.warworlds.ctrl;
 
+import java.util.List;
+
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.Resources;
 import android.graphics.Color;
 import android.util.AttributeSet;
-import android.util.TypedValue;
 import android.view.View;
+import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import au.com.codeka.warworlds.GlobalOptions;
+import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.game.ChatActivity;
+import au.com.codeka.warworlds.model.ChatConversation;
 import au.com.codeka.warworlds.model.ChatManager;
 import au.com.codeka.warworlds.model.ChatMessage;
 
@@ -39,28 +42,15 @@ public class MiniChatView extends RelativeLayout
             return;
         }
 
-        int id = 1;
         this.setBackgroundColor(Color.argb(0xaa, 0, 0, 0));
 
-        Resources r = getResources();
-        int size = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 30, r.getDisplayMetrics());
-        LayoutParams lp = new LayoutParams(size, size);
+        View view = inflate(context, R.layout.chat_mini_ctrl, null);
+        addView(view);
 
-        lp = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
-        mScrollView = new ScrollView(mContext);
-        mScrollView.setLayoutParams(lp);
-        mScrollView.setId(id++);
-        mScrollView.setFillViewport(true);
-        addView(mScrollView);
-
-        lp = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
-        mMsgsContainer = new LinearLayout(mContext);
-        mMsgsContainer.setOrientation(LinearLayout.VERTICAL);
-        mMsgsContainer.setLayoutParams(lp);
-        mMsgsContainer.setId(id++);
-        mScrollView.addView(mMsgsContainer);
-
+        mScrollView = (ScrollView) view.findViewById(R.id.scrollview);
+        mMsgsContainer = (LinearLayout) view.findViewById(R.id.msgs_container);
         mAutoTranslate = new GlobalOptions().autoTranslateChatMessages();
+        setupUnreadMessageCount(view);
 
         refreshMessages();
 
@@ -153,4 +143,62 @@ public class MiniChatView extends RelativeLayout
             }
         });
     }
+
+
+    private static int getTotalUnreadCount() {
+        int numUnread = 0;
+        for (ChatConversation conversation : ChatManager.i.getConversations()) {
+            numUnread += conversation.getUnreadCount();
+        }
+        return numUnread;
+    }
+
+    private static void refreshUnreadCountButton(Button btn) {
+        int numUnread = getTotalUnreadCount();
+
+        if (numUnread > 0) {
+            btn.setVisibility(View.VISIBLE);
+            btn.setText(String.format("  %d  ", numUnread));
+        } else {
+            btn.setVisibility(View.GONE);
+        }
+    }
+
+    private void setupUnreadMessageCount(View v) {
+        final Button btn = (Button) v.findViewById(R.id.unread_btn);
+        refreshUnreadCountButton(btn);
+
+        ChatManager.i.addMessageAddedListener(new ChatManager.MessageAddedListener() {
+            @Override
+            public void onMessageAdded(ChatMessage msg) {
+                refreshUnreadCountButton(btn);
+            }
+        });
+        ChatManager.i.addUnreadMessageCountListener(new ChatManager.UnreadMessageCountListener() {
+            @Override
+            public void onUnreadMessageCountChanged() {
+                refreshUnreadCountButton(btn);
+            }
+        });
+
+        btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // move to the first conversation with an unread message
+                Intent intent = new Intent(mContext, ChatActivity.class);
+
+                List<ChatConversation> conversations = ChatManager.i.getConversations();
+                for (int i = 0; i < conversations.size(); i++) {
+                    if (conversations.get(i).getUnreadCount() > 0) {
+                        intent.putExtra("au.com.codeka.warworlds.ConversationID", conversations.get(i).getID());
+                        break;
+                    }
+                }
+
+
+                mContext.startActivity(intent);
+            }
+        });
+    }
 }
+

@@ -89,26 +89,32 @@ public class Notifications {
             // realm to this notification. So we switch this thread temporarily to whatever
             // realm this notification is for.
             Realm thisRealm = RealmManager.i.getRealmByName(pb.getRealm());
+            log.debug("Got realm: "+thisRealm.getDisplayName());
             RealmContext.i.setThreadRealm(thisRealm);
             try {
                 // refresh the star this situation report is for, obviously
                 // something happened that we'll want to know about
                 Star star = StarManager.getInstance().refreshStarSync(pb.getStarKey(), true);
+                log.debug("refreshed star: successful? "+(star == null ? "false" : "true"));
                 if (star == null) { // <-- only refresh the star if we have one cached
                     // if we didn't refresh the star, then at least refresh
                     // the sector it was in (could have been a moving
                     // fleet, say)
                     star = SectorManager.getInstance().findStar(pb.getStarKey());
                     if (star != null) {
+                        log.debug("star found from sector manager instead.");
                         SectorManager.getInstance().refreshSector(star.getSectorX(), star.getSectorY());
                     }
                 } else {
+                    log.debug("firing star updated...");
                     StarManager.getInstance().fireStarUpdated(star);
                 }
 
                 // notify the build manager, in case it's a 'build complete' or something
+                log.debug("notifying build manager.");
                 BuildManager.getInstance().notifySituationReport(pb);
 
+                log.debug("displaying a notification...");
                 displayNotification(context, pb);
             } finally {
                 RealmContext.i.setThreadRealm(null);
@@ -136,13 +142,15 @@ public class Notifications {
     private static void displayNotification(final Context context,
                                             final Messages.SituationReport sitrep) {
         String starKey = sitrep.getStarKey();
-        StarSummary starSummary = StarManager.getInstance().requestStarSummarySync(starKey,
+        StarSummary starSummary = StarManager.getInstance().getStarSummaryNoFetch(starKey,
                 Float.MAX_VALUE // always prefer a cached version, no matter how old
             );
         if (starSummary == null) {
             // TODO: this is actually an error... we need better error reporting
+            log.error("Could not get star summary for star "+starKey+", cannot display notification.");
             return;
         }
+        log.debug("got a star summary!");
 
         NotificationDetails notification = new NotificationDetails();
         notification.sitrep = sitrep;
@@ -154,7 +162,10 @@ public class Notifications {
 
         DatabaseHelper db = new DatabaseHelper();
         if (!db.addNotification(notification)) {
+            log.debug("displaying notification now...");
             displayNotification(buildNotification(context, db.getNotifications()));
+        } else {
+            log.debug("notification already showing.");
         }
     }
 
@@ -355,9 +366,12 @@ public class Notifications {
             SQLiteDatabase db = getWritableDatabase();
             try {
                 // if there's an existing one, delete it first
-                int rows = db.delete("notifications",
-                        "sitrep_key = '"+details.sitrep.getKey()+"' AND realm_id = "+details.realm.getID(),
-                        null);
+                int rows = 0;
+                if (details.sitrep.getKey() != null && details.sitrep.getKey().length() > 0) {
+                    rows = db.delete("notifications",
+                            "sitrep_key = '"+details.sitrep.getKey()+"' AND realm_id = "+details.realm.getID(),
+                            null);
+                }
 
                 ByteArrayOutputStream sitrep = new ByteArrayOutputStream();
                 ByteArrayOutputStream star = new ByteArrayOutputStream();
@@ -366,6 +380,7 @@ public class Notifications {
                     details.star.writeTo(star);
                 } catch (IOException e) {
                     // we won't get the notification, but not the end of the world...
+                    log.error("Error serializing notification details.", e);
                     return false;
                 }
 

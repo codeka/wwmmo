@@ -7,6 +7,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Debug;
 import au.com.codeka.warworlds.model.EmpireManager;
 
 import com.google.android.gcm.GCMBaseIntentService;
@@ -44,28 +45,24 @@ public class GCMIntentService extends GCMBaseIntentService {
         DeviceRegistrar.unregister(false);
     }
 
-    /**
-     * Called where there's a non-recoverable error.
-     */
+    /** Called where there's a non-recoverable error.*/
     @Override
     public void onError(Context context, String errorId) {
         log.error("An error has occured! Error={}", errorId);
     }
 
-    /**
-     * Called when there's a \i recoverable error.
-     */
+    /** Called when there's a \i recoverable error. */
     @Override
     public boolean onRecoverableError(Context context, String errorId) {
         log.error("A recoverable error has occured, trying again. Error={}", errorId);
         return true;
     }
 
-    /**
-     * Called when a cloud message has been received.
-     */
+    /** Called when a cloud message has been received. */
     @Override
     public void onMessage(Context context, Intent intent) {
+        log.info("GCMIntentService.onMessage");
+
         // since this can be called when the application is not running, make sure we're
         // set to go still.
         Util.loadProperties();
@@ -78,7 +75,8 @@ public class GCMIntentService extends GCMBaseIntentService {
             }
             if (extras.containsKey("chat")) {
                 Notifications.displayNotfication(context, "chat", extras.getString("chat"));
-            } else if (extras.containsKey("empire_updated")) {
+            }
+            if (extras.containsKey("empire_updated")) {
                 EmpireManager.i.refreshEmpire();
             }
         }

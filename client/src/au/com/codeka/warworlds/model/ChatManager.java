@@ -34,6 +34,7 @@ public class ChatManager implements BackgroundDetector.BackgroundChangeHandler {
     private Handler mHandler;
     private SparseArray<ChatConversation> mConversations;
     private boolean mConversationsRefreshing = false;
+    private boolean mIsSetup = false;
 
     private ChatManager() {
         mMessageAddedListeners = new ArrayList<MessageAddedListener>();
@@ -58,6 +59,8 @@ public class ChatManager implements BackgroundDetector.BackgroundChangeHandler {
             mConversations.append(-1, new ChatConversation(-1));
         }
         refreshConversations();
+
+        mIsSetup = true;
 
         // fetch all chats from the last 24 hours -- todo: by day? or by number?
         mMostRecentMsg = (new DateTime()).minusDays(1);
@@ -217,6 +220,10 @@ public class ChatManager implements BackgroundDetector.BackgroundChangeHandler {
     }
 
     public ChatConversation getConversation(ChatMessage msg) {
+        if (!mIsSetup) {
+            return null;
+        }
+
         if (msg.getConversationID() == null) {
             if (msg.getAllianceKey() == null) {
                 return getGlobalConversation();
@@ -228,9 +235,15 @@ public class ChatManager implements BackgroundDetector.BackgroundChangeHandler {
         return getConversationByID(msg.getConversationID());
     }
     public ChatConversation getGlobalConversation() {
+        if (!mIsSetup) {
+            return null;
+        }
         return mConversations.get(0);
     }
     public ChatConversation getAllianceConversation() {
+        if (!mIsSetup) {
+            return null;
+        }
         return mConversations.get(-1);
     }
 

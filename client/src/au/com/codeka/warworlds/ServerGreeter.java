@@ -111,7 +111,7 @@ public class ServerGreeter {
 
         Util.loadProperties();
         if (Util.isDebug()) {
-            enableStrictMode();
+          //  enableStrictMode();
         }
 
         GCMRegistrar.checkDevice(activity);

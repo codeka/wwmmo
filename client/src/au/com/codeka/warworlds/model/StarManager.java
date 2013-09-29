@@ -481,7 +481,7 @@ public class StarManager extends BaseManager {
                     values.put("timestamp", DateTime.now(DateTimeZone.UTC).getMillis());
                     db.insert("stars", null, values);
                 } catch(Exception e) {
-                    // ignore errors... todo: log them
+                    log.error("Error saving star to cache.", e);
                 } finally {
                     db.close();
                 }
@@ -497,6 +497,7 @@ public class StarManager extends BaseManager {
                             "star_key = '"+starKey.replace('\'', ' ')+"' AND realm_id="+RealmContext.i.getCurrentRealm().getID(),
                             null, null, null, null);
                     if (!cursor.moveToFirst()) {
+                        log.debug("Star "+starKey+" realm "+RealmContext.i.getCurrentRealm().getDisplayName()+" not found in cache.");
                         cursor.close();
                         return null;
                     }
@@ -512,7 +513,7 @@ public class StarManager extends BaseManager {
 
                     return Messages.Star.parseFrom(cursor.getBlob(0));
                 } catch (Exception e) {
-                    // todo: log errors
+                    log.error("Error fetching star from cache.", e);
                     return null;
                 } finally {
                     if (cursor != null) cursor.close();

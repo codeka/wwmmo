@@ -20,6 +20,7 @@ public class Simulation {
     private LogHandler mLogHandler;
     private DateTime mNow;
 
+    private static int sNumSimulations;
     private static DateTime year2k = new DateTime(2000, 1, 1, 0, 0);
 
     public Simulation() {
@@ -28,6 +29,10 @@ public class Simulation {
     public Simulation(LogHandler log) {
         mNow = DateTime.now(DateTimeZone.UTC);
         mLogHandler = log;
+    }
+
+    public static int getNumRunningSimulations() {
+        return sNumSimulations;
     }
 
     protected void log(String message) {
@@ -41,6 +46,7 @@ public class Simulation {
      * @param star
      */
     public void simulate(BaseStar star) {
+        sNumSimulations ++;
         log(String.format("Begin simulation for '%s'", star.getName()));
 
         HashSet<String> empireKeys = new HashSet<String>();
@@ -138,6 +144,8 @@ public class Simulation {
 
             star.setLastSimulation(endTime);
         }
+
+        sNumSimulations --;
     }
 
     private DateTime getSimulateStartTime(BaseStar star) {
