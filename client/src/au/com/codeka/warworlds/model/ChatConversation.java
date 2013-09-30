@@ -20,7 +20,7 @@ import au.com.codeka.warworlds.model.ChatManager.MessageAddedListener;
 import au.com.codeka.warworlds.model.ChatManager.MessageUpdatedListener;
 
 public class ChatConversation extends BaseChatConversation {
-    private LinkedList<ChatMessage> mMessages = new LinkedList<ChatMessage>();
+    protected LinkedList<ChatMessage> mMessages = new LinkedList<ChatMessage>();
     private ArrayList<MessageAddedListener> mMessageAddedListeners = new ArrayList<MessageAddedListener>();
     private ArrayList<MessageUpdatedListener> mMessageUpdatedListeners = new ArrayList<MessageUpdatedListener>();
     private DateTime mMostRecentMsg;

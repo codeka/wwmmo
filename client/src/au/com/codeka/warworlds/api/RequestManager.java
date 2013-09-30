@@ -55,7 +55,7 @@ public class RequestManager {
     private static List<RequestManagerStateChangedHandler> sRequestManagerStateChangedHandlers =
             new ArrayList<RequestManagerStateChangedHandler>();
     private static String sImpersonateUser;
-    private static boolean sVerboseLog = true;
+    private static boolean sVerboseLog = false;
 
     // we record the last status code we got from the server, don't try to re-authenticate if we
     // get two 403's in a row, for example.

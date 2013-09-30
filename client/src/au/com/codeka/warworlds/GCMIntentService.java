@@ -7,7 +7,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Debug;
 import au.com.codeka.warworlds.model.EmpireManager;
 
 import com.google.android.gcm.GCMBaseIntentService;

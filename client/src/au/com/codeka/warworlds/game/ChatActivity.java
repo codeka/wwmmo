@@ -1,6 +1,7 @@
 package au.com.codeka.warworlds.game;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 
@@ -134,6 +135,15 @@ public class ChatActivity extends BaseActivity
     @Override
     public void onConversationsRefreshed() {
         mConversations = ChatManager.i.getConversations();
+        // remove the recent conversation, we don't display it here
+        Iterator<ChatConversation> it = mConversations.iterator();
+        while (it.hasNext()) {
+            ChatConversation conversation = it.next();
+            if (conversation.getID() < 0 &&
+                    conversation.getID() != ChatManager.ALLIANCE_CONVERSATION_ID) {
+                it.remove();
+            }
+        }
         if (EmpireManager.i.getEmpire().getAlliance() != null) {
             // swap alliance and global around...
             ChatConversation globalConversation = mConversations.get(1);

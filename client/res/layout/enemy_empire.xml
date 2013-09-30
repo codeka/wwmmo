@@ -58,6 +58,6 @@
         android:layout_below="@+id/view_msg"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="6dp"
-        android:text="View Empire" />
+        android:text="Locate Empire" />
 
 </RelativeLayout>

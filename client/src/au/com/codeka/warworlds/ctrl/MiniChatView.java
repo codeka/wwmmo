@@ -52,8 +52,6 @@ public class MiniChatView extends RelativeLayout
         mAutoTranslate = new GlobalOptions().autoTranslateChatMessages();
         setupUnreadMessageCount(view);
 
-        refreshMessages();
-
         mMsgsContainer.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -68,6 +66,8 @@ public class MiniChatView extends RelativeLayout
     public void onAttachedToWindow() {
         ChatManager.i.addMessageAddedListener(this);
         ChatManager.i.addMessageUpdatedListener(this);
+
+        refreshMessages();
     }
 
     @Override
@@ -78,12 +78,10 @@ public class MiniChatView extends RelativeLayout
 
     private void refreshMessages() {
         mMsgsContainer.removeAllViews();
-/*TODO: no way to get last 10 messages across all conversations...
-        List<ChatMessage> msgs = ChatManager.i.getLastMessages(10);
-        for(ChatMessage msg : msgs) {
+        ChatConversation conversation = ChatManager.i.getConversationByID(ChatManager.RECENT_CONVERSATION_ID);
+        for(ChatMessage msg : conversation.getAllMessages()) {
             appendMessage(msg);
         }
-*/
     }
 
     private void appendMessage(final ChatMessage msg) {
@@ -143,7 +141,6 @@ public class MiniChatView extends RelativeLayout
             }
         });
     }
-
 
     private static int getTotalUnreadCount() {
         int numUnread = 0;

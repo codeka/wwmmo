@@ -90,6 +90,8 @@ public class StarfieldActivity extends BaseActivity
     private Star mStarToSelect;
     private Fleet mFleetToSelect;
 
+    private boolean mDoNotNavigateToHomeStar;
+
     private static final int SOLAR_SYSTEM_REQUEST = 1;
     private static final int EMPIRE_REQUEST = 2;
     private static final int SITREP_REQUEST = 3;
@@ -248,7 +250,7 @@ public class StarfieldActivity extends BaseActivity
                     int offsetX = intent.getExtras().getInt("au.com.codeka.warworlds.OffsetX");
                     int offsetY = intent.getExtras().getInt("au.com.codeka.warworlds.OffsetY");
                     mStarfield.scrollTo(sectorX, sectorY, offsetX, offsetY, true);
-                    return;
+                    mDoNotNavigateToHomeStar = true;
                 }
             }
         }
@@ -287,10 +289,14 @@ public class StarfieldActivity extends BaseActivity
                 BaseStar homeStar = myEmpire.getHomeStar();
                 if (mHomeStar == null || !mHomeStar.getKey().equals(homeStar.getKey())) {
                     mHomeStar = (StarSummary) homeStar;
-                    mStarfield.scrollTo(homeStar.getSectorX(), homeStar.getSectorY(),
+                    if (!mDoNotNavigateToHomeStar) {
+                        mStarfield.scrollTo(homeStar.getSectorX(), homeStar.getSectorY(),
                                         homeStar.getOffsetX(), homeStar.getOffsetY(),
                                         true);
+                    }
                 }
+
+                mDoNotNavigateToHomeStar = true;
             }
         });
     }

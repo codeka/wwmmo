@@ -60,22 +60,11 @@ public class InfobarView extends FrameLayout
             @Override
             public void run() {
                 ProgressBar working = (ProgressBar) mView.findViewById(R.id.working);
-/*
-                if (Util.isDebug()) {
-                    TextView empireName = (TextView) mView.findViewById(R.id.empire_name);
-                    if (state.numInProgressRequests > 0) {
-                        String str = String.format(Locale.ENGLISH, "%d %s",
-                                                   state.numInProgressRequests,
-                                                   state.lastUri);
-                        empireName.setText(str);
-                    } else {
-                        String name = EmpireManager.i.getEmpire().getDisplayName();
-                        empireName.setText(name);
-                    }
-                }
-*/
+
                 RequestManagerState state = RequestManager.getCurrentState();
-                if (state.numInProgressRequests > 0) {
+                // We will always have one busy request for the notification long-poll, but
+                // that one doesn't really count.
+                if (state.numInProgressRequests > 1) {
                     working.setVisibility(View.VISIBLE);
                 } else {
                     working.setVisibility(View.GONE);

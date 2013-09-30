@@ -500,7 +500,6 @@ public class Notifications {
                 }
             }
         }
-
     }
 }
 

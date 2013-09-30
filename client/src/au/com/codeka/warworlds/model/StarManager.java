@@ -471,6 +471,7 @@ public class StarManager extends BaseManager {
                         star.writeTo(starBlob);
                     } catch (IOException e) {
                         // we won't get the notification, but not the end of the world...
+                        log.error("Error saving star to cache.", e);
                         return;
                     }
 

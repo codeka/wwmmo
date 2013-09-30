@@ -54,7 +54,7 @@ public class SitReportsHandler extends RequestHandler {
         for (Messages.SituationReport sitrep : sitreps) {
             sitreps_pb.addSituationReports(sitrep);
             DateTime thisSitRep = new DateTime(sitrep.getReportTime() * 1000, DateTimeZone.UTC);
-            if (thisSitRep.isBefore(after)) {
+            if (after == null || thisSitRep.isBefore(after)) {
                 after = thisSitRep;
             }
         }

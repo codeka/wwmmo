@@ -36,6 +36,10 @@ public class ChatManager implements BackgroundDetector.BackgroundChangeHandler {
     private boolean mConversationsRefreshing = false;
     private boolean mIsSetup = false;
 
+    public static final int GLOBAL_CONVERSATION_ID = 0;
+    public static final int ALLIANCE_CONVERSATION_ID = -1;
+    public static final int RECENT_CONVERSATION_ID = -2;
+
     private ChatManager() {
         mMessageAddedListeners = new ArrayList<MessageAddedListener>();
         mMessageUpdatedListeners = new ArrayList<MessageUpdatedListener>();
@@ -54,10 +58,11 @@ public class ChatManager implements BackgroundDetector.BackgroundChangeHandler {
 
         mHandler = new Handler();
         mConversations.clear();
-        mConversations.append(0, new ChatConversation(0));
+        mConversations.append(GLOBAL_CONVERSATION_ID, new ChatConversation(GLOBAL_CONVERSATION_ID));
         if (EmpireManager.i.getEmpire().getAlliance() != null) {
-            mConversations.append(-1, new ChatConversation(-1));
+            mConversations.append(ALLIANCE_CONVERSATION_ID, new ChatConversation(ALLIANCE_CONVERSATION_ID));
         }
+        mConversations.append(RECENT_CONVERSATION_ID, new ChatConversation(RECENT_CONVERSATION_ID));
         refreshConversations();
 
         mIsSetup = true;
@@ -238,13 +243,13 @@ public class ChatManager implements BackgroundDetector.BackgroundChangeHandler {
         if (!mIsSetup) {
             return null;
         }
-        return mConversations.get(0);
+        return mConversations.get(GLOBAL_CONVERSATION_ID);
     }
     public ChatConversation getAllianceConversation() {
         if (!mIsSetup) {
             return null;
         }
-        return mConversations.get(-1);
+        return mConversations.get(ALLIANCE_CONVERSATION_ID);
     }
 
     public ArrayList<ChatConversation> getConversations() {
