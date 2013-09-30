@@ -43,6 +43,11 @@ public class ChatHandler extends RequestHandler {
             before = minDate;
         }
 
+        Integer conversationID = null;
+        if (getRequest().getParameter("conversation") != null) {
+            conversationID = Integer.parseInt(getRequest().getParameter("conversation"));
+        }
+
         int max = 100;
         if (getRequest().getParameter("max") != null) {
             max = Integer.parseInt(getRequest().getParameter("max"));
@@ -60,16 +65,21 @@ public class ChatHandler extends RequestHandler {
                           ? "" // admin can see all alliance chat
                           : " AND (alliance_id IS NULL OR alliance_id = ?)") +
                        ")" +
+                      (conversationID != null ? " AND conversation_id = ?" : "") +
                     " ORDER BY posted_date DESC" +
                     " LIMIT "+max;
         try (SqlStmt stmt = DB.prepare(sql)) {
-            stmt.setDateTime(1, after);
-            stmt.setDateTime(2, before);
+            int i = 1;
+            stmt.setDateTime(i++, after);
+            stmt.setDateTime(i++, before);
             if (!getSession().isAdmin()) {
-                stmt.setInt(3, getSession().getEmpireID());
-                stmt.setInt(4, getSession().getAllianceID());
+                stmt.setInt(i++, getSession().getEmpireID());
+                stmt.setInt(i++, getSession().getAllianceID());
             } else {
-                stmt.setInt(3, 0); // TODO: admin won't see any private conversations...
+                stmt.setInt(i++, 0); // TODO: admin won't see any private conversations...
+            }
+            if (conversationID != null) {
+                stmt.setInt(i++, conversationID);
             }
             ResultSet rs = stmt.select();
 

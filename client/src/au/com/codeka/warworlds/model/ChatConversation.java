@@ -92,9 +92,7 @@ public class ChatConversation extends BaseChatConversation {
         return mNeedUpdate;
     }
 
-    /**
-     * Returns the last {c n} messages.
-     */
+    /** Returns the last {c n} messages. */
     public List<ChatMessage> getLastMessages(int n) {
         ArrayList<ChatMessage> msgs = new ArrayList<ChatMessage>();
 

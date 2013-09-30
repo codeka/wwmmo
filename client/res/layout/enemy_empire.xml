@@ -30,7 +30,7 @@
         android:layout_alignParentBottom="true" />
 
     <au.com.codeka.warworlds.ctrl.HorizontalSeparator
-        android:id="@+id/view_title"
+        android:id="@+id/horz_sep_1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
@@ -38,18 +38,18 @@
         android:layout_below="@+id/empire_icon"
         android:layout_marginLeft="@dimen/tablet_margin_5dp"
         android:layout_marginRight="@dimen/tablet_margin_5dp"
-        android:text="View" />
+        android:text="Locate" />
 
     <TextView
         android:id="@+id/view_msg"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
-        android:layout_below="@+id/view_title"
+        android:layout_below="@+id/horz_sep_1"
         android:layout_marginLeft="@dimen/tablet_margin_5dp"
         android:layout_marginRight="@dimen/tablet_margin_5dp"
         android:layout_marginTop="6dp"
-        android:text="Tap below to center the starfield view on this empire." />
+        android:text="Tap below to center the starfield view on %1s." />
 
     <Button
         android:id="@+id/view_btn"
@@ -60,4 +60,36 @@
         android:layout_marginTop="6dp"
         android:text="Locate Empire" />
 
+    <au.com.codeka.warworlds.ctrl.HorizontalSeparator
+        android:id="@+id/horz_sep_2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginTop="10dp"
+        android:layout_below="@+id/view_btn"
+        android:layout_marginLeft="@dimen/tablet_margin_5dp"
+        android:layout_marginRight="@dimen/tablet_margin_5dp"
+        android:text="Private Message" />
+
+    <TextView
+        android:id="@+id/private_message_btn_msg"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/horz_sep_2"
+        android:layout_marginLeft="@dimen/tablet_margin_5dp"
+        android:layout_marginRight="@dimen/tablet_margin_5dp"
+        android:layout_marginTop="6dp"
+        android:text="Tap below to start a private chat with %1s." />
+
+    <Button
+        android:id="@+id/private_message_btn"
+        android:layout_width="150dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/private_message_btn_msg"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="6dp"
+        android:text="Private Message" />
+    
 </RelativeLayout>

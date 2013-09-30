@@ -78,7 +78,7 @@ public class ChatActivity extends BaseActivity
 
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
-            final int conversationID = extras.getInt("au.com.codeka.warworlds.ConversationID", 0);
+            final int conversationID = extras.getInt("au.com.codeka.warworlds.ConversationID");
             if (conversationID != 0) {
                 int position = 0;
                 for (; position < mConversations.size(); position++) {
@@ -95,6 +95,16 @@ public class ChatActivity extends BaseActivity
                         }
                     });
                 }
+            }
+
+            final String empireKey = extras.getString("au.com.codeka.warworlds.NewConversationEmpireKey");
+            if (empireKey != null) {
+                mHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        startConversation(empireKey);
+                    }
+                });
             }
         }
 
@@ -152,6 +162,22 @@ public class ChatActivity extends BaseActivity
         }
 
         mChatPagerAdapter.refresh(mConversations);
+    }
+
+    /** Start a new conversation with the given empire (empireKey could be null for an empty chat) */
+    public void startConversation(String empireKey) {
+        ChatManager.i.startConversation(empireKey, new ChatManager.ConversationStartedListener() {
+            @Override
+            public void onConversationStarted(ChatConversation conversation) {
+                onConversationsRefreshed();
+
+                int index = mConversations.indexOf(conversation);
+                if (index >= 0) {
+                    mViewPager.setCurrentItem(index);
+                }
+            }
+        });
+
     }
 
     public class ChatPagerAdapter extends FragmentStatePagerAdapter {
@@ -549,21 +575,7 @@ public class ChatActivity extends BaseActivity
             newGroupBtn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    ChatManager.i.startConversation(null, new ChatManager.ConversationStartedListener() {
-                        @Override
-                        public void onConversationStarted(ChatConversation conversation) {
-                            ChatPagerAdapter adapter = ((ChatActivity) getActivity()).mChatPagerAdapter;
-                            ViewPager pager = ((ChatActivity) getActivity()).mViewPager;
-
-                            List<ChatConversation> conversations = ChatManager.i.getConversations();
-                            adapter.refresh(conversations);
-
-                            int index = conversations.indexOf(conversation);
-                            if (index >= 0) {
-                                pager.setCurrentItem(index);
-                            }
-                        }
-                    });
+                    ((ChatActivity) getActivity()).startConversation(null);
                 }
             });
 

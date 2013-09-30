@@ -73,7 +73,7 @@ public class ChatMessageDialog extends DialogFragment {
                 ChatManager.i.startConversation(mEmpire.getKey(), new ChatManager.ConversationStartedListener() {
                     @Override
                     public void onConversationStarted(ChatConversation conversation) {
-                        // TODO
+                        ((ChatActivity) getActivity()).startConversation(mEmpire.getKey());
                     }
                 });
 

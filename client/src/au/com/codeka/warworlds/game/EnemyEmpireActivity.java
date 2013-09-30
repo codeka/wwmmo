@@ -39,6 +39,14 @@ public class EnemyEmpireActivity extends BaseActivity
                 onEmpireViewClick();
             }
         });
+
+        Button privateMsgBtn = (Button) findViewById(R.id.private_message_btn);
+        privateMsgBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onPrivateMessageClick();
+            }
+        });
     }
 
     @Override
@@ -89,6 +97,12 @@ public class EnemyEmpireActivity extends BaseActivity
 
         empireName.setText(mEmpire.getDisplayName());
         empireIcon.setImageBitmap(EmpireShieldManager.i.getShield(mContext, mEmpire));
+
+        TextView tv = (TextView) findViewById(R.id.private_message_btn_msg);
+        tv.setText(String.format(tv.getText().toString(), mEmpire.getDisplayName()));
+
+        tv = (TextView) findViewById(R.id.view_msg);
+        tv.setText(String.format(tv.getText().toString(), mEmpire.getDisplayName()));
     }
 
     public void onEmpireViewClick() {
@@ -101,6 +115,15 @@ public class EnemyEmpireActivity extends BaseActivity
             intent.putExtra("au.com.codeka.warworlds.OffsetX", homeStar.getOffsetX());
             intent.putExtra("au.com.codeka.warworlds.OffsetY", homeStar.getOffsetY());
             startActivity(intent);
+        }
+    }
+
+    public void onPrivateMessageClick() {
+        if (mEmpire != null) {
+            Intent intent = new Intent(mContext, ChatActivity.class);
+            intent.putExtra("au.com.codeka.warworlds.NewConversationEmpireKey", mEmpire.getKey());
+            startActivity(intent);
+
         }
     }
 }

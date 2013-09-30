@@ -203,10 +203,7 @@ public class ChatManager implements BackgroundDetector.BackgroundChangeHandler {
         }.execute();
     }
 
-    /**
-     * This is called by the conversation when a message is added an the empire needs to be refreshed.
-     * @param empireKey
-     */
+    /** This is called by the conversation when a message is added an the empire needs to be refreshed. */
     public void queueRefreshEmpire(String empireKey) {
         synchronized(mEmpiresToRefresh) {
             if (!mEmpiresToRefresh.contains(empireKey)) {
