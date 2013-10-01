@@ -62,7 +62,7 @@ public class ChatManager implements BackgroundDetector.BackgroundChangeHandler {
         if (EmpireManager.i.getEmpire().getAlliance() != null) {
             mConversations.append(ALLIANCE_CONVERSATION_ID, new ChatConversation(ALLIANCE_CONVERSATION_ID));
         }
-        mConversations.append(RECENT_CONVERSATION_ID, new ChatConversation(RECENT_CONVERSATION_ID));
+        mConversations.append(RECENT_CONVERSATION_ID, new ChatRecentConversation(RECENT_CONVERSATION_ID));
         refreshConversations();
 
         mIsSetup = true;

@@ -539,8 +539,11 @@ public class ChatActivity extends BaseActivity
                     }
 
                     msgTime.setText(entry.message.getDatePosted().withZone(DateTimeZone.getDefault()).toString("h:mm a"));
-                    message.setText(entry.message.format(mConversation.getID() == 0, true, mAutoTranslate));
-                    message.setMovementMethod(LinkMovementMethod.getInstance());
+                    String html = entry.message.format(mConversation.getID() == 0, true, mAutoTranslate);
+                    message.setText(Html.fromHtml(html));
+                    if (html.indexOf("<a ") >= 0) { // only if there's actually a link...
+                        message.setMovementMethod(LinkMovementMethod.getInstance());
+                    }
                 }
 
                 return view;

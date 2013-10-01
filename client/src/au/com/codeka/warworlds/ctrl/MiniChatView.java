@@ -5,6 +5,7 @@ import java.util.List;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.text.Html;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.Button;
@@ -86,7 +87,7 @@ public class MiniChatView extends RelativeLayout
 
     private void appendMessage(final ChatMessage msg) {
         TextView tv = new TextView(mContext);
-        tv.setText(msg.format(true, false, mAutoTranslate));
+        tv.setText(Html.fromHtml(msg.format(true, false, mAutoTranslate)));
         tv.setTag(msg);
 
         while (mMsgsContainer.getChildCount() >= MAX_ROWS) {
@@ -117,7 +118,7 @@ public class MiniChatView extends RelativeLayout
 
             if (other.getDatePosted().equals(msg.getDatePosted()) &&
                 other.getEmpireKey().equals(msg.getEmpireKey())) {
-                tv.setText(msg.format(true, false, mAutoTranslate));
+                tv.setText(Html.fromHtml(msg.format(true, false, mAutoTranslate)));
             }
         }
     }

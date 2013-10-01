@@ -10,7 +10,6 @@ import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
-import android.text.Html;
 import au.com.codeka.common.model.BaseChatMessage;
 import au.com.codeka.common.protobuf.Messages;
 
@@ -50,7 +49,7 @@ public class ChatMessage extends BaseChatMessage {
      * ChatActivity. It actually returns a snippet of formatted text, hence the
      * CharSequence.
      */
-    public CharSequence format(boolean isPublic, boolean messageOnly, boolean autoTranslate) {
+    public String format(boolean isPublic, boolean messageOnly, boolean autoTranslate) {
         String msg = mMessage;
         boolean wasTranslated = false;
         if (mMessageEn != null && autoTranslate) {
@@ -108,7 +107,7 @@ public class ChatMessage extends BaseChatMessage {
             }
         }
 
-        return Html.fromHtml(msg);
+        return msg;
     }
 
     /**

@@ -74,10 +74,9 @@ public class ChatMessageDialog extends DialogFragment {
                     @Override
                     public void onConversationStarted(ChatConversation conversation) {
                         ((ChatActivity) getActivity()).startConversation(mEmpire.getKey());
+                        dismiss();
                     }
                 });
-
-                dismiss();
             }
         });
 

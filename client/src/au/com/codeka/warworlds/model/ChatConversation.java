@@ -75,9 +75,7 @@ public class ChatConversation extends BaseChatConversation {
         return getMessage(mMessages.size() - 1);
     }
 
-    /**
-     * Returns the nth message, where 0 is the {i most recent} message.
-     */
+    /** Returns the nth message, where 0 is the {i most recent} message. */
     public ChatMessage getMessage(int n) {
         synchronized(mMessages) {
             return mMessages.get(mMessages.size() - n - 1);
@@ -151,6 +149,24 @@ public class ChatConversation extends BaseChatConversation {
                     return;
                 }
             }
+
+            // also make sure it's actually for us!
+            if (mID != ChatManager.RECENT_CONVERSATION_ID) {
+                if (msg.getConversationID() == null) {
+                    if (msg.getAllianceKey() == null) {
+                        if (mID != ChatManager.GLOBAL_CONVERSATION_ID) {
+                            return;
+                        }
+                    } else {
+                        if (mID != ChatManager.ALLIANCE_CONVERSATION_ID) {
+                            return;
+                        }
+                    }
+                } else if (msg.getConversationID() != mID) {
+                    return;
+                }
+            }
+
             mMessages.add(index, msg);
 
             if (mMostRecentMsg == null) {
@@ -251,6 +267,10 @@ public class ChatConversation extends BaseChatConversation {
         }
 
         public void setLastReadDate(int conversationID, DateTime dt) {
+            if (conversationID <= 0) {
+                return;
+            }
+
             synchronized(sLock) {
                 SQLiteDatabase db = getWritableDatabase();
                 try {
@@ -272,6 +292,10 @@ public class ChatConversation extends BaseChatConversation {
         }
 
         public DateTime getLastReadDate(int conversationID) {
+            if (conversationID <= 0) {
+                return DateTime.now();
+            }
+
             synchronized(sLock) {
                 SQLiteDatabase db = getReadableDatabase();
                 Cursor cursor = null;

@@ -28,11 +28,15 @@ public class ChatRecentConversation extends ChatConversation
             }
         }
 
-        super.addMessage(index, msg, fireListeners);
+        if (index > mMessages.size()) {
+            // we might've removed the last one in the loop above....
+            index = mMessages.size();
+        }
+        super.addMessage(index, msg, false);
     }
 
     @Override
     public void onMessageAdded(ChatMessage msg) {
-        addMessage(mMessages.size(), msg, true);
+        addMessage(mMessages.size(), msg, false);
     }
 }
