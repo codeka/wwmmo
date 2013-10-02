@@ -304,7 +304,15 @@ public class ChatActivity extends BaseActivity
 
         @Override
         public void onMessageUpdated(ChatMessage msg) {
+            final int finalPosition = mChatOutput.getFirstVisiblePosition();
             mChatAdapter.notifyDataSetChanged();
+
+            mHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    mChatOutput.setSelection(finalPosition);
+                }
+            });
         }
 
         @Override
@@ -355,10 +363,6 @@ public class ChatActivity extends BaseActivity
                     }
 
                     if (position >= 0) {
-                        if (position > 0) {
-                            position -= 1;
-                        }
-
                         final int finalPosition = position;
                         mHandler.post(new Runnable() {
                             @Override
