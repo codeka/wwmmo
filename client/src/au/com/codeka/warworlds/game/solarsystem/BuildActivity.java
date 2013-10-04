@@ -24,10 +24,14 @@ import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import au.com.codeka.RomanNumeralFormatter;
+import au.com.codeka.TimeInHours;
 import au.com.codeka.common.model.BaseBuildRequest;
 import au.com.codeka.common.model.BaseColony;
+import au.com.codeka.common.model.BaseFleet;
+import au.com.codeka.common.model.BuildingDesign;
 import au.com.codeka.common.model.Design;
 import au.com.codeka.common.model.DesignKind;
 import au.com.codeka.common.model.ShipDesign;
@@ -43,9 +47,11 @@ import au.com.codeka.warworlds.ctrl.BuildingsList;
 import au.com.codeka.warworlds.game.BuildAccelerateDialog;
 import au.com.codeka.warworlds.game.BuildStopConfirmDialog;
 import au.com.codeka.warworlds.model.BuildRequest;
+import au.com.codeka.warworlds.model.Building;
 import au.com.codeka.warworlds.model.Colony;
 import au.com.codeka.warworlds.model.DesignManager;
 import au.com.codeka.warworlds.model.EmpireManager;
+import au.com.codeka.warworlds.model.Fleet;
 import au.com.codeka.warworlds.model.MyEmpire;
 import au.com.codeka.warworlds.model.Planet;
 import au.com.codeka.warworlds.model.PlanetImageManager;
@@ -329,10 +335,27 @@ public class BuildActivity extends BaseActivity implements StarManager.StarFetch
         public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
             View v = inflater.inflate(R.layout.solarsystem_build_ships_tab, container, false);
 
+            final Star star = ((BuildActivity) getActivity()).mStar;
             final Colony colony = getColony();
 
-            final ShipDesignListAdapter adapter = new ShipDesignListAdapter();
-            adapter.setDesigns(DesignManager.i.getDesigns(DesignKind.SHIP));
+            ArrayList<Fleet> fleets = new ArrayList<Fleet>();
+            for (BaseFleet baseFleet : star.getFleets()) {
+                if (baseFleet.getEmpireKey() != null &&
+                        baseFleet.getEmpireKey().equals(EmpireManager.i.getEmpire().getKey())) {
+                    fleets.add((Fleet) baseFleet);
+                }
+            }
+
+            ArrayList<BuildRequest> buildRequests = new ArrayList<BuildRequest>();
+            for (BaseBuildRequest baseBuildRequest : star.getBuildRequests()) {
+                if (baseBuildRequest.getEmpireKey().equals(EmpireManager.i.getEmpire().getKey()) &&
+                        baseBuildRequest.getDesignKind() == DesignKind.SHIP) {
+                    buildRequests.add((BuildRequest) baseBuildRequest);
+                }
+            }
+
+            final ShipListAdapter adapter = new ShipListAdapter();
+            adapter.setShips(DesignManager.i.getDesigns(DesignKind.SHIP), fleets, buildRequests);
 
             ListView availableDesignsList = (ListView) v.findViewById(R.id.ship_list);
             availableDesignsList.setAdapter(adapter);
@@ -346,15 +369,12 @@ public class BuildActivity extends BaseActivity implements StarManager.StarFetch
                             buildQueueSize ++;
                         }
                     }
-                    ShipDesign design = (ShipDesign) adapter.getItem(position);
-                    if (design == null) {
-                        // not sure why this would ever happen?
-                        return;
+                    ShipListAdapter.ItemEntry entry = (ShipListAdapter.ItemEntry) adapter.getItem(position);
+                    if (entry.design != null) {
+                        BuildConfirmDialog dialog = new BuildConfirmDialog();
+                        dialog.setup(entry.design, colony, buildQueueSize);
+                        dialog.show(getActivity().getSupportFragmentManager(), "");
                     }
-
-                    BuildConfirmDialog dialog = new BuildConfirmDialog();
-                    dialog.setup(design, colony, buildQueueSize);
-                    dialog.show(getActivity().getSupportFragmentManager(), "");
                 }
             });
 
@@ -364,29 +384,63 @@ public class BuildActivity extends BaseActivity implements StarManager.StarFetch
         /**
          * This adapter is used to populate the list of ship designs in our view.
          */
-        private class ShipDesignListAdapter extends BaseAdapter {
-            private List<ShipDesign> mDesigns;
+        private class ShipListAdapter extends BaseAdapter {
+            private List<ItemEntry> mEntries;
 
-            public void setDesigns(Map<String, Design> designs) {
-                mDesigns = new ArrayList<ShipDesign>();
-                for (Design d : designs.values()) {
-                    mDesigns.add((ShipDesign) d);
+            private static final int HEADING_TYPE = 0;
+            private static final int EXISTING_SHIP_TYPE = 1;
+            private static final int NEW_SHIP_TYPE = 2;
+
+            public void setShips(Map<String, Design> designs, ArrayList<Fleet> fleets, ArrayList<BuildRequest> buildRequests) {
+                mEntries = new ArrayList<ItemEntry>();
+                mEntries.add(new ItemEntry("Existing Ships"));
+                for (Fleet fleet : fleets) {
+                    mEntries.add(new ItemEntry(fleet));
                 }
+                for (BuildRequest buildRequest : buildRequests) {
+                    mEntries.add(new ItemEntry(buildRequest));
+                }
+                mEntries.add(new ItemEntry("New Ships"));
+                for (Design design : designs.values()) {
+                    mEntries.add(new ItemEntry((ShipDesign) design));
+                }
+
                 notifyDataSetChanged();
+            }
+
+            /**
+             * We have three types of items, the "headings", the list of existing buildings
+             * and the list of building designs.
+             */
+            @Override
+            public int getViewTypeCount() {
+                return 3;
             }
 
             @Override
             public int getCount() {
-                if (mDesigns == null)
+                if (mEntries == null)
                     return 0;
-                return mDesigns.size();
+                return mEntries.size();
+            }
+
+            @Override
+            public int getItemViewType(int position) {
+                if (mEntries == null)
+                    return 0;
+
+                if (mEntries.get(position).heading != null)
+                    return HEADING_TYPE;
+                if (mEntries.get(position).design != null)
+                    return NEW_SHIP_TYPE;
+                return EXISTING_SHIP_TYPE;
             }
 
             @Override
             public Object getItem(int position) {
-                if (mDesigns == null)
+                if (mEntries == null)
                     return null;
-                return mDesigns.get(position);
+                return mEntries.get(position);
             }
 
             @Override
@@ -396,33 +450,124 @@ public class BuildActivity extends BaseActivity implements StarManager.StarFetch
 
             @Override
             public View getView(int position, View convertView, ViewGroup parent) {
+                ItemEntry entry = mEntries.get(position);
+
                 View view = convertView;
                 if (view == null) {
                     LayoutInflater inflater = (LayoutInflater) getActivity().getSystemService
                             (Context.LAYOUT_INFLATER_SERVICE);
-                    view = inflater.inflate(R.layout.solarsystem_buildings_design, parent, false);
+                    if (entry.heading != null) {
+                        view = new TextView(getActivity());
+                    } else {
+                        view = inflater.inflate(R.layout.solarsystem_buildings_design, parent, false);
+                    }
                 }
 
-                ImageView icon = (ImageView) view.findViewById(R.id.building_icon);
-                TextView row1 = (TextView) view.findViewById(R.id.building_row1);
-                TextView row2 = (TextView) view.findViewById(R.id.building_row2);
-                TextView row3 = (TextView) view.findViewById(R.id.building_row3);
-                view.findViewById(R.id.building_progress).setVisibility(View.GONE);
-                view.findViewById(R.id.building_level).setVisibility(View.GONE);
-                view.findViewById(R.id.building_level_label).setVisibility(View.GONE);
+                if (entry.heading != null) {
+                    TextView tv = (TextView) view;
+                    tv.setText(entry.heading);
+                } else if (entry.fleet != null || entry.buildRequest != null) {
+                    // existing fleet/upgrading fleet
+                    ImageView icon = (ImageView) view.findViewById(R.id.building_icon);
+                    TextView row1 = (TextView) view.findViewById(R.id.building_row1);
+                    TextView row2 = (TextView) view.findViewById(R.id.building_row2);
+                    TextView row3 = (TextView) view.findViewById(R.id.building_row3);
+                    TextView level = (TextView) view.findViewById(R.id.building_level);
+                    TextView levelLabel = (TextView) view.findViewById(R.id.building_level_label);
+                    ProgressBar progress = (ProgressBar) view.findViewById(R.id.building_progress);
 
-                ShipDesign design = mDesigns.get(position);
+                    Fleet fleet = entry.fleet;
+                    BuildRequest buildRequest = entry.buildRequest;
+                    ShipDesign design = (ShipDesign) DesignManager.i.getDesign(DesignKind.SHIP,
+                            (fleet != null ? fleet.getDesignID() : buildRequest.getDesignID()));
 
-                icon.setImageDrawable(new SpriteDrawable(SpriteManager.i.getSprite(design.getSpriteName())));
+                    icon.setImageDrawable(new SpriteDrawable(SpriteManager.i.getSprite(design.getSpriteName())));
 
-                row1.setText(design.getDisplayName());
-                row2.setText(String.format("%.2f hours",
-                        (float) design.getBuildCost().getTimeInSeconds() / 3600.0f));
+                    int numUpgrades = 0;//design.getUpgrades().size();
 
-                String required = design.getDependenciesList(getColony());
-                row3.setText(Html.fromHtml(required));
+                    if (numUpgrades == 0 || fleet == null) {
+                        level.setVisibility(View.GONE);
+                        levelLabel.setVisibility(View.GONE);
+                    } else {
+                        // TODO
+                        level.setText("?");
+                        level.setVisibility(View.VISIBLE);
+                        levelLabel.setVisibility(View.VISIBLE);
+                    }
+
+                    row1.setText(design.getDisplayName());
+                    if (buildRequest != null) {
+                        String verb = (fleet == null ? "Building" : "Upgrading");
+                        row2.setText(Html.fromHtml(String.format(Locale.ENGLISH,
+                                "<font color=\"#0c6476\">%s:</font> %d %%, %s left",
+                                verb, (int) buildRequest.getPercentComplete(),
+                                 TimeInHours.format(buildRequest.getRemainingTime()))));
+
+                        row3.setVisibility(View.GONE);
+                        progress.setVisibility(View.VISIBLE);
+                        progress.setProgress((int) buildRequest.getPercentComplete());
+                    } else {
+                        if (false/*numUpgrades < building.getLevel()*/) {
+                            //TODO
+                            /*
+                            row2.setText("No more upgrades");
+                            row3.setVisibility(View.GONE);
+                            progress.setVisibility(View.GONE); */
+                        } else {
+                            progress.setVisibility(View.GONE);
+                            row2.setText(String.format(Locale.ENGLISH,
+                                    "Upgrade: %.2f hours",
+                                    (float) design.getBuildCost().getTimeInSeconds() / 3600.0f));
+
+                            String required = design.getDependenciesList(getColony());
+                            row3.setVisibility(View.VISIBLE);
+                            row3.setText(Html.fromHtml(required));
+                        }
+                    }
+                } else {
+                    // new fleet
+                    ImageView icon = (ImageView) view.findViewById(R.id.building_icon);
+                    TextView row1 = (TextView) view.findViewById(R.id.building_row1);
+                    TextView row2 = (TextView) view.findViewById(R.id.building_row2);
+                    TextView row3 = (TextView) view.findViewById(R.id.building_row3);
+
+                    view.findViewById(R.id.building_progress).setVisibility(View.GONE);
+                    view.findViewById(R.id.building_level).setVisibility(View.GONE);
+                    view.findViewById(R.id.building_level_label).setVisibility(View.GONE);
+
+                    ShipDesign design = mEntries.get(position).design;
+
+                    icon.setImageDrawable(new SpriteDrawable(SpriteManager.i.getSprite(design.getSpriteName())));
+
+                    row1.setText(design.getDisplayName());
+                    row2.setText(String.format("%.2f hours",
+                            (float) design.getBuildCost().getTimeInSeconds() / 3600.0f));
+
+                    String required = design.getDependenciesList(getColony());
+                    row3.setText(Html.fromHtml(required));
+                }
 
                 return view;
+            }
+
+            public class ItemEntry {
+                public ShipDesign design;
+                public Fleet fleet;
+                public BuildRequest buildRequest;
+                public String heading;
+
+                public ItemEntry(ShipDesign design) {
+                    this.design = design;
+                }
+                public ItemEntry(BuildRequest buildRequest) {
+                    this.buildRequest = buildRequest;
+                }
+                public ItemEntry(Fleet fleet) {
+                    this.fleet = fleet;
+                }
+                public ItemEntry(String heading) {
+                    this.heading = heading;
+                }
             }
         }
     }

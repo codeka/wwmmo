@@ -789,6 +789,15 @@ message Building
 
 
 //
+// An upgrade to a fleet
+//
+message FleetUpgrade
+{
+    optional string upgrade_id = 1;
+}
+
+
+//
 // A fleet represents one or more ships of the same(?) design.
 //
 message Fleet
@@ -852,6 +861,9 @@ message Fleet
 
     // for moving fleets, this is the time we expect it to arrive
     optional int64 eta = 15;
+
+    // a collection of upgrades to this fleet
+    repeated FleetUpgrade upgrades = 16;
 }
 
 

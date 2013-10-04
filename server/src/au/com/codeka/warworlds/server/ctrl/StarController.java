@@ -34,6 +34,7 @@ import au.com.codeka.warworlds.server.model.Colony;
 import au.com.codeka.warworlds.server.model.CombatReport;
 import au.com.codeka.warworlds.server.model.EmpirePresence;
 import au.com.codeka.warworlds.server.model.Fleet;
+import au.com.codeka.warworlds.server.model.FleetUpgrade;
 import au.com.codeka.warworlds.server.model.Planet;
 import au.com.codeka.warworlds.server.model.Star;
 
@@ -460,15 +461,34 @@ public class StarController {
 
         private void populateFleets(List<Star> stars, String inClause) throws Exception {
             String sql = "SELECT * FROM fleets WHERE star_id IN "+inClause;
+
+            ArrayList<Fleet> fleets = new ArrayList<Fleet>();
             try (SqlStmt stmt = prepare(sql)) {
                 ResultSet rs = stmt.select();
 
                 while (rs.next()) {
                     Fleet fleet = new Fleet(rs);
+                    fleets.add(fleet);
 
                     for (Star star : stars) {
                         if (star.getID() == fleet.getStarID()) {
                             star.getFleets().add(fleet);
+                        }
+                    }
+                }
+            }
+
+            sql = "SELECT * FROM fleet_upgrades WHERE star_id IN "+inClause;
+            try (SqlStmt stmt = prepare(sql)) {
+                ResultSet rs = stmt.select();
+
+                while (rs.next()) {
+                    FleetUpgrade fleetUpgrade = new FleetUpgrade(rs);
+
+                    for (Fleet fleet : fleets) {
+                        if (fleet.getID() == fleetUpgrade.getFleetID()) {
+                            fleet.getUpgrades().add(fleetUpgrade);
+                            break;
                         }
                     }
                 }

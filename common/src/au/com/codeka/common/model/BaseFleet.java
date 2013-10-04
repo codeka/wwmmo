@@ -1,12 +1,14 @@
 package au.com.codeka.common.model;
 
+import java.util.ArrayList;
+
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.Seconds;
 
 import au.com.codeka.common.protobuf.Messages;
 
-public class BaseFleet {
+public abstract class BaseFleet {
     protected String mKey;
     protected String mEmpireKey;
     protected String mDesignID;
@@ -20,6 +22,7 @@ public class BaseFleet {
     protected Stance mStance;
     protected DateTime mEta;
     protected DateTime mTimeDestroyed;
+    protected ArrayList<BaseFleetUpgrade> mUpgrades;
 
     public String getKey() {
         return mKey;
@@ -77,6 +80,9 @@ public class BaseFleet {
     public void setTimeDestroyed(DateTime time) {
         mTimeDestroyed = time;
     }
+    public ArrayList<BaseFleetUpgrade> getUpgrades() {
+        return mUpgrades;
+    }
 
     public void move(DateTime now, String destinationStarKey, DateTime eta) {
         mState = State.MOVING;
@@ -117,6 +123,8 @@ public class BaseFleet {
         return (Seconds.secondsBetween(now, mEta).getSeconds() / 3600.0f);
     }
 
+    protected abstract BaseFleetUpgrade createUpgrade(Messages.FleetUpgrade pb);
+
     public void fromProtocolBuffer(Messages.Fleet pb) {
         mKey = pb.getKey();
         if (pb.hasEmpireKey()) {
@@ -140,6 +148,10 @@ public class BaseFleet {
         }
         if (pb.hasTimeDestroyed()) {
             mTimeDestroyed = new DateTime(pb.getTimeDestroyed() * 1000, DateTimeZone.UTC);
+        }
+        mUpgrades = new ArrayList<BaseFleetUpgrade>();
+        for (Messages.FleetUpgrade upgrade_pb : pb.getUpgradesList()) {
+            mUpgrades.add(createUpgrade(upgrade_pb));
         }
     }
 
@@ -168,6 +180,13 @@ public class BaseFleet {
         }
         if (mTimeDestroyed != null) {
             pb.setTimeDestroyed(mTimeDestroyed.getMillis() / 1000);
+        }
+        if (mUpgrades != null) {
+            for (BaseFleetUpgrade baseFleetUpgrade : mUpgrades) {
+                Messages.FleetUpgrade.Builder upgrade_pb = Messages.FleetUpgrade.newBuilder();
+                baseFleetUpgrade.toProtocolBuffer(upgrade_pb);
+                pb.addUpgrades(upgrade_pb);
+            }
         }
     }
 
