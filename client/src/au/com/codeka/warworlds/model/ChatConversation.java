@@ -114,7 +114,7 @@ public class ChatConversation extends BaseChatConversation {
         }
         DateTime after = before.minusDays(7);
 
-        ChatManager.i.requestMessages(after, before, 100, getID() > 0 ? getID() : null,
+        ChatManager.i.requestMessages(after, before, 100, getID(),
                 new ChatManager.MessagesFetchedListener() {
             @Override
             public void onMessagesFetched(List<ChatMessage> msgs) {

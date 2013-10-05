@@ -60,12 +60,14 @@ public class ChatHandler extends RequestHandler {
                     " WHERE posted_date > ?" +
                       " AND posted_date <= ?" +
                       " AND (conversation_id IN (SELECT conversation_id FROM chat_conversation_participants WHERE empire_id = ?)" +
-                       " OR conversation_id IS NULL" +
+                       " OR (conversation_id IS NULL" +
                       (getSession().isAdmin()
                           ? "" // admin can see all alliance chat
                           : " AND (alliance_id IS NULL OR alliance_id = ?)") +
-                       ")" +
-                      (conversationID != null ? " AND conversation_id = ?" : "") +
+                       "))" +
+                      (conversationID != null && conversationID > 0 ? " AND conversation_id = ?" : "") +
+                      (conversationID != null && conversationID == 0 ? " AND alliance_id IS NULL" : "") +
+                      (conversationID != null && conversationID < 0 ? " AND alliance_id IS NOT NULL" : "") +
                     " ORDER BY posted_date DESC" +
                     " LIMIT "+max;
         try (SqlStmt stmt = DB.prepare(sql)) {
@@ -78,7 +80,7 @@ public class ChatHandler extends RequestHandler {
             } else {
                 stmt.setInt(i++, 0); // TODO: admin won't see any private conversations...
             }
-            if (conversationID != null) {
+            if (conversationID != null && conversationID > 0) {
                 stmt.setInt(i++, conversationID);
             }
             ResultSet rs = stmt.select();
