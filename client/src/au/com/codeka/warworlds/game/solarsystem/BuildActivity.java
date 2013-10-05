@@ -306,21 +306,13 @@ public class BuildActivity extends BaseActivity implements StarManager.StarFetch
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                     BuildingsList.Entry entry = mBuildingsList.getItem(position);
-                    int buildQueueSize = 0;
-                    BuildActivity activity = (BuildActivity) getActivity();
-                    for (BaseBuildRequest br : activity.mStar.getBuildRequests()) {
-                        if (br.getColonyKey().equals(colony.getKey())) {
-                            buildQueueSize ++;
-                        }
-                    }
-
                     if (entry.design != null) {
                         BuildConfirmDialog dialog = new BuildConfirmDialog();
-                        dialog.setup(entry.design, colony, buildQueueSize);
+                        dialog.setup(entry.design, star, colony);
                         dialog.show(getActivity().getSupportFragmentManager(), "");
                     } else if (entry.building != null) {
                         BuildConfirmDialog dialog = new BuildConfirmDialog();
-                        dialog.setup(entry.building, colony, buildQueueSize);
+                        dialog.setup(entry.building, star, colony);
                         dialog.show(getActivity().getSupportFragmentManager(), "");
                     }
                 }
@@ -362,17 +354,10 @@ public class BuildActivity extends BaseActivity implements StarManager.StarFetch
             availableDesignsList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                    int buildQueueSize = 0;
-                    BuildActivity activity = (BuildActivity) getActivity();
-                    for (BaseBuildRequest br : activity.mStar.getBuildRequests()) {
-                        if (br.getColonyKey().equals(colony.getKey())) {
-                            buildQueueSize ++;
-                        }
-                    }
                     ShipListAdapter.ItemEntry entry = (ShipListAdapter.ItemEntry) adapter.getItem(position);
                     if (entry.design != null) {
                         BuildConfirmDialog dialog = new BuildConfirmDialog();
-                        dialog.setup(entry.design, colony, buildQueueSize);
+                        dialog.setup(entry.design, star, colony);
                         dialog.show(getActivity().getSupportFragmentManager(), "");
                     }
                 }
@@ -381,9 +366,7 @@ public class BuildActivity extends BaseActivity implements StarManager.StarFetch
             return v;
         }
 
-        /**
-         * This adapter is used to populate the list of ship designs in our view.
-         */
+        /** This adapter is used to populate the list of ship designs in our view. */
         private class ShipListAdapter extends BaseAdapter {
             private List<ItemEntry> mEntries;
 

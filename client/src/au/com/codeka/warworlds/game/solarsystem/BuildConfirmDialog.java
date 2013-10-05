@@ -1,5 +1,7 @@
 package au.com.codeka.warworlds.game.solarsystem;
 
+import org.joda.time.DateTime;
+
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.DialogInterface;
@@ -14,37 +16,46 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
+import au.com.codeka.BackgroundRunner;
 import au.com.codeka.TimeInHours;
+import au.com.codeka.common.Pair;
 import au.com.codeka.common.model.Design;
+import au.com.codeka.common.model.Simulation;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.StyledDialog;
 import au.com.codeka.warworlds.model.BuildManager;
+import au.com.codeka.warworlds.model.BuildRequest;
 import au.com.codeka.warworlds.model.Building;
 import au.com.codeka.warworlds.model.Colony;
+import au.com.codeka.warworlds.model.EmpirePresence;
 import au.com.codeka.warworlds.model.SpriteDrawable;
 import au.com.codeka.warworlds.model.SpriteManager;
+import au.com.codeka.warworlds.model.Star;
 
 public class BuildConfirmDialog extends DialogFragment {
+    private Star mStar;
     private Colony mColony;
     private Design mDesign;
     private Building mExistingBuilding;
-    private int mCurrentQueueSize;
     private View mView;
+
+    private boolean mRefreshRunning = false;
+    private boolean mNeedRefresh = false;
 
     public BuildConfirmDialog() {
     }
 
-    public void setup(Design design, Colony colony, int buildQueueSize) {
+    public void setup(Design design, Star star, Colony colony) {
         mDesign = design;
+        mStar = star;
         mColony = colony;
-        mCurrentQueueSize = buildQueueSize;
     }
 
-    public void setup(Building existingBuilding, Colony colony, int buildQueueSize) {
+    public void setup(Building existingBuilding, Star star, Colony colony) {
         mExistingBuilding = existingBuilding;
         mDesign = existingBuilding.getDesign();
+        mStar = star;
         mColony = colony;
-        mCurrentQueueSize = buildQueueSize;
     }
 
     @Override
@@ -129,7 +140,6 @@ public class BuildConfirmDialog extends DialogFragment {
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
             }
-            
         });
 
         refreshBuildEstimates();
@@ -155,13 +165,13 @@ public class BuildConfirmDialog extends DialogFragment {
         return b.create();
     }
 
+    /** Runs a simulation on the star with the new build request and gets an estimate of the time taken. */
     private void refreshBuildEstimates() {
-        // estimate the build time, based on current queue size, construction focus, etc
-        float totalWorkers = mColony.getPopulation() * mColony.getConstructionFocus();
-        float workersPerBuildRequest = totalWorkers / (mCurrentQueueSize + 1);
-        if (workersPerBuildRequest < 1) {
-            workersPerBuildRequest = 1;
+        if (mRefreshRunning) {
+            mNeedRefresh = true;
+            return;
         }
+        mRefreshRunning = true;
 
         int count = 1;
         if (mDesign.canBuildMultiple()) {
@@ -169,16 +179,63 @@ public class BuildConfirmDialog extends DialogFragment {
             count = Integer.parseInt(countEdit.getText().toString());
         }
 
-        float timeInHours = (count * mDesign.getBuildCost().getTimeInSeconds()) / 3600.0f;
-        timeInHours *= (100.0f / workersPerBuildRequest);
-        TextView timeToBuildText = (TextView) mView.findViewById(R.id.building_timetobuild);
-        timeToBuildText.setText(TimeInHours.format(timeInHours));
+        final TextView timeToBuildText = (TextView) mView.findViewById(R.id.building_timetobuild);
+        final TextView mineralsToBuildText = (TextView) mView.findViewById(R.id.building_mineralstobuild);
 
-        float totalMineralsCost = count * mDesign.getBuildCost().getCostInMinerals();
-        TextView mineralsToBuildText = (TextView) mView.findViewById(R.id.building_mineralstobuild);
-        mineralsToBuildText.setText(Html.fromHtml(
-                                    String.format("%d (<font color=\"red\">%.2f</font>/hr)",
-                                    (int) totalMineralsCost, totalMineralsCost / timeInHours)));
+        timeToBuildText.setText("-");
+        mineralsToBuildText.setText("-");
+
+        final int finalCount = count;
+        final DateTime startTime = DateTime.now();
+        new BackgroundRunner<RefreshResult>() {
+            @Override
+            protected RefreshResult doInBackground() {
+                Star star = (Star) mStar.clone();
+
+                BuildRequest buildRequest = new BuildRequest("FAKE_BUILD_REQUEST",
+                        mDesign.getDesignKind(), mDesign.getID(), mColony.getKey(),
+                        startTime, finalCount,
+                        (mExistingBuilding == null ? null : mExistingBuilding.getKey()),
+                        (mExistingBuilding == null ? 0 : mExistingBuilding.getLevel()),
+                        star.getKey(), mColony.getPlanetIndex(), mColony.getKey());
+                star.getBuildRequests().add(buildRequest);
+
+                Simulation sim = new Simulation(DateTime.now().plusMinutes(5), null);
+                sim.simulate(star);
+
+                RefreshResult result = new RefreshResult();
+                result.buildRequest = buildRequest;
+                result.empire = (EmpirePresence) star.getEmpire(mColony.getEmpireKey());
+                return result;
+            }
+
+            @Override
+            protected void onComplete(RefreshResult result) {
+                DateTime endTime = result.buildRequest.getEndTime();
+
+                float deltaMineralsPerHourBefore = mStar.getEmpire(mColony.getEmpireKey()).getDeltaMineralsPerHour();
+                float deltaMineralsPerHourAfter = result.empire.getDeltaMineralsPerHour();
+
+                timeToBuildText.setText(TimeInHours.format(startTime, endTime));
+                mineralsToBuildText.setText(Html.fromHtml(
+                                            String.format("<font color=\"red\">%d</font>/hr - <font color=\"%s\">%d</font>",
+                                                    (int) (deltaMineralsPerHourAfter - deltaMineralsPerHourBefore),
+                                                    (deltaMineralsPerHourAfter < 0 ? "red" : "green"),
+                                                    (int) deltaMineralsPerHourAfter)));
+
+                mRefreshRunning = false;
+                if (mNeedRefresh) {
+                    mNeedRefresh = false;
+                    refreshBuildEstimates();
+                }
+            }
+
+        }.execute();
+    }
+
+    class RefreshResult {
+        public BuildRequest buildRequest;
+        public EmpirePresence empire;
     }
 
     private void onBuildClick() {

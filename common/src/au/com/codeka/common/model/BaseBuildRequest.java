@@ -141,7 +141,9 @@ public abstract class BaseBuildRequest  {
     }
 
     public void toProtocolBuffer(Messages.BuildRequest.Builder pb) {
-        pb.setKey(mKey);
+        if (mKey != null) {
+            pb.setKey(mKey);
+        }
         pb.setBuildKind(Messages.BuildRequest.BUILD_KIND.valueOf(mDesignKind.getValue()));
         pb.setDesignName(mDesignID);
         pb.setColonyKey(mColonyKey);

@@ -322,13 +322,11 @@ public class BuildingsList extends ListView
                         progress.setVisibility(View.GONE);
                     } else {
                         progress.setVisibility(View.GONE);
-                        row2.setText(String.format(Locale.ENGLISH,
-                                "Upgrade: %.2f hours",
-                                (float) design.getBuildCost().getTimeInSeconds() / 3600.0f));
 
                         String required = design.getDependenciesList(mColony, building.getLevel());
-                        row3.setVisibility(View.VISIBLE);
-                        row3.setText(Html.fromHtml(required));
+                        row2.setText(Html.fromHtml(required));
+
+                        row3.setVisibility(View.GONE);
                     }
                 }
             } else {
@@ -347,11 +345,10 @@ public class BuildingsList extends ListView
                 icon.setImageDrawable(new SpriteDrawable(SpriteManager.i.getSprite(design.getSpriteName())));
 
                 row1.setText(design.getDisplayName());
-                row2.setText(String.format("%.2f hours",
-                        (float) design.getBuildCost().getTimeInSeconds() / 3600.0f));
-
                 String required = design.getDependenciesList(mColony);
-                row3.setText(required);
+                row2.setText(required);
+
+                row3.setVisibility(View.GONE);
             }
 
             return view;

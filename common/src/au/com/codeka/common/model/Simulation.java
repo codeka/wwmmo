@@ -30,6 +30,10 @@ public class Simulation {
         mNow = DateTime.now(DateTimeZone.UTC);
         mLogHandler = log;
     }
+    public Simulation(DateTime now, LogHandler log) {
+        mNow = now;
+        mLogHandler = log;
+    }
 
     public static int getNumRunningSimulations() {
         return sNumSimulations;
