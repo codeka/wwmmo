@@ -192,6 +192,9 @@ public class BuildConfirmDialog extends DialogFragment {
             protected RefreshResult doInBackground() {
                 Star star = (Star) mStar.clone();
 
+                Simulation sim = new Simulation();
+                sim.simulate(star);
+
                 BuildRequest buildRequest = new BuildRequest("FAKE_BUILD_REQUEST",
                         mDesign.getDesignKind(), mDesign.getID(), mColony.getKey(),
                         startTime, finalCount,
@@ -200,7 +203,6 @@ public class BuildConfirmDialog extends DialogFragment {
                         star.getKey(), mColony.getPlanetIndex(), mColony.getKey());
                 star.getBuildRequests().add(buildRequest);
 
-                Simulation sim = new Simulation(DateTime.now().plusMinutes(5), null);
                 sim.simulate(star);
 
                 RefreshResult result = new RefreshResult();
