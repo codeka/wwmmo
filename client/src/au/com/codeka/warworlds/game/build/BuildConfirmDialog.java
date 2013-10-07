@@ -1,4 +1,4 @@
-package au.com.codeka.warworlds.game.solarsystem;
+package au.com.codeka.warworlds.game.build;
 
 import org.joda.time.DateTime;
 
@@ -16,13 +16,10 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
-import au.com.codeka.BackgroundRunner;
-import au.com.codeka.TimeInHours;
-import au.com.codeka.common.Pair;
 import au.com.codeka.common.model.Design;
-import au.com.codeka.common.model.Simulation;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.StyledDialog;
+import au.com.codeka.warworlds.ctrl.BuildEstimateView;
 import au.com.codeka.warworlds.model.BuildManager;
 import au.com.codeka.warworlds.model.BuildRequest;
 import au.com.codeka.warworlds.model.Building;
@@ -38,9 +35,7 @@ public class BuildConfirmDialog extends DialogFragment {
     private Design mDesign;
     private Building mExistingBuilding;
     private View mView;
-
-    private boolean mRefreshRunning = false;
-    private boolean mNeedRefresh = false;
+    private BuildEstimateView mBuildEstimateView;
 
     public BuildConfirmDialog() {
     }
@@ -65,6 +60,13 @@ public class BuildConfirmDialog extends DialogFragment {
 
         final SeekBar countSeekBar = (SeekBar) mView.findViewById(R.id.build_count_seek);
         final EditText countEdit = (EditText) mView.findViewById(R.id.build_count_edit);
+        mBuildEstimateView = (BuildEstimateView) mView.findViewById(R.id.build_estimate);
+        mBuildEstimateView.setOnBuildEstimateRefreshRequired(new BuildEstimateView.BuildEstimateRefreshRequiredHandler() {
+            @Override
+            public void onBuildEstimateRefreshRequired() {
+                refreshBuildEstimates();
+            }
+        });
 
         TextView nameTextView = (TextView) mView.findViewById(R.id.building_name);
         ImageView iconImageView = (ImageView) mView.findViewById(R.id.building_icon);
@@ -165,74 +167,23 @@ public class BuildConfirmDialog extends DialogFragment {
         return b.create();
     }
 
-    /** Runs a simulation on the star with the new build request and gets an estimate of the time taken. */
     private void refreshBuildEstimates() {
-        if (mRefreshRunning) {
-            mNeedRefresh = true;
-            return;
-        }
-        mRefreshRunning = true;
-
         int count = 1;
         if (mDesign.canBuildMultiple()) {
             final EditText countEdit = (EditText) mView.findViewById(R.id.build_count_edit);
             count = Integer.parseInt(countEdit.getText().toString());
         }
 
-        final TextView timeToBuildText = (TextView) mView.findViewById(R.id.building_timetobuild);
-        final TextView mineralsToBuildText = (TextView) mView.findViewById(R.id.building_mineralstobuild);
-
-        timeToBuildText.setText("-");
-        mineralsToBuildText.setText("-");
-
-        final int finalCount = count;
         final DateTime startTime = DateTime.now();
-        new BackgroundRunner<RefreshResult>() {
-            @Override
-            protected RefreshResult doInBackground() {
-                Star star = (Star) mStar.clone();
 
-                Simulation sim = new Simulation();
-                sim.simulate(star);
+        BuildRequest buildRequest = new BuildRequest("FAKE_BUILD_REQUEST",
+                mDesign.getDesignKind(), mDesign.getID(), mColony.getKey(),
+                startTime, count,
+                (mExistingBuilding == null ? null : mExistingBuilding.getKey()),
+                (mExistingBuilding == null ? 0 : mExistingBuilding.getLevel()),
+                null, null, mStar.getKey(), mColony.getPlanetIndex(), mColony.getEmpireKey());
 
-                BuildRequest buildRequest = new BuildRequest("FAKE_BUILD_REQUEST",
-                        mDesign.getDesignKind(), mDesign.getID(), mColony.getKey(),
-                        startTime, finalCount,
-                        (mExistingBuilding == null ? null : mExistingBuilding.getKey()),
-                        (mExistingBuilding == null ? 0 : mExistingBuilding.getLevel()),
-                        star.getKey(), mColony.getPlanetIndex(), mColony.getKey());
-                star.getBuildRequests().add(buildRequest);
-
-                sim.simulate(star);
-
-                RefreshResult result = new RefreshResult();
-                result.buildRequest = buildRequest;
-                result.empire = (EmpirePresence) star.getEmpire(mColony.getEmpireKey());
-                return result;
-            }
-
-            @Override
-            protected void onComplete(RefreshResult result) {
-                DateTime endTime = result.buildRequest.getEndTime();
-
-                float deltaMineralsPerHourBefore = mStar.getEmpire(mColony.getEmpireKey()).getDeltaMineralsPerHour();
-                float deltaMineralsPerHourAfter = result.empire.getDeltaMineralsPerHour();
-
-                timeToBuildText.setText(TimeInHours.format(startTime, endTime));
-                mineralsToBuildText.setText(Html.fromHtml(
-                                            String.format("<font color=\"red\">%d</font>/hr - <font color=\"%s\">%d</font>",
-                                                    (int) (deltaMineralsPerHourAfter - deltaMineralsPerHourBefore),
-                                                    (deltaMineralsPerHourAfter < 0 ? "red" : "green"),
-                                                    (int) deltaMineralsPerHourAfter)));
-
-                mRefreshRunning = false;
-                if (mNeedRefresh) {
-                    mNeedRefresh = false;
-                    refreshBuildEstimates();
-                }
-            }
-
-        }.execute();
+        mBuildEstimateView.refresh(mStar, buildRequest);
     }
 
     class RefreshResult {

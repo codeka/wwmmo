@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" >
+
+    <ImageView android:id="@+id/fleet_icon"
+               android:layout_width="48dp"
+               android:layout_height="48dp"
+               android:src="@drawable/app_icon" />
+
+    <TextView android:id="@+id/fleet_name"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:layout_alignParentTop="true"
+              android:layout_toRightOf="@id/fleet_icon"
+              android:text="Fleet Name"
+              android:textAppearance="?android:attr/textAppearanceMedium" />
+
+    <TextView android:id="@+id/fleet_description"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:layout_alignLeft="@id/fleet_name"
+              android:layout_below="@id/fleet_name"
+              android:text="Some extra details" />
+
+    <ListView android:id="@+id/upgrades"
+              android:layout_above="@+id/build_estimate"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:layout_below="@+id/fleet_icon" />
+
+    <au.com.codeka.warworlds.ctrl.BuildEstimateView
+        android:id="@+id/build_estimate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_marginLeft="50dp" />
+
+</RelativeLayout>

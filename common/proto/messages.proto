@@ -757,6 +757,10 @@ message BuildRequest
     // current colony as well.
     optional string existing_building_key = 10;
     optional int32 existing_building_level = 13;
+
+    // when upgrading a fleet, these will be set
+    optional int32 existing_fleet_id = 14;
+    optional string upgrade_id = 15;
 }
 
 

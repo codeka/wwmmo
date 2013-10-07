@@ -51,6 +51,8 @@ import au.com.codeka.warworlds.ctrl.BuildQueueList;
 import au.com.codeka.warworlds.ctrl.ColonyList;
 import au.com.codeka.warworlds.ctrl.EmpireRankList;
 import au.com.codeka.warworlds.ctrl.FleetList;
+import au.com.codeka.warworlds.game.build.BuildAccelerateDialog;
+import au.com.codeka.warworlds.game.build.BuildStopConfirmDialog;
 import au.com.codeka.warworlds.model.BuildManager;
 import au.com.codeka.warworlds.model.BuildRequest;
 import au.com.codeka.warworlds.model.Colony;

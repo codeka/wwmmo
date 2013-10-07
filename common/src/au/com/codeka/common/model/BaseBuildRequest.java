@@ -25,6 +25,8 @@ public abstract class BaseBuildRequest  {
     protected String mStarKey;
     protected int mPlanetIndex;
     protected String mEmpireKey;
+    protected Integer mExistingFleetID;
+    protected String mUpgradeID;
 
     public BaseBuildRequest() {
         mRefreshTime = DateTime.now(DateTimeZone.UTC);
@@ -62,6 +64,12 @@ public abstract class BaseBuildRequest  {
     }
     public String getEmpireKey() {
         return mEmpireKey;
+    }
+    public Integer getExistingFleetID() {
+        return mExistingFleetID;
+    }
+    public String getUpgradeID() {
+        return mUpgradeID;
     }
     public float getProgress(boolean interpolate) {
         if (!interpolate) {
@@ -138,6 +146,10 @@ public abstract class BaseBuildRequest  {
             mExistingBuildingKey = pb.getExistingBuildingKey();
             mExistingBuildingLevel = pb.getExistingBuildingLevel(); 
         }
+        if (pb.hasExistingFleetId() && pb.hasUpgradeId()) {
+            mExistingFleetID = pb.getExistingFleetId();
+            mUpgradeID = pb.getUpgradeId();
+        }
     }
 
     public void toProtocolBuffer(Messages.BuildRequest.Builder pb) {
@@ -157,6 +169,10 @@ public abstract class BaseBuildRequest  {
         if (mExistingBuildingKey != null) {
             pb.setExistingBuildingKey(mExistingBuildingKey);
             pb.setExistingBuildingLevel(mExistingBuildingLevel);
+        }
+        if (mExistingFleetID != null) {
+            pb.setExistingFleetId((int) mExistingFleetID);
+            pb.setUpgradeId(mUpgradeID);
         }
     }
 }

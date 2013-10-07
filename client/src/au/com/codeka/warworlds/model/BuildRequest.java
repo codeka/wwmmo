@@ -13,8 +13,8 @@ public class BuildRequest extends BaseBuildRequest {
     }
     public BuildRequest(String key, DesignKind designKind, String designID, String colonyKey,
                         DateTime startTime, int count, String existingBuildKey,
-                        int existingBuildLevel, String starKey, int planetIndex,
-                        String empireKey) {
+                        int existingBuildLevel, Integer existingFleetID, String upgradeID,
+                        String starKey, int planetIndex, String empireKey) {
         mKey = key;
         mDesignKind = designKind;
         mDesignID = designID;
@@ -26,6 +26,8 @@ public class BuildRequest extends BaseBuildRequest {
         mCount = count;
         mExistingBuildingKey = existingBuildKey;
         mExistingBuildingLevel = existingBuildLevel;
+        mExistingFleetID = existingFleetID;
+        mUpgradeID = upgradeID;
         mStarKey = starKey;
         mPlanetIndex = planetIndex;
         mEmpireKey = empireKey;

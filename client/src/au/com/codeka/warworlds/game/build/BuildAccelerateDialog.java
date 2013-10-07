@@ -1,4 +1,4 @@
-    package au.com.codeka.warworlds.game;
+    package au.com.codeka.warworlds.game.build;
 
 import java.util.Locale;
 

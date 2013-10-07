@@ -1,6 +1,11 @@
 package au.com.codeka.common.model;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.w3c.dom.Element;
+
+import au.com.codeka.common.XmlIterator;
 
 public class ShipDesign extends Design {
     private float mSpeedParsecPerHour;
@@ -8,6 +13,7 @@ public class ShipDesign extends Design {
     private float mBaseAttack;
     private float mBaseDefence;
     private int mCombatPriority;
+    private List<Upgrade> mUpgrades;
 
     public float getSpeedInParsecPerHour() {
         return mSpeedParsecPerHour;
@@ -27,6 +33,9 @@ public class ShipDesign extends Design {
     public int getCombatPriority() {
         return mCombatPriority;
     }
+    public List<Upgrade> getUpgrades() {
+        return mUpgrades;
+    }
 
     public static class Factory extends Design.Factory {
         public Factory(Element shipElement) {
@@ -43,6 +52,7 @@ public class ShipDesign extends Design {
         @Override
         protected void parseElement(Element elem, Design baseDesign) {
             ShipDesign design = (ShipDesign) baseDesign;
+            design.mUpgrades = new ArrayList<Upgrade>();
 
             if (elem.getNodeName().equals("stats")) {
                 design.mSpeedParsecPerHour = Float.parseFloat(elem.getAttribute("speed"));
@@ -59,6 +69,51 @@ public class ShipDesign extends Design {
                     design.mFuelCostPerParsec = Float.parseFloat(s);
                 }
             }
+
+            if (elem.getNodeName().equals("upgrades")) {
+                for (Element upgradeElem : XmlIterator.childElements(elem, "upgrade")) {
+                    Upgrade upgrade = new Upgrade(upgradeElem);
+                    design.mUpgrades.add(upgrade);
+                }
+            }
+        }
+    }
+
+    /**
+     * Ship upgrades are slightly different to building upgrades in that ship upgrades give
+     * specific bonuses to the ships. For example, one upgrade might increase shields, one
+     * might increase firepower, etc.
+     */
+    public static class Upgrade {
+        private String mID;
+        private String mDisplayName;
+        private String mDescription;
+        private String mSpriteName;
+
+        public Upgrade(Element upgradeElem) {
+            mID = upgradeElem.getAttribute("id");
+            for(Element elem : XmlIterator.childElements(upgradeElem)) {
+                if (elem.getNodeName().equals("sprite")) {
+                    mSpriteName = elem.getTextContent();
+                } else if (elem.getNodeName().equals("name")) {
+                    mDisplayName = elem.getTextContent();
+                } else if (elem.getNodeName().equals("description")) {
+                    mDescription = elem.getTextContent();
+                }
+            }
+        }
+
+        public String getID() {
+            return mID;
+        }
+        public String getDisplayName() {
+            return mDisplayName;
+        }
+        public String getDescription() {
+            return mDescription;
+        }
+        public String getSpriteName() {
+            return mSpriteName;
         }
     }
 }

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" >
+
+    <ImageView android:id="@+id/upgrade_icon"
+               android:layout_width="32dp"
+               android:layout_height="32dp"
+               android:src="@drawable/app_icon" />
+
+    <TextView android:id="@+id/upgrade_name"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:layout_alignParentTop="true"
+              android:layout_toRightOf="@id/upgrade_icon"
+              android:text="Upgrade Name"
+              android:textAppearance="?android:attr/textAppearanceMedium" />
+
+    <TextView android:id="@+id/upgrade_description"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:layout_alignLeft="@id/upgrade_name"
+              android:layout_below="@id/upgrade_name"
+              android:text="Blah blah blah, yada yada yada."
+              android:textAppearance="?android:attr/textAppearanceSmall" />
+
+</RelativeLayout>

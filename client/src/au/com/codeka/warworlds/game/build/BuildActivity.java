@@ -1,4 +1,4 @@
-package au.com.codeka.warworlds.game.solarsystem;
+package au.com.codeka.warworlds.game.build;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -7,9 +7,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import com.google.protobuf.InvalidProtocolBufferException;
-
 import android.content.Context;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -31,7 +30,6 @@ import au.com.codeka.TimeInHours;
 import au.com.codeka.common.model.BaseBuildRequest;
 import au.com.codeka.common.model.BaseColony;
 import au.com.codeka.common.model.BaseFleet;
-import au.com.codeka.common.model.BuildingDesign;
 import au.com.codeka.common.model.Design;
 import au.com.codeka.common.model.DesignKind;
 import au.com.codeka.common.model.ShipDesign;
@@ -44,10 +42,7 @@ import au.com.codeka.warworlds.TabFragmentFragment;
 import au.com.codeka.warworlds.TabManager;
 import au.com.codeka.warworlds.ctrl.BuildQueueList;
 import au.com.codeka.warworlds.ctrl.BuildingsList;
-import au.com.codeka.warworlds.game.BuildAccelerateDialog;
-import au.com.codeka.warworlds.game.BuildStopConfirmDialog;
 import au.com.codeka.warworlds.model.BuildRequest;
-import au.com.codeka.warworlds.model.Building;
 import au.com.codeka.warworlds.model.Colony;
 import au.com.codeka.warworlds.model.DesignManager;
 import au.com.codeka.warworlds.model.EmpireManager;
@@ -61,6 +56,8 @@ import au.com.codeka.warworlds.model.SpriteManager;
 import au.com.codeka.warworlds.model.Star;
 import au.com.codeka.warworlds.model.StarManager;
 import au.com.codeka.warworlds.model.StarSummary;
+
+import com.google.protobuf.InvalidProtocolBufferException;
 
 /**
  * When you click "Build" shows you the list of buildings/ships that are/can be built by your
@@ -355,9 +352,13 @@ public class BuildActivity extends BaseActivity implements StarManager.StarFetch
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                     ShipListAdapter.ItemEntry entry = (ShipListAdapter.ItemEntry) adapter.getItem(position);
-                    if (entry.design != null) {
+                    if (entry.fleet == null && entry.buildRequest == null) {
                         BuildConfirmDialog dialog = new BuildConfirmDialog();
                         dialog.setup(entry.design, star, colony);
+                        dialog.show(getActivity().getSupportFragmentManager(), "");
+                    } else if (entry.fleet != null && entry.buildRequest == null) {
+                        ShipUpgradeDialog dialog = new ShipUpgradeDialog();
+                        dialog.setup(star, colony, entry.fleet);
                         dialog.show(getActivity().getSupportFragmentManager(), "");
                     }
                 }
@@ -376,16 +377,18 @@ public class BuildActivity extends BaseActivity implements StarManager.StarFetch
 
             public void setShips(Map<String, Design> designs, ArrayList<Fleet> fleets, ArrayList<BuildRequest> buildRequests) {
                 mEntries = new ArrayList<ItemEntry>();
+
+                mEntries.add(new ItemEntry("New Ships"));
+                for (Design design : designs.values()) {
+                    mEntries.add(new ItemEntry((ShipDesign) design));
+                }
+
                 mEntries.add(new ItemEntry("Existing Ships"));
                 for (Fleet fleet : fleets) {
                     mEntries.add(new ItemEntry(fleet));
                 }
                 for (BuildRequest buildRequest : buildRequests) {
                     mEntries.add(new ItemEntry(buildRequest));
-                }
-                mEntries.add(new ItemEntry("New Ships"));
-                for (Design design : designs.values()) {
-                    mEntries.add(new ItemEntry((ShipDesign) design));
                 }
 
                 notifyDataSetChanged();
@@ -398,6 +401,15 @@ public class BuildActivity extends BaseActivity implements StarManager.StarFetch
             @Override
             public int getViewTypeCount() {
                 return 3;
+            }
+
+            @Override
+            public boolean isEnabled(int position) {
+                if (getItemViewType(position) == HEADING_TYPE) {
+                    return false;
+                }
+
+                return true;
             }
 
             @Override
@@ -448,6 +460,7 @@ public class BuildActivity extends BaseActivity implements StarManager.StarFetch
 
                 if (entry.heading != null) {
                     TextView tv = (TextView) view;
+                    tv.setTypeface(Typeface.DEFAULT_BOLD);
                     tv.setText(entry.heading);
                 } else if (entry.fleet != null || entry.buildRequest != null) {
                     // existing fleet/upgrading fleet
@@ -478,7 +491,14 @@ public class BuildActivity extends BaseActivity implements StarManager.StarFetch
                         levelLabel.setVisibility(View.VISIBLE);
                     }
 
-                    row1.setText(design.getDisplayName());
+                    int count;
+                    if (entry.fleet != null) {
+                        count = (int) entry.fleet.getNumShips();
+                    } else {
+                        count = entry.buildRequest.getCount();
+                    }
+
+                    row1.setText(String.format(Locale.ENGLISH, "%d × %s", count, design.getDisplayName()));
                     if (buildRequest != null) {
                         String verb = (fleet == null ? "Building" : "Upgrading");
                         row2.setText(Html.fromHtml(String.format(Locale.ENGLISH,
@@ -490,13 +510,11 @@ public class BuildActivity extends BaseActivity implements StarManager.StarFetch
                         progress.setVisibility(View.VISIBLE);
                         progress.setProgress((int) buildRequest.getPercentComplete());
                     } else {
-                        if (false/*numUpgrades < building.getLevel()*/) {
-                            //TODO
-                            /*
+                        /*if (numUpgrades < building.getLevel()) {
                             row2.setText("No more upgrades");
                             row3.setVisibility(View.GONE);
-                            progress.setVisibility(View.GONE); */
-                        } else {
+                            progress.setVisibility(View.GONE);
+                        } else {*/
                             progress.setVisibility(View.GONE);
                             row2.setText(String.format(Locale.ENGLISH,
                                     "Upgrade: %.2f hours",
@@ -505,7 +523,7 @@ public class BuildActivity extends BaseActivity implements StarManager.StarFetch
                             String required = design.getDependenciesList(getColony());
                             row3.setVisibility(View.VISIBLE);
                             row3.setText(Html.fromHtml(required));
-                        }
+                        /*}*/
                     }
                 } else {
                     // new fleet
@@ -518,7 +536,7 @@ public class BuildActivity extends BaseActivity implements StarManager.StarFetch
                     view.findViewById(R.id.building_level).setVisibility(View.GONE);
                     view.findViewById(R.id.building_level_label).setVisibility(View.GONE);
 
-                    ShipDesign design = mEntries.get(position).design;
+                    ShipDesign design = entry.design;
 
                     icon.setImageDrawable(new SpriteDrawable(SpriteManager.i.getSprite(design.getSpriteName())));
 

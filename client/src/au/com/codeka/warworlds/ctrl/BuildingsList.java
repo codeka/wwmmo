@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Locale;
 
 import android.content.Context;
+import android.graphics.Typeface;
 import android.text.Html;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
@@ -35,6 +36,9 @@ import au.com.codeka.warworlds.model.SpriteManager;
 import au.com.codeka.warworlds.model.Star;
 import au.com.codeka.warworlds.model.StarManager;
 
+/**
+ * This is a list of existing buildings, in-progress buildings and new designs available to build.
+ */
 public class BuildingsList extends ListView
                            implements StarManager.StarFetchedHandler {
     private Context mContext;
@@ -99,9 +103,7 @@ public class BuildingsList extends ListView
         }
     }
 
-    /**
-     * This adapter is used to populate a list of buildings in a list view.
-     */
+    /** This adapter is used to populate a list of buildings in a list view. */
     private class BuildingListAdapter extends BaseAdapter {
         private ArrayList<Entry> mEntries;
 
@@ -110,12 +112,14 @@ public class BuildingsList extends ListView
         private static final int NEW_BUILDING_TYPE = 2;
 
         public void setColony(Star star, Colony colony) {
+            mEntries = new ArrayList<Entry>();
+
             List<BaseBuilding> buildings = colony.getBuildings();
             if (buildings == null) {
                 buildings = new ArrayList<BaseBuilding>();
             }
 
-            mEntries = new ArrayList<Entry>();
+            ArrayList<Entry> existingBuildingEntries = new ArrayList<Entry>();
             for (BaseBuilding b : buildings) {
                 Entry entry = new Entry();
                 entry.building = (Building) b;
@@ -128,7 +132,7 @@ public class BuildingsList extends ListView
                         }
                     }
                 }
-                mEntries.add(entry);
+                existingBuildingEntries.add(entry);
             }
 
             for (BaseBuildRequest br : star.getBuildRequests()) {
@@ -137,11 +141,11 @@ public class BuildingsList extends ListView
                     br.getExistingBuildingKey() == null) {
                     Entry entry = new Entry();
                     entry.buildRequest = (BuildRequest) br;
-                    mEntries.add(entry);
+                    existingBuildingEntries.add(entry);
                 }
             }
 
-            Collections.sort(mEntries, new Comparator<Entry>() {
+            Collections.sort(existingBuildingEntries, new Comparator<Entry>() {
                 @Override
                 public int compare(Entry lhs, Entry rhs) {
                     String a = (lhs.building != null ? lhs.building.getDesignID() : lhs.buildRequest.getDesignID());
@@ -151,18 +155,14 @@ public class BuildingsList extends ListView
             });
 
             Entry title = new Entry();
-            title.title = "Existing Buildings";
-            mEntries.add(0, title);
-
-            title = new Entry();
-            title.title = "Available Buildings";
+            title.title = "New Buildings";
             mEntries.add(title);
 
             for (Design d : DesignManager.i.getDesigns(DesignKind.BUILDING).values()) {
                 BuildingDesign bd = (BuildingDesign) d;
                 if (bd.getMaxPerColony() > 0) {
                     int numExisting = 0;
-                    for (Entry e : mEntries) {
+                    for (Entry e : existingBuildingEntries) {
                         if (e.building != null) {
                             if (e.building.getDesignID().equals(bd.getID())) {
                                 numExisting ++;
@@ -190,6 +190,14 @@ public class BuildingsList extends ListView
                 }
                 Entry entry = new Entry();
                 entry.design = bd;
+                mEntries.add(entry);
+            }
+
+            title = new Entry();
+            title.title = "Existing Buildings";
+            mEntries.add(title);
+
+            for (Entry entry : existingBuildingEntries) {
                 mEntries.add(entry);
             }
 
@@ -275,6 +283,7 @@ public class BuildingsList extends ListView
             Entry entry = mEntries.get(position);
             if (entry.title != null) {
                 TextView tv = (TextView) view;
+                tv.setTypeface(Typeface.DEFAULT_BOLD);
                 tv.setText(entry.title);
             } else if (entry.building != null || entry.buildRequest != null) {
                 // existing building/upgrading building

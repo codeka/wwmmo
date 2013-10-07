@@ -72,12 +72,12 @@
         <activity android:name=".BlitzResetActivity" />
         <activity android:name=".game.EmpireActivity" />
         <activity android:name=".game.EnemyEmpireActivity" />
+        <activity android:name=".game.build.BuildActivity" />
         <activity android:name=".game.starfield.StarfieldActivity" />
         <activity android:name=".game.starfield.TacticalMapActivity" />
         <activity android:name=".game.solarsystem.SolarSystemActivity" />
         <activity android:name=".game.solarsystem.EnemyPlanetActivity" />
         <activity android:name=".game.solarsystem.EmptyPlanetActivity" />
-        <activity android:name=".game.solarsystem.BuildActivity" />
         <activity android:name=".game.solarsystem.FleetActivity" />
         <activity android:name=".game.alliance.AllianceActivity" />
         <activity android:name=".game.alliance.AllianceDetailsActivity" />

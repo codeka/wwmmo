@@ -1,21 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <sprites>
   <sheet filename="spritesheets/sprites.png">
-    <sprite name="ship.fighter">
-      <rect location="0,0" size="21x24" />
-      <direction>0,1</direction>
-    </sprite>
-    <sprite name="ship.scout">
-      <rect location="21,0" size="22x28" />
-      <direction>0,1</direction>
-    </sprite>
     <sprite name="building.biosphere-1">
       <rect location="43,0" size="25x24" />
       <direction>0,1</direction>
     </sprite>
-    <sprite name="ship.colony">
-      <rect location="0,28" size="50x58" />
-      <direction>0,-1</direction>
+    <sprite name="building.hq">
+      <rect location="102,30" size="66x57" />
+      <direction>0,1</direction>
+    </sprite>
+    <sprite name="building.radar">
+      <rect location="136,88" size="48x56" />
+      <direction>0,1</direction>
     </sprite>
     <sprite name="building.research">
       <rect location="52,26" size="50x58" />
@@ -25,24 +21,42 @@
       <rect location="0,87" size="64x50" />
       <direction>0,1</direction>
     </sprite>
+    <sprite name="building.shield-1">
+      <rect location="93,0" size="26x30" />
+      <direction>0,1</direction>
+    </sprite>
     <sprite name="building.silo">
       <rect location="68,0" size="25x19" />
       <direction>0,1</direction>
     </sprite>
-    <sprite name="building.shield-1">
-      <rect location="93,0" size="26x30" />
+
+      <sprite name="ship.colony">
+      <rect location="0,28" size="50x58" />
+      <direction>0,-1</direction>
+    </sprite>
+      <sprite name="ship.fighter">
+      <rect location="0,0" size="21x24" />
+      <direction>0,1</direction>
+    </sprite>
+    <sprite name="ship.scout">
+      <rect location="21,0" size="22x28" />
       <direction>0,1</direction>
     </sprite>
     <sprite name="ship.troopcarrier">
       <rect location="64,84" size="71x29" />
       <direction>0,-1</direction>
     </sprite>
-    <sprite name="building.hq">
-      <rect location="102,30" size="66x57" />
+
+    <sprite name="upgrade.firepower">
+      <rect location="135,1" size="9x16" />
       <direction>0,1</direction>
     </sprite>
-    <sprite name="building.radar">
-      <rect location="136,88" size="48x56" />
+    <sprite name="upgrade.shield">
+      <rect location="145,2" size="22x14" />
+      <direction>0,1</direction>
+    </sprite>
+    <sprite name="upgrade.boost">
+      <rect location="169,1" size="10x16" />
       <direction>0,1</direction>
     </sprite>
   </sheet>

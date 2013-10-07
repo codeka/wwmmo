@@ -56,6 +56,30 @@
     <effects>
       <effect kind="fighter" />
     </effects>
+    <upgrades>
+      <upgrade id="firepower">
+        <sprite>upgrade.firepower</sprite>
+        <name>Plasma Cannon</name>
+        <description><![CDATA[
+          A plamsa cannon upgrades the firepower of your fighters so that they are twice as
+          effective in battle.
+        ]]></description>
+      </upgrade>
+      <upgrade id="shield">
+        <sprite>upgrade.shield</sprite>
+        <name>Energy Shield</name>
+        <description><![CDATA[
+          This shield upgrade makes your fighter twice as resilient to enemy fire.
+        ]]></description>
+      </upgrade>
+      <upgrade id="boost">
+        <sprite>upgrade.boost</sprite>
+        <name>Warp Boost</name>
+        <description><![CDATA[
+          Allows you to boost your fleet half way to the destination in an instant.
+        ]]></description>
+      </upgrade>
+    </upgrades>
   </design>
   <design id="troopcarrier">
     <name>Troop Carrier</name>

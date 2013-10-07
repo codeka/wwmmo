@@ -30,6 +30,7 @@ import au.com.codeka.warworlds.ctrl.SelectionView;
 import au.com.codeka.warworlds.game.CombatReportDialog;
 import au.com.codeka.warworlds.game.ScoutReportDialog;
 import au.com.codeka.warworlds.game.SitrepActivity;
+import au.com.codeka.warworlds.game.build.BuildActivity;
 import au.com.codeka.warworlds.model.Colony;
 import au.com.codeka.warworlds.model.Empire;
 import au.com.codeka.warworlds.model.EmpireManager;

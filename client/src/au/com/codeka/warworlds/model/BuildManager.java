@@ -92,29 +92,50 @@ public class BuildManager {
 
     public void build(final Context context, final Colony colony,
                       final Design design, final Building existingBuilding, final int count) {
+        Messages.BuildRequest.BUILD_KIND kind;
+        if (design.getDesignKind() == DesignKind.BUILDING) {
+            kind = Messages.BuildRequest.BUILD_KIND.BUILDING;
+        } else {
+            kind = Messages.BuildRequest.BUILD_KIND.SHIP;
+        }
+
+        Messages.BuildRequest build_request_pb = Messages.BuildRequest.newBuilder()
+                .setBuildKind(kind)
+                .setStarKey(colony.getStarKey())
+                .setColonyKey(colony.getKey())
+                .setEmpireKey(colony.getEmpireKey())
+                .setDesignName(design.getID())
+                .setCount(count)
+                .setExistingBuildingKey(existingBuilding == null ? "" : existingBuilding.getKey())
+                .build();
+
+        build(context, build_request_pb);
+    }
+
+    public void build(final Context context, final Colony colony,
+                      final Design design, final int fleetID, final String upgradeID) {
+        Messages.BuildRequest build_request_pb = Messages.BuildRequest.newBuilder()
+                    .setBuildKind(Messages.BuildRequest.BUILD_KIND.SHIP)
+                    .setStarKey(colony.getStarKey())
+                    .setColonyKey(colony.getKey())
+                    .setEmpireKey(colony.getEmpireKey())
+                    .setDesignName(design.getID())
+                    .setExistingFleetId(fleetID)
+                    .setUpgradeId(upgradeID)
+                    .build();
+
+        build(context, build_request_pb);
+    }
+
+    private void build(final Context context, final Messages.BuildRequest build_request_pb) {
         new BackgroundRunner<BuildRequest>() {
             private int mErrorCode;
             private String mErrorMsg;
 
             @Override
             protected BuildRequest doInBackground() {
-                Messages.BuildRequest.BUILD_KIND kind;
-                if (design.getDesignKind() == DesignKind.BUILDING) {
-                    kind = Messages.BuildRequest.BUILD_KIND.BUILDING;
-                } else {
-                    kind = Messages.BuildRequest.BUILD_KIND.SHIP;
-                }
-
-                Messages.BuildRequest build = Messages.BuildRequest.newBuilder()
-                        .setBuildKind(kind)
-                        .setStarKey(colony.getStarKey())
-                        .setColonyKey(colony.getKey())
-                        .setEmpireKey(colony.getEmpireKey())
-                        .setDesignName(design.getID())
-                        .setCount(count)
-                        .setExistingBuildingKey(existingBuilding == null ? "" : existingBuilding.getKey())
-                        .build();
                 try {
+                    Messages.BuildRequest build = build_request_pb;
                     build = ApiClient.postProtoBuf("buildqueue", build, Messages.BuildRequest.class);
 
                     BuildRequest br = new BuildRequest();
@@ -146,7 +167,7 @@ public class BuildManager {
                 } else if (buildRequest != null) {
                     mBuildRequests.add(buildRequest);
 
-                    StarManager.getInstance().refreshStar(colony.getStarKey());
+                    StarManager.getInstance().refreshStar(build_request_pb.getStarKey());
                 }
             }
         }.execute();
