@@ -19,7 +19,7 @@
              android:layout_marginLeft="10dp"
              android:layout_marginRight="60dp"
              android:layout_below="@+id/note"
-             android:layout_toRightOf="@+id/focus_population_icon"
+             android:layout_toRightOf="@+id/focus_population_plus_btn"
              android:layout_alignParentRight="true" />
 
     <ImageView android:id="@+id/focus_population_icon"
@@ -30,6 +30,22 @@
                android:layout_alignParentLeft="true"
                android:layout_marginLeft="10dp"
                android:src="@drawable/population_white" />
+
+    <Button android:id="@+id/focus_population_minus_btn"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_alignBottom="@+id/focus_population"
+            android:layout_toRightOf="@+id/focus_population_icon"
+            android:layout_marginLeft="4dp"
+            android:text="-" />
+
+    <Button android:id="@+id/focus_population_plus_btn"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_alignBottom="@+id/focus_population"
+            android:layout_toRightOf="@+id/focus_population_minus_btn"
+            android:layout_marginLeft="4dp"
+            android:text="+" />
 
     <TextView android:id="@+id/focus_population_value"
               android:layout_width="wrap_content"
@@ -59,7 +75,7 @@
              android:layout_marginRight="60dp"
              android:layout_alignParentRight="true"
              android:layout_below="@+id/focus_population"
-             android:layout_toRightOf="@+id/focus_farming_icon"
+             android:layout_toRightOf="@+id/focus_farming_plus_btn"
              android:layout_toLeftOf="@+id/focus_farming_value" />
 
     <ImageView android:id="@+id/focus_farming_icon"
@@ -70,6 +86,22 @@
                android:layout_alignParentLeft="true"
                android:layout_marginLeft="10dp"
                android:src="@drawable/farming_white" />
+
+    <Button android:id="@+id/focus_farming_minus_btn"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_alignBottom="@+id/focus_farming"
+            android:layout_toRightOf="@+id/focus_farming_icon"
+            android:layout_marginLeft="4dp"
+            android:text="-" />
+
+    <Button android:id="@+id/focus_farming_plus_btn"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_alignBottom="@+id/focus_farming"
+            android:layout_toRightOf="@+id/focus_farming_minus_btn"
+            android:layout_marginLeft="4dp"
+            android:text="+" />
 
     <TextView android:id="@+id/focus_farming_value"
               android:layout_width="wrap_content"
@@ -99,7 +131,7 @@
                  android:layout_marginRight="10dp"
                  android:scaleType="fitXY"
                  android:src="@drawable/lock_opened" />
-    
+
     <SeekBar android:id="@+id/focus_mining"
              android:layout_width="match_parent"
              android:layout_height="wrap_content"
@@ -108,7 +140,7 @@
              android:layout_marginRight="60dp"
              android:layout_alignParentRight="true"
              android:layout_below="@+id/focus_farming"
-             android:layout_toRightOf="@+id/focus_mining_icon"
+             android:layout_toRightOf="@+id/focus_mining_plus_btn"
              android:layout_toLeftOf="@+id/focus_mining_value" />
 
     <ImageView android:id="@+id/focus_mining_icon"
@@ -119,6 +151,22 @@
                android:layout_alignParentLeft="true"
                android:layout_marginLeft="10dp"
                android:src="@drawable/mining_white" />
+
+    <Button android:id="@+id/focus_mining_minus_btn"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_alignBottom="@+id/focus_mining"
+            android:layout_toRightOf="@+id/focus_mining_icon"
+            android:layout_marginLeft="4dp"
+            android:text="-" />
+
+    <Button android:id="@+id/focus_mining_plus_btn"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_alignBottom="@+id/focus_mining"
+            android:layout_toRightOf="@+id/focus_mining_minus_btn"
+            android:layout_marginLeft="4dp"
+            android:text="+" />
 
     <TextView android:id="@+id/focus_mining_value"
               android:layout_width="wrap_content"
@@ -158,7 +206,7 @@
              android:layout_marginRight="60dp"
              android:layout_alignParentRight="true"
              android:layout_below="@+id/focus_mining"
-             android:layout_toRightOf="@+id/focus_construction_icon"
+             android:layout_toRightOf="@+id/focus_construction_plus_btn"
              android:layout_toLeftOf="@+id/focus_construction_value" />
 
     <ImageView android:id="@+id/focus_construction_icon"
@@ -169,6 +217,22 @@
                android:layout_alignParentLeft="true"
                android:layout_marginLeft="10dp"
                android:src="@drawable/construction_white" />
+
+    <Button android:id="@+id/focus_construction_minus_btn"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_alignBottom="@+id/focus_construction"
+            android:layout_toRightOf="@+id/focus_construction_icon"
+            android:layout_marginLeft="4dp"
+            android:text="-" />
+
+    <Button android:id="@+id/focus_construction_plus_btn"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_alignBottom="@+id/focus_construction"
+            android:layout_toRightOf="@+id/focus_construction_minus_btn"
+            android:layout_marginLeft="4dp"
+            android:text="+" />
 
     <TextView android:id="@+id/focus_construction_value"
               android:layout_width="wrap_content"
@@ -193,4 +257,5 @@
     <View android:layout_width="match_parent"
           android:layout_height="10dp"
           android:layout_below="@id/focus_construction" />
+
 </RelativeLayout>
