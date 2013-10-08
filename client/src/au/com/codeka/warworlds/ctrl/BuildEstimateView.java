@@ -55,6 +55,11 @@ public class BuildEstimateView extends FrameLayout {
         timeToBuildText.setText("-");
         mineralsToBuildText.setText("-");
 
+        if (star == null || br == null) {
+            mRefreshRunning = false;
+            return;
+        }
+
         new BackgroundRunner<Boolean>() {
             private BuildRequest buildRequest;
             private EmpirePresence empire;
@@ -70,7 +75,6 @@ public class BuildEstimateView extends FrameLayout {
                 starCopy.getBuildRequests().add(buildRequest);
                 sim.simulate(starCopy);
 
-                buildRequest = br;
                 empire = (EmpirePresence) starCopy.getEmpire(br.getEmpireKey());
                 return true;
             }
@@ -79,7 +83,7 @@ public class BuildEstimateView extends FrameLayout {
             protected void onComplete(Boolean success) {
                 DateTime endTime = buildRequest.getEndTime();
 
-                float deltaMineralsPerHourBefore = starCopy.getEmpire(br.getEmpireKey()).getDeltaMineralsPerHour();
+                float deltaMineralsPerHourBefore = star.getEmpire(br.getEmpireKey()).getDeltaMineralsPerHour();
                 float deltaMineralsPerHourAfter = empire.getDeltaMineralsPerHour();
 
                 timeToBuildText.setText(TimeInHours.format(br.getStartTime(), endTime));

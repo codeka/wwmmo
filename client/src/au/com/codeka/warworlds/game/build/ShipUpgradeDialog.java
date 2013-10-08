@@ -10,12 +10,14 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -44,6 +46,7 @@ public class ShipUpgradeDialog extends DialogFragment {
     private Colony mColony;
     private Fleet mFleet;
     private BuildEstimateView mBuildEstimateView;
+    private ShipDesign.Upgrade mUpgrade;
 
     public void setup(Star star, Colony colony, Fleet fleet) {
         Bundle args = new Bundle();
@@ -83,9 +86,19 @@ public class ShipUpgradeDialog extends DialogFragment {
         fleetName.setText(String.format(Locale.ENGLISH, "%d × %s",
                 (int) mFleet.getNumShips(), design.getDisplayName()));
 
-        UpgradeListAdapter adapter = new UpgradeListAdapter();
-        upgradesList.setAdapter(adapter);
-        adapter.setup(design.getUpgrades());
+        final UpgradeListAdapter upgradeListAdapter = new UpgradeListAdapter();
+        upgradesList.setAdapter(upgradeListAdapter);
+        upgradeListAdapter.setup(design.getUpgrades());
+
+        upgradesList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> listView, View view, int position, long id) {
+                upgradeListAdapter.setSelectedItem(position);
+
+                mUpgrade = (ShipDesign.Upgrade) upgradeListAdapter.getItem(position);
+                refreshBuildEstimate();
+            }
+        });
 
         return new StyledDialog.Builder(getActivity())
                .setView(mView)
@@ -127,23 +140,33 @@ public class ShipUpgradeDialog extends DialogFragment {
     }
 
     private void refreshBuildEstimate() {
+        if (mUpgrade == null) {
+            mBuildEstimateView.refresh(mStar, null);
+            return;
+        }
+
         final DateTime startTime = DateTime.now();
 
         BuildRequest buildRequest = new BuildRequest("FAKE_BUILD_REQUEST",
                 DesignKind.SHIP, mFleet.getDesignID(), mColony.getKey(), startTime,
                 (int) mFleet.getNumShips(), null, 0, Integer.parseInt(mFleet.getKey()),
-                "firepower", mStar.getKey(), mColony.getPlanetIndex(), mColony.getKey());
+                mUpgrade.getID(), mStar.getKey(), mColony.getPlanetIndex(), mColony.getKey());
 
         mBuildEstimateView.refresh(mStar, buildRequest);
-
     }
 
     /** This adapter is used to populate the list of upgrade designs in our view. */
     private class UpgradeListAdapter extends BaseAdapter {
         private List<ShipDesign.Upgrade> mEntries;
+        private ShipDesign.Upgrade mSelectedEntry;
 
         public void setup(List<ShipDesign.Upgrade> upgrades) {
             mEntries = new ArrayList<ShipDesign.Upgrade>(upgrades);
+            notifyDataSetChanged();
+        }
+
+        public void setSelectedItem(int position) {
+            mSelectedEntry = mEntries.get(position);
             notifyDataSetChanged();
         }
 
@@ -175,6 +198,12 @@ public class ShipUpgradeDialog extends DialogFragment {
                 LayoutInflater inflater = (LayoutInflater) getActivity().getSystemService
                         (Context.LAYOUT_INFLATER_SERVICE);
                 view = inflater.inflate(R.layout.build_ship_upgrade_row, parent, false);
+            }
+
+            if (mSelectedEntry != null && mSelectedEntry.getID().equals(entry.getID())) {
+                view.setBackgroundResource(R.drawable.list_item_selected);
+            } else {
+                view.setBackgroundResource(R.drawable.list_item_normal);
             }
 
             ImageView upgradeIcon = (ImageView) view.findViewById(R.id.upgrade_icon);
