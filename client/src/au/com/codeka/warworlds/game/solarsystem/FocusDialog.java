@@ -14,6 +14,7 @@ import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.SeekBar;
 import android.widget.TextView;
@@ -35,7 +36,7 @@ public class FocusDialog extends DialogFragment {
     private List<SeekBar> mSeekBars;
     private List<TextView> mTextViews;
     private List<ImageButton> mLockButtons;
-    private int mLockedIndex;
+    private ArrayList<Integer> mLockedIndexes;
     private View mView;
 
     private static float SEEKBAR_MAX = 1000.0f;
@@ -71,7 +72,7 @@ public class FocusDialog extends DialogFragment {
             }
         }
 
-        mLockedIndex = -1;
+        mLockedIndexes = new ArrayList<Integer>();
         mSeekBars = new ArrayList<SeekBar>();
         mTextViews = new ArrayList<TextView>();
         mLockButtons = new ArrayList<ImageButton>();
@@ -87,12 +88,24 @@ public class FocusDialog extends DialogFragment {
                                R.id.focus_farming_lock,
                                R.id.focus_mining_lock,
                                R.id.focus_construction_lock};
+        int[] plusBtnIds = {R.id.focus_population_plus_btn,
+                            R.id.focus_farming_plus_btn,
+                            R.id.focus_mining_plus_btn,
+                            R.id.focus_construction_plus_btn};
+        int[] minusBtnIds = {R.id.focus_population_minus_btn,
+                             R.id.focus_farming_minus_btn,
+                             R.id.focus_mining_minus_btn,
+                             R.id.focus_construction_minus_btn};
         for (int i = 0; i < 4; i++) {
             SeekBar seekBar = (SeekBar) mView.findViewById(seekBarIds[i]);
             TextView textView = (TextView) mView.findViewById(textViewIds[i]);
             ImageButton lockButton = (ImageButton) mView.findViewById(lockButtonIds[i]);
+            Button plusButton = (Button) mView.findViewById(plusBtnIds[i]);
+            Button minusButton = (Button) mView.findViewById(minusBtnIds[i]);
             seekBar.setMax((int) SEEKBAR_MAX);
             lockButton.setTag(i);
+            plusButton.setTag(i);
+            minusButton.setTag(i);
             seekBar.setTag(i);
             mSeekBars.add(seekBar);
             mTextViews.add(textView);
@@ -120,24 +133,54 @@ public class FocusDialog extends DialogFragment {
                     int index = (Integer) thisLockButton.getTag();
 
                     // if we're the locked one, unlock
-                    if (mLockedIndex == index) {
-                        mLockedIndex = -1;
+                    if (mLockedIndexes != null && mLockedIndexes.contains(index)) {
+                        mLockedIndexes.remove((Object) index);
                         thisLockButton.setImageResource(R.drawable.lock_opened);
                         mSeekBars.get(index).setEnabled(true);
-                        return;
+                    } else {
+                        mLockedIndexes.add(index);
+                        thisLockButton.setImageResource(R.drawable.lock_closed);
+                        mSeekBars.get(index).setEnabled(false);
                     }
 
-                    // otherwise we're now locked -- unlock all others
-                    mLockedIndex = index;
+                    // if there's two locked buttons, make sure the others are disabled, you
+                    // can't lock more than two at once.
                     for (int i = 0; i < 4; i++) {
-                        if (i == index) {
-                            mLockButtons.get(i).setImageResource(R.drawable.lock_closed);
-                            mSeekBars.get(i).setEnabled(false);
+                        boolean isLocked = mLockedIndexes.contains(i);
+                        if (isLocked || mLockedIndexes.size() < 2) {
+                            mLockButtons.get(i).setEnabled(true);
                         } else {
-                            mLockButtons.get(i).setImageResource(R.drawable.lock_opened);
-                            mSeekBars.get(i).setEnabled(true);
+                            mLockButtons.get(i).setEnabled(false);
                         }
                     }
+                }
+            });
+
+            plusButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    int index = (Integer) v.getTag();
+                    SeekBar seekBar = mSeekBars.get(index);
+                    int progress = seekBar.getProgress() + (int) (SEEKBAR_MAX / 100);
+                    if (progress >= SEEKBAR_MAX) {
+                        progress = (int) SEEKBAR_MAX;
+                    }
+                    seekBar.setProgress(progress);
+                    redistribute(seekBar, progress / SEEKBAR_MAX);
+                }
+            });
+
+            minusButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    int index = (Integer) v.getTag();
+                    SeekBar seekBar = mSeekBars.get(index);
+                    int progress = seekBar.getProgress() - (int) (SEEKBAR_MAX / 100);
+                    if (progress <= 0) {
+                        progress = 0;
+                    }
+                    seekBar.setProgress(progress);
+                    redistribute(seekBar, progress / SEEKBAR_MAX);
                 }
             });
         }
@@ -196,30 +239,24 @@ public class FocusDialog extends DialogFragment {
     }
 
     private void redistribute(SeekBar changedSeekBar, double newValue) {
-        SeekBar lockedSeekBar = null;
-        if (mLockedIndex >= 0) {
-            lockedSeekBar = mSeekBars.get(mLockedIndex);
-        }
-
         double otherValuesTotal = 0.0;
         for (SeekBar seekBar : mSeekBars) {
             if (seekBar == changedSeekBar)
                 continue;
             int progress = seekBar.getProgress();
+            if (progress == 0) {
+                progress = 1;
+            }
             otherValuesTotal += (progress / SEEKBAR_MAX);
         }
 
         double desiredOtherValuesTotal = 1.0 - newValue;
-        if (lockedSeekBar != null) {
-            desiredOtherValuesTotal -= (lockedSeekBar.getProgress() / SEEKBAR_MAX);
-        }
-
-        if (desiredOtherValuesTotal <= 0.0) {
+         if (desiredOtherValuesTotal <= 0.0) {
             for (int i = 0; i < 4; i++) {
                 SeekBar seekBar = mSeekBars.get(i);
                 TextView textView = mTextViews.get(i);
 
-                if (seekBar != changedSeekBar && seekBar != lockedSeekBar) {
+                if (seekBar != changedSeekBar && !mLockedIndexes.contains(i)) {
                     seekBar.setProgress(0);
                 }
                 textView.setText("0");
@@ -230,8 +267,11 @@ public class FocusDialog extends DialogFragment {
         for (int i = 0; i < 4; i++) {
             SeekBar seekBar = mSeekBars.get(i);
             TextView textView = mTextViews.get(i);
-            if (seekBar != changedSeekBar && seekBar != lockedSeekBar) {
+            if (seekBar != changedSeekBar && !mLockedIndexes.contains(i)) {
                 int progress = seekBar.getProgress();
+                if (progress == 0) {
+                    progress = 1;
+                }
                 seekBar.setProgress((int)(progress / ratio));
             }
 
