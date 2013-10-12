@@ -165,6 +165,14 @@ public abstract class BaseStar {
     public List<BaseFleet> getFleets() {
         return mFleets;
     }
+    public BaseFleet getFleet(int fleetID) {
+        for (BaseFleet fleet : mFleets) {
+            if (Integer.parseInt(fleet.getKey()) == fleetID) {
+                return fleet;
+            }
+        }
+        return null;
+    }
     public List<BaseBuildRequest> getBuildRequests() {
         return mBuildRequests;
     }

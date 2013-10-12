@@ -287,7 +287,7 @@ public class StarfieldActivity extends BaseActivity
                 }
 
                 BaseStar homeStar = myEmpire.getHomeStar();
-                if (mHomeStar == null || !mHomeStar.getKey().equals(homeStar.getKey())) {
+                if (homeStar != null && (mHomeStar == null || !mHomeStar.getKey().equals(homeStar.getKey()))) {
                     mHomeStar = (StarSummary) homeStar;
                     if (!mDoNotNavigateToHomeStar) {
                         mStarfield.scrollTo(homeStar.getSectorX(), homeStar.getSectorY(),

@@ -81,6 +81,9 @@ public abstract class BaseFleet {
         mTimeDestroyed = time;
     }
     public ArrayList<BaseFleetUpgrade> getUpgrades() {
+        if (mUpgrades == null) {
+            mUpgrades = new ArrayList<BaseFleetUpgrade>();
+        }
         return mUpgrades;
     }
 

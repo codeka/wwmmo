@@ -47,13 +47,37 @@ public class SqlStmt implements AutoCloseable {
         mStmt.setInt(position, value);
         saveParameter(position, value);
     }
+    public void setInt(int position, Integer value) throws SQLException {
+        if (value == null) {
+            setNull(position);
+        } else {
+            mStmt.setInt(position, value);
+            saveParameter(position, value);
+        }
+    }
     public void setLong(int position, long value) throws SQLException {
         mStmt.setLong(position, value);
         saveParameter(position, value);
     }
+    public void setLong(int position, Long value) throws SQLException {
+        if (value == null) {
+            setNull(position);
+        } else {
+            mStmt.setLong(position, value);
+            saveParameter(position, value);
+        }
+    }
     public void setDouble(int position, double value) throws SQLException {
         mStmt.setDouble(position, value);
         saveParameter(position, value);
+    }
+    public void setDouble(int position, Double value) throws SQLException {
+        if (value == null) {
+            setNull(position);
+        } else {
+            mStmt.setDouble(position, value);
+            saveParameter(position, value);
+        }
     }
     public void setString(int position, String value) throws SQLException {
         mStmt.setString(position, value);

@@ -14,6 +14,10 @@ public class Fleet extends BaseFleet {
 
     @Override
     protected BaseFleetUpgrade createUpgrade(Messages.FleetUpgrade pb) {
-        return null;
+        FleetUpgrade fleetUpgrade = new FleetUpgrade();
+        if (pb != null) {
+            fleetUpgrade.fromProtocolBuffer(this, pb);
+        }
+        return fleetUpgrade;
     }
 }

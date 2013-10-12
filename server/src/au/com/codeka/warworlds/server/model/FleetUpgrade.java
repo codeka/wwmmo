@@ -13,4 +13,9 @@ public class FleetUpgrade extends BaseFleetUpgrade {
         mUpgradeID = rs.getString("upgrade_id");
         mStarID = rs.getInt("star_id");
     }
+    public FleetUpgrade(int starID, int fleetID, String upgradeID) {
+        mFleetID = fleetID;
+        mStarID = starID;
+        mUpgradeID = upgradeID;
+    }
 }

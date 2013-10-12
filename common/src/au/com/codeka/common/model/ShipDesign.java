@@ -36,6 +36,14 @@ public class ShipDesign extends Design {
     public List<Upgrade> getUpgrades() {
         return mUpgrades;
     }
+    public Upgrade getUpgrade(String id) {
+        for (Upgrade upgrade : mUpgrades) {
+            if (upgrade.getID().equals(id)) {
+                return upgrade;
+            }
+        }
+        return null;
+    }
 
     public static class Factory extends Design.Factory {
         public Factory(Element shipElement) {
@@ -89,6 +97,7 @@ public class ShipDesign extends Design {
         private String mDisplayName;
         private String mDescription;
         private String mSpriteName;
+        private BuildCost mBuildCost;
 
         public Upgrade(Element upgradeElem) {
             mID = upgradeElem.getAttribute("id");
@@ -99,6 +108,8 @@ public class ShipDesign extends Design {
                     mDisplayName = elem.getTextContent();
                 } else if (elem.getNodeName().equals("description")) {
                     mDescription = elem.getTextContent();
+                } else if (elem.getNodeName().equals("cost")) {
+                    mBuildCost = new BuildCost(elem);
                 }
             }
         }
@@ -114,6 +125,9 @@ public class ShipDesign extends Design {
         }
         public String getSpriteName() {
             return mSpriteName;
+        }
+        public BuildCost getBuildCost() {
+            return mBuildCost;
         }
     }
 }

@@ -83,7 +83,11 @@ public class BuildEstimateView extends FrameLayout {
             protected void onComplete(Boolean success) {
                 DateTime endTime = buildRequest.getEndTime();
 
-                float deltaMineralsPerHourBefore = star.getEmpire(br.getEmpireKey()).getDeltaMineralsPerHour();
+                EmpirePresence empirePresenceBefore = (EmpirePresence) star.getEmpire(br.getEmpireKey());
+                float deltaMineralsPerHourBefore = 0;
+                if (empirePresenceBefore != null) {
+                    deltaMineralsPerHourBefore = empirePresenceBefore.getDeltaMineralsPerHour();
+                }
                 float deltaMineralsPerHourAfter = empire.getDeltaMineralsPerHour();
 
                 timeToBuildText.setText(TimeInHours.format(br.getStartTime(), endTime));

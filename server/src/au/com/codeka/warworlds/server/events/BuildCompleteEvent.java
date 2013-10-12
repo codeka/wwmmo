@@ -39,7 +39,7 @@ public class BuildCompleteEvent extends Event {
     public void process() {
         ArrayList<Integer> processedIDs = new ArrayList<Integer>();
         String sql = "SELECT id, star_id, colony_id, empire_id, existing_building_id," +
-                           " design_kind, design_id, count" +
+                           " existing_fleet_id, upgrade_id, design_kind, design_id, count" +
                     " FROM build_requests" +
                     " WHERE end_time < ? AND processing = 0" +
                     " LIMIT 10"; // just do ten at a time, which will allow us to interleve other events
@@ -65,9 +65,17 @@ public class BuildCompleteEvent extends Event {
                 if (rs.wasNull()) {
                     existingBuildingID = null;
                 }
-                DesignKind designKind = DesignKind.fromNumber(rs.getInt(6));
-                String designID = rs.getString(7);
-                float count = rs.getFloat(8);
+                Integer existingFleetID = rs.getInt(6);
+                if (rs.wasNull()) {
+                    existingFleetID = null;
+                }
+                String upgradeID = rs.getString(7);
+                if (rs.wasNull()) {
+                    upgradeID = null;
+                }
+                DesignKind designKind = DesignKind.fromNumber(rs.getInt(8));
+                String designID = rs.getString(9);
+                float count = rs.getFloat(10);
 
                 Star star = new StarController().getStar(starID);
                 Colony colony = null;
@@ -78,14 +86,14 @@ public class BuildCompleteEvent extends Event {
                 }
 
                 try {
-                    processBuildRequest(id, star, colony, empireID, existingBuildingID, designKind, designID, count);
+                    processBuildRequest(id, star, colony, empireID, existingBuildingID, existingFleetID, upgradeID,
+                                        designKind, designID, count);
                 } catch (Exception e) {
                     log.error("Error processing build-complete event!", e);
                 }
             }
         } catch(Exception e) {
             log.error("Error processing build-complete event!", e);
-            // TODO: errors?
         }
 
         if (processedIDs.isEmpty()) {
@@ -111,8 +119,8 @@ public class BuildCompleteEvent extends Event {
     }
 
     private void processBuildRequest(int buildRequestID, Star star, Colony colony, int empireID,
-                                     Integer existingBuildingID, DesignKind designKind,
-                                     String designID, float count) throws RequestException {
+                                     Integer existingBuildingID, Integer existingFleetID, String upgradeID,
+                                     DesignKind designKind, String designID, float count) throws RequestException {
         Simulation sim = new Simulation();
         sim.simulate(star);
 
@@ -120,7 +128,7 @@ public class BuildCompleteEvent extends Event {
         if (designKind == DesignKind.BUILDING) {
             processBuildingBuild(star, colony, empireID, existingBuildingID, designID);
         } else {
-            fleet = processFleetBuild(star, colony, empireID, designID, count);
+            fleet = processFleetBuild(star, colony, empireID, existingFleetID, upgradeID, designID, count);
         }
 
         sim.simulate(star); // simulate again to re-calculate the end times
@@ -150,19 +158,28 @@ public class BuildCompleteEvent extends Event {
         new SituationReportController().saveSituationReport(sitrep_pb.build());
     }
 
-    private Fleet processFleetBuild(Star star, Colony colony, int empireID, String designID,
-                                   float count) throws RequestException {
-        Empire empire = new EmpireController().getEmpire(empireID);
-        Fleet newFleet = new FleetController().createFleet(empire, star, designID, count);
-        FleetMoveCompleteEvent.fireFleetArrivedEvents(star, newFleet);
+    private Fleet processFleetBuild(Star star, Colony colony, int empireID, Integer existingFleetID,
+                                    String upgradeID, String designID, float count) throws RequestException {
+        Fleet fleet;
 
-        // todo: hard-coded?
-        if (designID.equals("colonyship")) {
-            // remove 100 population from the colony that built this guy
-            new ColonyController().reducePopulation(colony, 100.0f);
+        Empire empire = new EmpireController().getEmpire(empireID);
+        if (existingFleetID != null) {
+            fleet = (Fleet) star.getFleet(existingFleetID);
+            if (fleet != null) {
+                new FleetController().addUpgrade(star, fleet, upgradeID);
+            }
+        } else {
+            fleet = new FleetController().createFleet(empire, star, designID, count);
+            FleetMoveCompleteEvent.fireFleetArrivedEvents(star, fleet);
+    
+            // todo: hard-coded?
+            if (designID.equals("colonyship")) {
+                // remove 100 population from the colony that built this guy
+                new ColonyController().reducePopulation(colony, 100.0f);
+            }
         }
 
-        return newFleet;
+        return fleet;
     }
 
     private void processBuildingBuild(Star star, Colony colony, int empireID, Integer existingBuildingID,

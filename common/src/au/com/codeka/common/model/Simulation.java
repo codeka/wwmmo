@@ -301,10 +301,19 @@ public class Simulation {
                         continue;
                     }
 
+                    // the build cost is defined by the original design, or possibly by the upgrade if that
+                    // is what it is.
+                    Design.BuildCost buildCost = design.getBuildCost();
+                    if (br.mExistingFleetID != null) {
+                        ShipDesign shipDesign = (ShipDesign) design;
+                        ShipDesign.Upgrade upgrade = shipDesign.getUpgrade(br.getUpgradeID());
+                        buildCost = upgrade.getBuildCost();
+                    }
+
                     // So the build time the design specifies is the time to build the structure with
                     // 100 workers available. Double the workers and you halve the build time. Halve
                     // the workers and you double the build time.
-                    float totalBuildTimeInHours = br.getCount() * design.getBuildCost().getTimeInSeconds() / 3600.0f;
+                    float totalBuildTimeInHours = br.getCount() * buildCost.getTimeInSeconds() / 3600.0f;
                     totalBuildTimeInHours *= (100.0 / workersPerBuildRequest);
 
                     // the number of hours of work required, assuming we have all the minerals we need
@@ -343,7 +352,7 @@ public class Simulation {
                     }
 
                     // work out how many minerals we require for this turn
-                    float mineralsRequired = br.getCount() * design.getBuildCost().getCostInMinerals() * progressThisTurn;
+                    float mineralsRequired = br.getCount() * buildCost.getCostInMinerals() * progressThisTurn;
                     if (mineralsRequired > mineralsPerBuildRequest) {
                         // if we don't have enough minerals, we'll just do a percentage of the work
                         // this turn

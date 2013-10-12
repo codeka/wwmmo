@@ -60,6 +60,7 @@
       <upgrade id="firepower">
         <sprite>upgrade.firepower</sprite>
         <name>Plasma Cannon</name>
+        <cost minerals="20" time="0.10" />
         <description><![CDATA[
           A plamsa cannon upgrades the firepower of your fighters so that they are twice as
           effective in battle.
@@ -68,6 +69,7 @@
       <upgrade id="shield">
         <sprite>upgrade.shield</sprite>
         <name>Energy Shield</name>
+        <cost minerals="20" time="0.10" />
         <description><![CDATA[
           This shield upgrade makes your fighter twice as resilient to enemy fire.
         ]]></description>
@@ -75,6 +77,7 @@
       <upgrade id="boost">
         <sprite>upgrade.boost</sprite>
         <name>Warp Boost</name>
+        <cost minerals="45" time="0.15" />
         <description><![CDATA[
           Allows you to boost your fleet half way to the destination in an instant.
         ]]></description>

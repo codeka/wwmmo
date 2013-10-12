@@ -113,7 +113,7 @@ public class BuildManager {
     }
 
     public void build(final Context context, final Colony colony,
-                      final Design design, final int fleetID, final String upgradeID) {
+                      final Design design, final int fleetID, final int count, final String upgradeID) {
         Messages.BuildRequest build_request_pb = Messages.BuildRequest.newBuilder()
                     .setBuildKind(Messages.BuildRequest.BUILD_KIND.SHIP)
                     .setStarKey(colony.getStarKey())
@@ -121,6 +121,7 @@ public class BuildManager {
                     .setEmpireKey(colony.getEmpireKey())
                     .setDesignName(design.getID())
                     .setExistingFleetId(fleetID)
+                    .setCount(count)
                     .setUpgradeId(upgradeID)
                     .build();
 

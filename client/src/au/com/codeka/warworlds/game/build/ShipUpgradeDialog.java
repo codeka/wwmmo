@@ -10,7 +10,6 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.text.Html;
@@ -30,6 +29,7 @@ import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.StyledDialog;
 import au.com.codeka.warworlds.ctrl.BuildEstimateView;
+import au.com.codeka.warworlds.model.BuildManager;
 import au.com.codeka.warworlds.model.BuildRequest;
 import au.com.codeka.warworlds.model.Colony;
 import au.com.codeka.warworlds.model.Fleet;
@@ -105,7 +105,7 @@ public class ShipUpgradeDialog extends DialogFragment {
                .setPositiveButton("Upgrade", new DialogInterface.OnClickListener() {
                    @Override
                    public void onClick(DialogInterface dialog, int which) {
-                       
+                       onUpgradeClick();
                    }
                })
                .setNegativeButton("Cancel", null)
@@ -150,9 +150,18 @@ public class ShipUpgradeDialog extends DialogFragment {
         BuildRequest buildRequest = new BuildRequest("FAKE_BUILD_REQUEST",
                 DesignKind.SHIP, mFleet.getDesignID(), mColony.getKey(), startTime,
                 (int) mFleet.getNumShips(), null, 0, Integer.parseInt(mFleet.getKey()),
-                mUpgrade.getID(), mStar.getKey(), mColony.getPlanetIndex(), mColony.getKey());
+                mUpgrade.getID(), mStar.getKey(), mColony.getPlanetIndex(), mColony.getEmpireKey());
 
         mBuildEstimateView.refresh(mStar, buildRequest);
+    }
+
+    private void onUpgradeClick() {
+        final Activity activity = getActivity();
+
+        BuildManager.getInstance().build(activity, mColony, mFleet.getDesign(), Integer.parseInt(mFleet.getKey()),
+                (int) mFleet.getNumShips(), mUpgrade.getID());
+
+        dismiss();
     }
 
     /** This adapter is used to populate the list of upgrade designs in our view. */
