@@ -231,6 +231,15 @@ message EmpireBuildingStatistics
 
 
 //
+// A request to remove ads for a given empire.
+//
+message EmpireAdsRemoveRequest
+{
+    optional PurchaseInfo purchase_info = 1;
+}
+
+
+//
 // The "hello" request when you first join the game contains some info about yourself which we
 // record for posterity.
 //

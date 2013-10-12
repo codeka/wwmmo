@@ -56,6 +56,9 @@ public class PurchaseManager {
             String json = prefs.getString("au.com.codeka.warworlds.PurchaseInventory", null);
             if (json != null) {
                 mInventory = Inventory.fromJson(json);
+                if (Util.isDebug()) {
+                    mInventory.erasePurchase("remove_ads");
+                }
             }
         } catch (JSONException e) {
             // ignore... for now
@@ -73,6 +76,9 @@ public class PurchaseManager {
                         public void onQueryInventoryFinished(IabResult result, Inventory inv) {
                             if (result.isSuccess()) {
                                 mInventory = inv;
+                                if (Util.isDebug()) {
+                                    mInventory.erasePurchase("remove_ads");
+                                }
 
                                 try {
                                     SharedPreferences prefs = Util.getSharedPreferences();
@@ -113,6 +119,11 @@ public class PurchaseManager {
 
     public void launchPurchaseFlow(Activity activity, String sku,
             IabHelper.OnIabPurchaseFinishedListener listener) throws IabException {
+        if (mSetupResult == null) {
+            waitForSetup(activity, sku, listener);
+            return;
+        }
+
         if (!mSetupResult.isSuccess()) {
             throw new IabException(mSetupResult);
         }
@@ -127,6 +138,11 @@ public class PurchaseManager {
         } else {
             mHelper.launchPurchaseFlow(activity, skuName, REQUEST_CODE, listener);
         }
+    }
+
+    private void waitForSetup(Activity activity, String sku,
+            IabHelper.OnIabPurchaseFinishedListener listener) throws IabException {
+        // TODO
     }
 
     public void consume(Purchase purchase, final IabHelper.OnConsumeFinishedListener listener) {

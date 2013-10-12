@@ -354,6 +354,7 @@ public class StarManager extends BaseManager {
                         .setOldName(star.getName())
                         .setNewName(newName)
                         .setPurchaseInfo(Messages.PurchaseInfo.newBuilder()
+                                .setSku(purchase.getSku())
                                 .setOrderId(purchase.getOrderId())
                                 .setPrice(price)
                                 .setToken(purchase.getToken())

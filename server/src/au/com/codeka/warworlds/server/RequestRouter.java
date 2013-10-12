@@ -15,8 +15,50 @@ import org.eclipse.jetty.server.handler.AbstractHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import au.com.codeka.warworlds.server.handlers.*;
-import au.com.codeka.warworlds.server.handlers.pages.*;
+import au.com.codeka.warworlds.server.handlers.AllianceHandler;
+import au.com.codeka.warworlds.server.handlers.AllianceRequestHandler;
+import au.com.codeka.warworlds.server.handlers.AllianceRequestsHandler;
+import au.com.codeka.warworlds.server.handlers.AlliancesHandler;
+import au.com.codeka.warworlds.server.handlers.BuildAccelerateHandler;
+import au.com.codeka.warworlds.server.handlers.BuildQueueHandler;
+import au.com.codeka.warworlds.server.handlers.BuildStopHandler;
+import au.com.codeka.warworlds.server.handlers.ChatConversationParticipantHandler;
+import au.com.codeka.warworlds.server.handlers.ChatConversationParticipantsHandler;
+import au.com.codeka.warworlds.server.handlers.ChatConversationsHandler;
+import au.com.codeka.warworlds.server.handlers.ChatHandler;
+import au.com.codeka.warworlds.server.handlers.ColoniesHandler;
+import au.com.codeka.warworlds.server.handlers.ColonyAttackHandler;
+import au.com.codeka.warworlds.server.handlers.ColonyHandler;
+import au.com.codeka.warworlds.server.handlers.CombatReportHandler;
+import au.com.codeka.warworlds.server.handlers.DevicesHandler;
+import au.com.codeka.warworlds.server.handlers.EmpiresAdsHandler;
+import au.com.codeka.warworlds.server.handlers.EmpiresCashAuditHandler;
+import au.com.codeka.warworlds.server.handlers.EmpiresDisplayNameHandler;
+import au.com.codeka.warworlds.server.handlers.EmpiresHandler;
+import au.com.codeka.warworlds.server.handlers.EmpiresResetHandler;
+import au.com.codeka.warworlds.server.handlers.EmpiresSearchHandler;
+import au.com.codeka.warworlds.server.handlers.EmpiresShieldHandler;
+import au.com.codeka.warworlds.server.handlers.EmpiresStarsHandler;
+import au.com.codeka.warworlds.server.handlers.EmpiresTaxesHandler;
+import au.com.codeka.warworlds.server.handlers.FleetOrdersHandler;
+import au.com.codeka.warworlds.server.handlers.HelloHandler;
+import au.com.codeka.warworlds.server.handlers.LoginHandler;
+import au.com.codeka.warworlds.server.handlers.MotdHandler;
+import au.com.codeka.warworlds.server.handlers.NotificationHandler;
+import au.com.codeka.warworlds.server.handlers.RankingHistoryHandler;
+import au.com.codeka.warworlds.server.handlers.ScoutReportsHandler;
+import au.com.codeka.warworlds.server.handlers.SectorsHandler;
+import au.com.codeka.warworlds.server.handlers.SitReportsHandler;
+import au.com.codeka.warworlds.server.handlers.SitReportsReadHandler;
+import au.com.codeka.warworlds.server.handlers.StarHandler;
+import au.com.codeka.warworlds.server.handlers.StarSimulateHandler;
+import au.com.codeka.warworlds.server.handlers.StarsHandler;
+import au.com.codeka.warworlds.server.handlers.pages.ActionsMoveStarPageHandler;
+import au.com.codeka.warworlds.server.handlers.pages.ActionsResetEmpirePageHandler;
+import au.com.codeka.warworlds.server.handlers.pages.DashboardPageHandler;
+import au.com.codeka.warworlds.server.handlers.pages.DebugPurchasesPageHandler;
+import au.com.codeka.warworlds.server.handlers.pages.HtmlPageHandler;
+import au.com.codeka.warworlds.server.handlers.pages.StaticFileHandler;
 
 
 public class RequestRouter extends AbstractHandler {
@@ -25,7 +67,6 @@ public class RequestRouter extends AbstractHandler {
 
     {
         sRoutes = new ArrayList<Route>();
-        sRoutes.add(new Route("^/login$", true, LoginHandler.class)); // <-- legacy login page
         sRoutes.add(new Route("login", LoginHandler.class));
         sRoutes.add(new Route("devices/({id}[0-9]*)$", DevicesHandler.class));
         sRoutes.add(new Route("devices$", DevicesHandler.class));
@@ -41,7 +82,8 @@ public class RequestRouter extends AbstractHandler {
         sRoutes.add(new Route("empires/({empire_id}[0-9]+)/cash-audit$", EmpiresCashAuditHandler.class));
         sRoutes.add(new Route("empires/({empire_id}[0-9]+)/display-name$", EmpiresDisplayNameHandler.class));
         sRoutes.add(new Route("empires/({empire_id}[0-9]+)/shield$", EmpiresShieldHandler.class));
-        sRoutes.add(new Route("empires/({empire_id}[0-9]+)/reset$", EmpireResetHandler.class));
+        sRoutes.add(new Route("empires/({empire_id}[0-9]+)/reset$", EmpiresResetHandler.class));
+        sRoutes.add(new Route("empires/({empire_id}[0-9]+)/ads$", EmpiresAdsHandler.class));
         sRoutes.add(new Route("buildqueue", BuildQueueHandler.class));
         sRoutes.add(new Route("sectors$", SectorsHandler.class));
         sRoutes.add(new Route("stars$", StarsHandler.class));
@@ -114,9 +156,6 @@ public class RequestRouter extends AbstractHandler {
 
         public Route(String pattern, Class<?> handlerClass) {
             this(pattern, handlerClass, null);
-        }
-        public Route(String pattern, boolean dontAddRealm, Class<?> handlerClass) {
-            this(pattern, dontAddRealm, handlerClass, null);
         }
         public Route(String pattern, Class<?> handlerClass, String extraOption) {
             this("^/realms/({realm}[a-z]+)/"+pattern, false, handlerClass, extraOption);

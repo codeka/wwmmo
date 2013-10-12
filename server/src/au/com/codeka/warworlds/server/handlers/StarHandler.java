@@ -2,7 +2,6 @@ package au.com.codeka.warworlds.server.handlers;
 
 import java.util.ArrayList;
 
-import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,6 +15,7 @@ import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.RequestHandler;
 import au.com.codeka.warworlds.server.ctrl.BuildingController;
+import au.com.codeka.warworlds.server.ctrl.PurchaseController;
 import au.com.codeka.warworlds.server.ctrl.StarController;
 import au.com.codeka.warworlds.server.data.DB;
 import au.com.codeka.warworlds.server.data.SqlStmt;
@@ -198,28 +198,8 @@ public class StarHandler extends RequestHandler {
             throw new RequestException(e);
         }
 
-        sql = "INSERT INTO star_renames (star_id, old_name, new_name, purchase_developer_payload," +
-                                       " purchase_order_id, purchase_price, purchase_time)" +
-             " VALUES (?, ?, ?, ?, ?, ?, ?)";
-        try (SqlStmt stmt = DB.prepare(sql)) {
-            stmt.setInt(1, starID);
-            stmt.setString(2, star_rename_request_pb.getOldName());
-            stmt.setString(3, star_rename_request_pb.getNewName().trim());
-            Messages.PurchaseInfo purchase_info_pb = star_rename_request_pb.getPurchaseInfo();
-            if (purchase_info_pb != null && purchase_info_pb.hasSku()) {
-                stmt.setString(4, purchase_info_pb.getDeveloperPayload());
-                stmt.setString(5, purchase_info_pb.getOrderId());
-                stmt.setString(6, purchase_info_pb.getPrice());
-            } else {
-                stmt.setString(4, star_rename_request_pb.getDEPRECATEDPurchaseDeveloperPayload());
-                stmt.setString(5, star_rename_request_pb.getDEPRECATEDPurchaseOrderId());
-                stmt.setString(6, star_rename_request_pb.getDEPRECATEDPurchasePrice());
-            }
-            stmt.setDateTime(7, DateTime.now());
-            stmt.update();
-        } catch(Exception e) {
-            throw new RequestException(e);
-        }
+        new PurchaseController().addPurchase(getSession().getEmpireID(), star_rename_request_pb.getPurchaseInfo(),
+                star_rename_request_pb);
 
         Star star = new StarController().getStar(starID);
         Messages.Star.Builder star_pb = Messages.Star.newBuilder();

@@ -12,11 +12,18 @@
   <h1>Purchases</h1>
   <script>
     function display_extra(extra) {
+      if (!extra.purchase_info) {
+        return;
+      }
+
       if (extra.purchase_info.sku == "rename_empire") {
         document.write("<div><span class='name'>Old name</span>: <span class='value'>"+extra.old_name+"</span></div>");
         document.write("<div><span class='name'>New name</span>: <span class='value'>"+extra.new_name+"</span></div>");
       } else if (extra.purchase_info.sku == "decorate_empire") {
         document.write("<img src='data:image/png;base64,"+extra.png_image+"' />");
+      } else if (extra.purchase_info.sku == "star_rename") {
+        document.write("<div><span class='name'>Old name</span>: <span class='value'>"+extra.old_name+"</span></div>");
+        document.write("<div><span class='name'>New name</span>: <span class='value'>"+extra.new_name+"</span></div>");
       }
     }
   </script>

@@ -13,7 +13,7 @@ import au.com.codeka.warworlds.server.model.Star;
 /**
  * This handler handles the empires/[key]/reset request when users request an empire reset.
  */
-public class EmpireResetHandler extends RequestHandler {
+public class EmpiresResetHandler extends RequestHandler {
     @Override
     protected void post() throws RequestException {
         Messages.EmpireResetRequest reset_request_pb = getRequestBody(Messages.EmpireResetRequest.class);

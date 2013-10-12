@@ -476,20 +476,25 @@ public class StarfieldActivity extends BaseActivity
                         return;
                     }
 
+                    Purchase purchase = info;
                     boolean isSuccess = result.isSuccess();
                     if (result.isFailure() && result.getResponse() == IabHelper.BILLING_RESPONSE_RESULT_ITEM_ALREADY_OWNED) {
                         // if they've already purchased a star-renamed, but not reclaimed it, then
                         // we let them through anyway.
                         isSuccess = true;
+                        try {
+                            purchase = PurchaseManager.i.getInventory().getPurchase("star_rename");
+                        } catch (IabException e) {
+                        }
                     }
 
                     if (isSuccess) {
                         try {
-                            showStarRenamePopup(info);
+                            showStarRenamePopup(purchase);
                         } catch(IllegalStateException e) {
                             // this can be called before the activity is resumed, so we just set a
                             // flag that'll cause us to pop up the dialog when the activity is resumed.
-                            mStarRenamePurchase = info;
+                            mStarRenamePurchase = purchase;
                         }
                     }
                 }
