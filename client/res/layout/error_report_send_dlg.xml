@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+    <TextView android:id="@+id/message"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:layout_alignParentLeft="true"
+              android:layout_alignParentTop="true"
+              android:layout_margin="10dp"
+              android:text="We found some unsent error reports, do you want to send them now?\n\nSending error reports is entirely optional, but it helps greatly to improve the stability of the game. If you don't want to be asked again, check the checkbox below and we'll assume the same answer every time a crash report is detected." />
+
+    <CheckBox android:id="@+id/always_chk"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:layout_below="@+id/message"
+              android:layout_centerHorizontal="true"
+              android:layout_marginTop="20dp"
+              android:text="Always do this" />
+
+    <View android:id="@+id/spacer"
+          android:layout_width="match_parent"
+          android:layout_height="10dp"
+          android:layout_below="@+id/always_chk" />
+</RelativeLayout>

@@ -14,6 +14,7 @@ import android.os.Handler;
 import android.os.StrictMode;
 import android.preference.PreferenceManager;
 import au.com.codeka.BackgroundRunner;
+import au.com.codeka.ErrorReporter;
 import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.api.ApiClient;
 import au.com.codeka.warworlds.api.ApiException;
@@ -321,6 +322,8 @@ public class ServerGreeter {
                     if (mServerGreeting.mIntent != null) {
                         activity.startActivity(mServerGreeting.mIntent);
                     }
+
+                    ErrorReporter.register(activity);
                 }
             }
         }.execute();

@@ -1275,3 +1275,22 @@ message AllianceRequestVote
     optional int32 votes = 5;
     optional int64 date = 6;
 }
+
+
+message ErrorReport
+{
+    optional string android_version = 1;
+    optional string phone_model = 2;
+    optional string package_name = 3;
+    optional string app_version = 4;
+    optional string stack_trace = 5;
+    optional string message = 6;
+    optional int64 report_time = 7;
+    optional int32 empire_id = 8;
+}
+
+message ErrorReports
+{
+    repeated ErrorReport reports = 1;
+}
+

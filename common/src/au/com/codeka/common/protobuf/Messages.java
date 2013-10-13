@@ -82606,6 +82606,2093 @@ public final class Messages {
     // @@protoc_insertion_point(class_scope:au.com.codeka.common.protobuf.AllianceRequestVote)
   }
 
+  public interface ErrorReportOrBuilder
+      extends com.google.protobuf.MessageOrBuilder {
+
+    // optional string android_version = 1;
+    /**
+     * <code>optional string android_version = 1;</code>
+     */
+    boolean hasAndroidVersion();
+    /**
+     * <code>optional string android_version = 1;</code>
+     */
+    java.lang.String getAndroidVersion();
+    /**
+     * <code>optional string android_version = 1;</code>
+     */
+    com.google.protobuf.ByteString
+        getAndroidVersionBytes();
+
+    // optional string phone_model = 2;
+    /**
+     * <code>optional string phone_model = 2;</code>
+     */
+    boolean hasPhoneModel();
+    /**
+     * <code>optional string phone_model = 2;</code>
+     */
+    java.lang.String getPhoneModel();
+    /**
+     * <code>optional string phone_model = 2;</code>
+     */
+    com.google.protobuf.ByteString
+        getPhoneModelBytes();
+
+    // optional string package_name = 3;
+    /**
+     * <code>optional string package_name = 3;</code>
+     */
+    boolean hasPackageName();
+    /**
+     * <code>optional string package_name = 3;</code>
+     */
+    java.lang.String getPackageName();
+    /**
+     * <code>optional string package_name = 3;</code>
+     */
+    com.google.protobuf.ByteString
+        getPackageNameBytes();
+
+    // optional string app_version = 4;
+    /**
+     * <code>optional string app_version = 4;</code>
+     */
+    boolean hasAppVersion();
+    /**
+     * <code>optional string app_version = 4;</code>
+     */
+    java.lang.String getAppVersion();
+    /**
+     * <code>optional string app_version = 4;</code>
+     */
+    com.google.protobuf.ByteString
+        getAppVersionBytes();
+
+    // optional string stack_trace = 5;
+    /**
+     * <code>optional string stack_trace = 5;</code>
+     */
+    boolean hasStackTrace();
+    /**
+     * <code>optional string stack_trace = 5;</code>
+     */
+    java.lang.String getStackTrace();
+    /**
+     * <code>optional string stack_trace = 5;</code>
+     */
+    com.google.protobuf.ByteString
+        getStackTraceBytes();
+
+    // optional string message = 6;
+    /**
+     * <code>optional string message = 6;</code>
+     */
+    boolean hasMessage();
+    /**
+     * <code>optional string message = 6;</code>
+     */
+    java.lang.String getMessage();
+    /**
+     * <code>optional string message = 6;</code>
+     */
+    com.google.protobuf.ByteString
+        getMessageBytes();
+
+    // optional int64 report_time = 7;
+    /**
+     * <code>optional int64 report_time = 7;</code>
+     */
+    boolean hasReportTime();
+    /**
+     * <code>optional int64 report_time = 7;</code>
+     */
+    long getReportTime();
+
+    // optional int32 empire_id = 8;
+    /**
+     * <code>optional int32 empire_id = 8;</code>
+     */
+    boolean hasEmpireId();
+    /**
+     * <code>optional int32 empire_id = 8;</code>
+     */
+    int getEmpireId();
+  }
+  /**
+   * Protobuf type {@code au.com.codeka.common.protobuf.ErrorReport}
+   */
+  public static final class ErrorReport extends
+      com.google.protobuf.GeneratedMessage
+      implements ErrorReportOrBuilder {
+    // Use ErrorReport.newBuilder() to construct.
+    private ErrorReport(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
+      super(builder);
+      this.unknownFields = builder.getUnknownFields();
+    }
+    private ErrorReport(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
+
+    private static final ErrorReport defaultInstance;
+    public static ErrorReport getDefaultInstance() {
+      return defaultInstance;
+    }
+
+    public ErrorReport getDefaultInstanceForType() {
+      return defaultInstance;
+    }
+
+    private final com.google.protobuf.UnknownFieldSet unknownFields;
+    @java.lang.Override
+    public final com.google.protobuf.UnknownFieldSet
+        getUnknownFields() {
+      return this.unknownFields;
+    }
+    private ErrorReport(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      initFields();
+      int mutable_bitField0_ = 0;
+      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder();
+      try {
+        boolean done = false;
+        while (!done) {
+          int tag = input.readTag();
+          switch (tag) {
+            case 0:
+              done = true;
+              break;
+            default: {
+              if (!parseUnknownField(input, unknownFields,
+                                     extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
+            case 10: {
+              bitField0_ |= 0x00000001;
+              androidVersion_ = input.readBytes();
+              break;
+            }
+            case 18: {
+              bitField0_ |= 0x00000002;
+              phoneModel_ = input.readBytes();
+              break;
+            }
+            case 26: {
+              bitField0_ |= 0x00000004;
+              packageName_ = input.readBytes();
+              break;
+            }
+            case 34: {
+              bitField0_ |= 0x00000008;
+              appVersion_ = input.readBytes();
+              break;
+            }
+            case 42: {
+              bitField0_ |= 0x00000010;
+              stackTrace_ = input.readBytes();
+              break;
+            }
+            case 50: {
+              bitField0_ |= 0x00000020;
+              message_ = input.readBytes();
+              break;
+            }
+            case 56: {
+              bitField0_ |= 0x00000040;
+              reportTime_ = input.readInt64();
+              break;
+            }
+            case 64: {
+              bitField0_ |= 0x00000080;
+              empireId_ = input.readInt32();
+              break;
+            }
+          }
+        }
+      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+        throw e.setUnfinishedMessage(this);
+      } catch (java.io.IOException e) {
+        throw new com.google.protobuf.InvalidProtocolBufferException(
+            e.getMessage()).setUnfinishedMessage(this);
+      } finally {
+        this.unknownFields = unknownFields.build();
+        makeExtensionsImmutable();
+      }
+    }
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_ErrorReport_descriptor;
+    }
+
+    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_ErrorReport_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              au.com.codeka.common.protobuf.Messages.ErrorReport.class, au.com.codeka.common.protobuf.Messages.ErrorReport.Builder.class);
+    }
+
+    public static com.google.protobuf.Parser<ErrorReport> PARSER =
+        new com.google.protobuf.AbstractParser<ErrorReport>() {
+      public ErrorReport parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return new ErrorReport(input, extensionRegistry);
+      }
+    };
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<ErrorReport> getParserForType() {
+      return PARSER;
+    }
+
+    private int bitField0_;
+    // optional string android_version = 1;
+    public static final int ANDROID_VERSION_FIELD_NUMBER = 1;
+    private java.lang.Object androidVersion_;
+    /**
+     * <code>optional string android_version = 1;</code>
+     */
+    public boolean hasAndroidVersion() {
+      return ((bitField0_ & 0x00000001) == 0x00000001);
+    }
+    /**
+     * <code>optional string android_version = 1;</code>
+     */
+    public java.lang.String getAndroidVersion() {
+      java.lang.Object ref = androidVersion_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        if (bs.isValidUtf8()) {
+          androidVersion_ = s;
+        }
+        return s;
+      }
+    }
+    /**
+     * <code>optional string android_version = 1;</code>
+     */
+    public com.google.protobuf.ByteString
+        getAndroidVersionBytes() {
+      java.lang.Object ref = androidVersion_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        androidVersion_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    // optional string phone_model = 2;
+    public static final int PHONE_MODEL_FIELD_NUMBER = 2;
+    private java.lang.Object phoneModel_;
+    /**
+     * <code>optional string phone_model = 2;</code>
+     */
+    public boolean hasPhoneModel() {
+      return ((bitField0_ & 0x00000002) == 0x00000002);
+    }
+    /**
+     * <code>optional string phone_model = 2;</code>
+     */
+    public java.lang.String getPhoneModel() {
+      java.lang.Object ref = phoneModel_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        if (bs.isValidUtf8()) {
+          phoneModel_ = s;
+        }
+        return s;
+      }
+    }
+    /**
+     * <code>optional string phone_model = 2;</code>
+     */
+    public com.google.protobuf.ByteString
+        getPhoneModelBytes() {
+      java.lang.Object ref = phoneModel_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        phoneModel_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    // optional string package_name = 3;
+    public static final int PACKAGE_NAME_FIELD_NUMBER = 3;
+    private java.lang.Object packageName_;
+    /**
+     * <code>optional string package_name = 3;</code>
+     */
+    public boolean hasPackageName() {
+      return ((bitField0_ & 0x00000004) == 0x00000004);
+    }
+    /**
+     * <code>optional string package_name = 3;</code>
+     */
+    public java.lang.String getPackageName() {
+      java.lang.Object ref = packageName_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        if (bs.isValidUtf8()) {
+          packageName_ = s;
+        }
+        return s;
+      }
+    }
+    /**
+     * <code>optional string package_name = 3;</code>
+     */
+    public com.google.protobuf.ByteString
+        getPackageNameBytes() {
+      java.lang.Object ref = packageName_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        packageName_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    // optional string app_version = 4;
+    public static final int APP_VERSION_FIELD_NUMBER = 4;
+    private java.lang.Object appVersion_;
+    /**
+     * <code>optional string app_version = 4;</code>
+     */
+    public boolean hasAppVersion() {
+      return ((bitField0_ & 0x00000008) == 0x00000008);
+    }
+    /**
+     * <code>optional string app_version = 4;</code>
+     */
+    public java.lang.String getAppVersion() {
+      java.lang.Object ref = appVersion_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        if (bs.isValidUtf8()) {
+          appVersion_ = s;
+        }
+        return s;
+      }
+    }
+    /**
+     * <code>optional string app_version = 4;</code>
+     */
+    public com.google.protobuf.ByteString
+        getAppVersionBytes() {
+      java.lang.Object ref = appVersion_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        appVersion_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    // optional string stack_trace = 5;
+    public static final int STACK_TRACE_FIELD_NUMBER = 5;
+    private java.lang.Object stackTrace_;
+    /**
+     * <code>optional string stack_trace = 5;</code>
+     */
+    public boolean hasStackTrace() {
+      return ((bitField0_ & 0x00000010) == 0x00000010);
+    }
+    /**
+     * <code>optional string stack_trace = 5;</code>
+     */
+    public java.lang.String getStackTrace() {
+      java.lang.Object ref = stackTrace_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        if (bs.isValidUtf8()) {
+          stackTrace_ = s;
+        }
+        return s;
+      }
+    }
+    /**
+     * <code>optional string stack_trace = 5;</code>
+     */
+    public com.google.protobuf.ByteString
+        getStackTraceBytes() {
+      java.lang.Object ref = stackTrace_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        stackTrace_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    // optional string message = 6;
+    public static final int MESSAGE_FIELD_NUMBER = 6;
+    private java.lang.Object message_;
+    /**
+     * <code>optional string message = 6;</code>
+     */
+    public boolean hasMessage() {
+      return ((bitField0_ & 0x00000020) == 0x00000020);
+    }
+    /**
+     * <code>optional string message = 6;</code>
+     */
+    public java.lang.String getMessage() {
+      java.lang.Object ref = message_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        if (bs.isValidUtf8()) {
+          message_ = s;
+        }
+        return s;
+      }
+    }
+    /**
+     * <code>optional string message = 6;</code>
+     */
+    public com.google.protobuf.ByteString
+        getMessageBytes() {
+      java.lang.Object ref = message_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        message_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    // optional int64 report_time = 7;
+    public static final int REPORT_TIME_FIELD_NUMBER = 7;
+    private long reportTime_;
+    /**
+     * <code>optional int64 report_time = 7;</code>
+     */
+    public boolean hasReportTime() {
+      return ((bitField0_ & 0x00000040) == 0x00000040);
+    }
+    /**
+     * <code>optional int64 report_time = 7;</code>
+     */
+    public long getReportTime() {
+      return reportTime_;
+    }
+
+    // optional int32 empire_id = 8;
+    public static final int EMPIRE_ID_FIELD_NUMBER = 8;
+    private int empireId_;
+    /**
+     * <code>optional int32 empire_id = 8;</code>
+     */
+    public boolean hasEmpireId() {
+      return ((bitField0_ & 0x00000080) == 0x00000080);
+    }
+    /**
+     * <code>optional int32 empire_id = 8;</code>
+     */
+    public int getEmpireId() {
+      return empireId_;
+    }
+
+    private void initFields() {
+      androidVersion_ = "";
+      phoneModel_ = "";
+      packageName_ = "";
+      appVersion_ = "";
+      stackTrace_ = "";
+      message_ = "";
+      reportTime_ = 0L;
+      empireId_ = 0;
+    }
+    private byte memoizedIsInitialized = -1;
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized != -1) return isInitialized == 1;
+
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      getSerializedSize();
+      if (((bitField0_ & 0x00000001) == 0x00000001)) {
+        output.writeBytes(1, getAndroidVersionBytes());
+      }
+      if (((bitField0_ & 0x00000002) == 0x00000002)) {
+        output.writeBytes(2, getPhoneModelBytes());
+      }
+      if (((bitField0_ & 0x00000004) == 0x00000004)) {
+        output.writeBytes(3, getPackageNameBytes());
+      }
+      if (((bitField0_ & 0x00000008) == 0x00000008)) {
+        output.writeBytes(4, getAppVersionBytes());
+      }
+      if (((bitField0_ & 0x00000010) == 0x00000010)) {
+        output.writeBytes(5, getStackTraceBytes());
+      }
+      if (((bitField0_ & 0x00000020) == 0x00000020)) {
+        output.writeBytes(6, getMessageBytes());
+      }
+      if (((bitField0_ & 0x00000040) == 0x00000040)) {
+        output.writeInt64(7, reportTime_);
+      }
+      if (((bitField0_ & 0x00000080) == 0x00000080)) {
+        output.writeInt32(8, empireId_);
+      }
+      getUnknownFields().writeTo(output);
+    }
+
+    private int memoizedSerializedSize = -1;
+    public int getSerializedSize() {
+      int size = memoizedSerializedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      if (((bitField0_ & 0x00000001) == 0x00000001)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBytesSize(1, getAndroidVersionBytes());
+      }
+      if (((bitField0_ & 0x00000002) == 0x00000002)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBytesSize(2, getPhoneModelBytes());
+      }
+      if (((bitField0_ & 0x00000004) == 0x00000004)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBytesSize(3, getPackageNameBytes());
+      }
+      if (((bitField0_ & 0x00000008) == 0x00000008)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBytesSize(4, getAppVersionBytes());
+      }
+      if (((bitField0_ & 0x00000010) == 0x00000010)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBytesSize(5, getStackTraceBytes());
+      }
+      if (((bitField0_ & 0x00000020) == 0x00000020)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBytesSize(6, getMessageBytes());
+      }
+      if (((bitField0_ & 0x00000040) == 0x00000040)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt64Size(7, reportTime_);
+      }
+      if (((bitField0_ & 0x00000080) == 0x00000080)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt32Size(8, empireId_);
+      }
+      size += getUnknownFields().getSerializedSize();
+      memoizedSerializedSize = size;
+      return size;
+    }
+
+    private static final long serialVersionUID = 0L;
+    @java.lang.Override
+    protected java.lang.Object writeReplace()
+        throws java.io.ObjectStreamException {
+      return super.writeReplace();
+    }
+
+    public static au.com.codeka.common.protobuf.Messages.ErrorReport parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static au.com.codeka.common.protobuf.Messages.ErrorReport parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static au.com.codeka.common.protobuf.Messages.ErrorReport parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static au.com.codeka.common.protobuf.Messages.ErrorReport parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static au.com.codeka.common.protobuf.Messages.ErrorReport parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input);
+    }
+    public static au.com.codeka.common.protobuf.Messages.ErrorReport parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input, extensionRegistry);
+    }
+    public static au.com.codeka.common.protobuf.Messages.ErrorReport parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return PARSER.parseDelimitedFrom(input);
+    }
+    public static au.com.codeka.common.protobuf.Messages.ErrorReport parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseDelimitedFrom(input, extensionRegistry);
+    }
+    public static au.com.codeka.common.protobuf.Messages.ErrorReport parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input);
+    }
+    public static au.com.codeka.common.protobuf.Messages.ErrorReport parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input, extensionRegistry);
+    }
+
+    public static Builder newBuilder() { return Builder.create(); }
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder(au.com.codeka.common.protobuf.Messages.ErrorReport prototype) {
+      return newBuilder().mergeFrom(prototype);
+    }
+    public Builder toBuilder() { return newBuilder(this); }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * Protobuf type {@code au.com.codeka.common.protobuf.ErrorReport}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessage.Builder<Builder>
+       implements au.com.codeka.common.protobuf.Messages.ErrorReportOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_ErrorReport_descriptor;
+      }
+
+      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_ErrorReport_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                au.com.codeka.common.protobuf.Messages.ErrorReport.class, au.com.codeka.common.protobuf.Messages.ErrorReport.Builder.class);
+      }
+
+      // Construct using au.com.codeka.common.protobuf.Messages.ErrorReport.newBuilder()
+      private Builder() {
+        maybeForceBuilderInitialization();
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+        super(parent);
+        maybeForceBuilderInitialization();
+      }
+      private void maybeForceBuilderInitialization() {
+        if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
+        }
+      }
+      private static Builder create() {
+        return new Builder();
+      }
+
+      public Builder clear() {
+        super.clear();
+        androidVersion_ = "";
+        bitField0_ = (bitField0_ & ~0x00000001);
+        phoneModel_ = "";
+        bitField0_ = (bitField0_ & ~0x00000002);
+        packageName_ = "";
+        bitField0_ = (bitField0_ & ~0x00000004);
+        appVersion_ = "";
+        bitField0_ = (bitField0_ & ~0x00000008);
+        stackTrace_ = "";
+        bitField0_ = (bitField0_ & ~0x00000010);
+        message_ = "";
+        bitField0_ = (bitField0_ & ~0x00000020);
+        reportTime_ = 0L;
+        bitField0_ = (bitField0_ & ~0x00000040);
+        empireId_ = 0;
+        bitField0_ = (bitField0_ & ~0x00000080);
+        return this;
+      }
+
+      public Builder clone() {
+        return create().mergeFrom(buildPartial());
+      }
+
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_ErrorReport_descriptor;
+      }
+
+      public au.com.codeka.common.protobuf.Messages.ErrorReport getDefaultInstanceForType() {
+        return au.com.codeka.common.protobuf.Messages.ErrorReport.getDefaultInstance();
+      }
+
+      public au.com.codeka.common.protobuf.Messages.ErrorReport build() {
+        au.com.codeka.common.protobuf.Messages.ErrorReport result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      public au.com.codeka.common.protobuf.Messages.ErrorReport buildPartial() {
+        au.com.codeka.common.protobuf.Messages.ErrorReport result = new au.com.codeka.common.protobuf.Messages.ErrorReport(this);
+        int from_bitField0_ = bitField0_;
+        int to_bitField0_ = 0;
+        if (((from_bitField0_ & 0x00000001) == 0x00000001)) {
+          to_bitField0_ |= 0x00000001;
+        }
+        result.androidVersion_ = androidVersion_;
+        if (((from_bitField0_ & 0x00000002) == 0x00000002)) {
+          to_bitField0_ |= 0x00000002;
+        }
+        result.phoneModel_ = phoneModel_;
+        if (((from_bitField0_ & 0x00000004) == 0x00000004)) {
+          to_bitField0_ |= 0x00000004;
+        }
+        result.packageName_ = packageName_;
+        if (((from_bitField0_ & 0x00000008) == 0x00000008)) {
+          to_bitField0_ |= 0x00000008;
+        }
+        result.appVersion_ = appVersion_;
+        if (((from_bitField0_ & 0x00000010) == 0x00000010)) {
+          to_bitField0_ |= 0x00000010;
+        }
+        result.stackTrace_ = stackTrace_;
+        if (((from_bitField0_ & 0x00000020) == 0x00000020)) {
+          to_bitField0_ |= 0x00000020;
+        }
+        result.message_ = message_;
+        if (((from_bitField0_ & 0x00000040) == 0x00000040)) {
+          to_bitField0_ |= 0x00000040;
+        }
+        result.reportTime_ = reportTime_;
+        if (((from_bitField0_ & 0x00000080) == 0x00000080)) {
+          to_bitField0_ |= 0x00000080;
+        }
+        result.empireId_ = empireId_;
+        result.bitField0_ = to_bitField0_;
+        onBuilt();
+        return result;
+      }
+
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof au.com.codeka.common.protobuf.Messages.ErrorReport) {
+          return mergeFrom((au.com.codeka.common.protobuf.Messages.ErrorReport)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(au.com.codeka.common.protobuf.Messages.ErrorReport other) {
+        if (other == au.com.codeka.common.protobuf.Messages.ErrorReport.getDefaultInstance()) return this;
+        if (other.hasAndroidVersion()) {
+          bitField0_ |= 0x00000001;
+          androidVersion_ = other.androidVersion_;
+          onChanged();
+        }
+        if (other.hasPhoneModel()) {
+          bitField0_ |= 0x00000002;
+          phoneModel_ = other.phoneModel_;
+          onChanged();
+        }
+        if (other.hasPackageName()) {
+          bitField0_ |= 0x00000004;
+          packageName_ = other.packageName_;
+          onChanged();
+        }
+        if (other.hasAppVersion()) {
+          bitField0_ |= 0x00000008;
+          appVersion_ = other.appVersion_;
+          onChanged();
+        }
+        if (other.hasStackTrace()) {
+          bitField0_ |= 0x00000010;
+          stackTrace_ = other.stackTrace_;
+          onChanged();
+        }
+        if (other.hasMessage()) {
+          bitField0_ |= 0x00000020;
+          message_ = other.message_;
+          onChanged();
+        }
+        if (other.hasReportTime()) {
+          setReportTime(other.getReportTime());
+        }
+        if (other.hasEmpireId()) {
+          setEmpireId(other.getEmpireId());
+        }
+        this.mergeUnknownFields(other.getUnknownFields());
+        return this;
+      }
+
+      public final boolean isInitialized() {
+        return true;
+      }
+
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        au.com.codeka.common.protobuf.Messages.ErrorReport parsedMessage = null;
+        try {
+          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          parsedMessage = (au.com.codeka.common.protobuf.Messages.ErrorReport) e.getUnfinishedMessage();
+          throw e;
+        } finally {
+          if (parsedMessage != null) {
+            mergeFrom(parsedMessage);
+          }
+        }
+        return this;
+      }
+      private int bitField0_;
+
+      // optional string android_version = 1;
+      private java.lang.Object androidVersion_ = "";
+      /**
+       * <code>optional string android_version = 1;</code>
+       */
+      public boolean hasAndroidVersion() {
+        return ((bitField0_ & 0x00000001) == 0x00000001);
+      }
+      /**
+       * <code>optional string android_version = 1;</code>
+       */
+      public java.lang.String getAndroidVersion() {
+        java.lang.Object ref = androidVersion_;
+        if (!(ref instanceof java.lang.String)) {
+          java.lang.String s = ((com.google.protobuf.ByteString) ref)
+              .toStringUtf8();
+          androidVersion_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>optional string android_version = 1;</code>
+       */
+      public com.google.protobuf.ByteString
+          getAndroidVersionBytes() {
+        java.lang.Object ref = androidVersion_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          androidVersion_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>optional string android_version = 1;</code>
+       */
+      public Builder setAndroidVersion(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000001;
+        androidVersion_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional string android_version = 1;</code>
+       */
+      public Builder clearAndroidVersion() {
+        bitField0_ = (bitField0_ & ~0x00000001);
+        androidVersion_ = getDefaultInstance().getAndroidVersion();
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional string android_version = 1;</code>
+       */
+      public Builder setAndroidVersionBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000001;
+        androidVersion_ = value;
+        onChanged();
+        return this;
+      }
+
+      // optional string phone_model = 2;
+      private java.lang.Object phoneModel_ = "";
+      /**
+       * <code>optional string phone_model = 2;</code>
+       */
+      public boolean hasPhoneModel() {
+        return ((bitField0_ & 0x00000002) == 0x00000002);
+      }
+      /**
+       * <code>optional string phone_model = 2;</code>
+       */
+      public java.lang.String getPhoneModel() {
+        java.lang.Object ref = phoneModel_;
+        if (!(ref instanceof java.lang.String)) {
+          java.lang.String s = ((com.google.protobuf.ByteString) ref)
+              .toStringUtf8();
+          phoneModel_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>optional string phone_model = 2;</code>
+       */
+      public com.google.protobuf.ByteString
+          getPhoneModelBytes() {
+        java.lang.Object ref = phoneModel_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          phoneModel_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>optional string phone_model = 2;</code>
+       */
+      public Builder setPhoneModel(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000002;
+        phoneModel_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional string phone_model = 2;</code>
+       */
+      public Builder clearPhoneModel() {
+        bitField0_ = (bitField0_ & ~0x00000002);
+        phoneModel_ = getDefaultInstance().getPhoneModel();
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional string phone_model = 2;</code>
+       */
+      public Builder setPhoneModelBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000002;
+        phoneModel_ = value;
+        onChanged();
+        return this;
+      }
+
+      // optional string package_name = 3;
+      private java.lang.Object packageName_ = "";
+      /**
+       * <code>optional string package_name = 3;</code>
+       */
+      public boolean hasPackageName() {
+        return ((bitField0_ & 0x00000004) == 0x00000004);
+      }
+      /**
+       * <code>optional string package_name = 3;</code>
+       */
+      public java.lang.String getPackageName() {
+        java.lang.Object ref = packageName_;
+        if (!(ref instanceof java.lang.String)) {
+          java.lang.String s = ((com.google.protobuf.ByteString) ref)
+              .toStringUtf8();
+          packageName_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>optional string package_name = 3;</code>
+       */
+      public com.google.protobuf.ByteString
+          getPackageNameBytes() {
+        java.lang.Object ref = packageName_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          packageName_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>optional string package_name = 3;</code>
+       */
+      public Builder setPackageName(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000004;
+        packageName_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional string package_name = 3;</code>
+       */
+      public Builder clearPackageName() {
+        bitField0_ = (bitField0_ & ~0x00000004);
+        packageName_ = getDefaultInstance().getPackageName();
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional string package_name = 3;</code>
+       */
+      public Builder setPackageNameBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000004;
+        packageName_ = value;
+        onChanged();
+        return this;
+      }
+
+      // optional string app_version = 4;
+      private java.lang.Object appVersion_ = "";
+      /**
+       * <code>optional string app_version = 4;</code>
+       */
+      public boolean hasAppVersion() {
+        return ((bitField0_ & 0x00000008) == 0x00000008);
+      }
+      /**
+       * <code>optional string app_version = 4;</code>
+       */
+      public java.lang.String getAppVersion() {
+        java.lang.Object ref = appVersion_;
+        if (!(ref instanceof java.lang.String)) {
+          java.lang.String s = ((com.google.protobuf.ByteString) ref)
+              .toStringUtf8();
+          appVersion_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>optional string app_version = 4;</code>
+       */
+      public com.google.protobuf.ByteString
+          getAppVersionBytes() {
+        java.lang.Object ref = appVersion_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          appVersion_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>optional string app_version = 4;</code>
+       */
+      public Builder setAppVersion(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000008;
+        appVersion_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional string app_version = 4;</code>
+       */
+      public Builder clearAppVersion() {
+        bitField0_ = (bitField0_ & ~0x00000008);
+        appVersion_ = getDefaultInstance().getAppVersion();
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional string app_version = 4;</code>
+       */
+      public Builder setAppVersionBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000008;
+        appVersion_ = value;
+        onChanged();
+        return this;
+      }
+
+      // optional string stack_trace = 5;
+      private java.lang.Object stackTrace_ = "";
+      /**
+       * <code>optional string stack_trace = 5;</code>
+       */
+      public boolean hasStackTrace() {
+        return ((bitField0_ & 0x00000010) == 0x00000010);
+      }
+      /**
+       * <code>optional string stack_trace = 5;</code>
+       */
+      public java.lang.String getStackTrace() {
+        java.lang.Object ref = stackTrace_;
+        if (!(ref instanceof java.lang.String)) {
+          java.lang.String s = ((com.google.protobuf.ByteString) ref)
+              .toStringUtf8();
+          stackTrace_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>optional string stack_trace = 5;</code>
+       */
+      public com.google.protobuf.ByteString
+          getStackTraceBytes() {
+        java.lang.Object ref = stackTrace_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          stackTrace_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>optional string stack_trace = 5;</code>
+       */
+      public Builder setStackTrace(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000010;
+        stackTrace_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional string stack_trace = 5;</code>
+       */
+      public Builder clearStackTrace() {
+        bitField0_ = (bitField0_ & ~0x00000010);
+        stackTrace_ = getDefaultInstance().getStackTrace();
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional string stack_trace = 5;</code>
+       */
+      public Builder setStackTraceBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000010;
+        stackTrace_ = value;
+        onChanged();
+        return this;
+      }
+
+      // optional string message = 6;
+      private java.lang.Object message_ = "";
+      /**
+       * <code>optional string message = 6;</code>
+       */
+      public boolean hasMessage() {
+        return ((bitField0_ & 0x00000020) == 0x00000020);
+      }
+      /**
+       * <code>optional string message = 6;</code>
+       */
+      public java.lang.String getMessage() {
+        java.lang.Object ref = message_;
+        if (!(ref instanceof java.lang.String)) {
+          java.lang.String s = ((com.google.protobuf.ByteString) ref)
+              .toStringUtf8();
+          message_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>optional string message = 6;</code>
+       */
+      public com.google.protobuf.ByteString
+          getMessageBytes() {
+        java.lang.Object ref = message_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          message_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>optional string message = 6;</code>
+       */
+      public Builder setMessage(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000020;
+        message_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional string message = 6;</code>
+       */
+      public Builder clearMessage() {
+        bitField0_ = (bitField0_ & ~0x00000020);
+        message_ = getDefaultInstance().getMessage();
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional string message = 6;</code>
+       */
+      public Builder setMessageBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000020;
+        message_ = value;
+        onChanged();
+        return this;
+      }
+
+      // optional int64 report_time = 7;
+      private long reportTime_ ;
+      /**
+       * <code>optional int64 report_time = 7;</code>
+       */
+      public boolean hasReportTime() {
+        return ((bitField0_ & 0x00000040) == 0x00000040);
+      }
+      /**
+       * <code>optional int64 report_time = 7;</code>
+       */
+      public long getReportTime() {
+        return reportTime_;
+      }
+      /**
+       * <code>optional int64 report_time = 7;</code>
+       */
+      public Builder setReportTime(long value) {
+        bitField0_ |= 0x00000040;
+        reportTime_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional int64 report_time = 7;</code>
+       */
+      public Builder clearReportTime() {
+        bitField0_ = (bitField0_ & ~0x00000040);
+        reportTime_ = 0L;
+        onChanged();
+        return this;
+      }
+
+      // optional int32 empire_id = 8;
+      private int empireId_ ;
+      /**
+       * <code>optional int32 empire_id = 8;</code>
+       */
+      public boolean hasEmpireId() {
+        return ((bitField0_ & 0x00000080) == 0x00000080);
+      }
+      /**
+       * <code>optional int32 empire_id = 8;</code>
+       */
+      public int getEmpireId() {
+        return empireId_;
+      }
+      /**
+       * <code>optional int32 empire_id = 8;</code>
+       */
+      public Builder setEmpireId(int value) {
+        bitField0_ |= 0x00000080;
+        empireId_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional int32 empire_id = 8;</code>
+       */
+      public Builder clearEmpireId() {
+        bitField0_ = (bitField0_ & ~0x00000080);
+        empireId_ = 0;
+        onChanged();
+        return this;
+      }
+
+      // @@protoc_insertion_point(builder_scope:au.com.codeka.common.protobuf.ErrorReport)
+    }
+
+    static {
+      defaultInstance = new ErrorReport(true);
+      defaultInstance.initFields();
+    }
+
+    // @@protoc_insertion_point(class_scope:au.com.codeka.common.protobuf.ErrorReport)
+  }
+
+  public interface ErrorReportsOrBuilder
+      extends com.google.protobuf.MessageOrBuilder {
+
+    // repeated .au.com.codeka.common.protobuf.ErrorReport reports = 1;
+    /**
+     * <code>repeated .au.com.codeka.common.protobuf.ErrorReport reports = 1;</code>
+     */
+    java.util.List<au.com.codeka.common.protobuf.Messages.ErrorReport> 
+        getReportsList();
+    /**
+     * <code>repeated .au.com.codeka.common.protobuf.ErrorReport reports = 1;</code>
+     */
+    au.com.codeka.common.protobuf.Messages.ErrorReport getReports(int index);
+    /**
+     * <code>repeated .au.com.codeka.common.protobuf.ErrorReport reports = 1;</code>
+     */
+    int getReportsCount();
+    /**
+     * <code>repeated .au.com.codeka.common.protobuf.ErrorReport reports = 1;</code>
+     */
+    java.util.List<? extends au.com.codeka.common.protobuf.Messages.ErrorReportOrBuilder> 
+        getReportsOrBuilderList();
+    /**
+     * <code>repeated .au.com.codeka.common.protobuf.ErrorReport reports = 1;</code>
+     */
+    au.com.codeka.common.protobuf.Messages.ErrorReportOrBuilder getReportsOrBuilder(
+        int index);
+  }
+  /**
+   * Protobuf type {@code au.com.codeka.common.protobuf.ErrorReports}
+   */
+  public static final class ErrorReports extends
+      com.google.protobuf.GeneratedMessage
+      implements ErrorReportsOrBuilder {
+    // Use ErrorReports.newBuilder() to construct.
+    private ErrorReports(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
+      super(builder);
+      this.unknownFields = builder.getUnknownFields();
+    }
+    private ErrorReports(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
+
+    private static final ErrorReports defaultInstance;
+    public static ErrorReports getDefaultInstance() {
+      return defaultInstance;
+    }
+
+    public ErrorReports getDefaultInstanceForType() {
+      return defaultInstance;
+    }
+
+    private final com.google.protobuf.UnknownFieldSet unknownFields;
+    @java.lang.Override
+    public final com.google.protobuf.UnknownFieldSet
+        getUnknownFields() {
+      return this.unknownFields;
+    }
+    private ErrorReports(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      initFields();
+      int mutable_bitField0_ = 0;
+      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder();
+      try {
+        boolean done = false;
+        while (!done) {
+          int tag = input.readTag();
+          switch (tag) {
+            case 0:
+              done = true;
+              break;
+            default: {
+              if (!parseUnknownField(input, unknownFields,
+                                     extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
+            case 10: {
+              if (!((mutable_bitField0_ & 0x00000001) == 0x00000001)) {
+                reports_ = new java.util.ArrayList<au.com.codeka.common.protobuf.Messages.ErrorReport>();
+                mutable_bitField0_ |= 0x00000001;
+              }
+              reports_.add(input.readMessage(au.com.codeka.common.protobuf.Messages.ErrorReport.PARSER, extensionRegistry));
+              break;
+            }
+          }
+        }
+      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+        throw e.setUnfinishedMessage(this);
+      } catch (java.io.IOException e) {
+        throw new com.google.protobuf.InvalidProtocolBufferException(
+            e.getMessage()).setUnfinishedMessage(this);
+      } finally {
+        if (((mutable_bitField0_ & 0x00000001) == 0x00000001)) {
+          reports_ = java.util.Collections.unmodifiableList(reports_);
+        }
+        this.unknownFields = unknownFields.build();
+        makeExtensionsImmutable();
+      }
+    }
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_ErrorReports_descriptor;
+    }
+
+    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_ErrorReports_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              au.com.codeka.common.protobuf.Messages.ErrorReports.class, au.com.codeka.common.protobuf.Messages.ErrorReports.Builder.class);
+    }
+
+    public static com.google.protobuf.Parser<ErrorReports> PARSER =
+        new com.google.protobuf.AbstractParser<ErrorReports>() {
+      public ErrorReports parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return new ErrorReports(input, extensionRegistry);
+      }
+    };
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<ErrorReports> getParserForType() {
+      return PARSER;
+    }
+
+    // repeated .au.com.codeka.common.protobuf.ErrorReport reports = 1;
+    public static final int REPORTS_FIELD_NUMBER = 1;
+    private java.util.List<au.com.codeka.common.protobuf.Messages.ErrorReport> reports_;
+    /**
+     * <code>repeated .au.com.codeka.common.protobuf.ErrorReport reports = 1;</code>
+     */
+    public java.util.List<au.com.codeka.common.protobuf.Messages.ErrorReport> getReportsList() {
+      return reports_;
+    }
+    /**
+     * <code>repeated .au.com.codeka.common.protobuf.ErrorReport reports = 1;</code>
+     */
+    public java.util.List<? extends au.com.codeka.common.protobuf.Messages.ErrorReportOrBuilder> 
+        getReportsOrBuilderList() {
+      return reports_;
+    }
+    /**
+     * <code>repeated .au.com.codeka.common.protobuf.ErrorReport reports = 1;</code>
+     */
+    public int getReportsCount() {
+      return reports_.size();
+    }
+    /**
+     * <code>repeated .au.com.codeka.common.protobuf.ErrorReport reports = 1;</code>
+     */
+    public au.com.codeka.common.protobuf.Messages.ErrorReport getReports(int index) {
+      return reports_.get(index);
+    }
+    /**
+     * <code>repeated .au.com.codeka.common.protobuf.ErrorReport reports = 1;</code>
+     */
+    public au.com.codeka.common.protobuf.Messages.ErrorReportOrBuilder getReportsOrBuilder(
+        int index) {
+      return reports_.get(index);
+    }
+
+    private void initFields() {
+      reports_ = java.util.Collections.emptyList();
+    }
+    private byte memoizedIsInitialized = -1;
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized != -1) return isInitialized == 1;
+
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      getSerializedSize();
+      for (int i = 0; i < reports_.size(); i++) {
+        output.writeMessage(1, reports_.get(i));
+      }
+      getUnknownFields().writeTo(output);
+    }
+
+    private int memoizedSerializedSize = -1;
+    public int getSerializedSize() {
+      int size = memoizedSerializedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      for (int i = 0; i < reports_.size(); i++) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(1, reports_.get(i));
+      }
+      size += getUnknownFields().getSerializedSize();
+      memoizedSerializedSize = size;
+      return size;
+    }
+
+    private static final long serialVersionUID = 0L;
+    @java.lang.Override
+    protected java.lang.Object writeReplace()
+        throws java.io.ObjectStreamException {
+      return super.writeReplace();
+    }
+
+    public static au.com.codeka.common.protobuf.Messages.ErrorReports parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static au.com.codeka.common.protobuf.Messages.ErrorReports parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static au.com.codeka.common.protobuf.Messages.ErrorReports parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static au.com.codeka.common.protobuf.Messages.ErrorReports parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static au.com.codeka.common.protobuf.Messages.ErrorReports parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input);
+    }
+    public static au.com.codeka.common.protobuf.Messages.ErrorReports parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input, extensionRegistry);
+    }
+    public static au.com.codeka.common.protobuf.Messages.ErrorReports parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return PARSER.parseDelimitedFrom(input);
+    }
+    public static au.com.codeka.common.protobuf.Messages.ErrorReports parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseDelimitedFrom(input, extensionRegistry);
+    }
+    public static au.com.codeka.common.protobuf.Messages.ErrorReports parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input);
+    }
+    public static au.com.codeka.common.protobuf.Messages.ErrorReports parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input, extensionRegistry);
+    }
+
+    public static Builder newBuilder() { return Builder.create(); }
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder(au.com.codeka.common.protobuf.Messages.ErrorReports prototype) {
+      return newBuilder().mergeFrom(prototype);
+    }
+    public Builder toBuilder() { return newBuilder(this); }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * Protobuf type {@code au.com.codeka.common.protobuf.ErrorReports}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessage.Builder<Builder>
+       implements au.com.codeka.common.protobuf.Messages.ErrorReportsOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_ErrorReports_descriptor;
+      }
+
+      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_ErrorReports_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                au.com.codeka.common.protobuf.Messages.ErrorReports.class, au.com.codeka.common.protobuf.Messages.ErrorReports.Builder.class);
+      }
+
+      // Construct using au.com.codeka.common.protobuf.Messages.ErrorReports.newBuilder()
+      private Builder() {
+        maybeForceBuilderInitialization();
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+        super(parent);
+        maybeForceBuilderInitialization();
+      }
+      private void maybeForceBuilderInitialization() {
+        if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
+          getReportsFieldBuilder();
+        }
+      }
+      private static Builder create() {
+        return new Builder();
+      }
+
+      public Builder clear() {
+        super.clear();
+        if (reportsBuilder_ == null) {
+          reports_ = java.util.Collections.emptyList();
+          bitField0_ = (bitField0_ & ~0x00000001);
+        } else {
+          reportsBuilder_.clear();
+        }
+        return this;
+      }
+
+      public Builder clone() {
+        return create().mergeFrom(buildPartial());
+      }
+
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return au.com.codeka.common.protobuf.Messages.internal_static_au_com_codeka_common_protobuf_ErrorReports_descriptor;
+      }
+
+      public au.com.codeka.common.protobuf.Messages.ErrorReports getDefaultInstanceForType() {
+        return au.com.codeka.common.protobuf.Messages.ErrorReports.getDefaultInstance();
+      }
+
+      public au.com.codeka.common.protobuf.Messages.ErrorReports build() {
+        au.com.codeka.common.protobuf.Messages.ErrorReports result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      public au.com.codeka.common.protobuf.Messages.ErrorReports buildPartial() {
+        au.com.codeka.common.protobuf.Messages.ErrorReports result = new au.com.codeka.common.protobuf.Messages.ErrorReports(this);
+        int from_bitField0_ = bitField0_;
+        if (reportsBuilder_ == null) {
+          if (((bitField0_ & 0x00000001) == 0x00000001)) {
+            reports_ = java.util.Collections.unmodifiableList(reports_);
+            bitField0_ = (bitField0_ & ~0x00000001);
+          }
+          result.reports_ = reports_;
+        } else {
+          result.reports_ = reportsBuilder_.build();
+        }
+        onBuilt();
+        return result;
+      }
+
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof au.com.codeka.common.protobuf.Messages.ErrorReports) {
+          return mergeFrom((au.com.codeka.common.protobuf.Messages.ErrorReports)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(au.com.codeka.common.protobuf.Messages.ErrorReports other) {
+        if (other == au.com.codeka.common.protobuf.Messages.ErrorReports.getDefaultInstance()) return this;
+        if (reportsBuilder_ == null) {
+          if (!other.reports_.isEmpty()) {
+            if (reports_.isEmpty()) {
+              reports_ = other.reports_;
+              bitField0_ = (bitField0_ & ~0x00000001);
+            } else {
+              ensureReportsIsMutable();
+              reports_.addAll(other.reports_);
+            }
+            onChanged();
+          }
+        } else {
+          if (!other.reports_.isEmpty()) {
+            if (reportsBuilder_.isEmpty()) {
+              reportsBuilder_.dispose();
+              reportsBuilder_ = null;
+              reports_ = other.reports_;
+              bitField0_ = (bitField0_ & ~0x00000001);
+              reportsBuilder_ = 
+                com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders ?
+                   getReportsFieldBuilder() : null;
+            } else {
+              reportsBuilder_.addAllMessages(other.reports_);
+            }
+          }
+        }
+        this.mergeUnknownFields(other.getUnknownFields());
+        return this;
+      }
+
+      public final boolean isInitialized() {
+        return true;
+      }
+
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        au.com.codeka.common.protobuf.Messages.ErrorReports parsedMessage = null;
+        try {
+          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          parsedMessage = (au.com.codeka.common.protobuf.Messages.ErrorReports) e.getUnfinishedMessage();
+          throw e;
+        } finally {
+          if (parsedMessage != null) {
+            mergeFrom(parsedMessage);
+          }
+        }
+        return this;
+      }
+      private int bitField0_;
+
+      // repeated .au.com.codeka.common.protobuf.ErrorReport reports = 1;
+      private java.util.List<au.com.codeka.common.protobuf.Messages.ErrorReport> reports_ =
+        java.util.Collections.emptyList();
+      private void ensureReportsIsMutable() {
+        if (!((bitField0_ & 0x00000001) == 0x00000001)) {
+          reports_ = new java.util.ArrayList<au.com.codeka.common.protobuf.Messages.ErrorReport>(reports_);
+          bitField0_ |= 0x00000001;
+         }
+      }
+
+      private com.google.protobuf.RepeatedFieldBuilder<
+          au.com.codeka.common.protobuf.Messages.ErrorReport, au.com.codeka.common.protobuf.Messages.ErrorReport.Builder, au.com.codeka.common.protobuf.Messages.ErrorReportOrBuilder> reportsBuilder_;
+
+      /**
+       * <code>repeated .au.com.codeka.common.protobuf.ErrorReport reports = 1;</code>
+       */
+      public java.util.List<au.com.codeka.common.protobuf.Messages.ErrorReport> getReportsList() {
+        if (reportsBuilder_ == null) {
+          return java.util.Collections.unmodifiableList(reports_);
+        } else {
+          return reportsBuilder_.getMessageList();
+        }
+      }
+      /**
+       * <code>repeated .au.com.codeka.common.protobuf.ErrorReport reports = 1;</code>
+       */
+      public int getReportsCount() {
+        if (reportsBuilder_ == null) {
+          return reports_.size();
+        } else {
+          return reportsBuilder_.getCount();
+        }
+      }
+      /**
+       * <code>repeated .au.com.codeka.common.protobuf.ErrorReport reports = 1;</code>
+       */
+      public au.com.codeka.common.protobuf.Messages.ErrorReport getReports(int index) {
+        if (reportsBuilder_ == null) {
+          return reports_.get(index);
+        } else {
+          return reportsBuilder_.getMessage(index);
+        }
+      }
+      /**
+       * <code>repeated .au.com.codeka.common.protobuf.ErrorReport reports = 1;</code>
+       */
+      public Builder setReports(
+          int index, au.com.codeka.common.protobuf.Messages.ErrorReport value) {
+        if (reportsBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          ensureReportsIsMutable();
+          reports_.set(index, value);
+          onChanged();
+        } else {
+          reportsBuilder_.setMessage(index, value);
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .au.com.codeka.common.protobuf.ErrorReport reports = 1;</code>
+       */
+      public Builder setReports(
+          int index, au.com.codeka.common.protobuf.Messages.ErrorReport.Builder builderForValue) {
+        if (reportsBuilder_ == null) {
+          ensureReportsIsMutable();
+          reports_.set(index, builderForValue.build());
+          onChanged();
+        } else {
+          reportsBuilder_.setMessage(index, builderForValue.build());
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .au.com.codeka.common.protobuf.ErrorReport reports = 1;</code>
+       */
+      public Builder addReports(au.com.codeka.common.protobuf.Messages.ErrorReport value) {
+        if (reportsBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          ensureReportsIsMutable();
+          reports_.add(value);
+          onChanged();
+        } else {
+          reportsBuilder_.addMessage(value);
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .au.com.codeka.common.protobuf.ErrorReport reports = 1;</code>
+       */
+      public Builder addReports(
+          int index, au.com.codeka.common.protobuf.Messages.ErrorReport value) {
+        if (reportsBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          ensureReportsIsMutable();
+          reports_.add(index, value);
+          onChanged();
+        } else {
+          reportsBuilder_.addMessage(index, value);
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .au.com.codeka.common.protobuf.ErrorReport reports = 1;</code>
+       */
+      public Builder addReports(
+          au.com.codeka.common.protobuf.Messages.ErrorReport.Builder builderForValue) {
+        if (reportsBuilder_ == null) {
+          ensureReportsIsMutable();
+          reports_.add(builderForValue.build());
+          onChanged();
+        } else {
+          reportsBuilder_.addMessage(builderForValue.build());
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .au.com.codeka.common.protobuf.ErrorReport reports = 1;</code>
+       */
+      public Builder addReports(
+          int index, au.com.codeka.common.protobuf.Messages.ErrorReport.Builder builderForValue) {
+        if (reportsBuilder_ == null) {
+          ensureReportsIsMutable();
+          reports_.add(index, builderForValue.build());
+          onChanged();
+        } else {
+          reportsBuilder_.addMessage(index, builderForValue.build());
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .au.com.codeka.common.protobuf.ErrorReport reports = 1;</code>
+       */
+      public Builder addAllReports(
+          java.lang.Iterable<? extends au.com.codeka.common.protobuf.Messages.ErrorReport> values) {
+        if (reportsBuilder_ == null) {
+          ensureReportsIsMutable();
+          super.addAll(values, reports_);
+          onChanged();
+        } else {
+          reportsBuilder_.addAllMessages(values);
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .au.com.codeka.common.protobuf.ErrorReport reports = 1;</code>
+       */
+      public Builder clearReports() {
+        if (reportsBuilder_ == null) {
+          reports_ = java.util.Collections.emptyList();
+          bitField0_ = (bitField0_ & ~0x00000001);
+          onChanged();
+        } else {
+          reportsBuilder_.clear();
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .au.com.codeka.common.protobuf.ErrorReport reports = 1;</code>
+       */
+      public Builder removeReports(int index) {
+        if (reportsBuilder_ == null) {
+          ensureReportsIsMutable();
+          reports_.remove(index);
+          onChanged();
+        } else {
+          reportsBuilder_.remove(index);
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .au.com.codeka.common.protobuf.ErrorReport reports = 1;</code>
+       */
+      public au.com.codeka.common.protobuf.Messages.ErrorReport.Builder getReportsBuilder(
+          int index) {
+        return getReportsFieldBuilder().getBuilder(index);
+      }
+      /**
+       * <code>repeated .au.com.codeka.common.protobuf.ErrorReport reports = 1;</code>
+       */
+      public au.com.codeka.common.protobuf.Messages.ErrorReportOrBuilder getReportsOrBuilder(
+          int index) {
+        if (reportsBuilder_ == null) {
+          return reports_.get(index);  } else {
+          return reportsBuilder_.getMessageOrBuilder(index);
+        }
+      }
+      /**
+       * <code>repeated .au.com.codeka.common.protobuf.ErrorReport reports = 1;</code>
+       */
+      public java.util.List<? extends au.com.codeka.common.protobuf.Messages.ErrorReportOrBuilder> 
+           getReportsOrBuilderList() {
+        if (reportsBuilder_ != null) {
+          return reportsBuilder_.getMessageOrBuilderList();
+        } else {
+          return java.util.Collections.unmodifiableList(reports_);
+        }
+      }
+      /**
+       * <code>repeated .au.com.codeka.common.protobuf.ErrorReport reports = 1;</code>
+       */
+      public au.com.codeka.common.protobuf.Messages.ErrorReport.Builder addReportsBuilder() {
+        return getReportsFieldBuilder().addBuilder(
+            au.com.codeka.common.protobuf.Messages.ErrorReport.getDefaultInstance());
+      }
+      /**
+       * <code>repeated .au.com.codeka.common.protobuf.ErrorReport reports = 1;</code>
+       */
+      public au.com.codeka.common.protobuf.Messages.ErrorReport.Builder addReportsBuilder(
+          int index) {
+        return getReportsFieldBuilder().addBuilder(
+            index, au.com.codeka.common.protobuf.Messages.ErrorReport.getDefaultInstance());
+      }
+      /**
+       * <code>repeated .au.com.codeka.common.protobuf.ErrorReport reports = 1;</code>
+       */
+      public java.util.List<au.com.codeka.common.protobuf.Messages.ErrorReport.Builder> 
+           getReportsBuilderList() {
+        return getReportsFieldBuilder().getBuilderList();
+      }
+      private com.google.protobuf.RepeatedFieldBuilder<
+          au.com.codeka.common.protobuf.Messages.ErrorReport, au.com.codeka.common.protobuf.Messages.ErrorReport.Builder, au.com.codeka.common.protobuf.Messages.ErrorReportOrBuilder> 
+          getReportsFieldBuilder() {
+        if (reportsBuilder_ == null) {
+          reportsBuilder_ = new com.google.protobuf.RepeatedFieldBuilder<
+              au.com.codeka.common.protobuf.Messages.ErrorReport, au.com.codeka.common.protobuf.Messages.ErrorReport.Builder, au.com.codeka.common.protobuf.Messages.ErrorReportOrBuilder>(
+                  reports_,
+                  ((bitField0_ & 0x00000001) == 0x00000001),
+                  getParentForChildren(),
+                  isClean());
+          reports_ = null;
+        }
+        return reportsBuilder_;
+      }
+
+      // @@protoc_insertion_point(builder_scope:au.com.codeka.common.protobuf.ErrorReports)
+    }
+
+    static {
+      defaultInstance = new ErrorReports(true);
+      defaultInstance.initFields();
+    }
+
+    // @@protoc_insertion_point(class_scope:au.com.codeka.common.protobuf.ErrorReports)
+  }
+
   private static com.google.protobuf.Descriptors.Descriptor
     internal_static_au_com_codeka_common_protobuf_MessageOfTheDay_descriptor;
   private static
@@ -82971,6 +85058,16 @@ public final class Messages {
   private static
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_au_com_codeka_common_protobuf_AllianceRequestVote_fieldAccessorTable;
+  private static com.google.protobuf.Descriptors.Descriptor
+    internal_static_au_com_codeka_common_protobuf_ErrorReport_descriptor;
+  private static
+    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      internal_static_au_com_codeka_common_protobuf_ErrorReport_fieldAccessorTable;
+  private static com.google.protobuf.Descriptors.Descriptor
+    internal_static_au_com_codeka_common_protobuf_ErrorReports_descriptor;
+  private static
+    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      internal_static_au_com_codeka_common_protobuf_ErrorReports_fieldAccessorTable;
 
   public static com.google.protobuf.Descriptors.FileDescriptor
       getDescriptor() {
@@ -83320,12 +85417,19 @@ public final class Messages {
       "AllianceRequestVote\022\n\n\002id\030\001 \001(\005\022\023\n\013allia" +
       "nce_id\030\002 \001(\005\022\033\n\023alliance_request_id\030\003 \001(" +
       "\005\022\021\n\tempire_id\030\004 \001(\005\022\r\n\005votes\030\005 \001(\005\022\014\n\004d",
-      "ate\030\006 \001(\003*\344\001\n\025SituationReportFilter\022\013\n\007S" +
-      "howAll\020\000\022\020\n\014MoveComplete\020\001\022\024\n\020BuildCompl" +
-      "eteAny\020\002\022\021\n\rFleetAttacked\020\003\022\022\n\016FleetDest" +
-      "royed\020\004\022\023\n\017FleetVictorious\020\005\022\022\n\016ColonyAt" +
-      "tacked\020\006\022\023\n\017ColonyDestroyed\020\007\022\026\n\022BuildCo" +
-      "mpleteShips\020\010\022\031\n\025BuildCompleteBuilding\020\t"
+      "ate\030\006 \001(\003\"\264\001\n\013ErrorReport\022\027\n\017android_ver" +
+      "sion\030\001 \001(\t\022\023\n\013phone_model\030\002 \001(\t\022\024\n\014packa" +
+      "ge_name\030\003 \001(\t\022\023\n\013app_version\030\004 \001(\t\022\023\n\013st" +
+      "ack_trace\030\005 \001(\t\022\017\n\007message\030\006 \001(\t\022\023\n\013repo" +
+      "rt_time\030\007 \001(\003\022\021\n\tempire_id\030\010 \001(\005\"K\n\014Erro" +
+      "rReports\022;\n\007reports\030\001 \003(\0132*.au.com.codek" +
+      "a.common.protobuf.ErrorReport*\344\001\n\025Situat" +
+      "ionReportFilter\022\013\n\007ShowAll\020\000\022\020\n\014MoveComp" +
+      "lete\020\001\022\024\n\020BuildCompleteAny\020\002\022\021\n\rFleetAtt" +
+      "acked\020\003\022\022\n\016FleetDestroyed\020\004\022\023\n\017FleetVict",
+      "orious\020\005\022\022\n\016ColonyAttacked\020\006\022\023\n\017ColonyDe" +
+      "stroyed\020\007\022\026\n\022BuildCompleteShips\020\010\022\031\n\025Bui" +
+      "ldCompleteBuilding\020\t"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
       new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
@@ -83770,6 +85874,18 @@ public final class Messages {
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_au_com_codeka_common_protobuf_AllianceRequestVote_descriptor,
               new java.lang.String[] { "Id", "AllianceId", "AllianceRequestId", "EmpireId", "Votes", "Date", });
+          internal_static_au_com_codeka_common_protobuf_ErrorReport_descriptor =
+            getDescriptor().getMessageTypes().get(59);
+          internal_static_au_com_codeka_common_protobuf_ErrorReport_fieldAccessorTable = new
+            com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+              internal_static_au_com_codeka_common_protobuf_ErrorReport_descriptor,
+              new java.lang.String[] { "AndroidVersion", "PhoneModel", "PackageName", "AppVersion", "StackTrace", "Message", "ReportTime", "EmpireId", });
+          internal_static_au_com_codeka_common_protobuf_ErrorReports_descriptor =
+            getDescriptor().getMessageTypes().get(60);
+          internal_static_au_com_codeka_common_protobuf_ErrorReports_fieldAccessorTable = new
+            com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+              internal_static_au_com_codeka_common_protobuf_ErrorReports_descriptor,
+              new java.lang.String[] { "Reports", });
           return null;
         }
       };

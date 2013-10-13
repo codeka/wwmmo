@@ -45,8 +45,10 @@ import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.BaseActivity;
 import au.com.codeka.warworlds.GlobalOptions;
 import au.com.codeka.warworlds.R;
+import au.com.codeka.warworlds.ServerGreeter;
 import au.com.codeka.warworlds.StyledDialog;
 import au.com.codeka.warworlds.Util;
+import au.com.codeka.warworlds.ServerGreeter.ServerGreeting;
 import au.com.codeka.warworlds.model.Alliance;
 import au.com.codeka.warworlds.model.ChatConversation;
 import au.com.codeka.warworlds.model.ChatManager;
@@ -62,6 +64,7 @@ public class ChatActivity extends BaseActivity
     private ViewPager mViewPager;
     private List<ChatConversation> mConversations;
     private Handler mHandler;
+    private boolean mFirstRefresh;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -70,46 +73,12 @@ public class ChatActivity extends BaseActivity
         setContentView(R.layout.chat);
 
         mChatPagerAdapter = new ChatPagerAdapter(getSupportFragmentManager());
-        onConversationsRefreshed();
-
         mViewPager = (ViewPager) findViewById(R.id.pager);
         mViewPager.setAdapter(mChatPagerAdapter);
         mHandler = new Handler();
-
-        Bundle extras = getIntent().getExtras();
-        if (extras != null) {
-            final int conversationID = extras.getInt("au.com.codeka.warworlds.ConversationID");
-            if (conversationID != 0) {
-                int position = 0;
-                for (; position < mConversations.size(); position++) {
-                    if (mConversations.get(position).getID() == conversationID) {
-                        break;
-                    }
-                }
-                if (position < mConversations.size()) {
-                    final int finalPosition = position;
-                    mHandler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            mViewPager.setCurrentItem(finalPosition);
-                        }
-                    });
-                }
-            }
-
-            final String empireKey = extras.getString("au.com.codeka.warworlds.NewConversationEmpireKey");
-            if (empireKey != null) {
-                mHandler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        startConversation(empireKey);
-                    }
-                });
-            }
-        }
+        mFirstRefresh = true;
 
         final EditText chatMsg = (EditText) findViewById(R.id.chat_text);
-
         chatMsg.setOnEditorActionListener(new OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
@@ -126,6 +95,55 @@ public class ChatActivity extends BaseActivity
             @Override
             public void onClick(View v) {
                 sendCurrentChat();
+            }
+        });
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        ServerGreeter.waitForHello(this, new ServerGreeter.HelloCompleteHandler() {
+            @Override
+            public void onHelloComplete(boolean success, ServerGreeting greeting) {
+
+                onConversationsRefreshed();
+
+                if (mFirstRefresh) {
+                    mFirstRefresh = false;
+
+                    Bundle extras = getIntent().getExtras();
+                    if (extras != null) {
+                        final int conversationID = extras.getInt("au.com.codeka.warworlds.ConversationID");
+                        if (conversationID != 0) {
+                            int position = 0;
+                            for (; position < mConversations.size(); position++) {
+                                if (mConversations.get(position).getID() == conversationID) {
+                                    break;
+                                }
+                            }
+                            if (position < mConversations.size()) {
+                                final int finalPosition = position;
+                                mHandler.post(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        mViewPager.setCurrentItem(finalPosition);
+                                    }
+                                });
+                            }
+                        }
+
+                        final String empireKey = extras.getString("au.com.codeka.warworlds.NewConversationEmpireKey");
+                        if (empireKey != null) {
+                            mHandler.post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    startConversation(empireKey);
+                                }
+                            });
+                        }
+                    }
+                }
             }
         });
     }

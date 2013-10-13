@@ -15,50 +15,8 @@ import org.eclipse.jetty.server.handler.AbstractHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import au.com.codeka.warworlds.server.handlers.AllianceHandler;
-import au.com.codeka.warworlds.server.handlers.AllianceRequestHandler;
-import au.com.codeka.warworlds.server.handlers.AllianceRequestsHandler;
-import au.com.codeka.warworlds.server.handlers.AlliancesHandler;
-import au.com.codeka.warworlds.server.handlers.BuildAccelerateHandler;
-import au.com.codeka.warworlds.server.handlers.BuildQueueHandler;
-import au.com.codeka.warworlds.server.handlers.BuildStopHandler;
-import au.com.codeka.warworlds.server.handlers.ChatConversationParticipantHandler;
-import au.com.codeka.warworlds.server.handlers.ChatConversationParticipantsHandler;
-import au.com.codeka.warworlds.server.handlers.ChatConversationsHandler;
-import au.com.codeka.warworlds.server.handlers.ChatHandler;
-import au.com.codeka.warworlds.server.handlers.ColoniesHandler;
-import au.com.codeka.warworlds.server.handlers.ColonyAttackHandler;
-import au.com.codeka.warworlds.server.handlers.ColonyHandler;
-import au.com.codeka.warworlds.server.handlers.CombatReportHandler;
-import au.com.codeka.warworlds.server.handlers.DevicesHandler;
-import au.com.codeka.warworlds.server.handlers.EmpiresAdsHandler;
-import au.com.codeka.warworlds.server.handlers.EmpiresCashAuditHandler;
-import au.com.codeka.warworlds.server.handlers.EmpiresDisplayNameHandler;
-import au.com.codeka.warworlds.server.handlers.EmpiresHandler;
-import au.com.codeka.warworlds.server.handlers.EmpiresResetHandler;
-import au.com.codeka.warworlds.server.handlers.EmpiresSearchHandler;
-import au.com.codeka.warworlds.server.handlers.EmpiresShieldHandler;
-import au.com.codeka.warworlds.server.handlers.EmpiresStarsHandler;
-import au.com.codeka.warworlds.server.handlers.EmpiresTaxesHandler;
-import au.com.codeka.warworlds.server.handlers.FleetOrdersHandler;
-import au.com.codeka.warworlds.server.handlers.HelloHandler;
-import au.com.codeka.warworlds.server.handlers.LoginHandler;
-import au.com.codeka.warworlds.server.handlers.MotdHandler;
-import au.com.codeka.warworlds.server.handlers.NotificationHandler;
-import au.com.codeka.warworlds.server.handlers.RankingHistoryHandler;
-import au.com.codeka.warworlds.server.handlers.ScoutReportsHandler;
-import au.com.codeka.warworlds.server.handlers.SectorsHandler;
-import au.com.codeka.warworlds.server.handlers.SitReportsHandler;
-import au.com.codeka.warworlds.server.handlers.SitReportsReadHandler;
-import au.com.codeka.warworlds.server.handlers.StarHandler;
-import au.com.codeka.warworlds.server.handlers.StarSimulateHandler;
-import au.com.codeka.warworlds.server.handlers.StarsHandler;
-import au.com.codeka.warworlds.server.handlers.pages.ActionsMoveStarPageHandler;
-import au.com.codeka.warworlds.server.handlers.pages.ActionsResetEmpirePageHandler;
-import au.com.codeka.warworlds.server.handlers.pages.DashboardPageHandler;
-import au.com.codeka.warworlds.server.handlers.pages.DebugPurchasesPageHandler;
-import au.com.codeka.warworlds.server.handlers.pages.HtmlPageHandler;
-import au.com.codeka.warworlds.server.handlers.pages.StaticFileHandler;
+import au.com.codeka.warworlds.server.handlers.*;
+import au.com.codeka.warworlds.server.handlers.pages.*;
 
 
 public class RequestRouter extends AbstractHandler {
@@ -107,6 +65,7 @@ public class RequestRouter extends AbstractHandler {
         sRoutes.add(new Route("rankings/({year}[0-9]+)/({month}[0-9]+)$", RankingHistoryHandler.class));
         sRoutes.add(new Route("motd", MotdHandler.class));
         sRoutes.add(new Route("notifications$", NotificationHandler.class));
+        sRoutes.add(new Route("error-reports$", ErrorReportsHandler.class));
 
         sRoutes.add(new Route("admin/?$", DashboardPageHandler.class));
         sRoutes.add(new Route("admin/({path}actions/move-star)$", ActionsMoveStarPageHandler.class, "admin/"));

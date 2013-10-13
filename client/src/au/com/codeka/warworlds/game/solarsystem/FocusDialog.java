@@ -47,13 +47,15 @@ public class FocusDialog extends DialogFragment {
     public void setColony(Star star, Colony colony) {
         mColony = colony;
         mPlanet = (Planet) star.getPlanets()[colony.getPlanetIndex() - 1];
+
+        int a = 0;
+        int b = 10 / a;
     }
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         LayoutInflater inflater = getActivity().getLayoutInflater();
         mView = inflater.inflate(R.layout.focus_dlg, null);
-
         if (savedInstanceState != null) {
             byte[] bytes = savedInstanceState.getByteArray("au.com.codeka.warworlds.Colony");
             if (bytes != null) {
