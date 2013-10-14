@@ -78,6 +78,18 @@ public class GlobalOptions {
                     .commit();
     }
 
+    public AutoSendCrashReport getAutoSendCrashReport() {
+        String str = mPreferences.getString("GlobalOptions.AutoSendCrashReports", AutoSendCrashReport.Ask.toString());
+        if (str.equals("0"))
+            return AutoSendCrashReport.Ask;
+        return AutoSendCrashReport.valueOf(str);
+    }
+    public void setAutoSendCrashReport(AutoSendCrashReport value) {
+        mPreferences.edit()
+                    .putString("GlobalOptions.AutoSendCrashReports", value.toString())
+                    .commit();
+    }
+
     public boolean notificationsEnabled() {
         return mPreferences.getBoolean("GlobalOptions.EnableNotifications", true);
     }
@@ -133,6 +145,12 @@ public class GlobalOptions {
 
             return StarfieldDetail.STARS_AND_GAS;
         }
+    }
+
+    public enum AutoSendCrashReport {
+        Ask,
+        Never,
+        Always
     }
 
     public enum NotificationKind {

@@ -24,9 +24,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.CheckBox;
 import au.com.codeka.common.protobuf.Messages;
+import au.com.codeka.warworlds.GlobalOptions;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.StyledDialog;
-import au.com.codeka.warworlds.Util;
 import au.com.codeka.warworlds.api.ApiClient;
 import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.MyEmpire;
@@ -64,21 +64,16 @@ public class ErrorReporter {
     }
 
     public static class ReportSender {
-        private static final int AUTOSEND_ASK = 0;
-        private static final int AUTOSEND_ALWAYS = 1;
-        private static final int AUTOSEND_NEVER = 2;
-
         public void send(Context context) {
             String[] unsentErrorReports = findUnsentErrorReports();
             if (unsentErrorReports.length > 0) {
-                int autosend = Util.getSharedPreferences().getInt("au.com.codeka.warworlds.AutoSendErrorReports",
-                                                                  AUTOSEND_ASK);
+                GlobalOptions.AutoSendCrashReport autosend = new GlobalOptions().getAutoSendCrashReport();
 
-                if (autosend == AUTOSEND_NEVER) {
+                if (autosend == GlobalOptions.AutoSendCrashReport.Never) {
                     clearErrorReports(unsentErrorReports);
-                } else if (autosend == AUTOSEND_ALWAYS) {
+                } else if (autosend == GlobalOptions.AutoSendCrashReport.Always) {
                     sendErrorReports(unsentErrorReports);
-                } else {
+                } else /* Ask */ {
                     askToSend(context, unsentErrorReports);
                 }
             }
@@ -96,7 +91,7 @@ public class ErrorReporter {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             if (alwaysChk.isChecked()) {
-                                saveAutoSend(AUTOSEND_ALWAYS);
+                                saveAutoSend(GlobalOptions.AutoSendCrashReport.Always);
                             }
 
                             sendErrorReports(errorReportFiles);
@@ -107,7 +102,7 @@ public class ErrorReporter {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             if (alwaysChk.isChecked()) {
-                                saveAutoSend(AUTOSEND_NEVER);
+                                saveAutoSend(GlobalOptions.AutoSendCrashReport.Never);
                             }
 
                             clearErrorReports(errorReportFiles);
@@ -155,10 +150,8 @@ public class ErrorReporter {
             }
         }
 
-        private void saveAutoSend(int autoSend) {
-            Util.getSharedPreferences().edit()
-                .putInt("au.com.codeka.warworlds.AutoSendErrorReports", autoSend)
-                .commit();
+        private void saveAutoSend(GlobalOptions.AutoSendCrashReport autoSend) {
+            new GlobalOptions().setAutoSendCrashReport(autoSend);
         }
 
         /** Fetches the filename of all saved error reports. */

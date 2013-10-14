@@ -35,6 +35,17 @@ public class GlobalOptionsActivity extends PreferenceActivity
         Html.fromHtml("<font color=\"#0000ff\">Blue</font>"),
     };
 
+    final static String[] sAutoSendCrashReportValues = {
+        GlobalOptions.AutoSendCrashReport.Ask.toString(),
+        GlobalOptions.AutoSendCrashReport.Never.toString(),
+        GlobalOptions.AutoSendCrashReport.Always.toString()
+    };
+    final static String[] sAutoSendCrashReportDisplay = {
+        "Ask",
+        "Never",
+        "Always (recommended)"
+    };
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -54,6 +65,11 @@ public class GlobalOptionsActivity extends PreferenceActivity
         };
         starfieldDetail.setEntryValues(values);
         starfieldDetail.setEntries(displayValues);
+
+        ListPreference autoSendCrashReport = (ListPreference) getPreferenceScreen().findPreference(
+                "GlobalOptions.AutoSendCrashReports");
+        autoSendCrashReport.setEntryValues(sAutoSendCrashReportValues);
+        autoSendCrashReport.setEntries(sAutoSendCrashReportDisplay);
 
         for (GlobalOptions.NotificationKind kind : GlobalOptions.NotificationKind.values()) {
             ListPreference colour = (ListPreference) getPreferenceScreen().findPreference(
@@ -128,6 +144,19 @@ public class GlobalOptionsActivity extends PreferenceActivity
             p.setSummary("Notifications are enabled");
         } else {
             p.setSummary("You will not receive any notifications.");
+        }
+
+        p = getPreferenceScreen().findPreference("GlobalOptions.AutoSendCrashReports");
+        switch (opts.getAutoSendCrashReport()) {
+        case Ask:
+            p.setSummary("Ask every time");
+            break;
+        case Always:
+            p.setSummary("Send automatically");
+            break;
+        case Never:
+            p.setSummary("Never send");
+            break;
         }
 
         for (GlobalOptions.NotificationKind kind : GlobalOptions.NotificationKind.values()) {

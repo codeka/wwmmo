@@ -15,6 +15,12 @@
                             android:title="Auto-translate"
                             android:defaultValue="false" />
     </PreferenceCategory>
+    <PreferenceCategory android:title="Crash Reports"
+                        android:key="pref_key_crash_reports">
+        <ListPreference android:key="GlobalOptions.AutoSendCrashReports"
+                        android:title="Auto-send Crash Reports"
+                        android:defaultValue="Ask" />
+    </PreferenceCategory>
     <PreferenceCategory android:title="Notifications"
                         android:key="pref_key_notifications">
         <CheckBoxPreference android:key="GlobalOptions.EnableNotifications"
