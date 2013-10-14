@@ -1287,6 +1287,8 @@ message ErrorReport
     optional string message = 6;
     optional int64 report_time = 7;
     optional int32 empire_id = 8;
+    optional string context = 9;
+    optional string exception_class = 10;
 }
 
 message ErrorReports

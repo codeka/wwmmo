@@ -63,7 +63,7 @@ public class BaseActivity extends FragmentActivity {
             getWindowManager().removeView(mDebugView);
         }
 
-        BackgroundDetector.getInstance().onActivityPause(this);
+        BackgroundDetector.i.onActivityPause(this);
         super.onPause();
     }
 
@@ -78,25 +78,25 @@ public class BaseActivity extends FragmentActivity {
             getWindowManager().addView(mDebugView, mDebugViewLayout);
         }
 
-        BackgroundDetector.getInstance().onActivityResume(this);
+        BackgroundDetector.i.onActivityResume(this);
         super.onResume();
     }
 
     @Override
     public void startActivity(Intent intent) {
-        BackgroundDetector.getInstance().onStartActivity(this, intent);
+        BackgroundDetector.i.onStartActivity(this, intent);
         super.startActivity(intent);
     }
 
     @Override
     public void startActivityForResult(Intent intent, int requestCode) {
-        BackgroundDetector.getInstance().onStartActivity(this, intent);
+        BackgroundDetector.i.onStartActivity(this, intent);
         super.startActivityForResult(intent, requestCode);
     }
 
     @Override
     public void onPostResume() {
-        BackgroundDetector.getInstance().onActivityPostResume(this);
+        BackgroundDetector.i.onActivityPostResume(this);
         super.onPostResume();
     }
 

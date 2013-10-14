@@ -24,6 +24,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.CheckBox;
 import au.com.codeka.common.protobuf.Messages;
+import au.com.codeka.warworlds.BackgroundDetector;
 import au.com.codeka.warworlds.GlobalOptions;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.StyledDialog;
@@ -46,7 +47,7 @@ public class ErrorReporter {
             PackageInfo pi = pm.getPackageInfo(context.getPackageName(), 0);
             sVersionName = pi.versionName;
             sPackageName = pi.packageName;
-            sReportPath = context.getFilesDir().getAbsolutePath();
+            sReportPath = context.getFilesDir().getAbsolutePath() + "/error-reports/";
             sPhoneModel = android.os.Build.MODEL;
             sAndroidVersion = android.os.Build.VERSION.RELEASE;
         } catch (NameNotFoundException e) {
@@ -121,7 +122,7 @@ public class ErrorReporter {
                         log.debug("Sending "+errorReportFiles.length+" error reports...");
                         Messages.ErrorReports.Builder error_reports_pb = Messages.ErrorReports.newBuilder();
                         for (String file : errorReportFiles) {
-                            FileInputStream ins = new FileInputStream(sReportPath + "/" + file);
+                            FileInputStream ins = new FileInputStream(sReportPath + file);
                             error_reports_pb.addReports(Messages.ErrorReport.parseFrom(ins));
                         }
 
@@ -143,7 +144,7 @@ public class ErrorReporter {
         private void clearErrorReports(String[] errorReportFiles) {
             try {
                 for (String file : errorReportFiles) {
-                    new File(sReportPath + "/" + file).delete();
+                    new File(sReportPath + file).delete();
                 }
             } catch (Exception e) {
                 log.error("Exception caught removing error reports.", e);
@@ -157,7 +158,7 @@ public class ErrorReporter {
         /** Fetches the filename of all saved error reports. */
         private static String[] findUnsentErrorReports() {
             // try to create the files folder if it doesn't exist
-            File dir = new File(sReportPath + "/");
+            File dir = new File(sReportPath);
             dir.mkdir();
 
             // Filter for ".pb" files
@@ -185,7 +186,7 @@ public class ErrorReporter {
             String fileName = sVersionName + "-" + System.currentTimeMillis() + "-" + sRandom.nextInt(99999);
             OutputStream outs = null;
             try {
-                final String fullPath = sReportPath + "/" + fileName + ".pb";
+                final String fullPath = sReportPath + fileName + ".pb";
                 log.debug("Writing unhandled exception to: " + fullPath);
                 outs = new FileOutputStream(fullPath);
 
@@ -200,10 +201,14 @@ public class ErrorReporter {
                         .setPhoneModel(sPhoneModel)
                         .setStackTrace(stringWriter.toString())
                         .setMessage(throwable.getMessage())
+                        .setExceptionClass(throwable.getClass().getName())
                         .setReportTime(DateTime.now().getMillis());
                 MyEmpire myEmpire = EmpireManager.i.getEmpire();
                 if (myEmpire != null) {
                     error_report_pb.setEmpireId(Integer.parseInt(myEmpire.getKey()));
+                }
+                if (BackgroundDetector.i.getLastActivityName() != null) {
+                    error_report_pb.setContext(BackgroundDetector.i.getLastActivityName());
                 }
 
                 error_report_pb.build().writeTo(outs);

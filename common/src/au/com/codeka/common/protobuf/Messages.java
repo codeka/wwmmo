@@ -82718,6 +82718,36 @@ public final class Messages {
      * <code>optional int32 empire_id = 8;</code>
      */
     int getEmpireId();
+
+    // optional string context = 9;
+    /**
+     * <code>optional string context = 9;</code>
+     */
+    boolean hasContext();
+    /**
+     * <code>optional string context = 9;</code>
+     */
+    java.lang.String getContext();
+    /**
+     * <code>optional string context = 9;</code>
+     */
+    com.google.protobuf.ByteString
+        getContextBytes();
+
+    // optional string exception_class = 10;
+    /**
+     * <code>optional string exception_class = 10;</code>
+     */
+    boolean hasExceptionClass();
+    /**
+     * <code>optional string exception_class = 10;</code>
+     */
+    java.lang.String getExceptionClass();
+    /**
+     * <code>optional string exception_class = 10;</code>
+     */
+    com.google.protobuf.ByteString
+        getExceptionClassBytes();
   }
   /**
    * Protobuf type {@code au.com.codeka.common.protobuf.ErrorReport}
@@ -82808,6 +82838,16 @@ public final class Messages {
             case 64: {
               bitField0_ |= 0x00000080;
               empireId_ = input.readInt32();
+              break;
+            }
+            case 74: {
+              bitField0_ |= 0x00000100;
+              context_ = input.readBytes();
+              break;
+            }
+            case 82: {
+              bitField0_ |= 0x00000200;
+              exceptionClass_ = input.readBytes();
               break;
             }
           }
@@ -83140,6 +83180,92 @@ public final class Messages {
       return empireId_;
     }
 
+    // optional string context = 9;
+    public static final int CONTEXT_FIELD_NUMBER = 9;
+    private java.lang.Object context_;
+    /**
+     * <code>optional string context = 9;</code>
+     */
+    public boolean hasContext() {
+      return ((bitField0_ & 0x00000100) == 0x00000100);
+    }
+    /**
+     * <code>optional string context = 9;</code>
+     */
+    public java.lang.String getContext() {
+      java.lang.Object ref = context_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        if (bs.isValidUtf8()) {
+          context_ = s;
+        }
+        return s;
+      }
+    }
+    /**
+     * <code>optional string context = 9;</code>
+     */
+    public com.google.protobuf.ByteString
+        getContextBytes() {
+      java.lang.Object ref = context_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        context_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    // optional string exception_class = 10;
+    public static final int EXCEPTION_CLASS_FIELD_NUMBER = 10;
+    private java.lang.Object exceptionClass_;
+    /**
+     * <code>optional string exception_class = 10;</code>
+     */
+    public boolean hasExceptionClass() {
+      return ((bitField0_ & 0x00000200) == 0x00000200);
+    }
+    /**
+     * <code>optional string exception_class = 10;</code>
+     */
+    public java.lang.String getExceptionClass() {
+      java.lang.Object ref = exceptionClass_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        if (bs.isValidUtf8()) {
+          exceptionClass_ = s;
+        }
+        return s;
+      }
+    }
+    /**
+     * <code>optional string exception_class = 10;</code>
+     */
+    public com.google.protobuf.ByteString
+        getExceptionClassBytes() {
+      java.lang.Object ref = exceptionClass_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        exceptionClass_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
     private void initFields() {
       androidVersion_ = "";
       phoneModel_ = "";
@@ -83149,6 +83275,8 @@ public final class Messages {
       message_ = "";
       reportTime_ = 0L;
       empireId_ = 0;
+      context_ = "";
+      exceptionClass_ = "";
     }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
@@ -83185,6 +83313,12 @@ public final class Messages {
       }
       if (((bitField0_ & 0x00000080) == 0x00000080)) {
         output.writeInt32(8, empireId_);
+      }
+      if (((bitField0_ & 0x00000100) == 0x00000100)) {
+        output.writeBytes(9, getContextBytes());
+      }
+      if (((bitField0_ & 0x00000200) == 0x00000200)) {
+        output.writeBytes(10, getExceptionClassBytes());
       }
       getUnknownFields().writeTo(output);
     }
@@ -83226,6 +83360,14 @@ public final class Messages {
       if (((bitField0_ & 0x00000080) == 0x00000080)) {
         size += com.google.protobuf.CodedOutputStream
           .computeInt32Size(8, empireId_);
+      }
+      if (((bitField0_ & 0x00000100) == 0x00000100)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBytesSize(9, getContextBytes());
+      }
+      if (((bitField0_ & 0x00000200) == 0x00000200)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBytesSize(10, getExceptionClassBytes());
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
@@ -83359,6 +83501,10 @@ public final class Messages {
         bitField0_ = (bitField0_ & ~0x00000040);
         empireId_ = 0;
         bitField0_ = (bitField0_ & ~0x00000080);
+        context_ = "";
+        bitField0_ = (bitField0_ & ~0x00000100);
+        exceptionClass_ = "";
+        bitField0_ = (bitField0_ & ~0x00000200);
         return this;
       }
 
@@ -83419,6 +83565,14 @@ public final class Messages {
           to_bitField0_ |= 0x00000080;
         }
         result.empireId_ = empireId_;
+        if (((from_bitField0_ & 0x00000100) == 0x00000100)) {
+          to_bitField0_ |= 0x00000100;
+        }
+        result.context_ = context_;
+        if (((from_bitField0_ & 0x00000200) == 0x00000200)) {
+          to_bitField0_ |= 0x00000200;
+        }
+        result.exceptionClass_ = exceptionClass_;
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
@@ -83470,6 +83624,16 @@ public final class Messages {
         }
         if (other.hasEmpireId()) {
           setEmpireId(other.getEmpireId());
+        }
+        if (other.hasContext()) {
+          bitField0_ |= 0x00000100;
+          context_ = other.context_;
+          onChanged();
+        }
+        if (other.hasExceptionClass()) {
+          bitField0_ |= 0x00000200;
+          exceptionClass_ = other.exceptionClass_;
+          onChanged();
         }
         this.mergeUnknownFields(other.getUnknownFields());
         return this;
@@ -84004,6 +84168,154 @@ public final class Messages {
       public Builder clearEmpireId() {
         bitField0_ = (bitField0_ & ~0x00000080);
         empireId_ = 0;
+        onChanged();
+        return this;
+      }
+
+      // optional string context = 9;
+      private java.lang.Object context_ = "";
+      /**
+       * <code>optional string context = 9;</code>
+       */
+      public boolean hasContext() {
+        return ((bitField0_ & 0x00000100) == 0x00000100);
+      }
+      /**
+       * <code>optional string context = 9;</code>
+       */
+      public java.lang.String getContext() {
+        java.lang.Object ref = context_;
+        if (!(ref instanceof java.lang.String)) {
+          java.lang.String s = ((com.google.protobuf.ByteString) ref)
+              .toStringUtf8();
+          context_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>optional string context = 9;</code>
+       */
+      public com.google.protobuf.ByteString
+          getContextBytes() {
+        java.lang.Object ref = context_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          context_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>optional string context = 9;</code>
+       */
+      public Builder setContext(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000100;
+        context_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional string context = 9;</code>
+       */
+      public Builder clearContext() {
+        bitField0_ = (bitField0_ & ~0x00000100);
+        context_ = getDefaultInstance().getContext();
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional string context = 9;</code>
+       */
+      public Builder setContextBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000100;
+        context_ = value;
+        onChanged();
+        return this;
+      }
+
+      // optional string exception_class = 10;
+      private java.lang.Object exceptionClass_ = "";
+      /**
+       * <code>optional string exception_class = 10;</code>
+       */
+      public boolean hasExceptionClass() {
+        return ((bitField0_ & 0x00000200) == 0x00000200);
+      }
+      /**
+       * <code>optional string exception_class = 10;</code>
+       */
+      public java.lang.String getExceptionClass() {
+        java.lang.Object ref = exceptionClass_;
+        if (!(ref instanceof java.lang.String)) {
+          java.lang.String s = ((com.google.protobuf.ByteString) ref)
+              .toStringUtf8();
+          exceptionClass_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>optional string exception_class = 10;</code>
+       */
+      public com.google.protobuf.ByteString
+          getExceptionClassBytes() {
+        java.lang.Object ref = exceptionClass_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          exceptionClass_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>optional string exception_class = 10;</code>
+       */
+      public Builder setExceptionClass(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000200;
+        exceptionClass_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional string exception_class = 10;</code>
+       */
+      public Builder clearExceptionClass() {
+        bitField0_ = (bitField0_ & ~0x00000200);
+        exceptionClass_ = getDefaultInstance().getExceptionClass();
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional string exception_class = 10;</code>
+       */
+      public Builder setExceptionClassBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000200;
+        exceptionClass_ = value;
         onChanged();
         return this;
       }
@@ -85417,19 +85729,20 @@ public final class Messages {
       "AllianceRequestVote\022\n\n\002id\030\001 \001(\005\022\023\n\013allia" +
       "nce_id\030\002 \001(\005\022\033\n\023alliance_request_id\030\003 \001(" +
       "\005\022\021\n\tempire_id\030\004 \001(\005\022\r\n\005votes\030\005 \001(\005\022\014\n\004d",
-      "ate\030\006 \001(\003\"\264\001\n\013ErrorReport\022\027\n\017android_ver" +
+      "ate\030\006 \001(\003\"\336\001\n\013ErrorReport\022\027\n\017android_ver" +
       "sion\030\001 \001(\t\022\023\n\013phone_model\030\002 \001(\t\022\024\n\014packa" +
       "ge_name\030\003 \001(\t\022\023\n\013app_version\030\004 \001(\t\022\023\n\013st" +
       "ack_trace\030\005 \001(\t\022\017\n\007message\030\006 \001(\t\022\023\n\013repo" +
-      "rt_time\030\007 \001(\003\022\021\n\tempire_id\030\010 \001(\005\"K\n\014Erro" +
-      "rReports\022;\n\007reports\030\001 \003(\0132*.au.com.codek" +
-      "a.common.protobuf.ErrorReport*\344\001\n\025Situat" +
-      "ionReportFilter\022\013\n\007ShowAll\020\000\022\020\n\014MoveComp" +
-      "lete\020\001\022\024\n\020BuildCompleteAny\020\002\022\021\n\rFleetAtt" +
-      "acked\020\003\022\022\n\016FleetDestroyed\020\004\022\023\n\017FleetVict",
-      "orious\020\005\022\022\n\016ColonyAttacked\020\006\022\023\n\017ColonyDe" +
-      "stroyed\020\007\022\026\n\022BuildCompleteShips\020\010\022\031\n\025Bui" +
-      "ldCompleteBuilding\020\t"
+      "rt_time\030\007 \001(\003\022\021\n\tempire_id\030\010 \001(\005\022\017\n\007cont" +
+      "ext\030\t \001(\t\022\027\n\017exception_class\030\n \001(\t\"K\n\014Er" +
+      "rorReports\022;\n\007reports\030\001 \003(\0132*.au.com.cod" +
+      "eka.common.protobuf.ErrorReport*\344\001\n\025Situ" +
+      "ationReportFilter\022\013\n\007ShowAll\020\000\022\020\n\014MoveCo" +
+      "mplete\020\001\022\024\n\020BuildCompleteAny\020\002\022\021\n\rFleetA",
+      "ttacked\020\003\022\022\n\016FleetDestroyed\020\004\022\023\n\017FleetVi" +
+      "ctorious\020\005\022\022\n\016ColonyAttacked\020\006\022\023\n\017Colony" +
+      "Destroyed\020\007\022\026\n\022BuildCompleteShips\020\010\022\031\n\025B" +
+      "uildCompleteBuilding\020\t"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
       new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
@@ -85879,7 +86192,7 @@ public final class Messages {
           internal_static_au_com_codeka_common_protobuf_ErrorReport_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_au_com_codeka_common_protobuf_ErrorReport_descriptor,
-              new java.lang.String[] { "AndroidVersion", "PhoneModel", "PackageName", "AppVersion", "StackTrace", "Message", "ReportTime", "EmpireId", });
+              new java.lang.String[] { "AndroidVersion", "PhoneModel", "PackageName", "AppVersion", "StackTrace", "Message", "ReportTime", "EmpireId", "Context", "ExceptionClass", });
           internal_static_au_com_codeka_common_protobuf_ErrorReports_descriptor =
             getDescriptor().getMessageTypes().get(60);
           internal_static_au_com_codeka_common_protobuf_ErrorReports_fieldAccessorTable = new

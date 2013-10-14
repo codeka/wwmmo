@@ -18,13 +18,16 @@ public class ErrorReportsHandler extends RequestHandler {
     public void post() throws RequestException {
         Messages.ErrorReports error_reports_pb = getRequestBody(Messages.ErrorReports.class);
 
-        String sql = "INSERT INTO error_reports (report_date, empire_id, message, data) VALUES (?, ?, ?, ?)";
+        String sql = "INSERT INTO error_reports (report_date, empire_id, message, exception_class, context, data) " +
+                    " VALUES (?, ?, ?, ?, ?, ?)";
         try (SqlStmt stmt = DB.prepare(sql)) {
             for (Messages.ErrorReport pb : error_reports_pb.getReportsList()) {
                 stmt.setDateTime(1, new DateTime(pb.getReportTime()));
                 stmt.setInt(2, pb.getEmpireId());
                 stmt.setString(3, pb.getMessage());
-                stmt.setBlob(4, pb.toByteArray());
+                stmt.setString(4, pb.getExceptionClass());
+                stmt.setString(5, pb.getContext());
+                stmt.setBlob(6, pb.toByteArray());
                 stmt.update();
             }
         } catch(Exception e) {

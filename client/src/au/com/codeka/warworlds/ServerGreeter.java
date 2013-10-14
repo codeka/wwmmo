@@ -264,7 +264,7 @@ public class ServerGreeter {
                     Notifications.startLongPoll();
 
                     // make sure we're correctly registered as online.
-                    BackgroundDetector.getInstance().onBackgroundStatusChange(activity);
+                    BackgroundDetector.i.onBackgroundStatusChange(activity);
 
                     mServerGreeting.mMessageOfTheDay = result;
                     mServerGreeting.mColonies = mColonies;
