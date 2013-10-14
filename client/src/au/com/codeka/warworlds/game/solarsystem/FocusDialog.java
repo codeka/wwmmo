@@ -47,9 +47,6 @@ public class FocusDialog extends DialogFragment {
     public void setColony(Star star, Colony colony) {
         mColony = colony;
         mPlanet = (Planet) star.getPlanets()[colony.getPlanetIndex() - 1];
-
-        int a = 0;
-        int b = 10 / a;
     }
 
     @Override
