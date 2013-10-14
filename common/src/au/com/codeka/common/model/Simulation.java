@@ -692,7 +692,10 @@ public class Simulation {
         }
         if (!enemyExists) {
             for (BaseFleet fleet : star.getFleets()) {
-                fleet.idle(now);
+                // switch back from attacking mode to idle
+                if (fleet.getState() == BaseFleet.State.ATTACKING) {
+                    fleet.idle(now);
+                }
             }
             return false;
         }

@@ -59,7 +59,11 @@ public class SitReportsHandler extends RequestHandler {
             }
         }
 
-        cursor = Long.toString(after.getMillis());
+        if (after == null) {
+            cursor = "";
+        } else {
+            cursor = Long.toString(after.getMillis());
+        }
         sitreps_pb.setCursor(cursor);
         setResponseBody(sitreps_pb.build());
     }
