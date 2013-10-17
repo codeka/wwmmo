@@ -71,59 +71,15 @@ public class SitrepActivity extends BaseActivity
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        requestWindowFeature(Window.FEATURE_NO_TITLE); // remove the title bar
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
+
+        setContentView(R.layout.sitrep);
 
         mStarSummaries = new TreeMap<String, StarSummary>();
         mSituationReportAdapter = new SituationReportAdapter();
 
         mStarKey = getIntent().getStringExtra("au.com.codeka.warworlds.StarKey");
         mHandler = new Handler();
-
-        int realmID = getIntent().getIntExtra("au.com.codeka.warworlds.RealmID", 0);
-        if (realmID != 0) {
-            RealmManager.i.selectRealm(realmID);
-        }
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-
-        setContentView(R.layout.sitrep);
-
-        final Spinner filterSpinner = (Spinner) findViewById(R.id.filter);
-        filterSpinner.setAdapter(new FilterAdapter());
-        filterSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                mFilter = (Messages.SituationReportFilter) filterSpinner.getSelectedItem();
-                refreshReportItems();
-            }
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-            }
-        });
-
-        final Button markReadBtn = (Button) findViewById(R.id.mark_read);
-        if (mStarKey != null) {
-            markReadBtn.setVisibility(View.GONE);
-        } else {
-            markReadBtn.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    markAsRead();
-                }
-            });
-        }
-
-        final CheckBox showOldItems = (CheckBox) findViewById(R.id.show_read);
-        showOldItems.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                mShowOldItems = showOldItems.isChecked();
-                refreshReportItems();
-            }
-        });
 
         final ListView reportItems = (ListView) findViewById(R.id.report_items);
         reportItems.setAdapter(mSituationReportAdapter);
@@ -171,7 +127,59 @@ public class SitrepActivity extends BaseActivity
             }
         });
 
-        refresh();
+        final Spinner filterSpinner = (Spinner) findViewById(R.id.filter);
+        filterSpinner.setAdapter(new FilterAdapter());
+        filterSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                mFilter = (Messages.SituationReportFilter) filterSpinner.getSelectedItem();
+                refreshReportItems();
+            }
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+            }
+        });
+
+        final Button markReadBtn = (Button) findViewById(R.id.mark_read);
+        if (mStarKey != null) {
+            markReadBtn.setVisibility(View.GONE);
+        } else {
+            markReadBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    markAsRead();
+                }
+            });
+        }
+
+        final CheckBox showOldItems = (CheckBox) findViewById(R.id.show_read);
+        showOldItems.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                mShowOldItems = showOldItems.isChecked();
+                refreshReportItems();
+            }
+        });
+
+        int realmID = getIntent().getIntExtra("au.com.codeka.warworlds.RealmID", 0);
+        if (realmID != 0) {
+            RealmManager.i.selectRealm(realmID);
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        ServerGreeter.waitForHello(this, new ServerGreeter.HelloCompleteHandler() {
+            @Override
+            public void onHelloComplete(boolean success, ServerGreeting greeting) {
+                if (!success) {
+                    startActivity(new Intent(SitrepActivity.this, WarWorldsActivity.class));
+                }
+                refresh();
+            }
+        });
     }
 
     @Override

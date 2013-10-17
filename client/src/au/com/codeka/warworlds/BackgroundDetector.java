@@ -34,10 +34,8 @@ import au.com.codeka.common.protobuf.Messages;
  * background.
  */
 public class BackgroundDetector {
-    private static BackgroundDetector sInstance = new BackgroundDetector();
-    public static BackgroundDetector getInstance() {
-        return sInstance;
-    }
+    public static BackgroundDetector i = new BackgroundDetector();
+
     private BackgroundDetector() {
         mIsInBackground = true;
         mIsTransitioningToBackground = false;
@@ -52,6 +50,12 @@ public class BackgroundDetector {
     private ArrayList<BackgroundChangeHandler> mBackgroundChangeHandlers;
     private boolean mIsTransitioningToBackground;
     private Handler mHandler;
+    private String mLastActivityName;
+
+    /** Gets the name (class name) of the last activity that was running. */
+    public String getLastActivityName() {
+        return mLastActivityName;
+    }
 
     public boolean isInBackground() {
         return mIsInBackground;
@@ -175,12 +179,12 @@ public class BackgroundDetector {
             mStartingActivityPackage = componentName.getPackageName();
         }
 
-        log.info("Starting activity: "+mStartingActivityPackage);
+        mLastActivityName = callingActivity.getLocalClassName();
     }
 
     public void onActivityPostResume(BaseActivity activity) {
-        log.info("Activity started.");
         mStartingActivityPackage = null;
+        mLastActivityName = activity.getLocalClassName();
     }
 
     public interface BackgroundChangeHandler {

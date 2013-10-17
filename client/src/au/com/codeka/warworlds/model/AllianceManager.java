@@ -59,7 +59,7 @@ public class AllianceManager {
 
             @Override
             protected void onComplete(List<Alliance> alliances) {
-                if (handler != null) {
+                if (handler != null && alliances != null) {
                     handler.onAlliancesFetched(alliances);
                 }
             }

@@ -54,7 +54,7 @@ public class ChatManager implements BackgroundDetector.BackgroundChangeHandler {
      * ready to start receiving chat messages.
      */
     public void setup(Context context) {
-        BackgroundDetector.getInstance().addBackgroundChangeHandler(this);
+        BackgroundDetector.i.addBackgroundChangeHandler(this);
 
         mHandler = new Handler();
         mConversations.clear();

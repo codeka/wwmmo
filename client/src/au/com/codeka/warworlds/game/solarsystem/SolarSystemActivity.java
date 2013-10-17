@@ -81,10 +81,10 @@ public class SolarSystemActivity extends BaseActivity implements StarManager.Sta
 
                 mStarPagerAdapter.setStarIDs(starIDs);
                 if (mInitialStarIndex >= 0) {
-                    mViewPager.setCurrentItem(mInitialStarIndex);
-
                     mStarPagerAdapter.setFragmentExtras(starIDs.get(mInitialStarIndex),
                                                         getIntent().getExtras());
+
+                    mViewPager.setCurrentItem(mInitialStarIndex);
                 }
             }
         });

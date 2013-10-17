@@ -49,8 +49,10 @@ public class DebugPurchasesPageHandler extends BasePageHandler {
             return getRenameEmpireSkuExtra(rs.getBytes("sku_extra"));
         } else if (skuName.equals("decorate_empire")) {
             return getDecorateEmpireSkuExtra(rs.getBytes("sku_extra"));
+        } else if (skuName.equals("star_rename")) {
+            return getStarRenameSkuExtra(rs.getBytes("sku_extra"));
         }
-        return null;
+        return "{}";
     }
 
     private static String getRenameEmpireSkuExtra(byte[] data) throws Exception {
@@ -60,6 +62,11 @@ public class DebugPurchasesPageHandler extends BasePageHandler {
 
     private static String getDecorateEmpireSkuExtra(byte[] data) throws Exception {
         Messages.EmpireChangeShieldRequest pb = Messages.EmpireChangeShieldRequest.parseFrom(data);
+        return PbFormatter.toJson(pb);
+    }
+
+    private static String getStarRenameSkuExtra(byte[] data) throws Exception {
+        Messages.StarRenameRequest pb = Messages.StarRenameRequest.parseFrom(data);
         return PbFormatter.toJson(pb);
     }
 }

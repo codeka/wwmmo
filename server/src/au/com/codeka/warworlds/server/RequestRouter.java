@@ -25,7 +25,6 @@ public class RequestRouter extends AbstractHandler {
 
     {
         sRoutes = new ArrayList<Route>();
-        sRoutes.add(new Route("^/login$", true, LoginHandler.class)); // <-- legacy login page
         sRoutes.add(new Route("login", LoginHandler.class));
         sRoutes.add(new Route("devices/({id}[0-9]*)$", DevicesHandler.class));
         sRoutes.add(new Route("devices$", DevicesHandler.class));
@@ -41,7 +40,8 @@ public class RequestRouter extends AbstractHandler {
         sRoutes.add(new Route("empires/({empire_id}[0-9]+)/cash-audit$", EmpiresCashAuditHandler.class));
         sRoutes.add(new Route("empires/({empire_id}[0-9]+)/display-name$", EmpiresDisplayNameHandler.class));
         sRoutes.add(new Route("empires/({empire_id}[0-9]+)/shield$", EmpiresShieldHandler.class));
-        sRoutes.add(new Route("empires/({empire_id}[0-9]+)/reset$", EmpireResetHandler.class));
+        sRoutes.add(new Route("empires/({empire_id}[0-9]+)/reset$", EmpiresResetHandler.class));
+        sRoutes.add(new Route("empires/({empire_id}[0-9]+)/ads$", EmpiresAdsHandler.class));
         sRoutes.add(new Route("buildqueue", BuildQueueHandler.class));
         sRoutes.add(new Route("sectors$", SectorsHandler.class));
         sRoutes.add(new Route("stars$", StarsHandler.class));
@@ -65,11 +65,13 @@ public class RequestRouter extends AbstractHandler {
         sRoutes.add(new Route("rankings/({year}[0-9]+)/({month}[0-9]+)$", RankingHistoryHandler.class));
         sRoutes.add(new Route("motd", MotdHandler.class));
         sRoutes.add(new Route("notifications$", NotificationHandler.class));
+        sRoutes.add(new Route("error-reports$", ErrorReportsHandler.class));
 
         sRoutes.add(new Route("admin/?$", DashboardPageHandler.class));
         sRoutes.add(new Route("admin/({path}actions/move-star)$", ActionsMoveStarPageHandler.class, "admin/"));
         sRoutes.add(new Route("admin/({path}actions/reset-empire)$", ActionsResetEmpirePageHandler.class, "admin/"));
         sRoutes.add(new Route("admin/debug/purchases$", DebugPurchasesPageHandler.class, "admin/"));
+        sRoutes.add(new Route("admin/debug/error-reports$", DebugErrorReportsPageHandler.class, "admin/"));
         sRoutes.add(new Route("admin/?({path}.*)", HtmlPageHandler.class, "admin/"));
         sRoutes.add(new Route("intel/?({path}$)", HtmlPageHandler.class, "intel/"));
         sRoutes.add(new Route("intel/({path}.*)", StaticFileHandler.class, "intel/"));
@@ -114,9 +116,6 @@ public class RequestRouter extends AbstractHandler {
 
         public Route(String pattern, Class<?> handlerClass) {
             this(pattern, handlerClass, null);
-        }
-        public Route(String pattern, boolean dontAddRealm, Class<?> handlerClass) {
-            this(pattern, dontAddRealm, handlerClass, null);
         }
         public Route(String pattern, Class<?> handlerClass, String extraOption) {
             this("^/realms/({realm}[a-z]+)/"+pattern, false, handlerClass, extraOption);

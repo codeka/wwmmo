@@ -78,14 +78,12 @@ public class FighterShipEffect extends ShipEffect {
             return;
         }
 
-        log.info(String.format("Fleet #%s arrived at star #%s, switching to attack mode.",
-                otherFleet.getKey(), star.getKey()));
+        log.info(String.format("Fleet #%s arrived at star #%s, #%s switching to attack mode.",
+                otherFleet.getKey(), star.getKey(), fleet.getKey()));
         ((Fleet) fleet).attack(DateTime.now());
     }
 
-    /**
-     * This is called if we're idle and someone attacks us.
-     */
+    /** This is called if we're idle and someone attacks us. */
     @Override
     public void onAttacked(BaseStar star, BaseFleet fleet) {
         log.info(String.format("Fleet #%s has been attacked, switching to attack mode.", fleet.getKey()));

@@ -312,7 +312,9 @@ public class RequestManager {
     }
 
     private static void fireRequestManagerStateChangedHandlers() {
-        for(RequestManagerStateChangedHandler handler : sRequestManagerStateChangedHandlers) {
+        ArrayList<RequestManagerStateChangedHandler> handlers = new ArrayList<RequestManagerStateChangedHandler>(
+                sRequestManagerStateChangedHandlers);
+        for(RequestManagerStateChangedHandler handler : handlers) {
             handler.onStateChanged();
         }
     }

@@ -1,5 +1,6 @@
 package au.com.codeka.warworlds.ctrl;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
@@ -13,17 +14,21 @@ import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.FrameLayout;
-
-import com.google.ads.AdRequest;
-import com.google.ads.AdSize;
-import com.google.ads.AdView;
-
+import au.com.codeka.BackgroundRunner;
+import au.com.codeka.common.protobuf.Messages;
+import au.com.codeka.warworlds.api.ApiClient;
+import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.PurchaseManager;
 import au.com.codeka.warworlds.model.billing.IabException;
 import au.com.codeka.warworlds.model.billing.IabHelper;
 import au.com.codeka.warworlds.model.billing.IabResult;
 import au.com.codeka.warworlds.model.billing.Inventory;
 import au.com.codeka.warworlds.model.billing.Purchase;
+import au.com.codeka.warworlds.model.billing.SkuDetails;
+
+import com.google.ads.AdRequest;
+import com.google.ads.AdSize;
+import com.google.ads.AdView;
 
 /**
  * This is our subclass of \c AdView that adds the "standard" properties automatically.
@@ -151,7 +156,7 @@ public class BannerAdView extends FrameLayout {
             PurchaseManager.i.launchPurchaseFlow((Activity) mContext, "remove_ads",
                         new IabHelper.OnIabPurchaseFinishedListener() {
                 @Override
-                public void onIabPurchaseFinished(IabResult result, final Purchase info) {
+                public void onIabPurchaseFinished(IabResult result, final Purchase purchase) {
                     boolean isSuccess = result.isSuccess();
                     if (result.isFailure() && result.getResponse() == IabHelper.BILLING_RESPONSE_RESULT_ITEM_ALREADY_OWNED) {
                         // if they've already purchased a star-renamed, but not reclaimed it, then
@@ -162,14 +167,56 @@ public class BannerAdView extends FrameLayout {
                     if (isSuccess) {
                         sAdsRemoved = true;
                         setVisibility(View.GONE);
+
+                        // also post to the server so that we can save the fact that you've bought it
+                        if (purchase != null) {
+                            postRemovalToServer(purchase);
+                        }
                     }
                 }
             });
-
         } catch (IabException e) {
             log.error("Couldn't get SKU details!", e);
             return;
         }
+    }
 
+    private void postRemovalToServer(final Purchase purchase) {
+        new BackgroundRunner<Boolean>() {
+            @Override
+            protected Boolean doInBackground() {
+                String price = "???";
+                SkuDetails sku = null;
+                try {
+                    sku = PurchaseManager.i.getInventory().getSkuDetails(purchase.getSku());
+                } catch (IabException e1) {
+                }
+                if (sku != null) {
+                    price = sku.getPrice();
+                }
+
+                String url = "empires/" + EmpireManager.i.getEmpire().getKey() + "/ads";
+
+                Messages.EmpireAdsRemoveRequest pb = Messages.EmpireAdsRemoveRequest.newBuilder()
+                        .setPurchaseInfo(Messages.PurchaseInfo.newBuilder()
+                                .setSku(purchase.getSku())
+                                .setOrderId(purchase.getOrderId())
+                                .setPrice(price)
+                                .setToken(purchase.getToken())
+                                .setDeveloperPayload(purchase.getDeveloperPayload()))
+                        .build();
+                try {
+                    ApiClient.putProtoBuf(url, pb, null);
+                } catch(Exception e) {
+                    log.error(ExceptionUtils.getStackTrace(e));
+                }
+
+                return true;
+            }
+
+            @Override
+            protected void onComplete(Boolean sectors) {
+            }
+        }.execute();
     }
 }
