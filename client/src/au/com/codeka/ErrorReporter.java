@@ -129,6 +129,7 @@ public class ErrorReporter {
                         ApiClient.postProtoBuf("error-reports", error_reports_pb.build());
                     } catch(Exception e) {
                         log.error("Exception caught sending error reports.", e);
+                        return false;
                     }
 
                     return true;
@@ -136,7 +137,9 @@ public class ErrorReporter {
 
                 @Override
                 protected void onComplete(Boolean result) {
-                    clearErrorReports(errorReportFiles);
+                    if (result) {
+                        clearErrorReports(errorReportFiles);
+                    }
                 }
             }.execute();
         }

@@ -6,8 +6,6 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.protobuf.InvalidProtocolBufferException;
-
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
@@ -28,6 +26,8 @@ import au.com.codeka.warworlds.model.Colony;
 import au.com.codeka.warworlds.model.Planet;
 import au.com.codeka.warworlds.model.Star;
 import au.com.codeka.warworlds.model.StarManager;
+
+import com.google.protobuf.InvalidProtocolBufferException;
 
 public class FocusDialog extends DialogFragment {
     private static Logger log = LoggerFactory.getLogger(FocusDialog.class);
