@@ -2,9 +2,6 @@ package au.com.codeka.warworlds.ctrl;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
-
-import org.apache.commons.lang3.StringUtils;
 
 import android.content.Context;
 import android.util.AttributeSet;
@@ -13,9 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.TextView;
 import au.com.codeka.common.model.BaseFleet;
-import au.com.codeka.common.model.Design;
 import au.com.codeka.common.model.DesignKind;
 import au.com.codeka.common.model.ShipDesign;
 import au.com.codeka.warworlds.R;
