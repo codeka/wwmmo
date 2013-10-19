@@ -1,31 +1,76 @@
 package au.com.codeka.warworlds;
 
-import android.annotation.SuppressLint;
+import org.andengine.engine.camera.Camera;
+import org.andengine.engine.camera.ZoomCamera;
+import org.andengine.engine.options.EngineOptions;
+import org.andengine.engine.options.ScreenOrientation;
+import org.andengine.engine.options.resolutionpolicy.RatioResolutionPolicy;
+import org.andengine.ui.activity.SimpleLayoutGameActivity;
+
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.PixelFormat;
+import android.graphics.Point;
 import android.hardware.Sensor;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
-import android.support.v4.app.FragmentActivity;
+import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.Gravity;
 import android.view.Surface;
+import android.view.Window;
 import android.view.WindowManager;
 import au.com.codeka.warworlds.ctrl.DebugView;
 import au.com.codeka.warworlds.model.PurchaseManager;
 
-@SuppressLint("Registered") // it's a base class
-public class BaseActivity extends FragmentActivity {
+/**
+ * This is a base class for our activities which inherit from andengine's BaseActivity. We have to
+ * duplicate a few things that come from our own BaseActivity.
+ */
+public abstract class BaseGlActivity extends SimpleLayoutGameActivity {
     private SensorManager mSensorManager;
     private Sensor mAccelerometer;
     private DebugView mDebugView;
     private WindowManager.LayoutParams mDebugViewLayout;
     private SensorEventListener mBugReportShakeListener = new BugReportSensorListener(this);
 
+    protected int mCameraWidth;
+    protected int mCameraHeight;
+
+    protected Camera mCamera;
+
+    private void getRealDisplaySize(Point pt) {
+        DisplayMetrics dm = getResources().getDisplayMetrics();
+        pt.x = dm.widthPixels;
+        pt.y = dm.heightPixels;
+
+        int resId = getResources().getIdentifier("status_bar_height", "dimen", "android");
+        if (resId > 0) {
+            pt.y -= getResources().getDimensionPixelSize(resId);
+        }
+    }
+
+    @Override
+    public EngineOptions onCreateEngineOptions() {
+        Point size = new Point();
+        getRealDisplaySize(size);
+        mCameraWidth = size.x;
+        mCameraHeight = size.y;
+
+        mCamera = createCamera();
+        return new EngineOptions(false, ScreenOrientation.PORTRAIT_SENSOR,
+                new RatioResolutionPolicy(mCameraWidth, mCameraHeight), mCamera);
+    }
+
+    /** Create the camera, we create a ZoomCamera by default. */
+    protected Camera createCamera() {
+        return new ZoomCamera(0, 0, mCameraWidth, mCameraHeight);
+    }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        getWindow().requestFeature(Window.FEATURE_NO_TITLE);
         super.onCreate(savedInstanceState);
 
         // register our bug report shake listener with the accelerometer
@@ -102,5 +147,4 @@ public class BaseActivity extends FragmentActivity {
             return true;
         }
         return false;
-    }
-}
+    }}

@@ -1,15 +1,13 @@
 package au.com.codeka.warworlds.game.starfield;
 
-import android.content.Intent;
-import android.os.Bundle;
-import android.view.Window;
-import au.com.codeka.common.model.BaseStar;
-import au.com.codeka.warworlds.BaseActivity;
+import org.andengine.entity.scene.Scene;
+
+import au.com.codeka.warworlds.BaseGlActivity;
 import au.com.codeka.warworlds.R;
 
-public class TacticalMapActivity extends BaseActivity {
-    private TacticalMapView mTacticalMapView;
-
+public class TacticalMapActivity extends BaseGlActivity {
+    private TacticalMapSceneManager mSceneManager;
+/*
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -43,5 +41,42 @@ public class TacticalMapActivity extends BaseActivity {
                 finish();
             }
         });
+    }
+*/
+
+    public TacticalMapActivity() {
+        mSceneManager = new TacticalMapSceneManager(this);
+    }
+
+    @Override
+    protected int getLayoutID() {
+        return R.layout.tactical_map;
+    }
+
+    @Override
+    protected int getRenderSurfaceViewID() {
+        return R.id.tactical_map;
+    }
+
+    @Override
+    public void onCreateResources() {
+        mSceneManager.onLoadResources();
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        mSceneManager.onStart();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        mSceneManager.onStop();
+    }
+
+    @Override
+    protected Scene onCreateScene() {
+        return mSceneManager.createScene();
     }
 }

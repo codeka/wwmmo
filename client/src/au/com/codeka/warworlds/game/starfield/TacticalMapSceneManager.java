@@ -5,6 +5,15 @@ import java.util.List;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
+import org.andengine.entity.primitive.Rectangle;
+import org.andengine.entity.scene.Scene;
+import org.andengine.entity.scene.background.Background;
+import org.andengine.entity.shape.Shape;
+import org.andengine.entity.sprite.Sprite;
+import org.andengine.opengl.texture.TextureOptions;
+import org.andengine.opengl.texture.atlas.bitmap.BitmapTextureAtlas;
+import org.andengine.opengl.texture.atlas.bitmap.BitmapTextureAtlasTextureRegionFactory;
+import org.andengine.opengl.texture.region.TiledTextureRegion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,53 +40,62 @@ import au.com.codeka.warworlds.model.EmpireShieldManager;
 import au.com.codeka.warworlds.model.Sector;
 import au.com.codeka.warworlds.model.SectorManager;
 
-public class TacticalMapView extends SectorView
+public class TacticalMapSceneManager extends SectorSceneManager
                              implements SectorManager.OnSectorListChangedListener,
                                         EmpireShieldManager.EmpireShieldUpdatedHandler {
-    private static final Logger log = LoggerFactory.getLogger(TacticalMapView.class);
+    private static final Logger log = LoggerFactory.getLogger(TacticalMapSceneManager.class);
 
-    private Paint mPointPaint;
-    private Paint mInfluencePaint;
-    private DoubleTapHandler mDoubleTapHandler;
+    private Scene mScene;
+    private TacticalPointCloud mPointCloud;
+    private TacticalVoronoi mVoronoi;
+    private TreeMap<String, TacticalControlField> mControlFields;
 
-    private float mDragOffsetX;
-    private float mDragOffsetY;
+    private BitmapTextureAtlas mBitmapTextureAtlas;
+    private TiledTextureRegion mStarTextureRegion;
 
-    TacticalPointCloud mPointCloud;
-    TacticalVoronoi mVoronoi;
-    TreeMap<String, TacticalControlField> mControlFields;
-
-    public TacticalMapView(Context context, AttributeSet attrs) {
-        super(context, attrs);
-        if (this.isInEditMode()) {
-            return;
-        }
-
+    public TacticalMapSceneManager(TacticalMapActivity activity) {
+        super(activity);
         mSectorRadius = 2;
 
         log.info("Tactical map initializing...");
-        mPointPaint = new Paint();
-        mPointPaint.setARGB(255, 255, 0, 0);
-        mPointPaint.setStyle(Style.FILL);
-
-        mInfluencePaint = new Paint();
-        mInfluencePaint.setStyle(Style.FILL);
-    }
-
-    public void setDoubleTapHandler(DoubleTapHandler handler) {
-        mDoubleTapHandler = handler;
     }
 
     @Override
-    protected void onAttachedToWindow() {
-        super.onAttachedToWindow();
+    public void onLoadResources() {
+        mBitmapTextureAtlas = new BitmapTextureAtlas(mActivity.getTextureManager(), 32, 32,
+                TextureOptions.BILINEAR_PREMULTIPLYALPHA);
+        BitmapTextureAtlasTextureRegionFactory.setAssetBasePath("img/");
+        mStarTextureRegion = BitmapTextureAtlasTextureRegionFactory.createTiledFromAsset(mBitmapTextureAtlas, mActivity,
+                "tactical_star.png", 0, 0, 1, 1);
+        mActivity.getTextureManager().loadTexture(mBitmapTextureAtlas);
+    }
+
+    @Override
+    public Scene createScene() {
+        mScene = new Scene();
+        mScene.setBackground(new Background(0.09804f, 0.6274f, 0.8784f));
+
+        refreshControlField();
+        mPointCloud.addToScene(mScene);
+
+        return mScene;
+
+    }
+
+    public void setDoubleTapHandler(DoubleTapHandler handler) {
+        
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
         SectorManager.getInstance().addSectorListChangedListener(this);
         EmpireShieldManager.i.addEmpireShieldUpdatedHandler(this);
     }
 
     @Override
-    protected void onDetachedFromWindow() {
-        super.onDetachedFromWindow();
+    protected void onStop() {
+        super.onStop();
         SectorManager.getInstance().removeSectorListChangedListener(this);
         EmpireShieldManager.i.removeEmpireShieldUpdatedHandler(this);
     }
@@ -88,23 +106,22 @@ public class TacticalMapView extends SectorView
 
         refreshControlField();
     }
-
+/*
     @Override
     protected GestureDetector.OnGestureListener createGestureListener() {
         return new GestureListener();
     }
-
+*/
     /** Called when an empire's shield is updated, we'll have to refresh the list. */
     @Override
     public void onEmpireShieldUpdated(int empireID) {
-        invalidate();
+        //invalidate();
     }
-
+/*
     @Override
     public void onDraw(Canvas canvas) {
         if (mScrollToCentre) {
-            scroll(getWidth() /*/ getPixelScale()*/,
-                   getHeight() /*/ getPixelScale()*/);
+            scroll(getWidth(), getHeight());
             mScrollToCentre = false;
         }
 
@@ -133,7 +150,7 @@ public class TacticalMapView extends SectorView
 
         mPointCloud.render(canvas);
     }
-
+*/
     private void refreshControlField() {
         SectorManager sm = SectorManager.getInstance();
 
@@ -186,8 +203,8 @@ public class TacticalMapView extends SectorView
             }
         }
 
-        mDragOffsetX = 0.0f;
-        mDragOffsetY = 0.0f;
+        //mDragOffsetX = 0.0f;
+        //mDragOffsetY = 0.0f;
 
         mControlFields = new TreeMap<String, TacticalControlField>();
         mPointCloud = new TacticalPointCloud(points);
@@ -218,13 +235,13 @@ public class TacticalMapView extends SectorView
         public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX,
                 float distanceY) {
             // we move double the distance because our view is scaled by half.
-            scroll(-(float)(distanceX * 2.0 / getPixelScale()),
-                   -(float)(distanceY * 2.0 / getPixelScale()));
+            scroll(-(float)(distanceX * 2.0),
+                   -(float)(distanceY * 2.0));
 
-            mDragOffsetX += -(float)(distanceX * 2.0 / getPixelScale());
-            mDragOffsetY += -(float)(distanceY * 2.0 / getPixelScale());
+            //mDragOffsetX += -(float)(distanceX * 2.0);
+            //mDragOffsetY += -(float)(distanceY * 2.0);
 
-            redraw();
+            //invalidate();
             return false;
         }
 
@@ -234,15 +251,15 @@ public class TacticalMapView extends SectorView
          */
         @Override
         public boolean onDoubleTap(MotionEvent e) {
-            float tapX = (e.getX() - mDragOffsetX) / 256.0f;
-            float tapY = (e.getY() - mDragOffsetY) / 256.0f;
+            //float tapX = (e.getX() - mDragOffsetX) / 256.0f;
+            //float tapY = (e.getY() - mDragOffsetY) / 256.0f;
 
-            BaseStar star = mPointCloud.findStarNear(new Vector2(tapX, tapY));
-            if (star != null) {
-                if (mDoubleTapHandler != null) {
-                   mDoubleTapHandler.onDoubleTapped(star);
-                }
-            }
+            //BaseStar star = mPointCloud.findStarNear(new Vector2(tapX, tapY));
+            //if (star != null) {
+                //if (mDoubleTapHandler != null) {
+                //   mDoubleTapHandler.onDoubleTapped(star);
+                //}
+            //}
 
             return false;
         }
@@ -252,12 +269,24 @@ public class TacticalMapView extends SectorView
         public TacticalPointCloud(ArrayList<Vector2> points) {
             super(points);
         }
-
+/*
         public void render(Canvas canvas) {
             for (Vector2 p : mPoints) {
                 float x = (float)(p.x * 256.0) + mDragOffsetX;
                 float y = (float)(p.y * 256.0) + mDragOffsetY;
                 canvas.drawCircle(x, y, 5.0f, mPointPaint);
+            }
+        }
+*/
+        public void addToScene(Scene scene) {
+            for (Vector2 p : mPoints) {
+                Sprite sprite = new Sprite(
+                        (float)(p.x * 256.0),
+                        (float)(p.y * 256.0),
+                        15.0f, 15.0f,
+                        mStarTextureRegion,
+                        mActivity.getVertexBufferObjectManager());
+                mScene.attachChild(sprite);
             }
         }
 
@@ -293,7 +322,7 @@ public class TacticalMapView extends SectorView
         public TacticalControlField(PointCloud pointCloud, Voronoi voronoi) {
             super(pointCloud, voronoi);
         }
-
+/*
         public void render(Canvas canvas, Paint paint) {
             Path path = new Path();
             for (Vector2 pt : mOwnedPoints) {
@@ -313,6 +342,7 @@ public class TacticalMapView extends SectorView
             }
             canvas.drawPath(path, paint);
         }
+*/
     }
 
     private class TacticalVoronoi extends Voronoi {
