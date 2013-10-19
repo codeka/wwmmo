@@ -88,10 +88,14 @@ public class Sprite {
     }
 
     public void draw(Canvas canvas) {
-        draw(canvas, 0);
+        draw(canvas, 0, null);
     }
 
     public void draw(Canvas canvas, int frameNo) {
+        draw(canvas, 0, null);
+    }
+
+    public void draw(Canvas canvas, int frameNo, Rect destRect) {
         if (sPaint == null) {
             sPaint = new Paint();
             sPaint.setARGB(255, 255, 255, 255);
@@ -100,9 +104,12 @@ public class Sprite {
         }
 
         SpriteFrame frame = getFrame(frameNo);
-        if (mScale == 1.0f) {
+        if (mScale == 1.0f || destRect != null) {
+            if (destRect == null) {
+                destRect = new Rect(0, 0, frame.getWidth(), frame.getHeight());
+            }
             canvas.drawBitmap(mImage.getBitmap(), frame.getRect(),
-                              new Rect(0, 0, frame.getWidth(), frame.getHeight()), sPaint);
+                              destRect, sPaint);
         } else {
             float oneMinusScale = 1.0f - mScale;
             int sideBorder = (int)(oneMinusScale * 0.5f * frame.getWidth());

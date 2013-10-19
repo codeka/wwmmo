@@ -3,7 +3,9 @@ package au.com.codeka.warworlds.model;
 import android.graphics.Canvas;
 import android.graphics.ColorFilter;
 import android.graphics.PixelFormat;
+import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
+import android.view.Gravity;
 
 /**
  * This is an implementation of \c Drawable that draws a \c Sprite.
@@ -11,6 +13,9 @@ import android.graphics.drawable.Drawable;
 public class SpriteDrawable extends Drawable {
     private Sprite mSprite;
     private int mFrameNo;
+    private int mGravity;
+    private boolean mApplyGravity;
+    private Rect mGravityRect;
 
     public SpriteDrawable(Sprite sprite) {
         mSprite = sprite;
@@ -21,9 +26,24 @@ public class SpriteDrawable extends Drawable {
         mFrameNo = frameNo;
     }
 
+    public void setGravity(int gravity) {
+        if (mGravity != gravity) {
+            mGravity = gravity;
+            mApplyGravity = true;
+        }
+    }
+    public int getGravity() {
+        return mGravity;
+    }
+
     @Override
     public void draw(Canvas canvas) {
-        mSprite.draw(canvas, mFrameNo);
+        if (mApplyGravity) {
+            mGravityRect = new Rect();
+            Gravity.apply(mGravity, mSprite.getWidth(), mSprite.getHeight(),
+                          getBounds(), mGravityRect);
+        }
+        mSprite.draw(canvas, mFrameNo, mGravityRect);
     }
 
     @Override

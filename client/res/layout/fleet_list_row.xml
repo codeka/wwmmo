@@ -11,31 +11,31 @@
         android:layout_centerVertical="true"
         android:layout_marginRight="4dp" />
 
-    <TextView
+    <LinearLayout
         android:id="@+id/ship_row1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignTop="@+id/ship_icon"
         android:layout_toRightOf="@+id/ship_icon"
-        android:textAppearance="?android:attr/textAppearanceSmall"
-        android:text="Row 1" />
+        android:gravity="center_vertical"
+        android:orientation="horizontal" />
 
-    <TextView
+    <LinearLayout
         android:id="@+id/ship_row2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerVertical="true"
         android:layout_toRightOf="@+id/ship_icon"
-        android:textAppearance="?android:attr/textAppearanceSmall"
-        android:text="Row 2" />
+        android:gravity="center_vertical"
+        android:orientation="horizontal" />
 
-    <TextView
+    <LinearLayout
         android:id="@+id/ship_row3"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_toRightOf="@+id/ship_icon"
         android:layout_alignBottom="@+id/ship_icon"
-        android:textAppearance="?android:attr/textAppearanceSmall"
-        android:text="Row 3" />
+        android:gravity="center_vertical"
+        android:orientation="horizontal" />
 
 </RelativeLayout>

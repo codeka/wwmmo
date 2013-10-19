@@ -17,6 +17,7 @@ import android.widget.TextView;
 import au.com.codeka.common.model.BaseFleet;
 import au.com.codeka.common.model.Design;
 import au.com.codeka.common.model.DesignKind;
+import au.com.codeka.common.model.ShipDesign;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.model.DesignManager;
 import au.com.codeka.warworlds.model.Fleet;
@@ -87,20 +88,17 @@ public class FleetListSimple extends LinearLayout {
     }
 
     private View getRowView(LayoutInflater inflater, Fleet fleet) {
-        View view = (ViewGroup) inflater.inflate(R.layout.starfield_planet, null);
+        View view = (ViewGroup) inflater.inflate(R.layout.fleet_list_simple_row, null);
+        ShipDesign design = (ShipDesign) DesignManager.i.getDesign(DesignKind.SHIP, fleet.getDesignID());
 
-        final ImageView icon = (ImageView) view.findViewById(R.id.starfield_planet_icon);
-        Design design = DesignManager.i.getDesign(DesignKind.SHIP, fleet.getDesignID());
+        ImageView icon = (ImageView) view.findViewById(R.id.fleet_icon);
+        LinearLayout row1 = (LinearLayout) view.findViewById(R.id.ship_row1);
+        LinearLayout row2 = (LinearLayout) view.findViewById(R.id.ship_row2);
 
         icon.setImageDrawable(new SpriteDrawable(SpriteManager.i.getSprite(design.getSpriteName())));
 
-        TextView shipKindTextView = (TextView) view.findViewById(R.id.starfield_planet_type);
-        shipKindTextView.setText(String.format("%d × %s",
-                (int) Math.ceil(fleet.getNumShips()), design.getDisplayName(fleet.getNumShips() > 1)));
-
-        final TextView shipCountTextView = (TextView) view.findViewById(R.id.starfield_planet_colony);
-        shipCountTextView.setText(String.format("%s",
-                StringUtils.capitalize(fleet.getStance().toString().toLowerCase(Locale.ENGLISH))));
+        FleetList.populateFleetNameRow(mContext, row1, fleet, design);
+        FleetList.populateFleetStanceRow(mContext, row2, fleet);
 
         view.setOnClickListener(mOnClickListener);
         view.setTag(fleet);

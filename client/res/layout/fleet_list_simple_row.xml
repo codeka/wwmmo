@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:baselineAligned="false"
+    android:background="@drawable/list_selector" >
+
+    <ImageView
+        android:id="@+id/fleet_icon"
+        android:layout_width="32dp"
+        android:layout_height="32dp" />
+
+    <LinearLayout
+        android:id="@+id/ship_row1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@+id/fleet_icon"
+        android:layout_alignParentTop="true"
+        android:gravity="center_vertical"
+        android:orientation="horizontal" />
+
+    <LinearLayout
+        android:id="@+id/ship_row2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@+id/fleet_icon"
+        android:layout_below="@id/ship_row1"
+        android:gravity="center_vertical"
+        android:orientation="horizontal" />
+
+    <View android:id="@+id/separator"
+          android:layout_width="match_parent"
+          android:layout_height="1px"
+          android:layout_alignParentBottom="true"
+          android:background="#33ffffff" />
+</RelativeLayout>

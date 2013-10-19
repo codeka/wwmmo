@@ -14,6 +14,7 @@ import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.text.Html;
+import android.text.TextUtils.TruncateAt;
 import android.util.AttributeSet;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -25,12 +26,14 @@ import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.SpinnerAdapter;
 import android.widget.TextView;
 import au.com.codeka.TimeInHours;
 import au.com.codeka.common.model.BaseFleet;
+import au.com.codeka.common.model.BaseFleetUpgrade;
 import au.com.codeka.common.model.DesignKind;
 import au.com.codeka.common.model.ShipDesign;
 import au.com.codeka.warworlds.R;
@@ -279,21 +282,19 @@ public class FleetList extends FrameLayout implements StarManager.StarFetchedHan
     public static void populateFleetRow(final Context context, final Map<String, Star> stars, 
                                         View view, final Fleet fleet) {
         ImageView icon = (ImageView) view.findViewById(R.id.ship_icon);
-        final TextView row1 = (TextView) view.findViewById(R.id.ship_row1);
-        final TextView row2 = (TextView) view.findViewById(R.id.ship_row2);
-        final TextView row3 = (TextView) view.findViewById(R.id.ship_row3);
+        final LinearLayout row1 = (LinearLayout) view.findViewById(R.id.ship_row1);
+        final LinearLayout row2 = (LinearLayout) view.findViewById(R.id.ship_row2);
+        final LinearLayout row3 = (LinearLayout) view.findViewById(R.id.ship_row3);
+
+        row1.removeAllViews();
+        row2.removeAllViews();
+        row3.removeAllViews();
 
         ShipDesign design = (ShipDesign) DesignManager.i.getDesign(DesignKind.SHIP, fleet.getDesignID());
         icon.setImageDrawable(new SpriteDrawable(SpriteManager.i.getSprite(design.getSpriteName())));
 
-        String text = String.format(Locale.ENGLISH, "%d × %s",
-                    (int) Math.ceil(fleet.getNumShips()), design.getDisplayName(fleet.getNumShips() > 1));
-        row1.setText(text);
-
-        text = String.format("%s (stance: %s)",
-                             StringUtils.capitalize(fleet.getState().toString().toLowerCase(Locale.ENGLISH)),
-                             StringUtils.capitalize(fleet.getStance().toString().toLowerCase(Locale.ENGLISH)));
-        row2.setText(text);
+        populateFleetNameRow(context, row1, fleet, design);
+        populateFleetStanceRow(context, row2, fleet);
 
         if (fleet.getState() == Fleet.State.MOVING) {
             row3.setVisibility(View.GONE);
@@ -309,22 +310,22 @@ public class FleetList extends FrameLayout implements StarManager.StarFetchedHan
                                 srcStar = SectorManager.getInstance().findStar(fleet.getStarKey());
                             }
                             if (srcStar == null) {
-                                row3.setText("→ (unknown)");
+                                addTextToRow(context, row3, "→ (unknown)");
                             } else {
                                 float timeRemainingInHours = fleet.getTimeToDestination(srcStar, destStar);
-
+                                Sprite sprite = StarImageManager.getInstance().getSprite(destStar, -1, true);
                                 String eta = TimeInHours.format(timeRemainingInHours);
-                                String html = String.format("→ <img src=\"star\" width=\"16\" height=\"16\" /> %s <b>ETA:</b> %s",
+
+                                addTextToRow(context, row3, "→");
+                                addImageToRow(context, row3, sprite);
+                                String text = String.format("%s <b>ETA:</b> %s",
                                                             destStar.getName(), eta);
-                                row3.setText(Html.fromHtml(html, 
-                                                           new FleetListImageGetter(destStar),
-                                                           null));
+                                addTextToRow(context, row3, Html.fromHtml(text));
                             }
                             row3.setVisibility(View.VISIBLE);
                         }
                     });
         } else {
-            row3.setText("");
             row3.setVisibility(View.GONE);
 
             final MyEmpire myEmpire = EmpireManager.i.getEmpire();
@@ -335,36 +336,57 @@ public class FleetList extends FrameLayout implements StarManager.StarFetchedHan
                     row3.setVisibility(View.VISIBLE);
 
                     if (myEmpire.getKey().equals(empire.getKey())) {
-                        row3.setText(empire.getDisplayName());
+                        addTextToRow(context, row3, empire.getDisplayName());
                     } else {
-                        row3.setText(Html.fromHtml("<font color=\"red\">"+empire.getDisplayName()+"</font>"));
+                        addTextToRow(context, row3, Html.fromHtml("<font color=\"red\">"+empire.getDisplayName()+"</font>"));
                     }
                 }
             });
         }
     }
 
-    /**
-     * Fetches the inline images we use to display star icons and whatnot.
-     */
-    private static class FleetListImageGetter implements Html.ImageGetter {
-        private StarSummary mStarSummary;
-
-        public FleetListImageGetter(StarSummary starSummary) {
-            mStarSummary = starSummary;
-        }
-
-        @Override
-        public Drawable getDrawable(String source) {
-            if (mStarSummary != null) {
-                Sprite sprite = StarImageManager.getInstance().getSprite(mStarSummary, -1, true);
-                Drawable d = new SpriteDrawable(sprite);
-                d.setBounds(0, 0, d.getIntrinsicWidth(), d.getIntrinsicHeight());
-                return d;
-            } else {
-                return null;
+    public static void populateFleetNameRow(Context context, LinearLayout row, Fleet fleet, ShipDesign design) {
+        if (fleet.getUpgrades().size() == 0) {
+            String text = String.format(Locale.ENGLISH, "%d × %s",
+                    (int) Math.ceil(fleet.getNumShips()), design.getDisplayName(fleet.getNumShips() > 1));
+            addTextToRow(context, row, text);
+        } else {
+            String text = String.format(Locale.ENGLISH, "%d ×", (int) Math.ceil(fleet.getNumShips()));
+            addTextToRow(context, row, text);
+            for (BaseFleetUpgrade upgrade : fleet.getUpgrades()) {
+                Sprite sprite = SpriteManager.i.getSprite(design.getUpgrade(upgrade.getUpgradeID()).getSpriteName());
+                addImageToRow(context, row, sprite);
             }
+            text = String.format(Locale.ENGLISH, "%s", design.getDisplayName(fleet.getNumShips() > 1));
+            addTextToRow(context, row, text);
         }
+    }
+
+    public static void populateFleetStanceRow(Context context, LinearLayout row, Fleet fleet) {
+        String text = String.format("%s (stance: %s)",
+                StringUtils.capitalize(fleet.getState().toString().toLowerCase(Locale.ENGLISH)),
+                StringUtils.capitalize(fleet.getStance().toString().toLowerCase(Locale.ENGLISH)));
+        addTextToRow(context, row, text);
+    }
+
+    private static void addTextToRow(Context context, LinearLayout row, CharSequence text) {
+        TextView tv = new TextView(context);
+        tv.setText(text);
+        tv.setSingleLine(true);
+        tv.setEllipsize(TruncateAt.END);
+        row.addView(tv);
+    }
+
+    private static void addImageToRow(Context context, LinearLayout row, Sprite sprite) {
+        ImageView iv = new ImageView(context);
+        iv.setImageDrawable(new SpriteDrawable(sprite));
+
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT,
+                                                                     LinearLayout.LayoutParams.WRAP_CONTENT);
+        lp.setMargins(5, 0, 5, 0);
+        iv.setLayoutParams(lp);
+
+        row.addView(iv);
     }
 
     /**
