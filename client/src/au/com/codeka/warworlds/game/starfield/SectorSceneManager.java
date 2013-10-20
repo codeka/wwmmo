@@ -3,18 +3,19 @@ package au.com.codeka.warworlds.game.starfield;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.andengine.entity.scene.IOnSceneTouchListener;
 import org.andengine.entity.scene.Scene;
-import org.andengine.opengl.view.RenderSurfaceView;
+import org.andengine.entity.scene.background.Background;
+import org.andengine.input.touch.TouchEvent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import android.content.Context;
-import android.graphics.Canvas;
-import android.util.AttributeSet;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
+import android.view.ScaleGestureDetector;
 import au.com.codeka.common.Pair;
 import au.com.codeka.common.model.BaseStar;
 import au.com.codeka.warworlds.BaseGlActivity;
-import au.com.codeka.warworlds.game.UniverseElementSurfaceView;
 import au.com.codeka.warworlds.model.Sector;
 import au.com.codeka.warworlds.model.SectorManager;
 import au.com.codeka.warworlds.model.Star;
@@ -23,14 +24,20 @@ import au.com.codeka.warworlds.model.Star;
  * This is the base class for StarfieldSurfaceView and TacticalMapView, it contains the common code
  * for scrolling through sectors of stars, etc.
  */
-public abstract class SectorSceneManager implements SectorManager.OnSectorListChangedListener {
-    protected boolean mScrollToCentre = false;
+public abstract class SectorSceneManager implements SectorManager.OnSectorListChangedListener,
+                                                    IOnSceneTouchListener {
+    private static final Logger log = LoggerFactory.getLogger(SectorSceneManager.class);
+    private Scene mScene;
+    private GestureDetector mGestureDetector;
+    private ScaleGestureDetector mScaleGestureDetector;
     protected BaseGlActivity mActivity;
     protected int mSectorRadius = 1;
     protected long mSectorX;
     protected long mSectorY;
     protected float mOffsetX;
     protected float mOffsetY;
+    protected float mCameraX;
+    protected float mCameraY;
 
     public SectorSceneManager(BaseGlActivity activity) {
         mActivity = activity;
@@ -40,6 +47,15 @@ public abstract class SectorSceneManager implements SectorManager.OnSectorListCh
 
     protected void onStart() {
         SectorManager.getInstance().addSectorListChangedListener(this);
+
+        if (mGestureDetector == null) {
+            mGestureDetector = new GestureDetector(mActivity, createGestureListener());
+
+            ScaleGestureDetector.OnScaleGestureListener scaleListener = createScaleGestureListener();
+            if (scaleListener != null) {
+                mScaleGestureDetector = new ScaleGestureDetector(mActivity, scaleListener);
+            }
+        }
     }
 
     protected void onStop() {
@@ -48,11 +64,38 @@ public abstract class SectorSceneManager implements SectorManager.OnSectorListCh
 
     @Override
     public void onSectorListChanged() {
-        //invalidate();
+        mActivity.getEngine().runOnUpdateThread(new Runnable() {
+            @Override
+            public void run() {
+                refreshScene(mScene);
+                mCameraX = 0;
+                mCameraY = 0;
+            }
+        });
     }
 
     public abstract void onLoadResources();
-    public abstract Scene createScene();
+    protected abstract void refreshScene(Scene scene);
+
+    protected GestureDetector.OnGestureListener createGestureListener() {
+        return new GestureListener();
+    }
+
+    protected ScaleGestureDetector.OnScaleGestureListener createScaleGestureListener() {
+        return null;
+    }
+
+    public Scene createScene() {
+        mScene = new Scene();
+        mScene.setBackground(new Background(0.0f, 0.0f, 0.0f));
+        mScene.setOnSceneTouchListener(this);
+
+        refreshScene(mScene);
+        mCameraX = 0;
+        mCameraY = 0;
+
+        return mScene;
+    }
 
     /**
      * Scroll to the given sector (x,y) and offset into the sector.
@@ -67,11 +110,17 @@ public abstract class SectorSceneManager implements SectorManager.OnSectorListCh
     public void scrollTo(long sectorX, long sectorY, float offsetX, float offsetY, boolean centre) {
         mSectorX = sectorX;
         mSectorY = sectorY;
-        mOffsetX = -offsetX;
-        mOffsetY = -offsetY;
+        mOffsetX = offsetX;
+        mOffsetY = offsetY;
 
         if (centre) {
-            mScrollToCentre = true;
+            mActivity.getEngine().runOnUpdateThread(new Runnable() {
+                @Override
+                public void run() {
+                    scroll(mActivity.getCamera().getWidth() / 2.0f,
+                           mActivity.getCamera().getHeight() / 2.0f);
+                }
+            });
         }
 
         List<Pair<Long, Long>> missingSectors = new ArrayList<Pair<Long, Long>>();
@@ -90,7 +139,12 @@ public abstract class SectorSceneManager implements SectorManager.OnSectorListCh
             SectorManager.getInstance().requestSectors(missingSectors, false, null);
         }
 
-        //invalidate();
+        updateCamera();
+    }
+
+    private void updateCamera() {
+        log.debug("updating camera: sector=("+mSectorX+", "+mSectorY+") offset=("+mOffsetX+", "+mOffsetY+") camera=("+mCameraX+","+mCameraY+")");
+        mActivity.getCamera().setCenter(mCameraX, mCameraY);
     }
 
     /**
@@ -101,34 +155,37 @@ public abstract class SectorSceneManager implements SectorManager.OnSectorListCh
     public void scroll(float distanceX, float distanceY) {
         mOffsetX += distanceX;
         mOffsetY += distanceY;
+        mCameraX += distanceX;
+        mCameraY += distanceY;
 
         boolean needUpdate = false;
         while (mOffsetX < -(Sector.SECTOR_SIZE / 2)) {
             mOffsetX += Sector.SECTOR_SIZE;
-            mSectorX ++;
+            mSectorX --;
             needUpdate = true;
         }
         while (mOffsetX > (Sector.SECTOR_SIZE / 2)) {
             mOffsetX -= Sector.SECTOR_SIZE;
-            mSectorX --;
+            mSectorX ++;
             needUpdate = true;
         }
         while (mOffsetY < -(Sector.SECTOR_SIZE / 2)) {
             mOffsetY += Sector.SECTOR_SIZE;
-            mSectorY ++;
+            mSectorY --;
             needUpdate = true;
         }
         while (mOffsetY > (Sector.SECTOR_SIZE / 2)) {
             mOffsetY -= Sector.SECTOR_SIZE;
-            mSectorY --;
+            mSectorY ++;
             needUpdate = true;
         }
 
         if (needUpdate) {
-            scrollTo(mSectorX, mSectorY, -mOffsetX, -mOffsetY);
+            scrollTo(mSectorX, mSectorY, mOffsetX, mOffsetY);
+        } else {
+            updateCamera();
         }
     }
-
 
     /**
      * Gets the \c Star that's closest to the given (x,y), based on the current sector
@@ -187,6 +244,18 @@ public abstract class SectorSceneManager implements SectorManager.OnSectorListCh
         return null;
     }
 
+    @Override
+    public boolean onSceneTouchEvent(Scene scene, TouchEvent touchEvent) {
+        if (mGestureDetector == null) {
+            return false;
+        }
+
+        if (mScaleGestureDetector != null) {
+            mScaleGestureDetector.onTouchEvent(touchEvent.getMotionEvent());
+        }
+        return mGestureDetector.onTouchEvent(touchEvent.getMotionEvent());
+    }
+
     /**
      * Implements the \c OnGestureListener methods that we use to respond to
      * various touch events.
@@ -198,7 +267,6 @@ public abstract class SectorSceneManager implements SectorManager.OnSectorListCh
             scroll(-(float)(distanceX),
                    -(float)(distanceY));
 
-            //invalidate();
             return false;
         }
     }

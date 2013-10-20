@@ -2,6 +2,7 @@ package au.com.codeka.warworlds.game.starfield;
 
 import org.andengine.entity.scene.Scene;
 
+import android.os.Bundle;
 import au.com.codeka.warworlds.BaseGlActivity;
 import au.com.codeka.warworlds.R;
 
@@ -56,6 +57,11 @@ public class TacticalMapActivity extends BaseGlActivity {
     @Override
     protected int getRenderSurfaceViewID() {
         return R.id.tactical_map;
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
     }
 
     @Override

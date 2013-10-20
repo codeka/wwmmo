@@ -1,5 +1,7 @@
 package au.com.codeka.common;
 
+import java.util.Locale;
+
 import au.com.codeka.common.ObjectPool;
 import au.com.codeka.common.ObjectPool.Pooled;
 
@@ -116,6 +118,11 @@ public class Vector2 implements ObjectPool.Pooled {
         long lx = Double.doubleToRawLongBits(x);
         long ly = Double.doubleToRawLongBits(y);
         return (int) (lx ^ ly);
+    }
+
+    @Override
+    public String toString() {
+        return String.format(Locale.ENGLISH, "(%.4f, %.4f)", x, y);
     }
 
     @Override

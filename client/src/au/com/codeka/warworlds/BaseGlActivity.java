@@ -51,6 +51,10 @@ public abstract class BaseGlActivity extends SimpleLayoutGameActivity {
         }
     }
 
+    public Camera getCamera() {
+        return mCamera;
+    }
+
     @Override
     public EngineOptions onCreateEngineOptions() {
         Point size = new Point();

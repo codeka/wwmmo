@@ -1,57 +1,49 @@
 package au.com.codeka.warworlds.game.starfield;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Random;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-import org.andengine.entity.primitive.Rectangle;
+import org.andengine.engine.camera.ZoomCamera;
 import org.andengine.entity.scene.Scene;
-import org.andengine.entity.scene.background.Background;
-import org.andengine.entity.shape.Shape;
 import org.andengine.entity.sprite.Sprite;
 import org.andengine.opengl.texture.TextureOptions;
 import org.andengine.opengl.texture.atlas.bitmap.BitmapTextureAtlas;
 import org.andengine.opengl.texture.atlas.bitmap.BitmapTextureAtlasTextureRegionFactory;
+import org.andengine.opengl.texture.region.ITextureRegion;
 import org.andengine.opengl.texture.region.TiledTextureRegion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import android.content.Context;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.Paint.Style;
-import android.graphics.Path;
-import android.util.AttributeSet;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
+import android.view.ScaleGestureDetector;
 import au.com.codeka.common.Pair;
 import au.com.codeka.common.PointCloud;
-import au.com.codeka.common.Triangle;
 import au.com.codeka.common.Vector2;
 import au.com.codeka.common.Voronoi;
 import au.com.codeka.common.model.BaseColony;
 import au.com.codeka.common.model.BaseStar;
+import au.com.codeka.common.protobuf.Messages.Star;
 import au.com.codeka.controlfield.ControlField;
-import au.com.codeka.warworlds.model.Empire;
-import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.EmpireShieldManager;
 import au.com.codeka.warworlds.model.Sector;
 import au.com.codeka.warworlds.model.SectorManager;
 
 public class TacticalMapSceneManager extends SectorSceneManager
-                             implements SectorManager.OnSectorListChangedListener,
-                                        EmpireShieldManager.EmpireShieldUpdatedHandler {
+                             implements EmpireShieldManager.EmpireShieldUpdatedHandler {
     private static final Logger log = LoggerFactory.getLogger(TacticalMapSceneManager.class);
 
-    private Scene mScene;
     private TacticalPointCloud mPointCloud;
     private TacticalVoronoi mVoronoi;
     private TreeMap<String, TacticalControlField> mControlFields;
 
     private BitmapTextureAtlas mBitmapTextureAtlas;
-    private TiledTextureRegion mStarTextureRegion;
+    private TiledTextureRegion mNeutronTextureRegion;
+    private TiledTextureRegion mNormalTextureRegion;
 
     public TacticalMapSceneManager(TacticalMapActivity activity) {
         super(activity);
@@ -62,24 +54,21 @@ public class TacticalMapSceneManager extends SectorSceneManager
 
     @Override
     public void onLoadResources() {
-        mBitmapTextureAtlas = new BitmapTextureAtlas(mActivity.getTextureManager(), 32, 32,
+        mBitmapTextureAtlas = new BitmapTextureAtlas(mActivity.getTextureManager(), 128, 320,
                 TextureOptions.BILINEAR_PREMULTIPLYALPHA);
-        BitmapTextureAtlasTextureRegionFactory.setAssetBasePath("img/");
-        mStarTextureRegion = BitmapTextureAtlasTextureRegionFactory.createTiledFromAsset(mBitmapTextureAtlas, mActivity,
-                "tactical_star.png", 0, 0, 1, 1);
+        BitmapTextureAtlasTextureRegionFactory.setAssetBasePath("stars/");
+        mNormalTextureRegion = BitmapTextureAtlasTextureRegionFactory.createTiledFromAsset(mBitmapTextureAtlas, mActivity,
+                "stars_small.png", 0, 0, 4, 10);
+        mNeutronTextureRegion = BitmapTextureAtlasTextureRegionFactory.createTiledFromAsset(mBitmapTextureAtlas, mActivity,
+                "stars_small.png", 0, 0, 2, 5);
         mActivity.getTextureManager().loadTexture(mBitmapTextureAtlas);
     }
 
     @Override
-    public Scene createScene() {
-        mScene = new Scene();
-        mScene.setBackground(new Background(0.09804f, 0.6274f, 0.8784f));
-
+    protected void refreshScene(Scene scene) {
+        scene.detachChildren();
         refreshControlField();
-        mPointCloud.addToScene(mScene);
-
-        return mScene;
-
+        mPointCloud.addToScene(scene);
     }
 
     public void setDoubleTapHandler(DoubleTapHandler handler) {
@@ -89,29 +78,25 @@ public class TacticalMapSceneManager extends SectorSceneManager
     @Override
     protected void onStart() {
         super.onStart();
-        SectorManager.getInstance().addSectorListChangedListener(this);
         EmpireShieldManager.i.addEmpireShieldUpdatedHandler(this);
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        SectorManager.getInstance().removeSectorListChangedListener(this);
         EmpireShieldManager.i.removeEmpireShieldUpdatedHandler(this);
     }
 
     @Override
-    public void onSectorListChanged() {
-        super.onSectorListChanged();
-
-        refreshControlField();
-    }
-/*
-    @Override
     protected GestureDetector.OnGestureListener createGestureListener() {
         return new GestureListener();
     }
-*/
+
+    @Override
+    protected ScaleGestureDetector.OnScaleGestureListener createScaleGestureListener() {
+        return new ScaleGestureListener();
+    }
+
     /** Called when an empire's shield is updated, we'll have to refresh the list. */
     @Override
     public void onEmpireShieldUpdated(int empireID) {
@@ -120,10 +105,6 @@ public class TacticalMapSceneManager extends SectorSceneManager
 /*
     @Override
     public void onDraw(Canvas canvas) {
-        if (mScrollToCentre) {
-            scroll(getWidth(), getHeight());
-            mScrollToCentre = false;
-        }
 
         super.onDraw(canvas);
 
@@ -172,14 +153,15 @@ public class TacticalMapSceneManager extends SectorSceneManager
                     continue;
                 }
 
-                int sx = (int)((x * Sector.SECTOR_SIZE) + mOffsetX);
-                int sy = (int)((y * Sector.SECTOR_SIZE) + mOffsetY);
+                int sx = (int)(x * Sector.SECTOR_SIZE);
+                int sy = (int)(y * Sector.SECTOR_SIZE);
 
                 for (BaseStar star : sector.getStars()) {
                     int starX = sx + star.getOffsetX();
                     int starY = sy + star.getOffsetY();
                     TacticalPointCloudVector2 pt = new TacticalPointCloudVector2(
-                            starX / 512.0, starY / 512.0, star);
+                            (float) starX / Sector.SECTOR_SIZE, (float) starY / Sector.SECTOR_SIZE,
+                            star);
 
                     TreeSet<String> doneEmpires = new TreeSet<String>();
                     for (BaseColony c : star.getColonies()) {
@@ -226,6 +208,18 @@ public class TacticalMapSceneManager extends SectorSceneManager
         }
     }
 
+    protected class ScaleGestureListener extends ScaleGestureDetector.SimpleOnScaleGestureListener {
+        private float mZoomFactor = 1.0f;
+
+        @Override
+        public boolean onScale (ScaleGestureDetector detector) {
+            mZoomFactor *= detector.getScaleFactor();
+
+            ((ZoomCamera) mActivity.getCamera()).setZoomFactor(mZoomFactor);
+            return true;
+        }
+    }
+
     /**
      * Implements the \c OnGestureListener methods that we use to respond to
      * various touch events.
@@ -235,13 +229,9 @@ public class TacticalMapSceneManager extends SectorSceneManager
         public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX,
                 float distanceY) {
             // we move double the distance because our view is scaled by half.
-            scroll(-(float)(distanceX * 2.0),
-                   -(float)(distanceY * 2.0));
+            scroll( (float) distanceX,
+                   -(float) distanceY);
 
-            //mDragOffsetX += -(float)(distanceX * 2.0);
-            //mDragOffsetY += -(float)(distanceY * 2.0);
-
-            //invalidate();
             return false;
         }
 
@@ -279,14 +269,43 @@ public class TacticalMapSceneManager extends SectorSceneManager
         }
 */
         public void addToScene(Scene scene) {
+            Random rand = new Random(); // TODO: this isn't going to look good when a new sector loads
+
             for (Vector2 p : mPoints) {
+                BaseStar star = ((TacticalPointCloudVector2) p).star;
+
+                float size = (float)(star.getSize() * star.getStarType().getImageScale() * 2.0f);
+                ITextureRegion textureRegion = null;
+                if (star.getStarType().getInternalName().equals("neutron")) {
+                    textureRegion = mNeutronTextureRegion.getTextureRegion(2 + rand.nextInt(4));
+                    //size *= 4.0f;
+                } else {
+                    int y = 0;
+                    if (star.getStarType().getInternalName().equals("black-hole")) {
+                        y = 0;
+                    } else if (star.getStarType().getInternalName().equals("blue")) {
+                        y = 1;
+                    } else if (star.getStarType().getInternalName().equals("orange")) {
+                        y = 6;
+                    } else if (star.getStarType().getInternalName().equals("red")) {
+                        y = 7;
+                    } else if (star.getStarType().getInternalName().equals("white")) {
+                        y = 8;
+                    } else if (star.getStarType().getInternalName().equals("yellow")) {
+                        y = 9;
+                    }
+                    textureRegion = mNormalTextureRegion.getTextureRegion((y * 4) + rand.nextInt(4));
+                }
+
+                
+
                 Sprite sprite = new Sprite(
-                        (float)(p.x * 256.0),
-                        (float)(p.y * 256.0),
-                        15.0f, 15.0f,
-                        mStarTextureRegion,
+                        (float)(p.x * Sector.SECTOR_SIZE),
+                        (float)(p.y * Sector.SECTOR_SIZE),
+                        size, size,
+                        textureRegion,
                         mActivity.getVertexBufferObjectManager());
-                mScene.attachChild(sprite);
+                scene.attachChild(sprite);
             }
         }
 
