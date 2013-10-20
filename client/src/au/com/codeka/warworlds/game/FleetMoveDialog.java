@@ -25,7 +25,7 @@ import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.StyledDialog;
 import au.com.codeka.warworlds.api.ApiClient;
 import au.com.codeka.warworlds.api.ApiException;
-import au.com.codeka.warworlds.game.starfield.StarfieldSurfaceView;
+import au.com.codeka.warworlds.game.starfield.StarfieldSceneManager;
 import au.com.codeka.warworlds.model.DesignManager;
 import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.Fleet;
@@ -38,9 +38,9 @@ import au.com.codeka.warworlds.model.StarSummary;
 
 public class FleetMoveDialog extends DialogFragment {
     private Fleet mFleet;
-    private StarfieldSurfaceView mStarfield;
-    private SourceStarOverlay mSourceStarOverlay;
-    private DestinationStarOverlay mDestinationStarOverlay;
+    private StarfieldSceneManager mStarfield;
+ //   private SourceStarOverlay mSourceStarOverlay;
+  //  private DestinationStarOverlay mDestinationStarOverlay;
     private StarSummary mSourceStarSummary;
     private View mView;
     private float mEstimatedCost;
@@ -65,17 +65,17 @@ public class FleetMoveDialog extends DialogFragment {
         starDetailsView.setVisibility(View.GONE);
         instructionsView.setVisibility(View.VISIBLE);
 
-        mSourceStarOverlay = new SourceStarOverlay();
-        mDestinationStarOverlay = new DestinationStarOverlay();
+    //   mSourceStarOverlay = new SourceStarOverlay();
+    //    mDestinationStarOverlay = new DestinationStarOverlay();
 
-        mStarfield = (StarfieldSurfaceView) mView.findViewById(R.id.starfield);
+     //   mStarfield = (StarfieldSceneManager) mView.findViewById(R.id.starfield);
 
-        mStarfield.addSelectionChangedListener(new StarfieldSurfaceView.OnSelectionChangedListener() {
+        mStarfield.addSelectionChangedListener(new StarfieldSceneManager.OnSelectionChangedListener() {
             @Override
             public void onStarSelected(Star star) {
-                mStarfield.removeOverlay(mDestinationStarOverlay);
-                mStarfield.addOverlay(mDestinationStarOverlay, star);
-                mSourceStarOverlay.reset();
+     //           mStarfield.removeOverlay(mDestinationStarOverlay);
+      //          mStarfield.addOverlay(mDestinationStarOverlay, star);
+       //         mSourceStarOverlay.reset();
 
                 if (mSourceStarSummary != null) {
                     float distanceInParsecs = Sector.distanceInParsecs(mSourceStarSummary, star);
@@ -131,11 +131,11 @@ public class FleetMoveDialog extends DialogFragment {
                 long sectorY = s.getSectorY();
                 int offsetX = s.getOffsetX();
                 int offsetY = s.getOffsetY();
-                offsetX = offsetX - (int) ((mStarfield.getWidth() / 2) / mStarfield.getPixelScale());
-                offsetY = offsetY -  (int) ((mStarfield.getHeight() / 2) / mStarfield.getPixelScale());
+    //            offsetX = offsetX - (int) ((mStarfield.getWidth() / 2) / mStarfield.getPixelScale());
+    //            offsetY = offsetY -  (int) ((mStarfield.getHeight() / 2) / mStarfield.getPixelScale());
 
-                mStarfield.scrollTo(sectorX, sectorY, offsetX, offsetY, true);
-                mStarfield.addOverlay(mSourceStarOverlay, s);
+    //            mStarfield.scrollTo(sectorX, sectorY, offsetX, offsetY, true);
+    //            mStarfield.addOverlay(mSourceStarOverlay, s);
             }
         });
 
@@ -212,110 +212,5 @@ public class FleetMoveDialog extends DialogFragment {
                 }
             }
         }.execute();
-    }
-
-    /**
-     * This overlay is drawn over the "source" star so that we can see where the fleet is moving
-     * from.
-     */
-    private class SourceStarOverlay extends StarfieldSurfaceView.VisibleEntityAttachedOverlay {
-        private Paint mShipPaint;
-        private Sprite mSprite;
-        private Matrix mMatrix;
-
-        public SourceStarOverlay() {
-            Paint p = new Paint();
-            p.setARGB(255, 0, 255, 0);
-
-            mShipPaint = new Paint();
-            mShipPaint.setARGB(255, 255, 255, 255);
-
-            mMatrix = new Matrix();
-        }
-
-        @Override
-        public void setCentre(double x, double y) {
-            super.setCentre(x, y);
-            reset();
-        }
-
-        /**
-         * Calculates the triangle that we draw over the star to show the direction our
-         * fleet will move in.
-         */
-        public void reset() {
-            mSprite = SpriteManager.i.getSprite(
-                    DesignManager.i.getDesign(DesignKind.SHIP, mFleet.getDesignID()).getSpriteName());
-
-            float pixelScale = getPixelScale();
-
-            Vector2 direction = Vector2.pool.borrow();
-            if (mDestinationStarOverlay.isVisible()) {
-                direction.reset(mDestinationStarOverlay.getCentre());
-                direction.subtract(mCentre);
-                direction.normalize();
-            } else {
-                direction.reset(0, -1);
-            }
-
-            float angle = Vector2.angleBetween(mSprite.getUp(), direction);
-            Vector2.pool.release(direction); direction = null;
-
-            // scale zoom and rotate the bitmap all with one matrix
-            mMatrix.reset();
-            mMatrix.postTranslate(-(mSprite.getWidth() / 2.0f),
-                                  -(mSprite.getHeight() / 2.0f));
-            mMatrix.postScale(20.0f * pixelScale / mSprite.getWidth(),
-                              20.0f * pixelScale / mSprite.getHeight());
-            mMatrix.postRotate((float) (angle * 180.0 / Math.PI));
-            mMatrix.postTranslate((float) mCentre.x, (float) mCentre.y);
-        }
-
-        @Override
-        public void draw(Canvas canvas) {
-            if (mSprite != null) {
-                canvas.save();
-                canvas.concat(mMatrix);
-                mSprite.draw(canvas);
-                canvas.restore();
-            }
-        }
-    }
-
-    /**
-     * This overlay is drawn once you've selected a star as the "destination" for your move.
-     */
-    private class DestinationStarOverlay extends StarfieldSurfaceView.VisibleEntityAttachedOverlay {
-        private Paint mLinePaint;
-        private Paint mCirclePaint;
-
-        public DestinationStarOverlay() {
-            mLinePaint = new Paint();
-            mLinePaint.setARGB(255, 0, 255, 0);
-            mLinePaint.setStyle(Style.STROKE);
-            mLinePaint.setAntiAlias(true);
-
-            mCirclePaint = new Paint();
-            mCirclePaint.setARGB(255, 0, 255, 0);
-            mCirclePaint.setStyle(Style.FILL);
-            mCirclePaint.setAntiAlias(true);
-        }
-
-        @Override
-        public void setCentre(double x, double y) {
-            super.setCentre(x, y);
-            mSourceStarOverlay.reset();
-        }
-
-        @Override
-        public void draw(Canvas canvas) {
-            Vector2 start = mSourceStarOverlay.getCentre();
-            canvas.drawLine((float) start.x, (float) start.y,
-                            (float) mCentre.x, (float) mCentre.y,
-                            mLinePaint);
-
-            canvas.drawCircle((float) mCentre.x, (float) mCentre.y, 10.0f, mCirclePaint);
-        }
-
     }
 }

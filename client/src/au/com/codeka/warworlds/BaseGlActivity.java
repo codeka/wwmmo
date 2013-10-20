@@ -63,7 +63,7 @@ public abstract class BaseGlActivity extends SimpleLayoutGameActivity {
         mCameraHeight = size.y;
 
         mCamera = createCamera();
-        return new EngineOptions(false, ScreenOrientation.PORTRAIT_SENSOR,
+        return new EngineOptions(false, ScreenOrientation.MANIFEST,
                 new RatioResolutionPolicy(mCameraWidth, mCameraHeight), mCamera);
     }
 

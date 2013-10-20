@@ -3,6 +3,7 @@ package au.com.codeka.warworlds.game.starfield;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.andengine.engine.camera.ZoomCamera;
 import org.andengine.entity.scene.IOnSceneTouchListener;
 import org.andengine.entity.scene.Scene;
 import org.andengine.entity.scene.background.Background;
@@ -82,7 +83,7 @@ public abstract class SectorSceneManager implements SectorManager.OnSectorListCh
     }
 
     protected ScaleGestureDetector.OnScaleGestureListener createScaleGestureListener() {
-        return null;
+        return new ScaleGestureListener();
     }
 
     public Scene createScene() {
@@ -256,18 +257,28 @@ public abstract class SectorSceneManager implements SectorManager.OnSectorListCh
         return mGestureDetector.onTouchEvent(touchEvent.getMotionEvent());
     }
 
-    /**
-     * Implements the \c OnGestureListener methods that we use to respond to
-     * various touch events.
-     */
+    /** The default gesture listener is just for scrolling around. */
     protected class GestureListener extends GestureDetector.SimpleOnGestureListener {
         @Override
         public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX,
                 float distanceY) {
-            scroll(-(float)(distanceX),
+            scroll( (float)(distanceX),
                    -(float)(distanceY));
 
             return false;
+        }
+    }
+
+    /** The default scale gesture listener scales the view. */
+    protected class ScaleGestureListener extends ScaleGestureDetector.SimpleOnScaleGestureListener {
+        private float mZoomFactor = 1.0f;
+
+        @Override
+        public boolean onScale (ScaleGestureDetector detector) {
+            mZoomFactor *= detector.getScaleFactor();
+
+            ((ZoomCamera) mActivity.getCamera()).setZoomFactor(mZoomFactor);
+            return true;
         }
     }
 }

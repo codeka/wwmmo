@@ -10,7 +10,7 @@
         android:layout_toLeftOf="@+id/bottom_pane"
         android:layout_alignParentTop="true" />
 
-    <au.com.codeka.warworlds.game.starfield.StarfieldSurfaceView
+    <org.andengine.opengl.view.RenderSurfaceView
         android:id="@+id/starfield"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

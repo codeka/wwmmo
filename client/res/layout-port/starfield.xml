@@ -9,12 +9,12 @@
         android:layout_height="50dp"
         android:layout_alignParentTop="true" />
 
-    <au.com.codeka.warworlds.game.starfield.StarfieldSurfaceView
+    <org.andengine.opengl.view.RenderSurfaceView
         android:id="@+id/starfield"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@+id/bottom_pane"
-        android:layout_below="@id/ad"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentTop="true"
         android:layout_marginBottom="-4px" />
 
     <au.com.codeka.warworlds.ctrl.SelectionView

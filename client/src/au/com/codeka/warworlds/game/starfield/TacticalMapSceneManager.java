@@ -34,7 +34,7 @@ import au.com.codeka.warworlds.model.Sector;
 import au.com.codeka.warworlds.model.SectorManager;
 
 public class TacticalMapSceneManager extends SectorSceneManager
-                             implements EmpireShieldManager.EmpireShieldUpdatedHandler {
+                                     implements EmpireShieldManager.EmpireShieldUpdatedHandler {
     private static final Logger log = LoggerFactory.getLogger(TacticalMapSceneManager.class);
 
     private TacticalPointCloud mPointCloud;

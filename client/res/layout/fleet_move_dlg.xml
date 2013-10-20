@@ -30,7 +30,7 @@
         </LinearLayout>
     </RelativeLayout>
 
-    <au.com.codeka.warworlds.game.starfield.StarfieldSurfaceView
+    <au.com.codeka.warworlds.game.starfield.StarfieldSceneManager
         android:id="@+id/starfield"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

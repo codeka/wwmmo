@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="au.com.codeka.warworlds"
-    android:versionCode="710"
-    android:versionName="0.3.710"
+    android:versionCode="715"
+    android:versionName="0.3.715"
     android:installLocation="auto" >
 
     <!-- Android SDK version 2.2 (API level 8) is the minimum we can viably support, since
@@ -11,7 +11,7 @@
               android:targetSdkVersion="17" />
 
     <!-- We use OpenGL ES 2.0 -->
-    <!-- uses-feature android:glEsVersion="0x00020000" android:required="true" /-->
+    <uses-feature android:glEsVersion="0x00020000" android:required="true" />
 
     <!-- Only this application can receive the messages and registration result -->
     <permission

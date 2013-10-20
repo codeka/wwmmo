@@ -1,7 +1,9 @@
 package au.com.codeka.warworlds.game.starfield;
 
+import java.io.IOException;
 import java.util.Locale;
 
+import org.andengine.entity.scene.Scene;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,15 +24,12 @@ import au.com.codeka.common.model.BaseStar;
 import au.com.codeka.common.model.DesignKind;
 import au.com.codeka.common.model.ShipDesign;
 import au.com.codeka.common.protobuf.Messages;
-import au.com.codeka.warworlds.BaseActivity;
+import au.com.codeka.warworlds.BaseGlActivity;
 import au.com.codeka.warworlds.R;
-import au.com.codeka.warworlds.ServerGreeter;
-import au.com.codeka.warworlds.ServerGreeter.ServerGreeting;
 import au.com.codeka.warworlds.StyledDialog;
 import au.com.codeka.warworlds.ctrl.FleetListSimple;
 import au.com.codeka.warworlds.ctrl.InfobarView;
 import au.com.codeka.warworlds.ctrl.PlanetListSimple;
-import au.com.codeka.warworlds.ctrl.SelectionView;
 import au.com.codeka.warworlds.game.EmpireActivity;
 import au.com.codeka.warworlds.game.ScoutReportDialog;
 import au.com.codeka.warworlds.game.SitrepActivity;
@@ -66,13 +65,13 @@ import com.google.protobuf.InvalidProtocolBufferException;
  * The \c StarfieldActivity is the "home" screen of the game, and displays the
  * starfield where you scroll around and interact with stars, etc.
  */
-public class StarfieldActivity extends BaseActivity
-                               implements StarfieldSurfaceView.OnSelectionChangedListener,
+public class StarfieldActivity extends BaseGlActivity
+                               implements StarfieldSceneManager.OnSelectionChangedListener,
                                           StarManager.StarFetchedHandler,
                                           EmpireShieldManager.EmpireShieldUpdatedHandler {
     private static final Logger log = LoggerFactory.getLogger(StarfieldActivity.class);
     private Context mContext = this;
-    private StarfieldSurfaceView mStarfield;
+    private StarfieldSceneManager mStarfield;
     private PlanetListSimple mPlanetList;
     private FleetListSimple mFleetList;
     private Star mSelectedStar;
@@ -99,13 +98,11 @@ public class StarfieldActivity extends BaseActivity
 
     @Override
     public void onCreate(final Bundle savedInstanceState) {
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
         super.onCreate(savedInstanceState);
-        requestWindowFeature(Window.FEATURE_NO_TITLE); // remove the title bar
 
-        setContentView(R.layout.starfield);
-
-        mStarfield = (StarfieldSurfaceView) findViewById(R.id.starfield);
-        mStarfield.setSelectionView((SelectionView) findViewById(R.id.selection));
+        mStarfield = new StarfieldSceneManager(this);
+//        mStarfield.setSelectionView((SelectionView) findViewById(R.id.selection));
 
         mPlanetList = (PlanetListSimple) findViewById(R.id.planet_list);
         mFleetList = (FleetListSimple) findViewById(R.id.fleet_list);
@@ -152,7 +149,7 @@ public class StarfieldActivity extends BaseActivity
                 if (mSelectedStar != null) {
                     ScoutReportDialog dialog = new ScoutReportDialog();
                     dialog.setStar(mSelectedStar);
-                    dialog.show(getSupportFragmentManager(), "");
+                    // TODO: dialog.show(getSupportFragmentManager(), "");
                 }
             }
         });
@@ -162,24 +159,6 @@ public class StarfieldActivity extends BaseActivity
             @Override
             public void onClick(View v) {
                 openSitrepActivity();
-            }
-        });
-
-        final Button tacticalBtn = (Button) findViewById(R.id.tactical_map_btn);
-        tacticalBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(mContext, TacticalMapActivity.class);
-                // get the star closest to the centre of the screen currently, that's what we'll focus
-                // on in the tactical map as well.
-                Star centreStar = mStarfield.findStarInCentre();
-                if (centreStar != null) {
-                    intent.putExtra("au.com.codeka.warworlds.SectorX", centreStar.getSectorX());
-                    intent.putExtra("au.com.codeka.warworlds.SectorY", centreStar.getSectorY());
-                    intent.putExtra("au.com.codeka.warworlds.OffsetX", centreStar.getOffsetX());
-                    intent.putExtra("au.com.codeka.warworlds.OffsetY", centreStar.getOffsetY());
-                }
-                startActivityForResult(intent, TACTICAL_MAP_REQUEST);
             }
         });
 
@@ -259,14 +238,14 @@ public class StarfieldActivity extends BaseActivity
     @Override
     public void onResume() {
         super.onResume();
-
+/*
         ServerGreeter.waitForHello(this, new ServerGreeter.HelloCompleteHandler() {
             @Override
             public void onHelloComplete(boolean success, ServerGreeting greeting) {
                 if (!success) {
                     return;
                 }
-
+*/
                 if (mStarToSelect != null) {
                     mSelectedStar = mStarToSelect;
                     mStarfield.selectStar(mStarToSelect.getKey());
@@ -297,8 +276,29 @@ public class StarfieldActivity extends BaseActivity
                 }
 
                 mDoNotNavigateToHomeStar = true;
-            }
-        });
+ //           }
+//        });
+    }
+
+    @Override
+    protected int getLayoutID() {
+        return R.layout.starfield;
+    }
+
+    @Override
+    protected int getRenderSurfaceViewID() {
+        return R.id.starfield;
+    }
+
+
+    @Override
+    protected void onCreateResources() throws IOException {
+        mStarfield.onLoadResources();
+    }
+
+    @Override
+    protected Scene onCreateScene() throws IOException {
+        return mStarfield.createScene();
     }
 
     @Override
@@ -306,6 +306,8 @@ public class StarfieldActivity extends BaseActivity
         super.onStart();
         StarManager.getInstance().addStarUpdatedListener(null, this);
         EmpireShieldManager.i.addEmpireShieldUpdatedHandler(this);
+
+        mStarfield.onStart();
     }
 
     @Override
@@ -323,6 +325,8 @@ public class StarfieldActivity extends BaseActivity
         super.onStop();
         StarManager.getInstance().removeStarUpdatedListener(this);
         EmpireShieldManager.i.removeEmpireShieldUpdatedHandler(this);
+
+        mStarfield.onStop();
     }
 
     @Override
@@ -389,9 +393,9 @@ public class StarfieldActivity extends BaseActivity
     private void navigateToPlanet(long sectorX, long sectorY, String starKey, int starOffsetX,
                                   int starOffsetY, int planetIndex, boolean scrollView) {
         if (scrollView) {
-            int offsetX = starOffsetX - (int) ((mStarfield.getWidth() / 2) / mStarfield.getPixelScale());
-            int offsetY = starOffsetY -  (int) ((mStarfield.getHeight() / 2) / mStarfield.getPixelScale());
-            mStarfield.scrollTo(sectorX, sectorY, offsetX, offsetY);
+ //           int offsetX = starOffsetX - (int) ((mStarfield.getWidth() / 2) / mStarfield.getPixelScale());
+ //           int offsetY = starOffsetY -  (int) ((mStarfield.getHeight() / 2) / mStarfield.getPixelScale());
+ //           mStarfield.scrollTo(sectorX, sectorY, offsetX, offsetY);
         }
 
         Intent intent = new Intent(mContext, SolarSystemActivity.class);
@@ -422,7 +426,7 @@ public class StarfieldActivity extends BaseActivity
     }
 
     public void navigateToFleet(Star star, BaseFleet fleet) {
-        int offsetX = star.getOffsetX() - (int) ((mStarfield.getWidth() / 2) / mStarfield.getPixelScale());
+/*        int offsetX = star.getOffsetX() - (int) ((mStarfield.getWidth() / 2) / mStarfield.getPixelScale());
         int offsetY = star.getOffsetY() - (int) ((mStarfield.getHeight() / 2) / mStarfield.getPixelScale());
 
         // todo: if the fleet is moving, scroll to it...
@@ -433,7 +437,7 @@ public class StarfieldActivity extends BaseActivity
             mStarfield.selectFleet(fleet);
         } else {
             mStarfield.selectStar(star.getKey());
-        }
+        }*/
     }
 
     public void onRenameClick() {
@@ -509,7 +513,7 @@ public class StarfieldActivity extends BaseActivity
         StarRenameDialog dialog = new StarRenameDialog();
         dialog.setPurchaseInfo(purchase);
         dialog.setStar(mSelectedStar);
-        dialog.show(getSupportFragmentManager(), "");
+        //TODO dialog.show(getSupportFragmentManager(), "");
     }
 
     @Override
