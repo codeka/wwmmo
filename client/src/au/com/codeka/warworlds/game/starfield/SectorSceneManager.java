@@ -105,6 +105,10 @@ public abstract class SectorSceneManager implements SectorManager.OnSectorListCh
         scrollTo(sectorX, sectorY, offsetX, offsetY, false);
     }
 
+    protected void updateZoomFactor(float zoomFactor) {
+        ((ZoomCamera) mActivity.getCamera()).setZoomFactor(zoomFactor);
+    }
+
     /**
      * Scroll to the given sector (x,y) and offset into the sector.
      */
@@ -144,7 +148,6 @@ public abstract class SectorSceneManager implements SectorManager.OnSectorListCh
     }
 
     private void updateCamera() {
-        log.debug("updating camera: sector=("+mSectorX+", "+mSectorY+") offset=("+mOffsetX+", "+mOffsetY+") camera=("+mCameraX+","+mCameraY+")");
         mActivity.getCamera().setCenter(mCameraX, mCameraY);
     }
 
@@ -277,7 +280,7 @@ public abstract class SectorSceneManager implements SectorManager.OnSectorListCh
         public boolean onScale (ScaleGestureDetector detector) {
             mZoomFactor *= detector.getScaleFactor();
 
-            ((ZoomCamera) mActivity.getCamera()).setZoomFactor(mZoomFactor);
+            updateZoomFactor(mZoomFactor);
             return true;
         }
     }

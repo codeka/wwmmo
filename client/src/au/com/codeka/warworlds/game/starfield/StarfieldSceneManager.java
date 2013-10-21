@@ -3,10 +3,17 @@ package au.com.codeka.warworlds.game.starfield;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.TreeMap;
 
+import org.andengine.engine.camera.ZoomCamera;
+import org.andengine.entity.Entity;
+import org.andengine.entity.primitive.Rectangle;
 import org.andengine.entity.scene.Scene;
 import org.andengine.entity.sprite.Sprite;
+import org.andengine.opengl.shader.ShaderProgram;
+import org.andengine.opengl.shader.source.IShaderSource;
+import org.andengine.opengl.shader.source.StringShaderSource;
 import org.andengine.opengl.texture.TextureOptions;
 import org.andengine.opengl.texture.atlas.bitmap.BitmapTextureAtlas;
 import org.andengine.opengl.texture.atlas.bitmap.BitmapTextureAtlasTextureRegionFactory;
@@ -49,6 +56,12 @@ public class StarfieldSceneManager extends SectorSceneManager
     private TiledTextureRegion mNeutronStarTextureRegion;
     private TiledTextureRegion mNormalStarTextureRegion;
 
+    private BitmapTextureAtlas mBackgroundGasTextureAtlas;
+    private TiledTextureRegion mBackgroundGasTextureRegion;
+    private BitmapTextureAtlas mBackgroundStarsTextureAtlas;
+    private TiledTextureRegion mBackgroundStarsTextureRegion;
+    private ArrayList<Entity> mBackgroundEntities;
+
     public StarfieldSceneManager(StarfieldActivity activity) {
         super(activity);
         log.info("Starfield initializing...");
@@ -61,12 +74,23 @@ public class StarfieldSceneManager extends SectorSceneManager
     public void onLoadResources() {
         mStarTextureAtlas = new BitmapTextureAtlas(mActivity.getTextureManager(), 128, 320,
                 TextureOptions.BILINEAR_PREMULTIPLYALPHA);
-        BitmapTextureAtlasTextureRegionFactory.setAssetBasePath("stars/");
         mNormalStarTextureRegion = BitmapTextureAtlasTextureRegionFactory.createTiledFromAsset(mStarTextureAtlas, mActivity,
-                "stars_small.png", 0, 0, 4, 10);
+                "stars/stars_small.png", 0, 0, 4, 10);
         mNeutronStarTextureRegion = BitmapTextureAtlasTextureRegionFactory.createTiledFromAsset(mStarTextureAtlas, mActivity,
-                "stars_small.png", 0, 0, 2, 5);
+                "stars/stars_small.png", 0, 0, 2, 5);
+
+        mBackgroundGasTextureAtlas = new BitmapTextureAtlas(mActivity.getTextureManager(), 512, 512,
+                TextureOptions.BILINEAR_PREMULTIPLYALPHA);
+        mBackgroundGasTextureRegion = BitmapTextureAtlasTextureRegionFactory.createTiledFromAsset(mBackgroundGasTextureAtlas,
+                mActivity, "decoration/gas.png", 0, 0, 4, 4);
+        mBackgroundStarsTextureAtlas = new BitmapTextureAtlas(mActivity.getTextureManager(), 512, 512,
+                TextureOptions.BILINEAR_PREMULTIPLYALPHA);
+        mBackgroundStarsTextureRegion = BitmapTextureAtlasTextureRegionFactory.createTiledFromAsset(mBackgroundStarsTextureAtlas,
+                mActivity, "decoration/starfield.png", 0, 0, 4, 4);
+
         mActivity.getTextureManager().loadTexture(mStarTextureAtlas);
+        mActivity.getTextureManager().loadTexture(mBackgroundGasTextureAtlas);
+        mActivity.getTextureManager().loadTexture(mBackgroundStarsTextureAtlas);
     }
 
     @Override
@@ -149,10 +173,6 @@ public class StarfieldSceneManager extends SectorSceneManager
         return null;
     }
 
-    private void placeSelection() {
-        
-    }
-
     @Override
     protected void refreshScene(Scene scene) {
         scene.detachChildren();
@@ -163,9 +183,57 @@ public class StarfieldSceneManager extends SectorSceneManager
         }
     }
 
+    private boolean mIsBackgroundVisible = true;;
+
+    @Override
+    protected void updateZoomFactor(float zoomFactor) {
+        super.updateZoomFactor(zoomFactor);
+
+        // we fade out the background between 0.45 and 0.40, it should be totally invisible < 0.40
+        // and totally opaque for >= 0.45
+        if (zoomFactor < 0.4f && mIsBackgroundVisible) {
+            mIsBackgroundVisible = false;
+            // we need to make the background as invisible
+            mActivity.runOnUpdateThread(new Runnable() {
+                @Override
+                public void run() {
+                    for (Entity entity : mBackgroundEntities) {
+                        entity.setVisible(mIsBackgroundVisible);
+                    }
+                }
+            });
+        } else if (zoomFactor >= 0.4f && !mIsBackgroundVisible) {
+            mIsBackgroundVisible = true;
+            // we need to make the background as visible
+            mActivity.runOnUpdateThread(new Runnable() {
+                @Override
+                public void run() {
+                    for (Entity entity : mBackgroundEntities) {
+                        entity.setVisible(mIsBackgroundVisible);
+                    }
+                }
+            });
+        }
+        if (zoomFactor >= 0.4f && zoomFactor < 0.45f) {
+            // between 0.4 and 0.45 we need to fade the background in
+            final float factor = (zoomFactor - 0.4f) * 20.0f; // make it in the range 0...1
+            mActivity.runOnUpdateThread(new Runnable() {
+                @Override
+                public void run() {
+                    for (Entity entity : mBackgroundEntities) {
+                        entity.setAlpha(factor);
+                        entity.setColor(factor, factor, factor);
+                    }
+                }
+            });
+        }
+    }
+
     private List<Pair<Long, Long>> drawScene(Scene scene) {
         SectorManager sm = SectorManager.getInstance();
         List<Pair<Long, Long>> missingSectors = null;
+
+        mBackgroundEntities = new ArrayList<Entity>();
 
         for(int y = -mSectorRadius; y <= mSectorRadius; y++) {
             for(int x = -mSectorRadius; x <= mSectorRadius; x++) {
@@ -184,10 +252,7 @@ public class StarfieldSceneManager extends SectorSceneManager
 
                 int sx = (int)((x * Sector.SECTOR_SIZE) + mOffsetX);
                 int sy = (int)((y * Sector.SECTOR_SIZE) + mOffsetY);
-
-//                StarfieldBackgroundRenderer bgRenderer = SectorManager.getInstance().getBackgroundRenderer(sector);
-//                bgRenderer.drawBackground(canvas, sx, sy,
-//                        sx+Sector.SECTOR_SIZE, sy+Sector.SECTOR_SIZE);
+                drawBackground(scene, sx, sy);
             }
         }
 
@@ -207,6 +272,37 @@ public class StarfieldSceneManager extends SectorSceneManager
         }
 
         return missingSectors;
+    }
+
+    private void drawBackground(Scene scene, int sx, int sy) {
+        Random r = new Random(sx ^ (long)(sy * 48647563));
+        final int STAR_SIZE = 256;
+        for (int y = 0; y < Sector.SECTOR_SIZE / STAR_SIZE; y++) {
+            for (int x = 0; x < Sector.SECTOR_SIZE / STAR_SIZE; x++) {
+                Sprite bgSprite = new Sprite(
+                        (float) (sx + (x * STAR_SIZE)),
+                        (float) (sy + (y * STAR_SIZE)),
+                        STAR_SIZE, STAR_SIZE,
+                        mBackgroundStarsTextureRegion.getTextureRegion(r.nextInt(16)),
+                        mActivity.getVertexBufferObjectManager());
+                scene.attachChild(bgSprite);
+                mBackgroundEntities.add(bgSprite);
+            }
+        }
+
+        final int GAS_SIZE = 512;
+        for (int i = 0; i < 10; i++) {
+            float x = r.nextInt(Sector.SECTOR_SIZE + (GAS_SIZE / 4)) - (GAS_SIZE / 8);
+            float y = r.nextInt(Sector.SECTOR_SIZE + (GAS_SIZE / 4)) - (GAS_SIZE / 8);
+
+            Sprite bgSprite = new Sprite(
+                    (sx + x) - (GAS_SIZE / 2.0f), (sy + y) - (GAS_SIZE / 2.0f),
+                    GAS_SIZE, GAS_SIZE,
+                    mBackgroundGasTextureRegion.getTextureRegion(r.nextInt(14)),
+                    mActivity.getVertexBufferObjectManager());
+            scene.attachChild(bgSprite);
+            mBackgroundEntities.add(bgSprite);
+        }
     }
 
     /**
