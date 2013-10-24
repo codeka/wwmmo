@@ -61,6 +61,8 @@ public class StarfieldSceneManager extends SectorSceneManager
     private BitmapTextureAtlas mBackgroundStarsTextureAtlas;
     private TiledTextureRegion mBackgroundStarsTextureRegion;
     private ArrayList<Entity> mBackgroundEntities;
+    private boolean mIsBackgroundVisible = true;;
+    private float mBackgroundZoomAlpha = 1.0f;
 
     public StarfieldSceneManager(StarfieldActivity activity) {
         super(activity);
@@ -181,8 +183,6 @@ public class StarfieldSceneManager extends SectorSceneManager
         }
     }
 
-    private boolean mIsBackgroundVisible = true;;
-
     @Override
     protected void updateZoomFactor(float zoomFactor) {
         super.updateZoomFactor(zoomFactor);
@@ -214,13 +214,13 @@ public class StarfieldSceneManager extends SectorSceneManager
         }
         if (zoomFactor >= 0.4f && zoomFactor < 0.45f) {
             // between 0.4 and 0.45 we need to fade the background in
-            final float factor = (zoomFactor - 0.4f) * 20.0f; // make it in the range 0...1
+            mBackgroundZoomAlpha = (zoomFactor - 0.4f) * 20.0f; // make it in the range 0...1
             mActivity.runOnUpdateThread(new Runnable() {
                 @Override
                 public void run() {
                     for (Entity entity : mBackgroundEntities) {
-                        entity.setAlpha(factor);
-                        entity.setColor(factor, factor, factor);
+                        entity.setAlpha(mBackgroundZoomAlpha);
+                        entity.setColor(mBackgroundZoomAlpha, mBackgroundZoomAlpha, mBackgroundZoomAlpha);
                     }
                 }
             });
@@ -250,7 +250,7 @@ public class StarfieldSceneManager extends SectorSceneManager
 
                 int sx = (int)(x * Sector.SECTOR_SIZE);
                 int sy = (int)(y * Sector.SECTOR_SIZE);
-                drawBackground(scene, sx, sy);
+                drawBackground(scene, sector, sx, sy);
             }
         }
 
@@ -272,19 +272,20 @@ public class StarfieldSceneManager extends SectorSceneManager
         return missingSectors;
     }
 
-    private void drawBackground(Scene scene, int sx, int sy) {
-        Random r = new Random(sx ^ (long)(sy * 48647563));
+    private void drawBackground(Scene scene, Sector sector, int sx, int sy) {
+        Random r = new Random(sector.getX() ^ (long)(sector.getY() * 48647563));
         final int STAR_SIZE = 256;
         for (int y = 0; y < Sector.SECTOR_SIZE / STAR_SIZE; y++) {
             for (int x = 0; x < Sector.SECTOR_SIZE / STAR_SIZE; x++) {
-            //    Sprite bgSprite = new Sprite(
-            //            (float) (sx + (x * STAR_SIZE)),
-            //            (float) (sy + (y * STAR_SIZE)),
-            //            STAR_SIZE, STAR_SIZE,
-              //          mBackgroundStarsTextureRegion.getTextureRegion(r.nextInt(16)),
-             //           mActivity.getVertexBufferObjectManager());
-               // scene.attachChild(bgSprite);
-               // mBackgroundEntities.add(bgSprite);
+                Sprite bgSprite = new Sprite(
+                        (float) (sx + (x * STAR_SIZE)),
+                        (float) (sy + (y * STAR_SIZE)),
+                        STAR_SIZE, STAR_SIZE,
+                        mBackgroundStarsTextureRegion.getTextureRegion(r.nextInt(16)),
+                        mActivity.getVertexBufferObjectManager());
+                setBackgroundEntityZoomFactor(bgSprite);
+                scene.attachChild(bgSprite);
+                mBackgroundEntities.add(bgSprite);
             }
         }
 
@@ -293,14 +294,27 @@ public class StarfieldSceneManager extends SectorSceneManager
             float x = r.nextInt(Sector.SECTOR_SIZE + (GAS_SIZE / 4)) - (GAS_SIZE / 8);
             float y = r.nextInt(Sector.SECTOR_SIZE + (GAS_SIZE / 4)) - (GAS_SIZE / 8);
 
-         ///   Sprite bgSprite = new Sprite(
-         //           (sx + x) - (GAS_SIZE / 2.0f), (sy + y) - (GAS_SIZE / 2.0f),
-         //           GAS_SIZE, GAS_SIZE,
-         ///           mBackgroundGasTextureRegion.getTextureRegion(r.nextInt(14)),
-         //           mActivity.getVertexBufferObjectManager());
-           // scene.attachChild(bgSprite);
-           // mBackgroundEntities.add(bgSprite);
+            Sprite bgSprite = new Sprite(
+                    (sx + x) - (GAS_SIZE / 2.0f), (sy + y) - (GAS_SIZE / 2.0f),
+                    GAS_SIZE, GAS_SIZE,
+                    mBackgroundGasTextureRegion.getTextureRegion(r.nextInt(14)),
+                    mActivity.getVertexBufferObjectManager());
+            setBackgroundEntityZoomFactor(bgSprite);
+            scene.attachChild(bgSprite);
+            mBackgroundEntities.add(bgSprite);
         }
+    }
+
+    private void setBackgroundEntityZoomFactor(Sprite bgSprite) {
+        if (mBackgroundZoomAlpha <= 0.0f) {
+            bgSprite.setVisible(false);
+        } else if (mBackgroundZoomAlpha >= 1.0f) {
+            // do nothing
+        } else {
+            bgSprite.setAlpha(mBackgroundZoomAlpha);
+            bgSprite.setColor(mBackgroundZoomAlpha, mBackgroundZoomAlpha, mBackgroundZoomAlpha);
+        }
+
     }
 
     /**
