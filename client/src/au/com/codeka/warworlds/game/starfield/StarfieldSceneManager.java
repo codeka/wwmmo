@@ -175,8 +175,6 @@ public class StarfieldSceneManager extends SectorSceneManager
 
     @Override
     protected void refreshScene(Scene scene) {
-        scene.detachChildren();
-
         final List<Pair<Long, Long>> missingSectors = drawScene(scene);
         if (missingSectors != null) {
             SectorManager.getInstance().requestSectors(missingSectors, false, null);
@@ -250,8 +248,8 @@ public class StarfieldSceneManager extends SectorSceneManager
                     continue;
                 }
 
-                int sx = (int)((x * Sector.SECTOR_SIZE) + mOffsetX);
-                int sy = (int)((y * Sector.SECTOR_SIZE) + mOffsetY);
+                int sx = (int)(x * Sector.SECTOR_SIZE);
+                int sy = (int)(y * Sector.SECTOR_SIZE);
                 drawBackground(scene, sx, sy);
             }
         }
@@ -265,8 +263,8 @@ public class StarfieldSceneManager extends SectorSceneManager
                     continue;
                 }
 
-                int sx = (int)((x * Sector.SECTOR_SIZE) + mOffsetX);
-                int sy = (int)((y * Sector.SECTOR_SIZE) + mOffsetY);
+                int sx = (int)(x * Sector.SECTOR_SIZE);
+                int sy = (int)(y * Sector.SECTOR_SIZE);
                 drawSector(scene, sx, sy, sector);
             }
         }
@@ -279,14 +277,14 @@ public class StarfieldSceneManager extends SectorSceneManager
         final int STAR_SIZE = 256;
         for (int y = 0; y < Sector.SECTOR_SIZE / STAR_SIZE; y++) {
             for (int x = 0; x < Sector.SECTOR_SIZE / STAR_SIZE; x++) {
-                Sprite bgSprite = new Sprite(
-                        (float) (sx + (x * STAR_SIZE)),
-                        (float) (sy + (y * STAR_SIZE)),
-                        STAR_SIZE, STAR_SIZE,
-                        mBackgroundStarsTextureRegion.getTextureRegion(r.nextInt(16)),
-                        mActivity.getVertexBufferObjectManager());
-                scene.attachChild(bgSprite);
-                mBackgroundEntities.add(bgSprite);
+            //    Sprite bgSprite = new Sprite(
+            //            (float) (sx + (x * STAR_SIZE)),
+            //            (float) (sy + (y * STAR_SIZE)),
+            //            STAR_SIZE, STAR_SIZE,
+              //          mBackgroundStarsTextureRegion.getTextureRegion(r.nextInt(16)),
+             //           mActivity.getVertexBufferObjectManager());
+               // scene.attachChild(bgSprite);
+               // mBackgroundEntities.add(bgSprite);
             }
         }
 
@@ -295,13 +293,13 @@ public class StarfieldSceneManager extends SectorSceneManager
             float x = r.nextInt(Sector.SECTOR_SIZE + (GAS_SIZE / 4)) - (GAS_SIZE / 8);
             float y = r.nextInt(Sector.SECTOR_SIZE + (GAS_SIZE / 4)) - (GAS_SIZE / 8);
 
-            Sprite bgSprite = new Sprite(
-                    (sx + x) - (GAS_SIZE / 2.0f), (sy + y) - (GAS_SIZE / 2.0f),
-                    GAS_SIZE, GAS_SIZE,
-                    mBackgroundGasTextureRegion.getTextureRegion(r.nextInt(14)),
-                    mActivity.getVertexBufferObjectManager());
-            scene.attachChild(bgSprite);
-            mBackgroundEntities.add(bgSprite);
+         ///   Sprite bgSprite = new Sprite(
+         //           (sx + x) - (GAS_SIZE / 2.0f), (sy + y) - (GAS_SIZE / 2.0f),
+         //           GAS_SIZE, GAS_SIZE,
+         ///           mBackgroundGasTextureRegion.getTextureRegion(r.nextInt(14)),
+         //           mActivity.getVertexBufferObjectManager());
+           // scene.attachChild(bgSprite);
+           // mBackgroundEntities.add(bgSprite);
         }
     }
 

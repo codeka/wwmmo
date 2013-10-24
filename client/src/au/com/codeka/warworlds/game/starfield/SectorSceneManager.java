@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.andengine.engine.camera.ZoomCamera;
+import org.andengine.entity.IEntity;
+import org.andengine.entity.IEntityParameterCallable;
 import org.andengine.entity.scene.IOnSceneTouchListener;
 import org.andengine.entity.scene.Scene;
 import org.andengine.entity.scene.background.Background;
@@ -37,8 +39,6 @@ public abstract class SectorSceneManager implements SectorManager.OnSectorListCh
     protected long mSectorY;
     protected float mOffsetX;
     protected float mOffsetY;
-    protected float mCameraX;
-    protected float mCameraY;
 
     public SectorSceneManager(BaseGlActivity activity) {
         mActivity = activity;
@@ -65,12 +65,12 @@ public abstract class SectorSceneManager implements SectorManager.OnSectorListCh
 
     @Override
     public void onSectorListChanged() {
+        final Scene scene = createScene();
+
         mActivity.getEngine().runOnUpdateThread(new Runnable() {
             @Override
             public void run() {
-                refreshScene(mScene);
-                mCameraX = 0;
-                mCameraY = 0;
+                mActivity.getEngine().setScene(scene);
             }
         });
     }
@@ -92,8 +92,6 @@ public abstract class SectorSceneManager implements SectorManager.OnSectorListCh
         mScene.setOnSceneTouchListener(this);
 
         refreshScene(mScene);
-        mCameraX = 0;
-        mCameraY = 0;
 
         return mScene;
     }
@@ -109,46 +107,55 @@ public abstract class SectorSceneManager implements SectorManager.OnSectorListCh
         ((ZoomCamera) mActivity.getCamera()).setZoomFactor(zoomFactor);
     }
 
-    /**
-     * Scroll to the given sector (x,y) and offset into the sector.
-     */
-    public void scrollTo(long sectorX, long sectorY, float offsetX, float offsetY, boolean centre) {
-        mSectorX = sectorX;
-        mSectorY = sectorY;
-        mOffsetX = offsetX;
-        mOffsetY = offsetY;
+    /** Scroll to the given sector (x,y) and offset into the sector. */
+    public void scrollTo(final long sectorX, final long sectorY,
+                         final float offsetX, final float offsetY,
+                         final boolean centre) {
+        mActivity.getEngine().runOnUpdateThread(new Runnable() {
+            @Override
+            public void run() {
+                final long dy = mSectorY - sectorY;
+                final long dx = mSectorX - sectorX;
+                if (dy != 0 || dx != 0) {
+                    mScene.callOnChildren(new IEntityParameterCallable() {
+                        @Override
+                        public void call(IEntity entity) {
+                            entity.setPosition(
+                                    entity.getX() + (dx * Sector.SECTOR_SIZE),
+                                    entity.getY() + (dy * Sector.SECTOR_SIZE));
+                        }
+                    });
+                }
 
-        if (centre) {
-            mActivity.getEngine().runOnUpdateThread(new Runnable() {
-                @Override
-                public void run() {
+                mSectorX = sectorX;
+                mSectorY = sectorY;
+                mOffsetX = offsetX;
+                mOffsetY = offsetY;
+
+                List<Pair<Long, Long>> missingSectors = null;
+                for(long sy = mSectorY - mSectorRadius; sy <= mSectorY + mSectorRadius; sy++) {
+                    for(long sx = mSectorX - mSectorRadius; sx <= mSectorX + mSectorRadius; sx++) {
+                        Pair<Long, Long> key = new Pair<Long, Long>(sx, sy);
+                        Sector s = SectorManager.getInstance().getSector(sx, sy);
+                        if (s == null) {
+                            if (missingSectors == null) {
+                                missingSectors = new ArrayList<Pair<Long, Long>>();
+                            }
+                            missingSectors.add(key);
+                        }
+                    }
+                }
+                if (missingSectors != null) {
+                    SectorManager.getInstance().requestSectors(missingSectors, false, null);
+                }
+
+                mActivity.getCamera().setCenter(mOffsetX, mOffsetY);
+                if (centre) {
                     scroll(mActivity.getCamera().getWidth() / 2.0f,
                            mActivity.getCamera().getHeight() / 2.0f);
                 }
-            });
-        }
-
-        List<Pair<Long, Long>> missingSectors = new ArrayList<Pair<Long, Long>>();
-
-        for(sectorY = mSectorY - mSectorRadius; sectorY <= mSectorY + mSectorRadius; sectorY++) {
-            for(sectorX = mSectorX - mSectorRadius; sectorX <= mSectorX + mSectorRadius; sectorX++) {
-                Pair<Long, Long> key = new Pair<Long, Long>(sectorX, sectorY);
-                Sector s = SectorManager.getInstance().getSector(sectorX, sectorY);
-                if (s == null) {
-                    missingSectors.add(key);
-                }
             }
-        }
-
-        if (!missingSectors.isEmpty()) {
-            SectorManager.getInstance().requestSectors(missingSectors, false, null);
-        }
-
-        updateCamera();
-    }
-
-    private void updateCamera() {
-        mActivity.getCamera().setCenter(mCameraX, mCameraY);
+        });
     }
 
     /**
@@ -157,37 +164,39 @@ public abstract class SectorSceneManager implements SectorManager.OnSectorListCh
      * @param distanceY Number of pixels in the Y direction to scroll.
      */
     public void scroll(float distanceX, float distanceY) {
-        mOffsetX += distanceX;
-        mOffsetY += distanceY;
-        mCameraX += distanceX;
-        mCameraY += distanceY;
+        long newSectorX = mSectorX;
+        long newSectorY = mSectorY;
+        float newOffsetX = mOffsetX + distanceX;
+        float newOffsetY = mOffsetY + distanceY;
 
         boolean needUpdate = false;
-        while (mOffsetX < -(Sector.SECTOR_SIZE / 2)) {
-            mOffsetX += Sector.SECTOR_SIZE;
-            mSectorX --;
+        while (newOffsetX < -(Sector.SECTOR_SIZE / 2)) {
+            newOffsetX += Sector.SECTOR_SIZE;
+            newSectorX --;
             needUpdate = true;
         }
-        while (mOffsetX > (Sector.SECTOR_SIZE / 2)) {
-            mOffsetX -= Sector.SECTOR_SIZE;
-            mSectorX ++;
+        while (newOffsetX > (Sector.SECTOR_SIZE / 2)) {
+            newOffsetX -= Sector.SECTOR_SIZE;
+            newSectorX ++;
             needUpdate = true;
         }
-        while (mOffsetY < -(Sector.SECTOR_SIZE / 2)) {
-            mOffsetY += Sector.SECTOR_SIZE;
-            mSectorY --;
+        while (newOffsetY < -(Sector.SECTOR_SIZE / 2)) {
+            newOffsetY += Sector.SECTOR_SIZE;
+            newSectorY --;
             needUpdate = true;
         }
-        while (mOffsetY > (Sector.SECTOR_SIZE / 2)) {
-            mOffsetY -= Sector.SECTOR_SIZE;
-            mSectorY ++;
+        while (newOffsetY > (Sector.SECTOR_SIZE / 2)) {
+            newOffsetY -= Sector.SECTOR_SIZE;
+            newSectorY ++;
             needUpdate = true;
         }
 
         if (needUpdate) {
-            scrollTo(mSectorX, mSectorY, mOffsetX, mOffsetY);
+            scrollTo(newSectorX, newSectorY, newOffsetX, newOffsetY);
         } else {
-            updateCamera();
+            mOffsetX = newOffsetX;
+            mOffsetY = newOffsetY;
+            mActivity.getCamera().setCenter(mOffsetX, mOffsetY);
         }
     }
 
