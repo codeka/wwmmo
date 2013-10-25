@@ -23,11 +23,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import android.graphics.Canvas;
+import android.os.Handler;
 import android.view.GestureDetector;
+import android.view.MotionEvent;
+import android.view.ScaleGestureDetector;
 import au.com.codeka.common.Pair;
 import au.com.codeka.common.Vector2;
 import au.com.codeka.common.model.BaseFleet;
 import au.com.codeka.common.model.BaseStar;
+import au.com.codeka.warworlds.game.starfield.SectorSceneManager.GestureListener;
+import au.com.codeka.warworlds.game.starfield.SectorSceneManager.ScaleGestureListener;
 import au.com.codeka.warworlds.model.BuildManager;
 import au.com.codeka.warworlds.model.Empire;
 import au.com.codeka.warworlds.model.EmpireManager;
@@ -51,6 +56,10 @@ public class StarfieldSceneManager extends SectorSceneManager
     private ArrayList<OnSelectionChangedListener> mSelectionChangedListeners;
     private Map<String, Empire> mVisibleEmpires;
     private BaseStar mHqStar;
+    private Handler mHandler;
+
+    private Sprite mSelectingSprite;
+    private SelectionIndicator mSelectionIndicator;
 
     private BitmapTextureAtlas mStarTextureAtlas;
     private TiledTextureRegion mNeutronStarTextureRegion;
@@ -64,12 +73,15 @@ public class StarfieldSceneManager extends SectorSceneManager
     private boolean mIsBackgroundVisible = true;;
     private float mBackgroundZoomAlpha = 1.0f;
 
+    private StarSprite mSelectedStarSprite;
+
     public StarfieldSceneManager(StarfieldActivity activity) {
         super(activity);
         log.info("Starfield initializing...");
 
         mSelectionChangedListeners = new ArrayList<OnSelectionChangedListener>();
         mVisibleEmpires = new TreeMap<String, Empire>();
+        mHandler = new Handler();
     }
 
     @Override
@@ -93,6 +105,8 @@ public class StarfieldSceneManager extends SectorSceneManager
         mActivity.getTextureManager().loadTexture(mStarTextureAtlas);
         mActivity.getTextureManager().loadTexture(mBackgroundGasTextureAtlas);
         mActivity.getTextureManager().loadTexture(mBackgroundStarsTextureAtlas);
+
+        mSelectionIndicator = new SelectionIndicator(this);
     }
 
     @Override
@@ -131,14 +145,6 @@ public class StarfieldSceneManager extends SectorSceneManager
         // TODO: invalidate();
     }
 
-    /**
-     * Creates the \c OnGestureListener that'll handle our gestures.
-     */
-    @Override
-    protected GestureDetector.OnGestureListener createGestureListener() {
-        return new GestureListener();
-    }
-
     public void addSelectionChangedListener(OnSelectionChangedListener listener) {
         if (!mSelectionChangedListeners.contains(listener)) {
             mSelectionChangedListeners.add(listener);
@@ -148,17 +154,28 @@ public class StarfieldSceneManager extends SectorSceneManager
     public void removeSelectionChangedListener(OnSelectionChangedListener listener) {
         mSelectionChangedListeners.remove(listener);
     }
-/*
-    protected void fireSelectionChanged(VisibleEntity entity) {
-        for(OnSelectionChangedListener listener : mSelectionChangedListeners) {
-            if (entity.star != null) {
-                listener.onStarSelected(entity.star);
-            } else if (entity.fleet != null) {
-                listener.onFleetSelected(entity.fleet);
+
+    protected void fireSelectionChanged(final Star star) {
+        mHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                for(OnSelectionChangedListener listener : mSelectionChangedListeners) {
+                    listener.onStarSelected(star);
+                }
             }
-        }
+        });
     }
-*/
+    protected void fireSelectionChanged(final Fleet fleet) {
+        mHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                for(OnSelectionChangedListener listener : mSelectionChangedListeners) {
+                    listener.onFleetSelected(fleet);
+                }
+            }
+        });
+    }
+
     @Override
     public void onEmpireFetched(Empire empire) {
         // if the player's empire changes, it might mean that the location of their HQ has changed,
@@ -181,6 +198,8 @@ public class StarfieldSceneManager extends SectorSceneManager
         if (missingSectors != null) {
             SectorManager.getInstance().requestSectors(missingSectors, false, null);
         }
+
+        refreshSelectionIndicator();
     }
 
     @Override
@@ -357,7 +376,6 @@ public class StarfieldSceneManager extends SectorSceneManager
 
         int starID = Integer.parseInt(star.getKey());
 
-        float size = (float)(star.getSize() * star.getStarType().getImageScale() * 2.0f);
         ITextureRegion textureRegion = null;
         if (star.getStarType().getInternalName().equals("neutron")) {
             textureRegion = mNeutronStarTextureRegion.getTextureRegion(2 + (starID & 3));
@@ -380,13 +398,15 @@ public class StarfieldSceneManager extends SectorSceneManager
             textureRegion = mNormalStarTextureRegion.getTextureRegion((ty * 4) + (starID & 3));
         }
 
-        Sprite sprite = new Sprite(
-                (float) x,
-                (float) y,
-                size, size,
-                textureRegion,
-                mActivity.getVertexBufferObjectManager());
+        StarSprite sprite = new StarSprite(this, star,
+                                           (float) x, (float) y,
+                                           textureRegion, mActivity.getVertexBufferObjectManager());
+        scene.registerTouchArea(sprite);
         scene.attachChild(sprite);
+
+        if (mSelectedStarSprite != null && mSelectedStarSprite.getStar().getKey().equals(star.getKey())) {
+            mSelectedStarSprite = sprite;
+        }
 /*
         drawStarIcons(canvas, star, x, y);
         if (mHqStar != null && star.getKey().equals(mHqStar.getKey())) {
@@ -722,6 +742,51 @@ public class StarfieldSceneManager extends SectorSceneManager
                         mStarNamePaint);*/
     }
 
+    @Override
+    protected GestureDetector.OnGestureListener createGestureListener() {
+        return new GestureListener();
+    }
+
+    @Override
+    protected ScaleGestureDetector.OnScaleGestureListener createScaleGestureListener() {
+        return new ScaleGestureListener();
+    }
+
+    /** The default gesture listener is just for scrolling around. */
+    protected class GestureListener extends SectorSceneManager.GestureListener {
+        @Override
+        public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX,
+                float distanceY) {
+            super.onScroll(e1, e2, distanceX, distanceY);
+
+            // because we've navigating the map, we're no longer in the process of selecting a sprite.
+            mSelectingSprite = null;
+            return true;
+        }
+    }
+
+    /** The default scale gesture listener scales the view. */
+    protected class ScaleGestureListener extends SectorSceneManager.ScaleGestureListener {
+        @Override
+        public boolean onScale (ScaleGestureDetector detector) {
+            super.onScale(detector);
+
+            // because we've navigating the map, we're no longer in the process of selecting a sprite.
+            mSelectingSprite = null;
+            return true;
+        }
+    }
+
+    /** Gets the sprite we've marked as "being selected". That is, you've tapped down, but not yet tapped up. */
+    public Sprite getSelectingSprite() {
+        return mSelectingSprite;
+    }
+
+    /** Sets the sprite that we've tapped down on, but not yet tapped up on. */
+    public void setSelectingSprite(Sprite sprite) {
+        mSelectingSprite = sprite;
+    }
+
     public void selectStar(String starKey) {
         Star star = SectorManager.getInstance().findStar(starKey);
         selectStar(star);
@@ -729,6 +794,26 @@ public class StarfieldSceneManager extends SectorSceneManager
 
     public void selectStar(Star star) {
         
+    }
+
+    public void selectStar(StarSprite selectedStarSprite) {
+        log.info("OnSelect");
+        mSelectedStarSprite = selectedStarSprite;
+        // mSelectedFleetSprite = null;
+
+        refreshSelectionIndicator();
+        fireSelectionChanged(mSelectedStarSprite.getStar());
+    }
+
+    private void refreshSelectionIndicator() {
+        if (mSelectedStarSprite != null) {
+            Star star = mSelectedStarSprite.getStar();
+            if (mSelectionIndicator.getParent() != null) {
+                mSelectionIndicator.getParent().detachChild(mSelectionIndicator);
+            }
+            mSelectionIndicator.setScale(star.getSize());
+            mSelectedStarSprite.attachChild(mSelectionIndicator);
+        }
     }
 
     public void selectFleet(BaseFleet fleet) {

@@ -6,6 +6,7 @@ import java.util.List;
 import org.andengine.engine.camera.ZoomCamera;
 import org.andengine.entity.IEntity;
 import org.andengine.entity.IEntityParameterCallable;
+import org.andengine.entity.primitive.Line;
 import org.andengine.entity.scene.IOnSceneTouchListener;
 import org.andengine.entity.scene.Scene;
 import org.andengine.entity.scene.background.Background;
@@ -61,6 +62,10 @@ public abstract class SectorSceneManager implements SectorManager.OnSectorListCh
 
     protected void onStop() {
         SectorManager.getInstance().removeSectorListChangedListener(this);
+    }
+
+    public BaseGlActivity getActivity() {
+        return mActivity;
     }
 
     @Override
@@ -277,7 +282,7 @@ public abstract class SectorSceneManager implements SectorManager.OnSectorListCh
             scroll( (float)(distanceX),
                    -(float)(distanceY));
 
-            return false;
+            return true;
         }
     }
 
