@@ -1,6 +1,7 @@
 package au.com.codeka.warworlds.game.starfield;
 
 import org.andengine.entity.sprite.Sprite;
+import org.andengine.entity.text.Text;
 import org.andengine.input.touch.TouchEvent;
 import org.andengine.opengl.texture.region.ITextureRegion;
 import org.andengine.opengl.vbo.VertexBufferObjectManager;
@@ -11,6 +12,7 @@ import au.com.codeka.warworlds.model.Star;
 public class StarSprite extends Sprite {
     private StarfieldSceneManager mStarfield;
     private Star mStar;
+    private Text mStarName;
 
     public StarSprite(StarfieldSceneManager starfield, Star star,
                       float x, float y,
@@ -22,6 +24,11 @@ public class StarSprite extends Sprite {
               textureRegion, vertexBufferObjectManager);
         mStar = star;
         mStarfield = starfield;
+
+        float starSize = calculateSpriteSize(star);
+        mStarName = new Text(starSize / 2.0f, -starSize / 4.0f,
+                             mStarfield.getFont(), star.getName(), mStarfield.getActivity().getVertexBufferObjectManager());
+        attachChild(mStarName);
     }
 
     private static float calculateSpriteSize(Star star) {

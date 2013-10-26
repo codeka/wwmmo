@@ -11,6 +11,8 @@ import org.andengine.entity.Entity;
 import org.andengine.entity.primitive.Rectangle;
 import org.andengine.entity.scene.Scene;
 import org.andengine.entity.sprite.Sprite;
+import org.andengine.opengl.font.Font;
+import org.andengine.opengl.font.FontFactory;
 import org.andengine.opengl.shader.ShaderProgram;
 import org.andengine.opengl.shader.source.IShaderSource;
 import org.andengine.opengl.shader.source.StringShaderSource;
@@ -23,6 +25,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Typeface;
 import android.os.Handler;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
@@ -61,6 +65,7 @@ public class StarfieldSceneManager extends SectorSceneManager
     private Sprite mSelectingSprite;
     private SelectionIndicator mSelectionIndicator;
 
+    private Font mFont;
     private BitmapTextureAtlas mStarTextureAtlas;
     private TiledTextureRegion mNeutronStarTextureRegion;
     private TiledTextureRegion mNormalStarTextureRegion;
@@ -106,6 +111,10 @@ public class StarfieldSceneManager extends SectorSceneManager
         mActivity.getTextureManager().loadTexture(mBackgroundGasTextureAtlas);
         mActivity.getTextureManager().loadTexture(mBackgroundStarsTextureAtlas);
 
+        mFont = FontFactory.create(mActivity.getFontManager(), mActivity.getTextureManager(), 256, 256,
+                                   Typeface.create(Typeface.DEFAULT, Typeface.NORMAL), 16, true, Color.WHITE);
+        mFont.load();
+
         mSelectionIndicator = new SelectionIndicator(this);
     }
 
@@ -136,7 +145,8 @@ public class StarfieldSceneManager extends SectorSceneManager
         EmpireShieldManager.i.removeEmpireShieldUpdatedHandler(this);
     }
 
-    public void deselectStar() {
+    public Font getFont() {
+        return mFont;
     }
 
     /** Called when an empire's shield is updated, we'll have to refresh the list. */
@@ -803,6 +813,9 @@ public class StarfieldSceneManager extends SectorSceneManager
 
         refreshSelectionIndicator();
         fireSelectionChanged(mSelectedStarSprite.getStar());
+    }
+
+    public void deselectStar() {
     }
 
     private void refreshSelectionIndicator() {
