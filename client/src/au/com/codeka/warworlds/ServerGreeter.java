@@ -81,7 +81,7 @@ public class ServerGreeter {
         return mHelloComplete;
     }
 
-    public static void waitForHello(BaseActivity activity, HelloCompleteHandler handler) {
+    public static void waitForHello(Activity activity, HelloCompleteHandler handler) {
         if (mHelloComplete) {
             log.debug("Already said 'hello', not saying it again...");
             handler.onHelloComplete(true, mServerGreeting);
@@ -106,7 +106,7 @@ public class ServerGreeter {
         }
     }
 
-    private static void sayHello(final BaseActivity activity, final int retries) {
+    private static void sayHello(final Activity activity, final int retries) {
         log.debug("Saying 'hello'...");
         Util.setup(activity);
 

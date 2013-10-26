@@ -3,19 +3,16 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <org.andengine.opengl.view.RenderSurfaceView
+        android:id="@+id/starfield"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
     <au.com.codeka.warworlds.ctrl.BannerAdView
         android:id="@+id/ad"
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:layout_alignParentTop="true" />
-
-    <org.andengine.opengl.view.RenderSurfaceView
-        android:id="@+id/starfield"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentTop="true"
-        android:layout_marginBottom="-4px" />
 
     <au.com.codeka.warworlds.ctrl.SelectionView
         android:id="@+id/selection"
