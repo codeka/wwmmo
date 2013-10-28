@@ -240,7 +240,7 @@ public class StarfieldActivity extends BaseGlActivity
             }
         }
 
-        hideBottomPane();
+        hideBottomPane(true);
     }
 
     @Override
@@ -384,26 +384,32 @@ public class StarfieldActivity extends BaseGlActivity
         startActivity(intent);
     }
 
-    private void hideBottomPane() {
+    private void hideBottomPane(boolean instant) {
         Resources r = getResources();
         float px = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 34, r.getDisplayMetrics());
 
-        RelativeLayout.LayoutParams lp = (RelativeLayout.LayoutParams) mBottomPane.getLayoutParams();
-        lp.height = (int) px;
-        mBottomPane.setLayoutParams(lp);
+        if (instant) {
+            RelativeLayout.LayoutParams lp = (RelativeLayout.LayoutParams) mBottomPane.getLayoutParams();
+            lp.height = (int) px;
+            mBottomPane.setLayoutParams(lp);
+        } else {
+            applyBottomPaneAnimation(px);
+        }
     }
 
     private void showBottomPane() {
         Resources r = getResources();
         final float px = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 180, r.getDisplayMetrics());
+        applyBottomPaneAnimation(px);
+    }
 
+    private void applyBottomPaneAnimation(final float pxHeight) {
         Animation a = new Animation() {
             private int mInitialHeight;
 
             @Override
             protected void applyTransformation(float interpolatedTime, Transformation t) {
-                final int newHeight = mInitialHeight + (int)((px - mInitialHeight) * interpolatedTime);
-                log.debug("mInitialHeight = "+mInitialHeight+" px="+px+" interpolatedTime="+interpolatedTime);
+                final int newHeight = mInitialHeight + (int)((pxHeight - mInitialHeight) * interpolatedTime);
                 mBottomPane.getLayoutParams().height = newHeight;
                 mBottomPane.requestLayout();
             }
@@ -419,7 +425,7 @@ public class StarfieldActivity extends BaseGlActivity
                 return true;
             }
         };
-        a.setDuration(1000);
+        a.setDuration(500);
         mBottomPane.setAnimation(a);
     }
 
@@ -614,6 +620,20 @@ public class StarfieldActivity extends BaseGlActivity
 
     @Override
     public void onStarSelected(Star star) {
+        if (star == null) {
+            mFetchingStarKey = null;
+            mSelectedStar = null;
+            mFetchingFleetKey = null;
+            mSelectedFleet = null;
+
+            findViewById(R.id.loading_container).setVisibility(View.GONE);
+            findViewById(R.id.selected_star).setVisibility(View.GONE);
+            findViewById(R.id.selected_fleet).setVisibility(View.GONE);
+
+            hideBottomPane(false);
+            return;
+        }
+
         if (mSelectedStar != null && mSelectedStar.getKey().equals(star.getKey())) {
             updateStarSelection();
             return;

@@ -22,16 +22,16 @@ public class SelectionIndicator extends Entity {
             final float n1 = (float) (Math.PI * 2.0) / NUM_POINTS * (i + 1);
 
             Line line = new Line(
-                        (float) Math.sin(n) + 2.0f, (float) Math.cos(n) + 2.0f,
-                        (float) Math.sin(n1) + 2.0f, (float) Math.cos(n1) + 2.0f,
-                        2.0f, starfield.getActivity().getVertexBufferObjectManager()
+                        (float) Math.sin(n)*0.5f + 1.0f, (float) Math.cos(n)*0.5f + 1.0f,
+                        (float) Math.sin(n1)*0.5f + 1.0f, (float) Math.cos(n1)*0.5f + 1.0f,
+                        1.0f, starfield.getActivity().getVertexBufferObjectManager()
                     );
             mClockwise.attachChild(line);
 
             line = new Line(
-                    (float) Math.sin(n) * 1.4f + 2.0f, (float) Math.cos(n) * 1.4f + 2.0f,
-                    (float) Math.sin(n1) * 1.4f + 2.0f, (float) Math.cos(n1) * 1.4f + 2.0f,
-                    2.0f, starfield.getActivity().getVertexBufferObjectManager()
+                    (float) Math.sin(n)*0.6f + 1.0f, (float) Math.cos(n)*0.6f + 1.0f,
+                    (float) Math.sin(n1)*0.6f + 1.0f, (float) Math.cos(n1)*0.6f + 1.0f,
+                    1.0f, starfield.getActivity().getVertexBufferObjectManager()
                 );
             mAntiClockwise.attachChild(line);
         }
@@ -41,13 +41,19 @@ public class SelectionIndicator extends Entity {
         mAntiClockwise.setWidth(1.0f);
         mAntiClockwise.setHeight(1.0f);
 
-        mClockwise.setRotationCenter(2.0f, 2.0f);
-        mAntiClockwise.setRotationCenter(2.0f, 2.0f);
-
         attachChild(mClockwise);
         attachChild(mAntiClockwise);
 
         starfield.getActivity().getEngine().registerUpdateHandler(mUpdateHandler);
+    }
+
+    @Override
+    public void setScale(float scale) {
+        super.setScale(scale * 2.5f);
+//        mClockwise.setRotationCenter(scale / 2.0f, scale / 2.0f);
+//        mAntiClockwise.setRotationCenter(scale / 2.0f, scale / 2.0f);
+        mClockwise.setRotationCenter(1.0f, 1.0f);
+        mAntiClockwise.setRotationCenter(1.0f, 1.0f);
     }
 
     private IUpdateHandler mUpdateHandler = new IUpdateHandler() {

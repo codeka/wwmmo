@@ -264,14 +264,15 @@ public abstract class SectorSceneManager implements SectorManager.OnSectorListCh
 
     @Override
     public boolean onSceneTouchEvent(Scene scene, TouchEvent touchEvent) {
-        if (mGestureDetector == null) {
-            return false;
-        }
-
+        boolean returnValue = false;
         if (mScaleGestureDetector != null) {
             mScaleGestureDetector.onTouchEvent(touchEvent.getMotionEvent());
         }
-        return mGestureDetector.onTouchEvent(touchEvent.getMotionEvent());
+        if (mGestureDetector != null) {
+            mGestureDetector.onTouchEvent(touchEvent.getMotionEvent());
+        }
+
+        return true;
     }
 
     /** The default gesture listener is just for scrolling around. */

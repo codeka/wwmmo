@@ -11,6 +11,7 @@ import org.andengine.entity.Entity;
 import org.andengine.entity.primitive.Rectangle;
 import org.andengine.entity.scene.Scene;
 import org.andengine.entity.sprite.Sprite;
+import org.andengine.input.touch.TouchEvent;
 import org.andengine.opengl.font.Font;
 import org.andengine.opengl.font.FontFactory;
 import org.andengine.opengl.shader.ShaderProgram;
@@ -62,8 +63,9 @@ public class StarfieldSceneManager extends SectorSceneManager
     private BaseStar mHqStar;
     private Handler mHandler;
 
-    private Sprite mSelectingSprite;
+    private StarEntity mSelectingSprite;
     private SelectionIndicator mSelectionIndicator;
+    private boolean mWasDragging;
 
     private Font mFont;
     private BitmapTextureAtlas mStarTextureAtlas;
@@ -78,7 +80,7 @@ public class StarfieldSceneManager extends SectorSceneManager
     private boolean mIsBackgroundVisible = true;;
     private float mBackgroundZoomAlpha = 1.0f;
 
-    private StarSprite mSelectedStarSprite;
+    private StarEntity mSelectedStarSprite;
 
     public StarfieldSceneManager(StarfieldActivity activity) {
         super(activity);
@@ -408,10 +410,10 @@ public class StarfieldSceneManager extends SectorSceneManager
             textureRegion = mNormalStarTextureRegion.getTextureRegion((ty * 4) + (starID & 3));
         }
 
-        StarSprite sprite = new StarSprite(this, star,
+        StarEntity sprite = new StarEntity(this, star,
                                            (float) x, (float) y,
                                            textureRegion, mActivity.getVertexBufferObjectManager());
-        scene.registerTouchArea(sprite);
+        scene.registerTouchArea(sprite.getTouchEntity());
         scene.attachChild(sprite);
 
         if (mSelectedStarSprite != null && mSelectedStarSprite.getStar().getKey().equals(star.getKey())) {
@@ -753,6 +755,21 @@ public class StarfieldSceneManager extends SectorSceneManager
     }
 
     @Override
+    public boolean onSceneTouchEvent(Scene scene, TouchEvent touchEvent) {
+        super.onSceneTouchEvent(scene, touchEvent);
+
+        if (touchEvent.getAction() == TouchEvent.ACTION_DOWN) {
+            mWasDragging = false;
+        } else if (touchEvent.getAction() == TouchEvent.ACTION_UP) {
+            if (!mWasDragging) {
+                selectNothing();
+            }
+        }
+
+        return true;
+    }
+
+    @Override
     protected GestureDetector.OnGestureListener createGestureListener() {
         return new GestureListener();
     }
@@ -771,6 +788,7 @@ public class StarfieldSceneManager extends SectorSceneManager
 
             // because we've navigating the map, we're no longer in the process of selecting a sprite.
             mSelectingSprite = null;
+            mWasDragging = true;
             return true;
         }
     }
@@ -783,17 +801,18 @@ public class StarfieldSceneManager extends SectorSceneManager
 
             // because we've navigating the map, we're no longer in the process of selecting a sprite.
             mSelectingSprite = null;
+            mWasDragging = true;
             return true;
         }
     }
 
     /** Gets the sprite we've marked as "being selected". That is, you've tapped down, but not yet tapped up. */
-    public Sprite getSelectingSprite() {
+    public StarEntity getSelectingSprite() {
         return mSelectingSprite;
     }
 
     /** Sets the sprite that we've tapped down on, but not yet tapped up on. */
-    public void setSelectingSprite(Sprite sprite) {
+    public void setSelectingSprite(StarEntity sprite) {
         mSelectingSprite = sprite;
     }
 
@@ -806,7 +825,7 @@ public class StarfieldSceneManager extends SectorSceneManager
         
     }
 
-    public void selectStar(StarSprite selectedStarSprite) {
+    public void selectStar(StarEntity selectedStarSprite) {
         log.info("OnSelect");
         mSelectedStarSprite = selectedStarSprite;
         // mSelectedFleetSprite = null;
@@ -815,17 +834,28 @@ public class StarfieldSceneManager extends SectorSceneManager
         fireSelectionChanged(mSelectedStarSprite.getStar());
     }
 
-    public void deselectStar() {
+    /** Deselects the fleet or star you currently have selected. */
+    public void selectNothing() {
+        if (mSelectedStarSprite == null) {
+            return;
+        } else {
+            mSelectedStarSprite = null;
+            refreshSelectionIndicator();
+            fireSelectionChanged((Star) null);
+        }
     }
 
     private void refreshSelectionIndicator() {
+        if (mSelectionIndicator.getParent() != null) {
+            mSelectionIndicator.getParent().detachChild(mSelectionIndicator);
+        }
+
         if (mSelectedStarSprite != null) {
             Star star = mSelectedStarSprite.getStar();
-            if (mSelectionIndicator.getParent() != null) {
-                mSelectionIndicator.getParent().detachChild(mSelectionIndicator);
-            }
             mSelectionIndicator.setScale(star.getSize());
             mSelectedStarSprite.attachChild(mSelectionIndicator);
+        } else {
+            // nothing selected, nothing to do
         }
     }
 
