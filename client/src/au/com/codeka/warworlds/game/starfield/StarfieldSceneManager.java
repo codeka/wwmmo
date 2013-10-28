@@ -6,17 +6,12 @@ import java.util.Map;
 import java.util.Random;
 import java.util.TreeMap;
 
-import org.andengine.engine.camera.ZoomCamera;
 import org.andengine.entity.Entity;
-import org.andengine.entity.primitive.Rectangle;
 import org.andengine.entity.scene.Scene;
 import org.andengine.entity.sprite.Sprite;
 import org.andengine.input.touch.TouchEvent;
 import org.andengine.opengl.font.Font;
 import org.andengine.opengl.font.FontFactory;
-import org.andengine.opengl.shader.ShaderProgram;
-import org.andengine.opengl.shader.source.IShaderSource;
-import org.andengine.opengl.shader.source.StringShaderSource;
 import org.andengine.opengl.texture.TextureOptions;
 import org.andengine.opengl.texture.atlas.bitmap.BitmapTextureAtlas;
 import org.andengine.opengl.texture.atlas.bitmap.BitmapTextureAtlasTextureRegionFactory;
@@ -36,8 +31,6 @@ import au.com.codeka.common.Pair;
 import au.com.codeka.common.Vector2;
 import au.com.codeka.common.model.BaseFleet;
 import au.com.codeka.common.model.BaseStar;
-import au.com.codeka.warworlds.game.starfield.SectorSceneManager.GestureListener;
-import au.com.codeka.warworlds.game.starfield.SectorSceneManager.ScaleGestureListener;
 import au.com.codeka.warworlds.model.BuildManager;
 import au.com.codeka.warworlds.model.Empire;
 import au.com.codeka.warworlds.model.EmpireManager;
@@ -93,12 +86,12 @@ public class StarfieldSceneManager extends SectorSceneManager
 
     @Override
     public void onLoadResources() {
-        mStarTextureAtlas = new BitmapTextureAtlas(mActivity.getTextureManager(), 128, 320,
+        mStarTextureAtlas = new BitmapTextureAtlas(mActivity.getTextureManager(), 128, 384,
                 TextureOptions.BILINEAR_PREMULTIPLYALPHA);
         mNormalStarTextureRegion = BitmapTextureAtlasTextureRegionFactory.createTiledFromAsset(mStarTextureAtlas, mActivity,
-                "stars/stars_small.png", 0, 0, 4, 10);
+                "stars/stars_small.png", 0, 0, 2, 6);
         mNeutronStarTextureRegion = BitmapTextureAtlasTextureRegionFactory.createTiledFromAsset(mStarTextureAtlas, mActivity,
-                "stars/stars_small.png", 0, 0, 2, 5);
+                "stars/stars_small.png", 0, 0, 1, 3);
 
         mBackgroundGasTextureAtlas = new BitmapTextureAtlas(mActivity.getTextureManager(), 512, 512,
                 TextureOptions.BILINEAR_PREMULTIPLYALPHA);
@@ -390,24 +383,23 @@ public class StarfieldSceneManager extends SectorSceneManager
 
         ITextureRegion textureRegion = null;
         if (star.getStarType().getInternalName().equals("neutron")) {
-            textureRegion = mNeutronStarTextureRegion.getTextureRegion(2 + (starID & 3));
-            //size *= 4.0f;
+            textureRegion = mNeutronStarTextureRegion.getTextureRegion(0);
         } else {
-            int ty = 0;
+            int offset = 0;
             if (star.getStarType().getInternalName().equals("black-hole")) {
-                ty = 0;
+                offset = 4;
             } else if (star.getStarType().getInternalName().equals("blue")) {
-                ty = 1;
+                offset = 5;
             } else if (star.getStarType().getInternalName().equals("orange")) {
-                ty = 6;
+                offset = 6;
             } else if (star.getStarType().getInternalName().equals("red")) {
-                ty = 7;
+                offset = 7;
             } else if (star.getStarType().getInternalName().equals("white")) {
-                ty = 8;
+                offset = 8;
             } else if (star.getStarType().getInternalName().equals("yellow")) {
-                ty = 9;
+                offset = 9;
             }
-            textureRegion = mNormalStarTextureRegion.getTextureRegion((ty * 4) + (starID & 3));
+            textureRegion = mNormalStarTextureRegion.getTextureRegion(offset);
         }
 
         StarEntity sprite = new StarEntity(this, star,

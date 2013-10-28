@@ -1,5 +1,7 @@
 package au.com.codeka.warworlds.game.starfield;
 
+import java.util.Random;
+
 import org.andengine.entity.Entity;
 import org.andengine.entity.sprite.Sprite;
 import org.andengine.entity.text.Text;
@@ -29,6 +31,7 @@ public class StarEntity extends Entity {
         if (star.getStarType().getImageScale() > 1.0) {
             mStarSprite.setScale((float) star.getStarType().getImageScale());
         }
+        mStarSprite.setRotation(new Random(Integer.parseInt(star.getKey()) * 100000l).nextFloat() * 360.0f);
         mStarName = new Text(0.0f, -starSize * 0.6f,
                              mStarfield.getFont(), star.getName(),
                              mStarfield.getActivity().getVertexBufferObjectManager());

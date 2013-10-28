@@ -27,6 +27,7 @@ public class StarImageManager extends ImageManager {
             String spriteName = "star."+(realSize > 250 ? "big." : "small.")+star.getStarType().getInternalName();
             sprite = SpriteManager.i.getSprite(spriteName);
 
+//            sprite = sprite.extractFrame(0);
             if (sprite.getNumFrames() > 1) {
                 int frameNo = new Random(star.hashCode()).nextInt(sprite.getNumFrames());
                 sprite = sprite.extractFrame(frameNo);

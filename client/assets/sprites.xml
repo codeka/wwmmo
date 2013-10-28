@@ -136,47 +136,26 @@
   </sheet>
 
   <sheet filename="stars/stars_small.png">
+    <sprite name="star.small.neutron">
+      <rect location="0,0" size="128x128" />
+    </sprite>
     <sprite name="star.small.black-hole">
-      <rect location="0,0" size="32x32" />
-      <rect location="32,0" size="32x32" />
-      <rect location="64,0" size="32x32" />
-      <rect location="96,0" size="32x32" />
+      <rect location="0,128" size="64x64" />
     </sprite>
     <sprite name="star.small.blue">
-      <rect location="0,32" size="32x32" />
-      <rect location="32,32" size="32x32" />
-      <rect location="64,32" size="32x32" />
-      <rect location="96,32" size="32x32" />
-    </sprite>
-    <sprite name="star.small.neutron">
-      <rect location="0,64" size="64x64" />
-      <rect location="64,64" size="64x64" />
-      <rect location="0,128" size="64x64" />
       <rect location="64,128" size="64x64" />
     </sprite>
     <sprite name="star.small.orange">
-      <rect location="0,192" size="32x32" />
-      <rect location="32,192" size="32x32" />
-      <rect location="64,192" size="32x32" />
-      <rect location="96,192" size="32x32" />
+      <rect location="0,192" size="64x64" />
     </sprite>
     <sprite name="star.small.red">
-      <rect location="0,224" size="32x32" />
-      <rect location="32,224" size="32x32" />
-      <rect location="64,224" size="32x32" />
-      <rect location="96,224" size="32x32" />
+      <rect location="64,192" size="64x64" />
     </sprite>
     <sprite name="star.small.white">
-      <rect location="0,256" size="32x32" />
-      <rect location="32,256" size="32x32" />
-      <rect location="64,256" size="32x32" />
-      <rect location="96,256" size="32x32" />
+      <rect location="0,256" size="64x64" />
     </sprite>
     <sprite name="star.small.yellow">
-      <rect location="0,288" size="32x32" />
-      <rect location="32,288" size="32x32" />
-      <rect location="64,288" size="32x32" />
-      <rect location="96,288" size="32x32" />
+      <rect location="64,256" size="64x64" />
     </sprite>
   </sheet>
 </sprites>
