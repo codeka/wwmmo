@@ -50,8 +50,6 @@ public class SelectionIndicator extends Entity {
     @Override
     public void setScale(float scale) {
         super.setScale(scale * 2.5f);
-//        mClockwise.setRotationCenter(scale / 2.0f, scale / 2.0f);
-//        mAntiClockwise.setRotationCenter(scale / 2.0f, scale / 2.0f);
         mClockwise.setRotationCenter(1.0f, 1.0f);
         mAntiClockwise.setRotationCenter(1.0f, 1.0f);
     }

@@ -22,11 +22,11 @@ public class StarEntity extends Entity {
                       float x, float y,
                       ITextureRegion textureRegion,
                       VertexBufferObjectManager vertexBufferObjectManager) {
-        super(x, y, star.getSize() * 3.0f, star.getSize() * 3.0f);
+        super(x, y, star.getSize() * 2.0f, star.getSize() * 2.0f);
         mStar = star;
         mStarfield = starfield;
 
-        final float starSize = star.getSize() * 3.0f;
+        final float starSize = star.getSize() * 2.0f;
         mStarSprite = new StarSprite(starSize, textureRegion, vertexBufferObjectManager);
         if (star.getStarType().getImageScale() > 1.0) {
             mStarSprite.setScale((float) star.getStarType().getImageScale());
@@ -63,9 +63,10 @@ public class StarEntity extends Entity {
                 StarEntity selectingSprite = mStarfield.getSelectingSprite();
                 if (selectingSprite == StarEntity.this) {
                     mStarfield.selectStar(StarEntity.this);
+                    return true;
                 }
             }
-            return true;
+            return false;
         }
     }
 }

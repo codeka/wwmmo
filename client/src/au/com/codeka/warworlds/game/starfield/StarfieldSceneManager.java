@@ -319,7 +319,8 @@ public class StarfieldSceneManager extends SectorSceneManager
             float y = r.nextInt(Sector.SECTOR_SIZE + (GAS_SIZE / 4)) - (GAS_SIZE / 8);
 
             Sprite bgSprite = new Sprite(
-                    (sx + x) - (GAS_SIZE / 2.0f), (sy + y) - (GAS_SIZE / 2.0f),
+                    (sx + x) - (GAS_SIZE / 2.0f),
+                    (sy + y) - (GAS_SIZE / 2.0f),
                     GAS_SIZE, GAS_SIZE,
                     mBackgroundGasTextureRegion.getTextureRegion(r.nextInt(14)),
                     mActivity.getVertexBufferObjectManager());
@@ -378,8 +379,6 @@ public class StarfieldSceneManager extends SectorSceneManager
     private void drawStar(Scene scene, Star star, int x, int y) {
         x += star.getOffsetX();
         y += star.getOffsetY();
-
-        int starID = Integer.parseInt(star.getKey());
 
         ITextureRegion textureRegion = null;
         if (star.getStarType().getInternalName().equals("neutron")) {
@@ -748,17 +747,18 @@ public class StarfieldSceneManager extends SectorSceneManager
 
     @Override
     public boolean onSceneTouchEvent(Scene scene, TouchEvent touchEvent) {
-        super.onSceneTouchEvent(scene, touchEvent);
+        boolean handled = super.onSceneTouchEvent(scene, touchEvent);
 
         if (touchEvent.getAction() == TouchEvent.ACTION_DOWN) {
             mWasDragging = false;
         } else if (touchEvent.getAction() == TouchEvent.ACTION_UP) {
             if (!mWasDragging) {
                 selectNothing();
+                handled = true;
             }
         }
 
-        return true;
+        return handled;
     }
 
     @Override

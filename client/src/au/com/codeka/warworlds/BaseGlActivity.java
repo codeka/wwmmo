@@ -1,11 +1,19 @@
 package au.com.codeka.warworlds;
 
+import java.io.File;
+import java.io.FileFilter;
+import java.util.regex.Pattern;
+
+import org.andengine.engine.Engine;
+import org.andengine.engine.LimitedFPSEngine;
 import org.andengine.engine.camera.Camera;
 import org.andengine.engine.camera.ZoomCamera;
 import org.andengine.engine.options.EngineOptions;
 import org.andengine.engine.options.ScreenOrientation;
 import org.andengine.engine.options.resolutionpolicy.RatioResolutionPolicy;
 import org.andengine.ui.activity.SimpleLayoutGameActivity;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import android.content.Context;
 import android.content.Intent;
@@ -29,6 +37,7 @@ import au.com.codeka.warworlds.model.PurchaseManager;
  * duplicate a few things that come from our own BaseActivity.
  */
 public abstract class BaseGlActivity extends SimpleLayoutGameActivity {
+    private static Logger log = LoggerFactory.getLogger(BaseGlActivity.class);
     private SensorManager mSensorManager;
     private Sensor mAccelerometer;
     private DebugView mDebugView;
@@ -63,13 +72,31 @@ public abstract class BaseGlActivity extends SimpleLayoutGameActivity {
         mCameraHeight = size.y;
 
         mCamera = createCamera();
-        return new EngineOptions(false, ScreenOrientation.MANIFEST,
+        EngineOptions options =  new EngineOptions(false, ScreenOrientation.MANIFEST,
                 new RatioResolutionPolicy(mCameraWidth, mCameraHeight), mCamera);
+        options.setUpdateThreadPriority(Thread.NORM_PRIORITY - 2);
+        return options;
+    }
+
+    @Override
+    public Engine onCreateEngine(final EngineOptions engineOptions) {
+        if (getNumCores() == 1) {
+            log.info("Single-core device detected, using a Limited-FPS engine.");
+            return new LimitedFPSEngine(engineOptions, 5);
+        } else {
+            log.info("Multi-core device detected, using regular engine.");
+            return new Engine(engineOptions);
+        }
     }
 
     /** Create the camera, we create a ZoomCamera by default. */
     protected Camera createCamera() {
-        return new ZoomCamera(0, 0, mCameraWidth, mCameraHeight);
+        ZoomCamera camera = new ZoomCamera(0, 0, mCameraWidth, mCameraHeight);
+
+        final float zoomFactor = getResources().getDisplayMetrics().density;
+        camera.setZoomFactor(zoomFactor);
+
+        return camera;
     }
 
     @Override
@@ -151,4 +178,36 @@ public abstract class BaseGlActivity extends SimpleLayoutGameActivity {
             return true;
         }
         return false;
-    }}
+    }
+
+    /**
+     * Gets the number of cores available in this device, across all processors.
+     * Requires: Ability to peruse the filesystem at "/sys/devices/system/cpu"
+     * @return The number of cores, or 1 if failed to get result.
+     */
+    private static int getNumCores() {
+        //Private Class to display only CPU devices in the directory listing
+        class CpuFilter implements FileFilter {
+            @Override
+            public boolean accept(File pathname) {
+                //Check if filename is "cpu", followed by a single digit number
+                if(Pattern.matches("cpu[0-9]+", pathname.getName())) {
+                    return true;
+                }
+                return false;
+            }      
+        }
+
+        try {
+            //Get directory containing CPU info
+            File dir = new File("/sys/devices/system/cpu/");
+            //Filter to only list the devices we care about
+            File[] files = dir.listFiles(new CpuFilter());
+            //Return the number of cores (virtual CPU devices)
+            return files.length;
+        } catch(Exception e) {
+            //Default to return 1 core
+            return 1;
+        }
+    }
+}

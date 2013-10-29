@@ -175,27 +175,28 @@ public abstract class SectorSceneManager implements SectorManager.OnSectorListCh
         float newOffsetY = mOffsetY + distanceY;
 
         boolean needUpdate = false;
-        while (newOffsetX < -(Sector.SECTOR_SIZE / 2)) {
+        while (newOffsetX < -Sector.SECTOR_SIZE / 2) {
             newOffsetX += Sector.SECTOR_SIZE;
             newSectorX --;
             needUpdate = true;
         }
-        while (newOffsetX > (Sector.SECTOR_SIZE / 2)) {
+        while (newOffsetX > Sector.SECTOR_SIZE / 2) {
             newOffsetX -= Sector.SECTOR_SIZE;
             newSectorX ++;
             needUpdate = true;
         }
-        while (newOffsetY < -(Sector.SECTOR_SIZE / 2)) {
+        while (newOffsetY < -Sector.SECTOR_SIZE / 2) {
             newOffsetY += Sector.SECTOR_SIZE;
             newSectorY --;
             needUpdate = true;
         }
-        while (newOffsetY > (Sector.SECTOR_SIZE / 2)) {
+        while (newOffsetY > Sector.SECTOR_SIZE / 2) {
             newOffsetY -= Sector.SECTOR_SIZE;
             newSectorY ++;
             needUpdate = true;
         }
 
+        log.debug("scroll("+distanceX+", "+distanceY+") = ["+newSectorX+", "+newSectorY+"] ("+newOffsetX+", "+newOffsetY+")");
         if (needUpdate) {
             scrollTo(newSectorX, newSectorY, newOffsetX, newOffsetY);
         } else {
@@ -264,15 +265,19 @@ public abstract class SectorSceneManager implements SectorManager.OnSectorListCh
 
     @Override
     public boolean onSceneTouchEvent(Scene scene, TouchEvent touchEvent) {
-        boolean returnValue = false;
+        boolean handled = false;
         if (mScaleGestureDetector != null) {
-            mScaleGestureDetector.onTouchEvent(touchEvent.getMotionEvent());
+            if (mScaleGestureDetector.onTouchEvent(touchEvent.getMotionEvent())) {
+                handled = true;
+            }
         }
         if (mGestureDetector != null) {
-            mGestureDetector.onTouchEvent(touchEvent.getMotionEvent());
+            if (mGestureDetector.onTouchEvent(touchEvent.getMotionEvent())) {
+                handled = true;
+            }
         }
 
-        return true;
+        return handled;
     }
 
     /** The default gesture listener is just for scrolling around. */
@@ -280,8 +285,10 @@ public abstract class SectorSceneManager implements SectorManager.OnSectorListCh
         @Override
         public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX,
                 float distanceY) {
-            scroll( (float)(distanceX),
-                   -(float)(distanceY));
+            final ZoomCamera zoomCamera = (ZoomCamera) mActivity.getCamera();
+            final float zoomFactor = zoomCamera.getZoomFactor();
+            scroll( distanceX / zoomFactor,
+                   -distanceY / zoomFactor);
 
             return true;
         }
