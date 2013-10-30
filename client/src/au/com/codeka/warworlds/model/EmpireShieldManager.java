@@ -31,6 +31,7 @@ import android.graphics.Color;
 import au.com.codeka.BackgroundRunner;
 import au.com.codeka.warworlds.App;
 import au.com.codeka.warworlds.BaseGlActivity;
+import au.com.codeka.warworlds.RealmContext;
 import au.com.codeka.warworlds.api.ApiClient;
 import au.com.codeka.warworlds.api.ApiException;
 
@@ -282,7 +283,7 @@ public class EmpireShieldManager {
 
         File cacheDir = context.getCacheDir();
         String fullPath = cacheDir.getAbsolutePath() + File.separator + "empire-shields" + File.separator;
-        fullPath += String.format("v2-%s-%d.png", empire.getKey(), lastUpdate);
+        fullPath += String.format("%d-v2-%s-%d.png", RealmContext.i.getCurrentRealm().getID(), empire.getKey(), lastUpdate);
         return fullPath;
     }
 

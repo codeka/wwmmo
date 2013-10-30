@@ -358,6 +358,8 @@ public class StarfieldActivity extends BaseGlActivity
     /** Called when an empire's shield is updated, we'll have to refresh the list. */
     @Override
     public void onEmpireShieldUpdated(int empireID) {
+        EmpireShieldManager.i.clearTextureCache();
+
         if (mSelectedFleet != null) {
             // this will cause the selected fleet info to redraw and hence the shield
             onFleetSelected(mSelectedFleet);

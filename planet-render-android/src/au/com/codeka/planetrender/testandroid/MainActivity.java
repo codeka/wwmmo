@@ -34,7 +34,15 @@ public class MainActivity extends Activity {
         AssetManager assetManager = getAssets();
         String[] templateFiles = null;
         try {
-            templateFiles = assetManager.list("planets");
+            String[] allFiles = assetManager.list("planets");
+            // remove the planets.png file...
+            templateFiles = new String[allFiles.length - 1];
+            for (int i = 0, j = 0; i < allFiles.length; i++) {
+                if (allFiles[i].equals("planets.png")) {
+                    continue;
+                }
+                templateFiles[j++] = allFiles[i];
+            }
         } catch (IOException e1) {
         }
         if (templateFiles != null) {

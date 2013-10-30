@@ -2,9 +2,7 @@ package au.com.codeka.warworlds.game.starfield;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
-import java.util.TreeMap;
 
 import org.andengine.entity.Entity;
 import org.andengine.entity.scene.Scene;
@@ -20,7 +18,6 @@ import org.andengine.opengl.texture.region.TiledTextureRegion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Handler;
@@ -48,8 +45,7 @@ import au.com.codeka.warworlds.model.StarManager;
  */
 public class StarfieldSceneManager extends SectorSceneManager
                                   implements StarManager.StarFetchedHandler,
-                                             EmpireManager.EmpireFetchedHandler,
-                                             EmpireShieldManager.EmpireShieldUpdatedHandler {
+                                             EmpireManager.EmpireFetchedHandler {
     private static final Logger log = LoggerFactory.getLogger(StarfieldSceneManager.class);
     private ArrayList<OnSelectionChangedListener> mSelectionChangedListeners;
     private BaseStar mHqStar;
@@ -126,7 +122,6 @@ public class StarfieldSceneManager extends SectorSceneManager
 
         StarManager.getInstance().addStarUpdatedListener(null, this);
         EmpireManager.i.addEmpireUpdatedListener(null, this);
-        EmpireShieldManager.i.addEmpireShieldUpdatedHandler(this);
 
         MyEmpire myEmpire = EmpireManager.i.getEmpire();
         if (myEmpire != null) {
@@ -144,17 +139,10 @@ public class StarfieldSceneManager extends SectorSceneManager
 
         StarManager.getInstance().removeStarUpdatedListener(this);
         EmpireManager.i.removeEmpireUpdatedListener(this);
-        EmpireShieldManager.i.removeEmpireShieldUpdatedHandler(this);
     }
 
     public Font getFont() {
         return mFont;
-    }
-
-    /** Called when an empire's shield is updated, we'll have to refresh the list. */
-    @Override
-    public void onEmpireShieldUpdated(int empireID) {
-        // TODO: invalidate();
     }
 
     public void addSelectionChangedListener(OnSelectionChangedListener listener) {
@@ -354,26 +342,12 @@ public class StarfieldSceneManager extends SectorSceneManager
     }
 
     /**
-     * Given a \c Sector, returns the (x, y) coordinates (in view-space) of the origin of this
-     * sector.
-     */
-    private Vector2 getSectorOffset(long sx, long sy) {
-        sx -= mSectorX;
-        sy -= mSectorY;
-        return new Vector2((sx * Sector.SECTOR_SIZE) + mOffsetX,
-                           (sy * Sector.SECTOR_SIZE) + mOffsetY);
-    }
-
-    /**
      * Draws a sector, which is a 1024x1024 area of stars.
      */
     private void drawSector(Scene scene, int offsetX, int offsetY, Sector sector) {
         for(BaseStar star : sector.getStars()) {
             drawStar(scene, (Star) star, offsetX, offsetY);
         }/*
-        for(BaseStar star : sector.getStars()) {
-            drawStarName(scene, (Star) star, offsetX, offsetY);
-        }
         for (BaseStar star : sector.getStars()) {
             for (BaseFleet fleet : star.getFleets()) {
                 if (fleet.getState() == Fleet.State.MOVING) {
@@ -422,7 +396,6 @@ public class StarfieldSceneManager extends SectorSceneManager
             mSelectedStarSprite = sprite;
         }
 /*
-        drawStarIcons(canvas, star, x, y);
         if (mHqStar != null && star.getKey().equals(mHqStar.getKey())) {
             if (mHqSprite == null) {
                 mHqSprite = SpriteManager.i.getSprite("building.hq");

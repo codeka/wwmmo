@@ -201,63 +201,6 @@ public abstract class SectorSceneManager implements SectorManager.OnSectorListCh
         }
     }
 
-    /**
-     * Gets the \c Star that's closest to the given (x,y), based on the current sector
-     * centre and offsets.
-     */
-    public Star getStarAt(int viewX, int viewY) {
-        // first, work out which sector your actually inside of. If (mOffsetX, mOffsetY) is (0,0)
-        // then (x,y) corresponds exactly to the offset into (mSectorX, mSectorY). Otherwise, we
-        // have to adjust (x,y) by the offset so that it works out like that.
-        int x = viewX - (int) mOffsetX;
-        int y = viewY - (int) mOffsetY;
-
-        long sectorX = mSectorX;
-        long sectorY = mSectorY;
-        while (x < 0) {
-            x += Sector.SECTOR_SIZE;
-            sectorX --;
-        }
-        while (x >= Sector.SECTOR_SIZE) {
-            x -= Sector.SECTOR_SIZE;
-            sectorX ++;
-        }
-        while (y < 0) {
-            y += Sector.SECTOR_SIZE;
-            sectorY --;
-        }
-        while (y >= Sector.SECTOR_SIZE) {
-            y -= Sector.SECTOR_SIZE;
-            sectorY ++;
-        }
-
-        Sector sector = SectorManager.getInstance().getSector(sectorX, sectorY);
-        if (sector == null) {
-            // if it's not loaded yet, you can't have tapped on anything...
-            return null;
-        }
-
-        int minDistance = 0;
-        BaseStar closestStar = null;
-
-        for(BaseStar star : sector.getStars()) {
-            int starX = star.getOffsetX();
-            int starY = star.getOffsetY();
-
-            int distance = (starX - x)*(starX - x) + (starY - y)*(starY - y);
-            if (closestStar == null || distance < minDistance) {
-                closestStar = star;
-                minDistance = distance;
-            }
-        }
-
-        // only return it if you tapped within a 48 pixel radius
-        if (Math.sqrt(minDistance) <= 48) {
-            return (Star) closestStar;
-        }
-        return null;
-    }
-
     @Override
     public boolean onSceneTouchEvent(Scene scene, TouchEvent touchEvent) {
         boolean handled = false;
