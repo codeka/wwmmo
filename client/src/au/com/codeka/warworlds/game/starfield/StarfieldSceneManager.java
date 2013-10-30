@@ -52,7 +52,6 @@ public class StarfieldSceneManager extends SectorSceneManager
                                              EmpireShieldManager.EmpireShieldUpdatedHandler {
     private static final Logger log = LoggerFactory.getLogger(StarfieldSceneManager.class);
     private ArrayList<OnSelectionChangedListener> mSelectionChangedListeners;
-    private Map<String, Empire> mVisibleEmpires;
     private BaseStar mHqStar;
     private Handler mHandler;
 
@@ -64,6 +63,9 @@ public class StarfieldSceneManager extends SectorSceneManager
     private BitmapTextureAtlas mStarTextureAtlas;
     private TiledTextureRegion mNeutronStarTextureRegion;
     private TiledTextureRegion mNormalStarTextureRegion;
+
+    private BitmapTextureAtlas mFleetIconTextureAtlas;
+    private TiledTextureRegion mFleetIconTextureRegion;
 
     private BitmapTextureAtlas mBackgroundGasTextureAtlas;
     private TiledTextureRegion mBackgroundGasTextureRegion;
@@ -80,7 +82,6 @@ public class StarfieldSceneManager extends SectorSceneManager
         log.info("Starfield initializing...");
 
         mSelectionChangedListeners = new ArrayList<OnSelectionChangedListener>();
-        mVisibleEmpires = new TreeMap<String, Empire>();
         mHandler = new Handler();
     }
 
@@ -102,9 +103,15 @@ public class StarfieldSceneManager extends SectorSceneManager
         mBackgroundStarsTextureRegion = BitmapTextureAtlasTextureRegionFactory.createTiledFromAsset(mBackgroundStarsTextureAtlas,
                 mActivity, "decoration/starfield.png", 0, 0, 4, 4);
 
+        mFleetIconTextureAtlas = new BitmapTextureAtlas(mActivity.getTextureManager(), 64, 64,
+                TextureOptions.BILINEAR_PREMULTIPLYALPHA);
+        mFleetIconTextureRegion = BitmapTextureAtlasTextureRegionFactory.createTiledFromAsset(mFleetIconTextureAtlas, 
+                mActivity, "img/fleet.png", 0, 0, 1, 1);
+
         mActivity.getTextureManager().loadTexture(mStarTextureAtlas);
         mActivity.getTextureManager().loadTexture(mBackgroundGasTextureAtlas);
         mActivity.getTextureManager().loadTexture(mBackgroundStarsTextureAtlas);
+        mActivity.getTextureManager().loadTexture(mFleetIconTextureAtlas);
 
         mFont = FontFactory.create(mActivity.getFontManager(), mActivity.getTextureManager(), 256, 256,
                                    Typeface.create(Typeface.DEFAULT, Typeface.NORMAL), 16, true, Color.WHITE);
@@ -195,6 +202,10 @@ public class StarfieldSceneManager extends SectorSceneManager
 
     public Star getSelectedStar() {
         return null;
+    }
+
+    public ITextureRegion getFleetIconTextureRegion() {
+        return mFleetIconTextureRegion;
     }
 
     @Override
@@ -448,145 +459,6 @@ public class StarfieldSceneManager extends SectorSceneManager
     }
 
     /**
-     * Gets an \c Empire given it's key.
-     */
-    private Empire getEmpire(String empireKey) {
-        if (empireKey == null) {
-            return EmpireManager.i.getNativeEmpire();
-        }
-
-        Empire emp = mVisibleEmpires.get(empireKey);
-        if (emp == null) {
-            EmpireManager.i.fetchEmpire(empireKey, new EmpireManager.EmpireFetchedHandler() {
-                @Override
-                public void onEmpireFetched(Empire empire) {
-                    mVisibleEmpires.put(empire.getKey(), empire);
-                    // TODO: redraw()
-                }
-            });
-        }
-        return emp;
-    }
-
-    private void drawStarIcons(Scene scene, Star star, int x, int y) {
-        /*
-        List<BaseColony> colonies = star.getColonies();
-        if (colonies != null && !colonies.isEmpty()) {
-            Map<String, Integer> colonyEmpires = new TreeMap<String, Integer>();
-
-            for (int i = 0; i < colonies.size(); i++) {
-                BaseColony colony = colonies.get(i);
-                if (colony.getEmpireKey() == null) {
-                    continue;
-                }
-
-                Empire emp = getEmpire(colony.getEmpireKey());
-                if (emp != null) {
-                    Integer n = colonyEmpires.get(emp.getKey());
-                    if (n == null) {
-                        n = 1;
-                        colonyEmpires.put(emp.getKey(), n);
-                    } else {
-                        colonyEmpires.put(emp.getKey(), n+1);
-                    }
-                }
-            }
-
-            int i = 1;
-            for (String empireKey : colonyEmpires.keySet()) {
-                Integer n = colonyEmpires.get(empireKey);
-                Empire emp = mVisibleEmpires.get(empireKey);
-
-                Bitmap bmp = EmpireShieldManager.i.getShield(mContext, emp);
-
-                Vector2 pt = Vector2.pool.borrow().reset(0, -25.0f);
-                pt.rotate((float)(Math.PI / 4.0) * i);
-                pt.add(x, y);
-
-                mMatrix.reset();
-                mMatrix.postTranslate(-(bmp.getWidth() / 2.0f), -(bmp.getHeight() / 2.0f));
-                mMatrix.postScale(16.0f * pixelScale / bmp.getWidth(),
-                                  16.0f * pixelScale / bmp.getHeight());
-                mMatrix.postTranslate((float) pt.x * pixelScale, (float) pt.y * pixelScale);
-                canvas.drawBitmap(bmp, mMatrix, mStarPaint);
-
-                String name;
-                if (n.equals(1)) {
-                    name = emp.getDisplayName();
-                } else {
-                    name = String.format(Locale.ENGLISH, "%s (%d)", emp.getDisplayName(), n);
-                }
-
-                Rect bounds = new Rect();
-                mStarPaint.getTextBounds(name, 0, name.length(), bounds);
-                float textHeight = bounds.height();
-
-                canvas.drawText(name,
-                                (float) (pt.x + 12) * pixelScale,
-                                (float) (pt.y + 8) * pixelScale - (textHeight / 2),
-                                mStarPaint);
-                Vector2.pool.release(pt); pt = null;
-                i++;
-            }
-        }
-
-        List<BaseFleet> fleets = star.getFleets();
-        if (fleets != null && !fleets.isEmpty()) {
-            Map<String, Integer> empireFleets = new TreeMap<String, Integer>();
-            for (int i = 0; i < fleets.size(); i++) {
-                BaseFleet f = fleets.get(i);
-                if (f.getEmpireKey() == null || f.getState() == Fleet.State.MOVING) {
-                    // ignore moving fleets, we'll draw them separately
-                    continue;
-                }
-
-                
-                Integer n = empireFleets.get(f.getEmpireKey());
-                if (n == null) {
-                    empireFleets.put(f.getEmpireKey(), (int) Math.ceil(f.getNumShips()));
-                } else {
-                    empireFleets.put(f.getEmpireKey(), n + (int) Math.ceil(f.getNumShips()));
-                }
-            }
-
-            int i = 0;
-            for (String empireKey : empireFleets.keySet()) {
-                Integer numShips = empireFleets.get(empireKey);
-                Empire emp = getEmpire(empireKey);
-                if (emp != null) {
-                    Vector2 pt = Vector2.pool.borrow().reset(0, -25.0f);
-                    pt.rotate((float)(Math.PI / 4.0) * -i);
-                    pt.add(x, y);
-
-                    mMatrix.reset();
-                    mMatrix.postTranslate(-(sFleetMultiBitmap.getWidth() / 2.0f),
-                                          -(sFleetMultiBitmap.getHeight() / 2.0f));
-                    mMatrix.postScale(16.0f * pixelScale / sFleetMultiBitmap.getWidth(),
-                                      16.0f * pixelScale / sFleetMultiBitmap.getHeight());
-                    mMatrix.postTranslate((float) pt.x * pixelScale, (float) pt.y * pixelScale);
-                    canvas.drawBitmap(sFleetMultiBitmap, mMatrix, mStarPaint);
-
-                    String name = String.format(Locale.ENGLISH, "%s (%d)", emp.getDisplayName(), numShips);
-
-                    Rect bounds = new Rect();
-                    mStarPaint.getTextBounds(name, 0, name.length(), bounds);
-                    float textHeight = bounds.height();
-                    float textWidth = bounds.width();
-
-                    canvas.drawText(name,
-                                    (float) (pt.x - 12) * pixelScale - textWidth,
-                                    (float) (pt.y + 8) * pixelScale - (textHeight / 2),
-                                    mStarPaint);
-                    Vector2.pool.release(pt); pt = null;
-                }
-
-                i++;
-            }
-
-        }*/
-    }
-
-    /**
      * Draw a moving fleet as a line between the source and destination stars, with an icon
      * representing the current location of the fleet.
      */
@@ -723,26 +595,6 @@ public class StarfieldSceneManager extends SectorSceneManager
                 sao.setCentre(position.x, position.y);
             }
         }*/
-    }
-
-    /**
-     * Draws a single star. Note that we draw all stars first, then the names of stars
-     * after.
-     */
-    private void drawStarName(Canvas canvas, Star star, int x, int y) {/*
-        x += star.getOffsetX();
-        y += star.getOffsetY();
-
-        final float pixelScale = getPixelScale();
-
-        float width = mStarNamePaint.measureText(star.getName()) / pixelScale;
-        x -= (width / 2.0f);
-        y += star.getSize() + 10.0f;
-
-        canvas.drawText(star.getName(),
-                        x * pixelScale,
-                        y * pixelScale,
-                        mStarNamePaint);*/
     }
 
     @Override

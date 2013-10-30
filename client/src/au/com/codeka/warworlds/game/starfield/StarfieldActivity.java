@@ -108,6 +108,8 @@ public class StarfieldActivity extends BaseGlActivity
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         super.onCreate(savedInstanceState);
 
+        EmpireShieldManager.i.clearTextureCache();
+
         mStarfield = new StarfieldSceneManager(this);
         mPlanetList = (PlanetListSimple) findViewById(R.id.planet_list);
         mFleetList = (FleetListSimple) findViewById(R.id.fleet_list);

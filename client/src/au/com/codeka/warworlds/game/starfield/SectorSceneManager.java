@@ -6,13 +6,10 @@ import java.util.List;
 import org.andengine.engine.camera.ZoomCamera;
 import org.andengine.entity.IEntity;
 import org.andengine.entity.IEntityParameterCallable;
-import org.andengine.entity.primitive.Line;
 import org.andengine.entity.scene.IOnSceneTouchListener;
 import org.andengine.entity.scene.Scene;
 import org.andengine.entity.scene.background.Background;
 import org.andengine.input.touch.TouchEvent;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import android.view.GestureDetector;
 import android.view.MotionEvent;
@@ -30,7 +27,6 @@ import au.com.codeka.warworlds.model.Star;
  */
 public abstract class SectorSceneManager implements SectorManager.OnSectorListChangedListener,
                                                     IOnSceneTouchListener {
-    private static final Logger log = LoggerFactory.getLogger(SectorSceneManager.class);
     private Scene mScene;
     private GestureDetector mGestureDetector;
     private ScaleGestureDetector mScaleGestureDetector;
@@ -196,7 +192,6 @@ public abstract class SectorSceneManager implements SectorManager.OnSectorListCh
             needUpdate = true;
         }
 
-        log.debug("scroll("+distanceX+", "+distanceY+") = ["+newSectorX+", "+newSectorY+"] ("+newOffsetX+", "+newOffsetY+")");
         if (needUpdate) {
             scrollTo(newSectorX, newSectorY, newOffsetX, newOffsetY);
         } else {
