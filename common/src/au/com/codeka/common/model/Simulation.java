@@ -671,11 +671,11 @@ public class Simulation {
             }
         }
 
-        // if all the fleets are friendly, we can stop attacking
+        // if all the fleets are friendly (or running away), we can stop attacking
         boolean enemyExists = false;
         for (int i = 0; i < star.getFleets().size(); i++) {
             BaseFleet fleet1 = star.getFleets().get(i);
-            if (isDestroyed(fleet1, now)) {
+            if (isDestroyed(fleet1, now) || fleet1.getState() == BaseFleet.State.MOVING) {
                 continue;
             }
 
@@ -686,6 +686,10 @@ public class Simulation {
                 }
 
                 if (!isSameEmpire(fleet1.getEmpireKey(), fleet2.getEmpireKey())) {
+                    if (fleet2.getState() == BaseFleet.State.MOVING) {
+                        // if it's moving, it doesn't count
+                        continue;
+                    }
                     enemyExists = true;
                 }
             }
