@@ -151,7 +151,6 @@ public abstract class SectorSceneManager implements SectorManager.OnSectorListCh
                     SectorManager.getInstance().requestSectors(missingSectors, false, null);
                 }
 
-                log.debug("setting camera position: "+mOffsetX+", "+mOffsetY);
                 mActivity.getCamera().setCenter(mOffsetX, mOffsetY);
                 if (centre) {
                     scroll(mActivity.getCamera().getWidth() / 2.0f,
@@ -199,7 +198,6 @@ public abstract class SectorSceneManager implements SectorManager.OnSectorListCh
         } else {
             mOffsetX = newOffsetX;
             mOffsetY = newOffsetY;
-            log.debug("setting camera position: "+mOffsetX+", "+mOffsetY);
             mActivity.getCamera().setCenter(mOffsetX, mOffsetY);
         }
     }

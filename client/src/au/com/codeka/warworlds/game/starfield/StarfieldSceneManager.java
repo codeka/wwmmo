@@ -80,7 +80,7 @@ public class StarfieldSceneManager extends SectorSceneManager
 
     private StarEntity mSelectedStarSprite;
 
-    public StarfieldSceneManager(StarfieldActivity activity) {
+    public StarfieldSceneManager(BaseStarfieldActivity activity) {
         super(activity);
         log.info("Starfield initializing...");
 
@@ -569,7 +569,6 @@ public class StarfieldSceneManager extends SectorSceneManager
     }
 
     public void selectStar(StarEntity selectedStarSprite) {
-        log.info("OnSelect");
         mSelectedStarSprite = selectedStarSprite;
         // mSelectedFleetSprite = null;
 

@@ -90,7 +90,6 @@ public class FleetEntity extends Entity {
 
         setPosition((float) location.x, (float) location.y);
         setRotation((float)(angle * 180.0f / Math.PI));
-        log.debug("setting location: "+location.x+", "+location.y);
 /*
         // check if there's any other fleets nearby and offset this one by a bit so that they
         // don't overlap

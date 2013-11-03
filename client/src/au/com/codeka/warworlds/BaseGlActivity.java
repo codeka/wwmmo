@@ -15,6 +15,7 @@ import org.andengine.ui.activity.SimpleLayoutGameActivity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.PixelFormat;
@@ -36,6 +37,7 @@ import au.com.codeka.warworlds.model.PurchaseManager;
  * This is a base class for our activities which inherit from andengine's BaseActivity. We have to
  * duplicate a few things that come from our own BaseActivity.
  */
+@SuppressLint("Registered") // it's a base class
 public abstract class BaseGlActivity extends SimpleLayoutGameActivity {
     private static Logger log = LoggerFactory.getLogger(BaseGlActivity.class);
     private SensorManager mSensorManager;

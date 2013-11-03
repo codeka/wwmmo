@@ -71,13 +71,12 @@ import com.google.protobuf.InvalidProtocolBufferException;
  * The \c StarfieldActivity is the "home" screen of the game, and displays the
  * starfield where you scroll around and interact with stars, etc.
  */
-public class StarfieldActivity extends BaseGlActivity
+public class StarfieldActivity extends BaseStarfieldActivity
                                implements StarfieldSceneManager.OnSelectionChangedListener,
                                           StarManager.StarFetchedHandler,
                                           EmpireShieldManager.EmpireShieldUpdatedHandler {
     private static final Logger log = LoggerFactory.getLogger(StarfieldActivity.class);
     private Context mContext = this;
-    private StarfieldSceneManager mStarfield;
     private PlanetListSimple mPlanetList;
     private FleetListSimple mFleetList;
     private Star mSelectedStar;
@@ -105,20 +104,16 @@ public class StarfieldActivity extends BaseGlActivity
 
     @Override
     public void onCreate(final Bundle savedInstanceState) {
-        requestWindowFeature(Window.FEATURE_NO_TITLE);
         super.onCreate(savedInstanceState);
 
-        EmpireShieldManager.i.clearTextureCache();
+        mStarfield.addSelectionChangedListener(this);
 
-        mStarfield = new StarfieldSceneManager(this);
         mPlanetList = (PlanetListSimple) findViewById(R.id.planet_list);
         mFleetList = (FleetListSimple) findViewById(R.id.fleet_list);
 
         findViewById(R.id.selected_star).setVisibility(View.GONE);
         findViewById(R.id.selected_fleet).setVisibility(View.GONE);
         mBottomPane = findViewById(R.id.bottom_pane);
-
-        mStarfield.addSelectionChangedListener(this);
 
         if (isPortrait()) {
             InfobarView infobar = (InfobarView) findViewById(R.id.infobar);
@@ -296,28 +291,10 @@ public class StarfieldActivity extends BaseGlActivity
     }
 
     @Override
-    protected int getRenderSurfaceViewID() {
-        return R.id.starfield;
-    }
-
-
-    @Override
-    protected void onCreateResources() throws IOException {
-        mStarfield.onLoadResources();
-    }
-
-    @Override
-    protected Scene onCreateScene() throws IOException {
-        return mStarfield.createScene();
-    }
-
-    @Override
     public void onStart() {
         super.onStart();
         StarManager.getInstance().addStarUpdatedListener(null, this);
         EmpireShieldManager.i.addEmpireShieldUpdatedHandler(this);
-
-        mStarfield.onStart();
     }
 
     @Override
@@ -335,8 +312,6 @@ public class StarfieldActivity extends BaseGlActivity
         super.onStop();
         StarManager.getInstance().removeStarUpdatedListener(this);
         EmpireShieldManager.i.removeEmpireShieldUpdatedHandler(this);
-
-        mStarfield.onStop();
     }
 
     @Override
