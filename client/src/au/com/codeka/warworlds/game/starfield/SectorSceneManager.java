@@ -10,16 +10,16 @@ import org.andengine.entity.scene.IOnSceneTouchListener;
 import org.andengine.entity.scene.Scene;
 import org.andengine.entity.scene.background.Background;
 import org.andengine.input.touch.TouchEvent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import au.com.codeka.common.Pair;
-import au.com.codeka.common.model.BaseStar;
 import au.com.codeka.warworlds.BaseGlActivity;
 import au.com.codeka.warworlds.model.Sector;
 import au.com.codeka.warworlds.model.SectorManager;
-import au.com.codeka.warworlds.model.Star;
 
 /**
  * This is the base class for StarfieldSurfaceView and TacticalMapView, it contains the common code
@@ -27,6 +27,7 @@ import au.com.codeka.warworlds.model.Star;
  */
 public abstract class SectorSceneManager implements SectorManager.OnSectorListChangedListener,
                                                     IOnSceneTouchListener {
+    private static final Logger log = LoggerFactory.getLogger(SectorSceneManager.class);
     private Scene mScene;
     private GestureDetector mGestureDetector;
     private ScaleGestureDetector mScaleGestureDetector;
@@ -150,6 +151,7 @@ public abstract class SectorSceneManager implements SectorManager.OnSectorListCh
                     SectorManager.getInstance().requestSectors(missingSectors, false, null);
                 }
 
+                log.debug("setting camera position: "+mOffsetX+", "+mOffsetY);
                 mActivity.getCamera().setCenter(mOffsetX, mOffsetY);
                 if (centre) {
                     scroll(mActivity.getCamera().getWidth() / 2.0f,
@@ -197,6 +199,7 @@ public abstract class SectorSceneManager implements SectorManager.OnSectorListCh
         } else {
             mOffsetX = newOffsetX;
             mOffsetY = newOffsetY;
+            log.debug("setting camera position: "+mOffsetX+", "+mOffsetY);
             mActivity.getCamera().setCenter(mOffsetX, mOffsetY);
         }
     }

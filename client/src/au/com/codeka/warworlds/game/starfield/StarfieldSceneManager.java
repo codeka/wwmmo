@@ -1,6 +1,7 @@
 package au.com.codeka.warworlds.game.starfield;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
 
@@ -13,6 +14,10 @@ import org.andengine.opengl.font.FontFactory;
 import org.andengine.opengl.texture.TextureOptions;
 import org.andengine.opengl.texture.atlas.bitmap.BitmapTextureAtlas;
 import org.andengine.opengl.texture.atlas.bitmap.BitmapTextureAtlasTextureRegionFactory;
+import org.andengine.opengl.texture.atlas.bitmap.BuildableBitmapTextureAtlas;
+import org.andengine.opengl.texture.atlas.bitmap.source.IBitmapTextureAtlasSource;
+import org.andengine.opengl.texture.atlas.buildable.builder.BlackPawnTextureAtlasBuilder;
+import org.andengine.opengl.texture.atlas.buildable.builder.ITextureAtlasBuilder.TextureAtlasBuilderException;
 import org.andengine.opengl.texture.region.ITextureRegion;
 import org.andengine.opengl.texture.region.TiledTextureRegion;
 import org.slf4j.Logger;
@@ -31,7 +36,6 @@ import au.com.codeka.common.model.BaseStar;
 import au.com.codeka.warworlds.model.BuildManager;
 import au.com.codeka.warworlds.model.Empire;
 import au.com.codeka.warworlds.model.EmpireManager;
-import au.com.codeka.warworlds.model.EmpireShieldManager;
 import au.com.codeka.warworlds.model.Fleet;
 import au.com.codeka.warworlds.model.MyEmpire;
 import au.com.codeka.warworlds.model.Sector;
@@ -62,6 +66,9 @@ public class StarfieldSceneManager extends SectorSceneManager
 
     private BitmapTextureAtlas mFleetIconTextureAtlas;
     private TiledTextureRegion mFleetIconTextureRegion;
+
+    private BuildableBitmapTextureAtlas mFleetSpriteTextureAtlas;
+    private HashMap<String, ITextureRegion> mFleetSprites;
 
     private BitmapTextureAtlas mBackgroundGasTextureAtlas;
     private TiledTextureRegion mBackgroundGasTextureRegion;
@@ -104,10 +111,25 @@ public class StarfieldSceneManager extends SectorSceneManager
         mFleetIconTextureRegion = BitmapTextureAtlasTextureRegionFactory.createTiledFromAsset(mFleetIconTextureAtlas, 
                 mActivity, "img/fleet.png", 0, 0, 1, 1);
 
+        mFleetSpriteTextureAtlas = new BuildableBitmapTextureAtlas(mActivity.getTextureManager(), 256, 256,
+                TextureOptions.BILINEAR_PREMULTIPLYALPHA);
+        mFleetSprites = new HashMap<String, ITextureRegion>();
+        mFleetSprites.put("ship.fighter", BitmapTextureAtlasTextureRegionFactory.createFromAsset(mFleetSpriteTextureAtlas, mActivity, "spritesheets/ship.fighter.png"));
+        mFleetSprites.put("ship.scout", BitmapTextureAtlasTextureRegionFactory.createFromAsset(mFleetSpriteTextureAtlas, mActivity, "spritesheets/ship.scout.png"));
+        mFleetSprites.put("ship.colony", BitmapTextureAtlasTextureRegionFactory.createFromAsset(mFleetSpriteTextureAtlas, mActivity, "spritesheets/ship.colony.png"));
+        mFleetSprites.put("ship.troopcarrier", BitmapTextureAtlasTextureRegionFactory.createFromAsset(mFleetSpriteTextureAtlas, mActivity, "spritesheets/ship.troopcarrier.png"));
+
         mActivity.getTextureManager().loadTexture(mStarTextureAtlas);
         mActivity.getTextureManager().loadTexture(mBackgroundGasTextureAtlas);
         mActivity.getTextureManager().loadTexture(mBackgroundStarsTextureAtlas);
         mActivity.getTextureManager().loadTexture(mFleetIconTextureAtlas);
+
+        try {
+            mFleetSpriteTextureAtlas.build(new BlackPawnTextureAtlasBuilder<IBitmapTextureAtlasSource, BitmapTextureAtlas>(1, 1, 1));
+            mFleetSpriteTextureAtlas.load();
+        } catch (TextureAtlasBuilderException e) {
+            log.error("Error building texture atlas.", e);
+        }
 
         mFont = FontFactory.create(mActivity.getFontManager(), mActivity.getTextureManager(), 256, 256,
                                    Typeface.create(Typeface.DEFAULT, Typeface.NORMAL), 16, true, Color.WHITE);
@@ -143,6 +165,10 @@ public class StarfieldSceneManager extends SectorSceneManager
 
     public Font getFont() {
         return mFont;
+    }
+
+    public ITextureRegion getSpriteTexture(String spriteName) {
+        return mFleetSprites.get(spriteName);
     }
 
     public void addSelectionChangedListener(OnSelectionChangedListener listener) {
@@ -288,7 +314,7 @@ public class StarfieldSceneManager extends SectorSceneManager
 
                 int sx = (int)(x * Sector.SECTOR_SIZE);
                 int sy = (int)(y * Sector.SECTOR_SIZE);
-                drawSector(scene, sx, sy, sector);
+                addSector(scene, sx, sy, sector);
             }
         }
 
@@ -344,24 +370,24 @@ public class StarfieldSceneManager extends SectorSceneManager
     /**
      * Draws a sector, which is a 1024x1024 area of stars.
      */
-    private void drawSector(Scene scene, int offsetX, int offsetY, Sector sector) {
+    private void addSector(Scene scene, int offsetX, int offsetY, Sector sector) {
         for(BaseStar star : sector.getStars()) {
-            drawStar(scene, (Star) star, offsetX, offsetY);
-        }/*
+            addStar(scene, (Star) star, offsetX, offsetY);
+        }
         for (BaseStar star : sector.getStars()) {
             for (BaseFleet fleet : star.getFleets()) {
                 if (fleet.getState() == Fleet.State.MOVING) {
-                    drawMovingFleet(scene, (Fleet) fleet, (Star) star, offsetX, offsetY);
+                    addMovingFleet(scene, (Fleet) fleet, (Star) star, offsetX, offsetY);
                 }
             }
-        }*/
+        }
     }
 
     /**
      * Draws a single star. Note that we draw all stars first, then the names of stars
      * after.
      */
-    private void drawStar(Scene scene, Star star, int x, int y) {
+    private void addStar(Scene scene, Star star, int x, int y) {
         x += star.getOffsetX();
         y += star.getOffsetY();
 
@@ -432,13 +458,21 @@ public class StarfieldSceneManager extends SectorSceneManager
     }
 
     /**
+     * Given a \c Sector, returns the (x, y) coordinates (in view-space) of the origin of this
+     * sector.
+     */
+    private Vector2 getSectorOffset(long sx, long sy) {
+        sx -= mSectorX;
+        sy -= mSectorY;
+        return new Vector2((sx * Sector.SECTOR_SIZE),
+                           (sy * Sector.SECTOR_SIZE));
+    }
+
+    /**
      * Draw a moving fleet as a line between the source and destination stars, with an icon
      * representing the current location of the fleet.
      */
-    private void drawMovingFleet(Scene scene, Fleet fleet, Star srcStar, int offsetX, int offsetY) {
-        /*
-        float pixelScale = getPixelScale();
-
+    private void addMovingFleet(Scene scene, Fleet fleet, Star srcStar, int offsetX, int offsetY) {
         // we'll need to find the destination star
         Star destStar = SectorManager.getInstance().findStar(fleet.getDestinationStarKey());
         if (destStar == null) {
@@ -457,117 +491,9 @@ public class StarfieldSceneManager extends SectorSceneManager
         destPoint.x += destStar.getOffsetX();
         destPoint.y += destStar.getOffsetY();
 
-        // work out how far along the fleet has moved so we can draw the icon at the correct
-        // spot. Also, we'll draw the name of the empire, number of ships etc.
-        ShipDesign design = (ShipDesign) DesignManager.i.getDesign(DesignKind.SHIP, fleet.getDesignID());
-        double distance = srcPoint.distanceTo(destPoint);
-        double totalTimeInHours = (distance / 10.0) / design.getSpeedInParsecPerHour();
-
-        DateTime startTime = fleet.getStateStartTime();
-        DateTime now = DateTime.now(DateTimeZone.UTC);
-        float timeSoFarInHours = Seconds.secondsBetween(startTime, now).getSeconds() / 3600.0f;
-
-        double fractionComplete = timeSoFarInHours / totalTimeInHours;
-        if (fractionComplete > 1.0) {
-            fractionComplete = 1.0;
-        }
-
-        // we don't want to start the fleet over the top of the star, so we'll offset it a bit
-        distance -= 40.0f;
-        if (distance < 0) {
-            distance = 0;
-        }
-
-        Vector2 direction = Vector2.pool.borrow().reset(destPoint);
-        direction.subtract(srcPoint);
-        direction.normalize();
-
-        Vector2 location = Vector2.pool.borrow().reset(direction);
-        location.scale(distance * fractionComplete);
-        location.add(srcPoint);
-        Vector2.pool.release(srcPoint); srcPoint = null;
-
-        Sprite fleetSprite = SpriteManager.i.getSprite(design.getSpriteName());
-        Vector2 up = fleetSprite.getUp();
-
-        float angle = Vector2.angleBetween(up, direction);
-
-        direction.scale(20.0f);
-        location.add(direction);
-        Vector2.pool.release(direction); direction = null;
-
-        Vector2 position = new Vector2(location.x * pixelScale, location.y * pixelScale);
-        Vector2.pool.release(location); location = null;
-
-        // check if there's any other fleets nearby and offset this one by a bit so that they
-        // don't overlap
-        Random rand = new Random(fleet.getKey().hashCode());
-        for (int i = 0; i < mVisibleEntities.size(); i++) {
-            VisibleEntity existing = mVisibleEntities.get(i);
-            if (existing.fleet == null) {
-                continue;
-            }
-
-            if (existing.position.distanceTo(position) < (15.0f * pixelScale)) {
-                // pick a random direction and offset it a bit
-                Vector2 offset = Vector2.pool.borrow().reset(0, 20.0 * pixelScale);
-                offset.rotate(rand.nextFloat() * 2 * (float) Math.PI);
-                position.add(offset);
-                Vector2.pool.release(offset);
-                i = -1; // start looping again...
-            }
-        }
-
-        // record the fact that this guy is visible
-        VisibleEntity ve = new VisibleEntity(position, fleet);
-        if (mSelectedEntity != null && mSelectedEntity.fleet != null && mSelectedEntity.fleet.getKey().equals(fleet.getKey())) {
-            mSelectedEntity = ve;
-        }
-        mVisibleEntities.add(ve);
-
-        // scale zoom and rotate the bitmap all with one matrix
-        mMatrix.reset();
-        mMatrix.postTranslate(-(fleetSprite.getWidth() / 2.0f),
-                              -(fleetSprite.getHeight() / 2.0f));
-        mMatrix.postScale(20.0f * pixelScale / fleetSprite.getWidth(),
-                          20.0f * pixelScale / fleetSprite.getWidth());
-        mMatrix.postRotate((float) (angle * 180.0 / Math.PI));
-        mMatrix.postTranslate((float) position.x, (float) position.y);
-        canvas.save();
-        canvas.concat(mMatrix);
-        fleetSprite.draw(canvas);
-        canvas.restore();
-
-        Empire emp = getEmpire(fleet.getEmpireKey());
-        if (emp != null) {
-            Bitmap shield = EmpireShieldManager.i.getShield(mContext, emp);
-            if (shield != null) {
-                mMatrix.reset();
-                mMatrix.postTranslate(-(shield.getWidth() / 2.0f), -(shield.getHeight() / 2.0f));
-                mMatrix.postScale(16.0f * pixelScale / shield.getWidth(),
-                                  16.0f * pixelScale / shield.getHeight());
-                mMatrix.postTranslate((float) position.x + (20.0f * pixelScale),
-                                      (float) position.y);
-                canvas.drawBitmap(shield, mMatrix, mStarPaint);
-            }
-
-            String msg = emp.getDisplayName();
-            canvas.drawText(msg, (float) position.x + (30.0f * pixelScale),
-                            (float) position.y, mStarPaint);
-
-            msg = String.format(Locale.ENGLISH, "%s (%d)", design.getDisplayName(), (int) Math.ceil(fleet.getNumShips()));
-            canvas.drawText(msg, (float) position.x + (30.0f * pixelScale),
-                            (float) position.y + (10.0f * pixelScale), mStarPaint);
-        }
-
-        List<VisibleEntityAttachedOverlay> fleetAttachedOverlays = mFleetAttachedOverlays.get(fleet.getKey());
-        if (fleetAttachedOverlays != null && !fleetAttachedOverlays.isEmpty()) {
-            int n = fleetAttachedOverlays.size();
-            for (int i = 0; i < n; i++) {
-                VisibleEntityAttachedOverlay sao = fleetAttachedOverlays.get(i);
-                sao.setCentre(position.x, position.y);
-            }
-        }*/
+        FleetEntity fleetEntity = new FleetEntity(this, srcPoint, destPoint, fleet, mActivity.getVertexBufferObjectManager());
+        //scene.registerTouchArea(fleetEntity.getTouchEntity());
+        scene.attachChild(fleetEntity);
     }
 
     @Override
