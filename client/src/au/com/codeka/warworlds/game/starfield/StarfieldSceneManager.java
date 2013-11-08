@@ -1,8 +1,10 @@
 package au.com.codeka.warworlds.game.starfield;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 import org.andengine.entity.Entity;
@@ -55,7 +57,7 @@ public class StarfieldSceneManager extends SectorSceneManager
     private BaseStar mHqStar;
     private Handler mHandler;
 
-    private StarEntity mSelectingSprite;
+    private SelectableEntity mSelectingEntity;
     private SelectionIndicator mSelectionIndicator;
     private boolean mWasDragging;
 
@@ -68,7 +70,7 @@ public class StarfieldSceneManager extends SectorSceneManager
     private TiledTextureRegion mFleetIconTextureRegion;
 
     private BuildableBitmapTextureAtlas mFleetSpriteTextureAtlas;
-    private HashMap<String, ITextureRegion> mFleetSprites;
+    private HashMap<String, ITextureRegion> mFleetSpriteTextures;
 
     private BitmapTextureAtlas mBackgroundGasTextureAtlas;
     private TiledTextureRegion mBackgroundGasTextureRegion;
@@ -78,7 +80,10 @@ public class StarfieldSceneManager extends SectorSceneManager
     private boolean mIsBackgroundVisible = true;;
     private float mBackgroundZoomAlpha = 1.0f;
 
-    private StarEntity mSelectedStarSprite;
+    private Map<String, StarEntity> mStars;
+    private Map<String, FleetEntity> mFleets;
+    private StarEntity mSelectedStarEntity;
+    private FleetEntity mSelectedFleetEntity;
 
     public StarfieldSceneManager(BaseStarfieldActivity activity) {
         super(activity);
@@ -113,11 +118,11 @@ public class StarfieldSceneManager extends SectorSceneManager
 
         mFleetSpriteTextureAtlas = new BuildableBitmapTextureAtlas(mActivity.getTextureManager(), 256, 256,
                 TextureOptions.BILINEAR_PREMULTIPLYALPHA);
-        mFleetSprites = new HashMap<String, ITextureRegion>();
-        mFleetSprites.put("ship.fighter", BitmapTextureAtlasTextureRegionFactory.createFromAsset(mFleetSpriteTextureAtlas, mActivity, "spritesheets/ship.fighter.png"));
-        mFleetSprites.put("ship.scout", BitmapTextureAtlasTextureRegionFactory.createFromAsset(mFleetSpriteTextureAtlas, mActivity, "spritesheets/ship.scout.png"));
-        mFleetSprites.put("ship.colony", BitmapTextureAtlasTextureRegionFactory.createFromAsset(mFleetSpriteTextureAtlas, mActivity, "spritesheets/ship.colony.png"));
-        mFleetSprites.put("ship.troopcarrier", BitmapTextureAtlasTextureRegionFactory.createFromAsset(mFleetSpriteTextureAtlas, mActivity, "spritesheets/ship.troopcarrier.png"));
+        mFleetSpriteTextures = new HashMap<String, ITextureRegion>();
+        mFleetSpriteTextures.put("ship.fighter", BitmapTextureAtlasTextureRegionFactory.createFromAsset(mFleetSpriteTextureAtlas, mActivity, "spritesheets/ship.fighter.png"));
+        mFleetSpriteTextures.put("ship.scout", BitmapTextureAtlasTextureRegionFactory.createFromAsset(mFleetSpriteTextureAtlas, mActivity, "spritesheets/ship.scout.png"));
+        mFleetSpriteTextures.put("ship.colony", BitmapTextureAtlasTextureRegionFactory.createFromAsset(mFleetSpriteTextureAtlas, mActivity, "spritesheets/ship.colony.png"));
+        mFleetSpriteTextures.put("ship.troopcarrier", BitmapTextureAtlasTextureRegionFactory.createFromAsset(mFleetSpriteTextureAtlas, mActivity, "spritesheets/ship.troopcarrier.png"));
 
         mActivity.getTextureManager().loadTexture(mStarTextureAtlas);
         mActivity.getTextureManager().loadTexture(mBackgroundGasTextureAtlas);
@@ -168,7 +173,7 @@ public class StarfieldSceneManager extends SectorSceneManager
     }
 
     public ITextureRegion getSpriteTexture(String spriteName) {
-        return mFleetSprites.get(spriteName);
+        return mFleetSpriteTextures.get(spriteName);
     }
 
     public void addSelectionChangedListener(OnSelectionChangedListener listener) {
@@ -224,6 +229,8 @@ public class StarfieldSceneManager extends SectorSceneManager
 
     @Override
     protected void refreshScene(Scene scene) {
+        mFleets = new HashMap<String, FleetEntity>();
+        mStars = new HashMap<String, StarEntity>();
         final List<Pair<Long, Long>> missingSectors = drawScene(scene);
         if (missingSectors != null) {
             SectorManager.getInstance().requestSectors(missingSectors, false, null);
@@ -412,14 +419,15 @@ public class StarfieldSceneManager extends SectorSceneManager
             textureRegion = mNormalStarTextureRegion.getTextureRegion(offset);
         }
 
-        StarEntity sprite = new StarEntity(this, star,
-                                           (float) x, (float) y,
-                                           textureRegion, mActivity.getVertexBufferObjectManager());
-        scene.registerTouchArea(sprite.getTouchEntity());
-        scene.attachChild(sprite);
+        StarEntity starEntity = new StarEntity(this, star,
+                                               (float) x, (float) y,
+                                               textureRegion, mActivity.getVertexBufferObjectManager());
+        scene.registerTouchArea(starEntity.getTouchEntity());
+        scene.attachChild(starEntity);
+        mStars.put(star.getKey(), starEntity);
 
-        if (mSelectedStarSprite != null && mSelectedStarSprite.getStar().getKey().equals(star.getKey())) {
-            mSelectedStarSprite = sprite;
+        if (mSelectedStarEntity != null && mSelectedStarEntity.getStar().getKey().equals(star.getKey())) {
+            mSelectedStarEntity = starEntity;
         }
 /*
         if (mHqStar != null && star.getKey().equals(mHqStar.getKey())) {
@@ -492,8 +500,17 @@ public class StarfieldSceneManager extends SectorSceneManager
         destPoint.y += destStar.getOffsetY();
 
         FleetEntity fleetEntity = new FleetEntity(this, srcPoint, destPoint, fleet, mActivity.getVertexBufferObjectManager());
-        //scene.registerTouchArea(fleetEntity.getTouchEntity());
+        scene.registerTouchArea(fleetEntity.getTouchEntity());
         scene.attachChild(fleetEntity);
+        mFleets.put(fleet.getKey(), fleetEntity);
+
+        if (mSelectedFleetEntity != null && mSelectedFleetEntity.getFleet().getKey().equals(fleet.getKey())) {
+            mSelectedFleetEntity = fleetEntity;
+        }
+    }
+
+    Collection<FleetEntity> getMovingFleets() {
+        return mFleets.values();
     }
 
     @Override
@@ -530,7 +547,7 @@ public class StarfieldSceneManager extends SectorSceneManager
             super.onScroll(e1, e2, distanceX, distanceY);
 
             // because we've navigating the map, we're no longer in the process of selecting a sprite.
-            mSelectingSprite = null;
+            mSelectingEntity = null;
             mWasDragging = true;
             return true;
         }
@@ -543,47 +560,68 @@ public class StarfieldSceneManager extends SectorSceneManager
             super.onScale(detector);
 
             // because we've navigating the map, we're no longer in the process of selecting a sprite.
-            mSelectingSprite = null;
+            mSelectingEntity = null;
             mWasDragging = true;
             return true;
         }
     }
 
     /** Gets the sprite we've marked as "being selected". That is, you've tapped down, but not yet tapped up. */
-    public StarEntity getSelectingSprite() {
-        return mSelectingSprite;
+    public SelectableEntity getSelectingEntity() {
+        return mSelectingEntity;
     }
 
     /** Sets the sprite that we've tapped down on, but not yet tapped up on. */
-    public void setSelectingSprite(StarEntity sprite) {
-        mSelectingSprite = sprite;
+    public void setSelectingEntity(SelectableEntity entity) {
+        mSelectingEntity = entity;
+    }
+
+    public void selectStar(StarEntity selectedStarEntity) {
+        mSelectedStarEntity = selectedStarEntity;
+        mSelectedFleetEntity = null;
+
+        refreshSelectionIndicator();
+        fireSelectionChanged(mSelectedStarEntity.getStar());
     }
 
     public void selectStar(String starKey) {
-        Star star = SectorManager.getInstance().findStar(starKey);
-        selectStar(star);
+        if (starKey == null) {
+            selectStar((StarEntity) null);
+            return;
+        }
+
+        selectStar(mStars.get(starKey));
     }
 
-    public void selectStar(Star star) {
-        
-    }
-
-    public void selectStar(StarEntity selectedStarSprite) {
-        mSelectedStarSprite = selectedStarSprite;
-        // mSelectedFleetSprite = null;
+    public void selectFleet(FleetEntity fleet) {
+        mSelectedStarEntity = null;
+        mSelectedFleetEntity = fleet;
 
         refreshSelectionIndicator();
-        fireSelectionChanged(mSelectedStarSprite.getStar());
+        fireSelectionChanged(mSelectedFleetEntity.getFleet());
+    }
+
+    public void selectFleet(String fleetKey) {
+        if (fleetKey == null) {
+            selectFleet((FleetEntity) null);
+            return;
+        }
+
+        selectFleet(mFleets.get(fleetKey));
     }
 
     /** Deselects the fleet or star you currently have selected. */
     public void selectNothing() {
-        if (mSelectedStarSprite == null) {
-            return;
-        } else {
-            mSelectedStarSprite = null;
+        if (mSelectedStarEntity != null) {
+            mSelectedStarEntity = null;
             refreshSelectionIndicator();
             fireSelectionChanged((Star) null);
+        }
+
+        if (mSelectedFleetEntity != null) {
+            mSelectedFleetEntity = null;
+            refreshSelectionIndicator();
+            fireSelectionChanged((Fleet) null);
         }
     }
 
@@ -592,17 +630,15 @@ public class StarfieldSceneManager extends SectorSceneManager
             mSelectionIndicator.getParent().detachChild(mSelectionIndicator);
         }
 
-        if (mSelectedStarSprite != null) {
-            Star star = mSelectedStarSprite.getStar();
+        if (mSelectedStarEntity != null) {
+            Star star = mSelectedStarEntity.getStar();
             mSelectionIndicator.setScale(star.getSize());
-            mSelectedStarSprite.attachChild(mSelectionIndicator);
-        } else {
-            // nothing selected, nothing to do
+            mSelectedStarEntity.attachChild(mSelectionIndicator);
         }
-    }
-
-    public void selectFleet(BaseFleet fleet) {
-        
+        if (mSelectedFleetEntity != null) {
+            mSelectionIndicator.setScale(20.0f);
+            mSelectedFleetEntity.attachChild(mSelectionIndicator);
+        }
     }
 
     /**

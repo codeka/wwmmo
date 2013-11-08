@@ -22,7 +22,7 @@ import au.com.codeka.warworlds.model.EmpireShieldManager;
 import au.com.codeka.warworlds.model.Star;
 
 /** An entity that represents a star. */
-public class StarEntity extends Entity {
+public class StarEntity extends SelectableEntity {
     private StarfieldSceneManager mStarfield;
     private StarSprite mStarSprite;
     private Star mStar;
@@ -32,7 +32,7 @@ public class StarEntity extends Entity {
                       float x, float y,
                       ITextureRegion textureRegion,
                       VertexBufferObjectManager vertexBufferObjectManager) {
-        super(x, y, star.getSize() * 2.0f, star.getSize() * 2.0f);
+        super(0.0f, 0.0f, 1.0f, 1.0f);//star.getSize() * 2.0f, star.getSize() * 2.0f);
         mStar = star;
         mStarfield = starfield;
 
@@ -51,6 +51,8 @@ public class StarEntity extends Entity {
 
         addEmpireIcons();
         addFleetIcons();
+
+        setPosition(x, y);
     }
 
     public Entity getTouchEntity() {
@@ -177,10 +179,10 @@ public class StarEntity extends Entity {
                                      final float touchAreaLocalX,
                                      final float touchAreaLocalY) {
             if (sceneTouchEvent.getAction() == TouchEvent.ACTION_DOWN) {
-                mStarfield.setSelectingSprite(StarEntity.this);
+                mStarfield.setSelectingEntity(StarEntity.this);
             } else if (sceneTouchEvent.getAction() == TouchEvent.ACTION_UP) {
-                StarEntity selectingSprite = mStarfield.getSelectingSprite();
-                if (selectingSprite == StarEntity.this) {
+                SelectableEntity selectingEntity = mStarfield.getSelectingEntity();
+                if (selectingEntity == StarEntity.this) {
                     mStarfield.selectStar(StarEntity.this);
                     return true;
                 }

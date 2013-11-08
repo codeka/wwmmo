@@ -1,9 +1,7 @@
 package au.com.codeka.warworlds.game.starfield;
 
-import java.io.IOException;
 import java.util.Locale;
 
-import org.andengine.entity.scene.Scene;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,7 +13,6 @@ import android.os.Bundle;
 import android.text.Html;
 import android.util.TypedValue;
 import android.view.View;
-import android.view.Window;
 import android.view.animation.Animation;
 import android.view.animation.Transformation;
 import android.widget.Button;
@@ -29,7 +26,6 @@ import au.com.codeka.common.model.BaseStar;
 import au.com.codeka.common.model.DesignKind;
 import au.com.codeka.common.model.ShipDesign;
 import au.com.codeka.common.protobuf.Messages;
-import au.com.codeka.warworlds.BaseGlActivity;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.ServerGreeter;
 import au.com.codeka.warworlds.StyledDialog;
@@ -261,7 +257,7 @@ public class StarfieldActivity extends BaseStarfieldActivity
                 }
 
                 if (mFleetToSelect != null) {
-                    mStarfield.selectFleet(mFleetToSelect);
+                    mStarfield.selectFleet(mFleetToSelect.getKey());
                     mFleetToSelect = null;
                 }
 
@@ -466,7 +462,7 @@ public class StarfieldActivity extends BaseStarfieldActivity
         mStarfield.scrollTo(star.getSectorX(), star.getSectorY(), offsetX, offsetY);
 
         if (fleet.getState() == Fleet.State.MOVING) {
-            mStarfield.selectFleet(fleet);
+            mStarfield.selectFleet(fleet.getKey());
         } else {
             mStarfield.selectStar(star.getKey());
         }
@@ -631,7 +627,6 @@ public class StarfieldActivity extends BaseStarfieldActivity
         mSelectedFleet = null;
 
         showBottomPane();
-
         StarManager.getInstance().requestStar(star.getKey(), true, this);
     }
 
@@ -760,5 +755,7 @@ public class StarfieldActivity extends BaseStarfieldActivity
         selectionLoadingContainer.setVisibility(View.GONE);
         selectedStarContainer.setVisibility(View.GONE);
         selectedFleetContainer.setVisibility(View.VISIBLE);
+
+        showBottomPane();
     }
 }

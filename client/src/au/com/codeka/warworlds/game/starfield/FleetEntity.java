@@ -1,7 +1,12 @@
 package au.com.codeka.warworlds.game.starfield;
 
+import java.util.ArrayList;
+import java.util.Random;
+
 import org.andengine.entity.Entity;
+import org.andengine.entity.primitive.Rectangle;
 import org.andengine.entity.sprite.Sprite;
+import org.andengine.input.touch.TouchEvent;
 import org.andengine.opengl.texture.region.ITextureRegion;
 import org.andengine.opengl.vbo.VertexBufferObjectManager;
 import org.joda.time.DateTime;
@@ -17,36 +22,33 @@ import au.com.codeka.warworlds.model.DesignManager;
 import au.com.codeka.warworlds.model.Fleet;
 
 /** An entity that represents a moving fleet. */
-public class FleetEntity extends Entity {
+public class FleetEntity extends SelectableEntity {
     private static final Logger log = LoggerFactory.getLogger(FleetEntity.class);
     private StarfieldSceneManager mStarfield;
     private Vector2 mSrcPoint;
     private Vector2 mDestPoint;
     private Fleet mFleet;
+    private FleetSprite mFleetSprite;
 
     public FleetEntity(StarfieldSceneManager starfield, Vector2 srcPoint, Vector2 destPoint, Fleet fleet,
                        VertexBufferObjectManager vertexBufferObjectManager) {
-        super(0.0f, 0.0f, getIconWidth(starfield, fleet), getIconHeight(starfield, fleet));
+        super(0.0f, 0.0f, 1.0f, 1.0f);
         mStarfield = starfield;
         mSrcPoint = srcPoint;
         mDestPoint = destPoint;
         mFleet = fleet;
-        setup(vertexBufferObjectManager);
+        setup(starfield, vertexBufferObjectManager);
     }
 
-    private static float getIconWidth(StarfieldSceneManager starfield, Fleet fleet) {
-        ShipDesign design = (ShipDesign) DesignManager.i.getDesign(DesignKind.SHIP, fleet.getDesignID());
-        ITextureRegion textureRegion = starfield.getSpriteTexture(design.getSpriteName());
-        return textureRegion.getWidth();
+    public Entity getTouchEntity() {
+        return mFleetSprite;
     }
 
-    private static float getIconHeight(StarfieldSceneManager starfield, Fleet fleet) {
-        ShipDesign design = (ShipDesign) DesignManager.i.getDesign(DesignKind.SHIP, fleet.getDesignID());
-        ITextureRegion textureRegion = starfield.getSpriteTexture(design.getSpriteName());
-        return textureRegion.getWidth();
+    public Fleet getFleet() {
+        return mFleet;
     }
 
-    public void setup(VertexBufferObjectManager vertexBufferObjectManager) {
+    public void setup(StarfieldSceneManager starfield, VertexBufferObjectManager vertexBufferObjectManager) {
         // work out how far along the fleet has moved so we can draw the icon at the correct
         // spot. Also, we'll draw the name of the empire, number of ships etc.
         ShipDesign design = (ShipDesign) DesignManager.i.getDesign(DesignKind.SHIP, mFleet.getDesignID());
@@ -62,53 +64,52 @@ public class FleetEntity extends Entity {
             fractionComplete = 1.0;
         }
 
-        // we don't want to start the fleet over the top of the star, so we'll offset it a bit
-        distance -= 40.0f;
-        if (distance < 0) {
-            distance = 0;
+        ITextureRegion textureRegion = mStarfield.getSpriteTexture(design.getSpriteName());
+        float spriteWidth = textureRegion.getWidth();
+        float spriteHeight = textureRegion.getHeight();
+        float aspect = spriteWidth / spriteHeight;
+        if (spriteWidth > 40.0f) {
+            spriteWidth = 40.0f;
+            spriteHeight = 40.0f / aspect;
+        }
+        if (spriteHeight > 40.0f) {
+            spriteWidth = 40.0f * aspect;
+            spriteHeight = 40.0f;
         }
 
+        Vector2 up = Vector2.pool.borrow().reset(-1.0f, 0.0f); // fleetSprite.getUp();
         Vector2 direction = Vector2.pool.borrow().reset(mDestPoint);
         direction.subtract(mSrcPoint);
         direction.normalize();
-
-        Vector2 location = Vector2.pool.borrow().reset(direction);
-        location.scale(distance * fractionComplete);
-        location.add(mSrcPoint);
-
-        ITextureRegion textureRegion = mStarfield.getSpriteTexture(design.getSpriteName());
-        Sprite fleetSprite = new Sprite(0.0f, 0.0f, textureRegion.getWidth(), textureRegion.getHeight(),
-                textureRegion, vertexBufferObjectManager);
-        attachChild(fleetSprite);
-        Vector2 up = Vector2.pool.borrow().reset(0, 1.0f); // fleetSprite.getUp();
-
         float angle = Vector2.angleBetween(up, direction);
-
-        direction.scale(20.0f);
-        location.add(direction);
         Vector2.pool.release(direction); direction = null;
 
-        setPosition((float) location.x, (float) location.y);
-        setRotation((float)(angle * 180.0f / Math.PI));
-/*
+        mFleetSprite = new FleetSprite(spriteWidth, spriteHeight, (float)(angle * 180.0f / Math.PI),
+                textureRegion, vertexBufferObjectManager);
+        attachChild(mFleetSprite);
+
+        Vector2 location = getLocation((float) fractionComplete);
+
         // check if there's any other fleets nearby and offset this one by a bit so that they
         // don't overlap
         Random rand = new Random(mFleet.getKey().hashCode());
-        for (int i = 0; i < mVisibleEntities.size(); i++) {
-            VisibleEntity existing = mVisibleEntities.get(i);
-            if (existing.fleet == null) {
-                continue;
-            }
-
-            if (existing.position.distanceTo(position) < (15.0f * pixelScale)) {
+        ArrayList<FleetEntity> existingFleets = new ArrayList<FleetEntity>(starfield.getMovingFleets());
+        for (int i = 0; i < existingFleets.size(); i++) {
+            FleetEntity existingFleet = existingFleets.get(i);
+            Vector2 existingPosition = Vector2.pool.borrow().reset(existingFleet.getX(), existingFleet.getY());
+            if (existingPosition.distanceTo(location) < 30.0f) {
                 // pick a random direction and offset it a bit
-                Vector2 offset = Vector2.pool.borrow().reset(0, 20.0 * pixelScale);
+                Vector2 offset = Vector2.pool.borrow().reset(0, 40.0);
                 offset.rotate(rand.nextFloat() * 2 * (float) Math.PI);
-                position.add(offset);
+                location.add(offset);
                 Vector2.pool.release(offset);
-                i = -1; // start looping again...
+                i = 0;
             }
         }
+
+        setPosition((float) location.x, (float) location.y);
+        Vector2.pool.release(location);
+/*
 
         Empire emp = getEmpire(fleet.getEmpireKey());
         if (emp != null) {
@@ -132,5 +133,50 @@ public class FleetEntity extends Entity {
                             (float) position.y + (10.0f * pixelScale), mStarPaint);
         }
 */
+    }
+
+    private Vector2 getLocation(float fractionComplete) {
+        // we don't want to start the fleet over the top of the star, so we'll offset it a bit
+        double distance = mSrcPoint.distanceTo(mDestPoint) - 40.0f;
+        if (distance < 0) {
+            distance = 0;
+        }
+
+        Vector2 direction = Vector2.pool.borrow().reset(mDestPoint);
+        direction.subtract(mSrcPoint);
+        direction.normalize();
+
+        Vector2 location = Vector2.pool.borrow().reset(direction);
+        location.scale(distance * fractionComplete);
+        location.add(mSrcPoint);
+
+        direction.scale(20.0f);
+        location.add(direction);
+
+        return location;
+    }
+
+    private class FleetSprite extends Sprite {
+        public FleetSprite(float width, float height, float rotation, ITextureRegion textureRegion,
+                VertexBufferObjectManager vertexBufferObjectManager) {
+            super(0.0f, 0.0f, width, height, textureRegion, vertexBufferObjectManager);
+            setRotation(rotation);
+        }
+
+        @Override
+        public boolean onAreaTouched(final TouchEvent sceneTouchEvent,
+                                     final float touchAreaLocalX,
+                                     final float touchAreaLocalY) {
+            if (sceneTouchEvent.getAction() == TouchEvent.ACTION_DOWN) {
+                mStarfield.setSelectingEntity(FleetEntity.this);
+            } else if (sceneTouchEvent.getAction() == TouchEvent.ACTION_UP) {
+                SelectableEntity selectingEntity = mStarfield.getSelectingEntity();
+                if (selectingEntity == FleetEntity.this) {
+                    mStarfield.selectFleet(FleetEntity.this);
+                    return true;
+                }
+            }
+            return false;
+        }
     }
 }
