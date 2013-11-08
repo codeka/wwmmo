@@ -593,19 +593,23 @@ public class StarfieldActivity extends BaseStarfieldActivity
         }
     }
 
+    private void handleDeselect() {
+        mFetchingStarKey = null;
+        mSelectedStar = null;
+        mFetchingFleetKey = null;
+        mSelectedFleet = null;
+
+        findViewById(R.id.loading_container).setVisibility(View.GONE);
+        findViewById(R.id.selected_star).setVisibility(View.GONE);
+        findViewById(R.id.selected_fleet).setVisibility(View.GONE);
+
+        hideBottomPane(false);
+    }
+
     @Override
     public void onStarSelected(Star star) {
         if (star == null) {
-            mFetchingStarKey = null;
-            mSelectedStar = null;
-            mFetchingFleetKey = null;
-            mSelectedFleet = null;
-
-            findViewById(R.id.loading_container).setVisibility(View.GONE);
-            findViewById(R.id.selected_star).setVisibility(View.GONE);
-            findViewById(R.id.selected_fleet).setVisibility(View.GONE);
-
-            hideBottomPane(false);
+            handleDeselect();
             return;
         }
 
@@ -702,6 +706,11 @@ public class StarfieldActivity extends BaseStarfieldActivity
 
     @Override
     public void onFleetSelected(final Fleet fleet) {
+        if (fleet == null) {
+            handleDeselect();
+            return;
+        }
+        
         final View selectionLoadingContainer = findViewById(R.id.loading_container);
         final View selectedStarContainer = findViewById(R.id.selected_star);
         final View selectedFleetContainer = findViewById(R.id.selected_fleet);

@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
+import au.com.codeka.BackgroundRunner;
 import au.com.codeka.common.Pair;
 import au.com.codeka.warworlds.BaseGlActivity;
 import au.com.codeka.warworlds.model.Sector;
@@ -37,6 +38,7 @@ public abstract class SectorSceneManager implements SectorManager.OnSectorListCh
     protected long mSectorY;
     protected float mOffsetX;
     protected float mOffsetY;
+    private boolean mWasStopped;
 
     public SectorSceneManager(BaseGlActivity activity) {
         mActivity = activity;
@@ -55,10 +57,16 @@ public abstract class SectorSceneManager implements SectorManager.OnSectorListCh
                 mScaleGestureDetector = new ScaleGestureDetector(mActivity, scaleListener);
             }
         }
+
+        if (mWasStopped) {
+            log.debug("We were stopped, refreshing the scene...");
+            refreshScene();
+        }
     }
 
     protected void onStop() {
         SectorManager.getInstance().removeSectorListChangedListener(this);
+        mWasStopped = true;
     }
 
     public BaseGlActivity getActivity() {
@@ -67,14 +75,27 @@ public abstract class SectorSceneManager implements SectorManager.OnSectorListCh
 
     @Override
     public void onSectorListChanged() {
-        final Scene scene = createScene();
+        refreshScene();
+    }
 
-        mActivity.getEngine().runOnUpdateThread(new Runnable() {
+    private void refreshScene() {
+        new BackgroundRunner<Scene>() {
             @Override
-            public void run() {
-                mActivity.getEngine().setScene(scene);
+            protected Scene doInBackground() {
+                log.debug("Scene updated, refreshing...");
+                return createScene();
             }
-        });
+
+            @Override
+            protected void onComplete(final Scene scene) {
+                mActivity.getEngine().runOnUpdateThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        mActivity.getEngine().setScene(scene);
+                    }
+                });
+            }
+        }.execute();
     }
 
     public abstract void onLoadResources();

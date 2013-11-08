@@ -124,17 +124,6 @@ public class SectorManager extends BaseManager {
      */
     public void requestSectors(final List<Pair<Long, Long>> coords,
                                boolean force, final OnSectorsFetchedListener callback) {
-//        if (log.isDebugEnabled()) {
-            String msg = "";
-            for(Pair<Long, Long> coord : coords) {
-                if (msg.length() != 0) {
-                    msg += ", ";
-                }
-                msg += String.format("(%d, %d)", coord.one, coord.two);
-            }
-            log.debug(String.format("Requesting sectors %s...", msg));
-//        }
-
         Map<Pair<Long, Long>, Sector> existingSectors = new TreeMap<Pair<Long, Long>, Sector>();
         final List<Pair<Long, Long>> missingSectors = new ArrayList<Pair<Long, Long>>();
         synchronized(this) {

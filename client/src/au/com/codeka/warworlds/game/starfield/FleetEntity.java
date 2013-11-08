@@ -1,29 +1,30 @@
 package au.com.codeka.warworlds.game.starfield;
 
 import java.util.ArrayList;
+import java.util.Locale;
 import java.util.Random;
 
 import org.andengine.entity.Entity;
-import org.andengine.entity.primitive.Rectangle;
 import org.andengine.entity.sprite.Sprite;
+import org.andengine.entity.text.Text;
 import org.andengine.input.touch.TouchEvent;
 import org.andengine.opengl.texture.region.ITextureRegion;
 import org.andengine.opengl.vbo.VertexBufferObjectManager;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.Seconds;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import au.com.codeka.common.Vector2;
 import au.com.codeka.common.model.DesignKind;
 import au.com.codeka.common.model.ShipDesign;
 import au.com.codeka.warworlds.model.DesignManager;
+import au.com.codeka.warworlds.model.Empire;
+import au.com.codeka.warworlds.model.EmpireManager;
+import au.com.codeka.warworlds.model.EmpireShieldManager;
 import au.com.codeka.warworlds.model.Fleet;
 
 /** An entity that represents a moving fleet. */
 public class FleetEntity extends SelectableEntity {
-    private static final Logger log = LoggerFactory.getLogger(FleetEntity.class);
     private StarfieldSceneManager mStarfield;
     private Vector2 mSrcPoint;
     private Vector2 mDestPoint;
@@ -77,7 +78,7 @@ public class FleetEntity extends SelectableEntity {
             spriteHeight = 40.0f;
         }
 
-        Vector2 up = Vector2.pool.borrow().reset(-1.0f, 0.0f); // fleetSprite.getUp();
+        Vector2 up = Vector2.pool.borrow().reset(-1.0f, 0.0f);
         Vector2 direction = Vector2.pool.borrow().reset(mDestPoint);
         direction.subtract(mSrcPoint);
         direction.normalize();
@@ -109,30 +110,33 @@ public class FleetEntity extends SelectableEntity {
 
         setPosition((float) location.x, (float) location.y);
         Vector2.pool.release(location);
-/*
 
-        Empire emp = getEmpire(fleet.getEmpireKey());
+        Empire emp = EmpireManager.i.getEmpire(mFleet.getEmpireKey());
         if (emp != null) {
-            Bitmap shield = EmpireShieldManager.i.getShield(mContext, emp);
-            if (shield != null) {
-                mMatrix.reset();
-                mMatrix.postTranslate(-(shield.getWidth() / 2.0f), -(shield.getHeight() / 2.0f));
-                mMatrix.postScale(16.0f * pixelScale / shield.getWidth(),
-                                  16.0f * pixelScale / shield.getHeight());
-                mMatrix.postTranslate((float) position.x + (20.0f * pixelScale),
-                                      (float) position.y);
-                canvas.drawBitmap(shield, mMatrix, mStarPaint);
+            ITextureRegion texture = EmpireShieldManager.i.getShieldTexture(mStarfield.getActivity(), emp);
+            Vector2 pt = Vector2.pool.borrow().reset(30.0f, 0.0f);
+            if (texture != null) {
+                Sprite shieldSprite = new Sprite(
+                        (float) pt.x, (float) pt.y,
+                        20.0f, 20.0f, texture, mStarfield.getActivity().getVertexBufferObjectManager());
+                attachChild(shieldSprite);
             }
 
-            String msg = emp.getDisplayName();
-            canvas.drawText(msg, (float) position.x + (30.0f * pixelScale),
-                            (float) position.y, mStarPaint);
+            String name = emp.getDisplayName();
+            if (mFleet.getNumShips() > 1.0f) {
+                name += String.format(Locale.ENGLISH, "\n%d × %s", (int) mFleet.getNumShips(), design.getDisplayName());
+            } else {
+                name += String.format(Locale.ENGLISH, "\n%s", design.getDisplayName());
+            }
+            Text fleetName = new Text((float) pt.x, (float) pt.y, mStarfield.getFont(),
+                    name, mStarfield.getActivity().getVertexBufferObjectManager());
+            fleetName.setScale(0.666f);
+            float offset = ((fleetName.getLineWidthMaximum() * 0.666f) / 2.0f) + 14.0f;
+            fleetName.setX(fleetName.getX() + offset);
+            attachChild(fleetName);
 
-            msg = String.format(Locale.ENGLISH, "%s (%d)", design.getDisplayName(), (int) Math.ceil(fleet.getNumShips()));
-            canvas.drawText(msg, (float) position.x + (30.0f * pixelScale),
-                            (float) position.y + (10.0f * pixelScale), mStarPaint);
+            Vector2.pool.release(pt); pt = null;
         }
-*/
     }
 
     private Vector2 getLocation(float fractionComplete) {
@@ -160,6 +164,9 @@ public class FleetEntity extends SelectableEntity {
         public FleetSprite(float width, float height, float rotation, ITextureRegion textureRegion,
                 VertexBufferObjectManager vertexBufferObjectManager) {
             super(0.0f, 0.0f, width, height, textureRegion, vertexBufferObjectManager);
+            while (rotation < 0.0f) {
+                rotation += 360.0f;
+            }
             setRotation(rotation);
         }
 
