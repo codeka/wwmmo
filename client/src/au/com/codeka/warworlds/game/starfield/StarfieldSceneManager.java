@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
+import org.andengine.engine.camera.hud.HUD;
 import org.andengine.entity.Entity;
 import org.andengine.entity.scene.Scene;
 import org.andengine.entity.sprite.Sprite;
@@ -33,6 +34,8 @@ import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import au.com.codeka.common.Pair;
 import au.com.codeka.common.Vector2;
+import au.com.codeka.common.model.BaseBuilding;
+import au.com.codeka.common.model.BaseColony;
 import au.com.codeka.common.model.BaseFleet;
 import au.com.codeka.common.model.BaseStar;
 import au.com.codeka.warworlds.model.BuildManager;
@@ -237,6 +240,23 @@ public class StarfieldSceneManager extends SectorSceneManager
         }
 
         refreshSelectionIndicator();
+    }
+
+    @Override
+    protected void refreshHud(HUD hud) {
+        MyEmpire myEmpire = EmpireManager.i.getEmpire();
+        if (myEmpire != null && myEmpire.getHomeStar() != null) {
+            BaseStar homeStar = myEmpire.getHomeStar();
+            for (BaseColony colony : homeStar.getColonies()) {
+                if (colony.getEmpireKey() != null && colony.getEmpireKey().equals(myEmpire.getKey())) {
+                    for (BaseBuilding building : colony.getBuildings()) {
+                        if (building.getDesignID().equals("hq")) { // TODO: hard-coded?
+                            hud.attachChild(new HqEntity((Star) homeStar, mActivity.getCamera()));
+                        }
+                    }
+                }
+            }
+        }
     }
 
     @Override

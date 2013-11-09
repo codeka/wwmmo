@@ -245,6 +245,7 @@ $(function() {
       this.size = pb.size * 1.5;
       this.colonies = [];
       this.fleets = [];
+      this.rotation = 0;
 
       if (pb.colonies) {
         for (var i = 0; i < pb.colonies.length; i++) {
@@ -260,17 +261,22 @@ $(function() {
       }
 
       Math.seedrandom(this.key);
-      this.imgIndex = randomInt(0, 3);
+      this.rotation = Math.random() * Math.PI * 2;
     },
 
     render: function(context, offsetX, offsetY) {
       if (Star.small.img.complete) {
-        var slice = Star.small[this.type][this.imgIndex];
+        var slice = Star.small[this.type];
+        var x = offsetX + this.offsetX - (this.size * slice.scale / 2);
+        var y = offsetY + this.offsetY - (this.size * slice.scale / 2)
+        context.translate(x, y);
+        context.rotate(this.rotation);
         context.drawImage(Star.small.img,
           slice.x, slice.y, slice.width, slice.height,
-          offsetX + this.offsetX - (this.size * slice.scale / 2),
-          offsetY + this.offsetY - (this.size * slice.scale / 2),
+          -slice.width / 2, -slice.height / 2,
           this.size * slice.scale, this.size * slice.scale);
+        context.rotate(-this.rotation);
+        context.translate(-x, -y);
       }
 
       for (var i = 0; i < this.colonies.length; i++) {
@@ -301,58 +307,24 @@ $(function() {
           n ++;
         }
       }
-
+/*
       context.textAlign = "center";
       context.font = "12pt sans-serif"
       context.fillText(this.name,
                        offsetX + this.offsetX,
                        offsetY + this.offsetY + this.size + 6);
+*/
     }
   });
   Star.small = {
     img: new Image(),
-    "BLACKHOLE": [
-      {x: 0, y: 0, width: 32, height: 32, scale: 1},
-      {x: 32, y: 0, width: 32, height: 32, scale: 1},
-      {x: 64, y: 0, width: 32, height: 32, scale: 1},
-      {x: 96, y: 0, width: 32, height: 32, scale: 1}
-    ],
-    "BLUE": [
-      {x: 0, y: 32, width: 32, height: 32, scale: 1},
-      {x: 32, y: 32, width: 32, height: 32, scale: 1},
-      {x: 64, y: 32, width: 32, height: 32, scale: 1},
-      {x: 96, y: 32, width: 32, height: 32, scale: 1}
-    ],
-    "NEUTRON": [
-      {x: 0, y: 64, width: 64, height: 64, scale: 4},
-      {x: 64, y: 64, width: 64, height: 64, scale: 4},
-      {x: 0, y: 128, width: 64, height: 64, scale: 4},
-      {x: 64, y: 128, width: 64, height: 64, scale: 4}
-    ],
-    "ORANGE": [
-      {x: 0, y: 192, width: 32, height: 32, scale: 1},
-      {x: 32, y: 192, width: 32, height: 32, scale: 1},
-      {x: 64, y: 192, width: 32, height: 32, scale: 1},
-      {x: 96, y: 192, width: 32, height: 32, scale: 1}
-    ],
-    "RED": [
-      {x: 0, y: 224, width: 32, height: 32, scale: 1},
-      {x: 32, y: 224, width: 32, height: 32, scale: 1},
-      {x: 64, y: 224, width: 32, height: 32, scale: 1},
-      {x: 96, y: 224, width: 32, height: 32, scale: 1}
-    ],
-    "WHITE": [
-      {x: 0, y: 256, width: 32, height: 32, scale: 1},
-      {x: 32, y: 256, width: 32, height: 32, scale: 1},
-      {x: 64, y: 256, width: 32, height: 32, scale: 1},
-      {x: 96, y: 256, width: 32, height: 32, scale: 1}
-    ],
-    "YELLOW": [
-      {x: 0, y: 288, width: 32, height: 32, scale: 1},
-      {x: 32, y: 288, width: 32, height: 32, scale: 1},
-      {x: 64, y: 288, width: 32, height: 32, scale: 1},
-      {x: 96, y: 288, width: 32, height: 32, scale: 1}
-    ]
+    "BLACKHOLE": {x: 0, y: 128, width: 64, height: 64, scale: 1},
+    "BLUE": {x: 64, y: 128, width: 64, height: 64, scale: 1},
+    "NEUTRON": {x: 0, y: 0, width: 128, height: 128, scale: 4},
+    "ORANGE": {x: 0, y: 192, width: 64, height: 64, scale: 1},
+    "RED": {x: 64, y: 192, width: 64, height: 64, scale: 1},
+    "WHITE": {x: 0, y: 256, width: 64, height: 64, scale: 1},
+    "YELLOW": {x: 64, y: 256, width: 64, height: 64, scale: 1}
   };
   Star.small.img.src = "/realms/"+window.realm+"/intel/stars_small.png";
   Star.small.img.onload = function() { world.draw(); }

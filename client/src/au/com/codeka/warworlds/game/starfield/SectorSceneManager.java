@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.andengine.engine.camera.ZoomCamera;
+import org.andengine.engine.camera.hud.HUD;
 import org.andengine.entity.IEntity;
 import org.andengine.entity.IEntityParameterCallable;
 import org.andengine.entity.scene.IOnSceneTouchListener;
@@ -99,6 +100,7 @@ public abstract class SectorSceneManager implements SectorManager.OnSectorListCh
     }
 
     public abstract void onLoadResources();
+    protected abstract void refreshHud(HUD hud);
     protected abstract void refreshScene(Scene scene);
 
     protected GestureDetector.OnGestureListener createGestureListener() {
@@ -115,6 +117,10 @@ public abstract class SectorSceneManager implements SectorManager.OnSectorListCh
         mScene.setOnSceneTouchListener(this);
 
         refreshScene(mScene);
+
+        HUD hud = new HUD();
+        refreshHud(hud);
+        mActivity.getCamera().setHUD(hud);
 
         return mScene;
     }
