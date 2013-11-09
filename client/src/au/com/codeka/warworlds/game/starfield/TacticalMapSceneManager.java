@@ -8,6 +8,7 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 
 import org.andengine.engine.camera.ZoomCamera;
+import org.andengine.engine.camera.hud.HUD;
 import org.andengine.entity.scene.Scene;
 import org.andengine.entity.sprite.Sprite;
 import org.andengine.opengl.texture.TextureOptions;
@@ -403,5 +404,11 @@ public class TacticalMapSceneManager extends SectorSceneManager
 
     public interface DoubleTapHandler {
         void onDoubleTapped(BaseStar star);
+    }
+
+    @Override
+    protected void refreshHud(HUD hud) {
+        // TODO Auto-generated method stub
+        
     }
 }

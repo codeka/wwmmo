@@ -359,6 +359,10 @@ public class StarfieldActivity extends BaseStarfieldActivity
         startActivity(intent);
     }
 
+    public int getBottomPaneHeight() {
+        return mBottomPane.getHeight();
+    }
+
     private void hideBottomPane(boolean instant) {
         Resources r = getResources();
         float px = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 34, r.getDisplayMetrics());

@@ -69,8 +69,9 @@ public class StarfieldSceneManager extends SectorSceneManager
     private TiledTextureRegion mNeutronStarTextureRegion;
     private TiledTextureRegion mNormalStarTextureRegion;
 
-    private BitmapTextureAtlas mFleetIconTextureAtlas;
-    private TiledTextureRegion mFleetIconTextureRegion;
+    private BuildableBitmapTextureAtlas mIconTextureAtlas;
+    private ITextureRegion mFleetIconTextureRegion;
+    private ITextureRegion mArrowIconTextureRegion;
 
     private BuildableBitmapTextureAtlas mFleetSpriteTextureAtlas;
     private HashMap<String, ITextureRegion> mFleetSpriteTextures;
@@ -114,10 +115,10 @@ public class StarfieldSceneManager extends SectorSceneManager
         mBackgroundStarsTextureRegion = BitmapTextureAtlasTextureRegionFactory.createTiledFromAsset(mBackgroundStarsTextureAtlas,
                 mActivity, "decoration/starfield.png", 0, 0, 4, 4);
 
-        mFleetIconTextureAtlas = new BitmapTextureAtlas(mActivity.getTextureManager(), 64, 64,
+        mIconTextureAtlas = new BuildableBitmapTextureAtlas(mActivity.getTextureManager(), 256, 256,
                 TextureOptions.BILINEAR_PREMULTIPLYALPHA);
-        mFleetIconTextureRegion = BitmapTextureAtlasTextureRegionFactory.createTiledFromAsset(mFleetIconTextureAtlas, 
-                mActivity, "img/fleet.png", 0, 0, 1, 1);
+        mFleetIconTextureRegion = BitmapTextureAtlasTextureRegionFactory.createFromAsset(mIconTextureAtlas, mActivity, "img/fleet.png");
+        mArrowIconTextureRegion = BitmapTextureAtlasTextureRegionFactory.createFromAsset(mIconTextureAtlas, mActivity, "img/arrow.png");
 
         mFleetSpriteTextureAtlas = new BuildableBitmapTextureAtlas(mActivity.getTextureManager(), 256, 256,
                 TextureOptions.BILINEAR_PREMULTIPLYALPHA);
@@ -130,10 +131,14 @@ public class StarfieldSceneManager extends SectorSceneManager
         mActivity.getTextureManager().loadTexture(mStarTextureAtlas);
         mActivity.getTextureManager().loadTexture(mBackgroundGasTextureAtlas);
         mActivity.getTextureManager().loadTexture(mBackgroundStarsTextureAtlas);
-        mActivity.getTextureManager().loadTexture(mFleetIconTextureAtlas);
 
         try {
-            mFleetSpriteTextureAtlas.build(new BlackPawnTextureAtlasBuilder<IBitmapTextureAtlasSource, BitmapTextureAtlas>(1, 1, 1));
+            BlackPawnTextureAtlasBuilder<IBitmapTextureAtlasSource, BitmapTextureAtlas> builder =
+                    new BlackPawnTextureAtlasBuilder<IBitmapTextureAtlasSource, BitmapTextureAtlas>(1, 1, 1);
+            mIconTextureAtlas.build(builder);
+            mIconTextureAtlas.load();
+
+            mFleetSpriteTextureAtlas.build(builder);
             mFleetSpriteTextureAtlas.load();
         } catch (TextureAtlasBuilderException e) {
             log.error("Error building texture atlas.", e);
@@ -177,6 +182,10 @@ public class StarfieldSceneManager extends SectorSceneManager
 
     public ITextureRegion getSpriteTexture(String spriteName) {
         return mFleetSpriteTextures.get(spriteName);
+    }
+
+    public ITextureRegion getArrowTexture() {
+        return mArrowIconTextureRegion;
     }
 
     public void addSelectionChangedListener(OnSelectionChangedListener listener) {
@@ -246,15 +255,10 @@ public class StarfieldSceneManager extends SectorSceneManager
     protected void refreshHud(HUD hud) {
         MyEmpire myEmpire = EmpireManager.i.getEmpire();
         if (myEmpire != null && myEmpire.getHomeStar() != null) {
-            BaseStar homeStar = myEmpire.getHomeStar();
-            for (BaseColony colony : homeStar.getColonies()) {
-                if (colony.getEmpireKey() != null && colony.getEmpireKey().equals(myEmpire.getKey())) {
-                    for (BaseBuilding building : colony.getBuildings()) {
-                        if (building.getDesignID().equals("hq")) { // TODO: hard-coded?
-                            hud.attachChild(new HqEntity((Star) homeStar, mActivity.getCamera()));
-                        }
-                    }
-                }
+            // if you have a HQ, it'll be on your home star.
+            if (BuildManager.getInstance().getTotalBuildingsInEmpire("hq") > 0) {
+                hud.attachChild(new HqEntity(this, myEmpire.getHomeStar(), mActivity.getCamera(),
+                        mActivity.getVertexBufferObjectManager()));
             }
         }
     }
@@ -489,11 +493,11 @@ public class StarfieldSceneManager extends SectorSceneManager
      * Given a \c Sector, returns the (x, y) coordinates (in view-space) of the origin of this
      * sector.
      */
-    private Vector2 getSectorOffset(long sx, long sy) {
+    public Vector2 getSectorOffset(long sx, long sy) {
         sx -= mSectorX;
         sy -= mSectorY;
-        return new Vector2((sx * Sector.SECTOR_SIZE),
-                           (sy * Sector.SECTOR_SIZE));
+        return Vector2.pool.borrow().reset((sx * Sector.SECTOR_SIZE),
+                                           (sy * Sector.SECTOR_SIZE));
     }
 
     /**
