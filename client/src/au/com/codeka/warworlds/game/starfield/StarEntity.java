@@ -63,6 +63,13 @@ public class StarEntity extends SelectableEntity {
         return mStar;
     }
 
+    public void setStar(Star s) {
+        if (s == null || !s.getKey().equals(mStar.getKey())) {
+            throw new RuntimeException("Can only be used to refresh the existing star!");
+        }
+        mStar = s;
+    }
+
     private void addEmpireIcons() {
         List<BaseColony> colonies = mStar.getColonies();
         if (colonies != null && !colonies.isEmpty()) {

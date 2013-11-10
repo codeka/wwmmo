@@ -38,7 +38,9 @@ import au.com.codeka.common.model.BaseBuilding;
 import au.com.codeka.common.model.BaseColony;
 import au.com.codeka.common.model.BaseFleet;
 import au.com.codeka.common.model.BaseStar;
+import au.com.codeka.common.model.BuildingDesign;
 import au.com.codeka.warworlds.model.BuildManager;
+import au.com.codeka.warworlds.model.Building;
 import au.com.codeka.warworlds.model.Empire;
 import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.Fleet;
@@ -47,6 +49,7 @@ import au.com.codeka.warworlds.model.Sector;
 import au.com.codeka.warworlds.model.SectorManager;
 import au.com.codeka.warworlds.model.Star;
 import au.com.codeka.warworlds.model.StarManager;
+import au.com.codeka.warworlds.model.designeffects.RadarBuildingEffect;
 
 /**
  * \c SurfaceView that displays the starfield. You can scroll around, tap on stars to bring
@@ -62,6 +65,7 @@ public class StarfieldSceneManager extends SectorSceneManager
 
     private SelectableEntity mSelectingEntity;
     private SelectionIndicator mSelectionIndicator;
+    private RadarIndicatorEntity mRadarIndicator;
     private boolean mWasDragging;
 
     private Font mFont;
@@ -149,6 +153,7 @@ public class StarfieldSceneManager extends SectorSceneManager
         mFont.load();
 
         mSelectionIndicator = new SelectionIndicator(this);
+        mRadarIndicator = new RadarIndicatorEntity(this);
     }
 
     @Override
@@ -653,11 +658,21 @@ public class StarfieldSceneManager extends SectorSceneManager
         if (mSelectionIndicator.getParent() != null) {
             mSelectionIndicator.getParent().detachChild(mSelectionIndicator);
         }
+        if (mRadarIndicator.getParent() != null) {
+            mRadarIndicator.getParent().detachChild(mRadarIndicator);
+        }
 
         if (mSelectedStarEntity != null) {
             Star star = mSelectedStarEntity.getStar();
             mSelectionIndicator.setScale(star.getSize());
             mSelectedStarEntity.attachChild(mSelectionIndicator);
+
+            // if the selected star has a radar, pick the one with the biggest radius to display
+            float radarRadius = mSelectedStarEntity.getStar().getRadarRange(EmpireManager.i.getEmpire().getKey());
+            if (radarRadius > 0.0f) {
+                mSelectedStarEntity.attachChild(mRadarIndicator);
+                mRadarIndicator.setScale(radarRadius * Sector.PIXELS_PER_PARSEC * 2.0f);
+            }
         }
         if (mSelectedFleetEntity != null) {
             mSelectionIndicator.setScale(20.0f);
@@ -671,7 +686,11 @@ public class StarfieldSceneManager extends SectorSceneManager
      */
     @Override
     public void onStarFetched(Star s) {
-        // TODO: redraw();
+        // if it's the selected star, we'll want to update the selection
+        if (s != null && mSelectedStarEntity != null && s.getKey().equals(mSelectedStarEntity.getStar().getKey())) {
+            mSelectedStarEntity.setStar(s);
+            refreshSelectionIndicator();
+        }
     }
 
     public interface OnSelectionChangedListener {
