@@ -65,6 +65,10 @@ public class MiniChatView extends RelativeLayout
 
     @Override
     public void onAttachedToWindow() {
+        if (this.isInEditMode()) {
+            return;
+        }
+
         ChatManager.i.addMessageAddedListener(this);
         ChatManager.i.addMessageUpdatedListener(this);
 
@@ -73,6 +77,10 @@ public class MiniChatView extends RelativeLayout
 
     @Override
     public void onDetachedFromWindow() {
+        if (this.isInEditMode()) {
+            return;
+        }
+
         ChatManager.i.removeMessageAddedListener(this);
         ChatManager.i.removeMessageUpdatedListener(this);
     }

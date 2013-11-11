@@ -80,16 +80,10 @@ public class InfobarView extends FrameLayout
         }
         mHandler = new Handler();
 
-        MyEmpire empire = EmpireManager.i.getEmpire();
-        if (empire != null) {
-            onEmpireFetched(empire);
-        }
-
         EmpireManager.i.addEmpireUpdatedListener(null, this);
         RequestManager.addRequestManagerStateChangedHandler(this);
 
-        // set up the initial state
-        onStateChanged();
+        refreshEmpire();
     }
 
     @Override
@@ -97,7 +91,18 @@ public class InfobarView extends FrameLayout
         if (isInEditMode()) {
             return;
         }
+
         EmpireManager.i.removeEmpireUpdatedListener(this);
         RequestManager.removeRequestManagerStateChangedHandler(this);
+    }
+
+    private void refreshEmpire() {
+        MyEmpire empire = EmpireManager.i.getEmpire();
+        if (empire != null) {
+            onEmpireFetched(empire);
+        }
+
+        // set up the initial state
+        onStateChanged();
     }
 }

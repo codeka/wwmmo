@@ -149,6 +149,11 @@ public class Vector2 implements ObjectPool.Pooled {
                                   a.x * b.x + a.y * b.y);
     }
 
+    public static float angleBetweenCcw(Vector2 a, Vector2 b) {
+        return (float) Math.atan2(a.x * b.x + a.y * b.y,
+                                  a.x * b.y - a.y * b.x);
+    }
+
     static class Vector2Creator implements ObjectPool.PooledCreator {
         @Override
         public Pooled create() {

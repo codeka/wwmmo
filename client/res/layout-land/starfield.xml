@@ -215,15 +215,6 @@
             android:layout_width="match_parent"
             android:layout_height="68dp"
             android:layout_alignParentBottom="true" >
-            <Button
-                android:id="@+id/empire_btn"
-                style="@style/Button"
-                android:layout_width="92dp"
-                android:layout_height="30dp"
-                android:layout_marginRight="4dp"
-                android:layout_alignParentRight="true"
-                android:layout_alignParentTop="true"
-                android:text="Empire" />
 
             <Button
                 android:id="@+id/sitrep_btn"
@@ -235,14 +226,15 @@
                 android:layout_alignParentLeft="true"
                 android:text="Sit. Rep." />
 
-            <Button android:id="@+id/tactical_map_btn"
-                    style="@style/Button"
-                    android:layout_width="92dp"
-                    android:layout_height="30dp"
-                    android:layout_marginLeft="4dp"
-                    android:layout_alignParentBottom="true"
-                    android:layout_alignParentLeft="true"
-                    android:text="Tactical" />
+            <Button
+                android:id="@+id/empire_btn"
+                style="@style/Button"
+                android:layout_width="92dp"
+                android:layout_height="30dp"
+                android:layout_marginLeft="4dp"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentLeft="true"
+                android:text="Empire" />
 
             <Button android:id="@+id/alliance_btn"
                     style="@style/Button"

@@ -40,6 +40,7 @@ public abstract class SectorSceneManager implements SectorManager.OnSectorListCh
     protected float mOffsetX;
     protected float mOffsetY;
     private boolean mWasStopped;
+    private SceneCreatedHandler mSceneCreatedHandler;
 
     public SectorSceneManager(BaseGlActivity activity) {
         mActivity = activity;
@@ -68,6 +69,10 @@ public abstract class SectorSceneManager implements SectorManager.OnSectorListCh
     protected void onStop() {
         SectorManager.getInstance().removeSectorListChangedListener(this);
         mWasStopped = true;
+    }
+
+    public void setSceneCreatedHandler(SceneCreatedHandler handler) {
+        mSceneCreatedHandler = handler;
     }
 
     public BaseGlActivity getActivity() {
@@ -121,6 +126,10 @@ public abstract class SectorSceneManager implements SectorManager.OnSectorListCh
         HUD hud = new HUD();
         refreshHud(hud);
         mActivity.getCamera().setHUD(hud);
+
+        if (mSceneCreatedHandler != null) {
+            mSceneCreatedHandler.onSceneCreated(mScene);
+        }
 
         return mScene;
     }
@@ -271,5 +280,9 @@ public abstract class SectorSceneManager implements SectorManager.OnSectorListCh
             updateZoomFactor(mZoomFactor);
             return true;
         }
+    }
+
+    public interface SceneCreatedHandler {
+        void onSceneCreated(Scene scene);
     }
 }

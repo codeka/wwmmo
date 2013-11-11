@@ -34,13 +34,9 @@ import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import au.com.codeka.common.Pair;
 import au.com.codeka.common.Vector2;
-import au.com.codeka.common.model.BaseBuilding;
-import au.com.codeka.common.model.BaseColony;
 import au.com.codeka.common.model.BaseFleet;
 import au.com.codeka.common.model.BaseStar;
-import au.com.codeka.common.model.BuildingDesign;
 import au.com.codeka.warworlds.model.BuildManager;
-import au.com.codeka.warworlds.model.Building;
 import au.com.codeka.warworlds.model.Empire;
 import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.Fleet;
@@ -49,7 +45,6 @@ import au.com.codeka.warworlds.model.Sector;
 import au.com.codeka.warworlds.model.SectorManager;
 import au.com.codeka.warworlds.model.Star;
 import au.com.codeka.warworlds.model.StarManager;
-import au.com.codeka.warworlds.model.designeffects.RadarBuildingEffect;
 
 /**
  * \c SurfaceView that displays the starfield. You can scroll around, tap on stars to bring

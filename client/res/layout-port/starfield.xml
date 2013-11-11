@@ -215,22 +215,13 @@
             android:layout_toLeftOf="@+id/empire_btn"
             android:text="Sit. Rep." />
 
-        <Button android:id="@+id/tactical_map_btn"
-                style="@style/Button"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentBottom="true"
-                android:layout_marginRight="5dp"
-                android:layout_toLeftOf="@id/sitrep_btn"
-                android:text="Tactical" />
-
         <Button android:id="@+id/alliance_btn"
                 style="@style/Button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginRight="5dp"
-                android:layout_alignTop="@id/tactical_map_btn"
-                android:layout_toLeftOf="@+id/tactical_map_btn"
+                android:layout_alignTop="@id/sitrep_btn"
+                android:layout_toLeftOf="@+id/sitrep_btn"
                 android:text="Alliance" />
 
         <au.com.codeka.warworlds.ctrl.InfobarView

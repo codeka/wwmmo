@@ -96,7 +96,6 @@ public class StarfieldActivity extends BaseStarfieldActivity
     private static final int SOLAR_SYSTEM_REQUEST = 1;
     private static final int EMPIRE_REQUEST = 2;
     private static final int SITREP_REQUEST = 3;
-    private static final int TACTICAL_MAP_REQUEST = 4;
 
     @Override
     public void onCreate(final Bundle savedInstanceState) {
@@ -585,15 +584,6 @@ public class StarfieldActivity extends BaseStarfieldActivity
 
                 navigateToFleet(starKey, fleetKey);
             }
-        } else if (requestCode == TACTICAL_MAP_REQUEST && intent != null) {
-            long sectorX = intent.getLongExtra("au.com.codeka.warworlds.SectorX", 0);
-            long sectorY = intent.getLongExtra("au.com.codeka.warworlds.SectorY", 0);
-            int offsetX = intent.getIntExtra("au.com.codeka.warworlds.OffsetX", 0);
-            int offsetY = intent.getIntExtra("au.com.codeka.warworlds.OffsetY", 0);
-            String starKey = intent.getStringExtra("au.com.codeka.warworlds.StarKey");
-
-            mStarfield.scrollTo(sectorX, sectorY, offsetX, offsetY, true);
-            mStarfield.selectStar(starKey);
         }
     }
 
