@@ -16,6 +16,11 @@ import au.com.codeka.TexturedMesh;
  */
 public class RadarIndicatorEntity extends Entity {
     private TexturedMesh mMesh;
+    private static MyShaderProgram sShaderProgram = new MyShaderProgram();
+
+    public static ShaderProgram getShaderProgram() {
+        return sShaderProgram;
+    }
 
     public RadarIndicatorEntity(StarfieldSceneManager starfield) {
         super(0, 0, 1, 1);
@@ -36,7 +41,7 @@ public class RadarIndicatorEntity extends Entity {
 
         mMesh = new TexturedMesh(0.0f, 0.0f, vertexData, 4, DrawMode.TRIANGLE_STRIP,
                 starfield.getActivity().getVertexBufferObjectManager());
-        mMesh.setShaderProgram(new MyShaderProgram());
+        mMesh.setShaderProgram(sShaderProgram);
         attachChild(mMesh);
     }
 

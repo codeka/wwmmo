@@ -132,6 +132,7 @@ public class StarfieldSceneManager extends SectorSceneManager
         mFleetSpriteTextures.put("ship.colony", BitmapTextureAtlasTextureRegionFactory.createFromAsset(mFleetSpriteTextureAtlas, mActivity, "spritesheets/ship.colony.png"));
         mFleetSpriteTextures.put("ship.troopcarrier", BitmapTextureAtlasTextureRegionFactory.createFromAsset(mFleetSpriteTextureAtlas, mActivity, "spritesheets/ship.troopcarrier.png"));
 
+        mActivity.getShaderProgramManager().loadShaderProgram(RadarIndicatorEntity.getShaderProgram());
         mActivity.getTextureManager().loadTexture(mStarTextureAtlas);
         mActivity.getTextureManager().loadTexture(mBackgroundGasTextureAtlas);
         mActivity.getTextureManager().loadTexture(mBackgroundStarsTextureAtlas);
@@ -456,7 +457,11 @@ public class StarfieldSceneManager extends SectorSceneManager
         mStars.put(star.getKey(), starEntity);
 
         if (mSelectedStarEntity != null && mSelectedStarEntity.getStar().getKey().equals(star.getKey())) {
+            // the selected star will have been refreshed from the server with full details (buildings, etc), whereas
+            // the one in the sector will just be a summary. We want to make sure the selection stays "full detail".
+            Star selectedStar = mSelectedStarEntity.getStar();
             mSelectedStarEntity = starEntity;
+            mSelectedStarEntity.setStar(selectedStar);
         }
 /*
         if (mHqStar != null && star.getKey().equals(mHqStar.getKey())) {
