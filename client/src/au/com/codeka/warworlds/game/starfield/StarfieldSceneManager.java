@@ -421,7 +421,7 @@ public class StarfieldSceneManager extends SectorSceneManager
      */
     private void addStar(Scene scene, Star star, int x, int y) {
         x += star.getOffsetX();
-        y += star.getOffsetY();
+        y += Sector.SECTOR_SIZE - star.getOffsetY();
 
         ITextureRegion textureRegion = null;
         if (star.getStarType().getInternalName().equals("neutron")) {
@@ -522,11 +522,11 @@ public class StarfieldSceneManager extends SectorSceneManager
 
         Vector2 srcPoint = Vector2.pool.borrow().reset(offsetX, offsetY);
         srcPoint.x += srcStar.getOffsetX();
-        srcPoint.y += srcStar.getOffsetY();
+        srcPoint.y += Sector.SECTOR_SIZE - srcStar.getOffsetY();
 
         Vector2 destPoint = getSectorOffset(destStar.getSectorX(), destStar.getSectorY());
         destPoint.x += destStar.getOffsetX();
-        destPoint.y += destStar.getOffsetY();
+        destPoint.y += Sector.SECTOR_SIZE - destStar.getOffsetY();
 
         FleetEntity fleetEntity = new FleetEntity(this, srcPoint, destPoint, fleet, mActivity.getVertexBufferObjectManager());
         scene.registerTouchArea(fleetEntity.getTouchEntity());

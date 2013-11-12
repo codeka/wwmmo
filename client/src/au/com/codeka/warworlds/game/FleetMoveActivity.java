@@ -91,8 +91,7 @@ public class FleetMoveActivity extends BaseStarfieldActivity {
             }
         });
 
-        mStarfield.scrollTo(mSrcStar.getSectorX(), mSrcStar.getSectorY(), mSrcStar.getOffsetX(), mSrcStar.getOffsetY());
-
+        mStarfield.scrollTo(mSrcStar);
         mStarfield.addSelectionChangedListener(new StarfieldSceneManager.OnSelectionChangedListener() {
             @Override
             public void onStarSelected(Star star) {
@@ -164,12 +163,14 @@ public class FleetMoveActivity extends BaseStarfieldActivity {
         if (mDestStar == null) {
             instructionsView.setVisibility(View.VISIBLE);
             starDetailsView.setVisibility(View.GONE);
+            findViewById(R.id.move_btn).setEnabled(false);
             mFleetIndicatorEntity.setPoints(srcPoint, null);
 
             return;
         } else {
             instructionsView.setVisibility(View.GONE);
             starDetailsView.setVisibility(View.VISIBLE);
+            findViewById(R.id.move_btn).setEnabled(true);
 
             Vector2 destPoint = mStarfield.getSectorOffset(mDestStar.getSectorX(), mDestStar.getSectorY());
             destPoint.add(mDestStar.getOffsetX(), mDestStar.getOffsetY());

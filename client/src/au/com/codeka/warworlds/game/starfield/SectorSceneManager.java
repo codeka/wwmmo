@@ -19,6 +19,7 @@ import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import au.com.codeka.BackgroundRunner;
 import au.com.codeka.common.Pair;
+import au.com.codeka.common.model.BaseStar;
 import au.com.codeka.warworlds.BaseGlActivity;
 import au.com.codeka.warworlds.model.Sector;
 import au.com.codeka.warworlds.model.SectorManager;
@@ -139,6 +140,10 @@ public abstract class SectorSceneManager implements SectorManager.OnSectorListCh
      */
     public void scrollTo(long sectorX, long sectorY, float offsetX, float offsetY) {
         scrollTo(sectorX, sectorY, offsetX, offsetY, false);
+    }
+
+    public void scrollTo(BaseStar star) {
+        scrollTo(star.getSectorX(), star.getSectorY(), star.getOffsetX(), star.getOffsetY(), false);
     }
 
     protected void updateZoomFactor(float zoomFactor) {

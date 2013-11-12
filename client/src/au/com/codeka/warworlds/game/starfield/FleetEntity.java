@@ -78,7 +78,7 @@ public class FleetEntity extends SelectableEntity {
             spriteHeight = 40.0f;
         }
 
-        Vector2 up = Vector2.pool.borrow().reset(-1.0f, 0.0f);
+        Vector2 up = Vector2.pool.borrow().reset(1.0f, 0.0f);
         Vector2 direction = Vector2.pool.borrow().reset(mDestPoint);
         direction.subtract(mSrcPoint);
         direction.normalize();
