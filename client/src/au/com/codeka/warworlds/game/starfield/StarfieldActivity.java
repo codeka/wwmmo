@@ -79,6 +79,7 @@ public class StarfieldActivity extends BaseStarfieldActivity
     private Fleet mSelectedFleet;
     private StarSummary mHomeStar;
     private View mBottomPane;
+    private Button mAllianceBtn;
 
     private Purchase mStarRenamePurchase;
 
@@ -182,8 +183,8 @@ public class StarfieldActivity extends BaseStarfieldActivity
             }
         });
 
-        final Button allianceBtn = (Button) findViewById(R.id.alliance_btn);
-        allianceBtn.setOnClickListener(new View.OnClickListener() {
+        mAllianceBtn = (Button) findViewById(R.id.alliance_btn);
+        mAllianceBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 onAllianceClick();
@@ -363,25 +364,91 @@ public class StarfieldActivity extends BaseStarfieldActivity
     }
 
     private void hideBottomPane(boolean instant) {
-        Resources r = getResources();
-        float px = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 34, r.getDisplayMetrics());
-
-        if (instant) {
-            RelativeLayout.LayoutParams lp = (RelativeLayout.LayoutParams) mBottomPane.getLayoutParams();
-            lp.height = (int) px;
-            mBottomPane.setLayoutParams(lp);
-        } else {
-            applyBottomPaneAnimation(px);
-        }
+        applyBottomPaneAnimation(false, instant);
     }
 
     private void showBottomPane() {
-        Resources r = getResources();
-        final float px = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 180, r.getDisplayMetrics());
-        applyBottomPaneAnimation(px);
+        applyBottomPaneAnimation(true, false);
     }
 
-    private void applyBottomPaneAnimation(final float pxHeight) {
+    private void applyBottomPaneAnimation(boolean isOpen, boolean instant) {
+        float dp;
+        if (isPortrait()) {
+            if (isOpen) {
+                dp = 180;
+            } else {
+                dp = 34;
+            }
+        } else {
+            if (isOpen) {
+                dp = 200;
+            } else {
+                dp = 100;
+            }
+        }
+
+        Resources r = getResources();
+        float px = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, r.getDisplayMetrics());
+
+        if (isPortrait()) {
+            if (instant) {
+                RelativeLayout.LayoutParams lp = (RelativeLayout.LayoutParams) mBottomPane.getLayoutParams();
+                lp.height = (int) px;
+                mBottomPane.setLayoutParams(lp);
+            } else {
+                applyBottomPaneAnimationPortrait(px);
+            }
+        } else {
+            RelativeLayout.LayoutParams lp = (RelativeLayout.LayoutParams) mAllianceBtn.getLayoutParams();
+            if (isOpen) {
+                lp.removeRule(RelativeLayout.BELOW);
+                lp.addRule(RelativeLayout.ALIGN_PARENT_TOP, 1);
+                lp.topMargin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 34, r.getDisplayMetrics());
+            } else {
+                lp.addRule(RelativeLayout.BELOW, R.id.empire_btn);
+                lp.removeRule(RelativeLayout.ALIGN_PARENT_TOP);
+                lp.topMargin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 4, r.getDisplayMetrics());
+            }
+            mAllianceBtn.setLayoutParams(lp);
+
+            if (instant) {
+                lp = (RelativeLayout.LayoutParams) mBottomPane.getLayoutParams();
+                lp.width = (int) px;
+                mBottomPane.setLayoutParams(lp);
+            } else {
+                applyBottomPaneAnimationLandscape(px);
+            }
+        }
+    }
+
+    private void applyBottomPaneAnimationLandscape(final float pxWidth) {
+        Animation a = new Animation() {
+            private int mInitialWidth;
+
+            @Override
+            protected void applyTransformation(float interpolatedTime, Transformation t) {
+                final int newWidth = mInitialWidth + (int)((pxWidth - mInitialWidth) * interpolatedTime);
+                mBottomPane.getLayoutParams().width = newWidth;
+                mBottomPane.requestLayout();
+            }
+
+            @Override
+            public void initialize(int width, int height, int parentWidth, int parentHeight) {
+                super.initialize(width, height, parentWidth, parentHeight);
+                mInitialWidth = width;
+            }
+
+            @Override
+            public boolean willChangeBounds() {
+                return true;
+            }
+        };
+        a.setDuration(500);
+        mBottomPane.setAnimation(a);
+
+    }
+
+    private void applyBottomPaneAnimationPortrait(final float pxHeight) {
         Animation a = new Animation() {
             private int mInitialHeight;
 
@@ -516,10 +583,12 @@ public class StarfieldActivity extends BaseStarfieldActivity
                     if (result.isFailure() && result.getResponse() == IabHelper.BILLING_RESPONSE_RESULT_ITEM_ALREADY_OWNED) {
                         // if they've already purchased a star-renamed, but not reclaimed it, then
                         // we let them through anyway.
+                        log.debug("Already purchased a star-rename, we'll just show the popup.");
                         isSuccess = true;
                         try {
                             purchase = PurchaseManager.i.getInventory().getPurchase("star_rename");
                         } catch (IabException e) {
+                            log.warn("Got an exception getting the purchase details.", e);
                         }
                     }
 
@@ -529,6 +598,7 @@ public class StarfieldActivity extends BaseStarfieldActivity
                         } catch(IllegalStateException e) {
                             // this can be called before the activity is resumed, so we just set a
                             // flag that'll cause us to pop up the dialog when the activity is resumed.
+                            log.warn("Got an error trying to show the popup, we'll try again in a second...");
                             mStarRenamePurchase = purchase;
                         }
                     }
@@ -544,7 +614,7 @@ public class StarfieldActivity extends BaseStarfieldActivity
         StarRenameDialog dialog = new StarRenameDialog();
         dialog.setPurchaseInfo(purchase);
         dialog.setStar(mSelectedStar);
-        //TODO dialog.show(getSupportFragmentManager(), "");
+        dialog.show(getSupportFragmentManager(), "");
     }
 
     @Override

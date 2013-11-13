@@ -82,7 +82,7 @@ public class FleetEntity extends SelectableEntity {
         Vector2 direction = Vector2.pool.borrow().reset(mDestPoint);
         direction.subtract(mSrcPoint);
         direction.normalize();
-        float angle = Vector2.angleBetween(up, direction);
+        float angle = Vector2.angleBetweenCcw(up, direction);
         Vector2.pool.release(direction); direction = null;
 
         mFleetSprite = new FleetSprite(spriteWidth, spriteHeight, (float)(angle * 180.0f / Math.PI),
@@ -164,9 +164,6 @@ public class FleetEntity extends SelectableEntity {
         public FleetSprite(float width, float height, float rotation, ITextureRegion textureRegion,
                 VertexBufferObjectManager vertexBufferObjectManager) {
             super(0.0f, 0.0f, width, height, textureRegion, vertexBufferObjectManager);
-            while (rotation < 0.0f) {
-                rotation += 360.0f;
-            }
             setRotation(rotation);
         }
 

@@ -11,6 +11,7 @@ import org.andengine.opengl.vbo.VertexBufferObjectManager;
 import au.com.codeka.common.Vector2;
 import au.com.codeka.common.model.BaseStar;
 import au.com.codeka.warworlds.ctrl.BannerAdView;
+import au.com.codeka.warworlds.model.Sector;
 
 /** This entity is added to the HUB when you have a star with a HQ. We'll point towards that star. */
 public class HqEntity extends Entity {
@@ -24,7 +25,7 @@ public class HqEntity extends Entity {
         public void onUpdate(float pSecondsElapsed) {
             float zoomFactor = ((ZoomCamera) mCamera).getZoomFactor();
             Vector2 direction = mStarfield.getSectorOffset(mHomeStar.getSectorX(), mHomeStar.getSectorY());
-            direction.add(mHomeStar.getOffsetX(), mHomeStar.getOffsetY());
+            direction.add(mHomeStar.getOffsetX(), Sector.SECTOR_SIZE - mHomeStar.getOffsetY());
             Vector2 cam = Vector2.pool.borrow().reset(mCamera.getCenterX(), mCamera.getCenterY());
             direction.subtract(cam);
             direction.scale(zoomFactor);
@@ -93,7 +94,7 @@ public class HqEntity extends Entity {
         mSprite = new Sprite(0.0f, 0.0f, 32.f, 32.0f, texture, vertexBufferObjectManager);
         mSprite.setVisible(false);
         attachChild(mSprite);
-        
+
         registerUpdateHandler(mUpdateHandler);
     }
 }

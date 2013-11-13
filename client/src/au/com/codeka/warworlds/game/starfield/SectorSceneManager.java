@@ -85,7 +85,7 @@ public abstract class SectorSceneManager implements SectorManager.OnSectorListCh
         refreshScene();
     }
 
-    private void refreshScene() {
+    protected void refreshScene() {
         new BackgroundRunner<Scene>() {
             @Override
             protected Scene doInBackground() {
@@ -118,20 +118,25 @@ public abstract class SectorSceneManager implements SectorManager.OnSectorListCh
     }
 
     public Scene createScene() {
+        log.debug("Creating scene...");
         mScene = new Scene();
         mScene.setBackground(new Background(0.0f, 0.0f, 0.0f));
         mScene.setOnSceneTouchListener(this);
 
+        log.debug("Refreshing scene...");
         refreshScene(mScene);
+        log.debug("Scene refreshed.");
 
         HUD hud = new HUD();
         refreshHud(hud);
         mActivity.getCamera().setHUD(hud);
+        log.debug("HUD created...");
 
         if (mSceneCreatedHandler != null) {
             mSceneCreatedHandler.onSceneCreated(mScene);
         }
 
+        log.debug("Scene created.");
         return mScene;
     }
 
@@ -159,17 +164,6 @@ public abstract class SectorSceneManager implements SectorManager.OnSectorListCh
             public void run() {
                 final long dy = mSectorY - sectorY;
                 final long dx = mSectorX - sectorX;
-                if (dy != 0 || dx != 0) {
-                    mScene.callOnChildren(new IEntityParameterCallable() {
-                        @Override
-                        public void call(IEntity entity) {
-                            entity.setPosition(
-                                    entity.getX() + (dx * Sector.SECTOR_SIZE),
-                                    entity.getY() + (dy * Sector.SECTOR_SIZE));
-                        }
-                    });
-                }
-
                 mSectorX = sectorX;
                 mSectorY = sectorY;
                 mOffsetX = offsetX;
@@ -189,7 +183,20 @@ public abstract class SectorSceneManager implements SectorManager.OnSectorListCh
                     }
                 }
                 if (missingSectors != null) {
+                    if (dy != 0 || dx != 0) {
+                        mScene.callOnChildren(new IEntityParameterCallable() {
+                            @Override
+                            public void call(IEntity entity) {
+                                entity.setPosition(
+                                        entity.getX() + (dx * Sector.SECTOR_SIZE),
+                                        entity.getY() - (dy * Sector.SECTOR_SIZE));
+                            }
+                        });
+                    }
+
                     SectorManager.getInstance().requestSectors(missingSectors, false, null);
+                } else if (dx != 0 || dy != 0) {
+                    refreshScene();
                 }
 
                 mActivity.getCamera().setCenter(mOffsetX, mOffsetY);
@@ -225,12 +232,12 @@ public abstract class SectorSceneManager implements SectorManager.OnSectorListCh
         }
         while (newOffsetY < -Sector.SECTOR_SIZE / 2) {
             newOffsetY += Sector.SECTOR_SIZE;
-            newSectorY --;
+            newSectorY ++;
             needUpdate = true;
         }
         while (newOffsetY > Sector.SECTOR_SIZE / 2) {
             newOffsetY -= Sector.SECTOR_SIZE;
-            newSectorY ++;
+            newSectorY --;
             needUpdate = true;
         }
 

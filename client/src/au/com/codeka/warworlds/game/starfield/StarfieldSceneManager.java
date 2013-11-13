@@ -57,6 +57,7 @@ public class StarfieldSceneManager extends SectorSceneManager
     private ArrayList<OnSelectionChangedListener> mSelectionChangedListeners;
     private BaseStar mHqStar;
     private Handler mHandler;
+    private boolean mHasScrolled;
 
     private SelectableEntity mSelectingEntity;
     private SelectionIndicator mSelectionIndicator;
@@ -221,6 +222,15 @@ public class StarfieldSceneManager extends SectorSceneManager
     }
 
     @Override
+    public void scrollTo(final long sectorX, final long sectorY,
+            final float offsetX, final float offsetY,
+            final boolean centre) {
+        log.debug("--SCROLLING TO: "+sectorX+","+sectorY+" "+offsetX+","+offsetY);
+        mHasScrolled = true;
+        super.scrollTo(sectorX, sectorY, offsetX, offsetY, centre);
+    }
+
+    @Override
     public void onEmpireFetched(Empire empire) {
         // if the player's empire changes, it might mean that the location of their HQ has changed,
         // so we'll want to make sure it's still correct.
@@ -242,11 +252,31 @@ public class StarfieldSceneManager extends SectorSceneManager
 
     @Override
     protected void refreshScene(Scene scene) {
+        if (!mHasScrolled) {
+            // if you haven't scrolled yet, then don't even think about refreshing the
+            // scene... it's a waste of time!
+            return;
+        }
+
+        if (mActivity.getEngine() == null) {
+            // if the engine hasn't been created yet, schedule a refresh for later...
+            mActivity.runOnUpdateThread(new Runnable() {
+                @Override
+                public void run() {
+                    refreshScene();
+                }
+            });
+            return;
+        }
+
         mFleets = new HashMap<String, FleetEntity>();
         mStars = new HashMap<String, StarEntity>();
         final List<Pair<Long, Long>> missingSectors = drawScene(scene);
         if (missingSectors != null) {
+            log.debug("Requesting sectors...");
             SectorManager.getInstance().requestSectors(missingSectors, false, null);
+        } else {
+            log.debug("No sectors to request.");
         }
 
         refreshSelectionIndicator();
@@ -318,7 +348,7 @@ public class StarfieldSceneManager extends SectorSceneManager
             for(int x = -mSectorRadius; x <= mSectorRadius; x++) {
                 long sX = mSectorX + x;
                 long sY = mSectorY + y;
-
+                log.debug(String.format("Adding background for ("+sX+","+sY+")"));
                 Sector sector = sm.getSector(sX, sY);
                 if (sector == null) {
                     if (missingSectors == null) {
@@ -338,7 +368,9 @@ public class StarfieldSceneManager extends SectorSceneManager
         for (int y = -mSectorRadius; y <= mSectorRadius; y++) {
             for(int x = -mSectorRadius; x <= mSectorRadius; x++) {
                 long sX = mSectorX + x;
-                long sY = mSectorY + y;
+                long sY = mSectorY - y;
+                log.debug(String.format("Adding sector ("+sX+","+sY+")"));
+
                 Sector sector = sm.getSector(sX, sY);
                 if (sector == null) {
                     continue;
@@ -403,9 +435,11 @@ public class StarfieldSceneManager extends SectorSceneManager
      * Draws a sector, which is a 1024x1024 area of stars.
      */
     private void addSector(Scene scene, int offsetX, int offsetY, Sector sector) {
+        log.debug("Adding stars...");
         for(BaseStar star : sector.getStars()) {
             addStar(scene, (Star) star, offsetX, offsetY);
         }
+        log.debug("Adding fleets...");
         for (BaseStar star : sector.getStars()) {
             for (BaseFleet fleet : star.getFleets()) {
                 if (fleet.getState() == Fleet.State.MOVING) {

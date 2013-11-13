@@ -30,6 +30,7 @@
 
     <au.com.codeka.warworlds.ctrl.InfobarView
         android:id="@+id/infobar"
+        style="@style/BottomPane"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_toLeftOf="@+id/bottom_pane"
@@ -213,7 +214,7 @@
         <RelativeLayout
             android:id="@+id/bottom_buttons"
             android:layout_width="match_parent"
-            android:layout_height="68dp"
+            android:layout_height="wrap_content"
             android:layout_alignParentBottom="true" >
 
             <Button
@@ -222,6 +223,7 @@
                 android:layout_width="92dp"
                 android:layout_height="30dp"
                 android:layout_marginLeft="4dp"
+                android:layout_marginRight="4dp"
                 android:layout_alignParentTop="true"
                 android:layout_alignParentLeft="true"
                 android:text="Sit. Rep." />
@@ -232,7 +234,9 @@
                 android:layout_width="92dp"
                 android:layout_height="30dp"
                 android:layout_marginLeft="4dp"
-                android:layout_alignParentBottom="true"
+                android:layout_marginRight="4dp"
+                android:layout_marginTop="4dp"
+                android:layout_below="@+id/sitrep_btn"
                 android:layout_alignParentLeft="true"
                 android:text="Empire" />
 
@@ -240,8 +244,10 @@
                     style="@style/Button"
                     android:layout_width="92dp"
                     android:layout_height="30dp"
+                    android:layout_marginLeft="4dp"
                     android:layout_marginRight="4dp"
-                    android:layout_alignParentBottom="true"
+                    android:layout_marginTop="34dp"
+                    android:layout_alignParentTop="true"
                     android:layout_alignParentRight="true"
                     android:text="Alliance" />
         </RelativeLayout>

@@ -21,10 +21,12 @@ import android.widget.TextView;
 import au.com.codeka.BackgroundRunner;
 import au.com.codeka.Cash;
 import au.com.codeka.common.Vector2;
+import au.com.codeka.common.model.BaseStar;
 import au.com.codeka.common.model.DesignKind;
 import au.com.codeka.common.model.ShipDesign;
 import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.R;
+import au.com.codeka.warworlds.ServerGreeter;
 import au.com.codeka.warworlds.StyledDialog;
 import au.com.codeka.warworlds.api.ApiClient;
 import au.com.codeka.warworlds.api.ApiException;
@@ -34,10 +36,12 @@ import au.com.codeka.warworlds.game.starfield.StarfieldSceneManager;
 import au.com.codeka.warworlds.model.DesignManager;
 import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.Fleet;
+import au.com.codeka.warworlds.model.MyEmpire;
 import au.com.codeka.warworlds.model.Sector;
 import au.com.codeka.warworlds.model.SectorManager;
 import au.com.codeka.warworlds.model.Star;
 import au.com.codeka.warworlds.model.StarManager;
+import au.com.codeka.warworlds.model.StarSummary;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 
@@ -91,7 +95,6 @@ public class FleetMoveActivity extends BaseStarfieldActivity {
             }
         });
 
-        mStarfield.scrollTo(mSrcStar);
         mStarfield.addSelectionChangedListener(new StarfieldSceneManager.OnSelectionChangedListener() {
             @Override
             public void onStarSelected(Star star) {
@@ -105,11 +108,10 @@ public class FleetMoveActivity extends BaseStarfieldActivity {
                     if (star.getKey().equals(mSrcStar.getKey())) {
                         // if src & dest are the same, just forget about it
                         mDestStar = null;
-                        refreshSelection();
-                        return;
+                    } else {
+                        mDestStar = star;
                     }
 
-                    mDestStar = star;
                     refreshSelection();
                     return;
                 }
@@ -129,7 +131,6 @@ public class FleetMoveActivity extends BaseStarfieldActivity {
             }
         });
 
-
         Button moveBtn = (Button) findViewById(R.id.move_btn);
         moveBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -138,6 +139,24 @@ public class FleetMoveActivity extends BaseStarfieldActivity {
                     onMoveClick();
                 }
                 finish();
+            }
+        });
+
+        mStarfield.scrollTo(mSrcStar);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        ServerGreeter.waitForHello(this, new ServerGreeter.HelloCompleteHandler() {
+            @Override
+            public void onHelloComplete(boolean success, ServerGreeter.ServerGreeting greeting) {
+                if (!success) {
+                    return;
+                }
+
+                // TODO?
             }
         });
     }
@@ -173,7 +192,7 @@ public class FleetMoveActivity extends BaseStarfieldActivity {
             findViewById(R.id.move_btn).setEnabled(true);
 
             Vector2 destPoint = mStarfield.getSectorOffset(mDestStar.getSectorX(), mDestStar.getSectorY());
-            destPoint.add(mDestStar.getOffsetX(), mDestStar.getOffsetY());
+            destPoint.add(mDestStar.getOffsetX(), Sector.SECTOR_SIZE - mDestStar.getOffsetY());
             mFleetIndicatorEntity.setPoints(srcPoint, destPoint);
 
             float distanceInParsecs = Sector.distanceInParsecs(mSrcStar, mDestStar);
