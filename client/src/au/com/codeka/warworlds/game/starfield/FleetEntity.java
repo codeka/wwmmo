@@ -5,6 +5,7 @@ import java.util.Locale;
 import java.util.Random;
 
 import org.andengine.entity.Entity;
+import org.andengine.entity.primitive.Line;
 import org.andengine.entity.sprite.Sprite;
 import org.andengine.entity.text.Text;
 import org.andengine.input.touch.TouchEvent;
@@ -31,6 +32,8 @@ public class FleetEntity extends SelectableEntity {
     private Fleet mFleet;
     private FleetSprite mFleetSprite;
 
+    private Line mSelectionLine;
+
     public FleetEntity(StarfieldSceneManager starfield, Vector2 srcPoint, Vector2 destPoint, Fleet fleet,
                        VertexBufferObjectManager vertexBufferObjectManager) {
         super(0.0f, 0.0f, 1.0f, 1.0f);
@@ -41,8 +44,33 @@ public class FleetEntity extends SelectableEntity {
         setup(starfield, vertexBufferObjectManager);
     }
 
+    @Override
     public Entity getTouchEntity() {
         return mFleetSprite;
+    }
+
+    @Override
+    public void onSelected(SelectionIndicatorEntity selectionIndicator) {
+        selectionIndicator.setScale(20.0f);
+
+        if (mSelectionLine == null) {
+            mSelectionLine = new Line(0.0f, 0.0f, 0.0f, 0.0f,
+                    mStarfield.getActivity().getVertexBufferObjectManager());
+            mSelectionLine.setColor(0.0f, 1.0f, 0.0f);
+            mSelectionLine.setZIndex(-1);
+        }
+
+        float x = getX();
+        float y = getY();
+        mSelectionLine.setPosition((float) mSrcPoint.x - x, (float) mSrcPoint.y - y,
+                                   (float) mDestPoint.x - x, (float) mDestPoint.y - y);
+        attachChild(mSelectionLine);
+        sortChildren();
+    }
+
+    @Override
+    public void onDeselected(SelectionIndicatorEntity selectionIndicator) {
+        detachChild(mSelectionLine);
     }
 
     public Fleet getFleet() {

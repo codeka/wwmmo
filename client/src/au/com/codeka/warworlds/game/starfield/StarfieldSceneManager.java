@@ -60,7 +60,7 @@ public class StarfieldSceneManager extends SectorSceneManager
     private boolean mHasScrolled;
 
     private SelectableEntity mSelectingEntity;
-    private SelectionIndicator mSelectionIndicator;
+    private SelectionIndicatorEntity mSelectionIndicator;
     private RadarIndicatorEntity mRadarIndicator;
     private boolean mWasDragging;
 
@@ -149,7 +149,7 @@ public class StarfieldSceneManager extends SectorSceneManager
                                    Typeface.create(Typeface.DEFAULT, Typeface.NORMAL), 16, true, Color.WHITE);
         mFont.load();
 
-        mSelectionIndicator = new SelectionIndicator(this);
+        mSelectionIndicator = new SelectionIndicatorEntity(this);
         mRadarIndicator = new RadarIndicatorEntity(this);
     }
 
@@ -697,8 +697,7 @@ public class StarfieldSceneManager extends SectorSceneManager
         }
 
         if (mSelectedStarEntity != null) {
-            Star star = mSelectedStarEntity.getStar();
-            mSelectionIndicator.setScale(star.getSize());
+            mSelectionIndicator.setSelectedEntity(mSelectedStarEntity);
             mSelectedStarEntity.attachChild(mSelectionIndicator);
 
             // if the selected star has a radar, pick the one with the biggest radius to display
@@ -709,7 +708,7 @@ public class StarfieldSceneManager extends SectorSceneManager
             }
         }
         if (mSelectedFleetEntity != null) {
-            mSelectionIndicator.setScale(20.0f);
+            mSelectionIndicator.setSelectedEntity(mSelectedFleetEntity);
             mSelectedFleetEntity.attachChild(mSelectionIndicator);
         }
     }

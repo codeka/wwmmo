@@ -10,4 +10,6 @@ public abstract class SelectableEntity extends Entity {
 
     public abstract Entity getTouchEntity();
 
+    public abstract void onSelected(SelectionIndicatorEntity selectionIndicator);
+    public abstract void onDeselected(SelectionIndicatorEntity selectionIndicator);
 }

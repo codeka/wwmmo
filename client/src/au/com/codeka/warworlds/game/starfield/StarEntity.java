@@ -55,8 +55,18 @@ public class StarEntity extends SelectableEntity {
         setPosition(x, y);
     }
 
+    @Override
     public Entity getTouchEntity() {
         return mStarSprite;
+    }
+
+    @Override
+    public void onSelected(SelectionIndicatorEntity selectionIndicator) {
+        selectionIndicator.setScale(mStar.getSize());
+    }
+
+    @Override
+    public void onDeselected(SelectionIndicatorEntity selectionIndicator) {
     }
 
     public Star getStar() {

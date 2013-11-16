@@ -4,16 +4,18 @@ import org.andengine.engine.handler.IUpdateHandler;
 import org.andengine.entity.Entity;
 import org.andengine.entity.primitive.Line;
 
+import au.com.codeka.warworlds.model.Star;
+
 /** The selection indicator is an entity which is attached to the currently-select star or fleet. */
-public class SelectionIndicator extends Entity {
+public class SelectionIndicatorEntity extends Entity {
     private static final int NUM_POINTS = 16;
 
     private Entity mClockwise;
     private Entity mAntiClockwise;
+    private SelectableEntity mSelectedEntity;
 
-    public SelectionIndicator(StarfieldSceneManager starfield) {
-        setWidth(1.0f);
-        setHeight(1.0f);
+    public SelectionIndicatorEntity(StarfieldSceneManager starfield) {
+        super(0.0f, 0.0f, 1.0f, 1.0f);
 
         mClockwise = new Entity();
         mAntiClockwise = new Entity();
@@ -45,6 +47,16 @@ public class SelectionIndicator extends Entity {
         attachChild(mAntiClockwise);
 
         starfield.getActivity().getEngine().registerUpdateHandler(mUpdateHandler);
+    }
+
+    public void setSelectedEntity(SelectableEntity entity) {
+        if (mSelectedEntity != null) {
+            mSelectedEntity.onDeselected(this);
+        }
+        mSelectedEntity = entity;
+        if (mSelectedEntity != null) {
+            mSelectedEntity.onSelected(this);
+        }
     }
 
     @Override
