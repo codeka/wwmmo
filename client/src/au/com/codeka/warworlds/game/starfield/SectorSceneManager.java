@@ -279,11 +279,21 @@ public abstract class SectorSceneManager implements SectorManager.OnSectorListCh
 
     /** The default scale gesture listener scales the view. */
     protected class ScaleGestureListener extends ScaleGestureDetector.SimpleOnScaleGestureListener {
-        private float mZoomFactor = 1.0f;
+        private float mZoomFactor;
+
+        public ScaleGestureListener() {
+            mZoomFactor = mActivity.getResources().getDisplayMetrics().density;
+        }
 
         @Override
         public boolean onScale (ScaleGestureDetector detector) {
             mZoomFactor *= detector.getScaleFactor();
+            if (mZoomFactor < 0.333f) {
+                mZoomFactor = 0.333f;
+            }
+            if (mZoomFactor > 2.5f) {
+                mZoomFactor = 2.5f;
+            }
 
             updateZoomFactor(mZoomFactor);
             return true;

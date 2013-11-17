@@ -111,15 +111,17 @@ public class StarEntity extends SelectableEntity {
                     }
 
                     Empire emp = EmpireManager.i.getEmpire(f.getEmpireKey());
-                    Integer[] counts = colonyEmpires.get(emp.getKey());
-                    if (counts == null) {
-                        counts = new Integer[] { 0, 0, 0 };
-                        colonyEmpires.put(emp.getKey(), counts);
-                    }
-                    if (f.getDesignID().equals("fighter")) {
-                        counts[1] += (int) Math.ceil(f.getNumShips());
-                    } else {
-                        counts[2] += (int) Math.ceil(f.getNumShips());
+                    if (emp != null) {
+                        Integer[] counts = colonyEmpires.get(emp.getKey());
+                        if (counts == null) {
+                            counts = new Integer[] { 0, 0, 0 };
+                            colonyEmpires.put(emp.getKey(), counts);
+                        }
+                        if (f.getDesignID().equals("fighter")) {
+                            counts[1] += (int) Math.ceil(f.getNumShips());
+                        } else {
+                            counts[2] += (int) Math.ceil(f.getNumShips());
+                        }
                     }
                 }
             }

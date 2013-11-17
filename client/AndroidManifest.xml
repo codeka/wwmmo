@@ -74,7 +74,6 @@
         <activity android:name=".game.EnemyEmpireActivity" />
         <activity android:name=".game.FleetMoveActivity" />
         <activity android:name=".game.starfield.StarfieldActivity" />
-        <activity android:name=".game.starfield.TacticalMapActivity" />
         <activity android:name=".game.solarsystem.SolarSystemActivity" />
         <activity android:name=".game.solarsystem.EnemyPlanetActivity" />
         <activity android:name=".game.solarsystem.EmptyPlanetActivity" />

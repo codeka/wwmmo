@@ -6,9 +6,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.TreeMap;
+import java.util.TreeSet;
 
 import org.andengine.engine.camera.hud.HUD;
 import org.andengine.entity.Entity;
+import org.andengine.entity.primitive.DrawMode;
+import org.andengine.entity.primitive.Mesh;
 import org.andengine.entity.scene.Scene;
 import org.andengine.entity.sprite.Sprite;
 import org.andengine.input.touch.TouchEvent;
@@ -23,6 +27,7 @@ import org.andengine.opengl.texture.atlas.buildable.builder.BlackPawnTextureAtla
 import org.andengine.opengl.texture.atlas.buildable.builder.ITextureAtlasBuilder.TextureAtlasBuilderException;
 import org.andengine.opengl.texture.region.ITextureRegion;
 import org.andengine.opengl.texture.region.TiledTextureRegion;
+import org.andengine.opengl.vbo.VertexBufferObjectManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,12 +38,18 @@ import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import au.com.codeka.common.Pair;
+import au.com.codeka.common.PointCloud;
+import au.com.codeka.common.Triangle;
 import au.com.codeka.common.Vector2;
+import au.com.codeka.common.Voronoi;
+import au.com.codeka.common.model.BaseColony;
 import au.com.codeka.common.model.BaseFleet;
 import au.com.codeka.common.model.BaseStar;
+import au.com.codeka.controlfield.ControlField;
 import au.com.codeka.warworlds.model.BuildManager;
 import au.com.codeka.warworlds.model.Empire;
 import au.com.codeka.warworlds.model.EmpireManager;
+import au.com.codeka.warworlds.model.EmpireShieldManager;
 import au.com.codeka.warworlds.model.Fleet;
 import au.com.codeka.warworlds.model.MyEmpire;
 import au.com.codeka.warworlds.model.Sector;
@@ -87,6 +98,11 @@ public class StarfieldSceneManager extends SectorSceneManager
     private Map<String, FleetEntity> mFleets;
     private StarEntity mSelectedStarEntity;
     private FleetEntity mSelectedFleetEntity;
+
+    private TacticalPointCloud mPointCloud;
+    private TreeMap<String, TacticalControlField> mControlFields;
+    private boolean mIsTacticalVisible;
+    private float mTacticalZoomAlpha;
 
     public StarfieldSceneManager(BaseStarfieldActivity activity) {
         super(activity);
@@ -238,6 +254,11 @@ public class StarfieldSceneManager extends SectorSceneManager
                 mHqStar = empire.getHomeStar();
             }
         }
+
+        // otherwise, refresh the scene (but only if it's one we're actually displaying...)
+        if (mControlFields.keySet().contains(empire.getKey())) {
+            refreshScene();
+        }
     }
 
     public Star getSelectedStar() {
@@ -268,10 +289,7 @@ public class StarfieldSceneManager extends SectorSceneManager
         mStars = new HashMap<String, StarEntity>();
         final List<Pair<Long, Long>> missingSectors = drawScene(scene);
         if (missingSectors != null) {
-            log.debug("Requesting sectors...");
             SectorManager.getInstance().requestSectors(missingSectors, false, null);
-        } else {
-            log.debug("No sectors to request.");
         }
 
         refreshSelectionIndicator();
@@ -293,9 +311,9 @@ public class StarfieldSceneManager extends SectorSceneManager
     protected void updateZoomFactor(float zoomFactor) {
         super.updateZoomFactor(zoomFactor);
 
-        // we fade out the background between 0.45 and 0.40, it should be totally invisible < 0.40
-        // and totally opaque for >= 0.45
-        if (zoomFactor < 0.4f && mIsBackgroundVisible) {
+        // we fade out the background between 0.55 and 0.50, it should be totally invisible < 0.50
+        // and totally opaque for >= 0.55
+        if (zoomFactor < 0.5f && mIsBackgroundVisible) {
             mIsBackgroundVisible = false;
             // we need to make the background as invisible
             mActivity.runOnUpdateThread(new Runnable() {
@@ -306,7 +324,7 @@ public class StarfieldSceneManager extends SectorSceneManager
                     }
                 }
             });
-        } else if (zoomFactor >= 0.4f && !mIsBackgroundVisible) {
+        } else if (zoomFactor >= 0.5f && !mIsBackgroundVisible) {
             mIsBackgroundVisible = true;
             // we need to make the background as visible
             mActivity.runOnUpdateThread(new Runnable() {
@@ -318,15 +336,53 @@ public class StarfieldSceneManager extends SectorSceneManager
                 }
             });
         }
-        if (zoomFactor >= 0.4f && zoomFactor < 0.45f) {
-            // between 0.4 and 0.45 we need to fade the background in
-            mBackgroundZoomAlpha = (zoomFactor - 0.4f) * 20.0f; // make it in the range 0...1
+        if (zoomFactor >= 0.5f && zoomFactor < 0.55f) {
+            // between 0.5 and 0.55 we need to fade the background in
+            mBackgroundZoomAlpha = (zoomFactor - 0.5f) * 20.0f; // make it in the range 0...1
             mActivity.runOnUpdateThread(new Runnable() {
                 @Override
                 public void run() {
                     for (Entity entity : mBackgroundEntities) {
                         entity.setAlpha(mBackgroundZoomAlpha);
                         entity.setColor(mBackgroundZoomAlpha, mBackgroundZoomAlpha, mBackgroundZoomAlpha);
+                    }
+                }
+            });
+        }
+
+        // similarly, we fade IN the tactical view as you zoom out. It starts fading in a bit sooner
+        // than the background fades out, and fades slower, too.
+        if (zoomFactor >= 0.6f && mIsTacticalVisible) {
+            mIsTacticalVisible = false;
+            mTacticalZoomAlpha = 0.0f;
+            mActivity.runOnUpdateThread(new Runnable() {
+                @Override
+                public void run() {
+                    for (TacticalControlField tcf : mControlFields.values()) {
+                        tcf.updateAlpha(mIsTacticalVisible, mTacticalZoomAlpha);
+                    }
+                }
+            });
+        } else if (zoomFactor < 0.4f && !mIsTacticalVisible) {
+            mIsTacticalVisible = true;
+            mTacticalZoomAlpha = 1.0f;
+            mActivity.runOnUpdateThread(new Runnable() {
+                @Override
+                public void run() {
+                    for (TacticalControlField tcf : mControlFields.values()) {
+                        tcf.updateAlpha(mIsTacticalVisible, mTacticalZoomAlpha);
+                    }
+                }
+            });
+        }
+        if (zoomFactor >= 0.4f && zoomFactor < 0.6f) {
+            mIsTacticalVisible = true;
+            mTacticalZoomAlpha = 1.0f - ((zoomFactor - 0.4f) * 5.0f); // make it 1...0
+            mActivity.runOnUpdateThread(new Runnable() {
+                @Override
+                public void run() {
+                    for (TacticalControlField tcf : mControlFields.values()) {
+                        tcf.updateAlpha(mIsTacticalVisible, mTacticalZoomAlpha);
                     }
                 }
             });
@@ -357,6 +413,8 @@ public class StarfieldSceneManager extends SectorSceneManager
                 drawBackground(scene, sector, sx, sy);
             }
         }
+
+        addTacticalView(scene);
 
         for (int y = -mSectorRadius; y <= mSectorRadius; y++) {
             for(int x = -mSectorRadius; x <= mSectorRadius; x++) {
@@ -446,7 +504,6 @@ public class StarfieldSceneManager extends SectorSceneManager
         x += star.getOffsetX();
         y += Sector.SECTOR_SIZE - star.getOffsetY();
 
-
         ITextureRegion textureRegion = null;
         if (star.getStarType().getInternalName().equals("neutron")) {
             textureRegion = mNeutronStarTextureRegion.getTextureRegion(0);
@@ -482,40 +539,6 @@ public class StarfieldSceneManager extends SectorSceneManager
             mSelectedStarEntity = starEntity;
             mSelectedStarEntity.setStar(selectedStar);
         }
-/*
-        if (mHqStar != null && star.getKey().equals(mHqStar.getKey())) {
-            if (mHqSprite == null) {
-                mHqSprite = SpriteManager.i.getSprite("building.hq");
-            }
-
-            mMatrix.reset();
-            mMatrix.postTranslate(-(mHqSprite.getWidth() / 2.0f), -(mHqSprite.getHeight() / 2.0f));
-            mMatrix.postScale(40.0f * imageScale * pixelScale / mHqSprite.getWidth(),
-                              40.0f * imageScale * pixelScale / mHqSprite.getHeight());
-            mMatrix.postTranslate(x * pixelScale, (y * pixelScale) + sprite.getHeight());
-            canvas.save();
-            canvas.concat(mMatrix);
-            mHqSprite.draw(canvas);
-            canvas.restore();
-
-            mHqOverlay.setEnabled(false);
-        }
-
-        List<VisibleEntityAttachedOverlay> overlays = mStarAttachedOverlays.get(star.getKey());
-        if (overlays != null && !overlays.isEmpty()) {
-            int n = overlays.size();
-            for (int i = 0; i < n; i++) {
-                VisibleEntityAttachedOverlay sao = overlays.get(i);
-                sao.setCentre(x * pixelScale, y * pixelScale);
-            }
-        }
-
-        VisibleEntity ve = new VisibleEntity(new Vector2(x * pixelScale, y * pixelScale), star);
-        if (mSelectedEntity != null && mSelectedEntity.star != null && mSelectedEntity.star.getKey().equals(star.getKey())) {
-            mSelectedEntity = ve;
-        }
-        mVisibleEntities.add(ve);
-*/
     }
 
     /**
@@ -564,6 +587,82 @@ public class StarfieldSceneManager extends SectorSceneManager
 
     Collection<FleetEntity> getMovingFleets() {
         return mFleets.values();
+    }
+
+    private void addTacticalView(Scene scene) {
+        SectorManager sm = SectorManager.getInstance();
+
+        ArrayList<Vector2> points = new ArrayList<Vector2>();
+        TreeMap<String, List<Vector2>> empirePoints = new TreeMap<String, List<Vector2>>();
+
+        for(int y = -mSectorRadius; y <= mSectorRadius; y++) {
+            for(int x = -mSectorRadius; x <= mSectorRadius; x++) {
+                long sX = mSectorX + x;
+                long sY = mSectorY + y;
+
+                Sector sector = sm.getSector(sX, sY);
+                if (sector == null) {
+                    continue;
+                }
+
+                int sx = (int)(x * Sector.SECTOR_SIZE);
+                int sy = -(int)(y * Sector.SECTOR_SIZE);
+
+                for (BaseStar star : sector.getStars()) {
+                    int starX = sx + star.getOffsetX();
+                    int starY = sy + (Sector.SECTOR_SIZE - star.getOffsetY());
+                    Vector2 pt = new Vector2((float) starX / Sector.SECTOR_SIZE, (float) starY / Sector.SECTOR_SIZE);
+
+                    TreeSet<String> doneEmpires = new TreeSet<String>();
+                    for (BaseColony c : star.getColonies()) {
+                        String empireKey = c.getEmpireKey();
+                        if (empireKey == null || empireKey.length() == 0) {
+                            continue;
+                        }
+                        if (doneEmpires.contains(empireKey)) {
+                            continue;
+                        }
+                        doneEmpires.add(empireKey);
+                        List<Vector2> thisEmpirePoints = empirePoints.get(empireKey);
+                        if (thisEmpirePoints == null) {
+                            thisEmpirePoints = new ArrayList<Vector2>();
+                            empirePoints.put(empireKey, thisEmpirePoints);
+                        }
+                        thisEmpirePoints.add(pt);
+                    }
+                    points.add(pt);
+                }
+            }
+        }
+
+        mControlFields = new TreeMap<String, TacticalControlField>();
+        mPointCloud = new TacticalPointCloud(points);
+        TacticalVoronoi v = new TacticalVoronoi(mPointCloud);
+
+        for (String empireKey : empirePoints.keySet()) {
+            TacticalControlField cf = new TacticalControlField(mPointCloud, v);
+
+            List<Vector2> pts = empirePoints.get(empireKey);
+            for (Vector2 pt : pts) {
+                cf.addPointToControlField(pt);
+            }
+
+            int colour = Color.RED;
+            Empire empire = EmpireManager.i.getEmpire(empireKey);
+            if (empire != null) {
+                colour = EmpireShieldManager.i.getShieldColour(empire);
+            } else {
+                final String theEmpireKey = empireKey;
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        EmpireManager.i.refreshEmpire(theEmpireKey);
+                    }
+                });
+            }
+            cf.addToScene(scene, getActivity().getVertexBufferObjectManager(), colour);
+            mControlFields.put(empireKey, cf);
+        }
     }
 
     @Override
@@ -713,6 +812,64 @@ public class StarfieldSceneManager extends SectorSceneManager
         if (s != null && mSelectedStarEntity != null && s.getKey().equals(mSelectedStarEntity.getStar().getKey())) {
             mSelectedStarEntity.setStar(s);
             refreshSelectionIndicator();
+        }
+    }
+
+    /** Represents the PointCloud used by the tactical view. */
+    private class TacticalPointCloud extends PointCloud {
+        public TacticalPointCloud(ArrayList<Vector2> points) {
+            super(points);
+        }
+    }
+
+    /** Represents the ControlField used by the tactical view. */
+    private class TacticalControlField extends ControlField {
+        private ArrayList<Mesh> mMeshes;
+
+        public TacticalControlField(PointCloud pointCloud, Voronoi voronoi) {
+            super(pointCloud, voronoi);
+            mMeshes = new ArrayList<Mesh>();
+        }
+
+        public void updateAlpha(boolean visible, float alpha) {
+            for (Mesh mesh : mMeshes) {
+                mesh.setVisible(visible);
+                mesh.setAlpha(alpha);
+            }
+        }
+
+        public void addToScene(Scene scene, VertexBufferObjectManager vboManager, int colour) {
+            for (Vector2 pt : mOwnedPoints) {
+                log.debug("Adding point: "+pt.x+","+pt.y);
+                List<Triangle> triangles = mVoronoi.getTrianglesForPoint(pt);
+                if (triangles == null) {
+                    continue;
+                }
+
+                float[] meshVertices = new float[(triangles.size() + 2) * Mesh.VERTEX_SIZE];
+                meshVertices[Mesh.VERTEX_INDEX_X] = (float) pt.x * Sector.SECTOR_SIZE;
+                meshVertices[Mesh.VERTEX_INDEX_Y] = (float) pt.y * Sector.SECTOR_SIZE;
+                for (int i = 0; i < triangles.size(); i++) {
+                    meshVertices[(i + 1) * Mesh.VERTEX_SIZE + Mesh.VERTEX_INDEX_X] = (float) triangles.get(i).centre.x * Sector.SECTOR_SIZE;
+                    meshVertices[(i + 1) * Mesh.VERTEX_SIZE + Mesh.VERTEX_INDEX_Y] = (float) triangles.get(i).centre.y * Sector.SECTOR_SIZE;
+                }
+                meshVertices[(triangles.size() + 1) * Mesh.VERTEX_SIZE + Mesh.VERTEX_INDEX_X] = (float) triangles.get(0).centre.x * Sector.SECTOR_SIZE;
+                meshVertices[(triangles.size() + 1) * Mesh.VERTEX_SIZE + Mesh.VERTEX_INDEX_Y] = (float) triangles.get(0).centre.y * Sector.SECTOR_SIZE;
+
+                Mesh mesh = new Mesh(0.0f, 0.0f, meshVertices, triangles.size() + 2, DrawMode.TRIANGLE_FAN, vboManager);
+                mesh.setColor(colour);
+                mesh.setAlpha(mTacticalZoomAlpha);
+                mesh.setVisible(mIsTacticalVisible);
+                scene.attachChild(mesh);
+                mMeshes.add(mesh);
+            }
+        }
+    }
+
+    /** Represents the Voronoi diagram of the tactical view. */
+    private class TacticalVoronoi extends Voronoi {
+        public TacticalVoronoi(PointCloud pc) {
+            super(pc);
         }
     }
 
