@@ -225,7 +225,6 @@ public class StarfieldSceneManager extends SectorSceneManager
     public void scrollTo(final long sectorX, final long sectorY,
             final float offsetX, final float offsetY,
             final boolean centre) {
-        log.debug("--SCROLLING TO: "+sectorX+","+sectorY+" "+offsetX+","+offsetY);
         mHasScrolled = true;
         super.scrollTo(sectorX, sectorY, offsetX, offsetY, centre);
     }
@@ -348,19 +347,17 @@ public class StarfieldSceneManager extends SectorSceneManager
             for(int x = -mSectorRadius; x <= mSectorRadius; x++) {
                 long sX = mSectorX + x;
                 long sY = mSectorY + y;
-                log.debug(String.format("Adding background for ("+sX+","+sY+")"));
                 Sector sector = sm.getSector(sX, sY);
                 if (sector == null) {
                     if (missingSectors == null) {
                         missingSectors = new ArrayList<Pair<Long, Long>>();
                     }
                     missingSectors.add(new Pair<Long, Long>(sX, sY));
-                    log.debug(String.format("Missing sector: %d, %d", sX, sY));
                     continue;
                 }
 
                 int sx = (int)(x * Sector.SECTOR_SIZE);
-                int sy = (int)(y * Sector.SECTOR_SIZE);
+                int sy = -(int)(y * Sector.SECTOR_SIZE);
                 drawBackground(scene, sector, sx, sy);
             }
         }
@@ -368,8 +365,7 @@ public class StarfieldSceneManager extends SectorSceneManager
         for (int y = -mSectorRadius; y <= mSectorRadius; y++) {
             for(int x = -mSectorRadius; x <= mSectorRadius; x++) {
                 long sX = mSectorX + x;
-                long sY = mSectorY - y;
-                log.debug(String.format("Adding sector ("+sX+","+sY+")"));
+                long sY = mSectorY + y;
 
                 Sector sector = sm.getSector(sX, sY);
                 if (sector == null) {
@@ -377,7 +373,7 @@ public class StarfieldSceneManager extends SectorSceneManager
                 }
 
                 int sx = (int)(x * Sector.SECTOR_SIZE);
-                int sy = (int)(y * Sector.SECTOR_SIZE);
+                int sy = -(int)(y * Sector.SECTOR_SIZE);
                 addSector(scene, sx, sy, sector);
             }
         }
@@ -428,18 +424,15 @@ public class StarfieldSceneManager extends SectorSceneManager
             bgSprite.setAlpha(mBackgroundZoomAlpha);
             bgSprite.setColor(mBackgroundZoomAlpha, mBackgroundZoomAlpha, mBackgroundZoomAlpha);
         }
-
     }
 
     /**
      * Draws a sector, which is a 1024x1024 area of stars.
      */
     private void addSector(Scene scene, int offsetX, int offsetY, Sector sector) {
-        log.debug("Adding stars...");
         for(BaseStar star : sector.getStars()) {
             addStar(scene, (Star) star, offsetX, offsetY);
         }
-        log.debug("Adding fleets...");
         for (BaseStar star : sector.getStars()) {
             for (BaseFleet fleet : star.getFleets()) {
                 if (fleet.getState() == Fleet.State.MOVING) {
@@ -456,6 +449,7 @@ public class StarfieldSceneManager extends SectorSceneManager
     private void addStar(Scene scene, Star star, int x, int y) {
         x += star.getOffsetX();
         y += Sector.SECTOR_SIZE - star.getOffsetY();
+
 
         ITextureRegion textureRegion = null;
         if (star.getStarType().getInternalName().equals("neutron")) {
@@ -536,7 +530,7 @@ public class StarfieldSceneManager extends SectorSceneManager
         sx -= mSectorX;
         sy -= mSectorY;
         return Vector2.pool.borrow().reset((sx * Sector.SECTOR_SIZE),
-                                           (sy * Sector.SECTOR_SIZE));
+                                           -(sy * Sector.SECTOR_SIZE));
     }
 
     /**

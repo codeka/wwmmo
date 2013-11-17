@@ -14,6 +14,8 @@ import org.andengine.opengl.vbo.VertexBufferObjectManager;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.Seconds;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import au.com.codeka.common.Vector2;
 import au.com.codeka.common.model.DesignKind;
@@ -26,6 +28,7 @@ import au.com.codeka.warworlds.model.Fleet;
 
 /** An entity that represents a moving fleet. */
 public class FleetEntity extends SelectableEntity {
+    private static final Logger log = LoggerFactory.getLogger(FleetEntity.class);
     private StarfieldSceneManager mStarfield;
     private Vector2 mSrcPoint;
     private Vector2 mDestPoint;
@@ -41,6 +44,7 @@ public class FleetEntity extends SelectableEntity {
         mSrcPoint = srcPoint;
         mDestPoint = destPoint;
         mFleet = fleet;
+        log.debug("Adding fleet: from=("+mSrcPoint.x+", "+mSrcPoint.y+") to=("+mDestPoint.x+", "+mDestPoint.y+")");
         setup(starfield, vertexBufferObjectManager);
     }
 

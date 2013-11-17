@@ -4,8 +4,6 @@ import org.andengine.engine.handler.IUpdateHandler;
 import org.andengine.entity.Entity;
 import org.andengine.entity.primitive.Line;
 
-import au.com.codeka.warworlds.model.Star;
-
 /** The selection indicator is an entity which is attached to the currently-select star or fleet. */
 public class SelectionIndicatorEntity extends Entity {
     private static final int NUM_POINTS = 16;
