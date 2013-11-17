@@ -70,7 +70,6 @@ public class StarfieldSceneManager extends SectorSceneManager
     private TiledTextureRegion mNormalStarTextureRegion;
 
     private BuildableBitmapTextureAtlas mIconTextureAtlas;
-    private ITextureRegion mFleetIconTextureRegion;
     private ITextureRegion mArrowIconTextureRegion;
 
     private BuildableBitmapTextureAtlas mFleetSpriteTextureAtlas;
@@ -117,7 +116,6 @@ public class StarfieldSceneManager extends SectorSceneManager
 
         mIconTextureAtlas = new BuildableBitmapTextureAtlas(mActivity.getTextureManager(), 256, 256,
                 TextureOptions.BILINEAR_PREMULTIPLYALPHA);
-        mFleetIconTextureRegion = BitmapTextureAtlasTextureRegionFactory.createFromAsset(mIconTextureAtlas, mActivity, "img/fleet.png");
         mArrowIconTextureRegion = BitmapTextureAtlasTextureRegionFactory.createFromAsset(mIconTextureAtlas, mActivity, "img/arrow.png");
 
         mFleetSpriteTextureAtlas = new BuildableBitmapTextureAtlas(mActivity.getTextureManager(), 256, 256,
@@ -225,6 +223,7 @@ public class StarfieldSceneManager extends SectorSceneManager
     public void scrollTo(final long sectorX, final long sectorY,
             final float offsetX, final float offsetY,
             final boolean centre) {
+        log.debug("==SCROLL TO: "+sectorX+","+sectorY);
         mHasScrolled = true;
         super.scrollTo(sectorX, sectorY, offsetX, offsetY, centre);
     }
@@ -245,15 +244,12 @@ public class StarfieldSceneManager extends SectorSceneManager
         return null;
     }
 
-    public ITextureRegion getFleetIconTextureRegion() {
-        return mFleetIconTextureRegion;
-    }
-
     @Override
     protected void refreshScene(Scene scene) {
         if (!mHasScrolled) {
             // if you haven't scrolled yet, then don't even think about refreshing the
             // scene... it's a waste of time!
+            log.debug("We haven't scrolled yet, not drawing the scene.");
             return;
         }
 

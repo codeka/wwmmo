@@ -8,8 +8,6 @@ import org.andengine.entity.scene.Scene;
 import org.andengine.entity.sprite.Sprite;
 import org.andengine.opengl.texture.region.ITextureRegion;
 import org.andengine.opengl.vbo.VertexBufferObjectManager;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -21,7 +19,6 @@ import android.widget.TextView;
 import au.com.codeka.BackgroundRunner;
 import au.com.codeka.Cash;
 import au.com.codeka.common.Vector2;
-import au.com.codeka.common.model.BaseStar;
 import au.com.codeka.common.model.DesignKind;
 import au.com.codeka.common.model.ShipDesign;
 import au.com.codeka.common.protobuf.Messages;
@@ -36,18 +33,15 @@ import au.com.codeka.warworlds.game.starfield.StarfieldSceneManager;
 import au.com.codeka.warworlds.model.DesignManager;
 import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.Fleet;
-import au.com.codeka.warworlds.model.MyEmpire;
 import au.com.codeka.warworlds.model.Sector;
 import au.com.codeka.warworlds.model.SectorManager;
 import au.com.codeka.warworlds.model.Star;
 import au.com.codeka.warworlds.model.StarManager;
-import au.com.codeka.warworlds.model.StarSummary;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 
 /** This activity is used to select a location for moves. It's a bit annoying that we have to do it like this... */
 public class FleetMoveActivity extends BaseStarfieldActivity {
-    private static final Logger log = LoggerFactory.getLogger(FleetMoveActivity.class);
     private Star mSrcStar;
     private Star mDestStar;
     private Fleet mFleet;
@@ -82,7 +76,7 @@ public class FleetMoveActivity extends BaseStarfieldActivity {
             @Override
             public void onSceneCreated(Scene scene) {
                 Vector2 srcPoint = mStarfield.getSectorOffset(mSrcStar.getSectorX(), mSrcStar.getSectorY());
-                srcPoint.add(mSrcStar.getOffsetX(), mSrcStar.getOffsetY());
+                srcPoint.add(mSrcStar.getOffsetX(), Sector.SECTOR_SIZE - mSrcStar.getOffsetY());
                 mFleetIndicatorEntity = new FleetIndicatorEntity(mStarfield, srcPoint, mFleet, getVertexBufferObjectManager());
                 scene.attachChild(mFleetIndicatorEntity);
 
@@ -177,7 +171,7 @@ public class FleetMoveActivity extends BaseStarfieldActivity {
         }
 
         Vector2 srcPoint = mStarfield.getSectorOffset(mSrcStar.getSectorX(), mSrcStar.getSectorY());
-        srcPoint.add(mSrcStar.getOffsetX(), mSrcStar.getOffsetY());
+        srcPoint.add(mSrcStar.getOffsetX(), Sector.SECTOR_SIZE - mSrcStar.getOffsetY());
 
         if (mDestStar == null) {
             instructionsView.setVisibility(View.VISIBLE);

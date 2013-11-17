@@ -143,7 +143,7 @@ public abstract class SectorSceneManager implements SectorManager.OnSectorListCh
     }
 
     public void scrollTo(BaseStar star) {
-        scrollTo(star.getSectorX(), star.getSectorY(), star.getOffsetX(), star.getOffsetY(), false);
+        scrollTo(star.getSectorX(), star.getSectorY(), star.getOffsetX(), Sector.SECTOR_SIZE - star.getOffsetY(), false);
     }
 
     protected void updateZoomFactor(float zoomFactor) {
