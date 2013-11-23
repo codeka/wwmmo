@@ -19,6 +19,7 @@ import org.andengine.input.touch.TouchEvent;
 import org.andengine.opengl.font.Font;
 import org.andengine.opengl.font.FontFactory;
 import org.andengine.opengl.texture.TextureOptions;
+import org.andengine.opengl.texture.atlas.ITextureAtlas.ITextureAtlasStateListener;
 import org.andengine.opengl.texture.atlas.bitmap.BitmapTextureAtlas;
 import org.andengine.opengl.texture.atlas.bitmap.BitmapTextureAtlasTextureRegionFactory;
 import org.andengine.opengl.texture.atlas.bitmap.BuildableBitmapTextureAtlas;
@@ -117,6 +118,8 @@ public class StarfieldSceneManager extends SectorSceneManager
     public void onLoadResources() {
         mStarTextureAtlas = new BitmapTextureAtlas(mActivity.getTextureManager(), 128, 384,
                 TextureOptions.BILINEAR_PREMULTIPLYALPHA);
+        mStarTextureAtlas.setTextureAtlasStateListener(new ITextureAtlasStateListener.DebugTextureAtlasStateListener<IBitmapTextureAtlasSource>());
+
         mNormalStarTextureRegion = BitmapTextureAtlasTextureRegionFactory.createTiledFromAsset(mStarTextureAtlas, mActivity,
                 "stars/stars_small.png", 0, 0, 2, 6);
         mNeutronStarTextureRegion = BitmapTextureAtlasTextureRegionFactory.createTiledFromAsset(mStarTextureAtlas, mActivity,
@@ -124,6 +127,8 @@ public class StarfieldSceneManager extends SectorSceneManager
 
         mBackgroundGasTextureAtlas = new BitmapTextureAtlas(mActivity.getTextureManager(), 512, 512,
                 TextureOptions.BILINEAR_PREMULTIPLYALPHA);
+        mBackgroundGasTextureAtlas.setTextureAtlasStateListener(new ITextureAtlasStateListener.DebugTextureAtlasStateListener<IBitmapTextureAtlasSource>());
+
         mBackgroundGasTextureRegion = BitmapTextureAtlasTextureRegionFactory.createTiledFromAsset(mBackgroundGasTextureAtlas,
                 mActivity, "decoration/gas.png", 0, 0, 4, 4);
         mBackgroundStarsTextureAtlas = new BitmapTextureAtlas(mActivity.getTextureManager(), 512, 512,
@@ -133,10 +138,14 @@ public class StarfieldSceneManager extends SectorSceneManager
 
         mIconTextureAtlas = new BuildableBitmapTextureAtlas(mActivity.getTextureManager(), 256, 256,
                 TextureOptions.BILINEAR_PREMULTIPLYALPHA);
+        mIconTextureAtlas.setTextureAtlasStateListener(new ITextureAtlasStateListener.DebugTextureAtlasStateListener<IBitmapTextureAtlasSource>());
+
         mArrowIconTextureRegion = BitmapTextureAtlasTextureRegionFactory.createFromAsset(mIconTextureAtlas, mActivity, "img/arrow.png");
 
         mFleetSpriteTextureAtlas = new BuildableBitmapTextureAtlas(mActivity.getTextureManager(), 256, 256,
                 TextureOptions.BILINEAR_PREMULTIPLYALPHA);
+        mFleetSpriteTextureAtlas.setTextureAtlasStateListener(new ITextureAtlasStateListener.DebugTextureAtlasStateListener<IBitmapTextureAtlasSource>());
+
         mFleetSpriteTextures = new HashMap<String, ITextureRegion>();
         mFleetSpriteTextures.put("ship.fighter", BitmapTextureAtlasTextureRegionFactory.createFromAsset(mFleetSpriteTextureAtlas, mActivity, "spritesheets/ship.fighter.png"));
         mFleetSpriteTextures.put("ship.scout", BitmapTextureAtlasTextureRegionFactory.createFromAsset(mFleetSpriteTextureAtlas, mActivity, "spritesheets/ship.scout.png"));
