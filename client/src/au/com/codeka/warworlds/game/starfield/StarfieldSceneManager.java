@@ -98,6 +98,7 @@ public class StarfieldSceneManager extends SectorSceneManager
     private Map<String, FleetEntity> mFleets;
     private StarEntity mSelectedStarEntity;
     private FleetEntity mSelectedFleetEntity;
+    private String mStarToSelect;
 
     private TacticalPointCloud mPointCloud;
     private TreeMap<String, TacticalControlField> mControlFields;
@@ -539,6 +540,10 @@ public class StarfieldSceneManager extends SectorSceneManager
             mSelectedStarEntity = starEntity;
             mSelectedStarEntity.setStar(selectedStar);
         }
+        if (mStarToSelect != null && mStarToSelect.equals(star.getKey())) {
+            mStarToSelect = null;
+            mSelectedStarEntity = starEntity;
+        }
     }
 
     /**
@@ -741,6 +746,12 @@ public class StarfieldSceneManager extends SectorSceneManager
     }
 
     public void selectStar(String starKey) {
+        if (mStars == null) {
+            // this can happen if we haven't refreshed the scene yet.
+            mStarToSelect = starKey;
+            return;
+        }
+
         if (starKey == null || !mStars.containsKey(starKey)) {
             selectStar((StarEntity) null);
             return;

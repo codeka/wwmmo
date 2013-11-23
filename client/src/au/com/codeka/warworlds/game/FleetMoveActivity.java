@@ -69,6 +69,17 @@ public class FleetMoveActivity extends BaseStarfieldActivity {
 
         // we can get an instance of the star from the sector manager
         mSrcStar = SectorManager.getInstance().findStar(mFleet.getStarKey());
+        if (mSrcStar == null) {
+            // if we don't have the star in the sector manager, let's get it from the star manager instead. This
+            // may cause a callback to the server, but that's OK.
+            StarManager.getInstance().requestStar(mFleet.getStarKey(), false, new StarManager.StarFetchedHandler() {
+                @Override
+                public void onStarFetched(Star s) {
+                    mSrcStar = s;
+                    mStarfield.scrollTo(mSrcStar);
+                }
+            });
+        }
 
         super.onCreate(savedInstanceState);
 
@@ -136,7 +147,9 @@ public class FleetMoveActivity extends BaseStarfieldActivity {
             }
         });
 
-        mStarfield.scrollTo(mSrcStar);
+        if (mSrcStar != null) {
+            mStarfield.scrollTo(mSrcStar);
+        }
     }
 
     @Override

@@ -153,6 +153,8 @@ public abstract class SectorSceneManager implements SectorManager.OnSectorListCh
     }
 
     public void scrollTo(BaseStar star) {
+        if (star == null)
+            return;
         scrollTo(star.getSectorX(), star.getSectorY(), star.getOffsetX(), Sector.SECTOR_SIZE - star.getOffsetY(), false);
     }
 
