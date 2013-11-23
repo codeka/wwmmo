@@ -82748,6 +82748,36 @@ public final class Messages {
      */
     com.google.protobuf.ByteString
         getExceptionClassBytes();
+
+    // optional int64 heap_size = 11;
+    /**
+     * <code>optional int64 heap_size = 11;</code>
+     */
+    boolean hasHeapSize();
+    /**
+     * <code>optional int64 heap_size = 11;</code>
+     */
+    long getHeapSize();
+
+    // optional int64 heap_allocated = 12;
+    /**
+     * <code>optional int64 heap_allocated = 12;</code>
+     */
+    boolean hasHeapAllocated();
+    /**
+     * <code>optional int64 heap_allocated = 12;</code>
+     */
+    long getHeapAllocated();
+
+    // optional int64 heap_free = 13;
+    /**
+     * <code>optional int64 heap_free = 13;</code>
+     */
+    boolean hasHeapFree();
+    /**
+     * <code>optional int64 heap_free = 13;</code>
+     */
+    long getHeapFree();
   }
   /**
    * Protobuf type {@code au.com.codeka.common.protobuf.ErrorReport}
@@ -82848,6 +82878,21 @@ public final class Messages {
             case 82: {
               bitField0_ |= 0x00000200;
               exceptionClass_ = input.readBytes();
+              break;
+            }
+            case 88: {
+              bitField0_ |= 0x00000400;
+              heapSize_ = input.readInt64();
+              break;
+            }
+            case 96: {
+              bitField0_ |= 0x00000800;
+              heapAllocated_ = input.readInt64();
+              break;
+            }
+            case 104: {
+              bitField0_ |= 0x00001000;
+              heapFree_ = input.readInt64();
               break;
             }
           }
@@ -83266,6 +83311,54 @@ public final class Messages {
       }
     }
 
+    // optional int64 heap_size = 11;
+    public static final int HEAP_SIZE_FIELD_NUMBER = 11;
+    private long heapSize_;
+    /**
+     * <code>optional int64 heap_size = 11;</code>
+     */
+    public boolean hasHeapSize() {
+      return ((bitField0_ & 0x00000400) == 0x00000400);
+    }
+    /**
+     * <code>optional int64 heap_size = 11;</code>
+     */
+    public long getHeapSize() {
+      return heapSize_;
+    }
+
+    // optional int64 heap_allocated = 12;
+    public static final int HEAP_ALLOCATED_FIELD_NUMBER = 12;
+    private long heapAllocated_;
+    /**
+     * <code>optional int64 heap_allocated = 12;</code>
+     */
+    public boolean hasHeapAllocated() {
+      return ((bitField0_ & 0x00000800) == 0x00000800);
+    }
+    /**
+     * <code>optional int64 heap_allocated = 12;</code>
+     */
+    public long getHeapAllocated() {
+      return heapAllocated_;
+    }
+
+    // optional int64 heap_free = 13;
+    public static final int HEAP_FREE_FIELD_NUMBER = 13;
+    private long heapFree_;
+    /**
+     * <code>optional int64 heap_free = 13;</code>
+     */
+    public boolean hasHeapFree() {
+      return ((bitField0_ & 0x00001000) == 0x00001000);
+    }
+    /**
+     * <code>optional int64 heap_free = 13;</code>
+     */
+    public long getHeapFree() {
+      return heapFree_;
+    }
+
     private void initFields() {
       androidVersion_ = "";
       phoneModel_ = "";
@@ -83277,6 +83370,9 @@ public final class Messages {
       empireId_ = 0;
       context_ = "";
       exceptionClass_ = "";
+      heapSize_ = 0L;
+      heapAllocated_ = 0L;
+      heapFree_ = 0L;
     }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
@@ -83319,6 +83415,15 @@ public final class Messages {
       }
       if (((bitField0_ & 0x00000200) == 0x00000200)) {
         output.writeBytes(10, getExceptionClassBytes());
+      }
+      if (((bitField0_ & 0x00000400) == 0x00000400)) {
+        output.writeInt64(11, heapSize_);
+      }
+      if (((bitField0_ & 0x00000800) == 0x00000800)) {
+        output.writeInt64(12, heapAllocated_);
+      }
+      if (((bitField0_ & 0x00001000) == 0x00001000)) {
+        output.writeInt64(13, heapFree_);
       }
       getUnknownFields().writeTo(output);
     }
@@ -83368,6 +83473,18 @@ public final class Messages {
       if (((bitField0_ & 0x00000200) == 0x00000200)) {
         size += com.google.protobuf.CodedOutputStream
           .computeBytesSize(10, getExceptionClassBytes());
+      }
+      if (((bitField0_ & 0x00000400) == 0x00000400)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt64Size(11, heapSize_);
+      }
+      if (((bitField0_ & 0x00000800) == 0x00000800)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt64Size(12, heapAllocated_);
+      }
+      if (((bitField0_ & 0x00001000) == 0x00001000)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt64Size(13, heapFree_);
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
@@ -83505,6 +83622,12 @@ public final class Messages {
         bitField0_ = (bitField0_ & ~0x00000100);
         exceptionClass_ = "";
         bitField0_ = (bitField0_ & ~0x00000200);
+        heapSize_ = 0L;
+        bitField0_ = (bitField0_ & ~0x00000400);
+        heapAllocated_ = 0L;
+        bitField0_ = (bitField0_ & ~0x00000800);
+        heapFree_ = 0L;
+        bitField0_ = (bitField0_ & ~0x00001000);
         return this;
       }
 
@@ -83573,6 +83696,18 @@ public final class Messages {
           to_bitField0_ |= 0x00000200;
         }
         result.exceptionClass_ = exceptionClass_;
+        if (((from_bitField0_ & 0x00000400) == 0x00000400)) {
+          to_bitField0_ |= 0x00000400;
+        }
+        result.heapSize_ = heapSize_;
+        if (((from_bitField0_ & 0x00000800) == 0x00000800)) {
+          to_bitField0_ |= 0x00000800;
+        }
+        result.heapAllocated_ = heapAllocated_;
+        if (((from_bitField0_ & 0x00001000) == 0x00001000)) {
+          to_bitField0_ |= 0x00001000;
+        }
+        result.heapFree_ = heapFree_;
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
@@ -83634,6 +83769,15 @@ public final class Messages {
           bitField0_ |= 0x00000200;
           exceptionClass_ = other.exceptionClass_;
           onChanged();
+        }
+        if (other.hasHeapSize()) {
+          setHeapSize(other.getHeapSize());
+        }
+        if (other.hasHeapAllocated()) {
+          setHeapAllocated(other.getHeapAllocated());
+        }
+        if (other.hasHeapFree()) {
+          setHeapFree(other.getHeapFree());
         }
         this.mergeUnknownFields(other.getUnknownFields());
         return this;
@@ -84316,6 +84460,105 @@ public final class Messages {
   }
   bitField0_ |= 0x00000200;
         exceptionClass_ = value;
+        onChanged();
+        return this;
+      }
+
+      // optional int64 heap_size = 11;
+      private long heapSize_ ;
+      /**
+       * <code>optional int64 heap_size = 11;</code>
+       */
+      public boolean hasHeapSize() {
+        return ((bitField0_ & 0x00000400) == 0x00000400);
+      }
+      /**
+       * <code>optional int64 heap_size = 11;</code>
+       */
+      public long getHeapSize() {
+        return heapSize_;
+      }
+      /**
+       * <code>optional int64 heap_size = 11;</code>
+       */
+      public Builder setHeapSize(long value) {
+        bitField0_ |= 0x00000400;
+        heapSize_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional int64 heap_size = 11;</code>
+       */
+      public Builder clearHeapSize() {
+        bitField0_ = (bitField0_ & ~0x00000400);
+        heapSize_ = 0L;
+        onChanged();
+        return this;
+      }
+
+      // optional int64 heap_allocated = 12;
+      private long heapAllocated_ ;
+      /**
+       * <code>optional int64 heap_allocated = 12;</code>
+       */
+      public boolean hasHeapAllocated() {
+        return ((bitField0_ & 0x00000800) == 0x00000800);
+      }
+      /**
+       * <code>optional int64 heap_allocated = 12;</code>
+       */
+      public long getHeapAllocated() {
+        return heapAllocated_;
+      }
+      /**
+       * <code>optional int64 heap_allocated = 12;</code>
+       */
+      public Builder setHeapAllocated(long value) {
+        bitField0_ |= 0x00000800;
+        heapAllocated_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional int64 heap_allocated = 12;</code>
+       */
+      public Builder clearHeapAllocated() {
+        bitField0_ = (bitField0_ & ~0x00000800);
+        heapAllocated_ = 0L;
+        onChanged();
+        return this;
+      }
+
+      // optional int64 heap_free = 13;
+      private long heapFree_ ;
+      /**
+       * <code>optional int64 heap_free = 13;</code>
+       */
+      public boolean hasHeapFree() {
+        return ((bitField0_ & 0x00001000) == 0x00001000);
+      }
+      /**
+       * <code>optional int64 heap_free = 13;</code>
+       */
+      public long getHeapFree() {
+        return heapFree_;
+      }
+      /**
+       * <code>optional int64 heap_free = 13;</code>
+       */
+      public Builder setHeapFree(long value) {
+        bitField0_ |= 0x00001000;
+        heapFree_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional int64 heap_free = 13;</code>
+       */
+      public Builder clearHeapFree() {
+        bitField0_ = (bitField0_ & ~0x00001000);
+        heapFree_ = 0L;
         onChanged();
         return this;
       }
@@ -85729,20 +85972,22 @@ public final class Messages {
       "AllianceRequestVote\022\n\n\002id\030\001 \001(\005\022\023\n\013allia" +
       "nce_id\030\002 \001(\005\022\033\n\023alliance_request_id\030\003 \001(" +
       "\005\022\021\n\tempire_id\030\004 \001(\005\022\r\n\005votes\030\005 \001(\005\022\014\n\004d",
-      "ate\030\006 \001(\003\"\336\001\n\013ErrorReport\022\027\n\017android_ver" +
+      "ate\030\006 \001(\003\"\234\002\n\013ErrorReport\022\027\n\017android_ver" +
       "sion\030\001 \001(\t\022\023\n\013phone_model\030\002 \001(\t\022\024\n\014packa" +
       "ge_name\030\003 \001(\t\022\023\n\013app_version\030\004 \001(\t\022\023\n\013st" +
       "ack_trace\030\005 \001(\t\022\017\n\007message\030\006 \001(\t\022\023\n\013repo" +
       "rt_time\030\007 \001(\003\022\021\n\tempire_id\030\010 \001(\005\022\017\n\007cont" +
-      "ext\030\t \001(\t\022\027\n\017exception_class\030\n \001(\t\"K\n\014Er" +
-      "rorReports\022;\n\007reports\030\001 \003(\0132*.au.com.cod" +
-      "eka.common.protobuf.ErrorReport*\344\001\n\025Situ" +
-      "ationReportFilter\022\013\n\007ShowAll\020\000\022\020\n\014MoveCo" +
-      "mplete\020\001\022\024\n\020BuildCompleteAny\020\002\022\021\n\rFleetA",
-      "ttacked\020\003\022\022\n\016FleetDestroyed\020\004\022\023\n\017FleetVi" +
-      "ctorious\020\005\022\022\n\016ColonyAttacked\020\006\022\023\n\017Colony" +
-      "Destroyed\020\007\022\026\n\022BuildCompleteShips\020\010\022\031\n\025B" +
-      "uildCompleteBuilding\020\t"
+      "ext\030\t \001(\t\022\027\n\017exception_class\030\n \001(\t\022\021\n\the" +
+      "ap_size\030\013 \001(\003\022\026\n\016heap_allocated\030\014 \001(\003\022\021\n" +
+      "\theap_free\030\r \001(\003\"K\n\014ErrorReports\022;\n\007repo" +
+      "rts\030\001 \003(\0132*.au.com.codeka.common.protobu" +
+      "f.ErrorReport*\344\001\n\025SituationReportFilter\022",
+      "\013\n\007ShowAll\020\000\022\020\n\014MoveComplete\020\001\022\024\n\020BuildC" +
+      "ompleteAny\020\002\022\021\n\rFleetAttacked\020\003\022\022\n\016Fleet" +
+      "Destroyed\020\004\022\023\n\017FleetVictorious\020\005\022\022\n\016Colo" +
+      "nyAttacked\020\006\022\023\n\017ColonyDestroyed\020\007\022\026\n\022Bui" +
+      "ldCompleteShips\020\010\022\031\n\025BuildCompleteBuildi" +
+      "ng\020\t"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
       new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
@@ -86192,7 +86437,7 @@ public final class Messages {
           internal_static_au_com_codeka_common_protobuf_ErrorReport_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_au_com_codeka_common_protobuf_ErrorReport_descriptor,
-              new java.lang.String[] { "AndroidVersion", "PhoneModel", "PackageName", "AppVersion", "StackTrace", "Message", "ReportTime", "EmpireId", "Context", "ExceptionClass", });
+              new java.lang.String[] { "AndroidVersion", "PhoneModel", "PackageName", "AppVersion", "StackTrace", "Message", "ReportTime", "EmpireId", "Context", "ExceptionClass", "HeapSize", "HeapAllocated", "HeapFree", });
           internal_static_au_com_codeka_common_protobuf_ErrorReports_descriptor =
             getDescriptor().getMessageTypes().get(60);
           internal_static_au_com_codeka_common_protobuf_ErrorReports_fieldAccessorTable = new

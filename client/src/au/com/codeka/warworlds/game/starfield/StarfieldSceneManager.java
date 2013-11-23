@@ -733,11 +733,15 @@ public class StarfieldSceneManager extends SectorSceneManager
         mSelectedFleetEntity = null;
 
         refreshSelectionIndicator();
-        fireSelectionChanged(mSelectedStarEntity.getStar());
+        if (mSelectedStarEntity == null) {
+            fireSelectionChanged((Star) null);
+        } else {
+            fireSelectionChanged(mSelectedStarEntity.getStar());
+        }
     }
 
     public void selectStar(String starKey) {
-        if (starKey == null) {
+        if (starKey == null || !mStars.containsKey(starKey)) {
             selectStar((StarEntity) null);
             return;
         }

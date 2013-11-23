@@ -13,6 +13,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager.NameNotFoundException;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -40,7 +41,7 @@ public class WarWorldsActivity extends BaseActivity {
         log.info("WarWorlds activity starting...");
         requestWindowFeature(Window.FEATURE_NO_TITLE); // remove the title bar
 
-        setContentView(R.layout.home);
+        setContentView(R.layout.welcome);
         Util.setup(mContext);
 
         View rootView = findViewById(android.R.id.content);
@@ -70,6 +71,24 @@ public class WarWorldsActivity extends BaseActivity {
             public void onClick(View v) {
                 final Intent intent = new Intent(mContext, StarfieldActivity.class);
                 startActivity(intent);
+            }
+        });
+
+        ((Button) findViewById(R.id.help_btn)).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(Intent.ACTION_VIEW);
+                i.setData(Uri.parse("http://www.war-worlds.com/doc/getting-started"));
+                startActivity(i);
+            }
+        });
+
+        ((Button) findViewById(R.id.website_btn)).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(Intent.ACTION_VIEW);
+                i.setData(Uri.parse("http://www.war-worlds.com/"));
+                startActivity(i);
             }
         });
     }

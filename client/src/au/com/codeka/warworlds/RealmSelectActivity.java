@@ -2,6 +2,7 @@ package au.com.codeka.warworlds;
 
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.text.Html;
 import android.view.View;
@@ -68,6 +69,24 @@ public class RealmSelectActivity extends BaseActivity {
                 // this activity is finished, move to the main WarWorldsActivity
                 finish();
                 startActivity(new Intent(mContext, WarWorldsActivity.class));
+            }
+        });
+
+        ((Button) findViewById(R.id.help_btn)).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(Intent.ACTION_VIEW);
+                i.setData(Uri.parse("http://www.war-worlds.com/doc/getting-started"));
+                startActivity(i);
+            }
+        });
+
+        ((Button) findViewById(R.id.privacy_policy_btn)).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(Intent.ACTION_VIEW);
+                i.setData(Uri.parse("http://www.war-worlds.com/privacy-policy"));
+                startActivity(i);
             }
         });
 

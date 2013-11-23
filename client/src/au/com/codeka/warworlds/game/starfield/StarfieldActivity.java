@@ -148,7 +148,7 @@ public class StarfieldActivity extends BaseStarfieldActivity
                 if (mSelectedStar != null) {
                     ScoutReportDialog dialog = new ScoutReportDialog();
                     dialog.setStar(mSelectedStar);
-                    // TODO: dialog.show(getSupportFragmentManager(), "");
+                    dialog.show(getSupportFragmentManager(), "");
                 }
             }
         });
@@ -401,12 +401,13 @@ public class StarfieldActivity extends BaseStarfieldActivity
         } else {
             RelativeLayout.LayoutParams lp = (RelativeLayout.LayoutParams) mAllianceBtn.getLayoutParams();
             if (isOpen) {
-                lp.removeRule(RelativeLayout.BELOW);
+                // NB: removeRule is not available until API level 17 :/
+                lp.addRule(RelativeLayout.BELOW, 0);
                 lp.addRule(RelativeLayout.ALIGN_PARENT_TOP, 1);
                 lp.topMargin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 34, r.getDisplayMetrics());
             } else {
                 lp.addRule(RelativeLayout.BELOW, R.id.empire_btn);
-                lp.removeRule(RelativeLayout.ALIGN_PARENT_TOP);
+                lp.addRule(RelativeLayout.ALIGN_PARENT_TOP, 0);
                 lp.topMargin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 4, r.getDisplayMetrics());
             }
             mAllianceBtn.setLayoutParams(lp);

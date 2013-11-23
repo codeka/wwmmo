@@ -1,42 +1,60 @@
 {% extends "admin/skeleton.html" %}
-{% block title %}Purchases{% endblock %}
+{% block title %}Error Reports{% endblock %}
 {% block head %}
   <style>
     tr.stack-trace td {
       white-space: pre-wrap;
       font-family: monospace;
     }
+
+    form {
+      display: inline;
+    }
+    form dl {
+     margin: 0;
+     float: right;
+    }
+    form input[type=submit] {
+      display: block;
+      float: right;
+    }
+    form dt {
+      display: inline;
+      line-height: 30px;
+      font-weight: bold;
+      margin-left: 1em;
+    }
+    form dd {
+      display: inline;
+      margin-left: 0.5em;
+      line-height: 30px;
+    }
   </style>
 {% endblock %}
 
 {% block content %}
   <h1>Error Reports</h1>
-  <script>
-    function display_extra(extra) {
-      if (!extra.purchase_info) {
-        return;
-      }
-
-      if (extra.purchase_info.sku == "rename_empire") {
-        document.write("<div><span class='name'>Old name</span>: <span class='value'>"+extra.old_name+"</span></div>");
-        document.write("<div><span class='name'>New name</span>: <span class='value'>"+extra.new_name+"</span></div>");
-      } else if (extra.purchase_info.sku == "decorate_empire") {
-        document.write("<img src='data:image/png;base64,"+extra.png_image+"' />");
-      } else if (extra.purchase_info.sku == "star_rename") {
-        document.write("<div><span class='name'>Old name</span>: <span class='value'>"+extra.old_name+"</span></div>");
-        document.write("<div><span class='name'>New name</span>: <span class='value'>"+extra.new_name+"</span></div>");
-      }
-    }
-  </script>
+  <form method="get">
+    <input type="hidden" name="cursor" value="{{curr_cursor}}">
+    <input type="submit" value="Filter">
+    <dl>
+      <dt>Empire:</dt>
+      <dd><input type="text" name="empire" value="{{curr_empire}}">
+      <dt>Search:</dt>
+      <dd><input type="text" name="q" value="{{curr_q}}"></dd>
+    </dl>
+  </form>
   <table border="1" cellpadding="4" cellspacing="0" style="width: 100%;">
     <tr><th>Time</th><th>Empire</th><th>Version</th><th>Context</th><th>Exception</th><th>Details</th></tr>
   {% for error_report in error_reports %}
     <tr>
       <td><script>
-        var dt = new Date("{{error_report.report_time}}");
-        document.write(dt.toLocaleString());
+        (function() {
+          var dt = new Date("{{error_report.report_time}}");
+          document.write(dt.toLocaleString());
+        })();
       </script></td>
-      <td>[{{error_report.empire_id}}] {{error_report.empire_name}}</td>
+      <td>[<a href="mailto:{{error_report.empire_email}}">{{error_report.empire_id}}</a>] {{error_report.empire_name}}</td>
       <td>{{error_report.app_version}}</td>
       <td>{{error_report.context}}</td>
       <td>{{error_report.exception_class}}</td>
@@ -54,6 +72,18 @@
             }
           });
         })();
+      </script> &bull;
+      <a href="javascript:;" id="delete-{{loop.counter}}">Delete</a><script>
+        $(function() {
+          var $a = $("#delete-{{loop.counter}}");
+          var $tr = $("#row-{{loop.counter}}");
+          $a.click(function() {
+            $a.parents("tr").hide();
+            $tr.hide();
+            var dt = new Date("{{error_report.report_time}}");
+            $.post("error-reports?action=delete&ts="+dt.getTime()+"&e={{error_report.empire_id}}");
+          })
+        });
       </script></td>
     </tr>
     <tr class="stack-trace" style="display: none;" id="row-{{loop.counter}}">
@@ -61,5 +91,5 @@
     </tr>
   {% endfor %}
   </table>
-  <p><a href="?cursor={{cursor}}">Next Page &gt;&gt;</a></p>
+  <p><a href="?cursor={{cursor}}{% if curr_empire %}&empire={{curr_empire}}{% endif %}">Next Page &gt;&gt;</a></p>
 {% endblock %}

@@ -32,11 +32,41 @@
         android:layout_marginBottom="5dp"
         android:text="Start" />
 
+    <LinearLayout
+        android:id="@+id/button_wrapper"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/start_btn"
+        android:layout_marginLeft="@dimen/tablet_margin_5dp"
+        android:layout_marginRight="@dimen/tablet_margin_5dp"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/help_btn"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="5dp"
+            android:layout_marginLeft="5dp"
+            android:text="How to Play" />
+
+        <Button
+            android:id="@+id/privacy_policy_btn"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="5dp"
+            android:layout_marginLeft="5dp"
+            android:text="Privacy Policy" />
+    </LinearLayout>
+
     <au.com.codeka.warworlds.ctrl.TransparentWebView
         android:id="@+id/welcome"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@id/start_btn"
+        android:layout_above="@id/button_wrapper"
         android:layout_below="@id/title"
         android:layout_marginTop="10dp"
         android:layout_marginBottom="10dp"

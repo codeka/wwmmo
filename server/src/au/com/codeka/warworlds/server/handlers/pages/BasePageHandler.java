@@ -49,6 +49,16 @@ public class BasePageHandler extends RequestHandler {
         }
     }
 
+    protected void write(String text) {
+        getResponse().setContentType("text/plain");
+        getResponse().setHeader("Content-Type", "text/plain");
+        try {
+            getResponse().getWriter().write(text);;
+        } catch (IOException e) {
+            log.error("Error writing output!", e);
+        }
+    }
+
     protected boolean isAdmin() throws RequestException {
         if (getSessionNoError() == null || !getSessionNoError().isAdmin()) {
             // if they're not authenticated yet, we'll have to redirect them to the authentication

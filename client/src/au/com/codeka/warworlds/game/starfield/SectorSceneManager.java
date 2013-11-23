@@ -90,11 +90,21 @@ public abstract class SectorSceneManager implements SectorManager.OnSectorListCh
             @Override
             protected Scene doInBackground() {
                 log.debug("Scene updated, refreshing...");
-                return createScene();
+                try {
+                    return createScene();
+                } catch(Exception e) {
+                    // the most common reason for this is when the activity is destroyed before we finish...
+                    log.warn("Error while refreshing scene.", e);
+                    return null;
+                }
             }
 
             @Override
             protected void onComplete(final Scene scene) {
+                if (scene == null) {
+                    return;
+                }
+
                 mActivity.getEngine().runOnUpdateThread(new Runnable() {
                     @Override
                     public void run() {

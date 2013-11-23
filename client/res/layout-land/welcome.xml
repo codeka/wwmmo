@@ -33,11 +33,12 @@
 
     <LinearLayout
         android:id="@+id/button_wrapper"
-        android:layout_width="match_parent"
+        android:layout_width="280dp"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:layout_marginLeft="@dimen/tablet_margin_5dp"
-        android:layout_marginRight="@dimen/tablet_margin_5dp"
+        android:layout_alignParentRight="true"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp"
         android:orientation="horizontal">
 
         <Button
@@ -63,19 +64,22 @@
 
     <Button
         android:id="@+id/start_game_btn"
-        android:layout_width="match_parent"
+        android:layout_width="280dp"
         android:layout_height="40dp"
         android:layout_above="@id/button_wrapper"
+        android:layout_alignParentRight="true"
         android:layout_marginTop="5dp"
         android:layout_marginBottom="5dp"
-        android:layout_marginLeft="@dimen/tablet_margin_5dp"
-        android:layout_marginRight="@dimen/tablet_margin_5dp"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp"
         android:text="@string/start_game" />
 
     <TextView
         android:id="@+id/connection_status"
-        android:layout_width="match_parent"
+        android:layout_width="280dp"
         android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="5dp"
         android:layout_above="@id/start_game_btn"
         android:gravity="center" />
 
@@ -83,9 +87,38 @@
         android:id="@+id/motd"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@id/connection_status"
         android:layout_below="@id/realm_name"
+        android:layout_toLeftOf="@+id/start_game_btn"
         android:layout_marginLeft="@dimen/tablet_margin"
         android:layout_marginRight="@dimen/tablet_margin" />
 
+    <LinearLayout
+        android:id="@+id/top_button_wrapper"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignRight="@+id/start_game_btn"
+        android:layout_alignLeft="@+id/start_game_btn"
+        android:layout_alignTop="@+id/motd"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/help_btn"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="5dp"
+            android:text="How to Play" />
+
+        <Button
+            android:id="@+id/website_btn"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="5dp"
+            android:layout_marginLeft="5dp"
+            android:text="Website" />
+    </LinearLayout>
+    
 </RelativeLayout>

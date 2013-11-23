@@ -172,7 +172,7 @@ public class ChatActivity extends BaseActivity
                 it.remove();
             }
         }
-        if (EmpireManager.i.getEmpire().getAlliance() != null) {
+        if (EmpireManager.i.getEmpire().getAlliance() != null && mConversations.size() > 1) {
             // swap alliance and global around...
             ChatConversation globalConversation = mConversations.get(1);
             mConversations.set(1, mConversations.get(0));

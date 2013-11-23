@@ -66,7 +66,7 @@
     <name>Ground Shield</name>
     <sprite>building.shield-1</sprite>
     <description><![CDATA[
-      <p>The ground shield provide additional defence when an enemey lands a troop
+      <p>The ground shield provide additional defence when an enemy lands a troop
       carrier. Your colony's base defence will be increased by 0.25 for each level
       of Ground Shield.
     ]]></description>
