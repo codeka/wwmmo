@@ -774,7 +774,7 @@ public class StarfieldSceneManager extends SectorSceneManager
         mSelectedFleetEntity = fleet;
 
         refreshSelectionIndicator();
-        fireSelectionChanged(mSelectedFleetEntity.getFleet());
+        fireSelectionChanged(mSelectedFleetEntity == null ? null : mSelectedFleetEntity.getFleet());
     }
 
     public void selectFleet(String fleetKey) {
