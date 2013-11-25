@@ -45,6 +45,7 @@ public abstract class BaseGlActivity extends SimpleLayoutGameActivity {
     private DebugView mDebugView;
     private WindowManager.LayoutParams mDebugViewLayout;
     private SensorEventListener mBugReportShakeListener = new BugReportSensorListener(this);
+    private long mForegroundStartTimeMs;
 
     protected int mCameraWidth;
     protected int mCameraHeight;
@@ -130,7 +131,7 @@ public abstract class BaseGlActivity extends SimpleLayoutGameActivity {
             getWindowManager().removeView(mDebugView);
         }
 
-        BackgroundDetector.i.onActivityPause(this);
+        BackgroundDetector.i.onActivityPause(this, System.currentTimeMillis() - mForegroundStartTimeMs);
         super.onPause();
     }
 
@@ -138,6 +139,7 @@ public abstract class BaseGlActivity extends SimpleLayoutGameActivity {
     public void onResume() {
         Util.loadProperties();
 
+        mForegroundStartTimeMs = System.currentTimeMillis();
         mSensorManager.registerListener(mBugReportShakeListener, mAccelerometer,
                                         SensorManager.SENSOR_DELAY_UI);
 

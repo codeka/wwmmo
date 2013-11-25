@@ -1,10 +1,31 @@
 {% extends "admin/skeleton.html" %}
 {% block title %}Error Reports{% endblock %}
 {% block head %}
+  <script type="text/javascript" src="https://www.google.com/jsapi"></script>
+
   <style>
-    tr.stack-trace td {
+    div.stack-trace {
       white-space: pre-wrap;
       font-family: monospace;
+    }
+    div.details-extra {
+      float: right;
+      border: solid 2pt #999;
+      border-radius: 5pt;
+      padding: 1em;
+      margin: 0.5em;
+    }
+
+    div.details-extra dl {
+        margin: 0;
+    }
+    div.details-extra dt {
+        float: left;
+        clear: both;
+        font-weight: bold;
+    }
+    div.details-extra dd {
+        float: right;
     }
 
     form {
@@ -34,14 +55,40 @@
 
 {% block content %}
   <h1>Error Reports</h1>
+  <div id="histogram" style="width: 90%; margin: 0 auto; height: 150px;"></div>
+  <script type="text/javascript">
+    google.load("visualization", "1", {packages:["corechart"]});
+    google.setOnLoadCallback(drawChart);
+
+    function drawChart() {
+      var dataTable = new google.visualization.DataTable();
+      dataTable.addColumn("date", "Date");
+      dataTable.addColumn("number", "Total Reports");
+      dataTable.addColumn("number", "Empires Reporting");
+      dataTable.addRows([
+      {% for entry in error_histogram %}
+        [new Date({{entry.year}}, {{entry.month}}+1, {{entry.day}}), {{entry.num_reports}}, {{entry.num_empires_reporting}}],
+      {% endfor %}
+      ]);
+
+      var dataView = new google.visualization.DataView(dataTable);
+
+      var options = {
+      };
+
+      var chart = new google.visualization.LineChart(document.getElementById("histogram"));
+      chart.draw(dataView, options);
+    }
+  </script>
+
   <form method="get">
     <input type="hidden" name="cursor" value="{{curr_cursor}}">
     <input type="submit" value="Filter">
     <dl>
-      <dt>Empire:</dt>
+      <dt>Empire:
       <dd><input type="text" name="empire" value="{{curr_empire}}">
-      <dt>Search:</dt>
-      <dd><input type="text" name="q" value="{{curr_q}}"></dd>
+      <dt>Search:
+      <dd><input type="text" name="q" value="{{curr_q}}">
     </dl>
   </form>
   <table border="1" cellpadding="4" cellspacing="0" style="width: 100%;">
@@ -86,8 +133,25 @@
         });
       </script></td>
     </tr>
-    <tr class="stack-trace" style="display: none;" id="row-{{loop.counter}}">
-      <td colspan="6">{{error_report.stack_trace}}</td>
+    <tr style="display: none;" id="row-{{loop.counter}}">
+      <td colspan="6">
+        <div class="details-extra">
+          <dl>
+            <dt>Heap size:
+            <dd>{{error_report.heap_size|number}}
+            <dt>Allocated:
+            <dd>{{error_report.heap_allocated|number}}
+            <dt>Free:
+            <dd>{{error_report.heap_free|number}}
+            <dt>Run time:
+            <dd>{{error_report.total_run_time|number}} ms
+            <dt>FG time:
+            <dd>{{error_report.foreground_run_time|number}} ms
+          </dl>
+        </div>
+        <div class="stack-trace">{{error_report.stack_trace}}</div>
+        <div style="clear: both;"></div>
+      </td>
     </tr>
   {% endfor %}
   </table>

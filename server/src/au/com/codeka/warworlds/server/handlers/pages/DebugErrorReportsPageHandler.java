@@ -1,7 +1,10 @@
 package au.com.codeka.warworlds.server.handlers.pages;
 
+import java.sql.Date;
 import java.sql.ResultSet;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collections;
 import java.util.TreeMap;
 
 import org.joda.time.DateTime;
@@ -65,7 +68,6 @@ public class DebugErrorReportsPageHandler extends BasePageHandler {
         }
         sql += " ORDER BY report_date DESC" +
                " LIMIT 50";
-        // TODO: filtering
         try (SqlStmt stmt = DB.prepare(sql)) {
             for (int i = 0; i < parameters.size(); i++) {
                 stmt.setString(i + 1, parameters.get(i));
@@ -87,6 +89,11 @@ public class DebugErrorReportsPageHandler extends BasePageHandler {
                 result.put("empire_id", error_report_pb.getEmpireId());
                 result.put("context", error_report_pb.getContext());
                 result.put("exception_class", error_report_pb.getExceptionClass());
+                result.put("heap_size", error_report_pb.getHeapSize());
+                result.put("heap_allocated", error_report_pb.getHeapAllocated());
+                result.put("heap_free", error_report_pb.getHeapFree());
+                result.put("total_run_time", error_report_pb.getTotalRunTime());
+                result.put("foreground_run_time", error_report_pb.getForegroundRunTime());
                 results.add(result);
 
                 cursor = error_report_pb.getReportTime() / 1000;
@@ -97,6 +104,37 @@ public class DebugErrorReportsPageHandler extends BasePageHandler {
         }
 
         data.put("cursor", cursor);
+
+        // add some data so we can display a histogram of the number of errors we're getting
+        ArrayList<TreeMap<String, Object>> histogram = new ArrayList<TreeMap<String, Object>>();
+        sql = "SELECT DATE(report_date) AS date, COUNT(*) AS num_reports, COUNT(DISTINCT empire_id) AS num_empires_reporting" +
+              " FROM error_reports" +
+              " GROUP BY DATE(date)" +
+              " ORDER BY date DESC" +
+              " LIMIT 60";
+        try (SqlStmt stmt = DB.prepare(sql)) {
+            ResultSet rs = stmt.select();
+            while (rs.next()) {
+                Date dt = rs.getDate(1);
+                int numReports = rs.getInt(2);
+                int numEmpiresReporting = rs.getInt(3);
+
+                TreeMap<String, Object> entry = new TreeMap<String, Object>();
+                Calendar c = Calendar.getInstance();
+                c.setTime(dt);
+                entry.put("year", c.get(Calendar.YEAR));
+                entry.put("month", c.get(Calendar.MONTH) - 1);
+                entry.put("day", c.get(Calendar.DAY_OF_MONTH));
+                entry.put("num_reports", numReports);
+                entry.put("num_empires_reporting", numEmpiresReporting);
+                histogram.add(entry);
+            }
+        } catch(Exception e) {
+            throw new RequestException(e);
+        }
+        Collections.reverse(histogram);
+        data.put("error_histogram", histogram);
+
         render("admin/debug/error-reports.html", data);
     }
 

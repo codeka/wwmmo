@@ -24,6 +24,8 @@ public class BaseActivity extends FragmentActivity {
     private WindowManager.LayoutParams mDebugViewLayout;
     private SensorEventListener mBugReportShakeListener = new BugReportSensorListener(this);
 
+    private long mForegroundStartTimeMs;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -52,7 +54,7 @@ public class BaseActivity extends FragmentActivity {
             getWindowManager().removeView(mDebugView);
         }
 
-        BackgroundDetector.i.onActivityPause(this);
+        BackgroundDetector.i.onActivityPause(this, System.currentTimeMillis() - mForegroundStartTimeMs);
         super.onPause();
     }
 
@@ -60,6 +62,7 @@ public class BaseActivity extends FragmentActivity {
     public void onResume() {
         Util.loadProperties();
 
+        mForegroundStartTimeMs = System.currentTimeMillis();
         mSensorManager.registerListener(mBugReportShakeListener, mAccelerometer,
                                         SensorManager.SENSOR_DELAY_UI);
 

@@ -52,6 +52,8 @@ public class BackgroundDetector {
     private boolean mIsTransitioningToBackground;
     private Handler mHandler;
     private String mLastActivityName;
+    private long mStartTimeMs;
+    private long mTotalForegroundTimeMs;
 
     /** Gets the name (class name) of the last activity that was running. */
     public String getLastActivityName() {
@@ -79,6 +81,14 @@ public class BackgroundDetector {
                 handler.onBackgroundChange(context, mIsInBackground);
             }
         }
+    }
+
+    public long getTotalRunTime() {
+        return System.currentTimeMillis() - mStartTimeMs;
+    }
+
+    public long getTotalForegroundTime() {
+        return mTotalForegroundTimeMs;
     }
 
     public void onBackgroundStatusChange(final Activity activity) {
@@ -150,7 +160,9 @@ public class BackgroundDetector {
         onBackgroundStatusChange(activity);
     }
 
-    public void onActivityPause(Activity activity) {
+    public void onActivityPause(Activity activity, long activityRunTimeMs) {
+        mTotalForegroundTimeMs += activityRunTimeMs;
+
         mNumActiveActivities --;
         if (mNumActiveActivities <= 0) {
             if (mStartingActivityPackage != null &&
@@ -162,6 +174,10 @@ public class BackgroundDetector {
     }
 
     public void onActivityResume(Activity activity) {
+        if (mStartTimeMs == 0) {
+            mStartTimeMs = System.currentTimeMillis();
+        }
+
         mNumActiveActivities ++;
         if (mNumActiveActivities == 1) {
             if (mStartingActivityPackage != null &&

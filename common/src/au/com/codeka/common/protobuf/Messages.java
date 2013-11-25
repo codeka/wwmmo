@@ -82778,6 +82778,26 @@ public final class Messages {
      * <code>optional int64 heap_free = 13;</code>
      */
     long getHeapFree();
+
+    // optional int64 total_run_time = 14;
+    /**
+     * <code>optional int64 total_run_time = 14;</code>
+     */
+    boolean hasTotalRunTime();
+    /**
+     * <code>optional int64 total_run_time = 14;</code>
+     */
+    long getTotalRunTime();
+
+    // optional int64 foreground_run_time = 15;
+    /**
+     * <code>optional int64 foreground_run_time = 15;</code>
+     */
+    boolean hasForegroundRunTime();
+    /**
+     * <code>optional int64 foreground_run_time = 15;</code>
+     */
+    long getForegroundRunTime();
   }
   /**
    * Protobuf type {@code au.com.codeka.common.protobuf.ErrorReport}
@@ -82893,6 +82913,16 @@ public final class Messages {
             case 104: {
               bitField0_ |= 0x00001000;
               heapFree_ = input.readInt64();
+              break;
+            }
+            case 112: {
+              bitField0_ |= 0x00002000;
+              totalRunTime_ = input.readInt64();
+              break;
+            }
+            case 120: {
+              bitField0_ |= 0x00004000;
+              foregroundRunTime_ = input.readInt64();
               break;
             }
           }
@@ -83359,6 +83389,38 @@ public final class Messages {
       return heapFree_;
     }
 
+    // optional int64 total_run_time = 14;
+    public static final int TOTAL_RUN_TIME_FIELD_NUMBER = 14;
+    private long totalRunTime_;
+    /**
+     * <code>optional int64 total_run_time = 14;</code>
+     */
+    public boolean hasTotalRunTime() {
+      return ((bitField0_ & 0x00002000) == 0x00002000);
+    }
+    /**
+     * <code>optional int64 total_run_time = 14;</code>
+     */
+    public long getTotalRunTime() {
+      return totalRunTime_;
+    }
+
+    // optional int64 foreground_run_time = 15;
+    public static final int FOREGROUND_RUN_TIME_FIELD_NUMBER = 15;
+    private long foregroundRunTime_;
+    /**
+     * <code>optional int64 foreground_run_time = 15;</code>
+     */
+    public boolean hasForegroundRunTime() {
+      return ((bitField0_ & 0x00004000) == 0x00004000);
+    }
+    /**
+     * <code>optional int64 foreground_run_time = 15;</code>
+     */
+    public long getForegroundRunTime() {
+      return foregroundRunTime_;
+    }
+
     private void initFields() {
       androidVersion_ = "";
       phoneModel_ = "";
@@ -83373,6 +83435,8 @@ public final class Messages {
       heapSize_ = 0L;
       heapAllocated_ = 0L;
       heapFree_ = 0L;
+      totalRunTime_ = 0L;
+      foregroundRunTime_ = 0L;
     }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
@@ -83424,6 +83488,12 @@ public final class Messages {
       }
       if (((bitField0_ & 0x00001000) == 0x00001000)) {
         output.writeInt64(13, heapFree_);
+      }
+      if (((bitField0_ & 0x00002000) == 0x00002000)) {
+        output.writeInt64(14, totalRunTime_);
+      }
+      if (((bitField0_ & 0x00004000) == 0x00004000)) {
+        output.writeInt64(15, foregroundRunTime_);
       }
       getUnknownFields().writeTo(output);
     }
@@ -83485,6 +83555,14 @@ public final class Messages {
       if (((bitField0_ & 0x00001000) == 0x00001000)) {
         size += com.google.protobuf.CodedOutputStream
           .computeInt64Size(13, heapFree_);
+      }
+      if (((bitField0_ & 0x00002000) == 0x00002000)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt64Size(14, totalRunTime_);
+      }
+      if (((bitField0_ & 0x00004000) == 0x00004000)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt64Size(15, foregroundRunTime_);
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
@@ -83628,6 +83706,10 @@ public final class Messages {
         bitField0_ = (bitField0_ & ~0x00000800);
         heapFree_ = 0L;
         bitField0_ = (bitField0_ & ~0x00001000);
+        totalRunTime_ = 0L;
+        bitField0_ = (bitField0_ & ~0x00002000);
+        foregroundRunTime_ = 0L;
+        bitField0_ = (bitField0_ & ~0x00004000);
         return this;
       }
 
@@ -83708,6 +83790,14 @@ public final class Messages {
           to_bitField0_ |= 0x00001000;
         }
         result.heapFree_ = heapFree_;
+        if (((from_bitField0_ & 0x00002000) == 0x00002000)) {
+          to_bitField0_ |= 0x00002000;
+        }
+        result.totalRunTime_ = totalRunTime_;
+        if (((from_bitField0_ & 0x00004000) == 0x00004000)) {
+          to_bitField0_ |= 0x00004000;
+        }
+        result.foregroundRunTime_ = foregroundRunTime_;
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
@@ -83778,6 +83868,12 @@ public final class Messages {
         }
         if (other.hasHeapFree()) {
           setHeapFree(other.getHeapFree());
+        }
+        if (other.hasTotalRunTime()) {
+          setTotalRunTime(other.getTotalRunTime());
+        }
+        if (other.hasForegroundRunTime()) {
+          setForegroundRunTime(other.getForegroundRunTime());
         }
         this.mergeUnknownFields(other.getUnknownFields());
         return this;
@@ -84559,6 +84655,72 @@ public final class Messages {
       public Builder clearHeapFree() {
         bitField0_ = (bitField0_ & ~0x00001000);
         heapFree_ = 0L;
+        onChanged();
+        return this;
+      }
+
+      // optional int64 total_run_time = 14;
+      private long totalRunTime_ ;
+      /**
+       * <code>optional int64 total_run_time = 14;</code>
+       */
+      public boolean hasTotalRunTime() {
+        return ((bitField0_ & 0x00002000) == 0x00002000);
+      }
+      /**
+       * <code>optional int64 total_run_time = 14;</code>
+       */
+      public long getTotalRunTime() {
+        return totalRunTime_;
+      }
+      /**
+       * <code>optional int64 total_run_time = 14;</code>
+       */
+      public Builder setTotalRunTime(long value) {
+        bitField0_ |= 0x00002000;
+        totalRunTime_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional int64 total_run_time = 14;</code>
+       */
+      public Builder clearTotalRunTime() {
+        bitField0_ = (bitField0_ & ~0x00002000);
+        totalRunTime_ = 0L;
+        onChanged();
+        return this;
+      }
+
+      // optional int64 foreground_run_time = 15;
+      private long foregroundRunTime_ ;
+      /**
+       * <code>optional int64 foreground_run_time = 15;</code>
+       */
+      public boolean hasForegroundRunTime() {
+        return ((bitField0_ & 0x00004000) == 0x00004000);
+      }
+      /**
+       * <code>optional int64 foreground_run_time = 15;</code>
+       */
+      public long getForegroundRunTime() {
+        return foregroundRunTime_;
+      }
+      /**
+       * <code>optional int64 foreground_run_time = 15;</code>
+       */
+      public Builder setForegroundRunTime(long value) {
+        bitField0_ |= 0x00004000;
+        foregroundRunTime_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional int64 foreground_run_time = 15;</code>
+       */
+      public Builder clearForegroundRunTime() {
+        bitField0_ = (bitField0_ & ~0x00004000);
+        foregroundRunTime_ = 0L;
         onChanged();
         return this;
       }
@@ -85972,22 +86134,23 @@ public final class Messages {
       "AllianceRequestVote\022\n\n\002id\030\001 \001(\005\022\023\n\013allia" +
       "nce_id\030\002 \001(\005\022\033\n\023alliance_request_id\030\003 \001(" +
       "\005\022\021\n\tempire_id\030\004 \001(\005\022\r\n\005votes\030\005 \001(\005\022\014\n\004d",
-      "ate\030\006 \001(\003\"\234\002\n\013ErrorReport\022\027\n\017android_ver" +
+      "ate\030\006 \001(\003\"\321\002\n\013ErrorReport\022\027\n\017android_ver" +
       "sion\030\001 \001(\t\022\023\n\013phone_model\030\002 \001(\t\022\024\n\014packa" +
       "ge_name\030\003 \001(\t\022\023\n\013app_version\030\004 \001(\t\022\023\n\013st" +
       "ack_trace\030\005 \001(\t\022\017\n\007message\030\006 \001(\t\022\023\n\013repo" +
       "rt_time\030\007 \001(\003\022\021\n\tempire_id\030\010 \001(\005\022\017\n\007cont" +
       "ext\030\t \001(\t\022\027\n\017exception_class\030\n \001(\t\022\021\n\the" +
       "ap_size\030\013 \001(\003\022\026\n\016heap_allocated\030\014 \001(\003\022\021\n" +
-      "\theap_free\030\r \001(\003\"K\n\014ErrorReports\022;\n\007repo" +
-      "rts\030\001 \003(\0132*.au.com.codeka.common.protobu" +
-      "f.ErrorReport*\344\001\n\025SituationReportFilter\022",
-      "\013\n\007ShowAll\020\000\022\020\n\014MoveComplete\020\001\022\024\n\020BuildC" +
-      "ompleteAny\020\002\022\021\n\rFleetAttacked\020\003\022\022\n\016Fleet" +
-      "Destroyed\020\004\022\023\n\017FleetVictorious\020\005\022\022\n\016Colo" +
-      "nyAttacked\020\006\022\023\n\017ColonyDestroyed\020\007\022\026\n\022Bui" +
-      "ldCompleteShips\020\010\022\031\n\025BuildCompleteBuildi" +
-      "ng\020\t"
+      "\theap_free\030\r \001(\003\022\026\n\016total_run_time\030\016 \001(\003" +
+      "\022\033\n\023foreground_run_time\030\017 \001(\003\"K\n\014ErrorRe" +
+      "ports\022;\n\007reports\030\001 \003(\0132*.au.com.codeka.c",
+      "ommon.protobuf.ErrorReport*\344\001\n\025Situation" +
+      "ReportFilter\022\013\n\007ShowAll\020\000\022\020\n\014MoveComplet" +
+      "e\020\001\022\024\n\020BuildCompleteAny\020\002\022\021\n\rFleetAttack" +
+      "ed\020\003\022\022\n\016FleetDestroyed\020\004\022\023\n\017FleetVictori" +
+      "ous\020\005\022\022\n\016ColonyAttacked\020\006\022\023\n\017ColonyDestr" +
+      "oyed\020\007\022\026\n\022BuildCompleteShips\020\010\022\031\n\025BuildC" +
+      "ompleteBuilding\020\t"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
       new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
@@ -86437,7 +86600,7 @@ public final class Messages {
           internal_static_au_com_codeka_common_protobuf_ErrorReport_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_au_com_codeka_common_protobuf_ErrorReport_descriptor,
-              new java.lang.String[] { "AndroidVersion", "PhoneModel", "PackageName", "AppVersion", "StackTrace", "Message", "ReportTime", "EmpireId", "Context", "ExceptionClass", "HeapSize", "HeapAllocated", "HeapFree", });
+              new java.lang.String[] { "AndroidVersion", "PhoneModel", "PackageName", "AppVersion", "StackTrace", "Message", "ReportTime", "EmpireId", "Context", "ExceptionClass", "HeapSize", "HeapAllocated", "HeapFree", "TotalRunTime", "ForegroundRunTime", });
           internal_static_au_com_codeka_common_protobuf_ErrorReports_descriptor =
             getDescriptor().getMessageTypes().get(60);
           internal_static_au_com_codeka_common_protobuf_ErrorReports_fieldAccessorTable = new

@@ -211,7 +211,9 @@ public class ErrorReporter {
                         .setReportTime(DateTime.now().getMillis())
                         .setHeapSize(Debug.getNativeHeapSize())
                         .setHeapAllocated(Debug.getNativeHeapAllocatedSize())
-                        .setHeapFree(Debug.getNativeHeapFreeSize());
+                        .setHeapFree(Debug.getNativeHeapFreeSize())
+                        .setTotalRunTime(BackgroundDetector.i.getTotalRunTime())
+                        .setForegroundRunTime(BackgroundDetector.i.getTotalForegroundTime());
 
                 MyEmpire myEmpire = EmpireManager.i.getEmpire();
                 if (myEmpire != null) {

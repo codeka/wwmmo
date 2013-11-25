@@ -1,8 +1,9 @@
 {% extends "admin/skeleton.html" %}
 {% block title %}Dashboard{% endblock %}
-{% block content %}
+{% block head %}
   <script type="text/javascript" src="https://www.google.com/jsapi"></script>
-  
+{% endblock %}
+{% block content %}
   <h1>Active Empires</h1>
 
   <div id="n-day-actives" style="width: 90%; margin: 0 auto; height: 480px;"></div>
