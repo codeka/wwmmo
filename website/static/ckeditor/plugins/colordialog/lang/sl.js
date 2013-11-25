@@ -1,0 +1,1 @@
+﻿CKEDITOR.plugins.setLang("colordialog","sl",{clear:"Počisti",highlight:"Poudarjeno",options:"Color Options",selected:"Izbrano",title:"Izberi barvo"});

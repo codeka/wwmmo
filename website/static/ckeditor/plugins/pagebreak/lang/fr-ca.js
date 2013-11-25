@@ -1,0 +1,1 @@
+﻿CKEDITOR.plugins.setLang("pagebreak","fr-ca",{alt:"Page Break",toolbar:"Insérer un saut de page"});

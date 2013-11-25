@@ -1,0 +1,1 @@
+﻿CKEDITOR.plugins.setLang("horizontalrule","ja",{toolbar:"横罫線"});

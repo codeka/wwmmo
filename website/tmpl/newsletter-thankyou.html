@@ -1,0 +1,27 @@
+{% extends "skeleton.html" %}
+
+{% block header %}
+    <style>
+      section.maincontent {
+        width: 880px;
+        margin: 0 auto;
+        background: #fff;
+        margin-top: 50px;
+        padding: 10px;
+      }
+
+      @media only screen and (max-width: 900px) {
+        section.maincontent {
+          width: auto;
+        }
+      }
+    </style>
+{% endblock %}
+
+{% block maincontent %}
+  <section class="maincontent">
+    <h1>Thank you!</h1>
+    <p>Thank you for signing up, you should get a confirmation email shortly, and
+       you'll be getting a notification when the alpha is available.</p>
+  </section>
+{% endblock %}

@@ -1,0 +1,128 @@
+{% extends "skeleton.html" %}
+
+{% block header %}
+    <style>
+      section.maincontent {
+        position: relative;
+        width: 900px;
+        margin: 15px auto 0 auto;
+      }
+      section.screenshot-left {
+        position: absolute;
+        top: 0; left: 0;
+        width: 206px;
+      }
+      section.screenshot-right {
+        position: absolute;
+        top: 0; right: 0;
+        width: 206px;
+      }
+      section.blurb {
+        position: absolute;
+        top: 0;
+        left: 216px;
+        right: 216px;
+        background: #fff;
+        padding: 10px;
+      }
+      
+      p.centre {
+        text-align: center;
+      }
+
+      section.screenshot blockquote {
+        color: #fff;
+        margin: 0;
+        padding: 0;
+        border: none;
+        position: relative;
+        margin-top: 8pt;
+        text-shadow: rgba(0, 0, 0, 0.6) 2px 2px 1px;
+      }
+      section.screenshot-right blockquote {
+        text-align: right;
+      }
+      section.screenshot-left blockquote::before {
+        content: "“";
+        position: absolute;
+        top: -10pt;
+        left: -10pt;
+        font-size: 500%;
+        color: rgba(255, 255, 255, 0.3);
+      }
+      section.screenshot-right blockquote::after {
+        content: "”";
+        position: absolute;
+        top: -10pt;
+        right: -10pt;
+        font-size: 500%;
+        color: rgba(255, 255, 255, 0.3);
+      }
+      section.screenshot blockquote div.byline {
+        text-align: right;
+      }
+      section.screenshot blockquote div.byline a {
+        color: #fff;
+      }
+
+      @media only screen and (max-width: 900px) {
+        section.maincontent {
+          width: auto;
+        }
+
+        section.screenshot-left, section.screenshot-right {
+          position: static;
+          text-align: center;
+          width: auto;
+          margin-top: 10px;
+        }
+        section.blurb {
+          position: static;
+          width: auto;
+        }
+      }
+    </style>
+{% endblock %}
+
+{% block maincontent %}
+  <section class="maincontent">
+    <section class="blurb">
+      <p>Sorry... I'm not a web designer. In fact, I'm not much of a designer at
+      all. So if you&rsquo;re impressed by amazing graphics and beautiful web design,
+      then you're probably going to be disappointed.</p>
+      <p>However, if you <em>are</em> impressed with a compelling gameplay
+      mechanic, or you enjoy a <em>real</em> social gaming experience. If you
+      love a deep simulation and a game you can really sink your teeth into,
+      then hold onto your phone, you're in for a good time!</p>
+      <p>War Worlds is a massively-multiplayer <a href="http://en.wikipedia.org/wiki/4X">4X</a>
+      strategy game that is exclusively available on Android.</p>
+      <p>Explore an infinite universe, colonize worlds, harvest alien artifacts, raise an
+      army and <strong>conquer your enemies</strong>!</p>
+      <p>Development has only just begun, but you can already join the Alpha and
+      have <em>real</em> input into the development of this game.</p>
+      <p>While you're here, be sure to follow along at the <a href="/blog">development
+      blog</a>. And of course:</p>
+      <p class="centre">
+        <a href="https://play.google.com/store/apps/details?id=au.com.codeka.warworlds">
+          <img alt="Get it on Google Play"
+               src="https://developer.android.com/images/brand/en_generic_rgb_wo_45.png" />
+        </a>
+      </p>
+    </section>
+    <section class="screenshot screenshot-left">
+      <img src="/img/v{{resource_version}}/screens/starfield.png" width="206" height="400">
+      <blockquote>This 4X game could turn out to be one of the first great ones on mobile devices. We certainly hope so.
+      <div class="byline"><a href="http://www.gamesta.com/war-worlds-preview-android-4x-space-strategy/">&mdash; Gamesta</a></div>
+      </blockquote>
+    </section>
+    <section class="screenshot screenshot-right">
+      <img src="/img/v{{resource_version}}/screens/solarsystem.png" width="206" height="400">
+      <blockquote>I just woke up,<br />
+      grabbed my tablet.<br />
+      Girlfriend wanted a kiss.<br />
+      But I wanted to play this.<br />
+      Happy Valentines!
+      <div class="byline">&mdash; in-game player</div></blockquote>
+    </section>
+  </section>
+{% endblock %}

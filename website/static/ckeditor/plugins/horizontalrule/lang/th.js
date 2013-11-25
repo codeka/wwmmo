@@ -1,0 +1,1 @@
+﻿CKEDITOR.plugins.setLang("horizontalrule","th",{toolbar:"แทรกเส้นคั่นบรรทัด"});

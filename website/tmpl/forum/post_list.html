@@ -1,0 +1,32 @@
+{% extends "skeleton.html" %}
+{% import "forum/macros.html" as m %}
+
+{% block header %}{{m.html_header()}}{% endblock %}
+{% block pagetitle %}Forum &bull; {{forum.name}} &bull; {{forum_thread.subject}}{% endblock %}
+{% block title %}Forum &bull; {{forum.name}}{% endblock %}
+{% block headerlinks %}{{m.page_header(is_logged_in, user_profile, logout_url, login_url)}}{% endblock %}
+
+{% block maincontent %}
+  <section class="content">
+    <nav class="breadcrumbs">
+      <ul>
+        <li><a href="/">War Worlds</a>
+        <li><a href="/forum">Forums</a>
+        <li><a href="/forum/{{forum.slug}}">{{forum.name}}</a>
+        <li><span>{{forum_thread.subject}}</span>
+      </ul>
+    </nav>
+
+    <h1>{{forum_thread.subject}}</h1>
+  {% for post in posts %}
+    <article class="single-post">
+      <header>
+        <span class="posted">Posted <time itemprop="dateCreated" datetime="{{post|post_date_std}}">{{post|post_date_time}}</time></span>
+        <span class="author">by <a rel="author" href="/">{{post|forum_post_author}}</a></span>
+      </header>
+      {{post.content}}
+    </article>
+  {% endfor %}
+    <p><a href="/forum/{{forum.slug}}/{{forum_thread.slug}}/posts">Post Reply</a></p>
+  </section>
+{% endblock %}

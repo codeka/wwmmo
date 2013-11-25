@@ -1,0 +1,32 @@
+{% extends "admin/skeleton.html" %}
+{% block title %}Forum{% endblock %}
+{% block extracss %}
+  <link rel="stylesheet" href="/css/v1/forum_admin.css" />
+{% endblock %}
+{% block maincontent %}
+<h1>{% if forum %}Editing Forum &ldquo;{{forum.name}}&rdquo;{% else %}New Forum{% endif %}</h1>
+
+<div id="forum-container">
+  <form method="post">
+    <fieldset id="forum-details">
+      <legend>Forum Details</legend>
+        <div class="forum-field">
+          <label for="forum-name">Name:</label>
+          <input type="text" name="forum-name" id="forum-name"{% if forum %} value="{{forum.name}}"{% endif %}>
+        </div>
+        <div class="forum-field">
+          <label for="forum-slug">Slug:</label>
+          <label type="text" name="forum-slug" id="forum-slug"{% if forum %} value="{{forum.slug}}"{% endif %}>
+        </div>
+        <div class="forum-field forum-field-textarea">
+          <textarea name="forum-desc" id="forum-desc">{% if forum %}{{forum.description}}{% endif %}</textarea>
+        </div>
+        <div class="post-submit">
+          <input type="submit" name="action" value="Save">
+          <input type="submit" name="action" value="Save &amp; View">
+        </div>
+    </fieldset>
+  </form>
+</div>
+
+{% endblock %}

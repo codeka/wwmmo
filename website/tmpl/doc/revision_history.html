@@ -1,0 +1,29 @@
+{% extends "skeleton.html" %}
+{% import "doc/macros.html" as m %}
+
+{% block header %}
+  {{m.html_header(resource_version)}}
+{% endblock %}
+{% block pagetitle %}{{page.title}} &bull; Revision History{% endblock %}
+{% block title %}Revision History{% endblock %}
+{% block headerlinks %}{{m.user_info(is_logged_in, user_email, logout_url, login_url)}}{% endblock %}
+
+{% block maincontent %}
+  <section class="content revisions-content">
+    <h1>{{page.title}}</h1>
+    <p><a href="/doc{{page.slug}}">View Page</a></p>
+    <fieldset>
+      <legend>Revisions</legend>  
+      {% for rev in revisions %}
+        <article class="revision">
+          <h1>{{rev.date}} by {{rev.user}}</h1>
+          <p>xyz bytes, etc...</p>
+        </article>
+      {% endfor %}
+    </fieldset>
+    <section class="copyright">
+      Copyright &copy; 2012 by <a href="http://www.codeka.com.au/">Codeka Consulting</a>
+    </section>
+  </section>
+{% endblock %}
+

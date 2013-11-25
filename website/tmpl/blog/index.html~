@@ -1,0 +1,43 @@
+{% extends "skeleton.html" %}
+{% import "blog/post_macros.html" as pm %}
+
+{% block header %}{{pm.html_header()}}{% endblock %}
+{% block pagetitle %}Development Blog{% endblock %}
+{% block title %}Development Blog{% endblock %}
+{% block headerlinks %}<a href="/blog/rss" class="rss-btn"><img src="/img/rss.png" alt="RSS" width="32" height="32" title="RSS Feed" /></a>{% endblock %}
+
+{% block maincontent %}
+  <section class="posts">
+    {% for post in posts %}
+      {{ pm.post_body(post, True) }}
+      <div class="post-comment-count">
+        <a href="{{post|post_full_url}}#disqus_thread"></a>
+      </div>
+    {% endfor %}
+    <nav class="pages">
+      {% if pageNo > 1 %}
+      <a class="prev" href="?page={{pageNo-1}}">Newer Posts</a>
+      {% endif %}{% if pageNo == 1 %}
+      <a class="prev" href="/blog">Newer Posts</a>
+      {% endif %}
+      <a class="next" href="?page={{pageNo+1}}">Older Posts</a>
+    </nav>
+    <section class="copyright">
+      Copright &copy; 2012 by Dean Harding
+    </section>
+  </section>
+  <script type="text/javascript">
+    var disqus_shortname = 'war-worlds';
+    {% if is_development_server -%}
+var disqus_developer = true;
+    {%- endif %}
+
+    (function () {
+      var s = document.createElement('script'); s.async = true;
+      s.type = 'text/javascript';
+      s.src = 'http://' + disqus_shortname + '.disqus.com/count.js';
+      (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+    }());
+  </script>
+  {{pm.body_footer()}}
+{% endblock %}

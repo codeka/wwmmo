@@ -1,0 +1,28 @@
+{% extends "admin/skeleton.html" %}
+{% block title %}Posts{% endblock %}
+{% block maincontent %}
+  <h1>Posts</h1>
+  <table>
+    <tr>
+      <th>ID</th>
+      <th>Title</th>
+      <th>Posted</th>
+      <th>Published</th>
+      <th>Actions</th>
+    </tr>
+    {% for post in posts %}
+      <tr class="{{ loop.cycle('odd', 'even') }} {{post.isPublished ? published : unpublished}}">
+        <td>{{post|post_id}}</td>
+        <td>{{post.title}}</td>
+        <td>{{post.posted}}</td>
+        <td>{{post.isPublished}}</td>
+        <td>
+          <a href="posts/{{post|post_id}}">Edit</a> &bull;
+          <a href="/blog/{{post|post_url}}">View</a> &bull;
+          <a href="posts/{{post|post_id}}/delete">Delete</a>
+        </td>
+      </tr>
+    {% endfor %}
+  </table>
+  <a href="?page={{pageNo+1}}">Next Page</a>
+{% endblock %}

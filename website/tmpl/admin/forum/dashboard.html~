@@ -1,0 +1,5 @@
+{% extends "admin/skeleton.html" %}
+{% block title %}Forum{% endblock %}
+{% block maincontent %}
+<p>TODO: dashboard</p>
+{% endblock %}

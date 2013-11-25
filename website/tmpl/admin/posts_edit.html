@@ -1,0 +1,15 @@
+{% extends "admin/skeleton.html" %}
+{% import "admin/posts_macros.html" as posts %}
+
+{% block title %}New Post{% endblock %}
+{% block extracss %}
+  <style>
+    html, body {
+      overflow: hidden;
+    }
+  </style>
+{% endblock %}
+{% block maincontent %}
+  <h1>Edit Post</h1>
+  {{ posts.form(post, upload_url) }}
+{% endblock %}

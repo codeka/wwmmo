@@ -1,0 +1,1 @@
+﻿CKEDITOR.plugins.setLang("font","fr-ca",{fontSize:{label:"Taille",voiceLabel:"Font Size",panelTitle:"Taille"},label:"Police",panelTitle:"Police",voiceLabel:"Police"});

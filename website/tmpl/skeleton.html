@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<head>
+  <title>{% block pagetitleprefix %}War Worlds &bull; {% endblock %}{% block pagetitle %}An Android MMO{% endblock %}</title>
+  <meta name="viewport" content="width=device-width" />
+  <link rel="stylesheet" href="/css/v{{resource_version}}/reset.css">
+  <link rel="stylesheet" href="/css/v{{resource_version}}/style.css">
+  <link rel="stylesheet" href="/css/v{{resource_version}}/mobile.css" media="only screen and (max-width: 900px)" />
+  <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Quando">
+{% block header %}{% endblock %}
+</head>
+<body>
+    <header id="page-header">
+      <a href="/"><img class="logo" src="/img/logo.png?v=2" width="72" height="72" alt=""></a>
+      <div><h1><span class="war-worlds"><a href="/">War Worlds</a></span> <span class="extra">&bull; {% block title %}An Android&trade; MMO{% endblock %}</span></h1></div>
+      <a href="https://plus.google.com/114217154998683929092?prsrc=3" rel="publisher" class="gplus-btn"
+         title="Visit us on Google+">
+        <img src="https://ssl.gstatic.com/images/icons/gplus-32.png" alt="Google+" width="32" height="32">
+      </a>
+      <a href="http://twitter.com/WarWorlds" title="Follow us on Twitter!" class="twitter-btn">
+        <img src="/img/twitter.png" alt="Twitter" width="32" height="32" />
+      </a>
+      <ul class="main-nav">
+        <li><a href="/blog">Blog</a>
+        <li><a href="/doc/">Documentation</a>
+        <li><a href="https://play.google.com/store/apps/details?id=au.com.codeka.warworlds">Get the game</a>
+      </ul>
+      {% block headerlinks %}{% endblock %}
+    </header>
+{% if is_writer %}
+    <nav class="admin">
+      <ul>
+        <li><a href="/admin">Backend</a>
+{% block adminbuttons %}{% endblock %}
+      </ul>
+    </nav>
+{% endif %}
+{% block maincontent %}{% endblock %}
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-31689908-1']);
+    _gaq.push(['_trackPageview']);
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+</body>

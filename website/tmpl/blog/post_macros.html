@@ -1,0 +1,59 @@
+{% macro post_body(post, link_header) -%}
+  <article itemscope itemtype="http://schema.org/BlogPosting">
+    <header>
+      <h1 itemprop="name">
+        {% if link_header %}<a href="/blog/{{post|post_url}}">{{post.title}}</a>
+        {%- else %}{{post.title}}
+        {%- endif %}
+      </h1>
+      <span class="posted">Posted <time itemprop="dateCreated" datetime="{{post|post_date_std}}">{{post|post_date}}</time></span>
+      <span class="author">by <a rel="author" href="https://plus.google.com/111859491490622271994?rel=author">Dean Harding</a></span>
+    </header>
+    <div itemprop="articleBody">
+      {{post.html}}
+    </div>
+  </article>
+{%- endmacro %}
+
+{% macro html_header(resource_version) -%}
+  <link rel="stylesheet" href="/css/v{{resource_version}}/blog.css">
+  <link rel="stylesheet" href="/css/v{{resource_version}}/lightbox.css">
+  <link href="/css/v{{resource_version}}/highlight/shCore.css" rel="stylesheet" />
+  <link href="/css/v{{resource_version}}/highlight/shThemeDefault.css" rel="stylesheet" />
+  <link rel="alternate" type="application/rss+xml" title="RSS" href="/blog/rss" />
+
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+  <script src="/js/v{{resource_version}}/lightbox.js"></script>
+  <script src="/js/v{{resource_version}}/highlight/shCore.js"></script>
+  <script src="/js/v{{resource_version}}/highlight/shAutoloader.js"></script>
+{%- endmacro %}
+
+
+{% macro body_footer(resource_version) -%}
+<script>
+  function path() {
+    var args = arguments, result = [];
+    for(var i = 0; i < args.length; i++) {
+      result.push(args[i].replace('@', '/js/v{{resource_version}}/highlight/'));
+    }
+    return result;
+  }
+
+  SyntaxHighlighter.autoloader.apply(null, path(
+    'cpp c                  @shBrushCpp.js',
+    'c# c-sharp csharp      @shBrushCSharp.js',
+    'css                    @shBrushCss.js',
+    'java                   @shBrushJava.js',
+    'js jscript javascript  @shBrushJScript.js',
+    'php                    @shBrushPhp.js',
+    'text plain             @shBrushPlain.js',
+    'py python              @shBrushPython.js',
+    'sass scss              @shBrushSass.js',
+    'sql                    @shBrushSql.js',
+    'xml xhtml xslt html    @shBrushXml.js'
+  ));
+
+  SyntaxHighlighter.defaults['toolbar'] = false;
+  SyntaxHighlighter.all();
+</script>
+{%- endmacro %}

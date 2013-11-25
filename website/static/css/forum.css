@@ -1,0 +1,128 @@
+
+/* ------------------------------------------------------------------
+ * Overall
+ */
+
+header#page-header nav.forum-userinfo {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  color: #fff;
+}
+
+header#page-header nav.forum-userinfo a {
+  color: #99f;
+}
+
+
+/* ------------------------------------------------------------------
+ * Breadcrumbs
+ */
+
+nav.breadcrumbs ul {
+  margin: 0;
+  padding: 0;
+  list-style-type: none;
+  height: 20pt;
+  line-height: 20pt;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+nav.breadcrumbs li:before {
+  content: "»";
+  margin-right: 4pt;
+}
+
+nav.breadcrumbs li:first-child:before {
+  content: "";
+  margin-right: 0;
+}
+
+nav.breadcrumbs li {
+  display: inline;
+  margin-left: 4pt;
+}
+
+/* ------------------------------------------------------------------
+ * Post Viewing
+ */
+
+article.single-post header {
+  border-bottom: solid 1px #ccc;
+  padding-top: 10pt;
+}
+
+article.single-post header time {
+  font-weight: bold;
+}
+
+article.single-post header a {
+  font-weight: bold;
+  text-decoration: none;
+  color: #000;
+}
+
+article.single-post {
+  margin-bottom: 2em;
+}
+
+/* ------------------------------------------------------------------
+ * Post Editing
+ */
+
+fieldset {
+  border: none;
+  padding: 8pt 0 20pt 0;
+}
+
+div.forum-field {
+  height: 20pt;
+  position: relative;
+  margin: 8pt 0;
+}
+
+div.forum-field label {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 75pt;
+  line-height: 20pt;
+}
+
+div.forum-field input[type=text] {
+  position: absolute;
+  left: 75pt;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  border: solid 1px #ccc;
+  padding: 2pt 4pt;
+}
+
+div.forum-field.forum-field-markitup {
+  height: 300pt;
+}
+div.forum-field.forum-field-markitup label {
+  position: absolute;
+  top: 0; left: 0; height: 20pt; width: 75pt;
+  line-height: 20pt;
+}
+div.forum-field.forum-field-markitup textarea {
+  position: absolute;
+  top: 0; left: 75pt; bottom: 0; right: 0;
+  border: solid 1px #ccc;
+  padding: 2pt 4pt;
+}
+
+div.forum-field.forum-field-submit input {
+  position: absolute;
+  left: 75pt;
+  top: 0;
+  bottom: 0;
+  right: auto;
+  width: 100pt;
+}
+

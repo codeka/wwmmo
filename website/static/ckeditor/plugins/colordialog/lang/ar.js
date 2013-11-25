@@ -1,0 +1,1 @@
+﻿CKEDITOR.plugins.setLang("colordialog","ar",{clear:"مسح",highlight:"إلقاء الضوء",options:"Color Options",selected:"مُختار",title:"اختر لون"});

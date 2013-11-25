@@ -1,0 +1,1 @@
+﻿CKEDITOR.plugins.setLang("horizontalrule","lt",{toolbar:"Įterpti horizontalią liniją"});

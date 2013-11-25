@@ -1,0 +1,1 @@
+﻿CKEDITOR.plugins.setLang("specialchar","ar",{options:"Special Character Options",title:"اختر الخواص",toolbar:"إدراج  خاص.ِ"});

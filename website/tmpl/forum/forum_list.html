@@ -1,0 +1,78 @@
+{% extends "skeleton.html" %}
+{% import "forum/macros.html" as m %}
+
+{% block header %}
+  {{m.html_header()}}
+  <style>
+    div.forum-entry {
+      height: 40pt;
+      position: relative;
+      border-top: solid 1px #ccc;
+      margin-bottom: 1em;
+      margin-top: 0.5em;
+    }
+    div.forum-title {
+      position: absolute;
+      top: 0; left: 0; bottom: 0;
+      width: 50%;
+    }
+    div.forum-stats {
+      position: absolute;
+      top: 0; bottom: 0;
+      left: 50%;
+      width: 80pt;
+    }
+    div.last-post {
+      position: absolute;
+      left: 50%;
+      margin-left: 80pt;
+      right: 0; top: 0; bottom: 0;
+    }
+
+    div.forum-stats span {
+      font-weight: bold;
+    }
+
+    div.last-post {
+      font-size: 75%;
+    }
+  </style>
+{% endblock %}
+{% block pagetitle %}Forums{% endblock %}
+{% block title %}Forums{% endblock %}
+{% block headerlinks %}{{m.page_header(is_logged_in, user_profile, logout_url, login_url)}}{% endblock %}
+
+{% block maincontent %}
+  <section class="content">
+    <nav class="breadcrumbs">
+      <ul>
+        <li><a href="/">War Worlds</a>
+        <li><span>Forums</span>
+      </ul>
+    </nav>
+
+    <p>The War Worlds forums are a place to discuss various aspects of the game. I currently don't have a moderation
+       policy or "rules" as such, I just ask that people try to stay on-topic and be polite. I think we can all be
+       grown-ups here.</p>
+    <p>If you enjoy the game, I would encourage you to log in using the same Google Account that you use to play the
+       game, so that we can link your persona on the forums to your in-game Empire.</p>
+
+  {% for forum in forums %}
+    <div class="forum-entry">
+      <div class="forum-title">
+        <a href="/forum/{{forum.slug}}"><h2>{{forum.name}}</h2></a>
+        <div>{{forum.description}}</div>
+      </div>
+      <div class="forum-stats">
+        <div><span>{{post_counts[forum.slug]['threads'] if forum.slug in post_counts else '0'}}</span> threads</div>
+        <div><span>{{post_counts[forum.slug]['posts'] if forum.slug in post_counts else '0'}}</span> posts</div>
+      </div>
+      <div class="last-post">
+        <div class="post-title"><a href="/forum/{{forum.slug}}/{{top_threads[forum.slug].slug}}">{{top_threads[forum.slug].subject}}</a></div>
+        <div class="post-author">by <a href="/">{{top_thread_user_profiles[top_threads[forum.slug].user.user_id()].display_name}}</a></div>
+        <time datetime="{{top_threads[forum.slug]|post_date_std}}" class="post-date">{{top_threads[forum.slug]|post_date_time}}</time>
+      </div>
+    </div>
+  {% endfor %}
+  </section>
+{% endblock %}

@@ -1,0 +1,1 @@
+﻿CKEDITOR.plugins.setLang("horizontalrule","ar",{toolbar:"خط فاصل"});

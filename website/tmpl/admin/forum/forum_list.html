@@ -1,0 +1,26 @@
+{% extends "admin/skeleton.html" %}
+{% block title %}Forum{% endblock %}
+{% block maincontent %}
+<h1>Forums</h1>
+<table>
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Name</th>
+      <th>Description</th>
+      <th></th>
+    </tr>
+  </thead>
+{%- for forum in forums %}
+  <tr class="{{ loop.cycle('odd', 'even') }}">
+    <td>{{forum.key().id_or_name()}}</td>
+    <td>{{forum.name}}</td>
+    <td>{{forum.description}}</td>
+    <td><a href="/admin/forum/forums/edit/{{forum.key().id_or_name()}}">Edit</a></td>
+  </tr>
+{%- endfor %}
+</table>
+
+<p><a href="/admin/forum/forums/edit">New Forum</a></p>
+
+{% endblock %}

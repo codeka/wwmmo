@@ -1,0 +1,1 @@
+﻿CKEDITOR.plugins.setLang("horizontalrule","bn",{toolbar:"রেখা যুক্ত কর"});

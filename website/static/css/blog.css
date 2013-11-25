@@ -1,0 +1,55 @@
+
+p.centre {
+  text-align: center;
+}
+
+blockquote {
+  margin: 0 2em;
+  padding-left: 1em;
+  border-left: solid 2px #aaa;
+}
+
+span.author a {
+    font-weight: bold;
+    text-decoration: none;
+    color: #222;
+}
+
+nav.pages {
+  border-top: solid 1px #ccc;
+}
+
+nav.pages a.prev {
+  display: block;
+  float: left;
+}
+nav.pages a.next {
+  display: block;
+  float: right;
+}
+
+section.content header h1 a {
+  color: #00a;
+  text-decoration: none;
+}
+section.content header {
+  border-bottom: solid 1px #ccc;
+  padding-top: 10pt;
+}
+section.content article {
+  margin-bottom: 5em;
+}
+
+section.content article time {
+  font-weight: bold;
+}
+
+div.post-comment-count {
+    position: relative;
+    top: -4em;
+}
+
+div.newsletter-cta {
+    margin-top: 1em;
+    border-top: solid 1px #999;
+}

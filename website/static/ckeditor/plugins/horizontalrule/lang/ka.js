@@ -1,0 +1,1 @@
+﻿CKEDITOR.plugins.setLang("horizontalrule","ka",{toolbar:"ჰორიზონტალური ხაზის ჩასმა"});

@@ -1,0 +1,58 @@
+{% macro form(post, upload_url) -%}
+<div id="post-container">
+  <form method="post">
+    <fieldset id="post-details">
+      <legend>Post Details</legend>
+        <div class="post-details-header">
+          <div class="post-title">
+            <label for="post-title">Title:</label>
+            <input type="text" name="post-title" id="post-title"{% if post %} value="{{post.title|escape}}"{% endif %}>
+          </div>
+        </div>
+        <div class="post-details-content">
+          <textarea name="post-content" id="post-content">{% if post %}{{post.html|escape}}{% endif %}</textarea>
+        </div>
+        <div class="post-details-footer">
+          <div class="post-title">
+            <label for="post-tags">Tags:</label>
+            <input type="text" name="post-tags" id="post-tags"{% if post %} value="{{post|post_tags}}"{% endif %}>
+          </div>
+          <div class="post-title">
+            <label for="post-slug">Slug:</label>
+            <input type="text" name="post-slug" id="post-slug"{% if post and post.slug %} value="{{post.slug}}"{% endif %}
+                   placeholder="Leave blank for default">
+          </div>
+          <div class="post-date">
+            <label for="post-date">Posted:</label>
+            <input type="text" name="post-date" id="post-date"{% if post %} value="{{post|post_date_editable}}"{% endif %}>
+          </div>
+          <div class="post-ispublished">
+            <input type="checkbox" name="post-ispublished" id="post-ispublished"{% if post.isPublished %} checked{% endif %}>
+            <label for="post-ispublished">Published</label>
+          </div>
+          <div class="post-submit">
+            <input type="submit" name="action" value="Save">
+            <input type="submit" name="action" value="Save &amp; View">
+            {% if post %}
+              <a class="dont-save-just-view" href="/blog/{{post|post_url}}">Don't save, just view</a>
+            {% endif %}
+          </div>
+        </div>
+    </fieldset>
+
+    <script>
+      $(function() {
+        var editor = CKEDITOR.replace("post-content");
+        var $container = $("#post-details div.post-details-content");
+  
+        CKEDITOR.on('instanceReady', function() {
+          editor.resize($container.width(), $container.height());
+        });
+        $(window).resize(function() {
+          editor.resize($container.width(), $container.height());
+        });
+      });
+    </script>
+  </form>
+</div>
+{%- endmacro %}

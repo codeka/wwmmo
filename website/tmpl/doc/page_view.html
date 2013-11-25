@@ -1,0 +1,29 @@
+{% extends "skeleton.html" %}
+{% import "doc/macros.html" as m %}
+
+{% block header %}
+  {{m.html_header(resource_version)}}
+{% endblock %}
+{% block pagetitle %}{{page.title}}{% endblock %}
+{% block title %}{{page.title}}{% endblock %}
+{% block headerlinks %}{{m.user_info(is_logged_in, user_email, logout_url, login_url)}}{% endblock %}
+
+{% block maincontent %}
+  <section class="content view-content">
+    {% if is_logged_in %}
+      <nav class="page-controls">
+        <h4>Controls</h4>
+        <ul>
+          <li><a href="/doc/_/edit?slug={{page.slug}}">Edit this page</a>
+          <li><a href="/doc/_/delete?slug={{page.slug}}">Delete this page</a>
+          <li><a href="/doc/_/revisions?slug={{page.slug}}">Revision History</a>
+        </ul>
+      </nav>
+    {% endif %}
+    {{page.content}}
+    <section class="copyright">
+      Copyright &copy; 2012 by <a href="http://www.codeka.com.au/">Codeka Consulting</a>
+    </section>
+  </section>
+{% endblock %}
+

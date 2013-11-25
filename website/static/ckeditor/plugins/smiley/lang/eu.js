@@ -1,0 +1,1 @@
+﻿CKEDITOR.plugins.setLang("smiley","eu",{options:"Smiley Options",title:"Aurpegiera Sartu",toolbar:"Aurpegierak"});

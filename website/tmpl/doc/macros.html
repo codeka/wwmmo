@@ -1,0 +1,17 @@
+{% macro html_header(resource_version) -%}
+  <link rel="stylesheet" href="/css/v{{resource_version}}/doc.css" />
+  <link rel="stylesheet" href="/css/v{{resource_version}}/lightbox.css">
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+  <script src="/js/v{{resource_version}}/lightbox.js"></script>
+  <script src="/js/v{{resource_version}}/doc.js"></script>
+{%- endmacro %}
+
+{% macro user_info(is_logged_in, user_email, logout_url, login_url) -%}
+  <nav class="doc-userinfo">
+  {% if is_logged_in %}
+    Welcome, {{user_email}}.
+    <a href="{{logout_url}}">Log out</a>
+  {% endif %}
+  </nav>
+{%- endmacro %}
+

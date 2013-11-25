@@ -1,0 +1,25 @@
+
+
+  // update all <time> elements on the page to be in local time, rather than UTC
+  $(function() {
+    function zero_pad(n) {
+      n = "00"+n;
+      return n.substr(n.length - 2);
+    }
+
+    var month_names = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    $("time[datetime]").each(function() {
+      var dt = new Date($(this).attr("datetime")+" UTC");
+
+      var hours = dt.getHours();
+      var ampm = (hours >= 12 ? "pm" : "am");
+      if (hours == 0) {
+        hours = 12;
+      } else if (hours > 12) {
+        hours -= 12;
+      }
+
+      var dtstr = dt.getDate()+" "+month_names[dt.getMonth()]+" "+dt.getFullYear()+" "+zero_pad(hours)+":"+zero_pad(dt.getMinutes())+" "+ampm;
+      $(this).html(dtstr);
+    });
+  })();

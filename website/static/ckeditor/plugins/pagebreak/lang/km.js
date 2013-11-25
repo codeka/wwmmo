@@ -1,0 +1,1 @@
+﻿CKEDITOR.plugins.setLang("pagebreak","km",{alt:"Page Break",toolbar:"បន្ថែម ការផ្តាច់ទំព័រ"});

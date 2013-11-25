@@ -1,0 +1,1 @@
+﻿CKEDITOR.plugins.setLang("horizontalrule","ru",{toolbar:"Вставить горизонтальную линию"});

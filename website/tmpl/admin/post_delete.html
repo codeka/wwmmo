@@ -1,0 +1,13 @@
+{% extends "admin/skeleton.html" %}
+{% import "admin/posts_macros.html" as posts %}
+
+{% block title %}Delete Post{% endblock %}
+{% block maincontent %}
+  <h1>Delete Post</h1>
+  <p>Are you sure you want to delete this post?</p>
+  <blockquote>
+    <h2>{{post.title}}</h2>
+    <p>{{post|post_extract}}</p>
+  </blockquote>
+  <form method="post"><input type="submit" value="Delete"></form>
+{% endblock %}

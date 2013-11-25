@@ -1,0 +1,1 @@
+﻿CKEDITOR.plugins.setLang("pagebreak","eu",{alt:"Page Break",toolbar:"Txertatu Orrialde-jauzia"});

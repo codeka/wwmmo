@@ -1,0 +1,1 @@
+﻿CKEDITOR.plugins.setLang("colordialog","ku",{clear:"پاککردنهوه",highlight:"نیشانکردن",options:"ههڵبژاردهی ڕهنگهکان",selected:"ههڵبژاردرا",title:"ههڵبژاردنی ڕهنگ"});
