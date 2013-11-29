@@ -4,7 +4,6 @@
 {% block header %}{{m.html_header()}}{% endblock %}
 {% block pagetitle %}Forum &bull; {{forum.name}} &bull; {{forum_thread.subject}}{% endblock %}
 {% block title %}Forum &bull; {{forum.name}}{% endblock %}
-{% block headerlinks %}{{m.page_header(is_logged_in, user_profile, logout_url, login_url)}}{% endblock %}
 
 {% block maincontent %}
   <section class="content">

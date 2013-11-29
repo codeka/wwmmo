@@ -159,7 +159,7 @@ public class BuildCompleteEvent extends Event {
         // todo: hard-coded?
         if (designID.equals("colonyship")) {
             // remove 100 population from the colony that built this guy
-            new ColonyController().reducePopulation(colony, 100.0f);
+            //new ColonyController().reducePopulation(colony, 100.0f);
         }
 
         return newFleet;

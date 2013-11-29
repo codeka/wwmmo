@@ -1,12 +1,16 @@
 
-import jinja2, os
-import webapp2 as webapp
+import jinja2
+import json
 import logging
+import os
 import time
+import urllib
+import webapp2 as webapp
 
 from google.appengine.api import memcache
 from google.appengine.api import users
 
+from ctrl import profile as profile_ctrl
 
 # This value gets incremented every time we deploy so that we can cache bust
 # our static resources (css, js, etc)
@@ -61,7 +65,27 @@ def _filter_post_extract(post):
 jinja.filters['post_extract'] = _filter_post_extract
 
 
+def _filter_dump_json(obj):
+  return json.dumps(obj)
+jinja.filters['dump_json'] = _filter_dump_json
+
+
 class BaseHandler(webapp.RequestHandler):
+  def dispatch(self):
+    """Dispatches the current request.
+
+    Basically, we do some quick checks (e.g. to see whether the user is logged in, but hasn't yet set up
+    a profile), then defer to the base class's method to do the actual dispatching."""
+    self.user = users.get_current_user()
+    if self.user:
+      # they're logged in, so check to see whether they have a profile set up.
+      self.profile = profile_ctrl.getProfile(self.user.user_id())
+      if not self.profile and self.request.path != '/profile':
+        self.redirect('/profile')
+        return
+
+    super(BaseHandler, self).dispatch()
+
   def render(self, tmplName, args):
     user = users.get_current_user()
 
@@ -71,7 +95,7 @@ class BaseHandler(webapp.RequestHandler):
     if user:
       args['is_logged_in'] = True
       args['logout_url'] = users.create_logout_url(self.request.uri)
-      args['is_writer'] = (user.email() == 'dean@codeka.com.au')
+      args['is_writer'] = (user.email() == 'dean@codeka.com.au' or user.email() == 'lam.h.emily@gmail.com')
       args['user_email'] = user.email()
     else:
       args['is_logged_in'] = False
@@ -84,6 +108,11 @@ class BaseHandler(webapp.RequestHandler):
       args['is_development_server'] = False
       args['resource_version'] = RESOURCE_VERSION
 
+    if self.user and self.profile:
+      args['user_profile'] = self.profile
+    else:
+      args['user_profile'] = None
+
 
     tmpl = jinja.get_template(tmplName)
     self.response.out.write(tmpl.render(args))
@@ -92,3 +121,15 @@ class BaseHandler(webapp.RequestHandler):
     super(BaseHandler, self).error(code)
     if code == 404:
       self.render("404.html", {})
+
+  def _isLoggedIn(self):
+    """For pages that require a logged-in user, this can be called to ensure you're logged in."""
+    self.user = users.get_current_user()
+    if not self.user:
+      # not logged in, so redirect to the login page
+      self.redirect(users.create_login_url(self.request.path_qs))
+      return False
+
+    return True
+
+

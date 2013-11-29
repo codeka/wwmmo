@@ -76,7 +76,7 @@ public class EmpiresSearchHandler extends RequestHandler {
         for (Empire empire : empires) {
             Messages.Empire.Builder empire_pb = Messages.Empire.newBuilder();
             empire.toProtocolBuffer(empire_pb);
-            if (empire.getID() != getSession().getEmpireID() && !getSession().isAdmin()) {
+            if (getSessionNoError() == null || empire.getID() != getSession().getEmpireID() && !getSession().isAdmin()) {
                 // if it's not our empire....
                 empire_pb.setCash(0);
             }

@@ -44,8 +44,11 @@ handlers:
 - url: /blog(/.*)?
   script: handlers.blog.app
 
-#- url: /forum(/.*)?
-#  script: handlers.forum.app
+- url: /forum(/.*)?
+  script: handlers.forum.app
+
+- url: /profiles?(/.*)?
+  script: handlers.profiles.app
 
 - url: /doc(/.*)?
   script: handlers.doc.app

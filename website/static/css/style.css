@@ -19,9 +19,9 @@ fieldset legend {
   color: #900;
 }
 
-h1 { font-family: Quando, serif; font-size: 16pt; font-weight: bold; }
-h2 { font-family: Quando, serif; font-size: 14pt; font-weight: bold; }
-h3 { font-family: Quando, serif; font-size: 12pt; font-weight: bold; font-style: italic; }
+h1 { font-family: Quando, serif; font-size: 16pt; font-weight: bold; margin-top: 1em; }
+h2 { font-family: Quando, serif; font-size: 14pt; font-weight: bold; margin-top: 1em; }
+h3 { font-family: Quando, serif; font-size: 12pt; font-weight: bold; font-style: italic; margin-top: 1em; }
 
 ul {
   list-style-type: disc;
@@ -104,6 +104,17 @@ header#page-header ul.main-nav li a {
   color: #fff;
 }
 
+header#page-header nav.userinfo {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  color: #fff;
+}
+
+header#page-header nav.userinfo a {
+  color: #99f;
+}
+
 header a.gplus-btn img {
   display: block;
   position: absolute;
@@ -160,4 +171,30 @@ section.copyright {
   margin: 2em 0;
   padding-bottom: 2em;
   text-align: center;
+}
+
+nav.breadcrumbs ul {
+  margin: 0;
+  padding: 0;
+  list-style-type: none;
+  height: 20pt;
+  line-height: 20pt;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+nav.breadcrumbs li:before {
+  content: "»";
+  margin-right: 4pt;
+}
+
+nav.breadcrumbs li:first-child:before {
+  content: "";
+  margin-right: 0;
+}
+
+nav.breadcrumbs li {
+  display: inline;
+  margin-left: 4pt;
 }

@@ -1,5 +1,6 @@
 
 from HTMLParser import HTMLParser
+import os
 
 from google.appengine.api import memcache
 
@@ -40,3 +41,8 @@ def findCursor(query, keyname, page_no, page_size):
     memcache.set('post-page-cursor:%s:%d:%d' % (keyname, cursor_page, page_size), cursor)
 
   return cursor
+
+
+def isDevelopmentServer():
+  """Returns True if we're running on the development server."""
+  return os.environ["SERVER_SOFTWARE"].startswith("Development")

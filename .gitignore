@@ -5,5 +5,11 @@
 *.war
 *.ear
 
+# Python files
+*.pyc
+
+# Temp files
+*~
+
 .gitignore
 

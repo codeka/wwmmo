@@ -1,0 +1,89 @@
+{% extends "skeleton.html" %}
+
+{% block header %}
+  <style>
+    div.profile-field {
+      position: relative;
+      height: 20pt;
+      line-height: 20pt;
+    }
+    div.profile-field div {
+      display: block;
+      position: absolute;
+      top: 0;
+      left: 90pt;
+      right: 0;
+    }
+    div.profile-field input[type=text] {
+      width: 80%;
+    }
+
+    form {
+      padding-bottom: 5em;
+    }
+  </style>
+{% endblock %}
+{% block pagetitle %}Profile{% endblock %}
+{% block title %}Profile{% endblock %}
+{% block headerlinks %}{% endblock %}
+
+{% block maincontent %}
+  <section class="content">
+    <nav class="breadcrumbs">
+      <ul>
+        <li><a href="/">War Worlds</a>
+        <li><span>Profile</span>
+      </ul>
+    </nav>
+
+    <h1>Profile</h1>
+    <p>Your profile is how you appear to other users of the War Worlds website. It's probably a good idea to link your
+    profile to your empire in the game below, which will allow people to recognize you in the forums as well as in the
+    game. You also get extra features like being able to see your in-game stats on your posts and so on.</p>
+
+    <form method="POST">
+      <h2>Linked Empire</h2>
+      <select name="linked_empire">
+        <option value="">None</option>
+        {% if empires|length == 1 %}
+          {% for realm_name, empire in empires.iteritems() %}
+            <option value="{{realm_name}}:{{empire.empires[0].key}}">{{empire.empires[0].display_name}}</option>
+          {% endfor %}
+        {% else %}
+          {% for realm_name, empire in empires.iteritems() %}
+            <option value="{{realm_name}}:{{empire.empires[0].key}}">{{realm_name}}: {{empire.empires[0].display_name}}</option>
+          {% endfor %}
+        {% endif %}
+      </select>
+
+      <h2>Display Preferences</h2>
+      <p>Choose how you'd like to appear to other users on the website.</p>
+
+      <div class="profile-field">
+        <label for="display_name">Display Name:</label>
+        <div><input type="text" name="display_name" id="display_name" value="" placeholder=""></div>
+      </div>
+
+      <div class="profile-field">
+        <input type="submit" value="Save">
+      </div>
+    </form>
+  </section>
+  <script>
+    $(function() {
+      $("select").on("change", function() {
+        if ($(this).val() == "") {
+          $("#display_name").prop("disabled", false);
+        } else {
+          $("#display_name").prop("disabled", true);
+        }
+      });
+
+      var selectedEmpire = "{{user_profile.realm_name}}:{{user_profile.empire_id}}";
+      if (selectedEmpire != ":") {
+        $("select").val(selectedEmpire).change();
+      }
+      $("#display_name").val("{{user_profile.display_name}}");
+    });
+  </script>
+{% endblock %}

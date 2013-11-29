@@ -6,11 +6,10 @@
 {% endblock %}
 {% block pagetitle %}{{page.title}}{% endblock %}
 {% block title %}{{page.title}}{% endblock %}
-{% block headerlinks %}{{m.user_info(is_logged_in, user_email, logout_url, login_url)}}{% endblock %}
 
 {% block maincontent %}
   <section class="content view-content">
-    {% if is_logged_in %}
+    {% if is_writer %}
       <nav class="page-controls">
         <h4>Controls</h4>
         <ul>

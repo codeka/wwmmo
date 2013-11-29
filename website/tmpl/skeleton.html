@@ -6,6 +6,7 @@
   <link rel="stylesheet" href="/css/v{{resource_version}}/style.css">
   <link rel="stylesheet" href="/css/v{{resource_version}}/mobile.css" media="only screen and (max-width: 900px)" />
   <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Quando">
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
 {% block header %}{% endblock %}
 </head>
 <body>
@@ -24,6 +25,15 @@
         <li><a href="/doc/">Documentation</a>
         <li><a href="https://play.google.com/store/apps/details?id=au.com.codeka.warworlds">Get the game</a>
       </ul>
+      <nav class="userinfo">
+        {% if is_logged_in %}
+          Welcome, <a href="/profile">{{'New User' if not user_profile else user_profile.display_name}}</a>.
+          <a href="{{logout_url}}">Log out</a>
+        {% else %}
+          You&rsquo;re not logged in.
+          <a href="{{login_url}}">Log in</a>
+        {% endif %}
+      </nav>
       {% block headerlinks %}{% endblock %}
     </header>
 {% if is_writer %}

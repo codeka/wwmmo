@@ -1,49 +1,4 @@
 
-/* ------------------------------------------------------------------
- * Overall
- */
-
-header#page-header nav.forum-userinfo {
-  position: absolute;
-  right: 0;
-  bottom: 0;
-  color: #fff;
-}
-
-header#page-header nav.forum-userinfo a {
-  color: #99f;
-}
-
-
-/* ------------------------------------------------------------------
- * Breadcrumbs
- */
-
-nav.breadcrumbs ul {
-  margin: 0;
-  padding: 0;
-  list-style-type: none;
-  height: 20pt;
-  line-height: 20pt;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-nav.breadcrumbs li:before {
-  content: "»";
-  margin-right: 4pt;
-}
-
-nav.breadcrumbs li:first-child:before {
-  content: "";
-  margin-right: 0;
-}
-
-nav.breadcrumbs li {
-  display: inline;
-  margin-left: 4pt;
-}
 
 /* ------------------------------------------------------------------
  * Post Viewing
