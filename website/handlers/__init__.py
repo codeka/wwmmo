@@ -65,6 +65,17 @@ def _filter_post_extract(post):
 jinja.filters['post_extract'] = _filter_post_extract
 
 
+def _filter_profile_shield(profile):
+  if not profile:
+    return "/img/blank.png"
+  if profile.display_name == "Dean": # TODO: better than this!!
+    return "/img/hal-64.png"
+  if not profile.empire_id:
+    return "/img/blank.png"
+  return "http://localhost:8080/realms/beta/empires/"+str(profile.empire_id)+"/shield?final=1&size=64"
+jinja.filters['profile_shield'] = _filter_profile_shield
+
+
 def _filter_dump_json(obj):
   return json.dumps(obj)
 jinja.filters['dump_json'] = _filter_dump_json

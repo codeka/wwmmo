@@ -14,10 +14,7 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
-import org.andengine.opengl.texture.ITexture;
-import org.andengine.opengl.texture.ITextureStateListener;
 import org.andengine.opengl.texture.TextureOptions;
-import org.andengine.opengl.texture.atlas.ITextureAtlas;
 import org.andengine.opengl.texture.atlas.ITextureAtlas.ITextureAtlasStateListener;
 import org.andengine.opengl.texture.atlas.bitmap.BitmapTextureAtlas;
 import org.andengine.opengl.texture.atlas.bitmap.BitmapTextureAtlasTextureRegionFactory;

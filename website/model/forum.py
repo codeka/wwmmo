@@ -23,11 +23,6 @@ class ForumPost(db.Model):
   content = db.TextProperty(required=True)
 
 
-class ForumUserProfile(db.Model):
-  user = db.UserProperty(required=True)
-  display_name = db.StringProperty(required=True)
-
-
 class ForumShardedCounter(db.Model):
   """This is a simple sharded counter that contains counts of various posts.
 

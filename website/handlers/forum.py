@@ -9,6 +9,7 @@ from google.appengine.api import users
 from google.appengine.api import memcache
 
 import ctrl.forum
+import ctrl.profile
 import model.forum
 import handlers
 
@@ -19,67 +20,8 @@ handlers.jinja.filters['forum_post_author'] = _filter_forum_post_author
 
 
 class ForumPage(handlers.BaseHandler):
-  def _isLoggedIn(self):
-    """For pages that require a logged-in user, this can be called to ensure you're logged in."""
-    self.user = users.get_current_user()
-    if not self.user:
-      # not logged in, so redirect to the login page
-      self.redirect("/forum/login?"+urllib.urlencode({"continue": self.request.path_qs}))
-      return False
+  pass
 
-    return True
-
-  def render(self, tmplName, args):
-    if not args:
-      args = {}
-
-    if self.user and self.profile:
-      args['user_profile'] = self.profile
-    else:
-      args['user_profile'] = None
-
-    super(ForumPage, self).render(tmplName, args)
-
-  def dispatch(self):
-    """If the user is logged in, make sure they have a profile."""
-    self.user = users.get_current_user()
-    if self.user:
-      # logged in, so try to fetch their profile
-      self.profile = ctrl.forum.getUserProfile(self.user)
-      if not self.profile:
-        # if we're ON the profile page, don't redirect!
-        if self.request.path_qs[0:14] != "/forum/profile":
-          self.redirect("/forum/profile?"+urllib.urlencode({"continue": self.request.path_qs}))
-          return
-
-    super(ForumPage, self).dispatch()
-
-
-class LoginPage(ForumPage):
-  def get(self):
-    self.render("forum/login.html", {"login_url": users.create_login_url(self.request.get("continue"))})
-
-
-class ProfilePage(ForumPage):
-  def get(self):
-    self.render("forum/profile_edit.html", {"profile": self.profile})
-
-  def post(self):
-
-    display_name = self.request.POST.get("profile-displayname")
-
-    if not self.profile:
-      self.profile = model.forum.ForumUserProfile(display_name=display_name,
-                                                  user = self.user)
-
-    self.profile.display_name = display_name
-    self.profile.put()
-    memcache.set("forum:user:%s" % (self.user.user_id()), self.profile)
-
-    if self.request.get("continue") != "":
-      self.redirect(self.request.get("continue"))
-    else:
-      self.redirect(self.request.path_qs)
 
 class ForumListPage(ForumPage):
   def get(self):
@@ -87,12 +29,12 @@ class ForumListPage(ForumPage):
     post_counts = ctrl.forum.getForumThreadPostCounts()
     top_threads = ctrl.forum.getTopThreadsPerForum(forums)
 
-    top_thread_users = []
+    top_thread_user_ids = []
     for forum in forums:
       top_thread = top_threads[forum.slug]
-      if top_thread.user not in top_thread_users:
-        top_thread_users.append(top_thread.user)
-    top_thread_user_profiles = ctrl.forum.getUserProfiles(top_thread_users)
+      if top_thread.user.user_id() not in top_thread_user_ids:
+        top_thread_user_ids.append(top_thread.user.user_id())
+    top_thread_user_profiles = ctrl.profile.getProfiles(top_thread_user_ids)
 
     self.render("forum/forum_list.html", {"forums": forums,
                                           "post_counts": post_counts,
@@ -120,13 +62,13 @@ class ThreadListPage(ForumPage):
     post_counts = ctrl.forum.getThreadPostCounts(threads)
     last_posts = ctrl.forum.getLastPostsByForumThread(threads)
 
-    users = []
+    user_ids = []
     for thread in threads:
-      if thread.user not in users:
-        users.append(thread.user)
-      if last_posts[thread.key()].user not in users:
-        users.append(last_posts[thread.key()].user)
-    profiles = ctrl.forum.getUserProfiles(users)
+      if thread.user.user_id() not in user_ids:
+        user_ids.append(thread.user.user_id())
+      if last_posts[thread.key()].user.user_id() not in user_ids:
+        user_ids.append(last_posts[thread.key()].user.user_id())
+    profiles = ctrl.profile.getProfiles(user_ids)
 
     self.render("forum/thread_list.html", {"forum": forum,
                                            "threads": threads,
@@ -156,9 +98,16 @@ class PostListPage(ForumPage):
 
     posts = ctrl.forum.getPosts(forum, forum_thread, page_no, 25)
 
+    user_ids = []
+    for post in posts:
+      if post.user.user_id() not in user_ids:
+        user_ids.append(post.user.user_id())
+    profiles = ctrl.profile.getProfiles(user_ids)
+
     self.render("forum/post_list.html", {"forum": forum,
                                          "forum_thread": forum_thread,
                                          "posts": posts,
+                                         "profiles": profiles,
                                          "page_no": page_no})
 
 
@@ -235,8 +184,6 @@ class EditPostPage(ForumPage):
 
 
 app = webapp.WSGIApplication([("/forum/?", ForumListPage),
-                              ("/forum/login", LoginPage),
-                              ("/forum/profile", ProfilePage),
                               ("/forum/([^/]+)/?", ThreadListPage),
                               ("/forum/([^/]+)/posts", EditPostPage),
                               ("/forum/([^/]+)/([^/]+)", PostListPage),

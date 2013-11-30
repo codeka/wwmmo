@@ -24,3 +24,4 @@ class Profile(db.Model):
       profile.empire_id = empire_id
       profile.display_name = display_name
     profile.put()
+    return profile

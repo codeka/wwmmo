@@ -6,7 +6,7 @@ from google.appengine.api import memcache
 from google.appengine.api import urlfetch
 
 import ctrl
-from model import profile
+import model.profile
 
 
 def getEmpiresForUser(user_email):
@@ -40,10 +40,46 @@ def getEmpiresForUser(user_email):
 
 
 def saveProfile(user_id, realm_name, empire_id, display_name):
-  # TODO: cache
-  profile.Profile.SaveProfile(user_id, realm_name, empire_id, display_name)
+  profile = model.profile.Profile.SaveProfile(user_id, realm_name, empire_id, display_name)
+  keyname = "profile:%s" % (user_id)
+  memcache.set(keyname, profile)
 
 
 def getProfile(user_id):
-  # TODO: cache
-  return profile.Profile.GetProfile(user_id)
+  keyname = "profile:%s" % (user_id)
+  profile = memcache.get(keyname)
+  if not profile:
+    profile = model.profile.Profile.GetProfile(user_id)
+    if profile:
+      memcache.set(keyname, profile)
+  return profile
+
+
+def getProfiles(user_ids):
+  """Fetches profiles of multiple users at once.
+
+  Args:
+    user_ids: A list of user_id objects we want to fetch profiles for.
+  Returns
+    A mapping of user_id > profile for each matched user.
+  """
+  keynames = []
+  for user_id in user_ids:
+    keynames.append("profile:%s" % (user_id))
+  cache_mapping = memcache.get_multi(keynames)
+
+  for user_id in user_ids:
+    keyname = "profile:%s" % (user_id)
+    if keyname not in cache_mapping:
+      profile = model.profile.Profile.GetProfile(user_id)
+      cache_mapping[keyname] = profile
+
+      if profile:
+        memcache.set(keyname, profile)
+
+  memcache.set_multi(cache_mapping)
+
+  profiles = {}
+  for user_id in user_ids:
+    profiles[user_id] = cache_mapping["profile:%s" % (user_id)]
+  return profiles

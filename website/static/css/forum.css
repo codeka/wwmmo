@@ -7,6 +7,7 @@
 article.single-post header {
   border-bottom: solid 1px #ccc;
   padding-top: 10pt;
+  margin-left: 70px;
 }
 
 article.single-post header time {
@@ -21,6 +22,20 @@ article.single-post header a {
 
 article.single-post {
   margin-bottom: 2em;
+}
+
+article.single-post div.content {
+  margin-left: 70px;
+}
+
+article.single-post div.content p:nth-child(1) {
+  margin-top: 0;
+}
+
+article .poster-shield {
+  float: left;
+  margin-right: 6px;
+  margin-top: 12px;
 }
 
 /* ------------------------------------------------------------------

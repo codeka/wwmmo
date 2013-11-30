@@ -19,11 +19,14 @@
     <h1>{{forum_thread.subject}}</h1>
   {% for post in posts %}
     <article class="single-post">
+      <img src="{{profiles[post.user.user_id()]|profile_shield}}" class="poster-shield" width="64" height="64" alt="Shield" />
       <header>
-        <span class="posted">Posted <time itemprop="dateCreated" datetime="{{post|post_date_std}}">{{post|post_date_time}}</time></span>
-        <span class="author">by <a rel="author" href="/">{{post|forum_post_author}}</a></span>
+        <span class="author"><a rel="author" href="/">{{profiles[post.user.user_id()].display_name}}</a></span>
+        <span class="posted">posted <time itemprop="dateCreated" datetime="{{post|post_date_std}}">{{post|post_date_time}}</time></span>
       </header>
-      {{post.content}}
+      <div class="content">
+        {{post.content}}
+      </div>
     </article>
   {% endfor %}
     <p><a href="/forum/{{forum.slug}}/{{forum_thread.slug}}/posts">Post Reply</a></p>

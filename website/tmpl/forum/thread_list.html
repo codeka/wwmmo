@@ -28,6 +28,9 @@
       margin-left: 80pt;
       right: 0; top: 0; bottom: 0;
     }
+    div.thread-details img {
+      vertical-align: middle;
+    }
 
     div.forum-stats span {
       font-weight: bold;
@@ -61,8 +64,8 @@
         <div><span>{{post_counts[thread.forum.slug+":"+thread.slug] - 1}}</span> replies</div>
       </div>
       <div class="thread-details">
-        <div class="thread-author">started by <a href="/">{{profiles[thread.user.user_id()].display_name}}</a></div>
-        <div class="lastpost-author">last reply by <a href="/">{{profiles[last_posts[thread.key()].user.user_id()].display_name}}</a></div>
+        <div class="thread-author">started by <a href="/"><img src="{{profiles[thread.user.user_id()]|profile_shield}}" width="16" height="16"/> {{profiles[thread.user.user_id()].display_name}}</a></div>
+        <div class="lastpost-author">last reply by <a href="/"><img src="{{profiles[last_posts[thread.key()].user.user_id()]|profile_shield}}" width="16" height="16"/> {{profiles[last_posts[thread.key()].user.user_id()].display_name}}</a></div>
         <div class="lastpost-date">on <time datetime="{{last_posts[thread.key()]|post_date_std}}" class="post-date">{{last_posts[thread.key()]|post_date_time}}</time></div>
       </div>
     </div>

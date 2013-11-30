@@ -1,12 +1,30 @@
 package au.com.codeka.warworlds.server.handlers;
 
+import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.Point;
+import java.awt.Transparency;
+import java.awt.color.ColorSpace;
 import java.awt.geom.AffineTransform;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
+import java.awt.image.ColorModel;
+import java.awt.image.ComponentColorModel;
+import java.awt.image.DataBuffer;
+import java.awt.image.DataBufferByte;
+import java.awt.image.DataBufferInt;
+import java.awt.image.Raster;
+import java.awt.image.SinglePixelPackedSampleModel;
+import java.awt.image.WritableRaster;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
+import java.util.Random;
+
+import javax.imageio.ImageIO;
 
 import org.apache.commons.imaging.ImageFormat;
+import org.apache.commons.imaging.ImageReadException;
 import org.apache.commons.imaging.Imaging;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -73,7 +91,60 @@ public class EmpiresShieldHandler extends RequestHandler {
 
         byte[] pngImage = new EmpireController().getEmpireShield(empireID);
         if (pngImage == null) {
-            throw new RequestException(404);
+            if (getRequest().getParameter("final") != null && getRequest().getParameter("final").equals("1")) {
+                try {
+                    // if we're doing a "final" image for this guy, just create a coloured image based on his key
+                    BufferedImage shieldImage = new BufferedImage(128, 128, ColorSpace.TYPE_RGB);
+                    Graphics2D g = shieldImage.createGraphics();
+                    g.setPaint(getShieldColour(empireID));
+                    g.fillRect(0, 0, 128, 128);
+
+                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                    ImageIO.write(shieldImage, "png", baos);
+                    pngImage = baos.toByteArray();
+                } catch (Exception e) {
+                    throw new RequestException(e);
+                }
+            } else {
+                throw new RequestException(404);
+            }
+        }
+
+        if (getRequest().getParameter("final") != null && getRequest().getParameter("final").equals("1")) {
+            try {
+                BufferedImage shieldImage = Imaging.getBufferedImage(pngImage);
+                shieldImage = mergeShieldImage(shieldImage);
+
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                ImageIO.write(shieldImage, "png", baos);
+                pngImage = baos.toByteArray();
+            } catch (Exception e) {
+                throw new RequestException(e);
+            }
+        }
+
+        if (getRequest().getParameter("size") != null) {
+            int size = Integer.parseInt(getRequest().getParameter("size"));
+            if (size > 1 && size < 128) {
+                try {
+                    BufferedImage shieldImage = Imaging.getBufferedImage(pngImage);
+    
+                    int w = shieldImage.getWidth();
+                    int h = shieldImage.getHeight();
+                    BufferedImage after = new BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB);
+                    AffineTransform at = new AffineTransform();
+                    at.scale((float) size / w, (float) size / h);
+                    AffineTransformOp scaleOp = 
+                       new AffineTransformOp(at, AffineTransformOp.TYPE_BICUBIC);
+                    shieldImage = scaleOp.filter(shieldImage, after);
+
+                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                    ImageIO.write(shieldImage, "png", baos);
+                    pngImage = baos.toByteArray();
+                } catch(Exception e) {
+                    throw new RequestException(e);
+                }
+            }
         }
 
         getResponse().setContentType("image/png");
@@ -82,5 +153,37 @@ public class EmpiresShieldHandler extends RequestHandler {
         } catch (IOException e) {
             throw new RequestException(e);
         }
+    }
+
+    private BufferedImage mergeShieldImage(BufferedImage shieldImage) throws ImageReadException, IOException {
+        BufferedImage finalImage = Imaging.getBufferedImage(new File(getBasePath(), "data/static/img/shield.png"));
+        int width = finalImage.getWidth();
+        int height = finalImage.getHeight();
+        int[] pixels = (int[]) finalImage.getRaster().getDataElements(0, 0, width, height, null);
+
+        float fx = (float) shieldImage.getWidth() / (float) width;
+        float fy = (float) shieldImage.getHeight() / (float) height;
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                int offset = ((y * width) + x);
+                if ((pixels[offset] & 0xffffff) == 0xff00ff) {
+                    pixels[offset] = shieldImage.getRGB((int) (x * fx), (int) (y * fy));
+                }
+            }
+        }
+
+        int[] bitMasks = new int[]{0xFF0000, 0xFF00, 0xFF, 0xFF000000};
+        SinglePixelPackedSampleModel sm = new SinglePixelPackedSampleModel(
+                DataBuffer.TYPE_INT, width, height, bitMasks);
+        DataBufferInt db = new DataBufferInt(pixels, pixels.length);
+        WritableRaster wr = Raster.createWritableRaster(sm, db, new Point());
+        return new BufferedImage(ColorModel.getRGBdefault(), wr, false, null);
+    }
+
+    public Color getShieldColour(int empireID) {
+        Random rand = new Random(Integer.toString(empireID).hashCode());
+        return new Color(rand.nextInt(100) + 100,
+                         rand.nextInt(100) + 100,
+                         rand.nextInt(100) + 100);
     }
 }

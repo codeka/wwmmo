@@ -151,49 +151,6 @@ def getPosts(forum, forum_thread, page_no, page_size):
   return posts
 
 
-def _fetchProfileFromDataStore(user):
-  profile = None
-  for p in model.forum.ForumUserProfile.all().filter("user", user).fetch(1):
-    profile = p
-  return profile
-
-
-def getUserProfile(user):
-  keyname = "forum:user:%s" % (user.user_id())
-  profile = memcache.get(keyname)
-  if not profile:
-    profile = _fetchProfileFromDataStore(user)
-
-    if profile:
-      memcache.set(keyname, profile)
-
-  return profile
-
-
-def getUserProfiles(users):
-  """Fetches user profiles of multiple users at once."""
-  keynames = []
-  for user in users:
-    keynames.append("forum:user:%s" % (user.user_id()))
-  cache_mapping = memcache.get_multi(keynames)
-
-  for user in users:
-    keyname = "forum:user:%s" % (user.user_id())
-    if keyname not in cache_mapping:
-      profile = _fetchProfileFromDataStore(user)
-      cache_mapping[keyname] = profile
-
-      if profile:
-        memcache.set(keyname, profile)
-
-  memcache.set_multi(cache_mapping)
-
-  user_profiles = {}
-  for user in users:
-    user_profiles[user.user_id()] = cache_mapping["forum:user:%s" % (user.user_id())]
-  return user_profiles
-
-
 def getForumThreadPostCounts():
   """Helper method that returns a mapping of all the forum thread/post counts.
 
