@@ -9,15 +9,26 @@ import ctrl
 import model.profile
 
 
+REALMS = {'Beta': 'https://game.war-worlds.com/realms/beta/',
+          'Blitz': 'https://game.war-worlds.com/realms/blitz/'}
+if ctrl.isDevelopmentServer():
+  REALMS['Debug'] = 'http://localhost:8080/realms/beta/'
+
+
 def getEmpiresForUser(user_email):
+  """Fetches empires for the given user.
+
+  Even though the empires should be in the data store already, we force fetch them from the server. This is
+  because it could be a new user and it hasn't synced yet, but also this provides a way for the user to force
+  their empire to update after changing names or shield (otherwise, they'd have to wait for ~3 hours when the
+  cron job runs)."""
   keyname = 'profile:empires-for-user:'+user_email
   empires = memcache.get(keyname)
   if not empires:
     # we fire off an HTTP request to each of the realms to get empire details about this email address
-    urls = {'Beta': 'https://game.war-worlds.com/realms/beta/empires/search?email=' + user_email,
-            'Blitz': 'https://game.war-worlds.com/realms/blitz/empires/search?email=' + user_email}
-    if ctrl.isDevelopmentServer():
-      urls['Debug'] = 'http://localhost:8080/realms/beta/empires/search?email=' + user_email
+    urls = {}
+    for realm_name,base_url in REALMS.items():
+      urls[realm_name] = base_url+'empires/search?email=' + user_email
 
     # make simultaneous calls to all the URLs
     rpcs = {}
@@ -32,15 +43,18 @@ def getEmpiresForUser(user_email):
       if result.status_code == 200:
         empire = json.loads(result.content)
         if empire:
+          empire = empire["empires"][0]
           empires[realm_name] = empire
+          # while we're here, save it to the data store
+          model.profile.Empire.Save(realm_name, empire)
 
     memcache.set(keyname, empires, time=3600)
 
   return empires
 
 
-def saveProfile(user_id, realm_name, empire_id, display_name):
-  profile = model.profile.Profile.SaveProfile(user_id, realm_name, empire_id, display_name)
+def saveProfile(user_id, realm_name, display_name, empire):
+  profile = model.profile.Profile.SaveProfile(user_id, realm_name, display_name, empire)
   keyname = "profile:%s" % (user_id)
   memcache.set(keyname, profile)
 

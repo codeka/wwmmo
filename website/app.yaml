@@ -41,6 +41,10 @@ handlers:
   static_files: static/\1
   upload: static/.*
 
+- url: /cron/profiles(/.*)?
+  script: cron.profiles.app
+  login: admin
+
 - url: /blog(/.*)?
   script: handlers.blog.app
 

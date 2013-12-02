@@ -88,6 +88,7 @@ class BaseHandler(webapp.RequestHandler):
     Basically, we do some quick checks (e.g. to see whether the user is logged in, but hasn't yet set up
     a profile), then defer to the base class's method to do the actual dispatching."""
     self.user = users.get_current_user()
+    self.profile = None
     if self.user:
       # they're logged in, so check to see whether they have a profile set up.
       self.profile = profile_ctrl.getProfile(self.user.user_id())

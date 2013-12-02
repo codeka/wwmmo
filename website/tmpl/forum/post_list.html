@@ -1,7 +1,10 @@
 {% extends "skeleton.html" %}
 {% import "forum/macros.html" as m %}
 
-{% block header %}{{m.html_header()}}{% endblock %}
+{% block header %}
+  {{m.html_header()}}
+  <script src="/ckeditor/v{{resource_version}}/ckeditor.js"></script>
+{% endblock %}
 {% block pagetitle %}Forum &bull; {{forum.name}} &bull; {{forum_thread.subject}}{% endblock %}
 {% block title %}Forum &bull; {{forum.name}}{% endblock %}
 
@@ -29,6 +32,47 @@
       </div>
     </article>
   {% endfor %}
-    <p><a href="/forum/{{forum.slug}}/{{forum_thread.slug}}/posts">Post Reply</a></p>
+
+    <form method="POST" action="/forum/{{forum.slug}}/{{forum_thread.slug}}/posts">
+      <fieldset>
+        <header class="post-reply-header">
+          Post Reply
+        </header>
+        <div class="forum-field forum-field-markitup">
+          <label for="post-content">Message:</label>
+          <div class="hack"><textarea name="post-content" id="post-content"></textarea></div>
+        </div>
+        <div class="forum-field forum-field-submit">
+          <input type="submit" value="Post">
+        </div>
+      </fieldset>
+    </form>
+    <script>
+      $(function() {
+        var editor = CKEDITOR.replace("post-content");
+        var $container = $("fieldset div.forum-field-markitup div.hack");
+
+        CKEDITOR.on("instanceReady", function() {
+          editor.resize($container.width(), $container.height());
+        });
+        $(window).resize(function() {
+          editor.resize($container.width(), $container.height());
+        });
+
+        var changed = false;
+        var saving = false;
+        editor.on("change", function() {
+          changed = true;
+        });
+        $("form").on("submit", function() {
+          saving = true;
+        });
+        $(window).on("beforeunload", function() {
+          if (changed && !saving) {
+            return "You have unsaved changes.";
+          }
+        });
+      });
+    </script>
   </section>
 {% endblock %}

@@ -47,11 +47,11 @@
         <option value="">None</option>
         {% if empires|length == 1 %}
           {% for realm_name, empire in empires.iteritems() %}
-            <option value="{{realm_name}}:{{empire.empires[0].key}}">{{empire.empires[0].display_name}}</option>
+            <option value="{{realm_name}}:{{empire.key}}">{{empire.display_name}}</option>
           {% endfor %}
         {% else %}
           {% for realm_name, empire in empires.iteritems() %}
-            <option value="{{realm_name}}:{{empire.empires[0].key}}">{{realm_name}}: {{empire.empires[0].display_name}}</option>
+            <option value="{{realm_name}}:{{empire.key}}">{{realm_name}}: {{empire.display_name}}</option>
           {% endfor %}
         {% endif %}
       </select>

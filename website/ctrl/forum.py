@@ -8,19 +8,43 @@ import random
 from google.appengine.api import memcache
 from google.appengine.ext import db
 
+import ctrl
 import model.forum
 
 def getForums():
+  """Returns all of the non-alliance-specific forums."""
   keyname = "forums"
   forums = memcache.get(keyname)
   if not forums:
     forums = []
     for forum in model.forum.Forum.all():
+      if forum.alliance:
+        continue
       forums.append(forum)
 
     memcache.set(keyname, forums, time=3600)
 
   return forums
+
+
+def getAllianceForum(realm_name, alliance):
+  """Returns the forum for the given alliance."""
+  keyname = "forums:alliance:%s-%d" % (realm_name, alliance.alliance_id)
+  forum = memcache.get(keyname)
+  if not forum:
+    for f in model.forum.Forum.all().filter("alliance", realm_name+":"+str(alliance.alliance_id)).fetch(1):
+      forum = f
+      break
+    if forum:
+      memcache.set(keyname, forum, time=3600)
+  if not forum:
+    # if there's not one, we'll create one
+    forum = model.forum.Forum(name=alliance.name, slug="alliance:"+realm_name.lower()+":"+ctrl.makeSlug(alliance.name),
+                              description="Private alliance forum for "+alliance.name)
+    forum.alliance = realm_name+":"+str(alliance.alliance_id)
+    forum.put()
+    memcache.set(keyname, forum, time=3600)
+  return forum
 
 
 def getForumBySlug(forum_slug):
@@ -85,7 +109,9 @@ def getTopThreadsPerForum(forums):
   # convert from our (internal) memcache key names to a more reasonable key
   top_threads = {}
   for forum in forums:
-    top_threads[forum.slug] = cache_mapping["forum:%s:top-thread" % (forum.slug)]
+    keyname = "forum:%s:top-thread" % (forum.slug)
+    if keyname in cache_mapping:
+      top_threads[forum.slug] = cache_mapping[keyname]
 
   return top_threads
 
@@ -111,6 +137,29 @@ def getLastPostsByForumThread(forum_threads):
   for forum_thread in forum_threads:
     last_posts[forum_thread.key()] = cache_mapping["forum:%s:%s:last-post" % (forum_thread.forum.slug, forum_thread.slug)]
   return last_posts
+
+
+def getFirstPostsByForumThread(forum_threads):
+  """For each thread in the given list, returns the first post in that thread (i.e. the one that was originally posted by the created of the thread)."""
+  keynames = []
+  for forum_thread in forum_threads:
+    keynames.append("forum:%s:%s:first-post" % (forum_thread.forum.slug, forum_thread.slug))
+  cache_mapping = memcache.get_multi(keynames)
+
+  for forum_thread in forum_threads:
+    keyname = "forum:%s:%s:first-post" % (forum_thread.forum.slug, forum_thread.slug)
+    if keyname not in cache_mapping:
+      query = model.forum.ForumPost.all().ancestor(forum_thread).order("posted").fetch(1)
+      for post in query:
+        cache_mapping[keyname] = post
+        break
+
+  memcache.set_multi(cache_mapping)
+
+  first_posts = {}
+  for forum_thread in forum_threads:
+    first_posts[forum_thread.key()] = cache_mapping["forum:%s:%s:first-post" % (forum_thread.forum.slug, forum_thread.slug)]
+  return first_posts
 
 
 def getThreadBySlug(forum, forum_thread_slug):
@@ -162,7 +211,9 @@ def getForumThreadPostCounts():
     counts = {}
     for counter in (model.forum.ForumShardedCounter.all().filter("name >=", "forum")
                                                          .filter("name <", "forum\ufffd")):
-      parts = counter.name.split(":")
+      first_colon = counter.name.find(":")
+      last_colon = counter.name.rfind(":")                                    
+      parts = [counter.name[:first_colon], counter.name[first_colon+1:last_colon], counter.name[last_colon+1:]]
       if parts[1] not in counts:
         counts[parts[1]] = {}
       if parts[2] not in counts[parts[1]]:

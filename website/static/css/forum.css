@@ -38,6 +38,11 @@ article .poster-shield {
   margin-top: 12px;
 }
 
+header.post-reply-header {
+  font-weight: bold;
+  border-bottom: dotted 1px #999;
+}
+
 /* ------------------------------------------------------------------
  * Post Editing
  */
@@ -62,12 +67,12 @@ div.forum-field label {
   line-height: 20pt;
 }
 
-div.forum-field input[type=text] {
+div.forum-field div.hack {
   position: absolute;
-  left: 75pt;
-  top: 0;
-  bottom: 0;
-  right: 0;
+  top: 0; left: 75pt; bottom: 0; right: 4pt;
+}
+div.forum-field input[type=text] {
+  width: 100%;
   border: solid 1px #ccc;
   padding: 2pt 4pt;
 }
@@ -81,8 +86,7 @@ div.forum-field.forum-field-markitup label {
   line-height: 20pt;
 }
 div.forum-field.forum-field-markitup textarea {
-  position: absolute;
-  top: 0; left: 75pt; bottom: 0; right: 0;
+  width: 100%; height: 100%;
   border: solid 1px #ccc;
   padding: 2pt 4pt;
 }

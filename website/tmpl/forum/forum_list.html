@@ -16,6 +16,9 @@
       top: 0; left: 0; bottom: 0;
       width: 50%;
     }
+    div.forum-title h2 {
+      margin: 0;
+    }
     div.forum-stats {
       position: absolute;
       top: 0; bottom: 0;
@@ -27,6 +30,10 @@
       left: 50%;
       margin-left: 80pt;
       right: 0; top: 0; bottom: 0;
+    }
+
+    div.post-author img {
+      vertical-align: middle;
     }
 
     div.forum-stats span {
@@ -67,9 +74,14 @@
         <div><span>{{post_counts[forum.slug]['posts'] if forum.slug in post_counts else '0'}}</span> posts</div>
       </div>
       <div class="last-post">
-        <div class="post-title"><a href="/forum/{{forum.slug}}/{{top_threads[forum.slug].slug}}">{{top_threads[forum.slug].subject}}</a></div>
-        <div class="post-author">by <a href="/">{{top_thread_user_profiles[top_threads[forum.slug].user.user_id()].display_name}}</a></div>
-        <time datetime="{{top_threads[forum.slug]|post_date_std}}" class="post-date">{{top_threads[forum.slug]|post_date_time}}</time>
+        {% if forum.slug in top_threads %}
+          <div class="post-title"><a href="/forum/{{forum.slug}}/{{top_threads[forum.slug].slug}}">{{top_threads[forum.slug].subject}}</a></div>
+          <div class="post-author">
+            by <a href="/"><img src="{{top_thread_user_profiles[top_threads[forum.slug].user.user_id()]|profile_shield}}" width="16" height="16"/>
+            {{top_thread_user_profiles[top_threads[forum.slug].user.user_id()].display_name}}</a>
+          </div>
+          <time datetime="{{top_threads[forum.slug]|post_date_std}}" class="post-date">{{top_threads[forum.slug]|post_date_time}}</time>
+        {% endif %}
       </div>
     </div>
   {% endfor %}

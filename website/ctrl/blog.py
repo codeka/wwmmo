@@ -63,17 +63,11 @@ def getPostBySlug(year, month, slug):
   return post
 
 
-def _makeSlug(tagName):
-  slug = tagName.lower().replace(' ', '-')
-  slug = re.sub(r'[^a-zA-Z0-9_-]+', '', slug)
-  return slug
-
-
 def savePost(post):
   for tagName in post.tags:
-    tag = model.blog.Tag.get_by_key_name(_makeSlug(tagName))
+    tag = model.blog.Tag.get_by_key_name(ctrl.makeSlug(tagName))
     if not tag:
-      tag = model.blog.Tag(key_name = _makeSlug(tagName))
+      tag = model.blog.Tag(key_name = ctrl.makeSlug(tagName))
       tag.name = tagName
       tag.postCount = 1
       tag.put()
@@ -81,7 +75,7 @@ def savePost(post):
       pass
 
   if not post.slug:
-    post.slug = _makeSlug(post.title)
+    post.slug = ctrl.makeSlug(post.title)
 
   post.put()
   memcache.flush_all()

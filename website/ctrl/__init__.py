@@ -1,6 +1,7 @@
 
 from HTMLParser import HTMLParser
 import os
+import re
 
 from google.appengine.api import memcache
 
@@ -41,6 +42,12 @@ def findCursor(query, keyname, page_no, page_size):
     memcache.set('post-page-cursor:%s:%d:%d' % (keyname, cursor_page, page_size), cursor)
 
   return cursor
+
+
+def makeSlug(tagName):
+  slug = tagName.lower().replace(' ', '-')
+  slug = re.sub(r'[^a-zA-Z0-9_-]+', '', slug)
+  return slug
 
 
 def isDevelopmentServer():

@@ -1,7 +1,10 @@
 {% extends "skeleton.html" %}
 {% import "forum/macros.html" as m %}
 
-{% block header %}{{m.html_header()}}{% endblock %}
+{% block header %}
+  {{m.html_header()}}
+  <script src="/ckeditor/v{{resource_version}}/ckeditor.js"></script>
+{% endblock %}
 {% block pagetitle %}Forum &bull; {{forum.name}} &bull; {% if post %}Edit Post{% else %}New Post{% endif %}{% endblock %}
 {% block title %}Forum &bull; {{forum.name}} &bull; {% if post %}Edit Post{% else %}New Post{% endif %}{% endblock %}
 
@@ -9,17 +12,17 @@
   <section class="content">
     <form method="POST">
       <fieldset>
-        <h1>New Post</h1>
-        <p>Blah blah, instructions on posting.</p>
+        <h1>New Post in {{forum.name}}</h1>
+        <p>Compose your post below. Please keep the tone and content of your message friendly, and we'll all get along!</p>
         {% if not forum_thread %}
           <div class="forum-field">
             <label for="post-subject">Subject:</label>
-            <input type="text" name="post-subject" id="post-subject" placeholder="A short subject to describe your topic">
+            <div class="hack"><input type="text" name="post-subject" id="post-subject" placeholder="A short subject to describe your topic"></div>
           </div>
         {% endif %}
         <div class="forum-field forum-field-markitup">
           <label for="post-content">Message:</label>
-          <textarea name="post-content" id="post-content"></textarea>
+          <div class="hack"><textarea name="post-content" id="post-content"></textarea></div>
         </div>
         <div class="forum-field forum-field-submit">
           <input type="submit" value="Post">
@@ -27,4 +30,31 @@
       </fieldset>
     </form>
   </section>
+  <script>
+    $(function() {
+      var editor = CKEDITOR.replace("post-content");
+      var $container = $("fieldset div.forum-field-markitup div.hack");
+
+      CKEDITOR.on("instanceReady", function() {
+        editor.resize($container.width(), $container.height());
+      });
+      $(window).resize(function() {
+        editor.resize($container.width(), $container.height());
+      });
+
+      var changed = false;
+      var saving = false;
+      editor.on("change", function() {
+        changed = true;
+      });
+      $("form").on("submit", function() {
+        saving = true;
+      });
+      $(window).on("beforeunload", function() {
+        if (changed && !saving) {
+          return "You have unsaved changes.";
+        }
+      });
+    });
+  </script>
 {% endblock %}

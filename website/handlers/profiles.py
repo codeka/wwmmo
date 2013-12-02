@@ -43,18 +43,17 @@ class ProfilePage(BasePage):
       realm_name, empire_id = linked_empire.split(':')
       empire_id = int(empire_id)
 
-      found = False
-      for empire_realm_name, empire in empires.items():
-        if empire_realm_name == realm_name and int(empire["empires"][0]["key"]) == empire_id:
-          found = True
-          display_name = empire["empires"][0]["display_name"]
-      if not found:
-        # error
+      empire = None
+      for empire_realm_name, this_empire in empires.items():
+        if empire_realm_name == realm_name and int(this_empire["key"]) == empire_id:
+          empire = this_empire
+          display_name = empire["display_name"]
+      if not empire:
+        # actually an error
         realm_name = None
-        empire_id = None
     else:
       display_name = self.request.POST.get("display_name")
-    profile_ctrl.saveProfile(self.user.user_id(), realm_name, empire_id, display_name)
+    profile_ctrl.saveProfile(self.user.user_id(), realm_name, display_name, empire)
 
     self.redirect("/profile")
 

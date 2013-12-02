@@ -26,14 +26,22 @@ class ForumPage(handlers.BaseHandler):
 class ForumListPage(ForumPage):
   def get(self):
     forums = ctrl.forum.getForums()
+
+    if self.profile and self.profile.alliance_id:
+      alliance = model.profile.Alliance.Fetch(self.profile.realm_name, self.profile.alliance_id)
+      if alliance:
+        alliance_forum = ctrl.forum.getAllianceForum(self.profile.realm_name, alliance)
+        forums.insert(0, alliance_forum)
+
     post_counts = ctrl.forum.getForumThreadPostCounts()
     top_threads = ctrl.forum.getTopThreadsPerForum(forums)
 
     top_thread_user_ids = []
     for forum in forums:
-      top_thread = top_threads[forum.slug]
-      if top_thread.user.user_id() not in top_thread_user_ids:
-        top_thread_user_ids.append(top_thread.user.user_id())
+      if forum.slug in top_threads:
+        top_thread = top_threads[forum.slug]
+        if top_thread.user.user_id() not in top_thread_user_ids:
+          top_thread_user_ids.append(top_thread.user.user_id())
     top_thread_user_profiles = ctrl.profile.getProfiles(top_thread_user_ids)
 
     self.render("forum/forum_list.html", {"forums": forums,
@@ -60,6 +68,7 @@ class ThreadListPage(ForumPage):
       self.redirect('/forum/%s?page=%d' % (forum.slug, page_no-1))
 
     post_counts = ctrl.forum.getThreadPostCounts(threads)
+    first_posts = ctrl.forum.getFirstPostsByForumThread(threads)
     last_posts = ctrl.forum.getLastPostsByForumThread(threads)
 
     user_ids = []
@@ -75,6 +84,7 @@ class ThreadListPage(ForumPage):
                                            "post_counts": post_counts,
                                            "profiles": profiles,
                                            "last_posts": last_posts,
+                                           "first_posts": first_posts,
                                            "page_no": page_no})
 
 

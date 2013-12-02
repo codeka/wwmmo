@@ -6,6 +6,7 @@ class Forum(db.Model):
   name = db.StringProperty(required=True)
   slug = db.StringProperty(required=True)
   description = db.TextProperty(required=True)
+  alliance = db.StringProperty()
 
 
 class ForumThread(db.Model):

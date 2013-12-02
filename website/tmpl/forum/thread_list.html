@@ -58,7 +58,7 @@
     <div class="thread-entry">
       <div class="thread-title">
         <a href="/forum/{{forum.slug}}/{{thread.slug}}">{{thread.subject}}</a>
-        <div>(excerpt?)</div>
+        <div>{{first_posts[thread.key()].content|striptags|truncate(100)}}</div>
       </div>
       <div class="thread-replycount">
         <div><span>{{post_counts[thread.forum.slug+":"+thread.slug] - 1}}</span> replies</div>
