@@ -1,0 +1,1 @@
+﻿CKEDITOR.plugins.setLang("templates","gl",{button:"Plantillas",emptyListMsg:"(Non hai plantillas definidas)",insertOption:"Replace actual contents",options:"Template Options",selectPromptMsg:"Por favor, seleccione a plantilla a abrir no editor<br>(o contido actual perderase):",title:"Plantillas de Contido"});

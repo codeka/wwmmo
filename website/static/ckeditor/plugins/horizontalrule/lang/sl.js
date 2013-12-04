@@ -1,0 +1,1 @@
+﻿CKEDITOR.plugins.setLang("horizontalrule","sl",{toolbar:"Vstavi vodoravno črto"});

@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="au.com.codeka.warworlds"
-    android:versionCode="710"
-    android:versionName="0.3.710"
-    android:installLocation="auto" >
+    android:versionCode="726"
+    android:versionName="0.3.726"
+    android:installLocation="auto"
+    android:largeHeap="@bool/largeHeap">
 
     <!-- Android SDK version 2.2 (API level 8) is the minimum we can viably support, since
          that's what GCM required. We'd prefer ICS+ though... -->
@@ -11,7 +12,7 @@
               android:targetSdkVersion="17" />
 
     <!-- We use OpenGL ES 2.0 -->
-    <!-- uses-feature android:glEsVersion="0x00020000" android:required="true" /-->
+    <uses-feature android:glEsVersion="0x00020000" android:required="true" />
 
     <!-- Only this application can receive the messages and registration result -->
     <permission
@@ -73,8 +74,8 @@
         <activity android:name=".game.EmpireActivity" />
         <activity android:name=".game.EnemyEmpireActivity" />
         <activity android:name=".game.build.BuildActivity" />
+        <activity android:name=".game.FleetMoveActivity" />
         <activity android:name=".game.starfield.StarfieldActivity" />
-        <activity android:name=".game.starfield.TacticalMapActivity" />
         <activity android:name=".game.solarsystem.SolarSystemActivity" />
         <activity android:name=".game.solarsystem.EnemyPlanetActivity" />
         <activity android:name=".game.solarsystem.EmptyPlanetActivity" />

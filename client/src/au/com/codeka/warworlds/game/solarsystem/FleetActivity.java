@@ -16,7 +16,7 @@ import au.com.codeka.warworlds.ServerGreeter.ServerGreeting;
 import au.com.codeka.warworlds.WarWorldsActivity;
 import au.com.codeka.warworlds.ctrl.FleetList;
 import au.com.codeka.warworlds.game.FleetMergeDialog;
-import au.com.codeka.warworlds.game.FleetMoveDialog;
+import au.com.codeka.warworlds.game.FleetMoveActivity;
 import au.com.codeka.warworlds.game.FleetSplitDialog;
 import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.Fleet;
@@ -53,10 +53,7 @@ public class FleetActivity extends BaseActivity implements StarManager.StarFetch
 
             @Override
             public void onFleetMove(Star star, Fleet fleet) {
-                FragmentManager fm = getSupportFragmentManager();
-                FleetMoveDialog dialog = new FleetMoveDialog();
-                dialog.setFleet(fleet);
-                dialog.show(fm, "");
+                FleetMoveActivity.show(FleetActivity.this, fleet);;
             }
 
             @Override

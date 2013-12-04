@@ -3,19 +3,16 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <org.andengine.opengl.view.RenderSurfaceView
+        android:id="@+id/starfield"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
     <au.com.codeka.warworlds.ctrl.BannerAdView
         android:id="@+id/ad"
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:layout_alignParentTop="true" />
-
-    <au.com.codeka.warworlds.game.starfield.StarfieldSurfaceView
-        android:id="@+id/starfield"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_above="@+id/bottom_pane"
-        android:layout_below="@id/ad"
-        android:layout_marginBottom="-4px" />
 
     <au.com.codeka.warworlds.ctrl.SelectionView
         android:id="@+id/selection"
@@ -218,22 +215,13 @@
             android:layout_toLeftOf="@+id/empire_btn"
             android:text="Sit. Rep." />
 
-        <Button android:id="@+id/tactical_map_btn"
-                style="@style/Button"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentBottom="true"
-                android:layout_marginRight="5dp"
-                android:layout_toLeftOf="@id/sitrep_btn"
-                android:text="Tactical" />
-
         <Button android:id="@+id/alliance_btn"
                 style="@style/Button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginRight="5dp"
-                android:layout_alignTop="@id/tactical_map_btn"
-                android:layout_toLeftOf="@+id/tactical_map_btn"
+                android:layout_alignTop="@id/sitrep_btn"
+                android:layout_toLeftOf="@+id/sitrep_btn"
                 android:text="Alliance" />
 
         <au.com.codeka.warworlds.ctrl.InfobarView

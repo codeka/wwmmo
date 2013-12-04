@@ -1,6 +1,7 @@
 package au.com.codeka.planetrender.testandroid;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Random;
 
 import android.app.Activity;
@@ -30,24 +31,45 @@ public class MainActivity extends Activity {
         final Button refreshButton = (Button) findViewById(R.id.refresh);
         final TextView statusView = (TextView) findViewById(R.id.status);
         final Spinner templateView = (Spinner) findViewById(R.id.template);
+        final Spinner sizeView = (Spinner) findViewById(R.id.size);
 
         AssetManager assetManager = getAssets();
-        String[] templateFiles = null;
+        ArrayList<String> templateFiles = new ArrayList<String>();
         try {
-            templateFiles = assetManager.list("planets");
+            String[] allFiles = assetManager.list("planets");
+            // remove the planets.png file...
+            for (int i = 0; i < allFiles.length; i++) {
+                if (allFiles[i].endsWith(".png")) {
+                    continue;
+                }
+                templateFiles.add("planets/"+allFiles[i]);
+            }
+            allFiles = assetManager.list("stars");
+            // remove the planets.png file...
+            for (int i = 0; i < allFiles.length; i++) {
+                if (allFiles[i].endsWith(".png")) {
+                    continue;
+                }
+                templateFiles.add("stars/"+allFiles[i]);
+            }
         } catch (IOException e1) {
         }
-        if (templateFiles != null) {
-            templateView.setAdapter(new ArrayAdapter<String>(this, R.layout.template_entry, templateFiles));
+        if (templateFiles.size() > 0) {
+            String[] array = new String[templateFiles.size()];
+            templateFiles.toArray(array);
+            templateView.setAdapter(new ArrayAdapter<String>(this, R.layout.template_entry, array));
         }
+
+        String[] sizes = new String[] { "250x250", "500x500", "1000x1000", "2000x2000" };
+        sizeView.setAdapter(new ArrayAdapter<String>(this, R.layout.template_entry, sizes));
 
         refreshButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 String templateName = (String) templateView.getSelectedItem();
                 try {
-                    for (String fileName : getAssets().list("planets/"+templateName)) {
-                        templateName = "planets/" + templateName + "/" + fileName;
+                    for (String fileName : getAssets().list(templateName)) {
+                        templateName = templateName + "/" + fileName;
                         break;
                     }
                 } catch (IOException e) {
@@ -68,15 +90,18 @@ public class MainActivity extends Activity {
                 }
                 long parseEndTime = System.nanoTime();
 
+                String sizeString = (String) sizeView.getSelectedItem();
+                int size = Integer.parseInt(sizeString.split("x")[0]);
+
                 long renderStartTime = System.nanoTime();
                 PlanetRenderer renderer = new PlanetRenderer(
                         (Template.PlanetTemplate) tmpl.getTemplate(), new Random());
-                Image img = new Image(200, 200);
+                Image img = new Image(size, size);
                 renderer.render(img);
                 long renderEndTime = System.nanoTime();
 
                 long convertStartTime = System.nanoTime();
-                Bitmap bmp = Bitmap.createBitmap(img.getArgb(), 200, 200, Bitmap.Config.ARGB_8888);
+                Bitmap bmp = Bitmap.createBitmap(img.getArgb(), size, size, Bitmap.Config.ARGB_8888);
                 planetView.setImageBitmap(bmp);
                 long convertEndTime = System.nanoTime();
 

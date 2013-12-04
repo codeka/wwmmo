@@ -1,0 +1,1 @@
+﻿CKEDITOR.plugins.setLang("specialchar","eu",{options:"Special Character Options",title:"Karaktere Berezia Aukeratu",toolbar:"Txertatu Karaktere Berezia"});

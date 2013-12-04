@@ -1,5 +1,7 @@
 package au.com.codeka.common;
 
+import java.util.Locale;
+
 import au.com.codeka.common.ObjectPool;
 import au.com.codeka.common.ObjectPool.Pooled;
 
@@ -119,6 +121,11 @@ public class Vector2 implements ObjectPool.Pooled {
     }
 
     @Override
+    public String toString() {
+        return String.format(Locale.ENGLISH, "(%.4f, %.4f)", x, y);
+    }
+
+    @Override
     public boolean equals(Object other) {
         if (!(other instanceof Vector2)) {
             return false;
@@ -140,6 +147,11 @@ public class Vector2 implements ObjectPool.Pooled {
     public static float angleBetween(Vector2 a, Vector2 b) {
         return (float) Math.atan2(a.x * b.y - a.y * b.x,
                                   a.x * b.x + a.y * b.y);
+    }
+
+    public static float angleBetweenCcw(Vector2 a, Vector2 b) {
+        return (float) Math.atan2(a.x * b.x + a.y * b.y,
+                                  a.x * b.y - a.y * b.x);
     }
 
     static class Vector2Creator implements ObjectPool.PooledCreator {

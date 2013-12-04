@@ -1,0 +1,200 @@
+
+
+body {
+  font-family: georgia, serif;
+  font-size: 12pt;
+  background: #000 url(/img/v2/bg.jpg) repeat;
+  color: #222;
+}
+
+fieldset {
+  border: solid 1px #999;
+  border-radius: 4px;
+}
+
+fieldset legend {
+  margin-left: 0.5em;
+  padding: 0 0.5em;
+  font-weight: bold;
+  color: #900;
+}
+
+h1 { font-family: Quando, serif; font-size: 16pt; font-weight: bold; margin-top: 1em; }
+h2 { font-family: Quando, serif; font-size: 14pt; font-weight: bold; margin-top: 1em; }
+h3 { font-family: Quando, serif; font-size: 12pt; font-weight: bold; font-style: italic; margin-top: 1em; }
+
+ul {
+  list-style-type: disc;
+  margin: 1em 0 1em 2em;
+}
+ol {
+  margin-left: 2em;
+  margin: 1em 0 1em 2em;
+}
+li {
+  line-height: 1.4;
+}
+
+p {
+  margin: 1em 0;
+  line-height: 1.4;
+}
+
+blockquote {
+  margin-left: 2em;
+  padding-left: 1em;
+  border-left: solid 2pt #6f6;
+}
+
+header#page-header {
+  height: 80px;
+  width: 900px;
+  margin: 0 auto;
+  position: relative;
+}
+
+header#page-header img.logo {
+  margin: 3px 24px 0 16px;
+  float: left;
+}
+
+header#page-header div {
+  position: absolute;
+  top: 0;
+  left: 100px;
+  bottom: 0;
+  right: 100px;
+  line-height: 80px;
+}
+
+header#page-header h1 {
+  display: inline-block;
+  vertical-align: middle;
+  color: #fff;
+  font-size: 16pt;
+  line-height: 24pt;
+}
+
+header#page-header h1 span {
+  white-space: nowrap;
+}
+
+header#page-header h1 span.war-worlds a {
+  font-size: 24pt;
+  color: #fff;
+  text-decoration: none;
+}
+
+header#page-header ul.main-nav {
+  margin: 0; padding: 0;
+  color: #fff;
+  position: absolute;
+  bottom: 0; left: 100px;
+}
+header#page-header ul.main-nav li {
+  float: left;
+  margin-left: 1.5em;
+}
+header#page-header ul.main-nav li:first-child {
+  margin-left: 0;
+  list-style-type: none;
+}
+header#page-header ul.main-nav li a {
+  text-decoration: none;
+  color: #fff;
+}
+
+header#page-header nav.userinfo {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  color: #fff;
+}
+
+header#page-header nav.userinfo a {
+  color: #99f;
+}
+
+header a.gplus-btn img {
+  display: block;
+  position: absolute;
+  right: 16px;
+  top: 24px;
+}
+
+header a.twitter-btn img {
+  display: block;
+  position: absolute;
+  right: 56px;
+  top: 24px;
+}
+
+header a.rss-btn img {
+  display: block;
+  position: absolute;
+  right: 96px;
+  top: 26px;
+}
+
+nav.admin {
+  width: 900px;
+  background: #6faed2;
+  margin: 0 auto;
+  border: solid 2px #365567;
+  height: 24px;
+  line-height: 24px;
+}
+nav.admin ul {
+  list-style-type: none;
+  margin: 0;
+}
+nav.admin ul li {
+  float: left;
+  height: 24px;
+}
+nav.admin a {
+  color: #fff;
+  font-weight: bold;
+  padding: 3px 20px;
+  border-right: solid 2px #365567;
+}
+
+section.content {
+  background: #fff;
+  padding: 0 20px;
+  width: 860px;
+  margin: 0 auto;
+}
+
+section.copyright {
+  clear: both;
+  margin: 2em 0;
+  padding-bottom: 2em;
+  text-align: center;
+}
+
+nav.breadcrumbs ul {
+  margin: 0;
+  padding: 0;
+  list-style-type: none;
+  height: 20pt;
+  line-height: 20pt;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+nav.breadcrumbs li:before {
+  content: "»";
+  margin-right: 4pt;
+}
+
+nav.breadcrumbs li:first-child:before {
+  content: "";
+  margin-right: 0;
+}
+
+nav.breadcrumbs li {
+  display: inline;
+  margin-left: 4pt;
+}

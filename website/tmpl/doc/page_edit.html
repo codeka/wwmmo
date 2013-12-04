@@ -1,0 +1,67 @@
+{% extends "skeleton.html" %}
+{% import "doc/macros.html" as m %}
+
+{% block header %}
+  {{m.html_header(resource_version)}}
+  <style>
+    html, body {
+      overflow: hidden;
+    }
+  </style>
+  <script src="/ckeditor/v{{resource_version}}/ckeditor.js"></script>
+{% endblock %}
+{% block pagetitle %}Documentation &bull; Edit{% endblock %}
+{% block title %}Edit Document{% endblock %}
+
+{% block maincontent %}
+  <section class="content editor-content">
+    <form method="post">
+      <input type="hidden" name="slug" value="{{slug}}">
+      <fieldset class="edit-fields">
+        <legend>Editing: {{slug}}</legend>
+        <div class="top-fields">
+          <div class="field">
+            <label for="page-title">Title:</label>
+            <input type="text" id="page-title" name="page-title" value="{{page.title}}">
+          </div>
+        </div>
+        <div class="middle-fields">
+          <textarea id="page-content" name="page-content">{{page.content}}</textarea>
+        </div>
+        <div class="bottom-fields">
+          <div class="field">
+            <input type="submit" value="Save">
+          </div>
+        </div>
+      </fieldset>
+    </form>
+  </section>
+  <script>
+    $(function() {
+      var editor = CKEDITOR.replace("page-content");
+      var $container = $("fieldset.edit-fields div.middle-fields");
+
+      CKEDITOR.on("instanceReady", function() {
+        editor.resize($container.width(), $container.height());
+      });
+      $(window).resize(function() {
+        editor.resize($container.width(), $container.height());
+      });
+
+      var changed = false;
+      var saving = false;
+      editor.on("change", function() {
+        changed = true;
+      });
+      $("form").on("submit", function() {
+        saving = true;
+      });
+      $(window).on("beforeunload", function() {
+        if (changed && !saving) {
+          return "You have unsaved changes.";
+        }
+      });
+    });
+  </script>
+{% endblock %}
+

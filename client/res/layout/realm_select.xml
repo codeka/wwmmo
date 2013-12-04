@@ -24,7 +24,7 @@
               android:layout_below="@+id/title_icon"
               android:layout_marginLeft="@dimen/tablet_margin_5dp"
               android:layout_marginRight="@dimen/tablet_margin_5dp"
-              android:text="Choose a realm to join. If you're not sure, Beta is a good start." />
+              android:text="Realms are separate War World universes with differing rules and length of play. You are free to play in any or all realms as you like. If you're not sure, Beta is a good choice to start with." />
 
     <View android:id="@+id/separator"
           android:layout_width="1dp"
@@ -32,34 +32,71 @@
           android:layout_centerHorizontal="true"
           android:layout_alignParentBottom="true" />
 
-    <Button android:id="@+id/log_out_btn"
-            android:layout_width="match_parent"
-            android:layout_height="40dp"
-            android:layout_alignParentBottom="true"
-            android:layout_toLeftOf="@id/separator"
-            android:layout_marginTop="5dp"
-            android:layout_marginLeft="@dimen/tablet_margin_5dp"
-            android:layout_marginRight="5dp"
-            android:layout_marginBottom="5dp"
-            android:text="Log Out" />
+    <LinearLayout
+        android:id="@+id/bottom_button_wrapper"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_marginLeft="@dimen/tablet_margin_5dp"
+        android:layout_marginRight="@dimen/tablet_margin_5dp"
+        android:orientation="horizontal">
 
-    <Button android:id="@+id/start_btn"
-            android:layout_width="match_parent"
-            android:layout_height="40dp"
-            android:layout_alignParentBottom="true"
-            android:layout_toRightOf="@id/separator"
+        <Button android:id="@+id/log_out_btn"
+                android:layout_width="0px"
+                android:layout_weight="1"
+                android:layout_height="40dp"
+                android:layout_marginTop="5dp"
+                android:layout_marginLeft="@dimen/tablet_margin_5dp"
+                android:layout_marginRight="5dp"
+                android:layout_marginBottom="5dp"
+                android:text="Log Out" />
+
+        <Button android:id="@+id/start_btn"
+                android:layout_width="0px"
+                android:layout_weight="1"
+                android:layout_height="40dp"
+                android:layout_marginTop="5dp"
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="@dimen/tablet_margin_5dp"
+                android:layout_marginBottom="5dp"
+                android:text="Start" />
+    </LinearLayout>
+    
+    <LinearLayout
+        android:id="@+id/top_button_wrapper"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/bottom_button_wrapper"
+        android:layout_marginLeft="@dimen/tablet_margin_5dp"
+        android:layout_marginRight="@dimen/tablet_margin_5dp"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/help_btn"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
             android:layout_marginTop="5dp"
+            android:layout_marginBottom="5dp"
             android:layout_marginLeft="5dp"
-            android:layout_marginRight="@dimen/tablet_margin_5dp"
+            android:text="How to Play" />
+
+        <Button
+            android:id="@+id/privacy_policy_btn"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
             android:layout_marginBottom="5dp"
-            android:text="Start" />
-
-
+            android:layout_marginLeft="5dp"
+            android:text="Privacy Policy" />
+    </LinearLayout>
+    
     <ListView android:id="@+id/realms"
               android:layout_width="match_parent"
               android:layout_height="wrap_content"
               android:layout_alignParentLeft="true"
-              android:layout_above="@id/start_btn"
+              android:layout_above="@id/top_button_wrapper"
               android:layout_below="@+id/instructions"
               android:layout_marginLeft="@dimen/tablet_margin_5dp"
               android:layout_marginRight="@dimen/tablet_margin_5dp"

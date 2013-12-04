@@ -1,0 +1,1 @@
+﻿CKEDITOR.plugins.setLang("pagebreak","sl",{alt:"Page Break",toolbar:"Vstavi prelom strani"});

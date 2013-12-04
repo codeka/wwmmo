@@ -1,0 +1,59 @@
+{% extends "skeleton.html" %}
+
+{% block header %}
+    <style>
+      section.maincontent {
+        width: 880px;
+        padding: 10px;
+        margin: 0 auto;
+        background: #fff;
+      }
+      
+      @media only screen and (max-width: 900px) {
+        section.maincontent {
+          width: auto;
+        }
+      }
+    </style>
+{% endblock %}
+
+{% block maincontent %}
+  <section class="maincontent">
+    <h1>Privacy Policy</h1>
+    <p><a href="http://www.codeka.com.au/">Codeka Consulting</a> is the developer of
+    War Worlds and we have adopted this Privacy Policy in order to inform you of our
+    intentions with respect to information collected from you in the course of playing
+    the game. Your use of the game and/or this website constitutes your acceptance of
+    this Privacy Policy.</p>
+    <p>When you use this website or play the game, certain information is automatically
+    logged including, but not limited to, information about the device you are using, such
+    as model number, device identification number, and IP address. In addition, in order
+    to be able to log in, you must provide a
+    <a href="http://en.wikipedia.org/wiki/Google_Account">Google Account</a> to
+    authenticate yourself.</p>
+    <p>In particular, the Google Account will be associated with an email address that
+    will be collected by our servers. This email address is considered <strong>Strictly
+    Confidential</strong> and will never be shared with third parties.</p>
+    <p>Additionally, we will never contact you by email (unless you contact us
+    first, say for the purposes of support). If you sign up for our newsletter, then you
+    will occasionally get emails detailing new releases and so on, but just signing up
+    for the game does <em>not</em> automatically sign you up for the newsletter.</p>
+    <h2>Billing</h2>
+    <p>If you make any in-game purchases, all billing and purchasing information is
+    handled through the Google Play Store. Codeka Consulting never asks for, nor
+    stores, nor even sees your credit card details.</p>
+    <p>The Google Play Store shares certain information with us when you make an in-app
+    purchase, required for the successful processing of your transaction, including your
+    name and email address, the amount transacted and so on. This information is
+    considered <strong>Strictly Confidential</strong> and is never shared with any third
+    party.</p>
+    <h2>Cancelling</h2>
+    <p>If you wish to cancel your account, you can email
+    <a href="mailto:info@war-worlds.com">info@war-worlds.com</a> at any time and all
+    information, as described above, will be permanently purged from our servers.</p>
+    <h2>More Information</h2>
+    <p>If you have any questions or wish to know more, please do not hesitate to contact
+    us at <a href="mailto:info@war-worlds.com">info@war-worlds.com</a> and will be happy
+    to discuss further with you.</p>
+  </section>
+{% endblock %}

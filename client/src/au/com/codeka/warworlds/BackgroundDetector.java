@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -51,6 +52,8 @@ public class BackgroundDetector {
     private boolean mIsTransitioningToBackground;
     private Handler mHandler;
     private String mLastActivityName;
+    private long mStartTimeMs;
+    private long mTotalForegroundTimeMs;
 
     /** Gets the name (class name) of the last activity that was running. */
     public String getLastActivityName() {
@@ -80,7 +83,15 @@ public class BackgroundDetector {
         }
     }
 
-    public void onBackgroundStatusChange(final BaseActivity activity) {
+    public long getTotalRunTime() {
+        return System.currentTimeMillis() - mStartTimeMs;
+    }
+
+    public long getTotalForegroundTime() {
+        return mTotalForegroundTimeMs;
+    }
+
+    public void onBackgroundStatusChange(final Activity activity) {
         if (!Util.isSetup() || RealmContext.i.getCurrentRealm() == null) {
             return;
         }
@@ -121,7 +132,7 @@ public class BackgroundDetector {
         fireBackgroundChangeHandlers(activity);
     }
 
-    private void transitionToBackground(final BaseActivity activity) {
+    private void transitionToBackground(final Activity activity) {
         if (mIsTransitioningToBackground) {
             return;
         }
@@ -139,7 +150,7 @@ public class BackgroundDetector {
         }, 5000);
     }
 
-    private void transitionToForeground(BaseActivity activity) {
+    private void transitionToForeground(Activity activity) {
         if (mIsTransitioningToBackground) {
             mIsTransitioningToBackground = false;
             return;
@@ -149,7 +160,9 @@ public class BackgroundDetector {
         onBackgroundStatusChange(activity);
     }
 
-    public void onActivityPause(BaseActivity activity) {
+    public void onActivityPause(Activity activity, long activityRunTimeMs) {
+        mTotalForegroundTimeMs += activityRunTimeMs;
+
         mNumActiveActivities --;
         if (mNumActiveActivities <= 0) {
             if (mStartingActivityPackage != null &&
@@ -160,7 +173,11 @@ public class BackgroundDetector {
         }
     }
 
-    public void onActivityResume(BaseActivity activity) {
+    public void onActivityResume(Activity activity) {
+        if (mStartTimeMs == 0) {
+            mStartTimeMs = System.currentTimeMillis();
+        }
+
         mNumActiveActivities ++;
         if (mNumActiveActivities == 1) {
             if (mStartingActivityPackage != null &&
@@ -171,7 +188,7 @@ public class BackgroundDetector {
         }
     }
 
-    public void onStartActivity(BaseActivity callingActivity, Intent intent) {
+    public void onStartActivity(Activity callingActivity, Intent intent) {
         mStartingActivityPackage = null;
 
         ComponentName componentName = intent.getComponent();
@@ -182,7 +199,7 @@ public class BackgroundDetector {
         mLastActivityName = callingActivity.getLocalClassName();
     }
 
-    public void onActivityPostResume(BaseActivity activity) {
+    public void onActivityPostResume(Activity activity) {
         mStartingActivityPackage = null;
         mLastActivityName = activity.getLocalClassName();
     }

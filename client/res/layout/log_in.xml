@@ -44,7 +44,7 @@
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:layout_below="@id/divider"
-        android:layout_above="@+id/bottom_pane"
+        android:layout_above="@+id/button_wrapper"
         android:layout_marginTop="10dp"
         android:layout_marginLeft="@dimen/tablet_margin_10dp"
         android:layout_marginRight="@dimen/tablet_margin_10dp"
@@ -55,32 +55,43 @@
         android:textSize="16sp" >
     </ListView>
 
+    <Button
+        android:id="@+id/log_in_btn"
+        style="@style/Button"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:layout_margin="5dp"
+        android:layout_alignParentBottom="true"
+        android:text="Log in" />
+
     <LinearLayout
-        android:id="@+id/bottom_pane"
+        android:id="@+id/button_wrapper"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_marginLeft="@dimen/tablet_margin_10dp"
-        android:layout_marginRight="@dimen/tablet_margin_10dp"
+        android:layout_above="@+id/log_in_btn"
+        android:layout_marginLeft="@dimen/tablet_margin_5dp"
+        android:layout_marginRight="@dimen/tablet_margin_5dp"
         android:orientation="horizontal">
 
         <Button
-            android:id="@+id/cancel_btn"
-            style="@style/Button"
+            android:id="@+id/help_btn"
             android:layout_width="0dp"
             android:layout_weight="1"
-            android:layout_height="40dp"
-            android:layout_margin="5dp"
-            android:text="@string/cancel" />
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="5dp"
+            android:layout_marginLeft="5dp"
+            android:text="How to Play" />
 
         <Button
-            android:id="@+id/log_in_btn"
-            style="@style/Button"
+            android:id="@+id/privacy_policy_btn"
             android:layout_width="0dp"
             android:layout_weight="1"
-            android:layout_height="40dp"
-            android:layout_margin="5dp"
-            android:text="@string/log_in" />
-
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="5dp"
+            android:layout_marginLeft="5dp"
+            android:text="Privacy Policy" />
     </LinearLayout>
+
 </RelativeLayout>

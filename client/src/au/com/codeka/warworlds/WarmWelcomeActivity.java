@@ -3,6 +3,7 @@ package au.com.codeka.warworlds;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.view.Window;
@@ -29,8 +30,7 @@ public class WarmWelcomeActivity extends BaseActivity {
         String msg = TransparentWebView.getHtmlFile(this, "html/warm-welcome.html");
         welcome.loadHtml("html/skeleton.html", msg);
 
-        Button startBtn = (Button) findViewById(R.id.start_btn);
-        startBtn.setOnClickListener(new View.OnClickListener() {
+        ((Button) findViewById(R.id.start_btn)).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 // save the fact that we've finished the warm welcome
@@ -40,6 +40,24 @@ public class WarmWelcomeActivity extends BaseActivity {
                 // this activity is finished, move to the AccountActivity
                 finish();
                 startActivity(new Intent(mContext, AccountsActivity.class));
+            }
+        });
+
+        ((Button) findViewById(R.id.help_btn)).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(Intent.ACTION_VIEW);
+                i.setData(Uri.parse("http://www.war-worlds.com/doc/getting-started"));
+                startActivity(i);
+            }
+        });
+
+        ((Button) findViewById(R.id.privacy_policy_btn)).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(Intent.ACTION_VIEW);
+                i.setData(Uri.parse("http://www.war-worlds.com/privacy-policy"));
+                startActivity(i);
             }
         });
     }

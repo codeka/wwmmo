@@ -13,6 +13,7 @@ import android.content.SharedPreferences;
 import android.os.Handler;
 import android.os.StrictMode;
 import android.preference.PreferenceManager;
+import android.widget.Toast;
 import au.com.codeka.BackgroundRunner;
 import au.com.codeka.ErrorReporter;
 import au.com.codeka.common.protobuf.Messages;
@@ -81,7 +82,7 @@ public class ServerGreeter {
         return mHelloComplete;
     }
 
-    public static void waitForHello(BaseActivity activity, HelloCompleteHandler handler) {
+    public static void waitForHello(Activity activity, HelloCompleteHandler handler) {
         if (mHelloComplete) {
             log.debug("Already said 'hello', not saying it again...");
             handler.onHelloComplete(true, mServerGreeting);
@@ -106,7 +107,7 @@ public class ServerGreeter {
         }
     }
 
-    private static void sayHello(final BaseActivity activity, final int retries) {
+    private static void sayHello(final Activity activity, final int retries) {
         log.debug("Saying 'hello'...");
         Util.setup(activity);
 
@@ -149,6 +150,7 @@ public class ServerGreeter {
             private String mResetReason;
             private ArrayList<Colony> mColonies;
             private ArrayList<Long> mStarIDs;
+            private String mToastMessage;
 
             @Override
             protected String doInBackground() {
@@ -157,6 +159,12 @@ public class ServerGreeter {
                     try {
                         realm.getAuthenticator().authenticate(activity, realm);
                     } catch (ApiException e) {
+                        mErrorOccured = true;
+                        mNeedsReAuthenticate = true;
+                        if (e.getServerErrorCode() > 0 && e.getServerErrorMessage() != null) {
+                            mToastMessage = e.getServerErrorMessage();
+                        }
+                        return null;
                     }
                 }
 
@@ -165,7 +173,16 @@ public class ServerGreeter {
                 GCMIntentService.register(activity);
                 String deviceRegistrationKey = DeviceRegistrar.getDeviceRegistrationKey();
                 if (deviceRegistrationKey == null || deviceRegistrationKey.length() == 0) {
-                    deviceRegistrationKey = DeviceRegistrar.register();
+                    try {
+                        deviceRegistrationKey = DeviceRegistrar.register();
+                    } catch (ApiException e) {
+                        mErrorOccured = true;
+                        mNeedsReAuthenticate = true;
+                        if (e.getServerErrorCode() > 0 && e.getServerErrorMessage() != null) {
+                            mToastMessage = e.getServerErrorMessage();
+                        }
+                        return null;
+                    }
                 }
 
                 // say hello to the server
@@ -271,6 +288,11 @@ public class ServerGreeter {
                     mHelloComplete = true;
                 } else /* mErrorOccured */ {
                     mServerGreeting.mIsConnected = false;
+
+                    if (mToastMessage != null && mToastMessage.length() > 0) {
+                        Toast toast = Toast.makeText(App.i, mToastMessage, Toast.LENGTH_LONG);
+                        toast.show();
+                    }
 
                     if (mNeedsReAuthenticate) {
                         // if we need to re-authenticate, first forget the current credentials

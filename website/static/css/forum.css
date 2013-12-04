@@ -1,0 +1,102 @@
+
+
+/* ------------------------------------------------------------------
+ * Post Viewing
+ */
+
+article.single-post header {
+  border-bottom: solid 1px #ccc;
+  padding-top: 10pt;
+  margin-left: 70px;
+}
+
+article.single-post header time {
+  font-weight: bold;
+}
+
+article.single-post header a {
+  font-weight: bold;
+  text-decoration: none;
+  color: #000;
+}
+
+article.single-post {
+  margin-bottom: 2em;
+}
+
+article.single-post div.content {
+  margin-left: 70px;
+}
+
+article.single-post div.content p:nth-child(1) {
+  margin-top: 0;
+}
+
+article .poster-shield {
+  float: left;
+  margin-right: 6px;
+  margin-top: 12px;
+}
+
+header.post-reply-header {
+  font-weight: bold;
+  border-bottom: dotted 1px #999;
+}
+
+/* ------------------------------------------------------------------
+ * Post Editing
+ */
+
+fieldset {
+  border: none;
+  padding: 8pt 0 20pt 0;
+}
+
+div.forum-field {
+  height: 20pt;
+  position: relative;
+  margin: 8pt 0;
+}
+
+div.forum-field label {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 75pt;
+  line-height: 20pt;
+}
+
+div.forum-field div.hack {
+  position: absolute;
+  top: 0; left: 75pt; bottom: 0; right: 4pt;
+}
+div.forum-field input[type=text] {
+  width: 100%;
+  border: solid 1px #ccc;
+  padding: 2pt 4pt;
+}
+
+div.forum-field.forum-field-markitup {
+  height: 300pt;
+}
+div.forum-field.forum-field-markitup label {
+  position: absolute;
+  top: 0; left: 0; height: 20pt; width: 75pt;
+  line-height: 20pt;
+}
+div.forum-field.forum-field-markitup textarea {
+  width: 100%; height: 100%;
+  border: solid 1px #ccc;
+  padding: 2pt 4pt;
+}
+
+div.forum-field.forum-field-submit input {
+  position: absolute;
+  left: 75pt;
+  top: 0;
+  bottom: 0;
+  right: auto;
+  width: 100pt;
+}
+

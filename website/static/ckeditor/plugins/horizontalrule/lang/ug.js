@@ -1,0 +1,1 @@
+﻿CKEDITOR.plugins.setLang("horizontalrule","ug",{toolbar:"توغرا سىزىق قىستۇر"});

@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <org.andengine.opengl.view.RenderSurfaceView
+        android:id="@+id/starfield"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <RelativeLayout
+        android:id="@+id/bottom_pane"
+        style="@style/BottomPane"
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:layout_alignParentBottom="true"
+        android:baselineAligned="false">
+
+        <TextView android:id="@+id/instructions"
+                  android:layout_width="match_parent"
+                  android:layout_height="wrap_content"
+                  android:text="Select the star you want to move your fleet to and click &quot;Move&quot;" />
+
+        <LinearLayout android:id="@+id/star_details"
+                      android:layout_width="match_parent"
+                      android:layout_height="wrap_content"
+                      android:orientation="horizontal" >
+
+            <TextView android:id="@+id/star_details_left"
+                      android:layout_width="0dp"
+                      android:layout_weight="1"
+                      android:layout_height="wrap_content" />
+
+            <TextView android:id="@+id/star_details_right"
+                      android:layout_width="0dp"
+                      android:layout_weight="1"
+                      android:layout_height="wrap_content" />
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/move_btn"
+            android:layout_width="100dp"
+            android:layout_height="30dp"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="8dp"
+            android:layout_marginBottom="8dp"
+            android:text="Move" />
+
+        <Button
+            android:id="@+id/cancel_btn"
+            android:layout_width="100dp"
+            android:layout_height="30dp"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentLeft="true"
+            android:layout_marginLeft="8dp"
+            android:layout_marginBottom="8dp"
+            android:text="Cancel" />
+
+    </RelativeLayout>
+
+</RelativeLayout>

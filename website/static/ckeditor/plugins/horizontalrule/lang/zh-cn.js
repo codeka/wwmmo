@@ -1,0 +1,1 @@
+﻿CKEDITOR.plugins.setLang("horizontalrule","zh-cn",{toolbar:"插入水平线"});

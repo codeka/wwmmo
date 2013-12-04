@@ -1,0 +1,71 @@
+application: warworldssite
+version: 1
+runtime: python27
+api_version: 1
+threadsafe: yes
+
+libraries:
+- name: jinja2
+  version: latest
+
+builtins:
+- appstats: off
+- deferred: on
+
+handlers:
+- url: /img(/v[0-9]+)?/(.*)
+  static_files: static/img/\2
+  upload: static/img/.*
+  expiration: "365d"
+
+- url: /css(/v[0-9]+)?/(.*)
+  static_files: static/css/\2
+  upload: static/css/.*
+  expiration: "365d"
+
+- url: /js(/v[0-9]+)?/(.*)
+  static_files: static/js/\2
+  upload: static/js/.*
+  expiration: "365d"
+
+- url: /jar(/v[0-9]+)?/(.*)
+  static_files: static/jar/\2
+  upload: static/jar/.*
+  expiration: "365d"
+
+- url: /ckeditor(/v[0-9]+)?/(.*)
+  static_files: static/ckeditor/\2
+  upload: static/ckeditor/.*
+  expiration: "365d"
+
+- url: /(favicon.ico|robots.txt|apple-touch-icon.png|apple-touch-icon-precomposed.png)
+  static_files: static/\1
+  upload: static/.*
+
+- url: /cron/profiles(/.*)?
+  script: cron.profiles.app
+  login: admin
+
+- url: /blog(/.*)?
+  script: handlers.blog.app
+
+- url: /forum(/.*)?
+  script: handlers.forum.app
+
+- url: /profiles?(/.*)?
+  script: handlers.profiles.app
+
+- url: /doc(/.*)?
+  script: handlers.doc.app
+
+- url: /admin/forum(/.*)?
+  script: handlers.forum_admin.app
+
+- url: /admin(/.*)?
+  script: handlers.admin.app
+
+- url: /stats.*
+  script: google.appengine.ext.appstats.ui.app
+
+- url: /.*
+  script: handlers.main.app

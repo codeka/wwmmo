@@ -1,6 +1,7 @@
 package au.com.codeka.warworlds.server;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -25,6 +26,7 @@ import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.common.protoformat.PbFormatter;
 import au.com.codeka.warworlds.server.ctrl.NotificationController;
 import au.com.codeka.warworlds.server.ctrl.SessionController;
+import au.com.codeka.warworlds.server.handlers.pages.HtmlPageHandler;
 
 import com.google.protobuf.Message;
 import com.mysql.jdbc.exceptions.jdbc4.MySQLTransactionRollbackException;
@@ -282,6 +284,18 @@ public class RequestHandler {
         }
 
         return result;
+    }
+
+    /**
+     * Gets a file representing the "base" path where everything in installed into (e.g. the "data" directory
+     * is relative to this path.
+     */
+    protected static File getBasePath() {
+        String path = System.getProperty("au.com.codeka.warworlds.server.basePath");
+        if (path == null) {
+            path = HtmlPageHandler.class.getClassLoader().getResource("").getPath();
+        }
+        return new File(path+"../").getAbsoluteFile();
     }
 
     @SuppressWarnings("unchecked")

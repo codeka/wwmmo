@@ -14,17 +14,26 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
+import org.andengine.opengl.texture.TextureOptions;
+import org.andengine.opengl.texture.atlas.ITextureAtlas.ITextureAtlasStateListener;
+import org.andengine.opengl.texture.atlas.bitmap.BitmapTextureAtlas;
+import org.andengine.opengl.texture.atlas.bitmap.BitmapTextureAtlasTextureRegionFactory;
+import org.andengine.opengl.texture.atlas.bitmap.source.FileBitmapTextureAtlasSource;
+import org.andengine.opengl.texture.atlas.bitmap.source.IBitmapTextureAtlasSource;
+import org.andengine.opengl.texture.region.ITextureRegion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import android.content.Context;
 import android.content.res.AssetManager;
 import android.graphics.Bitmap;
+import android.graphics.Bitmap.CompressFormat;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.graphics.Bitmap.CompressFormat;
 import au.com.codeka.BackgroundRunner;
 import au.com.codeka.warworlds.App;
+import au.com.codeka.warworlds.BaseGlActivity;
+import au.com.codeka.warworlds.RealmContext;
 import au.com.codeka.warworlds.api.ApiClient;
 import au.com.codeka.warworlds.api.ApiException;
 
@@ -34,11 +43,13 @@ public class EmpireShieldManager {
 
     private Bitmap sBaseShield;
     private Map<String, SoftReference<Bitmap>> mEmpireShields;
+    private Map<String, ITextureRegion> mEmpireShieldTextures;
     private List<EmpireShieldUpdatedHandler> mEmpireShieldUpdatedHandlers;
     private Set<Integer> mFetchingShields;
 
     private EmpireShieldManager() {
         mEmpireShields = new HashMap<String, SoftReference<Bitmap>>();
+        mEmpireShieldTextures = new HashMap<String, ITextureRegion>();
         mEmpireShieldUpdatedHandlers = new ArrayList<EmpireShieldUpdatedHandler>();
         mFetchingShields = new HashSet<Integer>();
     }
@@ -79,21 +90,17 @@ public class EmpireShieldManager {
         }
 
         if (bmp == null) {
-            if (empire.getShieldLastUpdate() != null) {
+            bmp = loadCachedShieldImage(context, empire);
+            if (bmp == null && empire.getShieldLastUpdate() != null) {
                 log.info(String.format("Getting shield image for empire [key=%s last_update=%s]",
                         empire.getKey(), empire.getShieldLastUpdate()));
-                Bitmap shieldBitmap = loadCachedShieldImage(context, Integer.parseInt(empire.getKey()),
-                        empire.getShieldLastUpdate().getMillis());
-                if (shieldBitmap == null) {
-                    queueFetchShieldImage(empire);
-                } else {
-                    bmp = combineShieldImage(context, shieldBitmap);
-                }
+                queueFetchShieldImage(empire);
             }
-
             if (bmp == null) {
                 int colour = getShieldColour(empire);
                 bmp = combineShieldColour(context, colour);
+
+                saveCachedShieldImage(context, empire, bmp);
             }
 
             mEmpireShields.put(empire.getKey(), new SoftReference<Bitmap>(bmp));
@@ -102,7 +109,43 @@ public class EmpireShieldManager {
         return bmp;
     }
 
+    public void clearTextureCache() {
+        mEmpireShieldTextures.clear();
+    }
+
+    /** Gets (or creates) the empire's shield as an andengine texture. */
+    public ITextureRegion getShieldTexture(BaseGlActivity glActivity, Empire empire) {
+        ITextureRegion textureRegion = mEmpireShieldTextures.get(empire.getKey());
+        if (textureRegion == null) {
+            String fullPath = getCacheFile(glActivity, empire);
+            File f = new File(fullPath);
+            if (!f.exists()) {
+                if (empire.getShieldLastUpdate() != null) {
+                    log.info(String.format("Getting shield image for empire [key=%s last_update=%s]",
+                            empire.getKey(), empire.getShieldLastUpdate()));
+                    queueFetchShieldImage(empire);
+                }
+
+                int colour = getShieldColour(empire);
+                Bitmap bmp = combineShieldColour(glActivity, colour);
+                saveCachedShieldImage(glActivity, empire, bmp);
+            }
+
+            BitmapTextureAtlas atlas = new BitmapTextureAtlas(glActivity.getTextureManager(), 128, 128,
+                    TextureOptions.BILINEAR_PREMULTIPLYALPHA);
+            atlas.setTextureAtlasStateListener(new ITextureAtlasStateListener.DebugTextureAtlasStateListener<IBitmapTextureAtlasSource>());
+            textureRegion = BitmapTextureAtlasTextureRegionFactory.createTiledFromSource(
+                    atlas, FileBitmapTextureAtlasSource.create(f), 0, 0, 1, 1);
+            glActivity.getTextureManager().loadTexture(atlas);
+
+            mEmpireShieldTextures.put(empire.getKey(), textureRegion);
+        }
+
+        return textureRegion;
+    }
+
     private void queueFetchShieldImage(final Empire empire) {
+        log.debug("queuing up a request to fetch a new shield...");
         final int empireID = Integer.parseInt(empire.getKey());
         synchronized(mFetchingShields) {
             if (mFetchingShields.contains(empireID)) {
@@ -117,13 +160,15 @@ public class EmpireShieldManager {
                 String url = "empires/"+empireID+"/shield";
                 try {
                     Bitmap bmp = ApiClient.getImage(url);
+                    bmp = combineShieldImage(App.i, bmp);
 
                     // save the cached version
-                    saveCachedShieldImage(App.i, empireID, empire.getShieldLastUpdate().getMillis(), bmp);
-
-                    // re-generate the in-memory cache
-                    bmp = combineShieldImage(App.i, bmp);
+                    log.debug("got a new shield image for "+empireID);
+                    saveCachedShieldImage(App.i, empire, bmp);
                     mEmpireShields.put(empire.getKey(), new SoftReference<Bitmap>(bmp));
+
+                    // TODO: fix it
+                    mEmpireShieldTextures.remove(empireID);
 
                     return bmp;
                 } catch (ApiException e) {
@@ -209,8 +254,8 @@ public class EmpireShieldManager {
                             1.0f};
     }
 
-    private Bitmap loadCachedShieldImage(Context context, int empireID, long lastUpdateTime) {
-        String fullPath = getCacheFile(context, empireID, lastUpdateTime);
+    private Bitmap loadCachedShieldImage(Context context, Empire empire) {
+        String fullPath = getCacheFile(context, empire);
         File f = new File(fullPath);
         if (!f.exists()) {
             return null;
@@ -218,8 +263,8 @@ public class EmpireShieldManager {
         return BitmapFactory.decodeFile(fullPath);
     }
 
-    private void saveCachedShieldImage(Context context, int empireID, long lastUpdateTime, Bitmap bmp) {
-        String fullPath = getCacheFile(context, empireID, lastUpdateTime);
+    private void saveCachedShieldImage(Context context, Empire empire, Bitmap bmp) {
+        String fullPath = getCacheFile(context, empire);
 
         // make sure the directory exists...
         File f = new File(fullPath);
@@ -233,10 +278,15 @@ public class EmpireShieldManager {
         }
     }
 
-    private String getCacheFile(Context context, int empireID, long lastUpdateTime) {
+    private String getCacheFile(Context context, Empire empire) {
+        long lastUpdate = 0;
+        if (empire.getShieldLastUpdate() != null) {
+            lastUpdate = empire.getShieldLastUpdate().getMillis();
+        }
+
         File cacheDir = context.getCacheDir();
         String fullPath = cacheDir.getAbsolutePath() + File.separator + "empire-shields" + File.separator;
-        fullPath += String.format("%d-%d.png", empireID, lastUpdateTime);
+        fullPath += String.format("%d-v2-%s-%d.png", RealmContext.i.getCurrentRealm().getID(), empire.getKey(), lastUpdate);
         return fullPath;
     }
 

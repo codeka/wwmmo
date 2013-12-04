@@ -1,0 +1,79 @@
+{% extends "skeleton.html" %}
+
+{% block header %}
+    <style>
+      section.maincontent {
+        width: 900px;
+        margin: 0 auto;
+        background: #fff;
+        margin-top: 50px;
+      }
+      section.signup-form {
+        width: 400px;
+        float: left;
+        padding: 10px;
+      }
+      section.blurb {
+        width: 460px;
+        float: left;
+        padding: 10px;
+      }
+
+      section.signup-form label {
+        display: block;
+        margin: 1em 0 0 0;
+        font-weight: bold;
+      }
+
+      section.signup-form input {
+        display: block;
+      }
+      section.signup-form input[type=text], section.signup-form input[type=email] {
+        width: 380px;
+        border: solid 1px #999;
+        padding: 4px 8px;
+      }
+      section.signup-form input[type=submit] {
+        margin-top: 1em;
+      }
+
+      @media only screen and (max-width: 900px) {
+        section.maincontent {
+          width: auto;
+        }
+
+        section.signup-form {
+          float: none;
+          width: auto;
+          text-align: center;
+        }
+
+        section.blurb {
+          float: none;
+          width: auto;
+        }
+      }
+    </style>
+{% endblock %}
+
+{% block maincontent %}
+  <section class="maincontent">
+    <section class="blurb">
+      <h1>War Worlds Newsletter</h1>
+      <p>If you&rsquo;re interested in War Worlds, sign up for the newsletter
+         and be notified of any major updates.</p>
+      <p>We will only email you in case of major updates (such as when access
+         to the alpha begins) so you don&rsquo;t need to worry about being spammed.</p>
+    </section>
+    <section class="signup-form">
+      <form method="post">
+         <label for="display_name">Your name:</label>
+         <input type="text" name="display_name" id="display_name">
+         <label for="email">Email address:</label>
+         <input type="email" name="email" id="email">
+         <input type="submit" value="Signup">
+      </form>
+    </section>
+    <div style="clear: both;"></div>
+  </section>
+{% endblock %}

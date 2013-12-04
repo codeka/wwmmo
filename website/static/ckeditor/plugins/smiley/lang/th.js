@@ -1,0 +1,1 @@
+﻿CKEDITOR.plugins.setLang("smiley","th",{options:"Smiley Options",title:"แทรกสัญลักษณ์สื่ออารมณ์",toolbar:"รูปสื่ออารมณ์"});

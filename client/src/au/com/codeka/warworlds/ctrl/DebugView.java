@@ -3,6 +3,7 @@ package au.com.codeka.warworlds.ctrl;
 import java.util.Locale;
 
 import android.content.Context;
+import android.os.Debug;
 import android.os.Handler;
 import android.util.AttributeSet;
 import android.view.View;
@@ -84,9 +85,10 @@ public class DebugView extends FrameLayout
         TextView connectionInfo = (TextView) mView.findViewById(R.id.connection_info);
         RequestManagerState state = RequestManager.getCurrentState();
         if (state.numInProgressRequests > 0) {
-            String str = String.format(Locale.ENGLISH, "Sim: %d Conn: %d %s",
+            String str = String.format(Locale.ENGLISH, "Sim: %d Conn: %d Mem: %.1f MB",
                     Simulation.getNumRunningSimulations(),
-                    state.numInProgressRequests, state.lastUri);
+                    state.numInProgressRequests,
+                    Debug.getNativeHeapSize() / 1024.02f / 1024.0f);
             connectionInfo.setText(str);
         } else {
             connectionInfo.setText("Conn: none");

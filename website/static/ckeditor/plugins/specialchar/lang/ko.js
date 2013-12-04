@@ -1,0 +1,1 @@
+﻿CKEDITOR.plugins.setLang("specialchar","ko",{options:"Special Character Options",title:"특수문자 선택",toolbar:"특수문자 삽입"});

@@ -2,11 +2,15 @@ package au.com.codeka.common;
 
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 /**
  * A triangle is simply three vertices from a list of points.
  */
 public class Triangle {
+    private static final Logger log = LoggerFactory.getLogger(Triangle.class);
     private List<Vector2> mPoints;
     public int a;
     public int b;
@@ -69,10 +73,11 @@ public class Triangle {
                 i2 = c;
         }
 
-        if (i1 >= 0 && i2 >= 0)
+        if (i1 >= 0 && i2 >= 0) {
             return new Edge(mPoints, i1, i2);
-        else
+        } else {
             return null;
+        }
     }
 
     public Edge findOppositeEdge(Vector2 pt) {

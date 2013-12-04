@@ -481,10 +481,7 @@ public class EmpireActivity extends TabFragmentActivity
 
                 @Override
                 public void onFleetMove(Star star, Fleet fleet) {
-                    FragmentManager fm = getActivity().getSupportFragmentManager();
-                    FleetMoveDialog dialog = new FleetMoveDialog();
-                    dialog.setFleet(fleet);
-                    dialog.show(fm, "");
+                    FleetMoveActivity.show(getActivity(), fleet);
                 }
 
                 @Override

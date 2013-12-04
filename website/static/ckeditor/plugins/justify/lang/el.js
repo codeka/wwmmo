@@ -1,0 +1,1 @@
+﻿CKEDITOR.plugins.setLang("justify","el",{block:"Πλήρης Στοίχιση",center:"Στοίχιση στο Κέντρο",left:"Στοίχιση Αριστερά",right:"Στοίχιση Δεξιά"});

@@ -1,0 +1,26 @@
+{% extends "skeleton.html" %}
+{% import "doc/macros.html" as m %}
+
+{% block header %}
+  {{m.html_header(resource_version)}}
+{% endblock %}
+{% block pagetitle %}Documentation &bull; Delete{% endblock %}
+{% block title %}Delete Document{% endblock %}
+
+{% block maincontent %}
+  <section class="content delete-content">
+    <fieldset>
+      <legend>Delete Document</legend>
+      <p>Are you sure you want to delete this document? <em>This operation cannot
+      be undone.</em></p>
+      <blockquote>
+        <h2>Slug: {{slug}}</h2>
+        <h3>{{page.title}}</h3>
+      </blockquote>
+      <form action="/doc/_/delete" method="post">
+        <input type="hidden" name="key" value="{{page.key}}">
+        <input type="submit" value="Delete">
+      </form>
+    </fieldset>
+  </section>
+{% endblock %}

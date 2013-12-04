@@ -56,6 +56,9 @@ public abstract class BaseStar {
     public static StarType getStarType(int index) {
         return sStarTypes[index];
     }
+    public static StarType[] getStarTypes() {
+        return sStarTypes;
+    }
 
     protected String mKey;
     protected String mName;

@@ -1,0 +1,57 @@
+/**
+ * This is the CSS file that corresponds to lightbox.js.
+ *
+ * Copyright (c) 2012 by Dean Harding.
+ */
+
+#lightbox-background {
+    position: fixed;
+    left: 0; top: 0;
+    right: 0; bottom: 0;
+    z-index: 100;
+    background: rgba(0, 0, 0, 0.6);
+}
+
+#lightbox-background iframe {
+    position: absolute;
+    left: 0; top: 0;
+    right: 0; bottom: 0;
+    z-index: 99;
+}
+
+div.lightbox-image-container {
+    position: fixed;
+    top: 40px; left: 40px;
+    right: 40px; bottom: 40px;
+    text-align: center;
+    line-height: 100%;
+    z-index: 101;
+}
+
+div.lightbox-image-container img {
+    vertical-align: middle;
+    border: solid 8pt white;
+    border-radius: 5pt;
+    box-shadow: 0 10pt 25pt;
+
+    max-width: 100%;
+    max-height: 100%;
+}
+
+div.captioned-image {
+}
+
+div.captioned-image div.caption {
+    padding: 2px;
+    font-size: 90%;
+    font-family: arial, sans-serif;
+
+    color: white;
+    background: rgba(0, 0, 0, 0.6);
+    text-align: left;
+}
+
+div.captioned-image div.caption img {
+    vertical-align: bottom;
+    float: right;
+}

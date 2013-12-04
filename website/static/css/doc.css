@@ -1,0 +1,116 @@
+
+/* ------------------------------------------------------------------
+ * Overall
+ */
+
+header#page-header nav.doc-userinfo {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  color: #fff;
+}
+
+header#page-header nav.doc-userinfo a {
+  color: #99f;
+}
+
+/* ------------------------------------------------------------------
+ * Page Editor
+ */
+
+section.editor-content {
+  position: absolute;
+  top: 104px;
+  left: 50%;
+  margin-left: -450px;
+  bottom: 0;
+}
+
+fieldset.edit-fields {
+  position: absolute;
+  top: 10px;
+  bottom: 10px;
+  left: 20px;
+  right: 20px;
+}
+
+fieldset.edit-fields div.top-fields {
+  position: absolute;
+  top: 20px; left: 10px; right: 10px; height: 22px;
+}
+
+fieldset.edit-fields div.bottom-fields {
+  position: absolute;
+  bottom: 10px; left: 10px; right: 10px; height: 22px;
+}
+
+fieldset.edit-fields div.middle-fields {
+  position: absolute;
+  top: 52px;
+  left: 10px; right: 10px;
+  bottom: 42px;
+}
+
+fieldset.edit-fields div.field {
+  position: relative;
+  height: 22px;
+  line-height: 22px;
+}
+
+fieldset.edit-fields div.field label {
+  position: absolute;
+  top: 0; left: 0; bottom: 0;
+  width: 100px;
+}
+
+fieldset.edit-fields div.field input[type=text] {
+  position: absolute;
+  top: 0; right: 0; bottom: 0;
+  left: 110px;
+}
+
+/* ------------------------------------------------------------------
+ * Page "delete"
+ */
+
+section.delete-content {
+  padding-bottom: 1em;
+}
+
+section.delete-content fieldset {
+  padding: 10pt;
+}
+
+section.delete-content input[type=submit] {
+  margin-top: 1em;
+}
+
+/* ------------------------------------------------------------------
+ * Page "view"
+ */
+
+section.view-content {
+  position: relative;
+}
+
+nav.page-controls {
+  float: right;
+  margin: 10px;
+  padding: 0 10px;
+  border: solid 2px #666;
+  border-radius: 3px;
+  background: #fff;
+}
+
+nav.page-controls ul {
+  margin: 0 0 0 20px; padding: 0;
+}
+
+section.view-content img.float-left {
+  margin-right: 1em;
+}
+
+section.view-content img.float-right {
+  margin-left: 1em;
+}
+

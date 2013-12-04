@@ -13,6 +13,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.view.View;
@@ -65,6 +66,25 @@ public class AccountsActivity extends BaseActivity {
                     finish();
                 }
             });
+
+            ((Button) findViewById(R.id.help_btn)).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent i = new Intent(Intent.ACTION_VIEW);
+                    i.setData(Uri.parse("http://www.war-worlds.com/doc/getting-started"));
+                    startActivity(i);
+                }
+            });
+
+            ((Button) findViewById(R.id.privacy_policy_btn)).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent i = new Intent(Intent.ACTION_VIEW);
+                    i.setData(Uri.parse("http://www.war-worlds.com/privacy-policy"));
+                    startActivity(i);
+                }
+            });
+
         } else {
             mIsLogIn = false;
             setContentView(R.layout.log_out);
@@ -79,19 +99,19 @@ public class AccountsActivity extends BaseActivity {
                     finish();
                 }
             });
-        }
 
-        final Button cancelButton = (Button) findViewById(R.id.cancel_btn);
-        cancelButton.setOnClickListener(new OnClickListener() {
-            public void onClick(View v) {
-                if (mIsLogIn) {
-                    Intent intent = new Intent(mContext, WarmWelcomeActivity.class);
-                    startActivity(intent);
+            final Button cancelButton = (Button) findViewById(R.id.cancel_btn);
+            cancelButton.setOnClickListener(new OnClickListener() {
+                public void onClick(View v) {
+                    if (mIsLogIn) {
+                        Intent intent = new Intent(mContext, WarmWelcomeActivity.class);
+                        startActivity(intent);
+                    }
+
+                    finish();
                 }
-
-                finish();
-            }
-        });
+            });
+        }
     }
 
     @Override

@@ -1,5 +1,6 @@
 package au.com.codeka.warworlds.server.handlers.pages;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
@@ -14,7 +15,6 @@ import org.slf4j.LoggerFactory;
 import au.com.codeka.warworlds.server.OpenIdAuth;
 import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.RequestHandler;
-
 import net.asfun.jangod.template.TemplateEngine;
 import net.asfun.jangod.interpret.InterpretException;
 import net.asfun.jangod.interpret.JangodInterpreter;
@@ -28,11 +28,7 @@ public class BasePageHandler extends RequestHandler {
     static {
         sTemplateEngine = new TemplateEngine();
 
-        String path = System.getProperty("au.com.codeka.warworlds.server.basePath");
-        if (path == null) {
-            path = HtmlPageHandler.class.getClassLoader().getResource("").getPath();
-        }
-        sTemplateEngine.getConfiguration().setWorkspace(path+"../data/tmpl");
+        sTemplateEngine.getConfiguration().setWorkspace(new File(getBasePath(), "data/tmpl").getAbsolutePath());
 
         FilterLibrary.addFilter(new NumberFilter());
     }
@@ -46,6 +42,16 @@ public class BasePageHandler extends RequestHandler {
             getResponse().getWriter().write(sTemplateEngine.process(path, data));
         } catch (IOException e) {
             log.error("Error rendering template!", e);
+        }
+    }
+
+    protected void write(String text) {
+        getResponse().setContentType("text/plain");
+        getResponse().setHeader("Content-Type", "text/plain");
+        try {
+            getResponse().getWriter().write(text);;
+        } catch (IOException e) {
+            log.error("Error writing output!", e);
         }
     }
 

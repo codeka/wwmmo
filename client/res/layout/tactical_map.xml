@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <au.com.codeka.warworlds.game.starfield.TacticalMapView
+    <org.andengine.opengl.view.RenderSurfaceView
         android:id="@+id/tactical_map"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />

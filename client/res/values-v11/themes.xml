@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
     <style name="WarWorlds" parent="@android:style/Theme.Holo">
         <item name="android:buttonStyle">@style/Button</item>
         <item name="android:spinnerStyle">@style/Spinner</item>
     </style>
-
 </resources>

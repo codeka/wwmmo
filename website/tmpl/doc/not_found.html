@@ -1,0 +1,14 @@
+{% extends "skeleton.html" %}
+{% import "doc/macros.html" as m %}
+
+{% block header %}{{m.html_header()}}{% endblock %}
+{% block pagetitle %}Documentation &bull; Not Found{% endblock %}
+{% block title %}Not Found{% endblock %}
+{% block headerlinks %}{% endblock %}
+
+{% block maincontent %}
+  <section class="content">
+    <h1>Not Found</h1>
+    <p>No page exists at this address, you can <a href="/doc/_/edit?slug={{slug}}">create one</a>.</p>
+  </section>
+{% endblock %}

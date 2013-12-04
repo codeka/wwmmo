@@ -14,6 +14,7 @@ public abstract class BaseEmpire {
     protected BaseStar mHomeStar;
     protected BaseAlliance mAlliance;
     protected DateTime mShieldLastUpdate;
+    protected State mState;
 
     protected abstract BaseEmpireRank createEmpireRank(Messages.EmpireRank pb);
     protected abstract BaseStar createStar(Messages.Star pb);
@@ -56,6 +57,7 @@ public abstract class BaseEmpire {
         mDisplayName = pb.getDisplayName();
         mCash = pb.getCash();
         mEmailAddr = pb.getEmail();
+        mState = State.fromNumber(pb.getState().getNumber());
 
         if (pb.getRank() != null && pb.getRank().getEmpireKey() != null &&
                 pb.getRank().getEmpireKey().length() > 0) {
@@ -82,7 +84,7 @@ public abstract class BaseEmpire {
         pb.setDisplayName(mDisplayName);
         pb.setCash(mCash);
         pb.setEmail(mEmailAddr);
-        pb.setState(Messages.Empire.EmpireState.INITIAL);
+        pb.setState(Messages.Empire.EmpireState.valueOf(mState.getValue()));
 
         if (mHomeStar != null) {
             Messages.Star.Builder star_pb = Messages.Star.newBuilder();
@@ -106,4 +108,30 @@ public abstract class BaseEmpire {
             pb.setShieldImageLastUpdate(mShieldLastUpdate.getMillis() / 1000);
         }
     }
+
+    public enum State {
+        ACTIVE(1),
+        BANNED(2);
+
+        private int mValue;
+
+        State(int value) {
+            mValue = value;
+        }
+
+        public int getValue() {
+            return mValue;
+        }
+
+        public static State fromNumber(int value) {
+            for(State s : State.values()) {
+                if (s.getValue() == value) {
+                    return s;
+                }
+            }
+
+            return State.ACTIVE;
+        }
+    }
+
 }

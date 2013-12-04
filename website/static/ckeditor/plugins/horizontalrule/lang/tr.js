@@ -1,0 +1,1 @@
+﻿CKEDITOR.plugins.setLang("horizontalrule","tr",{toolbar:"Yatay Satır Ekle"});

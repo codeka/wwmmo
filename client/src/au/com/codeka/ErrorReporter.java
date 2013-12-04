@@ -20,6 +20,7 @@ import android.content.DialogInterface;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
+import android.os.Debug;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.CheckBox;
@@ -179,6 +180,7 @@ public class ErrorReporter {
      */
     public static class ExceptionHandler implements UncaughtExceptionHandler {
         private UncaughtExceptionHandler mOldDefaultExceptionHandler;
+        private static Debug.MemoryInfo sMemoryInfo = new Debug.MemoryInfo(); // allocate up-front in case we run out of memory later...
 
         public ExceptionHandler(UncaughtExceptionHandler oldDefaultExceptionHandler) {
             mOldDefaultExceptionHandler = oldDefaultExceptionHandler;
@@ -197,6 +199,7 @@ public class ErrorReporter {
                 final PrintWriter printWriter = new PrintWriter(stringWriter);
                 throwable.printStackTrace(printWriter);
 
+                Debug.getMemoryInfo(sMemoryInfo);
                 Messages.ErrorReport.Builder error_report_pb = Messages.ErrorReport.newBuilder()
                         .setAndroidVersion(sAndroidVersion)
                         .setAppVersion(sVersionName)
@@ -205,7 +208,13 @@ public class ErrorReporter {
                         .setStackTrace(stringWriter.toString())
                         .setMessage(throwable.getMessage())
                         .setExceptionClass(throwable.getClass().getName())
-                        .setReportTime(DateTime.now().getMillis());
+                        .setReportTime(DateTime.now().getMillis())
+                        .setHeapSize(Debug.getNativeHeapSize())
+                        .setHeapAllocated(Debug.getNativeHeapAllocatedSize())
+                        .setHeapFree(Debug.getNativeHeapFreeSize())
+                        .setTotalRunTime(BackgroundDetector.i.getTotalRunTime())
+                        .setForegroundRunTime(BackgroundDetector.i.getTotalForegroundTime());
+
                 MyEmpire myEmpire = EmpireManager.i.getEmpire();
                 if (myEmpire != null) {
                     error_report_pb.setEmpireId(Integer.parseInt(myEmpire.getKey()));

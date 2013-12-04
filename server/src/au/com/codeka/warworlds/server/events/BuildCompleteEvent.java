@@ -162,6 +162,7 @@ public class BuildCompleteEvent extends Event {
                                     String upgradeID, String designID, float count) throws RequestException {
         Fleet fleet;
 
+<<<<<<< HEAD
         Empire empire = new EmpireController().getEmpire(empireID);
         if (existingFleetID != null) {
             fleet = (Fleet) star.getFleet(existingFleetID);
@@ -177,6 +178,12 @@ public class BuildCompleteEvent extends Event {
                 // remove 100 population from the colony that built this guy
                 new ColonyController().reducePopulation(colony, 100.0f);
             }
+=======
+        // todo: hard-coded?
+        if (designID.equals("colonyship")) {
+            // remove 100 population from the colony that built this guy
+            //new ColonyController().reducePopulation(colony, 100.0f);
+>>>>>>> master
         }
 
         return fleet;

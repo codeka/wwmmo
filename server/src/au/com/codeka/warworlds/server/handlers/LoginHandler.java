@@ -18,6 +18,8 @@ import org.json.simple.JSONValue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import au.com.codeka.common.model.BaseEmpire;
+import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.server.OpenIdAuth;
 import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.RequestHandler;
@@ -164,7 +166,8 @@ public class LoginHandler extends RequestHandler {
 
         int empireID = 0;
         int allianceID = 0;
-        try (SqlStmt stmt = DB.prepare("SELECT id, alliance_id FROM empires WHERE user_email = ?")) {
+        boolean banned = false;
+        try (SqlStmt stmt = DB.prepare("SELECT id, alliance_id, state FROM empires WHERE user_email = ?")) {
             if (impersonateUser != null) {
                 stmt.setString(1, impersonateUser);
             } else {
@@ -174,9 +177,17 @@ public class LoginHandler extends RequestHandler {
             if (rs.next()) {
                 empireID = rs.getInt(1);
                 allianceID = rs.getInt(2);
+                BaseEmpire.State state = BaseEmpire.State.fromNumber(rs.getInt(3));
+                if (state == BaseEmpire.State.BANNED) {
+                    banned = true;
+                }
             }
         } catch (Exception e) {
             throw new RequestException(e);
+        }
+
+        if (banned) {
+            throw new RequestException(403, Messages.GenericError.ErrorCode.EmpireBanned, "You have been banned for misconduct.");
         }
 
         Session session = new Session(cookie.toString(), emailAddr, DateTime.now(),

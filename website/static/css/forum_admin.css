@@ -1,0 +1,29 @@
+
+
+fieldset#forum-details {
+  width: 600pt;
+  padding: 8pt;
+}
+
+div.forum-field {
+  position: relative;
+  height: 20pt;
+}
+
+div.forum-field input {
+  position: absolute;
+  left: 50pt;
+  right: 0;
+}
+
+div.forum-field.forum-field-textarea {
+  height: 100pt;
+}
+
+div.forum-field-textarea textarea {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}

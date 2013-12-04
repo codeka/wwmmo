@@ -1,0 +1,1 @@
+﻿CKEDITOR.plugins.setLang("selectall","km",{toolbar:"ជ្រើសរើសទាំងអស់"});

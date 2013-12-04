@@ -1,0 +1,1 @@
+﻿CKEDITOR.plugins.setLang("showblocks","km",{toolbar:"Show Blocks"});

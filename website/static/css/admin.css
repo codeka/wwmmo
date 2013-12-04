@@ -1,0 +1,267 @@
+
+
+body {
+  background: #fff;
+}
+
+ul {
+  margin: 0 0 0 1em;
+}
+
+header#main-header {
+  height: 80px;
+  background: #aaa;
+}
+
+header#main-header h1 {
+    font-size: 20pt;
+    line-height: 80px;
+    margin-left: 1em;
+}
+
+nav#main-nav {
+  position: absolute;
+  top: 80px;
+  left: 0;
+  width: 145pt;
+  bottom: 0;
+
+  background-image: linear-gradient(left , rgb(255,255,255) 75%, rgb(221,221,221) 100%);
+  background-image: -o-linear-gradient(left , rgb(255,255,255) 75%, rgb(221,221,221) 100%);
+  background-image: -moz-linear-gradient(left , rgb(255,255,255) 75%, rgb(221,221,221) 100%);
+  background-image: -webkit-linear-gradient(left , rgb(255,255,255) 75%, rgb(221,221,221) 100%);
+  background-image: -ms-linear-gradient(left , rgb(255,255,255) 75%, rgb(221,221,221) 100%);
+}
+
+section#main-content {
+  position: absolute;
+  top: 80px;
+  left: 150pt;
+  right: 0;
+  bottom: 0;
+}
+
+
+
+input[type=text] {
+  border: solid 1px #000;
+}
+
+
+div#post-container {
+  position: absolute;
+  top: 20pt; left: 0; right: 0; bottom: 10pt;
+}
+
+fieldset#post-details {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 10pt;
+  bottom: 0;
+  padding: 10pt;
+}
+
+div.post-details-header {
+  position: absolute;
+  top: 20pt;
+  left: 20pt;
+  right: 20pt;
+  height: 20pt;
+}
+
+div.post-details-content {
+  position: absolute;
+  top: 40pt;
+  bottom: 120pt;
+  left: 10pt;
+  right: 10pt;
+}
+
+div.post-details-content div.html {
+  height: 100%;
+}
+
+div.post-details-content div.markItUp {
+  height: 100%;
+}
+
+div.post-details-content div.markItUpContainer {
+  height: 100%;
+}
+
+div.post-details-content div.markItUp textarea {
+  height: -webkit-calc(100% - 60px);
+  height: calc(100% - 60px);
+}
+
+div.post-details-footer {
+  position: absolute;
+  bottom: 0; 
+  height: 120pt;
+  left: 10pt;
+  right: 10pt;
+}
+
+fieldset#post-images {
+  position: absolute;
+  right: 10pt;
+  width: 380pt;
+  top: 0;
+  bottom: 0;
+}
+
+div#images {
+  position: absolute;
+  top: 20pt;
+  left: 10pt;
+  right: 10pt;
+  bottom: 30pt;
+  overflow: auto;
+}
+
+div.images-footer {
+  position: absolute;
+  bottom: 10pt;
+  left: 10pt;
+}
+
+fieldset#post-details label {
+  line-height:16pt;
+}
+fieldset#post-details input[type=text] {
+  line-height:16pt;
+}
+
+fieldset#post-details a.dont-save-just-view {
+  float: right;
+}
+
+div.post-title {
+  position: relative;
+  height: 20pt;
+}
+
+div.post-title input {
+  position: absolute;
+  left: 50pt;
+  right: 0;
+}
+
+
+div.post-date {
+  position: relative;
+  height: 20pt;
+}
+
+div.post-date input {
+  position: absolute;
+  left: 50pt;
+  right: 50%;
+}
+
+
+div.post-ispublished {
+  line-height: 20pt;
+}
+
+div.post-ispublished input {
+  margin-left: 50pt;
+  height: 20pt;
+}
+
+
+div.post-submit {
+  margin-top: 20pt;
+}
+
+
+textarea#post-content {
+  padding: 5pt 5pt 5pt 10pt;
+  width: calc(100% - 15pt);
+  width: -webkit-calc(100% - 15pt);
+}
+
+
+div.uploaded-image {
+  border-bottom: solid 1px #ccc;
+}
+
+div.uploaded-image div.details {
+  margin-left: 105px;
+}
+
+div.uploaded-image div.details div {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+div.uploaded-image img {
+  display: block;
+  margin-right: 4px;
+  float: left;
+}
+
+
+#url-popup {
+  padding: 10px;
+}
+
+#url-popup div {
+  clear: left;
+}
+#url-popup div label {
+  float: left;
+  display: block;
+  width: 70px;
+}
+#url-popup div input[type=text] {
+  float: left;
+  display: block;
+  width: 200px;
+}
+#url-popup a.url-popup-refresh {
+  margin-left: 70px;
+}
+#url-popup input.url-popup-output {
+  width: 350px;
+  margin: 0 auto 10px auto;
+  display: block;
+}
+
+
+blockquote {
+  margin-left: 1em;
+  padding-left: 1em;
+  border-left: solid 2px #0f0;
+}
+
+table {
+  width: 100%;
+}
+table td, table th {
+  padding: 4px;
+}
+table th {
+  font-weight: bold;
+  text-align: left;
+}
+table tr.odd {
+  background: #eee;
+}
+table tr.even {
+  background: #fff;
+}
+table tr.published.even {
+  background: #efe;
+}
+table tr.published.odd {
+  background: #ded;
+}
+table tr.unpublished.even {
+  background: #fee;
+}
+table tr.unpublished.odd {
+  background: #edd;
+}
