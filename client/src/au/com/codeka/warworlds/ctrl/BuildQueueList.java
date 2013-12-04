@@ -15,6 +15,7 @@ import org.joda.time.Duration;
 import android.content.Context;
 import android.os.Handler;
 import android.text.Html;
+import android.text.TextUtils.TruncateAt;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -24,6 +25,7 @@ import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -482,7 +484,7 @@ public class BuildQueueList extends FrameLayout
                              RomanNumeralFormatter.format(entry.planet.getIndex())));
             } else {
                 ImageView icon = (ImageView) view.findViewById(R.id.building_icon);
-                TextView row1 = (TextView) view.findViewById(R.id.building_row1);
+                LinearLayout row1 = (LinearLayout) view.findViewById(R.id.building_row1);
                 entry.progressText = (TextView) view.findViewById(R.id.building_row2);
                 TextView row3 = (TextView) view.findViewById(R.id.building_row3);
                 entry.progressBar = (ProgressBar) view.findViewById(R.id.building_progress);
@@ -506,9 +508,9 @@ public class BuildQueueList extends FrameLayout
                 }
 
                 if (entry.buildRequest.getCount() == 1) {
-                    row1.setText(design.getDisplayName());
+                    addTextToRow(mContext, row1, design.getDisplayName());
                 } else {
-                    row1.setText(String.format("%d × %s",
+                    addTextToRow(mContext, row1, String.format("%d × %s",
                             entry.buildRequest.getCount(), design.getDisplayName(entry.buildRequest.getCount() > 1)));
                 }
 
@@ -525,6 +527,14 @@ public class BuildQueueList extends FrameLayout
             }
 
             return view;
+        }
+
+        private void addTextToRow(Context context, LinearLayout row, CharSequence text) {
+            TextView tv = new TextView(context);
+            tv.setText(text);
+            tv.setSingleLine(true);
+            tv.setEllipsize(TruncateAt.END);
+            row.addView(tv);
         }
 
         private class ItemEntry {

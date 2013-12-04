@@ -9,12 +9,14 @@ import java.util.Locale;
 import android.content.Context;
 import android.graphics.Typeface;
 import android.text.Html;
+import android.text.TextUtils.TruncateAt;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -288,7 +290,7 @@ public class BuildingsList extends ListView
             } else if (entry.building != null || entry.buildRequest != null) {
                 // existing building/upgrading building
                 ImageView icon = (ImageView) view.findViewById(R.id.building_icon);
-                TextView row1 = (TextView) view.findViewById(R.id.building_row1);
+                LinearLayout row1 = (LinearLayout) view.findViewById(R.id.building_row1);
                 TextView row2 = (TextView) view.findViewById(R.id.building_row2);
                 TextView row3 = (TextView) view.findViewById(R.id.building_row3);
                 TextView level = (TextView) view.findViewById(R.id.building_level);
@@ -313,7 +315,7 @@ public class BuildingsList extends ListView
                     levelLabel.setVisibility(View.VISIBLE);
                 }
 
-                row1.setText(design.getDisplayName());
+                addTextToRow(mContext, row1, design.getDisplayName());
                 if (buildRequest != null) {
                     String verb = (building == null ? "Building" : "Upgrading");
                     row2.setText(Html.fromHtml(String.format(Locale.ENGLISH,
@@ -341,7 +343,7 @@ public class BuildingsList extends ListView
             } else {
                 // new building
                 ImageView icon = (ImageView) view.findViewById(R.id.building_icon);
-                TextView row1 = (TextView) view.findViewById(R.id.building_row1);
+                LinearLayout row1 = (LinearLayout) view.findViewById(R.id.building_row1);
                 TextView row2 = (TextView) view.findViewById(R.id.building_row2);
                 TextView row3 = (TextView) view.findViewById(R.id.building_row3);
 
@@ -353,7 +355,7 @@ public class BuildingsList extends ListView
 
                 icon.setImageDrawable(new SpriteDrawable(SpriteManager.i.getSprite(design.getSpriteName())));
 
-                row1.setText(design.getDisplayName());
+                addTextToRow(mContext, row1, design.getDisplayName());
                 String requiredHtml = design.getDependenciesHtml(mColony);
                 row2.setText(requiredHtml);
 
@@ -361,6 +363,14 @@ public class BuildingsList extends ListView
             }
 
             return view;
+        }
+
+        private void addTextToRow(Context context, LinearLayout row, CharSequence text) {
+            TextView tv = new TextView(context);
+            tv.setText(text);
+            tv.setSingleLine(true);
+            tv.setEllipsize(TruncateAt.END);
+            row.addView(tv);
         }
     }
 

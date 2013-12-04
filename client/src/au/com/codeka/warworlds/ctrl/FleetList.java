@@ -346,7 +346,10 @@ public class FleetList extends FrameLayout implements StarManager.StarFetchedHan
     }
 
     public static void populateFleetNameRow(Context context, LinearLayout row, Fleet fleet, ShipDesign design) {
-        if (fleet.getUpgrades().size() == 0) {
+        if (fleet == null) {
+            String text = String.format(Locale.ENGLISH, "%s", design.getDisplayName(false));
+            addTextToRow(context, row, text);
+        } else if (fleet.getUpgrades().size() == 0) {
             String text = String.format(Locale.ENGLISH, "%d × %s",
                     (int) Math.ceil(fleet.getNumShips()), design.getDisplayName(fleet.getNumShips() > 1));
             addTextToRow(context, row, text);

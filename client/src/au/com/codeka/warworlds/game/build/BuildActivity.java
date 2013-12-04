@@ -22,6 +22,7 @@ import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -42,6 +43,7 @@ import au.com.codeka.warworlds.TabFragmentFragment;
 import au.com.codeka.warworlds.TabManager;
 import au.com.codeka.warworlds.ctrl.BuildQueueList;
 import au.com.codeka.warworlds.ctrl.BuildingsList;
+import au.com.codeka.warworlds.ctrl.FleetList;
 import au.com.codeka.warworlds.model.BuildRequest;
 import au.com.codeka.warworlds.model.Colony;
 import au.com.codeka.warworlds.model.DesignManager;
@@ -465,7 +467,7 @@ public class BuildActivity extends BaseActivity implements StarManager.StarFetch
                 } else if (entry.fleet != null || entry.buildRequest != null) {
                     // existing fleet/upgrading fleet
                     ImageView icon = (ImageView) view.findViewById(R.id.building_icon);
-                    TextView row1 = (TextView) view.findViewById(R.id.building_row1);
+                    LinearLayout row1 = (LinearLayout) view.findViewById(R.id.building_row1);
                     TextView row2 = (TextView) view.findViewById(R.id.building_row2);
                     TextView row3 = (TextView) view.findViewById(R.id.building_row3);
                     TextView level = (TextView) view.findViewById(R.id.building_level);
@@ -498,7 +500,7 @@ public class BuildActivity extends BaseActivity implements StarManager.StarFetch
                         count = entry.buildRequest.getCount();
                     }
 
-                    row1.setText(String.format(Locale.ENGLISH, "%d × %s", count, design.getDisplayName()));
+                    FleetList.populateFleetNameRow(getActivity(), row1, fleet, design);
                     if (buildRequest != null) {
                         String verb = (fleet == null ? "Building" : "Upgrading");
                         row2.setText(Html.fromHtml(String.format(Locale.ENGLISH,
@@ -528,7 +530,7 @@ public class BuildActivity extends BaseActivity implements StarManager.StarFetch
                 } else {
                     // new fleet
                     ImageView icon = (ImageView) view.findViewById(R.id.building_icon);
-                    TextView row1 = (TextView) view.findViewById(R.id.building_row1);
+                    LinearLayout row1 = (LinearLayout) view.findViewById(R.id.building_row1);
                     TextView row2 = (TextView) view.findViewById(R.id.building_row2);
                     TextView row3 = (TextView) view.findViewById(R.id.building_row3);
 
@@ -540,7 +542,7 @@ public class BuildActivity extends BaseActivity implements StarManager.StarFetch
 
                     icon.setImageDrawable(new SpriteDrawable(SpriteManager.i.getSprite(design.getSpriteName())));
 
-                    row1.setText(design.getDisplayName());
+                    FleetList.populateFleetNameRow(getActivity(), row1, null, design);
                     row2.setText(String.format("%.2f hours",
                             (float) design.getBuildCost().getTimeInSeconds() / 3600.0f));
 
