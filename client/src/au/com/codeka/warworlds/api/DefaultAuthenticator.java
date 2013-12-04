@@ -18,7 +18,7 @@ import au.com.codeka.warworlds.model.Realm;
 public class DefaultAuthenticator {
     final static Logger log = LoggerFactory.getLogger(DefaultAuthenticator.class);
 
-    public static String authenticate(String authToken, Realm realm) {
+    public static String authenticate(String authToken, Realm realm) throws ApiException {
         String url = realm.getBaseUrl().resolve("login?authToken="+authToken).toString();
 
         String impersonate = Util.getProperties().getProperty("user.on_behalf_of", null);
@@ -32,7 +32,7 @@ public class DefaultAuthenticator {
             int statusCode = resp.getResponse().getStatusLine().getStatusCode();
             if (statusCode != 200) {
                 log.warn("Authentication failure: {}", resp.getResponse().getStatusLine());
-                return null;
+                ApiException.checkResponse(resp.getResponse());
             }
 
             String cookie = null;
@@ -52,9 +52,6 @@ public class DefaultAuthenticator {
                 return null;
             }
             return "SESSION="+cookie;
-        } catch(ApiException e) {
-            log.warn("Authentication failure", e);
-            return null;
         } finally {
             if (resp != null) {
                 resp.close();

@@ -41,7 +41,7 @@ public class StatisticsController {
     public void updateRanks() throws Exception {
         TreeMap<Integer, EmpireRank> ranks = new TreeMap<Integer, EmpireRank>();
 
-        String sql = "SELECT id AS empire_id FROM empires";
+        String sql = "SELECT id AS empire_id FROM empires WHERE state <> 2";
         try (SqlStmt stmt = db.prepare(sql)) {
             ResultSet rs = stmt.select();
             while (rs.next()) {
@@ -56,6 +56,9 @@ public class StatisticsController {
             while (rs.next()) {
                 int empireID = rs.getInt(1);
                 int totalShips = rs.getInt(2);
+                if (!ranks.containsKey(empireID)) {
+                    continue;
+                }
                 ranks.get(empireID).setTotalShips(totalShips);
             }
         }
@@ -66,6 +69,9 @@ public class StatisticsController {
             while (rs.next()) {
                 int empireID = rs.getInt(1);
                 int totalShips = rs.getInt(2);
+                if (!ranks.containsKey(empireID)) {
+                    continue;
+                }
                 ranks.get(empireID).setTotalShips(totalShips);
             }
         }
@@ -76,6 +82,9 @@ public class StatisticsController {
             while (rs.next()) {
                 int empireID = rs.getInt(1);
                 int totalBuildings = rs.getInt(2);
+                if (!ranks.containsKey(empireID)) {
+                    continue;
+                }
                 ranks.get(empireID).setTotalBuildings(totalBuildings);
             }
         }
@@ -87,6 +96,9 @@ public class StatisticsController {
                 int empireID = rs.getInt(1);
                 int totalColonies = rs.getInt(2);
                 int totalPopulation = rs.getInt(3);
+                if (!ranks.containsKey(empireID)) {
+                    continue;
+                }
                 ranks.get(empireID).setTotalColonies(totalColonies);
                 ranks.get(empireID).setTotalPopulation(totalPopulation);
             }
@@ -105,6 +117,9 @@ public class StatisticsController {
             while (rs.next()) {
                 int empireID = rs.getInt(1);
                 int totalStars = rs.getInt(2);
+                if (!ranks.containsKey(empireID)) {
+                    continue;
+                }
                 ranks.get(empireID).setTotalStars(totalStars);
             }
         }

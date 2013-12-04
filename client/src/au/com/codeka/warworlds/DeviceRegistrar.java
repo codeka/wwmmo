@@ -8,9 +8,9 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.provider.Settings.Secure;
 import au.com.codeka.BackgroundRunner;
+import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.api.ApiClient;
 import au.com.codeka.warworlds.api.ApiException;
-import au.com.codeka.common.protobuf.Messages;
 
 /**
  * Register/unregister with the third-party App Engine server using
@@ -19,7 +19,7 @@ import au.com.codeka.common.protobuf.Messages;
 public class DeviceRegistrar {
     private static Logger log = LoggerFactory.getLogger(DeviceRegistrar.class);
 
-    public static String register() {
+    public static String register() throws ApiException {
         final SharedPreferences settings = Util.getSharedPreferences();
 
         String registrationKey = null;
@@ -37,10 +37,10 @@ public class DeviceRegistrar {
                     Messages.DeviceRegistration.class);
             registrationKey = registration.getKey();
             log.info("Got registration key: "+registrationKey);
-        } catch(Exception ex) {
+        } catch(ApiException ex) {
             log.error("Failure registring device.", ex);
             forgetDeviceRegistration();
-            return null;
+            throw ex;
         }
 
         SharedPreferences.Editor editor = settings.edit();

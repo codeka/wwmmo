@@ -93,7 +93,7 @@ public class EmpireSetupActivity extends BaseActivity {
             @Override
             protected Boolean doInBackground() {
                 Messages.Empire empire = Messages.Empire.newBuilder().setDisplayName(empireName)
-                        .setState(Messages.Empire.EmpireState.INITIAL)
+                        .setState(Messages.Empire.EmpireState.ACTIVE)
                         .setEmail(accountName)
                         .build();
 

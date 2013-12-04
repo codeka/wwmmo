@@ -53,3 +53,11 @@ div.newsletter-cta {
     margin-top: 1em;
     border-top: solid 1px #999;
 }
+
+img.float-left {
+  margin-right: 1em;
+}
+
+img.float-right {
+  margin-left: 1em;
+}

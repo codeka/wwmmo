@@ -35,7 +35,7 @@ class ProfilePage(BasePage):
       return
 
     realm_name = None
-    empire_id = None
+    empire = None
     display_name = None
     linked_empire = self.request.POST.get("linked_empire")
     if linked_empire:

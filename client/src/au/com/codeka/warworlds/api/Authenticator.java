@@ -58,37 +58,39 @@ public class Authenticator {
         log.info("(re-)authenticating \""+accountName+"\" to realm "+realm.getDisplayName()+"...");
         String cookie = null;
 
-        Account[] accts = accountManager.getAccountsByType("com.google");
-        for (Account acct : accts) {
-            final Account account = acct;
-            if (account.name.equals(accountName)) {
-                if (realm.getAuthentciationMethod() == Realm.AuthenticationMethod.Default) {
-                    log.info("Account found, fetching authentication token (authmethod = default)");
-
-                    final String scope = "oauth2:https://www.googleapis.com/auth/userinfo.email";
-                    String authToken = getAuthToken(accountManager, account, activity, scope);
-                    accountManager.invalidateAuthToken(account.type, authToken);
-                    authToken = getAuthToken(accountManager, account, activity, scope);
-                    cookie = DefaultAuthenticator.authenticate(authToken, realm);
-                } else if (realm.getAuthentciationMethod() == Realm.AuthenticationMethod.LocalAppEngine) {
-                    log.info("Account found, setting up with debug auth cookie.");
-                    // Use a fake cookie for the dev mode app engine server. The cookie has the
-                    // form email:isAdmin:userId (we set the userId to be the same as the email)
-                    cookie = "dev_appserver_login="+accountName+":false:"+accountName;
-                } else if (realm.getAuthentciationMethod() == Realm.AuthenticationMethod.AppEngine) {
-                    log.info("Account found, fetching authentication token (authmethod = AppEngine)");
-
-                    // Get the auth token from the AccountManager and convert it into a cookie 
-                    // that's usable by App Engine
-                    String authToken = getAuthToken(accountManager, account, activity, "ah");
-                    accountManager.invalidateAuthToken(account.type, authToken);
-                    authToken = getAuthToken(accountManager, account, activity, "ah");
-                    cookie = AppEngineAuthenticator.authenticate(authToken);
+        try {
+            Account[] accts = accountManager.getAccountsByType("com.google");
+            for (Account acct : accts) {
+                final Account account = acct;
+                if (account.name.equals(accountName)) {
+                    if (realm.getAuthentciationMethod() == Realm.AuthenticationMethod.Default) {
+                        log.info("Account found, fetching authentication token (authmethod = default)");
+    
+                        final String scope = "oauth2:https://www.googleapis.com/auth/userinfo.email";
+                        String authToken = getAuthToken(accountManager, account, activity, scope);
+                        accountManager.invalidateAuthToken(account.type, authToken);
+                        authToken = getAuthToken(accountManager, account, activity, scope);
+                        cookie = DefaultAuthenticator.authenticate(authToken, realm);
+                    } else if (realm.getAuthentciationMethod() == Realm.AuthenticationMethod.LocalAppEngine) {
+                        log.info("Account found, setting up with debug auth cookie.");
+                        // Use a fake cookie for the dev mode app engine server. The cookie has the
+                        // form email:isAdmin:userId (we set the userId to be the same as the email)
+                        cookie = "dev_appserver_login="+accountName+":false:"+accountName;
+                    } else if (realm.getAuthentciationMethod() == Realm.AuthenticationMethod.AppEngine) {
+                        log.info("Account found, fetching authentication token (authmethod = AppEngine)");
+    
+                        // Get the auth token from the AccountManager and convert it into a cookie 
+                        // that's usable by App Engine
+                        String authToken = getAuthToken(accountManager, account, activity, "ah");
+                        accountManager.invalidateAuthToken(account.type, authToken);
+                        authToken = getAuthToken(accountManager, account, activity, "ah");
+                        cookie = AppEngineAuthenticator.authenticate(authToken);
+                    }
                 }
             }
+        } finally {
+            mAuthenticating = false;
         }
-
-        mAuthenticating = false;
         mAuthCookie = cookie;
     }
 
@@ -128,6 +130,10 @@ public class Authenticator {
     private String getAuthToken(AccountManagerFuture<Bundle> future) {
         try {
             Bundle authTokenBundle = future.getResult();
+            if (authTokenBundle == null || authTokenBundle.get(AccountManager.KEY_AUTHTOKEN) == null) {
+                return null;
+            }
+
             String authToken = authTokenBundle.get(AccountManager.KEY_AUTHTOKEN).toString();
             return authToken;
         } catch (Exception e) {

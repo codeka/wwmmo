@@ -402,7 +402,7 @@ public class EmpireController {
         }
 
         public List<Empire> getEmpires(int[] ids) throws Exception {
-            String sql = getSelectEmpire("empires.id IN "+buildInClause(ids));
+            String sql = getSelectEmpire("empires.id IN "+buildInClause(ids), true);
 
             try (SqlStmt stmt = prepare(sql)) {
                 ResultSet rs = stmt.select();
@@ -417,7 +417,7 @@ public class EmpireController {
         }
 
         public Empire getEmpireByEmail(String email) throws Exception {
-            String sql = getSelectEmpire("user_email = ?");
+            String sql = getSelectEmpire("user_email = ?", true);
             try (SqlStmt stmt = prepare(sql)) {
                 stmt.setString(1, email);
                 ResultSet rs = stmt.select();
@@ -436,7 +436,7 @@ public class EmpireController {
         }
 
         public List<Empire> getEmpiresByName(String name, int limit) throws Exception {
-            String sql = getSelectEmpire("empires.name LIKE ? LIMIT ?");
+            String sql = getSelectEmpire("empires.name LIKE ? LIMIT ?", false);
             try (SqlStmt stmt = prepare(sql)) {
                 stmt.setString(1, "%"+name+"%"); // TODO: escape?
                 stmt.setInt(2, limit);
@@ -453,7 +453,7 @@ public class EmpireController {
         }
 
         public List<Empire> getEmpiresByRank(int minRank, int maxRank) throws Exception {
-            String sql = getSelectEmpire("empires.id IN (SELECT empire_id FROM empire_ranks WHERE rank BETWEEN ? AND ?)");
+            String sql = getSelectEmpire("empires.id IN (SELECT empire_id FROM empire_ranks WHERE rank BETWEEN ? AND ?)", false);
             try (SqlStmt stmt = prepare(sql)) {
                 stmt.setInt(1, minRank);
                 stmt.setInt(2, maxRank);
@@ -469,14 +469,18 @@ public class EmpireController {
             }
         }
 
-        private String getSelectEmpire(String whereClause) {
-            return "SELECT *, alliances.id AS alliance_id, alliances.name as alliance_name," +
-                         " (SELECT COUNT(*) FROM empires WHERE alliance_id = empires.alliance_id) AS num_empires," +
-                         " (SELECT MAX(create_date) FROM empire_shields WHERE empire_shields.empire_id = empires.id AND rejected = 0) AS shield_last_update" +
-                  " FROM empires" +
-                  " LEFT JOIN alliances ON empires.alliance_id = alliances.id" +
-                  " LEFT JOIN empire_ranks ON empires.id = empire_ranks.empire_id" +
-                  " WHERE " + whereClause;
+        private String getSelectEmpire(String whereClause, boolean includeBanned) {
+            String sql = "SELECT *, alliances.id AS alliance_id, alliances.name as alliance_name," +
+                               " (SELECT COUNT(*) FROM empires WHERE alliance_id = empires.alliance_id) AS num_empires," +
+                               " (SELECT MAX(create_date) FROM empire_shields WHERE empire_shields.empire_id = empires.id AND rejected = 0) AS shield_last_update" +
+                         " FROM empires" +
+                         " LEFT JOIN alliances ON empires.alliance_id = alliances.id" +
+                         " LEFT JOIN empire_ranks ON empires.id = empire_ranks.empire_id" +
+                         " WHERE " + whereClause;
+            if (!includeBanned) {
+                sql += " AND state <> 2";
+            }
+            return sql;
         }
 
         private void populateEmpires(List<Empire> empires) throws SQLException {

@@ -49,6 +49,7 @@ message GenericError
         EmpireNameExists = 20;
         InvalidConversation = 21;
         EmpireAlreadyInConversation = 22;
+        EmpireBanned = 23;
     }
 }
 
@@ -108,11 +109,9 @@ message Empire
 
     enum EmpireState
     {
-        INITIAL = 1;
-        REGISTERED = 2;
-        BANNED = 3;
+        ACTIVE = 1;
+        BANNED = 2;
     }
-
     required EmpireState state = 5;
 
     // May not be set, but if it is this is all of the fleets owned by this empire
