@@ -247,11 +247,9 @@ public class StarfieldSceneManager extends SectorSceneManager
 
     @Override
     public void scrollTo(final long sectorX, final long sectorY,
-            final float offsetX, final float offsetY,
-            final boolean centre) {
-        log.debug("==SCROLL TO: "+sectorX+","+sectorY);
+            final float offsetX, final float offsetY) {
         mHasScrolled = true;
-        super.scrollTo(sectorX, sectorY, offsetX, offsetY, centre);
+        super.scrollTo(sectorX, sectorY, offsetX, offsetY);
     }
 
     @Override

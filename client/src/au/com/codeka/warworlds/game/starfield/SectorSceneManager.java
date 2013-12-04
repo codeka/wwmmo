@@ -145,27 +145,19 @@ public abstract class SectorSceneManager implements SectorManager.OnSectorListCh
         return mScene;
     }
 
-    /**
-     * Scroll to the given sector (x,y) and offset into the sector.
-     */
-    public void scrollTo(long sectorX, long sectorY, float offsetX, float offsetY) {
-        scrollTo(sectorX, sectorY, offsetX, offsetY, false);
+    protected void updateZoomFactor(float zoomFactor) {
+        ((ZoomCamera) mActivity.getCamera()).setZoomFactor(zoomFactor);
     }
 
     public void scrollTo(BaseStar star) {
         if (star == null)
             return;
-        scrollTo(star.getSectorX(), star.getSectorY(), star.getOffsetX(), Sector.SECTOR_SIZE - star.getOffsetY(), false);
-    }
-
-    protected void updateZoomFactor(float zoomFactor) {
-        ((ZoomCamera) mActivity.getCamera()).setZoomFactor(zoomFactor);
+        scrollTo(star.getSectorX(), star.getSectorY(), star.getOffsetX(), Sector.SECTOR_SIZE - star.getOffsetY());
     }
 
     /** Scroll to the given sector (x,y) and offset into the sector. */
     public void scrollTo(final long sectorX, final long sectorY,
-                         final float offsetX, final float offsetY,
-                         final boolean centre) {
+                         final float offsetX, final float offsetY) {
         mActivity.getEngine().runOnUpdateThread(new Runnable() {
             @Override
             public void run() {
@@ -208,10 +200,6 @@ public abstract class SectorSceneManager implements SectorManager.OnSectorListCh
                 }
 
                 mActivity.getCamera().setCenter(mOffsetX, mOffsetY);
-                if (centre) {
-                    scroll(mActivity.getCamera().getWidth() / 2.0f,
-                           mActivity.getCamera().getHeight() / 2.0f);
-                }
             }
         });
     }

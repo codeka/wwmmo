@@ -227,7 +227,7 @@ public class StarfieldActivity extends BaseStarfieldActivity
                     long sectorY = intent.getExtras().getLong("au.com.codeka.warworlds.SectorY");
                     int offsetX = intent.getExtras().getInt("au.com.codeka.warworlds.OffsetX");
                     int offsetY = intent.getExtras().getInt("au.com.codeka.warworlds.OffsetY");
-                    mStarfield.scrollTo(sectorX, sectorY, offsetX, offsetY, true);
+                    mStarfield.scrollTo(sectorX, sectorY, offsetX, Sector.SECTOR_SIZE - offsetY);
                     mDoNotNavigateToHomeStar = true;
                 }
             }
@@ -250,9 +250,7 @@ public class StarfieldActivity extends BaseStarfieldActivity
                 if (mStarToSelect != null) {
                     mSelectedStar = mStarToSelect;
                     mStarfield.selectStar(mStarToSelect.getKey());
-                    mStarfield.scrollTo(mStarToSelect.getSectorX(), mStarToSelect.getSectorY(),
-                            mStarToSelect.getOffsetX(), mStarToSelect.getOffsetY(),
-                                        true);
+                    mStarfield.scrollTo(mStarToSelect);
                     mStarToSelect = null;
                 }
 
@@ -270,9 +268,7 @@ public class StarfieldActivity extends BaseStarfieldActivity
                 if (homeStar != null && (mHomeStar == null || !mHomeStar.getKey().equals(homeStar.getKey()))) {
                     mHomeStar = (StarSummary) homeStar;
                     if (!mDoNotNavigateToHomeStar) {
-                        mStarfield.scrollTo(homeStar.getSectorX(), homeStar.getSectorY(),
-                                        homeStar.getOffsetX(), homeStar.getOffsetY(),
-                                        true);
+                        mStarfield.scrollTo(homeStar);
                     }
                 }
 
@@ -494,7 +490,7 @@ public class StarfieldActivity extends BaseStarfieldActivity
         if (scrollView) {
             int offsetX = starOffsetX;
             int offsetY = starOffsetY;
-            mStarfield.scrollTo(sectorX, sectorY, offsetX, offsetY);
+            mStarfield.scrollTo(sectorX, sectorY, offsetX, Sector.SECTOR_SIZE - offsetY);
         }
 
         Intent intent = new Intent(mContext, SolarSystemActivity.class);
@@ -530,7 +526,7 @@ public class StarfieldActivity extends BaseStarfieldActivity
 
         // todo: if the fleet is moving, scroll to it...
 
-        mStarfield.scrollTo(star.getSectorX(), star.getSectorY(), offsetX, offsetY);
+        mStarfield.scrollTo(star.getSectorX(), star.getSectorY(), offsetX, Sector.SECTOR_SIZE - offsetY);
 
         if (fleet.getState() == Fleet.State.MOVING) {
             mStarfield.selectFleet(fleet.getKey());

@@ -129,7 +129,7 @@ public class UserManager {
                             new HttpPut(new URI(mBaseUrl).resolve("empires")),
                             Messages.Empire.newBuilder()
                                            .setDisplayName("Empire "+(mIndex + 1))
-                                           .setState(Messages.Empire.EmpireState.INITIAL)
+                                           .setState(Messages.Empire.EmpireState.ACTIVE)
                                            .build(),
                             null);
 
