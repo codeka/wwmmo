@@ -45,6 +45,15 @@ public class ShipDesign extends Design {
         return null;
     }
 
+    @Override
+    public ArrayList<Dependency> getDependencies(int level) {
+        if (level <= 1) {
+            return mDependencies;
+        } else {
+            return mUpgrades.get(level - 2).getDependencies();
+        }
+    }
+
     public static class Factory extends Design.Factory {
         public Factory(Element shipElement) {
             super(shipElement);
@@ -128,6 +137,10 @@ public class ShipDesign extends Design {
         }
         public BuildCost getBuildCost() {
             return mBuildCost;
+        }
+
+        public ArrayList<Dependency> getDependencies() {
+            return new ArrayList<Dependency>(); // TODO: none yet...
         }
     }
 }

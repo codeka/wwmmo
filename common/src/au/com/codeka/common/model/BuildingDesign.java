@@ -34,7 +34,8 @@ public class BuildingDesign extends Design {
         }
     }
 
-    public List<Dependency> getDependencies(int level) {
+    @Override
+    public ArrayList<Dependency> getDependencies(int level) {
         if (level <= 1) {
             return mDependencies;
         } else {
@@ -152,7 +153,7 @@ public class BuildingDesign extends Design {
         public BuildCost getBuildCost() {
             return mBuildCost;
         }
-        public List<Dependency> getDependencies() {
+        public ArrayList<Dependency> getDependencies() {
             return mDependencies;
         }
         public List<Effect> getEffects() {

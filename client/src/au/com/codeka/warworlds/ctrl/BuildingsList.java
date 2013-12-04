@@ -276,7 +276,7 @@ public class BuildingsList extends ListView
                 if (viewType == HEADING_TYPE) {
                     view = new TextView(mContext);
                 } else {
-                    view = inflater.inflate(R.layout.solarsystem_buildings_design, parent, false);
+                    view = inflater.inflate(R.layout.buildings_design, parent, false);
                 }
             }
 
@@ -332,8 +332,8 @@ public class BuildingsList extends ListView
                     } else {
                         progress.setVisibility(View.GONE);
 
-                        String required = design.getDependenciesList(mColony, building.getLevel());
-                        row2.setText(Html.fromHtml(required));
+                        String requiredHtml = design.getDependenciesHtml(mColony, building.getLevel() + 1);
+                        row2.setText(Html.fromHtml(requiredHtml));
 
                         row3.setVisibility(View.GONE);
                     }
@@ -354,8 +354,8 @@ public class BuildingsList extends ListView
                 icon.setImageDrawable(new SpriteDrawable(SpriteManager.i.getSprite(design.getSpriteName())));
 
                 row1.setText(design.getDisplayName());
-                String required = design.getDependenciesList(mColony);
-                row2.setText(required);
+                String requiredHtml = design.getDependenciesHtml(mColony);
+                row2.setText(requiredHtml);
 
                 row3.setVisibility(View.GONE);
             }

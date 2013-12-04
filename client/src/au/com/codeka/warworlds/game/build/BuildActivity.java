@@ -75,7 +75,7 @@ public class BuildActivity extends BaseActivity implements StarManager.StarFetch
         super.onCreate(savedInstanceState);
 
         requestWindowFeature(Window.FEATURE_NO_TITLE);
-        setContentView(R.layout.solarsystem_build);
+        setContentView(R.layout.build);
 
         mColonyPagerAdapter = new ColonyPagerAdapter(getSupportFragmentManager());
         mViewPager = (ViewPager) findViewById(R.id.pager);
@@ -290,7 +290,7 @@ public class BuildActivity extends BaseActivity implements StarManager.StarFetch
 
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-            View v = inflater.inflate(R.layout.solarsystem_build_buildings_tab, container, false);
+            View v = inflater.inflate(R.layout.build_buildings_tab, container, false);
             final Star star = ((BuildActivity) getActivity()).mStar;
             final Colony colony = getColony();
 
@@ -322,7 +322,7 @@ public class BuildActivity extends BaseActivity implements StarManager.StarFetch
     public static class ShipsFragment extends BaseTabFragment {
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-            View v = inflater.inflate(R.layout.solarsystem_build_ships_tab, container, false);
+            View v = inflater.inflate(R.layout.build_ships_tab, container, false);
 
             final Star star = ((BuildActivity) getActivity()).mStar;
             final Colony colony = getColony();
@@ -454,7 +454,7 @@ public class BuildActivity extends BaseActivity implements StarManager.StarFetch
                     if (entry.heading != null) {
                         view = new TextView(getActivity());
                     } else {
-                        view = inflater.inflate(R.layout.solarsystem_buildings_design, parent, false);
+                        view = inflater.inflate(R.layout.buildings_design, parent, false);
                     }
                 }
 
@@ -520,9 +520,9 @@ public class BuildActivity extends BaseActivity implements StarManager.StarFetch
                                     "Upgrade: %.2f hours",
                                     (float) design.getBuildCost().getTimeInSeconds() / 3600.0f));
 
-                            String required = design.getDependenciesList(getColony());
+                            String requiredHtml = design.getDependenciesHtml(getColony());
                             row3.setVisibility(View.VISIBLE);
-                            row3.setText(Html.fromHtml(required));
+                            row3.setText(Html.fromHtml(requiredHtml));
                         /*}*/
                     }
                 } else {
@@ -544,8 +544,8 @@ public class BuildActivity extends BaseActivity implements StarManager.StarFetch
                     row2.setText(String.format("%.2f hours",
                             (float) design.getBuildCost().getTimeInSeconds() / 3600.0f));
 
-                    String required = design.getDependenciesList(getColony());
-                    row3.setText(Html.fromHtml(required));
+                    String requiredHtml = design.getDependenciesHtml(getColony());
+                    row3.setText(Html.fromHtml(requiredHtml));
                 }
 
                 return view;
@@ -578,12 +578,12 @@ public class BuildActivity extends BaseActivity implements StarManager.StarFetch
 
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-            View v = inflater.inflate(R.layout.solarsystem_build_queue_tab, container, false);
+            View v = inflater.inflate(R.layout.build_queue_tab, container, false);
 
             final Star star = ((BuildActivity) getActivity()).mStar;
             final Colony colony = getColony();
             if (star == null)
-                return inflater.inflate(R.layout.solarsystem_build_loading_tab, container, false);
+                return inflater.inflate(R.layout.build_loading_tab, container, false);
 
             mBuildQueueList = (BuildQueueList) v.findViewById(R.id.build_queue);
             mBuildQueueList.setShowStars(false);

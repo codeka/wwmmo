@@ -452,7 +452,7 @@ public class BuildQueueList extends FrameLayout
                 if (entry.buildRequest == null) {
                     view = inflater.inflate(R.layout.buildqueue_list_colony_row, null);
                 } else {
-                    view = inflater.inflate(R.layout.solarsystem_buildings_design, null);
+                    view = inflater.inflate(R.layout.buildings_design, null);
                 }
             }
 

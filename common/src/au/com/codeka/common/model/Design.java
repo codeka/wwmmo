@@ -10,7 +10,7 @@ import au.com.codeka.common.XmlIterator;
 /**
  * This is the base "design" class which both \c ShipDesign and \c BuildingDesign inherit from.
  */
-public class Design {
+public abstract class Design {
     protected String mID;
     protected String mName;
     protected String mDescription;
@@ -77,24 +77,19 @@ public class Design {
         return false;
     }
 
-    public String getDependenciesList(BaseColony colony) {
-        return getDependenciesList(colony, 1);
+    public abstract ArrayList<Dependency> getDependencies(int level);
+
+    public String getDependenciesHtml(BaseColony colony) {
+        return getDependenciesHtml(colony, 0);
     }
 
     /**
      * Returns the dependencies of the given design a string for display to
      * the user. Dependencies that we don't meet will be coloured red.
      */
-    public String getDependenciesList(BaseColony colony, int level) {
+    public String getDependenciesHtml(BaseColony colony, int level) {
         String required = "Required: ";
-        List<Design.Dependency> dependencies;
-        if (level == 1 || mDesignKind != DesignKind.BUILDING) {
-            dependencies = getDependencies();
-        } else {
-            BuildingDesign bd = (BuildingDesign) this;
-            BuildingDesign.Upgrade upgrade = bd.getUpgrades().get(level - 1);
-            dependencies = upgrade.getDependencies();
-        }
+        List<Design.Dependency> dependencies = getDependencies(level);
 
         if (dependencies == null || dependencies.size() == 0) {
             required += "none";
