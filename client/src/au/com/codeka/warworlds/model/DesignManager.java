@@ -9,7 +9,9 @@ import android.content.Context;
 import au.com.codeka.common.model.BaseDesignManager;
 import au.com.codeka.common.model.Design;
 import au.com.codeka.common.model.DesignKind;
-import au.com.codeka.warworlds.model.designeffects.*;
+import au.com.codeka.warworlds.model.designeffects.BuildingEffect;
+import au.com.codeka.warworlds.model.designeffects.RadarBuildingEffect;
+import au.com.codeka.warworlds.model.designeffects.ShipEffect;
 
 /**
  * This is the base "manager" class that manages designs for ships and buildings.

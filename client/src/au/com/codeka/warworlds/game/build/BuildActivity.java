@@ -44,6 +44,8 @@ import au.com.codeka.warworlds.TabManager;
 import au.com.codeka.warworlds.ctrl.BuildQueueList;
 import au.com.codeka.warworlds.ctrl.BuildingsList;
 import au.com.codeka.warworlds.ctrl.FleetList;
+import au.com.codeka.warworlds.game.NotesDialog;
+import au.com.codeka.warworlds.model.BuildManager;
 import au.com.codeka.warworlds.model.BuildRequest;
 import au.com.codeka.warworlds.model.Colony;
 import au.com.codeka.warworlds.model.DesignManager;
@@ -348,7 +350,7 @@ public class BuildActivity extends BaseActivity implements StarManager.StarFetch
             final ShipListAdapter adapter = new ShipListAdapter();
             adapter.setShips(DesignManager.i.getDesigns(DesignKind.SHIP), fleets, buildRequests);
 
-            ListView availableDesignsList = (ListView) v.findViewById(R.id.ship_list);
+            final ListView availableDesignsList = (ListView) v.findViewById(R.id.ship_list);
             availableDesignsList.setAdapter(adapter);
             availableDesignsList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
@@ -363,6 +365,35 @@ public class BuildActivity extends BaseActivity implements StarManager.StarFetch
                         dialog.setup(star, colony, entry.fleet);
                         dialog.show(getActivity().getSupportFragmentManager(), "");
                     }
+                }
+            });
+
+            availableDesignsList.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+                @Override
+                public boolean onItemLongClick(AdapterView<?> adapterView, View view, int position, long id) {
+                    final ShipListAdapter.ItemEntry entry = (ShipListAdapter.ItemEntry) adapter.getItem(position);
+
+                    NotesDialog dialog = new NotesDialog();
+                    dialog.setup(entry.fleet == null ? entry.buildRequest.getNotes()
+                                                     : entry.fleet.getNotes(), new NotesDialog.NotesChangedHandler() {
+                        @Override
+                        public void onNotesChanged(String notes) {
+                            if (entry.fleet != null) {
+                                entry.fleet.setNotes(notes);
+                            } else if (entry.buildRequest != null) {
+                                entry.buildRequest.setNotes(notes);
+                            }
+                            adapter.notifyDataSetChanged();
+
+                            if (entry.fleet != null) {
+                            } else {
+                                BuildManager.getInstance().updateNotes(entry.buildRequest.getKey(), notes);
+                            }
+                        }
+                    });
+
+                    dialog.show(getActivity().getSupportFragmentManager(), "");
+                    return true;
                 }
             });
 
@@ -473,6 +504,7 @@ public class BuildActivity extends BaseActivity implements StarManager.StarFetch
                     TextView level = (TextView) view.findViewById(R.id.building_level);
                     TextView levelLabel = (TextView) view.findViewById(R.id.building_level_label);
                     ProgressBar progress = (ProgressBar) view.findViewById(R.id.building_progress);
+                    TextView notes = (TextView) view.findViewById(R.id.notes);
 
                     Fleet fleet = entry.fleet;
                     BuildRequest buildRequest = entry.buildRequest;
@@ -491,13 +523,6 @@ public class BuildActivity extends BaseActivity implements StarManager.StarFetch
                         level.setText("?");
                         level.setVisibility(View.VISIBLE);
                         levelLabel.setVisibility(View.VISIBLE);
-                    }
-
-                    int count;
-                    if (entry.fleet != null) {
-                        count = (int) entry.fleet.getNumShips();
-                    } else {
-                        count = entry.buildRequest.getCount();
                     }
 
                     FleetList.populateFleetNameRow(getActivity(), row1, fleet, design);
@@ -527,6 +552,18 @@ public class BuildActivity extends BaseActivity implements StarManager.StarFetch
                             row3.setText(Html.fromHtml(requiredHtml));
                         /*}*/
                     }
+
+                    if (fleet != null && fleet.getNotes() != null) {
+                        notes.setText(fleet.getNotes());
+                        notes.setVisibility(View.VISIBLE);
+                    } else if (buildRequest != null && buildRequest.getNotes() != null) {
+                        notes.setText(buildRequest.getNotes());
+                        notes.setVisibility(View.VISIBLE);
+                    } else {
+                        notes.setText("");
+                        notes.setVisibility(View.GONE);
+                    }
+
                 } else {
                     // new fleet
                     ImageView icon = (ImageView) view.findViewById(R.id.building_icon);
@@ -537,11 +574,13 @@ public class BuildActivity extends BaseActivity implements StarManager.StarFetch
                     view.findViewById(R.id.building_progress).setVisibility(View.GONE);
                     view.findViewById(R.id.building_level).setVisibility(View.GONE);
                     view.findViewById(R.id.building_level_label).setVisibility(View.GONE);
+                    view.findViewById(R.id.notes).setVisibility(View.GONE);
 
                     ShipDesign design = entry.design;
 
                     icon.setImageDrawable(new SpriteDrawable(SpriteManager.i.getSprite(design.getSpriteName())));
 
+                    row1.removeAllViews();
                     FleetList.populateFleetNameRow(getActivity(), row1, null, design);
                     row2.setText(String.format("%.2f hours",
                             (float) design.getBuildCost().getTimeInSeconds() / 3600.0f));

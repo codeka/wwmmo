@@ -11,6 +11,7 @@ public class BaseBuilding {
     protected String mEmpireKey;
     protected String mDesignID;
     protected int mLevel;
+    protected String mNotes;
 
     public String getKey() {
         return mKey;
@@ -24,12 +25,18 @@ public class BaseBuilding {
     public int getLevel() {
         return mLevel;
     }
+    public String getNotes() {
+        return mNotes;
+    }
 
     public void fromProtocolBuffer(Messages.Building pb) {
         mKey = pb.getKey();
         mColonyKey = pb.getColonyKey();
         mDesignID = pb.getDesignName();
         mLevel = pb.getLevel();
+        if (pb.hasNotes()) {
+            mNotes = pb.getNotes();
+        }
     }
 
     public void toProtocolBuffer(Messages.Building.Builder pb) {
@@ -37,5 +44,8 @@ public class BaseBuilding {
         pb.setColonyKey(mColonyKey);
         pb.setDesignName(mDesignID);
         pb.setLevel(mLevel);
+        if (mNotes != null) {
+            pb.setNotes(mNotes);
+        }
     }
 }

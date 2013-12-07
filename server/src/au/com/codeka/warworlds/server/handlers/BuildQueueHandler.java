@@ -61,4 +61,17 @@ public class BuildQueueHandler extends RequestHandler {
             throw new RequestException(e);
         }
     }
+
+    @Override
+    protected void put() throws RequestException {
+        Messages.BuildRequest build_request_pb = getRequestBody(Messages.BuildRequest.class);
+        try (Transaction t = DB.beginTransaction()) {
+
+            // the only thing you can change is the notes
+            new BuildQueueController(t).updateNotes(Integer.parseInt(build_request_pb.getKey()), build_request_pb.getNotes());
+
+        } catch(Exception e) {
+            throw new RequestException(e);
+        }
+    }
 }

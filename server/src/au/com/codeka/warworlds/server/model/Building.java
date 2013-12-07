@@ -20,12 +20,14 @@ public class Building extends BaseBuilding {
         mColonyKey = Integer.toString(mColonyID);
         mDesignID = rs.getString("design_id");
         mLevel = rs.getInt("level");
+        mNotes = rs.getString("notes");
     }
-    public Building(Star star, Colony colony, String designID) {
+    public Building(Star star, Colony colony, String designID, String notes) {
         mDesignID = designID;
         mColonyID = colony.getID();
         mColonyKey = Integer.toString(mColonyID);
         mLevel = 1;
+        mNotes = notes;
     }
 
     public int getID() {

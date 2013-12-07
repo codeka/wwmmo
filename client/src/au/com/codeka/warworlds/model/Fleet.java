@@ -20,4 +20,8 @@ public class Fleet extends BaseFleet {
         }
         return fleetUpgrade;
     }
+
+    public void setNotes(String notes) {
+        mNotes = notes;
+    }
 }

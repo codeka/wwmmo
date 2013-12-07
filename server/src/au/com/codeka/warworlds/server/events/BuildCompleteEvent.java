@@ -38,7 +38,7 @@ public class BuildCompleteEvent extends Event {
     public void process() {
         ArrayList<Integer> processedIDs = new ArrayList<Integer>();
         String sql = "SELECT id, star_id, colony_id, empire_id, existing_building_id," +
-                           " existing_fleet_id, upgrade_id, design_kind, design_id, count" +
+                           " existing_fleet_id, upgrade_id, design_kind, design_id, count, notes" +
                     " FROM build_requests" +
                     " WHERE end_time < ? AND processing = 0" +
                     " LIMIT 10"; // just do ten at a time, which will allow us to interleve other events
@@ -75,6 +75,7 @@ public class BuildCompleteEvent extends Event {
                 DesignKind designKind = DesignKind.fromNumber(rs.getInt(8));
                 String designID = rs.getString(9);
                 float count = rs.getFloat(10);
+                String notes = rs.getString(11);
 
                 Star star = new StarController().getStar(starID);
                 Colony colony = null;
@@ -86,7 +87,7 @@ public class BuildCompleteEvent extends Event {
 
                 try {
                     processBuildRequest(id, star, colony, empireID, existingBuildingID, existingFleetID, upgradeID,
-                                        designKind, designID, count);
+                                        designKind, designID, count, notes);
                 } catch (Exception e) {
                     log.error("Error processing build-complete event!", e);
                 }
@@ -119,15 +120,15 @@ public class BuildCompleteEvent extends Event {
 
     private void processBuildRequest(int buildRequestID, Star star, Colony colony, int empireID,
                                      Integer existingBuildingID, Integer existingFleetID, String upgradeID,
-                                     DesignKind designKind, String designID, float count) throws RequestException {
+                                     DesignKind designKind, String designID, float count, String notes) throws RequestException {
         Simulation sim = new Simulation();
         sim.simulate(star);
 
         Fleet fleet = null;
         if (designKind == DesignKind.BUILDING) {
-            processBuildingBuild(star, colony, empireID, existingBuildingID, designID);
+            processBuildingBuild(star, colony, empireID, existingBuildingID, designID, notes);
         } else {
-            fleet = processFleetBuild(star, colony, empireID, existingFleetID, upgradeID, designID, count);
+            fleet = processFleetBuild(star, colony, empireID, existingFleetID, upgradeID, designID, count, notes);
         }
 
         sim.simulate(star); // simulate again to re-calculate the end times
@@ -158,7 +159,7 @@ public class BuildCompleteEvent extends Event {
     }
 
     private Fleet processFleetBuild(Star star, Colony colony, int empireID, Integer existingFleetID,
-                                    String upgradeID, String designID, float count) throws RequestException {
+                                    String upgradeID, String designID, float count, String notes) throws RequestException {
         Fleet fleet;
 
         Empire empire = new EmpireController().getEmpire(empireID);
@@ -169,6 +170,7 @@ public class BuildCompleteEvent extends Event {
             }
         } else {
             fleet = new FleetController().createFleet(empire, star, designID, count);
+            fleet.setNotes(notes);
             FleetMoveCompleteEvent.fireFleetArrivedEvents(star, fleet);
         }
 
@@ -176,9 +178,9 @@ public class BuildCompleteEvent extends Event {
     }
 
     private void processBuildingBuild(Star star, Colony colony, int empireID, Integer existingBuildingID,
-                                      String designID) throws RequestException {
+                                      String designID, String notes) throws RequestException {
         if (existingBuildingID == null) {
-            new BuildingController().createBuilding(star, colony, designID);
+            new BuildingController().createBuilding(star, colony, designID, notes);
         } else {
             new BuildingController().upgradeBuilding(star, colony, existingBuildingID);
         }

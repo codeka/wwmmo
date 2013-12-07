@@ -15,9 +15,9 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
 import au.com.codeka.BackgroundRunner;
+import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.api.ApiClient;
 import au.com.codeka.warworlds.api.ApiException;
-import au.com.codeka.common.protobuf.Messages;
 
 /**
  * This activity lets you set up your Empire before you actually join the game. You need

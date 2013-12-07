@@ -6,8 +6,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import com.google.protobuf.InvalidProtocolBufferException;
-
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -32,6 +30,8 @@ import au.com.codeka.warworlds.model.Empire;
 import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.EmpireShieldManager;
 import au.com.codeka.warworlds.model.MyEmpire;
+
+import com.google.protobuf.InvalidProtocolBufferException;
 
 public class AllianceDetailsActivity extends BaseActivity
                                      implements AllianceManager.AllianceUpdatedHandler,

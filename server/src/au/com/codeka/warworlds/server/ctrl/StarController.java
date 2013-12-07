@@ -296,7 +296,8 @@ public class StarController {
                             " eta = ?," +
                             " target_star_id = ?," +
                             " target_fleet_id = ?," +
-                            " time_destroyed = ?" +
+                            " time_destroyed = ?," +
+                            " notes = ?" +
                         " WHERE id = ?";
             try (SqlStmt stmt = prepare(sql)) {
                 for (BaseFleet baseFleet : star.getFleets()) {
@@ -328,7 +329,8 @@ public class StarController {
                         stmt.setNull(9);
                     }
                     stmt.setDateTime(10, fleet.getTimeDestroyed());
-                    stmt.setInt(11, fleet.getID());
+                    stmt.setString(11, fleet.getNotes());
+                    stmt.setInt(12, fleet.getID());
                     stmt.update();
                 }
             } catch(Exception e) {
@@ -338,8 +340,8 @@ public class StarController {
             if (needInsert) {
                 sql = "INSERT INTO fleets (star_id, sector_id, design_id, empire_id, num_ships," +
                                          " stance, state, state_start_time, eta, target_star_id," +
-                                         " target_fleet_id, time_destroyed)" +
-                     " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                                         " target_fleet_id, time_destroyed, notes)" +
+                     " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
                 try (SqlStmt stmt = prepare(sql, Statement.RETURN_GENERATED_KEYS)) {
                     for (BaseFleet baseFleet : star.getFleets()) {
                         if (baseFleet.getKey() != null) {
@@ -371,6 +373,7 @@ public class StarController {
                             stmt.setNull(11);
                         }
                         stmt.setDateTime(12, fleet.getTimeDestroyed());
+                        stmt.setString(13, fleet.getNotes());
                         stmt.update();
                     }
                 } catch(Exception e) {

@@ -33,7 +33,10 @@
             android:layout_height="wrap_content"
             android:layout_alignTop="@+id/building_icon"
             android:layout_toRightOf="@+id/building_icon"
-            android:text="Small Text"
+            android:layout_toLeftOf="@+id/accelerate_btn"
+            android:text="Building Name"
+            android:singleLine="true"
+            android:ellipsize="end"
             android:textAppearance="?android:attr/textAppearanceSmall" />
 
         <TextView
@@ -42,7 +45,10 @@
             android:layout_height="wrap_content"
             android:layout_below="@+id/building_name"
             android:layout_toRightOf="@+id/building_icon"
-            android:text="Small Text"
+            android:layout_toLeftOf="@+id/accelerate_btn"
+            android:text="Progress..."
+            android:singleLine="true"
+            android:ellipsize="end"
             android:textAppearance="?android:attr/textAppearanceSmall" />
 
         <ProgressBar

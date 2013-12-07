@@ -181,7 +181,8 @@ public class BuildConfirmDialog extends DialogFragment {
                 startTime, count,
                 (mExistingBuilding == null ? null : mExistingBuilding.getKey()),
                 (mExistingBuilding == null ? 0 : mExistingBuilding.getLevel()),
-                null, null, mStar.getKey(), mColony.getPlanetIndex(), mColony.getEmpireKey());
+                null, null, mStar.getKey(), mColony.getPlanetIndex(), mColony.getEmpireKey(),
+                null);
 
         mBuildEstimateView.refresh(mStar, buildRequest);
     }

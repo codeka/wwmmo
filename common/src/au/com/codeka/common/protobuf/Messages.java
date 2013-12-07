@@ -5894,12 +5894,6 @@ public final class Messages {
           return false;
         }
       }
-      for (int i = 0; i < getBuildRequestsCount(); i++) {
-        if (!getBuildRequests(i).isInitialized()) {
-          memoizedIsInitialized = 0;
-          return false;
-        }
-      }
       if (hasHomeStar()) {
         if (!getHomeStar().isInitialized()) {
           memoizedIsInitialized = 0;
@@ -6445,12 +6439,6 @@ public final class Messages {
         }
         for (int i = 0; i < getFleetsCount(); i++) {
           if (!getFleets(i).isInitialized()) {
-            
-            return false;
-          }
-        }
-        for (int i = 0; i < getBuildRequestsCount(); i++) {
-          if (!getBuildRequests(i).isInitialized()) {
             
             return false;
           }
@@ -17299,12 +17287,6 @@ public final class Messages {
           return false;
         }
       }
-      for (int i = 0; i < getBuildRequestsCount(); i++) {
-        if (!getBuildRequests(i).isInitialized()) {
-          memoizedIsInitialized = 0;
-          return false;
-        }
-      }
       memoizedIsInitialized = 1;
       return true;
     }
@@ -17775,12 +17757,6 @@ public final class Messages {
         }
         if (hasBuildingStatistics()) {
           if (!getBuildingStatistics().isInitialized()) {
-            
-            return false;
-          }
-        }
-        for (int i = 0; i < getBuildRequestsCount(); i++) {
-          if (!getBuildRequests(i).isInitialized()) {
             
             return false;
           }
@@ -32265,12 +32241,6 @@ public final class Messages {
           return false;
         }
       }
-      for (int i = 0; i < getBuildRequestsCount(); i++) {
-        if (!getBuildRequests(i).isInitialized()) {
-          memoizedIsInitialized = 0;
-          return false;
-        }
-      }
       for (int i = 0; i < getFleetsCount(); i++) {
         if (!getFleets(i).isInitialized()) {
           memoizedIsInitialized = 0;
@@ -32961,12 +32931,6 @@ public final class Messages {
         }
         for (int i = 0; i < getEmpiresCount(); i++) {
           if (!getEmpires(i).isInitialized()) {
-            
-            return false;
-          }
-        }
-        for (int i = 0; i < getBuildRequestsCount(); i++) {
-          if (!getBuildRequests(i).isInitialized()) {
             
             return false;
           }
@@ -45336,9 +45300,9 @@ public final class Messages {
     com.google.protobuf.ByteString
         getKeyBytes();
 
-    // required string colony_key = 2;
+    // optional string colony_key = 2;
     /**
-     * <code>required string colony_key = 2;</code>
+     * <code>optional string colony_key = 2;</code>
      *
      * <pre>
      * The key of the colony you're trying to build at. Must have a shipyard to build
@@ -45347,7 +45311,7 @@ public final class Messages {
      */
     boolean hasColonyKey();
     /**
-     * <code>required string colony_key = 2;</code>
+     * <code>optional string colony_key = 2;</code>
      *
      * <pre>
      * The key of the colony you're trying to build at. Must have a shipyard to build
@@ -45356,7 +45320,7 @@ public final class Messages {
      */
     java.lang.String getColonyKey();
     /**
-     * <code>required string colony_key = 2;</code>
+     * <code>optional string colony_key = 2;</code>
      *
      * <pre>
      * The key of the colony you're trying to build at. Must have a shipyard to build
@@ -45366,9 +45330,9 @@ public final class Messages {
     com.google.protobuf.ByteString
         getColonyKeyBytes();
 
-    // required string empire_key = 3;
+    // optional string empire_key = 3;
     /**
-     * <code>required string empire_key = 3;</code>
+     * <code>optional string empire_key = 3;</code>
      *
      * <pre>
      * The empire this build operation belongs to.
@@ -45376,7 +45340,7 @@ public final class Messages {
      */
     boolean hasEmpireKey();
     /**
-     * <code>required string empire_key = 3;</code>
+     * <code>optional string empire_key = 3;</code>
      *
      * <pre>
      * The empire this build operation belongs to.
@@ -45384,7 +45348,7 @@ public final class Messages {
      */
     java.lang.String getEmpireKey();
     /**
-     * <code>required string empire_key = 3;</code>
+     * <code>optional string empire_key = 3;</code>
      *
      * <pre>
      * The empire this build operation belongs to.
@@ -45430,19 +45394,19 @@ public final class Messages {
      */
     int getPlanetIndex();
 
-    // required .au.com.codeka.common.protobuf.BuildRequest.BUILD_KIND build_kind = 4;
+    // optional .au.com.codeka.common.protobuf.BuildRequest.BUILD_KIND build_kind = 4;
     /**
-     * <code>required .au.com.codeka.common.protobuf.BuildRequest.BUILD_KIND build_kind = 4;</code>
+     * <code>optional .au.com.codeka.common.protobuf.BuildRequest.BUILD_KIND build_kind = 4;</code>
      */
     boolean hasBuildKind();
     /**
-     * <code>required .au.com.codeka.common.protobuf.BuildRequest.BUILD_KIND build_kind = 4;</code>
+     * <code>optional .au.com.codeka.common.protobuf.BuildRequest.BUILD_KIND build_kind = 4;</code>
      */
     au.com.codeka.common.protobuf.Messages.BuildRequest.BUILD_KIND getBuildKind();
 
-    // required string design_name = 5;
+    // optional string design_name = 5;
     /**
-     * <code>required string design_name = 5;</code>
+     * <code>optional string design_name = 5;</code>
      *
      * <pre>
      * The name of the design you're trying to build
@@ -45450,7 +45414,7 @@ public final class Messages {
      */
     boolean hasDesignName();
     /**
-     * <code>required string design_name = 5;</code>
+     * <code>optional string design_name = 5;</code>
      *
      * <pre>
      * The name of the design you're trying to build
@@ -45458,7 +45422,7 @@ public final class Messages {
      */
     java.lang.String getDesignName();
     /**
-     * <code>required string design_name = 5;</code>
+     * <code>optional string design_name = 5;</code>
      *
      * <pre>
      * The name of the design you're trying to build
@@ -45610,6 +45574,33 @@ public final class Messages {
      */
     com.google.protobuf.ByteString
         getUpgradeIdBytes();
+
+    // optional string notes = 16;
+    /**
+     * <code>optional string notes = 16;</code>
+     *
+     * <pre>
+     * notes you can attach to the fleet/building when it's finished
+     * </pre>
+     */
+    boolean hasNotes();
+    /**
+     * <code>optional string notes = 16;</code>
+     *
+     * <pre>
+     * notes you can attach to the fleet/building when it's finished
+     * </pre>
+     */
+    java.lang.String getNotes();
+    /**
+     * <code>optional string notes = 16;</code>
+     *
+     * <pre>
+     * notes you can attach to the fleet/building when it's finished
+     * </pre>
+     */
+    com.google.protobuf.ByteString
+        getNotesBytes();
   }
   /**
    * Protobuf type {@code au.com.codeka.common.protobuf.BuildRequest}
@@ -45746,6 +45737,11 @@ public final class Messages {
             case 122: {
               bitField0_ |= 0x00004000;
               upgradeId_ = input.readBytes();
+              break;
+            }
+            case 130: {
+              bitField0_ |= 0x00008000;
+              notes_ = input.readBytes();
               break;
             }
           }
@@ -45918,11 +45914,11 @@ public final class Messages {
       }
     }
 
-    // required string colony_key = 2;
+    // optional string colony_key = 2;
     public static final int COLONY_KEY_FIELD_NUMBER = 2;
     private java.lang.Object colonyKey_;
     /**
-     * <code>required string colony_key = 2;</code>
+     * <code>optional string colony_key = 2;</code>
      *
      * <pre>
      * The key of the colony you're trying to build at. Must have a shipyard to build
@@ -45933,7 +45929,7 @@ public final class Messages {
       return ((bitField0_ & 0x00000002) == 0x00000002);
     }
     /**
-     * <code>required string colony_key = 2;</code>
+     * <code>optional string colony_key = 2;</code>
      *
      * <pre>
      * The key of the colony you're trying to build at. Must have a shipyard to build
@@ -45955,7 +45951,7 @@ public final class Messages {
       }
     }
     /**
-     * <code>required string colony_key = 2;</code>
+     * <code>optional string colony_key = 2;</code>
      *
      * <pre>
      * The key of the colony you're trying to build at. Must have a shipyard to build
@@ -45976,11 +45972,11 @@ public final class Messages {
       }
     }
 
-    // required string empire_key = 3;
+    // optional string empire_key = 3;
     public static final int EMPIRE_KEY_FIELD_NUMBER = 3;
     private java.lang.Object empireKey_;
     /**
-     * <code>required string empire_key = 3;</code>
+     * <code>optional string empire_key = 3;</code>
      *
      * <pre>
      * The empire this build operation belongs to.
@@ -45990,7 +45986,7 @@ public final class Messages {
       return ((bitField0_ & 0x00000004) == 0x00000004);
     }
     /**
-     * <code>required string empire_key = 3;</code>
+     * <code>optional string empire_key = 3;</code>
      *
      * <pre>
      * The empire this build operation belongs to.
@@ -46011,7 +46007,7 @@ public final class Messages {
       }
     }
     /**
-     * <code>required string empire_key = 3;</code>
+     * <code>optional string empire_key = 3;</code>
      *
      * <pre>
      * The empire this build operation belongs to.
@@ -46102,27 +46098,27 @@ public final class Messages {
       return planetIndex_;
     }
 
-    // required .au.com.codeka.common.protobuf.BuildRequest.BUILD_KIND build_kind = 4;
+    // optional .au.com.codeka.common.protobuf.BuildRequest.BUILD_KIND build_kind = 4;
     public static final int BUILD_KIND_FIELD_NUMBER = 4;
     private au.com.codeka.common.protobuf.Messages.BuildRequest.BUILD_KIND buildKind_;
     /**
-     * <code>required .au.com.codeka.common.protobuf.BuildRequest.BUILD_KIND build_kind = 4;</code>
+     * <code>optional .au.com.codeka.common.protobuf.BuildRequest.BUILD_KIND build_kind = 4;</code>
      */
     public boolean hasBuildKind() {
       return ((bitField0_ & 0x00000020) == 0x00000020);
     }
     /**
-     * <code>required .au.com.codeka.common.protobuf.BuildRequest.BUILD_KIND build_kind = 4;</code>
+     * <code>optional .au.com.codeka.common.protobuf.BuildRequest.BUILD_KIND build_kind = 4;</code>
      */
     public au.com.codeka.common.protobuf.Messages.BuildRequest.BUILD_KIND getBuildKind() {
       return buildKind_;
     }
 
-    // required string design_name = 5;
+    // optional string design_name = 5;
     public static final int DESIGN_NAME_FIELD_NUMBER = 5;
     private java.lang.Object designName_;
     /**
-     * <code>required string design_name = 5;</code>
+     * <code>optional string design_name = 5;</code>
      *
      * <pre>
      * The name of the design you're trying to build
@@ -46132,7 +46128,7 @@ public final class Messages {
       return ((bitField0_ & 0x00000040) == 0x00000040);
     }
     /**
-     * <code>required string design_name = 5;</code>
+     * <code>optional string design_name = 5;</code>
      *
      * <pre>
      * The name of the design you're trying to build
@@ -46153,7 +46149,7 @@ public final class Messages {
       }
     }
     /**
-     * <code>required string design_name = 5;</code>
+     * <code>optional string design_name = 5;</code>
      *
      * <pre>
      * The name of the design you're trying to build
@@ -46409,6 +46405,61 @@ public final class Messages {
       }
     }
 
+    // optional string notes = 16;
+    public static final int NOTES_FIELD_NUMBER = 16;
+    private java.lang.Object notes_;
+    /**
+     * <code>optional string notes = 16;</code>
+     *
+     * <pre>
+     * notes you can attach to the fleet/building when it's finished
+     * </pre>
+     */
+    public boolean hasNotes() {
+      return ((bitField0_ & 0x00008000) == 0x00008000);
+    }
+    /**
+     * <code>optional string notes = 16;</code>
+     *
+     * <pre>
+     * notes you can attach to the fleet/building when it's finished
+     * </pre>
+     */
+    public java.lang.String getNotes() {
+      java.lang.Object ref = notes_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        if (bs.isValidUtf8()) {
+          notes_ = s;
+        }
+        return s;
+      }
+    }
+    /**
+     * <code>optional string notes = 16;</code>
+     *
+     * <pre>
+     * notes you can attach to the fleet/building when it's finished
+     * </pre>
+     */
+    public com.google.protobuf.ByteString
+        getNotesBytes() {
+      java.lang.Object ref = notes_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        notes_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
     private void initFields() {
       key_ = "";
       colonyKey_ = "";
@@ -46425,28 +46476,13 @@ public final class Messages {
       existingBuildingLevel_ = 0;
       existingFleetId_ = 0;
       upgradeId_ = "";
+      notes_ = "";
     }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized != -1) return isInitialized == 1;
 
-      if (!hasColonyKey()) {
-        memoizedIsInitialized = 0;
-        return false;
-      }
-      if (!hasEmpireKey()) {
-        memoizedIsInitialized = 0;
-        return false;
-      }
-      if (!hasBuildKind()) {
-        memoizedIsInitialized = 0;
-        return false;
-      }
-      if (!hasDesignName()) {
-        memoizedIsInitialized = 0;
-        return false;
-      }
       memoizedIsInitialized = 1;
       return true;
     }
@@ -46498,6 +46534,9 @@ public final class Messages {
       }
       if (((bitField0_ & 0x00004000) == 0x00004000)) {
         output.writeBytes(15, getUpgradeIdBytes());
+      }
+      if (((bitField0_ & 0x00008000) == 0x00008000)) {
+        output.writeBytes(16, getNotesBytes());
       }
       getUnknownFields().writeTo(output);
     }
@@ -46567,6 +46606,10 @@ public final class Messages {
       if (((bitField0_ & 0x00004000) == 0x00004000)) {
         size += com.google.protobuf.CodedOutputStream
           .computeBytesSize(15, getUpgradeIdBytes());
+      }
+      if (((bitField0_ & 0x00008000) == 0x00008000)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBytesSize(16, getNotesBytes());
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
@@ -46719,6 +46762,8 @@ public final class Messages {
         bitField0_ = (bitField0_ & ~0x00002000);
         upgradeId_ = "";
         bitField0_ = (bitField0_ & ~0x00004000);
+        notes_ = "";
+        bitField0_ = (bitField0_ & ~0x00008000);
         return this;
       }
 
@@ -46807,6 +46852,10 @@ public final class Messages {
           to_bitField0_ |= 0x00004000;
         }
         result.upgradeId_ = upgradeId_;
+        if (((from_bitField0_ & 0x00008000) == 0x00008000)) {
+          to_bitField0_ |= 0x00008000;
+        }
+        result.notes_ = notes_;
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
@@ -46882,27 +46931,16 @@ public final class Messages {
           upgradeId_ = other.upgradeId_;
           onChanged();
         }
+        if (other.hasNotes()) {
+          bitField0_ |= 0x00008000;
+          notes_ = other.notes_;
+          onChanged();
+        }
         this.mergeUnknownFields(other.getUnknownFields());
         return this;
       }
 
       public final boolean isInitialized() {
-        if (!hasColonyKey()) {
-          
-          return false;
-        }
-        if (!hasEmpireKey()) {
-          
-          return false;
-        }
-        if (!hasBuildKind()) {
-          
-          return false;
-        }
-        if (!hasDesignName()) {
-          
-          return false;
-        }
         return true;
       }
 
@@ -46999,10 +47037,10 @@ public final class Messages {
         return this;
       }
 
-      // required string colony_key = 2;
+      // optional string colony_key = 2;
       private java.lang.Object colonyKey_ = "";
       /**
-       * <code>required string colony_key = 2;</code>
+       * <code>optional string colony_key = 2;</code>
        *
        * <pre>
        * The key of the colony you're trying to build at. Must have a shipyard to build
@@ -47013,7 +47051,7 @@ public final class Messages {
         return ((bitField0_ & 0x00000002) == 0x00000002);
       }
       /**
-       * <code>required string colony_key = 2;</code>
+       * <code>optional string colony_key = 2;</code>
        *
        * <pre>
        * The key of the colony you're trying to build at. Must have a shipyard to build
@@ -47032,7 +47070,7 @@ public final class Messages {
         }
       }
       /**
-       * <code>required string colony_key = 2;</code>
+       * <code>optional string colony_key = 2;</code>
        *
        * <pre>
        * The key of the colony you're trying to build at. Must have a shipyard to build
@@ -47053,7 +47091,7 @@ public final class Messages {
         }
       }
       /**
-       * <code>required string colony_key = 2;</code>
+       * <code>optional string colony_key = 2;</code>
        *
        * <pre>
        * The key of the colony you're trying to build at. Must have a shipyard to build
@@ -47071,7 +47109,7 @@ public final class Messages {
         return this;
       }
       /**
-       * <code>required string colony_key = 2;</code>
+       * <code>optional string colony_key = 2;</code>
        *
        * <pre>
        * The key of the colony you're trying to build at. Must have a shipyard to build
@@ -47085,7 +47123,7 @@ public final class Messages {
         return this;
       }
       /**
-       * <code>required string colony_key = 2;</code>
+       * <code>optional string colony_key = 2;</code>
        *
        * <pre>
        * The key of the colony you're trying to build at. Must have a shipyard to build
@@ -47103,10 +47141,10 @@ public final class Messages {
         return this;
       }
 
-      // required string empire_key = 3;
+      // optional string empire_key = 3;
       private java.lang.Object empireKey_ = "";
       /**
-       * <code>required string empire_key = 3;</code>
+       * <code>optional string empire_key = 3;</code>
        *
        * <pre>
        * The empire this build operation belongs to.
@@ -47116,7 +47154,7 @@ public final class Messages {
         return ((bitField0_ & 0x00000004) == 0x00000004);
       }
       /**
-       * <code>required string empire_key = 3;</code>
+       * <code>optional string empire_key = 3;</code>
        *
        * <pre>
        * The empire this build operation belongs to.
@@ -47134,7 +47172,7 @@ public final class Messages {
         }
       }
       /**
-       * <code>required string empire_key = 3;</code>
+       * <code>optional string empire_key = 3;</code>
        *
        * <pre>
        * The empire this build operation belongs to.
@@ -47154,7 +47192,7 @@ public final class Messages {
         }
       }
       /**
-       * <code>required string empire_key = 3;</code>
+       * <code>optional string empire_key = 3;</code>
        *
        * <pre>
        * The empire this build operation belongs to.
@@ -47171,7 +47209,7 @@ public final class Messages {
         return this;
       }
       /**
-       * <code>required string empire_key = 3;</code>
+       * <code>optional string empire_key = 3;</code>
        *
        * <pre>
        * The empire this build operation belongs to.
@@ -47184,7 +47222,7 @@ public final class Messages {
         return this;
       }
       /**
-       * <code>required string empire_key = 3;</code>
+       * <code>optional string empire_key = 3;</code>
        *
        * <pre>
        * The empire this build operation belongs to.
@@ -47332,22 +47370,22 @@ public final class Messages {
         return this;
       }
 
-      // required .au.com.codeka.common.protobuf.BuildRequest.BUILD_KIND build_kind = 4;
+      // optional .au.com.codeka.common.protobuf.BuildRequest.BUILD_KIND build_kind = 4;
       private au.com.codeka.common.protobuf.Messages.BuildRequest.BUILD_KIND buildKind_ = au.com.codeka.common.protobuf.Messages.BuildRequest.BUILD_KIND.BUILDING;
       /**
-       * <code>required .au.com.codeka.common.protobuf.BuildRequest.BUILD_KIND build_kind = 4;</code>
+       * <code>optional .au.com.codeka.common.protobuf.BuildRequest.BUILD_KIND build_kind = 4;</code>
        */
       public boolean hasBuildKind() {
         return ((bitField0_ & 0x00000020) == 0x00000020);
       }
       /**
-       * <code>required .au.com.codeka.common.protobuf.BuildRequest.BUILD_KIND build_kind = 4;</code>
+       * <code>optional .au.com.codeka.common.protobuf.BuildRequest.BUILD_KIND build_kind = 4;</code>
        */
       public au.com.codeka.common.protobuf.Messages.BuildRequest.BUILD_KIND getBuildKind() {
         return buildKind_;
       }
       /**
-       * <code>required .au.com.codeka.common.protobuf.BuildRequest.BUILD_KIND build_kind = 4;</code>
+       * <code>optional .au.com.codeka.common.protobuf.BuildRequest.BUILD_KIND build_kind = 4;</code>
        */
       public Builder setBuildKind(au.com.codeka.common.protobuf.Messages.BuildRequest.BUILD_KIND value) {
         if (value == null) {
@@ -47359,7 +47397,7 @@ public final class Messages {
         return this;
       }
       /**
-       * <code>required .au.com.codeka.common.protobuf.BuildRequest.BUILD_KIND build_kind = 4;</code>
+       * <code>optional .au.com.codeka.common.protobuf.BuildRequest.BUILD_KIND build_kind = 4;</code>
        */
       public Builder clearBuildKind() {
         bitField0_ = (bitField0_ & ~0x00000020);
@@ -47368,10 +47406,10 @@ public final class Messages {
         return this;
       }
 
-      // required string design_name = 5;
+      // optional string design_name = 5;
       private java.lang.Object designName_ = "";
       /**
-       * <code>required string design_name = 5;</code>
+       * <code>optional string design_name = 5;</code>
        *
        * <pre>
        * The name of the design you're trying to build
@@ -47381,7 +47419,7 @@ public final class Messages {
         return ((bitField0_ & 0x00000040) == 0x00000040);
       }
       /**
-       * <code>required string design_name = 5;</code>
+       * <code>optional string design_name = 5;</code>
        *
        * <pre>
        * The name of the design you're trying to build
@@ -47399,7 +47437,7 @@ public final class Messages {
         }
       }
       /**
-       * <code>required string design_name = 5;</code>
+       * <code>optional string design_name = 5;</code>
        *
        * <pre>
        * The name of the design you're trying to build
@@ -47419,7 +47457,7 @@ public final class Messages {
         }
       }
       /**
-       * <code>required string design_name = 5;</code>
+       * <code>optional string design_name = 5;</code>
        *
        * <pre>
        * The name of the design you're trying to build
@@ -47436,7 +47474,7 @@ public final class Messages {
         return this;
       }
       /**
-       * <code>required string design_name = 5;</code>
+       * <code>optional string design_name = 5;</code>
        *
        * <pre>
        * The name of the design you're trying to build
@@ -47449,7 +47487,7 @@ public final class Messages {
         return this;
       }
       /**
-       * <code>required string design_name = 5;</code>
+       * <code>optional string design_name = 5;</code>
        *
        * <pre>
        * The name of the design you're trying to build
@@ -47920,6 +47958,104 @@ public final class Messages {
         return this;
       }
 
+      // optional string notes = 16;
+      private java.lang.Object notes_ = "";
+      /**
+       * <code>optional string notes = 16;</code>
+       *
+       * <pre>
+       * notes you can attach to the fleet/building when it's finished
+       * </pre>
+       */
+      public boolean hasNotes() {
+        return ((bitField0_ & 0x00008000) == 0x00008000);
+      }
+      /**
+       * <code>optional string notes = 16;</code>
+       *
+       * <pre>
+       * notes you can attach to the fleet/building when it's finished
+       * </pre>
+       */
+      public java.lang.String getNotes() {
+        java.lang.Object ref = notes_;
+        if (!(ref instanceof java.lang.String)) {
+          java.lang.String s = ((com.google.protobuf.ByteString) ref)
+              .toStringUtf8();
+          notes_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>optional string notes = 16;</code>
+       *
+       * <pre>
+       * notes you can attach to the fleet/building when it's finished
+       * </pre>
+       */
+      public com.google.protobuf.ByteString
+          getNotesBytes() {
+        java.lang.Object ref = notes_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          notes_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>optional string notes = 16;</code>
+       *
+       * <pre>
+       * notes you can attach to the fleet/building when it's finished
+       * </pre>
+       */
+      public Builder setNotes(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00008000;
+        notes_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional string notes = 16;</code>
+       *
+       * <pre>
+       * notes you can attach to the fleet/building when it's finished
+       * </pre>
+       */
+      public Builder clearNotes() {
+        bitField0_ = (bitField0_ & ~0x00008000);
+        notes_ = getDefaultInstance().getNotes();
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional string notes = 16;</code>
+       *
+       * <pre>
+       * notes you can attach to the fleet/building when it's finished
+       * </pre>
+       */
+      public Builder setNotesBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00008000;
+        notes_ = value;
+        onChanged();
+        return this;
+      }
+
       // @@protoc_insertion_point(builder_scope:au.com.codeka.common.protobuf.BuildRequest)
     }
 
@@ -48109,12 +48245,6 @@ public final class Messages {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized != -1) return isInitialized == 1;
 
-      for (int i = 0; i < getRequestsCount(); i++) {
-        if (!getRequests(i).isInitialized()) {
-          memoizedIsInitialized = 0;
-          return false;
-        }
-      }
       memoizedIsInitialized = 1;
       return true;
     }
@@ -48348,12 +48478,6 @@ public final class Messages {
       }
 
       public final boolean isInitialized() {
-        for (int i = 0; i < getRequestsCount(); i++) {
-          if (!getRequests(i).isInitialized()) {
-            
-            return false;
-          }
-        }
         return true;
       }
 
@@ -48728,6 +48852,33 @@ public final class Messages {
      * </pre>
      */
     int getLevel();
+
+    // optional string notes = 5;
+    /**
+     * <code>optional string notes = 5;</code>
+     *
+     * <pre>
+     * not as useful for buildings, but notes the player can attach
+     * </pre>
+     */
+    boolean hasNotes();
+    /**
+     * <code>optional string notes = 5;</code>
+     *
+     * <pre>
+     * not as useful for buildings, but notes the player can attach
+     * </pre>
+     */
+    java.lang.String getNotes();
+    /**
+     * <code>optional string notes = 5;</code>
+     *
+     * <pre>
+     * not as useful for buildings, but notes the player can attach
+     * </pre>
+     */
+    com.google.protobuf.ByteString
+        getNotesBytes();
   }
   /**
    * Protobuf type {@code au.com.codeka.common.protobuf.Building}
@@ -48803,6 +48954,11 @@ public final class Messages {
             case 32: {
               bitField0_ |= 0x00000008;
               level_ = input.readInt32();
+              break;
+            }
+            case 42: {
+              bitField0_ |= 0x00000010;
+              notes_ = input.readBytes();
               break;
             }
           }
@@ -49034,11 +49190,67 @@ public final class Messages {
       return level_;
     }
 
+    // optional string notes = 5;
+    public static final int NOTES_FIELD_NUMBER = 5;
+    private java.lang.Object notes_;
+    /**
+     * <code>optional string notes = 5;</code>
+     *
+     * <pre>
+     * not as useful for buildings, but notes the player can attach
+     * </pre>
+     */
+    public boolean hasNotes() {
+      return ((bitField0_ & 0x00000010) == 0x00000010);
+    }
+    /**
+     * <code>optional string notes = 5;</code>
+     *
+     * <pre>
+     * not as useful for buildings, but notes the player can attach
+     * </pre>
+     */
+    public java.lang.String getNotes() {
+      java.lang.Object ref = notes_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        if (bs.isValidUtf8()) {
+          notes_ = s;
+        }
+        return s;
+      }
+    }
+    /**
+     * <code>optional string notes = 5;</code>
+     *
+     * <pre>
+     * not as useful for buildings, but notes the player can attach
+     * </pre>
+     */
+    public com.google.protobuf.ByteString
+        getNotesBytes() {
+      java.lang.Object ref = notes_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        notes_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
     private void initFields() {
       key_ = "";
       colonyKey_ = "";
       designName_ = "";
       level_ = 0;
+      notes_ = "";
     }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
@@ -49076,6 +49288,9 @@ public final class Messages {
       if (((bitField0_ & 0x00000008) == 0x00000008)) {
         output.writeInt32(4, level_);
       }
+      if (((bitField0_ & 0x00000010) == 0x00000010)) {
+        output.writeBytes(5, getNotesBytes());
+      }
       getUnknownFields().writeTo(output);
     }
 
@@ -49100,6 +49315,10 @@ public final class Messages {
       if (((bitField0_ & 0x00000008) == 0x00000008)) {
         size += com.google.protobuf.CodedOutputStream
           .computeInt32Size(4, level_);
+      }
+      if (((bitField0_ & 0x00000010) == 0x00000010)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBytesSize(5, getNotesBytes());
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
@@ -49230,6 +49449,8 @@ public final class Messages {
         bitField0_ = (bitField0_ & ~0x00000004);
         level_ = 0;
         bitField0_ = (bitField0_ & ~0x00000008);
+        notes_ = "";
+        bitField0_ = (bitField0_ & ~0x00000010);
         return this;
       }
 
@@ -49274,6 +49495,10 @@ public final class Messages {
           to_bitField0_ |= 0x00000008;
         }
         result.level_ = level_;
+        if (((from_bitField0_ & 0x00000010) == 0x00000010)) {
+          to_bitField0_ |= 0x00000010;
+        }
+        result.notes_ = notes_;
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
@@ -49307,6 +49532,11 @@ public final class Messages {
         }
         if (other.hasLevel()) {
           setLevel(other.getLevel());
+        }
+        if (other.hasNotes()) {
+          bitField0_ |= 0x00000010;
+          notes_ = other.notes_;
+          onChanged();
         }
         this.mergeUnknownFields(other.getUnknownFields());
         return this;
@@ -49686,6 +49916,104 @@ public final class Messages {
       public Builder clearLevel() {
         bitField0_ = (bitField0_ & ~0x00000008);
         level_ = 0;
+        onChanged();
+        return this;
+      }
+
+      // optional string notes = 5;
+      private java.lang.Object notes_ = "";
+      /**
+       * <code>optional string notes = 5;</code>
+       *
+       * <pre>
+       * not as useful for buildings, but notes the player can attach
+       * </pre>
+       */
+      public boolean hasNotes() {
+        return ((bitField0_ & 0x00000010) == 0x00000010);
+      }
+      /**
+       * <code>optional string notes = 5;</code>
+       *
+       * <pre>
+       * not as useful for buildings, but notes the player can attach
+       * </pre>
+       */
+      public java.lang.String getNotes() {
+        java.lang.Object ref = notes_;
+        if (!(ref instanceof java.lang.String)) {
+          java.lang.String s = ((com.google.protobuf.ByteString) ref)
+              .toStringUtf8();
+          notes_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>optional string notes = 5;</code>
+       *
+       * <pre>
+       * not as useful for buildings, but notes the player can attach
+       * </pre>
+       */
+      public com.google.protobuf.ByteString
+          getNotesBytes() {
+        java.lang.Object ref = notes_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          notes_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>optional string notes = 5;</code>
+       *
+       * <pre>
+       * not as useful for buildings, but notes the player can attach
+       * </pre>
+       */
+      public Builder setNotes(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000010;
+        notes_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional string notes = 5;</code>
+       *
+       * <pre>
+       * not as useful for buildings, but notes the player can attach
+       * </pre>
+       */
+      public Builder clearNotes() {
+        bitField0_ = (bitField0_ & ~0x00000010);
+        notes_ = getDefaultInstance().getNotes();
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional string notes = 5;</code>
+       *
+       * <pre>
+       * not as useful for buildings, but notes the player can attach
+       * </pre>
+       */
+      public Builder setNotesBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000010;
+        notes_ = value;
         onChanged();
         return this;
       }
@@ -50527,6 +50855,33 @@ public final class Messages {
      */
     au.com.codeka.common.protobuf.Messages.FleetUpgradeOrBuilder getUpgradesOrBuilder(
         int index);
+
+    // optional string notes = 17;
+    /**
+     * <code>optional string notes = 17;</code>
+     *
+     * <pre>
+     * notes the player has attached so that he can remember what the fleet was for.
+     * </pre>
+     */
+    boolean hasNotes();
+    /**
+     * <code>optional string notes = 17;</code>
+     *
+     * <pre>
+     * notes the player has attached so that he can remember what the fleet was for.
+     * </pre>
+     */
+    java.lang.String getNotes();
+    /**
+     * <code>optional string notes = 17;</code>
+     *
+     * <pre>
+     * notes the player has attached so that he can remember what the fleet was for.
+     * </pre>
+     */
+    com.google.protobuf.ByteString
+        getNotesBytes();
   }
   /**
    * Protobuf type {@code au.com.codeka.common.protobuf.Fleet}
@@ -50677,6 +51032,11 @@ public final class Messages {
                 mutable_bitField0_ |= 0x00008000;
               }
               upgrades_.add(input.readMessage(au.com.codeka.common.protobuf.Messages.FleetUpgrade.PARSER, extensionRegistry));
+              break;
+            }
+            case 138: {
+              bitField0_ |= 0x00008000;
+              notes_ = input.readBytes();
               break;
             }
           }
@@ -51513,6 +51873,61 @@ public final class Messages {
       return upgrades_.get(index);
     }
 
+    // optional string notes = 17;
+    public static final int NOTES_FIELD_NUMBER = 17;
+    private java.lang.Object notes_;
+    /**
+     * <code>optional string notes = 17;</code>
+     *
+     * <pre>
+     * notes the player has attached so that he can remember what the fleet was for.
+     * </pre>
+     */
+    public boolean hasNotes() {
+      return ((bitField0_ & 0x00008000) == 0x00008000);
+    }
+    /**
+     * <code>optional string notes = 17;</code>
+     *
+     * <pre>
+     * notes the player has attached so that he can remember what the fleet was for.
+     * </pre>
+     */
+    public java.lang.String getNotes() {
+      java.lang.Object ref = notes_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        if (bs.isValidUtf8()) {
+          notes_ = s;
+        }
+        return s;
+      }
+    }
+    /**
+     * <code>optional string notes = 17;</code>
+     *
+     * <pre>
+     * notes the player has attached so that he can remember what the fleet was for.
+     * </pre>
+     */
+    public com.google.protobuf.ByteString
+        getNotesBytes() {
+      java.lang.Object ref = notes_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        notes_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
     private void initFields() {
       key_ = "";
       empireKey_ = "";
@@ -51530,6 +51945,7 @@ public final class Messages {
       lastVictory_ = 0L;
       eta_ = 0L;
       upgrades_ = java.util.Collections.emptyList();
+      notes_ = "";
     }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
@@ -51594,6 +52010,9 @@ public final class Messages {
       }
       for (int i = 0; i < upgrades_.size(); i++) {
         output.writeMessage(16, upgrades_.get(i));
+      }
+      if (((bitField0_ & 0x00008000) == 0x00008000)) {
+        output.writeBytes(17, getNotesBytes());
       }
       getUnknownFields().writeTo(output);
     }
@@ -51667,6 +52086,10 @@ public final class Messages {
       for (int i = 0; i < upgrades_.size(); i++) {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(16, upgrades_.get(i));
+      }
+      if (((bitField0_ & 0x00008000) == 0x00008000)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBytesSize(17, getNotesBytes());
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
@@ -51826,6 +52249,8 @@ public final class Messages {
         } else {
           upgradesBuilder_.clear();
         }
+        notes_ = "";
+        bitField0_ = (bitField0_ & ~0x00010000);
         return this;
       }
 
@@ -51923,6 +52348,10 @@ public final class Messages {
         } else {
           result.upgrades_ = upgradesBuilder_.build();
         }
+        if (((from_bitField0_ & 0x00010000) == 0x00010000)) {
+          to_bitField0_ |= 0x00008000;
+        }
+        result.notes_ = notes_;
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
@@ -52023,6 +52452,11 @@ public final class Messages {
               upgradesBuilder_.addAllMessages(other.upgrades_);
             }
           }
+        }
+        if (other.hasNotes()) {
+          bitField0_ |= 0x00010000;
+          notes_ = other.notes_;
+          onChanged();
         }
         this.mergeUnknownFields(other.getUnknownFields());
         return this;
@@ -53379,6 +53813,104 @@ public final class Messages {
           upgrades_ = null;
         }
         return upgradesBuilder_;
+      }
+
+      // optional string notes = 17;
+      private java.lang.Object notes_ = "";
+      /**
+       * <code>optional string notes = 17;</code>
+       *
+       * <pre>
+       * notes the player has attached so that he can remember what the fleet was for.
+       * </pre>
+       */
+      public boolean hasNotes() {
+        return ((bitField0_ & 0x00010000) == 0x00010000);
+      }
+      /**
+       * <code>optional string notes = 17;</code>
+       *
+       * <pre>
+       * notes the player has attached so that he can remember what the fleet was for.
+       * </pre>
+       */
+      public java.lang.String getNotes() {
+        java.lang.Object ref = notes_;
+        if (!(ref instanceof java.lang.String)) {
+          java.lang.String s = ((com.google.protobuf.ByteString) ref)
+              .toStringUtf8();
+          notes_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>optional string notes = 17;</code>
+       *
+       * <pre>
+       * notes the player has attached so that he can remember what the fleet was for.
+       * </pre>
+       */
+      public com.google.protobuf.ByteString
+          getNotesBytes() {
+        java.lang.Object ref = notes_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          notes_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>optional string notes = 17;</code>
+       *
+       * <pre>
+       * notes the player has attached so that he can remember what the fleet was for.
+       * </pre>
+       */
+      public Builder setNotes(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00010000;
+        notes_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional string notes = 17;</code>
+       *
+       * <pre>
+       * notes the player has attached so that he can remember what the fleet was for.
+       * </pre>
+       */
+      public Builder clearNotes() {
+        bitField0_ = (bitField0_ & ~0x00010000);
+        notes_ = getDefaultInstance().getNotes();
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional string notes = 17;</code>
+       *
+       * <pre>
+       * notes the player has attached so that he can remember what the fleet was for.
+       * </pre>
+       */
+      public Builder setNotesBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00010000;
+        notes_ = value;
+        onChanged();
+        return this;
       }
 
       // @@protoc_insertion_point(builder_scope:au.com.codeka.common.protobuf.Fleet)
@@ -87203,187 +87735,188 @@ public final class Messages {
       "\025\n\rdefence_bonus\030\020 \001(\002\022\026\n\016max_population" +
       "\030\021 \001(\002\022\031\n\021cooldown_end_time\030\022 \001(\003\"C\n\010Col" +
       "onies\0227\n\010colonies\030\001 \003(\0132%.au.com.codeka.",
-      "common.protobuf.Colony\"\250\003\n\014BuildRequest\022" +
-      "\013\n\003key\030\001 \001(\t\022\022\n\ncolony_key\030\002 \002(\t\022\022\n\nempi" +
-      "re_key\030\003 \002(\t\022\020\n\010star_key\030\013 \001(\t\022\024\n\014planet" +
-      "_index\030\014 \001(\005\022J\n\nbuild_kind\030\004 \002(\01626.au.co" +
+      "common.protobuf.Colony\"\267\003\n\014BuildRequest\022" +
+      "\013\n\003key\030\001 \001(\t\022\022\n\ncolony_key\030\002 \001(\t\022\022\n\nempi" +
+      "re_key\030\003 \001(\t\022\020\n\010star_key\030\013 \001(\t\022\024\n\014planet" +
+      "_index\030\014 \001(\005\022J\n\nbuild_kind\030\004 \001(\01626.au.co" +
       "m.codeka.common.protobuf.BuildRequest.BU" +
-      "ILD_KIND\022\023\n\013design_name\030\005 \002(\t\022\r\n\005count\030\t" +
+      "ILD_KIND\022\023\n\013design_name\030\005 \001(\t\022\r\n\005count\030\t" +
       " \001(\005\022\022\n\nstart_time\030\006 \001(\003\022\020\n\010end_time\030\007 \001" +
       "(\003\022\020\n\010progress\030\010 \001(\002\022\035\n\025existing_buildin" +
       "g_key\030\n \001(\t\022\037\n\027existing_building_level\030\r" +
       " \001(\005\022\031\n\021existing_fleet_id\030\016 \001(\005\022\022\n\nupgra",
-      "de_id\030\017 \001(\t\"$\n\nBUILD_KIND\022\014\n\010BUILDING\020\001\022" +
-      "\010\n\004SHIP\020\002\"K\n\nBuildQueue\022=\n\010requests\030\001 \003(" +
-      "\0132+.au.com.codeka.common.protobuf.BuildR" +
-      "equest\"O\n\010Building\022\013\n\003key\030\001 \002(\t\022\022\n\ncolon" +
-      "y_key\030\002 \002(\t\022\023\n\013design_name\030\003 \002(\t\022\r\n\005leve" +
-      "l\030\004 \001(\005\"\"\n\014FleetUpgrade\022\022\n\nupgrade_id\030\001 " +
-      "\001(\t\"\342\004\n\005Fleet\022\013\n\003key\030\001 \002(\t\022\022\n\nempire_key" +
-      "\030\002 \001(\t\022\023\n\013design_name\030\003 \001(\t\022\021\n\tnum_ships" +
-      "\030\004 \001(\002\022?\n\005state\030\005 \001(\01620.au.com.codeka.co" +
-      "mmon.protobuf.Fleet.FLEET_STATE\022\030\n\020state",
-      "_start_time\030\006 \001(\003\022\020\n\010star_key\030\007 \001(\t\022\034\n\024d" +
-      "estination_star_key\030\010 \001(\t\022\030\n\020target_flee" +
-      "t_key\030\t \001(\t\022\031\n\021target_colony_key\030\n \001(\t\022A" +
-      "\n\006stance\030\013 \001(\01621.au.com.codeka.common.pr" +
-      "otobuf.Fleet.FLEET_STANCE\022\026\n\016time_destro" +
-      "yed\030\014 \001(\003\022%\n\035block_notification_on_destr" +
-      "oy\030\016 \001(\010\022\024\n\014last_victory\030\r \001(\003\022\013\n\003eta\030\017 " +
-      "\001(\003\022=\n\010upgrades\030\020 \003(\0132+.au.com.codeka.co" +
-      "mmon.protobuf.FleetUpgrade\"2\n\013FLEET_STAT" +
-      "E\022\010\n\004IDLE\020\001\022\n\n\006MOVING\020\002\022\r\n\tATTACKING\020\003\"8",
-      "\n\014FLEET_STANCE\022\013\n\007PASSIVE\020\001\022\013\n\007NEUTRAL\020\002" +
-      "\022\016\n\nAGGRESSIVE\020\003\">\n\006Fleets\0224\n\006fleets\030\001 \003" +
-      "(\0132$.au.com.codeka.common.protobuf.Fleet" +
-      "\"\250\002\n\nFleetOrder\022D\n\005order\030\001 \002(\01625.au.com." +
-      "codeka.common.protobuf.FleetOrder.FLEET_" +
-      "ORDER\022\022\n\nsplit_left\030\002 \001(\005\022\023\n\013split_right" +
-      "\030\003 \001(\005\022\020\n\010star_key\030\004 \001(\t\022A\n\006stance\030\005 \001(\016" +
-      "21.au.com.codeka.common.protobuf.Fleet.F" +
-      "LEET_STANCE\022\027\n\017merge_fleet_key\030\006 \001(\t\"=\n\013" +
-      "FLEET_ORDER\022\t\n\005SPLIT\020\001\022\t\n\005MERGE\020\002\022\010\n\004MOV",
-      "E\020\003\022\016\n\nSET_STANCE\020\005\"_\n\013ScoutReport\022\013\n\003ke" +
-      "y\030\001 \001(\t\022\022\n\nempire_key\030\002 \001(\t\022\020\n\010star_key\030" +
-      "\003 \001(\t\022\014\n\004date\030\005 \001(\003\022\017\n\007star_pb\030\004 \001(\014\"K\n\014" +
-      "ScoutReports\022;\n\007reports\030\001 \003(\0132*.au.com.c" +
-      "odeka.common.protobuf.ScoutReport\"\252\006\n\013Co" +
-      "mbatRound\022\020\n\010star_key\030\001 \001(\t\022\022\n\nround_tim" +
-      "e\030\002 \001(\003\022G\n\006fleets\030\003 \003(\01327.au.com.codeka." +
-      "common.protobuf.CombatRound.FleetSummary" +
-      "\022S\n\rfleets_joined\030\004 \003(\0132<.au.com.codeka." +
-      "common.protobuf.CombatRound.FleetJoinedR",
-      "ecord\022V\n\020fleets_targetted\030\005 \003(\0132<.au.com" +
-      ".codeka.common.protobuf.CombatRound.Flee" +
-      "tTargetRecord\022U\n\017fleets_attacked\030\006 \003(\0132<" +
-      ".au.com.codeka.common.protobuf.CombatRou" +
-      "nd.FleetAttackRecord\022U\n\016fleets_damaged\030\007" +
-      " \003(\0132=.au.com.codeka.common.protobuf.Com" +
-      "batRound.FleetDamagedRecord\032\\\n\014FleetSumm" +
-      "ary\022\022\n\nfleet_keys\030\001 \003(\t\022\022\n\nempire_key\030\002 " +
-      "\001(\t\022\021\n\tdesign_id\030\003 \001(\t\022\021\n\tnum_ships\030\004 \001(" +
-      "\002\032(\n\021FleetJoinedRecord\022\023\n\013fleet_index\030\001 ",
-      "\001(\005\032>\n\021FleetTargetRecord\022\023\n\013fleet_index\030" +
-      "\001 \001(\005\022\024\n\014target_index\030\002 \001(\005\032N\n\021FleetAtta" +
-      "ckRecord\022\023\n\013fleet_index\030\001 \001(\005\022\024\n\014target_" +
-      "index\030\002 \001(\005\022\016\n\006damage\030\003 \001(\002\0329\n\022FleetDama" +
-      "gedRecord\022\023\n\013fleet_index\030\001 \001(\005\022\016\n\006damage" +
-      "\030\002 \001(\002\"\332\001\n\014CombatReport\022\013\n\003key\030\001 \001(\t\022\020\n\010" +
-      "star_key\030\002 \001(\t\022\022\n\nstart_time\030\003 \001(\003\022\020\n\010en" +
-      "d_time\030\004 \001(\003\022\031\n\021start_empire_keys\030\005 \003(\t\022" +
-      "\027\n\017end_empire_keys\030\006 \003(\t\022\025\n\rnum_destroye" +
-      "d\030\007 \001(\005\022:\n\006rounds\030\010 \003(\0132*.au.com.codeka.",
-      "common.protobuf.CombatRound\"M\n\rCombatRep" +
-      "orts\022<\n\007reports\030\001 \003(\0132+.au.com.codeka.co" +
-      "mmon.protobuf.CombatReport\"\304\r\n\017Situation" +
-      "Report\022\013\n\003key\030\001 \001(\t\022\022\n\nempire_key\030\002 \001(\t\022" +
-      "\023\n\013report_time\030\003 \001(\003\022\020\n\010star_key\030\004 \001(\t\022\024" +
-      "\n\014planet_index\030\005 \001(\005\022\r\n\005realm\030\016 \001(\t\022a\n\025b" +
-      "uild_complete_record\030\006 \001(\0132B.au.com.code" +
-      "ka.common.protobuf.SituationReport.Build" +
-      "CompleteRecord\022_\n\024move_complete_record\030\007" +
-      " \001(\0132A.au.com.codeka.common.protobuf.Sit",
-      "uationReport.MoveCompleteRecord\022h\n\031fleet" +
-      "_under_attack_record\030\010 \001(\0132E.au.com.code" +
-      "ka.common.protobuf.SituationReport.Fleet" +
-      "UnderAttackRecord\022c\n\026fleet_destroyed_rec" +
-      "ord\030\t \001(\0132C.au.com.codeka.common.protobu" +
-      "f.SituationReport.FleetDestroyedRecord\022e" +
-      "\n\027fleet_victorious_record\030\n \001(\0132D.au.com" +
+      "de_id\030\017 \001(\t\022\r\n\005notes\030\020 \001(\t\"$\n\nBUILD_KIND" +
+      "\022\014\n\010BUILDING\020\001\022\010\n\004SHIP\020\002\"K\n\nBuildQueue\022=" +
+      "\n\010requests\030\001 \003(\0132+.au.com.codeka.common." +
+      "protobuf.BuildRequest\"^\n\010Building\022\013\n\003key" +
+      "\030\001 \002(\t\022\022\n\ncolony_key\030\002 \002(\t\022\023\n\013design_nam" +
+      "e\030\003 \002(\t\022\r\n\005level\030\004 \001(\005\022\r\n\005notes\030\005 \001(\t\"\"\n" +
+      "\014FleetUpgrade\022\022\n\nupgrade_id\030\001 \001(\t\"\361\004\n\005Fl" +
+      "eet\022\013\n\003key\030\001 \002(\t\022\022\n\nempire_key\030\002 \001(\t\022\023\n\013" +
+      "design_name\030\003 \001(\t\022\021\n\tnum_ships\030\004 \001(\002\022?\n\005" +
+      "state\030\005 \001(\01620.au.com.codeka.common.proto",
+      "buf.Fleet.FLEET_STATE\022\030\n\020state_start_tim" +
+      "e\030\006 \001(\003\022\020\n\010star_key\030\007 \001(\t\022\034\n\024destination" +
+      "_star_key\030\010 \001(\t\022\030\n\020target_fleet_key\030\t \001(" +
+      "\t\022\031\n\021target_colony_key\030\n \001(\t\022A\n\006stance\030\013" +
+      " \001(\01621.au.com.codeka.common.protobuf.Fle" +
+      "et.FLEET_STANCE\022\026\n\016time_destroyed\030\014 \001(\003\022" +
+      "%\n\035block_notification_on_destroy\030\016 \001(\010\022\024" +
+      "\n\014last_victory\030\r \001(\003\022\013\n\003eta\030\017 \001(\003\022=\n\010upg" +
+      "rades\030\020 \003(\0132+.au.com.codeka.common.proto" +
+      "buf.FleetUpgrade\022\r\n\005notes\030\021 \001(\t\"2\n\013FLEET",
+      "_STATE\022\010\n\004IDLE\020\001\022\n\n\006MOVING\020\002\022\r\n\tATTACKIN" +
+      "G\020\003\"8\n\014FLEET_STANCE\022\013\n\007PASSIVE\020\001\022\013\n\007NEUT" +
+      "RAL\020\002\022\016\n\nAGGRESSIVE\020\003\">\n\006Fleets\0224\n\006fleet" +
+      "s\030\001 \003(\0132$.au.com.codeka.common.protobuf." +
+      "Fleet\"\250\002\n\nFleetOrder\022D\n\005order\030\001 \002(\01625.au" +
+      ".com.codeka.common.protobuf.FleetOrder.F" +
+      "LEET_ORDER\022\022\n\nsplit_left\030\002 \001(\005\022\023\n\013split_" +
+      "right\030\003 \001(\005\022\020\n\010star_key\030\004 \001(\t\022A\n\006stance\030" +
+      "\005 \001(\01621.au.com.codeka.common.protobuf.Fl" +
+      "eet.FLEET_STANCE\022\027\n\017merge_fleet_key\030\006 \001(",
+      "\t\"=\n\013FLEET_ORDER\022\t\n\005SPLIT\020\001\022\t\n\005MERGE\020\002\022\010" +
+      "\n\004MOVE\020\003\022\016\n\nSET_STANCE\020\005\"_\n\013ScoutReport\022" +
+      "\013\n\003key\030\001 \001(\t\022\022\n\nempire_key\030\002 \001(\t\022\020\n\010star" +
+      "_key\030\003 \001(\t\022\014\n\004date\030\005 \001(\003\022\017\n\007star_pb\030\004 \001(" +
+      "\014\"K\n\014ScoutReports\022;\n\007reports\030\001 \003(\0132*.au." +
+      "com.codeka.common.protobuf.ScoutReport\"\252" +
+      "\006\n\013CombatRound\022\020\n\010star_key\030\001 \001(\t\022\022\n\nroun" +
+      "d_time\030\002 \001(\003\022G\n\006fleets\030\003 \003(\01327.au.com.co" +
+      "deka.common.protobuf.CombatRound.FleetSu" +
+      "mmary\022S\n\rfleets_joined\030\004 \003(\0132<.au.com.co",
+      "deka.common.protobuf.CombatRound.FleetJo" +
+      "inedRecord\022V\n\020fleets_targetted\030\005 \003(\0132<.a" +
+      "u.com.codeka.common.protobuf.CombatRound" +
+      ".FleetTargetRecord\022U\n\017fleets_attacked\030\006 " +
+      "\003(\0132<.au.com.codeka.common.protobuf.Comb" +
+      "atRound.FleetAttackRecord\022U\n\016fleets_dama" +
+      "ged\030\007 \003(\0132=.au.com.codeka.common.protobu" +
+      "f.CombatRound.FleetDamagedRecord\032\\\n\014Flee" +
+      "tSummary\022\022\n\nfleet_keys\030\001 \003(\t\022\022\n\nempire_k" +
+      "ey\030\002 \001(\t\022\021\n\tdesign_id\030\003 \001(\t\022\021\n\tnum_ships",
+      "\030\004 \001(\002\032(\n\021FleetJoinedRecord\022\023\n\013fleet_ind" +
+      "ex\030\001 \001(\005\032>\n\021FleetTargetRecord\022\023\n\013fleet_i" +
+      "ndex\030\001 \001(\005\022\024\n\014target_index\030\002 \001(\005\032N\n\021Flee" +
+      "tAttackRecord\022\023\n\013fleet_index\030\001 \001(\005\022\024\n\014ta" +
+      "rget_index\030\002 \001(\005\022\016\n\006damage\030\003 \001(\002\0329\n\022Flee" +
+      "tDamagedRecord\022\023\n\013fleet_index\030\001 \001(\005\022\016\n\006d" +
+      "amage\030\002 \001(\002\"\332\001\n\014CombatReport\022\013\n\003key\030\001 \001(" +
+      "\t\022\020\n\010star_key\030\002 \001(\t\022\022\n\nstart_time\030\003 \001(\003\022" +
+      "\020\n\010end_time\030\004 \001(\003\022\031\n\021start_empire_keys\030\005" +
+      " \003(\t\022\027\n\017end_empire_keys\030\006 \003(\t\022\025\n\rnum_des",
+      "troyed\030\007 \001(\005\022:\n\006rounds\030\010 \003(\0132*.au.com.co" +
+      "deka.common.protobuf.CombatRound\"M\n\rComb" +
+      "atReports\022<\n\007reports\030\001 \003(\0132+.au.com.code" +
+      "ka.common.protobuf.CombatReport\"\304\r\n\017Situ" +
+      "ationReport\022\013\n\003key\030\001 \001(\t\022\022\n\nempire_key\030\002" +
+      " \001(\t\022\023\n\013report_time\030\003 \001(\003\022\020\n\010star_key\030\004 " +
+      "\001(\t\022\024\n\014planet_index\030\005 \001(\005\022\r\n\005realm\030\016 \001(\t" +
+      "\022a\n\025build_complete_record\030\006 \001(\0132B.au.com" +
       ".codeka.common.protobuf.SituationReport." +
-      "FleetVictoriousRecord\022e\n\027colony_destroye" +
-      "d_record\030\013 \001(\0132D.au.com.codeka.common.pr",
-      "otobuf.SituationReport.ColonyDestroyedRe" +
-      "cord\022c\n\026colony_attacked_record\030\014 \001(\0132C.a" +
+      "BuildCompleteRecord\022_\n\024move_complete_rec",
+      "ord\030\007 \001(\0132A.au.com.codeka.common.protobu" +
+      "f.SituationReport.MoveCompleteRecord\022h\n\031" +
+      "fleet_under_attack_record\030\010 \001(\0132E.au.com" +
+      ".codeka.common.protobuf.SituationReport." +
+      "FleetUnderAttackRecord\022c\n\026fleet_destroye" +
+      "d_record\030\t \001(\0132C.au.com.codeka.common.pr" +
+      "otobuf.SituationReport.FleetDestroyedRec" +
+      "ord\022e\n\027fleet_victorious_record\030\n \001(\0132D.a" +
       "u.com.codeka.common.protobuf.SituationRe" +
-      "port.ColonyAttackedRecord\022l\n\034star_ran_ou" +
-      "t_of_goods_record\030\r \001(\0132F.au.com.codeka." +
-      "common.protobuf.SituationReport.StarRunO" +
-      "utOfGoodsRecord\032\236\001\n\023BuildCompleteRecord\022" +
-      "J\n\nbuild_kind\030\001 \001(\01626.au.com.codeka.comm" +
-      "on.protobuf.BuildRequest.BUILD_KIND\022\021\n\td" +
-      "esign_id\030\002 \001(\t\022\r\n\005count\030\003 \001(\005\022\031\n\021build_r",
-      "equest_key\030\004 \001(\t\032m\n\022MoveCompleteRecord\022\021" +
-      "\n\tfleet_key\030\001 \001(\t\022\027\n\017fleet_design_id\030\003 \001" +
-      "(\t\022\021\n\tnum_ships\030\004 \001(\002\022\030\n\020scout_report_ke" +
-      "y\030\005 \001(\t\032r\n\026FleetUnderAttackRecord\022\021\n\tfle" +
-      "et_key\030\001 \001(\t\022\027\n\017fleet_design_id\030\002 \001(\t\022\021\n" +
-      "\tnum_ships\030\003 \001(\002\022\031\n\021combat_report_key\030\004 " +
-      "\001(\t\032J\n\024FleetDestroyedRecord\022\027\n\017fleet_des" +
-      "ign_id\030\001 \001(\t\022\031\n\021combat_report_key\030\002 \001(\t\032" +
-      "q\n\025FleetVictoriousRecord\022\021\n\tfleet_key\030\001 " +
-      "\001(\t\022\027\n\017fleet_design_id\030\002 \001(\t\022\021\n\tnum_ship",
-      "s\030\003 \001(\002\022\031\n\021combat_report_key\030\004 \001(\t\032E\n\025Co" +
-      "lonyDestroyedRecord\022\022\n\ncolony_key\030\001 \001(\t\022" +
-      "\030\n\020enemy_empire_key\030\002 \001(\t\032W\n\024ColonyAttac" +
-      "kedRecord\022\022\n\ncolony_key\030\001 \001(\t\022\030\n\020enemy_e" +
-      "mpire_key\030\002 \001(\t\022\021\n\tnum_ships\030\003 \001(\002\032-\n\027St" +
-      "arRunOutOfGoodsRecord\022\022\n\ncolony_key\030\001 \001(" +
-      "\t\"m\n\020SituationReports\022I\n\021situation_repor" +
-      "ts\030\001 \003(\0132..au.com.codeka.common.protobuf" +
-      ".SituationReport\022\016\n\006cursor\030\002 \001(\t\"\216\004\n\017Cas" +
-      "hAuditRecord\022\n\n\002id\030\001 \001(\005\022\021\n\tempire_id\030\002 ",
-      "\001(\005\022E\n\006reason\030\003 \001(\01625.au.com.codeka.comm" +
-      "on.protobuf.CashAuditRecord.Reason\022\023\n\013be" +
-      "fore_cash\030\004 \001(\002\022\022\n\nafter_cash\030\005 \001(\002\022\014\n\004t" +
-      "ime\030\020 \001(\003\022\020\n\010fleet_id\030\006 \001(\005\022\027\n\017fleet_des" +
-      "ign_id\030\007 \001(\t\022\021\n\tnum_ships\030\010 \001(\002\022\017\n\007star_" +
-      "id\030\t \001(\005\022\021\n\tstar_name\030\n \001(\t\022\025\n\rmove_dist" +
-      "ance\030\013 \001(\002\022\027\n\017build_design_id\030\014 \001(\t\022\023\n\013b" +
-      "uild_count\030\r \001(\005\022\031\n\021accelerate_amount\030\016 " +
-      "\001(\002\022\025\n\ralliance_name\030\017 \001(\t\"\204\001\n\006Reason\022\r\n" +
-      "\tFleetMove\020\000\022\023\n\017BuildAccelerate\020\001\022\027\n\023Col",
-      "lectFromColonies\020\002\022\022\n\016CreateAlliance\020\003\022\023" +
-      "\n\017AllianceDeposit\020\004\022\024\n\020AllianceWithdraw\020" +
-      "\005\"S\n\020CashAuditRecords\022?\n\007records\030\001 \003(\0132." +
-      ".au.com.codeka.common.protobuf.CashAudit" +
-      "Record\"\302\001\n\010Alliance\022\013\n\003key\030\001 \001(\t\022\014\n\004name" +
-      "\030\002 \001(\t\022\024\n\014time_created\030\003 \001(\003\022\032\n\022creator_" +
-      "empire_key\030\004 \001(\t\022\024\n\014bank_balance\030\007 \001(\001\022\023" +
-      "\n\013num_members\030\005 \001(\005\022>\n\007members\030\006 \003(\0132-.a" +
-      "u.com.codeka.common.protobuf.AllianceMem" +
-      "ber\"G\n\tAlliances\022:\n\talliances\030\001 \003(\0132\'.au",
-      ".com.codeka.common.protobuf.Alliance\"\317\001\n" +
-      "\016AllianceMember\022\013\n\003key\030\001 \001(\t\022\022\n\nempire_k" +
-      "ey\030\002 \001(\t\022\024\n\014alliance_key\030\003 \001(\t\022\023\n\013time_j" +
-      "oined\030\004 \001(\003\022@\n\004rank\030\005 \001(\01622.au.com.codek" +
-      "a.common.protobuf.AllianceMember.Rank\"/\n" +
-      "\004Rank\022\013\n\007CAPTAIN\020\000\022\016\n\nLIEUTENANT\020\001\022\n\n\006ME" +
-      "MBER\020\002\"\327\003\n\017AllianceRequest\022\n\n\002id\030\001 \001(\005\022\023" +
-      "\n\013alliance_id\030\002 \001(\005\022\031\n\021request_empire_id" +
-      "\030\003 \001(\005\022\024\n\014request_date\030\004 \001(\003\022P\n\014request_" +
-      "type\030\005 \001(\0162:.au.com.codeka.common.protob",
-      "uf.AllianceRequest.RequestType\022\017\n\007messag" +
-      "e\030\006 \001(\t\022J\n\005state\030\007 \001(\0162;.au.com.codeka.c" +
-      "ommon.protobuf.AllianceRequest.RequestSt" +
-      "ate\022\r\n\005votes\030\010 \001(\005\022\030\n\020target_empire_id\030\t" +
-      " \001(\005\022\016\n\006amount\030\n \001(\002\"Q\n\013RequestType\022\010\n\004J" +
-      "OIN\020\000\022\t\n\005LEAVE\020\001\022\010\n\004KICK\020\002\022\020\n\014DEPOSIT_CA" +
-      "SH\020\003\022\021\n\rWITHDRAW_CASH\020\004\"7\n\014RequestState\022" +
-      "\013\n\007PENDING\020\000\022\014\n\010ACCEPTED\020\001\022\014\n\010REJECTED\020\002" +
-      "\"d\n\020AllianceRequests\022@\n\010requests\030\001 \003(\0132." +
-      ".au.com.codeka.common.protobuf.AllianceR",
-      "equest\022\016\n\006cursor\030\002 \001(\t\"\203\001\n\023AllianceReque" +
-      "stVote\022\n\n\002id\030\001 \001(\005\022\023\n\013alliance_id\030\002 \001(\005\022" +
-      "\033\n\023alliance_request_id\030\003 \001(\005\022\021\n\tempire_i" +
-      "d\030\004 \001(\005\022\r\n\005votes\030\005 \001(\005\022\014\n\004date\030\006 \001(\003\"\321\002\n" +
-      "\013ErrorReport\022\027\n\017android_version\030\001 \001(\t\022\023\n" +
-      "\013phone_model\030\002 \001(\t\022\024\n\014package_name\030\003 \001(\t" +
-      "\022\023\n\013app_version\030\004 \001(\t\022\023\n\013stack_trace\030\005 \001" +
-      "(\t\022\017\n\007message\030\006 \001(\t\022\023\n\013report_time\030\007 \001(\003" +
-      "\022\021\n\tempire_id\030\010 \001(\005\022\017\n\007context\030\t \001(\t\022\027\n\017" +
-      "exception_class\030\n \001(\t\022\021\n\theap_size\030\013 \001(\003",
-      "\022\026\n\016heap_allocated\030\014 \001(\003\022\021\n\theap_free\030\r " +
-      "\001(\003\022\026\n\016total_run_time\030\016 \001(\003\022\033\n\023foregroun" +
-      "d_run_time\030\017 \001(\003\"K\n\014ErrorReports\022;\n\007repo" +
-      "rts\030\001 \003(\0132*.au.com.codeka.common.protobu" +
-      "f.ErrorReport*\344\001\n\025SituationReportFilter\022" +
-      "\013\n\007ShowAll\020\000\022\020\n\014MoveComplete\020\001\022\024\n\020BuildC" +
-      "ompleteAny\020\002\022\021\n\rFleetAttacked\020\003\022\022\n\016Fleet" +
-      "Destroyed\020\004\022\023\n\017FleetVictorious\020\005\022\022\n\016Colo" +
-      "nyAttacked\020\006\022\023\n\017ColonyDestroyed\020\007\022\026\n\022Bui" +
-      "ldCompleteShips\020\010\022\031\n\025BuildCompleteBuildi",
-      "ng\020\t"
+      "port.FleetVictoriousRecord\022e\n\027colony_des",
+      "troyed_record\030\013 \001(\0132D.au.com.codeka.comm" +
+      "on.protobuf.SituationReport.ColonyDestro" +
+      "yedRecord\022c\n\026colony_attacked_record\030\014 \001(" +
+      "\0132C.au.com.codeka.common.protobuf.Situat" +
+      "ionReport.ColonyAttackedRecord\022l\n\034star_r" +
+      "an_out_of_goods_record\030\r \001(\0132F.au.com.co" +
+      "deka.common.protobuf.SituationReport.Sta" +
+      "rRunOutOfGoodsRecord\032\236\001\n\023BuildCompleteRe" +
+      "cord\022J\n\nbuild_kind\030\001 \001(\01626.au.com.codeka" +
+      ".common.protobuf.BuildRequest.BUILD_KIND",
+      "\022\021\n\tdesign_id\030\002 \001(\t\022\r\n\005count\030\003 \001(\005\022\031\n\021bu" +
+      "ild_request_key\030\004 \001(\t\032m\n\022MoveCompleteRec" +
+      "ord\022\021\n\tfleet_key\030\001 \001(\t\022\027\n\017fleet_design_i" +
+      "d\030\003 \001(\t\022\021\n\tnum_ships\030\004 \001(\002\022\030\n\020scout_repo" +
+      "rt_key\030\005 \001(\t\032r\n\026FleetUnderAttackRecord\022\021" +
+      "\n\tfleet_key\030\001 \001(\t\022\027\n\017fleet_design_id\030\002 \001" +
+      "(\t\022\021\n\tnum_ships\030\003 \001(\002\022\031\n\021combat_report_k" +
+      "ey\030\004 \001(\t\032J\n\024FleetDestroyedRecord\022\027\n\017flee" +
+      "t_design_id\030\001 \001(\t\022\031\n\021combat_report_key\030\002" +
+      " \001(\t\032q\n\025FleetVictoriousRecord\022\021\n\tfleet_k",
+      "ey\030\001 \001(\t\022\027\n\017fleet_design_id\030\002 \001(\t\022\021\n\tnum" +
+      "_ships\030\003 \001(\002\022\031\n\021combat_report_key\030\004 \001(\t\032" +
+      "E\n\025ColonyDestroyedRecord\022\022\n\ncolony_key\030\001" +
+      " \001(\t\022\030\n\020enemy_empire_key\030\002 \001(\t\032W\n\024Colony" +
+      "AttackedRecord\022\022\n\ncolony_key\030\001 \001(\t\022\030\n\020en" +
+      "emy_empire_key\030\002 \001(\t\022\021\n\tnum_ships\030\003 \001(\002\032" +
+      "-\n\027StarRunOutOfGoodsRecord\022\022\n\ncolony_key" +
+      "\030\001 \001(\t\"m\n\020SituationReports\022I\n\021situation_" +
+      "reports\030\001 \003(\0132..au.com.codeka.common.pro" +
+      "tobuf.SituationReport\022\016\n\006cursor\030\002 \001(\t\"\216\004",
+      "\n\017CashAuditRecord\022\n\n\002id\030\001 \001(\005\022\021\n\tempire_" +
+      "id\030\002 \001(\005\022E\n\006reason\030\003 \001(\01625.au.com.codeka" +
+      ".common.protobuf.CashAuditRecord.Reason\022" +
+      "\023\n\013before_cash\030\004 \001(\002\022\022\n\nafter_cash\030\005 \001(\002" +
+      "\022\014\n\004time\030\020 \001(\003\022\020\n\010fleet_id\030\006 \001(\005\022\027\n\017flee" +
+      "t_design_id\030\007 \001(\t\022\021\n\tnum_ships\030\010 \001(\002\022\017\n\007" +
+      "star_id\030\t \001(\005\022\021\n\tstar_name\030\n \001(\t\022\025\n\rmove" +
+      "_distance\030\013 \001(\002\022\027\n\017build_design_id\030\014 \001(\t" +
+      "\022\023\n\013build_count\030\r \001(\005\022\031\n\021accelerate_amou" +
+      "nt\030\016 \001(\002\022\025\n\ralliance_name\030\017 \001(\t\"\204\001\n\006Reas",
+      "on\022\r\n\tFleetMove\020\000\022\023\n\017BuildAccelerate\020\001\022\027" +
+      "\n\023CollectFromColonies\020\002\022\022\n\016CreateAllianc" +
+      "e\020\003\022\023\n\017AllianceDeposit\020\004\022\024\n\020AllianceWith" +
+      "draw\020\005\"S\n\020CashAuditRecords\022?\n\007records\030\001 " +
+      "\003(\0132..au.com.codeka.common.protobuf.Cash" +
+      "AuditRecord\"\302\001\n\010Alliance\022\013\n\003key\030\001 \001(\t\022\014\n" +
+      "\004name\030\002 \001(\t\022\024\n\014time_created\030\003 \001(\003\022\032\n\022cre" +
+      "ator_empire_key\030\004 \001(\t\022\024\n\014bank_balance\030\007 " +
+      "\001(\001\022\023\n\013num_members\030\005 \001(\005\022>\n\007members\030\006 \003(" +
+      "\0132-.au.com.codeka.common.protobuf.Allian",
+      "ceMember\"G\n\tAlliances\022:\n\talliances\030\001 \003(\013" +
+      "2\'.au.com.codeka.common.protobuf.Allianc" +
+      "e\"\317\001\n\016AllianceMember\022\013\n\003key\030\001 \001(\t\022\022\n\nemp" +
+      "ire_key\030\002 \001(\t\022\024\n\014alliance_key\030\003 \001(\t\022\023\n\013t" +
+      "ime_joined\030\004 \001(\003\022@\n\004rank\030\005 \001(\01622.au.com." +
+      "codeka.common.protobuf.AllianceMember.Ra" +
+      "nk\"/\n\004Rank\022\013\n\007CAPTAIN\020\000\022\016\n\nLIEUTENANT\020\001\022" +
+      "\n\n\006MEMBER\020\002\"\327\003\n\017AllianceRequest\022\n\n\002id\030\001 " +
+      "\001(\005\022\023\n\013alliance_id\030\002 \001(\005\022\031\n\021request_empi" +
+      "re_id\030\003 \001(\005\022\024\n\014request_date\030\004 \001(\003\022P\n\014req",
+      "uest_type\030\005 \001(\0162:.au.com.codeka.common.p" +
+      "rotobuf.AllianceRequest.RequestType\022\017\n\007m" +
+      "essage\030\006 \001(\t\022J\n\005state\030\007 \001(\0162;.au.com.cod" +
+      "eka.common.protobuf.AllianceRequest.Requ" +
+      "estState\022\r\n\005votes\030\010 \001(\005\022\030\n\020target_empire" +
+      "_id\030\t \001(\005\022\016\n\006amount\030\n \001(\002\"Q\n\013RequestType" +
+      "\022\010\n\004JOIN\020\000\022\t\n\005LEAVE\020\001\022\010\n\004KICK\020\002\022\020\n\014DEPOS" +
+      "IT_CASH\020\003\022\021\n\rWITHDRAW_CASH\020\004\"7\n\014RequestS" +
+      "tate\022\013\n\007PENDING\020\000\022\014\n\010ACCEPTED\020\001\022\014\n\010REJEC" +
+      "TED\020\002\"d\n\020AllianceRequests\022@\n\010requests\030\001 ",
+      "\003(\0132..au.com.codeka.common.protobuf.Alli" +
+      "anceRequest\022\016\n\006cursor\030\002 \001(\t\"\203\001\n\023Alliance" +
+      "RequestVote\022\n\n\002id\030\001 \001(\005\022\023\n\013alliance_id\030\002" +
+      " \001(\005\022\033\n\023alliance_request_id\030\003 \001(\005\022\021\n\temp" +
+      "ire_id\030\004 \001(\005\022\r\n\005votes\030\005 \001(\005\022\014\n\004date\030\006 \001(" +
+      "\003\"\321\002\n\013ErrorReport\022\027\n\017android_version\030\001 \001" +
+      "(\t\022\023\n\013phone_model\030\002 \001(\t\022\024\n\014package_name\030" +
+      "\003 \001(\t\022\023\n\013app_version\030\004 \001(\t\022\023\n\013stack_trac" +
+      "e\030\005 \001(\t\022\017\n\007message\030\006 \001(\t\022\023\n\013report_time\030" +
+      "\007 \001(\003\022\021\n\tempire_id\030\010 \001(\005\022\017\n\007context\030\t \001(",
+      "\t\022\027\n\017exception_class\030\n \001(\t\022\021\n\theap_size\030" +
+      "\013 \001(\003\022\026\n\016heap_allocated\030\014 \001(\003\022\021\n\theap_fr" +
+      "ee\030\r \001(\003\022\026\n\016total_run_time\030\016 \001(\003\022\033\n\023fore" +
+      "ground_run_time\030\017 \001(\003\"K\n\014ErrorReports\022;\n" +
+      "\007reports\030\001 \003(\0132*.au.com.codeka.common.pr" +
+      "otobuf.ErrorReport*\344\001\n\025SituationReportFi" +
+      "lter\022\013\n\007ShowAll\020\000\022\020\n\014MoveComplete\020\001\022\024\n\020B" +
+      "uildCompleteAny\020\002\022\021\n\rFleetAttacked\020\003\022\022\n\016" +
+      "FleetDestroyed\020\004\022\023\n\017FleetVictorious\020\005\022\022\n" +
+      "\016ColonyAttacked\020\006\022\023\n\017ColonyDestroyed\020\007\022\026",
+      "\n\022BuildCompleteShips\020\010\022\031\n\025BuildCompleteB" +
+      "uilding\020\t"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
       new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
@@ -87629,7 +88162,7 @@ public final class Messages {
           internal_static_au_com_codeka_common_protobuf_BuildRequest_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_au_com_codeka_common_protobuf_BuildRequest_descriptor,
-              new java.lang.String[] { "Key", "ColonyKey", "EmpireKey", "StarKey", "PlanetIndex", "BuildKind", "DesignName", "Count", "StartTime", "EndTime", "Progress", "ExistingBuildingKey", "ExistingBuildingLevel", "ExistingFleetId", "UpgradeId", });
+              new java.lang.String[] { "Key", "ColonyKey", "EmpireKey", "StarKey", "PlanetIndex", "BuildKind", "DesignName", "Count", "StartTime", "EndTime", "Progress", "ExistingBuildingKey", "ExistingBuildingLevel", "ExistingFleetId", "UpgradeId", "Notes", });
           internal_static_au_com_codeka_common_protobuf_BuildQueue_descriptor =
             getDescriptor().getMessageTypes().get(39);
           internal_static_au_com_codeka_common_protobuf_BuildQueue_fieldAccessorTable = new
@@ -87641,7 +88174,7 @@ public final class Messages {
           internal_static_au_com_codeka_common_protobuf_Building_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_au_com_codeka_common_protobuf_Building_descriptor,
-              new java.lang.String[] { "Key", "ColonyKey", "DesignName", "Level", });
+              new java.lang.String[] { "Key", "ColonyKey", "DesignName", "Level", "Notes", });
           internal_static_au_com_codeka_common_protobuf_FleetUpgrade_descriptor =
             getDescriptor().getMessageTypes().get(41);
           internal_static_au_com_codeka_common_protobuf_FleetUpgrade_fieldAccessorTable = new
@@ -87653,7 +88186,7 @@ public final class Messages {
           internal_static_au_com_codeka_common_protobuf_Fleet_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_au_com_codeka_common_protobuf_Fleet_descriptor,
-              new java.lang.String[] { "Key", "EmpireKey", "DesignName", "NumShips", "State", "StateStartTime", "StarKey", "DestinationStarKey", "TargetFleetKey", "TargetColonyKey", "Stance", "TimeDestroyed", "BlockNotificationOnDestroy", "LastVictory", "Eta", "Upgrades", });
+              new java.lang.String[] { "Key", "EmpireKey", "DesignName", "NumShips", "State", "StateStartTime", "StarKey", "DestinationStarKey", "TargetFleetKey", "TargetColonyKey", "Stance", "TimeDestroyed", "BlockNotificationOnDestroy", "LastVictory", "Eta", "Upgrades", "Notes", });
           internal_static_au_com_codeka_common_protobuf_Fleets_descriptor =
             getDescriptor().getMessageTypes().get(43);
           internal_static_au_com_codeka_common_protobuf_Fleets_fieldAccessorTable = new

@@ -1,7 +1,5 @@
 package au.com.codeka.warworlds.game;
 
-import com.google.protobuf.InvalidProtocolBufferException;
-
 import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
@@ -19,6 +17,8 @@ import au.com.codeka.warworlds.model.ChatManager;
 import au.com.codeka.warworlds.model.ChatMessage;
 import au.com.codeka.warworlds.model.Empire;
 import au.com.codeka.warworlds.model.EmpireManager;
+
+import com.google.protobuf.InvalidProtocolBufferException;
 
 public class ChatMessageDialog extends DialogFragment {
     private View mView;

@@ -14,6 +14,7 @@ import org.joda.time.Duration;
 
 import android.content.Context;
 import android.os.Handler;
+import android.support.v4.app.FragmentActivity;
 import android.text.Html;
 import android.text.TextUtils.TruncateAt;
 import android.util.AttributeSet;
@@ -34,6 +35,8 @@ import au.com.codeka.TimeInHours;
 import au.com.codeka.common.model.BaseBuildRequest;
 import au.com.codeka.common.model.Design;
 import au.com.codeka.warworlds.R;
+import au.com.codeka.warworlds.game.NotesDialog;
+import au.com.codeka.warworlds.model.BuildManager;
 import au.com.codeka.warworlds.model.BuildRequest;
 import au.com.codeka.warworlds.model.Colony;
 import au.com.codeka.warworlds.model.DesignManager;
@@ -80,6 +83,28 @@ public class BuildQueueList extends FrameLayout
                     mBuildQueueListAdapter.notifyDataSetChanged();
                     refreshSelection();
                 }
+            }
+        });
+
+        buildQueueList.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> adapterView, View view, int position, long id) {
+                final BuildQueueListAdapter.ItemEntry entry = (BuildQueueListAdapter.ItemEntry) mBuildQueueListAdapter.getItem(position);
+
+                NotesDialog dialog = new NotesDialog();
+                dialog.setup(entry.buildRequest.getNotes(), new NotesDialog.NotesChangedHandler() {
+                    @Override
+                    public void onNotesChanged(String notes) {
+                        entry.buildRequest.setNotes(notes);
+                        mBuildQueueListAdapter.notifyDataSetChanged();
+
+                        BuildManager.getInstance().updateNotes(entry.buildRequest.getKey(), notes);
+                    }
+                });
+
+                FragmentActivity activity = (FragmentActivity) mContext;
+                dialog.show(activity.getSupportFragmentManager(), "");
+                return true;
             }
         });
 
@@ -490,6 +515,7 @@ public class BuildQueueList extends FrameLayout
                 entry.progressBar = (ProgressBar) view.findViewById(R.id.building_progress);
                 TextView level = (TextView) view.findViewById(R.id.building_level);
                 TextView levelLabel = (TextView) view.findViewById(R.id.building_level_label);
+                TextView notes = (TextView) view.findViewById(R.id.notes);
 
                 // we use these to detect when the view gets recycled in our refresh handler.
                 entry.progressText.setTag(entry);
@@ -507,6 +533,7 @@ public class BuildQueueList extends FrameLayout
                     levelLabel.setVisibility(View.GONE);
                 }
 
+                row1.removeAllViews();
                 if (entry.buildRequest.getCount() == 1) {
                     addTextToRow(mContext, row1, design.getDisplayName());
                 } else {
@@ -516,6 +543,14 @@ public class BuildQueueList extends FrameLayout
 
                 row3.setVisibility(View.GONE);
                 entry.progressBar.setVisibility(View.VISIBLE);
+
+                if (entry.buildRequest.getNotes() != null) {
+                    notes.setText(entry.buildRequest.getNotes());
+                    notes.setVisibility(View.VISIBLE);
+                } else {
+                    notes.setText("");
+                    notes.setVisibility(View.GONE);
+                }
 
                 if (mSelectedBuildRequest != null && mSelectedBuildRequest.getKey().equals(entry.buildRequest.getKey())) {
                     view.setBackgroundColor(0xff0c6476);

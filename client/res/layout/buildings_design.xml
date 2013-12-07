@@ -1,41 +1,49 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent" >
+    android:layout_height="match_parent">
 
-    <ImageView
-        android:id="@+id/building_icon"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
+    <RelativeLayout
+        android:id="@+id/icon_container"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
-        android:layout_centerVertical="true"
-        android:layout_marginRight="4dp" />
+        android:layout_alignTop="@+id/building_row1"
+        android:layout_alignBottom="@+id/building_row3">
+        <ImageView
+            android:id="@+id/building_icon"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="4dp" />
+    </RelativeLayout>
 
     <LinearLayout
         android:id="@+id/building_row1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
-        android:layout_toRightOf="@+id/building_icon"
+        android:layout_toRightOf="@+id/icon_container"
         android:gravity="center_vertical"
         android:orientation="horizontal" />
-    
+
     <TextView
         android:id="@+id/building_row2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerVertical="true"
-        android:layout_toRightOf="@+id/building_icon"
-        android:text="Small Text"
+        android:layout_below="@id/building_row1"
+        android:layout_toRightOf="@+id/icon_container"
+        android:text="row 2"
         android:textAppearance="?android:attr/textAppearanceSmall" />
 
     <TextView
         android:id="@+id/building_row3"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_toRightOf="@+id/building_icon"
-        android:layout_alignParentBottom="true"
-        android:text="Small Text"
+        android:layout_toRightOf="@+id/icon_container"
+        android:layout_below="@id/building_row2"
+        android:text="row 3"
         android:textAppearance="?android:attr/textAppearanceSmall" />
 
     <ProgressBar
@@ -43,11 +51,25 @@
         style="?android:attr/progressBarStyleHorizontal"
         android:layout_width="match_parent"
         android:layout_height="10dp"
-        android:layout_alignParentBottom="true"
-        android:layout_marginBottom="4dp"
+        android:layout_below="@id/building_row2"
+        android:layout_marginTop="4dp"
         android:layout_marginRight="8dp"
-        android:layout_toRightOf="@+id/building_icon" />
+        android:layout_toRightOf="@+id/icon_container" />
 
+    <TextView
+        android:id="@+id/notes"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@id/icon_container"
+        android:layout_margin="4dp"
+        android:layout_toLeftOf="@+id/building_level_label"
+        android:ellipsize="end"
+        android:singleLine="true"
+        android:text="Blah blah blah, notes, yada yada yada. More notes."
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:textColor="#666666" />
+    
     <TextView android:id="@+id/building_level"
               android:layout_width="wrap_content"
               android:layout_height="wrap_content"

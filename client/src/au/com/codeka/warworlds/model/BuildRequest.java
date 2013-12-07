@@ -14,7 +14,7 @@ public class BuildRequest extends BaseBuildRequest {
     public BuildRequest(String key, DesignKind designKind, String designID, String colonyKey,
                         DateTime startTime, int count, String existingBuildKey,
                         int existingBuildLevel, Integer existingFleetID, String upgradeID,
-                        String starKey, int planetIndex, String empireKey) {
+                        String starKey, int planetIndex, String empireKey, String notes) {
         mKey = key;
         mDesignKind = designKind;
         mDesignID = designID;
@@ -31,9 +31,13 @@ public class BuildRequest extends BaseBuildRequest {
         mStarKey = starKey;
         mPlanetIndex = planetIndex;
         mEmpireKey = empireKey;
+        mNotes = notes;
     }
 
     public void setEndTime(DateTime dt) {
         mEndTime = dt;
+    }
+    public void setNotes(String notes) {
+        mNotes = notes;
     }
 }

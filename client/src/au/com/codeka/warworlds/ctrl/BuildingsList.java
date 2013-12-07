@@ -296,6 +296,7 @@ public class BuildingsList extends ListView
                 TextView level = (TextView) view.findViewById(R.id.building_level);
                 TextView levelLabel = (TextView) view.findViewById(R.id.building_level_label);
                 ProgressBar progress = (ProgressBar) view.findViewById(R.id.building_progress);
+                TextView notes = (TextView) view.findViewById(R.id.notes);
 
                 Building building = entry.building;
                 BuildRequest buildRequest = entry.buildRequest;
@@ -340,6 +341,17 @@ public class BuildingsList extends ListView
                         row3.setVisibility(View.GONE);
                     }
                 }
+
+                if (building != null && building.getNotes() != null) {
+                    notes.setText(building.getNotes());
+                    notes.setVisibility(View.VISIBLE);
+                } else if (buildRequest != null && buildRequest.getNotes() != null) {
+                    notes.setText(buildRequest.getNotes());
+                    notes.setVisibility(View.VISIBLE);
+                } else {
+                    notes.setText("");
+                    notes.setVisibility(View.GONE);
+                }
             } else {
                 // new building
                 ImageView icon = (ImageView) view.findViewById(R.id.building_icon);
@@ -350,6 +362,7 @@ public class BuildingsList extends ListView
                 view.findViewById(R.id.building_progress).setVisibility(View.GONE);
                 view.findViewById(R.id.building_level).setVisibility(View.GONE);
                 view.findViewById(R.id.building_level_label).setVisibility(View.GONE);
+                view.findViewById(R.id.notes).setVisibility(View.GONE);
 
                 BuildingDesign design = mEntries.get(position).design;
 

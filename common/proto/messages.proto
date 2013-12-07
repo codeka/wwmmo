@@ -727,10 +727,10 @@ message BuildRequest
 
     // The key of the colony you're trying to build at. Must have a shipyard to build
     // a ship.
-    required string colony_key = 2;
+    optional string colony_key = 2;
 
     // The empire this build operation belongs to.
-    required string empire_key = 3;
+    optional string empire_key = 3;
 
     // The key of the star/planet this build request is happening on
     optional string star_key = 11;
@@ -743,10 +743,10 @@ message BuildRequest
         BUILDING = 1;
         SHIP = 2;
     }
-    required BUILD_KIND build_kind = 4;
+    optional BUILD_KIND build_kind = 4;
 
     // The name of the design you're trying to build
-    required string design_name = 5;
+    optional string design_name = 5;
 
     // The number of things we're building in this single operation
     optional int32 count = 9;
@@ -769,6 +769,9 @@ message BuildRequest
     // when upgrading a fleet, these will be set
     optional int32 existing_fleet_id = 14;
     optional string upgrade_id = 15;
+
+    // notes you can attach to the fleet/building when it's finished
+    optional string notes = 16;
 }
 
 
@@ -797,6 +800,9 @@ message Building
 
     // The level of this building
     optional int32 level = 4;
+
+    // not as useful for buildings, but notes the player can attach
+    optional string notes = 5;
 }
 
 
@@ -876,6 +882,9 @@ message Fleet
 
     // a collection of upgrades to this fleet
     repeated FleetUpgrade upgrades = 16;
+
+    // notes the player has attached so that he can remember what the fleet was for.
+    optional string notes = 17;
 }
 
 

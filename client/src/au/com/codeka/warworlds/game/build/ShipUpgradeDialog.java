@@ -150,7 +150,8 @@ public class ShipUpgradeDialog extends DialogFragment {
         BuildRequest buildRequest = new BuildRequest("FAKE_BUILD_REQUEST",
                 DesignKind.SHIP, mFleet.getDesignID(), mColony.getKey(), startTime,
                 (int) mFleet.getNumShips(), null, 0, Integer.parseInt(mFleet.getKey()),
-                mUpgrade.getID(), mStar.getKey(), mColony.getPlanetIndex(), mColony.getEmpireKey());
+                mUpgrade.getID(), mStar.getKey(), mColony.getPlanetIndex(), mColony.getEmpireKey(),
+                null);
 
         mBuildEstimateView.refresh(mStar, buildRequest);
     }

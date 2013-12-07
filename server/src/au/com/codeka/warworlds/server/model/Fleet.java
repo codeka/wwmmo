@@ -53,6 +53,8 @@ public class Fleet extends BaseFleet {
         if (!rs.wasNull()) {
             mTargetFleetKey = Integer.toString(mTargetFleetID);
         }
+
+        mNotes = rs.getString("notes");
     }
     public Fleet(Empire empire, Star star, String designID, float numShips) {
         mStarID = star.getID();
@@ -98,6 +100,9 @@ public class Fleet extends BaseFleet {
     public void setTargetFleetID(int id) {
         mTargetFleetID = id;
         mTargetFleetKey = Integer.toString(id);
+    }
+    public void setNotes(String notes) {
+        mNotes = notes;
     }
 
     public ShipDesign getDesign() {

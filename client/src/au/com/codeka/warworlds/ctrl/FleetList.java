@@ -285,6 +285,7 @@ public class FleetList extends FrameLayout implements StarManager.StarFetchedHan
         final LinearLayout row1 = (LinearLayout) view.findViewById(R.id.ship_row1);
         final LinearLayout row2 = (LinearLayout) view.findViewById(R.id.ship_row2);
         final LinearLayout row3 = (LinearLayout) view.findViewById(R.id.ship_row3);
+        final TextView notes = (TextView) view.findViewById(R.id.notes);
 
         row1.removeAllViews();
         row2.removeAllViews();
@@ -295,6 +296,14 @@ public class FleetList extends FrameLayout implements StarManager.StarFetchedHan
 
         populateFleetNameRow(context, row1, fleet, design);
         populateFleetStanceRow(context, row2, fleet);
+
+        if (notes != null && fleet.getNotes() != null) {
+            notes.setText(fleet.getNotes());
+            notes.setVisibility(View.VISIBLE);
+        } else if (notes != null) {
+            notes.setText("");
+            notes.setVisibility(View.GONE);
+        }
 
         if (fleet.getState() == Fleet.State.MOVING) {
             row3.setVisibility(View.GONE);
@@ -316,8 +325,15 @@ public class FleetList extends FrameLayout implements StarManager.StarFetchedHan
                                 Sprite sprite = StarImageManager.getInstance().getSprite(destStar, -1, true);
                                 String eta = TimeInHours.format(timeRemainingInHours);
 
+                                float marginHorz = 0;
+                                float marginVert = 0;
+                                if (destStar.getStarType().getImageScale() > 1.0) {
+                                    marginHorz = -(float) (sprite.getWidth() / destStar.getStarType().getImageScale());
+                                    marginVert = -(float) (sprite.getHeight() / destStar.getStarType().getImageScale());
+                                }
+
                                 addTextToRow(context, row3, "→");
-                                addImageToRow(context, row3, sprite);
+                                addImageToRow(context, row3, sprite, marginHorz, marginVert);
                                 String text = String.format("%s <b>ETA:</b> %s",
                                                             destStar.getName(), eta);
                                 addTextToRow(context, row3, Html.fromHtml(text));
@@ -381,12 +397,16 @@ public class FleetList extends FrameLayout implements StarManager.StarFetchedHan
     }
 
     private static void addImageToRow(Context context, LinearLayout row, Sprite sprite) {
+        addImageToRow(context, row, sprite, 0, 0);
+    }
+
+    private static void addImageToRow(Context context, LinearLayout row, Sprite sprite, float marginHorz, float marginVert) {
         ImageView iv = new ImageView(context);
         iv.setImageDrawable(new SpriteDrawable(sprite));
 
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT,
                                                                      LinearLayout.LayoutParams.WRAP_CONTENT);
-        lp.setMargins(5, 0, 5, 0);
+        lp.setMargins((int) (marginHorz + 5), (int) (marginVert - 5), (int) (marginHorz + 5), (int) (marginVert - 5));
         iv.setLayoutParams(lp);
 
         row.addView(iv);

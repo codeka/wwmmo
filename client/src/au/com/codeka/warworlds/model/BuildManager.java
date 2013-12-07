@@ -6,13 +6,13 @@ import java.util.TreeMap;
 
 import android.content.Context;
 import au.com.codeka.BackgroundRunner;
-import au.com.codeka.warworlds.StyledDialog;
-import au.com.codeka.warworlds.api.ApiClient;
-import au.com.codeka.warworlds.api.ApiException;
 import au.com.codeka.common.model.BaseBuildRequest;
 import au.com.codeka.common.model.Design;
 import au.com.codeka.common.model.DesignKind;
 import au.com.codeka.common.protobuf.Messages;
+import au.com.codeka.warworlds.StyledDialog;
+import au.com.codeka.warworlds.api.ApiClient;
+import au.com.codeka.warworlds.api.ApiException;
 
 public class BuildManager {
     private static BuildManager sInstance = new BuildManager();
@@ -53,6 +53,27 @@ public class BuildManager {
 
     public List<BuildRequest> getBuildRequests() {
         return mBuildRequests;
+    }
+
+    public void updateNotes(final String buildRequestKey, final String notes) {
+        new BackgroundRunner<BuildRequest>() {
+            @Override
+            protected BuildRequest doInBackground() {
+                try {
+                    Messages.BuildRequest build = Messages.BuildRequest.newBuilder()
+                            .setKey(buildRequestKey)
+                            .setNotes(notes)
+                            .build();
+                    ApiClient.putProtoBuf("buildqueue", build, Messages.BuildRequest.class);
+                } catch (ApiException e) {
+                }
+
+                return null;
+            }
+            @Override
+            protected void onComplete(BuildRequest buildRequest) {
+            }
+        }.execute();
     }
 
     /**

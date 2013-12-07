@@ -111,7 +111,14 @@ public class FleetOrdersHandler extends RequestHandler {
                             "Cannot merge two fleets of a different design.");
                 }
 
+                String notes = fleet.getNotes();
+                if (notes == null && otherFleet.getNotes() != null) {
+                    notes = otherFleet.getNotes();
+                } else if (otherFleet.getNotes() != null) {
+                    notes += "\n" + otherFleet.getNotes();
+                }
                 fleet.setNumShips(fleet.getNumShips() + otherFleet.getNumShips());
+                fleet.setNotes(notes);
 
                 // TODO: probably not the best place for this to go...
                 String sql = "DELETE FROM fleets WHERE id = ?";

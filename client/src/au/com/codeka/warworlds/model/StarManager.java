@@ -2,6 +2,7 @@ package au.com.codeka.warworlds.model;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -36,16 +37,16 @@ public class StarManager extends BaseManager {
     }
 
     private static final Logger log = LoggerFactory.getLogger(StarManager.class);
-    private TreeMap<String, Star> mStars;
-    private TreeMap<String, StarSummary> mStarSummaries;
+    private TreeMap<String, WeakReference<Star>> mStars;
+    private TreeMap<String, WeakReference<StarSummary>> mStarSummaries;
     private TreeMap<String, List<StarFetchedHandler>> mStarUpdatedListeners;
     private List<StarFetchedHandler> mAllStarUpdatedListeners;
 
     public static float DEFAULT_MAX_CACHE_HOURS = 24.0f;
 
     private StarManager() {
-        mStars = new TreeMap<String, Star>();
-        mStarSummaries = new TreeMap<String, StarSummary>();
+        mStars = new TreeMap<String, WeakReference<Star>>();
+        mStarSummaries = new TreeMap<String, WeakReference<StarSummary>>();
         mStarUpdatedListeners = new TreeMap<String, List<StarFetchedHandler>>();
         mAllStarUpdatedListeners = new ArrayList<StarFetchedHandler>();
     }
@@ -158,16 +159,23 @@ public class StarManager extends BaseManager {
     }
 
     public void requestStarSummary(final String starKey, final StarSummaryFetchedHandler callback) {
-        StarSummary ss = mStarSummaries.get(starKey);
-        if (ss != null) {
-            callback.onStarSummaryFetched(ss);
-            return;
+        StarSummary ss = null;
+        WeakReference<StarSummary> refss = mStarSummaries.get(starKey);
+        if (refss != null) {
+            ss = refss.get();
+            if (ss != null) {
+                callback.onStarSummaryFetched(ss);
+                return;
+            }
         }
 
-        ss = mStars.get(starKey);
-        if (ss != null) {
-            callback.onStarSummaryFetched(ss);
-            return;
+        WeakReference<Star> refs = mStars.get(starKey);
+        if (refs != null) {
+            ss = refs.get();
+            if (ss != null) {
+                callback.onStarSummaryFetched(ss);
+                return;
+            }
         }
 
         new BackgroundRunner<StarSummary>() {
@@ -190,16 +198,22 @@ public class StarManager extends BaseManager {
         final ArrayList<String> toFetch = new ArrayList<String>();
 
         for (String starKey : starKeys) {
-            StarSummary ss = mStarSummaries.get(starKey);
-            if (ss != null) {
-                summaries.add(ss);
-                continue;
+            WeakReference<StarSummary> refss = mStarSummaries.get(starKey);
+            if (refss != null) {
+                StarSummary ss = refss.get();
+                if (ss != null) {
+                    summaries.add(ss);
+                    continue;
+                }
             }
 
-            ss = mStars.get(starKey);
-            if (ss != null) {
-                summaries.add(ss);
-                continue;
+            WeakReference<Star> refs = mStars.get(starKey);
+            if (refs != null) {
+                Star s = refs.get();
+                if (s != null) {
+                    summaries.add(s);
+                    continue;
+                }
             }
 
             toFetch.add(starKey);
@@ -231,18 +245,25 @@ public class StarManager extends BaseManager {
      * Gets a StarSummary, but only if it's cached locally.
      */
     public StarSummary getStarSummaryNoFetch(String starKey, float maxCacheAgeHours) {
-        StarSummary ss = mStarSummaries.get(starKey);
-        if (ss != null) {
-            return ss;
+        WeakReference<StarSummary> refss = mStarSummaries.get(starKey);
+        if (refss != null) {
+            StarSummary ss = refss.get();
+            if (ss != null) {
+                return ss;
+            }
         }
 
-        ss = mStars.get(starKey);
-        if (ss != null) {
-            return ss;
+        WeakReference<Star> refs = mStars.get(starKey);
+        if (refs != null) {
+            Star s = refs.get();
+            if (s != null) {
+                return s;
+            }
         }
 
-        ss = loadStarSummary(starKey, maxCacheAgeHours);
+        StarSummary ss = loadStarSummary(starKey, maxCacheAgeHours);
         if (ss != null) {
+            mStarSummaries.put(starKey, new WeakReference<StarSummary>(ss));
             return ss;
         }
 
@@ -282,10 +303,13 @@ public class StarManager extends BaseManager {
      */
     public void requestStar(final String starKey, final boolean force,
                             final StarFetchedHandler callback) {
-        Star s = mStars.get(starKey);
-        if (s != null && !force) {
-            callback.onStarFetched(s);
-            return;
+        WeakReference<Star> refs = mStars.get(starKey);
+        if (refs != null && !force) {
+            Star star = refs.get();
+            if (star != null) {
+                callback.onStarFetched(star);
+                return;
+            }
         }
 
         new BackgroundRunner<Star>() {
@@ -302,7 +326,7 @@ public class StarManager extends BaseManager {
 
                 // if we had the star summary cached, remove it (cause the star itself is newer)
                 mStarSummaries.remove(starKey);
-                mStars.put(starKey, star);
+                mStars.put(starKey, new WeakReference<Star>(star));
 
                 if (callback != null) {
                     callback.onStarFetched(star);
@@ -313,9 +337,12 @@ public class StarManager extends BaseManager {
     }
 
     public Star requestStarSync(final String starKey, boolean force) {
-        Star s = mStars.get(starKey);
-        if (s != null && !force) {
-            return s;
+        WeakReference<Star> refs = mStars.get(starKey);
+        if (refs != null && !force) {
+            Star s = refs.get();
+            if (s != null) {
+                return s;
+            }
         }
 
         Star star = doFetchStar(starKey);
@@ -383,7 +410,7 @@ public class StarManager extends BaseManager {
 
                 // if we had the star summary cached, remove it (cause the star itself is newer)
                 mStarSummaries.remove(star.getKey());
-                mStars.put(star.getKey(), star);
+                mStars.put(star.getKey(), new WeakReference<Star>(star));
 
                 fireStarUpdated(star);
             }
@@ -476,6 +503,9 @@ public class StarManager extends BaseManager {
                         return;
                     }
 
+                    // delete existing values first
+                    db.delete("stars", getWhereClause(star.getKey()), null);
+
                     ContentValues values = new ContentValues();
                     values.put("star", starBlob.toByteArray());
                     values.put("star_key", star.getKey());
@@ -496,7 +526,7 @@ public class StarManager extends BaseManager {
                 Cursor cursor = null;
                 try {
                     cursor = db.query("stars", new String[] {"star", "timestamp"},
-                            "star_key = '"+starKey.replace('\'', ' ')+"' AND realm_id="+RealmContext.i.getCurrentRealm().getID(),
+                            getWhereClause(starKey),
                             null, null, null, null);
                     if (!cursor.moveToFirst()) {
                         log.debug("Star "+starKey+" realm "+RealmContext.i.getCurrentRealm().getDisplayName()+" not found in cache.");
@@ -522,6 +552,10 @@ public class StarManager extends BaseManager {
                     db.close();
                 }
             }
+        }
+
+        private String getWhereClause(String starKey) {
+            return "star_key = '"+starKey.replace('\'', ' ')+"' AND realm_id="+RealmContext.i.getCurrentRealm().getID();
         }
     }
     public interface StarFetchedHandler {

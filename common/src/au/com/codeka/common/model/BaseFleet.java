@@ -23,6 +23,7 @@ public abstract class BaseFleet {
     protected DateTime mEta;
     protected DateTime mTimeDestroyed;
     protected ArrayList<BaseFleetUpgrade> mUpgrades;
+    protected String mNotes;
 
     public String getKey() {
         return mKey;
@@ -85,6 +86,9 @@ public abstract class BaseFleet {
             mUpgrades = new ArrayList<BaseFleetUpgrade>();
         }
         return mUpgrades;
+    }
+    public String getNotes() {
+        return mNotes;
     }
 
     public void move(DateTime now, String destinationStarKey, DateTime eta) {
@@ -156,6 +160,9 @@ public abstract class BaseFleet {
         for (Messages.FleetUpgrade upgrade_pb : pb.getUpgradesList()) {
             mUpgrades.add(createUpgrade(upgrade_pb));
         }
+        if (pb.hasNotes()) {
+            mNotes = pb.getNotes();
+        }
     }
 
     public void toProtocolBuffer(Messages.Fleet.Builder pb) {
@@ -190,6 +197,9 @@ public abstract class BaseFleet {
                 baseFleetUpgrade.toProtocolBuffer(upgrade_pb);
                 pb.addUpgrades(upgrade_pb);
             }
+        }
+        if  (mNotes != null) {
+            pb.setNotes(mNotes);
         }
     }
 
