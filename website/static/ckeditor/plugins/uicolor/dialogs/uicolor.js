@@ -1,6 +1,6 @@
 ﻿/*
- Copyright (c) 2003-2012, CKSource - Frederico Knabben. All rights reserved.
- For licensing, see LICENSE.html or http://ckeditor.com/license
+ Copyright (c) 2003-2013, CKSource - Frederico Knabben. All rights reserved.
+ For licensing, see LICENSE.md or http://ckeditor.com/license
 */
 CKEDITOR.dialog.add("uicolor",function(b){function f(a){/^#/.test(a)&&(a=window.YAHOO.util.Color.hex2rgb(a.substr(1)));c.setValue(a,!0);c.refresh(e)}function g(a){b.setUiColor(a);d._.contents.tab1.configBox.setValue('config.uiColor = "#'+c.get("hex")+'"')}var d,c,h=b.getUiColor(),e="cke_uicolor_picker"+CKEDITOR.tools.getNextNumber();return{title:b.lang.uicolor.title,minWidth:360,minHeight:320,onLoad:function(){d=this;this.setupContent();CKEDITOR.env.ie7Compat&&d.parts.contents.setStyle("overflow",
 "hidden")},contents:[{id:"tab1",label:"",title:"",expand:!0,padding:0,elements:[{id:"yuiColorPicker",type:"html",html:"<div id='"+e+"' class='cke_uicolor_picker' style='width: 360px; height: 200px; position: relative;'></div>",onLoad:function(){var a=CKEDITOR.getUrl("plugins/uicolor/yui/");this.picker=c=new window.YAHOO.widget.ColorPicker(e,{showhsvcontrols:!0,showhexcontrols:!0,images:{PICKER_THUMB:a+"assets/picker_thumb.png",HUE_THUMB:a+"assets/hue_thumb.png"}});h&&f(h);c.on("rgbChange",function(){d._.contents.tab1.predefined.setValue("");

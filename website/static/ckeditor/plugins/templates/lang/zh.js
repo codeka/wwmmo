@@ -1,1 +1,0 @@
-﻿CKEDITOR.plugins.setLang("templates","zh",{button:"樣版",emptyListMsg:"(無樣版)",insertOption:"取代原有內容",options:"Template Options",selectPromptMsg:"請選擇欲開啟的樣版<br> (原有的內容將會被清除):",title:"內容樣版"});

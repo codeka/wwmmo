@@ -1,1 +1,0 @@
-﻿CKEDITOR.plugins.setLang("pagebreak","ja",{alt:"Page Break",toolbar:"改ページ挿入"});

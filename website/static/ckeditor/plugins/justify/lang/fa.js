@@ -1,1 +1,0 @@
-﻿CKEDITOR.plugins.setLang("justify","fa",{block:"بلوکچین",center:"میانچین",left:"چپچین",right:"راستچین"});

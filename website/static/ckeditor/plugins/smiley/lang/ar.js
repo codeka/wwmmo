@@ -1,1 +1,0 @@
-﻿CKEDITOR.plugins.setLang("smiley","ar",{options:"Smiley Options",title:"إدراج ابتسامات",toolbar:"ابتسامات"});

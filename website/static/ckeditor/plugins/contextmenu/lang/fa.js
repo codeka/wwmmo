@@ -1,1 +1,0 @@
-﻿CKEDITOR.plugins.setLang("contextmenu","fa",{options:"گزینههای منوی زمینه"});

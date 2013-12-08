@@ -46,6 +46,10 @@ handlers:
   script: cron.profiles.app
   login: admin
 
+- url: /cron/forum(/.*)?
+  script: cron.forum.app
+  login: admin
+
 - url: /blog(/.*)?
   script: handlers.blog.app
 

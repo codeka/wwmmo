@@ -1,1 +1,0 @@
-﻿CKEDITOR.plugins.setLang("smiley","fa",{options:"گزینههای خندانک",title:"گنجاندن خندانک",toolbar:"خندانک"});

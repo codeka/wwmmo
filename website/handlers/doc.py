@@ -20,7 +20,8 @@ class DocPage(handlers.BaseHandler):
        ensure you're logged in."""
     self.user = users.get_current_user()
     if (self.user and self.user.email().lower() != "dean@codeka.com.au"
-                  and self.user.email().lower() != "lam.h.emily@gmail.com"):
+                  and self.user.email().lower() != "lam.h.emily@gmail.com"
+                  and self.user.email().lower() != "ebaversjo@gmail.com"):
       self.user = None
 
     if not self.user:

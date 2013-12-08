@@ -73,6 +73,7 @@ header#page-header h1 {
   color: #fff;
   font-size: 16pt;
   line-height: 24pt;
+  margin-top: 0;
 }
 
 header#page-header h1 span {
@@ -197,4 +198,73 @@ nav.breadcrumbs li:first-child:before {
 nav.breadcrumbs li {
   display: inline;
   margin-left: 4pt;
+}
+
+a.button {
+  display: inline-block;
+  position: relative;
+  background: url(/img/button.png) no-repeat top right;
+  height: 20px;
+  padding: 0 8px 0 0;
+  color: #fff;
+  text-decoration: none;
+  font-family: arial;
+  font-size: 14px;
+  line-height: 20px;
+}
+a.button:before {
+  content: "";
+  position: absolute;
+  display: block;
+  background: url(/img/button.png) no-repeat top left;
+  width: 8px;
+  height: 20px;
+  left: -8px;
+}
+
+a.button:hover {
+  background-position: center right;
+}
+a.button:hover:before {
+  background-position: center left;
+}
+a.button.disabled {
+  background-position: bottom right;
+}
+a.button.disabled:before {
+  background-position: bottom left;
+}
+
+
+div.input-button input {
+  display: inline-block;
+  position: relative;
+  background: url(/img/button.png) no-repeat top right;
+  height: 20px;
+  color: #fff;
+  font-family: arial;
+  font-size: 14px;
+  line-height: 20px;
+  border: 0;
+  margin-top: -2px; /* ??? */
+}
+
+div.input-button {
+  display: inline-block;
+  background: url(/img/button.png) no-repeat top left;
+  height: 20px;
+  padding-left: 8px;
+}
+
+a.button:hover {
+  background-position: center right;
+}
+a.button:hover:before {
+  background-position: center left;
+}
+a.button.disabled {
+  background-position: bottom right;
+}
+a.button.disabled:before {
+  background-position: bottom left;
 }

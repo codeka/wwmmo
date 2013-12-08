@@ -1,1 +1,0 @@
-﻿CKEDITOR.plugins.setLang("horizontalrule","cy",{toolbar:"Mewnosod Llinell Lorweddol"});

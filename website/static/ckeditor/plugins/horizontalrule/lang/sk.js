@@ -1,1 +1,0 @@
-﻿CKEDITOR.plugins.setLang("horizontalrule","sk",{toolbar:"Vložiť vodorovnú čiaru"});

@@ -1,1 +1,0 @@
-﻿CKEDITOR.plugins.setLang("elementspath","el",{eleLabel:"Διαδρομή στοιχείων",eleTitle:"%1 στοιχείο"});

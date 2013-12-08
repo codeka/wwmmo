@@ -4,4 +4,7 @@ queue:
   rate: 1/s
   bucket_size: 10
   max_concurrent_requests: 1
-
+- name: forumsync
+  rate: 5/s
+  bucket_size: 10
+  max_concurrent_requests: 10

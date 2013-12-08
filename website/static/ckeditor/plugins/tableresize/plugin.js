@@ -1,6 +1,6 @@
 ﻿/*
- Copyright (c) 2003-2012, CKSource - Frederico Knabben. All rights reserved.
- For licensing, see LICENSE.html or http://ckeditor.com/license
+ Copyright (c) 2003-2013, CKSource - Frederico Knabben. All rights reserved.
+ For licensing, see LICENSE.md or http://ckeditor.com/license
 */
 (function(){function t(b){return CKEDITOR.env.ie?b.$.clientWidth:parseInt(b.getComputedStyle("width"),10)}function n(b,i){var a=b.getComputedStyle("border-"+i+"-width"),g={thin:"0px",medium:"1px",thick:"2px"};0>a.indexOf("px")&&(a=a in g&&"none"!=b.getComputedStyle("border-style")?g[a]:0);return parseInt(a,10)}function v(b){var i=[],a=-1,g="rtl"==b.getComputedStyle("direction"),c;c=b.$.rows;for(var p=0,e,f,d,h=0,o=c.length;h<o;h++)d=c[h],e=d.cells.length,e>p&&(p=e,f=d);c=f;p=new CKEDITOR.dom.element(b.$.tBodies[0]);
 e=p.getDocumentPosition();f=0;for(d=c.cells.length;f<d;f++){var h=new CKEDITOR.dom.element(c.cells[f]),o=c.cells[f+1]&&new CKEDITOR.dom.element(c.cells[f+1]),a=a+(h.$.colSpan||1),k,j,l=h.getDocumentPosition().x;g?j=l+n(h,"left"):k=l+h.$.offsetWidth-n(h,"right");o?(l=o.getDocumentPosition().x,g?k=l+o.$.offsetWidth-n(o,"right"):j=l+n(o,"left")):(l=b.getDocumentPosition().x,g?k=l:j=l+b.$.offsetWidth);h=Math.max(j-k,3);i.push({table:b,index:a,x:k,y:e.y,width:h,height:p.$.offsetHeight,rtl:g})}return i}

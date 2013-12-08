@@ -1,1 +1,0 @@
-﻿CKEDITOR.plugins.setLang("horizontalrule","el",{toolbar:"Εισαγωγή Οριζόντιας Γραμμής"});

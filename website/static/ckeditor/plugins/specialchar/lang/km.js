@@ -1,1 +1,0 @@
-﻿CKEDITOR.plugins.setLang("specialchar","km",{options:"Special Character Options",title:"តូអក្សរពិសេស",toolbar:"បន្ថែមអក្សរពិសេស"});

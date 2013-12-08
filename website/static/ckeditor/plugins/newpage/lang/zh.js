@@ -1,1 +1,0 @@
-﻿CKEDITOR.plugins.setLang("newpage","zh",{toolbar:"開新檔案"});

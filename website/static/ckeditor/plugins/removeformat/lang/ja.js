@@ -1,1 +1,0 @@
-﻿CKEDITOR.plugins.setLang("removeformat","ja",{toolbar:"フォーマット削除"});

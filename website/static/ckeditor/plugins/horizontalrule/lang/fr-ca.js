@@ -1,1 +1,0 @@
-﻿CKEDITOR.plugins.setLang("horizontalrule","fr-ca",{toolbar:"Insérer un séparateur"});

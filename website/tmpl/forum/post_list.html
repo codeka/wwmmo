@@ -2,7 +2,7 @@
 {% import "forum/macros.html" as m %}
 
 {% block header %}
-  {{m.html_header()}}
+  {{m.html_header(resource_version)}}
   <script src="/ckeditor/v{{resource_version}}/ckeditor.js"></script>
 {% endblock %}
 {% block pagetitle %}Forum &bull; {{forum.name}} &bull; {{forum_thread.subject}}{% endblock %}
@@ -43,7 +43,7 @@
           <div class="hack"><textarea name="post-content" id="post-content"></textarea></div>
         </div>
         <div class="forum-field forum-field-submit">
-          <input type="submit" value="Post">
+          <div class="input-button"><input type="submit" value="Post"></div>
         </div>
       </fieldset>
     </form>

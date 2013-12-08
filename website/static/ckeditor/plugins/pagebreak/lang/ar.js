@@ -1,1 +1,0 @@
-﻿CKEDITOR.plugins.setLang("pagebreak","ar",{alt:"Page Break",toolbar:"إدخال صفحة جديدة"});

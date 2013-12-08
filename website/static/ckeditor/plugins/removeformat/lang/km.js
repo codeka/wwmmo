@@ -1,1 +1,0 @@
-﻿CKEDITOR.plugins.setLang("removeformat","km",{toolbar:"លប់ចោល ការរចនា"});

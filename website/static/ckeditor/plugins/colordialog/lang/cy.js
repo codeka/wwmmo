@@ -1,1 +1,0 @@
-﻿CKEDITOR.plugins.setLang("colordialog","cy",{clear:"Clirio",highlight:"Uwcholeuo",options:"Opsiynau Lliw",selected:"Dewiswyd",title:"Dewis lliw"});

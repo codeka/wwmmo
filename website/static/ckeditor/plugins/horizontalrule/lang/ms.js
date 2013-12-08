@@ -1,1 +1,0 @@
-﻿CKEDITOR.plugins.setLang("horizontalrule","ms",{toolbar:"Masukkan Garisan Membujur"});

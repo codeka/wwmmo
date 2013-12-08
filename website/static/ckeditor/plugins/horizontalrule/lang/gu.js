@@ -1,1 +1,0 @@
-﻿CKEDITOR.plugins.setLang("horizontalrule","gu",{toolbar:"સમસ્તરીય રેખા ઇન્સર્ટ/દાખલ કરવી"});

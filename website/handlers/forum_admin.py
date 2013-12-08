@@ -2,6 +2,7 @@ import os
 import datetime
 import webapp2 as webapp
 
+from google.appengine.api import memcache
 import model.forum
 import ctrl.blog
 import handlers
@@ -45,6 +46,7 @@ class ForumEditPage(ForumAdminPage):
     forum.slug = self.request.POST.get("forum-slug")
     forum.description = self.request.POST.get("forum-desc")
     forum.put()
+    memcache.delete("forums")
 
     self.redirect("/admin/forum/forums/edit/"+str(forum.key().id_or_name()))
 

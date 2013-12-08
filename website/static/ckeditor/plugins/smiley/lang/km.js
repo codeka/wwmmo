@@ -1,1 +1,0 @@
-﻿CKEDITOR.plugins.setLang("smiley","km",{options:"Smiley Options",title:"បញ្ជូលរូបភាព",toolbar:"រូបភាព"});

@@ -2,7 +2,7 @@
 {% import "forum/macros.html" as m %}
 
 {% block header %}
-  {{m.html_header()}}
+  {{m.html_header(resource_version)}}
   <script src="/ckeditor/v{{resource_version}}/ckeditor.js"></script>
 {% endblock %}
 {% block pagetitle %}Forum &bull; {{forum.name}} &bull; {% if post %}Edit Post{% else %}New Post{% endif %}{% endblock %}
@@ -10,6 +10,15 @@
 
 {% block maincontent %}
   <section class="content">
+    <nav class="breadcrumbs">
+      <ul>
+        <li><a href="/">War Worlds</a>
+        <li><a href="/forum">Forums</a>
+        <li><a href="/forum/{{forum.slug}}">{{forum.name}}</a>
+        <li>New Post</li>
+      </ul>
+    </nav>
+
     <form method="POST">
       <fieldset>
         <h1>New Post in {{forum.name}}</h1>
@@ -25,7 +34,7 @@
           <div class="hack"><textarea name="post-content" id="post-content"></textarea></div>
         </div>
         <div class="forum-field forum-field-submit">
-          <input type="submit" value="Post">
+          <div class="input-button"><input type="submit" value="Post"></div>
         </div>
       </fieldset>
     </form>

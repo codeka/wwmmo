@@ -1,1 +1,0 @@
-﻿CKEDITOR.plugins.setLang("horizontalrule","mn",{toolbar:"Хөндлөн зураас оруулах"});

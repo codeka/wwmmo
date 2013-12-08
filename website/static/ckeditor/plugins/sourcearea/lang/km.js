@@ -1,1 +1,0 @@
-﻿CKEDITOR.plugins.setLang("sourcearea","km",{toolbar:"កូត"});

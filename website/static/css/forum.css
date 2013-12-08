@@ -1,4 +1,85 @@
 
+/* ------------------------------------------------------------------
+ * Forum list
+ */
+div.forum-entry {
+  height: 40pt;
+  position: relative;
+  border-top: solid 1px #ccc;
+  margin-bottom: 1em;
+  margin-top: 0.5em;
+}
+div.forum-title {
+  position: absolute;
+  top: 0; left: 0; bottom: 0;
+  width: 50%;
+}
+div.forum-title h2 {
+  margin: 0;
+}
+div.forum-stats {
+  position: absolute;
+  top: 0; bottom: 0;
+  left: 50%;
+  width: 80pt;
+}
+div.last-post {
+  position: absolute;
+  left: 50%;
+  margin-left: 80pt;
+  right: 0; top: 0; bottom: 0;
+}
+
+div.post-author img {
+  vertical-align: middle;
+}
+
+div.forum-stats span {
+  font-weight: bold;
+}
+
+div.last-post {
+  font-size: 75%;
+}
+
+/* -----------------------------------------------------------------
+ * Thread list
+ */
+div.thread-entry {
+  height: 40pt;
+  position: relative;
+  border-top: solid 1px #ccc;
+  margin-bottom: 1em;
+  margin-top: 0.5em;
+}
+div.thread-title {
+  position: absolute;
+  top: 0; left: 0; bottom: 0;
+  width: 50%;
+}
+div.thread-replycount {
+  position: absolute;
+  top: 0; bottom: 0;
+  left: 50%;
+  width: 80pt;
+}
+div.thread-details {
+  position: absolute;
+  left: 50%;
+  margin-left: 80pt;
+  right: 0; top: 0; bottom: 0;
+}
+div.thread-details img {
+  vertical-align: middle;
+}
+
+div.forum-stats span {
+  font-weight: bold;
+}
+
+div.thread-details {
+  font-size: 75%;
+}
 
 /* ------------------------------------------------------------------
  * Post Viewing
@@ -91,12 +172,15 @@ div.forum-field.forum-field-markitup textarea {
   padding: 2pt 4pt;
 }
 
-div.forum-field.forum-field-submit input {
+div.forum-field.forum-field-submit div.input-button {
   position: absolute;
   left: 75pt;
   top: 0;
   bottom: 0;
   right: auto;
-  width: 100pt;
+  width: 112px;
 }
 
+div.forum-field.forum-field-submit div.input-button input {
+  width: 120px;
+}

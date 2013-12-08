@@ -1,1 +1,0 @@
-﻿CKEDITOR.plugins.setLang("templates","fr-ca",{button:"Modèles",emptyListMsg:"(Aucun modèle disponible)",insertOption:"Remplacer tout le contenu actuel",options:"Template Options",selectPromptMsg:"Sélectionner le modèle à ouvrir dans l'éditeur<br>(le contenu actuel sera remplacé):",title:"Modèles de contenu"});

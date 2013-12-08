@@ -1,1 +1,0 @@
-﻿CKEDITOR.plugins.setLang("horizontalrule","nl",{toolbar:"Horizontale lijn invoegen"});

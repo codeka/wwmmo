@@ -1,1 +1,0 @@
-﻿CKEDITOR.plugins.setLang("horizontalrule","km",{toolbar:"បន្ថែមបន្ទាត់ផ្តេក"});

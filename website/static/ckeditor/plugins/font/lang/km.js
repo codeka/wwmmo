@@ -1,1 +1,0 @@
-﻿CKEDITOR.plugins.setLang("font","km",{fontSize:{label:"ទំហំ",voiceLabel:"Font Size",panelTitle:"ទំហំ"},label:"ហ្វុង",panelTitle:"ហ្វុង",voiceLabel:"ហ្វុង"});

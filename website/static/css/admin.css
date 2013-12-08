@@ -16,6 +16,7 @@ header#main-header {
 header#main-header h1 {
     font-size: 20pt;
     line-height: 80px;
+    margin: 0;
     margin-left: 1em;
 }
 

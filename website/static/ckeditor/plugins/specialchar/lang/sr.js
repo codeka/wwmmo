@@ -1,1 +1,0 @@
-﻿CKEDITOR.plugins.setLang("specialchar","sr",{options:"Special Character Options",title:"Одаберите специјални карактер",toolbar:"Унеси специјални карактер"});

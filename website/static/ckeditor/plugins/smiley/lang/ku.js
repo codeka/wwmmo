@@ -1,1 +1,0 @@
-﻿CKEDITOR.plugins.setLang("smiley","ku",{options:"ههڵبژاردهی زهردهخهنه",title:"دانانی زهردهخهنهیهك",toolbar:"زهردهخهنه"});

@@ -1,1 +1,0 @@
-﻿CKEDITOR.plugins.setLang("smiley","sl",{options:"Smiley Options",title:"Vstavi smeška",toolbar:"Smeško"});

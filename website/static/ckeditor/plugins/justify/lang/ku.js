@@ -1,1 +1,0 @@
-﻿CKEDITOR.plugins.setLang("justify","ku",{block:"هاوستوونی",center:"ناوهڕاست",left:"بههێڵ کردنی چهپ",right:"بههێڵ کردنی ڕاست"});

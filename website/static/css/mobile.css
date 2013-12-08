@@ -16,6 +16,10 @@ header#page-header img.logo {
   margin: 10px 0 0 16px;
 }
 
+header#page-header h1 {
+  margin-top: 8pt;
+}
+
 header#page-header h1 span.war-worlds {
   font-size: 18pt;
   line-height: 18pt;
@@ -46,13 +50,32 @@ header#page-header .rss-btn img {
   right: 5px;
 }
 
+header#page-header ul.main-nav {
+  margin-bottom: 1em;
+}
+
 header#page-header ul.main-nav li {
-  float: none;
+  float: left;
   list-style-type: none;
   margin: 0;
+  margin-left: 1em;
   line-height: normal;
+  width: 50pt;
+}
+
+header#page-header ul.main-nav li:nth-child(3) {
+  clear: left;
+  margin-left: 0;
+}
+
+header#page-header ul.main-nav li:nth-child(4) {
+  width: 75pt;
 }
 
 section.content {
+  width: auto;
+}
+
+nav.admin {
   width: auto;
 }

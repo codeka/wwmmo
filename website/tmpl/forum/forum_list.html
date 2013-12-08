@@ -2,48 +2,7 @@
 {% import "forum/macros.html" as m %}
 
 {% block header %}
-  {{m.html_header()}}
-  <style>
-    div.forum-entry {
-      height: 40pt;
-      position: relative;
-      border-top: solid 1px #ccc;
-      margin-bottom: 1em;
-      margin-top: 0.5em;
-    }
-    div.forum-title {
-      position: absolute;
-      top: 0; left: 0; bottom: 0;
-      width: 50%;
-    }
-    div.forum-title h2 {
-      margin: 0;
-    }
-    div.forum-stats {
-      position: absolute;
-      top: 0; bottom: 0;
-      left: 50%;
-      width: 80pt;
-    }
-    div.last-post {
-      position: absolute;
-      left: 50%;
-      margin-left: 80pt;
-      right: 0; top: 0; bottom: 0;
-    }
-
-    div.post-author img {
-      vertical-align: middle;
-    }
-
-    div.forum-stats span {
-      font-weight: bold;
-    }
-
-    div.last-post {
-      font-size: 75%;
-    }
-  </style>
+  {{m.html_header(resource_version)}}
 {% endblock %}
 {% block pagetitle %}Forums{% endblock %}
 {% block title %}Forums{% endblock %}
@@ -57,11 +16,13 @@
       </ul>
     </nav>
 
-    <p>The War Worlds forums are a place to discuss various aspects of the game. I currently don't have a moderation
-       policy or "rules" as such, I just ask that people try to stay on-topic and be polite. I think we can all be
-       grown-ups here.</p>
-    <p>If you enjoy the game, I would encourage you to log in using the same Google Account that you use to play the
-       game, so that we can link your persona on the forums to your in-game Empire.</p>
+    <section class="blurb">
+      <p>The War Worlds forums are a place to discuss various aspects of the game. I currently don't have a moderation
+         policy or "rules" as such, I just ask that people try to stay on-topic and be polite. I think we can all be
+         grown-ups here.</p>
+      <p>If you enjoy the game, I would encourage you to log in using the same Google Account that you use to play the
+         game, so that we can link your persona on the forums to your in-game Empire.</p>
+    </section>
 
   {% for forum in forums %}
     <div class="forum-entry">
@@ -83,6 +44,7 @@
           <time datetime="{{top_threads[forum.slug]|post_date_std}}" class="post-date">{{top_threads[forum.slug]|post_date_time}}</time>
         {% endif %}
       </div>
+      <div class="last"></div>
     </div>
   {% endfor %}
   </section>

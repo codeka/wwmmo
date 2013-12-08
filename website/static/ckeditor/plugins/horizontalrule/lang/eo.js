@@ -1,1 +1,0 @@
-﻿CKEDITOR.plugins.setLang("horizontalrule","eo",{toolbar:"Enmeti Horizontalan Linion"});

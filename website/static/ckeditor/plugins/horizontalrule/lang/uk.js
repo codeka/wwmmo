@@ -1,1 +1,0 @@
-﻿CKEDITOR.plugins.setLang("horizontalrule","uk",{toolbar:"Горизонтальна лінія"});

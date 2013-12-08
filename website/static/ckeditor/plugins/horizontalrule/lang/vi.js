@@ -1,1 +1,0 @@
-﻿CKEDITOR.plugins.setLang("horizontalrule","vi",{toolbar:"Chèn đường phân cách ngang"});

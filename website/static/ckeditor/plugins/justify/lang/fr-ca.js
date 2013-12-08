@@ -1,1 +1,0 @@
-﻿CKEDITOR.plugins.setLang("justify","fr-ca",{block:"Texte justifié",center:"Centrer",left:"Aligner à gauche",right:"Aligner à Droite"});

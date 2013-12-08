@@ -1,1 +1,0 @@
-﻿CKEDITOR.plugins.setLang("specialchar","pt",{options:"Special Character Options",title:"Seleccione um caracter especial",toolbar:"Inserir Caracter Especial"});
