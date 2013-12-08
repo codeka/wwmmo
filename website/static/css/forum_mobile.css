@@ -1,0 +1,85 @@
+
+
+section.blurb {
+  display: none;
+}
+
+/* --------------------------------------------------------------
+ * Forum list
+ */
+
+div.forum-entry {
+  height: auto;
+}
+div.forum-entry:last-child {
+  padding-bottom: 1em;
+}
+
+div.forum-title {
+  position: relative;
+  width: 100%;
+  padding-bottom: 1em;
+}
+
+div.forum-stats {
+  position: relative;
+  width: 80pt;
+  float: left;
+  left: 0;
+}
+div.last-post {
+  position: relative;
+  float: left;
+  top: 50%;
+  margin-left: 0;
+  left: 0; top: 0;
+}
+div.forum-entry div.last {
+  clear: both;
+}
+
+/* --------------------------------------------------------------
+ * Thread list
+ */
+
+div.thread-entry {
+  height: auto;
+}
+div.thread-entry:last-child {
+  padding-bottom: 1em;
+}
+
+div.thread-title {
+  position: relative;
+  width: 100%;
+  padding-bottom: 1em;
+}
+
+div.thread-replycount {
+  position: relative;
+  width: 80pt;
+  float: left;
+  left: 0;
+}
+div.thread-details {
+  position: relative;
+  float: left;
+  top: 50%;
+  margin-left: 0;
+  left: 0; top: 0;
+}
+div.thread-entry div.last {
+  clear: both;
+}
+
+/* -----------------------------------------------------------------
+ * Post viewing
+ */
+
+article.single-post span.posted {
+  white-space: pre-wrap;
+}
+
+article.single-post span.posted:before {
+  content: '\A';
+}
