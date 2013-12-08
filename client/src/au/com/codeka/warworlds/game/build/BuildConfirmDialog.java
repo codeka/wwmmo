@@ -171,7 +171,11 @@ public class BuildConfirmDialog extends DialogFragment {
         int count = 1;
         if (mDesign.canBuildMultiple()) {
             final EditText countEdit = (EditText) mView.findViewById(R.id.build_count_edit);
-            count = Integer.parseInt(countEdit.getText().toString());
+            try {
+                count = Integer.parseInt(countEdit.getText().toString());
+            } catch (NumberFormatException e) {
+                count = 1;
+            }
         }
 
         final DateTime startTime = DateTime.now();

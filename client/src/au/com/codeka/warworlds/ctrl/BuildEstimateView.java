@@ -70,10 +70,15 @@ public class BuildEstimateView extends FrameLayout {
                 starCopy = (Star) star.clone();
                 buildRequest = br;
 
-                Simulation sim = new Simulation();
-                sim.simulate(starCopy);
-                starCopy.getBuildRequests().add(buildRequest);
-                sim.simulate(starCopy);
+                try {
+                    Simulation sim = new Simulation();
+                    sim.simulate(starCopy);
+                    starCopy.getBuildRequests().add(buildRequest);
+                    sim.simulate(starCopy);
+                } catch (Exception e) {
+                    // if we can't simulate, it's some kind of error...
+                    return false;
+                }
 
                 empire = (EmpirePresence) starCopy.getEmpire(br.getEmpireKey());
                 return true;
@@ -81,19 +86,24 @@ public class BuildEstimateView extends FrameLayout {
 
             @Override
             protected void onComplete(Boolean success) {
-                DateTime endTime = buildRequest.getEndTime();
+                if (success != null && success) {
+                    DateTime endTime = buildRequest.getEndTime();
+    
+                    EmpirePresence empirePresenceBefore = (EmpirePresence) star.getEmpire(br.getEmpireKey());
+                    float deltaMineralsPerHourBefore = 0;
+                    if (empirePresenceBefore != null) {
+                        deltaMineralsPerHourBefore = empirePresenceBefore.getDeltaMineralsPerHour();
+                    }
+                    float deltaMineralsPerHourAfter = empire.getDeltaMineralsPerHour();
 
-                EmpirePresence empirePresenceBefore = (EmpirePresence) star.getEmpire(br.getEmpireKey());
-                float deltaMineralsPerHourBefore = 0;
-                if (empirePresenceBefore != null) {
-                    deltaMineralsPerHourBefore = empirePresenceBefore.getDeltaMineralsPerHour();
+                    timeToBuildText.setText(TimeInHours.format(br.getStartTime(), endTime));
+                    mineralsToBuildText.setText(Html.fromHtml(
+                                                String.format("<font color=\"red\">%d</font>/hr",
+                                                        (int) (deltaMineralsPerHourAfter - deltaMineralsPerHourBefore))));
+                } else {
+                    timeToBuildText.setText("??");
+                    mineralsToBuildText.setText("??");
                 }
-                float deltaMineralsPerHourAfter = empire.getDeltaMineralsPerHour();
-
-                timeToBuildText.setText(TimeInHours.format(br.getStartTime(), endTime));
-                mineralsToBuildText.setText(Html.fromHtml(
-                                            String.format("<font color=\"red\">%d</font>/hr",
-                                                    (int) (deltaMineralsPerHourAfter - deltaMineralsPerHourBefore))));
 
                 mRefreshRunning = false;
                 if (mNeedRefresh) {

@@ -316,6 +316,7 @@ public class BuildingsList extends ListView
                     levelLabel.setVisibility(View.VISIBLE);
                 }
 
+                row1.removeAllViews();
                 addTextToRow(mContext, row1, design.getDisplayName());
                 if (buildRequest != null) {
                     String verb = (building == null ? "Building" : "Upgrading");
@@ -368,6 +369,7 @@ public class BuildingsList extends ListView
 
                 icon.setImageDrawable(new SpriteDrawable(SpriteManager.i.getSprite(design.getSpriteName())));
 
+                row1.removeAllViews();
                 addTextToRow(mContext, row1, design.getDisplayName());
                 String requiredHtml = design.getDependenciesHtml(mColony);
                 row2.setText(requiredHtml);

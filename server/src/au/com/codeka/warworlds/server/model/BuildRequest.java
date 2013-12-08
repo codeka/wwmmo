@@ -38,7 +38,6 @@ public class BuildRequest extends BaseBuildRequest {
         mEmpireID = rs.getInt("empire_id");
         mEmpireKey = Integer.toString(mEmpireID);
         mExistingBuildingID = rs.getInt("existing_building_id");
-        mNotes = rs.getString("notes");
         if (!rs.wasNull()) {
             mExistingBuildingKey = Integer.toString(mExistingBuildingID);
             mExistingBuildingLevel = 1;
@@ -57,6 +56,7 @@ public class BuildRequest extends BaseBuildRequest {
         } else {
             mUpgradeID = rs.getString("upgrade_id");
         }
+        mNotes = rs.getString("notes");
     }
 
     public int getID() {

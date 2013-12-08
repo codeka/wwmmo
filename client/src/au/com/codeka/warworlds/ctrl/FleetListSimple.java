@@ -92,6 +92,9 @@ public class FleetListSimple extends LinearLayout {
 
         icon.setImageDrawable(new SpriteDrawable(SpriteManager.i.getSprite(design.getSpriteName())));
 
+        row1.removeAllViews();
+        row2.removeAllViews();
+
         FleetList.populateFleetNameRow(mContext, row1, fleet, design);
         FleetList.populateFleetStanceRow(mContext, row2, fleet);
 

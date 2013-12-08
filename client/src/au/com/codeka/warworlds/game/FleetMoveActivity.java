@@ -67,6 +67,8 @@ public class FleetMoveActivity extends BaseStarfieldActivity {
         } catch (InvalidProtocolBufferException e) {
         }
 
+        super.onCreate(savedInstanceState);
+
         // we can get an instance of the star from the sector manager
         mSrcStar = SectorManager.getInstance().findStar(mFleet.getStarKey());
         if (mSrcStar == null) {
@@ -76,15 +78,10 @@ public class FleetMoveActivity extends BaseStarfieldActivity {
                 @Override
                 public void onStarFetched(Star s) {
                     mSrcStar = s;
-                    if (mSrcStar != null) {
-                        // it shouldn't be null..
-                        mStarfield.scrollTo(mSrcStar);
-                    }
+                    mStarfield.scrollTo(mSrcStar);
                 }
             });
         }
-
-        super.onCreate(savedInstanceState);
 
         mStarfield.setSceneCreatedHandler(new SectorSceneManager.SceneCreatedHandler() {
             @Override

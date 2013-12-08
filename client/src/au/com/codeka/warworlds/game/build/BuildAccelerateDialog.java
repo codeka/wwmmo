@@ -2,6 +2,8 @@
 
 import java.util.Locale;
 
+import com.google.protobuf.InvalidProtocolBufferException;
+
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.DialogInterface;
@@ -20,8 +22,11 @@ import au.com.codeka.warworlds.StyledDialog;
 import au.com.codeka.warworlds.api.ApiClient;
 import au.com.codeka.warworlds.api.ApiException;
 import au.com.codeka.warworlds.model.BuildRequest;
+import au.com.codeka.warworlds.model.Colony;
 import au.com.codeka.warworlds.model.DesignManager;
 import au.com.codeka.warworlds.model.EmpireManager;
+import au.com.codeka.warworlds.model.Planet;
+import au.com.codeka.warworlds.model.Star;
 import au.com.codeka.warworlds.model.StarManager;
 import au.com.codeka.warworlds.model.StarSummary;
 
@@ -36,10 +41,52 @@ public class BuildAccelerateDialog extends DialogFragment {
     }
 
     @Override
+    public void onSaveInstanceState(Bundle state) {
+        super.onSaveInstanceState(state);
+        if (mBuildRequest != null) {
+            Messages.BuildRequest.Builder build_request_pb = Messages.BuildRequest.newBuilder();
+            mBuildRequest.toProtocolBuffer(build_request_pb);
+            state.putByteArray("au.com.codeka.warworlds.BuildRequest", build_request_pb.build().toByteArray());
+        }
+        if (mStar != null) {
+            Messages.Star.Builder star_pb = Messages.Star.newBuilder();
+            mStar.toProtocolBuffer(star_pb);
+            state.putByteArray("au.com.codeka.warworlds.Star", star_pb.build().toByteArray());
+        }
+    }
+
+    private void restoreSavedInstanceState(Bundle savedInstanceState) {
+        byte[] bytes = savedInstanceState.getByteArray("au.com.codeka.warworlds.Star");
+        if (bytes != null) {
+            try {
+                Messages.Star star_pb;
+                star_pb = Messages.Star.parseFrom(bytes);
+                mStar = new StarSummary();
+                mStar.fromProtocolBuffer(star_pb);
+            } catch (InvalidProtocolBufferException e) {
+            }
+        }
+
+        bytes = savedInstanceState.getByteArray("au.com.codeka.warworlds.BuildRequest");
+        if (bytes != null) {
+            try {
+                Messages.BuildRequest build_request_pb = Messages.BuildRequest.parseFrom(bytes);
+                mBuildRequest = new BuildRequest();
+                mBuildRequest.fromProtocolBuffer(build_request_pb);
+            } catch (InvalidProtocolBufferException e) {
+            }
+        }
+    }
+
+    @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         final Activity activity = getActivity();
         LayoutInflater inflater = activity.getLayoutInflater();
         mView = inflater.inflate(R.layout.build_accelerate_dlg, null);
+
+        if (savedInstanceState != null) {
+            restoreSavedInstanceState(savedInstanceState);
+        }
 
         SeekBar accelerateAmount = (SeekBar) mView.findViewById(R.id.accelerate_amount);
         accelerateAmount.setMax(50);
