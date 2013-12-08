@@ -76,7 +76,10 @@ public class FleetMoveActivity extends BaseStarfieldActivity {
                 @Override
                 public void onStarFetched(Star s) {
                     mSrcStar = s;
-                    mStarfield.scrollTo(mSrcStar);
+                    if (mSrcStar != null) {
+                        // it shouldn't be null..
+                        mStarfield.scrollTo(mSrcStar);
+                    }
                 }
             });
         }

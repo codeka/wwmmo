@@ -51,6 +51,7 @@ import au.com.codeka.warworlds.model.Colony;
 import au.com.codeka.warworlds.model.DesignManager;
 import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.Fleet;
+import au.com.codeka.warworlds.model.FleetManager;
 import au.com.codeka.warworlds.model.MyEmpire;
 import au.com.codeka.warworlds.model.Planet;
 import au.com.codeka.warworlds.model.PlanetImageManager;
@@ -386,6 +387,7 @@ public class BuildActivity extends BaseActivity implements StarManager.StarFetch
                             adapter.notifyDataSetChanged();
 
                             if (entry.fleet != null) {
+                                FleetManager.i.updateNotes(entry.fleet);
                             } else {
                                 BuildManager.getInstance().updateNotes(entry.buildRequest.getKey(), notes);
                             }
@@ -415,15 +417,28 @@ public class BuildActivity extends BaseActivity implements StarManager.StarFetch
                 for (Design design : designs.values()) {
                     mEntries.add(new ItemEntry((ShipDesign) design));
                 }
-
+/*
                 mEntries.add(new ItemEntry("Existing Ships"));
                 for (Fleet fleet : fleets) {
-                    mEntries.add(new ItemEntry(fleet));
+                    if (fleet.getState() != Fleet.State.IDLE) {
+                        continue;
+                    }
+                    ItemEntry entry = new ItemEntry(fleet);
+                    for (BuildRequest buildRequest : buildRequests) {
+                        if (buildRequest.getExistingFleetID() != null &&
+                                ((int) buildRequest.getExistingFleetID()) == Integer.parseInt(fleet.getKey())) {
+                            entry.buildRequest = buildRequest;
+                        }
+                    }
+                    mEntries.add(entry);
                 }
                 for (BuildRequest buildRequest : buildRequests) {
+                    if (buildRequest.getExistingFleetID() != null) {
+                        continue;
+                    }
                     mEntries.add(new ItemEntry(buildRequest));
                 }
-
+*/
                 notifyDataSetChanged();
             }
 
@@ -525,6 +540,7 @@ public class BuildActivity extends BaseActivity implements StarManager.StarFetch
                         levelLabel.setVisibility(View.VISIBLE);
                     }
 
+                    row1.removeAllViews();
                     FleetList.populateFleetNameRow(getActivity(), row1, fleet, design);
                     if (buildRequest != null) {
                         String verb = (fleet == null ? "Building" : "Upgrading");
@@ -563,7 +579,6 @@ public class BuildActivity extends BaseActivity implements StarManager.StarFetch
                         notes.setText("");
                         notes.setVisibility(View.GONE);
                     }
-
                 } else {
                     // new fleet
                     ImageView icon = (ImageView) view.findViewById(R.id.building_icon);

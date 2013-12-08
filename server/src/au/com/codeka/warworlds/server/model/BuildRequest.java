@@ -51,6 +51,12 @@ public class BuildRequest extends BaseBuildRequest {
                 }
             }
         }
+        mExistingFleetID = rs.getInt("existing_fleet_id");
+        if (rs.wasNull()) {
+            mExistingFleetID = null;
+        } else {
+            mUpgradeID = rs.getString("upgrade_id");
+        }
     }
 
     public int getID() {

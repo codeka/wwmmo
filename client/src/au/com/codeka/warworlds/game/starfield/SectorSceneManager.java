@@ -3,6 +3,7 @@ package au.com.codeka.warworlds.game.starfield;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.andengine.engine.Engine;
 import org.andengine.engine.camera.ZoomCamera;
 import org.andengine.engine.camera.hud.HUD;
 import org.andengine.entity.IEntity;
@@ -51,6 +52,13 @@ public abstract class SectorSceneManager implements SectorManager.OnSectorListCh
 
     protected void onStart() {
         SectorManager.getInstance().addSectorListChangedListener(this);
+
+        mActivity.getEngine().setErrorHandler(new Engine.EngineErrorHandler() {
+            @Override
+            public void onRenderThreadException(Exception e) {
+                refreshScene();
+            }
+        });
 
         if (mGestureDetector == null) {
             mGestureDetector = new GestureDetector(mActivity, createGestureListener());

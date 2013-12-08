@@ -36,11 +36,14 @@ import au.com.codeka.common.model.BaseFleet;
 import au.com.codeka.common.model.BaseFleetUpgrade;
 import au.com.codeka.common.model.DesignKind;
 import au.com.codeka.common.model.ShipDesign;
+import au.com.codeka.warworlds.BaseActivity;
 import au.com.codeka.warworlds.R;
+import au.com.codeka.warworlds.game.NotesDialog;
 import au.com.codeka.warworlds.model.DesignManager;
 import au.com.codeka.warworlds.model.Empire;
 import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.Fleet;
+import au.com.codeka.warworlds.model.FleetManager;
 import au.com.codeka.warworlds.model.ImageManager;
 import au.com.codeka.warworlds.model.MyEmpire;
 import au.com.codeka.warworlds.model.SectorManager;
@@ -171,13 +174,36 @@ public class FleetList extends FrameLayout implements StarManager.StarFetchedHan
 
         fleetList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> parent, View view,
-                    int position, long id) {
-                FleetListAdapter.ItemEntry entry =
-                        (FleetListAdapter.ItemEntry) mFleetListAdapter.getItem(position);
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                FleetListAdapter.ItemEntry entry = (FleetListAdapter.ItemEntry) mFleetListAdapter.getItem(position);
                 if (entry.type == FleetListAdapter.FLEET_ITEM_TYPE) {
                     selectFleet(((Fleet) entry.value).getKey(), false);
                 }
+            }
+        });
+
+        fleetList.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                FleetListAdapter.ItemEntry entry = (FleetListAdapter.ItemEntry) mFleetListAdapter.getItem(position);
+                if (entry.type != FleetListAdapter.FLEET_ITEM_TYPE) {
+                    return false;
+                }
+
+                final Fleet fleet = (Fleet) entry.value;
+                NotesDialog dialog = new NotesDialog();
+                dialog.setup(fleet.getNotes(), new NotesDialog.NotesChangedHandler() {
+                    @Override
+                    public void onNotesChanged(String notes) {
+                        fleet.setNotes(notes);
+                        mFleetListAdapter.notifyDataSetChanged();
+
+                        FleetManager.i.updateNotes(fleet);
+                    }
+                });
+
+                dialog.show(((BaseActivity) mContext).getSupportFragmentManager(), "");
+                return true;
             }
         });
 

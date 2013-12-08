@@ -15,7 +15,7 @@
     <EditText
         android:id="@+id/notes"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="100sp"
         android:layout_below="@+id/instruction"
         android:layout_margin="4dp"
         android:ems="10"

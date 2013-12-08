@@ -78,18 +78,22 @@ public abstract class BaseGlActivity extends SimpleLayoutGameActivity {
         EngineOptions options =  new EngineOptions(false, ScreenOrientation.MANIFEST,
                 new RatioResolutionPolicy(mCameraWidth, mCameraHeight), mCamera);
         options.setUpdateThreadPriority(Thread.NORM_PRIORITY - 2);
+
         return options;
     }
 
     @Override
     public Engine onCreateEngine(final EngineOptions engineOptions) {
+        Engine engine = null;
         if (getNumCores() == 1) {
             log.info("Single-core device detected, using a Limited-FPS engine.");
-            return new LimitedFPSEngine(engineOptions, 5);
+            engine = new LimitedFPSEngine(engineOptions, 5);
         } else {
             log.info("Multi-core device detected, using regular engine.");
-            return new Engine(engineOptions);
+            engine = new Engine(engineOptions);
         }
+
+        return engine;
     }
 
     /** Create the camera, we create a ZoomCamera by default. */

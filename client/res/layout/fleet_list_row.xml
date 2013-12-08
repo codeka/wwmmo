@@ -52,7 +52,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_below="@id/icon_container"
-        android:layout_margin="4dp"
+        android:layout_margin="8dp"
         android:ellipsize="end"
         android:singleLine="true"
         android:text="Blah blah blah, notes, yada yada yada. More notes."
