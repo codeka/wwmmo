@@ -21,7 +21,11 @@
 
     <form method="POST">
       <fieldset>
-        <h1>New Post in {{forum.name}}</h1>
+        {% if not post -%}
+          <h1>New Post in {{forum.name}}</h1>
+        {%- else -%}
+          <h1>Editing Post in {{forum.name}}</h1>
+        {%- endif %}
         <p>Compose your post below. Please keep the tone and content of your message friendly, and we'll all get along!</p>
         {% if not forum_thread %}
           <div class="forum-field">
@@ -31,7 +35,7 @@
         {% endif %}
         <div class="forum-field forum-field-markitup">
           <label for="post-content">Message:</label>
-          <div class="hack"><textarea name="post-content" id="post-content"></textarea></div>
+          <div class="hack"><textarea name="post-content" id="post-content">{% if post %}{{post.content}}{% endif %}</textarea></div>
         </div>
         <div class="forum-field forum-field-submit">
           <div class="input-button"><input type="submit" value="Post"></div>

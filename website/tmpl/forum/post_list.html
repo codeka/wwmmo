@@ -26,12 +26,24 @@
       <header>
         <span class="author"><a rel="author" href="/">{{profiles[post.user.user_id()].display_name}}</a></span>
         <span class="posted">posted <time itemprop="dateCreated" datetime="{{post|post_date_std}}">{{post|post_date_time}}</time></span>
+        <span class="controls">
+        {% if is_moderator or (user and post.user.user_id() == user.user_id()) %}
+          <a href="/forum/{{forum.slug}}/{{forum_thread.slug}}/posts/{{post.key()}}/delete" class="button">Delete</a>
+          <a href="/forum/{{forum.slug}}/{{forum_thread.slug}}/posts/{{post.key()}}" class="button">Edit</a>
+        {%- endif %}
+          <a href="" class="button">Quote</a>
+        </span>
       </header>
       <div class="content">
         {{post.content}}
+        {% if post.edit_notes -%}
+          <p>{{post.edit_notes}}</p>
+        {%- endif %}
       </div>
     </article>
   {% endfor %}
+
+    {{m.paginator(page_no, total_pages)}}
 
     <form method="POST" action="/forum/{{forum.slug}}/{{forum_thread.slug}}/posts">
       <fieldset>

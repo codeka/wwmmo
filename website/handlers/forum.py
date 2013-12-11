@@ -57,35 +57,39 @@ class ThreadListPage(ForumPage):
       self.error(404)
       return
 
-    page_no = 0
+    data = {}
+    data["forum"] = forum
+    data["is_moderator"] = False
+    if self.user:
+      data["is_moderator"] = ctrl.forum.isModerator(forum, self.user)
+
+    page_no = 1
     if self.request.get('page'):
       page_no = int(self.request.get('page'))
-    if page_no < 0:
-      page_no = 0
+    if page_no <= 0:
+      page_no = 1
+    data["page_no"] = page_no
 
-    threads = ctrl.forum.getThreads(forum, page_no, 50)
+    threads = ctrl.forum.getThreads(forum, page_no - 1, 25)
     if not threads and page_no > 0:
       self.redirect('/forum/%s?page=%d' % (forum.slug, page_no-1))
+    data["threads"] = threads
 
-    post_counts = ctrl.forum.getThreadPostCounts(threads)
-    first_posts = ctrl.forum.getFirstPostsByForumThread(threads)
-    last_posts = ctrl.forum.getLastPostsByForumThread(threads)
+    data["total_threads"] = ctrl.forum.getForumThreadPostCounts()[forum.slug]['threads']
+    data["total_pages"] = (data["total_threads"] / 25) + 1
+    data["post_counts"] = ctrl.forum.getThreadPostCounts(threads)
+    data["first_posts"] = ctrl.forum.getFirstPostsByForumThread(threads)
+    data["last_posts"] = ctrl.forum.getLastPostsByForumThread(threads)
 
     user_ids = []
     for thread in threads:
       if thread.user.user_id() not in user_ids:
         user_ids.append(thread.user.user_id())
-      if last_posts[thread.key()].user.user_id() not in user_ids:
-        user_ids.append(last_posts[thread.key()].user.user_id())
-    profiles = ctrl.profile.getProfiles(user_ids)
+      if thread.key() in data["last_posts"] and data["last_posts"][thread.key()].user.user_id() not in user_ids:
+        user_ids.append(data["last_posts"][thread.key()].user.user_id())
+    data["profiles"] = ctrl.profile.getProfiles(user_ids)
 
-    self.render("forum/thread_list.html", {"forum": forum,
-                                           "threads": threads,
-                                           "post_counts": post_counts,
-                                           "profiles": profiles,
-                                           "last_posts": last_posts,
-                                           "first_posts": first_posts,
-                                           "page_no": page_no})
+    self.render("forum/thread_list.html", data)
 
 
 class PostListPage(ForumPage):
@@ -95,34 +99,45 @@ class PostListPage(ForumPage):
       self.error(404)
       return
 
+    data = {}
+    data["forum"] = forum
+
+    is_moderator = False
+    if self.user:
+      is_moderator = ctrl.forum.isModerator(forum, self.user)
+    data["is_moderator"] = is_moderator
+
     forum_thread = ctrl.forum.getThreadBySlug(forum, forum_thread_slug)
     if not forum_thread:
       self.error(404)
       return
+    data["forum_thread"] = forum_thread
 
-    page_no = 0
+    page_no = 1
     if self.request.get('page'):
       page_no = int(self.request.get('page'))
-    if page_no < 0:
-      page_no = 0
+    if page_no <= 0:
+      page_no = 1
+    data["page_no"] = page_no
 
-    posts = ctrl.forum.getPosts(forum, forum_thread, page_no, 25)
+    posts = ctrl.forum.getPosts(forum, forum_thread, page_no - 1, 10)
+    data["posts"] = posts
+
+    data["total_posts"] = ctrl.forum.getThreadPostCounts([forum_thread])["%s:%s" % (forum.slug, forum_thread.slug)]
+    data["total_pages"] = (data["total_posts"] / 10) + 1
 
     user_ids = []
     for post in posts:
       if post.user.user_id() not in user_ids:
         user_ids.append(post.user.user_id())
     profiles = ctrl.profile.getProfiles(user_ids)
+    data["profiles"] = profiles
 
-    self.render("forum/post_list.html", {"forum": forum,
-                                         "forum_thread": forum_thread,
-                                         "posts": posts,
-                                         "profiles": profiles,
-                                         "page_no": page_no})
+    self.render("forum/post_list.html", data)
 
 
 class EditPostPage(ForumPage):
-  def get(self, forum_slug, forum_thread_slug=None):
+  def get(self, forum_slug, forum_thread_slug=None, post_id=None):
     if not self._isLoggedIn():
       return
 
@@ -138,10 +153,21 @@ class EditPostPage(ForumPage):
         self.error(404)
         return
 
-    self.render("forum/post_edit.html", {"forum": forum,
-                                         "forum_thread": forum_thread})
+    post = None
+    if post_id:
+      post = model.forum.ForumPost.get(post_id)
+      # if you're after a specific post, you either need to be a moderator or
+      # you need to be the person who posted this post.
+      if not ctrl.forum.isModerator(forum, self.user) and post.user.user_id() != self.user.user_id():
+        self.error(404)
+        return
 
-  def post(self, forum_slug, forum_thread_slug=None):
+
+    self.render("forum/post_edit.html", {"forum": forum,
+                                         "forum_thread": forum_thread,
+                                         "post": post})
+
+  def post(self, forum_slug, forum_thread_slug=None, post_id=None):
     if not self._isLoggedIn():
       return
 
@@ -174,17 +200,33 @@ class EditPostPage(ForumPage):
       forum_thread = model.forum.ForumThread(forum = forum,
                                              subject = subject,
                                              slug = slug,
-                                             posted = now,
+                                             posted = now, last_post = now,
                                              user = self.user)
       forum_thread.put()
       ctrl.forum.incrCount("forum:%s:threads" % (forum.slug))
 
     content = self.request.POST.get("post-content")
-    forum_post = model.forum.ForumPost(parent = forum_thread,
-                                       forum = forum,
-                                       posted = now,
-                                       user = self.user,
-                                       content = content)
+    if post_id:
+      forum_post = model.forum.ForumPost.get(post_id)
+      forum_post.content = content
+      forum_post.updated = datetime.now()
+      if forum_post.edit_notes:
+        forum_post.edit_notes += "<br/>"
+      else:
+        forum_post.edit_notes = ""
+      
+      forum_post.edit_notes += ("<em>Edited by "+self.profile.display_name+', <time datetime="'+
+          forum_post.updated.strftime('%Y-%m-%d %H:%M:%S')+'">'+forum_post.updated.strftime('%d %b %Y %H:%M')+"</time></em>")
+    else:
+      forum_post = model.forum.ForumPost(parent = forum_thread,
+                                         forum = forum,
+                                         posted = now,
+                                         user = self.user,
+                                         content = content)
+
+    forum_thread.last_post = now
+    forum_thread.put()
+
     forum_post.put()
     ctrl.forum.incrCount("forum:%s:posts" % (forum.slug))
     ctrl.forum.incrCount("thread:%s:%s:posts" % (forum.slug, forum_thread.slug), 1)
@@ -193,9 +235,71 @@ class EditPostPage(ForumPage):
     self.redirect("/forum/%s/%s" % (forum.slug, forum_thread.slug))
 
 
+class DeletePostPage(ForumPage):
+  def _getDetails(self, forum_slug, forum_thread_slug, post_id):
+    forum = ctrl.forum.getForumBySlug(forum_slug)
+    if not forum:
+      return
+
+    forum_thread = ctrl.forum.getThreadBySlug(forum, forum_thread_slug)
+    if not forum_thread:
+      return
+
+    post = model.forum.ForumPost.get(post_id)
+    # you either need to be a moderator or you need to be the person who posted this post.
+    if not ctrl.forum.isModerator(forum, self.user) and post.user.user_id() != self.user.user_id():
+      return
+
+    return (forum, forum_thread, post)
+    
+  def get(self, forum_slug, forum_thread_slug, post_id):
+    if not self._isLoggedIn():
+      return
+
+    forum, forum_thread, post = self._getDetails(forum_slug, forum_thread_slug, post_id)
+    if not forum or not forum_thread or not post:
+      self.error(404)
+      return
+
+    self.render("forum/post_delete.html", {"forum": forum,
+                                           "forum_thread": forum_thread,
+                                           "post": post})
+
+  def post(self, forum_slug, forum_thread_slug, post_id):
+    if not self._isLoggedIn():
+      return
+
+    forum, forum_thread, post = self._getDetails(forum_slug, forum_thread_slug, post_id)
+    if not forum or not forum_thread or not post:
+      self.error(404)
+      return
+
+    post.delete()
+
+    # if it's the last post in this thread, delete the thread as well
+    num_posts_left = 0
+    for p in model.forum.ForumPost.all().ancestor(forum_thread):
+      if p.key == post.key:
+        continue
+      num_posts_left += 1
+    if num_posts_left == 0:
+      forum_thread.delete()
+
+    ctrl.forum.incrCount("forum:%s:posts" % (forum.slug), amount=-1)
+    ctrl.forum.incrCount("thread:%s:%s:posts" % (forum.slug, forum_thread.slug), 1, amount=-1)
+
+    memcache.flush_all()
+    if num_posts_left == 0:
+      self.redirect("/forum/%s" % (forum.slug))
+    else:
+      self.redirect("/forum/%s/%s" % (forum.slug, forum_thread.slug))
+
+
 app = webapp.WSGIApplication([("/forum/?", ForumListPage),
                               ("/forum/([^/]+)/?", ThreadListPage),
                               ("/forum/([^/]+)/posts", EditPostPage),
                               ("/forum/([^/]+)/([^/]+)", PostListPage),
-                              ("/forum/([^/]+)/([^/]+)/posts", EditPostPage)],
+                              ("/forum/([^/]+)/([^/]+)/posts", EditPostPage),
+                              ("/forum/([^/]+)/([^/]+)/posts/([^/]+)", EditPostPage),
+                              ("/forum/([^/]+)/([^/]+)/posts/([^/]+)/delete", DeletePostPage)],
                              debug=os.environ["SERVER_SOFTWARE"].startswith("Development"))

@@ -476,10 +476,11 @@ public class EmpireController {
                          " FROM empires" +
                          " LEFT JOIN alliances ON empires.alliance_id = alliances.id" +
                          " LEFT JOIN empire_ranks ON empires.id = empire_ranks.empire_id" +
-                         " WHERE " + whereClause;
+                         " WHERE ";
             if (!includeBanned) {
-                sql += " AND state <> 2";
+                sql += "state != 2 AND ";
             }
+            sql += whereClause;
             return sql;
         }
 

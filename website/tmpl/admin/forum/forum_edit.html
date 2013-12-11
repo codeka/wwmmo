@@ -21,6 +21,10 @@
         <div class="forum-field forum-field-textarea">
           <textarea name="forum-desc" id="forum-desc">{% if forum %}{{forum.description}}{% endif %}</textarea>
         </div>
+        <div class="forum-field">
+          <label for="forum-moderators">Mods:</label>
+          <input type="text" name="forum-moderators" id="forum-moderators"{% if forum %} value="{{forum_moderators_string}}"{% endif %}>
+        </div>
         <div class="post-submit">
           <input type="submit" name="action" value="Save">
           <input type="submit" name="action" value="Save &amp; View">

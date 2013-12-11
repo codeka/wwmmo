@@ -107,7 +107,8 @@ class BaseHandler(webapp.RequestHandler):
     if user:
       args['is_logged_in'] = True
       args['logout_url'] = users.create_logout_url(self.request.uri)
-      args['is_writer'] = (user.email() == 'dean@codeka.com.au' or user.email() == 'lam.h.emily@gmail.com')
+      args['is_writer'] = (user.email() == 'dean@codeka.com.au' or user.email() == 'lam.h.emily@gmail.com' or user.email() == 'ebaversjo@gmail.com')
+      args['user'] = user
       args['user_email'] = user.email()
     else:
       args['is_logged_in'] = False

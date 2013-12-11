@@ -1,4 +1,5 @@
 
+from google.appengine.api import users
 from google.appengine.ext import db
 
 
@@ -7,11 +8,13 @@ class Forum(db.Model):
   slug = db.StringProperty(required=True)
   description = db.TextProperty(required=True)
   alliance = db.StringProperty()
+  moderators = db.ListProperty(users.User)
 
 
 class ForumThread(db.Model):
   forum = db.ReferenceProperty(Forum, required=True)
   posted = db.DateTimeProperty(required=True)
+  last_post = db.DateTimeProperty()
   subject = db.StringProperty(required=True)
   slug = db.StringProperty(required=True)
   user = db.UserProperty(required=True)
@@ -21,7 +24,9 @@ class ForumPost(db.Model):
   forum = db.ReferenceProperty(Forum, required=True)
   user = db.UserProperty(required=True)
   posted = db.DateTimeProperty(required=True)
+  updated = db.DateTimeProperty()
   content = db.TextProperty(required=True)
+  edit_notes = db.TextProperty()
 
 
 class ForumShardedCounter(db.Model):

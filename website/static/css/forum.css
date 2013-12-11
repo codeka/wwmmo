@@ -1,4 +1,8 @@
 
+section.content {
+  padding-bottom: 1em;
+}
+
 /* ------------------------------------------------------------------
  * Forum list
  */
@@ -101,6 +105,16 @@ article.single-post header a {
   color: #000;
 }
 
+article.single-post header span.controls {
+  float: right;
+}
+
+article.single-post header span.controls a {
+  font-weight: normal;
+  color: #fff;
+  margin-right: 8px;
+}
+
 article.single-post {
   margin-bottom: 2em;
 }
@@ -157,6 +171,15 @@ div.forum-field input[type=text] {
   border: solid 1px #ccc;
   padding: 2pt 4pt;
 }
+div.forum-field div.read-only {
+  margin-left: 75pt;
+  border-left: solid 2pt #090;
+  padding-left: 1em;
+}
+
+div.forum-field.forum-field-autoheight {
+  height: auto;
+}
 
 div.forum-field.forum-field-markitup {
   height: 300pt;
@@ -183,4 +206,30 @@ div.forum-field.forum-field-submit div.input-button {
 
 div.forum-field.forum-field-submit div.input-button input {
   width: 120px;
+}
+
+/* ------------------------------------------------------------------------------
+ * Pagination
+ */
+
+nav.pagination {
+  height: 2em;
+  padding-top: 1em;
+  border-top: dashed 1px #ccc;
+}
+
+nav.pagination ul {
+  margin: 0;
+}
+
+nav.pagination > span, nav.pagination > a, nav.pagination li {
+  display: block;
+  float: right;
+  height: 22px;
+  line-height: 22px;
+  margin: 0 1em;
+}
+
+nav.pagination a {
+  line-height: 22px;
 }

@@ -17,9 +17,14 @@
       </ul>
     </nav>
 
-  <p><a href="/forum/{{forum.slug}}/posts" class="button">New Post</a></p>
+  <p>
+    <a href="/forum/{{forum.slug}}/posts" class="button">New Post</a>
+    {% if is_moderator -%}
+       <!-- You're a moderator! -->
+    {% endif %}
+  </p>
 
-  {% for thread in threads %}
+  {% for thread in threads if thread.key() in last_posts %}
     <div class="thread-entry">
       <div class="thread-title">
         <a href="/forum/{{forum.slug}}/{{thread.slug}}">{{thread.subject}}</a>
@@ -31,12 +36,12 @@
       <div class="thread-details">
         <div class="thread-author">started by <a href="/"><img src="{{profiles[thread.user.user_id()]|profile_shield}}" width="16" height="16"/> {{profiles[thread.user.user_id()].display_name}}</a></div>
         <div class="lastpost-author">last reply by <a href="/"><img src="{{profiles[last_posts[thread.key()].user.user_id()]|profile_shield}}" width="16" height="16"/> {{profiles[last_posts[thread.key()].user.user_id()].display_name}}</a></div>
-        <div class="lastpost-date">on <time datetime="{{last_posts[thread.key()]|post_date_std}}" class="post-date">{{last_posts[thread.key()]|post_date_time}}</time></div>
+        <div class="lastpost-date"><time datetime="{{last_posts[thread.key()]|post_date_std}}" class="post-date">{{last_posts[thread.key()]|post_date_time}}</time></div>
       </div>
       <div class="last"></div>
     </div>
   {% endfor %}
 
-    <p><a href="/forum/{{forum.slug}}/posts" class="button">New Post</a></p>
+    {{m.paginator(page_no, total_pages)}}
   </section>
 {% endblock %}

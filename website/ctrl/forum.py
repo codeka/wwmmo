@@ -61,12 +61,24 @@ def getForumBySlug(forum_slug):
   return forum
 
 
+def isModerator(forum, user):
+  """Determines whether the given user is a moderator of this forum or not."""
+  if not forum.moderators:
+    return False
+  if not user:
+    return False
+  for mod in forum.moderators:
+    if mod.user_id() == user.user_id():
+      return True
+  return False
+
+
 def getThreads(forum, page_no, page_size):
   keyname = 'forum:threads:%s:%d:%d' % (str(forum.key()), page_no, page_size)
   threads = memcache.get(keyname)
   if not threads:
     query = model.forum.ForumThread.all().filter("forum", forum)
-    query = query.order("-posted")
+    query = query.order("-last_post")
 
     if page_no == 0:
       it = query.run(limit=page_size)
@@ -135,7 +147,9 @@ def getLastPostsByForumThread(forum_threads):
 
   last_posts = {}
   for forum_thread in forum_threads:
-    last_posts[forum_thread.key()] = cache_mapping["forum:%s:%s:last-post" % (forum_thread.forum.slug, forum_thread.slug)]
+    keyname = "forum:%s:%s:last-post" % (forum_thread.forum.slug, forum_thread.slug)
+    if keyname in cache_mapping:
+      last_posts[forum_thread.key()] = cache_mapping[keyname]
   return last_posts
 
 
@@ -158,7 +172,9 @@ def getFirstPostsByForumThread(forum_threads):
 
   first_posts = {}
   for forum_thread in forum_threads:
-    first_posts[forum_thread.key()] = cache_mapping["forum:%s:%s:first-post" % (forum_thread.forum.slug, forum_thread.slug)]
+    keyname = "forum:%s:%s:first-post" % (forum_thread.forum.slug, forum_thread.slug)
+    if keyname in cache_mapping:
+      first_posts[forum_thread.key()] = cache_mapping[keyname]
   return first_posts
 
 
@@ -270,7 +286,7 @@ def getCount(counter_name):
   return count
 
 
-def incrCount(counter_name, num_shards=20):
+def incrCount(counter_name, num_shards=20, amount=1):
   """Increments the given counter by one.
 
   See getCount() for example of the counter_names."""
@@ -285,7 +301,7 @@ def incrCount(counter_name, num_shards=20):
       counter = model.forum.ForumShardedCounter(key_name=shard_name,
                                                 name=counter_name)
 
-    counter.count += 1
+    counter.count += amount
     counter.put()
 
   db.run_in_transaction(_tx)
