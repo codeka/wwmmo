@@ -41,7 +41,6 @@ def SyncBatch(realm_name, url, start_rank, num_empires):
     else:
       # there's more to go, schedule another sync
       deferred.defer(SyncBatch, realm_name, url, start_rank+num_empires, num_empires, _queue="profilesync")
-      
 
 
 def SyncEmpiresForRealm(realm_name, base_url):

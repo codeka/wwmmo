@@ -15,6 +15,8 @@ import org.joda.time.Seconds;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.mysql.jdbc.exceptions.jdbc4.MySQLTransactionRollbackException;
+
 import au.com.codeka.common.model.BaseBuildRequest;
 import au.com.codeka.common.model.BaseColony;
 import au.com.codeka.common.model.BaseEmpirePresence;
@@ -41,6 +43,7 @@ import au.com.codeka.warworlds.server.model.Star;
 public class StarController {
     private static final Logger log = LoggerFactory.getLogger(StarController.class);
     private DataBase db;
+    private static Random sRand = new Random();
 
     public StarController() {
         db = new DataBase();
@@ -71,7 +74,24 @@ public class StarController {
     }
 
     public void update(Star star) throws RequestException {
-        db.updateStar(star);
+        for (int i = 0; ; i++) {
+            try {
+                db.updateStar(star);
+                break;
+            } catch (MySQLTransactionRollbackException e) {
+                if (i >= 5) {
+                    throw new RequestException(e);
+                }
+
+                // sleep a random amount and try again
+                try {
+                    Thread.sleep(100 + (sRand.nextInt(400)));
+                } catch (InterruptedException e1) {
+                }
+            } catch (Exception e) {
+                throw new RequestException(e);
+            }
+        }
 
         // we may need to ping the event processor if a build time change, or whatever.
         EventProcessor.i.ping();
@@ -176,7 +196,7 @@ public class StarController {
             return stars;
         }
 
-        public void updateStar(Star star) throws RequestException {
+        public void updateStar(Star star) throws Exception {
             final String sql = "UPDATE stars SET" +
                                  " last_simulation = ?" +
                               " WHERE id = ?";
@@ -196,8 +216,6 @@ public class StarController {
                 stmt.setDateTime(1, lastSimulation);
                 stmt.setInt(2, star.getID());
                 stmt.update();
-            } catch(Exception e) {
-                throw new RequestException(e);
             }
 
             updateEmpires(star);
@@ -210,7 +228,7 @@ public class StarController {
             }
         }
 
-        private void updateEmpires(Star star) throws RequestException {
+        private void updateEmpires(Star star) throws Exception {
             final String sql = "UPDATE empire_presences SET" +
                                  " total_goods = ?," +
                                  " total_minerals = ?," +
@@ -224,12 +242,10 @@ public class StarController {
                     stmt.setInt(4, ((EmpirePresence) empire).getID());
                     stmt.update();
                 }
-            } catch(Exception e) {
-               throw new RequestException(e);
             }
         }
 
-        private void updateColonies(Star star) throws RequestException {
+        private void updateColonies(Star star) throws Exception {
             boolean needDelete = false;
 
             final float MIN_POPULATION = 0.0001f;
@@ -257,8 +273,6 @@ public class StarController {
                     stmt.setInt(7, ((Colony) colony).getID());
                     stmt.update();
                 }
-            } catch(Exception e) {
-                throw new RequestException(e);
             }
 
             if (needDelete) {
@@ -275,14 +289,11 @@ public class StarController {
                     }
 
                     star.getColonies().removeAll(toRemove);
-                } catch(Exception e) {
-                    throw new RequestException(e);
                 }
-
             }
         }
 
-        private void updateFleets(Star star) throws RequestException {
+        private void updateFleets(Star star) throws Exception {
             boolean needInsert = false;
             boolean needDelete = false;
             DateTime now = DateTime.now();
@@ -333,8 +344,6 @@ public class StarController {
                     stmt.setInt(12, fleet.getID());
                     stmt.update();
                 }
-            } catch(Exception e) {
-                throw new RequestException(e);
             }
 
             if (needInsert) {
@@ -376,8 +385,6 @@ public class StarController {
                         stmt.setString(13, fleet.getNotes());
                         stmt.update();
                     }
-                } catch(Exception e) {
-                    throw new RequestException(e);
                 }
             }
 
@@ -401,7 +408,7 @@ public class StarController {
             }
         }
 
-        private void updateBuildRequests(Star star) throws RequestException {
+        private void updateBuildRequests(Star star) throws Exception {
             String sql = "UPDATE build_requests SET progress = ?, end_time = ? WHERE id = ?";
             try (SqlStmt stmt = prepare(sql)) {
                 for (BaseBuildRequest baseBuildRequest : star.getBuildRequests()) {
@@ -411,12 +418,10 @@ public class StarController {
                     stmt.setInt(3, buildRequest.getID());
                     stmt.update();
                 }
-            } catch(Exception e) {
-                throw new RequestException(e);
             }
         }
 
-        private void updateCombatReport(Star star, CombatReport combatReport) throws RequestException {
+        private void updateCombatReport(Star star, CombatReport combatReport) throws Exception {
             Messages.CombatReport.Builder pb = Messages.CombatReport.newBuilder();
             combatReport.toProtocolBuffer(pb);
 
@@ -436,8 +441,6 @@ public class StarController {
                 }
                 stmt.update();
                 combatReport.setID(stmt.getAutoGeneratedID());
-            } catch(Exception e) {
-                throw new RequestException(e);
             }
         }
 

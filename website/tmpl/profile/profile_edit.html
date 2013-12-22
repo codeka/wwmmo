@@ -14,7 +14,15 @@
       left: 90pt;
       right: 0;
     }
+    div.profile-field div.input-button {
+      display: inline-block;
+      position: static;
+      margin-left: 90pt;
+    }
     div.profile-field input[type=text] {
+      width: 80%;
+    }
+    div.profile-field select {
       width: 80%;
     }
 
@@ -22,6 +30,7 @@
       padding-bottom: 5em;
     }
   </style>
+  <script src="/js/v{{resource_version}}/autocomplete.js"></script>
 {% endblock %}
 {% block pagetitle %}Profile{% endblock %}
 {% block title %}Profile{% endblock %}
@@ -43,21 +52,37 @@
 
     <form method="POST">
       <h2>Linked Empire</h2>
-      <select name="linked_empire">
-        <option value="">None</option>
-        {% if empires|length == 1 %}
-          {% for realm_name, empire in empires.iteritems() %}
-            <option value="{{realm_name}}:{{empire.key}}">{{empire.display_name}}</option>
-          {% endfor %}
-        {% else %}
-          {% for realm_name, empire in empires.iteritems() %}
-            <option value="{{realm_name}}:{{empire.key}}">{{realm_name}}: {{empire.display_name}}</option>
-          {% endfor %}
-        {% endif %}
-      </select>
+      <p>If you've logged in to the website with the Google Account you use in the game, your empire list will be
+      auto-populated. However, if you use a different email address in the game, you can still link to your empire
+      by typing the name in the box below and clicking "Associate". In this case, you'll need to verify that you
+      actually own that empire by clicking a link in an email sent to that email account.</p>
+      <div class="profile-field">
+        <label for="linked_empire">Empire:</label>
+        <div><select name="linked_empire" id="linked_empire">
+          <option value="">None</option>
+          {% if empires|length == 1 %}
+            {% for realm_name, empire in empires.iteritems() %}
+              <option value="{{realm_name}}:{{empire.key}}">{{empire.display_name}}</option>
+            {% endfor %}
+          {% else %}
+            {% for realm_name, empire in empires.iteritems() %}
+              <option value="{{realm_name}}:{{empire.key}}">{{realm_name}}: {{empire.display_name}}</option>
+            {% endfor %}
+          {% endif %}
+        </select></div>
+      </div>
+      <hr />
+      <div class="profile-field">
+        <input type="hidden" name="empire_id" id="empire_id">
+        <div><input type="text" name="empire_name" id="empire_name"></div>
+      </div>
+      <div class="profile-field">
+        <div class="input-button"><input type="button" id="associate_empire" value="Associate" /></div>
+      </div>
 
       <h2>Display Preferences</h2>
-      <p>Choose how you'd like to appear to other users on the website.</p>
+      <p>If you don't want to link your account here to your empire, you can select "None" from the list above
+      and choose a display name here.</p>
 
       <div class="profile-field">
         <label for="display_name">Display Name:</label>
@@ -65,7 +90,7 @@
       </div>
 
       <div class="profile-field">
-        <input type="submit" value="Save">
+        <div class="input-button"><input type="submit" value="Save"></div>
       </div>
     </form>
   </section>
@@ -84,6 +109,47 @@
         $("select").val(selectedEmpire).change();
       }
       $("#display_name").val("{{user_profile.display_name}}");
+
+      $("#empire_name").autocomplete({
+        url: "/profile/empire-autocomplete",
+        showResult: function(value, data) {
+          return value;
+        },
+        onItemSelect: function(item) {
+          $("#empire_id").val(item.value+"|"+item.data[0]);
+        },
+        useCache: false
+      });
+
+      $("#associate_empire").click(function(evnt) {
+        evnt.preventDefault();
+        var value = $("#empire_id").val().split("|");
+        if (!value || value.length != 2) {
+          alert("You need to choose a empire name from the autocomplete list.");
+          return;
+        }
+        if (confirm("We need to confirm you own the empire "+value[0]+", which we will do by sending an "+
+                    "email to the email address associated with that empire. Are you sure you want to continue?")) {
+          $("#associate_empire").prop("disabled", true).parent().addClass("disabled");
+          $.ajax({
+            url: "/profile/empire-associate",
+            type: "POST",
+            data: {empire_id: value[1]},
+            success: function(data, status, xhr) {
+              $("#associate_empire").prop("disabled", false).parent().removeClass("disabled");
+              if (data.substr(0, 4) == "ERR:") {
+                alert("The follow error occurred and your profile could not be associated with the given empire.\r\n\r\n"+data.substr(4));
+              } else {
+                alert("An email has been sent, please check your inbox and click the link to complete the process.");
+              }
+            },
+            error: function() {
+              $("#associate_empire").prop("disabled", false).parent().removeClass("disabled");
+                alert("An unexpected error occurred and your profile could not be associated with the given empire. Please try again later.");
+            }
+          });
+        } 
+      });
     });
   </script>
 {% endblock %}

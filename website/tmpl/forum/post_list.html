@@ -21,7 +21,7 @@
 
     <h1>{{forum_thread.subject}}</h1>
   {% for post in posts %}
-    <article class="single-post">
+    <article class="single-post" data-postid="{{post.key()}}">
       <img src="{{profiles[post.user.user_id()]|profile_shield}}" class="poster-shield" width="64" height="64" alt="Shield" />
       <header>
         <span class="author"><a rel="author" href="/">{{profiles[post.user.user_id()].display_name}}</a></span>
@@ -31,7 +31,7 @@
           <a href="/forum/{{forum.slug}}/{{forum_thread.slug}}/posts/{{post.key()}}/delete" class="button">Delete</a>
           <a href="/forum/{{forum.slug}}/{{forum_thread.slug}}/posts/{{post.key()}}" class="button">Edit</a>
         {%- endif %}
-          <a href="" class="button">Quote</a>
+          <a href="javascript:quote(&quot;{{post.key()}}&quot;);" class="button">Quote</a>
         </span>
       </header>
       <div class="content">
@@ -84,6 +84,13 @@
             return "You have unsaved changes.";
           }
         });
+
+        window.quote = function(postID) {
+          var $article = $("article[data-postid="+postID+"]");
+          var $postContent = $article.find("div.content");
+          var $author = $article.find("span.author");
+          editor.setData("<blockquote><p><em><strong>"+$author.html()+"</strong> said,</em></p>"+$postContent.html()+"</blockquote><p></p>");
+        }
       });
     </script>
   </section>

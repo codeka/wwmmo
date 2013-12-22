@@ -200,6 +200,10 @@ nav.breadcrumbs li {
   margin-left: 4pt;
 }
 
+/*
+ * War Worlds-style buttons.
+ */
+
 a.button {
   display: inline-block;
   position: relative;
@@ -235,9 +239,8 @@ a.button.disabled:before {
   background-position: bottom left;
 }
 
-
 div.input-button input {
-  display: inline-block;
+  display: block;
   position: relative;
   background: url(/img/button.png) no-repeat top right;
   height: 20px;
@@ -246,7 +249,7 @@ div.input-button input {
   font-size: 14px;
   line-height: 20px;
   border: 0;
-  margin-top: -2px; /* ??? */
+  padding: 1px 16px 1px 8px;
 }
 
 div.input-button {
@@ -254,6 +257,7 @@ div.input-button {
   background: url(/img/button.png) no-repeat top left;
   height: 20px;
   padding-left: 8px;
+  width: 20px;
 }
 
 a.button:hover {
@@ -262,9 +266,60 @@ a.button:hover {
 a.button:hover:before {
   background-position: center left;
 }
+div.input-button:hover {
+  background-position: center left;
+}
+div.input-button:hover input {
+  background-position: center right;
+}
+
 a.button.disabled {
   background-position: bottom right;
 }
 a.button.disabled:before {
   background-position: bottom left;
+}
+div.input-button.disabled {
+  background-position: bottom left;
+}
+
+div.input-button.disabled input {
+  background-position: bottom right;
+  color: #aaa;
+}
+
+/*
+ * autocomplete
+ */
+.acResults {
+        padding: 0px;
+        border: 1px solid WindowFrame;
+        background-color: Window;
+        overflow: hidden;
+}
+
+.acResults ul {
+        margin: 0px;
+        padding: 0px;
+        list-style-position: outside;
+        list-style: none;        
+}
+
+.acResults ul li {
+        margin: 0px;
+        padding: 2px 5px;
+        cursor: pointer;
+        display: block;
+        font: menu;
+        font-size: 12px;
+        overflow: hidden;
+}
+
+.acLoading {
+        background : url('/img/spinner.gif') right center no-repeat;
+}
+
+.acSelect {
+        background-color: Highlight;
+        color: HighlightText;
 }

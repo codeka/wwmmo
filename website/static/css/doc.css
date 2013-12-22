@@ -14,6 +14,7 @@ header#page-header nav.doc-userinfo a {
   color: #99f;
 }
 
+
 /* ------------------------------------------------------------------
  * Page Editor
  */
@@ -88,6 +89,10 @@ section.delete-content input[type=submit] {
 /* ------------------------------------------------------------------
  * Page "view"
  */
+
+section.content h1 {
+  margin: 0;
+}
 
 section.view-content {
   position: relative;

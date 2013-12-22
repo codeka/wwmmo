@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.PixelFormat;
+import android.graphics.Point;
 import android.hardware.Sensor;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
@@ -11,7 +12,6 @@ import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.view.Display;
 import android.view.Gravity;
-import android.view.Surface;
 import android.view.WindowManager;
 import au.com.codeka.warworlds.ctrl.DebugView;
 import au.com.codeka.warworlds.model.PurchaseManager;
@@ -100,10 +100,8 @@ public class BaseActivity extends FragmentActivity {
     /** Helper function to determine whether we're in portrait orientation or not. */
     protected boolean isPortrait() {
         Display display = ((WindowManager) getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
-        int rotation = display.getRotation();
-        if (rotation == Surface.ROTATION_0 || rotation == Surface.ROTATION_180) {
-            return true;
-        }
-        return false;
+        Point pt = new Point();
+        display.getSize(pt);
+        return pt.y > pt.x;
     }
 }

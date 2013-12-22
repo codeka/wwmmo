@@ -38,6 +38,7 @@ class Empire(db.Model):
   display_name = db.StringProperty()
   user_email = db.StringProperty()
   empire_json = db.TextProperty()
+  name_search = db.StringListProperty()
 
   @staticmethod
   def Save(realm_name, empire):
@@ -51,7 +52,21 @@ class Empire(db.Model):
       empire_mdl.display_name = empire["display_name"].strip()
       empire_mdl.user_email = empire["email"]
       empire_mdl.empire_json = json.dumps(empire)
+
+    empire_mdl.name_search = []
+    for substr in empire["display_name"].split():
+      empire_mdl.name_search.append(substr.lower().strip())
+
     empire_mdl.put()
+
+
+class EmpireAssociateRequest(db.Model):
+  """Represents a request to associate a profile with a empire."""
+  empire_id = db.IntegerProperty()
+  realm_name = db.StringProperty()
+  profile = db.ReferenceProperty(Profile)
+  cookie = db.StringProperty()
+  request_date = db.DateTimeProperty()
 
 
 class Alliance(db.Model):

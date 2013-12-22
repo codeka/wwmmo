@@ -1,0 +1,32 @@
+/*
+ * This CSS is included in the WYSIWYG editor. We copy some of the styles from style.css, to make the editor
+ * look basically the same as the rest of the site.
+ */
+
+body {
+  font-family: georgia, serif;
+  font-size: 12pt;
+  color: #222;
+}
+
+h1 { font-family: Quando, serif; font-size: 16pt; font-weight: bold; margin-top: 1em; }
+h2 { font-family: Quando, serif; font-size: 14pt; font-weight: bold; margin-top: 1em; }
+h3 { font-family: Quando, serif; font-size: 12pt; font-weight: bold; font-style: italic; margin-top: 1em; }
+
+ul {
+  list-style-type: disc;
+  margin: 1em 0 1em 2em;
+}
+ol {
+  margin-left: 2em;
+  margin: 1em 0 1em 2em;
+}
+li {
+  line-height: 1.4;
+}
+
+blockquote {
+  margin-left: 2em;
+  padding-left: 1em;
+  border-left: solid 2pt #6f6;
+}

@@ -63,17 +63,21 @@
     function drawChart() {
       var dataTable = new google.visualization.DataTable();
       dataTable.addColumn("date", "Date");
-      dataTable.addColumn("number", "Total Reports");
+      dataTable.addColumn("number", "Client Errors");
+      dataTable.addColumn("number", "Server Errors");
       dataTable.addColumn("number", "Empires Reporting");
       dataTable.addRows([
       {% for entry in error_histogram %}
-        [new Date({{entry.year}}, {{entry.month}}+1, {{entry.day}}), {{entry.num_reports}}, {{entry.num_empires_reporting}}],
+        [new Date({{entry.year}}, {{entry.month}}+1, {{entry.day}}), {{entry.num_client_errors}}, {{entry.num_server_errors}}, {{entry.num_empires_reporting}}],
       {% endfor %}
       ]);
 
       var dataView = new google.visualization.DataView(dataTable);
-
+      var width = $("#histogram").width();
+      var height = 150;
       var options = {
+        "chartArea": {left: 40, top: 10, width: width - 250, height: height - 40},
+        "backgroundColor": {fill: "transparent"}
       };
 
       var chart = new google.visualization.LineChart(document.getElementById("histogram"));
@@ -89,6 +93,12 @@
       <dd><input type="text" name="empire" value="{{curr_empire}}">
       <dt>Search:
       <dd><input type="text" name="q" value="{{curr_q}}">
+      <dt>Source:
+      <dd><select name="source">
+        <option value="both">Both</option>
+        <option value="server"{% if curr_source|equal:"server" %} selected{% endif %}>Server</option>
+        <option value="client"{% if curr_source|equal:"client" %} selected{% endif %}>Client</option>
+      </select>
     </dl>
   </form>
   <table border="1" cellpadding="4" cellspacing="0" style="width: 100%;">
@@ -101,7 +111,13 @@
           document.write(dt.toLocaleString());
         })();
       </script></td>
-      <td>[<a href="mailto:{{error_report.empire_email}}">{{error_report.empire_id}}</a>] {{error_report.empire_name}}</td>
+      <td>
+        {% if error_report.empire_id %}
+          [<a href="mailto:{{error_report.empire_email}}">{{error_report.empire_id}}</a>] {{error_report.empire_name}}
+        {% else %}
+          <em>Server</em>
+        {% endif %}
+      </td>
       <td>{{error_report.app_version}}</td>
       <td>{{error_report.context}}</td>
       <td>{{error_report.exception_class}}</td>
@@ -137,23 +153,25 @@
       <td colspan="6">
         <div class="details-extra">
           <dl>
-            <dt>Android:
-            <dd>{{error_report.android_version}}
-            <dt>Phone:
-            <dd>{{error_report.phone_model}}
             <dt>Heap size:
             <dd>{{error_report.heap_size|number}}
             <dt>Allocated:
             <dd>{{error_report.heap_allocated|number}}
             <dt>Free:
             <dd>{{error_report.heap_free|number}}
-            <dt>Run time:
-            <dd>{{error_report.total_run_time|number}} ms
-            <dt>FG time:
-            <dd>{{error_report.foreground_run_time|number}} ms
+            {% if error_report.empire_id %}
+              <dt>Android:
+              <dd>{{error_report.android_version}}
+              <dt>Phone:
+              <dd>{{error_report.phone_model}}
+              <dt>Run time:
+              <dd>{{error_report.total_run_time|number}} ms
+              <dt>FG time:
+              <dd>{{error_report.foreground_run_time|number}} ms
+            {% endif %}
           </dl>
         </div>
-        <div class="stack-trace">{{error_report.stack_trace}}</div>
+        <div class="stack-trace">{% if error_report.log_buffer %}{{error_report.log_buffer|escape}}{% else %}{{error_report.stack_trace|escape}}{% endif %}</div>
         <div style="clear: both;"></div>
       </td>
     </tr>

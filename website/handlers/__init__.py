@@ -1,5 +1,4 @@
 
-import jinja2
 import json
 import logging
 import os
@@ -11,74 +10,11 @@ from google.appengine.api import memcache
 from google.appengine.api import users
 
 from ctrl import profile as profile_ctrl
+import ctrl.tmpl
 
 # This value gets incremented every time we deploy so that we can cache bust
 # our static resources (css, js, etc)
-RESOURCE_VERSION = 16
-
-
-jinja = jinja2.Environment(loader=jinja2.FileSystemLoader(os.path.dirname(__file__)+'/../tmpl'))
-
-
-def _filter_post_id(post):
-  return post.key().id()
-jinja.filters['post_id'] = _filter_post_id
-
-
-def _filter_post_tags(post):
-  return ', '.join(post.tags)
-jinja.filters['post_tags'] = _filter_post_tags
-
-
-def _filter_post_url(post):
-  return '%04d/%02d/%s' % (post.posted.year, post.posted.month, post.slug)
-jinja.filters['post_url'] = _filter_post_url
-
-
-def _filter_post_full_url(post):
-  return 'http://'+os.environ.get('HTTP_HOST')+'/blog/'+_filter_post_url(post)
-jinja.filters['post_full_url'] = _filter_post_full_url
-
-
-def _filter_post_date(post):
-  return post.posted.strftime('%d %b %Y')
-jinja.filters['post_date'] = _filter_post_date
-
-
-def _filter_post_date_time(post):
-  return post.posted.strftime('%d %b %Y %H:%M')
-jinja.filters['post_date_time'] = _filter_post_date_time
-
-
-def _filter_post_date_rss(post):
-  return post.posted.strftime('%a, %d %b %Y %H:%M:%S GMT')
-jinja.filters['post_date_rss'] = _filter_post_date_rss
-
-
-def _filter_post_date_std(post):
-  return post.posted.strftime('%Y-%m-%d %H:%M:%S')
-jinja.filters['post_date_std'] = _filter_post_date_std
-
-
-def _filter_post_extract(post):
-  return post.html[0:500]+'...'
-jinja.filters['post_extract'] = _filter_post_extract
-
-
-def _filter_profile_shield(profile):
-  if not profile:
-    return "/img/blank.png"
-  if profile.display_name == "Dean": # TODO: better than this!!
-    return "/img/hal-64.png"
-  if not profile.empire_id:
-    return "/img/blank.png"
-  return "http://localhost:8080/realms/beta/empires/"+str(profile.empire_id)+"/shield?final=1&size=64"
-jinja.filters['profile_shield'] = _filter_profile_shield
-
-
-def _filter_dump_json(obj):
-  return json.dumps(obj)
-jinja.filters['dump_json'] = _filter_dump_json
+RESOURCE_VERSION = 22
 
 
 class BaseHandler(webapp.RequestHandler):
@@ -127,8 +63,13 @@ class BaseHandler(webapp.RequestHandler):
       args['user_profile'] = None
 
 
-    tmpl = jinja.get_template(tmplName)
-    self.response.out.write(tmpl.render(args))
+    if tmplName[-4:] == ".txt":
+      self.response.content_type = "text/plain"
+    else:
+      self.response.content_type = "text/html"
+
+    tmpl = ctrl.tmpl.getTemplate(tmplName)
+    self.response.out.write(ctrl.tmpl.render(tmpl, args))
 
   def error(self, code):
     super(BaseHandler, self).error(code)

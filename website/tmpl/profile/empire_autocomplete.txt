@@ -1,0 +1,3 @@
+{% for empire in empires -%}
+{{empire.display_name}} ({{empire.realm_name}} realm)|{{empire.realm_name}}:{{empire.key}}
+{% endfor %}

@@ -2,8 +2,6 @@
 
 import java.util.Locale;
 
-import com.google.protobuf.InvalidProtocolBufferException;
-
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.DialogInterface;
@@ -22,13 +20,12 @@ import au.com.codeka.warworlds.StyledDialog;
 import au.com.codeka.warworlds.api.ApiClient;
 import au.com.codeka.warworlds.api.ApiException;
 import au.com.codeka.warworlds.model.BuildRequest;
-import au.com.codeka.warworlds.model.Colony;
 import au.com.codeka.warworlds.model.DesignManager;
 import au.com.codeka.warworlds.model.EmpireManager;
-import au.com.codeka.warworlds.model.Planet;
-import au.com.codeka.warworlds.model.Star;
 import au.com.codeka.warworlds.model.StarManager;
 import au.com.codeka.warworlds.model.StarSummary;
+
+import com.google.protobuf.InvalidProtocolBufferException;
 
 public class BuildAccelerateDialog extends DialogFragment {
     private BuildRequest mBuildRequest;

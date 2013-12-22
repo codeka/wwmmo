@@ -8,6 +8,13 @@
 
 {% block maincontent %}
   <section class="content">
+    <nav class="breadcrumbs">
+      <ul>
+        <li><a href="/">War Worlds</a>
+        <li><span>Blog</span>
+      </ul>
+    </nav>
+
     {% for post in posts %}
       {{ pm.post_body(post, True) }}
       <div class="post-comment-count">

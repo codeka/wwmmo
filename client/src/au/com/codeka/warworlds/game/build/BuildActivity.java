@@ -417,7 +417,7 @@ public class BuildActivity extends BaseActivity implements StarManager.StarFetch
                 for (Design design : designs.values()) {
                     mEntries.add(new ItemEntry((ShipDesign) design));
                 }
-/*
+
                 mEntries.add(new ItemEntry("Existing Ships"));
                 for (Fleet fleet : fleets) {
                     if (fleet.getState() != Fleet.State.IDLE) {
@@ -438,7 +438,7 @@ public class BuildActivity extends BaseActivity implements StarManager.StarFetch
                     }
                     mEntries.add(new ItemEntry(buildRequest));
                 }
-*/
+
                 notifyDataSetChanged();
             }
 

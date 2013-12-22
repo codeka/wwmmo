@@ -13,12 +13,6 @@ import ctrl.profile
 import model.forum
 import handlers
 
-
-def _filter_forum_post_author(post):
-  return post.user.email()
-handlers.jinja.filters['forum_post_author'] = _filter_forum_post_author
-
-
 class ForumPage(handlers.BaseHandler):
   pass
 
@@ -71,11 +65,15 @@ class ThreadListPage(ForumPage):
     data["page_no"] = page_no
 
     threads = ctrl.forum.getThreads(forum, page_no - 1, 25)
-    if not threads and page_no > 0:
+    if not threads and page_no > 1:
       self.redirect('/forum/%s?page=%d' % (forum.slug, page_no-1))
     data["threads"] = threads
 
-    data["total_threads"] = ctrl.forum.getForumThreadPostCounts()[forum.slug]['threads']
+    thread_post_counts = ctrl.forum.getForumThreadPostCounts()
+    if forum.slug in thread_post_counts:
+      data["total_threads"] = thread_post_counts[forum.slug]['threads']
+    else:
+      data["total_threads"] = 0
     data["total_pages"] = (data["total_threads"] / 25) + 1
     data["post_counts"] = ctrl.forum.getThreadPostCounts(threads)
     data["first_posts"] = ctrl.forum.getFirstPostsByForumThread(threads)
@@ -205,7 +203,8 @@ class EditPostPage(ForumPage):
       forum_thread.put()
       ctrl.forum.incrCount("forum:%s:threads" % (forum.slug))
 
-    content = self.request.POST.get("post-content")
+    content = ctrl.sanitizeHtml(self.request.POST.get("post-content"))
+    #content = self.request.POST.get("post-content")
     if post_id:
       forum_post = model.forum.ForumPost.get(post_id)
       forum_post.content = content

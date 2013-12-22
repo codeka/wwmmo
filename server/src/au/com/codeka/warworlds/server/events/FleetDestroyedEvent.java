@@ -11,6 +11,7 @@ import au.com.codeka.common.model.BaseFleet;
 import au.com.codeka.common.model.Simulation;
 import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.server.Event;
+import au.com.codeka.warworlds.server.RequestContext;
 import au.com.codeka.warworlds.server.ctrl.RealmController;
 import au.com.codeka.warworlds.server.ctrl.SituationReportController;
 import au.com.codeka.warworlds.server.ctrl.StarController;
@@ -37,6 +38,8 @@ public class FleetDestroyedEvent extends Event {
             while (rs.next()) {
                 int fleetID = rs.getInt(1);
                 Star star = new StarController().getStar(rs.getInt(2));
+
+                RequestContext.i.setContextName("event: FleetDestroyedEvent fleet.id="+fleetID);
 
                 try {
                     processFleetDestroyed(star, fleetID);

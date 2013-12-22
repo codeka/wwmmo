@@ -84554,6 +84554,21 @@ public final class Messages {
      * <code>optional int64 foreground_run_time = 15;</code>
      */
     long getForegroundRunTime();
+
+    // optional string log_output = 16;
+    /**
+     * <code>optional string log_output = 16;</code>
+     */
+    boolean hasLogOutput();
+    /**
+     * <code>optional string log_output = 16;</code>
+     */
+    java.lang.String getLogOutput();
+    /**
+     * <code>optional string log_output = 16;</code>
+     */
+    com.google.protobuf.ByteString
+        getLogOutputBytes();
   }
   /**
    * Protobuf type {@code au.com.codeka.common.protobuf.ErrorReport}
@@ -84679,6 +84694,11 @@ public final class Messages {
             case 120: {
               bitField0_ |= 0x00004000;
               foregroundRunTime_ = input.readInt64();
+              break;
+            }
+            case 130: {
+              bitField0_ |= 0x00008000;
+              logOutput_ = input.readBytes();
               break;
             }
           }
@@ -85177,6 +85197,49 @@ public final class Messages {
       return foregroundRunTime_;
     }
 
+    // optional string log_output = 16;
+    public static final int LOG_OUTPUT_FIELD_NUMBER = 16;
+    private java.lang.Object logOutput_;
+    /**
+     * <code>optional string log_output = 16;</code>
+     */
+    public boolean hasLogOutput() {
+      return ((bitField0_ & 0x00008000) == 0x00008000);
+    }
+    /**
+     * <code>optional string log_output = 16;</code>
+     */
+    public java.lang.String getLogOutput() {
+      java.lang.Object ref = logOutput_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        if (bs.isValidUtf8()) {
+          logOutput_ = s;
+        }
+        return s;
+      }
+    }
+    /**
+     * <code>optional string log_output = 16;</code>
+     */
+    public com.google.protobuf.ByteString
+        getLogOutputBytes() {
+      java.lang.Object ref = logOutput_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        logOutput_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
     private void initFields() {
       androidVersion_ = "";
       phoneModel_ = "";
@@ -85193,6 +85256,7 @@ public final class Messages {
       heapFree_ = 0L;
       totalRunTime_ = 0L;
       foregroundRunTime_ = 0L;
+      logOutput_ = "";
     }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
@@ -85250,6 +85314,9 @@ public final class Messages {
       }
       if (((bitField0_ & 0x00004000) == 0x00004000)) {
         output.writeInt64(15, foregroundRunTime_);
+      }
+      if (((bitField0_ & 0x00008000) == 0x00008000)) {
+        output.writeBytes(16, getLogOutputBytes());
       }
       getUnknownFields().writeTo(output);
     }
@@ -85319,6 +85386,10 @@ public final class Messages {
       if (((bitField0_ & 0x00004000) == 0x00004000)) {
         size += com.google.protobuf.CodedOutputStream
           .computeInt64Size(15, foregroundRunTime_);
+      }
+      if (((bitField0_ & 0x00008000) == 0x00008000)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBytesSize(16, getLogOutputBytes());
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
@@ -85466,6 +85537,8 @@ public final class Messages {
         bitField0_ = (bitField0_ & ~0x00002000);
         foregroundRunTime_ = 0L;
         bitField0_ = (bitField0_ & ~0x00004000);
+        logOutput_ = "";
+        bitField0_ = (bitField0_ & ~0x00008000);
         return this;
       }
 
@@ -85554,6 +85627,10 @@ public final class Messages {
           to_bitField0_ |= 0x00004000;
         }
         result.foregroundRunTime_ = foregroundRunTime_;
+        if (((from_bitField0_ & 0x00008000) == 0x00008000)) {
+          to_bitField0_ |= 0x00008000;
+        }
+        result.logOutput_ = logOutput_;
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
@@ -85630,6 +85707,11 @@ public final class Messages {
         }
         if (other.hasForegroundRunTime()) {
           setForegroundRunTime(other.getForegroundRunTime());
+        }
+        if (other.hasLogOutput()) {
+          bitField0_ |= 0x00008000;
+          logOutput_ = other.logOutput_;
+          onChanged();
         }
         this.mergeUnknownFields(other.getUnknownFields());
         return this;
@@ -86477,6 +86559,80 @@ public final class Messages {
       public Builder clearForegroundRunTime() {
         bitField0_ = (bitField0_ & ~0x00004000);
         foregroundRunTime_ = 0L;
+        onChanged();
+        return this;
+      }
+
+      // optional string log_output = 16;
+      private java.lang.Object logOutput_ = "";
+      /**
+       * <code>optional string log_output = 16;</code>
+       */
+      public boolean hasLogOutput() {
+        return ((bitField0_ & 0x00008000) == 0x00008000);
+      }
+      /**
+       * <code>optional string log_output = 16;</code>
+       */
+      public java.lang.String getLogOutput() {
+        java.lang.Object ref = logOutput_;
+        if (!(ref instanceof java.lang.String)) {
+          java.lang.String s = ((com.google.protobuf.ByteString) ref)
+              .toStringUtf8();
+          logOutput_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>optional string log_output = 16;</code>
+       */
+      public com.google.protobuf.ByteString
+          getLogOutputBytes() {
+        java.lang.Object ref = logOutput_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          logOutput_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>optional string log_output = 16;</code>
+       */
+      public Builder setLogOutput(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00008000;
+        logOutput_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional string log_output = 16;</code>
+       */
+      public Builder clearLogOutput() {
+        bitField0_ = (bitField0_ & ~0x00008000);
+        logOutput_ = getDefaultInstance().getLogOutput();
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional string log_output = 16;</code>
+       */
+      public Builder setLogOutputBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00008000;
+        logOutput_ = value;
         onChanged();
         return this;
       }
@@ -87900,7 +88056,7 @@ public final class Messages {
       "RequestVote\022\n\n\002id\030\001 \001(\005\022\023\n\013alliance_id\030\002" +
       " \001(\005\022\033\n\023alliance_request_id\030\003 \001(\005\022\021\n\temp" +
       "ire_id\030\004 \001(\005\022\r\n\005votes\030\005 \001(\005\022\014\n\004date\030\006 \001(" +
-      "\003\"\321\002\n\013ErrorReport\022\027\n\017android_version\030\001 \001" +
+      "\003\"\345\002\n\013ErrorReport\022\027\n\017android_version\030\001 \001" +
       "(\t\022\023\n\013phone_model\030\002 \001(\t\022\024\n\014package_name\030" +
       "\003 \001(\t\022\023\n\013app_version\030\004 \001(\t\022\023\n\013stack_trac" +
       "e\030\005 \001(\t\022\017\n\007message\030\006 \001(\t\022\023\n\013report_time\030" +
@@ -87908,15 +88064,15 @@ public final class Messages {
       "\t\022\027\n\017exception_class\030\n \001(\t\022\021\n\theap_size\030" +
       "\013 \001(\003\022\026\n\016heap_allocated\030\014 \001(\003\022\021\n\theap_fr" +
       "ee\030\r \001(\003\022\026\n\016total_run_time\030\016 \001(\003\022\033\n\023fore" +
-      "ground_run_time\030\017 \001(\003\"K\n\014ErrorReports\022;\n" +
-      "\007reports\030\001 \003(\0132*.au.com.codeka.common.pr" +
-      "otobuf.ErrorReport*\344\001\n\025SituationReportFi" +
-      "lter\022\013\n\007ShowAll\020\000\022\020\n\014MoveComplete\020\001\022\024\n\020B" +
-      "uildCompleteAny\020\002\022\021\n\rFleetAttacked\020\003\022\022\n\016" +
-      "FleetDestroyed\020\004\022\023\n\017FleetVictorious\020\005\022\022\n" +
-      "\016ColonyAttacked\020\006\022\023\n\017ColonyDestroyed\020\007\022\026",
-      "\n\022BuildCompleteShips\020\010\022\031\n\025BuildCompleteB" +
-      "uilding\020\t"
+      "ground_run_time\030\017 \001(\003\022\022\n\nlog_output\030\020 \001(" +
+      "\t\"K\n\014ErrorReports\022;\n\007reports\030\001 \003(\0132*.au." +
+      "com.codeka.common.protobuf.ErrorReport*\344" +
+      "\001\n\025SituationReportFilter\022\013\n\007ShowAll\020\000\022\020\n" +
+      "\014MoveComplete\020\001\022\024\n\020BuildCompleteAny\020\002\022\021\n" +
+      "\rFleetAttacked\020\003\022\022\n\016FleetDestroyed\020\004\022\023\n\017" +
+      "FleetVictorious\020\005\022\022\n\016ColonyAttacked\020\006\022\023\n",
+      "\017ColonyDestroyed\020\007\022\026\n\022BuildCompleteShips" +
+      "\020\010\022\031\n\025BuildCompleteBuilding\020\t"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
       new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
@@ -88372,7 +88528,7 @@ public final class Messages {
           internal_static_au_com_codeka_common_protobuf_ErrorReport_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_au_com_codeka_common_protobuf_ErrorReport_descriptor,
-              new java.lang.String[] { "AndroidVersion", "PhoneModel", "PackageName", "AppVersion", "StackTrace", "Message", "ReportTime", "EmpireId", "Context", "ExceptionClass", "HeapSize", "HeapAllocated", "HeapFree", "TotalRunTime", "ForegroundRunTime", });
+              new java.lang.String[] { "AndroidVersion", "PhoneModel", "PackageName", "AppVersion", "StackTrace", "Message", "ReportTime", "EmpireId", "Context", "ExceptionClass", "HeapSize", "HeapAllocated", "HeapFree", "TotalRunTime", "ForegroundRunTime", "LogOutput", });
           internal_static_au_com_codeka_common_protobuf_ErrorReports_descriptor =
             getDescriptor().getMessageTypes().get(61);
           internal_static_au_com_codeka_common_protobuf_ErrorReports_fieldAccessorTable = new

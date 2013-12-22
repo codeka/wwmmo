@@ -30,4 +30,7 @@ CKEDITOR.editorConfig = function( config ) {
 
 	// Let's have it basic on dialogs as well.
 	config.removeDialogTabs = 'link:advanced';
+
+    // We'll use our custom CSS, so that it looks similar to the rest of the site.
+    config.contentsCss = '/css/wysiwyg_editor.css';
 };

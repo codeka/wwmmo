@@ -23,6 +23,7 @@ public class Runner {
             basePath = HtmlPageHandler.class.getClassLoader().getResource("").getPath();
         }
 
+        ErrorReportingLoggingHandler.setup();
         DesignManager.setup(basePath);
         NameGenerator.setup(basePath);
 

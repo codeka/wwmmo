@@ -1,0 +1,36 @@
+{% extends "skeleton.html" %}
+{% import "forum/macros.html" as m %}
+
+{% block header %}
+  {{m.html_header(resource_version)}}
+  <script src="/ckeditor/v{{resource_version}}/ckeditor.js"></script>
+{% endblock %}
+{% block pagetitle %}Forum &bull; {{forum.name}} &bull; Delete Post{% endblock %}
+{% block title %}Forum &bull; {{forum.name}} &bull; Delete Post{% endblock %}
+
+{% block maincontent %}
+  <section class="content">
+    <nav class="breadcrumbs">
+      <ul>
+        <li><a href="/">War Worlds</a>
+        <li><a href="/forum">Forums</a>
+        <li><a href="/forum/{{forum.slug}}">{{forum.name}}</a>
+        <li>Delete Post</li>
+      </ul>
+    </nav>
+
+    <form method="POST">
+      <fieldset>
+        <h1>Delete post in {{forum.name}}</h1>
+        <p>Are you sure you want to delete this post? This action is <strong>irreversible</strong>!</p>
+        <div class="forum-field forum-field-autoheight">
+          <label for="post-content">Message:</label>
+          <div class="read-only">{{post.content}}</div>
+        </div>
+        <div class="forum-field forum-field-submit">
+          <div class="input-button"><input type="submit" value="Delete"></div>
+        </div>
+      </fieldset>
+    </form>
+  </section>
+{% endblock %}

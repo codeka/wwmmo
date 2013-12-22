@@ -24,7 +24,11 @@
 
       var dataView = new google.visualization.DataView(dataTable);
 
+      var width = $("#n-day-actives").width();
+      var height = $("#n-day-actives").height();
       var options = {
+        "chartArea": {left: 50, top: 10, width: width - 230, height: height - 40},
+        "backgroundColor": {fill: "transparent"}
       };
 
       var chart = new google.visualization.LineChart(document.getElementById("n-day-actives"));

@@ -15,6 +15,7 @@ import au.com.codeka.common.model.ShipEffect;
 import au.com.codeka.common.model.Simulation;
 import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.server.Event;
+import au.com.codeka.warworlds.server.RequestContext;
 import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.ctrl.RealmController;
 import au.com.codeka.warworlds.server.ctrl.SituationReportController;
@@ -44,6 +45,8 @@ public class FleetMoveCompleteEvent extends Event {
                 int fleetID = rs.getInt(1);
                 int srcStarID = rs.getInt(2);
                 int destStarID = rs.getInt(3);
+
+                RequestContext.i.setContextName("event: FleetMoveCompleteEvent fleet.id="+fleetID);
 
                 Star srcStar = null;
                 Star destStar = null;

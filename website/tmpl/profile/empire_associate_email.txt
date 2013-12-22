@@ -1,0 +1,10 @@
+Hi {{empire.display_name}},
+
+A request has been made on http://www.war-worlds.com/ to associate your empire with the email address
+{{request_email}}. To complete the association, click the link below:
+
+http://www.war-worlds.com/profile/empire-associate?cookie={{cookie}}
+
+If you did not initiate this request, you can just ignore this email.
+
+Dean (dean@war-worlds.com).

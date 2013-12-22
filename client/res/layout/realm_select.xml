@@ -46,7 +46,6 @@
                 android:layout_weight="1"
                 android:layout_height="40dp"
                 android:layout_marginTop="5dp"
-                android:layout_marginLeft="@dimen/tablet_margin_5dp"
                 android:layout_marginRight="5dp"
                 android:layout_marginBottom="5dp"
                 android:text="Log Out" />
@@ -57,7 +56,6 @@
                 android:layout_height="40dp"
                 android:layout_marginTop="5dp"
                 android:layout_marginLeft="5dp"
-                android:layout_marginRight="@dimen/tablet_margin_5dp"
                 android:layout_marginBottom="5dp"
                 android:text="Start" />
     </LinearLayout>

@@ -5,6 +5,8 @@ import re
 
 from google.appengine.api import memcache
 
+from bs4 import BeautifulSoup, Comment
+
 
 def findCursor(query, keyname, page_no, page_size):
   """Finds the cursor to use for fetching results from the given page.
@@ -53,3 +55,40 @@ def makeSlug(tagName):
 def isDevelopmentServer():
   """Returns True if we're running on the development server."""
   return os.environ["SERVER_SOFTWARE"].startswith("Development")
+
+
+
+DEFAULT_ALLOWED_TAGS = {
+  'strong': [], 'em': [], 'h1': [], 'h2': [], 'h3': [], 'h4': [], 'h5': [], 'h6': [],
+  'p': ['style'], 'ol': [], 'ul': [], 'li': [], 'br': [], 'blockquote': [],
+  'a': ['href', 'title', 'alt', 'class'],
+  'img': ['src', 'class']
+}
+
+
+def sanitizeHtml(html, allowed_tags=None):
+  if not allowed_tags:
+    allowed_tags = DEFAULT_ALLOWED_TAGS
+  soup = BeautifulSoup(html)
+  comments = soup.findAll(text=lambda text:isinstance(text, Comment))
+  [comment.extract() for comment in comments]
+  # Some markup can be crafted to slip through BeautifulSoup's parser, so
+  # we run this repeatedly until it generates the same output twice.
+  newoutput = soup.renderContents()
+  while 1:
+    oldoutput = newoutput
+    soup = BeautifulSoup(newoutput)
+    for tag in soup.findAll(True):
+      if tag.name not in allowed_tags:
+        tag.hidden = True
+      else:
+        attrs = {}
+        for attr, value in tag.attrs.items():
+          if attr in allowed_tags[tag.name]:
+            attrs[attr] = value
+          if attr[:5] == 'data-':
+            attrs[attr] = value
+    newoutput = soup.renderContents()
+    if oldoutput == newoutput:
+      break
+  return newoutput.decode('utf-8')

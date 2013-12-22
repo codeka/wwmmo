@@ -27,7 +27,6 @@ import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.Gravity;
-import android.view.Surface;
 import android.view.Window;
 import android.view.WindowManager;
 import au.com.codeka.warworlds.ctrl.DebugView;
@@ -181,11 +180,9 @@ public abstract class BaseGlActivity extends SimpleLayoutGameActivity {
     /** Helper function to determine whether we're in portrait orientation or not. */
     protected boolean isPortrait() {
         Display display = ((WindowManager) getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
-        int rotation = display.getRotation();
-        if (rotation == Surface.ROTATION_0 || rotation == Surface.ROTATION_180) {
-            return true;
-        }
-        return false;
+        Point pt = new Point();
+        display.getSize(pt);
+        return pt.y > pt.x;
     }
 
     /**

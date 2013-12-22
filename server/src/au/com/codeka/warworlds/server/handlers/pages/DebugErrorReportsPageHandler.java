@@ -37,7 +37,7 @@ public class DebugErrorReportsPageHandler extends BasePageHandler {
 
         String sql = "SELECT error_reports.*, empires.name AS empire_name, empires.user_email AS empire_email" +
                     " FROM error_reports" +
-                    " INNER JOIN empires ON error_reports.empire_id = empires.id" +
+                    " LEFT JOIN empires ON error_reports.empire_id = empires.id" +
                     " WHERE 1 = 1";
         if (cursor != 0) {
             sql += " AND report_date < FROM_UNIXTIME("+cursor+")";
@@ -66,6 +66,14 @@ public class DebugErrorReportsPageHandler extends BasePageHandler {
             parameters.add("%"+q+"%");
             parameters.add("%"+q+"%");
         }
+        if (getRequest().getParameter("source") != null && getRequest().getParameter("source").equals("client")) {
+            data.put("curr_source", "client");
+            sql += " AND error_reports.empire_id IS NOT NULL";
+        }
+        if (getRequest().getParameter("source") != null && getRequest().getParameter("source").equals("server")) {
+            data.put("curr_source", "server");
+            sql += " AND error_reports.empire_id IS NULL";
+        }
         sql += " ORDER BY report_date DESC" +
                " LIMIT 50";
         try (SqlStmt stmt = DB.prepare(sql)) {
@@ -83,6 +91,7 @@ public class DebugErrorReportsPageHandler extends BasePageHandler {
                 result.put("android_version", error_report_pb.getAndroidVersion());
                 result.put("phone_model", error_report_pb.getPhoneModel());
                 result.put("app_version", error_report_pb.getAppVersion());
+                result.put("log_buffer", error_report_pb.getLogOutput());
                 result.put("stack_trace", error_report_pb.getStackTrace());
                 result.put("message", error_report_pb.getMessage());
                 result.put("report_time", new DateTime(error_report_pb.getReportTime()));
@@ -107,7 +116,10 @@ public class DebugErrorReportsPageHandler extends BasePageHandler {
 
         // add some data so we can display a histogram of the number of errors we're getting
         ArrayList<TreeMap<String, Object>> histogram = new ArrayList<TreeMap<String, Object>>();
-        sql = "SELECT DATE(report_date) AS date, COUNT(*) AS num_reports, COUNT(DISTINCT empire_id) AS num_empires_reporting" +
+        sql = "SELECT DATE(report_date) AS date," +
+                    " SUM(CASE WHEN empire_id IS NULL THEN 0 ELSE 1 END) AS num_client_errors," +
+                    " SUM(CASE WHEN empire_id IS NULL THEN 1 ELSE 0 END) AS num_server_errors," +
+                    " COUNT(DISTINCT empire_id) AS num_empires_reporting" +
               " FROM error_reports" +
               " GROUP BY DATE(date)" +
               " ORDER BY date DESC" +
@@ -116,8 +128,9 @@ public class DebugErrorReportsPageHandler extends BasePageHandler {
             ResultSet rs = stmt.select();
             while (rs.next()) {
                 Date dt = rs.getDate(1);
-                int numReports = rs.getInt(2);
-                int numEmpiresReporting = rs.getInt(3);
+                int numClientErrors = rs.getInt(2);
+                int numServerErrors = rs.getInt(3);
+                int numEmpiresReporting = rs.getInt(4);
 
                 TreeMap<String, Object> entry = new TreeMap<String, Object>();
                 Calendar c = Calendar.getInstance();
@@ -125,7 +138,8 @@ public class DebugErrorReportsPageHandler extends BasePageHandler {
                 entry.put("year", c.get(Calendar.YEAR));
                 entry.put("month", c.get(Calendar.MONTH) - 1);
                 entry.put("day", c.get(Calendar.DAY_OF_MONTH));
-                entry.put("num_reports", numReports);
+                entry.put("num_client_errors", numClientErrors);
+                entry.put("num_server_errors", numServerErrors);
                 entry.put("num_empires_reporting", numEmpiresReporting);
                 histogram.add(entry);
             }

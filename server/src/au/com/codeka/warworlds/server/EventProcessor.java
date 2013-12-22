@@ -31,7 +31,9 @@ public class EventProcessor {
     private Runnable mThreadRunnable = new Runnable() {
         @Override
         public void run() {
-            threadProc();
+            while (true) {
+                threadProc();
+            }
         }
     };
 

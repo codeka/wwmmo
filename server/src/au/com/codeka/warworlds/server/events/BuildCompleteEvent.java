@@ -12,6 +12,7 @@ import au.com.codeka.common.model.DesignKind;
 import au.com.codeka.common.model.Simulation;
 import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.server.Event;
+import au.com.codeka.warworlds.server.RequestContext;
 import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.ctrl.BuildingController;
 import au.com.codeka.warworlds.server.ctrl.EmpireController;
@@ -47,6 +48,8 @@ public class BuildCompleteEvent extends Event {
             ResultSet rs = stmt.select();
             while (rs.next()) {
                 int id = rs.getInt(1);
+
+                RequestContext.i.setContextName("event: BuildCompleteEvent build_request.id="+id);
 
                 sql = "UPDATE build_requests SET processing = 1 WHERE processing = 0 AND id = ?";
                 try (SqlStmt stmt2 = DB.prepare(sql)) {

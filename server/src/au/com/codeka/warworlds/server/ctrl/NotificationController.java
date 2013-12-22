@@ -198,7 +198,7 @@ public class NotificationController {
                 }
             }
         } catch (IOException e) {
-            throw new RequestException(e);
+            log.error("Error caught sending notification.", e);
         }
     }
 

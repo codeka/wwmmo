@@ -9,7 +9,8 @@ from google.appengine.api import users
 from google.appengine.api import memcache
 
 import handlers
-from ctrl import profile as profile_ctrl
+import ctrl.profile
+import model.profile
 
 
 class BasePage(handlers.BaseHandler):
@@ -26,7 +27,7 @@ class ProfilePage(BasePage):
       return
 
     data = {}
-    data['empires'] = profile_ctrl.getEmpiresForUser(self.user.email())
+    data['empires'] = ctrl.profile.getEmpiresForUser(self.user.email())
 
     self.render("profile/profile_edit.html", data)
 
@@ -39,7 +40,7 @@ class ProfilePage(BasePage):
     display_name = None
     linked_empire = self.request.POST.get("linked_empire")
     if linked_empire:
-      empires = profile_ctrl.getEmpiresForUser(self.user.email())
+      empires = ctrl.profile.getEmpiresForUser(self.user.email())
       realm_name, empire_id = linked_empire.split(':')
       empire_id = int(empire_id)
 
@@ -53,10 +54,39 @@ class ProfilePage(BasePage):
         realm_name = None
     else:
       display_name = self.request.POST.get("display_name")
-    profile_ctrl.saveProfile(self.user.user_id(), realm_name, display_name, empire)
+    ctrl.profile.saveProfile(self.user.user_id(), realm_name, display_name, empire)
 
     self.redirect("/profile")
 
 
-app = webapp.WSGIApplication([("/profile/?", ProfilePage)],
+class EmpireAutocompletePage(BasePage):
+  """This page is used by the "autocomplete" feature for selecting an empire."""
+  def get(self):
+    query = self.request.get("q")
+    empires = ctrl.profile.getEmpiresByName(query.lower().strip())
+
+    self.render("profile/empire_autocomplete.txt", {"empires": empires})
+
+
+class EmpireAssociatePage(BasePage):
+  """This page is used to add an associate between an empire in the game and a profile."""
+  def get(self, cookie):
+    """If we have a cookie, we'll look up the association request and, well, honour it!"""
+    
+  def post(self):
+    empire_id = self.request.POST.get("empire_id")
+    realm_name, empire_id = empire_id.split(":")
+    empire_id = int(empire_id)
+
+    self.response.content_type = "text/plain"
+    err = ctrl.profile.initiateEmpireAssociateRequest(self.user, self.profile, realm_name, empire_id)
+    if err:
+      self.response.write("ERR:"+err)
+    else:
+      self.response.write("SUCCESS")
+
+
+app = webapp.WSGIApplication([("/profile/?", ProfilePage),
+                              ("/profile/empire-autocomplete", EmpireAutocompletePage),
+                              ("/profile/empire-associate/?(.*)", EmpireAssociatePage)],
                              debug=os.environ["SERVER_SOFTWARE"].startswith("Development"))

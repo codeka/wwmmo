@@ -47,7 +47,9 @@ class ForumEditPage(ForumAdminPage):
     if id:
       forum = model.forum.Forum.get_by_id(int(id))
     else:
-      forum = model.forum.Forum()
+      forum = model.forum.Forum(name=self.request.POST.get("forum-name"),
+                                slug=self.request.POST.get("forum-slug"),
+                                description=self.request.POST.get("forum-desc"))
 
     old_slug = forum.slug
     forum.name = self.request.POST.get("forum-name")

@@ -9,6 +9,18 @@
 
 {% block maincontent %}
   <section class="content view-content">
+    <nav class="breadcrumbs">
+      <ul>
+        <li><a href="/">War Worlds</a>
+        {% if page.slug == "/" -%}
+          <li><span>Docs</span>
+        {%- else -%}
+          <li><a href="/doc">Docs</a>
+          <li><span>{{page.title}}</span>
+        {%- endif %}
+      </ul>
+    </nav>
+
     {% if is_writer %}
       <nav class="page-controls">
         <h4>Controls</h4>
@@ -20,9 +32,6 @@
       </nav>
     {% endif %}
     {{page.content}}
-    <section class="copyright">
-      Copyright &copy; 2012 by <a href="http://www.codeka.com.au/">Codeka Consulting</a>
-    </section>
   </section>
 {% endblock %}
 

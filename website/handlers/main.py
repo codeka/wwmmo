@@ -159,6 +159,11 @@ class DownloadPage(handlers.BaseHandler):
     self.render("download.html", {})
 
 
+class PlayStorePage(handlers.BaseHandler):
+  def get(self):
+    self.redirect("https://play.google.com/store/apps/details?id=au.com.codeka.warworlds")
+
+
 app = webapp.WSGIApplication([("/", HomePage),
                               ("/privacy-policy", PrivacyPolicyPage),
                               ("/blob/upload-url", BlobUploadUrlPage),
@@ -168,5 +173,6 @@ app = webapp.WSGIApplication([("/", HomePage),
                               ("/newsletter", NewsletterSignupPage),
                               ("/newsletter/thankyou", NewsletterThankyouPage),
                               ("/download", DownloadPage),
+                              ("/play-store", PlayStorePage),
                               ("/sitemap.xml", SitemapPage)],
                              debug=os.environ["SERVER_SOFTWARE"].startswith("Development"))

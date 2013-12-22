@@ -12,6 +12,7 @@ import au.com.codeka.common.model.BaseEmpirePresence;
 import au.com.codeka.common.model.Simulation;
 import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.server.Event;
+import au.com.codeka.warworlds.server.RequestContext;
 import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.ctrl.RealmController;
 import au.com.codeka.warworlds.server.ctrl.StarController;
@@ -41,6 +42,8 @@ public class EmpireStarGoodsReachedZeroEvent extends Event {
             while (rs.next()) {
                 int id = rs.getInt(1);
                 int starID = rs.getInt(2);
+
+                RequestContext.i.setContextName("event: EmpireStarGoodsReachedZero star.id="+starID);
 
                 try {
                     Star star = new StarController().getStar(starID);

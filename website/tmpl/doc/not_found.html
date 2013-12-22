@@ -1,7 +1,7 @@
 {% extends "skeleton.html" %}
 {% import "doc/macros.html" as m %}
 
-{% block header %}{{m.html_header()}}{% endblock %}
+{% block header %}{{m.html_header(resource_version)}}{% endblock %}
 {% block pagetitle %}Documentation &bull; Not Found{% endblock %}
 {% block title %}Not Found{% endblock %}
 {% block headerlinks %}{% endblock %}

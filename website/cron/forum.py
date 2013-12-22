@@ -51,26 +51,5 @@ class RefreshPostCounts(BasePage):
       deferred.defer(CountPostsForForum, forum, _queue="forumsync")
 
 
-class SyncAlliancesPage(BasePage):
-  def get(self):
-    """This is a cron job that runs to sync alliance details from the server(s) to the local store."""
-
-    for realm_name, base_url in ctrl.profile.REALMS.items():
-      self.SyncAlliancesForRealm(realm_name, base_url)
-
-  def SyncAlliancesForRealm(self, realm_name, base_url):
-    url = base_url + "alliances"
-    result = urlfetch.fetch(url, headers = {'Accept': 'text/json'})
-    if result.status_code == 200:
-      alliances = json.loads(result.content)
-      if "alliances" in alliances:
-        for alliance in alliances["alliances"]:
-          self.SyncAlliance(realm_name, alliance)
-
-  def SyncAlliance(self, realm_name, alliance):
-    logging.info("Syncing alliance: "+realm_name+": "+alliance["name"])
-    model.profile.Alliance.Save(realm_name, alliance)
-
-
 app = webapp.WSGIApplication([("/cron/forum/refresh-post-counts", RefreshPostCounts)],
                              debug=os.environ["SERVER_SOFTWARE"].startswith("Development"))

@@ -68,6 +68,8 @@ public class RequestHandler {
         mRouteMatcher = matcher;
         mExtraOption = extraOption;
 
+        RequestContext.i.setContextName(request.getRequestURI());
+
         // start off with status 200, but the handler might change it
         mResponse.setStatus(200);
 
