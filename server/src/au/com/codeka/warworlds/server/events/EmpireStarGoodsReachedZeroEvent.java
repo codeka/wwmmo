@@ -7,6 +7,8 @@ import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.mysql.jdbc.exceptions.jdbc4.MySQLTransactionRollbackException;
+
 import au.com.codeka.common.model.BaseColony;
 import au.com.codeka.common.model.BaseEmpirePresence;
 import au.com.codeka.common.model.Simulation;
@@ -109,6 +111,10 @@ public class EmpireStarGoodsReachedZeroEvent extends Event {
             }
         }
 
-        new StarController().update(star);
+        try {
+            new StarController().update(star);
+        } catch (MySQLTransactionRollbackException e) {
+            throw new RequestException(e);
+        }
     }
 }

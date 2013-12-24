@@ -6,9 +6,13 @@ import logging
 import random
 
 from google.appengine.api import memcache
+from google.appengine.api import mail
+from google.appengine.api import users
 from google.appengine.ext import db
 
 import ctrl
+import ctrl.tmpl
+import ctrl.profile
 import model.forum
 
 def getForums():
@@ -307,3 +311,97 @@ def incrCount(counter_name, num_shards=20, amount=1):
   db.run_in_transaction(_tx)
   keyname = "counter:%s" % (counter_name)
   memcache.incr(keyname)
+
+
+def subscribeToThread(user, forum_thread):
+  """Subscribes the given user to the given forum thread so that they recieve updates via email."""
+  # if they're already a subscriber, nothing to do!
+  keyname = "thread:%s:subscribers" % (forum_thread.key())
+  model_key_name = "%s:%s" % (user.user_id(), forum_thread.key())
+  subscribers = memcache.get(keyname)
+  if not subscribers:
+    thread_subscription = model.forum.ForumThreadSubscriber.get_by_key_name(model_key_name)
+    if thread_subscription:
+      return
+  elif user.user_id() in subscribers:
+    return
+
+  thread_subscription = model.forum.ForumThreadSubscriber(key_name=model_key_name,
+                                                          user=user,
+                                                          forum_thread=forum_thread,
+                                                          subscribed=datetime.datetime.now())
+  thread_subscription.put()
+
+  # we manually re-cache the subscription with the new one, because it can take a while for
+  # datastore indexes to update, but we want it to be instant!
+  subscribers = getThreadSubscriptions(forum_thread, False)
+  if user.user_id() not in subscribers:
+    subscribers[user.user_id()] = thread_subscription
+  memcache.set(keyname, subscribers)
+
+
+def unsubscribeFromThread(user, forum_thread):
+  """Unsubscribes the given user from the given forum thread."""
+  keyname = "thread:%s:subscribers" % (forum_thread.key())
+  model_key_name = "%s:%s" % (user.user_id(), forum_thread.key())
+  thread_subscription = model.forum.ForumThreadSubscriber.get_by_key_name(model_key_name)
+  if not thread_subscription:
+    return
+
+  thread_subscription.delete()
+
+  # we manually re-cache the subscription with this one removed, because it can take a while for
+  # datastore indexes to update, but we want it to be instant!
+  subscribers = getThreadSubscriptions(forum_thread, False)
+  if user.user_id() in subscribers:
+    del subscribers[user.user_id()]
+  memcache.set(keyname, subscribers)
+
+
+def getThreadSubscriptions(forum_thread, doset=True):
+  """Gets the list of ForumThreadSubscribers who are subscribed to the given thread."""
+  keyname = "thread:%s:subscribers" % (forum_thread.key())
+  subscribers = memcache.get(keyname)
+  if subscribers is None: # note: empty list is OK, None is not...
+    subscribers = {}
+    query = model.forum.ForumThreadSubscriber.all().filter("forum_thread", forum_thread)
+    for subscriber in query:
+      subscribers[subscriber.user.user_id()] = subscriber
+    if doset:
+      memcache.set(keyname, subscribers)
+  return subscribers
+
+
+def notifySubscribers(forum, forum_thread, forum_post, poster_user, poster_profile):
+  """Sends an email notification to all subscribers of the given thread.
+
+  Arguments:
+    forum: The forum that was posted to.
+    forum_thread: The forum thread we posted to.
+    forum_post: The post that was just made
+    poster_user: The user who posted (we don't send notifications to this user).
+    poster_profile: The profile of the user who posted.
+  """
+  subscriptions = getThreadSubscriptions(forum_thread)
+  tmpl = ctrl.tmpl.getTemplate("email/forum_notification.txt")
+
+  user_ids = []
+  for user_id, subscription in subscriptions.items():
+    user_ids.append(user_id)
+  profiles = ctrl.profile.getProfiles(user_ids)
+
+  for user_id, subscription in subscriptions.items():
+    if user_id == poster_user.user_id():
+      continue
+    body = ctrl.tmpl.render(tmpl, {"forum": forum, "forum_thread": forum_thread, "forum_post": forum_post,
+                                   "poster_user": poster_user, "poster_profile": poster_profile,
+                                   "profile": profiles[user_id]})
+    sender = "forums@warworldssite.appspotmail.com"
+    recipient = subscription.user.email()
+    if recipient:
+      logging.info("Sending email: {from:"+sender+", recipient:"+recipient+", subject:[war-worlds.com forums] "+
+                   forum_thread.subject+", body:"+str(len(body))+" bytes")
+      mail.send_mail(sender, recipient, "[war-worlds.com forums] "+forum_thread.subject, body)
+                                 
+  
+    

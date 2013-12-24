@@ -7,29 +7,29 @@
 {%- endmacro %}
 
 {% macro paginator(page_no, total_pages) -%}
+  <nav class="pagination">
   {%- if total_pages > 1 %}
-    <nav class="pagination">
-      {% if page_no == total_pages -%}
-        <span class="current">Next &gt;</span>
-      {%- else -%}
-        <a href="?page={{page_no+1}}">Next &gt;</a>
-      {%- endif %}
-      <ul>
-      {% for n in range(page_no + 4, page_no - 4, -1) -%}
-        {% if n > 0 and n <= total_pages -%}
-          {% if n == page_no -%}
-            <li><span class="current">{{page_no}}</span>
-          {%- else -%}
-            <li><a href="?page={{n}}">{{n}}</a>
-          {%- endif %}
+    {% if page_no == total_pages -%}
+      <span class="current">Next &gt;</span>
+    {%- else -%}
+      <a href="?page={{page_no+1}}">Next &gt;</a>
+    {%- endif %}
+    <ul>
+    {% for n in range(page_no + 4, page_no - 4, -1) -%}
+      {% if n > 0 and n <= total_pages -%}
+        {% if n == page_no -%}
+          <li><span class="current">{{page_no}}</span>
+        {%- else -%}
+          <li><a href="?page={{n}}">{{n}}</a>
         {%- endif %}
-      {%- endfor %}
-      </ul>
-      {% if page_no == 1 -%}
-        <span class="current">&lt; Previous</span>
-      {%- else -%}
-        <a href="?page={{page_no - 1}}">&lt; Previous</a>
       {%- endif %}
-    </nav>
+    {%- endfor %}
+    </ul>
+    {% if page_no == 1 -%}
+      <span class="current">&lt; Previous</span>
+    {%- else -%}
+      <a href="?page={{page_no - 1}}">&lt; Previous</a>
+    {%- endif %}
   {% endif -%}
+  </nav>
 {%- endmacro %}

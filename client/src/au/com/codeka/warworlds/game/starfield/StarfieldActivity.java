@@ -10,7 +10,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.os.Bundle;
-import android.text.Html;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.animation.Animation;
@@ -19,12 +18,9 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import au.com.codeka.TimeInHours;
 import au.com.codeka.common.model.BaseColony;
 import au.com.codeka.common.model.BaseFleet;
 import au.com.codeka.common.model.BaseStar;
-import au.com.codeka.common.model.DesignKind;
-import au.com.codeka.common.model.ShipDesign;
 import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.ServerGreeter;
@@ -38,8 +34,6 @@ import au.com.codeka.warworlds.game.SitrepActivity;
 import au.com.codeka.warworlds.game.StarRenameDialog;
 import au.com.codeka.warworlds.game.alliance.AllianceActivity;
 import au.com.codeka.warworlds.game.solarsystem.SolarSystemActivity;
-import au.com.codeka.warworlds.model.DesignManager;
-import au.com.codeka.warworlds.model.Empire;
 import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.EmpireShieldManager;
 import au.com.codeka.warworlds.model.Fleet;
@@ -50,7 +44,6 @@ import au.com.codeka.warworlds.model.Sector;
 import au.com.codeka.warworlds.model.SectorManager;
 import au.com.codeka.warworlds.model.Sprite;
 import au.com.codeka.warworlds.model.SpriteDrawable;
-import au.com.codeka.warworlds.model.SpriteManager;
 import au.com.codeka.warworlds.model.Star;
 import au.com.codeka.warworlds.model.StarImageManager;
 import au.com.codeka.warworlds.model.StarManager;
@@ -87,7 +80,6 @@ public class StarfieldActivity extends BaseStarfieldActivity
     // way, if there's multiple in progress at once, on the last one to be
     // initiated will actually do anything
     private String mFetchingStarKey;
-    private String mFetchingFleetKey;
 
     private Star mStarToSelect;
     private Fleet mFleetToSelect;
@@ -657,7 +649,6 @@ public class StarfieldActivity extends BaseStarfieldActivity
     private void handleDeselect() {
         mFetchingStarKey = null;
         mSelectedStar = null;
-        mFetchingFleetKey = null;
         mSelectedFleet = null;
 
         findViewById(R.id.loading_container).setVisibility(View.GONE);
@@ -688,7 +679,6 @@ public class StarfieldActivity extends BaseStarfieldActivity
         selectedStarContainer.setVisibility(View.GONE);
         selectedFleetContainer.setVisibility(View.GONE);
         mFetchingStarKey = star.getKey();
-        mFetchingFleetKey = null;
         mSelectedFleet = null;
 
         showBottomPane();
@@ -771,60 +761,19 @@ public class StarfieldActivity extends BaseStarfieldActivity
             handleDeselect();
             return;
         }
-        
-        final View selectionLoadingContainer = findViewById(R.id.loading_container);
-        final View selectedStarContainer = findViewById(R.id.selected_star);
-        final View selectedFleetContainer = findViewById(R.id.selected_fleet);
-        final ImageView fleetIcon = (ImageView) findViewById(R.id.fleet_icon);
-        final ImageView empireIcon = (ImageView) findViewById(R.id.empire_icon);
-        final TextView fleetDesign = (TextView) findViewById(R.id.fleet_design);
-        final TextView empireName = (TextView) findViewById(R.id.empire_name);
-        final TextView fleetDetails = (TextView) findViewById(R.id.fleet_details);
 
-        empireName.setText("");
-        empireIcon.setImageBitmap(null);
-        mFetchingFleetKey = fleet.getKey();
         mFetchingStarKey = null;
         mSelectedStar = null;
         mSelectedFleet = fleet;
 
-        ShipDesign design = (ShipDesign) DesignManager.i.getDesign(DesignKind.SHIP, fleet.getDesignID());
-        EmpireManager.i.fetchEmpire(fleet.getEmpireKey(), new EmpireManager.EmpireFetchedHandler() {
-            @Override
-            public void onEmpireFetched(Empire empire) {
-                if (mFetchingFleetKey == null ||
-                    !mFetchingFleetKey.equals(fleet.getKey())) {
-                    return;
-                }
-                empireName.setText(empire.getDisplayName());
-                empireIcon.setImageBitmap(EmpireShieldManager.i.getShield(mContext, empire));
-            }
-        });
+        final View selectionLoadingContainer = findViewById(R.id.loading_container);
+        final View selectedStarContainer = findViewById(R.id.selected_star);
+        final FleetInfoView fleetInfoView = (FleetInfoView) findViewById(R.id.selected_fleet);
 
-        fleetDesign.setText(design.getDisplayName());
-        fleetIcon.setImageDrawable(new SpriteDrawable(SpriteManager.i.getSprite(design.getSpriteName())));
-
-        String eta = "???";
-        Star srcStar = SectorManager.getInstance().findStar(fleet.getStarKey());
-        Star destStar = SectorManager.getInstance().findStar(fleet.getDestinationStarKey());
-        if (srcStar != null && destStar != null) {
-            float timeRemainingInHours = fleet.getTimeToDestination(srcStar, destStar);
-            eta = TimeInHours.format(timeRemainingInHours);
-        }
-
-        String details = String.format(Locale.ENGLISH,
-            "<b>Ships:</b> %d<br />" +
-            "<b>Speed:</b> %.2f pc/hr<br />" +
-            "<b>Destination:</b> %s<br />" +
-            "<b>ETA:</b> %s",
-            (int) Math.ceil(fleet.getNumShips()), design.getSpeedInParsecPerHour(),
-            (destStar == null ? "???" : destStar.getName()),
-            eta);
-        fleetDetails.setText(Html.fromHtml(details));
-
+        fleetInfoView.setFleet(fleet);
         selectionLoadingContainer.setVisibility(View.GONE);
         selectedStarContainer.setVisibility(View.GONE);
-        selectedFleetContainer.setVisibility(View.VISIBLE);
+        fleetInfoView.setVisibility(View.VISIBLE);
 
         showBottomPane();
     }

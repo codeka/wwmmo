@@ -3,6 +3,9 @@ import jinja2
 import os
 
 
+import html2text
+
+
 jinja = jinja2.Environment(loader=jinja2.FileSystemLoader(os.path.dirname(__file__)+'/../tmpl'))
 
 
@@ -45,6 +48,9 @@ def _filter_post_date_std(post):
   return post.posted.strftime('%Y-%m-%d %H:%M:%S')
 jinja.filters['post_date_std'] = _filter_post_date_std
 
+def _filter_post_date_editable(post):
+  return post.posted.strftime('%y-%m-%d %H:%M')
+jinja.filters['post_date_editable'] = _filter_post_date_editable
 
 def _filter_post_extract(post):
   return post.html[0:500]+'...'
@@ -70,6 +76,11 @@ jinja.filters['dump_json'] = _filter_dump_json
 def _filter_forum_post_author(post):
   return post.user.email()
 jinja.filters['forum_post_author'] = _filter_forum_post_author
+
+
+def _filter_html_to_plain(html):
+  return html2text.html2text(html)
+jinja.filters['html_to_plain'] = _filter_html_to_plain
 
 
 def getTemplate(tmpl_name):

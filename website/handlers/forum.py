@@ -1,6 +1,8 @@
 
 import os
 from datetime import datetime
+import logging
+import math
 import re
 import urllib
 import webapp2 as webapp
@@ -74,7 +76,7 @@ class ThreadListPage(ForumPage):
       data["total_threads"] = thread_post_counts[forum.slug]['threads']
     else:
       data["total_threads"] = 0
-    data["total_pages"] = (data["total_threads"] / 25) + 1
+    data["total_pages"] = int(math.ceil(data["total_threads"] / 25.0))
     data["post_counts"] = ctrl.forum.getThreadPostCounts(threads)
     data["first_posts"] = ctrl.forum.getFirstPostsByForumThread(threads)
     data["last_posts"] = ctrl.forum.getLastPostsByForumThread(threads)
@@ -113,7 +115,10 @@ class PostListPage(ForumPage):
 
     page_no = 1
     if self.request.get('page'):
-      page_no = int(self.request.get('page'))
+      if self.request.get('page') == 'last':
+        page_no = 1
+      else:
+        page_no = int(self.request.get('page'))
     if page_no <= 0:
       page_no = 1
     data["page_no"] = page_no
@@ -122,7 +127,12 @@ class PostListPage(ForumPage):
     data["posts"] = posts
 
     data["total_posts"] = ctrl.forum.getThreadPostCounts([forum_thread])["%s:%s" % (forum.slug, forum_thread.slug)]
-    data["total_pages"] = (data["total_posts"] / 10) + 1
+    data["total_pages"] = int(math.ceil(data["total_posts"] / 10.0))
+
+    # if they were actually asking for the "last" page, we can redirect there now
+    if self.request.get('page') and self.request.get('page') == 'last':
+      self.redirect(str("/forum/%s/%s?page=%d" % (forum.slug, forum_thread.slug, data["total_pages"])))
+      return
 
     user_ids = []
     for post in posts:
@@ -130,6 +140,10 @@ class PostListPage(ForumPage):
         user_ids.append(post.user.user_id())
     profiles = ctrl.profile.getProfiles(user_ids)
     data["profiles"] = profiles
+
+    subscriptions = ctrl.forum.getThreadSubscriptions(forum_thread)
+    data["subscriptions"] = subscriptions
+    data["is_subscribed"] = bool(self.user and self.user.user_id() in subscriptions)
 
     self.render("forum/post_list.html", data)
 
@@ -204,7 +218,6 @@ class EditPostPage(ForumPage):
       ctrl.forum.incrCount("forum:%s:threads" % (forum.slug))
 
     content = ctrl.sanitizeHtml(self.request.POST.get("post-content"))
-    #content = self.request.POST.get("post-content")
     if post_id:
       forum_post = model.forum.ForumPost.get(post_id)
       forum_post.content = content
@@ -213,7 +226,7 @@ class EditPostPage(ForumPage):
         forum_post.edit_notes += "<br/>"
       else:
         forum_post.edit_notes = ""
-      
+
       forum_post.edit_notes += ("<em>Edited by "+self.profile.display_name+', <time datetime="'+
           forum_post.updated.strftime('%Y-%m-%d %H:%M:%S')+'">'+forum_post.updated.strftime('%d %b %Y %H:%M')+"</time></em>")
     else:
@@ -231,7 +244,26 @@ class EditPostPage(ForumPage):
     ctrl.forum.incrCount("thread:%s:%s:posts" % (forum.slug, forum_thread.slug), 1)
 
     memcache.flush_all()
-    self.redirect("/forum/%s/%s" % (forum.slug, forum_thread.slug))
+
+    # if you checked the 'subscribe' checkbox, also subscribe you...
+    if self.request.POST.get("post-subscribe"):
+      ctrl.forum.subscribeToThread(self.user, forum_thread)
+
+    # any users listed in the forum's auto-subscribe list get auto-subscribed...
+    if forum.auto_subscribers:
+      for subscriber in forum.auto_subscribers:
+        ctrl.forum.subscribeToThread(subscriber, forum_thread)
+
+    # go through all the subscribers and send them a notification about this post
+    ctrl.forum.notifySubscribers(forum, forum_thread, forum_post, self.user, self.profile)
+
+    total_posts = ctrl.forum.getThreadPostCounts([forum_thread])["%s:%s" % (forum.slug, forum_thread.slug)]
+    total_pages = int(math.ceil(total_posts / 10.0))
+
+    if total_pages <= 1:
+      self.redirect("/forum/%s/%s" % (forum.slug, forum_thread.slug))
+    else:
+      self.redirect("/forum/%s/%s?page=%d" % (forum.slug, forum_thread.slug, total_pages))
 
 
 class DeletePostPage(ForumPage):
@@ -294,11 +326,34 @@ class DeletePostPage(ForumPage):
       self.redirect("/forum/%s/%s" % (forum.slug, forum_thread.slug))
 
 
+class SubscriptionPage(ForumPage):
+  def post(self, forum_slug, forum_thread_slug):
+    if not self._isLoggedIn():
+      return
+
+    forum = ctrl.forum.getForumBySlug(forum_slug)
+    if not forum:
+      self.error(404)
+      return
+
+    forum_thread = ctrl.forum.getThreadBySlug(forum, forum_thread_slug)
+    if not forum_thread:
+      self.error(404)
+      return
+
+    if self.request.POST.get("action") == "subscribe":
+      ctrl.forum.subscribeToThread(self.user, forum_thread)
+    elif self.request.POST.get("action") == "unsubscribe":
+      ctrl.forum.unsubscribeFromThread(self.user, forum_thread)
+    self.redirect("/forum/%s/%s#post-reply" % (forum.slug, forum_thread.slug))
+
+
 app = webapp.WSGIApplication([("/forum/?", ForumListPage),
                               ("/forum/([^/]+)/?", ThreadListPage),
                               ("/forum/([^/]+)/posts", EditPostPage),
                               ("/forum/([^/]+)/([^/]+)", PostListPage),
                               ("/forum/([^/]+)/([^/]+)/posts", EditPostPage),
+                              ("/forum/([^/]+)/([^/]+)/subscription", SubscriptionPage),
                               ("/forum/([^/]+)/([^/]+)/posts/([^/]+)", EditPostPage),
                               ("/forum/([^/]+)/([^/]+)/posts/([^/]+)/delete", DeletePostPage)],
                              debug=os.environ["SERVER_SOFTWARE"].startswith("Development"))

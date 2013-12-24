@@ -38,6 +38,10 @@ class ForumEditPage(ForumAdminPage):
       for user in data["forum"].moderators:
         forum_moderators_string.append(user.email())
       data["forum_moderators_string"] = ", ".join(forum_moderators_string)
+      forum_auto_subscribers_string = []
+      for user in data["forum"].auto_subscribers:
+        forum_auto_subscribers_string.append(user.email())
+      data["forum_auto_subscribers_string"] = ", ".join(forum_auto_subscribers_string)
     else:
       data["forum"] = None
 
@@ -61,6 +65,14 @@ class ForumEditPage(ForumAdminPage):
         try:
           user = users.User(email.strip())
           forum.moderators.append(user)
+        except users.UserNotFoundError:
+          pass
+    if self.request.POST.get("forum-auto_subscribers"):
+      forum.auto_subscribers = []
+      for email in self.request.POST.get("forum-auto_subscribers").split(","):
+        try:
+          user = users.User(email.strip())
+          forum.auto_subscribers.append(user)
         except users.UserNotFoundError:
           pass
     forum.put()

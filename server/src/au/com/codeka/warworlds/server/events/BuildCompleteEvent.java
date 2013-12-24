@@ -7,6 +7,8 @@ import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.mysql.jdbc.exceptions.jdbc4.MySQLTransactionRollbackException;
+
 import au.com.codeka.common.model.BaseColony;
 import au.com.codeka.common.model.DesignKind;
 import au.com.codeka.common.model.Simulation;
@@ -135,7 +137,11 @@ public class BuildCompleteEvent extends Event {
         }
 
         sim.simulate(star); // simulate again to re-calculate the end times
-        new StarController().update(star);
+        try {
+            new StarController().update(star);
+        } catch (MySQLTransactionRollbackException e) {
+            throw new RequestException(e);
+        }
 
         Messages.SituationReport.Builder sitrep_pb = Messages.SituationReport.newBuilder();
         sitrep_pb.setRealm(new RealmController().getRealmName());

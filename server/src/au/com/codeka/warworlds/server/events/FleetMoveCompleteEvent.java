@@ -7,6 +7,8 @@ import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.mysql.jdbc.exceptions.jdbc4.MySQLTransactionRollbackException;
+
 import au.com.codeka.common.model.BaseCombatReport;
 import au.com.codeka.common.model.BaseFleet;
 import au.com.codeka.common.model.BaseStar;
@@ -99,8 +101,12 @@ public class FleetMoveCompleteEvent extends Event {
         // simulate the destination star again, in case there's any combat
         sim.simulate(destStar);
 
-        new StarController().update(srcStar);
-        new StarController().update(destStar);
+        try {
+            new StarController().update(srcStar);
+            new StarController().update(destStar);
+        } catch (MySQLTransactionRollbackException e) {
+            throw new RequestException(e);
+        }
 
         Messages.SituationReport.Builder sitrep_pb = Messages.SituationReport.newBuilder();
         sitrep_pb.setRealm(new RealmController().getRealmName());

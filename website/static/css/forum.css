@@ -162,6 +162,11 @@ div.forum-field label {
   line-height: 20pt;
 }
 
+div.forum-field.checkbox label {
+  left: 90pt;
+  width: auto;
+}
+
 div.forum-field div.hack {
   position: absolute;
   top: 0; left: 75pt; bottom: 0; right: 4pt;
@@ -232,4 +237,11 @@ nav.pagination > span, nav.pagination > a, nav.pagination li {
 
 nav.pagination a {
   line-height: 22px;
+}
+
+
+div.subscription {
+  float: left;
+  padding-top: 1em;
+  margin-left: 10pt
 }

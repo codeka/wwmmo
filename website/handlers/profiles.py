@@ -88,5 +88,6 @@ class EmpireAssociatePage(BasePage):
 
 app = webapp.WSGIApplication([("/profile/?", ProfilePage),
                               ("/profile/empire-autocomplete", EmpireAutocompletePage),
-                              ("/profile/empire-associate/?(.*)", EmpireAssociatePage)],
+                              ("/profile/empire-associate/?(.*)", EmpireAssociatePage),
+                              ("/profile/notifications", ProfilePage)], # TODO(deanh): notifications
                              debug=os.environ["SERVER_SOFTWARE"].startswith("Development"))

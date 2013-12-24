@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <head>
   <title>War Worlds &bull; {% block title %}Admin{% endblock %}</title>
-  <link rel="stylesheet" href="/css/v1/reset.css">
-  <link rel="stylesheet" href="/css/v1/style.css">
-  <link rel="stylesheet" href="/css/v5/admin.css">
+  <link rel="stylesheet" href="/css/v{{resource_version}}/reset.css">
+  <link rel="stylesheet" href="/css/v{{resource_version}}/style.css">
+  <link rel="stylesheet" href="/css/v{{resource_version}}/admin.css">
 
-  <link rel="stylesheet" href="/js/v1/markitup/skins/default/style.css" />
-  <link rel="stylesheet" href="/js/v1/markitup/sets/default/style.css" />
+  <link rel="stylesheet" href="/js/v{{resource_version}}/markitup/skins/default/style.css" />
+  <link rel="stylesheet" href="/js/v{{resource_version}}/markitup/sets/default/style.css" />
   {%- block extracss %}{% endblock %}
   <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
   <script src="/ckeditor/v{{resource_version}}/ckeditor.js"></script>

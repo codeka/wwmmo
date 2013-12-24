@@ -8,7 +8,12 @@ class Forum(db.Model):
   slug = db.StringProperty(required=True)
   description = db.TextProperty(required=True)
   alliance = db.StringProperty()
+
+  # the list of moderators are people who can edit/delete other people's posts within this forum.
   moderators = db.ListProperty(users.User)
+
+  # this is a list of users who get auto-subscribed to all posts in this forum.
+  auto_subscribers = db.ListProperty(users.User)
 
 
 class ForumThread(db.Model):
@@ -37,3 +42,11 @@ class ForumShardedCounter(db.Model):
   name = db.StringProperty(required=True)
   count = db.IntegerProperty(required=True, default=0)
 
+
+class ForumThreadSubscriber(db.Model):
+  """This model contains subscribers to a thread.
+
+  When a thread is posted to, all of the subscribers are notified by email."""
+  user = db.UserProperty(required=True)
+  forum_thread = db.ReferenceProperty(ForumThread, required=True)
+  subscribed = db.DateTimeProperty(required=True)

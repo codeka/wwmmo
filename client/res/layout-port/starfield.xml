@@ -141,59 +141,13 @@
                             android:orientation="vertical" />
                     </ScrollView>
                 </LinearLayout>
-
             </RelativeLayout>
 
-            <RelativeLayout android:id="@+id/selected_fleet"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:visibility="gone"  >
-
-                <ImageView android:id="@+id/fleet_icon"
-                           android:layout_width="48dp"
-                           android:layout_height="48dp"
-                           android:layout_alignParentLeft="true"
-                           android:layout_alignParentTop="true"
-                           android:src="@drawable/fleet" />
-
-                <ImageView android:id="@+id/empire_icon"
-                           android:layout_width="20dp"
-                           android:layout_height="20dp"
-                           android:layout_alignBottom="@+id/fleet_icon"
-                           android:layout_toRightOf="@+id/fleet_icon"
-                           android:src="@drawable/app_icon" />
-
-                <TextView android:id="@+id/fleet_design"
-                          android:layout_width="wrap_content"
-                          android:layout_height="20dp"
-                          android:layout_alignParentRight="true"
-                          android:layout_alignParentTop="true"
-                          android:layout_toRightOf="@+id/fleet_icon"
-                          android:gravity="center_vertical"
-                          android:text="Fleet Design"
-                          android:textSize="18sp" />
-
-                <TextView android:id="@+id/empire_name"
-                          android:layout_width="wrap_content"
-                          android:layout_height="20dp"
-                          android:layout_alignBottom="@+id/empire_icon"
-                          android:layout_toRightOf="@+id/empire_icon"
-                          android:gravity="center_vertical"
-                          android:text="Empire Name" />
-
-                <TextView android:id="@+id/fleet_details"
-                          android:layout_width="wrap_content"
-                          android:layout_height="wrap_content"
-                          android:layout_alignParentBottom="true"
-                          android:layout_alignParentLeft="true"
-                          android:layout_alignParentRight="true"
-                          android:layout_below="@+id/fleet_icon"
-                          android:layout_marginBottom="8dp"
-                          android:layout_marginLeft="8dp"
-                          android:layout_marginRight="8dp"
-                          android:layout_marginTop="8dp"
-                          android:text="Fleet Details" />
-            </RelativeLayout>
+            <au.com.codeka.warworlds.game.starfield.FleetInfoView
+                    android:id="@+id/selected_fleet"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:visibility="visible"  />
         </FrameLayout>
 
         <Button

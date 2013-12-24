@@ -43,8 +43,20 @@
     </article>
   {% endfor %}
 
+    <div class="subscription">
+      <form method="POST" action="/forum/{{forum.slug}}/{{forum_thread.slug}}/subscription">
+      {% if is_subscribed %}
+        <input type="hidden" name="action" value="unsubscribe">
+        <div class="input-button"><input type="submit" value="Unsubscribe" title="Click here if you no longer want to receive email updates when there are new posts in this thread."></div>
+      {% else %}
+        <input type="hidden" name="action" value="subscribe">
+        <div class="input-button"><input type="submit" value="Subscribe" title="Click here if you want to receive email updates when there are new posts."></div>
+      {% endif %}
+      </form>
+    </div>
     {{m.paginator(page_no, total_pages)}}
 
+    <a name="post-reply"></a>
     <form method="POST" action="/forum/{{forum.slug}}/{{forum_thread.slug}}/posts">
       <fieldset>
         <header class="post-reply-header">
@@ -53,6 +65,10 @@
         <div class="forum-field forum-field-markitup">
           <label for="post-content">Message:</label>
           <div class="hack"><textarea name="post-content" id="post-content"></textarea></div>
+        </div>
+        <div class="forum-field checkbox">
+          <div class="hack"><input type="checkbox" name="post-subscribe" id="post-subscribe"{% if is_subscribed %} checked{% endif %}></div>
+          <label for="post-subscribe">Notify me by email when someone replies to this thread.</label>
         </div>
         <div class="forum-field forum-field-submit">
           <div class="input-button"><input type="submit" value="Post"></div>

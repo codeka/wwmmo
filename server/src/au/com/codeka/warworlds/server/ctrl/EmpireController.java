@@ -9,6 +9,7 @@ import java.util.List;
 import org.joda.time.DateTime;
 
 import com.mysql.jdbc.exceptions.jdbc4.MySQLIntegrityConstraintViolationException;
+import com.mysql.jdbc.exceptions.jdbc4.MySQLTransactionRollbackException;
 
 import au.com.codeka.common.model.BaseColony;
 import au.com.codeka.common.protobuf.Messages;
@@ -236,7 +237,11 @@ public class EmpireController {
         // update the last simulation time for the star so that it doesn't simulate until we
         // actually arrived...
         star.setLastSimulation(DateTime.now());
-        new StarController().update(star);
+        try {
+            new StarController().update(star);
+        } catch (MySQLTransactionRollbackException e) {
+            throw new RequestException(e);
+        }
     }
 
     /**

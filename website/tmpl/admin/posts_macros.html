@@ -6,7 +6,7 @@
         <div class="post-details-header">
           <div class="post-title">
             <label for="post-title">Title:</label>
-            <input type="text" name="post-title" id="post-title"{% if post %} value="{{post.title|escape}}"{% endif %}>
+            <div class="hack"><input type="text" name="post-title" id="post-title"{% if post %} value="{{post.title|escape}}"{% endif %}></div>
           </div>
         </div>
         <div class="post-details-content">
@@ -15,12 +15,12 @@
         <div class="post-details-footer">
           <div class="post-title">
             <label for="post-tags">Tags:</label>
-            <input type="text" name="post-tags" id="post-tags"{% if post %} value="{{post|post_tags}}"{% endif %}>
+            <div class="hack"><input type="text" name="post-tags" id="post-tags"{% if post %} value="{{post|post_tags}}"{% endif %}></div>
           </div>
           <div class="post-title">
             <label for="post-slug">Slug:</label>
-            <input type="text" name="post-slug" id="post-slug"{% if post and post.slug %} value="{{post.slug}}"{% endif %}
-                   placeholder="Leave blank for default">
+            <div class="hack"><input type="text" name="post-slug" id="post-slug"{% if post and post.slug %} value="{{post.slug}}"{% endif %}
+                                     placeholder="Leave blank for default"></div>
           </div>
           <div class="post-date">
             <label for="post-date">Posted:</label>

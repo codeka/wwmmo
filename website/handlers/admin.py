@@ -11,10 +11,6 @@ import model.blog
 import ctrl.blog
 
 
-def _filter_post_date_editable(post):
-  return post.posted.strftime('%y-%m-%d %H:%M')
-handlers.jinja.filters['post_date_editable'] = _filter_post_date_editable
-
 
 class AdminPage(handlers.BaseHandler):
   def dispatch(self):

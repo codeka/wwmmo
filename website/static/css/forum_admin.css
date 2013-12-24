@@ -10,20 +10,20 @@ div.forum-field {
   height: 20pt;
 }
 
-div.forum-field input {
+div.forum-field div.hack {
   position: absolute;
-  left: 50pt;
-  right: 0;
+  top: 0; left: 50pt;
+  bottom: 0; right: 0;
+}
+div.forum-field input {
+  width: 100%;
 }
 
 div.forum-field.forum-field-textarea {
   height: 100pt;
 }
 
-div.forum-field-textarea textarea {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+div.forum-field-textarea div.hack textarea {
+  width: 100%;
+  height: 92pt;
 }

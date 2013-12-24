@@ -73,14 +73,23 @@ public class StarController {
         return db.getStars(idArray);
     }
 
-    public void update(Star star) throws RequestException {
+    public void update(Star star) throws RequestException, MySQLTransactionRollbackException {
+        if (db.getTransaction() != null) {
+            try {
+                updateNoRetry(star);
+            } catch (MySQLTransactionRollbackException e) {
+                throw e;
+            } catch (Exception e) {
+                throw new RequestException(e);
+            }
+        }
         for (int i = 0; ; i++) {
             try {
-                db.updateStar(star);
+                updateNoRetry(star);
                 break;
             } catch (MySQLTransactionRollbackException e) {
                 if (i >= 5) {
-                    throw new RequestException(e);
+                    throw e;
                 }
 
                 // sleep a random amount and try again
@@ -95,6 +104,10 @@ public class StarController {
 
         // we may need to ping the event processor if a build time change, or whatever.
         EventProcessor.i.ping();
+    }
+
+    private void updateNoRetry(Star star) throws Exception {
+        db.updateStar(star);
     }
 
     public void simulateAllStarsOlderThan(DateTime dt) {
@@ -131,7 +144,7 @@ public class StarController {
                     sim.simulate(star);
                     update(star);
                 }
-            } catch(RequestException e) {
+            } catch(Exception e) {
                 log.error("Unhandled exception simulating star", e);
             }
         }

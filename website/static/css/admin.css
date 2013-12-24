@@ -42,7 +42,7 @@ section#main-content {
   bottom: 0;
 }
 
-
+h1 { margin: 0; }
 
 input[type=text] {
   border: solid 1px #000;
@@ -143,10 +143,13 @@ div.post-title {
   height: 20pt;
 }
 
-div.post-title input {
+div.post-title div.hack {
   position: absolute;
-  left: 50pt;
-  right: 0;
+  top: 0; left: 50pt;
+  bottom: 0; right: 0;
+}
+div.post-title div.hack input {
+  width: 100%;
 }
 
 
@@ -158,7 +161,7 @@ div.post-date {
 div.post-date input {
   position: absolute;
   left: 50pt;
-  right: 50%;
+  width: 200pt;
 }
 
 

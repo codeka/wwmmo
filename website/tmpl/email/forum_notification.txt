@@ -1,0 +1,17 @@
+Hello {{profile.display_name}},
+
+New post in war-worlds.com forum thread "{{forum_thread.subject}}" by {{poster_profile.display_name}}:
+
+--------------------------------------------------------------------------
+{{forum_post.content|html_to_plain}}
+--------------------------------------------------------------------------
+
+To view this post online, click here: http://www.war-worlds.com/forum/{{forum.slug}}/{{forum_thread.slug}}
+
+
+
+You are receiving this email because you subscribed to notifications on the above forum thread on www.war-worlds.com. If you no longer wish to receive notifications, you can view your notifications settings here: http://www.war-worlds.com/profile/notifications.
+
+---
+Dean & The War Worlds team
+

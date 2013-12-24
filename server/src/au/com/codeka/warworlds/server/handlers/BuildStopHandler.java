@@ -1,5 +1,7 @@
 package au.com.codeka.warworlds.server.handlers;
 
+import com.mysql.jdbc.exceptions.jdbc4.MySQLTransactionRollbackException;
+
 import au.com.codeka.common.model.BaseBuildRequest;
 import au.com.codeka.common.model.Simulation;
 import au.com.codeka.warworlds.server.RequestException;
@@ -27,7 +29,11 @@ public class BuildStopHandler extends RequestHandler {
                 }
 
                 new BuildQueueController().stop(star, buildRequest);
-                new StarController().update(star);
+                try {
+                    new StarController().update(star);
+                } catch (MySQLTransactionRollbackException e) {
+                    throw new RequestException(e);
+                }
                 break;
             }
         }
