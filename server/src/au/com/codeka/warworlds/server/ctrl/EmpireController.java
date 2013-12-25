@@ -379,7 +379,7 @@ public class EmpireController {
         public void createEmpire(Empire empire) throws RequestException {
             String sql;
             if (empire.getKey() == null || empire.getID() == 0) {
-                sql = "INSERT INTO empires (name, cash, home_star_id, user_email) VALUES (?, ?, ?, ?)";
+                sql = "INSERT INTO empires (name, cash, home_star_id, user_email, signup_date) VALUES (?, ?, ?, ?, NOW())";
             } else {
                 sql = "UPDATE empires SET name = ?, cash = ?, home_star_id = ?, user_email = ? WHERE id = ?";
             }

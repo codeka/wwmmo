@@ -7,6 +7,9 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.TreeMap;
 
+import org.joda.time.DateTime;
+import org.joda.time.Days;
+
 import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.data.DB;
 import au.com.codeka.warworlds.server.data.SqlStmt;
@@ -20,7 +23,19 @@ public class DashboardPageHandler extends BasePageHandler {
 
         TreeMap<String, Object> data = new TreeMap<String, Object>();
 
-        ArrayList<TreeMap<String, Object>> ndas = new ArrayList<TreeMap<String, Object>>();
+        DateTime now = DateTime.now();
+        ArrayList<TreeMap<String, Object>> graphData = new ArrayList<TreeMap<String, Object>>();
+        for (int i = 0; i < 60; i++) {
+            TreeMap<String, Object> graphEntry = new TreeMap<String, Object>();
+            DateTime dt = now.minusDays(i);
+            Calendar c = Calendar.getInstance();
+            c.setTime(dt.toDate());
+            graphEntry.put("year", c.get(Calendar.YEAR));
+            graphEntry.put("month", c.get(Calendar.MONTH) - 1);
+            graphEntry.put("day", c.get(Calendar.DAY_OF_MONTH));
+            graphData.add(graphEntry);
+        }
+
         String sql = "SELECT DATE(date) AS date, COUNT(DISTINCT empire_id)," +
                            " (SELECT COUNT(DISTINCT empire_id) FROM empire_logins AS sub WHERE sub.date BETWEEN DATE_SUB(DATE(l.date), INTERVAL 6 DAY) AND DATE_ADD(DATE(l.date), INTERVAL 1 DAY))" +
                     " FROM empire_logins l" +
@@ -30,25 +45,44 @@ public class DashboardPageHandler extends BasePageHandler {
         try (SqlStmt stmt = DB.prepare(sql)) {
             ResultSet rs = stmt.select();
             while (rs.next()) {
-                Date dt = rs.getDate(1);
+                DateTime dt = new DateTime(rs.getDate(1).getTime());
                 int oneDA = rs.getInt(2);
                 int sevenDA = rs.getInt(3);
 
-                TreeMap<String, Object> nda = new TreeMap<String, Object>();
-                Calendar c = Calendar.getInstance();
-                c.setTime(dt);
-                nda.put("year", c.get(Calendar.YEAR));
-                nda.put("month", c.get(Calendar.MONTH) - 1);
-                nda.put("day", c.get(Calendar.DAY_OF_MONTH));
-                nda.put("oneda", oneDA);
-                nda.put("sevenda", sevenDA);
-                ndas.add(nda);
+                int index = Days.daysBetween(dt, now).getDays();
+                if (index < 60) {
+                    TreeMap<String, Object> graphEntry = graphData.get(index);
+                    graphEntry.put("oneda", oneDA);
+                    graphEntry.put("sevenda", sevenDA);
+                }
             }
         } catch(Exception e) {
             throw new RequestException(e);
         }
-        Collections.reverse(ndas);
-        data.put("empire_nda", ndas);
+
+        sql = "SELECT DATE(signup_date), COUNT(*)" +
+             " FROM empires" +
+             " WHERE signup_date IS NOT NULL" +
+               " AND signup_date > DATE_SUB(DATE(NOW()), INTERVAL 60 DAY)" +
+             " GROUP BY DATE(signup_date)" +
+             " ORDER BY signup_date DESC";
+        try (SqlStmt stmt = DB.prepare(sql)) {
+            ResultSet rs = stmt.select();
+            while (rs.next()) {
+                DateTime dt = new DateTime(rs.getDate(1).getTime());
+                int numSignups = rs.getInt(2);
+
+                int index = Days.daysBetween(dt, now).getDays();
+                if (index < 60) {
+                    TreeMap<String, Object> graphEntry = graphData.get(index);
+                    graphEntry.put("signups", numSignups);
+                }
+            }
+        } catch(Exception e) {
+            throw new RequestException(e);
+        }
+
+        data.put("graph_data", graphData);
 
         ArrayList<TreeMap<String, Object>> empireRanks = new ArrayList<TreeMap<String, Object>>();
         sql = "SELECT *" +

@@ -6,7 +6,7 @@
 {% block content %}
   <h1>Active Empires</h1>
 
-  <div id="n-day-actives" style="width: 90%; margin: 0 auto; height: 480px;"></div>
+  <div id="graph" style="width: 90%; margin: 0 auto; height: 480px;"></div>
   <script type="text/javascript">
     google.load("visualization", "1", {packages:["corechart"]});
     google.setOnLoadCallback(drawChart);
@@ -16,22 +16,28 @@
       dataTable.addColumn("date", "Date");
       dataTable.addColumn("number", "1-day actives");
       dataTable.addColumn("number", "7-day actives");
+      dataTable.addColumn("number", "New Signups");
       dataTable.addRows([
-      {% for nda in empire_nda %}
-        [new Date({{nda.year}}, {{nda.month}}+1, {{nda.day}}), {{nda.oneda}}, {{nda.sevenda}}],
+      {% for entry in graph_data %}
+        [new Date({{entry.year}}, {{entry.month|add:'1'}}, {{entry.day}}), {{entry.oneda|default:'0'}}, {{entry.sevenda|default:'0'}}, {{entry.signups|default:'0'}}],
       {% endfor %}
       ]);
 
       var dataView = new google.visualization.DataView(dataTable);
 
-      var width = $("#n-day-actives").width();
-      var height = $("#n-day-actives").height();
+      var width = $("#graph").width();
+      var height = $("#graph").height();
       var options = {
         "chartArea": {left: 50, top: 10, width: width - 230, height: height - 40},
-        "backgroundColor": {fill: "transparent"}
+        "backgroundColor": {fill: "transparent"},
+        "series": {
+          0: { "type": "line", "targetAxisIndex": 0 },
+          1: { "type": "line", "targetAxisIndex": 0 },
+          2: { "type": "line", "targetAxisIndex": 1 },
+        }
       };
 
-      var chart = new google.visualization.LineChart(document.getElementById("n-day-actives"));
+      var chart = new google.visualization.LineChart(document.getElementById("graph"));
       chart.draw(dataView, options);
     }
   </script>
