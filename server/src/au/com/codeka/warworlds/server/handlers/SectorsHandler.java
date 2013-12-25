@@ -30,9 +30,13 @@ public class SectorsHandler extends RequestHandler {
             String[] xy = xystr.split(",");
 
             Pair<Long, Long> coord = new Pair<Long, Long>();
-            coord.one = Long.parseLong(xy[0]);
-            coord.two = Long.parseLong(xy[1]);
-            coords.add(coord);
+            try {
+                coord.one = Long.parseLong(xy[0]);
+                coord.two = Long.parseLong(xy[1]);
+                coords.add(coord);
+            } catch (NumberFormatException e) {
+                // just ignore
+            }
         }
 
         return coords;

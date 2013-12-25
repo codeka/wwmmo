@@ -8,11 +8,13 @@ import android.util.AttributeSet;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import au.com.codeka.TimeInHours;
 import au.com.codeka.common.model.DesignKind;
 import au.com.codeka.common.model.ShipDesign;
 import au.com.codeka.warworlds.R;
+import au.com.codeka.warworlds.ctrl.FleetList;
 import au.com.codeka.warworlds.model.DesignManager;
 import au.com.codeka.warworlds.model.Empire;
 import au.com.codeka.warworlds.model.EmpireManager;
@@ -49,7 +51,7 @@ public class FleetInfoView extends FrameLayout {
 
         final ImageView fleetIcon = (ImageView) findViewById(R.id.fleet_icon);
         final ImageView empireIcon = (ImageView) findViewById(R.id.empire_icon);
-        final TextView fleetDesign = (TextView) findViewById(R.id.fleet_design);
+        final LinearLayout fleetDesign = (LinearLayout) findViewById(R.id.fleet_design);
         final TextView empireName = (TextView) findViewById(R.id.empire_name);
         final TextView fleetDetails = (TextView) findViewById(R.id.fleet_details);
 
@@ -69,7 +71,8 @@ public class FleetInfoView extends FrameLayout {
             }
         });
 
-        fleetDesign.setText(design.getDisplayName());
+        fleetDesign.removeAllViews();
+        FleetList.populateFleetNameRow(mContext, fleetDesign, fleet, design, 18.0f);
         fleetIcon.setImageDrawable(new SpriteDrawable(SpriteManager.i.getSprite(design.getSpriteName())));
 
         String eta = "???";

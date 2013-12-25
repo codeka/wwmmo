@@ -272,6 +272,7 @@ public class FleetList extends FrameLayout implements StarManager.StarFetchedHan
 
     @Override
     public void onDetachedFromWindow() {
+        super.onDetachedFromWindow();
         StarManager.getInstance().removeStarUpdatedListener(this);
     }
 
@@ -345,7 +346,7 @@ public class FleetList extends FrameLayout implements StarManager.StarFetchedHan
                                 srcStar = SectorManager.getInstance().findStar(fleet.getStarKey());
                             }
                             if (srcStar == null) {
-                                addTextToRow(context, row3, "→ (unknown)");
+                                addTextToRow(context, row3, "→ (unknown)", 0);
                             } else {
                                 float timeRemainingInHours = fleet.getTimeToDestination(srcStar, destStar);
                                 Sprite sprite = StarImageManager.getInstance().getSprite(destStar, -1, true);
@@ -358,11 +359,11 @@ public class FleetList extends FrameLayout implements StarManager.StarFetchedHan
                                     marginVert = -(float) (sprite.getHeight() / destStar.getStarType().getImageScale());
                                 }
 
-                                addTextToRow(context, row3, "→");
-                                addImageToRow(context, row3, sprite, marginHorz, marginVert);
+                                addTextToRow(context, row3, "→", 0);
+                                addImageToRow(context, row3, sprite, marginHorz, marginVert, 0);
                                 String text = String.format("%s <b>ETA:</b> %s",
                                                             destStar.getName(), eta);
-                                addTextToRow(context, row3, Html.fromHtml(text));
+                                addTextToRow(context, row3, Html.fromHtml(text), 0);
                             }
                             row3.setVisibility(View.VISIBLE);
                         }
@@ -378,9 +379,9 @@ public class FleetList extends FrameLayout implements StarManager.StarFetchedHan
                     row3.setVisibility(View.VISIBLE);
 
                     if (myEmpire.getKey().equals(empire.getKey())) {
-                        addTextToRow(context, row3, empire.getDisplayName());
+                        addTextToRow(context, row3, empire.getDisplayName(), 0);
                     } else {
-                        addTextToRow(context, row3, Html.fromHtml("<font color=\"red\">"+empire.getDisplayName()+"</font>"));
+                        addTextToRow(context, row3, Html.fromHtml("<font color=\"red\">"+empire.getDisplayName()+"</font>"), 0);
                     }
                 }
             });
@@ -388,22 +389,26 @@ public class FleetList extends FrameLayout implements StarManager.StarFetchedHan
     }
 
     public static void populateFleetNameRow(Context context, LinearLayout row, Fleet fleet, ShipDesign design) {
+        populateFleetNameRow(context, row, fleet, design, 0);
+    }
+
+    public static void populateFleetNameRow(Context context, LinearLayout row, Fleet fleet, ShipDesign design, float textSize) {
         if (fleet == null) {
             String text = String.format(Locale.ENGLISH, "%s", design.getDisplayName(false));
-            addTextToRow(context, row, text);
+            addTextToRow(context, row, text, textSize);
         } else if (fleet.getUpgrades().size() == 0) {
             String text = String.format(Locale.ENGLISH, "%d × %s",
                     (int) Math.ceil(fleet.getNumShips()), design.getDisplayName(fleet.getNumShips() > 1));
-            addTextToRow(context, row, text);
+            addTextToRow(context, row, text, textSize);
         } else {
             String text = String.format(Locale.ENGLISH, "%d ×", (int) Math.ceil(fleet.getNumShips()));
-            addTextToRow(context, row, text);
+            addTextToRow(context, row, text, textSize);
             for (BaseFleetUpgrade upgrade : fleet.getUpgrades()) {
                 Sprite sprite = SpriteManager.i.getSprite(design.getUpgrade(upgrade.getUpgradeID()).getSpriteName());
-                addImageToRow(context, row, sprite);
+                addImageToRow(context, row, sprite, textSize);
             }
             text = String.format(Locale.ENGLISH, "%s", design.getDisplayName(fleet.getNumShips() > 1));
-            addTextToRow(context, row, text);
+            addTextToRow(context, row, text, textSize);
         }
     }
 
@@ -411,27 +416,32 @@ public class FleetList extends FrameLayout implements StarManager.StarFetchedHan
         String text = String.format("%s (stance: %s)",
                 StringUtils.capitalize(fleet.getState().toString().toLowerCase(Locale.ENGLISH)),
                 StringUtils.capitalize(fleet.getStance().toString().toLowerCase(Locale.ENGLISH)));
-        addTextToRow(context, row, text);
+        addTextToRow(context, row, text, 0);
     }
 
-    private static void addTextToRow(Context context, LinearLayout row, CharSequence text) {
+    private static void addTextToRow(Context context, LinearLayout row, CharSequence text, float size) {
         TextView tv = new TextView(context);
         tv.setText(text);
         tv.setSingleLine(true);
         tv.setEllipsize(TruncateAt.END);
+        if (size != 0) {
+            tv.setTextSize(size);
+        }
         row.addView(tv);
     }
 
-    private static void addImageToRow(Context context, LinearLayout row, Sprite sprite) {
-        addImageToRow(context, row, sprite, 0, 0);
+    private static void addImageToRow(Context context, LinearLayout row, Sprite sprite, float size) {
+        addImageToRow(context, row, sprite, 0, 0, size);
     }
 
-    private static void addImageToRow(Context context, LinearLayout row, Sprite sprite, float marginHorz, float marginVert) {
+    private static void addImageToRow(Context context, LinearLayout row, Sprite sprite, float marginHorz, float marginVert, float size) {
         ImageView iv = new ImageView(context);
         iv.setImageDrawable(new SpriteDrawable(sprite));
 
-        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT,
-                                                                     LinearLayout.LayoutParams.WRAP_CONTENT);
+        if (size == 0) {
+            size = 16.0f;
+        }
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams((int) size * 2, (int) size * 2);
         lp.setMargins((int) (marginHorz + 5), (int) (marginVert - 5), (int) (marginHorz + 5), (int) (marginVert - 5));
         iv.setLayoutParams(lp);
 

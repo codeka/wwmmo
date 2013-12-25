@@ -2,6 +2,7 @@ package au.com.codeka.warworlds.server.ctrl;
 
 import java.sql.ResultSet;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 import au.com.codeka.common.Pair;
@@ -13,6 +14,7 @@ import au.com.codeka.warworlds.server.data.SqlStmt;
 import au.com.codeka.warworlds.server.data.Transaction;
 import au.com.codeka.warworlds.server.model.Colony;
 import au.com.codeka.warworlds.server.model.Fleet;
+import au.com.codeka.warworlds.server.model.FleetUpgrade;
 import au.com.codeka.warworlds.server.model.Sector;
 import au.com.codeka.warworlds.server.model.Star;
 
@@ -204,18 +206,43 @@ public class SectorController {
         }
 
         public List<Fleet> getFleetsForSectors(int[] sectorIds) throws Exception {
+            HashSet<Integer> starIds = new HashSet<Integer>();
+            List<Fleet> fleets = new ArrayList<Fleet>();
+
             String sql = "SELECT fleets.*" +
                          " FROM fleets" +
                          " WHERE sector_id IN "+buildInClause(sectorIds);
-             try (SqlStmt stmt = prepare(sql)) {
-                 ResultSet rs = stmt.select();
+            try (SqlStmt stmt = prepare(sql)) {
+                ResultSet rs = stmt.select();
 
-                 List<Fleet> fleets = new ArrayList<Fleet>();
-                 while (rs.next()) {
-                     fleets.add(new Fleet(rs));
-                 }
-                 return fleets;
-             }
+                while (rs.next()) {
+                    Fleet fleet = new Fleet(rs);
+                    fleets.add(fleet);
+                    if (!starIds.contains(fleet.getStarID())) {
+                        starIds.add(fleet.getStarID());
+                    }
+                }
+            }
+
+            if (starIds.size() > 0) {
+                sql = "SELECT * FROM fleet_upgrades WHERE star_id IN "+buildInClause(starIds);
+                try (SqlStmt stmt = prepare(sql)) {
+                    ResultSet rs = stmt.select();
+    
+                    while (rs.next()) {
+                        FleetUpgrade fleetUpgrade = new FleetUpgrade(rs);
+    
+                        for (Fleet fleet : fleets) {
+                            if (fleet.getID() == fleetUpgrade.getFleetID()) {
+                                fleet.getUpgrades().add(fleetUpgrade);
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+
+            return fleets;
         }
 
         public void swapStars(Star star1, Star star2) throws Exception {

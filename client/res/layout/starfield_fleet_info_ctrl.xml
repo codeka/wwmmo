@@ -4,12 +4,13 @@
                 android:layout_height="match_parent"
                 android:visibility="visible"  >
 
-    <ImageView android:id="@+id/fleet_icon"
-               android:layout_width="48dp"
-               android:layout_height="48dp"
-               android:layout_alignParentLeft="true"
-               android:layout_alignParentTop="true"
-               android:src="@drawable/fleet" />
+    <ImageView
+        android:id="@+id/fleet_icon"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:src="@drawable/app_icon" />
 
     <ImageView android:id="@+id/empire_icon"
                android:layout_width="20dp"
@@ -18,15 +19,14 @@
                android:layout_toRightOf="@+id/fleet_icon"
                android:src="@drawable/app_icon" />
 
-    <TextView android:id="@+id/fleet_design"
-              android:layout_width="wrap_content"
-              android:layout_height="20dp"
-              android:layout_alignParentRight="true"
-              android:layout_alignParentTop="true"
-              android:layout_toRightOf="@+id/fleet_icon"
-              android:gravity="center_vertical"
-              android:text="Fleet Design"
-              android:textSize="18sp" />
+    <LinearLayout android:id="@+id/fleet_design"
+                  android:layout_width="wrap_content"
+                  android:layout_height="20dp"
+                  android:layout_alignParentRight="true"
+                  android:layout_alignParentTop="true"
+                  android:layout_toRightOf="@+id/fleet_icon"
+                  android:gravity="center_vertical"
+                  android:orientation="horizontal" />
 
     <TextView android:id="@+id/empire_name"
               android:layout_width="wrap_content"

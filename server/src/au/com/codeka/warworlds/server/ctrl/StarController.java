@@ -82,23 +82,24 @@ public class StarController {
             } catch (Exception e) {
                 throw new RequestException(e);
             }
-        }
-        for (int i = 0; ; i++) {
-            try {
-                updateNoRetry(star);
-                break;
-            } catch (MySQLTransactionRollbackException e) {
-                if (i >= 5) {
-                    throw e;
-                }
-
-                // sleep a random amount and try again
+        } else {
+            for (int i = 0; ; i++) {
                 try {
-                    Thread.sleep(100 + (sRand.nextInt(400)));
-                } catch (InterruptedException e1) {
+                    updateNoRetry(star);
+                    break;
+                } catch (MySQLTransactionRollbackException e) {
+                    if (i >= 5) {
+                        throw e;
+                    }
+    
+                    // sleep a random amount and try again
+                    try {
+                        Thread.sleep(100 + (sRand.nextInt(400)));
+                    } catch (InterruptedException e1) {
+                    }
+                } catch (Exception e) {
+                    throw new RequestException(e);
                 }
-            } catch (Exception e) {
-                throw new RequestException(e);
             }
         }
 

@@ -84,7 +84,7 @@ public class BaseDataBase {
         sb.append("(");
         boolean first = true;
         for (Integer id : ids) {
-            if (first) {
+            if (!first) {
                 sb.append(", ");
             }
             first = false;
