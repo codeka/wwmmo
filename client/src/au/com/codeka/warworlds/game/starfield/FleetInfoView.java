@@ -3,13 +3,17 @@ package au.com.codeka.warworlds.game.starfield;
 import java.util.Locale;
 
 import android.content.Context;
+import android.os.Bundle;
 import android.text.Html;
 import android.util.AttributeSet;
 import android.view.View;
+import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 import au.com.codeka.TimeInHours;
 import au.com.codeka.common.model.DesignKind;
 import au.com.codeka.common.model.ShipDesign;
@@ -20,10 +24,10 @@ import au.com.codeka.warworlds.model.Empire;
 import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.EmpireShieldManager;
 import au.com.codeka.warworlds.model.Fleet;
-import au.com.codeka.warworlds.model.SectorManager;
+import au.com.codeka.warworlds.model.Sector;
 import au.com.codeka.warworlds.model.SpriteDrawable;
 import au.com.codeka.warworlds.model.SpriteManager;
-import au.com.codeka.warworlds.model.Star;
+import au.com.codeka.warworlds.model.StarSummary;
 
 /** This view displays information about a fleet you've selected on the starfield view. */
 public class FleetInfoView extends FrameLayout {
@@ -41,6 +45,23 @@ public class FleetInfoView extends FrameLayout {
 
         mView = inflate(context, R.layout.starfield_fleet_info_ctrl, null);
         addView(mView);
+
+        final Button boostBtn = (Button) mView.findViewById(R.id.boost_btn);
+        boostBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mFleet == null) {
+                    return;
+                }
+
+                if (!mFleet.hasUpgrade("boost")) {
+                    // toast?
+                    return;
+                }
+
+                Toast.makeText(mContext, "BOOOOOOOOOOOOOOST", Toast.LENGTH_SHORT).show();;
+            }
+        });
     }
 
     public void setFleet(final Fleet fleet) {
@@ -53,7 +74,10 @@ public class FleetInfoView extends FrameLayout {
         final ImageView empireIcon = (ImageView) findViewById(R.id.empire_icon);
         final LinearLayout fleetDesign = (LinearLayout) findViewById(R.id.fleet_design);
         final TextView empireName = (TextView) findViewById(R.id.empire_name);
-        final TextView fleetDetails = (TextView) findViewById(R.id.fleet_details);
+        final LinearLayout fleetDestination = (LinearLayout) findViewById(R.id.fleet_destination);
+        final ProgressBar progressBar = (ProgressBar) findViewById(R.id.progress_bar);
+        final TextView progressText = (TextView) findViewById(R.id.progress_text);
+        final Button boostBtn = (Button) findViewById(R.id.boost_btn);
 
         empireName.setText("");
         empireIcon.setImageBitmap(null);
@@ -75,22 +99,32 @@ public class FleetInfoView extends FrameLayout {
         FleetList.populateFleetNameRow(mContext, fleetDesign, fleet, design, 18.0f);
         fleetIcon.setImageDrawable(new SpriteDrawable(SpriteManager.i.getSprite(design.getSpriteName())));
 
-        String eta = "???";
-        Star srcStar = SectorManager.getInstance().findStar(fleet.getStarKey());
-        Star destStar = SectorManager.getInstance().findStar(fleet.getDestinationStarKey());
-        if (srcStar != null && destStar != null) {
-            float timeRemainingInHours = fleet.getTimeToDestination(srcStar, destStar);
-            eta = TimeInHours.format(timeRemainingInHours);
-        }
+        fleetDestination.removeAllViews();
+        FleetList.populateFleetDestinationRow(mContext, fleetDestination, fleet, false);
 
-        String details = String.format(Locale.ENGLISH,
-            "<b>Ships:</b> %d<br />" +
-            "<b>Speed:</b> %.2f pc/hr<br />" +
-            "<b>Destination:</b> %s<br />" +
-            "<b>ETA:</b> %s",
-            (int) Math.ceil(fleet.getNumShips()), design.getSpeedInParsecPerHour(),
-            (destStar == null ? "???" : destStar.getName()),
-            eta);
-        fleetDetails.setText(Html.fromHtml(details));
+        FleetList.fetchSrcDestStar(fleet, null, new FleetList.SrcDestStarsFetchedHandler() {
+            @Override
+            public void onSrcDestStarsFetched(StarSummary srcStar, StarSummary destStar) {
+                ShipDesign design = (ShipDesign) DesignManager.i.getDesign(DesignKind.SHIP, mFleet.getDesignID());
+
+                float distanceInParsecs = Sector.distanceInParsecs(srcStar, destStar);
+                float timeInHours = distanceInParsecs / design.getSpeedInParsecPerHour();
+                float timeRemainingInHours = fleet.getTimeToDestination();
+
+                float fractionComplete = timeRemainingInHours / timeInHours;
+                progressBar.setMax(1000);
+                progressBar.setProgress((int) (fractionComplete * 1000.0f));
+
+                String eta = String.format(Locale.ENGLISH, "<b>ETA</b>: %.1f pc in %s",
+                        distanceInParsecs * fractionComplete, TimeInHours.format(timeRemainingInHours));
+                progressText.setText(Html.fromHtml(eta));
+            }
+        });
+
+        if (fleet.hasUpgrade("boost")) {
+            boostBtn.setEnabled(true);
+        } else {
+            boostBtn.setEnabled(false);
+        }
     }
 }

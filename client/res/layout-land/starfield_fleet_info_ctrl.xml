@@ -36,16 +36,41 @@
               android:gravity="center_vertical"
               android:text="Empire Name" />
 
-    <TextView android:id="@+id/fleet_details"
+    <LinearLayout android:id="@+id/fleet_destination"
+                  android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  android:layout_alignParentLeft="true"
+                  android:layout_below="@id/fleet_icon"
+                  android:layout_marginTop="8dp"
+                  android:layout_marginLeft="4dp"
+                  android:gravity="center_vertical"
+                  android:orientation="horizontal" />
+
+    <ProgressBar android:id="@+id/progress_bar"
+                 style="?android:attr/progressBarStyleHorizontal"
+                 android:layout_width="match_parent"
+                 android:layout_height="wrap_content"
+                 android:layout_below="@+id/fleet_destination"
+                 android:layout_alignLeft="@+id/fleet_destination"
+                 android:layout_alignParentRight="true"
+                 android:layout_margin="4dp" />
+
+    <TextView android:id="@+id/progress_text"
               android:layout_width="wrap_content"
               android:layout_height="wrap_content"
-              android:layout_alignParentBottom="true"
-              android:layout_alignParentLeft="true"
+              android:layout_below="@+id/progress_bar"
+              android:layout_alignLeft="@+id/fleet_destination"
               android:layout_alignParentRight="true"
-              android:layout_below="@+id/fleet_icon"
-              android:layout_marginBottom="8dp"
-              android:layout_marginLeft="8dp"
-              android:layout_marginRight="8dp"
-              android:layout_marginTop="8dp"
-              android:text="Fleet Details" />
+              android:layout_margin="4dp"
+              android:gravity="center_vertical" />
+
+    <Button android:id="@+id/boost_btn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/progress_text"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentRight="true"
+            android:layout_margin="4dp"
+            android:text="Boost" />
+    
 </RelativeLayout>

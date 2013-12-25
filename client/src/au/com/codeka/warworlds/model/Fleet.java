@@ -24,4 +24,19 @@ public class Fleet extends BaseFleet {
     public void setNotes(String notes) {
         mNotes = notes;
     }
+
+    public boolean hasUpgrade(String upgradeID) {
+        if (mUpgrades == null) {
+            return false;
+        }
+
+        for (BaseFleetUpgrade baseUpgrade : mUpgrades) {
+            FleetUpgrade upgrade = (FleetUpgrade) baseUpgrade;
+            if (upgrade.getUpgradeID().equals(upgradeID)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 }

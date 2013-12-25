@@ -121,7 +121,7 @@ public abstract class BaseFleet {
         mTargetFleetKey = null;
     }
 
-    public float getTimeToDestination(BaseStar srcStar, BaseStar destStar) {
+    public float getTimeToDestination() {
         if (mEta == null) {
             return 0.0f;
         }

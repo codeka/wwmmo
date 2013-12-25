@@ -334,40 +334,7 @@ public class FleetList extends FrameLayout implements StarManager.StarFetchedHan
 
         if (fleet.getState() == Fleet.State.MOVING) {
             row3.setVisibility(View.GONE);
-            StarManager.getInstance().requestStarSummary(fleet.getDestinationStarKey(),
-                    new StarManager.StarSummaryFetchedHandler() {
-                        @Override
-                        public void onStarSummaryFetched(StarSummary destStar) {
-                            Star srcStar = null;
-                            if (stars != null) {
-                                srcStar = stars.get(fleet.getStarKey());
-                            }
-                            if (srcStar == null) {
-                                srcStar = SectorManager.getInstance().findStar(fleet.getStarKey());
-                            }
-                            if (srcStar == null) {
-                                addTextToRow(context, row3, "→ (unknown)", 0);
-                            } else {
-                                float timeRemainingInHours = fleet.getTimeToDestination(srcStar, destStar);
-                                Sprite sprite = StarImageManager.getInstance().getSprite(destStar, -1, true);
-                                String eta = TimeInHours.format(timeRemainingInHours);
-
-                                float marginHorz = 0;
-                                float marginVert = 0;
-                                if (destStar.getStarType().getImageScale() > 1.0) {
-                                    marginHorz = -(float) (sprite.getWidth() / destStar.getStarType().getImageScale());
-                                    marginVert = -(float) (sprite.getHeight() / destStar.getStarType().getImageScale());
-                                }
-
-                                addTextToRow(context, row3, "→", 0);
-                                addImageToRow(context, row3, sprite, marginHorz, marginVert, 0);
-                                String text = String.format("%s <b>ETA:</b> %s",
-                                                            destStar.getName(), eta);
-                                addTextToRow(context, row3, Html.fromHtml(text), 0);
-                            }
-                            row3.setVisibility(View.VISIBLE);
-                        }
-                    });
+            populateFleetDestinationRow(context, row3, fleet, stars, true);
         } else {
             row3.setVisibility(View.GONE);
 
@@ -410,6 +377,101 @@ public class FleetList extends FrameLayout implements StarManager.StarFetchedHan
             text = String.format(Locale.ENGLISH, "%s", design.getDisplayName(fleet.getNumShips() > 1));
             addTextToRow(context, row, text, textSize);
         }
+    }
+
+    public static void populateFleetDestinationRow(Context context, LinearLayout row, Fleet fleet, boolean includeEta) {
+        populateFleetDestinationRow(context, row, fleet, null, includeEta);
+    }
+
+    public static void fetchSrcDestStar(final Fleet fleet, Map<String, Star> stars, final SrcDestStarsFetchedHandler handler) {
+        StarSummary srcStar = null;
+        StarSummary destStar = null;
+        if (stars != null) {
+            srcStar = stars.get(fleet.getStarKey());
+            destStar = stars.get(fleet.getDestinationStarKey());
+        }
+
+        if (srcStar == null) {
+            SectorManager.getInstance().findStar(fleet.getStarKey());
+        }
+        if (destStar == null) {
+            SectorManager.getInstance().findStar(fleet.getStarKey());
+        }
+
+        if (srcStar != null && destStar != null) {
+            handler.onSrcDestStarsFetched(srcStar, destStar);
+            return;
+        }
+
+        if (srcStar == null) {
+            final StarSummary oldDestStar = destStar;
+            StarManager.getInstance().requestStarSummary(fleet.getStarKey(),
+                new StarManager.StarSummaryFetchedHandler() {
+                    @Override
+                    public void onStarSummaryFetched(final StarSummary srcStar) {
+                        if (oldDestStar == null) {
+                            StarManager.getInstance().requestStarSummary(fleet.getDestinationStarKey(),
+                                    new StarManager.StarSummaryFetchedHandler() {
+                                        @Override
+                                        public void onStarSummaryFetched(StarSummary destStar) {
+                                            handler.onSrcDestStarsFetched(srcStar, destStar);
+                                        }
+                            });
+                        } else {
+                            handler.onSrcDestStarsFetched(srcStar, oldDestStar);
+                        }
+                    }
+            });
+        } else {
+            final StarSummary oldSrcStar = srcStar;
+            StarManager.getInstance().requestStarSummary(fleet.getDestinationStarKey(),
+                    new StarManager.StarSummaryFetchedHandler() {
+                        @Override
+                        public void onStarSummaryFetched(StarSummary destStar) {
+                            handler.onSrcDestStarsFetched(oldSrcStar, destStar);
+                        }
+            });
+        }
+    }
+
+    public interface SrcDestStarsFetchedHandler {
+        void onSrcDestStarsFetched(StarSummary srcStar, StarSummary destStar);
+    }
+
+    public static void populateFleetDestinationRow(final Context context, final LinearLayout row,
+            final Fleet fleet, Map<String, Star> stars, final boolean includeEta) {
+        fetchSrcDestStar(fleet, stars, new SrcDestStarsFetchedHandler() {
+            @Override
+            public void onSrcDestStarsFetched(StarSummary srcStar, StarSummary destStar) {
+                populateFleetDestinationRow(context, row, fleet, srcStar, destStar, includeEta);
+            }
+        });
+    }
+
+    private static void populateFleetDestinationRow(Context context, LinearLayout row, Fleet fleet, StarSummary src,
+            StarSummary dest, boolean includeEta) {
+        float timeRemainingInHours = fleet.getTimeToDestination();
+        Sprite sprite = StarImageManager.getInstance().getSprite(dest, -1, true);
+        String eta = TimeInHours.format(timeRemainingInHours);
+
+        float marginHorz = 0;
+        float marginVert = 0;
+        if (dest.getStarType().getImageScale() > 1.0) {
+            marginHorz = -(float) (sprite.getWidth() / dest.getStarType().getImageScale());
+            marginVert = -(float) (sprite.getHeight() / dest.getStarType().getImageScale());
+        }
+
+        addTextToRow(context, row, "→", 0);
+        addImageToRow(context, row, sprite, marginHorz, marginVert, 0);
+        if (includeEta) {
+            String text = String.format("%s <b>ETA:</b> %s",
+                                        dest.getName(), eta);
+            addTextToRow(context, row, Html.fromHtml(text), 0);
+        } else {
+            addTextToRow(context, row, dest.getName(), 0);
+        }
+
+        row.setVisibility(View.VISIBLE);
     }
 
     public static void populateFleetStanceRow(Context context, LinearLayout row, Fleet fleet) {
