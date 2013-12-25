@@ -110,12 +110,12 @@ public class FleetInfoView extends FrameLayout {
                 float timeInHours = distanceInParsecs / design.getSpeedInParsecPerHour();
                 float timeRemainingInHours = fleet.getTimeToDestination();
 
-                float fractionComplete = timeRemainingInHours / timeInHours;
+                float fractionRemaining = timeRemainingInHours / timeInHours;
                 progressBar.setMax(1000);
-                progressBar.setProgress((int) (fractionComplete * 1000.0f));
+                progressBar.setProgress(1000 - (int) (fractionRemaining * 1000.0f));
 
                 String eta = String.format(Locale.ENGLISH, "<b>ETA</b>: %.1f pc in %s",
-                        distanceInParsecs * fractionComplete, TimeInHours.format(timeRemainingInHours));
+                        distanceInParsecs * fractionRemaining, TimeInHours.format(timeRemainingInHours));
                 progressText.setText(Html.fromHtml(eta));
             }
         });
