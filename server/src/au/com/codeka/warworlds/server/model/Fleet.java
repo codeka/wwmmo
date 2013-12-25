@@ -3,6 +3,7 @@ package au.com.codeka.warworlds.server.model;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 
 import org.joda.time.DateTime;
 import org.joda.time.Seconds;
@@ -93,6 +94,13 @@ public class Fleet extends BaseFleet {
     public void setID(int id) {
         mID = id;
         mKey = Integer.toString(id);
+
+        if (mUpgrades != null) {
+            for (BaseFleetUpgrade baseUpgrade : mUpgrades) {
+                FleetUpgrade upgrade = (FleetUpgrade) baseUpgrade;
+                upgrade.setFleetID(id);
+            }
+        }
     }
     public void setStance(Stance stance) {
         mStance = stance;
@@ -172,6 +180,12 @@ public class Fleet extends BaseFleet {
         other.mStance = mStance;
         other.mState = State.IDLE;
         other.mStateStartTime = DateTime.now();
+        if (mUpgrades != null) {
+            other.mUpgrades = new ArrayList<BaseFleetUpgrade>();
+            for (BaseFleetUpgrade upgrade : mUpgrades) {
+                other.mUpgrades.add(new FleetUpgrade((FleetUpgrade) upgrade));
+            }
+        }
         return other;
     }
 

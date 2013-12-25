@@ -3,7 +3,6 @@ package au.com.codeka.warworlds.game.starfield;
 import java.util.Locale;
 
 import android.content.Context;
-import android.os.Bundle;
 import android.text.Html;
 import android.util.AttributeSet;
 import android.view.View;

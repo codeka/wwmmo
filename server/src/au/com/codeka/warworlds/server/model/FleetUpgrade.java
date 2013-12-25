@@ -18,4 +18,14 @@ public class FleetUpgrade extends BaseFleetUpgrade {
         mStarID = starID;
         mUpgradeID = upgradeID;
     }
+    public FleetUpgrade(FleetUpgrade copy) {
+        mFleetID = copy.mFleetID;
+        mUpgradeID = copy.mUpgradeID;
+        mStarID = copy.mStarID;
+    }
+
+    public void setFleetID(int id) {
+        mFleetID = id;
+    }
 }
+
