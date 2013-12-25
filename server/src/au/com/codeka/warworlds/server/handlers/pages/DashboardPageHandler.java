@@ -1,10 +1,8 @@
 package au.com.codeka.warworlds.server.handlers.pages;
 
-import java.sql.Date;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.TreeMap;
 
 import org.joda.time.DateTime;
