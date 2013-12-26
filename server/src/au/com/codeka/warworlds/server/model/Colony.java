@@ -39,7 +39,7 @@ public class Colony extends BaseColony {
         mDefenceBoost = 1.0f;
         mBuildings = new ArrayList<BaseBuilding>();
     }
-    public Colony(int id, int sectorID, int starID, int planetIndex, Integer empireID) {
+    public Colony(int id, int sectorID, int starID, int planetIndex, Integer empireID, float population) {
         mID = id;
         mKey = Integer.toString(mID);
         mSectorID = sectorID;
@@ -56,7 +56,7 @@ public class Colony extends BaseColony {
         mMiningFocus = 0.25f;
         mUncollectedTaxes = 0.0f;
         mCooldownTimeEnd = new DateTime().plusHours(8);
-        mPopulation = 100.0f;
+        mPopulation = population;
         mDefenceBoost = 1.0f;
         mBuildings = new ArrayList<BaseBuilding>();
     }

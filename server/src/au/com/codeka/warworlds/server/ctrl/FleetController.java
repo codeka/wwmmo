@@ -47,7 +47,16 @@ public class FleetController {
      */
     public void removeShips(Star star, Fleet fleet, float numShips) throws RequestException {
         if (fleet.getNumShips() <= numShips) {
-            String sql = "DELETE FROM fleets WHERE id = ?";
+            String sql = "DELETE FROM fleet_upgrades WHERE fleet_id = ?";
+            try (SqlStmt stmt = db.prepare(sql)) {
+                stmt.setInt(1, fleet.getID());
+                stmt.update();
+                star.getFleets().remove(fleet);
+            } catch(Exception e) {
+                throw new RequestException(e);
+            }
+
+            sql = "DELETE FROM fleets WHERE id = ?";
             try (SqlStmt stmt = db.prepare(sql)) {
                 stmt.setInt(1, fleet.getID());
                 stmt.update();

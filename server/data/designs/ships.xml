@@ -6,9 +6,7 @@
     <description><![CDATA[
       <p>The colony ship is what you'll need to colonize remote planets. They'll carry 100 of
       your colony's population to a brave new world.</p>
-      <p>Colony ships are single-use. The ship is destroyed once a planet is colonized. <i>Be
-      aware that once your ship is built, 100 population will be removed from your colony and
-      added to the ship!</i></p>
+      <p>Colony ships are single-use. The ship is destroyed once a planet is colonized.</p>
     ]]></description>
     <dependencies>
       <requires building="shipyard" level="1" />
@@ -19,7 +17,18 @@
     <effects>
       <effect kind="fighter" />
     </effects>
-  </design>
+    <upgrades>
+      <upgrade id="cryogenics">
+        <sprite>upgrade.cryogenics</sprite>
+        <name>Cryogenic Chamber</name>
+        <cost minerals="2000" time="8.0" />
+        <description><![CDATA[
+          The cryogenic chamber means colonists are put to sleep during the voyage to the next planet. This allows for
+          a larger number of colonists to be deployed, increasing the number of initial colonists from 100 to 400.
+        ]]></description>
+      </upgrade>
+    </upgrades>
+    </design>
   <design id="scout">
     <name>Scout</name>
     <sprite>ship.scout</sprite>

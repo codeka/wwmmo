@@ -44,7 +44,8 @@ public class ColoniesHandler extends RequestHandler {
             }
 
             // find the fleet of colony ships we'll use to colonize this planet. Basically, we
-            // choose an idle fleet with the smaller number of ships to take from.
+            // choose an idle fleet with the smaller number of ships to take from, prefering one with the cyro upgrade
+            // over one without
             Fleet colonyShipFleet = null;
             for (BaseFleet baseFleet : star.getFleets()) {
                 Fleet fleet = (Fleet) baseFleet;
@@ -57,7 +58,16 @@ public class ColoniesHandler extends RequestHandler {
                 if (!fleet.getDesignID().equals("colonyship")) {
                     continue;
                 }
+                if (fleet.hasUpgrade("cryogenics") && (colonyShipFleet == null || !colonyShipFleet.hasUpgrade("cryogenics"))) {
+                    // if this fleet has a cryogenics upgrade and the existing one doesn't, choose this fleet
+                    colonyShipFleet = fleet;
+                }
+                if (colonyShipFleet != null && colonyShipFleet.hasUpgrade("cryogenics") && !fleet.hasUpgrade("cryogenics")) {
+                    // if the existing fleet has a cryogenics upgrade and this one doesn't, skip this one
+                    continue;
+                }
                 if (colonyShipFleet == null || colonyShipFleet.getNumShips() > fleet.getNumShips()) {
+                    // otherwise, choose the fleet with the smaller number of ships.
                     colonyShipFleet = fleet;
                 }
             }
@@ -67,11 +77,16 @@ public class ColoniesHandler extends RequestHandler {
                                            "No idle Colony Ship is available to colonize this planet.");
             }
 
+            float population = 100.0f;
+            if (colonyShipFleet.hasUpgrade("cryogenics")) {
+                population = 400.0f;
+            }
+
             // remove a ship from your colonyship fleet
             new FleetController(t).removeShips(star, colonyShipFleet, 1.0f);
 
             // and colonize the planet!
-            Colony colony = new ColonyController(t).colonize(myEmpire, star, planetIndex);
+            Colony colony = new ColonyController(t).colonize(myEmpire, star, planetIndex, population);
 
             Messages.Colony.Builder colony_pb = Messages.Colony.newBuilder();
             colony.toProtocolBuffer(colony_pb);

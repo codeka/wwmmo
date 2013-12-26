@@ -406,6 +406,19 @@ public class StarController {
             }
 
             if (needDelete) {
+                sql = "DELETE FROM fleet_upgrades WHERE fleet_id = ?";
+                try (SqlStmt stmt = prepare(sql)) {
+                    for (BaseFleet baseFleet : star.getFleets()) {
+                        if (baseFleet.getTimeDestroyed() != null && baseFleet.getTimeDestroyed().isBefore(now)) {
+                            Fleet fleet = (Fleet) baseFleet;
+                            stmt.setInt(1, fleet.getID());
+                            stmt.update();
+                        }
+                    }
+                } catch(Exception e) {
+                    throw new RequestException(e);
+                }
+
                 sql = "DELETE FROM fleets WHERE id = ?";
                 ArrayList<BaseFleet> toRemove = new ArrayList<BaseFleet>();
                 try (SqlStmt stmt = prepare(sql)) {
@@ -678,7 +691,7 @@ public class StarController {
             int numColonies = rand.nextInt(Math.min(3, planets.size() - 1)) + 1;
             for (int i = 0; i < numColonies; i++) {
                 Planet planet = planets.get(i);
-                Colony colony = new ColonyController(getTransaction()).colonize(null, star, planet.getIndex());
+                Colony colony = new ColonyController(getTransaction()).colonize(null, star, planet.getIndex(), 100.0f);
                 colony.setConstructionFocus(0.0f);
                 colony.setPopulationFocus(0.5f);
                 colony.setFarmingFocus(0.5f);

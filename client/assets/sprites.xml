@@ -55,7 +55,11 @@
       <rect location="149,1" size="19x21" />
       <direction>0,1</direction>
     </sprite>
-  </sheet>
+    <sprite name="upgrade.cryogenics">
+      <rect location="126,4" size="21x18" />
+      <direction>0,1</direction>
+    </sprite>
+    </sheet>
 
   <sheet filename="planets/planets.png">
     <sprite name="planet.asteroids" kind="alternate">

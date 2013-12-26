@@ -8,9 +8,6 @@ import java.util.List;
 
 import org.joda.time.DateTime;
 
-import com.mysql.jdbc.exceptions.jdbc4.MySQLIntegrityConstraintViolationException;
-import com.mysql.jdbc.exceptions.jdbc4.MySQLTransactionRollbackException;
-
 import au.com.codeka.common.model.BaseColony;
 import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.server.RequestException;
@@ -21,6 +18,9 @@ import au.com.codeka.warworlds.server.model.Colony;
 import au.com.codeka.warworlds.server.model.Empire;
 import au.com.codeka.warworlds.server.model.Planet;
 import au.com.codeka.warworlds.server.model.Star;
+
+import com.mysql.jdbc.exceptions.jdbc4.MySQLIntegrityConstraintViolationException;
+import com.mysql.jdbc.exceptions.jdbc4.MySQLTransactionRollbackException;
 
 public class EmpireController {
     private DataBase db;
@@ -226,8 +226,8 @@ public class EmpireController {
         star = new StarController().getStar(star.getID());
         Planet planet = (Planet) star.getPlanets()[starFinder.getPlanetIndex() - 1];
 
-        Colony colony = new ColonyController(db.getTransaction()).colonize(empire, star, starFinder.getPlanetIndex());
-        colony.setPopulation(planet.getPopulationCongeniality() * 0.8f);
+        new ColonyController(db.getTransaction()).colonize(empire, star, starFinder.getPlanetIndex(),
+                planet.getPopulationCongeniality() * 0.8f);
 
         new FleetController(db.getTransaction()).createFleet(empire, star, "colonyship", 2.0f);
         new FleetController(db.getTransaction()).createFleet(empire, star, "scout", 10.0f);

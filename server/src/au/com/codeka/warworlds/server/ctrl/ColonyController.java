@@ -155,7 +155,7 @@ public class ColonyController {
         }
     }
 
-    public Colony colonize(Empire empire, Star star, int planetIndex) throws RequestException {
+    public Colony colonize(Empire empire, Star star, int planetIndex, float population) throws RequestException {
         Colony colony = null;
 
         // add the initial colony and fleets to the star
@@ -166,7 +166,7 @@ public class ColonyController {
              " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         try (SqlStmt stmt = db.prepare(sql, Statement.RETURN_GENERATED_KEYS)) {
             colony = new Colony(0, star.getSectorID(), star.getID(), planetIndex,
-                    empire == null ? null : empire.getID());
+                    empire == null ? null : empire.getID(), population);
             stmt.setInt(1, colony.getSectorID());
             stmt.setInt(2, colony.getStarID());
             stmt.setInt(3, colony.getPlanetIndex());
