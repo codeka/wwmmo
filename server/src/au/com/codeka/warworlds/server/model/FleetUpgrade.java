@@ -42,6 +42,10 @@ public class FleetUpgrade extends BaseFleetUpgrade {
         mFleetID = id;
     }
 
+    /** This is called when the fleet that owns us arrives at a star. */
+    public void onArrived(Star star, Fleet fleet) {
+    }
+
     /** This is a specific upgrade for the 'boost' upgrade. */
     public static class BoostFleetUpgrade extends FleetUpgrade {
         private boolean mIsBoosting;
@@ -59,6 +63,17 @@ public class FleetUpgrade extends BaseFleetUpgrade {
 
         public void isBoosting(boolean value) {
             mIsBoosting = value;
+        }
+
+        /**
+         * Boost is a one-off thing. If you want to boost again, you have to upgrade again. So if we
+         * were boosting, then we'll remove this upgrade from the fleet.
+         */
+        @Override
+        public void onArrived(Star star, Fleet fleet) {
+            if (isBoosting()) {
+               fleet.getUpgrades().remove(this);
+            }
         }
 
         @Override

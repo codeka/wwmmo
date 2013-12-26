@@ -38,7 +38,18 @@
       <effect kind="scout" />
       <effect kind="fighter" />
     </effects>
-  </design>
+    <upgrades>
+      <upgrade id="cloak">
+        <sprite>upgrade.cloak</sprite>
+        <name>Cloak</name>
+        <cost minerals="1000" time="0.55" />
+        <description><![CDATA[
+          Adding a cloaking device to a scout makes it invisible to enemy radar. Additionally, if you set
+          the scout's stance to "Neutral" or "Passive", it will remain <em>undetected</em> around enemy stars.
+        ]]></description>
+      </upgrade>
+    </upgrades>
+    </design>
   <design id="fighter">
     <name>Fighter</name>
     <sprite>ship.fighter</sprite>
@@ -57,29 +68,12 @@
       <effect kind="fighter" />
     </effects>
     <upgrades>
-      <upgrade id="firepower">
-        <sprite>upgrade.firepower</sprite>
-        <name>Plasma Cannon</name>
-        <cost minerals="20" time="0.10" />
-        <description><![CDATA[
-          A plamsa cannon upgrades the firepower of your fighters so that they are twice as
-          effective in battle.
-        ]]></description>
-      </upgrade>
-      <upgrade id="shield">
-        <sprite>upgrade.shield</sprite>
-        <name>Energy Shield</name>
-        <cost minerals="20" time="0.10" />
-        <description><![CDATA[
-          This shield upgrade makes your fighter twice as resilient to enemy fire.
-        ]]></description>
-      </upgrade>
       <upgrade id="boost">
         <sprite>upgrade.boost</sprite>
         <name>Warp Boost</name>
         <cost minerals="45" time="0.15" />
         <description><![CDATA[
-          Allows you to boost your fleet half way to the destination in an instant.
+          Boost will halve the remaining travel-time for an in-flight fleet of fighters.
         ]]></description>
       </upgrade>
     </upgrades>

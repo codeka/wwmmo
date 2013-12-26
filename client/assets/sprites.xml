@@ -47,16 +47,12 @@
       <direction>0,-1</direction>
     </sprite>
 
-    <sprite name="upgrade.firepower">
-      <rect location="135,1" size="9x16" />
-      <direction>0,1</direction>
-    </sprite>
-    <sprite name="upgrade.shield">
-      <rect location="145,2" size="22x14" />
-      <direction>0,1</direction>
-    </sprite>
     <sprite name="upgrade.boost">
       <rect location="169,1" size="10x16" />
+      <direction>0,1</direction>
+    </sprite>
+    <sprite name="upgrade.cloak">
+      <rect location="149,1" size="19x21" />
       <direction>0,1</direction>
     </sprite>
   </sheet>

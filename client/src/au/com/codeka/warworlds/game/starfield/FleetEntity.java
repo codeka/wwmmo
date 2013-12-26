@@ -1,8 +1,6 @@
 package au.com.codeka.warworlds.game.starfield;
 
-import java.util.ArrayList;
 import java.util.Locale;
-import java.util.Random;
 
 import org.andengine.entity.Entity;
 import org.andengine.entity.primitive.Line;
@@ -14,9 +12,6 @@ import org.andengine.opengl.texture.region.ITextureRegion;
 import org.andengine.opengl.texture.region.ITiledTextureRegion;
 import org.andengine.opengl.vbo.DrawType;
 import org.andengine.opengl.vbo.VertexBufferObjectManager;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
-import org.joda.time.Seconds;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -90,7 +85,6 @@ public class FleetEntity extends SelectableEntity {
         // work out how far along the fleet has moved so we can draw the icon at the correct
         // spot. Also, we'll draw the name of the empire, number of ships etc.
         ShipDesign design = (ShipDesign) DesignManager.i.getDesign(DesignKind.SHIP, mFleet.getDesignID());
-        double distance = mSrcPoint.distanceTo(mDestPoint);
         float timeToDestinationInHours = mFleet.getTimeToDestination();
         float timeFromSourceInHours = mFleet.getTimeFromSource();
 

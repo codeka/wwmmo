@@ -116,16 +116,9 @@ public class Fleet extends BaseFleet {
         mNotes = notes;
     }
 
+    @Override
     public FleetUpgrade getUpgrade(String upgradeID) {
-        if (mUpgrades == null) {
-            return null;
-        }
-        for (BaseFleetUpgrade baseFleetUpgrade : mUpgrades) {
-            if (baseFleetUpgrade.getUpgradeID().equals(upgradeID)) {
-                return (FleetUpgrade) baseFleetUpgrade;
-            }
-        }
-        return null;
+        return (FleetUpgrade) super.getUpgrade(upgradeID);
     }
 
     public ShipDesign getDesign() {

@@ -11,6 +11,8 @@ import org.joda.time.Duration;
 import org.joda.time.Interval;
 import org.joda.time.Seconds;
 
+import au.com.codeka.common.model.BaseFleet.Stance;
+
 
 /**
  * This class is used to simulate a \c Star. It need to have the same logic as ctrl/simulation.py
@@ -560,6 +562,10 @@ public class Simulation {
     private boolean simulateCombatRound(DateTime now, BaseStar star, BaseCombatReport.CombatRound round) {
         for (BaseFleet fleet : star.getFleets()) {
             if (isDestroyed(fleet, now)) {
+                continue;
+            }
+            // if it's got a cloaking device and it's not aggressive, then it's invisible to combat
+            if (fleet.hasUpgrade("cloak") && fleet.getStance() != Stance.AGGRESSIVE) {
                 continue;
             }
 

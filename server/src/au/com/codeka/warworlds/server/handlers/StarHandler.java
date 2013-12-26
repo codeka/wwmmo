@@ -144,6 +144,21 @@ public class StarHandler extends RequestHandler {
             }
         }
 
+        // remove all fleets that aren't ours and have a cloaking device (regardless of radars)
+        ArrayList<Fleet> fleetsToRemove = null;
+        for (BaseFleet baseFleet : star.getFleets()) {
+            Fleet fleet = (Fleet) baseFleet;
+            if (fleet.getEmpireID() != myEmpireID && fleet.hasUpgrade("cloak")) {
+                if (fleetsToRemove == null) {
+                    fleetsToRemove = new ArrayList<Fleet>();
+                }
+                fleetsToRemove.add(fleet);
+            }
+        }
+        if (fleetsToRemove != null) {
+            star.getFleets().removeAll(fleetsToRemove);
+        }
+
         // remove build requests that aren't ours
         if (star.getBuildRequests() != null) {
             ArrayList<BaseBuildRequest> toRemove = new ArrayList<BaseBuildRequest>();

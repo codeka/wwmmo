@@ -11,6 +11,7 @@ import com.mysql.jdbc.exceptions.jdbc4.MySQLTransactionRollbackException;
 
 import au.com.codeka.common.model.BaseCombatReport;
 import au.com.codeka.common.model.BaseFleet;
+import au.com.codeka.common.model.BaseFleetUpgrade;
 import au.com.codeka.common.model.BaseStar;
 import au.com.codeka.common.model.ShipDesign;
 import au.com.codeka.common.model.ShipEffect;
@@ -26,6 +27,7 @@ import au.com.codeka.warworlds.server.data.DB;
 import au.com.codeka.warworlds.server.data.SqlStmt;
 import au.com.codeka.warworlds.server.model.CombatReport;
 import au.com.codeka.warworlds.server.model.Fleet;
+import au.com.codeka.warworlds.server.model.FleetUpgrade;
 import au.com.codeka.warworlds.server.model.ScoutReport;
 import au.com.codeka.warworlds.server.model.Star;
 
@@ -155,6 +157,12 @@ public class FleetMoveCompleteEvent extends Event {
             effect.onArrived(star, newFleet);
         }
 
+        ArrayList<BaseFleetUpgrade> upgrades = new ArrayList<BaseFleetUpgrade>(newFleet.getUpgrades());
+        for (BaseFleetUpgrade baseUpgrade : upgrades) {
+            FleetUpgrade upgrade = (FleetUpgrade) baseUpgrade;
+            upgrade.onArrived(star, newFleet);
+        }
+
         for (BaseFleet existingBaseFleet : star.getFleets()) {
             Fleet existingFleet = (Fleet) existingBaseFleet;
             if (existingFleet.getID() == newFleet.getID()) {
@@ -166,7 +174,6 @@ public class FleetMoveCompleteEvent extends Event {
             for (ShipEffect effect : effects) {
                 effect.onOtherArrived(star, existingFleet, newFleet);
             }
-
         }
     }
 }

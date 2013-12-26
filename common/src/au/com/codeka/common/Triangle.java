@@ -2,15 +2,11 @@ package au.com.codeka.common;
 
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 
 /**
  * A triangle is simply three vertices from a list of points.
  */
 public class Triangle {
-    private static final Logger log = LoggerFactory.getLogger(Triangle.class);
     private List<Vector2> mPoints;
     public int a;
     public int b;

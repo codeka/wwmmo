@@ -33,30 +33,8 @@ public class Fleet extends BaseFleet {
         mNotes = notes;
     }
 
-    public boolean hasUpgrade(String upgradeID) {
-        if (mUpgrades == null) {
-            return false;
-        }
-
-        for (BaseFleetUpgrade baseUpgrade : mUpgrades) {
-            FleetUpgrade upgrade = (FleetUpgrade) baseUpgrade;
-            if (upgrade.getUpgradeID().equals(upgradeID)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
+    @Override
     public FleetUpgrade getUpgrade(String upgradeID) {
-        if (mUpgrades == null) {
-            return null;
-        }
-        for (BaseFleetUpgrade baseFleetUpgrade : mUpgrades) {
-            if (baseFleetUpgrade.getUpgradeID().equals(upgradeID)) {
-                return (FleetUpgrade) baseFleetUpgrade;
-            }
-        }
-        return null;
+        return (FleetUpgrade) super.getUpgrade(upgradeID);
     }
 }

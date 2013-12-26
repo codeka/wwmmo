@@ -91,6 +91,21 @@ public abstract class BaseFleet {
         return mNotes;
     }
 
+    public BaseFleetUpgrade getUpgrade(String upgradeID) {
+        if (mUpgrades == null) {
+            return null;
+        }
+        for (BaseFleetUpgrade baseFleetUpgrade : mUpgrades) {
+            if (baseFleetUpgrade.getUpgradeID().equals(upgradeID)) {
+                return baseFleetUpgrade;
+            }
+        }
+        return null;
+    }
+    public boolean hasUpgrade(String upgradeID) {
+        return (getUpgrade(upgradeID) != null);
+    }
+
     public void move(DateTime now, String destinationStarKey, DateTime eta) {
         mState = State.MOVING;
         mStateStartTime = now;

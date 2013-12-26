@@ -9,6 +9,7 @@ import au.com.codeka.common.model.BaseStar;
 import au.com.codeka.common.model.DesignKind;
 import au.com.codeka.common.model.ShipDesign;
 import au.com.codeka.common.model.ShipEffect;
+import au.com.codeka.common.model.BaseFleet.Stance;
 import au.com.codeka.warworlds.server.model.DesignManager;
 import au.com.codeka.warworlds.server.model.Fleet;
 
@@ -69,6 +70,11 @@ public class FighterShipEffect extends ShipEffect {
 
         // if the other fleet is the same empire, that's fine
         if (((Fleet) fleet).getEmpireID() == ((Fleet) otherFleet).getEmpireID()) {
+            return;
+        }
+
+        // if we has a cloaking device, and it's not AGGRESSIVE, then we can't see it
+        if (((Fleet) otherFleet).hasUpgrade("cloak") && otherFleet.getStance() != Stance.AGGRESSIVE) {
             return;
         }
 
