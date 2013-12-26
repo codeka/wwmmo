@@ -12,7 +12,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 import au.com.codeka.TimeInHours;
 import au.com.codeka.common.model.DesignKind;
 import au.com.codeka.common.model.ShipDesign;
@@ -23,6 +22,8 @@ import au.com.codeka.warworlds.model.Empire;
 import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.EmpireShieldManager;
 import au.com.codeka.warworlds.model.Fleet;
+import au.com.codeka.warworlds.model.FleetManager;
+import au.com.codeka.warworlds.model.FleetUpgrade;
 import au.com.codeka.warworlds.model.Sector;
 import au.com.codeka.warworlds.model.SpriteDrawable;
 import au.com.codeka.warworlds.model.SpriteManager;
@@ -58,7 +59,12 @@ public class FleetInfoView extends FrameLayout {
                     return;
                 }
 
-                Toast.makeText(mContext, "BOOOOOOOOOOOOOOST", Toast.LENGTH_SHORT).show();;
+                FleetManager.i.boostFleet(mFleet, new FleetManager.FleetBoostedHandler() {
+                    @Override
+                    public void onFleetBoosted(Fleet fleet) {
+                        // update
+                    }
+                });
             }
         });
     }
@@ -104,23 +110,22 @@ public class FleetInfoView extends FrameLayout {
         FleetList.fetchSrcDestStar(fleet, null, new FleetList.SrcDestStarsFetchedHandler() {
             @Override
             public void onSrcDestStarsFetched(StarSummary srcStar, StarSummary destStar) {
-                ShipDesign design = (ShipDesign) DesignManager.i.getDesign(DesignKind.SHIP, mFleet.getDesignID());
-
                 float distanceInParsecs = Sector.distanceInParsecs(srcStar, destStar);
-                float timeInHours = distanceInParsecs / design.getSpeedInParsecPerHour();
-                float timeRemainingInHours = fleet.getTimeToDestination();
+                float timeFromSourceInHours = fleet.getTimeFromSource();
+                float timeToDestinationInHours = fleet.getTimeToDestination();
 
-                float fractionRemaining = timeRemainingInHours / timeInHours;
+                float fractionRemaining = timeToDestinationInHours / (timeToDestinationInHours + timeFromSourceInHours);
                 progressBar.setMax(1000);
                 progressBar.setProgress(1000 - (int) (fractionRemaining * 1000.0f));
 
                 String eta = String.format(Locale.ENGLISH, "<b>ETA</b>: %.1f pc in %s",
-                        distanceInParsecs * fractionRemaining, TimeInHours.format(timeRemainingInHours));
+                        distanceInParsecs * fractionRemaining, TimeInHours.format(timeToDestinationInHours));
                 progressText.setText(Html.fromHtml(eta));
             }
         });
 
-        if (fleet.hasUpgrade("boost")) {
+        FleetUpgrade.BoostFleetUpgrade fleetUpgrade = (FleetUpgrade.BoostFleetUpgrade) fleet.getUpgrade("boost");
+        if (fleetUpgrade != null && !fleetUpgrade.isBoosting()) {
             boostBtn.setEnabled(true);
         } else {
             boostBtn.setEnabled(false);

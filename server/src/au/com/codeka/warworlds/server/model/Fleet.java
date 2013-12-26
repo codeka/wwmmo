@@ -90,6 +90,9 @@ public class Fleet extends BaseFleet {
     public int getTargetFleetID() {
         return mTargetFleetID;
     }
+    public void setEta(DateTime eta) {
+        mEta = eta;
+    }
 
     public void setID(int id) {
         mID = id;
@@ -111,6 +114,18 @@ public class Fleet extends BaseFleet {
     }
     public void setNotes(String notes) {
         mNotes = notes;
+    }
+
+    public FleetUpgrade getUpgrade(String upgradeID) {
+        if (mUpgrades == null) {
+            return null;
+        }
+        for (BaseFleetUpgrade baseFleetUpgrade : mUpgrades) {
+            if (baseFleetUpgrade.getUpgradeID().equals(upgradeID)) {
+                return (FleetUpgrade) baseFleetUpgrade;
+            }
+        }
+        return null;
     }
 
     public ShipDesign getDesign() {
@@ -195,7 +210,15 @@ public class Fleet extends BaseFleet {
 
     @Override
     protected BaseFleetUpgrade createUpgrade(Messages.FleetUpgrade pb) {
-        FleetUpgrade fleetUpgrade = new FleetUpgrade();
+        FleetUpgrade fleetUpgrade;
+
+        String upgradeID = pb.getUpgradeId();
+        if (upgradeID.equals("boost")) {
+            fleetUpgrade = new FleetUpgrade.BoostFleetUpgrade();
+        } else {
+            fleetUpgrade = new FleetUpgrade();
+        }
+
         if (pb != null) {
             fleetUpgrade.fromProtocolBuffer(this, pb);
         }

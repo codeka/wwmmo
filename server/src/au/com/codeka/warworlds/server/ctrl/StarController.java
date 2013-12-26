@@ -432,7 +432,7 @@ public class StarController {
                 stmt.update();
             }
 
-            sql = "INSERT INTO fleet_upgrades (star_id, fleet_id, upgrade_id) VALUES (?, ?, ?)";
+            sql = "INSERT INTO fleet_upgrades (star_id, fleet_id, upgrade_id, extra) VALUES (?, ?, ?, ?)";
             try (SqlStmt stmt = prepare(sql)) {
                 stmt.setInt(1, star.getID());
                 for (BaseFleet baseFleet : star.getFleets()) {
@@ -444,6 +444,7 @@ public class StarController {
                     stmt.setInt(2, fleet.getID());
                     for (BaseFleetUpgrade upgrade : fleet.getUpgrades()) {
                         stmt.setString(3, upgrade.getUpgradeID());
+                        stmt.setString(4, upgrade.getExtra());
                         stmt.update();
                     }
                 }
@@ -531,7 +532,7 @@ public class StarController {
                 ResultSet rs = stmt.select();
 
                 while (rs.next()) {
-                    FleetUpgrade fleetUpgrade = new FleetUpgrade(rs);
+                    FleetUpgrade fleetUpgrade = FleetUpgrade.create(rs);
 
                     for (Fleet fleet : fleets) {
                         if (fleet.getID() == fleetUpgrade.getFleetID()) {

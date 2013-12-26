@@ -129,6 +129,14 @@ public abstract class BaseFleet {
         DateTime now = DateTime.now(DateTimeZone.UTC);
         return (Seconds.secondsBetween(now, mEta).getSeconds() / 3600.0f);
     }
+    public float getTimeFromSource() {
+        if (mStateStartTime == null || mState != State.MOVING) {
+            return 0.0f;
+        }
+
+        DateTime now = DateTime.now(DateTimeZone.UTC);
+        return (Seconds.secondsBetween(mStateStartTime, now).getSeconds() / 3600.0f);
+    }
 
     protected abstract BaseFleetUpgrade createUpgrade(Messages.FleetUpgrade pb);
 

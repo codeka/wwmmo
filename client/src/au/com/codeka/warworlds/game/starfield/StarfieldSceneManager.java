@@ -151,6 +151,7 @@ public class StarfieldSceneManager extends SectorSceneManager
         mFleetSpriteTextures.put("ship.scout", BitmapTextureAtlasTextureRegionFactory.createFromAsset(mFleetSpriteTextureAtlas, mActivity, "spritesheets/ship.scout.png"));
         mFleetSpriteTextures.put("ship.colony", BitmapTextureAtlasTextureRegionFactory.createFromAsset(mFleetSpriteTextureAtlas, mActivity, "spritesheets/ship.colony.png"));
         mFleetSpriteTextures.put("ship.troopcarrier", BitmapTextureAtlasTextureRegionFactory.createFromAsset(mFleetSpriteTextureAtlas, mActivity, "spritesheets/ship.troopcarrier.png"));
+        mFleetSpriteTextures.put("ship.upgrade.boost", BitmapTextureAtlasTextureRegionFactory.createTiledFromAsset(mFleetSpriteTextureAtlas, mActivity, "spritesheets/ship.upgrade.boost.png", 2, 1));
 
         mActivity.getShaderProgramManager().loadShaderProgram(RadarIndicatorEntity.getShaderProgram());
         mActivity.getTextureManager().loadTexture(mStarTextureAtlas);

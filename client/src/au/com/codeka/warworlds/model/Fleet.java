@@ -14,7 +14,15 @@ public class Fleet extends BaseFleet {
 
     @Override
     protected BaseFleetUpgrade createUpgrade(Messages.FleetUpgrade pb) {
-        FleetUpgrade fleetUpgrade = new FleetUpgrade();
+        FleetUpgrade fleetUpgrade;
+
+        String upgradeID = pb.getUpgradeId();
+        if (upgradeID.equals("boost")) {
+            fleetUpgrade = new FleetUpgrade.BoostFleetUpgrade();
+        } else {
+            fleetUpgrade = new FleetUpgrade();
+        }
+
         if (pb != null) {
             fleetUpgrade.fromProtocolBuffer(this, pb);
         }
@@ -38,5 +46,17 @@ public class Fleet extends BaseFleet {
         }
 
         return false;
+    }
+
+    public FleetUpgrade getUpgrade(String upgradeID) {
+        if (mUpgrades == null) {
+            return null;
+        }
+        for (BaseFleetUpgrade baseFleetUpgrade : mUpgrades) {
+            if (baseFleetUpgrade.getUpgradeID().equals(upgradeID)) {
+                return (FleetUpgrade) baseFleetUpgrade;
+            }
+        }
+        return null;
     }
 }

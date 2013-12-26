@@ -50,6 +50,9 @@ message GenericError
         InvalidConversation = 21;
         EmpireAlreadyInConversation = 22;
         EmpireBanned = 23;
+        FleetBoostNoUpgrade = 24;
+        FleetBoostAlreadyBoosting = 25;
+        FleetBoostNotMoving = 26;
     }
 }
 
@@ -812,6 +815,7 @@ message Building
 message FleetUpgrade
 {
     optional string upgrade_id = 1;
+    optional string extra = 2;
 }
 
 
@@ -902,6 +906,7 @@ message FleetOrder
         MERGE = 2;
         MOVE = 3;
         SET_STANCE = 5;
+        BOOST = 6;
     }
     required FLEET_ORDER order = 1;
 

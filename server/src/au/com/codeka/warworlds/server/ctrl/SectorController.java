@@ -230,7 +230,7 @@ public class SectorController {
                     ResultSet rs = stmt.select();
     
                     while (rs.next()) {
-                        FleetUpgrade fleetUpgrade = new FleetUpgrade(rs);
+                        FleetUpgrade fleetUpgrade = FleetUpgrade.create(rs);
     
                         for (Fleet fleet : fleets) {
                             if (fleet.getID() == fleetUpgrade.getFleetID()) {

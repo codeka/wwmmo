@@ -1,11 +1,13 @@
 package au.com.codeka.warworlds.server.handlers;
 
 import org.joda.time.DateTime;
+import org.joda.time.Seconds;
 
 import au.com.codeka.common.model.BaseFleet;
 import au.com.codeka.common.model.DesignKind;
 import au.com.codeka.common.model.ShipDesign;
 import au.com.codeka.common.model.Simulation;
+import au.com.codeka.common.model.BaseFleet.State;
 import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.server.EventProcessor;
 import au.com.codeka.warworlds.server.RequestException;
@@ -17,6 +19,7 @@ import au.com.codeka.warworlds.server.data.SqlStmt;
 import au.com.codeka.warworlds.server.data.Transaction;
 import au.com.codeka.warworlds.server.model.DesignManager;
 import au.com.codeka.warworlds.server.model.Fleet;
+import au.com.codeka.warworlds.server.model.FleetUpgrade;
 import au.com.codeka.warworlds.server.model.Sector;
 import au.com.codeka.warworlds.server.model.Star;
 
@@ -62,6 +65,8 @@ public class FleetOrdersHandler extends RequestHandler {
         } else if (fleet_order_pb.getOrder() == Messages.FleetOrder.FLEET_ORDER.MOVE) {
             orderFleetMove(star, fleet, fleet_order_pb, sim);
             return true;
+        } else if (fleet_order_pb.getOrder() == Messages.FleetOrder.FLEET_ORDER.BOOST) {
+            orderFleetBoost(star, fleet, fleet_order_pb, sim);
         }
 
         return false;
@@ -163,5 +168,29 @@ public class FleetOrdersHandler extends RequestHandler {
         float moveTimeInHours = distanceInParsecs / design.getSpeedInParsecPerHour();
         DateTime now = DateTime.now();
         fleet.move(now, destStar.getKey(), now.plusSeconds((int)(moveTimeInHours * 3600.0f)));
+    }
+
+    private void orderFleetBoost(Star star, Fleet fleet, Messages.FleetOrder fleet_order_pb, Simulation sim) throws RequestException {
+        FleetUpgrade.BoostFleetUpgrade boostFleetUpgrade = (FleetUpgrade.BoostFleetUpgrade) fleet.getUpgrade("boost");
+        if (boostFleetUpgrade == null) {
+            throw new RequestException(400, Messages.GenericError.ErrorCode.FleetBoostNoUpgrade,
+                    "This fleet does not have the 'Warp Boost' upgrade.");
+        }
+
+        if (fleet.getState() != State.MOVING) {
+            throw new RequestException(400, Messages.GenericError.ErrorCode.FleetBoostNotMoving, "Fleet is not moving.");
+        }
+
+        if (boostFleetUpgrade.isBoosting()) {
+            throw new RequestException(400, Messages.GenericError.ErrorCode.FleetBoostAlreadyBoosting, "Already boosting.");
+        }
+
+        boostFleetUpgrade.isBoosting(true);
+
+        // halve the time remaining
+        DateTime eta = fleet.getEta();
+        int seconds = Seconds.secondsBetween(DateTime.now(), eta).getSeconds();
+        seconds /= 2;
+        fleet.setEta(DateTime.now().plusSeconds(seconds));
     }
 }

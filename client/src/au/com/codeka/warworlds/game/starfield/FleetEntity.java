@@ -6,10 +6,13 @@ import java.util.Random;
 
 import org.andengine.entity.Entity;
 import org.andengine.entity.primitive.Line;
+import org.andengine.entity.sprite.AnimatedSprite;
 import org.andengine.entity.sprite.Sprite;
 import org.andengine.entity.text.Text;
 import org.andengine.input.touch.TouchEvent;
 import org.andengine.opengl.texture.region.ITextureRegion;
+import org.andengine.opengl.texture.region.ITiledTextureRegion;
+import org.andengine.opengl.vbo.DrawType;
 import org.andengine.opengl.vbo.VertexBufferObjectManager;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -25,6 +28,7 @@ import au.com.codeka.warworlds.model.Empire;
 import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.EmpireShieldManager;
 import au.com.codeka.warworlds.model.Fleet;
+import au.com.codeka.warworlds.model.FleetUpgrade;
 
 /** An entity that represents a moving fleet. */
 public class FleetEntity extends SelectableEntity {
@@ -34,6 +38,7 @@ public class FleetEntity extends SelectableEntity {
     private Vector2 mDestPoint;
     private Fleet mFleet;
     private FleetSprite mFleetSprite;
+    private AnimatedSprite mBoostSprite;
 
     private Line mSelectionLine;
 
@@ -86,13 +91,10 @@ public class FleetEntity extends SelectableEntity {
         // spot. Also, we'll draw the name of the empire, number of ships etc.
         ShipDesign design = (ShipDesign) DesignManager.i.getDesign(DesignKind.SHIP, mFleet.getDesignID());
         double distance = mSrcPoint.distanceTo(mDestPoint);
-        double totalTimeInHours = (distance / 10.0) / design.getSpeedInParsecPerHour();
+        float timeToDestinationInHours = mFleet.getTimeToDestination();
+        float timeFromSourceInHours = mFleet.getTimeFromSource();
 
-        DateTime startTime = mFleet.getStateStartTime();
-        DateTime now = DateTime.now(DateTimeZone.UTC);
-        float timeSoFarInHours = Seconds.secondsBetween(startTime, now).getSeconds() / 3600.0f;
-
-        double fractionComplete = timeSoFarInHours / totalTimeInHours;
+        double fractionComplete = timeFromSourceInHours / (timeFromSourceInHours + timeToDestinationInHours);
         if (fractionComplete > 1.0) {
             fractionComplete = 1.0;
         }
@@ -121,8 +123,16 @@ public class FleetEntity extends SelectableEntity {
                 textureRegion, vertexBufferObjectManager);
         attachChild(mFleetSprite);
 
-        Vector2 location = getLocation((float) fractionComplete);
+        FleetUpgrade.BoostFleetUpgrade boostUpgrade = (FleetUpgrade.BoostFleetUpgrade) mFleet.getUpgrade("boost");
+        if (boostUpgrade != null && boostUpgrade.isBoosting()) {
+            mBoostSprite = new AnimatedSprite(9.0f, -5.0f, 12.0f, 12.0f, (ITiledTextureRegion) mStarfield.getSpriteTexture("ship.upgrade.boost"),
+                    vertexBufferObjectManager, DrawType.STATIC);
+            mFleetSprite.attachChild(mBoostSprite);
+            mBoostSprite.animate(100);
+        }
 
+        Vector2 location = getLocation((float) fractionComplete);
+/*
         // check if there's any other fleets nearby and offset this one by a bit so that they
         // don't overlap
         Random rand = new Random(mFleet.getKey().hashCode());
@@ -139,7 +149,7 @@ public class FleetEntity extends SelectableEntity {
                 i = 0;
             }
         }
-
+*/
         setPosition((float) location.x, (float) location.y);
         Vector2.pool.release(location);
 
@@ -154,11 +164,11 @@ public class FleetEntity extends SelectableEntity {
                 attachChild(shieldSprite);
             }
 
-            String name = emp.getDisplayName();
+            String name;
             if (mFleet.getNumShips() > 1.0f) {
-                name += String.format(Locale.ENGLISH, "\n%d × %s", (int) mFleet.getNumShips(), design.getDisplayName());
+                name = String.format(Locale.ENGLISH, "%d × %s", (int) mFleet.getNumShips(), design.getDisplayName());
             } else {
-                name += String.format(Locale.ENGLISH, "\n%s", design.getDisplayName());
+                name = String.format(Locale.ENGLISH, "%s", design.getDisplayName());
             }
             Text fleetName = new Text((float) pt.x, (float) pt.y, mStarfield.getFont(),
                     name, mStarfield.getActivity().getVertexBufferObjectManager());
