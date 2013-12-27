@@ -27,7 +27,7 @@
   {% for thread in threads if thread.key() in last_posts %}
     <div class="thread-entry">
       <div class="thread-title">
-        <a href="/forum/{{forum.slug}}/{{thread.slug}}">{{thread.subject}}</a>
+        <div class="thread-title-link"><a href="/forum/{{forum.slug}}/{{thread.slug}}">{{thread.subject}}</a></div>
         <div>{{first_posts[thread.key()].content|striptags|truncate(100)}}</div>
       </div>
       <div class="thread-replycount">

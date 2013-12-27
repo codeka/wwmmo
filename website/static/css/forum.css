@@ -59,17 +59,26 @@ div.thread-entry {
 div.thread-title {
   position: absolute;
   top: 0; left: 0; bottom: 0;
-  width: 50%;
+  width: 60%;
+}
+div.thread-title div {
+  margin-right: 1em;
+}
+div.thread-title-link {
+  white-space: nowrap;
+  overflow: hidden;
+  margin-right: 1em;
+  text-overflow: ellipsis;
 }
 div.thread-replycount {
   position: absolute;
   top: 0; bottom: 0;
-  left: 50%;
+  left: 60%;
   width: 80pt;
 }
 div.thread-details {
   position: absolute;
-  left: 50%;
+  left: 60%;
   margin-left: 80pt;
   right: 0; top: 0; bottom: 0;
 }
