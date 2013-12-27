@@ -6,19 +6,19 @@
       <direction>0,1</direction>
     </sprite>
     <sprite name="building.hq">
-      <rect location="102,30" size="66x57" />
+      <rect location="80,32" size="64x54" />
       <direction>0,1</direction>
     </sprite>
     <sprite name="building.radar">
-      <rect location="136,88" size="48x56" />
+      <rect location="141,91" size="23x20" />
       <direction>0,1</direction>
     </sprite>
     <sprite name="building.research">
-      <rect location="52,26" size="50x58" />
+      <rect location="53,29" size="24x28" />
       <direction>0,1</direction>
     </sprite>
     <sprite name="building.shipyard">
-      <rect location="0,87" size="64x50" />
+      <rect location="54,61" size="23x26" />
       <direction>0,1</direction>
     </sprite>
     <sprite name="building.shield-1">
@@ -43,7 +43,7 @@
       <direction>0,1</direction>
     </sprite>
     <sprite name="ship.troopcarrier">
-      <rect location="64,84" size="71x29" />
+      <rect location="64,86" size="71x29" />
       <direction>0,-1</direction>
     </sprite>
 

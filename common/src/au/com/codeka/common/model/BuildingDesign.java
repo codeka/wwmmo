@@ -11,12 +11,16 @@ public class BuildingDesign extends Design {
     private int mMaxPerColony;
     private int mMaxPerEmpire;
     private ArrayList<Upgrade> mUpgrades;
+    private boolean mShowInSolarSystem;
 
     public int getMaxPerColony() {
         return mMaxPerColony;
     }
     public int getMaxPerEmpire() {
         return mMaxPerEmpire;
+    }
+    public boolean showInSolarSystem() {
+        return mShowInSolarSystem;
     }
 
     public List<Upgrade> getUpgrades() {
@@ -91,6 +95,7 @@ public class BuildingDesign extends Design {
             design.mDesignKind = DesignKind.BUILDING;
             design.mMaxPerColony = 0;
             design.mMaxPerEmpire = 0;
+            design.mShowInSolarSystem = false;
             design.mUpgrades = new ArrayList<Upgrade>();
 
             this.populateDesign(design);
@@ -116,6 +121,13 @@ public class BuildingDesign extends Design {
                 for (Element upgradeElem : XmlIterator.childElements(elem, "upgrade")) {
                     Upgrade upgrade = new Upgrade(upgradeElem);
                     bd.mUpgrades.add(upgrade);
+                }
+            }
+
+            if (elem.getTagName().equals("show")) {
+                String s = elem.getAttribute("inSolarSystem");
+                if (s != null && s.length() > 0) {
+                    bd.mShowInSolarSystem = Boolean.parseBoolean(s);
                 }
             }
         }
