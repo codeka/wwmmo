@@ -465,13 +465,14 @@ public class StarController {
         }
 
         private void updateBuildRequests(Star star) throws Exception {
-            String sql = "UPDATE build_requests SET progress = ?, end_time = ? WHERE id = ?";
+            String sql = "UPDATE build_requests SET progress = ?, end_time = ?, disable_notification = ? WHERE id = ?";
             try (SqlStmt stmt = prepare(sql)) {
                 for (BaseBuildRequest baseBuildRequest : star.getBuildRequests()) {
                     BuildRequest buildRequest = (BuildRequest) baseBuildRequest;
                     stmt.setDouble(1, buildRequest.getProgress(false));
                     stmt.setDateTime(2, buildRequest.getEndTime());
-                    stmt.setInt(3, buildRequest.getID());
+                    stmt.setInt(3, buildRequest.getDisableNotification() ? 1 : 0);
+                    stmt.setInt(4, buildRequest.getID());
                     stmt.update();
                 }
             }

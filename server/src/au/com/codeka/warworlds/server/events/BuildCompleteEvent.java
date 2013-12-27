@@ -41,7 +41,7 @@ public class BuildCompleteEvent extends Event {
     public void process() {
         ArrayList<Integer> processedIDs = new ArrayList<Integer>();
         String sql = "SELECT id, star_id, colony_id, empire_id, existing_building_id," +
-                           " existing_fleet_id, upgrade_id, design_kind, design_id, count, notes" +
+                           " existing_fleet_id, upgrade_id, design_kind, design_id, count, notes, disable_notification" +
                     " FROM build_requests" +
                     " WHERE end_time < ? AND processing = 0" +
                     " LIMIT 10"; // just do ten at a time, which will allow us to interleve other events
@@ -81,6 +81,7 @@ public class BuildCompleteEvent extends Event {
                 String designID = rs.getString(9);
                 float count = rs.getFloat(10);
                 String notes = rs.getString(11);
+                boolean disableNotification = (rs.getInt(12) > 0);
 
                 Star star = new StarController().getStar(starID);
                 Colony colony = null;
@@ -92,7 +93,7 @@ public class BuildCompleteEvent extends Event {
 
                 try {
                     processBuildRequest(id, star, colony, empireID, existingBuildingID, existingFleetID, upgradeID,
-                                        designKind, designID, count, notes);
+                                        designKind, designID, count, notes, disableNotification);
                 } catch (Exception e) {
                     log.error("Error processing build-complete event!", e);
                 }
@@ -125,7 +126,8 @@ public class BuildCompleteEvent extends Event {
 
     private void processBuildRequest(int buildRequestID, Star star, Colony colony, int empireID,
                                      Integer existingBuildingID, Integer existingFleetID, String upgradeID,
-                                     DesignKind designKind, String designID, float count, String notes) throws RequestException {
+                                     DesignKind designKind, String designID, float count, String notes,
+                                     boolean disableNotification) throws RequestException {
         Simulation sim = new Simulation();
         sim.simulate(star);
 
@@ -143,28 +145,30 @@ public class BuildCompleteEvent extends Event {
             throw new RequestException(e);
         }
 
-        Messages.SituationReport.Builder sitrep_pb = Messages.SituationReport.newBuilder();
-        sitrep_pb.setRealm(new RealmController().getRealmName());
-        sitrep_pb.setEmpireKey(Integer.toString(empireID));
-        sitrep_pb.setReportTime(DateTime.now().getMillis() / 1000);
-        sitrep_pb.setStarKey(star.getKey());
-        sitrep_pb.setPlanetIndex(colony.getPlanetIndex());
-        Messages.SituationReport.BuildCompleteRecord.Builder build_complete_pb = Messages.SituationReport.BuildCompleteRecord.newBuilder();
-        build_complete_pb.setBuildKind(Messages.BuildRequest.BUILD_KIND.valueOf(designKind.getValue()));
-        build_complete_pb.setBuildRequestKey(Integer.toString(buildRequestID));
-        build_complete_pb.setDesignId(designID);
-        build_complete_pb.setCount(Math.round(count));
-        sitrep_pb.setBuildCompleteRecord(build_complete_pb);
-        if (star.getCombatReport() != null && fleet != null) {
-            Messages.SituationReport.FleetUnderAttackRecord.Builder fleet_under_attack_pb = Messages.SituationReport.FleetUnderAttackRecord.newBuilder();
-            fleet_under_attack_pb.setCombatReportKey(star.getCombatReport().getKey());
-            fleet_under_attack_pb.setFleetDesignId(fleet.getDesignID());
-            fleet_under_attack_pb.setFleetKey(fleet.getKey());
-            fleet_under_attack_pb.setNumShips(fleet.getNumShips());
-            sitrep_pb.setFleetUnderAttackRecord(fleet_under_attack_pb);
-        }
+        if (!disableNotification) {
+            Messages.SituationReport.Builder sitrep_pb = Messages.SituationReport.newBuilder();
+            sitrep_pb.setRealm(new RealmController().getRealmName());
+            sitrep_pb.setEmpireKey(Integer.toString(empireID));
+            sitrep_pb.setReportTime(DateTime.now().getMillis() / 1000);
+            sitrep_pb.setStarKey(star.getKey());
+            sitrep_pb.setPlanetIndex(colony.getPlanetIndex());
+            Messages.SituationReport.BuildCompleteRecord.Builder build_complete_pb = Messages.SituationReport.BuildCompleteRecord.newBuilder();
+            build_complete_pb.setBuildKind(Messages.BuildRequest.BUILD_KIND.valueOf(designKind.getValue()));
+            build_complete_pb.setBuildRequestKey(Integer.toString(buildRequestID));
+            build_complete_pb.setDesignId(designID);
+            build_complete_pb.setCount(Math.round(count));
+            sitrep_pb.setBuildCompleteRecord(build_complete_pb);
+            if (star.getCombatReport() != null && fleet != null) {
+                Messages.SituationReport.FleetUnderAttackRecord.Builder fleet_under_attack_pb = Messages.SituationReport.FleetUnderAttackRecord.newBuilder();
+                fleet_under_attack_pb.setCombatReportKey(star.getCombatReport().getKey());
+                fleet_under_attack_pb.setFleetDesignId(fleet.getDesignID());
+                fleet_under_attack_pb.setFleetKey(fleet.getKey());
+                fleet_under_attack_pb.setNumShips(fleet.getNumShips());
+                sitrep_pb.setFleetUnderAttackRecord(fleet_under_attack_pb);
+            }
 
-        new SituationReportController().saveSituationReport(sitrep_pb.build());
+            new SituationReportController().saveSituationReport(sitrep_pb.build());
+        }
     }
 
     private Fleet processFleetBuild(Star star, Colony colony, int empireID, Integer existingFleetID,

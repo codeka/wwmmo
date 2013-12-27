@@ -227,6 +227,9 @@ public class BuildQueueController {
         buildRequest.setProgress(finalProgress);
         if (finalProgress > 0.999) {
             buildRequest.setEndTime(DateTime.now());
+
+            // if you accelerate to completion, don't spam a notification
+            buildRequest.disableNotification();
             return true;
         }
 
@@ -234,11 +237,12 @@ public class BuildQueueController {
     }
 
     public void saveBuildRequest(BuildRequest buildRequest) throws RequestException {
-        String sql = "UPDATE build_requests SET progress = ?, end_time = ? WHERE id = ?";
+        String sql = "UPDATE build_requests SET progress = ?, end_time = ?, disable_notification = ? WHERE id = ?";
         try (SqlStmt stmt = db.prepare(sql)) {
             stmt.setDouble(1, buildRequest.getProgress(false));
             stmt.setDateTime(2, buildRequest.getEndTime());
-            stmt.setInt(3, buildRequest.getID());
+            stmt.setInt(3, buildRequest.getDisableNotification() ? 1 : 0);
+            stmt.setInt(4, buildRequest.getID());
             stmt.update();
         } catch(Exception e) {
             throw new RequestException(e);

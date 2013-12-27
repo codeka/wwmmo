@@ -18,6 +18,7 @@ public class BuildRequest extends BaseBuildRequest {
     private int mColonyID;
     private int mEmpireID;
     private int mExistingBuildingID;
+    private boolean mDisableNotification;
 
     public BuildRequest() {
     }
@@ -56,6 +57,7 @@ public class BuildRequest extends BaseBuildRequest {
         } else {
             mUpgradeID = rs.getString("upgrade_id");
         }
+        mDisableNotification = (rs.getInt("disable_notification") > 0);
         mNotes = rs.getString("notes");
     }
 
@@ -88,6 +90,12 @@ public class BuildRequest extends BaseBuildRequest {
     }
     public void setPlanetIndex(int planetIndex) {
         mPlanetIndex = planetIndex;
+    }
+    public boolean getDisableNotification() {
+        return mDisableNotification;
+    }
+    public void disableNotification() {
+        mDisableNotification = true;
     }
 
     @Override
