@@ -72,7 +72,6 @@ public class FleetMoveCompleteEvent extends Event {
             }
         } catch(Exception e) {
             log.error("Error processing fleet-move event!", e);
-            // TODO: errors?
         }
     }
 

@@ -9,16 +9,14 @@
         android:layout_width="30dp"
         android:layout_height="30dp"
         android:layout_alignParentLeft="true"
-        android:layout_marginRight="4dp"
-        android:src="@drawable/app_icon" />
+        android:layout_marginRight="4dp" />
 
     <ImageView
         android:id="@+id/overlay_icon"
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:layout_alignParentLeft="true"
-        android:layout_marginRight="4dp"
-        android:src="@drawable/app_icon" />
+        android:layout_marginRight="4dp" />
 
     <TextView
         android:id="@+id/report_title"
@@ -26,7 +24,7 @@
         android:layout_height="wrap_content"
         android:layout_alignTop="@+id/overlay_icon"
         android:layout_toRightOf="@+id/overlay_icon"
-        android:text="Move complete"
+        android:text=""
         android:textAppearance="?android:attr/textAppearanceMedium" />
 
     <TextView
@@ -36,7 +34,7 @@
         android:layout_alignLeft="@+id/report_title"
         android:layout_toLeftOf="@+id/report_time"
         android:layout_below="@+id/report_title"
-        android:text="Fighter (x 12) arrived at SomeStar, and is under attack"
+        android:text=""
         android:textAppearance="?android:attr/textAppearanceSmall" />
 
     <TextView
@@ -44,7 +42,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
-        android:text="12 hrs ago"
+        android:text=""
         android:textAppearance="?android:attr/textAppearanceSmall" />
 
 </RelativeLayout>

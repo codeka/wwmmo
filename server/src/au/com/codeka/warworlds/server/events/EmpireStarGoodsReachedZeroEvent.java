@@ -17,6 +17,7 @@ import au.com.codeka.warworlds.server.Event;
 import au.com.codeka.warworlds.server.RequestContext;
 import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.ctrl.RealmController;
+import au.com.codeka.warworlds.server.ctrl.SituationReportController;
 import au.com.codeka.warworlds.server.ctrl.StarController;
 import au.com.codeka.warworlds.server.data.DB;
 import au.com.codeka.warworlds.server.data.SqlStmt;
@@ -51,14 +52,13 @@ public class EmpireStarGoodsReachedZeroEvent extends Event {
                     Star star = new StarController().getStar(starID);
                     processStar(star);
                 } catch (Exception e) {
-                    log.error("Error processing build-complete event!", e);
+                    log.error("Error processing goods-zero event!", e);
                 }
 
                 processedIDs.add(id);
             }
         } catch(Exception e) {
-            log.error("Error processing build-complete event!", e);
-            // TODO: errors?
+            log.error("Error processing goods-zero event!", e);
         }
 
         if (processedIDs.isEmpty()) {
@@ -79,7 +79,6 @@ public class EmpireStarGoodsReachedZeroEvent extends Event {
             stmt.update();
         } catch(Exception e) {
             log.error("Error processing empire-star-goods-zero event!", e);
-            // TODO: errors?
         }
     }
 
@@ -106,8 +105,7 @@ public class EmpireStarGoodsReachedZeroEvent extends Event {
                 }
                 sitrep_pb.setStarRanOutOfGoodsRecord(ran_out_of_goods_pb);
 
-                //TODO
-                //new SituationReportController().saveSituationReport(sitrep_pb.build());
+                new SituationReportController().saveSituationReport(sitrep_pb.build());
             }
         }
 

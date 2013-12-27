@@ -30,11 +30,11 @@
       <direction>0,1</direction>
     </sprite>
 
-      <sprite name="ship.colony">
+    <sprite name="ship.colony">
       <rect location="0,28" size="50x58" />
       <direction>0,-1</direction>
     </sprite>
-      <sprite name="ship.fighter">
+    <sprite name="ship.fighter">
       <rect location="0,0" size="21x24" />
       <direction>0,1</direction>
     </sprite>
