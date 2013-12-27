@@ -115,7 +115,7 @@ public abstract class BaseGlActivity extends SimpleLayoutGameActivity {
         mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
 
         Util.loadProperties();
-        if (false /*Util.isDebug()*/) {
+        if (Util.isDebug()) {
             mDebugView = new DebugView(this);
             mDebugViewLayout = new WindowManager.LayoutParams(
                     WindowManager.LayoutParams.WRAP_CONTENT, WindowManager.LayoutParams.WRAP_CONTENT,
@@ -178,11 +178,12 @@ public abstract class BaseGlActivity extends SimpleLayoutGameActivity {
     }
 
     /** Helper function to determine whether we're in portrait orientation or not. */
+    @SuppressWarnings("deprecation") // need to support older devices as well
     protected boolean isPortrait() {
         Display display = ((WindowManager) getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
-        Point pt = new Point();
-        display.getSize(pt);
-        return pt.y > pt.x;
+        int width = display.getWidth();
+        int height = display.getHeight();
+        return height > width;
     }
 
     /**

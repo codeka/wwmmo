@@ -553,20 +553,26 @@ public class BuildActivity extends BaseActivity implements StarManager.StarFetch
                         progress.setVisibility(View.VISIBLE);
                         progress.setProgress((int) buildRequest.getPercentComplete());
                     } else {
-                        /*if (numUpgrades < building.getLevel()) {
-                            row2.setText("No more upgrades");
-                            row3.setVisibility(View.GONE);
-                            progress.setVisibility(View.GONE);
-                        } else {*/
-                            progress.setVisibility(View.GONE);
-                            row2.setText(String.format(Locale.ENGLISH,
-                                    "Upgrade: %.2f hours",
-                                    (float) design.getBuildCost().getTimeInSeconds() / 3600.0f));
+                        String upgrades = "";
+                        for (ShipDesign.Upgrade upgrade : design.getUpgrades()) {
+                            if (!fleet.hasUpgrade(upgrade.getID())) {
+                                if (upgrades.length() > 0) {
+                                    upgrades += ", ";
+                                }
+                                upgrades += upgrade.getDisplayName();
+                            }
+                        }
 
-                            String requiredHtml = design.getDependenciesHtml(getColony());
-                            row3.setVisibility(View.VISIBLE);
-                            row3.setText(Html.fromHtml(requiredHtml));
-                        /*}*/
+                        progress.setVisibility(View.GONE);
+                        if (upgrades.length() == 0) {
+                            row2.setText(Html.fromHtml(String.format(Locale.ENGLISH, "Upgrades: <i>none</i>")));
+                        } else {
+                            row2.setText(String.format(Locale.ENGLISH, "Upgrades: " + upgrades));
+                        }
+
+                        String requiredHtml = design.getDependenciesHtml(getColony());
+                        row3.setVisibility(View.VISIBLE);
+                        row3.setText(Html.fromHtml(requiredHtml));
                     }
 
                     if (fleet != null && fleet.getNotes() != null) {
@@ -597,11 +603,10 @@ public class BuildActivity extends BaseActivity implements StarManager.StarFetch
 
                     row1.removeAllViews();
                     FleetList.populateFleetNameRow(getActivity(), row1, null, design);
-                    row2.setText(String.format("%.2f hours",
-                            (float) design.getBuildCost().getTimeInSeconds() / 3600.0f));
-
                     String requiredHtml = design.getDependenciesHtml(getColony());
-                    row3.setText(Html.fromHtml(requiredHtml));
+                    row2.setText(Html.fromHtml(requiredHtml));
+
+                    row3.setVisibility(View.GONE);
                 }
 
                 return view;

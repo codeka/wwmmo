@@ -33,4 +33,7 @@ CKEDITOR.editorConfig = function( config ) {
 
     // We'll use our custom CSS, so that it looks similar to the rest of the site.
     config.contentsCss = '/css/wysiwyg_editor.css';
+
+    // allow all html tags, we sanitize this on the server anyway
+    config.allowedContent = true;
 };

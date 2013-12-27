@@ -1,5 +1,6 @@
 package au.com.codeka.warworlds.game;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -166,12 +167,18 @@ public class EmpireActivity extends TabFragmentActivity
 
             // user has picked an image, save it so the fragment can find it..
             Cursor cursor = getContentResolver().query(uri, new String[] { android.provider.MediaStore.Images.ImageColumns.DATA }, null, null, null);
-            cursor.moveToFirst();
-            mShieldImagePath = cursor.getString(0);
-            cursor.close();
+            if (cursor != null) {
+                cursor.moveToFirst();
+                mShieldImagePath = cursor.getString(0);
+                cursor.close();
+            } else if (uri.getScheme() == "file") {
+                mShieldImagePath = uri.getPath();
+                if (!new File(mShieldImagePath).exists()) {
+                    mShieldImagePath = null;
+                }
+            }
 
             getTabHost().setCurrentTabByTag("Settings");
-            
         }
 
         super.onActivityResult(requestCode, resultCode, data);

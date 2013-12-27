@@ -71,6 +71,7 @@ public class ShipUpgradeDialog extends DialogFragment {
         ImageView fleetIcon = (ImageView) mView.findViewById(R.id.fleet_icon);
         TextView fleetName = (TextView) mView.findViewById(R.id.fleet_name);
         ListView upgradesList = (ListView) mView.findViewById(R.id.upgrades);
+        TextView upgradesNone = (TextView) mView.findViewById(R.id.upgrades_none);
         mBuildEstimateView = (BuildEstimateView) mView.findViewById(R.id.build_estimate);
         mBuildEstimateView.setOnBuildEstimateRefreshRequired(new BuildEstimateView.BuildEstimateRefreshRequiredHandler() {
             @Override
@@ -88,17 +89,34 @@ public class ShipUpgradeDialog extends DialogFragment {
 
         final UpgradeListAdapter upgradeListAdapter = new UpgradeListAdapter();
         upgradesList.setAdapter(upgradeListAdapter);
-        upgradeListAdapter.setup(design.getUpgrades());
 
-        upgradesList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> listView, View view, int position, long id) {
-                upgradeListAdapter.setSelectedItem(position);
-
-                mUpgrade = (ShipDesign.Upgrade) upgradeListAdapter.getItem(position);
-                refreshBuildEstimate();
+        ArrayList<ShipDesign.Upgrade> upgrades = new ArrayList<ShipDesign.Upgrade>();
+        for (ShipDesign.Upgrade upgrade : design.getUpgrades()) {
+            if (!mFleet.hasUpgrade(upgrade.getID())) {
+                upgrades.add(upgrade);
             }
-        });
+        }
+        if (upgrades.size() > 0) {
+            upgradeListAdapter.setup(upgrades);
+
+            // select the first one by default
+            upgradeListAdapter.setSelectedItem(0);
+            mUpgrade = (ShipDesign.Upgrade) upgradeListAdapter.getItem(0);
+            refreshBuildEstimate();
+
+            upgradesList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> listView, View view, int position, long id) {
+                    upgradeListAdapter.setSelectedItem(position);
+    
+                    mUpgrade = (ShipDesign.Upgrade) upgradeListAdapter.getItem(position);
+                    refreshBuildEstimate();
+                }
+            });
+        } else {
+            upgradesList.setVisibility(View.GONE);
+            upgradesNone.setVisibility(View.VISIBLE);
+        }
 
         return new StyledDialog.Builder(getActivity())
                .setView(mView)
@@ -157,6 +175,11 @@ public class ShipUpgradeDialog extends DialogFragment {
     }
 
     private void onUpgradeClick() {
+        if (mUpgrade == null) {
+            dismiss();
+            return;
+        }
+
         final Activity activity = getActivity();
 
         BuildManager.getInstance().build(activity, mColony, mFleet.getDesign(), Integer.parseInt(mFleet.getKey()),

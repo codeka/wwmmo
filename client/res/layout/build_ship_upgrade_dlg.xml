@@ -29,6 +29,16 @@
               android:layout_height="match_parent"
               android:layout_below="@+id/fleet_icon" />
 
+    <TextView android:id="@+id/upgrades_none"
+              android:layout_above="@+id/build_estimate"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:layout_below="@+id/fleet_icon"
+              android:gravity="center_horizontal"
+              android:layout_marginTop="20dp"
+              android:text="No upgrades available for this fleet."
+              android:visibility="gone" />
+
     <au.com.codeka.warworlds.ctrl.BuildEstimateView
         android:id="@+id/build_estimate"
         android:layout_width="wrap_content"
