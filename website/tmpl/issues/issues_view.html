@@ -1,0 +1,101 @@
+{% extends "skeleton.html" %}
+{% import "issues/macros.html" as m %}
+
+{% block header %}
+  {{m.html_header(resource_version)}}
+  <script src="/ckeditor/v{{resource_version}}/ckeditor.js"></script>
+{% endblock %}
+{% block pagetitle %}Issues{% endblock %}
+{% block title %}Issues{% endblock %}
+
+{% block maincontent %}
+  <section class="content">
+    <nav class="breadcrumbs">
+      <ul>
+        <li><a href="/">War Worlds</a>
+        <li><a href="/issues">Issues</a>
+        <li><span># {{issue.summary}}</span>
+      </ul>
+    </nav>
+
+    <nav class="issue-controls">
+      <ul>
+        <li><a href="/issues/new" class="button">Report Issue</a>
+      </ul>
+    </nav>
+
+    <h1>{{issue.summary}}</h1>
+
+    <fieldset class="issue-readonly">
+      <legend>Issue # {{issue.key().id()}}</legend>
+      <div class="issue-field">
+        <label>Summary:</label>
+        <div class="field-value">{{issue.summary}}</div>
+      </div>
+      <div class="issue-field">
+        <label>Description:</label>
+        <div class="field-value">{{issue.description}}</div>
+      </div>
+    </fieldset>
+
+    {% for update in updates %}
+    <article class="issue-update" data-updateid="{{update.key()}}">
+      <img src="{{profiles[update.user.user_id()]|profile_shield}}" class="poster-shield" width="64" height="64" alt="Shield" />
+      <header>
+        <span class="author"><a rel="author" href="/">{{profiles[update.user.user_id()].display_name}}</a></span>
+        <span class="posted">posted <time itemprop="dateCreated" datetime="{{update|post_date_std}}">{{update|post_date_time}}</time></span>
+      </header>
+      <div class="comment">
+        {{update.comment}}
+      </div>
+    </article>
+    {% endfor %}
+
+    <a name="add-comment"></a>
+    <form method="POST" action="/issues/{{issue.key().id()}}">
+      <fieldset class="no-border">
+        <header class="add-comment-header">
+          Add Comment
+        </header>
+        <div class="issue-field issue-field-markitup">
+          <label for="issue-comment">Comment:</label>
+          <div class="hack"><textarea name="issue-comment" id="issue-comment"></textarea></div>
+        </div>
+        <div class="issue-field checkbox">
+          <div class="hack"><input type="checkbox" name="issue-subscribe" id="issue-subscribe" checked></div>
+          <label for="post-subscribe">Also subscribe to this issue.</label>
+        </div>
+        <div class="issue-field issue-field-submit">
+          <div class="input-button"><input type="submit" value="Post"></div>
+        </div>
+      </fieldset>
+    </form>
+    <script>
+      $(function() {
+        var editor = CKEDITOR.replace("issue-comment");
+        var $container = $("fieldset div.issue-field-markitup div.hack");
+
+        CKEDITOR.on("instanceReady", function() {
+          editor.resize($container.width(), $container.height());
+        });
+        $(window).resize(function() {
+          editor.resize($container.width(), $container.height());
+        });
+
+        var changed = false;
+        var saving = false;
+        editor.on("change", function() {
+          changed = true;
+        });
+        $("form").on("submit", function() {
+          saving = true;
+        });
+        $(window).on("beforeunload", function() {
+          if (changed && !saving) {
+            return "You have unsaved changes.";
+          }
+        });
+      });
+    </script>
+  </section>
+{% endblock %}

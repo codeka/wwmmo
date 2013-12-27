@@ -56,6 +56,9 @@ handlers:
 - url: /forum(/.*)?
   script: handlers.forum.app
 
+- url: /issues(/.*)?
+  script: handlers.issues.app
+
 - url: /profiles?(/.*)?
   script: handlers.profiles.app
 

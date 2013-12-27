@@ -1,0 +1,32 @@
+{% extends "skeleton.html" %}
+{% import "issues/macros.html" as m %}
+
+{% block header %}
+  {{m.html_header(resource_version)}}
+{% endblock %}
+{% block pagetitle %}Issues{% endblock %}
+{% block title %}Issues{% endblock %}
+
+{% block maincontent %}
+  <section class="content">
+    <nav class="breadcrumbs">
+      <ul>
+        <li><a href="/">War Worlds</a>
+        <li><span>Issues</span>
+      </ul>
+    </nav>
+
+    <section class="blurb">
+      <p>Below are all the current known issues for War Worlds. Use the controls below to filter issues, or to
+      report a new one (please try to search before reporting a duplicate issue).</p>
+    </section>
+
+    <nav class="issue-controls">
+      <ul>
+        <li><a href="/issues/new" class="button">Report Issue</a>
+      </ul>
+    </nav>
+
+    <p>Blah</p>
+  </section>
+{% endblock %}

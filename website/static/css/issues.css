@@ -1,0 +1,155 @@
+
+
+nav.issue-controls {
+  height: 2em;
+}
+
+nav.issue-controls ul {
+  list-style-type: none;
+  margin: 0 0 0 10pt; padding: 0;
+}
+
+nav.issue-controls ul li {
+  float: left;
+}
+
+fieldset.no-border {
+  border: none;
+}
+
+/* Issue editing/viewing -------------------------------------------------------------------------------------------- */
+
+form.edit-issue {
+  padding-bottom: 3em;
+}
+
+form.edit-issue fieldset {
+  margin-bottom: 1em;
+  padding: 0 1em;
+}
+
+div.issue-field {
+  height: 20pt;
+  position: relative;
+  margin: 8pt 0;
+}
+
+div.issue-field label {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 75pt;
+  line-height: 20pt;
+}
+
+div.issue-field.checkbox label {
+  left: 90pt;
+  width: auto;
+}
+
+div.issue-field div.hack {
+  position: absolute;
+  top: 0; left: 75pt; bottom: 0; right: 4pt;
+}
+div.issue-field input[type=text] {
+  width: 100%;
+  border: solid 1px #ccc;
+  padding: 2pt 4pt;
+}
+div.issue-field div.read-only {
+  margin-left: 75pt;
+  border-left: solid 2pt #090;
+  padding-left: 1em;
+}
+
+div.issue-field p {
+  line-height: 20pt;
+}
+
+div.issue-field p:first-child {
+  margin-top: 0;
+}
+
+div.issue-field.issue-field-autoheight {
+  height: auto;
+}
+
+div.issue-field.issue-field-markitup {
+  height: 300pt;
+}
+div.issue-field.issue-field-markitup label {
+  position: absolute;
+  top: 0; left: 0; height: 20pt; width: 75pt;
+  line-height: 20pt;
+}
+div.issue-field.issue-field-markitup textarea {
+  width: 100%; height: 100%;
+  border: solid 1px #ccc;
+  padding: 2pt 4pt;
+}
+
+div.issue-field.issue-field-submit div.input-button {
+  position: absolute;
+  left: 75pt;
+  top: 0;
+  bottom: 0;
+  right: auto;
+  width: 112px;
+}
+
+div.issue-field.issue-field-submit div.input-button input {
+  width: 120px;
+}
+
+fieldset.issue-readonly div.field-value {
+  position: absolute;
+  top: 0; left: 75pt; bottom: 0; right: 4pt;
+  line-height: 20pt;
+}
+
+header.add-comment-header {
+  font-weight: bold;
+  border-bottom: dotted 1px #999;
+  margin-top: 2em;
+}
+
+
+article.issue-update header {
+  border-bottom: solid 1px #ccc;
+  padding-top: 10pt;
+  margin-left: 70px;
+}
+
+article.issue-update header time {
+  font-weight: bold;
+}
+
+article.issue-update header a {
+  font-weight: bold;
+  text-decoration: none;
+  color: #000;
+}
+
+article.issue-update {
+  margin-bottom: 2em;
+}
+
+article.issue-update div.comment {
+  margin-left: 70px;
+}
+
+article.issue-update div.comment p:nth-child(1) {
+  margin-top: 0;
+}
+
+article .poster-shield {
+  float: left;
+  margin-right: 6px;
+  margin-top: 12px;
+}
+
+header.post-reply-header {
+  font-weight: bold;
+  border-bottom: dotted 1px #999;
+}
