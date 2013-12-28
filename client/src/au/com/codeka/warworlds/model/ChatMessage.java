@@ -44,20 +44,22 @@ public class ChatMessage extends BaseChatMessage {
         }
     }
 
+    public String formatPlain(boolean autoTranslate) {
+        String msg = mMessage;
+        if (mMessageEn != null && autoTranslate) {
+            msg = mMessageEn;
+        }
+        return linkify(markdown(msg));
+    }
+
     /**
      * Formats this message for display in the mini chat view and/or
      * ChatActivity. It actually returns a snippet of formatted text, hence the
      * CharSequence.
      */
     public String format(boolean isPublic, boolean messageOnly, boolean autoTranslate) {
-        String msg = mMessage;
-        boolean wasTranslated = false;
+        String msg = formatPlain(autoTranslate);
         if (mMessageEn != null && autoTranslate) {
-            msg = mMessageEn;
-            wasTranslated = true;
-        }
-        msg = linkify(markdown(msg));
-        if (wasTranslated) {
             msg = "<i>‹"+msg+"›</i>";
         }
 

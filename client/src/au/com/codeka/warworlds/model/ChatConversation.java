@@ -15,6 +15,7 @@ import au.com.codeka.common.model.BaseChatConversation;
 import au.com.codeka.common.model.BaseChatConversationParticipant;
 import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.App;
+import au.com.codeka.warworlds.GlobalOptions;
 import au.com.codeka.warworlds.RealmContext;
 import au.com.codeka.warworlds.model.ChatManager.MessageAddedListener;
 import au.com.codeka.warworlds.model.ChatManager.MessageUpdatedListener;
@@ -80,6 +81,13 @@ public class ChatConversation extends BaseChatConversation {
         synchronized(mMessages) {
             return mMessages.get(mMessages.size() - n - 1);
         }
+    }
+
+    public boolean isMuted() {
+        if (mID <= 0) {
+            return false;
+        }
+        return new GlobalOptions().isConversationMuted(mID);
     }
 
     /**

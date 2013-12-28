@@ -181,5 +181,22 @@
                             android:defaultValue="#FF0000"
                             android:dependency="GlobalOptions.Notifications[STAR_GOODS_ZERO].Enabled" />
         </PreferenceScreen>
+        <PreferenceScreen android:key="GlobalOptions.Notifications[CHAT_MESSAGE]"
+                          android:title="Private Chat Message"
+                          android:dependency="GlobalOptions.EnableNotifications">
+            <CheckBoxPreference android:key="GlobalOptions.Notifications[CHAT_MESSAGE].Enabled"
+                                android:title="Notification Enabled"
+                                android:defaultValue="true" />
+            <RingtonePreference android:key="GlobalOptions.Notifications[CHAT_MESSAGE].Ringtone"
+                                android:ringtoneType="notification"
+                                android:title="Ringtone"
+                                android:showDefault="true"
+                                android:showSilent="true"
+                                android:dependency="GlobalOptions.Notifications[CHAT_MESSAGE].Enabled" />
+            <ListPreference android:key="GlobalOptions.Notifications[CHAT_MESSAGE].LedColour"
+                            android:title="LED Color"
+                            android:defaultValue="#FF0000"
+                            android:dependency="GlobalOptions.Notifications[CHAT_MESSAGE].Enabled" />
+        </PreferenceScreen>
     </PreferenceCategory>
 </PreferenceScreen>

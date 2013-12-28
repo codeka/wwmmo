@@ -12,6 +12,9 @@ public abstract class BaseChatConversation {
     public int getID() {
         return mID;
     }
+    public boolean isPrivateChat() {
+        return (mID > 0);
+    }
     public List<BaseChatConversationParticipant> getParticipants() {
         return mParticipants;
     }

@@ -58,6 +58,10 @@ public class EmpireManager {
     }
 
     public Empire getEmpire(String empireKey) {
+        return getEmpire(empireKey, false);
+    }
+
+    public Empire getEmpire(String empireKey, boolean allowOld) {
         if (empireKey == null) {
             return mNativeEmpire;
         }
@@ -71,7 +75,7 @@ public class EmpireManager {
             return empire;
         }
 
-        Messages.Empire pb = new LocalEmpireStore().getEmpire(empireKey);
+        Messages.Empire pb = new LocalEmpireStore().getEmpire(empireKey, allowOld);
         if (pb != null) {
             empire = new Empire();
             empire.fromProtocolBuffer(pb);
@@ -317,8 +321,11 @@ public class EmpireManager {
         return empires;
     }
 
-    public void fetchEmpire(final String empireKey,
-                            final EmpireFetchedHandler handler) {
+    public void fetchEmpire(String empireKey, EmpireFetchedHandler handler) {
+        fetchEmpire(empireKey, false, handler);
+    }
+
+    public void fetchEmpire(final String empireKey, boolean allowOld, final EmpireFetchedHandler handler) {
         if (empireKey == null) {
             if (handler != null) {
                 handler.onEmpireFetched(mNativeEmpire);
@@ -341,7 +348,7 @@ public class EmpireManager {
             return;
         }
 
-        Messages.Empire pb = new LocalEmpireStore().getEmpire(empireKey);
+        Messages.Empire pb = new LocalEmpireStore().getEmpire(empireKey, allowOld);
         if (pb != null) {
             Empire empire = new Empire();
             empire.fromProtocolBuffer(pb);
@@ -381,7 +388,7 @@ public class EmpireManager {
             }
 
             // if it's in the local store, that's fine as well
-            Messages.Empire pb = new LocalEmpireStore().getEmpire(empireKey);
+            Messages.Empire pb = new LocalEmpireStore().getEmpire(empireKey, false);
             if (pb != null) {
                 Empire empire = new Empire();
                 empire.fromProtocolBuffer(pb);
@@ -406,7 +413,7 @@ public class EmpireManager {
         ArrayList<String> missingKeys = new ArrayList<String>();
 
         for (String empireKey : empireKeys) {
-            Empire empire = getEmpire(empireKey);
+            Empire empire = getEmpire(empireKey, false);
             if (empire != null) {
                 empires.add(empire);
             } else {
@@ -632,7 +639,7 @@ public class EmpireManager {
             }
         }
 
-        public Messages.Empire getEmpire(String empireKey) {
+        public Messages.Empire getEmpire(String empireKey, boolean allowOld) {
             synchronized(sLock) {
                 SQLiteDatabase db = getReadableDatabase();
                 Cursor cursor = null;
@@ -646,10 +653,12 @@ public class EmpireManager {
                     }
 
                     // if it's too old, we'll want to refresh it anyway from the server
-                    long timestamp = cursor.getLong(1);
-                    long oneDayAgo = DateTime.now(DateTimeZone.UTC).minusDays(1).getMillis();
-                    if (timestamp == 0 || timestamp < oneDayAgo) {
-                        return null;
+                    if (!allowOld) {
+                        long timestamp = cursor.getLong(1);
+                        long oneDayAgo = DateTime.now(DateTimeZone.UTC).minusDays(1).getMillis();
+                        if (timestamp == 0 || timestamp < oneDayAgo) {
+                            return null;
+                        }
                     }
 
                     return Messages.Empire.parseFrom(cursor.getBlob(0));

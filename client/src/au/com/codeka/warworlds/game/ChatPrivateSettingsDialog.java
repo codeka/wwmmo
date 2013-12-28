@@ -54,15 +54,25 @@ public class ChatPrivateSettingsDialog extends DialogFragment {
                 dismiss();
             }
         });
-/*
+
         final Button muteBtn = (Button) mView.findViewById(R.id.mute_btn);
+        if (mConversation.isMuted()) {
+            muteBtn.setText("Unmute Conversation");
+        } else {
+            muteBtn.setText("Mute Conversation");
+        }
         muteBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                
+                if (mConversation.isMuted()) {
+                    ChatManager.i.unmuteConversation(mConversation);
+                } else {
+                    ChatManager.i.muteConversation(mConversation);
+                }
+                dismiss();
             }
         });
-*/
+
         return new StyledDialog.Builder(getActivity())
             .setTitle("Chat Settings")
             .setView(mView)

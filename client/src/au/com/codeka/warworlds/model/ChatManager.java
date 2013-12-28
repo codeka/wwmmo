@@ -15,6 +15,7 @@ import au.com.codeka.BackgroundRunner;
 import au.com.codeka.common.model.BaseChatConversationParticipant;
 import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.BackgroundDetector;
+import au.com.codeka.warworlds.GlobalOptions;
 import au.com.codeka.warworlds.api.ApiClient;
 
 /**
@@ -126,6 +127,15 @@ public class ChatManager implements BackgroundDetector.BackgroundChangeHandler {
         for(ConversationsRefreshListener listener : mConversationsRefreshListeners) {
             listener.onConversationsRefreshed();
         }
+    }
+
+    /** Returns true if any conversation listeners are attached, useful to know whether the game is currently
+        running or not. */
+    public boolean hasConversationListeners() {
+        return !mConversationsRefreshListeners.isEmpty() ||
+               !mMessageUpdatedListeners.isEmpty() ||
+               !mUnreadMessageCountListeners.isEmpty() ||
+               !mMessageAddedListeners.isEmpty();
     }
 
     /** Posts a message from us to the server. */
@@ -349,6 +359,20 @@ public class ChatManager implements BackgroundDetector.BackgroundChangeHandler {
                 fireConversationsRefreshListeners();
             }
         }.execute();
+    }
+
+    public void muteConversation(ChatConversation conversation) {
+        if (conversation.getID() <= 0) {
+            return;
+        }
+        new GlobalOptions().muteConversation(conversation.getID(), true);
+    }
+
+    public void unmuteConversation(ChatConversation conversation) {
+        if (conversation.getID() <= 0) {
+            return;
+        }
+        new GlobalOptions().muteConversation(conversation.getID(), false);
     }
 
     private void refreshEmpires() {

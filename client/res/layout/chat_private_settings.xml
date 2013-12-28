@@ -48,13 +48,40 @@
         android:layout_alignParentLeft="true"
         android:layout_marginTop="10dp"
         android:layout_below="@+id/empire_name"
+        android:text="Mute Conversation" />
+
+    <TextView
+        android:id="@+id/mute_instructions"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp"
+        android:layout_below="@+id/horz_sep_2"
+        android:text="Muting a conversation just means you'll no longer get notifications about messages when you're away from the game." />
+
+    <Button
+        android:id="@+id/mute_btn"
+        android:layout_width="160dp"
+        android:layout_height="30dp"
+        android:layout_below="@+id/mute_instructions"
+        android:layout_marginTop="10dp"
+        android:layout_centerHorizontal="true"
+        android:text="Mute Conversation" />
+
+    <au.com.codeka.warworlds.ctrl.HorizontalSeparator
+        android:id="@+id/horz_sep_3"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_marginTop="10dp"
+        android:layout_below="@+id/mute_btn"
         android:text="Leave Conversation" />
 
     <Button
         android:id="@+id/leave_btn"
         android:layout_width="160dp"
         android:layout_height="30dp"
-        android:layout_below="@+id/horz_sep_2"
+        android:layout_below="@+id/horz_sep_3"
         android:layout_marginTop="10dp"
         android:layout_centerHorizontal="true"
         android:text="Leave Conversation" />

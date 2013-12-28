@@ -13,7 +13,7 @@ body {
 
 #header {
 	width: 100%;
-	background: #66b0ff;
+	background: rgb(37,37,37);
 	padding: 0; margin: 0;
 
 	background-image: linear-gradient(bottom, rgb(37,37,37) 0%, rgb(25,25,25) 100%);
@@ -53,6 +53,10 @@ body {
 	color: white;
 	line-height: 56px;
 	margin-right: 1em;
+}
+
+#header div.user-details input {
+	width: 100pt;
 }
 
 #header #on_behalf_of {

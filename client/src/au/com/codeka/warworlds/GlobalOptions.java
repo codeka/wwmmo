@@ -1,5 +1,6 @@
 package au.com.codeka.warworlds;
 
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -115,6 +116,47 @@ public class GlobalOptions {
         return options;
     }
 
+    public ArrayList<Integer> getMutedConversations() {
+        String name = "GlobalOptions.MutedConversations["+RealmContext.i.getCurrentRealm().getID()+"]";
+        String value = mPreferences.getString(name, "");
+        ArrayList<Integer> conversationIDs = new ArrayList<Integer>();
+        for (String s : value.split(",")) {
+            try {
+                conversationIDs.add(Integer.parseInt(s));
+            } catch (NumberFormatException e) {
+                // we can get this if there's no conversations muted (i.e. if value is an empty string)
+            }
+        }
+        return conversationIDs;
+    }
+
+    public void muteConversation(int convID, boolean mute) {
+        ArrayList<Integer> mutedConversations = getMutedConversations();
+        if (mute && !mutedConversations.contains(convID)) {
+            mutedConversations.add(convID);
+        } else if (!mute && mutedConversations.contains(convID)) {
+            mutedConversations.remove(Integer.valueOf(convID));
+        }
+
+        StringBuilder sb = new StringBuilder();
+        for (Integer id : mutedConversations) {
+            if (sb.length() > 0) {
+                sb.append(",");
+            }
+            sb.append(id);
+        }
+
+        String name = "GlobalOptions.MutedConversations["+RealmContext.i.getCurrentRealm().getID()+"]";
+        mPreferences.edit()
+                    .putString(name, sb.toString())
+                    .commit();
+    }
+
+    public boolean isConversationMuted(int convID) {
+        ArrayList<Integer> mutedConversations = getMutedConversations();
+        return mutedConversations.contains(convID);
+    }
+
     /**
      * Pass this to \c addOnOptionsChangedListener to be notified when options change.
      */
@@ -163,7 +205,8 @@ public class GlobalOptions {
         FLEET_VICTORIOUS,
         COLONY_DESTROYED,
         COLONY_ATTACKED,
-        STAR_GOODS_ZERO
+        STAR_GOODS_ZERO,
+        CHAT_MESSAGE
     }
 
     public static class NotificationOptions {

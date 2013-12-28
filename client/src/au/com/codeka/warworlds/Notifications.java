@@ -37,6 +37,9 @@ import au.com.codeka.warworlds.model.BuildManager;
 import au.com.codeka.warworlds.model.ChatConversation;
 import au.com.codeka.warworlds.model.ChatManager;
 import au.com.codeka.warworlds.model.ChatMessage;
+import au.com.codeka.warworlds.model.Empire;
+import au.com.codeka.warworlds.model.EmpireManager;
+import au.com.codeka.warworlds.model.EmpireShieldManager;
 import au.com.codeka.warworlds.model.Realm;
 import au.com.codeka.warworlds.model.RealmManager;
 import au.com.codeka.warworlds.model.SectorManager;
@@ -123,8 +126,9 @@ public class Notifications {
             byte[] blob = Base64.decode(value, Base64.DEFAULT);
 
             ChatMessage msg;
+            Messages.ChatMessage pb;
             try {
-                Messages.ChatMessage pb = Messages.ChatMessage.parseFrom(blob);
+                pb = Messages.ChatMessage.parseFrom(blob);
                 msg = new ChatMessage();
                 msg.fromProtocolBuffer(pb);
             } catch(InvalidProtocolBufferException e) {
@@ -135,7 +139,28 @@ public class Notifications {
             ChatConversation conversation = ChatManager.i.getConversation(msg);
             if (conversation != null) {
                 conversation.addMessage(msg);
+
+                if (conversation.isPrivateChat() && BackgroundDetector.i.isInBackground()) {
+                    if (conversation.isMuted()) {
+                        log.debug("got notification, but conversation is muted.");
+                    } else {
+                        // if it's a private chat, and we're currently in the background, show a notification
+                        displayNotification(context, pb);
+                    }
+                }
             }
+        }
+    }
+
+    private static void displayNotification(final Context context,
+                                            final Messages.ChatMessage chatmsg) {
+        NotificationDetails notification = new NotificationDetails();
+        notification.chatMsg = chatmsg;
+        notification.realm = RealmContext.i.getCurrentRealm();
+
+        DatabaseHelper db = new DatabaseHelper();
+        if (!db.addNotification(notification)) {
+            displayNotification(buildNotification(context, db.getNotifications()));
         }
     }
 
@@ -146,11 +171,9 @@ public class Notifications {
                 Float.MAX_VALUE // always prefer a cached version, no matter how old
             );
         if (starSummary == null) {
-            // TODO: this is actually an error... we need better error reporting
             log.error("Could not get star summary for star "+starKey+", cannot display notification.");
             return;
         }
-        log.debug("got a star summary!");
 
         NotificationDetails notification = new NotificationDetails();
         notification.sitrep = sitrep;
@@ -162,10 +185,7 @@ public class Notifications {
 
         DatabaseHelper db = new DatabaseHelper();
         if (!db.addNotification(notification)) {
-            log.debug("displaying notification now...");
             displayNotification(buildNotification(context, db.getNotifications()));
-        } else {
-            log.debug("notification already showing.");
         }
     }
 
@@ -204,64 +224,20 @@ public class Notifications {
         int num = 0;
         boolean first = true;
         for (NotificationDetails notification : notifications) {
-            SituationReport sitrep = SituationReport.fromProtocolBuffer(notification.sitrep);
+            GlobalOptions.NotificationOptions thisOptions = null;
+            if (notification.sitrep != null) {
+                thisOptions = addSitrepNotification(context, notification, builder, inboxStyle, first);
+            } else if (notification.chatMsg != null) {
+                thisOptions = addChatNotification(context, notification, builder, inboxStyle, first);
+            }
 
-            Star star = new Star();
-            star.fromProtocolBuffer(notification.star);
-
-            GlobalOptions.NotificationKind kind = getNotificationKind(sitrep);
-            GlobalOptions.NotificationOptions thisOptions = new GlobalOptions().getNotificationOptions(kind);
-            if (!thisOptions.isEnabled()) {
+            if (thisOptions == null) {
+                // we didn't display this one, so just continue...
                 continue;
             }
+            options = thisOptions;
 
-            if (first) {
-                try {
-                    @SuppressLint("InlinedApi")
-                    int iconWidth = context.getResources().getDimensionPixelSize(android.R.dimen.notification_large_icon_width);
-                    @SuppressLint("InlinedApi")
-                    int iconHeight = context.getResources().getDimensionPixelSize(android.R.dimen.notification_large_icon_height);
-
-                    Bitmap largeIcon = Bitmap.createBitmap(iconWidth, iconHeight, Bitmap.Config.ARGB_8888);
-                    Canvas canvas = new Canvas(largeIcon);
-
-                    Sprite designSprite = sitrep.getDesignSprite();
-                    if (designSprite != null) {
-                        Matrix matrix = new Matrix();
-                        matrix.setScale((float) iconWidth / (float) designSprite.getWidth(),
-                                        (float) iconHeight / (float) designSprite.getHeight());
-
-                        canvas.save();
-                        canvas.setMatrix(matrix);
-                        designSprite.draw(canvas);
-                        canvas.restore();
-                    }
-
-                    Sprite starSprite = StarImageManager.getInstance().getSprite(star, iconWidth / 2, true);
-                    starSprite.draw(canvas);
-
-                    builder.setLargeIcon(largeIcon);
-                } catch (Resources.NotFoundException e) {
-                    // probably an old version of Android that doesn't support
-                    // large icons
-                }
-
-                builder.setContentTitle(sitrep.getTitle());
-                builder.setContentText(sitrep.getDescription(star));
-                builder.setWhen(sitrep.getReportTime().getMillis());
-
-                String ringtone = new GlobalOptions().getNotificationOptions(kind).getRingtone();
-                if (ringtone != null && ringtone.length() > 0) {
-                    builder.setSound(Uri.parse(ringtone));
-                }
-
-                options = thisOptions;
-            }
             first = false;
-
-            // subsequent notifications go in the expanded view
-            inboxStyle.addLine(Html.fromHtml(sitrep.getSummaryLine(star)));
-
             num++;
         }
 
@@ -276,6 +252,108 @@ public class Notifications {
         builder.setLights(options.getLedColour(), 1000, 5000);
 
         return builder.build();
+    }
+
+    private static GlobalOptions.NotificationOptions addSitrepNotification(Context context, NotificationDetails notification,
+            NotificationCompat.Builder builder, NotificationCompat.InboxStyle inboxStyle, boolean first) {
+        SituationReport sitrep = SituationReport.fromProtocolBuffer(notification.sitrep);
+
+        Star star = new Star();
+        star.fromProtocolBuffer(notification.star);
+
+        GlobalOptions.NotificationKind kind = getNotificationKind(sitrep);
+        GlobalOptions.NotificationOptions options = new GlobalOptions().getNotificationOptions(kind);
+        if (!options.isEnabled()) {
+            return null;
+        }
+
+        if (first) {
+            try {
+                @SuppressLint("InlinedApi")
+                int iconWidth = context.getResources().getDimensionPixelSize(android.R.dimen.notification_large_icon_width);
+                @SuppressLint("InlinedApi")
+                int iconHeight = context.getResources().getDimensionPixelSize(android.R.dimen.notification_large_icon_height);
+
+                Bitmap largeIcon = Bitmap.createBitmap(iconWidth, iconHeight, Bitmap.Config.ARGB_8888);
+                Canvas canvas = new Canvas(largeIcon);
+
+                Sprite designSprite = sitrep.getDesignSprite();
+                if (designSprite != null) {
+                    Matrix matrix = new Matrix();
+                    matrix.setScale((float) iconWidth / (float) designSprite.getWidth(),
+                                    (float) iconHeight / (float) designSprite.getHeight());
+
+                    canvas.save();
+                    canvas.setMatrix(matrix);
+                    designSprite.draw(canvas);
+                    canvas.restore();
+                }
+
+                Sprite starSprite = StarImageManager.getInstance().getSprite(star, iconWidth / 2, true);
+                starSprite.draw(canvas);
+
+                builder.setLargeIcon(largeIcon);
+            } catch (Resources.NotFoundException e) {
+                // probably an old version of Android that doesn't support
+                // large icons
+            }
+
+            builder.setContentTitle(sitrep.getTitle());
+            builder.setContentText(sitrep.getDescription(star));
+            builder.setWhen(sitrep.getReportTime().getMillis());
+
+            String ringtone = new GlobalOptions().getNotificationOptions(kind).getRingtone();
+            if (ringtone != null && ringtone.length() > 0) {
+                builder.setSound(Uri.parse(ringtone));
+            }
+        }
+
+        // subsequent notifications go in the expanded view
+        inboxStyle.addLine(Html.fromHtml(sitrep.getSummaryLine(star)));
+
+        return options;
+    }
+
+    private static GlobalOptions.NotificationOptions addChatNotification(Context context, NotificationDetails notification,
+            NotificationCompat.Builder builder, NotificationCompat.InboxStyle inboxStyle, boolean first) {
+        ChatMessage msg = new ChatMessage();
+        msg.fromProtocolBuffer(notification.chatMsg);
+
+        GlobalOptions.NotificationKind kind = GlobalOptions.NotificationKind.CHAT_MESSAGE;
+        GlobalOptions.NotificationOptions options = new GlobalOptions().getNotificationOptions(kind);
+        if (!options.isEnabled()) {
+            return null;
+        }
+
+        String msgContent = msg.formatPlain(new GlobalOptions().autoTranslateChatMessages());
+        String empireName = "Chat";
+
+        if (first) {
+            Empire empire = EmpireManager.i.getEmpire(msg.getEmpireKey(), true);
+            if (empire != null) {
+                empireName = empire.getDisplayName();
+
+                Bitmap shield = EmpireShieldManager.i.getShield(context, empire);
+                if (shield != null) {
+                    builder.setLargeIcon(shield);
+                }
+
+                builder.setContentTitle(empire.getDisplayName());
+            }
+
+            builder.setContentText(msgContent);
+            builder.setWhen(msg.getDatePosted().getMillis());
+
+            String ringtone = new GlobalOptions().getNotificationOptions(kind).getRingtone();
+            if (ringtone != null && ringtone.length() > 0) {
+                builder.setSound(Uri.parse(ringtone));
+            }
+        }
+
+        // subsequent notifications go in the expanded view
+        inboxStyle.addLine(Html.fromHtml("<b>"+empireName+"</b>: "+msgContent));
+
+        return options;
     }
 
     private static GlobalOptions.NotificationKind getNotificationKind(SituationReport sitrep) {
@@ -324,7 +402,7 @@ public class Notifications {
      */
     private static class DatabaseHelper extends SQLiteOpenHelper {
         public DatabaseHelper() {
-            super(App.i, "notifications.db", null, 3);
+            super(App.i, "notifications.db", null, 5);
         }
 
         /**
@@ -338,8 +416,10 @@ public class Notifications {
                       +"  realm_id INTEGER,"
                       +"  star BLOB,"
                       +"  sitrep BLOB,"
+                      +"  chat_msg BLOB,"
                       +"  timestamp INTEGER,"
-                      +"  sitrep_key STRING);");
+                      +"  sitrep_key STRING,"
+                      +"  chat_msg_id INTEGER");
             db.execSQL("CREATE INDEX IX_realm_id_timestamp ON notifications (realm_id, timestamp)");
             db.execSQL("CREATE INDEX IX_sitrep_key ON notifications(sitrep_key)");
         }
@@ -355,6 +435,12 @@ public class Notifications {
                 db.execSQL("ALTER TABLE notifications ADD COLUMN sitrep_key STRING");
                 db.execSQL("CREATE INDEX IX_sitrep_key ON notifications(sitrep_key)");
             }
+            if (oldVersion < 4) {
+                db.execSQL("ALTER TABLE notifications ADD COLUMN chat_msg BLOB");
+            }
+            if (oldVersion < 5) {
+                db.execSQL("ALTER TABLE notifications ADD COLUMN chat_msg_id INTEGER");
+            }
         }
 
         /**
@@ -367,17 +453,29 @@ public class Notifications {
             try {
                 // if there's an existing one, delete it first
                 int rows = 0;
-                if (details.sitrep.getKey() != null && details.sitrep.getKey().length() > 0) {
+                if (details.sitrep != null && details.sitrep.getKey() != null && details.sitrep.getKey().length() > 0) {
                     rows = db.delete("notifications",
                             "sitrep_key = '"+details.sitrep.getKey()+"' AND realm_id = "+details.realm.getID(),
+                            null);
+                } else if (details.chatMsg != null && details.chatMsg.getId() > 0) {
+                    rows = db.delete("notifications",
+                            "chat_msg_id = '"+details.chatMsg.getId()+"' AND realm_id = "+details.realm.getID(),
                             null);
                 }
 
                 ByteArrayOutputStream sitrep = new ByteArrayOutputStream();
                 ByteArrayOutputStream star = new ByteArrayOutputStream();
+                ByteArrayOutputStream chatMsg = new ByteArrayOutputStream();
                 try {
-                    details.sitrep.writeTo(sitrep);
-                    details.star.writeTo(star);
+                    if (details.sitrep != null) {
+                        details.sitrep.writeTo(sitrep);
+                    }
+                    if (details.star != null) {
+                        details.star.writeTo(star);
+                    }
+                    if (details.chatMsg != null) {
+                        details.chatMsg.writeTo(chatMsg);
+                    }
                 } catch (IOException e) {
                     // we won't get the notification, but not the end of the world...
                     log.error("Error serializing notification details.", e);
@@ -385,10 +483,19 @@ public class Notifications {
                 }
 
                 ContentValues values = new ContentValues();
-                values.put("star", star.toByteArray());
-                values.put("sitrep", sitrep.toByteArray());
-                values.put("sitrep_key", details.sitrep.getKey());
-                values.put("timestamp", details.sitrep.getReportTime());
+                if (details.star != null) {
+                    values.put("star", star.toByteArray());
+                }
+                if (details.sitrep != null) {
+                    values.put("sitrep", sitrep.toByteArray());
+                    values.put("sitrep_key", details.sitrep.getKey());
+                    values.put("timestamp", details.sitrep.getReportTime());
+                }
+                if (details.chatMsg != null) {
+                    values.put("chat_msg", chatMsg.toByteArray());
+                    values.put("chat_msg_id", details.chatMsg.getId());
+                    values.put("timestamp", details.chatMsg.getDatePosted());
+                }
                 values.put("realm_id", details.realm.getID());
                 db.insert("notifications", null, values);
 
@@ -404,7 +511,7 @@ public class Notifications {
             Realm realm = RealmContext.i.getCurrentRealm();
             SQLiteDatabase db = getReadableDatabase();
             try {
-                Cursor cursor = db.query("notifications", new String[] {"star", "sitrep"},
+                Cursor cursor = db.query("notifications", new String[] {"star", "sitrep", "chat_msg"},
                                          "realm_id = "+realm.getID(), null, null, null, "timestamp DESC");
                 if (!cursor.moveToFirst()) {
                     cursor.close();
@@ -414,8 +521,18 @@ public class Notifications {
                 do {
                     try {
                         NotificationDetails notification = new NotificationDetails();
-                        notification.star = Messages.Star.parseFrom(cursor.getBlob(0));
-                        notification.sitrep = Messages.SituationReport.parseFrom(cursor.getBlob(1));
+                        byte[] blob = cursor.getBlob(0);
+                        if (blob != null && blob.length > 0) {
+                            notification.star = Messages.Star.parseFrom(blob);
+                        }
+                        blob = cursor.getBlob(1);
+                        if (blob != null && blob.length > 0) {
+                            notification.sitrep = Messages.SituationReport.parseFrom(blob);
+                        }
+                        blob = cursor.getBlob(2);
+                        if (blob != null && blob.length > 0) {
+                            notification.chatMsg = Messages.ChatMessage.parseFrom(blob);
+                        }
                         notification.realm = realm;
                         notifications.add(notification);
                     } catch (InvalidProtocolBufferException e) {
@@ -427,7 +544,7 @@ public class Notifications {
                 } while (cursor.moveToNext());
                 cursor.close();
             } catch (Exception e) {
-                // ignore....
+                log.error("Error fetching notifications.", e);
             } finally {
                 db.close();
             }
@@ -450,6 +567,7 @@ public class Notifications {
     private static class NotificationDetails {
         public Messages.SituationReport sitrep;
         public Messages.Star star;
+        public Messages.ChatMessage chatMsg;
         public Realm realm;
     }
 
