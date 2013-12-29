@@ -174,7 +174,6 @@ class EditPostPage(ForumPage):
         self.error(404)
         return
 
-
     self.render("forum/post_edit.html", {"forum": forum,
                                          "forum_thread": forum_thread,
                                          "post": post})
@@ -219,6 +218,7 @@ class EditPostPage(ForumPage):
 
     content = ctrl.sanitizeHtml(self.request.POST.get("post-content"))
     if post_id:
+      is_edit = True
       forum_post = model.forum.ForumPost.get(post_id)
       forum_post.content = content
       forum_post.updated = datetime.now()
@@ -230,6 +230,7 @@ class EditPostPage(ForumPage):
       forum_post.edit_notes += ("<em>Edited by "+self.profile.display_name+', <time datetime="'+
           forum_post.updated.strftime('%Y-%m-%d %H:%M:%S')+'">'+forum_post.updated.strftime('%d %b %Y %H:%M')+"</time></em>")
     else:
+      is_edit = False
       forum_post = model.forum.ForumPost(parent = forum_thread,
                                          forum = forum,
                                          posted = now,
@@ -240,22 +241,24 @@ class EditPostPage(ForumPage):
     forum_thread.put()
 
     forum_post.put()
-    ctrl.forum.incrCount("forum:%s:posts" % (forum.slug))
-    ctrl.forum.incrCount("thread:%s:%s:posts" % (forum.slug, forum_thread.slug), 1)
-
-    memcache.flush_all()
 
     # if you checked the 'subscribe' checkbox, also subscribe you...
     if self.request.POST.get("post-subscribe"):
       ctrl.forum.subscribeToThread(self.user, forum_thread)
 
-    # any users listed in the forum's auto-subscribe list get auto-subscribed...
-    if forum.auto_subscribers:
-      for subscriber in forum.auto_subscribers:
-        ctrl.forum.subscribeToThread(subscriber, forum_thread)
+    if not is_edit:
+      ctrl.forum.incrCount("forum:%s:posts" % (forum.slug))
+      ctrl.forum.incrCount("thread:%s:%s:posts" % (forum.slug, forum_thread.slug), 1)
 
-    # go through all the subscribers and send them a notification about this post
-    ctrl.forum.notifySubscribers(forum, forum_thread, forum_post, self.user, self.profile)
+      # any users listed in the forum's auto-subscribe list get auto-subscribed...
+      if forum.auto_subscribers:
+        for subscriber in forum.auto_subscribers:
+          ctrl.forum.subscribeToThread(subscriber, forum_thread)
+
+      # go through all the subscribers and send them a notification about this post
+      ctrl.forum.notifySubscribers(forum, forum_thread, forum_post, self.user, self.profile)
+
+    memcache.flush_all()
 
     total_posts = ctrl.forum.getThreadPostCounts([forum_thread])["%s:%s" % (forum.slug, forum_thread.slug)]
     total_pages = int(math.ceil(total_posts / 10.0))

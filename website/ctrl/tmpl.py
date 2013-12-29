@@ -1,7 +1,8 @@
 
 import jinja2
+import logging
 import os
-
+import re
 
 import html2text
 
@@ -52,6 +53,7 @@ def _filter_post_date_editable(post):
   return post.posted.strftime('%y-%m-%d %H:%M')
 jinja.filters['post_date_editable'] = _filter_post_date_editable
 
+
 def _filter_post_extract(post):
   return post.html[0:500]+'...'
 jinja.filters['post_extract'] = _filter_post_extract
@@ -81,6 +83,12 @@ jinja.filters['forum_post_author'] = _filter_forum_post_author
 def _filter_html_to_plain(html):
   return html2text.html2text(html)
 jinja.filters['html_to_plain'] = _filter_html_to_plain
+
+
+def _filter_html_tidy(html):
+  html = re.sub(r"<p>[\s"+chr(0xa0)+r"]*</p>", " ", html, flags=re.IGNORECASE)
+  return html
+jinja.filters["html_tidy"] = _filter_html_tidy
 
 
 def getTemplate(tmpl_name):

@@ -35,7 +35,7 @@
         </span>
       </header>
       <div class="content">
-        {{post.content}}
+        {{post.content|html_tidy}}
         {% if post.edit_notes -%}
           <p>{{post.edit_notes}}</p>
         {%- endif %}

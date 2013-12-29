@@ -1,9 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <planet version="1">
-  <texture generator="voronoi-map" noisiness="0.6">
-    <voronoi>
-      <point-cloud generator="poisson" density="0.4" randomness="0.9" />
-    </voronoi>
+  <texture generator="perlin-noise" noisiness="0.6">
     <colour>
       <node n="0.0" colour="ff003e93" />
       <node n="0.6" colour="ff002980" />

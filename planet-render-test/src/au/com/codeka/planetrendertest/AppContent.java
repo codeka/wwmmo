@@ -31,7 +31,13 @@ import au.com.codeka.common.PerlinNoise;
 import au.com.codeka.common.PointCloud;
 import au.com.codeka.common.Voronoi;
 import au.com.codeka.common.ui.GoodFlowLayout;
-import au.com.codeka.planetrender.*;
+import au.com.codeka.planetrender.PlanetRenderer;
+import au.com.codeka.planetrender.Template;
+import au.com.codeka.planetrender.TemplateException;
+import au.com.codeka.planetrender.TemplatedPerlinNoise;
+import au.com.codeka.planetrender.TemplatedPointCloud;
+import au.com.codeka.planetrender.TemplatedVoronoi;
+import au.com.codeka.planetrender.TextureGenerator;
 
 /**
  * This is the shared implemented (between the applet and the Swing application). It's got
@@ -69,6 +75,9 @@ public class AppContent extends JPanel {
         Image img = createBlankImage(Colour.TRANSPARENT);
         if (tmpl instanceof Template.PlanetTemplate) {
             PlanetRenderer pr = new PlanetRenderer((Template.PlanetTemplate) tmpl, getRandom());
+            pr.render(img);
+        } else if (tmpl instanceof Template.PlanetsTemplate) {
+            PlanetRenderer pr = new PlanetRenderer((Template.PlanetsTemplate) tmpl, getRandom());
             pr.render(img);
         } else if (tmpl instanceof Template.TextureTemplate) {
             TextureGenerator texture = new TextureGenerator((Template.TextureTemplate) tmpl, getRandom());

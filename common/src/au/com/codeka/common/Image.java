@@ -44,6 +44,17 @@ public class Image {
         mArgb[y * mWidth + x] = c.toArgb();
     }
 
+    public void blendPixelColour(int x, int y, Colour c) {
+        if (x < 0 || x >= mWidth)
+            return;
+        if (y < 0 || y >= mHeight)
+            return;
+
+        Colour imgColour = Colour.pool.borrow().reset(mArgb[y * mWidth + x]);
+        Colour.blend(imgColour, c);
+        mArgb[y * mWidth + x] = imgColour.toArgb();
+    }
+
     /**
      * Draws a circle at the given (x,y) coordinates with the given radius and colour.
      */

@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <planet version="1">
   <texture generator="perlin-noise">
-      <perlin persistence="0.5" startOctave="7" endOctave="9" interpolation="linear" />
+      <perlin persistence="0.5" startOctave="3" endOctave="9" interpolation="linear" />
       <colour>
-        <node n="0.0" colour="ff006006" />
-        <node n="0.3" colour="ff002960" />
-        <node n="1.0" colour="ff00ff06" />
+        <node n="0.0" colour="ff00ff06" />
+        <node n="0.3" colour="ff006000" />
+        <node n="1.0" colour="ff00ff00" />
       </colour>
   </texture>
   <atmosphere>

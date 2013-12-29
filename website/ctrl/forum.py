@@ -15,6 +15,7 @@ import ctrl.tmpl
 import ctrl.profile
 import model.forum
 
+
 def getForums():
   """Returns all of the non-alliance-specific forums."""
   keyname = "forums"

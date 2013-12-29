@@ -78,7 +78,9 @@ public class Template {
 
     private static BaseTemplate parseElement(Element elem) throws TemplateException {
         TemplateFactory factory = null;
-        if (elem.getTagName().equals("planet")) {
+        if (elem.getTagName().equals("planets")) {
+            factory = new PlanetsTemplate.PlanetsTemplateFactory();
+        }else if (elem.getTagName().equals("planet")) {
             factory = new PlanetTemplate.PlanetTemplateFactory();
         } else if (elem.getTagName().equals("texture")) {
             factory = new TextureTemplate.TextureTemplateFactory();
@@ -92,6 +94,8 @@ public class Template {
             factory = new PerlinNoiseTemplate.PerlinNoiseTemplateFactory();
         } else if (elem.getTagName().equals("atmosphere")) {
             factory = new AtmosphereTemplate.AtmosphereTemplateFactory();
+        } else if (elem.getTagName().equals("warp")) {
+            factory = new WarpTemplate.WarpTemplateFactory();
         } else {
             throw new TemplateException("Unknown element: "+elem.getTagName());
         }
@@ -145,12 +149,29 @@ public class Template {
         }
     }
 
+    public static class PlanetsTemplate extends BaseTemplate {
+        public static class PlanetsTemplateFactory extends TemplateFactory {
+            @Override
+            public BaseTemplate parse(Element elem) throws TemplateException {
+                PlanetsTemplate tmpl = new PlanetsTemplate();
+
+                for (Element child : XmlIterator.childElements(elem)) {
+                    tmpl.getParameters().add(parseElement(child));
+                }
+
+                return tmpl;
+            }
+        }
+    }
+
     public static class PlanetTemplate extends BaseTemplate {
         private Vector3 mNorthFrom;
         private Vector3 mNorthTo;
         private double mPlanetSize;
         private double mAmbient;
         private Vector3 mSunLocation;
+        private Vector3 mOriginFrom;
+        private Vector3 mOriginTo;
 
         public Vector3 getNorthFrom() {
             return mNorthFrom;
@@ -167,6 +188,12 @@ public class Template {
         public Vector3 getSunLocation() {
             return mSunLocation;
         }
+        public Vector3 getOriginFrom() {
+            return mOriginFrom;
+        }
+        public Vector3 getOriginTo() {
+            return mOriginTo;
+        }
 
         public void setPlanetSize(double size) {
             mPlanetSize = size;
@@ -182,6 +209,24 @@ public class Template {
             @Override
             public BaseTemplate parse(Element elem) throws TemplateException {
                 PlanetTemplate tmpl = new PlanetTemplate();
+                tmpl.mOriginFrom = Vector3.pool.borrow().reset(0.0f, 0.0f, 30.0f);
+                tmpl.mOriginTo = Vector3.pool.borrow().reset(0.0f, 0.0f, 30.0f);
+                if (elem.getAttribute("origin") != null && !elem.getAttribute("origin").equals("")) {
+                    Vector3 other = parseVector3(elem.getAttribute("origin"));
+                    tmpl.mOriginFrom.reset(other);
+                    tmpl.mOriginTo.reset(other);
+                    Vector3.pool.release(other);
+                }
+                if (elem.getAttribute("originFrom") != null && !elem.getAttribute("originFrom").equals("")) {
+                    Vector3 other = parseVector3(elem.getAttribute("originFrom"));
+                    tmpl.mOriginFrom.reset(other);
+                    Vector3.pool.release(other);
+                }
+                if (elem.getAttribute("originTo") != null && !elem.getAttribute("originTo").equals("")) {
+                    Vector3 other = parseVector3(elem.getAttribute("originTo"));
+                    tmpl.mOriginTo.reset(other);
+                    Vector3.pool.release(other);
+                }
 
                 tmpl.mNorthFrom = Vector3.pool.borrow().reset(0.0, 1.0, 0.0);
                 tmpl.mNorthTo = Vector3.pool.borrow().reset(0.0, 1.0, 0.0);
@@ -570,6 +615,49 @@ public class Template {
                 if (elem.getAttribute("slope") != null && !elem.getAttribute("slope").equals("")) {
                     tmpl.mSlope = Double.parseDouble(elem.getAttribute("slope"));
                 }
+            }
+        }
+    }
+
+    public static class WarpTemplate extends BaseTemplate {
+        public enum NoiseGenerator {
+            Perlin
+        }
+
+        private NoiseGenerator mNoiseGenerator;
+        private double mWarpFactor;
+
+        public NoiseGenerator getNoiseGenerator() {
+            return mNoiseGenerator;
+        }
+        public double getWarpFactor() {
+            return mWarpFactor;
+        }
+
+        private static class WarpTemplateFactory extends TemplateFactory {
+            /**
+             * Parses a <warp> node and returns the corresponding \c ImageWarpTemplate.
+             */
+            @Override
+            public BaseTemplate parse(Element elem) throws TemplateException {
+                WarpTemplate tmpl = new WarpTemplate();
+
+                if (elem.getAttribute("generator").equals("perlin-noise")) {
+                    tmpl.mNoiseGenerator = NoiseGenerator.Perlin;
+                } else {
+                    throw new TemplateException("Unknown generator type: "+elem.getAttribute("generator"));
+                }
+
+                tmpl.mWarpFactor = 0.1;
+                if (elem.getAttribute("factor") != null && elem.getAttribute("factor").length() > 0) {
+                    tmpl.mWarpFactor = Double.parseDouble(elem.getAttribute("factor"));
+                }
+
+                for (Element child : XmlIterator.childElements(elem)) {
+                    tmpl.getParameters().add(parseElement(child));
+                }
+
+                return tmpl;
             }
         }
     }

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <planet version="1">
   <texture generator="perlin-noise">
-      <perlin persistence="0.5" startOctave="5" endOctave="7" interpolation="cosine" />
+      <perlin persistence="0.5" startOctave="3" endOctave="7" interpolation="cosine" />
       <colour>
         <node n="0.0" colour="ffc14006" />
         <node n="0.4" colour="ffc17306" />

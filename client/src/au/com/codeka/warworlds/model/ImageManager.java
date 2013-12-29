@@ -145,7 +145,7 @@ public abstract class ImageManager {
         } else if (fileNames.length == 1) {
             fullPath += fileNames[0];
         } else {
-            fullPath += fileNames[rand.nextInt(fileNames.length - 1)];
+            fullPath += fileNames[rand.nextInt(fileNames.length)];
         }
 
         Template tmpl = mTemplates.get(fullPath);
@@ -204,19 +204,32 @@ public abstract class ImageManager {
     private boolean generateBitmap(QueuedGenerate item) {
         Vector3 sunDirection = getSunDirection(item.extra);
 
-        Template.PlanetTemplate planetTemplate = (Template.PlanetTemplate) item.tmpl.getTemplate();
-        planetTemplate.setSunLocation(sunDirection);
-
         // planet size ranges from 10 to 50, we convert that to 5..10 which is what we apply to
         // the planet renderer itself
         double size = getPlanetSize(item.extra);
-        planetTemplate.setPlanetSize(size);
 
-        long seed = item.key.hashCode();
-        Random rand = new Random(seed);
+        PlanetRenderer renderer;
+        if (item.tmpl.getTemplate() instanceof Template.PlanetTemplate) {
+            Template.PlanetTemplate planetTemplate = (Template.PlanetTemplate) item.tmpl.getTemplate();
+            planetTemplate.setSunLocation(sunDirection);
+            planetTemplate.setPlanetSize(size);
 
-        PlanetRenderer renderer = new PlanetRenderer(
-                (Template.PlanetTemplate) item.tmpl.getTemplate(), rand);
+            long seed = item.key.hashCode();
+            Random rand = new Random(seed);
+
+            renderer = new PlanetRenderer(planetTemplate, rand);
+        } else {
+            Template.PlanetsTemplate planetsTemplate = (Template.PlanetsTemplate) item.tmpl.getTemplate();
+            for (Template.PlanetTemplate planetTemplate : planetsTemplate.getParameters(Template.PlanetTemplate.class)) {
+                planetTemplate.setSunLocation(sunDirection);
+                planetTemplate.setPlanetSize(size);
+            }
+
+            long seed = item.key.hashCode();
+            Random rand = new Random(seed);
+
+            renderer = new PlanetRenderer(planetsTemplate, rand);
+        }
 
         int imgSize = (int)(item.size * mPixelScale);
 
@@ -276,7 +289,6 @@ public abstract class ImageManager {
 
                 // make it low priority -- UI must stay responsive!
                 mGenerateThread.setPriority(Thread.MIN_PRIORITY);
-
                 mGenerateThread.start();
             }
         }
