@@ -43,6 +43,7 @@ public abstract class ImageManager {
     private List<SpriteGeneratedListener> mSpriteGeneratedListeners =
             new ArrayList<SpriteGeneratedListener>();
     private Map<String, Template> mTemplates = new HashMap<String, Template>();
+    private Map<String, String[]> mFileLists = new HashMap<String, String[]>();
     private double mPixelScale;
 
     /**
@@ -85,8 +86,9 @@ public abstract class ImageManager {
 
         final File cacheFile = new File(getCachePath(tmpl, cacheKey));
         if (cacheFile.exists()) {
-            log.debug("Loading cached image: "+cacheFile.getAbsolutePath());
-            return SpriteManager.i.getSimpleSprite(cacheFile.getAbsolutePath(), false);
+            String fullPath = cacheFile.getAbsolutePath();
+            log.debug("Loading cached image: "+fullPath);
+            return SpriteManager.i.getSimpleSprite(fullPath, false);
         } else {
             long endTime = System.nanoTime();
             log.debug(String.format("No cached image (after %.4fms), generating: %s",
@@ -129,11 +131,16 @@ public abstract class ImageManager {
      * Loads the \c Template for the given \c Planet.
      */
     protected Template loadTemplate(String basePath, String key) {
-        String[] fileNames = null;
-        try {
-            fileNames = App.i.getAssets().list(basePath);
-        } catch(IOException e) {
-            return null; // should never happen!
+        String[] fileNames = mFileLists.get(basePath);
+        if (fileNames == null) {
+            try {
+                // for some reason, this can be incredbly slow on some devices (noteably, my Galaxy Note 8), that's
+                // why we cache it.
+                fileNames = App.i.getAssets().list(basePath);
+                mFileLists.put(basePath, fileNames);
+            } catch(IOException e) {
+                return null; // should never happen!
+            }
         }
 
         long seed = key.hashCode();

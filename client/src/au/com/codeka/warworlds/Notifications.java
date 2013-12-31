@@ -419,7 +419,7 @@ public class Notifications {
                       +"  chat_msg BLOB,"
                       +"  timestamp INTEGER,"
                       +"  sitrep_key STRING,"
-                      +"  chat_msg_id INTEGER");
+                      +"  chat_msg_id INTEGER)");
             db.execSQL("CREATE INDEX IX_realm_id_timestamp ON notifications (realm_id, timestamp)");
             db.execSQL("CREATE INDEX IX_sitrep_key ON notifications(sitrep_key)");
         }

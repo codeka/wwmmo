@@ -78,6 +78,18 @@ def isModerator(forum, user):
   return False
 
 
+def canPost(forum, user):
+  """Determines whether the given user can post to this forum or not."""
+  if not forum.allowed_posters:
+    return True
+  if not user:
+    return True
+  for poster in forum.allowed_posters:
+    if poster.user_id() == user.user_id():
+      return True
+  return False
+
+
 def getThreads(forum, page_no, page_size):
   keyname = 'forum:threads:%s:%d:%d' % (str(forum.key()), page_no, page_size)
   threads = memcache.get(keyname)

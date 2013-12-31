@@ -42,6 +42,10 @@ class ForumEditPage(ForumAdminPage):
       for user in data["forum"].auto_subscribers:
         forum_auto_subscribers_string.append(user.email())
       data["forum_auto_subscribers_string"] = ", ".join(forum_auto_subscribers_string)
+      forum_allowed_posters_string = []
+      for user in data["forum"].allowed_posters:
+        forum_allowed_posters_string.append(user.email())
+      data["forum_allowed_posters_string"] = ", ".join(forum_allowed_posters_string)
     else:
       data["forum"] = None
 
@@ -73,6 +77,14 @@ class ForumEditPage(ForumAdminPage):
         try:
           user = users.User(email.strip())
           forum.auto_subscribers.append(user)
+        except users.UserNotFoundError:
+          pass
+    if self.request.POST.get("forum-allowed_posters"):
+      forum.allowed_posters = []
+      for email in self.request.POST.get("forum-allowed_posters").split(","):
+        try:
+          user = users.User(email.strip())
+          forum.allowed_posters.append(user)
         except users.UserNotFoundError:
           pass
     forum.put()

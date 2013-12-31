@@ -18,7 +18,9 @@
     </nav>
 
   <p>
-    <a href="/forum/{{forum.slug}}/posts" class="button">New Post</a>
+    {% if can_post %}
+      <a href="/forum/{{forum.slug}}/posts" class="button">New Post</a>
+    {% endif %}
     {% if is_moderator -%}
        <!-- You're a moderator! -->
     {% endif %}

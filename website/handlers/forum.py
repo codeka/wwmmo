@@ -59,6 +59,8 @@ class ThreadListPage(ForumPage):
     if self.user:
       data["is_moderator"] = ctrl.forum.isModerator(forum, self.user)
 
+    data["can_post"] = ctrl.forum.canPost(forum, self.user)
+
     page_no = 1
     if self.request.get('page'):
       page_no = int(self.request.get('page'))
@@ -158,6 +160,10 @@ class EditPostPage(ForumPage):
       self.error(404)
       return
 
+    if not ctrl.forum.canPost(forum, self.user):
+      self.error(404)
+      return
+
     forum_thread = None
     if forum_thread_slug:
       forum_thread = ctrl.forum.getThreadBySlug(forum, forum_thread_slug)
@@ -184,6 +190,10 @@ class EditPostPage(ForumPage):
 
     forum = ctrl.forum.getForumBySlug(forum_slug)
     if not forum:
+      self.error(404)
+      return
+
+    if not ctrl.forum.canPost(forum, self.user):
       self.error(404)
       return
 

@@ -12,24 +12,28 @@
       <legend>Forum Details</legend>
         <div class="forum-field">
           <label for="forum-name">Name:</label>
-          <div class="hack"><input type="text" name="forum-name" id="forum-name"{% if forum %} value="{{forum.name}}"{% endif %}></div>
+          <div class="hack"><input type="text" name="forum-name" id="forum-name"{% if forum %} value="{{forum.name}}"{% endif %} placeholder="Name of the forum"></div>
         </div>
         <div class="forum-field">
           <label for="forum-slug">Slug:</label>
-          <div class="hack"><input type="text" name="forum-slug" id="forum-slug"{% if forum %} value="{{forum.slug}}"{% endif %}></div>
+          <div class="hack"><input type="text" name="forum-slug" id="forum-slug"{% if forum %} value="{{forum.slug}}"{% endif %} placeholder="Slug for the forum's URL"></div>
         </div>
         <div class="forum-field forum-field-textarea">
           <div class="hack"><textarea name="forum-desc" id="forum-desc">{% if forum %}{{forum.description}}{% endif %}</textarea></div>
         </div>
         <div class="forum-field">
           <label for="forum-moderators">Mods:</label>
-          <div class="hack"><input type="text" name="forum-moderators" id="forum-moderators"{% if forum %} value="{{forum_moderators_string}}"{% endif %}></div>
+          <div class="hack"><input type="text" name="forum-moderators" id="forum-moderators"{% if forum %} value="{{forum_moderators_string}}"{% endif %} placeholder="Comma-separated list of users who are moderators for the forum."></div>
         </div>
         <div class="forum-field">
           <label for="forum-auto_subscribers">Subs:</label>
-          <div class="hack"><input type="text" name="forum-auto_subscribers" id="forum-auto_subscribers"{% if forum %} value="{{forum_auto_subscribers_string}}"{% endif %}></div>
+          <div class="hack"><input type="text" name="forum-auto_subscribers" id="forum-auto_subscribers"{% if forum %} value="{{forum_auto_subscribers_string}}"{% endif %} placeholder="Comma-separated list of users to automatically subscribe to every post."></div>
         </div>
-        
+        <div class="forum-field">
+          <label for="forum-auto_subscribers">Posters:</label>
+          <div class="hack"><input type="text" name="forum-allowed_posters" id="forum-allowed_posters"{% if forum %} value="{{forum_allowed_posters_string}}"{% endif %} placeholder="Comma-separated list of users who can post (blank for everybody)"></div>
+        </div>
+
         <div class="post-submit">
           <input type="submit" name="action" value="Save">
           <input type="submit" name="action" value="Save &amp; View">

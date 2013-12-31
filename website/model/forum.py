@@ -15,6 +15,9 @@ class Forum(db.Model):
   # this is a list of users who get auto-subscribed to all posts in this forum.
   auto_subscribers = db.ListProperty(users.User)
 
+  # this is the list of users who are allowed to post new topics. Anybody can still reply.
+  allowed_posters = db.ListProperty(users.User)
+
 
 class ForumThread(db.Model):
   forum = db.ReferenceProperty(Forum, required=True)

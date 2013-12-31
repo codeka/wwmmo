@@ -445,11 +445,15 @@ public class StarController {
                 stmt.update();
             }
 
+            DateTime now = DateTime.now();
             sql = "INSERT INTO fleet_upgrades (star_id, fleet_id, upgrade_id, extra) VALUES (?, ?, ?, ?)";
             try (SqlStmt stmt = prepare(sql)) {
                 stmt.setInt(1, star.getID());
                 for (BaseFleet baseFleet : star.getFleets()) {
                     if (baseFleet.getUpgrades() == null || baseFleet.getUpgrades().isEmpty()) {
+                        continue;
+                    }
+                    if (baseFleet.getTimeDestroyed() != null && baseFleet.getTimeDestroyed().isBefore(now)) {
                         continue;
                     }
 
