@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:ww="http://www.war-worlds.com/schema/rss-ext">
+  <channel>
+    <title>War Worlds - Forum - {{forum.name}}</title>
+    <description>{{forum.description|striptags}}</description>
+    <link>http://www.war-worlds.com/forum/{{forum.slug}}</link>
+    <pubDate>{{threads[0]|post_date_rss}}</pubDate>
+    {% for thread in threads if thread.key() in first_posts %}
+      <item>
+        <title>{{thread.subject}}</title>
+        <description>{{first_posts[thread.key()].content|e}}</description>
+        <link>http://www.war-worlds.com/forum/{{forum.slug}}/{{thread.slug}}</link>
+        <ww:replies>{{post_counts[thread.forum.slug+":"+thread.slug] - 1}}</ww:replies>
+        <pubDate>{{thread|post_date_rss}}</pubDate>
+      </item>
+    {% endfor %}
+  </channel>
+</rss>

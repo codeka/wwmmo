@@ -1,0 +1,155 @@
+{% extends "admin/skeleton.html" %}
+{% block title %}Alliances{% endblock %}
+{% block head %}
+  <script src="/realms/{{realm}}/js/tmpl.js"></script>
+  <script src="/realms/{{realm}}/js/time.js"></script>
+  <script src="/realms/{{realm}}/js/empirestore.js"></script>
+  <style>
+    div.left-column {
+      position: absolute;
+      left: 0; top: 90px; bottom: 0;
+      width: 49%;
+      padding-right: 10px;
+      border-right: 2px dashed #666;
+    }
+    div.right-column {
+      position: absolute;
+      right: 0; top: 90px; bottom: 0;
+      width: 49%;
+    }
+    div.spinner {
+      margin: 2em auto;
+    }
+    div.right-column div.top-half {
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 49%;
+      overflow: auto;
+    }
+    div.right-column div.bottom-half {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 49%;
+      overflow: auto;
+    }
+    #alliance-list {
+      width: 100%;
+    }
+    #member-list {
+      width: 100%;
+    }
+  </style>
+{% endblock %}
+
+{% block content %}
+  <h1>Alliances</h1>
+  <div class="left-column">
+    <div class="top-half">
+      <table id="alliance-list">
+        <thead>
+          <tr>
+            <th></th>
+            <th>Name</th>
+            <th>Members</th>
+            <th>Bank</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td colspan="4"><div class="spinner"></div></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="bottom-half">
+      <div class="spinner" style="display: none;"></div>
+      <table id="member-list" style="display: none;">
+        <thead>
+          <tr>
+            <th></th>
+            <th>Name</th>
+            <th>Rank</th>
+            <th>Joined</th>
+          </tr>
+        </thead>
+        <tbody>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div class="right-column">
+    <div class="top-half">
+    </div>
+    <div class="bottom-half">
+    </div>
+  </div>
+
+  <script type="text/html" id="alliance-tmpl">
+    <tr>
+      <td><%= key %></td>
+      <td><a href="javascript:;" class="alliance-name" data-id=<%= key %>><%= name %></a></td>
+      <td><%= num_members %></td>
+      <td>$<%= bank_balance %></td>
+    </tr>
+  </script>
+
+  <script type="text/html" id="member-tmpl">
+    <tr>
+      <td><%= empire_key %></td>
+      <td><span class="empire-name"></span></td>
+      <td><%= rank %></td>
+      <td><time timestamp="<%= time_joined %>"><%= time_joined %></time></td>
+    </tr>
+  </script>
+
+  <script>
+    $(function() {
+      var url = "/realms/{{realm}}/alliances";
+      $.ajax({
+        url: url,
+        type: "GET",
+        dataType: "json",
+        success: function(data) {
+          var allianceList = $("#alliance-list tbody");
+          allianceList.empty();
+          var tmpl = $("#alliance-tmpl");
+          for (var i = 0; i < data.alliances.length; i++) {
+            allianceList.append(tmpl.applyTemplate(data.alliances[i]));
+          }
+        },
+        error: function(xhr, status, err) {
+          alert("An error occured, check server logs: " + xhr.status);
+        }
+      });
+    });
+
+    $("#alliance-list").on("click", "a.alliance-name", function() {
+      $(".bottom-half div.spinner").show();
+      $("#member-list").hide();
+
+      var url = "/realms/{{realm}}/alliances/" + $(this).data("id");
+      $.ajax({
+        url: url,
+        type: "GET",
+        dataType: "json",
+        success: function(data) {
+          $(".bottom-half div.spinner").hide();
+          $("#member-list").show();
+
+          var membersList = $("#member-list tbody");
+          membersList.empty();
+          var tmpl = $("#member-tmpl");
+          for (var i = 0; i < data.members.length; i++) {
+            var html = $(tmpl.applyTemplate(data.members[i]));
+            empireStore.getEmpire(data.members[i].empire_key, function(empireName) {
+              html.find(".empire-name").html(empireName);
+            });
+            membersList.append(html);
+          }
+          fix_times();
+        },
+        error: function(xhr, status, err) {
+          alert("An error occured, check server logs: " + xhr.status);
+        }
+      });
+    });
+  </script>
+{% endblock %}

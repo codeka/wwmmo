@@ -94,6 +94,31 @@ class ThreadListPage(ForumPage):
     self.render("forum/thread_list.html", data)
 
 
+class ThreadRssPage(ForumPage):
+  """This page displays a forum as an RSS feed."""
+  def get(self, forum_slug):
+    forum = ctrl.forum.getForumBySlug(forum_slug)
+    if not forum:
+      self.error(404)
+      return
+
+    data = {}
+    data["forum"] = forum
+
+    threads = ctrl.forum.getThreads(forum, 0, 25)
+    data["threads"] = threads
+    data["post_counts"] = ctrl.forum.getThreadPostCounts(threads)
+    data["first_posts"] = ctrl.forum.getFirstPostsByForumThread(threads)
+
+    user_ids = []
+    for thread in threads:
+      if thread.user.user_id() not in user_ids:
+        user_ids.append(thread.user.user_id())
+    data["profiles"] = ctrl.profile.getProfiles(user_ids)
+
+    self.render("forum/thread_list.rss", data)
+
+
 class PostListPage(ForumPage):
   def get(self, forum_slug, forum_thread_slug):
     forum = ctrl.forum.getForumBySlug(forum_slug)
@@ -363,6 +388,7 @@ class SubscriptionPage(ForumPage):
 
 app = webapp.WSGIApplication([("/forum/?", ForumListPage),
                               ("/forum/([^/]+)/?", ThreadListPage),
+                              ("/forum/([^/]+)/rss", ThreadRssPage),
                               ("/forum/([^/]+)/posts", EditPostPage),
                               ("/forum/([^/]+)/([^/]+)", PostListPage),
                               ("/forum/([^/]+)/([^/]+)/posts", EditPostPage),

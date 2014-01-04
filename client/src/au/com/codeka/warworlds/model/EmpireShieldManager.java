@@ -37,7 +37,7 @@ import au.com.codeka.warworlds.RealmContext;
 import au.com.codeka.warworlds.api.ApiClient;
 import au.com.codeka.warworlds.api.ApiException;
 
-public class EmpireShieldManager {
+public class EmpireShieldManager implements RealmManager.RealmChangedHandler {
     private static final Logger log = LoggerFactory.getLogger(EmpireShieldManager.class);
     public static EmpireShieldManager i = new EmpireShieldManager();
 
@@ -52,6 +52,8 @@ public class EmpireShieldManager {
         mEmpireShieldTextures = new HashMap<String, ITextureRegion>();
         mEmpireShieldUpdatedHandlers = new ArrayList<EmpireShieldUpdatedHandler>();
         mFetchingShields = new HashSet<Integer>();
+
+        RealmManager.i.addRealmChangedHandler(this);
     }
 
     public void addEmpireShieldUpdatedHandler(EmpireShieldUpdatedHandler handler) {
@@ -76,6 +78,11 @@ public class EmpireShieldManager {
 
     public void flushCachedImage(String empireKey) {
         mEmpireShields.remove(empireKey);
+    }
+
+    @Override
+    public void onRealmChanged(Realm newRealm) {
+        mEmpireShields.clear();
     }
 
     /**

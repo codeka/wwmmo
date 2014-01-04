@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+
+    <ImageView android:id="@+id/title_icon"
+               android:layout_width="50dp"
+               android:layout_height="50dp"
+               android:layout_margin="5dp"
+               android:src="@drawable/app_icon" />
+
+    <TextView android:id="@+id/title"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:layout_alignParentTop="true"
+              android:layout_alignParentRight="true"
+              android:layout_toRightOf="@+id/title_icon"
+              android:text="Select Realm"
+              style="@style/TitleText" />
+
+    <View android:id="@+id/separator"
+          android:layout_width="1dp"
+          android:layout_height="match_parent"
+          android:layout_centerHorizontal="true"/>
+
+    <Button android:id="@+id/start_btn"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginLeft="@dimen/tablet_margin_5dp"
+            android:layout_marginBottom="5dp"
+            android:layout_marginRight="@dimen/tablet_margin_5dp"
+            android:layout_alignParentBottom="true"
+            android:text="Select Realm" />
+
+    <Button
+        android:id="@+id/help_btn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="5dp"
+        android:layout_marginLeft="@dimen/tablet_margin_5dp"
+        android:layout_marginRight="5dp"
+        android:layout_toLeftOf="@id/separator"
+        android:layout_below="@+id/title_icon"
+        android:text="How to Play" />
+
+    <Button
+        android:id="@+id/privacy_policy_btn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="5dp"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="@dimen/tablet_margin_5dp"
+        android:layout_toRightOf="@id/separator"
+        android:layout_below="@+id/title_icon"
+        android:text="Privacy Policy" />
+
+    <TextView android:id="@+id/instructions"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:layout_below="@+id/help_btn"
+              android:layout_marginLeft="@dimen/tablet_margin_5dp"
+              android:layout_marginRight="@dimen/tablet_margin_5dp"
+              android:text="Realms are separate War World universes with differing rules and length of play. You are free to play in any or all realms as you like. If you're not sure, Beta is a good choice to start with." />
+    
+    <ListView android:id="@+id/realms"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:layout_alignParentLeft="true"
+              android:layout_above="@id/start_btn"
+              android:layout_below="@+id/instructions"
+              android:layout_marginLeft="@dimen/tablet_margin_5dp"
+              android:layout_marginRight="@dimen/tablet_margin_5dp"
+              android:layout_marginTop="10dp"
+              android:layout_marginBottom="5dp" />
+
+</RelativeLayout>

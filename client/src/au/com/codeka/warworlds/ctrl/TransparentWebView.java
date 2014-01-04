@@ -6,15 +6,12 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 import org.apache.commons.io.IOUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import android.content.Context;
 import android.content.res.AssetManager;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.util.AttributeSet;
-import android.util.Base64;
 import android.view.View;
 import android.webkit.WebView;
 
@@ -24,8 +21,6 @@ import android.webkit.WebView;
  * which version of the Android API your device is.
  */
 public class TransparentWebView extends WebView {
-    private static Logger log = LoggerFactory.getLogger(TransparentWebView.class);
-
     public TransparentWebView(Context context, AttributeSet attrs) {
         super(context, attrs);
         setTransparent();
@@ -37,6 +32,12 @@ public class TransparentWebView extends WebView {
         setTransparent();
     }
 
+    @Override
+    public void loadDataWithBaseURL(String baseUrl, String data, String mimeType, String encoding, String historyUrl) {
+        super.loadDataWithBaseURL(baseUrl, data, mimeType, encoding, historyUrl);
+        setTransparent();
+    }
+
     /**
      * A helper that loads a template HTML (from your assets folder) and then replaces
      * the string "%s" in that template with the HTML you've supplied.
@@ -44,13 +45,8 @@ public class TransparentWebView extends WebView {
     public void loadHtml(String templateFileName, String html) {
         String tmpl = getHtmlFile(getContext(), templateFileName);
         html = String.format(tmpl, html);
-        html = Base64.encodeToString(html.getBytes(), Base64.DEFAULT);
-        log.debug(String.format("Loading HTML (template=%s)", templateFileName));
 
-        String url = "data:text/html;charset=utf-8;base64,"+html;
-        log.info(url);
-
-        loadUrl(url);
+        loadDataWithBaseURL(null, html, "text/html", "UTF-8", null);
     }
 
     /**

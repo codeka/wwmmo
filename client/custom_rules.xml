@@ -18,21 +18,23 @@
       <then>
         <!-- make sure on_behalf_of is commented out -->
         <replaceregexp file="assets/warworlds.properties"
-                       match="^#?user.on_behalf_of=.*$"
-                       flags="gm"
+                       match="^#?user.on_behalf_of=.*$" flags="gm"
                        replace="#user.on_behalf_of=nobody" />
 
         <!-- make sure debug is set to 'false' -->
         <replaceregexp file="assets/warworlds.properties"
-                       match="^debug=.*$"
-                       flags="gm"
+                       match="^debug=.*$" flags="gm"
                        replace="debug=false" />
 
         <!-- change all of the in-app purchase fields to their defaults -->
         <replaceregexp file="assets/warworlds.properties"
-                       match="^iap\.([^=]+)=.*$"
-                       flags="gm"
+                       match="^iap\.([^=]+)=.*$" flags="gm"
                        replace="iap.\1=\1" />
+
+        <!-- make sure the welcome.rss field is pointing to the live server -->
+        <replaceregexp file="assets/warworlds.properties"
+                       match="^welcome.rss=.*$" flags="gm"
+                       replace="welcome.rss=http://www.war-worlds.com/forum/announcements/rss"
 
         <!-- update the version number -->
         <replaceregexp file="AndroidManifest.xml"

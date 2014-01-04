@@ -1,11 +1,25 @@
 
 package au.com.codeka.warworlds;
 
+import java.text.DateFormat;
 import java.text.DecimalFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Locale;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.DefaultHttpClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
 
 import android.app.ActivityManager;
 import android.content.Context;
@@ -19,15 +33,20 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
+import au.com.codeka.BackgroundRunner;
 import au.com.codeka.warworlds.ctrl.TransparentWebView;
 import au.com.codeka.warworlds.game.starfield.StarfieldActivity;
+import au.com.codeka.warworlds.model.EmpireManager;
+import au.com.codeka.warworlds.model.EmpireShieldManager;
+import au.com.codeka.warworlds.model.MyEmpire;
 import au.com.codeka.warworlds.model.RealmManager;
 
 /**
  * Main activity. Displays the message of the day and lets you select "Start Game", "Options", etc.
  */
-public class WarWorldsActivity extends BaseActivity {
+public class WarWorldsActivity extends BaseActivity implements EmpireShieldManager.EmpireShieldUpdatedHandler {
     private static Logger log = LoggerFactory.getLogger(WarWorldsActivity.class);
     private Context mContext = this;
     private Button mStartGameButton;
@@ -52,6 +71,8 @@ public class WarWorldsActivity extends BaseActivity {
         mRealmName = (TextView) findViewById(R.id.realm_name);
         final Button realmSelectButton = (Button) findViewById(R.id.realm_select_btn);
         final Button optionsButton = (Button) findViewById(R.id.options_btn);
+
+        refreshWelcomeMessage();
 
         realmSelectButton.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
@@ -91,6 +112,14 @@ public class WarWorldsActivity extends BaseActivity {
                 startActivity(i);
             }
         });
+
+        ((Button) findViewById(R.id.reauth_btn)).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                final Intent intent = new Intent(mContext, AccountsActivity.class);
+                startActivity(intent);
+            }
+        });
     }
 
     @Override
@@ -122,6 +151,11 @@ public class WarWorldsActivity extends BaseActivity {
         mConnectionStatus.setText("Connecting...");
         mRealmName.setText(String.format(Locale.ENGLISH, "Realm: %s", RealmContext.i.getCurrentRealm().getDisplayName()));
 
+        final TextView empireName = (TextView) findViewById(R.id.empire_name);
+        final ImageView empireIcon = (ImageView) findViewById(R.id.empire_icon);
+        empireName.setText("");;
+        empireIcon.setImageBitmap(null);
+
         mHelloWatcher = new HelloWatcher();
         ServerGreeter.addHelloWatcher(mHelloWatcher);
 
@@ -129,7 +163,6 @@ public class WarWorldsActivity extends BaseActivity {
             @Override
             public void onHelloComplete(boolean success, ServerGreeter.ServerGreeting greeting) {
                 if (success) {
-                    TransparentWebView motdView = (TransparentWebView) findViewById(R.id.motd);
 
                     // we'll display a bit of debugging info along with the 'connected' message
                     long maxMemoryBytes = Runtime.getRuntime().maxMemory();
@@ -148,12 +181,89 @@ public class WarWorldsActivity extends BaseActivity {
                                                packageInfo == null ? "Unknown" : packageInfo.versionName,
                                                Util.isDebug() ? " (debug)" : " (rel)");
                     mConnectionStatus.setText(msg);
-
-                    motdView.loadHtml("html/skeleton.html", greeting.getMessageOfTheDay());
                     mStartGameButton.setEnabled(true);
+
+                    MyEmpire empire = EmpireManager.i.getEmpire();
+                    empireName.setText(empire.getDisplayName());
+                    empireIcon.setImageBitmap(EmpireShieldManager.i.getShield(mContext, empire));
                 }
             }
         });
+    }
+
+    private void refreshWelcomeMessage() {
+        new BackgroundRunner<Document>() {
+            @Override
+            protected Document doInBackground() {
+                String url = (String) Util.getProperties().get("welcome.rss");
+                try {
+                    // we have to use the built-in one because our special version assume all requests go to the
+                    // game server...
+                    HttpClient httpClient = new DefaultHttpClient();
+                    HttpResponse response = httpClient.execute(new HttpGet(url));
+                    if (response.getStatusLine().getStatusCode() == 200) {
+                        DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
+                        builderFactory.setValidating(false);
+
+                        DocumentBuilder builder = builderFactory.newDocumentBuilder();
+                        return builder.parse(response.getEntity().getContent());
+                    }
+                } catch (Exception e) {
+                    log.error("Error fetching MOTD.", e);
+                }
+
+                return null;
+            }
+
+            @Override
+            protected void onComplete(Document rss) {
+                StringBuilder motd = new StringBuilder();
+                if (rss != null) {
+                    NodeList itemNodes = rss.getElementsByTagName("item");
+                    for (int i = 0; i < itemNodes.getLength(); i++) {
+                        Element itemElem = (Element) itemNodes.item(i);
+                        String title = itemElem.getElementsByTagName("title").item(0).getTextContent();
+                        String content = itemElem.getElementsByTagName("description").item(0).getTextContent();
+                        String pubDate = itemElem.getElementsByTagName("pubDate").item(0).getTextContent();
+                        String link = itemElem.getElementsByTagName("link").item(0).getTextContent();
+
+                        try {
+                            DateFormat formatter = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz");
+                            Date date = formatter.parse(pubDate);
+                            formatter = new SimpleDateFormat("dd MMM yyyy h:mm a");
+                            motd.append("<h1>");
+                            motd.append(formatter.format(date));
+                            motd.append("</h1>");
+                        } catch (ParseException e) {
+                            // TODO Auto-generated catch block
+                            e.printStackTrace();
+                        }
+
+                        motd.append("<h2>"); motd.append(title); motd.append("</h2>");
+                        motd.append(content);
+                        motd.append("<div style=\"text-align: right; border-bottom: dashed 1px #fff; padding-bottom: 4px;\">");
+                        motd.append("<a href=\""); motd.append(link); motd.append("\">");
+                        motd.append("View forum post");
+                        motd.append("</a></div>");
+                    }
+                }
+
+                TransparentWebView motdView = (TransparentWebView) findViewById(R.id.motd);
+                motdView.loadHtml("html/skeleton.html", motd.toString());
+
+            }
+        }.execute();
+    }
+
+    @Override
+    public void onEmpireShieldUpdated(int empireID) {
+        // if it's the same as our empire, we'll need to update the icon we're currently showing.
+        MyEmpire empire = EmpireManager.i.getEmpire();
+        if (empireID == Integer.parseInt(empire.getKey())) {
+            ImageView empireIcon = (ImageView) findViewById(R.id.empire_icon);
+            empireIcon.setImageBitmap(EmpireShieldManager.i.getShield(mContext, empire));
+
+        }
     }
 
     @Override

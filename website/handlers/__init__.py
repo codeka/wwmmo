@@ -14,7 +14,7 @@ import ctrl.tmpl
 
 # This value gets incremented every time we deploy so that we can cache bust
 # our static resources (css, js, etc)
-RESOURCE_VERSION = 33
+RESOURCE_VERSION = 34
 
 
 class BaseHandler(webapp.RequestHandler):
@@ -65,6 +65,8 @@ class BaseHandler(webapp.RequestHandler):
 
     if tmplName[-4:] == ".txt":
       self.response.content_type = "text/plain"
+    elif tmplName[-4:] == ".rss":
+      self.response.content_type = "application/rss+xml"
     else:
       self.response.content_type = "text/html"
 

@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent">
+
+    <ImageView
+        android:id="@+id/title_icon"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_margin="5dp"
+        android:src="@drawable/app_icon" />
+
+    <TextView
+        android:id="@+id/title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true"
+        android:layout_toRightOf="@+id/title_icon"
+        android:text="Log In"
+        style="@style/TitleText" />
+
+    <TextView
+        android:id="@+id/note"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/title"
+        android:layout_margin="5dp"
+        android:gravity="center"
+        android:text="Note: your account details will remain private"
+        android:textColor="#ffffff" />
+
+    <View
+        android:id="@+id/divider"
+        android:layout_width="fill_parent"
+        android:layout_height="1dip"
+        android:layout_below="@id/note"
+        android:layout_marginLeft="@dimen/tablet_margin"
+        android:layout_marginRight="@dimen/tablet_margin"
+        android:background="#808080" />
+
+    <ListView
+        android:id="@+id/select_account"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_below="@id/divider"
+        android:layout_above="@+id/button_wrapper"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="@dimen/tablet_margin_10dp"
+        android:layout_marginRight="@dimen/tablet_margin_10dp"
+        android:layout_marginBottom="10dp"
+        android:background="@android:color/transparent"
+        android:cacheColorHint="@android:color/transparent"
+        android:divider="#FFFFFF"
+        android:textSize="16sp" >
+    </ListView>
+
+    <Button
+        android:id="@+id/log_in_btn"
+        style="@style/Button"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="5dp"
+        android:layout_marginLeft="@dimen/tablet_margin_5dp"
+        android:layout_marginRight="@dimen/tablet_margin_5dp"
+        android:layout_alignParentBottom="true"
+        android:text="Log in" />
+
+    <LinearLayout
+        android:id="@+id/button_wrapper"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/log_in_btn"
+        android:layout_marginLeft="@dimen/tablet_margin_5dp"
+        android:layout_marginRight="@dimen/tablet_margin_5dp"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/help_btn"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="5dp"
+            android:layout_marginLeft="5dp"
+            android:text="How to Play" />
+
+        <Button
+            android:id="@+id/privacy_policy_btn"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="5dp"
+            android:layout_marginLeft="5dp"
+            android:text="Privacy Policy" />
+    </LinearLayout>
+
+</RelativeLayout>

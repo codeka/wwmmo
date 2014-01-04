@@ -32,7 +32,6 @@ public class AccountsActivity extends BaseActivity {
     final Logger log = LoggerFactory.getLogger(AccountsActivity.class);
     private int mAccountSelectedPosition = 0;
     private Context mContext = this;
-    private boolean mIsLogIn;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -46,86 +45,9 @@ public class AccountsActivity extends BaseActivity {
         Util.loadProperties();
         SharedPreferences prefs = Util.getSharedPreferences();
         String accountName = prefs.getString("AccountName", null);
-        if (accountName == null) {
-            mIsLogIn = true;
-            setContentView(R.layout.log_in);
 
-            final ListView listView = (ListView) findViewById(R.id.select_account);
-            final Button logInButton = (Button) findViewById(R.id.log_in_btn);
-            logInButton.setOnClickListener(new OnClickListener() {
-                public void onClick(View v) {
-                    // Get account name
-                    mAccountSelectedPosition = listView.getCheckedItemPosition();
-                    TextView account = (TextView) listView.getChildAt(mAccountSelectedPosition);
+        setContentView(R.layout.accounts);
 
-                    // Register
-                    register((String) account.getText());
-                    ServerGreeter.clearHello();
-                    RealmManager.i.selectRealm(null);
-
-                    finish();
-                }
-            });
-
-            ((Button) findViewById(R.id.help_btn)).setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Intent i = new Intent(Intent.ACTION_VIEW);
-                    i.setData(Uri.parse("http://www.war-worlds.com/doc/getting-started"));
-                    startActivity(i);
-                }
-            });
-
-            ((Button) findViewById(R.id.privacy_policy_btn)).setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Intent i = new Intent(Intent.ACTION_VIEW);
-                    i.setData(Uri.parse("http://www.war-worlds.com/privacy-policy"));
-                    startActivity(i);
-                }
-            });
-
-        } else {
-            mIsLogIn = false;
-            setContentView(R.layout.log_out);
-
-            final Button logOutButton = (Button) findViewById(R.id.log_out_btn);
-            logOutButton.setOnClickListener(new OnClickListener() {
-                public void onClick(View v) {
-                    ServerGreeter.clearHello();
-                    RealmManager.i.selectRealm(null);
-
-                    unregister();
-                    finish();
-                }
-            });
-
-            final Button cancelButton = (Button) findViewById(R.id.cancel_btn);
-            cancelButton.setOnClickListener(new OnClickListener() {
-                public void onClick(View v) {
-                    if (mIsLogIn) {
-                        Intent intent = new Intent(mContext, WarmWelcomeActivity.class);
-                        startActivity(intent);
-                    }
-
-                    finish();
-                }
-            });
-        }
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-
-        if (mIsLogIn) {
-            setLogInScreenContent();
-        } else {
-            setLogOutScreenContent();
-        }
-    }
-
-    private void setLogInScreenContent() {
         List<String> accounts = getGoogleAccounts();
         if (accounts.size() == 0) {
             // Show a dialog and invoke the "Add Account" activity if requested
@@ -150,20 +72,46 @@ public class AccountsActivity extends BaseActivity {
             listView.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
             listView.setItemChecked(mAccountSelectedPosition, true);
         }
+
+        final ListView listView = (ListView) findViewById(R.id.select_account);
+        final Button logInButton = (Button) findViewById(R.id.log_in_btn);
+        logInButton.setOnClickListener(new OnClickListener() {
+            public void onClick(View v) {
+                // Get account name
+                mAccountSelectedPosition = listView.getCheckedItemPosition();
+                TextView account = (TextView) listView.getChildAt(mAccountSelectedPosition);
+
+                // Register
+                register((String) account.getText());
+                ServerGreeter.clearHello();
+                RealmManager.i.selectRealm(null);
+
+                finish();
+            }
+        });
+
+        ((Button) findViewById(R.id.help_btn)).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(Intent.ACTION_VIEW);
+                i.setData(Uri.parse("http://www.war-worlds.com/doc/getting-started"));
+                startActivity(i);
+            }
+        });
+
+        ((Button) findViewById(R.id.privacy_policy_btn)).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(Intent.ACTION_VIEW);
+                i.setData(Uri.parse("http://www.war-worlds.com/privacy-policy"));
+                startActivity(i);
+            }
+        });
     }
 
-    /**
-     * Sets up the 'disconnected' screen.
-     */
-    private void setLogOutScreenContent() {
-        final SharedPreferences prefs = Util.getSharedPreferences();
-        String accountName = prefs.getString("AccountName", "Unknown");
-
-        // Format the disconnect message with the currently connected account name
-        TextView logOutMsg = (TextView) findViewById(R.id.log_out_msg);
-        String message = getResources().getString(R.string.log_out_msg);
-        String formatted = String.format(message, accountName);
-        logOutMsg.setText(formatted);
+    @Override
+    public void onResume() {
+        super.onResume();
     }
 
     /**

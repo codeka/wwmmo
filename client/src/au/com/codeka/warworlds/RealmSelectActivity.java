@@ -6,7 +6,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.text.Html;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.Window;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -28,7 +27,7 @@ public class RealmSelectActivity extends BaseActivity {
 
         Util.setup(mContext);
         if (RealmManager.i.getRealms().size() == 1) {
-            // if there's only one realm, select it an move on.
+            // if there's only one realm, select it and move on.
             RealmManager.i.selectRealm(RealmManager.i.getRealms().get(0).getDisplayName());
             finish();
             startActivity(new Intent(mContext, WarWorldsActivity.class));
@@ -87,14 +86,6 @@ public class RealmSelectActivity extends BaseActivity {
                 Intent i = new Intent(Intent.ACTION_VIEW);
                 i.setData(Uri.parse("http://www.war-worlds.com/privacy-policy"));
                 startActivity(i);
-            }
-        });
-
-        final Button logOutButton = (Button) findViewById(R.id.log_out_btn);
-        logOutButton.setOnClickListener(new OnClickListener() {
-            public void onClick(View v) {
-                finish();
-                startActivity(new Intent(mContext, AccountsActivity.class));
             }
         });
     }
