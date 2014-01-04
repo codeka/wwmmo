@@ -125,8 +125,20 @@ public class FleetOrdersHandler extends RequestHandler {
                 fleet.setNumShips(fleet.getNumShips() + otherFleet.getNumShips());
                 fleet.setNotes(notes);
 
+                // TODO: do something better than just clearing out all upgrades. e.g. keep upgrades that both
+                // fleets had
+                fleet.getUpgrades().clear();
+
                 // TODO: probably not the best place for this to go...
-                String sql = "DELETE FROM fleets WHERE id = ?";
+                String sql = "DELETE FROM fleet_upgrades WHERE fleet_id = ?";
+                try (SqlStmt stmt = t.prepare(sql)) {
+                    stmt.setInt(1, otherFleet.getID());
+                    stmt.update();
+                } catch (Exception e) {
+                    throw new RequestException(e);
+                }
+
+                sql = "DELETE FROM fleets WHERE id = ?";
                 try (SqlStmt stmt = t.prepare(sql)) {
                     stmt.setInt(1, otherFleet.getID());
                     stmt.update();
