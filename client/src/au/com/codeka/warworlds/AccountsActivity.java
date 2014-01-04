@@ -23,7 +23,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
-import au.com.codeka.warworlds.model.RealmManager;
+import au.com.codeka.warworlds.model.EmpireManager;
 
 /**
  * Account selections activity - handles device registration and unregistration.
@@ -67,6 +67,15 @@ public class AccountsActivity extends BaseActivity {
             builder.setTitle("No Google Account");
             builder.create().show();
         } else {
+            if (accountName != null) {
+                for (int i = 0; i < accounts.size(); i++) {
+                    if (accounts.get(i).equals(accountName)) {
+                        mAccountSelectedPosition = i;
+                        break;
+                    }
+                }
+            }
+
             ListView listView = (ListView) findViewById(R.id.select_account);
             listView.setAdapter(new ArrayAdapter<String>(mContext, R.layout.account, accounts));
             listView.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
@@ -81,10 +90,12 @@ public class AccountsActivity extends BaseActivity {
                 mAccountSelectedPosition = listView.getCheckedItemPosition();
                 TextView account = (TextView) listView.getChildAt(mAccountSelectedPosition);
 
-                // Register
+                // Register, and force another 'hello'
                 register((String) account.getText());
+                if (RealmContext.i.getCurrentRealm() != null) {
+                    RealmContext.i.getCurrentRealm().getAuthenticator().logout();
+                }
                 ServerGreeter.clearHello();
-                RealmManager.i.selectRealm(null);
 
                 finish();
             }
@@ -124,16 +135,6 @@ public class AccountsActivity extends BaseActivity {
         final SharedPreferences prefs = Util.getSharedPreferences();
         SharedPreferences.Editor editor = prefs.edit();
         editor.putString("AccountName", accountName);
-        editor.commit();
-    }
-
-    private void unregister() {
-        DeviceRegistrar.unregister(true);
-        GCMIntentService.unregister(this);
-
-        final SharedPreferences prefs = Util.getSharedPreferences();
-        SharedPreferences.Editor editor = prefs.edit();
-        editor.remove("AccountName");
         editor.commit();
     }
 

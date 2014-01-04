@@ -56,6 +56,9 @@ public class EmpireManager {
     public MyEmpire getEmpire() {
         return mEmpire;
     }
+    public void clearEmpire() {
+        mEmpire = null;
+    }
 
     public Empire getEmpire(String empireKey) {
         return getEmpire(empireKey, false);

@@ -41,7 +41,6 @@ import au.com.codeka.warworlds.game.starfield.StarfieldActivity;
 import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.EmpireShieldManager;
 import au.com.codeka.warworlds.model.MyEmpire;
-import au.com.codeka.warworlds.model.RealmManager;
 
 /**
  * Main activity. Displays the message of the day and lets you select "Start Game", "Options", etc.
@@ -76,7 +75,6 @@ public class WarWorldsActivity extends BaseActivity implements EmpireShieldManag
 
         realmSelectButton.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
-                RealmManager.i.selectRealm(null);
                 startActivity(new Intent(mContext, RealmSelectActivity.class));
             }
         });
@@ -184,8 +182,10 @@ public class WarWorldsActivity extends BaseActivity implements EmpireShieldManag
                     mStartGameButton.setEnabled(true);
 
                     MyEmpire empire = EmpireManager.i.getEmpire();
-                    empireName.setText(empire.getDisplayName());
-                    empireIcon.setImageBitmap(EmpireShieldManager.i.getShield(mContext, empire));
+                    if (empire != null) {
+                        empireName.setText(empire.getDisplayName());
+                        empireIcon.setImageBitmap(EmpireShieldManager.i.getShield(mContext, empire));
+                    }
                 }
             }
         });

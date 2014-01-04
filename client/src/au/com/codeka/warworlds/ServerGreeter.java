@@ -76,6 +76,9 @@ public class ServerGreeter {
         mHelloStarted = false;
         mHelloComplete = false;
         mServerGreeting = new ServerGreeting();
+
+        // tell the empire manager that the "MyEmpire" it has cached will no longer be valid either.
+        EmpireManager.i.clearEmpire();
     }
 
     public static boolean isHelloComplete() {
