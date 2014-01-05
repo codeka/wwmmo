@@ -34,13 +34,14 @@
         <!-- make sure the welcome.rss field is pointing to the live server -->
         <replaceregexp file="assets/warworlds.properties"
                        match="^welcome.rss=.*$" flags="gm"
-                       replace="welcome.rss=http://www.war-worlds.com/forum/announcements/rss"
+                       replace="welcome.rss=http://www.war-worlds.com/forum/announcements/rss" />
 
         <!-- update the version number -->
         <replaceregexp file="AndroidManifest.xml"
                        match="android:versionCode=&quot;(.*)&quot;"
                        flags="g"
                        replace="android:versionCode=&quot;${build.number}&quot;" />
+
         <replaceregexp file="AndroidManifest.xml"
                        match="android:versionName=&quot;(.*)&quot;"
                        flags="g"

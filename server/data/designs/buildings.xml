@@ -114,7 +114,6 @@
       </upgrade>
     </upgrades>
     <limits maxPerColony="1" />
-    <show inSolarSystem="true" />
   </design>
   <design id="biosphere">
     <name>Biosphere</name>
