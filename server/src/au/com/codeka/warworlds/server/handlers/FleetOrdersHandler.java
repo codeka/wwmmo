@@ -1,9 +1,14 @@
 package au.com.codeka.warworlds.server.handlers;
 
+import java.util.ArrayList;
+
 import org.joda.time.DateTime;
 import org.joda.time.Seconds;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import au.com.codeka.common.model.BaseFleet;
+import au.com.codeka.common.model.BaseFleetUpgrade;
 import au.com.codeka.common.model.DesignKind;
 import au.com.codeka.common.model.ShipDesign;
 import au.com.codeka.common.model.Simulation;
@@ -24,6 +29,8 @@ import au.com.codeka.warworlds.server.model.Sector;
 import au.com.codeka.warworlds.server.model.Star;
 
 public class FleetOrdersHandler extends RequestHandler {
+    private static final Logger log = LoggerFactory.getLogger(FleetOrdersHandler.class);
+
     @Override
     protected void post() throws RequestException {
         Messages.FleetOrder fleet_order_pb = getRequestBody(Messages.FleetOrder.class);
@@ -103,7 +110,8 @@ public class FleetOrdersHandler extends RequestHandler {
                                        "Cannot merge a fleet that is not currently idle.");
         }
 
-        for (BaseFleet baseFleet : star.getFleets()) {
+        ArrayList<BaseFleet> fleets = new ArrayList<BaseFleet>(star.getFleets());
+        for (BaseFleet baseFleet : fleets) {
             if (baseFleet.getKey().equals(fleet_order_pb.getMergeFleetKey())) {
                 Fleet otherFleet = (Fleet) baseFleet;
                 if (otherFleet.getState() != Fleet.State.IDLE) {
@@ -125,9 +133,23 @@ public class FleetOrdersHandler extends RequestHandler {
                 fleet.setNumShips(fleet.getNumShips() + otherFleet.getNumShips());
                 fleet.setNotes(notes);
 
-                // TODO: do something better than just clearing out all upgrades. e.g. keep upgrades that both
-                // fleets had
-                fleet.getUpgrades().clear();
+                // only when the upgrade is in both fleets do we keep it.
+                ArrayList<BaseFleetUpgrade> upgradesToRemove = new ArrayList<BaseFleetUpgrade>();
+                for (BaseFleetUpgrade baseFleetUpgrade : fleet.getUpgrades()) {
+                    log.info("baseFleetUpgrade = "+baseFleetUpgrade.getUpgradeID());
+                    boolean keep = false;
+                    for (BaseFleetUpgrade otherFleetUpgrade : otherFleet.getUpgrades()) {
+                        log.info("otherFleetUpgrade = "+baseFleetUpgrade.getUpgradeID());
+                        if (baseFleetUpgrade.getUpgradeID().equals(otherFleetUpgrade.getUpgradeID())) {
+                            keep = true;
+                        }
+                    }
+
+                    if (!keep) {
+                        upgradesToRemove.add(baseFleetUpgrade);
+                    }
+                }
+                fleet.getUpgrades().removeAll(upgradesToRemove);
 
                 // TODO: probably not the best place for this to go...
                 String sql = "DELETE FROM fleet_upgrades WHERE fleet_id = ?";
@@ -145,6 +167,8 @@ public class FleetOrdersHandler extends RequestHandler {
                 } catch (Exception e) {
                     throw new RequestException(e);
                 }
+
+                star.getFleets().remove(otherFleet);
             }
         }
     }

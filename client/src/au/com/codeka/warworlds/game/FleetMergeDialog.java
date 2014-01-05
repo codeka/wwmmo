@@ -18,6 +18,7 @@ import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 import au.com.codeka.BackgroundRunner;
+import au.com.codeka.common.model.BaseFleetUpgrade;
 import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.StyledDialog;
@@ -126,8 +127,37 @@ public class FleetMergeDialog extends DialogFragment {
             return;
         }
 
-        final StyledDialog dialog = ((StyledDialog) getDialog());
-        dialog.setCloseable(false);
+        // if they have different upgrades, issue a warning that you'll lose them
+        boolean hasDifferentUpgrades = false;
+        for (BaseFleetUpgrade upgrade1 : mFleet.getUpgrades()) {
+            boolean exists = false;
+            for (BaseFleetUpgrade upgrade2 : mSelectedFleet.getUpgrades()) {
+                if (upgrade1.getUpgradeID().equals(upgrade2.getUpgradeID())) {
+                    exists = true;
+                }
+            }
+            if (!exists) {
+                hasDifferentUpgrades = true;
+            }
+        }
+        if (hasDifferentUpgrades) {
+            new StyledDialog.Builder(getActivity())
+                .setMessage("These fleets have different upgrades, you'll lose any upgrades that aren't on both fleets. Are you sure you want to merge them?")
+                .setTitle("Different upgrades")
+                .setPositiveButton("Merge", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                        doMerge();
+                    }
+                }).setNegativeButton("Cancel", null)
+                .create().show();
+        } else {
+            doMerge();
+        }
+    }
+
+    private void doMerge() {
         dismiss();
 
         new BackgroundRunner<Boolean>() {
