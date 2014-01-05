@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-
-    <!-- ignore the lint warning: we DO need this...  -->
-    <dimen name="default_gap">16dip</dimen>
-
-</resources>
