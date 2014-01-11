@@ -62,7 +62,7 @@ public class FleetInfoView extends FrameLayout {
                 FleetManager.i.boostFleet(mFleet, new FleetManager.FleetBoostedHandler() {
                     @Override
                     public void onFleetBoosted(Fleet fleet) {
-                        // update
+                        // update happens automatically anyway when star refreshes
                     }
                 });
             }

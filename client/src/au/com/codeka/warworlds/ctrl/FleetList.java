@@ -33,6 +33,7 @@ import android.widget.SpinnerAdapter;
 import android.widget.TextView;
 import au.com.codeka.TimeInHours;
 import au.com.codeka.common.model.BaseFleet;
+import au.com.codeka.common.model.BaseFleet.State;
 import au.com.codeka.common.model.BaseFleetUpgrade;
 import au.com.codeka.common.model.DesignKind;
 import au.com.codeka.common.model.ShipDesign;
@@ -44,6 +45,7 @@ import au.com.codeka.warworlds.model.Empire;
 import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.Fleet;
 import au.com.codeka.warworlds.model.FleetManager;
+import au.com.codeka.warworlds.model.FleetUpgrade.BoostFleetUpgrade;
 import au.com.codeka.warworlds.model.ImageManager;
 import au.com.codeka.warworlds.model.MyEmpire;
 import au.com.codeka.warworlds.model.SectorManager;
@@ -112,6 +114,11 @@ public class FleetList extends FrameLayout implements StarManager.StarFetchedHan
                 }
             }
         }
+        if (mSelectedFleet != null) {
+            selectFleet(mSelectedFleet.getKey(), false);
+        } else {
+            selectFleet(null, false);
+        }
 
         mFleetListAdapter.setFleets(stars, mFleets);
     }
@@ -119,13 +126,42 @@ public class FleetList extends FrameLayout implements StarManager.StarFetchedHan
     public void selectFleet(String fleetKey, boolean recentre) {
         mSelectedFleet = null;
         for (Fleet f : mFleets) {
-            if (f.getKey().equals(fleetKey)) {
+            if (fleetKey != null && f.getKey().equals(fleetKey)) {
                 mSelectedFleet = f;
             }
         }
 
+        final Spinner stanceSpinner = (Spinner) findViewById(R.id.stance);
+        final Button moveBtn = (Button) findViewById(R.id.move_btn);
+        final Button viewBtn = (Button) findViewById(R.id.view_btn);
+        final Button splitBtn = (Button) findViewById(R.id.split_btn);
+        final Button mergeBtn = (Button) findViewById(R.id.merge_btn);
+
+        moveBtn.setText("Move");
         if (mSelectedFleet != null) {
-            final Spinner stanceSpinner = (Spinner) findViewById(R.id.stance);
+            stanceSpinner.setEnabled(true);
+            viewBtn.setEnabled(true);
+
+            if (mSelectedFleet.getState() == State.IDLE) {
+                moveBtn.setEnabled(true);
+                splitBtn.setEnabled(true);
+                mergeBtn.setEnabled(true);
+            } else if (mSelectedFleet.getState() == State.MOVING) {
+                BoostFleetUpgrade boost = (BoostFleetUpgrade) mSelectedFleet.getUpgrade("boost");
+                if (boost != null) {
+                    moveBtn.setText("Boost");
+                    moveBtn.setEnabled(!boost.isBoosting());
+                } else {
+                    moveBtn.setEnabled(false);
+                }
+                splitBtn.setEnabled(false);
+                mergeBtn.setEnabled(false);
+            } else {
+                moveBtn.setEnabled(false);
+                splitBtn.setEnabled(false);
+                mergeBtn.setEnabled(false);
+            }
+
             stanceSpinner.setSelection(mSelectedFleet.getStance().getValue() - 1);
 
             if (recentre) {
@@ -135,6 +171,12 @@ public class FleetList extends FrameLayout implements StarManager.StarFetchedHan
                     fleetList.setSelection(position);
                 }
             }
+        } else {
+            stanceSpinner.setEnabled(false);
+            viewBtn.setEnabled(false);
+            moveBtn.setEnabled(false);
+            splitBtn.setEnabled(false);
+            mergeBtn.setEnabled(false);
         }
 
         mFleetListAdapter.notifyDataSetChanged();
@@ -231,8 +273,12 @@ public class FleetList extends FrameLayout implements StarManager.StarFetchedHan
                 }
 
                 if (mFleetActionListener != null) {
-                    mFleetActionListener.onFleetMove(mStars.get(mSelectedFleet.getStarKey()),
-                                                     mSelectedFleet);
+                    Star star = mStars.get(mSelectedFleet.getStarKey());
+                    if (mSelectedFleet.getState() == State.MOVING && mSelectedFleet.hasUpgrade("boost")) {
+                        mFleetActionListener.onFleetBoost(star, mSelectedFleet);
+                    } else if (mSelectedFleet.getState() == State.IDLE) {
+                        mFleetActionListener.onFleetMove(star, mSelectedFleet);
+                    }
                 }
             }
         });
@@ -461,6 +507,10 @@ public class FleetList extends FrameLayout implements StarManager.StarFetchedHan
             marginVert = -(float) (sprite.getHeight() / dest.getStarType().getImageScale());
         }
 
+        BoostFleetUpgrade boostUpgrade = (BoostFleetUpgrade) fleet.getUpgrade("boost");
+        if (boostUpgrade != null && boostUpgrade.isBoosting()) {
+            addTextToRow(context, row, "→", 0);
+        }
         addTextToRow(context, row, "→", 0);
         addImageToRow(context, row, sprite, marginHorz, marginVert, 0);
         if (includeEta) {
@@ -762,6 +812,7 @@ public class FleetList extends FrameLayout implements StarManager.StarFetchedHan
         void onFleetView(Star star, Fleet fleet);
         void onFleetSplit(Star star, Fleet fleet);
         void onFleetMove(Star star, Fleet fleet);
+        void onFleetBoost(Star star, Fleet fleet);
         void onFleetStanceModified(Star star, Fleet fleet, Fleet.Stance newStance);
         void onFleetMerge(Fleet fleet, List<Fleet> potentialFleets);
     }

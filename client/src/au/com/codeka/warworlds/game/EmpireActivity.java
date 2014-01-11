@@ -61,6 +61,7 @@ import au.com.codeka.warworlds.model.Empire;
 import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.EmpireShieldManager;
 import au.com.codeka.warworlds.model.Fleet;
+import au.com.codeka.warworlds.model.FleetManager;
 import au.com.codeka.warworlds.model.MyEmpire;
 import au.com.codeka.warworlds.model.PurchaseManager;
 import au.com.codeka.warworlds.model.Star;
@@ -484,6 +485,11 @@ public class EmpireActivity extends TabFragmentActivity
                     FleetSplitDialog dialog = new FleetSplitDialog();
                     dialog.setFleet(fleet);
                     dialog.show(fm, "");
+                }
+
+                @Override
+                public void onFleetBoost(Star star, Fleet fleet) {
+                    FleetManager.i.boostFleet(fleet, null);
                 }
 
                 @Override

@@ -20,6 +20,7 @@ import au.com.codeka.warworlds.game.FleetMoveActivity;
 import au.com.codeka.warworlds.game.FleetSplitDialog;
 import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.Fleet;
+import au.com.codeka.warworlds.model.FleetManager;
 import au.com.codeka.warworlds.model.Star;
 import au.com.codeka.warworlds.model.StarManager;
 
@@ -49,6 +50,11 @@ public class FleetActivity extends BaseActivity implements StarManager.StarFetch
                 FleetSplitDialog dialog = new FleetSplitDialog();
                 dialog.setFleet(fleet);
                 dialog.show(fm, "");
+            }
+
+            @Override
+            public void onFleetBoost(Star star, Fleet fleet) {
+                FleetManager.i.boostFleet(fleet, null);
             }
 
             @Override
