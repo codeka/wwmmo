@@ -46,6 +46,10 @@
       <rect location="64,86" size="71x29" />
       <direction>0,-1</direction>
     </sprite>
+    <sprite name="ship.wormhole-generator">
+      <rect location="147,28" size="27x44" />
+      <direction>0,1</direction>
+    </sprite>
 
     <sprite name="upgrade.boost">
       <rect location="169,1" size="10x16" />
