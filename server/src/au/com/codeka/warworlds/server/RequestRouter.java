@@ -30,6 +30,7 @@ public class RequestRouter extends AbstractHandler {
         sRoutes.add(new Route("devices$", DevicesHandler.class));
         sRoutes.add(new Route("hello/({device_id}[0-9]+)$", HelloHandler.class));
         sRoutes.add(new Route("chat$", ChatHandler.class));
+        sRoutes.add(new Route("chat/({msg_id}[0-9]+)/abuse-reports", ChatAbuseReportHandler.class));
         sRoutes.add(new Route("chat/conversations$", ChatConversationsHandler.class));
         sRoutes.add(new Route("chat/conversations/({conversation_id}[0-9]+)/participants$", ChatConversationParticipantsHandler.class));
         sRoutes.add(new Route("chat/conversations/({conversation_id}[0-9]+)/participants/({empire_id}[0-9]+)$", ChatConversationParticipantHandler.class));

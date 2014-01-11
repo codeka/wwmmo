@@ -44,6 +44,14 @@ public class ChatMessage extends BaseChatMessage {
         mConversationID = conversationID;
         mDatePosted = DateTime.now();
     }
+    
+    public static ChatMessage createServerMessage(String message) {
+        ChatMessage msg = new ChatMessage();
+        msg.mMessage = message;
+        msg.mDatePosted = DateTime.now();
+        msg.mAction = MessageAction.Normal;
+        return msg;
+    }
 
     public void setID(int id) {
         mID = id;
@@ -59,6 +67,9 @@ public class ChatMessage extends BaseChatMessage {
     }
     public void setDatePosted(DateTime dt) {
         mDatePosted = dt;
+    }
+    public void setEnglishMessage(String msg) {
+        mMessageEn = msg;
     }
 
     @Override

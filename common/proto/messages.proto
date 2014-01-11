@@ -428,6 +428,14 @@ message ChatMessages
 
 
 //
+// When you report a message for abuse, this is what you post to the server.
+//
+message ChatAbuseReport
+{
+    optional int32 chat_msg_id = 1;
+}
+
+//
 // A conversation is a private chat between two or more participants.
 //
 message ChatConversation

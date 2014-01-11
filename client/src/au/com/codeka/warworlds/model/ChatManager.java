@@ -166,6 +166,29 @@ public class ChatManager implements BackgroundDetector.BackgroundChangeHandler {
         }.execute();
     }
 
+    public void reportMessageForAbuse(final ChatMessage msg) {
+        new BackgroundRunner<Boolean>() {
+            @Override
+            protected Boolean doInBackground() {
+                try {
+                    Messages.ChatAbuseReport pb = Messages.ChatAbuseReport.newBuilder()
+                            .setChatMsgId(msg.getID())
+                            .build();
+                    ApiClient.postProtoBuf("chat/"+msg.getID()+"/abuse-reports", pb, null);
+                    return true;
+                } catch (Exception e) {
+                    log.error("Error posting chat!", e);
+                    return false;
+                }
+            }
+
+            @Override
+            protected void onComplete(Boolean success) {
+            }
+        }.execute();
+
+    }
+
     public void addParticipant(final Context context, final ChatConversation conversation, final String empireName) {
         // look in the cache first, it'll be quicker and one less request to the server...
         List<Empire> empires = EmpireManager.i.getMatchingEmpiresFromCache(empireName);

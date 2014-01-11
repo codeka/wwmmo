@@ -18,9 +18,16 @@ import au.com.codeka.warworlds.server.ctrl.NotificationController;
 public class NotificationHandler extends RequestHandler {
     private static Logger log = LoggerFactory.getLogger(NotificationHandler.class);
     private Continuation mContinuation;
+    private int mEmpireID;
+    private int mAllianceID;
 
     @Override
     public void get() throws RequestException {
+        if (getSessionNoError() != null) {
+            mEmpireID = getSession().getEmpireID();
+            mAllianceID = getSession().getAllianceID();
+        }
+
         mContinuation = ContinuationSupport.getContinuation(getRequest());
         NotificationController.Notification notification = (NotificationController.Notification) mContinuation.getAttribute("notification");
         if (notification != null) {
@@ -50,6 +57,13 @@ public class NotificationHandler extends RequestHandler {
         }
     }
 
+    public int getEmpireID() {
+        return mEmpireID;
+    }
+    public int getAllianceID() {
+        return mAllianceID;
+    }
+
     /**
      * This is called by the notification controller when a notification is received.
      */
@@ -57,6 +71,7 @@ public class NotificationHandler extends RequestHandler {
         if (mContinuation == null || !mContinuation.isSuspended()) {
             return;
         }
+        log.info("Sending notification via NotificationHandler for "+mEmpireID);
         mContinuation.setAttribute("notification", notification);
         mContinuation.resume();
     }

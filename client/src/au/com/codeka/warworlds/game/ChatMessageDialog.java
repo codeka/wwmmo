@@ -1,6 +1,8 @@
 package au.com.codeka.warworlds.game;
 
 import android.app.Dialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
@@ -66,6 +68,15 @@ public class ChatMessageDialog extends DialogFragment {
             }
         });
 
+        Button reportBtn = (Button) mView.findViewById(R.id.report_btn);
+        reportBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onReportClick();
+                dismiss();
+            }
+        });
+
         Button privateMessageBtn = (Button) mView.findViewById(R.id.private_message_btn);
         privateMessageBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -84,5 +95,42 @@ public class ChatMessageDialog extends DialogFragment {
             .setTitle(mEmpire.getDisplayName())
             .setView(mView)
             .create();
+    }
+
+    private void onReportClick() {
+        final Context context = getActivity();
+        new StyledDialog.Builder(context)
+                .setTitle("Report abuse")
+                .setMessage("Reporting an empire for abusive chat may result in that empire being banned from chatting."
+                           +" Are you sure you want to report "+mEmpire.getDisplayName()+" for abuse?\n\nIf you would also"
+                           +" like to immediately block "+mEmpire.getDisplayName()+" from your own chat - in addition to"
+                           +" reporting them - click \"Block\".")
+                .setPositiveButton("Block", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        doBlock(context);
+                        doReport();
+                        dialog.dismiss();
+                    }
+                }).setNeutralButton("Report", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        doReport();
+                        dialog.dismiss();
+                    }
+                }).setNegativeButton("Cancel", null)
+                .create().show();
+    }
+
+    private void doReport() {
+        ChatManager.i.reportMessageForAbuse(mChatMessage);
+    }
+
+    private void doBlock(Context context) {
+        new StyledDialog.Builder(context)
+        .setTitle("Block")
+        .setMessage("Not yet implemented :)")
+        .setPositiveButton("Fine", null)
+        .create().show();
     }
 }

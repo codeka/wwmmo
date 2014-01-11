@@ -48,23 +48,27 @@ public class NotificationController {
 
         ChatConversationParticipant[] arr = new ChatConversationParticipant[participants.size()];
         participants.toArray(arr);
-        sendNotification(arr, null, new Notification(name, value));
+        sendNotification(arr, new Notification(name, value));
     }
 
     public void sendNotificationToEmpire(int empireID, String name, String value) throws RequestException {
-        sendNotification(new ChatConversationParticipant[] {new ChatConversationParticipant(empireID, false)}, null, new Notification(name, value));
+        sendNotification(new ChatConversationParticipant[] {new ChatConversationParticipant(empireID, false)}, new Notification(name, value));
     }
 
     public void sendNotificationToOnlineAlliance(int allianceID, String name, String value) throws RequestException {
         TreeMap<String, String> values = new TreeMap<String, String>();
         values.put(name, value);
-        sendNotification(null, allianceID, new Notification(name, value));
+        Notification notification = new Notification(name, value);
+
+        sHandlers.sendNotificationToAlliance(allianceID, notification);
     }
 
     public void sendNotificationToAllOnline(String name, String value) throws RequestException {
         TreeMap<String, String> values = new TreeMap<String, String>();
         values.put(name, value);
-        sendNotification(null, null, new Notification(name, value));
+        Notification notification = new Notification(name, value);
+
+        sHandlers.sendNotificationToAll(notification);
     }
 
     public List<Map<String, String>> getRecentNotifications(int empireID) {
@@ -82,70 +86,50 @@ public class NotificationController {
         sHandlers.addNotificationHandler(empireID, handler);
     }
 
-    private void sendNotification(ChatConversationParticipant[] participants, Integer allianceID, Notification notification) throws RequestException {
+    private void sendNotification(ChatConversationParticipant[] participants, Notification notification) throws RequestException {
         Message.Builder msgBuilder = new Message.Builder();
         for (Map.Entry<String, String> value : notification.values.entrySet()) {
             msgBuilder.addData(value.getKey(), value.getValue());
         }
 
-        Map<String, String> devices = new TreeMap<String, String>();
-        String sql;
-        if (participants == null && allianceID == null) {
-            sql = "SELECT gcm_registration_id, empires.user_email, empires.id AS empire_id" +
-                 " FROM devices" +
-                 " INNER JOIN empires ON devices.user_email = empires.user_email" +
-                 " WHERE online_since > ?" +
-                   " AND gcm_registration_id IS NOT NULL";
-        } else if (allianceID != null) {
-            sql = "SELECT gcm_registration_id, devices.user_email, empires.id AS empire_id" +
-                 " FROM devices" +
-                 " INNER JOIN empires ON devices.user_email = empires.user_email" +
-                 " WHERE online_since > ?" +
-                   " AND gcm_registration_id IS NOT NULL" +
-                   " AND alliance_id = ?";
-        } else {
-            sql = "SELECT gcm_registration_id, devices.user_email, empires.id AS empire_id" +
-                 " FROM devices" +
-                 " INNER JOIN empires ON devices.user_email = empires.user_email" +
-                 " WHERE empires.id IN " + BaseDataBase.buildInClause(participants) +
-                   " AND gcm_registration_id IS NOT NULL";
-        }
-        try (SqlStmt stmt = DB.prepare(sql)) {
-            if (participants == null && allianceID == null) {
-                stmt.setDateTime(1, DateTime.now().minusHours(1));
-            } else if (allianceID != null) {
-                stmt.setDateTime(1, DateTime.now().minusHours(1));
-                stmt.setInt(2, allianceID);
-            } else {
-                // nothing to do for empireIDs...
+        // go through attached handlers and mark any in there as already done.
+        Set<Integer> doneEmpires = new HashSet<Integer>();
+        for (ChatConversationParticipant participant : participants) {
+            if (participant.isMuted()) {
+                continue;
             }
 
+            if (!doneEmpires.contains(participant.getEmpireID())) {
+                if (sHandlers.sendNotification(participant.getEmpireID(), notification)) {
+                    doneEmpires.add(participant.getEmpireID());
+                } else {
+                    sRecentNotifications.addNotification(participant.getEmpireID(), notification);
+                }
+            }
+        }
+
+        Map<String, String> devices = new TreeMap<String, String>();
+        String sql = "SELECT gcm_registration_id, devices.user_email, empires.id AS empire_id" +
+                    " FROM devices" +
+                    " INNER JOIN empires ON devices.user_email = empires.user_email" +
+                    " WHERE empires.id IN " + BaseDataBase.buildInClause(participants) +
+                      " AND gcm_registration_id IS NOT NULL";
+        try (SqlStmt stmt = DB.prepare(sql)) {
             ResultSet rs = stmt.select();
-            Set<Integer> doneEmpires = new HashSet<Integer>();
             while (rs.next()) {
                 String registrationId = rs.getString(1);
                 String email = rs.getString(2);
                 int empireID = rs.getInt(3);
 
+                if (doneEmpires.contains(empireID)) {
+                    continue;
+                }
+
                 ChatConversationParticipant participant = null;
-                if (participants != null) for (ChatConversationParticipant p : participants) {
+                for (ChatConversationParticipant p : participants) {
                     if (p.getEmpireID() == empireID) {
                         participant = p;
                         break;
-                    }
-                }
-
-                if (!doneEmpires.contains(empireID)) {
-                    doneEmpires.add(empireID);
-
-                    if (sHandlers.sendNotification(empireID, notification)) {
-                        // if an attached handler handled it, then we're all done!
-                        continue;
-                    }
-
-                    // only send a notification if they're not muted
-                    if (participant != null && !participant.isMuted()) {
-                        sRecentNotifications.addNotification(empireID, notification);
                     }
                 }
 
@@ -330,6 +314,47 @@ public class NotificationController {
             }
 
             return false;
+        }
+
+        /* Sends the given notification to all attached handlers at once. */
+        public void sendNotificationToAll(Notification notification) {
+            synchronized(mHandlers) {
+                for (List<NotificationHandler> handlers : mHandlers.values()) {
+                    if (handlers != null && handlers.size() > 0) {
+                        for (NotificationHandler handler : handlers) {
+                            handler.sendNotification(notification);
+                        }
+
+                        // once a handler has processed a notification, it's finished and
+                        // the client is expected to re-establish it.
+                        handlers.clear();
+                    }
+                }
+            }
+        }
+
+        /* Sends the given notification to all attached handlers at once, as long as they match the given alliance. */
+        public void sendNotificationToAlliance(int allianceID, Notification notification) {
+            synchronized(mHandlers) {
+                for (List<NotificationHandler> handlers : mHandlers.values()) {
+                    if (handlers != null && handlers.size() > 0) {
+                        boolean sent = false;
+                        for (NotificationHandler handler : handlers) {
+                            if (handler.getAllianceID() != allianceID) {
+                                continue;
+                            }
+                            handler.sendNotification(notification);
+                            sent = true;
+                        }
+
+                        // once a handler has processed a notification, it's finished and
+                        // the client is expected to re-establish it.
+                        if (sent) {
+                            handlers.clear();
+                        }
+                    }
+                }
+            }
         }
     }
 

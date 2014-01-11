@@ -5,6 +5,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 
 import org.apache.commons.codec.binary.Base64;
 import org.joda.time.DateTime;
@@ -73,6 +74,17 @@ public class ChatController {
     }
 
     public void postMessage(ChatMessage msg) throws RequestException {
+        msg.setDatePosted(DateTime.now());
+        String msg_native = msg.getMessage();
+        String msg_en = new TranslateController().translate(msg_native);
+        if (msg_en != null) {
+            msg.setEnglishMessage(msg_en);
+        }
+
+        if (isInPenaltyBox(msg)) {
+            return;
+        }
+
         String sql = "INSERT INTO chat_messages (empire_id, alliance_id, message, message_en, posted_date, conversation_id, action)" +
                     " VALUES (?, ?, ?, ?, ?, ?, ?)";
         try (SqlStmt stmt = DB.prepare(sql, Statement.RETURN_GENERATED_KEYS)) {
@@ -88,12 +100,9 @@ public class ChatController {
                 stmt.setNull(2);
             }
 
-            String msg_native = msg.getMessage();
-            String msg_en = new TranslateController().translate(msg_native);
-            stmt.setString(3, msg_native);
-            stmt.setString(4, msg_en);
+            stmt.setString(3, msg.getMessage());
+            stmt.setString(4, msg.getEnglishMessage());
 
-            msg.setDatePosted(DateTime.now());
             stmt.setDateTime(5, msg.getDatePosted());
 
             if (msg.getConversationID() != null && msg.getConversationID() > 0) {
@@ -118,7 +127,7 @@ public class ChatController {
         Messages.ChatMessage.Builder chat_msg_pb = Messages.ChatMessage.newBuilder();
         msg.toProtocolBuffer(chat_msg_pb, true);
 
-        String encoded = Base64.encodeBase64String(chat_msg_pb.build().toByteArray());
+        String encoded = getEncodedMessage(msg);
         if (chat_msg_pb.hasConversationId()) {
             new NotificationController().sendNotificationToConversation(
                     chat_msg_pb.getConversationId(), "chat", encoded);
@@ -129,6 +138,31 @@ public class ChatController {
             new NotificationController().sendNotificationToAllOnline(
                     "chat", encoded);
         }
+    }
+
+    /**
+     * Determines if the given empire is sinbinned. If they are, we send them a notification back as if their
+     * message was successfully sent, otherwise the message is just dropped.
+     */
+    private boolean isInPenaltyBox(ChatMessage msg) throws RequestException {
+        if (new ChatAbuseController().isInPenaltyBox(msg.getEmpireID())) {
+            // send them a fake notification so they can't be quite sure if they're still banned or not.
+            // give the msg a fake ID so that the client doesn't de-dupe it
+            msg.setID(- new Random().nextInt());
+            new NotificationController().sendNotificationToEmpire(msg.getEmpireID(), "chat", getEncodedMessage(msg));
+
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /** Encodes the given message, ready to be used in a notification. */
+    private String getEncodedMessage(ChatMessage msg) {
+        Messages.ChatMessage.Builder chat_msg_pb = Messages.ChatMessage.newBuilder();
+        msg.toProtocolBuffer(chat_msg_pb, true);
+
+        return Base64.encodeBase64String(chat_msg_pb.build().toByteArray());
     }
 
     /**

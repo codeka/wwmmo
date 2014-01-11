@@ -497,7 +497,7 @@ public class ChatActivity extends BaseActivity
 
                     if (entry.date == null && entry.message == null) {
                         view = inflater.inflate(R.layout.chat_row_loading, null);
-                    } else if (entry.date != null || action != ChatMessage.MessageAction.Normal || entry.message.getEmpireKey() == null) {
+                    } else if (entry.date != null || action != ChatMessage.MessageAction.Normal) {
                         view = inflater.inflate(R.layout.chat_row_simple, null);
                     } else {
                         view = inflater.inflate(R.layout.chat_row, null);
@@ -540,10 +540,21 @@ public class ChatActivity extends BaseActivity
                         }
                     }
                 } else if (entry.message.getEmpireKey() == null) {
+                    ImageView empireIcon = (ImageView) view.findViewById(R.id.empire_icon);
+                    TextView empireName = (TextView) view.findViewById(R.id.empire_name);
+                    TextView msgTime = (TextView) view.findViewById(R.id.msg_time);
                     TextView message = (TextView) view.findViewById(R.id.message);
-                    message.setTextColor(Color.CYAN);
-                    message.setGravity(Gravity.LEFT);
-                    message.setText("[SERVER] "+entry.message.getMessage());
+
+                    empireName.setText("");
+                    empireIcon.setImageBitmap(null);
+                    msgTime.setText(entry.message.getDatePosted().withZone(DateTimeZone.getDefault()).toString("h:mm a"));
+
+                    String html = entry.message.format(true, true, false);
+                    message.setText(Html.fromHtml("<font color=\"#00ffff\"><b>[SERVER]</b></font> " + html));
+
+                    if (html.indexOf("<a ") >= 0) { // only if there's actually a link...
+                        message.setMovementMethod(LinkMovementMethod.getInstance());
+                    }
                 } else {
                     ImageView empireIcon = (ImageView) view.findViewById(R.id.empire_icon);
                     TextView empireName = (TextView) view.findViewById(R.id.empire_name);

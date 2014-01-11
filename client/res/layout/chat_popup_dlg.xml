@@ -19,6 +19,13 @@
         android:background="@drawable/dialog_button_right_bg" />
 
     <Button
+        android:id="@+id/report_btn"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:text="Report abuse"
+        android:background="@drawable/dialog_button_right_bg" />
+
+    <Button
         android:id="@+id/private_message_btn"
         android:layout_width="match_parent"
         android:layout_height="40dp"
