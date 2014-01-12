@@ -72,6 +72,7 @@ public class RequestRouter extends AbstractHandler {
         sRoutes.add(new Route("admin/?$", DashboardPageHandler.class));
         sRoutes.add(new Route("admin/({path}actions/move-star)$", ActionsMoveStarPageHandler.class, "admin/"));
         sRoutes.add(new Route("admin/({path}actions/reset-empire)$", ActionsResetEmpirePageHandler.class, "admin/"));
+        sRoutes.add(new Route("admin/chat$", ChatPageHandler.class));
         sRoutes.add(new Route("admin/debug/purchases$", DebugPurchasesPageHandler.class, "admin/"));
         sRoutes.add(new Route("admin/debug/error-reports$", DebugErrorReportsPageHandler.class, "admin/"));
         sRoutes.add(new Route("admin/?({path}.*)", HtmlPageHandler.class, "admin/"));

@@ -66,6 +66,10 @@ public class BaseCombatReport {
         for (Messages.CombatRound crpb : pb.getRoundsList()) {
             CombatRound combatRound = CombatRound.fromProtocolBuffer(crpb);
             mCombatRounds.add(combatRound);
+            if (mCombatRounds.size() > 50) {
+                // don't try to populate more than 50 founds of a combat report...
+                break;
+            }
         }
     }
 

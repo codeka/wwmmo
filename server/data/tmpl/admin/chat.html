@@ -7,10 +7,11 @@
     section#messages {
       position: absolute;
       left: 0px;
-      right: 10px;
+      right: 20%;
       bottom: 50px;
       top: 70px;
       overflow-y: auto;
+      margin-right: 30px;
       border: solid 1px #999;
     }
     form {
@@ -18,13 +19,20 @@
       bottom: 0; left: 0; right: 0;
       height: 50px;
     }
-    form input[type=text] {
+    form div.hack {
       position: absolute;
       left: 0; top: 4px; right: 120px;
+    }
+    form div.hack input[type=text] {
+      width: 100%;
     }
     form input[type=submit] {
       position: absolute;
       top: 0; right: 30px;
+    }
+    fieldset#sinbin {
+      position: absolute;
+      bottom: 50px; width: 20%; right: 0; top: 70px;
     }
     section#messages span.translated {
       color: #a00;
@@ -36,9 +44,25 @@
   <h1>Chat</h1>
   <section id="messages"></section>
   <form id="sendmsg">
-    <input type="text">
+    <div class="hack"><input type="text"></div>
     <input type="submit" value="Send">
   </form>
+  <fieldset id="sinbin">
+    <legend>Sin Bin</legend>
+    <div><b>Current</b></div>
+    <ul>
+      {% for empire in currPenalty %}
+        <li>[{{empire.empire_id}}] {{empire.empireName}} until <script>document.write(new Date({{empire.expiry}}).toLocaleString());</script></li>
+      {% endfor %}
+    </ul>
+    <hr />
+    <div><b>Past 24 hours</b></div>
+    <ul>
+      {% for empire in pastPenalty %}
+        <li>[{{empire.empire_id}}] {{empire.empireName}} until <script>document.write(new Date({{empire.expiry}}).toLocaleString());</script></li>
+      {% endfor %}
+    </ul>
+  </fieldset>
   <script>
     $("form input[type=text]").focus();
     $("form#sendmsg").on("click", "input[type=submit]", function(evnt) {

@@ -136,7 +136,7 @@ public class ChatAbuseController {
                 stmt.setInt(1, empireID);
                 ResultSet rs = stmt.select();
                 while (rs.next()) {
-                    DateTime expiry = new DateTime(rs.getDate(1).getTime());
+                    DateTime expiry = new DateTime(rs.getTimestamp(1).getTime());
                     if (Days.daysBetween(expiry, lastPenalty).getDays() > 7) {
                         break;
                     }

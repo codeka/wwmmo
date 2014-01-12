@@ -43,7 +43,7 @@ public class DashboardPageHandler extends BasePageHandler {
         try (SqlStmt stmt = DB.prepare(sql)) {
             ResultSet rs = stmt.select();
             while (rs.next()) {
-                DateTime dt = new DateTime(rs.getDate(1).getTime());
+                DateTime dt = new DateTime(rs.getTimestamp(1).getTime());
                 int oneDA = rs.getInt(2);
                 int sevenDA = rs.getInt(3);
 
@@ -67,7 +67,7 @@ public class DashboardPageHandler extends BasePageHandler {
         try (SqlStmt stmt = DB.prepare(sql)) {
             ResultSet rs = stmt.select();
             while (rs.next()) {
-                DateTime dt = new DateTime(rs.getDate(1).getTime());
+                DateTime dt = new DateTime(rs.getTimestamp(1).getTime());
                 int numSignups = rs.getInt(2);
 
                 int index = Days.daysBetween(dt, now).getDays();
