@@ -10,6 +10,11 @@
     ]]></description>
     <cost minerals="300" time="2.4" />
     <limits maxPerColony="1" />
+    <upgrades>
+      <upgrade level="2">
+        <cost minerals="300" time="2.4" />
+      </upgrade>
+    </upgrades>
     <show inSolarSystem="true" />
   </design>
   <design id="silo">

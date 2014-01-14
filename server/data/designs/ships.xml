@@ -105,4 +105,22 @@
       <effect kind="fighter" />
     </effects>
   </design>
+  <design id="wormhole-generator">
+    <name>Wormhole Generator</name>
+    <sprite>ship.wormhole-generator</sprite>
+    <description><![CDATA[
+      <p>The Wormhole Generator will - quite literally - generate a wormhole. Once the ship is built, select a
+      location on the starfield to deploy, and the ship will generate a wormhole which you can then use to instantly
+      transport ships throughout your empire.</p>
+    ]]></description>
+    <dependencies>
+      <requires building="shipyard" level="2" />
+    </dependencies>
+    <cost minerals="98000" time="128.0" />
+    <fuel costPerParsec="3096.2" />
+    <stats speed="0.6" baseAttack="1" baseDefence="1" combatPriority="99"  />
+    <effects>
+      <!-- effect kind="wormhole" /-->
+    </effects>
+  </design>
 </designs>

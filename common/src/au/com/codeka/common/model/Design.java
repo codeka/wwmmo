@@ -104,6 +104,9 @@ public abstract class Design {
                 Design dependentDesign = BaseDesignManager.i.getDesign(DesignKind.BUILDING, dep.getDesignID());
                 required += "<font color=\""+(dependencyMet ? "green" : "red")+"\">";
                 required += dependentDesign.getDisplayName();
+                if (dep.getLevel() > 1) {
+                    required += " lvl " + dep.getLevel();
+                }
                 required += "</font>";
             }
         }
