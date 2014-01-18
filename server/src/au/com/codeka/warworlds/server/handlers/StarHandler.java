@@ -62,6 +62,11 @@ public class StarHandler extends RequestHandler {
     public static void sanitizeStar(Star star, int myEmpireID,
                                     ArrayList<BuildingPosition> buildings,
                                     ArrayList<Star> otherStars) {
+        if (getSessionNoError() != null && getSession().isAdmin()) {
+            // skip sanitization for the admin user
+            return;
+        }
+
         log.debug(String.format("Sanitizing star %s (%d, %d) (%d, %d)",
                 star.getName(), star.getSectorX(), star.getSectorY(), star.getOffsetX(), star.getOffsetY()));
         // if we don't have any fleets here, remove all the others
