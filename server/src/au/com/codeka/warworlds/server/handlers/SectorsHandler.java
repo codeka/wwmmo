@@ -10,6 +10,7 @@ import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.RequestHandler;
 import au.com.codeka.warworlds.server.ctrl.BuildingController;
 import au.com.codeka.warworlds.server.ctrl.SectorController;
+import au.com.codeka.warworlds.server.ctrl.StarController;
 import au.com.codeka.warworlds.server.model.BuildingPosition;
 import au.com.codeka.warworlds.server.model.Sector;
 import au.com.codeka.warworlds.server.model.Star;
@@ -84,9 +85,11 @@ public class SectorsHandler extends RequestHandler {
 
         Messages.Sectors.Builder sectors_pb = Messages.Sectors.newBuilder();
         for (Sector sector : sectors) {
-            for (BaseStar baseStar : sector.getStars()) {
-                Star star = (Star) baseStar;
-                StarHandler.sanitizeStar(star, myEmpireID, buildings, allStars);
+            if (!isAdmin()) {
+                for (BaseStar baseStar : sector.getStars()) {
+                    Star star = (Star) baseStar;
+                    new StarController().sanitizeStar(star, myEmpireID, buildings, allStars);
+                }
             }
 
             sector.toProtocolBuffer(sectors_pb.addSectorsBuilder());

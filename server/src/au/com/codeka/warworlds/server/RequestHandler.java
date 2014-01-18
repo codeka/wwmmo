@@ -262,6 +262,11 @@ public class RequestHandler {
         }
     }
 
+    protected boolean isAdmin() {
+        Session s = getSessionNoError();
+        return (s != null && s.isAdmin());
+    }
+
     @SuppressWarnings({"unchecked"})
     protected <T> T getRequestBody(Class<T> protoBuffFactory) {
         if (mRequest.getHeader("Content-Type").equals("application/json")) {

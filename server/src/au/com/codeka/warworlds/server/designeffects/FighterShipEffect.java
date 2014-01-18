@@ -48,6 +48,11 @@ public class FighterShipEffect extends ShipEffect {
                 continue;
             }
 
+            // if the existing fleet has a cloak and is not aggressive, it's not combat-worthy
+            if (existingFleet.hasUpgrade("cloak") && existingFleet.getStance() != Stance.AGGRESSIVE) {
+                continue;
+            }
+
             log.info(String.format("Fleet #%s arrived at star #%s, found enemy fleet, switching to attack mode.",
                                    fleet.getKey(), star.getKey()));
             ((Fleet) fleet).attack(DateTime.now());
