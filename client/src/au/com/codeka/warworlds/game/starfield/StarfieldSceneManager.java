@@ -67,6 +67,7 @@ public class StarfieldSceneManager extends SectorSceneManager
                                              EmpireManager.EmpireFetchedHandler {
     private static final Logger log = LoggerFactory.getLogger(StarfieldSceneManager.class);
     private ArrayList<OnSelectionChangedListener> mSelectionChangedListeners;
+    private OnSpaceTapListener mSpaceTapListener;
     private BaseStar mHqStar;
     private Handler mHandler;
     private boolean mHasScrolled;
@@ -75,6 +76,7 @@ public class StarfieldSceneManager extends SectorSceneManager
     private SelectionIndicatorEntity mSelectionIndicator;
     private RadarIndicatorEntity mRadarIndicator;
     private boolean mWasDragging;
+    private float mZoomFactor;
 
     private Font mFont;
     private BitmapTextureAtlas mStarTextureAtlas;
@@ -216,6 +218,10 @@ public class StarfieldSceneManager extends SectorSceneManager
         return mArrowIconTextureRegion;
     }
 
+    public void setSpaceTapListener(OnSpaceTapListener listener) {
+        mSpaceTapListener = listener;
+    }
+
     public void addSelectionChangedListener(OnSelectionChangedListener listener) {
         if (!mSelectionChangedListeners.contains(listener)) {
             mSelectionChangedListeners.add(listener);
@@ -320,6 +326,7 @@ public class StarfieldSceneManager extends SectorSceneManager
     @Override
     protected void updateZoomFactor(float zoomFactor) {
         super.updateZoomFactor(zoomFactor);
+        mZoomFactor = zoomFactor;
 
         // we fade out the background between 0.55 and 0.50, it should be totally invisible < 0.50
         // and totally opaque for >= 0.55
@@ -681,13 +688,38 @@ public class StarfieldSceneManager extends SectorSceneManager
 
     @Override
     public boolean onSceneTouchEvent(Scene scene, TouchEvent touchEvent) {
+        float tx = touchEvent.getX() * mZoomFactor;
+        float ty = -touchEvent.getY() * mZoomFactor;
+
+        long sectorX = (long) (tx / Sector.SECTOR_SIZE) - mSectorX;
+        long sectorY = (long) (ty / Sector.SECTOR_SIZE) - mSectorY;
+        int offsetX = (int) (tx - (tx / Sector.SECTOR_SIZE));
+        int offsetY = Sector.SECTOR_SIZE - (int) (ty - (ty / Sector.SECTOR_SIZE));
+        while (offsetX < 0) {
+            sectorX --;
+            offsetX += Sector.SECTOR_SIZE;
+        }
+        while (offsetX > Sector.SECTOR_SIZE) {
+            sectorX ++;
+            offsetX -= Sector.SECTOR_SIZE;
+        }
+        while (offsetY < 0) {
+            sectorY --;
+            offsetY += Sector.SECTOR_SIZE;
+        }
+        while (offsetY > Sector.SECTOR_SIZE) {
+            sectorY ++;
+            offsetY -= Sector.SECTOR_SIZE;
+        }
+        log.info("touched: ("+sectorX+", "+sectorY+"), ("+offsetX+", "+offsetY+")");
+
         boolean handled = super.onSceneTouchEvent(scene, touchEvent);
 
         if (touchEvent.getAction() == TouchEvent.ACTION_DOWN) {
             mWasDragging = false;
         } else if (touchEvent.getAction() == TouchEvent.ACTION_UP) {
             if (!mWasDragging) {
-                selectNothing();
+                selectNothing(sectorX, sectorY, offsetX, offsetY);
                 handled = true;
             }
         }
@@ -787,7 +819,7 @@ public class StarfieldSceneManager extends SectorSceneManager
     }
 
     /** Deselects the fleet or star you currently have selected. */
-    public void selectNothing() {
+    private void selectNothing(long sectorX, long sectorY, int offsetX, int offsetY) {
         if (mSelectedStarEntity != null) {
             mSelectedStarEntity = null;
             refreshSelectionIndicator();
@@ -798,6 +830,10 @@ public class StarfieldSceneManager extends SectorSceneManager
             mSelectedFleetEntity = null;
             refreshSelectionIndicator();
             fireSelectionChanged((Fleet) null);
+        }
+
+        if (mSpaceTapListener != null) {
+            mSpaceTapListener.onSpaceTap(sectorX, sectorY, offsetX, offsetY);
         }
     }
 
@@ -897,8 +933,12 @@ public class StarfieldSceneManager extends SectorSceneManager
         }
     }
 
+    public interface OnSpaceTapListener {
+        void onSpaceTap(long sectorX, long sectorY, int offsetX, int offsetY);
+    }
+
     public interface OnSelectionChangedListener {
-        public abstract void onStarSelected(Star star);
-        public abstract void onFleetSelected(Fleet fleet);
+        void onStarSelected(Star star);
+        void onFleetSelected(Fleet fleet);
     }
 }

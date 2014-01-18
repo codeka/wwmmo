@@ -291,6 +291,7 @@ public abstract class SectorSceneManager implements SectorManager.OnSectorListCh
 
         public ScaleGestureListener() {
             mZoomFactor = mActivity.getResources().getDisplayMetrics().density;
+            updateZoomFactor(mZoomFactor);
         }
 
         @Override
