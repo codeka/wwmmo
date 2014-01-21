@@ -157,6 +157,17 @@ public class ServerGreeter {
 
             @Override
             protected String doInBackground() {
+                mHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        synchronized(mHelloWatchers) {
+                            for (HelloWatcher watcher : mHelloWatchers) {
+                                watcher.onAuthenticating();
+                            }
+                        }
+                    }
+                });
+
                 Realm realm = RealmContext.i.getCurrentRealm();
                 if (!realm.getAuthenticator().isAuthenticated()) {
                     try {
@@ -187,6 +198,17 @@ public class ServerGreeter {
                         return null;
                     }
                 }
+
+                mHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        synchronized(mHelloWatchers) {
+                            for (HelloWatcher watcher : mHelloWatchers) {
+                                watcher.onConnecting();
+                            }
+                        }
+                    }
+                });
 
                 // say hello to the server
                 String message;
@@ -401,6 +423,8 @@ public class ServerGreeter {
     }
 
     public interface HelloWatcher {
+        void onAuthenticating();
+        void onConnecting();
         void onRetry(int retries);
     }
 }
