@@ -23,7 +23,10 @@ public class EmpiresStarsHandler extends RequestHandler {
 
         Messages.Stars.Builder pb = Messages.Stars.newBuilder();
         for (Star star : stars) {
-            StarHandler.sanitizeStar(star, empire.getID(), null, null); // no need to filter by buildings, these are -- by definition -- our stars anyway
+            if (!isAdmin()) {
+                // no need to filter by buildings, these are -- by definition -- our stars anyway
+                new StarController().sanitizeStar(star, empire.getID(), null, null);
+            }
 
             Messages.Star.Builder star_pb = Messages.Star.newBuilder();
             star.toProtocolBuffer(star_pb);

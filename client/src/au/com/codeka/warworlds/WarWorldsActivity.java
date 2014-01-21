@@ -146,7 +146,6 @@ public class WarWorldsActivity extends BaseActivity implements EmpireShieldManag
         }
 
         mStartGameButton.setEnabled(false);
-        mConnectionStatus.setText("Connecting...");
         mRealmName.setText(String.format(Locale.ENGLISH, "Realm: %s", RealmContext.i.getCurrentRealm().getDisplayName()));
 
         final TextView empireName = (TextView) findViewById(R.id.empire_name);
@@ -273,9 +272,28 @@ public class WarWorldsActivity extends BaseActivity implements EmpireShieldManag
     }
 
     private class HelloWatcher implements ServerGreeter.HelloWatcher {
+        private int mNumRetries = 0;
+
         @Override
         public void onRetry(final int retries) {
-            mConnectionStatus.setText(String.format("Retrying (#%d)...", retries+1));
+            mNumRetries = retries + 1;
+            mConnectionStatus.setText(String.format("Retrying (#%d)...", mNumRetries));
+        }
+
+        @Override
+        public void onAuthenticating() {
+            if (mNumRetries > 0) {
+                return;
+            }
+            mConnectionStatus.setText("Authenticating...");
+        }
+
+        @Override
+        public void onConnecting() {
+            if (mNumRetries > 0) {
+                return;
+            }
+            mConnectionStatus.setText("Connecting...");
         }
     }
 }

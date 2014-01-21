@@ -28,7 +28,7 @@ public class BuildingDesign extends Design {
     }
 
     public List<Effect> getEffects(int level) {
-        if (level <= 1) {
+        if (level <= 1 || mUpgrades.size() == 0) {
             return mEffects;
         } else {
             if (level - 2 >= mUpgrades.size()) {
