@@ -24,9 +24,31 @@ public class HelloHandler extends RequestHandler {
     private final Logger log = LoggerFactory.getLogger(HelloHandler.class);
 
     @Override
+    protected void get() throws RequestException {
+        // this is just used for testing, nothing more...
+        if (!getSession().isAdmin()) {
+            throw new RequestException(501);
+        }
+
+        Messages.HelloRequest hello_request_pb = Messages.HelloRequest.newBuilder()
+                .setAllowInlineNotfications(false)
+                .setDeviceBuild("TEST_DEVICE_BUILD")
+                .setDeviceManufacturer("TEST_DEVICE_MANUFACTURER")
+                .setDeviceModel("TEST_DEVICE_MODEL")
+                .setDeviceVersion("TEST_DEVICE_VERSION")
+                .setMemoryClass(0)
+                .build();
+        processHello(hello_request_pb);
+    }
+
+    @Override
     protected void put() throws RequestException {
         Messages.HelloRequest hello_request_pb = getRequestBody(Messages.HelloRequest.class);
 
+        processHello(hello_request_pb);
+    }
+
+    private void processHello(Messages.HelloRequest hello_request_pb) throws RequestException {
         Session sess = getSession();
         if (hello_request_pb.hasAllowInlineNotfications()) {
             sess.setAllowInlineNotifications(hello_request_pb.getAllowInlineNotfications());
@@ -101,10 +123,12 @@ public class HelloHandler extends RequestHandler {
             hello_response_pb.setForceRemoveAds(empire.getForceRemoveAds());
 
             // grab all of the empire's stars and send across the identifiers
-            sql = "SELECT id FROM stars WHERE id IN (" +
-                    "SELECT DISTINCT star_id FROM colonies WHERE empire_id = ?" +
-                   " UNION SELECT DISTINCT star_id FROM fleets WHERE empire_id = ?" +
-                  ") ORDER BY name ASC";
+            sql = "SELECT id, name" +
+                 " FROM stars" +
+                 " INNER JOIN (SELECT DISTINCT star_id FROM colonies WHERE empire_id = ?" +
+                             " UNION SELECT DISTINCT star_id FROM fleets WHERE empire_id = ?) as s" +
+                   " ON s.star_id = stars.id" +
+                 " ORDER BY name ASC";
             try (SqlStmt stmt = DB.prepare(sql)) {
                 stmt.setInt(1, empire.getID());
                 stmt.setInt(2, empire.getID());
