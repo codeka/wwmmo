@@ -50,11 +50,19 @@ public abstract class BaseStar {
                               .setDisplayName("Black Hole")
                               .setInternalName("black-hole")
                               .setShortName("BH")
-                              .build()
+                              .build(),
+        new StarType.Builder().setIndex(7)
+                              .setDisplayName("Marker")
+                              .setInternalName("marker")
+                              .setShortName("M")
+                              .build(),
     };
 
     public static StarType getStarType(int index) {
         return sStarTypes[index];
+    }
+    public static StarType getMarkerStarType() {
+        return sStarTypes[7];
     }
     public static StarType[] getStarTypes() {
         return sStarTypes;

@@ -76,7 +76,6 @@ public class StarfieldSceneManager extends SectorSceneManager
     private SelectionIndicatorEntity mSelectionIndicator;
     private RadarIndicatorEntity mRadarIndicator;
     private boolean mWasDragging;
-    private float mZoomFactor;
 
     private Font mFont;
     private BitmapTextureAtlas mStarTextureAtlas;
@@ -326,7 +325,6 @@ public class StarfieldSceneManager extends SectorSceneManager
     @Override
     protected void updateZoomFactor(float zoomFactor) {
         super.updateZoomFactor(zoomFactor);
-        mZoomFactor = zoomFactor;
 
         // we fade out the background between 0.55 and 0.50, it should be totally invisible < 0.50
         // and totally opaque for >= 0.55
@@ -538,6 +536,8 @@ public class StarfieldSceneManager extends SectorSceneManager
                 offset = 8;
             } else if (star.getStarType().getInternalName().equals("yellow")) {
                 offset = 9;
+            } else if (star.getStarType().getInternalName().equals("marker")) {
+                offset = 10;
             }
             textureRegion = mNormalStarTextureRegion.getTextureRegion(offset);
         }
@@ -688,37 +688,36 @@ public class StarfieldSceneManager extends SectorSceneManager
 
     @Override
     public boolean onSceneTouchEvent(Scene scene, TouchEvent touchEvent) {
-        float tx = touchEvent.getX() * mZoomFactor;
-        float ty = -touchEvent.getY() * mZoomFactor;
-
-        long sectorX = (long) (tx / Sector.SECTOR_SIZE) - mSectorX;
-        long sectorY = (long) (ty / Sector.SECTOR_SIZE) - mSectorY;
-        int offsetX = (int) (tx - (tx / Sector.SECTOR_SIZE));
-        int offsetY = Sector.SECTOR_SIZE - (int) (ty - (ty / Sector.SECTOR_SIZE));
-        while (offsetX < 0) {
-            sectorX --;
-            offsetX += Sector.SECTOR_SIZE;
-        }
-        while (offsetX > Sector.SECTOR_SIZE) {
-            sectorX ++;
-            offsetX -= Sector.SECTOR_SIZE;
-        }
-        while (offsetY < 0) {
-            sectorY --;
-            offsetY += Sector.SECTOR_SIZE;
-        }
-        while (offsetY > Sector.SECTOR_SIZE) {
-            sectorY ++;
-            offsetY -= Sector.SECTOR_SIZE;
-        }
-        log.info("touched: ("+sectorX+", "+sectorY+"), ("+offsetX+", "+offsetY+")");
-
         boolean handled = super.onSceneTouchEvent(scene, touchEvent);
 
         if (touchEvent.getAction() == TouchEvent.ACTION_DOWN) {
             mWasDragging = false;
         } else if (touchEvent.getAction() == TouchEvent.ACTION_UP) {
             if (!mWasDragging) {
+                float tx = touchEvent.getX();
+                float ty = touchEvent.getY();
+
+                long sectorX = (long) (tx / Sector.SECTOR_SIZE) + mSectorX;
+                long sectorY = (long) (ty / Sector.SECTOR_SIZE) + mSectorY;
+                int offsetX = (int) (tx - (tx / Sector.SECTOR_SIZE));
+                int offsetY = Sector.SECTOR_SIZE - (int) (ty - (ty / Sector.SECTOR_SIZE));
+                while (offsetX < 0) {
+                    sectorX --;
+                    offsetX += Sector.SECTOR_SIZE;
+                }
+                while (offsetX > Sector.SECTOR_SIZE) {
+                    sectorX ++;
+                    offsetX -= Sector.SECTOR_SIZE;
+                }
+                while (offsetY < 0) {
+                    sectorY --;
+                    offsetY += Sector.SECTOR_SIZE;
+                }
+                while (offsetY > Sector.SECTOR_SIZE) {
+                    sectorY ++;
+                    offsetY -= Sector.SECTOR_SIZE;
+                }
+
                 selectNothing(sectorX, sectorY, offsetX, offsetY);
                 handled = true;
             }

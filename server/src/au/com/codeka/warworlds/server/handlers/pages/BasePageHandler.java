@@ -55,6 +55,7 @@ public class BasePageHandler extends RequestHandler {
         }
     }
 
+    @Override
     protected boolean isAdmin() throws RequestException {
         if (getSessionNoError() == null || !getSessionNoError().isAdmin()) {
             // if they're not authenticated yet, we'll have to redirect them to the authentication

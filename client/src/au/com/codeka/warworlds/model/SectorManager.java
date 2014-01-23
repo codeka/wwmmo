@@ -86,7 +86,7 @@ public class SectorManager extends BaseManager {
         mSectorListChangedListeners.remove(onSectorListChanged);
     }
 
-    protected void fireSectorListChanged() {
+    public void fireSectorListChanged() {
         for(final OnSectorListChangedListener listener : mSectorListChangedListeners) {
             fireHandler(listener, new Runnable() {
                 @Override

@@ -24,6 +24,23 @@ public class DebugView extends FrameLayout
     private Handler mHandler;
     private boolean mIsAttached;
 
+    private static DebugView sCurrVisible;
+    private static String sOverride;
+
+    public static void setOverride(String override) {
+        sOverride = override;
+
+        final DebugView view = sCurrVisible;
+        if (view != null) {
+            view.mHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    view.refresh();
+                }
+            });
+        }
+    }
+
     public DebugView(Context context) {
         this(context, null);
     }
@@ -37,6 +54,8 @@ public class DebugView extends FrameLayout
 
     @Override
     public void onAttachedToWindow() {
+        super.onAttachedToWindow();
+
         if (!isInEditMode()) {
             mHandler = new Handler();
 
@@ -44,14 +63,18 @@ public class DebugView extends FrameLayout
             onStateChanged();
 
             mIsAttached = true;
+            sCurrVisible = this;
         }
     }
 
     @Override
     public void onDetachedFromWindow() {
+        super.onDetachedFromWindow();
+
         if (!isInEditMode()) {
             RequestManager.removeRequestManagerStateChangedHandler(this);
             mIsAttached = false;
+            sCurrVisible = null;
         }
     }
 
@@ -83,6 +106,11 @@ public class DebugView extends FrameLayout
 
     public void refresh() {
         TextView connectionInfo = (TextView) mView.findViewById(R.id.connection_info);
+        if (sOverride != null) {
+            connectionInfo.setText(sOverride);
+            return;
+        }
+
         RequestManagerState state = RequestManager.getCurrentState();
         if (state.numInProgressRequests > 0) {
             String str = String.format(Locale.ENGLISH, "Sim: %d Conn: %d Mem: %.1f MB",

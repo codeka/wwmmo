@@ -19,6 +19,7 @@ import android.widget.TextView;
 import au.com.codeka.BackgroundRunner;
 import au.com.codeka.Cash;
 import au.com.codeka.common.Vector2;
+import au.com.codeka.common.model.BaseStar;
 import au.com.codeka.common.model.DesignKind;
 import au.com.codeka.common.model.ShipDesign;
 import au.com.codeka.common.protobuf.Messages;
@@ -47,6 +48,8 @@ public class FleetMoveActivity extends BaseStarfieldActivity {
     private Fleet mFleet;
     private float mEstimatedCost;
     private FleetIndicatorEntity mFleetIndicatorEntity;
+
+    private Star mMarkerStar;
 
     public static void show(Activity activity, Fleet fleet) {
         Intent intent = new Intent(activity, FleetMoveActivity.class);
@@ -125,6 +128,48 @@ public class FleetMoveActivity extends BaseStarfieldActivity {
             @Override
             public void onFleetSelected(Fleet fleet) {
                 // you can't select fleets
+            }
+        });
+
+        mStarfield.setSpaceTapListener(new StarfieldSceneManager.OnSpaceTapListener() {
+            @Override
+            public void onSpaceTap(long sectorX, long sectorY, int offsetX, int offsetY) {
+                // if the fleet you're moving has the 'empty space mover' effect, it means you can move it
+                // to regions of empty space.
+                if (!mFleet.getDesign().hasEffect("empty-space-mover")) {
+                    return;
+                }
+
+                // when moving to a region of empty space, we need to place a special "marker" star
+                // at the destination (since everything else we do assume you're moving to a star)
+                if (mMarkerStar != null) {
+                    Sector s = SectorManager.getInstance().getSector(mMarkerStar.getSectorX(), mMarkerStar.getSectorY());
+                    if (s != null) {
+                        s.getStars().remove(mMarkerStar);
+                    }
+                }
+                mMarkerStar = new Star(BaseStar.getMarkerStarType(), "Marker", 20, sectorX, sectorY, offsetX, offsetY, null);
+                Sector s = SectorManager.getInstance().getSector(sectorX, sectorY);
+                if (s != null) {
+                    s.getStars().add(mMarkerStar);
+                }
+                SectorManager.getInstance().fireSectorListChanged();
+
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        mStarfield.selectStar(mMarkerStar.getKey());
+                    }
+                });
+/*
+                mDestStar = mMarkerStar;
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        refreshSelection();
+                    }
+                });
+*/
             }
         });
 
