@@ -17,6 +17,7 @@ public class CronJobRegistry {
         sCronJobs.put("simulate-stars", SimulateAllStarsCronJob.class);
         sCronJobs.put("purge-combat-reports", PurgeCombatReportsCronJob.class);
         sCronJobs.put("purge-sessions", PurgeSessionsCronJob.class);
+        sCronJobs.put("find-abandoned-empires", FindAbandonedEmpiresCronJob.class);
     }
 
     public static CronJob getJob(String name) {

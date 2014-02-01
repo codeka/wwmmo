@@ -46,8 +46,8 @@ public class FindAbandonedEmpiresCronJob extends CronJob {
         try (SqlStmt stmt = DB.prepare(sql)) {
             ResultSet rs = stmt.select();
             while (rs.next()) {
-                int empireID = rs.getInt(0);
-                String empireName = rs.getString(1);
+                int empireID = rs.getInt(1);
+                String empireName = rs.getString(2);
                 log.info(String.format(Locale.ENGLISH,
                         "Empire #%d (%s) has not logged in for two weeks, marking abandoned.",
                         empireID, empireName));
