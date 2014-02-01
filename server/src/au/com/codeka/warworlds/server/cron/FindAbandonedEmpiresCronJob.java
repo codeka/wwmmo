@@ -7,9 +7,12 @@ import java.util.Locale;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import au.com.codeka.warworlds.server.ctrl.StarController;
 import au.com.codeka.warworlds.server.data.DB;
 import au.com.codeka.warworlds.server.data.SqlStmt;
 import au.com.codeka.warworlds.server.model.Empire;
+import au.com.codeka.warworlds.server.model.Sector;
+import au.com.codeka.warworlds.server.model.Star;
 
 /**
  * An abandoned empire is one where the user hasn't logged in for a while, and they only have one star under
@@ -40,7 +43,7 @@ public class FindAbandonedEmpiresCronJob extends CronJob {
                      " INNER JOIN (" +
                      "SELECT empire_id, COUNT(*) AS num_stars FROM empire_presences" +
                      " GROUP BY empire_id) stars ON stars.empire_id = empires.id" +
-                     " WHERE state = 1" + // 1 == ACTIVE
+                     " WHERE state = " + Empire.State.ACTIVE.getValue() +
                        " AND last_login < DATE_ADD(NOW(), INTERVAL -14 DAY)" +
                        " AND num_stars <= 1";
         try (SqlStmt stmt = DB.prepare(sql)) {
@@ -63,6 +66,79 @@ public class FindAbandonedEmpiresCronJob extends CronJob {
                 stmt.update();
             }
         }
+
+        updateAbandonedStars();
     }
 
+    private void updateAbandonedStars() throws Exception {
+        String sql = "SELECT stars.id, empires.id" +
+                     " FROM stars" +
+                     " INNER JOIN empire_presences ON empire_presences.star_id = stars.id" + 
+                     " INNER JOIN empires ON empires.id = empire_presences.empire_id" + 
+                     " WHERE empires.state = " + Empire.State.ABANDONED.getValue();
+        try (SqlStmt stmt = DB.prepare(sql)) {
+            ResultSet rs = stmt.select();
+            while (rs.next()) {
+                int starID = rs.getInt(1);
+                int empireID = rs.getInt(2);
+                try {
+                    updateAbandonedStar(starID, empireID);
+                } catch (Exception e) {
+                    log.error("Error marking star abandoned, starID="+starID, e);
+                }
+            }
+        }
+    }
+
+    private void updateAbandonedStar(int starID, int empireID) throws Exception {
+        Star star = new StarController().getStar(starID);
+        float distanceToNonAbandonedEmpire = 0.0f;
+
+        // find all stars around us with non-abandoned empires on them
+        String sql = "SELECT sectors.x, sectors.y, stars.x, stars.y" +
+                     " FROM stars" +
+                     " INNER JOIN sectors ON sectors.id = stars.sector_id" +
+                     " INNER JOIN empire_presences ON empire_presences.star_id = stars.id" +
+                     " INNER JOIN empires ON empire_presences.empire_id = empires.id" +
+                     " WHERE sectors.x < ? AND sectors.x > ?" +
+                       " AND sectors.y < ? AND sectors.y > ?" +
+                       " AND empires.state = " + Empire.State.ACTIVE.getValue();
+        try (SqlStmt stmt = DB.prepare(sql)) {
+            stmt.setLong(1, star.getSectorX() + 3);
+            stmt.setLong(2, star.getSectorX() - 3);
+            stmt.setLong(3, star.getSectorY() + 3);
+            stmt.setLong(4, star.getSectorY() - 3);
+            ResultSet rs = stmt.select();
+
+            while (rs.next()) {
+                long sectorX = rs.getLong(1);
+                long sectorY = rs.getLong(2);
+                int offsetX = rs.getInt(3);
+                int offsetY = rs.getInt(4);
+
+                float distance = Sector.distanceInParsecs(star, sectorX, sectorY, offsetX, offsetY);
+                if (distanceToNonAbandonedEmpire < 0.001f || distance < distanceToNonAbandonedEmpire) {
+                    distanceToNonAbandonedEmpire = distance;
+                }
+            }
+        }
+
+        if (distanceToNonAbandonedEmpire < 0.0001f) {
+            distanceToNonAbandonedEmpire = 9999.0f;
+        }
+
+        double distanceToCentre = Math.sqrt((star.getSectorX() * star.getSectorX()) + (star.getSectorY() * star.getSectorY()));
+
+        sql = "INSERT INTO abandoned_stars (star_id, empire_id, distance_to_centre, distance_to_non_abandoned_empire)" +
+              " VALUES (?, ?, ?, ?) ON DUPLICATE KEY UPDATE" +
+              " distance_to_non_abandoned_empire = ?";
+        try (SqlStmt stmt = DB.prepare(sql)) {
+            stmt.setInt(1, star.getID());
+            stmt.setInt(2, empireID);
+            stmt.setDouble(3, distanceToCentre);
+            stmt.setDouble(4, distanceToNonAbandonedEmpire);
+            stmt.setDouble(5, distanceToNonAbandonedEmpire);
+            stmt.update();
+        }
+    }
 }

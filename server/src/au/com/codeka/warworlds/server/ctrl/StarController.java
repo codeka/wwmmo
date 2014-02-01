@@ -117,6 +117,23 @@ public class StarController {
 
     private void updateNoRetry(Star star) throws Exception {
         db.updateStar(star);
+        removeEmpirePresences(star.getID());
+    }
+
+    public void removeEmpirePresences(int starID) throws RequestException {
+        // delete an empire presences for empires that no longer have colonies on this star...
+        String sql = "DELETE FROM empire_presences" +
+                     " WHERE star_id = ?" +
+                     " AND (SELECT COUNT(*)" +
+                          " FROM colonies" +
+                          " WHERE colonies.empire_id = empire_presences.empire_id" +
+                          " AND colonies.star_id = empire_presences.star_id) = 0";
+        try (SqlStmt stmt = db.prepare(sql)) {
+            stmt.setInt(1, starID);
+            stmt.update();
+        } catch(Exception e) {
+            throw new RequestException(e);
+        }
     }
 
     /**

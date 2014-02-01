@@ -104,6 +104,7 @@ public class ColonyController {
             } catch (Exception e) {
                 throw new RequestException(e);
             }
+            new StarController(db.getTransaction()).removeEmpirePresences(colony.getStarID());
             star.getColonies().remove(colony);
 
             // if this is the last colony for this empire on this star, make sure the empire's home
