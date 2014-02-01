@@ -211,6 +211,15 @@ public class ColonyController {
             }
         }
 
+        // make sure the star is no longer marked abandoned!
+        sql = "DELETE FROM abandoned_stars WHERE star_id = ?";
+        try (SqlStmt stmt = DB.prepare(sql)) {
+            stmt.setInt(1, star.getID());
+            stmt.update();
+        } catch(Exception e) {
+            throw new RequestException(e);
+        }
+
         star.getColonies().add(colony);
         return colony;
     }
