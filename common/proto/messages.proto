@@ -114,6 +114,7 @@ message Empire
     {
         ACTIVE = 1;
         BANNED = 2;
+        ABANDONED = 3;
     }
     required EmpireState state = 5;
 

@@ -41,6 +41,9 @@ public abstract class BaseEmpire {
     public DateTime getShieldLastUpdate() {
         return mShieldLastUpdate;
     }
+    public State getState() {
+        return mState;
+    }
     public String getEmailAddr() {
         return mEmailAddr;
     }
@@ -111,7 +114,8 @@ public abstract class BaseEmpire {
 
     public enum State {
         ACTIVE(1),
-        BANNED(2);
+        BANNED(2),
+        ABANDONED(3);
 
         private int mValue;
 

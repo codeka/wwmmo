@@ -57,20 +57,16 @@ public class HelloHandler extends RequestHandler {
 
         Messages.HelloResponse.Builder hello_response_pb = Messages.HelloResponse.newBuilder();
 
-        String motd = null;
-        try (SqlStmt stmt = DB.prepare("SELECT motd FROM motd")) {
-            motd = stmt.selectFirstValue(String.class);
-        } catch (Exception e) {
-            throw new RequestException(e);
-        }
-        hello_response_pb.setMotd(Messages.MessageOfTheDay.newBuilder()
-                                          .setMessage(motd == null ? "" : motd)
-                                          .setLastUpdate(""));
+        // damn, this is why things should never be marked "required" in protobufs!
+        hello_response_pb.setMotd(Messages.MessageOfTheDay.newBuilder().setMessage("").setLastUpdate(""));
 
         // fetch the empire we're interested in
         Empire empire = new EmpireController().getEmpire(getSession().getEmpireID());
         if (empire != null) {
             new StatisticsController().registerLogin(getSession().getEmpireID(), hello_request_pb);
+            if (empire.getState() == Empire.State.ABANDONED) {
+                new EmpireController().markActive(empire);
+            }
 
             // make sure they still have some colonies...
             int numColonies = 0;
