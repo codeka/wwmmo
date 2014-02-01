@@ -56,16 +56,6 @@ public class SessionController {
                 });
     }
 
-    public void purgeSessionsOlderThan(DateTime dt) {
-        String sql = "DELETE FROM sessions WHERE login_time < ?";
-        try (SqlStmt stmt = DB.prepare(sql)) {
-            stmt.setDateTime(1, dt);
-            stmt.update();
-        } catch (Exception e) {
-            // ignore?
-        }
-    }
-
     public void saveSession(Session session) throws RequestException {
         sSessionCache.put(session.getCookie(), session);
 

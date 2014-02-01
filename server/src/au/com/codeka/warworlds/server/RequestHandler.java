@@ -262,7 +262,7 @@ public class RequestHandler {
         }
     }
 
-    protected boolean isAdmin() {
+    protected boolean isAdmin() throws RequestException {
         Session s = getSessionNoError();
         return (s != null && s.isAdmin());
     }

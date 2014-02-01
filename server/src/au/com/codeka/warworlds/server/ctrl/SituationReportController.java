@@ -8,17 +8,13 @@ import java.util.List;
 import org.apache.commons.codec.binary.Base64;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.server.RequestException;
-import au.com.codeka.warworlds.server.data.DB;
 import au.com.codeka.warworlds.server.data.SqlStmt;
 import au.com.codeka.warworlds.server.data.Transaction;
 
 public class SituationReportController {
-    private final Logger log = LoggerFactory.getLogger(SituationReportController.class);
     private DataBase db;
 
     public SituationReportController() {
@@ -83,38 +79,6 @@ public class SituationReportController {
         }
 
         return kinds;
-    }
-
-    /**
-     * Goes through the entire situation report and update the event_kinds column for each row.
-     */
-    public void updateAllEventKinds() {
-        String sql = "SELECT id, report FROM situation_reports";
-        try (SqlStmt stmt = db.prepare(sql)) {
-            ResultSet rs = stmt.select();
-            while (rs.next()) {
-                updateEventKind(rs);
-            }
-        } catch(Exception e) {
-            log.error("An error occured.", e);
-        }
-    }
-
-    /**
-     * Updates a single event_kind from the given row.
-     */
-    private void updateEventKind(ResultSet rs) {
-        try {
-            Messages.SituationReport sitrep_pb = Messages.SituationReport.parseFrom(rs.getBytes("report"));
-            String sql = "UPDATE situation_reports SET event_kinds = ? WHERE id = ?";
-            try (SqlStmt stmt = DB.prepare(sql)) {
-                stmt.setInt(1, getEventKinds(sitrep_pb));
-                stmt.setInt(2, rs.getInt("id"));
-                stmt.update();
-            }
-        } catch(Exception e) {
-            log.warn("Error occured updating row.", e);
-        }
     }
 
     private static class DataBase extends BaseDataBase {
