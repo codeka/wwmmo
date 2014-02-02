@@ -3,16 +3,14 @@ package au.com.codeka.warworlds.server.ctrl;
 import java.sql.ResultSet;
 import java.util.concurrent.TimeUnit;
 
-import org.joda.time.DateTime;
-
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
-
 import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.Session;
 import au.com.codeka.warworlds.server.data.DB;
 import au.com.codeka.warworlds.server.data.SqlStmt;
+
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 
 public class SessionController {
     private static LoadingCache<String, Session> sSessionCache;
@@ -54,16 +52,6 @@ public class SessionController {
                         return null;
                     }
                 });
-    }
-
-    public void purgeSessionsOlderThan(DateTime dt) {
-        String sql = "DELETE FROM sessions WHERE login_time < ?";
-        try (SqlStmt stmt = DB.prepare(sql)) {
-            stmt.setDateTime(1, dt);
-            stmt.update();
-        } catch (Exception e) {
-            // ignore?
-        }
     }
 
     public void saveSession(Session session) throws RequestException {

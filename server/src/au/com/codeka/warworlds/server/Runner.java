@@ -1,16 +1,12 @@
 package au.com.codeka.warworlds.server;
 
 import org.eclipse.jetty.server.Server;
-import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import au.com.codeka.warworlds.server.ctrl.CombatReportController;
+import au.com.codeka.warworlds.server.cron.CronJob;
+import au.com.codeka.warworlds.server.cron.CronJobRegistry;
 import au.com.codeka.warworlds.server.ctrl.NameGenerator;
-import au.com.codeka.warworlds.server.ctrl.SessionController;
-import au.com.codeka.warworlds.server.ctrl.SituationReportController;
-import au.com.codeka.warworlds.server.ctrl.StarController;
-import au.com.codeka.warworlds.server.ctrl.StatisticsController;
 import au.com.codeka.warworlds.server.handlers.pages.HtmlPageHandler;
 import au.com.codeka.warworlds.server.model.DesignManager;
 
@@ -40,36 +36,13 @@ public class Runner {
 
     private static void cronMain(String method, String extra) {
         try {
-            if (method.equals("update-ranks")) {
-                new StatisticsController().updateRanks();
-            } else if (method.equals("simulate-stars")) {
-                DateTime dt = DateTime.now().minusHours(extraToNum(extra, 0, 6));
-                new StarController().simulateAllStarsOlderThan(dt);
-            } else if (method.equals("purge-combat-reports")) {
-                DateTime dt = DateTime.now().minusDays(extraToNum(extra, 7, 30));
-                new CombatReportController().purgeCombatReportsOlderThan(dt);
-            } else if (method.equals("purge-sessions")) {
-                DateTime dt = DateTime.now().minusDays(extraToNum(extra, 1, 7));
-                new SessionController().purgeSessionsOlderThan(dt);
-            } else if (method.equals("update-all-event-kinds")) {
-                new SituationReportController().updateAllEventKinds();
-            } else {
-                log.error("Unknown command: "+method);
+            CronJob job = CronJobRegistry.getJob(method);
+            if (job != null) {
+                job.run(extra);
             }
         } catch(Exception e) {
             log.error("Error running CRON", e);
         }
-    }
-
-    private static int extraToNum(String extra, int minNumber, int defaultNumber) {
-        int num = defaultNumber;
-        if (extra != null) {
-            num = Integer.parseInt(extra);
-        }
-        if (num < minNumber) {
-            num = minNumber;
-        }
-        return num;
     }
 
     private static void gameMain() throws Exception {

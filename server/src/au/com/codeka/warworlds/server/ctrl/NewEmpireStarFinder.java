@@ -2,11 +2,14 @@ package au.com.codeka.warworlds.server.ctrl;
 
 import java.sql.ResultSet;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
+import java.util.Random;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import au.com.codeka.common.Pair;
 import au.com.codeka.common.model.BaseColony;
 import au.com.codeka.common.model.BaseFleet;
 import au.com.codeka.common.model.BasePlanet;
@@ -24,6 +27,9 @@ import au.com.codeka.warworlds.server.model.Star;
  * colony. We need to choose a star that's close to other players, but not TOO
  * close as to make them an easy target.
  * 
+ * Before looking for a brand new star, we'll first look through the abandoned stars
+ * for an approprite one.
+ * 
  * @return A \see NewEmpireStarDetails with details of the new star.
  */
 public class NewEmpireStarFinder {
@@ -39,6 +45,10 @@ public class NewEmpireStarFinder {
     }
 
     public boolean findStarForNewEmpire() throws RequestException {
+        if (findAbandonedStar()) {
+            return true;
+        }
+
         if (!findStarForNewEmpire(true)) {
             if (!findStarForNewEmpire(false)) {
                 new SectorGenerator().expandUniverse();
@@ -47,6 +57,50 @@ public class NewEmpireStarFinder {
         }
 
         return true;
+    }
+
+    /**
+     * Look for abandoned stars. We look for stars which are far enough from established empires, but still
+     * near the centre of the universe and not *too* far...
+     */
+    private boolean findAbandonedStar() throws RequestException {
+        String sql = "SELECT star_id, empire_id" + 
+                     " FROM abandoned_stars" +
+                     " WHERE distance_to_non_abandoned_empire > 200" +
+                     " ORDER BY (distance_to_non_abandoned_empire + distance_to_centre) ASC" +
+                     " LIMIT 10";
+        try (SqlStmt stmt = DB.prepare(sql)) {
+            ResultSet rs = stmt.select();
+
+            List<Pair<Integer, Integer>> stars = new ArrayList<Pair<Integer, Integer>>();
+            while (rs.next()) {
+                int starID = rs.getInt(1);
+                int empireID = rs.getInt(2);
+                stars.add(new Pair<Integer, Integer>(starID, empireID));
+            }
+
+            if (stars.size() > 0) {
+                Pair<Integer, Integer> starDetails = stars.get(new Random().nextInt(stars.size()));
+
+                // we need to reset the empire on this star so that they move to a different star if the log in again.
+                new EmpireController().resetEmpire(starDetails.two, "You have not logged in for a while and your star was reclaimed.");
+
+                mStarID = starDetails.one;
+                findPlanetOnStar(new StarController().getStar(mStarID));
+
+                // the star is no longer abandoned!
+                sql = "DELETE FROM abandoned_stars WHERE star_id = ?";
+                try (SqlStmt stmt2 = DB.prepare(sql)) {
+                    stmt2.setInt(1, mStarID);
+                    stmt2.update();
+                }
+                return true;
+            }
+        } catch (Exception e) {
+            throw new RequestException(e);
+        }
+
+        return false;
     }
 
     private boolean findStarForNewEmpire(boolean allowEmptySectors) throws RequestException {
@@ -61,19 +115,22 @@ public class NewEmpireStarFinder {
             // if we get here, then we've found the star. Also find which planet to
             // put the colony on.
             mStarID = star.getID();
-
-            int highestPopulationCongeniality = 0;
-            for (BasePlanet planet : star.getPlanets()) {
-                if (planet.getPopulationCongeniality() > highestPopulationCongeniality) {
-                    highestPopulationCongeniality = planet.getPopulationCongeniality();
-                    mPlanetIndex = planet.getIndex();
-                }
-            }
+            findPlanetOnStar(star);
 
             return true;
         }
 
         return false;
+    }
+
+    private void findPlanetOnStar(Star star) {
+        int highestPopulationCongeniality = 0;
+        for (BasePlanet planet : star.getPlanets()) {
+            if (planet.getPopulationCongeniality() > highestPopulationCongeniality) {
+                highestPopulationCongeniality = planet.getPopulationCongeniality();
+                mPlanetIndex = planet.getIndex();
+            }
+        }
     }
 
     private Star findHighestScoreStar(Sector sector) {

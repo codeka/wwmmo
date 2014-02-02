@@ -117,48 +117,24 @@ public class StarController {
 
     private void updateNoRetry(Star star) throws Exception {
         db.updateStar(star);
+        removeEmpirePresences(star.getID());
     }
 
-    public void simulateAllStarsOlderThan(DateTime dt) {
-        // this'll be a number, 0..6. We want to try & spread out the load throughout the whole
-        // day, and this will ensure an individual star is only elligible once every 6 hours
-        int mod = dt.getHourOfDay() / 4;
-        while (true) {
-            ArrayList<Integer> starIDs = new ArrayList<Integer>();
-            String sql = "SELECT id FROM stars WHERE last_simulation < ? AND" +
-                        " (SELECT COUNT(*) FROM colonies WHERE star_id = stars.id) > 0" +
-                        " AND (id % 6 = "+mod+")" +
-                        " LIMIT 25";
-            try (SqlStmt stmt = db.prepare(sql)) {
-                stmt.setDateTime(1, dt);
-                ResultSet rs = stmt.select();
-                while (rs.next()) {
-                    starIDs.add(rs.getInt(1));
-                }
-            } catch (Exception e) {
-            }
-
-            if (starIDs.size() == 0) {
-                break;
-            }
-
-            int[] ids = new int[starIDs.size()];
-            for (int i = 0; i < starIDs.size(); i++) {
-                ids[i] = starIDs.get(i);
-            }
-
-            try {
-                Simulation sim = new Simulation();
-                for (Star star : getStars(ids)) {
-                    sim.simulate(star);
-                    update(star);
-                }
-            } catch(Exception e) {
-                log.error("Unhandled exception simulating star", e);
-            }
+    public void removeEmpirePresences(int starID) throws RequestException {
+        // delete an empire presences for empires that no longer have colonies on this star...
+        String sql = "DELETE FROM empire_presences" +
+                     " WHERE star_id = ?" +
+                     " AND (SELECT COUNT(*)" +
+                          " FROM colonies" +
+                          " WHERE colonies.empire_id = empire_presences.empire_id" +
+                          " AND colonies.star_id = empire_presences.star_id) = 0";
+        try (SqlStmt stmt = db.prepare(sql)) {
+            stmt.setInt(1, starID);
+            stmt.update();
+        } catch(Exception e) {
+            throw new RequestException(e);
         }
     }
-
 
     /**
      * "Sanitizes" a star and removes all info specific to other empires.

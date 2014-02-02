@@ -104,6 +104,7 @@ public class ColonyController {
             } catch (Exception e) {
                 throw new RequestException(e);
             }
+            new StarController(db.getTransaction()).removeEmpirePresences(colony.getStarID());
             star.getColonies().remove(colony);
 
             // if this is the last colony for this empire on this star, make sure the empire's home
@@ -208,6 +209,15 @@ public class ColonyController {
             } catch(Exception e) {
                 throw new RequestException(e);
             }
+        }
+
+        // make sure the star is no longer marked abandoned!
+        sql = "DELETE FROM abandoned_stars WHERE star_id = ?";
+        try (SqlStmt stmt = DB.prepare(sql)) {
+            stmt.setInt(1, star.getID());
+            stmt.update();
+        } catch(Exception e) {
+            throw new RequestException(e);
         }
 
         star.getColonies().add(colony);

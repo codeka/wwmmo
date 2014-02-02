@@ -76,6 +76,20 @@ public class EmpireController {
         }
     }
 
+    /** Marks an empire active, that was previously marked abandoned. */
+    public void markActive(Empire empire) throws RequestException {
+        try (SqlStmt stmt = db.prepare("UPDATE empires SET state = ? WHERE id = ? AND state = ?")) {
+            stmt.setInt(1, Empire.State.ACTIVE.getValue());
+            stmt.setInt(2, empire.getID());
+            stmt.setInt(3, Empire.State.ABANDONED.getValue());
+            stmt.update();
+        } catch (Exception e) {
+            throw new RequestException(e);
+        }
+
+        // TODO: remove the empire's stars from the "abandoned stars" list...
+    }
+
     public int[] getStarsForEmpire(int empireId) throws RequestException {
         try {
             return db.getStarsForEmpire(empireId);

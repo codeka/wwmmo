@@ -73,21 +73,37 @@ public class LoginHandler extends RequestHandler {
             throw new RequestException(e); // should never happen
         }
 
-        JSONObject json;
-        try {
-            URLConnection conn = url.openConnection();
-            InputStream ins = conn.getInputStream();
-            String encoding = conn.getContentEncoding();
-            if (encoding == null) {
-                encoding = "utf-8";
+        long startTime = System.currentTimeMillis();
+        JSONObject json = null;
+        Exception ex = null;
+        for (int i = 0; i < 5; i++) {
+            try {
+                URLConnection conn = url.openConnection();
+                int timeout = i * 5000;
+                conn.setConnectTimeout(timeout);
+                conn.setReadTimeout(timeout);
+                InputStream ins = conn.getInputStream();
+                String encoding = conn.getContentEncoding();
+                if (encoding == null) {
+                    encoding = "utf-8";
+                }
+                InputStreamReader isr = new InputStreamReader(ins, encoding);
+                json = (JSONObject) JSONValue.parse(isr);
+
+                ex = null;
+                break;
+            } catch (IOException e) {
+                if (e.getMessage().indexOf("401") >= 0) {
+                    throw new RequestException(403, "Error requesting user info, token expired?", e);
+                }
+
+                log.error(String.format("OAuth error after attempt #%d, %dms elapsed.",
+                        i+1, System.currentTimeMillis() - startTime));
+                ex = e;
             }
-            InputStreamReader isr = new InputStreamReader(ins, encoding);
-            json = (JSONObject) JSONValue.parse(isr);
-        } catch (IOException e) {
-            if (e.getMessage().indexOf("401") >= 0) {
-                throw new RequestException(403, "Error requesting user info, token expired?", e);
-            }
-            throw new RequestException(e);
+        }
+        if (ex != null) {
+            throw new RequestException(ex);
         }
 
         if (!json.containsKey("email")) {
