@@ -2,15 +2,6 @@ package au.com.codeka.warworlds.server.handlers;
 
 import java.util.ArrayList;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import au.com.codeka.common.Vector2;
-import au.com.codeka.common.model.BaseBuildRequest;
-import au.com.codeka.common.model.BaseColony;
-import au.com.codeka.common.model.BaseFleet;
-import au.com.codeka.common.model.BaseScoutReport;
-import au.com.codeka.common.model.BuildingDesign;
 import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.RequestHandler;
@@ -19,21 +10,13 @@ import au.com.codeka.warworlds.server.ctrl.PurchaseController;
 import au.com.codeka.warworlds.server.ctrl.StarController;
 import au.com.codeka.warworlds.server.data.DB;
 import au.com.codeka.warworlds.server.data.SqlStmt;
-import au.com.codeka.warworlds.server.designeffects.RadarBuildingEffect;
-import au.com.codeka.warworlds.server.model.BuildRequest;
 import au.com.codeka.warworlds.server.model.BuildingPosition;
-import au.com.codeka.warworlds.server.model.Colony;
-import au.com.codeka.warworlds.server.model.Fleet;
-import au.com.codeka.warworlds.server.model.ScoutReport;
-import au.com.codeka.warworlds.server.model.Sector;
 import au.com.codeka.warworlds.server.model.Star;
 
 /**
  * Handles /realm/.../stars/{id} URL
  */
 public class StarHandler extends RequestHandler {
-    private static final Logger log = LoggerFactory.getLogger(StarHandler.class);
-
     @Override
     protected void get() throws RequestException {
         int id = Integer.parseInt(getUrlParameter("star_id"));

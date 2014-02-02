@@ -513,12 +513,16 @@ public class FleetList extends FrameLayout implements StarManager.StarFetchedHan
         }
         addTextToRow(context, row, "→", 0);
         addImageToRow(context, row, sprite, marginHorz, marginVert, 0);
+        String name = dest.getName();
+        if (dest.getStarType().getInternalName().equals("marker")) {
+            name = "<i>Empty Space</i>";
+        }
         if (includeEta) {
             String text = String.format("%s <b>ETA:</b> %s",
-                                        dest.getName(), eta);
+                                        name, eta);
             addTextToRow(context, row, Html.fromHtml(text), 0);
         } else {
-            addTextToRow(context, row, dest.getName(), 0);
+            addTextToRow(context, row, Html.fromHtml(name), 0);
         }
 
         row.setVisibility(View.VISIBLE);

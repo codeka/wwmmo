@@ -175,5 +175,8 @@
     <sprite name="star.small.yellow">
       <rect location="64,256" size="64x64" />
     </sprite>
+    <sprite name="star.small.marker">
+      <rect location="0,320" size="64x64" />
+    </sprite>
   </sheet>
 </sprites>

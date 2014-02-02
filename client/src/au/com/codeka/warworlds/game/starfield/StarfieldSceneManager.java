@@ -409,6 +409,7 @@ public class StarfieldSceneManager extends SectorSceneManager
         List<Pair<Long, Long>> missingSectors = null;
 
         mBackgroundEntities = new ArrayList<Entity>();
+        StarEntity oldSelection = mSelectedStarEntity;
 
         for(int y = -mSectorRadius; y <= mSectorRadius; y++) {
             for(int x = -mSectorRadius; x <= mSectorRadius; x++) {
@@ -444,6 +445,15 @@ public class StarfieldSceneManager extends SectorSceneManager
                 int sx = (int)(x * Sector.SECTOR_SIZE);
                 int sy = -(int)(y * Sector.SECTOR_SIZE);
                 addSector(scene, sx, sy, sector);
+            }
+        }
+
+        if (oldSelection != mSelectedStarEntity) {
+            // if we need to select a star and we did, then fire the handler
+            if (mSelectedStarEntity != null) {
+                fireSelectionChanged(mSelectedStarEntity.getStar());
+            } else {
+                fireSelectionChanged((Star) null);
             }
         }
 
@@ -792,8 +802,13 @@ public class StarfieldSceneManager extends SectorSceneManager
             return;
         }
 
-        if (starKey == null || !mStars.containsKey(starKey)) {
+        if (starKey == null) {
             selectStar((StarEntity) null);
+            return;
+        }
+
+        if (!mStars.containsKey(starKey)) {
+            mStarToSelect = starKey;
             return;
         }
 

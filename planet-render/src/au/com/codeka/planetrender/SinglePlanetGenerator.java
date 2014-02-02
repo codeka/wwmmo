@@ -31,7 +31,11 @@ public class SinglePlanetGenerator {
             mRayWarper = new RayWarper(warpTemplate, rand);
         }
 
-        mTexture = new TextureGenerator(tmpl.getParameter(Template.TextureTemplate.class), rand);
+        Template.TextureTemplate textureTemplate = tmpl.getParameter(Template.TextureTemplate.class);
+        if (textureTemplate == null) {
+            return;
+        }
+        mTexture = new TextureGenerator(textureTemplate, rand);
         mSunOrigin = tmpl.getSunLocation();
         mAmbient = tmpl.getAmbient();
         mPlanetRadius = tmpl.getPlanetSize();
@@ -53,6 +57,10 @@ public class SinglePlanetGenerator {
      * Renders a planet into the given \c Image.
      */
     public void render(Image img) {
+        if (mTexture == null) {
+            return;
+        }
+
         for (int y = 0; y < img.getHeight(); y++) {
             for (int x = 0; x < img.getWidth(); x++) {
                 double nx = ((double) x / (double) img.getWidth()) - 0.5;

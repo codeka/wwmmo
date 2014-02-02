@@ -103,7 +103,6 @@ public abstract class ImageManager {
         }
     }
 
-
     public void addSpriteGeneratedListener(SpriteGeneratedListener listener) {
         mSpriteGeneratedListeners.add(listener);
     }

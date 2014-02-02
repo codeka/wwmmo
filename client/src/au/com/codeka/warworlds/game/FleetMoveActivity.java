@@ -112,17 +112,14 @@ public class FleetMoveActivity extends BaseStarfieldActivity {
                     return;
                 }
 
-                if (mDestStar == null || !mDestStar.getKey().equals(star.getKey())) {
-                    if (star.getKey().equals(mSrcStar.getKey())) {
-                        // if src & dest are the same, just forget about it
-                        mDestStar = null;
-                    } else {
-                        mDestStar = star;
-                    }
-
-                    refreshSelection();
-                    return;
+                if (star.getKey().equals(mSrcStar.getKey())) {
+                    // if src & dest are the same, just forget about it
+                    mDestStar = null;
+                } else {
+                    mDestStar = star;
                 }
+
+                refreshSelection();
             }
 
             @Override
@@ -161,15 +158,6 @@ public class FleetMoveActivity extends BaseStarfieldActivity {
                         mStarfield.selectStar(mMarkerStar.getKey());
                     }
                 });
-/*
-                mDestStar = mMarkerStar;
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        refreshSelection();
-                    }
-                });
-*/
             }
         });
 
@@ -211,6 +199,19 @@ public class FleetMoveActivity extends BaseStarfieldActivity {
                 // TODO?
             }
         });
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+
+        // if we have a marker star, make sure we remove it first
+        if (mMarkerStar != null) {
+            Sector s = SectorManager.getInstance().getSector(mMarkerStar.getSectorX(), mMarkerStar.getSectorY());
+            if (s != null) {
+                s.getStars().remove(mMarkerStar);
+            }
+        }
     }
 
     @Override
@@ -289,12 +290,18 @@ public class FleetMoveActivity extends BaseStarfieldActivity {
                 String url = String.format("stars/%s/fleets/%s/orders",
                                            mFleet.getStarKey(),
                                            mFleet.getKey());
-                Messages.FleetOrder fleetOrder = Messages.FleetOrder.newBuilder()
-                               .setOrder(Messages.FleetOrder.FLEET_ORDER.MOVE)
-                               .setStarKey(mDestStar.getKey())
-                               .build();
+                Messages.FleetOrder.Builder builder = Messages.FleetOrder.newBuilder()
+                        .setOrder(Messages.FleetOrder.FLEET_ORDER.MOVE);
+                if (mMarkerStar != null) {
+                    builder.setSectorX(mMarkerStar.getSectorX());
+                    builder.setSectorY(mMarkerStar.getSectorY());
+                    builder.setOffsetX(mMarkerStar.getOffsetX());
+                    builder.setOffsetY(mMarkerStar.getOffsetY());
+                } else {
+                    builder.setStarKey(mDestStar.getKey());
+                }
                 try {
-                    return ApiClient.postProtoBuf(url, fleetOrder);
+                    return ApiClient.postProtoBuf(url, builder.build());
                 } catch (ApiException e) {
                     return false;
                 }

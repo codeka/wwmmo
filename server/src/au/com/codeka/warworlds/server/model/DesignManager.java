@@ -9,6 +9,7 @@ import org.w3c.dom.Element;
 import au.com.codeka.common.model.BaseDesignManager;
 import au.com.codeka.common.model.Design;
 import au.com.codeka.common.model.DesignKind;
+import au.com.codeka.common.model.ShipEffect;
 import au.com.codeka.warworlds.server.designeffects.*;
 
 public class DesignManager extends BaseDesignManager {
@@ -63,6 +64,8 @@ public class DesignManager extends BaseDesignManager {
                 return new FighterShipEffect();
             } else if (effectKind.equals("troopcarrier")) {
                 return new TroopCarrierShipEffect();
+            } else if (effectKind.equals("empty-space-mover")) {
+                return new EmptySpaceMoverShipEffect();
             }
         }
 

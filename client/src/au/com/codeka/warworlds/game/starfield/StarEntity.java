@@ -42,12 +42,15 @@ public class StarEntity extends SelectableEntity {
             mStarSprite.setScale((float) star.getStarType().getImageScale());
         }
         mStarSprite.setRotation(new Random(Integer.parseInt(star.getKey()) * 100000l).nextFloat() * 360.0f);
-        mStarName = new Text(0.0f, -starSize * 0.6f,
-                             mStarfield.getFont(), star.getName(),
-                             mStarfield.getActivity().getVertexBufferObjectManager());
-
         attachChild(mStarSprite);
-        attachChild(mStarName);
+
+        // don't display the name for marker stars...
+        if (!star.getStarType().getInternalName().equals("marker")) {
+            mStarName = new Text(0.0f, -starSize * 0.6f,
+                    mStarfield.getFont(), star.getName(),
+                    mStarfield.getActivity().getVertexBufferObjectManager());
+            attachChild(mStarName);
+        }
 
         addEmpireIcons();
 

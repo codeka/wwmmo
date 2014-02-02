@@ -53,6 +53,8 @@ message GenericError
         FleetBoostNoUpgrade = 24;
         FleetBoostAlreadyBoosting = 25;
         FleetBoostNotMoving = 26;
+        FleetMoveCannotMoveToEmptySpace = 27;
+        FleetMoveCannotMoveToStar = 28;
     }
 }
 
@@ -511,6 +513,7 @@ message Star
         RED = 4;
         NEUTRON = 5;
         BLACKHOLE = 6;
+        MARKER = 7;
     }
     optional CLASSIFICATION classification = 3;
 
@@ -933,6 +936,13 @@ message FleetOrder
 
     // if the order is MERGE, this will be the fleet to merge with
     optional string merge_fleet_key = 6;
+
+    // if it's a move command, but to empty space and not a star (e.g. for wormhole generators),
+    // then this represents the coordinates you want to move to
+    optional int64 sector_x = 7;
+    optional int64 sector_y = 8;
+    optional int32 offset_x = 9;
+    optional int32 offset_y = 10;
 }
 
 

@@ -22,6 +22,7 @@ import au.com.codeka.warworlds.server.ctrl.StarController;
 import au.com.codeka.warworlds.server.data.DB;
 import au.com.codeka.warworlds.server.data.SqlStmt;
 import au.com.codeka.warworlds.server.data.Transaction;
+import au.com.codeka.warworlds.server.designeffects.EmptySpaceMoverShipEffect;
 import au.com.codeka.warworlds.server.model.DesignManager;
 import au.com.codeka.warworlds.server.model.Fleet;
 import au.com.codeka.warworlds.server.model.FleetUpgrade;
@@ -180,7 +181,13 @@ public class FleetOrdersHandler extends RequestHandler {
         }
 
         Star srcStar = star;
-        Star destStar = new StarController().getStar(Integer.parseInt(fleet_order_pb.getStarKey()));
+        Star destStar;
+        if (fleet_order_pb.hasStarKey()) {
+            destStar = orderFleetMoveStar(star, fleet, fleet_order_pb, sim);
+        } else {
+            destStar = orderFleetMoveSpace(star, fleet, fleet_order_pb, sim);
+        }
+
         float distanceInParsecs = Sector.distanceInParsecs(srcStar, destStar);
 
         ShipDesign design = (ShipDesign) DesignManager.i.getDesign(DesignKind.SHIP, fleet.getDesignID());
@@ -204,6 +211,37 @@ public class FleetOrdersHandler extends RequestHandler {
         float moveTimeInHours = distanceInParsecs / design.getSpeedInParsecPerHour();
         DateTime now = DateTime.now();
         fleet.move(now, destStar.getKey(), now.plusSeconds((int)(moveTimeInHours * 3600.0f)));
+    }
+
+    private Star orderFleetMoveStar(Star srcStar, Fleet fleet, Messages.FleetOrder fleet_order_pb, Simulation sim) throws RequestException {
+        if (fleet.getDesign().hasEffect(EmptySpaceMoverShipEffect.class)) {
+            throw new RequestException(400, Messages.GenericError.ErrorCode.FleetMoveCannotMoveToStar,
+                    "This fleet cannot be moved to another star.");
+        }
+
+        Star destStar = new StarController().getStar(Integer.parseInt(fleet_order_pb.getStarKey()));
+
+        // you can't move to a marker star either....
+        if (destStar.getStarType().getInternalName().equals("marker")) {
+            throw new RequestException(400, Messages.GenericError.ErrorCode.FleetMoveCannotMoveToEmptySpace,
+                    "This fleet can only be moved to stars.");
+        }
+
+        return destStar;
+    }
+
+    private Star orderFleetMoveSpace(Star srcStar, Fleet fleet, Messages.FleetOrder fleet_order_pb, Simulation sim) throws RequestException {
+        if (!fleet.getDesign().hasEffect(EmptySpaceMoverShipEffect.class)) {
+            throw new RequestException(400, Messages.GenericError.ErrorCode.FleetMoveCannotMoveToEmptySpace,
+                    "This fleet can only be moved to stars.");
+        }
+
+        long sectorX = fleet_order_pb.getSectorX();
+        long sectorY = fleet_order_pb.getSectorY();
+        int offsetX = fleet_order_pb.getOffsetX();
+        int offsetY = fleet_order_pb.getOffsetY();
+
+        return new StarController().addMarkerStar(sectorX, sectorY, offsetX, offsetY);
     }
 
     private void orderFleetBoost(Star star, Fleet fleet, Messages.FleetOrder fleet_order_pb, Simulation sim) throws RequestException {

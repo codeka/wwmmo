@@ -65,6 +65,16 @@ public class SectorController {
         return sectors;
     }
 
+    public Sector getSector(long sectorX, long sectorY) throws RequestException {
+        ArrayList<Pair<Long, Long>> coords = new ArrayList<Pair<Long, Long>>();
+        coords.add(new Pair<Long, Long>(sectorX, sectorY));
+        List<Sector> sectors = getSectors(coords, false);
+        if (sectors.size() == 1) {
+            return sectors.get(0);
+        }
+        return null;
+    }
+
     public Sector getSector(int sectorId) throws RequestException {
         try {
             List<Sector> sectors = db.getSectors(new int[] {sectorId});

@@ -1,5 +1,6 @@
 package au.com.codeka.warworlds.server.data;
 
+import java.io.ByteArrayInputStream;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -9,8 +10,6 @@ import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.TimeZone;
-
-import javax.sql.rowset.serial.SerialBlob;
 
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
@@ -92,7 +91,7 @@ public class SqlStmt implements AutoCloseable {
         }
     }
     public void setBlob(int position, byte[] blob) throws SQLException {
-        mStmt.setBlob(position, new SerialBlob(blob));
+        mStmt.setBlob(position, new ByteArrayInputStream(blob));
     }
     public void setNull(int position) throws SQLException {
         mStmt.setNull(position, Types.NULL);
