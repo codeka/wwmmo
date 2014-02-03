@@ -121,7 +121,7 @@
     <stats speed="0.6" baseAttack="1" baseDefence="1" combatPriority="99"  />
     <effects>
       <effect kind="empty-space-mover" />
-      <!-- effect kind="wormhole" /-->
+      <effect kind="wormhole-generator" />
     </effects>
   </design>
 </designs>

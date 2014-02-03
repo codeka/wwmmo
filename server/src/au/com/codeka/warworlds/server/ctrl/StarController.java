@@ -86,7 +86,7 @@ public class StarController {
 
         Sector sector = new SectorController().getSector(sectorX, sectorY);
         try {
-            int starID = db.addStar(sector.getID(), offsetX, offsetY, 20, "Marker", Star.getMarkerStarType().getIndex(), null);
+            int starID = db.addStar(sector.getID(), offsetX, offsetY, 20, "Marker", Star.Type.Marker, null);
             return getStar(starID);
         } catch (Exception e) {
             throw new RequestException(e);
@@ -345,7 +345,7 @@ public class StarController {
             return stars;
         }
 
-        public int addStar(int sectorID, int x, int y, int size, String name, int starType, Planet[] planets) throws Exception {
+        public int addStar(int sectorID, int x, int y, int size, String name, Star.Type starType, Planet[] planets) throws Exception {
             String sql = "INSERT INTO stars (sector_id, x, y, size, name, star_type, planets, last_simulation, time_emptied)" +
                         " VALUES (?, ?, ?, ?, ?, ?, ?, NOW(), NOW())";
             try (SqlStmt stmt = prepare(sql, Statement.RETURN_GENERATED_KEYS)) {
@@ -354,7 +354,7 @@ public class StarController {
                 stmt.setInt(3, y);
                 stmt.setInt(4, size);
                 stmt.setString(5, name);
-                stmt.setInt(6, starType);
+                stmt.setInt(6, starType.ordinal());
 
                 Messages.Planets.Builder planets_pb = Messages.Planets.newBuilder();
                 if (planets == null) {
@@ -374,7 +374,9 @@ public class StarController {
 
         public void updateStar(Star star) throws Exception {
             final String sql = "UPDATE stars SET" +
-                                 " last_simulation = ?" +
+                                 " last_simulation = ?," +
+                                 " name = ?," +
+                                 " star_type = ?" +
                               " WHERE id = ?";
             try (SqlStmt stmt = prepare(sql)) {
                 DateTime lastSimulation = star.getLastSimulation();
@@ -390,7 +392,9 @@ public class StarController {
                     }
                 }
                 stmt.setDateTime(1, lastSimulation);
-                stmt.setInt(2, star.getID());
+                stmt.setString(2, star.getName());
+                stmt.setInt(3, star.getStarType().getType().ordinal());
+                stmt.setInt(4, star.getID());
                 stmt.update();
             }
 

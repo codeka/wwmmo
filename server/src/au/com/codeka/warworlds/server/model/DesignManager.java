@@ -9,8 +9,15 @@ import org.w3c.dom.Element;
 import au.com.codeka.common.model.BaseDesignManager;
 import au.com.codeka.common.model.Design;
 import au.com.codeka.common.model.DesignKind;
-import au.com.codeka.common.model.ShipEffect;
-import au.com.codeka.warworlds.server.designeffects.*;
+import au.com.codeka.warworlds.server.designeffects.DefenceBuildingEffect;
+import au.com.codeka.warworlds.server.designeffects.EmptySpaceMoverShipEffect;
+import au.com.codeka.warworlds.server.designeffects.FighterShipEffect;
+import au.com.codeka.warworlds.server.designeffects.PopulationBoostBuildingEffect;
+import au.com.codeka.warworlds.server.designeffects.RadarBuildingEffect;
+import au.com.codeka.warworlds.server.designeffects.ScoutShipEffect;
+import au.com.codeka.warworlds.server.designeffects.StorageBuildingEffect;
+import au.com.codeka.warworlds.server.designeffects.TroopCarrierShipEffect;
+import au.com.codeka.warworlds.server.designeffects.WormholeGeneratorShipEffect;
 
 public class DesignManager extends BaseDesignManager {
     private String mBasePath;
@@ -66,6 +73,8 @@ public class DesignManager extends BaseDesignManager {
                 return new TroopCarrierShipEffect();
             } else if (effectKind.equals("empty-space-mover")) {
                 return new EmptySpaceMoverShipEffect();
+            } else if (effectKind.equals("wormhole-generator")) {
+                return new WormholeGeneratorShipEffect();
             }
         }
 

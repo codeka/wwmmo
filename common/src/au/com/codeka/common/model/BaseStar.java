@@ -13,57 +13,64 @@ import au.com.codeka.common.protobuf.Messages;
  * A star is \i basically a container for planets. It shows up on the starfield list.
  */
 public abstract class BaseStar {
+
+    public enum Type {
+        Blue, White, Yellow, Orange, Red, Neutron, BlackHole, Marker, Wormhole,
+    }
+
     protected static StarType[] sStarTypes = {
-        new StarType.Builder().setIndex(0)
+        new StarType.Builder().setType(Type.Blue)
                               .setDisplayName("Blue")
                               .setInternalName("blue")
                               .setShortName("B")
                               .build(),
-        new StarType.Builder().setIndex(1)
+        new StarType.Builder().setType(Type.White)
                               .setDisplayName("White")
                               .setInternalName("white")
                               .setShortName("W")
                               .build(),
-        new StarType.Builder().setIndex(2)
+        new StarType.Builder().setType(Type.Yellow)
                               .setDisplayName("Yellow")
                               .setInternalName("yellow")
                               .setShortName("Y")
                               .build(),
-        new StarType.Builder().setIndex(3)
+        new StarType.Builder().setType(Type.Orange)
                               .setDisplayName("Orange")
                               .setInternalName("orange")
                               .setShortName("O")
                               .build(),
-        new StarType.Builder().setIndex(4)
+        new StarType.Builder().setType(Type.Red)
                               .setDisplayName("Red")
                               .setInternalName("red")
                               .setShortName("R")
                               .build(),
-        new StarType.Builder().setIndex(5)
+        new StarType.Builder().setType(Type.Neutron)
                               .setDisplayName("Neutron")
                               .setInternalName("neutron")
                               .setShortName("N")
                               .setBaseSize(1.0)
                               .setImageScale(4.0)
                               .build(),
-        new StarType.Builder().setIndex(6)
+        new StarType.Builder().setType(Type.BlackHole)
                               .setDisplayName("Black Hole")
                               .setInternalName("black-hole")
                               .setShortName("BH")
                               .build(),
-        new StarType.Builder().setIndex(7)
+        new StarType.Builder().setType(Type.Marker)
                               .setDisplayName("Marker")
                               .setInternalName("marker")
                               .setShortName("M")
-                              .setImageScale(4.0)
                               .build(),
+        new StarType.Builder().setType(Type.Wormhole)
+                              .setDisplayName("Wormhole")
+                              .setInternalName("wormhole")
+                              .setShortName("WH")
+                              .setImageScale(2.0)
+                              .build()
     };
 
-    public static StarType getStarType(int index) {
-        return sStarTypes[index];
-    }
-    public static StarType getMarkerStarType() {
-        return sStarTypes[7];
+    public static StarType getStarType(Type type) {
+        return sStarTypes[type.ordinal()];
     }
     public static StarType[] getStarTypes() {
         return sStarTypes;
@@ -226,7 +233,7 @@ public abstract class BaseStar {
     public void fromProtocolBuffer(Messages.Star pb) {
         mKey = pb.getKey();
         mName = pb.getName();
-        mStarType = getStarType(pb.getClassification().getNumber());
+        mStarType = getStarType(Type.values()[pb.getClassification().getNumber()]);
         mSize = pb.getSize();
         mSectorX = pb.getSectorX();
         mSectorY = pb.getSectorY();
@@ -300,7 +307,7 @@ public abstract class BaseStar {
             pb.setKey(mKey);
         }
         pb.setName(mName);
-        pb.setClassification(Messages.Star.CLASSIFICATION.valueOf(mStarType.getIndex()));
+        pb.setClassification(Messages.Star.CLASSIFICATION.valueOf(mStarType.getType().ordinal()));
         pb.setSize(mSize);
         pb.setSectorX(mSectorX);
         pb.setSectorY(mSectorY);
@@ -361,15 +368,15 @@ public abstract class BaseStar {
     }
 
     public static class StarType {
-        private int mIndex;
+        private Type mType;
         private String mDisplayName;
         private String mInternalName;
         private String mShortName;
         private double mBaseSize;
         private double mImageScale;
 
-        public int getIndex() {
-            return mIndex;
+        public Type getType() {
+            return mType;
         }
         public String getDisplayName() {
             return mDisplayName;
@@ -409,8 +416,8 @@ public abstract class BaseStar {
                 mStarType.mImageScale = 1.0;
             }
 
-            public Builder setIndex(int index) {
-                mStarType.mIndex = index;
+            public Builder setType(Type type) {
+                mStarType.mType = type;
                 return this;
             }
 

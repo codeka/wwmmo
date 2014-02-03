@@ -204,7 +204,7 @@ public class SectorGenerator {
             stmt.setInt(3, star.getOffsetY());
             stmt.setInt(4, star.getSize());
             stmt.setString(5, name);
-            stmt.setInt(6, star.getStarType().getIndex());
+            stmt.setInt(6, star.getStarType().getType().ordinal());
             stmt.setBlob(7, planets_pb.build().toByteArray());
             stmt.setDateTime(8, DateTime.now());
             stmt.update();
@@ -227,7 +227,7 @@ public class SectorGenerator {
             int[] bonuses = new int[PlanetTypeSlotBonuses[0].length];
             for (int i = 0; i < bonuses.length; i++) {
                 bonuses[i] = PlanetTypeSlotBonuses[planetIndex][i] +
-                             PlanetTypeStarBonuses[star.getStarType().getIndex()][i];
+                             PlanetTypeStarBonuses[star.getStarType().getType().ordinal()][i];
             }
             int planetType = select(bonuses);
 

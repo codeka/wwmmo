@@ -107,6 +107,9 @@ public class Star extends BaseStar {
     public void setPlanets(Planet[] planets) {
         mPlanets = planets;
     }
+    public void setStarType(StarType type) {
+        mStarType = type;
+    }
 
     public ArrayList<ScoutReport> getScoutReports() {
         return mScoutReports;

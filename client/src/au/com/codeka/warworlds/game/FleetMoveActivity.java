@@ -145,7 +145,7 @@ public class FleetMoveActivity extends BaseStarfieldActivity {
                         s.getStars().remove(mMarkerStar);
                     }
                 }
-                mMarkerStar = new Star(BaseStar.getMarkerStarType(), "Marker", 20, sectorX, sectorY, offsetX, offsetY, null);
+                mMarkerStar = new Star(BaseStar.getStarType(Star.Type.Marker), "Marker", 20, sectorX, sectorY, offsetX, offsetY, null);
                 Sector s = SectorManager.getInstance().getSector(sectorX, sectorY);
                 if (s != null) {
                     s.getStars().add(mMarkerStar);

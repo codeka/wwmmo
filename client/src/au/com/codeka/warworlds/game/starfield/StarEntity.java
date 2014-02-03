@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.Random;
 import java.util.TreeMap;
 
+import org.andengine.engine.handler.IUpdateHandler;
 import org.andengine.entity.Entity;
 import org.andengine.entity.sprite.Sprite;
 import org.andengine.entity.text.Text;
@@ -43,6 +44,11 @@ public class StarEntity extends SelectableEntity {
         }
         mStarSprite.setRotation(new Random(Integer.parseInt(star.getKey()) * 100000l).nextFloat() * 360.0f);
         attachChild(mStarSprite);
+
+        // if it's a wormhole, we want to register an updater to apply the rotation
+        if (star.getStarType().getType() == Star.Type.Wormhole) {
+            starfield.getActivity().getEngine().registerUpdateHandler(mWormholeUpdateHandler);
+        }
 
         // don't display the name for marker stars...
         if (!star.getStarType().getInternalName().equals("marker")) {
@@ -183,4 +189,20 @@ public class StarEntity extends SelectableEntity {
             return false;
         }
     }
+
+    private IUpdateHandler mWormholeUpdateHandler = new IUpdateHandler() {
+
+        @Override
+        public void onUpdate(float dt) {
+            float rotation = mStarSprite.getRotation() + 15.0f * dt;
+            while (rotation > 360.0f) {
+                rotation -= 360.0f;
+            }
+            mStarSprite.setRotation(rotation);
+        }
+
+        @Override
+        public void reset() {
+        }
+    };
 }

@@ -32,7 +32,7 @@ public class StarExportController {
                 while (rs.next()) {
                     ps.println(String.format("%d.%d,%d.%d,%s,%s,%s,%s",
                             rs.getInt(1), rs.getInt(3), rs.getInt(2), rs.getInt(4),
-                            escapeValue(rs.getString(5)), rs.getInt(6), getStarTypeName(rs.getInt(7)),
+                            escapeValue(rs.getString(5)), rs.getInt(6), getStarTypeName(BaseStar.Type.values()[rs.getInt(7)]),
                             escapeValue(rs.getString(8))));
                 }
             }
@@ -57,7 +57,7 @@ public class StarExportController {
         return value;
     }
 
-    private String getStarTypeName(int type) {
+    private String getStarTypeName(BaseStar.Type type) {
         return BaseStar.getStarType(type).getDisplayName();
     }
 
