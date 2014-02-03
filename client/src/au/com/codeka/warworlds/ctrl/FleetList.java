@@ -502,7 +502,7 @@ public class FleetList extends FrameLayout implements StarManager.StarFetchedHan
 
         float marginHorz = 0;
         float marginVert = 0;
-        if (dest.getStarType().getImageScale() > 1.0) {
+        if (dest.getStarType().getImageScale() > 2.5) {
             marginHorz = -(float) (sprite.getWidth() / dest.getStarType().getImageScale());
             marginVert = -(float) (sprite.getHeight() / dest.getStarType().getImageScale());
         }
