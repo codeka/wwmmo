@@ -178,5 +178,8 @@
     <sprite name="star.small.marker">
       <rect location="0,320" size="64x64" />
     </sprite>
+    <sprite name="star.small.wormhole">
+      <rect location="128,0" size="128x128" />
+    </sprite>
   </sheet>
 </sprites>

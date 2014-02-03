@@ -7,6 +7,7 @@ import java.util.Random;
 import au.com.codeka.common.Colour;
 import au.com.codeka.common.ColourGradient;
 import au.com.codeka.common.PerlinNoise;
+import au.com.codeka.common.Vector2;
 import au.com.codeka.common.Vector3;
 
 /**
@@ -50,6 +51,9 @@ public class Atmosphere {
     public Colour getInnerPixelColour(double u, double v, Vector3 pt,
             Vector3 normal, Vector3 sunDirection, Vector3 north) {
         return Colour.pool.borrow().reset(Colour.TRANSPARENT);
+    }
+
+    public void updateUv(Vector2 uv) {
     }
 
     protected static double getSunShadowFactor(double dot, double sunStartShadow,
@@ -206,14 +210,12 @@ public class Atmosphere {
     public static class StarAtmosphere extends OuterAtmosphere {
         private int mNumPoints;
         private double mBaseWidth;
-       // private double mSlope;
 
         public StarAtmosphere(Template.AtmosphereTemplate.StarTemplate tmpl, Random rand) {
             super(tmpl, rand);
 
             mNumPoints = tmpl.getNumPoints();
             mBaseWidth = tmpl.getBaseWidth();
-          //  mSlope = tmpl.getSlope();
         }
 
         @Override

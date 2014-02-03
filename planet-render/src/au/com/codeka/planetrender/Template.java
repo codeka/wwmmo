@@ -621,7 +621,8 @@ public class Template {
 
     public static class WarpTemplate extends BaseTemplate {
         public enum NoiseGenerator {
-            Perlin
+            Perlin,
+            Spiral
         }
 
         private NoiseGenerator mNoiseGenerator;
@@ -644,6 +645,8 @@ public class Template {
 
                 if (elem.getAttribute("generator").equals("perlin-noise")) {
                     tmpl.mNoiseGenerator = NoiseGenerator.Perlin;
+                } else if (elem.getAttribute("generator").equals("spiral")) {
+                    tmpl.mNoiseGenerator = NoiseGenerator.Spiral;
                 } else {
                     throw new TemplateException("Unknown generator type: "+elem.getAttribute("generator"));
                 }

@@ -79,7 +79,7 @@ public class StarfieldSceneManager extends SectorSceneManager
 
     private Font mFont;
     private BitmapTextureAtlas mStarTextureAtlas;
-    private TiledTextureRegion mNeutronStarTextureRegion;
+    private TiledTextureRegion mBigStarTextureRegion;
     private TiledTextureRegion mNormalStarTextureRegion;
 
     private BuildableBitmapTextureAtlas mIconTextureAtlas;
@@ -117,14 +117,14 @@ public class StarfieldSceneManager extends SectorSceneManager
 
     @Override
     public void onLoadResources() {
-        mStarTextureAtlas = new BitmapTextureAtlas(mActivity.getTextureManager(), 128, 384,
+        mStarTextureAtlas = new BitmapTextureAtlas(mActivity.getTextureManager(), 256, 384,
                 TextureOptions.BILINEAR_PREMULTIPLYALPHA);
         mStarTextureAtlas.setTextureAtlasStateListener(new ITextureAtlasStateListener.DebugTextureAtlasStateListener<IBitmapTextureAtlasSource>());
 
         mNormalStarTextureRegion = BitmapTextureAtlasTextureRegionFactory.createTiledFromAsset(mStarTextureAtlas, mActivity,
-                "stars/stars_small.png", 0, 0, 2, 6);
-        mNeutronStarTextureRegion = BitmapTextureAtlasTextureRegionFactory.createTiledFromAsset(mStarTextureAtlas, mActivity,
-                "stars/stars_small.png", 0, 0, 1, 3);
+                "stars/stars_small.png", 0, 0, 4, 6);
+        mBigStarTextureRegion = BitmapTextureAtlasTextureRegionFactory.createTiledFromAsset(mStarTextureAtlas, mActivity,
+                "stars/stars_small.png", 0, 0, 2, 3);
 
         mBackgroundGasTextureAtlas = new BitmapTextureAtlas(mActivity.getTextureManager(), 512, 512,
                 TextureOptions.BILINEAR_PREMULTIPLYALPHA);
@@ -531,23 +531,25 @@ public class StarfieldSceneManager extends SectorSceneManager
 
         ITextureRegion textureRegion = null;
         if (star.getStarType().getInternalName().equals("neutron")) {
-            textureRegion = mNeutronStarTextureRegion.getTextureRegion(0);
+            textureRegion = mBigStarTextureRegion.getTextureRegion(0);
+        } else if (star.getStarType().getInternalName().equals("wormhole")) {
+            textureRegion = mBigStarTextureRegion.getTextureRegion(1);
         } else {
             int offset = 0;
             if (star.getStarType().getInternalName().equals("black-hole")) {
-                offset = 4;
-            } else if (star.getStarType().getInternalName().equals("blue")) {
-                offset = 5;
-            } else if (star.getStarType().getInternalName().equals("orange")) {
-                offset = 6;
-            } else if (star.getStarType().getInternalName().equals("red")) {
-                offset = 7;
-            } else if (star.getStarType().getInternalName().equals("white")) {
                 offset = 8;
-            } else if (star.getStarType().getInternalName().equals("yellow")) {
+            } else if (star.getStarType().getInternalName().equals("blue")) {
                 offset = 9;
+            } else if (star.getStarType().getInternalName().equals("orange")) {
+                offset = 12;
+            } else if (star.getStarType().getInternalName().equals("red")) {
+                offset = 13;
+            } else if (star.getStarType().getInternalName().equals("white")) {
+                offset = 16;
+            } else if (star.getStarType().getInternalName().equals("yellow")) {
+                offset = 17;
             } else if (star.getStarType().getInternalName().equals("marker")) {
-                offset = 10;
+                offset = 18;
             }
             textureRegion = mNormalStarTextureRegion.getTextureRegion(offset);
         }

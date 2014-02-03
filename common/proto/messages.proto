@@ -514,6 +514,7 @@ message Star
         NEUTRON = 5;
         BLACKHOLE = 6;
         MARKER = 7;
+        WORMHOLE = 8;
     }
     optional CLASSIFICATION classification = 3;
 

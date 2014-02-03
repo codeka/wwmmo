@@ -55,6 +55,7 @@ public abstract class BaseStar {
                               .setDisplayName("Marker")
                               .setInternalName("marker")
                               .setShortName("M")
+                              .setImageScale(4.0)
                               .build(),
     };
 

@@ -96,9 +96,9 @@ public class Vector2 implements ObjectPool.Pooled {
         this.y -= y;
     }
 
-    public void rotate(float radians) {
-        float nx = (float)(x*Math.cos(radians) - y*Math.sin(radians));
-        float ny = (float)(y*Math.cos(radians) + x*Math.sin(radians));
+    public void rotate(double radians) {
+        double nx = (x*Math.cos(radians) - y*Math.sin(radians));
+        double ny = (y*Math.cos(radians) + x*Math.sin(radians));
         x = nx;
         y = ny;
     }
