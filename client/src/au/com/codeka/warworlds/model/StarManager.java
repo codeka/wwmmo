@@ -368,29 +368,32 @@ public class StarManager extends BaseManager {
 
                 String price = "???";
                 SkuDetails sku = null;
-                try {
-                    sku = PurchaseManager.i.getInventory().getSkuDetails(purchase.getSku());
-                } catch (IabException e1) {
+                if (purchase != null) {
+                    try {
+                        sku = PurchaseManager.i.getInventory().getSkuDetails(purchase.getSku());
+                    } catch (IabException e1) {
+                    }
                 }
                 if (sku != null) {
                     price = sku.getPrice();
                 }
 
-                Messages.StarRenameRequest pb = Messages.StarRenameRequest.newBuilder()
+                Messages.StarRenameRequest.Builder pb = Messages.StarRenameRequest.newBuilder()
                         .setStarKey(star.getKey())
                         .setOldName(star.getName())
-                        .setNewName(newName)
-                        .setPurchaseInfo(Messages.PurchaseInfo.newBuilder()
-                                .setSku(purchase.getSku())
-                                .setOrderId(purchase.getOrderId())
-                                .setPrice(price)
-                                .setToken(purchase.getToken())
-                                .setDeveloperPayload(purchase.getDeveloperPayload()))
-                        .build();
+                        .setNewName(newName);
+                if (purchase != null) {
+                        pb.setPurchaseInfo(Messages.PurchaseInfo.newBuilder()
+                          .setSku(purchase.getSku())
+                          .setOrderId(purchase.getOrderId())
+                          .setPrice(price)
+                          .setToken(purchase.getToken())
+                          .setDeveloperPayload(purchase.getDeveloperPayload()));
+                }
 
                 Messages.Star star_pb;
                 try {
-                    star_pb = ApiClient.putProtoBuf(url, pb, Messages.Star.class);
+                    star_pb = ApiClient.putProtoBuf(url, pb.build(), Messages.Star.class);
                     Star star = new Star();
                     star.fromProtocolBuffer(star_pb);
 

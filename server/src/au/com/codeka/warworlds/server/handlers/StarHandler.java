@@ -60,8 +60,10 @@ public class StarHandler extends RequestHandler {
             throw new RequestException(e);
         }
 
-        new PurchaseController().addPurchase(getSession().getEmpireID(), star_rename_request_pb.getPurchaseInfo(),
-                star_rename_request_pb);
+        if (star_rename_request_pb.hasPurchaseInfo()) {
+            new PurchaseController().addPurchase(getSession().getEmpireID(), star_rename_request_pb.getPurchaseInfo(),
+                    star_rename_request_pb);
+        }
 
         Star star = new StarController().getStar(starID);
         Messages.Star.Builder star_pb = Messages.Star.newBuilder();

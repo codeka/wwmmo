@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <ImageView android:id="@+id/star_icon"
+               android:layout_width="48dp"
+               android:layout_height="48dp" />
+
+    <TextView android:id="@+id/star_name"
+              android:layout_toRightOf="@id/star_icon"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:layout_alignTop="@id/star_icon"
+              android:text="Wormhole Name"
+              android:textAppearance="?android:attr/textAppearanceMedium" />
+
+    <TextView android:id="@+id/star_rename_info"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:layout_below="@id/star_name"
+              android:layout_toRightOf="@id/star_icon"
+              android:text="The name of the wormhole is used to identify it from the other wormholes in your alliance. Enter a name below:" />
+
+    <EditText android:id="@+id/star_newname"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:layout_below="@id/star_rename_info"
+              android:inputType="textCapWords"
+              android:layout_marginTop="6dp" />
+
+</RelativeLayout>
