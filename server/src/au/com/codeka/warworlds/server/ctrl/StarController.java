@@ -822,6 +822,12 @@ public class StarController {
          */
         private void checkNativeColonies(List<Star> stars) throws Exception {
             for (Star star : stars) {
+                // marker and wormhole don't get colonies anyway
+                if (star.getStarType().getType() == Star.Type.Marker ||
+                        star.getStarType().getType() == Star.Type.Wormhole) {
+                    continue;
+                }
+
                 // first, make sure there's no colonies and no fleets
                 if (!star.getColonies().isEmpty() || !star.getFleets().isEmpty()) {
                     continue;

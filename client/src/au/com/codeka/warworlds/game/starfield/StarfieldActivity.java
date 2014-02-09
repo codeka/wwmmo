@@ -21,6 +21,7 @@ import android.widget.TextView;
 import au.com.codeka.common.model.BaseColony;
 import au.com.codeka.common.model.BaseFleet;
 import au.com.codeka.common.model.BaseStar;
+import au.com.codeka.common.model.BaseStar.StarType;
 import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.ServerGreeter;
@@ -34,6 +35,7 @@ import au.com.codeka.warworlds.game.SitrepActivity;
 import au.com.codeka.warworlds.game.StarRenameDialog;
 import au.com.codeka.warworlds.game.alliance.AllianceActivity;
 import au.com.codeka.warworlds.game.solarsystem.SolarSystemActivity;
+import au.com.codeka.warworlds.game.wormhole.WormholeActivity;
 import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.EmpireShieldManager;
 import au.com.codeka.warworlds.model.Fleet;
@@ -161,7 +163,12 @@ public class StarfieldActivity extends BaseStarfieldActivity
                     return;
                 }
 
-                Intent intent = new Intent(mContext, SolarSystemActivity.class);
+                Intent intent;
+                if (mSelectedStar.getStarType().getType() == Star.Type.Wormhole) {
+                    intent = new Intent(mContext, WormholeActivity.class);
+                } else {
+                    intent = new Intent(mContext, SolarSystemActivity.class);
+                }
                 intent.putExtra("au.com.codeka.warworlds.StarKey", mSelectedStar.getKey());
                 startActivityForResult(intent, SOLAR_SYSTEM_REQUEST);
             }
@@ -472,12 +479,12 @@ public class StarfieldActivity extends BaseStarfieldActivity
      *         is centered on the given star.
      */
     public void navigateToPlanet(Star star, Planet planet, boolean scrollView) {
-        navigateToPlanet(star.getSectorX(), star.getSectorY(), star.getKey(),
+        navigateToPlanet(star.getStarType(), star.getSectorX(), star.getSectorY(), star.getKey(),
                          star.getOffsetX(), star.getOffsetY(), planet.getIndex(),
                          scrollView);
     }
 
-    private void navigateToPlanet(long sectorX, long sectorY, String starKey, int starOffsetX,
+    private void navigateToPlanet(StarType starType, long sectorX, long sectorY, String starKey, int starOffsetX,
                                   int starOffsetY, int planetIndex, boolean scrollView) {
         if (scrollView) {
             int offsetX = starOffsetX;
@@ -485,8 +492,12 @@ public class StarfieldActivity extends BaseStarfieldActivity
             mStarfield.scrollTo(sectorX, sectorY, offsetX, Sector.SECTOR_SIZE - offsetY);
         }
 
-        Intent intent = new Intent(mContext, SolarSystemActivity.class);
-        intent.putExtra("au.com.codeka.warworlds.StarKey", starKey);
+        Intent intent;
+        if (starType.getType() == Star.Type.Wormhole) {
+            intent = new Intent(mContext, WormholeActivity.class);
+        } else {
+            intent = new Intent(mContext, SolarSystemActivity.class);
+        }        intent.putExtra("au.com.codeka.warworlds.StarKey", starKey);
         intent.putExtra("au.com.codeka.warworlds.PlanetIndex", planetIndex);
         startActivityForResult(intent, SOLAR_SYSTEM_REQUEST);
     }
@@ -627,17 +638,22 @@ public class StarfieldActivity extends BaseStarfieldActivity
             EmpireActivity.EmpireActivityResult res = EmpireActivity.EmpireActivityResult.fromValue(
                     intent.getIntExtra("au.com.codeka.warworlds.Result", 0));
 
-            long sectorX = intent.getLongExtra("au.com.codeka.warworlds.SectorX", 0);
-            long sectorY = intent.getLongExtra("au.com.codeka.warworlds.SectorY", 0);
-            int starOffsetX = intent.getIntExtra("au.com.codeka.warworlds.StarOffsetX", 0);
-            int starOffsetY = intent.getIntExtra("au.com.codeka.warworlds.StarOffsetY", 0);
-            String starKey = intent.getStringExtra("au.com.codeka.warworlds.StarKey");
+            final long sectorX = intent.getLongExtra("au.com.codeka.warworlds.SectorX", 0);
+            final long sectorY = intent.getLongExtra("au.com.codeka.warworlds.SectorY", 0);
+            final int starOffsetX = intent.getIntExtra("au.com.codeka.warworlds.StarOffsetX", 0);
+            final int starOffsetY = intent.getIntExtra("au.com.codeka.warworlds.StarOffsetY", 0);
+            final String starKey = intent.getStringExtra("au.com.codeka.warworlds.StarKey");
 
             if (res == EmpireActivity.EmpireActivityResult.NavigateToPlanet) {
-                int planetIndex = intent.getIntExtra("au.com.codeka.warworlds.PlanetIndex", 0);
+                final int planetIndex = intent.getIntExtra("au.com.codeka.warworlds.PlanetIndex", 0);
 
-                navigateToPlanet(sectorX, sectorY, starKey, starOffsetX, starOffsetY,
-                                 planetIndex, true);
+                StarManager.getInstance().requestStarSummary(starKey, new StarManager.StarSummaryFetchedHandler() {
+                    @Override
+                    public void onStarSummaryFetched(StarSummary s) {
+                        navigateToPlanet(s.getStarType(), sectorX, sectorY, starKey, starOffsetX, starOffsetY,
+                                planetIndex, true);
+                    }
+                });
             } else if (res == EmpireActivity.EmpireActivityResult.NavigateToFleet) {
                 String fleetKey = intent.getStringExtra("au.com.codeka.warworlds.FleetKey");
 
