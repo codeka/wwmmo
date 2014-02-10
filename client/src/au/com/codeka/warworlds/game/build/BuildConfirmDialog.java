@@ -2,6 +2,8 @@ package au.com.codeka.warworlds.game.build;
 
 import org.joda.time.DateTime;
 
+import com.google.protobuf.InvalidProtocolBufferException;
+
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.DialogInterface;
@@ -16,7 +18,11 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
+import au.com.codeka.common.model.BaseBuilding;
+import au.com.codeka.common.model.BaseColony;
 import au.com.codeka.common.model.Design;
+import au.com.codeka.common.model.DesignKind;
+import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.StyledDialog;
 import au.com.codeka.warworlds.ctrl.BuildEstimateView;
@@ -24,10 +30,12 @@ import au.com.codeka.warworlds.model.BuildManager;
 import au.com.codeka.warworlds.model.BuildRequest;
 import au.com.codeka.warworlds.model.Building;
 import au.com.codeka.warworlds.model.Colony;
+import au.com.codeka.warworlds.model.DesignManager;
 import au.com.codeka.warworlds.model.EmpirePresence;
 import au.com.codeka.warworlds.model.SpriteDrawable;
 import au.com.codeka.warworlds.model.SpriteManager;
 import au.com.codeka.warworlds.model.Star;
+import au.com.codeka.warworlds.model.StarSummary;
 
 public class BuildConfirmDialog extends DialogFragment {
     private Star mStar;
@@ -54,9 +62,61 @@ public class BuildConfirmDialog extends DialogFragment {
     }
 
     @Override
+    public void onSaveInstanceState(Bundle state) {
+        super.onSaveInstanceState(state);
+
+        state.putString("au.com.codeka.warworlds.DesignID", mDesign.getID());
+        state.putInt("au.com.codeka.warworlds.DesignKind", mDesign.getDesignKind().getValue());
+        state.putString("au.com.codeka.warworlds.ColonyKey", mColony.getKey());;
+
+        Messages.Star.Builder star_pb = Messages.Star.newBuilder();
+        mStar.toProtocolBuffer(star_pb);
+        state.putByteArray("au.com.codeka.warworlds.Star", star_pb.build().toByteArray());
+
+        if (mExistingBuilding != null) {
+            state.putString("au.com.codeka.warworlds.ExistingBuildingKey", mExistingBuilding.getKey());
+        }
+    }
+
+    private void restoreSavedInstanceState(Bundle savedInstanceState) {
+        byte[] bytes = savedInstanceState.getByteArray("au.com.codeka.warworlds.Star");
+        try {
+            Messages.Star star_pb;
+            star_pb = Messages.Star.parseFrom(bytes);
+            mStar = new Star();
+            mStar.fromProtocolBuffer(star_pb);
+        } catch (InvalidProtocolBufferException e) {
+        }
+
+        String colonyKey = savedInstanceState.getString("au.com.codeka.warworlds.ColonyKey");
+        for (BaseColony baseColony : mStar.getColonies()) {
+            if (baseColony.getKey().equals(colonyKey)) {
+                mColony = (Colony) baseColony;
+            }
+        }
+
+        String existingBuildingKey = savedInstanceState.getString("au.com.codeka.warworlds.ExistingBuildingKey");
+        if (existingBuildingKey != null) {
+            for (BaseBuilding baseBuilding : mColony.getBuildings()) {
+                if (baseBuilding.getKey().equals(existingBuildingKey)) {
+                    mExistingBuilding = (Building) baseBuilding;
+                }
+            }
+        }
+
+        DesignKind designKind = DesignKind.fromNumber(savedInstanceState.getInt("au.com.codeka.warworlds.DesignKind"));
+        String designID = savedInstanceState.getString("au.com.codeka.warworlds.DesignID");
+        mDesign = DesignManager.i.getDesign(designKind, designID);
+    }
+
+    @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         LayoutInflater inflater = getActivity().getLayoutInflater();
         mView = inflater.inflate(R.layout.build_confirm_dlg, null);
+
+        if (savedInstanceState != null) {
+            restoreSavedInstanceState(savedInstanceState);
+        }
 
         final SeekBar countSeekBar = (SeekBar) mView.findViewById(R.id.build_count_seek);
         final EditText countEdit = (EditText) mView.findViewById(R.id.build_count_edit);
