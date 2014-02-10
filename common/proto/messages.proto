@@ -556,6 +556,17 @@ message Star
     // If we're in the middle of combat, this will be the combat report for what's currently
     // going on.
     optional CombatReport current_combat_report = 19;
+
+    // These are extra details stored with a star, usually specific to the type of star it is.
+    message StarExtra
+    {
+        // The following are used by wormholes to store their state.
+        optional int32 wormhole_dest_star_id = 1;
+        optional int64 wormhole_tune_complete_time = 2;
+        repeated int64 wormhole_tune_history = 3;
+        optional int32 wormhole_empire_id = 4;
+    }
+    optional StarExtra extra = 20;
 }
 
 

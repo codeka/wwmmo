@@ -1,6 +1,7 @@
 package au.com.codeka.warworlds.server.model;
 
 import java.io.IOException;
+import java.sql.Blob;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
@@ -69,6 +70,18 @@ public class Star extends BaseStar {
             }
         } catch (IOException e) {
         }
+
+        try {
+            Blob extraBlob = rs.getBlob("extra");
+            if (!rs.wasNull()) {
+                Messages.Star.StarExtra star_extra_pb = Messages.Star.StarExtra.parseFrom(extraBlob.getBinaryStream());
+                if (star_extra_pb.hasWormholeEmpireId()) {
+                    mWormholeExtra = new WormholeExtra();
+                    mWormholeExtra.fromProtocolBuffer(star_extra_pb);
+                }
+            }
+        } catch (IOException e) {
+        }
     }
 
     public int getSectorID() {
@@ -109,6 +122,9 @@ public class Star extends BaseStar {
     }
     public void setStarType(StarType type) {
         mStarType = type;
+    }
+    public void setWormholeExtra(WormholeExtra extra) {
+        mWormholeExtra = extra;
     }
 
     public ArrayList<ScoutReport> getScoutReports() {

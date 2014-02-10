@@ -302,7 +302,7 @@ public class StarController {
             ArrayList<Star> stars = new ArrayList<Star>();
             final String sql = "SELECT stars.id, sector_id, name, sectors.x AS sector_x," +
                                      " sectors.y AS sector_y, stars.x, stars.y, size, star_type, planets," +
-                                     " last_simulation, time_emptied" +
+                                     " extra, last_simulation, time_emptied" +
                               " FROM stars" +
                               " INNER JOIN sectors ON stars.sector_id = sectors.id" +
                               " WHERE stars.id IN "+buildInClause(ids);

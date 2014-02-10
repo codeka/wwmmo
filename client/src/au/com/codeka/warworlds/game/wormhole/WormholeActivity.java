@@ -1,12 +1,14 @@
 package au.com.codeka.warworlds.game.wormhole;
 
 import java.io.IOException;
+import java.util.Locale;
 
 import org.andengine.engine.camera.Camera;
 import org.andengine.engine.camera.ZoomCamera;
 import org.andengine.entity.scene.Scene;
 
 import android.os.Bundle;
+import android.text.Html;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
@@ -43,6 +45,14 @@ public class WormholeActivity extends BaseGlActivity implements StarManager.Star
                 dialog.show(getSupportFragmentManager(), "");
             }
         });
+
+        Button destinationBtn = (Button) findViewById(R.id.destination_btn);
+        destinationBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                
+            }
+        });
     }
 
     @Override
@@ -65,14 +75,26 @@ public class WormholeActivity extends BaseGlActivity implements StarManager.Star
         Bundle extras = getIntent().getExtras();
         String starKey = extras.getString("au.com.codeka.warworlds.StarKey");
 
+        TextView starName  = (TextView) findViewById(R.id.star_name);
+        TextView destinationName = (TextView) findViewById(R.id.destination_name);
+
         if (!s.getKey().equals(starKey)) {
+            int starID = Integer.parseInt(s.getKey());
+            if (mStar != null && mStar.getWormholeExtra().getDestWormholeID() == starID) {
+                destinationName.setText(String.format(Locale.ENGLISH, "→ %s", s.getName()));
+            }
+
             return;
         }
 
         mStar = s;
 
-        TextView starName  = (TextView) findViewById(R.id.star_name);
-
+        if (destinationName.getText().toString().equals("")) {
+            destinationName.setText(Html.fromHtml("→ <i>None</i>"));
+            if (mStar.getWormholeExtra().getDestWormholeID() != 0) {
+                StarManager.getInstance().requestStar(Integer.toString(mStar.getWormholeExtra().getDestWormholeID()), false, this);
+            }
+        }
         starName.setText(mStar.getName());
     }
 

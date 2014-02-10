@@ -92,6 +92,7 @@ public abstract class BaseStar {
     protected DateTime mLastSimulation;
     protected DateTime mTimeEmptied;
     protected BaseCombatReport mCombatReport;
+    protected WormholeExtra mWormholeExtra;
 
     protected BaseStar() {
         mColonies = null;
@@ -151,6 +152,9 @@ public abstract class BaseStar {
     }
     public DateTime getTimeEmptied() {
         return mTimeEmptied;
+    }
+    public WormholeExtra getWormholeExtra() {
+        return mWormholeExtra;
     }
 
     public List<BaseColony> getColonies() {
@@ -292,6 +296,10 @@ public abstract class BaseStar {
             mCombatReport = createCombatReport(pb.getCurrentCombatReport());
         }
 
+        if (pb.hasExtra() && pb.getExtra().hasWormholeEmpireId()) {
+            mWormholeExtra = new WormholeExtra();
+            mWormholeExtra.fromProtocolBuffer(pb.getExtra());
+        }
     }
 
     public void toProtocolBuffer(Messages.Star.Builder pb) {
@@ -364,6 +372,18 @@ public abstract class BaseStar {
                 mCombatReport.toProtocolBuffer(combat_report_pb);
                 pb.setCurrentCombatReport(combat_report_pb);
             }
+        }
+
+        Messages.Star.StarExtra.Builder star_extra_pb = null;
+        if (mWormholeExtra != null) {
+            if (star_extra_pb == null) {
+                star_extra_pb = Messages.Star.StarExtra.newBuilder();
+            }
+            mWormholeExtra.toProtocolBuffer(star_extra_pb);
+        }
+
+        if (star_extra_pb != null) {
+            pb.setExtra(star_extra_pb);
         }
     }
 
@@ -449,6 +469,48 @@ public abstract class BaseStar {
             public StarType build() {
                 return mStarType;
             }
+        }
+    }
+
+    public static class WormholeExtra {
+        private int mDestWormholeID;
+        private DateTime mTuneCompleteTime;
+        private List<DateTime> mTuneHistory;
+        private int mEmpireID;
+
+        public WormholeExtra() {
+        }
+
+        public int getDestWormholeID() {
+            return mDestWormholeID;
+        }
+        public DateTime getTuneCompleteTime() {
+            return mTuneCompleteTime;
+        }
+        public List<DateTime> getTuneHistory() {
+            return mTuneHistory;
+        }
+        public int getEmpireID() {
+            return mEmpireID;
+        }
+
+        public void fromProtocolBuffer(Messages.Star.StarExtra pb) {
+            mDestWormholeID = pb.getWormholeDestStarId();
+            mTuneCompleteTime = new DateTime(pb.getWormholeTuneCompleteTime() * 1000);
+            mTuneHistory = new ArrayList<DateTime>();
+            for (int i = 0; i < pb.getWormholeTuneHistoryCount(); i++) {
+                mTuneHistory.add(new DateTime(pb.getWormholeTuneHistory(i) * 1000));
+            }
+            mEmpireID = pb.getWormholeEmpireId();
+        }
+
+        public void toProtocolBuffer(Messages.Star.StarExtra.Builder pb) {
+            pb.setWormholeDestStarId(mDestWormholeID);
+            pb.setWormholeTuneCompleteTime(mTuneCompleteTime.getMillis() / 1000);
+            for (DateTime dt : mTuneHistory) {
+                pb.addWormholeTuneHistory(dt.getMillis() / 1000);
+            }
+            pb.setWormholeEmpireId(mEmpireID);
         }
     }
 }

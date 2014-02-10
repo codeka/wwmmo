@@ -29,6 +29,7 @@ public class WormholeGeneratorShipEffect extends ShipEffect {
 
         star.setStarType(Star.getStarType(Star.Type.Wormhole));
         star.setName("Wormhole");
+        //star.getW
 
         // TODO: probably not the best place for this to go...
         String sql = "DELETE FROM fleet_upgrades WHERE fleet_id = ?";

@@ -21,10 +21,19 @@
             android:layout_marginBottom="-6dp"
             android:layout_marginRight="-6dp" />
 
-    <TextView android:id="@+id/star_name"
+    <TextView android:id="@+id/destination_name"
               android:layout_width="match_parent"
               android:layout_height="wrap_content"
               android:layout_above="@id/centre"
+              android:layout_alignParentLeft="true"
+              android:layout_toLeftOf="@id/centre"
+              android:gravity="center_horizontal"
+              android:textAppearance="?android:attr/textAppearanceMedium" />
+
+    <TextView android:id="@+id/star_name"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:layout_above="@id/destination_name"
               android:layout_alignParentLeft="true"
               android:layout_toLeftOf="@id/centre"
               android:gravity="center_horizontal"
