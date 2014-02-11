@@ -753,20 +753,9 @@ public class StarfieldActivity extends BaseStarfieldActivity
         }
 
         starName.setText(mSelectedStar.getName());
-        int offsetX = (int)(mSelectedStar.getOffsetX() / (float) Sector.SECTOR_SIZE * 1000.0f);
-        if (mSelectedStar.getSectorX() < 0) {
-            offsetX = 1000 - offsetX;
-        }
-        offsetX /= Sector.PIXELS_PER_PARSEC;
-        int offsetY = (int)(mSelectedStar.getOffsetY() / (float) Sector.SECTOR_SIZE * 1000.0f);
-        if (mSelectedStar.getSectorY() < 0) {
-            offsetY = 1000 - offsetY;
-        }
-        offsetY /= Sector.PIXELS_PER_PARSEC;
-        starKind.setText(String.format(Locale.ENGLISH, "%s [%d.%02d,%d.%02d]",
+        starKind.setText(String.format(Locale.ENGLISH, "%s %s",
                 mSelectedStar.getStarType().getShortName(),
-                mSelectedStar.getSectorX(), offsetX,
-                mSelectedStar.getSectorY(), offsetY));
+                mSelectedStar.getCoordinateString()));
         Sprite starImage = StarImageManager.getInstance().getSprite(mSelectedStar, 80, true);
         starIcon.setImageDrawable(new SpriteDrawable(starImage));
     }

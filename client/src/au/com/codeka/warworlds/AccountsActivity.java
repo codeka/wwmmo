@@ -23,7 +23,6 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
-import au.com.codeka.warworlds.model.EmpireManager;
 
 /**
  * Account selections activity - handles device registration and unregistration.

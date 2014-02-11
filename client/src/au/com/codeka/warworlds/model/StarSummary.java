@@ -1,5 +1,7 @@
 package au.com.codeka.warworlds.model;
 
+import java.util.Locale;
+
 import au.com.codeka.common.model.BaseBuildRequest;
 import au.com.codeka.common.model.BaseBuilding;
 import au.com.codeka.common.model.BaseColony;
@@ -91,5 +93,19 @@ public class StarSummary extends BaseStar {
         return clone;
     }
 
-
+    public String getCoordinateString() {
+        int offsetX = (int)(mOffsetX / (float) Sector.SECTOR_SIZE * 1000.0f);
+        if (mSectorX < 0) {
+            offsetX = 1000 - offsetX;
+        }
+        offsetX /= Sector.PIXELS_PER_PARSEC;
+        int offsetY = (int)(mOffsetY / (float) Sector.SECTOR_SIZE * 1000.0f);
+        if (mSectorY < 0) {
+            offsetY = 1000 - offsetY;
+        }
+        offsetY /= Sector.PIXELS_PER_PARSEC;
+        return String.format(Locale.ENGLISH, "[%d.%02d,%d.%02d]",
+                mSectorX, offsetX,
+                mSectorY, offsetY);
+    }
 }

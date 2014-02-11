@@ -185,7 +185,7 @@ public class SectorController {
         public List<Star> getStarsForSectors(int[] sectorIds) throws Exception {
             String sql = "SELECT stars.id, sector_id, name, sectors.x AS sector_x," +
                                " sectors.y AS sector_y, stars.x, stars.y, size, star_type, planets," +
-                               " last_simulation, time_emptied" +
+                               " extra, last_simulation, time_emptied" +
                         " FROM stars" +
                         " INNER JOIN sectors ON stars.sector_id = sectors.id" +
                         " WHERE sector_id IN "+buildInClause(sectorIds);

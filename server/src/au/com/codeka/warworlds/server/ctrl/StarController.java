@@ -35,6 +35,7 @@ import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.data.SqlStmt;
 import au.com.codeka.warworlds.server.data.Transaction;
 import au.com.codeka.warworlds.server.designeffects.RadarBuildingEffect;
+import au.com.codeka.warworlds.server.model.Alliance;
 import au.com.codeka.warworlds.server.model.BuildRequest;
 import au.com.codeka.warworlds.server.model.Building;
 import au.com.codeka.warworlds.server.model.BuildingPosition;
@@ -79,6 +80,15 @@ public class StarController {
             idArray[i++] = id;
         }
         return db.getStars(idArray);
+    }
+
+    public List<Star> getWormholesForAlliance(int allianceID) throws RequestException {
+        Alliance alliance = new AllianceController().getAlliance(allianceID);
+        try {
+            return db.getWormholesForAlliance(alliance);
+        } catch(Exception e) {
+            throw new RequestException(e);
+        }
     }
 
     public Star addMarkerStar(long sectorX, long sectorY, int offsetX, int offsetY) throws RequestException {
@@ -343,6 +353,32 @@ public class StarController {
                 throw new RequestException(e);
             }
             return stars;
+        }
+
+        public List<Star> getWormholesForAlliance(Alliance alliance) throws Exception {
+            String sql = "SELECT stars.id, sector_id, name, sectors.x AS sector_x," +
+                               " sectors.y AS sector_y, stars.x, stars.y, size, star_type, planets," +
+                               " extra, last_simulation, time_emptied" +
+                        " FROM stars" +
+                        " INNER JOIN sectors ON stars.sector_id = sectors.id" +
+                        " WHERE star_type = "+Star.Type.Wormhole.ordinal();
+            try (SqlStmt stmt = prepare(sql)) {
+                ResultSet rs = stmt.select();
+
+                ArrayList<Star> stars = new ArrayList<Star>();
+                while (rs.next()) {
+                    Star star = new Star(rs);
+                    if (star.getWormholeExtra() == null) {
+                        continue;
+                    }
+                    int empireID = star.getWormholeExtra().getEmpireID();
+                    if (alliance.isEmpireMember(empireID)) {
+                        stars.add(star);
+                    }
+                }
+
+                return stars;
+            }
         }
 
         public int addStar(int sectorID, int x, int y, int size, String name, Star.Type starType, Planet[] planets) throws Exception {

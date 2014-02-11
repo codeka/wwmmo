@@ -66,6 +66,36 @@ public class AllianceManager {
         }.execute();
     }
 
+    public void fetchWormholes(final int allianceID, final FetchWormholesCompleteHandler handler) {
+        new BackgroundRunner<List<Star>>() {
+            @Override
+            protected List<Star> doInBackground() {
+                ArrayList<Star> wormholes;
+
+                String url = "alliances/"+allianceID+"/wormholes";
+                try {
+                    Messages.Stars pb = ApiClient.getProtoBuf(url, Messages.Stars.class);
+                    wormholes = new ArrayList<Star>();
+                    for (Messages.Star star_pb : pb.getStarsList()) {
+                        Star wormhole = new Star();
+                        wormhole.fromProtocolBuffer(star_pb);
+                        wormholes.add(wormhole);
+                    }
+                    return wormholes;
+                } catch(ApiException e) {
+                    return null;
+                }
+            }
+
+            @Override
+            protected void onComplete(List<Star> wormholes) {
+                if (handler != null && wormholes != null) {
+                    handler.onWormholesFetched(wormholes);
+                }
+            }
+        }.execute();
+    }
+
     /**
      * Fetches details, including memberships, of the alliance with the given key.
      */
@@ -263,5 +293,8 @@ public class AllianceManager {
     }
     public interface FetchRequestsCompleteHandler {
         void onRequestsFetched(Map<Integer, Empire> empires, List<AllianceRequest> requests);
+    }
+    public interface FetchWormholesCompleteHandler {
+        void onWormholesFetched(List<Star> wormholes);
     }
 }

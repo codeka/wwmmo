@@ -1,0 +1,219 @@
+package au.com.codeka.warworlds.game.wormhole;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+import java.util.TreeMap;
+import java.util.TreeSet;
+
+import android.app.Activity;
+import android.app.Dialog;
+import android.content.DialogInterface;
+import android.graphics.Bitmap;
+import android.os.Bundle;
+import android.support.v4.app.DialogFragment;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.BaseAdapter;
+import android.widget.ImageView;
+import android.widget.ListView;
+import android.widget.TextView;
+import au.com.codeka.warworlds.R;
+import au.com.codeka.warworlds.StyledDialog;
+import au.com.codeka.warworlds.model.AllianceManager;
+import au.com.codeka.warworlds.model.Empire;
+import au.com.codeka.warworlds.model.EmpireManager;
+import au.com.codeka.warworlds.model.EmpireShieldManager;
+import au.com.codeka.warworlds.model.MyEmpire;
+import au.com.codeka.warworlds.model.Sector;
+import au.com.codeka.warworlds.model.Sprite;
+import au.com.codeka.warworlds.model.SpriteDrawable;
+import au.com.codeka.warworlds.model.Star;
+import au.com.codeka.warworlds.model.StarImageManager;
+
+public class DestinationDialog extends DialogFragment {
+    private Star mSrcWormhole;
+    private Star mDestWormhole;
+    private View mView;
+    private WormholeAdapter mWormholeAdapter;
+    private TreeMap<String, Empire> mEmpires;
+
+    public void loadWormholes(Star srcWormhole) {
+        mSrcWormhole = srcWormhole;
+
+        if (mEmpires == null) {
+            mEmpires = new TreeMap<String, Empire>();
+        }
+    }
+
+    @Override
+    public Dialog onCreateDialog(Bundle savedInstanceState) {
+        final Activity activity = getActivity();
+        LayoutInflater inflater = activity.getLayoutInflater();
+        mView = inflater.inflate(R.layout.wormhole_destination_dlg, null);
+
+        final View progressBar = mView.findViewById(R.id.progress_bar);
+        final ListView wormholeItems = (ListView) mView.findViewById(R.id.wormholes);
+
+        progressBar.setVisibility(View.VISIBLE);
+        wormholeItems.setVisibility(View.GONE);
+
+        mWormholeAdapter = new WormholeAdapter();
+        wormholeItems.setAdapter(mWormholeAdapter);
+
+        MyEmpire myEmpire = EmpireManager.i.getEmpire();
+        if (myEmpire.getAlliance() != null) {
+            AllianceManager.i.fetchWormholes(Integer.parseInt(myEmpire.getAlliance().getKey()),
+                new AllianceManager.FetchWormholesCompleteHandler() {
+                    @Override
+                    public void onWormholesFetched(List<Star> wormholes) {
+                        DestinationDialog.this.onWormholesFetched(wormholes);
+                    }
+                });
+        }
+
+        StyledDialog.Builder b = new StyledDialog.Builder(getActivity());
+        b.setView(mView);
+        b.setPositiveButton("Tune", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface d, int id) {
+                onTuneClicked();
+                d.dismiss();
+            }
+        });
+        b.setNegativeButton("Cancel", null);
+
+        final StyledDialog dialog = b.create();
+        dialog.setOnShowListener(new DialogInterface.OnShowListener() {
+            @Override
+            public void onShow(DialogInterface d) {
+                dialog.getPositiveButton().setEnabled(false);
+            }
+        });
+
+        wormholeItems.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Star star = (Star) mWormholeAdapter.getItem(position);
+                mDestWormhole = star;
+                mWormholeAdapter.notifyDataSetChanged();
+                dialog.getPositiveButton().setEnabled(true);
+            }
+        });
+
+        return dialog;
+    }
+
+    private void onWormholesFetched(List<Star> wormholes) {
+        final View progressBar = mView.findViewById(R.id.progress_bar);
+        final ListView wormholeItems = (ListView) mView.findViewById(R.id.wormholes);
+
+        progressBar.setVisibility(View.GONE);
+        wormholeItems.setVisibility(View.VISIBLE);
+
+        TreeSet<String> empireKeys = new TreeSet<String>();
+        for (Star wormhole : wormholes){
+            String empireKey = Integer.toString(wormhole.getWormholeExtra().getEmpireID());
+            if (!empireKeys.contains(empireKey)) {
+                empireKeys.add(empireKey);
+            }
+        }
+        for (String empireKey : empireKeys) {
+            if (mEmpires.containsKey(empireKey)) {
+                continue;
+            }
+
+            EmpireManager.i.fetchEmpire(empireKey,
+                    new EmpireManager.EmpireFetchedHandler() {
+                        @Override
+                        public void onEmpireFetched(Empire empire) {
+                            mEmpires.put(empire.getKey(), empire);
+                            mWormholeAdapter.notifyDataSetChanged();
+                        }
+                    });
+        }
+
+        mWormholeAdapter.setWormholes(wormholes);
+    }
+
+    public void onTuneClicked() {
+        
+    }
+
+    private class WormholeAdapter extends BaseAdapter {
+        private List<Star> mWormholes;
+
+        public void setWormholes(List<Star> wormholes) {
+            ArrayList<Star> availableWormholes = new ArrayList<Star>();
+            for (Star wormhole : wormholes) {
+                if (wormhole.getKey().equals(mSrcWormhole.getKey())) {
+                    continue;
+                }
+                availableWormholes.add(wormhole);
+            }
+
+            mWormholes = availableWormholes;
+            notifyDataSetChanged();
+        }
+
+        @Override
+        public int getCount() {
+            return (mWormholes == null ? 0 : mWormholes.size());
+        }
+
+        @Override
+        public Object getItem(int position) {
+            return mWormholes.get(position);
+        }
+
+        @Override
+        public long getItemId(int position) {
+            return position;
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            Star wormhole = mWormholes.get(position);
+            View view = convertView;
+            if (view == null) {
+                LayoutInflater inflater = getActivity().getLayoutInflater();
+                view = inflater.inflate(R.layout.wormhole_destination_entry_row, null);
+            }
+
+            ImageView starIcon = (ImageView) view.findViewById(R.id.star_icon);
+            ImageView empireIcon = (ImageView) view.findViewById(R.id.empire_icon);
+            TextView wormholeName = (TextView) view.findViewById(R.id.wormhole_name);
+            TextView empireName = (TextView) view.findViewById(R.id.empire_name);
+            TextView distance = (TextView) view.findViewById(R.id.distance);
+
+            Empire empire = mEmpires.get(Integer.toString(wormhole.getWormholeExtra().getEmpireID()));
+            if (empire == null) {
+                empireIcon.setImageBitmap(null);
+                empireName.setText("");
+            } else {
+                Bitmap bmp = EmpireShieldManager.i.getShield(getActivity(), empire);
+                empireIcon.setImageBitmap(bmp);
+                empireName.setText(empire.getDisplayName());
+            }
+
+            Sprite starSprite = StarImageManager.getInstance().getSprite(wormhole, 20, true);
+            starIcon.setImageDrawable(new SpriteDrawable(starSprite));
+
+            wormholeName.setText(wormhole.getName());
+
+            float distanceInPc = Sector.distanceInParsecs(mSrcWormhole, wormhole);
+            distance.setText(String.format(Locale.ENGLISH, "%s %.1f pc", 
+                    wormhole.getCoordinateString(), distanceInPc));
+
+            if (mDestWormhole != null && mDestWormhole.getKey().equals(wormhole.getKey())) {
+                view.setBackgroundColor(0xff0c6476);
+            } else {
+                view.setBackgroundColor(0xff000000);
+            }
+
+            return view;
+        }
+    }
+}

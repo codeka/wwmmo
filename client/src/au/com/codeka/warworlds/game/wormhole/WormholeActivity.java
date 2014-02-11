@@ -50,7 +50,9 @@ public class WormholeActivity extends BaseGlActivity implements StarManager.Star
         destinationBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                
+                DestinationDialog dialog = new DestinationDialog();
+                dialog.loadWormholes(mStar);
+                dialog.show(getSupportFragmentManager(), "");
             }
         });
     }

@@ -45,6 +45,15 @@ public class Alliance extends BaseAlliance {
         return mID;
     }
 
+    public boolean isEmpireMember(int empireID) {
+        for (BaseAllianceMember baseAllianceMember : mMembers) {
+            if (Integer.parseInt(baseAllianceMember.getEmpireKey()) == empireID) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     @Override
     protected BaseAllianceMember createAllianceMember(Messages.AllianceMember pb) {
         AllianceMember am = new AllianceMember();
