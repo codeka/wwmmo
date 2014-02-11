@@ -15,6 +15,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -402,6 +403,10 @@ public class SitrepActivity extends BaseActivity
                 items = new ArrayList<SituationReport>();
             }
 
+            if (Looper.getMainLooper().getThread() != Thread.currentThread()) {
+                throw new RuntimeException("Called from non-UI thread!");
+            }
+
             mStarSummaries = starSummaries;
             mItems = items;
             notifyDataSetChanged();
@@ -411,6 +416,10 @@ public class SitrepActivity extends BaseActivity
                                 Map<String, StarSummary> starSummaries) {
             if (items == null) {
                 items = new ArrayList<SituationReport>();
+            }
+
+            if (Looper.getMainLooper().getThread() != Thread.currentThread()) {
+                throw new RuntimeException("Called from non-UI thread!");
             }
 
             mStarSummaries = starSummaries;
@@ -480,12 +489,12 @@ public class SitrepActivity extends BaseActivity
                 // note: once this view comes into... view, we'll want to load the next
                 // lot of reports
                 if (mCursor != null) {
-                    mHandler.post(new Runnable() {
+                    mHandler.postDelayed(new Runnable() {
                         @Override
                         public void run() {
                             fetchNextReportItems();
                         }
-                    });
+                    }, 100);
                 }
 
                 return view;
