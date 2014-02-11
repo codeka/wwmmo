@@ -2,8 +2,6 @@ package au.com.codeka.warworlds.game.build;
 
 import org.joda.time.DateTime;
 
-import com.google.protobuf.InvalidProtocolBufferException;
-
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.DialogInterface;
@@ -35,7 +33,8 @@ import au.com.codeka.warworlds.model.EmpirePresence;
 import au.com.codeka.warworlds.model.SpriteDrawable;
 import au.com.codeka.warworlds.model.SpriteManager;
 import au.com.codeka.warworlds.model.Star;
-import au.com.codeka.warworlds.model.StarSummary;
+
+import com.google.protobuf.InvalidProtocolBufferException;
 
 public class BuildConfirmDialog extends DialogFragment {
     private Star mStar;
