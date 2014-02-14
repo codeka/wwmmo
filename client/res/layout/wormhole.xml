@@ -79,7 +79,18 @@
                 android:layout_marginRight="8dp"
                 android:layout_marginTop="10dp"
                 android:text="Tune Destination" />
-        
+
+        <Button android:id="@+id/view_destination_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentBottom="true"
+                android:layout_marginLeft="4dp"
+                android:layout_marginRight="8dp"
+                android:layout_marginBottom="10dp"
+                android:text="View Destination" />
+
     </RelativeLayout>
 
     <RelativeLayout android:id="@+id/ship_pane"

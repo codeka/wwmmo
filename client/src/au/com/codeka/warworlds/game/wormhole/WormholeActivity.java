@@ -10,6 +10,7 @@ import org.andengine.engine.camera.ZoomCamera;
 import org.andengine.entity.scene.Scene;
 import org.joda.time.DateTime;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.FragmentManager;
@@ -29,6 +30,7 @@ import au.com.codeka.warworlds.ctrl.FleetListWormhole;
 import au.com.codeka.warworlds.game.FleetMergeDialog;
 import au.com.codeka.warworlds.game.FleetMoveActivity;
 import au.com.codeka.warworlds.game.FleetSplitDialog;
+import au.com.codeka.warworlds.game.solarsystem.SolarSystemActivity;
 import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.EmpireShieldManager;
 import au.com.codeka.warworlds.model.Fleet;
@@ -74,6 +76,21 @@ public class WormholeActivity extends BaseGlActivity implements StarManager.Star
                 dialog.show(getSupportFragmentManager(), "");
             }
         });
+
+        Button viewDestinationBtn = (Button) findViewById(R.id.view_destination_btn);
+        viewDestinationBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mDestStar == null) {
+                    return;
+                }
+
+                Intent intent = new Intent(WormholeActivity.this, WormholeActivity.class);
+                intent.putExtra("au.com.codeka.warworlds.StarKey", mDestStar.getKey());
+                startActivity(intent);
+            }
+        });
+        viewDestinationBtn.setEnabled(false);
 
         FleetListWormhole fleetList = (FleetListWormhole) findViewById(R.id.fleet_list);
         fleetList.setOnFleetActionListener(new FleetList.OnFleetActionListener() {
@@ -158,6 +175,8 @@ public class WormholeActivity extends BaseGlActivity implements StarManager.Star
                 String str = String.format(Locale.ENGLISH, "→ %s", s.getName());
                 if (mTuneCompleteTime != null) {
                     str = "<font color=\"red\">" + str + "</font>";
+                } else {
+                    findViewById(R.id.view_destination_btn).setEnabled(true);
                 }
                 destinationName.setText(Html.fromHtml(str));
             }
