@@ -55,6 +55,8 @@ message GenericError
         FleetBoostNotMoving = 26;
         FleetMoveCannotMoveToEmptySpace = 27;
         FleetMoveCannotMoveToStar = 28;
+        FleetNotOnWormhole = 29;
+        WormholeNotTuned = 30;
     }
 }
 
@@ -592,6 +594,13 @@ message StarRenameRequest
 }
 
 
+message WormholeTuneRequest
+{
+    optional int32 src_star_id = 1;
+    optional int32 dest_star_id = 2;
+}
+
+
 //
 // Represents a planet in the star system. A planet orbits a \c Star which in turn belongs
 // to a \c Sector.
@@ -931,6 +940,7 @@ message FleetOrder
         MOVE = 3;
         SET_STANCE = 5;
         BOOST = 6;
+        ENTER_WORMHOLE = 7;
     }
     required FLEET_ORDER order = 1;
 

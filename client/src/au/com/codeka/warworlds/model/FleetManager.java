@@ -85,7 +85,48 @@ public class FleetManager {
         }.execute();
     }
 
+    public void enterWormhole(final Star star, final Fleet fleet, final FleetEnteredWormholeHandler handler) {
+        if (fleet.getState() != State.IDLE) {
+            // don't call the handler...
+            return;
+        }
+
+        new BackgroundRunner<Boolean>() {
+            @Override
+            protected Boolean doInBackground() {
+                String url = String.format("stars/%s/fleets/%s/orders",
+                                           fleet.getStarKey(),
+                                           fleet.getKey());
+                Messages.FleetOrder fleetOrder = Messages.FleetOrder.newBuilder()
+                               .setOrder(Messages.FleetOrder.FLEET_ORDER.ENTER_WORMHOLE)
+                               .build();
+
+                try {
+                    return ApiClient.postProtoBuf(url, fleetOrder);
+                } catch (ApiException e) {
+                    // TODO: do something..?
+                    return false;
+                }
+            }
+
+            @Override
+            protected void onComplete(Boolean success) {
+                if (success) {
+                    // the star this fleet is attached to needs to be refreshed...
+                    StarManager.getInstance().refreshStar(fleet.getStarKey());
+
+                    if (handler != null) {
+                        handler.onFleetEnteredWormhole(fleet);
+                    }
+                }
+            }
+        }.execute();
+    }
+
     public interface FleetBoostedHandler {
         void onFleetBoosted(Fleet fleet);
+    }
+    public interface FleetEnteredWormholeHandler {
+        void onFleetEnteredWormhole(Fleet fleet);
     }
 }

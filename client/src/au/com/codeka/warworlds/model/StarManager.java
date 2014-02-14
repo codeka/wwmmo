@@ -91,6 +91,12 @@ public class StarManager extends BaseManager {
         mAllStarUpdatedListeners.remove(handler);
     }
 
+    public void updateStar(Star star) {
+        mStarSummaries.remove(star.getKey());
+        mStars.put(star.getKey(), new WeakReference<Star>(star));
+        fireStarUpdated(star);
+    }
+
     public void fireStarUpdated(final Star star) {
         synchronized(mStarUpdatedListeners) {
             List<StarFetchedHandler> listeners = mStarUpdatedListeners.get(star.getKey());
@@ -324,14 +330,10 @@ public class StarManager extends BaseManager {
                     return; // BAD!
                 }
 
-                // if we had the star summary cached, remove it (cause the star itself is newer)
-                mStarSummaries.remove(starKey);
-                mStars.put(starKey, new WeakReference<Star>(star));
-
                 if (callback != null) {
                     callback.onStarFetched(star);
                 }
-                fireStarUpdated(star);
+                updateStar(star);
             }
         }.execute();
     }
@@ -411,11 +413,7 @@ public class StarManager extends BaseManager {
                     return; //TODO: bad!
                 }
 
-                // if we had the star summary cached, remove it (cause the star itself is newer)
-                mStarSummaries.remove(star.getKey());
-                mStars.put(star.getKey(), new WeakReference<Star>(star));
-
-                fireStarUpdated(star);
+                updateStar(star);
             }
         }.execute();
     }

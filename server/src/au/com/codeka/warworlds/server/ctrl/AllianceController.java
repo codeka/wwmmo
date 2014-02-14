@@ -49,6 +49,14 @@ public class AllianceController {
         }
     }
 
+    public boolean isSameAlliance(int empireID1, int empireID2) throws RequestException {
+        try {
+            return db.isSameAlliance(empireID1, empireID2);
+        } catch (Exception e) {
+            throw new RequestException(e);
+        }
+    }
+
     public List<AllianceRequest> getRequests(int allianceID) throws RequestException {
         try {
             return db.getRequests(allianceID);
@@ -131,6 +139,26 @@ public class AllianceController {
         }
         public DataBase(Transaction trans) {
             super(trans);
+        }
+
+        public boolean isSameAlliance(int empireID1, int empireID2) throws Exception {
+            String sql = "SELECT alliance_id FROM empires WHERE id IN (?, ?)";
+            try (SqlStmt stmt = prepare(sql)) {
+                stmt.setInt(1, empireID1);
+                stmt.setInt(2, empireID2);
+                ResultSet rs = stmt.select();
+
+                int allianceID = -1;
+                while (rs.next()) {
+                    if (allianceID < 0) {
+                        allianceID = rs.getInt(1);
+                    } else if (allianceID > 0) {
+                        return rs.getInt(1) == allianceID;
+                    }
+                }
+            }
+
+            return false;
         }
 
         public List<Alliance> getAlliances() throws Exception {

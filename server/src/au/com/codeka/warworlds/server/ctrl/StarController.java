@@ -412,7 +412,8 @@ public class StarController {
             final String sql = "UPDATE stars SET" +
                                  " last_simulation = ?," +
                                  " name = ?," +
-                                 " star_type = ?" +
+                                 " star_type = ?," +
+                                 " extra = ?" +
                               " WHERE id = ?";
             try (SqlStmt stmt = prepare(sql)) {
                 DateTime lastSimulation = star.getLastSimulation();
@@ -430,7 +431,21 @@ public class StarController {
                 stmt.setDateTime(1, lastSimulation);
                 stmt.setString(2, star.getName());
                 stmt.setInt(3, star.getStarType().getType().ordinal());
-                stmt.setInt(4, star.getID());
+
+                Messages.Star.StarExtra.Builder star_extra_pb = null;
+                if (star.getWormholeExtra() != null) {
+                    if (star_extra_pb == null) {
+                        star_extra_pb = Messages.Star.StarExtra.newBuilder();
+                    }
+                    star.getWormholeExtra().toProtocolBuffer(star_extra_pb);
+                }
+                if (star_extra_pb == null) {
+                    stmt.setNull(4);
+                } else {
+                    stmt.setBlob(4, star_extra_pb.build().toByteArray());
+                }
+
+                stmt.setInt(5, star.getID());
                 stmt.update();
             }
 

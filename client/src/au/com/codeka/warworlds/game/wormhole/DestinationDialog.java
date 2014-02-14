@@ -20,8 +20,12 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+import au.com.codeka.BackgroundRunner;
+import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.StyledDialog;
+import au.com.codeka.warworlds.api.ApiClient;
+import au.com.codeka.warworlds.api.ApiException;
 import au.com.codeka.warworlds.model.AllianceManager;
 import au.com.codeka.warworlds.model.Empire;
 import au.com.codeka.warworlds.model.EmpireManager;
@@ -32,6 +36,7 @@ import au.com.codeka.warworlds.model.Sprite;
 import au.com.codeka.warworlds.model.SpriteDrawable;
 import au.com.codeka.warworlds.model.Star;
 import au.com.codeka.warworlds.model.StarImageManager;
+import au.com.codeka.warworlds.model.StarManager;
 
 public class DestinationDialog extends DialogFragment {
     private Star mSrcWormhole;
@@ -139,7 +144,36 @@ public class DestinationDialog extends DialogFragment {
     }
 
     public void onTuneClicked() {
-        
+        if (mDestWormhole == null) {
+            return;
+        }
+
+        new BackgroundRunner<Star>() {
+            @Override
+            protected Star doInBackground() {
+                String url = "stars/"+mSrcWormhole.getKey()+"/wormhole/tune";
+                try {
+                    Messages.WormholeTuneRequest request_pb = Messages.WormholeTuneRequest.newBuilder()
+                            .setSrcStarId(Integer.parseInt(mSrcWormhole.getKey()))
+                            .setDestStarId(Integer.parseInt(mDestWormhole.getKey()))
+                            .build();
+                    Messages.Star pb = ApiClient.postProtoBuf(url, request_pb, Messages.Star.class);
+                    Star star = new Star();
+                    star.fromProtocolBuffer(pb);
+                    return star;
+                } catch(ApiException e) {
+                    return null;
+                }
+            }
+
+            @Override
+            protected void onComplete(Star star) {
+                if (star != null) {
+                    StarManager.getInstance().updateStar(star);
+                }
+            }
+        }.execute();
+
     }
 
     private class WormholeAdapter extends BaseAdapter {

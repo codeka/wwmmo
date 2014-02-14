@@ -63,7 +63,7 @@ import au.com.codeka.warworlds.model.StarSummary;
  */
 public class FleetList extends FrameLayout implements StarManager.StarFetchedHandler {
     private FleetListAdapter mFleetListAdapter;
-    private Fleet mSelectedFleet;
+    protected Fleet mSelectedFleet;
     private List<Fleet> mFleets;
     private Map<String, Star> mStars;
     private Context mContext;
@@ -71,18 +71,18 @@ public class FleetList extends FrameLayout implements StarManager.StarFetchedHan
     private OnFleetActionListener mFleetActionListener;
 
     public FleetList(Context context, AttributeSet attrs) {
-        super(context, attrs);
-        mContext = context;
-
-        View child = inflate(context, R.layout.fleet_list_ctrl, null);
-        this.addView(child);
+        this(context, attrs, R.layout.fleet_list_ctrl);
     }
 
     public FleetList(Context context) {
-        super(context);
+        this(context, null, R.layout.fleet_list_ctrl);
+    }
+
+    protected FleetList(Context context, AttributeSet attrs, int layoutID) {
+        super(context, attrs);
         mContext = context;
 
-        View child = inflate(context, R.layout.fleet_list_ctrl, null);
+        View child = inflate(context, layoutID, null);
         this.addView(child);
     }
 
@@ -140,7 +140,9 @@ public class FleetList extends FrameLayout implements StarManager.StarFetchedHan
         moveBtn.setText("Move");
         if (mSelectedFleet != null) {
             stanceSpinner.setEnabled(true);
-            viewBtn.setEnabled(true);
+            if (viewBtn != null) {
+                viewBtn.setEnabled(true);
+            }
 
             if (mSelectedFleet.getState() == State.IDLE) {
                 moveBtn.setEnabled(true);
@@ -173,7 +175,9 @@ public class FleetList extends FrameLayout implements StarManager.StarFetchedHan
             }
         } else {
             stanceSpinner.setEnabled(false);
-            viewBtn.setEnabled(false);
+            if (viewBtn != null) {
+                viewBtn.setEnabled(false);
+            }
             moveBtn.setEnabled(false);
             splitBtn.setEnabled(false);
             mergeBtn.setEnabled(false);
@@ -284,7 +288,7 @@ public class FleetList extends FrameLayout implements StarManager.StarFetchedHan
         });
 
         final Button viewBtn = (Button) findViewById(R.id.view_btn);
-        viewBtn.setOnClickListener(new View.OnClickListener() {
+        if (viewBtn != null) viewBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (mSelectedFleet == null) {
@@ -313,7 +317,12 @@ public class FleetList extends FrameLayout implements StarManager.StarFetchedHan
             }
         });
 
+        onInitialize();
+
         StarManager.getInstance().addStarUpdatedListener(null, this);
+    }
+
+    protected void onInitialize() {
     }
 
     @Override

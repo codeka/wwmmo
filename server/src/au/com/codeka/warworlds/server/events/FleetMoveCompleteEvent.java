@@ -32,7 +32,7 @@ import au.com.codeka.warworlds.server.model.ScoutReport;
 import au.com.codeka.warworlds.server.model.Star;
 
 public class FleetMoveCompleteEvent extends Event {
-    private final Logger log = LoggerFactory.getLogger(FleetMoveCompleteEvent.class);
+    private final static Logger log = LoggerFactory.getLogger(FleetMoveCompleteEvent.class);
 
     @Override
     public String getNextEventTimeSql() {
@@ -65,7 +65,7 @@ public class FleetMoveCompleteEvent extends Event {
                 }
 
                 try {
-                    processFleet(fleetID, srcStar, destStar);
+                    processFleet(fleetID, srcStar, destStar, true);
                 } catch (Exception e) {
                     log.error("Error processing fleet-move event!", e);
                 }
@@ -75,7 +75,8 @@ public class FleetMoveCompleteEvent extends Event {
         }
     }
 
-    private void processFleet(int fleetID, Star srcStar, Star destStar) throws RequestException {
+    public static void processFleet(int fleetID, Star srcStar, Star destStar,
+            boolean addSitrep) throws RequestException {
         Simulation sim = new Simulation();
         sim.simulate(srcStar);
         sim.simulate(destStar);
@@ -109,33 +110,35 @@ public class FleetMoveCompleteEvent extends Event {
             throw new RequestException(e);
         }
 
-        Messages.SituationReport.Builder sitrep_pb = Messages.SituationReport.newBuilder();
-        sitrep_pb.setRealm(new RealmController().getRealmName());
-        sitrep_pb.setEmpireKey(fleet.getEmpireKey());
-        sitrep_pb.setReportTime(DateTime.now().getMillis() / 1000);
-        sitrep_pb.setStarKey(destStar.getKey());
-        sitrep_pb.setPlanetIndex(-1);
-        Messages.SituationReport.MoveCompleteRecord.Builder move_complete_pb = Messages.SituationReport.MoveCompleteRecord.newBuilder();
-        move_complete_pb.setFleetKey(fleet.getKey());
-        move_complete_pb.setFleetDesignId(fleet.getDesignID());
-        move_complete_pb.setNumShips(fleet.getNumShips());
-        for (ScoutReport scoutReport : destStar.getScoutReports()) {
-            move_complete_pb.setScoutReportKey(scoutReport.getKey());
+        if (addSitrep) {
+            Messages.SituationReport.Builder sitrep_pb = Messages.SituationReport.newBuilder();
+            sitrep_pb.setRealm(new RealmController().getRealmName());
+            sitrep_pb.setEmpireKey(fleet.getEmpireKey());
+            sitrep_pb.setReportTime(DateTime.now().getMillis() / 1000);
+            sitrep_pb.setStarKey(destStar.getKey());
+            sitrep_pb.setPlanetIndex(-1);
+            Messages.SituationReport.MoveCompleteRecord.Builder move_complete_pb = Messages.SituationReport.MoveCompleteRecord.newBuilder();
+            move_complete_pb.setFleetKey(fleet.getKey());
+            move_complete_pb.setFleetDesignId(fleet.getDesignID());
+            move_complete_pb.setNumShips(fleet.getNumShips());
+            for (ScoutReport scoutReport : destStar.getScoutReports()) {
+                move_complete_pb.setScoutReportKey(scoutReport.getKey());
+            }
+            sitrep_pb.setMoveCompleteRecord(move_complete_pb);
+            if (destStar.getCombatReport() != null && isFleetInCombatReport(fleet.getKey(), (CombatReport) destStar.getCombatReport())) {
+                Messages.SituationReport.FleetUnderAttackRecord.Builder fleet_under_attack_pb = Messages.SituationReport.FleetUnderAttackRecord.newBuilder();
+                fleet_under_attack_pb.setCombatReportKey(destStar.getCombatReport().getKey());
+                fleet_under_attack_pb.setFleetDesignId(fleet.getDesignID());
+                fleet_under_attack_pb.setFleetKey(fleet.getKey());
+                fleet_under_attack_pb.setNumShips(fleet.getNumShips());
+                sitrep_pb.setFleetUnderAttackRecord(fleet_under_attack_pb);
+            }
+    
+            new SituationReportController().saveSituationReport(sitrep_pb.build());
         }
-        sitrep_pb.setMoveCompleteRecord(move_complete_pb);
-        if (destStar.getCombatReport() != null && isFleetInCombatReport(fleet.getKey(), (CombatReport) destStar.getCombatReport())) {
-            Messages.SituationReport.FleetUnderAttackRecord.Builder fleet_under_attack_pb = Messages.SituationReport.FleetUnderAttackRecord.newBuilder();
-            fleet_under_attack_pb.setCombatReportKey(destStar.getCombatReport().getKey());
-            fleet_under_attack_pb.setFleetDesignId(fleet.getDesignID());
-            fleet_under_attack_pb.setFleetKey(fleet.getKey());
-            fleet_under_attack_pb.setNumShips(fleet.getNumShips());
-            sitrep_pb.setFleetUnderAttackRecord(fleet_under_attack_pb);
-        }
-
-        new SituationReportController().saveSituationReport(sitrep_pb.build());
     }
 
-    private boolean isFleetInCombatReport(String fleetKey, CombatReport combatReport) {
+    private static boolean isFleetInCombatReport(String fleetKey, CombatReport combatReport) {
         for (BaseCombatReport.CombatRound round : combatReport.getCombatRounds()) {
             for (BaseCombatReport.FleetSummary fleetSummary : round.getFleets()) {
                 for (String combatFleetKey : fleetSummary.getFleetKeys()) {

@@ -494,6 +494,11 @@ public abstract class BaseStar {
             return mEmpireID;
         }
 
+        public void tuneTo(int destWormholeID) {
+            mDestWormholeID = destWormholeID;
+            mTuneCompleteTime = DateTime.now().plusHours(2); // TODO: proper calculation
+        }
+
         public void fromProtocolBuffer(Messages.Star.StarExtra pb) {
             mDestWormholeID = pb.getWormholeDestStarId();
             mTuneCompleteTime = new DateTime(pb.getWormholeTuneCompleteTime() * 1000);

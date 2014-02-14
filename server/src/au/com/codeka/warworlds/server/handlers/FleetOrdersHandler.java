@@ -23,6 +23,7 @@ import au.com.codeka.warworlds.server.data.DB;
 import au.com.codeka.warworlds.server.data.SqlStmt;
 import au.com.codeka.warworlds.server.data.Transaction;
 import au.com.codeka.warworlds.server.designeffects.EmptySpaceMoverShipEffect;
+import au.com.codeka.warworlds.server.events.FleetMoveCompleteEvent;
 import au.com.codeka.warworlds.server.model.DesignManager;
 import au.com.codeka.warworlds.server.model.Fleet;
 import au.com.codeka.warworlds.server.model.FleetUpgrade;
@@ -75,6 +76,8 @@ public class FleetOrdersHandler extends RequestHandler {
             return true;
         } else if (fleet_order_pb.getOrder() == Messages.FleetOrder.FLEET_ORDER.BOOST) {
             orderFleetBoost(star, fleet, fleet_order_pb, sim);
+        } else if (fleet_order_pb.getOrder() == Messages.FleetOrder.FLEET_ORDER.ENTER_WORMHOLE) {
+            orderFleetEnterWormhole(star, fleet, sim);
         }
 
         return false;
@@ -86,7 +89,8 @@ public class FleetOrdersHandler extends RequestHandler {
         // TODO: if we just set it to "aggressive" then assume we just arrived at the star
     }
 
-    private void orderFleetSplit(Star star, Fleet fleet, Messages.FleetOrder fleet_order_pb, Simulation sim) throws RequestException {
+    private void orderFleetSplit(Star star, Fleet fleet, Messages.FleetOrder fleet_order_pb, Simulation sim)
+            throws RequestException {
         if (fleet.getState() != Fleet.State.IDLE) {
             throw new RequestException(400, Messages.GenericError.ErrorCode.CannotOrderFleetNotIdle,
                                        "Cannot split a fleet that is not currently idle.");
@@ -101,6 +105,35 @@ public class FleetOrdersHandler extends RequestHandler {
 
         Fleet newFleet = fleet.split(rightShips);
         star.getFleets().add(newFleet);
+    }
+
+    private void orderFleetEnterWormhole(Star star, Fleet fleet, Simulation sim) throws RequestException {
+        // make sure the star *is* a wormhole
+        if (star.getStarType().getType() != Star.Type.Wormhole) {
+            throw new RequestException(400, Messages.GenericError.ErrorCode.FleetNotOnWormhole,
+                    "Can only enter wormhole when orbiting wormhole.");
+        }
+
+        // also make sure the fleet is idle
+        if (fleet.getState() != Fleet.State.IDLE) {
+            throw new RequestException(400, Messages.GenericError.ErrorCode.CannotOrderFleetNotIdle,
+                                       "Cannot enter wormhole when fleet is not idle.");
+        }
+
+        // finally, make sure the womrhole has a destination AND the destination has been tuned
+        Star.WormholeExtra wormholeExtra = star.getWormholeExtra();
+        if (wormholeExtra == null || wormholeExtra.getDestWormholeID() == 0) {
+            throw new RequestException(400, Messages.GenericError.ErrorCode.WormholeNotTuned,
+                    "Cannot enter wormhole, destination has not been tuned.");
+        }
+        if (wormholeExtra.getTuneCompleteTime().isAfter(DateTime.now())) {
+            throw new RequestException(400, Messages.GenericError.ErrorCode.WormholeNotTuned,
+                    "Cannot enter wormhole, tuning is still in progress.");
+        }
+
+        // OK, we're good to go!
+        Star destStar = new StarController().getStar(wormholeExtra.getDestWormholeID());
+        FleetMoveCompleteEvent.processFleet(fleet.getID(), star, destStar, false);
     }
 
     private void orderFleetMerge(Transaction t, Star star, Fleet fleet,
@@ -174,7 +207,8 @@ public class FleetOrdersHandler extends RequestHandler {
         }
     }
 
-    private void orderFleetMove(Star star, Fleet fleet, Messages.FleetOrder fleet_order_pb, Simulation sim) throws RequestException {
+    private void orderFleetMove(Star star, Fleet fleet, Messages.FleetOrder fleet_order_pb, Simulation sim)
+            throws RequestException {
         if (fleet.getState() != Fleet.State.IDLE) {
             throw new RequestException(400, Messages.GenericError.ErrorCode.CannotOrderFleetNotIdle,
                                        "Cannot move a fleet that is not currently idle.");
@@ -213,7 +247,8 @@ public class FleetOrdersHandler extends RequestHandler {
         fleet.move(now, destStar.getKey(), now.plusSeconds((int)(moveTimeInHours * 3600.0f)));
     }
 
-    private Star orderFleetMoveStar(Star srcStar, Fleet fleet, Messages.FleetOrder fleet_order_pb, Simulation sim) throws RequestException {
+    private Star orderFleetMoveStar(Star srcStar, Fleet fleet, Messages.FleetOrder fleet_order_pb, Simulation sim)
+            throws RequestException {
         if (fleet.getDesign().hasEffect(EmptySpaceMoverShipEffect.class)) {
             throw new RequestException(400, Messages.GenericError.ErrorCode.FleetMoveCannotMoveToStar,
                     "This fleet cannot be moved to another star.");
@@ -230,7 +265,8 @@ public class FleetOrdersHandler extends RequestHandler {
         return destStar;
     }
 
-    private Star orderFleetMoveSpace(Star srcStar, Fleet fleet, Messages.FleetOrder fleet_order_pb, Simulation sim) throws RequestException {
+    private Star orderFleetMoveSpace(Star srcStar, Fleet fleet, Messages.FleetOrder fleet_order_pb, Simulation sim)
+            throws RequestException {
         if (!fleet.getDesign().hasEffect(EmptySpaceMoverShipEffect.class)) {
             throw new RequestException(400, Messages.GenericError.ErrorCode.FleetMoveCannotMoveToEmptySpace,
                     "This fleet can only be moved to stars.");
@@ -244,7 +280,8 @@ public class FleetOrdersHandler extends RequestHandler {
         return new StarController().addMarkerStar(sectorX, sectorY, offsetX, offsetY);
     }
 
-    private void orderFleetBoost(Star star, Fleet fleet, Messages.FleetOrder fleet_order_pb, Simulation sim) throws RequestException {
+    private void orderFleetBoost(Star star, Fleet fleet, Messages.FleetOrder fleet_order_pb, Simulation sim)
+            throws RequestException {
         FleetUpgrade.BoostFleetUpgrade boostFleetUpgrade = (FleetUpgrade.BoostFleetUpgrade) fleet.getUpgrade("boost");
         if (boostFleetUpgrade == null) {
             throw new RequestException(400, Messages.GenericError.ErrorCode.FleetBoostNoUpgrade,
@@ -252,11 +289,13 @@ public class FleetOrdersHandler extends RequestHandler {
         }
 
         if (fleet.getState() != State.MOVING) {
-            throw new RequestException(400, Messages.GenericError.ErrorCode.FleetBoostNotMoving, "Fleet is not moving.");
+            throw new RequestException(
+                    400, Messages.GenericError.ErrorCode.FleetBoostNotMoving, "Fleet is not moving.");
         }
 
         if (boostFleetUpgrade.isBoosting()) {
-            throw new RequestException(400, Messages.GenericError.ErrorCode.FleetBoostAlreadyBoosting, "Already boosting.");
+            throw new RequestException(
+                    400, Messages.GenericError.ErrorCode.FleetBoostAlreadyBoosting, "Already boosting.");
         }
 
         boostFleetUpgrade.isBoosting(true);
