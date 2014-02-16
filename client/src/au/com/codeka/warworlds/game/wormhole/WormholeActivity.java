@@ -30,7 +30,6 @@ import au.com.codeka.warworlds.ctrl.FleetListWormhole;
 import au.com.codeka.warworlds.game.FleetMergeDialog;
 import au.com.codeka.warworlds.game.FleetMoveActivity;
 import au.com.codeka.warworlds.game.FleetSplitDialog;
-import au.com.codeka.warworlds.game.solarsystem.SolarSystemActivity;
 import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.EmpireShieldManager;
 import au.com.codeka.warworlds.model.Fleet;
