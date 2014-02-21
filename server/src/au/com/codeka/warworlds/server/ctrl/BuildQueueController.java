@@ -130,6 +130,13 @@ public class BuildQueueController {
                                       buildRequest.getDesign().getDisplayName()));
             }
 
+            // make sure the existing building isn't already at the maximum level
+            if (existingBuilding.getLevel() == buildingDesign.getUpgrades().size() + 1) {
+                throw new RequestException(400, Messages.GenericError.ErrorCode.CannotBuildMaxLevelReached,
+                        String.format("Cannot update %s, already at maximum level.",
+                                buildRequest.getDesign().getDisplayName()));
+            }
+
             // check dependencies for this specific level
             for (Design.Dependency dependency : buildingDesign.getDependencies(existingBuilding.getLevel() + 1)) {
                 if (!dependency.isMet(colony)) {

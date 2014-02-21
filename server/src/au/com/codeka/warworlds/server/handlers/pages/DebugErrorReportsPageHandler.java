@@ -115,6 +115,7 @@ public class DebugErrorReportsPageHandler extends BasePageHandler {
         data.put("cursor", cursor);
 
         // add some data so we can display a histogram of the number of errors we're getting
+        ArrayList<Integer> maxValues = new ArrayList<Integer>();
         ArrayList<TreeMap<String, Object>> histogram = new ArrayList<TreeMap<String, Object>>();
         sql = "SELECT DATE(report_date) AS date," +
                     " SUM(CASE WHEN empire_id IS NULL THEN 0 ELSE 1 END) AS num_client_errors," +
@@ -142,12 +143,19 @@ public class DebugErrorReportsPageHandler extends BasePageHandler {
                 entry.put("num_server_errors", numServerErrors);
                 entry.put("num_empires_reporting", numEmpiresReporting);
                 histogram.add(entry);
+                maxValues.add(Math.max(numClientErrors, numServerErrors));
             }
         } catch(Exception e) {
             throw new RequestException(e);
         }
         Collections.reverse(histogram);
         data.put("error_histogram", histogram);
+
+        // calculate the 90th percentile of maxValues, which will be the max value of the graph. We
+        // don't want one or two bad days to make the whole graph unsuable for a month...
+        Collections.sort(maxValues);
+        int index = (int)(0.9 * maxValues.size()); // not exactly 90th percentile, but close enough..
+        data.put("error_histogram_max", maxValues.get(index) + 10);
 
         render("admin/debug/error-reports.html", data);
     }

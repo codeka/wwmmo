@@ -77,7 +77,8 @@
       var height = 150;
       var options = {
         "chartArea": {left: 40, top: 10, width: width - 250, height: height - 40},
-        "backgroundColor": {fill: "transparent"}
+        "backgroundColor": {fill: "transparent"},
+        "vAxis": {viewWindow: {max: {{error_histogram_max}} } }
       };
 
       var chart = new google.visualization.LineChart(document.getElementById("histogram"));
