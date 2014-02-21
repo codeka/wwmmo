@@ -45,6 +45,13 @@ public class StarEntity extends SelectableEntity {
         mStarSprite.setRotation(new Random(Integer.parseInt(star.getKey()) * 100000l).nextFloat() * 360.0f);
         attachChild(mStarSprite);
 
+        if (star.hasAttachedEntities()) for (Entity child : star.getAttachedEntities()) {
+            if (child.hasParent()) {
+                child.getParent().detachChild(child);
+            }
+            attachChild(child);
+        }
+
         // if it's a wormhole, we want to register an updater to apply the rotation
         if (star.getStarType().getType() == Star.Type.Wormhole) {
             starfield.getActivity().getEngine().registerUpdateHandler(mWormholeUpdateHandler);

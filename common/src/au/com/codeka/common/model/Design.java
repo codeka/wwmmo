@@ -60,6 +60,15 @@ public abstract class Design {
         }
         return effects;
     }
+    @SuppressWarnings("unchecked")
+    public <T> T getEffect(Class<?> effectClass) {
+        for (Effect e : mEffects) {
+            if (effectClass.isInstance(e)) {
+                return (T) e;
+            }
+        }
+        return null;
+    }
     public boolean hasEffect(String kind) {
         for (Effect e : mEffects) {
             if (e.getKind().equals(kind)) {

@@ -38,6 +38,7 @@ import au.com.codeka.warworlds.model.Sector;
 import au.com.codeka.warworlds.model.SectorManager;
 import au.com.codeka.warworlds.model.Star;
 import au.com.codeka.warworlds.model.StarManager;
+import au.com.codeka.warworlds.model.designeffects.EmptySpaceMoverShipEffect;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 
@@ -50,6 +51,7 @@ public class FleetMoveActivity extends BaseStarfieldActivity {
     private FleetIndicatorEntity mFleetIndicatorEntity;
 
     private Star mMarkerStar;
+    private RadiusIndicatorEntity mTooCloseIndicatorEntity;
 
     public static void show(Activity activity, Fleet fleet) {
         Intent intent = new Intent(activity, FleetMoveActivity.class);
@@ -274,7 +276,41 @@ public class FleetMoveActivity extends BaseStarfieldActivity {
                     "<b>ETA:</b> %d hrs, %d mins<br />%s<b>Cost:</b> %s%s",
                     hrs, mins, fontOpen, cash, fontClose);
             starDetailsRight.setText(Html.fromHtml(rightDetails));
+
+            // if it's the marker star, make sure it's not too close to existing stars
+            if (mDestStar == mMarkerStar) {
+                EmptySpaceMoverShipEffect effect = mFleet.getDesign().getEffect(EmptySpaceMoverShipEffect.class);
+                float minDistance = effect.getMinStarDistance();
+                if (minDistance > 0) {
+                    float distanceToClosestStar = findClosestStar(mMarkerStar);
+                    if (distanceToClosestStar < minDistance) {
+                        if (mTooCloseIndicatorEntity == null) {
+                            mTooCloseIndicatorEntity = new RadiusIndicatorEntity(this);
+                            mTooCloseIndicatorEntity.setScale(minDistance * Sector.PIXELS_PER_PARSEC * 2.0f);
+                        }
+                        if (!mMarkerStar.getAttachedEntities().contains(mTooCloseIndicatorEntity)) {
+                            mMarkerStar.getAttachedEntities().add(mTooCloseIndicatorEntity);
+                            mStarfield.onSectorListChanged();
+                        }
+                    }
+                }
+            }
         }
+    }
+
+    /** Searches for, and returns the distance to, the clostest star to the given star. */
+    private float findClosestStar(Star toStar) {
+        float minDistance = -1.0f;
+        for (Star star : SectorManager.getInstance().getAllVisibleStars()) {
+            if (star == toStar || star.getKey().equals(toStar.getKey())) {
+                continue;
+            }
+            float distance = Sector.distanceInParsecs(star, toStar);
+            if (distance < minDistance || minDistance < 0.0f) {
+                minDistance = distance;
+            }
+        }
+        return minDistance;
     }
 
     private void onMoveClick() {

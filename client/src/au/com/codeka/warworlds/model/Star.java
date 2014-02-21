@@ -1,6 +1,9 @@
 package au.com.codeka.warworlds.model;
 
 import java.util.ArrayList;
+import java.util.List;
+
+import org.andengine.entity.Entity;
 
 import au.com.codeka.common.model.BaseBuildRequest;
 import au.com.codeka.common.model.BaseBuilding;
@@ -17,6 +20,7 @@ import au.com.codeka.warworlds.model.designeffects.RadarBuildingEffect;
  */
 public class Star extends StarSummary {
     private Float mRadarRange;
+    private ArrayList<Entity> mAttachedEntities;
 
     public Star() {
     }
@@ -42,6 +46,16 @@ public class Star extends StarSummary {
         mEmpires = new ArrayList<BaseEmpirePresence>();
         mFleets = new ArrayList<BaseFleet>();
         mBuildRequests = new ArrayList<BaseBuildRequest>();
+    }
+
+    public List<Entity> getAttachedEntities() {
+        if (mAttachedEntities == null) {
+            mAttachedEntities = new ArrayList<Entity>();
+        }
+        return mAttachedEntities;
+    }
+    public boolean hasAttachedEntities() {
+        return mAttachedEntities != null && mAttachedEntities.size() > 0;
     }
 
     /**

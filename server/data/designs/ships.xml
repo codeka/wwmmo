@@ -120,7 +120,9 @@
     <fuel costPerParsec="3096.2" />
     <stats speed="0.6" baseAttack="1" baseDefence="1" combatPriority="99"  />
     <effects>
-      <effect kind="empty-space-mover" />
+      <effect kind="empty-space-mover">
+        <star-distance min="12" />
+      </effect>
       <effect kind="wormhole-generator" />
     </effects>
   </design>

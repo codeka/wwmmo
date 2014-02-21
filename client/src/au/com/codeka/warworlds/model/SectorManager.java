@@ -74,6 +74,11 @@ public class SectorManager extends BaseManager {
         return mSectorStars.get(starKey);
     }
 
+    /** Gets a collection of all visible stars. This is "pretty" big... */
+    public Collection<Star> getAllVisibleStars() {
+        return mSectorStars.values();
+    }
+
     public void addSectorListChangedListener(OnSectorListChangedListener onSectorListChanged) {
         if (mSectorListChangedListeners.contains(onSectorListChanged))
             return;

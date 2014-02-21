@@ -10,6 +10,7 @@ import au.com.codeka.common.model.BaseDesignManager;
 import au.com.codeka.common.model.Design;
 import au.com.codeka.common.model.DesignKind;
 import au.com.codeka.warworlds.model.designeffects.BuildingEffect;
+import au.com.codeka.warworlds.model.designeffects.EmptySpaceMoverShipEffect;
 import au.com.codeka.warworlds.model.designeffects.RadarBuildingEffect;
 import au.com.codeka.warworlds.model.designeffects.ShipEffect;
 
@@ -48,7 +49,11 @@ public class DesignManager extends BaseDesignManager {
     public Design.Effect createEffect(DesignKind designKind, Element effectElement) {
         final String kind = effectElement.getAttribute("kind");
         if (designKind == DesignKind.SHIP) {
-            return new ShipEffect(effectElement);
+            if (kind.equals("empty-space-mover")) {
+                return new EmptySpaceMoverShipEffect(effectElement);
+            } else {
+                return new ShipEffect(effectElement);
+            }
         } else {
             if (kind.equals("radar")) {
                 return new RadarBuildingEffect(effectElement);

@@ -26,6 +26,9 @@ public class StarImageManager extends ImageManager {
             double realSize = size * star.getStarType().getImageScale();
             String spriteName = "star."+(realSize > 250 ? "big." : "small.")+star.getStarType().getInternalName();
             sprite = SpriteManager.i.getSprite(spriteName);
+            if (sprite == null) {
+                throw new RuntimeException("No such sprite: "+spriteName);
+            }
 
 //            sprite = sprite.extractFrame(0);
             if (sprite.getNumFrames() > 1) {

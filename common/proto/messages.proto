@@ -57,6 +57,7 @@ message GenericError
         FleetMoveCannotMoveToStar = 28;
         FleetNotOnWormhole = 29;
         WormholeNotTuned = 30;
+        WormholeTooClose = 31;
     }
 }
 
