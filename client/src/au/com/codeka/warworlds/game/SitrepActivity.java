@@ -239,35 +239,44 @@ public class SitrepActivity extends BaseActivity
         mCursor = null;
         fetchReportItems(null, new FetchItemsCompleteHandler() {
             @Override
-            public void onItemsFetched(List<SituationReport> items) {
+            public void onItemsFetched(List<SituationReport> items, boolean hasMore) {
                 progressBar.setVisibility(View.GONE);
                 reportItems.setVisibility(View.VISIBLE);
 
-                mSituationReportAdapter.setItems(items, mStarSummaries);
+                mSituationReportAdapter.setItems(items, mStarSummaries, hasMore);
             }
         });
     }
 
     private void fetchNextReportItems() {
-        String cursor = mCursor;
-        mCursor = null;
+        String cursor;
+        synchronized(this) {
+            cursor = mCursor;
+            mCursor = null;
+        }
+
+        if (cursor == null) {
+            return;
+        }
 
         fetchReportItems(cursor, new FetchItemsCompleteHandler() {
             @Override
-            public void onItemsFetched(List<SituationReport> items) {
+            public void onItemsFetched(List<SituationReport> items, boolean hasMore) {
                 if (items == null || items.size() == 0) {
                     // if there's no more, we set the cursor to null so the adapter knows
                     // there's no more
                     mCursor = null;
                 }
 
-                mSituationReportAdapter.appendItems(items, mStarSummaries);
+                mSituationReportAdapter.appendItems(items, mStarSummaries, hasMore);
             }
         });
     }
 
     private void fetchReportItems(final String cursor, final FetchItemsCompleteHandler handler) {
         new BackgroundRunner<List<SituationReport>>() {
+            private boolean mHasMore;
+
             @Override
             protected List<SituationReport> doInBackground() {
                 String url = "sit-reports";
@@ -318,7 +327,12 @@ public class SitrepActivity extends BaseActivity
                     }
 
                     // grab the cursor we'll need to fetch the next batch
-                    mCursor = pb.getCursor();
+                    mHasMore = pb.hasCursor() && pb.getCursor() != null && !pb.getCursor().equals("");
+                    if (mHasMore) {
+                        mCursor = pb.getCursor();
+                    } else {
+                        mCursor = null;
+                    }
 
                     // here we want to fetch all of the star summaries for any
                     // stars that are new and we don't currently have summaries
@@ -340,7 +354,7 @@ public class SitrepActivity extends BaseActivity
 
             @Override
             protected void onComplete(List<SituationReport> items) {
-                handler.onItemsFetched(items);
+                handler.onItemsFetched(items, mHasMore);
             }
         }.execute();
     }
@@ -368,7 +382,7 @@ public class SitrepActivity extends BaseActivity
     }
 
     private interface FetchItemsCompleteHandler {
-        public void onItemsFetched(List<SituationReport> items);
+        public void onItemsFetched(List<SituationReport> items, boolean hasMore);
     }
 
     private void refresh() {
@@ -388,6 +402,7 @@ public class SitrepActivity extends BaseActivity
     private class SituationReportAdapter extends BaseAdapter {
         private List<SituationReport> mItems;
         private Map<String, StarSummary> mStarSummaries;
+        private boolean mHasMore;
 
         public SituationReportAdapter() {
             mItems = new ArrayList<SituationReport>();
@@ -398,7 +413,7 @@ public class SitrepActivity extends BaseActivity
         }
 
         public void setItems(List<SituationReport> items,
-                             Map<String, StarSummary> starSummaries) {
+                             Map<String, StarSummary> starSummaries, boolean hasMore) {
             if (items == null) {
                 items = new ArrayList<SituationReport>();
             }
@@ -409,11 +424,12 @@ public class SitrepActivity extends BaseActivity
 
             mStarSummaries = starSummaries;
             mItems = items;
+            mHasMore = hasMore;
             notifyDataSetChanged();
         }
 
         public void appendItems(List<SituationReport> items,
-                                Map<String, StarSummary> starSummaries) {
+                                Map<String, StarSummary> starSummaries, boolean hasMore) {
             if (items == null) {
                 items = new ArrayList<SituationReport>();
             }
@@ -424,6 +440,7 @@ public class SitrepActivity extends BaseActivity
 
             mStarSummaries = starSummaries;
             mItems.addAll(items);
+            mHasMore = hasMore;
             notifyDataSetChanged();
         }
 
@@ -435,7 +452,7 @@ public class SitrepActivity extends BaseActivity
 
         @Override
         public int getCount() {
-            if (mCursor == null) {
+            if (!mHasMore) {
                 return mItems.size();
             }
 
@@ -486,16 +503,13 @@ public class SitrepActivity extends BaseActivity
             }
 
             if (position >= mItems.size()) {
-                // note: once this view comes into... view, we'll want to load the next
-                // lot of reports
-                if (mCursor != null) {
-                    mHandler.postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            fetchNextReportItems();
-                        }
-                    }, 100);
-                }
+                // note: once this view comes into... view, we'll want to load the next lot of reports
+                mHandler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        fetchNextReportItems();
+                    }
+                }, 100);
 
                 return view;
             }
