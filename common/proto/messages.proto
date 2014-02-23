@@ -58,6 +58,7 @@ message GenericError
         FleetNotOnWormhole = 29;
         WormholeNotTuned = 30;
         WormholeTooClose = 31;
+        FleetMoveTooCloseToStar = 32;
     }
 }
 

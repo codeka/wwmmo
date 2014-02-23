@@ -239,7 +239,7 @@ public class FleetOrdersHandler extends RequestHandler {
 
         if (!new EmpireController().withdrawCash(getSession().getEmpireID(), fuelCost, audit_record_pb)) {
             throw new RequestException(400, Messages.GenericError.ErrorCode.InsufficientCash,
-                                       "Insufficient cash for move.");
+                                       "Cannot move there, you do not have enough cash.");
         }
 
         float moveTimeInHours = distanceInParsecs / design.getSpeedInParsecPerHour();
@@ -267,7 +267,8 @@ public class FleetOrdersHandler extends RequestHandler {
 
     private Star orderFleetMoveSpace(Star srcStar, Fleet fleet, Messages.FleetOrder fleet_order_pb, Simulation sim)
             throws RequestException {
-        if (!fleet.getDesign().hasEffect(EmptySpaceMoverShipEffect.class)) {
+        EmptySpaceMoverShipEffect emptySpaceMoverShipEffect = fleet.getDesign().getEffect(EmptySpaceMoverShipEffect.class);
+        if (emptySpaceMoverShipEffect == null) {
             throw new RequestException(400, Messages.GenericError.ErrorCode.FleetMoveCannotMoveToEmptySpace,
                     "This fleet can only be moved to stars.");
         }
@@ -276,6 +277,13 @@ public class FleetOrdersHandler extends RequestHandler {
         long sectorY = fleet_order_pb.getSectorY();
         int offsetX = fleet_order_pb.getOffsetX();
         int offsetY = fleet_order_pb.getOffsetY();
+
+        // if you haven't given enough space, it's an error.
+        float distance = Sector.distanceInParsecs(srcStar, sectorX, sectorY, offsetX, offsetY);
+        if (distance < emptySpaceMoverShipEffect.getMinStarDistance()) {
+            throw new RequestException(400, Messages.GenericError.ErrorCode.FleetMoveTooCloseToStar,
+                    "Cannot move there, too close to other stars.");
+        }
 
         return new StarController().addMarkerStar(sectorX, sectorY, offsetX, offsetY);
     }

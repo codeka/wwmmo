@@ -178,7 +178,6 @@ public class FleetMoveActivity extends BaseStarfieldActivity {
                 if (mDestStar != null) {
                     onMoveClick();
                 }
-                finish();
             }
         });
 
@@ -318,9 +317,14 @@ public class FleetMoveActivity extends BaseStarfieldActivity {
             return;
         }
 
+        final Button moveBtn = (Button) findViewById(R.id.move_btn);
+        moveBtn.setEnabled(false);
+
         EmpireManager.i.getEmpire().addCash(-mEstimatedCost);
 
         new BackgroundRunner<Boolean>() {
+            private String mErrorMessage;
+
             @Override
             protected Boolean doInBackground() {
                 String url = String.format("stars/%s/fleets/%s/orders",
@@ -339,6 +343,7 @@ public class FleetMoveActivity extends BaseStarfieldActivity {
                 try {
                     return ApiClient.postProtoBuf(url, builder.build());
                 } catch (ApiException e) {
+                    mErrorMessage = e.getServerErrorMessage();
                     return false;
                 }
             }
@@ -347,11 +352,12 @@ public class FleetMoveActivity extends BaseStarfieldActivity {
             protected void onComplete(Boolean success) {
                 if (!success) {
                     StyledDialog dialog = new StyledDialog.Builder(FleetMoveActivity.this)
-                                            .setMessage("Could not move the fleet: do you have enough cash?")
+                                            .setTitle("Could not move fleet")
+                                            .setMessage(mErrorMessage == null ? "Unable to move fleet, reason unknown." : mErrorMessage)
+                                            .setPositiveButton("OK", null)
                                             .create();
                     dialog.show();
-                    dialog.getPositiveButton().setEnabled(true);
-                    dialog.getNegativeButton().setEnabled(true);
+                    moveBtn.setEnabled(true);
                 } else {
                     // the star this fleet is attached to needs to be refreshed...
                     StarManager.getInstance().refreshStar(mFleet.getStarKey());
@@ -359,6 +365,8 @@ public class FleetMoveActivity extends BaseStarfieldActivity {
                     // the empire needs to be updated, too, since we'll have subtracted
                     // the cost of this move from your cash
                     EmpireManager.i.refreshEmpire(mFleet.getEmpireKey());
+
+                    finish();
                 }
             }
         }.execute();
