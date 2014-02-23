@@ -58,7 +58,7 @@ public class StarEntity extends SelectableEntity {
         }
 
         // don't display the name for marker stars...
-        if (!star.getStarType().getInternalName().equals("marker")) {
+        if (star.getStarType().getType() != Star.Type.Marker) {
             mStarName = new Text(0.0f, -starSize * 0.6f,
                     mStarfield.getFont(), star.getName(),
                     mStarfield.getActivity().getVertexBufferObjectManager());
@@ -97,9 +97,8 @@ public class StarEntity extends SelectableEntity {
 
     private void addEmpireIcons() {
         List<BaseColony> colonies = mStar.getColonies();
+        Map<String, Integer[]> empires = new TreeMap<String, Integer[]>();
         if (colonies != null && !colonies.isEmpty()) {
-            Map<String, Integer[]> colonyEmpires = new TreeMap<String, Integer[]>();
-
             for (int i = 0; i < colonies.size(); i++) {
                 BaseColony colony = colonies.get(i);
                 if (colony.getEmpireKey() == null) {
@@ -108,70 +107,72 @@ public class StarEntity extends SelectableEntity {
 
                 Empire emp = EmpireManager.i.getEmpire(colony.getEmpireKey());
                 if (emp != null) {
-                    Integer[] counts = colonyEmpires.get(emp.getKey());
+                    Integer[] counts = empires.get(emp.getKey());
                     if (counts == null) {
                         counts = new Integer[] { 0, 0, 0 };
-                        colonyEmpires.put(emp.getKey(), counts);
+                        empires.put(emp.getKey(), counts);
                     }
                     counts[0] += 1;
                 }
             }
+        }
 
-            List<BaseFleet> fleets = mStar.getFleets();
-            if (fleets != null && !fleets.isEmpty()) {
-                for (int i = 0; i < fleets.size(); i++) {
-                    BaseFleet f = fleets.get(i);
-                    if (f.getEmpireKey() == null || f.getState() == BaseFleet.State.MOVING) {
-                        // ignore moving fleets, we'll draw them separately
-                        continue;
+        List<BaseFleet> fleets = mStar.getFleets();
+        if (fleets != null && !fleets.isEmpty()) {
+            for (int i = 0; i < fleets.size(); i++) {
+                BaseFleet f = fleets.get(i);
+                if (f.getEmpireKey() == null || f.getState() == BaseFleet.State.MOVING) {
+                    // ignore moving fleets, we'll draw them separately
+                    continue;
+                }
+
+                Empire emp = EmpireManager.i.getEmpire(f.getEmpireKey());
+                if (emp != null) {
+                    Integer[] counts = empires.get(emp.getKey());
+                    if (counts == null) {
+                        counts = new Integer[] { 0, 0, 0 };
+                        empires.put(emp.getKey(), counts);
                     }
-
-                    Empire emp = EmpireManager.i.getEmpire(f.getEmpireKey());
-                    if (emp != null) {
-                        Integer[] counts = colonyEmpires.get(emp.getKey());
-                        if (counts == null) {
-                            counts = new Integer[] { 0, 0, 0 };
-                            colonyEmpires.put(emp.getKey(), counts);
-                        }
-                        if (f.getDesignID().equals("fighter")) {
-                            counts[1] += (int) Math.ceil(f.getNumShips());
-                        } else {
-                            counts[2] += (int) Math.ceil(f.getNumShips());
-                        }
+                    if (f.getDesignID().equals("fighter")) {
+                        counts[1] += (int) Math.ceil(f.getNumShips());
+                    } else {
+                        counts[2] += (int) Math.ceil(f.getNumShips());
                     }
                 }
             }
+        }
 
-            int i = 1;
-            for (String empireKey : colonyEmpires.keySet()) {
-                Integer[] counts = colonyEmpires.get(empireKey);
-                Empire emp = EmpireManager.i.getEmpire(empireKey);
-                ITextureRegion texture = EmpireShieldManager.i.getShieldTexture(mStarfield.getActivity(), emp);
+        int i = 1;
+        for (String empireKey : empires.keySet()) {
+            Integer[] counts = empires.get(empireKey);
+            Empire emp = EmpireManager.i.getEmpire(empireKey);
+            ITextureRegion texture = EmpireShieldManager.i.getShieldTexture(mStarfield.getActivity(), emp);
 
-                Vector2 pt = Vector2.pool.borrow().reset(0, 30.0f);
-                pt.rotate(-(float)(Math.PI / 4.0) * i);
+            Vector2 pt = Vector2.pool.borrow().reset(0, 30.0f);
+            pt.rotate(-(float)(Math.PI / 4.0) * i);
 
-                Sprite shieldSprite = new Sprite(
-                        (float) pt.x, (float) pt.y,
-                        20.0f, 20.0f, texture, mStarfield.getActivity().getVertexBufferObjectManager());
-                attachChild(shieldSprite);
+            Sprite shieldSprite = new Sprite(
+                    (float) pt.x, (float) pt.y,
+                    20.0f, 20.0f, texture, mStarfield.getActivity().getVertexBufferObjectManager());
+            attachChild(shieldSprite);
 
-                String text;
-                if (counts[1] == 0 && counts[2] == 0) {
-                    text = String.format(Locale.ENGLISH, "%d", counts[0]);
-                } else {
-                    text = String.format(Locale.ENGLISH, "%d ● %d, %d", counts[0], counts[1], counts[2]);
-                }
-                Text empireCounts = new Text((float) pt.x, (float) pt.y, mStarfield.getFont(),
-                        text, mStarfield.getActivity().getVertexBufferObjectManager());
-                empireCounts.setScale(0.666f);
-                float offset = ((empireCounts.getLineWidthMaximum() * 0.666f) / 2.0f) + 14.0f;
-                empireCounts.setX(empireCounts.getX() + offset);
-                attachChild(empireCounts);
-
-                Vector2.pool.release(pt); pt = null;
-                i++;
+            String text;
+            if (counts[1] == 0 && counts[2] == 0) {
+                text = String.format(Locale.ENGLISH, "%d", counts[0]);
+            } else if (counts[0] == 0) {
+                text = String.format(Locale.ENGLISH, "[%d, %d]", counts[1], counts[2]);
+            } else {
+                text = String.format(Locale.ENGLISH, "%d ● [%d, %d]", counts[0], counts[1], counts[2]);
             }
+            Text empireCounts = new Text((float) pt.x, (float) pt.y, mStarfield.getFont(),
+                    text, mStarfield.getActivity().getVertexBufferObjectManager());
+            empireCounts.setScale(0.666f);
+            float offset = ((empireCounts.getLineWidthMaximum() * 0.666f) / 2.0f) + 14.0f;
+            empireCounts.setX(empireCounts.getX() + offset);
+            attachChild(empireCounts);
+
+            Vector2.pool.release(pt); pt = null;
+            i++;
         }
     }
 

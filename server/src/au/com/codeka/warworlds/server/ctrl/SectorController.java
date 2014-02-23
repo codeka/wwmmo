@@ -219,8 +219,9 @@ public class SectorController {
             HashSet<Integer> starIds = new HashSet<Integer>();
             List<Fleet> fleets = new ArrayList<Fleet>();
 
-            String sql = "SELECT fleets.*" +
+            String sql = "SELECT fleets.*, empires.alliance_id" +
                          " FROM fleets" +
+                         " LEFT OUTER JOIN empires ON empires.id = fleets.empire_id" +
                          " WHERE sector_id IN "+buildInClause(sectorIds);
             try (SqlStmt stmt = prepare(sql)) {
                 ResultSet rs = stmt.select();

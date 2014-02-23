@@ -11,6 +11,7 @@ import au.com.codeka.common.protobuf.Messages;
 public abstract class BaseFleet {
     protected String mKey;
     protected String mEmpireKey;
+    protected Integer mAllianceID;
     protected String mDesignID;
     protected float mNumShips;
     protected State mState;
@@ -30,6 +31,9 @@ public abstract class BaseFleet {
     }
     public String getEmpireKey() {
         return mEmpireKey;
+    }
+    public Integer getAllianceID() {
+        return mAllianceID;
     }
     public String getDesignID() {
         return mDesignID;
@@ -160,6 +164,9 @@ public abstract class BaseFleet {
         if (pb.hasEmpireKey()) {
             mEmpireKey = pb.getEmpireKey();
         }
+        if (pb.hasAllianceId()) {
+            mAllianceID = pb.getAllianceId();
+        }
         mDesignID = pb.getDesignName();
         mNumShips = pb.getNumShips();
         mState = State.fromNumber(pb.getState().getNumber());
@@ -192,6 +199,9 @@ public abstract class BaseFleet {
         pb.setKey(mKey);
         if (mEmpireKey != null) {
             pb.setEmpireKey(mEmpireKey);
+        }
+        if (mAllianceID != null) {
+            pb.setAllianceId(mAllianceID);
         }
         pb.setDesignName(mDesignID);
         pb.setNumShips(mNumShips);

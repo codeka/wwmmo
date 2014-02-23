@@ -35,6 +35,10 @@ public class Fleet extends BaseFleet {
         if (!rs.wasNull()) {
             mEmpireKey = Integer.toString(mEmpireID);
         }
+        mAllianceID = rs.getInt("alliance_id");
+        if (rs.wasNull()) {
+            mAllianceID = null;
+        }
         mNumShips = rs.getFloat("num_ships");
         mStance = Stance.fromNumber(rs.getInt("stance"));
         mState = State.fromNumber(rs.getInt("state"));
@@ -65,6 +69,9 @@ public class Fleet extends BaseFleet {
         if (empire != null) {
             mEmpireID = empire.getID();
             mEmpireKey = Integer.toString(mEmpireID);
+            if (empire.getAlliance() != null) {
+                mAllianceID = ((Alliance) empire.getAlliance()).getID();
+            }
         }
         mNumShips = numShips;
         mStance = Stance.AGGRESSIVE;

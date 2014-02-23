@@ -113,12 +113,14 @@ public abstract class SectorSceneManager implements SectorManager.OnSectorListCh
                     return;
                 }
 
-                mActivity.getEngine().runOnUpdateThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        mActivity.getEngine().setScene(scene);
-                    }
-                });
+                if (mActivity.getEngine() != null) {
+                    mActivity.getEngine().runOnUpdateThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            mActivity.getEngine().setScene(scene);
+                        }
+                    });
+                }
             }
         }.execute();
     }

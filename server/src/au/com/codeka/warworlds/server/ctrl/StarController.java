@@ -168,6 +168,13 @@ public class StarController {
                              ArrayList<Star> otherStars) {
         log.debug(String.format("Sanitizing star %s (%d, %d) (%d, %d)",
                 star.getName(), star.getSectorX(), star.getSectorY(), star.getOffsetX(), star.getOffsetY()));
+
+        // if the star is a wormhole, don't sanitize it -- a wormhole is basically fleets in
+        // transit anyway
+        if (star.getStarType().getType() == Star.Type.Wormhole) {
+            return;
+        }
+
         // if we don't have any fleets here, remove all the others
         boolean removeFleets = true;
         ArrayList<Fleet> fleetsToAddBack = null;
@@ -743,7 +750,10 @@ public class StarController {
         }
 
         private void populateFleets(List<Star> stars, String inClause) throws Exception {
-            String sql = "SELECT * FROM fleets WHERE star_id IN "+inClause;
+            String sql = "SELECT fleets.*, empires.alliance_id" +
+                        " FROM fleets" +
+                        " LEFT OUTER JOIN empires ON empires.id = fleets.empire_id" +
+                        " WHERE star_id IN "+inClause;
 
             ArrayList<Fleet> fleets = new ArrayList<Fleet>();
             try (SqlStmt stmt = prepare(sql)) {

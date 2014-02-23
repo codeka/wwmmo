@@ -9,6 +9,7 @@ import au.com.codeka.common.model.BaseStar;
 import au.com.codeka.common.model.DesignKind;
 import au.com.codeka.common.model.ShipDesign;
 import au.com.codeka.common.model.ShipEffect;
+import au.com.codeka.common.model.Simulation;
 import au.com.codeka.common.model.BaseFleet.Stance;
 import au.com.codeka.warworlds.server.model.DesignManager;
 import au.com.codeka.warworlds.server.model.Fleet;
@@ -36,9 +37,8 @@ public class FighterShipEffect extends ShipEffect {
                 continue;
             }
 
-            // if it's the same empire, then we're not going to attack it
-            if (existingFleet.getEmpireID() == ((Fleet) fleet).getEmpireID()) {
-                // TODO: also check alliances...
+            // if it's the friendly, then we're not going to attack it
+            if (Simulation.isFriendly(existingFleet, fleet)) {
                 continue;
             }
 
@@ -74,7 +74,7 @@ public class FighterShipEffect extends ShipEffect {
         }
 
         // if the other fleet is the same empire, that's fine
-        if (((Fleet) fleet).getEmpireID() == ((Fleet) otherFleet).getEmpireID()) {
+        if (Simulation.isFriendly(fleet, otherFleet)) {
             return;
         }
 

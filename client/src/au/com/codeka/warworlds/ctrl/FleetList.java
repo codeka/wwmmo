@@ -11,6 +11,7 @@ import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.text.Html;
@@ -43,6 +44,7 @@ import au.com.codeka.warworlds.game.NotesDialog;
 import au.com.codeka.warworlds.model.DesignManager;
 import au.com.codeka.warworlds.model.Empire;
 import au.com.codeka.warworlds.model.EmpireManager;
+import au.com.codeka.warworlds.model.EmpireShieldManager;
 import au.com.codeka.warworlds.model.Fleet;
 import au.com.codeka.warworlds.model.FleetManager;
 import au.com.codeka.warworlds.model.FleetUpgrade.BoostFleetUpgrade;
@@ -61,7 +63,9 @@ import au.com.codeka.warworlds.model.StarSummary;
  * This control displays a list of fleets along with controls you can use to manage them (split
  * them, move them around, etc).
  */
-public class FleetList extends FrameLayout implements StarManager.StarFetchedHandler {
+public class FleetList extends FrameLayout
+                       implements StarManager.StarFetchedHandler,
+                                  EmpireShieldManager.EmpireShieldUpdatedHandler {
     private FleetListAdapter mFleetListAdapter;
     protected Fleet mSelectedFleet;
     private List<Fleet> mFleets;
@@ -319,6 +323,7 @@ public class FleetList extends FrameLayout implements StarManager.StarFetchedHan
 
         onInitialize();
 
+        EmpireShieldManager.i.addEmpireShieldUpdatedHandler(this);
         StarManager.getInstance().addStarUpdatedListener(null, this);
     }
 
@@ -329,6 +334,7 @@ public class FleetList extends FrameLayout implements StarManager.StarFetchedHan
     public void onDetachedFromWindow() {
         super.onDetachedFromWindow();
         StarManager.getInstance().removeStarUpdatedListener(this);
+        EmpireShieldManager.i.removeEmpireShieldUpdatedHandler(this);
     }
 
     /**
@@ -356,6 +362,12 @@ public class FleetList extends FrameLayout implements StarManager.StarFetchedHan
                 break;
             }
         }
+    }
+
+    /** If an empire's shield is updated, we'll want to refresh the list. */
+    @Override
+    public void onEmpireShieldUpdated(int empireID) {
+        mFleetListAdapter.notifyDataSetChanged();
     }
 
     /**
@@ -400,7 +412,15 @@ public class FleetList extends FrameLayout implements StarManager.StarFetchedHan
                 public void onEmpireFetched(Empire empire) {
                     row3.setVisibility(View.VISIBLE);
 
+                    Bitmap shieldBmp = EmpireShieldManager.i.getShield(context, empire);
+                    if (shieldBmp != null) {
+                        addImageToRow(context, row3, shieldBmp, 0);
+                    }
+
                     if (myEmpire.getKey().equals(empire.getKey())) {
+                        addTextToRow(context, row3, empire.getDisplayName(), 0);
+                    } else if (myEmpire.getAlliance() != null && empire.getAlliance() != null &&
+                            myEmpire.getAlliance().getKey().equals(empire.getAlliance().getKey())) {
                         addTextToRow(context, row3, empire.getDisplayName(), 0);
                     } else {
                         addTextToRow(context, row3, Html.fromHtml("<font color=\"red\">"+empire.getDisplayName()+"</font>"), 0);
@@ -557,6 +577,19 @@ public class FleetList extends FrameLayout implements StarManager.StarFetchedHan
 
     private static void addImageToRow(Context context, LinearLayout row, Sprite sprite, float size) {
         addImageToRow(context, row, sprite, 0, 0, size);
+    }
+    private static void addImageToRow(Context context, LinearLayout row, Bitmap bmp, float size) {
+        ImageView iv = new ImageView(context);
+        iv.setImageBitmap(bmp);
+
+        if (size == 0) {
+            size = 16.0f;
+        }
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams((int) size * 2, (int) size * 2);
+        lp.setMargins(5, -5, 5, -5);
+        iv.setLayoutParams(lp);
+
+        row.addView(iv);
     }
 
     private static void addImageToRow(Context context, LinearLayout row, Sprite sprite, float marginHorz, float marginVert, float size) {

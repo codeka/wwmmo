@@ -865,6 +865,10 @@ message Fleet
     // The key of the empire who owns this fleet
     optional string empire_key = 2;
 
+    // The ID of the alliance this fleet belongs to. If not specified, it means the
+    // empire that owns this fleet does not belong to an alliance.
+    optional int32 alliance_id = 18;
+
     // The name of the ship design of the ship(s) in this fleet
     optional string design_name = 3;
 

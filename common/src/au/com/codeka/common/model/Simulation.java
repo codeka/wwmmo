@@ -579,7 +579,7 @@ public class Simulation {
             for (int j = i + 1; j < round.getFleets().size(); j++) {
                 BaseCombatReport.FleetSummary fs2 = round.getFleets().get(j);
 
-                if (!isSameEmpire(fs1.getEmpireKey(), fs2.getEmpireKey())) {
+                if (!isFriendly(fs1, fs2)) {
                     continue;
                 }
                 if (!fs1.getDesignID().equals(fs2.getDesignID())) {
@@ -704,7 +704,7 @@ public class Simulation {
                     continue;
                 }
 
-                if (!isSameEmpire(fleet1.getEmpireKey(), fleet2.getEmpireKey())) {
+                if (!isFriendly(fleet1, fleet2)) {
                     if (fleet2.getState() == BaseFleet.State.MOVING) {
                         // if it's moving, it doesn't count
                         continue;
@@ -734,7 +734,7 @@ public class Simulation {
         BaseCombatReport.FleetSummary foundFleet = null;
 
         for (BaseCombatReport.FleetSummary otherFleet : round.getFleets()) {
-            if (isSameEmpire(fleet.getEmpireKey(), otherFleet.getEmpireKey())) {
+            if (isFriendly(fleet, otherFleet)) {
                 continue;
             }
             if (otherFleet.getFleetState() == BaseFleet.State.MOVING) {
@@ -750,14 +750,34 @@ public class Simulation {
         return foundFleet;
     }
 
-    private static boolean isSameEmpire(String key1, String key2) {
-        if (key1 == null && key2 == null) {
+    private static boolean isFriendly(BaseCombatReport.FleetSummary fleet1, BaseCombatReport.FleetSummary fleet2) {
+        BaseFleet baseFleet1 = fleet1.getFleets().get(0);
+        BaseFleet baseFleet2 = fleet2.getFleets().get(0);
+        return isFriendly(baseFleet1, baseFleet2);
+    }
+
+    public static boolean isFriendly(BaseFleet fleet1, BaseFleet fleet2) {
+        if (fleet1.getEmpireKey() == null && fleet2.getEmpireKey() == null) {
+            // if they're both native (i.e. no empire key) they they're friendly
             return true;
         }
-        if (key1 == null || key2 == null) {
+        if (fleet1.getEmpireKey() == null || fleet2.getEmpireKey() == null) {
+            // if one is native and one is non-native, then they're not friendly
             return false;
         }
-        return key1.equals(key2);
+        if (fleet1.getEmpireKey().equals(fleet2.getEmpireKey())) {
+            // if they're both the same empire they're friendly
+            return true;
+        }
+
+        // check whether they're the same alliance, in which case they're friendly
+        if (fleet1.getAllianceID() != null && fleet2.getAllianceID() != null &&
+                fleet1.getAllianceID() == fleet2.getAllianceID()) {
+            return true;
+        }
+
+        // otherwise they're enemies
+        return false;
     }
 
     private boolean isDestroyed(BaseFleet fleet, DateTime now) {
