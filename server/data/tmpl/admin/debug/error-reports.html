@@ -169,6 +169,11 @@
               <dd>{{error_report.total_run_time|number}} ms
               <dt>FG time:
               <dd>{{error_report.foreground_run_time|number}} ms
+            {% else %}
+              <dt>Query:
+              <dd>{{error_report.server_request_qs}}
+              <dt>User-Agent:
+              <dd>{{error_report.server_request_user_agent}}
             {% endif %}
           </dl>
         </div>

@@ -87,7 +87,11 @@ public abstract class BaseEmpire {
         pb.setDisplayName(mDisplayName);
         pb.setCash(mCash);
         pb.setEmail(mEmailAddr);
-        pb.setState(Messages.Empire.EmpireState.valueOf(mState.getValue()));
+        if (mState == State.ABANDONED) {
+            pb.setState(Messages.Empire.EmpireState.valueOf(State.ACTIVE.getValue()));
+        } else {
+            pb.setState(Messages.Empire.EmpireState.valueOf(mState.getValue()));
+        }
 
         if (mHomeStar != null) {
             Messages.Star.Builder star_pb = Messages.Star.newBuilder();

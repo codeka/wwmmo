@@ -1333,6 +1333,8 @@ message ErrorReport
     optional int64 total_run_time = 14;
     optional int64 foreground_run_time = 15;
     optional string log_output = 16;
+    optional string server_request_qs = 17;
+    optional string server_request_user_agent = 18;
 }
 
 message ErrorReports

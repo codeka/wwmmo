@@ -46,7 +46,7 @@ public class EmpireStarGoodsReachedZeroEvent extends Event {
                 int id = rs.getInt(1);
                 int starID = rs.getInt(2);
 
-                RequestContext.i.setContextName("event: EmpireStarGoodsReachedZero star.id="+starID);
+                RequestContext.i.setContext("event: EmpireStarGoodsReachedZero star.id="+starID);
 
                 try {
                     Star star = new StarController().getStar(starID);

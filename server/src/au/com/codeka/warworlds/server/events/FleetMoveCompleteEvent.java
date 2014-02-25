@@ -50,7 +50,7 @@ public class FleetMoveCompleteEvent extends Event {
                 int srcStarID = rs.getInt(2);
                 int destStarID = rs.getInt(3);
 
-                RequestContext.i.setContextName("event: FleetMoveCompleteEvent fleet.id="+fleetID);
+                RequestContext.i.setContext("event: FleetMoveCompleteEvent fleet.id="+fleetID);
 
                 Star srcStar = null;
                 Star destStar = null;

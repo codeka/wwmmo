@@ -103,6 +103,8 @@ public class DebugErrorReportsPageHandler extends BasePageHandler {
                 result.put("heap_free", error_report_pb.getHeapFree());
                 result.put("total_run_time", error_report_pb.getTotalRunTime());
                 result.put("foreground_run_time", error_report_pb.getForegroundRunTime());
+                result.put("server_request_qs", error_report_pb.getServerRequestQs());
+                result.put("server_request_user_agent", error_report_pb.getServerRequestUserAgent());
                 results.add(result);
 
                 cursor = error_report_pb.getReportTime() / 1000;
