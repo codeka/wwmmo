@@ -11,8 +11,8 @@ package au.com.codeka.common.protobuf;
 //
 message MessageOfTheDay
 {
-    required string message = 1;
-    required string last_update = 2; // last update date (in ISO string format)
+    optional string message = 1;
+    optional string last_update = 2; // last update date (in ISO string format)
 }
 
 
@@ -102,7 +102,7 @@ message Empire
     optional string key = 1;
 
     // The "display" name for the player, which is what other players see.
-    required string display_name = 2;
+    optional string display_name = 2;
 
     // The player's Google Account identifier (which is actually unique of their email address)
     optional string user = 3;
@@ -116,7 +116,7 @@ message Empire
         BANNED = 2;
         ABANDONED = 3;
     }
-    required EmpireState state = 5;
+    optional EmpireState state = 5;
 
     // May not be set, but if it is this is all of the fleets owned by this empire
     repeated Fleet fleets = 6;
@@ -225,8 +225,8 @@ message EmpireBuildingStatistics
 {
     message DesignCount
     {
-        required string design_id = 1;
-        required int32 num_buildings = 2;
+        optional string design_id = 1;
+        optional int32 num_buildings = 2;
     }
 
     repeated DesignCount counts = 1;
@@ -278,7 +278,7 @@ message HelloRequest
 message HelloResponse
 {
     // The current message of the day.
-    required MessageOfTheDay motd = 1;
+    optional MessageOfTheDay motd = 1;
 
     // If specified, the Empire you're currently logged in as (if not specified, it means
     // you haven't set up an empire yet, and you should do that before anything else...)
@@ -388,7 +388,7 @@ message Notifications {
 // If we want to send a notification along with a message, this is what we wrap it in.
 //
 message NotificationWrapper {
-    required bytes original_message = 1;
+    optional bytes original_message = 1;
     repeated Notification notifications = 2;
 }
 
@@ -399,7 +399,7 @@ message NotificationWrapper {
 message ChatMessage
 {
     optional int32 id = 7;
-    required string message = 1;
+    optional string message = 1;
     optional string empire_key = 2;
     optional int64 date_posted = 3;
     optional string alliance_key = 4;
@@ -468,8 +468,8 @@ message Sector
 {
     // these are the (x,y) coordinates of the sector. (0,0) is the "centre" of the universe,
     // (1,1) is one sector up and to the right, and so on.
-    required int64 x = 1;
-    required int64 y = 2;
+    optional int64 x = 1;
+    optional int64 y = 2;
 
     // number of colonies in this sector
     optional int32 num_colonies = 5;
@@ -565,9 +565,9 @@ message Stars
 //
 message StarRenameRequest
 {
-    required string star_key = 1;
-    required string old_name = 2;
-    required string new_name = 3;
+    optional string star_key = 1;
+    optional string old_name = 2;
+    optional string new_name = 3;
 
     optional string DEPRECATED_purchase_order_id = 4;
     optional int64 DEPRECATED_purchase_time = 5;
@@ -585,7 +585,7 @@ message Planet
 {
     // The "index" of the planet represents how far it is from the sun. Planets are always
     // in monotonically increasing order of distance (0, 1, 2, 3, etc)
-    required int32 index = 2;
+    optional int32 index = 2;
 
     // The various different "kinds" of planets. Planets are spawned in increasing order
     // of probability (so "terran" is most likely, "gas giant" least likely).
@@ -602,7 +602,7 @@ message Planet
         TERRAN = 9;
     }
 
-    required PLANET_TYPE planet_type = 3;
+    optional PLANET_TYPE planet_type = 3;
 
     // The size of the planet. Certain planet_type's are predisposed to be certain sizes
     // (e.g. GASGIANT is predisposed to being big, etc) but planets will still vary in exact size.
@@ -642,7 +642,7 @@ message Sectors
 //
 message EmpirePresence
 {
-    required string key = 1;
+    optional string key = 1;
     optional string empire_key = 2;
     optional string star_key = 3;
 
@@ -664,7 +664,7 @@ message EmpirePresence
 message ColonizeRequest
 {
     // The index of the planet you want to colonize
-    required int32 planet_index = 1;
+    optional int32 planet_index = 1;
 }
 
 //
@@ -802,13 +802,13 @@ message BuildQueue
 message Building
 {
     // The unique key of this building.
-    required string key = 1;
+    optional string key = 1;
 
     // The key of the colony to which this building belongs.
-    required string colony_key = 2;
+    optional string colony_key = 2;
 
     // The name of the design of this building (defined in data/buildings.xml)
-    required string design_name = 3;
+    optional string design_name = 3;
 
     // The level of this building
     optional int32 level = 4;
@@ -834,7 +834,7 @@ message FleetUpgrade
 message Fleet
 {
     // The unique key for this fleet
-    required string key = 1;
+    optional string key = 1;
 
     // The key of the empire who owns this fleet
     optional string empire_key = 2;
@@ -917,7 +917,7 @@ message FleetOrder
         SET_STANCE = 5;
         BOOST = 6;
     }
-    required FLEET_ORDER order = 1;
+    optional FLEET_ORDER order = 1;
 
     // if the order is to split, this will be the number of ships
     // in the "left" and "right" fleets. The numbers must add up to

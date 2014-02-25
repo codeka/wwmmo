@@ -170,24 +170,24 @@ public final class Messages {
   public interface MessageOfTheDayOrBuilder
       extends com.google.protobuf.MessageOrBuilder {
 
-    // required string message = 1;
+    // optional string message = 1;
     /**
-     * <code>required string message = 1;</code>
+     * <code>optional string message = 1;</code>
      */
     boolean hasMessage();
     /**
-     * <code>required string message = 1;</code>
+     * <code>optional string message = 1;</code>
      */
     java.lang.String getMessage();
     /**
-     * <code>required string message = 1;</code>
+     * <code>optional string message = 1;</code>
      */
     com.google.protobuf.ByteString
         getMessageBytes();
 
-    // required string last_update = 2;
+    // optional string last_update = 2;
     /**
-     * <code>required string last_update = 2;</code>
+     * <code>optional string last_update = 2;</code>
      *
      * <pre>
      * last update date (in ISO string format)
@@ -195,7 +195,7 @@ public final class Messages {
      */
     boolean hasLastUpdate();
     /**
-     * <code>required string last_update = 2;</code>
+     * <code>optional string last_update = 2;</code>
      *
      * <pre>
      * last update date (in ISO string format)
@@ -203,7 +203,7 @@ public final class Messages {
      */
     java.lang.String getLastUpdate();
     /**
-     * <code>required string last_update = 2;</code>
+     * <code>optional string last_update = 2;</code>
      *
      * <pre>
      * last update date (in ISO string format)
@@ -319,17 +319,17 @@ public final class Messages {
     }
 
     private int bitField0_;
-    // required string message = 1;
+    // optional string message = 1;
     public static final int MESSAGE_FIELD_NUMBER = 1;
     private java.lang.Object message_;
     /**
-     * <code>required string message = 1;</code>
+     * <code>optional string message = 1;</code>
      */
     public boolean hasMessage() {
       return ((bitField0_ & 0x00000001) == 0x00000001);
     }
     /**
-     * <code>required string message = 1;</code>
+     * <code>optional string message = 1;</code>
      */
     public java.lang.String getMessage() {
       java.lang.Object ref = message_;
@@ -346,7 +346,7 @@ public final class Messages {
       }
     }
     /**
-     * <code>required string message = 1;</code>
+     * <code>optional string message = 1;</code>
      */
     public com.google.protobuf.ByteString
         getMessageBytes() {
@@ -362,11 +362,11 @@ public final class Messages {
       }
     }
 
-    // required string last_update = 2;
+    // optional string last_update = 2;
     public static final int LAST_UPDATE_FIELD_NUMBER = 2;
     private java.lang.Object lastUpdate_;
     /**
-     * <code>required string last_update = 2;</code>
+     * <code>optional string last_update = 2;</code>
      *
      * <pre>
      * last update date (in ISO string format)
@@ -376,7 +376,7 @@ public final class Messages {
       return ((bitField0_ & 0x00000002) == 0x00000002);
     }
     /**
-     * <code>required string last_update = 2;</code>
+     * <code>optional string last_update = 2;</code>
      *
      * <pre>
      * last update date (in ISO string format)
@@ -397,7 +397,7 @@ public final class Messages {
       }
     }
     /**
-     * <code>required string last_update = 2;</code>
+     * <code>optional string last_update = 2;</code>
      *
      * <pre>
      * last update date (in ISO string format)
@@ -426,14 +426,6 @@ public final class Messages {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized != -1) return isInitialized == 1;
 
-      if (!hasMessage()) {
-        memoizedIsInitialized = 0;
-        return false;
-      }
-      if (!hasLastUpdate()) {
-        memoizedIsInitialized = 0;
-        return false;
-      }
       memoizedIsInitialized = 1;
       return true;
     }
@@ -657,14 +649,6 @@ public final class Messages {
       }
 
       public final boolean isInitialized() {
-        if (!hasMessage()) {
-          
-          return false;
-        }
-        if (!hasLastUpdate()) {
-          
-          return false;
-        }
         return true;
       }
 
@@ -687,16 +671,16 @@ public final class Messages {
       }
       private int bitField0_;
 
-      // required string message = 1;
+      // optional string message = 1;
       private java.lang.Object message_ = "";
       /**
-       * <code>required string message = 1;</code>
+       * <code>optional string message = 1;</code>
        */
       public boolean hasMessage() {
         return ((bitField0_ & 0x00000001) == 0x00000001);
       }
       /**
-       * <code>required string message = 1;</code>
+       * <code>optional string message = 1;</code>
        */
       public java.lang.String getMessage() {
         java.lang.Object ref = message_;
@@ -710,7 +694,7 @@ public final class Messages {
         }
       }
       /**
-       * <code>required string message = 1;</code>
+       * <code>optional string message = 1;</code>
        */
       public com.google.protobuf.ByteString
           getMessageBytes() {
@@ -726,7 +710,7 @@ public final class Messages {
         }
       }
       /**
-       * <code>required string message = 1;</code>
+       * <code>optional string message = 1;</code>
        */
       public Builder setMessage(
           java.lang.String value) {
@@ -739,7 +723,7 @@ public final class Messages {
         return this;
       }
       /**
-       * <code>required string message = 1;</code>
+       * <code>optional string message = 1;</code>
        */
       public Builder clearMessage() {
         bitField0_ = (bitField0_ & ~0x00000001);
@@ -748,7 +732,7 @@ public final class Messages {
         return this;
       }
       /**
-       * <code>required string message = 1;</code>
+       * <code>optional string message = 1;</code>
        */
       public Builder setMessageBytes(
           com.google.protobuf.ByteString value) {
@@ -761,10 +745,10 @@ public final class Messages {
         return this;
       }
 
-      // required string last_update = 2;
+      // optional string last_update = 2;
       private java.lang.Object lastUpdate_ = "";
       /**
-       * <code>required string last_update = 2;</code>
+       * <code>optional string last_update = 2;</code>
        *
        * <pre>
        * last update date (in ISO string format)
@@ -774,7 +758,7 @@ public final class Messages {
         return ((bitField0_ & 0x00000002) == 0x00000002);
       }
       /**
-       * <code>required string last_update = 2;</code>
+       * <code>optional string last_update = 2;</code>
        *
        * <pre>
        * last update date (in ISO string format)
@@ -792,7 +776,7 @@ public final class Messages {
         }
       }
       /**
-       * <code>required string last_update = 2;</code>
+       * <code>optional string last_update = 2;</code>
        *
        * <pre>
        * last update date (in ISO string format)
@@ -812,7 +796,7 @@ public final class Messages {
         }
       }
       /**
-       * <code>required string last_update = 2;</code>
+       * <code>optional string last_update = 2;</code>
        *
        * <pre>
        * last update date (in ISO string format)
@@ -829,7 +813,7 @@ public final class Messages {
         return this;
       }
       /**
-       * <code>required string last_update = 2;</code>
+       * <code>optional string last_update = 2;</code>
        *
        * <pre>
        * last update date (in ISO string format)
@@ -842,7 +826,7 @@ public final class Messages {
         return this;
       }
       /**
-       * <code>required string last_update = 2;</code>
+       * <code>optional string last_update = 2;</code>
        *
        * <pre>
        * last update date (in ISO string format)
@@ -4678,9 +4662,9 @@ public final class Messages {
     com.google.protobuf.ByteString
         getKeyBytes();
 
-    // required string display_name = 2;
+    // optional string display_name = 2;
     /**
-     * <code>required string display_name = 2;</code>
+     * <code>optional string display_name = 2;</code>
      *
      * <pre>
      * The "display" name for the player, which is what other players see.
@@ -4688,7 +4672,7 @@ public final class Messages {
      */
     boolean hasDisplayName();
     /**
-     * <code>required string display_name = 2;</code>
+     * <code>optional string display_name = 2;</code>
      *
      * <pre>
      * The "display" name for the player, which is what other players see.
@@ -4696,7 +4680,7 @@ public final class Messages {
      */
     java.lang.String getDisplayName();
     /**
-     * <code>required string display_name = 2;</code>
+     * <code>optional string display_name = 2;</code>
      *
      * <pre>
      * The "display" name for the player, which is what other players see.
@@ -4759,13 +4743,13 @@ public final class Messages {
     com.google.protobuf.ByteString
         getEmailBytes();
 
-    // required .au.com.codeka.common.protobuf.Empire.EmpireState state = 5;
+    // optional .au.com.codeka.common.protobuf.Empire.EmpireState state = 5;
     /**
-     * <code>required .au.com.codeka.common.protobuf.Empire.EmpireState state = 5;</code>
+     * <code>optional .au.com.codeka.common.protobuf.Empire.EmpireState state = 5;</code>
      */
     boolean hasState();
     /**
-     * <code>required .au.com.codeka.common.protobuf.Empire.EmpireState state = 5;</code>
+     * <code>optional .au.com.codeka.common.protobuf.Empire.EmpireState state = 5;</code>
      */
     au.com.codeka.common.protobuf.Messages.Empire.EmpireState getState();
 
@@ -5387,11 +5371,11 @@ public final class Messages {
       }
     }
 
-    // required string display_name = 2;
+    // optional string display_name = 2;
     public static final int DISPLAY_NAME_FIELD_NUMBER = 2;
     private java.lang.Object displayName_;
     /**
-     * <code>required string display_name = 2;</code>
+     * <code>optional string display_name = 2;</code>
      *
      * <pre>
      * The "display" name for the player, which is what other players see.
@@ -5401,7 +5385,7 @@ public final class Messages {
       return ((bitField0_ & 0x00000002) == 0x00000002);
     }
     /**
-     * <code>required string display_name = 2;</code>
+     * <code>optional string display_name = 2;</code>
      *
      * <pre>
      * The "display" name for the player, which is what other players see.
@@ -5422,7 +5406,7 @@ public final class Messages {
       }
     }
     /**
-     * <code>required string display_name = 2;</code>
+     * <code>optional string display_name = 2;</code>
      *
      * <pre>
      * The "display" name for the player, which is what other players see.
@@ -5552,17 +5536,17 @@ public final class Messages {
       }
     }
 
-    // required .au.com.codeka.common.protobuf.Empire.EmpireState state = 5;
+    // optional .au.com.codeka.common.protobuf.Empire.EmpireState state = 5;
     public static final int STATE_FIELD_NUMBER = 5;
     private au.com.codeka.common.protobuf.Messages.Empire.EmpireState state_;
     /**
-     * <code>required .au.com.codeka.common.protobuf.Empire.EmpireState state = 5;</code>
+     * <code>optional .au.com.codeka.common.protobuf.Empire.EmpireState state = 5;</code>
      */
     public boolean hasState() {
       return ((bitField0_ & 0x00000010) == 0x00000010);
     }
     /**
-     * <code>required .au.com.codeka.common.protobuf.Empire.EmpireState state = 5;</code>
+     * <code>optional .au.com.codeka.common.protobuf.Empire.EmpireState state = 5;</code>
      */
     public au.com.codeka.common.protobuf.Messages.Empire.EmpireState getState() {
       return state_;
@@ -5916,26 +5900,6 @@ public final class Messages {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized != -1) return isInitialized == 1;
 
-      if (!hasDisplayName()) {
-        memoizedIsInitialized = 0;
-        return false;
-      }
-      if (!hasState()) {
-        memoizedIsInitialized = 0;
-        return false;
-      }
-      for (int i = 0; i < getFleetsCount(); i++) {
-        if (!getFleets(i).isInitialized()) {
-          memoizedIsInitialized = 0;
-          return false;
-        }
-      }
-      if (hasHomeStar()) {
-        if (!getHomeStar().isInitialized()) {
-          memoizedIsInitialized = 0;
-          return false;
-        }
-      }
       memoizedIsInitialized = 1;
       return true;
     }
@@ -6465,26 +6429,6 @@ public final class Messages {
       }
 
       public final boolean isInitialized() {
-        if (!hasDisplayName()) {
-          
-          return false;
-        }
-        if (!hasState()) {
-          
-          return false;
-        }
-        for (int i = 0; i < getFleetsCount(); i++) {
-          if (!getFleets(i).isInitialized()) {
-            
-            return false;
-          }
-        }
-        if (hasHomeStar()) {
-          if (!getHomeStar().isInitialized()) {
-            
-            return false;
-          }
-        }
         return true;
       }
 
@@ -6611,10 +6555,10 @@ public final class Messages {
         return this;
       }
 
-      // required string display_name = 2;
+      // optional string display_name = 2;
       private java.lang.Object displayName_ = "";
       /**
-       * <code>required string display_name = 2;</code>
+       * <code>optional string display_name = 2;</code>
        *
        * <pre>
        * The "display" name for the player, which is what other players see.
@@ -6624,7 +6568,7 @@ public final class Messages {
         return ((bitField0_ & 0x00000002) == 0x00000002);
       }
       /**
-       * <code>required string display_name = 2;</code>
+       * <code>optional string display_name = 2;</code>
        *
        * <pre>
        * The "display" name for the player, which is what other players see.
@@ -6642,7 +6586,7 @@ public final class Messages {
         }
       }
       /**
-       * <code>required string display_name = 2;</code>
+       * <code>optional string display_name = 2;</code>
        *
        * <pre>
        * The "display" name for the player, which is what other players see.
@@ -6662,7 +6606,7 @@ public final class Messages {
         }
       }
       /**
-       * <code>required string display_name = 2;</code>
+       * <code>optional string display_name = 2;</code>
        *
        * <pre>
        * The "display" name for the player, which is what other players see.
@@ -6679,7 +6623,7 @@ public final class Messages {
         return this;
       }
       /**
-       * <code>required string display_name = 2;</code>
+       * <code>optional string display_name = 2;</code>
        *
        * <pre>
        * The "display" name for the player, which is what other players see.
@@ -6692,7 +6636,7 @@ public final class Messages {
         return this;
       }
       /**
-       * <code>required string display_name = 2;</code>
+       * <code>optional string display_name = 2;</code>
        *
        * <pre>
        * The "display" name for the player, which is what other players see.
@@ -6905,22 +6849,22 @@ public final class Messages {
         return this;
       }
 
-      // required .au.com.codeka.common.protobuf.Empire.EmpireState state = 5;
+      // optional .au.com.codeka.common.protobuf.Empire.EmpireState state = 5;
       private au.com.codeka.common.protobuf.Messages.Empire.EmpireState state_ = au.com.codeka.common.protobuf.Messages.Empire.EmpireState.ACTIVE;
       /**
-       * <code>required .au.com.codeka.common.protobuf.Empire.EmpireState state = 5;</code>
+       * <code>optional .au.com.codeka.common.protobuf.Empire.EmpireState state = 5;</code>
        */
       public boolean hasState() {
         return ((bitField0_ & 0x00000010) == 0x00000010);
       }
       /**
-       * <code>required .au.com.codeka.common.protobuf.Empire.EmpireState state = 5;</code>
+       * <code>optional .au.com.codeka.common.protobuf.Empire.EmpireState state = 5;</code>
        */
       public au.com.codeka.common.protobuf.Messages.Empire.EmpireState getState() {
         return state_;
       }
       /**
-       * <code>required .au.com.codeka.common.protobuf.Empire.EmpireState state = 5;</code>
+       * <code>optional .au.com.codeka.common.protobuf.Empire.EmpireState state = 5;</code>
        */
       public Builder setState(au.com.codeka.common.protobuf.Messages.Empire.EmpireState value) {
         if (value == null) {
@@ -6932,7 +6876,7 @@ public final class Messages {
         return this;
       }
       /**
-       * <code>required .au.com.codeka.common.protobuf.Empire.EmpireState state = 5;</code>
+       * <code>optional .au.com.codeka.common.protobuf.Empire.EmpireState state = 5;</code>
        */
       public Builder clearState() {
         bitField0_ = (bitField0_ & ~0x00000010);
@@ -8644,12 +8588,6 @@ public final class Messages {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized != -1) return isInitialized == 1;
 
-      for (int i = 0; i < getEmpiresCount(); i++) {
-        if (!getEmpires(i).isInitialized()) {
-          memoizedIsInitialized = 0;
-          return false;
-        }
-      }
       memoizedIsInitialized = 1;
       return true;
     }
@@ -8878,12 +8816,6 @@ public final class Messages {
       }
 
       public final boolean isInitialized() {
-        for (int i = 0; i < getEmpiresCount(); i++) {
-          if (!getEmpires(i).isInitialized()) {
-            
-            return false;
-          }
-        }
         return true;
       }
 
@@ -13352,28 +13284,28 @@ public final class Messages {
     public interface DesignCountOrBuilder
         extends com.google.protobuf.MessageOrBuilder {
 
-      // required string design_id = 1;
+      // optional string design_id = 1;
       /**
-       * <code>required string design_id = 1;</code>
+       * <code>optional string design_id = 1;</code>
        */
       boolean hasDesignId();
       /**
-       * <code>required string design_id = 1;</code>
+       * <code>optional string design_id = 1;</code>
        */
       java.lang.String getDesignId();
       /**
-       * <code>required string design_id = 1;</code>
+       * <code>optional string design_id = 1;</code>
        */
       com.google.protobuf.ByteString
           getDesignIdBytes();
 
-      // required int32 num_buildings = 2;
+      // optional int32 num_buildings = 2;
       /**
-       * <code>required int32 num_buildings = 2;</code>
+       * <code>optional int32 num_buildings = 2;</code>
        */
       boolean hasNumBuildings();
       /**
-       * <code>required int32 num_buildings = 2;</code>
+       * <code>optional int32 num_buildings = 2;</code>
        */
       int getNumBuildings();
     }
@@ -13478,17 +13410,17 @@ public final class Messages {
       }
 
       private int bitField0_;
-      // required string design_id = 1;
+      // optional string design_id = 1;
       public static final int DESIGN_ID_FIELD_NUMBER = 1;
       private java.lang.Object designId_;
       /**
-       * <code>required string design_id = 1;</code>
+       * <code>optional string design_id = 1;</code>
        */
       public boolean hasDesignId() {
         return ((bitField0_ & 0x00000001) == 0x00000001);
       }
       /**
-       * <code>required string design_id = 1;</code>
+       * <code>optional string design_id = 1;</code>
        */
       public java.lang.String getDesignId() {
         java.lang.Object ref = designId_;
@@ -13505,7 +13437,7 @@ public final class Messages {
         }
       }
       /**
-       * <code>required string design_id = 1;</code>
+       * <code>optional string design_id = 1;</code>
        */
       public com.google.protobuf.ByteString
           getDesignIdBytes() {
@@ -13521,17 +13453,17 @@ public final class Messages {
         }
       }
 
-      // required int32 num_buildings = 2;
+      // optional int32 num_buildings = 2;
       public static final int NUM_BUILDINGS_FIELD_NUMBER = 2;
       private int numBuildings_;
       /**
-       * <code>required int32 num_buildings = 2;</code>
+       * <code>optional int32 num_buildings = 2;</code>
        */
       public boolean hasNumBuildings() {
         return ((bitField0_ & 0x00000002) == 0x00000002);
       }
       /**
-       * <code>required int32 num_buildings = 2;</code>
+       * <code>optional int32 num_buildings = 2;</code>
        */
       public int getNumBuildings() {
         return numBuildings_;
@@ -13546,14 +13478,6 @@ public final class Messages {
         byte isInitialized = memoizedIsInitialized;
         if (isInitialized != -1) return isInitialized == 1;
 
-        if (!hasDesignId()) {
-          memoizedIsInitialized = 0;
-          return false;
-        }
-        if (!hasNumBuildings()) {
-          memoizedIsInitialized = 0;
-          return false;
-        }
         memoizedIsInitialized = 1;
         return true;
       }
@@ -13769,14 +13693,6 @@ public final class Messages {
         }
 
         public final boolean isInitialized() {
-          if (!hasDesignId()) {
-            
-            return false;
-          }
-          if (!hasNumBuildings()) {
-            
-            return false;
-          }
           return true;
         }
 
@@ -13799,16 +13715,16 @@ public final class Messages {
         }
         private int bitField0_;
 
-        // required string design_id = 1;
+        // optional string design_id = 1;
         private java.lang.Object designId_ = "";
         /**
-         * <code>required string design_id = 1;</code>
+         * <code>optional string design_id = 1;</code>
          */
         public boolean hasDesignId() {
           return ((bitField0_ & 0x00000001) == 0x00000001);
         }
         /**
-         * <code>required string design_id = 1;</code>
+         * <code>optional string design_id = 1;</code>
          */
         public java.lang.String getDesignId() {
           java.lang.Object ref = designId_;
@@ -13822,7 +13738,7 @@ public final class Messages {
           }
         }
         /**
-         * <code>required string design_id = 1;</code>
+         * <code>optional string design_id = 1;</code>
          */
         public com.google.protobuf.ByteString
             getDesignIdBytes() {
@@ -13838,7 +13754,7 @@ public final class Messages {
           }
         }
         /**
-         * <code>required string design_id = 1;</code>
+         * <code>optional string design_id = 1;</code>
          */
         public Builder setDesignId(
             java.lang.String value) {
@@ -13851,7 +13767,7 @@ public final class Messages {
           return this;
         }
         /**
-         * <code>required string design_id = 1;</code>
+         * <code>optional string design_id = 1;</code>
          */
         public Builder clearDesignId() {
           bitField0_ = (bitField0_ & ~0x00000001);
@@ -13860,7 +13776,7 @@ public final class Messages {
           return this;
         }
         /**
-         * <code>required string design_id = 1;</code>
+         * <code>optional string design_id = 1;</code>
          */
         public Builder setDesignIdBytes(
             com.google.protobuf.ByteString value) {
@@ -13873,22 +13789,22 @@ public final class Messages {
           return this;
         }
 
-        // required int32 num_buildings = 2;
+        // optional int32 num_buildings = 2;
         private int numBuildings_ ;
         /**
-         * <code>required int32 num_buildings = 2;</code>
+         * <code>optional int32 num_buildings = 2;</code>
          */
         public boolean hasNumBuildings() {
           return ((bitField0_ & 0x00000002) == 0x00000002);
         }
         /**
-         * <code>required int32 num_buildings = 2;</code>
+         * <code>optional int32 num_buildings = 2;</code>
          */
         public int getNumBuildings() {
           return numBuildings_;
         }
         /**
-         * <code>required int32 num_buildings = 2;</code>
+         * <code>optional int32 num_buildings = 2;</code>
          */
         public Builder setNumBuildings(int value) {
           bitField0_ |= 0x00000002;
@@ -13897,7 +13813,7 @@ public final class Messages {
           return this;
         }
         /**
-         * <code>required int32 num_buildings = 2;</code>
+         * <code>optional int32 num_buildings = 2;</code>
          */
         public Builder clearNumBuildings() {
           bitField0_ = (bitField0_ & ~0x00000002);
@@ -13961,12 +13877,6 @@ public final class Messages {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized != -1) return isInitialized == 1;
 
-      for (int i = 0; i < getCountsCount(); i++) {
-        if (!getCounts(i).isInitialized()) {
-          memoizedIsInitialized = 0;
-          return false;
-        }
-      }
       memoizedIsInitialized = 1;
       return true;
     }
@@ -14202,12 +14112,6 @@ public final class Messages {
       }
 
       public final boolean isInitialized() {
-        for (int i = 0; i < getCountsCount(); i++) {
-          if (!getCounts(i).isInitialized()) {
-            
-            return false;
-          }
-        }
         return true;
       }
 
@@ -16406,9 +16310,9 @@ public final class Messages {
   public interface HelloResponseOrBuilder
       extends com.google.protobuf.MessageOrBuilder {
 
-    // required .au.com.codeka.common.protobuf.MessageOfTheDay motd = 1;
+    // optional .au.com.codeka.common.protobuf.MessageOfTheDay motd = 1;
     /**
-     * <code>required .au.com.codeka.common.protobuf.MessageOfTheDay motd = 1;</code>
+     * <code>optional .au.com.codeka.common.protobuf.MessageOfTheDay motd = 1;</code>
      *
      * <pre>
      * The current message of the day.
@@ -16416,7 +16320,7 @@ public final class Messages {
      */
     boolean hasMotd();
     /**
-     * <code>required .au.com.codeka.common.protobuf.MessageOfTheDay motd = 1;</code>
+     * <code>optional .au.com.codeka.common.protobuf.MessageOfTheDay motd = 1;</code>
      *
      * <pre>
      * The current message of the day.
@@ -16424,7 +16328,7 @@ public final class Messages {
      */
     au.com.codeka.common.protobuf.Messages.MessageOfTheDay getMotd();
     /**
-     * <code>required .au.com.codeka.common.protobuf.MessageOfTheDay motd = 1;</code>
+     * <code>optional .au.com.codeka.common.protobuf.MessageOfTheDay motd = 1;</code>
      *
      * <pre>
      * The current message of the day.
@@ -16896,11 +16800,11 @@ public final class Messages {
     }
 
     private int bitField0_;
-    // required .au.com.codeka.common.protobuf.MessageOfTheDay motd = 1;
+    // optional .au.com.codeka.common.protobuf.MessageOfTheDay motd = 1;
     public static final int MOTD_FIELD_NUMBER = 1;
     private au.com.codeka.common.protobuf.Messages.MessageOfTheDay motd_;
     /**
-     * <code>required .au.com.codeka.common.protobuf.MessageOfTheDay motd = 1;</code>
+     * <code>optional .au.com.codeka.common.protobuf.MessageOfTheDay motd = 1;</code>
      *
      * <pre>
      * The current message of the day.
@@ -16910,7 +16814,7 @@ public final class Messages {
       return ((bitField0_ & 0x00000001) == 0x00000001);
     }
     /**
-     * <code>required .au.com.codeka.common.protobuf.MessageOfTheDay motd = 1;</code>
+     * <code>optional .au.com.codeka.common.protobuf.MessageOfTheDay motd = 1;</code>
      *
      * <pre>
      * The current message of the day.
@@ -16920,7 +16824,7 @@ public final class Messages {
       return motd_;
     }
     /**
-     * <code>required .au.com.codeka.common.protobuf.MessageOfTheDay motd = 1;</code>
+     * <code>optional .au.com.codeka.common.protobuf.MessageOfTheDay motd = 1;</code>
      *
      * <pre>
      * The current message of the day.
@@ -17303,26 +17207,6 @@ public final class Messages {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized != -1) return isInitialized == 1;
 
-      if (!hasMotd()) {
-        memoizedIsInitialized = 0;
-        return false;
-      }
-      if (!getMotd().isInitialized()) {
-        memoizedIsInitialized = 0;
-        return false;
-      }
-      if (hasEmpire()) {
-        if (!getEmpire().isInitialized()) {
-          memoizedIsInitialized = 0;
-          return false;
-        }
-      }
-      if (hasBuildingStatistics()) {
-        if (!getBuildingStatistics().isInitialized()) {
-          memoizedIsInitialized = 0;
-          return false;
-        }
-      }
       memoizedIsInitialized = 1;
       return true;
     }
@@ -17777,26 +17661,6 @@ public final class Messages {
       }
 
       public final boolean isInitialized() {
-        if (!hasMotd()) {
-          
-          return false;
-        }
-        if (!getMotd().isInitialized()) {
-          
-          return false;
-        }
-        if (hasEmpire()) {
-          if (!getEmpire().isInitialized()) {
-            
-            return false;
-          }
-        }
-        if (hasBuildingStatistics()) {
-          if (!getBuildingStatistics().isInitialized()) {
-            
-            return false;
-          }
-        }
         return true;
       }
 
@@ -17819,12 +17683,12 @@ public final class Messages {
       }
       private int bitField0_;
 
-      // required .au.com.codeka.common.protobuf.MessageOfTheDay motd = 1;
+      // optional .au.com.codeka.common.protobuf.MessageOfTheDay motd = 1;
       private au.com.codeka.common.protobuf.Messages.MessageOfTheDay motd_ = au.com.codeka.common.protobuf.Messages.MessageOfTheDay.getDefaultInstance();
       private com.google.protobuf.SingleFieldBuilder<
           au.com.codeka.common.protobuf.Messages.MessageOfTheDay, au.com.codeka.common.protobuf.Messages.MessageOfTheDay.Builder, au.com.codeka.common.protobuf.Messages.MessageOfTheDayOrBuilder> motdBuilder_;
       /**
-       * <code>required .au.com.codeka.common.protobuf.MessageOfTheDay motd = 1;</code>
+       * <code>optional .au.com.codeka.common.protobuf.MessageOfTheDay motd = 1;</code>
        *
        * <pre>
        * The current message of the day.
@@ -17834,7 +17698,7 @@ public final class Messages {
         return ((bitField0_ & 0x00000001) == 0x00000001);
       }
       /**
-       * <code>required .au.com.codeka.common.protobuf.MessageOfTheDay motd = 1;</code>
+       * <code>optional .au.com.codeka.common.protobuf.MessageOfTheDay motd = 1;</code>
        *
        * <pre>
        * The current message of the day.
@@ -17848,7 +17712,7 @@ public final class Messages {
         }
       }
       /**
-       * <code>required .au.com.codeka.common.protobuf.MessageOfTheDay motd = 1;</code>
+       * <code>optional .au.com.codeka.common.protobuf.MessageOfTheDay motd = 1;</code>
        *
        * <pre>
        * The current message of the day.
@@ -17868,7 +17732,7 @@ public final class Messages {
         return this;
       }
       /**
-       * <code>required .au.com.codeka.common.protobuf.MessageOfTheDay motd = 1;</code>
+       * <code>optional .au.com.codeka.common.protobuf.MessageOfTheDay motd = 1;</code>
        *
        * <pre>
        * The current message of the day.
@@ -17886,7 +17750,7 @@ public final class Messages {
         return this;
       }
       /**
-       * <code>required .au.com.codeka.common.protobuf.MessageOfTheDay motd = 1;</code>
+       * <code>optional .au.com.codeka.common.protobuf.MessageOfTheDay motd = 1;</code>
        *
        * <pre>
        * The current message of the day.
@@ -17909,7 +17773,7 @@ public final class Messages {
         return this;
       }
       /**
-       * <code>required .au.com.codeka.common.protobuf.MessageOfTheDay motd = 1;</code>
+       * <code>optional .au.com.codeka.common.protobuf.MessageOfTheDay motd = 1;</code>
        *
        * <pre>
        * The current message of the day.
@@ -17926,7 +17790,7 @@ public final class Messages {
         return this;
       }
       /**
-       * <code>required .au.com.codeka.common.protobuf.MessageOfTheDay motd = 1;</code>
+       * <code>optional .au.com.codeka.common.protobuf.MessageOfTheDay motd = 1;</code>
        *
        * <pre>
        * The current message of the day.
@@ -17938,7 +17802,7 @@ public final class Messages {
         return getMotdFieldBuilder().getBuilder();
       }
       /**
-       * <code>required .au.com.codeka.common.protobuf.MessageOfTheDay motd = 1;</code>
+       * <code>optional .au.com.codeka.common.protobuf.MessageOfTheDay motd = 1;</code>
        *
        * <pre>
        * The current message of the day.
@@ -17952,7 +17816,7 @@ public final class Messages {
         }
       }
       /**
-       * <code>required .au.com.codeka.common.protobuf.MessageOfTheDay motd = 1;</code>
+       * <code>optional .au.com.codeka.common.protobuf.MessageOfTheDay motd = 1;</code>
        *
        * <pre>
        * The current message of the day.
@@ -23751,13 +23615,13 @@ public final class Messages {
   public interface NotificationWrapperOrBuilder
       extends com.google.protobuf.MessageOrBuilder {
 
-    // required bytes original_message = 1;
+    // optional bytes original_message = 1;
     /**
-     * <code>required bytes original_message = 1;</code>
+     * <code>optional bytes original_message = 1;</code>
      */
     boolean hasOriginalMessage();
     /**
-     * <code>required bytes original_message = 1;</code>
+     * <code>optional bytes original_message = 1;</code>
      */
     com.google.protobuf.ByteString getOriginalMessage();
 
@@ -23898,17 +23762,17 @@ public final class Messages {
     }
 
     private int bitField0_;
-    // required bytes original_message = 1;
+    // optional bytes original_message = 1;
     public static final int ORIGINAL_MESSAGE_FIELD_NUMBER = 1;
     private com.google.protobuf.ByteString originalMessage_;
     /**
-     * <code>required bytes original_message = 1;</code>
+     * <code>optional bytes original_message = 1;</code>
      */
     public boolean hasOriginalMessage() {
       return ((bitField0_ & 0x00000001) == 0x00000001);
     }
     /**
-     * <code>required bytes original_message = 1;</code>
+     * <code>optional bytes original_message = 1;</code>
      */
     public com.google.protobuf.ByteString getOriginalMessage() {
       return originalMessage_;
@@ -23959,10 +23823,6 @@ public final class Messages {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized != -1) return isInitialized == 1;
 
-      if (!hasOriginalMessage()) {
-        memoizedIsInitialized = 0;
-        return false;
-      }
       memoizedIsInitialized = 1;
       return true;
     }
@@ -24214,10 +24074,6 @@ public final class Messages {
       }
 
       public final boolean isInitialized() {
-        if (!hasOriginalMessage()) {
-          
-          return false;
-        }
         return true;
       }
 
@@ -24240,22 +24096,22 @@ public final class Messages {
       }
       private int bitField0_;
 
-      // required bytes original_message = 1;
+      // optional bytes original_message = 1;
       private com.google.protobuf.ByteString originalMessage_ = com.google.protobuf.ByteString.EMPTY;
       /**
-       * <code>required bytes original_message = 1;</code>
+       * <code>optional bytes original_message = 1;</code>
        */
       public boolean hasOriginalMessage() {
         return ((bitField0_ & 0x00000001) == 0x00000001);
       }
       /**
-       * <code>required bytes original_message = 1;</code>
+       * <code>optional bytes original_message = 1;</code>
        */
       public com.google.protobuf.ByteString getOriginalMessage() {
         return originalMessage_;
       }
       /**
-       * <code>required bytes original_message = 1;</code>
+       * <code>optional bytes original_message = 1;</code>
        */
       public Builder setOriginalMessage(com.google.protobuf.ByteString value) {
         if (value == null) {
@@ -24267,7 +24123,7 @@ public final class Messages {
         return this;
       }
       /**
-       * <code>required bytes original_message = 1;</code>
+       * <code>optional bytes original_message = 1;</code>
        */
       public Builder clearOriginalMessage() {
         bitField0_ = (bitField0_ & ~0x00000001);
@@ -24540,17 +24396,17 @@ public final class Messages {
      */
     int getId();
 
-    // required string message = 1;
+    // optional string message = 1;
     /**
-     * <code>required string message = 1;</code>
+     * <code>optional string message = 1;</code>
      */
     boolean hasMessage();
     /**
-     * <code>required string message = 1;</code>
+     * <code>optional string message = 1;</code>
      */
     java.lang.String getMessage();
     /**
-     * <code>required string message = 1;</code>
+     * <code>optional string message = 1;</code>
      */
     com.google.protobuf.ByteString
         getMessageBytes();
@@ -24923,17 +24779,17 @@ public final class Messages {
       return id_;
     }
 
-    // required string message = 1;
+    // optional string message = 1;
     public static final int MESSAGE_FIELD_NUMBER = 1;
     private java.lang.Object message_;
     /**
-     * <code>required string message = 1;</code>
+     * <code>optional string message = 1;</code>
      */
     public boolean hasMessage() {
       return ((bitField0_ & 0x00000002) == 0x00000002);
     }
     /**
-     * <code>required string message = 1;</code>
+     * <code>optional string message = 1;</code>
      */
     public java.lang.String getMessage() {
       java.lang.Object ref = message_;
@@ -24950,7 +24806,7 @@ public final class Messages {
       }
     }
     /**
-     * <code>required string message = 1;</code>
+     * <code>optional string message = 1;</code>
      */
     public com.google.protobuf.ByteString
         getMessageBytes() {
@@ -25173,10 +25029,6 @@ public final class Messages {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized != -1) return isInitialized == 1;
 
-      if (!hasMessage()) {
-        memoizedIsInitialized = 0;
-        return false;
-      }
       memoizedIsInitialized = 1;
       return true;
     }
@@ -25499,10 +25351,6 @@ public final class Messages {
       }
 
       public final boolean isInitialized() {
-        if (!hasMessage()) {
-          
-          return false;
-        }
         return true;
       }
 
@@ -25558,16 +25406,16 @@ public final class Messages {
         return this;
       }
 
-      // required string message = 1;
+      // optional string message = 1;
       private java.lang.Object message_ = "";
       /**
-       * <code>required string message = 1;</code>
+       * <code>optional string message = 1;</code>
        */
       public boolean hasMessage() {
         return ((bitField0_ & 0x00000002) == 0x00000002);
       }
       /**
-       * <code>required string message = 1;</code>
+       * <code>optional string message = 1;</code>
        */
       public java.lang.String getMessage() {
         java.lang.Object ref = message_;
@@ -25581,7 +25429,7 @@ public final class Messages {
         }
       }
       /**
-       * <code>required string message = 1;</code>
+       * <code>optional string message = 1;</code>
        */
       public com.google.protobuf.ByteString
           getMessageBytes() {
@@ -25597,7 +25445,7 @@ public final class Messages {
         }
       }
       /**
-       * <code>required string message = 1;</code>
+       * <code>optional string message = 1;</code>
        */
       public Builder setMessage(
           java.lang.String value) {
@@ -25610,7 +25458,7 @@ public final class Messages {
         return this;
       }
       /**
-       * <code>required string message = 1;</code>
+       * <code>optional string message = 1;</code>
        */
       public Builder clearMessage() {
         bitField0_ = (bitField0_ & ~0x00000002);
@@ -25619,7 +25467,7 @@ public final class Messages {
         return this;
       }
       /**
-       * <code>required string message = 1;</code>
+       * <code>optional string message = 1;</code>
        */
       public Builder setMessageBytes(
           com.google.protobuf.ByteString value) {
@@ -26170,12 +26018,6 @@ public final class Messages {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized != -1) return isInitialized == 1;
 
-      for (int i = 0; i < getMessagesCount(); i++) {
-        if (!getMessages(i).isInitialized()) {
-          memoizedIsInitialized = 0;
-          return false;
-        }
-      }
       memoizedIsInitialized = 1;
       return true;
     }
@@ -26404,12 +26246,6 @@ public final class Messages {
       }
 
       public final boolean isInitialized() {
-        for (int i = 0; i < getMessagesCount(); i++) {
-          if (!getMessages(i).isInitialized()) {
-            
-            return false;
-          }
-        }
         return true;
       }
 
@@ -29021,9 +28857,9 @@ public final class Messages {
   public interface SectorOrBuilder
       extends com.google.protobuf.MessageOrBuilder {
 
-    // required int64 x = 1;
+    // optional int64 x = 1;
     /**
-     * <code>required int64 x = 1;</code>
+     * <code>optional int64 x = 1;</code>
      *
      * <pre>
      * these are the (x,y) coordinates of the sector. (0,0) is the "centre" of the universe,
@@ -29032,7 +28868,7 @@ public final class Messages {
      */
     boolean hasX();
     /**
-     * <code>required int64 x = 1;</code>
+     * <code>optional int64 x = 1;</code>
      *
      * <pre>
      * these are the (x,y) coordinates of the sector. (0,0) is the "centre" of the universe,
@@ -29041,13 +28877,13 @@ public final class Messages {
      */
     long getX();
 
-    // required int64 y = 2;
+    // optional int64 y = 2;
     /**
-     * <code>required int64 y = 2;</code>
+     * <code>optional int64 y = 2;</code>
      */
     boolean hasY();
     /**
-     * <code>required int64 y = 2;</code>
+     * <code>optional int64 y = 2;</code>
      */
     long getY();
 
@@ -29348,11 +29184,11 @@ public final class Messages {
     }
 
     private int bitField0_;
-    // required int64 x = 1;
+    // optional int64 x = 1;
     public static final int X_FIELD_NUMBER = 1;
     private long x_;
     /**
-     * <code>required int64 x = 1;</code>
+     * <code>optional int64 x = 1;</code>
      *
      * <pre>
      * these are the (x,y) coordinates of the sector. (0,0) is the "centre" of the universe,
@@ -29363,7 +29199,7 @@ public final class Messages {
       return ((bitField0_ & 0x00000001) == 0x00000001);
     }
     /**
-     * <code>required int64 x = 1;</code>
+     * <code>optional int64 x = 1;</code>
      *
      * <pre>
      * these are the (x,y) coordinates of the sector. (0,0) is the "centre" of the universe,
@@ -29374,17 +29210,17 @@ public final class Messages {
       return x_;
     }
 
-    // required int64 y = 2;
+    // optional int64 y = 2;
     public static final int Y_FIELD_NUMBER = 2;
     private long y_;
     /**
-     * <code>required int64 y = 2;</code>
+     * <code>optional int64 y = 2;</code>
      */
     public boolean hasY() {
       return ((bitField0_ & 0x00000002) == 0x00000002);
     }
     /**
-     * <code>required int64 y = 2;</code>
+     * <code>optional int64 y = 2;</code>
      */
     public long getY() {
       return y_;
@@ -29595,26 +29431,6 @@ public final class Messages {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized != -1) return isInitialized == 1;
 
-      if (!hasX()) {
-        memoizedIsInitialized = 0;
-        return false;
-      }
-      if (!hasY()) {
-        memoizedIsInitialized = 0;
-        return false;
-      }
-      for (int i = 0; i < getStarsCount(); i++) {
-        if (!getStars(i).isInitialized()) {
-          memoizedIsInitialized = 0;
-          return false;
-        }
-      }
-      for (int i = 0; i < getFleetsCount(); i++) {
-        if (!getFleets(i).isInitialized()) {
-          memoizedIsInitialized = 0;
-          return false;
-        }
-      }
       memoizedIsInitialized = 1;
       return true;
     }
@@ -29996,26 +29812,6 @@ public final class Messages {
       }
 
       public final boolean isInitialized() {
-        if (!hasX()) {
-          
-          return false;
-        }
-        if (!hasY()) {
-          
-          return false;
-        }
-        for (int i = 0; i < getStarsCount(); i++) {
-          if (!getStars(i).isInitialized()) {
-            
-            return false;
-          }
-        }
-        for (int i = 0; i < getFleetsCount(); i++) {
-          if (!getFleets(i).isInitialized()) {
-            
-            return false;
-          }
-        }
         return true;
       }
 
@@ -30038,10 +29834,10 @@ public final class Messages {
       }
       private int bitField0_;
 
-      // required int64 x = 1;
+      // optional int64 x = 1;
       private long x_ ;
       /**
-       * <code>required int64 x = 1;</code>
+       * <code>optional int64 x = 1;</code>
        *
        * <pre>
        * these are the (x,y) coordinates of the sector. (0,0) is the "centre" of the universe,
@@ -30052,7 +29848,7 @@ public final class Messages {
         return ((bitField0_ & 0x00000001) == 0x00000001);
       }
       /**
-       * <code>required int64 x = 1;</code>
+       * <code>optional int64 x = 1;</code>
        *
        * <pre>
        * these are the (x,y) coordinates of the sector. (0,0) is the "centre" of the universe,
@@ -30063,7 +29859,7 @@ public final class Messages {
         return x_;
       }
       /**
-       * <code>required int64 x = 1;</code>
+       * <code>optional int64 x = 1;</code>
        *
        * <pre>
        * these are the (x,y) coordinates of the sector. (0,0) is the "centre" of the universe,
@@ -30077,7 +29873,7 @@ public final class Messages {
         return this;
       }
       /**
-       * <code>required int64 x = 1;</code>
+       * <code>optional int64 x = 1;</code>
        *
        * <pre>
        * these are the (x,y) coordinates of the sector. (0,0) is the "centre" of the universe,
@@ -30091,22 +29887,22 @@ public final class Messages {
         return this;
       }
 
-      // required int64 y = 2;
+      // optional int64 y = 2;
       private long y_ ;
       /**
-       * <code>required int64 y = 2;</code>
+       * <code>optional int64 y = 2;</code>
        */
       public boolean hasY() {
         return ((bitField0_ & 0x00000002) == 0x00000002);
       }
       /**
-       * <code>required int64 y = 2;</code>
+       * <code>optional int64 y = 2;</code>
        */
       public long getY() {
         return y_;
       }
       /**
-       * <code>required int64 y = 2;</code>
+       * <code>optional int64 y = 2;</code>
        */
       public Builder setY(long value) {
         bitField0_ |= 0x00000002;
@@ -30115,7 +29911,7 @@ public final class Messages {
         return this;
       }
       /**
-       * <code>required int64 y = 2;</code>
+       * <code>optional int64 y = 2;</code>
        */
       public Builder clearY() {
         bitField0_ = (bitField0_ & ~0x00000002);
@@ -32665,30 +32461,6 @@ public final class Messages {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized != -1) return isInitialized == 1;
 
-      for (int i = 0; i < getPlanetsCount(); i++) {
-        if (!getPlanets(i).isInitialized()) {
-          memoizedIsInitialized = 0;
-          return false;
-        }
-      }
-      for (int i = 0; i < getBuildingsCount(); i++) {
-        if (!getBuildings(i).isInitialized()) {
-          memoizedIsInitialized = 0;
-          return false;
-        }
-      }
-      for (int i = 0; i < getEmpiresCount(); i++) {
-        if (!getEmpires(i).isInitialized()) {
-          memoizedIsInitialized = 0;
-          return false;
-        }
-      }
-      for (int i = 0; i < getFleetsCount(); i++) {
-        if (!getFleets(i).isInitialized()) {
-          memoizedIsInitialized = 0;
-          return false;
-        }
-      }
       memoizedIsInitialized = 1;
       return true;
     }
@@ -33359,30 +33131,6 @@ public final class Messages {
       }
 
       public final boolean isInitialized() {
-        for (int i = 0; i < getPlanetsCount(); i++) {
-          if (!getPlanets(i).isInitialized()) {
-            
-            return false;
-          }
-        }
-        for (int i = 0; i < getBuildingsCount(); i++) {
-          if (!getBuildings(i).isInitialized()) {
-            
-            return false;
-          }
-        }
-        for (int i = 0; i < getEmpiresCount(); i++) {
-          if (!getEmpires(i).isInitialized()) {
-            
-            return false;
-          }
-        }
-        for (int i = 0; i < getFleetsCount(); i++) {
-          if (!getFleets(i).isInitialized()) {
-            
-            return false;
-          }
-        }
         return true;
       }
 
@@ -36204,12 +35952,6 @@ public final class Messages {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized != -1) return isInitialized == 1;
 
-      for (int i = 0; i < getStarsCount(); i++) {
-        if (!getStars(i).isInitialized()) {
-          memoizedIsInitialized = 0;
-          return false;
-        }
-      }
       memoizedIsInitialized = 1;
       return true;
     }
@@ -36438,12 +36180,6 @@ public final class Messages {
       }
 
       public final boolean isInitialized() {
-        for (int i = 0; i < getStarsCount(); i++) {
-          if (!getStars(i).isInitialized()) {
-            
-            return false;
-          }
-        }
         return true;
       }
 
@@ -36720,47 +36456,47 @@ public final class Messages {
   public interface StarRenameRequestOrBuilder
       extends com.google.protobuf.MessageOrBuilder {
 
-    // required string star_key = 1;
+    // optional string star_key = 1;
     /**
-     * <code>required string star_key = 1;</code>
+     * <code>optional string star_key = 1;</code>
      */
     boolean hasStarKey();
     /**
-     * <code>required string star_key = 1;</code>
+     * <code>optional string star_key = 1;</code>
      */
     java.lang.String getStarKey();
     /**
-     * <code>required string star_key = 1;</code>
+     * <code>optional string star_key = 1;</code>
      */
     com.google.protobuf.ByteString
         getStarKeyBytes();
 
-    // required string old_name = 2;
+    // optional string old_name = 2;
     /**
-     * <code>required string old_name = 2;</code>
+     * <code>optional string old_name = 2;</code>
      */
     boolean hasOldName();
     /**
-     * <code>required string old_name = 2;</code>
+     * <code>optional string old_name = 2;</code>
      */
     java.lang.String getOldName();
     /**
-     * <code>required string old_name = 2;</code>
+     * <code>optional string old_name = 2;</code>
      */
     com.google.protobuf.ByteString
         getOldNameBytes();
 
-    // required string new_name = 3;
+    // optional string new_name = 3;
     /**
-     * <code>required string new_name = 3;</code>
+     * <code>optional string new_name = 3;</code>
      */
     boolean hasNewName();
     /**
-     * <code>required string new_name = 3;</code>
+     * <code>optional string new_name = 3;</code>
      */
     java.lang.String getNewName();
     /**
-     * <code>required string new_name = 3;</code>
+     * <code>optional string new_name = 3;</code>
      */
     com.google.protobuf.ByteString
         getNewNameBytes();
@@ -36978,17 +36714,17 @@ public final class Messages {
     }
 
     private int bitField0_;
-    // required string star_key = 1;
+    // optional string star_key = 1;
     public static final int STAR_KEY_FIELD_NUMBER = 1;
     private java.lang.Object starKey_;
     /**
-     * <code>required string star_key = 1;</code>
+     * <code>optional string star_key = 1;</code>
      */
     public boolean hasStarKey() {
       return ((bitField0_ & 0x00000001) == 0x00000001);
     }
     /**
-     * <code>required string star_key = 1;</code>
+     * <code>optional string star_key = 1;</code>
      */
     public java.lang.String getStarKey() {
       java.lang.Object ref = starKey_;
@@ -37005,7 +36741,7 @@ public final class Messages {
       }
     }
     /**
-     * <code>required string star_key = 1;</code>
+     * <code>optional string star_key = 1;</code>
      */
     public com.google.protobuf.ByteString
         getStarKeyBytes() {
@@ -37021,17 +36757,17 @@ public final class Messages {
       }
     }
 
-    // required string old_name = 2;
+    // optional string old_name = 2;
     public static final int OLD_NAME_FIELD_NUMBER = 2;
     private java.lang.Object oldName_;
     /**
-     * <code>required string old_name = 2;</code>
+     * <code>optional string old_name = 2;</code>
      */
     public boolean hasOldName() {
       return ((bitField0_ & 0x00000002) == 0x00000002);
     }
     /**
-     * <code>required string old_name = 2;</code>
+     * <code>optional string old_name = 2;</code>
      */
     public java.lang.String getOldName() {
       java.lang.Object ref = oldName_;
@@ -37048,7 +36784,7 @@ public final class Messages {
       }
     }
     /**
-     * <code>required string old_name = 2;</code>
+     * <code>optional string old_name = 2;</code>
      */
     public com.google.protobuf.ByteString
         getOldNameBytes() {
@@ -37064,17 +36800,17 @@ public final class Messages {
       }
     }
 
-    // required string new_name = 3;
+    // optional string new_name = 3;
     public static final int NEW_NAME_FIELD_NUMBER = 3;
     private java.lang.Object newName_;
     /**
-     * <code>required string new_name = 3;</code>
+     * <code>optional string new_name = 3;</code>
      */
     public boolean hasNewName() {
       return ((bitField0_ & 0x00000004) == 0x00000004);
     }
     /**
-     * <code>required string new_name = 3;</code>
+     * <code>optional string new_name = 3;</code>
      */
     public java.lang.String getNewName() {
       java.lang.Object ref = newName_;
@@ -37091,7 +36827,7 @@ public final class Messages {
       }
     }
     /**
-     * <code>required string new_name = 3;</code>
+     * <code>optional string new_name = 3;</code>
      */
     public com.google.protobuf.ByteString
         getNewNameBytes() {
@@ -37289,18 +37025,6 @@ public final class Messages {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized != -1) return isInitialized == 1;
 
-      if (!hasStarKey()) {
-        memoizedIsInitialized = 0;
-        return false;
-      }
-      if (!hasOldName()) {
-        memoizedIsInitialized = 0;
-        return false;
-      }
-      if (!hasNewName()) {
-        memoizedIsInitialized = 0;
-        return false;
-      }
       memoizedIsInitialized = 1;
       return true;
     }
@@ -37636,18 +37360,6 @@ public final class Messages {
       }
 
       public final boolean isInitialized() {
-        if (!hasStarKey()) {
-          
-          return false;
-        }
-        if (!hasOldName()) {
-          
-          return false;
-        }
-        if (!hasNewName()) {
-          
-          return false;
-        }
         return true;
       }
 
@@ -37670,16 +37382,16 @@ public final class Messages {
       }
       private int bitField0_;
 
-      // required string star_key = 1;
+      // optional string star_key = 1;
       private java.lang.Object starKey_ = "";
       /**
-       * <code>required string star_key = 1;</code>
+       * <code>optional string star_key = 1;</code>
        */
       public boolean hasStarKey() {
         return ((bitField0_ & 0x00000001) == 0x00000001);
       }
       /**
-       * <code>required string star_key = 1;</code>
+       * <code>optional string star_key = 1;</code>
        */
       public java.lang.String getStarKey() {
         java.lang.Object ref = starKey_;
@@ -37693,7 +37405,7 @@ public final class Messages {
         }
       }
       /**
-       * <code>required string star_key = 1;</code>
+       * <code>optional string star_key = 1;</code>
        */
       public com.google.protobuf.ByteString
           getStarKeyBytes() {
@@ -37709,7 +37421,7 @@ public final class Messages {
         }
       }
       /**
-       * <code>required string star_key = 1;</code>
+       * <code>optional string star_key = 1;</code>
        */
       public Builder setStarKey(
           java.lang.String value) {
@@ -37722,7 +37434,7 @@ public final class Messages {
         return this;
       }
       /**
-       * <code>required string star_key = 1;</code>
+       * <code>optional string star_key = 1;</code>
        */
       public Builder clearStarKey() {
         bitField0_ = (bitField0_ & ~0x00000001);
@@ -37731,7 +37443,7 @@ public final class Messages {
         return this;
       }
       /**
-       * <code>required string star_key = 1;</code>
+       * <code>optional string star_key = 1;</code>
        */
       public Builder setStarKeyBytes(
           com.google.protobuf.ByteString value) {
@@ -37744,16 +37456,16 @@ public final class Messages {
         return this;
       }
 
-      // required string old_name = 2;
+      // optional string old_name = 2;
       private java.lang.Object oldName_ = "";
       /**
-       * <code>required string old_name = 2;</code>
+       * <code>optional string old_name = 2;</code>
        */
       public boolean hasOldName() {
         return ((bitField0_ & 0x00000002) == 0x00000002);
       }
       /**
-       * <code>required string old_name = 2;</code>
+       * <code>optional string old_name = 2;</code>
        */
       public java.lang.String getOldName() {
         java.lang.Object ref = oldName_;
@@ -37767,7 +37479,7 @@ public final class Messages {
         }
       }
       /**
-       * <code>required string old_name = 2;</code>
+       * <code>optional string old_name = 2;</code>
        */
       public com.google.protobuf.ByteString
           getOldNameBytes() {
@@ -37783,7 +37495,7 @@ public final class Messages {
         }
       }
       /**
-       * <code>required string old_name = 2;</code>
+       * <code>optional string old_name = 2;</code>
        */
       public Builder setOldName(
           java.lang.String value) {
@@ -37796,7 +37508,7 @@ public final class Messages {
         return this;
       }
       /**
-       * <code>required string old_name = 2;</code>
+       * <code>optional string old_name = 2;</code>
        */
       public Builder clearOldName() {
         bitField0_ = (bitField0_ & ~0x00000002);
@@ -37805,7 +37517,7 @@ public final class Messages {
         return this;
       }
       /**
-       * <code>required string old_name = 2;</code>
+       * <code>optional string old_name = 2;</code>
        */
       public Builder setOldNameBytes(
           com.google.protobuf.ByteString value) {
@@ -37818,16 +37530,16 @@ public final class Messages {
         return this;
       }
 
-      // required string new_name = 3;
+      // optional string new_name = 3;
       private java.lang.Object newName_ = "";
       /**
-       * <code>required string new_name = 3;</code>
+       * <code>optional string new_name = 3;</code>
        */
       public boolean hasNewName() {
         return ((bitField0_ & 0x00000004) == 0x00000004);
       }
       /**
-       * <code>required string new_name = 3;</code>
+       * <code>optional string new_name = 3;</code>
        */
       public java.lang.String getNewName() {
         java.lang.Object ref = newName_;
@@ -37841,7 +37553,7 @@ public final class Messages {
         }
       }
       /**
-       * <code>required string new_name = 3;</code>
+       * <code>optional string new_name = 3;</code>
        */
       public com.google.protobuf.ByteString
           getNewNameBytes() {
@@ -37857,7 +37569,7 @@ public final class Messages {
         }
       }
       /**
-       * <code>required string new_name = 3;</code>
+       * <code>optional string new_name = 3;</code>
        */
       public Builder setNewName(
           java.lang.String value) {
@@ -37870,7 +37582,7 @@ public final class Messages {
         return this;
       }
       /**
-       * <code>required string new_name = 3;</code>
+       * <code>optional string new_name = 3;</code>
        */
       public Builder clearNewName() {
         bitField0_ = (bitField0_ & ~0x00000004);
@@ -37879,7 +37591,7 @@ public final class Messages {
         return this;
       }
       /**
-       * <code>required string new_name = 3;</code>
+       * <code>optional string new_name = 3;</code>
        */
       public Builder setNewNameBytes(
           com.google.protobuf.ByteString value) {
@@ -38278,9 +37990,9 @@ public final class Messages {
   public interface PlanetOrBuilder
       extends com.google.protobuf.MessageOrBuilder {
 
-    // required int32 index = 2;
+    // optional int32 index = 2;
     /**
-     * <code>required int32 index = 2;</code>
+     * <code>optional int32 index = 2;</code>
      *
      * <pre>
      * The "index" of the planet represents how far it is from the sun. Planets are always
@@ -38289,7 +38001,7 @@ public final class Messages {
      */
     boolean hasIndex();
     /**
-     * <code>required int32 index = 2;</code>
+     * <code>optional int32 index = 2;</code>
      *
      * <pre>
      * The "index" of the planet represents how far it is from the sun. Planets are always
@@ -38298,13 +38010,13 @@ public final class Messages {
      */
     int getIndex();
 
-    // required .au.com.codeka.common.protobuf.Planet.PLANET_TYPE planet_type = 3;
+    // optional .au.com.codeka.common.protobuf.Planet.PLANET_TYPE planet_type = 3;
     /**
-     * <code>required .au.com.codeka.common.protobuf.Planet.PLANET_TYPE planet_type = 3;</code>
+     * <code>optional .au.com.codeka.common.protobuf.Planet.PLANET_TYPE planet_type = 3;</code>
      */
     boolean hasPlanetType();
     /**
-     * <code>required .au.com.codeka.common.protobuf.Planet.PLANET_TYPE planet_type = 3;</code>
+     * <code>optional .au.com.codeka.common.protobuf.Planet.PLANET_TYPE planet_type = 3;</code>
      */
     au.com.codeka.common.protobuf.Messages.Planet.PLANET_TYPE getPlanetType();
 
@@ -38665,11 +38377,11 @@ public final class Messages {
     }
 
     private int bitField0_;
-    // required int32 index = 2;
+    // optional int32 index = 2;
     public static final int INDEX_FIELD_NUMBER = 2;
     private int index_;
     /**
-     * <code>required int32 index = 2;</code>
+     * <code>optional int32 index = 2;</code>
      *
      * <pre>
      * The "index" of the planet represents how far it is from the sun. Planets are always
@@ -38680,7 +38392,7 @@ public final class Messages {
       return ((bitField0_ & 0x00000001) == 0x00000001);
     }
     /**
-     * <code>required int32 index = 2;</code>
+     * <code>optional int32 index = 2;</code>
      *
      * <pre>
      * The "index" of the planet represents how far it is from the sun. Planets are always
@@ -38691,17 +38403,17 @@ public final class Messages {
       return index_;
     }
 
-    // required .au.com.codeka.common.protobuf.Planet.PLANET_TYPE planet_type = 3;
+    // optional .au.com.codeka.common.protobuf.Planet.PLANET_TYPE planet_type = 3;
     public static final int PLANET_TYPE_FIELD_NUMBER = 3;
     private au.com.codeka.common.protobuf.Messages.Planet.PLANET_TYPE planetType_;
     /**
-     * <code>required .au.com.codeka.common.protobuf.Planet.PLANET_TYPE planet_type = 3;</code>
+     * <code>optional .au.com.codeka.common.protobuf.Planet.PLANET_TYPE planet_type = 3;</code>
      */
     public boolean hasPlanetType() {
       return ((bitField0_ & 0x00000002) == 0x00000002);
     }
     /**
-     * <code>required .au.com.codeka.common.protobuf.Planet.PLANET_TYPE planet_type = 3;</code>
+     * <code>optional .au.com.codeka.common.protobuf.Planet.PLANET_TYPE planet_type = 3;</code>
      */
     public au.com.codeka.common.protobuf.Messages.Planet.PLANET_TYPE getPlanetType() {
       return planetType_;
@@ -38818,14 +38530,6 @@ public final class Messages {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized != -1) return isInitialized == 1;
 
-      if (!hasIndex()) {
-        memoizedIsInitialized = 0;
-        return false;
-      }
-      if (!hasPlanetType()) {
-        memoizedIsInitialized = 0;
-        return false;
-      }
       memoizedIsInitialized = 1;
       return true;
     }
@@ -39109,14 +38813,6 @@ public final class Messages {
       }
 
       public final boolean isInitialized() {
-        if (!hasIndex()) {
-          
-          return false;
-        }
-        if (!hasPlanetType()) {
-          
-          return false;
-        }
         return true;
       }
 
@@ -39139,10 +38835,10 @@ public final class Messages {
       }
       private int bitField0_;
 
-      // required int32 index = 2;
+      // optional int32 index = 2;
       private int index_ ;
       /**
-       * <code>required int32 index = 2;</code>
+       * <code>optional int32 index = 2;</code>
        *
        * <pre>
        * The "index" of the planet represents how far it is from the sun. Planets are always
@@ -39153,7 +38849,7 @@ public final class Messages {
         return ((bitField0_ & 0x00000001) == 0x00000001);
       }
       /**
-       * <code>required int32 index = 2;</code>
+       * <code>optional int32 index = 2;</code>
        *
        * <pre>
        * The "index" of the planet represents how far it is from the sun. Planets are always
@@ -39164,7 +38860,7 @@ public final class Messages {
         return index_;
       }
       /**
-       * <code>required int32 index = 2;</code>
+       * <code>optional int32 index = 2;</code>
        *
        * <pre>
        * The "index" of the planet represents how far it is from the sun. Planets are always
@@ -39178,7 +38874,7 @@ public final class Messages {
         return this;
       }
       /**
-       * <code>required int32 index = 2;</code>
+       * <code>optional int32 index = 2;</code>
        *
        * <pre>
        * The "index" of the planet represents how far it is from the sun. Planets are always
@@ -39192,22 +38888,22 @@ public final class Messages {
         return this;
       }
 
-      // required .au.com.codeka.common.protobuf.Planet.PLANET_TYPE planet_type = 3;
+      // optional .au.com.codeka.common.protobuf.Planet.PLANET_TYPE planet_type = 3;
       private au.com.codeka.common.protobuf.Messages.Planet.PLANET_TYPE planetType_ = au.com.codeka.common.protobuf.Messages.Planet.PLANET_TYPE.GASGIANT;
       /**
-       * <code>required .au.com.codeka.common.protobuf.Planet.PLANET_TYPE planet_type = 3;</code>
+       * <code>optional .au.com.codeka.common.protobuf.Planet.PLANET_TYPE planet_type = 3;</code>
        */
       public boolean hasPlanetType() {
         return ((bitField0_ & 0x00000002) == 0x00000002);
       }
       /**
-       * <code>required .au.com.codeka.common.protobuf.Planet.PLANET_TYPE planet_type = 3;</code>
+       * <code>optional .au.com.codeka.common.protobuf.Planet.PLANET_TYPE planet_type = 3;</code>
        */
       public au.com.codeka.common.protobuf.Messages.Planet.PLANET_TYPE getPlanetType() {
         return planetType_;
       }
       /**
-       * <code>required .au.com.codeka.common.protobuf.Planet.PLANET_TYPE planet_type = 3;</code>
+       * <code>optional .au.com.codeka.common.protobuf.Planet.PLANET_TYPE planet_type = 3;</code>
        */
       public Builder setPlanetType(au.com.codeka.common.protobuf.Messages.Planet.PLANET_TYPE value) {
         if (value == null) {
@@ -39219,7 +38915,7 @@ public final class Messages {
         return this;
       }
       /**
-       * <code>required .au.com.codeka.common.protobuf.Planet.PLANET_TYPE planet_type = 3;</code>
+       * <code>optional .au.com.codeka.common.protobuf.Planet.PLANET_TYPE planet_type = 3;</code>
        */
       public Builder clearPlanetType() {
         bitField0_ = (bitField0_ & ~0x00000002);
@@ -39618,12 +39314,6 @@ public final class Messages {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized != -1) return isInitialized == 1;
 
-      for (int i = 0; i < getPlanetsCount(); i++) {
-        if (!getPlanets(i).isInitialized()) {
-          memoizedIsInitialized = 0;
-          return false;
-        }
-      }
       memoizedIsInitialized = 1;
       return true;
     }
@@ -39858,12 +39548,6 @@ public final class Messages {
       }
 
       public final boolean isInitialized() {
-        for (int i = 0; i < getPlanetsCount(); i++) {
-          if (!getPlanets(i).isInitialized()) {
-            
-            return false;
-          }
-        }
         return true;
       }
 
@@ -40315,12 +39999,6 @@ public final class Messages {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized != -1) return isInitialized == 1;
 
-      for (int i = 0; i < getSectorsCount(); i++) {
-        if (!getSectors(i).isInitialized()) {
-          memoizedIsInitialized = 0;
-          return false;
-        }
-      }
       memoizedIsInitialized = 1;
       return true;
     }
@@ -40554,12 +40232,6 @@ public final class Messages {
       }
 
       public final boolean isInitialized() {
-        for (int i = 0; i < getSectorsCount(); i++) {
-          if (!getSectors(i).isInitialized()) {
-            
-            return false;
-          }
-        }
         return true;
       }
 
@@ -40836,17 +40508,17 @@ public final class Messages {
   public interface EmpirePresenceOrBuilder
       extends com.google.protobuf.MessageOrBuilder {
 
-    // required string key = 1;
+    // optional string key = 1;
     /**
-     * <code>required string key = 1;</code>
+     * <code>optional string key = 1;</code>
      */
     boolean hasKey();
     /**
-     * <code>required string key = 1;</code>
+     * <code>optional string key = 1;</code>
      */
     java.lang.String getKey();
     /**
-     * <code>required string key = 1;</code>
+     * <code>optional string key = 1;</code>
      */
     com.google.protobuf.ByteString
         getKeyBytes();
@@ -41098,17 +40770,17 @@ public final class Messages {
     }
 
     private int bitField0_;
-    // required string key = 1;
+    // optional string key = 1;
     public static final int KEY_FIELD_NUMBER = 1;
     private java.lang.Object key_;
     /**
-     * <code>required string key = 1;</code>
+     * <code>optional string key = 1;</code>
      */
     public boolean hasKey() {
       return ((bitField0_ & 0x00000001) == 0x00000001);
     }
     /**
-     * <code>required string key = 1;</code>
+     * <code>optional string key = 1;</code>
      */
     public java.lang.String getKey() {
       java.lang.Object ref = key_;
@@ -41125,7 +40797,7 @@ public final class Messages {
       }
     }
     /**
-     * <code>required string key = 1;</code>
+     * <code>optional string key = 1;</code>
      */
     public com.google.protobuf.ByteString
         getKeyBytes() {
@@ -41356,10 +41028,6 @@ public final class Messages {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized != -1) return isInitialized == 1;
 
-      if (!hasKey()) {
-        memoizedIsInitialized = 0;
-        return false;
-      }
       memoizedIsInitialized = 1;
       return true;
     }
@@ -41713,10 +41381,6 @@ public final class Messages {
       }
 
       public final boolean isInitialized() {
-        if (!hasKey()) {
-          
-          return false;
-        }
         return true;
       }
 
@@ -41739,16 +41403,16 @@ public final class Messages {
       }
       private int bitField0_;
 
-      // required string key = 1;
+      // optional string key = 1;
       private java.lang.Object key_ = "";
       /**
-       * <code>required string key = 1;</code>
+       * <code>optional string key = 1;</code>
        */
       public boolean hasKey() {
         return ((bitField0_ & 0x00000001) == 0x00000001);
       }
       /**
-       * <code>required string key = 1;</code>
+       * <code>optional string key = 1;</code>
        */
       public java.lang.String getKey() {
         java.lang.Object ref = key_;
@@ -41762,7 +41426,7 @@ public final class Messages {
         }
       }
       /**
-       * <code>required string key = 1;</code>
+       * <code>optional string key = 1;</code>
        */
       public com.google.protobuf.ByteString
           getKeyBytes() {
@@ -41778,7 +41442,7 @@ public final class Messages {
         }
       }
       /**
-       * <code>required string key = 1;</code>
+       * <code>optional string key = 1;</code>
        */
       public Builder setKey(
           java.lang.String value) {
@@ -41791,7 +41455,7 @@ public final class Messages {
         return this;
       }
       /**
-       * <code>required string key = 1;</code>
+       * <code>optional string key = 1;</code>
        */
       public Builder clearKey() {
         bitField0_ = (bitField0_ & ~0x00000001);
@@ -41800,7 +41464,7 @@ public final class Messages {
         return this;
       }
       /**
-       * <code>required string key = 1;</code>
+       * <code>optional string key = 1;</code>
        */
       public Builder setKeyBytes(
           com.google.protobuf.ByteString value) {
@@ -42206,9 +41870,9 @@ public final class Messages {
   public interface ColonizeRequestOrBuilder
       extends com.google.protobuf.MessageOrBuilder {
 
-    // required int32 planet_index = 1;
+    // optional int32 planet_index = 1;
     /**
-     * <code>required int32 planet_index = 1;</code>
+     * <code>optional int32 planet_index = 1;</code>
      *
      * <pre>
      * The index of the planet you want to colonize
@@ -42216,7 +41880,7 @@ public final class Messages {
      */
     boolean hasPlanetIndex();
     /**
-     * <code>required int32 planet_index = 1;</code>
+     * <code>optional int32 planet_index = 1;</code>
      *
      * <pre>
      * The index of the planet you want to colonize
@@ -42325,11 +41989,11 @@ public final class Messages {
     }
 
     private int bitField0_;
-    // required int32 planet_index = 1;
+    // optional int32 planet_index = 1;
     public static final int PLANET_INDEX_FIELD_NUMBER = 1;
     private int planetIndex_;
     /**
-     * <code>required int32 planet_index = 1;</code>
+     * <code>optional int32 planet_index = 1;</code>
      *
      * <pre>
      * The index of the planet you want to colonize
@@ -42339,7 +42003,7 @@ public final class Messages {
       return ((bitField0_ & 0x00000001) == 0x00000001);
     }
     /**
-     * <code>required int32 planet_index = 1;</code>
+     * <code>optional int32 planet_index = 1;</code>
      *
      * <pre>
      * The index of the planet you want to colonize
@@ -42357,10 +42021,6 @@ public final class Messages {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized != -1) return isInitialized == 1;
 
-      if (!hasPlanetIndex()) {
-        memoizedIsInitialized = 0;
-        return false;
-      }
       memoizedIsInitialized = 1;
       return true;
     }
@@ -42563,10 +42223,6 @@ public final class Messages {
       }
 
       public final boolean isInitialized() {
-        if (!hasPlanetIndex()) {
-          
-          return false;
-        }
         return true;
       }
 
@@ -42589,10 +42245,10 @@ public final class Messages {
       }
       private int bitField0_;
 
-      // required int32 planet_index = 1;
+      // optional int32 planet_index = 1;
       private int planetIndex_ ;
       /**
-       * <code>required int32 planet_index = 1;</code>
+       * <code>optional int32 planet_index = 1;</code>
        *
        * <pre>
        * The index of the planet you want to colonize
@@ -42602,7 +42258,7 @@ public final class Messages {
         return ((bitField0_ & 0x00000001) == 0x00000001);
       }
       /**
-       * <code>required int32 planet_index = 1;</code>
+       * <code>optional int32 planet_index = 1;</code>
        *
        * <pre>
        * The index of the planet you want to colonize
@@ -42612,7 +42268,7 @@ public final class Messages {
         return planetIndex_;
       }
       /**
-       * <code>required int32 planet_index = 1;</code>
+       * <code>optional int32 planet_index = 1;</code>
        *
        * <pre>
        * The index of the planet you want to colonize
@@ -42625,7 +42281,7 @@ public final class Messages {
         return this;
       }
       /**
-       * <code>required int32 planet_index = 1;</code>
+       * <code>optional int32 planet_index = 1;</code>
        *
        * <pre>
        * The index of the planet you want to colonize
@@ -49196,9 +48852,9 @@ public final class Messages {
   public interface BuildingOrBuilder
       extends com.google.protobuf.MessageOrBuilder {
 
-    // required string key = 1;
+    // optional string key = 1;
     /**
-     * <code>required string key = 1;</code>
+     * <code>optional string key = 1;</code>
      *
      * <pre>
      * The unique key of this building.
@@ -49206,7 +48862,7 @@ public final class Messages {
      */
     boolean hasKey();
     /**
-     * <code>required string key = 1;</code>
+     * <code>optional string key = 1;</code>
      *
      * <pre>
      * The unique key of this building.
@@ -49214,7 +48870,7 @@ public final class Messages {
      */
     java.lang.String getKey();
     /**
-     * <code>required string key = 1;</code>
+     * <code>optional string key = 1;</code>
      *
      * <pre>
      * The unique key of this building.
@@ -49223,9 +48879,9 @@ public final class Messages {
     com.google.protobuf.ByteString
         getKeyBytes();
 
-    // required string colony_key = 2;
+    // optional string colony_key = 2;
     /**
-     * <code>required string colony_key = 2;</code>
+     * <code>optional string colony_key = 2;</code>
      *
      * <pre>
      * The key of the colony to which this building belongs.
@@ -49233,7 +48889,7 @@ public final class Messages {
      */
     boolean hasColonyKey();
     /**
-     * <code>required string colony_key = 2;</code>
+     * <code>optional string colony_key = 2;</code>
      *
      * <pre>
      * The key of the colony to which this building belongs.
@@ -49241,7 +48897,7 @@ public final class Messages {
      */
     java.lang.String getColonyKey();
     /**
-     * <code>required string colony_key = 2;</code>
+     * <code>optional string colony_key = 2;</code>
      *
      * <pre>
      * The key of the colony to which this building belongs.
@@ -49250,9 +48906,9 @@ public final class Messages {
     com.google.protobuf.ByteString
         getColonyKeyBytes();
 
-    // required string design_name = 3;
+    // optional string design_name = 3;
     /**
-     * <code>required string design_name = 3;</code>
+     * <code>optional string design_name = 3;</code>
      *
      * <pre>
      * The name of the design of this building (defined in data/buildings.xml)
@@ -49260,7 +48916,7 @@ public final class Messages {
      */
     boolean hasDesignName();
     /**
-     * <code>required string design_name = 3;</code>
+     * <code>optional string design_name = 3;</code>
      *
      * <pre>
      * The name of the design of this building (defined in data/buildings.xml)
@@ -49268,7 +48924,7 @@ public final class Messages {
      */
     java.lang.String getDesignName();
     /**
-     * <code>required string design_name = 3;</code>
+     * <code>optional string design_name = 3;</code>
      *
      * <pre>
      * The name of the design of this building (defined in data/buildings.xml)
@@ -49443,11 +49099,11 @@ public final class Messages {
     }
 
     private int bitField0_;
-    // required string key = 1;
+    // optional string key = 1;
     public static final int KEY_FIELD_NUMBER = 1;
     private java.lang.Object key_;
     /**
-     * <code>required string key = 1;</code>
+     * <code>optional string key = 1;</code>
      *
      * <pre>
      * The unique key of this building.
@@ -49457,7 +49113,7 @@ public final class Messages {
       return ((bitField0_ & 0x00000001) == 0x00000001);
     }
     /**
-     * <code>required string key = 1;</code>
+     * <code>optional string key = 1;</code>
      *
      * <pre>
      * The unique key of this building.
@@ -49478,7 +49134,7 @@ public final class Messages {
       }
     }
     /**
-     * <code>required string key = 1;</code>
+     * <code>optional string key = 1;</code>
      *
      * <pre>
      * The unique key of this building.
@@ -49498,11 +49154,11 @@ public final class Messages {
       }
     }
 
-    // required string colony_key = 2;
+    // optional string colony_key = 2;
     public static final int COLONY_KEY_FIELD_NUMBER = 2;
     private java.lang.Object colonyKey_;
     /**
-     * <code>required string colony_key = 2;</code>
+     * <code>optional string colony_key = 2;</code>
      *
      * <pre>
      * The key of the colony to which this building belongs.
@@ -49512,7 +49168,7 @@ public final class Messages {
       return ((bitField0_ & 0x00000002) == 0x00000002);
     }
     /**
-     * <code>required string colony_key = 2;</code>
+     * <code>optional string colony_key = 2;</code>
      *
      * <pre>
      * The key of the colony to which this building belongs.
@@ -49533,7 +49189,7 @@ public final class Messages {
       }
     }
     /**
-     * <code>required string colony_key = 2;</code>
+     * <code>optional string colony_key = 2;</code>
      *
      * <pre>
      * The key of the colony to which this building belongs.
@@ -49553,11 +49209,11 @@ public final class Messages {
       }
     }
 
-    // required string design_name = 3;
+    // optional string design_name = 3;
     public static final int DESIGN_NAME_FIELD_NUMBER = 3;
     private java.lang.Object designName_;
     /**
-     * <code>required string design_name = 3;</code>
+     * <code>optional string design_name = 3;</code>
      *
      * <pre>
      * The name of the design of this building (defined in data/buildings.xml)
@@ -49567,7 +49223,7 @@ public final class Messages {
       return ((bitField0_ & 0x00000004) == 0x00000004);
     }
     /**
-     * <code>required string design_name = 3;</code>
+     * <code>optional string design_name = 3;</code>
      *
      * <pre>
      * The name of the design of this building (defined in data/buildings.xml)
@@ -49588,7 +49244,7 @@ public final class Messages {
       }
     }
     /**
-     * <code>required string design_name = 3;</code>
+     * <code>optional string design_name = 3;</code>
      *
      * <pre>
      * The name of the design of this building (defined in data/buildings.xml)
@@ -49699,18 +49355,6 @@ public final class Messages {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized != -1) return isInitialized == 1;
 
-      if (!hasKey()) {
-        memoizedIsInitialized = 0;
-        return false;
-      }
-      if (!hasColonyKey()) {
-        memoizedIsInitialized = 0;
-        return false;
-      }
-      if (!hasDesignName()) {
-        memoizedIsInitialized = 0;
-        return false;
-      }
       memoizedIsInitialized = 1;
       return true;
     }
@@ -49985,18 +49629,6 @@ public final class Messages {
       }
 
       public final boolean isInitialized() {
-        if (!hasKey()) {
-          
-          return false;
-        }
-        if (!hasColonyKey()) {
-          
-          return false;
-        }
-        if (!hasDesignName()) {
-          
-          return false;
-        }
         return true;
       }
 
@@ -50019,10 +49651,10 @@ public final class Messages {
       }
       private int bitField0_;
 
-      // required string key = 1;
+      // optional string key = 1;
       private java.lang.Object key_ = "";
       /**
-       * <code>required string key = 1;</code>
+       * <code>optional string key = 1;</code>
        *
        * <pre>
        * The unique key of this building.
@@ -50032,7 +49664,7 @@ public final class Messages {
         return ((bitField0_ & 0x00000001) == 0x00000001);
       }
       /**
-       * <code>required string key = 1;</code>
+       * <code>optional string key = 1;</code>
        *
        * <pre>
        * The unique key of this building.
@@ -50050,7 +49682,7 @@ public final class Messages {
         }
       }
       /**
-       * <code>required string key = 1;</code>
+       * <code>optional string key = 1;</code>
        *
        * <pre>
        * The unique key of this building.
@@ -50070,7 +49702,7 @@ public final class Messages {
         }
       }
       /**
-       * <code>required string key = 1;</code>
+       * <code>optional string key = 1;</code>
        *
        * <pre>
        * The unique key of this building.
@@ -50087,7 +49719,7 @@ public final class Messages {
         return this;
       }
       /**
-       * <code>required string key = 1;</code>
+       * <code>optional string key = 1;</code>
        *
        * <pre>
        * The unique key of this building.
@@ -50100,7 +49732,7 @@ public final class Messages {
         return this;
       }
       /**
-       * <code>required string key = 1;</code>
+       * <code>optional string key = 1;</code>
        *
        * <pre>
        * The unique key of this building.
@@ -50117,10 +49749,10 @@ public final class Messages {
         return this;
       }
 
-      // required string colony_key = 2;
+      // optional string colony_key = 2;
       private java.lang.Object colonyKey_ = "";
       /**
-       * <code>required string colony_key = 2;</code>
+       * <code>optional string colony_key = 2;</code>
        *
        * <pre>
        * The key of the colony to which this building belongs.
@@ -50130,7 +49762,7 @@ public final class Messages {
         return ((bitField0_ & 0x00000002) == 0x00000002);
       }
       /**
-       * <code>required string colony_key = 2;</code>
+       * <code>optional string colony_key = 2;</code>
        *
        * <pre>
        * The key of the colony to which this building belongs.
@@ -50148,7 +49780,7 @@ public final class Messages {
         }
       }
       /**
-       * <code>required string colony_key = 2;</code>
+       * <code>optional string colony_key = 2;</code>
        *
        * <pre>
        * The key of the colony to which this building belongs.
@@ -50168,7 +49800,7 @@ public final class Messages {
         }
       }
       /**
-       * <code>required string colony_key = 2;</code>
+       * <code>optional string colony_key = 2;</code>
        *
        * <pre>
        * The key of the colony to which this building belongs.
@@ -50185,7 +49817,7 @@ public final class Messages {
         return this;
       }
       /**
-       * <code>required string colony_key = 2;</code>
+       * <code>optional string colony_key = 2;</code>
        *
        * <pre>
        * The key of the colony to which this building belongs.
@@ -50198,7 +49830,7 @@ public final class Messages {
         return this;
       }
       /**
-       * <code>required string colony_key = 2;</code>
+       * <code>optional string colony_key = 2;</code>
        *
        * <pre>
        * The key of the colony to which this building belongs.
@@ -50215,10 +49847,10 @@ public final class Messages {
         return this;
       }
 
-      // required string design_name = 3;
+      // optional string design_name = 3;
       private java.lang.Object designName_ = "";
       /**
-       * <code>required string design_name = 3;</code>
+       * <code>optional string design_name = 3;</code>
        *
        * <pre>
        * The name of the design of this building (defined in data/buildings.xml)
@@ -50228,7 +49860,7 @@ public final class Messages {
         return ((bitField0_ & 0x00000004) == 0x00000004);
       }
       /**
-       * <code>required string design_name = 3;</code>
+       * <code>optional string design_name = 3;</code>
        *
        * <pre>
        * The name of the design of this building (defined in data/buildings.xml)
@@ -50246,7 +49878,7 @@ public final class Messages {
         }
       }
       /**
-       * <code>required string design_name = 3;</code>
+       * <code>optional string design_name = 3;</code>
        *
        * <pre>
        * The name of the design of this building (defined in data/buildings.xml)
@@ -50266,7 +49898,7 @@ public final class Messages {
         }
       }
       /**
-       * <code>required string design_name = 3;</code>
+       * <code>optional string design_name = 3;</code>
        *
        * <pre>
        * The name of the design of this building (defined in data/buildings.xml)
@@ -50283,7 +49915,7 @@ public final class Messages {
         return this;
       }
       /**
-       * <code>required string design_name = 3;</code>
+       * <code>optional string design_name = 3;</code>
        *
        * <pre>
        * The name of the design of this building (defined in data/buildings.xml)
@@ -50296,7 +49928,7 @@ public final class Messages {
         return this;
       }
       /**
-       * <code>required string design_name = 3;</code>
+       * <code>optional string design_name = 3;</code>
        *
        * <pre>
        * The name of the design of this building (defined in data/buildings.xml)
@@ -51111,9 +50743,9 @@ public final class Messages {
   public interface FleetOrBuilder
       extends com.google.protobuf.MessageOrBuilder {
 
-    // required string key = 1;
+    // optional string key = 1;
     /**
-     * <code>required string key = 1;</code>
+     * <code>optional string key = 1;</code>
      *
      * <pre>
      * The unique key for this fleet
@@ -51121,7 +50753,7 @@ public final class Messages {
      */
     boolean hasKey();
     /**
-     * <code>required string key = 1;</code>
+     * <code>optional string key = 1;</code>
      *
      * <pre>
      * The unique key for this fleet
@@ -51129,7 +50761,7 @@ public final class Messages {
      */
     java.lang.String getKey();
     /**
-     * <code>required string key = 1;</code>
+     * <code>optional string key = 1;</code>
      *
      * <pre>
      * The unique key for this fleet
@@ -51873,11 +51505,11 @@ public final class Messages {
     }
 
     private int bitField0_;
-    // required string key = 1;
+    // optional string key = 1;
     public static final int KEY_FIELD_NUMBER = 1;
     private java.lang.Object key_;
     /**
-     * <code>required string key = 1;</code>
+     * <code>optional string key = 1;</code>
      *
      * <pre>
      * The unique key for this fleet
@@ -51887,7 +51519,7 @@ public final class Messages {
       return ((bitField0_ & 0x00000001) == 0x00000001);
     }
     /**
-     * <code>required string key = 1;</code>
+     * <code>optional string key = 1;</code>
      *
      * <pre>
      * The unique key for this fleet
@@ -51908,7 +51540,7 @@ public final class Messages {
       }
     }
     /**
-     * <code>required string key = 1;</code>
+     * <code>optional string key = 1;</code>
      *
      * <pre>
      * The unique key for this fleet
@@ -52550,10 +52182,6 @@ public final class Messages {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized != -1) return isInitialized == 1;
 
-      if (!hasKey()) {
-        memoizedIsInitialized = 0;
-        return false;
-      }
       memoizedIsInitialized = 1;
       return true;
     }
@@ -53061,10 +52689,6 @@ public final class Messages {
       }
 
       public final boolean isInitialized() {
-        if (!hasKey()) {
-          
-          return false;
-        }
         return true;
       }
 
@@ -53087,10 +52711,10 @@ public final class Messages {
       }
       private int bitField0_;
 
-      // required string key = 1;
+      // optional string key = 1;
       private java.lang.Object key_ = "";
       /**
-       * <code>required string key = 1;</code>
+       * <code>optional string key = 1;</code>
        *
        * <pre>
        * The unique key for this fleet
@@ -53100,7 +52724,7 @@ public final class Messages {
         return ((bitField0_ & 0x00000001) == 0x00000001);
       }
       /**
-       * <code>required string key = 1;</code>
+       * <code>optional string key = 1;</code>
        *
        * <pre>
        * The unique key for this fleet
@@ -53118,7 +52742,7 @@ public final class Messages {
         }
       }
       /**
-       * <code>required string key = 1;</code>
+       * <code>optional string key = 1;</code>
        *
        * <pre>
        * The unique key for this fleet
@@ -53138,7 +52762,7 @@ public final class Messages {
         }
       }
       /**
-       * <code>required string key = 1;</code>
+       * <code>optional string key = 1;</code>
        *
        * <pre>
        * The unique key for this fleet
@@ -53155,7 +52779,7 @@ public final class Messages {
         return this;
       }
       /**
-       * <code>required string key = 1;</code>
+       * <code>optional string key = 1;</code>
        *
        * <pre>
        * The unique key for this fleet
@@ -53168,7 +52792,7 @@ public final class Messages {
         return this;
       }
       /**
-       * <code>required string key = 1;</code>
+       * <code>optional string key = 1;</code>
        *
        * <pre>
        * The unique key for this fleet
@@ -54695,12 +54319,6 @@ public final class Messages {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized != -1) return isInitialized == 1;
 
-      for (int i = 0; i < getFleetsCount(); i++) {
-        if (!getFleets(i).isInitialized()) {
-          memoizedIsInitialized = 0;
-          return false;
-        }
-      }
       memoizedIsInitialized = 1;
       return true;
     }
@@ -54929,12 +54547,6 @@ public final class Messages {
       }
 
       public final boolean isInitialized() {
-        for (int i = 0; i < getFleetsCount(); i++) {
-          if (!getFleets(i).isInitialized()) {
-            
-            return false;
-          }
-        }
         return true;
       }
 
@@ -55211,13 +54823,13 @@ public final class Messages {
   public interface FleetOrderOrBuilder
       extends com.google.protobuf.MessageOrBuilder {
 
-    // required .au.com.codeka.common.protobuf.FleetOrder.FLEET_ORDER order = 1;
+    // optional .au.com.codeka.common.protobuf.FleetOrder.FLEET_ORDER order = 1;
     /**
-     * <code>required .au.com.codeka.common.protobuf.FleetOrder.FLEET_ORDER order = 1;</code>
+     * <code>optional .au.com.codeka.common.protobuf.FleetOrder.FLEET_ORDER order = 1;</code>
      */
     boolean hasOrder();
     /**
-     * <code>required .au.com.codeka.common.protobuf.FleetOrder.FLEET_ORDER order = 1;</code>
+     * <code>optional .au.com.codeka.common.protobuf.FleetOrder.FLEET_ORDER order = 1;</code>
      */
     au.com.codeka.common.protobuf.Messages.FleetOrder.FLEET_ORDER getOrder();
 
@@ -55567,17 +55179,17 @@ public final class Messages {
     }
 
     private int bitField0_;
-    // required .au.com.codeka.common.protobuf.FleetOrder.FLEET_ORDER order = 1;
+    // optional .au.com.codeka.common.protobuf.FleetOrder.FLEET_ORDER order = 1;
     public static final int ORDER_FIELD_NUMBER = 1;
     private au.com.codeka.common.protobuf.Messages.FleetOrder.FLEET_ORDER order_;
     /**
-     * <code>required .au.com.codeka.common.protobuf.FleetOrder.FLEET_ORDER order = 1;</code>
+     * <code>optional .au.com.codeka.common.protobuf.FleetOrder.FLEET_ORDER order = 1;</code>
      */
     public boolean hasOrder() {
       return ((bitField0_ & 0x00000001) == 0x00000001);
     }
     /**
-     * <code>required .au.com.codeka.common.protobuf.FleetOrder.FLEET_ORDER order = 1;</code>
+     * <code>optional .au.com.codeka.common.protobuf.FleetOrder.FLEET_ORDER order = 1;</code>
      */
     public au.com.codeka.common.protobuf.Messages.FleetOrder.FLEET_ORDER getOrder() {
       return order_;
@@ -55774,10 +55386,6 @@ public final class Messages {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized != -1) return isInitialized == 1;
 
-      if (!hasOrder()) {
-        memoizedIsInitialized = 0;
-        return false;
-      }
       memoizedIsInitialized = 1;
       return true;
     }
@@ -56059,10 +55667,6 @@ public final class Messages {
       }
 
       public final boolean isInitialized() {
-        if (!hasOrder()) {
-          
-          return false;
-        }
         return true;
       }
 
@@ -56085,22 +55689,22 @@ public final class Messages {
       }
       private int bitField0_;
 
-      // required .au.com.codeka.common.protobuf.FleetOrder.FLEET_ORDER order = 1;
+      // optional .au.com.codeka.common.protobuf.FleetOrder.FLEET_ORDER order = 1;
       private au.com.codeka.common.protobuf.Messages.FleetOrder.FLEET_ORDER order_ = au.com.codeka.common.protobuf.Messages.FleetOrder.FLEET_ORDER.SPLIT;
       /**
-       * <code>required .au.com.codeka.common.protobuf.FleetOrder.FLEET_ORDER order = 1;</code>
+       * <code>optional .au.com.codeka.common.protobuf.FleetOrder.FLEET_ORDER order = 1;</code>
        */
       public boolean hasOrder() {
         return ((bitField0_ & 0x00000001) == 0x00000001);
       }
       /**
-       * <code>required .au.com.codeka.common.protobuf.FleetOrder.FLEET_ORDER order = 1;</code>
+       * <code>optional .au.com.codeka.common.protobuf.FleetOrder.FLEET_ORDER order = 1;</code>
        */
       public au.com.codeka.common.protobuf.Messages.FleetOrder.FLEET_ORDER getOrder() {
         return order_;
       }
       /**
-       * <code>required .au.com.codeka.common.protobuf.FleetOrder.FLEET_ORDER order = 1;</code>
+       * <code>optional .au.com.codeka.common.protobuf.FleetOrder.FLEET_ORDER order = 1;</code>
        */
       public Builder setOrder(au.com.codeka.common.protobuf.Messages.FleetOrder.FLEET_ORDER value) {
         if (value == null) {
@@ -56112,7 +55716,7 @@ public final class Messages {
         return this;
       }
       /**
-       * <code>required .au.com.codeka.common.protobuf.FleetOrder.FLEET_ORDER order = 1;</code>
+       * <code>optional .au.com.codeka.common.protobuf.FleetOrder.FLEET_ORDER order = 1;</code>
        */
       public Builder clearOrder() {
         bitField0_ = (bitField0_ & ~0x00000001);
@@ -88637,7 +88241,7 @@ public final class Messages {
     java.lang.String[] descriptorData = {
       "\n\016messages.proto\022\035au.com.codeka.common.p" +
       "rotobuf\"7\n\017MessageOfTheDay\022\017\n\007message\030\001 " +
-      "\002(\t\022\023\n\013last_update\030\002 \002(\t\"\317\006\n\014GenericErro" +
+      "\001(\t\022\023\n\013last_update\030\002 \001(\t\"\317\006\n\014GenericErro" +
       "r\022\022\n\nerror_code\030\001 \001(\005\022\025\n\rerror_message\030\002" +
       " \001(\t\"\223\006\n\tErrorCode\022\020\n\014UnknownError\020\017\022\024\n\020" +
       "InsufficientCash\020\001\022\031\n\025CannotAttackOwnCol" +
@@ -88669,8 +88273,8 @@ public final class Messages {
       "\001(\005\"U\n\013EmpireRanks\0228\n\005ranks\030\001 \003(\0132).au.c" +
       "om.codeka.common.protobuf.EmpireRank\022\014\n\004" +
       "date\030\002 \001(\003\"\320\004\n\006Empire\022\013\n\003key\030\001 \001(\t\022\024\n\014di" +
-      "splay_name\030\002 \002(\t\022\014\n\004user\030\003 \001(\t\022\r\n\005email\030" +
-      "\004 \001(\t\022@\n\005state\030\005 \002(\01621.au.com.codeka.com" +
+      "splay_name\030\002 \001(\t\022\014\n\004user\030\003 \001(\t\022\r\n\005email\030" +
+      "\004 \001(\t\022@\n\005state\030\005 \001(\01621.au.com.codeka.com" +
       "mon.protobuf.Empire.EmpireState\0224\n\006fleet" +
       "s\030\006 \003(\0132$.au.com.codeka.common.protobuf." +
       "Fleet\0227\n\010colonies\030\007 \003(\0132%.au.com.codeka." +
@@ -88703,7 +88307,7 @@ public final class Messages {
       "dingStatistics\022S\n\006counts\030\001 \003(\0132C.au.com." +
       "codeka.common.protobuf.EmpireBuildingSta" +
       "tistics.DesignCount\0327\n\013DesignCount\022\021\n\tde" +
-      "sign_id\030\001 \002(\t\022\025\n\rnum_buildings\030\002 \002(\005\"\\\n\026" +
+      "sign_id\030\001 \001(\t\022\025\n\rnum_buildings\030\002 \001(\005\"\\\n\026" +
       "EmpireAdsRemoveRequest\022B\n\rpurchase_info\030",
       "\001 \001(\0132+.au.com.codeka.common.protobuf.Pu" +
       "rchaseInfo\"\250\001\n\014HelloRequest\022\024\n\014device_mo" +
@@ -88711,7 +88315,7 @@ public final class Messages {
       "\n\014device_build\030\003 \001(\t\022\026\n\016device_version\030\004" +
       " \001(\t\022\024\n\014memory_class\030\005 \001(\005\022!\n\031allow_inli" +
       "ne_notfications\030\006 \001(\010\"\331\003\n\rHelloResponse\022" +
-      "<\n\004motd\030\001 \002(\0132..au.com.codeka.common.pro" +
+      "<\n\004motd\030\001 \001(\0132..au.com.codeka.common.pro" +
       "tobuf.MessageOfTheDay\0225\n\006empire\030\002 \001(\0132%." +
       "au.com.codeka.common.protobuf.Empire\0227\n\010" +
       "colonies\030\003 \003(\0132%.au.com.codeka.common.pr",
@@ -88735,9 +88339,9 @@ public final class Messages {
       "otifications\022B\n\rnotifications\030\001 \003(\0132+.au" +
       ".com.codeka.common.protobuf.Notification" +
       "\"s\n\023NotificationWrapper\022\030\n\020original_mess",
-      "age\030\001 \002(\014\022B\n\rnotifications\030\002 \003(\0132+.au.co" +
+      "age\030\001 \001(\014\022B\n\rnotifications\030\002 \003(\0132+.au.co" +
       "m.codeka.common.protobuf.Notification\"\250\002" +
-      "\n\013ChatMessage\022\n\n\002id\030\007 \001(\005\022\017\n\007message\030\001 \002" +
+      "\n\013ChatMessage\022\n\n\002id\030\007 \001(\005\022\017\n\007message\030\001 \001" +
       "(\t\022\022\n\nempire_key\030\002 \001(\t\022\023\n\013date_posted\030\003 " +
       "\001(\003\022\024\n\014alliance_key\030\004 \001(\t\022\022\n\nmessage_en\030" +
       "\005 \001(\t\022\027\n\017conversation_id\030\006 \001(\005\022H\n\006action" +
@@ -88754,7 +88358,7 @@ public final class Messages {
       "ations\030\001 \003(\0132/.au.com.codeka.common.prot" +
       "obuf.ChatConversation\"B\n\033ChatConversatio" +
       "nParticipant\022\021\n\tempire_id\030\001 \001(\005\022\020\n\010is_mu" +
-      "ted\030\002 \001(\010\"\327\001\n\006Sector\022\t\n\001x\030\001 \002(\003\022\t\n\001y\030\002 \002",
+      "ted\030\002 \001(\010\"\327\001\n\006Sector\022\t\n\001x\030\001 \001(\003\022\t\n\001y\030\002 \001",
       "(\003\022\024\n\014num_colonies\030\005 \001(\005\0222\n\005stars\030\003 \003(\0132" +
       "#.au.com.codeka.common.protobuf.Star\0227\n\010" +
       "colonies\030\004 \003(\0132%.au.com.codeka.common.pr" +
@@ -88781,15 +88385,15 @@ public final class Messages {
       "\n\n\006ORANGE\020\003\022\007\n\003RED\020\004\022\013\n\007NEUTRON\020\005\022\r\n\tBLA" +
       "CKHOLE\020\006\";\n\005Stars\0222\n\005stars\030\001 \003(\0132#.au.co" +
       "m.codeka.common.protobuf.Star\"\247\002\n\021StarRe" +
-      "nameRequest\022\020\n\010star_key\030\001 \002(\t\022\020\n\010old_nam" +
-      "e\030\002 \002(\t\022\020\n\010new_name\030\003 \002(\t\022$\n\034DEPRECATED_" +
+      "nameRequest\022\020\n\010star_key\030\001 \001(\t\022\020\n\010old_nam" +
+      "e\030\002 \001(\t\022\020\n\010new_name\030\003 \001(\t\022$\n\034DEPRECATED_" +
       "purchase_order_id\030\004 \001(\t\022 \n\030DEPRECATED_pu" +
       "rchase_time\030\005 \001(\003\022-\n%DEPRECATED_purchase",
       "_developer_payload\030\006 \001(\t\022!\n\031DEPRECATED_p" +
       "urchase_price\030\007 \001(\t\022B\n\rpurchase_info\030\010 \001" +
       "(\0132+.au.com.codeka.common.protobuf.Purch" +
-      "aseInfo\"\311\002\n\006Planet\022\r\n\005index\030\002 \002(\005\022F\n\013pla" +
-      "net_type\030\003 \002(\01621.au.com.codeka.common.pr" +
+      "aseInfo\"\311\002\n\006Planet\022\r\n\005index\030\002 \001(\005\022F\n\013pla" +
+      "net_type\030\003 \001(\01621.au.com.codeka.common.pr" +
       "otobuf.Planet.PLANET_TYPE\022\014\n\004size\030\004 \001(\005\022" +
       "\037\n\027population_congeniality\030\005 \001(\005\022\034\n\024farm" +
       "ing_congeniality\030\006 \001(\005\022\033\n\023mining_congeni" +
@@ -88800,13 +88404,13 @@ public final class Messages {
       "s\030\001 \003(\0132%.au.com.codeka.common.protobuf." +
       "Planet\"A\n\007Sectors\0226\n\007sectors\030\001 \003(\0132%.au." +
       "com.codeka.common.protobuf.Sector\"\361\001\n\016Em" +
-      "pirePresence\022\013\n\003key\030\001 \002(\t\022\022\n\nempire_key\030" +
+      "pirePresence\022\013\n\003key\030\001 \001(\t\022\022\n\nempire_key\030" +
       "\002 \001(\t\022\020\n\010star_key\030\003 \001(\t\022\023\n\013total_goods\030\004" +
       " \001(\002\022\026\n\016total_minerals\030\005 \001(\002\022\034\n\024goods_de" +
       "lta_per_hour\030\006 \001(\002\022\037\n\027minerals_delta_per" +
       "_hour\030\007 \001(\002\022\021\n\tmax_goods\030\010 \001(\002\022\024\n\014max_mi",
       "nerals\030\t \001(\002\022\027\n\017goods_zero_time\030\n \001(\003\"\'\n" +
-      "\017ColonizeRequest\022\024\n\014planet_index\030\001 \002(\005\"\230" +
+      "\017ColonizeRequest\022\024\n\014planet_index\030\001 \001(\005\"\230" +
       "\003\n\006Colony\022\013\n\003key\030\001 \001(\t\022\022\n\nempire_key\030\002 \001" +
       "(\t\022\020\n\010star_key\030\004 \001(\t\022\024\n\014planet_index\030\016 \001" +
       "(\005\022\022\n\npopulation\030\005 \001(\002\022\"\n\032DEPRECATED_las" +
@@ -88832,11 +88436,11 @@ public final class Messages {
       "(\t\"$\n\nBUILD_KIND\022\014\n\010BUILDING\020\001\022\010\n\004SHIP\020\002" +
       "\"K\n\nBuildQueue\022=\n\010requests\030\001 \003(\0132+.au.co" +
       "m.codeka.common.protobuf.BuildRequest\"^\n" +
-      "\010Building\022\013\n\003key\030\001 \002(\t\022\022\n\ncolony_key\030\002 \002" +
-      "(\t\022\023\n\013design_name\030\003 \002(\t\022\r\n\005level\030\004 \001(\005\022\r" +
+      "\010Building\022\013\n\003key\030\001 \001(\t\022\022\n\ncolony_key\030\002 \001" +
+      "(\t\022\023\n\013design_name\030\003 \001(\t\022\r\n\005level\030\004 \001(\005\022\r" +
       "\n\005notes\030\005 \001(\t\"1\n\014FleetUpgrade\022\022\n\nupgrade",
       "_id\030\001 \001(\t\022\r\n\005extra\030\002 \001(\t\"\361\004\n\005Fleet\022\013\n\003ke" +
-      "y\030\001 \002(\t\022\022\n\nempire_key\030\002 \001(\t\022\023\n\013design_na" +
+      "y\030\001 \001(\t\022\022\n\nempire_key\030\002 \001(\t\022\023\n\013design_na" +
       "me\030\003 \001(\t\022\021\n\tnum_ships\030\004 \001(\002\022?\n\005state\030\005 \001" +
       "(\01620.au.com.codeka.common.protobuf.Fleet" +
       ".FLEET_STATE\022\030\n\020state_start_time\030\006 \001(\003\022\020" +
@@ -88853,7 +88457,7 @@ public final class Messages {
       "EET_STANCE\022\013\n\007PASSIVE\020\001\022\013\n\007NEUTRAL\020\002\022\016\n\n" +
       "AGGRESSIVE\020\003\">\n\006Fleets\0224\n\006fleets\030\001 \003(\0132$" +
       ".au.com.codeka.common.protobuf.Fleet\"\263\002\n" +
-      "\nFleetOrder\022D\n\005order\030\001 \002(\01625.au.com.code" +
+      "\nFleetOrder\022D\n\005order\030\001 \001(\01625.au.com.code" +
       "ka.common.protobuf.FleetOrder.FLEET_ORDE",
       "R\022\022\n\nsplit_left\030\002 \001(\005\022\023\n\013split_right\030\003 \001" +
       "(\005\022\020\n\010star_key\030\004 \001(\t\022A\n\006stance\030\005 \001(\01621.a" +
