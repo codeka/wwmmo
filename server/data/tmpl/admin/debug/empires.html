@@ -1,25 +1,44 @@
 {% extends "admin/skeleton.html" %}
 {% block title %}Empires{% endblock %}
 {% block head %}
+  <script src="/realms/{{realm}}/js/tmpl.js"></script>
   <style>
-    textarea#search-results {
-      width: 800px;
-      height: 400px;
+    #search-results {
+      position: absolute;
+      top: 95pt;
+      left: 560pt;
+      right: 10pt;
+      bottom: 10pt;
+      border: solid 1px #666;
+      overflow-y: scroll;
+      white-space: pre;
+      font-family: monospace;
+    }
+    #search-time {
+        position: absolute;
+        top: 80pt;
+        left: 560pt;
     }
     form {
       position: relative;
       height: 28pt;
       line-height: 28pt;
-      width: 500pt;
+      width: 555pt;
     }
     form input[type=submit] {
       position: absolute;
       right: 0;
     }
-    form input[type=text] {
+    form div.hack {
       position: absolute;
       top: 0; left: 60pt;
-      bottom: 0; right: 70pt;
+      bottom: 4pt; right: 185pt;;
+    }
+    input[type=text] {
+      width: 98%;
+      height: 100%;
+      padding: 0;
+      padding-left: 1%;
       border: solid 1px black;
     }
     form label {
@@ -28,50 +47,25 @@
       left: 0; width: 60pt;
       top: 0; bottom: 0;
     }
-    form#find-byemailidname input[type=text] {
-      right: 130pt;
-    }
-    form#find-byemailidname input[id=search-details] {
-      position: absolute;
-      right: 110pt;
-      top: 1pt;
-    }
-    form#find-byemailidname label[for=search-details] {
-      position: absolute;
-      top: 0; height: 16pt;
-      left: 392pt;
-      line-height: 16pt;
-    }
-    form#find-byemailidname input[id=search-simulate] {
-      position: absolute;
-      right: 110pt;
-      top: 12pt;
-    }
-    form#find-byemailidname label[for=search-simulate] {
-      position: absolute;
-      top: 12pt; height: 16pt;
-      left: 392pt;
-      line-height: 16pt;
+    form#find-byemailidname input[type=submit] {
+      right: 120pt;
     }
 
-    form#empire-query {
-        width: 550pt;
-    }
-    form#empire-query input[type=text] {
-      right: 180pt;
-    }
     form#empire-query input[value="Cash Audit"] {
       position: absolute;
-      right: 95pt;
+      right: 100pt;
     }
     form#empire-query input[value="Building Stats"] {
       position: absolute;
       right: 0;
     }
 
-    form input[type=text]#create-empire-name {
-      right: 100pt;
+    table {
+      width: 560pt;
     }
+    div.spinner {
+    }
+
   </style>
 {% endblock %}
 
@@ -79,67 +73,55 @@
   <h1>Empires</h1>
   <p>To find the details of a given Empire, enter the email address below of the user
      who owns the Empire, or the Empire's key, then click &ldquo;Search&rdquo;.
+  <div id="search-time"></div>
+  <div id="search-results"></div>
   <form id="find-byemailidname">
     <label for="search-email">Search:</label>
-    <input type="text" id="search-value" placeholder="Key, email or name" />
-    <input type="checkbox" id="search-details">
-    <label for="search-details" title="(You must specify key for this)">Details</label>
-    <input type="checkbox" id="search-simulate">
-    <label for="search-simulate">Simulate</label>
+    <div class="hack"><input type="text" id="search-value" placeholder="Key, email or name" /></div>
     <input type="submit" value="Search" />
   </form>
   <form id="empire-query">
     <label for="empire-key">Key:</label>
-    <input type="text" id="empire-key" placeholder="Empire key" />
+    <div class="hack"><input type="text" id="empire-key" placeholder="Empire key" /></div>
     <input type="submit" value="Cash Audit" />
     <input type="submit" value="Building Stats" />
   </form>
-  <form id="create-empire">
-    <label for="create-empire-name">Name:</label>
-    <input type="text" id="create-empire-name" />
-    <input type="submit" value="Create Empire" />
-  </form>
-  <textarea id="search-results" wrap="off"></textarea>
-  <div id="search-time"></div>
+  <table id="empire-list">
+    <thead>
+      <tr>
+        <th width="20"></th>
+        <th width="40">Shield</th>
+        <th>Name</th>
+        <th width="20" align="center">Rank</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+    <tfoot>
+      
+    </tfoot>
+  </table>
+  <script type="text/html" id="empire-row">
+    <tr>
+      <td align="center"><%=key%></td>
+      <td align="center"><img src="/realms/{{realm}}/empires/<%=key%>/shield?final=1&size=32" width="32" height="32" /></td>
+      <td><a href="javascript:;" class="empire-name" data-id="<%=key%>"><%=display_name%></a><br/><span style="color: #aaa;"><%=email%></span></td>
+      <td align="center"><%=rank.rank%></td>
+    </tr>
+  </script>
   <script>
     $("#find-byemailidname").on("submit", function(evnt) {
       evnt.preventDefault();
 
-      var url = "";
-      var inp = $(this).find("input[type=text]");
-      if ($(this).find("#search-details").prop("checked")) {
-        url = "/realms/{{realm}}/empires/"+inp.val()+"/details";
-        if (!$(this).find("#search-simulate").prop("checked")) {
-          url += "?do_simulate=0";
-        }
+      var query;
+      var $inp = $("#search-value");
+      if ($inp.val().indexOf("@") > 0) {
+        query = "email="+$inp.val();
+      } else if (parseInt($inp.val()) == $inp.val()) {
+        query = "ids="+$inp.val();
       } else {
-        url = "/realms/{{realm}}/empires/search";
-        if (inp.val().indexOf("@") > 0) {
-          url += "?email="+inp.val();
-        } else if (parseInt(inp.val()) == inp.val()) {
-          url += "?ids="+inp.val();
-        } else {
-          url += "?name="+inp.val();
-        }
+        query = "name="+$inp.val();
       }
-
-      $.ajax({
-        url: url,
-        dataType: "json",
-        success: function (data, status, xhr) {
-          setTimeout(function() {
-            $("#search-time").html("<b>Time:</b> "+xhr.elapsedMs+"ms");
-          }, 10);
-          $("#search-results").val(JSON.stringify(data, null, "  "));
-        },
-        error: function(xhr, status, err) {
-          if (xhr.status == 404) {
-            $("#search-results").val("No empire!");
-          } else {
-            alert("An error occured, check server logs: " + xhr.status);
-          }
-        }
-      });
+      fetchEmpireList(query);
     });
 
     function zeroPad(str, n) {
@@ -165,6 +147,7 @@
             text += " | "+spacePad("Before", 10);
             text += " | "+spacePad("After", 10);
             text += " | "+spacePad("Reason", 20);
+            text += "\r\n";
             for(var i = 0; i < data.records.length; i++) {
               var entry = data.records[i];
               var dt = new Date(entry["time"] * 1000);
@@ -194,7 +177,7 @@
               }
               text += "\r\n";
             }
-            $("#search-results").val(text);
+            $("#search-results").html(text);
           },
           error: function(xhr, status, err) {
             alert("An error occured, check server logs: " + xhr.status);
@@ -207,7 +190,7 @@
           type: "GET",
           dataType: "json",
           success: function(data) {
-            $("#search-results").val(JSON.stringify(data, null, "  "));
+            $("#search-results").html(JSON.stringify(data, null, "  "));
           },
           error: function(xhr, status, err) {
             alert("An error occured, check server logs: " + xhr.status);
@@ -216,24 +199,52 @@
       }
     });
 
-    $("#create-empire").on("submit", function(evnt) {
-      evnt.preventDefault();
+    $("#empire-list").on("click", "a.empire-name", function() {
+      $.ajax({
+          url: "/realms/{{realm}}/empires/search?ids="+$(this).data("id"),
+          dataType: "json",
+          success: function (data, status, xhr) {
+            setTimeout(function() {
+              $("#search-time").html("<b>Time:</b> "+xhr.elapsedMs+"ms");
+            }, 10);
+            $("#search-results").html(JSON.stringify(data, null, "  "));
+          },
+          error: function(xhr, status, err) {
+            if (xhr.status == 404) {
+              $("#search-results").val("No empire!");
+            } else {
+              alert("An error occured, check server logs: " + xhr.status);
+            }
+          }
+        });
+    });
 
-      var url = "/realms/{{realm}}/empires";
+    function fetchEmpireList(query) {
+      var $tbody = $("#empire-list tbody");
+      $tbody.html("<tr><td colspan=\"4\"><div class=\"spinner\"></div></td></tr>");
 
       $.ajax({
-        url: url,
-        type: "PUT",
-        contentType: "application/json",
-        data: JSON.stringify({display_name: $(this).find("input[type=text]").val(),
-                              state: 1}),
-        success: function (data) {
-          $("#search-results").val(JSON.stringify(data, null, "  "));
-        },
-        error: function(xhr, status, err) {
-          alert("An error occured, check server logs: " + xhr.status);
-        }
-      });
+          url: "/realms/{{realm}}/empires/search?"+query,
+          dataType: "json",
+          success: function(data) {
+            showEmpireList(data.empires);
+          }
+        });
+    }
+
+    function showEmpireList(empires) {
+      var rowTmpl = $("#empire-row");
+      var $tbody = $("#empire-list tbody");
+      $tbody.empty();
+      for (var i = 0; i < empires.length; i++) {
+        var empire = empires[i];
+        $tbody.append(rowTmpl.applyTemplate(empire));
+      }
+//      alert(JSON.stringify(empires));
+    }
+
+    $(function() {
+      fetchEmpireList("minRank=1&maxRank=50");
     });
   </script>
 {% endblock %}
