@@ -75,7 +75,7 @@ public class TranslateController {
     private static boolean isEnglish(String str) {
         for (int i = 0; i < str.length(); i++) {
             Character ch = str.charAt(i);
-            if (ch > 0x80) {
+            if (ch > 0x80 && Character.isAlphabetic(ch)) {
                 return false;
             }
         }

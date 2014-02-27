@@ -16,6 +16,9 @@ public class RealmManager {
 
     // The IDs for the realms can NEVER change, once set
     public static final int DEBUG_REALM_ID = 1000;
+
+    // The IDs for the realms can NEVER change, once set
+    public static final int DEBUG_REALM_ID = 1000;
     public static final int ALPHA_REALM_ID = 1;
     public static final int BETA_REALM_ID = 2;
     public static final int BLITZ_REALM_ID = 10;

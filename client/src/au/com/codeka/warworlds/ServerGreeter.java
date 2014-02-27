@@ -280,12 +280,16 @@ public class ServerGreeter {
                                 "data connection.</p>";
                         mErrorOccured = true;
                         mNeedsReAuthenticate = false;
-                    } else {
-                        // an HTTP error is likely because our credentials are out of date, we'll
-                        // want to re-authenticate ourselves.
+                    } else if (e.getHttpStatusLine().getStatusCode() == 403) {
+                        // if it's an authentication problem, we'll want to re-authenticate
                         message = "<p class=\"error\">Authentication failed.</p>";
                         mErrorOccured = true;
                         mNeedsReAuthenticate = true;
+                    } else {
+                        // any other HTTP error, let's display that
+                        message = "<p class=\"error\">AN ERROR OCCURED.</p>";
+                        mErrorOccured = true;
+                        mNeedsReAuthenticate = false;
                     }
                 }
 
