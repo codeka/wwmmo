@@ -31,6 +31,7 @@ public class BasePageHandler extends RequestHandler {
         sTemplateEngine.getConfiguration().setWorkspace(new File(getBasePath(), "data/tmpl").getAbsolutePath());
 
         FilterLibrary.addFilter(new NumberFilter());
+        FilterLibrary.addFilter(new AttrEscapeFilter());
     }
 
     protected void render(String path, Map<String, Object> data) {
@@ -121,6 +122,19 @@ public class BasePageHandler extends RequestHandler {
 
             throw new InterpretException("Expected a number.");
         }
-        
+    }
+
+    private static class AttrEscapeFilter implements Filter {
+        @Override
+        public String getName() {
+            return "attr-escape";
+        }
+
+        @Override
+        public Object filter(Object object, JangodInterpreter interpreter,
+                             String... args) throws InterpretException {
+            return object.toString().replace("\"", "&quot;")
+                    .replace("'", "&squot;");
+        }
     }
 }

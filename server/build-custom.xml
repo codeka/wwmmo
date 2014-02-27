@@ -31,14 +31,9 @@
       it to GCE, in the "stage" directory, ready to be pushed live.
     -->
     <target name="deploy" depends="package">
-        <echo message="${ant.project.name}: deploying ${deploy.filename}..."/>
         <zip destfile="${deploy.filename}" basedir="${output.location}" />
-        <exec executable="gcutil">
-            <arg value="push" />
-            <arg value="--zone=us-central1-a" />
-            <arg value="warworlds-main" />
-            <arg value="${deploy.filename}" />
-            <arg value="/home/dean" />
-        </exec> 
+        <echo message="${ant.project.name}: copying ${deploy.filename}..."/>
+        <scp localFile="${deploy.filename}" remoteToFile="dean@game.war-worlds.com:/home/dean"
+            keyfile="${user.home}/.ssh/id_rsa" />
     </target>
 </project>

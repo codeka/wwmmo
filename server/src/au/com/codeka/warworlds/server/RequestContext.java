@@ -43,12 +43,12 @@ public class RequestContext {
     public void setContext(HttpServletRequest request) {
         String userAgent = request.getHeader("User-Agent");
         if (userAgent == null) {
-            userAgent = "???";
+            userAgent = "";
         }
 
         long tid = Thread.currentThread().getId();
         mContextMap.put(tid, new Context(request.getRequestURI(),
-                request.getQueryString(), userAgent));
+                userAgent, request.getQueryString()));
     }
 
     private Context getContext() {
