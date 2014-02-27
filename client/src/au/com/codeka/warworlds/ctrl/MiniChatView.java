@@ -177,13 +177,23 @@ public class MiniChatView extends RelativeLayout
         ChatManager.i.addMessageAddedListener(new ChatManager.MessageAddedListener() {
             @Override
             public void onMessageAdded(ChatMessage msg) {
-                refreshUnreadCountButton(btn);
+                post(new Runnable() {
+                    @Override
+                    public void run() {
+                        refreshUnreadCountButton(btn);
+                    }
+                });
             }
         });
         ChatManager.i.addUnreadMessageCountListener(new ChatManager.UnreadMessageCountListener() {
             @Override
             public void onUnreadMessageCountChanged() {
-                refreshUnreadCountButton(btn);
+                post(new Runnable() {
+                    @Override
+                    public void run() {
+                        refreshUnreadCountButton(btn);
+                    }
+                });
             }
         });
 

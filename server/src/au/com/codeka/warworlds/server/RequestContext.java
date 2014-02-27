@@ -2,6 +2,8 @@ package au.com.codeka.warworlds.server;
 
 import java.util.HashMap;
 
+import javax.servlet.http.HttpServletRequest;
+
 /**
  * This class contains "context" information about the current request, mostly used for error reporting
  * and such.
@@ -9,10 +11,10 @@ import java.util.HashMap;
 public class RequestContext {
     public static RequestContext i = new RequestContext();
 
-    private HashMap<Long, String> mContextNames;
+    private HashMap<Long, Context> mContextMap;
 
     private RequestContext() {
-        mContextNames = new HashMap<Long, String>();
+        mContextMap = new HashMap<Long, Context>();
     }
 
     /**
@@ -20,12 +22,60 @@ public class RequestContext {
      * for event handlers.
      */
     public String getContextName() {
-        long tid = Thread.currentThread().getId();
-        return mContextNames.get(tid);
+        return getContext().name;
     }
 
-    public void setContextName(String name) {
+    public String getQueryString() {
+        String value = getContext().queryString;
+        return value == null ? "" : value;
+    }
+
+    public String getUserAgent() {
+        String value = getContext().userAgent;
+        return value == null ? "" : value;
+    }
+
+    public void setContext(String name) {
         long tid = Thread.currentThread().getId();
-        mContextNames.put(tid, name);
+        mContextMap.put(tid, new Context(name));
+    }
+    
+    public void setContext(HttpServletRequest request) {
+        String userAgent = request.getHeader("User-Agent");
+        if (userAgent == null) {
+            userAgent = "";
+        }
+
+        long tid = Thread.currentThread().getId();
+        mContextMap.put(tid, new Context(request.getRequestURI(),
+                userAgent, request.getQueryString()));
+    }
+
+    private Context getContext() {
+        long tid = Thread.currentThread().getId();
+        Context ctx = mContextMap.get(tid);
+        if (ctx == null) {
+            ctx = Context.Empty;
+        }
+        return ctx;
+    }
+
+    private static class Context {
+        public String name;
+        public String userAgent;
+        public String queryString;
+
+        public static Context Empty = new Context();
+
+        private Context() {
+        }
+        public Context(String name) {
+            this.name = name;
+        }
+        public Context(String name, String userAgent, String queryString) {
+            this.name = name;
+            this.userAgent = userAgent;
+            this.queryString = queryString;
+        }
     }
 }

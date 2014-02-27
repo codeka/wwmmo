@@ -25,6 +25,10 @@
         font-weight: bold;
     }
     div.details-extra dd {
+        max-width: 300pt;
+        overflow-x: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
         float: right;
     }
 
@@ -169,6 +173,11 @@
               <dd>{{error_report.total_run_time|number}} ms
               <dt>FG time:
               <dd>{{error_report.foreground_run_time|number}} ms
+            {% else %}
+              <dt>Query:
+              <dd title="{{error_report.server_request_qs|attr-escape}}">{{error_report.server_request_qs}}
+              <dt>User-Agent:
+              <dd title="{{error_report.server_request_user_agent|attr-escape}}">{{error_report.server_request_user_agent}}
             {% endif %}
           </dl>
         </div>

@@ -71,6 +71,8 @@ public class ErrorReportingLoggingHandler extends Handler {
             }
             error_report_pb.setLogOutput(sb.toString());
             error_report_pb.setReportTime(DateTime.now().getMillis());
+            error_report_pb.setServerRequestUserAgent(RequestContext.i.getUserAgent());
+            error_report_pb.setServerRequestQs(RequestContext.i.getQueryString());
 
             if (record.getThrown() != null) {
                 Throwable thrown = record.getThrown();

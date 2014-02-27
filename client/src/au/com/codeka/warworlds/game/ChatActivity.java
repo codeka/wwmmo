@@ -706,13 +706,23 @@ public class ChatActivity extends BaseActivity
             ChatManager.i.addMessageAddedListener(new ChatManager.MessageAddedListener() {
                 @Override
                 public void onMessageAdded(ChatMessage msg) {
-                    refreshUnreadCountButton(btn);
+                    mHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            refreshUnreadCountButton(btn);
+                        }
+                    });
                 }
             });
             ChatManager.i.addUnreadMessageCountListener(new ChatManager.UnreadMessageCountListener() {
                 @Override
                 public void onUnreadMessageCountChanged() {
-                    refreshUnreadCountButton(btn);
+                    mHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            refreshUnreadCountButton(btn);
+                        }
+                    });
                 }
             });
 

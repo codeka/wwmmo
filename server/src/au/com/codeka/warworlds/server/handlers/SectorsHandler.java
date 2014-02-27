@@ -32,9 +32,11 @@ public class SectorsHandler extends RequestHandler {
 
             Pair<Long, Long> coord = new Pair<Long, Long>();
             try {
-                coord.one = Long.parseLong(xy[0]);
-                coord.two = Long.parseLong(xy[1]);
-                coords.add(coord);
+                if (xy.length == 2) {
+                    coord.one = Long.parseLong(xy[0]);
+                    coord.two = Long.parseLong(xy[1]);
+                    coords.add(coord);
+                }
             } catch (NumberFormatException e) {
                 // just ignore
             }
@@ -48,6 +50,9 @@ public class SectorsHandler extends RequestHandler {
         int myEmpireID = getSession().getEmpireID();
 
         List<Pair<Long, Long>> coords = getCoords();
+        if (coords == null || coords.size() == 0) {
+            throw new RequestException(404);
+        }
         boolean generate = true;
         if (getRequest().getParameter("gen") != null && getRequest().getParameter("gen").equals("0")) {
             generate = false;

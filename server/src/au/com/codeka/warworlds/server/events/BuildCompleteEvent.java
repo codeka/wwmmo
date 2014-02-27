@@ -51,7 +51,7 @@ public class BuildCompleteEvent extends Event {
             while (rs.next()) {
                 int id = rs.getInt(1);
 
-                RequestContext.i.setContextName("event: BuildCompleteEvent build_request.id="+id);
+                RequestContext.i.setContext("event: BuildCompleteEvent build_request.id="+id);
 
                 sql = "UPDATE build_requests SET processing = 1 WHERE processing = 0 AND id = ?";
                 try (SqlStmt stmt2 = DB.prepare(sql)) {

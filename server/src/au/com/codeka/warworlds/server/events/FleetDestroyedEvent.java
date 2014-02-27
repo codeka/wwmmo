@@ -39,7 +39,7 @@ public class FleetDestroyedEvent extends Event {
                 int fleetID = rs.getInt(1);
                 Star star = new StarController().getStar(rs.getInt(2));
 
-                RequestContext.i.setContextName("event: FleetDestroyedEvent fleet.id="+fleetID);
+                RequestContext.i.setContext("event: FleetDestroyedEvent fleet.id="+fleetID);
 
                 try {
                     processFleetDestroyed(star, fleetID);

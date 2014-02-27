@@ -32,6 +32,7 @@ public class SqlStmt implements AutoCloseable {
     private String mSql;
     private ArrayList<Object> mParameters;
     private ArrayList<ResultSet> mResultSets;
+    private boolean mWasStatementLogged;
 
     public SqlStmt(Connection conn, String sql, PreparedStatement stmt, boolean autoCloseConnection) {
         mConn = conn;
@@ -40,6 +41,7 @@ public class SqlStmt implements AutoCloseable {
         mAutoCloseConnection = autoCloseConnection;
         mParameters = new ArrayList<Object>();
         mResultSets = new ArrayList<ResultSet>();
+        mWasStatementLogged = false;
     }
 
     public void setInt(int position, int value) throws SQLException {
@@ -110,16 +112,7 @@ public class SqlStmt implements AutoCloseable {
      * Execute an 'update' query. That is, anything but "SELECT".
      */
     public int update() throws SQLException {
-        if (log.isInfoEnabled()) {
-            StringBuffer sb = new StringBuffer();
-            sb.append(mSql);
-            sb.append(System.lineSeparator());
-            for (Object obj : mParameters) {
-                sb.append(String.format("? = %s", obj));
-                sb.append(System.lineSeparator());
-            }
-            log.info(sb.toString());
-        }
+        logStatement();
         return mStmt.executeUpdate();
     }
 
@@ -141,16 +134,7 @@ public class SqlStmt implements AutoCloseable {
 
     @SuppressWarnings("unchecked")
     public <T> T selectFirstValue(Class<T> type) throws SQLException {
-        if (log.isInfoEnabled()) {
-            StringBuffer sb = new StringBuffer();
-            sb.append(mSql);
-            sb.append(System.lineSeparator());
-            for (Object obj : mParameters) {
-                sb.append(String.format("? = %s", obj));
-                sb.append(System.lineSeparator());
-            }
-            log.info(sb.toString());
-        }
+        logStatement();
 
         ResultSet rs = null;
         try {
@@ -165,6 +149,19 @@ public class SqlStmt implements AutoCloseable {
     }
 
     public ResultSet select() throws SQLException {
+        logStatement();
+
+        ResultSet rs = mStmt.executeQuery();
+        mResultSets.add(rs);
+        return rs;
+    }
+
+    private void logStatement() {
+        if (mWasStatementLogged) {
+            return;
+        }
+        mWasStatementLogged = true;
+
         if (log.isInfoEnabled()) {
             StringBuffer sb = new StringBuffer();
             sb.append(mSql);
@@ -175,14 +172,12 @@ public class SqlStmt implements AutoCloseable {
             }
             log.info(sb.toString());
         }
-
-        ResultSet rs = mStmt.executeQuery();
-        mResultSets.add(rs);
-        return rs;
     }
 
     @Override
     public void close() throws Exception {
+        logStatement();
+
         for (ResultSet rs : mResultSets) {
             rs.close();
         }
