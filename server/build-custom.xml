@@ -33,7 +33,9 @@
     <target name="deploy" depends="package">
         <zip destfile="${deploy.filename}" basedir="${output.location}" />
         <echo message="${ant.project.name}: copying ${deploy.filename}..."/>
-        <scp localFile="${deploy.filename}" remoteToFile="dean@game.war-worlds.com:/home/dean"
-            keyfile="${user.home}/.ssh/id_rsa" />
+        <exec executable="scp">
+            <arg value="${deploy.filename}" />
+            <arg value="game.war-worlds.com:/home/dean" />
+        </exec>
     </target>
 </project>
