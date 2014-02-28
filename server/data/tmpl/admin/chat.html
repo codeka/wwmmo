@@ -140,7 +140,8 @@
       $.ajax({
         url: url, type: "POST", contentType: "application/json",
         data: JSON.stringify({
-          "message": msg
+          "message": msg,
+          "action": 0
         }),
         success: function(data) {
           // ??
