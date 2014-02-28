@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ListView
+        android:id="@+id/ship_list"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentTop="true"
+        android:layout_toLeftOf="@+id/bottom_pane"
+        android:layout_marginRight="-4px"
+        android:listSelector="@drawable/list_selector" />
+
+    <RelativeLayout
+        android:id="@+id/bottom_pane"
+        android:layout_width="280dp"
+        android:layout_height="match_parent"
+        android:layout_alignParentRight="true">
+
+        <TextView
+            android:id="@+id/stance_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="12dp"
+            android:layout_marginRight="12dp"
+            android:layout_alignParentLeft="true"
+            android:layout_alignTop="@+id/stance"
+            android:layout_alignBottom="@+id/stance"
+            android:gravity="center_vertical"
+            android:text="Stance" />
+
+        <Spinner
+            android:id="@+id/stance"
+            style="@style/Spinner"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="12dp"
+            android:layout_marginTop="12dp"
+            android:layout_toRightOf="@id/stance_label"
+            android:layout_alignParentRight="true" />
+
+        <Button
+            android:id="@+id/move_btn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="4dp"
+            android:layout_marginRight="4dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="5dp"
+            android:layout_alignParentLeft="true"
+            android:layout_below="@id/stance"
+            android:text="Move" />
+
+        <Button
+            android:id="@+id/split_btn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="4dp"
+            android:layout_marginRight="4dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="5dp"
+            android:layout_alignParentLeft="true"
+            android:layout_below="@id/move_btn"
+            android:text="Split" />
+
+        <Button
+            android:id="@+id/merge_btn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="4dp"
+            android:layout_marginRight="4dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="5dp"
+            android:layout_alignParentRight="true"
+            android:layout_below="@id/split_btn"
+            android:text="Merge" />
+
+        <Button
+            android:id="@+id/enter_btn"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_marginLeft="4dp"
+            android:layout_marginRight="4dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="5dp"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentBottom="true"
+            android:text="Enter" />
+    </RelativeLayout>
+
+</RelativeLayout>

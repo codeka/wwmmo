@@ -36,7 +36,8 @@ import au.com.codeka.warworlds.model.Fleet;
 import au.com.codeka.warworlds.model.Star;
 import au.com.codeka.warworlds.model.StarManager;
 
-public class WormholeActivity extends BaseGlActivity implements StarManager.StarFetchedHandler {
+public class WormholeActivity extends BaseGlActivity
+                              implements StarManager.StarFetchedHandler {
     private WormholeSceneManager mWormhole;
     private Star mStar;
     private Star mDestStar;
@@ -187,11 +188,14 @@ public class WormholeActivity extends BaseGlActivity implements StarManager.Star
         mStar = s;
         fleetList.setWormhole(mStar);
 
+        if (mStar.getWormholeExtra().getDestWormholeID() != 0 && (
+                mDestStar == null || !mDestStar.getKey().equals(Integer.toString(mStar.getWormholeExtra().getDestWormholeID())))) {
+            StarManager.getInstance().requestStar(Integer.toString(
+                    mStar.getWormholeExtra().getDestWormholeID()), false, this);
+        }
+
         if (destinationName.getText().toString().equals("")) {
             destinationName.setText(Html.fromHtml("→ <i>None</i>"));
-            if (mStar.getWormholeExtra().getDestWormholeID() != 0) {
-                StarManager.getInstance().requestStar(Integer.toString(mStar.getWormholeExtra().getDestWormholeID()), false, this);
-            }
         }
         starName.setText(mStar.getName());
     }
@@ -250,10 +254,7 @@ public class WormholeActivity extends BaseGlActivity implements StarManager.Star
         super.onStart();
         mWormhole.onStart();
 
-        Bundle extras = getIntent().getExtras();
-        String starKey = extras.getString("au.com.codeka.warworlds.StarKey");
-
-        StarManager.getInstance().addStarUpdatedListener(starKey, this);
+        StarManager.getInstance().addStarUpdatedListener(null, this);
     }
 
     @Override

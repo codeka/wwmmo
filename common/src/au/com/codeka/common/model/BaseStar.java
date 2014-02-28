@@ -480,6 +480,9 @@ public abstract class BaseStar {
 
         public WormholeExtra() {
         }
+        public WormholeExtra(int empireID) {
+            mEmpireID = empireID;
+        }
 
         public int getDestWormholeID() {
             return mDestWormholeID;
@@ -494,9 +497,32 @@ public abstract class BaseStar {
             return mEmpireID;
         }
 
+        public int getTuneTimeHours() {
+            if (mTuneHistory == null || mTuneHistory.size() == 0) {
+                return 0;
+            } else {
+                DateTime twoWeeksAgo = DateTime.now().minusWeeks(2);
+                int numTunes = 0;
+                for (DateTime dt : mTuneHistory) {
+                    if (dt.isAfter(twoWeeksAgo)) {
+                        numTunes ++;
+                    }
+                }
+                return (int) Math.pow(numTunes + 1, 2);
+            }
+        }
+
         public void tuneTo(int destWormholeID) {
             mDestWormholeID = destWormholeID;
-            mTuneCompleteTime = DateTime.now().plusHours(2); // TODO: proper calculation
+            mTuneCompleteTime = DateTime.now().plusHours(getTuneTimeHours());
+
+            if (mTuneHistory == null) {
+                mTuneHistory = new ArrayList<DateTime>();
+            }
+            mTuneHistory.add(0, mTuneCompleteTime);
+            while (mTuneHistory.size() > 10) {
+                mTuneHistory.remove(mTuneHistory.size() - 1);
+            }
         }
 
         public void fromProtocolBuffer(Messages.Star.StarExtra pb) {

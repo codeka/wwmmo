@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:baselineAligned="false" >
+
+    <View android:id="@+id/centre"
+          android:layout_width="1dp"
+          android:layout_height="1dp"
+          android:layout_marginRight="280dp"
+          android:layout_alignParentRight="true"
+          android:layout_centerVertical="true" />
+
+    <org.andengine.opengl.view.RenderSurfaceView
+            android:id="@+id/wormhole"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_above="@id/centre"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentLeft="true"
+            android:layout_marginBottom="-6dp"
+            android:layout_marginRight="274dp" />
+
+    <TextView android:id="@+id/tuning_progress"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:layout_above="@id/centre"
+              android:layout_alignParentLeft="true"
+              android:layout_toLeftOf="@id/centre"
+              android:gravity="center_horizontal"
+              android:textAppearance="?android:attr/textAppearanceMedium" />
+
+    <TextView android:id="@+id/destination_name"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:layout_above="@id/tuning_progress"
+              android:layout_alignParentLeft="true"
+              android:layout_toLeftOf="@id/centre"
+              android:gravity="center_horizontal"
+              android:textAppearance="?android:attr/textAppearanceMedium" />
+
+    <TextView android:id="@+id/star_name"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:layout_above="@id/destination_name"
+              android:layout_alignParentLeft="true"
+              android:layout_toLeftOf="@id/centre"
+              android:gravity="center_horizontal"
+              android:textAppearance="?android:attr/textAppearanceLarge" />
+
+    <RelativeLayout android:id="@+id/action_pane"
+                    style="@style/RightPane"
+                    android:layout_width="280dp"
+                    android:layout_height="wrap_content"
+                    android:layout_above="@id/centre"
+                    android:layout_alignParentTop="true"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginBottom="-6dp">
+
+        <Button android:id="@+id/rename_btn"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentTop="true"
+                android:layout_marginLeft="4dp"
+                android:layout_marginRight="8dp"
+                android:layout_marginTop="10dp"
+                android:text="Rename" />
+
+        <Button android:id="@+id/destination_btn"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentRight="true"
+                android:layout_below="@id/rename_btn"
+                android:layout_marginLeft="4dp"
+                android:layout_marginRight="8dp"
+                android:layout_marginTop="10dp"
+                android:text="Tune Destination" />
+
+        <Button android:id="@+id/view_destination_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentBottom="true"
+                android:layout_marginLeft="4dp"
+                android:layout_marginRight="8dp"
+                android:layout_marginBottom="10dp"
+                android:text="View Destination" />
+
+    </RelativeLayout>
+
+    <RelativeLayout android:id="@+id/ship_pane"
+                    style="@style/BottomPane"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/centre"
+                    android:layout_alignParentBottom="true"
+                    android:layout_alignParentLeft="true">
+        <au.com.codeka.warworlds.ctrl.FleetListWormhole
+            android:id="@+id/fleet_list"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+    </RelativeLayout>
+
+</RelativeLayout>

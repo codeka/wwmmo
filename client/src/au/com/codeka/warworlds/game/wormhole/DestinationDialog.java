@@ -79,6 +79,12 @@ public class DestinationDialog extends DialogFragment {
                 });
         }
 
+        TextView tuneTime = (TextView) mView.findViewById(R.id.tune_time);
+        int tuneTimeHours = mSrcWormhole.getWormholeExtra() == null
+                ? 0 : mSrcWormhole.getWormholeExtra().getTuneTimeHours();
+        tuneTime.setText(String.format(Locale.ENGLISH, "Tune time: %d hr%s",
+                tuneTimeHours, tuneTimeHours == 1 ? "" : "s"));
+
         StyledDialog.Builder b = new StyledDialog.Builder(getActivity());
         b.setView(mView);
         b.setPositiveButton("Tune", new DialogInterface.OnClickListener() {

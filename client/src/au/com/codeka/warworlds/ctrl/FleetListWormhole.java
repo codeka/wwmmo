@@ -37,8 +37,8 @@ public class FleetListWormhole extends FleetList {
         boolean tuned = false;
         if (mWormhole != null && mWormhole.getWormholeExtra() != null) {
             Star.WormholeExtra extra = mWormhole.getWormholeExtra();
-            if (extra.getDestWormholeID() > 0 && (extra.getTuneCompleteTime() != null ||
-                    extra.getTuneCompleteTime().isBefore(DateTime.now()))) {
+            if (extra.getDestWormholeID() > 0 && extra.getTuneCompleteTime() != null &&
+                    extra.getTuneCompleteTime().isBefore(DateTime.now())) {
                 tuned = true;
             }
         }

@@ -34,7 +34,7 @@ public class BaseActivity extends FragmentActivity {
         mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
 
         Util.loadProperties();
-        if (Util.isDebug()) {
+       /* if (Util.isDebug()) {
             mDebugView = new DebugView(this);
             mDebugViewLayout = new WindowManager.LayoutParams(
                     WindowManager.LayoutParams.WRAP_CONTENT, WindowManager.LayoutParams.WRAP_CONTENT,
@@ -42,7 +42,7 @@ public class BaseActivity extends FragmentActivity {
                     WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
                     PixelFormat.TRANSLUCENT);
             mDebugViewLayout.gravity = Gravity.TOP | Gravity.RIGHT;
-        }
+        }*/
     }
 
     @Override
