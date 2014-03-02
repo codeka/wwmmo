@@ -16,11 +16,13 @@ public class WormholeEntity extends Entity {
         super(0.0f, 0.0f, 1.0f, 1.0f);
         mSceneManager = sceneManager;
 
-        float margin = sceneManager.getActivity().getWidth() * 0.5f;
-        float size = sceneManager.getActivity().getWidth() * 0.999f;
+        int activityWidth = sceneManager.getActivity().getWidth();
+        int activityHeight = sceneManager.getActivity().getHeight();
+        int activitySize = Math.min(activityWidth, activityHeight);
+        float size = activitySize * 0.999f;
 
-        float x = margin;
-        float y = sceneManager.getActivity().getHeight() - margin;
+        float x = activityWidth * 0.5f;
+        float y = activityHeight - (activityHeight * 0.5f);
 
         mWormholeSprite = new AnimatedSprite(x, y, size, size, textureRegion, vertexBufferObjectManager);
         mWormholeSprite.animate(1000);
