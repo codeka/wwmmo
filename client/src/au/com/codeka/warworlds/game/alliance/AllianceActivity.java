@@ -26,7 +26,10 @@ import android.widget.TextView;
 import au.com.codeka.TimeInHours;
 import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.R;
+import au.com.codeka.warworlds.ServerGreeter;
+import au.com.codeka.warworlds.ServerGreeter.ServerGreeting;
 import au.com.codeka.warworlds.TabFragmentActivity;
+import au.com.codeka.warworlds.WarWorldsActivity;
 import au.com.codeka.warworlds.model.Alliance;
 import au.com.codeka.warworlds.model.AllianceManager;
 import au.com.codeka.warworlds.model.AllianceRequest;
@@ -43,11 +46,22 @@ public class AllianceActivity extends TabFragmentActivity
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        getTabManager().addTab(mContext, new TabInfo(this, "Overview", OverviewFragment.class, null));
-        MyEmpire myEmpire = EmpireManager.i.getEmpire();
-        if (myEmpire.getAlliance() != null) {
-            getTabManager().addTab(mContext, new TabInfo(this, "Requests", RequestsFragment.class, null));
-        }
+        ServerGreeter.waitForHello(this, new ServerGreeter.HelloCompleteHandler() {
+            @Override
+            public void onHelloComplete(boolean success, ServerGreeting greeting) {
+                if (!success) {
+                    startActivity(new Intent(AllianceActivity.this, WarWorldsActivity.class));
+                } else {
+                    getTabManager().addTab(mContext, new TabInfo(AllianceActivity.this, "Overview",
+                            OverviewFragment.class, null));
+                    MyEmpire myEmpire = EmpireManager.i.getEmpire();
+                    if (myEmpire.getAlliance() != null) {
+                        getTabManager().addTab(mContext, new TabInfo(AllianceActivity.this, "Requests",
+                                RequestsFragment.class, null));
+                    }
+                }
+            }
+        });
     }
 
     @Override
