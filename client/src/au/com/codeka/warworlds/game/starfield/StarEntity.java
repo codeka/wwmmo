@@ -185,6 +185,11 @@ public class StarEntity extends SelectableEntity {
         public boolean onAreaTouched(final TouchEvent sceneTouchEvent,
                                      final float touchAreaLocalX,
                                      final float touchAreaLocalY) {
+            if (mStar.getStarType().getType() == Star.Type.Marker) {
+                // you can't select markers
+                return false;
+            }
+
             if (sceneTouchEvent.getAction() == TouchEvent.ACTION_DOWN) {
                 mStarfield.setSelectingEntity(StarEntity.this);
             } else if (sceneTouchEvent.getAction() == TouchEvent.ACTION_UP) {

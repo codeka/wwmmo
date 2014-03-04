@@ -201,6 +201,10 @@ public class ChatManager implements BackgroundDetector.BackgroundChangeHandler {
         EmpireManager.i.searchEmpires(context, empireName, new EmpireManager.EmpiresFetchedHandler() {
             @Override
             public void onEmpiresFetched(List<Empire> empires) {
+                if (empires.isEmpty()) {
+                    return;
+                }
+
                 addParticipant(conversation, empires.get(0));
             }
         });

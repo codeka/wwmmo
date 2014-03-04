@@ -379,6 +379,11 @@ public class Simulation {
 
                     // adjust the end_time for this turn
                     timeRemainingInHours = (1.0f - br.getProgress(false)) * totalBuildTimeInHours;
+                    if (timeRemainingInHours > 100000) {
+                        // this is waaaaaay too long! it's basically never going to finish, but cap it to
+                        // avoid overflow errors.
+                        timeRemainingInHours = 100000;
+                    }
                     DateTime endTime = now.plus((long)(dtUsed * 1000 * 3600) + (long)(timeRemainingInHours * 1000 * 3600));
                     br.setEndTime(endTime);
                     log(String.format("     End Time: %s (%.2f hrs)", endTime, Seconds.secondsBetween(now, endTime).getSeconds() / 3600.0f));

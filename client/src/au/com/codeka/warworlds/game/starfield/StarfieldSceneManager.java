@@ -831,6 +831,11 @@ public class StarfieldSceneManager extends SectorSceneManager
             return;
         }
 
+        if (mFleets == null) {
+            // TODO: handle this better
+            return;
+        }
+
         selectFleet(mFleets.get(fleetKey));
     }
 
