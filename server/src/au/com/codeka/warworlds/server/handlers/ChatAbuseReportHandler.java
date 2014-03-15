@@ -18,6 +18,8 @@ import au.com.codeka.warworlds.server.model.Empire;
 public class ChatAbuseReportHandler extends RequestHandler {
     @Override
     protected void post() throws RequestException {
+        throw new RequestException(400, "This feature has been disabled.");
+/*
         Messages.ChatAbuseReport chat_abuse_report_pb = getRequestBody(Messages.ChatAbuseReport.class);
 
         int chatMsgID = Integer.parseInt(getUrlParameter("msg_id"));
@@ -43,6 +45,7 @@ public class ChatAbuseReportHandler extends RequestHandler {
         Empire empire = new EmpireController().getEmpire(getSession().getEmpireID());
 
         new ChatAbuseController().reportAbuse(msg, empire);
+*/
     }
 
 }

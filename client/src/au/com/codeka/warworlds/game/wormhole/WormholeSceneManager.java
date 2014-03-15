@@ -2,7 +2,6 @@ package au.com.codeka.warworlds.game.wormhole;
 
 import java.util.Random;
 
-import org.andengine.engine.Engine;
 import org.andengine.entity.scene.Scene;
 import org.andengine.entity.scene.background.Background;
 import org.andengine.entity.sprite.Sprite;
