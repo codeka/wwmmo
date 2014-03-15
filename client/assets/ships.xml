@@ -1,1 +1,129 @@
-../../server/data/designs/ships.xml
+<?xml version="1.0" ?>
+<designs>
+  <design id="colonyship">
+    <name>Colony Ship</name>
+    <sprite>ship.colony</sprite>
+    <description><![CDATA[
+      <p>The colony ship is what you'll need to colonize remote planets. They'll carry 100 of
+      your colony's population to a brave new world.</p>
+      <p>Colony ships are single-use. The ship is destroyed once a planet is colonized.</p>
+    ]]></description>
+    <dependencies>
+      <requires building="shipyard" level="1" />
+    </dependencies>
+    <cost minerals="1000" time="4.0" />
+    <fuel costPerParsec="35" />
+    <stats speed="1" baseAttack="1" baseDefence="1" combatPriority="100" />
+    <effects>
+      <effect kind="fighter" />
+    </effects>
+    <upgrades>
+      <upgrade id="cryogenics">
+        <sprite>upgrade.cryogenics</sprite>
+        <name>Cryogenic Chamber</name>
+        <cost minerals="2000" time="8.0" />
+        <description><![CDATA[
+          The cryogenic chamber means colonists are put to sleep during the voyage to the next planet. This allows for
+          a larger number of colonists to be deployed, increasing the number of initial colonists from 100 to 400.
+        ]]></description>
+      </upgrade>
+    </upgrades>
+    </design>
+  <design id="scout">
+    <name>Scout</name>
+    <sprite>ship.scout</sprite>
+    <description><![CDATA[
+      <p>Scouts are small, fast ships with no attack capability (and not much in the way of
+      defensive capabilities, either). What they <em>are</em> good at, though, is getting in
+      and out of enemy starsystems and reporting back what they found.</p>
+    ]]></description>
+    <dependencies>
+      <requires building="shipyard" level="1" />
+    </dependencies>
+    <cost minerals="50" time="0.1667" />
+    <fuel costPerParsec="0.1" />
+    <stats speed="23" baseAttack="1" baseDefence="1" combatPriority="100" />
+    <effects>
+      <effect kind="scout" />
+      <effect kind="fighter" />
+    </effects>
+    <upgrades>
+      <upgrade id="cloak">
+        <sprite>upgrade.cloak</sprite>
+        <name>Cloak</name>
+        <cost minerals="1000" time="0.55" />
+        <description><![CDATA[
+          Adding a cloaking device to a scout makes it invisible to enemy radar. Additionally, if you set
+          the scout's stance to "Neutral" or "Passive", it will remain <em>undetected</em> around enemy stars.
+        ]]></description>
+      </upgrade>
+    </upgrades>
+    </design>
+  <design id="fighter">
+    <name>Fighter</name>
+    <sprite>ship.fighter</sprite>
+    <description><![CDATA[
+      <p>Your basic fighter has average speed, low-grade weapons and low-grade shields. They
+      make up for a general lack of firepower by being incredibly cheap to produce and
+      fuel-efficient, allowing you to overwhealm your enemy with numbers.</p>
+    ]]></description>
+    <dependencies>
+      <requires building="shipyard" level="1" />
+    </dependencies>
+    <cost minerals="45" time="0.15" />
+    <fuel costPerParsec="0.2" />
+    <stats speed="10" baseAttack="5" baseDefence="15" combatPriority="10"  />
+    <effects>
+      <effect kind="fighter" />
+    </effects>
+    <upgrades>
+      <upgrade id="boost">
+        <sprite>upgrade.boost</sprite>
+        <name>Warp Boost</name>
+        <cost minerals="45" time="0.15" />
+        <description><![CDATA[
+          Boost will halve the remaining travel-time for an in-flight fleet of fighters.
+        ]]></description>
+      </upgrade>
+    </upgrades>
+  </design>
+  <design id="troopcarrier">
+    <name>Troop Carrier</name>
+    <sprite>ship.troopcarrier</sprite>
+    <description><![CDATA[
+      <p>The Troop Carrier carries ground troops which you can deploy to capture
+      an enemy colony.</p>
+    ]]></description>
+    <dependencies>
+      <requires building="shipyard" level="1" />
+    </dependencies>
+    <cost minerals="50" time="0.17" />
+    <fuel costPerParsec="0.2" />
+    <stats speed="10" baseAttack="1" baseDefence="1" combatPriority="50"  />
+    <effects>
+      <effect kind="troopcarrier" />
+      <effect kind="fighter" />
+    </effects>
+  </design>
+  <design id="wormhole-generator">
+    <name>Wormhole Generator</name>
+    <sprite>ship.wormhole-generator</sprite>
+    <description><![CDATA[
+      <p>The Wormhole Generator will - quite literally - generate a wormhole. Once the ship is built, select a
+      location on the starfield to deploy, and the ship will generate a wormhole which you can then use to instantly
+      transport ships throughout your empire.</p>
+    ]]></description>
+    <dependencies>
+      <requires building="shipyard" level="2" />
+    </dependencies>
+    <cost minerals="98000" time="128.0" />
+    <fuel costPerParsec="3096.2" />
+    <stats speed="0.6" baseAttack="1" baseDefence="1" combatPriority="99"  />
+    <effects>
+      <effect kind="empty-space-mover">
+        <star-distance min="12" />
+      </effect>
+      <effect kind="wormhole-generator" />
+    </effects>
+  </design>
+</designs>
