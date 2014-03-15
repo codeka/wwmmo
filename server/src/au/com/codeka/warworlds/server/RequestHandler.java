@@ -238,6 +238,10 @@ public class RequestHandler {
         if (mSession == null) {
             String impersonate = getRequest().getParameter("on_behalf_of");
 
+            if (mRequest.getCookies() == null) {
+                throw new RequestException(403);
+            }
+
             String sessionCookieValue = "";
             for (Cookie cookie : mRequest.getCookies()) {
                 if (cookie.getName().equals("SESSION")) {

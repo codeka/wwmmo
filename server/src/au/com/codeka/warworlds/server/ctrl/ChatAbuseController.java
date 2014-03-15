@@ -57,6 +57,13 @@ public class ChatAbuseController {
             return;
         }
 
+        if (isInPenaltyBox(msg.getEmpireID())) {
+            throw new RequestException(400, "Cannot report an empire that's already in penalty.");
+        }
+        if (isInPenaltyBox(reportingEmpire.getID())) {
+            throw new RequestException(400, "Cannot report an empire while you are in penalty.");
+        }
+
         try {
             db.reportAbuse(msg.getID(), msg.getEmpireID(), reportingEmpire.getID());
 
@@ -86,9 +93,6 @@ public class ChatAbuseController {
         } catch (Exception e) {
             throw new RequestException(e);
         }
-
-        // check whether the empire that was just reported needs to be added to the sin-bin
-        
     }
 
     private static class DataBase extends BaseDataBase {
