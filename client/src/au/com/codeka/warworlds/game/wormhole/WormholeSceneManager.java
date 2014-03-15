@@ -70,12 +70,14 @@ public class WormholeSceneManager {
     }
 
     public void onStart() {
+/*
         mActivity.getEngine().setErrorHandler(new Engine.EngineErrorHandler() {
             @Override
             public void onRenderThreadException(Exception e) {
                 refreshScene();
             }
         });
+*/
 
         if (mWasStopped) {
             log.debug("We were stopped, refreshing the scene...");

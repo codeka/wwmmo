@@ -13,3 +13,7 @@
 
 .gitignore
 
+client/bin
+client/gen
+planet-render-android/bin
+planet-render-android/gen

@@ -2,26 +2,6 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.7"/>
-	<classpathentry kind="lib" path="../jetty/lib/jetty-http-9.0.1.v20130408.jar"/>
-	<classpathentry kind="lib" path="../jetty/lib/jetty-servlet-9.0.1.v20130408.jar"/>
-	<classpathentry kind="lib" path="../jetty/lib/servlet-api-3.0.jar"/>
-	<classpathentry kind="lib" path="../jetty/lib/jetty-annotations-9.0.1.v20130408.jar"/>
-	<classpathentry kind="lib" path="../jetty/lib/jetty-continuation-9.0.1.v20130408.jar"/>
-	<classpathentry kind="lib" path="../jetty/lib/jetty-security-9.0.1.v20130408.jar"/>
-	<classpathentry kind="lib" path="../jetty/lib/jetty-servlets-9.0.1.v20130408.jar"/>
-	<classpathentry kind="lib" path="../jetty/lib/jetty-jmx-9.0.1.v20130408.jar"/>
-	<classpathentry kind="lib" path="../jetty/lib/jetty-rewrite-9.0.1.v20130408.jar"/>
-	<classpathentry kind="lib" path="../jetty/lib/jetty-plus-9.0.1.v20130408.jar"/>
-	<classpathentry kind="lib" path="../jetty/lib/jetty-client-9.0.1.v20130408.jar"/>
-	<classpathentry kind="lib" path="../jetty/lib/jetty-jaas-9.0.1.v20130408.jar"/>
-	<classpathentry kind="lib" path="../jetty/lib/jetty-jndi-9.0.1.v20130408.jar"/>
-	<classpathentry kind="lib" path="../jetty/lib/jetty-webapp-9.0.1.v20130408.jar"/>
-	<classpathentry kind="lib" path="../jetty/lib/jetty-io-9.0.1.v20130408.jar"/>
-	<classpathentry kind="lib" path="../jetty/lib/jetty-util-9.0.1.v20130408.jar"/>
-	<classpathentry kind="lib" path="../jetty/lib/jetty-deploy-9.0.1.v20130408.jar"/>
-	<classpathentry kind="lib" path="../jetty/lib/jetty-xml-9.0.1.v20130408.jar"/>
-	<classpathentry kind="lib" path="../jetty/lib/jetty-proxy-9.0.1.v20130408.jar"/>
-	<classpathentry kind="lib" path="../jetty/lib/jetty-server-9.0.1.v20130408.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/common"/>
 	<classpathentry kind="lib" path="/common/libs/protobuf-java-2.5.0.jar"/>
 	<classpathentry kind="lib" path="/common/libs/jregex1.2_01.jar"/>
@@ -48,5 +28,27 @@
 	<classpathentry kind="lib" path="/common/libs/httpclient-4.2.2.jar"/>
 	<classpathentry kind="lib" path="/common/libs/httpcore-4.2.2.jar"/>
 	<classpathentry kind="lib" path="libs/commons-imaging-1.0-SNAPSHOT.jar"/>
+	<classpathentry kind="lib" path="D:/Dean/src/wwmmo/code/jetty/lib/jetty-annotations-9.1.3.v20140225.jar"/>
+	<classpathentry kind="lib" path="D:/Dean/src/wwmmo/code/jetty/lib/jetty-client-9.1.3.v20140225.jar"/>
+	<classpathentry kind="lib" path="D:/Dean/src/wwmmo/code/jetty/lib/jetty-continuation-9.1.3.v20140225.jar"/>
+	<classpathentry kind="lib" path="D:/Dean/src/wwmmo/code/jetty/lib/jetty-deploy-9.1.3.v20140225.jar"/>
+	<classpathentry kind="lib" path="D:/Dean/src/wwmmo/code/jetty/lib/jetty-http-9.1.3.v20140225.jar"/>
+	<classpathentry kind="lib" path="D:/Dean/src/wwmmo/code/jetty/lib/jetty-io-9.1.3.v20140225.jar"/>
+	<classpathentry kind="lib" path="D:/Dean/src/wwmmo/code/jetty/lib/jetty-jaas-9.1.3.v20140225.jar"/>
+	<classpathentry kind="lib" path="D:/Dean/src/wwmmo/code/jetty/lib/jetty-jaspi-9.1.3.v20140225.jar"/>
+	<classpathentry kind="lib" path="D:/Dean/src/wwmmo/code/jetty/lib/jetty-jmx-9.1.3.v20140225.jar"/>
+	<classpathentry kind="lib" path="D:/Dean/src/wwmmo/code/jetty/lib/jetty-jndi-9.1.3.v20140225.jar"/>
+	<classpathentry kind="lib" path="D:/Dean/src/wwmmo/code/jetty/lib/jetty-plus-9.1.3.v20140225.jar"/>
+	<classpathentry kind="lib" path="D:/Dean/src/wwmmo/code/jetty/lib/jetty-proxy-9.1.3.v20140225.jar"/>
+	<classpathentry kind="lib" path="D:/Dean/src/wwmmo/code/jetty/lib/jetty-rewrite-9.1.3.v20140225.jar"/>
+	<classpathentry kind="lib" path="D:/Dean/src/wwmmo/code/jetty/lib/jetty-schemas-3.1.jar"/>
+	<classpathentry kind="lib" path="D:/Dean/src/wwmmo/code/jetty/lib/jetty-security-9.1.3.v20140225.jar"/>
+	<classpathentry kind="lib" path="D:/Dean/src/wwmmo/code/jetty/lib/jetty-server-9.1.3.v20140225.jar"/>
+	<classpathentry kind="lib" path="D:/Dean/src/wwmmo/code/jetty/lib/jetty-servlet-9.1.3.v20140225.jar"/>
+	<classpathentry kind="lib" path="D:/Dean/src/wwmmo/code/jetty/lib/jetty-servlets-9.1.3.v20140225.jar"/>
+	<classpathentry kind="lib" path="D:/Dean/src/wwmmo/code/jetty/lib/jetty-util-9.1.3.v20140225.jar"/>
+	<classpathentry kind="lib" path="D:/Dean/src/wwmmo/code/jetty/lib/jetty-webapp-9.1.3.v20140225.jar"/>
+	<classpathentry kind="lib" path="D:/Dean/src/wwmmo/code/jetty/lib/jetty-xml-9.1.3.v20140225.jar"/>
+	<classpathentry kind="lib" path="D:/Dean/src/wwmmo/code/jetty/lib/servlet-api-3.1.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
