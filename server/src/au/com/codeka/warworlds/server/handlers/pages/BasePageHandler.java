@@ -7,8 +7,10 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLEncoder;
 import java.text.DecimalFormat;
+import java.util.Locale;
 import java.util.Map;
 
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,6 +34,7 @@ public class BasePageHandler extends RequestHandler {
 
         FilterLibrary.addFilter(new NumberFilter());
         FilterLibrary.addFilter(new AttrEscapeFilter());
+        FilterLibrary.addFilter(new LocalDateFilter());
     }
 
     protected void render(String path, Map<String, Object> data) {
@@ -85,8 +88,7 @@ public class BasePageHandler extends RequestHandler {
         }
 
         String url = OpenIdAuth.getAuthenticateUrl(getRequest(), returnUrl);
-        getResponse().setStatus(302);
-        getResponse().addHeader("Location", url);
+        redirect(url);
     }
 
     private static class NumberFilter implements Filter {
@@ -136,6 +138,29 @@ public class BasePageHandler extends RequestHandler {
                              String... args) throws InterpretException {
             return object.toString().replace("\"", "&quot;")
                     .replace("'", "&squot;");
+        }
+    }
+
+    private static class LocalDateFilter implements Filter {
+
+        @Override
+        public String getName() {
+            return "local-date";
+        }
+
+        @Override
+        public Object filter(Object object, JangodInterpreter interpreter,
+                String... args) throws InterpretException {
+            if (object instanceof DateTime) {
+                DateTime dt = (DateTime) object;
+                return String.format(Locale.ENGLISH,
+                        "<script>(function() {" +
+                          " var dt = new Date(\"%s\");" +
+                          " +document.write(dt.toLocaleString());" +
+                        "})();</script>", dt);
+            }
+
+            throw new InterpretException("Expected a DateTime.");
         }
     }
 }

@@ -119,10 +119,18 @@ public class EmpireController {
         }
     }
 
-    public byte[] getEmpireShield(int empireID) throws RequestException {
-        String sql = "SELECT image FROM empire_shields WHERE empire_id = ? AND rejected = 0 ORDER BY create_date DESC LIMIT 1";
+    public byte[] getEmpireShield(int empireID, Integer shieldID) throws RequestException {
+        String sql = "SELECT image FROM empire_shields " +
+                    " WHERE empire_id = ? AND rejected = 0 ";
+        if (shieldID != null) {
+            sql += " AND id = ?";
+        }
+        sql += " ORDER BY create_date DESC LIMIT 1";
         try (SqlStmt stmt = db.prepare(sql)) {
             stmt.setInt(1, empireID);
+            if (shieldID != null) {
+                stmt.setInt(2, shieldID);
+            }
             ResultSet rs = stmt.select();
             if (rs.next()) {
                 return rs.getBytes(1);

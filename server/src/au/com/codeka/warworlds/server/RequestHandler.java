@@ -211,6 +211,11 @@ public class RequestHandler {
         }
     }
 
+    protected void redirect(String url) {
+        mResponse.setStatus(302);
+        mResponse.addHeader("Location", url);
+    }
+
     protected HttpServletRequest getRequest() {
         return mRequest;
     }
