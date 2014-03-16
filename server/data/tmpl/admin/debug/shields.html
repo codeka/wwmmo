@@ -1,0 +1,29 @@
+{% extends "admin/skeleton.html" %}
+{% block title %}Shields{% endblock %}
+{% block head %}
+  <style>
+  </style>
+{% endblock %}
+
+{% block content %}
+  <h1>Shields</h1>
+  <form method="post" enctype="multipart/form-data">
+    <fieldset>
+      <legend>Upload Shield</legend>
+      <input type="text" name="empire_id" placeholder="Empire ID" />
+      <input type="file" name="shield_file" />
+      <input type="submit" value="Upload" />
+    </fieldset>
+  </form>
+  <table border="1" cellpadding="4" cellspacing="0">
+    <tr><th>Time</th><th>Empire</th><th>Shield</th><th>Current Shield</th></tr>
+  {% for shield in shields %}
+    <tr>
+      <td>{{shield.create_date|local-date}}</td>
+      <td>{{shield.empire_name}}<br /><span style="color: #aaa;">{{shield.user_email}}</span></td>
+      <td><img src="/realms/{{realm}}/empires/{{shield.empire_id}}/shield?final=1&size=32&id={{shield.shield_id}}" width="32" height="32" /></td>
+      <td><img src="/realms/{{realm}}/empires/{{shield.empire_id}}/shield?final=1&size=32" width="32" height="32" /></td>
+    </tr>
+  {% endfor %}
+  </table>
+{% endblock %}

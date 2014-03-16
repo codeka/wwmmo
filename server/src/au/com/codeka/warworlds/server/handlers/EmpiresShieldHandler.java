@@ -41,6 +41,81 @@ public class EmpiresShieldHandler extends RequestHandler {
     private static final Logger log = LoggerFactory.getLogger(EmpiresShieldHandler.class);
 
     @Override
+    protected void get() throws RequestException {
+        int empireID = Integer.parseInt(getUrlParameter("empire_id"));
+
+        Integer shieldID = null;
+        if (getRequest().getParameter("id") != null) {
+            shieldID = Integer.parseInt(getRequest().getParameter("id"));
+        }
+
+        byte[] pngImage = new EmpireController().getEmpireShield(empireID, shieldID);
+        if (pngImage == null) {
+            if (getRequest().getParameter("final") != null && getRequest().getParameter("final").equals("1")) {
+                try {
+                    // if we're doing a "final" image for this guy, just create a coloured image based on his key
+                    BufferedImage shieldImage = new BufferedImage(128, 128, ColorSpace.TYPE_RGB);
+                    Graphics2D g = shieldImage.createGraphics();
+                    g.setPaint(getShieldColour(empireID));
+                    g.fillRect(0, 0, 128, 128);
+
+                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                    ImageIO.write(shieldImage, "png", baos);
+                    pngImage = baos.toByteArray();
+                } catch (Exception e) {
+                    throw new RequestException(e);
+                }
+            } else {
+                throw new RequestException(404);
+            }
+        }
+
+        if (getRequest().getParameter("final") != null && getRequest().getParameter("final").equals("1")) {
+            try {
+                BufferedImage shieldImage = Imaging.getBufferedImage(pngImage);
+                shieldImage = mergeShieldImage(shieldImage);
+
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                ImageIO.write(shieldImage, "png", baos);
+                pngImage = baos.toByteArray();
+            } catch (Exception e) {
+                throw new RequestException(e);
+            }
+        }
+
+        if (getRequest().getParameter("size") != null) {
+            int size = Integer.parseInt(getRequest().getParameter("size"));
+            if (size > 1 && size < 128) {
+                try {
+                    BufferedImage shieldImage = Imaging.getBufferedImage(pngImage);
+
+                    int w = shieldImage.getWidth();
+                    int h = shieldImage.getHeight();
+                    BufferedImage after = new BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB);
+                    AffineTransform at = new AffineTransform();
+                    at.scale((float) size / w, (float) size / h);
+                    AffineTransformOp scaleOp = 
+                       new AffineTransformOp(at, AffineTransformOp.TYPE_BICUBIC);
+                    shieldImage = scaleOp.filter(shieldImage, after);
+
+                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                    ImageIO.write(shieldImage, "png", baos);
+                    pngImage = baos.toByteArray();
+                } catch(Exception e) {
+                    throw new RequestException(e);
+                }
+            }
+        }
+
+        getResponse().setContentType("image/png");
+        try {
+            getResponse().getOutputStream().write(pngImage);
+        } catch (IOException e) {
+            throw new RequestException(e);
+        }
+    }
+
+    @Override
     protected void put() throws RequestException {
         Messages.EmpireChangeShieldRequest shield_request_pb = getRequestBody(Messages.EmpireChangeShieldRequest.class);
         int empireID = getSession().getEmpireID();
@@ -80,76 +155,6 @@ public class EmpiresShieldHandler extends RequestHandler {
         Empire empire = new EmpireController().getEmpire(empireID);
         empire.toProtocolBuffer(empire_pb);
         setResponseBody(empire_pb.build());
-    }
-
-    @Override
-    protected void get() throws RequestException {
-        int empireID = Integer.parseInt(getUrlParameter("empire_id"));
-
-        byte[] pngImage = new EmpireController().getEmpireShield(empireID);
-        if (pngImage == null) {
-            if (getRequest().getParameter("final") != null && getRequest().getParameter("final").equals("1")) {
-                try {
-                    // if we're doing a "final" image for this guy, just create a coloured image based on his key
-                    BufferedImage shieldImage = new BufferedImage(128, 128, ColorSpace.TYPE_RGB);
-                    Graphics2D g = shieldImage.createGraphics();
-                    g.setPaint(getShieldColour(empireID));
-                    g.fillRect(0, 0, 128, 128);
-
-                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                    ImageIO.write(shieldImage, "png", baos);
-                    pngImage = baos.toByteArray();
-                } catch (Exception e) {
-                    throw new RequestException(e);
-                }
-            } else {
-                throw new RequestException(404);
-            }
-        }
-
-        if (getRequest().getParameter("final") != null && getRequest().getParameter("final").equals("1")) {
-            try {
-                BufferedImage shieldImage = Imaging.getBufferedImage(pngImage);
-                shieldImage = mergeShieldImage(shieldImage);
-
-                ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                ImageIO.write(shieldImage, "png", baos);
-                pngImage = baos.toByteArray();
-            } catch (Exception e) {
-                throw new RequestException(e);
-            }
-        }
-
-        if (getRequest().getParameter("size") != null) {
-            int size = Integer.parseInt(getRequest().getParameter("size"));
-            if (size > 1 && size < 128) {
-                try {
-                    BufferedImage shieldImage = Imaging.getBufferedImage(pngImage);
-    
-                    int w = shieldImage.getWidth();
-                    int h = shieldImage.getHeight();
-                    BufferedImage after = new BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB);
-                    AffineTransform at = new AffineTransform();
-                    at.scale((float) size / w, (float) size / h);
-                    AffineTransformOp scaleOp = 
-                       new AffineTransformOp(at, AffineTransformOp.TYPE_BICUBIC);
-                    shieldImage = scaleOp.filter(shieldImage, after);
-
-                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                    ImageIO.write(shieldImage, "png", baos);
-                    pngImage = baos.toByteArray();
-                } catch(Exception e) {
-                    throw new RequestException(e);
-                }
-            }
-        }
-
-        getResponse().setContentType("image/png");
-        try {
-            getResponse().getOutputStream().write(pngImage);
-        } catch (IOException e) {
-            throw new RequestException(e);
-        }
     }
 
     private BufferedImage mergeShieldImage(BufferedImage shieldImage) throws ImageReadException, IOException {

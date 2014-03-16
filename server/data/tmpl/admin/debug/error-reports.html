@@ -110,12 +110,7 @@
     <tr><th>Time</th><th>Empire</th><th>Version</th><th>Context</th><th>Exception</th><th>Details</th></tr>
   {% for error_report in error_reports %}
     <tr>
-      <td><script>
-        (function() {
-          var dt = new Date("{{error_report.report_time}}");
-          document.write(dt.toLocaleString());
-        })();
-      </script></td>
+      <td>{{error_report.report_time|local-date}}</td>
       <td>
         {% if error_report.empire_id %}
           [<a href="mailto:{{error_report.empire_email}}">{{error_report.empire_id}}</a>] {{error_report.empire_name}}
