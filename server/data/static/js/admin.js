@@ -27,5 +27,27 @@ $(function() {
         }
     });
 
-    // TODO: store "on_behalf_of" in localStorage or something
+    // save on_behalf_of in localStorage
+    $(window).on("beforeunload", function() {
+        window.localStorage.setItem("on_behalf_of", $("#on_behalf_of").val());
+    });
+    $("#on_behalf_of").val(window.localStorage.getItem("on_behalf_of"));
+
+    // clicking the toggle button toggles the menu
+    $("#navmenu-toggle").on("click", function() {
+        var $navmenu = $("#navmenu");
+        var show = ($navmenu.css("display") == "none");
+
+        $navmenu.show();
+        $navmenu.animate({
+                "width": (show ? "300" : "0")+"px"
+            }, "fast", function() {
+                if (!show) {
+                    $navmenu.hide();
+                }
+            });
+        $("#maincontent").animate({
+                "left": (show ? "310" : "0")+"px"
+            }, "fast");
+    });
 });

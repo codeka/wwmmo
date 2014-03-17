@@ -17,6 +17,7 @@ import org.slf4j.LoggerFactory;
 import au.com.codeka.warworlds.server.OpenIdAuth;
 import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.RequestHandler;
+import au.com.codeka.warworlds.server.Session;
 import net.asfun.jangod.template.TemplateEngine;
 import net.asfun.jangod.interpret.InterpretException;
 import net.asfun.jangod.interpret.JangodInterpreter;
@@ -31,6 +32,7 @@ public class BasePageHandler extends RequestHandler {
         sTemplateEngine = new TemplateEngine();
 
         sTemplateEngine.getConfiguration().setWorkspace(new File(getBasePath(), "data/tmpl").getAbsolutePath());
+        sTemplateEngine.getConfiguration().setEncoding("utf-8");
 
         FilterLibrary.addFilter(new NumberFilter());
         FilterLibrary.addFilter(new AttrEscapeFilter());
@@ -39,9 +41,13 @@ public class BasePageHandler extends RequestHandler {
 
     protected void render(String path, Map<String, Object> data) {
         data.put("realm", getRealm());
+        Session session = getSessionNoError();
+        if (session != null) {
+            data.put("logged_in_user", session.getActualEmail());
+        }
 
         getResponse().setContentType("text/html");
-        getResponse().setHeader("Content-Type", "text/html");
+        getResponse().setHeader("Content-Type", "text/html; charset=utf-8");
         try {
             getResponse().getWriter().write(sTemplateEngine.process(path, data));
         } catch (IOException e) {
@@ -51,7 +57,7 @@ public class BasePageHandler extends RequestHandler {
 
     protected void write(String text) {
         getResponse().setContentType("text/plain");
-        getResponse().setHeader("Content-Type", "text/plain");
+        getResponse().setHeader("Content-Type", "text/plain; charset=utf-8");
         try {
             getResponse().getWriter().write(text);;
         } catch (IOException e) {

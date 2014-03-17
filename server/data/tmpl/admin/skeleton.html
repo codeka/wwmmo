@@ -2,7 +2,9 @@
 <html>
   <head>
     <title>War Worlds &bull; {% block title %}Backend{% endblock %}</title>
-    <link type="text/css" rel="stylesheet" href="/realms/{{realm}}/css/admin.css">
+    <meta name="viewport" content="width=device-width" />
+    <link rel="stylesheet" href="/realms/{{realm}}/css/admin.css">
+    <link rel="stylesheet" href="/realms/{{realm}}/css/admin-mobile.css" media="only screen and (max-width: 900px)" />
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
     <script>window.realm = "{{realm}}";</script>
     <script src="/realms/{{realm}}/js/admin.js"></script>
@@ -10,11 +12,7 @@
   </head>
   <body>
     <section id="header"><div class="header-bg">
-      <div class="user-details">
-        Impersonate: <input type="email" id="on_behalf_of" placeholder="Email address" />
-        {{ logged_in_user }} &bull;
-        <a href="{{ logout_url }}">Logout</a>
-      </div>
+      <div id="navmenu-toggle">≡</div>
       <img src="/realms/{{realm}}/img/logo.png" width="38" height="38" alt="Logo" />
       <h1>War Worlds</h1>
       {% if msgs %}
@@ -26,22 +24,26 @@
       {% endif %}
     </div></section>
 
-    <section id="navmenu">
+    <section id="navmenu"><div class="navmenu-bg">
+      <div class="user-details">
+        <div>Impersonate: <input type="email" id="on_behalf_of" placeholder="Email address" /></div>
+        <div>{{ logged_in_user }}</div>
+      </div>
       <ul>
         <li><a href="/realms/{{realm}}/admin">Dashboard</a>
         <li><a href="/realms/{{realm}}/admin/chat">Chat</a>
         <li><a href="/realms/{{realm}}/admin/motd">Message of the Day</a>
-        <li>Info
+        <li><span><span>Info</span></span>
           <ul>
             <li><a href="/realms/{{realm}}/admin/devices">Devices</a>
           </ul>
-        <li>Actions
+        <li><span><span>Actions</span></span>
           <ul>
             <li><a href="/realms/{{realm}}/admin/actions/move-star">Move Star</a>
             <li><a href="/realms/{{realm}}/admin/actions/create-fleet">Create Fleet</a>
             <li><a href="/realms/{{realm}}/admin/actions/reset-empire">Reset Empire</a>
           </ul>
-        <li>Debug
+        <li><span><span>Debug</span></span>
           <ul>
             <li><a href="/realms/{{realm}}/admin/debug/empires">Empires</a>
             <li><a href="/realms/{{realm}}/admin/debug/shields">Shields</a>
@@ -53,7 +55,7 @@
             <li><a href="/realms/{{realm}}/admin/debug/error-reports">Error Reports</a>
           </ul>
       </ul>
-    </section>
+    </div></section>
 
     <div id="maincontent">{% block content %}{% endblock %}</div>
   </body>
