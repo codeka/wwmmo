@@ -77,6 +77,8 @@ public class DestinationDialog extends DialogFragment {
                         DestinationDialog.this.onWormholesFetched(wormholes);
                     }
                 });
+        } else {
+            // TODO: support wormholes in your own empire at least...
         }
 
         TextView tuneTime = (TextView) mView.findViewById(R.id.tune_time);
