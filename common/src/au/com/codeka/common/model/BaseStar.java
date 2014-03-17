@@ -527,18 +527,24 @@ public abstract class BaseStar {
 
         public void fromProtocolBuffer(Messages.Star.StarExtra pb) {
             mDestWormholeID = pb.getWormholeDestStarId();
-            mTuneCompleteTime = new DateTime(pb.getWormholeTuneCompleteTime() * 1000);
-            mTuneHistory = new ArrayList<DateTime>();
-            for (int i = 0; i < pb.getWormholeTuneHistoryCount(); i++) {
-                mTuneHistory.add(new DateTime(pb.getWormholeTuneHistory(i) * 1000));
+            if (pb.hasWormholeTuneCompleteTime()) {
+                mTuneCompleteTime = new DateTime(pb.getWormholeTuneCompleteTime() * 1000);
+            }
+            if (pb.getWormholeTuneHistoryCount() > 0) {
+                mTuneHistory = new ArrayList<DateTime>();
+                for (int i = 0; i < pb.getWormholeTuneHistoryCount(); i++) {
+                    mTuneHistory.add(new DateTime(pb.getWormholeTuneHistory(i) * 1000));
+                }
             }
             mEmpireID = pb.getWormholeEmpireId();
         }
 
         public void toProtocolBuffer(Messages.Star.StarExtra.Builder pb) {
             pb.setWormholeDestStarId(mDestWormholeID);
-            pb.setWormholeTuneCompleteTime(mTuneCompleteTime.getMillis() / 1000);
-            for (DateTime dt : mTuneHistory) {
+            if (mTuneCompleteTime != null) {
+                pb.setWormholeTuneCompleteTime(mTuneCompleteTime.getMillis() / 1000);
+            }
+            if (mTuneHistory != null) for (DateTime dt : mTuneHistory) {
                 pb.addWormholeTuneHistory(dt.getMillis() / 1000);
             }
             pb.setWormholeEmpireId(mEmpireID);

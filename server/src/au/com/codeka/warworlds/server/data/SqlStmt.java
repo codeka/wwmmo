@@ -94,6 +94,7 @@ public class SqlStmt implements AutoCloseable {
     }
     public void setBlob(int position, byte[] blob) throws SQLException {
         mStmt.setBlob(position, new ByteArrayInputStream(blob));
+        saveParameter(position, "<BLOB>");
     }
     public void setNull(int position) throws SQLException {
         mStmt.setNull(position, Types.NULL);

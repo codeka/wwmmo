@@ -19,7 +19,7 @@ public class AllianceWormholeHandler extends RequestHandler {
         }
 
         List<Star> stars = new StarController().getWormholesForAlliance(allianceID);
-        
+
         Messages.Stars.Builder stars_pb = Messages.Stars.newBuilder();
         for (Star star : stars) {
             Messages.Star.Builder star_pb = Messages.Star.newBuilder();
