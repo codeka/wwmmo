@@ -65,8 +65,8 @@ public class Authenticator {
                 if (account.name.equals(accountName)) {
                     if (realm.getAuthentciationMethod() == Realm.AuthenticationMethod.Default) {
                         log.info("Account found, fetching authentication token (authmethod = default)");
-    
-                        final String scope = "oauth2:https://www.googleapis.com/auth/userinfo.email";
+
+                        final String scope = "oauth2:email";
                         String authToken = getAuthToken(accountManager, account, activity, scope);
                         accountManager.invalidateAuthToken(account.type, authToken);
                         authToken = getAuthToken(accountManager, account, activity, scope);

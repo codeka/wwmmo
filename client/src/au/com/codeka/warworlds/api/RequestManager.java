@@ -40,7 +40,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager.NameNotFoundException;
 import au.com.codeka.warworlds.App;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.RealmContext;
