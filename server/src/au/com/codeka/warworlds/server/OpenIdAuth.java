@@ -72,6 +72,8 @@ public class OpenIdAuth {
                     "http://schema.openid.net/contact/email",   // type URI
                     true);                                      // required
             authRequest.addExtension(fetch);
+            authRequest.setRealm("War Worlds Backend");
+            
 
             return authRequest.getDestinationUrl(true);
         } catch (OpenIDException e) {

@@ -3,16 +3,18 @@ package au.com.codeka.warworlds.server.handlers;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLConnection;
 import java.security.SecureRandom;
 import java.sql.ResultSet;
 import java.util.Locale;
 
 import javax.servlet.http.Cookie;
 
+import org.apache.commons.io.IOUtils;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.DefaultHttpClient;
 import org.joda.time.DateTime;
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 import org.slf4j.Logger;
@@ -64,52 +66,46 @@ public class LoginHandler extends RequestHandler {
             throw new RequestException(400);
         }
 
+        log.error("AUTH TOKEN: "+authToken);
+
         // make a quick request to Google's Authorization endpoint to make sure the token they've
         // given us is actually valid (this'll also give us the actual email address)
-        URL url;
+
+        DefaultHttpClient httpClient = new DefaultHttpClient();
+//      https://www.googleapis.com/oauth2/v1/userinfo
+        HttpGet httpGet = new HttpGet("https://www.googleapis.com/plus/v1/people/me?key=AIzaSyANXsZc4CaLMXDBJDClO9uAnzuYysQJ0zw");
+        httpGet.addHeader("Authorization", "OAuth "+authToken);
+        httpGet.addHeader("client_id", "1021675369049-cb56ts1l657ghi3ml2cg07t7c8t3dta9.apps.googleusercontent.com");
+        httpGet.addHeader("client_secret", "6JQyk9rSsLHDJlenrsCWh4wv");
+
+        JSONObject json;
         try {
-            url = new URL("https://www.googleapis.com/oauth2/v1/userinfo?access_token="+authToken);
-        } catch (MalformedURLException e) {
-            throw new RequestException(e); // should never happen
-        }
-
-        long startTime = System.currentTimeMillis();
-        JSONObject json = null;
-        Exception ex = null;
-        for (int i = 0; i < 5; i++) {
-            try {
-                URLConnection conn = url.openConnection();
-                int timeout = i * 5000;
-                conn.setConnectTimeout(timeout);
-                conn.setReadTimeout(timeout);
-                InputStream ins = conn.getInputStream();
-                String encoding = conn.getContentEncoding();
-                if (encoding == null) {
-                    encoding = "utf-8";
-                }
-                InputStreamReader isr = new InputStreamReader(ins, encoding);
-                json = (JSONObject) JSONValue.parse(isr);
-
-                ex = null;
-                break;
-            } catch (IOException e) {
-                if (e.getMessage().indexOf("401") >= 0) {
-                    throw new RequestException(403, "Error requesting user info, token expired?", e);
-                }
-
-                log.error(String.format("OAuth error after attempt #%d, %dms elapsed.",
-                        i+1, System.currentTimeMillis() - startTime));
-                ex = e;
+            HttpResponse response = httpClient.execute(httpGet);
+            InputStream ins = response.getEntity().getContent();
+            String encoding = "utf-8";
+            if (response.getEntity().getContentEncoding() != null) {
+                encoding = response.getEntity().getContentEncoding().getValue();
             }
-        }
-        if (ex != null) {
-            throw new RequestException(ex);
+            InputStreamReader isr = new InputStreamReader(ins, encoding);
+
+            if (response.getStatusLine().getStatusCode() != 200) {
+                String responseBody = IOUtils.toString(isr);
+                log.warn(String.format("%d %s\r\n%s", response.getStatusLine().getStatusCode(),
+                        response.getStatusLine().getReasonPhrase(), responseBody));
+                throw new RequestException(response.getStatusLine().getStatusCode(), "Error fetching user details.");
+            }
+            json = (JSONObject) JSONValue.parse(isr);
+        } catch (IOException e) {
+            throw new RequestException(e);
         }
 
-        if (!json.containsKey("email")) {
-            throw new RequestException(401);
+        if (!json.containsKey("emails")) {
+            throw new RequestException(500, "'emails' key expected.");
         }
-        String emailAddr = (String) json.get("email");
+
+        // eww, so much casting...
+        JSONArray emailsArray = (JSONArray) json.get("emails");
+        String emailAddr = (String) ((JSONObject) emailsArray.get(0)).get("value");
         String impersonateUser = getRequest().getParameter("impersonate");
         String cookie = generateCookie(emailAddr, false, impersonateUser);
 
