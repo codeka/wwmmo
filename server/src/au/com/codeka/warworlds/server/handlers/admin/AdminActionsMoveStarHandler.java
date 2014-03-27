@@ -1,4 +1,4 @@
-package au.com.codeka.warworlds.server.handlers.pages;
+package au.com.codeka.warworlds.server.handlers.admin;
 
 import java.util.TreeMap;
 
@@ -12,7 +12,7 @@ import au.com.codeka.warworlds.server.model.Star;
 /**
  * Handles the /admin/actions/move-star page.
  */
-public class ActionsMoveStarPageHandler extends HtmlPageHandler {
+public class AdminActionsMoveStarHandler extends AdminGenericHandler {
     @Override
     protected void post() throws RequestException {
         Star star1 = new StarController().getStar(Integer.parseInt(getRequest().getParameter("star1")));

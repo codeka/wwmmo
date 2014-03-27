@@ -1,10 +1,10 @@
-package au.com.codeka.warworlds.server.handlers.pages;
+package au.com.codeka.warworlds.server.handlers.admin;
 
 import java.util.TreeMap;
 
 import au.com.codeka.warworlds.server.RequestException;
 
-public class HtmlPageHandler extends BasePageHandler {
+public class AdminGenericHandler extends AdminHandler {
     @Override
     protected void get() throws RequestException {
         if (!isAdmin()) {

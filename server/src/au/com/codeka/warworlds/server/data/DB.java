@@ -75,7 +75,7 @@ public class DB {
             config.setUsername(sUsername);
             config.setPassword(sPassword);
             config.setPartitionCount(4);
-            config.setMaxConnectionsPerPartition(20);
+            config.setMaxConnectionsPerPartition(50);
             config.setConnectionTimeoutInMs(10000);
             config.setReleaseHelperThreads(0);
             config.setStatementReleaseHelperThreads(0);

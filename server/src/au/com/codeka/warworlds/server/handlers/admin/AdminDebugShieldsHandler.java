@@ -1,4 +1,4 @@
-package au.com.codeka.warworlds.server.handlers.pages;
+package au.com.codeka.warworlds.server.handlers.admin;
 
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
@@ -24,7 +24,7 @@ import au.com.codeka.warworlds.server.ctrl.EmpireController;
 import au.com.codeka.warworlds.server.data.DB;
 import au.com.codeka.warworlds.server.data.SqlStmt;
 
-public class DebugShieldsPageHandler extends BasePageHandler {
+public class AdminDebugShieldsHandler extends AdminHandler {
     private static final MultipartConfigElement MULTI_PART_CONFIG =
             new MultipartConfigElement(System.getProperty("java.io.tmpdir"));
 

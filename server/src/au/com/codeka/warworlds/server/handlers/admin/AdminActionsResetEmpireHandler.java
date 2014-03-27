@@ -1,4 +1,4 @@
-package au.com.codeka.warworlds.server.handlers.pages;
+package au.com.codeka.warworlds.server.handlers.admin;
 
 import java.util.TreeMap;
 
@@ -8,7 +8,7 @@ import au.com.codeka.warworlds.server.ctrl.EmpireController;
 /**
  * Handles the /admin/actions/move-star page.
  */
-public class ActionsResetEmpirePageHandler extends HtmlPageHandler {
+public class AdminActionsResetEmpireHandler extends AdminGenericHandler {
 
     @Override
     protected void post() throws RequestException {

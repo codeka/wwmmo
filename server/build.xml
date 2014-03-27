@@ -32,16 +32,9 @@
         <fileset dir="../jetty/lib">
             <include name="*.jar" />
         </fileset>
-        <pathelement location="libs/bonecp-0.7.1.jar"/>
-        <pathelement location="libs/commons-imaging-1.0-SNAPSHOT.jar"/>
-        <pathelement location="libs/gcm-server.jar"/>
-        <pathelement location="libs/guava-14.0.1.jar"/>
-        <pathelement location="libs/guice-2.0.jar"/>
-        <pathelement location="libs/jangod-template.jar"/>
-        <pathelement location="libs/json_simple-1.1.jar"/>
-        <pathelement location="libs/mysql-connector-java-5.1.24-bin.jar"/>
-        <pathelement location="libs/openid4java-0.9.8.jar"/>
-        <pathelement location="libs/spymemcached-2.8.7.jar"/>
+        <fileset dir="libs">
+            <include name="*.jar" />
+        </fileset>
         <path refid="common.classpath"/>
     </path>
     <target name="init">
