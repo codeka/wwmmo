@@ -26,7 +26,7 @@ import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.common.protoformat.PbFormatter;
 import au.com.codeka.warworlds.server.ctrl.NotificationController;
 import au.com.codeka.warworlds.server.ctrl.SessionController;
-import au.com.codeka.warworlds.server.handlers.pages.HtmlPageHandler;
+import au.com.codeka.warworlds.server.handlers.admin.AdminGenericHandler;
 
 import com.google.protobuf.Message;
 import com.mysql.jdbc.exceptions.jdbc4.MySQLTransactionRollbackException;
@@ -76,6 +76,7 @@ public class RequestHandler {
         RequestException lastException = null;
         for (int retries = 0; retries < 10; retries++) {
             try {
+                onBeforeHandle();
                 if (request.getMethod().equals("GET")) {
                     get();
                 } else if (request.getMethod().equals("POST")) {
@@ -119,6 +120,13 @@ public class RequestHandler {
         log.error("Too many retries: "+request.getRequestURI(), lastException);
         lastException.populate(mResponse);
         setResponseBody(lastException.getGenericError());
+    }
+
+    /**
+     * This is called before the get(), put(), etc methods but after the request
+     * is set up, ready to go.
+     */
+    protected void onBeforeHandle() throws RequestException {
     }
 
     protected void get() throws RequestException {
@@ -309,7 +317,7 @@ public class RequestHandler {
     protected static File getBasePath() {
         String path = System.getProperty("au.com.codeka.warworlds.server.basePath");
         if (path == null) {
-            path = HtmlPageHandler.class.getClassLoader().getResource("").getPath();
+            path = AdminGenericHandler.class.getClassLoader().getResource("").getPath();
         }
         return new File(path+"../").getAbsoluteFile();
     }

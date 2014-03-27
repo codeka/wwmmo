@@ -1,4 +1,4 @@
-package au.com.codeka.warworlds.server.handlers.pages;
+package au.com.codeka.warworlds.server.handlers;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -10,9 +10,10 @@ import org.slf4j.LoggerFactory;
 
 import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.RequestHandler;
+import au.com.codeka.warworlds.server.handlers.admin.AdminGenericHandler;
 
 public class StaticFileHandler extends RequestHandler {
-    private final Logger log = LoggerFactory.getLogger(HtmlPageHandler.class);
+    private final Logger log = LoggerFactory.getLogger(AdminGenericHandler.class);
 
     private static String sBasePath;
     static {

@@ -1,4 +1,4 @@
-package au.com.codeka.warworlds.server.handlers.pages;
+package au.com.codeka.warworlds.server.handlers.admin;
 
 import java.sql.ResultSet;
 import java.util.ArrayList;
@@ -12,7 +12,7 @@ import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.data.DB;
 import au.com.codeka.warworlds.server.data.SqlStmt;
 
-public class DashboardPageHandler extends BasePageHandler {
+public class AdminDashboardHandler extends AdminHandler {
     @Override
     protected void get() throws RequestException {
         if (!isAdmin()) {

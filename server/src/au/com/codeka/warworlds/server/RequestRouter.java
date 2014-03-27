@@ -16,7 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import au.com.codeka.warworlds.server.handlers.*;
-import au.com.codeka.warworlds.server.handlers.pages.*;
+import au.com.codeka.warworlds.server.handlers.admin.*;
 
 
 public class RequestRouter extends AbstractHandler {
@@ -71,16 +71,20 @@ public class RequestRouter extends AbstractHandler {
         sRoutes.add(new Route("notifications$", NotificationHandler.class));
         sRoutes.add(new Route("error-reports$", ErrorReportsHandler.class));
 
-        sRoutes.add(new Route("admin/?$", DashboardPageHandler.class));
-        sRoutes.add(new Route("admin/({path}actions/move-star)$", ActionsMoveStarPageHandler.class, "admin/"));
-        sRoutes.add(new Route("admin/({path}actions/reset-empire)$", ActionsResetEmpirePageHandler.class, "admin/"));
-        sRoutes.add(new Route("admin/chat$", ChatPageHandler.class));
-        sRoutes.add(new Route("admin/debug/purchases$", DebugPurchasesPageHandler.class, "admin/"));
-        sRoutes.add(new Route("admin/debug/error-reports$", DebugErrorReportsPageHandler.class, "admin/"));
-        sRoutes.add(new Route("admin/debug/shields$", DebugShieldsPageHandler.class, "admin/"));
-        sRoutes.add(new Route("admin/?({path}.*)", HtmlPageHandler.class, "admin/"));
-        sRoutes.add(new Route("intel/?({path}$)", HtmlPageHandler.class, "intel/"));
+        sRoutes.add(new Route("admin/?$", AdminDashboardHandler.class));
+        sRoutes.add(new Route("admin/login$", AdminLoginHandler.class));
+        sRoutes.add(new Route("admin/({path}actions/move-star)$", AdminActionsMoveStarHandler.class, "admin/"));
+        sRoutes.add(new Route("admin/({path}actions/reset-empire)$", AdminActionsResetEmpireHandler.class, "admin/"));
+        sRoutes.add(new Route("admin/chat$", AdminChatHandler.class));
+        sRoutes.add(new Route("admin/debug/purchases$", AdminDebugPurchasesHandler.class, "admin/"));
+        sRoutes.add(new Route("admin/debug/error-reports$", AdminDebugErrorReportsHandler.class, "admin/"));
+        sRoutes.add(new Route("admin/debug/shields$", AdminDebugShieldsHandler.class, "admin/"));
+        sRoutes.add(new Route("admin/?({path}.*)", AdminGenericHandler.class, "admin/"));
+
+        // TODO: move intel to a different handler
+        sRoutes.add(new Route("intel/?({path}$)", AdminGenericHandler.class, "intel/"));
         sRoutes.add(new Route("intel/({path}.*)", StaticFileHandler.class, "intel/"));
+
         sRoutes.add(new Route("css/({path}.*)", StaticFileHandler.class, "css/"));
         sRoutes.add(new Route("js/({path}.*)", StaticFileHandler.class, "js/"));
         sRoutes.add(new Route("img/({path}.*)", StaticFileHandler.class, "img/"));

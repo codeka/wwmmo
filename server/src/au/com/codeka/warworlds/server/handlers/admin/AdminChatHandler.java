@@ -1,4 +1,4 @@
-package au.com.codeka.warworlds.server.handlers.pages;
+package au.com.codeka.warworlds.server.handlers.admin;
 
 import java.sql.ResultSet;
 import java.util.ArrayList;
@@ -12,8 +12,8 @@ import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.data.DB;
 import au.com.codeka.warworlds.server.data.SqlStmt;
 
-public class ChatPageHandler extends HtmlPageHandler {
-    private final Logger log = LoggerFactory.getLogger(ChatPageHandler.class);
+public class AdminChatHandler extends AdminGenericHandler {
+    private final Logger log = LoggerFactory.getLogger(AdminChatHandler.class);
     @Override
     protected void get() throws RequestException {
         if (!isAdmin()) {

@@ -1,4 +1,4 @@
-package au.com.codeka.warworlds.server.handlers.pages;
+package au.com.codeka.warworlds.server.handlers.admin;
 
 import java.sql.Date;
 import java.sql.ResultSet;
@@ -17,8 +17,8 @@ import au.com.codeka.warworlds.server.data.DB;
 import au.com.codeka.warworlds.server.data.SqlStmt;
 
 
-public class DebugErrorReportsPageHandler extends BasePageHandler {
-    private final Logger log = LoggerFactory.getLogger(DebugErrorReportsPageHandler.class);
+public class AdminDebugErrorReportsHandler extends AdminHandler {
+    private final Logger log = LoggerFactory.getLogger(AdminDebugErrorReportsHandler.class);
 
     @Override
     protected void get() throws RequestException {

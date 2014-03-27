@@ -7,7 +7,7 @@ import org.slf4j.LoggerFactory;
 import au.com.codeka.warworlds.server.cron.CronJob;
 import au.com.codeka.warworlds.server.cron.CronJobRegistry;
 import au.com.codeka.warworlds.server.ctrl.NameGenerator;
-import au.com.codeka.warworlds.server.handlers.pages.HtmlPageHandler;
+import au.com.codeka.warworlds.server.handlers.admin.AdminGenericHandler;
 import au.com.codeka.warworlds.server.model.DesignManager;
 
 public class Runner {
@@ -16,7 +16,7 @@ public class Runner {
     public static void main(String[] args) throws Exception {
         String basePath = System.getProperty("au.com.codeka.warworlds.server.basePath");
         if (basePath == null) {
-            basePath = HtmlPageHandler.class.getClassLoader().getResource("").getPath();
+            basePath = AdminGenericHandler.class.getClassLoader().getResource("").getPath();
         }
 
         ErrorReportingLoggingHandler.setup();

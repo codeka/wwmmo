@@ -1,4 +1,4 @@
-package au.com.codeka.warworlds.server.handlers.pages;
+package au.com.codeka.warworlds.server.handlers.admin;
 
 import java.io.File;
 import java.io.IOException;
@@ -7,8 +7,14 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLEncoder;
 import java.text.DecimalFormat;
+import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import jregex.Matcher;
 
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
@@ -24,8 +30,8 @@ import net.asfun.jangod.interpret.JangodInterpreter;
 import net.asfun.jangod.lib.Filter;
 import net.asfun.jangod.lib.FilterLibrary;
 
-public class BasePageHandler extends RequestHandler {
-    private final Logger log = LoggerFactory.getLogger(BasePageHandler.class);
+public class AdminHandler extends RequestHandler {
+    private final Logger log = LoggerFactory.getLogger(AdminHandler.class);
 
     private static TemplateEngine sTemplateEngine;
     static {
@@ -37,6 +43,19 @@ public class BasePageHandler extends RequestHandler {
         FilterLibrary.addFilter(new NumberFilter());
         FilterLibrary.addFilter(new AttrEscapeFilter());
         FilterLibrary.addFilter(new LocalDateFilter());
+    }
+
+    @Override
+    public void onBeforeHandle() {
+        if (!(this instanceof AdminLoginHandler)) {
+            // if we're not the Login handler and we're not yet authed, auth now
+            if (getSessionNoError() == null || !getSessionNoError().isAdmin()) {
+                // if they're not authenticated yet, we'll have to redirect them to the authentication
+                // page first.
+                authenticate();
+                return;
+            }
+        }
     }
 
     protected void render(String path, Map<String, Object> data) {
@@ -65,36 +84,23 @@ public class BasePageHandler extends RequestHandler {
         }
     }
 
-    @Override
-    protected boolean isAdmin() throws RequestException {
-        if (getSessionNoError() == null || !getSessionNoError().isAdmin()) {
-            // if they're not authenticated yet, we'll have to redirect them to the authentication
-            // page first.
-            authenticate();
-            return false;
-        }
-
-        return true;
-    }
-
-    protected void authenticate() throws RequestException {
-        URI requestUrl;
+    protected void authenticate() {
+        URI requestUrl = null;
         try {
             requestUrl = new URI(getRequestUrl());
         } catch (URISyntaxException e) {
-            throw new RequestException(e);
+            // should never happen
         }
 
         String finalUrl = requestUrl.getPath();
-        String returnUrl = requestUrl.resolve("/realms/"+getRealm()+"/login").toString();
+        String redirectUrl = requestUrl.resolve("/realms/"+getRealm()+"/admin/login").toString();
         try {
-            returnUrl += "?continue="+URLEncoder.encode(finalUrl, "utf-8");
+            redirectUrl += "?continue="+URLEncoder.encode(finalUrl, "utf-8");
         } catch (UnsupportedEncodingException e) {
-            throw new RequestException(e);
+            // should never happen
         }
 
-        String url = OpenIdAuth.getAuthenticateUrl(getRequest(), returnUrl);
-        redirect(url);
+        redirect(redirectUrl);
     }
 
     private static class NumberFilter implements Filter {
