@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.TimeZone;
 
-import org.joda.time.DateTime;
+import org.joda.time.ReadableInstant;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -84,7 +84,7 @@ public class SqlStmt implements AutoCloseable {
         mStmt.setString(position, value);
         saveParameter(position, value);
     }
-    public void setDateTime(int position, DateTime value) throws SQLException {
+    public void setDateTime(int position, ReadableInstant value) throws SQLException {
         if (value == null) {
             setNull(position);
         } else {

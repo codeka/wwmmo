@@ -249,6 +249,34 @@ message EmpireAdsRemoveRequest
 
 
 //
+// Contains a record of (potential) alt accounts for an empire.
+//
+message EmpireAltAccounts
+{
+    optional int32 empire_id = 1;
+
+    message EmpireAltEmpire
+    {
+        optional int32 empire_id = 1;
+        optional string empire_name = 2;
+        optional string user_email = 3;
+        optional int32 alliance_id = 4;
+    }
+    repeated EmpireAltEmpire alt_empire = 2;
+
+    message DeviceInfo
+    {
+        optional string device_id = 1;
+        optional string device_manufacturer = 2;
+        optional string device_model = 3;
+        optional string device_build = 4;
+        optional string device_version = 5;
+    }
+    repeated DeviceInfo device = 3;
+}
+
+
+//
 // The "hello" request when you first join the game contains some info about yourself which we
 // record for posterity.
 //

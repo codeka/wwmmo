@@ -1,0 +1,25 @@
+{% extends "admin/skeleton.html" %}
+{% block title %}Alts{% endblock %}
+{% block head %}
+  <style>
+  </style>
+{% endblock %}
+
+{% block content %}
+  <h1>Alts</h1>
+  <form method="get">
+    <fieldset>
+      <input type="text" name="empire_id" placeholder="Empire ID" />
+      <input type="submit" value="Search" />
+    </fieldset>
+  </form>
+  <script id="alts" type="text/plain">
+    {{alts}}
+  </script>
+  <script>
+    var json = $("#alts").html();
+    document.write("<pre>");
+    document.write(JSON.stringify(JSON.parse(json), null, "  "));
+    document.write("</pre>");
+  </script>
+{% endblock %}
