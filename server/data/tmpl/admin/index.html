@@ -6,8 +6,12 @@
 {% block content %}
   <h1>Active Empires</h1>
 
-  <div id="graph" style="width: 90%; margin: 0 auto; height: 480px;"></div>
+  <div id="graph" style="width: 100%; margin: 0 auto;"></div>
   <script type="text/javascript">
+    // keep the width/height ratio of the graph nice
+    var ratio = 0.4;
+    $("#graph").css("height", $("#graph").width() * ratio);
+
     google.load("visualization", "1", {packages:["corechart"]});
     google.setOnLoadCallback(drawChart);
 
@@ -28,7 +32,7 @@
       var width = $("#graph").width();
       var height = $("#graph").height();
       var options = {
-        "chartArea": {left: 50, top: 10, width: width - 230, height: height - 40},
+        "chartArea": {left: 50, top: 10, width: width - 100, height: height - 80},
         "backgroundColor": {fill: "transparent"},
         "series": {
           0: { "type": "line", "targetAxisIndex": 0 },
@@ -41,24 +45,4 @@
       chart.draw(dataView, options);
     }
   </script>
-
-  <h1>Top 10 Empires</h1>
-  <table>
-    <tr>
-      <th>Rank</th><th>Empire</th><th>Stars</th><th>Colonies</th><th>Buildings</th>
-      <th>Ships</th><th>Population</th>
-    </tr>
-  {% for rank in empire_ranks %}
-    <tr>
-      <td>{{ rank.rank }}</td>
-      <td>{{ rank.empireName }}</td>
-      <td>{{ rank.totalStars|number }}</td>
-      <td>{{ rank.totalColonies|number }}</td>
-      <td>{{ rank.totalBuildings|number }}</td>
-      <td>{{ rank.totalShips|number }}</td>
-      <td>{{ rank.totalPopulation|number }}</td>
-    </tr>
-  {% endfor %}
-  </table>
-
 {% endblock %}

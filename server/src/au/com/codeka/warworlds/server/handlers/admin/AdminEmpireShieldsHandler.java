@@ -24,7 +24,7 @@ import au.com.codeka.warworlds.server.ctrl.EmpireController;
 import au.com.codeka.warworlds.server.data.DB;
 import au.com.codeka.warworlds.server.data.SqlStmt;
 
-public class AdminDebugShieldsHandler extends AdminHandler {
+public class AdminEmpireShieldsHandler extends AdminHandler {
     private static final MultipartConfigElement MULTI_PART_CONFIG =
             new MultipartConfigElement(System.getProperty("java.io.tmpdir"));
 
@@ -58,7 +58,7 @@ public class AdminDebugShieldsHandler extends AdminHandler {
             // TODO: handle errors
         }
 
-        render("admin/debug/shields.html", data);
+        render("admin/empire/shields.html", data);
     }
 
     @Override

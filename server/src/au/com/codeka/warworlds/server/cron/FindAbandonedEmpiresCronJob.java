@@ -27,7 +27,7 @@ import au.com.codeka.warworlds.server.model.Star;
  * required to choose another.
  */
 public class FindAbandonedEmpiresCronJob extends CronJob {
-    private static final Logger log = LoggerFactory.getLogger(CronJobRegistry.class);
+    private static final Logger log = LoggerFactory.getLogger(FindAbandonedEmpiresCronJob.class);
 
     @Override
     public void run(String extra) throws Exception {
