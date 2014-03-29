@@ -24,6 +24,9 @@ public class ChatAbuseController {
     // number of seconds that sSinBinUniqueEmpireVotes needs to come in for us to count them
     private static int sSinBinVoteTimeSeconds = 4 * 60 * 60; // 4 hours
 
+    // you cannot vote more than this number of times per day
+    private static int sMaxVotesPerDay = 4;
+
     static {
         String str = System.getProperty("au.com.codeka.warworlds.server.sinbinUniqueEmpireVotes");
         if (str != null) {
@@ -51,10 +54,17 @@ public class ChatAbuseController {
         }
     }
 
+    public int getNumVotesToday(int empireID) throws RequestException {
+        try {
+            return db.getNumVotesToday(empireID);
+        } catch (Exception e) {
+            throw new RequestException(e);
+        }
+    }
+
     public void reportAbuse(ChatMessage msg, Empire reportingEmpire) throws RequestException {
-        // you can't report yourself for abuse
         if (msg.getEmpireID() == reportingEmpire.getID()) {
-            return;
+            throw new RequestException(400, "You cannot report yourself.");
         }
 
         if (isInPenaltyBox(msg.getEmpireID())) {
@@ -62,6 +72,10 @@ public class ChatAbuseController {
         }
         if (isInPenaltyBox(reportingEmpire.getID())) {
             throw new RequestException(400, "Cannot report an empire while you are in penalty.");
+        }
+
+        if (getNumVotesToday(reportingEmpire.getID()) >= sMaxVotesPerDay) {
+            throw new RequestException(400, "Too many reports posted today, please wait before reporting again.");
         }
 
         try {
@@ -120,7 +134,9 @@ public class ChatAbuseController {
         public int getUniqueReports(int empireID, DateTime cutoff) throws Exception {
             String sql = "SELECT COUNT(DISTINCT reporting_empire_id) FROM chat_abuse_reports" +
                         " WHERE empire_id = ?" +
-                          " AND reported_date > ?";
+                          " AND reported_date > ?" +
+                          // reports from before they were sinbinned last time don't count:
+                          " AND reported_date > (SELECT MAX(expiry) FROM chat_sinbin WHERE chat_sinbin.empire_id = chat_abuse_reports.empire_id)";
             try (SqlStmt stmt = prepare(sql)) {
                 stmt.setInt(1, empireID);
                 stmt.setDateTime(2, cutoff);
@@ -158,6 +174,19 @@ public class ChatAbuseController {
             try (SqlStmt stmt = prepare(sql)) {
                 stmt.setInt(1, empireID);
                 return (stmt.selectFirstValue(Long.class) > 0);
+            }
+        }
+
+        /**
+         * Gets the number of votes this empire has cast to ban anybody today.
+         */
+        public int getNumVotesToday(int empireID) throws Exception {
+            String sql = "SELECT COUNT(*) FROM chat_abuse_reports" +
+                        " WHERE reporting_empire_id = ?" +
+                        " AND reported_date >= DATE_ADD(NOW(), INTERVAL -1 DAY)";
+            try (SqlStmt stmt = prepare(sql)) {
+                stmt.setInt(1, empireID);
+                return (int) (long) stmt.selectFirstValue(Long.class);
             }
         }
 
