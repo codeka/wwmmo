@@ -106,14 +106,14 @@ public class ChatMessageDialog extends DialogFragment {
                 .setPositiveButton("Report", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        doReport();
+                        doReport(context);
                         dialog.dismiss();
                     }
                 }).setNegativeButton("Cancel", null)
                 .create().show();
     }
 
-    private void doReport() {
-        ChatManager.i.reportMessageForAbuse(mChatMessage);
+    private void doReport(Context context) {
+        ChatManager.i.reportMessageForAbuse(context, mChatMessage);
     }
 }

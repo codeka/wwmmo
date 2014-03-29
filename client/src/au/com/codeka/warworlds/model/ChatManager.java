@@ -16,7 +16,9 @@ import au.com.codeka.common.model.BaseChatConversationParticipant;
 import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.BackgroundDetector;
 import au.com.codeka.warworlds.GlobalOptions;
+import au.com.codeka.warworlds.StyledDialog;
 import au.com.codeka.warworlds.api.ApiClient;
+import au.com.codeka.warworlds.api.ApiException;
 
 /**
  * This class keeps track of chats and what-not.
@@ -166,8 +168,10 @@ public class ChatManager implements BackgroundDetector.BackgroundChangeHandler {
         }.execute();
     }
 
-    public void reportMessageForAbuse(final ChatMessage msg) {
+    public void reportMessageForAbuse(final Context context, final ChatMessage msg) {
         new BackgroundRunner<Boolean>() {
+            String mErrorMessage;
+
             @Override
             protected Boolean doInBackground() {
                 try {
@@ -176,6 +180,11 @@ public class ChatManager implements BackgroundDetector.BackgroundChangeHandler {
                             .build();
                     ApiClient.postProtoBuf("chat/"+msg.getID()+"/abuse-reports", pb, null);
                     return true;
+                } catch (ApiException e) {
+                    if (e.getServerErrorMessage() != null) {
+                        mErrorMessage = e.getServerErrorMessage();
+                    }
+                    return false;
                 } catch (Exception e) {
                     log.error("Error posting chat!", e);
                     return false;
@@ -184,6 +193,21 @@ public class ChatManager implements BackgroundDetector.BackgroundChangeHandler {
 
             @Override
             protected void onComplete(Boolean success) {
+                if (!success) {
+                    if (mErrorMessage == null || mErrorMessage.isEmpty()) {
+                        mErrorMessage = "An error occured reporting this empire. Try again later.";
+                    }
+
+                   // try {
+                        new StyledDialog.Builder(context)
+                                        .setTitle("Error")
+                                        .setMessage(mErrorMessage)
+                                        .setPositiveButton("OK", null)
+                                        .create().show();
+                    //} catch (Exception e) {
+                        // ignore
+                    //}
+                }
             }
         }.execute();
 
