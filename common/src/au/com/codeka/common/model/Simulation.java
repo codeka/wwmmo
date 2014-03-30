@@ -620,6 +620,7 @@ public class Simulation {
             if (target == null) {
                 // if there's no more available targets, then we're no longer attacking
                 log(String.format("    Fleet #%d no suitable target.", fleet.getIndex()));
+                fleet.setFleetState(BaseFleet.State.IDLE);
                 continue;
             } else {
                 log(String.format("    Fleet #%d attacking fleet #%d", fleet.getIndex(), target.getIndex()));
