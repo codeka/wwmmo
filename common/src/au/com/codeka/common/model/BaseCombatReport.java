@@ -241,6 +241,11 @@ public class BaseCombatReport {
             }
             return mFleets.get(0).getState();
         }
+        public void setFleetState(BaseFleet.State state) {
+            for (BaseFleet fleet : mFleets) {
+                fleet.setState(state, DateTime.now());
+            }
+        }
         public String getEmpireKey() {
             return mEmpireKey;
         }

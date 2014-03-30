@@ -420,6 +420,7 @@ public class StarController {
                                  " last_simulation = ?," +
                                  " name = ?," +
                                  " star_type = ?," +
+                                 " empire_count = ?," +
                                  " extra = ?" +
                               " WHERE id = ?";
             try (SqlStmt stmt = prepare(sql)) {
@@ -439,6 +440,14 @@ public class StarController {
                 stmt.setString(2, star.getName());
                 stmt.setInt(3, star.getStarType().getType().ordinal());
 
+                int empireCount = 0;
+                for (BaseEmpirePresence empirePresence : star.getEmpirePresences()) {
+                    if (empirePresence.getEmpireKey() != null) {
+                        empireCount ++;
+                    }
+                }
+                stmt.setInt(4, empireCount);
+
                 Messages.Star.StarExtra.Builder star_extra_pb = null;
                 if (star.getWormholeExtra() != null) {
                     if (star_extra_pb == null) {
@@ -447,12 +456,12 @@ public class StarController {
                     star.getWormholeExtra().toProtocolBuffer(star_extra_pb);
                 }
                 if (star_extra_pb == null) {
-                    stmt.setNull(4);
+                    stmt.setNull(5);
                 } else {
-                    stmt.setBlob(4, star_extra_pb.build().toByteArray());
+                    stmt.setBlob(5, star_extra_pb.build().toByteArray());
                 }
 
-                stmt.setInt(5, star.getID());
+                stmt.setInt(6, star.getID());
                 stmt.update();
             }
 

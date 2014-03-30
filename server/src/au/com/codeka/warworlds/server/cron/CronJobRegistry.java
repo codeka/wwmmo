@@ -14,7 +14,6 @@ public class CronJobRegistry {
     static {
         sCronJobs = new TreeMap<String, Class<? extends CronJob>>();
         sCronJobs.put("update-ranks", UpdateRanksCronJob.class);
-        sCronJobs.put("simulate-stars", SimulateAllStarsCronJob.class);
         sCronJobs.put("purge-combat-reports", PurgeCombatReportsCronJob.class);
         sCronJobs.put("purge-sessions", PurgeSessionsCronJob.class);
         sCronJobs.put("find-abandoned-empires", FindAbandonedEmpiresCronJob.class);
