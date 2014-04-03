@@ -142,9 +142,9 @@ public class ChatManager implements BackgroundDetector.BackgroundChangeHandler {
 
     /** Posts a message from us to the server. */
     public void postMessage(final ChatMessage msg) {
-        new BackgroundRunner<Boolean>() {
+        new BackgroundRunner<ChatMessage>() {
             @Override
-            protected Boolean doInBackground() {
+            protected ChatMessage doInBackground() {
                 try {
                     Messages.ChatMessage.Builder pb = Messages.ChatMessage.newBuilder()
                             .setMessage(msg.getMessage())
@@ -155,15 +155,21 @@ public class ChatManager implements BackgroundDetector.BackgroundChangeHandler {
                     Messages.ChatMessage chat_msg = ApiClient.postProtoBuf("chat", pb.build(), Messages.ChatMessage.class);
                     ChatMessage respMsg = new ChatMessage();
                     respMsg.fromProtocolBuffer(chat_msg);
-                    return true;
+                    return respMsg;
                 } catch (Exception e) {
                     log.error("Error posting chat!", e);
-                    return false;
+                    return null;
                 }
             }
 
             @Override
-            protected void onComplete(Boolean success) {
+            protected void onComplete(ChatMessage msg) {
+                if (msg != null) {
+                    ChatConversation conv = getConversation(msg);
+                    if (conv != null) {
+                        conv.addMessage(msg);
+                    }
+                }
             }
         }.execute();
     }
