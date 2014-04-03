@@ -123,6 +123,8 @@ public class ChatHandler extends RequestHandler {
         msg.fromProtocolBuffer(chat_msg_pb);
         new ChatController().postMessage(msg);
 
-        setResponseBody(chat_msg_pb);
+        Messages.ChatMessage.Builder chat_msg_builder = Messages.ChatMessage.newBuilder();
+        msg.toProtocolBuffer(chat_msg_builder, true);
+        setResponseBody(chat_msg_builder.build());
     }
 }

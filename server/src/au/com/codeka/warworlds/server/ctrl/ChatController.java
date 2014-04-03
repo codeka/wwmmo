@@ -13,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import au.com.codeka.common.protobuf.Messages;
+import au.com.codeka.warworlds.server.BackgroundRunner;
 import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.data.DB;
 import au.com.codeka.warworlds.server.data.SqlStmt;
@@ -82,7 +83,7 @@ public class ChatController {
         }
 
         if (isInPenaltyBox(msg)) {
-            return;
+            throw new RequestException(400, "You cannot post while in penalty.");
         }
 
         String sql = "INSERT INTO chat_messages (empire_id, alliance_id, message, message_en, posted_date, conversation_id, action)" +
@@ -123,21 +124,32 @@ public class ChatController {
             throw new RequestException(e);
         }
 
-        // escape the HTML before sending the notification out
-        Messages.ChatMessage.Builder chat_msg_pb = Messages.ChatMessage.newBuilder();
-        msg.toProtocolBuffer(chat_msg_pb, true);
+        // send notifications on a background thread, it can take a while...
+        final ChatMessage chatmsg = msg;
+        new BackgroundRunner() {
+            @Override
+            protected void doInBackground() {
+                // escape the HTML before sending the notification out
+                Messages.ChatMessage.Builder chat_msg_pb = Messages.ChatMessage.newBuilder();
+                chatmsg.toProtocolBuffer(chat_msg_pb, true);
 
-        String encoded = getEncodedMessage(msg);
-        if (chat_msg_pb.hasConversationId()) {
-            new NotificationController().sendNotificationToConversation(
-                    chat_msg_pb.getConversationId(), "chat", encoded);
-        } else if (chat_msg_pb.hasAllianceKey()) {
-            new NotificationController().sendNotificationToOnlineAlliance(
-                    Integer.parseInt(chat_msg_pb.getAllianceKey()), "chat", encoded);
-        } else {
-            new NotificationController().sendNotificationToAllOnline(
-                    "chat", encoded);
-        }
+                String encoded = getEncodedMessage(chatmsg);
+                try {
+                    if (chat_msg_pb.hasConversationId()) {
+                        new NotificationController().sendNotificationToConversation(
+                                chat_msg_pb.getConversationId(), "chat", encoded);
+                    } else if (chat_msg_pb.hasAllianceKey()) {
+                        new NotificationController().sendNotificationToOnlineAlliance(
+                                Integer.parseInt(chat_msg_pb.getAllianceKey()), "chat", encoded);
+                    } else {
+                        new NotificationController().sendNotificationToAllOnline(
+                                "chat", encoded);
+                    }
+                } catch (RequestException e) {
+                    log.error("Error sending notification.");
+                }
+            }
+        }.execute();
     }
 
     /**

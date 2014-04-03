@@ -1,4 +1,4 @@
-package au.com.codeka.warworlds.game;
+package au.com.codeka.warworlds.game.chat;
 
 import android.app.Dialog;
 import android.content.Context;
@@ -14,6 +14,8 @@ import au.com.codeka.Clipboard;
 import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.StyledDialog;
+import au.com.codeka.warworlds.game.EmpireActivity;
+import au.com.codeka.warworlds.game.EnemyEmpireActivity;
 import au.com.codeka.warworlds.model.ChatConversation;
 import au.com.codeka.warworlds.model.ChatManager;
 import au.com.codeka.warworlds.model.ChatMessage;
