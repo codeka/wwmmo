@@ -63,14 +63,15 @@ public class AdminLoginHandler extends AdminHandler {
             throw new RequestException(e);
         }
 
-        String cookie = new LoginController().generateCookie(emailAddr, true, null);
+        String cookieValue = new LoginController().generateCookie(emailAddr, true, null);
 
-        getResponse().addCookie(new Cookie("SESSION", cookie));
+        Cookie cookie = new Cookie("SESSION", cookieValue);
+        getResponse().addCookie(cookie);
         getResponse().setStatus(302);
 
         String continueUrl = getRequest().getParameter("continue");
         if (continueUrl == null) {
-            continueUrl = "/admin";
+            continueUrl = "/realms/"+getRealm()+"/admin";
         }
         getResponse().addHeader("Location", continueUrl);
     }
