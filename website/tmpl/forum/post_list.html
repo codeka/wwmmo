@@ -20,6 +20,13 @@
     </nav>
 
     <h1>{{forum_thread.subject}}</h1>
+    {% if is_moderator %}
+      <p>
+        <a href="/forum/{{forum.slug}}/{{forum_thread.slug}}/sticky" class="button">
+          {% if forum_thread.is_sticky %}Unstick{% else %}Make Sticky{% endif %}
+        </a>
+      </p>
+    {%- endif %}
   {% for post in posts %}
     <article class="single-post" data-postid="{{post.key()}}">
       <img src="{{profiles[post.user.user_id()]|profile_shield}}" class="poster-shield" width="64" height="64" alt="Shield" />

@@ -73,6 +73,10 @@ class ThreadListPage(ForumPage):
       self.redirect('/forum/%s?page=%d' % (forum.slug, page_no-1))
     data["threads"] = threads
 
+    sticky_threads = ctrl.forum.getStickyThreads(forum)
+    data["sticky_threads"] = sticky_threads
+    threads = threads + sticky_threads
+
     thread_post_counts = ctrl.forum.getForumThreadPostCounts()
     if forum.slug in thread_post_counts:
       data["total_threads"] = thread_post_counts[forum.slug]['threads']
@@ -247,6 +251,7 @@ class EditPostPage(ForumPage):
                                              subject = subject,
                                              slug = slug,
                                              posted = now, last_post = now,
+                                             is_sticky = False,
                                              user = self.user)
       forum_thread.put()
       ctrl.forum.incrCount("forum:%s:threads" % (forum.slug))
@@ -364,6 +369,41 @@ class DeletePostPage(ForumPage):
       self.redirect("/forum/%s/%s" % (forum.slug, forum_thread.slug))
 
 
+class ThreadStickyPage(ForumPage):
+  def _getDetails(self, forum_slug, forum_thread_slug):
+    forum = ctrl.forum.getForumBySlug(forum_slug)
+    if not forum:
+      return None
+    forum_thread = ctrl.forum.getThreadBySlug(forum, forum_thread_slug)
+    if not forum_thread:
+      return None
+    return (forum, forum_thread)
+
+  def get(self, forum_slug, forum_thread_slug):
+    if not self._isLoggedIn():
+      return
+
+    forum, forum_thread = self._getDetails(forum_slug, forum_thread_slug)
+    if not forum or not forum_thread:
+      self.error(404)
+      return
+
+    self.render("forum/thread_sticky.html", {"forum": forum,
+                                             "forum_thread": forum_thread})
+
+  def post(self, forum_slug, forum_thread_slug):
+    if not self._isLoggedIn():
+      return
+
+    forum, forum_thread = self._getDetails(forum_slug, forum_thread_slug)
+    if not forum or not forum_thread:
+      self.error(404)
+      return
+
+    ctrl.forum.toggleSticky(forum, forum_thread)
+    self.redirect("/forum/%s" % (forum.slug))
+
+
 class SubscriptionPage(ForumPage):
   def post(self, forum_slug, forum_thread_slug):
     if not self._isLoggedIn():
@@ -391,6 +431,7 @@ app = webapp.WSGIApplication([("/forum/?", ForumListPage),
                               ("/forum/([^/]+)/rss", ThreadRssPage),
                               ("/forum/([^/]+)/posts", EditPostPage),
                               ("/forum/([^/]+)/([^/]+)", PostListPage),
+                              ("/forum/([^/]+)/([^/]+)/sticky", ThreadStickyPage),
                               ("/forum/([^/]+)/([^/]+)/posts", EditPostPage),
                               ("/forum/([^/]+)/([^/]+)/subscription", SubscriptionPage),
                               ("/forum/([^/]+)/([^/]+)/posts/([^/]+)", EditPostPage),

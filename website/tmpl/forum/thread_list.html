@@ -7,6 +7,24 @@
 {% block pagetitle %}Forums &bull; {{forum.name}}{% endblock %}
 {% block title %}Forums &bull; {{forum.name}}{% endblock %}
 
+{% macro thread_entry(thread, first_posts, last_posts, post_counts, profiles) -%}
+  <div class="thread-entry">
+    <div class="thread-title">
+      <div class="thread-title-link"><a href="/forum/{{forum.slug}}/{{thread.slug}}">{{thread.subject}}</a></div>
+      <div>{{first_posts[thread.key()].content|striptags|truncate(100)}}</div>
+    </div>
+    <div class="thread-replycount">
+      <div><span>{{post_counts[thread.forum.slug+":"+thread.slug] - 1}}</span> replies</div>
+    </div>
+    <div class="thread-details">
+      <div class="thread-author">started by <a href="/"><img src="{{profiles[thread.user.user_id()]|profile_shield}}" width="16" height="16"/> {{profiles[thread.user.user_id()].display_name}}</a></div>
+      <div class="lastpost-author">last reply by <a href="/"><img src="{{profiles[last_posts[thread.key()].user.user_id()]|profile_shield}}" width="16" height="16"/> {{profiles[last_posts[thread.key()].user.user_id()].display_name}}</a></div>
+      <div class="lastpost-date"><time datetime="{{last_posts[thread.key()]|post_date_std}}" class="post-date">{{last_posts[thread.key()]|post_date_time}}</time></div>
+    </div>
+    <div class="last"></div>
+  </div>
+{%- endmacro %}
+
 {% block maincontent %}
   <section class="content">
     <nav class="breadcrumbs">
@@ -26,22 +44,14 @@
     {% endif %}
   </p>
 
+  <div class="sticky-threads">
+    {% for thread in sticky_threads if thread.key() in last_posts %}
+      {{thread_entry(thread, first_posts, last_posts, post_counts, profiles)}}
+    {% endfor %}
+  </div>
+
   {% for thread in threads if thread.key() in last_posts %}
-    <div class="thread-entry">
-      <div class="thread-title">
-        <div class="thread-title-link"><a href="/forum/{{forum.slug}}/{{thread.slug}}">{{thread.subject}}</a></div>
-        <div>{{first_posts[thread.key()].content|striptags|truncate(100)}}</div>
-      </div>
-      <div class="thread-replycount">
-        <div><span>{{post_counts[thread.forum.slug+":"+thread.slug] - 1}}</span> replies</div>
-      </div>
-      <div class="thread-details">
-        <div class="thread-author">started by <a href="/"><img src="{{profiles[thread.user.user_id()]|profile_shield}}" width="16" height="16"/> {{profiles[thread.user.user_id()].display_name}}</a></div>
-        <div class="lastpost-author">last reply by <a href="/"><img src="{{profiles[last_posts[thread.key()].user.user_id()]|profile_shield}}" width="16" height="16"/> {{profiles[last_posts[thread.key()].user.user_id()].display_name}}</a></div>
-        <div class="lastpost-date"><time datetime="{{last_posts[thread.key()]|post_date_std}}" class="post-date">{{last_posts[thread.key()]|post_date_time}}</time></div>
-      </div>
-      <div class="last"></div>
-    </div>
+    {{thread_entry(thread, first_posts, last_posts, post_counts, profiles)}}
   {% endfor %}
 
     {{m.paginator(page_no, total_pages)}}

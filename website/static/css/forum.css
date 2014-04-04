@@ -34,6 +34,10 @@ div.last-post {
   right: 0; top: 0; bottom: 0;
 }
 
+div.sticky-threads {
+  background: #ccc;
+}
+
 div.post-author img {
   vertical-align: middle;
 }
