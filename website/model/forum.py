@@ -26,6 +26,7 @@ class ForumThread(db.Model):
   subject = db.StringProperty(required=True)
   slug = db.StringProperty(required=True)
   user = db.UserProperty(required=True)
+  is_sticky = db.BooleanProperty()
 
 
 class ForumPost(db.Model):

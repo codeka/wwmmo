@@ -30,6 +30,13 @@ indexes:
 - kind: ForumThread
   properties:
   - name: forum
+  - name: is_sticky
+  - name: last_post
+    direction: desc
+
+- kind: ForumThread
+  properties:
+  - name: forum
   - name: last_post
     direction: desc
 

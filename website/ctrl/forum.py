@@ -104,14 +104,45 @@ def getThreads(forum, page_no, page_size):
       it = query.with_cursor(cursor)
 
     threads = []
+    n = 0
     for thread in it:
+      n += 1
+      if thread.is_sticky:
+        # note: stickies will make the page slightly smaller, but it should
+        # only ever be one or two anyway...
+        continue
       threads.append(thread)
-      if len(threads) >= page_size:
+      if n >= page_size:
         break
 
     memcache.set(keyname, threads)
 
   return threads
+
+
+def getStickyThreads(forum):
+  keyname = 'forum:sticky-threads:%s' % (str(forum.key()))
+  sticky_threads = memcache.get(keyname)
+  if not sticky_threads:
+    query = model.forum.ForumThread.all().filter("forum", forum)
+    query = query.filter("is_sticky", True)
+    query = query.order("-last_post")
+
+    it = query.run()
+
+    sticky_threads = []
+    for thread in it:
+      sticky_threads.append(thread)
+
+    memcache.set(keyname, sticky_threads)
+
+  return sticky_threads
+
+
+def toggleSticky(forum, forum_thread):
+  forum_thread.is_sticky = not forum_thread.is_sticky
+  forum_thread.put()
+  memcache.flush_all()
 
 
 def getTopThreadsPerForum(forums):

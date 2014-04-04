@@ -1,0 +1,30 @@
+{% extends "skeleton.html" %}
+{% import "forum/macros.html" as m %}
+
+{% block header %}
+  {{m.html_header(resource_version)}}
+{% endblock %}
+{% block pagetitle %}Forums &bull; {{forum.name}}{% endblock %}
+{% block title %}Forums &bull; {{forum.name}}{% endblock %}
+
+{% block maincontent %}
+  <section class="content">
+    <nav class="breadcrumbs">
+      <ul>
+        <li><a href="/">War Worlds</a>
+        <li><a href="/forum">Forums</a>
+        <li><a href="/forum/{{forum.slug}}">{{forum.name}}</a>
+        <li><a href="/forum/{{forum.slug}}/{{forum_thread.slug}}">{{forum_thread.subject}}</a>
+        <li><span>Sticky</span>
+      </ul>
+    </nav>
+
+    <h1>{{forum_thread.subject}}</h1>
+    <p>Do you want to mark this post as <strong>{% if forum_thread.is_sticky %}not sticky{% else %}sticky{% endif %}</strong>?</p>
+    <form method="post">
+      <div class="input-button">
+        <input type="submit" value="{% if forum_thread.is_sticky %}Mark not sticky{% else %}Mark sticky{% endif %}" class="button" />
+      </div>
+    </form>
+  </section>
+{% endblock %}
