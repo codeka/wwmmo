@@ -6,6 +6,7 @@ import java.util.TreeSet;
 import org.joda.time.DateTime;
 
 import au.com.codeka.common.protobuf.Messages;
+import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.data.SqlStmt;
 import au.com.codeka.warworlds.server.model.Alliance;
 import au.com.codeka.warworlds.server.model.AllianceMember;
@@ -51,6 +52,12 @@ public abstract class AllianceRequestProcessor {
      * request is passed. If we've received enough negative votes, the motion is denied.
      */
     public void onVote(AllianceController ctrl) throws Exception {
+        if (mRequest.getState() != AllianceRequest.RequestState.PENDING) {
+            throw new RequestException(400,
+                    Messages.GenericError.ErrorCode.CannotVoteOnNonPendingRequest,
+                    "Cannot vote on a request that is not PENDING.");
+        }
+
         int requiredVotes = mRequest.getRequestType().getRequiredVotes();
         int totalPossibleVotes = getTotalPossibleVotes();
         if (requiredVotes > totalPossibleVotes) {
@@ -118,6 +125,19 @@ public abstract class AllianceRequestProcessor {
                 stmt.setInt(1, mRequest.getAllianceID());
                 stmt.setInt(2, AllianceMember.Rank.MEMBER.getNumber());
                 stmt.setInt(3, mRequest.getRequestEmpireID());
+                stmt.update();
+            }
+
+            // if you have open requests to join other alliances, withdraw those
+            sql = "UPDATE alliance_requests SET state = ?" +
+                 " WHERE request_type = ?" +
+                   " AND state = ?" +
+                   " AND request_empire_id = ?";
+            try (SqlStmt stmt = ctrl.getDB().prepare(sql)) {
+                stmt.setInt(1, AllianceRequest.RequestState.WITHDRAWN.getNumber());
+                stmt.setInt(2, AllianceRequest.RequestType.JOIN.getNumber());
+                stmt.setInt(3, AllianceRequest.RequestState.PENDING.getNumber());
+                stmt.setInt(4, mRequest.getRequestEmpireID());
                 stmt.update();
             }
 

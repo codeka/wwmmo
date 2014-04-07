@@ -156,6 +156,7 @@
     window.lastFetch = new Date();
     window.lastFetch.setDate(lastFetch.getDate() - 4);
     function fetchMessages() {
+      $("section#messages").append("<div>"+document.cookie+"</div>");
       $.ajax({
         "url": "/realms/{{realm}}/chat?since="+parseInt(window.lastFetch.getTime() / 1000),
         "method": "get",

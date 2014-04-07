@@ -57,9 +57,10 @@ public class AllianceController {
         }
     }
 
-    public List<AllianceRequest> getRequests(int allianceID) throws RequestException {
+    public List<AllianceRequest> getRequests(int allianceID, boolean includeWithdrawn)
+            throws RequestException {
         try {
-            return db.getRequests(allianceID);
+            return db.getRequests(allianceID, includeWithdrawn);
         } catch (Exception e) {
             throw new RequestException(e);
         }
@@ -274,8 +275,14 @@ public class AllianceController {
             }
         }
 
-        public List<AllianceRequest> getRequests(int allianceID) throws Exception {
-            String sql = "SELECT * FROM alliance_requests WHERE alliance_id = ? ORDER BY request_date DESC";
+        public List<AllianceRequest> getRequests(int allianceID, boolean includeWithdrawn)
+                throws Exception {
+            String sql = "SELECT * FROM alliance_requests" +
+                        " WHERE alliance_id = ?";
+            if (!includeWithdrawn) {
+                sql += " AND state != " + AllianceRequest.RequestState.WITHDRAWN.getNumber();
+            }
+            sql += " ORDER BY request_date DESC";
             try (SqlStmt stmt = prepare(sql)) {
                 stmt.setInt(1, allianceID); 
                 ResultSet rs = stmt.select();

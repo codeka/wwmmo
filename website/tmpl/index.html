@@ -30,6 +30,22 @@
         text-align: center;
       }
 
+      div.video {
+        position: relative;
+        padding-bottom: 56.25%;
+        padding-top: 30px;
+        height: 0;
+        overflow: hidden;
+      }
+ 
+      div.video iframe {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+      }
+
       section.screenshot blockquote {
         color: #fff;
         margin: 0;
@@ -91,7 +107,9 @@
       <p>If you are impressed with compelling gameplay, or you enjoy a real social gaming experience 
          you can sink your teeth into, hold onto your cellphone. Forget jazzy web graphics, or beautiful 
          web design, you are here for the <em>game</em>!</p>
-      <iframe width="448" height="252" src="//www.youtube.com/embed/0PlL9Pgz6a4" frameborder="0" allowfullscreen></iframe>
+      <div class="video">
+        <iframe width="448" height="252" src="//www.youtube.com/embed/0PlL9Pgz6a4" frameborder="0" allowfullscreen></iframe>
+      </div>
       <p>War Worlds is galactic space war at its best, played online by hundreds of players at a time.
          Explore an infinite universe, in fact, multiple universes, known as Realms. Colonize worlds, 
          harvest alien artefacts, raise a war fleet, and <em>conquer your enemies!!</em></p>
