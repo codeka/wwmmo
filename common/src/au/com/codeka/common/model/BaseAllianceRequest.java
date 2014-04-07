@@ -116,7 +116,8 @@ public class BaseAllianceRequest {
     public enum RequestState {
         PENDING(0),
         ACCEPTED(1),
-        REJECTED(2);
+        REJECTED(2),
+        WITHDRAWN(3);
 
         private int mNumber;
 

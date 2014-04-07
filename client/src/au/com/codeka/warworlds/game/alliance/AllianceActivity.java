@@ -263,7 +263,7 @@ public class AllianceActivity extends TabFragmentActivity
 
                 if (entry.alliance != null) {
                     TextView allianceName = (TextView) view.findViewById(R.id.alliance_name);
-                    allianceName.setText(entry.alliance.getName() + ":" + entry.alliance.getKey());
+                    allianceName.setText(entry.alliance.getName());
 
                     TextView allianceMembers = (TextView) view.findViewById(R.id.alliance_num_members);
                     allianceMembers.setText(String.format("Members: %d", entry.alliance.getNumMembers()));
@@ -457,6 +457,11 @@ public class AllianceActivity extends TabFragmentActivity
                 } else if (entry.request.getState().equals(AllianceRequest.RequestState.REJECTED)) {
                     requestStatus.setVisibility(View.VISIBLE);
                     requestVotes.setVisibility(View.GONE);
+                    requestStatus.setImageResource(R.drawable.cross);
+                } else if (entry.request.getState().equals(AllianceRequest.RequestState.WITHDRAWN)) {
+                    requestStatus.setVisibility(View.VISIBLE);
+                    requestVotes.setVisibility(View.GONE);
+                    // TODO: use a different graphic
                     requestStatus.setImageResource(R.drawable.cross);
                 }
 

@@ -59,6 +59,7 @@ message GenericError
         WormholeNotTuned = 30;
         WormholeTooClose = 31;
         FleetMoveTooCloseToStar = 32;
+        CannotVoteOnNonPendingRequest = 33;
     }
 }
 
@@ -1350,6 +1351,7 @@ message AllianceRequest
         PENDING = 0;
         ACCEPTED = 1;
         REJECTED = 2;
+        WITHDRAWN = 3;
     }
     optional RequestState state = 7;
 

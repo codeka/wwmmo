@@ -12,7 +12,7 @@ public class AllianceRequestsHandler extends RequestHandler {
         int allianceID = Integer.parseInt(getUrlParameter("alliance_id"));
 
         Messages.AllianceRequests.Builder alliance_requests_pb = Messages.AllianceRequests.newBuilder();
-        for (AllianceRequest request : new AllianceController().getRequests(allianceID)) {
+        for (AllianceRequest request : new AllianceController().getRequests(allianceID, false)) {
             Messages.AllianceRequest.Builder alliance_request_pb = Messages.AllianceRequest.newBuilder();
             request.toProtocolBuffer(alliance_request_pb);
             alliance_requests_pb.addRequests(alliance_request_pb);

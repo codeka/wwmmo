@@ -1121,6 +1121,10 @@ public final class Messages {
        * <code>FleetMoveTooCloseToStar = 32;</code>
        */
       FleetMoveTooCloseToStar(31, 32),
+      /**
+       * <code>CannotVoteOnNonPendingRequest = 33;</code>
+       */
+      CannotVoteOnNonPendingRequest(32, 33),
       ;
 
       /**
@@ -1251,6 +1255,10 @@ public final class Messages {
        * <code>FleetMoveTooCloseToStar = 32;</code>
        */
       public static final int FleetMoveTooCloseToStar_VALUE = 32;
+      /**
+       * <code>CannotVoteOnNonPendingRequest = 33;</code>
+       */
+      public static final int CannotVoteOnNonPendingRequest_VALUE = 33;
 
 
       public final int getNumber() { return value; }
@@ -1289,6 +1297,7 @@ public final class Messages {
           case 30: return WormholeNotTuned;
           case 31: return WormholeTooClose;
           case 32: return FleetMoveTooCloseToStar;
+          case 33: return CannotVoteOnNonPendingRequest;
           default: return null;
         }
       }
@@ -86863,6 +86872,10 @@ public final class Messages {
        * <code>REJECTED = 2;</code>
        */
       REJECTED(2, 2),
+      /**
+       * <code>WITHDRAWN = 3;</code>
+       */
+      WITHDRAWN(3, 3),
       ;
 
       /**
@@ -86877,6 +86890,10 @@ public final class Messages {
        * <code>REJECTED = 2;</code>
        */
       public static final int REJECTED_VALUE = 2;
+      /**
+       * <code>WITHDRAWN = 3;</code>
+       */
+      public static final int WITHDRAWN_VALUE = 3;
 
 
       public final int getNumber() { return value; }
@@ -86886,6 +86903,7 @@ public final class Messages {
           case 0: return PENDING;
           case 1: return ACCEPTED;
           case 2: return REJECTED;
+          case 3: return WITHDRAWN;
           default: return null;
         }
       }
@@ -93270,9 +93288,9 @@ public final class Messages {
     java.lang.String[] descriptorData = {
       "\n\016messages.proto\022\035au.com.codeka.common.p" +
       "rotobuf\"7\n\017MessageOfTheDay\022\017\n\007message\030\001 " +
-      "\001(\t\022\023\n\013last_update\030\002 \001(\t\"\364\007\n\014GenericErro" +
+      "\001(\t\022\023\n\013last_update\030\002 \001(\t\"\227\010\n\014GenericErro" +
       "r\022\022\n\nerror_code\030\001 \001(\005\022\025\n\rerror_message\030\002" +
-      " \001(\t\"\270\007\n\tErrorCode\022\020\n\014UnknownError\020\017\022\024\n\020" +
+      " \001(\t\"\333\007\n\tErrorCode\022\020\n\014UnknownError\020\017\022\024\n\020" +
       "InsufficientCash\020\001\022\031\n\025CannotAttackOwnCol" +
       "ony\020\002\022\032\n\026CannotAttackColonyGone\020\007\022\037\n\033Can" +
       "notBuildDependencyNotMet\020\003\022\"\n\036CannotBuil" +
@@ -93295,372 +93313,373 @@ public final class Messages {
       "eetMoveCannotMoveToEmptySpace\020\033\022\035\n\031Fleet" +
       "MoveCannotMoveToStar\020\034\022\026\n\022FleetNotOnWorm" +
       "hole\020\035\022\024\n\020WormholeNotTuned\020\036\022\024\n\020Wormhole" +
-      "TooClose\020\037\022\033\n\027FleetMoveTooCloseToStar\020 \"" +
-      "f\n\014PurchaseInfo\022\013\n\003sku\030\001 \001(\t\022\r\n\005token\030\002 " +
-      "\001(\t\022\020\n\010order_id\030\003 \001(\t\022\r\n\005price\030\004 \001(\t\022\031\n\021",
-      "developer_payload\030\005 \001(\t\"\266\001\n\nEmpireRank\022\022" +
-      "\n\nempire_key\030\001 \001(\t\022\014\n\004rank\030\002 \001(\005\022\021\n\tlast" +
-      "_rank\030\003 \001(\005\022\023\n\013total_stars\030\004 \001(\005\022\026\n\016tota" +
-      "l_colonies\030\005 \001(\005\022\023\n\013total_ships\030\006 \001(\005\022\027\n" +
-      "\017total_buildings\030\007 \001(\005\022\030\n\020total_populati" +
-      "on\030\010 \001(\005\"U\n\013EmpireRanks\0228\n\005ranks\030\001 \003(\0132)" +
-      ".au.com.codeka.common.protobuf.EmpireRan" +
-      "k\022\014\n\004date\030\002 \001(\003\"\320\004\n\006Empire\022\013\n\003key\030\001 \001(\t\022" +
-      "\024\n\014display_name\030\002 \001(\t\022\014\n\004user\030\003 \001(\t\022\r\n\005e" +
-      "mail\030\004 \001(\t\022@\n\005state\030\005 \001(\01621.au.com.codek",
-      "a.common.protobuf.Empire.EmpireState\0224\n\006" +
-      "fleets\030\006 \003(\0132$.au.com.codeka.common.prot" +
-      "obuf.Fleet\0227\n\010colonies\030\007 \003(\0132%.au.com.co" +
-      "deka.common.protobuf.Colony\022C\n\016build_req" +
-      "uests\030\n \003(\0132+.au.com.codeka.common.proto" +
-      "buf.BuildRequest\022\014\n\004cash\030\t \001(\002\0227\n\004rank\030\013" +
-      " \001(\0132).au.com.codeka.common.protobuf.Emp" +
-      "ireRank\0226\n\thome_star\030\014 \001(\0132#.au.com.code" +
-      "ka.common.protobuf.Star\0229\n\010alliance\030\r \001(" +
-      "\0132\'.au.com.codeka.common.protobuf.Allian",
-      "ce\022 \n\030shield_image_last_update\030\016 \001(\003\"4\n\013" +
-      "EmpireState\022\n\n\006ACTIVE\020\001\022\n\n\006BANNED\020\002\022\r\n\tA" +
-      "BANDONED\020\003\"A\n\007Empires\0226\n\007empires\030\001 \003(\0132%" +
-      ".au.com.codeka.common.protobuf.Empire\"\215\001" +
-      "\n\024EmpireCashAuditEntry\022\013\n\003key\030\001 \001(\t\022\022\n\ne" +
-      "mpire_key\030\002 \001(\t\022\022\n\ndifference\030\003 \001(\002\022\020\n\010o" +
-      "ld_cash\030\004 \001(\002\022\020\n\010new_cash\030\005 \001(\002\022\016\n\006reaso" +
-      "n\030\006 \001(\t\022\014\n\004time\030\007 \001(\003\"W\n\017EmpireCashAudit" +
-      "\022D\n\007entries\030\001 \003(\01323.au.com.codeka.common" +
-      ".protobuf.EmpireCashAuditEntry\"\212\001\n\023Empir",
-      "eRenameRequest\022\013\n\003key\030\001 \001(\t\022\020\n\010new_name\030" +
-      "\002 \001(\t\022\020\n\010old_name\030\004 \001(\t\022B\n\rpurchase_info" +
-      "\030\003 \001(\0132+.au.com.codeka.common.protobuf.P" +
-      "urchaseInfo\"\177\n\031EmpireChangeShieldRequest" +
-      "\022\013\n\003key\030\001 \001(\t\022\021\n\tpng_image\030\002 \001(\014\022B\n\rpurc" +
-      "hase_info\030\003 \001(\0132+.au.com.codeka.common.p" +
-      "rotobuf.PurchaseInfo\"X\n\022EmpireResetReque" +
-      "st\022B\n\rpurchase_info\030\001 \001(\0132+.au.com.codek" +
-      "a.common.protobuf.PurchaseInfo\"\250\001\n\030Empir" +
-      "eBuildingStatistics\022S\n\006counts\030\001 \003(\0132C.au",
-      ".com.codeka.common.protobuf.EmpireBuildi" +
-      "ngStatistics.DesignCount\0327\n\013DesignCount\022" +
-      "\021\n\tdesign_id\030\001 \001(\t\022\025\n\rnum_buildings\030\002 \001(" +
-      "\005\"\\\n\026EmpireAdsRemoveRequest\022B\n\rpurchase_" +
-      "info\030\001 \001(\0132+.au.com.codeka.common.protob" +
-      "uf.PurchaseInfo\"\260\003\n\021EmpireAltAccounts\022\021\n" +
-      "\tempire_id\030\001 \001(\005\022T\n\nalt_empire\030\002 \003(\0132@.a" +
-      "u.com.codeka.common.protobuf.EmpireAltAc" +
-      "counts.EmpireAltEmpire\022K\n\006device\030\003 \003(\0132;" +
-      ".au.com.codeka.common.protobuf.EmpireAlt",
-      "Accounts.DeviceInfo\032b\n\017EmpireAltEmpire\022\021" +
-      "\n\tempire_id\030\001 \001(\005\022\023\n\013empire_name\030\002 \001(\t\022\022" +
-      "\n\nuser_email\030\003 \001(\t\022\023\n\013alliance_id\030\004 \001(\005\032" +
-      "\200\001\n\nDeviceInfo\022\021\n\tdevice_id\030\001 \001(\t\022\033\n\023dev" +
-      "ice_manufacturer\030\002 \001(\t\022\024\n\014device_model\030\003" +
-      " \001(\t\022\024\n\014device_build\030\004 \001(\t\022\026\n\016device_ver" +
-      "sion\030\005 \001(\t\"\250\001\n\014HelloRequest\022\024\n\014device_mo" +
-      "del\030\001 \001(\t\022\033\n\023device_manufacturer\030\002 \001(\t\022\024" +
-      "\n\014device_build\030\003 \001(\t\022\026\n\016device_version\030\004" +
-      " \001(\t\022\024\n\014memory_class\030\005 \001(\005\022!\n\031allow_inli",
-      "ne_notfications\030\006 \001(\010\"\331\003\n\rHelloResponse\022" +
-      "<\n\004motd\030\001 \001(\0132..au.com.codeka.common.pro" +
-      "tobuf.MessageOfTheDay\0225\n\006empire\030\002 \001(\0132%." +
-      "au.com.codeka.common.protobuf.Empire\0227\n\010" +
-      "colonies\030\003 \003(\0132%.au.com.codeka.common.pr" +
-      "otobuf.Colony\022\034\n\024require_gcm_register\030\006 " +
-      "\001(\010\022\030\n\020was_empire_reset\030\007 \001(\010\022\033\n\023empire_" +
-      "reset_reason\030\n \001(\t\022T\n\023building_statistic" +
-      "s\030\010 \001(\01327.au.com.codeka.common.protobuf." +
-      "EmpireBuildingStatistics\022C\n\016build_reques",
-      "ts\030\t \003(\0132+.au.com.codeka.common.protobuf" +
-      ".BuildRequest\022\030\n\020force_remove_ads\030\013 \001(\010\022" +
-      "\020\n\010star_ids\030\014 \003(\003\"\300\001\n\022DeviceRegistration" +
-      "\022\013\n\003key\030\001 \001(\t\022\021\n\tdevice_id\030\002 \001(\t\022\033\n\023gcm_" +
-      "registration_id\030\003 \001(\t\022\024\n\014device_model\030\004 " +
-      "\001(\t\022\033\n\023device_manufacturer\030\005 \001(\t\022\024\n\014devi" +
-      "ce_build\030\006 \001(\t\022\026\n\016device_version\030\007 \001(\t\022\014" +
-      "\n\004user\030\010 \001(\t\"_\n\023DeviceRegistrations\022H\n\rr" +
-      "egistrations\030\001 \003(\01321.au.com.codeka.commo" +
-      "n.protobuf.DeviceRegistration\"\'\n\022DeviceO",
-      "nlineStatus\022\021\n\tis_online\030\001 \001(\010\"+\n\014Notifi" +
-      "cation\022\014\n\004name\030\001 \001(\t\022\r\n\005value\030\002 \001(\t\"S\n\rN" +
-      "otifications\022B\n\rnotifications\030\001 \003(\0132+.au" +
-      ".com.codeka.common.protobuf.Notification" +
-      "\"s\n\023NotificationWrapper\022\030\n\020original_mess" +
-      "age\030\001 \001(\014\022B\n\rnotifications\030\002 \003(\0132+.au.co" +
-      "m.codeka.common.protobuf.Notification\"\250\002" +
-      "\n\013ChatMessage\022\n\n\002id\030\007 \001(\005\022\017\n\007message\030\001 \001" +
-      "(\t\022\022\n\nempire_key\030\002 \001(\t\022\023\n\013date_posted\030\003 " +
-      "\001(\003\022\024\n\014alliance_key\030\004 \001(\t\022\022\n\nmessage_en\030",
-      "\005 \001(\t\022\027\n\017conversation_id\030\006 \001(\005\022H\n\006action" +
-      "\030\010 \001(\01628.au.com.codeka.common.protobuf.C" +
-      "hatMessage.MessageAction\"F\n\rMessageActio" +
-      "n\022\n\n\006Normal\020\000\022\024\n\020ParticipantAdded\020\001\022\023\n\017P" +
-      "articipantLeft\020\002\"L\n\014ChatMessages\022<\n\010mess" +
-      "ages\030\001 \003(\0132*.au.com.codeka.common.protob" +
-      "uf.ChatMessage\"&\n\017ChatAbuseReport\022\023\n\013cha" +
-      "t_msg_id\030\001 \001(\005\"p\n\020ChatConversation\022\n\n\002id" +
-      "\030\001 \001(\005\022P\n\014participants\030\002 \003(\0132:.au.com.co" +
-      "deka.common.protobuf.ChatConversationPar",
-      "ticipant\"[\n\021ChatConversations\022F\n\rconvers" +
-      "ations\030\001 \003(\0132/.au.com.codeka.common.prot" +
-      "obuf.ChatConversation\"B\n\033ChatConversatio" +
-      "nParticipant\022\021\n\tempire_id\030\001 \001(\005\022\020\n\010is_mu" +
-      "ted\030\002 \001(\010\"\327\001\n\006Sector\022\t\n\001x\030\001 \001(\003\022\t\n\001y\030\002 \001" +
-      "(\003\022\024\n\014num_colonies\030\005 \001(\005\0222\n\005stars\030\003 \003(\0132" +
-      "#.au.com.codeka.common.protobuf.Star\0227\n\010" +
-      "colonies\030\004 \003(\0132%.au.com.codeka.common.pr" +
-      "otobuf.Colony\0224\n\006fleets\030\006 \003(\0132$.au.com.c" +
-      "odeka.common.protobuf.Fleet\"\357\007\n\004Star\022\013\n\003",
-      "key\030\001 \001(\t\022\020\n\010sector_x\030\013 \001(\003\022\020\n\010sector_y\030" +
-      "\014 \001(\003\022\014\n\004name\030\002 \001(\t\022J\n\016classification\030\003 " +
-      "\001(\01622.au.com.codeka.common.protobuf.Star" +
-      ".CLASSIFICATION\022\014\n\004size\030\005 \001(\005\022\020\n\010offset_" +
-      "x\030\006 \001(\005\022\020\n\010offset_y\030\007 \001(\005\0226\n\007planets\030\t \003" +
-      "(\0132%.au.com.codeka.common.protobuf.Plane" +
-      "t\0227\n\010colonies\030\n \003(\0132%.au.com.codeka.comm" +
-      "on.protobuf.Colony\022:\n\tbuildings\030\r \003(\0132\'." +
-      "au.com.codeka.common.protobuf.Building\022>" +
-      "\n\007empires\030\016 \003(\0132-.au.com.codeka.common.p",
-      "rotobuf.EmpirePresence\022C\n\016build_requests" +
-      "\030\017 \003(\0132+.au.com.codeka.common.protobuf.B" +
-      "uildRequest\0224\n\006fleets\030\020 \003(\0132$.au.com.cod" +
-      "eka.common.protobuf.Fleet\022\024\n\014time_emptie" +
-      "d\030\021 \001(\003\022\027\n\017last_simulation\030\022 \001(\003\022J\n\025curr" +
-      "ent_combat_report\030\023 \001(\0132+.au.com.codeka." +
-      "common.protobuf.CombatReport\022<\n\005extra\030\024 " +
-      "\001(\0132-.au.com.codeka.common.protobuf.Star" +
-      ".StarExtra\032\212\001\n\tStarExtra\022\035\n\025wormhole_des" +
-      "t_star_id\030\001 \001(\005\022#\n\033wormhole_tune_complet",
-      "e_time\030\002 \001(\003\022\035\n\025wormhole_tune_history\030\003 " +
-      "\003(\003\022\032\n\022wormhole_empire_id\030\004 \001(\005\"|\n\016CLASS" +
-      "IFICATION\022\010\n\004BLUE\020\000\022\t\n\005WHITE\020\001\022\n\n\006YELLOW" +
-      "\020\002\022\n\n\006ORANGE\020\003\022\007\n\003RED\020\004\022\013\n\007NEUTRON\020\005\022\r\n\t" +
-      "BLACKHOLE\020\006\022\n\n\006MARKER\020\007\022\014\n\010WORMHOLE\020\010\";\n" +
-      "\005Stars\0222\n\005stars\030\001 \003(\0132#.au.com.codeka.co" +
-      "mmon.protobuf.Star\"\247\002\n\021StarRenameRequest" +
-      "\022\020\n\010star_key\030\001 \001(\t\022\020\n\010old_name\030\002 \001(\t\022\020\n\010" +
-      "new_name\030\003 \001(\t\022$\n\034DEPRECATED_purchase_or" +
-      "der_id\030\004 \001(\t\022 \n\030DEPRECATED_purchase_time",
-      "\030\005 \001(\003\022-\n%DEPRECATED_purchase_developer_" +
-      "payload\030\006 \001(\t\022!\n\031DEPRECATED_purchase_pri" +
-      "ce\030\007 \001(\t\022B\n\rpurchase_info\030\010 \001(\0132+.au.com" +
-      ".codeka.common.protobuf.PurchaseInfo\"@\n\023" +
-      "WormholeTuneRequest\022\023\n\013src_star_id\030\001 \001(\005" +
-      "\022\024\n\014dest_star_id\030\002 \001(\005\"\311\002\n\006Planet\022\r\n\005ind" +
-      "ex\030\002 \001(\005\022F\n\013planet_type\030\003 \001(\01621.au.com.c" +
-      "odeka.common.protobuf.Planet.PLANET_TYPE" +
-      "\022\014\n\004size\030\004 \001(\005\022\037\n\027population_congenialit" +
-      "y\030\005 \001(\005\022\034\n\024farming_congeniality\030\006 \001(\005\022\033\n",
-      "\023mining_congeniality\030\007 \001(\005\"~\n\013PLANET_TYP" +
-      "E\022\014\n\010GASGIANT\020\001\022\014\n\010RADIATED\020\002\022\013\n\007INFERNO" +
-      "\020\003\022\r\n\tASTEROIDS\020\004\022\t\n\005WATER\020\005\022\t\n\005TOXIC\020\006\022" +
-      "\n\n\006DESERT\020\007\022\t\n\005SWAMP\020\010\022\n\n\006TERRAN\020\t\"A\n\007Pl" +
-      "anets\0226\n\007planets\030\001 \003(\0132%.au.com.codeka.c" +
-      "ommon.protobuf.Planet\"A\n\007Sectors\0226\n\007sect" +
-      "ors\030\001 \003(\0132%.au.com.codeka.common.protobu" +
-      "f.Sector\"\361\001\n\016EmpirePresence\022\013\n\003key\030\001 \001(\t" +
-      "\022\022\n\nempire_key\030\002 \001(\t\022\020\n\010star_key\030\003 \001(\t\022\023" +
-      "\n\013total_goods\030\004 \001(\002\022\026\n\016total_minerals\030\005 ",
-      "\001(\002\022\034\n\024goods_delta_per_hour\030\006 \001(\002\022\037\n\027min" +
-      "erals_delta_per_hour\030\007 \001(\002\022\021\n\tmax_goods\030" +
-      "\010 \001(\002\022\024\n\014max_minerals\030\t \001(\002\022\027\n\017goods_zer" +
-      "o_time\030\n \001(\003\"\'\n\017ColonizeRequest\022\024\n\014plane" +
-      "t_index\030\001 \001(\005\"\230\003\n\006Colony\022\013\n\003key\030\001 \001(\t\022\022\n" +
-      "\nempire_key\030\002 \001(\t\022\020\n\010star_key\030\004 \001(\t\022\024\n\014p" +
-      "lanet_index\030\016 \001(\005\022\022\n\npopulation\030\005 \001(\002\022\"\n" +
-      "\032DEPRECATED_last_simulation\030\006 \001(\003\022\030\n\020foc" +
-      "us_population\030\007 \001(\002\022\025\n\rfocus_farming\030\010 \001" +
-      "(\002\022\024\n\014focus_mining\030\t \001(\002\022\032\n\022focus_constr",
-      "uction\030\n \001(\002\022\030\n\020delta_population\030\013 \001(\002\022\023" +
-      "\n\013delta_goods\030\014 \001(\002\022\026\n\016delta_minerals\030\r " +
-      "\001(\002\022\031\n\021uncollected_taxes\030\017 \001(\002\022\025\n\rdefenc" +
-      "e_bonus\030\020 \001(\002\022\026\n\016max_population\030\021 \001(\002\022\031\n" +
-      "\021cooldown_end_time\030\022 \001(\003\"C\n\010Colonies\0227\n\010" +
-      "colonies\030\001 \003(\0132%.au.com.codeka.common.pr" +
-      "otobuf.Colony\"\267\003\n\014BuildRequest\022\013\n\003key\030\001 " +
-      "\001(\t\022\022\n\ncolony_key\030\002 \001(\t\022\022\n\nempire_key\030\003 " +
-      "\001(\t\022\020\n\010star_key\030\013 \001(\t\022\024\n\014planet_index\030\014 " +
-      "\001(\005\022J\n\nbuild_kind\030\004 \001(\01626.au.com.codeka.",
-      "common.protobuf.BuildRequest.BUILD_KIND\022" +
-      "\023\n\013design_name\030\005 \001(\t\022\r\n\005count\030\t \001(\005\022\022\n\ns" +
-      "tart_time\030\006 \001(\003\022\020\n\010end_time\030\007 \001(\003\022\020\n\010pro" +
-      "gress\030\010 \001(\002\022\035\n\025existing_building_key\030\n \001" +
-      "(\t\022\037\n\027existing_building_level\030\r \001(\005\022\031\n\021e" +
-      "xisting_fleet_id\030\016 \001(\005\022\022\n\nupgrade_id\030\017 \001" +
-      "(\t\022\r\n\005notes\030\020 \001(\t\"$\n\nBUILD_KIND\022\014\n\010BUILD" +
-      "ING\020\001\022\010\n\004SHIP\020\002\"K\n\nBuildQueue\022=\n\010request" +
-      "s\030\001 \003(\0132+.au.com.codeka.common.protobuf." +
-      "BuildRequest\"^\n\010Building\022\013\n\003key\030\001 \001(\t\022\022\n",
-      "\ncolony_key\030\002 \001(\t\022\023\n\013design_name\030\003 \001(\t\022\r" +
-      "\n\005level\030\004 \001(\005\022\r\n\005notes\030\005 \001(\t\"1\n\014FleetUpg" +
-      "rade\022\022\n\nupgrade_id\030\001 \001(\t\022\r\n\005extra\030\002 \001(\t\"" +
-      "\206\005\n\005Fleet\022\013\n\003key\030\001 \001(\t\022\022\n\nempire_key\030\002 \001" +
-      "(\t\022\023\n\013alliance_id\030\022 \001(\005\022\023\n\013design_name\030\003" +
-      " \001(\t\022\021\n\tnum_ships\030\004 \001(\002\022?\n\005state\030\005 \001(\01620" +
-      ".au.com.codeka.common.protobuf.Fleet.FLE" +
-      "ET_STATE\022\030\n\020state_start_time\030\006 \001(\003\022\020\n\010st" +
-      "ar_key\030\007 \001(\t\022\034\n\024destination_star_key\030\010 \001" +
-      "(\t\022\030\n\020target_fleet_key\030\t \001(\t\022\031\n\021target_c",
-      "olony_key\030\n \001(\t\022A\n\006stance\030\013 \001(\01621.au.com" +
-      ".codeka.common.protobuf.Fleet.FLEET_STAN" +
-      "CE\022\026\n\016time_destroyed\030\014 \001(\003\022%\n\035block_noti" +
-      "fication_on_destroy\030\016 \001(\010\022\024\n\014last_victor" +
-      "y\030\r \001(\003\022\013\n\003eta\030\017 \001(\003\022=\n\010upgrades\030\020 \003(\0132+" +
-      ".au.com.codeka.common.protobuf.FleetUpgr" +
-      "ade\022\r\n\005notes\030\021 \001(\t\"2\n\013FLEET_STATE\022\010\n\004IDL" +
-      "E\020\001\022\n\n\006MOVING\020\002\022\r\n\tATTACKING\020\003\"8\n\014FLEET_" +
-      "STANCE\022\013\n\007PASSIVE\020\001\022\013\n\007NEUTRAL\020\002\022\016\n\nAGGR" +
-      "ESSIVE\020\003\">\n\006Fleets\0224\n\006fleets\030\001 \003(\0132$.au.",
-      "com.codeka.common.protobuf.Fleet\"\217\003\n\nFle" +
-      "etOrder\022D\n\005order\030\001 \001(\01625.au.com.codeka.c" +
-      "ommon.protobuf.FleetOrder.FLEET_ORDER\022\022\n" +
-      "\nsplit_left\030\002 \001(\005\022\023\n\013split_right\030\003 \001(\005\022\020" +
-      "\n\010star_key\030\004 \001(\t\022A\n\006stance\030\005 \001(\01621.au.co" +
-      "m.codeka.common.protobuf.Fleet.FLEET_STA" +
-      "NCE\022\027\n\017merge_fleet_key\030\006 \001(\t\022\020\n\010sector_x" +
-      "\030\007 \001(\003\022\020\n\010sector_y\030\010 \001(\003\022\020\n\010offset_x\030\t \001" +
-      "(\005\022\020\n\010offset_y\030\n \001(\005\"\\\n\013FLEET_ORDER\022\t\n\005S" +
-      "PLIT\020\001\022\t\n\005MERGE\020\002\022\010\n\004MOVE\020\003\022\016\n\nSET_STANC",
-      "E\020\005\022\t\n\005BOOST\020\006\022\022\n\016ENTER_WORMHOLE\020\007\"_\n\013Sc" +
-      "outReport\022\013\n\003key\030\001 \001(\t\022\022\n\nempire_key\030\002 \001" +
-      "(\t\022\020\n\010star_key\030\003 \001(\t\022\014\n\004date\030\005 \001(\003\022\017\n\007st" +
-      "ar_pb\030\004 \001(\014\"K\n\014ScoutReports\022;\n\007reports\030\001" +
-      " \003(\0132*.au.com.codeka.common.protobuf.Sco" +
-      "utReport\"\252\006\n\013CombatRound\022\020\n\010star_key\030\001 \001" +
-      "(\t\022\022\n\nround_time\030\002 \001(\003\022G\n\006fleets\030\003 \003(\01327" +
-      ".au.com.codeka.common.protobuf.CombatRou" +
-      "nd.FleetSummary\022S\n\rfleets_joined\030\004 \003(\0132<" +
-      ".au.com.codeka.common.protobuf.CombatRou",
-      "nd.FleetJoinedRecord\022V\n\020fleets_targetted" +
-      "\030\005 \003(\0132<.au.com.codeka.common.protobuf.C" +
-      "ombatRound.FleetTargetRecord\022U\n\017fleets_a" +
-      "ttacked\030\006 \003(\0132<.au.com.codeka.common.pro" +
-      "tobuf.CombatRound.FleetAttackRecord\022U\n\016f" +
-      "leets_damaged\030\007 \003(\0132=.au.com.codeka.comm" +
-      "on.protobuf.CombatRound.FleetDamagedReco" +
-      "rd\032\\\n\014FleetSummary\022\022\n\nfleet_keys\030\001 \003(\t\022\022" +
-      "\n\nempire_key\030\002 \001(\t\022\021\n\tdesign_id\030\003 \001(\t\022\021\n" +
-      "\tnum_ships\030\004 \001(\002\032(\n\021FleetJoinedRecord\022\023\n",
-      "\013fleet_index\030\001 \001(\005\032>\n\021FleetTargetRecord\022" +
-      "\023\n\013fleet_index\030\001 \001(\005\022\024\n\014target_index\030\002 \001" +
-      "(\005\032N\n\021FleetAttackRecord\022\023\n\013fleet_index\030\001" +
-      " \001(\005\022\024\n\014target_index\030\002 \001(\005\022\016\n\006damage\030\003 \001" +
-      "(\002\0329\n\022FleetDamagedRecord\022\023\n\013fleet_index\030" +
-      "\001 \001(\005\022\016\n\006damage\030\002 \001(\002\"\332\001\n\014CombatReport\022\013" +
-      "\n\003key\030\001 \001(\t\022\020\n\010star_key\030\002 \001(\t\022\022\n\nstart_t" +
-      "ime\030\003 \001(\003\022\020\n\010end_time\030\004 \001(\003\022\031\n\021start_emp" +
-      "ire_keys\030\005 \003(\t\022\027\n\017end_empire_keys\030\006 \003(\t\022" +
-      "\025\n\rnum_destroyed\030\007 \001(\005\022:\n\006rounds\030\010 \003(\0132*",
-      ".au.com.codeka.common.protobuf.CombatRou" +
-      "nd\"M\n\rCombatReports\022<\n\007reports\030\001 \003(\0132+.a" +
-      "u.com.codeka.common.protobuf.CombatRepor" +
-      "t\"\304\r\n\017SituationReport\022\013\n\003key\030\001 \001(\t\022\022\n\nem" +
-      "pire_key\030\002 \001(\t\022\023\n\013report_time\030\003 \001(\003\022\020\n\010s" +
-      "tar_key\030\004 \001(\t\022\024\n\014planet_index\030\005 \001(\005\022\r\n\005r" +
-      "ealm\030\016 \001(\t\022a\n\025build_complete_record\030\006 \001(" +
-      "\0132B.au.com.codeka.common.protobuf.Situat" +
-      "ionReport.BuildCompleteRecord\022_\n\024move_co" +
-      "mplete_record\030\007 \001(\0132A.au.com.codeka.comm",
-      "on.protobuf.SituationReport.MoveComplete" +
-      "Record\022h\n\031fleet_under_attack_record\030\010 \001(" +
-      "\0132E.au.com.codeka.common.protobuf.Situat" +
-      "ionReport.FleetUnderAttackRecord\022c\n\026flee" +
-      "t_destroyed_record\030\t \001(\0132C.au.com.codeka" +
-      ".common.protobuf.SituationReport.FleetDe" +
-      "stroyedRecord\022e\n\027fleet_victorious_record" +
-      "\030\n \001(\0132D.au.com.codeka.common.protobuf.S" +
-      "ituationReport.FleetVictoriousRecord\022e\n\027" +
-      "colony_destroyed_record\030\013 \001(\0132D.au.com.c",
-      "odeka.common.protobuf.SituationReport.Co" +
-      "lonyDestroyedRecord\022c\n\026colony_attacked_r" +
-      "ecord\030\014 \001(\0132C.au.com.codeka.common.proto" +
-      "buf.SituationReport.ColonyAttackedRecord" +
-      "\022l\n\034star_ran_out_of_goods_record\030\r \001(\0132F" +
-      ".au.com.codeka.common.protobuf.Situation" +
-      "Report.StarRunOutOfGoodsRecord\032\236\001\n\023Build" +
-      "CompleteRecord\022J\n\nbuild_kind\030\001 \001(\01626.au." +
-      "com.codeka.common.protobuf.BuildRequest." +
-      "BUILD_KIND\022\021\n\tdesign_id\030\002 \001(\t\022\r\n\005count\030\003",
-      " \001(\005\022\031\n\021build_request_key\030\004 \001(\t\032m\n\022MoveC" +
-      "ompleteRecord\022\021\n\tfleet_key\030\001 \001(\t\022\027\n\017flee" +
-      "t_design_id\030\003 \001(\t\022\021\n\tnum_ships\030\004 \001(\002\022\030\n\020" +
-      "scout_report_key\030\005 \001(\t\032r\n\026FleetUnderAtta" +
-      "ckRecord\022\021\n\tfleet_key\030\001 \001(\t\022\027\n\017fleet_des" +
-      "ign_id\030\002 \001(\t\022\021\n\tnum_ships\030\003 \001(\002\022\031\n\021comba" +
-      "t_report_key\030\004 \001(\t\032J\n\024FleetDestroyedReco" +
-      "rd\022\027\n\017fleet_design_id\030\001 \001(\t\022\031\n\021combat_re" +
-      "port_key\030\002 \001(\t\032q\n\025FleetVictoriousRecord\022" +
-      "\021\n\tfleet_key\030\001 \001(\t\022\027\n\017fleet_design_id\030\002 ",
-      "\001(\t\022\021\n\tnum_ships\030\003 \001(\002\022\031\n\021combat_report_" +
-      "key\030\004 \001(\t\032E\n\025ColonyDestroyedRecord\022\022\n\nco" +
-      "lony_key\030\001 \001(\t\022\030\n\020enemy_empire_key\030\002 \001(\t" +
-      "\032W\n\024ColonyAttackedRecord\022\022\n\ncolony_key\030\001" +
-      " \001(\t\022\030\n\020enemy_empire_key\030\002 \001(\t\022\021\n\tnum_sh" +
-      "ips\030\003 \001(\002\032-\n\027StarRunOutOfGoodsRecord\022\022\n\n" +
-      "colony_key\030\001 \001(\t\"m\n\020SituationReports\022I\n\021" +
-      "situation_reports\030\001 \003(\0132..au.com.codeka." +
-      "common.protobuf.SituationReport\022\016\n\006curso" +
-      "r\030\002 \001(\t\"\216\004\n\017CashAuditRecord\022\n\n\002id\030\001 \001(\005\022",
-      "\021\n\tempire_id\030\002 \001(\005\022E\n\006reason\030\003 \001(\01625.au." +
-      "com.codeka.common.protobuf.CashAuditReco" +
-      "rd.Reason\022\023\n\013before_cash\030\004 \001(\002\022\022\n\nafter_" +
-      "cash\030\005 \001(\002\022\014\n\004time\030\020 \001(\003\022\020\n\010fleet_id\030\006 \001" +
-      "(\005\022\027\n\017fleet_design_id\030\007 \001(\t\022\021\n\tnum_ships" +
-      "\030\010 \001(\002\022\017\n\007star_id\030\t \001(\005\022\021\n\tstar_name\030\n \001" +
-      "(\t\022\025\n\rmove_distance\030\013 \001(\002\022\027\n\017build_desig" +
-      "n_id\030\014 \001(\t\022\023\n\013build_count\030\r \001(\005\022\031\n\021accel" +
-      "erate_amount\030\016 \001(\002\022\025\n\ralliance_name\030\017 \001(" +
-      "\t\"\204\001\n\006Reason\022\r\n\tFleetMove\020\000\022\023\n\017BuildAcce",
-      "lerate\020\001\022\027\n\023CollectFromColonies\020\002\022\022\n\016Cre" +
-      "ateAlliance\020\003\022\023\n\017AllianceDeposit\020\004\022\024\n\020Al" +
-      "lianceWithdraw\020\005\"S\n\020CashAuditRecords\022?\n\007" +
-      "records\030\001 \003(\0132..au.com.codeka.common.pro" +
-      "tobuf.CashAuditRecord\"\302\001\n\010Alliance\022\013\n\003ke" +
-      "y\030\001 \001(\t\022\014\n\004name\030\002 \001(\t\022\024\n\014time_created\030\003 " +
-      "\001(\003\022\032\n\022creator_empire_key\030\004 \001(\t\022\024\n\014bank_" +
-      "balance\030\007 \001(\001\022\023\n\013num_members\030\005 \001(\005\022>\n\007me" +
-      "mbers\030\006 \003(\0132-.au.com.codeka.common.proto" +
-      "buf.AllianceMember\"G\n\tAlliances\022:\n\tallia",
-      "nces\030\001 \003(\0132\'.au.com.codeka.common.protob" +
-      "uf.Alliance\"\317\001\n\016AllianceMember\022\013\n\003key\030\001 " +
-      "\001(\t\022\022\n\nempire_key\030\002 \001(\t\022\024\n\014alliance_key\030" +
-      "\003 \001(\t\022\023\n\013time_joined\030\004 \001(\003\022@\n\004rank\030\005 \001(\016" +
-      "22.au.com.codeka.common.protobuf.Allianc" +
-      "eMember.Rank\"/\n\004Rank\022\013\n\007CAPTAIN\020\000\022\016\n\nLIE" +
-      "UTENANT\020\001\022\n\n\006MEMBER\020\002\"\327\003\n\017AllianceReques" +
-      "t\022\n\n\002id\030\001 \001(\005\022\023\n\013alliance_id\030\002 \001(\005\022\031\n\021re" +
-      "quest_empire_id\030\003 \001(\005\022\024\n\014request_date\030\004 " +
-      "\001(\003\022P\n\014request_type\030\005 \001(\0162:.au.com.codek",
-      "a.common.protobuf.AllianceRequest.Reques" +
-      "tType\022\017\n\007message\030\006 \001(\t\022J\n\005state\030\007 \001(\0162;." +
-      "au.com.codeka.common.protobuf.AllianceRe" +
-      "quest.RequestState\022\r\n\005votes\030\010 \001(\005\022\030\n\020tar" +
-      "get_empire_id\030\t \001(\005\022\016\n\006amount\030\n \001(\002\"Q\n\013R" +
-      "equestType\022\010\n\004JOIN\020\000\022\t\n\005LEAVE\020\001\022\010\n\004KICK\020" +
-      "\002\022\020\n\014DEPOSIT_CASH\020\003\022\021\n\rWITHDRAW_CASH\020\004\"7" +
-      "\n\014RequestState\022\013\n\007PENDING\020\000\022\014\n\010ACCEPTED\020" +
-      "\001\022\014\n\010REJECTED\020\002\"d\n\020AllianceRequests\022@\n\010r" +
-      "equests\030\001 \003(\0132..au.com.codeka.common.pro",
-      "tobuf.AllianceRequest\022\016\n\006cursor\030\002 \001(\t\"\203\001" +
-      "\n\023AllianceRequestVote\022\n\n\002id\030\001 \001(\005\022\023\n\013all" +
-      "iance_id\030\002 \001(\005\022\033\n\023alliance_request_id\030\003 " +
-      "\001(\005\022\021\n\tempire_id\030\004 \001(\005\022\r\n\005votes\030\005 \001(\005\022\014\n" +
-      "\004date\030\006 \001(\003\"\243\003\n\013ErrorReport\022\027\n\017android_v" +
-      "ersion\030\001 \001(\t\022\023\n\013phone_model\030\002 \001(\t\022\024\n\014pac" +
-      "kage_name\030\003 \001(\t\022\023\n\013app_version\030\004 \001(\t\022\023\n\013" +
-      "stack_trace\030\005 \001(\t\022\017\n\007message\030\006 \001(\t\022\023\n\013re" +
-      "port_time\030\007 \001(\003\022\021\n\tempire_id\030\010 \001(\005\022\017\n\007co" +
-      "ntext\030\t \001(\t\022\027\n\017exception_class\030\n \001(\t\022\021\n\t",
-      "heap_size\030\013 \001(\003\022\026\n\016heap_allocated\030\014 \001(\003\022" +
-      "\021\n\theap_free\030\r \001(\003\022\026\n\016total_run_time\030\016 \001" +
-      "(\003\022\033\n\023foreground_run_time\030\017 \001(\003\022\022\n\nlog_o" +
-      "utput\030\020 \001(\t\022\031\n\021server_request_qs\030\021 \001(\t\022!" +
-      "\n\031server_request_user_agent\030\022 \001(\t\"K\n\014Err" +
-      "orReports\022;\n\007reports\030\001 \003(\0132*.au.com.code" +
-      "ka.common.protobuf.ErrorReport*\344\001\n\025Situa" +
-      "tionReportFilter\022\013\n\007ShowAll\020\000\022\020\n\014MoveCom" +
-      "plete\020\001\022\024\n\020BuildCompleteAny\020\002\022\021\n\rFleetAt" +
-      "tacked\020\003\022\022\n\016FleetDestroyed\020\004\022\023\n\017FleetVic",
-      "torious\020\005\022\022\n\016ColonyAttacked\020\006\022\023\n\017ColonyD" +
-      "estroyed\020\007\022\026\n\022BuildCompleteShips\020\010\022\031\n\025Bu" +
-      "ildCompleteBuilding\020\t"
+      "TooClose\020\037\022\033\n\027FleetMoveTooCloseToStar\020 \022" +
+      "!\n\035CannotVoteOnNonPendingRequest\020!\"f\n\014Pu" +
+      "rchaseInfo\022\013\n\003sku\030\001 \001(\t\022\r\n\005token\030\002 \001(\t\022\020",
+      "\n\010order_id\030\003 \001(\t\022\r\n\005price\030\004 \001(\t\022\031\n\021devel" +
+      "oper_payload\030\005 \001(\t\"\266\001\n\nEmpireRank\022\022\n\nemp" +
+      "ire_key\030\001 \001(\t\022\014\n\004rank\030\002 \001(\005\022\021\n\tlast_rank" +
+      "\030\003 \001(\005\022\023\n\013total_stars\030\004 \001(\005\022\026\n\016total_col" +
+      "onies\030\005 \001(\005\022\023\n\013total_ships\030\006 \001(\005\022\027\n\017tota" +
+      "l_buildings\030\007 \001(\005\022\030\n\020total_population\030\010 " +
+      "\001(\005\"U\n\013EmpireRanks\0228\n\005ranks\030\001 \003(\0132).au.c" +
+      "om.codeka.common.protobuf.EmpireRank\022\014\n\004" +
+      "date\030\002 \001(\003\"\320\004\n\006Empire\022\013\n\003key\030\001 \001(\t\022\024\n\014di" +
+      "splay_name\030\002 \001(\t\022\014\n\004user\030\003 \001(\t\022\r\n\005email\030",
+      "\004 \001(\t\022@\n\005state\030\005 \001(\01621.au.com.codeka.com" +
+      "mon.protobuf.Empire.EmpireState\0224\n\006fleet" +
+      "s\030\006 \003(\0132$.au.com.codeka.common.protobuf." +
+      "Fleet\0227\n\010colonies\030\007 \003(\0132%.au.com.codeka." +
+      "common.protobuf.Colony\022C\n\016build_requests" +
+      "\030\n \003(\0132+.au.com.codeka.common.protobuf.B" +
+      "uildRequest\022\014\n\004cash\030\t \001(\002\0227\n\004rank\030\013 \001(\0132" +
+      ").au.com.codeka.common.protobuf.EmpireRa" +
+      "nk\0226\n\thome_star\030\014 \001(\0132#.au.com.codeka.co" +
+      "mmon.protobuf.Star\0229\n\010alliance\030\r \001(\0132\'.a",
+      "u.com.codeka.common.protobuf.Alliance\022 \n" +
+      "\030shield_image_last_update\030\016 \001(\003\"4\n\013Empir" +
+      "eState\022\n\n\006ACTIVE\020\001\022\n\n\006BANNED\020\002\022\r\n\tABANDO" +
+      "NED\020\003\"A\n\007Empires\0226\n\007empires\030\001 \003(\0132%.au.c" +
+      "om.codeka.common.protobuf.Empire\"\215\001\n\024Emp" +
+      "ireCashAuditEntry\022\013\n\003key\030\001 \001(\t\022\022\n\nempire" +
+      "_key\030\002 \001(\t\022\022\n\ndifference\030\003 \001(\002\022\020\n\010old_ca" +
+      "sh\030\004 \001(\002\022\020\n\010new_cash\030\005 \001(\002\022\016\n\006reason\030\006 \001" +
+      "(\t\022\014\n\004time\030\007 \001(\003\"W\n\017EmpireCashAudit\022D\n\007e" +
+      "ntries\030\001 \003(\01323.au.com.codeka.common.prot",
+      "obuf.EmpireCashAuditEntry\"\212\001\n\023EmpireRena" +
+      "meRequest\022\013\n\003key\030\001 \001(\t\022\020\n\010new_name\030\002 \001(\t" +
+      "\022\020\n\010old_name\030\004 \001(\t\022B\n\rpurchase_info\030\003 \001(" +
+      "\0132+.au.com.codeka.common.protobuf.Purcha" +
+      "seInfo\"\177\n\031EmpireChangeShieldRequest\022\013\n\003k" +
+      "ey\030\001 \001(\t\022\021\n\tpng_image\030\002 \001(\014\022B\n\rpurchase_" +
+      "info\030\003 \001(\0132+.au.com.codeka.common.protob" +
+      "uf.PurchaseInfo\"X\n\022EmpireResetRequest\022B\n" +
+      "\rpurchase_info\030\001 \001(\0132+.au.com.codeka.com" +
+      "mon.protobuf.PurchaseInfo\"\250\001\n\030EmpireBuil",
+      "dingStatistics\022S\n\006counts\030\001 \003(\0132C.au.com." +
+      "codeka.common.protobuf.EmpireBuildingSta" +
+      "tistics.DesignCount\0327\n\013DesignCount\022\021\n\tde" +
+      "sign_id\030\001 \001(\t\022\025\n\rnum_buildings\030\002 \001(\005\"\\\n\026" +
+      "EmpireAdsRemoveRequest\022B\n\rpurchase_info\030" +
+      "\001 \001(\0132+.au.com.codeka.common.protobuf.Pu" +
+      "rchaseInfo\"\260\003\n\021EmpireAltAccounts\022\021\n\tempi" +
+      "re_id\030\001 \001(\005\022T\n\nalt_empire\030\002 \003(\0132@.au.com" +
+      ".codeka.common.protobuf.EmpireAltAccount" +
+      "s.EmpireAltEmpire\022K\n\006device\030\003 \003(\0132;.au.c",
+      "om.codeka.common.protobuf.EmpireAltAccou" +
+      "nts.DeviceInfo\032b\n\017EmpireAltEmpire\022\021\n\temp" +
+      "ire_id\030\001 \001(\005\022\023\n\013empire_name\030\002 \001(\t\022\022\n\nuse" +
+      "r_email\030\003 \001(\t\022\023\n\013alliance_id\030\004 \001(\005\032\200\001\n\nD" +
+      "eviceInfo\022\021\n\tdevice_id\030\001 \001(\t\022\033\n\023device_m" +
+      "anufacturer\030\002 \001(\t\022\024\n\014device_model\030\003 \001(\t\022" +
+      "\024\n\014device_build\030\004 \001(\t\022\026\n\016device_version\030" +
+      "\005 \001(\t\"\250\001\n\014HelloRequest\022\024\n\014device_model\030\001" +
+      " \001(\t\022\033\n\023device_manufacturer\030\002 \001(\t\022\024\n\014dev" +
+      "ice_build\030\003 \001(\t\022\026\n\016device_version\030\004 \001(\t\022",
+      "\024\n\014memory_class\030\005 \001(\005\022!\n\031allow_inline_no" +
+      "tfications\030\006 \001(\010\"\331\003\n\rHelloResponse\022<\n\004mo" +
+      "td\030\001 \001(\0132..au.com.codeka.common.protobuf" +
+      ".MessageOfTheDay\0225\n\006empire\030\002 \001(\0132%.au.co" +
+      "m.codeka.common.protobuf.Empire\0227\n\010colon" +
+      "ies\030\003 \003(\0132%.au.com.codeka.common.protobu" +
+      "f.Colony\022\034\n\024require_gcm_register\030\006 \001(\010\022\030" +
+      "\n\020was_empire_reset\030\007 \001(\010\022\033\n\023empire_reset" +
+      "_reason\030\n \001(\t\022T\n\023building_statistics\030\010 \001" +
+      "(\01327.au.com.codeka.common.protobuf.Empir",
+      "eBuildingStatistics\022C\n\016build_requests\030\t " +
+      "\003(\0132+.au.com.codeka.common.protobuf.Buil" +
+      "dRequest\022\030\n\020force_remove_ads\030\013 \001(\010\022\020\n\010st" +
+      "ar_ids\030\014 \003(\003\"\300\001\n\022DeviceRegistration\022\013\n\003k" +
+      "ey\030\001 \001(\t\022\021\n\tdevice_id\030\002 \001(\t\022\033\n\023gcm_regis" +
+      "tration_id\030\003 \001(\t\022\024\n\014device_model\030\004 \001(\t\022\033" +
+      "\n\023device_manufacturer\030\005 \001(\t\022\024\n\014device_bu" +
+      "ild\030\006 \001(\t\022\026\n\016device_version\030\007 \001(\t\022\014\n\004use" +
+      "r\030\010 \001(\t\"_\n\023DeviceRegistrations\022H\n\rregist" +
+      "rations\030\001 \003(\01321.au.com.codeka.common.pro",
+      "tobuf.DeviceRegistration\"\'\n\022DeviceOnline" +
+      "Status\022\021\n\tis_online\030\001 \001(\010\"+\n\014Notificatio" +
+      "n\022\014\n\004name\030\001 \001(\t\022\r\n\005value\030\002 \001(\t\"S\n\rNotifi" +
+      "cations\022B\n\rnotifications\030\001 \003(\0132+.au.com." +
+      "codeka.common.protobuf.Notification\"s\n\023N" +
+      "otificationWrapper\022\030\n\020original_message\030\001" +
+      " \001(\014\022B\n\rnotifications\030\002 \003(\0132+.au.com.cod" +
+      "eka.common.protobuf.Notification\"\250\002\n\013Cha" +
+      "tMessage\022\n\n\002id\030\007 \001(\005\022\017\n\007message\030\001 \001(\t\022\022\n" +
+      "\nempire_key\030\002 \001(\t\022\023\n\013date_posted\030\003 \001(\003\022\024",
+      "\n\014alliance_key\030\004 \001(\t\022\022\n\nmessage_en\030\005 \001(\t" +
+      "\022\027\n\017conversation_id\030\006 \001(\005\022H\n\006action\030\010 \001(" +
+      "\01628.au.com.codeka.common.protobuf.ChatMe" +
+      "ssage.MessageAction\"F\n\rMessageAction\022\n\n\006" +
+      "Normal\020\000\022\024\n\020ParticipantAdded\020\001\022\023\n\017Partic" +
+      "ipantLeft\020\002\"L\n\014ChatMessages\022<\n\010messages\030" +
+      "\001 \003(\0132*.au.com.codeka.common.protobuf.Ch" +
+      "atMessage\"&\n\017ChatAbuseReport\022\023\n\013chat_msg" +
+      "_id\030\001 \001(\005\"p\n\020ChatConversation\022\n\n\002id\030\001 \001(" +
+      "\005\022P\n\014participants\030\002 \003(\0132:.au.com.codeka.",
+      "common.protobuf.ChatConversationParticip" +
+      "ant\"[\n\021ChatConversations\022F\n\rconversation" +
+      "s\030\001 \003(\0132/.au.com.codeka.common.protobuf." +
+      "ChatConversation\"B\n\033ChatConversationPart" +
+      "icipant\022\021\n\tempire_id\030\001 \001(\005\022\020\n\010is_muted\030\002" +
+      " \001(\010\"\327\001\n\006Sector\022\t\n\001x\030\001 \001(\003\022\t\n\001y\030\002 \001(\003\022\024\n" +
+      "\014num_colonies\030\005 \001(\005\0222\n\005stars\030\003 \003(\0132#.au." +
+      "com.codeka.common.protobuf.Star\0227\n\010colon" +
+      "ies\030\004 \003(\0132%.au.com.codeka.common.protobu" +
+      "f.Colony\0224\n\006fleets\030\006 \003(\0132$.au.com.codeka",
+      ".common.protobuf.Fleet\"\357\007\n\004Star\022\013\n\003key\030\001" +
+      " \001(\t\022\020\n\010sector_x\030\013 \001(\003\022\020\n\010sector_y\030\014 \001(\003" +
+      "\022\014\n\004name\030\002 \001(\t\022J\n\016classification\030\003 \001(\01622" +
+      ".au.com.codeka.common.protobuf.Star.CLAS" +
+      "SIFICATION\022\014\n\004size\030\005 \001(\005\022\020\n\010offset_x\030\006 \001" +
+      "(\005\022\020\n\010offset_y\030\007 \001(\005\0226\n\007planets\030\t \003(\0132%." +
+      "au.com.codeka.common.protobuf.Planet\0227\n\010" +
+      "colonies\030\n \003(\0132%.au.com.codeka.common.pr" +
+      "otobuf.Colony\022:\n\tbuildings\030\r \003(\0132\'.au.co" +
+      "m.codeka.common.protobuf.Building\022>\n\007emp",
+      "ires\030\016 \003(\0132-.au.com.codeka.common.protob" +
+      "uf.EmpirePresence\022C\n\016build_requests\030\017 \003(" +
+      "\0132+.au.com.codeka.common.protobuf.BuildR" +
+      "equest\0224\n\006fleets\030\020 \003(\0132$.au.com.codeka.c" +
+      "ommon.protobuf.Fleet\022\024\n\014time_emptied\030\021 \001" +
+      "(\003\022\027\n\017last_simulation\030\022 \001(\003\022J\n\025current_c" +
+      "ombat_report\030\023 \001(\0132+.au.com.codeka.commo" +
+      "n.protobuf.CombatReport\022<\n\005extra\030\024 \001(\0132-" +
+      ".au.com.codeka.common.protobuf.Star.Star" +
+      "Extra\032\212\001\n\tStarExtra\022\035\n\025wormhole_dest_sta",
+      "r_id\030\001 \001(\005\022#\n\033wormhole_tune_complete_tim" +
+      "e\030\002 \001(\003\022\035\n\025wormhole_tune_history\030\003 \003(\003\022\032" +
+      "\n\022wormhole_empire_id\030\004 \001(\005\"|\n\016CLASSIFICA" +
+      "TION\022\010\n\004BLUE\020\000\022\t\n\005WHITE\020\001\022\n\n\006YELLOW\020\002\022\n\n" +
+      "\006ORANGE\020\003\022\007\n\003RED\020\004\022\013\n\007NEUTRON\020\005\022\r\n\tBLACK" +
+      "HOLE\020\006\022\n\n\006MARKER\020\007\022\014\n\010WORMHOLE\020\010\";\n\005Star" +
+      "s\0222\n\005stars\030\001 \003(\0132#.au.com.codeka.common." +
+      "protobuf.Star\"\247\002\n\021StarRenameRequest\022\020\n\010s" +
+      "tar_key\030\001 \001(\t\022\020\n\010old_name\030\002 \001(\t\022\020\n\010new_n" +
+      "ame\030\003 \001(\t\022$\n\034DEPRECATED_purchase_order_i",
+      "d\030\004 \001(\t\022 \n\030DEPRECATED_purchase_time\030\005 \001(" +
+      "\003\022-\n%DEPRECATED_purchase_developer_paylo" +
+      "ad\030\006 \001(\t\022!\n\031DEPRECATED_purchase_price\030\007 " +
+      "\001(\t\022B\n\rpurchase_info\030\010 \001(\0132+.au.com.code" +
+      "ka.common.protobuf.PurchaseInfo\"@\n\023Wormh" +
+      "oleTuneRequest\022\023\n\013src_star_id\030\001 \001(\005\022\024\n\014d" +
+      "est_star_id\030\002 \001(\005\"\311\002\n\006Planet\022\r\n\005index\030\002 " +
+      "\001(\005\022F\n\013planet_type\030\003 \001(\01621.au.com.codeka" +
+      ".common.protobuf.Planet.PLANET_TYPE\022\014\n\004s" +
+      "ize\030\004 \001(\005\022\037\n\027population_congeniality\030\005 \001",
+      "(\005\022\034\n\024farming_congeniality\030\006 \001(\005\022\033\n\023mini" +
+      "ng_congeniality\030\007 \001(\005\"~\n\013PLANET_TYPE\022\014\n\010" +
+      "GASGIANT\020\001\022\014\n\010RADIATED\020\002\022\013\n\007INFERNO\020\003\022\r\n" +
+      "\tASTEROIDS\020\004\022\t\n\005WATER\020\005\022\t\n\005TOXIC\020\006\022\n\n\006DE" +
+      "SERT\020\007\022\t\n\005SWAMP\020\010\022\n\n\006TERRAN\020\t\"A\n\007Planets" +
+      "\0226\n\007planets\030\001 \003(\0132%.au.com.codeka.common" +
+      ".protobuf.Planet\"A\n\007Sectors\0226\n\007sectors\030\001" +
+      " \003(\0132%.au.com.codeka.common.protobuf.Sec" +
+      "tor\"\361\001\n\016EmpirePresence\022\013\n\003key\030\001 \001(\t\022\022\n\ne" +
+      "mpire_key\030\002 \001(\t\022\020\n\010star_key\030\003 \001(\t\022\023\n\013tot",
+      "al_goods\030\004 \001(\002\022\026\n\016total_minerals\030\005 \001(\002\022\034" +
+      "\n\024goods_delta_per_hour\030\006 \001(\002\022\037\n\027minerals" +
+      "_delta_per_hour\030\007 \001(\002\022\021\n\tmax_goods\030\010 \001(\002" +
+      "\022\024\n\014max_minerals\030\t \001(\002\022\027\n\017goods_zero_tim" +
+      "e\030\n \001(\003\"\'\n\017ColonizeRequest\022\024\n\014planet_ind" +
+      "ex\030\001 \001(\005\"\230\003\n\006Colony\022\013\n\003key\030\001 \001(\t\022\022\n\nempi" +
+      "re_key\030\002 \001(\t\022\020\n\010star_key\030\004 \001(\t\022\024\n\014planet" +
+      "_index\030\016 \001(\005\022\022\n\npopulation\030\005 \001(\002\022\"\n\032DEPR" +
+      "ECATED_last_simulation\030\006 \001(\003\022\030\n\020focus_po" +
+      "pulation\030\007 \001(\002\022\025\n\rfocus_farming\030\010 \001(\002\022\024\n",
+      "\014focus_mining\030\t \001(\002\022\032\n\022focus_constructio" +
+      "n\030\n \001(\002\022\030\n\020delta_population\030\013 \001(\002\022\023\n\013del" +
+      "ta_goods\030\014 \001(\002\022\026\n\016delta_minerals\030\r \001(\002\022\031" +
+      "\n\021uncollected_taxes\030\017 \001(\002\022\025\n\rdefence_bon" +
+      "us\030\020 \001(\002\022\026\n\016max_population\030\021 \001(\002\022\031\n\021cool" +
+      "down_end_time\030\022 \001(\003\"C\n\010Colonies\0227\n\010colon" +
+      "ies\030\001 \003(\0132%.au.com.codeka.common.protobu" +
+      "f.Colony\"\267\003\n\014BuildRequest\022\013\n\003key\030\001 \001(\t\022\022" +
+      "\n\ncolony_key\030\002 \001(\t\022\022\n\nempire_key\030\003 \001(\t\022\020" +
+      "\n\010star_key\030\013 \001(\t\022\024\n\014planet_index\030\014 \001(\005\022J",
+      "\n\nbuild_kind\030\004 \001(\01626.au.com.codeka.commo" +
+      "n.protobuf.BuildRequest.BUILD_KIND\022\023\n\013de" +
+      "sign_name\030\005 \001(\t\022\r\n\005count\030\t \001(\005\022\022\n\nstart_" +
+      "time\030\006 \001(\003\022\020\n\010end_time\030\007 \001(\003\022\020\n\010progress" +
+      "\030\010 \001(\002\022\035\n\025existing_building_key\030\n \001(\t\022\037\n" +
+      "\027existing_building_level\030\r \001(\005\022\031\n\021existi" +
+      "ng_fleet_id\030\016 \001(\005\022\022\n\nupgrade_id\030\017 \001(\t\022\r\n" +
+      "\005notes\030\020 \001(\t\"$\n\nBUILD_KIND\022\014\n\010BUILDING\020\001" +
+      "\022\010\n\004SHIP\020\002\"K\n\nBuildQueue\022=\n\010requests\030\001 \003" +
+      "(\0132+.au.com.codeka.common.protobuf.Build",
+      "Request\"^\n\010Building\022\013\n\003key\030\001 \001(\t\022\022\n\ncolo" +
+      "ny_key\030\002 \001(\t\022\023\n\013design_name\030\003 \001(\t\022\r\n\005lev" +
+      "el\030\004 \001(\005\022\r\n\005notes\030\005 \001(\t\"1\n\014FleetUpgrade\022" +
+      "\022\n\nupgrade_id\030\001 \001(\t\022\r\n\005extra\030\002 \001(\t\"\206\005\n\005F" +
+      "leet\022\013\n\003key\030\001 \001(\t\022\022\n\nempire_key\030\002 \001(\t\022\023\n" +
+      "\013alliance_id\030\022 \001(\005\022\023\n\013design_name\030\003 \001(\t\022" +
+      "\021\n\tnum_ships\030\004 \001(\002\022?\n\005state\030\005 \001(\01620.au.c" +
+      "om.codeka.common.protobuf.Fleet.FLEET_ST" +
+      "ATE\022\030\n\020state_start_time\030\006 \001(\003\022\020\n\010star_ke" +
+      "y\030\007 \001(\t\022\034\n\024destination_star_key\030\010 \001(\t\022\030\n",
+      "\020target_fleet_key\030\t \001(\t\022\031\n\021target_colony" +
+      "_key\030\n \001(\t\022A\n\006stance\030\013 \001(\01621.au.com.code" +
+      "ka.common.protobuf.Fleet.FLEET_STANCE\022\026\n" +
+      "\016time_destroyed\030\014 \001(\003\022%\n\035block_notificat" +
+      "ion_on_destroy\030\016 \001(\010\022\024\n\014last_victory\030\r \001" +
+      "(\003\022\013\n\003eta\030\017 \001(\003\022=\n\010upgrades\030\020 \003(\0132+.au.c" +
+      "om.codeka.common.protobuf.FleetUpgrade\022\r" +
+      "\n\005notes\030\021 \001(\t\"2\n\013FLEET_STATE\022\010\n\004IDLE\020\001\022\n" +
+      "\n\006MOVING\020\002\022\r\n\tATTACKING\020\003\"8\n\014FLEET_STANC" +
+      "E\022\013\n\007PASSIVE\020\001\022\013\n\007NEUTRAL\020\002\022\016\n\nAGGRESSIV",
+      "E\020\003\">\n\006Fleets\0224\n\006fleets\030\001 \003(\0132$.au.com.c" +
+      "odeka.common.protobuf.Fleet\"\217\003\n\nFleetOrd" +
+      "er\022D\n\005order\030\001 \001(\01625.au.com.codeka.common" +
+      ".protobuf.FleetOrder.FLEET_ORDER\022\022\n\nspli" +
+      "t_left\030\002 \001(\005\022\023\n\013split_right\030\003 \001(\005\022\020\n\010sta" +
+      "r_key\030\004 \001(\t\022A\n\006stance\030\005 \001(\01621.au.com.cod" +
+      "eka.common.protobuf.Fleet.FLEET_STANCE\022\027" +
+      "\n\017merge_fleet_key\030\006 \001(\t\022\020\n\010sector_x\030\007 \001(" +
+      "\003\022\020\n\010sector_y\030\010 \001(\003\022\020\n\010offset_x\030\t \001(\005\022\020\n" +
+      "\010offset_y\030\n \001(\005\"\\\n\013FLEET_ORDER\022\t\n\005SPLIT\020",
+      "\001\022\t\n\005MERGE\020\002\022\010\n\004MOVE\020\003\022\016\n\nSET_STANCE\020\005\022\t" +
+      "\n\005BOOST\020\006\022\022\n\016ENTER_WORMHOLE\020\007\"_\n\013ScoutRe" +
+      "port\022\013\n\003key\030\001 \001(\t\022\022\n\nempire_key\030\002 \001(\t\022\020\n" +
+      "\010star_key\030\003 \001(\t\022\014\n\004date\030\005 \001(\003\022\017\n\007star_pb" +
+      "\030\004 \001(\014\"K\n\014ScoutReports\022;\n\007reports\030\001 \003(\0132" +
+      "*.au.com.codeka.common.protobuf.ScoutRep" +
+      "ort\"\252\006\n\013CombatRound\022\020\n\010star_key\030\001 \001(\t\022\022\n" +
+      "\nround_time\030\002 \001(\003\022G\n\006fleets\030\003 \003(\01327.au.c" +
+      "om.codeka.common.protobuf.CombatRound.Fl" +
+      "eetSummary\022S\n\rfleets_joined\030\004 \003(\0132<.au.c",
+      "om.codeka.common.protobuf.CombatRound.Fl" +
+      "eetJoinedRecord\022V\n\020fleets_targetted\030\005 \003(" +
+      "\0132<.au.com.codeka.common.protobuf.Combat" +
+      "Round.FleetTargetRecord\022U\n\017fleets_attack" +
+      "ed\030\006 \003(\0132<.au.com.codeka.common.protobuf" +
+      ".CombatRound.FleetAttackRecord\022U\n\016fleets" +
+      "_damaged\030\007 \003(\0132=.au.com.codeka.common.pr" +
+      "otobuf.CombatRound.FleetDamagedRecord\032\\\n" +
+      "\014FleetSummary\022\022\n\nfleet_keys\030\001 \003(\t\022\022\n\nemp" +
+      "ire_key\030\002 \001(\t\022\021\n\tdesign_id\030\003 \001(\t\022\021\n\tnum_",
+      "ships\030\004 \001(\002\032(\n\021FleetJoinedRecord\022\023\n\013flee" +
+      "t_index\030\001 \001(\005\032>\n\021FleetTargetRecord\022\023\n\013fl" +
+      "eet_index\030\001 \001(\005\022\024\n\014target_index\030\002 \001(\005\032N\n" +
+      "\021FleetAttackRecord\022\023\n\013fleet_index\030\001 \001(\005\022" +
+      "\024\n\014target_index\030\002 \001(\005\022\016\n\006damage\030\003 \001(\002\0329\n" +
+      "\022FleetDamagedRecord\022\023\n\013fleet_index\030\001 \001(\005" +
+      "\022\016\n\006damage\030\002 \001(\002\"\332\001\n\014CombatReport\022\013\n\003key" +
+      "\030\001 \001(\t\022\020\n\010star_key\030\002 \001(\t\022\022\n\nstart_time\030\003" +
+      " \001(\003\022\020\n\010end_time\030\004 \001(\003\022\031\n\021start_empire_k" +
+      "eys\030\005 \003(\t\022\027\n\017end_empire_keys\030\006 \003(\t\022\025\n\rnu",
+      "m_destroyed\030\007 \001(\005\022:\n\006rounds\030\010 \003(\0132*.au.c" +
+      "om.codeka.common.protobuf.CombatRound\"M\n" +
+      "\rCombatReports\022<\n\007reports\030\001 \003(\0132+.au.com" +
+      ".codeka.common.protobuf.CombatReport\"\304\r\n" +
+      "\017SituationReport\022\013\n\003key\030\001 \001(\t\022\022\n\nempire_" +
+      "key\030\002 \001(\t\022\023\n\013report_time\030\003 \001(\003\022\020\n\010star_k" +
+      "ey\030\004 \001(\t\022\024\n\014planet_index\030\005 \001(\005\022\r\n\005realm\030" +
+      "\016 \001(\t\022a\n\025build_complete_record\030\006 \001(\0132B.a" +
+      "u.com.codeka.common.protobuf.SituationRe" +
+      "port.BuildCompleteRecord\022_\n\024move_complet",
+      "e_record\030\007 \001(\0132A.au.com.codeka.common.pr" +
+      "otobuf.SituationReport.MoveCompleteRecor" +
+      "d\022h\n\031fleet_under_attack_record\030\010 \001(\0132E.a" +
+      "u.com.codeka.common.protobuf.SituationRe" +
+      "port.FleetUnderAttackRecord\022c\n\026fleet_des" +
+      "troyed_record\030\t \001(\0132C.au.com.codeka.comm" +
+      "on.protobuf.SituationReport.FleetDestroy" +
+      "edRecord\022e\n\027fleet_victorious_record\030\n \001(" +
+      "\0132D.au.com.codeka.common.protobuf.Situat" +
+      "ionReport.FleetVictoriousRecord\022e\n\027colon",
+      "y_destroyed_record\030\013 \001(\0132D.au.com.codeka" +
+      ".common.protobuf.SituationReport.ColonyD" +
+      "estroyedRecord\022c\n\026colony_attacked_record" +
+      "\030\014 \001(\0132C.au.com.codeka.common.protobuf.S" +
+      "ituationReport.ColonyAttackedRecord\022l\n\034s" +
+      "tar_ran_out_of_goods_record\030\r \001(\0132F.au.c" +
+      "om.codeka.common.protobuf.SituationRepor" +
+      "t.StarRunOutOfGoodsRecord\032\236\001\n\023BuildCompl" +
+      "eteRecord\022J\n\nbuild_kind\030\001 \001(\01626.au.com.c" +
+      "odeka.common.protobuf.BuildRequest.BUILD",
+      "_KIND\022\021\n\tdesign_id\030\002 \001(\t\022\r\n\005count\030\003 \001(\005\022" +
+      "\031\n\021build_request_key\030\004 \001(\t\032m\n\022MoveComple" +
+      "teRecord\022\021\n\tfleet_key\030\001 \001(\t\022\027\n\017fleet_des" +
+      "ign_id\030\003 \001(\t\022\021\n\tnum_ships\030\004 \001(\002\022\030\n\020scout" +
+      "_report_key\030\005 \001(\t\032r\n\026FleetUnderAttackRec" +
+      "ord\022\021\n\tfleet_key\030\001 \001(\t\022\027\n\017fleet_design_i" +
+      "d\030\002 \001(\t\022\021\n\tnum_ships\030\003 \001(\002\022\031\n\021combat_rep" +
+      "ort_key\030\004 \001(\t\032J\n\024FleetDestroyedRecord\022\027\n" +
+      "\017fleet_design_id\030\001 \001(\t\022\031\n\021combat_report_" +
+      "key\030\002 \001(\t\032q\n\025FleetVictoriousRecord\022\021\n\tfl",
+      "eet_key\030\001 \001(\t\022\027\n\017fleet_design_id\030\002 \001(\t\022\021" +
+      "\n\tnum_ships\030\003 \001(\002\022\031\n\021combat_report_key\030\004" +
+      " \001(\t\032E\n\025ColonyDestroyedRecord\022\022\n\ncolony_" +
+      "key\030\001 \001(\t\022\030\n\020enemy_empire_key\030\002 \001(\t\032W\n\024C" +
+      "olonyAttackedRecord\022\022\n\ncolony_key\030\001 \001(\t\022" +
+      "\030\n\020enemy_empire_key\030\002 \001(\t\022\021\n\tnum_ships\030\003" +
+      " \001(\002\032-\n\027StarRunOutOfGoodsRecord\022\022\n\ncolon" +
+      "y_key\030\001 \001(\t\"m\n\020SituationReports\022I\n\021situa" +
+      "tion_reports\030\001 \003(\0132..au.com.codeka.commo" +
+      "n.protobuf.SituationReport\022\016\n\006cursor\030\002 \001",
+      "(\t\"\216\004\n\017CashAuditRecord\022\n\n\002id\030\001 \001(\005\022\021\n\tem" +
+      "pire_id\030\002 \001(\005\022E\n\006reason\030\003 \001(\01625.au.com.c" +
+      "odeka.common.protobuf.CashAuditRecord.Re" +
+      "ason\022\023\n\013before_cash\030\004 \001(\002\022\022\n\nafter_cash\030" +
+      "\005 \001(\002\022\014\n\004time\030\020 \001(\003\022\020\n\010fleet_id\030\006 \001(\005\022\027\n" +
+      "\017fleet_design_id\030\007 \001(\t\022\021\n\tnum_ships\030\010 \001(" +
+      "\002\022\017\n\007star_id\030\t \001(\005\022\021\n\tstar_name\030\n \001(\t\022\025\n" +
+      "\rmove_distance\030\013 \001(\002\022\027\n\017build_design_id\030" +
+      "\014 \001(\t\022\023\n\013build_count\030\r \001(\005\022\031\n\021accelerate" +
+      "_amount\030\016 \001(\002\022\025\n\ralliance_name\030\017 \001(\t\"\204\001\n",
+      "\006Reason\022\r\n\tFleetMove\020\000\022\023\n\017BuildAccelerat" +
+      "e\020\001\022\027\n\023CollectFromColonies\020\002\022\022\n\016CreateAl" +
+      "liance\020\003\022\023\n\017AllianceDeposit\020\004\022\024\n\020Allianc" +
+      "eWithdraw\020\005\"S\n\020CashAuditRecords\022?\n\007recor" +
+      "ds\030\001 \003(\0132..au.com.codeka.common.protobuf" +
+      ".CashAuditRecord\"\302\001\n\010Alliance\022\013\n\003key\030\001 \001" +
+      "(\t\022\014\n\004name\030\002 \001(\t\022\024\n\014time_created\030\003 \001(\003\022\032" +
+      "\n\022creator_empire_key\030\004 \001(\t\022\024\n\014bank_balan" +
+      "ce\030\007 \001(\001\022\023\n\013num_members\030\005 \001(\005\022>\n\007members" +
+      "\030\006 \003(\0132-.au.com.codeka.common.protobuf.A",
+      "llianceMember\"G\n\tAlliances\022:\n\talliances\030" +
+      "\001 \003(\0132\'.au.com.codeka.common.protobuf.Al" +
+      "liance\"\317\001\n\016AllianceMember\022\013\n\003key\030\001 \001(\t\022\022" +
+      "\n\nempire_key\030\002 \001(\t\022\024\n\014alliance_key\030\003 \001(\t" +
+      "\022\023\n\013time_joined\030\004 \001(\003\022@\n\004rank\030\005 \001(\01622.au" +
+      ".com.codeka.common.protobuf.AllianceMemb" +
+      "er.Rank\"/\n\004Rank\022\013\n\007CAPTAIN\020\000\022\016\n\nLIEUTENA" +
+      "NT\020\001\022\n\n\006MEMBER\020\002\"\346\003\n\017AllianceRequest\022\n\n\002" +
+      "id\030\001 \001(\005\022\023\n\013alliance_id\030\002 \001(\005\022\031\n\021request" +
+      "_empire_id\030\003 \001(\005\022\024\n\014request_date\030\004 \001(\003\022P",
+      "\n\014request_type\030\005 \001(\0162:.au.com.codeka.com" +
+      "mon.protobuf.AllianceRequest.RequestType" +
+      "\022\017\n\007message\030\006 \001(\t\022J\n\005state\030\007 \001(\0162;.au.co" +
+      "m.codeka.common.protobuf.AllianceRequest" +
+      ".RequestState\022\r\n\005votes\030\010 \001(\005\022\030\n\020target_e" +
+      "mpire_id\030\t \001(\005\022\016\n\006amount\030\n \001(\002\"Q\n\013Reques" +
+      "tType\022\010\n\004JOIN\020\000\022\t\n\005LEAVE\020\001\022\010\n\004KICK\020\002\022\020\n\014" +
+      "DEPOSIT_CASH\020\003\022\021\n\rWITHDRAW_CASH\020\004\"F\n\014Req" +
+      "uestState\022\013\n\007PENDING\020\000\022\014\n\010ACCEPTED\020\001\022\014\n\010" +
+      "REJECTED\020\002\022\r\n\tWITHDRAWN\020\003\"d\n\020AllianceReq",
+      "uests\022@\n\010requests\030\001 \003(\0132..au.com.codeka." +
+      "common.protobuf.AllianceRequest\022\016\n\006curso" +
+      "r\030\002 \001(\t\"\203\001\n\023AllianceRequestVote\022\n\n\002id\030\001 " +
+      "\001(\005\022\023\n\013alliance_id\030\002 \001(\005\022\033\n\023alliance_req" +
+      "uest_id\030\003 \001(\005\022\021\n\tempire_id\030\004 \001(\005\022\r\n\005vote" +
+      "s\030\005 \001(\005\022\014\n\004date\030\006 \001(\003\"\243\003\n\013ErrorReport\022\027\n" +
+      "\017android_version\030\001 \001(\t\022\023\n\013phone_model\030\002 " +
+      "\001(\t\022\024\n\014package_name\030\003 \001(\t\022\023\n\013app_version" +
+      "\030\004 \001(\t\022\023\n\013stack_trace\030\005 \001(\t\022\017\n\007message\030\006" +
+      " \001(\t\022\023\n\013report_time\030\007 \001(\003\022\021\n\tempire_id\030\010",
+      " \001(\005\022\017\n\007context\030\t \001(\t\022\027\n\017exception_class" +
+      "\030\n \001(\t\022\021\n\theap_size\030\013 \001(\003\022\026\n\016heap_alloca" +
+      "ted\030\014 \001(\003\022\021\n\theap_free\030\r \001(\003\022\026\n\016total_ru" +
+      "n_time\030\016 \001(\003\022\033\n\023foreground_run_time\030\017 \001(" +
+      "\003\022\022\n\nlog_output\030\020 \001(\t\022\031\n\021server_request_" +
+      "qs\030\021 \001(\t\022!\n\031server_request_user_agent\030\022 " +
+      "\001(\t\"K\n\014ErrorReports\022;\n\007reports\030\001 \003(\0132*.a" +
+      "u.com.codeka.common.protobuf.ErrorReport" +
+      "*\344\001\n\025SituationReportFilter\022\013\n\007ShowAll\020\000\022" +
+      "\020\n\014MoveComplete\020\001\022\024\n\020BuildCompleteAny\020\002\022",
+      "\021\n\rFleetAttacked\020\003\022\022\n\016FleetDestroyed\020\004\022\023" +
+      "\n\017FleetVictorious\020\005\022\022\n\016ColonyAttacked\020\006\022" +
+      "\023\n\017ColonyDestroyed\020\007\022\026\n\022BuildCompleteShi" +
+      "ps\020\010\022\031\n\025BuildCompleteBuilding\020\t"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
       new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {

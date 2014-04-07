@@ -66,14 +66,17 @@ public class AdminLoginHandler extends AdminHandler {
         String cookieValue = new LoginController().generateCookie(emailAddr, true, null);
 
         Cookie cookie = new Cookie("SESSION", cookieValue);
-        getResponse().addCookie(cookie);
-        getResponse().setStatus(302);
+        cookie.setHttpOnly(true);
+        cookie.setPath("/realms/"+getRealm());
 
         String continueUrl = getRequest().getParameter("continue");
         if (continueUrl == null) {
             continueUrl = "/realms/"+getRealm()+"/admin";
         }
-        getResponse().addHeader("Location", continueUrl);
+
+        getResponse().addCookie(cookie);
+        getResponse().setStatus(302);
+        getResponse().setHeader("Location", continueUrl);
     }
 
     public class TokenParser {
