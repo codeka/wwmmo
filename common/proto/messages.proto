@@ -1303,6 +1303,10 @@ message Alliance
 
     // If set, the actual collection of members
     repeated AllianceMember members = 6;
+
+    // The date the alliance's image was last changed (so we know if
+    // we need to re-fetch a cached version).
+    optional int64 date_image_updated = 8;
 }
 
 
@@ -1342,6 +1346,8 @@ message AllianceRequest
         KICK = 2;
         DEPOSIT_CASH = 3;
         WITHDRAW_CASH = 4;
+        CHANGE_IMAGE = 5;
+        CHANGE_NAME = 6;
     }
     optional RequestType request_type = 5;
     optional string message = 6;
@@ -1362,6 +1368,12 @@ message AllianceRequest
 
     // for DEPOSIT_CASH and WITHDRAW_CASH, the amount of cash to deposit/withdraw
     optional float amount = 10;
+
+    // for CHANGE_IMAGE, the new image to use
+    optional bytes png_image = 11;
+
+    // for CHANGE_NAME, the new name you want
+    optional string new_name = 12;
 }
 
 

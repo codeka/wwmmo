@@ -21,6 +21,15 @@
         android:text="Alliance Name"
         android:textAppearance="?android:attr/textAppearanceMedium" />
 
+    <Button
+        android:id="@+id/change_details_btn"
+        android:layout_width="100dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:layout_margin="10dp"
+        android:text="Change" />
+
     <TextView
         android:id="@+id/alliance_num_members"
         android:layout_width="wrap_content"
