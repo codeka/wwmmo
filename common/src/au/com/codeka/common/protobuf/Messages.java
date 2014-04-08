@@ -83219,6 +83219,26 @@ public final class Messages {
      */
     au.com.codeka.common.protobuf.Messages.AllianceMemberOrBuilder getMembersOrBuilder(
         int index);
+
+    // optional int64 date_image_updated = 8;
+    /**
+     * <code>optional int64 date_image_updated = 8;</code>
+     *
+     * <pre>
+     * The date the alliance's image was last changed (so we know if
+     * we need to re-fetch a cached version).
+     * </pre>
+     */
+    boolean hasDateImageUpdated();
+    /**
+     * <code>optional int64 date_image_updated = 8;</code>
+     *
+     * <pre>
+     * The date the alliance's image was last changed (so we know if
+     * we need to re-fetch a cached version).
+     * </pre>
+     */
+    long getDateImageUpdated();
   }
   /**
    * Protobuf type {@code au.com.codeka.common.protobuf.Alliance}
@@ -83312,6 +83332,11 @@ public final class Messages {
             case 57: {
               bitField0_ |= 0x00000010;
               bankBalance_ = input.readDouble();
+              break;
+            }
+            case 64: {
+              bitField0_ |= 0x00000040;
+              dateImageUpdated_ = input.readInt64();
               break;
             }
           }
@@ -83638,6 +83663,32 @@ public final class Messages {
       return members_.get(index);
     }
 
+    // optional int64 date_image_updated = 8;
+    public static final int DATE_IMAGE_UPDATED_FIELD_NUMBER = 8;
+    private long dateImageUpdated_;
+    /**
+     * <code>optional int64 date_image_updated = 8;</code>
+     *
+     * <pre>
+     * The date the alliance's image was last changed (so we know if
+     * we need to re-fetch a cached version).
+     * </pre>
+     */
+    public boolean hasDateImageUpdated() {
+      return ((bitField0_ & 0x00000040) == 0x00000040);
+    }
+    /**
+     * <code>optional int64 date_image_updated = 8;</code>
+     *
+     * <pre>
+     * The date the alliance's image was last changed (so we know if
+     * we need to re-fetch a cached version).
+     * </pre>
+     */
+    public long getDateImageUpdated() {
+      return dateImageUpdated_;
+    }
+
     private void initFields() {
       key_ = "";
       name_ = "";
@@ -83646,6 +83697,7 @@ public final class Messages {
       bankBalance_ = 0D;
       numMembers_ = 0;
       members_ = java.util.Collections.emptyList();
+      dateImageUpdated_ = 0L;
     }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
@@ -83679,6 +83731,9 @@ public final class Messages {
       }
       if (((bitField0_ & 0x00000010) == 0x00000010)) {
         output.writeDouble(7, bankBalance_);
+      }
+      if (((bitField0_ & 0x00000040) == 0x00000040)) {
+        output.writeInt64(8, dateImageUpdated_);
       }
       getUnknownFields().writeTo(output);
     }
@@ -83716,6 +83771,10 @@ public final class Messages {
       if (((bitField0_ & 0x00000010) == 0x00000010)) {
         size += com.google.protobuf.CodedOutputStream
           .computeDoubleSize(7, bankBalance_);
+      }
+      if (((bitField0_ & 0x00000040) == 0x00000040)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt64Size(8, dateImageUpdated_);
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
@@ -83857,6 +83916,8 @@ public final class Messages {
         } else {
           membersBuilder_.clear();
         }
+        dateImageUpdated_ = 0L;
+        bitField0_ = (bitField0_ & ~0x00000080);
         return this;
       }
 
@@ -83918,6 +83979,10 @@ public final class Messages {
         } else {
           result.members_ = membersBuilder_.build();
         }
+        if (((from_bitField0_ & 0x00000080) == 0x00000080)) {
+          to_bitField0_ |= 0x00000040;
+        }
+        result.dateImageUpdated_ = dateImageUpdated_;
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
@@ -83983,6 +84048,9 @@ public final class Messages {
               membersBuilder_.addAllMessages(other.members_);
             }
           }
+        }
+        if (other.hasDateImageUpdated()) {
+          setDateImageUpdated(other.getDateImageUpdated());
         }
         this.mergeUnknownFields(other.getUnknownFields());
         return this;
@@ -84738,6 +84806,59 @@ public final class Messages {
           members_ = null;
         }
         return membersBuilder_;
+      }
+
+      // optional int64 date_image_updated = 8;
+      private long dateImageUpdated_ ;
+      /**
+       * <code>optional int64 date_image_updated = 8;</code>
+       *
+       * <pre>
+       * The date the alliance's image was last changed (so we know if
+       * we need to re-fetch a cached version).
+       * </pre>
+       */
+      public boolean hasDateImageUpdated() {
+        return ((bitField0_ & 0x00000080) == 0x00000080);
+      }
+      /**
+       * <code>optional int64 date_image_updated = 8;</code>
+       *
+       * <pre>
+       * The date the alliance's image was last changed (so we know if
+       * we need to re-fetch a cached version).
+       * </pre>
+       */
+      public long getDateImageUpdated() {
+        return dateImageUpdated_;
+      }
+      /**
+       * <code>optional int64 date_image_updated = 8;</code>
+       *
+       * <pre>
+       * The date the alliance's image was last changed (so we know if
+       * we need to re-fetch a cached version).
+       * </pre>
+       */
+      public Builder setDateImageUpdated(long value) {
+        bitField0_ |= 0x00000080;
+        dateImageUpdated_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional int64 date_image_updated = 8;</code>
+       *
+       * <pre>
+       * The date the alliance's image was last changed (so we know if
+       * we need to re-fetch a cached version).
+       * </pre>
+       */
+      public Builder clearDateImageUpdated() {
+        bitField0_ = (bitField0_ & ~0x00000080);
+        dateImageUpdated_ = 0L;
+        onChanged();
+        return this;
       }
 
       // @@protoc_insertion_point(builder_scope:au.com.codeka.common.protobuf.Alliance)
@@ -86593,6 +86714,51 @@ public final class Messages {
      * </pre>
      */
     float getAmount();
+
+    // optional bytes png_image = 11;
+    /**
+     * <code>optional bytes png_image = 11;</code>
+     *
+     * <pre>
+     * for CHANGE_IMAGE, the new image to use
+     * </pre>
+     */
+    boolean hasPngImage();
+    /**
+     * <code>optional bytes png_image = 11;</code>
+     *
+     * <pre>
+     * for CHANGE_IMAGE, the new image to use
+     * </pre>
+     */
+    com.google.protobuf.ByteString getPngImage();
+
+    // optional string new_name = 12;
+    /**
+     * <code>optional string new_name = 12;</code>
+     *
+     * <pre>
+     * for CHANGE_NAME, the new name you want
+     * </pre>
+     */
+    boolean hasNewName();
+    /**
+     * <code>optional string new_name = 12;</code>
+     *
+     * <pre>
+     * for CHANGE_NAME, the new name you want
+     * </pre>
+     */
+    java.lang.String getNewName();
+    /**
+     * <code>optional string new_name = 12;</code>
+     *
+     * <pre>
+     * for CHANGE_NAME, the new name you want
+     * </pre>
+     */
+    com.google.protobuf.ByteString
+        getNewNameBytes();
   }
   /**
    * Protobuf type {@code au.com.codeka.common.protobuf.AllianceRequest}
@@ -86707,6 +86873,16 @@ public final class Messages {
               amount_ = input.readFloat();
               break;
             }
+            case 90: {
+              bitField0_ |= 0x00000400;
+              pngImage_ = input.readBytes();
+              break;
+            }
+            case 98: {
+              bitField0_ |= 0x00000800;
+              newName_ = input.readBytes();
+              break;
+            }
           }
         }
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
@@ -86771,6 +86947,14 @@ public final class Messages {
        * <code>WITHDRAW_CASH = 4;</code>
        */
       WITHDRAW_CASH(4, 4),
+      /**
+       * <code>CHANGE_IMAGE = 5;</code>
+       */
+      CHANGE_IMAGE(5, 5),
+      /**
+       * <code>CHANGE_NAME = 6;</code>
+       */
+      CHANGE_NAME(6, 6),
       ;
 
       /**
@@ -86793,6 +86977,14 @@ public final class Messages {
        * <code>WITHDRAW_CASH = 4;</code>
        */
       public static final int WITHDRAW_CASH_VALUE = 4;
+      /**
+       * <code>CHANGE_IMAGE = 5;</code>
+       */
+      public static final int CHANGE_IMAGE_VALUE = 5;
+      /**
+       * <code>CHANGE_NAME = 6;</code>
+       */
+      public static final int CHANGE_NAME_VALUE = 6;
 
 
       public final int getNumber() { return value; }
@@ -86804,6 +86996,8 @@ public final class Messages {
           case 2: return KICK;
           case 3: return DEPOSIT_CASH;
           case 4: return WITHDRAW_CASH;
+          case 5: return CHANGE_IMAGE;
+          case 6: return CHANGE_NAME;
           default: return null;
         }
       }
@@ -87159,6 +87353,85 @@ public final class Messages {
       return amount_;
     }
 
+    // optional bytes png_image = 11;
+    public static final int PNG_IMAGE_FIELD_NUMBER = 11;
+    private com.google.protobuf.ByteString pngImage_;
+    /**
+     * <code>optional bytes png_image = 11;</code>
+     *
+     * <pre>
+     * for CHANGE_IMAGE, the new image to use
+     * </pre>
+     */
+    public boolean hasPngImage() {
+      return ((bitField0_ & 0x00000400) == 0x00000400);
+    }
+    /**
+     * <code>optional bytes png_image = 11;</code>
+     *
+     * <pre>
+     * for CHANGE_IMAGE, the new image to use
+     * </pre>
+     */
+    public com.google.protobuf.ByteString getPngImage() {
+      return pngImage_;
+    }
+
+    // optional string new_name = 12;
+    public static final int NEW_NAME_FIELD_NUMBER = 12;
+    private java.lang.Object newName_;
+    /**
+     * <code>optional string new_name = 12;</code>
+     *
+     * <pre>
+     * for CHANGE_NAME, the new name you want
+     * </pre>
+     */
+    public boolean hasNewName() {
+      return ((bitField0_ & 0x00000800) == 0x00000800);
+    }
+    /**
+     * <code>optional string new_name = 12;</code>
+     *
+     * <pre>
+     * for CHANGE_NAME, the new name you want
+     * </pre>
+     */
+    public java.lang.String getNewName() {
+      java.lang.Object ref = newName_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        if (bs.isValidUtf8()) {
+          newName_ = s;
+        }
+        return s;
+      }
+    }
+    /**
+     * <code>optional string new_name = 12;</code>
+     *
+     * <pre>
+     * for CHANGE_NAME, the new name you want
+     * </pre>
+     */
+    public com.google.protobuf.ByteString
+        getNewNameBytes() {
+      java.lang.Object ref = newName_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        newName_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
     private void initFields() {
       id_ = 0;
       allianceId_ = 0;
@@ -87170,6 +87443,8 @@ public final class Messages {
       votes_ = 0;
       targetEmpireId_ = 0;
       amount_ = 0F;
+      pngImage_ = com.google.protobuf.ByteString.EMPTY;
+      newName_ = "";
     }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
@@ -87212,6 +87487,12 @@ public final class Messages {
       }
       if (((bitField0_ & 0x00000200) == 0x00000200)) {
         output.writeFloat(10, amount_);
+      }
+      if (((bitField0_ & 0x00000400) == 0x00000400)) {
+        output.writeBytes(11, pngImage_);
+      }
+      if (((bitField0_ & 0x00000800) == 0x00000800)) {
+        output.writeBytes(12, getNewNameBytes());
       }
       getUnknownFields().writeTo(output);
     }
@@ -87261,6 +87542,14 @@ public final class Messages {
       if (((bitField0_ & 0x00000200) == 0x00000200)) {
         size += com.google.protobuf.CodedOutputStream
           .computeFloatSize(10, amount_);
+      }
+      if (((bitField0_ & 0x00000400) == 0x00000400)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBytesSize(11, pngImage_);
+      }
+      if (((bitField0_ & 0x00000800) == 0x00000800)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBytesSize(12, getNewNameBytes());
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
@@ -87398,6 +87687,10 @@ public final class Messages {
         bitField0_ = (bitField0_ & ~0x00000100);
         amount_ = 0F;
         bitField0_ = (bitField0_ & ~0x00000200);
+        pngImage_ = com.google.protobuf.ByteString.EMPTY;
+        bitField0_ = (bitField0_ & ~0x00000400);
+        newName_ = "";
+        bitField0_ = (bitField0_ & ~0x00000800);
         return this;
       }
 
@@ -87466,6 +87759,14 @@ public final class Messages {
           to_bitField0_ |= 0x00000200;
         }
         result.amount_ = amount_;
+        if (((from_bitField0_ & 0x00000400) == 0x00000400)) {
+          to_bitField0_ |= 0x00000400;
+        }
+        result.pngImage_ = pngImage_;
+        if (((from_bitField0_ & 0x00000800) == 0x00000800)) {
+          to_bitField0_ |= 0x00000800;
+        }
+        result.newName_ = newName_;
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
@@ -87513,6 +87814,14 @@ public final class Messages {
         }
         if (other.hasAmount()) {
           setAmount(other.getAmount());
+        }
+        if (other.hasPngImage()) {
+          setPngImage(other.getPngImage());
+        }
+        if (other.hasNewName()) {
+          bitField0_ |= 0x00000800;
+          newName_ = other.newName_;
+          onChanged();
         }
         this.mergeUnknownFields(other.getUnknownFields());
         return this;
@@ -87946,6 +88255,156 @@ public final class Messages {
       public Builder clearAmount() {
         bitField0_ = (bitField0_ & ~0x00000200);
         amount_ = 0F;
+        onChanged();
+        return this;
+      }
+
+      // optional bytes png_image = 11;
+      private com.google.protobuf.ByteString pngImage_ = com.google.protobuf.ByteString.EMPTY;
+      /**
+       * <code>optional bytes png_image = 11;</code>
+       *
+       * <pre>
+       * for CHANGE_IMAGE, the new image to use
+       * </pre>
+       */
+      public boolean hasPngImage() {
+        return ((bitField0_ & 0x00000400) == 0x00000400);
+      }
+      /**
+       * <code>optional bytes png_image = 11;</code>
+       *
+       * <pre>
+       * for CHANGE_IMAGE, the new image to use
+       * </pre>
+       */
+      public com.google.protobuf.ByteString getPngImage() {
+        return pngImage_;
+      }
+      /**
+       * <code>optional bytes png_image = 11;</code>
+       *
+       * <pre>
+       * for CHANGE_IMAGE, the new image to use
+       * </pre>
+       */
+      public Builder setPngImage(com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000400;
+        pngImage_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional bytes png_image = 11;</code>
+       *
+       * <pre>
+       * for CHANGE_IMAGE, the new image to use
+       * </pre>
+       */
+      public Builder clearPngImage() {
+        bitField0_ = (bitField0_ & ~0x00000400);
+        pngImage_ = getDefaultInstance().getPngImage();
+        onChanged();
+        return this;
+      }
+
+      // optional string new_name = 12;
+      private java.lang.Object newName_ = "";
+      /**
+       * <code>optional string new_name = 12;</code>
+       *
+       * <pre>
+       * for CHANGE_NAME, the new name you want
+       * </pre>
+       */
+      public boolean hasNewName() {
+        return ((bitField0_ & 0x00000800) == 0x00000800);
+      }
+      /**
+       * <code>optional string new_name = 12;</code>
+       *
+       * <pre>
+       * for CHANGE_NAME, the new name you want
+       * </pre>
+       */
+      public java.lang.String getNewName() {
+        java.lang.Object ref = newName_;
+        if (!(ref instanceof java.lang.String)) {
+          java.lang.String s = ((com.google.protobuf.ByteString) ref)
+              .toStringUtf8();
+          newName_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>optional string new_name = 12;</code>
+       *
+       * <pre>
+       * for CHANGE_NAME, the new name you want
+       * </pre>
+       */
+      public com.google.protobuf.ByteString
+          getNewNameBytes() {
+        java.lang.Object ref = newName_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          newName_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>optional string new_name = 12;</code>
+       *
+       * <pre>
+       * for CHANGE_NAME, the new name you want
+       * </pre>
+       */
+      public Builder setNewName(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000800;
+        newName_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional string new_name = 12;</code>
+       *
+       * <pre>
+       * for CHANGE_NAME, the new name you want
+       * </pre>
+       */
+      public Builder clearNewName() {
+        bitField0_ = (bitField0_ & ~0x00000800);
+        newName_ = getDefaultInstance().getNewName();
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional string new_name = 12;</code>
+       *
+       * <pre>
+       * for CHANGE_NAME, the new name you want
+       * </pre>
+       */
+      public Builder setNewNameBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000800;
+        newName_ = value;
         onChanged();
         return this;
       }
@@ -93631,55 +94090,58 @@ public final class Messages {
       "liance\020\003\022\023\n\017AllianceDeposit\020\004\022\024\n\020Allianc" +
       "eWithdraw\020\005\"S\n\020CashAuditRecords\022?\n\007recor" +
       "ds\030\001 \003(\0132..au.com.codeka.common.protobuf" +
-      ".CashAuditRecord\"\302\001\n\010Alliance\022\013\n\003key\030\001 \001" +
+      ".CashAuditRecord\"\336\001\n\010Alliance\022\013\n\003key\030\001 \001" +
       "(\t\022\014\n\004name\030\002 \001(\t\022\024\n\014time_created\030\003 \001(\003\022\032" +
       "\n\022creator_empire_key\030\004 \001(\t\022\024\n\014bank_balan" +
       "ce\030\007 \001(\001\022\023\n\013num_members\030\005 \001(\005\022>\n\007members" +
       "\030\006 \003(\0132-.au.com.codeka.common.protobuf.A",
-      "llianceMember\"G\n\tAlliances\022:\n\talliances\030" +
-      "\001 \003(\0132\'.au.com.codeka.common.protobuf.Al" +
-      "liance\"\317\001\n\016AllianceMember\022\013\n\003key\030\001 \001(\t\022\022" +
-      "\n\nempire_key\030\002 \001(\t\022\024\n\014alliance_key\030\003 \001(\t" +
-      "\022\023\n\013time_joined\030\004 \001(\003\022@\n\004rank\030\005 \001(\01622.au" +
-      ".com.codeka.common.protobuf.AllianceMemb" +
-      "er.Rank\"/\n\004Rank\022\013\n\007CAPTAIN\020\000\022\016\n\nLIEUTENA" +
-      "NT\020\001\022\n\n\006MEMBER\020\002\"\346\003\n\017AllianceRequest\022\n\n\002" +
-      "id\030\001 \001(\005\022\023\n\013alliance_id\030\002 \001(\005\022\031\n\021request" +
-      "_empire_id\030\003 \001(\005\022\024\n\014request_date\030\004 \001(\003\022P",
-      "\n\014request_type\030\005 \001(\0162:.au.com.codeka.com" +
-      "mon.protobuf.AllianceRequest.RequestType" +
-      "\022\017\n\007message\030\006 \001(\t\022J\n\005state\030\007 \001(\0162;.au.co" +
-      "m.codeka.common.protobuf.AllianceRequest" +
-      ".RequestState\022\r\n\005votes\030\010 \001(\005\022\030\n\020target_e" +
-      "mpire_id\030\t \001(\005\022\016\n\006amount\030\n \001(\002\"Q\n\013Reques" +
-      "tType\022\010\n\004JOIN\020\000\022\t\n\005LEAVE\020\001\022\010\n\004KICK\020\002\022\020\n\014" +
-      "DEPOSIT_CASH\020\003\022\021\n\rWITHDRAW_CASH\020\004\"F\n\014Req" +
-      "uestState\022\013\n\007PENDING\020\000\022\014\n\010ACCEPTED\020\001\022\014\n\010" +
-      "REJECTED\020\002\022\r\n\tWITHDRAWN\020\003\"d\n\020AllianceReq",
-      "uests\022@\n\010requests\030\001 \003(\0132..au.com.codeka." +
-      "common.protobuf.AllianceRequest\022\016\n\006curso" +
-      "r\030\002 \001(\t\"\203\001\n\023AllianceRequestVote\022\n\n\002id\030\001 " +
-      "\001(\005\022\023\n\013alliance_id\030\002 \001(\005\022\033\n\023alliance_req" +
-      "uest_id\030\003 \001(\005\022\021\n\tempire_id\030\004 \001(\005\022\r\n\005vote" +
-      "s\030\005 \001(\005\022\014\n\004date\030\006 \001(\003\"\243\003\n\013ErrorReport\022\027\n" +
-      "\017android_version\030\001 \001(\t\022\023\n\013phone_model\030\002 " +
-      "\001(\t\022\024\n\014package_name\030\003 \001(\t\022\023\n\013app_version" +
-      "\030\004 \001(\t\022\023\n\013stack_trace\030\005 \001(\t\022\017\n\007message\030\006" +
-      " \001(\t\022\023\n\013report_time\030\007 \001(\003\022\021\n\tempire_id\030\010",
-      " \001(\005\022\017\n\007context\030\t \001(\t\022\027\n\017exception_class" +
-      "\030\n \001(\t\022\021\n\theap_size\030\013 \001(\003\022\026\n\016heap_alloca" +
-      "ted\030\014 \001(\003\022\021\n\theap_free\030\r \001(\003\022\026\n\016total_ru" +
-      "n_time\030\016 \001(\003\022\033\n\023foreground_run_time\030\017 \001(" +
-      "\003\022\022\n\nlog_output\030\020 \001(\t\022\031\n\021server_request_" +
-      "qs\030\021 \001(\t\022!\n\031server_request_user_agent\030\022 " +
-      "\001(\t\"K\n\014ErrorReports\022;\n\007reports\030\001 \003(\0132*.a" +
-      "u.com.codeka.common.protobuf.ErrorReport" +
-      "*\344\001\n\025SituationReportFilter\022\013\n\007ShowAll\020\000\022" +
-      "\020\n\014MoveComplete\020\001\022\024\n\020BuildCompleteAny\020\002\022",
-      "\021\n\rFleetAttacked\020\003\022\022\n\016FleetDestroyed\020\004\022\023" +
-      "\n\017FleetVictorious\020\005\022\022\n\016ColonyAttacked\020\006\022" +
-      "\023\n\017ColonyDestroyed\020\007\022\026\n\022BuildCompleteShi" +
-      "ps\020\010\022\031\n\025BuildCompleteBuilding\020\t"
+      "llianceMember\022\032\n\022date_image_updated\030\010 \001(" +
+      "\003\"G\n\tAlliances\022:\n\talliances\030\001 \003(\0132\'.au.c" +
+      "om.codeka.common.protobuf.Alliance\"\317\001\n\016A" +
+      "llianceMember\022\013\n\003key\030\001 \001(\t\022\022\n\nempire_key" +
+      "\030\002 \001(\t\022\024\n\014alliance_key\030\003 \001(\t\022\023\n\013time_joi" +
+      "ned\030\004 \001(\003\022@\n\004rank\030\005 \001(\01622.au.com.codeka." +
+      "common.protobuf.AllianceMember.Rank\"/\n\004R" +
+      "ank\022\013\n\007CAPTAIN\020\000\022\016\n\nLIEUTENANT\020\001\022\n\n\006MEMB" +
+      "ER\020\002\"\256\004\n\017AllianceRequest\022\n\n\002id\030\001 \001(\005\022\023\n\013" +
+      "alliance_id\030\002 \001(\005\022\031\n\021request_empire_id\030\003",
+      " \001(\005\022\024\n\014request_date\030\004 \001(\003\022P\n\014request_ty" +
+      "pe\030\005 \001(\0162:.au.com.codeka.common.protobuf" +
+      ".AllianceRequest.RequestType\022\017\n\007message\030" +
+      "\006 \001(\t\022J\n\005state\030\007 \001(\0162;.au.com.codeka.com" +
+      "mon.protobuf.AllianceRequest.RequestStat" +
+      "e\022\r\n\005votes\030\010 \001(\005\022\030\n\020target_empire_id\030\t \001" +
+      "(\005\022\016\n\006amount\030\n \001(\002\022\021\n\tpng_image\030\013 \001(\014\022\020\n" +
+      "\010new_name\030\014 \001(\t\"t\n\013RequestType\022\010\n\004JOIN\020\000" +
+      "\022\t\n\005LEAVE\020\001\022\010\n\004KICK\020\002\022\020\n\014DEPOSIT_CASH\020\003\022" +
+      "\021\n\rWITHDRAW_CASH\020\004\022\020\n\014CHANGE_IMAGE\020\005\022\017\n\013",
+      "CHANGE_NAME\020\006\"F\n\014RequestState\022\013\n\007PENDING" +
+      "\020\000\022\014\n\010ACCEPTED\020\001\022\014\n\010REJECTED\020\002\022\r\n\tWITHDR" +
+      "AWN\020\003\"d\n\020AllianceRequests\022@\n\010requests\030\001 " +
+      "\003(\0132..au.com.codeka.common.protobuf.Alli" +
+      "anceRequest\022\016\n\006cursor\030\002 \001(\t\"\203\001\n\023Alliance" +
+      "RequestVote\022\n\n\002id\030\001 \001(\005\022\023\n\013alliance_id\030\002" +
+      " \001(\005\022\033\n\023alliance_request_id\030\003 \001(\005\022\021\n\temp" +
+      "ire_id\030\004 \001(\005\022\r\n\005votes\030\005 \001(\005\022\014\n\004date\030\006 \001(" +
+      "\003\"\243\003\n\013ErrorReport\022\027\n\017android_version\030\001 \001" +
+      "(\t\022\023\n\013phone_model\030\002 \001(\t\022\024\n\014package_name\030",
+      "\003 \001(\t\022\023\n\013app_version\030\004 \001(\t\022\023\n\013stack_trac" +
+      "e\030\005 \001(\t\022\017\n\007message\030\006 \001(\t\022\023\n\013report_time\030" +
+      "\007 \001(\003\022\021\n\tempire_id\030\010 \001(\005\022\017\n\007context\030\t \001(" +
+      "\t\022\027\n\017exception_class\030\n \001(\t\022\021\n\theap_size\030" +
+      "\013 \001(\003\022\026\n\016heap_allocated\030\014 \001(\003\022\021\n\theap_fr" +
+      "ee\030\r \001(\003\022\026\n\016total_run_time\030\016 \001(\003\022\033\n\023fore" +
+      "ground_run_time\030\017 \001(\003\022\022\n\nlog_output\030\020 \001(" +
+      "\t\022\031\n\021server_request_qs\030\021 \001(\t\022!\n\031server_r" +
+      "equest_user_agent\030\022 \001(\t\"K\n\014ErrorReports\022" +
+      ";\n\007reports\030\001 \003(\0132*.au.com.codeka.common.",
+      "protobuf.ErrorReport*\344\001\n\025SituationReport" +
+      "Filter\022\013\n\007ShowAll\020\000\022\020\n\014MoveComplete\020\001\022\024\n" +
+      "\020BuildCompleteAny\020\002\022\021\n\rFleetAttacked\020\003\022\022" +
+      "\n\016FleetDestroyed\020\004\022\023\n\017FleetVictorious\020\005\022" +
+      "\022\n\016ColonyAttacked\020\006\022\023\n\017ColonyDestroyed\020\007" +
+      "\022\026\n\022BuildCompleteShips\020\010\022\031\n\025BuildComplet" +
+      "eBuilding\020\t"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
       new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
@@ -94135,7 +94597,7 @@ public final class Messages {
           internal_static_au_com_codeka_common_protobuf_Alliance_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_au_com_codeka_common_protobuf_Alliance_descriptor,
-              new java.lang.String[] { "Key", "Name", "TimeCreated", "CreatorEmpireKey", "BankBalance", "NumMembers", "Members", });
+              new java.lang.String[] { "Key", "Name", "TimeCreated", "CreatorEmpireKey", "BankBalance", "NumMembers", "Members", "DateImageUpdated", });
           internal_static_au_com_codeka_common_protobuf_Alliances_descriptor =
             getDescriptor().getMessageTypes().get(58);
           internal_static_au_com_codeka_common_protobuf_Alliances_fieldAccessorTable = new
@@ -94153,7 +94615,7 @@ public final class Messages {
           internal_static_au_com_codeka_common_protobuf_AllianceRequest_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_au_com_codeka_common_protobuf_AllianceRequest_descriptor,
-              new java.lang.String[] { "Id", "AllianceId", "RequestEmpireId", "RequestDate", "RequestType", "Message", "State", "Votes", "TargetEmpireId", "Amount", });
+              new java.lang.String[] { "Id", "AllianceId", "RequestEmpireId", "RequestDate", "RequestType", "Message", "State", "Votes", "TargetEmpireId", "Amount", "PngImage", "NewName", });
           internal_static_au_com_codeka_common_protobuf_AllianceRequests_descriptor =
             getDescriptor().getMessageTypes().get(61);
           internal_static_au_com_codeka_common_protobuf_AllianceRequests_fieldAccessorTable = new

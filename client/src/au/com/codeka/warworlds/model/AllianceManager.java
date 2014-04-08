@@ -6,6 +6,8 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
+import com.google.protobuf.ByteString;
+
 import au.com.codeka.BackgroundRunner;
 import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.api.ApiClient;
@@ -223,6 +225,30 @@ public class AllianceManager {
                             .setAllianceId(Integer.parseInt(myEmpire.getAlliance().getKey()))
                             .setRequestEmpireId(Integer.parseInt(myEmpire.getKey()))
                             .setMessage("")
+                            .build();
+        request(pb);
+    }
+
+    public void requestChangeName(final int allianceID, final String message, final String newName) {
+        final MyEmpire myEmpire = EmpireManager.i.getEmpire();
+        Messages.AllianceRequest pb = Messages.AllianceRequest.newBuilder()
+                            .setRequestType(Messages.AllianceRequest.RequestType.CHANGE_NAME)
+                            .setNewName(newName)
+                            .setAllianceId(allianceID)
+                            .setRequestEmpireId(Integer.parseInt(myEmpire.getKey()))
+                            .setMessage(message)
+                            .build();
+        request(pb);
+    }
+
+    public void requestChangeImage(final int allianceID, final String message, final byte[] pngImage) {
+        final MyEmpire myEmpire = EmpireManager.i.getEmpire();
+        Messages.AllianceRequest pb = Messages.AllianceRequest.newBuilder()
+                            .setRequestType(Messages.AllianceRequest.RequestType.CHANGE_IMAGE)
+                            .setPngImage(ByteString.copyFrom(pngImage))
+                            .setAllianceId(allianceID)
+                            .setRequestEmpireId(Integer.parseInt(myEmpire.getKey()))
+                            .setMessage(message)
                             .build();
         request(pb);
     }

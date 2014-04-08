@@ -3,6 +3,8 @@ package au.com.codeka.common.model;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
+import com.google.protobuf.ByteString;
+
 import au.com.codeka.common.protobuf.Messages;
 
 public class BaseAllianceRequest {
@@ -16,6 +18,8 @@ public class BaseAllianceRequest {
     protected int mVotes;
     protected Integer mTargetEmpireID;
     protected Float mAmount;
+    protected byte[] mPngImage;
+    protected String mNewName;
 
     public int getID() {
         return mID;
@@ -47,6 +51,12 @@ public class BaseAllianceRequest {
     public Float getAmount() {
         return mAmount;
     }
+    public byte[] getPngImage() {
+        return mPngImage;
+    }
+    public String getNewName() {
+        return mNewName;
+    }
 
     public void fromProtocolBuffer(Messages.AllianceRequest pb) {
         if (pb.hasId()) {
@@ -65,6 +75,12 @@ public class BaseAllianceRequest {
         if (pb.hasAmount()) {
             mAmount = pb.getAmount();
         }
+        if (pb.hasPngImage()) {
+            mPngImage = pb.getPngImage().toByteArray();
+        }
+        if (pb.hasNewName()) {
+            mNewName = pb.getNewName();
+        }
     }
 
     public void toProtocolBuffer(Messages.AllianceRequest.Builder pb) {
@@ -82,6 +98,12 @@ public class BaseAllianceRequest {
         if (mAmount != null) {
             pb.setAmount((float) mAmount);
         }
+        if (mPngImage != null) {
+            pb.setPngImage(ByteString.copyFrom(mPngImage));
+        }
+        if (mNewName != null) {
+            pb.setNewName(mNewName);
+        }
     }
 
     public enum RequestType {
@@ -89,7 +111,9 @@ public class BaseAllianceRequest {
         LEAVE(1, 0),
         KICK(2, 10),
         DEPOSIT_CASH(3, 0),
-        WITHDRAW_CASH(4, 10);
+        WITHDRAW_CASH(4, 10),
+        CHANGE_IMAGE(5, 10),
+        CHANGE_NAME(6, 10);
 
         private int mNumber;
         private int mRequiredVotes;

@@ -143,6 +143,15 @@ public class AllianceDetailsActivity extends BaseActivity
             }
         });
 
+        Button changeBtn = (Button) findViewById(R.id.change_details_btn);
+        if (changeBtn != null) changeBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(AllianceDetailsActivity.this,
+                        AllianceChangeDetailsActivity.class));
+            }
+        });
+
         Button joinBtn = (Button) findViewById(R.id.join_btn);
         if (joinBtn != null) joinBtn.setOnClickListener(new View.OnClickListener() {
             @Override

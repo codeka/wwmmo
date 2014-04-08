@@ -28,6 +28,11 @@ public class AllianceRequest extends BaseAllianceRequest {
         if (rs.wasNull()) {
             mAmount = null;
         }
+        mPngImage = rs.getBytes("png_image");
+        if (rs.wasNull()) {
+            mPngImage = null;
+        }
+        mNewName = rs.getString("new_name");
     }
 
     public void setID(int id){
