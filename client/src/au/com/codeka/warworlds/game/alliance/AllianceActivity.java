@@ -211,7 +211,7 @@ public class AllianceActivity extends TabFragmentActivity
             public int getViewTypeCount() {
                 return 2;
             }
-            
+
             @Override
             public int getItemViewType(int position) {
                 ItemEntry entry = mEntries.get(position);
