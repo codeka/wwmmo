@@ -52,9 +52,15 @@ public class AllianceActivity extends TabFragmentActivity
                 if (!success) {
                     startActivity(new Intent(AllianceActivity.this, WarWorldsActivity.class));
                 } else {
-                    getTabManager().addTab(mContext, new TabInfo(AllianceActivity.this, "Overview",
-                            OverviewFragment.class, null));
                     MyEmpire myEmpire = EmpireManager.i.getEmpire();
+                    if (myEmpire.getAlliance() != null) {
+                        getTabManager().addTab(mContext, new TabInfo(AllianceActivity.this, "Overview",
+                                AllianceDetailsFragment.class, null));
+                    }
+
+                    getTabManager().addTab(mContext, new TabInfo(AllianceActivity.this, "Alliances",
+                            AllianceListFragment.class, null));
+
                     if (myEmpire.getAlliance() != null) {
                         Integer numPendingRequests = myEmpire.getAlliance().getNumPendingRequests();
                         String pending = "";
@@ -93,8 +99,8 @@ public class AllianceActivity extends TabFragmentActivity
     public static class BaseFragment extends Fragment {
     }
 
-    public static class OverviewFragment extends BaseFragment
-                                         implements AllianceManager.AllianceUpdatedHandler {
+    public static class AllianceListFragment extends BaseFragment
+                                             implements AllianceManager.AllianceUpdatedHandler {
         private View mView;
         private RankListAdapter mRankListAdapter;
 
