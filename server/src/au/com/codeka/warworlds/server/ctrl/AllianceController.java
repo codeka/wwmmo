@@ -135,6 +135,40 @@ public class AllianceController {
         }
     }
 
+    public byte[] getAllianceShield(int allianceID, Integer shieldID) throws RequestException {
+        String sql = "SELECT image FROM alliance_shields " +
+                    " WHERE alliance_id = ? ";
+        if (shieldID != null) {
+            sql += " AND id = ?";
+        }
+        sql += " ORDER BY create_date DESC LIMIT 1";
+        try (SqlStmt stmt = db.prepare(sql)) {
+            stmt.setInt(1, allianceID);
+            if (shieldID != null) {
+                stmt.setInt(2, shieldID);
+            }
+            ResultSet rs = stmt.select();
+            if (rs.next()) {
+                return rs.getBytes(1);
+            }
+        } catch (Exception e) {
+            throw new RequestException(e);
+        }
+
+        return null;
+    }
+
+    public void changeAllianceShield(int allianceID, byte[] pngImage) throws RequestException {
+        String sql = "INSERT INTO alliance_shields (alliance_id, create_date, image) VALUES (?, NOW(), ?)";
+        try (SqlStmt stmt = db.prepare(sql)) {
+            stmt.setInt(1, allianceID);
+            stmt.setBlob(2, pngImage);
+            stmt.update();
+        } catch (Exception e) {
+            throw new RequestException(e);
+        }
+    }
+
     private static class DataBase extends BaseDataBase {
         public DataBase() {
             super();

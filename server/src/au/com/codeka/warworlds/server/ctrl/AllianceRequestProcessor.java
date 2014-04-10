@@ -1,8 +1,14 @@
 package au.com.codeka.warworlds.server.ctrl;
 
+import java.awt.geom.AffineTransform;
+import java.awt.image.AffineTransformOp;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
 import java.util.Arrays;
 import java.util.TreeSet;
 
+import org.apache.commons.imaging.ImageFormat;
+import org.apache.commons.imaging.Imaging;
 import org.joda.time.DateTime;
 
 import au.com.codeka.common.protobuf.Messages;
@@ -273,6 +279,28 @@ public abstract class AllianceRequestProcessor {
         @Override
         protected void onVotePassed(AllianceController ctrl) throws Exception {
             super.onVotePassed(ctrl);
+
+            // load up the image, make sure it's valid and reasonable dimensions
+            BufferedImage img = Imaging.getBufferedImage(mRequest.getPngImage());
+            if (img.getWidth() > 128 || img.getHeight() > 128) {
+                // if it's bigger than 128x128, we'll resize it here so that we don't ever store images
+                // that are too big to actually display.
+                BufferedImage after = new BufferedImage(128, 128, BufferedImage.TYPE_INT_ARGB);
+                AffineTransform at = new AffineTransform();
+                at.scale(128.0 / img.getWidth(), 128.0 / img.getHeight());
+                AffineTransformOp scaleOp = new AffineTransformOp(at, AffineTransformOp.TYPE_BILINEAR);
+                after = scaleOp.filter(img, after);
+                img = after;
+            }
+
+            ByteArrayOutputStream png = new ByteArrayOutputStream();
+            try {
+                Imaging.writeImage(img, png, ImageFormat.IMAGE_FORMAT_PNG, null);
+            } catch(Exception e) {
+                throw new RequestException(e);
+            }
+
+            new AllianceController().changeAllianceShield(mAlliance.getID(), png.toByteArray());
         }
     }
 

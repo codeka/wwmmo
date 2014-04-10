@@ -82,8 +82,6 @@ public class ChatMessage extends BaseChatMessage {
             }
         }
 
-        msg = String.format("%d %s", mID, msg);
-
         if (mDatePosted != null && !messageOnly) {
             msg = mDatePosted.withZone(DateTimeZone.getDefault()).toString(sChatDateFormat) + " : " + msg;
         }

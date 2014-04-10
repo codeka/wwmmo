@@ -9,7 +9,7 @@
         android:layout_height="40dp"
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
-        android:src="@drawable/alliance" />
+        android:src="@drawable/app_icon" />
 
     <TextView
         android:id="@+id/alliance_name"

@@ -146,6 +146,7 @@ public abstract class ShieldManager implements RealmManager.RealmChangedHandler 
 
     protected abstract Bitmap processShieldImage(Bitmap bmp);
     protected abstract Bitmap getDefaultShield(ShieldInfo shieldInfo);
+    protected abstract String getFetchUrl(ShieldInfo shieldInfo);
 
     private void queueFetchShieldImage(final ShieldInfo shieldInfo) {
         log.debug("queuing up a request to fetch a new shield...");
@@ -159,7 +160,7 @@ public abstract class ShieldManager implements RealmManager.RealmChangedHandler 
         new BackgroundRunner<Bitmap>() {
             @Override
             protected Bitmap doInBackground() {
-                String url = shieldInfo.kind+"/"+shieldInfo.id+"/shield";
+                String url = getFetchUrl(shieldInfo);
                 try {
                     Bitmap bmp = ApiClient.getImage(url);
                     bmp = processShieldImage(bmp);
