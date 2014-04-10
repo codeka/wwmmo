@@ -26,7 +26,7 @@ import au.com.codeka.warworlds.model.EmpireShieldManager;
 import au.com.codeka.warworlds.model.MyEmpire;
 
 public class EmpireRankList extends ListView
-                            implements EmpireShieldManager.EmpireShieldUpdatedHandler {
+                            implements EmpireShieldManager.ShieldUpdatedHandler {
     private RankListAdapter mRankListAdapter;
     private Context mContext;
 
@@ -40,13 +40,13 @@ public class EmpireRankList extends ListView
     @Override
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
-        EmpireShieldManager.i.addEmpireShieldUpdatedHandler(this);
+        EmpireShieldManager.i.addShieldUpdatedHandler(this);
     }
 
     @Override
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
-        EmpireShieldManager.i.removeEmpireShieldUpdatedHandler(this);
+        EmpireShieldManager.i.removeShieldUpdatedHandler(this);
     }
 
     public void setEmpires(List<Empire> empires, boolean addGaps) {
@@ -67,7 +67,7 @@ public class EmpireRankList extends ListView
 
     /** Called when an empire's shield is updated, we'll have to refresh the list. */
     @Override
-    public void onEmpireShieldUpdated(int empireID) {
+    public void onShieldUpdated(int empireID) {
         mRankListAdapter.notifyDataSetChanged();
     }
 

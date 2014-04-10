@@ -5,6 +5,7 @@ import java.util.Locale;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -46,7 +47,7 @@ import au.com.codeka.warworlds.model.StarSummary;
  */
 public class SolarSystemFragment extends Fragment
                                  implements StarManager.StarFetchedHandler,
-                                            EmpireShieldManager.EmpireShieldUpdatedHandler {
+                                            EmpireShieldManager.ShieldUpdatedHandler {
     private static Logger log = LoggerFactory.getLogger(SolarSystemFragment.class);
     private SolarSystemSurfaceView mSolarSystemSurfaceView;
     private ProgressBar mProgressBar;
@@ -166,6 +167,7 @@ public class SolarSystemFragment extends Fragment
         return mView;
     }
 
+    @SuppressLint("NewApi")
     @Override
     public void onStart() {
         super.onStart();
@@ -173,7 +175,7 @@ public class SolarSystemFragment extends Fragment
         long starID = args.getLong("au.com.codeka.warworlds.StarID");
         String starKey = Long.toString(starID);
         StarManager.getInstance().addStarUpdatedListener(starKey, this);
-        EmpireShieldManager.i.addEmpireShieldUpdatedHandler(this);
+        EmpireShieldManager.i.addShieldUpdatedHandler(this);
 
         // get as much details about the star as we can, until it gets refreshes anyway.
         mStarSummary = StarManager.getInstance().getStarSummaryNoFetch(starKey, Float.MAX_VALUE);
@@ -206,11 +208,12 @@ public class SolarSystemFragment extends Fragment
         }
     }
 
+    @SuppressLint("NewApi")
     @Override
     public void onStop() {
         super.onStop();
         StarManager.getInstance().removeStarUpdatedListener(this);
-        EmpireShieldManager.i.removeEmpireShieldUpdatedHandler(this);
+        EmpireShieldManager.i.removeShieldUpdatedHandler(this);
 
         int sdk = android.os.Build.VERSION.SDK_INT;
         if (sdk >= android.os.Build.VERSION_CODES.HONEYCOMB) {
@@ -221,7 +224,7 @@ public class SolarSystemFragment extends Fragment
 
     /** Called when an empire's shield is updated, we'll have to refresh the list. */
     @Override
-    public void onEmpireShieldUpdated(int empireID) {
+    public void onShieldUpdated(int empireID) {
         refreshSelectedPlanet();
     }
 

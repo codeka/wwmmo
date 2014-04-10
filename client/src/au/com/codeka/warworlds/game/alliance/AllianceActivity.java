@@ -296,7 +296,7 @@ public class AllianceActivity extends TabFragmentActivity
 
     public static class RequestsFragment extends BaseFragment
                                          implements AllianceManager.AllianceUpdatedHandler,
-                                                    EmpireShieldManager.EmpireShieldUpdatedHandler {
+                                                    EmpireShieldManager.ShieldUpdatedHandler {
         private View mView;
         private RequestListAdapter mRequestListAdapter;
         private Alliance mAlliance;
@@ -313,14 +313,14 @@ public class AllianceActivity extends TabFragmentActivity
         public void onAttach(Activity activity) {
             super.onAttach(activity);
             AllianceManager.i.addAllianceUpdatedHandler(this);
-            EmpireShieldManager.i.addEmpireShieldUpdatedHandler(this);
+            EmpireShieldManager.i.addShieldUpdatedHandler(this);
         }
 
         @Override
         public void onDetach() {
             super.onDetach();
             AllianceManager.i.removeAllianceUpdatedHandler(this);
-            EmpireShieldManager.i.removeEmpireShieldUpdatedHandler(this);
+            EmpireShieldManager.i.removeShieldUpdatedHandler(this);
         }
 
         @Override
@@ -347,7 +347,7 @@ public class AllianceActivity extends TabFragmentActivity
 
         /** Called when an empire's shield is updated, we'll have to refresh the list. */
         @Override
-        public void onEmpireShieldUpdated(int empireID) {
+        public void onShieldUpdated(int empireID) {
             mRequestListAdapter.notifyDataSetChanged();
         }
 

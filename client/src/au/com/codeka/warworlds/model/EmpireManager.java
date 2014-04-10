@@ -164,7 +164,7 @@ public class EmpireManager {
             }
         }
 
-        EmpireShieldManager.i.flushCachedImage(empire.getKey());
+        EmpireShieldManager.i.flushCachedImage(empire.getID());
     }
 
     public void refreshEmpire() {

@@ -45,7 +45,7 @@ import au.com.codeka.warworlds.model.MyEmpire;
 /**
  * Main activity. Displays the message of the day and lets you select "Start Game", "Options", etc.
  */
-public class WarWorldsActivity extends BaseActivity implements EmpireShieldManager.EmpireShieldUpdatedHandler {
+public class WarWorldsActivity extends BaseActivity implements EmpireShieldManager.ShieldUpdatedHandler {
     private static Logger log = LoggerFactory.getLogger(WarWorldsActivity.class);
     private Context mContext = this;
     private Button mStartGameButton;
@@ -255,13 +255,12 @@ public class WarWorldsActivity extends BaseActivity implements EmpireShieldManag
     }
 
     @Override
-    public void onEmpireShieldUpdated(int empireID) {
+    public void onShieldUpdated(int empireID) {
         // if it's the same as our empire, we'll need to update the icon we're currently showing.
         MyEmpire empire = EmpireManager.i.getEmpire();
         if (empireID == Integer.parseInt(empire.getKey())) {
             ImageView empireIcon = (ImageView) findViewById(R.id.empire_icon);
             empireIcon.setImageBitmap(EmpireShieldManager.i.getShield(mContext, empire));
-
         }
     }
 
