@@ -31,7 +31,7 @@ public class AllianceRequest extends BaseAllianceRequest {
         case WITHDRAW_CASH:
             return String.format("Withdraw %s", Cash.format(mAmount));
         case CHANGE_NAME:
-            return String.format("Chaneg alliance name to \"%s\"", mNewName);
+            return String.format("Change alliance name to \"%s\"", mNewName);
         case CHANGE_IMAGE:
             return "Change image (TODO)";
         default:

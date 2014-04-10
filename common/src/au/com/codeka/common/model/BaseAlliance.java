@@ -18,6 +18,7 @@ public abstract class BaseAlliance {
     protected List<BaseAllianceMember> mMembers;
     protected double mBankBalance;
     protected DateTime mDateImageUpdated;
+    protected Integer mNumPendingRequests;
 
     protected abstract BaseAllianceMember createAllianceMember(Messages.AllianceMember pb);
 
@@ -34,6 +35,9 @@ public abstract class BaseAlliance {
         return mCreatorEmpireKey;
     }
     public int getNumMembers() {
+        if (mNumMembers == 0 && mMembers != null) {
+            return mMembers.size();
+        }
         return mNumMembers;
     }
     public double getBankBalance() {
@@ -44,6 +48,9 @@ public abstract class BaseAlliance {
     }
     public DateTime getDateImageUpdated() {
         return mDateImageUpdated;
+    }
+    public Integer getNumPendingRequests() {
+        return mNumPendingRequests;
     }
 
     public int getTotalPossibleVotes(Set<Integer> excludingEmpires) {
@@ -81,6 +88,10 @@ public abstract class BaseAlliance {
         }
 
         mDateImageUpdated = new DateTime(pb.getDateImageUpdated() * 1000, DateTimeZone.UTC);
+
+        if (pb.hasNumPendingRequests()) {
+            mNumPendingRequests = pb.getNumPendingRequests();
+        }
     }
 
     public void toProtocolBuffer(Messages.Alliance.Builder pb) {
@@ -93,6 +104,9 @@ public abstract class BaseAlliance {
         pb.setNumMembers(mNumMembers);
         pb.setBankBalance(mBankBalance);
         pb.setDateImageUpdated(mDateImageUpdated.getMillis() / 1000);
+        if (mNumPendingRequests != null) {
+            pb.setNumPendingRequests(mNumPendingRequests);
+        }
 
         if (mMembers != null) {
             for (BaseAllianceMember member : mMembers) {
