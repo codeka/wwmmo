@@ -86669,15 +86669,15 @@ public final class Messages {
      */
     au.com.codeka.common.protobuf.Messages.AllianceRequest.RequestState getState();
 
-    // optional int32 votes = 8;
+    // optional int32 num_votes = 8;
     /**
-     * <code>optional int32 votes = 8;</code>
+     * <code>optional int32 num_votes = 8;</code>
      */
-    boolean hasVotes();
+    boolean hasNumVotes();
     /**
-     * <code>optional int32 votes = 8;</code>
+     * <code>optional int32 num_votes = 8;</code>
      */
-    int getVotes();
+    int getNumVotes();
 
     // optional int32 target_empire_id = 9;
     /**
@@ -86759,6 +86759,51 @@ public final class Messages {
      */
     com.google.protobuf.ByteString
         getNewNameBytes();
+
+    // repeated .au.com.codeka.common.protobuf.AllianceRequestVote vote = 13;
+    /**
+     * <code>repeated .au.com.codeka.common.protobuf.AllianceRequestVote vote = 13;</code>
+     *
+     * <pre>
+     * the votes we've received for this request so far.
+     * </pre>
+     */
+    java.util.List<au.com.codeka.common.protobuf.Messages.AllianceRequestVote> 
+        getVoteList();
+    /**
+     * <code>repeated .au.com.codeka.common.protobuf.AllianceRequestVote vote = 13;</code>
+     *
+     * <pre>
+     * the votes we've received for this request so far.
+     * </pre>
+     */
+    au.com.codeka.common.protobuf.Messages.AllianceRequestVote getVote(int index);
+    /**
+     * <code>repeated .au.com.codeka.common.protobuf.AllianceRequestVote vote = 13;</code>
+     *
+     * <pre>
+     * the votes we've received for this request so far.
+     * </pre>
+     */
+    int getVoteCount();
+    /**
+     * <code>repeated .au.com.codeka.common.protobuf.AllianceRequestVote vote = 13;</code>
+     *
+     * <pre>
+     * the votes we've received for this request so far.
+     * </pre>
+     */
+    java.util.List<? extends au.com.codeka.common.protobuf.Messages.AllianceRequestVoteOrBuilder> 
+        getVoteOrBuilderList();
+    /**
+     * <code>repeated .au.com.codeka.common.protobuf.AllianceRequestVote vote = 13;</code>
+     *
+     * <pre>
+     * the votes we've received for this request so far.
+     * </pre>
+     */
+    au.com.codeka.common.protobuf.Messages.AllianceRequestVoteOrBuilder getVoteOrBuilder(
+        int index);
   }
   /**
    * Protobuf type {@code au.com.codeka.common.protobuf.AllianceRequest}
@@ -86860,7 +86905,7 @@ public final class Messages {
             }
             case 64: {
               bitField0_ |= 0x00000080;
-              votes_ = input.readInt32();
+              numVotes_ = input.readInt32();
               break;
             }
             case 72: {
@@ -86883,6 +86928,14 @@ public final class Messages {
               newName_ = input.readBytes();
               break;
             }
+            case 106: {
+              if (!((mutable_bitField0_ & 0x00001000) == 0x00001000)) {
+                vote_ = new java.util.ArrayList<au.com.codeka.common.protobuf.Messages.AllianceRequestVote>();
+                mutable_bitField0_ |= 0x00001000;
+              }
+              vote_.add(input.readMessage(au.com.codeka.common.protobuf.Messages.AllianceRequestVote.PARSER, extensionRegistry));
+              break;
+            }
           }
         }
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
@@ -86891,6 +86944,9 @@ public final class Messages {
         throw new com.google.protobuf.InvalidProtocolBufferException(
             e.getMessage()).setUnfinishedMessage(this);
       } finally {
+        if (((mutable_bitField0_ & 0x00001000) == 0x00001000)) {
+          vote_ = java.util.Collections.unmodifiableList(vote_);
+        }
         this.unknownFields = unknownFields.build();
         makeExtensionsImmutable();
       }
@@ -87289,20 +87345,20 @@ public final class Messages {
       return state_;
     }
 
-    // optional int32 votes = 8;
-    public static final int VOTES_FIELD_NUMBER = 8;
-    private int votes_;
+    // optional int32 num_votes = 8;
+    public static final int NUM_VOTES_FIELD_NUMBER = 8;
+    private int numVotes_;
     /**
-     * <code>optional int32 votes = 8;</code>
+     * <code>optional int32 num_votes = 8;</code>
      */
-    public boolean hasVotes() {
+    public boolean hasNumVotes() {
       return ((bitField0_ & 0x00000080) == 0x00000080);
     }
     /**
-     * <code>optional int32 votes = 8;</code>
+     * <code>optional int32 num_votes = 8;</code>
      */
-    public int getVotes() {
-      return votes_;
+    public int getNumVotes() {
+      return numVotes_;
     }
 
     // optional int32 target_empire_id = 9;
@@ -87432,6 +87488,62 @@ public final class Messages {
       }
     }
 
+    // repeated .au.com.codeka.common.protobuf.AllianceRequestVote vote = 13;
+    public static final int VOTE_FIELD_NUMBER = 13;
+    private java.util.List<au.com.codeka.common.protobuf.Messages.AllianceRequestVote> vote_;
+    /**
+     * <code>repeated .au.com.codeka.common.protobuf.AllianceRequestVote vote = 13;</code>
+     *
+     * <pre>
+     * the votes we've received for this request so far.
+     * </pre>
+     */
+    public java.util.List<au.com.codeka.common.protobuf.Messages.AllianceRequestVote> getVoteList() {
+      return vote_;
+    }
+    /**
+     * <code>repeated .au.com.codeka.common.protobuf.AllianceRequestVote vote = 13;</code>
+     *
+     * <pre>
+     * the votes we've received for this request so far.
+     * </pre>
+     */
+    public java.util.List<? extends au.com.codeka.common.protobuf.Messages.AllianceRequestVoteOrBuilder> 
+        getVoteOrBuilderList() {
+      return vote_;
+    }
+    /**
+     * <code>repeated .au.com.codeka.common.protobuf.AllianceRequestVote vote = 13;</code>
+     *
+     * <pre>
+     * the votes we've received for this request so far.
+     * </pre>
+     */
+    public int getVoteCount() {
+      return vote_.size();
+    }
+    /**
+     * <code>repeated .au.com.codeka.common.protobuf.AllianceRequestVote vote = 13;</code>
+     *
+     * <pre>
+     * the votes we've received for this request so far.
+     * </pre>
+     */
+    public au.com.codeka.common.protobuf.Messages.AllianceRequestVote getVote(int index) {
+      return vote_.get(index);
+    }
+    /**
+     * <code>repeated .au.com.codeka.common.protobuf.AllianceRequestVote vote = 13;</code>
+     *
+     * <pre>
+     * the votes we've received for this request so far.
+     * </pre>
+     */
+    public au.com.codeka.common.protobuf.Messages.AllianceRequestVoteOrBuilder getVoteOrBuilder(
+        int index) {
+      return vote_.get(index);
+    }
+
     private void initFields() {
       id_ = 0;
       allianceId_ = 0;
@@ -87440,11 +87552,12 @@ public final class Messages {
       requestType_ = au.com.codeka.common.protobuf.Messages.AllianceRequest.RequestType.JOIN;
       message_ = "";
       state_ = au.com.codeka.common.protobuf.Messages.AllianceRequest.RequestState.PENDING;
-      votes_ = 0;
+      numVotes_ = 0;
       targetEmpireId_ = 0;
       amount_ = 0F;
       pngImage_ = com.google.protobuf.ByteString.EMPTY;
       newName_ = "";
+      vote_ = java.util.Collections.emptyList();
     }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
@@ -87480,7 +87593,7 @@ public final class Messages {
         output.writeEnum(7, state_.getNumber());
       }
       if (((bitField0_ & 0x00000080) == 0x00000080)) {
-        output.writeInt32(8, votes_);
+        output.writeInt32(8, numVotes_);
       }
       if (((bitField0_ & 0x00000100) == 0x00000100)) {
         output.writeInt32(9, targetEmpireId_);
@@ -87493,6 +87606,9 @@ public final class Messages {
       }
       if (((bitField0_ & 0x00000800) == 0x00000800)) {
         output.writeBytes(12, getNewNameBytes());
+      }
+      for (int i = 0; i < vote_.size(); i++) {
+        output.writeMessage(13, vote_.get(i));
       }
       getUnknownFields().writeTo(output);
     }
@@ -87533,7 +87649,7 @@ public final class Messages {
       }
       if (((bitField0_ & 0x00000080) == 0x00000080)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeInt32Size(8, votes_);
+          .computeInt32Size(8, numVotes_);
       }
       if (((bitField0_ & 0x00000100) == 0x00000100)) {
         size += com.google.protobuf.CodedOutputStream
@@ -87550,6 +87666,10 @@ public final class Messages {
       if (((bitField0_ & 0x00000800) == 0x00000800)) {
         size += com.google.protobuf.CodedOutputStream
           .computeBytesSize(12, getNewNameBytes());
+      }
+      for (int i = 0; i < vote_.size(); i++) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(13, vote_.get(i));
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
@@ -87659,6 +87779,7 @@ public final class Messages {
       }
       private void maybeForceBuilderInitialization() {
         if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
+          getVoteFieldBuilder();
         }
       }
       private static Builder create() {
@@ -87681,7 +87802,7 @@ public final class Messages {
         bitField0_ = (bitField0_ & ~0x00000020);
         state_ = au.com.codeka.common.protobuf.Messages.AllianceRequest.RequestState.PENDING;
         bitField0_ = (bitField0_ & ~0x00000040);
-        votes_ = 0;
+        numVotes_ = 0;
         bitField0_ = (bitField0_ & ~0x00000080);
         targetEmpireId_ = 0;
         bitField0_ = (bitField0_ & ~0x00000100);
@@ -87691,6 +87812,12 @@ public final class Messages {
         bitField0_ = (bitField0_ & ~0x00000400);
         newName_ = "";
         bitField0_ = (bitField0_ & ~0x00000800);
+        if (voteBuilder_ == null) {
+          vote_ = java.util.Collections.emptyList();
+          bitField0_ = (bitField0_ & ~0x00001000);
+        } else {
+          voteBuilder_.clear();
+        }
         return this;
       }
 
@@ -87750,7 +87877,7 @@ public final class Messages {
         if (((from_bitField0_ & 0x00000080) == 0x00000080)) {
           to_bitField0_ |= 0x00000080;
         }
-        result.votes_ = votes_;
+        result.numVotes_ = numVotes_;
         if (((from_bitField0_ & 0x00000100) == 0x00000100)) {
           to_bitField0_ |= 0x00000100;
         }
@@ -87767,6 +87894,15 @@ public final class Messages {
           to_bitField0_ |= 0x00000800;
         }
         result.newName_ = newName_;
+        if (voteBuilder_ == null) {
+          if (((bitField0_ & 0x00001000) == 0x00001000)) {
+            vote_ = java.util.Collections.unmodifiableList(vote_);
+            bitField0_ = (bitField0_ & ~0x00001000);
+          }
+          result.vote_ = vote_;
+        } else {
+          result.vote_ = voteBuilder_.build();
+        }
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
@@ -87806,8 +87942,8 @@ public final class Messages {
         if (other.hasState()) {
           setState(other.getState());
         }
-        if (other.hasVotes()) {
-          setVotes(other.getVotes());
+        if (other.hasNumVotes()) {
+          setNumVotes(other.getNumVotes());
         }
         if (other.hasTargetEmpireId()) {
           setTargetEmpireId(other.getTargetEmpireId());
@@ -87822,6 +87958,32 @@ public final class Messages {
           bitField0_ |= 0x00000800;
           newName_ = other.newName_;
           onChanged();
+        }
+        if (voteBuilder_ == null) {
+          if (!other.vote_.isEmpty()) {
+            if (vote_.isEmpty()) {
+              vote_ = other.vote_;
+              bitField0_ = (bitField0_ & ~0x00001000);
+            } else {
+              ensureVoteIsMutable();
+              vote_.addAll(other.vote_);
+            }
+            onChanged();
+          }
+        } else {
+          if (!other.vote_.isEmpty()) {
+            if (voteBuilder_.isEmpty()) {
+              voteBuilder_.dispose();
+              voteBuilder_ = null;
+              vote_ = other.vote_;
+              bitField0_ = (bitField0_ & ~0x00001000);
+              voteBuilder_ = 
+                com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders ?
+                   getVoteFieldBuilder() : null;
+            } else {
+              voteBuilder_.addAllMessages(other.vote_);
+            }
+          }
         }
         this.mergeUnknownFields(other.getUnknownFields());
         return this;
@@ -88128,35 +88290,35 @@ public final class Messages {
         return this;
       }
 
-      // optional int32 votes = 8;
-      private int votes_ ;
+      // optional int32 num_votes = 8;
+      private int numVotes_ ;
       /**
-       * <code>optional int32 votes = 8;</code>
+       * <code>optional int32 num_votes = 8;</code>
        */
-      public boolean hasVotes() {
+      public boolean hasNumVotes() {
         return ((bitField0_ & 0x00000080) == 0x00000080);
       }
       /**
-       * <code>optional int32 votes = 8;</code>
+       * <code>optional int32 num_votes = 8;</code>
        */
-      public int getVotes() {
-        return votes_;
+      public int getNumVotes() {
+        return numVotes_;
       }
       /**
-       * <code>optional int32 votes = 8;</code>
+       * <code>optional int32 num_votes = 8;</code>
        */
-      public Builder setVotes(int value) {
+      public Builder setNumVotes(int value) {
         bitField0_ |= 0x00000080;
-        votes_ = value;
+        numVotes_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>optional int32 votes = 8;</code>
+       * <code>optional int32 num_votes = 8;</code>
        */
-      public Builder clearVotes() {
+      public Builder clearNumVotes() {
         bitField0_ = (bitField0_ & ~0x00000080);
-        votes_ = 0;
+        numVotes_ = 0;
         onChanged();
         return this;
       }
@@ -88407,6 +88569,318 @@ public final class Messages {
         newName_ = value;
         onChanged();
         return this;
+      }
+
+      // repeated .au.com.codeka.common.protobuf.AllianceRequestVote vote = 13;
+      private java.util.List<au.com.codeka.common.protobuf.Messages.AllianceRequestVote> vote_ =
+        java.util.Collections.emptyList();
+      private void ensureVoteIsMutable() {
+        if (!((bitField0_ & 0x00001000) == 0x00001000)) {
+          vote_ = new java.util.ArrayList<au.com.codeka.common.protobuf.Messages.AllianceRequestVote>(vote_);
+          bitField0_ |= 0x00001000;
+         }
+      }
+
+      private com.google.protobuf.RepeatedFieldBuilder<
+          au.com.codeka.common.protobuf.Messages.AllianceRequestVote, au.com.codeka.common.protobuf.Messages.AllianceRequestVote.Builder, au.com.codeka.common.protobuf.Messages.AllianceRequestVoteOrBuilder> voteBuilder_;
+
+      /**
+       * <code>repeated .au.com.codeka.common.protobuf.AllianceRequestVote vote = 13;</code>
+       *
+       * <pre>
+       * the votes we've received for this request so far.
+       * </pre>
+       */
+      public java.util.List<au.com.codeka.common.protobuf.Messages.AllianceRequestVote> getVoteList() {
+        if (voteBuilder_ == null) {
+          return java.util.Collections.unmodifiableList(vote_);
+        } else {
+          return voteBuilder_.getMessageList();
+        }
+      }
+      /**
+       * <code>repeated .au.com.codeka.common.protobuf.AllianceRequestVote vote = 13;</code>
+       *
+       * <pre>
+       * the votes we've received for this request so far.
+       * </pre>
+       */
+      public int getVoteCount() {
+        if (voteBuilder_ == null) {
+          return vote_.size();
+        } else {
+          return voteBuilder_.getCount();
+        }
+      }
+      /**
+       * <code>repeated .au.com.codeka.common.protobuf.AllianceRequestVote vote = 13;</code>
+       *
+       * <pre>
+       * the votes we've received for this request so far.
+       * </pre>
+       */
+      public au.com.codeka.common.protobuf.Messages.AllianceRequestVote getVote(int index) {
+        if (voteBuilder_ == null) {
+          return vote_.get(index);
+        } else {
+          return voteBuilder_.getMessage(index);
+        }
+      }
+      /**
+       * <code>repeated .au.com.codeka.common.protobuf.AllianceRequestVote vote = 13;</code>
+       *
+       * <pre>
+       * the votes we've received for this request so far.
+       * </pre>
+       */
+      public Builder setVote(
+          int index, au.com.codeka.common.protobuf.Messages.AllianceRequestVote value) {
+        if (voteBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          ensureVoteIsMutable();
+          vote_.set(index, value);
+          onChanged();
+        } else {
+          voteBuilder_.setMessage(index, value);
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .au.com.codeka.common.protobuf.AllianceRequestVote vote = 13;</code>
+       *
+       * <pre>
+       * the votes we've received for this request so far.
+       * </pre>
+       */
+      public Builder setVote(
+          int index, au.com.codeka.common.protobuf.Messages.AllianceRequestVote.Builder builderForValue) {
+        if (voteBuilder_ == null) {
+          ensureVoteIsMutable();
+          vote_.set(index, builderForValue.build());
+          onChanged();
+        } else {
+          voteBuilder_.setMessage(index, builderForValue.build());
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .au.com.codeka.common.protobuf.AllianceRequestVote vote = 13;</code>
+       *
+       * <pre>
+       * the votes we've received for this request so far.
+       * </pre>
+       */
+      public Builder addVote(au.com.codeka.common.protobuf.Messages.AllianceRequestVote value) {
+        if (voteBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          ensureVoteIsMutable();
+          vote_.add(value);
+          onChanged();
+        } else {
+          voteBuilder_.addMessage(value);
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .au.com.codeka.common.protobuf.AllianceRequestVote vote = 13;</code>
+       *
+       * <pre>
+       * the votes we've received for this request so far.
+       * </pre>
+       */
+      public Builder addVote(
+          int index, au.com.codeka.common.protobuf.Messages.AllianceRequestVote value) {
+        if (voteBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          ensureVoteIsMutable();
+          vote_.add(index, value);
+          onChanged();
+        } else {
+          voteBuilder_.addMessage(index, value);
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .au.com.codeka.common.protobuf.AllianceRequestVote vote = 13;</code>
+       *
+       * <pre>
+       * the votes we've received for this request so far.
+       * </pre>
+       */
+      public Builder addVote(
+          au.com.codeka.common.protobuf.Messages.AllianceRequestVote.Builder builderForValue) {
+        if (voteBuilder_ == null) {
+          ensureVoteIsMutable();
+          vote_.add(builderForValue.build());
+          onChanged();
+        } else {
+          voteBuilder_.addMessage(builderForValue.build());
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .au.com.codeka.common.protobuf.AllianceRequestVote vote = 13;</code>
+       *
+       * <pre>
+       * the votes we've received for this request so far.
+       * </pre>
+       */
+      public Builder addVote(
+          int index, au.com.codeka.common.protobuf.Messages.AllianceRequestVote.Builder builderForValue) {
+        if (voteBuilder_ == null) {
+          ensureVoteIsMutable();
+          vote_.add(index, builderForValue.build());
+          onChanged();
+        } else {
+          voteBuilder_.addMessage(index, builderForValue.build());
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .au.com.codeka.common.protobuf.AllianceRequestVote vote = 13;</code>
+       *
+       * <pre>
+       * the votes we've received for this request so far.
+       * </pre>
+       */
+      public Builder addAllVote(
+          java.lang.Iterable<? extends au.com.codeka.common.protobuf.Messages.AllianceRequestVote> values) {
+        if (voteBuilder_ == null) {
+          ensureVoteIsMutable();
+          super.addAll(values, vote_);
+          onChanged();
+        } else {
+          voteBuilder_.addAllMessages(values);
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .au.com.codeka.common.protobuf.AllianceRequestVote vote = 13;</code>
+       *
+       * <pre>
+       * the votes we've received for this request so far.
+       * </pre>
+       */
+      public Builder clearVote() {
+        if (voteBuilder_ == null) {
+          vote_ = java.util.Collections.emptyList();
+          bitField0_ = (bitField0_ & ~0x00001000);
+          onChanged();
+        } else {
+          voteBuilder_.clear();
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .au.com.codeka.common.protobuf.AllianceRequestVote vote = 13;</code>
+       *
+       * <pre>
+       * the votes we've received for this request so far.
+       * </pre>
+       */
+      public Builder removeVote(int index) {
+        if (voteBuilder_ == null) {
+          ensureVoteIsMutable();
+          vote_.remove(index);
+          onChanged();
+        } else {
+          voteBuilder_.remove(index);
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .au.com.codeka.common.protobuf.AllianceRequestVote vote = 13;</code>
+       *
+       * <pre>
+       * the votes we've received for this request so far.
+       * </pre>
+       */
+      public au.com.codeka.common.protobuf.Messages.AllianceRequestVote.Builder getVoteBuilder(
+          int index) {
+        return getVoteFieldBuilder().getBuilder(index);
+      }
+      /**
+       * <code>repeated .au.com.codeka.common.protobuf.AllianceRequestVote vote = 13;</code>
+       *
+       * <pre>
+       * the votes we've received for this request so far.
+       * </pre>
+       */
+      public au.com.codeka.common.protobuf.Messages.AllianceRequestVoteOrBuilder getVoteOrBuilder(
+          int index) {
+        if (voteBuilder_ == null) {
+          return vote_.get(index);  } else {
+          return voteBuilder_.getMessageOrBuilder(index);
+        }
+      }
+      /**
+       * <code>repeated .au.com.codeka.common.protobuf.AllianceRequestVote vote = 13;</code>
+       *
+       * <pre>
+       * the votes we've received for this request so far.
+       * </pre>
+       */
+      public java.util.List<? extends au.com.codeka.common.protobuf.Messages.AllianceRequestVoteOrBuilder> 
+           getVoteOrBuilderList() {
+        if (voteBuilder_ != null) {
+          return voteBuilder_.getMessageOrBuilderList();
+        } else {
+          return java.util.Collections.unmodifiableList(vote_);
+        }
+      }
+      /**
+       * <code>repeated .au.com.codeka.common.protobuf.AllianceRequestVote vote = 13;</code>
+       *
+       * <pre>
+       * the votes we've received for this request so far.
+       * </pre>
+       */
+      public au.com.codeka.common.protobuf.Messages.AllianceRequestVote.Builder addVoteBuilder() {
+        return getVoteFieldBuilder().addBuilder(
+            au.com.codeka.common.protobuf.Messages.AllianceRequestVote.getDefaultInstance());
+      }
+      /**
+       * <code>repeated .au.com.codeka.common.protobuf.AllianceRequestVote vote = 13;</code>
+       *
+       * <pre>
+       * the votes we've received for this request so far.
+       * </pre>
+       */
+      public au.com.codeka.common.protobuf.Messages.AllianceRequestVote.Builder addVoteBuilder(
+          int index) {
+        return getVoteFieldBuilder().addBuilder(
+            index, au.com.codeka.common.protobuf.Messages.AllianceRequestVote.getDefaultInstance());
+      }
+      /**
+       * <code>repeated .au.com.codeka.common.protobuf.AllianceRequestVote vote = 13;</code>
+       *
+       * <pre>
+       * the votes we've received for this request so far.
+       * </pre>
+       */
+      public java.util.List<au.com.codeka.common.protobuf.Messages.AllianceRequestVote.Builder> 
+           getVoteBuilderList() {
+        return getVoteFieldBuilder().getBuilderList();
+      }
+      private com.google.protobuf.RepeatedFieldBuilder<
+          au.com.codeka.common.protobuf.Messages.AllianceRequestVote, au.com.codeka.common.protobuf.Messages.AllianceRequestVote.Builder, au.com.codeka.common.protobuf.Messages.AllianceRequestVoteOrBuilder> 
+          getVoteFieldBuilder() {
+        if (voteBuilder_ == null) {
+          voteBuilder_ = new com.google.protobuf.RepeatedFieldBuilder<
+              au.com.codeka.common.protobuf.Messages.AllianceRequestVote, au.com.codeka.common.protobuf.Messages.AllianceRequestVote.Builder, au.com.codeka.common.protobuf.Messages.AllianceRequestVoteOrBuilder>(
+                  vote_,
+                  ((bitField0_ & 0x00001000) == 0x00001000),
+                  getParentForChildren(),
+                  isClean());
+          vote_ = null;
+        }
+        return voteBuilder_;
       }
 
       // @@protoc_insertion_point(builder_scope:au.com.codeka.common.protobuf.AllianceRequest)
@@ -94103,45 +94577,47 @@ public final class Messages {
       "ned\030\004 \001(\003\022@\n\004rank\030\005 \001(\01622.au.com.codeka." +
       "common.protobuf.AllianceMember.Rank\"/\n\004R" +
       "ank\022\013\n\007CAPTAIN\020\000\022\016\n\nLIEUTENANT\020\001\022\n\n\006MEMB" +
-      "ER\020\002\"\256\004\n\017AllianceRequest\022\n\n\002id\030\001 \001(\005\022\023\n\013" +
+      "ER\020\002\"\364\004\n\017AllianceRequest\022\n\n\002id\030\001 \001(\005\022\023\n\013" +
       "alliance_id\030\002 \001(\005\022\031\n\021request_empire_id\030\003",
       " \001(\005\022\024\n\014request_date\030\004 \001(\003\022P\n\014request_ty" +
       "pe\030\005 \001(\0162:.au.com.codeka.common.protobuf" +
       ".AllianceRequest.RequestType\022\017\n\007message\030" +
       "\006 \001(\t\022J\n\005state\030\007 \001(\0162;.au.com.codeka.com" +
       "mon.protobuf.AllianceRequest.RequestStat" +
-      "e\022\r\n\005votes\030\010 \001(\005\022\030\n\020target_empire_id\030\t \001" +
-      "(\005\022\016\n\006amount\030\n \001(\002\022\021\n\tpng_image\030\013 \001(\014\022\020\n" +
-      "\010new_name\030\014 \001(\t\"t\n\013RequestType\022\010\n\004JOIN\020\000" +
-      "\022\t\n\005LEAVE\020\001\022\010\n\004KICK\020\002\022\020\n\014DEPOSIT_CASH\020\003\022" +
-      "\021\n\rWITHDRAW_CASH\020\004\022\020\n\014CHANGE_IMAGE\020\005\022\017\n\013",
-      "CHANGE_NAME\020\006\"F\n\014RequestState\022\013\n\007PENDING" +
-      "\020\000\022\014\n\010ACCEPTED\020\001\022\014\n\010REJECTED\020\002\022\r\n\tWITHDR" +
-      "AWN\020\003\"d\n\020AllianceRequests\022@\n\010requests\030\001 " +
-      "\003(\0132..au.com.codeka.common.protobuf.Alli" +
-      "anceRequest\022\016\n\006cursor\030\002 \001(\t\"\203\001\n\023Alliance" +
-      "RequestVote\022\n\n\002id\030\001 \001(\005\022\023\n\013alliance_id\030\002" +
-      " \001(\005\022\033\n\023alliance_request_id\030\003 \001(\005\022\021\n\temp" +
-      "ire_id\030\004 \001(\005\022\r\n\005votes\030\005 \001(\005\022\014\n\004date\030\006 \001(" +
-      "\003\"\243\003\n\013ErrorReport\022\027\n\017android_version\030\001 \001" +
-      "(\t\022\023\n\013phone_model\030\002 \001(\t\022\024\n\014package_name\030",
-      "\003 \001(\t\022\023\n\013app_version\030\004 \001(\t\022\023\n\013stack_trac" +
-      "e\030\005 \001(\t\022\017\n\007message\030\006 \001(\t\022\023\n\013report_time\030" +
-      "\007 \001(\003\022\021\n\tempire_id\030\010 \001(\005\022\017\n\007context\030\t \001(" +
-      "\t\022\027\n\017exception_class\030\n \001(\t\022\021\n\theap_size\030" +
-      "\013 \001(\003\022\026\n\016heap_allocated\030\014 \001(\003\022\021\n\theap_fr" +
-      "ee\030\r \001(\003\022\026\n\016total_run_time\030\016 \001(\003\022\033\n\023fore" +
-      "ground_run_time\030\017 \001(\003\022\022\n\nlog_output\030\020 \001(" +
-      "\t\022\031\n\021server_request_qs\030\021 \001(\t\022!\n\031server_r" +
-      "equest_user_agent\030\022 \001(\t\"K\n\014ErrorReports\022" +
-      ";\n\007reports\030\001 \003(\0132*.au.com.codeka.common.",
-      "protobuf.ErrorReport*\344\001\n\025SituationReport" +
-      "Filter\022\013\n\007ShowAll\020\000\022\020\n\014MoveComplete\020\001\022\024\n" +
-      "\020BuildCompleteAny\020\002\022\021\n\rFleetAttacked\020\003\022\022" +
-      "\n\016FleetDestroyed\020\004\022\023\n\017FleetVictorious\020\005\022" +
-      "\022\n\016ColonyAttacked\020\006\022\023\n\017ColonyDestroyed\020\007" +
-      "\022\026\n\022BuildCompleteShips\020\010\022\031\n\025BuildComplet" +
-      "eBuilding\020\t"
+      "e\022\021\n\tnum_votes\030\010 \001(\005\022\030\n\020target_empire_id" +
+      "\030\t \001(\005\022\016\n\006amount\030\n \001(\002\022\021\n\tpng_image\030\013 \001(" +
+      "\014\022\020\n\010new_name\030\014 \001(\t\022@\n\004vote\030\r \003(\01322.au.c" +
+      "om.codeka.common.protobuf.AllianceReques" +
+      "tVote\"t\n\013RequestType\022\010\n\004JOIN\020\000\022\t\n\005LEAVE\020",
+      "\001\022\010\n\004KICK\020\002\022\020\n\014DEPOSIT_CASH\020\003\022\021\n\rWITHDRA" +
+      "W_CASH\020\004\022\020\n\014CHANGE_IMAGE\020\005\022\017\n\013CHANGE_NAM" +
+      "E\020\006\"F\n\014RequestState\022\013\n\007PENDING\020\000\022\014\n\010ACCE" +
+      "PTED\020\001\022\014\n\010REJECTED\020\002\022\r\n\tWITHDRAWN\020\003\"d\n\020A" +
+      "llianceRequests\022@\n\010requests\030\001 \003(\0132..au.c" +
+      "om.codeka.common.protobuf.AllianceReques" +
+      "t\022\016\n\006cursor\030\002 \001(\t\"\203\001\n\023AllianceRequestVot" +
+      "e\022\n\n\002id\030\001 \001(\005\022\023\n\013alliance_id\030\002 \001(\005\022\033\n\023al" +
+      "liance_request_id\030\003 \001(\005\022\021\n\tempire_id\030\004 \001" +
+      "(\005\022\r\n\005votes\030\005 \001(\005\022\014\n\004date\030\006 \001(\003\"\243\003\n\013Erro",
+      "rReport\022\027\n\017android_version\030\001 \001(\t\022\023\n\013phon" +
+      "e_model\030\002 \001(\t\022\024\n\014package_name\030\003 \001(\t\022\023\n\013a" +
+      "pp_version\030\004 \001(\t\022\023\n\013stack_trace\030\005 \001(\t\022\017\n" +
+      "\007message\030\006 \001(\t\022\023\n\013report_time\030\007 \001(\003\022\021\n\te" +
+      "mpire_id\030\010 \001(\005\022\017\n\007context\030\t \001(\t\022\027\n\017excep" +
+      "tion_class\030\n \001(\t\022\021\n\theap_size\030\013 \001(\003\022\026\n\016h" +
+      "eap_allocated\030\014 \001(\003\022\021\n\theap_free\030\r \001(\003\022\026" +
+      "\n\016total_run_time\030\016 \001(\003\022\033\n\023foreground_run" +
+      "_time\030\017 \001(\003\022\022\n\nlog_output\030\020 \001(\t\022\031\n\021serve" +
+      "r_request_qs\030\021 \001(\t\022!\n\031server_request_use",
+      "r_agent\030\022 \001(\t\"K\n\014ErrorReports\022;\n\007reports" +
+      "\030\001 \003(\0132*.au.com.codeka.common.protobuf.E" +
+      "rrorReport*\344\001\n\025SituationReportFilter\022\013\n\007" +
+      "ShowAll\020\000\022\020\n\014MoveComplete\020\001\022\024\n\020BuildComp" +
+      "leteAny\020\002\022\021\n\rFleetAttacked\020\003\022\022\n\016FleetDes" +
+      "troyed\020\004\022\023\n\017FleetVictorious\020\005\022\022\n\016ColonyA" +
+      "ttacked\020\006\022\023\n\017ColonyDestroyed\020\007\022\026\n\022BuildC" +
+      "ompleteShips\020\010\022\031\n\025BuildCompleteBuilding\020" +
+      "\t"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
       new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
@@ -94615,7 +95091,7 @@ public final class Messages {
           internal_static_au_com_codeka_common_protobuf_AllianceRequest_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_au_com_codeka_common_protobuf_AllianceRequest_descriptor,
-              new java.lang.String[] { "Id", "AllianceId", "RequestEmpireId", "RequestDate", "RequestType", "Message", "State", "Votes", "TargetEmpireId", "Amount", "PngImage", "NewName", });
+              new java.lang.String[] { "Id", "AllianceId", "RequestEmpireId", "RequestDate", "RequestType", "Message", "State", "NumVotes", "TargetEmpireId", "Amount", "PngImage", "NewName", "Vote", });
           internal_static_au_com_codeka_common_protobuf_AllianceRequests_descriptor =
             getDescriptor().getMessageTypes().get(61);
           internal_static_au_com_codeka_common_protobuf_AllianceRequests_fieldAccessorTable = new

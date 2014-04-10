@@ -1,5 +1,8 @@
 package au.com.codeka.common.model;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
@@ -7,7 +10,7 @@ import com.google.protobuf.ByteString;
 
 import au.com.codeka.common.protobuf.Messages;
 
-public class BaseAllianceRequest {
+public abstract class BaseAllianceRequest {
     protected int mID;
     protected int mAllianceID;
     protected int mRequestEmpireID;
@@ -15,11 +18,12 @@ public class BaseAllianceRequest {
     protected RequestType mRequestType;
     protected String mMessage;
     protected RequestState mState;
-    protected int mVotes;
+    protected int mNumVotes;
     protected Integer mTargetEmpireID;
     protected Float mAmount;
     protected byte[] mPngImage;
     protected String mNewName;
+    protected List<BaseAllianceRequestVote> mVotes;
 
     public int getID() {
         return mID;
@@ -42,8 +46,8 @@ public class BaseAllianceRequest {
     public RequestState getState() {
         return mState;
     }
-    public int getVotes() {
-        return mVotes;
+    public int getNumVotes() {
+        return mNumVotes;
     }
     public Integer getTargetEmpireID() {
         return mTargetEmpireID;
@@ -57,6 +61,14 @@ public class BaseAllianceRequest {
     public String getNewName() {
         return mNewName;
     }
+    public List<BaseAllianceRequestVote> getVotes() {
+        if (mVotes == null) {
+            mVotes = new ArrayList<BaseAllianceRequestVote>();
+        }
+        return mVotes;
+    }
+
+    protected abstract BaseAllianceRequestVote createVote(Messages.AllianceRequestVote pb);
 
     public void fromProtocolBuffer(Messages.AllianceRequest pb) {
         if (pb.hasId()) {
@@ -68,7 +80,7 @@ public class BaseAllianceRequest {
         mRequestType = RequestType.fromNumber(pb.getRequestType().getNumber());
         mMessage = pb.getMessage();
         mState = RequestState.fromNumber(pb.getState().getNumber());
-        mVotes = pb.getVotes();
+        mNumVotes = pb.getNumVotes();
         if (pb.hasTargetEmpireId()) {
             mTargetEmpireID = pb.getTargetEmpireId();
         }
@@ -81,6 +93,12 @@ public class BaseAllianceRequest {
         if (pb.hasNewName()) {
             mNewName = pb.getNewName();
         }
+        if (pb.getVoteList() != null) {
+            mVotes = new ArrayList<BaseAllianceRequestVote>();
+            for (Messages.AllianceRequestVote vote_pb : pb.getVoteList()) {
+                mVotes.add(createVote(vote_pb));
+            }
+        }
     }
 
     public void toProtocolBuffer(Messages.AllianceRequest.Builder pb) {
@@ -91,7 +109,7 @@ public class BaseAllianceRequest {
         pb.setRequestType(Messages.AllianceRequest.RequestType.valueOf(mRequestType.getNumber()));
         pb.setMessage(mMessage);
         pb.setState(Messages.AllianceRequest.RequestState.valueOf(mState.getNumber()));
-        pb.setVotes(mVotes);
+        pb.setNumVotes(mNumVotes);
         if (mTargetEmpireID != null) {
             pb.setTargetEmpireId((int) mTargetEmpireID);
         }
@@ -103,6 +121,13 @@ public class BaseAllianceRequest {
         }
         if (mNewName != null) {
             pb.setNewName(mNewName);
+        }
+        if (mVotes != null) {
+            for (BaseAllianceRequestVote vote : mVotes) {
+                Messages.AllianceRequestVote.Builder vote_pb = Messages.AllianceRequestVote.newBuilder();
+                vote.toProtocolBuffer(vote_pb);
+                pb.addVote(vote_pb);
+            }
         }
     }
 

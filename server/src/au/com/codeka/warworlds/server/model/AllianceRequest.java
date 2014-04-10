@@ -6,6 +6,8 @@ import java.sql.SQLException;
 import org.joda.time.DateTime;
 
 import au.com.codeka.common.model.BaseAllianceRequest;
+import au.com.codeka.common.model.BaseAllianceRequestVote;
+import au.com.codeka.common.protobuf.Messages;
 
 public class AllianceRequest extends BaseAllianceRequest {
     public AllianceRequest() {
@@ -19,7 +21,7 @@ public class AllianceRequest extends BaseAllianceRequest {
         mRequestType = RequestType.fromNumber(rs.getInt("request_type"));
         mMessage = rs.getString("message");
         mState = RequestState.fromNumber(rs.getInt("state"));
-        mVotes = rs.getInt("votes");
+        mNumVotes = rs.getInt("votes");
         mTargetEmpireID = rs.getInt("target_empire_id");
         if (rs.wasNull()) {
             mTargetEmpireID = null;
@@ -41,5 +43,14 @@ public class AllianceRequest extends BaseAllianceRequest {
 
     public void setState(RequestState state) {
         mState = state;
+    }
+
+    @Override
+    protected BaseAllianceRequestVote createVote(Messages.AllianceRequestVote pb) {
+        AllianceRequestVote vote = new AllianceRequestVote();
+        if (pb != null) {
+            vote.fromProtocolBuffer(pb);
+        }
+        return vote;
     }
 }
