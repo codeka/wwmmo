@@ -8,6 +8,11 @@ import au.com.codeka.common.protobuf.Messages;
 
 
 public class Empire extends BaseEmpire {
+    //TODO: we can store the ID and have getKey() return a string....
+    public int getID() {
+        return Integer.parseInt(mKey);
+    }
+
     @Override
     protected BaseEmpireRank createEmpireRank(Messages.EmpireRank pb) {
         EmpireRank er = new EmpireRank();

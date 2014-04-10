@@ -22,7 +22,7 @@ import au.com.codeka.warworlds.model.EmpireShieldManager;
 
 public class EnemyEmpireActivity extends BaseActivity
                                  implements EmpireManager.EmpireFetchedHandler,
-                                            EmpireShieldManager.EmpireShieldUpdatedHandler {
+                                            EmpireShieldManager.ShieldUpdatedHandler {
     private Context mContext = this;
     private Empire mEmpire;
 
@@ -70,19 +70,19 @@ public class EnemyEmpireActivity extends BaseActivity
     @Override
     protected void onStart() {
         super.onStart();
-        EmpireShieldManager.i.addEmpireShieldUpdatedHandler(this);
+        EmpireShieldManager.i.addShieldUpdatedHandler(this);
     }
 
     @Override
     protected void onStop() {
         super.onStart();
-        EmpireShieldManager.i.removeEmpireShieldUpdatedHandler(this);
+        EmpireShieldManager.i.removeShieldUpdatedHandler(this);
     }
 
 
     /** Called when an empire's shield is updated, we'll have to refresh the list. */
     @Override
-    public void onEmpireShieldUpdated(int empireID) {
+    public void onShieldUpdated(int empireID) {
         refresh();
     }
 

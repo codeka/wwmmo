@@ -36,7 +36,7 @@ import au.com.codeka.warworlds.model.MyEmpire;
 public class AllianceDetailsFragment extends Fragment
                                      implements AllianceManager.AllianceUpdatedHandler,
                                      EmpireManager.EmpireFetchedHandler,
-                                     EmpireShieldManager.EmpireShieldUpdatedHandler {
+                                     EmpireShieldManager.ShieldUpdatedHandler {
     private Handler mHandler;
     private Activity mActivity;
     private LayoutInflater mLayoutInflater;
@@ -101,7 +101,7 @@ public class AllianceDetailsFragment extends Fragment
         super.onStart();
         AllianceManager.i.addAllianceUpdatedHandler(this);
         EmpireManager.i.addEmpireUpdatedListener(null, this);
-        EmpireShieldManager.i.addEmpireShieldUpdatedHandler(this);
+        EmpireShieldManager.i.addShieldUpdatedHandler(this);
     }
 
     @Override
@@ -109,7 +109,7 @@ public class AllianceDetailsFragment extends Fragment
         super.onStop();
         AllianceManager.i.removeAllianceUpdatedHandler(this);
         EmpireManager.i.removeEmpireUpdatedListener(this);
-        EmpireShieldManager.i.removeEmpireShieldUpdatedHandler(this);
+        EmpireShieldManager.i.removeShieldUpdatedHandler(this);
     }
 
     @Override
@@ -130,7 +130,7 @@ public class AllianceDetailsFragment extends Fragment
 
     /** Called when an empire's shield is updated, we'll have to refresh the list. */
     @Override
-    public void onEmpireShieldUpdated(int empireID) {
+    public void onShieldUpdated(int empireID) {
         refreshAlliance();
     }
 

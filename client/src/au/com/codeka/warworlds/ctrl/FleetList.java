@@ -65,7 +65,7 @@ import au.com.codeka.warworlds.model.StarSummary;
  */
 public class FleetList extends FrameLayout
                        implements StarManager.StarFetchedHandler,
-                                  EmpireShieldManager.EmpireShieldUpdatedHandler {
+                                  EmpireShieldManager.ShieldUpdatedHandler {
     private FleetListAdapter mFleetListAdapter;
     protected Fleet mSelectedFleet;
     private List<Fleet> mFleets;
@@ -323,7 +323,7 @@ public class FleetList extends FrameLayout
 
         onInitialize();
 
-        EmpireShieldManager.i.addEmpireShieldUpdatedHandler(this);
+        EmpireShieldManager.i.addShieldUpdatedHandler(this);
         StarManager.getInstance().addStarUpdatedListener(null, this);
     }
 
@@ -334,7 +334,7 @@ public class FleetList extends FrameLayout
     public void onDetachedFromWindow() {
         super.onDetachedFromWindow();
         StarManager.getInstance().removeStarUpdatedListener(this);
-        EmpireShieldManager.i.removeEmpireShieldUpdatedHandler(this);
+        EmpireShieldManager.i.removeShieldUpdatedHandler(this);
     }
 
     /**
@@ -366,7 +366,7 @@ public class FleetList extends FrameLayout
 
     /** If an empire's shield is updated, we'll want to refresh the list. */
     @Override
-    public void onEmpireShieldUpdated(int empireID) {
+    public void onShieldUpdated(int empireID) {
         mFleetListAdapter.notifyDataSetChanged();
     }
 

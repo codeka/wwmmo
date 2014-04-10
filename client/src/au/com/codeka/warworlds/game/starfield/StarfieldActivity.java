@@ -65,7 +65,7 @@ import com.google.protobuf.InvalidProtocolBufferException;
 public class StarfieldActivity extends BaseStarfieldActivity
                                implements StarfieldSceneManager.OnSelectionChangedListener,
                                           StarManager.StarFetchedHandler,
-                                          EmpireShieldManager.EmpireShieldUpdatedHandler {
+                                          EmpireShieldManager.ShieldUpdatedHandler {
     private static final Logger log = LoggerFactory.getLogger(StarfieldActivity.class);
     private Context mContext = this;
     private PlanetListSimple mPlanetList;
@@ -285,7 +285,7 @@ public class StarfieldActivity extends BaseStarfieldActivity
     public void onStart() {
         super.onStart();
         StarManager.getInstance().addStarUpdatedListener(null, this);
-        EmpireShieldManager.i.addEmpireShieldUpdatedHandler(this);
+        EmpireShieldManager.i.addShieldUpdatedHandler(this);
     }
 
     @Override
@@ -302,7 +302,7 @@ public class StarfieldActivity extends BaseStarfieldActivity
     public void onStop() {
         super.onStop();
         StarManager.getInstance().removeStarUpdatedListener(this);
-        EmpireShieldManager.i.removeEmpireShieldUpdatedHandler(this);
+        EmpireShieldManager.i.removeShieldUpdatedHandler(this);
     }
 
     @Override
@@ -323,7 +323,7 @@ public class StarfieldActivity extends BaseStarfieldActivity
 
     /** Called when an empire's shield is updated, we'll have to refresh the list. */
     @Override
-    public void onEmpireShieldUpdated(int empireID) {
+    public void onShieldUpdated(int empireID) {
         EmpireShieldManager.i.clearTextureCache();
 
         if (mSelectedFleet != null) {

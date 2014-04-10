@@ -46,7 +46,7 @@ import au.com.codeka.warworlds.model.StarImageManager;
  * and representations of the fleets, etc.
  */
 public class SolarSystemSurfaceView extends UniverseElementSurfaceView
-                                    implements EmpireShieldManager.EmpireShieldUpdatedHandler {
+                                    implements EmpireShieldManager.ShieldUpdatedHandler {
     private Context mContext;
     private Star mStar;
     private PlanetInfo[] mPlanetInfos;
@@ -239,7 +239,7 @@ public class SolarSystemSurfaceView extends UniverseElementSurfaceView
     @Override
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
-        EmpireShieldManager.i.addEmpireShieldUpdatedHandler(this);
+        EmpireShieldManager.i.addShieldUpdatedHandler(this);
     }
 
     @Override
@@ -251,7 +251,7 @@ public class SolarSystemSurfaceView extends UniverseElementSurfaceView
             mBackgroundRenderer.close();
             mBackgroundRenderer = null;
         }
-        EmpireShieldManager.i.removeEmpireShieldUpdatedHandler(this);
+        EmpireShieldManager.i.removeShieldUpdatedHandler(this);
     }
 
     @Override
@@ -265,7 +265,7 @@ public class SolarSystemSurfaceView extends UniverseElementSurfaceView
 
     /** Called when an empire's shield is updated, we'll have to refresh the view. */
     @Override
-    public void onEmpireShieldUpdated(int empireID) {
+    public void onShieldUpdated(int empireID) {
         invalidate();
     }
 

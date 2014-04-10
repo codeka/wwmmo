@@ -26,10 +26,11 @@ import au.com.codeka.warworlds.model.AllianceRequest;
 import au.com.codeka.warworlds.model.Empire;
 import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.EmpireShieldManager;
+import au.com.codeka.warworlds.model.ShieldManager;
 
 public class RequestVoteDialog extends DialogFragment
                                implements EmpireManager.EmpireFetchedHandler,
-                                          EmpireShieldManager.EmpireShieldUpdatedHandler {
+                                          ShieldManager.ShieldUpdatedHandler {
     private View mView;
     private Alliance mAlliance;
     private AllianceRequest mRequest;
@@ -43,14 +44,14 @@ public class RequestVoteDialog extends DialogFragment
     public void onStart() {
         super.onStart();
         EmpireManager.i.addEmpireUpdatedListener(null, this);
-        EmpireShieldManager.i.addEmpireShieldUpdatedHandler(this);
+        EmpireShieldManager.i.addShieldUpdatedHandler(this);
     }
 
     @Override
     public void onStop() {
         super.onStop();
         EmpireManager.i.removeEmpireUpdatedListener(this);
-        EmpireShieldManager.i.removeEmpireShieldUpdatedHandler(this);
+        EmpireShieldManager.i.removeShieldUpdatedHandler(this);
     }
 
     @Override
@@ -190,7 +191,7 @@ public class RequestVoteDialog extends DialogFragment
     }
 
     @Override
-    public void onEmpireShieldUpdated(int empireID) {
+    public void onShieldUpdated(int id) {
         refresh();
     }
 }
