@@ -46,6 +46,11 @@ public class EmpireShieldManager extends ShieldManager {
         return combineShieldColour(App.i, colour);
     }
 
+    @Override
+    protected String getFetchUrl(ShieldInfo shieldInfo) {
+        return "empires/" + shieldInfo.id + "/shield";
+    }
+
     /**
      * Combines the base shield image with the given colour.
      */

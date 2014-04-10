@@ -48,7 +48,6 @@ public class AllianceDetailsFragment extends Fragment
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         mLayoutInflater = inflater;
-        super.onCreate(savedInstanceState);
         mHandler = new Handler();
         mActivity = getActivity();
 
