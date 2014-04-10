@@ -56,7 +56,13 @@ public class AllianceActivity extends TabFragmentActivity
                             OverviewFragment.class, null));
                     MyEmpire myEmpire = EmpireManager.i.getEmpire();
                     if (myEmpire.getAlliance() != null) {
-                        getTabManager().addTab(mContext, new TabInfo(AllianceActivity.this, "Requests",
+                        Integer numPendingRequests = myEmpire.getAlliance().getNumPendingRequests();
+                        String pending = "";
+                        if (numPendingRequests != null && numPendingRequests > 0) {
+                            pending = " (<font color=\"red\">" + numPendingRequests + "</font>)";
+                        }
+                        getTabManager().addTab(mContext, new TabInfo(AllianceActivity.this,
+                                "Requests" + pending,
                                 RequestsFragment.class, null));
                     }
                 }

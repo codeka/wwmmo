@@ -3,6 +3,7 @@ package au.com.codeka.warworlds;
 import java.util.TreeMap;
 
 import android.content.Context;
+import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.TabHost;
@@ -71,7 +72,7 @@ public class TabManager {
     private View createTabButton(Context context, final String text) {
         View view = LayoutInflater.from(context).inflate(R.layout.tab_button, null);
         TextView tv = (TextView) view.findViewById(R.id.text);
-        tv.setText(text);
+        tv.setText(Html.fromHtml(text));
         return view;
     }
 

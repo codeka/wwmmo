@@ -1307,6 +1307,10 @@ message Alliance
     // The date the alliance's image was last changed (so we know if
     // we need to re-fetch a cached version).
     optional int64 date_image_updated = 8;
+
+    // Only for our own alliance, this'll be the number of pending requests
+    // we have waiting for us.
+    optional int32 num_pending_requests = 9;
 }
 
 

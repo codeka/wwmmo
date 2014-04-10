@@ -36,6 +36,7 @@ public class Alliance extends BaseAlliance {
         mBankBalance = rs.getDouble("bank_balance");
         mMembers = new ArrayList<BaseAllianceMember>();
         mDateImageUpdated = new DateTime(rs.getTimestamp("image_updated_date").getTime());
+        mNumPendingRequests = rs.getInt("num_pending_requests");
     }
 
     public void setID(int id) {

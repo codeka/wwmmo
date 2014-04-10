@@ -14,6 +14,7 @@ import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.data.DB;
 import au.com.codeka.warworlds.server.data.SqlStmt;
 import au.com.codeka.warworlds.server.data.Transaction;
+import au.com.codeka.warworlds.server.model.AllianceRequest;
 import au.com.codeka.warworlds.server.model.Colony;
 import au.com.codeka.warworlds.server.model.Empire;
 import au.com.codeka.warworlds.server.model.Planet;
@@ -499,7 +500,8 @@ public class EmpireController {
         private String getSelectEmpire(String whereClause, boolean includeBanned) {
             String sql = "SELECT *, alliances.id AS alliance_id, alliances.name as alliance_name," +
                                " (SELECT COUNT(*) FROM empires WHERE alliance_id = empires.alliance_id) AS num_empires," +
-                               " (SELECT MAX(create_date) FROM empire_shields WHERE empire_shields.empire_id = empires.id AND rejected = 0) AS shield_last_update" +
+                               " (SELECT MAX(create_date) FROM empire_shields WHERE empire_shields.empire_id = empires.id AND rejected = 0) AS shield_last_update," +
+                               " (SELECT COUNT(*) FROM alliance_requests WHERE alliance_id = alliances.id AND state = " + AllianceRequest.RequestState.PENDING.getNumber() + ") AS num_pending_requests" +
                          " FROM empires" +
                          " LEFT JOIN alliances ON empires.alliance_id = alliances.id" +
                          " LEFT JOIN empire_ranks ON empires.id = empire_ranks.empire_id" +

@@ -165,7 +165,8 @@ public class AllianceController {
 
         public List<Alliance> getAlliances() throws Exception {
             String sql = "SELECT alliances.*," +
-                               " (SELECT COUNT(*) FROM empires WHERE empires.alliance_id = alliances.id) AS num_empires" +
+                               " (SELECT COUNT(*) FROM empires WHERE empires.alliance_id = alliances.id) AS num_empires," +
+                               " (SELECT COUNT(*) FROM alliance_requests WHERE alliance_id = alliances.id AND state = " + AllianceRequest.RequestState.PENDING.getNumber() + ") AS num_pending_requests" +
                         " FROM alliances" +
                         " ORDER BY name DESC";
             try (SqlStmt stmt = prepare(sql)) {
@@ -181,7 +182,9 @@ public class AllianceController {
 
         public Alliance getAlliance(int allianceID) throws Exception {
             Alliance alliance = null;
-            String sql = "SELECT *, 0 AS num_empires FROM alliances WHERE id = ?";
+            String sql = "SELECT *, 0 AS num_empires," +
+                               " (SELECT COUNT(*) FROM alliance_requests WHERE alliance_id = alliances.id AND state = " + AllianceRequest.RequestState.PENDING.getNumber() + ") AS num_pending_requests" +
+                        " FROM alliances WHERE id = ?";
             try (SqlStmt stmt = prepare(sql)) {
                 stmt.setInt(1, allianceID);
                 ResultSet rs = stmt.select();
