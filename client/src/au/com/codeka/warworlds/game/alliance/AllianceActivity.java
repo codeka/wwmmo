@@ -397,15 +397,6 @@ public class AllianceActivity extends TabFragmentActivity
             }
 
             @Override
-            public boolean isEnabled(int position) {
-                if (mEntries == null) 
-                    return false;
-                if (mEntries.get(position).request.getState() == AllianceRequest.RequestState.PENDING)
-                    return true;
-                return false;
-            }
-
-            @Override
             public Object getItem(int position) {
                 if (mEntries == null)
                     return null;
@@ -444,11 +435,11 @@ public class AllianceActivity extends TabFragmentActivity
                 if (entry.request.getState().equals(AllianceRequest.RequestState.PENDING)) {
                     requestStatus.setVisibility(View.GONE);
                     requestVotes.setVisibility(View.VISIBLE);
-                    if (entry.request.getVotes() == 0) {
+                    if (entry.request.getNumVotes() == 0) {
                         requestVotes.setText("0");
                     } else {
                         requestVotes.setText(String.format(Locale.ENGLISH, "%s%d",
-                            entry.request.getVotes() < 0 ? "-" : "+", Math.abs(entry.request.getVotes())));
+                            entry.request.getNumVotes() < 0 ? "-" : "+", Math.abs(entry.request.getNumVotes())));
                     }
                 } else if (entry.request.getState().equals(AllianceRequest.RequestState.ACCEPTED)) {
                     requestStatus.setVisibility(View.VISIBLE);

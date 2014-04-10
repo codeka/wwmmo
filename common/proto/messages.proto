@@ -1361,7 +1361,7 @@ message AllianceRequest
     }
     optional RequestState state = 7;
 
-    optional int32 votes = 8;
+    optional int32 num_votes = 8;
 
     // for KICK requests, this is the empire we're kicking
     optional int32 target_empire_id = 9;
@@ -1374,6 +1374,9 @@ message AllianceRequest
 
     // for CHANGE_NAME, the new name you want
     optional string new_name = 12;
+
+    // the votes we've received for this request so far.
+    repeated AllianceRequestVote vote = 13;
 }
 
 

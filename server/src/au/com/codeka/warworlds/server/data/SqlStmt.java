@@ -81,8 +81,12 @@ public class SqlStmt implements AutoCloseable {
         }
     }
     public void setString(int position, String value) throws SQLException {
-        mStmt.setString(position, value);
-        saveParameter(position, value);
+        if (value == null) {
+            setNull(position);
+        } else {
+            mStmt.setString(position, value);
+            saveParameter(position, value);
+        }
     }
     public void setDateTime(int position, ReadableInstant value) throws SQLException {
         if (value == null) {
@@ -93,8 +97,12 @@ public class SqlStmt implements AutoCloseable {
         }
     }
     public void setBlob(int position, byte[] blob) throws SQLException {
-        mStmt.setBlob(position, new ByteArrayInputStream(blob));
-        saveParameter(position, "<BLOB>");
+        if (blob == null) {
+            setNull(position);
+        } else {
+            mStmt.setBlob(position, new ByteArrayInputStream(blob));
+            saveParameter(position, "<BLOB>");
+        }
     }
     public void setNull(int position) throws SQLException {
         mStmt.setNull(position, Types.NULL);

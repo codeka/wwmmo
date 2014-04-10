@@ -34,6 +34,10 @@ public abstract class AllianceRequestProcessor {
             return new DepositCashRequestProcessor(alliance, request);
         case WITHDRAW_CASH:
             return new WithdrawCashRequestProcessor(alliance, request);
+        case CHANGE_IMAGE:
+            return new ChangeImageRequestProcessor(alliance, request);
+        case CHANGE_NAME:
+            return new ChangeNameRequestProcessor(alliance, request);
         }
 
         throw new UnsupportedOperationException("Unknown request type: " + request.getRequestType());
@@ -67,10 +71,10 @@ public abstract class AllianceRequestProcessor {
             requiredVotes = 0;
         }
 
-        if (mRequest.getVotes() >= requiredVotes) {
+        if (mRequest.getNumVotes() >= requiredVotes) {
             // if we have enough votes for a 'success', then this vote passes.
             onVotePassed(ctrl);
-        } else if (mRequest.getVotes() <= -requiredVotes) {
+        } else if (mRequest.getNumVotes() <= -requiredVotes) {
             // if we have enough negative votes for a 'failure' then this vote fails.
             onVoteFailed(ctrl);
         }
@@ -256,6 +260,35 @@ public abstract class AllianceRequestProcessor {
                 stmt.setDateTime(4, DateTime.now());
                 stmt.setDouble(5, mAlliance.getBankBalance());
                 stmt.setDouble(6, mAlliance.getBankBalance() - mRequest.getAmount());
+                stmt.update();
+            }
+        }
+    }
+
+    private static class ChangeImageRequestProcessor extends AllianceRequestProcessor {
+        public ChangeImageRequestProcessor(Alliance alliance, AllianceRequest request) {
+            super(alliance, request);
+        }
+
+        @Override
+        protected void onVotePassed(AllianceController ctrl) throws Exception {
+            super.onVotePassed(ctrl);
+        }
+    }
+
+    private static class ChangeNameRequestProcessor extends AllianceRequestProcessor {
+        public ChangeNameRequestProcessor(Alliance alliance, AllianceRequest request) {
+            super(alliance, request);
+        }
+
+        @Override
+        protected void onVotePassed(AllianceController ctrl) throws Exception {
+            super.onVotePassed(ctrl);
+
+            String sql = "UPDATE alliances SET name = ? WHERE id = ?";
+            try (SqlStmt stmt = ctrl.getDB().prepare(sql)) {
+                stmt.setString(1, mRequest.getNewName());
+                stmt.setInt(2, mRequest.getAllianceID());
                 stmt.update();
             }
         }

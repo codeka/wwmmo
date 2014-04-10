@@ -81,7 +81,8 @@
         <activity android:name=".game.solarsystem.EmptyPlanetActivity" />
         <activity android:name=".game.solarsystem.FleetActivity" />
         <activity android:name=".game.alliance.AllianceActivity" />
-        <activity android:name=".game.alliance.AllianceChangeDetailsActivity" />
+        <activity android:name=".game.alliance.AllianceChangeDetailsActivity"
+                  android:windowSoftInputMode="stateUnchanged" />
         <activity android:name=".game.alliance.AllianceDetailsActivity" />
         <activity android:name=".game.alliance.AllianceMemberDetailsActivity" />
         <activity android:name=".game.wormhole.WormholeActivity" />

@@ -1,6 +1,5 @@
 package au.com.codeka.warworlds.game;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -14,10 +13,7 @@ import org.slf4j.LoggerFactory;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.database.Cursor;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -41,6 +37,7 @@ import au.com.codeka.common.model.BaseColony;
 import au.com.codeka.common.model.BaseFleet;
 import au.com.codeka.common.model.BasePlanet;
 import au.com.codeka.common.protobuf.Messages;
+import au.com.codeka.warworlds.ImagePickerHelper;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.ServerGreeter;
 import au.com.codeka.warworlds.ServerGreeter.ServerGreeting;
@@ -85,9 +82,7 @@ public class EmpireActivity extends TabFragmentActivity
     Bundle mExtras = null;
     boolean mFirstRefresh = true;
     boolean mFirstStarsRefresh = true;
-    String mShieldImagePath = null;
-
-    private static final int CHOOSE_SHIELD_RESULT_ID = 9876;
+    private ImagePickerHelper mImagePickerHelper = new ImagePickerHelper(this);
 
     public enum EmpireActivityResult {
         NavigateToPlanet(1),
@@ -163,22 +158,7 @@ public class EmpireActivity extends TabFragmentActivity
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if(requestCode == CHOOSE_SHIELD_RESULT_ID && data != null && data.getData() != null) {
-            Uri uri = data.getData();
-
-            // user has picked an image, save it so the fragment can find it..
-            Cursor cursor = getContentResolver().query(uri, new String[] { android.provider.MediaStore.Images.ImageColumns.DATA }, null, null, null);
-            if (cursor != null) {
-                cursor.moveToFirst();
-                mShieldImagePath = cursor.getString(0);
-                cursor.close();
-            } else if (uri.getScheme() == "file") {
-                mShieldImagePath = uri.getPath();
-                if (!new File(mShieldImagePath).exists()) {
-                    mShieldImagePath = null;
-                }
-            }
-
+        if (mImagePickerHelper.onActivityResult(requestCode, resultCode, data)) {
             getTabHost().setCurrentTabByTag("Settings");
         }
 
@@ -518,11 +498,12 @@ public class EmpireActivity extends TabFragmentActivity
     public static class SettingsFragment extends BaseFragment
                                          implements EmpireShieldManager.EmpireShieldUpdatedHandler {
         private View mView;
-        private Bitmap mNewShieldImage;
+        private ImagePickerHelper mImagePickerHelper;
 
         @Override
         public void onStart() {
             super.onStart();
+            mImagePickerHelper = ((EmpireActivity) getActivity()).mImagePickerHelper;
             EmpireShieldManager.i.addEmpireShieldUpdatedHandler(this);
         }
 
@@ -622,10 +603,8 @@ public class EmpireActivity extends TabFragmentActivity
                 }
             });
 
-            String shieldImagePath = ((EmpireActivity) getActivity()).mShieldImagePath;
-            if (shieldImagePath != null) {
-                loadShieldImage(shieldImagePath);
-            }
+            mImagePickerHelper = ((EmpireActivity) getActivity()).mImagePickerHelper;
+            loadShieldImage();
 
             return mView;
         }
@@ -652,22 +631,19 @@ public class EmpireActivity extends TabFragmentActivity
         }
 
         private void onShieldChangeClick() {
-            // launch a new intent to find an image
-            Intent intent = new Intent();
-            intent.setType("image/*");
-            intent.setAction(Intent.ACTION_GET_CONTENT);
-            getActivity().startActivityForResult(Intent.createChooser(intent, "Choose Image"), CHOOSE_SHIELD_RESULT_ID);
+            mImagePickerHelper.chooseImage();
         }
 
         private void onShieldSaveClick() {
-            if (mNewShieldImage == null) {
+            final Bitmap bmp = mImagePickerHelper.getImage();
+            if (bmp == null) {
                 return;
             }
 
             purchase("decorate_empire", new PurchaseCompleteHandler() {
                 @Override
                 public void onPurchaseComplete(Purchase purchaseInfo) {
-                    EmpireManager.i.getEmpire().changeShieldImage(mNewShieldImage, purchaseInfo);
+                    EmpireManager.i.getEmpire().changeShieldImage(bmp, purchaseInfo);
                 }
             });
         }
@@ -723,31 +699,19 @@ public class EmpireActivity extends TabFragmentActivity
             });
         }
 
-        private void loadShieldImage(String path) {
-            BitmapFactory.Options opts = new BitmapFactory.Options();
-            opts.inJustDecodeBounds = true;
-            BitmapFactory.decodeFile(path, opts);
+        private void loadShieldImage() {
+            Bitmap bmp = mImagePickerHelper.getImage();
+            if (bmp != null) {
+                bmp = EmpireShieldManager.i.combineShieldImage(getActivity(), bmp);
 
-            int scale = 1;
-            while (opts.outWidth / scale / 2 >= 100 && opts.outHeight / scale / 2 >= 100) {
-                scale *= 2;
+                ImageView currentShield = (ImageView) mView.findViewById(R.id.current_shield);
+                currentShield.setImageBitmap(bmp);
+                ImageView currentShieldSmall = (ImageView) mView.findViewById(R.id.current_shield_small);
+                currentShieldSmall.setImageBitmap(bmp);
+    
+                // and now we can enable the 'save' button
+                ((Button) mView.findViewById(R.id.save_btn)).setEnabled(true);;
             }
-            log.info("Scale set to "+scale+" for image size "+opts.outWidth+"x"+opts.outHeight);
-
-            opts = new BitmapFactory.Options();
-            opts.inPurgeable = true;
-            opts.inInputShareable = true;
-            opts.inSampleSize = scale;
-            mNewShieldImage = BitmapFactory.decodeFile(path, opts);
-            Bitmap bmp = EmpireShieldManager.i.combineShieldImage(getActivity(), mNewShieldImage);
-
-            ImageView currentShield = (ImageView) mView.findViewById(R.id.current_shield);
-            currentShield.setImageBitmap(bmp);
-            ImageView currentShieldSmall = (ImageView) mView.findViewById(R.id.current_shield_small);
-            currentShieldSmall.setImageBitmap(bmp);
-
-            // and now we can enable the 'save' button
-            ((Button) mView.findViewById(R.id.save_btn)).setEnabled(true);;
         }
 
         private void purchase(String sku, final PurchaseCompleteHandler onComplete) {

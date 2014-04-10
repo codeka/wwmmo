@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <ImageView
+        android:id="@+id/empire_icon"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:layout_alignParentLeft="true"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:src="@drawable/app_icon" />
+
+    <TextView
+        android:id="@+id/empire_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_toRightOf="@id/empire_icon"
+        android:layout_toLeftOf="@+id/vote_time"
+        android:ellipsize="end" 
+        android:maxLines="1"
+        android:text="Empire Name"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+
+    <TextView
+        android:id="@+id/vote_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/empire_name"
+        android:layout_toLeftOf="@+id/empire_votes"
+        android:text="1 min ago"
+        android:textAppearance="?android:attr/textAppearanceSmall" />
+
+    <TextView
+        android:id="@+id/empire_votes"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_alignBaseline="@+id/empire_name"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:gravity="right"
+        android:text="+7"
+        android:textStyle="bold"
+        android:textColor="#0f0" />
+
+</RelativeLayout>

@@ -1,17 +1,10 @@
 package au.com.codeka.warworlds.game.alliance;
 
 import java.io.ByteArrayOutputStream;
-import java.io.FileNotFoundException;
-import java.io.InputStream;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.CompressFormat;
-import android.graphics.BitmapFactory;
-import android.net.Uri;
 import android.os.Bundle;
 import android.text.Html;
 import android.view.View;
@@ -21,6 +14,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import au.com.codeka.warworlds.BaseActivity;
+import au.com.codeka.warworlds.ImagePickerHelper;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.ServerGreeter;
 import au.com.codeka.warworlds.ServerGreeter.ServerGreeting;
@@ -32,11 +26,7 @@ import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.MyEmpire;
 
 public class AllianceChangeDetailsActivity extends BaseActivity {
-    private static final Logger log = LoggerFactory.getLogger(AllianceChangeDetailsActivity.class);
-
-    private static final int CHOOSE_IMAGE_RESULT_ID = 7406;
-    private InputStream mImageStream;
-    private Bitmap mNewBitmap;
+    private ImagePickerHelper mImagePickerHelper = new ImagePickerHelper(this);
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -48,14 +38,7 @@ public class AllianceChangeDetailsActivity extends BaseActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if(requestCode == CHOOSE_IMAGE_RESULT_ID && data != null && data.getData() != null) {
-            Uri uri = data.getData();
-
-            try {
-                mImageStream = getContentResolver().openInputStream(uri);
-            } catch (FileNotFoundException e) {
-            }
-        }
+        mImagePickerHelper.onActivityResult(requestCode, resultCode, data);
 
         super.onActivityResult(requestCode, resultCode, data);
     }
@@ -79,6 +62,12 @@ public class AllianceChangeDetailsActivity extends BaseActivity {
     private void fullRefresh() {
         MyEmpire myEmpire = EmpireManager.i.getEmpire();
         Alliance myAlliance = (Alliance) myEmpire.getAlliance();
+
+        TextView allianceName = (TextView) findViewById(R.id.alliance_name);
+        allianceName.setText(myAlliance.getName());
+
+        TextView allianceMembers = (TextView) findViewById(R.id.alliance_num_members);
+        allianceMembers.setText(String.format("Members: %d", myAlliance.getNumMembers()));
 
         final EditText newNameEdit = (EditText) findViewById(R.id.new_name);
         newNameEdit.setText(myAlliance.getName());
@@ -115,9 +104,7 @@ public class AllianceChangeDetailsActivity extends BaseActivity {
             }
         });
 
-        if (mImageStream != null) {
-            loadImage(mImageStream);
-        }
+        loadImage();
     }
 
     private void onChangeNameClick() {
@@ -138,66 +125,35 @@ public class AllianceChangeDetailsActivity extends BaseActivity {
     }
 
     private void onChooseImageClick() {
-        // launch a new intent to find an image
-        Intent intent = new Intent();
-        intent.setType("image/*");
-        intent.setAction(Intent.ACTION_GET_CONTENT);
-        startActivityForResult(Intent.createChooser(intent, "Choose Image"),
-                CHOOSE_IMAGE_RESULT_ID);
+        mImagePickerHelper.chooseImage();
     }
 
     private void onChangeImageClick() {
-        if (mNewBitmap == null) {
+        Bitmap bmp = mImagePickerHelper.getImage();
+        if (bmp == null) {
             return;
         }
 
         int allianceID = ((Alliance) EmpireManager.i.getEmpire().getAlliance()).getID();
 
         ByteArrayOutputStream outs = new ByteArrayOutputStream();
-        mNewBitmap.compress(CompressFormat.PNG, 90, outs);
+        bmp.compress(CompressFormat.PNG, 90, outs);
 
         AllianceManager.i.requestChangeImage(allianceID, "", outs.toByteArray());
     }
 
-    private void loadImage(InputStream ins) {
-        if (ins.markSupported()) {
-            mNewBitmap = loadImageWithMark(ins);
-        } else {
-            mNewBitmap = loadImageNoMark(ins);
+    private void loadImage() {
+        Bitmap bmp = mImagePickerHelper.getImage();
+        if (bmp == null) {
+            return;
         }
 
         ImageView currentImage = (ImageView) findViewById(R.id.current_image);
-        currentImage.setImageBitmap(mNewBitmap);
+        currentImage.setImageBitmap(bmp);
         ImageView currentImageSmall = (ImageView) findViewById(R.id.current_image_small);
-        currentImageSmall.setImageBitmap(mNewBitmap);
+        currentImageSmall.setImageBitmap(bmp);
 
         // and now we can enable the 'Change' button
         ((Button) findViewById(R.id.change_image_btn)).setEnabled(true);;        
-    }
-
-    private Bitmap loadImageWithMark(InputStream ins) {
-        BitmapFactory.Options opts = new BitmapFactory.Options();
-        opts.inJustDecodeBounds = true;
-        ins.mark(10 * 1024 * 1024);
-        BitmapFactory.decodeStream(ins, null, opts);
-
-        int scale = 1;
-        while (opts.outWidth / scale / 2 >= 100 && opts.outHeight / scale / 2 >= 100) {
-            scale *= 2;
-        }
-        log.info("Scale set to "+scale+" for image size "+opts.outWidth+"x"+opts.outHeight);
-
-        opts = new BitmapFactory.Options();
-        opts.inPurgeable = true;
-        opts.inInputShareable = true;
-        opts.inSampleSize = scale;
-        return BitmapFactory.decodeStream(ins, null, opts);
-    }
-
-    private Bitmap loadImageNoMark(InputStream ins) {
-        BitmapFactory.Options opts = new BitmapFactory.Options();
-        opts.inPurgeable = true;
-        opts.inInputShareable = true;
-        return BitmapFactory.decodeStream(ins, null, opts);
     }
 }
