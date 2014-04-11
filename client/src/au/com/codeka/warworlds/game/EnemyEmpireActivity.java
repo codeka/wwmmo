@@ -1,24 +1,32 @@
 package au.com.codeka.warworlds.game;
 
+import java.text.DecimalFormat;
+
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.Html;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import au.com.codeka.common.model.BaseEmpireRank;
 import au.com.codeka.common.model.BaseStar;
 import au.com.codeka.warworlds.BaseActivity;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.ServerGreeter;
 import au.com.codeka.warworlds.ServerGreeter.ServerGreeting;
 import au.com.codeka.warworlds.WarWorldsActivity;
+import au.com.codeka.warworlds.game.alliance.KickRequestDialog;
 import au.com.codeka.warworlds.game.chat.ChatActivity;
 import au.com.codeka.warworlds.game.starfield.StarfieldActivity;
+import au.com.codeka.warworlds.model.Alliance;
+import au.com.codeka.warworlds.model.AllianceShieldManager;
 import au.com.codeka.warworlds.model.Empire;
 import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.EmpireShieldManager;
+import au.com.codeka.warworlds.model.MyEmpire;
 
 public class EnemyEmpireActivity extends BaseActivity
                                  implements EmpireManager.EmpireFetchedHandler,
@@ -48,6 +56,14 @@ public class EnemyEmpireActivity extends BaseActivity
                 onPrivateMessageClick();
             }
         });
+
+        Button kickBtn = (Button) findViewById(R.id.kick_btn);
+        kickBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onKickClick();
+            }
+        });
     }
 
     @Override
@@ -71,12 +87,14 @@ public class EnemyEmpireActivity extends BaseActivity
     protected void onStart() {
         super.onStart();
         EmpireShieldManager.i.addShieldUpdatedHandler(this);
+        AllianceShieldManager.i.addShieldUpdatedHandler(this);
     }
 
     @Override
     protected void onStop() {
         super.onStart();
         EmpireShieldManager.i.removeShieldUpdatedHandler(this);
+        AllianceShieldManager.i.removeShieldUpdatedHandler(this);
     }
 
 
@@ -93,6 +111,8 @@ public class EnemyEmpireActivity extends BaseActivity
     }
 
     private void refresh() {
+        MyEmpire myEmpire = EmpireManager.i.getEmpire();
+
         TextView empireName = (TextView) findViewById(R.id.empire_name);
         ImageView empireIcon = (ImageView) findViewById(R.id.empire_icon);
 
@@ -104,6 +124,68 @@ public class EnemyEmpireActivity extends BaseActivity
 
         tv = (TextView) findViewById(R.id.view_msg);
         tv.setText(String.format(tv.getText().toString(), mEmpire.getDisplayName()));
+
+        TextView allianceName = (TextView) findViewById(R.id.alliance_name);
+        ImageView allianceIcon = (ImageView) findViewById(R.id.alliance_icon);
+
+        Alliance alliance = (Alliance) mEmpire.getAlliance();
+        if (alliance != null) {
+            allianceName.setText(alliance.getName());
+            allianceIcon.setImageBitmap(AllianceShieldManager.i.getShield(this, alliance));
+        } else {
+            allianceName.setText("");
+            allianceIcon.setImageBitmap(null);
+        }
+
+        TextView totalStars = (TextView) findViewById(R.id.total_stars);
+        TextView totalColonies = (TextView) findViewById(R.id.total_colonies);
+        TextView totalShips = (TextView) findViewById(R.id.total_ships);
+        TextView totalBuildings = (TextView) findViewById(R.id.total_buildings);
+        DecimalFormat formatter = new DecimalFormat("#,##0");
+
+        BaseEmpireRank rank = mEmpire.getRank();
+        if (rank != null) {
+            totalStars.setText(Html.fromHtml(String.format("Stars: <b>%s</b>",
+                    formatter.format(rank.getTotalStars()))));
+            totalColonies.setText(Html.fromHtml(String.format("Colonies: <b>%s</b>",
+                    formatter.format(rank.getTotalColonies()))));
+
+            if (mEmpire.getKey().equals(myEmpire.getKey()) || rank.getTotalStars() >= 10) {
+                totalShips.setText(Html.fromHtml(String.format("Ships: <b>%s</b>",
+                       formatter.format(rank.getTotalShips()))));
+                totalBuildings.setText(Html.fromHtml(String.format("Buildings: <b>%s</b>",
+                       formatter.format(rank.getTotalBuildings()))));
+            } else {
+                totalShips.setText("");
+                totalBuildings.setText("");
+            }
+        } else {
+            totalStars.setText("");
+            totalColonies.setText("");
+            totalShips.setText("");
+            totalBuildings.setText("");
+        }
+
+        View horzSep = findViewById(R.id.horz_sep_3);
+        TextView kickInfo = (TextView) findViewById(R.id.kick_info);
+        Button kickBtn = (Button) findViewById(R.id.kick_btn);
+        if (mEmpire.getAlliance() != null && myEmpire.getAlliance() != null &&
+            mEmpire.getID() != myEmpire.getID() &&
+            mEmpire.getAlliance().getKey().equals(myEmpire.getAlliance().getKey())) {
+            horzSep.setVisibility(View.VISIBLE);
+            kickInfo.setVisibility(View.VISIBLE);
+            kickBtn.setVisibility(View.VISIBLE);
+        } else {
+            horzSep.setVisibility(View.GONE);
+            kickInfo.setVisibility(View.GONE);
+            kickBtn.setVisibility(View.GONE);
+        }
+    }
+
+    private void onKickClick() {
+        KickRequestDialog dialog = new KickRequestDialog();
+        dialog.setup((Alliance) mEmpire.getAlliance(), mEmpire);
+        dialog.show(getSupportFragmentManager(), "");
     }
 
     public void onEmpireViewClick() {

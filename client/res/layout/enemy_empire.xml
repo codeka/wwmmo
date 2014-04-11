@@ -19,9 +19,66 @@
         android:layout_height="wrap_content"
         android:layout_alignTop="@id/empire_icon"
         android:layout_toRightOf="@id/empire_icon"
-        android:text="Empire name goes here"
+        android:text="Empire name"
         android:layout_marginLeft="5dp"
         android:textAppearance="?android:attr/textAppearanceMedium" />
+
+    <ImageView
+        android:id="@+id/alliance_icon"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:layout_alignLeft="@id/empire_name"
+        android:layout_below="@id/empire_name"
+        android:src="@drawable/app_icon" />
+
+    <TextView
+        android:id="@+id/alliance_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@id/alliance_icon"
+        android:layout_toRightOf="@id/alliance_icon"
+        android:text="Alliance name"
+        android:layout_marginLeft="5dp" />
+
+    <TextView
+        android:id="@+id/total_stars"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/alliance_icon"
+        android:layout_toRightOf="@id/empire_icon"
+        android:layout_marginLeft="5dp"
+        android:layout_marginTop="5dp"
+        android:text="Stars: 12"
+        android:textAppearance="?android:attr/textAppearanceSmall" />
+
+    <TextView
+        android:id="@+id/total_colonies"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/total_stars"
+        android:layout_toRightOf="@id/empire_icon"
+        android:layout_marginLeft="5dp"
+        android:text="Colonies: 23"
+        android:textAppearance="?android:attr/textAppearanceSmall" />
+
+    <TextView
+        android:id="@+id/total_ships"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@id/total_stars"
+        android:layout_toRightOf="@id/total_colonies"
+        android:layout_marginLeft="20dp"
+        android:text="Ships: 12,345"
+        android:textAppearance="?android:attr/textAppearanceSmall" />
+
+    <TextView
+        android:id="@+id/total_buildings"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@id/total_colonies"
+        android:layout_alignLeft="@id/total_ships"
+        android:text="Buildings 145"
+        android:textAppearance="?android:attr/textAppearanceSmall" />
 
     <au.com.codeka.warworlds.ctrl.InfobarView
         android:id="@+id/infobar"
@@ -35,7 +92,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_alignParentRight="true"
-        android:layout_below="@+id/empire_icon"
+        android:layout_below="@+id/total_buildings"
         android:layout_marginLeft="@dimen/tablet_margin_5dp"
         android:layout_marginRight="@dimen/tablet_margin_5dp"
         android:text="Locate" />
@@ -91,5 +148,36 @@
         android:layout_centerHorizontal="true"
         android:layout_marginTop="6dp"
         android:text="Private Message" />
-    
+
+    <au.com.codeka.warworlds.ctrl.HorizontalSeparator
+        android:id="@+id/horz_sep_3"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/private_message_btn"
+        android:layout_marginTop="15dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:text="Kick Empire" />
+
+    <TextView
+        android:id="@+id/kick_info"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/horz_sep_3"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:text="You can vote to kick this empire out of your alliance by clicking the button below." />
+
+    <Button
+        android:id="@+id/kick_btn"
+        android:layout_width="100dp"
+        android:layout_height="30dp"
+        android:layout_below="@+id/kick_info"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="15dp"
+        android:text="Kick" />
+
 </RelativeLayout>

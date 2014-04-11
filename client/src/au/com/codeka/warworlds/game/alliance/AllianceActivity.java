@@ -33,10 +33,12 @@ import au.com.codeka.warworlds.WarWorldsActivity;
 import au.com.codeka.warworlds.model.Alliance;
 import au.com.codeka.warworlds.model.AllianceManager;
 import au.com.codeka.warworlds.model.AllianceRequest;
+import au.com.codeka.warworlds.model.AllianceShieldManager;
 import au.com.codeka.warworlds.model.Empire;
 import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.EmpireShieldManager;
 import au.com.codeka.warworlds.model.MyEmpire;
+import au.com.codeka.warworlds.model.ShieldManager;
 
 public class AllianceActivity extends TabFragmentActivity
                               implements EmpireManager.EmpireFetchedHandler {
@@ -100,7 +102,8 @@ public class AllianceActivity extends TabFragmentActivity
     }
 
     public static class AllianceListFragment extends BaseFragment
-                                             implements AllianceManager.AllianceUpdatedHandler {
+                                             implements AllianceManager.AllianceUpdatedHandler,
+                                                        ShieldManager.ShieldUpdatedHandler {
         private View mView;
         private RankListAdapter mRankListAdapter;
 
@@ -144,17 +147,24 @@ public class AllianceActivity extends TabFragmentActivity
         public void onAttach(Activity activity) {
             super.onAttach(activity);
             AllianceManager.i.addAllianceUpdatedHandler(this);
+            AllianceShieldManager.i.addShieldUpdatedHandler(this);
         }
 
         @Override
         public void onDetach() {
             super.onDetach();
             AllianceManager.i.removeAllianceUpdatedHandler(this);
+            AllianceShieldManager.i.removeShieldUpdatedHandler(this);
         }
 
         @Override
         public void onAllianceUpdated(Alliance alliance) {
             refresh();
+        }
+
+        @Override
+        public void onShieldUpdated(int id) {
+            mRankListAdapter.notifyDataSetChanged();
         }
 
         private void onAllianceCreate() {
@@ -279,6 +289,9 @@ public class AllianceActivity extends TabFragmentActivity
 
                     TextView allianceMembers = (TextView) view.findViewById(R.id.alliance_num_members);
                     allianceMembers.setText(String.format("Members: %d", entry.alliance.getNumMembers()));
+
+                    ImageView allianceIcon = (ImageView) view.findViewById(R.id.alliance_icon);
+                    allianceIcon.setImageBitmap(AllianceShieldManager.i.getShield(getActivity(), entry.alliance));
                 }
 
                 return view;
@@ -292,6 +305,7 @@ public class AllianceActivity extends TabFragmentActivity
                 }
             }
         }
+
     }
 
     public static class RequestsFragment extends BaseFragment

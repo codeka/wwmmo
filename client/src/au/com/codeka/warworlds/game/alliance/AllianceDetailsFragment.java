@@ -6,8 +6,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import com.google.protobuf.InvalidProtocolBufferException;
-
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -26,17 +24,22 @@ import au.com.codeka.common.model.BaseAllianceMember;
 import au.com.codeka.common.model.BaseEmpireRank;
 import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.R;
+import au.com.codeka.warworlds.game.EnemyEmpireActivity;
 import au.com.codeka.warworlds.model.Alliance;
 import au.com.codeka.warworlds.model.AllianceManager;
+import au.com.codeka.warworlds.model.AllianceShieldManager;
 import au.com.codeka.warworlds.model.Empire;
 import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.EmpireShieldManager;
 import au.com.codeka.warworlds.model.MyEmpire;
+import au.com.codeka.warworlds.model.ShieldManager;
+
+import com.google.protobuf.InvalidProtocolBufferException;
 
 public class AllianceDetailsFragment extends Fragment
                                      implements AllianceManager.AllianceUpdatedHandler,
-                                     EmpireManager.EmpireFetchedHandler,
-                                     EmpireShieldManager.ShieldUpdatedHandler {
+                                                EmpireManager.EmpireFetchedHandler,
+                                                ShieldManager.ShieldUpdatedHandler {
     private Handler mHandler;
     private Activity mActivity;
     private LayoutInflater mLayoutInflater;
@@ -100,6 +103,7 @@ public class AllianceDetailsFragment extends Fragment
         super.onStart();
         AllianceManager.i.addAllianceUpdatedHandler(this);
         EmpireManager.i.addEmpireUpdatedListener(null, this);
+        AllianceShieldManager.i.addShieldUpdatedHandler(this);
         EmpireShieldManager.i.addShieldUpdatedHandler(this);
     }
 
@@ -108,6 +112,7 @@ public class AllianceDetailsFragment extends Fragment
         super.onStop();
         AllianceManager.i.removeAllianceUpdatedHandler(this);
         EmpireManager.i.removeEmpireUpdatedListener(this);
+        AllianceShieldManager.i.removeShieldUpdatedHandler(this);
         EmpireShieldManager.i.removeShieldUpdatedHandler(this);
     }
 
@@ -200,6 +205,9 @@ public class AllianceDetailsFragment extends Fragment
         TextView allianceMembers = (TextView) mView.findViewById(R.id.alliance_num_members);
         allianceMembers.setText(String.format("Members: %d", mAlliance.getNumMembers()));
 
+        ImageView allianceIcon = (ImageView) mView.findViewById(R.id.alliance_icon);
+        allianceIcon.setImageBitmap(AllianceShieldManager.i.getShield(mActivity, mAlliance));
+
         if (mAlliance.getMembers() != null) {
             ArrayList<Empire> members = new ArrayList<Empire>();
             ArrayList<String> missingMembers = new ArrayList<String>();
@@ -247,12 +255,12 @@ public class AllianceDetailsFragment extends Fragment
             @Override
             public void onClick(View v) {
                 Empire empire = (Empire) v.getTag();
+                if (empire.getKey().equals(EmpireManager.i.getEmpire().getKey())) {
+                    // don't show your own empire...
+                    return;
+                }
 
-                Intent intent = new Intent(mActivity, AllianceMemberDetailsActivity.class);
-                intent.putExtra("au.com.codeka.warworlds.AllianceKey", mAlliance.getKey());
-                Messages.Alliance.Builder alliance_pb = Messages.Alliance.newBuilder();
-                mAlliance.toProtocolBuffer(alliance_pb);
-                intent.putExtra("au.com.codeka.warworlds.Alliance", alliance_pb.build().toByteArray());
+                Intent intent = new Intent(mActivity, EnemyEmpireActivity.class);
                 intent.putExtra("au.com.codeka.warworlds.EmpireKey", empire.getKey());
 
                 startActivity(intent);
