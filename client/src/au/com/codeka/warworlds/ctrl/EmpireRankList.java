@@ -32,6 +32,10 @@ public class EmpireRankList extends ListView
 
     public EmpireRankList(Context context, AttributeSet attrs) {
         super(context, attrs);
+        if (isInEditMode()) {
+            return;
+        }
+
         mContext = context;
         mRankListAdapter = new RankListAdapter();
         setAdapter(mRankListAdapter);
@@ -40,12 +44,18 @@ public class EmpireRankList extends ListView
     @Override
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
+        if (isInEditMode()) {
+            return;
+        }
         EmpireShieldManager.i.addShieldUpdatedHandler(this);
     }
 
     @Override
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
+        if (isInEditMode()) {
+            return;
+        }
         EmpireShieldManager.i.removeShieldUpdatedHandler(this);
     }
 

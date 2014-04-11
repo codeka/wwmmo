@@ -51,6 +51,8 @@ import au.com.codeka.warworlds.ctrl.EmpireRankList;
 import au.com.codeka.warworlds.ctrl.FleetList;
 import au.com.codeka.warworlds.game.build.BuildAccelerateDialog;
 import au.com.codeka.warworlds.game.build.BuildStopConfirmDialog;
+import au.com.codeka.warworlds.model.Alliance;
+import au.com.codeka.warworlds.model.AllianceShieldManager;
 import au.com.codeka.warworlds.model.BuildManager;
 import au.com.codeka.warworlds.model.BuildRequest;
 import au.com.codeka.warworlds.model.Colony;
@@ -206,21 +208,28 @@ public class EmpireActivity extends TabFragmentActivity
         public void onStart() {
             super.onStart();
             EmpireShieldManager.i.addShieldUpdatedHandler(this);
+            AllianceShieldManager.i.addShieldUpdatedHandler(this);
         }
 
         @Override
         public void onStop() {
             super.onStop();
             EmpireShieldManager.i.removeShieldUpdatedHandler(this);
+            AllianceShieldManager.i.removeShieldUpdatedHandler(this);
         }
 
         /** Called when an empire's shield is updated, we'll have to refresh the list. */
         @Override
-        public void onShieldUpdated(int empireID) {
+        public void onShieldUpdated(int id) {
             MyEmpire empire = EmpireManager.i.getEmpire();
-            if (Integer.parseInt(empire.getKey()) == empireID) {
-                ImageView empireIcon = (ImageView) mView.findViewById(R.id.empire_icon);
-                empireIcon.setImageBitmap(EmpireShieldManager.i.getShield(getActivity(), empire));
+
+            ImageView empireIcon = (ImageView) mView.findViewById(R.id.empire_icon);
+            empireIcon.setImageBitmap(EmpireShieldManager.i.getShield(getActivity(), empire));
+
+            ImageView allianceIcon = (ImageView) mView.findViewById(R.id.alliance_icon);
+            if (empire.getAlliance() != null) {
+                allianceIcon.setImageBitmap(AllianceShieldManager.i.getShield(getActivity(),
+                        (Alliance) empire.getAlliance()));
             }
         }
 
@@ -238,13 +247,17 @@ public class EmpireActivity extends TabFragmentActivity
             TextView empireName = (TextView) mView.findViewById(R.id.empire_name);
             ImageView empireIcon = (ImageView) mView.findViewById(R.id.empire_icon);
             TextView allianceName = (TextView) mView.findViewById(R.id.alliance_name);
+            ImageView allianceIcon = (ImageView) mView.findViewById(R.id.alliance_icon);
 
             empireName.setText(empire.getDisplayName());
             empireIcon.setImageBitmap(EmpireShieldManager.i.getShield(getActivity(), empire));
             if (empire.getAlliance() != null) {
                 allianceName.setText(empire.getAlliance().getName());
+                allianceIcon.setImageBitmap(AllianceShieldManager.i.getShield(getActivity(),
+                        (Alliance) empire.getAlliance()));
             } else {
                 allianceName.setText("");
+                allianceIcon.setImageBitmap(null);
             }
 
             final ProgressBar progress = (ProgressBar) mView.findViewById(R.id.progress_bar);

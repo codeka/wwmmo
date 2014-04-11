@@ -141,10 +141,13 @@ public class EnemyEmpireActivity extends BaseActivity
         TextView totalColonies = (TextView) findViewById(R.id.total_colonies);
         TextView totalShips = (TextView) findViewById(R.id.total_ships);
         TextView totalBuildings = (TextView) findViewById(R.id.total_buildings);
+        TextView rankNumber = (TextView) findViewById(R.id.rank);
         DecimalFormat formatter = new DecimalFormat("#,##0");
 
         BaseEmpireRank rank = mEmpire.getRank();
         if (rank != null) {
+            rankNumber.setText(formatter.format(rank.getRank()));
+
             totalStars.setText(Html.fromHtml(String.format("Stars: <b>%s</b>",
                     formatter.format(rank.getTotalStars()))));
             totalColonies.setText(Html.fromHtml(String.format("Colonies: <b>%s</b>",
@@ -160,6 +163,7 @@ public class EnemyEmpireActivity extends BaseActivity
                 totalBuildings.setText("");
             }
         } else {
+            rankNumber.setText("");
             totalStars.setText("");
             totalColonies.setText("");
             totalShips.setText("");

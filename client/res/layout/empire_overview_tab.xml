@@ -19,16 +19,25 @@
         android:layout_height="wrap_content"
         android:layout_alignTop="@id/empire_icon"
         android:layout_toRightOf="@id/empire_icon"
-        android:text="Empire name goes here"
+        android:text="Empire"
         android:layout_marginLeft="5dp"
         android:textAppearance="?android:attr/textAppearanceMedium" />
+
+    <ImageView
+        android:id="@+id/alliance_icon"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:layout_alignLeft="@+id/empire_name"
+        android:layout_below="@+id/empire_name"
+        android:src="@drawable/app_icon" />
 
     <TextView
         android:id="@+id/alliance_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/empire_name"
-        android:layout_below="@+id/empire_name"
+        android:layout_toRightOf="@+id/alliance_icon"
+        android:layout_alignBottom="@+id/alliance_icon"
+        android:layout_marginLeft="5dp"
         android:text="Alliance"
         android:textAppearance="?android:attr/textAppearanceSmall" />
 
