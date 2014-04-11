@@ -41,6 +41,17 @@
         android:layout_marginLeft="5dp" />
 
     <TextView
+        android:id="@+id/rank"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_alignBottom="@+id/alliance_name"
+        android:layout_alignTop="@+id/empire_name"
+        android:text="123"
+        android:gravity="center"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
+
+    <TextView
         android:id="@+id/total_stars"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
