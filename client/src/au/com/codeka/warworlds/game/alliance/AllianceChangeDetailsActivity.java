@@ -22,10 +22,13 @@ import au.com.codeka.warworlds.StyledDialog;
 import au.com.codeka.warworlds.WarWorldsActivity;
 import au.com.codeka.warworlds.model.Alliance;
 import au.com.codeka.warworlds.model.AllianceManager;
+import au.com.codeka.warworlds.model.AllianceShieldManager;
 import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.MyEmpire;
+import au.com.codeka.warworlds.model.ShieldManager;
 
-public class AllianceChangeDetailsActivity extends BaseActivity {
+public class AllianceChangeDetailsActivity extends BaseActivity
+                                           implements ShieldManager.ShieldUpdatedHandler {
     private ImagePickerHelper mImagePickerHelper = new ImagePickerHelper(this);
 
     @Override
@@ -34,6 +37,30 @@ public class AllianceChangeDetailsActivity extends BaseActivity {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
 
         setContentView(R.layout.alliance_change_details);
+
+        final Button changeNameBtn = (Button) findViewById(R.id.change_name_btn);
+        changeNameBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onChangeNameClick();
+            }
+        });
+
+        final Button chooseImageBtn = (Button) findViewById(R.id.choose_image_btn);
+        chooseImageBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onChooseImageClick();
+            }
+        });
+
+        final Button changeImageBtn = (Button) findViewById(R.id.change_image_btn);
+        changeImageBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onChangeImageClick();
+            }
+        });
     }
 
     @Override
@@ -59,6 +86,18 @@ public class AllianceChangeDetailsActivity extends BaseActivity {
         });
     }
 
+    @Override
+    public void onStart() {
+        super.onStart();
+        AllianceShieldManager.i.addShieldUpdatedHandler(this);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        AllianceShieldManager.i.removeShieldUpdatedHandler(this);
+    }
+
     private void fullRefresh() {
         MyEmpire myEmpire = EmpireManager.i.getEmpire();
         Alliance myAlliance = (Alliance) myEmpire.getAlliance();
@@ -72,39 +111,23 @@ public class AllianceChangeDetailsActivity extends BaseActivity {
         final EditText newNameEdit = (EditText) findViewById(R.id.new_name);
         newNameEdit.setText(myAlliance.getName());
 
-        final Button changeNameBtn = (Button) findViewById(R.id.change_name_btn);
-        changeNameBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onChangeNameClick();
-            }
-        });
-
         TextView txt = (TextView) findViewById(R.id.change_image_info);
         txt.setText(Html.fromHtml(txt.getText().toString()));
 
-        ImageView currentImage = (ImageView) findViewById(R.id.current_image);
-        //currentShield.setImageBitmap(EmpireShieldManager.i.getShield(getActivity(), EmpireManager.i.getEmpire()));
-        ImageView currentImageSmall = (ImageView) findViewById(R.id.current_image_small);
-        //currentShieldSmall.setImageBitmap(EmpireShieldManager.i.getShield(getActivity(), EmpireManager.i.getEmpire()));
-
-        final Button chooseImageBtn = (Button) findViewById(R.id.choose_image_btn);
-        chooseImageBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onChooseImageClick();
-            }
-        });
-
-        final Button changeImageBtn = (Button) findViewById(R.id.change_image_btn);
-        changeImageBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onChangeImageClick();
-            }
-        });
+        Bitmap shield = AllianceShieldManager.i.getShield(this, myAlliance);
+        ImageView currentShield = (ImageView) findViewById(R.id.current_image);
+        currentShield.setImageBitmap(shield);
+        ImageView currentShieldSmall = (ImageView) findViewById(R.id.current_image_small);
+        currentShieldSmall.setImageBitmap(shield);
+        ImageView allianceIcon = (ImageView) findViewById(R.id.alliance_icon);
+        allianceIcon.setImageBitmap(shield);
 
         loadImage();
+    }
+
+    @Override
+    public void onShieldUpdated(int id) {
+        fullRefresh();
     }
 
     private void onChangeNameClick() {
