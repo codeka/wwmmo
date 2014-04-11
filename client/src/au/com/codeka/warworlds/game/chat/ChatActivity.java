@@ -50,6 +50,7 @@ import au.com.codeka.warworlds.ServerGreeter.ServerGreeting;
 import au.com.codeka.warworlds.StyledDialog;
 import au.com.codeka.warworlds.Util;
 import au.com.codeka.warworlds.model.Alliance;
+import au.com.codeka.warworlds.model.AllianceShieldManager;
 import au.com.codeka.warworlds.model.ChatConversation;
 import au.com.codeka.warworlds.model.ChatManager;
 import au.com.codeka.warworlds.model.ChatMessage;
@@ -247,13 +248,15 @@ public class ChatActivity extends BaseActivity
 
     public static class ChatFragment extends Fragment
                                      implements ChatManager.MessageAddedListener,
-                                                ChatManager.MessageUpdatedListener {
+                                                ChatManager.MessageUpdatedListener,
+                                                AllianceShieldManager.ShieldUpdatedHandler {
         private ChatConversation mConversation;
         private ChatAdapter mChatAdapter;
         private Handler mHandler;
         private boolean mAutoTranslate;
         private ListView mChatOutput;
         private boolean mNoMoreChats;
+        private View mHeaderContent;
 
         @Override
         public void onCreate(Bundle savedInstanceState) {
@@ -271,18 +274,17 @@ public class ChatActivity extends BaseActivity
             View v = inflater.inflate(R.layout.chat_page, container, false);
 
             FrameLayout header = (FrameLayout) v.findViewById(R.id.header);
-            View headerContent;
             if (mConversation.getID() == 0) {
-                headerContent = inflater.inflate(R.layout.chat_header_global, null, false);
-                setupGlobalChatHeader(headerContent);
+                mHeaderContent = inflater.inflate(R.layout.chat_header_global, null, false);
+                setupGlobalChatHeader(mHeaderContent);
             } else if (mConversation.getID() < 0) {
-                headerContent = inflater.inflate(R.layout.chat_header_alliance, null, false);
-                setupAllianceChatHeader(headerContent);
+                mHeaderContent = inflater.inflate(R.layout.chat_header_alliance, null, false);
+                setupAllianceChatHeader(mHeaderContent);
             } else {
-                headerContent = inflater.inflate(R.layout.chat_header_private, null, false);
-                setupPrivateChatHeader(headerContent);
+                mHeaderContent = inflater.inflate(R.layout.chat_header_private, null, false);
+                setupPrivateChatHeader(mHeaderContent);
             }
-            header.addView(headerContent);
+            header.addView(mHeaderContent);
 
             mChatAdapter = new ChatAdapter();
             mChatOutput = (ListView) v.findViewById(R.id.chat_output);
@@ -339,11 +341,17 @@ public class ChatActivity extends BaseActivity
             mConversation.addMessageAddedListener(this);
             mConversation.addMessageUpdatedListener(this);
             refreshMessages();
+            if (mConversation.getID() < 0) {
+                AllianceShieldManager.i.addShieldUpdatedHandler(this);
+            }
         }
 
         @Override
         public void onStop() {
             super.onStop();
+            if (mConversation.getID() < 0) {
+                AllianceShieldManager.i.removeShieldUpdatedHandler(this);
+            }
             mConversation.removeMessageAddedListener(this);
             mConversation.removeMessageUpdatedListener(this);
         }
@@ -395,6 +403,13 @@ public class ChatActivity extends BaseActivity
 
         private void appendMessage(final ChatMessage msg) {
             mChatAdapter.appendMessage(msg);
+        }
+
+        @Override
+        public void onShieldUpdated(int id) {
+            if (mConversation.getID() < 0) {
+                setupAllianceChatHeader(mHeaderContent);
+            }
         }
 
         private class ChatAdapter extends BaseAdapter {
@@ -626,6 +641,9 @@ public class ChatActivity extends BaseActivity
 
             TextView title = (TextView) v.findViewById(R.id.title);
             title.setText(alliance.getName());
+
+            ImageView allianceIcon = (ImageView) v.findViewById(R.id.alliance_icon);
+            allianceIcon.setImageBitmap(AllianceShieldManager.i.getShield(getActivity(), alliance));
 
             setupUnreadMessageCount(v);
         }
