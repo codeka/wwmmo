@@ -18,6 +18,7 @@ import android.widget.RadioButton;
 import android.widget.TextView;
 import au.com.codeka.TimeInHours;
 import au.com.codeka.common.model.BaseAllianceRequestVote;
+import au.com.codeka.warworlds.ImageHelper;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.StyledDialog;
 import au.com.codeka.warworlds.model.Alliance;
@@ -97,6 +98,7 @@ public class RequestVoteDialog extends DialogFragment
         TextView empireName = (TextView) mView.findViewById(R.id.empire_name);
         ImageView empireIcon = (ImageView) mView.findViewById(R.id.empire_icon);
         TextView requestDescription = (TextView) mView.findViewById(R.id.request_description);
+        ImageView pngImage = (ImageView) mView.findViewById(R.id.png_image);
         TextView requestVotes = (TextView) mView.findViewById(R.id.request_votes);
         TextView requestRequiredVotes = (TextView) mView.findViewById(R.id.request_required_votes);
         TextView message = (TextView) mView.findViewById(R.id.message);
@@ -121,6 +123,13 @@ public class RequestVoteDialog extends DialogFragment
         } else {
             requestVotes.setText(String.format(Locale.ENGLISH, "%s%d",
                     mRequest.getNumVotes() < 0 ? "-" : "+", Math.abs(mRequest.getNumVotes())));
+        }
+
+        if (mRequest.getPngImage() != null) {
+            pngImage.setVisibility(View.VISIBLE);
+            pngImage.setImageBitmap(new ImageHelper(mRequest.getPngImage()).getImage());
+        } else {
+            pngImage.setVisibility(View.GONE);
         }
 
         TreeSet<Integer> excludingEmpires = new TreeSet<Integer>(

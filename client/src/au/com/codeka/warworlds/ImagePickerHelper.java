@@ -1,19 +1,16 @@
 package au.com.codeka.warworlds;
 
 import java.io.FileNotFoundException;
-import java.io.InputStream;
 
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 
 public class ImagePickerHelper {
     private static final int CHOOSE_IMAGE_RESULT_ID = 7406;
     private Activity mActivity;
-    private InputStream mImageStream;
-    private Bitmap mImage;
+    private ImageHelper mImageHelper;
 
     public ImagePickerHelper(Activity activity) {
         mActivity = activity;
@@ -24,7 +21,8 @@ public class ImagePickerHelper {
             Uri uri = data.getData();
 
             try {
-                mImageStream = mActivity.getContentResolver().openInputStream(uri);
+                mImageHelper = new ImageHelper(
+                        mActivity.getContentResolver().openInputStream(uri));
             } catch (FileNotFoundException e) {
             }
 
@@ -42,46 +40,9 @@ public class ImagePickerHelper {
     }
 
     public Bitmap getImage() {
-        if (mImage == null && mImageStream != null) {
-            loadImage();
+        if (mImageHelper != null) {
+            return mImageHelper.getImage();
         }
-
-        return mImage;
-    }
-
-    private void loadImage() {
-        // if the stream supports mark (e.g. a local file vs. a "cloud" file) we can
-        // load the image using less memory, and therefore will prefer that. If it doesn't
-        // support mark then we don't have much choice...
-        if (mImageStream.markSupported()) {
-            loadImageWithMark();
-        } else {
-            loadImageNoMark();
-        }
-    }
-
-    private void loadImageWithMark() {
-        BitmapFactory.Options opts = new BitmapFactory.Options();
-        opts.inJustDecodeBounds = true;
-        mImageStream.mark(10 * 1024 * 1024);
-        BitmapFactory.decodeStream(mImageStream, null, opts);
-
-        int scale = 1;
-        while (opts.outWidth / scale / 2 >= 100 && opts.outHeight / scale / 2 >= 100) {
-            scale *= 2;
-        }
-
-        opts = new BitmapFactory.Options();
-        opts.inPurgeable = true;
-        opts.inInputShareable = true;
-        opts.inSampleSize = scale;
-        mImage = BitmapFactory.decodeStream(mImageStream, null, opts);
-    }
-
-    private void loadImageNoMark() {
-        BitmapFactory.Options opts = new BitmapFactory.Options();
-        opts.inPurgeable = true;
-        opts.inInputShareable = true;
-        mImage = BitmapFactory.decodeStream(mImageStream, null, opts);
+        return null;
     }
 }

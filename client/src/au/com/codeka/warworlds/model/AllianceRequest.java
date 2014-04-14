@@ -33,7 +33,7 @@ public class AllianceRequest extends BaseAllianceRequest {
         case CHANGE_NAME:
             return String.format("Change alliance name to \"%s\"", mNewName);
         case CHANGE_IMAGE:
-            return "Change image (TODO)";
+            return "Change shield";
         default:
             return "Unknown!";
         }

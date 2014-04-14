@@ -32,6 +32,15 @@
         android:textAppearance="?android:attr/textAppearanceSmall" />
 
     <ImageView
+        android:id="@+id/png_image"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="48dp"
+        android:layout_alignTop="@id/request_description"
+        android:src="@drawable/app_icon" />
+
+    <ImageView
         android:id="@+id/request_status"
         android:layout_width="32dp"
         android:layout_height="32dp"
@@ -62,7 +71,8 @@
         android:layout_height="wrap_content"
         android:layout_alignLeft="@+id/request_description"
         android:layout_below="@+id/request_description"
-        android:layout_marginRight="48dp"
+        android:layout_alignRight="@id/png_image"
+        android:layout_marginRight="38dp"
         android:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit."
         android:singleLine="true"
         android:textAppearance="?android:attr/textAppearanceSmall" />

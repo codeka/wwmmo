@@ -34,8 +34,8 @@
             android:layout_height="wrap_content"
             android:layout_below="@+id/empire_name"
             android:layout_toRightOf="@+id/empire_icon"
-            android:layout_toLeftOf="@+id/request_votes"
-            android:text="Requested blah blah blah blah blah blah blah blah: 7 hrs ago"
+            android:layout_toLeftOf="@+id/png_image"
+            android:text="Requested: 7 hrs ago"
             android:textAppearance="?android:attr/textAppearanceSmall" />
 
         <TextView
@@ -46,6 +46,14 @@
             android:layout_toRightOf="@+id/empire_icon"
             android:text="by Empire"
             android:textAppearance="?android:attr/textAppearanceSmall" />
+
+        <ImageView
+            android:id="@+id/png_image"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_toLeftOf="@+id/request_votes"
+            android:layout_alignTop="@id/request_description"
+            android:src="@drawable/app_icon" />
 
         <TextView
             android:id="@+id/request_required_votes"
@@ -63,7 +71,6 @@
             android:layout_height="32dp"
             android:layout_alignParentTop="true"
             android:layout_toLeftOf="@+id/request_required_votes"
-            android:layout_marginLeft="10dp"
             android:layout_marginRight="4dp"
             android:layout_marginTop="20dp"
             android:gravity="right"

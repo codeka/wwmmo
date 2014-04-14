@@ -58,10 +58,10 @@ public class AllianceController {
         }
     }
 
-    public List<AllianceRequest> getRequests(int allianceID, boolean includeWithdrawn)
+    public List<AllianceRequest> getRequests(int allianceID, boolean includeWithdrawn, Integer cursor)
             throws RequestException {
         try {
-            return db.getRequests(allianceID, includeWithdrawn);
+            return db.getRequests(allianceID, includeWithdrawn, cursor);
         } catch (Exception e) {
             throw new RequestException(e);
         }
@@ -316,8 +316,8 @@ public class AllianceController {
             }
         }
 
-        public List<AllianceRequest> getRequests(int allianceID, boolean includeWithdrawn)
-                throws Exception {
+        public List<AllianceRequest> getRequests(int allianceID, boolean includeWithdrawn,
+                Integer cursor) throws Exception {
             ArrayList<AllianceRequest> requests = new ArrayList<AllianceRequest>();
             HashSet<Integer> requestIDs = new HashSet<Integer>();
 
@@ -326,9 +326,15 @@ public class AllianceController {
             if (!includeWithdrawn) {
                 sql += " AND state != " + AllianceRequest.RequestState.WITHDRAWN.getNumber();
             }
-            sql += " ORDER BY request_date DESC";
+            if (cursor != null) {
+                sql += " AND id < ?";
+            }
+            sql += " ORDER BY request_date DESC LIMIT 50";
             try (SqlStmt stmt = prepare(sql)) {
                 stmt.setInt(1, allianceID); 
+                if (cursor != null) {
+                    stmt.setInt(2, cursor);
+                }
                 ResultSet rs = stmt.select();
 
                 while (rs.next()) {
