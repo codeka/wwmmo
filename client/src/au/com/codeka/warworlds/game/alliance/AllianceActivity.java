@@ -11,6 +11,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -25,6 +26,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import au.com.codeka.TimeInHours;
 import au.com.codeka.common.protobuf.Messages;
+import au.com.codeka.warworlds.ImageHelper;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.ServerGreeter;
 import au.com.codeka.warworlds.ServerGreeter.ServerGreeting;
@@ -314,6 +316,8 @@ public class AllianceActivity extends TabFragmentActivity
         private View mView;
         private RequestListAdapter mRequestListAdapter;
         private Alliance mAlliance;
+        private Handler mHandler = new Handler();
+        private String mCursor;
 
         @Override
         public void onAllianceUpdated(Alliance alliance) {
@@ -382,14 +386,29 @@ public class AllianceActivity extends TabFragmentActivity
         }
 
         private void refreshRequests() {
+            fetchRequests(true);
+        }
+
+        private void fetchNextRequests() {
+            fetchRequests(false);
+        }
+
+        private void fetchRequests(boolean clear) {
             final ProgressBar progressBar = (ProgressBar) mView.findViewById(R.id.loading);
             final ListView joinRequestsList = (ListView) mView.findViewById(R.id.join_requests);
 
-            AllianceManager.i.fetchRequests(mAlliance.getKey(),
+            if (clear) {
+                mCursor = null;
+                mRequestListAdapter.clearRequests();
+            }
+
+            AllianceManager.i.fetchRequests(mAlliance.getKey(), mCursor,
                     new AllianceManager.FetchRequestsCompleteHandler() {
                         @Override
-                        public void onRequestsFetched(Map<Integer, Empire> empires, List<AllianceRequest> requests) {
-                            mRequestListAdapter.setRequests(empires, requests);
+                        public void onRequestsFetched(Map<Integer, Empire> empires,
+                                List<AllianceRequest> requests, String cursor) {
+                            mCursor = cursor;
+                            mRequestListAdapter.appendRequests(empires, requests);
 
                             joinRequestsList.setVisibility(View.VISIBLE);
                             progressBar.setVisibility(View.GONE);
@@ -400,8 +419,12 @@ public class AllianceActivity extends TabFragmentActivity
         private class RequestListAdapter extends BaseAdapter {
             private ArrayList<ItemEntry> mEntries;
 
-            public void setRequests(Map<Integer, Empire> empires, List<AllianceRequest> requests) {
+            public void clearRequests() {
                 mEntries = new ArrayList<ItemEntry>();
+                notifyDataSetChanged();
+            }
+
+            public void appendRequests(Map<Integer, Empire> empires, List<AllianceRequest> requests) {
                 for (AllianceRequest request : requests) {
                     Empire empire;
                     if (request.getTargetEmpireID() != null) {
@@ -416,33 +439,72 @@ public class AllianceActivity extends TabFragmentActivity
             }
 
             @Override
+            public int getViewTypeCount() {
+                // The other type is the "please wait..." at the bottom
+                return 2;
+            }
+
+            @Override
             public int getCount() {
                 if (mEntries == null)
                     return 0;
-                return mEntries.size();
+                return mEntries.size() + (mCursor == null ? 0 : 1);
             }
 
             @Override
             public Object getItem(int position) {
                 if (mEntries == null)
                     return null;
+                if (mEntries.size() <= position) {
+                    return null;
+                }
                 return mEntries.get(position);
             }
 
             @Override
             public long getItemId(int position) {
-                return position;
+                ItemEntry entry = (ItemEntry) getItem(position);
+                if (entry == null) {
+                    return 0;
+                }
+                return entry.request.getID();
+            }
+
+            @Override
+            public boolean isEnabled(int position) {
+                if (getItem(position) == null) {
+                    return false;
+                }
+
+                return true;
             }
 
             @Override
             public View getView(int position, View convertView, ViewGroup parent) {
-                ItemEntry entry = mEntries.get(position);
+                ItemEntry entry = (ItemEntry) getItem(position);
                 Activity activity = getActivity();
                 View view = convertView;
 
                 if (view == null) {
                     LayoutInflater inflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-                    view = inflater.inflate(R.layout.alliance_requests_row, null);
+                    if (entry != null) {
+                        view = inflater.inflate(R.layout.alliance_requests_row, null);
+                    } else {
+                        view = inflater.inflate(R.layout.alliance_requests_row_loading, null);
+                    }
+                }
+
+                if (entry == null) {
+                    //  once this view comes into... view, we'll want to load the next
+                    // lot of requests
+                    mHandler.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            fetchNextRequests();
+                        }
+                    }, 100);
+
+                    return view;
                 }
 
                 TextView empireName = (TextView) view.findViewById(R.id.empire_name);
@@ -451,12 +513,20 @@ public class AllianceActivity extends TabFragmentActivity
                 ImageView requestStatus = (ImageView) view.findViewById(R.id.request_status);
                 TextView requestVotes = (TextView) view.findViewById(R.id.request_votes);
                 TextView message = (TextView) view.findViewById(R.id.message);
+                ImageView pngImage = (ImageView) view.findViewById(R.id.png_image);
 
                 empireName.setText(entry.empire.getDisplayName());
                 empireIcon.setImageBitmap(EmpireShieldManager.i.getShield(getActivity(), entry.empire));
                 requestDescription.setText(String.format(Locale.ENGLISH, "%s requested %s",
                         entry.request.getDescription(), TimeInHours.format(entry.request.getRequestDate())));
                 message.setText(entry.request.getMessage());
+
+                if (entry.request.getPngImage() != null) {
+                    pngImage.setVisibility(View.VISIBLE);
+                    pngImage.setImageBitmap(new ImageHelper(entry.request.getPngImage()).getImage());
+                } else {
+                    pngImage.setVisibility(View.GONE);
+                }
 
                 if (entry.request.getState().equals(AllianceRequest.RequestState.PENDING)) {
                     requestStatus.setVisibility(View.GONE);

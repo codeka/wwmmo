@@ -24,6 +24,7 @@ import au.com.codeka.common.model.BaseAllianceMember;
 import au.com.codeka.common.model.BaseEmpireRank;
 import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.R;
+import au.com.codeka.warworlds.TabManager;
 import au.com.codeka.warworlds.game.EnemyEmpireActivity;
 import au.com.codeka.warworlds.model.Alliance;
 import au.com.codeka.warworlds.model.AllianceManager;
@@ -39,7 +40,8 @@ import com.google.protobuf.InvalidProtocolBufferException;
 public class AllianceDetailsFragment extends Fragment
                                      implements AllianceManager.AllianceUpdatedHandler,
                                                 EmpireManager.EmpireFetchedHandler,
-                                                ShieldManager.ShieldUpdatedHandler {
+                                                ShieldManager.ShieldUpdatedHandler,
+                                                TabManager.Reloadable {
     private Handler mHandler;
     private Activity mActivity;
     private LayoutInflater mLayoutInflater;
@@ -136,6 +138,11 @@ public class AllianceDetailsFragment extends Fragment
     @Override
     public void onShieldUpdated(int empireID) {
         refreshAlliance();
+    }
+
+    @Override
+    public void reloadTab() {
+        // TODO: ignore?
     }
 
     private void fullRefresh() {

@@ -126,14 +126,18 @@ public class AllianceManager {
         }.execute();
     }
 
-    public void fetchRequests(final String allianceKey,
+    public void fetchRequests(final String allianceKey, final String cursor,
                               final FetchRequestsCompleteHandler handler) {
         new BackgroundRunner<List<AllianceRequest>>() {
             private TreeMap<Integer, Empire> mEmpires;
+            private String mCursor;
 
             @Override
             protected List<AllianceRequest> doInBackground() {
                 String url = "alliances/"+allianceKey+"/requests";
+                if (cursor != null) {
+                    url += "?cursor="+cursor;
+                }
                 try {
                     Messages.AllianceRequests pb = ApiClient.getProtoBuf(url, Messages.AllianceRequests.class);
                     ArrayList<AllianceRequest> requests = new ArrayList<AllianceRequest>();
@@ -149,6 +153,7 @@ public class AllianceManager {
                             empireKeys.add(Integer.toString(request_pb.getTargetEmpireId()));
                         }
                     }
+                    mCursor = pb.getCursor();
 
                     List<Empire> empires = EmpireManager.i.fetchEmpiresSync(empireKeys);
                     mEmpires = new TreeMap<Integer, Empire>();
@@ -165,7 +170,7 @@ public class AllianceManager {
             @Override
             protected void onComplete(List<AllianceRequest> requests) {
                 if (handler != null && requests != null) {
-                    handler.onRequestsFetched(mEmpires, requests);
+                    handler.onRequestsFetched(mEmpires, requests, mCursor);
                 }
             }
         }.execute();
@@ -318,7 +323,7 @@ public class AllianceManager {
         void onAllianceUpdated(Alliance alliance);
     }
     public interface FetchRequestsCompleteHandler {
-        void onRequestsFetched(Map<Integer, Empire> empires, List<AllianceRequest> requests);
+        void onRequestsFetched(Map<Integer, Empire> empires, List<AllianceRequest> requests, String cursor);
     }
     public interface FetchWormholesCompleteHandler {
         void onWormholesFetched(List<Star> wormholes);
