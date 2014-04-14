@@ -7,6 +7,9 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -29,6 +32,7 @@ import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.ImageHelper;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.ServerGreeter;
+import au.com.codeka.warworlds.TabManager;
 import au.com.codeka.warworlds.ServerGreeter.ServerGreeting;
 import au.com.codeka.warworlds.TabFragmentActivity;
 import au.com.codeka.warworlds.WarWorldsActivity;
@@ -312,12 +316,15 @@ public class AllianceActivity extends TabFragmentActivity
 
     public static class RequestsFragment extends BaseFragment
                                          implements AllianceManager.AllianceUpdatedHandler,
-                                                    EmpireShieldManager.ShieldUpdatedHandler {
+                                                    EmpireShieldManager.ShieldUpdatedHandler,
+                                                    TabManager.Reloadable {
+        private static final Logger log = LoggerFactory.getLogger(RequestsFragment.class);
         private View mView;
         private RequestListAdapter mRequestListAdapter;
         private Alliance mAlliance;
         private Handler mHandler = new Handler();
         private String mCursor;
+        private boolean mFetching;
 
         @Override
         public void onAllianceUpdated(Alliance alliance) {
@@ -394,6 +401,12 @@ public class AllianceActivity extends TabFragmentActivity
         }
 
         private void fetchRequests(boolean clear) {
+            log.error("Fetching requests... ("+mFetching+")", new Exception());
+            if (mFetching) {
+                return;
+            }
+            mFetching = true;
+
             final ProgressBar progressBar = (ProgressBar) mView.findViewById(R.id.loading);
             final ListView joinRequestsList = (ListView) mView.findViewById(R.id.join_requests);
 
@@ -407,6 +420,7 @@ public class AllianceActivity extends TabFragmentActivity
                         @Override
                         public void onRequestsFetched(Map<Integer, Empire> empires,
                                 List<AllianceRequest> requests, String cursor) {
+                            mFetching = false;
                             mCursor = cursor;
                             mRequestListAdapter.appendRequests(empires, requests);
 
@@ -418,6 +432,10 @@ public class AllianceActivity extends TabFragmentActivity
 
         private class RequestListAdapter extends BaseAdapter {
             private ArrayList<ItemEntry> mEntries;
+
+            public RequestListAdapter() {
+                mEntries = new ArrayList<ItemEntry>();
+            }
 
             public void clearRequests() {
                 mEntries = new ArrayList<ItemEntry>();
@@ -564,6 +582,12 @@ public class AllianceActivity extends TabFragmentActivity
                     this.request = request;
                 }
             }
+        }
+
+        @Override
+        public void reloadTab() {
+            // TODO Auto-generated method stub
+            
         }
     }
 }
