@@ -154,6 +154,9 @@ public class AllianceManager {
                         }
                     }
                     mCursor = pb.getCursor();
+                    if (mCursor != null && mCursor.isEmpty()) {
+                        mCursor = null;
+                    }
 
                     List<Empire> empires = EmpireManager.i.fetchEmpiresSync(empireKeys);
                     mEmpires = new TreeMap<Integer, Empire>();
