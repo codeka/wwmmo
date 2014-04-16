@@ -18,14 +18,3 @@
 #-keepclassmembers class fqcn.of.javascript.interface.for.webview {
 #   public *;
 #}
-
-
-# this has references to unknown classes, but we never use it anyway
--dontwarn org.apache.commons.collections.BeanMap
-
-# hopefully we can get rid of this with a newer version of the AdMod SDK
--dontwarn com.google.ads.**
--dontwarn com.google.analytics.tracking.android.AdMobInfo
-
-# to be honest, I don't really understand this error..
--dontwarn jregex.util.io.PathElementMask

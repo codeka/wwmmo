@@ -245,7 +245,8 @@ public class AllianceController {
         }
 
         public void createAlliance(Alliance alliance, int creatorEmpireID) throws Exception {
-            String sql = "INSERT INTO alliances (name, creator_empire_id, created_date, bank_balance) VALUES (?, ?, ?, 0)";
+            String sql = "INSERT INTO alliances (name, creator_empire_id, created_date," +
+                              " bank_balance, image_updated_date) VALUES (?, ?, ?, 0, NOW())";
             try (SqlStmt stmt = prepare(sql, Statement.RETURN_GENERATED_KEYS)) {
                 stmt.setString(1, alliance.getName());
                 stmt.setInt(2, creatorEmpireID);

@@ -19,14 +19,17 @@ import android.widget.ListView;
 import android.widget.TextView;
 import au.com.codeka.BackgroundRunner;
 import au.com.codeka.warworlds.R;
+import au.com.codeka.warworlds.model.Alliance;
+import au.com.codeka.warworlds.model.AllianceShieldManager;
 import au.com.codeka.warworlds.model.Empire;
 import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.EmpireRank;
 import au.com.codeka.warworlds.model.EmpireShieldManager;
 import au.com.codeka.warworlds.model.MyEmpire;
+import au.com.codeka.warworlds.model.ShieldManager;
 
 public class EmpireRankList extends ListView
-                            implements EmpireShieldManager.ShieldUpdatedHandler {
+                            implements ShieldManager.ShieldUpdatedHandler {
     private RankListAdapter mRankListAdapter;
     private Context mContext;
 
@@ -48,6 +51,7 @@ public class EmpireRankList extends ListView
             return;
         }
         EmpireShieldManager.i.addShieldUpdatedHandler(this);
+        AllianceShieldManager.i.addShieldUpdatedHandler(this);
     }
 
     @Override
@@ -57,6 +61,7 @@ public class EmpireRankList extends ListView
             return;
         }
         EmpireShieldManager.i.removeShieldUpdatedHandler(this);
+        AllianceShieldManager.i.removeShieldUpdatedHandler(this);
     }
 
     public void setEmpires(List<Empire> empires, boolean addGaps) {
@@ -215,6 +220,8 @@ public class EmpireRankList extends ListView
             TextView totalColonies = (TextView) view.findViewById(R.id.total_colonies);
             TextView totalShips = (TextView) view.findViewById(R.id.total_ships);
             TextView totalBuildings = (TextView) view.findViewById(R.id.total_buildings);
+            TextView allianceName = (TextView) view.findViewById(R.id.alliance_name);
+            ImageView allianceIcon = (ImageView) view.findViewById(R.id.alliance_icon);
 
             Empire empire = entry.empire;
             EmpireRank rank = entry.rank;
@@ -222,6 +229,17 @@ public class EmpireRankList extends ListView
             if (empire != null) {
                 empireName.setText(empire.getDisplayName());
                 empireIcon.setImageBitmap(EmpireShieldManager.i.getShield(mContext, empire));
+
+                Alliance alliance = (Alliance) empire.getAlliance();
+                if (alliance != null) {
+                    allianceName.setText(alliance.getName());
+                    allianceIcon.setImageBitmap(AllianceShieldManager.i.getShield(mContext, alliance));
+                    allianceName.setVisibility(View.VISIBLE);
+                    allianceIcon.setVisibility(View.VISIBLE);
+                } else {
+                    allianceName.setVisibility(View.GONE);
+                    allianceIcon.setVisibility(View.GONE);
+                }
             } else {
                 empireName.setText("???");
                 empireIcon.setImageDrawable(null);

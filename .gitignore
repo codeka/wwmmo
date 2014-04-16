@@ -13,7 +13,10 @@
 
 .gitignore
 
+local.properties
+
 client/bin
+client/bin.bak
 client/gen
 planet-render-android/bin
 planet-render-android/gen
