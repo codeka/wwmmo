@@ -39,6 +39,28 @@
               android:text="Population: 123,456"
               android:textAppearance="?android:attr/textAppearanceSmall" />
 
+    <ImageView android:id="@+id/alliance_icon"
+               android:layout_width="20dp"
+               android:layout_height="20dp"
+               android:layout_alignBottom="@id/total_population"
+               android:layout_alignParentRight="true"
+               android:layout_marginLeft="8dp"
+               android:layout_marginRight="8dp"
+               android:src="@drawable/app_icon" />
+
+    <TextView android:id="@+id/alliance_name"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:layout_alignBaseline="@id/total_population"
+              android:layout_toLeftOf="@+id/alliance_icon"
+              android:layout_toRightOf="@id/total_population"
+              android:layout_marginLeft="10dp"
+              android:singleLine="true"
+              android:ellipsize="end"
+              android:text="Alliance name"
+              android:gravity="right"
+              android:textAppearance="?android:attr/textAppearanceSmall" />
+
     <TextView
         android:id="@+id/total_stars"
         android:layout_width="wrap_content"

@@ -343,7 +343,6 @@ public class EmpireActivity extends TabFragmentActivity
                         }
                     });
         }
-
     }
 
     public static class ColoniesFragment extends BaseFragment {

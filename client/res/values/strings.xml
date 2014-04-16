@@ -22,8 +22,8 @@
 
     <!-- "empire_setup.xml" layout -->
     <string name="empire_setup_welcome">Before you begin, you need to tell us a little about your Empire. Fill in the details below to get started.</string>
-    <string name="empire_setup_name">Give your Empire a name:</string>
-    <string name="empire_setup_name_hint">Empire name</string>
+    <string name="empire_setup_name">What name will you go by in the game?</string>
+    <string name="empire_setup_name_hint">Player name</string>
 
 
     <!-- "solarsystem.xml" layout -->

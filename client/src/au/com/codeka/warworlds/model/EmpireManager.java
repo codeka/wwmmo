@@ -438,6 +438,12 @@ public class EmpireManager {
         return empires;
     }
 
+    // we cache the call below, because it's annoying when you switch between
+    // tabs to have to keep reloading the list for no real reason.
+    private int mLastFetchMinRank = 0;
+    private int mLastFetchMaxRank = 0;
+    private List<Empire> mLastRankFetchEmpires;
+
     /**
      * Fetches empires in the given rank range. This will always include the top three
      * empires as well (since that's usually what you want in addition to the specific
@@ -445,6 +451,11 @@ public class EmpireManager {
      */
     public void fetchEmpiresByRank(final int minRank, final int maxRank,
                                    final EmpiresFetchedHandler handler) {
+        if (mLastFetchMinRank == minRank && mLastFetchMaxRank == maxRank) {
+            handler.onEmpiresFetched(mLastRankFetchEmpires);
+            return;
+        }
+
         new BackgroundRunner<List<Empire>>() {
             @Override
             protected List<Empire> doInBackground() {
@@ -479,6 +490,9 @@ public class EmpireManager {
                     }
                 }
 
+                mLastFetchMinRank = minRank;
+                mLastFetchMaxRank = maxRank;
+                mLastRankFetchEmpires = empires;
                 handler.onEmpiresFetched(empires);
             }
         }.execute();
