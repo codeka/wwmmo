@@ -3,6 +3,7 @@ import os
 import webapp2 as webapp
 from google.appengine.api import users
 from google.appengine.api import images
+from google.appengine.api import memcache
 from google.appengine.ext import blobstore
 import datetime
 import json

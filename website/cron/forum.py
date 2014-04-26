@@ -13,6 +13,7 @@ from google.appengine.api import urlfetch
 from google.appengine.api import users
 
 import cron
+import ctrl.forum
 import model.forum
 
 
@@ -51,5 +52,13 @@ class RefreshPostCounts(BasePage):
       deferred.defer(CountPostsForForum, forum, _queue="forumsync")
 
 
-app = webapp.WSGIApplication([("/cron/forum/refresh-post-counts", RefreshPostCounts)],
+class IndexAllThreads(BasePage):
+  def get(self):
+    """This is a cron job that goes through all threads and (re-)indexes them."""
+    for forum_thread in model.forum.ForumThread.all():
+      ctrl.forum.indexForumThread(forum_thread)
+
+
+app = webapp.WSGIApplication([("/cron/forum/refresh-post-counts", RefreshPostCounts),
+                              ("/cron/forum/index-all-threads", IndexAllThreads)],
                              debug=os.environ["SERVER_SOFTWARE"].startswith("Development"))

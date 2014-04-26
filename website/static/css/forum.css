@@ -226,6 +226,34 @@ div.forum-field.forum-field-submit div.input-button input {
   width: 120px;
 }
 
+/*
+ * ------------------------------------------------------------------------------
+ * Toolbar
+ */
+
+nav.toolbar ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+nav.toolbar li {
+  float: left;
+  margin-left: 10pt;
+}
+
+nav.toolbar li.search {
+  float: right;
+  width: 280pt;
+}
+
+nav.toolbar li.search input[type=text] {
+  border: solid 1px #999;
+  padding: 2pt 4pt;
+  width: 200pt;
+}
+
 /* ------------------------------------------------------------------------------
  * Pagination
  */

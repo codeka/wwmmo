@@ -35,14 +35,23 @@
       </ul>
     </nav>
 
-  <p>
+  <nav class="toolbar">
+    <ul>
     {% if can_post %}
-      <a href="/forum/{{forum.slug}}/posts" class="button">New Post</a>
+      <li><a href="/forum/{{forum.slug}}/posts" class="button">New Post</a></li>
     {% endif %}
     {% if is_moderator -%}
        <!-- You're a moderator! -->
     {% endif %}
-  </p>
+      <li class="search">
+        <form action="/forum/search" method="get">
+          <input type="text" name="q" placeholder="Search">
+          <input type="hidden" name="forum" value="{{forum.slug}}" />
+          <div class="input-button"><input type="submit" value="Search"></div>
+        </form>
+      </li>
+    </ul>
+  </nav>
 
   <div class="sticky-threads">
     {% for thread in sticky_threads if thread.key() in last_posts %}

@@ -1,0 +1,82 @@
+{% extends "skeleton.html" %}
+{% import "forum/macros.html" as m %}
+
+{% block header %}
+  {{m.html_header(resource_version)}}
+  <style>
+    #search-form {
+      position: relative;
+      height: 20pt;
+      border: 0;
+    }
+    #search-form div.hack {
+      position: absolute;
+      top: 0; left: 0; bottom: 0;
+      right: 210pt;
+    }
+    #q {
+      width: 100%;
+      border: solid 1px #999;
+      padding: 2pt 4pt;
+    }
+    #search-form select {
+      position: absolute;
+      top: 0; right: 60pt;
+      width: 130pt;
+    }
+    #search-form div.input-button {
+      position: absolute;
+      top: 0; right: 30pt;
+      
+    }
+  </style>
+{% endblock %}
+{% block pagetitle %}Forums{% endblock %}
+{% block title %}Forums{% endblock %}
+
+{% block maincontent %}
+  <section class="content">
+    <nav class="breadcrumbs">
+      <ul>
+        <li><a href="/">War Worlds</a>
+        <li><a href="/forum">Forums</a>
+        <li><span>Search</span>
+      </ul>
+    </nav>
+
+    <h1>Search</h1>
+    <form action="" method="get">
+      <fieldset id="search-form">
+        <div class="hack"><input type="text" name="q" id="q" placeholder="Search" value="{{query}}" /></div>
+        <select name="forum">
+          <option value="">All Forums</option>
+        {%- for this_forum in forums %}
+          <option value="{{this_forum.slug}}"{% if forum and this_forum.slug == forum.slug %} selected{% endif %}>{{this_forum.name}}</option>
+        {%- endfor %}
+        </select>
+        <div class="input-button"><input type="submit" value="Search"></div>
+      </fieldset>
+    </form>
+
+    {% for thread in threads %}
+      <div class="thread-entry">
+        <div class="thread-title">
+          <div class="thread-title-link"><a href="/forum/{{thread.forum.slug}}/{{thread.slug}}">{{thread.subject}}</a></div>
+          <div>{{first_posts[thread.key()].content|striptags|truncate(100)}}</div>
+        </div>
+        <div class="thread-replycount">
+          <div><span>{{post_counts[thread.forum.slug+":"+thread.slug] - 1}}</span> replies</div>
+        </div>
+        <div class="thread-details">
+          <div class="thread-author">started by <a href="{{m.profile_url(profiles[thread.user.user_id()])}}"><img src="{{profiles[thread.user.user_id()]|profile_shield}}" width="16" height="16"/> {{profiles[thread.user.user_id()].display_name}}</a></div>
+          <div class="lastpost-author">last reply by <a href="{{m.profile_url(profiles[last_posts[thread.key()].user.user_id()])}}"><img src="{{profiles[last_posts[thread.key()].user.user_id()]|profile_shield}}" width="16" height="16"/> {{profiles[last_posts[thread.key()].user.user_id()].display_name}}</a></div>
+          <div class="lastpost-date"><time datetime="{{last_posts[thread.key()]|post_date_std}}" class="post-date">{{last_posts[thread.key()]|post_date_time}}</time></div>
+        </div>
+        <div class="last"></div>
+      </div>
+    {% endfor %}
+    {% if not threads %}
+      <p><em>No posts found.</em></p>
+    {% endif %}
+  </section>
+{% endblock %}

@@ -53,6 +53,10 @@ class ThreadListPage(ForumPage):
       self.error(404)
       return
 
+    if not ctrl.forum.canViewAllianceForum(forum, self.profile):
+      self.error(404)
+      return
+
     data = {}
     data["forum"] = forum
     data["is_moderator"] = False
@@ -106,6 +110,10 @@ class ThreadRssPage(ForumPage):
       self.error(404)
       return
 
+    if not ctrl.forum.canViewAllianceForum(forum, self.profile):
+      self.error(404)
+      return
+
     data = {}
     data["forum"] = forum
 
@@ -127,6 +135,10 @@ class PostListPage(ForumPage):
   def get(self, forum_slug, forum_thread_slug):
     forum = ctrl.forum.getForumBySlug(forum_slug)
     if not forum:
+      self.error(404)
+      return
+
+    if not ctrl.forum.canViewAllianceForum(forum, self.profile):
       self.error(404)
       return
 
@@ -282,6 +294,8 @@ class EditPostPage(ForumPage):
 
     forum_post.put()
 
+    ctrl.forum.indexForumThread(forum_thread, forum_post)
+
     # if you checked the 'subscribe' checkbox, also subscribe you...
     if self.request.POST.get("post-subscribe"):
       ctrl.forum.subscribeToThread(self.user, forum_thread)
@@ -369,6 +383,42 @@ class DeletePostPage(ForumPage):
       self.redirect("/forum/%s/%s" % (forum.slug, forum_thread.slug))
 
 
+class ForumSearchPage(ForumPage):
+  def get(self):
+    data = {}
+    data["query"] = self.request.get("q")
+
+    forum = None
+    if self.request.get("forum"):
+      forum = ctrl.forum.getForumBySlug(self.request.get("forum"))
+    data["forum"] = forum
+
+    threads = ctrl.forum.searchThreads(forum, self.request.get("q"), self.profile)
+    data["threads"] = threads
+
+    data["post_counts"] = ctrl.forum.getThreadPostCounts(threads)
+    data["first_posts"] = ctrl.forum.getFirstPostsByForumThread(threads)
+    data["last_posts"] = ctrl.forum.getLastPostsByForumThread(threads)
+
+    user_ids = []
+    for thread in threads:
+      if thread.user.user_id() not in user_ids:
+        user_ids.append(thread.user.user_id())
+      if thread.key() in data["last_posts"] and data["last_posts"][thread.key()].user.user_id() not in user_ids:
+        user_ids.append(data["last_posts"][thread.key()].user.user_id())
+    data["profiles"] = ctrl.profile.getProfiles(user_ids)
+
+    forums = ctrl.forum.getForums()
+    if self.profile and self.profile.alliance_id:
+      alliance = model.profile.Alliance.Fetch(self.profile.realm_name, self.profile.alliance_id)
+      if alliance:
+        alliance_forum = ctrl.forum.getAllianceForum(self.profile.realm_name, alliance)
+        forums.insert(0, alliance_forum)
+    data["forums"] = forums
+
+    self.render("forum/search.html", data)
+
+
 class ThreadStickyPage(ForumPage):
   def _getDetails(self, forum_slug, forum_thread_slug):
     forum = ctrl.forum.getForumBySlug(forum_slug)
@@ -427,6 +477,7 @@ class SubscriptionPage(ForumPage):
 
 
 app = webapp.WSGIApplication([("/forum/?", ForumListPage),
+                              ("/forum/search/?", ForumSearchPage),
                               ("/forum/([^/]+)/?", ThreadListPage),
                               ("/forum/([^/]+)/rss", ThreadRssPage),
                               ("/forum/([^/]+)/posts", EditPostPage),

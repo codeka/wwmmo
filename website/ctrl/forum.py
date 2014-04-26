@@ -7,8 +7,11 @@ import random
 
 from google.appengine.api import memcache
 from google.appengine.api import mail
+from google.appengine.api import search 
 from google.appengine.api import users
 from google.appengine.ext import db
+from google.appengine.ext import deferred
+
 
 import ctrl
 import ctrl.tmpl
@@ -30,6 +33,14 @@ def getForums():
     memcache.set(keyname, forums, time=3600)
 
   return forums
+
+
+def canViewAllianceForum(forum, profile):
+  if not forum.alliance:
+    return True
+  if forum.alliance == profile.realm_name + ":" + str(profile.alliance_id):
+    return True
+  return False
 
 
 def getAllianceForum(realm_name, alliance):
@@ -117,6 +128,25 @@ def getThreads(forum, page_no, page_size):
 
     memcache.set(keyname, threads)
 
+  return threads
+
+
+def searchThreads(forum, query, profile):
+  index = search.Index("forum")
+  if forum:
+    query = "forum:" + forum.slug.replace(":", "_") + " " + query
+  if not profile or not profile.alliance_id:
+    query = "alliance:NA " + query
+  else:
+    alliance = profile.realm_name+"_"+str(profile.alliance_id)
+    query = "(alliance:NA OR alliance:"+alliance+") " + query
+  logging.info("Query: "+query)
+  results = index.search(search.Query(query_string=query,
+        options=search.QueryOptions(ids_only=True)))
+
+  threads = []
+  for doc in results:
+    threads.append(model.forum.ForumThread.get(doc.doc_id))
   return threads
 
 
@@ -483,6 +513,38 @@ def notifySubscribers(forum, forum_thread, forum_post, poster_user, poster_profi
       logging.info("Sending email: {from:"+sender+", recipient:"+recipient+", subject:[war-worlds.com forums] "+
                    forum_thread.subject+", body:"+str(len(body))+" bytes")
       mail.send_mail(sender, recipient, "[war-worlds.com forums] "+forum_thread.subject, body)
-                                 
-  
-    
+
+
+def _indexForumThread(forum_thread, new_forum_post = None):
+  """Does the actual work of indexing the given forum thread. We expect to be called in a deferred handler."""
+  forum= forum_thread.forum
+  fields = [search.TextField(name="subject", value=forum_thread.subject),
+            search.DateField(name="posted", value=forum_thread.posted),
+            search.DateField(name="last_post", value=forum_thread.last_post),
+            search.AtomField(name="forum", value=forum.slug.replace(":", "_"))]
+  if forum.alliance:
+    fields.append(search.AtomField(name="alliance", value=forum.alliance.replace(":", "_")))
+  else:
+    fields.append(search.AtomField(name="alliance", value="NA"))
+
+  content = ""
+  for forum_post in model.forum.ForumPost.all().ancestor(forum_thread).order("posted"):
+    if new_forum_post and str(forum_post.key()) == str(new_forum_post.key()):
+      new_forum_post = None
+    content += "\r\n<hr />\r\n" + forum_post.content
+  if new_forum_post:
+    content = new_forum_post.content + content
+  fields.append(search.HtmlField(name="content", value=content))
+
+  doc = search.Document(
+    doc_id = str(forum_thread.key()),
+    fields = fields)
+
+  index = search.Index(name="forum")
+  index.put(doc)
+
+
+def indexForumThread(forum_thread, forum_post = None):
+  """Queues the given forum thread to be indexed."""
+  deferred.defer(_indexForumThread, forum_thread, forum_post, _queue="forumsync")
+

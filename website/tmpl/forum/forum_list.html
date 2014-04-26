@@ -24,6 +24,17 @@
          game, so that we can link your persona on the forums to your in-game Empire.</p>
     </section>
 
+  <nav class="toolbar">
+    <ul>
+      <li class="search">
+        <form action="/forum/search" method="get">
+          <input type="text" name="q" placeholder="Search">
+          <div class="input-button"><input type="submit" value="Search"></div>
+        </form>
+      </li>
+    </ul>
+  </nav>
+
   {% for forum in forums %}
     <div class="forum-entry">
       <div class="forum-title">
