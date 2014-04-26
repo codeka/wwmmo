@@ -14,7 +14,7 @@ import ctrl.tmpl
 
 # This value gets incremented every time we deploy so that we can cache bust
 # our static resources (css, js, etc)
-RESOURCE_VERSION = 34
+RESOURCE_VERSION = 40
 
 
 class BaseHandler(webapp.RequestHandler):
@@ -31,6 +31,12 @@ class BaseHandler(webapp.RequestHandler):
       if not self.profile and self.request.path != '/profile':
         self.redirect('/profile')
         return
+      if self.profile and not self.profile.user:
+        self.profile.user = self.user
+        self.profile.put()
+      if self.profile and self.profile.empire_id and not self.profile.realm_name:
+        self.profile.realm_name = "Beta"
+        self.profile.put()
 
     super(BaseHandler, self).dispatch()
 

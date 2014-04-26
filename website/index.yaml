@@ -17,6 +17,19 @@ indexes:
     direction: desc
 
 - kind: ForumPost
+  properties:
+  - name: user
+  - name: forum
+  - name: posted
+    direction: desc
+
+- kind: ForumPost
+  properties:
+  - name: user
+  - name: posted
+    direction: desc
+
+- kind: ForumPost
   ancestor: yes
   properties:
   - name: posted

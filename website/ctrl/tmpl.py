@@ -1,4 +1,5 @@
 
+import base64
 import jinja2
 import logging
 import os
@@ -62,7 +63,7 @@ jinja.filters['post_extract'] = _filter_post_extract
 def _filter_profile_shield(profile):
   if not profile:
     return "/img/blank.png"
-  if profile.display_name == "Dean": # TODO: better than this!!
+  if profile.user and profile.user.email() == "dean@codeka.com.au":
     return "/img/hal-64.png"
   if not profile.empire_id:
     return "/img/blank.png"
@@ -90,6 +91,10 @@ def _filter_html_tidy(html):
   return html
 jinja.filters["html_tidy"] = _filter_html_tidy
 
+
+def _filter_base64(str):
+  return base64.b64encode(str)
+jinja.filters["base64"] = _filter_base64
 
 def getTemplate(tmpl_name):
   return jinja.get_template(tmpl_name)

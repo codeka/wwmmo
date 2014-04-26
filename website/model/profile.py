@@ -10,6 +10,7 @@ class Profile(db.Model):
   alliance_id = db.IntegerProperty()
   realm_name = db.StringProperty()
   display_name = db.StringProperty()
+  user = db.UserProperty()
 
   @staticmethod
   def GetProfile(user_id):
@@ -17,12 +18,13 @@ class Profile(db.Model):
     return Profile.get(profile_key)
 
   @staticmethod
-  def SaveProfile(user_id, realm_name, display_name, empire):
-    profile = Profile.GetProfile(user_id)
+  def SaveProfile(user, realm_name, display_name, empire):
+    profile = Profile.GetProfile(user.user_id())
     if not profile:
-      profile = Profile(key=db.Key.from_path(Profile.__name__, user_id))
+      profile = Profile(key=db.Key.from_path(Profile.__name__, user.user_id()))
     profile.realm_name = realm_name
     profile.display_name = display_name
+    profile.user = user
     if empire:
       profile.empire_id = int(empire["key"])
       if "alliance" in empire and "key" in empire["alliance"]:

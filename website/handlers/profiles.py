@@ -1,5 +1,8 @@
 
+import base64
+import json
 import os
+import logging
 from datetime import datetime
 import re
 import urllib
@@ -10,6 +13,7 @@ from google.appengine.api import memcache
 
 import handlers
 import ctrl.profile
+import ctrl.forum
 import model.profile
 
 
@@ -54,9 +58,35 @@ class ProfilePage(BasePage):
         realm_name = None
     else:
       display_name = self.request.POST.get("display_name")
-    ctrl.profile.saveProfile(self.user.user_id(), realm_name, display_name, empire)
+    ctrl.profile.saveProfile(self.user, realm_name, display_name, empire)
 
     self.redirect("/profile")
+
+
+class ProfileViewPage(BasePage):
+  def get(self, user_id_base64):
+    user_id = base64.b64decode(user_id_base64)
+    data = {}
+    profile = ctrl.profile.getProfile(user_id)
+    posts = ctrl.forum.getPostsForUser(profile, False, 0, 25)
+    if profile.empire_id:
+      empire = ctrl.profile.getEmpire(profile.realm_name, profile.empire_id)
+      data["empire"] = json.loads(empire.empire_json)
+    else:
+      data["empire"] = None
+    data["profile"] = profile
+    data["posts"] = posts
+
+    user_ids = []
+    for post in posts:
+      logging.info(post.key())
+      logging.info(post.forum.slug)
+      thread = post.parent()
+      if thread.user.user_id() not in user_ids:
+        user_ids.append(thread.user.user_id())
+    data["profiles"] = ctrl.profile.getProfiles(user_ids)
+
+    self.render("profile/profile_view.html", data)
 
 
 class EmpireAutocompletePage(BasePage):
@@ -89,5 +119,6 @@ class EmpireAssociatePage(BasePage):
 app = webapp.WSGIApplication([("/profile/?", ProfilePage),
                               ("/profile/empire-autocomplete", EmpireAutocompletePage),
                               ("/profile/empire-associate/?(.*)", EmpireAssociatePage),
-                              ("/profile/notifications", ProfilePage)], # TODO(deanh): notifications
+                              ("/profile/notifications", ProfilePage), # TODO(deanh): notifications
+                              ("/profile/([^/]+)$", ProfileViewPage)],
                              debug=os.environ["SERVER_SOFTWARE"].startswith("Development"))

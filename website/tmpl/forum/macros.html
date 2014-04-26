@@ -33,3 +33,7 @@
   {% endif -%}
   </nav>
 {%- endmacro %}
+
+{% macro profile_url(profile) -%}
+{% if not profile %}/profile{% else %}/profile/{{profile.key().name()|base64}}{% endif %}
+{%- endmacro %}

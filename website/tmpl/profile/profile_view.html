@@ -1,0 +1,63 @@
+{% extends "skeleton.html" %}
+
+{% block header %}
+  <style>
+    .profile-shield {
+      float: left;
+      margin-top: 1em;
+      margin-right: 0.5em;
+    }
+    .benevolent-dictator {
+      font-weight: bold;
+      color: cyan;
+    }
+  </style>
+  <link rel="stylesheet" href="/css/v{{resource_version}}/forum.css" />
+  <link rel="stylesheet" href="/css/v{{resource_version}}/forum_mobile.css" media="only screen and (max-width: 900px)" />
+{% endblock %}
+{% block pagetitle %}Profile{% endblock %}
+{% block title %}Profile{% endblock %}
+{% block headerlinks %}{% endblock %}
+
+{% block maincontent %}
+  <section class="content">
+    <nav class="breadcrumbs">
+      <ul>
+        <li><a href="/">War Worlds</a>
+        <li><a href="/profile">Profile</a>
+        <li><span>{{profile.display_name}}</span>
+      </ul>
+    </nav>
+
+    <img src="{{profile|profile_shield}}" width="64" height="64" class="profile-shield" />
+    <h1>{{profile.display_name}}</h1>
+    {% if empire %}
+      {% if empire.alliance %}
+        <div class="alliance">
+          <img src="https://game.war-worlds.com/realms/{{profile.realm_name|lower}}/alliances/{{empire.alliance.key}}/shield" width="20" height="20" />
+          {{empire.alliance.name}}
+        </div>
+      {% endif %}
+    {% else %}
+      {% if profile.user and profile.user.email() == "dean@codeka.com.au" %}
+        <div class="benevolent-dictator">[SERVER] Hello World!</div>
+      {% endif %}
+    {% endif %}
+    <div style="clear: both;"></div>
+    <h2>Posts</h2>
+    {% for post in posts %}
+      <div class="thread-entry">
+        <div class="thread-title">
+          <div class="thread-title-link"><a href="/forum/{{post.forum.slug}}/{{post.parent().slug}}">{{post.parent().subject}}</a></div>
+          <div>{{post.content|striptags|truncate(100)}}</div>
+        </div>
+        <div class="thread-details">
+          <div class="thread-author">started by <a href="/profile/{{post.parent().user.user_id()|base64}}"><img src="{{profiles[post.parent().user.user_id()]|profile_shield}}" width="16" height="16"/> {{profiles[post.parent().user.user_id()].display_name}}</a></div>
+          <div class="lastpost-author">post by <a href="/profile/{{profile.key().name()|base64}}"><img src="{{profile|profile_shield}}" width="16" height="16"/> {{profile.display_name}}</a></div>
+          <div class="lastpost-date"><time datetime="{{post|post_date_std}}" class="post-date">{{post|post_date_time}}</time></div>
+        </div>
+        <div class="last"></div>
+      </div>
+    {% endfor %}
+  </section>
+{% endblock %}

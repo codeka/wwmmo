@@ -76,9 +76,9 @@ def getEmpire(realm_name, empire_id):
     return empire_mdl
 
 
-def saveProfile(user_id, realm_name, display_name, empire):
-  profile = model.profile.Profile.SaveProfile(user_id, realm_name, display_name, empire)
-  keyname = "profile:%s" % (user_id)
+def saveProfile(user, realm_name, display_name, empire):
+  profile = model.profile.Profile.SaveProfile(user, realm_name, display_name, empire)
+  keyname = "profile:%s" % (user.user_id())
   memcache.set(keyname, profile)
 
 
@@ -89,6 +89,8 @@ def getProfile(user_id):
     profile = model.profile.Profile.GetProfile(user_id)
     if profile:
       memcache.set(keyname, profile)
+  if not profile.realm_name:
+    profile.realm_name = "Beta"
   return profile
 
 

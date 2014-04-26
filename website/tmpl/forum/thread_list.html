@@ -17,8 +17,8 @@
       <div><span>{{post_counts[thread.forum.slug+":"+thread.slug] - 1}}</span> replies</div>
     </div>
     <div class="thread-details">
-      <div class="thread-author">started by <a href="/"><img src="{{profiles[thread.user.user_id()]|profile_shield}}" width="16" height="16"/> {{profiles[thread.user.user_id()].display_name}}</a></div>
-      <div class="lastpost-author">last reply by <a href="/"><img src="{{profiles[last_posts[thread.key()].user.user_id()]|profile_shield}}" width="16" height="16"/> {{profiles[last_posts[thread.key()].user.user_id()].display_name}}</a></div>
+      <div class="thread-author">started by <a href="{{m.profile_url(profiles[thread.user.user_id()])}}"><img src="{{profiles[thread.user.user_id()]|profile_shield}}" width="16" height="16"/> {{profiles[thread.user.user_id()].display_name}}</a></div>
+      <div class="lastpost-author">last reply by <a href="{{m.profile_url(profiles[last_posts[thread.key()].user.user_id()])}}"><img src="{{profiles[last_posts[thread.key()].user.user_id()]|profile_shield}}" width="16" height="16"/> {{profiles[last_posts[thread.key()].user.user_id()].display_name}}</a></div>
       <div class="lastpost-date"><time datetime="{{last_posts[thread.key()]|post_date_std}}" class="post-date">{{last_posts[thread.key()]|post_date_time}}</time></div>
     </div>
     <div class="last"></div>

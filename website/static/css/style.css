@@ -1,7 +1,8 @@
 
+@import url(http://fonts.googleapis.com/css?family=Roboto:300,300italic,700,700italic);
 
 body {
-  font-family: georgia, serif;
+  font-family: roboto, sans-serif;
   font-size: 12pt;
   background: #000 url(/img/v2/bg.jpg) repeat;
   color: #222;
@@ -19,9 +20,9 @@ fieldset legend {
   color: #900;
 }
 
-h1 { font-family: Quando, serif; font-size: 16pt; font-weight: bold; margin-top: 1em; }
-h2 { font-family: Quando, serif; font-size: 14pt; font-weight: bold; margin-top: 1em; }
-h3 { font-family: Quando, serif; font-size: 12pt; font-weight: bold; font-style: italic; margin-top: 1em; }
+h1 { font-family: georgia, serif; font-size: 16pt; font-weight: bold; margin-top: 1em; }
+h2 { font-family: georgia, serif; font-size: 14pt; font-weight: bold; margin-top: 1em; }
+h3 { font-family: georgia, serif; font-size: 12pt; font-weight: bold; font-style: italic; margin-top: 1em; }
 
 ul {
   list-style-type: disc;

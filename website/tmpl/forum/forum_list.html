@@ -38,7 +38,7 @@
         {% if forum.slug in top_threads %}
           <div class="post-title"><a href="/forum/{{forum.slug}}/{{top_threads[forum.slug].slug}}">{{top_threads[forum.slug].subject}}</a></div>
           <div class="post-author">
-            by <a href="/"><img src="{{top_thread_user_profiles[top_threads[forum.slug].user.user_id()]|profile_shield}}" width="16" height="16"/>
+            by <a href="{{m.profile_url(top_thread_user_profiles[top_threads[forum.slug].user.user_id()])}}"><img src="{{top_thread_user_profiles[top_threads[forum.slug].user.user_id()]|profile_shield}}" width="16" height="16"/>
             {{top_thread_user_profiles[top_threads[forum.slug].user.user_id()].display_name}}</a>
           </div>
           <time datetime="{{top_threads[forum.slug]|post_date_std}}" class="post-date">{{top_threads[forum.slug]|post_date_time}}</time>

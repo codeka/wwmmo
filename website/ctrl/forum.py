@@ -176,6 +176,43 @@ def getTopThreadsPerForum(forums):
   return top_threads
 
 
+def getPostsForUser(profile, include_alliance_posts, page_no, page_size):
+  """Gets the posts that the given user has made.
+
+  Args:
+    profile The profile of the user whose posts we're after.
+    include_alliance_posts: If True, we'll include posts the user has made to their alliance forum."""
+  if not profile.user:
+    # The user will need to log in to the website in order to set the user.
+    return []
+
+  user_id = profile.key().name()
+  keyname = 'forum:threads-per-user:%s:%d:%d:%d' % (str(user_id), int(include_alliance_posts), page_no, page_size)
+  posts = memcache.get(keyname)
+  if not posts:
+    query = model.forum.ForumPost.all().filter("user", profile.user)
+    if not include_alliance_posts and profile.alliance_id:
+      alliance = model.profile.Alliance.Fetch(profile.realm_name, profile.alliance_id)
+      if alliance:
+        alliance_forum = getAllianceForum(profile.realm_name, alliance)
+        query.filter("forum !=", alliance_forum).order("forum")
+    query = query.order("-posted")
+
+    if page_no == 0:
+      it = query.run(limit=page_size)
+    else:
+      cursor = ctrl.findCursor(query, "forum-posts-for-user:%s:%d" % (str(user_id), int(include_alliance_posts)), page_no, page_size)
+      it = query.with_cursor(cursor)
+
+    posts = []
+    for post in it:
+      posts.append(post)
+
+    memcache.set(keyname, posts)
+
+  return posts
+
+
 def getLastPostsByForumThread(forum_threads):
   """For each thread in the given list, returns the most recent post in that thread."""
   keynames = []

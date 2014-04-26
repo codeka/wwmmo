@@ -31,7 +31,7 @@
     <article class="single-post" data-postid="{{post.key()}}">
       <img src="{{profiles[post.user.user_id()]|profile_shield}}" class="poster-shield" width="64" height="64" alt="Shield" />
       <header>
-        <span class="author"><a rel="author" href="/">{{profiles[post.user.user_id()].display_name}}</a></span>
+        <span class="author"><a href="{{m.profile_url(profiles[post.user.user_id()])}}" rel="author">{{profiles[post.user.user_id()].display_name}}</a></span>
         <span class="posted">posted <time itemprop="dateCreated" datetime="{{post|post_date_std}}">{{post|post_date_time}}</time></span>
         <span class="controls">
         {% if is_moderator or (user and post.user.user_id() == user.user_id()) %}
