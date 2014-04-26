@@ -14,35 +14,16 @@ import handlers
 
 
 class DocPage(handlers.BaseHandler):
-  """This is the base class for all doc pages."""
-  def _isLoggedIn(self):
-    """For pages that require a logged-in user, this can be called to
-       ensure you're logged in."""
-    self.user = users.get_current_user()
-    if (self.user and self.user.email().lower() != "dean@codeka.com.au"
-                  and self.user.email().lower() != "lam.h.emily@gmail.com"
-                  and self.user.email().lower() != "ebaversjo@gmail.com"):
-      self.user = None
-
+  def _isWriter(self):
     if not self.user:
-      # not logged in, so redirect to the login page
-      opts = {"continue": self.request.path_qs}
-      self.redirect("/doc/_/login?"+urllib.urlencode(opts))
       return False
-
-    return True
-
-  def render(self, tmplName, args):
-    if not args:
-      args = {}
-    super(DocPage, self).render(tmplName, args)
-
-
-class DocLoginPage(DocPage):
-  """An interstitial for when you have to log in."""
-  def get(self):
-    login_url = users.create_login_url(self.request.get("continue"))
-    self.render("doc/login.html", {"login_url": login_url})
+    writers = memcache.get("docs:writers")
+    if not writers:
+      writers = []
+      for writer in model.doc.DocWriter.all():
+        writers.append(writer.user.email())
+      memcache.set("docs:writers", writers)
+    return self.user.email() in writers
 
 
 class DocViewPage(DocPage):
@@ -54,7 +35,7 @@ class DocViewPage(DocPage):
     if not page:
       self.render("doc/not_found.html", {"slug": slug})
     else:
-      self.render("doc/page_view.html", {"page": page})
+      self.render("doc/page_view.html", {"page": page, "is_writer": self._isWriter()})
 
 
 class DocEditPage(DocPage):
@@ -63,6 +44,8 @@ class DocEditPage(DocPage):
     if not self._isLoggedIn():
       return
     slug = self.request.get("slug")
+    if not self._isWriter():
+      self.redirect("/doc/" + slug)
     page = ctrl.doc.getPage(slug)
     if not page:
       page = ctrl.doc.DocPage()
@@ -73,7 +56,9 @@ class DocEditPage(DocPage):
   def post(self):
     if not self._isLoggedIn():
       return
-    slug = self.request.POST.get("slug")
+    slug = self.request.get("slug")
+    if not self._isWriter():
+      self.redirect("/doc/" + slug)
     if slug[0] != "/":
       # TODO: invalid slug!
       return
@@ -95,6 +80,8 @@ class DocDeletePage(DocPage):
     if not self._isLoggedIn():
       return
     slug = self.request.get("slug")
+    if not self._isWriter():
+      self.redirect("/doc/" + slug)
     page = ctrl.doc.getPage(slug)
     if not page:
       self.response.set_status(404)
@@ -104,6 +91,8 @@ class DocDeletePage(DocPage):
   def post(self):
     if not self._isLoggedIn():
       return
+    if not self._isWriter():
+      self.redirect("/doc/")
     key = self.request.POST.get("key")
     ctrl.doc.deletePage(key)
     self.redirect("/doc/")
@@ -124,8 +113,7 @@ class DocRevisionHistoryPage(DocPage):
                                               "revisions": revisions})
 
 
-app = webapp.WSGIApplication([("/doc/_/login", DocLoginPage),
-                              ("/doc/_/edit", DocEditPage),
+app = webapp.WSGIApplication([("/doc/_/edit", DocEditPage),
                               ("/doc/_/delete", DocDeletePage),
                               ("/doc/_/revisions", DocRevisionHistoryPage),
                               ("/doc(/.*)?", DocViewPage)],

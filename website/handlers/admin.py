@@ -9,6 +9,7 @@ import json
 
 import handlers
 import model.blog
+import model.doc
 import ctrl.blog
 
 
@@ -127,10 +128,43 @@ class AdminBlobsNewPage(AdminPage):
     self.render('admin/blobs/new.html', {})
 
 
+class AdminDocsPage(AdminPage):
+  def get(self):
+    data = {}
+
+    writers = ""
+    for writer in model.doc.DocWriter.all():
+      if writers:
+        writers += ", "
+      writers += writer.user.email()
+    data["writers"] = writers
+
+    self.render('admin/docs/index.html', data)
+
+
+class AdminDocsWritersPage(AdminPage):
+  def post(self):
+    data = {}
+
+    for writer in model.doc.DocWriter.all():
+      writer.delete()
+
+    for email in self.request.POST.get("writers").split(","):
+      email = email.strip()
+      user = users.User(email)
+      writer = model.doc.DocWriter(user=user)
+      writer.put()
+    memcache.delete("docs:writers")
+
+    self.redirect('/admin/docs')
+
+
 app = webapp.WSGIApplication([('/admin', AdminDashboardPage),
                               ('/admin/posts', AdminPostListPage),
                               ('/admin/posts/([0-9]+|new)', AdminPostsPage),
                               ('/admin/posts/([0-9]+)/delete', AdminPostDeletePage),
                               ('/admin/blobs', AdminBlobsPage),
-                              ('/admin/blobs/new', AdminBlobsNewPage)],
+                              ('/admin/blobs/new', AdminBlobsNewPage),
+                              ('/admin/docs', AdminDocsPage),
+                              ('/admin/docs/writers', AdminDocsWritersPage)],
                              debug=os.environ['SERVER_SOFTWARE'].startswith('Development'))

@@ -14,7 +14,7 @@ import ctrl.tmpl
 
 # This value gets incremented every time we deploy so that we can cache bust
 # our static resources (css, js, etc)
-RESOURCE_VERSION = 45
+RESOURCE_VERSION = 46
 
 
 class BaseHandler(webapp.RequestHandler):
@@ -49,7 +49,7 @@ class BaseHandler(webapp.RequestHandler):
     if user:
       args['is_logged_in'] = True
       args['logout_url'] = users.create_logout_url(self.request.uri)
-      args['is_writer'] = (user.email() == 'dean@codeka.com.au' or user.email() == 'lam.h.emily@gmail.com' or user.email() == 'ebaversjo@gmail.com')
+      args['is_admin'] = (user.email() == 'dean@codeka.com.au')
       args['user'] = user
       args['user_email'] = user.email()
     else:

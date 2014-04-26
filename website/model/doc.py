@@ -1,6 +1,11 @@
 
 from google.appengine.ext import db
 
+import model.profile
+
+class DocWriter(db.Model):
+  user = db.UserProperty(required=True)
+
 
 class DocPage(db.Model):
   """The 'high level' document object."""

@@ -1,0 +1,24 @@
+{% extends "admin/skeleton.html" %}
+{% block title %}Docs{% endblock %}
+{% block extracss %}
+  <style>
+    fieldset {
+      padding: 0 10pt 10pt 10pt;
+    }
+    fieldset input[type=text] {
+      width: 100%;
+      margin-bottom: 8pt;
+    }
+  </style>
+{% endblock %}
+{% block maincontent %}
+<h1>Docs</h1>
+<form action="/admin/docs/writers" method="post">
+  <fieldset>
+    <legend>Writers</legend>
+    <p>Comma-separated list of email addresses of users who can edit docs.</p>
+    <div><input type="text" name="writers" value="{{writers}}" /></div>
+    <div><input type="submit" value="Save" /></div>
+  </fieldset>
+</form>
+{% endblock %}
