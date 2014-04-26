@@ -3,6 +3,7 @@ import os
 import webapp2 as webapp
 from google.appengine.api import users
 from google.appengine.api import images
+from google.appengine.ext import blobstore
 import datetime
 import json
 
@@ -21,7 +22,7 @@ class AdminPage(handlers.BaseHandler):
       self.redirect(users.create_login_url(self.request.uri))
       return
 
-    # TODO: better handling of authorization... one email address ain't enough!
+    # TODO: better handling of authorization...
     if self.user.email() != 'dean@codeka.com.au':
       # not authorized to view the backend, redirect to the home page instead
       self.redirect('/')
@@ -100,14 +101,36 @@ class AdminPostDeletePage(AdminPage):
     self.redirect('/admin/posts')
 
 
-class AdminDownloadsPage(AdminPage):
+class AdminBlobsPage(AdminPage):
   def get(self):
-    self.render('admin/downloads_list.html', {})
+    query = blobstore.BlobInfo.all().order("-creation")
+    if self.request.get("cursor"):
+      query.with_cursor(self.request.get("cursor"))
+    blobs = []
+    for blob in query:
+      blobs.append(blob)
+      if len(blobs) > 20:
+        break
+    data = {"blobs": blobs}
+
+    cursor = query.cursor()
+    for blob in query:
+      # only add the cursor if there's at least one more...
+      data["cursor"] = cursor
+      break
+
+    self.render('admin/blobs/index.html', data)
+
+
+class AdminBlobsNewPage(AdminPage):
+  def get(self):
+    self.render('admin/blobs/new.html', {})
 
 
 app = webapp.WSGIApplication([('/admin', AdminDashboardPage),
                               ('/admin/posts', AdminPostListPage),
                               ('/admin/posts/([0-9]+|new)', AdminPostsPage),
                               ('/admin/posts/([0-9]+)/delete', AdminPostDeletePage),
-                              ('/admin/downloads', AdminDownloadsPage)],
+                              ('/admin/blobs', AdminBlobsPage),
+                              ('/admin/blobs/new', AdminBlobsNewPage)],
                              debug=os.environ['SERVER_SOFTWARE'].startswith('Development'))

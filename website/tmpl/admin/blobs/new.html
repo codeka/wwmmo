@@ -1,0 +1,126 @@
+{% extends "admin/skeleton.html" %}
+{% block title %}New Blob{% endblock %}
+{% block extracss %}
+  <style>
+    fieldset {
+      padding: 0 10pt 10pt 10pt;
+    }
+    #upload-container {
+      position: relative;
+    }
+    #progress-container {
+      position: absolute;
+      top: 0; left: 100px;
+      right: 0; bottom: 0;
+    }
+    #progress-value {
+      position: absolute;
+      top: 0; left: 0; bottom: 0; width: 0;
+      background: #090;
+      white-space: nowrap;
+    }
+    #progress-value span {
+      padding-left: 10pt;
+    }
+
+    #upload-details input[type=text] {
+      width: 100%;
+      margin: 4pt 0;
+    }
+    #upload-details div.read-only {
+      height: 23px;
+      margin: 4pt 0;
+      border: solid 1px #000;
+      display: inline-block;
+      width: 100%;
+    }
+  </style>
+{% endblock %}
+{% block maincontent %}
+<h1>New Blob</h1>
+<form action="post">
+  <fieldset>
+    <p>Upload the file by clicking the button below first, then make sure the details are correct.</p>
+    <div id="upload-container">
+      <button id="upload-btn">Select File</button>
+      <input type="file" id="upload-file">
+      <div id="progress-container"><div id="progress-value"><span></span></div></div>
+    </div>
+    <div id="upload-details" style="display: none;">
+      <hr />
+      <input type="text" name="filename" id="filename" placeholder="Filename" />
+      <input type="text" name="contenttype" id="contenttype" placeholder="Content-Type" />
+      <div class="read-only" id="filesize"></div>
+      <div class="read-only" id="url"></div>
+      <input type="submit" value="Save" />
+    </div>
+  </fieldset>
+</form>
+
+<script>
+  function refresh(fileInfo) {
+    $("#upload-details").show();
+    $("#filename").val(fileInfo.filename);
+    $("#contenttype").val(fileInfo.content_type);
+    $("#filesize").html(fileInfo.size + " bytes");
+    $("#url").html("<a href=\""+fileInfo.url+"/download\">"+fileInfo.url+"/download</a>");
+  }
+
+  function setProgress(pct, label) {
+    $("#progress-value span").html(label);
+    if (pct == 0) {
+      $("#progress-value").css("width", "0");
+    } else {
+      $("#progress-value").css("width", pct+"%");
+    }
+  }
+
+  function startUpload(file) {
+    setProgress(0, "Starting...");
+
+    // the first thing we need to do is figure out the upload URL to use
+    $.ajax({
+      "url": "/blob/upload-url",
+      "success": function(data) {
+        var uploadUrl = data.upload_url;
+
+        var xhr = new XMLHttpRequest();
+        xhr.upload.addEventListener("progress", function(evnt) {
+          if (evnt.lengthComputable) {
+            var percent = Math.round((evnt.loaded * 100) / evnt.total);
+            setProgress(percent, file.name+" ... "+percent+"%");
+          }
+        }, false);
+
+        xhr.onreadystatechange = function() {
+          if (xhr.readyState == 4) {
+            resp = JSON.parse(xhr.responseText);
+
+            setProgress(100, "Complete: "+resp.filename);
+            refresh(resp);
+          }
+        };
+
+        xhr.open("POST", uploadUrl, true);
+        xhr.setRequestHeader("X-File-Name", file.name);
+        xhr.setRequestHeader("X-File-Type", file.type);
+        xhr.setRequestHeader("X-Blob", "1");
+
+        var form = new FormData();
+        form.append("file", file);
+        xhr.send(form);
+      }
+    });
+  }
+
+  $("#upload-file").css("position", "absolute").css("visibility", "collapse");
+  $("#upload-btn").on("click", function(evnt) {
+    evnt.preventDefault();
+    $("#upload-file").click();
+  });
+  $("#upload-file").on("change", function(evnt) {
+    startUpload(this.files[0]);
+    $(this).attr("value", "");
+  });
+</script>
+{% endblock %}

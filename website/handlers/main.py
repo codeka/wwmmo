@@ -39,16 +39,20 @@ class BlobUploadUrlPage(handlers.BaseHandler):
 class BlobUploadCompletePage(blobstore_handlers.BlobstoreUploadHandler):
   def post(self):
     blob_info = self.get_uploads('file')[0]
-    img = images.Image(blob_key=blob_info)
-    img.im_feeling_lucky() # we have to do a transform in order to get dimensions
-    img.execute_transforms()
     response = {'success': True,
                 'blob_key': str(blob_info.key()),
                 'size': blob_info.size,
-                'filename': blob_info.filename,
-                'width': img.width,
-                'height': img.height,
-                'url': images.get_serving_url(blob_info.key(), 100, 0)}
+                'filename': blob_info.filename}
+    if "X-Blob" in self.request.headers:
+      response['content_type'] = blob_info.content_type
+      response['url'] = '/blob/' + str(blob_info.key())
+    else:
+      img = images.Image(blob_key=blob_info)
+      img.im_feeling_lucky() # we have to do a transform in order to get dimensions
+      img.execute_transforms()
+      response['width'] = img.width
+      response['height'] = img.height
+      response['url'] = images.get_serving_url(blob_info.key(), 100, 0)
     self.response.headers["Content-Type"] = "application/json"
     self.response.write(json.dumps(response))
 
@@ -61,6 +65,19 @@ class BlobPage(blobstore_handlers.BlobstoreDownloadHandler):
       self.response.headers["Cache-Control"] = "public, max-age="+str(30*24*60*60) # 30 days
       self.response.headers["Expires"] = (datetime.now() + timedelta(days=30)).strftime("%a, %d %b %Y %H:%M:%S GMT")
       self.send_blob(blob_key)
+
+
+class BlobDownloadPage(blobstore_handlers.BlobstoreDownloadHandler):
+  def get(self, blob_key):
+    blob_info = blobstore.get(blob_key)
+    if not blob_info:
+      self.error(404)
+    else:
+      self.response.headers["Cache-Control"] = "public, max-age="+str(30*24*60*60) # 30 days
+      self.response.headers["Expires"] = (datetime.now() + timedelta(days=30)).strftime("%a, %d %b %Y %H:%M:%S GMT")
+      self.response.headers["Content-Type"] = blob_info.content_type
+      self.response.headers["Content-Disposition"] = str("attachment; filename=" + blob_info.filename)
+      self.send_blob(blob_info)
 
 
 class BlobInfoPage(handlers.BaseHandler):
@@ -169,6 +186,7 @@ app = webapp.WSGIApplication([("/", HomePage),
                               ("/blob/upload-url", BlobUploadUrlPage),
                               ("/blob/upload-complete", BlobUploadCompletePage),
                               ("/blob/([^/]+)", BlobPage),
+                              ("/blob/([^/]+)/download", BlobDownloadPage),
                               ("/blob/([^/]+)/info", BlobInfoPage),
                               ("/newsletter", NewsletterSignupPage),
                               ("/newsletter/thankyou", NewsletterThankyouPage),

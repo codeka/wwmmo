@@ -89,7 +89,7 @@ def getProfile(user_id):
     profile = model.profile.Profile.GetProfile(user_id)
     if profile:
       memcache.set(keyname, profile)
-  if not profile.realm_name:
+  if profile and not profile.realm_name:
     profile.realm_name = "Beta"
   return profile
 

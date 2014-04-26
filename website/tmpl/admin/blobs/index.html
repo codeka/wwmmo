@@ -1,0 +1,31 @@
+{% extends "admin/skeleton.html" %}
+{% block title %}Blobs{% endblock %}
+{% block maincontent %}
+<h1>Blobs</h1>
+<table>
+  <thead>
+    <tr>
+      <th>Filename</th>
+      <th>Size</th>
+      <th>Creation</th>
+      <th></th>
+    </tr>
+  </thead>
+{%- for blob in blobs %}
+  <tr class="{{ loop.cycle('odd', 'even') }}">
+    <td>
+      <a href="/blob/{{blob.key()}}">{{blob.filename}}</a>
+      (<a href="/blob/{{blob.key()}}/download">Download</a>)
+    </td>
+    <td>{{blob.size|number}}</td>
+    <td>{{blob.creation}}</td>
+    <td><a href="/admin/downloads/{{blob.key()}}/delete">Delete</a></td>
+  </tr>
+{%- endfor %}
+</table>
+
+{% if cursor %}
+<a href="?cursor={{cursor}}">Next &gt;&gt;</a>
+{% endif %}
+
+{% endblock %}

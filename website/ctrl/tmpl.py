@@ -96,6 +96,12 @@ def _filter_base64(str):
   return base64.b64encode(str)
 jinja.filters["base64"] = _filter_base64
 
+
+def _filter_number(n):
+  return "{:,}".format(n)
+jinja.filters["number"] = _filter_number
+
+
 def getTemplate(tmpl_name):
   return jinja.get_template(tmpl_name)
 

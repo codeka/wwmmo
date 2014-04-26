@@ -5,8 +5,6 @@
   <link rel="stylesheet" href="/css/v{{resource_version}}/style.css">
   <link rel="stylesheet" href="/css/v{{resource_version}}/admin.css">
 
-  <link rel="stylesheet" href="/js/v{{resource_version}}/markitup/skins/default/style.css" />
-  <link rel="stylesheet" href="/js/v{{resource_version}}/markitup/sets/default/style.css" />
   {%- block extracss %}{% endblock %}
   <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
   <script src="/ckeditor/v{{resource_version}}/ckeditor.js"></script>
@@ -23,11 +21,15 @@
         <ul>
           <li><a href="/admin/posts/new">New Post</a>
         </ul>
-      <li><a href="/admin/downloads">Downloads</a>
+      <li><a href="/admin/blobs">Blobs</a>
+        <ul>
+          <li><a href="/admin/blobs/new">New Blob</a>
+        </ul>
       <li><a href="/admin/forum">Forum</a>
         <ul>
           <li><a href="/admin/forum/forums">Forum List</a>
         </ul>
+      <li><a href="/admin/docs">Docs</a>
       <li><a href="/">Leave Backend</a>
     </ul>
   </nav>
