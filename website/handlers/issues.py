@@ -1,6 +1,7 @@
 
 import os
 from datetime import datetime
+import inspect
 import logging
 import math
 import re
@@ -23,7 +24,8 @@ class IssuesPage(handlers.BaseHandler):
 
 class IssuesListPage(IssuesPage):
   def get(self):
-    self.render("issues/issues_list.html", {})
+    issues = ctrl.issues.searchIssues("state:Open OR state:New")
+    self.render("issues/issues_list.html", {"issues": issues})
 
 
 class IssuesCreatePage(IssuesPage):
@@ -31,6 +33,8 @@ class IssuesCreatePage(IssuesPage):
     self.render("issues/issues_edit.html", {})
   def post(self):
     id = ctrl.issues.createIssue(self.request.POST.get("issue-summary"),
+                                 model.issues.Type.fromString(self.request.POST.get("issue-type")),
+                                 int(self.request.POST.get("issue-priority")),
                                  self.request.POST.get("issue-description"),
                                  self.user)
     self.redirect("/issues/"+str(id))
@@ -50,6 +54,8 @@ class IssuesViewPage(IssuesPage):
     profiles = ctrl.profile.getProfiles(user_ids)
     data["profiles"] = profiles
 
+    data["actions"] = ctrl.issues.getPossibleActions(issue)
+
     self.render("issues/issues_view.html", data)
 
   def post(self, issue_id):
@@ -62,9 +68,16 @@ class IssuesViewPage(IssuesPage):
     update = model.issues.IssueUpdate(parent=issue)
     update.posted = datetime.now()
     update.user = self.user
-    if self.request.POST.get("issue-comment"):
-      update.comment = ctrl.sanitizeHtml(self.request.POST.get("issue-comment"))
-    ctrl.issues.saveUpdate(issue, update)
+    if self.request.POST.get("update-comment"):
+      update.comment = ctrl.sanitizeHtml(self.request.POST.get("update-comment"))
+    update.action = model.issues.Action.fromString(self.request.POST.get('update-action'))
+    new_type = model.issues.Type.fromString(self.request.POST.get('update-type'))
+    if new_type != issue.type:
+      update.new_type = new_type
+    new_priority = int(self.request.POST.get('update-priority'))
+    if new_priority != issue.priority:
+      update.new_priority = new_priority
+    ctrl.issues.saveUpdate(issue, updates, update)
 
     # redirect back with a GET
     self.redirect("/issues/"+str(issue_id))

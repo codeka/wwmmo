@@ -50,6 +50,10 @@ handlers:
   script: cron.forum.app
   login: admin
 
+- url: /cron/issues(/.*)?
+  script: cron.issues.app
+  login: admin
+
 - url: /blog(/.*)?
   script: handlers.blog.app
 

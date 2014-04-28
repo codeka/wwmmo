@@ -39,10 +39,10 @@ import org.apache.http.params.BasicHttpParams;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import android.content.pm.PackageInfo;
 import au.com.codeka.warworlds.App;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.RealmContext;
+import au.com.codeka.warworlds.Util;
 import au.com.codeka.warworlds.model.Realm;
 
 /**
@@ -57,7 +57,6 @@ public class RequestManager {
             new ArrayList<RequestManagerStateChangedHandler>();
     private static String sImpersonateUser;
     private static boolean sVerboseLog = false;
-    private static String sVersion = null;
 
     // we record the last status code we got from the server, don't try to re-authenticate if we
     // get two 403's in a row, for example.
@@ -127,19 +126,6 @@ public class RequestManager {
         return request(method, url, extraHeaders, null);
     }
 
-    private static void ensureVersion() {
-        if (sVersion != null) {
-            return;
-        }
-
-        try {
-            PackageInfo packageInfo = App.i.getPackageManager().getPackageInfo(App.i.getPackageName(), 0);
-            sVersion = packageInfo.versionName;
-        } catch (Exception e) {
-            sVersion = "??";
-        }
-    }
-
     /**
      * Performs a request with the given method to the given URL. The URL is assumed to be
      * relative to the \c baseUri that was passed in to \c configure().
@@ -163,8 +149,6 @@ public class RequestManager {
         if (!realm.getAuthenticator().isAuthenticated()) {
             realm.getAuthenticator().authenticate(null, realm);
         }
-
-        ensureVersion();
 
         URI uri = realm.getBaseUrl().resolve(url);
         if (sVerboseLog) {
@@ -213,7 +197,7 @@ public class RequestManager {
                 }
                 request.addHeader("Host", host);
 
-                request.addHeader("User-Agent", "wwmmo/"+sVersion);
+                request.addHeader("User-Agent", "wwmmo/" + Util.getVersion());
 
                 if (extraHeaders != null) {
                     for(String headerName : extraHeaders.keySet()) {

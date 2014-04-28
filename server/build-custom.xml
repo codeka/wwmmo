@@ -33,9 +33,7 @@
     <target name="deploy" depends="package">
         <zip destfile="${deploy.filename}" basedir="${output.location}" />
         <echo message="${ant.project.name}: copying ${deploy.filename}..."/>
-        <exec executable="pscp">
-            <arg value="-load" />
-            <arg value="game.war-worlds.com" />
+        <exec executable="scp">
             <arg value="${deploy.filename}" />
             <arg value="dean@game.war-worlds.com:/home/dean" />
         </exec>

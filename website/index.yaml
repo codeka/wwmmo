@@ -59,6 +59,17 @@ indexes:
   - name: posted
     direction: desc
 
+- kind: IssueUpdate
+  ancestor: yes
+  properties:
+  - name: posted
+
+- kind: IssueUpdate
+  ancestor: yes
+  properties:
+  - name: posted
+    direction: desc
+
 - kind: Post
   properties:
   - name: isPublished

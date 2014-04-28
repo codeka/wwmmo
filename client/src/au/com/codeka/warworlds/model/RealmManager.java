@@ -26,7 +26,7 @@ public class RealmManager {
         mRealms = new ArrayList<Realm>();
         try {
             if (Util.isDebug()) {
-                mRealms.add(new Realm(DEBUG_REALM_ID, "http://192.168.168.106:8080/realms/beta/",
+                mRealms.add(new Realm(DEBUG_REALM_ID, "http://192.168.1.4:8080/realms/beta/",
                                       "Debug",
                                       "The debug realm runs on my local dev box for testing.",
                                       Realm.AuthenticationMethod.Default, false));

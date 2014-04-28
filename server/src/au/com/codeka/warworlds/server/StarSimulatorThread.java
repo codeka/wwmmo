@@ -22,6 +22,11 @@ public class StarSimulatorThread {
     private Thread mThread;
     private boolean mStopped;
 
+    private static int WAIT_TIME_NO_STARS = 10 * 60 * 1000; // 10 minutes, after no stars found
+    private static int WAIT_TIME_JUST_SIMULATED = 60 * 60 * 1000; // 1 hour, we just simulated the oldest star
+    private static int WAIT_TIME_ERROR = 60 * 1000; // 1 minute, in case of error
+    private static int WAIT_TIME_NORMAL = 2 * 1000; // 2 seconds, normal wait time between simulations
+
     public void start() {
         if (mThread != null) {
             stop();
@@ -57,35 +62,39 @@ public class StarSimulatorThread {
 
     private void threadproc() {
         while (!mStopped) {
-            simulateOneStar();
+            int waitTime = simulateOneStar();
 
-            // TODO: if we ever catch up, sleep for more than 2 seconds!
+            log.info(String.format("Waiting %d seconds before simulating next star.", waitTime / 1000));
             try {
-                Thread.sleep(2000);
+                Thread.sleep(waitTime);
             } catch (InterruptedException e) {
             }
         }
     }
 
-    private void simulateOneStar() {
+    private int simulateOneStar() {
         try {
             int starID = findOldestStar();
+            if (starID == 0) {
+                return WAIT_TIME_NO_STARS; 
+            }
             log.info("Simulating star: "+starID);
 
             Star star = new StarController().getStar(starID);
             if (star.getLastSimulation().isAfter(DateTime.now().minusHours(1))) {
-                // TODO: sleep for more than 2 seconds if we get here...
-                return;
+                return WAIT_TIME_JUST_SIMULATED;
             }
 
             new Simulation().simulate(star);
             new StarController().update(star);
+            return WAIT_TIME_NORMAL;
         } catch (Exception e) {
             log.info("HERE");
             log.error("Exception caught simulating star!", e);
             // TODO: if there are errors, it'll just keep reporting
             // over and over... probably a good thing because we'll
             // definitely need to fix it!
+            return WAIT_TIME_ERROR;
         }
     }
 

@@ -27,6 +27,21 @@
       </ul>
     </nav>
 
-    <p>Blah</p>
+    <table class="issue-list">
+      <tr>
+        <th>ID</th>
+        <th>Summary</th>
+        <th>Priority</th>
+        <th>Type</th>
+      </tr>
+    {%- for issue in issues %}
+      <tr class="{{ loop.cycle('odd', 'even') }}">
+        <td><a href="/issues/{{issue.key().id()}}">{{issue.key().id()}}</a></td>
+        <td>{{issue.summary}}</td>
+        <td>{{issue.priority}}</td>
+        <td>{{issue.type}}</td>
+      </tr>
+    {% endfor %}
+    </table>
   </section>
 {% endblock %}

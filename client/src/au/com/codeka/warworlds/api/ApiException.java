@@ -1,5 +1,7 @@
 package au.com.codeka.warworlds.api;
 
+import java.net.SocketException;
+
 import org.apache.http.HttpResponse;
 import org.apache.http.StatusLine;
 
@@ -52,6 +54,18 @@ public class ApiException extends Exception {
 
         ex.mHttpStatusLine = resp.getStatusLine();
         throw ex;
+    }
+
+    /** Returns true if this exception was thrown as the result of a network error. */
+    public boolean networkError() {
+        Throwable cause = this.getCause();
+        while (cause != null) {
+            if (cause instanceof SocketException) {
+                return true;
+            }
+            cause = cause.getCause();
+        }
+        return false;
     }
 
     public StatusLine getHttpStatusLine() {

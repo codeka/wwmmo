@@ -8,3 +8,7 @@ queue:
   rate: 5/s
   bucket_size: 10
   max_concurrent_requests: 10
+- name: issuesync
+  rate: 5/s
+  bucket_size: 10
+  max_concurrent_requests: 10

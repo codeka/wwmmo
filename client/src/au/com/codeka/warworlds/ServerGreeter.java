@@ -116,7 +116,7 @@ public class ServerGreeter {
 
         Util.loadProperties();
         if (Util.isDebug()) {
-          //  enableStrictMode();
+            enableStrictMode();
         }
 
         GCMRegistrar.checkDevice(activity);
@@ -174,7 +174,8 @@ public class ServerGreeter {
                         realm.getAuthenticator().authenticate(activity, realm);
                     } catch (ApiException e) {
                         mErrorOccured = true;
-                        mNeedsReAuthenticate = true;
+                        // if it wasn't a network error, it probably means we need to re-auth.
+                        mNeedsReAuthenticate = !e.networkError();
                         if (e.getServerErrorCode() > 0 && e.getServerErrorMessage() != null) {
                             mToastMessage = e.getServerErrorMessage();
                         }
@@ -191,7 +192,8 @@ public class ServerGreeter {
                         deviceRegistrationKey = DeviceRegistrar.register();
                     } catch (ApiException e) {
                         mErrorOccured = true;
-                        mNeedsReAuthenticate = true;
+                        // only re-authenticate for non-network related errors
+                        mNeedsReAuthenticate = !e.networkError();
                         if (e.getServerErrorCode() > 0 && e.getServerErrorMessage() != null) {
                             mToastMessage = e.getServerErrorMessage();
                         }

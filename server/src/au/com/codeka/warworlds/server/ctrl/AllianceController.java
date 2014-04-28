@@ -167,6 +167,14 @@ public class AllianceController {
         } catch (Exception e) {
             throw new RequestException(e);
         }
+
+        sql = "UPDATE alliances SET image_updated_date = NOW() WHERE id = ?";
+        try (SqlStmt stmt = db.prepare(sql)) {
+            stmt.setInt(1, allianceID);
+            stmt.update();
+        } catch (Exception e) {
+            throw new RequestException(e);
+        }
     }
 
     private static class DataBase extends BaseDataBase {

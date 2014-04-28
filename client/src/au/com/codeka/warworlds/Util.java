@@ -7,6 +7,7 @@ import java.util.Properties;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.pm.PackageInfo;
 import android.content.res.AssetManager;
 import au.com.codeka.warworlds.api.ApiClient;
 import au.com.codeka.warworlds.model.DesignManager;
@@ -26,6 +27,7 @@ public class Util {
 
     private static Properties sProperties;
     private static boolean sWasSetup;
+    private static String sVersion;
 
     /**
      * This should be called from every entry-point into the process to make
@@ -41,12 +43,23 @@ public class Util {
         PurchaseManager.i.setup();
         RealmManager.i.setup();
 
+        try {
+            PackageInfo packageInfo = App.i.getPackageManager().getPackageInfo(App.i.getPackageName(), 0);
+            sVersion = packageInfo.versionName;
+        } catch (Exception e) {
+            sVersion = "??";
+        }
+
         sWasSetup = true;
         return true;
     }
 
     public static boolean isSetup() {
         return sWasSetup;
+    }
+
+    public static String getVersion() {
+        return sVersion;
     }
 
     /**

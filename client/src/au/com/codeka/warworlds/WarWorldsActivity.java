@@ -15,6 +15,7 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.protocol.HTTP;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -25,8 +26,6 @@ import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager.NameNotFoundException;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
@@ -164,18 +163,13 @@ public class WarWorldsActivity extends BaseActivity implements EmpireShieldManag
                     // we'll display a bit of debugging info along with the 'connected' message
                     long maxMemoryBytes = Runtime.getRuntime().maxMemory();
                     int memoryClass = ((ActivityManager) getSystemService(ACTIVITY_SERVICE)).getMemoryClass();
-                    PackageInfo packageInfo = null;
-                    try {
-                        packageInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
-                    } catch (NameNotFoundException e) {
-                    }
 
                     DecimalFormat formatter = new DecimalFormat("#,##0");
                     String msg = String.format(Locale.ENGLISH,
                                                "Connected\r\nMemory Class: %d - Max bytes: %s\r\nVersion: %s%s",
                                                memoryClass,
                                                formatter.format(maxMemoryBytes),
-                                               packageInfo == null ? "Unknown" : packageInfo.versionName,
+                                               Util.getVersion(),
                                                Util.isDebug() ? " (debug)" : " (rel)");
                     mConnectionStatus.setText(msg);
                     mStartGameButton.setEnabled(true);
@@ -199,6 +193,8 @@ public class WarWorldsActivity extends BaseActivity implements EmpireShieldManag
                     // we have to use the built-in one because our special version assume all requests go to the
                     // game server...
                     HttpClient httpClient = new DefaultHttpClient();
+                    HttpGet get = new HttpGet(url);
+                    get.addHeader(HTTP.USER_AGENT, "wwmmo/" + Util.getVersion());
                     HttpResponse response = httpClient.execute(new HttpGet(url));
                     if (response.getStatusLine().getStatusCode() == 200) {
                         DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();

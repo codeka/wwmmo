@@ -30,7 +30,19 @@
           <label for="issue-summary">Summary:</label>
           <div class="hack"><input type="text" name="issue-summary" id="issue-summary" placeholder="Describe the issue in a short sentence." /></div>
         </div>
-        <div class="issue-field issue-field-markitup">
+        <div class="issue-field issue-field-half select">
+          <label for="issue-type">Type:</label>
+          <select name="issue-type" id="issue-type"><option value="B">Bug</option><option value="FR">Feature Request</option><option value="P">Process</option></select>
+        </div>
+        <div class="issue-field issue-field-half select">
+          <label for="issue-priority">Priority:</label>
+          <select name="issue-priority" id="issue-priority">
+            <option value="1">1 - Game Unplayable</option>
+            <option value="2" selected>2 - Normal</option>
+            <option value="3">3 - Cosmetic</option>
+          </select>
+        </div>
+        <div class="issue-field issue-field-wysiwyg">
           <label for="issue-description">Description:</label>
           <div class="hack"><textarea name="issue-description" id="issue-description"></textarea></div>
         </div>
@@ -41,7 +53,7 @@
   <script>
     $(function() {
       var editor = CKEDITOR.replace("issue-description");
-      var $container = $("fieldset div.issue-field-markitup div.hack");
+      var $container = $("fieldset div.issue-field-wysiwyg div.hack");
 
       CKEDITOR.on("instanceReady", function() {
         editor.resize($container.width(), $container.height());

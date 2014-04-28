@@ -17,6 +17,24 @@ fieldset.no-border {
   border: none;
 }
 
+section.content {
+  padding-bottom: 5em;
+}
+
+/* Issue list ------------------------------------------------------------------------------------------------------- */
+
+table.issue-list {
+  width: 100%;
+}
+
+table.issue-list tr.odd {
+  background: #eee;
+}
+table.issue-list tr.even {
+  background: #fff;
+}
+
+
 /* Issue editing/viewing -------------------------------------------------------------------------------------------- */
 
 form.edit-issue {
@@ -29,9 +47,17 @@ form.edit-issue fieldset {
 }
 
 div.issue-field {
-  height: 20pt;
+  min-height: 20pt;
   position: relative;
   margin: 8pt 0;
+  clear: left;
+}
+
+div.issue-field-half {
+  float: left;
+  width: 50%;
+  clear: none;
+  margin-top: 0;
 }
 
 div.issue-field label {
@@ -63,6 +89,12 @@ div.issue-field div.read-only {
   padding-left: 1em;
 }
 
+div.issue-field.select select {
+  position: absolute;
+  left: 75pt;
+  width: auto;
+}
+
 div.issue-field p {
   line-height: 20pt;
 }
@@ -75,15 +107,15 @@ div.issue-field.issue-field-autoheight {
   height: auto;
 }
 
-div.issue-field.issue-field-markitup {
+div.issue-field.issue-field-wysiwyg {
   height: 300pt;
 }
-div.issue-field.issue-field-markitup label {
+div.issue-field.issue-field-wysiwyg label {
   position: absolute;
   top: 0; left: 0; height: 20pt; width: 75pt;
   line-height: 20pt;
 }
-div.issue-field.issue-field-markitup textarea {
+div.issue-field.issue-field-wysiwyg textarea {
   width: 100%; height: 100%;
   border: solid 1px #ccc;
   padding: 2pt 4pt;
@@ -102,18 +134,41 @@ div.issue-field.issue-field-submit div.input-button input {
   width: 120px;
 }
 
+fieldset.issue-readonly, fieldset.issue-callout {
+  padding-left: 10pt;
+}
+
+fieldset.issue-readonly div.issue-field {
+  margin: 2pt 0;
+}
+
+fieldset.issue-readonly label {
+  font-weight: bold;
+}
+
 fieldset.issue-readonly div.field-value {
-  position: absolute;
-  top: 0; left: 75pt; bottom: 0; right: 4pt;
+  margin-left: 75pt;
   line-height: 20pt;
 }
 
-header.add-comment-header {
+fieldset.issue-readonly legend {
+  height: 18pt;
+}
+
+fieldset.issue-callout {
+  float: right;
+  width: 33%;
+  right: 0;
+  top: 0;
+  margin-right: -1px;
+  margin-top: -10pt;
+}
+
+header.update-issue-header {
   font-weight: bold;
   border-bottom: dotted 1px #999;
   margin-top: 2em;
 }
-
 
 article.issue-update header {
   border-bottom: solid 1px #ccc;
@@ -141,6 +196,13 @@ article.issue-update div.comment {
 
 article.issue-update div.comment p:nth-child(1) {
   margin-top: 0;
+}
+
+article.issue-update div.action {
+  margin-left: 100pt;
+  font-style: italic;
+  border-left: dotted 1px #ccc;
+  padding-left: 10pt;
 }
 
 article .poster-shield {

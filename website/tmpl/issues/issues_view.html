@@ -28,6 +28,23 @@
 
     <fieldset class="issue-readonly">
       <legend>Issue # {{issue.key().id()}}</legend>
+      <fieldset class="issue-callout">
+        <div class="issue-field">
+          <label>Type:</label>
+          <div class="field-value">{{issue.type}}</div>
+        </div>
+        <div class="issue-field">
+          <label>Priority:</label>
+          <div class="field-value">{{['1 - Game Unplayable', '2 - Normal', '3 - Cosmetic'][issue.priority-1]}}</div>
+        </div>
+        <div class="issue-field">
+          <label>State:</label>
+          <div class="field-value">
+            {{issue.state}}
+            {%- if issue.state == 'Closed' %}, {{issue.resolution}}{% endif %}
+          </div>
+        </div>
+      </fieldset>
       <div class="issue-field">
         <label>Summary:</label>
         <div class="field-value">{{issue.summary}}</div>
@@ -45,21 +62,56 @@
         <span class="author"><a rel="author" href="/">{{profiles[update.user.user_id()].display_name}}</a></span>
         <span class="posted">posted <time itemprop="dateCreated" datetime="{{update|post_date_std}}">{{update|post_date_time}}</time></span>
       </header>
+      <div class="action">
+        {% if update.action == 'Leave' %}
+        {%- elif update.action == 'Open' %}→ Opened
+        {%- elif update.action == 'CloseFixed' %}→ Fixed
+        {%- elif update.action == 'CloseDupe' %}→ Duplicate
+        {%- elif update.action == 'CloseWorksForMe' %}→ Works for me
+        {%- elif update.action == 'CloseReject' %}→ Rejected
+        {%- endif %}
+      </div>
+      {% if update.new_priority %}<div class="action"><strong>Priority</strong> → P{{update.new_priority}}</div>{% endif %}
+      {% if update.new_type %}<div class="action"><strong>Type:</strong> → {{update.new_type}}</div>{% endif %}
       <div class="comment">
         {{update.comment}}
       </div>
     </article>
     {% endfor %}
 
-    <a name="add-comment"></a>
+    <a name="update-issue"></a>
     <form method="POST" action="/issues/{{issue.key().id()}}">
       <fieldset class="no-border">
-        <header class="add-comment-header">
-          Add Comment
+        <header class="update-issue-header">
+          Update Issue
         </header>
-        <div class="issue-field issue-field-markitup">
-          <label for="issue-comment">Comment:</label>
-          <div class="hack"><textarea name="issue-comment" id="issue-comment"></textarea></div>
+        <div class="issue-field select">
+          <label for="update-action">Action:</label>
+          <select name="update-action" id="update-action">
+          {%- for action in actions %}
+            <option value={{action[0]}}>{{action[1]}}</option>
+          {%- endfor %}
+          </select>
+        </div>
+        <div class="issue-field issue-field-half select">
+          <label for="update-type">Type:</label>
+          <select name="update-type" id="update-type">
+            <option value="B"{% if issue.type == 'Bug' %} selected{% endif %}>Bug</option>
+            <option value="FR"{% if issue.type == 'FeatureRequest' %} selected{% endif %}>Feature Request</option>
+            <option value="P"{% if issue.type == 'Process' %} selected{% endif %}>Process</option>
+          </select>
+        </div>
+        <div class="issue-field issue-field-half select">
+          <label for="update-priority">Priority:</label>
+          <select name="update-priority" id="update-priority">
+            <option value="1"{% if issue.priority == 1 %} selected{% endif %}>1 - Game Unplayable</option>
+            <option value="2"{% if not issue.priority or issue.priority == 2 %} selected{% endif %}>2 - Normal</option>
+            <option value="3"{% if issue.priority == 3 %} selected{% endif %}>3 - Cosmetic</option>
+          </select>
+        </div>
+        <div class="issue-field issue-field-wysiwyg">
+          <label for="update-comment">Comment:</label>
+          <div class="hack"><textarea name="update-comment" id="update-comment"></textarea></div>
         </div>
         <div class="issue-field checkbox">
           <div class="hack"><input type="checkbox" name="issue-subscribe" id="issue-subscribe" checked></div>
@@ -72,8 +124,8 @@
     </form>
     <script>
       $(function() {
-        var editor = CKEDITOR.replace("issue-comment");
-        var $container = $("fieldset div.issue-field-markitup div.hack");
+        var editor = CKEDITOR.replace("update-comment");
+        var $container = $("fieldset div.issue-field-wysiwyg div.hack");
 
         CKEDITOR.on("instanceReady", function() {
           editor.resize($container.width(), $container.height());
