@@ -90,7 +90,7 @@ public class AccountsActivity extends BaseActivity {
                 TextView account = (TextView) listView.getChildAt(mAccountSelectedPosition);
 
                 // Register, and force another 'hello'
-                register((String) account.getText());
+                register(account.getText().toString());
                 if (RealmContext.i.getCurrentRealm() != null) {
                     RealmContext.i.getCurrentRealm().getAuthenticator().logout();
                 }
