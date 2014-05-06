@@ -119,7 +119,11 @@ public class RequestHandler {
         // if we get here, it's because we exceeded the number of retries.
         log.error("Too many retries: "+request.getRequestURI(), lastException);
         lastException.populate(mResponse);
-        setResponseBody(lastException.getGenericError());
+        handleException(lastException);
+    }
+
+    protected void handleException(RequestException e) {
+        setResponseBody(e.getGenericError());
     }
 
     /**

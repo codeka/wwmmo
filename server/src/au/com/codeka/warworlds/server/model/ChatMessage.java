@@ -35,6 +35,7 @@ public class ChatMessage extends BaseChatMessage {
         if (!rs.wasNull()) {
             mAction = MessageAction.fromNumber(action);
         }
+        mProfanityLevel = rs.getInt("profanity_level");
     }
     public ChatMessage(int empireID, String message, MessageAction action, int conversationID) {
         mEmpireID = empireID;
@@ -70,6 +71,9 @@ public class ChatMessage extends BaseChatMessage {
     }
     public void setEnglishMessage(String msg) {
         mMessageEn = msg;
+    }
+    public void setProfanityLevel(int profanityLevel) {
+        mProfanityLevel = profanityLevel;
     }
 
     @Override

@@ -11,8 +11,8 @@ import json
 
 #from qrcode import main as qr
 import handlers
-import model
 from model import blog
+import model.ping
 
 
 class HomePage(handlers.BaseHandler):
@@ -112,39 +112,20 @@ class BlobInfoPage(handlers.BaseHandler):
             "url": images.get_serving_url(blob_key, size, crop)}
 
 
-class NewsletterSignupPage(handlers.BaseHandler):
+class StatusPage(handlers.BaseHandler):
   def get(self):
-    self.render("newsletter.html", {})
+    min_date = datetime.now() - timedelta(hours=24)
 
-  def post(self):
-    email = self.request.POST.get("email")
-    display_name = self.request.POST.get("display_name")
+    last_ping = None
+    pings = []
+    # TODO: cache(?)
+    query = model.ping.Ping.all().filter("date >", min_date).order("date")
+    for ping in query:
+      if not last_ping or last_ping.date < ping.date:
+        last_ping = ping
+      pings.append(ping)
 
-    # check to see if there's already one with that email address
-    newsletter_signup = None
-    for mdl in model.NewsletterSignup.all().filter("email", email).fetch(1):
-      newsletter_signup = mdl
-
-    if not newsletter_signup:
-      newsletter_signup = model.NewsletterSignup()
-
-    newsletter_signup.email = email
-    newsletter_signup.display_name = display_name
-    newsletter_signup.ip_address = self.request.remote_addr
-    newsletter_signup.put()
-
-    msg = mail.EmailMessage(sender="War Worlds <dean@codeka.com.au>",
-                            subject="War Worlds newsletter",
-                            to=email)
-    msg.html = handlers.jinja.get_template("email/newsletter_welcome.html").render({})
-    msg.send()
-
-    self.redirect("/newsletter/thankyou")
-
-
-class NewsletterThankyouPage(handlers.BaseHandler):
-  def get(self):
-    self.render("newsletter-thankyou.html", {})
+    self.render("status.html", {"pings": pings, "last_ping": last_ping})
 
 
 class SitemapPage(handlers.BaseHandler):
@@ -169,13 +150,6 @@ class SitemapPage(handlers.BaseHandler):
     self.render("sitemap.xml", data)
 
 
-class DownloadPage(handlers.BaseHandler):
-  def get(self):
-    #    data = {"url": "/jar/warworlds.apk",
-    #            "qr": qr.make("htttp://www.war-worlds.com/jar/warworlds.apk")}
-    self.render("download.html", {})
-
-
 class PlayStorePage(handlers.BaseHandler):
   def get(self):
     self.redirect("https://play.google.com/store/apps/details?id=au.com.codeka.warworlds")
@@ -188,9 +162,7 @@ app = webapp.WSGIApplication([("/", HomePage),
                               ("/blob/([^/]+)", BlobPage),
                               ("/blob/([^/]+)/download", BlobDownloadPage),
                               ("/blob/([^/]+)/info", BlobInfoPage),
-                              ("/newsletter", NewsletterSignupPage),
-                              ("/newsletter/thankyou", NewsletterThankyouPage),
-                              ("/download", DownloadPage),
+                              ("/status/?", StatusPage),
                               ("/play-store", PlayStorePage),
                               ("/sitemap.xml", SitemapPage)],
                              debug=os.environ["SERVER_SOFTWARE"].startswith("Development"))

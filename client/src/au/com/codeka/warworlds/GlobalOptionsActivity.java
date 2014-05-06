@@ -46,6 +46,17 @@ public class GlobalOptionsActivity extends PreferenceActivity
         "Always (recommended)"
     };
 
+    final static String[] sChatProfanityFilterLevelValues = {
+        GlobalOptions.ChatProfanityFilterLevel.All.toString(), 
+        GlobalOptions.ChatProfanityFilterLevel.AllowMild.toString(),
+        GlobalOptions.ChatProfanityFilterLevel.None.toString()
+    };
+    final static String[] sChatProfanityFilterLevelDisplay = {
+        "Filter all profanity",
+        "Filter only strong profanity",
+        "Filter nothing"
+    };
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -70,6 +81,11 @@ public class GlobalOptionsActivity extends PreferenceActivity
                 "GlobalOptions.AutoSendCrashReports");
         autoSendCrashReport.setEntryValues(sAutoSendCrashReportValues);
         autoSendCrashReport.setEntries(sAutoSendCrashReportDisplay);
+
+        ListPreference chatProfanityFilterLevel = (ListPreference) getPreferenceScreen().findPreference(
+                "GlobalOptions.ChatProfanityFilterLevel");
+        chatProfanityFilterLevel.setEntryValues(sChatProfanityFilterLevelValues);
+        chatProfanityFilterLevel.setEntries(sChatProfanityFilterLevelDisplay);
 
         for (GlobalOptions.NotificationKind kind : GlobalOptions.NotificationKind.values()) {
             ListPreference colour = (ListPreference) getPreferenceScreen().findPreference(
@@ -138,6 +154,9 @@ public class GlobalOptionsActivity extends PreferenceActivity
         } else {
             p.setSummary("Display chat messages in their native language.");
         }
+
+        p = getPreferenceScreen().findPreference("GlobalOptions.ChatProfanityFilterLevel");
+        p.setSummary(sChatProfanityFilterLevelDisplay[opts.chatProfanityFilterLevel().getValue()]);
 
         p = getPreferenceScreen().findPreference("GlobalOptions.EnableNotifications");
         if (opts.notificationsEnabled()) {

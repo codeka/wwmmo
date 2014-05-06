@@ -86,8 +86,11 @@ public class ChatController {
             throw new RequestException(400, "You cannot post while in penalty.");
         }
 
-        String sql = "INSERT INTO chat_messages (empire_id, alliance_id, message, message_en, posted_date, conversation_id, action)" +
-                    " VALUES (?, ?, ?, ?, ?, ?, ?)";
+        int profanityLevel = ProfanityFilter.filter(msg_en == null ? msg_native : msg_en);
+
+        String sql = "INSERT INTO chat_messages (empire_id, alliance_id, message, message_en,"
+                      + " profanity_level, posted_date, conversation_id, action) VALUES"
+                      + " (?, ?, ?, ?, ?, ?, ?, ?)";
         try (SqlStmt stmt = DB.prepare(sql, Statement.RETURN_GENERATED_KEYS)) {
             if (msg.getEmpireKey() != null) {
                 stmt.setInt(1, msg.getEmpireID());
@@ -103,19 +106,19 @@ public class ChatController {
 
             stmt.setString(3, msg.getMessage());
             stmt.setString(4, msg.getEnglishMessage());
-
-            stmt.setDateTime(5, msg.getDatePosted());
+            stmt.setInt(5, profanityLevel);
+            stmt.setDateTime(6, msg.getDatePosted());
 
             if (msg.getConversationID() != null && msg.getConversationID() > 0) {
-                stmt.setInt(6, msg.getConversationID());
+                stmt.setInt(7, msg.getConversationID());
             } else {
-                stmt.setNull(6);
+                stmt.setNull(7);
             }
 
             if (msg.getAction() == null || msg.getAction() == ChatMessage.MessageAction.Normal) {
-                stmt.setNull(7);
+                stmt.setNull(8);
             } else {
-                stmt.setInt(7, msg.getAction().getValue());
+                stmt.setInt(8, msg.getAction().getValue());
             }
 
             stmt.update();

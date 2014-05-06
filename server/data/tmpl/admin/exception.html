@@ -1,0 +1,12 @@
+{% extends "admin/skeleton.html" %}
+{% block title %}Error{% endblock %}
+{% block head %}
+  <script type="text/javascript" src="https://www.google.com/jsapi"></script>
+{% endblock %}
+{% block content %}
+  <h1>An error has occured</h1>
+
+  <pre>{{e.getMessage()}}</pre>
+  <pre>{{stack_trace}}</pre>
+  </script>
+{% endblock %}

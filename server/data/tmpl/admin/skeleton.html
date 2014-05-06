@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width" />
     <link rel="stylesheet" href="/realms/{{realm}}/css/admin.css">
     <link rel="stylesheet" href="/realms/{{realm}}/css/admin-mobile.css" media="only screen and (max-width: 900px)" />
+    <link rel="icon" href="/realms/{{realm}}/favicon.ico" />
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
     <script>window.realm = "{{realm}}";</script>
     <script src="/realms/{{realm}}/js/admin.js"></script>
@@ -31,8 +32,11 @@
       </div>
       <ul>
         <li><a href="/realms/{{realm}}/admin">Dashboard</a>
-        <li><a href="/realms/{{realm}}/admin/chat">Chat</a>
-        <li><a href="/realms/{{realm}}/admin/motd">Message of the Day</a>
+        <li><span><span>Chat</span></span>
+          <ul>
+            <li><a href="/realms/{{realm}}/admin/chat">Messages</a>
+            <li><a href="/realms/{{realm}}/admin/chat/profanity">Profanity Filter</a>
+          </li>
         <li><span><span>Info</span></span>
           <ul>
             <li><a href="/realms/{{realm}}/admin/devices">Devices</a>

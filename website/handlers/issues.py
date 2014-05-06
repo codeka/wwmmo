@@ -1,17 +1,8 @@
 
 import os
 from datetime import datetime
-import inspect
-import logging
-import math
-import re
-import urllib
 import webapp2 as webapp
 
-from google.appengine.api import users
-from google.appengine.api import memcache
-
-import ctrl
 import ctrl.issues
 import ctrl.profile
 import model.issues

@@ -20,3 +20,6 @@ client/bin.bak
 client/gen
 planet-render-android/bin
 planet-render-android/gen
+website/.project
+website/.pydevproject
+

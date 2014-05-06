@@ -54,6 +54,10 @@ handlers:
   script: cron.issues.app
   login: admin
 
+- url: /cron/ping(/.*)?
+  script: cron.ping.app
+  login: admin
+
 - url: /blog(/.*)?
   script: handlers.blog.app
 

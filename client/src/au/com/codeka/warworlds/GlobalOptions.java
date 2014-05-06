@@ -79,6 +79,17 @@ public class GlobalOptions {
                     .commit();
     }
 
+    public ChatProfanityFilterLevel chatProfanityFilterLevel() {
+        String s = mPreferences.getString("GlobalOptions.ChatProfanityFilterLevel",
+                ChatProfanityFilterLevel.None.toString());
+        return ChatProfanityFilterLevel.valueOf(s);
+    }
+    public void chatProfanityFilterLevel(ChatProfanityFilterLevel level) {
+        mPreferences.edit()
+                    .putString("GlobalOptions.ChatProfanityFilterLevel", level.toString())
+                    .commit();
+    }
+
     public AutoSendCrashReport getAutoSendCrashReport() {
         String str = mPreferences.getString("GlobalOptions.AutoSendCrashReports", AutoSendCrashReport.Ask.toString());
         if (str.equals("0"))
@@ -162,6 +173,31 @@ public class GlobalOptions {
      */
     public interface OptionsChangedListener {
         void onOptionsChanged(GlobalOptions newOptions);
+    }
+
+    public enum ChatProfanityFilterLevel {
+        All(0),
+        AllowMild(1),
+        None(2);
+
+        private int mValue;
+        ChatProfanityFilterLevel(int value) {
+            mValue = value;
+        }
+
+        public int getValue() {
+            return mValue;
+        }
+
+        public static ChatProfanityFilterLevel fromValue(int value) {
+            for(ChatProfanityFilterLevel l : ChatProfanityFilterLevel.values()) {
+                if (l.getValue() == value) {
+                    return l;
+                }
+            }
+
+            return ChatProfanityFilterLevel.None;
+        }
     }
 
     public enum StarfieldDetail {

@@ -12,6 +12,7 @@ import org.joda.time.format.DateTimeFormatter;
 
 import au.com.codeka.common.model.BaseChatMessage;
 import au.com.codeka.common.protobuf.Messages;
+import au.com.codeka.warworlds.GlobalOptions;
 
 public class ChatMessage extends BaseChatMessage {
     private static DateTimeFormatter sChatDateFormat;
@@ -49,6 +50,12 @@ public class ChatMessage extends BaseChatMessage {
         if (mMessageEn != null && autoTranslate) {
             msg = mMessageEn;
         }
+
+        int filterLevel = new GlobalOptions().chatProfanityFilterLevel().getValue();
+        if (mProfanityLevel > filterLevel) {
+            msg = "<b>--CENSORED--</b>";
+        }
+
         return linkify(markdown(msg));
     }
 

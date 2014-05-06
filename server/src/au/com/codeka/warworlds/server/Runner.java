@@ -48,8 +48,13 @@ public class Runner {
     private static void gameMain() throws Exception {
         EventProcessor.i.ping();
 
-        StarSimulatorThread starSimulatorThread = new StarSimulatorThread();
-        starSimulatorThread.start();
+        StarSimulatorThread starSimulatorThread = null;
+        if (System.getProperty("au.com.codeka.warworlds.server.disableStarSimulationThread") == null) {
+            starSimulatorThread = new StarSimulatorThread();
+            starSimulatorThread.start();
+        } else {
+            log.info("Star simulation thread disabled.");
+        }
 
         int port = 8080;
         String portName = System.getProperty("au.com.codeka.warworlds.server.listenPort");
@@ -62,6 +67,8 @@ public class Runner {
         server.start();
         server.join();
 
-        starSimulatorThread.stop();
+        if (starSimulatorThread != null) {
+            starSimulatorThread.stop();
+        }
     }
 }

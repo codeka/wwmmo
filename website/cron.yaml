@@ -7,6 +7,9 @@ cron:
 - description: sync alliances from the game server to the website
   url: /cron/profiles/sync-alliances
   schedule: every 12 hours
+- description: ping the game server to gather statistics about uptime, outages, response time, etc
+  url: /cron/ping/ping-game
+  schedule: every 5 minutes
 
 # this is disabled, but you can run it on demand...
 #- description: refreshes the post counts in the forums

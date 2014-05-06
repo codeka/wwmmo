@@ -15,31 +15,43 @@ public class StarSimulateHandler extends RequestHandler {
 
     @Override
     protected void get() throws RequestException {
-        simulate(Integer.parseInt(getUrlParameter("star_id")), false);
+        boolean dolog = true;
+        if (getRequest().getParameter("dolog") != null) {
+            dolog = getRequest().getParameter("dolog").equals("1");
+        }
+        simulate(Integer.parseInt(getUrlParameter("star_id")), false, dolog);
     }
 
     @Override
     protected void post() throws RequestException {
         boolean update = false;
+        boolean dolog = true;
         if (getRequest().getParameter("update") != null) {
             update = getRequest().getParameter("update").equals("1");
         }
-        simulate(Integer.parseInt(getUrlParameter("star_id")), update);
+        if (getRequest().getParameter("dolog") != null) {
+            dolog = getRequest().getParameter("dolog").equals("1");
+        }
+        simulate(Integer.parseInt(getUrlParameter("star_id")), update, dolog);
     }
 
-    private void simulate(int starID, boolean update) throws RequestException {
-        PrintWriter printWriter;
-        try {
-            printWriter = getResponse().getWriter();
-        } catch (IOException e) {
-            throw new RequestException(e);
+    private void simulate(int starID, boolean update, boolean dolog) throws RequestException {
+        PrintWriter printWriter = null;
+        if (dolog) {
+            try {
+                printWriter = getResponse().getWriter();
+            } catch (IOException e) {
+                throw new RequestException(e);
+            }
         }
         final PrintWriter outw = printWriter;
 
         Simulation sim = new Simulation(new Simulation.LogHandler() {
             @Override
             public void log(String message) {
-                outw.println(message);
+                if (outw != null) {
+                    outw.println(message);
+                }
             }
         });
 

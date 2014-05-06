@@ -445,6 +445,10 @@ message ChatMessage
 
     optional int32 conversation_id = 6;
 
+    // "profanity" level, 0 == not profane, 1 == somewhat profane, 2 == very profane. Used in
+    // conjunction with client-side filtering of chat messages.
+    optional int32 profanity_level = 9;
+
     // The "action" of this message, allows us to notify participants of a conversation
     // via special messages with a custom action.
     enum MessageAction

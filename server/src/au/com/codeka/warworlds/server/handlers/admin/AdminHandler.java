@@ -9,6 +9,7 @@ import java.net.URLEncoder;
 import java.text.DecimalFormat;
 import java.util.Locale;
 import java.util.Map;
+import java.util.TreeMap;
 
 import net.asfun.jangod.interpret.InterpretException;
 import net.asfun.jangod.interpret.JangodInterpreter;
@@ -16,10 +17,12 @@ import net.asfun.jangod.lib.Filter;
 import net.asfun.jangod.lib.FilterLibrary;
 import net.asfun.jangod.template.TemplateEngine;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.RequestHandler;
 import au.com.codeka.warworlds.server.Session;
 
@@ -48,6 +51,18 @@ public class AdminHandler extends RequestHandler {
                 authenticate();
                 return;
             }
+        }
+    }
+
+    @Override
+    protected void handleException(RequestException e) {
+        try {
+            TreeMap<String, Object> data = new TreeMap<String, Object>();
+            data.put("exception", e);
+            data.put("stack_trace", ExceptionUtils.getStackTrace(e));
+            render("exception.html", data);
+        } catch(Exception e2) {
+            setResponseBody(e.getGenericError());
         }
     }
 

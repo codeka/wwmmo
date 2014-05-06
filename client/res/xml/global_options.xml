@@ -14,6 +14,9 @@
         <CheckBoxPreference android:key="GlobalOptions.AutoTranslateChatMessages"
                             android:title="Auto-translate"
                             android:defaultValue="false" />
+        <ListPreference android:key="GlobalOptions.ChatProfanityFilterLevel"
+                        android:title="Profanity Filter"
+                        android:defaultValue="None" />
     </PreferenceCategory>
     <PreferenceCategory android:title="Crash Reports"
                         android:key="pref_key_crash_reports">

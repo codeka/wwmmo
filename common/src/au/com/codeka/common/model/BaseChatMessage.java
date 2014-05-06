@@ -16,6 +16,11 @@ public class BaseChatMessage {
     protected String mMessageEn;
     protected Integer mConversationID;
     protected MessageAction mAction;
+    protected int mProfanityLevel;
+
+    public static final int PROFANITY_NONE = 0;
+    public static final int PROFANITY_MILD = 1;
+    public static final int PROFANITY_STRONG = 2;
 
     public BaseChatMessage() {
         mDatePosted = new DateTime(DateTimeZone.UTC);
@@ -67,6 +72,9 @@ public class BaseChatMessage {
     public MessageAction getAction() {
         return mAction;
     }
+    public int getProfanityLevel() {
+        return mProfanityLevel;
+    }
 
     public void fromProtocolBuffer(Messages.ChatMessage pb) {
         if (pb.hasId()) {
@@ -90,6 +98,9 @@ public class BaseChatMessage {
             mAction = MessageAction.fromNumber(pb.getAction().getNumber());
         } else {
             mAction = MessageAction.Normal;
+        }
+        if (pb.hasProfanityLevel()) {
+            mProfanityLevel = pb.getProfanityLevel();
         }
     }
 
@@ -116,6 +127,7 @@ public class BaseChatMessage {
         if (mAction != null && mAction != MessageAction.Normal) {
             pb.setAction(Messages.ChatMessage.MessageAction.valueOf(mAction.getValue()));
         }
+        pb.setProfanityLevel(mProfanityLevel);
     }
 
     public enum MessageAction {

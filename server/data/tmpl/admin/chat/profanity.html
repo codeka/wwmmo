@@ -1,0 +1,30 @@
+{% extends "admin/skeleton.html" %}
+{% block title %}Chat{% endblock %}
+{% block head %}
+  <style>
+    label {
+      font-weight: bold;
+      margin-top: 10pt;
+    } 
+    div.text-container {
+      width: 95%;
+      height: 100pt;
+      margin-bottom: 10pt;
+    }
+    textarea {
+      width: 100%;
+      height: 100%;
+    }
+  </style>
+{% endblock %}
+
+{% block content %}
+  <h1>Profanity Filter</h1>
+  <form method="post">
+    <label for="mild-words">Mild Profanity:</label>
+    <div class="text-container"><textarea name="mild-words" id="mild-words">{{mild}}</textarea></div>
+    <label for="strong-words">Strong Words</label>
+    <div class="text-container"><textarea name="strong-words" id="strong-words">{{strong}}</textarea></div>
+    <input type="submit" value="Save">
+  </form>
+{% endblock %}

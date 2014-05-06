@@ -1,0 +1,92 @@
+{% extends "skeleton.html" %}
+
+{% block header %}
+  <script type="text/javascript" src="https://www.google.com/jsapi"></script>
+  <style>
+    section.maincontent {
+      width: 880px;
+      padding: 10px;
+      margin: 0 auto;
+      background: #fff;
+    }
+
+	p.game-status {
+	  font-size: 400%;
+	  font-weight: bold;
+	  margin: 0;
+	  text-align: center;
+	}
+
+	p.game-status span.down {
+	  color: #a00;
+	}
+	p.game-status span.ok {
+	  color: #0a0;
+	}
+
+    @media only screen and (max-width: 900px) {
+      section.maincontent {
+        width: auto;
+      }
+    }
+  </style>
+{% endblock %}
+
+{% block maincontent %}
+  <section class="maincontent">
+    <h1>Game Status</h1>
+	<p class="game-status">{% if last_ping.response_status == 200 %}<span class="ok">All OK</span>{% else %}<span class="down">DOWN!</span>{% endif %}</p>
+    <h2>Response Time</h2>
+    <p>This graph shows approximate response times of the server over the last 24 hours.
+    It's just an indication to give you a general idea of when the busy times may be.</p>
+    <div id="graph" style="width: 100%; margin: 10pt auto;"></div>
+  </section>
+  <script>
+    var ratio = 0.4;
+    $("#graph").css("height", $("#graph").width() * ratio);
+
+    google.load('visualization', '1.0', {'packages':['corechart']});
+    google.setOnLoadCallback(drawChart);
+    function drawChart() {
+      var tzOffset = -new Date().getTimezoneOffset() * 60000;
+      console.log(tzOffset);
+      var dataTable = new google.visualization.DataTable();
+      dataTable.addColumn("datetime", "Time");
+      dataTable.addColumn("number", "Response Time");
+      dataTable.addColumn("number", "Response Status");
+      dataTable.addColumn({"type": "string", "role": "style" });
+      dataTable.addRows([
+      {%- for ping in pings %}
+        [new Date(new Date("{{ping.date|date_std}}").getTime() + tzOffset),
+         {%- if ping.response_status != 200 %}0{% else %}{{ping.response_time}}{% endif %}, 
+         {%- if ping.response_status < 0 %}500{% else %}{{ping.response_status}}{% endif %},
+         {%- if ping.response_status == 200 %}"fill-opacity: 0.2; fill-color: #0a0;"{% else %}"fill-opacity: 0.8; fill-color: #a00;"{% endif %}],
+	  {%- endfor %}
+      ]);
+
+      var dataView = new google.visualization.DataView(dataTable);
+
+      var width = $("#graph").width();
+      var height = $("#graph").height();
+      var options = {
+        "chartArea": {left: 10, top: 10, width: width - 20, height: height - 80},
+        "backgroundColor": {fill: "transparent"},
+        "curveType": "function",
+        "legend": {"position": "none"},
+        "bar": {"groupWidth": "100%"},
+        "series": {
+          0: { "type": "line", "targetAxisIndex": 0 },
+          1: { "type": "bars", "targetAxisIndex": 1 }
+        },
+        "vAxes": {
+          0: {"textPosition": "in", "minValue": 0},
+          1: {"minValue": 100, "maxValue": 600}
+        },
+        "hAxis": {"format": "hh:mm aa"}
+      };
+
+      var chart = new google.visualization.ComboChart(document.getElementById("graph"));
+      chart.draw(dataView, options);
+	}
+  </script>
+{% endblock %}

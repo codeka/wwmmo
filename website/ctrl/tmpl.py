@@ -50,6 +50,12 @@ def _filter_post_date_std(post):
   return post.posted.strftime('%Y-%m-%d %H:%M:%S')
 jinja.filters['post_date_std'] = _filter_post_date_std
 
+
+def _filter_date_std(date):
+  return date.strftime("%Y-%m-%d %H:%M:%S")
+jinja.filters['date_std'] = _filter_date_std
+
+
 def _filter_post_date_editable(post):
   return post.posted.strftime('%y-%m-%d %H:%M')
 jinja.filters['post_date_editable'] = _filter_post_date_editable

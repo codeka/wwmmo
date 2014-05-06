@@ -51,7 +51,7 @@ public class AdminChatHandler extends AdminGenericHandler {
             // TODO: handle errors
         }
 
-        render("admin/chat.html", data);
+        render("admin/chat/messages.html", data);
     }
 
 }
