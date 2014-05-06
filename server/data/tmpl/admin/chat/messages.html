@@ -35,7 +35,13 @@
       bottom: 50px; width: 20%; right: 0; top: 70px;
     }
     section#messages span.translated {
+      font-style: italics;
+    }
+    section#messages span.profanity-strong {
       color: #a00;
+    }
+    section#messages span.profanity-mild {
+      color: #cc0;
     }
   </style>
 {% endblock %}
@@ -48,17 +54,9 @@
     <input type="submit" value="Send">
   </form>
   <fieldset id="sinbin">
-    <legend>Sin Bin</legend>
-    <div><b>Current</b></div>
+    <legend>Sinbin</legend>
     <ul>
-      {% for empire in currPenalty %}
-        <li>[{{empire.empire_id}}] {{empire.empireName}} until <script>document.write(new Date({{empire.expiry}}).toLocaleString());</script></li>
-      {% endfor %}
-    </ul>
-    <hr />
-    <div><b>Past 24 hours</b></div>
-    <ul>
-      {% for empire in pastPenalty %}
+      {% for empire in sinbin %}
         <li>[{{empire.empire_id}}] {{empire.empireName}} until <script>document.write(new Date({{empire.expiry}}).toLocaleString());</script></li>
       {% endfor %}
     </ul>
@@ -120,6 +118,11 @@
       } else {
         msgstr += msg.message;
       }
+      if (msg.profanity_level == 1) {
+        msgstr = "<span class=\"profanity-mild\">"+msgstr+"</span>";
+      } else if (msg.profanity_level == 2) {
+        msgstr = "<span class=\"profanity-strong\">"+msgstr+"</span>";
+      }
 
       var div = $("<div>"+msgstr+"</div>");
       div.data("dt", msg.date_posted);
@@ -156,7 +159,6 @@
     window.lastFetch = new Date();
     window.lastFetch.setDate(lastFetch.getDate() - 4);
     function fetchMessages() {
-      $("section#messages").append("<div>"+document.cookie+"</div>");
       $.ajax({
         "url": "/realms/{{realm}}/chat?since="+parseInt(window.lastFetch.getTime() / 1000),
         "method": "get",

@@ -12,7 +12,7 @@ import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.data.DB;
 import au.com.codeka.warworlds.server.data.SqlStmt;
 
-public class AdminChatHandler extends AdminGenericHandler {
+public class AdminChatSinbinHandler extends AdminGenericHandler {
     private final Logger log = LoggerFactory.getLogger(AdminChatHandler.class);
     @Override
     protected void get() throws RequestException {
@@ -24,9 +24,9 @@ public class AdminChatHandler extends AdminGenericHandler {
         String sql = "SELECT *" +
                     " FROM chat_sinbin" +
                     " INNER JOIN empires ON chat_sinbin.empire_id = empires.id" +
-                    " WHERE expiry > NOW()";
+                    " ORDER BY expiry DESC" +
+                    " LIMIT 50";
         try (SqlStmt stmt = DB.prepare(sql)) {
-            stmt.setDateTime(1, DateTime.now().minusHours(24));
             ResultSet rs = stmt.select();
             ArrayList<TreeMap<String, Object>> sinbin = new ArrayList<TreeMap<String, Object>>();
             while (rs.next()) {
@@ -44,7 +44,7 @@ public class AdminChatHandler extends AdminGenericHandler {
             // TODO: handle errors
         }
 
-        render("admin/chat/messages.html", data);
+        render("admin/chat/sinbin.html", data);
     }
 
 }

@@ -2,6 +2,7 @@
 {% block title %}Empires{% endblock %}
 {% block head %}
   <script src="/realms/{{realm}}/js/tmpl.js"></script>
+  <script src="/realms/{{realm}}/js/hashparams.js"></script>
   <style>
     #search-results {
       position: absolute;
@@ -109,7 +110,7 @@
     </tr>
   </script>
   <script>
-    $("#find-byemailidname").on("submit", function(evnt) {
+  $("#find-byemailidname").on("submit", function(evnt) {
       evnt.preventDefault();
 
       var query;
@@ -200,24 +201,28 @@
     });
 
     $("#empire-list").on("click", "a.empire-name", function() {
-      $.ajax({
-          url: "/realms/{{realm}}/empires/search?ids="+$(this).data("id"),
-          dataType: "json",
-          success: function (data, status, xhr) {
-            setTimeout(function() {
-              $("#search-time").html("<b>Time:</b> "+xhr.elapsedMs+"ms");
-            }, 10);
-            $("#search-results").html(JSON.stringify(data, null, "  "));
-          },
-          error: function(xhr, status, err) {
-            if (xhr.status == 404) {
-              $("#search-results").val("No empire!");
-            } else {
-              alert("An error occured, check server logs: " + xhr.status);
-            }
-          }
-        });
+      fetchEmpire($(this).data("id"));
     });
+
+    function fetchEmpire(id) {
+      $.ajax({
+        url: "/realms/{{realm}}/empires/search?ids="+id,
+        dataType: "json",
+        success: function (data, status, xhr) {
+          setTimeout(function() {
+            $("#search-time").html("<b>Time:</b> "+xhr.elapsedMs+"ms");
+          }, 10);
+          $("#search-results").html(JSON.stringify(data, null, "  "));
+        },
+        error: function(xhr, status, err) {
+          if (xhr.status == 404) {
+            $("#search-results").val("No empire!");
+          } else {
+            alert("An error occured, check server logs: " + xhr.status);
+          }
+        }
+      });
+    }
 
     function fetchEmpireList(query) {
       var $tbody = $("#empire-list tbody");
@@ -243,7 +248,20 @@
     }
 
     $(function() {
-      fetchEmpireList("minRank=1&maxRank=50");
+      hashparams.register(function(params) {
+        if ($("#search-value").val() != params["search"]) {
+          $("#search-value").val(params["search"]);
+          $("#find-byemailidname").submit();
+        }
+
+        if (params["id"]) {
+          fetchEmpire(params["id"]);
+        }
+      });
+
+      if ($("#search-value").val() == "") {
+        fetchEmpireList("minRank=1&maxRank=50");
+      }
     });
   </script>
 {% endblock %}

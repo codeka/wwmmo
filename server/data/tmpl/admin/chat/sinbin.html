@@ -1,0 +1,27 @@
+{% extends "admin/skeleton.html" %}
+{% block title %}Chat Sinbin{% endblock %}
+{% block head %}
+  <script src="/realms/{{realm}}/js/tmpl.js"></script>
+  <script src="/realms/{{realm}}/js/empirestore.js"></script>
+  <style>
+    fieldset#sinbin {
+      width: 45%;
+      float: left;
+    }
+  </style>
+{% endblock %}
+
+{% block content %}
+  <h1>Chat</h1>
+  <fieldset id="sinbin">
+    <legend>Sinbin</legend>
+    <ul>
+      {% for empire in sinbin %}
+        <li>
+          [{{empire.empire_id}}]
+          <a href="/realms/{{realm}}/admin/empire/search#search={{empire.empire_id}}&id={{empire.empire_id}}">{{empire.empireName}}</a>
+          until <script>document.write(new Date({{empire.expiry}}).toLocaleString());</script></li>
+      {% endfor %}
+    </ul>
+  </fieldset>
+{% endblock %}
