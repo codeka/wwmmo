@@ -8,6 +8,11 @@
       width: 45%;
       float: left;
     }
+    fieldset#reports {
+      width: 45%;
+      margin-left: 10pt;
+      float: left;
+    }
   </style>
 {% endblock %}
 
@@ -23,5 +28,29 @@
           until <script>document.write(new Date({{empire.expiry}}).toLocaleString());</script></li>
       {% endfor %}
     </ul>
+  </fieldset>
+  <fieldset id="reports">
+    <legend>Abuse Reports</legend>
+    <table>
+      <tr>
+        <th>Report Time</th>
+        <th>Reported Empire</th>
+        <th>Reporting Empire</th>
+      </tr>
+      {% for report in reports %}
+        <tr>
+          <td><script>document.write(new Date({{report.reported_date}}).toLocaleString());</script></td>
+          <td><a href="/realms/{{realm}}/admin/empire/search#search={{report.empire_id}}&id={{report.empire_id}}">{{report.empire_name}}</a></td>
+          <td><a href="/realms/{{realm}}/admin/empire/search#search={{report.reporting_empire_id}}&id={{report.reporting_empire_id}}">{{report.reporting_empire_name}}</a></td>
+        </tr>
+        <tr>
+          <td colspan="3">
+            <script>document.write(new Date({{report.posted_date}}).toLocaleString());</script>
+            {{report.message}}
+          </td>
+        </tr>
+        </tr>
+      {% endfor %}
+    </table>
   </fieldset>
 {% endblock %}

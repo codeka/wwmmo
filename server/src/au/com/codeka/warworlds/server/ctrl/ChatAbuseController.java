@@ -136,7 +136,7 @@ public class ChatAbuseController {
                         " WHERE empire_id = ?" +
                           " AND reported_date > ?" +
                           // reports from before they were sinbinned last time don't count:
-                          " AND reported_date > (SELECT MAX(expiry) FROM chat_sinbin WHERE chat_sinbin.empire_id = chat_abuse_reports.empire_id)";
+                          " AND reported_date > IFNULL((SELECT MAX(expiry) FROM chat_sinbin WHERE chat_sinbin.empire_id = chat_abuse_reports.empire_id), '2000-01-01')";
             try (SqlStmt stmt = prepare(sql)) {
                 stmt.setInt(1, empireID);
                 stmt.setDateTime(2, cutoff);
