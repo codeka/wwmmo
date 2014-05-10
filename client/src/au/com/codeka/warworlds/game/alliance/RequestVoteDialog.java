@@ -16,7 +16,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.TextView;
-import au.com.codeka.TimeInHours;
+import au.com.codeka.common.TimeInHours;
 import au.com.codeka.common.model.BaseAllianceRequestVote;
 import au.com.codeka.warworlds.ImageHelper;
 import au.com.codeka.warworlds.R;

@@ -9,7 +9,7 @@ import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 import au.com.codeka.BackgroundRunner;
-import au.com.codeka.TimeInHours;
+import au.com.codeka.common.TimeInHours;
 import au.com.codeka.common.model.Simulation;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.model.BuildRequest;

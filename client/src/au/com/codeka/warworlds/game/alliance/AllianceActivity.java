@@ -27,7 +27,7 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import au.com.codeka.TimeInHours;
+import au.com.codeka.common.TimeInHours;
 import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.ImageHelper;
 import au.com.codeka.warworlds.R;

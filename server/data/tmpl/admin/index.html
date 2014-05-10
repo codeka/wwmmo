@@ -8,8 +8,10 @@
   <div id="graph" style="width: 100%; margin: 0 auto;"></div>
 
   <h2>Oldest Unsimulated Star</h2>
-  <p>{{oldest_star_id}} <b>{{oldest_star_name}}</b>:
-  <script>var dt = new Date({{oldest_star_simulation_time}}); document.write(dt.toString());</script></p>
+  <p>
+    {{oldest_star_id}} <b>{{oldest_star_name}}</b>:
+    {{oldest_star_time_since}}
+  </p>
 
   <script type="text/javascript">
     // keep the width/height ratio of the graph nice

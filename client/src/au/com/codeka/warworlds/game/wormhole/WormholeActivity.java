@@ -19,7 +19,7 @@ import android.view.View;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.TextView;
-import au.com.codeka.TimeInHours;
+import au.com.codeka.common.TimeInHours;
 import au.com.codeka.common.model.BaseStar;
 import au.com.codeka.warworlds.BaseGlActivity;
 import au.com.codeka.warworlds.R;

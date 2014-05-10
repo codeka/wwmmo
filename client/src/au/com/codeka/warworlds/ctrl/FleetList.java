@@ -32,7 +32,7 @@ import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.SpinnerAdapter;
 import android.widget.TextView;
-import au.com.codeka.TimeInHours;
+import au.com.codeka.common.TimeInHours;
 import au.com.codeka.common.model.BaseFleet;
 import au.com.codeka.common.model.BaseFleet.State;
 import au.com.codeka.common.model.BaseFleetUpgrade;
