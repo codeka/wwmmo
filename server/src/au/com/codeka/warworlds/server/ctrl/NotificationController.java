@@ -177,8 +177,8 @@ public class NotificationController {
                     success = false;
                 }
                 if (success) {
-                    log.info(String.format("Notification successfully sent: %s %s, user=%s registration=%s",
-                            new RealmController().getRealmName(), result.getMessageId(), devices.get(registrationId), registrationId));
+                    log.info(String.format("Notification successfully sent: %s user=%s registration=%s",
+                            new RealmController().getRealmName(), devices.get(registrationId), registrationId));
                 }
             }
         } catch (IOException e) {
