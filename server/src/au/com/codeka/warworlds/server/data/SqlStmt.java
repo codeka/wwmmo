@@ -171,7 +171,7 @@ public class SqlStmt implements AutoCloseable {
         }
         mWasStatementLogged = true;
 
-        if (log.isInfoEnabled()) {
+        if (log.isDebugEnabled()) {
             StringBuffer sb = new StringBuffer();
             sb.append(mSql);
             sb.append(System.lineSeparator());
@@ -179,7 +179,7 @@ public class SqlStmt implements AutoCloseable {
                 sb.append(String.format("? = %s", obj));
                 sb.append(System.lineSeparator());
             }
-            log.info(sb.toString());
+            log.debug(sb.toString());
         }
     }
 

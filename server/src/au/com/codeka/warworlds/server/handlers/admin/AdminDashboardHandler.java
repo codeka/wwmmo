@@ -9,8 +9,11 @@ import org.joda.time.DateTime;
 import org.joda.time.Days;
 
 import au.com.codeka.warworlds.server.RequestException;
+import au.com.codeka.warworlds.server.StarSimulatorThread;
+import au.com.codeka.warworlds.server.ctrl.StarController;
 import au.com.codeka.warworlds.server.data.DB;
 import au.com.codeka.warworlds.server.data.SqlStmt;
+import au.com.codeka.warworlds.server.model.Star;
 
 public class AdminDashboardHandler extends AdminHandler {
     @Override
@@ -58,6 +61,17 @@ public class AdminDashboardHandler extends AdminHandler {
             throw new RequestException(e);
         }
         data.put("graph_data", graphData);
+
+        try {
+            int oldestStarID = StarSimulatorThread.findOldestStar();
+            data.put("oldest_star_id", oldestStarID);
+            Star oldestStar = new StarController().getStar(oldestStarID);
+            data.put("oldest_star_name", oldestStar.getName());
+            data.put("oldest_star_simulation_time", oldestStar.getLastSimulation().getMillis());
+        } catch (Exception e) {
+            throw new RequestException(e);
+        }
+
         render("admin/index.html", data);
     }
 }

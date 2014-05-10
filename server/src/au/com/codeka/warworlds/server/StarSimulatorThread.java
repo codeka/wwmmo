@@ -98,7 +98,7 @@ public class StarSimulatorThread {
         }
     }
 
-    private int findOldestStar() throws Exception {
+    public static int findOldestStar() throws Exception {
         String sql = "SELECT stars.id FROM stars" +
                     " WHERE empire_count > 0" +
                     " ORDER BY last_simulation ASC LIMIT 1";

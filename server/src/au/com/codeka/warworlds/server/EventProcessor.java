@@ -59,6 +59,7 @@ public class EventProcessor {
      */
     private void threadProc() {
         log.info("EventProcessor thread starting.");
+        DateTime lastEventDateTime = null;
 
         while (true) {
             // work out when the next event is scheduled
@@ -74,7 +75,7 @@ public class EventProcessor {
 
                 DateTime next = event.getNextEventTime();
                 if (next != null) {
-                    log.info(String.format("Event %s says next event is at %s", eventClass.getName(), next));
+                    log.debug(String.format("Event %s says next event is at %s", eventClass.getName(), next));
                 }
                 if (next != null && next.isBefore(DateTime.now())) {
                     events.add(event);
@@ -89,7 +90,10 @@ public class EventProcessor {
                 nextEventDateTime = DateTime.now().plusMinutes(10);
             }
 
-            log.info(String.format("Next event is scheduled at %s", nextEventDateTime));
+            if (lastEventDateTime == null || (nextEventDateTime.getMillis() / 1000) != (lastEventDateTime.getMillis() / 1000)) {
+                log.info(String.format("Next event is scheduled at %s", nextEventDateTime));
+                lastEventDateTime = nextEventDateTime;
+            }
 
             // make sure we don't try to sleep for a negative amount of time...
             if (nextEventDateTime.isBefore(DateTime.now())) {
@@ -101,7 +105,7 @@ public class EventProcessor {
                 } catch(InterruptedException e) {
                     // if we get interrupted it's because somebody pinged us and we need to
                     // check the next time again
-                    log.info("EventProcessor pinged, checking for new events.");
+                    log.debug("EventProcessor pinged, checking for new events.");
                     continue;
                 }
             }
