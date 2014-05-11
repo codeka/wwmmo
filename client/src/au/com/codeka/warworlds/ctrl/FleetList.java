@@ -32,7 +32,7 @@ import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.SpinnerAdapter;
 import android.widget.TextView;
-import au.com.codeka.common.TimeInHours;
+import au.com.codeka.common.TimeFormatter;
 import au.com.codeka.common.model.BaseFleet;
 import au.com.codeka.common.model.BaseFleet.State;
 import au.com.codeka.common.model.BaseFleetUpgrade;
@@ -527,7 +527,7 @@ public class FleetList extends FrameLayout
             StarSummary dest, boolean includeEta) {
         float timeRemainingInHours = fleet.getTimeToDestination();
         Sprite sprite = StarImageManager.getInstance().getSprite(dest, -1, true);
-        String eta = TimeInHours.format(timeRemainingInHours);
+        String eta = TimeFormatter.create().format(timeRemainingInHours);
 
         float marginHorz = 0;
         float marginVert = 0;

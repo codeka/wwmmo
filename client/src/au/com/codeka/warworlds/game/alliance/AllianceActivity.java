@@ -27,14 +27,14 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import au.com.codeka.common.TimeInHours;
+import au.com.codeka.common.TimeFormatter;
 import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.ImageHelper;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.ServerGreeter;
-import au.com.codeka.warworlds.TabManager;
 import au.com.codeka.warworlds.ServerGreeter.ServerGreeting;
 import au.com.codeka.warworlds.TabFragmentActivity;
+import au.com.codeka.warworlds.TabManager;
 import au.com.codeka.warworlds.WarWorldsActivity;
 import au.com.codeka.warworlds.model.Alliance;
 import au.com.codeka.warworlds.model.AllianceManager;
@@ -536,7 +536,8 @@ public class AllianceActivity extends TabFragmentActivity
                 empireName.setText(entry.empire.getDisplayName());
                 empireIcon.setImageBitmap(EmpireShieldManager.i.getShield(getActivity(), entry.empire));
                 requestDescription.setText(String.format(Locale.ENGLISH, "%s requested %s",
-                        entry.request.getDescription(), TimeInHours.format(entry.request.getRequestDate())));
+                        entry.request.getDescription(),
+                        TimeFormatter.create().format(entry.request.getRequestDate())));
                 message.setText(entry.request.getMessage());
 
                 if (entry.request.getPngImage() != null) {

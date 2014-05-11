@@ -8,6 +8,7 @@ import java.util.TreeMap;
 import org.joda.time.DateTime;
 import org.joda.time.Days;
 
+import au.com.codeka.common.TimeFormatter;
 import au.com.codeka.common.TimeInHours;
 import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.StarSimulatorThread;
@@ -69,7 +70,8 @@ public class AdminDashboardHandler extends AdminHandler {
             Star oldestStar = new StarController().getStar(oldestStarID);
             data.put("oldest_star_name", oldestStar.getName());
             data.put("oldest_star_simulation_time", oldestStar.getLastSimulation().getMillis());
-            data.put("oldest_star_time_since", TimeInHours.format(oldestStar.getLastSimulation()));
+            data.put("oldest_star_time_since", TimeFormatter.create().withMaxDays(100).format(
+                    oldestStar.getLastSimulation()));
         } catch (Exception e) {
             throw new RequestException(e);
         }

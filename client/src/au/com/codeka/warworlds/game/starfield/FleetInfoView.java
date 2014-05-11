@@ -12,7 +12,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import au.com.codeka.common.TimeInHours;
+import au.com.codeka.common.TimeFormatter;
 import au.com.codeka.common.model.DesignKind;
 import au.com.codeka.common.model.ShipDesign;
 import au.com.codeka.warworlds.R;
@@ -119,7 +119,8 @@ public class FleetInfoView extends FrameLayout {
                 progressBar.setProgress(1000 - (int) (fractionRemaining * 1000.0f));
 
                 String eta = String.format(Locale.ENGLISH, "<b>ETA</b>: %.1f pc in %s",
-                        distanceInParsecs * fractionRemaining, TimeInHours.format(timeToDestinationInHours));
+                        distanceInParsecs * fractionRemaining,
+                        TimeFormatter.create().format(timeToDestinationInHours));
                 progressText.setText(Html.fromHtml(eta));
             }
         });

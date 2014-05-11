@@ -22,7 +22,7 @@ import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.SpinnerAdapter;
 import android.widget.TextView;
-import au.com.codeka.common.TimeInHours;
+import au.com.codeka.common.TimeFormatter;
 import au.com.codeka.common.model.BaseColony;
 import au.com.codeka.common.model.BaseFleet;
 import au.com.codeka.warworlds.R;
@@ -168,7 +168,7 @@ public class ScoutReportDialog extends DialogFragment {
             }
 
             ScoutReport report = mReports.get(position);
-            view.setText(TimeInHours.format(report.getReportDate()));
+            view.setText(TimeFormatter.create().format(report.getReportDate()));
             return view;
         }
     }

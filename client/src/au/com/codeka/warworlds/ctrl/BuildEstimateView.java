@@ -9,7 +9,7 @@ import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 import au.com.codeka.BackgroundRunner;
-import au.com.codeka.common.TimeInHours;
+import au.com.codeka.common.TimeFormatter;
 import au.com.codeka.common.model.Simulation;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.model.BuildRequest;
@@ -96,7 +96,7 @@ public class BuildEstimateView extends FrameLayout {
                     }
                     float deltaMineralsPerHourAfter = empire.getDeltaMineralsPerHour();
 
-                    timeToBuildText.setText(TimeInHours.format(br.getStartTime(), endTime));
+                    timeToBuildText.setText(TimeFormatter.create().format(br.getStartTime(), endTime));
                     mineralsToBuildText.setText(Html.fromHtml(
                                                 String.format("<font color=\"red\">%d</font>/hr",
                                                         (int) (deltaMineralsPerHourAfter - deltaMineralsPerHourBefore))));

@@ -19,7 +19,7 @@ import android.view.View;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.TextView;
-import au.com.codeka.common.TimeInHours;
+import au.com.codeka.common.TimeFormatter;
 import au.com.codeka.common.model.BaseStar;
 import au.com.codeka.warworlds.BaseGlActivity;
 import au.com.codeka.warworlds.R;
@@ -210,7 +210,7 @@ public class WormholeActivity extends BaseGlActivity
             destinationName.setText(Html.fromHtml(str));
         } else {
             tuningProgress.setText(String.format(Locale.ENGLISH, "%s left",
-                    TimeInHours.format(DateTime.now(), mTuneCompleteTime)));
+                    TimeFormatter.create().format(DateTime.now(), mTuneCompleteTime)));
 
             mHandler.postDelayed(new Runnable() {
                 @Override

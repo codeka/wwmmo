@@ -31,7 +31,7 @@ import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import au.com.codeka.RomanNumeralFormatter;
-import au.com.codeka.common.TimeInHours;
+import au.com.codeka.common.TimeFormatter;
 import au.com.codeka.common.model.BaseBuildRequest;
 import au.com.codeka.common.model.Design;
 import au.com.codeka.warworlds.R;
@@ -458,7 +458,7 @@ public class BuildQueueList extends FrameLayout
             } else if (remainingDuration.getStandardMinutes() > 0) {
                 msg = String.format(Locale.ENGLISH, "%s %d %%, %s left",
                                     prefix, (int) buildRequest.getPercentComplete(),
-                                    TimeInHours.format(remainingDuration));
+                                    TimeFormatter.create().format(remainingDuration));
             } else {
                 msg = String.format(Locale.ENGLISH, "%s %d %%, almost done",
                                     prefix, (int) buildRequest.getPercentComplete());

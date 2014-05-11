@@ -16,7 +16,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.TextView;
-import au.com.codeka.common.TimeInHours;
+import au.com.codeka.common.TimeFormatter;
 import au.com.codeka.common.model.BaseAllianceRequestVote;
 import au.com.codeka.warworlds.ImageHelper;
 import au.com.codeka.warworlds.R;
@@ -179,7 +179,7 @@ public class RequestVoteDialog extends DialogFragment
                     EmpireManager.i.refreshEmpire(Integer.toString(vote.getEmpireID()));
                 }
                 TextView voteDate = (TextView) v.findViewById(R.id.vote_time);
-                voteDate.setText(TimeInHours.format(vote.getDate()));
+                voteDate.setText(TimeFormatter.create().format(vote.getDate()));
                 TextView votes = (TextView) v.findViewById(R.id.empire_votes);
                 votes.setText(String.format("%s%d", vote.getVotes() > 0 ? "+" : "-", Math.abs(vote.getVotes())));
                 if (vote.getVotes() > 0) {

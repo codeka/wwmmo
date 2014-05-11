@@ -35,7 +35,7 @@ import android.widget.Spinner;
 import android.widget.SpinnerAdapter;
 import android.widget.TextView;
 import au.com.codeka.BackgroundRunner;
-import au.com.codeka.common.TimeInHours;
+import au.com.codeka.common.TimeFormatter;
 import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.BaseActivity;
 import au.com.codeka.warworlds.Notifications;
@@ -528,7 +528,7 @@ public class SitrepActivity extends BaseActivity
             Sprite starSprite = StarImageManager.getInstance().getSprite(starSummary, imageSize, true);
             starIcon.setImageDrawable(new SpriteDrawable(starSprite));
 
-            reportTime.setText(TimeInHours.format(sitrep.getReportTime()));
+            reportTime.setText(TimeFormatter.create().format(sitrep.getReportTime()));
             reportContent.setText(msg);
             reportTitle.setText(sitrep.getTitle());
 

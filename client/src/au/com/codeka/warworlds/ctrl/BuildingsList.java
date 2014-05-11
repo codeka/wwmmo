@@ -20,7 +20,7 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import au.com.codeka.common.TimeInHours;
+import au.com.codeka.common.TimeFormatter;
 import au.com.codeka.common.model.BaseBuildRequest;
 import au.com.codeka.common.model.BaseBuilding;
 import au.com.codeka.common.model.BaseColony;
@@ -323,7 +323,7 @@ public class BuildingsList extends ListView
                     row2.setText(Html.fromHtml(String.format(Locale.ENGLISH,
                             "<font color=\"#0c6476\">%s:</font> %d %%, %s left",
                             verb, (int) buildRequest.getPercentComplete(),
-                             TimeInHours.format(buildRequest.getRemainingTime()))));
+                            TimeFormatter.create().format(buildRequest.getRemainingTime()))));
 
                     row3.setVisibility(View.GONE);
                     progress.setVisibility(View.VISIBLE);
