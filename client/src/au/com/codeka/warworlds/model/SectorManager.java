@@ -53,6 +53,11 @@ public class SectorManager extends BaseManager {
         mSectorStars = new TreeMap<String, Star>();
     }
 
+    public void clearCache() {
+        mSectorStars.clear();
+        mSectors.clear();
+    }
+
     public Sector getSector(long sectorX, long sectorY) {
         Pair<Long, Long> key = new Pair<Long, Long>(sectorX, sectorY);
         return mSectors.get(key);
@@ -245,6 +250,11 @@ public class SectorManager extends BaseManager {
             RealmManager.i.addRealmChangedHandler(this);
         }
 
+        public void clear() {
+            mSectors.evictAll();
+            mBackgroundRenderers.evictAll();
+        }
+
         public static String key(Pair<Long, Long> coord) {
             return String.format(Locale.ENGLISH, "%d:%d", coord.one, coord.two);
         }
@@ -302,8 +312,7 @@ public class SectorManager extends BaseManager {
          */
         @Override
         public void onRealmChanged(Realm newRealm) {
-            mSectors.evictAll();
-            mBackgroundRenderers.evictAll();
+            clear();
         }
     }
 

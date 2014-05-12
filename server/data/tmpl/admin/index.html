@@ -6,13 +6,6 @@
 {% block content %}
   <h1>Active Empires</h1>
   <div id="graph" style="width: 100%; margin: 0 auto;"></div>
-
-  <h2>Oldest Unsimulated Star</h2>
-  <p>
-    {{oldest_star_id}} <b>{{oldest_star_name}}</b>:
-    {{oldest_star_time_since}}
-  </p>
-
   <script type="text/javascript">
     // keep the width/height ratio of the graph nice
     var ratio = 0.4;
@@ -50,5 +43,22 @@
       var chart = new google.visualization.LineChart(document.getElementById("graph"));
       chart.draw(dataView, options);
     }
+  </script>
+
+  <p id="oldest-star">
+    Oldest star (<a href="javascript:;">Refresh</a>):
+    <span><b>{{oldest_star_name}}</b> ({{oldest_star_id}}): {{oldest_star_time}}</span>
+  </p>
+  <script>
+    $("p#oldest-star").on("click", "a", function() {
+      $.ajax({
+        "url": "/realms/{{realm}}/admin",
+        "type": "POST",
+        "success": function(data) {
+          $("p#oldest-star span").html("<b>" + data["oldest_star_name"] + "</b> (" +
+              data["oldest_star_id"] + "): " + data["oldest_star_time"]);
+        }
+      })
+    });
   </script>
 {% endblock %}

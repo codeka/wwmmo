@@ -103,6 +103,10 @@ public abstract class ImageManager {
         }
     }
 
+    public void clearCaches() {
+        mTemplates.clear();
+    }
+
     public void addSpriteGeneratedListener(SpriteGeneratedListener listener) {
         mSpriteGeneratedListeners.add(listener);
     }
@@ -133,8 +137,8 @@ public abstract class ImageManager {
         String[] fileNames = mFileLists.get(basePath);
         if (fileNames == null) {
             try {
-                // for some reason, this can be incredbly slow on some devices (noteably, my Galaxy Note 8), that's
-                // why we cache it.
+                // for some reason, this can be incredibly slow on some devices (notably, my Galaxy
+                // Note 8), that's why we cache it.
                 fileNames = App.i.getAssets().list(basePath);
                 mFileLists.put(basePath, fileNames);
             } catch(IOException e) {

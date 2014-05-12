@@ -51,6 +51,11 @@ public class StarManager extends BaseManager {
         mAllStarUpdatedListeners = new ArrayList<StarFetchedHandler>();
     }
 
+    public void clearCache() {
+        mStars.clear();
+        mStarSummaries.clear();
+    }
+
     /**
      * Call this to register your interest in when a particular star is updated. Any time that
      * star is re-fetched from the server, your \c StarFetchedHandler will be called.

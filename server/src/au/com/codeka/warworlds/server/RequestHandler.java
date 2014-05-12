@@ -11,6 +11,7 @@ import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.TreeMap;
 
 import javax.servlet.ServletInputStream;
 import javax.servlet.http.Cookie;
@@ -19,6 +20,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import jregex.Matcher;
 
+import org.json.simple.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -155,6 +157,15 @@ public class RequestHandler {
      */
     protected boolean supportsRetryOnDeadlock() {
         return false;
+    }
+
+    protected void setResponseJson(Map<String, Object> data) {
+        mResponse.setContentType("application/json");
+        mResponse.setCharacterEncoding("utf-8");
+        try {
+            mResponse.getWriter().write(JSONObject.toJSONString(data));
+        } catch (IOException e) {
+        }
     }
 
     protected void setResponseBody(Message pb) {

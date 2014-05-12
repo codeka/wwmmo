@@ -74,6 +74,13 @@ public class BaseActivity extends FragmentActivity {
     }
 
     @Override
+    public void onTrimMemory(int level) {
+        if (level == TRIM_MEMORY_UI_HIDDEN) {
+            MemoryTrimmer.trimMemory();
+        }
+    }
+
+    @Override
     public void startActivity(Intent intent) {
         BackgroundDetector.i.onStartActivity(this, intent);
         super.startActivity(intent);

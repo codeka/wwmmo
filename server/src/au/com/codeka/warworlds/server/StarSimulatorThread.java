@@ -3,6 +3,7 @@ package au.com.codeka.warworlds.server;
 import java.sql.ResultSet;
 
 import org.joda.time.DateTime;
+import org.joda.time.Seconds;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,9 +24,8 @@ public class StarSimulatorThread {
     private boolean mStopped;
 
     private static int WAIT_TIME_NO_STARS = 10 * 60 * 1000; // 10 minutes, after no stars found
-    private static int WAIT_TIME_JUST_SIMULATED = 60 * 60 * 1000; // 1 hour, we just simulated the oldest star
     private static int WAIT_TIME_ERROR = 60 * 1000; // 1 minute, in case of error
-    private static int WAIT_TIME_NORMAL = 2 * 1000; // 2 seconds, normal wait time between simulations
+    private static int WAIT_TIME_NORMAL = 0; // don't wait if there's more stars to simulate
 
     public void start() {
         if (mThread != null) {
@@ -62,12 +62,15 @@ public class StarSimulatorThread {
 
     private void threadproc() {
         while (!mStopped) {
-            int waitTime = simulateOneStar();
+            int waitTimeMs = simulateOneStar();
 
-            log.info(String.format("Waiting %d seconds before simulating next star.", waitTime / 1000));
-            try {
-                Thread.sleep(waitTime);
-            } catch (InterruptedException e) {
+            if (waitTimeMs > 0) {
+                log.info(String.format("Waiting %d seconds before simulating next star.",
+                        waitTimeMs / 1000));
+                try {
+                    Thread.sleep(waitTimeMs);
+                } catch (InterruptedException e) {
+                }
             }
         }
     }
@@ -82,7 +85,11 @@ public class StarSimulatorThread {
 
             Star star = new StarController().getStar(starID);
             if (star.getLastSimulation().isAfter(DateTime.now().minusHours(1))) {
-                return WAIT_TIME_JUST_SIMULATED;
+                // how long would we have to wait (in seconds) before there WOULD HAVE been one
+                // hour since it was last simulated?
+                int seconds = Seconds.secondsBetween(DateTime.now().minusHours(1),
+                        star.getLastSimulation()).getSeconds();
+                return seconds * 1000;
             }
 
             new Simulation().simulate(star);

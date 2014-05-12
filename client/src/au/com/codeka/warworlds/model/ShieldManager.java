@@ -75,9 +75,14 @@ public abstract class ShieldManager implements RealmManager.RealmChangedHandler 
         mShields.remove(id);
     }
 
+    public void clearCache() {
+        mShieldTextures.clear();
+        mShields.clear();
+    }
+
     @Override
     public void onRealmChanged(Realm newRealm) {
-        mShields.clear();
+        clearCache();
     }
 
     /**
