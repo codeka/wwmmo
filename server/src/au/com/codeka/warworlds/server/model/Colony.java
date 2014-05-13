@@ -96,10 +96,4 @@ public class Colony extends BaseColony {
         mUncollectedTaxes = 0.0f;
         mBuildings.clear();
     }
-
-    public float collectTaxes() {
-        float taxes = mUncollectedTaxes;
-        mUncollectedTaxes = 0;
-        return taxes;
-    }
 }

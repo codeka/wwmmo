@@ -86,14 +86,6 @@ public class ColonyList extends FrameLayout {
         mColonyListAdapter.setColonies(stars, colonies);
     }
 
-    @Override
-    public void onAttachedToWindow() {
-    }
-
-    @Override
-    public void onDetachedFromWindow() {
-    }
-
     public void setOnColonyActionListener(ColonyActionHandler listener) {
         mColonyActionListener = listener;
     }
@@ -126,14 +118,6 @@ public class ColonyList extends FrameLayout {
                     Star star = mStars.get(mSelectedColony.getStarKey());
                     mColonyActionListener.onViewColony(star, mSelectedColony);
                 }
-            }
-        });
-
-        final Button collectBtn = (Button) findViewById(R.id.collect_btn);
-        collectBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mColonyActionListener.onCollectTaxes();
             }
         });
     }
@@ -451,6 +435,5 @@ public class ColonyList extends FrameLayout {
 
     public interface ColonyActionHandler {
         void onViewColony(Star star, Colony colony);
-        void onCollectTaxes();
     }
 }

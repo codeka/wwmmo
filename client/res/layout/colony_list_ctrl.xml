@@ -36,17 +36,6 @@
             android:layout_marginBottom="5dp"
             android:text="@string/view" />
 
-        <Button
-            android:id="@+id/collect_btn"
-            style="@style/Button"
-            android:layout_width="180dp"
-            android:layout_height="35dp"
-            android:layout_above="@+id/infobar"
-            android:layout_alignParentRight="true"
-            android:layout_marginRight="5dp"
-            android:layout_marginBottom="5dp"
-            android:text="Collect Taxes" />
-
         <au.com.codeka.warworlds.ctrl.InfobarView
             android:id="@+id/infobar"
             android:layout_width="match_parent"

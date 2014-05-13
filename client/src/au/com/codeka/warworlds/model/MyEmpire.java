@@ -15,7 +15,6 @@ import android.graphics.Bitmap.CompressFormat;
 import au.com.codeka.BackgroundRunner;
 import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.api.ApiClient;
-import au.com.codeka.warworlds.api.ApiException;
 import au.com.codeka.warworlds.model.billing.Purchase;
 import au.com.codeka.warworlds.model.billing.SkuDetails;
 
@@ -27,9 +26,6 @@ import com.google.protobuf.ByteString;
  */
 public class MyEmpire extends Empire {
     private static final Logger log = LoggerFactory.getLogger(MyEmpire.class);
-
-    // make sure we don't collect taxes twice
-    private boolean mCollectingTaxes = false;
 
     public MyEmpire() {
     }
@@ -91,38 +87,6 @@ public class MyEmpire extends Empire {
 
                 // make sure we record the fact that the star is updated as well
                 StarManager.getInstance().refreshStar(colony.getStarKey());
-            }
-        }.execute();
-    }
-
-    public void collectTaxes() {
-        if (mCollectingTaxes) {
-            return;
-        }
-        mCollectingTaxes = true;
-
-        new BackgroundRunner<Boolean>() {
-            private String mErrorMsg;
-            @Override
-            protected Boolean doInBackground() {
-                try {
-                    String url = String.format("empires/%s/taxes?async=1", getKey());
-                    ApiClient.postProtoBuf(url, null);
-                } catch(ApiException e) {
-                    mErrorMsg = e.getServerErrorMessage();
-                }
-
-                return true;
-            }
-
-            @Override
-            protected void onComplete(Boolean success) {
-                mCollectingTaxes = false;
-                if (mErrorMsg != null) {
-                    //TODO: ERROR
-                }
-
-                EmpireManager.i.refreshEmpire();
             }
         }.execute();
     }

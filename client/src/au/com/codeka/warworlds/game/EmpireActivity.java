@@ -382,11 +382,6 @@ public class EmpireActivity extends TabFragmentActivity
                     getActivity().setResult(RESULT_OK, intent);
                     getActivity().finish();
                 }
-
-                @Override
-                public void onCollectTaxes() {
-                    EmpireManager.i.getEmpire().collectTaxes();
-                }
             });
 
             return v;
