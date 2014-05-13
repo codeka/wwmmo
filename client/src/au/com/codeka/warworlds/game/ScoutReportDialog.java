@@ -290,8 +290,6 @@ public class ScoutReportDialog extends DialogFragment {
                 Colony colony = item.colony;
 
                 ColonyList.populateColonyListRow(getActivity(), view, colony, mStar);
-                TextView uncollectedTaxes = (TextView) view.findViewById(R.id.colony_taxes);
-                uncollectedTaxes.setText("");
             } else {
                 Fleet fleet = item.fleet;
                 FleetList.populateFleetRow(getActivity(), null, view, fleet);

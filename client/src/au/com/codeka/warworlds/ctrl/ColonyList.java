@@ -147,7 +147,6 @@ public class ColonyList extends FrameLayout {
         ImageView planetIcon = (ImageView) view.findViewById(R.id.planet_icon);
         TextView colonyName = (TextView) view.findViewById(R.id.colony_name);
         TextView colonySummary = (TextView) view.findViewById(R.id.colony_summary);
-        TextView uncollectedTaxes = (TextView) view.findViewById(R.id.colony_taxes);
 
         Sprite sprite = PlanetImageManager.getInstance().getSprite(planet);
         planetIcon.setImageDrawable(new SpriteDrawable(sprite));
@@ -158,10 +157,8 @@ public class ColonyList extends FrameLayout {
             // if the star hasn't been simulated for > 5 minutes, just display ??? for the
             // various parameters (a simulation will be scheduled)
             colonySummary.setText("Pop: ?");
-            uncollectedTaxes.setText("Taxes: ?");
         } else {
             colonySummary.setText(String.format("Pop: %d", (int) colony.getPopulation()));
-            uncollectedTaxes.setText(String.format("Taxes: %s", Cash.format(colony.getUncollectedTaxes())));
         }
     }
 
