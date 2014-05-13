@@ -8,14 +8,14 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Random;
+import java.util.TreeMap;
 
 import org.joda.time.DateTime;
 import org.joda.time.Seconds;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.mysql.jdbc.exceptions.jdbc4.MySQLTransactionRollbackException;
 
 import au.com.codeka.common.Vector2;
 import au.com.codeka.common.model.BaseBuildRequest;
@@ -48,6 +48,8 @@ import au.com.codeka.warworlds.server.model.Planet;
 import au.com.codeka.warworlds.server.model.ScoutReport;
 import au.com.codeka.warworlds.server.model.Sector;
 import au.com.codeka.warworlds.server.model.Star;
+
+import com.mysql.jdbc.exceptions.jdbc4.MySQLTransactionRollbackException;
 
 public class StarController {
     private static final Logger log = LoggerFactory.getLogger(StarController.class);
@@ -498,6 +500,8 @@ public class StarController {
 
             final float MIN_POPULATION = 0.0001f;
 
+            TreeMap<Integer, Float> empireTaxes = new TreeMap<Integer, Float>();
+
             String sql = "UPDATE colonies SET" +
                            " focus_population = ?," +
                            " focus_construction = ?," +
@@ -507,19 +511,46 @@ public class StarController {
                            " uncollected_taxes = ?" +
                         " WHERE id = ?";
             try (SqlStmt stmt = prepare(sql)) {
-                for (BaseColony colony : star.getColonies()) {
+                for (BaseColony baseColony : star.getColonies()) {
+                    Colony colony = (Colony) baseColony;
                     if (colony.getPopulation() <= MIN_POPULATION) {
                         needDelete = true;
                         continue;
                     }
+
+                    Float uncollectedTaxes = empireTaxes.get(colony.getEmpireID());
+                    uncollectedTaxes = (uncollectedTaxes == null ? 0 : uncollectedTaxes) +
+                            colony.getUncollectedTaxes();
+                    empireTaxes.put(colony.getEmpireID(), uncollectedTaxes);
+
                     stmt.setDouble(1, colony.getPopulationFocus());
                     stmt.setDouble(2, colony.getConstructionFocus());
                     stmt.setDouble(3, colony.getFarmingFocus());
                     stmt.setDouble(4, colony.getMiningFocus());
                     stmt.setDouble(5, colony.getPopulation());
-                    stmt.setDouble(6, colony.getUncollectedTaxes());
+                    stmt.setDouble(6, 0); // TODO: remove this column from the database
                     stmt.setInt(7, ((Colony) colony).getID());
                     stmt.update();
+
+                    colony.setUncollectedTaxes(0.0f);
+                }
+            }
+
+            if (!empireTaxes.isEmpty()) {
+                sql = "UPDATE empires SET cash = LAST_INSERT_ID(cash + ?) WHERE id = ? ; SELECT LAST_INSERT_ID()";
+                try (SqlStmt stmt = prepare(sql)) {
+                    for (Map.Entry<Integer, Float> entry : empireTaxes.entrySet()) {
+                        stmt.setDouble(1, entry.getValue());
+                        stmt.setInt(2, entry.getKey());
+                        ResultSet rs = stmt.updateAndSelect();
+                        if (rs.next()) {
+                            double totalCash = rs.getDouble(1);
+
+                            // send a notification that cash has been updated
+                            new NotificationController().sendNotificationToOnlineEmpire(entry.getKey(),
+                                    "cash", Double.toString(totalCash));
+                        }
+                    }
                 }
             }
 

@@ -25,6 +25,11 @@ public class InfobarView extends FrameLayout
     private Handler mHandler;
     private View mView;
 
+    // The cash value we're currently displaying, so we can animate to the "real" value as it's
+    // updated.
+    private static float sCurrCash;
+    private static float sRealCash;
+
     public InfobarView(Context context, AttributeSet attrs) {
         super(context, attrs);
 
@@ -40,13 +45,37 @@ public class InfobarView extends FrameLayout
     public void onEmpireFetched(Empire empire) {
         MyEmpire myEmpire = EmpireManager.i.getEmpire();
         if (myEmpire != null && myEmpire.getKey().equals(empire.getKey())) {
+            sRealCash = empire.getCash();
+            if (sCurrCash == 0.0f) {
+                sCurrCash = sRealCash;
+            } else if (sRealCash != sCurrCash) {
+                mHandler.post(mUpdateCashRunnable);
+            }
             TextView cash = (TextView) mView.findViewById(R.id.cash);
-            cash.setText(Cash.format(empire.getCash()));
+            cash.setText(Cash.format(sCurrCash));
 
             TextView empireName = (TextView) mView.findViewById(R.id.empire_name);
             empireName.setText(empire.getDisplayName());
         }
     }
+
+    private Runnable mUpdateCashRunnable = new Runnable() {
+        @Override
+        public void run() {
+            boolean increasing = sRealCash > sCurrCash;
+            float newCash = sCurrCash + (increasing ? 125f : -125f);
+            if ((increasing && newCash > sRealCash) || (!increasing && newCash < sRealCash)) {
+                newCash = sRealCash;
+            }
+            TextView cash = (TextView) mView.findViewById(R.id.cash);
+            cash.setText(Cash.format(newCash));
+            sCurrCash = newCash;
+
+            if (sCurrCash != sRealCash) {
+                mHandler.post(mUpdateCashRunnable);
+            }
+        }
+    };
 
     @Override
     public void onStateChanged() {
@@ -54,8 +83,6 @@ public class InfobarView extends FrameLayout
             return;
         }
 
-        // this is not called on the UI, so we have to send a request to the
-        // UI thread to update the UI
         mHandler.post(new Runnable() {
             @Override
             public void run() {
@@ -75,6 +102,7 @@ public class InfobarView extends FrameLayout
 
     @Override
     public void onAttachedToWindow() {
+        super.onAttachedToWindow();
         if (isInEditMode()) {
             return;
         }
@@ -88,6 +116,7 @@ public class InfobarView extends FrameLayout
 
     @Override
     public void onDetachedFromWindow() {
+        super.onDetachedFromWindow();
         if (isInEditMode()) {
             return;
         }

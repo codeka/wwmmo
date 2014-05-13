@@ -260,6 +260,7 @@ public class BuildQueueList extends FrameLayout
 
     @Override
     public void onAttachedToWindow() {
+        super.onAttachedToWindow();
         StarManager.getInstance().addStarUpdatedListener(null, this);
 
         mProgressUpdater = new ProgressUpdater();
@@ -268,6 +269,7 @@ public class BuildQueueList extends FrameLayout
 
     @Override
     public void onDetachedFromWindow() {
+        super.onDetachedFromWindow();
         StarManager.getInstance().removeStarUpdatedListener(this);
 
         mHandler.removeCallbacks(mProgressUpdater);

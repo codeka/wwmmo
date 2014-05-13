@@ -40,6 +40,7 @@ import au.com.codeka.warworlds.model.ChatMessage;
 import au.com.codeka.warworlds.model.Empire;
 import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.EmpireShieldManager;
+import au.com.codeka.warworlds.model.MyEmpire;
 import au.com.codeka.warworlds.model.Realm;
 import au.com.codeka.warworlds.model.RealmManager;
 import au.com.codeka.warworlds.model.SectorManager;
@@ -76,80 +77,97 @@ public class Notifications {
         new DatabaseHelper().clearNotifications();
     }
 
-    public static void displayNotfication(Context context, String name, String value) {
+    public static void handleNotfication(Context context, String name, String value) {
         if (name.equals("sitrep")) {
-            byte[] blob = Base64.decode(value, Base64.DEFAULT);
-
-            Messages.SituationReport pb;
-            try {
-                pb = Messages.SituationReport.parseFrom(blob);
-            } catch (InvalidProtocolBufferException e) {
-                log.error("Could not parse situation report!", e);
-                return;
-            }
-
-            // we could currently be in a game, and that game could be running in a different
-            // realm to this notification. So we switch this thread temporarily to whatever
-            // realm this notification is for.
-            Realm thisRealm = RealmManager.i.getRealmByName(pb.getRealm());
-            log.debug("Got realm: "+thisRealm.getDisplayName());
-            RealmContext.i.setThreadRealm(thisRealm);
-            try {
-                // refresh the star this situation report is for, obviously
-                // something happened that we'll want to know about
-                Star star = StarManager.getInstance().refreshStarSync(pb.getStarKey(), true);
-                log.debug("refreshed star: successful? "+(star == null ? "false" : "true"));
-                if (star == null) { // <-- only refresh the star if we have one cached
-                    // if we didn't refresh the star, then at least refresh
-                    // the sector it was in (could have been a moving
-                    // fleet, say)
-                    star = SectorManager.getInstance().findStar(pb.getStarKey());
-                    if (star != null) {
-                        log.debug("star found from sector manager instead.");
-                        SectorManager.getInstance().refreshSector(star.getSectorX(), star.getSectorY());
-                    }
-                } else {
-                    log.debug("firing star updated...");
-                    StarManager.getInstance().fireStarUpdated(star);
-                }
-
-                // notify the build manager, in case it's a 'build complete' or something
-                log.debug("notifying build manager.");
-                BuildManager.getInstance().notifySituationReport(pb);
-
-                log.debug("displaying a notification...");
-                displayNotification(context, pb);
-            } finally {
-                RealmContext.i.setThreadRealm(null);
-            }
+            handleSitrepNotification(context, value);
         } else if (name.equals("chat")) {
-            byte[] blob = Base64.decode(value, Base64.DEFAULT);
+            handleChatNotification(context, value);
+        } else if (name.equals("cash")) {
+            handleCashNotification(value);
+        }
+    }
 
-            ChatMessage msg;
-            Messages.ChatMessage pb;
-            try {
-                pb = Messages.ChatMessage.parseFrom(blob);
-                msg = new ChatMessage();
-                msg.fromProtocolBuffer(pb);
-            } catch(InvalidProtocolBufferException e) {
-                log.error("Could not parse chat message!", e);
-                return;
+    private static void handleSitrepNotification(Context context, String value) {
+        byte[] blob = Base64.decode(value, Base64.DEFAULT);
+
+        Messages.SituationReport pb;
+        try {
+            pb = Messages.SituationReport.parseFrom(blob);
+        } catch (InvalidProtocolBufferException e) {
+            log.error("Could not parse situation report!", e);
+            return;
+        }
+
+        // we could currently be in a game, and that game could be running in a different
+        // realm to this notification. So we switch this thread temporarily to whatever
+        // realm this notification is for.
+        Realm thisRealm = RealmManager.i.getRealmByName(pb.getRealm());
+        log.debug("Got realm: "+thisRealm.getDisplayName());
+        RealmContext.i.setThreadRealm(thisRealm);
+        try {
+            // refresh the star this situation report is for, obviously
+            // something happened that we'll want to know about
+            Star star = StarManager.getInstance().refreshStarSync(pb.getStarKey(), true);
+            log.debug("refreshed star: successful? "+(star == null ? "false" : "true"));
+            if (star == null) { // <-- only refresh the star if we have one cached
+                // if we didn't refresh the star, then at least refresh
+                // the sector it was in (could have been a moving
+                // fleet, say)
+                star = SectorManager.getInstance().findStar(pb.getStarKey());
+                if (star != null) {
+                    log.debug("star found from sector manager instead.");
+                    SectorManager.getInstance().refreshSector(star.getSectorX(), star.getSectorY());
+                }
+            } else {
+                log.debug("firing star updated...");
+                StarManager.getInstance().fireStarUpdated(star);
             }
 
-            ChatConversation conversation = ChatManager.i.getConversation(msg);
-            if (conversation != null) {
-                conversation.addMessage(msg);
+            // notify the build manager, in case it's a 'build complete' or something
+            log.debug("notifying build manager.");
+            BuildManager.getInstance().notifySituationReport(pb);
 
-                if (conversation.isPrivateChat() && BackgroundDetector.i.isInBackground()) {
-                    if (conversation.isMuted()) {
-                        log.debug("got notification, but conversation is muted.");
-                    } else {
-                        // if it's a private chat, and we're currently in the background, show a notification
-                        displayNotification(context, pb);
-                    }
+            log.debug("displaying a notification...");
+            displayNotification(context, pb);
+        } finally {
+            RealmContext.i.setThreadRealm(null);
+        }
+    }
+
+    private static void handleChatNotification(Context context, String value) {
+        byte[] blob = Base64.decode(value, Base64.DEFAULT);
+
+        ChatMessage msg;
+        Messages.ChatMessage pb;
+        try {
+            pb = Messages.ChatMessage.parseFrom(blob);
+            msg = new ChatMessage();
+            msg.fromProtocolBuffer(pb);
+        } catch(InvalidProtocolBufferException e) {
+            log.error("Could not parse chat message!", e);
+            return;
+        }
+
+        ChatConversation conversation = ChatManager.i.getConversation(msg);
+        if (conversation != null) {
+            conversation.addMessage(msg);
+
+            if (conversation.isPrivateChat() && BackgroundDetector.i.isInBackground()) {
+                if (conversation.isMuted()) {
+                    log.debug("got notification, but conversation is muted.");
+                } else {
+                    // if it's a private chat, and we're currently in the background, show a notification
+                    displayNotification(context, pb);
                 }
             }
         }
+    }
+
+    private static void handleCashNotification(String value) {
+        float newCash = Float.parseFloat(value);
+        MyEmpire empire = EmpireManager.i.getEmpire();
+        empire.updateCash(newCash);
+        EmpireManager.i.fireEmpireUpdated(empire);
     }
 
     private static void displayNotification(final Context context,
@@ -606,7 +624,7 @@ public class Notifications {
                         mHandler.post(new Runnable() {
                             @Override
                             public void run() {
-                                Notifications.displayNotfication(App.i, name, value);
+                                Notifications.handleNotfication(App.i, name, value);
                             }
                         });
                     }

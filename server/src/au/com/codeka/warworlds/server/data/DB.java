@@ -25,7 +25,7 @@ public class DB {
         if (dbName == null) {
             dbName = "wwmmo";
         }
-        sJdbcUrl = String.format("jdbc:mysql://localhost:3306/%s?useUnicode=true&characterEncoding=utf8", dbName);
+        sJdbcUrl = String.format("jdbc:mysql://localhost:3306/%s?useUnicode=true&characterEncoding=utf8&allowMultiQueries=true", dbName);
 
         sUsername = System.getProperty("au.com.codeka.warworlds.server.dbUser");
         if (sUsername == null) {

@@ -38,6 +38,10 @@ public class MyEmpire extends Empire {
         mCash += amount;
     }
 
+    public void updateCash(float cash) {
+        mCash = cash;
+    }
+
     /**
      * Colonizes the given planet. We'll call the given \c ColonizeCompleteHandler when the
      * operation completes (successfully or not).

@@ -55,11 +55,15 @@ public class NotificationController {
         sendNotification(new ChatConversationParticipant[] {new ChatConversationParticipant(empireID, false)}, new Notification(name, value));
     }
 
-    public void sendNotificationToOnlineAlliance(int allianceID, String name, String value) throws RequestException {
-        TreeMap<String, String> values = new TreeMap<String, String>();
-        values.put(name, value);
+    public void sendNotificationToOnlineEmpire(int empireID, String name, String value) throws RequestException {
         Notification notification = new Notification(name, value);
+        if (!sHandlers.sendNotification(empireID, notification)) {
+            sRecentNotifications.addNotification(empireID, notification);
+        }
+    }
 
+    public void sendNotificationToOnlineAlliance(int allianceID, String name, String value) throws RequestException {
+        Notification notification = new Notification(name, value);
         sHandlers.sendNotificationToAlliance(allianceID, notification);
     }
 

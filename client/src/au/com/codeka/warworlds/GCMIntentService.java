@@ -70,10 +70,10 @@ public class GCMIntentService extends GCMBaseIntentService {
         Bundle extras = intent.getExtras();
         if (extras != null) {
             if (extras.containsKey("sitrep")) {
-                Notifications.displayNotfication(context, "sitrep", extras.getString("sitrep"));
+                Notifications.handleNotfication(context, "sitrep", extras.getString("sitrep"));
             }
             if (extras.containsKey("chat")) {
-                Notifications.displayNotfication(context, "chat", extras.getString("chat"));
+                Notifications.handleNotfication(context, "chat", extras.getString("chat"));
             }
             if (extras.containsKey("empire_updated")) {
                 EmpireManager.i.refreshEmpire();

@@ -250,7 +250,7 @@ public class ApiClient {
                     handler.post(new Runnable() {
                         @Override
                         public void run() {
-                            Notifications.displayNotfication(App.i, name, value);
+                            Notifications.handleNotfication(App.i, name, value);
                         }
                     });
                 }

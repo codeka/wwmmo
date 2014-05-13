@@ -165,6 +165,26 @@ public class SqlStmt implements AutoCloseable {
         return rs;
     }
 
+    /**
+     * Wrapper for executing a single "UPDATE ; SELECT" combo, which is somewhat common.
+     *
+     * Returns the {@link ResultSet} from the SELECT statement.
+     */
+    public ResultSet updateAndSelect() throws SQLException {
+        logStatement();
+        mStmt.execute();
+
+        do {
+            ResultSet rs = mStmt.getResultSet();
+            if (rs != null) {
+                mResultSets.add(rs);
+                return rs;
+            }
+        } while (mStmt.getMoreResults());
+
+        return null;
+    }
+
     private void logStatement() {
         if (mWasStatementLogged) {
             return;
