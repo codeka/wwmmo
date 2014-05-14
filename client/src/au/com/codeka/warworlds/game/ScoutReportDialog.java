@@ -296,7 +296,6 @@ public class ScoutReportDialog extends DialogFragment {
             }
 
             return view;
-
         }
 
         private class ReportItem {
