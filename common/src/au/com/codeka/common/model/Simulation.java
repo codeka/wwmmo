@@ -194,6 +194,7 @@ public class Simulation {
         float totalPopulation = 0.0f;
         float maxGoods = 50.0f;
         float maxMinerals = 50.0f;
+        float totalTaxPerHour = 0.0f;
 
         BaseEmpirePresence empire = null;
         for (BaseEmpirePresence e : star.getEmpires()) {
@@ -240,8 +241,10 @@ public class Simulation {
 
             // work out the amount of taxes this colony has generated in the last turn
             float taxPerPopulationPerHour = 0.012f;
-            float taxThisTurn = taxPerPopulationPerHour * dtInHours * colony.getPopulation();
+            float taxPerHour = taxPerPopulationPerHour * colony.getPopulation();
+            float taxThisTurn = taxPerHour * dtInHours;
             log(String.format("    Taxes %.2f + %.2f = %.2f uncollected", colony.getUncollectedTaxes(), taxThisTurn, colony.getUncollectedTaxes() + taxThisTurn));
+            totalTaxPerHour += taxPerHour;
             colony.setUncollectedTaxes(colony.getUncollectedTaxes() + taxThisTurn);
         }
 
@@ -474,6 +477,7 @@ public class Simulation {
             empire.setTotalMinerals(totalMinerals);
             empire.setDeltaGoodsPerHour(goodsDeltaPerHour);
             empire.setDeltaMineralsPerHour(mineralsDeltaPerHour);
+            empire.setTaxPerHour(totalTaxPerHour);
         }
     }
 

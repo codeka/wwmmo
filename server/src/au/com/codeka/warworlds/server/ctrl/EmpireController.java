@@ -4,7 +4,10 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 import org.joda.time.DateTime;
 
@@ -51,6 +54,15 @@ public class EmpireController {
         } catch (Exception e) {
             throw new RequestException(e);
         }
+    }
+
+    public Map<Integer, Double> getTaxCollectedPerHour(Collection<Integer> empireIDs) throws RequestException {
+        try {
+            return db.getTaxCollectedPerHour(empireIDs);
+        } catch (Exception e) {
+            throw new RequestException(e);
+        }
+
     }
 
     public Empire getEmpireByEmail(String email) throws RequestException {
@@ -441,6 +453,23 @@ public class EmpireController {
                 }
                 populateEmpires(empires);
                 return empires;
+            }
+        }
+
+        public Map<Integer, Double> getTaxCollectedPerHour(Collection<Integer> empireIDs) throws Exception {
+            String sql = "SELECT empire_id, sum(tax_per_hour)" +
+                        " FROM empire_presences" +
+                        " WHERE empire_id IN " + buildInClause(empireIDs) +
+                        " GROUP BY empire_id";
+
+            try (SqlStmt stmt = prepare(sql)) {
+                ResultSet rs = stmt.select();
+
+                Map<Integer, Double> taxRates = new TreeMap<Integer, Double>();
+                while (rs.next()) {
+                    taxRates.put(rs.getInt(1), rs.getDouble(2));
+                }
+                return taxRates;
             }
         }
 

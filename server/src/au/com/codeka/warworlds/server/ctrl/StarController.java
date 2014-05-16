@@ -482,14 +482,16 @@ public class StarController {
             final String sql = "UPDATE empire_presences SET" +
                                  " total_goods = ?," +
                                  " total_minerals = ?," +
+                                 " tax_per_hour = ?," +
                                  " goods_zero_time = ?" +
                               " WHERE id = ?";
             try (SqlStmt stmt = prepare(sql)) {
                 for (BaseEmpirePresence empire : star.getEmpires()) {
                     stmt.setDouble(1, empire.getTotalGoods());
                     stmt.setDouble(2, empire.getTotalMinerals());
-                    stmt.setDateTime(3, empire.getGoodsZeroTime());
-                    stmt.setInt(4, ((EmpirePresence) empire).getID());
+                    stmt.setDouble(3, empire.getTaxPerHour());
+                    stmt.setDateTime(4, empire.getGoodsZeroTime());
+                    stmt.setInt(5, ((EmpirePresence) empire).getID());
                     stmt.update();
                 }
             }

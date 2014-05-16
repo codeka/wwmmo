@@ -29,6 +29,7 @@ public class InfobarView extends FrameLayout
     // updated.
     private static float sCurrCash;
     private static float sRealCash;
+    private static int sEmpireID; // if this changes, we update the cash instantly
 
     public InfobarView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -46,8 +47,9 @@ public class InfobarView extends FrameLayout
         MyEmpire myEmpire = EmpireManager.i.getEmpire();
         if (myEmpire != null && myEmpire.getKey().equals(empire.getKey())) {
             sRealCash = empire.getCash();
-            if (sCurrCash == 0.0f) {
+            if (sCurrCash == 0.0f || sEmpireID != myEmpire.getID()) {
                 sCurrCash = sRealCash;
+                sEmpireID = myEmpire.getID();
             } else if (sRealCash != sCurrCash) {
                 mHandler.post(mUpdateCashRunnable);
             }

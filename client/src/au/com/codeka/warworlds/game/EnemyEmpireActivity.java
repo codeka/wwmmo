@@ -1,6 +1,7 @@
 package au.com.codeka.warworlds.game;
 
 import java.text.DecimalFormat;
+import java.util.Locale;
 
 import android.content.Context;
 import android.content.Intent;
@@ -11,6 +12,7 @@ import android.view.Window;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import au.com.codeka.Cash;
 import au.com.codeka.common.model.BaseEmpireRank;
 import au.com.codeka.common.model.BaseStar;
 import au.com.codeka.warworlds.BaseActivity;
@@ -142,7 +144,16 @@ public class EnemyEmpireActivity extends BaseActivity
         TextView totalShips = (TextView) findViewById(R.id.total_ships);
         TextView totalBuildings = (TextView) findViewById(R.id.total_buildings);
         TextView rankNumber = (TextView) findViewById(R.id.rank);
+        TextView taxes = (TextView) findViewById(R.id.taxes);
         DecimalFormat formatter = new DecimalFormat("#,##0");
+
+        if (mEmpire.getTaxCollectedPerHour() != null) {
+            float taxesPerHour = (float) (double) mEmpire.getTaxCollectedPerHour();
+            float taxesPerDay = taxesPerHour * 24;
+            taxes.setVisibility(View.VISIBLE);
+            taxes.setText(Html.fromHtml(String.format(Locale.ENGLISH,
+                    "Taxes: <b>%s</b> / day", Cash.format(taxesPerDay))));
+        }
 
         BaseEmpireRank rank = mEmpire.getRank();
         if (rank != null) {

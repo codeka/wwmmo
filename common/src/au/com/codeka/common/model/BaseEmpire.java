@@ -15,6 +15,7 @@ public abstract class BaseEmpire {
     protected BaseAlliance mAlliance;
     protected DateTime mShieldLastUpdate;
     protected State mState;
+    protected Double mTaxCollectedPerHour;
 
     protected abstract BaseEmpireRank createEmpireRank(Messages.EmpireRank pb);
     protected abstract BaseStar createStar(Messages.Star pb);
@@ -50,6 +51,9 @@ public abstract class BaseEmpire {
     public void setEmailAddr(String email) {
         mEmailAddr = email;
     }
+    public Double getTaxCollectedPerHour() {
+        return mTaxCollectedPerHour;
+    }
 
     public void updateAlliance(BaseAlliance alliance) {
         mAlliance = alliance;
@@ -79,6 +83,10 @@ public abstract class BaseEmpire {
 
         if (pb.hasShieldImageLastUpdate()) {
             mShieldLastUpdate = new DateTime(pb.getShieldImageLastUpdate() * 1000, DateTimeZone.UTC);
+        }
+
+        if (pb.hasTaxesCollectedPerHour()) {
+            mTaxCollectedPerHour = pb.getTaxesCollectedPerHour();
         }
     }
 
@@ -113,6 +121,10 @@ public abstract class BaseEmpire {
 
         if (mShieldLastUpdate != null) {
             pb.setShieldImageLastUpdate(mShieldLastUpdate.getMillis() / 1000);
+        }
+
+        if (mTaxCollectedPerHour != null) {
+            pb.setTaxesCollectedPerHour(mTaxCollectedPerHour);
         }
     }
 

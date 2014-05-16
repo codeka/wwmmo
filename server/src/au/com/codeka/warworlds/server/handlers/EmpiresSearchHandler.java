@@ -1,14 +1,22 @@
 package au.com.codeka.warworlds.server.handlers;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.RequestHandler;
 import au.com.codeka.warworlds.server.ctrl.EmpireController;
+import au.com.codeka.warworlds.server.model.Alliance;
 import au.com.codeka.warworlds.server.model.Empire;
 
 public class EmpiresSearchHandler extends RequestHandler {
+    private final Logger log = LoggerFactory.getLogger(EmpiresSearchHandler.class);
+
     @Override
     protected void get() throws RequestException {
         ArrayList<Empire> empires = new ArrayList<Empire>();
@@ -72,13 +80,40 @@ public class EmpiresSearchHandler extends RequestHandler {
             empires.add(ctrl.getEmpire(getSession().getEmpireID()));
         }
 
+        int myAllianceID = 0;
+        if (getSessionNoError() != null) {
+            myAllianceID = getSession().getAllianceID();
+        }
+
+        ArrayList<Integer> empiresToFetchTaxRateFor = new ArrayList<Integer>();
+        for (Empire empire : empires) {
+            if (myAllianceID > 0 && empire.getAlliance() != null &&
+                    ((Alliance) empire.getAlliance()).getID() == myAllianceID) {
+                empiresToFetchTaxRateFor.add(empire.getID());
+            }
+        }
+        Map<Integer, Double> taxRates;
+        if (!empiresToFetchTaxRateFor.isEmpty()) {
+            taxRates = new EmpireController().getTaxCollectedPerHour(empiresToFetchTaxRateFor);
+        } else {
+            taxRates = new HashMap<Integer, Double>();
+        }
+
         Messages.Empires.Builder pb = Messages.Empires.newBuilder();
         for (Empire empire : empires) {
             Messages.Empire.Builder empire_pb = Messages.Empire.newBuilder();
             empire.toProtocolBuffer(empire_pb);
-            if (getSessionNoError() == null || empire.getID() != getSession().getEmpireID() && !getSession().isAdmin()) {
+            if (getSessionNoError() == null ||
+                    empire.getID() != getSession().getEmpireID() && !getSession().isAdmin()) {
                 // if it's not our empire....
                 empire_pb.setCash(0);
+            }
+            Double taxRate = taxRates.get(empire.getID());
+            if (taxRate != null) {
+                log.info("Setting tax for empire %d to %f", empire.getID(), taxRate);
+                empire_pb.setTaxesCollectedPerHour(taxRate); 
+            } else {
+                log.info("No tax for empire %d", empire.getID());
             }
             pb.addEmpires(empire_pb);
         }

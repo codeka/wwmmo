@@ -21,6 +21,7 @@ public abstract class BaseEmpirePresence {
     protected float mDeltaMineralsPerHour;
     protected float mMaxGoods;
     protected float mMaxMinerals;
+    protected float mTaxPerHour;
     protected DateTime mGoodsZeroTime;
 
     public String getKey() {
@@ -55,6 +56,12 @@ public abstract class BaseEmpirePresence {
     }
     public void setDeltaMineralsPerHour(float d) {
         mDeltaMineralsPerHour = d;
+    }
+    public float getTaxPerHour() {
+        return mTaxPerHour;
+    }
+    public void setTaxPerHour(float tax) {
+        mTaxPerHour = tax;
     }
     public float getMaxGoods() {
         return mMaxGoods;

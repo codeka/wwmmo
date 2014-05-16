@@ -91,6 +91,15 @@
         android:text="Buildings 145"
         android:textAppearance="?android:attr/textAppearanceSmall" />
 
+    <TextView
+        android:id="@+id/taxes"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/total_colonies"
+        android:layout_alignLeft="@id/total_colonies"
+        android:text="Taxes: $123.45 / day"
+        android:visibility="gone" />
+
     <au.com.codeka.warworlds.ctrl.InfobarView
         android:id="@+id/infobar"
         android:layout_width="match_parent"
@@ -103,7 +112,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_alignParentRight="true"
-        android:layout_below="@+id/total_buildings"
+        android:layout_below="@+id/taxes"
         android:layout_marginLeft="@dimen/tablet_margin_5dp"
         android:layout_marginRight="@dimen/tablet_margin_5dp"
         android:text="Locate" />

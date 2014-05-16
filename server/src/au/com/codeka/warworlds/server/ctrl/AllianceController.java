@@ -58,6 +58,15 @@ public class AllianceController {
         }
     }
 
+    public boolean isSameAlliance(Empire empire1, Empire empire2) {
+        if (empire1.getAlliance() == null || empire2.getAlliance() == null) {
+            return false;
+        }
+
+        return ((Alliance) empire1.getAlliance()).getID() ==
+                ((Alliance) empire2.getAlliance()).getID();
+    }
+
     public List<AllianceRequest> getRequests(int allianceID, boolean includeWithdrawn, Integer cursor)
             throws RequestException {
         try {

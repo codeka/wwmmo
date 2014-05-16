@@ -158,6 +158,9 @@ message Empire
     // if set, this is the last date/time the empire's shield was updated (so we can detect if we
     // need to re-download it)
     optional int64 shield_image_last_update = 14;
+
+    // if set, this is the amount of taxes collected per hour for all stars in this empire combined.
+    optional double taxes_collected_per_hour = 15;
 }
 
 
