@@ -1,7 +1,5 @@
 package au.com.codeka.warworlds.server.ctrl;
 
-import com.mysql.jdbc.exceptions.jdbc4.MySQLTransactionRollbackException;
-
 import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.model.Star;
 
@@ -18,10 +16,6 @@ public class WormholeController {
         }
 
         srcWormhole.getWormholeExtra().tuneTo(destWormhole.getID());
-        try {
-            new StarController().update(srcWormhole);
-        } catch (MySQLTransactionRollbackException e) {
-            throw new RequestException(e);
-        }
+        new StarController().update(srcWormhole);
     }
 }

@@ -7,7 +7,6 @@
 	<classpathentry kind="lib" path="/common/libs/jregex1.2_01.jar"/>
 	<classpathentry kind="lib" path="/common/libs/slf4j-api-1.7.5.jar"/>
 	<classpathentry kind="lib" path="/common/libs/slf4j-jdk14-1.7.5.jar"/>
-	<classpathentry kind="lib" path="libs/mysql-connector-java-5.1.24-bin.jar"/>
 	<classpathentry kind="lib" path="/common/libs/joda-convert-1.2.jar"/>
 	<classpathentry kind="lib" path="/common/libs/joda-time-2.1.jar"/>
 	<classpathentry kind="lib" path="libs/spymemcached-2.8.7.jar"/>
@@ -53,5 +52,6 @@
 	<classpathentry kind="lib" path="libs/google-http-client-gson-1.18.0-rc.jar"/>
 	<classpathentry kind="lib" path="libs/google-oauth-client-1.18.0-rc.jar"/>
 	<classpathentry kind="lib" path="libs/gson-2.1.jar"/>
+	<classpathentry kind="lib" path="libs/postgresql-9.3-1101.jdbc41.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

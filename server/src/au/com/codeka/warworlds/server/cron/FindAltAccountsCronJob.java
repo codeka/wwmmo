@@ -80,7 +80,7 @@ public class FindAltAccountsCronJob extends CronJob {
         try (SqlStmt stmt = DB.prepare(sql)) {
             for (Messages.EmpireAltAccounts pb : alts) {
                 stmt.setInt(1, pb.getEmpireId());
-                stmt.setBlob(2, pb.toByteArray());
+                stmt.setBytes(2, pb.toByteArray());
                 stmt.update();
             }
         }

@@ -8,6 +8,7 @@ import java.io.InputStreamReader;
 import java.lang.reflect.Method;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -27,10 +28,10 @@ import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.common.protoformat.PbFormatter;
 import au.com.codeka.warworlds.server.ctrl.NotificationController;
 import au.com.codeka.warworlds.server.ctrl.SessionController;
+import au.com.codeka.warworlds.server.data.DB;
 import au.com.codeka.warworlds.server.handlers.admin.AdminGenericHandler;
 
 import com.google.protobuf.Message;
-import com.mysql.jdbc.exceptions.jdbc4.MySQLTransactionRollbackException;
 
 /**
  * This is the base class for the game's request handlers. It handles some common tasks such as
@@ -93,7 +94,8 @@ public class RequestHandler {
                 return; // break out of the retry loop
             } catch(RequestException e) {
                 Throwable cause = e.getCause();
-                if (cause instanceof MySQLTransactionRollbackException && supportsRetryOnDeadlock()) {
+                if (cause instanceof SQLException && DB.isRetryable((SQLException) cause)
+                        && supportsRetryOnDeadlock()) {
                     try {
                         Thread.sleep(50 + new Random().nextInt(100));
                     } catch (InterruptedException e1) {

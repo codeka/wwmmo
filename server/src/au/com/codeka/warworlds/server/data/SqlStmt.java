@@ -1,6 +1,5 @@
 package au.com.codeka.warworlds.server.data;
 
-import java.io.ByteArrayInputStream;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -96,12 +95,12 @@ public class SqlStmt implements AutoCloseable {
             saveParameter(position, value);
         }
     }
-    public void setBlob(int position, byte[] blob) throws SQLException {
-        if (blob == null) {
+    public void setBytes(int position, byte[] bytes) throws SQLException {
+        if (bytes == null) {
             setNull(position);
         } else {
-            mStmt.setBlob(position, new ByteArrayInputStream(blob));
-            saveParameter(position, "<BLOB>");
+            mStmt.setBytes(position, bytes);
+            saveParameter(position, String.format("<BLOB> %d bytes", bytes.length));
         }
     }
     public void setNull(int position) throws SQLException {

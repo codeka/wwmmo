@@ -86,6 +86,9 @@ public class AllianceController {
 
     public int addRequest(AllianceRequest request) throws RequestException {
         try {
+            // if there's a PNG image attached, make sure it's not too big
+            request.ensurePngImageMaxSize(128, 128);
+
             int requestID = db.addRequest(request);
             request.setID(requestID);
 
@@ -171,7 +174,7 @@ public class AllianceController {
         String sql = "INSERT INTO alliance_shields (alliance_id, create_date, image) VALUES (?, NOW(), ?)";
         try (SqlStmt stmt = db.prepare(sql)) {
             stmt.setInt(1, allianceID);
-            stmt.setBlob(2, pngImage);
+            stmt.setBytes(2, pngImage);
             stmt.update();
         } catch (Exception e) {
             throw new RequestException(e);
@@ -317,7 +320,7 @@ public class AllianceController {
                 } else {
                     stmt.setNull(9);
                 }
-                stmt.setBlob(10, request.getPngImage());
+                stmt.setBytes(10, request.getPngImage());
                 stmt.setString(11, request.getNewName());
                 stmt.update();
 

@@ -19,6 +19,7 @@ public class CronJobRegistry {
         sCronJobs.put("find-abandoned-empires", FindAbandonedEmpiresCronJob.class);
         sCronJobs.put("find-alts", FindAltAccountsCronJob.class);
         sCronJobs.put("update-dashboard", UpdateDashboardCronJob.class);
+        sCronJobs.put("fix-image-sizes", FixImageSizesCronJob.class);
     }
 
     public static CronJob getJob(String name) {

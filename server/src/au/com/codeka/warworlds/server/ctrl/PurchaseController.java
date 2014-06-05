@@ -49,7 +49,7 @@ public class PurchaseController {
                 stmt.setString(5, purchaseInfo.getPrice());
                 stmt.setString(6, purchaseInfo.getDeveloperPayload());
                 stmt.setDateTime(7, DateTime.now());
-                stmt.setBlob(8, purchaseExtra);
+                stmt.setBytes(8, purchaseExtra);
                 stmt.update();
             }
         }

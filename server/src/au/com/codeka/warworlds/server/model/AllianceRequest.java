@@ -8,6 +8,7 @@ import org.joda.time.DateTime;
 import au.com.codeka.common.model.BaseAllianceRequest;
 import au.com.codeka.common.model.BaseAllianceRequestVote;
 import au.com.codeka.common.protobuf.Messages;
+import au.com.codeka.warworlds.server.utils.ImageSizer;
 
 public class AllianceRequest extends BaseAllianceRequest {
     public AllianceRequest() {
@@ -43,6 +44,12 @@ public class AllianceRequest extends BaseAllianceRequest {
 
     public void setState(RequestState state) {
         mState = state;
+    }
+
+    public void ensurePngImageMaxSize(int maxWidth, int maxHeight) {
+        if (mPngImage != null) {
+            mPngImage = ImageSizer.ensureMaxSize(mPngImage, maxWidth, maxHeight);
+        }
     }
 
     @Override

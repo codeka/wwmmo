@@ -62,7 +62,7 @@ public class Star extends BaseStar {
         }
 
         try {
-            Messages.Planets planets_pb = Messages.Planets.parseFrom(rs.getBlob("planets").getBinaryStream());
+            Messages.Planets planets_pb = Messages.Planets.parseFrom(rs.getBytes("planets"));
             mPlanets = new BasePlanet[planets_pb.getPlanetsCount()];
             for (int i = 0; i < planets_pb.getPlanetsCount(); i++) {
                 mPlanets[i] = new Planet();
@@ -72,9 +72,9 @@ public class Star extends BaseStar {
         }
 
         try {
-            Blob extraBlob = rs.getBlob("extra");
+            byte[] extra = rs.getBytes("extra");
             if (!rs.wasNull()) {
-                Messages.Star.StarExtra star_extra_pb = Messages.Star.StarExtra.parseFrom(extraBlob.getBinaryStream());
+                Messages.Star.StarExtra star_extra_pb = Messages.Star.StarExtra.parseFrom(extra);
                 if (star_extra_pb.hasWormholeEmpireId()) {
                     mWormholeExtra = new WormholeExtra();
                     mWormholeExtra.fromProtocolBuffer(star_extra_pb);

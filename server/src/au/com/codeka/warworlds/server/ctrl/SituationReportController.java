@@ -96,7 +96,7 @@ public class SituationReportController {
                 stmt.setInt(1, Integer.parseInt(sitrep_pb.getEmpireKey()));
                 stmt.setInt(2, Integer.parseInt(sitrep_pb.getStarKey()));
                 stmt.setDateTime(3, new DateTime(sitrep_pb.getReportTime() * 1000, DateTimeZone.UTC));
-                stmt.setBlob(4, sitrep_pb.toByteArray());
+                stmt.setBytes(4, sitrep_pb.toByteArray());
                 stmt.setInt(5, getEventKinds(sitrep_pb));
                 stmt.update();
 

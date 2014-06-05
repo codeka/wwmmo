@@ -1,5 +1,6 @@
 package au.com.codeka.warworlds.server.data;
 
+import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -9,6 +10,9 @@ import org.slf4j.LoggerFactory;
 
 import com.jolbox.bonecp.BoneCP;
 import com.jolbox.bonecp.BoneCPConfig;
+import com.jolbox.bonecp.ConnectionHandle;
+import com.jolbox.bonecp.hooks.AbstractConnectionHook;
+import com.jolbox.bonecp.hooks.ConnectionHook;
 
 /**
  * This is a wrapper class that helps us with connecting to the database.
@@ -18,6 +22,7 @@ public class DB {
     private static String sJdbcUrl;
     private static String sUsername;
     private static String sPassword;
+    private static String sSchema;
     private static Strategy sStrategy;
 
     static {
@@ -25,7 +30,12 @@ public class DB {
         if (dbName == null) {
             dbName = "wwmmo";
         }
-        sJdbcUrl = String.format("jdbc:mysql://localhost:3306/%s?useUnicode=true&characterEncoding=utf8&allowMultiQueries=true", dbName);
+        sJdbcUrl = String.format("jdbc:postgresql://localhost:5432/%s", dbName);
+
+        sSchema = System.getProperty("au.com.codeka.warworlds.server.dbSchema");
+        if (sSchema == null) {
+            sSchema = "beta";
+        }
 
         sUsername = System.getProperty("au.com.codeka.warworlds.server.dbUser");
         if (sUsername == null) {
@@ -38,7 +48,7 @@ public class DB {
         }
 
         try {
-            Class.forName("com.mysql.jdbc.Driver");
+            Class.forName("org.postgresql.Driver");
         } catch (ClassNotFoundException e) {
             // TODO: should never happen!
         }
@@ -57,6 +67,16 @@ public class DB {
 
     public static Transaction beginTransaction() throws SQLException {
         return sStrategy.beginTransaction();
+    }
+
+    /** Determines whether the given {@link SQLException} was a constraint violation. */
+    public static boolean isConstraintViolation(SQLException e) {
+        return false; // TODO
+    }
+
+    /** Determines whether the given {@link SQLException} is retryable (e.g. deadlock, etc) */
+    public static boolean isRetryable(SQLException e) {
+        return false; // TODO
     }
 
     private interface Strategy {
@@ -79,6 +99,7 @@ public class DB {
             config.setConnectionTimeoutInMs(10000);
             config.setReleaseHelperThreads(0);
             config.setStatementReleaseHelperThreads(0);
+            config.setConnectionHook(mConnectionHook);
             try {
                 mConnPool = new BoneCP(config);
             } catch (SQLException e) {
@@ -102,6 +123,19 @@ public class DB {
         public Transaction beginTransaction() throws SQLException {
             return new Transaction(mConnPool.getConnection());
         }
+
+        private ConnectionHook mConnectionHook = new AbstractConnectionHook() {
+            @Override
+            public void onAcquire(ConnectionHandle connection) {
+                try {
+                    CallableStatement stmt = connection.getInternalConnection().prepareCall(
+                            String.format("SET search_path TO '%s'", sSchema));
+                    stmt.execute();
+                } catch (SQLException e) {
+                    log.error("Exception caught trying to set schema.", e);
+                }
+            }
+        };
     }
 
     @SuppressWarnings("unused") // we're using BoneCP now

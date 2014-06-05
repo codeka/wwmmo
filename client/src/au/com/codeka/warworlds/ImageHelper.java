@@ -9,9 +9,16 @@ import android.graphics.BitmapFactory;
 public class ImageHelper {
     private InputStream mInputStream;
     private Bitmap mImage;
+    private int mWidth;
+    private int mHeight;
 
     public ImageHelper(InputStream ins) {
         mInputStream = ins;
+    }
+    public ImageHelper(InputStream ins, int width, int height) {
+        mInputStream = ins;
+        mWidth = width;
+        mHeight = height;
     }
     public ImageHelper(byte[] bytes) {
         mInputStream = new ByteArrayInputStream(bytes);
@@ -26,14 +33,31 @@ public class ImageHelper {
     }
 
     private void loadImage() {
-        // if the stream supports mark (e.g. a local file vs. a "cloud" file) we can
-        // load the image using less memory, and therefore will prefer that. If it doesn't
-        // support mark then we don't have much choice...
-        if (mInputStream.markSupported()) {
+        if (mWidth > 0 && mHeight > 0) {
+            // If we known the width/height in advance (some content providers let you query for
+            // that directly) then it saves an extra decode of the image to calculate it.
+            loadImageWithKnownSize();
+        } else if (mInputStream.markSupported()) {
+            // if the stream supports mark (e.g. a local file vs. a "cloud" file) we can
+            // load the image using less memory, and therefore will prefer that. If it doesn't
+            // support mark then we don't have much choice...
             loadImageWithMark();
         } else {
             loadImageNoMark();
         }
+    }
+
+    private void loadImageWithKnownSize() {
+        int scale = 1;
+        while (mWidth / scale / 2 >= 100 && mHeight / scale / 2 >= 100) {
+            scale *= 2;
+        }
+
+        BitmapFactory.Options opts = new BitmapFactory.Options();
+        opts.inPurgeable = true;
+        opts.inInputShareable = true;
+        opts.inSampleSize = scale;
+        mImage = BitmapFactory.decodeStream(mInputStream, null, opts);
     }
 
     private void loadImageWithMark() {

@@ -58,7 +58,7 @@ public class ErrorReportsController {
                     stmt.setString(3, pb.getMessage());
                     stmt.setString(4, pb.getExceptionClass());
                     stmt.setString(5, pb.getContext());
-                    stmt.setBlob(6, pb.toByteArray());
+                    stmt.setBytes(6, pb.toByteArray());
                     stmt.update();
                 }
             }

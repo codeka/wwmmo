@@ -1,7 +1,5 @@
 package au.com.codeka.warworlds.server.handlers;
 
-import com.mysql.jdbc.exceptions.jdbc4.MySQLTransactionRollbackException;
-
 import au.com.codeka.common.model.BaseColony;
 import au.com.codeka.common.model.Simulation;
 import au.com.codeka.common.protobuf.Messages;
@@ -53,10 +51,6 @@ public class ColonyHandler extends RequestHandler {
         colony.setFarmingFocus(colony_pb.getFocusFarming() / focusTotal);
         colony.setMiningFocus(colony_pb.getFocusMining() / focusTotal);
 
-        try {
-            new StarController().update(star);
-        } catch (MySQLTransactionRollbackException e) {
-            throw new RequestException(e);
-        }
+        new StarController().update(star);
     }
 }

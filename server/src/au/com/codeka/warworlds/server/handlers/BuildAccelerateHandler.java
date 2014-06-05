@@ -1,7 +1,5 @@
 package au.com.codeka.warworlds.server.handlers;
 
-import com.mysql.jdbc.exceptions.jdbc4.MySQLTransactionRollbackException;
-
 import au.com.codeka.common.model.BaseBuildRequest;
 import au.com.codeka.common.model.Simulation;
 import au.com.codeka.warworlds.server.RequestException;
@@ -52,11 +50,7 @@ public class BuildAccelerateHandler extends RequestHandler {
                 } else {
                     // if it's not actually complete yet, just simulate the star again
                     sim.simulate(star);
-                    try {
-                        new StarController().update(star);
-                    } catch (MySQLTransactionRollbackException e) {
-                        throw new RequestException(e);
-                    }
+                    new StarController().update(star);
                 }
                 return;
             }
