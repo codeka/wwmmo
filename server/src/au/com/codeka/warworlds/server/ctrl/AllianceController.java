@@ -405,18 +405,18 @@ public class AllianceController {
             // if they're already voted for this request, then update the existing vote
             String sql = "SELECT id FROM alliance_request_votes " +
                          "WHERE alliance_request_id = ? AND empire_id = ?";
-            Integer id = null;
+            Long id = null;
             try (SqlStmt stmt = prepare(sql)) {
                 stmt.setInt(1, vote.getAllianceRequestID());
                 stmt.setInt(2, vote.getEmpireID());
-                id = (int) (long) stmt.selectFirstValue(Long.class);
+                id = stmt.selectFirstValue(Long.class);
             }
 
             if (id != null) {
                 sql = "UPDATE alliance_request_votes SET votes = ? WHERE id = ?";
                 try (SqlStmt stmt = prepare(sql)) {
                     stmt.setInt(1, vote.getVotes());
-                    stmt.setInt(2, (int) id);
+                    stmt.setInt(2, (int) (long) id);
                     stmt.update();
                 }
             } else {
