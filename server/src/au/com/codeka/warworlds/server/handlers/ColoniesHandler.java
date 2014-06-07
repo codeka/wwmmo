@@ -1,11 +1,15 @@
 package au.com.codeka.warworlds.server.handlers;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import au.com.codeka.common.model.BaseColony;
 import au.com.codeka.common.model.BaseFleet;
 import au.com.codeka.common.model.Simulation;
 import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.RequestHandler;
+import au.com.codeka.warworlds.server.ctrl.ChatController;
 import au.com.codeka.warworlds.server.ctrl.ColonyController;
 import au.com.codeka.warworlds.server.ctrl.EmpireController;
 import au.com.codeka.warworlds.server.ctrl.FleetController;
@@ -21,6 +25,8 @@ import au.com.codeka.warworlds.server.model.Star;
  * Handles the /realms/.../stars/<star_id>/colonies URLs.
  */
 public class ColoniesHandler extends RequestHandler {
+    private final Logger log = LoggerFactory.getLogger(ColoniesHandler.class);
+
     @Override
     protected void post() throws RequestException {
         Messages.ColonizeRequest colonize_request_pb = getRequestBody(Messages.ColonizeRequest.class);

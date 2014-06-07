@@ -195,16 +195,27 @@ public class ColonyController {
                 throw new RequestException(e);
             }
 
-            sql = "INSERT INTO empire_presences" +
-                    " (empire_id, star_id, total_goods, total_minerals)" +
-                    " VALUES (?, ?, 100, 100)";
-            try (SqlStmt stmt = db.prepare(sql)) {
-                stmt.setInt(1, empire.getID());
-                stmt.setInt(2, star.getID());
-                stmt.update();
-            } catch(Exception e) {
-                //TODO need to emulate INSERT IGNORE
-                //throw new RequestException(e);
+            // only insert a new empire_presences row if there's not one already there
+            int numExistingColonies = 0;
+            for (BaseColony baseColony : star.getColonies()) {
+                Colony existingColony = (Colony) baseColony;
+                if (existingColony.getEmpireID() != null &&
+                        existingColony.getEmpireID() == empire.getID()) {
+                    numExistingColonies ++;
+                }
+            }
+
+            if (numExistingColonies == 0) {
+                sql = "INSERT INTO empire_presences" +
+                        " (empire_id, star_id, total_goods, total_minerals)" +
+                        " VALUES (?, ?, 100, 100)";
+                try (SqlStmt stmt = db.prepare(sql)) {
+                    stmt.setInt(1, empire.getID());
+                    stmt.setInt(2, star.getID());
+                    stmt.update();
+                } catch(Exception e) {
+                    throw new RequestException(e);
+                }
             }
         }
 

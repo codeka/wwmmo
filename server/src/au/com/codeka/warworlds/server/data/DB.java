@@ -128,6 +128,8 @@ public class DB {
             @Override
             public void onAcquire(ConnectionHandle connection) {
                 try {
+                    connection.getInternalConnection().setAutoCommit(true);
+
                     CallableStatement stmt = connection.getInternalConnection().prepareCall(
                             String.format("SET search_path TO '%s'", sSchema));
                     stmt.execute();
