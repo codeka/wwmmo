@@ -55,6 +55,10 @@ public class ChatMessage extends BaseChatMessage {
         mID = id;
     }
     public int getEmpireID() {
+        // TODO: fixme
+        if (mEmpireID == null) {
+            return 0;
+        }
         return mEmpireID;
     }
     public int getAllianceID() {
