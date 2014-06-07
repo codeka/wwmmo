@@ -1,9 +1,10 @@
 package au.com.codeka.warworlds.server;
 
-import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import org.joda.time.DateTime;
+
+import au.com.codeka.warworlds.server.data.SqlResult;
 
 /**
  * Represents details about the current session, such as your username, empire_id and so on.
@@ -22,15 +23,15 @@ public class Session {
 
     public Session() {
     }
-    public Session(ResultSet rs) throws SQLException {
-        mCookie = rs.getString("session_cookie");
-        mActualEmail = rs.getString("user_email");
+    public Session(SqlResult res) throws SQLException {
+        mCookie = res.getString("session_cookie");
+        mActualEmail = res.getString("user_email");
         mEmail = mActualEmail;
-        mLoginTime = new DateTime(rs.getTimestamp("login_time").getTime());
-        mEmpireID = rs.getInt("empire_id");
-        mAllianceID = rs.getInt("alliance_id");
-        mIsAdmin = rs.getInt("is_admin") == 1;
-        mAllowInlineNotifications = (rs.getInt("inline_notifications") == 1);
+        mLoginTime = res.getDateTime("login_time");
+        mEmpireID = res.getInt("empire_id");
+        mAllianceID = res.getInt("alliance_id");
+        mIsAdmin = res.getInt("is_admin") == 1;
+        mAllowInlineNotifications = (res.getInt("inline_notifications") == 1);
     }
     public Session(Session copy) {
         mCookie = copy.mCookie;

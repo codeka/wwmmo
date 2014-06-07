@@ -1,12 +1,12 @@
 package au.com.codeka.warworlds.server.ctrl;
 
-import java.sql.ResultSet;
 import java.util.HashMap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import au.com.codeka.warworlds.server.data.DB;
+import au.com.codeka.warworlds.server.data.SqlResult;
 import au.com.codeka.warworlds.server.data.SqlStmt;
 
 /** Profanity filter looks at a string and returns an integer describing the "profanity level"
@@ -51,10 +51,10 @@ public class ProfanityFilter {
 
         String sql = "SELECT * FROM chat_profane_words";
         try (SqlStmt stmt = DB.prepare(sql)) {
-            ResultSet rs = stmt.select();
-            while (rs.next()) {
-                int profanityLevel = rs.getInt("profanity_level");
-                String words = rs.getString("words");
+            SqlResult res = stmt.select();
+            while (res.next()) {
+                int profanityLevel = res.getInt("profanity_level");
+                String words = res.getString("words");
 
                 for (String word : words.split("\\s+")) {
                     sProfaneWords.put(word.trim().toLowerCase(), profanityLevel);

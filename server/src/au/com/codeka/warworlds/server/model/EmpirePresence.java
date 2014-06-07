@@ -1,9 +1,9 @@
 package au.com.codeka.warworlds.server.model;
 
-import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import au.com.codeka.common.model.BaseEmpirePresence;
+import au.com.codeka.warworlds.server.data.SqlResult;
 
 public class EmpirePresence extends BaseEmpirePresence {
     private int mID;
@@ -12,15 +12,15 @@ public class EmpirePresence extends BaseEmpirePresence {
 
     public EmpirePresence() {
     }
-    public EmpirePresence(ResultSet rs) throws SQLException {
-        mID = rs.getInt("id");
+    public EmpirePresence(SqlResult res) throws SQLException {
+        mID = res.getInt("id");
         mKey = Integer.toString(mID);
-        mStarID = rs.getInt("star_id");
+        mStarID = res.getInt("star_id");
         mStarKey = Integer.toString(mStarID);
-        mEmpireID = rs.getInt("empire_id");
+        mEmpireID = res.getInt("empire_id");
         mEmpireKey = Integer.toString(mEmpireID);
-        mTotalGoods = rs.getFloat("total_goods");
-        mTotalMinerals = rs.getFloat("total_minerals");
+        mTotalGoods = res.getFloat("total_goods");
+        mTotalMinerals = res.getFloat("total_minerals");
     }
 
     public int getID() {

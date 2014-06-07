@@ -1,7 +1,6 @@
 package au.com.codeka.warworlds.server.ctrl;
 
 import java.io.IOException;
-import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -17,6 +16,7 @@ import org.slf4j.LoggerFactory;
 import au.com.codeka.common.model.BaseChatConversationParticipant;
 import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.data.DB;
+import au.com.codeka.warworlds.server.data.SqlResult;
 import au.com.codeka.warworlds.server.data.SqlStmt;
 import au.com.codeka.warworlds.server.handlers.NotificationHandler;
 import au.com.codeka.warworlds.server.model.ChatConversation;
@@ -119,11 +119,11 @@ public class NotificationController {
                     " WHERE empires.id IN " + BaseDataBase.buildInClause(participants) +
                       " AND gcm_registration_id IS NOT NULL";
         try (SqlStmt stmt = DB.prepare(sql)) {
-            ResultSet rs = stmt.select();
-            while (rs.next()) {
-                String registrationId = rs.getString(1);
-                String email = rs.getString(2);
-                int empireID = rs.getInt(3);
+            SqlResult res = stmt.select();
+            while (res.next()) {
+                String registrationId = res.getString(1);
+                String email = res.getString(2);
+                int empireID = res.getInt(3);
 
                 if (doneEmpires.contains(empireID)) {
                     continue;

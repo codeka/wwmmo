@@ -1,6 +1,5 @@
 package au.com.codeka.warworlds.server.handlers.admin;
 
-import java.sql.ResultSet;
 import java.util.TreeMap;
 
 import org.slf4j.Logger;
@@ -8,6 +7,7 @@ import org.slf4j.LoggerFactory;
 
 import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.data.DB;
+import au.com.codeka.warworlds.server.data.SqlResult;
 import au.com.codeka.warworlds.server.data.SqlStmt;
 import au.com.codeka.warworlds.server.data.Transaction;
 
@@ -22,12 +22,12 @@ public class AdminChatProfanityHandler extends AdminGenericHandler {
 
         String sql = "SELECT * FROM chat_profane_words";
         try (SqlStmt stmt = DB.prepare(sql)) {
-            ResultSet rs = stmt.select();
-            while (rs.next()) {
-                if (rs.getInt("profanity_level") == 1) {
-                    data.put("mild", rs.getString("words"));
+            SqlResult res = stmt.select();
+            while (res.next()) {
+                if (res.getInt("profanity_level") == 1) {
+                    data.put("mild", res.getString("words"));
                 } else {
-                    data.put("strong", rs.getString("words"));
+                    data.put("strong", res.getString("words"));
                 }
             }
         } catch(Exception e) {

@@ -1,6 +1,5 @@
 package au.com.codeka.warworlds.server.handlers.admin;
 
-import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.TreeMap;
 
@@ -9,6 +8,7 @@ import org.slf4j.LoggerFactory;
 
 import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.data.DB;
+import au.com.codeka.warworlds.server.data.SqlResult;
 import au.com.codeka.warworlds.server.data.SqlStmt;
 
 public class AdminChatSinbinHandler extends AdminGenericHandler {
@@ -26,14 +26,14 @@ public class AdminChatSinbinHandler extends AdminGenericHandler {
                     " ORDER BY expiry DESC" +
                     " LIMIT 50";
         try (SqlStmt stmt = DB.prepare(sql)) {
-            ResultSet rs = stmt.select();
+            SqlResult res = stmt.select();
             ArrayList<TreeMap<String, Object>> sinbin = new ArrayList<TreeMap<String, Object>>();
-            while (rs.next()) {
+            while (res.next()) {
                 TreeMap<String, Object> result = new TreeMap<String, Object>();
-                result.put("empire_id", rs.getInt("empire_id"));
-                result.put("expiry", rs.getTimestamp("expiry").getTime());
-                result.put("empireName", rs.getString("name"));
-                result.put("userEmail", rs.getString("user_email"));
+                result.put("empire_id", res.getInt("empire_id"));
+                result.put("expiry", res.getDateTime("expiry"));
+                result.put("empireName", res.getString("name"));
+                result.put("userEmail", res.getString("user_email"));
 
                 sinbin.add(result);
             }
@@ -54,21 +54,21 @@ public class AdminChatSinbinHandler extends AdminGenericHandler {
              " ORDER BY reported_date DESC" +
              " LIMIT 50";
         try (SqlStmt stmt = DB.prepare(sql)) {
-            ResultSet rs = stmt.select();
+            SqlResult res = stmt.select();
             ArrayList<TreeMap<String, Object>> reports = new ArrayList<TreeMap<String, Object>>();
-            while (rs.next()) {
+            while (res.next()) {
                 TreeMap<String, Object> report = new TreeMap<String, Object>();
-                report.put("empire_id", rs.getInt("empire_id"));
-                report.put("reporting_empire_id", rs.getInt("reporting_empire_id"));
-                report.put("reported_date", rs.getTimestamp("reported_date").getTime());
-                report.put("message", rs.getString("message"));
-                report.put("message_en", rs.getString("message_en"));
-                report.put("profanity_level", rs.getInt("profanity_level"));
-                report.put("posted_date", rs.getTimestamp("posted_date").getTime());
-                report.put("empire_name", rs.getString("empire_name"));
-                report.put("empire_user_email", rs.getString("empire_user_email"));
-                report.put("reporting_empire_name", rs.getString("reporting_empire_name"));
-                report.put("reporting_empire_user_email", rs.getString("reporting_empire_user_email"));
+                report.put("empire_id", res.getInt("empire_id"));
+                report.put("reporting_empire_id", res.getInt("reporting_empire_id"));
+                report.put("reported_date", res.getDateTime("reported_date"));
+                report.put("message", res.getString("message"));
+                report.put("message_en", res.getString("message_en"));
+                report.put("profanity_level", res.getInt("profanity_level"));
+                report.put("posted_date", res.getDateTime("posted_date"));
+                report.put("empire_name", res.getString("empire_name"));
+                report.put("empire_user_email", res.getString("empire_user_email"));
+                report.put("reporting_empire_name", res.getString("reporting_empire_name"));
+                report.put("reporting_empire_user_email", res.getString("reporting_empire_user_email"));
 
                 reports.add(report);
             }

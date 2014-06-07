@@ -1,6 +1,5 @@
 package au.com.codeka.warworlds.server.ctrl;
 
-import java.sql.ResultSet;
 import java.util.Locale;
 
 import org.joda.time.DateTime;
@@ -9,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import au.com.codeka.warworlds.server.RequestException;
+import au.com.codeka.warworlds.server.data.SqlResult;
 import au.com.codeka.warworlds.server.data.SqlStmt;
 import au.com.codeka.warworlds.server.data.Transaction;
 import au.com.codeka.warworlds.server.model.ChatMessage;
@@ -154,9 +154,9 @@ public class ChatAbuseController {
             String sql = "SELECT expiry FROM chat_sinbin WHERE empire_id = ?";
             try (SqlStmt stmt = prepare(sql)) {
                 stmt.setInt(1, empireID);
-                ResultSet rs = stmt.select();
-                while (rs.next()) {
-                    DateTime expiry = new DateTime(rs.getTimestamp(1).getTime());
+                SqlResult res = stmt.select();
+                while (res.next()) {
+                    DateTime expiry = res.getDateTime(1);
                     if (Days.daysBetween(expiry, lastPenalty).getDays() > 7) {
                         break;
                     }

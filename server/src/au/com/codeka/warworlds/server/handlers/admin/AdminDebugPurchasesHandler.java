@@ -1,15 +1,13 @@
 package au.com.codeka.warworlds.server.handlers.admin;
 
-import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.TreeMap;
-
-import org.joda.time.DateTime;
 
 import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.common.protoformat.PbFormatter;
 import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.data.DB;
+import au.com.codeka.warworlds.server.data.SqlResult;
 import au.com.codeka.warworlds.server.data.SqlStmt;
 
 public class AdminDebugPurchasesHandler extends AdminHandler {
@@ -24,15 +22,15 @@ public class AdminDebugPurchasesHandler extends AdminHandler {
                     " INNER JOIN empires ON empires.id = purchases.empire_id" +
                     " ORDER BY time DESC";
         try (SqlStmt stmt = DB.prepare(sql)) {
-            ResultSet rs = stmt.select();
+            SqlResult res = stmt.select();
             ArrayList<TreeMap<String, Object>> results = new ArrayList<TreeMap<String, Object>>();
-            while (rs.next()) {
+            while (res.next()) {
                 TreeMap<String, Object> result = new TreeMap<String, Object>();
-                result.put("time", new DateTime(rs.getTimestamp("time").getTime()));
-                result.put("sku", rs.getString("sku"));
-                result.put("empireName", rs.getString("name"));
-                result.put("price", rs.getString("price"));
-                result.put("skuExtra", getSkuExtra(rs));
+                result.put("time", res.getDateTime("time"));
+                result.put("sku", res.getString("sku"));
+                result.put("empireName", res.getString("name"));
+                result.put("price", res.getString("price"));
+                result.put("skuExtra", getSkuExtra(res));
                 results.add(result);
             }
             data.put("purchases", results);
@@ -43,14 +41,14 @@ public class AdminDebugPurchasesHandler extends AdminHandler {
         render("admin/debug/purchases.html", data);
     }
 
-    private static String getSkuExtra(ResultSet rs) throws Exception {
-        String skuName = rs.getString("sku");
+    private static String getSkuExtra(SqlResult res) throws Exception {
+        String skuName = res.getString("sku");
         if (skuName.equals("rename_empire")) {
-            return getRenameEmpireSkuExtra(rs.getBytes("sku_extra"));
+            return getRenameEmpireSkuExtra(res.getBytes("sku_extra"));
         } else if (skuName.equals("decorate_empire")) {
-            return getDecorateEmpireSkuExtra(rs.getBytes("sku_extra"));
+            return getDecorateEmpireSkuExtra(res.getBytes("sku_extra"));
         } else if (skuName.equals("star_rename")) {
-            return getStarRenameSkuExtra(rs.getBytes("sku_extra"));
+            return getStarRenameSkuExtra(res.getBytes("sku_extra"));
         }
         return "{}";
     }

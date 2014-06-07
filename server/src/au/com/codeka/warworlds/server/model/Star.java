@@ -1,13 +1,8 @@
 package au.com.codeka.warworlds.server.model;
 
 import java.io.IOException;
-import java.sql.Blob;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Timestamp;
 import java.util.ArrayList;
-
-import org.joda.time.DateTime;
 
 import au.com.codeka.common.model.BaseBuildRequest;
 import au.com.codeka.common.model.BaseBuilding;
@@ -18,6 +13,7 @@ import au.com.codeka.common.model.BaseFleet;
 import au.com.codeka.common.model.BasePlanet;
 import au.com.codeka.common.model.BaseStar;
 import au.com.codeka.common.protobuf.Messages;
+import au.com.codeka.warworlds.server.data.SqlResult;
 
 public class Star extends BaseStar {
     private int mID;
@@ -39,30 +35,22 @@ public class Star extends BaseStar {
         mColonies = new ArrayList<BaseColony>();
         mFleets = new ArrayList<BaseFleet>();
     }
-    public Star(ResultSet rs) throws SQLException {
-        mID = rs.getInt("id");
+    public Star(SqlResult res) throws SQLException {
+        mID = res.getInt("id");
         mKey = Integer.toString(mID);
-        mSectorID = rs.getInt("sector_id");
-        mSectorX = rs.getLong("sector_x");
-        mSectorY = rs.getLong("sector_y");
-        mOffsetX = rs.getInt("x");
-        mOffsetY = rs.getInt("y");
-        mName = rs.getString("name");
-        mSize = rs.getInt("size");
-        mStarType = sStarTypes[rs.getInt("star_type")];
-
-        Timestamp lastSimulation = rs.getTimestamp("last_simulation");
-        if (lastSimulation != null) {
-            mLastSimulation = new DateTime(lastSimulation.getTime());
-        }
-
-        Timestamp timeEmptied = rs.getTimestamp("time_emptied");
-        if (timeEmptied != null) {
-            mTimeEmptied = new DateTime(timeEmptied.getTime());
-        }
+        mSectorID = res.getInt("sector_id");
+        mSectorX = res.getLong("sector_x");
+        mSectorY = res.getLong("sector_y");
+        mOffsetX = res.getInt("x");
+        mOffsetY = res.getInt("y");
+        mName = res.getString("name");
+        mSize = res.getInt("size");
+        mStarType = sStarTypes[res.getInt("star_type")];
+        mLastSimulation = res.getDateTime("last_simulation");
+        mTimeEmptied = res.getDateTime("time_emptied");
 
         try {
-            Messages.Planets planets_pb = Messages.Planets.parseFrom(rs.getBytes("planets"));
+            Messages.Planets planets_pb = Messages.Planets.parseFrom(res.getBytes("planets"));
             mPlanets = new BasePlanet[planets_pb.getPlanetsCount()];
             for (int i = 0; i < planets_pb.getPlanetsCount(); i++) {
                 mPlanets[i] = new Planet();
@@ -72,8 +60,8 @@ public class Star extends BaseStar {
         }
 
         try {
-            byte[] extra = rs.getBytes("extra");
-            if (!rs.wasNull()) {
+            byte[] extra = res.getBytes("extra");
+            if (extra != null) {
                 Messages.Star.StarExtra star_extra_pb = Messages.Star.StarExtra.parseFrom(extra);
                 if (star_extra_pb.hasWormholeEmpireId()) {
                     mWormholeExtra = new WormholeExtra();

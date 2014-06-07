@@ -1,6 +1,5 @@
 package au.com.codeka.warworlds.server.events;
 
-import java.sql.ResultSet;
 import java.util.ArrayList;
 
 import org.joda.time.DateTime;
@@ -18,6 +17,7 @@ import au.com.codeka.warworlds.server.ctrl.RealmController;
 import au.com.codeka.warworlds.server.ctrl.SituationReportController;
 import au.com.codeka.warworlds.server.ctrl.StarController;
 import au.com.codeka.warworlds.server.data.DB;
+import au.com.codeka.warworlds.server.data.SqlResult;
 import au.com.codeka.warworlds.server.data.SqlStmt;
 import au.com.codeka.warworlds.server.model.Colony;
 import au.com.codeka.warworlds.server.model.EmpirePresence;
@@ -39,10 +39,10 @@ public class EmpireStarGoodsReachedZeroEvent extends Event {
                     " WHERE goods_zero_time IS NOT NULL AND goods_zero_time < ?";
         try (SqlStmt stmt = DB.prepare(sql)) {
             stmt.setDateTime(1, DateTime.now().plusSeconds(10));
-            ResultSet rs = stmt.select();
-            while (rs.next()) {
-                int id = rs.getInt(1);
-                int starID = rs.getInt(2);
+            SqlResult res = stmt.select();
+            while (res.next()) {
+                int id = res.getInt(1);
+                int starID = res.getInt(2);
 
                 RequestContext.i.setContext("event: EmpireStarGoodsReachedZero star.id="+starID);
 
@@ -96,7 +96,7 @@ public class EmpireStarGoodsReachedZeroEvent extends Event {
                 Messages.SituationReport.StarRunOutOfGoodsRecord.Builder ran_out_of_goods_pb = Messages.SituationReport.StarRunOutOfGoodsRecord.newBuilder();
                 for (BaseColony baseColony : star.getColonies()) {
                     Colony colony = (Colony) baseColony;
-                    if (colony.getEmpireID() == empire.getEmpireID()) {
+                    if (colony.getEmpireID() != null && colony.getEmpireID() == empire.getEmpireID()) {
                         ran_out_of_goods_pb.setColonyKey(colony.getKey());
                         break;
                     }

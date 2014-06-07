@@ -1,6 +1,5 @@
 package au.com.codeka.warworlds.server.model;
 
-import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import org.json.simple.JSONObject;
@@ -8,15 +7,16 @@ import org.json.simple.JSONObject;
 import au.com.codeka.common.model.BaseFleet;
 import au.com.codeka.common.model.BaseFleetUpgrade;
 import au.com.codeka.common.protobuf.Messages;
+import au.com.codeka.warworlds.server.data.SqlResult;
 
 public class FleetUpgrade extends BaseFleetUpgrade {
     public FleetUpgrade() {
     }
-    protected FleetUpgrade(ResultSet rs) throws SQLException {
-        mFleetID = rs.getInt("fleet_id");
-        mUpgradeID = rs.getString("upgrade_id");
-        mStarID = rs.getInt("star_id");
-        mExtra = rs.getString("extra");
+    protected FleetUpgrade(SqlResult res) throws SQLException {
+        mFleetID = res.getInt("fleet_id");
+        mUpgradeID = res.getString("upgrade_id");
+        mStarID = res.getInt("star_id");
+        mExtra = res.getString("extra");
     }
     public FleetUpgrade(int starID, int fleetID, String upgradeID) {
         mFleetID = fleetID;
@@ -29,12 +29,12 @@ public class FleetUpgrade extends BaseFleetUpgrade {
         mStarID = copy.mStarID;
     }
 
-    public static FleetUpgrade create(ResultSet rs) throws SQLException {
-        String id = rs.getString("upgrade_id");
+    public static FleetUpgrade create(SqlResult res) throws SQLException {
+        String id = res.getString("upgrade_id");
         if (id.equals("boost")) {
-            return new BoostFleetUpgrade(rs);
+            return new BoostFleetUpgrade(res);
         } else {
-            return new FleetUpgrade(rs);
+            return new FleetUpgrade(res);
         }
     }
 
@@ -52,8 +52,8 @@ public class FleetUpgrade extends BaseFleetUpgrade {
 
         public BoostFleetUpgrade() {
         }
-        public BoostFleetUpgrade(ResultSet rs) throws SQLException {
-            super(rs);
+        public BoostFleetUpgrade(SqlResult res) throws SQLException {
+            super(res);
             parseExtra();
         }
 

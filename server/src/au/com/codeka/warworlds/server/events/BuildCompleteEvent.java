@@ -1,6 +1,5 @@
 package au.com.codeka.warworlds.server.events;
 
-import java.sql.ResultSet;
 import java.util.ArrayList;
 
 import org.joda.time.DateTime;
@@ -21,6 +20,7 @@ import au.com.codeka.warworlds.server.ctrl.RealmController;
 import au.com.codeka.warworlds.server.ctrl.SituationReportController;
 import au.com.codeka.warworlds.server.ctrl.StarController;
 import au.com.codeka.warworlds.server.data.DB;
+import au.com.codeka.warworlds.server.data.SqlResult;
 import au.com.codeka.warworlds.server.data.SqlStmt;
 import au.com.codeka.warworlds.server.model.Colony;
 import au.com.codeka.warworlds.server.model.Empire;
@@ -45,9 +45,9 @@ public class BuildCompleteEvent extends Event {
                     " LIMIT 10"; // just do ten at a time, which will allow us to interleve other events
         try (SqlStmt stmt = DB.prepare(sql)) {
             stmt.setDateTime(1, DateTime.now().plusSeconds(10)); // anything in the next 10 seconds is a candidate
-            ResultSet rs = stmt.select();
-            while (rs.next()) {
-                int id = rs.getInt(1);
+            SqlResult res = stmt.select();
+            while (res.next()) {
+                int id = res.getInt(1);
 
                 RequestContext.i.setContext("event: BuildCompleteEvent build_request.id="+id);
 
@@ -60,26 +60,17 @@ public class BuildCompleteEvent extends Event {
                 }
                 processedIDs.add(id);
 
-                int starID = rs.getInt(2);
-                int colonyID = rs.getInt(3);
-                int empireID = rs.getInt(4);
-                Integer existingBuildingID = rs.getInt(5);
-                if (rs.wasNull()) {
-                    existingBuildingID = null;
-                }
-                Integer existingFleetID = rs.getInt(6);
-                if (rs.wasNull()) {
-                    existingFleetID = null;
-                }
-                String upgradeID = rs.getString(7);
-                if (rs.wasNull()) {
-                    upgradeID = null;
-                }
-                DesignKind designKind = DesignKind.fromNumber(rs.getInt(8));
-                String designID = rs.getString(9);
-                float count = rs.getFloat(10);
-                String notes = rs.getString(11);
-                boolean disableNotification = (rs.getInt(12) > 0);
+                int starID = res.getInt(2);
+                int colonyID = res.getInt(3);
+                int empireID = res.getInt(4);
+                Integer existingBuildingID = res.getInt(5);
+                Integer existingFleetID = res.getInt(6);
+                String upgradeID = res.getString(7);
+                DesignKind designKind = DesignKind.fromNumber(res.getInt(8));
+                String designID = res.getString(9);
+                float count = res.getFloat(10);
+                String notes = res.getString(11);
+                boolean disableNotification = (res.getInt(12) > 0);
 
                 Star star = new StarController().getStar(starID);
                 Colony colony = null;

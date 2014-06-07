@@ -1,12 +1,12 @@
 package au.com.codeka.warworlds.server.handlers.admin;
 
-import java.sql.ResultSet;
 import java.util.TreeMap;
 
 import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.common.protoformat.PbFormatter;
 import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.data.DB;
+import au.com.codeka.warworlds.server.data.SqlResult;
 import au.com.codeka.warworlds.server.data.SqlStmt;
 
 public class AdminEmpireAltsHandler extends AdminHandler {
@@ -24,9 +24,9 @@ public class AdminEmpireAltsHandler extends AdminHandler {
             String sql = "SELECT alt_blob FROM empire_alts WHERE empire_id = ?";
             try (SqlStmt stmt = DB.prepare(sql)) {
                 stmt.setInt(1, empireID);
-                ResultSet rs = stmt.select();
-                if (rs.next()) {
-                    byte[] blob = rs.getBytes(1);
+                SqlResult res = stmt.select();
+                if (res.next()) {
+                    byte[] blob = res.getBytes(1);
                     Messages.EmpireAltAccounts pb = Messages.EmpireAltAccounts.parseFrom(blob);
                     data.put("alts", PbFormatter.toJson(pb));
                 }

@@ -1,6 +1,5 @@
 package au.com.codeka.warworlds.server.ctrl;
 
-import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
@@ -11,6 +10,7 @@ import org.joda.time.DateTimeZone;
 
 import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.server.RequestException;
+import au.com.codeka.warworlds.server.data.SqlResult;
 import au.com.codeka.warworlds.server.data.SqlStmt;
 import au.com.codeka.warworlds.server.data.Transaction;
 
@@ -134,11 +134,11 @@ public class SituationReportController {
                     stmt.setInt(i, 1 << filter.getNumber());
                     i++;
                 }
-                ResultSet rs = stmt.select();
+                SqlResult res = stmt.select();
 
                 ArrayList<Messages.SituationReport> reports = new ArrayList<Messages.SituationReport>();
-                while (rs.next()) {
-                    reports.add(Messages.SituationReport.parseFrom(rs.getBytes(1)));
+                while (res.next()) {
+                    reports.add(Messages.SituationReport.parseFrom(res.getBytes(1)));
                 }
                 return reports;
             }

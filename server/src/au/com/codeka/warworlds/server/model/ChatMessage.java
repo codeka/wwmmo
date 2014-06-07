@@ -1,41 +1,38 @@
 package au.com.codeka.warworlds.server.model;
 
-import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import org.joda.time.DateTime;
 
 import au.com.codeka.common.model.BaseChatMessage;
 import au.com.codeka.common.protobuf.Messages;
+import au.com.codeka.warworlds.server.data.SqlResult;
 
 public class ChatMessage extends BaseChatMessage {
-    private int mEmpireID;
-    private int mAllianceID;
+    private Integer mEmpireID;
+    private Integer mAllianceID;
 
     public ChatMessage() {
     }
-    public ChatMessage(ResultSet rs) throws SQLException {
-        mID = rs.getInt("id");
-        mEmpireID = rs.getInt("empire_id");
-        if (!rs.wasNull()) {
+    public ChatMessage(SqlResult res) throws SQLException {
+        mID = res.getInt("id");
+        mEmpireID = res.getInt("empire_id");
+        if (mEmpireID != null) {
             mEmpireKey = Integer.toString(mEmpireID);
         }
-        mAllianceID = rs.getInt("alliance_id");
-        if (!rs.wasNull()) {
+        mAllianceID = res.getInt("alliance_id");
+        if (mAllianceID != null) {
             mAllianceKey = Integer.toString(mAllianceID);
         }
-        mDatePosted = new DateTime(rs.getTimestamp("posted_date").getTime());
-        mMessage = rs.getString("message");
-        mMessageEn = rs.getString("message_en");
-        mConversationID = rs.getInt("conversation_id");
-        if (rs.wasNull()) {
-            mConversationID = null;
-        }
-        int action = rs.getInt("action");
-        if (!rs.wasNull()) {
+        mDatePosted = res.getDateTime("posted_date");
+        mMessage = res.getString("message");
+        mMessageEn = res.getString("message_en");
+        mConversationID = res.getInt("conversation_id");
+        Integer action = res.getInt("action");
+        if (action != null) {
             mAction = MessageAction.fromNumber(action);
         }
-        mProfanityLevel = rs.getInt("profanity_level");
+        mProfanityLevel = res.getInt("profanity_level");
     }
     public ChatMessage(int empireID, String message, MessageAction action, int conversationID) {
         mEmpireID = empireID;

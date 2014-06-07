@@ -1,7 +1,5 @@
 package au.com.codeka.warworlds.server.handlers;
 
-import java.sql.ResultSet;
-
 import org.joda.time.DateTime;
 
 import au.com.codeka.common.protobuf.Messages;
@@ -9,6 +7,7 @@ import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.RequestHandler;
 import au.com.codeka.warworlds.server.ctrl.ChatController;
 import au.com.codeka.warworlds.server.data.DB;
+import au.com.codeka.warworlds.server.data.SqlResult;
 import au.com.codeka.warworlds.server.data.SqlStmt;
 import au.com.codeka.warworlds.server.model.ChatMessage;
 
@@ -83,11 +82,11 @@ public class ChatHandler extends RequestHandler {
             if (conversationID != null && conversationID > 0) {
                 stmt.setInt(i++, conversationID);
             }
-            ResultSet rs = stmt.select();
+            SqlResult res = stmt.select();
 
             Messages.ChatMessages.Builder chat_msgs_pb = Messages.ChatMessages.newBuilder();
-            while (rs.next()) {
-                ChatMessage msg = new ChatMessage(rs);
+            while (res.next()) {
+                ChatMessage msg = new ChatMessage(res);
                 Messages.ChatMessage.Builder chat_msg_pb = Messages.ChatMessage.newBuilder();
                 msg.toProtocolBuffer(chat_msg_pb, true);
                 chat_msgs_pb.addMessages(chat_msg_pb);

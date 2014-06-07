@@ -1,6 +1,5 @@
 package au.com.codeka.warworlds.server.handlers.admin;
 
-import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Map;
@@ -14,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import au.com.codeka.common.TimeFormatter;
 import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.data.DB;
+import au.com.codeka.warworlds.server.data.SqlResult;
 import au.com.codeka.warworlds.server.data.SqlStmt;
 
 public class AdminDashboardHandler extends AdminHandler {
@@ -45,12 +45,12 @@ public class AdminDashboardHandler extends AdminHandler {
                     " ORDER BY date DESC" +
                     " LIMIT 60";
         try (SqlStmt stmt = DB.prepare(sql)) {
-            ResultSet rs = stmt.select();
-            while (rs.next()) {
-                DateTime dt = new DateTime(rs.getTimestamp(1).getTime());
-                int oneDA = rs.getInt(2);
-                int sevenDA = rs.getInt(3);
-                int newSignups = rs.getInt(4);
+            SqlResult res = stmt.select();
+            while (res.next()) {
+                DateTime dt = res.getDateTime(1);
+                int oneDA = res.getInt(2);
+                int sevenDA = res.getInt(3);
+                int newSignups = res.getInt(4);
 
                 int index = Days.daysBetween(dt, now).getDays();
                 if (index < 60) {
@@ -88,9 +88,9 @@ public class AdminDashboardHandler extends AdminHandler {
                 " WHERE empire_count > 0" +
                 " ORDER BY last_simulation ASC LIMIT 2";
         try (SqlStmt stmt = DB.prepare(sql)) {
-            ResultSet rs = stmt.select();
-            while (rs.next()) {
-                starID = rs.getInt(1);
+            SqlResult res = stmt.select();
+            while (res.next()) {
+                starID = res.getInt(1);
             }
         } catch (Exception e) {
             log.error("Error fetching oldest star.", e);
@@ -100,12 +100,12 @@ public class AdminDashboardHandler extends AdminHandler {
             sql = "SELECT id, name, last_simulation FROM stars WHERE id = ?";
             try (SqlStmt stmt = DB.prepare(sql)) {
                 stmt.setInt(1, starID);
-                ResultSet rs = stmt.select();
-                if (rs.next()) {
-                    data.put("oldest_star_id", rs.getInt(1));
-                    data.put("oldest_star_name", rs.getString(2));
+                SqlResult res = stmt.select();
+                if (res.next()) {
+                    data.put("oldest_star_id", res.getInt(1));
+                    data.put("oldest_star_name", res.getString(2));
                     data.put("oldest_star_time", TimeFormatter.create().withMaxDays(1000).format(
-                            new DateTime(rs.getTimestamp(3).getTime())));
+                            res.getDateTime(3)));
                 }
             } catch (Exception e) {
                 log.error("Error fetching oldest star.", e);

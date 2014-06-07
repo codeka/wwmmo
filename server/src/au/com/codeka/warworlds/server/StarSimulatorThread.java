@@ -1,7 +1,5 @@
 package au.com.codeka.warworlds.server;
 
-import java.sql.ResultSet;
-
 import org.joda.time.DateTime;
 import org.joda.time.Seconds;
 import org.slf4j.Logger;
@@ -10,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import au.com.codeka.common.model.Simulation;
 import au.com.codeka.warworlds.server.ctrl.StarController;
 import au.com.codeka.warworlds.server.data.DB;
+import au.com.codeka.warworlds.server.data.SqlResult;
 import au.com.codeka.warworlds.server.data.SqlStmt;
 import au.com.codeka.warworlds.server.model.Star;
 
@@ -110,9 +109,9 @@ public class StarSimulatorThread {
                     " WHERE empire_count > 0" +
                     " ORDER BY last_simulation ASC LIMIT 1";
         try (SqlStmt stmt = DB.prepare(sql)) {
-            ResultSet rs = stmt.select();
-            if (rs.next()) {
-                return rs.getInt(1);
+            SqlResult res = stmt.select();
+            if (res.next()) {
+                return res.getInt(1);
             }
             return 0;
         }

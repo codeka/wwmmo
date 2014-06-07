@@ -1,7 +1,5 @@
 package au.com.codeka.warworlds.server.handlers;
 
-import java.sql.ResultSet;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,6 +13,7 @@ import au.com.codeka.warworlds.server.ctrl.SessionController;
 import au.com.codeka.warworlds.server.ctrl.StarController;
 import au.com.codeka.warworlds.server.ctrl.StatisticsController;
 import au.com.codeka.warworlds.server.data.DB;
+import au.com.codeka.warworlds.server.data.SqlResult;
 import au.com.codeka.warworlds.server.data.SqlStmt;
 import au.com.codeka.warworlds.server.model.Colony;
 import au.com.codeka.warworlds.server.model.Empire;
@@ -74,7 +73,7 @@ public class HelloHandler extends RequestHandler {
             for (Star star : new StarController().getStars(stars)) {
                 for (BaseColony baseColony : star.getColonies()) {
                     Colony colony = (Colony) baseColony;
-                    if (colony.getEmpireID() == empire.getID()) {
+                    if (colony.getEmpireID() != null && empire.getID() == colony.getEmpireID()) {
                         numColonies ++;
                     }
                 }
@@ -98,12 +97,12 @@ public class HelloHandler extends RequestHandler {
             String sql = "SELECT design_id, COUNT(*) FROM buildings WHERE empire_id = ? GROUP BY design_id";
             try (SqlStmt stmt = DB.prepare(sql)) {
                 stmt.setInt(1, empire.getID());
-                ResultSet rs = stmt.select();
+                SqlResult res = stmt.select();
 
                 Messages.EmpireBuildingStatistics.Builder build_stats_pb = Messages.EmpireBuildingStatistics.newBuilder();
-                while (rs.next()) {
-                    String designID = rs.getString(1);
-                    int num = rs.getInt(2);
+                while (res.next()) {
+                    String designID = res.getString(1);
+                    int num = res.getInt(2);
 
                     Messages.EmpireBuildingStatistics.DesignCount.Builder design_count_pb = Messages.EmpireBuildingStatistics.DesignCount.newBuilder();
                     design_count_pb.setDesignId(designID);
@@ -129,10 +128,10 @@ public class HelloHandler extends RequestHandler {
             try (SqlStmt stmt = DB.prepare(sql)) {
                 stmt.setInt(1, empire.getID());
                 stmt.setInt(2, empire.getID());
-                ResultSet rs = stmt.select();
+                SqlResult res = stmt.select();
 
-                while (rs.next()) {
-                    hello_response_pb.addStarIds(rs.getLong(1));
+                while (res.next()) {
+                    hello_response_pb.addStarIds(res.getLong(1));
                 }
             } catch (Exception e) {
                 throw new RequestException(e);

@@ -1,11 +1,11 @@
 package au.com.codeka.warworlds.server.model;
 
-import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import au.com.codeka.common.model.BaseBuilding;
 import au.com.codeka.common.model.BuildingDesign;
 import au.com.codeka.common.model.DesignKind;
+import au.com.codeka.warworlds.server.data.SqlResult;
 
 public class Building extends BaseBuilding {
     private int mID;
@@ -13,14 +13,14 @@ public class Building extends BaseBuilding {
 
     public Building() {
     }
-    public Building(ResultSet rs) throws SQLException {
-        mID = rs.getInt("id");
+    public Building(SqlResult res) throws SQLException {
+        mID = res.getInt("id");
         mKey = Integer.toString(mID);
-        mColonyID = rs.getInt("colony_id");
+        mColonyID = res.getInt("colony_id");
         mColonyKey = Integer.toString(mColonyID);
-        mDesignID = rs.getString("design_id");
-        mLevel = rs.getInt("level");
-        mNotes = rs.getString("notes");
+        mDesignID = res.getString("design_id");
+        mLevel = res.getInt("level");
+        mNotes = res.getString("notes");
     }
     public Building(Star star, Colony colony, String designID, String notes) {
         mDesignID = designID;

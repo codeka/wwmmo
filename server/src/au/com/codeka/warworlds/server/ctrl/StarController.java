@@ -1,6 +1,5 @@
 package au.com.codeka.warworlds.server.ctrl;
 
-import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -32,6 +31,7 @@ import au.com.codeka.common.model.Simulation;
 import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.server.EventProcessor;
 import au.com.codeka.warworlds.server.RequestException;
+import au.com.codeka.warworlds.server.data.SqlResult;
 import au.com.codeka.warworlds.server.data.SqlStmt;
 import au.com.codeka.warworlds.server.data.Transaction;
 import au.com.codeka.warworlds.server.designeffects.RadarBuildingEffect;
@@ -156,7 +156,7 @@ public class StarController {
         ArrayList<Fleet> fleetsToAddBack = null;
         for (BaseFleet baseFleet : star.getFleets()) {
             Fleet fleet = (Fleet) baseFleet;
-            if (fleet.getEmpireID() == myEmpireID) {
+            if (fleet.getEmpireID() != null && fleet.getEmpireID() == myEmpireID) {
                 removeFleets = false;
             }
         }
@@ -235,7 +235,7 @@ public class StarController {
         ArrayList<Fleet> fleetsToRemove = null;
         for (BaseFleet baseFleet : star.getFleets()) {
             Fleet fleet = (Fleet) baseFleet;
-            if (fleet.getEmpireID() != myEmpireID && fleet.hasUpgrade("cloak")) {
+            if (fleet.hasUpgrade("cloak") && fleet.getEmpireID() != myEmpireID) {
                 if (fleetsToRemove == null) {
                     fleetsToRemove = new ArrayList<Fleet>();
                 }
@@ -273,7 +273,7 @@ public class StarController {
         // for any colonies that are not ours, hide some "secret" information
         for (BaseColony baseColony : star.getColonies()) {
             Colony colony = (Colony) baseColony;
-            if (colony.getEmpireID() != myEmpireID) {
+            if (colony.getEmpireID() != null && colony.getEmpireID() != myEmpireID) {
                 colony.sanitize();
             }
         }
@@ -300,10 +300,10 @@ public class StarController {
                               " INNER JOIN sectors ON stars.sector_id = sectors.id" +
                               " WHERE stars.id IN "+buildInClause(ids);
             try (SqlStmt stmt = prepare(sql)) {
-                ResultSet rs = stmt.select();
+                SqlResult res = stmt.select();
 
-                while (rs.next()) {
-                    stars.add(new Star(rs));
+                while (res.next()) {
+                    stars.add(new Star(res));
                 }
 
                 if (stars.isEmpty()) {
@@ -346,11 +346,11 @@ public class StarController {
                         " INNER JOIN sectors ON stars.sector_id = sectors.id" +
                         " WHERE star_type = "+Star.Type.Wormhole.ordinal();
             try (SqlStmt stmt = prepare(sql)) {
-                ResultSet rs = stmt.select();
+                SqlResult res = stmt.select();
 
                 ArrayList<Star> stars = new ArrayList<Star>();
-                while (rs.next()) {
-                    Star star = new Star(rs);
+                while (res.next()) {
+                    Star star = new Star(res);
                     if (star.getWormholeExtra() == null) {
                         continue;
                     }
@@ -494,10 +494,12 @@ public class StarController {
                         continue;
                     }
 
-                    Float uncollectedTaxes = empireTaxes.get(colony.getEmpireID());
-                    uncollectedTaxes = (uncollectedTaxes == null ? 0 : uncollectedTaxes) +
-                            colony.getUncollectedTaxes();
-                    empireTaxes.put(colony.getEmpireID(), uncollectedTaxes);
+                    if (colony.getEmpireID() != null) {
+                        Float uncollectedTaxes = empireTaxes.get(colony.getEmpireID());
+                        uncollectedTaxes = (uncollectedTaxes == null ? 0 : uncollectedTaxes) +
+                                colony.getUncollectedTaxes();
+                        empireTaxes.put(colony.getEmpireID(), uncollectedTaxes);
+                    }
 
                     stmt.setDouble(1, colony.getPopulationFocus());
                     stmt.setDouble(2, colony.getConstructionFocus());
@@ -518,9 +520,9 @@ public class StarController {
                     for (Map.Entry<Integer, Float> entry : empireTaxes.entrySet()) {
                         stmt.setDouble(1, entry.getValue());
                         stmt.setInt(2, entry.getKey());
-                        ResultSet rs = stmt.updateAndSelect();
-                        if (rs.next()) {
-                            double totalCash = rs.getDouble(1);
+                        SqlResult res = stmt.updateAndSelect();
+                        if (res.next()) {
+                            double totalCash = res.getDouble(1);
 
                             // send a notification that cash has been updated
                             new NotificationController().sendNotificationToOnlineEmpire(entry.getKey(),
@@ -584,16 +586,8 @@ public class StarController {
                     stmt.setInt(5, fleet.getState().getValue());
                     stmt.setDateTime(6, fleet.getStateStartTime());
                     stmt.setDateTime(7, fleet.getEta());
-                    if (fleet.getDestinationStarKey() != null) {
-                        stmt.setInt(8, fleet.getDestinationStarID());
-                    } else {
-                        stmt.setNull(8);
-                    }
-                    if (fleet.getTargetFleetKey() != null && fleet.getTargetFleetID() != 0) {
-                        stmt.setInt(9, fleet.getTargetFleetID());
-                    } else {
-                        stmt.setNull(9);
-                    }
+                    stmt.setInt(8, fleet.getDestinationStarID());
+                    stmt.setInt(9, fleet.getTargetFleetID());
                     stmt.setDateTime(10, fleet.getTimeDestroyed());
                     stmt.setString(11, fleet.getNotes());
                     stmt.setInt(12, fleet.getID());
@@ -626,16 +620,8 @@ public class StarController {
                         stmt.setInt(7, fleet.getState().getValue());
                         stmt.setDateTime(8, fleet.getStateStartTime());
                         stmt.setDateTime(9, fleet.getEta());
-                        if (fleet.getDestinationStarKey() != null) {
-                            stmt.setInt(10, fleet.getDestinationStarID());
-                        } else {
-                            stmt.setNull(10);
-                        }
-                        if (fleet.getTargetFleetKey() != null && fleet.getTargetFleetID() != 0) {
-                            stmt.setInt(11, fleet.getTargetFleetID());
-                        } else {
-                            stmt.setNull(11);
-                        }
+                        stmt.setInt(10, fleet.getDestinationStarID());
+                        stmt.setInt(11, fleet.getTargetFleetID());
                         stmt.setDateTime(12, fleet.getTimeDestroyed());
                         stmt.setString(13, fleet.getNotes());
                         stmt.update();
@@ -747,10 +733,10 @@ public class StarController {
         private void populateColonies(List<Star> stars, String inClause) throws Exception {
             String sql = "SELECT * FROM colonies WHERE star_id IN "+inClause;
             try (SqlStmt stmt = prepare(sql)) {
-                ResultSet rs = stmt.select();
+                SqlResult res = stmt.select();
 
-                while (rs.next()) {
-                    Colony colony = new Colony(rs);
+                while (res.next()) {
+                    Colony colony = new Colony(res);
 
                     for (Star star : stars) {
                         if (star.getID() == colony.getStarID()) {
@@ -773,10 +759,10 @@ public class StarController {
 
             ArrayList<Fleet> fleets = new ArrayList<Fleet>();
             try (SqlStmt stmt = prepare(sql)) {
-                ResultSet rs = stmt.select();
+                SqlResult res = stmt.select();
 
-                while (rs.next()) {
-                    Fleet fleet = new Fleet(rs);
+                while (res.next()) {
+                    Fleet fleet = new Fleet(res);
                     fleets.add(fleet);
 
                     for (Star star : stars) {
@@ -789,10 +775,10 @@ public class StarController {
 
             sql = "SELECT * FROM fleet_upgrades WHERE star_id IN "+inClause;
             try (SqlStmt stmt = prepare(sql)) {
-                ResultSet rs = stmt.select();
+                SqlResult res = stmt.select();
 
-                while (rs.next()) {
-                    FleetUpgrade fleetUpgrade = FleetUpgrade.create(rs);
+                while (res.next()) {
+                    FleetUpgrade fleetUpgrade = FleetUpgrade.create(res);
 
                     for (Fleet fleet : fleets) {
                         if (fleet.getID() == fleetUpgrade.getFleetID()) {
@@ -807,10 +793,10 @@ public class StarController {
         private void populateEmpires(List<Star> stars, String inClause) throws Exception {
             String sql = "SELECT * FROM empire_presences WHERE star_id IN "+inClause;
             try (SqlStmt stmt = prepare(sql)) {
-                ResultSet rs = stmt.select();
+                SqlResult res = stmt.select();
 
-                while (rs.next()) {
-                    EmpirePresence empirePresence = new EmpirePresence(rs);
+                while (res.next()) {
+                    EmpirePresence empirePresence = new EmpirePresence(res);
 
                     for (Star star : stars) {
                         if (star.getID() == empirePresence.getStarID()) {
@@ -828,10 +814,10 @@ public class StarController {
         private void populateBuildRequests(List<Star> stars, String inClause) throws Exception {
             String sql = "SELECT * FROM build_requests WHERE star_id IN "+inClause;
             try (SqlStmt stmt = prepare(sql)) {
-                ResultSet rs = stmt.select();
+                SqlResult res = stmt.select();
 
-                while (rs.next()) {
-                    int starID = rs.getInt("star_id");
+                while (res.next()) {
+                    int starID = res.getInt("star_id");
                     Star star = null;
                     for (Star thisStar : stars) {
                         if (thisStar.getID() == starID) {
@@ -840,7 +826,7 @@ public class StarController {
                         }
                     }
 
-                    BuildRequest buildRequest = new BuildRequest(star, rs);
+                    BuildRequest buildRequest = new BuildRequest(star, res);
                     star.getBuildRequests().add(buildRequest);
                 }
             }
@@ -849,10 +835,10 @@ public class StarController {
         private void populateBuildings(List<Star> stars, String inClause) throws Exception {
             String sql = "SELECT * FROM buildings WHERE star_id IN "+inClause;
             try (SqlStmt stmt = prepare(sql)) {
-                ResultSet rs = stmt.select();
+                SqlResult res = stmt.select();
 
-                while (rs.next()) {
-                    Building building = new Building(rs);
+                while (res.next()) {
+                    Building building = new Building(res);
 
                     for (Star star : stars) {
                         for (BaseColony baseColony : star.getColonies()) {
@@ -875,11 +861,11 @@ public class StarController {
             sql += " AND end_time > ?";
             try (SqlStmt stmt = prepare(sql)) {
                 stmt.setDateTime(1, DateTime.now());
-                ResultSet rs = stmt.select();
+                SqlResult res = stmt.select();
 
-                while (rs.next()) {
-                    int starID = rs.getInt(1);
-                    Messages.CombatReport pb = Messages.CombatReport.parseFrom(rs.getBytes(2));
+                while (res.next()) {
+                    int starID = res.getInt(1);
+                    Messages.CombatReport pb = Messages.CombatReport.parseFrom(res.getBytes(2));
                     CombatReport combatReport = new CombatReport();
                     combatReport.fromProtocolBuffer(pb);
 

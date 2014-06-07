@@ -1,11 +1,10 @@
 package au.com.codeka.warworlds.server.cron;
 
-import java.sql.ResultSet;
-
 import org.joda.time.DateMidnight;
 import org.joda.time.DateTime;
 
 import au.com.codeka.warworlds.server.data.DB;
+import au.com.codeka.warworlds.server.data.SqlResult;
 import au.com.codeka.warworlds.server.data.SqlStmt;
 
 /**
@@ -31,10 +30,10 @@ public class UpdateDashboardCronJob extends CronJob {
                      " GROUP BY DATE(date)";
         try (SqlStmt stmt = DB.prepare(sql)) {
             stmt.setDateTime(1, new DateMidnight(dt));
-            ResultSet rs = stmt.select();
-            if (rs.next()) {
-                oneDA = rs.getInt(2);
-                sevenDA = rs.getInt(3);
+            SqlResult res = stmt.select();
+            if (res.next()) {
+                oneDA = res.getInt(2);
+                sevenDA = res.getInt(3);
             }
         }
 
@@ -45,9 +44,9 @@ public class UpdateDashboardCronJob extends CronJob {
                 " GROUP BY DATE(signup_date)";
         try (SqlStmt stmt = DB.prepare(sql)) {
             stmt.setDateTime(1, new DateMidnight(dt));
-            ResultSet rs = stmt.select();
-            if (rs.next()) {
-                newSignups = rs.getInt(1);
+            SqlResult res = stmt.select();
+            if (res.next()) {
+                newSignups = res.getInt(1);
             }
         }
 

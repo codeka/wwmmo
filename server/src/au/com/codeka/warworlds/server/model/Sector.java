@@ -1,6 +1,5 @@
 package au.com.codeka.warworlds.server.model;
 
-import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import au.com.codeka.common.model.BaseColony;
@@ -8,6 +7,7 @@ import au.com.codeka.common.model.BaseFleet;
 import au.com.codeka.common.model.BaseSector;
 import au.com.codeka.common.model.BaseStar;
 import au.com.codeka.common.protobuf.Messages;
+import au.com.codeka.warworlds.server.data.SqlResult;
 
 public class Sector extends BaseSector {
     private int mID;
@@ -23,12 +23,12 @@ public class Sector extends BaseSector {
         mDistanceToCentre = Math.sqrt((x * x) + (y * y));
         mNumColonies = 0;
     }
-    public Sector(ResultSet rs) throws SQLException {
-        mID = rs.getInt("id");
-        mX = rs.getLong("x");
-        mY = rs.getLong("y");
-        mDistanceToCentre = rs.getDouble("distance_to_centre");
-        mNumColonies = rs.getInt("num_colonies");
+    public Sector(SqlResult res) throws SQLException {
+        mID = res.getInt("id");
+        mX = res.getLong("x");
+        mY = res.getLong("y");
+        mDistanceToCentre = res.getDouble("distance_to_centre");
+        mNumColonies = res.getInt("num_colonies");
     }
 
     public double getDistanceToCentre() {

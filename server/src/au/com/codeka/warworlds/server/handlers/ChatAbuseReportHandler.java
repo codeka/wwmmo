@@ -1,13 +1,12 @@
 package au.com.codeka.warworlds.server.handlers;
 
-import java.sql.ResultSet;
-
 import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.RequestHandler;
 import au.com.codeka.warworlds.server.ctrl.ChatAbuseController;
 import au.com.codeka.warworlds.server.ctrl.EmpireController;
 import au.com.codeka.warworlds.server.data.DB;
+import au.com.codeka.warworlds.server.data.SqlResult;
 import au.com.codeka.warworlds.server.data.SqlStmt;
 import au.com.codeka.warworlds.server.model.ChatMessage;
 import au.com.codeka.warworlds.server.model.Empire;
@@ -43,12 +42,12 @@ public class ChatAbuseReportHandler extends RequestHandler {
         String sql = "SELECT * FROM chat_messages WHERE id = ?";
         try (SqlStmt stmt = DB.prepare(sql)) {
             stmt.setInt(1, chatMsgID);
-            ResultSet rs = stmt.select();
-            if (!rs.first()) {
+            SqlResult res = stmt.select();
+            if (!res.next()) {
                 throw new RequestException(404);
             }
 
-            msg = new ChatMessage(rs);
+            msg = new ChatMessage(res);
         } catch (Exception e) {
             throw new RequestException(e);
         }

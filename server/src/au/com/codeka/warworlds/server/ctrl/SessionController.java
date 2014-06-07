@@ -1,11 +1,11 @@
 package au.com.codeka.warworlds.server.ctrl;
 
-import java.sql.ResultSet;
 import java.util.concurrent.TimeUnit;
 
 import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.Session;
 import au.com.codeka.warworlds.server.data.DB;
+import au.com.codeka.warworlds.server.data.SqlResult;
 import au.com.codeka.warworlds.server.data.SqlStmt;
 
 import com.google.common.cache.CacheBuilder;
@@ -25,9 +25,9 @@ public class SessionController {
                     public Session load(String cookie) throws Exception {
                         try (SqlStmt stmt = DB.prepare("SELECT * FROM sessions WHERE session_cookie=?")) {
                             stmt.setString(1, cookie);
-                            ResultSet rs = stmt.select();
-                            if (rs.next()) {
-                                return new Session(rs);
+                            SqlResult res = stmt.select();
+                            if (res.next()) {
+                                return new Session(res);
                             }
                         }
 
@@ -43,9 +43,9 @@ public class SessionController {
                     public Integer load(String email) throws Exception {
                         try (SqlStmt stmt = DB.prepare("SELECT id FROM empires WHERE user_email = ?")) {
                             stmt.setString(1, email);
-                            ResultSet rs = stmt.select();
-                            if (rs.next()) {
-                                return rs.getInt(1);
+                            SqlResult res = stmt.select();
+                            if (res.next()) {
+                                return res.getInt(1);
                             }
                         }
 

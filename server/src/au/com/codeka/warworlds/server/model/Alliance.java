@@ -1,14 +1,12 @@
 package au.com.codeka.warworlds.server.model;
 
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-
-import org.joda.time.DateTime;
 
 import au.com.codeka.common.model.BaseAlliance;
 import au.com.codeka.common.model.BaseAllianceMember;
 import au.com.codeka.common.protobuf.Messages;
+import au.com.codeka.warworlds.server.data.SqlResult;
 
 public class Alliance extends BaseAlliance {
     private int mID;
@@ -17,26 +15,26 @@ public class Alliance extends BaseAlliance {
     public Alliance() {
         mMembers = new ArrayList<BaseAllianceMember>();
     }
-    public Alliance(Integer id, ResultSet rs) throws SQLException {
+    public Alliance(Integer id, SqlResult res) throws SQLException {
         if (id == null) {
-            mID = rs.getInt("id");
+            mID = res.getInt("id");
         } else {
             mID = (int) id;
         }
         mKey = Integer.toString(mID);
         try {
-            mName = rs.getString("alliance_name");
+            mName = res.getString("alliance_name");
         } catch (Exception e) {
-            mName = rs.getString("name");
+            mName = res.getString("name");
         }
-        mCreatorEmpireID = rs.getInt("creator_empire_id");
+        mCreatorEmpireID = res.getInt("creator_empire_id");
         mCreatorEmpireKey = Integer.toString(mCreatorEmpireID);
-        mTimeCreated = new DateTime(rs.getTimestamp("created_date").getTime());
-        mNumMembers = rs.getInt("num_empires");
-        mBankBalance = rs.getDouble("bank_balance");
+        mTimeCreated = res.getDateTime("created_date");
+        mNumMembers = res.getInt("num_empires");
+        mBankBalance = res.getDouble("bank_balance");
         mMembers = new ArrayList<BaseAllianceMember>();
-        mDateImageUpdated = new DateTime(rs.getTimestamp("image_updated_date").getTime());
-        mNumPendingRequests = rs.getInt("num_pending_requests");
+        mDateImageUpdated = res.getDateTime("image_updated_date");
+        mNumPendingRequests = res.getInt("num_pending_requests");
     }
 
     public void setID(int id) {

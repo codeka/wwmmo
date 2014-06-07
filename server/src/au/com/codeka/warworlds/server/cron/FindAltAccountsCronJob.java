@@ -1,6 +1,5 @@
 package au.com.codeka.warworlds.server.cron;
 
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
@@ -9,6 +8,7 @@ import org.slf4j.LoggerFactory;
 
 import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.server.data.DB;
+import au.com.codeka.warworlds.server.data.SqlResult;
 import au.com.codeka.warworlds.server.data.SqlStmt;
 
 /**
@@ -27,9 +27,9 @@ public class FindAltAccountsCronJob extends CronJob {
         // in the database. We look for alts one-by-one.
         String sql = "SELECT DISTINCT user_email FROM empires";
         try (SqlStmt stmt = DB.prepare(sql)) {
-            ResultSet rs = stmt.select();
-            while (rs.next()) {
-                String emailAddr = rs.getString(1);
+            SqlResult res = stmt.select();
+            while (res.next()) {
+                String emailAddr = res.getString(1);
                 emailAddrs.add(emailAddr);
             }
         }
@@ -44,18 +44,18 @@ public class FindAltAccountsCronJob extends CronJob {
         try (SqlStmt stmt = DB.prepare(sql)) {
             for (String emailAddr : emailAddrs) {
                 stmt.setString(1, emailAddr);
-                ResultSet rs = stmt.select();
+                SqlResult res = stmt.select();
 
                 Messages.EmpireAltAccounts.Builder alt_acct_pb = Messages.EmpireAltAccounts.newBuilder();
                 int numFound = 0;
-                while (rs.next()) {
-                    String altEmailAddr = rs.getString("user_email");
+                while (res.next()) {
+                    String altEmailAddr = res.getString("user_email");
                     if (altEmailAddr.equals(emailAddr)) {
-                        alt_acct_pb.setEmpireId(rs.getInt("empire_id"));
+                        alt_acct_pb.setEmpireId(res.getInt("empire_id"));
                     }
 
-                    addDeviceInfo(alt_acct_pb, rs);
-                    addEmpireInfo(alt_acct_pb, rs);
+                    addDeviceInfo(alt_acct_pb, res);
+                    addEmpireInfo(alt_acct_pb, res);
                     numFound ++;
                 }
 
@@ -86,10 +86,10 @@ public class FindAltAccountsCronJob extends CronJob {
         }
     }
 
-    private void addDeviceInfo(Messages.EmpireAltAccounts.Builder alt_acct_pb, ResultSet rs)
+    private void addDeviceInfo(Messages.EmpireAltAccounts.Builder alt_acct_pb, SqlResult res)
             throws SQLException {
         // check whether we've added this device already, and add it if not
-        String deviceId = rs.getString("device_id");
+        String deviceId = res.getString("device_id");
         for (Messages.EmpireAltAccounts.DeviceInfo device_info_pb : alt_acct_pb.getDeviceList()) {
             if (device_info_pb.getDeviceId().equals(deviceId)) {
                 return;
@@ -99,17 +99,17 @@ public class FindAltAccountsCronJob extends CronJob {
         Messages.EmpireAltAccounts.DeviceInfo.Builder device_info_pb =
                 Messages.EmpireAltAccounts.DeviceInfo.newBuilder();
         device_info_pb.setDeviceId(deviceId);
-        device_info_pb.setDeviceBuild(rs.getString("device_build"));
-        device_info_pb.setDeviceManufacturer(rs.getString("device_manufacturer"));
-        device_info_pb.setDeviceModel(rs.getString("device_model"));
-        device_info_pb.setDeviceVersion(rs.getString("device_version"));
+        device_info_pb.setDeviceBuild(res.getString("device_build"));
+        device_info_pb.setDeviceManufacturer(res.getString("device_manufacturer"));
+        device_info_pb.setDeviceModel(res.getString("device_model"));
+        device_info_pb.setDeviceVersion(res.getString("device_version"));
         alt_acct_pb.addDevice(device_info_pb);
     }
 
-    private void addEmpireInfo(Messages.EmpireAltAccounts.Builder alt_acct_pb, ResultSet rs)
+    private void addEmpireInfo(Messages.EmpireAltAccounts.Builder alt_acct_pb, SqlResult res)
             throws SQLException {
         // check whether we've added this device already, and add it if not
-        int empireId = rs.getInt("empire_id");
+        int empireId = res.getInt("empire_id");
         for (Messages.EmpireAltAccounts.EmpireAltEmpire alt_empire_pb : alt_acct_pb.getAltEmpireList()) {
             if (alt_empire_pb.getEmpireId() == empireId) {
                 return;
@@ -119,10 +119,10 @@ public class FindAltAccountsCronJob extends CronJob {
         Messages.EmpireAltAccounts.EmpireAltEmpire.Builder alt_empire_pb =
                 Messages.EmpireAltAccounts.EmpireAltEmpire.newBuilder();
         alt_empire_pb.setEmpireId(empireId);
-        alt_empire_pb.setEmpireName(rs.getString("name"));
-        alt_empire_pb.setUserEmail(rs.getString("user_email"));
-        Integer allianceID = rs.getInt("alliance_id");
-        if (!rs.wasNull()) {
+        alt_empire_pb.setEmpireName(res.getString("name"));
+        alt_empire_pb.setUserEmail(res.getString("user_email"));
+        Integer allianceID = res.getInt("alliance_id");
+        if (allianceID != null) {
             alt_empire_pb.setAllianceId(allianceID);
         }
         alt_acct_pb.addAltEmpire(alt_empire_pb);

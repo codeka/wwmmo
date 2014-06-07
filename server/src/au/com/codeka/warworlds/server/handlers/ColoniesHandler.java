@@ -49,7 +49,7 @@ public class ColoniesHandler extends RequestHandler {
             Fleet colonyShipFleet = null;
             for (BaseFleet baseFleet : star.getFleets()) {
                 Fleet fleet = (Fleet) baseFleet;
-                if (fleet.getEmpireID() != myEmpire.getID()) {
+                if (fleet.getEmpireID() == null || fleet.getEmpireID() != myEmpire.getID()) {
                     continue;
                 }
                 if (fleet.getState() != Fleet.State.IDLE) {

@@ -1,7 +1,6 @@
 package au.com.codeka.warworlds.server.ctrl;
 
 import java.security.SecureRandom;
-import java.sql.ResultSet;
 import java.util.Locale;
 
 import org.joda.time.DateTime;
@@ -13,6 +12,7 @@ import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.Session;
 import au.com.codeka.warworlds.server.data.DB;
+import au.com.codeka.warworlds.server.data.SqlResult;
 import au.com.codeka.warworlds.server.data.SqlStmt;
 
 public class LoginController {
@@ -69,11 +69,11 @@ public class LoginController {
             } else {
                 stmt.setString(1, emailAddr);
             }
-            ResultSet rs = stmt.select();
-            if (rs.next()) {
-                empireID = rs.getInt(1);
-                allianceID = rs.getInt(2);
-                BaseEmpire.State state = BaseEmpire.State.fromNumber(rs.getInt(3));
+            SqlResult res = stmt.select();
+            if (res.next()) {
+                empireID = res.getInt(1);
+                allianceID = res.getInt(2);
+                BaseEmpire.State state = BaseEmpire.State.fromNumber(res.getInt(3));
                 if (state == BaseEmpire.State.BANNED) {
                     banned = true;
                 }

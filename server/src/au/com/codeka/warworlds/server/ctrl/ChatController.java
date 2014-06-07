@@ -1,6 +1,5 @@
 package au.com.codeka.warworlds.server.ctrl;
 
-import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -16,6 +15,7 @@ import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.server.BackgroundRunner;
 import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.data.DB;
+import au.com.codeka.warworlds.server.data.SqlResult;
 import au.com.codeka.warworlds.server.data.SqlStmt;
 import au.com.codeka.warworlds.server.data.Transaction;
 import au.com.codeka.warworlds.server.model.ChatConversation;
@@ -232,9 +232,9 @@ public class ChatController {
             try (SqlStmt stmt = prepare(sql)) {
                 stmt.setInt(1, empireID1);
                 stmt.setInt(2, empireID2);
-                ResultSet rs = stmt.select();
-                if (rs.next()) {
-                    chatID = rs.getInt(1);
+                SqlResult res = stmt.select();
+                if (res.next()) {
+                    chatID = res.getInt(1);
                 }
             }
 
@@ -259,15 +259,15 @@ public class ChatController {
                         " INNER JOIN chat_conversation_participants ON conversation_id = chat_conversations.id" +
                         " WHERE " + whereClause;
             try (SqlStmt stmt = prepare(sql)) {
-                ResultSet rs = stmt.select();
-                while (rs.next()) {
-                    int conversationID = rs.getInt(1);
+                SqlResult res = stmt.select();
+                while (res.next()) {
+                    int conversationID = res.getInt(1);
                     ChatConversation conversation = conversations.get(conversationID);
                     if (conversation == null) {
                         conversation = new ChatConversation(conversationID);
                         conversations.put(conversationID, conversation);
                     }
-                    conversation.addParticipant(rs.getInt(2), rs.getBoolean(3));
+                    conversation.addParticipant(res.getInt(2), res.getInt(3) != 0);
                 }
             }
             return new ArrayList<ChatConversation>(conversations.values());

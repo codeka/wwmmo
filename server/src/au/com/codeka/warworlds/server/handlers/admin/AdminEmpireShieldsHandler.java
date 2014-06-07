@@ -4,7 +4,6 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.TreeMap;
 
@@ -17,11 +16,11 @@ import org.apache.commons.imaging.ImageReadException;
 import org.apache.commons.imaging.Imaging;
 import org.apache.commons.io.IOUtils;
 import org.eclipse.jetty.server.Request;
-import org.joda.time.DateTime;
 
 import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.ctrl.EmpireController;
 import au.com.codeka.warworlds.server.data.DB;
+import au.com.codeka.warworlds.server.data.SqlResult;
 import au.com.codeka.warworlds.server.data.SqlStmt;
 
 public class AdminEmpireShieldsHandler extends AdminHandler {
@@ -41,16 +40,16 @@ public class AdminEmpireShieldsHandler extends AdminHandler {
                     " INNER JOIN empires ON empires.id = empire_shields.empire_id" +
                     " ORDER BY create_date DESC";
         try (SqlStmt stmt = DB.prepare(sql)) {
-            ResultSet rs = stmt.select();
+            SqlResult res = stmt.select();
             ArrayList<TreeMap<String, Object>> results = new ArrayList<TreeMap<String, Object>>();
-            while (rs.next()) {
+            while (res.next()) {
                 TreeMap<String, Object> result = new TreeMap<String, Object>();
-                result.put("shield_id", rs.getInt(1));
-                result.put("empire_id", rs.getInt(2));
-                result.put("create_date", new DateTime(rs.getTimestamp(3).getTime()));
-                result.put("rejected", rs.getBoolean(4));
-                result.put("empire_name", rs.getString(5));
-                result.put("user_email", rs.getString(6));
+                result.put("shield_id", res.getInt(1));
+                result.put("empire_id", res.getInt(2));
+                result.put("create_date", res.getDateTime(3));
+                result.put("rejected", res.getInt(4) != 0);
+                result.put("empire_name", res.getString(5));
+                result.put("user_email", res.getString(6));
                 results.add(result);
             }
             data.put("shields", results);

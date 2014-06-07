@@ -1,9 +1,6 @@
 package au.com.codeka.warworlds.server.model;
 
-import java.sql.ResultSet;
 import java.sql.SQLException;
-
-import org.joda.time.DateTime;
 
 import au.com.codeka.common.model.BaseBuildRequest;
 import au.com.codeka.common.model.BaseBuilding;
@@ -11,35 +8,36 @@ import au.com.codeka.common.model.BaseColony;
 import au.com.codeka.common.model.Design;
 import au.com.codeka.common.model.DesignKind;
 import au.com.codeka.common.protobuf.Messages;
+import au.com.codeka.warworlds.server.data.SqlResult;
 
 public class BuildRequest extends BaseBuildRequest {
     private int mID;
     private int mStarID;
     private int mColonyID;
     private int mEmpireID;
-    private int mExistingBuildingID;
+    private Integer mExistingBuildingID;
     private boolean mDisableNotification;
 
     public BuildRequest() {
     }
-    public BuildRequest(Star star, ResultSet rs) throws SQLException {
-        mID = rs.getInt("id");
+    public BuildRequest(Star star, SqlResult res) throws SQLException {
+        mID = res.getInt("id");
         mKey = Integer.toString(mID);
-        mDesignKind = DesignKind.fromNumber(rs.getInt("design_kind"));
-        mDesignID = rs.getString("design_id");
-        mColonyID = rs.getInt("colony_id");
+        mDesignKind = DesignKind.fromNumber(res.getInt("design_kind"));
+        mDesignID = res.getString("design_id");
+        mColonyID = res.getInt("colony_id");
         mColonyKey = Integer.toString(mColonyID);
-        mEndTime = new DateTime(rs.getTimestamp("end_time").getTime());
-        mStartTime = new DateTime(rs.getTimestamp("start_time").getTime());
-        mProgress = (float) rs.getDouble("progress");
-        mCount = rs.getInt("count");
-        mStarID = rs.getInt("star_id");
+        mEndTime = res.getDateTime("end_time");
+        mStartTime = res.getDateTime("start_time");
+        mProgress = res.getFloat("progress");
+        mCount = res.getInt("count");
+        mStarID = res.getInt("star_id");
         mStarKey = Integer.toString(mStarID);
-        mPlanetIndex = rs.getInt("planet_index");
-        mEmpireID = rs.getInt("empire_id");
+        mPlanetIndex = res.getInt("planet_index");
+        mEmpireID = res.getInt("empire_id");
         mEmpireKey = Integer.toString(mEmpireID);
-        mExistingBuildingID = rs.getInt("existing_building_id");
-        if (!rs.wasNull()) {
+        mExistingBuildingID = res.getInt("existing_building_id");
+        if (mExistingBuildingID != null) {
             mExistingBuildingKey = Integer.toString(mExistingBuildingID);
             mExistingBuildingLevel = 1;
             for (BaseColony baseColony : star.getColonies()) {
@@ -51,14 +49,14 @@ public class BuildRequest extends BaseBuildRequest {
                 }
             }
         }
-        mExistingFleetID = rs.getInt("existing_fleet_id");
-        if (rs.wasNull()) {
-            mExistingFleetID = null;
-        } else {
-            mUpgradeID = rs.getString("upgrade_id");
+        mExistingFleetID = res.getInt("existing_fleet_id");
+        if (mExistingFleetID != null) {
+            mUpgradeID = res.getString("upgrade_id");
         }
-        mDisableNotification = (rs.getInt("disable_notification") > 0);
-        mNotes = rs.getString("notes");
+        if (res.getInt("disable_notification") != null && res.getInt("disable_notification") > 0) {
+            mDisableNotification = true;
+        }
+        mNotes = res.getString("notes");
     }
 
     public int getID() {

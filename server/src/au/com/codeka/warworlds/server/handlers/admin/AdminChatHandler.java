@@ -1,6 +1,5 @@
 package au.com.codeka.warworlds.server.handlers.admin;
 
-import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.TreeMap;
 
@@ -10,6 +9,7 @@ import org.slf4j.LoggerFactory;
 
 import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.data.DB;
+import au.com.codeka.warworlds.server.data.SqlResult;
 import au.com.codeka.warworlds.server.data.SqlStmt;
 
 public class AdminChatHandler extends AdminGenericHandler {
@@ -27,14 +27,14 @@ public class AdminChatHandler extends AdminGenericHandler {
                     " WHERE expiry > NOW()";
         try (SqlStmt stmt = DB.prepare(sql)) {
             stmt.setDateTime(1, DateTime.now().minusHours(24));
-            ResultSet rs = stmt.select();
+            SqlResult res = stmt.select();
             ArrayList<TreeMap<String, Object>> sinbin = new ArrayList<TreeMap<String, Object>>();
-            while (rs.next()) {
+            while (res.next()) {
                 TreeMap<String, Object> result = new TreeMap<String, Object>();
-                result.put("empire_id", rs.getInt("empire_id"));
-                result.put("expiry", rs.getTimestamp("expiry").getTime());
-                result.put("empireName", rs.getString("name"));
-                result.put("userEmail", rs.getString("user_email"));
+                result.put("empire_id", res.getInt("empire_id"));
+                result.put("expiry", res.getDateTime("expiry"));
+                result.put("empireName", res.getString("name"));
+                result.put("userEmail", res.getString("user_email"));
 
                 sinbin.add(result);
             }

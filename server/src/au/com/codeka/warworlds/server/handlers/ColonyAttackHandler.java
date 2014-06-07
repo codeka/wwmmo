@@ -34,7 +34,7 @@ public class ColonyAttackHandler extends RequestHandler {
                         "No colony found on this planet.");
             }
 
-            if (colony.getEmpireID() == getSession().getEmpireID()) {
+            if (colony.getEmpireID() != null && colony.getEmpireID() == getSession().getEmpireID()) {
                 throw new RequestException(400, Messages.GenericError.ErrorCode.CannotAttackOwnColony,
                         "Cannot attack your own colony.");
             }

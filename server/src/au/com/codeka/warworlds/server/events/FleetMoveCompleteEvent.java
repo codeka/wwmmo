@@ -1,6 +1,5 @@
 package au.com.codeka.warworlds.server.events;
 
-import java.sql.ResultSet;
 import java.util.ArrayList;
 
 import org.joda.time.DateTime;
@@ -22,6 +21,7 @@ import au.com.codeka.warworlds.server.ctrl.RealmController;
 import au.com.codeka.warworlds.server.ctrl.SituationReportController;
 import au.com.codeka.warworlds.server.ctrl.StarController;
 import au.com.codeka.warworlds.server.data.DB;
+import au.com.codeka.warworlds.server.data.SqlResult;
 import au.com.codeka.warworlds.server.data.SqlStmt;
 import au.com.codeka.warworlds.server.model.CombatReport;
 import au.com.codeka.warworlds.server.model.Fleet;
@@ -42,11 +42,11 @@ public class FleetMoveCompleteEvent extends Event {
         String sql = "SELECT id, star_id, target_star_id FROM fleets WHERE eta < ?";
         try (SqlStmt stmt = DB.prepare(sql)) {
             stmt.setDateTime(1, DateTime.now().plusSeconds(10)); // anything in the next 10 seconds is a candidate
-            ResultSet rs = stmt.select();
-            while (rs.next()) {
-                int fleetID = rs.getInt(1);
-                int srcStarID = rs.getInt(2);
-                int destStarID = rs.getInt(3);
+            SqlResult res = stmt.select();
+            while (res.next()) {
+                int fleetID = res.getInt(1);
+                int srcStarID = res.getInt(2);
+                int destStarID = res.getInt(3);
 
                 RequestContext.i.setContext("event: FleetMoveCompleteEvent fleet.id="+fleetID);
 

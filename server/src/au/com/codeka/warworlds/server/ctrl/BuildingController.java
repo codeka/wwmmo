@@ -1,6 +1,5 @@
 package au.com.codeka.warworlds.server.ctrl;
 
-import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
 
@@ -10,6 +9,7 @@ import au.com.codeka.common.model.BaseBuilding;
 import au.com.codeka.common.model.BuildingDesign;
 import au.com.codeka.common.model.DesignKind;
 import au.com.codeka.warworlds.server.RequestException;
+import au.com.codeka.warworlds.server.data.SqlResult;
 import au.com.codeka.warworlds.server.data.SqlStmt;
 import au.com.codeka.warworlds.server.data.Transaction;
 import au.com.codeka.warworlds.server.model.Building;
@@ -94,11 +94,7 @@ public class BuildingController {
             try (SqlStmt stmt = prepare(sql, Statement.RETURN_GENERATED_KEYS)) {
                 stmt.setInt(1, colony.getStarID());
                 stmt.setInt(2, colony.getID());
-                if (colony.getEmpireKey() == null) {
-                    stmt.setNull(3);
-                } else {
-                    stmt.setInt(3, colony.getEmpireID());
-                }
+                stmt.setInt(3, colony.getEmpireID());
                 stmt.setString(4, building.getDesignID());
                 stmt.setDateTime(5, DateTime.now());
                 stmt.setInt(6, 1);
@@ -133,11 +129,11 @@ public class BuildingController {
                 stmt.setLong(3, maxSectorX);
                 stmt.setLong(4, minSectorY);
                 stmt.setLong(5, maxSectorY);
-                ResultSet rs = stmt.select();
+                SqlResult res = stmt.select();
 
                 ArrayList<BuildingPosition> buildings = new ArrayList<BuildingPosition>();
-                while (rs.next()) {
-                    buildings.add(new BuildingPosition(rs));
+                while (res.next()) {
+                    buildings.add(new BuildingPosition(res));
                 }
                 return buildings;
             }

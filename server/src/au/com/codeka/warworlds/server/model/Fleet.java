@@ -1,8 +1,6 @@
 package au.com.codeka.warworlds.server.model;
 
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Timestamp;
 import java.util.ArrayList;
 
 import org.joda.time.DateTime;
@@ -13,53 +11,46 @@ import au.com.codeka.common.model.BaseFleetUpgrade;
 import au.com.codeka.common.model.DesignKind;
 import au.com.codeka.common.model.ShipDesign;
 import au.com.codeka.common.protobuf.Messages;
+import au.com.codeka.warworlds.server.data.SqlResult;
 
 public class Fleet extends BaseFleet {
     private int mID;
     private int mStarID;
     private int mSectorID;
-    private int mEmpireID;
-    private int mDestinationStarID;
-    private int mTargetFleetID;
+    private Integer mEmpireID;
+    private Integer mDestinationStarID;
+    private Integer mTargetFleetID;
 
     public Fleet() {
     }
-    public Fleet(ResultSet rs) throws SQLException {
-        mID = rs.getInt("id");
+    public Fleet(SqlResult res) throws SQLException {
+        mID = res.getInt("id");
         mKey = Integer.toString(mID);
-        mStarID = rs.getInt("star_id");
+        mStarID = res.getInt("star_id");
         mStarKey = Integer.toString(mStarID);
-        mSectorID = rs.getInt("sector_id");
-        mDesignID = rs.getString("design_id");
-        mEmpireID = rs.getInt("empire_id");
-        if (!rs.wasNull()) {
+        mSectorID = res.getInt("sector_id");
+        mDesignID = res.getString("design_id");
+        mEmpireID = res.getInt("empire_id");
+        if (mEmpireID != null) {
             mEmpireKey = Integer.toString(mEmpireID);
         }
-        mAllianceID = rs.getInt("alliance_id");
-        if (rs.wasNull()) {
-            mAllianceID = null;
-        }
-        mNumShips = rs.getFloat("num_ships");
-        mStance = Stance.fromNumber(rs.getInt("stance"));
-        mState = State.fromNumber(rs.getInt("state"));
-        mStateStartTime = new DateTime(rs.getTimestamp("state_start_time").getTime());
-
-        Timestamp eta = rs.getTimestamp("eta");
-        if (eta != null) {
-            mEta = new DateTime(eta.getTime());
-        }
-
-        mDestinationStarID = rs.getInt("target_star_id");
-        if (!rs.wasNull()) {
+        mAllianceID = res.getInt("alliance_id");
+        mNumShips = res.getFloat("num_ships");
+        mStance = Stance.fromNumber(res.getInt("stance"));
+        mState = State.fromNumber(res.getInt("state"));
+        mStateStartTime = res.getDateTime("state_start_time");
+        mEta = res.getDateTime("eta");
+        mDestinationStarID = res.getInt("target_star_id");
+        if (mDestinationStarID != null) {
             mDestinationStarKey = Integer.toString(mDestinationStarID);
         }
 
-        mTargetFleetID = rs.getInt("target_fleet_id");
-        if (!rs.wasNull()) {
+        mTargetFleetID = res.getInt("target_fleet_id");
+        if (mTargetFleetID != null) {
             mTargetFleetKey = Integer.toString(mTargetFleetID);
         }
 
-        mNotes = rs.getString("notes");
+        mNotes = res.getString("notes");
     }
     public Fleet(Empire empire, Star star, String designID, float numShips) {
         mStarID = star.getID();
@@ -88,13 +79,13 @@ public class Fleet extends BaseFleet {
     public int getSectorID() {
         return mSectorID;
     }
-    public int getEmpireID() {
+    public Integer getEmpireID() {
         return mEmpireID;
     }
-    public int getDestinationStarID() {
+    public Integer getDestinationStarID() {
         return mDestinationStarID;
     }
-    public int getTargetFleetID() {
+    public Integer getTargetFleetID() {
         return mTargetFleetID;
     }
     public void setEta(DateTime eta) {
@@ -114,10 +105,6 @@ public class Fleet extends BaseFleet {
     }
     public void setStance(Stance stance) {
         mStance = stance;
-    }
-    public void setTargetFleetID(int id) {
-        mTargetFleetID = id;
-        mTargetFleetKey = Integer.toString(id);
     }
     public void setNotes(String notes) {
         mNotes = notes;
@@ -158,21 +145,21 @@ public class Fleet extends BaseFleet {
     public void move(DateTime now, String destinationStarKey, DateTime eta) {
         super.move(now, destinationStarKey, eta);
         mDestinationStarID = Integer.parseInt(destinationStarKey);
-        mTargetFleetID = 0;
+        mTargetFleetID = null;
     }
 
     @Override
     public void idle(DateTime now) {
         super.idle(now);
-        mDestinationStarID = 0;
-        mTargetFleetID = 0;
+        mDestinationStarID = null;
+        mTargetFleetID = null;
     }
 
     @Override
     public void attack(DateTime now) {
         super.attack(now);
-        mDestinationStarID = 0;
-        mTargetFleetID = 0;
+        mDestinationStarID = null;
+        mTargetFleetID = null;
     }
 
     /**

@@ -1,6 +1,5 @@
 package au.com.codeka.warworlds.server.ctrl;
 
-import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -17,6 +16,7 @@ import au.com.codeka.common.model.BaseSector;
 import au.com.codeka.common.model.BaseStar;
 import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.data.DB;
+import au.com.codeka.warworlds.server.data.SqlResult;
 import au.com.codeka.warworlds.server.data.SqlStmt;
 import au.com.codeka.warworlds.server.model.Sector;
 import au.com.codeka.warworlds.server.model.Star;
@@ -70,12 +70,12 @@ public class NewEmpireStarFinder {
                      " ORDER BY (distance_to_non_abandoned_empire + distance_to_centre) ASC" +
                      " LIMIT 10";
         try (SqlStmt stmt = DB.prepare(sql)) {
-            ResultSet rs = stmt.select();
+            SqlResult res = stmt.select();
 
             List<Pair<Integer, Integer>> stars = new ArrayList<Pair<Integer, Integer>>();
-            while (rs.next()) {
-                int starID = rs.getInt(1);
-                int empireID = rs.getInt(2);
+            while (res.next()) {
+                int starID = res.getInt(1);
+                int empireID = res.getInt(2);
                 stars.add(new Pair<Integer, Integer>(starID, empireID));
             }
 
@@ -257,9 +257,9 @@ public class NewEmpireStarFinder {
                 " ORDER BY distance_to_centre ASC";
         ArrayList<Integer> ids = new ArrayList<Integer>();
         try (SqlStmt stmt = DB.prepare(sql)) {
-            ResultSet rs = stmt.select();
-            while (rs.next()) {
-                ids.add(rs.getInt(1));
+            SqlResult res = stmt.select();
+            while (res.next()) {
+                ids.add(res.getInt(1));
                 if (ids.size() > 10) {
                     break;
                 }

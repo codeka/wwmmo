@@ -1,12 +1,12 @@
 package au.com.codeka.warworlds.server.cron;
 
-import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.TreeMap;
 
 import au.com.codeka.warworlds.server.data.DB;
+import au.com.codeka.warworlds.server.data.SqlResult;
 import au.com.codeka.warworlds.server.data.SqlStmt;
 import au.com.codeka.warworlds.server.model.EmpireRank;
 
@@ -21,19 +21,19 @@ public class UpdateRanksCronJob extends CronJob {
 
         String sql = "SELECT id AS empire_id FROM empires WHERE state <> 2";
         try (SqlStmt stmt = DB.prepare(sql)) {
-            ResultSet rs = stmt.select();
-            while (rs.next()) {
-                EmpireRank rank = new EmpireRank(rs);
+            SqlResult res = stmt.select();
+            while (res.next()) {
+                EmpireRank rank = new EmpireRank(res);
                 ranks.put(rank.getEmpireID(), rank);
             }
         }
 
         sql = "SELECT empire_id, SUM(num_ships) FROM fleets WHERE empire_id IS NOT NULL GROUP BY empire_id";
         try (SqlStmt stmt = DB.prepare(sql)) {
-            ResultSet rs = stmt.select();
-            while (rs.next()) {
-                int empireID = rs.getInt(1);
-                int totalShips = rs.getInt(2);
+            SqlResult res = stmt.select();
+            while (res.next()) {
+                int empireID = res.getInt(1);
+                int totalShips = res.getInt(2);
                 if (!ranks.containsKey(empireID)) {
                     continue;
                 }
@@ -43,10 +43,10 @@ public class UpdateRanksCronJob extends CronJob {
 
         sql = "SELECT empire_id, SUM(num_ships) FROM fleets WHERE empire_id IS NOT NULL GROUP BY empire_id";
         try (SqlStmt stmt = DB.prepare(sql)) {
-            ResultSet rs = stmt.select();
-            while (rs.next()) {
-                int empireID = rs.getInt(1);
-                int totalShips = rs.getInt(2);
+            SqlResult res = stmt.select();
+            while (res.next()) {
+                int empireID = res.getInt(1);
+                int totalShips = res.getInt(2);
                 if (!ranks.containsKey(empireID)) {
                     continue;
                 }
@@ -56,10 +56,10 @@ public class UpdateRanksCronJob extends CronJob {
 
         sql = "SELECT empire_id, COUNT(*) FROM buildings GROUP BY empire_id";
         try (SqlStmt stmt = DB.prepare(sql)) {
-            ResultSet rs = stmt.select();
-            while (rs.next()) {
-                int empireID = rs.getInt(1);
-                int totalBuildings = rs.getInt(2);
+            SqlResult res = stmt.select();
+            while (res.next()) {
+                int empireID = res.getInt(1);
+                int totalBuildings = res.getInt(2);
                 if (!ranks.containsKey(empireID)) {
                     continue;
                 }
@@ -69,11 +69,11 @@ public class UpdateRanksCronJob extends CronJob {
 
         sql = "SELECT empire_id, COUNT(*), SUM(population) FROM colonies WHERE empire_id IS NOT NULL GROUP BY empire_id";
         try (SqlStmt stmt = DB.prepare(sql)) {
-            ResultSet rs = stmt.select();
-            while (rs.next()) {
-                int empireID = rs.getInt(1);
-                int totalColonies = rs.getInt(2);
-                int totalPopulation = rs.getInt(3);
+            SqlResult res = stmt.select();
+            while (res.next()) {
+                int empireID = res.getInt(1);
+                int totalColonies = res.getInt(2);
+                int totalPopulation = res.getInt(3);
                 if (!ranks.containsKey(empireID)) {
                     continue;
                 }
@@ -91,10 +91,10 @@ public class UpdateRanksCronJob extends CronJob {
               ") AS stars" +
              " GROUP BY empire_id";
         try (SqlStmt stmt = DB.prepare(sql)) {
-            ResultSet rs = stmt.select();
-            while (rs.next()) {
-                int empireID = rs.getInt(1);
-                int totalStars = rs.getInt(2);
+            SqlResult res = stmt.select();
+            while (res.next()) {
+                int empireID = res.getInt(1);
+                int totalStars = res.getInt(2);
                 if (!ranks.containsKey(empireID)) {
                     continue;
                 }

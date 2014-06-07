@@ -1,15 +1,15 @@
 package au.com.codeka.warworlds.server.model;
 
-import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import org.joda.time.DateTime;
 
-import com.google.protobuf.InvalidProtocolBufferException;
-
 import au.com.codeka.common.model.BaseScoutReport;
 import au.com.codeka.common.model.BaseStar;
 import au.com.codeka.common.protobuf.Messages;
+import au.com.codeka.warworlds.server.data.SqlResult;
+
+import com.google.protobuf.InvalidProtocolBufferException;
 
 public class ScoutReport extends BaseScoutReport {
     private int mID;
@@ -22,15 +22,16 @@ public class ScoutReport extends BaseScoutReport {
         mReportDate = DateTime.now();
         mStarSnapshot = star;
     }
-    public ScoutReport(ResultSet rs) throws SQLException {
+    public ScoutReport(SqlResult res) throws SQLException {
         try {
-            Messages.ScoutReport scout_report_pb = Messages.ScoutReport.parseFrom(rs.getBytes("report"));
+            Messages.ScoutReport scout_report_pb = Messages.ScoutReport.parseFrom(
+                    res.getBytes("report"));
             fromProtocolBuffer(scout_report_pb);
         } catch(InvalidProtocolBufferException e) {
             // ignore
         }
 
-        mID = rs.getInt("id");
+        mID = res.getInt("id");
         mKey = Integer.toString(mID);
     }
 

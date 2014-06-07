@@ -1,6 +1,5 @@
 package au.com.codeka.warworlds.server.ctrl;
 
-import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -12,6 +11,7 @@ import au.com.codeka.common.model.BaseAllianceMember;
 import au.com.codeka.common.model.BaseAllianceRequest;
 import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.server.RequestException;
+import au.com.codeka.warworlds.server.data.SqlResult;
 import au.com.codeka.warworlds.server.data.SqlStmt;
 import au.com.codeka.warworlds.server.data.Transaction;
 import au.com.codeka.warworlds.server.model.Alliance;
@@ -159,9 +159,9 @@ public class AllianceController {
             if (shieldID != null) {
                 stmt.setInt(2, shieldID);
             }
-            ResultSet rs = stmt.select();
-            if (rs.next()) {
-                return rs.getBytes(1);
+            SqlResult res = stmt.select();
+            if (res.next()) {
+                return res.getBytes(1);
             }
         } catch (Exception e) {
             throw new RequestException(e);
@@ -202,14 +202,14 @@ public class AllianceController {
             try (SqlStmt stmt = prepare(sql)) {
                 stmt.setInt(1, empireID1);
                 stmt.setInt(2, empireID2);
-                ResultSet rs = stmt.select();
+                SqlResult res = stmt.select();
 
                 int allianceID = -1;
-                while (rs.next()) {
+                while (res.next()) {
                     if (allianceID < 0) {
-                        allianceID = rs.getInt(1);
+                        allianceID = res.getInt(1);
                     } else if (allianceID > 0) {
-                        return rs.getInt(1) == allianceID;
+                        return res.getInt(1) == allianceID;
                     }
                 }
             }
@@ -224,11 +224,11 @@ public class AllianceController {
                         " FROM alliances" +
                         " ORDER BY name DESC";
             try (SqlStmt stmt = prepare(sql)) {
-                ResultSet rs = stmt.select();
+                SqlResult res = stmt.select();
 
                 ArrayList<Alliance> alliances = new ArrayList<Alliance>();
-                while (rs.next()) {
-                    alliances.add(new Alliance(null, rs));
+                while (res.next()) {
+                    alliances.add(new Alliance(null, res));
                 }
                 return alliances;
             }
@@ -241,10 +241,10 @@ public class AllianceController {
                         " FROM alliances WHERE id = ?";
             try (SqlStmt stmt = prepare(sql)) {
                 stmt.setInt(1, allianceID);
-                ResultSet rs = stmt.select();
+                SqlResult res = stmt.select();
 
-                if (rs.next()) {
-                    alliance = new Alliance(null, rs);
+                if (res.next()) {
+                    alliance = new Alliance(null, res);
                 }
             }
             if (alliance == null) {
@@ -254,9 +254,9 @@ public class AllianceController {
             sql = "SELECT id, alliance_id, alliance_rank FROM empires WHERE alliance_id = ?";
             try (SqlStmt stmt = prepare(sql)) {
                 stmt.setInt(1, allianceID);
-                ResultSet rs = stmt.select();
-                while (rs.next()) {
-                    AllianceMember member = new AllianceMember(rs);
+                SqlResult res = stmt.select();
+                while (res.next()) {
+                    AllianceMember member = new AllianceMember(res);
                     alliance.getMembers().add(member);
                 }
             }
@@ -356,10 +356,10 @@ public class AllianceController {
                 if (cursor != null) {
                     stmt.setInt(2, cursor);
                 }
-                ResultSet rs = stmt.select();
+                SqlResult res = stmt.select();
 
-                while (rs.next()) {
-                    AllianceRequest request = new AllianceRequest(rs);
+                while (res.next()) {
+                    AllianceRequest request = new AllianceRequest(res);
                     requests.add(request);
 
                     if (!requestIDs.contains(request.getID())) {
@@ -372,9 +372,9 @@ public class AllianceController {
                 sql = "SELECT * FROM alliance_request_votes WHERE alliance_request_id IN ";
                 sql += buildInClause(requestIDs);
                 try (SqlStmt stmt = prepare(sql)) {
-                    ResultSet rs = stmt.select();
-                    while (rs.next()) {
-                        AllianceRequestVote vote = new AllianceRequestVote(rs);
+                    SqlResult res = stmt.select();
+                    while (res.next()) {
+                        AllianceRequestVote vote = new AllianceRequestVote(res);
                         for (BaseAllianceRequest request : requests) {
                             if (request.getID() == vote.getAllianceRequestID()) {
                                 request.getVotes().add(vote);
@@ -391,10 +391,10 @@ public class AllianceController {
             String sql = "SELECT * FROM alliance_requests WHERE id = ?";
             try (SqlStmt stmt = prepare(sql)) {
                 stmt.setInt(1, allianceRequestID); 
-                ResultSet rs = stmt.select();
+                SqlResult res = stmt.select();
 
-                if (rs.next()) {
-                    return new AllianceRequest(rs);
+                if (res.next()) {
+                    return new AllianceRequest(res);
                 }
             }
 

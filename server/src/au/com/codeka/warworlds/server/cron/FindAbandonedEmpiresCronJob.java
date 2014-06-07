@@ -1,6 +1,5 @@
 package au.com.codeka.warworlds.server.cron;
 
-import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.Locale;
 
@@ -9,6 +8,7 @@ import org.slf4j.LoggerFactory;
 
 import au.com.codeka.warworlds.server.ctrl.StarController;
 import au.com.codeka.warworlds.server.data.DB;
+import au.com.codeka.warworlds.server.data.SqlResult;
 import au.com.codeka.warworlds.server.data.SqlStmt;
 import au.com.codeka.warworlds.server.model.Empire;
 import au.com.codeka.warworlds.server.model.Sector;
@@ -47,10 +47,10 @@ public class FindAbandonedEmpiresCronJob extends CronJob {
                        " AND last_login < DATE_ADD(NOW(), INTERVAL -14 DAY)" +
                        " AND num_stars <= 1";
         try (SqlStmt stmt = DB.prepare(sql)) {
-            ResultSet rs = stmt.select();
-            while (rs.next()) {
-                int empireID = rs.getInt(1);
-                String empireName = rs.getString(2);
+            SqlResult res = stmt.select();
+            while (res.next()) {
+                int empireID = res.getInt(1);
+                String empireName = res.getString(2);
                 log.info(String.format(Locale.ENGLISH,
                         "Empire #%d (%s) has not logged in for two weeks, marking abandoned.",
                         empireID, empireName));
@@ -77,10 +77,10 @@ public class FindAbandonedEmpiresCronJob extends CronJob {
                      " INNER JOIN empires ON empires.id = empire_presences.empire_id" + 
                      " WHERE empires.state = " + Empire.State.ABANDONED.getValue();
         try (SqlStmt stmt = DB.prepare(sql)) {
-            ResultSet rs = stmt.select();
-            while (rs.next()) {
-                int starID = rs.getInt(1);
-                int empireID = rs.getInt(2);
+            SqlResult res = stmt.select();
+            while (res.next()) {
+                int starID = res.getInt(1);
+                int empireID = res.getInt(2);
                 try {
                     updateAbandonedStar(starID, empireID);
                 } catch (Exception e) {
@@ -108,13 +108,13 @@ public class FindAbandonedEmpiresCronJob extends CronJob {
             stmt.setLong(2, star.getSectorX() - 3);
             stmt.setLong(3, star.getSectorY() + 3);
             stmt.setLong(4, star.getSectorY() - 3);
-            ResultSet rs = stmt.select();
+            SqlResult res = stmt.select();
 
-            while (rs.next()) {
-                long sectorX = rs.getLong(1);
-                long sectorY = rs.getLong(2);
-                int offsetX = rs.getInt(3);
-                int offsetY = rs.getInt(4);
+            while (res.next()) {
+                long sectorX = res.getLong(1);
+                long sectorY = res.getLong(2);
+                int offsetX = res.getInt(3);
+                int offsetY = res.getInt(4);
 
                 float distance = Sector.distanceInParsecs(star, sectorX, sectorY, offsetX, offsetY);
                 if (distanceToNonAbandonedEmpire < 0.001f || distance < distanceToNonAbandonedEmpire) {

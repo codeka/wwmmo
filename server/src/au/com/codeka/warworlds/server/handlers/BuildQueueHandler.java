@@ -1,7 +1,5 @@
 package au.com.codeka.warworlds.server.handlers;
 
-import java.util.Random;
-
 import org.joda.time.DateTime;
 
 import au.com.codeka.common.model.BaseColony;
@@ -18,8 +16,6 @@ import au.com.codeka.warworlds.server.model.Colony;
 import au.com.codeka.warworlds.server.model.Star;
 
 public class BuildQueueHandler extends RequestHandler {
-    private static Random sRand = new Random();
-
     @Override
     protected void post() throws RequestException {
         Messages.BuildRequest build_request_pb = getRequestBody(Messages.BuildRequest.class);
@@ -43,7 +39,7 @@ public class BuildQueueHandler extends RequestHandler {
                     colony = (Colony) c;
                 }
             }
-            if (colony == null) {
+            if (colony == null || colony.getEmpireID() == null) {
                 throw new RequestException(404);
             }
             if (colony.getEmpireID() != getSession().getEmpireID()) {

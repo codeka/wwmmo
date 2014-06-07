@@ -1,6 +1,5 @@
 package au.com.codeka.warworlds.server.ctrl;
 
-import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -10,6 +9,7 @@ import au.com.codeka.common.model.BaseColony;
 import au.com.codeka.common.model.BaseFleet;
 import au.com.codeka.common.model.BaseStar;
 import au.com.codeka.warworlds.server.RequestException;
+import au.com.codeka.warworlds.server.data.SqlResult;
 import au.com.codeka.warworlds.server.data.SqlStmt;
 import au.com.codeka.warworlds.server.data.Transaction;
 import au.com.codeka.warworlds.server.model.Colony;
@@ -172,11 +172,11 @@ public class SectorController {
 
         private List<Sector> getSectors(String sql) throws Exception {
             try (SqlStmt stmt = prepare(sql)) {
-                ResultSet rs = stmt.select();
+                SqlResult res = stmt.select();
 
                 List<Sector> sectors = new ArrayList<Sector>();
-                while (rs.next()) {
-                    sectors.add(new Sector(rs));
+                while (res.next()) {
+                    sectors.add(new Sector(res));
                 }
                 return sectors;
             }
@@ -190,11 +190,11 @@ public class SectorController {
                         " INNER JOIN sectors ON stars.sector_id = sectors.id" +
                         " WHERE sector_id IN "+buildInClause(sectorIds);
             try (SqlStmt stmt = prepare(sql)) {
-                ResultSet rs = stmt.select();
+                SqlResult res = stmt.select();
 
                 List<Star> stars = new ArrayList<Star>();
-                while (rs.next()) {
-                    stars.add(new Star(rs));
+                while (res.next()) {
+                    stars.add(new Star(res));
                 }
                 return stars;
             }
@@ -205,11 +205,11 @@ public class SectorController {
                          " FROM colonies" +
                          " WHERE sector_id IN "+buildInClause(sectorIds);
              try (SqlStmt stmt = prepare(sql)) {
-                 ResultSet rs = stmt.select();
+                 SqlResult res = stmt.select();
 
                  List<Colony> colonies = new ArrayList<Colony>();
-                 while (rs.next()) {
-                     colonies.add(new Colony(rs));
+                 while (res.next()) {
+                     colonies.add(new Colony(res));
                  }
                  return colonies;
              }
@@ -224,10 +224,10 @@ public class SectorController {
                          " LEFT OUTER JOIN empires ON empires.id = fleets.empire_id" +
                          " WHERE sector_id IN "+buildInClause(sectorIds);
             try (SqlStmt stmt = prepare(sql)) {
-                ResultSet rs = stmt.select();
+                SqlResult res = stmt.select();
 
-                while (rs.next()) {
-                    Fleet fleet = new Fleet(rs);
+                while (res.next()) {
+                    Fleet fleet = new Fleet(res);
                     fleets.add(fleet);
                     if (!starIds.contains(fleet.getStarID())) {
                         starIds.add(fleet.getStarID());
@@ -238,10 +238,10 @@ public class SectorController {
             if (starIds.size() > 0) {
                 sql = "SELECT * FROM fleet_upgrades WHERE star_id IN "+buildInClause(starIds);
                 try (SqlStmt stmt = prepare(sql)) {
-                    ResultSet rs = stmt.select();
+                    SqlResult res = stmt.select();
     
-                    while (rs.next()) {
-                        FleetUpgrade fleetUpgrade = FleetUpgrade.create(rs);
+                    while (res.next()) {
+                        FleetUpgrade fleetUpgrade = FleetUpgrade.create(res);
     
                         for (Fleet fleet : fleets) {
                             if (fleet.getID() == fleetUpgrade.getFleetID()) {

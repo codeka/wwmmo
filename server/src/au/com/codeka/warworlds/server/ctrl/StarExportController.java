@@ -2,12 +2,12 @@ package au.com.codeka.warworlds.server.ctrl;
 
 import java.io.OutputStream;
 import java.io.PrintStream;
-import java.sql.ResultSet;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import au.com.codeka.common.model.BaseStar;
+import au.com.codeka.warworlds.server.data.SqlResult;
 import au.com.codeka.warworlds.server.data.SqlStmt;
 
 public class StarExportController {
@@ -26,14 +26,15 @@ public class StarExportController {
                                " WHERE colonies.star_id = stars.id GROUP BY empire_id ORDER BY COUNT(*) DESC LIMIT 1) AS empire_name" +
                          " FROM stars INNER JOIN sectors ON sectors.id = stars.sector_id";
             try (SqlStmt stmt = db.prepare(sql)) {
-                ResultSet rs = stmt.select();
+                SqlResult res = stmt.select();
 
                 ps.println("x,y,name,size,type,empire_name");
-                while (rs.next()) {
+                while (res.next()) {
                     ps.println(String.format("%d.%d,%d.%d,%s,%s,%s,%s",
-                            rs.getInt(1), rs.getInt(3), rs.getInt(2), rs.getInt(4),
-                            escapeValue(rs.getString(5)), rs.getInt(6), getStarTypeName(BaseStar.Type.values()[rs.getInt(7)]),
-                            escapeValue(rs.getString(8))));
+                            res.getInt(1), res.getInt(3), res.getInt(2), res.getInt(4),
+                            escapeValue(res.getString(5)), res.getInt(6),
+                            getStarTypeName(BaseStar.Type.values()[res.getInt(7)]),
+                            escapeValue(res.getString(8))));
                 }
             }
         } catch (Exception e) {

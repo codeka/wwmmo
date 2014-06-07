@@ -1,10 +1,9 @@
 package au.com.codeka.warworlds.server.ctrl;
 
-import java.sql.ResultSet;
-
 import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.data.DB;
+import au.com.codeka.warworlds.server.data.SqlResult;
 import au.com.codeka.warworlds.server.data.SqlStmt;
 import au.com.codeka.warworlds.server.data.Transaction;
 
@@ -38,9 +37,9 @@ public class CombatReportController {
             String sql = "SELECT rounds FROM combat_reports WHERE id = ?";
             try (SqlStmt stmt = DB.prepare(sql)) {
                 stmt.setInt(1, combatReportID);
-                ResultSet rs = stmt.select();
-                while (rs.next()) {
-                    return Messages.CombatReport.parseFrom(rs.getBytes(1));
+                SqlResult res = stmt.select();
+                while (res.next()) {
+                    return Messages.CombatReport.parseFrom(res.getBytes(1));
                 }
             }
 

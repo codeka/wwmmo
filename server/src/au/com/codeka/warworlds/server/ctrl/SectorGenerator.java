@@ -1,6 +1,5 @@
 package au.com.codeka.warworlds.server.ctrl;
 
-import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Random;
@@ -15,6 +14,7 @@ import au.com.codeka.common.Vector2;
 import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.data.DB;
+import au.com.codeka.warworlds.server.data.SqlResult;
 import au.com.codeka.warworlds.server.data.SqlStmt;
 import au.com.codeka.warworlds.server.model.Planet;
 import au.com.codeka.warworlds.server.model.Sector;
@@ -124,10 +124,10 @@ public class SectorGenerator {
         long minX = 0, minY = 0, maxX = 0, maxY = 0;
         String sql = "SELECT x, y FROM sectors";
         try (SqlStmt stmt = DB.prepare(sql)) {
-            ResultSet rs = stmt.select();
-            while (rs.next()) {
-                long x = rs.getLong(0);
-                long y = rs.getLong(1);
+            SqlResult res = stmt.select();
+            while (res.next()) {
+                long x = res.getLong(0);
+                long y = res.getLong(1);
 
                 Set<Long> xs = existingSectors.get(y);
                 if (xs == null) {

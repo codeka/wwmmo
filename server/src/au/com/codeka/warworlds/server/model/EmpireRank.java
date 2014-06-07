@@ -1,26 +1,26 @@
 package au.com.codeka.warworlds.server.model;
 
-import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import au.com.codeka.common.model.BaseEmpireRank;
+import au.com.codeka.warworlds.server.data.SqlResult;
 
 public class EmpireRank extends BaseEmpireRank {
     private int mEmpireID;
 
     public EmpireRank() {
     }
-    public EmpireRank(ResultSet rs) throws SQLException {
-        mEmpireID = rs.getInt("empire_id");
+    public EmpireRank(SqlResult res) throws SQLException {
+        mEmpireID = res.getInt("empire_id");
         mEmpireKey = Integer.toString(mEmpireID);
 
         try {
-            mRank = rs.getInt("rank");
-            mTotalStars = rs.getInt("total_stars");
-            mTotalColonies = rs.getInt("total_colonies");
-            mTotalBuildings = rs.getInt("total_buildings");
-            mTotalShips = rs.getInt("total_ships");
-            mTotalPopulation = rs.getInt("total_population");
+            mRank = res.getInt("rank");
+            mTotalStars = res.getInt("total_stars");
+            mTotalColonies = res.getInt("total_colonies");
+            mTotalBuildings = res.getInt("total_buildings");
+            mTotalShips = res.getInt("total_ships");
+            mTotalPopulation = res.getInt("total_population");
         } catch (SQLException e) {
             // these may not exist... doesn't matter
         }

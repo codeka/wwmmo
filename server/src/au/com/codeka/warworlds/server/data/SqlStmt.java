@@ -30,16 +30,17 @@ public class SqlStmt implements AutoCloseable {
     private boolean mAutoCloseConnection;
     private String mSql;
     private ArrayList<Object> mParameters;
-    private ArrayList<ResultSet> mResultSets;
+    private ArrayList<SqlResult> mResults;
     private boolean mWasStatementLogged;
 
-    public SqlStmt(Connection conn, String sql, PreparedStatement stmt, boolean autoCloseConnection) {
+    public SqlStmt(Connection conn, String sql, PreparedStatement stmt,
+            boolean autoCloseConnection) {
         mConn = conn;
         mStmt = stmt;
         mSql = sql;
         mAutoCloseConnection = autoCloseConnection;
         mParameters = new ArrayList<Object>();
-        mResultSets = new ArrayList<ResultSet>();
+        mResults = new ArrayList<SqlResult>();
         mWasStatementLogged = false;
     }
 
@@ -156,12 +157,12 @@ public class SqlStmt implements AutoCloseable {
         }
     }
 
-    public ResultSet select() throws SQLException {
+    public SqlResult select() throws SQLException {
         logStatement();
 
-        ResultSet rs = mStmt.executeQuery();
-        mResultSets.add(rs);
-        return rs;
+        SqlResult result = new SqlResult(mStmt.executeQuery());
+        mResults.add(result);
+        return result;
     }
 
     /**
@@ -169,15 +170,15 @@ public class SqlStmt implements AutoCloseable {
      *
      * Returns the {@link ResultSet} from the SELECT statement.
      */
-    public ResultSet updateAndSelect() throws SQLException {
+    public SqlResult updateAndSelect() throws SQLException {
         logStatement();
         mStmt.execute();
 
         do {
-            ResultSet rs = mStmt.getResultSet();
-            if (rs != null) {
-                mResultSets.add(rs);
-                return rs;
+            SqlResult res = new SqlResult(mStmt.getResultSet());
+            if (res != null) {
+                mResults.add(res);
+                return res;
             }
         } while (mStmt.getMoreResults());
 
@@ -206,8 +207,8 @@ public class SqlStmt implements AutoCloseable {
     public void close() throws Exception {
         logStatement();
 
-        for (ResultSet rs : mResultSets) {
-            rs.close();
+        for (SqlResult res : mResults) {
+            res.close();
         }
         mStmt.close();
         if (mAutoCloseConnection) {

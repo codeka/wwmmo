@@ -1,12 +1,12 @@
 package au.com.codeka.warworlds.server.ctrl;
 
-import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
 import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.server.RequestException;
+import au.com.codeka.warworlds.server.data.SqlResult;
 import au.com.codeka.warworlds.server.data.SqlStmt;
 import au.com.codeka.warworlds.server.data.Transaction;
 import au.com.codeka.warworlds.server.model.ScoutReport;
@@ -66,11 +66,11 @@ public class ScoutReportController {
             try (SqlStmt stmt = prepare(sql)) {
                 stmt.setInt(1, starID);
                 stmt.setInt(2, empireID);
-                ResultSet rs = stmt.select();
+                SqlResult res = stmt.select();
 
                 ArrayList<ScoutReport> reports = new ArrayList<ScoutReport>();
-                while (rs.next()) {
-                    reports.add(new ScoutReport(rs));
+                while (res.next()) {
+                    reports.add(new ScoutReport(res));
                 }
                 return reports;
             }

@@ -1,6 +1,5 @@
 package au.com.codeka.warworlds.server.ctrl;
 
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
@@ -15,6 +14,7 @@ import au.com.codeka.common.model.BaseColony;
 import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.data.DB;
+import au.com.codeka.warworlds.server.data.SqlResult;
 import au.com.codeka.warworlds.server.data.SqlStmt;
 import au.com.codeka.warworlds.server.data.Transaction;
 import au.com.codeka.warworlds.server.model.AllianceRequest;
@@ -141,9 +141,9 @@ public class EmpireController {
             if (shieldID != null) {
                 stmt.setInt(2, shieldID);
             }
-            ResultSet rs = stmt.select();
-            if (rs.next()) {
-                return rs.getBytes(1);
+            SqlResult res = stmt.select();
+            if (res.next()) {
+                return res.getBytes(1);
             }
         } catch (Exception e) {
             throw new RequestException(e);
@@ -345,9 +345,9 @@ public class EmpireController {
                     " WHERE empire_id = ?";
         try (SqlStmt stmt = DB.prepare(sql)) {
             stmt.setInt(1, empireID);
-            ResultSet rs = stmt.select();
-            while (rs.next()) {
-                starIds.add(rs.getInt(1));
+            SqlResult res = stmt.select();
+            while (res.next()) {
+                starIds.add(res.getInt(1));
             }
         } catch(Exception e) {
             throw new RequestException(e);
@@ -389,7 +389,7 @@ public class EmpireController {
         float population = 0;
         for (BaseColony baseColony : star.getColonies()) {
             Colony colony = (Colony) baseColony;
-            if (colony.getEmpireID() == empireID) {
+            if (colony.getEmpireID() != null && colony.getEmpireID() == empireID) {
                 population += colony.getPopulation();
             }
         }
@@ -442,11 +442,11 @@ public class EmpireController {
             String sql = getSelectEmpire("empires.id IN "+buildInClause(ids), true);
 
             try (SqlStmt stmt = prepare(sql)) {
-                ResultSet rs = stmt.select();
+                SqlResult res = stmt.select();
 
                 ArrayList<Empire> empires = new ArrayList<Empire>();
-                while (rs.next()) {
-                    empires.add(new Empire(rs));
+                while (res.next()) {
+                    empires.add(new Empire(res));
                 }
                 populateEmpires(empires);
                 return empires;
@@ -460,11 +460,11 @@ public class EmpireController {
                         " GROUP BY empire_id";
 
             try (SqlStmt stmt = prepare(sql)) {
-                ResultSet rs = stmt.select();
+                SqlResult res = stmt.select();
 
                 Map<Integer, Double> taxRates = new TreeMap<Integer, Double>();
-                while (rs.next()) {
-                    taxRates.put(rs.getInt(1), rs.getDouble(2));
+                while (res.next()) {
+                    taxRates.put(res.getInt(1), res.getDouble(2));
                 }
                 return taxRates;
             }
@@ -474,11 +474,11 @@ public class EmpireController {
             String sql = getSelectEmpire("user_email = ?", true);
             try (SqlStmt stmt = prepare(sql)) {
                 stmt.setString(1, email);
-                ResultSet rs = stmt.select();
+                SqlResult res = stmt.select();
 
                 ArrayList<Empire> empires = new ArrayList<Empire>();
-                if (rs.next()) {
-                    empires.add(new Empire(rs));
+                if (res.next()) {
+                    empires.add(new Empire(res));
                 }
                 if (empires.size() == 0) {
                     return null;
@@ -494,11 +494,11 @@ public class EmpireController {
             try (SqlStmt stmt = prepare(sql)) {
                 stmt.setString(1, "%"+name+"%"); // TODO: escape?
                 stmt.setInt(2, limit);
-                ResultSet rs = stmt.select();
+                SqlResult res = stmt.select();
 
                 ArrayList<Empire> empires = new ArrayList<Empire>();
-                while (rs.next()) {
-                    empires.add(new Empire(rs));
+                while (res.next()) {
+                    empires.add(new Empire(res));
                 }
 
                 populateEmpires(empires);
@@ -511,11 +511,11 @@ public class EmpireController {
             try (SqlStmt stmt = prepare(sql)) {
                 stmt.setInt(1, minRank);
                 stmt.setInt(2, maxRank);
-                ResultSet rs = stmt.select();
+                SqlResult res = stmt.select();
 
                 ArrayList<Empire> empires = new ArrayList<Empire>();
-                while (rs.next()) {
-                    empires.add(new Empire(rs));
+                while (res.next()) {
+                    empires.add(new Empire(res));
                 }
 
                 populateEmpires(empires);
@@ -555,11 +555,11 @@ public class EmpireController {
             try (SqlStmt stmt = prepare(sql)) {
                 stmt.setInt(1, empireId);
                 stmt.setInt(2, empireId);
-                ResultSet rs = stmt.select();
+                SqlResult res = stmt.select();
 
                 ArrayList<Integer> starIds = new ArrayList<Integer>();
-                while (rs.next()) {
-                    starIds.add(rs.getInt(1));
+                while (res.next()) {
+                    starIds.add(res.getInt(1));
                 }
 
                 int[] array = new int[starIds.size()];

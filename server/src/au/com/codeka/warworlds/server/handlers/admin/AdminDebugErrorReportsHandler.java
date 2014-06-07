@@ -1,9 +1,6 @@
 package au.com.codeka.warworlds.server.handlers.admin;
 
-import java.sql.Date;
-import java.sql.ResultSet;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collections;
 import java.util.TreeMap;
 
@@ -14,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.server.RequestException;
 import au.com.codeka.warworlds.server.data.DB;
+import au.com.codeka.warworlds.server.data.SqlResult;
 import au.com.codeka.warworlds.server.data.SqlStmt;
 
 
@@ -80,14 +78,15 @@ public class AdminDebugErrorReportsHandler extends AdminHandler {
             for (int i = 0; i < parameters.size(); i++) {
                 stmt.setString(i + 1, parameters.get(i));
             }
-            ResultSet rs = stmt.select();
+            SqlResult res = stmt.select();
             ArrayList<TreeMap<String, Object>> results = new ArrayList<TreeMap<String, Object>>();
-            while (rs.next()) {
+            while (res.next()) {
                 TreeMap<String, Object> result = new TreeMap<String, Object>();
-                result.put("empire_name", rs.getString("empire_name"));
-                result.put("empire_email", rs.getString("empire_email"));
+                result.put("empire_name", res.getString("empire_name"));
+                result.put("empire_email", res.getString("empire_email"));
 
-                Messages.ErrorReport error_report_pb = Messages.ErrorReport.parseFrom(rs.getBytes("data"));
+                Messages.ErrorReport error_report_pb = Messages.ErrorReport.parseFrom(
+                        res.getBytes("data"));
                 result.put("android_version", error_report_pb.getAndroidVersion());
                 result.put("phone_model", error_report_pb.getPhoneModel());
                 result.put("app_version", error_report_pb.getAppVersion());
@@ -124,23 +123,21 @@ public class AdminDebugErrorReportsHandler extends AdminHandler {
                     " SUM(CASE WHEN empire_id IS NULL THEN 1 ELSE 0 END) AS num_server_errors," +
                     " COUNT(DISTINCT empire_id) AS num_empires_reporting" +
               " FROM error_reports" +
-              " GROUP BY DATE(date)" +
-              " ORDER BY date DESC" +
+              " GROUP BY DATE(report_date)" +
+              " ORDER BY DATE(report_date) DESC" +
               " LIMIT 60";
         try (SqlStmt stmt = DB.prepare(sql)) {
-            ResultSet rs = stmt.select();
-            while (rs.next()) {
-                Date dt = rs.getDate(1);
-                int numClientErrors = rs.getInt(2);
-                int numServerErrors = rs.getInt(3);
-                int numEmpiresReporting = rs.getInt(4);
+            SqlResult res = stmt.select();
+            while (res.next()) {
+                DateTime dt = res.getDateTime(1);
+                int numClientErrors = res.getInt(2);
+                int numServerErrors = res.getInt(3);
+                int numEmpiresReporting = res.getInt(4);
 
                 TreeMap<String, Object> entry = new TreeMap<String, Object>();
-                Calendar c = Calendar.getInstance();
-                c.setTime(dt);
-                entry.put("year", c.get(Calendar.YEAR));
-                entry.put("month", c.get(Calendar.MONTH) - 1);
-                entry.put("day", c.get(Calendar.DAY_OF_MONTH));
+                entry.put("year", dt.getYear());
+                entry.put("month", dt.getMonthOfYear());
+                entry.put("day", dt.getDayOfMonth());
                 entry.put("num_client_errors", numClientErrors);
                 entry.put("num_server_errors", numServerErrors);
                 entry.put("num_empires_reporting", numEmpiresReporting);
