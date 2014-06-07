@@ -110,10 +110,10 @@ public class EmpiresSearchHandler extends RequestHandler {
             }
             Double taxRate = taxRates.get(empire.getID());
             if (taxRate != null) {
-                log.info("Setting tax for empire %d to %f", empire.getID(), taxRate);
+                log.debug(String.format("Setting tax for empire %d to %f", empire.getID(), taxRate));
                 empire_pb.setTaxesCollectedPerHour(taxRate); 
-            } else {
-                log.info("No tax for empire %d", empire.getID());
+            } else{
+                log.debug(String.format("No tax for empire %d", empire.getID()));
             }
             pb.addEmpires(empire_pb);
         }

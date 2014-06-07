@@ -80,7 +80,8 @@ public class StarSimulatorThread {
             if (starID == 0) {
                 return WAIT_TIME_NO_STARS; 
             }
-            log.info("Simulating star: "+starID);
+            log.debug("Simulating star: "+starID);
+            long startTime = System.currentTimeMillis();
 
             Star star = new StarController().getStar(starID);
             if (star.getLastSimulation().isAfter(DateTime.now().minusHours(1))) {
@@ -93,6 +94,11 @@ public class StarSimulatorThread {
 
             new Simulation().simulate(star);
             new StarController().update(star);
+
+            long endTime = System.currentTimeMillis();
+            log.info(String.format("Simulated star (%d colonies, %d fleets) in %dms: \"%s\" [%d]",
+                    star.getColonies().size(), star.getFleets().size(),
+                    endTime - startTime, star.getName(), star.getID()));
             return WAIT_TIME_NORMAL;
         } catch (Exception e) {
             log.info("HERE");

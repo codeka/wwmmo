@@ -8,6 +8,7 @@ import java.util.TreeMap;
 import au.com.codeka.warworlds.server.data.DB;
 import au.com.codeka.warworlds.server.data.SqlResult;
 import au.com.codeka.warworlds.server.data.SqlStmt;
+import au.com.codeka.warworlds.server.data.Transaction;
 import au.com.codeka.warworlds.server.model.EmpireRank;
 
 /**
@@ -122,33 +123,43 @@ public class UpdateRanksCronJob extends CronJob {
                 return diff;
             }
         });
-
-        sql = "INSERT INTO empire_ranks (empire_id, rank, total_stars, total_colonies," +
-                                       " total_buildings, total_ships, total_population)" +
-             " VALUES (?, ?, ?, ?, ?, ?, ?)" +
-             " ON DUPLICATE KEY UPDATE" +
-                 " rank = ?, total_stars = ?, total_colonies = ?, total_buildings = ?," +
-                 " total_ships = ?, total_population = ?";
-        try (SqlStmt stmt = DB.prepare(sql)) {
-            int rankValue = 1;
-            for (EmpireRank rank : sortedRanks) {
-                stmt.setInt(1, rank.getEmpireID());
-                stmt.setInt(2, rankValue);
-                stmt.setInt(3, rank.getTotalStars());
-                stmt.setInt(4, rank.getTotalColonies());
-                stmt.setInt(5, rank.getTotalBuildings());
-                stmt.setInt(6, rank.getTotalShips());
-                stmt.setInt(7, rank.getTotalPopulation());
-                stmt.setInt(8, rankValue);
-                stmt.setInt(9, rank.getTotalStars());
-                stmt.setInt(10, rank.getTotalColonies());
-                stmt.setInt(11, rank.getTotalBuildings());
-                stmt.setInt(12, rank.getTotalShips());
-                stmt.setInt(13, rank.getTotalPopulation());
-                stmt.update();
-
-                rankValue ++;
+/* TODO
+        try (Transaction t = DB.beginTransaction()) {
+            sql = "DELETE FROM empire_ranks WHERE empire_id IN (";
+            sql += DB.
+            try (SqlStmt stmt = t.prepare(sql)) {
+                for (EmpireRank rank : sortedRanks) {
+                    stmt.setInt(1, rank.getEmpireID());
+                }
             }
-        }
+
+            sql = "INSERT INTO empire_ranks (empire_id, rank, total_stars, total_colonies," +
+                                           " total_buildings, total_ships, total_population)" +
+                 " VALUES (?, ?, ?, ?, ?, ?, ?)" +
+                 " ON DUPLICATE KEY UPDATE" +
+                     " rank = ?, total_stars = ?, total_colonies = ?, total_buildings = ?," +
+                     " total_ships = ?, total_population = ?";
+            try (SqlStmt stmt = DB.prepare(sql)) {
+                int rankValue = 1;
+                for (EmpireRank rank : sortedRanks) {
+                    stmt.setInt(1, rank.getEmpireID());
+                    stmt.setInt(2, rankValue);
+                    stmt.setInt(3, rank.getTotalStars());
+                    stmt.setInt(4, rank.getTotalColonies());
+                    stmt.setInt(5, rank.getTotalBuildings());
+                    stmt.setInt(6, rank.getTotalShips());
+                    stmt.setInt(7, rank.getTotalPopulation());
+                    stmt.setInt(8, rankValue);
+                    stmt.setInt(9, rank.getTotalStars());
+                    stmt.setInt(10, rank.getTotalColonies());
+                    stmt.setInt(11, rank.getTotalBuildings());
+                    stmt.setInt(12, rank.getTotalShips());
+                    stmt.setInt(13, rank.getTotalPopulation());
+                    stmt.update();
+
+                    rankValue ++;
+                }
+            }
+        }*/
     }
 }

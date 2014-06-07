@@ -17,7 +17,7 @@ public class Session {
     private String mEmail;
     private DateTime mLoginTime;
     private int mEmpireID;
-    private int mAllianceID;
+    private Integer mAllianceID;
     private boolean mIsAdmin;
     private boolean mAllowInlineNotifications;
 
@@ -28,7 +28,11 @@ public class Session {
         mActualEmail = res.getString("user_email");
         mEmail = mActualEmail;
         mLoginTime = res.getDateTime("login_time");
-        mEmpireID = res.getInt("empire_id");
+        if (res.getInt("empire_id") == null) {
+            mEmpireID = 0;
+        } else {
+            mEmpireID = res.getInt("empire_id");
+        }
         mAllianceID = res.getInt("alliance_id");
         mIsAdmin = res.getInt("is_admin") == 1;
         mAllowInlineNotifications = (res.getInt("inline_notifications") == 1);
@@ -43,7 +47,8 @@ public class Session {
         mIsAdmin = copy.mIsAdmin;
         mAllowInlineNotifications = copy.mAllowInlineNotifications;
     }
-    public Session(String cookie, String email, DateTime loginTime, int empireID, int allianceID, boolean isAdmin) {
+    public Session(String cookie, String email, DateTime loginTime, int empireID,
+            Integer allianceID, boolean isAdmin) {
         mCookie = cookie;
         mActualEmail = email;
         mEmail = mActualEmail;
@@ -72,6 +77,9 @@ public class Session {
         mEmpireID = empireID;
     }
     public int getAllianceID() {
+        if (mAllianceID == null) {
+            return 0;
+        }
         return mAllianceID;
     }
     public boolean isAdmin() {

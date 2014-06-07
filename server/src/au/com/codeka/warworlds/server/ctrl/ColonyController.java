@@ -195,7 +195,7 @@ public class ColonyController {
                 throw new RequestException(e);
             }
 
-            sql = "INSERT IGNORE INTO empire_presences" +
+            sql = "INSERT INTO empire_presences" +
                     " (empire_id, star_id, total_goods, total_minerals)" +
                     " VALUES (?, ?, 100, 100)";
             try (SqlStmt stmt = db.prepare(sql)) {
@@ -203,7 +203,8 @@ public class ColonyController {
                 stmt.setInt(2, star.getID());
                 stmt.update();
             } catch(Exception e) {
-                throw new RequestException(e);
+                //TODO need to emulate INSERT IGNORE
+                //throw new RequestException(e);
             }
         }
 

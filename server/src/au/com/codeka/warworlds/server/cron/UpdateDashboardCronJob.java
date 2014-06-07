@@ -50,17 +50,20 @@ public class UpdateDashboardCronJob extends CronJob {
             }
         }
 
+        // TODO: the below two could be done with UPSERTs.
+        sql = "DELETE FROM dashboard_stats WHERE date = ?";
+        try (SqlStmt stmt = DB.prepare(sql)) {
+            stmt.setDateTime(1, new DateMidnight(dt));
+            stmt.update();
+        }
+
         sql = "INSERT INTO dashboard_stats (date, active_1d, active_7d, new_signups)" +
-             " VALUES (?, ?, ?, ?) ON DUPLICATE KEY UPDATE" +
-             " active_1d = ?, active_7d = ?, new_signups = ?";
+             " VALUES (?, ?, ?, ?)";
         try (SqlStmt stmt = DB.prepare(sql)) {
             stmt.setDateTime(1, new DateMidnight(dt));
             stmt.setInt(2, oneDA);
             stmt.setInt(3, sevenDA);
             stmt.setInt(4, newSignups);
-            stmt.setInt(5, oneDA);
-            stmt.setInt(6, sevenDA);
-            stmt.setInt(7, newSignups);
             stmt.update();
         }
     }

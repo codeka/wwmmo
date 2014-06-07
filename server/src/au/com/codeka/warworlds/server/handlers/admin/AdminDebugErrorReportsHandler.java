@@ -38,7 +38,7 @@ public class AdminDebugErrorReportsHandler extends AdminHandler {
                     " LEFT JOIN empires ON error_reports.empire_id = empires.id" +
                     " WHERE 1 = 1";
         if (cursor != 0) {
-            sql += " AND report_date < FROM_UNIXTIME("+cursor+")";
+            sql += " AND report_date < "+cursor;
         }
         if (getRequest().getParameter("empire") != null && !getRequest().getParameter("empire").equals("")) {
             String empire = getRequest().getParameter("empire");
@@ -169,7 +169,7 @@ public class AdminDebugErrorReportsHandler extends AdminHandler {
             long ms = Long.parseLong(getRequest().getParameter("ts"));
             int empireID = Integer.parseInt(getRequest().getParameter("e"));
 
-            String sql = "DELETE FROM error_reports WHERE report_date = FROM_UNIXTIME("+(ms / 1000)+")"+
+            String sql = "DELETE FROM error_reports WHERE report_date = "+(ms / 1000)+
                          " AND empire_id = "+empireID;
             try (SqlStmt stmt = DB.prepare(sql)) {
                 stmt.update();

@@ -72,7 +72,11 @@ public class LoginController {
             SqlResult res = stmt.select();
             if (res.next()) {
                 empireID = res.getInt(1);
-                allianceID = res.getInt(2);
+                if (res.getInt(2) == null) {
+                    allianceID = 0;
+                } else {
+                    allianceID = res.getInt(2);
+                }
                 BaseEmpire.State state = BaseEmpire.State.fromNumber(res.getInt(3));
                 if (state == BaseEmpire.State.BANNED) {
                     banned = true;

@@ -265,11 +265,11 @@ public class SectorController {
                 try (SqlStmt stmt = prepare(sql)) {
                     stmt.setLong(1, star1.getSectorX());
                     stmt.setLong(2, star1.getSectorY());
-                    sector1ID = stmt.selectFirstValue(Integer.class);
+                    sector1ID = (int) (long) stmt.selectFirstValue(Long.class);
 
                     stmt.setLong(1, star2.getSectorX());
                     stmt.setLong(2, star2.getSectorY());
-                    sector2ID = stmt.selectFirstValue(Integer.class);
+                    sector2ID = (int) (long) stmt.selectFirstValue(Long.class);
                 }
 
                 String[] sqls = {"UPDATE stars SET sector_id = ? WHERE id = ?",

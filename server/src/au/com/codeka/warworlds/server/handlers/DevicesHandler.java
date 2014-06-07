@@ -21,7 +21,7 @@ public class DevicesHandler extends RequestHandler {
                 "SELECT id FROM devices WHERE device_id=? AND user_email=?")) {
             sql.setString(1, registration.getDeviceId());
             sql.setString(2, getSession().getEmail());
-            id = sql.selectFirstValue(Integer.class);
+            id = (int) (long) sql.selectFirstValue(Long.class);
         } catch (RequestException e) {
             throw e;
         } catch (Exception e) {

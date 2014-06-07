@@ -409,7 +409,7 @@ public class AllianceController {
             try (SqlStmt stmt = prepare(sql)) {
                 stmt.setInt(1, vote.getAllianceRequestID());
                 stmt.setInt(2, vote.getEmpireID());
-                id = stmt.selectFirstValue(Integer.class);
+                id = (int) (long) stmt.selectFirstValue(Long.class);
             }
 
             if (id != null) {
