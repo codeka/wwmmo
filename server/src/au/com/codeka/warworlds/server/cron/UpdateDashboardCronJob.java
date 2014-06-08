@@ -23,13 +23,13 @@ public class UpdateDashboardCronJob extends CronJob {
         int sevenDA = 0;
         int newSignups = 0;
 
-        String sql = "SELECT DATE(date) AS date, COUNT(DISTINCT empire_id)," +
-                     " (SELECT COUNT(DISTINCT empire_id) FROM empire_logins AS sub WHERE sub.date BETWEEN DATE_SUB(DATE(l.date), INTERVAL 6 DAY) AND DATE_ADD(DATE(l.date), INTERVAL 1 DAY))" +
+        String sql = "SELECT DATE_TRUNC('day', l.date) AS date, COUNT(DISTINCT empire_id)," +
+                     " (SELECT COUNT(DISTINCT empire_id) FROM empire_logins AS sub WHERE sub.date BETWEEN (CURRENT_DATE - INTERVAL '6 DAY') AND (CURRENT_DATE + INTERVAL '1 DAY'))" +
                      " FROM empire_logins l" +
-                     " WHERE DATE(date) = ?" +
-                     " GROUP BY DATE(date)";
+                     " WHERE DATE_TRUNC('day', l.date) = CURRENT_DATE" +
+                     " GROUP BY DATE_TRUNC('day', l.date)";
         try (SqlStmt stmt = DB.prepare(sql)) {
-            stmt.setDateTime(1, new DateMidnight(dt));
+            //stmt.setDateTime(1, new DateMidnight(dt));
             SqlResult res = stmt.select();
             if (res.next()) {
                 oneDA = res.getInt(2);
@@ -67,5 +67,4 @@ public class UpdateDashboardCronJob extends CronJob {
             stmt.update();
         }
     }
-
 }

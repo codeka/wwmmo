@@ -31,19 +31,40 @@ public class RequestException extends Exception {
     }
 
     public RequestException(Throwable innerException) {
-        super((innerException instanceof RequestException) 
-                ? "HTTP Error: "+((RequestException) innerException).mHttpErrorCode
-                : (innerException instanceof SQLException)
-                    ? "SQL Error: "+((SQLException) innerException).getErrorCode()
-                    : "HTTP Error: 500", innerException);
+        super(getExceptionDescription(innerException));
 
-        if (innerException instanceof RequestException) {
-            RequestException innerRequestException = (RequestException) innerException;
-            mHttpErrorCode = innerRequestException.mHttpErrorCode;
-            mGenericError = innerRequestException.mGenericError;
+        RequestException reqExc = findInnerException(innerException, RequestException.class);
+        if (reqExc != null) {
+            mHttpErrorCode = reqExc.mHttpErrorCode;
+            mGenericError = reqExc.mGenericError;
         } else {
             mHttpErrorCode = 500;
         }
+    }
+
+    private static String getExceptionDescription(Throwable e) {
+        RequestException reqExc = findInnerException(e, RequestException.class);
+        if (reqExc != null) {
+            return "HTTP Error: " + reqExc.mHttpErrorCode;
+        }
+
+        SQLException sqlExc = findInnerException(e, SQLException.class);
+        if (sqlExc != null) {
+            return "SQL Error: " + sqlExc.getErrorCode();
+        }
+
+        return "Unknown Exception";
+    }
+
+    @SuppressWarnings("unchecked")
+    private static <T extends Exception> T findInnerException(Throwable e, Class<T> exceptionType) {
+        while (e != null) {
+            if (e.getClass().equals(exceptionType)) {
+                return (T) e;
+            }
+            e = e.getCause();
+        }
+        return null;
     }
 
     public RequestException(int httpErrorCode, Messages.GenericError.ErrorCode errorCode, String errorMsg) {
