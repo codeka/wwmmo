@@ -5,6 +5,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
+import org.postgresql.util.PSQLException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -69,14 +70,19 @@ public class DB {
         return sStrategy.beginTransaction();
     }
 
+    // PostgreSQL error codes are documented here:
+    // http://www.postgresql.org/docs/current/static/errcodes-appendix.html
+
     /** Determines whether the given {@link SQLException} was a constraint violation. */
     public static boolean isConstraintViolation(SQLException e) {
-        return false; // TODO
+        PSQLException psql = (PSQLException) e;
+        return psql.getSQLState().startsWith("23");
     }
 
     /** Determines whether the given {@link SQLException} is retryable (e.g. deadlock, etc) */
     public static boolean isRetryable(SQLException e) {
-        return false; // TODO
+        PSQLException psql = (PSQLException) e;
+        return psql.getSQLState().startsWith("40");
     }
 
     private interface Strategy {

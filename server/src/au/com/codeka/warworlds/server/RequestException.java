@@ -1,5 +1,7 @@
 package au.com.codeka.warworlds.server;
 
+import java.sql.SQLException;
+
 import javax.servlet.http.HttpServletResponse;
 
 import au.com.codeka.common.protobuf.Messages;
@@ -31,7 +33,9 @@ public class RequestException extends Exception {
     public RequestException(Throwable innerException) {
         super((innerException instanceof RequestException) 
                 ? "HTTP Error: "+((RequestException) innerException).mHttpErrorCode
-                : "HTTP Error: 500", innerException);
+                : (innerException instanceof SQLException)
+                    ? "SQL Error: "+((SQLException) innerException).getErrorCode()
+                    : "HTTP Error: 500", innerException);
 
         if (innerException instanceof RequestException) {
             RequestException innerRequestException = (RequestException) innerException;
