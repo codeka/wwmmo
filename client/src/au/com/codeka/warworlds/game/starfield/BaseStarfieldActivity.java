@@ -21,8 +21,6 @@ public abstract class BaseStarfieldActivity extends BaseGlActivity {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         super.onCreate(savedInstanceState);
 
-        EmpireShieldManager.i.clearTextureCache();
-
         mStarfield = new StarfieldSceneManager(this);
     }
 
@@ -45,6 +43,12 @@ public abstract class BaseStarfieldActivity extends BaseGlActivity {
     public void onStart() {
         super.onStart();
         mStarfield.onStart();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume(); 
+        EmpireShieldManager.i.clearTextureCache();
     }
 
     @Override
