@@ -3,6 +3,7 @@ package au.com.codeka.warworlds.model;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.lang.ref.SoftReference;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -211,10 +212,16 @@ public abstract class ShieldManager implements RealmManager.RealmChangedHandler 
         f = f.getParentFile();
         f.mkdirs();
 
+        FileOutputStream fos = null;
         try {
-            bmp.compress(CompressFormat.PNG, 100, new FileOutputStream(fullPath));
+            fos = new FileOutputStream(fullPath);
+            bmp.compress(CompressFormat.PNG, 100, fos);
         } catch (FileNotFoundException e) {
             // ignore errors
+        } finally {
+            if (fos != null) {
+                try { fos.close(); } catch (IOException e) {}
+            }
         }
     }
 

@@ -62,6 +62,7 @@ public class FleetEntity extends SelectableEntity {
 
         float x = getX();
         float y = getY();
+
         mSelectionLine.setPosition((float) mSrcPoint.x - x, (float) mSrcPoint.y - y,
                                    (float) mDestPoint.x - x, (float) mDestPoint.y - y);
         attachChild(mSelectionLine);

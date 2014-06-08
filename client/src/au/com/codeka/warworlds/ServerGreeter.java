@@ -382,7 +382,7 @@ public class ServerGreeter {
         }.execute();
     }
 
-    @SuppressLint({ "NewApi" }) // StrictMode doesn't work on < 3.0
+    @SuppressLint({ "NewApi" }) // StrictMode doesn't work on < 3.0 and some of the tests are even newer
     private static void enableStrictMode() {
         try {
             StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
@@ -390,6 +390,14 @@ public class ServerGreeter {
                       .detectDiskWrites()
                       .detectNetwork()
                       .penaltyLog()
+                      .build());
+            StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
+                      .detectActivityLeaks()
+                      .detectLeakedClosableObjects()
+                      .detectLeakedRegistrationObjects()
+                      .detectLeakedSqlLiteObjects()
+                      .penaltyLog()
+                      .penaltyDeath() // these are bad enough to warrent death...
                       .build());
         } catch(Exception e) {
             // ignore errors

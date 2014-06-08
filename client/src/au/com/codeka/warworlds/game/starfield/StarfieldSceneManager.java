@@ -785,16 +785,21 @@ public class StarfieldSceneManager extends SectorSceneManager
         mSelectingEntity = entity;
     }
 
-    public void selectStar(StarEntity selectedStarEntity) {
-        mSelectedStarEntity = selectedStarEntity;
-        mSelectedFleetEntity = null;
+    public void selectStar(final StarEntity selectedStarEntity) {
+        getActivity().runOnUpdateThread(new Runnable() {
+            @Override
+            public void run() {
+                mSelectedStarEntity = selectedStarEntity;
+                mSelectedFleetEntity = null;
 
-        refreshSelectionIndicator();
-        if (mSelectedStarEntity == null) {
-            fireSelectionChanged((Star) null);
-        } else {
-            fireSelectionChanged(mSelectedStarEntity.getStar());
-        }
+                refreshSelectionIndicator();
+                if (mSelectedStarEntity == null) {
+                    fireSelectionChanged((Star) null);
+                } else {
+                    fireSelectionChanged(mSelectedStarEntity.getStar());
+                }
+            }
+        });
     }
 
     public void selectStar(String starKey) {
@@ -817,12 +822,17 @@ public class StarfieldSceneManager extends SectorSceneManager
         selectStar(mStars.get(starKey));
     }
 
-    public void selectFleet(FleetEntity fleet) {
-        mSelectedStarEntity = null;
-        mSelectedFleetEntity = fleet;
+    public void selectFleet(final FleetEntity fleet) {
+        getActivity().runOnUpdateThread(new Runnable() {
+            @Override
+            public void run() {
+                mSelectedStarEntity = null;
+                mSelectedFleetEntity = fleet;
 
-        refreshSelectionIndicator();
-        fireSelectionChanged(mSelectedFleetEntity == null ? null : mSelectedFleetEntity.getFleet());
+                refreshSelectionIndicator();
+                fireSelectionChanged(mSelectedFleetEntity == null ? null : mSelectedFleetEntity.getFleet());
+            }
+        });
     }
 
     public void selectFleet(String fleetKey) {
@@ -840,22 +850,28 @@ public class StarfieldSceneManager extends SectorSceneManager
     }
 
     /** Deselects the fleet or star you currently have selected. */
-    private void selectNothing(long sectorX, long sectorY, int offsetX, int offsetY) {
-        if (mSelectedStarEntity != null) {
-            mSelectedStarEntity = null;
-            refreshSelectionIndicator();
-            fireSelectionChanged((Star) null);
-        }
+    private void selectNothing(final long sectorX, final long sectorY, final int offsetX,
+            final int offsetY) {
+        getActivity().runOnUpdateThread(new Runnable() {
+            @Override
+            public void run() {
+                if (mSelectedStarEntity != null) {
+                    mSelectedStarEntity = null;
+                    refreshSelectionIndicator();
+                    fireSelectionChanged((Star) null);
+                }
 
-        if (mSelectedFleetEntity != null) {
-            mSelectedFleetEntity = null;
-            refreshSelectionIndicator();
-            fireSelectionChanged((Fleet) null);
-        }
+                if (mSelectedFleetEntity != null) {
+                    mSelectedFleetEntity = null;
+                    refreshSelectionIndicator();
+                    fireSelectionChanged((Fleet) null);
+                }
 
-        if (mSpaceTapListener != null) {
-            mSpaceTapListener.onSpaceTap(sectorX, sectorY, offsetX, offsetY);
-        }
+                if (mSpaceTapListener != null) {
+                    mSpaceTapListener.onSpaceTap(sectorX, sectorY, offsetX, offsetY);
+                }
+            }
+        });
     }
 
     private void refreshSelectionIndicator() {
@@ -888,12 +904,18 @@ public class StarfieldSceneManager extends SectorSceneManager
      * have the latest data (e.g. it might've been renamed)
      */
     @Override
-    public void onStarFetched(Star s) {
-        // if it's the selected star, we'll want to update the selection
-        if (s != null && mSelectedStarEntity != null && s.getKey().equals(mSelectedStarEntity.getStar().getKey())) {
-            mSelectedStarEntity.setStar(s);
-            refreshSelectionIndicator();
-        }
+    public void onStarFetched(final Star s) {
+        getActivity().runOnUpdateThread(new Runnable() {
+            @Override
+            public void run() {
+                // if it's the selected star, we'll want to update the selection
+                if (s != null && mSelectedStarEntity != null &&
+                        s.getKey().equals(mSelectedStarEntity.getStar().getKey())) {
+                    mSelectedStarEntity.setStar(s);
+                    refreshSelectionIndicator();
+                }
+            }
+        });
     }
 
     /** Represents the PointCloud used by the tactical view. */
