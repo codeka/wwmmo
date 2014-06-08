@@ -70,7 +70,6 @@ public class ColonyController {
             totalTroopCarriers += fleet.getNumShips();
             troopCarriers.add(fleet);
         }
-
         float colonyDefence = 0.25f * colony.getPopulation() * colony.getDefenceBoost();
         if (colonyDefence < 1.0f) {
             colonyDefence = 1.0f;
@@ -79,66 +78,73 @@ public class ColonyController {
         float remainingShips = totalTroopCarriers - colonyDefence;
         float remainingPopulation = colony.getPopulation() - (totalTroopCarriers * 4.0f / colony.getDefenceBoost());
 
+        Messages.SituationReport.Builder sitrep_pb = null;
         if (colony.getEmpireID() != null) {
-            Messages.SituationReport.Builder sitrep_pb = Messages.SituationReport.newBuilder();
+            sitrep_pb = Messages.SituationReport.newBuilder();
             sitrep_pb.setRealm(new RealmController().getRealmName());
             sitrep_pb.setEmpireKey(Integer.toString(colony.getEmpireID()));
             sitrep_pb.setReportTime(DateTime.now().getMillis() / 1000);
             sitrep_pb.setStarKey(star.getKey());
             sitrep_pb.setPlanetIndex(colony.getPlanetIndex());
-    
-            if (remainingPopulation <= 0.0f) {
-                log.info(String.format("Colony destroyed: remainingPopulation=%.2f, remainingShips=%.2f",
-                                       remainingPopulation, remainingShips));
-                float numShipsLost = totalTroopCarriers - remainingShips;
-                for (Fleet fleet : troopCarriers) {
-                    float numShips = fleet.getNumShips();
-                    new FleetController(db.getTransaction()).removeShips(star, fleet, numShipsLost);
-                    numShipsLost -= numShips;
-                    if (numShipsLost <= 0.0f) {
-                        break;
-                    }
+        }
+
+        if (remainingPopulation <= 0.0f) {
+            log.info(String.format("Colony destroyed: remainingPopulation=%.2f, remainingShips=%.2f",
+                                   remainingPopulation, remainingShips));
+            float numShipsLost = totalTroopCarriers - remainingShips;
+            for (Fleet fleet : troopCarriers) {
+                float numShips = fleet.getNumShips();
+                new FleetController(db.getTransaction()).removeShips(star, fleet, numShipsLost);
+                numShipsLost -= numShips;
+                if (numShipsLost <= 0.0f) {
+                    break;
                 }
-    
-                try {
-                    db.destroyColony(colony.getStarID(), colony.getID());
-                } catch (Exception e) {
-                    throw new RequestException(e);
+            }
+
+            try {
+                db.destroyColony(colony.getStarID(), colony.getID());
+            } catch (Exception e) {
+                throw new RequestException(e);
+            }
+            new StarController(db.getTransaction()).removeEmpirePresences(colony.getStarID());
+            star.getColonies().remove(colony);
+
+            // if this is the last colony for this empire on this star, make sure the empire's home
+            // star is reset
+            boolean anotherColonyExists = false;
+            for (BaseColony baseColony : star.getColonies()) {
+                if (baseColony.getEmpireKey() != null && baseColony.getEmpireKey().equals(colony.getEmpireKey())) {
+                    anotherColonyExists = true;
                 }
-                new StarController(db.getTransaction()).removeEmpirePresences(colony.getStarID());
-                star.getColonies().remove(colony);
-    
-                // if this is the last colony for this empire on this star, make sure the empire's home
-                // star is reset
-                boolean anotherColonyExists = false;
-                for (BaseColony baseColony : star.getColonies()) {
-                    if (baseColony.getEmpireKey() != null && baseColony.getEmpireKey().equals(colony.getEmpireKey())) {
-                        anotherColonyExists = true;
-                    }
-                }
-                if (!anotherColonyExists && new EmpireController().getEmpire(empireID).getHomeStarID() == star.getID()) {
-                    new EmpireController().findNewHomeStar(empireID);
-                }
-    
+            }
+            if (!anotherColonyExists && new EmpireController().getEmpire(empireID).getHomeStarID() == star.getID()) {
+                new EmpireController().findNewHomeStar(empireID);
+            }
+
+            if (sitrep_pb != null) {
                 Messages.SituationReport.ColonyDestroyedRecord.Builder colony_destroyed_pb = Messages.SituationReport.ColonyDestroyedRecord.newBuilder();
                 colony_destroyed_pb.setColonyKey(colony.getKey());
                 colony_destroyed_pb.setEnemyEmpireKey(Integer.toString(empireID));
                 sitrep_pb.setColonyDestroyedRecord(colony_destroyed_pb);
-            } else {
-                log.info(String.format("Fleets destroyed: remainingPopulation=%.2f, remainingShips=%.2f",
-                        remainingPopulation, remainingShips));
-                colony.setPopulation(remainingPopulation);
-                for (Fleet fleet : troopCarriers) {
-                    new FleetController(db.getTransaction()).removeShips(star, fleet, fleet.getNumShips());
-                }
-    
+            }
+        } else {
+            log.info(String.format("Fleets destroyed: remainingPopulation=%.2f, remainingShips=%.2f",
+                    remainingPopulation, remainingShips));
+            colony.setPopulation(remainingPopulation);
+            for (Fleet fleet : troopCarriers) {
+                new FleetController(db.getTransaction()).removeShips(star, fleet, fleet.getNumShips());
+            }
+
+            if (sitrep_pb != null) {
                 Messages.SituationReport.ColonyAttackedRecord.Builder colony_attacked_pb = Messages.SituationReport.ColonyAttackedRecord.newBuilder();
                 colony_attacked_pb.setColonyKey(colony.getKey());
                 colony_attacked_pb.setEnemyEmpireKey(Integer.toString(empireID));
                 colony_attacked_pb.setNumShips(totalTroopCarriers);
                 sitrep_pb.setColonyAttackedRecord(colony_attacked_pb);
             }
-    
+        }
+
+        if (sitrep_pb != null) {
             new SituationReportController().saveSituationReport(sitrep_pb.build());
         }
     }
